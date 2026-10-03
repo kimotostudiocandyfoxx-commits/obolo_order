@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- PLACEHOLDER (P-BRAND-1): provisional app icon until the official logo is delivered -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#1b2246"/><stop offset="1" stop-color="#04050d"/></radialGradient>
+    <radialGradient id="e" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#7fd3ff"/><stop offset="1" stop-color="#1d4fa8"/></radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#8fd8ff" stroke-opacity=".35" stroke-width="4" stroke-dasharray="6 14"/>
+  <circle cx="256" cy="256" r="82" fill="url(#e)"/>
+  <circle cx="256" cy="106" r="30" fill="#f2f0e6"/>
+  <circle cx="362" cy="150" r="22" fill="#e9cf94"/>
+  <circle cx="150" cy="362" r="22" fill="#a9c4ff"/>
+</svg>

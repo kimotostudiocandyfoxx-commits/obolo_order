@@ -11,7 +11,7 @@ export class MediaController {
   @Post('voice')
   @UseGuards(AuthGuard)
   upload(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
-    return this.media.uploadVoice(userId, type, req.body);
+    return this.media.uploadVoice(userId, type, req.body, `${req.protocol}://${req.get('host')}`);
   }
 
   /** Dev/preview fallback delivery for media stored in Postgres (P-MEDIA-1). */

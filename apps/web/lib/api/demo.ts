@@ -1,0 +1,306 @@
+import {
+  BUDDY_FREE_DAILY_MESSAGES,
+  MONTHLY_GRANT_MANA,
+  type BuddyMessageView,
+  type BuddyPersona,
+  type Locale,
+  type Me,
+  type SaturnPostView,
+} from '@obolo/shared';
+import { putBlob } from './idb';
+import { tokenStore } from './token';
+import { ApiError, type Api } from './types';
+
+/**
+ * DEMO MODE — used when NEXT_PUBLIC_API_URL is empty (e.g. a Vercel preview before Cloud Run
+ * is connected). Mirrors the real API contract with browser storage so every "live" planet can
+ * be clicked through. Nothing here is the system of record.
+ */
+
+interface DemoWalletEntry {
+  id: string;
+  delta: number;
+  reason: string;
+  createdAt: string;
+}
+interface DemoState {
+  users: Record<string, Me>; // by id
+  sessions: Record<string, string>; // token -> userId
+  wallets: Record<string, { mana: number; entries: DemoWalletEntry[]; lastActivity: string }>;
+  buddy: Record<string, { name: string; persona: BuddyPersona; memory: string[]; messages: BuddyMessageView[] }>;
+  posts: (Omit<SaturnPostView, 'starredByMe'> & { starredBy: string[] })[];
+  quota: Record<string, number>;
+  pendingCodes: Record<string, string>;
+}
+
+const KEY = 'obolo.demo.v1';
+const uid = () => crypto.randomUUID();
+const now = () => new Date().toISOString();
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date());
+
+function seedPosts(): DemoState['posts'] {
+  const mk = (min: number, handle: string, name: string, text: string, stars: number) => ({
+    id: uid(),
+    author: { id: `seed-${handle}`, handle, displayName: name },
+    text,
+    voiceUrl: `tts:${text}`,
+    voiceSource: 'default' as const,
+    voiceDurationSec: null,
+    starCount: stars,
+    starredBy: [],
+    createdAt: new Date(Date.now() - min * 60_000).toISOString(),
+  });
+  return [
+    mk(4, 'dj_kimoto', 'DJ KIMOTO', '今夜は新曲のミックス作業中🎧 土星のみんなに一番に聴いてほしいな', 128),
+    mk(37, 'hana_sings', 'はな', '朝の散歩で鳥の声を録ってきた。声で投稿できるの、ほんとに楽しい！', 54),
+    mk(180, 'leo_space', 'Leo', 'Hello from Singapore! Saturn feels like a radio station made of friends.', 77),
+    mk(1440, 'mika88', 'みか', '88円でこんなに遊べるの、すごくない？🪐', 31),
+  ];
+}
+
+function load(): DemoState {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return JSON.parse(raw) as DemoState;
+  } catch {
+    /* ignore */
+  }
+  return { users: {}, sessions: {}, wallets: {}, buddy: {}, posts: seedPosts(), quota: {}, pendingCodes: {} };
+}
+
+function cannedReply(text: string, name: string, memory: string[], locale: Locale): string {
+  const has = (...ws: string[]) => ws.some((w) => text.toLowerCase().includes(w));
+  const remembered = memory.length ? memory[Math.floor(Math.random() * memory.length)] : null;
+  if (locale === 'en') {
+    if (has('hello', 'hi', 'hey')) return `Hey hey! ${name} here 🌙 What's on your mind today?`;
+    if (has('tired', 'sleepy')) return `You worked hard today ✨ Want me to play you something chill on Mercury?`;
+    if (has('music', 'song')) return `Music! My favourite topic 🎵 What kind of sound are you into lately?`;
+    if (remembered && Math.random() < 0.5) return `By the way, you told me before: "${remembered}". I remembered! 😊`;
+    return `Ooh, "${text.slice(0, 30)}"! Tell me more ✨`;
+  }
+  if (has('こんにちは', 'やっほ', 'おはよ', 'こんばん')) return `やっほー！${name}だよ🌙 今日はどんなことがあった？`;
+  if (has('疲れ', 'つかれ', '眠', 'ねむ')) return `今日もおつかれさま✨ 水星でゆったりした曲でも聴く？`;
+  if (has('音楽', '曲', 'うた', '歌')) return `音楽の話、大好き！🎵 最近どんな曲にハマってる？`;
+  if (remembered && Math.random() < 0.5) return `そういえば前に「${remembered}」って言ってたよね。ちゃんと覚えてるよ😊`;
+  return `「${text.slice(0, 24)}」かぁ！もっと聞かせて✨`;
+}
+
+export class DemoApi implements Api {
+  readonly mode = 'demo' as const;
+  private s: DemoState = typeof window === 'undefined' ? ({} as DemoState) : load();
+
+  private save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(this.s));
+    } catch {
+      /* quota */
+    }
+  }
+  private uid(): string {
+    const t = tokenStore.get();
+    const id = t ? this.s.sessions[t] : undefined;
+    if (!id || !this.s.users[id]) throw new ApiError(401, 'UNAUTHENTICATED', 'Login required');
+    return id;
+  }
+
+  async requestCode(email: string) {
+    await sleep(300);
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    this.s.pendingCodes[email.toLowerCase()] = code;
+    this.save();
+    return { sent: true as const, devCode: code };
+  }
+
+  async verify(email: string, code: string) {
+    await sleep(300);
+    const e = email.toLowerCase();
+    if (this.s.pendingCodes[e] !== code) throw new ApiError(400, 'CODE_INVALID', 'Wrong code');
+    delete this.s.pendingCodes[e];
+    let user = Object.values(this.s.users).find((u) => u.email === e);
+    const isNew = !user;
+    if (!user) {
+      const base = e.split('@')[0].replace(/[^a-z0-9_]/g, '').slice(0, 12) || 'star';
+      user = {
+        id: uid(),
+        email: e,
+        handle: `${base}_${Math.random().toString(16).slice(2, 6)}`,
+        displayName: base,
+        bio: '',
+        country: 'JP',
+        locale: (document.documentElement.lang as Locale) || 'ja',
+        subscriptionStatus: 'demo',
+        createdAt: now(),
+      };
+      this.s.users[user.id] = user;
+      this.s.wallets[user.id] = {
+        mana: MONTHLY_GRANT_MANA,
+        lastActivity: now(),
+        entries: [{ id: uid(), delta: MONTHLY_GRANT_MANA, reason: 'demo_grant', createdAt: now() }],
+      };
+    }
+    const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+    this.s.sessions[token] = user.id;
+    this.save();
+    return { token, user, isNew };
+  }
+
+  async logout() {
+    const t = tokenStore.get();
+    if (t) delete this.s.sessions[t];
+    this.save();
+    tokenStore.clear();
+  }
+
+  async me() {
+    return this.s.users[this.uid()];
+  }
+
+  async updateMe(body: Parameters<Api['updateMe']>[0]) {
+    const id = this.uid();
+    if (body.handle && Object.values(this.s.users).some((u) => u.handle === body.handle && u.id !== id)) {
+      throw new ApiError(409, 'HANDLE_TAKEN', 'taken');
+    }
+    const u = { ...this.s.users[id], ...Object.fromEntries(Object.entries(body).filter(([, v]) => v !== undefined)) };
+    this.s.users[id] = u;
+    for (const p of this.s.posts) if (p.author.id === id) p.author = { id, handle: u.handle, displayName: u.displayName };
+    this.save();
+    return u;
+  }
+
+  async wallet() {
+    const w = this.s.wallets[this.uid()];
+    const exp = new Date(w.lastActivity);
+    exp.setFullYear(exp.getFullYear() + 1);
+    return {
+      manaBalance: w.mana,
+      earningsBalanceJpy: 0,
+      manaExpiresAt: w.mana > 0 ? exp.toISOString() : null,
+      recent: w.entries.slice(-20).reverse().map((e) => ({ ...e, ledger: 'mana' as const })),
+    };
+  }
+
+  private buddyOf(id: string) {
+    const locale = this.s.users[id]?.locale ?? 'ja';
+    this.s.buddy[id] ??= {
+      name: locale === 'en' ? 'Bati' : 'バティ',
+      persona: { cheer: 80, polite: 30, humor: 65 },
+      memory: [],
+      messages: [],
+    };
+    return this.s.buddy[id];
+  }
+
+  async buddyProfile() {
+    const b = this.buddyOf(this.uid());
+    return { buddyName: b.name, persona: b.persona, hasMemory: b.memory.length > 0 };
+  }
+
+  async updateBuddyProfile(body: Parameters<Api['updateBuddyProfile']>[0]) {
+    const b = this.buddyOf(this.uid());
+    if (body.buddyName) b.name = body.buddyName;
+    if (body.persona) b.persona = body.persona;
+    this.save();
+    return this.buddyProfile();
+  }
+
+  async buddyMessages(cursor?: string) {
+    const msgs = [...this.buddyOf(this.uid()).messages].reverse();
+    const start = cursor ? Number(cursor) : 0;
+    const items = msgs.slice(start, start + 30);
+    return { items, nextCursor: start + 30 < msgs.length ? String(start + 30) : null };
+  }
+
+  async buddyQuota() {
+    return { usedToday: this.s.quota[`${this.uid()}:${today()}`] ?? 0, freeDaily: BUDDY_FREE_DAILY_MESSAGES };
+  }
+
+  async buddyChat(text: string, locale: Locale) {
+    const id = this.uid();
+    const qk = `${id}:${today()}`;
+    const used = (this.s.quota[qk] ?? 0) + 1;
+    if (used > BUDDY_FREE_DAILY_MESSAGES) throw new ApiError(429, 'BUDDY_QUOTA', 'quota');
+    this.s.quota[qk] = used;
+    const b = this.buddyOf(id);
+    await sleep(700 + Math.random() * 600);
+    const reply = cannedReply(text, b.name, b.memory, locale);
+    const t0 = Date.now();
+    const userMessage: BuddyMessageView = { id: uid(), role: 'user', text, createdAt: new Date(t0).toISOString() };
+    const buddyMessage: BuddyMessageView = { id: uid(), role: 'buddy', text: reply, createdAt: new Date(t0 + 1).toISOString() };
+    b.messages.push(userMessage, buddyMessage);
+    // Demo "memory": remember short statements the user makes about themselves.
+    if (/好き|嫌い|名前|趣味|i like|i love|my name|hobby/i.test(text)) b.memory = [...b.memory, text.slice(0, 40)].slice(-15);
+    this.save();
+    return { userMessage, reply: buddyMessage, quota: { usedToday: used, freeDaily: BUDDY_FREE_DAILY_MESSAGES } };
+  }
+
+  async buddyForget() {
+    const b = this.buddyOf(this.uid());
+    b.memory = [];
+    b.messages = [];
+    this.save();
+  }
+
+  async uploadVoice(blob: Blob) {
+    this.uid();
+    const id = uid();
+    await putBlob(id, blob);
+    return { id, url: `idb:${id}` };
+  }
+
+  private view(p: DemoState['posts'][number], viewer: string): SaturnPostView {
+    const { starredBy, ...rest } = p;
+    return { ...rest, starredByMe: starredBy.includes(viewer) };
+  }
+
+  async saturnFeed(cursor?: string) {
+    const viewer = this.uid();
+    const sorted = [...this.s.posts].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const start = cursor ? Number(cursor) : 0;
+    return {
+      items: sorted.slice(start, start + 20).map((p) => this.view(p, viewer)),
+      nextCursor: start + 20 < sorted.length ? String(start + 20) : null,
+    };
+  }
+
+  async createSaturnPost(body: Parameters<Api['createSaturnPost']>[0]) {
+    const id = this.uid();
+    const u = this.s.users[id];
+    const p = {
+      id: uid(),
+      author: { id, handle: u.handle, displayName: u.displayName },
+      text: body.text,
+      voiceUrl: `idb:${body.voiceMediaId}`,
+      voiceSource: 'recorded' as const,
+      voiceDurationSec: body.voiceDurationSec ?? null,
+      starCount: 0,
+      starredBy: [],
+      createdAt: now(),
+    };
+    this.s.posts.push(p);
+    this.save();
+    return this.view(p, id);
+  }
+
+  async deleteSaturnPost(postId: string) {
+    const id = this.uid();
+    this.s.posts = this.s.posts.filter((p) => !(p.id === postId && p.author.id === id));
+    this.save();
+  }
+
+  async starSaturnPost(postId: string, on: boolean) {
+    const id = this.uid();
+    const p = this.s.posts.find((x) => x.id === postId);
+    if (!p) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    const had = p.starredBy.includes(id);
+    if (on && !had) {
+      p.starredBy.push(id);
+      p.starCount++;
+    } else if (!on && had) {
+      p.starredBy = p.starredBy.filter((x) => x !== id);
+      p.starCount = Math.max(0, p.starCount - 1);
+    }
+    this.save();
+    return { starCount: p.starCount, starredByMe: on };
+  }
+}

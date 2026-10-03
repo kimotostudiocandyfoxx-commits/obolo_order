@@ -23,17 +23,17 @@ export class MediaService {
     return { zone: c.BUNNY_STORAGE_ZONE, accessKey: c.BUNNY_STORAGE_KEY, endpoint: c.BUNNY_STORAGE_ENDPOINT, cdnHost: c.BUNNY_CDN_HOST };
   }
 
-  async uploadVoice(userId: string, mimeHeader: string | undefined, body: unknown) {
+  async uploadVoice(userId: string, mimeHeader: string | undefined, body: unknown, requestOrigin: string) {
     const mime = (mimeHeader ?? '').split(';')[0].trim().toLowerCase();
     if (!(VOICE_MIME_TYPES as readonly string[]).includes(mime)) {
       throw apiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 'UNSUPPORTED_AUDIO', `Unsupported audio type: ${mime || 'none'}`);
     }
     if (!Buffer.isBuffer(body) || body.length === 0) throw apiError(HttpStatus.BAD_REQUEST, 'EMPTY_UPLOAD', 'No audio received');
     if (body.length > VOICE_MAX_BYTES) throw apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'TOO_LARGE', 'Audio file too large');
-    return this.store(userId, 'voice', mime, body);
+    return this.store(userId, 'voice', mime, body, requestOrigin);
   }
 
-  private async store(userId: string, kind: MediaKind, mime: string, data: Buffer) {
+  private async store(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string) {
     const [u] = await this.db.write.select({ used: users.storageUsageBytes }).from(users).where(eq(users.id, userId));
     if ((u?.used ?? 0) + data.length > STORAGE_QUOTA_BYTES) {
       // Spec §5: reject with a storage add-on offer (add-on purchase = phase 1 billing, P-BILL-1).
@@ -49,7 +49,7 @@ export class MediaService {
       storage = 'bunny';
     } else {
       // Dev / preview fallback only (P-MEDIA-1). Production must always use Bunny.
-      url = `${this.cfg.PUBLIC_API_URL.replace(/\/$/, '')}/media/${id}`;
+      url = `${(this.cfg.PUBLIC_API_URL ?? requestOrigin).replace(/\/$/, '')}/media/${id}`;
       storage = 'db';
     }
     await this.db.write.transaction(async (tx) => {

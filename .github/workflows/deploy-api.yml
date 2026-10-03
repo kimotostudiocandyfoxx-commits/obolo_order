@@ -1,0 +1,71 @@
+# Deploys apps/api to Google Cloud Run (Tokyo, asia-northeast1).
+# Runs on pushes to main that touch the API, or manually from the GitHub "Actions" tab
+# (works from an iPad: Actions → Deploy API → Run workflow).
+# One-time setup is described in docs/deploy.md (all values below are PLACEHOLDERS: P-INFRA-1).
+name: Deploy API
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['apps/api/**', 'packages/**', 'pnpm-lock.yaml']
+
+concurrency:
+  group: deploy-api
+  cancel-in-progress: false
+
+env:
+  REGION: asia-northeast1
+  SERVICE: obolo-api
+  REPO: obolo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ vars.GCP_PROJECT_ID != '' }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build & push image
+        run: |
+          IMAGE="${REGION}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${REPO}/${SERVICE}:${GITHUB_SHA}"
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker build -f apps/api/Dockerfile -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: ${{ env.IMAGE }}
+          flags: >-
+            --allow-unauthenticated
+            --service-account=${{ vars.GCP_RUNTIME_SA }}
+            --add-cloudsql-instances=${{ vars.CLOUDSQL_INSTANCE }}
+            --cpu=1 --memory=512Mi --concurrency=80 --min-instances=0 --max-instances=20
+          env_vars: |
+            NODE_ENV=production
+            MIGRATE_ON_START=true
+            QUEUE_DRIVER=inline
+            CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
+            AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || 'true' }}
+            BUDDY_OVERAGE_ENABLED=false
+            BUNNY_STORAGE_ZONE=${{ vars.BUNNY_STORAGE_ZONE }}
+            BUNNY_STORAGE_ENDPOINT=${{ vars.BUNNY_STORAGE_ENDPOINT || 'sg.storage.bunnycdn.com' }}
+            BUNNY_CDN_HOST=${{ vars.BUNNY_CDN_HOST }}
+          secrets: |
+            DATABASE_URL=obolo-database-url:latest
+            REDIS_URL=obolo-redis-url:latest
+            GEMINI_API_KEY=obolo-gemini-api-key:latest
+            BUNNY_STORAGE_KEY=obolo-bunny-storage-key:latest

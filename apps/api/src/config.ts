@@ -10,6 +10,13 @@ const bool = (def: boolean) =>
     .optional()
     .transform((v) => (v === undefined ? def : v === 'true' || v === '1'));
 
+/** Optional secret: empty or "PLACEHOLDER…" means "not configured yet" (lets deploys succeed before keys exist). */
+const secret = () =>
+  z
+    .string()
+    .optional()
+    .transform((v) => (!v || v.trim() === '' || v.startsWith('PLACEHOLDER') ? undefined : v.trim()));
+
 const Env = z.object({
   NODE_ENV: z.string().default('development'),
   PORT: z.coerce.number().default(8080),
@@ -18,12 +25,12 @@ const Env = z.object({
    *  postgres://USER:PASS@/DB?host=/cloudsql/PROJECT:asia-northeast1:INSTANCE */
   DATABASE_URL: z.string().default('postgres://postgres:postgres@localhost:5432/obolo'),
   /** Optional read replica. Falls back to DATABASE_URL (read/write split ready, spec decision). */
-  DATABASE_READ_URL: z.string().optional(),
+  DATABASE_READ_URL: secret(),
   DB_POOL_MAX: z.coerce.number().default(5),
   MIGRATE_ON_START: bool(false),
 
   /** Upstash: rediss://default:TOKEN@HOST:6379 . Empty = in-memory store (single-instance dev only). */
-  REDIS_URL: z.string().optional(),
+  REDIS_URL: secret(),
   /** "inline" runs jobs in-process after the response; "bullmq" pushes to Redis for apps/api worker. */
   QUEUE_DRIVER: z.enum(['inline', 'bullmq']).default('inline'),
 
@@ -37,12 +44,12 @@ const Env = z.object({
   AUTH_DEMO_SHOW_CODE: bool(false),
   /** PLACEHOLDER (P-AUTH-2): "console" logs codes; "resend" sends real email. */
   EMAIL_DRIVER: z.enum(['console', 'resend']).default('console'),
-  RESEND_API_KEY: z.string().optional(),
+  RESEND_API_KEY: secret(),
   EMAIL_FROM: z.string().default('Obolo Order <no-reply@example.com>'),
 
-  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: secret(),
   GEMINI_MODEL: z.string().optional(),
-  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: secret(),
   OPENAI_MODEL: z.string().optional(),
 
   BUDDY_FREE_DAILY: z.coerce.number().default(30),
@@ -52,12 +59,12 @@ const Env = z.object({
   DEMO_SIGNUP_GRANT_MANA: z.coerce.number().default(88),
 
   /** Bunny Storage (PLACEHOLDER P-MEDIA-1). If any is missing, media is stored in Postgres (dev only). */
-  BUNNY_STORAGE_ZONE: z.string().optional(),
-  BUNNY_STORAGE_KEY: z.string().optional(),
+  BUNNY_STORAGE_ZONE: secret(),
+  BUNNY_STORAGE_KEY: secret(),
   BUNNY_STORAGE_ENDPOINT: z.string().default('sg.storage.bunnycdn.com'),
-  BUNNY_CDN_HOST: z.string().optional(),
-  /** Public base URL of this API, used for dev-fallback media URLs. */
-  PUBLIC_API_URL: z.string().default('http://localhost:8080'),
+  BUNNY_CDN_HOST: secret(),
+  /** Public base URL of this API for dev-fallback media URLs. Unset = derived from the request host. */
+  PUBLIC_API_URL: secret(),
 });
 
 export type AppConfig = z.infer<typeof Env>;

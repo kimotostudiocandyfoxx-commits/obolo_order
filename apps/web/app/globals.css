@@ -1,0 +1,266 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-space-950: #04050d;
+  --color-space-900: #080b1c;
+  --color-space-800: #10152e;
+  --color-space-700: #1b2246;
+  --color-glow: #8fd8ff;
+  --color-mana: #b79bff;
+  --color-star: #ffd36b;
+  --font-sans: 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic', system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-space-950);
+  color: #eef1ff;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  min-height: 100svh;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(84, 70, 190, 0.28), transparent 60%),
+    radial-gradient(90% 50% at 100% 100%, rgba(30, 120, 200, 0.18), transparent 60%),
+    var(--color-space-950);
+  background-attachment: fixed;
+}
+
+/* ---------- Starfield (pure CSS, no images) ---------- */
+.starfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 70%, #cfe3ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 55% 35%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 75% 15%, #ffe9c9 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 60%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 20% 90%, #d9d2ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 65% 85%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 92%, #cfe3ff 50%, transparent 51%),
+    radial-gradient(1px 1px at 45% 5%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 5% 50%, #fff 50%, transparent 51%);
+  background-size: 260px 260px;
+  opacity: 0.7;
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+.starfield.layer2 {
+  background-size: 410px 410px;
+  background-position: 120px 60px;
+  opacity: 0.45;
+  animation-duration: 9s;
+}
+@keyframes twinkle {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+
+/* ---------- Planets ---------- */
+.planet {
+  position: relative;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 32% 28%, var(--c1) 0%, var(--c2) 70%, color-mix(in srgb, var(--c2) 55%, #000) 100%);
+  box-shadow:
+    inset -0.35em -0.45em 0.9em rgba(0, 0, 0, 0.5),
+    0 0 18px color-mix(in srgb, var(--c1) 45%, transparent);
+}
+.planet::after {
+  /* soft specular highlight */
+  content: '';
+  position: absolute;
+  inset: 12% 45% 50% 15%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55), transparent 70%);
+  filter: blur(2px);
+}
+.planet-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 175%;
+  height: 48%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  border: 3px solid color-mix(in srgb, var(--c1) 80%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--c2) 50%, transparent);
+  pointer-events: none;
+}
+.planet-earth {
+  background:
+    radial-gradient(circle at 62% 38%, #58c98a 0 12%, transparent 13%),
+    radial-gradient(circle at 35% 62%, #4fbf7e 0 15%, transparent 16%),
+    radial-gradient(circle at 70% 72%, #63d394 0 8%, transparent 9%),
+    radial-gradient(circle at 32% 28%, var(--c1) 0%, var(--c2) 70%, #0c2457 100%);
+}
+.planet-moon {
+  background:
+    radial-gradient(circle at 60% 40%, rgba(0, 0, 0, 0.12) 0 8%, transparent 9%),
+    radial-gradient(circle at 38% 65%, rgba(0, 0, 0, 0.1) 0 10%, transparent 11%),
+    radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.08) 0 6%, transparent 7%),
+    radial-gradient(circle at 32% 28%, var(--c1) 0%, var(--c2) 75%, #55544f 100%);
+}
+.planet-jupiter {
+  background:
+    linear-gradient(
+      170deg,
+      transparent 0 28%,
+      rgba(120, 60, 20, 0.35) 28% 34%,
+      transparent 34% 48%,
+      rgba(255, 230, 200, 0.25) 48% 54%,
+      transparent 54% 64%,
+      rgba(120, 60, 20, 0.3) 64% 70%,
+      transparent 70%
+    ),
+    radial-gradient(circle at 32% 28%, var(--c1) 0%, var(--c2) 72%, #4a2a12 100%);
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-4px);
+  }
+}
+.earth-glow {
+  animation: glow 4s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 14px rgba(127, 211, 255, 0.55));
+  }
+  50% {
+    filter: drop-shadow(0 0 26px rgba(127, 211, 255, 0.85));
+  }
+}
+
+/* ---------- UI helpers ---------- */
+.card {
+  background: color-mix(in srgb, var(--color-space-800) 78%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  padding: 0.65rem 1.2rem;
+  font-weight: 700;
+  transition:
+    transform 0.1s,
+    opacity 0.2s,
+    background 0.2s;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #7fd3ff, #9b7bff);
+  color: #0a0d22;
+}
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: #eef1ff;
+}
+.input {
+  width: 100%;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.7rem 0.9rem;
+  font-size: 16px; /* prevents iOS zoom-on-focus */
+  color: #fff;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--color-glow);
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.square {
+  aspect-ratio: 1 / 1;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .earth-glow,
+  .starfield {
+    animation: none;
+  }
+}
+
+@keyframes pan {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-6%) rotate(4deg);
+  }
+}
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes eq {
+  from {
+    height: 20%;
+  }
+  to {
+    height: 100%;
+  }
+}
