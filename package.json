@@ -1,0 +1,21 @@
+{
+  "name": "obolo-order",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --workspace-concurrency=1 build",
+    "build:packages": "pnpm --filter \"./packages/**\" -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "dev:web": "pnpm --filter @obolo/web dev",
+    "dev:api": "pnpm --filter @obolo/api dev"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
