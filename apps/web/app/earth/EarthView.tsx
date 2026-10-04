@@ -1,6 +1,7 @@
 'use client';
 
 import { HANDLE_RE, type Me, type WalletView } from '@obolo/shared';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
 import { Avatar } from '@/components/Avatar';
@@ -25,6 +26,7 @@ export function EarthView() {
 
 function LoginCard() {
   const { m, t } = useI18n();
+  const router = useRouter();
   const { signIn } = useAuth();
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [email, setEmail] = useState('');
@@ -54,7 +56,8 @@ function LoginCard() {
     setErr(null);
     try {
       const r = await getApi().verify(email.trim(), code.trim());
-      signIn(r.token, r.user);
+      if (r.kind === 'invited') router.push(`/invite/${r.inviteCode}`);
+      else signIn(r.token, r.user);
     } catch (e) {
       setErr(e instanceof ApiError ? e.message : m.common.error);
     } finally {

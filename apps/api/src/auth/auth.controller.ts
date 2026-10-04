@@ -33,7 +33,8 @@ export class AuthController {
   async verify(@Body() body: unknown, @Ip() ip: string, @Headers('accept-language') lang?: string) {
     const { email, code } = parseBody(VerifyCodeBody, body);
     await rateLimit(this.kv, `verify-ip:${ip}`, 60, 3600);
-    return this.auth.verify(email, code, pickLocale(lang));
+    void lang;
+    return this.auth.verify(email, code);
   }
 
   @Post('logout')

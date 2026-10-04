@@ -45,9 +45,11 @@ packages/media  Bunny のキー設計・アップロード
 | POST | `/invites/:code/accept` | OBOLON に名前を伝える → アカウント作成＋88 MANA＋トークン発行 |
 | GET/POST | `/invites` | 自分の招待一覧／仲間を招待 |
 | POST | `/admin/invites` | 運営が最初の招待を発行（`x-admin-token`） |
-| POST | `/me/onboarding` | 1日目の物語の完了を記録 |
-| POST | `/auth/request-code` | ログインコード送信（ORDERメンバーのみ） |
-| POST | `/auth/verify` | コード確認 → トークン発行 |
+| POST | `/me/journey/complete` | その日の物語を終えた（`{ day }`） |
+| POST | `/me/journey/advance` | 次の日へ（24時間後、または `{ skip: true }`＝明日まで待てへん） |
+| POST | `/me/order` | 「ORDERになる」（決済は仮） |
+| POST | `/auth/request-code` | 入口：招待されたアドレス／ORDERにコード送信（それ以外は拒否） |
+| POST | `/auth/verify` | ORDER → トークン発行、招待された人 → 招待コード（1日目へ） |
 | POST | `/auth/logout` | ログアウト |
 | GET/PATCH | `/me` | プロフィール |
 | GET | `/wallet` | MANA・EARNINGS 残高と履歴（表示のみ） |

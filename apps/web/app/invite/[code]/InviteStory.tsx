@@ -10,7 +10,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { DAY1 } from '@/lib/onboarding/day1';
-import { clearDay1, loadDay1, markDay2Unlocked, saveDay1, type SavedDay1 } from '@/lib/onboarding/progress';
+import { clearDay1, loadDay1, saveDay1, type SavedDay1 } from '@/lib/onboarding/progress';
 
 /** /invite/<code> — the invitation link from the email. "resume" continues a story already begun. */
 export function InviteStory({ code }: { code: string }) {
@@ -24,12 +24,13 @@ export function InviteStory({ code }: { code: string }) {
 
   useEffect(() => {
     if (status === 'loading') return;
-    if (status === 'authed' && me && me.onboardingStage !== 'day1' && !finished) {
+    const playingDay1 = !!me && me.journeyDay === 1 && !me.journeyCompletedAt;
+    if (status === 'authed' && me && !playingDay1 && !finished) {
       setError('member');
       return;
     }
     const s = loadDay1();
-    const resuming = status === 'authed' && me?.onboardingStage === 'day1';
+    const resuming = status === 'authed' && playingDay1;
     setSaved(s && (s.code === code || code === 'resume') ? s : null);
     if (resuming) {
       setInvite({ code, inviterName: me?.invitedByName ?? '', status: 'accepted', expiresAt: '' });
@@ -76,7 +77,7 @@ export function InviteStory({ code }: { code: string }) {
   const onEnd = useCallback(
     async (answers: Record<string, string>) => {
       try {
-        setMe(await getApi().onboardingProgress('day1_done', answers));
+        setMe(await getApi().completeJourneyDay(1, answers));
       } catch {
         /* the finale still shows; progress is retried from the home gate */
       }
@@ -90,10 +91,13 @@ export function InviteStory({ code }: { code: string }) {
     return (
       <TomorrowScreen
         name={me.displayName}
-        completedAt={me.day1CompletedAt}
-        onUnlocked={() => {
-          markDay2Unlocked(me.id);
-          router.push('/');
+        completedAt={me.journeyCompletedAt}
+        onUnlocked={async (skipped) => {
+          try {
+            setMe(await getApi().advanceJourney(skipped));
+          } finally {
+            router.push('/');
+          }
         }}
       />
     );

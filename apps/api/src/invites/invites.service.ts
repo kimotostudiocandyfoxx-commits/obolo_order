@@ -116,7 +116,7 @@ export class InvitesService {
           locale: 'ja',
           invitedByUserId: inv.inviterUserId,
           invitedByName: inv.inviterName,
-          onboardingStage: 'day1',
+          journeyDay: 1,
         })
         .returning();
       await tx.insert(wallets).values({ userId: u.id });

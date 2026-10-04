@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n/client';
 import { unlockAudio } from '@/lib/onboarding/audio';
-import { DAY_WAIT_MS } from '@/lib/onboarding/progress';
+import { JOURNEY_WAIT_MS } from '@obolo/shared';
 import { playTimeSkip, startDrone, tick } from '@/lib/onboarding/sfx';
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -18,7 +18,7 @@ const fmt = (ms: number) => {
 };
 
 /**
- * End of Day 1: "〇〇、また明日。" + a 24-hour countdown with ticking sound.
+ * End of every journey day: "〇〇、また明日。" + a 24-hour countdown with ticking sound.
  * "明日まで待てへん" skips the wait with a spinning mystical clock.
  * PLACEHOLDER (P-OB-3): the skip is free and unlimited for now; it may later cost MANA.
  */
@@ -28,17 +28,19 @@ export function TomorrowScreen({
   onUnlocked,
 }: {
   name: string;
-  /** When Day 1 was finished (ISO). The wait is 24 h from here. */
+  /** When the day was finished (ISO). The wait is 24 h from here. */
   completedAt: string | null;
-  onUnlocked: () => void;
+  /** skipped = the visitor pressed 明日まで待てへん (false = the 24 h passed). */
+  onUnlocked: (skipped: boolean) => void;
 }) {
   const { m, t } = useI18n();
-  const target = useRef((completedAt ? Date.parse(completedAt) : Date.now()) + DAY_WAIT_MS);
+  const target = useRef((completedAt ? Date.parse(completedAt) : Date.now()) + JOURNEY_WAIT_MS);
   const [left, setLeft] = useState(() => target.current - Date.now());
   const [showButton, setShowButton] = useState(false);
   const [phase, setPhase] = useState<'wait' | 'skip' | 'flash' | 'open'>('wait');
   const [needsTap, setNeedsTap] = useState(false);
   const stopDrone = useRef<(() => void) | null>(null);
+  const skipped = useRef(false);
   const tickAlt = useRef(false);
 
   // countdown + tick every second
@@ -78,6 +80,7 @@ export function TomorrowScreen({
   };
 
   const skip = useCallback(() => {
+    skipped.current = true;
     unlockAudio();
     setPhase('skip');
     playTimeSkip(SKIP_SECONDS);
@@ -100,7 +103,7 @@ export function TomorrowScreen({
 
   useEffect(() => {
     if (phase !== 'open') return;
-    const id = setTimeout(onUnlocked, 2200);
+    const id = setTimeout(() => onUnlocked(skipped.current), 2200);
     return () => clearTimeout(id);
   }, [phase, onUnlocked]);
 

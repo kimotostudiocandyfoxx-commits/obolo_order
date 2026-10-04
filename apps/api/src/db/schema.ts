@@ -52,9 +52,11 @@ export const users = pgTable(
     /** Invite-only (client decision 2026-10-04): who invited this user. */
     invitedByUserId: uuid('invited_by_user_id'),
     invitedByName: text('invited_by_name'),
-    /** Onboarding story progress: day1 → day1_done → complete. Pre-invite accounts are 'complete'. */
-    onboardingStage: text('onboarding_stage').notNull().default('complete'),
-    day1CompletedAt: timestamp('day1_completed_at', { withTimezone: true }),
+    /** 8-day journey (see @obolo/shared journey.ts): 1–8 = day to play, 9 = payment, 10 = ORDER member.
+     *  Accounts created before the journey existed default to 10. */
+    journeyDay: integer('journey_day').notNull().default(10),
+    /** When the current day was finished; the next day unlocks 24 h later (or by skipping). */
+    journeyCompletedAt: timestamp('journey_completed_at', { withTimezone: true }),
     onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
     lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
     ...timestamps,

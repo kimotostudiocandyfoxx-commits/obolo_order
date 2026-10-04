@@ -71,9 +71,15 @@ export const AdminCreateInviteBody = CreateInviteBody.extend({
 });
 export type AdminCreateInviteBody = z.infer<typeof AdminCreateInviteBody>;
 
-export const OnboardingProgressBody = z.object({
-  stage: z.enum(['day1_done']),
+export const CompleteJourneyDayBody = z.object({
+  day: z.number().int().min(1).max(8),
   /** Answers given in the story (e.g. "want to go to space?"). */
   answers: z.record(z.string().max(40), z.string().max(100)).optional(),
 });
-export type OnboardingProgressBody = z.infer<typeof OnboardingProgressBody>;
+export type CompleteJourneyDayBody = z.infer<typeof CompleteJourneyDayBody>;
+
+export const AdvanceJourneyBody = z.object({
+  /** true = "明日まで待てへん" (skip the 24 h wait). */
+  skip: z.boolean().default(false),
+});
+export type AdvanceJourneyBody = z.infer<typeof AdvanceJourneyBody>;

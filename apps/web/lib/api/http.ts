@@ -34,7 +34,7 @@ export class HttpApi implements Api {
   }
 
   requestCode(email: string) {
-    return this.req<{ sent: true; devCode?: string }>('POST', '/auth/request-code', { email });
+    return this.req<Awaited<ReturnType<Api['requestCode']>>>('POST', '/auth/request-code', { email });
   }
   verify(email: string, code: string) {
     return this.req<Awaited<ReturnType<Api['verify']>>>('POST', '/auth/verify', { email, code });
@@ -98,8 +98,14 @@ export class HttpApi implements Api {
   acceptInvite(code: string, displayName: string) {
     return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName });
   }
-  onboardingProgress(stage: 'day1_done', answers?: Record<string, string>) {
-    return this.req<Awaited<ReturnType<Api['onboardingProgress']>>>('POST', '/me/onboarding', { stage, answers });
+  completeJourneyDay(day: number, answers?: Record<string, string>) {
+    return this.req<Awaited<ReturnType<Api['completeJourneyDay']>>>('POST', '/me/journey/complete', { day, answers });
+  }
+  advanceJourney(skip: boolean) {
+    return this.req<Awaited<ReturnType<Api['advanceJourney']>>>('POST', '/me/journey/advance', { skip });
+  }
+  becomeOrder() {
+    return this.req<Awaited<ReturnType<Api['becomeOrder']>>>('POST', '/me/order');
   }
   myInvites() {
     return this.req<Awaited<ReturnType<Api['myInvites']>>>('GET', '/invites');

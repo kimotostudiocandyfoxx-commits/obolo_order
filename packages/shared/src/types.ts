@@ -11,13 +11,21 @@ export interface Me {
   country: string;
   locale: Locale;
   subscriptionStatus: 'none' | 'demo' | 'active' | 'past_due' | 'canceled';
-  onboardingStage: OnboardingStage;
-  day1CompletedAt: string | null;
+  /** 1–8 = journey day to play, 9 = payment ("ORDERになるか？"), 10 = ORDER member. */
+  journeyDay: number;
+  /** Set when the current day has been finished (the next unlocks 24 h later or by skipping). */
+  journeyCompletedAt: string | null;
   invitedByName: string | null;
   createdAt: string;
 }
 
-export type OnboardingStage = 'day1' | 'day1_done' | 'complete';
+/** Result of POST /auth/request-code: who is this email? */
+export type EntryKind = 'member' | 'invited';
+
+/** POST /auth/verify returns a session for members, or the invitation to start Day 1 for invitees. */
+export type VerifyResult =
+  | { kind: 'member'; token: string; user: Me }
+  | { kind: 'invited'; inviteCode: string; inviterName: string };
 
 export interface InviteView {
   code: string;

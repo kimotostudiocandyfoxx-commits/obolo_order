@@ -12,6 +12,8 @@ import type {
   SaturnPostView,
   UpdateBuddyProfileBody,
   UpdateProfileBody,
+  EntryKind,
+  VerifyResult,
   WalletView,
 } from '@obolo/shared';
 
@@ -28,8 +30,10 @@ export class ApiError extends Error {
 /** Everything the web app needs from the backend. Implemented by HttpApi (Cloud Run) and DemoApi (in-browser). */
 export interface Api {
   readonly mode: 'live' | 'demo';
-  requestCode(email: string): Promise<{ sent: true; devCode?: string }>;
-  verify(email: string, code: string): Promise<{ token: string; user: Me; isNew: boolean }>;
+  /** Entry: members and invited people get a 6-digit code; anyone else → NOT_INVITED. */
+  requestCode(email: string): Promise<{ sent: true; kind: EntryKind; devCode?: string }>;
+  /** Members get a session; invited people get their invitation (account is created on Day 1). */
+  verify(email: string, code: string): Promise<VerifyResult>;
   logout(): Promise<void>;
   me(): Promise<Me>;
   updateMe(body: UpdateProfileBody): Promise<Me>;
@@ -48,7 +52,11 @@ export interface Api {
   // --- Invite-only onboarding
   getInvite(code: string): Promise<InviteView>;
   acceptInvite(code: string, displayName: string): Promise<{ token: string; user: Me; isNew: boolean }>;
-  onboardingProgress(stage: 'day1_done', answers?: Record<string, string>): Promise<Me>;
+  completeJourneyDay(day: number, answers?: Record<string, string>): Promise<Me>;
+  /** Start the next day (skip = "明日まで待てへん"). */
+  advanceJourney(skip: boolean): Promise<Me>;
+  /** "ORDERになるか？" → yes. Payment is PLACEHOLDER (P-BILL-1). */
+  becomeOrder(): Promise<Me>;
   myInvites(): Promise<MyInviteView[]>;
   createInvite(email: string): Promise<MyInviteView>;
 }

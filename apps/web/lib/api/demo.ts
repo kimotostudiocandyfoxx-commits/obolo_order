@@ -1,5 +1,8 @@
 import {
   BUDDY_FREE_DAILY_MESSAGES,
+  JOURNEY_DONE,
+  JOURNEY_PAYMENT,
+  JOURNEY_WAIT_MS,
   MONTHLY_GRANT_MANA,
   type BuddyMessageView,
   type BuddyPersona,
@@ -38,7 +41,8 @@ interface DemoState {
 /** Demo invitation that always works: /invite/demo (inviter = KIMORIN). */
 export const DEMO_INVITE_CODE = 'demo';
 
-const KEY = 'obolo.demo.v1';
+// v2: the 8-day journey. Data from older demo builds is discarded so everyone starts at the entry screen.
+const KEY = 'obolo.demo.v2';
 const uid = () => crypto.randomUUID();
 const now = () => new Date().toISOString();
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -109,15 +113,22 @@ export class DemoApi implements Api {
     return id;
   }
 
+  /**
+   * Demo entry: a member gets a login code; ANY other email is treated as invited by KIMORIN so the
+   * demo can be walked without an operator (PLACEHOLDER P-INV-4 — the real API refuses strangers).
+   */
   async requestCode(email: string) {
     await sleep(300);
-    if (!Object.values(this.s.users).some((u) => u.email === email.toLowerCase())) {
-      throw new ApiError(403, 'NOT_INVITED', 'invite-only');
+    const e = email.toLowerCase();
+    const member = Object.values(this.s.users).some((u) => u.email === e);
+    if (!member && !Object.values(this.invites()).some((i) => i.email === e && i.status === 'pending')) {
+      const code = Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(16).padStart(2, '0')).join('');
+      this.invites()[code] = { code, inviterName: 'KIMORIN', email: e, status: 'pending', createdAt: now(), inviterId: null };
     }
     const code = String(Math.floor(100000 + Math.random() * 900000));
-    this.s.pendingCodes[email.toLowerCase()] = code;
+    this.s.pendingCodes[e] = code;
     this.save();
-    return { sent: true as const, devCode: code };
+    return { sent: true as const, kind: member ? ('member' as const) : ('invited' as const), devCode: code };
   }
 
   async verify(email: string, code: string) {
@@ -126,12 +137,16 @@ export class DemoApi implements Api {
     if (this.s.pendingCodes[e] !== code) throw new ApiError(400, 'CODE_INVALID', 'Wrong code');
     delete this.s.pendingCodes[e];
     const user = Object.values(this.s.users).find((u) => u.email === e);
-    if (!user) throw new ApiError(403, 'NOT_INVITED', 'invite-only');
-    const isNew = false;
+    if (!user) {
+      const inv = Object.values(this.invites()).find((i) => i.email === e && i.status === 'pending');
+      this.save();
+      if (!inv) throw new ApiError(403, 'NOT_INVITED', 'invite-only');
+      return { kind: 'invited' as const, inviteCode: inv.code, inviterName: inv.inviterName };
+    }
     const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
     this.s.sessions[token] = user.id;
     this.save();
-    return { token, user, isNew };
+    return { kind: 'member' as const, token, user };
   }
 
   async logout() {
@@ -142,7 +157,7 @@ export class DemoApi implements Api {
   }
 
   async me() {
-    return withDefaults(this.s.users[this.uid()]);
+    return this.s.users[this.uid()];
   }
 
   async updateMe(body: Parameters<Api['updateMe']>[0]) {
@@ -325,8 +340,8 @@ export class DemoApi implements Api {
       country: 'JP',
       locale: 'ja',
       subscriptionStatus: 'demo',
-      onboardingStage: 'day1',
-      day1CompletedAt: null,
+      journeyDay: 1,
+      journeyCompletedAt: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };
@@ -343,15 +358,28 @@ export class DemoApi implements Api {
     return { token, user, isNew: true };
   }
 
-  async onboardingProgress(stage: 'day1_done', answers?: Record<string, string>) {
-    void answers;
+  private patchMe(fn: (u: Me) => Partial<Me>): Me {
     const id = this.uid();
-    const u = withDefaults(this.s.users[id]);
-    if (u.onboardingStage === 'day1') {
-      this.s.users[id] = { ...u, onboardingStage: stage, day1CompletedAt: now() };
-      this.save();
-    }
-    return withDefaults(this.s.users[id]);
+    this.s.users[id] = { ...this.s.users[id], ...fn(this.s.users[id]) };
+    this.save();
+    return this.s.users[id];
+  }
+
+  async completeJourneyDay(day: number, answers?: Record<string, string>) {
+    void answers;
+    return this.patchMe((u) => (u.journeyDay === day && !u.journeyCompletedAt ? { journeyCompletedAt: now() } : {}));
+  }
+
+  async advanceJourney(skip: boolean) {
+    return this.patchMe((u) => {
+      if (!u.journeyCompletedAt || u.journeyDay >= JOURNEY_PAYMENT) return {};
+      if (!skip && Date.now() < Date.parse(u.journeyCompletedAt) + JOURNEY_WAIT_MS) throw new ApiError(409, 'NOT_YET', 'not yet');
+      return { journeyDay: u.journeyDay + 1, journeyCompletedAt: null };
+    });
+  }
+
+  async becomeOrder() {
+    return this.patchMe((u) => (u.journeyDay === JOURNEY_PAYMENT ? { journeyDay: JOURNEY_DONE, journeyCompletedAt: null } : {}));
   }
 
   async myInvites() {
@@ -377,15 +405,4 @@ export class DemoApi implements Api {
     this.save();
     return { ...inv, expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
   }
-}
-
-/** Accounts stored by older demo builds lack onboarding fields — treat them as fully onboarded. */
-function withDefaults(u: Me): Me {
-  const legacy = u as Partial<Me>;
-  return {
-    ...u,
-    onboardingStage: legacy.onboardingStage ?? 'complete',
-    day1CompletedAt: legacy.day1CompletedAt ?? null,
-    invitedByName: legacy.invitedByName ?? null,
-  };
 }

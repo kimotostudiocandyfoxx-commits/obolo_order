@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Patch, Post, UseGuards } from '@nestjs/common';
-import { OnboardingProgressBody, UpdateProfileBody } from '@obolo/shared';
+import { AdvanceJourneyBody, CompleteJourneyDayBody, UpdateProfileBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
 import { UsersService } from './users.service';
@@ -19,9 +19,21 @@ export class UsersController {
     return this.users.updateMe(userId, parseBody(UpdateProfileBody, body));
   }
 
-  @Post('onboarding')
+  @Post('journey/complete')
   @HttpCode(200)
-  onboarding(@UserId() userId: string, @Body() body: unknown) {
-    return this.users.onboardingProgress(userId, parseBody(OnboardingProgressBody, body));
+  completeDay(@UserId() userId: string, @Body() body: unknown) {
+    return this.users.completeJourneyDay(userId, parseBody(CompleteJourneyDayBody, body));
+  }
+
+  @Post('journey/advance')
+  @HttpCode(200)
+  advance(@UserId() userId: string, @Body() body: unknown) {
+    return this.users.advanceJourney(userId, parseBody(AdvanceJourneyBody, body ?? {}).skip);
+  }
+
+  @Post('order')
+  @HttpCode(200)
+  order(@UserId() userId: string) {
+    return this.users.becomeOrder(userId);
   }
 }
