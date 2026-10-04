@@ -9,10 +9,10 @@ import type { Step } from './script';
  *  - "承諾しない" / "話さずに帰る" / "やめておく" have no written outcome: a short line is shown and the
  *    same choice is offered again (the story can only move forward).
  *  - "OBOLON「そう来なくっちゃ」（2モーション9）": the line is shown first, then motion 2-9 plays.
- *    Motion 2-9 has not been delivered yet (placeholder screen).
+ *    Motion 2-9 was delivered at 480×854 (upload limit) — replace with a full-quality file later.
  *  - The invitation card in motion 2-2 has its own text baked in ("この前、本部にきてくれてありがとう！
  *    今日はゾロ目の日！…"), which differs from the script's "昨日いなかったケン！…".
- *  - The BGM fades out before KIMORIN's motion (2-10) so his voice is clear.
+ *  - The BGM fades out before KIMORIN's motions (2-9, 2-10) so his voice is clear.
  */
 export const DAY2: Step[] = [
   { t: 'bgm', track: 'opening' },
@@ -54,7 +54,8 @@ export const DAY2: Step[] = [
 
   { t: 'label', id: 'kimorin' },
   { t: 'say', who: 'OBOLON', text: 'そう来なくっちゃ' },
-  { t: 'video', motion: '2-9' },
+  { t: 'bgm', track: null }, // KIMORIN speaks in 2-9 and 2-10: music out so his voice is clear
+  { t: 'video', motion: '2-9' }, // KIMORIN appears (delivered at 480×854 because of the 30 MB upload limit)
   { t: 'label', id: 'trip' },
   {
     t: 'choice',
@@ -65,7 +66,6 @@ export const DAY2: Step[] = [
   { t: 'goto', id: 'trip' },
 
   { t: 'label', id: 'go' },
-  { t: 'bgm', track: null },
   { t: 'video', motion: '2-10' }, // KIMORIN
   { t: 'end' },
 ];

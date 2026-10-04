@@ -21,8 +21,8 @@ describe('all day scripts', () => {
     expect(d.skipLabel).toBe('もちろん明日まで待てへん');
     const vids = d.steps.flatMap((s) => (s.t === 'video' || s.t === 'loop' ? [s.motion] : []));
     expect(vids).toEqual(['2-1', '2-2', '2-3', 6, 7, 9, 11, 12, 13, '2-9', '2-10']);
-    // every motion is delivered except 2-9 (placeholder)
-    expect(vids.filter((m) => !hasMotion(m))).toEqual(['2-9']);
+    // every motion has been delivered
+    expect(vids.filter((m) => !hasMotion(m))).toEqual([]);
   });
 
   it('declining on day 2 always comes back to the same question', () => {
