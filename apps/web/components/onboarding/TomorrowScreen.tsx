@@ -26,7 +26,10 @@ export function TomorrowScreen({
   name,
   completedAt,
   onUnlocked,
+  skipLabel,
 }: {
+  /** Per-day wording of the skip button (default: m.gate.cantWait = 明日まで待てへん). */
+  skipLabel?: string;
   name: string;
   /** When the day was finished (ISO). The wait is 24 h from here. */
   completedAt: string | null;
@@ -137,7 +140,7 @@ export function TomorrowScreen({
                 onClick={skip}
                 className="animate-[fadeUp_0.8s_ease-out] rounded-full border border-amber-200/70 bg-black px-8 py-3.5 text-[17px] tracking-[0.2em] text-amber-50 shadow-[0_0_28px_rgba(255,210,130,0.3)] active:scale-95"
               >
-                {m.gate.cantWait}
+                {skipLabel ?? m.gate.cantWait}
               </button>
             )}
           </div>

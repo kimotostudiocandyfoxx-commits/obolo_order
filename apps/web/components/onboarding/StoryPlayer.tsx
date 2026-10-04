@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { hasMotion, motionUrl } from '@/lib/onboarding/media';
+import { hasMotion, motionUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
@@ -49,12 +49,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   const [ready, setReady] = useState(false);
   /** 'black' step: the screen stays black until the next motion has a frame on screen. */
   const [blackout, setBlackout] = useState(false);
-  const [placeholder, setPlaceholder] = useState<number | null>(null);
+  const [placeholder, setPlaceholder] = useState<MotionId | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
   const placeholderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Motions still to play behind the dialogue after the current background motion (bgvideo.then). */
-  const bgQueue = useRef<number[]>([]);
+  const bgQueue = useRef<MotionId[]>([]);
   /** Timed captions of the motion that is starting (shown once its first frame is on screen). */
   const pendingCaptions = useRef<TimedCaption[]>([]);
   const captionTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -80,7 +80,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   );
 
   /** Show a motion. freeze = jump to its last frame without playing (used when resuming). */
-  const playMedia = useCallback((motion: number, loop: boolean, freeze = false) => {
+  const playMedia = useCallback((motion: MotionId, loop: boolean, freeze = false) => {
     const d = dual.current;
     if (!d) return;
     if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
@@ -422,7 +422,7 @@ function GoldButton({ onClick, children }: { onClick: () => void; children: Reac
   return (
     <button
       onClick={onClick}
-      className="min-h-13 rounded-full border border-amber-200/70 bg-black/50 px-6 py-3.5 text-[17px] tracking-[0.15em] text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)] backdrop-blur-sm transition active:scale-[0.97] active:bg-amber-200/20"
+      className="min-h-13 rounded-full border border-amber-200/70 bg-black/50 px-5 py-3.5 text-[17px] tracking-[0.08em] text-amber-50 [word-break:keep-all] shadow-[0_0_24px_rgba(255,210,130,0.25)] backdrop-blur-sm transition active:scale-[0.97] active:bg-amber-200/20"
     >
       {children}
     </button>
@@ -475,7 +475,7 @@ function NameInput({
   );
 }
 
-function MotionPlaceholder({ motion }: { motion: number }) {
+function MotionPlaceholder({ motion }: { motion: MotionId }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,#2a2140_0%,#07060d_70%)]">
       <div className="starfield" aria-hidden />

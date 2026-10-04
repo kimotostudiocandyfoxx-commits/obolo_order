@@ -4,6 +4,8 @@
  *
  * Text placeholders: {name} = the name the visitor told OBOLON, {inviter} = who invited them.
  */
+import type { MotionId } from './media';
+
 export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN';
 
 export type Step =
@@ -11,7 +13,7 @@ export type Step =
    * Play a motion once. Cannot be skipped; the last frame stays on screen afterwards.
    * `captions` appear on top while it plays (seconds from the start of the motion; no tap needed).
    */
-  | { t: 'video'; motion: number; captions?: TimedCaption[] }
+  | { t: 'video'; motion: MotionId; captions?: TimedCaption[] }
   /** Switch background music (crossfade). null = fade out. Continues immediately. */
   | { t: 'bgm'; track: string | null }
   /**
@@ -19,11 +21,11 @@ export type Step =
    * it plays. `then` motions follow automatically when it ends; the last one holds its final frame.
    * Still unskippable: there are no controls, the dialogue just runs on top of it.
    */
-  | { t: 'bgvideo'; motion: number; then?: number[] }
+  | { t: 'bgvideo'; motion: MotionId; then?: MotionId[] }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */
-  | { t: 'loop'; motion: number }
+  | { t: 'loop'; motion: MotionId }
   /** Narration line (e.g. "MONBANが現れた"). Tap to continue. */
   | { t: 'caption'; text: string }
   /** Character line. Tap to continue. */
@@ -64,7 +66,7 @@ export function labelIndex(steps: Step[], id: string): number {
 }
 
 /** The media that should be on screen at step i (for resuming mid-story). null = black screen. */
-export function mediaAt(steps: Step[], i: number): { motion: number; loop: boolean } | null {
+export function mediaAt(steps: Step[], i: number): { motion: MotionId; loop: boolean } | null {
   for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
     const s = steps[k];
     if (s.t === 'black') return null;

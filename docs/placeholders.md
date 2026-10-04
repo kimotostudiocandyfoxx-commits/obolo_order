@@ -26,7 +26,7 @@
 
 | ID | 状態 | 内容 | 現在の仮実装 | 差し替え場所 |
 |---|---|---|---|---|
-| P-OB-1 | 🟡 | 2〜8日目の物語（台本・動画） | 未着。仮画面で「その日の流れ（クライアントの箇条書き）」を表示し、「（仮）DAY n を体験したことにする」で次へ進める。プロフィール作成（3日目）・バティ作成（3日目）・土星の投稿（4日目）の組み込みもこの日の台本が届いてから | `components/onboarding/JourneyDayScreen.tsx` |
+| P-OB-1 | 🟡 | 3〜8日目の物語（台本・動画）※2日目は組み込み済み | 未着。仮画面で「その日の流れ（クライアントの箇条書き）」を表示し、「（仮）DAY n を体験したことにする」で次へ進める。プロフィール作成（3日目）・バティ作成（3日目）・土星の投稿（4日目）の組み込みもこの日の台本が届いてから | `components/onboarding/JourneyDayScreen.tsx` |
 | P-OB-2 | 🟡 | 台本の解釈が必要だった箇所 | ①「門開（モーション11）」はボタンなしで自動再生 ②「やめておく」→ OBOLON「そうか。」→ MONBAN の締め（「おい！待て！」「喋りすぎた」は省略）③ モーション8・18・20〜26は台本で未使用 ④ 台本の「OBLON」は「OBOLON」に統一 ⑤ モーション6には「本部に到着しました」が動画内に入っているため、画面上の字幕は出さない | `apps/web/lib/onboarding/day1.ts` |
 | P-OB-3 | 🟡 | 「また明日」の待ち時間と「明日まで待てへん」 | 1日目終了から24時間のカウントダウン。「明日まで待てへん」で何度でも無料でスキップでき、スキップしたことはその端末にだけ記録（2日目を作るときにサーバー側へ移す。将来 MANA 消費にする案もあり） | `components/onboarding/TomorrowScreen.tsx`、`lib/onboarding/progress.ts` |
 | P-OB-9 | 🟡 | カウントダウン・時計演出の音 | ブラウザ内で合成（時計のチクタク・低い持続音・加速するチクタク＋上昇音＋鐘）。専用の効果音を作ったら差し替え | `lib/onboarding/sfx.ts` |
@@ -37,6 +37,7 @@
 | P-OB-8 | 🟡 | BGM の区間と音量 | ✅ 区間はクライアント指示で確定：オープニング（`bgm-opening`）＝最初〜本部到着、MONBANのテーマ（`bgm-monban`、元「VIDEO11」の曲）＝MONBAN登場（モーション7）〜／最後の再登場〜、OBOLONのテーマ（`bgm-obolon`、元「OBOLO」の曲）＝OBOLON登場（モーション13）〜。音量：動画の音・BGMとも −16 LUFS に揃え（`scripts/normalize-audio.sh`、新しい動画は `encode-onboarding.sh` が自動で揃える）、BGMは MONBAN の曲 1.0・ほか 0.9（動画の音とほぼ同じ大きさ）。iPad の消音スイッチがオンでもBGM・演出音が鳴るよう Audio Session を「再生」に設定（iOS 16.4 未満は通常の音声再生に自動切替）。全体に音割れ防止のリミッター | `lib/onboarding/day1.ts`（`bgm` の行）、`lib/onboarding/media.ts`（`BGM_VOLUME`） |
 | P-INV-4 | 🟡 | デモモードの入口 | API 未接続のデモでは**どのメールアドレスでも KIMORIN からの招待扱い**で入れる（運営なしで通しテストできるように）。本番 API では招待のないアドレスは拒否 | `lib/api/demo.ts` |
 | P-BILL-2 | 🔴 | 「ORDERになるか？」の決済 | Stripe 未接続。「ORDERになる」を押すと決済なしで ORDER になる（デモ） | `components/onboarding/OrderScreen.tsx`、`apps/api/src/users/users.service.ts`（`becomeOrder`） |
+| P-OB-10 | 🟡 | 2日目の台本で解釈した箇所 | ①［認証］＝2日目の最初にメールアドレス＋確認コードを入れ直す（デモではコード自動入力） ②「承諾しない」「話さずに帰る」「やめておく」の後の流れが未記載のため、短いセリフのあと同じ選択肢に戻す ③「OBOLON『そう来なくっちゃ』（2モーション9）」はセリフ→2-9の順 ④ 2モーション9は未着（仮画面） ⑤ 2-2の招待状の文字は動画内のもの（台本の「昨日いなかったケン！」とは異なる） ⑥ BGMは1日目と同じ割当（オープニング→MONBAN→OBOLON）で、KIMORINの動画（2-10）の前にフェードアウト | `apps/web/lib/onboarding/day2.ts` |
 | P-INV-1 | 🟡 | 1人が招待できる人数 | 30日で10人まで | `apps/api/src/invites/invites.service.ts` |
 | P-INV-2 | 🟡 | 招待の有効期限 | 14日 | 環境変数 `INVITE_TTL_DAYS` |
 | P-INV-3 | 🟡 | 未登録メールでのログイン | 「招待制です」とはっきり表示（＝登録の有無が分かってしまう）。メール送信を入れたら黙って「送信しました」にする | `apps/api/src/auth/auth.service.ts` |

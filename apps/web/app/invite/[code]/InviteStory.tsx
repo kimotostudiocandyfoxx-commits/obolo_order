@@ -10,6 +10,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { DAY1 } from '@/lib/onboarding/day1';
+import { STORIES } from '@/lib/onboarding/stories';
 import { clearDay1, loadDay1, saveDay1, type SavedDay1 } from '@/lib/onboarding/progress';
 
 /** /invite/<code> — the invitation link from the email. "resume" continues a story already begun. */
@@ -92,6 +93,7 @@ export function InviteStory({ code }: { code: string }) {
       <TomorrowScreen
         name={me.displayName}
         completedAt={me.journeyCompletedAt}
+        skipLabel={STORIES[1].skipLabel}
         onUnlocked={async (skipped) => {
           try {
             setMe(await getApi().advanceJourney(skipped));

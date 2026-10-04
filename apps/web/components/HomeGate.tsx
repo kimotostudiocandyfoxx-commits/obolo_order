@@ -6,11 +6,13 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { EntryScreen } from '@/components/onboarding/EntryScreen';
 import { JourneyDayScreen } from '@/components/onboarding/JourneyDayScreen';
 import { OrderScreen } from '@/components/onboarding/OrderScreen';
+import { StoryDay } from '@/components/onboarding/StoryDay';
 import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { loadDay1 } from '@/lib/onboarding/progress';
+import { STORIES } from '@/lib/onboarding/stories';
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -37,6 +39,7 @@ export function HomeGate({ children }: { children: ReactNode }) {
         key={`${day}-${me.journeyCompletedAt}`}
         name={me.displayName}
         completedAt={me.journeyCompletedAt}
+        skipLabel={STORIES[day]?.skipLabel}
         onUnlocked={async (skipped) => {
           const elapsed = Date.now() >= Date.parse(me.journeyCompletedAt!) + JOURNEY_WAIT_MS;
           setMe(await getApi().advanceJourney(skipped || !elapsed));
@@ -45,6 +48,8 @@ export function HomeGate({ children }: { children: ReactNode }) {
     );
   }
   if (day === 1) return <ResumeStory />;
+  const story = STORIES[day];
+  if (story) return <StoryDay key={day} day={day} story={story} />;
   return <JourneyDayScreen key={day} day={day} />;
 }
 

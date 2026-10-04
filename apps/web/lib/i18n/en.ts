@@ -45,6 +45,9 @@ const en: Messages = {
     notInvited: 'No invitation has been sent to this address. OBOLO ORDER is invitation-only.',
     wrongCode: 'Wrong code',
     demoHint: 'Demo mode: any address enters as invited by KIMORIN',
+    authTitle: 'Authentication',
+    authLead: 'Enter your ORDER email address',
+    authMismatch: 'This does not match your registered address',
   },
   journey: {
     day: 'DAY {n}',
