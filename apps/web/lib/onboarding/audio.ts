@@ -23,3 +23,22 @@ export function unlockAudio(): AudioContext | null {
   if (c && c.state !== 'running') void c.resume();
   return c;
 }
+
+let bus: DynamicsCompressorNode | null = null;
+
+/**
+ * Master output for music + effects: a gentle limiter so the louder mix never clips on phone
+ * speakers. Everything synthesised or routed through Web Audio connects here.
+ */
+export function masterBus(c: AudioContext): AudioNode {
+  if (!bus || bus.context !== c) {
+    bus = c.createDynamicsCompressor();
+    bus.threshold.value = -3;
+    bus.knee.value = 3;
+    bus.ratio.value = 20;
+    bus.attack.value = 0.002;
+    bus.release.value = 0.2;
+    bus.connect(c.destination);
+  }
+  return bus;
+}

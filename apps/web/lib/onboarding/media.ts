@@ -15,5 +15,9 @@ export const hasMotion = (n: number) => AVAILABLE_MOTIONS.has(n);
 
 /** Background music tracks (by the client, DJ SHACHO). Converted to AAC 128 kbps. */
 export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;
-/** PLACEHOLDER (P-OB-8): BGM level under the motions' own sound (0–1). */
-export const BGM_VOLUME = 0.55;
+/**
+ * PLACEHOLDER (P-OB-8): BGM level under the motions' own sound (0–1). All files are loudness-
+ * normalised to −16 LUFS (scripts/normalize-audio.sh), so 0.75 sits the music ~2.5 dB under the
+ * motions' sound effects.
+ */
+export const BGM_VOLUME = 0.75;

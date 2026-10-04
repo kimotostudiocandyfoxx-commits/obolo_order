@@ -1,6 +1,6 @@
 'use client';
 
-import { audioCtx } from './audio';
+import { audioCtx, masterBus } from './audio';
 
 /**
  * Synthesised sound effects for the "また明日" countdown (no audio files needed).
@@ -9,7 +9,7 @@ import { audioCtx } from './audio';
 const out = (c: AudioContext, v: number) => {
   const g = c.createGain();
   g.gain.value = v;
-  g.connect(c.destination);
+  g.connect(masterBus(c));
   return g;
 };
 
@@ -21,7 +21,7 @@ function blip(c: AudioContext, t: number, freq: number, dur: number, vol: number
   g.gain.setValueAtTime(0.0001, t);
   g.gain.exponentialRampToValueAtTime(vol, t + 0.004);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(c.destination);
+  o.connect(g).connect(masterBus(c));
   o.start(t);
   o.stop(t + dur + 0.02);
 }
@@ -31,8 +31,8 @@ export function tick(alt: boolean, when = 0) {
   const c = audioCtx();
   if (!c || c.state !== 'running') return;
   const t = c.currentTime + when;
-  blip(c, t, alt ? 1650 : 1320, 0.05, 0.09, 'triangle');
-  blip(c, t, alt ? 3300 : 2640, 0.12, 0.012);
+  blip(c, t, alt ? 1650 : 1320, 0.05, 0.25, 'triangle');
+  blip(c, t, alt ? 3300 : 2640, 0.12, 0.035);
 }
 
 /** Low mystical drone under the countdown. Returns a stop() function. */
@@ -61,7 +61,7 @@ export function startDrone(): () => void {
   lfoGain.gain.value = 250;
   lfo.connect(lfoGain).connect(lp.frequency);
   lfo.start();
-  master.gain.linearRampToValueAtTime(0.06, c.currentTime + 3);
+  master.gain.linearRampToValueAtTime(0.16, c.currentTime + 3);
   return () => {
     const t = c.currentTime;
     master.gain.cancelScheduledValues(t);
@@ -97,18 +97,18 @@ export function playTimeSkip(seconds: number) {
   f.frequency.setValueAtTime(400, t0);
   f.frequency.exponentialRampToValueAtTime(5000, t0 + seconds - 0.3);
   g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(0.05, t0 + seconds - 0.4);
+  g.gain.exponentialRampToValueAtTime(0.12, t0 + seconds - 0.4);
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + seconds);
-  o.connect(f).connect(g).connect(c.destination);
+  o.connect(f).connect(g).connect(masterBus(c));
   o.start(t0);
   o.stop(t0 + seconds + 0.05);
   // bell
   const tb = t0 + seconds - 0.1;
   for (const [freq, vol, dur] of [
-    [523.25, 0.16, 4],
-    [1046.5, 0.08, 3],
-    [1568, 0.05, 2.2],
-    [2637, 0.025, 1.4],
+    [523.25, 0.4, 4],
+    [1046.5, 0.2, 3],
+    [1568, 0.12, 2.2],
+    [2637, 0.06, 1.4],
   ] as const) {
     blip(c, tb, freq, dur, vol);
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import { unlockAudio } from './audio';
+import { masterBus, unlockAudio } from './audio';
 import { BGM_VOLUME, bgmUrl } from './media';
 
 /**
@@ -27,7 +27,7 @@ export class Bgm {
       if (this.ctx) {
         this.gain = this.ctx.createGain();
         this.gain.gain.value = 0;
-        this.ctx.createMediaElementSource(this.el).connect(this.gain).connect(this.ctx.destination);
+        this.ctx.createMediaElementSource(this.el).connect(this.gain).connect(masterBus(this.ctx));
       }
     }
     unlockAudio();
