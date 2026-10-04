@@ -7,6 +7,7 @@ import { Avatar } from '@/components/Avatar';
 import { PlanetShell } from '@/components/PlanetShell';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { InviteCard } from './InviteCard';
 import { useI18n } from '@/lib/i18n/client';
 
 export function EarthView() {
@@ -41,7 +42,7 @@ function LoginCard() {
       setDevCode(r.devCode ?? null);
       setStep('code');
     } catch (e) {
-      setErr(e instanceof ApiError ? e.message : m.common.error);
+      setErr(e instanceof ApiError && e.code === 'NOT_INVITED' ? m.earth.notInvited : e instanceof ApiError ? e.message : m.common.error);
     } finally {
       setBusy(false);
     }
@@ -140,6 +141,7 @@ function Home() {
         </div>
         <p className="mt-2 text-[11px] text-white/45">{m.earth.bankHint}</p>
       </section>
+      <InviteCard />
       <div className="grid grid-cols-2 gap-3">
         <FeatureTile icon="🎙️" title={m.earth.voice} hint={m.earth.voiceHint} />
         <FeatureTile icon="✉️" title={m.earth.messages} hint={m.earth.messagesHint} />

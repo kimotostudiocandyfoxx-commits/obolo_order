@@ -3,6 +3,7 @@ import {
   MONTHLY_GRANT_MANA,
   type BuddyMessageView,
   type BuddyPersona,
+  type InviteView,
   type Locale,
   type Me,
   type SaturnPostView,
@@ -31,7 +32,11 @@ interface DemoState {
   posts: (Omit<SaturnPostView, 'starredByMe'> & { starredBy: string[] })[];
   quota: Record<string, number>;
   pendingCodes: Record<string, string>;
+  invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
 }
+
+/** Demo invitation that always works: /invite/demo (inviter = KIMORIN). */
+export const DEMO_INVITE_CODE = 'demo';
 
 const KEY = 'obolo.demo.v1';
 const uid = () => crypto.randomUUID();
@@ -106,6 +111,9 @@ export class DemoApi implements Api {
 
   async requestCode(email: string) {
     await sleep(300);
+    if (!Object.values(this.s.users).some((u) => u.email === email.toLowerCase())) {
+      throw new ApiError(403, 'NOT_INVITED', 'invite-only');
+    }
     const code = String(Math.floor(100000 + Math.random() * 900000));
     this.s.pendingCodes[email.toLowerCase()] = code;
     this.save();
@@ -117,28 +125,9 @@ export class DemoApi implements Api {
     const e = email.toLowerCase();
     if (this.s.pendingCodes[e] !== code) throw new ApiError(400, 'CODE_INVALID', 'Wrong code');
     delete this.s.pendingCodes[e];
-    let user = Object.values(this.s.users).find((u) => u.email === e);
-    const isNew = !user;
-    if (!user) {
-      const base = e.split('@')[0].replace(/[^a-z0-9_]/g, '').slice(0, 12) || 'star';
-      user = {
-        id: uid(),
-        email: e,
-        handle: `${base}_${Math.random().toString(16).slice(2, 6)}`,
-        displayName: base,
-        bio: '',
-        country: 'JP',
-        locale: (document.documentElement.lang as Locale) || 'ja',
-        subscriptionStatus: 'demo',
-        createdAt: now(),
-      };
-      this.s.users[user.id] = user;
-      this.s.wallets[user.id] = {
-        mana: MONTHLY_GRANT_MANA,
-        lastActivity: now(),
-        entries: [{ id: uid(), delta: MONTHLY_GRANT_MANA, reason: 'demo_grant', createdAt: now() }],
-      };
-    }
+    const user = Object.values(this.s.users).find((u) => u.email === e);
+    if (!user) throw new ApiError(403, 'NOT_INVITED', 'invite-only');
+    const isNew = false;
     const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
     this.s.sessions[token] = user.id;
     this.save();
@@ -153,7 +142,7 @@ export class DemoApi implements Api {
   }
 
   async me() {
-    return this.s.users[this.uid()];
+    return withDefaults(this.s.users[this.uid()]);
   }
 
   async updateMe(body: Parameters<Api['updateMe']>[0]) {
@@ -303,4 +292,100 @@ export class DemoApi implements Api {
     this.save();
     return { starCount: p.starCount, starredByMe: on };
   }
+
+  // ---------------- Invite-only onboarding (demo) ----------------
+  private invites() {
+    this.s.invites ??= {};
+    return this.s.invites;
+  }
+
+  async getInvite(code: string): Promise<InviteView> {
+    await sleep(200);
+    if (code === DEMO_INVITE_CODE) {
+      return { code, inviterName: 'KIMORIN', status: 'pending', expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
+    }
+    const inv = this.invites()[code];
+    if (!inv) throw new ApiError(404, 'INVITE_NOT_FOUND', 'not found');
+    return { code, inviterName: inv.inviterName, status: inv.status, expiresAt: new Date(Date.parse(inv.createdAt) + 14 * 86400_000).toISOString() };
+  }
+
+  async acceptInvite(code: string, displayName: string) {
+    await sleep(300);
+    const inv = code === DEMO_INVITE_CODE ? null : this.invites()[code];
+    if (code !== DEMO_INVITE_CODE && !inv) throw new ApiError(404, 'INVITE_NOT_FOUND', 'not found');
+    if (inv?.status === 'accepted') throw new ApiError(409, 'INVITE_USED', 'used');
+    const id = uid();
+    const user: Me = {
+      id,
+      // The demo invite has no real email; a placeholder keeps the data model identical.
+      email: inv?.email ?? `demo+${id.slice(0, 8)}@example.com`,
+      handle: `order_${id.slice(0, 6)}`,
+      displayName,
+      bio: '',
+      country: 'JP',
+      locale: 'ja',
+      subscriptionStatus: 'demo',
+      onboardingStage: 'day1',
+      day1CompletedAt: null,
+      invitedByName: inv?.inviterName ?? 'KIMORIN',
+      createdAt: now(),
+    };
+    this.s.users[id] = user;
+    this.s.wallets[id] = {
+      mana: MONTHLY_GRANT_MANA,
+      lastActivity: now(),
+      entries: [{ id: uid(), delta: MONTHLY_GRANT_MANA, reason: 'demo_grant', createdAt: now() }],
+    };
+    if (inv) inv.status = 'accepted';
+    const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+    this.s.sessions[token] = id;
+    this.save();
+    return { token, user, isNew: true };
+  }
+
+  async onboardingProgress(stage: 'day1_done', answers?: Record<string, string>) {
+    void answers;
+    const id = this.uid();
+    const u = withDefaults(this.s.users[id]);
+    if (u.onboardingStage === 'day1') {
+      this.s.users[id] = { ...u, onboardingStage: stage, day1CompletedAt: now() };
+      this.save();
+    }
+    return withDefaults(this.s.users[id]);
+  }
+
+  async myInvites() {
+    const id = this.uid();
+    return Object.values(this.invites())
+      .filter((i) => i.inviterId === id)
+      .map((i) => ({
+        code: i.code,
+        inviterName: i.inviterName,
+        status: i.status,
+        email: i.email,
+        createdAt: i.createdAt,
+        expiresAt: new Date(Date.parse(i.createdAt) + 14 * 86400_000).toISOString(),
+      }))
+      .reverse();
+  }
+
+  async createInvite(email: string) {
+    const id = this.uid();
+    const code = Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(16).padStart(2, '0')).join('');
+    const inv = { code, inviterName: this.s.users[id].displayName, email, status: 'pending' as const, createdAt: now(), inviterId: id };
+    this.invites()[code] = inv;
+    this.save();
+    return { ...inv, expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
+  }
+}
+
+/** Accounts stored by older demo builds lack onboarding fields — treat them as fully onboarded. */
+function withDefaults(u: Me): Me {
+  const legacy = u as Partial<Me>;
+  return {
+    ...u,
+    onboardingStage: legacy.onboardingStage ?? 'complete',
+    day1CompletedAt: legacy.day1CompletedAt ?? null,
+    invitedByName: legacy.invitedByName ?? null,
+  };
 }

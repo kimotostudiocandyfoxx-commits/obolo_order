@@ -28,7 +28,7 @@ async function bootstrap() {
   app.enableCors({
     origin: parseOrigins(cfg.CORS_ORIGINS),
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['authorization', 'content-type', 'accept-language'],
+    allowedHeaders: ['authorization', 'content-type', 'accept-language', 'x-admin-token'],
     maxAge: 600,
   });
   app.useGlobalFilters(new AllExceptionsFilter());

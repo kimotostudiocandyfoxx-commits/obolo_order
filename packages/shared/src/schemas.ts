@@ -52,3 +52,28 @@ export const CreateSaturnPostBody = z.object({
   voiceDurationSec: z.number().min(0).max(600).optional(),
 });
 export type CreateSaturnPostBody = z.infer<typeof CreateSaturnPostBody>;
+
+export const INVITE_CODE_RE = /^[A-Za-z0-9_-]{6,64}$/;
+
+/** Name told to OBOLON during the Day-1 story; becomes the display name. */
+export const AcceptInviteBody = z.object({
+  displayName: z.string().trim().min(1).max(20),
+});
+export type AcceptInviteBody = z.infer<typeof AcceptInviteBody>;
+
+export const CreateInviteBody = z.object({
+  email: z.string().trim().toLowerCase().email().max(254),
+});
+export type CreateInviteBody = z.infer<typeof CreateInviteBody>;
+
+export const AdminCreateInviteBody = CreateInviteBody.extend({
+  inviterName: z.string().trim().min(1).max(40),
+});
+export type AdminCreateInviteBody = z.infer<typeof AdminCreateInviteBody>;
+
+export const OnboardingProgressBody = z.object({
+  stage: z.enum(['day1_done']),
+  /** Answers given in the story (e.g. "want to go to space?"). */
+  answers: z.record(z.string().max(40), z.string().max(100)).optional(),
+});
+export type OnboardingProgressBody = z.infer<typeof OnboardingProgressBody>;

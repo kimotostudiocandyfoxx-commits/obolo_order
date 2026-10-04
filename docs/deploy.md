@@ -62,6 +62,7 @@ printf '%s' "postgres://obolo:$DB_PASSWORD@/obolo?host=/cloudsql/$INSTANCE" | gc
 printf '%s' "$REDIS_URL"      | gcloud secrets create obolo-redis-url --data-file=-
 printf '%s' "$GEMINI_API_KEY" | gcloud secrets create obolo-gemini-api-key --data-file=-
 printf '%s' "PLACEHOLDER"     | gcloud secrets create obolo-bunny-storage-key --data-file=-
+printf '%s' "$(openssl rand -hex 24)" | gcloud secrets create obolo-admin-token --data-file=-   # 招待発行用。値は Secret Manager の画面で確認
 
 # 実行用サービスアカウント
 gcloud iam service-accounts create obolo-api-runtime
@@ -106,6 +107,7 @@ GitHub のリポジトリ → **Settings → Secrets and variables → Actions �
 | `GCP_RUNTIME_SA` | ステップ2の出力 |
 | `CLOUDSQL_INSTANCE` | ステップ2の出力 |
 | `CORS_ORIGINS` | `/^https:\/\/obolo-order[a-z0-9-]*\.vercel\.app$/`（Vercel のURLに合わせる。正式ドメインはカンマ区切りで追加） |
+| `WEB_ORIGIN` | Vercel の URL（招待メールのリンクに使う） |
 | `AUTH_DEMO_SHOW_CODE` | デモ中は `true`（ログインコードを画面に表示）。メール送信を設定したら `false` |
 
 （Bunny を使う時は `BUNNY_STORAGE_ZONE` / `BUNNY_CDN_HOST` も追加し、シークレット `obolo-bunny-storage-key` を本物のキーに更新）
@@ -122,6 +124,14 @@ DB のテーブルは起動時に自動作成されます（`MIGRATE_ON_START=tr
 Vercel → Project → **Settings → Environment Variables**
 - `NEXT_PUBLIC_API_URL` = Cloud Run の URL（Preview と Production の両方にチェック）
 - **Redeploy** すると、デモモードの黄色い帯が消え、本物のログイン・バティ・土星になります
+
+## ステップ6：最初の招待状を出す
+
+OBOLO ORDER は招待制なので、最初の1人は運営が招待します。
+1. Google Cloud の **Secret Manager** → `obolo-admin-token` → 最新バージョンの「値を表示」でトークンをコピー
+2. Vercel の URL に `/admin/invites` を付けて開く（例：`https://obolo-order-web.vercel.app/admin/invites`）
+3. 管理トークン・招待する人のメール・招待者名（例：KIMORIN）を入れて「招待リンクをつくる」
+4. できたリンクを、その人に送る（メール自動送信は準備中）
 
 ## よくあるトラブル
 

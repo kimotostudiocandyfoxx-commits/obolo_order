@@ -4,7 +4,9 @@ import type {
   BuddyProfileView,
   BuddyQuotaView,
   CreateSaturnPostBody,
+  InviteView,
   Locale,
+  MyInviteView,
   Me,
   Paged,
   SaturnPostView,
@@ -43,4 +45,10 @@ export interface Api {
   createSaturnPost(body: CreateSaturnPostBody): Promise<SaturnPostView>;
   deleteSaturnPost(id: string): Promise<void>;
   starSaturnPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;
+  // --- Invite-only onboarding
+  getInvite(code: string): Promise<InviteView>;
+  acceptInvite(code: string, displayName: string): Promise<{ token: string; user: Me; isNew: boolean }>;
+  onboardingProgress(stage: 'day1_done', answers?: Record<string, string>): Promise<Me>;
+  myInvites(): Promise<MyInviteView[]>;
+  createInvite(email: string): Promise<MyInviteView>;
 }

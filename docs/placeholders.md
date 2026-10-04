@@ -18,6 +18,24 @@
 | P-AUTH-2 | 🔴 | メール送信サービス | 送信せずログに出すだけ。`AUTH_DEMO_SHOW_CODE=true` で画面にコードを表示（デモ用）。Resend 用の仮アダプタあり | `apps/api/src/infra/email.ts`、環境変数 |
 | P-AUTH-3 | 🔴 | 未成年の保護者同意・利用上限（OPEN #5） | 未対応 | 法務レビュー後 |
 
+## 1.5 招待制・オンボーディング（2026-10-04 追加決定）
+
+**決定事項**：OBOLO ORDER は**完全招待制**。招待メールのリンク（`/invite/<コード>`）を開いたところから1日目の物語が始まり、OBOLON に名前を伝えた時点でアカウントが作られる。動画はスキップ不可、会話はタップで進む。
+
+| ID | 状態 | 内容 | 現在の仮実装 | 差し替え場所 |
+|---|---|---|---|---|
+| P-OB-1 | ⚪ | 2日目以降（KIMORIN・入会と支払い・プロフィール画像・バティ作成） | 未着手。1日目の翌日（日本時間）からは太陽系ホームに直接入れる | `apps/web/components/HomeGate.tsx` |
+| P-OB-2 | 🟡 | 台本の解釈が必要だった箇所 | ①「門開（モーション11）」はボタンなしで自動再生 ②「やめておく」→ OBOLON「そうか。」→ MONBAN の締め（「おい！待て！」「喋りすぎた」は省略）③ モーション8・18〜26は台本で未使用 ④ 台本の「OBLON」は「OBOLON」に統一 | `apps/web/lib/onboarding/day1.ts` |
+| P-OB-3 | 🟡 | 「明日また来て」の判定 | 日本時間の日付が変わったら解禁。デモ用に「（デモ用）太陽系へ進む」ボタンを表示中（`NEXT_PUBLIC_ALLOW_DAY_SKIP=false` で消える） | `apps/web/lib/onboarding/progress.ts` |
+| P-OB-4 | 🟡 | 動画の配信元 | Web アプリ内（`apps/web/public/onboarding/`）に圧縮版を置いている。本番は Bunny CDN へ（`NEXT_PUBLIC_ONBOARDING_MEDIA_BASE`） | `scripts/encode-onboarding.sh`、`lib/onboarding/media.ts` |
+| P-OB-5 | 🟡 | 招待状の招待者名 | モーション4の動画に「KIMORIN 木元駿之介」が焼き込まれているため、誰が招待しても動画上はKIMORIN。セリフ中の（招待者名）は実際の招待者になる。**名前なしの招待状動画**をもらえれば、名前を画面上に重ねて表示できる | — |
+| P-OB-6 | ⚪ | 物語の英語版 | 台本は日本語のみ（英語表示でも日本語） | `lib/onboarding/day1.ts` |
+| P-OB-7 | 🟡 | 届いていないモーション（6〜29） | 「MOTION n（動画準備中）」の仮画面を表示（再生系は約2.6秒で次へ）。届いたら `AVAILABLE_MOTIONS` に番号を足すだけ | `lib/onboarding/media.ts` |
+| P-INV-1 | 🟡 | 1人が招待できる人数 | 30日で10人まで | `apps/api/src/invites/invites.service.ts` |
+| P-INV-2 | 🟡 | 招待の有効期限 | 14日 | 環境変数 `INVITE_TTL_DAYS` |
+| P-INV-3 | 🟡 | 未登録メールでのログイン | 「招待制です」とはっきり表示（＝登録の有無が分かってしまう）。メール送信を入れたら黙って「送信しました」にする | `apps/api/src/auth/auth.service.ts` |
+| — | 🔴 | 最初の招待状の発行 | 運営用 API `POST /admin/invites`（環境変数 `ADMIN_TOKEN` が必要）。発行画面はまだない。デモモードでは `/invite/demo` がいつでも使える | — |
+
 ## 2. 月（バティ）
 
 | ID | 状態 | 内容 | 現在の仮実装 | 差し替え場所 |

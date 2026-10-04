@@ -49,6 +49,13 @@ export const users = pgTable(
     virtualAccountNo: text('virtual_account_no'),
     kycStatus: text('kyc_status').notNull().default('none'),
     storageUsageBytes: bigint('storage_usage_bytes', { mode: 'number' }).notNull().default(0),
+    /** Invite-only (client decision 2026-10-04): who invited this user. */
+    invitedByUserId: uuid('invited_by_user_id'),
+    invitedByName: text('invited_by_name'),
+    /** Onboarding story progress: day1 → day1_done → complete. Pre-invite accounts are 'complete'. */
+    onboardingStage: text('onboarding_stage').notNull().default('complete'),
+    day1CompletedAt: timestamp('day1_completed_at', { withTimezone: true }),
+    onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
     lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
     ...timestamps,
   },
@@ -202,4 +209,27 @@ export const starEvents = pgTable(
     uniqueIndex('star_events_uq').on(t.userId, t.targetType, t.targetId),
     check('star_events_tier', sql`${t.tier} BETWEEN 1 AND 3`),
   ],
+);
+
+/**
+ * Invitations (the app is fully invite-only — client decision 2026-10-04).
+ * A link /invite/<code> is sent to `email`; opening it starts the Day-1 story and the account
+ * is created when the visitor tells OBOLON their name.
+ */
+export const invites = pgTable(
+  'invites',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    code: text('code').notNull(),
+    inviterUserId: uuid('inviter_user_id').references(() => users.id),
+    /** Snapshot shown in the story ("（招待者名）から招待されたのか…"). */
+    inviterName: text('inviter_name').notNull(),
+    email: text('email').notNull(),
+    status: text('status').notNull().default('pending'), // pending | accepted | revoked
+    acceptedUserId: uuid('accepted_user_id').references(() => users.id),
+    acceptedAt: timestamp('accepted_at', { withTimezone: true }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('invites_code_uq').on(t.code), index('invites_inviter_idx').on(t.inviterUserId, t.createdAt)],
 );

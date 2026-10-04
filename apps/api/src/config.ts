@@ -39,6 +39,12 @@ const Env = z.object({
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
 
   SESSION_TTL_DAYS: z.coerce.number().default(30),
+  /** Invite-only: token for POST /admin/invites (issuing the first invitations). Unset = admin API disabled. */
+  ADMIN_TOKEN: secret(),
+  /** PLACEHOLDER (P-INV-2): invitation validity. */
+  INVITE_TTL_DAYS: z.coerce.number().default(14),
+  /** Web origin used in invitation emails, e.g. https://obolo-order-web.vercel.app */
+  WEB_ORIGIN: secret(),
   /** PLACEHOLDER (P-AUTH-2): until an email provider is wired, return the login code in the API
    *  response so the demo works. MUST be false in production. */
   AUTH_DEMO_SHOW_CODE: bool(false),

@@ -10,3 +10,4 @@ coverage/
 .vercel
 .DS_Store
 next-env.d.ts
+apps/web/public/onboarding-test/

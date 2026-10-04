@@ -11,6 +11,23 @@ export interface Me {
   country: string;
   locale: Locale;
   subscriptionStatus: 'none' | 'demo' | 'active' | 'past_due' | 'canceled';
+  onboardingStage: OnboardingStage;
+  day1CompletedAt: string | null;
+  invitedByName: string | null;
+  createdAt: string;
+}
+
+export type OnboardingStage = 'day1' | 'day1_done' | 'complete';
+
+export interface InviteView {
+  code: string;
+  inviterName: string;
+  status: 'pending' | 'accepted' | 'revoked' | 'expired';
+  expiresAt: string;
+}
+
+export interface MyInviteView extends InviteView {
+  email: string;
   createdAt: string;
 }
 

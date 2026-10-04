@@ -264,3 +264,23 @@ body {
     height: 100%;
   }
 }
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes letterIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotate(-4deg) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1deg);
+  }
+}

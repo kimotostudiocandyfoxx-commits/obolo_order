@@ -41,8 +41,13 @@ packages/media  Bunny のキー設計・アップロード
 
 | メソッド | パス | 用途 |
 |---|---|---|
-| POST | `/auth/request-code` | ログインコード送信 |
-| POST | `/auth/verify` | コード確認 → トークン発行（初回は自動登録＋88 MANA） |
+| GET | `/invites/:code` | 招待の確認（招待者名・状態） |
+| POST | `/invites/:code/accept` | OBOLON に名前を伝える → アカウント作成＋88 MANA＋トークン発行 |
+| GET/POST | `/invites` | 自分の招待一覧／仲間を招待 |
+| POST | `/admin/invites` | 運営が最初の招待を発行（`x-admin-token`） |
+| POST | `/me/onboarding` | 1日目の物語の完了を記録 |
+| POST | `/auth/request-code` | ログインコード送信（ORDERメンバーのみ） |
+| POST | `/auth/verify` | コード確認 → トークン発行 |
 | POST | `/auth/logout` | ログアウト |
 | GET/PATCH | `/me` | プロフィール |
 | GET | `/wallet` | MANA・EARNINGS 残高と履歴（表示のみ） |

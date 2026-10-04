@@ -92,4 +92,19 @@ export class HttpApi implements Api {
   starSaturnPost(id: string, on: boolean) {
     return this.req<{ starCount: number; starredByMe: boolean }>(on ? 'POST' : 'DELETE', `/saturn/posts/${id}/star`);
   }
+  getInvite(code: string) {
+    return this.req<Awaited<ReturnType<Api['getInvite']>>>('GET', `/invites/${encodeURIComponent(code)}`);
+  }
+  acceptInvite(code: string, displayName: string) {
+    return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName });
+  }
+  onboardingProgress(stage: 'day1_done', answers?: Record<string, string>) {
+    return this.req<Awaited<ReturnType<Api['onboardingProgress']>>>('POST', '/me/onboarding', { stage, answers });
+  }
+  myInvites() {
+    return this.req<Awaited<ReturnType<Api['myInvites']>>>('GET', '/invites');
+  }
+  createInvite(email: string) {
+    return this.req<Awaited<ReturnType<Api['createInvite']>>>('POST', '/invites', { email });
+  }
 }

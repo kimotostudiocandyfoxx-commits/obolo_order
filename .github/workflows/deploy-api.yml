@@ -59,6 +59,7 @@ jobs:
             MIGRATE_ON_START=true
             QUEUE_DRIVER=inline
             CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
+            WEB_ORIGIN=${{ vars.WEB_ORIGIN }}
             AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || 'true' }}
             BUDDY_OVERAGE_ENABLED=false
             BUNNY_STORAGE_ZONE=${{ vars.BUNNY_STORAGE_ZONE }}
@@ -69,3 +70,4 @@ jobs:
             REDIS_URL=obolo-redis-url:latest
             GEMINI_API_KEY=obolo-gemini-api-key:latest
             BUNNY_STORAGE_KEY=obolo-bunny-storage-key:latest
+            ADMIN_TOKEN=obolo-admin-token:latest
