@@ -30,7 +30,7 @@
 | P-OB-4 | 🟡 | 動画の配信元 | Web アプリ内（`apps/web/public/onboarding/`）に圧縮版を置いている。本番は Bunny CDN へ（`NEXT_PUBLIC_ONBOARDING_MEDIA_BASE`） | `scripts/encode-onboarding.sh`、`lib/onboarding/media.ts` |
 | P-OB-5 | 🟡 | 招待状の招待者名 | モーション4の動画に「KIMORIN 木元駿之介」が焼き込まれているため、誰が招待しても動画上はKIMORIN。セリフ中の（招待者名）は実際の招待者になる。**名前なしの招待状動画**をもらえれば、名前を画面上に重ねて表示できる | — |
 | P-OB-6 | ⚪ | 物語の英語版 | 台本は日本語のみ（英語表示でも日本語） | `lib/onboarding/day1.ts` |
-| P-OB-7 | 🟡 | 届いていないモーション（12〜17・27〜29） | 「MOTION n（動画準備中）」の仮画面を表示（再生系は約2.6秒で次へ）。届いたら `AVAILABLE_MOTIONS` に番号を足すだけ | `lib/onboarding/media.ts` |
+| P-OB-7 | 🟡 | 届いていないモーション（17・27〜29） | 「MOTION n（動画準備中）」の仮画面を表示（再生系は約2.6秒で次へ）。届いたら `AVAILABLE_MOTIONS` に番号を足すだけ | `lib/onboarding/media.ts` |
 | P-INV-1 | 🟡 | 1人が招待できる人数 | 30日で10人まで | `apps/api/src/invites/invites.service.ts` |
 | P-INV-2 | 🟡 | 招待の有効期限 | 14日 | 環境変数 `INVITE_TTL_DAYS` |
 | P-INV-3 | 🟡 | 未登録メールでのログイン | 「招待制です」とはっきり表示（＝登録の有無が分かってしまう）。メール送信を入れたら黙って「送信しました」にする | `apps/api/src/auth/auth.service.ts` |
