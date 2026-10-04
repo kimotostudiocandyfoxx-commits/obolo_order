@@ -23,103 +23,70 @@ API がなくても、Web は**デモモード**で全画面を確認できま�
 
 > ビルド設定は `apps/web/vercel.json` にあります（モノレポの共有パッケージを先にビルドします）。
 
-## ステップ1：Upstash Redis（5分）
+## ステップ1：Gemini API キー（3分）
+
+1. https://aistudio.google.com/apikey を開いて Google アカウントでログイン
+2. **Create API key**（「APIキーを作成」）→ 表示されたキー（`AIza…`）をメモ
+
+> 無くても進められます（バティは仮の返事になります）。あとから入れ直せます。
+
+## ステップ2：Upstash Redis（5分）
 
 1. https://console.upstash.com → **Create Database**
-2. Region: **ap-northeast-1 (Tokyo)**、TLS: ON
-3. 「Connect」→ **ioredis** タブの URL（`rediss://default:xxxx@xxxx.upstash.io:6379`）をメモ
+2. Name: `obolo`、Region: **ap-northeast-1 (Tokyo)**（Primary Region）、プランは Free
+3. できたデータベースの画面を下にスクロール → **Connect** の **ioredis** タブにある
+   `rediss://default:xxxx@xxxx.upstash.io:6379` をメモ（目のアイコンで伏せ字を外してからコピー）
 
-## ステップ2：Google Cloud（Cloud Shell で 20〜30分）
+## ステップ3：Google Cloud（Cloud Shell で 15〜20分。ほぼ待つだけ）
 
-https://console.cloud.google.com でプロジェクトを作り、右上の **Cloud Shell** アイコンを開いて、
-下の値を自分のものに書き換えてから貼り付けます。
+1. https://console.cloud.google.com → 上部のプロジェクト選択 → **新しいプロジェクト**
+   - 名前：`obolo-order`（プロジェクトID は自動で付きます）
+2. 左メニュー **お支払い（Billing）** でこのプロジェクトに請求先アカウントをリンク
+   （Cloud SQL に必要。デモ構成で月 1,500〜2,000円ほど。無料トライアルのクレジットでも可）
+3. 右上の **Cloud Shell**（`>_` アイコン）を開き、次の1行を貼り付けて Enter
 
 ```bash
-# ===== 書き換える値（P-INFRA-1）=====
-PROJECT_ID=obolo-order-prod
-GITHUB_REPO=kimotostudiocandyfoxx-commits/obolo_order
-DB_PASSWORD='長いランダムな文字列'
-REDIS_URL='rediss://default:xxxx@xxxx.upstash.io:6379'
-GEMINI_API_KEY='（Google AI Studio で発行。まだ無ければ PLACEHOLDER のまま）'
-# ====================================
-REGION=asia-northeast1
-gcloud config set project $PROJECT_ID
-gcloud services enable run.googleapis.com sqladmin.googleapis.com artifactregistry.googleapis.com \
-  secretmanager.googleapis.com iamcredentials.googleapis.com
-
-# Docker イメージ置き場
-gcloud artifacts repositories create obolo --repository-format=docker --location=$REGION
-
-# Cloud SQL (PostgreSQL 16) — デモは最小構成。後で読み取りレプリカを追加できます
-gcloud sql instances create obolo-pg --database-version=POSTGRES_16 --region=$REGION \
-  --tier=db-f1-micro --storage-auto-increase
-gcloud sql databases create obolo --instance=obolo-pg
-gcloud sql users create obolo --instance=obolo-pg --password="$DB_PASSWORD"
-INSTANCE="$PROJECT_ID:$REGION:obolo-pg"
-
-# シークレット
-printf '%s' "postgres://obolo:$DB_PASSWORD@/obolo?host=/cloudsql/$INSTANCE" | gcloud secrets create obolo-database-url --data-file=-
-printf '%s' "$REDIS_URL"      | gcloud secrets create obolo-redis-url --data-file=-
-printf '%s' "$GEMINI_API_KEY" | gcloud secrets create obolo-gemini-api-key --data-file=-
-printf '%s' "PLACEHOLDER"     | gcloud secrets create obolo-bunny-storage-key --data-file=-
-printf '%s' "$(openssl rand -hex 24)" | gcloud secrets create obolo-admin-token --data-file=-   # 招待発行用。値は Secret Manager の画面で確認
-
-# 実行用サービスアカウント
-gcloud iam service-accounts create obolo-api-runtime
-RUNTIME_SA=obolo-api-runtime@$PROJECT_ID.iam.gserviceaccount.com
-for r in roles/cloudsql.client roles/secretmanager.secretAccessor; do
-  gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:$RUNTIME_SA --role=$r
-done
-
-# GitHub Actions からデプロイするためのサービスアカウント（鍵ファイル不要の Workload Identity）
-gcloud iam service-accounts create obolo-deployer
-DEPLOY_SA=obolo-deployer@$PROJECT_ID.iam.gserviceaccount.com
-for r in roles/run.admin roles/artifactregistry.writer roles/iam.serviceAccountUser; do
-  gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:$DEPLOY_SA --role=$r
-done
-gcloud iam workload-identity-pools create github --location=global
-gcloud iam workload-identity-pools providers create-oidc github --location=global --workload-identity-pool=github \
-  --issuer-uri=https://token.actions.githubusercontent.com \
-  --attribute-mapping=google.subject=assertion.sub,attribute.repository=assertion.repository \
-  --attribute-condition="assertion.repository=='$GITHUB_REPO'"
-POOL=$(gcloud iam workload-identity-pools describe github --location=global --format='value(name)')
-gcloud iam service-accounts add-iam-policy-binding $DEPLOY_SA --role=roles/iam.workloadIdentityUser \
-  --member="principalSet://iam.googleapis.com/$POOL/attribute.repository/$GITHUB_REPO"
-
-echo "GCP_PROJECT_ID=$PROJECT_ID"
-echo "GCP_WIF_PROVIDER=$POOL/providers/github"
-echo "GCP_DEPLOY_SA=$DEPLOY_SA"
-echo "GCP_RUNTIME_SA=$RUNTIME_SA"
-echo "CLOUDSQL_INSTANCE=$INSTANCE"
+curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo_order/claude/solar-system-home-planets-ew766y/scripts/gcp-setup.sh -o setup.sh && bash setup.sh
 ```
 
-最後に表示された5行をメモします。
+4. 聞かれたものを貼り付けて Enter
+   - プロジェクトID（表示されていればそのまま Enter）
+   - Upstash の URL（ステップ2）
+   - Gemini API キー（ステップ1。無ければ空で Enter）
+   - 「承認」のポップアップが出たら **承認**
+5. 最後に緑で **GCP_PROJECT_ID** と **GCP_PROJECT_NUMBER** が表示されたら完了
 
-## ステップ3：GitHub に値を登録（5分）
+> 途中で止まっても、もう一度同じ1行を貼れば続きからやり直せます（作成済みのものはそのまま使います）。
 
-GitHub のリポジトリ → **Settings → Secrets and variables → Actions → Variables** タブ → **New repository variable**
+## ステップ4：GitHub に2つの値を登録して API をデプロイ（5分）
+
+1. GitHub のリポジトリ → **Settings → Secrets and variables → Actions → Variables** タブ
+   → **New repository variable** で2つ登録
 
 | 名前 | 値 |
 |---|---|
-| `GCP_PROJECT_ID` | ステップ2の出力 |
-| `GCP_WIF_PROVIDER` | ステップ2の出力 |
-| `GCP_DEPLOY_SA` | ステップ2の出力 |
-| `GCP_RUNTIME_SA` | ステップ2の出力 |
-| `CLOUDSQL_INSTANCE` | ステップ2の出力 |
-| `CORS_ORIGINS` | `/^https:\/\/obolo-order[a-z0-9-]*\.vercel\.app$/`（Vercel のURLに合わせる。正式ドメインはカンマ区切りで追加） |
-| `WEB_ORIGIN` | Vercel の URL（招待メールのリンクに使う） |
-| `AUTH_DEMO_SHOW_CODE` | デモ中は `true`（ログインコードを画面に表示）。メール送信を設定したら `false` |
+| `GCP_PROJECT_ID` | ステップ3の最後に表示された値 |
+| `GCP_PROJECT_NUMBER` | ステップ3の最後に表示された値 |
 
-（Bunny を使う時は `BUNNY_STORAGE_ZONE` / `BUNNY_CDN_HOST` も追加し、シークレット `obolo-bunny-storage-key` を本物のキーに更新）
+2. **Actions** タブ → 左の **Deploy API** → **Run workflow** → 緑の **Run workflow**
+3. 5分ほどで緑のチェック。開くと **API URL: `https://obolo-api-xxxx.asia-northeast1.run.app`** が表示されます
+   - その URL の最後に `/readyz` を付けて開き `{"ok":true}` なら DB と Redis につながっています
+   - DB のテーブルは起動時に自動で作られます
 
-## ステップ4：API をデプロイ
+以後、このブランチに push するたびに API も自動で更新されます。
 
-GitHub → **Actions → Deploy API → Run workflow**（以後は main への push で自動）。
-完了すると Cloud Run の URL（`https://obolo-api-xxxx-an.a.run.app`）が出ます。
-`https://…run.app/readyz` を開いて `{"ok":true}` なら DB と Redis につながっています。
-DB のテーブルは起動時に自動作成されます（`MIGRATE_ON_START=true`）。
+<details><summary>任意の変数（普段は不要）</summary>
 
-## ステップ5：Web と API をつなぐ
+| 名前 | 既定値 / 用途 |
+|---|---|
+| `CORS_ORIGINS` | `/^https:\/\/obolo[a-z0-9-]*\.vercel\.app$/`。Vercel の URL が `obolo` で始まらない時や正式ドメインを足す時に（カンマ区切り） |
+| `WEB_ORIGIN` | 招待メールのリンク先（メール送信を入れたら） |
+| `AUTH_DEMO_SHOW_CODE` | 既定 `true`（ログインコードを画面に表示）。メール送信を設定したら `false` |
+| `BUNNY_STORAGE_ZONE` / `BUNNY_CDN_HOST` | Bunny を使う時（シークレット `obolo-bunny-storage-key` も本物に更新） |
+
+</details>
+
+## ステップ5：Web と API をつなぐ（3分）
 
 Vercel → Project → **Settings → Environment Variables**
 - `NEXT_PUBLIC_API_URL` = Cloud Run の URL（Preview と Production の両方にチェック）
@@ -144,6 +111,7 @@ OBOLO ORDER は招待制なので、最初の1人は運営が招待します。
 | 症状 | 原因と対処 |
 |---|---|
 | 画面に黄色い「デモモード」帯が出る | `NEXT_PUBLIC_API_URL` が未設定。設定後に Redeploy が必要（ビルド時に埋め込まれるため） |
-| ログイン時に「Network error」 | CORS。`CORS_ORIGINS` にプレビューURLが一致しているか確認 |
-| バティがいつも同じような返事 | `GEMINI_API_KEY` が未設定（オフラインの仮返答）。シークレットを更新して再デプロイ |
+| ログイン時に「Network error」 | CORS。Vercel の URL が `obolo` で始まらない場合は変数 `CORS_ORIGINS` を追加して Deploy API を再実行 |
+| バティがいつも同じような返事 | Gemini キーが未設定（仮返答）。Cloud Shell でセットアップの1行をもう一度実行してキーを入れ、Deploy API を再実行 |
+| Deploy API が `Permission denied` / `unauthorized` | 変数の値違い、またはセットアップ直後で権限の反映待ち。数分おいて Re-run |
 | 土星の音声が再生されない | Bunny 未設定時は API から仮配信しています。`https://…run.app/media/<id>` が開けるか確認 |
