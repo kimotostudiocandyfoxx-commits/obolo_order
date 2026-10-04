@@ -7,7 +7,7 @@
 export const MEDIA_BASE = (process.env.NEXT_PUBLIC_ONBOARDING_MEDIA_BASE || '/onboarding').replace(/\/$/, '');
 
 /** Motions that have been delivered. Missing ones render a placeholder so the whole story is testable. */
-export const AVAILABLE_MOTIONS: ReadonlySet<number> = new Set([1, 2, 3, 4, 5]);
+export const AVAILABLE_MOTIONS: ReadonlySet<number> = new Set([1, 2, 3, 4, 5, 6, 7, 9, 10, 11]);
 
 export const motionUrl = (n: number) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: number) => `${MEDIA_BASE}/m${n}.jpg`;

@@ -22,8 +22,7 @@ export const DAY1: Step[] = [
   { t: 'action', label: '本部へ向かう' },
 
   { t: 'video', motion: 5 },
-  { t: 'loop', motion: 6 },
-  { t: 'caption', text: 'OBOLO ORDER 本部に到着' },
+  { t: 'loop', motion: 6 }, // 「本部に到着しました」is in the video itself
   { t: 'action', label: '中に入る' },
 
   { t: 'video', motion: 7 },
