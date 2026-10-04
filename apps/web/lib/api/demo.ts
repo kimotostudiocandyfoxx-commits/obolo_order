@@ -4,6 +4,7 @@ import {
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
   MONTHLY_GRANT_MANA,
+  neoVoiceUrl,
   type BuddyMessageView,
   type BuddyPersona,
   type InviteView,
@@ -272,10 +273,10 @@ export class DemoApi implements Api {
     const u = this.s.users[id];
     const p = {
       id: uid(),
-      author: { id, handle: u.handle, displayName: u.displayName },
+      author: { id, handle: u.handle, displayName: u.displayName, neoForm: u.neoForm },
       text: body.text,
-      voiceUrl: `idb:${body.voiceMediaId}`,
-      voiceSource: 'recorded' as const,
+      voiceUrl: body.voiceStyle ? neoVoiceUrl(body.voiceStyle, u.neoForm, body.text) : `idb:${body.voiceMediaId}`,
+      voiceSource: body.voiceStyle ? ('default' as const) : ('recorded' as const),
       voiceDurationSec: body.voiceDurationSec ?? null,
       starCount: 0,
       starredBy: [],

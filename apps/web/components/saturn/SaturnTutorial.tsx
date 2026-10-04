@@ -6,16 +6,20 @@ import { KororinWorld } from './KororinWorld';
 
 /**
  * Day 4 tutorial on top of ころりん, coached by たこ焼きブラザー / たこ焼きシスター.
- * Steps: listen to a voice → give a star → drop your own voice → done.
+ * Steps: listen to a voice → give a star → write something and have it read in the NEO voice
+ * (choose the style) → why it is the NEO voice → done.
  * PLACEHOLDER (P-OB-13): provisional lines by Claude.
  */
 type Who = 'brother' | 'sister';
+// Endings (client, 2026-10-04): ブラザー → 「だZE!!」/「ZE!!」, シスター → 「わ。」
 const STEPS: { who: Who; text: string; wait: 'listen' | 'star' | 'post' | 'next' | 'done' }[] = [
-  { who: 'sister', text: 'ころころしてるのは、ぜんぶ、みんなの声。\nひとつ、さわってみて。', wait: 'listen' },
-  { who: 'brother', text: 'な？ 声で聞くと、気持ちがぜんぶ伝わるだろ。', wait: 'next' },
-  { who: 'sister', text: 'いいなと思ったら、星をあげて。\n星は、そのまま気持ちになって届くの。', wait: 'star' },
-  { who: 'brother', text: '次はお前の番だ。\n「声をおとす」で、いまの気持ちを呟いてみな。', wait: 'post' },
-  { who: 'sister', text: 'あなたの声が、土星にころがった。\nこれが、土星の遊び方。', wait: 'done' },
+  { who: 'sister', text: 'ころころしてるのは、ぜんぶ、みんなの声だわ。\nひとつ、さわってみるといいわ。', wait: 'listen' },
+  { who: 'brother', text: 'な？ 声で聞くと、気持ちがぜんぶ伝わるだろ？\nこれが土星だZE!!', wait: 'next' },
+  { who: 'sister', text: 'いいなと思ったら、星をあげるといいわ。\n星は、そのまま気持ちになって届くわ。', wait: 'star' },
+  { who: 'sister', text: '試しに呟いてみたらいいわ。', wait: 'post' },
+  { who: 'brother', text: '今はネオだから、ネオの声だZE!!', wait: 'next' },
+  { who: 'sister', text: 'ORDERになったら、登録した声にできるわ。', wait: 'next' },
+  { who: 'sister', text: 'あなたの声が、土星にころがったわ。\nこれが土星の遊び方だわ。', wait: 'done' },
 ];
 
 const NAMES: Record<Who, string> = { brother: 'たこ焼きブラザー', sister: 'たこ焼きシスター' };
@@ -28,6 +32,8 @@ export function SaturnTutorial({ onDone }: { onDone: () => void }) {
   return (
     <div className="fixed inset-0 z-[150]">
       <KororinWorld
+        neoOnly
+        highlightDrop={step?.wait === 'post'}
         events={{ onListen: () => advanceOn('listen'), onStar: () => advanceOn('star'), onPosted: () => advanceOn('post') }}
         overlay={
           step && (
@@ -39,11 +45,7 @@ export function SaturnTutorial({ onDone }: { onDone: () => void }) {
                   <p className="text-[11px] font-black text-violet-500">{NAMES[step.who]}</p>
                   <p className="mt-0.5 whitespace-pre-wrap text-[15px] font-bold leading-snug">{step.text}</p>
                   <div className="mt-2 flex items-center justify-end gap-3">
-                    {step.wait === 'post' && (
-                      <button onClick={() => setI(i + 1)} className="text-[11px] text-slate-400 underline">
-                        あとでやる
-                      </button>
-                    )}
+                    {step.wait === 'post' && <span className="animate-pulse text-[11px] font-bold text-pink-500">👇「声をおとす」をタップ</span>}
                     {step.wait === 'next' && (
                       <button onClick={() => setI(i + 1)} className="rounded-full bg-violet-500 px-4 py-1.5 text-xs font-bold text-white">
                         つぎへ

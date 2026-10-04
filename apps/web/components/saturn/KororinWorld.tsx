@@ -1,6 +1,6 @@
 'use client';
 
-import { SATURN_MAX_CHARS, type SaturnPostView } from '@obolo/shared';
+import { neoVoiceUrl, SATURN_MAX_CHARS, VOICE_STYLES, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
@@ -42,8 +42,14 @@ export function KororinWorld({
   events,
   overlay,
   className = '',
+  neoOnly = false,
+  highlightDrop = false,
 }: {
   events?: KororinEvents;
+  /** Only the NEO voice can be used to post (Day 4 tutorial). */
+  neoOnly?: boolean;
+  /** Make the 声をおとす button pulse (tutorial cue). */
+  highlightDrop?: boolean;
   /** Extra layer on top (tutorial coach). */
   overlay?: ReactNode;
   className?: string;
@@ -199,6 +205,8 @@ export function KororinWorld({
     setDropped(p.id);
     setComposer(false);
     setTimeout(() => setDropped(null), 1600);
+    // play your own voice right after it lands
+    setTimeout(() => listen(p), 1300);
     events?.onPosted?.();
   };
 
@@ -319,7 +327,7 @@ export function KororinWorld({
               close();
               setComposer(true);
             }}
-            className="rounded-full bg-gradient-to-r from-pink-400 to-violet-400 px-7 py-3.5 text-base font-black text-white shadow-lg"
+            className={`rounded-full bg-gradient-to-r from-pink-400 to-violet-400 px-7 py-3.5 text-base font-black text-white shadow-lg ${highlightDrop ? 'animate-pulse ring-4 ring-pink-200' : ''}`}
             data-kororin="drop"
           >
             🎙 声をおとす
@@ -330,27 +338,43 @@ export function KororinWorld({
         </div>
       </div>
 
-      {composer && <DropComposer onClose={() => setComposer(false)} onPosted={onPosted} />}
+      {composer && <DropComposer neoOnly={neoOnly} onClose={() => setComposer(false)} onPosted={onPosted} />}
       {overlay}
     </div>
   );
 }
 
-/** 声をおとす: write a short line, record it in your own voice, drop it onto Saturn. */
-function DropComposer({ onClose, onPosted }: { onClose: () => void; onPosted: (p: SaturnPostView) => void }) {
+/**
+ * 声をおとす: write a short line and drop it onto Saturn, read aloud either
+ *  - by the NEO voice in a chosen style (OBOLO NEO members; client decision 2026-10-04), or
+ *  - with a recording of your own voice.
+ */
+function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onPosted: (p: SaturnPostView) => void; neoOnly: boolean }) {
+  const { me } = useAuth();
   const rec = useRecorder();
+  const [mode, setMode] = useState<'neo' | 'record'>('neo');
+  const [style, setStyle] = useState(VOICE_STYLES[0].id);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const left = SATURN_MAX_CHARS - [...text].length;
+  const canPost = !!text.trim() && left >= 0 && !busy && (mode === 'neo' || (!!rec.blob && !rec.recording));
+
+  const preview = () => {
+    if (text.trim()) void toggleAudio(neoVoiceUrl(style, me?.neoForm, text.trim())).catch(() => undefined);
+  };
 
   const post = async () => {
-    if (!rec.blob) return;
     setBusy(true);
     setErr(null);
     try {
-      const media = await getApi().uploadVoice(rec.blob);
-      onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceMediaId: media.id, voiceDurationSec: rec.duration }));
+      if (mode === 'neo') {
+        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style }));
+      } else {
+        if (!rec.blob) return;
+        const media = await getApi().uploadVoice(rec.blob);
+        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceMediaId: media.id, voiceDurationSec: rec.duration }));
+      }
     } catch {
       setErr('うまく落とせなかった…もう一度');
       setBusy(false);
@@ -361,35 +385,76 @@ function DropComposer({ onClose, onPosted }: { onClose: () => void; onPosted: (p
     <div className="absolute inset-0 z-[95] flex items-end justify-center bg-violet-950/50" onClick={onClose}>
       <div className="pb-safe w-full max-w-md rounded-t-3xl bg-white p-5 text-slate-800" onClick={(e) => e.stopPropagation()}>
         <p className="text-center text-sm font-black text-violet-600">いまの気持ちを、声でおとす</p>
+        {!neoOnly && (
+          <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full bg-violet-50 p-1">
+            {(
+              [
+                ['neo', 'ネオの声で読む'],
+                ['record', '自分で録音'],
+              ] as const
+            ).map(([k, label]) => (
+              <button key={k} onClick={() => setMode(k)} className={`rounded-full px-4 py-1.5 text-xs font-bold ${mode === k ? 'bg-violet-500 text-white' : 'text-violet-500'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         <textarea
           className="mt-3 h-24 w-full resize-none rounded-2xl bg-violet-50 p-3 text-[16px] outline-none"
-          placeholder="ひとこと（声といっしょに届きます）"
+          placeholder="なんでもいい。いま思ったことを書いてみて"
           maxLength={SATURN_MAX_CHARS * 2}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        <div className="mt-2 flex items-center gap-2">
-          {!rec.recording && !rec.blob && (
-            <button onClick={() => void rec.start()} className="rounded-full bg-rose-400 px-4 py-2 text-sm font-bold text-white">
-              ● 録音
-            </button>
-          )}
-          {rec.recording && (
-            <button onClick={rec.stop} className="animate-pulse rounded-full bg-rose-500 px-4 py-2 text-sm font-bold text-white">
-              ■ 停止 {rec.elapsed}秒
-            </button>
-          )}
-          {rec.blob && !rec.recording && (
-            <button onClick={() => void rec.start()} className="rounded-full bg-violet-100 px-4 py-2 text-sm font-bold text-violet-600">
-              ↺ 録り直す（{rec.duration.toFixed(1)}秒）
-            </button>
-          )}
-          <span className={`ml-auto text-xs ${left < 0 ? 'text-rose-500' : 'text-slate-400'}`}>{left}</span>
+        <div className="mt-1 text-right text-xs text-slate-400">
+          <span className={left < 0 ? 'text-rose-500' : ''}>{left}</span>
         </div>
-        {rec.error && <p className="mt-2 text-xs text-rose-500">{rec.error === 'denied' ? 'マイクを許可してください' : 'このブラウザでは録音できません'}</p>}
+
+        {mode === 'neo' ? (
+          <>
+            <p className="mt-1 text-xs font-black text-violet-600">どんな感じで読んでもらう？</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {VOICE_STYLES.map((v) => (
+                <button
+                  key={v.id}
+                  onClick={() => setStyle(v.id)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-bold ${style === v.id ? 'bg-violet-500 text-white' : 'bg-violet-50 text-violet-600'}`}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={preview}
+              disabled={!text.trim()}
+              className="mt-3 w-full rounded-full bg-violet-100 py-2.5 text-sm font-bold text-violet-700 disabled:opacity-40"
+            >
+              ▶ ネオの声で聞いてみる
+            </button>
+          </>
+        ) : (
+          <div className="mt-2 flex items-center gap-2">
+            {!rec.recording && !rec.blob && (
+              <button onClick={() => void rec.start()} className="rounded-full bg-rose-400 px-4 py-2 text-sm font-bold text-white">
+                ● 録音
+              </button>
+            )}
+            {rec.recording && (
+              <button onClick={rec.stop} className="animate-pulse rounded-full bg-rose-500 px-4 py-2 text-sm font-bold text-white">
+                ■ 停止 {rec.elapsed}秒
+              </button>
+            )}
+            {rec.blob && !rec.recording && (
+              <button onClick={() => void rec.start()} className="rounded-full bg-violet-100 px-4 py-2 text-sm font-bold text-violet-600">
+                ↺ 録り直す（{rec.duration.toFixed(1)}秒）
+              </button>
+            )}
+          </div>
+        )}
+        {rec.error && mode === 'record' && <p className="mt-2 text-xs text-rose-500">{rec.error === 'denied' ? 'マイクを許可してください' : 'このブラウザでは録音できません'}</p>}
         {err && <p className="mt-2 text-xs text-rose-500">{err}</p>}
         <button
-          disabled={!rec.blob || !text.trim() || left < 0 || busy || rec.recording}
+          disabled={!canPost}
           onClick={() => void post()}
           className="mt-4 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-3.5 text-base font-black text-white disabled:opacity-40"
         >

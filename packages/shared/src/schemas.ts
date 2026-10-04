@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { LOCALES, SATURN_MAX_CHARS } from './config';
 import { NEO_FORM_IDS } from './neo';
+import { VOICE_STYLE_IDS } from './neoVoice';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -48,12 +49,16 @@ export const BuddyChatBody = z.object({
 });
 export type BuddyChatBody = z.infer<typeof BuddyChatBody>;
 
-export const CreateSaturnPostBody = z.object({
-  text: z.string().trim().min(1).max(SATURN_MAX_CHARS),
-  /** id returned by POST /media/voice */
-  voiceMediaId: z.string().uuid(),
-  voiceDurationSec: z.number().min(0).max(600).optional(),
-});
+export const CreateSaturnPostBody = z
+  .object({
+    text: z.string().trim().min(1).max(SATURN_MAX_CHARS),
+    /** id returned by POST /media/voice (recorded voice) */
+    voiceMediaId: z.string().uuid().optional(),
+    /** NEO voice: read the text aloud in this style instead of a recording */
+    voiceStyle: z.enum(VOICE_STYLE_IDS).optional(),
+    voiceDurationSec: z.number().min(0).max(600).optional(),
+  })
+  .refine((b) => !!b.voiceMediaId !== !!b.voiceStyle, { message: 'either voiceMediaId or voiceStyle is required' });
 export type CreateSaturnPostBody = z.infer<typeof CreateSaturnPostBody>;
 
 export const INVITE_CODE_RE = /^[A-Za-z0-9_-]{6,64}$/;

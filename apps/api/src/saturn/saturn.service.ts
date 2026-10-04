@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import type { CreateSaturnPostBody, Paged, SaturnPostView } from '@obolo/shared';
+import { neoVoiceUrl, type CreateSaturnPostBody, type Paged, type SaturnPostView } from '@obolo/shared';
 import { and, desc, eq, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { apiError } from '../common/errors';
@@ -70,8 +70,19 @@ export class SaturnService {
   }
 
   async create(userId: string, body: CreateSaturnPostBody): Promise<SaturnPostView> {
-    const media = await this.media.getOwned(userId, body.voiceMediaId, 'voice');
-    if (!media) throw apiError(HttpStatus.BAD_REQUEST, 'VOICE_REQUIRED', 'Record your voice before posting');
+    const [author] = await this.db.write
+      .select({ id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm })
+      .from(users)
+      .where(eq(users.id, userId));
+    let voice: { mediaId: string | null; url: string; source: 'recorded' | 'default' };
+    if (body.voiceMediaId) {
+      const media = await this.media.getOwned(userId, body.voiceMediaId, 'voice');
+      if (!media) throw apiError(HttpStatus.BAD_REQUEST, 'VOICE_REQUIRED', 'Record your voice before posting');
+      voice = { mediaId: media.id, url: media.url, source: 'recorded' };
+    } else {
+      // NEO voice (P-VOICE-1): read aloud on the device today; later rendered server-side to audio.
+      voice = { mediaId: null, url: neoVoiceUrl(body.voiceStyle!, author?.neoForm, body.text), source: 'default' };
+    }
     const mod = await moderateText(body.text, this.llm);
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     const [p] = await this.db.write
@@ -79,17 +90,13 @@ export class SaturnService {
       .values({
         userId,
         text: body.text,
-        voiceMediaId: media.id,
-        voiceAudioUrl: media.url,
-        voiceSource: 'recorded',
+        voiceMediaId: voice.mediaId,
+        voiceAudioUrl: voice.url,
+        voiceSource: voice.source,
         voiceDurationSec: body.voiceDurationSec ?? null,
       })
       .returning();
-    const [u] = await this.db.write
-      .select({ id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm })
-      .from(users)
-      .where(eq(users.id, userId));
-    return this.toView(p, u, false);
+    return this.toView(p, author, false);
   }
 
   async remove(userId: string, postId: string): Promise<void> {

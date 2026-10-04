@@ -1,11 +1,13 @@
 'use client';
 
+import { NEO_PITCH, parseTtsUrl } from '@obolo/shared';
 import { getBlob } from './api/idb';
 
 /**
  * One shared <audio> element for voice playback: starting a clip stops the previous one,
  * and reusing a single element keeps iOS Safari happy (it is "unlocked" by the first tap).
- * URL schemes: https:// (Bunny CDN / API), idb:<id> (demo recordings), tts:<text> (demo sample voice).
+ * URL schemes: https:// (Bunny CDN / API), idb:<id> (demo recordings), tts:<text> / tts:<style>.<neo>:<text>
+ * (speech synthesis: sample voices and the NEO voice).
  */
 type Listener = (state: { url: string | null; playing: boolean; progress: number }) => void;
 
@@ -53,12 +55,18 @@ export async function toggleAudio(url: string): Promise<void> {
   currentUrl = url;
 
   if (url.startsWith('tts:')) {
-    const text = url.slice(4);
+    const tts = parseTtsUrl(url)!;
+    const text = tts.text;
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = /[぀-ヿ一-龯]/.test(text) ? 'ja-JP' : 'en-US';
-    u.rate = 1.05;
+    u.lang = /[\u3040-\u30ff\u4e00-\u9faf]/.test(text) ? 'ja-JP' : 'en-US';
+    const voice = speechSynthesis.getVoices().find((v) => v.lang.replace('_', '-').startsWith(u.lang.slice(0, 2)));
+    if (voice) u.voice = voice;
+    u.rate = tts.style?.rate ?? 1.05;
+    // NEO voice: the style's pitch × the NEO form's own pitch (P-VOICE-1)
+    u.pitch = Math.min(2, Math.max(0, (tts.style?.pitch ?? 1) * (NEO_PITCH[tts.neo ?? ''] ?? 1)));
+    u.volume = tts.style?.volume ?? 1;
     const started = Date.now();
-    const est = Math.max(1500, text.length * 140);
+    const est = Math.max(1500, (text.length * 140) / (u.rate || 1));
     u.onend = () => {
       if (ttsTimer) clearInterval(ttsTimer);
       emit(false, 1);
