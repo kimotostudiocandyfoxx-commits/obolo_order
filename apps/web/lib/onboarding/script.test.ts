@@ -42,4 +42,11 @@ describe('day 1 script', () => {
     expect(DAY1[i + 1]).toEqual({ t: 'video', motion: 27 });
     expect(mediaAt(DAY1, i)).toBeNull();
   });
+  it('shows the temple caption during motion 12 and loops motion 13 behind OBOLON', () => {
+    const i = DAY1.findIndex((s) => s.t === 'video' && s.motion === 12);
+    expect(DAY1[i]).toMatchObject({ captions: [{ text: '地球の神殿に到着した' }] });
+    expect(DAY1[i + 1]).toEqual({ t: 'loop', motion: 13 });
+    const name = DAY1.findIndex((s) => s.t === 'name');
+    expect(mediaAt(DAY1, name)).toEqual({ motion: 13, loop: true });
+  });
 });

@@ -7,8 +7,11 @@
 export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN';
 
 export type Step =
-  /** Play a motion once. Cannot be skipped; the last frame stays on screen afterwards. */
-  | { t: 'video'; motion: number }
+  /**
+   * Play a motion once. Cannot be skipped; the last frame stays on screen afterwards.
+   * `captions` appear on top while it plays (seconds from the start of the motion; no tap needed).
+   */
+  | { t: 'video'; motion: number; captions?: TimedCaption[] }
   /** Switch background music (crossfade). null = fade out. Continues immediately. */
   | { t: 'bgm'; track: string | null }
   /**
@@ -36,6 +39,14 @@ export type Step =
   | { t: 'label'; id: string }
   | { t: 'goto'; id: string }
   | { t: 'end' };
+
+export interface TimedCaption {
+  text: string;
+  /** seconds into the motion */
+  from: number;
+  /** seconds into the motion; omitted = until the motion ends */
+  to?: number;
+}
 
 export interface StoryVars {
   name: string;

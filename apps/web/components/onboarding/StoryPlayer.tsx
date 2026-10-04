@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { hasMotion, motionUrl } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
-import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars } from '@/lib/onboarding/script';
+import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 
 /**
  * Full-screen story player used by the invite-only onboarding.
@@ -55,6 +55,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   const placeholderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Motions still to play behind the dialogue after the current background motion (bgvideo.then). */
   const bgQueue = useRef<number[]>([]);
+  /** Timed captions of the motion that is starting (shown once its first frame is on screen). */
+  const pendingCaptions = useRef<TimedCaption[]>([]);
+  const captionTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [overlayCaption, setOverlayCaption] = useState<string | null>(null);
+  const clearCaptions = useCallback(() => {
+    captionTimers.current.forEach(clearTimeout);
+    captionTimers.current = [];
+    setOverlayCaption(null);
+  }, []);
   const bgm = useRef<Bgm | null>(null);
   bgm.current ??= new Bgm();
 
@@ -113,6 +122,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
           n++;
         } else if (s.t === 'video') {
           bgQueue.current = [];
+          clearCaptions();
+          pendingCaptions.current = s.captions ?? [];
           playMedia(s.motion, false);
           setI(n);
           return;
@@ -126,13 +137,16 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
         }
       }
     },
-    [steps, playMedia, setI, onEnd],
+    [steps, playMedia, setI, onEnd, clearCaptions],
   );
 
   const onEndedRef = useRef(() => {});
   onEndedRef.current = () => {
     const s = steps[iRef.current];
-    if (s?.t === 'video') run(iRef.current + 1);
+    if (s?.t === 'video') {
+      clearCaptions();
+      run(iRef.current + 1);
+    }
     else {
       // a background motion finished while the visitor reads: play the next one in its chain
       const next = bgQueue.current.shift();
@@ -149,6 +163,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
         setBlocked(false);
         setReady(true);
         setBlackout(false);
+        // schedule the starting motion's timed captions from its first visible frame
+        const caps = pendingCaptions.current;
+        pendingCaptions.current = [];
+        for (const c of caps) {
+          captionTimers.current.push(setTimeout(() => setOverlayCaption(c.text), c.from * 1000));
+          if (c.to !== undefined) captionTimers.current.push(setTimeout(() => setOverlayCaption(null), c.to * 1000));
+        }
         setBackdrop(url.replace(/\.mp4$/, '.jpg'));
       },
     });
@@ -159,6 +180,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   useEffect(
     () => () => {
       if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
+      captionTimers.current.forEach(clearTimeout);
       bgm.current?.dispose();
     },
     [],
@@ -229,6 +251,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
       </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
       {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
+      {overlayCaption && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-[calc(18vh+env(safe-area-inset-bottom))] z-[6] flex animate-[fadeUp_0.8s_ease-out] justify-center">
+          <div className="flex items-center gap-3 rounded-full bg-black/55 px-6 py-3 text-lg tracking-[0.2em] text-amber-100 backdrop-blur-sm">
+            <span className="h-px w-6 bg-amber-200/60" />
+            {fill(overlayCaption, v)}
+            <span className="h-px w-6 bg-amber-200/60" />
+          </div>
+        </div>
+      )}
 
       {started && (
         <div

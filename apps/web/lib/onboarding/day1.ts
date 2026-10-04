@@ -43,9 +43,10 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'MONBAN', text: '門を潜り、地球の神殿に行け…。' },
   { t: 'action', label: '門を潜り、地球の神殿に向かう' },
 
-  { t: 'video', motion: 12 },
-  { t: 'caption', text: '地球の神殿に到着した' },
-  { t: 'video', motion: 13 },
+  // Client (2026-10-04): the caption appears as the camera enters the temple (~4 s into motion 12);
+  // motion 13 is a loop that keeps playing behind OBOLON's whole conversation.
+  { t: 'video', motion: 12, captions: [{ text: '地球の神殿に到着した', from: 4.5, to: 7 }] },
+  { t: 'loop', motion: 13 },
   { t: 'caption', text: 'OBOLONが現れた' },
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' },
   { t: 'say', who: 'OBOLON', text: 'お前の名前は？' },
