@@ -7,6 +7,7 @@ import type { Step } from './script';
  * → how to enjoy Saturn (client's points) → "まぁまずは遊んでみよう！" → ころりん tutorial → countdown.
  *
  * Endings (client, 2026-10-04): ブラザー → 「だZE!!」/「ZE!!」, シスター → 「わ。」
+ * KIMORIN travels along from day 3 on; the siblings are his friends (client, 2026-10-04).
  * In the tutorial the visitor writes something and hears it read in the NEO voice (style of their
  * choice); ORDER members will later use their registered voice.
  */
@@ -15,6 +16,11 @@ export const DAY4: Step[] = [
   { t: 'video', motion: '4-1' }, // 月から土星へ
   { t: 'still', image: 'saturn-temple' },
   { t: 'caption', text: '土星の神殿に到着した' },
+  // ✏️ KIMORIN travels with the visitor from day 3 on and introduces his friends (client, 2026-10-04)
+  { t: 'sprite', image: 'kimorin-3' },
+  { t: 'say', who: 'KIMORIN', text: '着いたケン！ここが土星だ。' },
+  { t: 'say', who: 'KIMORIN', text: 'この神殿には、オレの友達がいるんだ。\n紹介するケン！' },
+  { t: 'sprite', image: null },
   { t: 'action', label: '神殿の中に入る' },
 
   { t: 'video', motion: '4-2' }, // たこ焼きブラザーとシスターがいる（動画・未着）
@@ -22,6 +28,12 @@ export const DAY4: Step[] = [
   { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
   { t: 'caption', text: 'たこ焼きブラザーとたこ焼きシスターが現れた' },
   // ✏️ introductions
+  { t: 'sprite', image: ['kimorin-1', 'takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'KIMORIN', text: 'よっ！ブラザー、シスター！' },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'おぉ、KIMORIN！\n久しぶりだZE!!' },
+  { t: 'say', who: 'たこ焼きシスター', text: '……いらっしゃい、KIMORIN。' },
+  { t: 'say', who: 'KIMORIN', text: '今日は新入りを連れてきたケン。\nOBOLO NEOの{name}だ。' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
   { t: 'say', who: 'たこ焼きブラザー', text: 'よぉ、{name}。よく来たZE!!\n俺は、たこ焼きブラザーだZE!!' },
   { t: 'say', who: 'たこ焼きシスター', text: '……わたしは、たこ焼きシスター。\n土星の案内人をしているわ。' },
   // client's points
@@ -43,6 +55,8 @@ export const DAY4: Step[] = [
   { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
   { t: 'say', who: 'たこ焼きシスター', text: '{name}の声、ちゃんと届いたわ。' },
   { t: 'say', who: 'たこ焼きブラザー', text: '明日は木星だZE!!\n遅れるんじゃねぇZE!!' },
+  { t: 'sprite', image: 'kimorin-8' },
+  { t: 'say', who: 'KIMORIN', text: '木星にも、オレの友達がいるケン。\nお楽しみに！' },
   { t: 'sprite', image: null },
   { t: 'end' },
 ];

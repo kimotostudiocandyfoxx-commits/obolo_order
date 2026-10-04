@@ -311,7 +311,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
             src={spriteUrl(name)}
             alt=""
             className="pointer-events-none absolute bottom-[24%] z-[3] h-[50%] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
-            style={{ left: arr.length === 1 ? '50%' : `${28 + (44 * k) / (arr.length - 1)}%`, maxWidth: arr.length === 1 ? '92%' : '52%' }}
+            style={spriteSlot(k, arr.length)}
             aria-hidden
           />
         ))}
@@ -547,6 +547,13 @@ function NameInput({
       </div>
     </form>
   );
+}
+
+/** Spread 1–3 standing characters across the screen (three get a wider spread and narrower slots). */
+function spriteSlot(k: number, n: number) {
+  if (n === 1) return { left: '50%', maxWidth: '92%' };
+  const span = n > 2 ? 62 : 44;
+  return { left: `${50 - span / 2 + (span * k) / (n - 1)}%`, maxWidth: n > 2 ? '40%' : '52%' };
 }
 
 function MotionPlaceholder({ motion }: { motion: MotionId }) {

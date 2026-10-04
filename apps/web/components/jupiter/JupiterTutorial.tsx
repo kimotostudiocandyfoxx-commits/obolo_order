@@ -9,14 +9,15 @@ import { synth } from '@/lib/synth';
 /**
  * Day 5 tutorial on Jupiter, coached by 大根カイザー.
  * PLACEHOLDER (P-JUP-1): the client is designing the real Jupiter play screen; until it arrives this
- * reuses the demo photo grid (spec §2.4: every photo carries a sound). Lines are provisional (P-OB-14).
+ * reuses the demo photo grid (spec §2.4: every photo carries a sound). Lines are provisional (P-OB-14);
+ * Kaiser ends his sentences with 「DA」 (client).
  */
 const STEPS: { text: string; wait: 'open' | 'listen' | 'star' | 'next' | 'done' }[] = [
-  { text: 'ここに並んでいるのは、みんなの日常だ。\n気になる一枚を、ひらいてみるといい。', wait: 'open' },
-  { text: '木星の写真には、かならず音が宿る。\n▶ で、その時の音を聴いてみよ。', wait: 'listen' },
-  { text: '景色も、音も、そのまま残る。\nこうして日常は、思い出になっていくのだ。', wait: 'next' },
-  { text: '心が動いたなら、星を贈るといい。', wait: 'star' },
-  { text: 'それが木星の遊び方だ。\n君の日常にも、命は宿っている。', wait: 'done' },
+  { text: 'ここに並んでいるのは、みんなの日常DA。\n気になる一枚を、ひらいてみるのDA。', wait: 'open' },
+  { text: '木星の写真には、かならず音が宿るのDA。\n▶ で、その時の音を聴いてみるのDA。', wait: 'listen' },
+  { text: '景色も、音も、そのまま残る。\nこうして日常は、思い出になっていくのDA。', wait: 'next' },
+  { text: '心が動いたなら、星を贈るのDA。', wait: 'star' },
+  { text: 'それが木星の遊び方DA。\n君の日常にも、命は宿っているのDA。', wait: 'done' },
 ];
 
 export function JupiterTutorial({ onDone }: { onDone: () => void }) {
