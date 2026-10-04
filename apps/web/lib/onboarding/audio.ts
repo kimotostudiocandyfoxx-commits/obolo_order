@@ -7,8 +7,28 @@
  */
 let ctx: AudioContext | null = null;
 
+type NavigatorWithAudioSession = Navigator & { audioSession?: { type: string } };
+
+/**
+ * iOS Safari mutes Web Audio when the ringer/silent switch is on (while <video> keeps playing),
+ * which made the BGM and countdown sounds inaudible. Declaring a "playback" audio session
+ * (Safari 16.4+) makes them play like music. Returns false where the API is missing.
+ */
+export function hasPlaybackSession(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const n = navigator as NavigatorWithAudioSession;
+  if (!n.audioSession) return false;
+  try {
+    if (n.audioSession.type !== 'playback') n.audioSession.type = 'playback';
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function audioCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null;
+  hasPlaybackSession();
   if (!ctx) {
     const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Ctx) return null;

@@ -17,7 +17,11 @@ export const hasMotion = (n: number) => AVAILABLE_MOTIONS.has(n);
 export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;
 /**
  * PLACEHOLDER (P-OB-8): BGM level under the motions' own sound (0–1). All files are loudness-
- * normalised to −16 LUFS (scripts/normalize-audio.sh), so 0.75 sits the music ~2.5 dB under the
- * motions' sound effects.
+ * normalised to −16 LUFS (scripts/normalize-audio.sh); the music now sits about level with the
+ * motions' sound (client asked for clearly audible BGM, 2026-10-04).
  */
-export const BGM_VOLUME = 0.75;
+export const BGM_VOLUME = 0.9;
+
+/** Per-track level (client: the MONBAN music must be clearly audible). */
+export const BGM_LEVELS: Record<string, number> = { video11: 0.9, obolo: 0.9, '3': 1 };
+export const bgmLevel = (track: string) => BGM_LEVELS[track] ?? BGM_VOLUME;
