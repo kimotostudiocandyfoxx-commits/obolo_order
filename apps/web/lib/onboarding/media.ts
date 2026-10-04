@@ -12,3 +12,8 @@ export const AVAILABLE_MOTIONS: ReadonlySet<number> = new Set([1, 2, 3, 4, 5, 6,
 export const motionUrl = (n: number) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: number) => `${MEDIA_BASE}/m${n}.jpg`;
 export const hasMotion = (n: number) => AVAILABLE_MOTIONS.has(n);
+
+/** Background music tracks (by the client, DJ SHACHO). Converted to AAC 128 kbps. */
+export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;
+/** PLACEHOLDER (P-OB-8): BGM level under the motions' own sound (0–1). */
+export const BGM_VOLUME = 0.55;

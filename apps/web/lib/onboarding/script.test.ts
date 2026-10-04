@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DAY1 } from './day1';
-import { fill, labelIndex, mediaAt } from './script';
+import { bgmAt, fill, labelIndex, mediaAt } from './script';
 
 describe('day 1 script', () => {
   it('every goto/choice target exists', () => {
@@ -10,7 +10,7 @@ describe('day 1 script', () => {
     }
   });
   it('starts with motion 1 and ends with end', () => {
-    expect(DAY1[0]).toEqual({ t: 'video', motion: 1 });
+    expect(DAY1.find((s) => s.t === 'video')).toEqual({ t: 'video', motion: 1 });
     expect(DAY1[DAY1.length - 1]).toEqual({ t: 'end' });
   });
   it('asks the name exactly once', () => {
@@ -22,5 +22,11 @@ describe('day 1 script', () => {
   it('restores the right background when resuming', () => {
     const i = DAY1.findIndex((s) => s.t === 'action' && s.label === '本部へ向かう');
     expect(mediaAt(DAY1, i)).toEqual({ motion: 4, loop: true });
+  });
+  it('every BGM track has a file and the music is set from the first step', () => {
+    const fs = require('node:fs') as typeof import('node:fs');
+    for (const s of DAY1) if (s.t === 'bgm' && s.track) expect(fs.existsSync(`public/onboarding/bgm-${s.track}.m4a`)).toBe(true);
+    expect(bgmAt(DAY1, 1)).toBe('video11');
+    expect(bgmAt(DAY1, DAY1.length - 1)).toBe('3');
   });
 });

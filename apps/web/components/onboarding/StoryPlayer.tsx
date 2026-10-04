@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { hasMotion, motionUrl, posterUrl } from '@/lib/onboarding/media';
-import { fill, labelIndex, mediaAt, type Step, type StoryVars } from '@/lib/onboarding/script';
+import { Bgm } from '@/lib/onboarding/bgm';
+import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars } from '@/lib/onboarding/script';
 
 /**
  * Full-screen story player used by the invite-only onboarding.
@@ -46,6 +47,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
   const placeholderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const bgm = useRef<Bgm | null>(null);
+  bgm.current ??= new Bgm();
 
   const step = steps[i];
   const v: StoryVars = { ...vars, name: name || vars.name };
@@ -100,6 +103,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
         const s = steps[n];
         if (!s) return;
         if (s.t === 'label') n++;
+        else if (s.t === 'bgm') {
+          bgm.current?.set(s.track);
+          n++;
+        }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
         else if (s.t === 'loop') {
           playMedia(s.motion, true);
@@ -110,7 +117,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
           return;
         } else {
           setI(n);
-          if (s.t === 'end') onEnd(stateRef.current.answers);
+          if (s.t === 'end') {
+            bgm.current?.fadeOut();
+            onEnd(stateRef.current.answers);
+          }
           return;
         }
       }
@@ -143,15 +153,24 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
     };
   }, []);
 
-  useEffect(() => () => {
-    if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
+      bgm.current?.dispose();
+    },
+    [],
+  );
+
+  useEffect(() => bgm.current?.setMuted(muted), [muted]);
 
   /** First tap: unlocks audio/video on iOS and starts (or resumes) the story inside the gesture. */
   const start = () => {
     setStarted(true);
+    // Start the music inside the gesture (fresh start: the first track; resume: the track at that point).
+    const firstBgm = steps.find((s) => s.t === 'bgm');
+    bgm.current?.unlock(i === 0 ? (firstBgm?.t === 'bgm' ? firstBgm.track : null) : bgmAt(steps, i));
     const cur = steps[i];
-    if (cur.t === 'video' || i === 0) {
+    if (i === 0 || ['video', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
       run(i);
       return;
     }

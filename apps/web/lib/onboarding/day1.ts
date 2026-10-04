@@ -13,6 +13,10 @@ import type { Step } from './script';
  *  - The invitation card (motion 4) has the inviter name baked into the video ("KIMORIN").
  */
 export const DAY1: Step[] = [
+  // BGM sections (PLACEHOLDER P-OB-8 — the file titles that name each section were lost in upload;
+  // this split is inferred from the remaining "VIDEO11" / "OBOLO" in the names — confirm with client):
+  //   bgm-video11: start → motion 11 · bgm-obolo: after motion 11 → "OBOLOとは" · bgm-3: MONBAN → end
+  { t: 'bgm', track: 'video11' },
   { t: 'video', motion: 1 }, // 招待信号を受信しました
   { t: 'loop', motion: 2 },
   { t: 'action', label: '封を開く' },
@@ -35,6 +39,7 @@ export const DAY1: Step[] = [
   { t: 'video', motion: 10 },
   { t: 'say', who: 'MONBAN', text: 'なるほど…。\n{inviter}から…招待されたのか…。' },
   { t: 'video', motion: 11 }, // 門開
+  { t: 'bgm', track: 'obolo' },
   { t: 'say', who: 'MONBAN', text: '門を潜り、地球の神殿に行け…。' },
   { t: 'action', label: '門を潜り、地球の神殿に向かう' },
 
@@ -87,6 +92,7 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'わかりやすく、言う。' },
   { t: 'say', who: 'OBOLON', text: 'OBOLOとは、、、、' },
 
+  { t: 'bgm', track: '3' },
   { t: 'video', motion: 27 },
   { t: 'say', who: 'MONBAN', text: 'おい！待て！' },
   { t: 'loop', motion: 28 },
@@ -95,6 +101,7 @@ export const DAY1: Step[] = [
 
   { t: 'label', id: 'decline' },
   { t: 'say', who: 'OBOLON', text: 'そうか。' },
+  { t: 'bgm', track: '3' },
   { t: 'video', motion: 27 },
   { t: 'loop', motion: 28 },
 

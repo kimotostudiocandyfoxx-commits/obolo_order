@@ -9,6 +9,8 @@ export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN';
 export type Step =
   /** Play a motion once. Cannot be skipped; the last frame stays on screen afterwards. */
   | { t: 'video'; motion: number }
+  /** Switch background music (crossfade). null = fade out. Continues immediately. */
+  | { t: 'bgm'; track: string | null }
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: number }
   /** Narration line (e.g. "MONBANが現れた"). Tap to continue. */
@@ -47,6 +49,15 @@ export function mediaAt(steps: Step[], i: number): { motion: number; loop: boole
   for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
     const s = steps[k];
     if (s.t === 'video' || s.t === 'loop') return { motion: s.motion, loop: s.t === 'loop' };
+  }
+  return null;
+}
+
+/** The BGM track that should be playing at step i (for resuming mid-story). */
+export function bgmAt(steps: Step[], i: number): string | null {
+  for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
+    const s = steps[k];
+    if (s.t === 'bgm') return s.track;
   }
   return null;
 }
