@@ -26,6 +26,21 @@ GEMINI_API_KEY="${GEMINI_API_KEY:-PLACEHOLDER}"
 gcloud config set project "$PROJECT_ID" >/dev/null || fail "プロジェクト $PROJECT_ID が見つかりません"
 PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
 
+say "請求先アカウントの確認"
+gcloud services enable cloudbilling.googleapis.com --quiet >/dev/null 2>&1
+if [ "$(gcloud billing projects describe "$PROJECT_ID" --format='value(billingEnabled)' 2>/dev/null)" != True ]; then
+  ACCOUNTS=$(gcloud billing accounts list --filter=open=true --format='value(name)' 2>/dev/null)
+  case "$(printf '%s' "$ACCOUNTS" | grep -c .)" in
+    0) fail "請求先アカウントが見つかりません。Google Cloud の「お支払い」で請求先アカウントを作ってから、もう一度実行してください" ;;
+    1) BILLING="$ACCOUNTS" ;;
+    *) echo "請求先アカウント一覧:"; gcloud billing accounts list --filter=open=true
+       read -rp "使う請求先アカウントID（XXXXXX-XXXXXX-XXXXXX）: " BILLING ;;
+  esac
+  gcloud billing projects link "$PROJECT_ID" --billing-account="${BILLING#billingAccounts/}" >/dev/null \
+    || fail "プロジェクトに請求先をリンクできませんでした"
+fi
+ok "リンク済み"
+
 say "API を有効化（1〜2分）"
 gcloud services enable run.googleapis.com sqladmin.googleapis.com artifactregistry.googleapis.com \
   secretmanager.googleapis.com iamcredentials.googleapis.com sts.googleapis.com \
