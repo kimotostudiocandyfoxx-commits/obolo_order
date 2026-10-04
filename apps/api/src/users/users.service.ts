@@ -26,6 +26,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     journeyDay: u.journeyDay,
     journeyCompletedAt: u.journeyCompletedAt?.toISOString() ?? null,
     invitedByName: u.invitedByName,
+    neoForm: u.neoForm,
     createdAt: u.createdAt.toISOString(),
   };
 }

@@ -9,8 +9,8 @@ import type { Step } from './script';
  *  - "・宇宙行き切符": no motion given; the ticket is assumed to be part of motion 3-1.
  *    (3モーション2 / 3モーション5 have not been referenced or delivered.)
  *  - KIMORIN's "宇宙なめんな" reply is used for both "宇宙に行く" and "やめておく".
- *  - The script stops at "創って創って創りまくって…" — the avatar creation (and the rest of the
- *    day: the Moon, OBOLON, profile, Bati) is still to come; for now the day ends there.
+ *  - The client's script stops at "創って創って創りまくって…"; the rest of the day (choosing one of
+ *    8 OBOLO NEO forms + a NEO name) uses provisional lines (P-OB-12).
  *  - BGM: none is specified for day 3; the opening track plays until KIMORIN's motion.
  */
 export const DAY3: Step[] = [
@@ -41,8 +41,25 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'なぜなら、OBOLO ORDERは新しいものを生み出す者たち….' },
   { t: 'say', who: 'KIMORIN', text: '創って創って創りまくって、気に入った物を見つけるのだ！' },
 
-  // ↓ to be continued (avatar creation …) — PLACEHOLDER
+  // ---- From here: provisional lines by Claude (client decision 2026-10-04: on Day 3 the visitor only
+  // takes an apprentice "OBOLO NEO" form chosen from 8; Bati is created later, after joining ORDER
+  // at the Sun temple, on a second visit to the Moon temple). Edit freely. PLACEHOLDER (P-OB-12)
+  { t: 'sprite', image: 'kimorin-2' },
+  { t: 'say', who: 'KIMORIN', text: '……と言いたいところだけど、君はまだ見習いだケン。' },
+  { t: 'say', who: 'KIMORIN', text: '見習いのORDERは「OBOLO NEO（オボロネオ）」と呼ばれる。' },
+  { t: 'say', who: 'KIMORIN', text: 'ネオの姿は、オレが用意した8つの中から選んでもらうケン。\n本当の姿を創るのは、ORDERになってからのお楽しみ！' },
   { t: 'sprite', image: null },
-  { t: 'caption', text: '— 新しい姿の創造（準備中）—' },
+  { t: 'neo' },
+  { t: 'sprite', image: 'kimorin-3' },
+  { t: 'say', who: 'KIMORIN', text: 'おお！{neo}か！似合ってるケン！' },
+  { t: 'sprite', image: 'kimorin-1' },
+  { t: 'say', who: 'KIMORIN', text: 'じゃあ名前も変えよう。\nネオとしての名前は？' },
+  { t: 'name', placeholder: 'ネオとしての名前', submit: 'この名前にする' },
+  { t: 'say', who: 'KIMORIN', text: '{name}……いい名前だケン。' },
+  { t: 'say', who: 'KIMORIN', text: '今日から君は見習いORDER、\nOBOLO NEO「{name}」だ。' },
+  { t: 'sprite', image: 'kimorin-8' },
+  { t: 'say', who: 'KIMORIN', text: '明日は土星に行くケン。\n土星には、声でつながる仲間がいる。' },
+  { t: 'say', who: 'KIMORIN', text: '遅れるなよ！' },
+  { t: 'sprite', image: null },
   { t: 'end' },
 ];

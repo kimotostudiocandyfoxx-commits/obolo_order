@@ -16,6 +16,8 @@ export interface Me {
   /** Set when the current day has been finished (the next unlocks 24 h later or by skipping). */
   journeyCompletedAt: string | null;
   invitedByName: string | null;
+  /** OBOLO NEO form id (Day 3), null until chosen. */
+  neoForm: string | null;
   createdAt: string;
 }
 

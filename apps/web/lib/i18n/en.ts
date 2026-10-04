@@ -57,7 +57,7 @@ const en: Messages = {
   },
   order: {
     title: '{name}, will you become ORDER?',
-    lead: 'You have visited eight worlds. Beyond here is for ORDER only.',
+    lead: 'You visited eight worlds and reached the Sun temple. Beyond here is for ORDER only.',
     price: '¥88 / month',
     perks: ['88 MANA every month', 'Create and share on every planet', 'Bati stays your companion'],
     yes: 'Become ORDER',

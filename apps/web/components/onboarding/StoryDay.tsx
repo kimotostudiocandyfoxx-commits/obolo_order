@@ -47,7 +47,12 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       vars={{ name: me.displayName, inviter: me.invitedByName ?? 'KIMORIN' }}
       initial={saved}
       onProgress={onProgress}
-      onName={async () => undefined}
+      onName={async (n) => {
+        setMe(await getApi().updateMe({ displayName: n }));
+      }}
+      onNeo={async (id) => {
+        setMe(await getApi().updateMe({ neoForm: id }));
+      }}
       onEnd={onEnd}
     />
   );

@@ -342,6 +342,7 @@ export class DemoApi implements Api {
       subscriptionStatus: 'demo',
       journeyDay: 1,
       journeyCompletedAt: null,
+      neoForm: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };

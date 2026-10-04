@@ -39,8 +39,10 @@ export type Step =
   | { t: 'action'; label: string }
   /** Several buttons. The answer is saved under `key`; `goto` jumps to a label. */
   | { t: 'choice'; key: string; options: { label: string; goto?: string }[] }
-  /** Name input → creates the account from the invitation. */
+  /** Name input (Day 1: creates the account from the invitation; Day 3: the NEO name). */
   | { t: 'name'; placeholder: string; submit: string }
+  /** Choose one of the eight OBOLO NEO forms (Day 3). Saved on the account. */
+  | { t: 'neo' }
   /** A handwritten-style letter card. Tap to continue. */
   | { t: 'letter'; text: string }
   | { t: 'label'; id: string }
@@ -58,10 +60,15 @@ export interface TimedCaption {
 export interface StoryVars {
   name: string;
   inviter: string;
+  /** Name of the chosen OBOLO NEO form ({neo}). */
+  neo?: string;
 }
 
 export function fill(text: string, v: StoryVars): string {
-  return text.replaceAll('{name}', v.name || '…').replaceAll('{inviter}', v.inviter || '…');
+  return text
+    .replaceAll('{name}', v.name || '…')
+    .replaceAll('{inviter}', v.inviter || '…')
+    .replaceAll('{neo}', v.neo || '…');
 }
 
 export function labelIndex(steps: Step[], id: string): number {

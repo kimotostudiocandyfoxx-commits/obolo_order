@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "neo_form" text;

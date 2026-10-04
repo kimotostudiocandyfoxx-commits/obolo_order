@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { hasMotion, motionUrl, spriteUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
+import { neoForm } from '@obolo/shared';
+import { NeoChooser } from './NeoChooser';
 import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 
 /**
@@ -27,12 +29,14 @@ interface Props {
   onProgress: (p: StoryProgress) => void;
   /** Called by the name step. Resolve to continue, reject with a message to stay. */
   onName: (name: string) => Promise<void>;
+  /** Called by the 'neo' step with the chosen OBOLO NEO form id. */
+  onNeo?: (id: string) => Promise<void>;
   onEnd: (answers: Record<string, string>) => void;
 }
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, onEnd }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -70,7 +74,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   bgm.current ??= new Bgm();
 
   const step = steps[i];
-  const v: StoryVars = { ...vars, name: name || vars.name };
+  const v: StoryVars = { ...vars, name: name || vars.name, neo: neoForm(answers.neo)?.name ?? vars.neo };
 
   const setI = useCallback(
     (n: number) => {
@@ -320,6 +324,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
             </GoldButton>
           ))}
         </Buttons>
+      )}
+      {started && step?.t === 'neo' && (
+        <NeoChooser
+          onChoose={async (id) => {
+            await onNeo?.(id);
+            choose('neo', id);
+          }}
+        />
       )}
       {started && step?.t === 'name' && (
         <NameInput

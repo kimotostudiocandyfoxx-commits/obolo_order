@@ -57,6 +57,8 @@ export const users = pgTable(
     journeyDay: integer('journey_day').notNull().default(10),
     /** When the current day was finished; the next day unlocks 24 h later (or by skipping). */
     journeyCompletedAt: timestamp('journey_completed_at', { withTimezone: true }),
+    /** OBOLO NEO form chosen on Day 3 (see @obolo/shared neo.ts). */
+    neoForm: text('neo_form'),
     onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
     lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
     ...timestamps,

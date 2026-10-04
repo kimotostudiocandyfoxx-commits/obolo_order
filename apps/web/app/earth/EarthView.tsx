@@ -1,6 +1,7 @@
 'use client';
 
-import { HANDLE_RE, type Me, type WalletView } from '@obolo/shared';
+import { HANDLE_RE, neoForm, type Me, type WalletView } from '@obolo/shared';
+import { NeoEmblem } from '@/components/onboarding/NeoChooser';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
@@ -193,10 +194,13 @@ function ProfileCard({ me }: { me: Me }) {
   return (
     <section className="card p-5">
       <div className="flex items-center gap-4">
-        <Avatar name={me.displayName} size={64} />
+        {neoForm(me.neoForm) ? <NeoEmblem form={neoForm(me.neoForm)!} size={64} /> : <Avatar name={me.displayName} size={64} />}
         <div className="min-w-0 flex-1">
           <div className="truncate text-xl font-black">{me.displayName}</div>
           <div className="truncate text-sm text-white/55">@{me.handle}</div>
+          {neoForm(me.neoForm) && (
+            <div className="text-[11px] tracking-widest text-amber-200/70">OBOLO NEO · {neoForm(me.neoForm)!.name}</div>
+          )}
           <span className="chip mt-1 bg-emerald-300/15 text-emerald-200">
             {me.subscriptionStatus === 'active' ? m.earth.subActive : m.earth.subDemo}
           </span>

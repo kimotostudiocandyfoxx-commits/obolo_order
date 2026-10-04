@@ -3,8 +3,9 @@ import type { PlanetId } from './planets';
 /**
  * The 8-day journey every invited person goes through before becoming an ORDER member
  * (client decision 2026-10-04). One day unlocks 24 h after the previous one is finished
- * (or immediately with "明日まで待てへん"). After day 8 comes the payment step
- * ("ORDERになるか？"); members who paid are "order".
+ * (or immediately with "明日まで待てへん"). After day 8 comes the Sun temple, where the visitor is
+ * asked "ORDERになるか？" (payment); members then return to the Moon temple to create Bati.
+ * Until then the visitor is an apprentice, an "OBOLO NEO" (form chosen on day 3).
  *
  * Stored on the user as `journeyDay` (1–8 = day to play, 9 = payment, 10 = ORDER member)
  * plus `journeyCompletedAt` (set when the current day is finished, cleared when the next starts).
@@ -38,7 +39,13 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
     planet: 'moon',
     guides: ['KIMORIN', 'OBOLON'],
     title: '月へ',
-    beats: ['宇宙行きの切符が届く', 'KIMORINと月に行く', '月の神殿につく', '月の案内人OBOLONと出会う', 'プロフィールを作る', 'バティを作る'],
+    beats: [
+      '宇宙行きの切符が届く',
+      'KIMORINと月に行く',
+      '月の神殿につく',
+      'OBOLO NEO（見習いの姿）を8つから選ぶ',
+      'ネオとしての名前を決める',
+    ],
   },
   {
     day: 4,
@@ -56,3 +63,9 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
 export function journeyMeta(day: number): JourneyDayMeta | undefined {
   return JOURNEY.find((d) => d.day === day);
 }
+
+/**
+ * After the 8 days (client decision 2026-10-04): the Sun temple ("ORDERになるか？" → membership),
+ * then a second visit to the Moon temple where the new member creates Bati. Not built yet.
+ */
+export const AFTER_JOURNEY = ['太陽の神殿で「ORDERになるか？」→ 会員になる', 'もう一度月の神殿へ → バティを作る'] as const;

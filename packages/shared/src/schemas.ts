@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LOCALES, SATURN_MAX_CHARS } from './config';
+import { NEO_FORM_IDS } from './neo';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -20,6 +21,8 @@ export const UpdateProfileBody = z.object({
   bio: z.string().trim().max(160).optional(),
   country: z.string().trim().length(2).toUpperCase().optional(),
   locale: z.enum(LOCALES).optional(),
+  /** OBOLO NEO form chosen on Day 3. */
+  neoForm: z.enum(NEO_FORM_IDS).optional(),
 });
 export type UpdateProfileBody = z.infer<typeof UpdateProfileBody>;
 
