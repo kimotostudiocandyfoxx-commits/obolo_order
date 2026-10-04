@@ -6,7 +6,7 @@
  */
 import type { MotionId } from './media';
 
-export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター';
+export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー';
 
 export type Step =
   /**
@@ -31,6 +31,8 @@ export type Step =
   | { t: 'still'; image: string }
   /** Saturn ("ころりん") tutorial: the visitor listens, gives a star and drops their own voice. */
   | { t: 'saturn' }
+  /** Jupiter tutorial (Day 5), coached by 大根カイザー. Placeholder screen until the client's UI arrives. */
+  | { t: 'jupiter' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

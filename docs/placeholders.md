@@ -42,6 +42,8 @@
 | P-OB-12 | ✏️ | 3日目後半（Claude の仮のセリフ） | KIMORIN が OBOLO NEO を説明 → 8つの姿から選ぶ → ネオの名前を入力（表示名が変わる）→ 明日は土星へ。バティ作成は会員になった後の「2回目の月の神殿」に移動（クライアント決定） | `apps/web/lib/onboarding/day3.ts` |
 | P-NEO-1 | ✏️ | OBOLO NEO の8つの姿 | 名前・ひとこと・色は仮。画像は絵文字の仮エンブレム（`neo-<id>.webp` を置くと自動で差し替え） | `packages/shared/src/neo.ts` |
 | P-OB-13 | ✏️ | 4日目（土星） | クライアントの要点（原石の星／文字だけだと伝わらない…）をブラザーとシスターに振り分け、自己紹介・チュートリアル・締めのセリフは Claude の仮。ブラザーとシスターの登場動画は未着（4-2 は仮画面 → 神殿の静止画に2人を重ねて表示）。BGMは月→土星までオープニング、ころりんの前で消す | `apps/web/lib/onboarding/day4.ts`、`components/saturn/SaturnTutorial.tsx` |
+| P-OB-14 | ✏️ | 5日目（木星） | 大根カイザーの説明はクライアントのセリフどおり。「土星で目を覚ました」、自己紹介（「我こそは木星の王」）、チュートリアル・締めのセリフは Claude の仮。動画 5-1（土星→木星）と 5-2（木星の神殿へ）は未着で仮画面。大根カイザーは届いた1枚絵（jupiter-kaiser.jpg、縦に切り出し）を背景に表示 | `apps/web/lib/onboarding/day5.ts`、`components/jupiter/JupiterTutorial.tsx` |
+| P-JUP-1 | 🟡 | 木星で遊ぶ画面 | クライアントが制作中。届くまではデモの写真グリッド（写真をひらく→▶で音→☆）を大根カイザーの案内つきで表示 | `components/jupiter/JupiterTutorial.tsx` |
 | P-VOICE-1 | ✏️ | ネオの声（読み上げ） | 端末の読み上げ機能で、7つの読み方（元気に／ゆっくり／早口／低い声で／高い声で／ささやき風／叫ぶ風）× ネオの姿ごとの声の高さ。本物のささやき・叫びは出せないので「〜風」。将来は Gemini などの表現力のある音声生成をサーバーで行い、音声ファイルにする（読み方の種類はそのまま） | `packages/shared/src/neoVoice.ts`、`apps/web/lib/audio.ts` |
 | P-SAT-3 | ✏️ | ころりんのアイコンの絵 | 丸い体＋顔＋ネオの姿のバッジ（SVGの仮絵） | `components/saturn/BallAvatar.tsx` |
 | P-SAT-4 | ✏️ | ころりんのサンプル住人 | 投稿が少ないうちは12人のサンプル住人で賑やかに見せる（声はブラウザの読み上げ） | `lib/saturnResidents.ts` |

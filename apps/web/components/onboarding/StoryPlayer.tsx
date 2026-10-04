@@ -6,6 +6,7 @@ import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { neoForm } from '@obolo/shared';
 import { NeoChooser } from './NeoChooser';
+import { JupiterTutorial } from '@/components/jupiter/JupiterTutorial';
 import { SaturnTutorial } from '@/components/saturn/SaturnTutorial';
 import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 
@@ -97,6 +98,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
     if (!hasMotion(motion)) {
       d.pauseAll();
       setPlaceholder(motion);
+      // the placeholder stands in for the motion, so it replaces the still / black screen too
+      setBlackout(false);
+      if (clearStillOnShow.current) {
+        clearStillOnShow.current = false;
+        setStill(null);
+      }
       if (!loop && !freeze) placeholderTimer.current = setTimeout(() => onEndedRef.current(), 2600);
       return;
     }
@@ -355,6 +362,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
         </Buttons>
       )}
       {started && step?.t === 'saturn' && <SaturnTutorial onDone={next} />}
+      {started && step?.t === 'jupiter' && <JupiterTutorial onDone={next} />}
       {started && step?.t === 'neo' && (
         <NeoChooser
           onChoose={async (id) => {
