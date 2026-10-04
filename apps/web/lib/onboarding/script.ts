@@ -22,6 +22,11 @@ export type Step =
    * Still unskippable: there are no controls, the dialogue just runs on top of it.
    */
   | { t: 'bgvideo'; motion: MotionId; then?: MotionId[] }
+  /**
+   * Show a character image (transparent PNG/WebP in public/onboarding, e.g. "kimorin-1") standing in
+   * front of the background motion; it stays until the next sprite step, null, or a blocking video.
+   */
+  | { t: 'sprite'; image: string | null }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

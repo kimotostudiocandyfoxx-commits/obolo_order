@@ -326,3 +326,13 @@ body {
     opacity: 0;
   }
 }
+@keyframes spriteIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

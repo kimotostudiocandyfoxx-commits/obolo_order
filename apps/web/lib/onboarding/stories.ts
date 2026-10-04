@@ -1,5 +1,6 @@
 import { DAY1 } from './day1';
 import { DAY2 } from './day2';
+import { DAY3 } from './day3';
 import type { Step } from './script';
 
 /** Scripted journey days. Days without a script show the placeholder JourneyDayScreen. */
@@ -14,6 +15,7 @@ export interface DayStory {
 export const STORIES: Record<number, DayStory> = {
   1: { steps: DAY1, skipLabel: '明日まで待てへん', auth: false },
   2: { steps: DAY2, skipLabel: 'もちろん明日まで待てへん', auth: true },
+  3: { steps: DAY3, skipLabel: '明日まで待てへん', auth: true },
 };
 
 export const DEFAULT_SKIP_LABEL = '明日まで待てへん';
