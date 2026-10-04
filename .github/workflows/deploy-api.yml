@@ -23,7 +23,7 @@ env:
   DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
   RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
   CLOUDSQL_INSTANCE: ${{ vars.CLOUDSQL_INSTANCE || format('{0}:asia-northeast1:obolo-pg', vars.GCP_PROJECT_ID) }}
-  CORS_ORIGINS: ${{ vars.CORS_ORIGINS || '/^https:\/\/obolo[a-z0-9-]*\.vercel\.app$/' }}
+  CORS_ORIGINS: ${{ vars.CORS_ORIGINS || '/^https://obolo[a-z0-9-]*[.]vercel[.]app$/' }}
 
 jobs:
   deploy:

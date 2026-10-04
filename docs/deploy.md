@@ -79,7 +79,7 @@ curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo
 
 | 名前 | 既定値 / 用途 |
 |---|---|
-| `CORS_ORIGINS` | `/^https:\/\/obolo[a-z0-9-]*\.vercel\.app$/`。Vercel の URL が `obolo` で始まらない時や正式ドメインを足す時に（カンマ区切り） |
+| `CORS_ORIGINS` | `/^https://obolo[a-z0-9-]*[.]vercel[.]app$/`。Vercel の URL が `obolo` で始まらない時や正式ドメインを足す時に（カンマ区切り） |
 | `WEB_ORIGIN` | 招待メールのリンク先（メール送信を入れたら） |
 | `AUTH_DEMO_SHOW_CODE` | 既定 `true`（ログインコードを画面に表示）。メール送信を設定したら `false` |
 | `BUNNY_STORAGE_ZONE` / `BUNNY_CDN_HOST` | Bunny を使う時（シークレット `obolo-bunny-storage-key` も本物に更新） |
