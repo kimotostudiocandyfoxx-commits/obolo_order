@@ -1,5 +1,6 @@
 'use client';
 
+import { unlockAudio } from './audio';
 import { BGM_VOLUME, bgmUrl } from './media';
 
 /**
@@ -18,19 +19,18 @@ export class Bgm {
   /** Call inside a user gesture. `track` = what should play right now (if anything). */
   unlock(track: string | null) {
     if (typeof window === 'undefined') return;
-    if (!this.ctx) {
-      const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!this.el) {
       this.el = new Audio();
       this.el.loop = true;
       this.el.preload = 'auto';
-      if (Ctx) {
-        this.ctx = new Ctx();
+      this.ctx = unlockAudio();
+      if (this.ctx) {
         this.gain = this.ctx.createGain();
         this.gain.gain.value = 0;
         this.ctx.createMediaElementSource(this.el).connect(this.gain).connect(this.ctx.destination);
       }
     }
-    void this.ctx?.resume();
+    unlockAudio();
     if (track) {
       this.play(track, 0.6);
     } else if (this.el) {
@@ -78,7 +78,7 @@ export class Bgm {
   dispose() {
     if (this.swapTimer) clearTimeout(this.swapTimer);
     this.el?.pause();
-    void this.ctx?.close();
+    this.gain?.disconnect(); // the shared AudioContext stays alive for the countdown sounds
     this.ctx = null;
     this.el = null;
     this.gain = null;

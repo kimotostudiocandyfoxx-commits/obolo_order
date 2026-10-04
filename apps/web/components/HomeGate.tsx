@@ -6,49 +6,41 @@ import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { DEMO_INVITE_CODE } from '@/lib/api/demo';
-import { ALLOW_DAY_SKIP, jstDay, loadDay1, msUntilNextJstDay } from '@/lib/onboarding/progress';
+import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
+import { isDay2Unlocked, loadDay1, markDay2Unlocked } from '@/lib/onboarding/progress';
 
-const SKIP_KEY = 'obolo.day2.skip';
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 /**
  * Invite-only gate in front of the solar system (client decision 2026-10-04):
  *  guest → "invitation only" · story in progress → resume · Day 1 done today → "come back tomorrow".
  * Day 2 (KIMORIN, payment, profile image, Bati creation) is not built yet: on the next day the
- * member reaches the solar system directly (PLACEHOLDER P-OB-1).
+ * member reaches the solar system after the wait or the skip (PLACEHOLDER P-OB-1).
  */
 export function HomeGate({ children }: { children: ReactNode }) {
   const { status, me } = useAuth();
-  const [skipped, setSkipped] = useState(false);
+  const [unlocked, setUnlocked] = useState<boolean | null>(null);
   useEffect(() => {
-    try {
-      setSkipped(localStorage.getItem(SKIP_KEY) === '1');
-    } catch {
-      /* ignore */
-    }
-  }, []);
+    if (me) setUnlocked(isDay2Unlocked(me.id, me.day1CompletedAt));
+  }, [me]);
 
   if (status === 'loading') return <div className="min-h-svh" />;
   if (status === 'guest') return <InviteOnly />;
   if (me?.onboardingStage === 'day1') return <ResumeStory />;
-  if (
-    me?.onboardingStage === 'day1_done' &&
-    me.day1CompletedAt &&
-    jstDay(new Date(me.day1CompletedAt)) === jstDay(new Date()) &&
-    !skipped
-  ) {
-    return (
-      <ComeBackTomorrow
-        onSkip={() => {
-          try {
-            localStorage.setItem(SKIP_KEY, '1');
-          } catch {
-            /* ignore */
-          }
-          setSkipped(true);
-        }}
-      />
-    );
+  if (me?.onboardingStage === 'day1_done') {
+    if (unlocked === null) return <div className="fixed inset-0 bg-black" />;
+    if (!unlocked) {
+      return (
+        <TomorrowScreen
+          name={me.displayName}
+          completedAt={me.day1CompletedAt}
+          onUnlocked={() => {
+            markDay2Unlocked(me.id);
+            setUnlocked(true);
+          }}
+        />
+      );
+    }
   }
   return <>{children}</>;
 }
@@ -97,29 +89,6 @@ function ResumeStory() {
       <Link href={`/invite/${code}`} className="mt-2 rounded-full border border-amber-200/60 px-8 py-3 tracking-widest text-amber-100">
         {m.gate.resume}
       </Link>
-    </Shell>
-  );
-}
-
-function ComeBackTomorrow({ onSkip }: { onSkip: () => void }) {
-  const { m, t } = useI18n();
-  const [left, setLeft] = useState(msUntilNextJstDay());
-  useEffect(() => {
-    const id = setInterval(() => setLeft(msUntilNextJstDay()), 1000);
-    return () => clearInterval(id);
-  }, []);
-  const s = Math.max(0, Math.floor(left / 1000));
-  const time = `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-  return (
-    <Shell>
-      <p className="text-2xl tracking-[0.2em] text-amber-50">{m.gate.seeYou}</p>
-      <p className="text-sm text-white/55">{m.gate.tomorrowLead}</p>
-      <p className="mt-2 font-mono text-sm tracking-widest text-amber-200/70">{t(m.gate.opensIn, { time })}</p>
-      {ALLOW_DAY_SKIP && (
-        <button onClick={onSkip} className="mt-6 text-xs text-white/40 underline">
-          {m.gate.demoSkip}
-        </button>
-      )}
     </Shell>
   );
 }

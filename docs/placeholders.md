@@ -26,7 +26,8 @@
 |---|---|---|---|---|
 | P-OB-1 | ⚪ | 2日目以降（KIMORIN・入会と支払い・プロフィール画像・バティ作成） | 未着手。1日目の翌日（日本時間）からは太陽系ホームに直接入れる | `apps/web/components/HomeGate.tsx` |
 | P-OB-2 | 🟡 | 台本の解釈が必要だった箇所 | ①「門開（モーション11）」はボタンなしで自動再生 ②「やめておく」→ OBOLON「そうか。」→ MONBAN の締め（「おい！待て！」「喋りすぎた」は省略）③ モーション8・18・20〜26は台本で未使用 ④ 台本の「OBLON」は「OBOLON」に統一 ⑤ モーション6には「本部に到着しました」が動画内に入っているため、画面上の字幕は出さない | `apps/web/lib/onboarding/day1.ts` |
-| P-OB-3 | 🟡 | 「明日また来て」の判定 | 日本時間の日付が変わったら解禁。デモ用に「（デモ用）太陽系へ進む」ボタンを表示中（`NEXT_PUBLIC_ALLOW_DAY_SKIP=false` で消える） | `apps/web/lib/onboarding/progress.ts` |
+| P-OB-3 | 🟡 | 「また明日」の待ち時間と「明日まで待てへん」 | 1日目終了から24時間のカウントダウン。「明日まで待てへん」で何度でも無料でスキップでき、スキップしたことはその端末にだけ記録（2日目を作るときにサーバー側へ移す。将来 MANA 消費にする案もあり） | `components/onboarding/TomorrowScreen.tsx`、`lib/onboarding/progress.ts` |
+| P-OB-9 | 🟡 | カウントダウン・時計演出の音 | ブラウザ内で合成（時計のチクタク・低い持続音・加速するチクタク＋上昇音＋鐘）。専用の効果音を作ったら差し替え | `lib/onboarding/sfx.ts` |
 | P-OB-4 | 🟡 | 動画の配信元 | Web アプリ内（`apps/web/public/onboarding/`）に圧縮版を置いている。本番は Bunny CDN へ（`NEXT_PUBLIC_ONBOARDING_MEDIA_BASE`） | `scripts/encode-onboarding.sh`、`lib/onboarding/media.ts` |
 | P-OB-5 | 🟡 | 招待状の招待者名 | モーション4の動画に「KIMORIN 木元駿之介」が焼き込まれているため、誰が招待しても動画上はKIMORIN。セリフ中の（招待者名）は実際の招待者になる。**名前なしの招待状動画**をもらえれば、名前を画面上に重ねて表示できる | — |
 | P-OB-6 | ⚪ | 物語の英語版 | 台本は日本語のみ（英語表示でも日本語） | `lib/onboarding/day1.ts` |

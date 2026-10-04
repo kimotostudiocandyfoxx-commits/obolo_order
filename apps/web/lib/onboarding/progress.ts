@@ -31,16 +31,25 @@ export function clearDay1() {
   }
 }
 
-/** Day 2 unlocks on the next calendar day in Japan time (PLACEHOLDER P-OB-3). */
-export function jstDay(d: Date): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(d);
+/** Day 2 unlocks 24 hours after Day 1 is finished, or immediately with "明日まで待てへん". */
+export const DAY_WAIT_MS = 24 * 3600_000;
+
+const unlockKey = (userId: string) => `obolo.day2.unlocked.${userId}`;
+
+/** PLACEHOLDER (P-OB-3): the skip is remembered on this device only; move to the server with Day 2. */
+export function isDay2Unlocked(userId: string, completedAt: string | null): boolean {
+  if (completedAt && Date.now() >= Date.parse(completedAt) + DAY_WAIT_MS) return true;
+  try {
+    return localStorage.getItem(unlockKey(userId)) === '1';
+  } catch {
+    return false;
+  }
 }
 
-export function msUntilNextJstDay(now = new Date()): number {
-  const jst = new Date(now.getTime() + 9 * 3600_000);
-  const next = Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate() + 1) - 9 * 3600_000;
-  return next - now.getTime();
+export function markDay2Unlocked(userId: string) {
+  try {
+    localStorage.setItem(unlockKey(userId), '1');
+  } catch {
+    /* ignore */
+  }
 }
-
-/** PLACEHOLDER (P-OB-3): lets the 10/10 demo continue past "come back tomorrow". */
-export const ALLOW_DAY_SKIP = process.env.NEXT_PUBLIC_ALLOW_DAY_SKIP !== 'false';

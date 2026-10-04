@@ -284,3 +284,45 @@ body {
     transform: rotate(-1deg);
   }
 }
+@keyframes spinRev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes handHour {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(720deg);
+  }
+}
+@keyframes handMinute {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(8640deg);
+  }
+}
+@keyframes clockIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-40deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes flash {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

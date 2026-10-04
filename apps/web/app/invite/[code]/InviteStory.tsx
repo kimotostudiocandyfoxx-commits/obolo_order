@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
+import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { DAY1 } from '@/lib/onboarding/day1';
-import { clearDay1, loadDay1, saveDay1, type SavedDay1 } from '@/lib/onboarding/progress';
+import { clearDay1, loadDay1, markDay2Unlocked, saveDay1, type SavedDay1 } from '@/lib/onboarding/progress';
 
 /** /invite/<code> — the invitation link from the email. "resume" continues a story already begun. */
 export function InviteStory({ code }: { code: string }) {
@@ -80,12 +81,23 @@ export function InviteStory({ code }: { code: string }) {
         /* the finale still shows; progress is retried from the home gate */
       }
       clearDay1();
-      setTimeout(() => setFinished(true), 1200);
+      setTimeout(() => setFinished(true), 1500);
     },
     [setMe],
   );
 
-  if (finished) return <DayOneFinale onHome={() => router.push('/')} />;
+  if (finished && me) {
+    return (
+      <TomorrowScreen
+        name={me.displayName}
+        completedAt={me.day1CompletedAt}
+        onUnlocked={() => {
+          markDay2Unlocked(me.id);
+          router.push('/');
+        }}
+      />
+    );
+  }
 
   if (error) {
     const title =
@@ -112,22 +124,5 @@ export function InviteStory({ code }: { code: string }) {
       onName={onName}
       onEnd={onEnd}
     />
-  );
-}
-
-function DayOneFinale({ onHome }: { onHome: () => void }) {
-  const { m } = useI18n();
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex animate-[fadeUp_1.2s_ease-out] flex-col items-center justify-center gap-5 bg-black px-8 text-center"
-      style={{ fontFamily: '"Hiragino Mincho ProN", "Yu Mincho", serif' }}
-    >
-      <span className="text-xs tracking-[0.6em] text-amber-200/70">{m.gate.day1Done}</span>
-      <p className="text-2xl tracking-[0.2em] text-amber-50">{m.gate.seeYou}</p>
-      <p className="text-sm text-white/50">{m.gate.tomorrowLead}</p>
-      <button onClick={onHome} className="mt-6 rounded-full border border-amber-200/60 px-8 py-3 tracking-widest text-amber-100">
-        {m.gate.toHome}
-      </button>
-    </div>
   );
 }
