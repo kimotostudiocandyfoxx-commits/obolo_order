@@ -26,8 +26,11 @@ describe('day 1 script', () => {
   it('every BGM track has a file and the music is set from the first step', () => {
     const fs = require('node:fs') as typeof import('node:fs');
     for (const s of DAY1) if (s.t === 'bgm' && s.track) expect(fs.existsSync(`public/onboarding/bgm-${s.track}.m4a`)).toBe(true);
-    expect(bgmAt(DAY1, 1)).toBe('video11');
-    expect(bgmAt(DAY1, DAY1.length - 1)).toBe('3');
+    expect(bgmAt(DAY1, 1)).toBe('opening');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 7))).toBe('monban');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'name'))).toBe('obolon');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい！待て！'))).toBe('monban');
+    expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');
   });
   it('lets the visitor read during motion 17, with 19 chained after it', () => {
     const i = DAY1.findIndex((s) => s.t === 'bgvideo');
@@ -45,7 +48,8 @@ describe('day 1 script', () => {
   it('shows the temple caption during motion 12 and loops motion 13 behind OBOLON', () => {
     const i = DAY1.findIndex((s) => s.t === 'video' && s.motion === 12);
     expect(DAY1[i]).toMatchObject({ captions: [{ text: '地球の神殿に到着した' }] });
-    expect(DAY1[i + 1]).toEqual({ t: 'loop', motion: 13 });
+    expect(DAY1[i + 1]).toEqual({ t: 'bgm', track: 'obolon' });
+    expect(DAY1[i + 2]).toEqual({ t: 'loop', motion: 13 });
     const name = DAY1.findIndex((s) => s.t === 'name');
     expect(mediaAt(DAY1, name)).toEqual({ motion: 13, loop: true });
   });

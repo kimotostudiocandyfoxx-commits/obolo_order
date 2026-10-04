@@ -23,5 +23,5 @@ export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;
 export const BGM_VOLUME = 0.9;
 
 /** Per-track level (client: the MONBAN music must be clearly audible). */
-export const BGM_LEVELS: Record<string, number> = { video11: 0.9, obolo: 0.9, '3': 1 };
+export const BGM_LEVELS: Record<string, number> = { opening: 0.9, monban: 1, obolon: 0.9 };
 export const bgmLevel = (track: string) => BGM_LEVELS[track] ?? BGM_VOLUME;

@@ -34,7 +34,7 @@
 | P-OB-5 | 🟡 | 招待状の招待者名 | モーション4の動画に「KIMORIN 木元駿之介」が焼き込まれているため、誰が招待しても動画上はKIMORIN。セリフ中の（招待者名）は実際の招待者になる。**名前なしの招待状動画**をもらえれば、名前を画面上に重ねて表示できる | — |
 | P-OB-6 | ⚪ | 物語の英語版 | 台本は日本語のみ（英語表示でも日本語） | `lib/onboarding/day1.ts` |
 | P-OB-7 | ✅ | 1日目のモーションはすべて届いて組み込み済み（19は17の直後に追加）。今後のモーションが未着のときは | 「MOTION n（動画準備中）」の仮画面を表示（再生系は約2.6秒で次へ）。届いたら `AVAILABLE_MOTIONS` に番号を足すだけ | `lib/onboarding/media.ts` |
-| P-OB-8 | 🟡 | BGM の区間と音量 | 曲名（区間の説明）が送信時に文字化けして読めなかったため推測：①「VIDEO11」入りの曲＝最初〜モーション11 ②「OBOLO」入りの曲＝モーション11の後〜「OBOLOとは、、、、」 ③ 残りの曲＝MONBAN登場（モーション27）〜最後。音量：動画の音・BGMとも −16 LUFS に揃え（`scripts/normalize-audio.sh`、新しい動画は `encode-onboarding.sh` が自動で揃える）、BGMは MONBAN の曲 1.0・ほか 0.9（動画の音とほぼ同じ大きさ）。iPad の消音スイッチがオンでもBGM・演出音が鳴るよう Audio Session を「再生」に設定（iOS 16.4 未満は通常の音声再生に自動切替）。全体に音割れ防止のリミッター | `lib/onboarding/day1.ts`（`bgm` の行）、`lib/onboarding/media.ts`（`BGM_VOLUME`） |
+| P-OB-8 | 🟡 | BGM の区間と音量 | ✅ 区間はクライアント指示で確定：オープニング（`bgm-opening`）＝最初〜本部到着、MONBANのテーマ（`bgm-monban`、元「VIDEO11」の曲）＝MONBAN登場（モーション7）〜／最後の再登場〜、OBOLONのテーマ（`bgm-obolon`、元「OBOLO」の曲）＝OBOLON登場（モーション13）〜。音量：動画の音・BGMとも −16 LUFS に揃え（`scripts/normalize-audio.sh`、新しい動画は `encode-onboarding.sh` が自動で揃える）、BGMは MONBAN の曲 1.0・ほか 0.9（動画の音とほぼ同じ大きさ）。iPad の消音スイッチがオンでもBGM・演出音が鳴るよう Audio Session を「再生」に設定（iOS 16.4 未満は通常の音声再生に自動切替）。全体に音割れ防止のリミッター | `lib/onboarding/day1.ts`（`bgm` の行）、`lib/onboarding/media.ts`（`BGM_VOLUME`） |
 | P-INV-4 | 🟡 | デモモードの入口 | API 未接続のデモでは**どのメールアドレスでも KIMORIN からの招待扱い**で入れる（運営なしで通しテストできるように）。本番 API では招待のないアドレスは拒否 | `lib/api/demo.ts` |
 | P-BILL-2 | 🔴 | 「ORDERになるか？」の決済 | Stripe 未接続。「ORDERになる」を押すと決済なしで ORDER になる（デモ） | `components/onboarding/OrderScreen.tsx`、`apps/api/src/users/users.service.ts`（`becomeOrder`） |
 | P-INV-1 | 🟡 | 1人が招待できる人数 | 30日で10人まで | `apps/api/src/invites/invites.service.ts` |

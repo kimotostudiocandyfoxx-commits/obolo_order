@@ -58,7 +58,7 @@ export class Bgm {
     else {
       // Prime the element inside the gesture so later play() calls are allowed on iOS.
       this.quiet();
-      this.el.src = bgmUrl('video11');
+      this.el.src = bgmUrl('opening');
       this.el.play().then(
         () => {
           if (!this.track) {
@@ -78,11 +78,12 @@ export class Bgm {
       if (track) this.play(track, 1.2);
       return;
     }
-    this.fadeTo(0, 0.9);
+    // Short fade so the new theme lands on the cue (e.g. the moment MONBAN appears).
+    this.fadeTo(0, 0.25);
     this.swapTimer = setTimeout(() => {
-      if (track) this.play(track, 1.2);
+      if (track) this.play(track, 0.8);
       else this.stopNow();
-    }, 950);
+    }, 280);
   }
 
   fadeOut(seconds = 2.5) {

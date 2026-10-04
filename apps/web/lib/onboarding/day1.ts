@@ -13,10 +13,9 @@ import type { Step } from './script';
  *  - The invitation card (motion 4) has the inviter name baked into the video ("KIMORIN").
  */
 export const DAY1: Step[] = [
-  // BGM sections (PLACEHOLDER P-OB-8 — the file titles that name each section were lost in upload;
-  // this split is inferred from the remaining "VIDEO11" / "OBOLO" in the names — confirm with client):
-  //   bgm-video11: start → motion 11 · bgm-obolo: after motion 11 → "OBOLOとは" · bgm-3: MONBAN → end
-  { t: 'bgm', track: 'video11' },
+  // BGM (client, 2026-10-04): opening → MONBAN's theme from the moment MONBAN appears (motion 7,
+  // and again when he returns at the end) → OBOLON's theme from the moment OBOLON appears (motion 13).
+  { t: 'bgm', track: 'opening' },
   { t: 'video', motion: 1 }, // 招待信号を受信しました
   { t: 'loop', motion: 2 },
   { t: 'action', label: '封を開く' },
@@ -29,6 +28,7 @@ export const DAY1: Step[] = [
   { t: 'loop', motion: 6 }, // 「本部に到着しました」is in the video itself
   { t: 'action', label: '中に入る' },
 
+  { t: 'bgm', track: 'monban' },
   { t: 'video', motion: 7 },
   { t: 'caption', text: 'MONBANが現れた' },
   { t: 'loop', motion: 9 },
@@ -39,13 +39,13 @@ export const DAY1: Step[] = [
   { t: 'video', motion: 10 },
   { t: 'say', who: 'MONBAN', text: 'なるほど…。\n{inviter}から…招待されたのか…。' },
   { t: 'video', motion: 11 }, // 門開
-  { t: 'bgm', track: 'obolo' },
   { t: 'say', who: 'MONBAN', text: '門を潜り、地球の神殿に行け…。' },
   { t: 'action', label: '門を潜り、地球の神殿に向かう' },
 
   // Client (2026-10-04): the caption appears as the camera enters the temple (~4 s into motion 12);
   // motion 13 is a loop that keeps playing behind OBOLON's whole conversation.
   { t: 'video', motion: 12, captions: [{ text: '地球の神殿に到着した', from: 4.5, to: 7 }] },
+  { t: 'bgm', track: 'obolon' },
   { t: 'loop', motion: 13 },
   { t: 'caption', text: 'OBOLONが現れた' },
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' },
@@ -94,7 +94,7 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'OBOLOとは、、、、' },
 
   // Client (2026-10-04): MONBAN interrupts on a black screen, THEN motion 27 plays.
-  { t: 'bgm', track: '3' },
+  { t: 'bgm', track: 'monban' },
   { t: 'black' },
   { t: 'say', who: 'MONBAN', text: 'おい！待て！' },
   { t: 'video', motion: 27 },
@@ -104,7 +104,7 @@ export const DAY1: Step[] = [
 
   { t: 'label', id: 'decline' },
   { t: 'say', who: 'OBOLON', text: 'そうか。' },
-  { t: 'bgm', track: '3' },
+  { t: 'bgm', track: 'monban' },
   { t: 'video', motion: 27 },
   { t: 'loop', motion: 28 },
 
