@@ -12,6 +12,10 @@ ok()   { printf '  \033[32m✓ %s\033[0m\n' "$*"; }
 fail() { printf '\n\033[1;31m✗ %s\033[0m\n' "$*"; exit 1; }
 
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
+if [ -z "$PROJECT_ID" ] && [ "$(gcloud projects list --format='value(projectId)' 2>/dev/null | wc -l)" = 1 ]; then
+  PROJECT_ID=$(gcloud projects list --format='value(projectId)')
+fi
+[ -n "$PROJECT_ID" ] || { echo "あなたのプロジェクト一覧:"; gcloud projects list --format='value(projectId)'; }
 read -rp "プロジェクトID [${PROJECT_ID}]: " IN; PROJECT_ID="${IN:-$PROJECT_ID}"
 [ -n "$PROJECT_ID" ] || fail "プロジェクトIDが空です"
 read -rp "Upstash の Redis URL (rediss://...): " REDIS_URL
