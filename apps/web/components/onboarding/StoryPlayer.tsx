@@ -47,6 +47,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   const [backdrop, setBackdrop] = useState<string | null>(null);
   /** False until the first motion frame is on screen: the start light stays up instead of black. */
   const [ready, setReady] = useState(false);
+  /** 'black' step: the screen stays black until the next motion has a frame on screen. */
+  const [blackout, setBlackout] = useState(false);
   const [placeholder, setPlaceholder] = useState<number | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -96,7 +98,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
           n++;
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
-        else if (s.t === 'loop') {
+        else if (s.t === 'black') {
+          bgQueue.current = [];
+          setBlackout(true);
+          dual.current?.pauseAll();
+          n++;
+        } else if (s.t === 'loop') {
           bgQueue.current = [];
           playMedia(s.motion, true);
           n++;
@@ -141,6 +148,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
       onShown: (url) => {
         setBlocked(false);
         setReady(true);
+        setBlackout(false);
         setBackdrop(url.replace(/\.mp4$/, '.jpg'));
       },
     });
@@ -170,12 +178,16 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
     const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
-    if (i === 0 || ['video', 'bgvideo', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
+    if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
       run(i);
       return;
     }
     const m = mediaAt(steps, i);
     if (m) playMedia(m.motion, m.loop, !m.loop);
+    else {
+      setBlackout(true);
+      setReady(true);
+    }
   };
 
   const next = () => run(iRef.current + 1);
@@ -216,6 +228,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
         ))}
       </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
+      {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
 
       {started && (
         <div

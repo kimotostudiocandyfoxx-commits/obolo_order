@@ -92,9 +92,11 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'わかりやすく、言う。' },
   { t: 'say', who: 'OBOLON', text: 'OBOLOとは、、、、' },
 
+  // Client (2026-10-04): MONBAN interrupts on a black screen, THEN motion 27 plays.
   { t: 'bgm', track: '3' },
-  { t: 'video', motion: 27 },
+  { t: 'black' },
   { t: 'say', who: 'MONBAN', text: 'おい！待て！' },
+  { t: 'video', motion: 27 },
   { t: 'loop', motion: 28 },
   { t: 'say', who: 'MONBAN', text: 'OBOLON、それは…喋りすぎた。' },
   { t: 'goto', id: 'ending' },

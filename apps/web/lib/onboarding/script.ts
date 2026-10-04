@@ -17,6 +17,8 @@ export type Step =
    * Still unskippable: there are no controls, the dialogue just runs on top of it.
    */
   | { t: 'bgvideo'; motion: number; then?: number[] }
+  /** Cut to a black screen (until the next motion appears) and continue immediately. */
+  | { t: 'black' }
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: number }
   /** Narration line (e.g. "MONBANが現れた"). Tap to continue. */
@@ -50,10 +52,11 @@ export function labelIndex(steps: Step[], id: string): number {
   return i;
 }
 
-/** The media that should be on screen at step i (for resuming mid-story). */
+/** The media that should be on screen at step i (for resuming mid-story). null = black screen. */
 export function mediaAt(steps: Step[], i: number): { motion: number; loop: boolean } | null {
   for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
     const s = steps[k];
+    if (s.t === 'black') return null;
     if (s.t === 'video' || s.t === 'loop') return { motion: s.motion, loop: s.t === 'loop' };
     if (s.t === 'bgvideo') return { motion: s.then?.length ? s.then[s.then.length - 1] : s.motion, loop: false };
   }

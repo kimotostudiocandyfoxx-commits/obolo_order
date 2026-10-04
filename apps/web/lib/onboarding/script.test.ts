@@ -36,4 +36,10 @@ describe('day 1 script', () => {
     // resuming during those lines shows 19's last frame
     expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
   });
+  it('MONBAN shouts on a black screen before motion 27', () => {
+    const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい！待て！');
+    expect(DAY1[i - 1]).toEqual({ t: 'black' });
+    expect(DAY1[i + 1]).toEqual({ t: 'video', motion: 27 });
+    expect(mediaAt(DAY1, i)).toBeNull();
+  });
 });
