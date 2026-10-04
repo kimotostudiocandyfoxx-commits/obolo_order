@@ -1,16 +1,17 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { hasMotion, motionUrl, posterUrl } from '@/lib/onboarding/media';
+import { hasMotion, motionUrl } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
+import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars } from '@/lib/onboarding/script';
 
 /**
  * Full-screen story player used by the invite-only onboarding.
  *  - Motion videos cannot be skipped (no controls, taps ignored while they play).
  *  - Dialogue stops at each line; a tap reveals the full line, the next tap continues.
- *  - A single <video> element is reused for every motion: once iOS Safari has started it from the
- *    first tap, later motions can play with sound without another gesture.
+ *  - Two stacked <video> elements are used as a double buffer (DualVideo): no black flashes between
+ *    motions or at loop seams, and no stale frame. Both are unlocked by the first tap (iOS).
  *  - Progress is saved after every step so a reload resumes where the visitor was.
  */
 export interface StoryProgress {
@@ -32,7 +33,9 @@ interface Props {
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }: Props) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoA = useRef<HTMLVideoElement>(null);
+  const videoB = useRef<HTMLVideoElement>(null);
+  const dual = useRef<DualVideo | null>(null);
   const [started, setStarted] = useState(false);
   const [i, setIState] = useState(initial?.i ?? 0);
   const iRef = useRef(i);
@@ -41,8 +44,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   const stateRef = useRef({ name, answers });
   stateRef.current = { name, answers };
 
-  const [poster, setPoster] = useState<string | null>(null);
-  const [posterVisible, setPosterVisible] = useState(false);
+  const [backdrop, setBackdrop] = useState<string | null>(null);
+  /** False until the first motion frame is on screen: the start light stays up instead of black. */
+  const [ready, setReady] = useState(false);
   const [placeholder, setPlaceholder] = useState<number | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -64,35 +68,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
 
   /** Show a motion. freeze = jump to its last frame without playing (used when resuming). */
   const playMedia = useCallback((motion: number, loop: boolean, freeze = false) => {
-    const el = videoRef.current;
-    if (!el) return;
+    const d = dual.current;
+    if (!d) return;
     if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
     if (!hasMotion(motion)) {
-      el.pause();
+      d.pauseAll();
       setPlaceholder(motion);
-      setPoster(null);
       if (!loop && !freeze) placeholderTimer.current = setTimeout(() => onEndedRef.current(), 2600);
       return;
     }
     setPlaceholder(null);
-    setPoster(posterUrl(motion));
-    setPosterVisible(true);
-    el.loop = loop;
-    el.src = motionUrl(motion);
-    if (freeze) {
-      el.addEventListener(
-        'loadedmetadata',
-        () => {
-          el.currentTime = Math.max(0, el.duration - 0.05);
-        },
-        { once: true },
-      );
-      el.addEventListener('seeked', () => setPosterVisible(false), { once: true });
-      el.load();
-      return;
-    }
-    const p = el.play();
-    if (p) p.catch(() => setBlocked(true));
+    d.show(motionUrl(motion), loop, freeze);
   }, []);
 
   /** Advance from step `from`, running non-interactive steps until something needs the visitor. */
@@ -135,22 +121,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   };
 
   useEffect(() => {
-    const el = videoRef.current;
-    if (!el) return;
-    const ended = () => onEndedRef.current();
-    const playing = () => {
-      setPosterVisible(false);
-      setBlocked(false);
-    };
-    const failed = () => setBlocked(true);
-    el.addEventListener('ended', ended);
-    el.addEventListener('playing', playing);
-    el.addEventListener('error', failed);
-    return () => {
-      el.removeEventListener('ended', ended);
-      el.removeEventListener('playing', playing);
-      el.removeEventListener('error', failed);
-    };
+    if (!videoA.current || !videoB.current) return;
+    const d = new DualVideo([videoA.current, videoB.current], {
+      onEnded: () => onEndedRef.current(),
+      onBlocked: () => setBlocked(true),
+      onShown: (url) => {
+        setBlocked(false);
+        setReady(true);
+        setBackdrop(url.replace(/\.mp4$/, '.jpg'));
+      },
+    });
+    dual.current = d;
+    return () => d.dispose();
   }, []);
 
   useEffect(
@@ -161,7 +143,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
     [],
   );
 
-  useEffect(() => bgm.current?.setMuted(muted), [muted]);
+  useEffect(() => {
+    bgm.current?.setMuted(muted);
+    dual.current?.setMuted(muted);
+  }, [muted]);
 
   /** First tap: unlocks audio/video on iOS and starts (or resumes) the story inside the gesture. */
   const start = () => {
@@ -169,6 +154,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
     // Start the music inside the gesture (fresh start: the first track; resume: the track at that point).
     const firstBgm = steps.find((s) => s.t === 'bgm');
     bgm.current?.unlock(i === 0 ? (firstBgm?.t === 'bgm' ? firstBgm.track : null) : bgmAt(steps, i));
+    const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
+    if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
     if (i === 0 || ['video', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
       run(i);
@@ -176,7 +163,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
     }
     const m = mediaAt(steps, i);
     if (m) playMedia(m.motion, m.loop, !m.loop);
-    else videoRef.current?.play().catch(() => undefined);
   };
 
   const next = () => run(iRef.current + 1);
@@ -196,30 +182,36 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   return (
     <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
       {/* blurred backdrop so 9:16 motions fill wider screens (iPad) without cropping */}
-      {poster && (
+      {backdrop && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={poster} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" aria-hidden />
+        <img src={backdrop} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" aria-hidden />
       )}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 h-full w-full object-contain"
-        playsInline
-        preload="auto"
-        muted={muted}
-        disablePictureInPicture
-        controls={false}
-        onContextMenu={(e) => e.preventDefault()}
-      />
-      {poster && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={poster}
-          alt=""
-          className={`pointer-events-none absolute inset-0 h-full w-full object-contain transition-opacity duration-300 ${posterVisible ? 'opacity-100' : 'opacity-0'}`}
-          aria-hidden
-        />
-      )}
+      {/* double-buffered motion videos (see DualVideo) */}
+      <div className="absolute inset-0 z-0">
+        {[videoA, videoB].map((ref, k) => (
+          <video
+            key={k}
+            ref={ref}
+            className="absolute inset-0 h-full w-full object-contain"
+            playsInline
+            preload="auto"
+            muted={muted}
+            disablePictureInPicture
+            controls={false}
+            onContextMenu={(e) => e.preventDefault()}
+          />
+        ))}
+      </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
+
+      {started && (
+        <div
+          className={`pointer-events-none absolute inset-0 z-[5] flex items-center justify-center bg-black transition-opacity duration-700 ${ready || placeholder !== null ? 'opacity-0' : 'opacity-100'}`}
+          aria-hidden
+        >
+          <span className="h-3 w-3 animate-pulse rounded-full bg-amber-100 shadow-[0_0_40px_12px_rgba(255,214,140,0.7)]" />
+        </div>
+      )}
 
       {/* tap layer for dialogue */}
       {started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />}
@@ -277,15 +269,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
         <button
           className="absolute inset-0 z-30 flex items-center justify-center bg-black/50"
           onClick={() => {
-            const el = videoRef.current;
             setBlocked(false);
-            // A motion that cannot load must never trap the visitor: skip it (loops just stay hidden).
-            if (!el || el.error) {
-              setPosterVisible(true);
-              onEndedRef.current();
-              return;
-            }
-            el.play().catch(() => setBlocked(true));
+            // A motion that cannot load must never trap the visitor: skip it.
+            if (!dual.current?.retry()) onEndedRef.current();
           }}
         >
           <span className="rounded-full border border-amber-200/60 px-6 py-3 text-amber-100">▶ タップして続ける</span>
