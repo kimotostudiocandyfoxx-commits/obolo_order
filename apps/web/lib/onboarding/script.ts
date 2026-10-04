@@ -6,7 +6,7 @@
  */
 import type { MotionId } from './media';
 
-export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN';
+export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター';
 
 export type Step =
   /**
@@ -26,7 +26,11 @@ export type Step =
    * Show a character image (transparent PNG/WebP in public/onboarding, e.g. "kimorin-1") standing in
    * front of the background motion; it stays until the next sprite step, null, or a blocking video.
    */
-  | { t: 'sprite'; image: string | null }
+  | { t: 'sprite'; image: string | string[] | null }
+  /** Still background image (public/onboarding/<image>.jpg) for scenes without a motion yet. */
+  | { t: 'still'; image: string }
+  /** Saturn ("ころりん") tutorial: the visitor listens, gives a star and drops their own voice. */
+  | { t: 'saturn' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

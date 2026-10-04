@@ -83,7 +83,7 @@ export interface BuddyChatResponse {
 
 export interface SaturnPostView {
   id: string;
-  author: { id: string; handle: string; displayName: string };
+  author: { id: string; handle: string; displayName: string; neoForm?: string | null };
   text: string;
   voiceUrl: string;
   voiceSource: 'recorded' | 'cloned' | 'default';

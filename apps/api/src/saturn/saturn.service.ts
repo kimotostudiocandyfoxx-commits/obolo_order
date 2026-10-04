@@ -22,7 +22,7 @@ export class SaturnService {
     const c = decodeCursor(cursor);
     const db = fresh ? this.db.write : this.db.read;
     const rows = await db
-      .select({ p: saturnPosts, u: { id: users.id, handle: users.handle, displayName: users.displayName } })
+      .select({ p: saturnPosts, u: { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm } })
       .from(saturnPosts)
       .innerJoin(users, eq(users.id, saturnPosts.userId))
       .where(
@@ -53,7 +53,7 @@ export class SaturnService {
 
   private toView(
     p: typeof saturnPosts.$inferSelect,
-    u: { id: string; handle: string; displayName: string },
+    u: { id: string; handle: string; displayName: string; neoForm?: string | null },
     starredByMe: boolean,
   ): SaturnPostView {
     return {
@@ -86,7 +86,7 @@ export class SaturnService {
       })
       .returning();
     const [u] = await this.db.write
-      .select({ id: users.id, handle: users.handle, displayName: users.displayName })
+      .select({ id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm })
       .from(users)
       .where(eq(users.id, userId));
     return this.toView(p, u, false);

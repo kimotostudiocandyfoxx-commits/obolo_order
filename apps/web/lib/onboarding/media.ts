@@ -17,6 +17,8 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   '2-1', '2-2', '2-3', '2-9', '2-10',
   // Day 3
   '3-1', '3-3', '3-4', '3-6', '3-7',
+  // Day 4
+  '4-1',
 ]);
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
@@ -25,6 +27,8 @@ export const hasMotion = (n: MotionId) => AVAILABLE_MOTIONS.has(n);
 
 /** Character images shown over the motions (transparent WebP). */
 export const spriteUrl = (name: string) => `${MEDIA_BASE}/${name}.webp`;
+/** Still background images (JPEG). */
+export const stillUrl = (name: string) => `${MEDIA_BASE}/${name}.jpg`;
 
 /** Background music tracks (by the client, DJ SHACHO). Converted to AAC 128 kbps. */
 export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;

@@ -1,11 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { hasMotion, motionUrl, spriteUrl, type MotionId } from '@/lib/onboarding/media';
+import { hasMotion, motionUrl, spriteUrl, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { neoForm } from '@obolo/shared';
 import { NeoChooser } from './NeoChooser';
+import { SaturnTutorial } from '@/components/saturn/SaturnTutorial';
 import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 
 /**
@@ -54,7 +55,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
   /** 'black' step: the screen stays black until the next motion has a frame on screen. */
   const [blackout, setBlackout] = useState(false);
   /** Character image standing in front of the motion ('sprite' steps). */
-  const [sprite, setSprite] = useState<string | null>(null);
+  const [sprite, setSprite] = useState<string | string[] | null>(null);
+  /** Still background image ('still' steps), removed once the next motion is on screen. */
+  const [still, setStill] = useState<string | null>(null);
+  const clearStillOnShow = useRef(false);
   const [placeholder, setPlaceholder] = useState<MotionId | null>(null);
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -113,7 +117,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
           n++;
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
-        else if (s.t === 'sprite') {
+        else if (s.t === 'still') {
+          setStill(s.image);
+          n++;
+        } else if (s.t === 'sprite') {
           setSprite(s.image);
           n++;
         } else if (s.t === 'black') {
@@ -122,14 +129,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
           dual.current?.pauseAll();
           n++;
         } else if (s.t === 'loop') {
+          clearStillOnShow.current = true;
           bgQueue.current = [];
           playMedia(s.motion, true);
           n++;
         } else if (s.t === 'bgvideo') {
+          clearStillOnShow.current = true;
           bgQueue.current = [...(s.then ?? [])];
           playMedia(s.motion, false);
           n++;
         } else if (s.t === 'video') {
+          clearStillOnShow.current = true;
           bgQueue.current = [];
           setSprite(null);
           clearCaptions();
@@ -173,6 +183,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
         setBlocked(false);
         setReady(true);
         setBlackout(false);
+        if (clearStillOnShow.current) {
+          clearStillOnShow.current = false;
+          setStill(null);
+        }
         // schedule the starting motion's timed captions from its first visible frame
         const caps = pendingCaptions.current;
         pendingCaptions.current = [];
@@ -213,6 +227,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
     if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
       run(i);
       return;
+    }
+    for (let k = i - 1; k >= 0; k--) {
+      const s = steps[k];
+      if (s.t === 'video' || s.t === 'loop') break;
+      if (s.t === 'still') {
+        setStill(s.image);
+        setReady(true);
+        break;
+      }
     }
     for (let k = i - 1; k >= 0; k--) {
       const s = steps[k];
@@ -269,16 +292,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
       </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
       {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
-      {sprite && (
+      {still && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={sprite}
-          src={spriteUrl(sprite)}
-          alt=""
-          className="pointer-events-none absolute bottom-[24%] left-1/2 z-[3] h-[50%] max-w-[92%] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
-          aria-hidden
-        />
+        <img src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
       )}
+      {sprite &&
+        (Array.isArray(sprite) ? sprite : [sprite]).map((name, k, arr) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={name}
+            src={spriteUrl(name)}
+            alt=""
+            className="pointer-events-none absolute bottom-[24%] z-[3] h-[50%] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
+            style={{ left: arr.length === 1 ? '50%' : `${28 + (44 * k) / (arr.length - 1)}%`, maxWidth: arr.length === 1 ? '92%' : '52%' }}
+            aria-hidden
+          />
+        ))}
       {overlayCaption && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[calc(18vh+env(safe-area-inset-bottom))] z-[6] flex animate-[fadeUp_0.8s_ease-out] justify-center">
           <div className="flex items-center gap-3 rounded-full bg-black/55 px-6 py-3 text-lg tracking-[0.2em] text-amber-100 backdrop-blur-sm">
@@ -325,6 +354,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
           ))}
         </Buttons>
       )}
+      {started && step?.t === 'saturn' && <SaturnTutorial onDone={next} />}
       {started && step?.t === 'neo' && (
         <NeoChooser
           onChoose={async (id) => {
