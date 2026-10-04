@@ -79,8 +79,8 @@ export const DAY1: Step[] = [
   { t: 'video', motion: 16 },
   { t: 'say', who: 'OBOLON', text: '地球も、俺も、お前も。\n想像しうる全てが\n宇宙、そこで生まれる。' },
 
-  { t: 'video', motion: 17 },
-  { t: 'video', motion: 19 }, // added by the client (2026-10-04): plays right after 17, no audio
+  // Client (2026-10-04): the lines below are read WHILE motion 17 plays; 19 follows right after 17.
+  { t: 'bgvideo', motion: 17, then: [19] },
   { t: 'say', who: 'OBOLON', text: '何かの偶然、何かの欲望、何かの閃き、\nいつだって、何かによって、何かが生まれる。' },
   { t: 'say', who: 'OBOLON', text: '“OBOLO ORDER”\nそれは、新しい何かを、生み出す者達' },
   { t: 'say', who: 'OBOLON', text: '楽しむ心があれば\n曲、映像、物語、服、食べ物。' },

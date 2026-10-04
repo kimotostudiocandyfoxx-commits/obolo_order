@@ -51,6 +51,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
   const placeholderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Motions still to play behind the dialogue after the current background motion (bgvideo.then). */
+  const bgQueue = useRef<number[]>([]);
   const bgm = useRef<Bgm | null>(null);
   bgm.current ??= new Bgm();
 
@@ -95,9 +97,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
         else if (s.t === 'loop') {
+          bgQueue.current = [];
           playMedia(s.motion, true);
           n++;
+        } else if (s.t === 'bgvideo') {
+          bgQueue.current = [...(s.then ?? [])];
+          playMedia(s.motion, false);
+          n++;
         } else if (s.t === 'video') {
+          bgQueue.current = [];
           playMedia(s.motion, false);
           setI(n);
           return;
@@ -118,6 +126,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
   onEndedRef.current = () => {
     const s = steps[iRef.current];
     if (s?.t === 'video') run(iRef.current + 1);
+    else {
+      // a background motion finished while the visitor reads: play the next one in its chain
+      const next = bgQueue.current.shift();
+      if (next !== undefined) playMedia(next, false);
+    }
   };
 
   useEffect(() => {
@@ -157,7 +170,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onEnd }:
     const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
-    if (i === 0 || ['video', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
+    if (i === 0 || ['video', 'bgvideo', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
       run(i);
       return;
     }

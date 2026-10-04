@@ -11,6 +11,12 @@ export type Step =
   | { t: 'video'; motion: number }
   /** Switch background music (crossfade). null = fade out. Continues immediately. */
   | { t: 'bgm'; track: string | null }
+  /**
+   * Play a motion once IN THE BACKGROUND and continue immediately, so the dialogue can be read while
+   * it plays. `then` motions follow automatically when it ends; the last one holds its final frame.
+   * Still unskippable: there are no controls, the dialogue just runs on top of it.
+   */
+  | { t: 'bgvideo'; motion: number; then?: number[] }
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: number }
   /** Narration line (e.g. "MONBANが現れた"). Tap to continue. */
@@ -49,6 +55,7 @@ export function mediaAt(steps: Step[], i: number): { motion: number; loop: boole
   for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
     const s = steps[k];
     if (s.t === 'video' || s.t === 'loop') return { motion: s.motion, loop: s.t === 'loop' };
+    if (s.t === 'bgvideo') return { motion: s.then?.length ? s.then[s.then.length - 1] : s.motion, loop: false };
   }
   return null;
 }

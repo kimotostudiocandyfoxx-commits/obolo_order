@@ -29,4 +29,11 @@ describe('day 1 script', () => {
     expect(bgmAt(DAY1, 1)).toBe('video11');
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('3');
   });
+  it('lets the visitor read during motion 17, with 19 chained after it', () => {
+    const i = DAY1.findIndex((s) => s.t === 'bgvideo');
+    expect(DAY1[i]).toEqual({ t: 'bgvideo', motion: 17, then: [19] });
+    expect(DAY1[i + 1]).toMatchObject({ t: 'say', text: expect.stringContaining('何かの偶然') });
+    // resuming during those lines shows 19's last frame
+    expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
+  });
 });
