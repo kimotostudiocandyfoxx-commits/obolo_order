@@ -3,6 +3,8 @@
 # Run it in Cloud Shell. It asks for the values it needs and can be re-run safely:
 # anything that already exists is kept, and secrets get a new version.
 set -uo pipefail
+# Never wait on a hidden gcloud question (several checks below hide their output).
+export CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 REGION=asia-northeast1
 GITHUB_REPO=kimotostudiocandyfoxx-commits/obolo_order
