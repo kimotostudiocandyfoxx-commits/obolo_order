@@ -2,14 +2,14 @@ import type { Step } from './script';
 
 /**
  * DAY 1 — from opening the invitation link to MONBAN's "また明日会おう".
- * Text is the client's script (2026-10-04) verbatim. Motions 6–29 have not been delivered yet;
- * the player shows a placeholder for them (see AVAILABLE_MOTIONS).
+ * Text is the client's script (2026-10-04) verbatim. All motions used here have been delivered
+ * (motion 19 was added after the script, directly after 17).
  *
  * Interpretations (PLACEHOLDER P-OB-2, confirm with the client):
  *  - "→門開（モーション11）" plays automatically after MONBAN's line (no button).
  *  - The script does not say what "やめておく" leads to: OBOLON says "そうか。" and the story jumps to
  *    MONBAN's ending (without "おい！待て！" / "喋りすぎた").
- *  - Motion 8 and motions 18–26 are not referenced by the script.
+ *  - Motion 8, 18 and 20–26 are not referenced by the script.
  *  - The invitation card (motion 4) has the inviter name baked into the video ("KIMORIN").
  */
 export const DAY1: Step[] = [
@@ -75,6 +75,7 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: '地球も、俺も、お前も。\n想像しうる全てが\n宇宙、そこで生まれる。' },
 
   { t: 'video', motion: 17 },
+  { t: 'video', motion: 19 }, // added by the client (2026-10-04): plays right after 17, no audio
   { t: 'say', who: 'OBOLON', text: '何かの偶然、何かの欲望、何かの閃き、\nいつだって、何かによって、何かが生まれる。' },
   { t: 'say', who: 'OBOLON', text: '“OBOLO ORDER”\nそれは、新しい何かを、生み出す者達' },
   { t: 'say', who: 'OBOLON', text: '楽しむ心があれば\n曲、映像、物語、服、食べ物。' },
