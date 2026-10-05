@@ -93,11 +93,25 @@ export const AdvanceJourneyBody = z.object({
 export type AdvanceJourneyBody = z.infer<typeof AdvanceJourneyBody>;
 
 /** Day 3: the three questions for generating the OBOLO NEO look (client decision 2026-10-05). */
-export const NeoLookBody = z.object({
-  animal: z.string().trim().min(1).max(30),
-  color: z.string().trim().min(1).max(30),
-  mood: z.string().trim().min(1).max(40),
-});
+export const NeoLookBody = z.union([
+  z.object({
+    animal: z.string().trim().min(1).max(30),
+    color: z.string().trim().min(1).max(30),
+    mood: z.string().trim().min(1).max(40),
+  }),
+  /** From a reference image (client decision 2026-10-05). The image is only read, never stored. */
+  z.object({
+    reference: z.object({
+      mime: z.enum(['image/jpeg', 'image/png', 'image/webp']),
+      /** base64, already downscaled by the client (≤ ~1.5 MB) */
+      data: z.string().min(100).max(2_000_000),
+    }),
+    /** KIMORIN's question 1: the part of the image they love */
+    liked: z.string().trim().min(1).max(60),
+    /** KIMORIN's question 2: their own twist */
+    twist: z.string().trim().min(1).max(60),
+  }),
+]);
 export type NeoLookBody = z.infer<typeof NeoLookBody>;
 
 export const ChooseLookBody = z.object({ mediaId: z.string().uuid() });
@@ -110,3 +124,7 @@ export type BatiEggBody = z.infer<typeof BatiEggBody>;
 /** Day 4: the newborn Bati's name. */
 export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) });
 export type BatiNameBody = z.infer<typeof BatiNameBody>;
+
+/** Day 3: refine the chosen look with one instruction (3 times). */
+export const RefineLookBody = z.object({ mediaId: z.string().uuid(), instruction: z.string().trim().min(1).max(60) });
+export type RefineLookBody = z.infer<typeof RefineLookBody>;

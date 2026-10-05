@@ -10,7 +10,7 @@ import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { neoForm } from '@obolo/shared';
-import { demoNeoLooks } from '@/lib/look';
+import { demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
 import { STORIES } from '@/lib/onboarding/stories';
 
 /**
@@ -33,6 +33,7 @@ function PreviewPlay() {
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);
   const [round, setRound] = useState(0);
+  const [refines, setRefines] = useState(0);
   const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
 
   if (q.get('world') === 'venus') {
@@ -94,10 +95,22 @@ function PreviewPlay() {
         lookApi={{
           candidates: async (a) => {
             await new Promise((r) => setTimeout(r, 1500));
-            const c = demoNeoLooks(a, round).map((url, k) => ({ id: `${round}-${k}`, url }));
-            setCands(c);
+            const urls =
+              'reference' in a
+                ? await Promise.all([0, 1, 2, 3].map((k) => demoFromReference(`data:${a.reference.mime};base64,${a.reference.data}`, a, k + round * 4)))
+                : demoNeoLooks(a, round);
+            const c = urls.map((url, k) => ({ id: `${round}-${k}`, url }));
+            setCands((x) => [...x, ...c]);
             setRound(round + 1);
-            return { candidates: c, triesLeft: Math.max(0, 2 - round) };
+            return { candidates: c, triesLeft: Math.max(0, 2 - round), refinesLeft: 3 - refines };
+          },
+          refine: async (id, instruction) => {
+            await new Promise((r) => setTimeout(r, 1200));
+            const src = cands.find((c) => c.id === id);
+            const c = { id: `r${refines}`, url: await demoRefine(src?.url ?? '', instruction, refines) };
+            setCands((x) => [...x, c]);
+            setRefines(refines + 1);
+            return { candidates: [c], triesLeft: Math.max(0, 3 - round), refinesLeft: 2 - refines };
           },
           choose: async (id) => cands.find((c) => c.id === id)?.url ?? '',
           chooseForm: async (id) => setNeo(id),

@@ -63,6 +63,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       }}
       lookApi={{
         candidates: (a) => getApi().lookCandidates(a),
+        refine: (id, instruction) => getApi().refineLook(id, instruction),
         choose: async (id) => {
           const u = await getApi().chooseLook(id);
           setMe(u);

@@ -11,7 +11,8 @@ export interface GeneratedImage {
 
 export interface ImageProvider {
   readonly name: string;
-  generate(prompt: string, seed?: number): Promise<GeneratedImage>;
+  /** `refs`: images the model looks at (a reference to take inspiration from, or the image to edit). */
+  generate(prompt: string, seed?: number, refs?: GeneratedImage[]): Promise<GeneratedImage>;
 }
 
 export class GeminiImageProvider implements ImageProvider {
@@ -23,10 +24,15 @@ export class GeminiImageProvider implements ImageProvider {
   ) {
     this.client = new GoogleGenAI({ apiKey });
   }
-  async generate(prompt: string): Promise<GeneratedImage> {
+  async generate(prompt: string, _seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     const res = await this.client.models.generateContent({
       model: this.model,
-      contents: prompt,
+      contents: [
+        {
+          role: 'user',
+          parts: [...refs.map((r) => ({ inlineData: { mimeType: r.mime, data: r.data.toString('base64') } })), { text: prompt }],
+        },
+      ],
       config: { responseModalities: ['IMAGE'] },
     });
     for (const part of res.candidates?.[0]?.content?.parts ?? []) {
@@ -65,4 +71,23 @@ export function neoLookPrompt(a: { animal: string; color: string; mood: string }
 /** Day 4: the newborn Bati, a small round creature inspired by the visitor's favourite food. */
 export function batiPrompt(food: string): string {
   return `${STYLE} The character is a newborn magical partner creature called Bati: small, round and chubby, with big sparkling eyes, whose body, colors and accessories are inspired by "${food}". It looks friendly and happy, as if it just hatched from an egg (a few eggshell pieces nearby).`;
+}
+
+const ORIGINAL =
+  'IMPORTANT: the result must be a completely NEW, ORIGINAL character. Do NOT reproduce, trace or imitate any existing ' +
+  'character, mascot, costume, logo or trademark from anime, games, films or brands; change the face, outfit design, ' +
+  'silhouette and details so it is clearly a different character.';
+
+/**
+ * Day 3 (client decision 2026-10-05): start from a reference image the visitor likes. KIMORIN asks
+ * which part they love (`liked`) and what twist makes it theirs (`twist`), so only elements are taken.
+ */
+export function neoFromReferencePrompt(a: { liked: string; twist: string }, variant: number): string {
+  const poses = ['standing proudly', 'waving one hand', 'with a small cape fluttering', 'holding a tiny glowing star'];
+  return `${STYLE} Use the attached image ONLY as loose inspiration for this element: "${a.liked}". ${ORIGINAL} Add this personal twist: "${a.twist}". The character is an apprentice of a secret society wearing a hooded robe. Pose: ${poses[variant % poses.length]}.`;
+}
+
+/** Day 3: refine the chosen look with one instruction ("bluer", "longer ears"…). */
+export function refineLookPrompt(instruction: string): string {
+  return `${STYLE} Edit the attached character image following this request: "${instruction}". Keep the same character identity, art style, framing and background. ${ORIGINAL}`;
 }

@@ -110,6 +110,9 @@ export class HttpApi implements Api {
   lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
   }
+  refineLook(mediaId: string, instruction: string) {
+    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { mediaId, instruction });
+  }
   chooseLook(mediaId: string) {
     return this.req<Awaited<ReturnType<Api['chooseLook']>>>('POST', '/me/look', { mediaId });
   }

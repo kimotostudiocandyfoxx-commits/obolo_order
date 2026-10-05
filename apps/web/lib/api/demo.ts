@@ -12,7 +12,7 @@ import {
   type Me,
   type SaturnPostView,
 } from '@obolo/shared';
-import { demoBati, demoNeoLooks } from '@/lib/look';
+import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
 import { putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
@@ -391,9 +391,30 @@ export class DemoApi implements Api {
     if (u.journeyDay < JOURNEY_DONE && used >= 3) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
     localStorage.setItem(key, String(used + 1));
     await new Promise((r) => setTimeout(r, 1800));
-    const urls = demoNeoLooks(body, used);
-    this.lookCache = urls.map((url) => ({ id: uid(), url }));
-    return { candidates: this.lookCache, triesLeft: u.journeyDay < JOURNEY_DONE ? 3 - (used + 1) : 99 };
+    const urls =
+      'reference' in body
+        ? await Promise.all([0, 1, 2, 3].map((v) => demoFromReference(`data:${body.reference.mime};base64,${body.reference.data}`, body, v + used * 4)))
+        : demoNeoLooks(body, used);
+    this.lookCache = [...this.lookCache, ...urls.map((url) => ({ id: uid(), url }))];
+    return { candidates: this.lookCache.slice(-urls.length), triesLeft: u.journeyDay < JOURNEY_DONE ? 3 - (used + 1) : 99, refinesLeft: this.refinesLeft() };
+  }
+
+  private refinesLeft() {
+    const u = this.s.users[this.uid()];
+    return u.journeyDay < JOURNEY_DONE ? Math.max(0, 3 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
+  }
+
+  async refineLook(mediaId: string, instruction: string) {
+    const u = this.s.users[this.uid()];
+    if (this.refinesLeft() <= 0) throw new ApiError(429, 'LOOK_REFINES', 'もう描き直せません');
+    const src = this.lookCache.find((c) => c.id === mediaId);
+    if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    const n = 3 - this.refinesLeft();
+    localStorage.setItem(`obolo.look.refines.${u.id}`, String(n + 1));
+    await new Promise((r) => setTimeout(r, 1500));
+    const c = { id: uid(), url: await demoRefine(src.url, instruction, n) };
+    this.lookCache.push(c);
+    return { candidates: [c], triesLeft: u.journeyDay < JOURNEY_DONE ? Math.max(0, 3 - Number(localStorage.getItem(`obolo.look.tries.${u.id}`) ?? 0)) : 99, refinesLeft: this.refinesLeft() };
   }
   private lookCache: { id: string; url: string }[] = [];
 

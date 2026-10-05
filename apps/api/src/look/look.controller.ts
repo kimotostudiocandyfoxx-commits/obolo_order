@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
-import { BatiEggBody, BatiNameBody, ChooseLookBody, NeoLookBody } from '@obolo/shared';
+import { BatiEggBody, BatiNameBody, ChooseLookBody, NeoLookBody, RefineLookBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -23,6 +23,13 @@ export class LookController {
   async candidates(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `look:${userId}`, 4, 60);
     return this.look.candidates(userId, parseBody(NeoLookBody, body), origin(req));
+  }
+
+  @Post('look/refine')
+  @HttpCode(200)
+  async refine(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `look:${userId}`, 6, 60);
+    return this.look.refine(userId, parseBody(RefineLookBody, body), origin(req));
   }
 
   @Post('look')

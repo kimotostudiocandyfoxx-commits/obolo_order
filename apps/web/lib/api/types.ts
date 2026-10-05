@@ -61,6 +61,8 @@ export interface Api {
   becomeOrder(): Promise<Me>;
   // --- Day 3/4: generated OBOLO NEO look and the Bati egg (client decision 2026-10-05)
   lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;
+  /** One instruction → one new version of a candidate (3 per apprentice). */
+  refineLook(mediaId: string, instruction: string): Promise<NeoLookResult>;
   chooseLook(mediaId: string): Promise<Me>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */

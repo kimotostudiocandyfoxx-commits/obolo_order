@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { batiPrompt, type ImageProvider, type LlmProvider, moderateText, neoLookPrompt } from '@obolo/ai';
-import { JOURNEY_DONE, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult } from '@obolo/shared';
+import { batiPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, refineLookPrompt } from '@obolo/ai';
+import { JOURNEY_DONE, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -12,6 +12,7 @@ import { toMe } from '../users/users.service';
 
 /** Generations per OBOLO NEO (client decision 2026-10-05: 4 candidates, 3 tries). */
 export const NEO_LOOK_TRIES = 3;
+export const NEO_LOOK_REFINES = 3;
 const CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
 
@@ -45,7 +46,10 @@ export class LookService {
 
   async candidates(userId: string, body: NeoLookBody, origin: string): Promise<NeoLookResult> {
     const u = await this.user(userId);
-    await this.clean(`${body.animal} ${body.color} ${body.mood}`);
+    const fromRef = 'reference' in body;
+    await this.clean(fromRef ? `${body.liked} ${body.twist}` : `${body.animal} ${body.color} ${body.mood}`);
+    // the reference image is only handed to the model, never stored (copyright, client decision 2026-10-05)
+    const refs: GeneratedImage[] = fromRef ? [{ data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime }] : [];
     const key = `look:tries:${userId}`;
     const limited = u.journeyDay < JOURNEY_DONE;
     const used = Number((await this.kv.get(key)) ?? 0);
@@ -53,7 +57,9 @@ export class LookService {
     const tries = await this.kv.incr(key, TRY_TTL);
 
     const made = await Promise.allSettled(
-      Array.from({ length: CANDIDATES }, (_, i) => this.images.generate(neoLookPrompt(body, i), i)),
+      Array.from({ length: CANDIDATES }, (_, i) =>
+        this.images.generate(fromRef ? neoFromReferencePrompt(body, i) : neoLookPrompt(body, i), i, refs),
+      ),
     );
     const candidates = [];
     for (const r of made) {
@@ -62,7 +68,32 @@ export class LookService {
         candidates.push({ id: m.id, url: m.url });
       } else this.log.warn(`look generation failed: ${String(r.reason)}`);
     }
-    return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99 };
+    return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
+  }
+
+  private async refinesLeft(userId: string, limited: boolean) {
+    return limited ? Math.max(0, NEO_LOOK_REFINES - Number((await this.kv.get(`look:refine:${userId}`)) ?? 0)) : 99;
+  }
+
+  /** One instruction → one new version of the chosen candidate (3 times per apprentice). */
+  async refine(userId: string, body: RefineLookBody, origin: string): Promise<NeoLookResult> {
+    const u = await this.user(userId);
+    await this.clean(body.instruction);
+    const limited = u.journeyDay < JOURNEY_DONE;
+    if (limited && (await this.refinesLeft(userId, true)) <= 0) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', 'もう描き直せません');
+    const src = await this.media.imageData(userId, body.mediaId, 'avatar');
+    if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
+    await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
+    const candidates = [];
+    try {
+      const img = await this.images.generate(refineLookPrompt(body.instruction), 0, [src]);
+      const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
+      candidates.push({ id: m.id, url: m.url });
+    } catch (e) {
+      this.log.warn(`look refine failed: ${String(e)}`);
+    }
+    const tries = Number((await this.kv.get(`look:tries:${userId}`)) ?? 0);
+    return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
   }
 
   async choose(userId: string, mediaId: string): Promise<Me> {

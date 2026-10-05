@@ -24,6 +24,8 @@ async function bootstrap() {
   app.set('trust proxy', true); // Cloud Run sits behind Google's front end
   app.disable('x-powered-by');
   app.use('/media/voice', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
+  // the NEO look can start from a reference image (sent once, never stored)
+  app.use('/me/look', express.json({ limit: '3mb' }));
   app.useBodyParser('json', { limit: '64kb' });
   app.enableCors({
     origin: parseOrigins(cfg.CORS_ORIGINS),

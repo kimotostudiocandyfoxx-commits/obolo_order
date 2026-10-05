@@ -100,3 +100,88 @@ export function eggSvg(food: string): string {
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480"><defs><radialGradient id="e" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#fffaf0"/><stop offset=".7" stop-color="hsl(${h},70%,86%)"/><stop offset="1" stop-color="hsl(${h},55%,62%)"/></radialGradient><radialGradient id="glow"><stop offset="0" stop-color="hsl(${h},90%,80%)" stop-opacity=".7"/><stop offset="1" stop-color="hsl(${h},90%,80%)" stop-opacity="0"/></radialGradient></defs><ellipse cx="200" cy="260" rx="200" ry="220" fill="url(#glow)"/><path d="M200 50 C 300 50 350 200 350 290 C 350 380 285 440 200 440 C 115 440 50 380 50 290 C 50 200 100 50 200 50 Z" fill="url(#e)" stroke="hsl(${h},50%,55%)" stroke-width="5"/><text x="200" y="290" font-size="120" text-anchor="middle" dominant-baseline="middle" opacity=".28">${emoji}</text><path d="M95 250 Q130 230 160 255 T225 255 T300 250" stroke="hsl(${h},60%,60%)" stroke-width="6" fill="none" opacity=".6"/></svg>`,
   );
 }
+
+/** Read a picked image, downscale it (≤768 px JPEG) and return it for the look request. */
+export async function fileToReference(file: File): Promise<{ mime: 'image/jpeg'; data: string; url: string }> {
+  const src = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(src);
+    const s = Math.min(1, 768 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * s);
+    c.height = Math.round(img.height * s);
+    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+    const url = c.toDataURL('image/jpeg', 0.8);
+    return { mime: 'image/jpeg', data: url.split(',')[1], url };
+  } finally {
+    URL.revokeObjectURL(src);
+  }
+}
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = src;
+  });
+}
+
+const hueOf = (text: string, fallback: number) => {
+  const h = pick(COLORS, text, fallback);
+  return h < 0 ? fallback : h;
+};
+
+/** Demo stand-in for a look made from a reference: the picture as an emblem on a hooded robe. */
+export async function demoFromReference(refUrl: string, a: { liked: string; twist: string }, variant: number): Promise<string> {
+  const img = await loadImage(refUrl);
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const g = c.getContext('2d')!;
+  g.fillStyle = ['#120c2a', '#1a1030', '#0b1430', '#1d0d22'][variant % 4];
+  g.fillRect(0, 0, 512, 512);
+  g.fillStyle = '#fff';
+  for (let k = 0; k < 24; k++) g.fillRect((k * 97 + variant * 31) % 512, (k * 53 + variant * 17) % 300, 2, 2);
+  const hue = (hueOf(a.twist, 260) + variant * 25) % 360;
+  g.fillStyle = `hsl(${hue},60%,40%)`;
+  g.strokeStyle = `hsl(${(hue + 40) % 360},80%,70%)`;
+  g.lineWidth = 8;
+  g.beginPath();
+  g.moveTo(256, 110);
+  g.bezierCurveTo(150, 110, 105, 230, 118, 330);
+  g.lineTo(88, 512);
+  g.lineTo(424, 512);
+  g.lineTo(394, 330);
+  g.bezierCurveTo(407, 230, 362, 110, 256, 110);
+  g.fill();
+  g.stroke();
+  g.save();
+  g.beginPath();
+  g.arc(256, 255, 92, 0, Math.PI * 2);
+  g.clip();
+  g.filter = `hue-rotate(${variant * 35}deg) saturate(1.2)`;
+  const s = Math.max(184 / img.width, 184 / img.height);
+  g.drawImage(img, 256 - (img.width * s) / 2, 255 - (img.height * s) / 2, img.width * s, img.height * s);
+  g.restore();
+  g.fillStyle = `hsl(${(hue + 40) % 360},80%,70%)`;
+  g.beginPath();
+  g.arc(256, 390, 14, 0, Math.PI * 2);
+  g.fill();
+  return c.toDataURL('image/jpeg', 0.82);
+}
+
+/** Demo stand-in for a refinement: recolour toward the colour named in the instruction. */
+export async function demoRefine(url: string, instruction: string, n: number): Promise<string> {
+  const img = await loadImage(url);
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const g = c.getContext('2d')!;
+  const named = pick(COLORS, instruction, 999);
+  g.filter = named !== 999 ? `hue-rotate(${(named + 360 - 260) % 360}deg)` : /明る/.test(instruction) ? 'brightness(1.25)' : /暗|クール/.test(instruction) ? 'brightness(0.8) contrast(1.15)' : `hue-rotate(${40 * (n + 1)}deg)`;
+  g.drawImage(img, 0, 0, 512, 512);
+  g.filter = 'none';
+  g.fillStyle = 'rgba(255,240,200,0.9)';
+  g.font = '40px serif';
+  g.fillText('✦', 430, 70);
+  return c.toDataURL('image/jpeg', 0.82);
+}

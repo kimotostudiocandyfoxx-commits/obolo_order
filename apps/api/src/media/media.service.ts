@@ -92,4 +92,17 @@ export class MediaService {
       .where(and(eq(mediaObjects.id, id), eq(mediaObjects.storage, 'db'), isNull(mediaObjects.deletedAt)));
     return m?.data ? m : null;
   }
+
+  /** The bytes of one of the user's generated images (to edit it). */
+  async imageData(userId: string, id: string, kind: MediaKind): Promise<{ data: Buffer; mime: string } | null> {
+    const [m] = await this.db.write
+      .select({ mime: mediaObjects.mime, data: mediaObjects.data, url: mediaObjects.url, storage: mediaObjects.storage })
+      .from(mediaObjects)
+      .where(and(eq(mediaObjects.id, id), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, kind), isNull(mediaObjects.deletedAt)));
+    if (!m) return null;
+    if (m.data) return { data: m.data, mime: m.mime };
+    const res = await fetch(m.url);
+    if (!res.ok) return null;
+    return { data: Buffer.from(await res.arrayBuffer()), mime: m.mime };
+  }
 }

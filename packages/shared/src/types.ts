@@ -42,6 +42,8 @@ export interface NeoLookResult {
   candidates: NeoLookCandidate[];
   /** tries left for this OBOLO NEO (3 per apprentice; ORDER members are not limited) */
   triesLeft: number;
+  /** refinements left (3 per apprentice) */
+  refinesLeft?: number;
 }
 
 /** Result of POST /auth/request-code: who is this email? */
