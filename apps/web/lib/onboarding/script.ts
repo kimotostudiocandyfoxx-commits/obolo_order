@@ -6,7 +6,7 @@
  */
 import type { MotionId } from './media';
 
-export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー';
+export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー' | 'ヒポキン';
 
 export type Step =
   /**
@@ -35,6 +35,8 @@ export type Step =
   | { t: 'jupiter' }
   /** Mercury sea-chart tutorial (Day 6), coached by フリージー. */
   | { t: 'mercury' }
+  /** Mars play screen (Day 7). Placeholder until the client's UI arrives. */
+  | { t: 'mars' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

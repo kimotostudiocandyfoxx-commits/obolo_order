@@ -54,10 +54,11 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
     title: '土星へ',
     beats: ['土星に行く', '案内人たこ焼きブラザー・たこ焼きシスターに出会う', '土星の楽しみ方（声の出るTwitter）を教わる', '投稿してみる'],
   },
-  { day: 5, planet: 'jupiter', guides: [], title: '木星へ', beats: ['木星に行く'] },
-  { day: 6, planet: 'mercury', guides: [], title: '水星へ', beats: ['水星に行く'] },
-  { day: 7, planet: 'venus', guides: [], title: '金星へ', beats: ['金星に行く'] },
-  { day: 8, planet: 'mars', guides: [], title: '火星へ', beats: ['火星に行く'] },
+  { day: 5, planet: 'jupiter', guides: ['KIMORIN', '大根カイザー'], title: '木星へ', beats: ['木星に行く', '大根カイザーに出会う', '木星（パタパタ）で遊ぶ'] },
+  { day: 6, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
+  // Mars comes before Venus (client, 2026-10-05)
+  { day: 7, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
+  { day: 8, planet: 'venus', guides: [], title: '金星へ', beats: ['金星に行く'] },
 ];
 
 export function journeyMeta(day: number): JourneyDayMeta | undefined {
