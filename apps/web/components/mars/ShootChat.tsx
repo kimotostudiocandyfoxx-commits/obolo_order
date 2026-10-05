@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Face, Mic } from '@/components/mercury/ComposeChat';
 import { useAuth } from '@/lib/auth';
+import { usePartner } from '@/lib/partner';
 import { KINDS, makeVideo, pickKind } from '@/lib/mars/make';
 import { fmtLen, type Kind, type Video } from '@/lib/mars/sky';
 import { Frame } from './Frame';
@@ -16,8 +17,8 @@ type Msg = { who: 'partner' | 'me'; text: string } | { who: 'video'; video: Vide
 
 export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Video) => void; onOpenStudio: () => void; onPreview: (v: Video) => void }) {
   const { me } = useAuth();
-  const hasBati = (me?.journeyDay ?? 0) >= 10;
-  const partner = hasBati ? { name: 'バティ', face: null as string | null } : { name: 'KIMORIN', face: 'kimorin-face' };
+  const partner = usePartner();
+  const hasBati = partner.isBati;
   const author = me?.displayName || 'neo';
 
   const [msgs, setMsgs] = useState<Msg[]>([

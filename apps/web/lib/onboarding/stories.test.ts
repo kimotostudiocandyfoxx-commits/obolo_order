@@ -35,3 +35,15 @@ describe('all day scripts', () => {
     }
   });
 });
+
+describe('the look and the Bati (client decision 2026-10-05)', () => {
+  it('day 3 generates the look, asks the NEO name, then hands over the egg', () => {
+    const order = STORIES[3].steps.map((s) => s.t).filter((t) => ['look', 'name', 'egg'].includes(t));
+    expect(order).toEqual(['look', 'name', 'egg']);
+  });
+  it('day 4 hatches and names the Bati before leaving for Saturn', () => {
+    const t = STORIES[4].steps.map((s) => (s.t === 'video' ? `video:${s.motion}` : s.t));
+    expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
+    expect(t.indexOf('batiname')).toBeLessThan(t.indexOf('video:4-1'));
+  });
+});

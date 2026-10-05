@@ -6,7 +6,7 @@
  */
 import type { MotionId } from './media';
 
-export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー' | 'ヒポキン' | 'ロングG' | 'ハットG' | 'ボスG';
+export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー' | 'ヒポキン' | 'ロングG' | 'ハットG' | 'ボスG' | 'バティ';
 
 export type Step =
   /**
@@ -53,8 +53,16 @@ export type Step =
   | { t: 'choice'; key: string; options: { label: string; goto?: string }[] }
   /** Name input (Day 1: creates the account from the invitation; Day 3: the NEO name). */
   | { t: 'name'; placeholder: string; submit: string }
-  /** Choose one of the eight OBOLO NEO forms (Day 3). Saved on the account. */
+  /** Choose one of the eight OBOLO NEO forms (Day 3). Saved on the account. Fallback for 'look'. */
   | { t: 'neo' }
+  /** Day 3: three questions → four generated OBOLO NEO looks → choose one (or a preset form). */
+  | { t: 'look' }
+  /** Day 3: the favourite food → the Bati egg. */
+  | { t: 'egg' }
+  /** Day 4: the egg hatches (the Bati image is generated meanwhile). */
+  | { t: 'hatch' }
+  /** Day 4: name the newborn Bati. */
+  | { t: 'batiname'; placeholder: string; submit: string }
   /** A handwritten-style letter card. Tap to continue. */
   | { t: 'letter'; text: string }
   | { t: 'label'; id: string }
@@ -74,13 +82,20 @@ export interface StoryVars {
   inviter: string;
   /** Name of the chosen OBOLO NEO form ({neo}). */
   neo?: string;
+  /** The Bati's name ({bati}) and pictures used by the '@bati' / '@egg' / '@me' sprites. */
+  bati?: string;
+  batiImage?: string;
+  batiFood?: string;
+  look?: string;
 }
 
 export function fill(text: string, v: StoryVars): string {
   return text
     .replaceAll('{name}', v.name || '…')
     .replaceAll('{inviter}', v.inviter || '…')
-    .replaceAll('{neo}', v.neo || '…');
+    .replaceAll('{neo}', v.neo || '…')
+    .replaceAll('{bati}', v.bati || 'バティ')
+    .replaceAll('{food}', v.batiFood || '…');
 }
 
 export function labelIndex(steps: Step[], id: string): number {

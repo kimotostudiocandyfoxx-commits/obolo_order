@@ -6,7 +6,7 @@ import { spriteUrl } from '@/lib/onboarding/media';
  * A butterfly in the sky: the resident's cut-out art (from the client's パタパタ mock) or, for
  * anyone without art (e.g. the visitor's OBOLO NEO), their emblem between two flapping wings.
  */
-export function Butterfly({ art, emoji, wing = '#e9b98a', size }: { art?: string; emoji?: string; wing?: string; size: number }) {
+export function Butterfly({ art, emoji, img, wing = '#e9b98a', size }: { art?: string; emoji?: string; img?: string | null; wing?: string; size: number }) {
   if (art) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={spriteUrl(art)} alt="" draggable={false} style={{ width: size }} className="pointer-events-none select-none drop-shadow-[0_8px_14px_rgba(120,80,40,0.25)]" />;
@@ -26,9 +26,15 @@ export function Butterfly({ art, emoji, wing = '#e9b98a', size }: { art?: string
           </svg>
         </div>
       ))}
-      <span className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2 drop-shadow" style={{ fontSize: size * 0.4 }}>
-        {emoji}
-      </span>
+      {img ? (
+        // the visitor's generated OBOLO NEO look rides between the wings
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={img} alt="" className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/80 object-cover shadow" style={{ width: size * 0.46, height: size * 0.46 }} />
+      ) : (
+        <span className="absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2 drop-shadow" style={{ fontSize: size * 0.4 }}>
+          {emoji}
+        </span>
+      )}
     </div>
   );
 }

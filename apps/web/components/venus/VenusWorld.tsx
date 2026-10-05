@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Artwork } from '@/components/Artwork';
 import { Face, Mic } from '@/components/mercury/ComposeChat';
 import { useAuth } from '@/lib/auth';
+import { usePartner } from '@/lib/partner';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { guessKind, makeItem } from '@/lib/venus/make';
 import { ITEM_KINDS, ITEMS, MAKERS, type Item, type ItemKind } from '@/lib/venus/shop';
@@ -234,8 +235,8 @@ const IDEAS = ['ラーメンのステッカー', '狐のバッジ', '星のぼ�
 
 function MakeChat({ onList, onOpenShop }: { onList: (i: Item) => void; onOpenShop: () => void }) {
   const { me } = useAuth();
-  const hasBati = (me?.journeyDay ?? 0) >= 10;
-  const partner = hasBati ? { name: 'バティ', face: null as string | null } : { name: 'KIMORIN', face: 'kimorin-face' };
+  const partner = usePartner();
+  const hasBati = partner.isBati;
   const [msgs, setMsgs] = useState<Msg[]>([
     { who: 'partner', text: hasBati ? '何をつくる？ 作りたいものを話して。わたしが形にするね。' : '何をつくるケン？ 作りたいものを話してみろ。オレが形にしてやるケン。' },
   ]);

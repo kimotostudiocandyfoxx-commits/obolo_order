@@ -1,11 +1,11 @@
 import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/common';
-import { createLlm, LlmProvider } from '@obolo/ai';
+import { createImageProvider, createLlm, LlmProvider } from '@obolo/ai';
 import { AppConfig, CONFIG, loadConfig } from '../config';
 import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, InlineQueue, JobQueue } from './queue';
-import { EMAIL, KV, LLM, QUEUE } from './tokens';
+import { EMAIL, IMAGES, KV, LLM, QUEUE } from './tokens';
 
 @Global()
 @Module({
@@ -26,6 +26,11 @@ import { EMAIL, KV, LLM, QUEUE } from './tokens';
     },
     { provide: EMAIL, inject: [CONFIG], useFactory: createEmailSender },
     {
+      provide: IMAGES,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig) => createImageProvider({ geminiApiKey: c.GEMINI_API_KEY, imageModel: c.GEMINI_IMAGE_MODEL }),
+    },
+    {
       provide: LLM,
       inject: [CONFIG],
       useFactory: (c: AppConfig): LlmProvider => {
@@ -42,7 +47,7 @@ import { EMAIL, KV, LLM, QUEUE } from './tokens';
       },
     },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

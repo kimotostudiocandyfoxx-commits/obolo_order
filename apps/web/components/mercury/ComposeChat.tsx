@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Artwork } from '@/components/Artwork';
 import { useAuth } from '@/lib/auth';
+import { usePartner } from '@/lib/partner';
 import { GENRES, makeSong, pickGenre, type Genre, type MadeSong } from '@/lib/mercury/compose';
 import { fmt } from '@/lib/mercury/sea';
 import { spriteUrl } from '@/lib/onboarding/media';
@@ -22,8 +23,8 @@ type Msg =
 export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) => void; onOpenIsland: () => void }) {
   const { me } = useAuth();
   // Bati exists only for ORDER members (journeyDay 10) — until then KIMORIN composes.
-  const hasBati = (me?.journeyDay ?? 0) >= 10;
-  const partner = hasBati ? { name: 'バティ', face: null as string | null, end: '' } : { name: 'KIMORIN', face: 'kimorin-face', end: 'ケン' };
+  const partner = usePartner();
+  const hasBati = partner.isBati;
   const artist = me?.displayName || 'neo';
 
   const [msgs, setMsgs] = useState<Msg[]>([
@@ -153,15 +154,9 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   );
 }
 
-export function Face({ face, size }: { face: string | null; size: number }) {
-  return face ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={spriteUrl(face)} alt="" style={{ width: size, height: size }} className="shrink-0 rounded-full border border-white/20" />
-  ) : (
-    <span style={{ width: size, height: size, fontSize: size * 0.55 }} className="flex shrink-0 items-center justify-center rounded-full bg-violet-500/40">
-      🐾
-    </span>
-  );
+export function Face({ face, size }: { face: string; size: number }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={face} alt="" style={{ width: size, height: size }} className="shrink-0 rounded-full border border-white/20 object-cover" />;
 }
 
 function SongCard({

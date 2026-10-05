@@ -59,6 +59,12 @@ export const users = pgTable(
     journeyCompletedAt: timestamp('journey_completed_at', { withTimezone: true }),
     /** OBOLO NEO form chosen on Day 3 (see @obolo/shared neo.ts). */
     neoForm: text('neo_form'),
+    /** Generated OBOLO NEO look chosen on Day 3 (client decision 2026-10-05). */
+    avatarUrl: text('avatar_url'),
+    /** Bati egg (Day 3) → hatched and named (Day 4). */
+    batiFood: text('bati_food'),
+    batiImageUrl: text('bati_image_url'),
+    batiName: text('bati_name'),
     onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
     lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
     ...timestamps,

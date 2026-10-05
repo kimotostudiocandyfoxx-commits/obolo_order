@@ -14,6 +14,8 @@ import type {
   UpdateProfileBody,
   EntryKind,
   VerifyResult,
+  NeoLookBody,
+  NeoLookResult,
   WalletView,
 } from '@obolo/shared';
 
@@ -57,6 +59,13 @@ export interface Api {
   advanceJourney(skip: boolean): Promise<Me>;
   /** "ORDERになるか？" → yes. Payment is PLACEHOLDER (P-BILL-1). */
   becomeOrder(): Promise<Me>;
+  // --- Day 3/4: generated OBOLO NEO look and the Bati egg (client decision 2026-10-05)
+  lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;
+  chooseLook(mediaId: string): Promise<Me>;
+  batiEgg(food: string): Promise<Me>;
+  /** The egg hatches: the Bati image is generated (can take a while). */
+  batiHatch(): Promise<Me>;
+  batiName(name: string): Promise<Me>;
   myInvites(): Promise<MyInviteView[]>;
   createInvite(email: string): Promise<MyInviteView>;
 }

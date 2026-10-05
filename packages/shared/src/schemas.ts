@@ -91,3 +91,22 @@ export const AdvanceJourneyBody = z.object({
   skip: z.boolean().default(false),
 });
 export type AdvanceJourneyBody = z.infer<typeof AdvanceJourneyBody>;
+
+/** Day 3: the three questions for generating the OBOLO NEO look (client decision 2026-10-05). */
+export const NeoLookBody = z.object({
+  animal: z.string().trim().min(1).max(30),
+  color: z.string().trim().min(1).max(30),
+  mood: z.string().trim().min(1).max(40),
+});
+export type NeoLookBody = z.infer<typeof NeoLookBody>;
+
+export const ChooseLookBody = z.object({ mediaId: z.string().uuid() });
+export type ChooseLookBody = z.infer<typeof ChooseLookBody>;
+
+/** Day 3: the favourite food the Bati egg is made from. */
+export const BatiEggBody = z.object({ food: z.string().trim().min(1).max(40) });
+export type BatiEggBody = z.infer<typeof BatiEggBody>;
+
+/** Day 4: the newborn Bati's name. */
+export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) });
+export type BatiNameBody = z.infer<typeof BatiNameBody>;

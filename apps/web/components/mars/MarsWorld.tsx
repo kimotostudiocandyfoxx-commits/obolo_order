@@ -138,7 +138,7 @@ export function MarsWorld({ events, overlay }: { events?: MarsEvents; overlay?: 
                     <br />
                     <span className="text-white/60">{hoursSince(myFlying[0].at) ? `${hoursSince(myFlying[0].at)}時間前` : 'たった今'}</span>
                   </span>
-                  <OwnUfo emoji={neo?.emoji ?? '🦊'} />
+                  <OwnUfo emoji={neo?.emoji ?? '🦊'} img={me?.avatarUrl} />
                 </button>
               )}
             </div>
@@ -207,10 +207,15 @@ export function MarsWorld({ events, overlay }: { events?: MarsEvents; overlay?: 
 }
 
 /** The visitor's UFO (no art yet): their OBOLO NEO in a little saucer. */
-function OwnUfo({ emoji }: { emoji: string }) {
+function OwnUfo({ emoji, img }: { emoji: string; img?: string | null }) {
   return (
     <div className="relative w-full">
-      <span className="absolute left-1/2 top-[2%] -translate-x-1/2 text-[clamp(16px,3.2vw,32px)]">{emoji}</span>
+      {img ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={img} alt="" className="absolute left-1/2 top-0 aspect-square w-[34%] -translate-x-1/2 rounded-full border-2 border-white/80 object-cover" />
+      ) : (
+        <span className="absolute left-1/2 top-[2%] -translate-x-1/2 text-[clamp(16px,3.2vw,32px)]">{emoji}</span>
+      )}
       <svg viewBox="0 0 120 64" className="w-full drop-shadow-[0_6px_10px_rgba(0,0,0,0.6)]" aria-hidden>
         <ellipse cx="60" cy="30" rx="28" ry="18" fill="#9fd6ff" opacity="0.35" />
         <ellipse cx="60" cy="40" rx="56" ry="14" fill="#3b3b4a" stroke="#c9a24a" strokeWidth="3" />

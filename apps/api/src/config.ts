@@ -55,6 +55,8 @@ const Env = z.object({
 
   GEMINI_API_KEY: secret(),
   GEMINI_MODEL: z.string().optional(),
+  /** PLACEHOLDER (P-AI-3): image model for the NEO look / Bati. */
+  GEMINI_IMAGE_MODEL: z.string().optional(),
   OPENAI_API_KEY: secret(),
   OPENAI_MODEL: z.string().optional(),
 

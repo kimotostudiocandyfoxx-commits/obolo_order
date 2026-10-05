@@ -9,8 +9,8 @@ import type { Step } from './script';
  *  - "・宇宙行き切符": no motion given; the ticket is assumed to be part of motion 3-1.
  *    (3モーション2 / 3モーション5 have not been referenced or delivered.)
  *  - KIMORIN's "宇宙なめんな" reply is used for both "宇宙に行く" and "やめておく".
- *  - The client's script stops at "創って創って創りまくって…"; the rest of the day (choosing one of
- *    8 OBOLO NEO forms + a NEO name) uses provisional lines (P-OB-12).
+ *  - The client's script stops at "創って創って創りまくって…"; the rest of the day (generating the
+ *    OBOLO NEO look, a NEO name, the Bati egg) uses provisional lines (P-OB-12).
  *  - BGM: none is specified for day 3; the opening track plays until KIMORIN's motion.
  */
 export const DAY3: Step[] = [
@@ -41,22 +41,32 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'なぜなら、OBOLO ORDERは新しいものを生み出す者たち….' },
   { t: 'say', who: 'KIMORIN', text: '創って創って創りまくって、気に入った物を見つけるのだ！' },
 
-  // ---- From here: provisional lines by Claude (client decision 2026-10-04: on Day 3 the visitor only
-  // takes an apprentice "OBOLO NEO" form chosen from 8; Bati is created later, after joining ORDER
-  // at the Sun temple, on a second visit to the Moon temple). Edit freely. PLACEHOLDER (P-OB-12)
+  // ---- From here: provisional lines by Claude (client decision 2026-10-05): the visitor's OBOLO NEO
+  // look is GENERATED from three questions (4 candidates, 3 tries), and the Bati egg is made from
+  // their favourite food — it hatches tomorrow morning. Edit freely. PLACEHOLDER (P-OB-12)
   { t: 'sprite', image: 'kimorin-2' },
-  { t: 'say', who: 'KIMORIN', text: '……と言いたいところだけど、君はまだ見習いだケン。' },
   { t: 'say', who: 'KIMORIN', text: '見習いのORDERは「OBOLO NEO（オボロネオ）」と呼ばれる。' },
-  { t: 'say', who: 'KIMORIN', text: 'ネオの姿は、オレが用意した8つの中から選んでもらうケン。\n本当の姿を創るのは、ORDERになってからのお楽しみ！' },
-  { t: 'sprite', image: null },
-  { t: 'neo' },
   { t: 'sprite', image: 'kimorin-3' },
-  { t: 'say', who: 'KIMORIN', text: 'おお！{neo}か！似合ってるケン！' },
+  { t: 'say', who: 'KIMORIN', text: 'さあ、君のネオの姿を創るケン！\nいくつか質問するぞ。' },
+  { t: 'sprite', image: null },
+  { t: 'look' },
+  { t: 'sprite', image: ['kimorin-3', '@me'] },
+  { t: 'say', who: 'KIMORIN', text: 'おお！いい姿だケン！\nよく似合ってる。' },
   { t: 'sprite', image: 'kimorin-1' },
   { t: 'say', who: 'KIMORIN', text: 'じゃあ名前も変えよう。\nネオとしての名前は？' },
   { t: 'name', placeholder: 'ネオとしての名前', submit: 'この名前にする' },
   { t: 'say', who: 'KIMORIN', text: '{name}……いい名前だケン。' },
   { t: 'say', who: 'KIMORIN', text: '今日から君は見習いORDER、\nOBOLO NEO「{name}」だ。' },
+  // the Bati egg
+  { t: 'sprite', image: 'kimorin-2' },
+  { t: 'say', who: 'KIMORIN', text: 'それと、もうひとつ。\nORDERには、一緒に旅をする相棒がいるケン。' },
+  { t: 'say', who: 'KIMORIN', text: '相棒の名前は「バティ」。\n君だけのバティが、これから生まれる。' },
+  { t: 'sprite', image: 'kimorin-1' },
+  { t: 'say', who: 'KIMORIN', text: '{name}の好きな食べ物は？' },
+  { t: 'egg' },
+  { t: 'sprite', image: ['kimorin-3', '@egg'] },
+  { t: 'say', who: 'KIMORIN', text: '{food}か！いいねぇ。\nほら、君のたまごだケン。' },
+  { t: 'say', who: 'KIMORIN', text: 'このたまごから、明日の朝、\n君のバティが生まれる。大事に持っておけよ。' },
   { t: 'sprite', image: 'kimorin-8' },
   { t: 'say', who: 'KIMORIN', text: '明日は土星に行くケン。\n土星には、声でつながる仲間がいる。' },
   { t: 'say', who: 'KIMORIN', text: '遅れるなよ！' },

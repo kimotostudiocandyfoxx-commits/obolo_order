@@ -10,6 +10,7 @@ import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { neoForm } from '@obolo/shared';
+import { demoNeoLooks } from '@/lib/look';
 import { STORIES } from '@/lib/onboarding/stories';
 
 /**
@@ -31,6 +32,8 @@ function PreviewPlay() {
   const at = q.get('at');
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);
+  const [round, setRound] = useState(0);
+  const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
 
   if (q.get('world') === 'venus') {
     return (
@@ -83,11 +86,28 @@ function PreviewPlay() {
       <StoryPlayer
         key={`${day}-${at}`}
         steps={story.steps}
-        vars={{ name: 'テスト', inviter: 'KIMORIN', neo: neoForm(neo)?.name }}
+        vars={{ name: 'テスト', inviter: 'KIMORIN', neo: neoForm(neo)?.name, batiFood: day >= 4 ? 'ラーメン' : undefined }}
         initial={start > 0 ? { i: start, name: 'テスト', answers: {} } : null}
         onProgress={() => {}}
         onName={async () => {}}
         onNeo={async (id) => setNeo(id)}
+        lookApi={{
+          candidates: async (a) => {
+            await new Promise((r) => setTimeout(r, 1500));
+            const c = demoNeoLooks(a, round).map((url, k) => ({ id: `${round}-${k}`, url }));
+            setCands(c);
+            setRound(round + 1);
+            return { candidates: c, triesLeft: Math.max(0, 2 - round) };
+          },
+          choose: async (id) => cands.find((c) => c.id === id)?.url ?? '',
+          chooseForm: async (id) => setNeo(id),
+        }}
+        onEgg={async () => {}}
+        onHatch={async () => {
+          await new Promise((r) => setTimeout(r, 1500));
+          return '';
+        }}
+        onBatiName={async () => {}}
         onEnd={() => setTimeout(() => setEnded(true), 1200)}
       />
       <BackLink />

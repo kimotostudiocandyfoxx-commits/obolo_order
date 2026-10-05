@@ -32,6 +32,7 @@ interface Flyer {
   handle: string;
   art?: string;
   emoji?: string;
+  img?: string | null;
   wing?: string;
   hours: number;
   posts: ViewPost[];
@@ -97,7 +98,7 @@ export function PatapataWorld({ events, overlay, topInset = 0 }: { events?: Pata
   }, [tab]);
 
   const meFlyer: Flyer | null = myFlying.length
-    ? { key: 'me', handle: myHandle, emoji: neo?.emoji ?? '🦋', wing: neo?.color ?? '#f0b27a', hours: myFlying[0].hours, posts: myFlying, me: true }
+    ? { key: 'me', handle: myHandle, img: me?.avatarUrl, emoji: neo?.emoji ?? '🦋', wing: neo?.color ?? '#f0b27a', hours: myFlying[0].hours, posts: myFlying, me: true }
     : null;
 
   // ---- the eight slots: who floats where, who is flying away ----
@@ -199,7 +200,7 @@ export function PatapataWorld({ events, overlay, topInset = 0 }: { events?: Pata
                     aria-label={`@${f.handle}`}
                   >
                     <div style={{ animation: `hover ${5 + (i % 3)}s ease-in-out ${i * 0.7}s infinite` }}>
-                      <Butterfly art={f.art} emoji={f.emoji} wing={f.wing} size={bfSize} />
+                      <Butterfly art={f.art} emoji={f.emoji} img={f.img} wing={f.wing} size={bfSize} />
                     </div>
                     <span className={`mt-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] shadow-sm ${f.me ? 'bg-amber-200/90 text-amber-900' : f.hours <= 6 ? 'bg-orange-100/90' : 'bg-white/80'}`}>
                       @{f.handle} <span className="text-[#b09276]">{f.hours}h</span>
@@ -216,7 +217,7 @@ export function PatapataWorld({ events, overlay, topInset = 0 }: { events?: Pata
           <TreeView
             owner={
               view.who === 'me'
-                ? { handle: myHandle, emoji: neo?.emoji ?? '🦋', wing: neo?.color, leaves: myLeaves, fruits: 0, friends: 0, flyer: meFlyer }
+                ? { handle: myHandle, img: me?.avatarUrl, emoji: neo?.emoji ?? '🦋', wing: neo?.color, leaves: myLeaves, fruits: 0, friends: 0, flyer: meFlyer }
                 : {
                     handle: view.who.handle,
                     art: view.who.art,
@@ -315,7 +316,7 @@ export function PatapataWorld({ events, overlay, topInset = 0 }: { events?: Pata
       {hatching && (
         <div className="pointer-events-none absolute inset-0 z-[60] flex items-center justify-center">
           <div className="animate-[hatch_1.5s_ease-out_forwards]">
-            <Butterfly emoji={neo?.emoji ?? '🦋'} wing={neo?.color ?? '#f0b27a'} size={140} />
+            <Butterfly emoji={neo?.emoji ?? '🦋'} img={me?.avatarUrl} wing={neo?.color ?? '#f0b27a'} size={140} />
           </div>
         </div>
       )}
@@ -345,7 +346,7 @@ function StoryViewer({ flyer, start, onClose }: { flyer: Flyer; start: number; o
           ))}
         </div>
         <div className="mb-3 flex items-center gap-2">
-          <Butterfly art={flyer.art} emoji={flyer.emoji} wing={flyer.wing} size={40} />
+          <Butterfly art={flyer.art} emoji={flyer.emoji} img={flyer.img} wing={flyer.wing} size={40} />
           <span className="font-bold">@{flyer.handle}</span>
           <span className="text-xs text-[#b09276]">{post.hours}h</span>
           <button onClick={onClose} className="ml-auto rounded-full bg-amber-50 px-3 py-1 text-sm" aria-label="とじる">
@@ -398,6 +399,7 @@ interface TreeOwner {
   handle: string;
   art?: string;
   emoji?: string;
+  img?: string | null;
   wing?: string;
   leaves: ViewPost[];
   fruits: number;
@@ -422,7 +424,7 @@ function TreeView({
 }) {
   const [all, setAll] = useState(false);
   const [following, setFollowing] = useState(false);
-  const asFlyer = (posts: ViewPost[]): Flyer => ({ key: `leaves-${owner.handle}`, handle: owner.handle, art: owner.art, emoji: owner.emoji, wing: owner.wing, hours: 0, posts });
+  const asFlyer = (posts: ViewPost[]): Flyer => ({ key: `leaves-${owner.handle}`, handle: owner.handle, art: owner.art, emoji: owner.emoji, img: owner.img, wing: owner.wing, hours: 0, posts });
 
   return (
     <div className="flex-1 overflow-y-auto pb-32">
@@ -432,7 +434,7 @@ function TreeView({
             ‹
           </button>
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/70 shadow">
-            <Butterfly art={owner.art} emoji={owner.emoji} wing={owner.wing} size={44} />
+            <Butterfly art={owner.art} emoji={owner.emoji} img={owner.img} wing={owner.wing} size={44} />
           </div>
           <span className="truncate font-bold">@{owner.handle}</span>
         </div>
@@ -485,7 +487,7 @@ function TreeView({
           {owner.flyer && (
             <button onClick={() => onOpen(owner.flyer!, 0)} className="absolute right-[4%] top-[2%] flex flex-col items-center" aria-label="飛んでいる蝶">
               <div className="animate-[hover_6s_ease-in-out_infinite]">
-                <Butterfly art={owner.art} emoji={owner.emoji} wing={owner.wing} size={72} />
+                <Butterfly art={owner.art} emoji={owner.emoji} img={owner.img} wing={owner.wing} size={72} />
               </div>
               <span className="rounded-full bg-white/80 px-2 text-[11px]">{owner.flyer.hours}h</span>
             </button>

@@ -5,6 +5,7 @@ import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPl
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
+import { demoBati } from '@/lib/look';
 import { clearDay, loadDay, saveDay } from '@/lib/onboarding/progress';
 import type { DayStory } from '@/lib/onboarding/stories';
 
@@ -44,7 +45,14 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
   return (
     <StoryPlayer
       steps={story.steps}
-      vars={{ name: me.displayName, inviter: me.invitedByName ?? 'KIMORIN' }}
+      vars={{
+        name: me.displayName,
+        inviter: me.invitedByName ?? 'KIMORIN',
+        bati: me.bati?.name ?? undefined,
+        batiImage: me.bati?.imageUrl ?? undefined,
+        batiFood: me.bati?.food,
+        look: me.avatarUrl ?? undefined,
+      }}
       initial={saved}
       onProgress={onProgress}
       onName={async (n) => {
@@ -52,6 +60,33 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       }}
       onNeo={async (id) => {
         setMe(await getApi().updateMe({ neoForm: id }));
+      }}
+      lookApi={{
+        candidates: (a) => getApi().lookCandidates(a),
+        choose: async (id) => {
+          const u = await getApi().chooseLook(id);
+          setMe(u);
+          return u.avatarUrl ?? '';
+        },
+        chooseForm: async (id) => {
+          setMe(await getApi().updateMe({ neoForm: id }));
+        },
+      }}
+      onEgg={async (food) => {
+        setMe(await getApi().batiEgg(food));
+      }}
+      onHatch={async () => {
+        try {
+          const u = await getApi().batiHatch();
+          setMe(u);
+          // if generation failed, a drawn Bati keeps the story going
+          return u.bati?.imageUrl ?? demoBati(u.bati?.food ?? '');
+        } catch {
+          return demoBati(me.bati?.food ?? '');
+        }
+      }}
+      onBatiName={async (n) => {
+        setMe(await getApi().batiName(n));
       }}
       onEnd={onEnd}
     />

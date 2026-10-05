@@ -116,7 +116,7 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
                     <br />
                     <span className="text-white/60">{hoursSince(mySailing[0].at) || 'たった今'}{hoursSince(mySailing[0].at) ? '時間前' : ''}</span>
                   </span>
-                  <OwnShip emoji={neo?.emoji ?? '🦊'} />
+                  <OwnShip emoji={neo?.emoji ?? '🦊'} img={me?.avatarUrl} />
                 </button>
               )}
             </div>
@@ -208,10 +208,15 @@ function Tabs({ tab, setTab }: { tab: 'all' | 'follow' | 'friend'; setTab: (t: '
 }
 
 /** The visitor's ship (no art yet): a little boat with their OBOLO NEO on deck. */
-function OwnShip({ emoji }: { emoji: string }) {
+function OwnShip({ emoji, img }: { emoji: string; img?: string | null }) {
   return (
     <div className="relative w-full">
-      <span className="absolute left-1/2 top-[8%] -translate-x-1/2 text-[clamp(18px,3.5vw,34px)]">{emoji}</span>
+      {img ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={img} alt="" className="absolute left-1/2 top-0 aspect-square w-[34%] -translate-x-1/2 rounded-full border-2 border-white/80 object-cover" />
+      ) : (
+        <span className="absolute left-1/2 top-[8%] -translate-x-1/2 text-[clamp(18px,3.5vw,34px)]">{emoji}</span>
+      )}
       <svg viewBox="0 0 120 70" className="w-full drop-shadow-[0_6px_10px_rgba(0,0,0,0.5)]" aria-hidden>
         <path d="M60 4 L60 40" stroke="#e9d3a0" strokeWidth="3" />
         <path d="M62 8 L92 34 L62 34 Z" fill="#f4e6c0" opacity="0.9" />

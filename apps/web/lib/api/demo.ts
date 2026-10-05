@@ -12,6 +12,7 @@ import {
   type Me,
   type SaturnPostView,
 } from '@obolo/shared';
+import { demoBati, demoNeoLooks } from '@/lib/look';
 import { putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
@@ -344,6 +345,8 @@ export class DemoApi implements Api {
       journeyDay: 1,
       journeyCompletedAt: null,
       neoForm: null,
+      avatarUrl: null,
+      bati: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };
@@ -378,6 +381,42 @@ export class DemoApi implements Api {
       if (!skip && Date.now() < Date.parse(u.journeyCompletedAt) + JOURNEY_WAIT_MS) throw new ApiError(409, 'NOT_YET', 'not yet');
       return { journeyDay: u.journeyDay + 1, journeyCompletedAt: null };
     });
+  }
+
+  // Demo looks: SVG portraits built in the browser (lib/look.ts); 4 candidates, 3 tries.
+  async lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
+    const u = this.s.users[this.uid()];
+    const key = `obolo.look.tries.${u.id}`;
+    const used = Number(localStorage.getItem(key) ?? 0);
+    if (u.journeyDay < JOURNEY_DONE && used >= 3) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
+    localStorage.setItem(key, String(used + 1));
+    await new Promise((r) => setTimeout(r, 1800));
+    const urls = demoNeoLooks(body, used);
+    this.lookCache = urls.map((url) => ({ id: uid(), url }));
+    return { candidates: this.lookCache, triesLeft: u.journeyDay < JOURNEY_DONE ? 3 - (used + 1) : 99 };
+  }
+  private lookCache: { id: string; url: string }[] = [];
+
+  async chooseLook(mediaId: string) {
+    const c = this.lookCache.find((x) => x.id === mediaId);
+    if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return this.patchMe(() => ({ avatarUrl: c.url }));
+  }
+
+  async batiEgg(food: string) {
+    return this.patchMe(() => ({ bati: { food, name: null, imageUrl: null } }));
+  }
+
+  async batiHatch() {
+    await new Promise((r) => setTimeout(r, 2500));
+    return this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: u.bati.imageUrl ?? demoBati(u.bati.food) } } : {}));
+  }
+
+  async batiName(name: string) {
+    const me = this.patchMe((u) => (u.bati ? { bati: { ...u.bati, name } } : {}));
+    this.buddyOf(me.id).name = name;
+    this.save();
+    return me;
   }
 
   async becomeOrder() {

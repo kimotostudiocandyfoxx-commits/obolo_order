@@ -18,7 +18,30 @@ export interface Me {
   invitedByName: string | null;
   /** OBOLO NEO form id (Day 3), null until chosen. */
   neoForm: string | null;
+  /** Generated OBOLO NEO look (Day 3), null until chosen — falls back to the neoForm emblem. */
+  avatarUrl: string | null;
+  /** The visitor's Bati: egg on Day 3 (food), hatched and named on Day 4. */
+  bati: BatiView | null;
   createdAt: string;
+}
+
+export interface BatiView {
+  /** favourite food the egg was made from */
+  food: string;
+  /** set once it has hatched and been named */
+  name: string | null;
+  imageUrl: string | null;
+}
+
+export interface NeoLookCandidate {
+  id: string;
+  url: string;
+}
+
+export interface NeoLookResult {
+  candidates: NeoLookCandidate[];
+  /** tries left for this OBOLO NEO (3 per apprentice; ORDER members are not limited) */
+  triesLeft: number;
 }
 
 /** Result of POST /auth/request-code: who is this email? */

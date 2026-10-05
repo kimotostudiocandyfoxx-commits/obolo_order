@@ -5,6 +5,9 @@ import { hasMotion, motionUrl, spriteUrl, stillUrl, type MotionId } from '@/lib/
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { neoForm } from '@obolo/shared';
+import { eggSvg } from '@/lib/look';
+import { EggStep, HatchStep } from './BatiSteps';
+import { LookMaker, type LookApi } from './LookMaker';
 import { NeoChooser } from './NeoChooser';
 import { JupiterTutorial } from '@/components/jupiter/JupiterTutorial';
 import { MarsTutorial } from '@/components/mars/MarsTutorial';
@@ -36,12 +39,20 @@ interface Props {
   onName: (name: string) => Promise<void>;
   /** Called by the 'neo' step with the chosen OBOLO NEO form id. */
   onNeo?: (id: string) => Promise<void>;
+  /** Day 3 'look' step: generate and choose the OBOLO NEO look. */
+  lookApi?: LookApi;
+  /** Day 3 'egg' step. */
+  onEgg?: (food: string) => Promise<void>;
+  /** Day 4 'hatch' step: resolves with the Bati picture. */
+  onHatch?: () => Promise<string>;
+  /** Day 4 'batiname' step. */
+  onBatiName?: (name: string) => Promise<void>;
   onEnd: (answers: Record<string, string>) => void;
 }
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, onEnd }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, onEnd }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -82,7 +93,24 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
   bgm.current ??= new Bgm();
 
   const step = steps[i];
-  const v: StoryVars = { ...vars, name: name || vars.name, neo: neoForm(answers.neo)?.name ?? vars.neo };
+  const v: StoryVars = {
+    ...vars,
+    name: name || vars.name,
+    neo: neoForm(answers.neo)?.name ?? vars.neo,
+    bati: answers.batiName ?? vars.bati,
+    batiImage: answers.batiImage ?? vars.batiImage,
+    batiFood: answers.food ?? vars.batiFood,
+    look: answers.look ?? vars.look,
+  };
+  /** '@bati' / '@egg' / '@me' sprites are the visitor's own pictures. */
+  const spriteSrc = (n: string) =>
+    n === '@bati' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
+  /** Remember an answer (saved with the progress) without moving on. */
+  const remember = (key: string, value: string) => {
+    const a = { ...stateRef.current.answers, [key]: value };
+    stateRef.current = { ...stateRef.current, answers: a };
+    setAnswers(a);
+  };
 
   const setI = useCallback(
     (n: number) => {
@@ -129,6 +157,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
         else if (s.t === 'still') {
           setStill(s.image);
+          // a still is a full background: lift the start light / black screen
+          setReady(true);
+          setBlackout(false);
           n++;
         } else if (s.t === 'sprite') {
           setSprite(s.image);
@@ -234,7 +265,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
     const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
-    if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto'].includes(cur.t)) {
+    if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -275,7 +306,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
   const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter');
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
   const prev = steps[i - 1];
-  const prompt = step && (step.t === 'choice' || step.t === 'name' || step.t === 'action') && prev?.t === 'say' ? prev : null;
+  const prompt = step && (step.t === 'choice' || step.t === 'name' || step.t === 'action' || step.t === 'egg' || step.t === 'batiname') && prev?.t === 'say' ? prev : null;
 
   return (
     <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
@@ -307,17 +338,23 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
         <img src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
       )}
       {sprite &&
-        (Array.isArray(sprite) ? sprite : [sprite]).map((name, k, arr) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={name}
-            src={spriteUrl(name)}
-            alt=""
-            className="pointer-events-none absolute bottom-[24%] z-[3] h-[50%] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
-            style={spriteSlot(k, arr.length)}
-            aria-hidden
-          />
-        ))}
+        (Array.isArray(sprite) ? sprite : [sprite]).map((name, k, arr) => {
+          const src = spriteSrc(name);
+          if (!src) return null;
+          // the visitor's own pictures are square paintings: shown as rounded cards
+          const own = name.startsWith('@') && name !== '@egg';
+          return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={name}
+              src={src}
+              alt=""
+              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : 'bottom-[24%] h-[50%]'}`}
+              style={spriteSlot(k, arr.length)}
+              aria-hidden
+            />
+          );
+        })}
       {overlayCaption && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[calc(18vh+env(safe-area-inset-bottom))] z-[6] flex animate-[fadeUp_0.8s_ease-out] justify-center">
           <div className="flex items-center gap-3 rounded-full bg-black/55 px-6 py-3 text-lg tracking-[0.2em] text-amber-100 backdrop-blur-sm">
@@ -341,10 +378,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
       {started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />}
 
       {started && prompt && (
-        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 64 + 40 : step?.t === 'name' ? 200 : 150}px + env(safe-area-inset-bottom))` }}>
+        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 64 + 40 : step?.t === 'name' || step?.t === 'batiname' ? 200 : step?.t === 'egg' ? 250 : 150}px + env(safe-area-inset-bottom))` }}>
           <div className="relative mx-auto w-full max-w-xl rounded-2xl border border-amber-200/35 bg-black/60 px-5 pb-5 pt-7 backdrop-blur-md">
             <span className="absolute -top-3.5 left-5 rounded-full border border-amber-200/50 bg-black px-3 py-0.5 text-xs font-bold tracking-[0.25em] text-amber-200">
-              {prompt.who}
+              {prompt.who === 'バティ' ? v.bati || 'バティ' : prompt.who}
             </span>
             <p className="whitespace-pre-wrap text-[17px] leading-relaxed">{fill(prompt.text, v)}</p>
           </div>
@@ -374,6 +411,46 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
           onChoose={async (id) => {
             await onNeo?.(id);
             choose('neo', id);
+          }}
+        />
+      )}
+      {started && step?.t === 'look' && lookApi && (
+        <LookMaker
+          api={lookApi}
+          onDone={(url) => {
+            if (url) remember('look', url);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'egg' && (
+        <EggStep
+          onEgg={async (food) => {
+            await onEgg?.(food);
+            remember('food', food);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'hatch' && (
+        <HatchStep
+          food={v.batiFood ?? ''}
+          onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
+          onDone={(url) => {
+            remember('batiImage', url);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'batiname' && (
+        <NameInput
+          placeholder={step.placeholder}
+          submit={step.submit}
+          initial=""
+          onSubmit={async (n) => {
+            await onBatiName?.(n);
+            remember('batiName', n);
+            run(iRef.current + 1);
           }}
         />
       )}
@@ -470,7 +547,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
     );
   }
 
-  const who = step.t === 'say' ? step.who : '';
+  const who = step.t === 'say' ? (step.who === 'バティ' ? vars.bati || 'バティ' : step.who) : '';
   return (
     <button className="absolute inset-0 z-10 flex items-end justify-center" onClick={tap}>
       <div className="pb-safe w-full bg-gradient-to-t from-black via-black/80 to-transparent px-4 pt-16">

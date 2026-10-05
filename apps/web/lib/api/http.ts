@@ -107,6 +107,21 @@ export class HttpApi implements Api {
   becomeOrder() {
     return this.req<Awaited<ReturnType<Api['becomeOrder']>>>('POST', '/me/order');
   }
+  lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
+    return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
+  }
+  chooseLook(mediaId: string) {
+    return this.req<Awaited<ReturnType<Api['chooseLook']>>>('POST', '/me/look', { mediaId });
+  }
+  batiEgg(food: string) {
+    return this.req<Awaited<ReturnType<Api['batiEgg']>>>('POST', '/me/bati/egg', { food });
+  }
+  batiHatch() {
+    return this.req<Awaited<ReturnType<Api['batiHatch']>>>('POST', '/me/bati/hatch');
+  }
+  batiName(name: string) {
+    return this.req<Awaited<ReturnType<Api['batiName']>>>('POST', '/me/bati/name', { name });
+  }
   myInvites() {
     return this.req<Awaited<ReturnType<Api['myInvites']>>>('GET', '/invites');
   }

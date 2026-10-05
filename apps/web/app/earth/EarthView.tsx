@@ -194,12 +194,26 @@ function ProfileCard({ me }: { me: Me }) {
   return (
     <section className="card p-5">
       <div className="flex items-center gap-4">
-        {neoForm(me.neoForm) ? <NeoEmblem form={neoForm(me.neoForm)!} size={64} /> : <Avatar name={me.displayName} size={64} />}
+        {me.avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={me.avatarUrl} alt="" className="h-16 w-16 shrink-0 rounded-full border-2 border-amber-200/60 object-cover" />
+        ) : neoForm(me.neoForm) ? (
+          <NeoEmblem form={neoForm(me.neoForm)!} size={64} />
+        ) : (
+          <Avatar name={me.displayName} size={64} />
+        )}
         <div className="min-w-0 flex-1">
           <div className="truncate text-xl font-black">{me.displayName}</div>
           <div className="truncate text-sm text-white/55">@{me.handle}</div>
-          {neoForm(me.neoForm) && (
-            <div className="text-[11px] tracking-widest text-amber-200/70">OBOLO NEO · {neoForm(me.neoForm)!.name}</div>
+          {(me.avatarUrl || neoForm(me.neoForm)) && (
+            <div className="text-[11px] tracking-widest text-amber-200/70">OBOLO NEO{neoForm(me.neoForm) && !me.avatarUrl ? ` · ${neoForm(me.neoForm)!.name}` : ''}</div>
+          )}
+          {me.bati?.name && (
+            <div className="mt-1 flex items-center gap-1.5 text-xs text-white/70">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {me.bati.imageUrl && <img src={me.bati.imageUrl} alt="" className="h-5 w-5 rounded-full object-cover" />}
+              相棒：{me.bati.name}
+            </div>
           )}
           <span className="chip mt-1 bg-emerald-300/15 text-emerald-200">
             {me.subscriptionStatus === 'active' ? m.earth.subActive : m.earth.subDemo}

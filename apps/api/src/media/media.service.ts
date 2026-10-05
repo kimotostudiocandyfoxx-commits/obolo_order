@@ -33,6 +33,11 @@ export class MediaService {
     return this.store(userId, 'voice', mime, body, requestOrigin);
   }
 
+  /** Generated images (NEO look, Bati). */
+  storeImage(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string) {
+    return this.store(userId, kind, mime, data, requestOrigin);
+  }
+
   private async store(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string) {
     const [u] = await this.db.write.select({ used: users.storageUsageBytes }).from(users).where(eq(users.id, userId));
     if ((u?.used ?? 0) + data.length > STORAGE_QUOTA_BYTES) {

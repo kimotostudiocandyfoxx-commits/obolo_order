@@ -43,8 +43,9 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
       '宇宙行きの切符が届く',
       'KIMORINと月に行く',
       '月の神殿につく',
-      'OBOLO NEO（見習いの姿）を8つから選ぶ',
+      'OBOLO NEO（見習いの姿）を質問から生成して選ぶ',
       'ネオとしての名前を決める',
+      '好きな食べ物を答えて、バティのたまごを受け取る',
     ],
   },
   {
@@ -52,7 +53,7 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
     planet: 'saturn',
     guides: ['たこ焼きブラザー', 'たこ焼きシスター'],
     title: '土星へ',
-    beats: ['土星に行く', '案内人たこ焼きブラザー・たこ焼きシスターに出会う', '土星の楽しみ方（声の出るTwitter）を教わる', '投稿してみる'],
+    beats: ['たまごからバティが生まれ、名前をつける', '土星に行く', '案内人たこ焼きブラザー・たこ焼きシスターに出会う', '土星の楽しみ方（声の出るTwitter）を教わる', '投稿してみる'],
   },
   { day: 5, planet: 'jupiter', guides: ['KIMORIN', '大根カイザー'], title: '木星へ', beats: ['木星に行く', '大根カイザーに出会う', '木星（パタパタ）で遊ぶ'] },
   { day: 6, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
@@ -66,7 +67,8 @@ export function journeyMeta(day: number): JourneyDayMeta | undefined {
 }
 
 /**
- * After the 8 days (client decision 2026-10-04): the Sun temple ("ORDERになるか？" → membership),
- * then a second visit to the Moon temple where the new member creates Bati. Not built yet.
+ * After the 8 days: the Sun temple ("ORDERになるか？" → membership), then a second visit to the
+ * Moon temple. Bati is now born on day 4 (client decision 2026-10-05), so the second visit is where
+ * the new member's Bati awakens and grows into its true form. Not built yet.
  */
-export const AFTER_JOURNEY = ['太陽の神殿で「ORDERになるか？」→ 会員になる', 'もう一度月の神殿へ → バティを作る'] as const;
+export const AFTER_JOURNEY = ['太陽の神殿で「ORDERになるか？」→ 会員になる', 'もう一度月の神殿へ → バティが目覚めて成長する'] as const;

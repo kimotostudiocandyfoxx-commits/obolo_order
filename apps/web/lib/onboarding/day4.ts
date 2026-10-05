@@ -2,7 +2,7 @@ import type { Step } from './script';
 
 /**
  * DAY 4 【土星】 — client outline (2026-10-04) + provisional lines by Claude (✏️, P-OB-13).
- * Flow: [認証] → motion 4-1 (Moon → Saturn) → Saturn temple → inside: たこ焼きブラザー & シスター
+ * Flow: [認証] → the Bati hatches from the day-3 egg and is named → motion 4-1 (Moon → Saturn) → Saturn temple → inside: たこ焼きブラザー & シスター
  * (their video is not made yet: motion 4-2 placeholder, then the temple still with both standing)
  * → how to enjoy Saturn (client's points) → "まぁまずは遊んでみよう！" → ころりん tutorial → countdown.
  *
@@ -13,6 +13,23 @@ import type { Step } from './script';
  */
 export const DAY4: Step[] = [
   { t: 'bgm', track: 'opening' },
+  // ✏️ the Bati hatches (client decision 2026-10-05): made from the favourite food on day 3
+  { t: 'still', image: 'm3-7' },
+  { t: 'caption', text: '月の神殿で目を覚ました' },
+  { t: 'sprite', image: '@egg' },
+  { t: 'caption', text: 'たまごが、ぴくっと動いた……' },
+  { t: 'sprite', image: null },
+  { t: 'hatch' },
+  { t: 'sprite', image: ['kimorin-3', '@bati'] },
+  { t: 'say', who: 'KIMORIN', text: '生まれたケン！\n{food}から生まれた、君だけのバティだ。' },
+  { t: 'say', who: 'KIMORIN', text: 'さあ、名前をつけてやれ。' },
+  { t: 'batiname', placeholder: 'バティの名前', submit: 'この名前にする' },
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: '{bati}……それが、わたしの名前？\nうれしい！ よろしくね、{name}！' },
+  { t: 'sprite', image: ['kimorin-1', '@bati'] },
+  { t: 'say', who: 'KIMORIN', text: 'これからは、{bati}が君の相棒だ。\n曲も映像もグッズも、{bati}と一緒に作るケン。' },
+  { t: 'say', who: 'KIMORIN', text: 'よし、土星へ出発だ！' },
+  { t: 'sprite', image: null },
   { t: 'video', motion: '4-1' }, // 月から土星へ
   { t: 'still', image: 'saturn-temple' },
   { t: 'caption', text: '土星の神殿に到着した' },
