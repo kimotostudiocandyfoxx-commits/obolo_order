@@ -86,7 +86,7 @@ const ja = {
     earth: { name: '地球', role: 'ホーム・プロフィール・バンク' },
     moon: { name: '月', role: '相棒AI「バティ」' },
     saturn: { name: '土星', role: '声でつぶやくSNS' },
-    jupiter: { name: '木星', role: '写真＋サウンド' },
+    jupiter: { name: '木星', role: '蝶と木（写真・8秒動画）' },
     mercury: { name: '水星', role: '音楽を見つける・つくる' },
     venus: { name: '金星', role: 'スクエアリール' },
     mars: { name: '火星', role: 'ロング動画' },

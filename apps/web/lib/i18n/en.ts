@@ -87,7 +87,7 @@ const en: Messages = {
     earth: { name: 'Earth', role: 'Home · Profile · Bank' },
     moon: { name: 'Moon', role: 'Your buddy, Bati' },
     saturn: { name: 'Saturn', role: 'Voice microblog' },
-    jupiter: { name: 'Jupiter', role: 'Photos + sound' },
+    jupiter: { name: 'Jupiter', role: 'Butterflies & trees (photos, 8s videos)' },
     mercury: { name: 'Mercury', role: 'Discover & make music' },
     venus: { name: 'Venus', role: 'Square reels' },
     mars: { name: 'Mars', role: 'Long-form video' },

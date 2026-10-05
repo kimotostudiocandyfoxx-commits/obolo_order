@@ -43,7 +43,10 @@
 | P-NEO-1 | ✏️ | OBOLO NEO の8つの姿 | 名前・ひとこと・色は仮。画像は絵文字の仮エンブレム（`neo-<id>.webp` を置くと自動で差し替え） | `packages/shared/src/neo.ts` |
 | P-OB-13 | ✏️ | 4日目（土星） | クライアントの要点（原石の星／文字だけだと伝わらない…）をブラザーとシスターに振り分け、KIMORIN が友達として2人を紹介するセリフ、自己紹介・チュートリアル・締めのセリフは Claude の仮。ブラザーとシスターの登場動画は未着（4-2 は仮画面 → 神殿の静止画に2人を重ねて表示）。BGMは月→土星までオープニング、ころりんの前で消す | `apps/web/lib/onboarding/day4.ts`、`components/saturn/SaturnTutorial.tsx` |
 | P-OB-14 | ✏️ | 5日目（木星） | 大根カイザーの説明はクライアントのセリフどおり（語尾「DA」を付加）。KIMORIN が同行して友達のカイザーを紹介するセリフ、「土星で目を覚ました」、自己紹介（「我こそは木星の王」）、チュートリアル・締めのセリフは Claude の仮。動画 5-1（土星→木星）と 5-2（木星の神殿へ）は未着で仮画面。大根カイザーは届いた1枚絵（jupiter-kaiser.jpg、縦に切り出し）を背景に表示 | `apps/web/lib/onboarding/day5.ts`、`components/jupiter/JupiterTutorial.tsx` |
-| P-JUP-1 | 🟡 | 木星で遊ぶ画面 | **設計が変わった（docs/jupiter.md：木・根っこ・枝・葉っぱ・卵・蝶・空・88時間）**。クライアントの画面データ待ち。それまでは旧デモの写真グリッドを大根カイザーの案内つきで表示（音の部分は廃止予定） | `components/jupiter/JupiterTutorial.tsx` |
+| P-JUP-1 | 🟡 | 木星（パタパタ）の画面 | クライアントのデザイン（空・木）どおりに実装。蝶と木の絵はモックから切り出したもの。正式な素材（蝶の絵、写真・文字なしの木）が届いたら差し替え | `components/jupiter/PatapataWorld.tsx`、`public/onboarding/bf-*.webp`、`jupiter-tree.webp` |
+| P-JUP-2 | 🟡 | 木星のデータ | 住人12人と投稿はサンプル（絵文字の写真）。自分の根っこ・投稿はこの端末だけに保存（サーバー未対応） | `lib/jupiter/residents.ts`、`lib/jupiter/state.ts` |
+| P-JUP-3 | 🟡 | 8秒を超える動画 | 拒否せず、最初の8秒をくり返し再生。切り出し画面はまだない | `components/jupiter/PostCircle.tsx` |
+| P-JUP-4 | ✏️ | 枝・実・加工 | 枝は4つ固定（旅行・ごはん・おさんぽ・おまつり：絵に描かれた札）。「実」は数字だけ。加工は5種類の色フィルター＋ひとこと | `lib/jupiter/residents.ts`、`lib/jupiter/state.ts` |
 | P-VOICE-1 | ✏️ | ネオの声（読み上げ） | 端末の読み上げ機能で、7つの読み方（元気に／ゆっくり／早口／低い声で／高い声で／ささやき風／叫ぶ風）× ネオの姿ごとの声の高さ。本物のささやき・叫びは出せないので「〜風」。将来は Gemini などの表現力のある音声生成をサーバーで行い、音声ファイルにする（読み方の種類はそのまま） | `packages/shared/src/neoVoice.ts`、`apps/web/lib/audio.ts` |
 | P-SAT-3 | ✏️ | ころりんのアイコンの絵 | 丸い体＋顔＋ネオの姿のバッジ（SVGの仮絵） | `components/saturn/BallAvatar.tsx` |
 | P-SAT-4 | ✏️ | ころりんのサンプル住人 | 投稿が少ないうちは12人のサンプル住人で賑やかに見せる（声はブラウザの読み上げ） | `lib/saturnResidents.ts` |
