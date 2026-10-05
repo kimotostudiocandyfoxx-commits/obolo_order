@@ -10,6 +10,11 @@ export class HttpApi implements Api {
     const headers: Record<string, string> = { 'accept-language': document.documentElement.lang || 'ja' };
     const token = tokenStore.get();
     if (token) headers.authorization = `Bearer ${token}`;
+    // operator testing: the admin token lifts the NEO look try limits
+    if (path.startsWith('/me/look')) {
+      const admin = typeof window !== 'undefined' ? localStorage.getItem('obolo.lookAdmin') : null;
+      if (admin) headers['x-admin-token'] = admin;
+    }
     let payload: BodyInit | undefined;
     if (raw) {
       headers['content-type'] = raw.type || 'application/octet-stream';

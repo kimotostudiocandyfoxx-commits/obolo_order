@@ -44,14 +44,14 @@ export class LookService {
     if (m.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'その言葉は使えません');
   }
 
-  async candidates(userId: string, body: NeoLookBody, origin: string): Promise<NeoLookResult> {
+  async candidates(userId: string, body: NeoLookBody, origin: string, unlimited = false): Promise<NeoLookResult> {
     const u = await this.user(userId);
     const fromRef = 'reference' in body;
     await this.clean(fromRef ? `${body.liked} ${body.twist}` : `${body.animal} ${body.color} ${body.mood}`);
     // the reference image is only handed to the model, never stored (copyright, client decision 2026-10-05)
     const refs: GeneratedImage[] = fromRef ? [{ data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime }] : [];
     const key = `look:tries:${userId}`;
-    const limited = u.journeyDay < JOURNEY_DONE;
+    const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');
     const tries = await this.kv.incr(key, TRY_TTL);
@@ -76,10 +76,10 @@ export class LookService {
   }
 
   /** One instruction → one new version of the chosen candidate (3 times per apprentice). */
-  async refine(userId: string, body: RefineLookBody, origin: string): Promise<NeoLookResult> {
+  async refine(userId: string, body: RefineLookBody, origin: string, unlimited = false): Promise<NeoLookResult> {
     const u = await this.user(userId);
     await this.clean(body.instruction);
-    const limited = u.journeyDay < JOURNEY_DONE;
+    const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     if (limited && (await this.refinesLeft(userId, true)) <= 0) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', 'もう描き直せません');
     const src = await this.media.imageData(userId, body.mediaId, 'avatar');
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');

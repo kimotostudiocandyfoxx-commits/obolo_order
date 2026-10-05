@@ -1,9 +1,11 @@
-import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { timingSafeEqual } from 'node:crypto';
 import { BatiEggBody, BatiNameBody, ChooseLookBody, NeoLookBody, RefineLookBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
+import { AppConfig, CONFIG } from '../config';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { LookService } from './look.service';
@@ -16,20 +18,27 @@ export class LookController {
   constructor(
     private readonly look: LookService,
     @Inject(KV) private readonly kv: KvStore,
+    @Inject(CONFIG) private readonly cfg: AppConfig,
   ) {}
+
+  /** The operator's admin token lifts the try limits (for testing the generation). */
+  private admin(token?: string) {
+    const expected = this.cfg.ADMIN_TOKEN;
+    return !!expected && !!token && token.length === expected.length && timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+  }
 
   @Post('look/candidates')
   @HttpCode(200)
-  async candidates(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+  async candidates(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
     await rateLimit(this.kv, `look:${userId}`, 4, 60);
-    return this.look.candidates(userId, parseBody(NeoLookBody, body), origin(req));
+    return this.look.candidates(userId, parseBody(NeoLookBody, body), origin(req), this.admin(token));
   }
 
   @Post('look/refine')
   @HttpCode(200)
-  async refine(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+  async refine(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
     await rateLimit(this.kv, `look:${userId}`, 6, 60);
-    return this.look.refine(userId, parseBody(RefineLookBody, body), origin(req));
+    return this.look.refine(userId, parseBody(RefineLookBody, body), origin(req), this.admin(token));
   }
 
   @Post('look')
