@@ -15,6 +15,8 @@ export default function PreviewIndex() {
     { href: '/preview/play?day=6&at=choice', label: '6日目：フリージーの質問（ある／ない）から' },
     { href: '/preview/play?day=6&at=mercury', label: '6日目：水星（船の海と島）から' },
     { href: '/preview/play?day=7&at=mars', label: '7日目：火星（UFOの星図とスタジオ）から' },
+    { href: '/preview/play?day=8&at=venus', label: '8日目：金星（マーケット）から' },
+    { href: '/preview/play?world=venus', label: '金星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=mars', label: '火星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=mercury', label: '水星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=saturn', label: '土星ころりんだけ（チュートリアルなし）' },

@@ -45,9 +45,13 @@
 | P-OB-14 | ✏️ | 5日目（木星） | 大根カイザーの説明はクライアントのセリフどおり（語尾「DA」を付加）。KIMORIN が同行して友達のカイザーを紹介するセリフ、「土星で目を覚ました」、自己紹介（「我こそは木星の王」）、チュートリアル・締めのセリフは Claude の仮。動画 5-1（土星→木星）と 5-2（木星の神殿へ）は未着で仮画面。大根カイザーは届いた1枚絵（jupiter-kaiser.jpg、縦に切り出し）を背景に表示 | `apps/web/lib/onboarding/day5.ts`、`components/jupiter/JupiterTutorial.tsx` |
 | P-OB-15 | ✏️ | 6日目（水星） | フリージーと KIMORIN の説明はクライアントのセリフどおり。「木星で目を覚ました」、着陸後の KIMORIN、フリージーの紹介、「ある／ない」への返事（ある→「ほう、なかなかやるな。」、ない→「そうか。なら今日が、はじめての日だ。」）、締めは Claude の仮。動画 6-1（ロケットで水星へ）・6-2（海に浮かぶ島に着陸）・6-3（水星の神殿へ）は未着で仮画面 | `apps/web/lib/onboarding/day6.ts` |
 | P-OB-16 | ✏️ | 7日目（火星） | KIMORIN とヒポキンの説明はクライアントのセリフどおり。「水星で目を覚ました」、着いた後の KIMORIN、ヒポキンの紹介、締めは Claude の仮。動画 7-1（ロケットで火星へ）・7-2（未来都市へ）は未着で仮画面。金星は8日目に後回し（クライアント 2026-10-05） | `apps/web/lib/onboarding/day7.ts`、`packages/shared/src/journey.ts` |
+| P-OB-17 | ✏️ | 8日目（金星） | KIMORIN とゴリラの説明はクライアントのセリフどおり。ゴリラ3人へのセリフの割り振り、「火星で目を覚ました」、着いた後の KIMORIN、紹介、締め（「明日は太陽の神殿」）は Claude の仮。動画 8-1 は未着。3人の絵は火星のデザイン画から顔を切り出した仮（gorilla-trio.webp）、金星の背景は自動で描いた仮（venus-market.jpg） | `apps/web/lib/onboarding/day8.ts` |
 | P-MARS-1 | 🟡 | 火星の画面（星図・スタジオ） | クライアントのデザインどおりに実装（街中／郊外の2パターン）。絵はデザイン画から切り出したもの。描かれたタイトル・カードの上に本物を重ねている。正式な素材（文字・カードの入っていない背景、UFO）が届いたら差し替え | `components/mars/MarsWorld.tsx`、`public/onboarding/mars-*.jpg`、`pod-*.webp` |
 | P-MARS-2 | 🟡 | 火星のデータと再生 | 8人の映像はサンプル。本物の動画はまだなく、サムネイル＋シーンの字幕＋BGM の仮の再生。自分のスタジオ・ロッカー・見た目の設定はこの端末だけに保存 | `lib/mars/sky.ts`、`lib/mars/state.ts`、`components/mars/Frame.tsx` |
 | P-MARS-3 | ✏️ | 火星の撮影 | 作曲と同じ仮組み：KIMORIN（バティができたらバティ）に話しかけると映像になるチャット。映像はその場で作る仮のもの | `components/mars/ShootChat.tsx`、`lib/mars/make.ts` |
+| P-VENUS-1 | 🟡 | 金星の画面 | クライアントのデザイン待ち。いまは ショップ／つくる／自分の店 の仮の画面 | `components/venus/VenusWorld.tsx` |
+| P-VENUS-2 | 🟡 | 金星のデータと星 | グッズ12個はサンプル（絵文字）。星はデモでは88から。自分の店・コレクション・星はこの端末だけに保存。店を開いている間、ときどき誰かが買ってくれる（デモの演出） | `lib/venus/shop.ts`、`lib/venus/state.ts` |
+| P-VENUS-3 | ✏️ | 金星のつくる | 作曲・撮影と同じ仮組み：KIMORIN（バティができたらバティ）に話しかけるとグッズになるチャット | `components/venus/VenusWorld.tsx`、`lib/venus/make.ts` |
 | P-MER-1 | 🟡 | 水星の画面（海・島） | クライアントのデザイン（第2版）どおりに実装。海・船・島・宝箱の絵はデザイン画から切り出したもの。正式な素材（文字なしの海、船、島の種類）が届いたら差し替え。作曲画面は次のデザイン待ち | `components/mercury/MercuryWorld.tsx`、`public/onboarding/mercury-*.jpg`、`ship-*.webp`、`chest-*.webp` |
 | P-MER-2 | 🟡 | 水星のデータ | 船8人とその曲はサンプル（絵文字のレコード、音はシンセ）。自分のデモ曲3つはデザイン画のレコード。自分の島・星はこの端末だけに保存。友達の島へ行く入口はまだない | `lib/mercury/sea.ts`、`lib/mercury/state.ts` |
 | P-MER-3 | ✏️ | 水星の作曲 | デザインができるまでの仮組み：KIMORIN（バティができたらバティ）に話しかけると曲になるチャット。曲はその場で作る仮のもの（話した言葉からタイトル・歌詞4行、レコードは絵文字、音はシンセ）。本物は AI＋音楽生成につなぐ。バティの有無はいまは「ORDER会員か」で判定 | `components/mercury/ComposeChat.tsx`、`lib/mercury/compose.ts` |

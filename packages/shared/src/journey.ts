@@ -58,7 +58,7 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
   { day: 6, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
   // Mars comes before Venus (client, 2026-10-05)
   { day: 7, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
-  { day: 8, planet: 'venus', guides: [], title: '金星へ', beats: ['金星に行く'] },
+  { day: 8, planet: 'venus', guides: ['KIMORIN', 'ロングG', 'ハットG', 'ボスG'], title: '金星へ', beats: ['金星に行く', 'ゴリラ3人組に出会う', '金星（グッズをつくって星で売り買い）で遊ぶ'] },
 ];
 
 export function journeyMeta(day: number): JourneyDayMeta | undefined {

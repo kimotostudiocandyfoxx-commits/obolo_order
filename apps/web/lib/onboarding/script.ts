@@ -6,7 +6,7 @@
  */
 import type { MotionId } from './media';
 
-export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー' | 'ヒポキン';
+export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー' | 'ヒポキン' | 'ロングG' | 'ハットG' | 'ボスG';
 
 export type Step =
   /**
@@ -37,6 +37,8 @@ export type Step =
   | { t: 'mercury' }
   /** Mars tutorial (Day 7), coached by ヒポキン. */
   | { t: 'mars' }
+  /** Venus tutorial (Day 8), coached by the gorilla trio. */
+  | { t: 'venus' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

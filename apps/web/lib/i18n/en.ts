@@ -89,7 +89,7 @@ const en: Messages = {
     saturn: { name: 'Saturn', role: 'Voice microblog' },
     jupiter: { name: 'Jupiter', role: 'Butterflies & trees (photos, 8s videos)' },
     mercury: { name: 'Mercury', role: 'Discover & make music' },
-    venus: { name: 'Venus', role: 'Square reels' },
+    venus: { name: 'Venus', role: 'Make goods, trade them for stars' },
     mars: { name: 'Mars', role: 'Long-form video' },
     uranus: { name: 'Uranus', role: 'Zero-inventory mall' },
     neptune: { name: 'Neptune', role: 'Game store' },
