@@ -43,6 +43,8 @@
 | P-NEO-1 | ✏️ | OBOLO NEO の8つの姿 | 名前・ひとこと・色は仮。画像は絵文字の仮エンブレム（`neo-<id>.webp` を置くと自動で差し替え） | `packages/shared/src/neo.ts` |
 | P-OB-13 | ✏️ | 4日目（土星） | クライアントの要点（原石の星／文字だけだと伝わらない…）をブラザーとシスターに振り分け、KIMORIN が友達として2人を紹介するセリフ、自己紹介・チュートリアル・締めのセリフは Claude の仮。ブラザーとシスターの登場動画は未着（4-2 は仮画面 → 神殿の静止画に2人を重ねて表示）。BGMは月→土星までオープニング、ころりんの前で消す | `apps/web/lib/onboarding/day4.ts`、`components/saturn/SaturnTutorial.tsx` |
 | P-OB-14 | ✏️ | 5日目（木星） | 大根カイザーの説明はクライアントのセリフどおり（語尾「DA」を付加）。KIMORIN が同行して友達のカイザーを紹介するセリフ、「土星で目を覚ました」、自己紹介（「我こそは木星の王」）、チュートリアル・締めのセリフは Claude の仮。動画 5-1（土星→木星）と 5-2（木星の神殿へ）は未着で仮画面。大根カイザーは届いた1枚絵（jupiter-kaiser.jpg、縦に切り出し）を背景に表示 | `apps/web/lib/onboarding/day5.ts`、`components/jupiter/JupiterTutorial.tsx` |
+| P-OB-15 | ✏️ | 6日目（水星） | フリージーと KIMORIN の説明はクライアントのセリフどおり。「木星で目を覚ました」、着陸後の KIMORIN、フリージーの紹介、「ある／ない」への返事（ある→「ほう、なかなかやるな。」、ない→「そうか。なら今日が、はじめての日だ。」）、締めは Claude の仮。動画 6-1（ロケットで水星へ）・6-2（海に浮かぶ島に着陸）・6-3（水星の神殿へ）は未着で仮画面 | `apps/web/lib/onboarding/day6.ts` |
+| P-MER-1 | 🟡 | 水星で遊ぶ画面 | クライアントのデザインが次に届く。いまは「水星で遊ぶ画面」の仮画面と「水星をあとにする」ボタンだけ | `components/mercury/MercuryPlaceholder.tsx` |
 | P-JUP-1 | 🟡 | 木星（パタパタ）の画面 | クライアントのデザイン（空・木）どおりに実装。蝶と木の絵はモックから切り出したもの。正式な素材（蝶の絵、写真・文字なしの木）が届いたら差し替え | `components/jupiter/PatapataWorld.tsx`、`public/onboarding/bf-*.webp`、`jupiter-tree.webp` |
 | P-JUP-2 | 🟡 | 木星のデータ | 住人12人と投稿はサンプル（絵文字の写真）。自分の根っこ・投稿はこの端末だけに保存（サーバー未対応） | `lib/jupiter/residents.ts`、`lib/jupiter/state.ts` |
 | P-JUP-3 | 🟡 | 8秒を超える動画 | 拒否せず、最初の8秒をくり返し再生。切り出し画面はまだない | `components/jupiter/PostCircle.tsx` |
