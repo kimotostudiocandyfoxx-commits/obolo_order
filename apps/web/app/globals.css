@@ -394,3 +394,13 @@ body {
   0%, 100% { transform: translate(0, 0) rotate(-0.8deg); }
   50% { transform: translate(0.6%, -1.6%) rotate(0.8deg); }
 }
+
+/* Mars: UFOs hovering, videos panning */
+@keyframes ufo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.8%); }
+}
+@keyframes kenburns {
+  from { transform: scale(1.02) translate(0, 0); }
+  to { transform: scale(1.18) translate(-3%, -2%); }
+}

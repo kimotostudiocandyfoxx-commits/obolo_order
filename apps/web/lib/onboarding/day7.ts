@@ -5,7 +5,7 @@ import type { Step } from './script';
  * Mars comes before Venus (client, 2026-10-05): Venus is day 8.
  * Flow: [認証] → wake up on Mercury → KIMORIN: rocket to Mars (motion 7-1) → the future city of Mars
  * (7-2) → ヒポキン, the hippo king (KIMORIN's friend) → "Mars is the planet where videos gather"
- * → Mars play screen (the client's UI comes next: P-MARS-1, placeholder for now) → countdown.
+ * → Mars tutorial (the client's design: UFO timeline, studio, locker) → countdown.
  * Motions 7-1 / 7-2 are not made yet. Art: mars-city.jpg, hipokin.webp (client, 2026-10-05).
  */
 export const DAY7: Step[] = [

@@ -35,7 +35,7 @@ export type Step =
   | { t: 'jupiter' }
   /** Mercury sea-chart tutorial (Day 6), coached by フリージー. */
   | { t: 'mercury' }
-  /** Mars play screen (Day 7). Placeholder until the client's UI arrives. */
+  /** Mars tutorial (Day 7), coached by ヒポキン. */
   | { t: 'mars' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }

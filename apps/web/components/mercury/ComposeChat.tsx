@@ -153,7 +153,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   );
 }
 
-function Face({ face, size }: { face: string | null; size: number }) {
+export function Face({ face, size }: { face: string | null; size: number }) {
   return face ? (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={spriteUrl(face)} alt="" style={{ width: size, height: size }} className="shrink-0 rounded-full border border-white/20" />
@@ -223,7 +223,7 @@ function SongCard({
 
 /** Voice input (the round device is voice first). Hidden where the browser can't listen. */
 type Recognition = { lang: string; interimResults: boolean; continuous: boolean; start(): void; stop(): void; onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null; onend: (() => void) | null };
-function Mic({ onText }: { onText: (t: string) => void }) {
+export function Mic({ onText }: { onText: (t: string) => void }) {
   const [on, setOn] = useState(false);
   const rec = useRef<Recognition | null>(null);
   const [supported, setSupported] = useState(false);
