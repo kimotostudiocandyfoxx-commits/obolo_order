@@ -1,138 +1,184 @@
 'use client';
 
+import { neoForm } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Artwork } from '@/components/Artwork';
-import { CARD_RECT, CREATE_RECT, fmt, ISLANDS, type Island, type Song } from '@/lib/mercury/islands';
+import { useAuth } from '@/lib/auth';
+import { fmt, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
+import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
 
 /**
- * Mercury — the planet of music (client design 2026-10-05, docs/mercury.md).
- *  海図: the sea chart, one island per genre. Tap an island → its card → 「この島を航海する」.
- *  Player: records of that island; swipe sideways for the next / previous song; three stars.
- *  作曲 / 船 (profile) come with the client's next designs (placeholders for now).
- * Laid out as a square stage with the controls underneath (docs/devices.md).
- * VISUAL DEMO: sample songs, synthesised sound (P-MER-2).
+ * Mercury — the planet of music (client design 2026-10-05 v2, docs/mercury.md).
+ *  海 (timeline): friends' released songs sail as ships for 88 hours. Tap a ship → their songs of
+ *     the last 88 hours play; swipe for the next one; three-tier stars.
+ *  島 (profile): every user has an island. Released songs decorate it as records once back from
+ *     sea; demos are buried in the soil (own island only) and set sail when released.
+ *  作曲 comes with the client's next design.
+ * Square stage with the controls underneath (docs/devices.md). VISUAL DEMO (P-MER-2).
  */
 export interface MercuryEvents {
-  onIsland?: () => void;
-  onSail?: () => void;
+  onShip?: () => void;
   onSwipe?: () => void;
   onStar?: () => void;
+  onIsland?: () => void;
+  onSoil?: () => void;
+  onRelease?: () => void;
 }
 
+type View = { v: 'sea' } | { v: 'island'; who: 'me' | Sailor } | { v: 'play'; title: string; songs: Song[]; start: number; back: View };
+
 export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; overlay?: ReactNode }) {
-  const [selected, setSelected] = useState<Island>(ISLANDS.find((i) => i.id === 'pop')!);
-  const [sailing, setSailing] = useState<Island | null>(null);
+  const { me } = useAuth();
+  const mine = useMercury();
+  const [view, setView] = useState<View>({ v: 'sea' });
+  const [tab, setTab] = useState<'all' | 'follow' | 'friend'>('friend');
   const [toast, setToast] = useState<string | null>(null);
   const ev = useRef(events);
   ev.current = events;
   useEffect(() => () => synth.stop(), []);
 
+  const myHandle = me?.displayName || 'neo';
+  const neo = neoForm(me?.neoForm);
+  const mySailing = mine.released.filter((r) => atSea(r.at));
+  const myRecords = mine.released.filter((r) => !atSea(r.at)).map((r) => r.song);
+  const visible = (s: Sailor) => tab === 'all' || (tab === 'follow' ? s.follow : s.friend);
+  const sailingCount = SAILORS.filter(visible).length + (mySailing.length ? 1 : 0);
+
   const say = (t: string) => {
     setToast(t);
     setTimeout(() => setToast(null), 1800);
   };
+  const go = (next: View) => {
+    if (next.v !== 'play') synth.stop();
+    setView(next);
+    if (next.v === 'island' && next.who === 'me') ev.current?.onIsland?.();
+  };
+  const play = (title: string, songs: Song[], start = 0) => go({ v: 'play', title, songs, start, back: view.v === 'play' ? view.back : view });
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#050b1f] text-white">
-      {sailing ? (
-        <Player
-          island={sailing}
-          onSwipe={() => ev.current?.onSwipe?.()}
-          onStar={() => ev.current?.onStar?.()}
-        />
-      ) : (
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#06123a] text-white">
+      {view.v === 'sea' && (
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="px-4 pt-[calc(12px+env(safe-area-inset-top))]">
-            <button onClick={() => say('検索は準備中です')} className="mx-auto flex w-full max-w-xl items-center gap-3 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-left text-sm text-white/55">
-              <span className="text-lg">🔍</span> 島・曲・船をさがす
-            </button>
+          <div className="px-4 pt-[calc(10px+env(safe-area-inset-top))]">
+            <Tabs tab={tab} setTab={setTab} />
+            <p className="mx-auto mt-2 w-fit rounded-full border border-amber-300/50 bg-black/30 px-4 py-1 text-sm text-amber-100">👥 今 {sailingCount}人が航海中</p>
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center p-2">
-            <div className="relative w-full max-w-[min(100%,calc((100svh-230px)*1.2875))]" style={{ aspectRatio: '1254 / 974' }}>
+            <div className="relative w-full max-w-[min(100%,calc((100svh-230px)*1.293))]" style={{ aspectRatio: '1254 / 970' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={stillUrl('mercury-map')} alt="" className="absolute inset-0 h-full w-full select-none rounded-xl" draggable={false} />
-              {ISLANDS.map((is) => (
+              <img src={stillUrl('mercury-sea')} alt="" className="absolute inset-0 h-full w-full select-none rounded-xl" draggable={false} />
+              {SAILORS.map((s, i) => (
                 <button
-                  key={is.id}
+                  key={s.id}
                   onClick={() => {
-                    setSelected(is);
-                    ev.current?.onIsland?.();
+                    play(`@${s.handle} の船`, s.sailing);
+                    ev.current?.onShip?.();
                   }}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  className="absolute transition-opacity duration-500"
                   style={{
-                    left: `${is.x}%`,
-                    top: `${is.y}%`,
-                    width: `${is.r * 2}%`,
-                    aspectRatio: '1.5 / 1',
-                    boxShadow: selected.id === is.id ? `0 0 0 3px ${is.color}, 0 0 28px 6px ${is.color}aa` : undefined,
-                    background: selected.id === is.id ? `${is.color}18` : undefined,
+                    left: `${s.box.left}%`,
+                    top: `${s.box.top}%`,
+                    width: `${s.box.width}%`,
+                    height: `${s.box.height}%`,
+                    opacity: visible(s) ? 1 : 0,
+                    pointerEvents: visible(s) ? 'auto' : 'none',
+                    animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite`,
                   }}
-                  aria-label={is.name}
+                  aria-label={`@${s.handle}の船：${s.bubble}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={spriteUrl(s.ship)} alt="" className="h-full w-full" draggable={false} />
+                </button>
+              ))}
+              {/* the sea art draws every ship; hidden ones are covered with calm water */}
+              {SAILORS.filter((s) => !visible(s)).map((s) => (
+                <div
+                  key={`cover-${s.id}`}
+                  className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md"
+                  style={{ left: `${s.box.left + 2}%`, top: `${s.box.top + 2}%`, width: `${s.box.width - 4}%`, height: `${s.box.height - 4}%` }}
                 />
               ))}
-              {/* the island card (covers the one drawn on the chart) */}
-              <div
-                className="absolute flex flex-col justify-between rounded-2xl border border-white/20 bg-[#0d1530]/95 p-[1.4%] shadow-2xl backdrop-blur"
-                style={{ left: `${CARD_RECT.left}%`, top: `${CARD_RECT.top}%`, width: `${CARD_RECT.width}%`, height: `${CARD_RECT.height}%`, containerType: 'inline-size' }}
-              >
-                <p className="truncate text-center text-[clamp(10px,9cqw,20px)] font-bold">{selected.name}</p>
-                <div className="space-y-[2cqw] text-[clamp(8px,6.5cqw,15px)] text-white/80">
-                  <p className="flex justify-between">
-                    <span>👤 住民</span>
-                    <span>{selected.residents.toLocaleString()}</span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>♫ 収録</span>
-                    <span>{selected.songs.length}曲</span>
-                  </p>
-                </div>
+              {mySailing.length > 0 && (
                 <button
                   onClick={() => {
-                    setSailing(selected);
-                    ev.current?.onSail?.();
+                    play(`@${myHandle} の船`, mySailing.map((r) => r.song));
+                    ev.current?.onShip?.();
                   }}
-                  className="rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 py-[3cqw] text-[clamp(8px,6.5cqw,15px)] font-bold shadow-[0_0_16px_rgba(190,100,255,0.6)]"
+                  className="absolute flex flex-col items-center"
+                  style={{ left: '74%', top: '74%', width: '24%', animation: 'sail 5s ease-in-out infinite' }}
+                  aria-label="自分の船"
                 >
-                  この島を航海する
+                  <span className="mb-1 rounded-xl border border-amber-300/70 bg-[#0d1838]/90 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight">
+                    新曲を出航！「{mySailing[0].song.title}」
+                    <br />
+                    <span className="text-white/60">{hoursSince(mySailing[0].at) || 'たった今'}{hoursSince(mySailing[0].at) ? '時間前' : ''}</span>
+                  </span>
+                  <OwnShip emoji={neo?.emoji ?? '🦊'} />
                 </button>
-              </div>
-              <button
-                onClick={() => say('島をつくるのは準備中です')}
-                className="absolute flex items-center justify-center gap-2 rounded-full border border-cyan-200/40 bg-[#081430]/95 text-[clamp(10px,2.2vw,18px)]"
-                style={{ left: `${CREATE_RECT.left}%`, top: `${CREATE_RECT.top}%`, width: `${CREATE_RECT.width}%`, height: `${CREATE_RECT.height}%` }}
-              >
-                ＋ 島をつくる
-              </button>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* controls: 海図 / 作曲 / 船 */}
-      <nav className="relative z-20 mx-auto mb-[calc(10px+env(safe-area-inset-bottom))] flex w-[min(94%,560px)] items-center justify-around rounded-[2rem] border border-white/10 bg-white/5 px-6 py-2.5 backdrop-blur">
-        <button
-          onClick={() => {
-            synth.stop();
-            setSailing(null);
+      {view.v === 'island' && (
+        <IslandView
+          title={view.who === 'me' ? myHandle : view.who.handle}
+          isMe={view.who === 'me'}
+          stats={
+            view.who === 'me'
+              ? { residents: 0, discovered: SAILORS.length, released: mine.released.length }
+              : { residents: view.who.residents, discovered: view.who.discovered, released: view.who.sailing.length + view.who.records.length }
+          }
+          records={view.who === 'me' ? myRecords : view.who.records}
+          sailing={view.who === 'me' ? mySailing.map((r) => r.song) : view.who.sailing}
+          chests={view.who === 'me' ? mine.chests : view.who.chests}
+          soil={view.who === 'me' ? mine.soil : []}
+          onPlay={(songs, i) => play(view.who === 'me' ? '自分の島' : `@${(view.who as Sailor).handle} の島`, songs, i)}
+          onSoil={() => ev.current?.onSoil?.()}
+          onRelease={(id) => {
+            mine.release(id);
+            say('🚢 出航！ 88時間、みんなの海を渡ります');
+            ev.current?.onRelease?.();
           }}
-          className={`flex flex-col items-center text-xs ${sailing ? 'text-white/60' : 'text-amber-200'}`}
-        >
+          say={say}
+        />
+      )}
+
+      {view.v === 'play' && (
+        <Player
+          key={`${view.title}-${view.start}-${view.songs[0]?.id}`}
+          title={view.title}
+          songs={view.songs}
+          start={view.start}
+          stars={mine.stars}
+          onStar={(id, tier) => {
+            mine.star(id, tier);
+            ev.current?.onStar?.();
+          }}
+          onSwipe={() => ev.current?.onSwipe?.()}
+        />
+      )}
+
+      {/* controls: 海図 / 作曲 / 島 */}
+      <nav className="relative z-20 mx-auto mb-[calc(10px+env(safe-area-inset-bottom))] flex w-[min(94%,560px)] items-center justify-around rounded-[2rem] border border-white/10 bg-[#0a1430]/80 px-6 py-2.5 backdrop-blur">
+        <button onClick={() => go({ v: 'sea' })} className={`flex flex-col items-center text-xs ${view.v === 'sea' ? 'text-amber-200' : 'text-white/60'}`}>
           <span className="text-2xl">🗺️</span>海図
         </button>
         <button onClick={() => say('作曲の画面は、次のデザインで作ります')} className="-mt-8 flex flex-col items-center text-xs">
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 via-fuchsia-500 to-violet-500 text-2xl shadow-[0_0_24px_rgba(220,90,255,0.6)]">♫+</span>
           作曲
         </button>
-        <button onClick={() => say('船（プロフィール）は、次のデザインで作ります')} className="flex flex-col items-center text-xs text-white/60">
-          <span className="text-2xl">⛵</span>船
+        <button onClick={() => go({ v: 'island', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'island' ? 'text-amber-200' : 'text-white/60'}`}>
+          <span className="text-2xl">🏝️</span>島
         </button>
       </nav>
 
       {toast && (
-        <div className="absolute inset-x-0 bottom-28 z-[70] flex justify-center">
-          <span className="rounded-full bg-black/75 px-4 py-2 text-sm">{toast}</span>
+        <div className="absolute inset-x-0 bottom-28 z-[70] flex justify-center px-4">
+          <span className="rounded-full bg-black/75 px-4 py-2 text-center text-sm">{toast}</span>
         </div>
       )}
       {overlay}
@@ -140,10 +186,45 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
   );
 }
 
+function Tabs({ tab, setTab }: { tab: 'all' | 'follow' | 'friend'; setTab: (t: 'all' | 'follow' | 'friend') => void }) {
+  return (
+    <div className="mx-auto flex w-full max-w-md rounded-full border border-white/15 bg-black/30 p-1">
+      {(
+        [
+          ['all', '全部'],
+          ['follow', 'フォロー'],
+          ['friend', 'ダチ'],
+        ] as const
+      ).map(([k, label]) => (
+        <button key={k} onClick={() => setTab(k)} className={`flex-1 rounded-full py-1.5 text-sm ${tab === k ? 'bg-white/10 font-bold text-amber-200' : 'text-white/70'}`}>
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** The visitor's ship (no art yet): a little boat with their OBOLO NEO on deck. */
+function OwnShip({ emoji }: { emoji: string }) {
+  return (
+    <div className="relative w-full">
+      <span className="absolute left-1/2 top-[8%] -translate-x-1/2 text-[clamp(18px,3.5vw,34px)]">{emoji}</span>
+      <svg viewBox="0 0 120 70" className="w-full drop-shadow-[0_6px_10px_rgba(0,0,0,0.5)]" aria-hidden>
+        <path d="M60 4 L60 40" stroke="#e9d3a0" strokeWidth="3" />
+        <path d="M62 8 L92 34 L62 34 Z" fill="#f4e6c0" opacity="0.9" />
+        <path d="M6 40 L114 40 L98 62 Q60 70 22 62 Z" fill="#2b2a44" stroke="#d4a93c" strokeWidth="3" />
+        {[30, 50, 70, 90].map((x) => (
+          <circle key={x} cx={x} cy="51" r="5" fill="#0c1022" stroke="#7fd4ff" strokeWidth="2" />
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 /** A record (round art) for a song. */
 function Record({ song, spinning, className = '' }: { song: Song; spinning?: boolean; className?: string }) {
   return (
-    <div className={`relative aspect-square overflow-hidden rounded-full border-[6px] border-black/80 shadow-[0_20px_60px_rgba(0,0,0,0.6)] ${className}`}>
+    <div className={`relative aspect-square overflow-hidden rounded-full border-[5px] border-black/80 shadow-[0_16px_40px_rgba(0,0,0,0.55)] ${className}`}>
       <div className={`absolute inset-0 ${spinning ? 'animate-[spin-slow_14s_linear_infinite]' : ''}`}>
         {song.cover ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -151,26 +232,158 @@ function Record({ song, spinning, className = '' }: { song: Song; spinning?: boo
         ) : (
           <Artwork hue={song.hue ?? 220} emoji={song.emoji ?? '🎵'} className="h-full w-full" />
         )}
-        <span className="absolute left-1/2 top-1/2 h-[6%] w-[6%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-300/80 bg-black" />
+        <span className="absolute left-1/2 top-1/2 h-[7%] w-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-300/80 bg-black" />
       </div>
     </div>
   );
 }
 
-function Player({ island, onSwipe, onStar }: { island: Island; onSwipe: () => void; onStar: () => void }) {
-  const [tab, setTab] = useState<'all' | 'follow' | 'friend'>('all');
-  const songs = island.songs.filter((s) => tab === 'all' || (tab === 'follow' ? s.follow : s.friend));
-  const list = songs.length ? songs : island.songs;
-  const [i, setI] = useState(0);
+function IslandView({
+  title,
+  isMe,
+  stats,
+  records,
+  sailing,
+  chests,
+  soil,
+  onPlay,
+  onSoil,
+  onRelease,
+  say,
+}: {
+  title: string;
+  isMe: boolean;
+  stats: { residents: number; discovered: number; released: number };
+  records: Song[];
+  sailing: Song[];
+  chests: [number, number, number];
+  soil: Song[];
+  onPlay: (songs: Song[], i: number) => void;
+  onSoil: () => void;
+  onRelease: (id: string) => void;
+  say: (t: string) => void;
+}) {
+  const [dig, setDig] = useState(false);
+  return (
+    <div className="min-h-0 flex-1 overflow-y-auto pb-6">
+      <div className="relative mx-auto max-w-2xl">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={stillUrl('mercury-island')} alt="" className="w-full select-none" draggable={false} />
+        <div className="absolute inset-x-3 top-[calc(8px+env(safe-area-inset-top))] flex items-center justify-between">
+          <span className="rounded-full border border-cyan-200/40 bg-[#0a1430]/85 px-4 py-1.5 text-sm font-black tracking-wider">♫ {title.toUpperCase()} ISLAND</span>
+          <button onClick={() => say('島を飾るのは準備中です')} className="rounded-full border border-amber-300/60 bg-[#0a1430]/85 px-4 py-1.5 text-sm text-amber-100">
+            🏝 島を飾る
+          </button>
+        </div>
+        {isMe && (
+          // the soil: demos are buried here
+          <button
+            onClick={() => {
+              setDig(true);
+              onSoil();
+            }}
+            className="absolute left-1/2 top-[80%] -translate-x-1/2 rounded-full border border-amber-200/60 bg-[#3a2410]/90 px-4 py-1.5 text-sm shadow-lg"
+          >
+            ⛏ 土の中のデモ曲（{soil.length}）
+          </button>
+        )}
+      </div>
+
+      <div className="mx-auto max-w-2xl px-4">
+        <p className="mx-auto -mt-2 w-fit rounded-full border border-white/20 bg-[#0a1430]/90 px-4 py-1.5 text-xs text-white/85">
+          👤 島の住人 {stats.residents.toLocaleString()}人 ・ 発見した島 {stats.discovered} ・ 出した曲 {stats.released}
+        </p>
+
+        {sailing.length > 0 && (
+          <p className="mt-3 text-center text-xs text-cyan-200/80">🚢 航海中の曲 {sailing.length}（88時間後に島に戻ってきます）</p>
+        )}
+
+        <h3 className="mb-2 mt-4 text-xs tracking-widest text-white/60">島に飾られたレコード</h3>
+        {records.length ? (
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {records.map((r, i) => (
+              <button key={r.id} onClick={() => onPlay(records, i)} className="w-24 shrink-0 text-center">
+                <Record song={r} />
+                <p className="mt-1 truncate text-[11px] text-white/80">{r.title}</p>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-white/45">{isMe ? '出航した曲は、88時間の航海を終えると、ここに飾られます。' : 'まだレコードはありません'}</p>
+        )}
+
+        <div className="mt-5 grid grid-cols-3 gap-3">
+          {chests.map((c, i) => (
+            <button key={i} onClick={() => say(`★${i + 1}の宝箱：星${i + 1}をつけた曲が入っています`)} className="flex flex-col items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={spriteUrl(`chest-${i + 1}`)} alt="" className="w-full max-w-[150px]" />
+              <span className="-mt-2 rounded-xl border border-amber-300/50 bg-[#0a1430]/90 px-3 py-1 text-center text-xs">
+                ★{i + 1}の宝箱
+                <br />
+                <b className="text-base">{c}</b> 枚
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {dig && (
+        <div className="absolute inset-0 z-40 flex items-end justify-center bg-black/60" onClick={() => setDig(false)}>
+          <div className="w-full max-w-lg rounded-t-3xl border-t border-amber-200/30 bg-gradient-to-b from-[#3b2614] to-[#1d1209] p-5 pb-[calc(24px+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
+            <p className="text-center text-sm font-bold">⛏ 土の中のデモ曲</p>
+            <p className="mt-1 text-center text-[11px] text-white/55">まだ発表していない曲は、島の土に埋まっています。出航させると、88時間みんなの海を渡ります。</p>
+            <div className="mt-4 space-y-3">
+              {soil.map((d) => (
+                <div key={d.id} className="flex items-center gap-3 rounded-2xl bg-black/25 p-2">
+                  <button onClick={() => onPlay([d], 0)} className="w-14 shrink-0" aria-label={`${d.title}を聴く`}>
+                    <Record song={d} />
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold">{d.title}</p>
+                    <p className="text-[11px] text-white/50">デモ ・ {fmt(d.seconds)}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      onRelease(d.id);
+                      setDig(false);
+                    }}
+                    className="rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-3 py-1.5 text-xs font-bold"
+                  >
+                    🚢 出航させる
+                  </button>
+                </div>
+              ))}
+              {!soil.length && <p className="text-center text-xs text-white/50">土の中は空っぽです（作曲すると、ここにデモが埋まります）</p>}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Player({
+  title,
+  songs,
+  start,
+  stars,
+  onStar,
+  onSwipe,
+}: {
+  title: string;
+  songs: Song[];
+  start: number;
+  stars: Record<string, number>;
+  onStar: (id: string, tier: 0 | 1 | 2 | 3) => void;
+  onSwipe: () => void;
+}) {
+  const [i, setI] = useState(start);
   const [t, setT] = useState(0);
-  const [stars, setStars] = useState<Record<string, number>>({});
-  const song = list[((i % list.length) + list.length) % list.length];
-  const prevSong = list[(((i - 1) % list.length) + list.length) % list.length];
-  const nextSong = list[(((i + 1) % list.length) + list.length) % list.length];
+  const at = (k: number) => songs[((k % songs.length) + songs.length) % songs.length];
+  const song = at(i);
   const drag = useRef<{ x: number; dx: number } | null>(null);
   const [dx, setDx] = useState(0);
 
-  // play the song (synth) and run the clock
   useEffect(() => {
     synth.play(song.preset);
     setT(0);
@@ -182,10 +395,10 @@ function Player({ island, onSwipe, onStar }: { island: Island; onSwipe: () => vo
     setI((v) => v + d);
     onSwipe();
   };
+  const many = songs.length > 1;
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
-      {/* blurred art behind */}
       <div className="pointer-events-none absolute inset-0 opacity-40 blur-2xl">
         {song.cover ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -194,28 +407,9 @@ function Player({ island, onSwipe, onStar }: { island: Island; onSwipe: () => vo
           <Artwork hue={song.hue ?? 220} emoji="" className="h-full w-full" />
         )}
       </div>
-      <div className="relative px-4 pt-[calc(10px+env(safe-area-inset-top))]">
-        <p className="mb-2 text-center text-xs tracking-[0.3em] text-white/60">⚓ {island.name}</p>
-        <div className="mx-auto flex w-full max-w-md rounded-full border border-white/15 bg-black/30 p-1">
-          {(
-            [
-              ['all', '全部'],
-              ['follow', 'フォロー'],
-              ['friend', 'ダチ'],
-            ] as const
-          ).map(([k, label]) => (
-            <button
-              key={k}
-              onClick={() => {
-                setTab(k);
-                setI(0);
-              }}
-              className={`flex-1 rounded-full py-1.5 text-sm ${tab === k ? 'bg-white/10 font-bold text-amber-200' : 'text-white/70'}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className="relative px-4 pt-[calc(12px+env(safe-area-inset-top))] text-center">
+        <p className="text-sm tracking-[0.2em] text-white/75">⚓ {title}</p>
+        <p className="text-[11px] text-white/45">{many ? `88時間以内の曲 ${songs.length}曲` : '88時間以内の曲'}</p>
       </div>
 
       <div
@@ -237,15 +431,19 @@ function Player({ island, onSwipe, onStar }: { island: Island; onSwipe: () => vo
           setDx(0);
         }}
       >
-        <button onClick={() => go(-1)} className="absolute left-0 top-1/2 w-[22%] -translate-x-[55%] -translate-y-1/2 opacity-70" aria-label="前の曲">
-          <Record song={prevSong} />
-        </button>
-        <div className="w-[min(64%,calc(100svh-420px))] transition-transform" style={{ transform: `translateX(${dx}px) rotate(${dx / 20}deg)` }}>
+        {many && (
+          <button onClick={() => go(-1)} className="absolute left-0 top-1/2 w-[22%] -translate-x-[55%] -translate-y-1/2 opacity-70" aria-label="前の曲">
+            <Record song={at(i - 1)} />
+          </button>
+        )}
+        <div className="w-[min(64%,calc(100svh-420px))]" style={{ transform: `translateX(${dx}px) rotate(${dx / 20}deg)` }}>
           <Record song={song} spinning />
         </div>
-        <button onClick={() => go(1)} className="absolute right-0 top-1/2 w-[22%] -translate-y-1/2 translate-x-[55%] opacity-70" aria-label="次の曲">
-          <Record song={nextSong} />
-        </button>
+        {many && (
+          <button onClick={() => go(1)} className="absolute right-0 top-1/2 w-[22%] -translate-y-1/2 translate-x-[55%] opacity-70" aria-label="次の曲">
+            <Record song={at(i + 1)} />
+          </button>
+        )}
       </div>
 
       <div className="relative px-6 pb-3 text-center">
@@ -259,15 +457,12 @@ function Player({ island, onSwipe, onStar }: { island: Island; onSwipe: () => vo
           <span className="w-9 text-right">{fmt(song.seconds)}</span>
         </div>
         <div className="mt-3 flex justify-center gap-4">
-          {[1, 2, 3].map((n) => {
+          {([1, 2, 3] as const).map((n) => {
             const on = (stars[song.id] ?? 0) >= n;
             return (
               <button
                 key={n}
-                onClick={() => {
-                  setStars((s) => ({ ...s, [song.id]: s[song.id] === n ? n - 1 : n }));
-                  onStar();
-                }}
+                onClick={() => onStar(song.id, stars[song.id] === n ? ((n - 1) as 0 | 1 | 2) : n)}
                 className={`flex h-12 w-12 items-center justify-center rounded-full border text-xl ${on ? 'border-amber-300 text-amber-300 shadow-[0_0_16px_rgba(255,200,80,0.6)]' : 'border-white/40 text-white/70'}`}
                 aria-label={`星${n}`}
               >
@@ -276,7 +471,7 @@ function Player({ island, onSwipe, onStar }: { island: Island; onSwipe: () => vo
             );
           })}
         </div>
-        <p className="mt-1 text-[10px] text-white/40">← スワイプで次の曲 →</p>
+        {many && <p className="mt-1 text-[10px] text-white/40">← スワイプで次の曲 →</p>}
       </div>
     </div>
   );

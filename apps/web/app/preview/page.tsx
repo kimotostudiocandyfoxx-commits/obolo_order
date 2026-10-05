@@ -13,8 +13,8 @@ export default function PreviewIndex() {
     { href: '/preview/play?day=4&at=saturn', label: '4日目：ころりん（土星で遊ぶ）から' },
     { href: '/preview/play?day=5&at=jupiter', label: '5日目：パタパタ（木星で遊ぶ）から' },
     { href: '/preview/play?day=6&at=choice', label: '6日目：フリージーの質問（ある／ない）から' },
-    { href: '/preview/play?day=6&at=mercury', label: '6日目：水星の海図（遊ぶ画面）から' },
-    { href: '/preview/play?world=mercury', label: '水星の海図だけ（チュートリアルなし）' },
+    { href: '/preview/play?day=6&at=mercury', label: '6日目：水星（船の海と島）から' },
+    { href: '/preview/play?world=mercury', label: '水星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=saturn', label: '土星ころりんだけ（チュートリアルなし）' },
     { href: '/preview/play?world=jupiter', label: '木星パタパタだけ（チュートリアルなし）' },
   ];

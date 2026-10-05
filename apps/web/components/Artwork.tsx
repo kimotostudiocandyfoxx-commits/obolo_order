@@ -18,7 +18,7 @@ export function Artwork({
 }) {
   const h2 = hue2 ?? (hue + 50) % 360;
   const style: CSSProperties = {
-    background: `
+    backgroundImage: `
       radial-gradient(circle at 75% 20%, hsl(${(hue + 30) % 360} 90% 75% / 0.55), transparent 40%),
       radial-gradient(circle at 20% 85%, hsl(${h2} 85% 60% / 0.6), transparent 45%),
       linear-gradient(135deg, hsl(${hue} 70% 35%), hsl(${h2} 65% 18%))`,
