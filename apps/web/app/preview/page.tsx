@@ -12,6 +12,7 @@ export default function PreviewIndex() {
     { href: '/preview/play?day=3&at=neo', label: '3日目：ネオの姿えらびから' },
     { href: '/preview/play?day=4&at=saturn', label: '4日目：ころりん（土星で遊ぶ）から' },
     { href: '/preview/play?day=5&at=jupiter', label: '5日目：パタパタ（木星で遊ぶ）から' },
+    { href: '/preview/play?world=saturn', label: '土星ころりんだけ（チュートリアルなし）' },
     { href: '/preview/play?world=jupiter', label: '木星パタパタだけ（チュートリアルなし）' },
   ];
   return (
