@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Artwork } from '@/components/Artwork';
 import { useAuth } from '@/lib/auth';
 import { fmt, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
+import { ComposeChat } from './ComposeChat';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
@@ -15,7 +16,7 @@ import { synth } from '@/lib/synth';
  *     the last 88 hours play; swipe for the next one; three-tier stars.
  *  島 (profile): every user has an island. Released songs decorate it as records once back from
  *     sea; demos are buried in the soil (own island only) and set sail when released.
- *  作曲 comes with the client's next design.
+ *  作曲: talk to KIMORIN (Bati once the visitor has one) and they make a demo (placeholder chat).
  * Square stage with the controls underneath (docs/devices.md). VISUAL DEMO (P-MER-2).
  */
 export interface MercuryEvents {
@@ -27,7 +28,7 @@ export interface MercuryEvents {
   onRelease?: () => void;
 }
 
-type View = { v: 'sea' } | { v: 'island'; who: 'me' | Sailor } | { v: 'play'; title: string; songs: Song[]; start: number; back: View };
+type View = { v: 'sea' } | { v: 'compose' } | { v: 'island'; who: 'me' | Sailor } | { v: 'play'; title: string; songs: Song[]; start: number; back: View };
 
 export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; overlay?: ReactNode }) {
   const { me } = useAuth();
@@ -147,6 +148,8 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
         />
       )}
 
+      {view.v === 'compose' && <ComposeChat onBury={(song) => mine.bury(song)} onOpenIsland={() => go({ v: 'island', who: 'me' })} />}
+
       {view.v === 'play' && (
         <Player
           key={`${view.title}-${view.start}-${view.songs[0]?.id}`}
@@ -167,7 +170,7 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
         <button onClick={() => go({ v: 'sea' })} className={`flex flex-col items-center text-xs ${view.v === 'sea' ? 'text-amber-200' : 'text-white/60'}`}>
           <span className="text-2xl">🗺️</span>海図
         </button>
-        <button onClick={() => say('作曲の画面は、次のデザインで作ります')} className="-mt-8 flex flex-col items-center text-xs">
+        <button onClick={() => go({ v: 'compose' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'compose' ? 'text-amber-200' : ''}`}>
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 via-fuchsia-500 to-violet-500 text-2xl shadow-[0_0_24px_rgba(220,90,255,0.6)]">♫+</span>
           作曲
         </button>

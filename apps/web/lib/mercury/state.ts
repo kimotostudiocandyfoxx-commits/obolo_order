@@ -44,6 +44,9 @@ export function useMercury() {
     [setSt],
   );
 
+  /** A new demo (from the 作曲 chat) is buried in the soil. */
+  const bury = useCallback((song: Song) => setSt((s) => ({ ...s, soil: [song, ...s.soil] })), [setSt]);
+
   const star = useCallback(
     (id: string, tier: 0 | 1 | 2 | 3) =>
       setSt((s) => {
@@ -56,5 +59,5 @@ export function useMercury() {
   );
 
   const chests = [1, 2, 3].map((t) => Object.values(st.stars).filter((v) => v === t).length) as [number, number, number];
-  return { soil: st.soil, released: st.released, stars: st.stars, chests, release, star };
+  return { soil: st.soil, released: st.released, stars: st.stars, chests, release, bury, star };
 }
