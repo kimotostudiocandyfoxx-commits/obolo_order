@@ -7,7 +7,7 @@ import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { neoForm } from '@obolo/shared';
 import { NeoChooser } from './NeoChooser';
 import { JupiterTutorial } from '@/components/jupiter/JupiterTutorial';
-import { MercuryPlaceholder } from '@/components/mercury/MercuryPlaceholder';
+import { MercuryTutorial } from '@/components/mercury/MercuryTutorial';
 import { SaturnTutorial } from '@/components/saturn/SaturnTutorial';
 import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 
@@ -364,7 +364,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, o
       )}
       {started && step?.t === 'saturn' && <SaturnTutorial onDone={next} />}
       {started && step?.t === 'jupiter' && <JupiterTutorial onDone={next} />}
-      {started && step?.t === 'mercury' && <MercuryPlaceholder onDone={next} />}
+      {started && step?.t === 'mercury' && <MercuryTutorial onDone={next} />}
       {started && step?.t === 'neo' && (
         <NeoChooser
           onChoose={async (id) => {

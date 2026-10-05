@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { PatapataWorld } from '@/components/jupiter/PatapataWorld';
+import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { neoForm } from '@obolo/shared';
@@ -12,7 +13,7 @@ import { STORIES } from '@/lib/onboarding/stories';
 /**
  * /preview/play?day=N[&at=<step type>] — plays one day's story from the start (or from its first
  * step of that type, e.g. at=jupiter) with a test name. Nothing is saved to the account.
- * /preview/play?world=jupiter | saturn — that planet's world on its own.
+ * /preview/play?world=jupiter | saturn | mercury — that planet's world on its own.
  */
 export default function PreviewPlayPage() {
   return (
@@ -29,6 +30,14 @@ function PreviewPlay() {
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);
 
+  if (q.get('world') === 'mercury') {
+    return (
+      <div className="fixed inset-0">
+        <MercuryWorld />
+        <BackLink />
+      </div>
+    );
+  }
   if (q.get('world') === 'saturn') {
     return (
       <div className="fixed inset-0">

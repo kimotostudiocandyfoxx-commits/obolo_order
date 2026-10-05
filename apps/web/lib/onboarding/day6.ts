@@ -4,8 +4,8 @@ import type { Step } from './script';
  * DAY 6 【水星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-15).
  * Flow: [認証] → wake up on Jupiter → KIMORIN: rocket to Mercury (motion 6-1) → Mercury: a sea with
  * floating islands, land on one (6-2) → Mercury temple (6-3) → フリージー (KIMORIN's friend)
- * → "have you ever put your feelings on sound?" ある / ない → Mercury play screen (the client's UI
- * comes next: P-MER-1, placeholder for now) → countdown.
+ * → "have you ever put your feelings on sound?" ある / ない → Mercury sea chart tutorial (the
+ * client's design: islands per genre, swipe through songs) → countdown.
  * Motions 6-1…6-3 are not made yet (placeholder screen). Art: freezy.webp (client, 2026-10-05).
  */
 export const DAY6: Step[] = [

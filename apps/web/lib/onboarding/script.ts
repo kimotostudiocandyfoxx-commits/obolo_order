@@ -33,7 +33,7 @@ export type Step =
   | { t: 'saturn' }
   /** Jupiter tutorial (Day 5), coached by 大根カイザー. Placeholder screen until the client's UI arrives. */
   | { t: 'jupiter' }
-  /** Mercury play screen (Day 6). Placeholder until the client's UI arrives. */
+  /** Mercury sea-chart tutorial (Day 6), coached by フリージー. */
   | { t: 'mercury' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
