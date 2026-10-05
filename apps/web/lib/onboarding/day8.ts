@@ -7,7 +7,7 @@ import type { Step } from './script';
  * Flow: [認証] → wake up on Mars → KIMORIN: off to Venus by rocket (motion 8-1) → the gorilla trio
  * ロングG / ハットG / ボスG (KIMORIN's friends) → Venus play screen (placeholder layout until the
  * client's design, P-VENUS-1) → countdown. The last day of the journey: next is the Sun temple.
- * Art: no Venus art yet — the trio's faces are cut out of the Mars mock, the backdrop is generated.
+ * Art: longg/hatg/bossg.webp (client, 2026-10-05); the Venus backdrop is still generated.
  * Who says which of the client's lines is Claude's choice (✏️).
  */
 export const DAY8: Step[] = [
@@ -25,7 +25,7 @@ export const DAY8: Step[] = [
   { t: 'caption', text: '金星に到着した' }, // ✏️
   { t: 'sprite', image: 'kimorin-3' },
   { t: 'say', who: 'KIMORIN', text: '着いたケン！\nここには、オレの友達のゴリラが3人いるんだ。' }, // ✏️
-  { t: 'sprite', image: 'gorilla-trio' },
+  { t: 'sprite', image: ['longg', 'bossg', 'hatg'] },
   { t: 'caption', text: 'ロングG、ハットG、ボスGが現れた' }, // ✏️
   { t: 'say', who: 'KIMORIN', text: 'よっ、ロングG、ハットG、ボスG！\n今日は新入りを連れてきたケン。' }, // ✏️
   // client's lines (split between the three by Claude ✏️)
@@ -42,7 +42,7 @@ export const DAY8: Step[] = [
 
   // ✏️ after playing — the last planet of the journey
   { t: 'bgm', track: 'opening' },
-  { t: 'sprite', image: 'gorilla-trio' },
+  { t: 'sprite', image: ['longg', 'bossg', 'hatg'] },
   { t: 'say', who: 'ボスG', text: '{name}の作ったもの、楽しみにしてるぜ。' },
   { t: 'sprite', image: 'kimorin-8' },
   { t: 'say', who: 'KIMORIN', text: 'これで、8つの星をぜんぶまわったケン。' },
