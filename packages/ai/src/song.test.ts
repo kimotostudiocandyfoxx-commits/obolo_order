@@ -45,3 +45,23 @@ describe('song design', () => {
     expect(parseComposeChat('ふつうの返事')).toEqual({ reply: 'ふつうの返事', ready: false });
   });
 });
+
+import { geminiContents } from './providers';
+describe('gemini contents', () => {
+  it('moves the leading greeting into the system text and merges same-side lines', () => {
+    const r = geminiContents({
+      system: 'S',
+      history: [
+        { role: 'assistant', text: 'やあ' },
+        { role: 'user', text: 'a' },
+        { role: 'user', text: 'b' },
+        { role: 'assistant', text: 'c' },
+      ],
+    });
+    expect(r.system).toContain('やあ');
+    expect(r.contents).toEqual([
+      { role: 'user', parts: [{ text: 'a\nb' }] },
+      { role: 'model', parts: [{ text: 'c' }] },
+    ]);
+  });
+});

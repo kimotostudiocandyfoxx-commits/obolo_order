@@ -12,6 +12,9 @@ import type { ComposeChatBody, ComposeChatResult, ComposeDesignBody, SongDesign 
 import { apiError } from '../common/errors';
 import { LLM } from '../infra/tokens';
 
+/** Short reason for the client (no secrets: provider error text only), so a failure can be diagnosed. */
+const why = (e: unknown) => String(e instanceof Error ? e.message : e).replace(/\s+/g, ' ').slice(0, 160);
+
 const turns = (h: ComposeChatBody['history']): ChatTurn[] => h.map((t) => ({ role: t.role === 'partner' ? 'assistant' : 'user', text: t.text }));
 
 /**
@@ -37,7 +40,7 @@ export class ComposeService {
       return parseComposeChat(raw);
     } catch (e) {
       this.log.warn(`chat failed: ${String(e)}`);
-      throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', 'The partner could not answer');
+      throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', `The partner could not answer: ${why(e)}`);
     }
   }
 
@@ -46,13 +49,15 @@ export class ComposeService {
     const partner = { name: body.partner, isBati: body.isBati };
     const req = { system: songDesignSystem(partner, body.genre), history: turns(body.history), json: true, temperature: 0.9, maxOutputTokens: 2000 };
     // one retry: the model sometimes returns lyrics without kana
+    let last: unknown;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         return buildSongDesign(await this.llm.chat(req), partner, body.genre);
       } catch (e) {
+        last = e;
         this.log.warn(`design attempt ${attempt + 1} failed: ${String(e)}`);
       }
     }
-    throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', 'The song could not be made');
+    throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', `The song could not be made: ${why(last)}`);
   }
 }

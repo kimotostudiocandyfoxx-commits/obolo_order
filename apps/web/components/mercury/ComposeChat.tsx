@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Artwork } from '@/components/Artwork';
-import { getApi } from '@/lib/api';
+import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { usePartner } from '@/lib/partner';
 import { GENRES, makeSong, pickGenre, songFromDesign, type Genre, type MadeSong } from '@/lib/mercury/compose';
@@ -71,8 +71,8 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
       say(r.reply);
       // the partner decides when it knows enough; after two answers the genres show anyway
       if (r.ready || msgs.filter((m) => m.who === 'me').length + 1 >= 2) setPending(t);
-    } catch {
-      say(hasBati ? 'ごめん、うまく聞き取れなかった。もう一回話して？' : 'すまん、うまく聞き取れなかったケン。もう一回話してくれ。');
+    } catch (e) {
+      say((hasBati ? 'ごめん、うまく聞き取れなかった。もう一回話して？' : 'すまん、うまく聞き取れなかったケン。もう一回話してくれ。') + detail(e));
     } finally {
       setBusy(false);
       setTyping(false);
@@ -97,8 +97,8 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
       const d = await getApi().composeDesign({ partner: partner.name, isBati: hasBati, genre, history: history(label) });
       const song = songFromDesign(d, artist);
       setMsgs((m) => [...m, { who: 'partner', text: d.comment }, { who: 'song', song }]);
-    } catch {
-      say(hasBati ? 'ごめん、うまく作れなかった……。もう一回ジャンルを選んで？' : 'すまん、うまく作れなかったケン……。もう一回ジャンルを選んでくれ。');
+    } catch (e) {
+      say((hasBati ? 'ごめん、うまく作れなかった……。もう一回ジャンルを選んで？' : 'すまん、うまく作れなかったケン……。もう一回ジャンルを選んでくれ。') + detail(e));
       setPending(words);
     } finally {
       setBusy(false);
@@ -188,6 +188,11 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
       </div>
     </div>
   );
+}
+
+/** The reason under an error line (status / code / provider message) so failures can be reported. */
+function detail(e: unknown) {
+  return e instanceof ApiError ? `\n（${e.status} ${e.code}${e.message ? `: ${e.message.slice(0, 120)}` : ''}）` : `\n（${String(e).slice(0, 120)}）`;
 }
 
 export function Face({ face, size }: { face: string; size: number }) {

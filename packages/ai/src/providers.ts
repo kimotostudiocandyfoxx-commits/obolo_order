@@ -2,29 +2,59 @@ import { GoogleGenAI } from '@google/genai';
 import { mockSongDesign } from './song';
 import type { ChatRequest, LlmProvider } from './types';
 
+/**
+ * Gemini wants the conversation to start with the user and to alternate: leading partner lines
+ * (e.g. the greeting) move into the system text, consecutive lines of the same side are merged.
+ */
+export function geminiContents(req: ChatRequest): { system: string; contents: { role: 'user' | 'model'; parts: { text: string }[] }[] } {
+  const turns = [...req.history];
+  const lead: string[] = [];
+  while (turns.length && turns[0].role === 'assistant') lead.push(turns.shift()!.text);
+  const contents: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
+  for (const t of turns) {
+    const role = t.role === 'assistant' ? 'model' : 'user';
+    const last = contents[contents.length - 1];
+    if (last?.role === role) last.parts[0].text += `\n${t.text}`;
+    else contents.push({ role, parts: [{ text: t.text }] });
+  }
+  const system = lead.length ? `${req.system}\n\n（会話の最初にあなたが言ったこと：${lead.join(' / ')}）` : req.system;
+  return { system, contents };
+}
+
 export class GeminiProvider implements LlmProvider {
   readonly name = 'gemini';
   private readonly client: GoogleGenAI;
-  constructor(
-    apiKey: string,
-    private readonly model: string,
-  ) {
+  /** first model that answers is kept; the rest are fallbacks when a model name is unknown / retired */
+  private readonly models: string[];
+  constructor(apiKey: string, model: string | string[]) {
     this.client = new GoogleGenAI({ apiKey });
+    this.models = Array.isArray(model) ? model : [model];
   }
   async chat(req: ChatRequest): Promise<string> {
-    const res = await this.client.models.generateContent({
-      model: this.model,
-      contents: req.history.map((t) => ({ role: t.role === 'assistant' ? 'model' : 'user', parts: [{ text: t.text }] })),
-      config: {
-        systemInstruction: req.system,
-        temperature: req.temperature ?? 0.9,
-        maxOutputTokens: req.maxOutputTokens ?? 800,
-        ...(req.json ? { responseMimeType: 'application/json' } : {}),
-      },
-    });
-    const text = res.text?.trim();
-    if (!text) throw new Error('Gemini returned an empty response');
-    return text;
+    const { system, contents } = geminiContents(req);
+    let lastErr: unknown;
+    for (const model of this.models) {
+      try {
+        const res = await this.client.models.generateContent({
+          model,
+          contents,
+          config: {
+            systemInstruction: system,
+            temperature: req.temperature ?? 0.9,
+            maxOutputTokens: req.maxOutputTokens ?? 800,
+            ...(req.json ? { responseMimeType: 'application/json' } : {}),
+          },
+        });
+        const text = res.text?.trim();
+        if (!text) throw new Error(`Gemini (${model}) returned an empty response`);
+        return text;
+      } catch (e) {
+        lastErr = e;
+        // only an unknown model name moves on to the next model
+        if (!/404|not found|NOT_FOUND|is not supported/i.test(String(e))) throw e;
+      }
+    }
+    throw lastErr;
   }
 }
 
@@ -125,7 +155,8 @@ export interface LlmConfig {
 export function createLlm(cfg: LlmConfig): LlmProvider {
   const chain: LlmProvider[] = [];
   // P-AI-1: Flash-Lite for every text call (Bati chat on all planets, song design) — client, 2026-10-06 (cost).
-  if (cfg.geminiApiKey) chain.push(new GeminiProvider(cfg.geminiApiKey, cfg.geminiModel || 'gemini-2.5-flash-lite'));
+  // The "-latest" alias follows Google's current Flash-Lite, so a retired version never breaks the app.
+  if (cfg.geminiApiKey) chain.push(new GeminiProvider(cfg.geminiApiKey, cfg.geminiModel ? [cfg.geminiModel] : ['gemini-flash-lite-latest', 'gemini-2.5-flash-lite']));
   if (cfg.openaiApiKey) chain.push(new OpenAiProvider(cfg.openaiApiKey, cfg.openaiModel || 'gpt-4o-mini'));
   if (chain.length === 0) return new MockProvider();
   return chain.length === 1 ? chain[0] : new FallbackProvider(chain, cfg.onError);
