@@ -5,6 +5,11 @@ name: Deploy Music GPU
 
 on:
   workflow_dispatch:
+    inputs:
+      refresh_weights:
+        description: 'モデルを入れ直し、正しい一式以外のファイルを消す'
+        type: boolean
+        default: false
   push:
     branches: [main, claude/solar-system-home-planets-ew766y]
     paths: ['gpu/music/**']
@@ -60,12 +65,15 @@ jobs:
         run: |
           MODEL="${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }}"
           MARK="gs://$BUCKET/ace15/.ready-$MODEL"
-          if gcloud storage ls "$MARK" >/dev/null 2>&1; then echo "weights already in the bucket"; exit 0; fi
+          REFRESH="${{ inputs.refresh_weights || false }}"
+          if [ "$REFRESH" != "true" ] && gcloud storage ls "$MARK" >/dev/null 2>&1; then echo "weights already in the bucket"; exit 0; fi
           sudo mkdir -p /mnt/ace15 /mnt/hf && sudo chmod 777 /mnt/ace15 /mnt/hf
           docker run --rm -e ACESTEP_CHECKPOINTS_DIR=/ckpt -e HF_HOME=/hf -e ACE15_MODEL="$MODEL" \
             -v /mnt/ace15:/ckpt -v /mnt/hf:/hf "$IMAGE" python /app/app.py download
           du -sh /mnt/ace15
-          gcloud storage rsync -r /mnt/ace15 "gs://$BUCKET/ace15"
+          # refresh: also delete leftovers (partial downloads) that are not part of the model set
+          if [ "$REFRESH" = "true" ]; then DEL=--delete-unmatched-destination-objects; else DEL=; fi
+          gcloud storage rsync -r $DEL /mnt/ace15 "gs://$BUCKET/ace15"
           echo ok | gcloud storage cp - "$MARK"
 
       - name: Deploy (GPU)
