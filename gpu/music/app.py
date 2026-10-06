@@ -9,10 +9,11 @@ background thread at start-up (weights cached on the Cloud Storage volume mounte
 cold instance answers 503 {"warming": true} until it is ready; the API tells the visitor to retry.
 
 ENGINE (MUSIC_ENGINE):
-  acestep  (default, client decision 2026-10-06) — ACE-Step, Apache-2.0, commercial use OK.
-           The design's chords + melody are rendered as a synth guide and given as the reference
-           audio (audio2audio) so the instrumental keeps the design's tempo, key and chords.
-  musicgen — MusicGen-Melody (CC-BY-NC weights: tests only, never for the paid service).
+  acestep15 (default, client decision 2026-10-06) — ACE-Step 1.5 (MIT, commercial use OK).
+            Tempo, key, length and "instrumental" are passed directly from the song design.
+            Optionally (ACE_REF_STRENGTH > 0) the design's chords + melody synth guide is used as
+            a cover source; off by default (the v1 test with the guide came out muffled / noisy).
+  musicgen  — MusicGen-Melody (CC-BY-NC weights: tests only, never for the paid service).
 """
 import os
 import subprocess
@@ -28,11 +29,12 @@ from scipy.io import wavfile
 
 from render import render_guide
 
-ENGINE = os.environ.get("MUSIC_ENGINE", "acestep")
+ENGINE = os.environ.get("MUSIC_ENGINE", "acestep15")
 MODEL_ID = os.environ.get("MUSIC_MODEL", "facebook/musicgen-melody-large")
-ACE_DIR = os.environ.get("ACE_CHECKPOINT_DIR", "/models/ace-step")
-# how closely the result follows the synth guide (0 = ignore it, 1 = copy it). PLACEHOLDER (P-MER-6): tune by ear.
-ACE_REF_STRENGTH = float(os.environ.get("ACE_REF_STRENGTH", "0.35"))
+# ACE-Step 1.5 DiT: acestep-v15-turbo (2B, fast) or acestep-v15-xl-turbo (4B, better, fits a 24 GB L4)
+ACE15_MODEL = os.environ.get("ACE15_MODEL", "acestep-v15-turbo")
+# how strongly the synth guide steers the result (0 = not used). PLACEHOLDER (P-MER-6): tune by ear.
+ACE_REF_STRENGTH = float(os.environ.get("ACE_REF_STRENGTH", "0"))
 NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
 state: dict = {"engine": None, "error": None, "loading": False}
@@ -43,56 +45,57 @@ app = FastAPI()
 # --- engines --------------------------------------------------------------------------------------
 
 
-class AceStep:
+class AceStep15:
+    """ACE-Step 1.5 (MIT, commercial use OK). DiT only: our own song design already fixes the tempo,
+    key and length, so the 5Hz LM planner is not needed (faster, less GPU memory)."""
+
     max_seconds = 120
 
     def __init__(self) -> None:
-        from acestep.pipeline_ace_step import ACEStepPipeline
+        from acestep.handler import AceStepHandler
 
-        os.makedirs(ACE_DIR, exist_ok=True)
-        self.pipe = ACEStepPipeline(checkpoint_dir=ACE_DIR, dtype="bfloat16", torch_compile=False)
-        # download (first start) and load the weights now instead of on the first request
-        if hasattr(self.pipe, "load_checkpoint"):
-            self.pipe.load_checkpoint(ACE_DIR)
+        self.handler = AceStepHandler()
+        msg, ok = self.handler.initialize_service(
+            project_root=os.environ.get("ACESTEP_PROJECT_ROOT", "/opt/ace"),
+            config_path=ACE15_MODEL,
+            device="cuda",
+            prefer_source="huggingface",
+        )
+        if not ok:
+            raise RuntimeError(f"ACE-Step 1.5 init failed: {msg}")
 
     def generate(self, r: "GenerateReq", seconds: float, guide: np.ndarray, guide_sr: int) -> tuple[np.ndarray, int]:
-        tags = f"{r.prompt}, {r.bpm} bpm, {NAMES[r.keyRoot]} {r.scale}, instrumental"
+        from acestep.inference import GenerationConfig, GenerationParams, generate_music
+
+        key = f"{NAMES[r.keyRoot]} {'Major' if r.scale == 'major' else 'minor'}"
         with tempfile.TemporaryDirectory() as d:
-            ref = os.path.join(d, "guide.wav")
-            wavfile.write(ref, guide_sr, (guide * 32767).astype(np.int16))
-            out = os.path.join(d, "out.wav")
-            args = dict(
-                audio_duration=seconds,
-                prompt=tags,
-                lyrics="[instrumental]",
-                infer_step=60,
-                guidance_scale=15.0,
-                scheduler_type="euler",
-                cfg_type="apg",
-                omega_scale=10.0,
-                manual_seeds=None,
-                guidance_interval=0.5,
-                guidance_interval_decay=0.0,
-                min_guidance_scale=3.0,
-                use_erg_tag=True,
-                use_erg_lyric=False,
-                use_erg_diffusion=True,
-                oss_steps=None,
-                guidance_scale_text=0.0,
-                guidance_scale_lyric=0.0,
-                save_path=out,
-                format="wav",
+            extra: dict = {}
+            if ACE_REF_STRENGTH > 0:
+                # optional: let the synth guide (design chords + melody) steer the result as a cover source
+                ref = os.path.join(d, "guide.wav")
+                wavfile.write(ref, guide_sr, (guide * 32767).astype(np.int16))
+                extra = dict(task_type="cover", src_audio=ref, audio_cover_strength=ACE_REF_STRENGTH)
+            params = GenerationParams(
+                **({"task_type": "text2music"} | extra),
+                caption=f"{r.prompt}, instrumental"[:512],
+                lyrics="[Instrumental]",
+                instrumental=True,
+                bpm=r.bpm,
+                keyscale=key,
+                timesignature="4",
+                duration=max(10.0, seconds),
+                inference_steps=8,
+                shift=3.0,
+                thinking=False,
+                use_cot_metas=False,
+                use_cot_caption=False,
+                use_cot_language=False,
             )
-            try:
-                # steer the tempo / key / chords with the guide (reference audio)
-                self.pipe(**args, audio2audio_enable=True, ref_audio_strength=ACE_REF_STRENGTH, ref_audio_input=ref)
-            except TypeError:
-                # an ACE-Step version without audio2audio: text only
-                self.pipe(**args)
-            path = out if os.path.exists(out) else next((os.path.join(d, f) for f in os.listdir(d) if f.endswith((".wav", ".flac", ".mp3")) and f != "guide.wav"), None)
-            if not path:
-                raise RuntimeError("ACE-Step produced no audio file")
-            return read_audio(path)
+            config = GenerationConfig(batch_size=1, audio_format="wav", use_random_seed=True)
+            result = generate_music(self.handler, None, params, config, save_dir=d)
+            if not result.success or not result.audios:
+                raise RuntimeError(f"ACE-Step 1.5: {result.error}")
+            return read_audio(result.audios[0]["path"])
 
 
 class MusicGen:
@@ -131,7 +134,7 @@ def read_audio(path: str) -> tuple[np.ndarray, int]:
 def load() -> None:
     state["loading"] = True
     try:
-        state["engine"] = AceStep() if ENGINE == "acestep" else MusicGen()
+        state["engine"] = MusicGen() if ENGINE == "musicgen" else AceStep15()
         print(f"engine {ENGINE} ready", flush=True)
     except Exception as e:  # noqa: BLE001 — reported by /health and /generate
         state["error"] = f"{e!r}"

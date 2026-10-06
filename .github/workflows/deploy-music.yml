@@ -63,7 +63,7 @@ jobs:
             --concurrency 1 --min-instances 0 --max-instances 1 --timeout 900 \
             --add-volume name=models,type=cloud-storage,bucket="$BUCKET" \
             --add-volume-mount volume=models,mount-path=/models \
-            --set-env-vars HF_HOME=/models/hf,ACE_CHECKPOINT_DIR=/models/ace-step,MUSIC_ENGINE=${{ vars.MUSIC_ENGINE || 'acestep' }},MUSIC_MODEL=${{ vars.MUSIC_MODEL || 'facebook/musicgen-melody-large' }}
+            --set-env-vars HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,MUSIC_ENGINE=${{ vars.MUSIC_ENGINE || 'acestep15' }},ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }},ACE_REF_STRENGTH=${{ vars.ACE_REF_STRENGTH || '0' }}
           URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
           echo "### Music GPU: $URL" >> "$GITHUB_STEP_SUMMARY"
           echo "次に Actions → Deploy API → Run workflow を実行してください（API がこの URL を使い始めます）" >> "$GITHUB_STEP_SUMMARY"
