@@ -59,7 +59,7 @@
 | P-VENUS-3 | ✏️ | 金星のつくる | 作曲・撮影と同じ仮組み：KIMORIN（バティができたらバティ）に話しかけるとグッズになるチャット | `components/venus/VenusWorld.tsx`、`lib/venus/make.ts` |
 | P-MER-1 | 🟡 | 水星の画面（海・島） | クライアントのデザイン（第2版）どおりに実装。海・船・島・宝箱の絵はデザイン画から切り出したもの。正式な素材（文字なしの海、船、島の種類）が届いたら差し替え。作曲画面は次のデザイン待ち | `components/mercury/MercuryWorld.tsx`、`public/onboarding/mercury-*.jpg`、`ship-*.webp`、`chest-*.webp` |
 | P-MER-2 | 🟡 | 水星のデータ | 船8人とその曲はサンプル（絵文字のレコード、音はシンセ）。自分のデモ曲3つはデザイン画のレコード。自分の島・星はこの端末だけに保存。友達の島へ行く入口はまだない | `lib/mercury/sea.ts`、`lib/mercury/state.ts` |
-| P-MER-3 | ✏️ | 水星の作曲 | デザインができるまでの仮組み：KIMORIN（バティができたらバティ）に話しかけると曲になるチャット。曲はその場で作る仮のもの（話した言葉からタイトル・歌詞4行、レコードは絵文字、音はシンセ）。本物は AI＋音楽生成につなぐ。バティの有無はいまは「ORDER会員か」で判定 | `components/mercury/ComposeChat.tsx`、`lib/mercury/compose.ts` |
+| P-MER-3 | 🟡 | 水星の作曲 | **会話と曲の設計図は本物のAI（Gemini）**：パートナー（KIMORIN／バティ）と話す → ジャンルを選ぶ → 曲名・歌詞（ひらがな付き）・コード・テンポ・メロディ（1音ずつ）ができる。試し聴きはブラウザのシンセでメロディとコードを鳴らすだけ。**伴奏（MusicGen）と歌（DiffSinger）はまだ**（GPUサーバー待ち）。デモモードでは従来の仮の作曲 | `apps/api/src/compose/`、`packages/ai/src/song.ts`、`components/mercury/ComposeChat.tsx` |
 | P-JUP-1 | 🟡 | 木星（パタパタ）の画面 | クライアントのデザイン（空・木）どおりに実装。蝶と木の絵はモックから切り出したもの。正式な素材（蝶の絵、写真・文字なしの木）が届いたら差し替え | `components/jupiter/PatapataWorld.tsx`、`public/onboarding/bf-*.webp`、`jupiter-tree.webp` |
 | P-JUP-2 | 🟡 | 木星のデータ | 住人12人と投稿はサンプル（絵文字の写真）。自分の根っこ・投稿はこの端末だけに保存（サーバー未対応） | `lib/jupiter/residents.ts`、`lib/jupiter/state.ts` |
 | P-JUP-3 | 🟡 | 8秒を超える動画 | 拒否せず、最初の8秒をくり返し再生。切り出し画面はまだない | `components/jupiter/PostCircle.tsx` |
@@ -95,6 +95,7 @@
 | ID | 状態 | 内容 | 現在の仮実装 |
 |---|---|---|---|
 | P-WALLET-1 | 🟡 | 月額 88 MANA の付与 | サブスク未接続のため、**新規登録時に 88 MANA を1回だけ付与**（台帳理由 `demo_grant`） |
+| P-MER-4 | ✏️ | 作曲の回数 | 1人1日20曲まで（MANA での料金は未決） | `apps/api/src/compose/compose.controller.ts` |
 | P-MEDIA-3 | ✏️ | 動画の長さの上限 | 既定60秒（木星は8秒）。火星の動画の最大の長さはクライアント未決 | `packages/shared/src/config.ts`（`MEDIA_POLICY`） |
 | P-MEDIA-4 | ⚪ | Bunny の配信プラン | 少人数のうちは Standard。人が増えたら Volume に切り替え（docs/media.md） | Bunny 管理画面 |
 | P-USE-1 | 🔴 | 1日88分の利用時間 | クライアントの決まり（全惑星合計で1日88分）。**まだ作っていない**。費用の上限の前提なので次に作る | — |

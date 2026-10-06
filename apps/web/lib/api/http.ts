@@ -81,6 +81,12 @@ export class HttpApi implements Api {
   uploadVoice(blob: Blob) {
     return this.req<{ id: string; url: string }>('POST', '/media/voice', undefined, blob);
   }
+  composeChat(body: Parameters<Api['composeChat']>[0]) {
+    return this.req<Awaited<ReturnType<Api['composeChat']>>>('POST', '/compose/chat', body);
+  }
+  composeDesign(body: Parameters<Api['composeDesign']>[0]) {
+    return this.req<Awaited<ReturnType<Api['composeDesign']>>>('POST', '/compose/design', body);
+  }
   uploadPhoto(blob: Blob) {
     return this.req<Awaited<ReturnType<Api['uploadPhoto']>>>('POST', '/media/photo', undefined, blob);
   }

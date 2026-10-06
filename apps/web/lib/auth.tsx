@@ -2,7 +2,7 @@
 
 import type { Me } from '@obolo/shared';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { getApi, tokenStore } from './api';
+import { ApiError, getApi, tokenStore } from './api';
 
 type Status = 'loading' | 'guest' | 'authed';
 
@@ -25,16 +25,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStatus('guest');
       return;
     }
-    getApi()
-      .me()
-      .then((u) => {
-        setMe(u);
-        setStatus('authed');
-      })
-      .catch(() => {
-        tokenStore.clear();
-        setStatus('guest');
-      });
+    // Only a rejected session logs out; a network hiccup while opening keeps the token (retried once).
+    const load = (retry: boolean) =>
+      getApi()
+        .me()
+        .then((u) => {
+          setMe(u);
+          setStatus('authed');
+        })
+        .catch((e) => {
+          if (e instanceof ApiError && e.status === 401) {
+            tokenStore.clear();
+            setStatus('guest');
+          } else if (retry) setTimeout(() => void load(false), 1500);
+          else setStatus('guest');
+        });
+    void load(true);
   }, []);
 
   const signIn = useCallback((token: string, u: Me) => {

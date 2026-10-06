@@ -10,6 +10,8 @@ export interface ChatRequest {
   history: ChatTurn[];
   temperature?: number;
   maxOutputTokens?: number;
+  /** Ask for a JSON object as the whole answer (song design etc.). */
+  json?: boolean;
 }
 
 /** Provider-agnostic LLM interface (spec §7.4). Gemini primary, OpenAI fallback. */

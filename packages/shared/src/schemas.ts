@@ -136,3 +136,18 @@ export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;
 /** Day 3: refine the chosen look with one instruction (3 times). */
 export const RefineLookBody = z.object({ mediaId: z.string().uuid(), instruction: z.string().trim().min(1).max(60) });
 export type RefineLookBody = z.infer<typeof RefineLookBody>;
+
+/** Mercury 作曲: the conversation so far (the partner's and the visitor's lines). */
+const ComposeTurn = z.object({ role: z.enum(['user', 'partner']), text: z.string().trim().min(1).max(400) });
+export const ComposeChatBody = z.object({
+  /** Bati's name once it exists; KIMORIN otherwise */
+  partner: z.string().trim().min(1).max(20),
+  isBati: z.boolean(),
+  history: z.array(ComposeTurn).min(1).max(30),
+});
+export type ComposeChatBody = z.infer<typeof ComposeChatBody>;
+
+export const ComposeDesignBody = ComposeChatBody.extend({
+  genre: z.enum(['pop', 'rock', 'hiphop', 'ballad', 'edm', 'auto']),
+});
+export type ComposeDesignBody = z.infer<typeof ComposeDesignBody>;

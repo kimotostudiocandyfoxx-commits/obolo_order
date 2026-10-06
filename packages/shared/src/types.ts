@@ -136,3 +136,54 @@ export interface Paged<T> {
 export interface ApiErrorBody {
   error: { code: string; message: string };
 }
+
+/**
+ * Mercury 作曲 (client decision 2026-10-06): the partner (KIMORIN / Bati) talks with the visitor,
+ * then an LLM designs the song. The design is the blueprint for the instrumental (MusicGen) and the
+ * vocal (DiffSinger): lyrics in kana, chords, tempo and a melody of one note per mora.
+ */
+export interface SongNote {
+  /** one mora in hiragana ("きょ", "ん", "っ"); '' = rest */
+  kana: string;
+  /** MIDI note number; null for a rest */
+  midi: number | null;
+  beats: number;
+}
+
+export interface SongLine {
+  text: string;
+  kana: string;
+  notes: SongNote[];
+}
+
+export interface SongSection {
+  name: 'verse' | 'chorus' | 'bridge';
+  lines: SongLine[];
+}
+
+export interface SongDesign {
+  title: string;
+  emoji: string;
+  genre: string;
+  mood: string;
+  bpm: number;
+  /** pitch class of the key, 0 = C … 11 = B */
+  keyRoot: number;
+  scale: 'major' | 'minor';
+  /** chord loop as scale degrees (0 = I) and as names for display */
+  progression: number[];
+  chords: string[];
+  sections: SongSection[];
+  /** English prompt for the instrumental generator (no vocals) */
+  instrumentalPrompt: string;
+  /** the partner's line when handing the song over */
+  comment: string;
+  /** length of one pass through all sections */
+  seconds: number;
+}
+
+export interface ComposeChatResult {
+  reply: string;
+  /** enough was said to make a song: show the genre buttons */
+  ready: boolean;
+}

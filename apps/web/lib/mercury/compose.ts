@@ -1,3 +1,4 @@
+import type { SongDesign } from '@obolo/shared';
 import { P, type Song } from './sea';
 
 /**
@@ -80,6 +81,29 @@ export function pickGenre(text: string): Genre {
 export interface MadeSong extends Song {
   lyrics: string[];
   genre: Genre;
+  /** the AI-made blueprint (lyrics in kana, chords, melody) — absent for offline songs */
+  design?: SongDesign;
+}
+
+const WAVE: Record<Genre, OscillatorType> = { pop: 'triangle', rock: 'sawtooth', hiphop: 'square', ballad: 'sine', edm: 'sawtooth' };
+
+/** A song card from the AI design: the preview plays its chords and its melody. */
+export function songFromDesign(d: SongDesign, artist: string): MadeSong {
+  const genre = (GENRES.some((g) => g.id === d.genre) ? d.genre : 'pop') as Genre;
+  const root = 57 + ((d.keyRoot + 3) % 12); // 57–68, comfortable for the pads
+  const lines = d.sections.flatMap((s) => s.lines);
+  return {
+    id: `d-${Date.now().toString(36)}`,
+    title: d.title,
+    artist,
+    emoji: d.emoji,
+    hue: hash(d.title) % 360,
+    seconds: d.seconds,
+    preset: { ...P(d.bpm, root, d.scale, d.progression, WAVE[genre]), melody: lines.flatMap((l) => l.notes).map((n) => ({ midi: n.midi === null ? null : n.midi + 12, beats: n.beats })) },
+    lyrics: lines.map((l) => l.text),
+    genre,
+    design: d,
+  };
 }
 
 export function makeSong(text: string, genre: Genre, artist: string): MadeSong {

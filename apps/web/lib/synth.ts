@@ -10,6 +10,8 @@ export interface SynthPreset {
   mode: 'major' | 'minor';
   progression: number[];
   wave: OscillatorType;
+  /** optional sung melody (one note per mora), looped over its own length */
+  melody?: { midi: number | null; beats: number }[];
 }
 
 const SCALES = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10] };
@@ -24,6 +26,8 @@ class Engine {
   private step = 0;
   private nextTime = 0;
   private onLoop: (() => void) | null = null;
+  private melodyAt = new Map<number, { midi: number; len: number }>();
+  private melodyLen = 0;
 
   /** Must be called from a user gesture the first time (iOS). */
   unlock(): boolean {
@@ -55,6 +59,13 @@ class Engine {
     this.preset = p;
     this.onLoop = onLoop ?? null;
     this.step = 0;
+    this.melodyAt.clear();
+    this.melodyLen = 0;
+    for (const n of p.melody ?? []) {
+      const len = Math.max(1, Math.round(n.beats * 4));
+      if (n.midi !== null) this.melodyAt.set(this.melodyLen, { midi: n.midi, len });
+      this.melodyLen += len;
+    }
     this.nextTime = this.ctx.currentTime + 0.05;
     this.master!.gain.cancelScheduledValues(this.ctx.currentTime);
     this.master!.gain.setValueAtTime(0.0001, this.ctx.currentTime);
@@ -98,6 +109,11 @@ class Engine {
     if (inBar % 4 === 0) this.kick(t);
     if (inBar % 4 === 2) this.hat(t);
     if (inBar === 0 || inBar === 8 || inBar === 11) this.tone(midiHz(notes[0] - 24), t, s16 * 3, 'sine', 0.22, 0.01); // bass
+    if (this.melodyLen) {
+      const n = this.melodyAt.get(step % this.melodyLen);
+      if (n) this.tone(midiHz(n.midi), t, s16 * n.len * 0.92, 'triangle', 0.16, 0.01);
+      return; // the melody replaces the arpeggio
+    }
     if (inBar % 2 === 0) {
       const arp = notes[(inBar / 2) % 3] + 12 * (inBar % 8 < 4 ? 1 : 2) - 12;
       this.tone(midiHz(arp), t, s16 * 1.6, p.wave, p.wave === 'sine' ? 0.09 : 0.035, 0.005, 2400);

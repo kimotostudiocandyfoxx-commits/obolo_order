@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Artwork } from '@/components/Artwork';
+import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { usePartner } from '@/lib/partner';
-import { GENRES, makeSong, pickGenre, type Genre, type MadeSong } from '@/lib/mercury/compose';
+import { GENRES, makeSong, pickGenre, songFromDesign, type Genre, type MadeSong } from '@/lib/mercury/compose';
 import { fmt } from '@/lib/mercury/sea';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
@@ -38,6 +39,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   const [text, setText] = useState('');
   const [pending, setPending] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [typing, setTyping] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null);
   const [buried, setBuried] = useState<Set<string>>(new Set());
   const end = useRef<HTMLDivElement>(null);
@@ -45,28 +47,62 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   useEffect(() => () => synth.stop(), []);
 
   const say = (t: string) => setMsgs((m) => [...m, { who: 'partner', text: t }]);
+  // live: the partner and the song come from the AI (Gemini); demo: the offline song maker
+  const live = getApi().mode === 'live';
+  const history = (extra?: string) => [
+    ...msgs.flatMap((m) => (m.who === 'song' ? [] : [{ role: m.who === 'me' ? ('user' as const) : ('partner' as const), text: m.text.slice(0, 400) }])),
+    ...(extra ? [{ role: 'user' as const, text: extra.slice(0, 400) }] : []),
+  ].slice(-30);
 
-  const send = () => {
+  const send = async () => {
     const t = text.trim();
     if (!t || busy) return;
     setText('');
     setMsgs((m) => [...m, { who: 'me', text: t }]);
-    setPending(t);
-    setTimeout(() => say(`いいね！「${[...t].slice(0, 14).join('')}${[...t].length > 14 ? '…' : ''}」か。どんな感じの曲にする${partner.end ? 'ケン？' : '？'}`), 500);
+    if (!live) {
+      setPending(t);
+      setTimeout(() => say(`いいね！「${[...t].slice(0, 14).join('')}${[...t].length > 14 ? '…' : ''}」か。どんな感じの曲にする${partner.end ? 'ケン？' : '？'}`), 500);
+      return;
+    }
+    setBusy(true);
+    setTyping(true);
+    try {
+      const r = await getApi().composeChat({ partner: partner.name, isBati: hasBati, history: history(t) });
+      say(r.reply);
+      // the partner decides when it knows enough; after two answers the genres show anyway
+      if (r.ready || msgs.filter((m) => m.who === 'me').length + 1 >= 2) setPending(t);
+    } catch {
+      say(hasBati ? 'ごめん、うまく聞き取れなかった。もう一回話して？' : 'すまん、うまく聞き取れなかったケン。もう一回話してくれ。');
+    } finally {
+      setBusy(false);
+      setTyping(false);
+    }
   };
 
-  const compose = (genre: Genre | 'auto') => {
+  const compose = async (genre: Genre | 'auto') => {
     if (!pending) return;
-    const g = genre === 'auto' ? pickGenre(pending) : genre;
-    setMsgs((m) => [...m, { who: 'me', text: genre === 'auto' ? 'おまかせ！' : GENRES.find((x) => x.id === g)!.label }]);
+    const label = genre === 'auto' ? 'おまかせ！' : GENRES.find((x) => x.id === genre)!.label;
+    setMsgs((m) => [...m, { who: 'me', text: label }]);
     const words = pending;
     setPending(null);
     setBusy(true);
-    setTimeout(() => {
+    const offline = () => makeSong(words, genre === 'auto' ? pickGenre(words) : genre, artist);
+    try {
+      if (!live) {
+        await new Promise((r) => setTimeout(r, 2200));
+        const song = offline();
+        setMsgs((m) => [...m, { who: 'partner', text: hasBati ? 'できたよ！ 聴いてみて。' : 'できたケン！ 聴いてみろ。' }, { who: 'song', song }]);
+        return;
+      }
+      const d = await getApi().composeDesign({ partner: partner.name, isBati: hasBati, genre, history: history(label) });
+      const song = songFromDesign(d, artist);
+      setMsgs((m) => [...m, { who: 'partner', text: d.comment }, { who: 'song', song }]);
+    } catch {
+      say(hasBati ? 'ごめん、うまく作れなかった……。もう一回ジャンルを選んで？' : 'すまん、うまく作れなかったケン……。もう一回ジャンルを選んでくれ。');
+      setPending(words);
+    } finally {
       setBusy(false);
-      const song = makeSong(words, g, artist);
-      setMsgs((m) => [...m, { who: 'partner', text: hasBati ? 'できたよ！ 聴いてみて。' : 'できたケン！ 聴いてみろ。' }, { who: 'song', song }]);
-    }, 2200);
+    }
   };
 
   return (
@@ -75,7 +111,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
         <Face face={partner.face} size={40} />
         <div>
           <p className="text-sm font-bold">{partner.name}と作曲</p>
-          <p className="text-[11px] text-white/50">話しかけると、{partner.name}が曲にしてくれる（仮の画面）</p>
+          <p className="text-[11px] text-white/50">話しかけると、{partner.name}が曲にしてくれる（{live ? 'AI作曲・伴奏と歌はこれから' : '仮の画面'}）</p>
         </div>
       </div>
 
@@ -131,7 +167,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
         {busy && (
           <div className="flex items-end gap-2">
             <Face face={partner.face} size={32} />
-            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">♪ 作曲中…</p>
+            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{typing ? '……' : '♪ 作曲中…'}</p>
           </div>
         )}
         <div ref={end} />
@@ -142,11 +178,11 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && send()}
+          onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && void send()}
           placeholder="今日あったことを話してみよう"
           className="min-w-0 flex-1 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm outline-none"
         />
-        <button onClick={send} disabled={!text.trim() || busy} className="rounded-full bg-violet-500 px-4 py-2.5 text-sm font-bold disabled:opacity-40">
+        <button onClick={() => void send()} disabled={!text.trim() || busy} className="rounded-full bg-violet-500 px-4 py-2.5 text-sm font-bold disabled:opacity-40">
           送る
         </button>
       </div>
@@ -194,10 +230,22 @@ function SongCard({
         </div>
       </div>
       <div className="mt-3 rounded-2xl bg-black/25 p-3 text-center text-sm leading-relaxed text-white/85">
-        {song.lyrics.map((l, i) => (
-          <p key={i}>{l}</p>
-        ))}
+        {song.design
+          ? song.design.sections.map((s) => (
+              <div key={s.name} className="mb-2 last:mb-0">
+                <p className="mb-0.5 text-[10px] tracking-widest text-violet-200/60">{s.name === 'chorus' ? 'サビ' : s.name === 'bridge' ? 'Cメロ' : 'Aメロ'}</p>
+                {s.lines.map((l, i) => (
+                  <p key={i}>{l.text}</p>
+                ))}
+              </div>
+            ))
+          : song.lyrics.map((l, i) => <p key={i}>{l}</p>)}
       </div>
+      {song.design && (
+        <p className="mt-2 text-center text-[11px] text-white/50">
+          {song.design.chords.join(' → ')} ・ BPM {song.design.bpm} ・ ▶ はメロディの試し聴き
+        </p>
+      )}
       {buried ? (
         <button onClick={onIsland} className="mt-3 w-full rounded-full border border-amber-200/50 bg-[#3a2410]/80 py-2 text-sm">
           ⛏ 島の土に埋めました → 島を見る

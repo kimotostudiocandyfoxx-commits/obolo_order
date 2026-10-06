@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { mockSongDesign } from './song';
 import type { ChatRequest, LlmProvider } from './types';
 
 export class GeminiProvider implements LlmProvider {
@@ -18,6 +19,7 @@ export class GeminiProvider implements LlmProvider {
         systemInstruction: req.system,
         temperature: req.temperature ?? 0.9,
         maxOutputTokens: req.maxOutputTokens ?? 800,
+        ...(req.json ? { responseMimeType: 'application/json' } : {}),
       },
     });
     const text = res.text?.trim();
@@ -41,6 +43,7 @@ export class OpenAiProvider implements LlmProvider {
         model: this.model,
         temperature: req.temperature ?? 0.9,
         max_tokens: req.maxOutputTokens ?? 800,
+        ...(req.json ? { response_format: { type: 'json_object' } } : {}),
         messages: [{ role: 'system', content: req.system }, ...req.history.map((t) => ({ role: t.role, content: t.text }))],
       }),
     });
@@ -60,6 +63,7 @@ export class MockProvider implements LlmProvider {
   readonly name = 'mock';
   async chat(req: ChatRequest): Promise<string> {
     const last = [...req.history].reverse().find((t) => t.role === 'user')?.text ?? '';
+    if (req.json && req.system.includes('SONG_DESIGN')) return mockSongDesign(last);
     const ja = /[぀-ヿ一-龯]/.test(last) || req.system.includes('あなたは');
     if (req.system.includes('長期記憶') || req.system.includes('long-term memory')) {
       // Offline "summary": keep existing bullets + the user's latest lines.

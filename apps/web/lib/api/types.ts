@@ -18,6 +18,10 @@ import type {
   NeoLookResult,
   WalletView,
   OrderCheckout,
+  ComposeChatBody,
+  ComposeChatResult,
+  ComposeDesignBody,
+  SongDesign,
 } from '@obolo/shared';
 
 export class ApiError extends Error {
@@ -64,6 +68,10 @@ export interface Api {
   buddyChat(text: string, locale: Locale): Promise<BuddyChatResponse>;
   buddyForget(): Promise<void>;
   uploadVoice(blob: Blob): Promise<{ id: string; url: string }>;
+  /** Mercury 作曲: the partner's reply while talking about the song. */
+  composeChat(body: ComposeChatBody): Promise<ComposeChatResult>;
+  /** Mercury 作曲: the song design (lyrics in kana, chords, melody). */
+  composeDesign(body: ComposeDesignBody): Promise<SongDesign>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */

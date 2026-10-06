@@ -11,6 +11,8 @@ import {
   type Locale,
   type Me,
   type OrderCheckout,
+  type ComposeChatResult,
+  type SongDesign,
   type SaturnPostView,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
@@ -253,6 +255,15 @@ export class DemoApi implements Api {
     const id = uid();
     await putBlob(id, blob);
     return { id, url: `idb:${id}` };
+  }
+
+  // demo: no AI — the Mercury screen keeps its offline song maker
+  async composeChat(): Promise<ComposeChatResult> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+
+  async composeDesign(): Promise<SongDesign> {
+    throw new ApiError(501, 'DEMO', 'demo');
   }
 
   // demo: kept as-is in this browser (no re-encoding)
