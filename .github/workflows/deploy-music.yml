@@ -54,17 +54,19 @@ jobs:
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
-      # Download the model weights into the bucket with a CPU job first (a GPU instance can be shut
-      # down while idle, which would restart a long download over and over). Quick once cached.
-      - name: Download model weights (Cloud Run job)
+      # Model weights go into the bucket from here: download on the runner (fast, visible in this log)
+      # and copy with parallel uploads. Skipped once a marker for this model exists in the bucket.
+      - name: Model weights → bucket
         run: |
-          gcloud beta run jobs deploy obolo-music-download --image "$IMAGE" --region "$REGION" --quiet \
-            --service-account "$MUSIC_SA" --cpu 4 --memory 8Gi --task-timeout 3600 --max-retries 1 \
-            --add-volume name=models,type=cloud-storage,bucket="$BUCKET" \
-            --add-volume-mount volume=models,mount-path=/models \
-            --set-env-vars HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }} \
-            --command python --args /app/app.py,download
-          gcloud beta run jobs execute obolo-music-download --region "$REGION" --wait
+          MODEL="${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }}"
+          MARK="gs://$BUCKET/ace15/.ready-$MODEL"
+          if gcloud storage ls "$MARK" >/dev/null 2>&1; then echo "weights already in the bucket"; exit 0; fi
+          sudo mkdir -p /mnt/ace15 /mnt/hf && sudo chmod 777 /mnt/ace15 /mnt/hf
+          docker run --rm -e ACESTEP_CHECKPOINTS_DIR=/ckpt -e HF_HOME=/hf -e ACE15_MODEL="$MODEL" \
+            -v /mnt/ace15:/ckpt -v /mnt/hf:/hf "$IMAGE" python /app/app.py download
+          du -sh /mnt/ace15
+          gcloud storage rsync -r /mnt/ace15 "gs://$BUCKET/ace15"
+          echo ok | gcloud storage cp - "$MARK"
 
       - name: Deploy (GPU)
         run: |

@@ -32,6 +32,10 @@ gcloud storage buckets describe "gs://$BUCKET" >/dev/null 2>&1 || gcloud storage
 gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member="serviceAccount:$MUSIC_SA" --role=roles/storage.objectAdmin --quiet >/dev/null
 ok "gs://$BUCKET"
 
+DEPLOY_SA="obolo-deployer@$PROJECT_ID.iam.gserviceaccount.com"
+gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member="serviceAccount:$DEPLOY_SA" --role=roles/storage.objectAdmin --quiet >/dev/null
+ok "GitHub のデプロイからモデルを置ける（$DEPLOY_SA）"
+
 say "API から GPU サービスを呼べるようにする"
 gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$API_SA" --role=roles/run.invoker --condition=None --quiet >/dev/null
 ok "$API_SA → run.invoker"
