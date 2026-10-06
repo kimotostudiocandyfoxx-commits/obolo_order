@@ -376,18 +376,15 @@ export class DemoApi implements Api {
     void answers;
     return this.patchMe((u) => {
       if (u.journeyDay !== day || u.journeyCompletedAt) return {};
-      // day 9 (the Eclipse day) ends only after paying, and goes straight to ORDER
-      if (day === JOURNEY_PAYMENT) {
-        if (!u.orderedAt) throw new ApiError(402, 'ORDER_REQUIRED', 'not paid');
-        return { journeyDay: JOURNEY_DONE };
-      }
+      // day 9 (the Eclipse day) ends only after paying
+      if (day === JOURNEY_PAYMENT && !u.orderedAt) throw new ApiError(402, 'ORDER_REQUIRED', 'not paid');
       return { journeyCompletedAt: now() };
     });
   }
 
   async advanceJourney(skip: boolean) {
     return this.patchMe((u) => {
-      if (!u.journeyCompletedAt || u.journeyDay >= JOURNEY_PAYMENT) return {};
+      if (!u.journeyCompletedAt || u.journeyDay >= JOURNEY_DONE) return {};
       if (!skip && Date.now() < Date.parse(u.journeyCompletedAt) + JOURNEY_WAIT_MS) throw new ApiError(409, 'NOT_YET', 'not yet');
       return { journeyDay: u.journeyDay + 1, journeyCompletedAt: null };
     });

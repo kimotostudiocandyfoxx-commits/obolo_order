@@ -1,6 +1,6 @@
 'use client';
 
-import { JOURNEY_DONE, JOURNEY_LAST_DAY, JOURNEY_WAIT_MS } from '@obolo/shared';
+import { JOURNEY_DONE, JOURNEY_WAIT_MS } from '@obolo/shared';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
 import { EntryScreen } from '@/components/onboarding/EntryScreen';
@@ -20,7 +20,7 @@ const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
  *   guest            → email entry (invited → Day 1, member → continue)
  *   day 1–8, playing → that day's story (Day 1 = /invite story)
  *   day finished     → "〇〇、また明日。" 24 h countdown (or 明日まで待てへん)
- *   day 9            → the Eclipse day: story with the ¥88/month payment inside (no countdown after)
+ *   day 9            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
  *   day 10 (ORDER)   → the solar system
  */
 export function HomeGate({ children }: { children: ReactNode }) {
@@ -31,7 +31,7 @@ export function HomeGate({ children }: { children: ReactNode }) {
 
   const day = me.journeyDay;
   if (day >= JOURNEY_DONE) return <>{children}</>;
-  if (day <= JOURNEY_LAST_DAY && me.journeyCompletedAt) {
+  if (me.journeyCompletedAt) {
     return (
       <TomorrowScreen
         key={`${day}-${me.journeyCompletedAt}`}

@@ -79,6 +79,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [still, setStill] = useState<string | null>(null);
   const clearStillOnShow = useRef(false);
   const [placeholder, setPlaceholder] = useState<MotionId | null>(null);
+  /** 'whiteout' step: the screen fades to white; the next scene fades in from it. */
+  const [white, setWhite] = useState(false);
+  const runRef = useRef<(from: number) => void>(() => {});
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
   const placeholderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -160,6 +163,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
         else if (s.t === 'still') {
+          setWhite(false);
           setStill(s.image);
           // a still is a full background: lift the start light / black screen
           setReady(true);
@@ -174,16 +178,26 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           dual.current?.pauseAll();
           n++;
         } else if (s.t === 'loop') {
+          setWhite(false);
           clearStillOnShow.current = true;
           bgQueue.current = [];
           playMedia(s.motion, true);
           n++;
         } else if (s.t === 'bgvideo') {
+          setWhite(false);
           clearStillOnShow.current = true;
           bgQueue.current = [...(s.then ?? [])];
           playMedia(s.motion, false);
           n++;
+        } else if (s.t === 'whiteout') {
+          setSprite(null);
+          setWhite(true);
+          setI(n);
+          const after = n + 1;
+          setTimeout(() => runRef.current(after), 3400);
+          return;
         } else if (s.t === 'video') {
+          setWhite(false);
           clearStillOnShow.current = true;
           bgQueue.current = [];
           setSprite(null);
@@ -204,6 +218,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     },
     [steps, playMedia, setI, onEnd, clearCaptions],
   );
+  runRef.current = run;
 
   const onEndedRef = useRef(() => {});
   onEndedRef.current = () => {
@@ -269,7 +284,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
-    if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite'].includes(cur.t)) {
+    if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -337,6 +352,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
       {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
+      <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
       {still && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
@@ -353,7 +369,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
               key={name}
               src={src}
               alt=""
-              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${name === '@bati-weak' ? 'bottom-[26%] h-[30%] rotate-[-6deg] rounded-[2rem] border-2 border-white/20 opacity-80 brightness-75 saturate-[.35]' : own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : 'bottom-[24%] h-[50%]'}`}
+              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${name === 'obolon' ? 'bottom-[40%] h-[22%]' : name === '@bati-weak' ? 'bottom-[26%] h-[30%] rotate-[-6deg] rounded-[2rem] border-2 border-white/20 opacity-80 brightness-75 saturate-[.35]' : own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : 'bottom-[24%] h-[50%]'}`}
               style={spriteSlot(k, arr.length)}
               aria-hidden
             />

@@ -68,17 +68,16 @@ export class UsersService {
 
   /**
    * The story of `day` was finished. Idempotent; never moves the journey backwards.
-   * Day 9 (the Eclipse day) can only be finished after paying, and goes straight to ORDER.
+   * Day 9 (the Eclipse day) can only be finished after paying; the next day is ORDER (10).
    */
   async completeJourneyDay(userId: string, body: CompleteJourneyDayBody): Promise<Me> {
     const cur = await this.load(userId);
     if (cur.journeyDay !== body.day || cur.journeyCompletedAt) return toMe(cur);
-    const eclipse = body.day === JOURNEY_PAYMENT;
-    if (eclipse && !cur.orderedAt) throw apiError(HttpStatus.PAYMENT_REQUIRED, 'ORDER_REQUIRED', 'The Eclipse has not been paid for');
+    if (body.day === JOURNEY_PAYMENT && !cur.orderedAt) throw apiError(HttpStatus.PAYMENT_REQUIRED, 'ORDER_REQUIRED', 'The Eclipse has not been paid for');
     const [u] = await this.db.write
       .update(users)
       .set({
-        ...(eclipse ? { journeyDay: JOURNEY_DONE } : { journeyCompletedAt: new Date() }),
+        journeyCompletedAt: new Date(),
         onboardingJson: { ...cur.onboardingJson, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`d${body.day}.${k}`, v])) },
         updatedAt: new Date(),
       })
@@ -93,7 +92,7 @@ export class UsersService {
    */
   async advanceJourney(userId: string, skip: boolean): Promise<Me> {
     const cur = await this.load(userId);
-    if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_PAYMENT) return toMe(cur);
+    if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_DONE) return toMe(cur);
     if (!skip && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS) {
       throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     }

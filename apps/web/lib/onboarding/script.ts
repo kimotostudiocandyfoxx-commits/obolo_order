@@ -39,6 +39,8 @@ export type Step =
   | { t: 'mars' }
   /** Venus tutorial (Day 8), coached by the gorilla trio. */
   | { t: 'venus' }
+  /** Fade the whole screen to white (~3 s), then continue; the next still/motion fades in from white. */
+  | { t: 'whiteout' }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

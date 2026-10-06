@@ -7,7 +7,9 @@ import type { Step } from './script';
  * Earth (motion 9-1, not made yet; then Day 1's HQ motions 6 / 7 / 9) → MONBAN: "おかえり" →
  * the Eclipse: link your soul to the Sun at the Sun temple; whoever succeeds is an ORDER and can
  * give Bati mana → the secret rocket costs ¥88 a month → OK → payment (Stripe, inside the story)
- * → "エクリプス用のロケットに案内する" → ORDER (the Eclipse scene itself is the next script).
+ * → "エクリプス用のロケットに案内する" → launch to the Sun (motion 9-2, not made yet) → the Sun temple:
+ * KIMORIN shows the "akashic record"-like thing, OBOLON appears: "you were connected from the
+ * start — feel it" → fade to white → back at HQ: "旅の続きは明日から。また明日！" → countdown → ORDER.
  * "もう少し考える" brings MONBAN's question back.
  */
 export const DAY9: Step[] = [
@@ -66,5 +68,44 @@ export const DAY9: Step[] = [
   { t: 'order', cancel: 'later' },
   { t: 'say', who: 'MONBAN', text: 'よし、分かった。' },
   { t: 'say', who: 'MONBAN', text: 'それでは、エクリプス用のロケットに案内する。' },
+
+  // the Eclipse (client script 2026-10-06, second part)
+  { t: 'bgm', track: 'opening' },
+  { t: 'action', label: 'ロケットに乗る' },
+  { t: 'video', motion: '9-2' }, // 秘密ロケットで太陽へ発射（動画・未着）
+  { t: 'still', image: 'sun-temple' }, // ✏️ placeholder backdrop drawn by Claude
+  { t: 'caption', text: '太陽の神殿に着いた' }, // ✏️
+  { t: 'sprite', image: 'kimorin-3' },
+  { t: 'say', who: 'KIMORIN', text: 'ここが、太陽の神殿やけんね。' },
+  { t: 'say', who: 'KIMORIN', text: 'あそこに見える、すごそうなものが……\nうーん、なんて……説明すればいいのかな……' },
+  { t: 'say', who: 'KIMORIN', text: 'まあ、アカシックレコードみたいな\n言い方をする人もいるが……' },
+  { t: 'bgm', track: 'obolon' },
+  { t: 'sprite', image: ['kimorin-3', 'obolon'] }, // OBOLON drawn after motion 13 (✏️)
+  { t: 'caption', text: 'OBOLONが現れた' },
+  { t: 'say', who: 'KIMORIN', text: 'あ、OBOLON出てきた！' },
+  { t: 'say', who: 'KIMORIN', text: 'OBOLONは、地球と月と太陽を\n自由に行き来できるんだ。' },
+  { t: 'sprite', image: 'obolon' },
+  { t: 'say', who: 'OBOLON', text: '{name}の魂の一部と、\n太陽をつなげにきた。……と思うが、' },
+  { t: 'say', who: 'OBOLON', text: 'そうじゃない、、、、、' },
+  { t: 'say', who: 'OBOLON', text: '実は、、、\n最初から、つながってるんだ。' },
+  { t: 'say', who: 'OBOLON', text: '太陽だけじゃない。\nあれとも、俺とも、地球とも、' },
+  { t: 'say', who: 'OBOLON', text: '想像しうる全てと、\nつながってるんだ。' },
+  { t: 'sprite', image: ['kimorin-8', 'obolon'] },
+  { t: 'say', who: 'KIMORIN', text: 'そうそう！\nそれに気づく、そして受け入れる。' },
+  { t: 'say', who: 'OBOLON', text: 'いや、違う。\n繋がっている、それを感じる。' },
+  { t: 'say', who: 'KIMORIN', text: 'そういうことやけんね！' },
+  { t: 'bgm', track: null },
+  { t: 'whiteout' },
+  { t: 'black' },
+
+  // back at the society's HQ on Earth
+  { t: 'bgm', track: 'opening' },
+  { t: 'loop', motion: 6 },
+  { t: 'caption', text: '地球の結社に帰ってきた' }, // ✏️
+  { t: 'sprite', image: 'kimorin-1' },
+  { t: 'say', who: 'KIMORIN', text: '宇宙旅行、楽しかったね。' },
+  { t: 'say', who: 'KIMORIN', text: 'これからは、明日から、\n旅の続きに出よう！' },
+  { t: 'say', who: 'KIMORIN', text: 'じゃあ、また明日！\nバイバイ！' },
+  { t: 'sprite', image: null },
   { t: 'end' },
 ];

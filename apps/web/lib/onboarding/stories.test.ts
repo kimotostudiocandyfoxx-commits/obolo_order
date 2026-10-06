@@ -67,3 +67,20 @@ describe('day 9: the Eclipse (client script 2026-10-06)', () => {
     expect(labelIndex(steps, (back as { id: string }).id)).toBeLessThan(c);
   });
 });
+
+describe('day 9: the Sun temple and home (client script 2026-10-06, part 2)', () => {
+  const steps = STORIES[9].steps;
+  it('after paying: rocket to the Sun, OBOLON, fade to white, back at HQ, see you tomorrow', () => {
+    const pay = labelIndex(steps, 'pay');
+    const after = steps.slice(pay);
+    const order = (pred: (s: (typeof steps)[number]) => boolean) => after.findIndex(pred);
+    const temple = order((s) => s.t === 'still' && s.image === 'sun-temple');
+    const obolon = order((s) => s.t === 'say' && s.who === 'OBOLON' && s.text.includes('最初から'));
+    const white = order((s) => s.t === 'whiteout');
+    const bye = order((s) => s.t === 'say' && s.text.includes('バイバイ'));
+    expect(temple).toBeGreaterThan(0);
+    expect(obolon).toBeGreaterThan(temple);
+    expect(white).toBeGreaterThan(obolon);
+    expect(bye).toBeGreaterThan(white);
+  });
+});

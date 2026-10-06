@@ -10,7 +10,7 @@ import type { PlanetId } from './planets';
  *
  * Stored on the user as `journeyDay` (1–8 = day to play, 9 = the Eclipse day, 10 = ORDER member)
  * plus `journeyCompletedAt` (set when the current day is finished, cleared when the next starts).
- * Day 9 has no countdown: finishing it after paying moves straight to 10.
+ * Day 9 can only be finished after paying; after its countdown the visitor is an ORDER (10).
  */
 export const JOURNEY_LAST_DAY = 8;
 export const JOURNEY_PAYMENT = 9;
@@ -71,7 +71,9 @@ export const ECLIPSE_DAY_BEATS = [
   'MONBAN：太陽の神殿で、太陽と君の魂の一部をつなぐ「エクリプス」が必要',
   'エクリプスに成功した人がORDER。バティにマナを渡せて、自由に宇宙を旅できる',
   '太陽の神殿へは結社の秘密ロケット。リンクの経費は月88円 → OK で支払い',
-  'エクリプス用のロケットへ案内される',
+  'エクリプス用のロケットで太陽へ。太陽の神殿で KIMORIN がアカシックレコードのようなものを見せる',
+  'OBOLON「最初から、つながってるんだ。…それを感じる」',
+  '白くフェードアウトして地球の結社へ。KIMORIN「旅の続きは明日から。また明日！」',
 ] as const;
 
 export function journeyMeta(day: number): JourneyDayMeta | undefined {
@@ -79,10 +81,10 @@ export function journeyMeta(day: number): JourneyDayMeta | undefined {
 }
 
 /**
- * After paying on day 9: the Eclipse itself at the Sun temple (Bati receives mana and evolves into
- * its ORDER form), then the solar system. Script not delivered yet.
+ * After day 9's countdown the visitor is an ORDER and the journey goes on in the solar system.
+ * Bati receiving mana / evolving into its ORDER form is not scripted yet.
  */
-export const AFTER_JOURNEY = ['エクリプス用のロケットで太陽の神殿へ → エクリプス', 'バティにマナが渡り、ORDERの姿に進化する'] as const;
+export const AFTER_JOURNEY = ['ORDER として旅の続きへ（太陽系）', 'バティにマナが渡り、ORDERの姿に進化する（台本待ち）'] as const;
 
 /** Monthly price of the Eclipse / ORDER membership in yen (client, 2026-10-06). */
 export const ORDER_PRICE_JPY = 88;

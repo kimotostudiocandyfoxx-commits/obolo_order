@@ -27,7 +27,7 @@ export const STORIES: Record<number, DayStory> = {
   6: { steps: DAY6, skipLabel: '明日まで待てへん', auth: true },
   7: { steps: DAY7, skipLabel: '明日まで待てへん', auth: true },
   8: { steps: DAY8, skipLabel: '明日まで待てへん', auth: true },
-  // the Eclipse day: payment inside the story, no countdown afterwards
+  // the Eclipse day: payment inside the story; after its countdown the visitor is an ORDER
   9: { steps: DAY9, skipLabel: '明日まで待てへん', auth: true },
 };
 
