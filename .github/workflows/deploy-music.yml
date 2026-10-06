@@ -20,7 +20,8 @@ env:
   WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
   DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
   MUSIC_SA: ${{ format('obolo-music-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
-  BUCKET: ${{ format('{0}-obolo-models', vars.GCP_PROJECT_ID) }}
+  # model cache next to the GPU (cross-region reads would be billed on every cold start)
+  BUCKET: ${{ format('{0}-models-{1}', vars.GCP_PROJECT_ID, vars.MUSIC_REGION) }}
 
 jobs:
   deploy:

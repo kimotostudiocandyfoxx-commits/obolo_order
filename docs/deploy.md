@@ -120,13 +120,13 @@ Webhook（解約や支払い失敗を反映）は任意：スクリプトの最�
 
 ## 伴奏の GPU サーバー（Cloud Run + NVIDIA L4）
 
-1. Cloud Shell で次の1行（リージョンはまず東京 `asia-northeast1`）
+1. Cloud Shell で次の1行（リージョンはシンガポール `asia-southeast1`。Cloud Run の GPU は東京では使えない）
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo_order/claude/solar-system-home-planets-ew766y/scripts/music-setup.sh -o music.sh && bash music.sh
 ```
 
-2. GitHub の Variables に `MUSIC_REGION`（例 `asia-northeast1`）
+2. GitHub の Variables に `MUSIC_REGION` = `asia-southeast1`
 3. Actions → **Deploy Music GPU** → Run workflow（初回 15〜25 分）
 4. Actions → **Deploy API** → Run workflow
 5. 水星で作曲 → 曲カードの「🎹 伴奏をつくる」。最初の1回は GPU の起動とモデルのダウンロードで数分かかる（「もう一度押してね」が出たら少し待って押す）

@@ -11,10 +11,10 @@ fail() { printf '\n\033[1;31m✗ %s\033[0m\n' "$*"; exit 1; }
 PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
 read -rp "プロジェクトID [${PROJECT_ID:-obolo-order}]: " IN; PROJECT_ID="${IN:-${PROJECT_ID:-obolo-order}}"
 gcloud config set project "$PROJECT_ID" >/dev/null || fail "プロジェクト $PROJECT_ID が見つかりません"
-echo "GPU を使うリージョン。まず東京 asia-northeast1 を試し、GPU が使えないと言われたら asia-southeast1（シンガポール）か us-central1"
-read -rp "リージョン [asia-northeast1]: " REGION; REGION="${REGION:-asia-northeast1}"
+echo "GPU を使うリージョン。Cloud Run の GPU は東京ではまだ使えないので、アジアはシンガポール asia-southeast1"
+read -rp "リージョン [asia-southeast1]: " REGION; REGION="${REGION:-asia-southeast1}"
 
-BUCKET="$PROJECT_ID-obolo-models"
+BUCKET="$PROJECT_ID-models-$REGION"
 MUSIC_SA="obolo-music-runtime@$PROJECT_ID.iam.gserviceaccount.com"
 API_SA="obolo-api-runtime@$PROJECT_ID.iam.gserviceaccount.com"
 
