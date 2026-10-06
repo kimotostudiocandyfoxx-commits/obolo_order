@@ -95,7 +95,8 @@
 | ID | 状態 | 内容 | 現在の仮実装 |
 |---|---|---|---|
 | P-WALLET-1 | 🟡 | 月額 88 MANA の付与 | サブスク未接続のため、**新規登録時に 88 MANA を1回だけ付与**（台帳理由 `demo_grant`） |
-| P-MER-5 | 🔴 | 伴奏のAIモデル | いまは MusicGen-Melody（large）。**MusicGen の学習済みモデルは非商用ライセンス（CC-BY-NC）**なので、有料公開の前に商用OKのモデル（ACE-Step など）に替える。`MUSIC_MODEL` で切り替える作り | `gpu/music/app.py` |
+| P-MER-5 | 🟡 | 伴奏のAIモデル | **ACE-Step（Apache-2.0、商用OK）に決定（2026-10-06）**。MusicGen は非商用ライセンスなのでテスト用の切り替え先としてだけ残す（`MUSIC_ENGINE=musicgen`） | `gpu/music/app.py` |
+| P-MER-6 | ✏️ | 伴奏がガイドに従う強さ | 設計図のコードとメロディのシンセ音を参考音声として 0.35 の強さで渡す（`ACE_REF_STRENGTH`）。耳で聴いて調整 | `gpu/music/app.py` |
 | P-MER-4 | ✏️ | 作曲の回数 | 1人1日20曲まで（MANA での料金は未決） | `apps/api/src/compose/compose.controller.ts` |
 | P-MEDIA-3 | ✏️ | 動画の長さの上限 | 既定60秒（木星は8秒）。火星の動画の最大の長さはクライアント未決 | `packages/shared/src/config.ts`（`MEDIA_POLICY`） |
 | P-MEDIA-4 | ⚪ | Bunny の配信プラン | 少人数のうちは Standard。人が増えたら Volume に切り替え（docs/media.md） | Bunny 管理画面 |

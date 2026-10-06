@@ -28,8 +28,8 @@ export async function generateInstrumental(baseUrl: string, body: InstrumentalBo
       headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({
         prompt: body.prompt,
-        // MusicGen makes up to 30 s at a time
-        seconds: Math.max(4, Math.min(30, body.seconds)),
+        // the GPU service clamps to what its engine can make (ACE-Step 120 s, MusicGen 30 s)
+        seconds: Math.max(4, Math.min(120, body.seconds)),
         bpm: body.bpm,
         keyRoot: body.keyRoot,
         scale: body.scale,

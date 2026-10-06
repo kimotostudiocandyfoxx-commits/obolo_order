@@ -1,11 +1,12 @@
 # GPU music service (Cloud Run + NVIDIA L4). torch wheels from PyPI bundle the CUDA 12 runtime.
 torch==2.5.1
 torchaudio==2.5.1
-transformers==4.46.3
-sentencepiece==0.2.0
-protobuf==5.28.3
-huggingface_hub==0.26.2
+# ACE-Step (Apache-2.0) — the instrumental engine (MUSIC_ENGINE=acestep, default)
+ace-step @ git+https://github.com/ace-step/ACE-Step.git
+sentencepiece
+protobuf
+huggingface_hub
 fastapi==0.115.5
 uvicorn==0.32.1
-numpy==1.26.4
-scipy==1.14.1
+numpy
+scipy
