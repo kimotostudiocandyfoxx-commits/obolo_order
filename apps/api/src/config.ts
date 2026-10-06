@@ -69,6 +69,11 @@ const Env = z.object({
   /** Optional Price id (price_…). Unset = an inline ¥ORDER_PRICE_JPY monthly price. */
   STRIPE_PRICE_ID: secret(),
 
+  /** Fish Audio API (voices: registration, read-aloud, singing). Unset = voice features off. */
+  FISH_API_KEY: secret(),
+  /** PLACEHOLDER (P-VOICE-1): Fish Audio model name (client: s2.1-pro). */
+  FISH_MODEL: z.string().default('s2.1-pro'),
+
   /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
   MUSIC_URL: secret(),
 

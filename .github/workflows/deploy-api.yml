@@ -62,6 +62,10 @@ jobs:
             echo 'GEMINI_API_KEY=obolo-gemini-api-key:latest'
             echo 'BUNNY_STORAGE_KEY=obolo-bunny-storage-key:latest'
             echo 'ADMIN_TOKEN=obolo-admin-token:latest'
+            # Fish Audio voices: switched on once the key is in Secret Manager (FISH_ENABLED=true)
+            if [ "${{ vars.FISH_ENABLED }}" = "true" ]; then
+              echo 'FISH_API_KEY=obolo-fish-api-key:latest'
+            fi
             if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
               echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
               echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'

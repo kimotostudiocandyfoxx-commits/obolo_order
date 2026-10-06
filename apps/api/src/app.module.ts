@@ -6,6 +6,8 @@ import { BillingController } from './billing/billing.controller';
 import { BillingService } from './billing/billing.service';
 import { ComposeController } from './compose/compose.controller';
 import { ComposeService } from './compose/compose.service';
+import { VoiceController } from './voice/voice.controller';
+import { VoiceService } from './voice/voice.service';
 import { BuddyController } from './buddy/buddy.controller';
 import { BuddyService } from './buddy/buddy.service';
 import { HealthController } from './health.controller';
@@ -26,7 +28,7 @@ import { WalletController } from './wallet/wallet.controller';
 /** One module for the demo; split per planet (spec §4.3) as the surface grows. */
 @Module({
   imports: [InfraModule],
-  controllers: [HealthController, AuthController, UsersController, WalletController, BuddyController, MediaController, SaturnController, InvitesController, LookController, BillingController, ComposeController],
-  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, InvitesService, LookService, BillingService, ComposeService],
+  controllers: [HealthController, AuthController, UsersController, WalletController, BuddyController, MediaController, SaturnController, InvitesController, LookController, BillingController, ComposeController, VoiceController],
+  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, InvitesService, LookService, BillingService, ComposeService, VoiceService],
 })
 export class AppModule {}

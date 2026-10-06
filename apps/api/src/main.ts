@@ -26,6 +26,8 @@ async function bootstrap() {
   app.use('/media/voice', express.raw({ type: 'audio/*', limit: VOICE_MAX_BYTES }));
   // the NEO look can start from a reference image (sent once, never stored)
   app.use('/me/look', express.json({ limit: '3mb' }));
+  // voice registration sends one recording (base64)
+  app.use('/voice/register', express.json({ limit: '8mb' }));
   // Stripe signs the exact bytes it sends
   app.use('/billing/webhook', express.raw({ type: '*/*', limit: '1mb' }));
   app.useBodyParser('json', { limit: '64kb' });

@@ -49,6 +49,10 @@ export const users = pgTable(
     orderedAt: timestamp('ordered_at', { withTimezone: true }),
     stripeCustomerId: text('stripe_customer_id'),
     stripeSubscriptionId: text('stripe_subscription_id'),
+    /** Fish Audio voice models made from the member's recordings (client decision 2026-10-07):
+     *  their own voice (Saturn, singing) and the voice they gave Bati (a changed voice). */
+    voiceSelfId: text('voice_self_id'),
+    voiceBatiId: text('voice_bati_id'),
     voiceId: text('voice_id'),
     virtualAccountNo: text('virtual_account_no'),
     kycStatus: text('kyc_status').notNull().default('none'),

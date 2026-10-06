@@ -164,3 +164,17 @@ export const InstrumentalBody = z.object({
   melody: z.array(z.object({ midi: z.number().int().min(0).max(127).nullable(), beats: z.number().positive().max(16) })).max(600),
 });
 export type InstrumentalBody = z.infer<typeof InstrumentalBody>;
+
+/** Voice registration: one recording of the fixed script (base64, ≤ ~4 MB before encoding). */
+export const RegisterVoiceBody = z.object({
+  slot: z.enum(['self', 'bati']),
+  audio: z.object({ mime: z.string().regex(/^audio\//).max(60), data: z.string().min(100).max(6_000_000) }),
+});
+export type RegisterVoiceBody = z.infer<typeof RegisterVoiceBody>;
+
+/** Speak a text in one of the member's registered voices (Saturn read-aloud, Bati's lines). */
+export const SpeakBody = z.object({
+  slot: z.enum(['self', 'bati']),
+  text: z.string().trim().min(1).max(300),
+});
+export type SpeakBody = z.infer<typeof SpeakBody>;

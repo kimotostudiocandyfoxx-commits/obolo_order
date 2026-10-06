@@ -24,6 +24,8 @@ import type {
   SongDesign,
   InstrumentalBody,
   InstrumentalResult,
+  RegisterVoiceBody,
+  SpeakBody,
 } from '@obolo/shared';
 
 export class ApiError extends Error {
@@ -78,6 +80,10 @@ export interface Api {
   composeInstrumental(body: InstrumentalBody): Promise<InstrumentalResult>;
   /** The GPU studio's state (phase, download progress, error) while it warms up. */
   composeMusicStatus(): Promise<Record<string, unknown>>;
+  /** Register one of the two voices (own / Bati) from a recording of the fixed script. */
+  registerVoice(body: RegisterVoiceBody): Promise<Me>;
+  /** Read a text aloud in a registered voice (Fish Audio). */
+  speak(body: SpeakBody): Promise<{ url: string }>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */

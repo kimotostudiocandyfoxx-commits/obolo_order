@@ -24,6 +24,8 @@ export interface Me {
   bati: BatiView | null;
   /** Day 9: when the Eclipse was paid for (null = not yet). */
   orderedAt: string | null;
+  /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice. */
+  voices: { self: boolean; bati: boolean };
   createdAt: string;
 }
 

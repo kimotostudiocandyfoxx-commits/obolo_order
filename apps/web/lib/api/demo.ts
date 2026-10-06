@@ -267,6 +267,15 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
+  async registerVoice(body: { slot: 'self' | 'bati' }) {
+    await sleep(800);
+    return this.patchMe((u) => ({ voices: { ...(u.voices ?? { self: false, bati: false }), [body.slot]: true } }));
+  }
+
+  async speak(): Promise<{ url: string }> {
+    throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
+  }
+
   async composeMusicStatus(): Promise<Record<string, unknown>> {
     return { reachable: false, error: 'demo' };
   }
@@ -380,6 +389,7 @@ export class DemoApi implements Api {
       avatarUrl: null,
       bati: null,
       orderedAt: null,
+      voices: { self: false, bati: false },
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };

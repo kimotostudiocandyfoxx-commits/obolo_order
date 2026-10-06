@@ -93,6 +93,12 @@ export class HttpApi implements Api {
   composeMusicStatus() {
     return this.req<Record<string, unknown>>('GET', '/compose/music-status');
   }
+  registerVoice(body: Parameters<Api['registerVoice']>[0]) {
+    return this.req<Awaited<ReturnType<Api['registerVoice']>>>('POST', '/voice/register', body);
+  }
+  speak(body: Parameters<Api['speak']>[0]) {
+    return this.req<Awaited<ReturnType<Api['speak']>>>('POST', '/voice/speak', body);
+  }
   uploadPhoto(blob: Blob) {
     return this.req<Awaited<ReturnType<Api['uploadPhoto']>>>('POST', '/media/photo', undefined, blob);
   }
