@@ -8,7 +8,10 @@ import {
   parseComposeChat,
   songDesignSystem,
 } from '@obolo/ai';
-import type { ComposeChatBody, ComposeChatResult, ComposeDesignBody, SongDesign } from '@obolo/shared';
+import type { ComposeChatBody, ComposeChatResult, ComposeDesignBody, InstrumentalBody, InstrumentalResult, SongDesign } from '@obolo/shared';
+import { AppConfig, CONFIG } from '../config';
+import { MediaService } from '../media/media.service';
+import { generateInstrumental } from './music.client';
 import { apiError } from '../common/errors';
 import { LLM } from '../infra/tokens';
 
@@ -25,7 +28,20 @@ const turns = (h: ComposeChatBody['history']): ChatTurn[] => h.map((t) => ({ rol
 @Injectable()
 export class ComposeService {
   private readonly log = new Logger('Compose');
-  constructor(@Inject(LLM) private readonly llm: LlmProvider) {}
+  constructor(
+    @Inject(LLM) private readonly llm: LlmProvider,
+    @Inject(CONFIG) private readonly cfg: AppConfig,
+    private readonly media: MediaService,
+  ) {}
+
+  /** Step 2: the instrumental from the design (GPU service, gpu/music), stored on Bunny. */
+  async instrumental(userId: string, body: InstrumentalBody, origin: string): Promise<InstrumentalResult> {
+    if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
+    const { data, seconds } = await generateInstrumental(this.cfg.MUSIC_URL, body);
+    const m = await this.media.storeAudio(userId, 'audio/mp4', data, origin);
+    this.log.log(`instrumental ${userId} "${body.title}" ${seconds}s ${data.length}B`);
+    return { url: m.url, seconds };
+  }
 
   private async checkWords(body: ComposeChatBody, deep: boolean) {
     const said = body.history.filter((t) => t.role === 'user').map((t) => t.text).join('\n');

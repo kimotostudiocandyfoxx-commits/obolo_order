@@ -83,6 +83,8 @@ export interface MadeSong extends Song {
   genre: Genre;
   /** the AI-made blueprint (lyrics in kana, chords, melody) — absent for offline songs */
   design?: SongDesign;
+  /** the generated instrumental (GPU), once made */
+  instrumentalUrl?: string;
 }
 
 const WAVE: Record<Genre, OscillatorType> = { pop: 'triangle', rock: 'sawtooth', hiphop: 'square', ballad: 'sine', edm: 'sawtooth' };

@@ -118,6 +118,21 @@ curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo
 本番にするときは、本番キー（sk_live_… / pk_live_…）で 2〜4 をもう一度。
 Webhook（解約や支払い失敗を反映）は任意：スクリプトの最後に出る URL を Stripe の「Webhook」に登録し、whsec_… をスクリプトで保存 → Deploy API。
 
+## 伴奏の GPU サーバー（Cloud Run + NVIDIA L4）
+
+1. Cloud Shell で次の1行（リージョンはまず東京 `asia-northeast1`）
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo_order/claude/solar-system-home-planets-ew766y/scripts/music-setup.sh -o music.sh && bash music.sh
+```
+
+2. GitHub の Variables に `MUSIC_REGION`（例 `asia-northeast1`）
+3. Actions → **Deploy Music GPU** → Run workflow（初回 15〜25 分）
+4. Actions → **Deploy API** → Run workflow
+5. 水星で作曲 → 曲カードの「🎹 伴奏をつくる」。最初の1回は GPU の起動とモデルのダウンロードで数分かかる（「もう一度押してね」が出たら少し待って押す）
+
+費用の目安：L4 は使っている間だけ課金。ただし最後の利用から最大15分ほどは起きたまま課金されるので、1回の作曲で数十円かかることがある。
+
 ## 日ごとに確認する（/preview）
 
 URL の最後に **`/preview`** を付けて開くと、1日目〜の各日を単独で再生できる（途中のころりん・パタパタから始めることもできる）。

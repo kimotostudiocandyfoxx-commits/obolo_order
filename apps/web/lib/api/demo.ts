@@ -13,6 +13,7 @@ import {
   type OrderCheckout,
   type ComposeChatResult,
   type SongDesign,
+  type InstrumentalResult,
   type SaturnPostView,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
@@ -263,6 +264,10 @@ export class DemoApi implements Api {
   }
 
   async composeDesign(): Promise<SongDesign> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+
+  async composeInstrumental(): Promise<InstrumentalResult> {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 

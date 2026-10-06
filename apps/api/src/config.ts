@@ -69,6 +69,9 @@ const Env = z.object({
   /** Optional Price id (price_…). Unset = an inline ¥ORDER_PRICE_JPY monthly price. */
   STRIPE_PRICE_ID: secret(),
 
+  /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
+  MUSIC_URL: secret(),
+
   BUDDY_FREE_DAILY: z.coerce.number().default(30),
   /** Spec §2.2 overage (1 MANA/msg). Demo: billing off → blocked after the quota. */
   BUDDY_OVERAGE_ENABLED: bool(false),

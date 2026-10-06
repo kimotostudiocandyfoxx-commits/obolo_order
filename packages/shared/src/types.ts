@@ -187,3 +187,8 @@ export interface ComposeChatResult {
   /** enough was said to make a song: show the genre buttons */
   ready: boolean;
 }
+
+export interface InstrumentalResult {
+  url: string;
+  seconds: number;
+}

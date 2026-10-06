@@ -87,6 +87,9 @@ export class HttpApi implements Api {
   composeDesign(body: Parameters<Api['composeDesign']>[0]) {
     return this.req<Awaited<ReturnType<Api['composeDesign']>>>('POST', '/compose/design', body);
   }
+  composeInstrumental(body: Parameters<Api['composeInstrumental']>[0]) {
+    return this.req<Awaited<ReturnType<Api['composeInstrumental']>>>('POST', '/compose/instrumental', body);
+  }
   uploadPhoto(blob: Blob) {
     return this.req<Awaited<ReturnType<Api['uploadPhoto']>>>('POST', '/media/photo', undefined, blob);
   }

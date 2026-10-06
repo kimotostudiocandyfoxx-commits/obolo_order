@@ -151,3 +151,16 @@ export const ComposeDesignBody = ComposeChatBody.extend({
   genre: z.enum(['pop', 'rock', 'hiphop', 'ballad', 'edm', 'auto']),
 });
 export type ComposeDesignBody = z.infer<typeof ComposeDesignBody>;
+
+/** Mercury 伴奏: the parts of the song design the instrumental generator needs. */
+export const InstrumentalBody = z.object({
+  title: z.string().trim().min(1).max(40),
+  prompt: z.string().trim().min(1).max(500),
+  seconds: z.number().min(4).max(120),
+  bpm: z.number().int().min(40).max(220),
+  keyRoot: z.number().int().min(0).max(11),
+  scale: z.enum(['major', 'minor']),
+  progression: z.array(z.number().int().min(0).max(6)).min(1).max(16),
+  melody: z.array(z.object({ midi: z.number().int().min(0).max(127).nullable(), beats: z.number().positive().max(16) })).max(600),
+});
+export type InstrumentalBody = z.infer<typeof InstrumentalBody>;

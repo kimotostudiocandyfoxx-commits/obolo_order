@@ -81,6 +81,11 @@ export class MediaService {
     }
   }
 
+  /** Generated audio (Mercury instrumentals, later vocals / mixes). */
+  storeAudio(userId: string, mime: string, data: Buffer, requestOrigin: string) {
+    return this.store(userId, 'audio', mime, data, requestOrigin);
+  }
+
   /** Generated images (NEO look, Bati). */
   storeImage(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string) {
     return this.store(userId, kind, mime, data, requestOrigin);

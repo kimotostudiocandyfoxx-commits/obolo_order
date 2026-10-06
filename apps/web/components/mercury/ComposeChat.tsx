@@ -144,6 +144,12 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
                 say('じゃあ、もう一回。どんな感じにする？');
               }}
               onIsland={onOpenIsland}
+              live={live}
+              onInstrumental={(url) => {
+                synth.stop();
+                setPlaying(null);
+                setMsgs((ms) => ms.map((x) => (x.who === 'song' && x.song.id === m.song.id ? { ...x, song: { ...x.song, instrumentalUrl: url } } : x)));
+              }}
             />
           ) : (
             <div key={i} className={`flex items-end gap-2 ${m.who === 'me' ? 'justify-end' : ''}`}>
@@ -208,7 +214,11 @@ function SongCard({
   onBury,
   onAgain,
   onIsland,
+  live,
+  onInstrumental,
 }: {
+  live: boolean;
+  onInstrumental: (url: string) => void;
   song: MadeSong;
   playing: boolean;
   buried: boolean;
@@ -251,6 +261,7 @@ function SongCard({
           {song.design.chords.join(' → ')} ・ BPM {song.design.bpm} ・ ▶ はメロディの試し聴き
         </p>
       )}
+      {live && song.design && <Instrumental song={song} onMade={onInstrumental} />}
       {buried ? (
         <button onClick={onIsland} className="mt-3 w-full rounded-full border border-amber-200/50 bg-[#3a2410]/80 py-2 text-sm">
           ⛏ 島の土に埋めました → 島を見る
@@ -265,6 +276,57 @@ function SongCard({
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Step 2 of composing: the instrumental from the design, made on the GPU service (Cloud Run L4).
+ * A cold GPU needs a minute or two to start; the visitor is asked to press again.
+ */
+function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) => void }) {
+  const [state, setState] = useState<'idle' | 'working' | 'warming' | 'error'>('idle');
+  const [err, setErr] = useState('');
+  if (song.instrumentalUrl) {
+    return (
+      <div className="mt-3 rounded-2xl bg-black/25 p-2">
+        <p className="mb-1 text-center text-[11px] text-violet-200/70">🎹 伴奏（AI）</p>
+        <audio src={song.instrumentalUrl} controls playsInline className="w-full" />
+      </div>
+    );
+  }
+  const make = async () => {
+    const d = song.design!;
+    setState('working');
+    setErr('');
+    try {
+      const r = await getApi().composeInstrumental({
+        title: d.title.slice(0, 40),
+        prompt: d.instrumentalPrompt,
+        seconds: d.seconds,
+        bpm: d.bpm,
+        keyRoot: d.keyRoot,
+        scale: d.scale,
+        progression: d.progression,
+        melody: d.sections.flatMap((s) => s.lines).flatMap((l) => l.notes).map((n) => ({ midi: n.midi, beats: n.beats })).slice(0, 600),
+      });
+      onMade(r.url);
+      setState('idle');
+    } catch (e) {
+      if (e instanceof ApiError && (e.code === 'MUSIC_WARMING' || e.status === 504)) setState('warming');
+      else {
+        setErr(detail(e));
+        setState('error');
+      }
+    }
+  };
+  return (
+    <div className="mt-3 text-center">
+      <button onClick={() => void make()} disabled={state === 'working'} className="w-full rounded-full border border-violet-300/60 bg-violet-500/20 py-2 text-sm font-bold disabled:opacity-60">
+        {state === 'working' ? '🎹 伴奏を作曲中…（1〜2分）' : '🎹 伴奏をつくる（AI）'}
+      </button>
+      {state === 'warming' && <p className="mt-1.5 text-[11px] text-amber-200/80">音楽スタジオ（GPU）を起動中…。1〜2分たったら、もう一度押してね。</p>}
+      {state === 'error' && <p className="mt-1.5 whitespace-pre-wrap text-[11px] text-rose-300">うまく作れなかった。{err}</p>}
     </div>
   );
 }

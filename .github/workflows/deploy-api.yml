@@ -93,6 +93,7 @@ jobs:
             BUNNY_CDN_HOST=${{ vars.BUNNY_CDN_HOST }}
             STRIPE_PUBLISHABLE_KEY=${{ vars.STRIPE_PUBLISHABLE_KEY }}
             STRIPE_PRICE_ID=${{ vars.STRIPE_PRICE_ID }}
+            MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
           secrets: ${{ steps.sec.outputs.list }}
 
       - name: Check it is up

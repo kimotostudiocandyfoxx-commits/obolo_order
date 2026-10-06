@@ -22,6 +22,8 @@ import type {
   ComposeChatResult,
   ComposeDesignBody,
   SongDesign,
+  InstrumentalBody,
+  InstrumentalResult,
 } from '@obolo/shared';
 
 export class ApiError extends Error {
@@ -72,6 +74,8 @@ export interface Api {
   composeChat(body: ComposeChatBody): Promise<ComposeChatResult>;
   /** Mercury 作曲: the song design (lyrics in kana, chords, melody). */
   composeDesign(body: ComposeDesignBody): Promise<SongDesign>;
+  /** Mercury 伴奏: the instrumental from the design (GPU service), stored on Bunny. */
+  composeInstrumental(body: InstrumentalBody): Promise<InstrumentalResult>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
