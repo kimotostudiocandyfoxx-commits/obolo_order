@@ -105,6 +105,24 @@ export class UsersService {
   }
 
   /**
+   * Operator testing: put the account on `day` (story from the start, no countdown). Days up to 9
+   * also forget the order so the Day 9 payment can be tried again (the Stripe customer is kept).
+   */
+  async jumpJourney(userId: string, day: number): Promise<Me> {
+    const [u] = await this.db.write
+      .update(users)
+      .set({
+        journeyDay: day,
+        journeyCompletedAt: null,
+        ...(day <= JOURNEY_PAYMENT ? { orderedAt: null, stripeSubscriptionId: null } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(u);
+  }
+
+  /**
    * Day 9 "OK" without Stripe configured (demo, no charge). BillingController refuses it once
    * STRIPE_SECRET_KEY is set. The journey moves to ORDER when the day's story ends.
    */

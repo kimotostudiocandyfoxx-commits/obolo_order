@@ -382,6 +382,10 @@ export class DemoApi implements Api {
     });
   }
 
+  async jumpJourney(day: number) {
+    return this.patchMe(() => ({ journeyDay: day, journeyCompletedAt: null, ...(day <= JOURNEY_PAYMENT ? { orderedAt: null } : {}) }));
+  }
+
   async advanceJourney(skip: boolean) {
     return this.patchMe((u) => {
       if (!u.journeyCompletedAt || u.journeyDay >= JOURNEY_DONE) return {};

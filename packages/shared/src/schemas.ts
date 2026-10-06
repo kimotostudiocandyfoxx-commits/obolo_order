@@ -125,6 +125,10 @@ export type BatiEggBody = z.infer<typeof BatiEggBody>;
 export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) });
 export type BatiNameBody = z.infer<typeof BatiNameBody>;
 
+/** Operator testing (/lab, admin token): move the logged-in account to a journey day. */
+export const JumpJourneyBody = z.object({ day: z.number().int().min(1).max(10) });
+export type JumpJourneyBody = z.infer<typeof JumpJourneyBody>;
+
 /** Day 9: the embedded Stripe Checkout finished — the server checks the session and records the order. */
 export const ConfirmOrderBody = z.object({ sessionId: z.string().min(8).max(255) });
 export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;

@@ -11,7 +11,7 @@ export class HttpApi implements Api {
     const token = tokenStore.get();
     if (token) headers.authorization = `Bearer ${token}`;
     // operator testing: the admin token lifts the NEO look try limits
-    if (path.startsWith('/me/look')) {
+    if (path.startsWith('/me/look') || path === '/me/journey/jump') {
       const admin = typeof window !== 'undefined' ? localStorage.getItem('obolo.lookAdmin') : null;
       if (admin) headers['x-admin-token'] = admin;
     }
@@ -105,6 +105,9 @@ export class HttpApi implements Api {
   }
   completeJourneyDay(day: number, answers?: Record<string, string>) {
     return this.req<Awaited<ReturnType<Api['completeJourneyDay']>>>('POST', '/me/journey/complete', { day, answers });
+  }
+  jumpJourney(day: number) {
+    return this.req<Awaited<ReturnType<Api['jumpJourney']>>>('POST', '/me/journey/jump', { day });
   }
   advanceJourney(skip: boolean) {
     return this.req<Awaited<ReturnType<Api['advanceJourney']>>>('POST', '/me/journey/advance', { skip });

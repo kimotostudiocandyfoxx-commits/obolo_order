@@ -65,6 +65,38 @@ export default function LabPage() {
             <p className="mt-2 text-[11px] text-white/45">ログイン中：{me.displayName}（{me.email}）。決めた姿・バティはこのアカウントに保存されます。</p>
           </section>
 
+          <section className="mx-auto mt-5 max-w-md rounded-2xl border border-white/15 bg-white/5 p-4">
+            <p className="text-xs text-white/60">
+              旅の日を移動（管理トークンが必要）　いま：{me.journeyDay >= 10 ? 'ORDER' : `${me.journeyDay}日目`}
+              {me.orderedAt ? '・支払い済み' : ''}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
+                <button
+                  key={d}
+                  disabled={!admin || busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    setErr(null);
+                    try {
+                      setMe(await api.jumpJourney(d));
+                    } catch (e) {
+                      setErr(e instanceof Error ? e.message : String(e));
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                  className={`h-9 w-9 rounded-full text-sm disabled:opacity-30 ${me.journeyDay === d ? 'bg-amber-300 font-bold text-black' : 'bg-white/10'}`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-[11px] leading-relaxed text-white/45">
+              9 を押す → トップを開くと9日目が最初から始まります（支払いもやり直せます）。Stripe のテストはこれで。
+            </p>
+          </section>
+
           <section className="mx-auto mt-6 max-w-md">
             <h2 className="mb-2 text-sm tracking-widest text-amber-100">① ネオの姿</h2>
             <div className="relative h-[640px] overflow-hidden rounded-3xl border border-amber-200/20 bg-[radial-gradient(circle_at_50%_30%,#2a2140,#07060d)]">
