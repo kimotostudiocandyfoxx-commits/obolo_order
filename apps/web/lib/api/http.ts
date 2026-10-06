@@ -81,6 +81,12 @@ export class HttpApi implements Api {
   uploadVoice(blob: Blob) {
     return this.req<{ id: string; url: string }>('POST', '/media/voice', undefined, blob);
   }
+  uploadPhoto(blob: Blob) {
+    return this.req<Awaited<ReturnType<Api['uploadPhoto']>>>('POST', '/media/photo', undefined, blob);
+  }
+  uploadVideo(blob: Blob, maxSeconds: number) {
+    return this.req<Awaited<ReturnType<Api['uploadVideo']>>>('POST', `/media/video?max=${Math.round(maxSeconds)}`, undefined, blob);
+  }
   saturnFeed(cursor?: string, fresh?: boolean) {
     const q = new URLSearchParams();
     if (cursor) q.set('cursor', cursor);

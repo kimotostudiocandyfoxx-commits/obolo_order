@@ -1,17 +1,22 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { mediaKey, MediaKind, putObject } from '@obolo/media';
-import { VOICE_MAX_BYTES, VOICE_MIME_TYPES } from '@obolo/shared';
+import { MEDIA_POLICY, VOICE_MAX_BYTES, VOICE_MIME_TYPES } from '@obolo/shared';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { AppConfig, CONFIG } from '../config';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { mediaObjects, users } from '../db/schema';
+import { probe, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
 
 /** Spec §5: default per-user storage quota 1 GB across all planets. */
 export const STORAGE_QUOTA_BYTES = 1024 * 1024 * 1024;
 
 @Injectable()
 export class MediaService {
+  private readonly log = new Logger('Media');
   constructor(
     @Inject(CONFIG) private readonly cfg: AppConfig,
     private readonly db: Database,
@@ -31,6 +36,49 @@ export class MediaService {
     if (!Buffer.isBuffer(body) || body.length === 0) throw apiError(HttpStatus.BAD_REQUEST, 'EMPTY_UPLOAD', 'No audio received');
     if (body.length > VOICE_MAX_BYTES) throw apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'TOO_LARGE', 'Audio file too large');
     return this.store(userId, 'voice', mime, body, requestOrigin);
+  }
+
+  /** A photo (Jupiter roots etc.): re-encoded to WebP ≤ 1600 px before it is stored. */
+  async uploadPhoto(userId: string, mimeHeader: string | undefined, file: string, requestOrigin: string) {
+    const mime = (mimeHeader ?? '').split(';')[0].trim().toLowerCase();
+    if (!mime.startsWith('image/')) throw apiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 'UNSUPPORTED_IMAGE', `Unsupported image type: ${mime || 'none'}`);
+    let out: Awaited<ReturnType<typeof transcodePhoto>>;
+    try {
+      out = await transcodePhoto(await readFile(file));
+    } catch {
+      throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_IMAGE', 'Could not read this image');
+    }
+    const m = await this.store(userId, 'photo', 'image/webp', out.data, requestOrigin);
+    return { ...m, width: out.width, height: out.height };
+  }
+
+  /**
+   * A video (Jupiter 8 s posts, Mars …): re-encoded to 720p / ~1.5 Mbps MP4 and trimmed to
+   * `maxSeconds`, plus a small WebP poster for lists.
+   */
+  async uploadVideo(userId: string, mimeHeader: string | undefined, file: string, maxSeconds: number, requestOrigin: string) {
+    const mime = (mimeHeader ?? '').split(';')[0].trim().toLowerCase();
+    if (!mime.startsWith('video/')) throw apiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 'UNSUPPORTED_VIDEO', `Unsupported video type: ${mime || 'none'}`);
+    const limit = Math.max(1, Math.min(MEDIA_POLICY.video.maxSeconds, Math.floor(maxSeconds) || MEDIA_POLICY.video.maxSeconds));
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-v-'));
+    try {
+      const info = await probe(file).catch(() => null);
+      if (!info?.hasVideo) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_VIDEO', 'Could not read this video');
+      const outFile = join(dir, 'out.mp4');
+      try {
+        await transcodeVideo(file, outFile, limit);
+      } catch (e) {
+        this.log.warn(`transcode failed: ${e instanceof Error ? e.message : String(e)}`);
+        throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_VIDEO', 'Could not convert this video');
+      }
+      const out = await probe(outFile);
+      const poster = await videoPoster(outFile, join(dir, 'poster.png'));
+      const p = await this.store(userId, 'poster', 'image/webp', poster, requestOrigin);
+      const v = await this.store(userId, 'video', 'video/mp4', await readFile(outFile), requestOrigin);
+      return { ...v, posterUrl: p.url, seconds: Math.round(out.seconds * 10) / 10, width: out.width, height: out.height };
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   }
 
   /** Generated images (NEO look, Bati). */

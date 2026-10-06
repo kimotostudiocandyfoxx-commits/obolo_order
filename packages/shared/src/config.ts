@@ -30,3 +30,22 @@ export const BUDDY_CONTEXT_MESSAGES = 20;
 
 /** Business-day boundary for daily quotas. Spec does not say; PLACEHOLDER (P-MOON-2). */
 export const QUOTA_TIMEZONE = 'Asia/Tokyo';
+
+/**
+ * Upload processing policy (client decision 2026-10-06, docs/media.md). Re-encoding keeps a member
+ * who watches the full 88 minutes a day at roughly 30 GB/month of delivery.
+ */
+export const MEDIA_POLICY = {
+  video: {
+    /** shorter side */
+    maxSide: 720,
+    maxrate: '1500k',
+    bufsize: '3000k',
+    audioBitrate: '96k',
+    /** raw upload size accepted before re-encoding */
+    maxUploadBytes: 120 * 1024 * 1024,
+    /** default / hard cap on length; planets ask for less (Jupiter: 8 s). PLACEHOLDER (P-MEDIA-3). */
+    maxSeconds: 60,
+  },
+  photo: { maxSide: 1600, quality: 80, maxUploadBytes: 25 * 1024 * 1024 },
+} as const;

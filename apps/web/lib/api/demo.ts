@@ -255,6 +255,17 @@ export class DemoApi implements Api {
     return { id, url: `idb:${id}` };
   }
 
+  // demo: kept as-is in this browser (no re-encoding)
+  async uploadPhoto(blob: Blob) {
+    const { id, url } = await this.uploadVoice(blob);
+    return { id, url, width: 0, height: 0 };
+  }
+
+  async uploadVideo(blob: Blob, maxSeconds: number) {
+    const { id, url } = await this.uploadVoice(blob);
+    return { id, url, posterUrl: '', seconds: maxSeconds, width: 0, height: 0 };
+  }
+
   private view(p: DemoState['posts'][number], viewer: string): SaturnPostView {
     const { starredBy, ...rest } = p;
     return { ...rest, starredByMe: starredBy.includes(viewer) };

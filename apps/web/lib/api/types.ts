@@ -31,6 +31,22 @@ export class ApiError extends Error {
 }
 
 /** Everything the web app needs from the backend. Implemented by HttpApi (Cloud Run) and DemoApi (in-browser). */
+export interface UploadedPhoto {
+  id: string;
+  url: string;
+  width: number;
+  height: number;
+}
+
+export interface UploadedVideo {
+  id: string;
+  url: string;
+  posterUrl: string;
+  seconds: number;
+  width: number;
+  height: number;
+}
+
 export interface Api {
   readonly mode: 'live' | 'demo';
   /** Entry: members and invited people get a 6-digit code; anyone else → NOT_INVITED. */
@@ -48,6 +64,10 @@ export interface Api {
   buddyChat(text: string, locale: Locale): Promise<BuddyChatResponse>;
   buddyForget(): Promise<void>;
   uploadVoice(blob: Blob): Promise<{ id: string; url: string }>;
+  /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
+  uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
+  /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
+  uploadVideo(blob: Blob, maxSeconds: number): Promise<UploadedVideo>;
   saturnFeed(cursor?: string, fresh?: boolean): Promise<Paged<SaturnPostView>>;
   createSaturnPost(body: CreateSaturnPostBody): Promise<SaturnPostView>;
   deleteSaturnPost(id: string): Promise<void>;

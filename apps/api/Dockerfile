@@ -11,6 +11,8 @@ RUN pnpm --filter "@obolo/api..." build
 RUN pnpm --filter @obolo/api deploy --prod --legacy /out
 
 FROM node:22-slim
+# ffmpeg re-encodes uploaded videos to 720p / ~1.5 Mbps (docs/media.md)
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /out .
