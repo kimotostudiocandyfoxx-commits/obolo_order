@@ -47,4 +47,4 @@
 4. **歌**（これから）：設計図の音符（ひらがな＋音程＋長さ）を DiffSinger に渡して歌声を作り、伴奏と合わせて1曲にする → Bunny に保存。
 5. **自分の声で歌う／土星の読み上げ**（これから）：短い登録音声から声を真似る技術を重ねる。
 
-モデルは `GEMINI_MODEL`（既定 `gemini-2.5-flash`）。キーは土星や月と同じ `obolo-gemini-api-key`。
+モデルは `GEMINI_MODEL`（既定 `gemini-2.5-flash-lite`、全惑星のバティとの会話で共通）。キーは土星や月と同じ `obolo-gemini-api-key`。

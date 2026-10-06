@@ -124,8 +124,8 @@ export interface LlmConfig {
 /** Build the provider chain from config. With no keys at all, falls back to MockProvider. */
 export function createLlm(cfg: LlmConfig): LlmProvider {
   const chain: LlmProvider[] = [];
-  // PLACEHOLDER (P-AI-1): model names are defaults; tune after cost/quality tests.
-  if (cfg.geminiApiKey) chain.push(new GeminiProvider(cfg.geminiApiKey, cfg.geminiModel || 'gemini-2.5-flash'));
+  // P-AI-1: Flash-Lite for every text call (Bati chat on all planets, song design) — client, 2026-10-06 (cost).
+  if (cfg.geminiApiKey) chain.push(new GeminiProvider(cfg.geminiApiKey, cfg.geminiModel || 'gemini-2.5-flash-lite'));
   if (cfg.openaiApiKey) chain.push(new OpenAiProvider(cfg.openaiApiKey, cfg.openaiModel || 'gpt-4o-mini'));
   if (chain.length === 0) return new MockProvider();
   return chain.length === 1 ? chain[0] : new FallbackProvider(chain, cfg.onError);
