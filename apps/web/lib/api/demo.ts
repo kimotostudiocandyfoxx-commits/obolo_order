@@ -10,6 +10,7 @@ import {
   type InviteView,
   type Locale,
   type Me,
+  type OrderCheckout,
   type SaturnPostView,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
@@ -347,6 +348,7 @@ export class DemoApi implements Api {
       neoForm: null,
       avatarUrl: null,
       bati: null,
+      orderedAt: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };
@@ -372,7 +374,15 @@ export class DemoApi implements Api {
 
   async completeJourneyDay(day: number, answers?: Record<string, string>) {
     void answers;
-    return this.patchMe((u) => (u.journeyDay === day && !u.journeyCompletedAt ? { journeyCompletedAt: now() } : {}));
+    return this.patchMe((u) => {
+      if (u.journeyDay !== day || u.journeyCompletedAt) return {};
+      // day 9 (the Eclipse day) ends only after paying, and goes straight to ORDER
+      if (day === JOURNEY_PAYMENT) {
+        if (!u.orderedAt) throw new ApiError(402, 'ORDER_REQUIRED', 'not paid');
+        return { journeyDay: JOURNEY_DONE };
+      }
+      return { journeyCompletedAt: now() };
+    });
   }
 
   async advanceJourney(skip: boolean) {
@@ -440,8 +450,17 @@ export class DemoApi implements Api {
     return me;
   }
 
+  async orderCheckout(): Promise<OrderCheckout> {
+    return { mode: 'demo' };
+  }
+
+  async confirmOrder(): Promise<Me> {
+    throw new ApiError(409, 'BILLING_DEMO', 'demo');
+  }
+
   async becomeOrder() {
-    return this.patchMe((u) => (u.journeyDay === JOURNEY_PAYMENT ? { journeyDay: JOURNEY_DONE, journeyCompletedAt: null } : {}));
+    await sleep(600);
+    return this.patchMe((u) => (u.journeyDay === JOURNEY_PAYMENT && !u.orderedAt ? { orderedAt: now(), subscriptionStatus: 'demo' } : {}));
   }
 
   async myInvites() {

@@ -10,7 +10,7 @@ import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { neoForm } from '@obolo/shared';
-import { demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
+import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
 import { STORIES } from '@/lib/onboarding/stories';
 
 /**
@@ -35,6 +35,7 @@ function PreviewPlay() {
   const [round, setRound] = useState(0);
   const [refines, setRefines] = useState(0);
   const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
+  const [ordered, setOrdered] = useState(false);
 
   if (q.get('world') === 'venus') {
     return (
@@ -87,7 +88,14 @@ function PreviewPlay() {
       <StoryPlayer
         key={`${day}-${at}`}
         steps={story.steps}
-        vars={{ name: 'テスト', inviter: 'KIMORIN', neo: neoForm(neo)?.name, batiFood: day >= 4 ? 'ラーメン' : undefined }}
+        vars={{
+          name: 'テスト',
+          inviter: 'KIMORIN',
+          neo: neoForm(neo)?.name,
+          batiFood: day >= 4 ? 'ラーメン' : undefined,
+          bati: day >= 5 ? 'ラーメンバティ' : undefined,
+          batiImage: day >= 5 ? demoBati('ラーメン') : undefined,
+        }}
         initial={start > 0 ? { i: start, name: 'テスト', answers: {} } : null}
         onProgress={() => {}}
         onName={async () => {}}
@@ -121,6 +129,15 @@ function PreviewPlay() {
           return '';
         }}
         onBatiName={async () => {}}
+        ordered={ordered}
+        orderApi={{
+          checkout: async () => ({ mode: 'demo' }),
+          confirm: async () => {},
+          demo: async () => {
+            await new Promise((r) => setTimeout(r, 800));
+            setOrdered(true);
+          },
+        }}
         onEnd={() => setTimeout(() => setEnded(true), 1200)}
       />
       <BackLink />

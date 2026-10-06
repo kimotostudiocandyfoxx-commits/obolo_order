@@ -89,6 +89,16 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       onBatiName={async (n) => {
         setMe(await getApi().batiName(n));
       }}
+      ordered={!!me.orderedAt}
+      orderApi={{
+        checkout: () => getApi().orderCheckout(),
+        confirm: async (sessionId) => {
+          setMe(await getApi().confirmOrder(sessionId));
+        },
+        demo: async () => {
+          setMe(await getApi().becomeOrder());
+        },
+      }}
       onEnd={onEnd}
     />
   );

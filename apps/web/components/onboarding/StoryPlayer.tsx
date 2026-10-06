@@ -7,6 +7,7 @@ import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { neoForm } from '@obolo/shared';
 import { eggSvg } from '@/lib/look';
 import { EggStep, HatchStep } from './BatiSteps';
+import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { NeoChooser } from './NeoChooser';
 import { JupiterTutorial } from '@/components/jupiter/JupiterTutorial';
@@ -47,12 +48,15 @@ interface Props {
   onHatch?: () => Promise<string>;
   /** Day 4 'batiname' step. */
   onBatiName?: (name: string) => Promise<void>;
+  /** Day 9 'order' step: the Eclipse payment. `ordered` = already paid. */
+  orderApi?: OrderApi;
+  ordered?: boolean;
   onEnd: (answers: Record<string, string>) => void;
 }
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, onEnd }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onEnd }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -102,9 +106,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     batiFood: answers.food ?? vars.batiFood,
     look: answers.look ?? vars.look,
   };
-  /** '@bati' / '@egg' / '@me' sprites are the visitor's own pictures. */
+  /** '@bati' / '@egg' / '@me' sprites are the visitor's own pictures ('@bati-weak': out of mana). */
   const spriteSrc = (n: string) =>
-    n === '@bati' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
+    n === '@bati' || n === '@bati-weak' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
   /** Remember an answer (saved with the progress) without moving on. */
   const remember = (key: string, value: string) => {
     const a = { ...stateRef.current.answers, [key]: value };
@@ -349,7 +353,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
               key={name}
               src={src}
               alt=""
-              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : 'bottom-[24%] h-[50%]'}`}
+              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${name === '@bati-weak' ? 'bottom-[26%] h-[30%] rotate-[-6deg] rounded-[2rem] border-2 border-white/20 opacity-80 brightness-75 saturate-[.35]' : own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : 'bottom-[24%] h-[50%]'}`}
               style={spriteSlot(k, arr.length)}
               aria-hidden
             />
@@ -406,6 +410,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'mercury' && <MercuryTutorial onDone={next} />}
       {started && step?.t === 'mars' && <MarsTutorial onDone={next} />}
       {started && step?.t === 'venus' && <VenusTutorial onDone={next} />}
+      {started && step?.t === 'order' && orderApi && (
+        <EclipsePay api={orderApi} paid={!!ordered} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
+      )}
       {started && step?.t === 'neo' && (
         <NeoChooser
           onChoose={async (id) => {

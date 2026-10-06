@@ -50,6 +50,25 @@ jobs:
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
+      # Stripe (Day 9 payment) is switched on by the STRIPE_PUBLISHABLE_KEY variable, after
+      # scripts/stripe-setup.sh stored the secret key. Without it the payment runs in demo mode.
+      - name: Secrets
+        id: sec
+        run: |
+          {
+            echo 'list<<EOF'
+            echo 'DATABASE_URL=obolo-database-url:latest'
+            echo 'REDIS_URL=obolo-redis-url:latest'
+            echo 'GEMINI_API_KEY=obolo-gemini-api-key:latest'
+            echo 'BUNNY_STORAGE_KEY=obolo-bunny-storage-key:latest'
+            echo 'ADMIN_TOKEN=obolo-admin-token:latest'
+            if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
+              echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
+              echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'
+            fi
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
@@ -72,12 +91,9 @@ jobs:
             BUNNY_STORAGE_ZONE=${{ vars.BUNNY_STORAGE_ZONE }}
             BUNNY_STORAGE_ENDPOINT=${{ vars.BUNNY_STORAGE_ENDPOINT || 'sg.storage.bunnycdn.com' }}
             BUNNY_CDN_HOST=${{ vars.BUNNY_CDN_HOST }}
-          secrets: |
-            DATABASE_URL=obolo-database-url:latest
-            REDIS_URL=obolo-redis-url:latest
-            GEMINI_API_KEY=obolo-gemini-api-key:latest
-            BUNNY_STORAGE_KEY=obolo-bunny-storage-key:latest
-            ADMIN_TOKEN=obolo-admin-token:latest
+            STRIPE_PUBLISHABLE_KEY=${{ vars.STRIPE_PUBLISHABLE_KEY }}
+            STRIPE_PRICE_ID=${{ vars.STRIPE_PRICE_ID }}
+          secrets: ${{ steps.sec.outputs.list }}
 
       - name: Check it is up
         run: |

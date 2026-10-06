@@ -6,6 +6,7 @@ import { DAY5 } from './day5';
 import { DAY6 } from './day6';
 import { DAY7 } from './day7';
 import { DAY8 } from './day8';
+import { DAY9 } from './day9';
 import type { Step } from './script';
 
 /** Scripted journey days. Days without a script show the placeholder JourneyDayScreen. */
@@ -26,6 +27,8 @@ export const STORIES: Record<number, DayStory> = {
   6: { steps: DAY6, skipLabel: '明日まで待てへん', auth: true },
   7: { steps: DAY7, skipLabel: '明日まで待てへん', auth: true },
   8: { steps: DAY8, skipLabel: '明日まで待てへん', auth: true },
+  // the Eclipse day: payment inside the story, no countdown afterwards
+  9: { steps: DAY9, skipLabel: '明日まで待てへん', auth: true },
 };
 
 export const DEFAULT_SKIP_LABEL = '明日まで待てへん';

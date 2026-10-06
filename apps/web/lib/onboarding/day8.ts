@@ -6,7 +6,7 @@ import type { Step } from './script';
  * the stars collected on the other planets (no real money, no real products). Replaces spec's reels.
  * Flow: [認証] → wake up on Mars → KIMORIN: off to Venus by rocket (motion 8-1) → the gorilla trio
  * ロングG / ハットG / ボスG (KIMORIN's friends) → Venus play screen (placeholder layout until the
- * client's design, P-VENUS-1) → countdown. The last day of the journey: next is the Sun temple.
+ * client's design, P-VENUS-1) → countdown. The last planet; day 9 is the Eclipse day.
  * Art: longg/hatg/bossg.webp (client, 2026-10-05); the Venus backdrop is still generated.
  * Who says which of the client's lines is Claude's choice (✏️).
  */
@@ -46,7 +46,7 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'ボスG', text: '{name}の作ったもの、楽しみにしてるぜ。' },
   { t: 'sprite', image: 'kimorin-8' },
   { t: 'say', who: 'KIMORIN', text: 'これで、8つの星をぜんぶまわったケン。' },
-  { t: 'say', who: 'KIMORIN', text: '明日は、いよいよ太陽の神殿だ。\n遅れるなよ！' },
+  { t: 'say', who: 'KIMORIN', text: '明日は、もっと遠くの星へ行くケン。\n遅れるなよ！' }, // ✏️ (day 9 heads for Pluto)
   { t: 'sprite', image: null },
   { t: 'end' },
 ];

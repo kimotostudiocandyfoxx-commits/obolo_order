@@ -47,3 +47,23 @@ describe('the look and the Bati (client decision 2026-10-05)', () => {
     expect(t.indexOf('batiname')).toBeLessThan(t.indexOf('video:4-1'));
   });
 });
+
+describe('day 9: the Eclipse (client script 2026-10-06)', () => {
+  const steps = STORIES[9].steps;
+
+  it('MONBAN asks for the 88 yen, OK leads to the payment, then the rocket', () => {
+    const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'eclipse');
+    const ok = steps[c].t === 'choice' ? steps[c].options.find((o) => o.label === 'OK') : undefined;
+    const pay = labelIndex(steps, ok!.goto!);
+    expect(steps[pay + 1]).toEqual({ t: 'order', cancel: 'later' });
+    expect(steps.slice(pay).some((s) => s.t === 'say' && s.text.includes('エクリプス用のロケット'))).toBe(true);
+    expect(steps.slice(0, c).some((s) => s.t === 'say' && s.text.includes('月88円'))).toBe(true);
+  });
+
+  it('thinking it over (or leaving the payment) always comes back to the question', () => {
+    const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'eclipse');
+    const later = labelIndex(steps, 'later');
+    const back = steps.slice(later).find((s) => s.t === 'goto');
+    expect(labelIndex(steps, (back as { id: string }).id)).toBeLessThan(c);
+  });
+});

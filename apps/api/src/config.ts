@@ -60,6 +60,15 @@ const Env = z.object({
   OPENAI_API_KEY: secret(),
   OPENAI_MODEL: z.string().optional(),
 
+  /** Stripe (Day 9 Eclipse, ¥88/month). Without the secret key the payment runs in demo mode
+   *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */
+  STRIPE_SECRET_KEY: secret(),
+  STRIPE_PUBLISHABLE_KEY: secret(),
+  /** Signing secret of the webhook endpoint (POST /billing/webhook). Optional for the demo. */
+  STRIPE_WEBHOOK_SECRET: secret(),
+  /** Optional Price id (price_…). Unset = an inline ¥ORDER_PRICE_JPY monthly price. */
+  STRIPE_PRICE_ID: secret(),
+
   BUDDY_FREE_DAILY: z.coerce.number().default(30),
   /** Spec §2.2 overage (1 MANA/msg). Demo: billing off → blocked after the quota. */
   BUDDY_OVERAGE_ENABLED: bool(false),

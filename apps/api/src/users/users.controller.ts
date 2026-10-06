@@ -30,10 +30,4 @@ export class UsersController {
   advance(@UserId() userId: string, @Body() body: unknown) {
     return this.users.advanceJourney(userId, parseBody(AdvanceJourneyBody, body ?? {}).skip);
   }
-
-  @Post('order')
-  @HttpCode(200)
-  order(@UserId() userId: string) {
-    return this.users.becomeOrder(userId);
-  }
 }

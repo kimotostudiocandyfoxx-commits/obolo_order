@@ -109,6 +109,12 @@ export class HttpApi implements Api {
   advanceJourney(skip: boolean) {
     return this.req<Awaited<ReturnType<Api['advanceJourney']>>>('POST', '/me/journey/advance', { skip });
   }
+  orderCheckout() {
+    return this.req<Awaited<ReturnType<Api['orderCheckout']>>>('POST', '/me/order/checkout');
+  }
+  confirmOrder(sessionId: string) {
+    return this.req<Awaited<ReturnType<Api['confirmOrder']>>>('POST', '/me/order/confirm', { sessionId });
+  }
   becomeOrder() {
     return this.req<Awaited<ReturnType<Api['becomeOrder']>>>('POST', '/me/order');
   }

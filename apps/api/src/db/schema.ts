@@ -43,8 +43,12 @@ export const users = pgTable(
     birthdate: date('birthdate'),
     country: text('country').notNull().default('JP'),
     locale: text('locale').notNull().default('ja'),
-    /** none | demo | active | past_due | canceled — Stripe is not wired yet (P-BILL-1). */
+    /** none | demo | active | past_due | canceled … (Stripe subscription status once paid). */
     subscriptionStatus: text('subscription_status').notNull().default('demo'),
+    /** Day 9: when the visitor paid for the Eclipse (became ORDER). Null = not paid yet. */
+    orderedAt: timestamp('ordered_at', { withTimezone: true }),
+    stripeCustomerId: text('stripe_customer_id'),
+    stripeSubscriptionId: text('stripe_subscription_id'),
     voiceId: text('voice_id'),
     virtualAccountNo: text('virtual_account_no'),
     kycStatus: text('kyc_status').notNull().default('none'),
@@ -52,7 +56,7 @@ export const users = pgTable(
     /** Invite-only (client decision 2026-10-04): who invited this user. */
     invitedByUserId: uuid('invited_by_user_id'),
     invitedByName: text('invited_by_name'),
-    /** 8-day journey (see @obolo/shared journey.ts): 1–8 = day to play, 9 = payment, 10 = ORDER member.
+    /** 8-day journey (see @obolo/shared journey.ts): 1–8 = day to play, 9 = the Eclipse day (payment), 10 = ORDER member.
      *  Accounts created before the journey existed default to 10. */
     journeyDay: integer('journey_day').notNull().default(10),
     /** When the current day was finished; the next day unlocks 24 h later (or by skipping). */

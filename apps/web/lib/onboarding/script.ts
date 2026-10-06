@@ -63,6 +63,11 @@ export type Step =
   | { t: 'hatch' }
   /** Day 4: name the newborn Bati. */
   | { t: 'batiname'; placeholder: string; submit: string }
+  /**
+   * Day 9: the Eclipse payment (¥88/month, Stripe inside the story). Continues once paid;
+   * "もう少し考える" jumps to the `cancel` label.
+   */
+  | { t: 'order'; cancel: string }
   /** A handwritten-style letter card. Tap to continue. */
   | { t: 'letter'; text: string }
   | { t: 'label'; id: string }

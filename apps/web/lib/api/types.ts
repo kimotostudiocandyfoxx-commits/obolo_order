@@ -17,6 +17,7 @@ import type {
   NeoLookBody,
   NeoLookResult,
   WalletView,
+  OrderCheckout,
 } from '@obolo/shared';
 
 export class ApiError extends Error {
@@ -57,7 +58,11 @@ export interface Api {
   completeJourneyDay(day: number, answers?: Record<string, string>): Promise<Me>;
   /** Start the next day (skip = "明日まで待てへん"). */
   advanceJourney(skip: boolean): Promise<Me>;
-  /** "ORDERになるか？" → yes. Payment is PLACEHOLDER (P-BILL-1). */
+  /** Day 9 Eclipse payment: Stripe Embedded Checkout, or demo mode when billing is not configured. */
+  orderCheckout(): Promise<OrderCheckout>;
+  /** After Embedded Checkout completed: the server checks the session and records the order. */
+  confirmOrder(sessionId: string): Promise<Me>;
+  /** Demo mode only: "OK" without a charge. */
   becomeOrder(): Promise<Me>;
   // --- Day 3/4: generated OBOLO NEO look and the Bati egg (client decision 2026-10-05)
   lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;

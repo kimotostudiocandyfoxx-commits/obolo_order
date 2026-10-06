@@ -16,6 +16,7 @@ export default function PreviewIndex() {
     { href: '/preview/play?day=6&at=mercury', label: '6日目：水星（船の海と島）から' },
     { href: '/preview/play?day=7&at=mars', label: '7日目：火星（UFOの星図とスタジオ）から' },
     { href: '/preview/play?day=8&at=venus', label: '8日目：金星（マーケット）から' },
+    { href: '/preview/play?day=9&at=choice', label: '9日目：MONBANの「月88円」から（支払いはデモ）' },
     { href: '/preview/play?world=venus', label: '金星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=mars', label: '火星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=mercury', label: '水星だけ（チュートリアルなし）' },
@@ -31,7 +32,7 @@ export default function PreviewIndex() {
         {days.map((d) => (
           <Link key={d} href={`/preview/play?day=${d}`} className="rounded-2xl border border-amber-200/30 bg-white/5 px-4 py-3">
             <span className="text-amber-100">{d}日目</span>
-            <span className="ml-3 text-sm text-white/70">{JOURNEY.find((j) => j.day === d)?.title ?? ''}</span>
+            <span className="ml-3 text-sm text-white/70">{JOURNEY.find((j) => j.day === d)?.title ?? (d === 9 ? 'エクリプス（ORDERへ）' : '')}</span>
           </Link>
         ))}
       </div>

@@ -11,7 +11,7 @@ export interface Me {
   country: string;
   locale: Locale;
   subscriptionStatus: 'none' | 'demo' | 'active' | 'past_due' | 'canceled';
-  /** 1–8 = journey day to play, 9 = payment ("ORDERになるか？"), 10 = ORDER member. */
+  /** 1–8 = journey day to play, 9 = the Eclipse day (story + payment), 10 = ORDER member. */
   journeyDay: number;
   /** Set when the current day has been finished (the next unlocks 24 h later or by skipping). */
   journeyCompletedAt: string | null;
@@ -22,8 +22,18 @@ export interface Me {
   avatarUrl: string | null;
   /** The visitor's Bati: egg on Day 3 (food), hatched and named on Day 4. */
   bati: BatiView | null;
+  /** Day 9: when the Eclipse was paid for (null = not yet). */
+  orderedAt: string | null;
   createdAt: string;
 }
+
+/**
+ * Day 9 "エクリプス" payment (¥88/month). `stripe`: mount Stripe Embedded Checkout with the client
+ * secret, then confirm the session. `demo`: billing is not configured — confirm with /me/order.
+ */
+export type OrderCheckout =
+  | { mode: 'stripe'; publishableKey: string; clientSecret: string; sessionId: string }
+  | { mode: 'demo' };
 
 export interface BatiView {
   /** favourite food the egg was made from */

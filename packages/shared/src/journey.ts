@@ -1,14 +1,16 @@
 import type { PlanetId } from './planets';
 
 /**
- * The 8-day journey every invited person goes through before becoming an ORDER member
- * (client decision 2026-10-04). One day unlocks 24 h after the previous one is finished
- * (or immediately with "明日まで待てへん"). After day 8 comes the Sun temple, where the visitor is
- * asked "ORDERになるか？" (payment); members then return to the Moon temple to create Bati.
- * Until then the visitor is an apprentice, an "OBOLO NEO" (form chosen on day 3).
+ * The journey every invited person goes through before becoming an ORDER member
+ * (client decisions 2026-10-04 / 10-06). One day unlocks 24 h after the previous one is finished
+ * (or immediately with "明日まで待てへん"). Days 1–8 visit the planets; day 9 is the Eclipse day:
+ * Bati runs out of mana, MONBAN explains the Eclipse (linking your soul to the Sun) and asks for
+ * the ¥88/month for the secret rocket (payment inside the story). Paying makes you an ORDER member.
+ * Until then the visitor is an apprentice, an "OBOLO NEO".
  *
- * Stored on the user as `journeyDay` (1–8 = day to play, 9 = payment, 10 = ORDER member)
+ * Stored on the user as `journeyDay` (1–8 = day to play, 9 = the Eclipse day, 10 = ORDER member)
  * plus `journeyCompletedAt` (set when the current day is finished, cleared when the next starts).
+ * Day 9 has no countdown: finishing it after paying moves straight to 10.
  */
 export const JOURNEY_LAST_DAY = 8;
 export const JOURNEY_PAYMENT = 9;
@@ -62,13 +64,25 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
   { day: 8, planet: 'venus', guides: ['KIMORIN', 'ロングG', 'ハットG', 'ボスG'], title: '金星へ', beats: ['金星に行く', 'ゴリラ3人組に出会う', '金星（グッズをつくって星で売り買い）で遊ぶ'] },
 ];
 
+/** Day 9 (client, 2026-10-06): not a planet visit — the way to ORDER. */
+export const ECLIPSE_DAY_BEATS = [
+  '金星で目を覚ます。今日は冥王星へ……のはずが、バティの元気がない',
+  'バティは太陽の力「マナ」で生きている。マナが切れかけているので地球の本部へ戻る',
+  'MONBAN：太陽の神殿で、太陽と君の魂の一部をつなぐ「エクリプス」が必要',
+  'エクリプスに成功した人がORDER。バティにマナを渡せて、自由に宇宙を旅できる',
+  '太陽の神殿へは結社の秘密ロケット。リンクの経費は月88円 → OK で支払い',
+  'エクリプス用のロケットへ案内される',
+] as const;
+
 export function journeyMeta(day: number): JourneyDayMeta | undefined {
   return JOURNEY.find((d) => d.day === day);
 }
 
 /**
- * After the 8 days: the Sun temple ("ORDERになるか？" → membership), then a second visit to the
- * Moon temple. Bati is now born on day 4 (client decision 2026-10-05), so the second visit is where
- * the new member's Bati awakens and grows into its true form. Not built yet.
+ * After paying on day 9: the Eclipse itself at the Sun temple (Bati receives mana and evolves into
+ * its ORDER form), then the solar system. Script not delivered yet.
  */
-export const AFTER_JOURNEY = ['太陽の神殿で「ORDERになるか？」→ 会員になる', 'もう一度月の神殿へ → バティが目覚めて成長する'] as const;
+export const AFTER_JOURNEY = ['エクリプス用のロケットで太陽の神殿へ → エクリプス', 'バティにマナが渡り、ORDERの姿に進化する'] as const;
+
+/** Monthly price of the Eclipse / ORDER membership in yen (client, 2026-10-06). */
+export const ORDER_PRICE_JPY = 88;

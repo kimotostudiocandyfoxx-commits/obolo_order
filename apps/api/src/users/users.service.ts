@@ -29,6 +29,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     neoForm: u.neoForm,
     avatarUrl: u.avatarUrl,
     bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl } : null,
+    orderedAt: u.orderedAt?.toISOString() ?? null,
     createdAt: u.createdAt.toISOString(),
   };
 }
@@ -65,14 +66,19 @@ export class UsersService {
     return u;
   }
 
-  /** The story of `day` was finished. Idempotent; never moves the journey backwards. */
+  /**
+   * The story of `day` was finished. Idempotent; never moves the journey backwards.
+   * Day 9 (the Eclipse day) can only be finished after paying, and goes straight to ORDER.
+   */
   async completeJourneyDay(userId: string, body: CompleteJourneyDayBody): Promise<Me> {
     const cur = await this.load(userId);
     if (cur.journeyDay !== body.day || cur.journeyCompletedAt) return toMe(cur);
+    const eclipse = body.day === JOURNEY_PAYMENT;
+    if (eclipse && !cur.orderedAt) throw apiError(HttpStatus.PAYMENT_REQUIRED, 'ORDER_REQUIRED', 'The Eclipse has not been paid for');
     const [u] = await this.db.write
       .update(users)
       .set({
-        journeyCompletedAt: new Date(),
+        ...(eclipse ? { journeyDay: JOURNEY_DONE } : { journeyCompletedAt: new Date() }),
         onboardingJson: { ...cur.onboardingJson, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`d${body.day}.${k}`, v])) },
         updatedAt: new Date(),
       })
@@ -100,17 +106,25 @@ export class UsersService {
   }
 
   /**
-   * "ORDERになるか？" → yes. PLACEHOLDER (P-BILL-1): Stripe is not wired, so this only marks the
-   * user as an ORDER member in demo mode; the real flow must confirm payment first.
+   * Day 9 "OK" without Stripe configured (demo, no charge). BillingController refuses it once
+   * STRIPE_SECRET_KEY is set. The journey moves to ORDER when the day's story ends.
    */
-  async becomeOrder(userId: string): Promise<Me> {
+  async demoOrder(userId: string): Promise<Me> {
     const cur = await this.load(userId);
-    if (cur.journeyDay !== JOURNEY_PAYMENT) return toMe(cur);
+    if (cur.journeyDay !== JOURNEY_PAYMENT || cur.orderedAt) return toMe(cur);
+    return this.markOrdered(userId, { subscriptionStatus: 'demo' });
+  }
+
+  /** Record a paid (or demo) Eclipse. */
+  async markOrdered(
+    userId: string,
+    s: { subscriptionStatus: string; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null },
+  ): Promise<Me> {
     const [u] = await this.db.write
       .update(users)
-      .set({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, subscriptionStatus: 'demo', updatedAt: new Date() })
-      .where(eq(users.id, userId))
+      .set({ ...s, orderedAt: new Date(), updatedAt: new Date() })
+      .where(and(eq(users.id, userId), isNull(users.orderedAt)))
       .returning();
-    return toMe(u);
+    return u ? toMe(u) : this.getMe(userId);
   }
 }

@@ -80,7 +80,7 @@ export const AdminCreateInviteBody = CreateInviteBody.extend({
 export type AdminCreateInviteBody = z.infer<typeof AdminCreateInviteBody>;
 
 export const CompleteJourneyDayBody = z.object({
-  day: z.number().int().min(1).max(8),
+  day: z.number().int().min(1).max(9),
   /** Answers given in the story (e.g. "want to go to space?"). */
   answers: z.record(z.string().max(40), z.string().max(100)).optional(),
 });
@@ -124,6 +124,10 @@ export type BatiEggBody = z.infer<typeof BatiEggBody>;
 /** Day 4: the newborn Bati's name. */
 export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) });
 export type BatiNameBody = z.infer<typeof BatiNameBody>;
+
+/** Day 9: the embedded Stripe Checkout finished — the server checks the session and records the order. */
+export const ConfirmOrderBody = z.object({ sessionId: z.string().min(8).max(255) });
+export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;
 
 /** Day 3: refine the chosen look with one instruction (3 times). */
 export const RefineLookBody = z.object({ mediaId: z.string().uuid(), instruction: z.string().trim().min(1).max(60) });
