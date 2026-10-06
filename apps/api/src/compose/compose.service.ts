@@ -11,7 +11,7 @@ import {
 import type { ComposeChatBody, ComposeChatResult, ComposeDesignBody, InstrumentalBody, InstrumentalResult, SongDesign } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { MediaService } from '../media/media.service';
-import { generateInstrumental } from './music.client';
+import { generateInstrumental, musicStatus } from './music.client';
 import { apiError } from '../common/errors';
 import { LLM } from '../infra/tokens';
 
@@ -33,6 +33,11 @@ export class ComposeService {
     @Inject(CONFIG) private readonly cfg: AppConfig,
     private readonly media: MediaService,
   ) {}
+
+  async musicStatus() {
+    if (!this.cfg.MUSIC_URL) return { reachable: false, error: 'MUSIC_URL not set' };
+    return musicStatus(this.cfg.MUSIC_URL);
+  }
 
   /** Step 2: the instrumental from the design (GPU service, gpu/music), stored on Bunny. */
   async instrumental(userId: string, body: InstrumentalBody, origin: string): Promise<InstrumentalResult> {

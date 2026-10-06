@@ -17,6 +17,19 @@ async function idToken(audience: string): Promise<string | undefined> {
   return res.text();
 }
 
+/** The GPU service's /health (phase, download progress, error) — shown while the studio warms up. */
+export async function musicStatus(baseUrl: string): Promise<Record<string, unknown>> {
+  const url = baseUrl.replace(/\/$/, '');
+  try {
+    const token = await idToken(url);
+    const res = await fetch(`${url}/health`, { headers: token ? { authorization: `Bearer ${token}` } : {}, signal: AbortSignal.timeout(60_000) });
+    if (!res.ok) return { reachable: false, status: res.status, error: (await res.text().catch(() => '')).slice(0, 200) };
+    return { reachable: true, ...((await res.json()) as Record<string, unknown>) };
+  } catch (e) {
+    return { reachable: false, error: String(e).slice(0, 200) };
+  }
+}
+
 /** Ask the GPU service for an instrumental. Returns AAC (audio/mp4) bytes. */
 export async function generateInstrumental(baseUrl: string, body: InstrumentalBody): Promise<{ data: Buffer; seconds: number }> {
   const url = baseUrl.replace(/\/$/, '');

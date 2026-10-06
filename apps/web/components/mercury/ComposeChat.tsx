@@ -287,6 +287,29 @@ function SongCard({
 function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) => void }) {
   const [state, setState] = useState<'idle' | 'working' | 'warming' | 'error'>('idle');
   const [err, setErr] = useState('');
+  const [status, setStatus] = useState('');
+  // while warming, show what the GPU studio is doing (downloading the model, loading, or an error)
+  useEffect(() => {
+    if (state !== 'warming') return;
+    let live = true;
+    const poll = async () => {
+      try {
+        const s = await getApi().composeMusicStatus();
+        if (!live) return;
+        if (s.ready) setStatus('準備できた！もう一度押してね。');
+        else if (s.error) setStatus(`スタジオの状態：${String(s.error).slice(0, 160)}`);
+        else setStatus(`スタジオの状態：${String(s.phase ?? '起動中')}（${Number(s.seconds ?? 0)}秒・モデル ${Number(s.checkpointGB ?? 0)}GB）`);
+      } catch {
+        /* keep the last status */
+      }
+    };
+    void poll();
+    const t = setInterval(() => void poll(), 15000);
+    return () => {
+      live = false;
+      clearInterval(t);
+    };
+  }, [state]);
   if (song.instrumentalUrl) {
     return (
       <div className="mt-3 rounded-2xl bg-black/25 p-2">
@@ -325,7 +348,12 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
       <button onClick={() => void make()} disabled={state === 'working'} className="w-full rounded-full border border-violet-300/60 bg-violet-500/20 py-2 text-sm font-bold disabled:opacity-60">
         {state === 'working' ? '🎹 伴奏を作曲中…（1〜2分）' : '🎹 伴奏をつくる（AI）'}
       </button>
-      {state === 'warming' && <p className="mt-1.5 text-[11px] text-amber-200/80">音楽スタジオ（GPU）を起動中…。1〜2分たったら、もう一度押してね。</p>}
+      {state === 'warming' && (
+        <p className="mt-1.5 text-[11px] text-amber-200/80">
+          音楽スタジオ（GPU）を起動中…。1〜2分たったら、もう一度押してね。
+          {status && <span className="mt-0.5 block text-white/60">{status}</span>}
+        </p>
+      )}
       {state === 'error' && <p className="mt-1.5 whitespace-pre-wrap text-[11px] text-rose-300">うまく作れなかった。{err}</p>}
     </div>
   );

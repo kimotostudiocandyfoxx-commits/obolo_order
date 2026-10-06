@@ -17,6 +17,8 @@ ENGINE (MUSIC_ENGINE):
 """
 import os
 import subprocess
+import sys
+import time
 import tempfile
 import threading
 import traceback
@@ -37,7 +39,7 @@ ACE15_MODEL = os.environ.get("ACE15_MODEL", "acestep-v15-turbo")
 ACE_REF_STRENGTH = float(os.environ.get("ACE_REF_STRENGTH", "0"))
 NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 
-state: dict = {"engine": None, "error": None, "loading": False}
+state: dict = {"engine": None, "error": None, "loading": False, "phase": "starting", "since": time.time()}
 gen_lock = threading.Lock()
 app = FastAPI()
 
@@ -131,13 +133,53 @@ def read_audio(path: str) -> tuple[np.ndarray, int]:
     return np.frombuffer(raw, dtype=np.float32).copy(), sr
 
 
+CKPT_DIR = os.environ.get("ACESTEP_CHECKPOINTS_DIR", "/models/ace15")
+
+
+def dir_bytes(path: str) -> int:
+    total = 0
+    for root, _dirs, files in os.walk(path):
+        for f in files:
+            try:
+                total += os.path.getsize(os.path.join(root, f))
+            except OSError:
+                pass
+    return total
+
+
+def download_models() -> None:
+    """Fetch ACE-Step 1.5 checkpoints into the /models bucket (run as a Cloud Run job: no GPU,
+    no idle shutdown), so the GPU service only has to load them."""
+    from pathlib import Path
+
+    from acestep.model_downloader import check_main_model_exists, check_model_exists, ensure_dit_model, ensure_main_model
+
+    path = Path(CKPT_DIR)
+    path.mkdir(parents=True, exist_ok=True)
+    if not check_main_model_exists(path):
+        ok, msg = ensure_main_model(path, prefer_source="huggingface")
+        print(f"main model: {ok} {msg}", flush=True)
+        if not ok:
+            raise SystemExit(1)
+    if not check_model_exists(ACE15_MODEL, path):
+        ok, msg = ensure_dit_model(ACE15_MODEL, path, prefer_source="huggingface")
+        print(f"{ACE15_MODEL}: {ok} {msg}", flush=True)
+        if not ok:
+            raise SystemExit(1)
+    print(f"checkpoints ready in {CKPT_DIR} ({dir_bytes(CKPT_DIR) / 1e9:.1f} GB)", flush=True)
+
+
 def load() -> None:
     state["loading"] = True
+    state["phase"] = "loading model"
+    state["since"] = time.time()
     try:
         state["engine"] = MusicGen() if ENGINE == "musicgen" else AceStep15()
+        state["phase"] = "ready"
         print(f"engine {ENGINE} ready", flush=True)
     except Exception as e:  # noqa: BLE001 — reported by /health and /generate
         state["error"] = f"{e!r}"
+        state["phase"] = "failed"
         traceback.print_exc()
     finally:
         state["loading"] = False
@@ -168,7 +210,22 @@ class GenerateReq(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"engine": ENGINE, "ready": state["engine"] is not None, "loading": state["loading"], "error": state["error"]}
+    try:
+        import torch
+
+        cuda = torch.cuda.is_available()
+    except Exception:  # noqa: BLE001
+        cuda = False
+    return {
+        "engine": ENGINE,
+        "model": ACE15_MODEL,
+        "ready": state["engine"] is not None,
+        "phase": state["phase"],
+        "seconds": int(time.time() - state["since"]),
+        "checkpointGB": round(dir_bytes(CKPT_DIR) / 1e9, 2) if os.path.isdir(CKPT_DIR) else 0,
+        "cuda": cuda,
+        "error": state["error"],
+    }
 
 
 def to_m4a(audio: np.ndarray, sr: int) -> bytes:
@@ -202,3 +259,7 @@ def generate(r: GenerateReq):
         audio[-fade:] *= np.linspace(1, 0, fade, dtype=np.float32)
     audio = audio / (float(np.max(np.abs(audio))) or 1.0) * 0.9
     return Response(to_m4a(audio, sr), media_type="audio/mp4", headers={"x-seconds": f"{len(audio) / sr:.1f}", "x-engine": ENGINE})
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "download":
+    download_models()

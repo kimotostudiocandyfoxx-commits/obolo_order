@@ -76,6 +76,8 @@ export interface Api {
   composeDesign(body: ComposeDesignBody): Promise<SongDesign>;
   /** Mercury 伴奏: the instrumental from the design (GPU service), stored on Bunny. */
   composeInstrumental(body: InstrumentalBody): Promise<InstrumentalResult>;
+  /** The GPU studio's state (phase, download progress, error) while it warms up. */
+  composeMusicStatus(): Promise<Record<string, unknown>>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */

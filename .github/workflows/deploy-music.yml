@@ -54,6 +54,18 @@ jobs:
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
+      # Download the model weights into the bucket with a CPU job first (a GPU instance can be shut
+      # down while idle, which would restart a long download over and over). Quick once cached.
+      - name: Download model weights (Cloud Run job)
+        run: |
+          gcloud beta run jobs deploy obolo-music-download --image "$IMAGE" --region "$REGION" --quiet \
+            --service-account "$MUSIC_SA" --cpu 4 --memory 8Gi --task-timeout 3600 --max-retries 1 \
+            --add-volume name=models,type=cloud-storage,bucket="$BUCKET" \
+            --add-volume-mount volume=models,mount-path=/models \
+            --set-env-vars HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }} \
+            --command python --args /app/app.py,download
+          gcloud beta run jobs execute obolo-music-download --region "$REGION" --wait
+
       - name: Deploy (GPU)
         run: |
           gcloud beta run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --quiet \

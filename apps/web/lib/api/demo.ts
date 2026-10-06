@@ -267,6 +267,10 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
+  async composeMusicStatus(): Promise<Record<string, unknown>> {
+    return { reachable: false, error: 'demo' };
+  }
+
   async composeInstrumental(): Promise<InstrumentalResult> {
     throw new ApiError(501, 'DEMO', 'demo');
   }

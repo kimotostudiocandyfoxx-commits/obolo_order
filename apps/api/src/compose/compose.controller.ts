@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { ComposeChatBody, ComposeDesignBody, InstrumentalBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
@@ -22,6 +22,13 @@ export class ComposeController {
   async chat(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `compose-chat:${userId}`, 20, 60);
     return this.compose.chat(parseBody(ComposeChatBody, body));
+  }
+
+  /** The GPU studio's state (warming up, downloading, error) for the song card. */
+  @Get('music-status')
+  async musicStatus(@UserId() userId: string) {
+    await rateLimit(this.kv, `compose-status:${userId}`, 30, 60);
+    return this.compose.musicStatus();
   }
 
   /** PLACEHOLDER (P-MER-4): 30 tries a day per member (retries while the GPU warms up count too). */
