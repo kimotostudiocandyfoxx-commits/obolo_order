@@ -320,11 +320,13 @@ export class DemoApi implements Api {
     return { ...rest, author: { ...rest.author, look }, starredByMe: starredBy.includes(viewer) };
   }
 
-  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following') {
+  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following' | 'friends') {
     const viewer = this.uid();
-    const mine = new Set([...(this.s.follows?.[viewer] ?? []), viewer]);
+    const f = this.s.follows ?? {};
+    const mutual = new Set((f[viewer] ?? []).filter((u) => (f[u] ?? []).includes(viewer)));
+    const mine = tab === 'friends' ? mutual : new Set([...(f[viewer] ?? []), viewer]);
     const sorted = [...this.s.posts]
-      .filter((p) => !p.replyToId && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (tab !== 'following' || mine.has(p.author.id)))
+      .filter((p) => !p.replyToId && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (!tab || tab === 'all' || mine.has(p.author.id)))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {

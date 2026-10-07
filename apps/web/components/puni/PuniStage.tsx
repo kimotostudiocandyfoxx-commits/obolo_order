@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { anchors, BackParts, COLORS, FaceParts, FrontParts, SAMPLE_LOOKS, SLOT_LABELS, SLOTS, TextureDefs, WearPart, type Effect, type Look } from '@/lib/puni/parts';
+import { anchors, BackParts, COLORS, FaceParts, FrontParts, SAMPLE_LOOKS, SkinDefs, SkinGloss, SkinRim, skinStroke, SLOT_LABELS, SLOTS, TextureDefs, WearPart, type Effect, type Look } from '@/lib/puni/parts';
 import { createBlob, localPoints, poke, smoothPath, step, stretchMatrix, type Blob } from '@/lib/puni/physics';
 
 /**
@@ -13,6 +13,7 @@ import { createBlob, localPoints, poke, smoothPath, step, stretchMatrix, type Bl
 interface Nodes {
   outer: SVGGElement | null;
   rot: SVGGElement | null;
+  gloss: SVGGElement | null;
   bodies: SVGPathElement[];
   clip: SVGPathElement | null;
   parts: SVGGElement[];
@@ -85,7 +86,10 @@ export function PuniStage() {
         if (!n?.outer || !n.rot) continue;
         const [ma, mb, mc, md] = stretchMatrix(b);
         n.outer.setAttribute('transform', `translate(${b.x.toFixed(1)} ${b.y.toFixed(1)}) matrix(${ma.toFixed(3)} ${mb.toFixed(3)} ${mc.toFixed(3)} ${md.toFixed(3)} 0 0)`);
-        n.rot.setAttribute('transform', `rotate(${((b.angle * 180) / Math.PI).toFixed(1)})`);
+        const deg = (b.angle * 180) / Math.PI;
+        n.rot.setAttribute('transform', `rotate(${deg.toFixed(1)})`);
+        // the highlight stays top-left while the body rolls
+        n.gloss?.setAttribute('transform', `rotate(${(-deg).toFixed(1)}) translate(0 ${(b.cy * 0.5).toFixed(1)}) scale(${b.sx.toFixed(3)} ${b.sy.toFixed(3)})`);
         const d = smoothPath(localPoints(b));
         for (const p of n.bodies) p.setAttribute('d', d);
         n.clip?.setAttribute('d', d);
@@ -275,7 +279,7 @@ function Character({ look: l, R, register }: { look: Look; R: number; register: 
   const a = anchors(l.shape);
   const tex = `tex-${l.id}`;
   const clip = `clip-${l.id}`;
-  const n = useRef<Nodes>({ outer: null, rot: null, bodies: [], clip: null, parts: [], open: null, poked: null });
+  const n = useRef<Nodes>({ outer: null, rot: null, gloss: null, bodies: [], clip: null, parts: [], open: null, poked: null });
   const partsRef = (el: SVGGElement | null) => {
     if (el && !n.current.parts.includes(el)) n.current.parts.push(el);
   };
@@ -296,6 +300,7 @@ function Character({ look: l, R, register }: { look: Look; R: number; register: 
       <g ref={(el) => void (n.current.rot = el)}>
         <defs>
           <TextureDefs id={tex} tex={l.tex} color={l.color} R={R} />
+          <SkinDefs uid={l.id} color={l.color} R={R} />
           <clipPath id={clip}>
             <path ref={(el) => void (n.current.clip = el)} />
           </clipPath>
@@ -303,15 +308,18 @@ function Character({ look: l, R, register }: { look: Look; R: number; register: 
         <g ref={partsRef}>
           <BackParts look={l} a={a} />
         </g>
-        <path ref={bodyRef} fill={l.color} />
-        {l.tex !== 'none' && <path ref={bodyRef} fill={`url(#${tex})`} opacity={l.tex === 'rice' ? 0.95 : 0.8} />}
+        <path ref={bodyRef} fill={`url(#pg${l.id})`} />
+        {l.tex !== 'none' && <path ref={bodyRef} fill={`url(#${tex})`} opacity={l.tex === 'rice' ? 0.95 : 0.85} />}
         <g clipPath={`url(#${clip})`}>
           <g ref={partsRef}>
             <WearPart look={l} a={a} />
           </g>
         </g>
-        <path ref={bodyRef} fill="url(#puni-shine)" />
-        <path ref={bodyRef} fill="none" stroke="#000" strokeOpacity={0.22} strokeWidth={2} />
+        <SkinRim uid={l.id} clip={clip} color={l.color} R={R} />
+        <g ref={(el) => void (n.current.gloss = el)}>
+          <SkinGloss uid={l.id} R={R} />
+        </g>
+        <path ref={bodyRef} fill="none" stroke={skinStroke(l.color)} strokeOpacity={0.35} strokeWidth={1.5} />
         <g ref={partsRef}>
           <FaceParts look={l} a={a} />
           <FrontParts look={l} a={a} />

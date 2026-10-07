@@ -2,7 +2,7 @@
 
 import type { PuniLook } from '@obolo/shared';
 import { useId, useMemo } from 'react';
-import { anchors, BackParts, FaceParts, FrontParts, TextureDefs, WearPart } from '@/lib/puni/parts';
+import { anchors, BackParts, FaceParts, FrontParts, SkinDefs, SkinGloss, SkinRim, skinStroke, TextureDefs, WearPart } from '@/lib/puni/parts';
 import { createBlob, localPoints, smoothPath } from '@/lib/puni/physics';
 
 /**
@@ -31,29 +31,26 @@ export function PuniFigure({ look, size, speaking = false, poked = false, bounce
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-            <radialGradient id={`ps${uid}`} cx="35%" cy="28%" r="70%">
-              <stop offset="0" stopColor="#fff" stopOpacity=".55" />
-              <stop offset=".45" stopColor="#fff" stopOpacity="0" />
-              <stop offset="1" stopColor="#000" stopOpacity=".18" />
-            </radialGradient>
+            <SkinDefs uid={uid} color={look.color} R={R} />
             <TextureDefs id={tex} tex={look.tex} color={look.color} R={R} />
             <clipPath id={clip}>
               <path d={d} />
             </clipPath>
           </defs>
-          <ellipse cx={0} cy={R * (a.bottom / 100) + 4} rx={R * 0.8} ry={R * 0.12} fill="#000" opacity={0.16} />
+          <ellipse cx={0} cy={R * (a.bottom / 100) + 2} rx={R * 0.78} ry={R * 0.11} fill="#3a1d5c" opacity={0.18} />
           <g transform={`scale(${R / 100})`}>
             <BackParts look={look} a={a} />
           </g>
-          <path d={d} fill={look.color} />
-          {look.tex !== 'none' && <path d={d} fill={`url(#${tex})`} opacity={look.tex === 'rice' ? 0.95 : 0.8} />}
+          <path d={d} fill={`url(#pg${uid})`} />
+          {look.tex !== 'none' && <path d={d} fill={`url(#${tex})`} opacity={look.tex === 'rice' ? 0.95 : 0.85} />}
           <g clipPath={`url(#${clip})`}>
             <g transform={`scale(${R / 100})`}>
               <WearPart look={look} a={a} />
             </g>
           </g>
-          <path d={d} fill={`url(#ps${uid})`} />
-          <path d={d} fill="none" stroke="#000" strokeOpacity={0.22} strokeWidth={2} />
+          <SkinRim uid={uid} clip={clip} color={look.color} R={R} />
+          <SkinGloss uid={uid} R={R} />
+          <path d={d} fill="none" stroke={skinStroke(look.color)} strokeOpacity={0.35} strokeWidth={1.5} />
           <g transform={`scale(${R / 100})`} className={poked ? 'puni-poked' : ''}>
             <FaceParts look={look} a={a} />
             <FrontParts look={look} a={a} />

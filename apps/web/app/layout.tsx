@@ -24,6 +24,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const locale = await getLocale();
   return (
     <html lang={locale}>
+      <head>
+        {/* rounded font of the client's picture (falls back to Hiragino Maru Gothic on iPad) */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet" />
+      </head>
       <body className="antialiased">
         <div className="starfield" aria-hidden />
         <div className="starfield layer2" aria-hidden />

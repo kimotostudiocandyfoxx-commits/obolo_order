@@ -1,4 +1,4 @@
-import { PUNI_PARTS, type PuniLook, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
+import type { PuniLook, SaturnPostView, SaturnProfileView } from '@obolo/shared';
 
 /**
  * Sample "residents" so Saturn never feels empty while real posts are few.
@@ -20,28 +20,26 @@ const R: [string, string, string, string][] = [
   ['r12', 'カイ', 'ookami', 'はじめて土星にきた。みんなの声、あったかいな。'],
 ];
 
-const PALETTE = ['#f6f1e4', '#f4a3c4', '#8ec5ff', '#ffd36b', '#b58cff', '#9be3b0', '#ffb38a', '#5e8a4b', '#3b3433', '#5a5461'];
+const base: PuniLook = { shape: 'round', color: '#f4a3c4', tex: 'none', face: 'normal', eyes: 'sparkle', mouth: 'cat', hat: 'none', glasses: 'none', neck: 'none', wear: 'none', hands: 'none', item: 'none', effect: 'sparkle' };
 
-/** Sample residents are dressed too (deterministic mix of parts) so the world shows the variety. */
+/** Sample residents are dressed like the client's reference picture (P-SAT-4). */
+const LOOKS: Partial<PuniLook>[] = [
+  { color: '#ff8a6b', tex: 'salmon', item: 'star' }, // salmon sushi
+  { color: '#6f7378', shape: 'chunky', hands: 'none' }, // gray mochi
+  { color: '#f6f1e4', shape: 'tall', tex: 'rice', wear: 'nori' }, // onigiri
+  { color: '#9c7be0', tex: 'sesame', hat: 'crown', item: 'star' }, // purple sesame
+  { color: '#e5544b', neck: 'goldChain', item: 'star' }, // red
+  { color: '#5e8a4b', tex: 'scales', face: 'croc', mouth: 'none', hat: 'crown', neck: 'queenCollar', wear: 'dress' }, // croc queen
+  { color: '#3b3433', shape: 'chunky', tex: 'fur', face: 'gorilla', glasses: 'roundYellow', hat: 'bucket', neck: 'goldChain' }, // gorilla
+  { color: '#ffd36b', item: 'star', hands: 'peace' },
+  { color: '#8ec5ff', glasses: 'roundDark' },
+  { color: '#5a5461', shape: 'chunky', face: 'hippo', eyes: 'glow', mouth: 'none', wear: 'suit' }, // hippo
+  { color: '#9be3b0', hands: 'fan', item: 'star' },
+  { color: '#f4a3c4', tex: 'sesame', shape: 'tall' },
+];
+
 function residentLook(i: number): PuniLook {
-  const pick = <T,>(list: readonly T[], k: number) => list[(i * 7 + k * 13) % list.length];
-  const face = i % 4 === 1 ? pick(PUNI_PARTS.face, 1) : 'normal';
-  return {
-    shape: pick(PUNI_PARTS.shape, 2),
-    color: PALETTE[(i * 3) % PALETTE.length],
-    tex: i % 3 === 0 ? pick(PUNI_PARTS.tex, 3) : 'none',
-    face,
-    eyes: 'sparkle',
-    mouth: face === 'normal' ? pick(['smile', 'cat', 'smile'] as const, 4) : 'none',
-    hat: i % 2 === 0 ? pick(PUNI_PARTS.hat, 5) : 'none',
-    glasses: i % 5 === 2 ? pick(['roundDark', 'roundYellow'] as const, 6) : 'none',
-    neck: i % 4 === 3 ? 'goldChain' : 'none',
-    wear: i % 3 === 1 ? pick(PUNI_PARTS.wear, 7) : 'none',
-    hands: i % 2 === 1 ? pick(['peace', 'fan', 'spray', 'peace'] as const, 8) : 'none',
-    item: 'none',
-    effect: pick(PUNI_PARTS.effect, 9),
-    medal: String(10 + i),
-  };
+  return { ...base, ...LOOKS[i % LOOKS.length], medal: String(10 + i) };
 }
 
 export const SATURN_RESIDENTS: SaturnPostView[] = R.map(([id, name, neo, text], i) => ({

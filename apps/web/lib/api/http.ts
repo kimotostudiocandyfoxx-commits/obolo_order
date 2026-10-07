@@ -126,11 +126,11 @@ export class HttpApi implements Api {
   followSaturnUser(userId: string, on: boolean) {
     return this.req<Awaited<ReturnType<Api['followSaturnUser']>>>(on ? 'POST' : 'DELETE', `/saturn/users/${userId}/follow`);
   }
-  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following') {
+  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends') {
     const q = new URLSearchParams();
     if (cursor) q.set('cursor', cursor);
     if (fresh) q.set('fresh', '1');
-    if (tab === 'following') q.set('tab', 'following');
+    if (tab && tab !== 'all') q.set('tab', tab);
     const qs = q.toString();
     return this.req<Awaited<ReturnType<Api['saturnFeed']>>>('GET', `/saturn/posts${qs ? `?${qs}` : ''}`);
   }

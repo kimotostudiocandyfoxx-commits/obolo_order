@@ -7,7 +7,7 @@ import { z } from 'zod';
  */
 export const PUNI_PARTS = {
   shape: ['round', 'tall', 'chunky'],
-  tex: ['none', 'rice', 'fur', 'scales'],
+  tex: ['none', 'rice', 'fur', 'scales', 'salmon', 'sesame'],
   face: ['normal', 'gorilla', 'croc', 'hippo'],
   eyes: ['sparkle', 'glow'],
   mouth: ['smile', 'roar', 'cat', 'none'],
@@ -16,7 +16,7 @@ export const PUNI_PARTS = {
   neck: ['none', 'goldChain', 'queenCollar'],
   wear: ['none', 'nori', 'suit', 'dress', 'shorts'],
   hands: ['none', 'peace', 'robot', 'fan', 'spray'],
-  item: ['none', 'banana'],
+  item: ['none', 'banana', 'star'],
   effect: ['sparkle', 'zap', 'puff', 'hearts'],
 } as const;
 

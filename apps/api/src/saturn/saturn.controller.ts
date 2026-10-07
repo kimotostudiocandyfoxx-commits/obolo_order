@@ -18,7 +18,7 @@ export class SaturnController {
 
   @Get()
   feed(@UserId() userId: string, @Query('cursor') cursor?: string, @Query('fresh') fresh?: string, @Query('tab') tab?: string) {
-    return this.saturn.feed(userId, cursor, 20, fresh === '1', tab === 'following' ? 'following' : 'all');
+    return this.saturn.feed(userId, cursor, 20, fresh === '1', tab === 'following' || tab === 'friends' ? tab : 'all');
   }
 
   /** The voice replies under a post (little balls lined up under it). */

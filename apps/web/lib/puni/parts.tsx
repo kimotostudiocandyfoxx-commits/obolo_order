@@ -28,13 +28,13 @@ export interface Look extends PuniLook {
 
 /** A plain starting look from the member's NEO colour. */
 export function defaultLook(color = '#f4a3c4'): PuniLook {
-  return { shape: 'round', color, tex: 'none', face: 'normal', eyes: 'sparkle', mouth: 'smile', hat: 'none', glasses: 'none', neck: 'none', wear: 'none', hands: 'none', item: 'none', effect: 'sparkle' };
+  return { shape: 'round', color, tex: 'none', face: 'normal', eyes: 'sparkle', mouth: 'cat', hat: 'none', glasses: 'none', neck: 'none', wear: 'none', hands: 'none', item: 'star', effect: 'sparkle' };
 }
 
 /** The five characters from the client's reference pictures (2026-10-07). */
 export const SAMPLE_LOOKS: Look[] = [
-  { id: 'onigiri', name: 'おにぎりくん', shape: 'tall', color: '#f6f1e4', tex: 'rice', face: 'normal', eyes: 'sparkle', mouth: 'smile', hat: 'none', glasses: 'none', neck: 'none', wear: 'nori', hands: 'peace', item: 'none', effect: 'sparkle' },
-  { id: 'gorilla5454', name: 'ゴリラ 5454', shape: 'chunky', color: '#3b3433', tex: 'fur', face: 'gorilla', eyes: 'sparkle', mouth: 'none', hat: 'none', glasses: 'roundDark', neck: 'goldChain', wear: 'shorts', hands: 'robot', item: 'banana', effect: 'zap', medal: '5454' },
+  { id: 'onigiri', name: 'おにぎりくん', shape: 'tall', color: '#f6f1e4', tex: 'rice', face: 'normal', eyes: 'sparkle', mouth: 'cat', hat: 'none', glasses: 'none', neck: 'none', wear: 'nori', hands: 'peace', item: 'none', effect: 'sparkle' },
+  { id: 'gorilla5454', name: 'ゴリラ 5454', shape: 'chunky', color: '#3b3433', tex: 'fur', face: 'gorilla', eyes: 'sparkle', mouth: 'cat', hat: 'none', glasses: 'roundDark', neck: 'goldChain', wear: 'shorts', hands: 'robot', item: 'banana', effect: 'zap', medal: '5454' },
   { id: 'queen', name: 'ワニの女王', shape: 'round', color: '#5e8a4b', tex: 'scales', face: 'croc', eyes: 'sparkle', mouth: 'none', hat: 'crown', glasses: 'none', neck: 'queenCollar', wear: 'dress', hands: 'fan', item: 'none', effect: 'hearts' },
   { id: 'hippo', name: 'カバの紳士', shape: 'chunky', color: '#5a5461', tex: 'none', face: 'hippo', eyes: 'glow', mouth: 'none', hat: 'none', glasses: 'none', neck: 'none', wear: 'suit', hands: 'none', item: 'none', effect: 'zap' },
   { id: 'gorilla4545', name: 'ゴリラ 4545', shape: 'round', color: '#3a3332', tex: 'fur', face: 'gorilla', eyes: 'sparkle', mouth: 'roar', hat: 'bucket', glasses: 'roundYellow', neck: 'goldChain', wear: 'none', hands: 'spray', item: 'none', effect: 'puff', medal: '4545' },
@@ -43,7 +43,7 @@ export const SAMPLE_LOOKS: Look[] = [
 /** The choices per slot, for the wardrobe (label shown to the visitor). */
 export const SLOTS = {
   shape: [['round', 'まる'], ['tall', 'たて長'], ['chunky', 'どっしり']],
-  tex: [['none', 'つるつる'], ['rice', 'お米'], ['fur', 'けがわ'], ['scales', 'うろこ']],
+  tex: [['none', 'つるつる'], ['rice', 'お米'], ['fur', 'けがわ'], ['scales', 'うろこ'], ['salmon', 'サーモン'], ['sesame', 'ごま']],
   face: [['normal', 'ふつう'], ['gorilla', 'ゴリラ'], ['croc', 'ワニ'], ['hippo', 'カバ']],
   eyes: [['sparkle', 'キラキラ'], ['glow', '光る目']],
   mouth: [['smile', 'にっこり'], ['roar', 'ガオー'], ['cat', 'ω'], ['none', 'なし']],
@@ -52,7 +52,7 @@ export const SLOTS = {
   neck: [['none', 'なし'], ['goldChain', '金チェーン'], ['queenCollar', '女王のえり']],
   wear: [['none', 'なし'], ['nori', 'のり'], ['suit', 'スーツ'], ['dress', 'ドレス'], ['shorts', '短パン']],
   hands: [['none', 'なし'], ['peace', 'ピース'], ['robot', 'ロボ腕'], ['fan', '扇子'], ['spray', 'スプレー']],
-  item: [['none', 'なし'], ['banana', 'バナナ']],
+  item: [['none', 'なし'], ['banana', 'バナナ'], ['star', 'キラ星']],
 } as const satisfies Record<string, readonly (readonly [string, string])[]>;
 
 export const SLOT_LABELS: Record<keyof typeof SLOTS, string> = {
@@ -69,17 +69,17 @@ export const SLOT_LABELS: Record<keyof typeof SLOTS, string> = {
   item: '口もと',
 };
 
-export const COLORS = ['#f6f1e4', '#3b3433', '#5e8a4b', '#5a5461', '#f4a3c4', '#8ec5ff', '#ffd36b', '#b58cff'];
+export const COLORS = ['#f6f1e4', '#3b3433', '#6f7378', '#5e8a4b', '#5a5461', '#e5544b', '#ff8a6b', '#f4a3c4', '#8ec5ff', '#ffd36b', '#9c7be0', '#9be3b0'];
 
 /** Where things go on each body (box: radius 100). */
 export function anchors(shape: BodyShape) {
   switch (shape) {
     case 'tall':
-      return { top: -104, face: -22, side: 84, belly: 34, bottom: 116 };
+      return { top: -104, face: -6, side: 84, belly: 40, bottom: 116 };
     case 'chunky':
-      return { top: -84, face: -10, side: 108, belly: 40, bottom: 102 };
+      return { top: -84, face: 4, side: 108, belly: 46, bottom: 102 };
     default:
-      return { top: -98, face: -14, side: 98, belly: 38, bottom: 98 };
+      return { top: -98, face: 2, side: 98, belly: 44, bottom: 98 };
   }
 }
 
@@ -120,14 +120,82 @@ export function TextureDefs({ id, tex, color, R }: { id: string; tex: Texture; c
         <path d={`M0,${9 * s} a${6 * s},${6 * s} 0 0 1 ${12 * s},0 M${-6 * s},${4.5 * s} a${6 * s},${6 * s} 0 0 1 ${12 * s},0 M${6 * s},${4.5 * s} a${6 * s},${6 * s} 0 0 1 ${12 * s},0`} fill="none" stroke={shade(color, -0.3)} strokeWidth={0.9 * s} />
       </pattern>
     );
+  if (tex === 'salmon')
+    return (
+      <pattern id={id} width={60 * s} height={26 * s} patternUnits="userSpaceOnUse" patternTransform="rotate(-28)">
+        <path d={`M0,${13 * s} q${15 * s},${-9 * s} ${30 * s},0 t${30 * s},0`} fill="none" stroke="#fff4ec" strokeWidth={5 * s} strokeLinecap="round" opacity={0.9} />
+      </pattern>
+    );
+  if (tex === 'sesame')
+    return (
+      <pattern id={id} width={16 * s} height={14 * s} patternUnits="userSpaceOnUse">
+        <ellipse cx={4 * s} cy={4 * s} rx={1.6 * s} ry={2.6 * s} fill="#f5c84a" transform={`rotate(25 ${4 * s} ${4 * s})`} />
+        <ellipse cx={12 * s} cy={11 * s} rx={1.6 * s} ry={2.6 * s} fill="#f5c84a" transform={`rotate(-30 ${12 * s} ${11 * s})`} />
+      </pattern>
+    );
   return null;
 }
+
+/**
+ * The glossy "mochi" skin (client's reference picture): soft gradient body, a light rim at the
+ * lower edge, a big blurred highlight and a sharp shine dot top-left, a soft (not black) outline.
+ * `uid` keeps the gradient / filter ids unique per figure.
+ */
+export function SkinDefs({ uid, color, R }: { uid: string; color: string; R: number }) {
+  return (
+    <>
+      <radialGradient id={`pg${uid}`} cx=".38" cy=".32" r=".78">
+        <stop offset="0" stopColor={shade(color, 0.32)} />
+        <stop offset=".55" stopColor={color} />
+        <stop offset="1" stopColor={shade(color, -0.32)} />
+      </radialGradient>
+      <filter id={`pb${uid}`} x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation={R * 0.07} />
+      </filter>
+    </>
+  );
+}
+
+/** Rim light (needs the body clip) — drawn over the body / texture / clothes. */
+export function SkinRim({ uid, clip, color, R }: { uid: string; clip: string; color: string; R: number }) {
+  return (
+    <g clipPath={`url(#${clip})`}>
+      <ellipse cx={R * 0.1} cy={R * 0.16} rx={R * 1.02} ry={R * 1.02} fill="none" stroke={shade(color, 0.55)} strokeWidth={R * 0.1} opacity={0.45} filter={`url(#pb${uid})`} />
+    </g>
+  );
+}
+
+/** The highlight: stays top-left whatever the body does (the stage counter-rotates it). */
+export function SkinGloss({ uid, R }: { uid: string; R: number }) {
+  return (
+    <>
+      <ellipse cx={-R * 0.36} cy={-R * 0.5} rx={R * 0.36} ry={R * 0.2} fill="#fff" opacity={0.75} transform={`rotate(-28 ${-R * 0.36} ${-R * 0.5})`} filter={`url(#pb${uid})`} />
+      <ellipse cx={-R * 0.48} cy={-R * 0.56} rx={R * 0.09} ry={R * 0.06} fill="#fff" opacity={0.95} transform={`rotate(-28 ${-R * 0.48} ${-R * 0.56})`} />
+    </>
+  );
+}
+
+export const skinStroke = (color: string) => shade(color, -0.4);
 
 // --- parts ----------------------------------------------------------------------------------------
 
 /** Behind the body: ears, the queen's collar back, the nori tails. */
 export function BackParts({ look: l, a }: { look: PuniLook; a: A }) {
   const out: ReactNode[] = [];
+  const limb = shade(l.color, -0.18);
+  out.push(
+    <g key="feet">
+      <ellipse cx={-34} cy={a.bottom - 6} rx={20} ry={14} fill={limb} />
+      <ellipse cx={34} cy={a.bottom - 6} rx={20} ry={14} fill={limb} />
+    </g>,
+  );
+  if (l.hands === 'none')
+    out.push(
+      <g key="arms">
+        <ellipse cx={-a.side * 0.98} cy={a.belly - 4} rx={16} ry={12} fill={limb} transform={`rotate(-25 ${-a.side * 0.98} ${a.belly - 4})`} />
+        <ellipse cx={a.side * 0.98} cy={a.belly - 4} rx={16} ry={12} fill={limb} transform={`rotate(25 ${a.side * 0.98} ${a.belly - 4})`} />
+      </g>,
+    );
   if (l.face === 'gorilla')
     out.push(
       <g key="ears">
@@ -222,18 +290,18 @@ function Eye({ x, y, kind }: { x: number; y: number; kind: Eyes }) {
     );
   return (
     <g>
-      <ellipse cx={x} cy={y} rx={11} ry={13} fill="#1d1622" />
-      <circle cx={x + 3.5} cy={y - 4.5} r={4.6} fill="#fff" />
-      <circle cx={x - 4} cy={y + 5} r={1.8} fill="#fff" />
-      <path d={`M${x - 3},${y + 1} l1.2,-3 l1.2,3 l3,1.2 l-3,1.2 l-1.2,3 l-1.2,-3 l-3,-1.2z`} fill="#fff" opacity={0.85} />
+      <ellipse cx={x} cy={y} rx={8.5} ry={10} fill="#241a2e" />
+      <ellipse cx={x} cy={y + 4} rx={6} ry={4} fill="#5b3f7a" opacity={0.55} />
+      <circle cx={x + 2.6} cy={y - 3.6} r={3.6} fill="#fff" />
+      <circle cx={x - 3} cy={y + 4} r={1.5} fill="#fff" opacity={0.9} />
     </g>
   );
 }
 
 /** Face: muzzle, eyes (normal + "poked" >_<, the stage switches them), mouth, cheeks. */
 export function FaceParts({ look: l, a }: { look: PuniLook; a: A }) {
-  const ey = a.face - (l.face === 'croc' ? 26 : l.face === 'hippo' ? 22 : 6);
-  const ex = l.face === 'croc' ? 30 : 30;
+  const ey = a.face - (l.face === 'croc' ? 26 : l.face === 'hippo' ? 22 : l.face === 'gorilla' ? 6 : 0);
+  const ex = l.face === 'normal' ? 34 : 30;
   const out: ReactNode[] = [];
   if (l.face === 'gorilla') {
     out.push(
@@ -284,14 +352,14 @@ export function FaceParts({ look: l, a }: { look: PuniLook; a: A }) {
       )}
     </g>,
   );
-  if (l.face === 'normal')
+  if (l.face !== 'croc')
     out.push(
-      <g key="cheeks" opacity={0.75}>
-        <ellipse cx={-50} cy={ey + 18} rx={12} ry={7.5} fill="#f59ab0" />
-        <ellipse cx={50} cy={ey + 18} rx={12} ry={7.5} fill="#f59ab0" />
+      <g key="cheeks" opacity={0.7}>
+        <ellipse cx={-ex - 14} cy={ey + 14} rx={11} ry={6.5} fill="#ff8fb0" />
+        <ellipse cx={ex + 14} cy={ey + 14} rx={11} ry={6.5} fill="#ff8fb0" />
       </g>,
     );
-  const my = l.face === 'gorilla' ? a.face + 40 : ey + 26;
+  const my = l.face === 'gorilla' ? a.face + 40 : l.face === 'normal' ? ey + 4 : ey + 26;
   if (l.mouth === 'smile') out.push(<path key="mouth" d={`M-15,${my - 4} Q0,${my - 6} 15,${my - 4} Q13,${my + 16} 0,${my + 16} Q-13,${my + 16} -15,${my - 4}Z`} fill="#7a2a33" />, <ellipse key="tongue" cx={0} cy={my + 10} rx={8} ry={4.5} fill="#f08a98" />);
   if (l.mouth === 'roar')
     out.push(
@@ -301,7 +369,7 @@ export function FaceParts({ look: l, a }: { look: PuniLook; a: A }) {
         <path d={`M-18,${my - 8} l4,10 l4,-10 M10,${my - 8} l4,10 l4,-10`} fill="#fff" />
       </g>,
     );
-  if (l.mouth === 'cat') out.push(<path key="mouth" d={`M-12,${my} q6,7 12,0 q6,7 12,0`} fill="none" stroke="#1d1622" strokeWidth={3.5} strokeLinecap="round" />);
+  if (l.mouth === 'cat') out.push(<path key="mouth" d={`M-10,${my} q5,6 10,0 q5,6 10,0`} fill="none" stroke="#2a1d33" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />);
   return <>{out}</>;
 }
 
@@ -346,6 +414,17 @@ export function FrontParts({ look: l, a }: { look: PuniLook; a: A }) {
         <path d="M-10,0 Q14,16 44,4 Q48,2 46,-3 Q16,6 -8,-8z" fill="#f6d24a" stroke="#8a6a12" strokeWidth={2} />
         <path d="M44,4 l6,-3" stroke="#5b450c" strokeWidth={4} strokeLinecap="round" />
       </g>,
+    );
+  if (l.item === 'star')
+    out.push(
+      <path
+        key="star"
+        d={`M${a.side * 0.72},${a.top + 2} q3,14 16,17 q-13,3 -16,17 q-3,-14 -16,-17 q13,-3 16,-17z`}
+        fill="#ffe27a"
+        stroke="#fff6c4"
+        strokeWidth={2}
+        className="animate-[twinkle_2.4s_ease-in-out_infinite]"
+      />,
     );
   if (l.hat === 'bucket')
     out.push(

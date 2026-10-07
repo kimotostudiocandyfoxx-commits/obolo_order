@@ -27,12 +27,18 @@ export class SaturnService {
   ) {}
 
   /**
-   * Timeline (newest first), replies left out (they live under their post).
-   * tab "following": only people the viewer follows, and the viewer. PLACEHOLDER (P-SAT-2): ranking.
+   * Timeline (newest first), replies left out (they live under their post). Tabs (every planet,
+   * client decision 2026-10-07): みんな = everyone, フォロー = people the viewer follows (and the
+   * viewer), ダチ = mutual follows only. PLACEHOLDER (P-SAT-2): ranking.
    */
-  async feed(viewerId: string, cursor?: string, limit = 20, fresh = false, tab: 'all' | 'following' = 'all'): Promise<Paged<SaturnPostView>> {
-    const following = tab === 'following' ? sql`(${saturnPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${saturnPosts.userId} = ${viewerId})` : undefined;
-    return this.page(viewerId, and(isNull(saturnPosts.replyToId), alive(), following), cursor, limit, fresh);
+  async feed(viewerId: string, cursor?: string, limit = 20, fresh = false, tab: 'all' | 'following' | 'friends' = 'all'): Promise<Paged<SaturnPostView>> {
+    const scope =
+      tab === 'following'
+        ? sql`(${saturnPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${saturnPosts.userId} = ${viewerId})`
+        : tab === 'friends'
+          ? sql`${saturnPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
+          : undefined;
+    return this.page(viewerId, and(isNull(saturnPosts.replyToId), alive(), scope), cursor, limit, fresh);
   }
 
   /** Someone's posts (their page), replies left out. */
