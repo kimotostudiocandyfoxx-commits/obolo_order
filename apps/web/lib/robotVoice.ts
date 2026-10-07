@@ -9,18 +9,25 @@
  *  - a short comb delay for a tin-can ring, and a little bit-crush grit.
  * PLACEHOLDER (P-SAT-16): the three strengths are tuned by ear.
  */
-export type RobotLevel = 'light' | 'robot' | 'full';
+export type RobotLevel = 'light' | 'mid' | 'robot' | 'full';
+
+/** The one the tutorial uses (client choice 2026-10-07: between ちょいロボ and ロボ, without the hiss). */
+export const TUTORIAL_ROBOT: RobotLevel = 'mid';
 
 export const ROBOT_LEVELS: { id: RobotLevel; label: string }[] = [
   { id: 'light', label: 'ちょいロボ' },
+  { id: 'mid', label: 'まんなかロボ' },
   { id: 'robot', label: 'ロボ' },
   { id: 'full', label: 'がっつりロボ' },
 ];
 
-const PRESETS: Record<RobotLevel, { vocoder: number; ring: number; ringHz: number; dry: number; comb: number; combMs: number; crush: number; carrierHz: number }> = {
-  light: { vocoder: 0, ring: 0.75, ringHz: 34, dry: 0.35, comb: 0.35, combMs: 9, crush: 0, carrierHz: 0 },
-  robot: { vocoder: 0.75, ring: 0.45, ringHz: 50, dry: 0, comb: 0.5, combMs: 7, crush: 0.25, carrierHz: 110 },
-  full: { vocoder: 1, ring: 0.3, ringHz: 70, dry: 0, comb: 0.62, combMs: 5, crush: 0.6, carrierHz: 92 },
+// noise = the hiss mixed into the vocoder's buzz (for the s / t sounds); crush = digital grit
+const PRESETS: Record<RobotLevel, { vocoder: number; ring: number; ringHz: number; dry: number; comb: number; combMs: number; crush: number; carrierHz: number; noise: number; gain: number }> = {
+  light: { vocoder: 0, ring: 0.75, ringHz: 34, dry: 0.35, comb: 0.35, combMs: 9, crush: 0, carrierHz: 0, noise: 0, gain: 0.75 },
+  // half of each, no grit and almost no hiss: robotic but clean
+  mid: { vocoder: 0.45, ring: 0.6, ringHz: 42, dry: 0.15, comb: 0.42, combMs: 8, crush: 0, carrierHz: 110, noise: 0.05, gain: 0.45 },
+  robot: { vocoder: 0.75, ring: 0.45, ringHz: 50, dry: 0, comb: 0.5, combMs: 7, crush: 0.25, carrierHz: 110, noise: 0.25, gain: 0.75 },
+  full: { vocoder: 1, ring: 0.3, ringHz: 70, dry: 0, comb: 0.62, combMs: 5, crush: 0.6, carrierHz: 92, noise: 0.25, gain: 0.75 },
 };
 
 /** Builds the effect between `input` and `out` on any (realtime or offline) context. */
@@ -62,7 +69,7 @@ function robotChain(ctx: BaseAudioContext, input: AudioNode, out: AudioNode, lev
     const noise = ctx.createBufferSource();
     const nb = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
     const d = nb.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * 0.25;
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * p.noise;
     noise.buffer = nb;
     noise.loop = true;
     const carrierBus = ctx.createGain();
@@ -90,7 +97,8 @@ function robotChain(ctx: BaseAudioContext, input: AudioNode, out: AudioNode, lev
       r.curve = curve;
       const env = ctx.createBiquadFilter();
       env.type = 'lowpass';
-      env.frequency.value = 28;
+      // smoother envelopes for the clean one (less rattle)
+      env.frequency.value = p.noise < 0.1 ? 20 : 28;
       const boost = ctx.createGain();
       boost.gain.value = 9;
       pre.connect(an).connect(r).connect(env).connect(boost);
@@ -142,7 +150,7 @@ function robotChain(ctx: BaseAudioContext, input: AudioNode, out: AudioNode, lev
   comp.threshold.value = -18;
   comp.ratio.value = 4;
   const vol = ctx.createGain();
-  vol.gain.value = 0.75;
+  vol.gain.value = p.gain;
   tail.connect(post).connect(comp).connect(vol).connect(out);
 }
 

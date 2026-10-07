@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { spriteUrl } from '@/lib/onboarding/media';
-import { decodeVoice, playRobot, ROBOT_LEVELS, stopRobot, unlockRobot, type RobotLevel } from '@/lib/robotVoice';
+import { decodeVoice, playRobot, ROBOT_LEVELS, stopRobot, TUTORIAL_ROBOT, unlockRobot, type RobotLevel } from '@/lib/robotVoice';
 import { useRecorder } from '@/lib/useRecorder';
 
 /**
@@ -75,6 +75,7 @@ export function RobotVoiceTest() {
             {ROBOT_LEVELS.map((l) => (
               <button key={l.id} onClick={() => void play(l.id)} className={`rounded-2xl py-3 text-sm font-black ${playing === l.id ? 'bg-violet-500 text-white' : 'bg-violet-50 text-[#5a3f8a]'}`}>
                 🤖 {l.label}
+                {l.id === TUTORIAL_ROBOT && <span className="ml-1 rounded-full bg-pink-100 px-1.5 text-[9px] text-pink-500">チュートリアル用</span>}
               </button>
             ))}
           </div>
