@@ -444,7 +444,6 @@ export class DemoApi implements Api {
       user: { ...a, bio: u?.bio ?? '' },
       postCount: posts.length,
       stars: posts.reduce((n, p) => n + p.starCount, 0),
-      followers: Object.values(f).filter((l) => l.includes(userId)).length,
       following: (f[userId] ?? []).length,
       followedByMe: (f[viewer] ?? []).includes(userId),
       isMe: viewer === userId,

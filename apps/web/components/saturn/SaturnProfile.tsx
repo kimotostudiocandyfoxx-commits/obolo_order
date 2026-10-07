@@ -131,11 +131,11 @@ export function SaturnProfile({
               <p className="mt-3 whitespace-pre-wrap text-center text-sm leading-relaxed text-slate-600">{u.bio || (profile.isMe ? 'まだ自己紹介がないよ' : '')}</p>
             )}
 
-            <div className="mt-4 grid grid-cols-4 gap-1 rounded-2xl bg-violet-50/70 py-2.5 text-center">
+            {/* no follower count (client rule 2026-10-07) */}
+            <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl bg-violet-50/70 py-2.5 text-center">
               {(
                 [
                   ['声', profile.postCount],
-                  ['フォロワー', profile.followers],
                   ['フォロー', profile.following],
                   ['もらった星', profile.stars],
                 ] as const

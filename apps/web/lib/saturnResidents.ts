@@ -104,7 +104,6 @@ export function residentProfile(authorId: string): SaturnProfileView | null {
     user: { ...p.author, bio: 'サンプルの住人。土星でのんびりころりん中。' },
     postCount: 1,
     stars: p.starCount,
-    followers: 40 + (h % 300),
     following: 10 + (h % 80),
     followedByMe: false,
     isMe: false,

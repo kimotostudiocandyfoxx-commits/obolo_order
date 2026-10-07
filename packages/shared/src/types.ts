@@ -170,7 +170,7 @@ export interface SaturnPostRef {
 export interface SaturnProfileView {
   user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string; look?: PuniLook | null; pic?: string | null };
   postCount: number;
-  followers: number;
+  // no follower count anywhere in the app (client rule 2026-10-07): following yes, numbers of followers no
   following: number;
   /** stars their posts received */
   stars: number;

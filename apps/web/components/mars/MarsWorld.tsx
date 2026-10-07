@@ -154,7 +154,6 @@ export function MarsWorld({ events, overlay }: { events?: MarsEvents; overlay?: 
           theme={theme}
           title={view.who === 'me' ? myHandle : view.who.handle}
           isMe={view.who === 'me'}
-          followers={view.who === 'me' ? '0' : view.who.followers}
           works={view.who === 'me' ? myWorks : view.who.works}
           flyingCount={view.who === 'me' ? myFlying.length : view.who.flying.length}
           locker={view.who === 'me' ? mine.locker : []}
@@ -303,7 +302,6 @@ function StudioView({
   theme,
   title,
   isMe,
-  followers,
   works,
   flyingCount,
   locker,
@@ -316,7 +314,6 @@ function StudioView({
   theme: Theme;
   title: string;
   isMe: boolean;
-  followers: string;
   works: Video[];
   flyingCount: number;
   locker: Video[];
@@ -342,7 +339,7 @@ function StudioView({
         <div className="absolute flex flex-col items-center justify-center rounded-2xl border border-amber-400/60 bg-[#1c0d08]/95 text-center shadow-[0_0_24px_rgba(255,150,60,0.35)]" style={{ ...pct(st.title), containerType: 'inline-size' }}>
           <p className="truncate px-2 text-[clamp(14px,9cqw,44px)] font-black tracking-wide text-amber-50">{title.toUpperCase()} STUDIO</p>
           <p className="text-[clamp(9px,3.4cqw,15px)] text-white/75">
-            フォロワー {followers} ・ 作品 {works.length + flyingCount} ・ {flyingCount ? `とんでいる映像 ${flyingCount}` : '総再生 —'}
+            作品 {works.length + flyingCount} ・ {flyingCount ? `とんでいる映像 ${flyingCount}` : '総再生 —'}
           </p>
         </div>
         <div className="absolute flex gap-[3%]" style={pct(st.buttons)}>

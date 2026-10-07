@@ -44,7 +44,6 @@ export interface Creator {
   flying: Video[];
   /** older videos, shown in the studio */
   works: Video[];
-  followers: string;
 }
 
 /** Where each UFO (with its card) sits on the two timeline arts, in % of 1254×1045. */
@@ -91,14 +90,14 @@ const LIVE = P(128, 57, 'minor', [0, 5, 3, 4], 'sawtooth');
 const EPIC = P(76, 60, 'minor', [0, 3, 4, 3], 'triangle');
 
 export const CREATORS: Creator[] = [
-  { id: 'onigiri', handle: 'おにぎり丸', friend: true, follow: true, followers: '1.2万', flying: [v('ごはんのうた', 'MV', 'おにぎり丸', 'thumb-onigiri', '🍙', 95, 222, ['草原におにぎりが集合', 'みんなで「いただきます」', 'のりを巻いてジャンプ！'], POP, 0, '3.1万')], works: [v('梅干しの冒険', '映画', 'おにぎり丸', undefined, '🟥', 350, 300, ['すっぱい旅のはじまり'], EPIC, 200, '8,800')] },
-  { id: 'gorilla5454', handle: 'GORILLA 5454', friend: true, follow: true, live: true, followers: '45万', flying: [v('【LIVE】配信中', 'LIVE', 'GORILLA 5454', 'thumb-gorilla5454', '🦍', 280, 8100, ['ステージに光が走る', '1.2万人が視聴中', 'コール＆レスポンス！'], LIVE, 0, '1.2万人視聴')], works: [v('ジャングル・フェス', 'LIVE', 'GORILLA 5454', undefined, '🌴', 120, 3600, ['フェスのアーカイブ'], LIVE, 300, '120万')] },
-  { id: 'wani_queen', handle: '女王', friend: true, follow: false, followers: '2.9万', flying: [v('女王の舞踏会 予告編', '映画', '女王', 'thumb-wani_queen', '👑', 30, 135, ['シャンデリアの下で', '扇子をひらく女王', '「舞踏会へようこそ」'], EPIC, 0.2, '5.4万')], works: [v('黄金のティータイム', '番組', '女王', undefined, '🫖', 40, 900, ['優雅な午後'], POP, 150, '2.2万')] },
-  { id: 'kaba_boss', handle: 'カバ', friend: true, follow: true, followers: '8.8万', flying: [v('深夜のマフィア会議 #12', '番組', 'カバ', 'thumb-kaba_boss', '🦛', 260, 1440, ['テーブルを囲むボスたち', '議題：明日のランチ', '「異議なし」'], DARK, 0.3, '2.4万')], works: [v('ボスの休日', '番組', 'カバ', undefined, '☕', 28, 1200, ['ボスもたまには休む'], POP, 400, '6.1万')] },
-  { id: 'gori4545', handle: 'ゴリラ', friend: true, follow: false, followers: '4.5万', flying: [v('スプレー・タイム', 'MV', 'ゴリラ', 'thumb-gori4545', '🎨', 300, 118, ['壁に「KING」', 'スプレーで色をのせる', '夜明けの完成'], P(96, 55, 'minor', [0, 5, 3, 4], 'square'), 0.3, '9.7万')], works: [v('バナナは正義', 'MV', 'ゴリラ', undefined, '🍌', 52, 176, ['正義のバナナ'], POP, 220, '30万')] },
-  { id: 'samurai806', handle: '侍', friend: true, follow: true, followers: '8,060', flying: [v('サムライ・ウェイブ', '映画', '侍', 'thumb-samurai806', '⚔️', 205, 158, ['荒波と満月', '刀を抜く侍', '一閃'], EPIC, 0.4, '1.8万')], works: [v('富士の朝焼け', '映画', '侍', undefined, '🗻', 15, 240, ['静かな朝'], EPIC, 500, '5,200')] },
-  { id: 'kong_dread', handle: 'DJ ゴリラ', friend: false, follow: true, live: true, followers: '12万', flying: [v('サイケデリック・ナイト', 'LIVE', 'DJ ゴリラ', 'thumb-kong_dread', '🪩', 290, 260, ['ミラーボールが回る', 'フロアが揺れる', 'ドロップ！'], LIVE, 0.5, '3.3万')], works: [v('トリップ・タイム', 'MV', 'DJ ゴリラ', undefined, '🌈', 270, 252, ['色の旅'], LIVE, 180, '22万')] },
-  { id: 'pen_lady', handle: 'ペンギン', friend: false, follow: true, live: true, followers: '6,400', flying: [v('Lunar Gothic', 'MV', 'ペンギン', 'thumb-pen_lady', '🦇', 250, 191, ['月夜の古城', 'ゆっくり振り向くペンギン', '黒いマントがひるがえる'], DARK, 0.6, '1.1万')], works: [v('南極のララバイ', 'MV', 'ペンギン', undefined, '🐧', 195, 200, ['氷の子守唄'], EPIC, 300, '4,000')] },
+  { id: 'onigiri', handle: 'おにぎり丸', friend: true, follow: true, flying: [v('ごはんのうた', 'MV', 'おにぎり丸', 'thumb-onigiri', '🍙', 95, 222, ['草原におにぎりが集合', 'みんなで「いただきます」', 'のりを巻いてジャンプ！'], POP, 0, '3.1万')], works: [v('梅干しの冒険', '映画', 'おにぎり丸', undefined, '🟥', 350, 300, ['すっぱい旅のはじまり'], EPIC, 200, '8,800')] },
+  { id: 'gorilla5454', handle: 'GORILLA 5454', friend: true, follow: true, live: true, flying: [v('【LIVE】配信中', 'LIVE', 'GORILLA 5454', 'thumb-gorilla5454', '🦍', 280, 8100, ['ステージに光が走る', '1.2万人が視聴中', 'コール＆レスポンス！'], LIVE, 0, '1.2万人視聴')], works: [v('ジャングル・フェス', 'LIVE', 'GORILLA 5454', undefined, '🌴', 120, 3600, ['フェスのアーカイブ'], LIVE, 300, '120万')] },
+  { id: 'wani_queen', handle: '女王', friend: true, follow: false, flying: [v('女王の舞踏会 予告編', '映画', '女王', 'thumb-wani_queen', '👑', 30, 135, ['シャンデリアの下で', '扇子をひらく女王', '「舞踏会へようこそ」'], EPIC, 0.2, '5.4万')], works: [v('黄金のティータイム', '番組', '女王', undefined, '🫖', 40, 900, ['優雅な午後'], POP, 150, '2.2万')] },
+  { id: 'kaba_boss', handle: 'カバ', friend: true, follow: true, flying: [v('深夜のマフィア会議 #12', '番組', 'カバ', 'thumb-kaba_boss', '🦛', 260, 1440, ['テーブルを囲むボスたち', '議題：明日のランチ', '「異議なし」'], DARK, 0.3, '2.4万')], works: [v('ボスの休日', '番組', 'カバ', undefined, '☕', 28, 1200, ['ボスもたまには休む'], POP, 400, '6.1万')] },
+  { id: 'gori4545', handle: 'ゴリラ', friend: true, follow: false, flying: [v('スプレー・タイム', 'MV', 'ゴリラ', 'thumb-gori4545', '🎨', 300, 118, ['壁に「KING」', 'スプレーで色をのせる', '夜明けの完成'], P(96, 55, 'minor', [0, 5, 3, 4], 'square'), 0.3, '9.7万')], works: [v('バナナは正義', 'MV', 'ゴリラ', undefined, '🍌', 52, 176, ['正義のバナナ'], POP, 220, '30万')] },
+  { id: 'samurai806', handle: '侍', friend: true, follow: true, flying: [v('サムライ・ウェイブ', '映画', '侍', 'thumb-samurai806', '⚔️', 205, 158, ['荒波と満月', '刀を抜く侍', '一閃'], EPIC, 0.4, '1.8万')], works: [v('富士の朝焼け', '映画', '侍', undefined, '🗻', 15, 240, ['静かな朝'], EPIC, 500, '5,200')] },
+  { id: 'kong_dread', handle: 'DJ ゴリラ', friend: false, follow: true, live: true, flying: [v('サイケデリック・ナイト', 'LIVE', 'DJ ゴリラ', 'thumb-kong_dread', '🪩', 290, 260, ['ミラーボールが回る', 'フロアが揺れる', 'ドロップ！'], LIVE, 0.5, '3.3万')], works: [v('トリップ・タイム', 'MV', 'DJ ゴリラ', undefined, '🌈', 270, 252, ['色の旅'], LIVE, 180, '22万')] },
+  { id: 'pen_lady', handle: 'ペンギン', friend: false, follow: true, live: true, flying: [v('Lunar Gothic', 'MV', 'ペンギン', 'thumb-pen_lady', '🦇', 250, 191, ['月夜の古城', 'ゆっくり振り向くペンギン', '黒いマントがひるがえる'], DARK, 0.6, '1.1万')], works: [v('南極のララバイ', 'MV', 'ペンギン', undefined, '🐧', 195, 200, ['氷の子守唄'], EPIC, 300, '4,000')] },
 ];
 
 export const fmtLen = (sec: number) => {
