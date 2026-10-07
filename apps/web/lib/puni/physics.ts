@@ -160,6 +160,8 @@ export function step(blobs: Blob[], dt: number, w: World) {
       b.ov[i] += (-K * b.o[i] - C * b.ov[i] + KL * lap) * dt;
       b.o[i] += b.ov[i] * dt;
     }
+    // only the neighbours can touch this edge (a crowd of 50 stays cheap)
+    const near = blobs.filter((c) => c !== b && Math.abs(c.x - b.x) < (b.R + c.R) * 1.4 && Math.abs(c.y - b.y) < (b.R + c.R) * 1.4);
     for (let i = 0; i < N; i++) {
       const t = theta(i);
       const dir = t + b.angle;
@@ -173,8 +175,7 @@ export function step(blobs: Blob[], dt: number, w: World) {
       }
       if (dx < -0.05 && b.x + r * dx < 0) r = -b.x / dx;
       if (dx > 0.05 && b.x + r * dx > w.W) r = (w.W - b.x) / dx;
-      for (const c of blobs) {
-        if (c === b) continue;
+      for (const c of near) {
         const px = b.x + r * dx - c.x;
         const py = b.y + r * dy - c.y;
         const rc = c.R * 0.93;

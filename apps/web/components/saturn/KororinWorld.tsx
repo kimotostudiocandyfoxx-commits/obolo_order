@@ -93,7 +93,7 @@ export function KororinWorld({
   // voices you have heard pop like soap bubbles and stay gone (remembered on this device)
   const heardKey = `obolo.saturn.heard.${me?.id ?? 'guest'}`;
   const [heard, setHeard] = useState<Set<string>>(new Set());
-  const [bursts, setBursts] = useState<{ key: number; x: number; y: number; r: number }[]>([]);
+  const [bursts, setBursts] = useState<{ key: number; x: number; y: number; r: number; rainbow?: boolean }[]>([]);
   useEffect(() => {
     try {
       setHeard(new Set(JSON.parse(localStorage.getItem(heardKey) ?? '[]') as string[]));
@@ -101,15 +101,22 @@ export function KororinWorld({
       setHeard(new Set());
     }
   }, [heardKey]);
-  const remember = (next: Set<string>) => {
-    setHeard(next);
-    try {
-      localStorage.setItem(heardKey, JSON.stringify([...next].slice(-600)));
-    } catch {
-      /* private mode: only for this visit */
-    }
+  const remember = (next: Set<string> | ((cur: Set<string>) => Set<string>)) => {
+    setHeard((cur) => {
+      const n = typeof next === 'function' ? next(cur) : next;
+      try {
+        localStorage.setItem(heardKey, JSON.stringify([...n].slice(-600)));
+      } catch {
+        /* private mode: only for this visit */
+      }
+      return n;
+    });
   };
   const popRef = useRef<(id: string) => void>(() => {});
+  // なぞる (みんな's ひろば only): traced characters speak one after another, then pop as rainbows
+  const chain = useRef<{ queue: string[]; id: string | null; started: boolean }>({ queue: [], id: null, started: false });
+  const nextRef = useRef<() => void>(() => {});
+  const denseRef = useRef(false);
   const pendingPop = useRef<string | null>(null);
 
   useEffect(
@@ -122,6 +129,15 @@ export function KororinWorld({
         if (!st.playing && st.progress >= 0.97 && p && st.url === p.voiceUrl && p.author.id !== meIdRef.current) {
           if (detailRef.current) pendingPop.current = p.id;
           else popRef.current(p.id);
+        }
+        // なぞる chain: when the current voice stops (ended, or could not play), the next one speaks
+        const cur = chain.current;
+        if (cur.id && p && cur.id === p.id && st.url === p.voiceUrl) {
+          if (st.playing) cur.started = true;
+          else if (cur.started) {
+            cur.id = null;
+            setTimeout(() => nextRef.current(), 140);
+          }
         }
       }),
     [],
@@ -138,7 +154,10 @@ export function KororinWorld({
   // only so many on the planet at once; when one pops, the next voice drops in from the sky
   const [tabCursor, setTabCursor] = useState<string | null>(null);
   const loadingMore = useRef(false);
-  const plazaId = tab === 'all' ? (plaza?.id ?? null) : null;
+  const plazaId = tab === 'all' && !neoOnly ? (plaza?.id ?? null) : null;
+  // inside a ひろば: lots of small characters piled up, traced with a finger (なぞる)
+  const dense = !!plazaId;
+  denseRef.current = dense;
   const fromList = tab !== 'all' || !!plazaId;
   useEffect(() => {
     if (tab === 'all' && !plazaId) return;
@@ -163,9 +182,14 @@ export function KororinWorld({
     if (!fromList) return onMap ? [] : all;
     const real = tabPosts ?? [];
     if (tab !== 'all' || !tabPosts || real.length >= PLAZA_MIN) return real;
+    // residents (repeated with their own ids when the crowd needs more of them)
     const h = hueOf(plazaId ?? '');
-    const fill = Array.from({ length: PLAZA_MIN - real.length }, (_, k) => SATURN_RESIDENTS[(h + k * 3) % SATURN_RESIDENTS.length]);
-    return [...real, ...fill.filter((x, i) => fill.indexOf(x) === i)];
+    const n = SATURN_RESIDENTS.length;
+    const fill = Array.from({ length: PLAZA_MIN - real.length }, (_, k) => {
+      const r = SATURN_RESIDENTS[(h + k) % n];
+      return k < n ? r : { ...r, id: `${r.id}~${k}` };
+    });
+    return [...real, ...fill];
   }, [fromList, onMap, all, tabPosts, tab, plazaId]);
   const unheard = useMemo(() => source.filter((p) => !heard.has(p.id)), [source, heard]);
   const cap = tab === 'all' ? (plazaId ? TAB_CAP.plaza : Infinity) : TAB_CAP[tab];
@@ -212,13 +236,15 @@ export function KororinWorld({
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
           pic: p.author.pic ?? null,
           photo: p.photoUrl ?? null,
-          R: Math.min(
+          R: dense
+            ? Math.max(13, Math.min(26, stageW * 0.024 * (1 + (hueOf(p.id) % 3) * 0.12))) * (1 + (popScale(p) - 1) * 0.6)
+            : Math.min(
             stageW * (tab === 'friends' ? 0.16 : 0.12),
             Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * popScale(p),
           ),
         };
       }),
-    [shown, stageW, tab],
+    [shown, stageW, tab, dense],
   );
   const speakingId = shown.find((p) => p.voiceUrl === playingUrl)?.id ?? null;
 
@@ -244,10 +270,15 @@ export function KororinWorld({
   meIdRef.current = me?.id;
   popRef.current = (id: string) => {
     const b = layer.current?.blob(id);
-    if (b) setBursts((cur) => [...cur.slice(-6), { key: Date.now() + Math.random(), x: b.x, y: b.y, r: b.R }]);
+    if (b) setBursts((cur) => [...cur.slice(-8), { key: Date.now() + Math.random(), x: b.x, y: b.y, r: b.R, rainbow: denseRef.current }]);
     playPop(b ? Math.min(1, b.R / 120) : 0.5);
-    if (openRef.current === id) close();
-    remember(new Set(heard).add(id));
+    // (not close(): that would also end a なぞる chain that is still going)
+    if (openRef.current === id) {
+      openRef.current = null;
+      setOpen(null);
+      setDetail(false);
+    }
+    remember((cur) => new Set(cur).add(id));
   };
   // the sheet closed after the voice ended: pop now
   useEffect(() => {
@@ -256,6 +287,7 @@ export function KororinWorld({
       pendingPop.current = null;
       popRef.current(id);
     }
+    if (!detail && !chain.current.id && chain.current.queue.length) nextRef.current();
   }, [detail]);
 
   const listen = useCallback(
@@ -269,6 +301,31 @@ export function KororinWorld({
     },
     [events],
   );
+
+  const shownRef = useRef(shown);
+  shownRef.current = shown;
+  nextRef.current = () => {
+    const c = chain.current;
+    // wait while the details sheet is open; it resumes when it closes
+    if (detailRef.current) return;
+    while (c.queue.length) {
+      const id = c.queue.shift()!;
+      const p = shownRef.current.find((x) => x.id === id);
+      if (!p) continue;
+      c.id = id;
+      c.started = false;
+      layer.current?.poke(id);
+      listen(p);
+      return;
+    }
+    c.id = null;
+  };
+  const onTrace = (id: string) => {
+    const c = chain.current;
+    if (c.id === id || c.queue.includes(id)) return;
+    c.queue.push(id);
+    if (!c.id) nextRef.current();
+  };
 
   // the answers under the opened voice (sample residents answer each other)
   useEffect(() => {
@@ -291,6 +348,7 @@ export function KororinWorld({
   };
 
   const close = () => {
+    chain.current = { queue: [], id: null, started: false };
     openRef.current = null;
     setOpen(null);
     setDetail(false);
@@ -428,12 +486,16 @@ export function KororinWorld({
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
           const p = shown.find((x) => x.id === id);
           if (p) listen(p);
-        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
+        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} onTrace={dense ? onTrace : undefined} />
       </div>
 
       {/* soap-bubble pops of the voices you heard */}
       {bursts.map((bu) => (
-        <BubbleBurst key={bu.key} x={bu.x} y={bu.y} r={bu.r} onDone={() => setBursts((cur) => cur.filter((x) => x.key !== bu.key))} />
+        bu.rainbow ? (
+          <RainbowBurst key={bu.key} x={bu.x} y={bu.y} r={bu.r} onDone={() => setBursts((cur) => cur.filter((x) => x.key !== bu.key))} />
+        ) : (
+          <BubbleBurst key={bu.key} x={bu.x} y={bu.y} r={bu.r} onDone={() => setBursts((cur) => cur.filter((x) => x.key !== bu.key))} />
+        )
       ))}
       {tab === 'all' && !onMap && source.length > 0 && shown.length === 0 && (
         <div className="absolute inset-x-0 top-[38%] z-[70] flex flex-col items-center gap-2 px-6 text-center">
@@ -670,9 +732,9 @@ const TABS: [Tab, string][] = [
 ];
 
 /** How many characters a tab shows at once (client decision 2026-10-07; みんな/セカイ is still being designed). */
-const TAB_CAP: Record<Exclude<Tab, 'all'> | 'plaza', number> = { following: 22, friends: 8, plaza: 22 };
-/** A quiet ひろば gets a few residents so it never feels empty. */
-const PLAZA_MIN = 6;
+const TAB_CAP: Record<Exclude<Tab, 'all'> | 'plaza', number> = { following: 22, friends: 8, plaza: 50 };
+/** A quiet ひろば is topped up with residents so it looks like a crowd (P-SAT-15). */
+const PLAZA_MIN = 50;
 /** ダチ are few, so they are drawn bigger. */
 const FRIENDS_SCALE = 1.45;
 
@@ -770,6 +832,37 @@ function BubbleBurst({ x, y, r, onDone }: { x: number; y: number; r: number; onD
             key={i}
             className="absolute left-1/2 top-1/2 animate-[bubbleDrop_0.6s_ease-out_forwards] rounded-full bg-white/90"
             style={{ width: 5 + (i % 3) * 2, height: 5 + (i % 3) * 2, ['--dx' as string]: `${Math.cos(a) * d}px`, ['--dy' as string]: `${Math.sin(a) * d}px`, boxShadow: '0 0 6px rgba(200,180,255,.9)' }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+/** なぞる pop (みんな's ひろば): the character turns into a little rainbow that rises and fades. */
+const RAINBOW = ['#ff6b8b', '#ffa14f', '#ffe066', '#7ee08a', '#5cc8ff', '#7a8cff', '#c38bff'];
+function RainbowBurst({ x, y, r, onDone }: { x: number; y: number; r: number; onDone: () => void }) {
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    const t = setTimeout(() => done.current(), 1050);
+    return () => clearTimeout(t);
+  }, []);
+  const w = Math.max(70, r * 4);
+  return (
+    <div className="pointer-events-none absolute z-[60]" style={{ left: x - w / 2, top: y - w / 2, width: w, height: w }}>
+      <svg className="absolute inset-0 animate-[rainbowUp_1s_ease-out_forwards]" viewBox="-50 -50 100 100" aria-hidden>
+        {RAINBOW.map((c, i) => (
+          <path key={c} d={`M ${-40 + i * 4} 8 A ${40 - i * 4} ${40 - i * 4} 0 0 1 ${40 - i * 4} 8`} fill="none" stroke={c} strokeWidth="5.5" strokeLinecap="round" />
+        ))}
+      </svg>
+      {RAINBOW.map((c, i) => {
+        const a = (i / RAINBOW.length) * Math.PI * 2;
+        return (
+          <span
+            key={c}
+            className="absolute left-1/2 top-1/2 animate-[bubbleDrop_0.7s_ease-out_forwards] rounded-full"
+            style={{ width: 7, height: 7, background: c, ['--dx' as string]: `${Math.cos(a) * w * 0.55}px`, ['--dy' as string]: `${Math.sin(a) * w * 0.55}px`, boxShadow: `0 0 6px ${c}` }}
           />
         );
       })}

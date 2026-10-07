@@ -42,9 +42,15 @@ export const PuniPhysicsLayer = forwardRef<
     /** called every frame after the physics step (e.g. to move a card with a character) */
     onFrame?: (get: (id: string) => Blob | undefined, W: number, H: number) => void;
     speakingId?: string | null;
+    /**
+     * なぞる mode (みんな's ひろば, client decision 2026-10-07): sliding a finger over the characters
+     * picks them one after another (like a chain puzzle) instead of dragging / throwing one.
+     * Each newly touched one squishes and is reported to `onTrace` (a tap is a chain of one).
+     */
+    onTrace?: (id: string) => void;
     className?: string;
   }
->(function PuniPhysicsLayer({ items, floorAt, onTap, onTapEmpty, onFrame, speakingId = null, className = '' }, ref) {
+>(function PuniPhysicsLayer({ items, floorAt, onTap, onTapEmpty, onFrame, speakingId = null, onTrace, className = '' }, ref) {
   const box = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const glCanvas = useRef<HTMLCanvasElement>(null);
@@ -55,8 +61,11 @@ export const PuniPhysicsLayer = forwardRef<
   const blobs = useRef<Blob[]>([]);
   const nodes = useRef(new Map<string, PuniNodes>());
   const held = useRef(new Map<string, HTMLDivElement>());
-  const cb = useRef({ floorAt, onTap, onTapEmpty, onFrame, speakingId });
-  cb.current = { floorAt, onTap, onTapEmpty, onFrame, speakingId };
+  const cb = useRef({ floorAt, onTap, onTapEmpty, onFrame, speakingId, onTrace });
+  cb.current = { floorAt, onTap, onTapEmpty, onFrame, speakingId, onTrace };
+  // the chain being traced (ids) and the glowing line through them
+  const chain = useRef<string[]>([]);
+  const chainLine = useRef<SVGPolylineElement>(null);
 
   useEffect(() => {
     const el = box.current;
@@ -188,6 +197,10 @@ export const PuniPhysicsLayer = forwardRef<
         el.style.width = el.style.height = `${d.toFixed(0)}px`;
         el.style.transform = `translate(${(b.x + b.R * 0.66 * b.sx - d / 2).toFixed(1)}px, ${(b.y + b.cy + b.R * 0.5 * b.sy - d / 2).toFixed(1)}px) rotate(${tilt.toFixed(1)}deg) scale(${b.sx.toFixed(3)}, ${b.sy.toFixed(3)})`;
       }
+      if (chainLine.current) {
+        const pts = chain.current.map(get).filter((b): b is Blob => !!b);
+        chainLine.current.setAttribute('points', pts.map((b) => `${b.x.toFixed(1)},${b.y.toFixed(1)}`).join(' '));
+      }
       cb.current.onFrame?.(get, W, H);
       raf = requestAnimationFrame(loop);
     };
@@ -210,8 +223,22 @@ export const PuniPhysicsLayer = forwardRef<
     }
     return null;
   };
+  const traceAt = (x: number, y: number) => {
+    const b = hit(x, y);
+    if (!b || chain.current.includes(b.id)) return;
+    chain.current.push(b.id);
+    poke(b, x, y);
+    cb.current.onTrace?.(b.id);
+  };
   const down = (e: React.PointerEvent) => {
     const p = local(e);
+    if (cb.current.onTrace) {
+      svg.current?.setPointerCapture(e.pointerId);
+      chain.current = [];
+      pointer.current = { id: e.pointerId, blob: null, x0: p.x, y0: p.y, moved: false, hist: [] };
+      traceAt(p.x, p.y);
+      return;
+    }
     const b = hit(p.x, p.y);
     if (b) svg.current?.setPointerCapture(e.pointerId);
     pointer.current = { id: e.pointerId, blob: b, x0: p.x, y0: p.y, moved: false, hist: [{ ...p, t: performance.now() }] };
@@ -220,6 +247,11 @@ export const PuniPhysicsLayer = forwardRef<
     const pt = pointer.current;
     if (!pt || pt.id !== e.pointerId) return;
     const p = local(e);
+    if (cb.current.onTrace) {
+      if (Math.hypot(p.x - pt.x0, p.y - pt.y0) > 8) pt.moved = true;
+      traceAt(p.x, p.y);
+      return;
+    }
     if (!pt.blob) {
       if (Math.hypot(p.x - pt.x0, p.y - pt.y0) > 8) pt.moved = true;
       return;
@@ -233,6 +265,11 @@ export const PuniPhysicsLayer = forwardRef<
     const pt = pointer.current;
     pointer.current = null;
     if (!pt || pt.id !== e.pointerId) return;
+    if (cb.current.onTrace) {
+      if (!chain.current.length && !pt.moved) cb.current.onTapEmpty?.();
+      chain.current = [];
+      return;
+    }
     const b = pt.blob;
     if (!b) {
       // a tap on the sky / ground (not a character) closes the open card
@@ -277,6 +314,7 @@ export const PuniPhysicsLayer = forwardRef<
               </feMerge>
             </filter>
           </defs>
+          <polyline ref={chainLine} fill="none" stroke="#fff6a8" strokeOpacity={0.85} strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" filter="url(#puni-glow)" pointerEvents="none" />
           {items.map((it) => (it.pic ? null : <PuniBody key={it.id} look={{ ...it.look, id: it.id }} R={it.R} register={(n) => nodes.current.set(it.id, n)} />))}
         </svg>
       )}

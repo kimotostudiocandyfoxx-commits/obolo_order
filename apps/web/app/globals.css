@@ -463,3 +463,10 @@ body {
     transform: translate(-3px, -2px) rotate(-1deg);
   }
 }
+/* Saturn なぞる: a popped voice becomes a little rainbow */
+@keyframes rainbowUp {
+  0% { transform: translateY(10%) scale(0.35); opacity: 0; }
+  15% { opacity: 1; }
+  65% { opacity: 1; }
+  100% { transform: translateY(-45%) scale(1.2); opacity: 0; }
+}
