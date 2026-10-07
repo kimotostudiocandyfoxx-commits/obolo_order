@@ -251,3 +251,32 @@ export const invites = pgTable(
   },
   (t) => [uniqueIndex('invites_code_uq').on(t.code), index('invites_inviter_idx').on(t.inviterUserId, t.createdAt)],
 );
+
+/**
+ * Mercury songs that were sung (client spec 2026-10-07, chat edits). Everything needed to re-mix
+ * without calling an AI again is kept: the instrumental, one vocal file per lyric line (phrase),
+ * the mix settings. Edits regenerate only what changed (a phrase, or the instrumental).
+ */
+export const songs = pgTable(
+  'songs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    title: text('title').notNull(),
+    /** bpm, key, genre, mood, instrumental prompt, lyric lines with their beats, melody */
+    designJson: jsonb('design_json').$type<Record<string, unknown>>().notNull(),
+    instrumentalUrl: text('instrumental_url').notNull(),
+    /** one entry per lyric line: text, voice slot, vocal file url, its length */
+    phrasesJson: jsonb('phrases_json').$type<Record<string, unknown>[]>().notNull(),
+    /** tempo, vocal / instrumental gain, delay, gaps between phrases */
+    mixJson: jsonb('mix_json').$type<Record<string, unknown>>().notNull(),
+    directionJson: jsonb('direction_json').$type<Record<string, unknown>>().notNull(),
+    mixUrl: text('mix_url').notNull(),
+    seconds: real('seconds').notNull(),
+    savedAt: timestamp('saved_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('songs_user_idx').on(t.userId, t.createdAt)],
+);

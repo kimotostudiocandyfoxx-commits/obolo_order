@@ -6,7 +6,9 @@ import { probe, run } from '../media/transcode';
 /**
  * Mercury 歌入れ — audio around the Fish vocal (ffmpeg, in the API image):
  *  - guideWav: the design's melody as a plain tone (optional audio prompt for Fish, P-VOICE-5)
- *  - mixSong: the vocal fitted to the song's length and mixed over the instrumental
+ *  - preparePhrase: one sung line with the silence around it cut
+ *  - renderSong: all lines placed at their own start, mixed over the instrumental (re-run on
+ *    every tempo / volume / timing edit — no AI call)
  */
 
 const GUIDE_SR = 22050;
@@ -49,42 +51,88 @@ export function guideWav(melody: { midi: number | null; beats: number }[], bpm: 
   return Buffer.concat([h, Buffer.from(pcm.buffer)]);
 }
 
-/** How far the vocal may be stretched / squeezed to fit the song (beyond this it sounds wrong). */
-const FIT = { min: 0.8, max: 1.25 };
-/** PLACEHOLDER (P-VOICE-6): when the vocal comes in after the instrumental starts, in seconds. */
-const VOCAL_DELAY_S = 0;
+/** How far one line may be squeezed / stretched to fit its slot (beyond this it sounds wrong). */
+const FIT = { min: 0.9, max: 1.25 };
 
-export async function mixSong(o: { instrumental: Buffer; vocal: Buffer; vocalSeconds: number }): Promise<{ data: Buffer; vocal: Buffer; seconds: number; fit: number }> {
-  const dir = await mkdtemp(join(tmpdir(), 'sing-'));
+/** One Fish line → trimmed (silence before / after cut) mono MP3, and its length. */
+export async function preparePhrase(mp3: Buffer): Promise<{ data: Buffer; seconds: number }> {
+  const dir = await mkdtemp(join(tmpdir(), 'phrase-'));
+  try {
+    const raw = join(dir, 'in.mp3');
+    const out = join(dir, 'out.mp3');
+    await writeFile(raw, mp3);
+    const trim = 'silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.03';
+    await run('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', raw, '-af', `${trim},areverse,${trim},areverse`, '-ac', '1', '-ar', '44100', '-b:a', '128k', out]);
+    return { data: await readFile(out), seconds: Math.round((await probe(out)).seconds * 100) / 100 };
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
+export interface RenderPhrase {
+  data: Buffer;
+  seconds: number;
+  startBeat: number;
+  beats: number;
+}
+
+export interface RenderMix {
+  tempo: number;
+  vocalDb: number;
+  bgmDb: number;
+  delayBeats: number;
+  gaps: number[];
+}
+
+/** Where each line starts (seconds) after the delay and the gaps before it. */
+export function phraseStarts(phrases: Pick<RenderPhrase, 'startBeat'>[], bpm: number, mix: Pick<RenderMix, 'delayBeats' | 'gaps'>): number[] {
+  const spb = 60 / bpm;
+  let pushed = 0;
+  return phrases.map((p, i) => {
+    const t = (p.startBeat + mix.delayBeats) * spb + pushed;
+    pushed += mix.gaps[i] ?? 0;
+    return Math.round(t * 1000) / 1000;
+  });
+}
+
+/**
+ * Put the song together from its stored parts: every line placed at its own start in the design
+ * (fitted to its slot), a little compression and room on the voice, the instrumental under it,
+ * then the whole-song tempo (pitch kept) and loudness. No AI involved.
+ */
+export async function renderSong(o: { instrumental: Buffer; phrases: RenderPhrase[]; bpm: number; mix: RenderMix }): Promise<{ data: Buffer; seconds: number }> {
+  const dir = await mkdtemp(join(tmpdir(), 'song-'));
   try {
     const inst = join(dir, 'inst.m4a');
-    const raw = join(dir, 'vocal.mp3');
-    const trimmed = join(dir, 'trimmed.wav');
-    const fitted = join(dir, 'fitted.mp3');
     const out = join(dir, 'song.m4a');
     await writeFile(inst, o.instrumental);
-    await writeFile(raw, o.vocal);
-    // 1) cut the silence Fish leaves before the first word
-    await run('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', raw, '-af', 'silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.05', '-ac', '1', '-ar', '44100', trimmed]);
-    // 2) fit its length to the lyrics' length in the design (atempo keeps the pitch)
-    const dur = (await probe(trimmed)).seconds || o.vocalSeconds;
-    const fit = Math.max(FIT.min, Math.min(FIT.max, dur / Math.max(1, o.vocalSeconds)));
-    await run('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', trimmed, '-af', `atempo=${fit.toFixed(3)}`, '-b:a', '128k', fitted]);
-    // 3) mix: a little compression and room on the voice, instrumental slightly under it
-    const delay = Math.round(VOCAL_DELAY_S * 1000);
-    await run(
-      'ffmpeg',
-      [
-        '-y', '-hide_banner', '-loglevel', 'error',
-        '-i', inst, '-i', fitted,
-        '-filter_complex',
-        `[0:a]volume=0.72[i];[1:a]adelay=${delay}|${delay},highpass=f=90,acompressor=threshold=-18dB:ratio=3:attack=5:release=80,aecho=0.8:0.6:60|120:0.16|0.08,volume=1.25[v];[i][v]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11[o]`,
-        '-map', '[o]', '-ar', '44100', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart',
-        out,
-      ],
-      180_000,
-    );
-    return { data: await readFile(out), vocal: await readFile(fitted), seconds: Math.round((await probe(out)).seconds * 10) / 10, fit };
+    const spb = 60 / o.bpm;
+    const starts = phraseStarts(o.phrases, o.bpm, o.mix);
+    const args = ['-y', '-hide_banner', '-loglevel', 'error', '-i', inst];
+    const chains: string[] = [];
+    for (const [i, p] of o.phrases.entries()) {
+      const f = join(dir, `p${i}.mp3`);
+      await writeFile(f, p.data);
+      args.push('-i', f);
+      const slot = Math.max(0.5, p.beats * spb);
+      const fit = Math.max(FIT.min, Math.min(FIT.max, p.seconds / slot));
+      const ms = Math.round(starts[i] * 1000);
+      chains.push(`[${i + 1}:a]atempo=${fit.toFixed(3)},adelay=${ms}|${ms}[p${i}]`);
+    }
+    const n = o.phrases.length;
+    const vocalBus = n
+      ? `${o.phrases.map((_, i) => `[p${i}]`).join('')}amix=inputs=${n}:duration=longest:normalize=0,highpass=f=90,acompressor=threshold=-18dB:ratio=3:attack=5:release=80,aecho=0.8:0.6:60|120:0.16|0.08,volume=${(1.25 * 10 ** (o.mix.vocalDb / 20)).toFixed(3)}[v]`
+      : 'anullsrc=r=44100:cl=mono,atrim=0:1[v]';
+    const tempo = Math.abs(o.mix.tempo - 1) > 0.001 ? `,atempo=${o.mix.tempo.toFixed(3)}` : '';
+    const graph = [
+      ...chains,
+      vocalBus,
+      `[0:a]volume=${(0.72 * 10 ** (o.mix.bgmDb / 20)).toFixed(3)}[i]`,
+      `[i][v]amix=inputs=2:duration=longest:normalize=0${tempo},loudnorm=I=-14:TP=-1.5:LRA=11[o]`,
+    ].join(';');
+    args.push('-filter_complex', graph, '-map', '[o]', '-ar', '44100', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', out);
+    await run('ffmpeg', args, 180_000);
+    return { data: await readFile(out), seconds: Math.round((await probe(out)).seconds * 10) / 10 };
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

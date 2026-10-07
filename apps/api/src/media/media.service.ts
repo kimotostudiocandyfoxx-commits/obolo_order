@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { mediaKey, MediaKind, putObject } from '@obolo/media';
+import { deleteObject, mediaKey, MediaKind, putObject } from '@obolo/media';
 import { MEDIA_POLICY, VOICE_MAX_BYTES, VOICE_MIME_TYPES } from '@obolo/shared';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -144,6 +144,22 @@ export class MediaService {
       .from(mediaObjects)
       .where(and(eq(mediaObjects.id, id), eq(mediaObjects.storage, 'db'), isNull(mediaObjects.deletedAt)));
     return m?.data ? m : null;
+  }
+
+  /** Delete one of the user's files by its URL (an old mix after an edit): Bunny object, row, quota. */
+  async removeByUrl(userId: string, url: string): Promise<void> {
+    const [m] = await this.db.write
+      .update(mediaObjects)
+      .set({ deletedAt: new Date(), data: null })
+      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)))
+      .returning({ key: mediaObjects.key, storage: mediaObjects.storage, size: mediaObjects.sizeBytes });
+    if (!m) return;
+    await this.db.write
+      .update(users)
+      .set({ storageUsageBytes: sql`GREATEST(${users.storageUsageBytes} - ${m.size}, 0)` })
+      .where(eq(users.id, userId));
+    const bunny = this.bunny;
+    if (m.storage === 'bunny' && bunny) await deleteObject(bunny, m.key).catch(() => undefined);
   }
 
   /** The bytes of one of the user's own generated audio files, found by its URL (e.g. an instrumental to sing over). */

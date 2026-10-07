@@ -7,3 +7,4 @@ export * from './prompts/memory';
 export * from './images';
 export * from './song';
 export * from './sing';
+export * from './songEdit';

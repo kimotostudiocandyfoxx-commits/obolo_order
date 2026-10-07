@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 import { mockSongDesign } from './song';
+import { mockSongEdit } from './songEdit';
 import type { ChatRequest, LlmProvider } from './types';
 
 /**
@@ -94,6 +95,7 @@ export class MockProvider implements LlmProvider {
   async chat(req: ChatRequest): Promise<string> {
     const last = [...req.history].reverse().find((t) => t.role === 'user')?.text ?? '';
     if (req.json && req.system.includes('SONG_DESIGN')) return mockSongDesign(last);
+    if (req.json && req.system.includes('SONG_EDIT')) return mockSongEdit(last);
     const ja = /[぀-ヿ一-龯]/.test(last) || req.system.includes('あなたは');
     if (req.system.includes('長期記憶') || req.system.includes('long-term memory')) {
       // Offline "summary": keep existing bullets + the user's latest lines.

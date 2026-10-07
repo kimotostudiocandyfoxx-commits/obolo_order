@@ -1,4 +1,5 @@
 import type { BuddyPersona, Locale } from './index';
+import type { SongEditCommand } from './schemas';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
 
@@ -209,11 +210,57 @@ export interface SingDirection {
   breathEvery: number;
 }
 
-export interface SingResult {
-  /** the song: vocal + instrumental */
+/** One sung lyric line: its own vocal file, so a single line can be re-sung or moved. */
+export interface SongPhrase {
+  index: number;
+  section: 'verse' | 'chorus' | 'bridge';
+  text: string;
+  /** which registered voice sings it (self = own voice, bati = Bati's voice) */
+  slot: 'self' | 'bati';
   url: string;
-  /** the vocal alone */
-  vocalUrl: string;
+  /** length of the vocal file */
   seconds: number;
+  /** where the line starts in the design (beats from the top) and how long its slot is */
+  startBeat: number;
+  beats: number;
+}
+
+/** How the stored parts are put together (changing these costs no AI call). */
+export interface SongMix {
+  /** whole-song speed (pitch kept), 0.8–1.25 */
+  tempo: number;
+  /** gain in dB added to the vocal / the instrumental */
+  vocalDb: number;
+  bgmDb: number;
+  /** the vocal comes in this many beats later */
+  delayBeats: number;
+  /** extra silence (seconds) after phrase i, pushing the later lines back */
+  gaps: number[];
+}
+
+export interface SongView {
+  id: string;
+  title: string;
+  /** the finished song (vocal + instrumental) */
+  url: string;
+  instrumentalUrl: string;
+  instrumentalPrompt: string;
+  bpm: number;
+  phrases: SongPhrase[];
+  mix: SongMix;
   direction: SingDirection;
+  seconds: number;
+  savedAt: string | null;
+}
+
+export type SongEditAction = 'VOLUME_TEMPO_EDIT' | 'LYRICS_EDIT' | 'VOICE_REPLACE' | 'TIMING_EDIT' | 'GENRE_EDIT' | 'CHAT';
+
+export interface SongEditResult {
+  /** the partner's answer in the chat */
+  reply: string;
+  action: SongEditAction;
+  song: SongView;
+  /** the GPU studio is starting: send `command` again once it is ready */
+  pending?: 'MUSIC_WARMING';
+  command?: SongEditCommand;
 }

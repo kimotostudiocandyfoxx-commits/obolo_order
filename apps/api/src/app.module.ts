@@ -6,6 +6,7 @@ import { BillingController } from './billing/billing.controller';
 import { BillingService } from './billing/billing.service';
 import { ComposeController } from './compose/compose.controller';
 import { ComposeService } from './compose/compose.service';
+import { SongService } from './compose/song.service';
 import { VoiceController } from './voice/voice.controller';
 import { VoiceService } from './voice/voice.service';
 import { BuddyController } from './buddy/buddy.controller';
@@ -29,6 +30,6 @@ import { WalletController } from './wallet/wallet.controller';
 @Module({
   imports: [InfraModule],
   controllers: [HealthController, AuthController, UsersController, WalletController, BuddyController, MediaController, SaturnController, InvitesController, LookController, BillingController, ComposeController, VoiceController],
-  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, InvitesService, LookService, BillingService, ComposeService, VoiceService],
+  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, InvitesService, LookService, BillingService, ComposeService, SongService, VoiceService],
 })
 export class AppModule {}

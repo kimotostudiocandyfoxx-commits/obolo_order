@@ -5,6 +5,7 @@ import { Artwork } from '@/components/Artwork';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { usePartner } from '@/lib/partner';
+import type { SongEditCommand, SongView } from '@obolo/shared';
 import { GENRES, makeSong, pickGenre, songFromDesign, type Genre, type MadeSong } from '@/lib/mercury/compose';
 import { fmt } from '@/lib/mercury/sea';
 import { spriteUrl } from '@/lib/onboarding/media';
@@ -42,6 +43,9 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   const [typing, setTyping] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null);
   const [buried, setBuried] = useState<Set<string>>(new Set());
+  // 手直し mode: chat messages go to the song's edit endpoint (Gemini picks the change)
+  const [editing, setEditing] = useState<string | null>(null);
+  const [warming, setWarming] = useState<{ songId: string; command: SongEditCommand } | null>(null);
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, busy, pending]);
   useEffect(() => () => synth.stop(), []);
@@ -59,11 +63,67 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
     ...(extra ? [{ role: 'user' as const, text: extra.slice(0, 400) }] : []),
   ].slice(-30);
 
+  const songMsg = (id: string) => msgs.find((m): m is Extract<Msg, { who: 'song' }> => m.who === 'song' && m.song.id === id)?.song;
+  const updateSong = (id: string, v: SongView) =>
+    setMsgs((ms) => ms.map((x) => (x.who === 'song' && x.song.id === id ? { ...x, song: { ...x.song, songUrl: v.url, songId: v.id, instrumentalUrl: v.instrumentalUrl, seconds: Math.round(v.seconds) } } : x)));
+
+  /** One 手直し round: the message (or a command retried after the GPU warmed up) → reply + new mix. */
+  const editSong = async (id: string, body: { message?: string; command?: SongEditCommand }) => {
+    const song = songMsg(id);
+    if (!song?.songId) return;
+    synth.stop();
+    setPlaying(null);
+    setBusy(true);
+    try {
+      const r = await getApi().composeSongEdit(song.songId, {
+        ...body,
+        history: history().slice(-8),
+        partner: partner.name,
+        isBati: hasBati,
+      });
+      say(r.reply);
+      if (r.pending === 'MUSIC_WARMING' && r.command) setWarming({ songId: id, command: r.command });
+      else {
+        setWarming(null);
+        if (r.action !== 'CHAT') updateSong(id, r.song);
+      }
+    } catch (e) {
+      say((hasBati ? 'ごめん、うまく直せなかった……もう一回言ってみて？' : 'すまん、うまく直せなかったケン……もう一回言ってみろ。') + detail(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // a genre edit waits for the GPU studio: poll and send the same command once it is ready
+  useEffect(() => {
+    if (!warming) return;
+    let on = true;
+    const t = setInterval(async () => {
+      try {
+        const st = await getApi().composeMusicStatus();
+        if (on && st.ready) {
+          clearInterval(t);
+          const w = warming;
+          setWarming(null);
+          await editSong(w.songId, { command: w.command });
+        }
+      } catch {
+        /* keep polling */
+      }
+    }, 10000);
+    return () => {
+      on = false;
+      clearInterval(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [warming]);
+
   const send = async () => {
     const t = text.trim();
     if (!t || busy) return;
     setText('');
     setMsgs((m) => [...m, { who: 'me', text: t }]);
+    if (editing) return void editSong(editing, { message: t });
     if (!live) {
       setPending(t);
       setTimeout(() => say(`いいね！「${[...t].slice(0, 14).join('')}${[...t].length > 14 ? '…' : ''}」か。どんな感じの曲にする${partner.end ? 'ケン？' : '？'}`), 500);
@@ -127,7 +187,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
               key={i}
               song={m.song}
               playing={playing === m.song.id}
-              buried={buried.has(m.song.id)}
+              buried={buried.has(`${m.song.id}:${m.song.songUrl ?? ''}`) || (!m.song.songUrl && buried.has(`${m.song.id}:`))}
               onPlay={() => {
                 if (playing === m.song.id) {
                   synth.stop();
@@ -137,12 +197,36 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
                   setPlaying(m.song.id);
                 }
               }}
-              onBury={() => {
+              onBury={async () => {
                 synth.stop();
                 setPlaying(null);
-                onBury(m.song);
-                setBuried((b) => new Set(b).add(m.song.id));
-                say(hasBati ? '島の土に埋めておいたよ。出航させたくなったら、島から出航してね。' : '島の土に埋めといたケン。出航させたくなったら、島から出航だ！');
+                // 保存する: a sung song keeps this version on the server and plays its recording on the island
+                if (m.song.songId) {
+                  try {
+                    await getApi().composeSongSave(m.song.songId);
+                  } catch (e) {
+                    say((hasBati ? 'ごめん、保存できなかった……' : 'すまん、保存できなかったケン……') + detail(e));
+                    return;
+                  }
+                }
+                onBury(m.song.songUrl ? { ...m.song, id: `${m.song.id}-${Date.now()}`, audioUrl: m.song.songUrl } : m.song);
+                setBuried((b) => new Set(b).add(`${m.song.id}:${m.song.songUrl ?? ''}`));
+                if (editing === m.song.id) setEditing(null);
+                say(hasBati ? '保存して、島の土に埋めておいたよ。出航させたくなったら、島から出航してね。' : '保存して、島の土に埋めといたケン。出航させたくなったら、島から出航だ！');
+              }}
+              editing={editing === m.song.id}
+              onEdit={() => {
+                setEditing(m.song.id);
+                say(
+                  hasBati
+                    ? 'どこを直す？ 「もう少し速く」「歌を大きく」「サビの歌詞を変えて」「サビだけわたしの声で」「歌い出しを遅らせて」「ロックっぽくして」…なんでも言ってね！'
+                    : 'どこを直すケン？ 「もう少し速く」「歌を大きく」「サビの歌詞を変えて」「サビだけバティの声で」「歌い出しを遅らせて」「ロックっぽくして」…なんでも言ってみろ！',
+                );
+              }}
+              onEditDone={() => {
+                setEditing(null);
+                setWarming(null);
+                say(hasBati ? 'おつかれさま！気に入ったら「保存する」を押してね。' : 'おつかれだケン！気に入ったら「保存する」だ。');
               }}
               onAgain={() => {
                 setPending(m.song.lyrics[0]);
@@ -155,10 +239,10 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
                 setPlaying(null);
                 setMsgs((ms) => ms.map((x) => (x.who === 'song' && x.song.id === m.song.id ? { ...x, song: { ...x.song, instrumentalUrl: url } } : x)));
               }}
-              onSung={(url) => {
+              onSung={(v) => {
                 synth.stop();
                 setPlaying(null);
-                setMsgs((ms) => ms.map((x) => (x.who === 'song' && x.song.id === m.song.id ? { ...x, song: { ...x.song, songUrl: url } } : x)));
+                updateSong(m.song.id, v);
               }}
             />
           ) : (
@@ -180,10 +264,13 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
             </button>
           </div>
         )}
+        {warming && !busy && (
+          <p className="text-center text-[11px] text-amber-200/80">音楽スタジオ（GPU）を起動中…。準備できたら自動で伴奏を作り直すよ。</p>
+        )}
         {busy && (
           <div className="flex items-end gap-2">
             <Face face={partner.face} size={32} />
-            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{typing ? '……' : '♪ 作曲中…'}</p>
+            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{typing ? '……' : editing ? '♪ 手直し中…（歌い直し・伴奏の作り直しは1〜2分）' : '♪ 作曲中…'}</p>
           </div>
         )}
         <div ref={end} />
@@ -195,7 +282,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && void send()}
-          placeholder="今日あったことを話してみよう"
+          placeholder={editing ? '例：サビをバティの声にして／もう少し速く' : '今日あったことを話してみよう'}
           className="min-w-0 flex-1 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm outline-none"
         />
         <button onClick={() => void send()} disabled={!text.trim() || busy} className="rounded-full bg-violet-500 px-4 py-2.5 text-sm font-bold disabled:opacity-40">
@@ -227,15 +314,21 @@ function SongCard({
   live,
   onInstrumental,
   onSung,
+  editing,
+  onEdit,
+  onEditDone,
 }: {
   live: boolean;
   onInstrumental: (url: string) => void;
-  onSung: (url: string) => void;
+  onSung: (v: SongView) => void;
+  editing: boolean;
+  onEdit: () => void;
+  onEditDone: () => void;
   song: MadeSong;
   playing: boolean;
   buried: boolean;
   onPlay: () => void;
-  onBury: () => void;
+  onBury: () => void | Promise<void>;
   onAgain: () => void;
   onIsland: () => void;
 }) {
@@ -277,14 +370,36 @@ function SongCard({
       {live && song.design && song.instrumentalUrl && <Sing song={song} onMade={onSung} />}
       {buried ? (
         <button onClick={onIsland} className="mt-3 w-full rounded-full border border-amber-200/50 bg-[#3a2410]/80 py-2 text-sm">
-          ⛏ 島の土に埋めました → 島を見る
+          ⛏ 保存して島の土に埋めました → 島を見る
         </button>
+      ) : song.songUrl ? (
+        <>
+          {editing ? (
+            <button onClick={onEditDone} className="mt-3 w-full rounded-full border border-fuchsia-300/50 bg-fuchsia-500/10 py-2 text-xs">
+              ✏️ 手直し中 — チャットで直したいところを話してね（終わる）
+            </button>
+          ) : (
+            <div className="mt-3 flex gap-2">
+              <button onClick={onEdit} className="flex-1 rounded-full border border-fuchsia-300/60 bg-fuchsia-500/15 py-2 text-sm font-bold">
+                ✏️ 手直しする
+              </button>
+              <button onClick={() => void onBury()} className="flex-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
+                💾 保存する
+              </button>
+            </div>
+          )}
+          {editing && (
+            <button onClick={() => void onBury()} className="mt-2 w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
+              💾 この曲を保存する
+            </button>
+          )}
+        </>
       ) : (
         <div className="mt-3 flex gap-2">
           <button onClick={onAgain} className="flex-1 rounded-full border border-white/20 py-2 text-xs">
             もう一回つくる
           </button>
-          <button onClick={onBury} className="flex-[2] rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
+          <button onClick={() => void onBury()} className="flex-[2] rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
             ⛏ 島の土に埋める（デモ）
           </button>
         </div>
@@ -385,7 +500,7 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
  * Step 3: the song sung in the member's own registered voice (Fish Audio [singing]) over the
  * instrumental. The AI picks how it is sung (tags, speed, volume) from the design.
  */
-function Sing({ song, onMade }: { song: MadeSong; onMade: (url: string) => void }) {
+function Sing({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => void }) {
   const { me } = useAuth();
   const [state, setState] = useState<'idle' | 'working' | 'error'>('idle');
   const [err, setErr] = useState('');
@@ -394,7 +509,7 @@ function Sing({ song, onMade }: { song: MadeSong; onMade: (url: string) => void 
     return (
       <div className="mt-3 rounded-2xl bg-black/25 p-2">
         <p className="mb-1 text-center text-[11px] text-fuchsia-200/80">🎤 歌入り（あなたの声）</p>
-        <audio src={song.songUrl} controls playsInline className="w-full" />
+        <audio key={song.songUrl} src={song.songUrl} controls playsInline className="w-full" />
         {how && <p className="mt-1 text-center text-[10px] text-white/40">{how}</p>}
       </div>
     );
@@ -421,11 +536,14 @@ function Sing({ song, onMade }: { song: MadeSong; onMade: (url: string) => void 
         sections: d.sections.map((s) => ({ name: s.name, lines: s.lines.map((l) => ({ text: l.text.slice(0, 40), beats: l.notes.reduce((a, n) => a + n.beats, 0) })) })),
         melody: d.sections.flatMap((s) => s.lines).flatMap((l) => l.notes).map((n) => ({ midi: n.midi, beats: n.beats })).slice(0, 600),
         instrumentalUrl: song.instrumentalUrl!,
+        instrumentalPrompt: d.instrumentalPrompt,
+        progression: d.progression,
+        seconds: d.seconds,
         slot: 'self',
       });
       const dir = r.direction;
       setHow(`歌い方：${[...dir.style, ...dir.sections.flatMap((s) => s.tags)].join(' / ')} ・ 速さ ${dir.speed} ・ 音量 ${dir.volume}dB`);
-      onMade(r.url);
+      onMade(r);
       setState('idle');
     } catch (e) {
       setErr(detail(e));

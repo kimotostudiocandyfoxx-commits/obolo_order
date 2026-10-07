@@ -9,6 +9,7 @@ import { ComposeChat } from './ComposeChat';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
+import { stopAudio, toggleAudio } from '@/lib/audio';
 
 /**
  * Mercury — the planet of music (client design 2026-10-05 v2, docs/mercury.md).
@@ -393,10 +394,16 @@ function Player({
   const [dx, setDx] = useState(0);
 
   useEffect(() => {
-    synth.play(song.preset);
+    if (song.audioUrl) {
+      synth.stop();
+      void toggleAudio(song.audioUrl).catch(() => undefined);
+    } else synth.play(song.preset);
     setT(0);
     const id = setInterval(() => setT((v) => (v + 1 >= song.seconds ? 0 : v + 1)), 1000);
-    return () => clearInterval(id);
+    return () => {
+      clearInterval(id);
+      if (song.audioUrl) stopAudio();
+    };
   }, [song]);
 
   const go = (d: number) => {

@@ -14,7 +14,8 @@ import {
   type ComposeChatResult,
   type SongDesign,
   type InstrumentalResult,
-  type SingResult,
+  type SongEditResult,
+  type SongView,
   type SaturnPostView,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
@@ -277,7 +278,15 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
   }
 
-  async composeSing(): Promise<SingResult> {
+  async composeSing(): Promise<SongView> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+
+  async composeSongEdit(): Promise<SongEditResult> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+
+  async composeSongSave(): Promise<SongView> {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 

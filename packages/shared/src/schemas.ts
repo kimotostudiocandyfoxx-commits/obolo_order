@@ -204,7 +204,51 @@ export const SingBody = z.object({
     .min(1)
     .max(6),
   melody: z.array(z.object({ midi: z.number().int().min(0).max(127).nullable(), beats: z.number().positive().max(16) })).max(600),
+  /** kept with the song so the instrumental can be made again on a genre edit */
+  instrumentalPrompt: z.string().trim().min(1).max(500),
+  progression: z.array(z.number().int().min(0).max(6)).min(1).max(16),
+  seconds: z.number().min(4).max(120),
   instrumentalUrl: z.string().url().max(500),
   slot: z.enum(['self', 'bati']).default('self'),
 });
 export type SingBody = z.infer<typeof SingBody>;
+
+/** A decided song edit (what the LLM chose from the chat message; see SongEditResult). */
+export const SongEditCommand = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('VOLUME_TEMPO_EDIT'),
+    tempo: z.number().min(0.8).max(1.25).optional(),
+    vocalDb: z.number().min(-12).max(12).optional(),
+    bgmDb: z.number().min(-12).max(12).optional(),
+  }),
+  z.object({
+    action: z.literal('LYRICS_EDIT'),
+    edits: z.array(z.object({ index: z.number().int().min(0).max(47), text: z.string().trim().min(1).max(40) })).min(1).max(8),
+  }),
+  z.object({
+    action: z.literal('VOICE_REPLACE'),
+    indexes: z.array(z.number().int().min(0).max(47)).min(1).max(48),
+    slot: z.enum(['self', 'bati']),
+  }),
+  z.object({
+    action: z.literal('TIMING_EDIT'),
+    delayBeats: z.number().min(-16).max(16).optional(),
+    gapAfter: z.number().int().min(0).max(47).optional(),
+    gapSeconds: z.number().min(0).max(8).optional(),
+  }),
+  z.object({ action: z.literal('GENRE_EDIT'), prompt: z.string().trim().min(3).max(400) }),
+]);
+export type SongEditCommand = z.infer<typeof SongEditCommand>;
+
+/** A chat message about a finished song ("サビを大きく", "ロックにして" …), or a command to retry. */
+export const SongEditBody = z
+  .object({
+    message: z.string().trim().min(1).max(300).optional(),
+    /** the last few chat lines, so "もっと" / "さっきの" make sense */
+    history: z.array(z.object({ role: z.enum(['user', 'partner']), text: z.string().trim().min(1).max(400) })).max(10).default([]),
+    partner: z.string().trim().min(1).max(20),
+    isBati: z.boolean(),
+    command: SongEditCommand.optional(),
+  })
+  .refine((b) => !!b.message || !!b.command, { message: 'message or command is required' });
+export type SongEditBody = z.infer<typeof SongEditBody>;

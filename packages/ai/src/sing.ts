@@ -119,3 +119,17 @@ export function singText(song: Pick<SingSong, 'sections'> & Partial<Pick<SingSon
   }
   return out.join('\n');
 }
+
+/**
+ * The text for one lyric line sung on its own (each line is its own Fish call so it can be
+ * re-sung / moved later): "[singing][key…][style][section tags] words".
+ */
+export function phraseText(
+  song: { keyRoot: number; scale: 'major' | 'minor'; bpm: number },
+  d: SingDirection,
+  section: SectionName,
+  text: string,
+): string {
+  const t = tagText(d.sections.find((x) => x.name === section)?.tags ?? []);
+  return `[singing]${keyTags(song)}${tagText(d.style)}${t} ${text.replace(/[[\]]/g, '')}`;
+}

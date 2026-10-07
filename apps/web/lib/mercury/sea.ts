@@ -18,6 +18,8 @@ export interface Song {
   hue?: number;
   seconds: number;
   preset: SynthPreset;
+  /** a real recording (a saved song with vocals); played instead of the synth preset */
+  audioUrl?: string;
   /** hours since it was released */
   hoursAgo?: number;
 }

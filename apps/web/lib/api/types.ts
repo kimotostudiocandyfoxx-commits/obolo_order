@@ -26,7 +26,9 @@ import type {
   InstrumentalResult,
   RegisterVoiceBody,
   SingBody,
-  SingResult,
+  SongEditBody,
+  SongEditResult,
+  SongView,
   SpeakBody,
 } from '@obolo/shared';
 
@@ -87,7 +89,11 @@ export interface Api {
   /** Read a text aloud in a registered voice (Fish Audio). */
   speak(body: SpeakBody): Promise<{ url: string }>;
   /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */
-  composeSing(body: SingBody): Promise<SingResult>;
+  composeSing(body: SingBody): Promise<SongView>;
+  /** 手直し: a chat message about a sung song (or a retried command) → the partner's reply + the new mix. */
+  composeSongEdit(id: string, body: SongEditBody): Promise<SongEditResult>;
+  /** 保存する: keep this version of the song. */
+  composeSongSave(id: string): Promise<SongView>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */

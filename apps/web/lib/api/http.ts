@@ -99,6 +99,12 @@ export class HttpApi implements Api {
   composeSing(body: Parameters<Api['composeSing']>[0]) {
     return this.req<Awaited<ReturnType<Api['composeSing']>>>('POST', '/compose/sing', body);
   }
+  composeSongEdit(id: string, body: Parameters<Api['composeSongEdit']>[1]) {
+    return this.req<Awaited<ReturnType<Api['composeSongEdit']>>>('POST', `/compose/songs/${encodeURIComponent(id)}/edit`, body);
+  }
+  composeSongSave(id: string) {
+    return this.req<Awaited<ReturnType<Api['composeSongSave']>>>('POST', `/compose/songs/${encodeURIComponent(id)}/save`);
+  }
   speak(body: Parameters<Api['speak']>[0]) {
     return this.req<Awaited<ReturnType<Api['speak']>>>('POST', '/voice/speak', body);
   }

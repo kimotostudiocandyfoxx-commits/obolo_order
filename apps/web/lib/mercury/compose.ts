@@ -87,6 +87,8 @@ export interface MadeSong extends Song {
   instrumentalUrl?: string;
   /** the sung song (vocal in the member's voice + instrumental), once made */
   songUrl?: string;
+  /** the server's song record (chat edits / save) */
+  songId?: string;
 }
 
 const WAVE: Record<Genre, OscillatorType> = { pop: 'triangle', rock: 'sawtooth', hiphop: 'square', ballad: 'sine', edm: 'sawtooth' };
