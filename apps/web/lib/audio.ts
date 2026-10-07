@@ -53,30 +53,6 @@ export function stopAudio() {
   emit(false);
 }
 
-const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
-let primed = { el: false, tts: false };
-/**
- * iPad Safari only lets sound start inside a tap. Call this from a tap (pointerup) to unlock
- * the channel a chain of voices may need later from a timer: `keep` is the one about to play now.
- */
-export function primeAudio(keep: 'el' | 'tts') {
-  if (keep !== 'el' && !primed.el) {
-    primed.el = true;
-    const a = audio();
-    elUrl = null;
-    a.src = SILENT_WAV;
-    void a.play().catch(() => undefined);
-  }
-  if (keep !== 'tts' && !primed.tts && typeof speechSynthesis !== 'undefined') {
-    primed.tts = true;
-    const u = new SpeechSynthesisUtterance(' ');
-    u.volume = 0;
-    speechSynthesis.speak(u);
-  }
-  if (keep === 'el') primed.el = true;
-  else primed.tts = true;
-}
-
 export async function toggleAudio(url: string): Promise<void> {
   if (currentUrl === url && el && !el.paused) {
     el.pause();

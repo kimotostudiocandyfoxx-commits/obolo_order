@@ -3,7 +3,7 @@
 import { neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type PlazaView, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
-import { primeAudio, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
+import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useDictation } from '@/lib/useDictation';
@@ -113,9 +113,7 @@ export function KororinWorld({
     });
   };
   const popRef = useRef<(id: string) => void>(() => {});
-  // なぞる (みんな's ひろば only): traced characters speak one after another, then pop as rainbows
-  const chain = useRef<{ queue: string[]; id: string | null; started: boolean }>({ queue: [], id: null, started: false });
-  const nextRef = useRef<() => void>(() => {});
+  // みんな's ひろば: popped voices turn into rainbows
   const denseRef = useRef(false);
   const pendingPop = useRef<string | null>(null);
 
@@ -129,15 +127,6 @@ export function KororinWorld({
         if (!st.playing && st.progress >= 0.97 && p && st.url === p.voiceUrl && p.author.id !== meIdRef.current) {
           if (detailRef.current) pendingPop.current = p.id;
           else popRef.current(p.id);
-        }
-        // なぞる chain: when the current voice stops (ended, or could not play), the next one speaks
-        const cur = chain.current;
-        if (cur.id && p && cur.id === p.id && st.url === p.voiceUrl) {
-          if (st.playing) cur.started = true;
-          else if (cur.started) {
-            cur.id = null;
-            setTimeout(() => nextRef.current(), 140);
-          }
         }
       }),
     [],
@@ -155,7 +144,7 @@ export function KororinWorld({
   const [tabCursor, setTabCursor] = useState<string | null>(null);
   const loadingMore = useRef(false);
   const plazaId = tab === 'all' && !neoOnly ? (plaza?.id ?? null) : null;
-  // inside a ひろば: lots of small characters piled up, traced with a finger (なぞる)
+  // inside a ひろば: lots of small characters piled up
   const dense = !!plazaId;
   denseRef.current = dense;
   const fromList = tab !== 'all' || !!plazaId;
@@ -272,12 +261,7 @@ export function KororinWorld({
     const b = layer.current?.blob(id);
     if (b) setBursts((cur) => [...cur.slice(-8), { key: Date.now() + Math.random(), x: b.x, y: b.y, r: b.R, rainbow: denseRef.current }]);
     playPop(b ? Math.min(1, b.R / 120) : 0.5);
-    // (not close(): that would also end a なぞる chain that is still going)
-    if (openRef.current === id) {
-      openRef.current = null;
-      setOpen(null);
-      setDetail(false);
-    }
+    if (openRef.current === id) close();
     remember((cur) => new Set(cur).add(id));
   };
   // the sheet closed after the voice ended: pop now
@@ -287,7 +271,6 @@ export function KororinWorld({
       pendingPop.current = null;
       popRef.current(id);
     }
-    if (!detail && !chain.current.id && chain.current.queue.length) nextRef.current();
   }, [detail]);
 
   const listen = useCallback(
@@ -301,42 +284,6 @@ export function KororinWorld({
     },
     [events],
   );
-
-  const shownRef = useRef(shown);
-  shownRef.current = shown;
-  nextRef.current = () => {
-    const c = chain.current;
-    // wait while the details sheet is open; it resumes when it closes
-    if (detailRef.current) return;
-    while (c.queue.length) {
-      const id = c.queue.shift()!;
-      const p = shownRef.current.find((x) => x.id === id);
-      if (!p) continue;
-      c.id = id;
-      c.started = false;
-      layer.current?.poke(id);
-      listen(p);
-      return;
-    }
-    c.id = null;
-  };
-  // iPad Safari lets sound start only when the finger lifts; after that first time, voices can
-  // start while still tracing
-  const unlocked = useRef(false);
-  const onTrace = (id: string) => {
-    const c = chain.current;
-    if (c.id === id || c.queue.includes(id)) return;
-    c.queue.push(id);
-    if (!c.id && unlocked.current) nextRef.current();
-  };
-  const onTraceEnd = () => {
-    const c = chain.current;
-    if (c.id || !c.queue.length) return;
-    const first = shownRef.current.find((x) => x.id === c.queue[0]);
-    primeAudio(first?.voiceUrl.startsWith('tts:') ? 'tts' : 'el');
-    unlocked.current = true;
-    nextRef.current();
-  };
 
   // the answers under the opened voice (sample residents answer each other)
   useEffect(() => {
@@ -359,7 +306,6 @@ export function KororinWorld({
   };
 
   const close = () => {
-    chain.current = { queue: [], id: null, started: false };
     openRef.current = null;
     setOpen(null);
     setDetail(false);
@@ -497,7 +443,7 @@ export function KororinWorld({
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
           const p = shown.find((x) => x.id === id);
           if (p) listen(p);
-        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} onTrace={dense ? onTrace : undefined} onTraceEnd={onTraceEnd} />
+        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
       </div>
 
       {/* soap-bubble pops of the voices you heard */}
