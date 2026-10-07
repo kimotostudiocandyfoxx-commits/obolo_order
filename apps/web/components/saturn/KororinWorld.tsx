@@ -58,6 +58,8 @@ export function KororinWorld({
   const [tabPosts, setTabPosts] = useState<SaturnPostView[] | null>(null);
   const [stageW, setStageW] = useState(390);
   const [allReplies, setAllReplies] = useState(false);
+  // the replies / reply / quote sheet opened from the bubble's 💬
+  const [detail, setDetail] = useState(false);
   const card = useRef<HTMLDivElement>(null);
   const tail = useRef<HTMLSpanElement>(null);
   const [replies, setReplies] = useState<SaturnPostView[]>([]);
@@ -122,7 +124,7 @@ export function KororinWorld({
   );
   const speakingId = shown.find((p) => p.voiceUrl === playingUrl)?.id ?? null;
 
-  // the post card follows the tapped character (above it, or below near the top)
+  // the speech bubble follows the tapped character, always above it (never over the buttons)
   const onFrame = useCallback((get: (id: string) => { x: number; y: number; R: number } | undefined, W: number) => {
     const id = openRef.current;
     const el = card.current;
@@ -132,16 +134,11 @@ export function KororinWorld({
     const cw = el.offsetWidth;
     const ch = el.offsetHeight;
     const left = Math.max(12, Math.min(W - cw - 12, b.x - cw / 2));
-    const above = b.y - b.R * 1.15 - ch - 14;
-    const below = above < 96;
-    const top = below ? b.y + b.R * 1.05 + 14 : above;
+    // under the header at most; near the top it may overlap the character a little
+    const top = Math.max(150, b.y - b.R * 1.1 - ch - 16);
     el.style.transform = `translate(${left}px, ${top}px)`;
     el.style.opacity = '1';
-    if (tail.current) {
-      tail.current.style.left = `${Math.max(24, Math.min(cw - 24, b.x - left))}px`;
-      tail.current.style.top = below ? '-8px' : '';
-      tail.current.style.bottom = below ? '' : '-8px';
-    }
+    if (tail.current) tail.current.style.left = `${Math.max(22, Math.min(cw - 22, b.x - left))}px`;
   }, []);
 
   const listen = useCallback(
@@ -178,6 +175,7 @@ export function KororinWorld({
   const close = () => {
     openRef.current = null;
     setOpen(null);
+    setDetail(false);
     setAllReplies(false);
     setActiveReply(null);
     stopAudio();
@@ -315,82 +313,97 @@ export function KororinWorld({
         </p>
       </div>
 
-      {/* the post card, floating over the tapped character (positioned by the loop) */}
+      {/* the speech bubble: just the words, over the tapped character (positioned by the loop);
+          replies and stars as small badges at its lower right */}
       {open && (
-        <div ref={card} className="absolute left-0 top-0 z-[90] w-[min(330px,calc(100%-24px))] rounded-[28px] bg-white p-4 text-[#3d2a5c] opacity-0 shadow-[0_12px_40px_rgba(60,20,110,.28)]">
-          <span ref={tail} className="absolute h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px] bg-white" />
-          <div className="relative flex items-center gap-2">
-            <button onClick={() => setProfileId(open.author.id)} className="flex min-w-0 items-baseline gap-2 text-left" aria-label="profile">
-              <span className="truncate text-base font-black">{open.author.displayName}</span>
-              <span className="shrink-0 text-[11px] font-bold text-[#a08fc4]">{resident ? 'サンプル' : lifeLeft(open.createdAt)}</span>
-            </button>
-            {!resident && (
-              <button onClick={() => setComposer({ quote: open })} className="ml-auto flex h-8 shrink-0 items-center gap-1 rounded-full bg-[#f3ecff] px-2.5 text-xs font-black text-[#7a62b0]" aria-label="quote">
-                🔁 {open.repostCount ?? 0}
+        <div ref={card} className="pointer-events-none absolute left-0 top-0 z-[90] opacity-0">
+          <div className="relative w-max max-w-[min(270px,calc(100vw-24px))] animate-[fadeUp_0.2s_ease-out] rounded-[22px] bg-white px-4 py-2.5 text-[16px] font-black leading-snug text-[#3d2a5c] shadow-[0_10px_30px_rgba(60,20,110,.28)]">
+            <span ref={tail} className="absolute -bottom-2 h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px] bg-white" />
+            <span className="relative line-clamp-5 pb-1.5 pr-2">{open.text}</span>
+            <span className="pointer-events-auto absolute -bottom-3 -right-3 flex gap-1">
+              <button onClick={() => setDetail(true)} className="flex h-7 items-center gap-1 rounded-full border border-violet-100 bg-white px-2 text-[11px] font-black text-[#7a62b0] shadow" aria-label="replies">
+                💬 {replies.length}
+              </button>
+              <button onClick={() => void star(open)} className={`flex h-7 items-center gap-0.5 rounded-full border px-2 text-[11px] font-black shadow ${open.starredByMe ? 'border-amber-200 bg-amber-50 text-amber-500' : 'border-violet-100 bg-white text-[#7a62b0]'}`} aria-label="star">
+                {open.starredByMe ? '★' : '☆'} {open.starCount}
+              </button>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* the details (from 💬): who, replies to listen to, answer by voice, quote */}
+      {open && detail && (
+        <div className="absolute inset-0 z-[94] flex items-end justify-center bg-violet-950/40" onClick={() => setDetail(false)}>
+          <div className="pb-safe max-h-[75%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 text-[#3d2a5c]" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setProfileId(open.author.id)} className="flex min-w-0 items-center gap-2 text-left" aria-label="profile">
+                <PuniAvatar seed={open.author.id} neo={open.author.neoForm} look={open.author.look} pic={open.author.pic} size={34} />
+                <span className="truncate text-base font-black">{open.author.displayName}</span>
+                <span className="shrink-0 text-[11px] font-bold text-[#a08fc4]">{resident ? 'サンプル' : lifeLeft(open.createdAt)}</span>
+              </button>
+              <button onClick={() => setDetail(false)} className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f3ecff] text-[#7a62b0]" aria-label="close">
+                ✕
+              </button>
+            </div>
+            <p className="mt-2 text-sm font-bold leading-relaxed text-slate-600">{open.text}</p>
+            {open.repostOf && (
+              <button onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)} className="mt-2 flex w-full items-center gap-2 rounded-2xl bg-[#f8f3ff] p-2 text-left">
+                <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} pic={open.repostOf.author.pic} size={28} speaking={playingUrl === open.repostOf.voiceUrl} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[10px] font-black text-[#a08fc4]">🔁 {open.repostOf.author.displayName}の声</span>
+                  <span className="block truncate text-xs font-bold">{open.repostOf.text}</span>
+                </span>
+                <span className="text-xs text-[#7a62b0]">{playingUrl === open.repostOf.voiceUrl ? '❚❚' : '▶'}</span>
               </button>
             )}
-            <button onClick={close} className={`${resident ? 'ml-auto' : ''} flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f3ecff] text-[#7a62b0]`} aria-label="close">
-              ✕
-            </button>
-          </div>
-          <p className="relative mt-2 max-h-[30vh] overflow-y-auto text-[17px] font-black leading-relaxed">{open.text}</p>
-          {open.repostOf && (
-            <button onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)} className="relative mt-2 flex w-full items-center gap-2 rounded-2xl bg-[#f8f3ff] p-2 text-left">
-              <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} pic={open.repostOf.author.pic} size={28} speaking={playingUrl === open.repostOf.voiceUrl} />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[10px] font-black text-[#a08fc4]">🔁 {open.repostOf.author.displayName}の声</span>
-                <span className="block truncate text-xs font-bold">{open.repostOf.text}</span>
-              </span>
-              <span className="text-xs text-[#7a62b0]">{playingUrl === open.repostOf.voiceUrl ? '❚❚' : '▶'}</span>
-            </button>
-          )}
-          {/* replies: overlapping little characters, tap one to hear it */}
-          <div className="relative mt-3 rounded-[22px] bg-[#f6f0ff] p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-[#8a76bd]">💬 リプ {replies.length}</span>
-              <span className="text-[10px] font-bold text-[#b3a5d6]">{replies.length ? 'アイコンをタップできくよ' : resident ? 'サンプルには返信できないよ' : 'まだリプはないよ'}</span>
-            </div>
-            {(() => {
-              const a = replies.find((x) => x.id === activeReply);
-              return a ? (
-                <p className="mt-2 animate-[fadeUp_0.2s_ease-out] rounded-2xl rounded-bl-sm bg-white px-3 py-1.5 text-sm font-black shadow-sm">
-                  <span className="mr-1 text-[10px] text-[#a08fc4]">{a.author.displayName}</span>
-                  {a.text}
-                </p>
-              ) : null;
-            })()}
-            {!!replies.length && (
-              <div className="mt-2 flex items-center overflow-x-auto py-1 pl-1">
-                {shownReplies.map((rp, i) => (
-                  <button
-                    key={rp.id}
-                    onClick={() => playReply(rp)}
-                    className={`relative shrink-0 rounded-full border-[3px] bg-white ${activeReply === rp.id ? 'z-10 border-pink-300' : 'border-white'}`}
-                    style={{ marginLeft: i ? -12 : 0 }}
-                    aria-label={`${rp.author.displayName}: ${rp.text}`}
-                  >
-                    <PuniAvatar seed={rp.author.id} neo={rp.author.neoForm} look={rp.author.look} pic={rp.author.pic} size={42} speaking={playingUrl === rp.voiceUrl} bounce={activeReply === rp.id ? `${rp.id}-on` : undefined} />
-                  </button>
-                ))}
-                {replies.length > 5 && !allReplies && (
-                  <button onClick={() => setAllReplies(true)} className="-ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[3px] border-white bg-white text-sm font-black text-[#8a76bd] shadow-sm">
-                    +{replies.length - 5}
-                  </button>
-                )}
+            <div className="mt-3 rounded-[22px] bg-[#f6f0ff] p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-[#8a76bd]">💬 リプ {replies.length}</span>
+                <span className="text-[10px] font-bold text-[#b3a5d6]">{replies.length ? 'アイコンをタップできくよ' : resident ? 'サンプルには返信できないよ' : 'まだリプはないよ'}</span>
               </div>
-            )}
-          </div>
-          <div className="relative mt-3 grid grid-cols-2 gap-2">
-            <button onClick={() => void star(open)} className={`rounded-full py-2.5 text-sm font-black ${open.starredByMe ? 'bg-amber-100 text-amber-600' : 'bg-[#f3ecff] text-[#5a3f8a]'}`}>
-              {open.starredByMe ? '★' : '☆'} {open.starCount}
-            </button>
-            <button
-              onClick={() => !resident && setComposer({ replyTo: open })}
-              disabled={resident}
-              className="flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#fbd0e8] to-[#e7d2ff] py-2.5 text-sm font-black text-[#5a3f8a] disabled:opacity-50"
-            >
-              <MicIcon size={16} /> 声でかえす
-            </button>
+              {(() => {
+                const a = replies.find((x) => x.id === activeReply);
+                return a ? (
+                  <p className="mt-2 animate-[fadeUp_0.2s_ease-out] rounded-2xl rounded-bl-sm bg-white px-3 py-1.5 text-sm font-black shadow-sm">
+                    <span className="mr-1 text-[10px] text-[#a08fc4]">{a.author.displayName}</span>
+                    {a.text}
+                  </p>
+                ) : null;
+              })()}
+              {!!replies.length && (
+                <div className="mt-2 flex items-center overflow-x-auto py-1 pl-1">
+                  {shownReplies.map((rp, i) => (
+                    <button
+                      key={rp.id}
+                      onClick={() => playReply(rp)}
+                      className={`relative shrink-0 rounded-full border-[3px] bg-white ${activeReply === rp.id ? 'z-10 border-pink-300' : 'border-white'}`}
+                      style={{ marginLeft: i ? -12 : 0 }}
+                      aria-label={`${rp.author.displayName}: ${rp.text}`}
+                    >
+                      <PuniAvatar seed={rp.author.id} neo={rp.author.neoForm} look={rp.author.look} pic={rp.author.pic} size={42} speaking={playingUrl === rp.voiceUrl} bounce={activeReply === rp.id ? `${rp.id}-on` : undefined} />
+                    </button>
+                  ))}
+                  {replies.length > 5 && !allReplies && (
+                    <button onClick={() => setAllReplies(true)} className="-ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[3px] border-white bg-white text-sm font-black text-[#8a76bd] shadow-sm">
+                      +{replies.length - 5}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                onClick={() => !resident && setComposer({ replyTo: open })}
+                disabled={resident}
+                className="flex items-center justify-center gap-1.5 rounded-full bg-gradient-to-r from-[#fbd0e8] to-[#e7d2ff] py-2.5 text-sm font-black text-[#5a3f8a] disabled:opacity-50"
+              >
+                <MicIcon size={16} /> 声でかえす
+              </button>
+              <button onClick={() => !resident && setComposer({ quote: open })} disabled={resident} className="rounded-full bg-[#f3ecff] py-2.5 text-sm font-black text-[#5a3f8a] disabled:opacity-50">
+                🔁 引用 {open.repostCount ?? 0}
+              </button>
+            </div>
           </div>
         </div>
       )}
