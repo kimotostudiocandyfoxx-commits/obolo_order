@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { neoVoiceUrl, type CreateSaturnPostBody, type Paged, type SaturnPostRef, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
-import { and, asc, count, desc, eq, inArray, isNull, lt, or, sql, sum, type SQL } from 'drizzle-orm';
+import { neoVoiceUrl, SATURN_LIFETIME_HOURS, type CreateSaturnPostBody, type PuniLook, type Paged, type SaturnPostRef, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
+import { and, asc, count, desc, eq, gt, inArray, isNull, lt, or, sql, sum, type SQL } from 'drizzle-orm';
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -11,9 +11,11 @@ import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 
 type PostRow = typeof saturnPosts.$inferSelect;
-type Author = { id: string; handle: string; displayName: string; neoForm?: string | null };
+type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null };
 
-const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm };
+const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, look: users.lookJson };
+
+const alive = () => gt(saturnPosts.createdAt, new Date(Date.now() - SATURN_LIFETIME_HOURS * 3600_000));
 
 @Injectable()
 export class SaturnService {
@@ -30,12 +32,12 @@ export class SaturnService {
    */
   async feed(viewerId: string, cursor?: string, limit = 20, fresh = false, tab: 'all' | 'following' = 'all'): Promise<Paged<SaturnPostView>> {
     const following = tab === 'following' ? sql`(${saturnPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${saturnPosts.userId} = ${viewerId})` : undefined;
-    return this.page(viewerId, and(isNull(saturnPosts.replyToId), following), cursor, limit, fresh);
+    return this.page(viewerId, and(isNull(saturnPosts.replyToId), alive(), following), cursor, limit, fresh);
   }
 
   /** Someone's posts (their page), replies left out. */
   async userPosts(viewerId: string, userId: string, cursor?: string, limit = 30): Promise<Paged<SaturnPostView>> {
-    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId)), cursor, limit, true);
+    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), alive()), cursor, limit, true);
   }
 
   /** The voice replies under a post, oldest first (they line up as little balls under it). */
@@ -195,7 +197,7 @@ export class SaturnService {
       this.db.read
         .select({ n: count(), stars: sum(saturnPosts.starCount) })
         .from(saturnPosts)
-        .where(and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), isNull(saturnPosts.deletedAt))),
+        .where(and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), isNull(saturnPosts.deletedAt), alive())),
       this.db.read.select({ n: count() }).from(follows).where(eq(follows.followeeId, userId)),
       this.db.read.select({ n: count() }).from(follows).where(eq(follows.followerId, userId)),
       this.db.read.select({ n: count() }).from(follows).where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, userId))),

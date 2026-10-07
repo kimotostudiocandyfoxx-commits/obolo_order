@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { LOCALES, SATURN_MAX_CHARS } from './config';
 import { NEO_FORM_IDS } from './neo';
 import { VOICE_STYLE_IDS } from './neoVoice';
+import { PuniLook } from './puni';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -24,6 +25,8 @@ export const UpdateProfileBody = z.object({
   locale: z.enum(LOCALES).optional(),
   /** OBOLO NEO form chosen on Day 3. */
   neoForm: z.enum(NEO_FORM_IDS).optional(),
+  /** the round ぷにぷに character (null = back to the plain ball) */
+  look: PuniLook.nullable().optional(),
 });
 export type UpdateProfileBody = z.infer<typeof UpdateProfileBody>;
 

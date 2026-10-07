@@ -5,6 +5,7 @@ import {
   JOURNEY_WAIT_MS,
   MONTHLY_GRANT_MANA,
   neoVoiceUrl,
+  SATURN_LIFETIME_HOURS,
   type BuddyMessageView,
   type BuddyPersona,
   type InviteView,
@@ -314,14 +315,16 @@ export class DemoApi implements Api {
 
   private view(p: DemoState['posts'][number], viewer: string): SaturnPostView {
     const { starredBy, ...rest } = p;
-    return { ...rest, starredByMe: starredBy.includes(viewer) };
+    // the author's current look (they may have re-dressed since posting)
+    const look = this.s.users[rest.author.id]?.look ?? rest.author.look ?? null;
+    return { ...rest, author: { ...rest.author, look }, starredByMe: starredBy.includes(viewer) };
   }
 
   async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following') {
     const viewer = this.uid();
     const mine = new Set([...(this.s.follows?.[viewer] ?? []), viewer]);
     const sorted = [...this.s.posts]
-      .filter((p) => !p.replyToId && (tab !== 'following' || mine.has(p.author.id)))
+      .filter((p) => !p.replyToId && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (tab !== 'following' || mine.has(p.author.id)))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {
@@ -387,7 +390,7 @@ export class DemoApi implements Api {
       replyToId: replyTo ? (replyTo.replyToId ?? replyTo.id) : null,
       repostOf: quoted ? { id: quoted.id, author: quoted.author, text: quoted.text, voiceUrl: quoted.voiceUrl } : null,
       id: uid(),
-      author: { id, handle: u.handle, displayName: u.displayName, neoForm: u.neoForm },
+      author: { id, handle: u.handle, displayName: u.displayName, neoForm: u.neoForm, look: u.look ?? null },
       text: body.text,
       voiceUrl: body.voiceStyle ? neoVoiceUrl(body.voiceStyle, u.neoForm, body.text) : `idb:${body.voiceMediaId}`,
       voiceSource: body.voiceStyle ? ('default' as const) : ('recorded' as const),
@@ -462,6 +465,7 @@ export class DemoApi implements Api {
       bati: null,
       orderedAt: null,
       voices: { self: false, bati: false },
+      look: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };

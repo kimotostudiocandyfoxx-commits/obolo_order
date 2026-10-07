@@ -8,6 +8,8 @@ export const DEFAULT_LOCALE: Locale = 'ja';
 
 /** Spec §2.3 — 280-char class posts. */
 export const SATURN_MAX_CHARS = 280;
+/** Saturn voices vanish this many hours after they are dropped (client decision 2026-10-07). */
+export const SATURN_LIFETIME_HOURS = 88;
 /** PLACEHOLDER (P-SAT-1): max voice length for a Saturn post. */
 export const VOICE_MAX_SECONDS = 60;
 /** PLACEHOLDER (P-SAT-1): max upload size for a voice clip. */

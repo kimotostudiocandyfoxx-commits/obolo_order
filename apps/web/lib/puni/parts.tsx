@@ -5,38 +5,30 @@
  * A look = body shape + colour + texture + one part per slot. Saved as ids only.
  */
 import type { ReactNode } from 'react';
+import type { PuniLook } from '@obolo/shared';
 import type { BodyShape } from './physics';
 
-export type Texture = 'none' | 'rice' | 'fur' | 'scales';
-export type FaceKind = 'normal' | 'gorilla' | 'croc' | 'hippo';
-export type Eyes = 'sparkle' | 'glow';
-export type Mouth = 'smile' | 'roar' | 'cat' | 'none';
-export type Hat = 'none' | 'bucket' | 'crown';
-export type Glasses = 'none' | 'roundDark' | 'roundYellow';
-export type Neck = 'none' | 'goldChain' | 'queenCollar';
-export type Wear = 'none' | 'nori' | 'suit' | 'dress' | 'shorts';
-export type Hands = 'none' | 'peace' | 'robot' | 'fan' | 'spray';
-export type Item = 'none' | 'banana';
-export type Effect = 'sparkle' | 'zap' | 'puff' | 'hearts';
+export type Texture = PuniLook['tex'];
+export type FaceKind = PuniLook['face'];
+export type Eyes = PuniLook['eyes'];
+export type Mouth = PuniLook['mouth'];
+export type Hat = PuniLook['hat'];
+export type Glasses = PuniLook['glasses'];
+export type Neck = PuniLook['neck'];
+export type Wear = PuniLook['wear'];
+export type Hands = PuniLook['hands'];
+export type Item = PuniLook['item'];
+export type Effect = PuniLook['effect'];
 
-export interface Look {
+/** A look with a name (the samples / the wardrobe); members store the PuniLook part only. */
+export interface Look extends PuniLook {
   id: string;
   name: string;
-  shape: BodyShape;
-  color: string;
-  tex: Texture;
-  face: FaceKind;
-  eyes: Eyes;
-  mouth: Mouth;
-  hat: Hat;
-  glasses: Glasses;
-  neck: Neck;
-  wear: Wear;
-  hands: Hands;
-  item: Item;
-  effect: Effect;
-  /** text on the chain's medal */
-  medal?: string;
+}
+
+/** A plain starting look from the member's NEO colour. */
+export function defaultLook(color = '#f4a3c4'): PuniLook {
+  return { shape: 'round', color, tex: 'none', face: 'normal', eyes: 'sparkle', mouth: 'smile', hat: 'none', glasses: 'none', neck: 'none', wear: 'none', hands: 'none', item: 'none', effect: 'sparkle' };
 }
 
 /** The five characters from the client's reference pictures (2026-10-07). */
@@ -134,7 +126,7 @@ export function TextureDefs({ id, tex, color, R }: { id: string; tex: Texture; c
 // --- parts ----------------------------------------------------------------------------------------
 
 /** Behind the body: ears, the queen's collar back, the nori tails. */
-export function BackParts({ look: l, a }: { look: Look; a: A }) {
+export function BackParts({ look: l, a }: { look: PuniLook; a: A }) {
   const out: ReactNode[] = [];
   if (l.face === 'gorilla')
     out.push(
@@ -167,7 +159,7 @@ export function BackParts({ look: l, a }: { look: Look; a: A }) {
 }
 
 /** Clothes: clipped to the body so they wrap it. */
-export function WearPart({ look: l, a }: { look: Look; a: A }) {
+export function WearPart({ look: l, a }: { look: PuniLook; a: A }) {
   switch (l.wear) {
     case 'nori':
       return (
@@ -239,7 +231,7 @@ function Eye({ x, y, kind }: { x: number; y: number; kind: Eyes }) {
 }
 
 /** Face: muzzle, eyes (normal + "poked" >_<, the stage switches them), mouth, cheeks. */
-export function FaceParts({ look: l, a }: { look: Look; a: A }) {
+export function FaceParts({ look: l, a }: { look: PuniLook; a: A }) {
   const ey = a.face - (l.face === 'croc' ? 26 : l.face === 'hippo' ? 22 : 6);
   const ex = l.face === 'croc' ? 30 : 30;
   const out: ReactNode[] = [];
@@ -314,7 +306,7 @@ export function FaceParts({ look: l, a }: { look: Look; a: A }) {
 }
 
 /** Glasses, hat, neck, hands, items: in front of everything. */
-export function FrontParts({ look: l, a }: { look: Look; a: A }) {
+export function FrontParts({ look: l, a }: { look: PuniLook; a: A }) {
   const ey = a.face - (l.face === 'croc' ? 26 : l.face === 'hippo' ? 22 : 6);
   const out: ReactNode[] = [];
   if (l.wear === 'nori')

@@ -1,5 +1,6 @@
 import type { BuddyPersona, Locale } from './index';
 import type { SongEditCommand } from './schemas';
+import type { PuniLook } from './puni';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
 
@@ -27,6 +28,8 @@ export interface Me {
   orderedAt: string | null;
   /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice. */
   voices: { self: boolean; bati: boolean };
+  /** the round ぷにぷに character (null until dressed on the profile) */
+  look: PuniLook | null;
   createdAt: string;
 }
 
@@ -121,7 +124,7 @@ export interface BuddyChatResponse {
 
 export interface SaturnPostView {
   id: string;
-  author: { id: string; handle: string; displayName: string; neoForm?: string | null };
+  author: { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null };
   text: string;
   voiceUrl: string;
   voiceSource: 'recorded' | 'cloned' | 'default';
@@ -140,14 +143,14 @@ export interface SaturnPostView {
 /** A short form of a post, embedded in a quote repost. */
 export interface SaturnPostRef {
   id: string;
-  author: { id: string; handle: string; displayName: string; neoForm?: string | null };
+  author: { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null };
   text: string;
   voiceUrl: string;
 }
 
 /** Someone's Saturn page. */
 export interface SaturnProfileView {
-  user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string };
+  user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string; look?: PuniLook | null };
   postCount: number;
   followers: number;
   following: number;

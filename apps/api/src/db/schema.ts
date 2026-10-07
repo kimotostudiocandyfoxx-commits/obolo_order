@@ -8,6 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
+import type { PuniLook } from '@obolo/shared';
 import {
   bigint,
   check,
@@ -40,6 +41,8 @@ export const users = pgTable(
     handle: text('handle').notNull(),
     displayName: text('display_name').notNull(),
     bio: text('bio').notNull().default(''),
+    /** the round ぷにぷに character (part ids, see @obolo/shared PuniLook) */
+    lookJson: jsonb('look_json').$type<PuniLook>(),
     birthdate: date('birthdate'),
     country: text('country').notNull().default('JP'),
     locale: text('locale').notNull().default('ja'),

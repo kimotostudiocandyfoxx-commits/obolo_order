@@ -1,4 +1,4 @@
-import type { SaturnPostView, SaturnProfileView } from '@obolo/shared';
+import { PUNI_PARTS, type PuniLook, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
 
 /**
  * Sample "residents" so Saturn never feels empty while real posts are few.
@@ -20,9 +20,33 @@ const R: [string, string, string, string][] = [
   ['r12', 'カイ', 'ookami', 'はじめて土星にきた。みんなの声、あったかいな。'],
 ];
 
+const PALETTE = ['#f6f1e4', '#f4a3c4', '#8ec5ff', '#ffd36b', '#b58cff', '#9be3b0', '#ffb38a', '#5e8a4b', '#3b3433', '#5a5461'];
+
+/** Sample residents are dressed too (deterministic mix of parts) so the world shows the variety. */
+function residentLook(i: number): PuniLook {
+  const pick = <T,>(list: readonly T[], k: number) => list[(i * 7 + k * 13) % list.length];
+  const face = i % 4 === 1 ? pick(PUNI_PARTS.face, 1) : 'normal';
+  return {
+    shape: pick(PUNI_PARTS.shape, 2),
+    color: PALETTE[(i * 3) % PALETTE.length],
+    tex: i % 3 === 0 ? pick(PUNI_PARTS.tex, 3) : 'none',
+    face,
+    eyes: 'sparkle',
+    mouth: face === 'normal' ? pick(['smile', 'cat', 'smile'] as const, 4) : 'none',
+    hat: i % 2 === 0 ? pick(PUNI_PARTS.hat, 5) : 'none',
+    glasses: i % 5 === 2 ? pick(['roundDark', 'roundYellow'] as const, 6) : 'none',
+    neck: i % 4 === 3 ? 'goldChain' : 'none',
+    wear: i % 3 === 1 ? pick(PUNI_PARTS.wear, 7) : 'none',
+    hands: i % 2 === 1 ? pick(['peace', 'fan', 'spray', 'peace'] as const, 8) : 'none',
+    item: 'none',
+    effect: pick(PUNI_PARTS.effect, 9),
+    medal: String(10 + i),
+  };
+}
+
 export const SATURN_RESIDENTS: SaturnPostView[] = R.map(([id, name, neo, text], i) => ({
   id: `resident-${id}`,
-  author: { id: `resident-${id}`, handle: `neo_${id}`, displayName: name, neoForm: neo },
+  author: { id: `resident-${id}`, handle: `neo_${id}`, displayName: name, neoForm: neo, look: residentLook(i) },
   text,
   voiceUrl: `tts:${text}`,
   voiceSource: 'default',

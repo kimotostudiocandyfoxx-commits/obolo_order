@@ -1,19 +1,22 @@
 'use client';
 
-import { neoVoiceUrl, SATURN_MAX_CHARS, VOICE_STYLES, type SaturnPostView } from '@obolo/shared';
+import { neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useRecorder } from '@/lib/useRecorder';
-import { BallAvatar, hueOf } from './BallAvatar';
+import { PuniAvatar } from '@/components/puni/PuniAvatar';
+import { hueOf } from './BallAvatar';
 import { SaturnProfile } from './SaturnProfile';
 
 /**
  * 「ころりん」 — Saturn's voice world (client concept, 2026-10-04).
  * Everyone's posts become round chibi avatars that drift along Saturn's rings or roll on the ground.
- * Tap one → it stops, a speech card opens and the poster's voice plays.
+ * Tap one → it squishes and stops, its words pop up in a speech bubble and the poster's voice
+ * plays (the card below holds stars, replies, quote). Everyone is drawn as the ぷにぷに character
+ * they dressed on their profile (or the plain ball). Voices vanish after 88 hours.
  * Bottom bar: ゆらす (shake) · 声をおとす (record & drop your voice) · おまかせ (play a random voice).
  * Under an opened voice, the people who answered line up as little balls: tap one → its voice
  * plays with a speech bubble. Names open the person's page (follow); 🔁 quotes the voice.
@@ -67,6 +70,8 @@ export function KororinWorld({
   const [replies, setReplies] = useState<SaturnPostView[]>([]);
   const [activeReply, setActiveReply] = useState<string | null>(null);
   const [profileId, setProfileId] = useState<string | null>(null);
+  // replays the squish of a tapped character
+  const [bounce, setBounce] = useState<Record<string, number>>({});
   const [shaking, setShaking] = useState(false);
   const [dropped, setDropped] = useState<string | null>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -158,7 +163,13 @@ export function KororinWorld({
             rot = (Math.cos(m.t) * m.speed > 0 ? 1 : -1) * ((m.t * 180) % 360);
           }
           node.style.transform = `translate(${x - m.size / 2}px, ${y - m.size / 2}px) scale(${scale})`;
-          node.style.zIndex = String(z);
+          node.style.zIndex = String(paused.current === m.post.id ? 75 : z);
+          if (paused.current === m.post.id) {
+            // keep the speech bubble (≤ 240 px wide) inside the screen
+            const half = 124;
+            const shift = x - half < 8 ? 8 - (x - half) : x + half > W - 8 ? W - 8 - (x + half) : 0;
+            node.style.setProperty('--bubble-shift', `${shift}px`);
+          }
           const inner = node.firstElementChild as HTMLElement | null;
           if (inner) inner.style.transform = m.kind === 'ground' && paused.current !== m.post.id ? `rotate(${rot * 0.15}deg)` : '';
         }
@@ -174,6 +185,7 @@ export function KororinWorld({
       paused.current = p.id;
       setOpen(p);
       setActiveReply(null);
+      setBounce((b) => ({ ...b, [p.id]: Date.now() }));
       void toggleAudio(p.voiceUrl).catch(() => undefined);
       events?.onListen?.();
     },
@@ -300,8 +312,16 @@ export function KororinWorld({
               aria-label={`${p.author.displayName}: ${p.text}`}
             >
               <span className={`block ${dropped === p.id ? 'animate-[dropIn_1.2s_cubic-bezier(.3,1.4,.6,1)]' : ''}`}>
-                <BallAvatar seed={p.author.id} neo={p.author.neoForm} size={size} speaking={playingUrl === p.voiceUrl} />
+                <PuniAvatar seed={p.author.id} neo={p.author.neoForm} look={p.author.look} size={size} speaking={playingUrl === p.voiceUrl} bounce={bounce[p.id]} />
               </span>
+              {open?.id === p.id && (
+                <span className="pointer-events-none absolute bottom-[calc(100%+6px)] left-1/2 w-max max-w-[240px]" style={{ transform: 'translateX(calc(-50% + var(--bubble-shift, 0px)))' }}>
+                  <span className="relative block animate-[fadeUp_0.25s_ease-out] rounded-2xl bg-white px-3 py-2 text-left text-[14px] font-bold leading-snug text-slate-800 shadow-xl">
+                    <span className="line-clamp-4">{p.text}</span>
+                    <span className="absolute top-full border-x-8 border-t-8 border-x-transparent border-t-white" style={{ left: 'calc(50% - 8px - var(--bubble-shift, 0px))' }} />
+                  </span>
+                </span>
+              )}
             </button>
           );
         })}
@@ -315,7 +335,7 @@ export function KororinWorld({
             <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-bold text-amber-600">⭐ {all.reduce((a, p) => a + (p.author.id === me?.id ? p.starCount : 0), 0) || 0}</span>
             {me && (
               <button onClick={() => setProfileId(me.id)} aria-label="my page">
-                <BallAvatar seed={me.id} neo={me.neoForm} size={34} />
+                <PuniAvatar seed={me.id} neo={me.neoForm} look={me.look} size={34} />
               </button>
             )}
           </div>
@@ -350,21 +370,23 @@ export function KororinWorld({
           <div className="w-full max-w-sm animate-[fadeUp_0.3s_ease-out] rounded-3xl bg-white p-4 text-slate-800 shadow-2xl">
             <div className="flex items-center gap-2">
               <button onClick={() => setProfileId(open.author.id)} className="flex min-w-0 items-center gap-2 text-left" aria-label="profile">
-                <BallAvatar seed={open.author.id} neo={open.author.neoForm} size={32} speaking={playingUrl === open.voiceUrl} />
+                <PuniAvatar seed={open.author.id} neo={open.author.neoForm} look={open.author.look} size={32} speaking={playingUrl === open.voiceUrl} />
                 <span className="truncate font-black">{open.author.displayName}</span>
                 <span className="truncate text-[11px] text-slate-400">@{open.author.handle}</span>
+                <span className="shrink-0 text-[10px] text-pink-400">{lifeLeft(open.createdAt)}</span>
               </button>
               <button onClick={close} className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-500" aria-label="close">
                 ×
               </button>
             </div>
-            <p className="mt-2 text-[17px] font-bold leading-relaxed">{open.text}</p>
+            {/* the words are in the bubble over the character; long ones are repeated here in full */}
+            {[...open.text].length > 60 && <p className="mt-2 text-sm font-bold leading-relaxed text-slate-600">{open.text}</p>}
             {open.repostOf && (
               <button
                 onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)}
                 className="mt-2 flex w-full items-center gap-2 rounded-2xl border border-violet-100 bg-violet-50/60 p-2 text-left"
               >
-                <BallAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} size={26} speaking={playingUrl === open.repostOf.voiceUrl} />
+                <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} size={26} speaking={playingUrl === open.repostOf.voiceUrl} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[10px] font-bold text-violet-400">🔁 {open.repostOf.author.displayName}の声</span>
                   <span className="block truncate text-xs text-slate-600">{open.repostOf.text}</span>
@@ -412,7 +434,7 @@ export function KororinWorld({
               <div className="-mx-1 mt-1.5 flex items-end gap-1.5 overflow-x-auto px-1 pb-1">
                 {replies.map((rp) => (
                   <button key={rp.id} onClick={() => playReply(rp)} className={`relative shrink-0 rounded-full p-0.5 ${activeReply === rp.id ? 'ring-2 ring-violet-400' : ''}`} aria-label={`${rp.author.displayName}: ${rp.text}`}>
-                    <BallAvatar seed={rp.author.id} neo={rp.author.neoForm} size={40} speaking={playingUrl === rp.voiceUrl} />
+                    <PuniAvatar seed={rp.author.id} neo={rp.author.neoForm} look={rp.author.look} size={40} speaking={playingUrl === rp.voiceUrl} bounce={activeReply === rp.id ? `${rp.id}-on` : undefined} />
                   </button>
                 ))}
                 {!open.id.startsWith('resident-') ? (
@@ -468,6 +490,12 @@ export function KororinWorld({
       {overlay}
     </div>
   );
+}
+
+/** "のこり 12時間": how long a voice stays on Saturn (they vanish after 88 hours). */
+function lifeLeft(createdAt: string) {
+  const h = SATURN_LIFETIME_HOURS - (Date.now() - new Date(createdAt).getTime()) / 3600_000;
+  return h <= 1 ? 'まもなく消える' : `のこり${Math.floor(h)}時間`;
 }
 
 /**
@@ -552,7 +580,7 @@ function DropComposer({
         </p>
         {(replyTo ?? quote) && (
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-violet-50 p-2">
-            <BallAvatar seed={(replyTo ?? quote)!.author.id} neo={(replyTo ?? quote)!.author.neoForm} size={26} />
+            <PuniAvatar seed={(replyTo ?? quote)!.author.id} neo={(replyTo ?? quote)!.author.neoForm} look={(replyTo ?? quote)!.author.look} size={26} />
             <p className="min-w-0 flex-1 truncate text-xs text-slate-600">{(replyTo ?? quote)!.text}</p>
           </div>
         )}

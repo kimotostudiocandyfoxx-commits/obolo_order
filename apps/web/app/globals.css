@@ -416,3 +416,14 @@ body {
   30% { opacity: 1; }
   100% { transform: scale(1.9) translateX(-30px); opacity: 0; }
 }
+@keyframes puniSquish {
+  0% { transform: scale(1, 1); }
+  18% { transform: scale(1.28, 0.72); }
+  40% { transform: scale(0.86, 1.16); }
+  62% { transform: scale(1.08, 0.94); }
+  80% { transform: scale(0.97, 1.03); }
+  100% { transform: scale(1, 1); }
+}
+/* a poked figure shows its >_< eyes */
+.puni-poked [data-eyes='open'] { display: none; }
+.puni-poked [data-eyes='poked'] { display: inline !important; }

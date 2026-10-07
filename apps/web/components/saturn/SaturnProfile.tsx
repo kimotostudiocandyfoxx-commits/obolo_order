@@ -1,12 +1,14 @@
 'use client';
 
-import type { SaturnPostView, SaturnProfileView } from '@obolo/shared';
+import { SATURN_LIFETIME_HOURS, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { residentProfile, SATURN_RESIDENTS } from '@/lib/saturnResidents';
-import { BallAvatar, hueOf } from './BallAvatar';
+import { PuniAvatar } from '@/components/puni/PuniAvatar';
+import { PuniWardrobe } from '@/components/puni/PuniWardrobe';
+import { hueOf } from './BallAvatar';
 
 /**
  * Someone's Saturn page (P-SAT-6). The header art is drawn in code in the same touch as the
@@ -33,6 +35,8 @@ export function SaturnProfile({
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState('');
+  const [wardrobe, setWardrobe] = useState(false);
+  const [bounce, setBounce] = useState<number>();
 
   useEffect(() => {
     if (resident) return;
@@ -89,9 +93,9 @@ export function SaturnProfile({
           </button>
           {resident && <span className="mt-2 rounded-full bg-white/80 px-3 py-1 text-[10px] font-bold text-violet-500">サンプルの住人</span>}
         </div>
-        <div className="absolute bottom-[44px] left-1/2 -translate-x-1/2 animate-[bob_3s_ease-in-out_infinite]">
-          {u && <BallAvatar seed={u.id} neo={u.neoForm} size={104} speaking={!!playingUrl && posts.some((p) => p.voiceUrl === playingUrl)} />}
-        </div>
+        <button onClick={() => setBounce(Date.now())} className="absolute bottom-[44px] left-1/2 -translate-x-1/2 animate-[bob_3s_ease-in-out_infinite]" aria-label="squish">
+          {u && <PuniAvatar seed={u.id} neo={u.neoForm} look={u.look} size={110} bounce={bounce} speaking={!!playingUrl && posts.some((p) => p.voiceUrl === playingUrl)} />}
+        </button>
       </div>
 
       {/* sheet */}
@@ -143,6 +147,14 @@ export function SaturnProfile({
               ))}
             </div>
 
+            {profile.isMe && !editing && (
+              <button
+                onClick={() => setWardrobe(true)}
+                className="mt-3 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow"
+              >
+                👕 着せ替え（ぷにぷにの姿）
+              </button>
+            )}
             {profile.isMe ? (
               !editing && (
                 <button
@@ -181,6 +193,7 @@ export function SaturnProfile({
                   </button>
                   <button onClick={() => onOpenPost(p)} className="min-w-0 flex-1 text-left">
                     <p className="text-sm font-bold leading-snug">{p.text}</p>
+                    <p className="text-[10px] text-pink-400">のこり{Math.max(0, Math.floor(SATURN_LIFETIME_HOURS - (Date.now() - new Date(p.createdAt).getTime()) / 3600_000))}時間で消える</p>
                     {p.repostOf && (
                       <p className="mt-1 truncate rounded-xl bg-white/80 px-2 py-1 text-[11px] text-slate-500">
                         🔁 {p.repostOf.author.displayName}「{p.repostOf.text}」
@@ -196,6 +209,17 @@ export function SaturnProfile({
           </>
         )}
       </div>
+      {wardrobe && profile && (
+        <PuniWardrobe
+          start={profile.user.look ?? null}
+          onClose={() => setWardrobe(false)}
+          onSaved={(look) => {
+            setProfile((p) => (p ? { ...p, user: { ...p.user, look } } : p));
+            setWardrobe(false);
+            setBounce(Date.now());
+          }}
+        />
+      )}
     </div>
   );
 }

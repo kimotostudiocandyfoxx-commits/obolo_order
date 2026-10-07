@@ -31,6 +31,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl } : null,
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId },
+    look: u.lookJson ?? null,
     createdAt: u.createdAt.toISOString(),
   };
 }
@@ -53,9 +54,10 @@ export class UsersService {
         .where(and(eq(users.handle, body.handle), ne(users.id, userId)));
       if (taken) throw apiError(HttpStatus.CONFLICT, 'HANDLE_TAKEN', 'This handle is already taken');
     }
+    const { look, ...rest } = body;
     const [u] = await this.db.write
       .update(users)
-      .set({ ...body, updatedAt: new Date() })
+      .set({ ...rest, ...(look !== undefined ? { lookJson: look } : {}), updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     return toMe(u);
