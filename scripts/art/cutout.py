@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Art workshop: cut a sprite painted on flat white out of its background -> transparent webp.
 
-usage: python3 scripts/art/cutout.py <in.png> <out.webp> [--width 640]
+usage: python3 scripts/art/cutout.py <in.png> <out.webp> [--width 640] [--glow-below 0.7]
 
 Only the white connected to the picture's border is removed (white inside the sprite stays),
 with a soft edge so glows do not get a hard halo. The result is trimmed to its content.
+--glow-below f: below that fraction of the height, light pixels are glow painted on white — they
+become see-through coloured light (so a saucer's under-glow is not a pale cloud on dark skies).
 """
 import argparse
 
@@ -16,6 +18,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('src')
 ap.add_argument('dst')
 ap.add_argument('--width', type=int, default=640)
+ap.add_argument('--glow-below', type=float, default=None)
 a = ap.parse_args()
 
 img = Image.open(a.src).convert('RGB')
@@ -30,6 +33,14 @@ bg = np.isin(lab, border[border > 0])
 alpha = np.where(bg, np.clip((dist - 8) / 32, 0, 1), 1.0)
 alpha = ndimage.gaussian_filter(alpha, 0.8)
 alpha = np.where(bg | ndimage.binary_dilation(bg, iterations=1), alpha, 1.0)
+if a.glow_below is not None:
+    rows = np.arange(rgb.shape[0])[:, None] >= int(rgb.shape[0] * a.glow_below)
+    # only light areas reachable from the outside (the hull's dark outline stops the flood)
+    lab2, _ = ndimage.label((dist < 150) & rows)
+    touch = np.unique(lab2[ndimage.binary_dilation(bg, iterations=2) & (lab2 > 0)])
+    halo = np.isin(lab2, touch[touch > 0])
+    glow = np.clip(dist / 170, 0, 1) ** 1.2
+    alpha = np.where(halo, np.minimum(alpha, glow), alpha)
 # un-premultiply the white out of semi-transparent edge pixels
 a3 = np.maximum(alpha, 1e-3)[..., None]
 fg = np.clip((rgb - 255 * (1 - a3)) / a3, 0, 255)

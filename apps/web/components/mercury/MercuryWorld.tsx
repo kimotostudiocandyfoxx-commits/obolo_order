@@ -6,6 +6,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { Artwork } from '@/components/Artwork';
 import { useAuth } from '@/lib/auth';
 import { fmt, P, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
+import { ArtStage, Vessel } from '@/components/art/Stage';
 import { ComposeChat } from './ComposeChat';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
@@ -89,6 +90,33 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
   };
   const sailingCount = SAILORS.filter(visible).length + realOthers.length + (mySailing.length ? 1 : 0);
 
+  // live sea (painted by the Art workshop): you first, then the real ships, then samples on みんな
+  type Rider = { key: string; name: string; title: string; sub?: string; img?: string | null; emoji: string; mine?: boolean; onTap: () => void };
+  const riders: Rider[] = live
+    ? [
+        ...(mySailing.length
+          ? [
+              {
+                key: 'me',
+                name: myHandle,
+                title: mySailing[0].song.title,
+                sub: hoursSince(mySailing[0].at) ? `${hoursSince(mySailing[0].at)}時間前` : 'たった今',
+                img: me?.puniPic ?? me?.avatarUrl,
+                emoji: neo?.emoji ?? '🦊',
+                mine: true,
+                onTap: () => play(`@${myHandle} の船`, mySailing.map((r) => r.song)),
+              },
+            ]
+          : []),
+        ...realOthers.map((f) => {
+          const songs = f.posts.map(songOf);
+          const name = f.author.displayName || f.author.handle;
+          return { key: f.author.id, name, title: songs[0]?.title ?? '', img: f.author.pic, emoji: neoForm(f.author.neoForm)?.emoji ?? '⛵', onTap: () => play(`@${name} の船`, songs, 0, { userId: f.author.id, name }) };
+        }),
+        ...SAILORS.filter(visible).map((s) => ({ key: s.id, name: s.handle, title: s.sailing[0]?.title ?? '', img: spriteUrl(s.avatar), emoji: '⛵', onTap: () => play(`@${s.handle} の船`, s.sailing) })),
+      ].slice(0, SEA_SLOTS.length)
+    : [];
+
   const say = (t: string) => {
     setToast(t);
     setTimeout(() => setToast(null), 1800);
@@ -109,84 +137,112 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
             <p className="mx-auto mt-2 w-fit rounded-full border border-amber-300/50 bg-black/30 px-4 py-1 text-sm text-amber-100">👥 今 {sailingCount}人が航海中</p>
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center p-2">
-            <div className="relative w-full max-w-[min(100%,calc((100svh-230px)*1.293))]" style={{ aspectRatio: '1254 / 970' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={stillUrl('mercury-sea')} alt="" className="absolute inset-0 h-full w-full select-none rounded-xl" draggable={false} />
-              {SAILORS.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    play(`@${s.handle} の船`, s.sailing);
-                    ev.current?.onShip?.();
-                  }}
-                  className="absolute transition-opacity duration-500"
-                  style={{
-                    left: `${s.box.left}%`,
-                    top: `${s.box.top}%`,
-                    width: `${s.box.width}%`,
-                    height: `${s.box.height}%`,
-                    opacity: visible(s) ? 1 : 0,
-                    pointerEvents: visible(s) ? 'auto' : 'none',
-                    animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite`,
-                  }}
-                  aria-label={`@${s.handle}の船：${s.bubble}`}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={spriteUrl(s.ship)} alt="" className="h-full w-full" draggable={false} />
-                </button>
-              ))}
-              {/* the sea art draws every ship; hidden ones are covered with calm water */}
-              {SAILORS.filter((s) => !visible(s)).map((s) => (
-                <div
-                  key={`cover-${s.id}`}
-                  className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md"
-                  style={{ left: `${s.box.left + 2}%`, top: `${s.box.top + 2}%`, width: `${s.box.width - 4}%`, height: `${s.box.height - 4}%` }}
-                />
-              ))}
-              {/* real ships (live) over the slots of the sample ones */}
-              {realOthers.map((f, i) => {
-                const b = SAILORS[i].box;
-                const songs = f.posts.map(songOf);
-                const name = f.author.displayName || f.author.handle;
-                return (
-                  <div key={f.author.id}>
-                    <div className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md" style={{ left: `${b.left + 2}%`, top: `${b.top + 2}%`, width: `${b.width - 4}%`, height: `${b.height - 4}%` }} />
+            {live ? (
+              <ArtStage name="mercury-sea" reserve={230} focus={62}>
+                {riders.map((r, i) => {
+                  const at = SEA_SLOTS[i];
+                  return (
                     <button
+                      key={r.key}
                       onClick={() => {
-                        play(`@${name} の船`, songs, 0, { userId: f.author.id, name });
+                        r.onTap();
                         ev.current?.onShip?.();
                       }}
                       className="absolute flex flex-col items-center"
-                      style={{ left: `${b.left}%`, top: `${b.top}%`, width: `${Math.min(b.width, 24)}%`, animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}
-                      aria-label={`@${name}の船`}
+                      style={{ left: `${at.x}%`, top: `${at.y}%`, width: `${at.w}%`, transform: 'translate(-50%, -100%)', zIndex: Math.round(at.y) }}
+                      aria-label={`@${r.name}の船`}
                     >
-                      <span className="mb-1 max-w-full truncate rounded-xl border border-amber-300/70 bg-[#0d1838]/90 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight">
-                        @{name}「{songs[0]?.title}」
+                      <span className="flex w-full flex-col items-center" style={{ animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}>
+                        <span className="mb-[3%] max-w-[140%] truncate rounded-xl border border-amber-300/70 bg-[#0d1838]/85 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight shadow-lg backdrop-blur-sm">
+                          {r.mine ? '新曲を出航！' : `@${r.name}`}「{r.title}」
+                          {r.sub && <span className="block text-white/60">{r.sub}</span>}
+                        </span>
+                        <Vessel kind="ship" img={r.img} emoji={r.emoji} />
                       </span>
-                      <OwnShip emoji={neoForm(f.author.neoForm)?.emoji ?? '⛵'} img={f.author.pic} />
                     </button>
-                  </div>
-                );
-              })}
-              {mySailing.length > 0 && (
-                <button
-                  onClick={() => {
-                    play(`@${myHandle} の船`, mySailing.map((r) => r.song));
-                    ev.current?.onShip?.();
-                  }}
-                  className="absolute flex flex-col items-center"
-                  style={{ left: '74%', top: '74%', width: '24%', animation: 'sail 5s ease-in-out infinite' }}
-                  aria-label="自分の船"
-                >
-                  <span className="mb-1 rounded-xl border border-amber-300/70 bg-[#0d1838]/90 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight">
-                    新曲を出航！「{mySailing[0].song.title}」
-                    <br />
-                    <span className="text-white/60">{hoursSince(mySailing[0].at) || 'たった今'}{hoursSince(mySailing[0].at) ? '時間前' : ''}</span>
-                  </span>
-                  <OwnShip emoji={neo?.emoji ?? '🦊'} img={me?.puniPic ?? me?.avatarUrl} />
-                </button>
-              )}
-            </div>
+                  );
+                })}
+              </ArtStage>
+            ) : (
+              <div className="relative w-full max-w-[min(100%,calc((100svh-230px)*1.293))]" style={{ aspectRatio: '1254 / 970' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={stillUrl('mercury-sea')} alt="" className="absolute inset-0 h-full w-full select-none rounded-xl" draggable={false} />
+                {SAILORS.map((s, i) => (
+                  <button
+                    key={s.id}
+                    onClick={() => {
+                      play(`@${s.handle} の船`, s.sailing);
+                      ev.current?.onShip?.();
+                    }}
+                    className="absolute transition-opacity duration-500"
+                    style={{
+                      left: `${s.box.left}%`,
+                      top: `${s.box.top}%`,
+                      width: `${s.box.width}%`,
+                      height: `${s.box.height}%`,
+                      opacity: visible(s) ? 1 : 0,
+                      pointerEvents: visible(s) ? 'auto' : 'none',
+                      animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite`,
+                    }}
+                    aria-label={`@${s.handle}の船：${s.bubble}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={spriteUrl(s.ship)} alt="" className="h-full w-full" draggable={false} />
+                  </button>
+                ))}
+                {/* the sea art draws every ship; hidden ones are covered with calm water */}
+                {SAILORS.filter((s) => !visible(s)).map((s) => (
+                  <div
+                    key={`cover-${s.id}`}
+                    className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md"
+                    style={{ left: `${s.box.left + 2}%`, top: `${s.box.top + 2}%`, width: `${s.box.width - 4}%`, height: `${s.box.height - 4}%` }}
+                  />
+                ))}
+                {/* real ships (live) over the slots of the sample ones */}
+                {realOthers.map((f, i) => {
+                  const b = SAILORS[i].box;
+                  const songs = f.posts.map(songOf);
+                  const name = f.author.displayName || f.author.handle;
+                  return (
+                    <div key={f.author.id}>
+                      <div className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md" style={{ left: `${b.left + 2}%`, top: `${b.top + 2}%`, width: `${b.width - 4}%`, height: `${b.height - 4}%` }} />
+                      <button
+                        onClick={() => {
+                          play(`@${name} の船`, songs, 0, { userId: f.author.id, name });
+                          ev.current?.onShip?.();
+                        }}
+                        className="absolute flex flex-col items-center"
+                        style={{ left: `${b.left}%`, top: `${b.top}%`, width: `${Math.min(b.width, 24)}%`, animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}
+                        aria-label={`@${name}の船`}
+                      >
+                        <span className="mb-1 max-w-full truncate rounded-xl border border-amber-300/70 bg-[#0d1838]/90 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight">
+                          @{name}「{songs[0]?.title}」
+                        </span>
+                        <OwnShip emoji={neoForm(f.author.neoForm)?.emoji ?? '⛵'} img={f.author.pic} />
+                      </button>
+                    </div>
+                  );
+                })}
+                {mySailing.length > 0 && (
+                  <button
+                    onClick={() => {
+                      play(`@${myHandle} の船`, mySailing.map((r) => r.song));
+                      ev.current?.onShip?.();
+                    }}
+                    className="absolute flex flex-col items-center"
+                    style={{ left: '74%', top: '74%', width: '24%', animation: 'sail 5s ease-in-out infinite' }}
+                    aria-label="自分の船"
+                  >
+                    <span className="mb-1 rounded-xl border border-amber-300/70 bg-[#0d1838]/90 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight">
+                      新曲を出航！「{mySailing[0].song.title}」
+                      <br />
+                      <span className="text-white/60">{hoursSince(mySailing[0].at) || 'たった今'}{hoursSince(mySailing[0].at) ? '時間前' : ''}</span>
+                    </span>
+                    <OwnShip emoji={neo?.emoji ?? '🦊'} img={me?.puniPic ?? me?.avatarUrl} />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -291,6 +347,18 @@ function Tabs({ tab, setTab }: { tab: 'all' | 'follow' | 'friend'; setTab: (t: '
     </div>
   );
 }
+
+/** Where ships sail on the painted sea (4:3), front row first: bottom-centre of the ship, width — all in %. */
+const SEA_SLOTS = [
+  { x: 50, y: 97, w: 27 },
+  { x: 17, y: 93, w: 26 },
+  { x: 83, y: 94, w: 26 },
+  { x: 31, y: 76, w: 22 },
+  { x: 69, y: 77, w: 22 },
+  { x: 14, y: 61, w: 18 },
+  { x: 50, y: 59, w: 18 },
+  { x: 86, y: 62, w: 18 },
+];
 
 /** The visitor's ship (no art yet): a little boat with their OBOLO NEO on deck. */
 function OwnShip({ emoji, img }: { emoji: string; img?: string | null }) {
