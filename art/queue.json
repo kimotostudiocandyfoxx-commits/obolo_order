@@ -1,0 +1,10 @@
+[
+  {
+    "id": "test-mercury-sea-v1",
+    "kind": "image",
+    "aspect": "4:3",
+    "count": 1,
+    "refs": ["apps/web/public/onboarding/mercury-sea.jpg"],
+    "prompt": "Repaint the attached picture as a clean BACKGROUND ONLY: the same magical night ocean with aurora, moon, glowing teal water and gentle waves, in exactly the same painterly anime style and colours — but with NO ships, NO boats, NO people, NO speech bubbles, NO text, NO user interface. Wide open water so small ships can be placed on top later. High detail, production quality."
+  }
+]
