@@ -8,15 +8,17 @@ import { useAuth } from '@/lib/auth';
 import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useRecorder } from '@/lib/useRecorder';
 import { PuniAvatar } from '@/components/puni/PuniAvatar';
+import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
+import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
 import { SaturnProfile } from './SaturnProfile';
 
 /**
  * 「ころりん」 — Saturn's voice world (client concept, 2026-10-04).
- * Everyone's posts become round chibi avatars that drift along Saturn's rings or roll on the ground.
- * Tap one → it squishes and stops, its words pop up in a speech bubble and the poster's voice
- * plays (the card below holds stars, replies, quote). Everyone is drawn as the ぷにぷに character
- * they dressed on their profile (or the plain ball). Voices vanish after 88 hours.
+ * Every voice is its author's ぷにぷに character (dressed on their profile), a soft body that
+ * falls onto the planet, rolls, squashes and bumps into the others. Tap one → it squishes and
+ * talks: the post card floats over it and the voice plays (it jiggles while talking). Drag →
+ * stretch and throw. Voices vanish after 88 hours.
  * Bottom bar: ゆらす (shake) · 声をおとす (record & drop your voice) · おまかせ (play a random voice).
  * Under an opened voice, the people who answered line up as little balls: tap one → its voice
  * plays with a speech bubble. Names open the person's page (follow); 🔁 quotes the voice.
@@ -28,22 +30,6 @@ export interface KororinEvents {
   onStar?: () => void;
   onPosted?: () => void;
 }
-
-interface Mover {
-  post: SaturnPostView;
-  kind: 'ring' | 'ground';
-  ring: number; // which ring (0..2)
-  home: number; // ground ones: their place along the horizon (0..1)
-  t: number; // phase
-  speed: number;
-  size: number;
-}
-
-const RINGS = [
-  { cy: 0.3, rx: 0.4, ry: 0.05 },
-  { cy: 0.4, rx: 0.46, ry: 0.07 },
-  { cy: 0.5, rx: 0.5, ry: 0.08 },
-];
 
 export function KororinWorld({
   events,
@@ -76,13 +62,9 @@ export function KororinWorld({
   const [activeReply, setActiveReply] = useState<string | null>(null);
   const [profileId, setProfileId] = useState<string | null>(null);
   // replays the squish of a tapped character
-  const [bounce, setBounce] = useState<Record<string, number>>({});
-  const [shaking, setShaking] = useState(false);
-  const [dropped, setDropped] = useState<string | null>(null);
   const stage = useRef<HTMLDivElement>(null);
-  const nodes = useRef(new Map<string, HTMLButtonElement>());
-  const movers = useRef<Mover[]>([]);
-  const paused = useRef<string | null>(null);
+  const layer = useRef<PuniLayerHandle>(null);
+  const openRef = useRef<string | null>(null);
 
   useEffect(() => {
     getApi()
@@ -122,98 +104,48 @@ export function KororinWorld({
     return () => ro.disconnect();
   }, []);
 
-  // (re)build movers when the set changes, keeping existing ones (and their phase) in place
-  useMemo(() => {
-    const prev = new Map(movers.current.map((m) => [m.post.id, m]));
-    const groundCount = shown.filter((_, i) => i % 3 !== 0).length;
-    let g = 0;
-    movers.current = shown.map((post, i) => {
-      // most sit on the planet like the client's picture; a few float along the rings
-      const ground = i % 3 !== 0;
-      // spread the ground ones along the horizon (interleaved so neighbours differ in size)
-      const home = ground ? ((g++ * 0.618) % 1) * (groundCount > 1 ? 1 : 0) + (groundCount > 1 ? 0 : 0.5) : 0;
-      const old = prev.get(post.id);
-      if (old) return { ...old, post, home: ground ? home : old.home };
-      const h = hueOf(post.id);
-      return {
-        post,
-        kind: ground ? 'ground' : 'ring',
-        ring: i % 3,
-        home,
-        t: (h / 360) * Math.PI * 2,
-        speed: (0.025 + ((h % 7) / 7) * 0.035) * (h % 2 ? 1 : -1),
-        size: ground ? 0.15 + (h % 5) * 0.012 : 0.075 + (h % 4) * 0.008, // share of the stage width
-      } satisfies Mover;
-    });
-  }, [shown]);
+  // everyone as a soft body: their look (or a simple one in a colour of their own), size varies a little
+  const items = useMemo<PuniItem[]>(
+    () =>
+      shown.map((p) => {
+        const h = hueOf(p.author.id);
+        return {
+          id: p.id,
+          look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
+          R: Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))),
+        };
+      }),
+    [shown, stageW],
+  );
+  const speakingId = shown.find((p) => p.voiceUrl === playingUrl)?.id ?? null;
 
-  // animation loop: positions written straight to the DOM (no React re-render per frame)
-  useEffect(() => {
-    let raf = 0;
-    let last = performance.now();
-    const loop = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      const el = stage.current;
-      if (el) {
-        const W = el.clientWidth;
-        const H = el.clientHeight;
-        for (const m of movers.current) {
-          const node = nodes.current.get(m.post.id);
-          if (!node) continue;
-          if (paused.current !== m.post.id) m.t += m.speed * dt * (m.kind === 'ground' ? 1.4 : 1);
-          let x: number, y: number, scale: number, z: number, rot = 0;
-          const size = moverPx(m, W);
-          if (m.kind === 'ring') {
-            const r = RINGS[m.ring];
-            x = W / 2 + Math.cos(m.t) * r.rx * W;
-            y = H * r.cy + Math.sin(m.t) * r.ry * H;
-            const depth = (Math.sin(m.t) + 1) / 2; // 0 = back, 1 = front
-            scale = 0.7 + depth * 0.45;
-            z = Math.round(10 + depth * 40);
-          } else {
-            // roll left/right on the planet's horizon (the same ellipse as the striped surface)
-            // each sways a little around its own place
-            x = W * (0.07 + m.home * 0.86) + Math.sin(m.t) * W * 0.04;
-            y = surfaceY(x, W, H) - size * 0.36;
-            scale = 1;
-            z = 40 + Math.round((y - H * 0.5) / 10);
-            rot = (Math.cos(m.t) * m.speed > 0 ? 1 : -1) * ((m.t * 180) % 360);
-          }
-          node.style.transform = `translate(${x - size / 2}px, ${y - size / 2}px) scale(${scale})`;
-          node.style.zIndex = String(paused.current === m.post.id ? 75 : z);
-          // the post card floats over the tapped character (or under it near the top)
-          if (paused.current === m.post.id && card.current) {
-            const cw = card.current.offsetWidth;
-            const ch = card.current.offsetHeight;
-            const left = Math.max(12, Math.min(W - cw - 12, x - cw / 2));
-            const above = y - (size * scale) / 2 - ch - 16;
-            const below = above < 96;
-            const top = below ? y + (size * scale) * 0.45 + 16 : above;
-            card.current.style.transform = `translate(${left}px, ${top}px)`;
-            card.current.style.opacity = '1';
-            if (tail.current) {
-              tail.current.style.left = `${Math.max(24, Math.min(cw - 24, x - left))}px`;
-              tail.current.style.top = below ? '-8px' : '';
-              tail.current.style.bottom = below ? '' : '-8px';
-            }
-          }
-          const inner = node.firstElementChild as HTMLElement | null;
-          if (inner) inner.style.transform = m.kind === 'ground' && paused.current !== m.post.id ? `rotate(${rot * 0.15}deg)` : '';
-        }
-      }
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+  // the post card follows the tapped character (above it, or below near the top)
+  const onFrame = useCallback((get: (id: string) => { x: number; y: number; R: number } | undefined, W: number) => {
+    const id = openRef.current;
+    const el = card.current;
+    if (!id || !el) return;
+    const b = get(id);
+    if (!b) return;
+    const cw = el.offsetWidth;
+    const ch = el.offsetHeight;
+    const left = Math.max(12, Math.min(W - cw - 12, b.x - cw / 2));
+    const above = b.y - b.R * 1.15 - ch - 14;
+    const below = above < 96;
+    const top = below ? b.y + b.R * 1.05 + 14 : above;
+    el.style.transform = `translate(${left}px, ${top}px)`;
+    el.style.opacity = '1';
+    if (tail.current) {
+      tail.current.style.left = `${Math.max(24, Math.min(cw - 24, b.x - left))}px`;
+      tail.current.style.top = below ? '-8px' : '';
+      tail.current.style.bottom = below ? '' : '-8px';
+    }
   }, []);
 
   const listen = useCallback(
     (p: SaturnPostView) => {
-      paused.current = p.id;
+      openRef.current = p.id;
       setOpen(p);
       setActiveReply(null);
-      setBounce((b) => ({ ...b, [p.id]: Date.now() }));
       void toggleAudio(p.voiceUrl).catch(() => undefined);
       events?.onListen?.();
     },
@@ -241,7 +173,7 @@ export function KororinWorld({
   };
 
   const close = () => {
-    paused.current = null;
+    openRef.current = null;
     setOpen(null);
     setAllReplies(false);
     setActiveReply(null);
@@ -265,18 +197,13 @@ export function KororinWorld({
     if (on) events?.onStar?.();
   };
 
-  const shake = () => {
-    setShaking(true);
-    for (const m of movers.current) m.speed *= -1.15;
-    setTimeout(() => {
-      setShaking(false);
-      for (const m of movers.current) m.speed /= 1.15;
-    }, 600);
-  };
+  const shake = () => layer.current?.shake();
 
   const omakase = () => {
-    const pool = movers.current;
-    if (pool.length) listen(pool[Math.floor(Math.random() * pool.length)].post);
+    if (!shown.length) return;
+    const p = shown[Math.floor(Math.random() * shown.length)];
+    layer.current?.poke(p.id);
+    listen(p);
   };
 
   const onPosted = (p: SaturnPostView) => {
@@ -293,10 +220,8 @@ export function KororinWorld({
     }
     setPosts((cur) => [p, ...cur]);
     if (p.repostOf) setPosts((cur) => cur.map((x) => (x.id === p.repostOf!.id ? { ...x, repostCount: (x.repostCount ?? 0) + 1 } : x)));
-    setDropped(p.id);
     setComposer(false);
-    setTimeout(() => setDropped(null), 1600);
-    // play your own voice right after it lands
+    // it drops in from the sky; play your own voice once it has landed
     setTimeout(() => listen(p), 1300);
     events?.onPosted?.();
   };
@@ -344,29 +269,12 @@ export function KororinWorld({
         }}
       />
 
-      {/* characters */}
-      <div ref={stage} className={`absolute inset-0 ${shaking ? 'animate-[shake_0.3s_ease-in-out_2]' : ''}`}>
-        {shown.map((p) => {
-          const m = movers.current.find((x) => x.post.id === p.id);
-          const size = m ? moverPx(m, stageW) : 80;
-          return (
-            <button
-              key={p.id}
-              ref={(el) => {
-                if (el) nodes.current.set(p.id, el);
-                else nodes.current.delete(p.id);
-              }}
-              onClick={() => listen(p)}
-              className="absolute left-0 top-0 will-change-transform"
-              style={{ width: size, height: size }}
-              aria-label={`${p.author.displayName}: ${p.text}`}
-            >
-              <span className={`block ${dropped === p.id ? 'animate-[dropIn_1.2s_cubic-bezier(.3,1.4,.6,1)]' : ''}`}>
-                <PuniAvatar seed={p.author.id} neo={p.author.neoForm} look={p.author.look} size={size} speaking={playingUrl === p.voiceUrl} bounce={bounce[p.id]} />
-              </span>
-            </button>
-          );
-        })}
+      {/* characters: soft bodies on the planet */}
+      <div ref={stage} className="absolute inset-0">
+        <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
+          const p = shown.find((x) => x.id === id);
+          if (p) listen(p);
+        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
       </div>
 
       {/* header */}
@@ -542,12 +450,6 @@ function surfaceY(x: number, W: number, H: number) {
   const cy = PLANET.top * H + ry;
   const dx = Math.min(0.999, Math.abs(x - W / 2) / rx);
   return cy - ry * Math.sqrt(1 - dx * dx);
-}
-
-/** A character's size in px (ground ones are big like the client's picture). */
-function moverPx(m: Mover, W: number) {
-  const px = m.size * W;
-  return m.kind === 'ground' ? Math.max(76, Math.min(210, px)) : Math.max(46, Math.min(110, px));
 }
 
 /** Where the little 4-point sparkles sit in the sky: [x %, y %, size px]. */

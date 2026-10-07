@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { anchors, BackParts, COLORS, FaceParts, FrontParts, SAMPLE_LOOKS, SkinDefs, SkinGloss, SkinRim, skinStroke, SLOT_LABELS, SLOTS, TextureDefs, WearPart, type Effect, type Look } from '@/lib/puni/parts';
+import { COLORS, SAMPLE_LOOKS, SLOT_LABELS, SLOTS, type Effect, type Look } from '@/lib/puni/parts';
+import { PuniBody, type PuniNodes as Nodes } from './PuniBody';
 import { createBlob, localPoints, poke, smoothPath, step, stretchMatrix, type Blob } from '@/lib/puni/physics';
 
 /**
@@ -10,16 +11,6 @@ import { createBlob, localPoints, poke, smoothPath, step, stretchMatrix, type Bl
  * they roll, bounce, squash on the floor and against each other, and stand back up.
  * 着せ替え swaps parts on a body to show that every part fits every body.
  */
-interface Nodes {
-  outer: SVGGElement | null;
-  rot: SVGGElement | null;
-  gloss: SVGGElement | null;
-  bodies: SVGPathElement[];
-  clip: SVGPathElement | null;
-  parts: SVGGElement[];
-  open: SVGGElement | null;
-  poked: SVGGElement | null;
-}
 
 interface Fx {
   id: number;
@@ -212,7 +203,7 @@ export function PuniStage() {
             </radialGradient>
           </defs>
           {looks.map((l) => (
-            <Character key={l.id} look={l} R={R} register={(n) => nodes.current.set(l.id, n)} />
+            <PuniBody key={l.id} look={l} R={R} register={(n) => nodes.current.set(l.id, n)} />
           ))}
         </svg>
       )}
@@ -271,61 +262,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
       <span className="w-14 shrink-0 text-[10px] font-black text-violet-400">{label}</span>
       <div className="flex gap-1.5 overflow-x-auto py-0.5">{children}</div>
     </div>
-  );
-}
-
-/** One character: the body path (colour, texture, shine, outline) with its parts. */
-function Character({ look: l, R, register }: { look: Look; R: number; register: (n: Nodes) => void }) {
-  const a = anchors(l.shape);
-  const tex = `tex-${l.id}`;
-  const clip = `clip-${l.id}`;
-  const n = useRef<Nodes>({ outer: null, rot: null, gloss: null, bodies: [], clip: null, parts: [], open: null, poked: null });
-  const partsRef = (el: SVGGElement | null) => {
-    if (el && !n.current.parts.includes(el)) n.current.parts.push(el);
-  };
-  const bodyRef = (el: SVGPathElement | null) => {
-    if (el && !n.current.bodies.includes(el)) n.current.bodies.push(el);
-  };
-  useEffect(() => {
-    // pick up the face's two eye groups (open / poked) after each render
-    const rot = n.current.rot;
-    n.current.open = rot?.querySelector('[data-eyes="open"]') ?? null;
-    n.current.poked = rot?.querySelector('[data-eyes="poked"]') ?? null;
-    n.current.parts = n.current.parts.filter((g) => g.isConnected);
-    n.current.bodies = n.current.bodies.filter((p) => p.isConnected);
-    register(n.current);
-  });
-  return (
-    <g ref={(el) => void (n.current.outer = el)}>
-      <g ref={(el) => void (n.current.rot = el)}>
-        <defs>
-          <TextureDefs id={tex} tex={l.tex} color={l.color} R={R} />
-          <SkinDefs uid={l.id} color={l.color} R={R} />
-          <clipPath id={clip}>
-            <path ref={(el) => void (n.current.clip = el)} />
-          </clipPath>
-        </defs>
-        <g ref={partsRef}>
-          <BackParts look={l} a={a} />
-        </g>
-        <path ref={bodyRef} fill={`url(#pg${l.id})`} />
-        {l.tex !== 'none' && <path ref={bodyRef} fill={`url(#${tex})`} opacity={l.tex === 'rice' ? 0.95 : 0.85} />}
-        <g clipPath={`url(#${clip})`}>
-          <g ref={partsRef}>
-            <WearPart look={l} a={a} />
-          </g>
-        </g>
-        <SkinRim uid={l.id} clip={clip} color={l.color} R={R} />
-        <g ref={(el) => void (n.current.gloss = el)}>
-          <SkinGloss uid={l.id} R={R} />
-        </g>
-        <path ref={bodyRef} fill="none" stroke={skinStroke(l.color)} strokeOpacity={0.35} strokeWidth={1.5} />
-        <g ref={partsRef}>
-          <FaceParts look={l} a={a} />
-          <FrontParts look={l} a={a} />
-        </g>
-      </g>
-    </g>
   );
 }
 

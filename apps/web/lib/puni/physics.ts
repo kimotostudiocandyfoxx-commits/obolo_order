@@ -56,6 +56,8 @@ export interface World {
   W: number;
   H: number;
   floor: number;
+  /** a curved ground (Saturn's horizon): the floor's y at x; `floor` is used when absent */
+  floorAt?: (x: number) => number;
 }
 
 export function createBlob(id: string, x: number, y: number, R: number, shape: BodyShape): Blob {
@@ -71,6 +73,7 @@ function downReach(b: Blob) {
 }
 
 export function step(blobs: Blob[], dt: number, w: World) {
+  const fl = (x: number) => (w.floorAt ? w.floorAt(x) : w.floor);
   for (const b of blobs) {
     let ax = 0;
     let ay = G;
@@ -88,8 +91,9 @@ export function step(blobs: Blob[], dt: number, w: World) {
     // floor: bounce a little, roll without slipping, stand back up when slow
     const reach = downReach(b) * SOFT;
     b.grounded = false;
-    if (b.y + reach >= w.floor) {
-      b.y = w.floor - reach;
+    const ground = fl(b.x);
+    if (b.y + reach >= ground) {
+      b.y = ground - reach;
       if (b.vy > 0) b.vy = b.vy > 120 ? -b.vy * 0.32 : 0;
       b.grounded = true;
       b.vx *= Math.max(0, 1 - 2.6 * dt);
@@ -163,7 +167,10 @@ export function step(blobs: Blob[], dt: number, w: World) {
       const dy = Math.sin(dir);
       const rest = restRadius(b.shape, t) * b.R;
       let r = rest + b.o[i];
-      if (dy > 0.05 && b.y + r * dy > w.floor) r = (w.floor - b.y) / dy;
+      if (dy > 0.05) {
+        const g = fl(b.x + r * dx);
+        if (b.y + r * dy > g) r = (g - b.y) / dy;
+      }
       if (dx < -0.05 && b.x + r * dx < 0) r = -b.x / dx;
       if (dx > 0.05 && b.x + r * dx > w.W) r = (w.W - b.x) / dx;
       for (const c of blobs) {
@@ -191,6 +198,15 @@ export function step(blobs: Blob[], dt: number, w: World) {
     if (free && sum < 0) {
       const add = (-sum / free) * 0.55;
       for (let i = 0; i < N; i++) if (!clamped[i]) b.o[i] += add * Math.min(1, dt * 30);
+    }
+    // never balloon: a squeezed body bulges at most a third of its radius (a crowd pushes from
+    // every side, which would otherwise keep inflating the few free points)
+    for (let i = 0; i < N; i++) {
+      const cap = restRadius(b.shape, theta(i)) * b.R * 0.32;
+      if (b.o[i] > cap) {
+        b.o[i] = cap;
+        if (b.ov[i] > 0) b.ov[i] = 0;
+      }
     }
 
     // squash of the whole body for the parts (face, hat …), smoothed

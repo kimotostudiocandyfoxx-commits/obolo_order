@@ -54,3 +54,17 @@ describe('puni physics', () => {
     expect(Math.abs(Math.atan2(Math.sin(b.angle), Math.cos(b.angle)))).toBeLessThan(0.15);
   });
 });
+
+describe('crowds', () => {
+  it('a squeezed crowd never balloons', () => {
+    const blobs = Array.from({ length: 16 }, (_, i) => createBlob(`c${i}`, 200 + (i % 4) * 20, 100 - i * 60, 60, shapes[i % shapes.length]));
+    const narrow = { W: 420, H: 1000, floor: 900 };
+    let maxO = 0;
+    for (let t = 0; t < 8; t += 1 / 120) {
+      step(blobs, 1 / 120, narrow);
+      for (const b of blobs) for (const o of b.o) maxO = Math.max(maxO, o);
+    }
+    expect(maxO).toBeLessThan(60 * 1.25 * 0.33);
+    for (const b of blobs) expect(Number.isFinite(b.x) && Number.isFinite(b.y)).toBe(true);
+  });
+});
