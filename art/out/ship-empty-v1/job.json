@@ -1,0 +1,10 @@
+{
+  "id": "ship-empty-v1",
+  "kind": "image",
+  "aspect": "1:1",
+  "count": 3,
+  "refs": [
+    "apps/web/public/onboarding/ship-samurai806.webp"
+  ],
+  "prompt": "A single small DJ party boat, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference: an ornate dark-iron and brass hull lined with round glowing speakers, a big turntable deck on top, little lanterns at the bow and stern, cyan and magenta neon accents. The boat is EMPTY — nobody on board — with an open standing space in the middle of the deck where a character will be placed later. Three-quarter front view, the whole boat fully visible and centred with margin around it, a tiny bit of white water foam at the waterline only. Isolated on a perfectly flat, pure white (#FFFFFF) background. No sea, no sky, no shadow on the background. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders."
+}

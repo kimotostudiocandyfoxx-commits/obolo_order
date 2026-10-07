@@ -1,0 +1,10 @@
+{
+  "id": "mars-sky-city-bg-v1",
+  "kind": "image",
+  "aspect": "16:9",
+  "count": 3,
+  "refs": [
+    "apps/web/public/onboarding/mars-sky-city.jpg"
+  ],
+  "prompt": "Paint a clean BACKGROUND ONLY for a movie app screen: the night sky above a neon cyber city on Mars, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference. Distant glowing skyscrapers and holographic light along the bottom edge, red planet and small moons in a deep violet starry sky, soft glowing light trails swirling through the air — lots of open sky in the middle where small flying saucers will be placed later. Keep key elements inside the central 75% width so it can be cropped to 4:3. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders. No flying saucers or UFOs at all. Production quality, crisp, high detail."
+}

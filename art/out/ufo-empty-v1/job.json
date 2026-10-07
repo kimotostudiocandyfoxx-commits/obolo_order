@@ -1,0 +1,10 @@
+{
+  "id": "ufo-empty-v1",
+  "kind": "image",
+  "aspect": "1:1",
+  "count": 3,
+  "refs": [
+    "apps/web/public/onboarding/pod-city-pen_lady.webp"
+  ],
+  "prompt": "A single small round flying-saucer pod, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference: a polished gunmetal ring-shaped saucer with glowing coloured lights around the rim (cyan, magenta, amber), riveted metal panels, an OPEN round cockpit hole in the top with NOBODY inside — a character will be placed in it later. Three-quarter front view seen slightly from above so the empty cockpit opening is visible, the whole saucer fully visible and centred with margin around it, a soft glow underneath. Isolated on a perfectly flat, pure white (#FFFFFF) background. No sky, no ground, no light trails, no shadow on the background. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders."
+}

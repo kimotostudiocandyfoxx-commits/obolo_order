@@ -1,0 +1,10 @@
+{
+  "id": "mercury-sea-bg-v1",
+  "kind": "image",
+  "aspect": "16:9",
+  "count": 3,
+  "refs": [
+    "apps/web/public/onboarding/mercury-sea.jpg"
+  ],
+  "prompt": "Paint a clean BACKGROUND ONLY for a music app screen: the magical night ocean of the planet Mercury, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference. A huge full moon upper right, green and violet aurora ribbons across a starry sky, small glowing fairy-tale castle islands on the far left and far right horizon, and a wide expanse of glittering teal-blue water with gentle waves and moonlight sparkles filling the lower two thirds — open water where small ships will be placed later. Keep the moon and castles inside the central 75% width so the picture can be cropped to 4:3. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders. No boats or ships at all. Production quality, crisp, high detail."
+}

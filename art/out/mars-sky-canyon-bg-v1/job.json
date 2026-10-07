@@ -1,0 +1,10 @@
+{
+  "id": "mars-sky-canyon-bg-v1",
+  "kind": "image",
+  "aspect": "16:9",
+  "count": 3,
+  "refs": [
+    "apps/web/public/onboarding/mars-sky-canyon.jpg"
+  ],
+  "prompt": "Paint a clean BACKGROUND ONLY for a movie app screen: the red rocky canyon of Mars under a dark starry sky, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference. Towering red cliffs on both sides, a huge red planet and small moons in the sky, colourful glowing comet-like light trails sweeping across the valley — wide open space in the middle where small flying saucers will be placed later. Keep key elements inside the central 75% width so it can be cropped to 4:3. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders. No flying saucers, no film cameras, no signposts. Production quality, crisp, high detail."
+}
