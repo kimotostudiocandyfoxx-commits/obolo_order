@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { ComposeChatBody, ComposeDesignBody, InstrumentalBody } from '@obolo/shared';
+import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -38,6 +38,15 @@ export class ComposeController {
     const b = parseBody(InstrumentalBody, body);
     await rateLimit(this.kv, `compose-inst:${userId}`, 30, 86400);
     return this.compose.instrumental(userId, b, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** PLACEHOLDER (P-VOICE-3): 10 sung songs a day per member (each one is a paid Fish call). */
+  @Post('sing')
+  @HttpCode(200)
+  async sing(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    const b = parseBody(SingBody, body);
+    await rateLimit(this.kv, `compose-sing:${userId}`, 10, 86400);
+    return this.compose.sing(userId, b, `${req.protocol}://${req.get('host')}`);
   }
 
   /** PLACEHOLDER (P-MER-4): 20 songs a day per member until the pricing (MANA) is decided. */

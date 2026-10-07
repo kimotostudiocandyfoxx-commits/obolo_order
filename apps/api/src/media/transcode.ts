@@ -11,7 +11,7 @@ import { MEDIA_POLICY } from '@obolo/shared';
  *  - photo: WebP, longer side ≤ 1600 px, EXIF rotation applied and all metadata (GPS) dropped
  */
 
-function run(cmd: string, args: string[], timeoutMs = 120_000): Promise<string> {
+export function run(cmd: string, args: string[], timeoutMs = 120_000): Promise<string> {
   return new Promise((resolve, reject) => {
     const p = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';

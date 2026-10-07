@@ -1,5 +1,6 @@
 import { HttpStatus, Logger } from '@nestjs/common';
 import { apiError } from '../common/errors';
+import { packMsg } from './msgpack';
 
 /**
  * Fish Audio REST API (commercial use OK via the paid API, client decision 2026-10-07).
@@ -40,13 +41,36 @@ export async function deleteVoiceModel(key: string, id: string): Promise<void> {
   if (res && !res.ok && res.status !== 404) log.warn(`delete voice ${id}: ${res.status}`);
 }
 
-/** Read a text aloud in a voice model. Returns MP3 bytes. */
-export async function textToSpeech(key: string, model: string, o: { text: string; referenceId: string }): Promise<Buffer> {
+export interface TtsOptions {
+  text: string;
+  referenceId: string;
+  /** speed 0.5–2.0 (multiplier), volume in dB */
+  prosody?: { speed: number; volume: number };
+  /** extra audio prompts (bytes + transcript). Sent as msgpack, like the official SDK. */
+  references?: { audio: Buffer; text: string }[];
+  temperature?: number;
+}
+
+/** Read (or, with a leading [singing] tag, sing) a text in a voice model. Returns MP3 bytes. */
+export async function textToSpeech(key: string, model: string, o: TtsOptions): Promise<Buffer> {
+  const payload = {
+    text: o.text,
+    reference_id: o.referenceId,
+    format: 'mp3',
+    mp3_bitrate: 128,
+    latency: 'normal',
+    normalize: true,
+    // a whole song is longer than one reading: let it run past the default 1024 tokens
+    ...(o.text.length > 200 ? { chunk_length: 300, max_new_tokens: 4096 } : {}),
+    ...(o.prosody ? { prosody: o.prosody } : {}),
+    ...(o.temperature !== undefined ? { temperature: o.temperature } : {}),
+  };
+  const refs = o.references?.length ? o.references : null;
   const res = await fetch(`${BASE}/v1/tts`, {
     method: 'POST',
-    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json', model },
-    body: JSON.stringify({ text: o.text, reference_id: o.referenceId, format: 'mp3', mp3_bitrate: 128, latency: 'normal', normalize: true }),
-    signal: AbortSignal.timeout(120_000),
+    headers: { authorization: `Bearer ${key}`, 'content-type': refs ? 'application/msgpack' : 'application/json', model },
+    body: refs ? new Uint8Array(packMsg({ ...payload, references: refs.map((r) => ({ audio: new Uint8Array(r.audio), text: r.text })) })) : JSON.stringify(payload),
+    signal: AbortSignal.timeout(240_000),
   });
   if (!res.ok) await fail(res, 'tts');
   return Buffer.from(await res.arrayBuffer());

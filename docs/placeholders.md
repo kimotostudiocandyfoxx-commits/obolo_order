@@ -98,9 +98,11 @@
 | P-MER-5 | 🟢 | 伴奏のAIモデル | **ACE-Step 1.5（MIT、商用OK）**（クライアント決定 2026-10-06、本番で伴奏ができることを確認済み）。設計図のテンポ・キー・長さ・伴奏のみを直接指定。DiT は `acestep-v15-turbo`（GitHub 変数 `ACE15_MODEL` で XL に切り替え可）。モデル本体のライセンスは Hugging Face のページで要確認。v1 は試験で使用（音がこもった雑音になった） | `gpu/music/app.py` |
 | P-MER-6 | ✏️ | 設計図のシンセ音を参考にさせるか | 既定はオフ（`ACE_REF_STRENGTH=0`）。v1 でシンセ音を参考にさせたら、こもった雑音になったため。必要なら GitHub 変数で 0.2 などに | `gpu/music/app.py` |
 | P-VOICE-1 | 🟡 | 声のAI | Fish Audio API（有料・商用OK、クライアント決定 2026-10-07）、モデル `s2.1-pro`。1人2つの声（自分の声／バティの変声）をそれぞれ Fish の非公開ボイスモデルにする。読み上げ（TTS）は実装済み | `apps/api/src/voice/` |
-| P-VOICE-2 | 🔴 | 歌（Fish の歌声合成 API） | 公式 SDK・検索で仕様（エンドポイント・項目）が見つからず未実装。クライアントにドキュメントをもらってから組む。テンポ・キー・音量・歌い方・感情タグは Gemini Flash-Lite が会話から決める予定 | — |
-| P-VOICE-3 | ✏️ | 読み上げの回数 | 1人1日100回まで（料金未決） | `apps/api/src/voice/voice.controller.ts` |
+| P-VOICE-2 | 🟡 | 歌入れ（Fish の [singing]） | Fish に歌専用 API はなく、通常の TTS（`/v1/tts`）の文頭に `[singing]` を付けて歌わせる（クライアント提供の仕様 2026-10-07）。Gemini Flash-Lite が歌い方（全体タグ・パートごとのタグ `[pitch_up]` など・`[breath]`・速さ・音量）を決める。歌声は ffmpeg で歌詞の長さに合わせて伸縮（0.8〜1.25倍）し伴奏とミックス。**メロディを伴奏と正確に合わせる保証はない**（耳で確認して調整） | `packages/ai/src/sing.ts`、`apps/api/src/compose/mix.ts` |
+| P-VOICE-3 | ✏️ | 読み上げ・歌入れの回数 | 読み上げ 1人1日100回、歌入れ 1日10曲まで（料金未決） | `apps/api/src/voice/voice.controller.ts` |
 | P-VOICE-4 | ✏️ | 声の登録画面 | 仮で `/voice` に単独ページ。決まった文を読んで録音（8〜30秒） | `apps/web/app/voice/page.tsx`、`packages/shared/src/voice.ts` |
+| P-VOICE-5 | ✏️ | お手本メロディを Fish に渡すか | 設計図のメロディを単音のWAVにして音声プロンプト（references）として送る機能。Fish の SDK では references は「声のサンプル」扱いなので、声質が変わる恐れあり → 既定はオフ。`FISH_SING_GUIDE=true` で試せる | `apps/api/src/config.ts`、`apps/api/src/compose/mix.ts` |
+| P-VOICE-6 | ✏️ | 歌い出しの位置・ミックスの音量 | 歌は伴奏の頭から（遅らせ0秒）、伴奏 0.72／歌 1.25、-14 LUFS | `apps/api/src/compose/mix.ts` |
 | P-MER-4 | ✏️ | 作曲の回数 | 1人1日20曲まで（MANA での料金は未決） | `apps/api/src/compose/compose.controller.ts` |
 | P-MEDIA-3 | ✏️ | 動画の長さの上限 | 既定60秒（木星は8秒）。火星の動画の最大の長さはクライアント未決 | `packages/shared/src/config.ts`（`MEDIA_POLICY`） |
 | P-MEDIA-4 | ⚪ | Bunny の配信プラン | 少人数のうちは Standard。人が増えたら Volume に切り替え（docs/media.md） | Bunny 管理画面 |

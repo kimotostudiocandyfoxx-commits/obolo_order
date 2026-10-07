@@ -9,7 +9,7 @@ import { Database } from '../db/db';
 import { users } from '../db/schema';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
-import { createVoiceModel, deleteVoiceModel, textToSpeech } from './fish.client';
+import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
 
 /** Any browser recording (webm / mp4 / …) → 44.1 kHz mono MP3 with ffmpeg, trimmed to 30 s. */
 function toMp3(input: Buffer): Promise<Buffer> {
@@ -29,7 +29,7 @@ function toMp3(input: Buffer): Promise<Buffer> {
 /**
  * Member voices (client decision 2026-10-07): two Fish Audio voice models per member — their own
  * voice and the changed voice they give Bati. Read-aloud (Saturn, Bati's lines) uses Fish TTS
- * (model s2.1-pro); singing will use Fish's singing API once its spec is in hand (P-VOICE-2).
+ * (model s2.1-pro); singing uses the same TTS with a leading [singing] tag (ComposeService.sing).
  */
 @Injectable()
 export class VoiceService {
@@ -43,6 +43,20 @@ export class VoiceService {
   private key(): string {
     if (!this.cfg.FISH_API_KEY) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'VOICE_OFF', 'The voice service is not connected yet');
     return this.cfg.FISH_API_KEY;
+  }
+
+  /** The member's Fish voice model for this slot (throws when not registered). */
+  async voiceId(userId: string, slot: VoiceSlot): Promise<string> {
+    this.key();
+    const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
+    const ref = u?.[this.col(slot)];
+    if (!ref) throw apiError(HttpStatus.CONFLICT, 'VOICE_NOT_REGISTERED', 'Register this voice first');
+    return ref;
+  }
+
+  /** Sing (text starting with [singing]) in a voice model. Returns MP3 bytes. */
+  sing(referenceId: string, o: Omit<TtsOptions, 'referenceId'>): Promise<Buffer> {
+    return textToSpeech(this.key(), this.cfg.FISH_MODEL, { ...o, referenceId });
   }
 
   private col(slot: VoiceSlot) {
@@ -77,9 +91,7 @@ export class VoiceService {
   async speak(userId: string, body: SpeakBody, origin: string): Promise<{ url: string }> {
     const key = this.key();
     if ((await moderateText(body.text)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be read aloud');
-    const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
-    const ref = u?.[this.col(body.slot)];
-    if (!ref) throw apiError(HttpStatus.CONFLICT, 'VOICE_NOT_REGISTERED', 'Register this voice first');
+    const ref = await this.voiceId(userId, body.slot);
     const mp3 = await textToSpeech(key, this.cfg.FISH_MODEL, { text: body.text, referenceId: ref });
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
     return { url: m.url };

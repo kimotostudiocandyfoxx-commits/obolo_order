@@ -178,3 +178,29 @@ export const SpeakBody = z.object({
   text: z.string().trim().min(1).max(300),
 });
 export type SpeakBody = z.infer<typeof SpeakBody>;
+
+/**
+ * Mercury 歌入れ: sing the song in a registered voice (Fish Audio, [singing] mode) and mix it with
+ * the instrumental already made for it. `instrumentalUrl` must be one of the member's own files.
+ */
+export const SingBody = z.object({
+  title: z.string().trim().min(1).max(40),
+  genre: z.string().trim().max(20),
+  mood: z.string().trim().max(30),
+  bpm: z.number().int().min(40).max(220),
+  keyRoot: z.number().int().min(0).max(11),
+  scale: z.enum(['major', 'minor']),
+  sections: z
+    .array(
+      z.object({
+        name: z.enum(['verse', 'chorus', 'bridge']),
+        lines: z.array(z.object({ text: z.string().trim().min(1).max(40), beats: z.number().positive().max(64) })).min(1).max(8),
+      }),
+    )
+    .min(1)
+    .max(6),
+  melody: z.array(z.object({ midi: z.number().int().min(0).max(127).nullable(), beats: z.number().positive().max(16) })).max(600),
+  instrumentalUrl: z.string().url().max(500),
+  slot: z.enum(['self', 'bati']).default('self'),
+});
+export type SingBody = z.infer<typeof SingBody>;

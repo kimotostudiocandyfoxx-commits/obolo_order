@@ -194,3 +194,26 @@ export interface InstrumentalResult {
   url: string;
   seconds: number;
 }
+
+/** How the song is sung (chosen by the LLM from the song design; sent to Fish as tags / prosody). */
+export interface SingDirection {
+  /** tags for the whole song, e.g. ["bright"] (after [singing]) */
+  style: string[];
+  /** tags at the start of each section, e.g. chorus: ["pitch_up", "energetic"] */
+  sections: { name: 'verse' | 'chorus' | 'bridge'; tags: string[] }[];
+  /** Fish prosody.speed (0.5–2.0) */
+  speed: number;
+  /** Fish prosody.volume in dB */
+  volume: number;
+  /** a [breath] after every n lines (0 = none) */
+  breathEvery: number;
+}
+
+export interface SingResult {
+  /** the song: vocal + instrumental */
+  url: string;
+  /** the vocal alone */
+  vocalUrl: string;
+  seconds: number;
+  direction: SingDirection;
+}

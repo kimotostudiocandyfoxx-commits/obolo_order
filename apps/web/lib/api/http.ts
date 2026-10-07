@@ -96,6 +96,9 @@ export class HttpApi implements Api {
   registerVoice(body: Parameters<Api['registerVoice']>[0]) {
     return this.req<Awaited<ReturnType<Api['registerVoice']>>>('POST', '/voice/register', body);
   }
+  composeSing(body: Parameters<Api['composeSing']>[0]) {
+    return this.req<Awaited<ReturnType<Api['composeSing']>>>('POST', '/compose/sing', body);
+  }
   speak(body: Parameters<Api['speak']>[0]) {
     return this.req<Awaited<ReturnType<Api['speak']>>>('POST', '/voice/speak', body);
   }

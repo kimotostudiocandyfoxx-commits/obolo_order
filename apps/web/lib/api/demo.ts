@@ -14,6 +14,7 @@ import {
   type ComposeChatResult,
   type SongDesign,
   type InstrumentalResult,
+  type SingResult,
   type SaturnPostView,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
@@ -274,6 +275,10 @@ export class DemoApi implements Api {
 
   async speak(): Promise<{ url: string }> {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
+  }
+
+  async composeSing(): Promise<SingResult> {
+    throw new ApiError(501, 'DEMO', 'demo');
   }
 
   async composeMusicStatus(): Promise<Record<string, unknown>> {

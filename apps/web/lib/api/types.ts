@@ -25,6 +25,8 @@ import type {
   InstrumentalBody,
   InstrumentalResult,
   RegisterVoiceBody,
+  SingBody,
+  SingResult,
   SpeakBody,
 } from '@obolo/shared';
 
@@ -84,6 +86,8 @@ export interface Api {
   registerVoice(body: RegisterVoiceBody): Promise<Me>;
   /** Read a text aloud in a registered voice (Fish Audio). */
   speak(body: SpeakBody): Promise<{ url: string }>;
+  /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */
+  composeSing(body: SingBody): Promise<SingResult>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */

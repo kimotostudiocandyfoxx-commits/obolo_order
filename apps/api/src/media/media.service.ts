@@ -146,6 +146,18 @@ export class MediaService {
     return m?.data ? m : null;
   }
 
+  /** The bytes of one of the user's own generated audio files, found by its URL (e.g. an instrumental to sing over). */
+  async audioByUrl(userId: string, url: string): Promise<Buffer | null> {
+    const [m] = await this.db.write
+      .select({ data: mediaObjects.data, url: mediaObjects.url })
+      .from(mediaObjects)
+      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'audio'), isNull(mediaObjects.deletedAt)));
+    if (!m) return null;
+    if (m.data) return m.data;
+    const res = await fetch(m.url, { signal: AbortSignal.timeout(60_000) });
+    return res.ok ? Buffer.from(await res.arrayBuffer()) : null;
+  }
+
   /** The bytes of one of the user's generated images (to edit it). */
   async imageData(userId: string, id: string, kind: MediaKind): Promise<{ data: Buffer; mime: string } | null> {
     const [m] = await this.db.write

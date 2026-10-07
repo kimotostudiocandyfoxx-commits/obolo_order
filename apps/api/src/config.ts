@@ -73,6 +73,12 @@ const Env = z.object({
   FISH_API_KEY: secret(),
   /** PLACEHOLDER (P-VOICE-1): Fish Audio model name (client: s2.1-pro). */
   FISH_MODEL: z.string().default('s2.1-pro'),
+  /**
+   * PLACEHOLDER (P-VOICE-5): also send the design's melody (a plain tone) to Fish as an audio prompt
+   * when singing. Off until tried by ear: Fish documents reference audio as a voice sample, so it may
+   * change the timbre instead of guiding the melody.
+   */
+  FISH_SING_GUIDE: bool(false),
 
   /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
   MUSIC_URL: secret(),

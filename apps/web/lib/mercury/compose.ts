@@ -85,6 +85,8 @@ export interface MadeSong extends Song {
   design?: SongDesign;
   /** the generated instrumental (GPU), once made */
   instrumentalUrl?: string;
+  /** the sung song (vocal in the member's voice + instrumental), once made */
+  songUrl?: string;
 }
 
 const WAVE: Record<Genre, OscillatorType> = { pop: 'triangle', rock: 'sawtooth', hiphop: 'square', ballad: 'sine', edm: 'sawtooth' };
