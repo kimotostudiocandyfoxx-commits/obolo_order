@@ -17,8 +17,14 @@ export class SaturnController {
   ) {}
 
   @Get()
-  feed(@UserId() userId: string, @Query('cursor') cursor?: string, @Query('fresh') fresh?: string) {
-    return this.saturn.feed(userId, cursor, 20, fresh === '1');
+  feed(@UserId() userId: string, @Query('cursor') cursor?: string, @Query('fresh') fresh?: string, @Query('tab') tab?: string) {
+    return this.saturn.feed(userId, cursor, 20, fresh === '1', tab === 'following' ? 'following' : 'all');
+  }
+
+  /** The voice replies under a post (little balls lined up under it). */
+  @Get(':id/replies')
+  replies(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.saturn.replies(userId, id);
   }
 
   @Post()
@@ -46,5 +52,39 @@ export class SaturnController {
   @HttpCode(200)
   unstar(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
     return this.saturn.setStar(userId, id, false);
+  }
+}
+
+/** Saturn pages (profile) and follows. */
+@Controller('saturn/users')
+@UseGuards(AuthGuard)
+export class SaturnUsersController {
+  constructor(
+    private readonly saturn: SaturnService,
+    @Inject(KV) private readonly kv: KvStore,
+  ) {}
+
+  @Get(':id')
+  profile(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.saturn.profile(userId, id);
+  }
+
+  @Get(':id/posts')
+  posts(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Query('cursor') cursor?: string) {
+    return this.saturn.userPosts(userId, id, cursor);
+  }
+
+  @Post(':id/follow')
+  @HttpCode(200)
+  async follow(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    await rateLimit(this.kv, `saturn-follow:${userId}`, 60, 600);
+    return this.saturn.follow(userId, id, true);
+  }
+
+  @Delete(':id/follow')
+  @HttpCode(200)
+  async unfollow(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    await rateLimit(this.kv, `saturn-follow:${userId}`, 60, 600);
+    return this.saturn.follow(userId, id, false);
   }
 }

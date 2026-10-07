@@ -1,4 +1,4 @@
-import type { SaturnPostView } from '@obolo/shared';
+import type { SaturnPostView, SaturnProfileView } from '@obolo/shared';
 
 /**
  * Sample "residents" so Saturn never feels empty while real posts are few.
@@ -31,3 +31,53 @@ export const SATURN_RESIDENTS: SaturnPostView[] = R.map(([id, name, neo, text], 
   starredByMe: false,
   createdAt: new Date(Date.now() - (i + 1) * 47 * 60_000).toISOString(),
 }));
+
+/** Short sample replies the residents leave under each other's voices (P-SAT-4). */
+const REPLY_LINES = [
+  'わかる〜！',
+  'それめっちゃいいね',
+  'おつかれさま！',
+  'ちょっと元気でた、ありがとう',
+  'いいなぁ、わたしも行きたい',
+  'その気持ち、すごくわかるよ',
+  'きいてて笑っちゃった',
+  'がんばれ〜！',
+  'Nice voice!',
+  'こっちも同じ空みてるよ',
+];
+
+/** Deterministic 0–3 replies from other residents under a resident's post. */
+export function residentReplies(postId: string): SaturnPostView[] {
+  const i = SATURN_RESIDENTS.findIndex((p) => p.id === postId);
+  if (i < 0) return [];
+  const n = i % 4;
+  return Array.from({ length: n }, (_, k) => {
+    const from = SATURN_RESIDENTS[(i + 3 + k * 5) % SATURN_RESIDENTS.length];
+    const text = REPLY_LINES[(i * 3 + k * 7) % REPLY_LINES.length];
+    return {
+      ...from,
+      id: `${postId}-reply-${k}`,
+      text,
+      voiceUrl: `tts:${text}`,
+      starCount: (i + k * 11) % 9,
+      replyToId: postId,
+      createdAt: new Date(Date.now() - (n - k) * 13 * 60_000).toISOString(),
+    };
+  });
+}
+
+/** A resident's sample page. */
+export function residentProfile(authorId: string): SaturnProfileView | null {
+  const p = SATURN_RESIDENTS.find((x) => x.author.id === authorId);
+  if (!p) return null;
+  const h = [...authorId].reduce((a, c) => a + c.charCodeAt(0), 0);
+  return {
+    user: { ...p.author, bio: 'サンプルの住人。土星でのんびりころりん中。' },
+    postCount: 1,
+    stars: p.starCount,
+    followers: 40 + (h % 300),
+    following: 10 + (h % 80),
+    followedByMe: false,
+    isMe: false,
+  };
+}

@@ -10,6 +10,7 @@ import type {
   Me,
   Paged,
   SaturnPostView,
+  SaturnProfileView,
   UpdateBuddyProfileBody,
   UpdateProfileBody,
   EntryKind,
@@ -98,7 +99,12 @@ export interface Api {
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
   uploadVideo(blob: Blob, maxSeconds: number): Promise<UploadedVideo>;
-  saturnFeed(cursor?: string, fresh?: boolean): Promise<Paged<SaturnPostView>>;
+  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following'): Promise<Paged<SaturnPostView>>;
+  /** The voice replies under a post (oldest first). */
+  saturnReplies(postId: string): Promise<SaturnPostView[]>;
+  saturnProfile(userId: string): Promise<SaturnProfileView>;
+  saturnUserPosts(userId: string, cursor?: string): Promise<Paged<SaturnPostView>>;
+  followSaturnUser(userId: string, on: boolean): Promise<SaturnProfileView>;
   createSaturnPost(body: CreateSaturnPostBody): Promise<SaturnPostView>;
   deleteSaturnPost(id: string): Promise<void>;
   starSaturnPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;

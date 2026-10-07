@@ -5,17 +5,20 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
-import { SATURN_RESIDENTS } from '@/lib/saturnResidents';
+import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useRecorder } from '@/lib/useRecorder';
 import { BallAvatar, hueOf } from './BallAvatar';
+import { SaturnProfile } from './SaturnProfile';
 
 /**
  * 「ころりん」 — Saturn's voice world (client concept, 2026-10-04).
  * Everyone's posts become round chibi avatars that drift along Saturn's rings or roll on the ground.
  * Tap one → it stops, a speech card opens and the poster's voice plays.
  * Bottom bar: ゆらす (shake) · 声をおとす (record & drop your voice) · おまかせ (play a random voice).
+ * Under an opened voice, the people who answered line up as little balls: tap one → its voice
+ * plays with a speech bubble. Names open the person's page (follow); 🔁 quotes the voice.
  */
-type Tab = 'all' | 'friends' | 'starred';
+type Tab = 'all' | 'following' | 'starred';
 
 export interface KororinEvents {
   onListen?: () => void;
@@ -59,7 +62,11 @@ export function KororinWorld({
   const [tab, setTab] = useState<Tab>('all');
   const [open, setOpen] = useState<SaturnPostView | null>(null);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
-  const [composer, setComposer] = useState(false);
+  const [composer, setComposer] = useState<false | { replyTo?: SaturnPostView; quote?: SaturnPostView }>(false);
+  const [followingPosts, setFollowingPosts] = useState<SaturnPostView[] | null>(null);
+  const [replies, setReplies] = useState<SaturnPostView[]>([]);
+  const [activeReply, setActiveReply] = useState<string | null>(null);
+  const [profileId, setProfileId] = useState<string | null>(null);
   const [shaking, setShaking] = useState(false);
   const [dropped, setDropped] = useState<string | null>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -84,9 +91,18 @@ export function KororinWorld({
     return [...real, ...fill];
   }, [posts]);
 
+  // フォロー中: the people you follow (and you) — real posts only, fetched when the tab opens
+  useEffect(() => {
+    if (tab !== 'following') return;
+    getApi()
+      .saturnFeed(undefined, true, 'following')
+      .then((p) => setFollowingPosts(p.items))
+      .catch(() => setFollowingPosts([]));
+  }, [tab]);
+
   const shown = useMemo(
-    () => (tab === 'starred' ? all.filter((p) => p.starredByMe) : tab === 'friends' ? all.filter((p) => !p.id.startsWith('resident-')) : all),
-    [all, tab],
+    () => (tab === 'starred' ? all.filter((p) => p.starredByMe) : tab === 'following' ? (followingPosts ?? []) : all),
+    [all, tab, followingPosts],
   );
 
   // (re)build movers when the set changes, keeping existing ones (and their phase) in place
@@ -157,15 +173,37 @@ export function KororinWorld({
     (p: SaturnPostView) => {
       paused.current = p.id;
       setOpen(p);
+      setActiveReply(null);
       void toggleAudio(p.voiceUrl).catch(() => undefined);
       events?.onListen?.();
     },
     [events],
   );
 
+  // the answers under the opened voice (sample residents answer each other)
+  useEffect(() => {
+    setReplies([]);
+    if (!open) return;
+    if (open.id.startsWith('resident-')) return setReplies(residentReplies(open.id));
+    let on = true;
+    getApi()
+      .saturnReplies(open.id)
+      .then((r) => on && setReplies(r))
+      .catch(() => undefined);
+    return () => {
+      on = false;
+    };
+  }, [open?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const playReply = (r: SaturnPostView) => {
+    setActiveReply(r.id);
+    void toggleAudio(r.voiceUrl).catch(() => undefined);
+  };
+
   const close = () => {
     paused.current = null;
     setOpen(null);
+    setActiveReply(null);
     stopAudio();
   };
 
@@ -201,7 +239,19 @@ export function KororinWorld({
   };
 
   const onPosted = (p: SaturnPostView) => {
+    // a reply joins the row under its post instead of floating in the world
+    if (p.replyToId) {
+      setComposer(false);
+      setReplies((cur) => [...cur, p]);
+      const bump = (x: SaturnPostView) => (x.id === p.replyToId ? { ...x, replyCount: (x.replyCount ?? 0) + 1 } : x);
+      setPosts((cur) => cur.map(bump));
+      setOpen((o) => (o ? bump(o) : o));
+      setTimeout(() => playReply(p), 400);
+      events?.onPosted?.();
+      return;
+    }
     setPosts((cur) => [p, ...cur]);
+    if (p.repostOf) setPosts((cur) => cur.map((x) => (x.id === p.repostOf!.id ? { ...x, repostCount: (x.repostCount ?? 0) + 1 } : x)));
     setDropped(p.id);
     setComposer(false);
     setTimeout(() => setDropped(null), 1600);
@@ -263,14 +313,18 @@ export function KororinWorld({
           <span className="flex items-center gap-1.5 text-xl font-black text-white drop-shadow">🪐 ころりん</span>
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-bold text-amber-600">⭐ {all.reduce((a, p) => a + (p.author.id === me?.id ? p.starCount : 0), 0) || 0}</span>
-            {me && <BallAvatar seed={me.id} neo={me.neoForm} size={34} />}
+            {me && (
+              <button onClick={() => setProfileId(me.id)} aria-label="my page">
+                <BallAvatar seed={me.id} neo={me.neoForm} size={34} />
+              </button>
+            )}
           </div>
         </div>
         <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full bg-white/20 p-1 backdrop-blur">
           {(
             [
               ['all', 'みんな'],
-              ['friends', 'ともだち'],
+              ['following', 'フォロー中'],
               ['starred', '星をあげた声'],
             ] as const
           ).map(([k, label]) => (
@@ -279,6 +333,11 @@ export function KororinWorld({
             </button>
           ))}
         </div>
+        {tab === 'following' && followingPosts && !followingPosts.length && (
+          <p className="mx-auto mt-2 w-fit max-w-[90%] rounded-2xl bg-white/85 px-3 py-1.5 text-center text-[11px] font-bold text-violet-600">
+            まだ誰もフォローしていないよ。声の名前をタップして、その人のページからフォローしてね
+          </p>
+        )}
         <p className="mx-auto mt-2 w-fit rounded-full bg-white/80 px-3 py-1 text-[11px] font-bold text-violet-700">
           <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-pink-400 align-middle" />
           いま土星に {online} 人がころりん中
@@ -290,15 +349,30 @@ export function KororinWorld({
         <div className="absolute inset-x-0 bottom-[calc(110px+env(safe-area-inset-bottom))] z-[90] flex justify-center px-4">
           <div className="w-full max-w-sm animate-[fadeUp_0.3s_ease-out] rounded-3xl bg-white p-4 text-slate-800 shadow-2xl">
             <div className="flex items-center gap-2">
-              <BallAvatar seed={open.author.id} neo={open.author.neoForm} size={32} speaking={playingUrl === open.voiceUrl} />
-              <span className="font-black">{open.author.displayName}</span>
-              <span className="text-[11px] text-slate-400">@{open.author.handle}</span>
-              <button onClick={close} className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-violet-500" aria-label="close">
+              <button onClick={() => setProfileId(open.author.id)} className="flex min-w-0 items-center gap-2 text-left" aria-label="profile">
+                <BallAvatar seed={open.author.id} neo={open.author.neoForm} size={32} speaking={playingUrl === open.voiceUrl} />
+                <span className="truncate font-black">{open.author.displayName}</span>
+                <span className="truncate text-[11px] text-slate-400">@{open.author.handle}</span>
+              </button>
+              <button onClick={close} className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-500" aria-label="close">
                 ×
               </button>
             </div>
             <p className="mt-2 text-[17px] font-bold leading-relaxed">{open.text}</p>
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            {open.repostOf && (
+              <button
+                onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)}
+                className="mt-2 flex w-full items-center gap-2 rounded-2xl border border-violet-100 bg-violet-50/60 p-2 text-left"
+              >
+                <BallAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} size={26} speaking={playingUrl === open.repostOf.voiceUrl} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[10px] font-bold text-violet-400">🔁 {open.repostOf.author.displayName}の声</span>
+                  <span className="block truncate text-xs text-slate-600">{open.repostOf.text}</span>
+                </span>
+                <span className="text-xs text-violet-500">{playingUrl === open.repostOf.voiceUrl ? '❚❚' : '▶'}</span>
+              </button>
+            )}
+            <div className="mt-3 grid grid-cols-3 gap-2">
               <button
                 onClick={() => void star(open)}
                 className={`rounded-full py-2.5 text-sm font-bold ${open.starredByMe ? 'bg-amber-100 text-amber-600' : 'bg-violet-50 text-violet-600'}`}
@@ -306,11 +380,52 @@ export function KororinWorld({
                 {open.starredByMe ? '★' : '☆'} {open.starCount}
               </button>
               <button
-                onClick={() => void toggleAudio(open.voiceUrl).catch(() => undefined)}
+                onClick={() => {
+                  setActiveReply(null);
+                  void toggleAudio(open.voiceUrl).catch(() => undefined);
+                }}
                 className="rounded-full bg-gradient-to-r from-pink-200 to-violet-200 py-2.5 text-sm font-bold text-violet-700"
               >
-                {playingUrl === open.voiceUrl ? '❚❚ 再生中' : '▶ もう一度きく'}
+                {playingUrl === open.voiceUrl ? '❚❚' : '▶ きく'}
               </button>
+              <button
+                onClick={() => !open.id.startsWith('resident-') && setComposer({ quote: open })}
+                disabled={open.id.startsWith('resident-')}
+                className="rounded-full bg-violet-50 py-2.5 text-sm font-bold text-violet-600 disabled:opacity-40"
+              >
+                🔁 {open.repostCount ?? 0}
+              </button>
+            </div>
+
+            {/* the answers: little balls in a row; tap → the voice plays with a speech bubble */}
+            <div className="mt-3 border-t border-violet-50 pt-2">
+              <p className="text-[10px] font-bold text-violet-400">💬 返信 {replies.length}</p>
+              {(() => {
+                const a = replies.find((x) => x.id === activeReply);
+                return a ? (
+                  <div className="mt-1.5 animate-[fadeUp_0.2s_ease-out] rounded-2xl rounded-bl-sm bg-violet-500 px-3 py-2 text-sm font-bold text-white">
+                    <span className="mr-1 text-[10px] text-violet-200">{a.author.displayName}</span>
+                    {a.text}
+                  </div>
+                ) : null;
+              })()}
+              <div className="-mx-1 mt-1.5 flex items-end gap-1.5 overflow-x-auto px-1 pb-1">
+                {replies.map((rp) => (
+                  <button key={rp.id} onClick={() => playReply(rp)} className={`relative shrink-0 rounded-full p-0.5 ${activeReply === rp.id ? 'ring-2 ring-violet-400' : ''}`} aria-label={`${rp.author.displayName}: ${rp.text}`}>
+                    <BallAvatar seed={rp.author.id} neo={rp.author.neoForm} size={40} speaking={playingUrl === rp.voiceUrl} />
+                  </button>
+                ))}
+                {!open.id.startsWith('resident-') ? (
+                  <button
+                    onClick={() => setComposer({ replyTo: open })}
+                    className="flex h-11 shrink-0 items-center gap-1 rounded-full border-2 border-dashed border-violet-200 px-3 text-xs font-bold text-violet-500"
+                  >
+                    ＋ 声で返信
+                  </button>
+                ) : (
+                  !replies.length && <span className="text-[10px] text-slate-400">サンプルの住人には返信できないよ</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -325,7 +440,7 @@ export function KororinWorld({
           <button
             onClick={() => {
               close();
-              setComposer(true);
+              setComposer({});
             }}
             className={`rounded-full bg-gradient-to-r from-pink-400 to-violet-400 px-7 py-3.5 text-base font-black text-white shadow-lg ${highlightDrop ? 'animate-pulse ring-4 ring-pink-200' : ''}`}
             data-kororin="drop"
@@ -338,7 +453,18 @@ export function KororinWorld({
         </div>
       </div>
 
-      {composer && <DropComposer neoOnly={neoOnly} onClose={() => setComposer(false)} onPosted={onPosted} />}
+      {composer && <DropComposer neoOnly={neoOnly} replyTo={composer.replyTo} quote={composer.quote} onClose={() => setComposer(false)} onPosted={onPosted} />}
+      {profileId && (
+        <SaturnProfile
+          userId={profileId}
+          playingUrl={playingUrl}
+          onClose={() => setProfileId(null)}
+          onOpenPost={(p) => {
+            setProfileId(null);
+            listen(p);
+          }}
+        />
+      )}
       {overlay}
     </div>
   );
@@ -350,7 +476,21 @@ export function KororinWorld({
  *  - by the member's own registered voice in a chosen style (Fish Audio, P-SAT-5), or
  *  - with a recording of your own voice.
  */
-function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onPosted: (p: SaturnPostView) => void; neoOnly: boolean }) {
+function DropComposer({
+  onClose,
+  onPosted,
+  neoOnly,
+  replyTo,
+  quote,
+}: {
+  onClose: () => void;
+  onPosted: (p: SaturnPostView) => void;
+  neoOnly: boolean;
+  /** answering this voice (the reply lines up under it) */
+  replyTo?: SaturnPostView;
+  /** quoting this voice (🔁, with your own words and voice) */
+  quote?: SaturnPostView;
+}) {
   const { me } = useAuth();
   const rec = useRecorder();
   const [mode, setMode] = useState<'neo' | 'own' | 'record'>('neo');
@@ -390,12 +530,13 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
     setBusy(true);
     setErr(null);
     try {
+      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}) };
       if (mode === 'neo' || mode === 'own') {
-        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, ...(mode === 'own' ? { ownVoice: true } : {}) }));
+        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, ...(mode === 'own' ? { ownVoice: true } : {}), ...target }));
       } else {
         if (!rec.blob) return;
         const media = await getApi().uploadVoice(rec.blob);
-        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceMediaId: media.id, voiceDurationSec: rec.duration }));
+        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceMediaId: media.id, voiceDurationSec: rec.duration, ...target }));
       }
     } catch {
       setErr('うまく落とせなかった…もう一度');
@@ -406,7 +547,15 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
   return (
     <div className="absolute inset-0 z-[95] flex items-end justify-center bg-violet-950/50" onClick={onClose}>
       <div className="pb-safe w-full max-w-md rounded-t-3xl bg-white p-5 text-slate-800" onClick={(e) => e.stopPropagation()}>
-        <p className="text-center text-sm font-black text-violet-600">いまの気持ちを、声でおとす</p>
+        <p className="text-center text-sm font-black text-violet-600">
+          {replyTo ? `${replyTo.author.displayName}に、声で返信` : quote ? '声を引用して、ひとこと' : 'いまの気持ちを、声でおとす'}
+        </p>
+        {(replyTo ?? quote) && (
+          <div className="mt-2 flex items-center gap-2 rounded-2xl bg-violet-50 p-2">
+            <BallAvatar seed={(replyTo ?? quote)!.author.id} neo={(replyTo ?? quote)!.author.neoForm} size={26} />
+            <p className="min-w-0 flex-1 truncate text-xs text-slate-600">{(replyTo ?? quote)!.text}</p>
+          </div>
+        )}
         {!neoOnly && (
           <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full bg-violet-50 p-1">
             {(
@@ -424,7 +573,7 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
         )}
         <textarea
           className="mt-3 h-24 w-full resize-none rounded-2xl bg-violet-50 p-3 text-[16px] outline-none"
-          placeholder="なんでもいい。いま思ったことを書いてみて"
+          placeholder={replyTo ? 'どう返す？' : quote ? 'この声について、ひとこと' : 'なんでもいい。いま思ったことを書いてみて'}
           maxLength={SATURN_MAX_CHARS * 2}
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -485,7 +634,7 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
           onClick={() => void post()}
           className="mt-4 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-3.5 text-base font-black text-white disabled:opacity-40"
         >
-          {busy ? 'おとしています…' : '🎙 土星におとす'}
+          {busy ? 'おとしています…' : replyTo ? '💬 返信する' : quote ? '🔁 引用しておとす' : '🎙 土星におとす'}
         </button>
       </div>
     </div>

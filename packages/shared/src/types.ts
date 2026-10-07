@@ -129,6 +129,32 @@ export interface SaturnPostView {
   starCount: number;
   starredByMe: boolean;
   createdAt: string;
+  /** set on a reply: the post it answers */
+  replyToId?: string | null;
+  replyCount?: number;
+  repostCount?: number;
+  /** quote repost: the post it introduces (one level, no nesting) */
+  repostOf?: SaturnPostRef | null;
+}
+
+/** A short form of a post, embedded in a quote repost. */
+export interface SaturnPostRef {
+  id: string;
+  author: { id: string; handle: string; displayName: string; neoForm?: string | null };
+  text: string;
+  voiceUrl: string;
+}
+
+/** Someone's Saturn page. */
+export interface SaturnProfileView {
+  user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string };
+  postCount: number;
+  followers: number;
+  following: number;
+  /** stars their posts received */
+  stars: number;
+  followedByMe: boolean;
+  isMe: boolean;
 }
 
 export interface Paged<T> {

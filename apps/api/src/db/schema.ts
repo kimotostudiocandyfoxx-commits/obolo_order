@@ -204,10 +204,33 @@ export const saturnPosts = pgTable(
     voiceDurationSec: real('voice_duration_sec'),
     starCount: integer('star_count').notNull().default(0),
     replyToId: uuid('reply_to_id'),
+    /** quote repost: this post introduces another one (with its own words and voice) */
+    repostOfId: uuid('repost_of_id'),
+    replyCount: integer('reply_count').notNull().default(0),
+    repostCount: integer('repost_count').notNull().default(0),
     aiGenerated: integer('ai_generated').notNull().default(0),
     ...timestamps,
   },
-  (t) => [index('saturn_posts_created_idx').on(t.createdAt, t.id), index('saturn_posts_user_idx').on(t.userId, t.createdAt)],
+  (t) => [
+    index('saturn_posts_created_idx').on(t.createdAt, t.id),
+    index('saturn_posts_user_idx').on(t.userId, t.createdAt),
+    index('saturn_posts_reply_idx').on(t.replyToId, t.createdAt),
+  ],
+);
+
+/** Saturn follows (spec §2.3 "standard SNS graph"). */
+export const follows = pgTable(
+  'follows',
+  {
+    followerId: uuid('follower_id')
+      .notNull()
+      .references(() => users.id),
+    followeeId: uuid('followee_id')
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('follows_pair_idx').on(t.followerId, t.followeeId), index('follows_followee_idx').on(t.followeeId)],
 );
 
 /** Stars are platform-wide (spec v1.6). On Mercury they carry tiers 1–3; elsewhere tier = 1. */

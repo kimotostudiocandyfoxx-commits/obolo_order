@@ -17,6 +17,7 @@ import {
   type SongEditResult,
   type SongView,
   type SaturnPostView,
+  type SaturnProfileView,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
 import { putBlob } from './idb';
@@ -43,6 +44,8 @@ interface DemoState {
   posts: (Omit<SaturnPostView, 'starredByMe'> & { starredBy: string[] })[];
   quota: Record<string, number>;
   pendingCodes: Record<string, string>;
+  /** Saturn follows: follower id → followee ids */
+  follows?: Record<string, string[]>;
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
 }
 
@@ -314,9 +317,12 @@ export class DemoApi implements Api {
     return { ...rest, starredByMe: starredBy.includes(viewer) };
   }
 
-  async saturnFeed(cursor?: string) {
+  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following') {
     const viewer = this.uid();
-    const sorted = [...this.s.posts].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const mine = new Set([...(this.s.follows?.[viewer] ?? []), viewer]);
+    const sorted = [...this.s.posts]
+      .filter((p) => !p.replyToId && (tab !== 'following' || mine.has(p.author.id)))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {
       items: sorted.slice(start, start + 20).map((p) => this.view(p, viewer)),
@@ -324,10 +330,62 @@ export class DemoApi implements Api {
     };
   }
 
+  async saturnReplies(postId: string) {
+    const viewer = this.uid();
+    return this.s.posts
+      .filter((p) => p.replyToId === postId)
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+      .map((p) => this.view(p, viewer));
+  }
+
+  async saturnProfile(userId: string): Promise<SaturnProfileView> {
+    const viewer = this.uid();
+    const u = this.s.users[userId];
+    const posts = this.s.posts.filter((p) => p.author.id === userId && !p.replyToId);
+    const a = u ? { id: u.id, handle: u.handle, displayName: u.displayName, neoForm: u.neoForm } : (posts[0]?.author ?? { id: userId, handle: 'neo', displayName: 'NEO' });
+    const f = this.s.follows ?? {};
+    return {
+      user: { ...a, bio: u?.bio ?? '' },
+      postCount: posts.length,
+      stars: posts.reduce((n, p) => n + p.starCount, 0),
+      followers: Object.values(f).filter((l) => l.includes(userId)).length,
+      following: (f[userId] ?? []).length,
+      followedByMe: (f[viewer] ?? []).includes(userId),
+      isMe: viewer === userId,
+    };
+  }
+
+  async saturnUserPosts(userId: string) {
+    const viewer = this.uid();
+    const items = this.s.posts
+      .filter((p) => p.author.id === userId && !p.replyToId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .map((p) => this.view(p, viewer));
+    return { items, nextCursor: null };
+  }
+
+  async followSaturnUser(userId: string, on: boolean) {
+    const viewer = this.uid();
+    this.s.follows ??= {};
+    const l = new Set(this.s.follows[viewer] ?? []);
+    if (on && userId !== viewer) l.add(userId);
+    else l.delete(userId);
+    this.s.follows[viewer] = [...l];
+    this.save();
+    return this.saturnProfile(userId);
+  }
+
   async createSaturnPost(body: Parameters<Api['createSaturnPost']>[0]) {
     const id = this.uid();
     const u = this.s.users[id];
+    const target = (pid?: string) => (pid ? this.s.posts.find((x) => x.id === pid) : undefined);
+    const replyTo = target(body.replyToId);
+    const quoted = target(body.repostOfId);
+    if (replyTo) replyTo.replyCount = (replyTo.replyCount ?? 0) + 1;
+    if (quoted) quoted.repostCount = (quoted.repostCount ?? 0) + 1;
     const p = {
+      replyToId: replyTo ? (replyTo.replyToId ?? replyTo.id) : null,
+      repostOf: quoted ? { id: quoted.id, author: quoted.author, text: quoted.text, voiceUrl: quoted.voiceUrl } : null,
       id: uid(),
       author: { id, handle: u.handle, displayName: u.displayName, neoForm: u.neoForm },
       text: body.text,

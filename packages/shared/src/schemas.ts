@@ -59,6 +59,10 @@ export const CreateSaturnPostBody = z
     /** with voiceStyle: read it in the member's own registered voice (Fish Audio) instead of the NEO voice */
     ownVoice: z.boolean().optional(),
     voiceDurationSec: z.number().min(0).max(600).optional(),
+    /** a voice reply to this post */
+    replyToId: z.string().uuid().optional(),
+    /** a quote repost of this post */
+    repostOfId: z.string().uuid().optional(),
   })
   .refine((b) => !!b.voiceMediaId !== !!b.voiceStyle, { message: 'either voiceMediaId or voiceStyle is required' });
 export type CreateSaturnPostBody = z.infer<typeof CreateSaturnPostBody>;

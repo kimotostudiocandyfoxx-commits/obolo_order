@@ -114,10 +114,23 @@ export class HttpApi implements Api {
   uploadVideo(blob: Blob, maxSeconds: number) {
     return this.req<Awaited<ReturnType<Api['uploadVideo']>>>('POST', `/media/video?max=${Math.round(maxSeconds)}`, undefined, blob);
   }
-  saturnFeed(cursor?: string, fresh?: boolean) {
+  saturnReplies(postId: string) {
+    return this.req<Awaited<ReturnType<Api['saturnReplies']>>>('GET', `/saturn/posts/${postId}/replies`);
+  }
+  saturnProfile(userId: string) {
+    return this.req<Awaited<ReturnType<Api['saturnProfile']>>>('GET', `/saturn/users/${userId}`);
+  }
+  saturnUserPosts(userId: string, cursor?: string) {
+    return this.req<Awaited<ReturnType<Api['saturnUserPosts']>>>('GET', `/saturn/users/${userId}/posts${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`);
+  }
+  followSaturnUser(userId: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['followSaturnUser']>>>(on ? 'POST' : 'DELETE', `/saturn/users/${userId}/follow`);
+  }
+  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following') {
     const q = new URLSearchParams();
     if (cursor) q.set('cursor', cursor);
     if (fresh) q.set('fresh', '1');
+    if (tab === 'following') q.set('tab', 'following');
     const qs = q.toString();
     return this.req<Awaited<ReturnType<Api['saturnFeed']>>>('GET', `/saturn/posts${qs ? `?${qs}` : ''}`);
   }
