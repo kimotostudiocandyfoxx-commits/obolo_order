@@ -13,6 +13,7 @@ import { playPop, unlockPop } from '@/lib/popSound';
 import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
 import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
+import { PhotoCropper } from './PhotoCropper';
 import { PlazaMap } from './PlazaMap';
 import { SaturnProfile } from './SaturnProfile';
 
@@ -508,7 +509,7 @@ export function KororinWorld({
             <span ref={tail} className="absolute -bottom-2 h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px] bg-white" />
             {open.photoUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={open.photoUrl} alt="" className="relative mb-1.5 h-32 w-32 rounded-2xl object-cover" />
+              <img src={open.photoUrl} alt="" className="relative mb-1.5 h-28 w-28 rounded-full border-[3px] border-violet-50 object-cover" />
             )}
             <span className="relative line-clamp-5 pb-1.5 pr-2">{open.text}</span>
             <span className="pointer-events-auto absolute -bottom-3 -right-3 flex gap-1">
@@ -547,7 +548,7 @@ export function KororinWorld({
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-600">{open.text}</p>
             {open.photoUrl && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={open.photoUrl} alt="" className="mt-2 max-h-72 w-full rounded-2xl bg-violet-50 object-contain" />
+              <img src={open.photoUrl} alt="" className="mx-auto mt-2 block aspect-square w-[min(260px,70%)] rounded-full border-4 border-white object-cover shadow" />
             )}
             {open.repostOf && (
               <button onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)} className="mt-2 flex w-full items-center gap-2 rounded-2xl bg-[#f8f3ff] p-2 text-left">
@@ -782,18 +783,6 @@ function lifeLeft(createdAt: string) {
   return h <= 1 ? 'まもなく消える' : `のこり${Math.floor(h)}時間`;
 }
 
-/** A photo for a post, made smaller on the device first (≤1600 px JPEG) so it uploads quickly. */
-async function shrinkPhoto(f: File): Promise<Blob> {
-  const img = await createImageBitmap(f);
-  const k = Math.min(1, 1600 / Math.max(img.width, img.height));
-  const c = document.createElement('canvas');
-  c.width = Math.round(img.width * k);
-  c.height = Math.round(img.height * k);
-  c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
-  img.close();
-  return new Promise((ok, ng) => c.toBlob((b) => (b ? ok(b) : ng(new Error('encode'))), 'image/jpeg', 0.86));
-}
-
 /** The reading styles, as the "バティに読んでもらう" choices. */
 const READ_LABELS: Record<string, string> = {
   genki: '元気に読む',
@@ -841,17 +830,9 @@ function DropComposer({
   const [err, setErr] = useState<string | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   // 📷 写真もつける: the character holds it on the planet
+  // (fitted into the round frame first: photos on Saturn are round)
   const [photo, setPhoto] = useState<{ blob: Blob; preview: string } | null>(null);
-  const pickPhoto = async (f: File | undefined) => {
-    if (!f) return;
-    setErr(null);
-    try {
-      const blob = await shrinkPhoto(f);
-      setPhoto({ blob, preview: URL.createObjectURL(blob) });
-    } catch {
-      setErr('この写真は読みこめなかった…別の写真でためしてね');
-    }
-  };
+  const [cropping, setCropping] = useState<File | null>(null);
   const [places, setPlaces] = useState<PlazaView[]>([]);
   const [into, setInto] = useState<PlazaView | null>(plaza ?? null);
   useEffect(() => {
@@ -966,9 +947,18 @@ function DropComposer({
 
         {/* 📷 a photo to go with it: your character holds it */}
         <div className="mt-3 flex items-center gap-3">
-          <label className="cursor-pointer rounded-full bg-sky-50 px-4 py-2 text-xs font-black text-sky-700">
+          <label className="shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-sky-50 px-4 py-2 text-xs font-black text-sky-700">
             📷 {photo ? '写真をかえる' : '写真もつける'}
-            <input type="file" accept="image/*" className="hidden" onChange={(e) => void pickPhoto(e.target.files?.[0])} />
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (f) setCropping(f);
+              }}
+            />
           </label>
           {photo && (
             <span className="relative">
@@ -979,8 +969,18 @@ function DropComposer({
               </button>
             </span>
           )}
-          {photo && <span className="text-[10px] text-slate-400">あなたのキャラが、この写真を持ってころがるよ</span>}
+          {photo && <span className="text-[10px] text-slate-400">あなたのキャラに、この写真がついてころがるよ</span>}
         </div>
+        {cropping && (
+          <PhotoCropper
+            file={cropping}
+            onCancel={() => setCropping(null)}
+            onDone={(blob) => {
+              setCropping(null);
+              setPhoto({ blob, preview: URL.createObjectURL(blob) });
+            }}
+          />
+        )}
 
         {/* Bati reads it */}
         <p className="mt-3 text-xs font-black text-amber-700">🐣 バティがどんなふうに読む？</p>

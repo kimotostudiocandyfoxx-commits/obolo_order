@@ -19,7 +19,7 @@ export interface PuniItem {
   R: number;
   /** a painted picture (round, transparent PNG): drawn warped onto the body instead of `look` */
   pic?: string | null;
-  /** a photo posted with the voice: the character holds it as a round picture in front of it */
+  /** a photo posted with the voice: a small round picture at the character's lower right */
   photo?: string | null;
 }
 
@@ -178,14 +178,15 @@ export const PuniPhysicsLayer = forwardRef<
           if (b && t) gl.draw(b, t);
         }
       }
-      // held photos: upright in front of the body, squashing with it, swaying a little when moving
+      // photos: a small round picture at the lower right, sticking out of the body a little
+      // (the face stays visible), squashing with it and swaying a little when moving
       for (const [id, el] of held.current) {
         const b = get(id);
         if (!b) continue;
-        const d = b.R * 1.2;
-        const tilt = Math.max(-14, Math.min(14, b.vx * 0.02));
+        const d = b.R * 0.68;
+        const tilt = 8 + Math.max(-12, Math.min(12, b.vx * 0.02));
         el.style.width = el.style.height = `${d.toFixed(0)}px`;
-        el.style.transform = `translate(${(b.x - d / 2).toFixed(1)}px, ${(b.y + b.cy + b.R * 0.38 - d / 2).toFixed(1)}px) rotate(${tilt.toFixed(1)}deg) scale(${b.sx.toFixed(3)}, ${b.sy.toFixed(3)})`;
+        el.style.transform = `translate(${(b.x + b.R * 0.66 * b.sx - d / 2).toFixed(1)}px, ${(b.y + b.cy + b.R * 0.5 * b.sy - d / 2).toFixed(1)}px) rotate(${tilt.toFixed(1)}deg) scale(${b.sx.toFixed(3)}, ${b.sy.toFixed(3)})`;
       }
       cb.current.onFrame?.(get, W, H);
       raf = requestAnimationFrame(loop);
@@ -281,7 +282,7 @@ export const PuniPhysicsLayer = forwardRef<
       )}
       {/* painted characters (WebGL); touches go to the SVG underneath (hit-test is by position) */}
       <canvas ref={glCanvas} className="pointer-events-none absolute inset-0 h-full w-full" />
-      {/* photos the characters hold (positioned by the loop) */}
+      {/* photos on the characters (positioned by the loop) */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {items.map((it) =>
           it.photo ? (
@@ -296,9 +297,6 @@ export const PuniPhysicsLayer = forwardRef<
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={it.photo} alt="" draggable={false} className="h-full w-full rounded-full border-[3px] border-white object-cover shadow-[0_4px_10px_rgba(60,20,110,.35)]" />
-              {/* little hands holding it */}
-              <span className="absolute left-[-8%] top-[38%] h-[26%] w-[26%] rounded-full border-2 border-white/70 shadow" style={{ background: it.look.color }} />
-              <span className="absolute right-[-8%] top-[38%] h-[26%] w-[26%] rounded-full border-2 border-white/70 shadow" style={{ background: it.look.color }} />
             </div>
           ) : null,
         )}
