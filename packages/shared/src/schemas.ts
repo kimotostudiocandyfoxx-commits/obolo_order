@@ -56,6 +56,8 @@ export const CreateSaturnPostBody = z
     voiceMediaId: z.string().uuid().optional(),
     /** NEO voice: read the text aloud in this style instead of a recording */
     voiceStyle: z.enum(VOICE_STYLE_IDS).optional(),
+    /** with voiceStyle: read it in the member's own registered voice (Fish Audio) instead of the NEO voice */
+    ownVoice: z.boolean().optional(),
     voiceDurationSec: z.number().min(0).max(600).optional(),
   })
   .refine((b) => !!b.voiceMediaId !== !!b.voiceStyle, { message: 'either voiceMediaId or voiceStyle is required' });
@@ -176,6 +178,8 @@ export type RegisterVoiceBody = z.infer<typeof RegisterVoiceBody>;
 export const SpeakBody = z.object({
   slot: z.enum(['self', 'bati']),
   text: z.string().trim().min(1).max(300),
+  /** one of VOICE_STYLES (元気に, ささやき風 …) — read with that style's Fish tag */
+  style: z.enum(VOICE_STYLE_IDS).optional(),
 });
 export type SpeakBody = z.infer<typeof SpeakBody>;
 

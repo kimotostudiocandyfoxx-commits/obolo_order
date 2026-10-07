@@ -12,16 +12,18 @@ export interface VoiceStyle {
   rate: number; // 0.1–10 (1 = normal)
   pitch: number; // 0–2 (1 = normal)
   volume: number; // 0–1
+  /** the same style for a registered voice read by Fish Audio: inline tag + prosody speed */
+  fish: { tag: string; speed: number };
 }
 
 export const VOICE_STYLES: readonly VoiceStyle[] = [
-  { id: 'genki', label: '元気に', rate: 1.15, pitch: 1.35, volume: 1 },
-  { id: 'yukkuri', label: 'ゆっくり', rate: 0.72, pitch: 1, volume: 1 },
-  { id: 'hayakuchi', label: '早口', rate: 1.65, pitch: 1.1, volume: 1 },
-  { id: 'hikui', label: '低い声で', rate: 0.95, pitch: 0.55, volume: 1 },
-  { id: 'takai', label: '高い声で', rate: 1.05, pitch: 1.85, volume: 1 },
-  { id: 'sasayaki', label: 'ささやき風', rate: 0.82, pitch: 1.15, volume: 0.4 },
-  { id: 'sakebu', label: '叫ぶ風', rate: 1.25, pitch: 1.6, volume: 1 },
+  { id: 'genki', label: '元気に', rate: 1.15, pitch: 1.35, volume: 1, fish: { tag: '[excited]', speed: 1.05 } },
+  { id: 'yukkuri', label: 'ゆっくり', rate: 0.72, pitch: 1, volume: 1, fish: { tag: '[calm]', speed: 0.8 } },
+  { id: 'hayakuchi', label: '早口', rate: 1.65, pitch: 1.1, volume: 1, fish: { tag: '[hurried]', speed: 1.4 } },
+  { id: 'hikui', label: '低い声で', rate: 0.95, pitch: 0.55, volume: 1, fish: { tag: '[low voice]', speed: 0.95 } },
+  { id: 'takai', label: '高い声で', rate: 1.05, pitch: 1.85, volume: 1, fish: { tag: '[high-pitched voice]', speed: 1.05 } },
+  { id: 'sasayaki', label: 'ささやき風', rate: 0.82, pitch: 1.15, volume: 0.4, fish: { tag: '[whispering]', speed: 0.9 } },
+  { id: 'sakebu', label: '叫ぶ風', rate: 1.25, pitch: 1.6, volume: 1, fish: { tag: '[shouting]', speed: 1.1 } },
 ];
 
 export const VOICE_STYLE_IDS = VOICE_STYLES.map((s) => s.id) as [string, ...string[]];

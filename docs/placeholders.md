@@ -67,6 +67,7 @@
 | P-VOICE-1 | ✏️ | ネオの声（読み上げ） | 端末の読み上げ機能で、7つの読み方（元気に／ゆっくり／早口／低い声で／高い声で／ささやき風／叫ぶ風）× ネオの姿ごとの声の高さ。本物のささやき・叫びは出せないので「〜風」。将来は Gemini などの表現力のある音声生成をサーバーで行い、音声ファイルにする（読み方の種類はそのまま） | `packages/shared/src/neoVoice.ts`、`apps/web/lib/audio.ts` |
 | P-SAT-3 | ✏️ | ころりんのアイコンの絵 | 丸い体＋顔＋ネオの姿のバッジ（SVGの仮絵） | `components/saturn/BallAvatar.tsx` |
 | P-SAT-4 | ✏️ | ころりんのサンプル住人 | 投稿が少ないうちは12人のサンプル住人で賑やかに見せる（声はブラウザの読み上げ） | `lib/saturnResidents.ts` |
+| P-SAT-5 | ✏️ | 土星「自分の声（AI）」 | 登録した自分の声（Fish）で投稿を読む。7つの読み方を Fish のタグに対応（元気に→`[excited]`、ゆっくり→`[calm]`＋速さ0.8、早口→`[hurried]`＋1.4、低い声で→`[low voice]`、高い声で→`[high-pitched voice]`、ささやき風→`[whispering]`、叫ぶ風→`[shouting]`）。効き具合は耳で調整。今は声を登録した人なら誰でも使える（ORDER 限定にするかは未決）。投稿時に1回生成（試し聞きは同じ文なら使い回し）、読み上げ回数（1日100回）に含める | `packages/shared/src/neoVoice.ts`、`apps/api/src/saturn/`、`apps/web/components/saturn/KororinWorld.tsx` |
 | P-INV-1 | 🟡 | 1人が招待できる人数 | 30日で10人まで | `apps/api/src/invites/invites.service.ts` |
 | P-INV-2 | 🟡 | 招待の有効期限 | 14日 | 環境変数 `INVITE_TTL_DAYS` |
 | P-INV-3 | 🟡 | 未登録メールでのログイン | 「招待制です」とはっきり表示（＝登録の有無が分かってしまう）。メール送信を入れたら黙って「送信しました」にする | `apps/api/src/auth/auth.service.ts` |

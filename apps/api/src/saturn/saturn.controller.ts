@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
 import { CreateSaturnPostBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -21,10 +22,12 @@ export class SaturnController {
   }
 
   @Post()
-  async create(@UserId() userId: string, @Body() body: unknown) {
+  async create(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     const input = parseBody(CreateSaturnPostBody, body);
     await rateLimit(this.kv, `saturn-post:${userId}`, 10, 600);
-    return this.saturn.create(userId, input);
+    // own-voice posts are paid read-alouds: they share the read-aloud allowance (P-VOICE-3)
+    if (input.ownVoice) await rateLimit(this.kv, `voice-speak:${userId}`, 100, 86400);
+    return this.saturn.create(userId, input, `${req.protocol}://${req.get('host')}`);
   }
 
   @Delete(':id')

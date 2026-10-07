@@ -346,30 +346,52 @@ export function KororinWorld({
 
 /**
  * 声をおとす: write a short line and drop it onto Saturn, read aloud either
- *  - by the NEO voice in a chosen style (OBOLO NEO members; client decision 2026-10-04), or
+ *  - by the NEO voice in a chosen style (OBOLO NEO members; client decision 2026-10-04),
+ *  - by the member's own registered voice in a chosen style (Fish Audio, P-SAT-5), or
  *  - with a recording of your own voice.
  */
 function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onPosted: (p: SaturnPostView) => void; neoOnly: boolean }) {
   const { me } = useAuth();
   const rec = useRecorder();
-  const [mode, setMode] = useState<'neo' | 'record'>('neo');
+  const [mode, setMode] = useState<'neo' | 'own' | 'record'>('neo');
+  // own-voice previews cost a Fish call: keep the last one for the same text + style
+  const [ownPreview, setOwnPreview] = useState<{ key: string; url: string } | null>(null);
+  const [previewing, setPreviewing] = useState(false);
+  const hasOwnVoice = !!me?.voices?.self;
   const [style, setStyle] = useState(VOICE_STYLES[0].id);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const left = SATURN_MAX_CHARS - [...text].length;
-  const canPost = !!text.trim() && left >= 0 && !busy && (mode === 'neo' || (!!rec.blob && !rec.recording));
+  const canPost = !!text.trim() && left >= 0 && !busy && (mode === 'neo' || (mode === 'own' && hasOwnVoice) || (!!rec.blob && !rec.recording));
 
-  const preview = () => {
-    if (text.trim()) void toggleAudio(neoVoiceUrl(style, me?.neoForm, text.trim())).catch(() => undefined);
+  const preview = async () => {
+    const t = text.trim();
+    if (!t) return;
+    if (mode === 'neo') return void toggleAudio(neoVoiceUrl(style, me?.neoForm, t)).catch(() => undefined);
+    const key = `${style}:${t}`;
+    setErr(null);
+    try {
+      let url = ownPreview?.key === key ? ownPreview.url : null;
+      if (!url) {
+        setPreviewing(true);
+        url = (await getApi().speak({ slot: 'self', text: t, style })).url;
+        setOwnPreview({ key, url });
+      }
+      await toggleAudio(url);
+    } catch {
+      setErr('自分の声で読めなかった…もう一度');
+    } finally {
+      setPreviewing(false);
+    }
   };
 
   const post = async () => {
     setBusy(true);
     setErr(null);
     try {
-      if (mode === 'neo') {
-        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style }));
+      if (mode === 'neo' || mode === 'own') {
+        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, ...(mode === 'own' ? { ownVoice: true } : {}) }));
       } else {
         if (!rec.blob) return;
         const media = await getApi().uploadVoice(rec.blob);
@@ -389,7 +411,8 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
           <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full bg-violet-50 p-1">
             {(
               [
-                ['neo', 'ネオの声で読む'],
+                ['neo', 'ネオの声'],
+                ['own', '自分の声（AI）'],
                 ['record', '自分で録音'],
               ] as const
             ).map(([k, label]) => (
@@ -410,7 +433,11 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
           <span className={left < 0 ? 'text-rose-500' : ''}>{left}</span>
         </div>
 
-        {mode === 'neo' ? (
+        {mode === 'own' && !hasOwnVoice ? (
+          <a href="/voice" className="mt-2 block rounded-2xl bg-violet-50 p-3 text-center text-xs font-bold text-violet-600">
+            自分の声で読んでもらうには、先に声を登録してね →
+          </a>
+        ) : mode !== 'record' ? (
           <>
             <p className="mt-1 text-xs font-black text-violet-600">どんな感じで読んでもらう？</p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -425,11 +452,11 @@ function DropComposer({ onClose, onPosted, neoOnly }: { onClose: () => void; onP
               ))}
             </div>
             <button
-              onClick={preview}
-              disabled={!text.trim()}
+              onClick={() => void preview()}
+              disabled={!text.trim() || previewing}
               className="mt-3 w-full rounded-full bg-violet-100 py-2.5 text-sm font-bold text-violet-700 disabled:opacity-40"
             >
-              ▶ ネオの声で聞いてみる
+              {previewing ? '自分の声で読んでいます…' : mode === 'own' ? '▶ 自分の声で聞いてみる' : '▶ ネオの声で聞いてみる'}
             </button>
           </>
         ) : (

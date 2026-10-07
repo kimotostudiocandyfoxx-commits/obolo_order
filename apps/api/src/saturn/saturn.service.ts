@@ -8,6 +8,7 @@ import { Database } from '../db/db';
 import { saturnPosts, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
+import { VoiceService } from '../voice/voice.service';
 
 @Injectable()
 export class SaturnService {
@@ -15,6 +16,7 @@ export class SaturnService {
     private readonly db: Database,
     private readonly media: MediaService,
     @Inject(LLM) private readonly llm: LlmProvider,
+    private readonly voices: VoiceService,
   ) {}
 
   /** Global timeline (newest first). PLACEHOLDER (P-SAT-2): following graph / ranking not built. */
@@ -69,13 +71,20 @@ export class SaturnService {
     };
   }
 
-  async create(userId: string, body: CreateSaturnPostBody): Promise<SaturnPostView> {
+  async create(userId: string, body: CreateSaturnPostBody, origin: string): Promise<SaturnPostView> {
     const [author] = await this.db.write
       .select({ id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm })
       .from(users)
       .where(eq(users.id, userId));
-    let voice: { mediaId: string | null; url: string; source: 'recorded' | 'default' };
-    if (body.voiceMediaId) {
+    // check the words first: a flagged post must not cost a voice generation
+    const mod = await moderateText(body.text, this.llm);
+    if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
+    let voice: { mediaId: string | null; url: string; source: 'recorded' | 'cloned' | 'default' };
+    if (body.ownVoice && body.voiceStyle) {
+      // the member's own registered voice, read by Fish Audio in the chosen style (P-SAT-5)
+      const v = await this.voices.readAloud(userId, { slot: 'self', text: body.text, style: body.voiceStyle }, origin);
+      voice = { mediaId: null, url: v.url, source: 'cloned' };
+    } else if (body.voiceMediaId) {
       const media = await this.media.getOwned(userId, body.voiceMediaId, 'voice');
       if (!media) throw apiError(HttpStatus.BAD_REQUEST, 'VOICE_REQUIRED', 'Record your voice before posting');
       voice = { mediaId: media.id, url: media.url, source: 'recorded' };
@@ -83,8 +92,6 @@ export class SaturnService {
       // NEO voice (P-VOICE-1): read aloud on the device today; later rendered server-side to audio.
       voice = { mediaId: null, url: neoVoiceUrl(body.voiceStyle!, author?.neoForm, body.text), source: 'default' };
     }
-    const mod = await moderateText(body.text, this.llm);
-    if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     const [p] = await this.db.write
       .insert(saturnPosts)
       .values({

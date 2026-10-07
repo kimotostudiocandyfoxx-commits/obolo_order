@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { moderateText } from '@obolo/ai';
-import { VOICE_SCRIPTS, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { spawn } from 'node:child_process';
 import { apiError } from '../common/errors';
@@ -88,12 +88,25 @@ export class VoiceService {
     return toMe(nu);
   }
 
-  async speak(userId: string, body: SpeakBody, origin: string): Promise<{ url: string }> {
+  async speak(userId: string, body: SpeakBody, origin: string): Promise<{ url: string; mediaId: string }> {
     const key = this.key();
     if ((await moderateText(body.text)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be read aloud');
+    return this.readAloud(userId, body, origin, key);
+  }
+
+  /**
+   * Read an already-moderated text in a registered voice, in one of the Saturn reading styles
+   * (元気に → [excited], ささやき風 → [whispering] … plus the style's speed). Stored on Bunny.
+   */
+  async readAloud(userId: string, body: SpeakBody, origin: string, key = this.key()): Promise<{ url: string; mediaId: string }> {
     const ref = await this.voiceId(userId, body.slot);
-    const mp3 = await textToSpeech(key, this.cfg.FISH_MODEL, { text: body.text, referenceId: ref });
+    const style = VOICE_STYLES.find((s) => s.id === body.style);
+    const mp3 = await textToSpeech(key, this.cfg.FISH_MODEL, {
+      text: style ? `${style.fish.tag} ${body.text}` : body.text,
+      referenceId: ref,
+      ...(style ? { prosody: { speed: style.fish.speed, volume: 0 } } : {}),
+    });
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
-    return { url: m.url };
+    return { url: m.url, mediaId: m.id };
   }
 }
