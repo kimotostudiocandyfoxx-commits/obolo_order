@@ -9,6 +9,7 @@ import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useDictation } from '@/lib/useDictation';
 import { MicButton } from '@/components/MicButton';
 import { PuniAvatar } from '@/components/puni/PuniAvatar';
+import { playPop, unlockPop } from '@/lib/popSound';
 import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
 import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
@@ -224,6 +225,7 @@ export function KororinWorld({
   popRef.current = (id: string) => {
     const b = layer.current?.blob(id);
     if (b) setBursts((cur) => [...cur.slice(-6), { key: Date.now() + Math.random(), x: b.x, y: b.y, r: b.R }]);
+    playPop(b ? Math.min(1, b.R / 120) : 0.5);
     if (openRef.current === id) close();
     remember(new Set(heard).add(id));
   };
@@ -238,6 +240,7 @@ export function KororinWorld({
 
   const listen = useCallback(
     (p: SaturnPostView) => {
+      unlockPop();
       openRef.current = p.id;
       setOpen(p);
       setActiveReply(null);
@@ -429,6 +432,13 @@ export function KororinWorld({
             <span ref={tail} className="absolute -bottom-2 h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px] bg-white" />
             <span className="relative line-clamp-5 pb-1.5 pr-2">{open.text}</span>
             <span className="pointer-events-auto absolute -bottom-3 -right-3 flex gap-1">
+              <button onClick={() => setProfileId(open.author.id)} className="flex h-7 items-center gap-1 rounded-full border border-violet-100 bg-white py-0 pl-0.5 pr-2 text-[11px] font-black text-[#7a62b0] shadow" aria-label="profile">
+                <span className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-[#f3ecff]">
+                  <PuniAvatar seed={open.author.id} neo={open.author.neoForm} look={open.author.look} pic={open.author.pic} size={22} />
+                </span>
+                <span className="max-w-[5.5em] truncate">{open.author.displayName}</span>
+                <span className="text-[#b4a3d8]">›</span>
+              </button>
               <button onClick={() => setDetail(true)} className="flex h-7 items-center gap-1 rounded-full border border-violet-100 bg-white px-2 text-[11px] font-black text-[#7a62b0] shadow" aria-label="replies">
                 💬 {replies.length}
               </button>
