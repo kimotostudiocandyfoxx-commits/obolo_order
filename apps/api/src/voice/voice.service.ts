@@ -125,7 +125,22 @@ export class VoiceService {
    * (元気に → [excited], ささやき風 → [whispering] … plus the style's speed). Stored on Bunny.
    */
   async readAloud(userId: string, body: SpeakBody, origin: string, key = this.key()): Promise<{ url: string; mediaId: string }> {
-    const ref = await this.voiceId(userId, body.slot);
+    return this.readWith(await this.voiceId(userId, body.slot), userId, body, origin, key);
+  }
+
+  /**
+   * Bati reads a post: the member's registered Bati voice, else the shared default voice
+   * (FISH_DEFAULT_VOICE_ID); null when neither exists (the caller falls back to the device voice).
+   */
+  async readByBati(userId: string, body: Omit<SpeakBody, 'slot'>, origin: string): Promise<{ url: string; mediaId: string } | null> {
+    if (!this.cfg.FISH_API_KEY) return null;
+    const [u] = await this.db.write.select({ bati: users.voiceBatiId }).from(users).where(eq(users.id, userId));
+    const ref = u?.bati ?? this.cfg.FISH_DEFAULT_VOICE_ID;
+    if (!ref) return null;
+    return this.readWith(ref, userId, { ...body, slot: 'bati' }, origin, this.key());
+  }
+
+  private async readWith(ref: string, userId: string, body: SpeakBody, origin: string, key: string): Promise<{ url: string; mediaId: string }> {
     const style = VOICE_STYLES.find((s) => s.id === body.style);
     const mp3 = await textToSpeech(key, this.cfg.FISH_MODEL, {
       text: style ? `${style.fish.tag} ${body.text}` : body.text,

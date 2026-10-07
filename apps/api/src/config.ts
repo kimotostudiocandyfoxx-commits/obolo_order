@@ -79,6 +79,11 @@ const Env = z.object({
    * change the timbre instead of guiding the melody.
    */
   FISH_SING_GUIDE: bool(false),
+  /**
+   * PLACEHOLDER (P-SAT-8): a shared Fish voice model id used as Bati's voice for members who have
+   * not registered one yet. Unset = their posts use the device's reading voice instead.
+   */
+  FISH_DEFAULT_VOICE_ID: secret(),
 
   /** Cloud Run GPU service that makes Mercury instrumentals (gpu/music). Unset = not available yet. */
   MUSIC_URL: secret(),
