@@ -127,3 +127,15 @@ export async function playBlob(blob: Blob, key: string): Promise<void> {
   a.src = objectUrl;
   await a.play();
 }
+
+/** Resumes the clip that was paused (true), or false when `url` is not the paused clip. */
+export function resumeAudio(url: string): boolean {
+  if (!el || currentUrl !== url || elUrl !== url || !el.paused || el.ended) return false;
+  void el.play().catch(() => undefined);
+  return true;
+}
+
+/** Pauses the current clip where it is (resumeAudio picks it up again). */
+export function pauseAudio() {
+  if (el && !el.paused) el.pause();
+}

@@ -48,14 +48,19 @@ export function ArtStage({ name, reserve, focus = 50, children }: { name: string
  * Where the rider stands in each vessel, in % of the sprite: the round character sits at (x, bottom),
  * and the part of the vessel below `front` is drawn again over it, so the rider is inside.
  */
-const RIDE = {
+export type Ride = { src: string; x: number; bottom: number; size: number; front: number; ratio: number };
+const RIDE: Record<'ship' | 'ufo', Ride> = {
   ship: { src: 'ship', x: 37, bottom: 52, size: 30, front: 50, ratio: 640 / 397 },
   ufo: { src: 'ufo', x: 50, bottom: 33, size: 36, front: 30, ratio: 640 / 460 },
-} as const;
+};
+
+/** The big DJ ships of the Mercury player (one look per person, chosen by `pickShip`). */
+export const BIG_SHIPS: Ride[] = [RIDE.ship];
+export const pickShip = (key: string) => BIG_SHIPS[[...key].reduce((n, c) => n + c.charCodeAt(0), 0) % BIG_SHIPS.length];
 
 /** The painted ship / UFO with someone aboard (their character picture, or their emoji). */
-export function Vessel({ kind, img, emoji }: { kind: 'ship' | 'ufo'; img?: string | null; emoji: string }) {
-  const r = RIDE[kind];
+export function Vessel({ kind, ride, img, emoji }: { kind?: 'ship' | 'ufo'; ride?: Ride; img?: string | null; emoji: string }) {
+  const r = ride ?? RIDE[kind ?? 'ship'];
   const sprite = `${ART_BASE}/${r.src}.webp`;
   return (
     <div className="relative w-full drop-shadow-[0_8px_12px_rgba(0,0,0,0.45)]" style={{ aspectRatio: `${r.ratio}` }}>

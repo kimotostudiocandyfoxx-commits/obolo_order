@@ -12,6 +12,7 @@ import { synth } from '@/lib/synth';
 import { ArtStage, Vessel } from '@/components/art/Stage';
 import { Backstage } from './Backstage';
 import { Frame } from './Frame';
+import { UfoPlayer, type CrewMember } from './UfoPlayer';
 import { LiveShoot } from './LiveMars';
 import { ShootChat } from './ShootChat';
 
@@ -41,7 +42,9 @@ type View =
   | { v: 'shoot' }
   | { v: 'studio'; who: 'me' | Creator }
   | { v: 'live-studio'; who: 'me' | Person }
-  | { v: 'play'; videos: Video[]; start: number; owner: string; creator?: Creator; person?: Person; back: View };
+  | { v: 'play'; crew: Crew[]; start: number; video: number; back: View };
+/** A UFO in the player: whose it is (for「スタジオへ」). */
+type Crew = CrewMember & { creator?: Creator; person?: Person };
 
 const hash = (t: string) => [...t].reduce((n, c) => n + c.charCodeAt(0), 0);
 /** A posted movie as the 星図 / studio show it. */
@@ -99,28 +102,16 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
   };
   const liveCount = CREATORS.filter((c) => visible(c) && c.live).length;
 
-  // live sky (painted by the Art workshop): you first, then the real UFOs, then samples on みんな
-  type Rider = { key: string; name: string; video?: Video; img?: string | null; emoji: string; mine?: boolean; onTap: () => void };
-  const riders: Rider[] = live
-    ? [
-        ...(myFlying.length
-          ? [{ key: 'me', name: myHandle, video: myFlying[0].video, img: me?.puniPic ?? me?.avatarUrl, emoji: neo?.emoji ?? '🦊', mine: true, onTap: () => play(myFlying.map((r) => r.video), myHandle) }]
-          : []),
-        ...realOthers.map((f) => {
-          const videos = f.posts.map(videoOf);
-          const name = f.author.displayName || f.author.handle;
-          return { key: f.author.id, name, video: videos[0], img: f.author.pic, emoji: neoForm(f.author.neoForm)?.emoji ?? '🛸', onTap: () => play(videos, name, undefined, 0, { userId: f.author.id, name }) };
-        }),
-        ...CREATORS.filter(visible).map((c) => ({
-          key: c.id,
-          name: c.handle,
-          video: c.flying[0],
-          img: SAMPLE_FACES.has(c.id) ? spriteUrl(`av-${c.id}`) : null,
-          emoji: c.flying[0]?.emoji ?? '🛸',
-          onTap: () => play(c.flying, c.handle, c),
-        })),
-      ].slice(0, UFO_SLOTS.length)
-    : [];
+  // the UFOs in the sky, in the player's order: you first, then real UFOs, then samples (みんな)
+  const crew: Crew[] = [
+    ...(myFlying.length ? [{ key: 'me', name: myHandle, isMe: true, videos: myFlying.map((r) => r.video), img: me?.puniPic ?? me?.avatarUrl, emoji: neo?.emoji ?? '🦊' }] : []),
+    ...realOthers.map((f) => {
+      const name = f.author.displayName || f.author.handle;
+      return { key: f.author.id, name, person: { userId: f.author.id, name }, videos: f.posts.map(videoOf), img: f.author.pic, emoji: neoForm(f.author.neoForm)?.emoji ?? '🛸' };
+    }),
+    ...CREATORS.filter(visible).map((c) => ({ key: c.id, name: c.handle, creator: c, videos: c.flying, img: SAMPLE_FACES.has(c.id) ? spriteUrl(`av-${c.id}`) : null, emoji: c.flying[0]?.emoji ?? '🛸' })),
+  ].filter((m) => m.videos.length > 0);
+  const riders = live ? crew.slice(0, UFO_SLOTS.length).map((m) => ({ ...m, video: m.videos[0], mine: m.isMe })) : [];
 
   const say = (t: string) => {
     setToast(t);
@@ -131,8 +122,16 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
     setView(next);
     if (next.v === 'studio' && next.who === 'me') ev.current?.onStudio?.();
   };
-  const play = (videos: Video[], owner: string, creator?: Creator, start = 0, person?: Person) =>
-    go({ v: 'play', videos, start, owner, creator, person, back: view.v === 'play' ? view.back : view });
+  const back = view.v === 'play' ? view.back : view;
+  /** from the sky: every UFO, starting at this one */
+  const playCrew = (key: string) => go({ v: 'play', crew, start: Math.max(0, crew.findIndex((m) => m.key === key)), video: 0, back });
+  /** from a studio / a preview: that person's movies */
+  const play = (videos: Video[], owner: string, creator?: Creator, start = 0, person?: Person) => {
+    const isMe = !creator && !person;
+    const img = creator ? (SAMPLE_FACES.has(creator.id) ? spriteUrl(`av-${creator.id}`) : null) : isMe ? (me?.puniPic ?? me?.avatarUrl) : null;
+    const emoji = creator ? (creator.flying[0]?.emoji ?? '🛸') : isMe ? (neo?.emoji ?? '🦊') : '🛸';
+    go({ v: 'play', crew: [{ key: creator?.id ?? person?.userId ?? 'me', name: owner, isMe, creator, person, videos, img, emoji }], start: 0, video: start, back });
+  };
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#140707] text-white">
@@ -165,7 +164,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                     <button
                       key={r.key}
                       onClick={() => {
-                        r.onTap();
+                        playCrew(r.key);
                         ev.current?.onUfo?.();
                       }}
                       className="absolute"
@@ -200,7 +199,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                     <button
                       key={c.id}
                       onClick={() => {
-                        play(c.flying, c.handle, c);
+                        playCrew(c.id);
                         ev.current?.onUfo?.();
                       }}
                       className="absolute transition-opacity duration-500"
@@ -243,7 +242,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                       />
                       <button
                         onClick={() => {
-                          play(videos, name, undefined, 0, { userId: f.author.id, name });
+                          playCrew(f.author.id);
                           ev.current?.onUfo?.();
                         }}
                         className="absolute flex items-center gap-[4%]"
@@ -266,7 +265,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                 {myFlying.length > 0 && (
                   <button
                     onClick={() => {
-                      play(myFlying.map((r) => r.video), myHandle);
+                      playCrew('me');
                       ev.current?.onUfo?.();
                     }}
                     className="absolute flex flex-col items-center"
@@ -346,12 +345,18 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
       )}
 
       {view.v === 'play' && (
-        <Player
-          key={`${view.owner}-${view.videos[0]?.id}-${view.start}`}
-          videos={view.videos}
+        <UfoPlayer
+          key={`${view.crew.map((m) => m.key).join()}-${view.start}-${view.video}`}
+          crew={view.crew}
           start={view.start}
-          owner={view.owner}
-          onStudio={view.creator ? () => go({ v: 'studio', who: view.creator! }) : view.person ? () => go({ v: 'live-studio', who: view.person! }) : undefined}
+          startVideo={view.video}
+          theme={theme}
+          onStudio={(m) => {
+            const c = m as Crew;
+            if (c.creator) go({ v: 'studio', who: c.creator });
+            else if (c.person) go({ v: 'live-studio', who: c.person });
+            else if (c.isMe) go(live ? { v: 'live-studio', who: 'me' } : { v: 'studio', who: 'me' });
+          }}
         />
       )}
 
@@ -409,99 +414,6 @@ function OwnUfo({ emoji, img }: { emoji: string; img?: string | null }) {
         ))}
         <ellipse cx="60" cy="58" rx="22" ry="4" fill="#9a7bff" opacity="0.6" />
       </svg>
-    </div>
-  );
-}
-
-function Player({ videos, start, owner, onStudio }: { videos: Video[]; start: number; owner: string; onStudio?: () => void }) {
-  const [i, setI] = useState(start);
-  const [t, setT] = useState(0);
-  const video = videos[((i % videos.length) + videos.length) % videos.length];
-  const live = video.kind === 'LIVE';
-  const real = !!video.url;
-  const [starred, setStarred] = useState<Record<string, boolean>>({});
-  const isStarred = starred[video.id] ?? !!video.starred;
-
-  useEffect(() => {
-    if (real) synth.stop();
-    else synth.play(video.bgm);
-    setT(0);
-    const id = setInterval(() => setT((v) => v + 1), 1000);
-    return () => clearInterval(id);
-  }, [video, real]);
-  // the storyboard: each scene gets an equal share of a short loop
-  const scene = video.scenes[Math.floor(t / 4) % video.scenes.length];
-  const pos = live ? 1 : (t % Math.min(video.seconds, 60)) / Math.min(video.seconds, 60);
-
-  return (
-    <div className="relative flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-2 px-4 pt-[calc(12px+env(safe-area-inset-top))]">
-        <p className="min-w-0 flex-1 truncate text-sm text-white/80">🎬 {owner}</p>
-        {onStudio && (
-          <button onClick={onStudio} className="rounded-full border border-amber-300/50 px-3 py-1 text-xs text-amber-100">
-            スタジオを見る
-          </button>
-        )}
-      </div>
-      <div className="flex min-h-0 flex-1 items-center justify-center p-3">
-        {/* real Mars movies are square (client decision 2026-10-07) */}
-        <div className={`relative w-full overflow-hidden rounded-2xl border border-amber-500/30 shadow-[0_20px_60px_rgba(0,0,0,0.6)] ${real ? 'max-w-[min(100%,calc(100svh-330px))]' : 'max-w-2xl'}`}>
-          <Frame video={video} playing className={real ? 'aspect-square w-full' : 'aspect-video w-full'} />
-          {!real && (
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
-              <p key={scene} className="animate-[fadeUp_0.6s_ease-out] text-center text-sm font-bold drop-shadow">{scene}</p>
-            </div>
-          )}
-          {live && <span className="absolute left-3 top-3 animate-pulse rounded bg-red-600 px-2 py-0.5 text-xs font-bold">● LIVE</span>}
-        </div>
-      </div>
-      <div className="px-6 pb-3">
-        <div className="flex items-center gap-2">
-          <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${KIND_COLOR[video.kind]}`}>{video.kind}</span>
-          <p className="min-w-0 flex-1 truncate text-lg font-black">{video.title}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <p className="min-w-0 flex-1 truncate text-xs text-white/55">{video.author}</p>
-          {video.postId && (
-            <button
-              onClick={() => {
-                const on = !isStarred;
-                setStarred((cur) => ({ ...cur, [video.id]: on }));
-                getApi()
-                  .starPlanetPost('mars', video.postId!, on)
-                  .catch(() => undefined);
-              }}
-              className={`rounded-full border px-3 py-1 text-sm ${isStarred ? 'border-amber-300 text-amber-300' : 'border-white/30 text-white/70'}`}
-              aria-label="star"
-            >
-              {isStarred ? '★' : '☆'}
-            </button>
-          )}
-        </div>
-        {!real && (
-        <div className="mt-2 flex items-center gap-3 text-xs text-white/70">
-          <span className="w-12">{live ? 'LIVE' : fmtLen(t % Math.min(video.seconds, 60))}</span>
-          <div className="relative h-1.5 flex-1 rounded-full bg-white/15">
-            <div className={`absolute inset-y-0 left-0 rounded-full ${live ? 'bg-red-500' : 'bg-gradient-to-r from-orange-400 to-fuchsia-500'}`} style={{ width: `${pos * 100}%` }} />
-          </div>
-          <span className="w-12 text-right">{live ? '' : fmtLen(video.seconds)}</span>
-        </div>
-        )}
-        {videos.length > 1 && (
-          <div className="mt-2 flex justify-between text-xs">
-            <button onClick={() => setI(i - 1)} className="rounded-full border border-white/20 px-3 py-1">
-              ← 前の映像
-            </button>
-            <span className="text-white/50">
-              {((i % videos.length) + videos.length) % videos.length + 1} / {videos.length}
-            </span>
-            <button onClick={() => setI(i + 1)} className="rounded-full border border-white/20 px-3 py-1">
-              次の映像 →
-            </button>
-          </div>
-        )}
-        {!real && <p className="mt-1 text-center text-[10px] text-white/35">（サンプルの映像：サムネイル＋シーンの字幕＋BGM）</p>}
-      </div>
     </div>
   );
 }

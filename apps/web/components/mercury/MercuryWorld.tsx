@@ -8,10 +8,10 @@ import { useAuth } from '@/lib/auth';
 import { fmt, P, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
 import { ArtStage, Vessel } from '@/components/art/Stage';
 import { ComposeChat } from './ComposeChat';
+import { ShipPlayer, type Flyer } from './ShipPlayer';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
-import { stopAudio, toggleAudio } from '@/lib/audio';
 
 /**
  * Mercury — the planet of music (client design 2026-10-05 v2, docs/mercury.md).
@@ -35,7 +35,9 @@ export interface MercuryEvents {
 }
 
 type Who = 'me' | Sailor | { userId: string; name: string };
-type View = { v: 'sea' } | { v: 'compose' } | { v: 'island'; who: Who } | { v: 'play'; title: string; songs: Song[]; start: number; back: View; owner?: Who };
+type View = { v: 'sea' } | { v: 'compose' } | { v: 'island'; who: Who } | { v: 'play'; flyers: SeaFlyer[]; start: number; song: number; back: View };
+/** A ship in the player: whose it is (for「島へ」) and what it says on the sea. */
+type SeaFlyer = Flyer & { owner: Who; title: string; sub?: string };
 
 /** A posted song as the sea / island show it (a record with an emoji until songs get covers). */
 const RECORD_EMOJI = ['🎵', '🎶', '🎤', '🎸', '🎹', '🥁', '🎧', '🎺'];
@@ -90,32 +92,31 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
   };
   const sailingCount = SAILORS.filter(visible).length + realOthers.length + (mySailing.length ? 1 : 0);
 
-  // live sea (painted by the Art workshop): you first, then the real ships, then samples on みんな
-  type Rider = { key: string; name: string; title: string; sub?: string; img?: string | null; emoji: string; mine?: boolean; onTap: () => void };
-  const riders: Rider[] = live
-    ? [
-        ...(mySailing.length
-          ? [
-              {
-                key: 'me',
-                name: myHandle,
-                title: mySailing[0].song.title,
-                sub: hoursSince(mySailing[0].at) ? `${hoursSince(mySailing[0].at)}時間前` : 'たった今',
-                img: me?.puniPic ?? me?.avatarUrl,
-                emoji: neo?.emoji ?? '🦊',
-                mine: true,
-                onTap: () => play(`@${myHandle} の船`, mySailing.map((r) => r.song)),
-              },
-            ]
-          : []),
-        ...realOthers.map((f) => {
-          const songs = f.posts.map(songOf);
-          const name = f.author.displayName || f.author.handle;
-          return { key: f.author.id, name, title: songs[0]?.title ?? '', img: f.author.pic, emoji: neoForm(f.author.neoForm)?.emoji ?? '⛵', onTap: () => play(`@${name} の船`, songs, 0, { userId: f.author.id, name }) };
-        }),
-        ...SAILORS.filter(visible).map((s) => ({ key: s.id, name: s.handle, title: s.sailing[0]?.title ?? '', img: spriteUrl(s.avatar), emoji: '⛵', onTap: () => play(`@${s.handle} の船`, s.sailing) })),
-      ].slice(0, SEA_SLOTS.length)
-    : [];
+  // the ships on the sea, in the player's order: you first, then real ships, then samples (みんな)
+  const fleet: SeaFlyer[] = [
+    ...(mySailing.length
+      ? [
+          {
+            key: 'me',
+            name: myHandle,
+            isMe: true,
+            owner: 'me' as Who,
+            songs: mySailing.map((r) => r.song),
+            title: mySailing[0].song.title,
+            sub: hoursSince(mySailing[0].at) ? `${hoursSince(mySailing[0].at)}時間前` : 'たった今',
+            img: me?.puniPic ?? me?.avatarUrl,
+            emoji: neo?.emoji ?? '🦊',
+          },
+        ]
+      : []),
+    ...realOthers.map((f) => {
+      const songs = f.posts.map(songOf);
+      const name = f.author.displayName || f.author.handle;
+      return { key: f.author.id, name, owner: { userId: f.author.id, name } as Who, songs, title: songs[0]?.title ?? '', img: f.author.pic, emoji: neoForm(f.author.neoForm)?.emoji ?? '⛵' };
+    }),
+    ...SAILORS.filter(visible).map((s) => ({ key: s.id, name: s.handle, owner: s as Who, songs: s.sailing, title: s.sailing[0]?.title ?? '', img: spriteUrl(s.avatar), emoji: '⛵' })),
+  ].filter((f) => f.songs.length > 0);
+  const riders = live ? fleet.slice(0, SEA_SLOTS.length) : [];
 
   const say = (t: string) => {
     setToast(t);
@@ -126,7 +127,16 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
     setView(next);
     if (next.v === 'island' && next.who === 'me') ev.current?.onIsland?.();
   };
-  const play = (title: string, songs: Song[], start = 0, owner?: Who) => go({ v: 'play', title, songs, start, back: view.v === 'play' ? view.back : view, owner });
+  const back = view.v === 'play' ? view.back : view;
+  /** from the sea: every ship, starting at this one */
+  const playFleet = (key: string) => go({ v: 'play', flyers: fleet, start: Math.max(0, fleet.findIndex((f) => f.key === key)), song: 0, back });
+  /** from an island: that person's songs */
+  const play = (who: Who, songs: Song[], start = 0, img?: string | null) => {
+    const name = who === 'me' ? myHandle : 'userId' in who ? who.name : who.handle;
+    const pic = who === 'me' ? (me?.puniPic ?? me?.avatarUrl) : 'userId' in who ? img : spriteUrl(who.avatar);
+    const key = who === 'me' ? 'me' : 'userId' in who ? who.userId : who.id;
+    go({ v: 'play', flyers: [{ key, name, isMe: who === 'me', owner: who, songs, title: songs[0]?.title ?? '', img: pic, emoji: who === 'me' ? (neo?.emoji ?? '🦊') : '⛵' }], start: 0, song: start, back });
+  };
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#06123a] text-white">
@@ -145,7 +155,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                     <button
                       key={r.key}
                       onClick={() => {
-                        r.onTap();
+                        playFleet(r.key);
                         ev.current?.onShip?.();
                       }}
                       className="absolute flex flex-col items-center"
@@ -154,7 +164,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                     >
                       <span className="flex w-full flex-col items-center" style={{ animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}>
                         <span className="mb-[3%] max-w-[140%] truncate rounded-xl border border-amber-300/70 bg-[#0d1838]/85 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight shadow-lg backdrop-blur-sm">
-                          {r.mine ? '新曲を出航！' : `@${r.name}`}「{r.title}」
+                          {r.isMe ? '新曲を出航！' : `@${r.name}`}「{r.title}」
                           {r.sub && <span className="block text-white/60">{r.sub}</span>}
                         </span>
                         <Vessel kind="ship" img={r.img} emoji={r.emoji} />
@@ -171,7 +181,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                   <button
                     key={s.id}
                     onClick={() => {
-                      play(`@${s.handle} の船`, s.sailing);
+                      playFleet(s.id);
                       ev.current?.onShip?.();
                     }}
                     className="absolute transition-opacity duration-500"
@@ -208,7 +218,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                       <div className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md" style={{ left: `${b.left + 2}%`, top: `${b.top + 2}%`, width: `${b.width - 4}%`, height: `${b.height - 4}%` }} />
                       <button
                         onClick={() => {
-                          play(`@${name} の船`, songs, 0, { userId: f.author.id, name });
+                          playFleet(f.author.id);
                           ev.current?.onShip?.();
                         }}
                         className="absolute flex flex-col items-center"
@@ -226,7 +236,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                 {mySailing.length > 0 && (
                   <button
                     onClick={() => {
-                      play(`@${myHandle} の船`, mySailing.map((r) => r.song));
+                      playFleet('me');
                       ev.current?.onShip?.();
                     }}
                     className="absolute flex flex-col items-center"
@@ -253,7 +263,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
           myId={me?.id}
           myName={myHandle}
           refreshKey={skyKey}
-          onPlay={(title, songs, i) => play(title, songs, i)}
+          onPlay={(songs, i, pic) => play(view.who as Who, songs, i, pic)}
           onSoil={() => ev.current?.onSoil?.()}
           onReleased={() => {
             setSkyKey(Date.now());
@@ -269,9 +279,10 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
           isMe={view.who === 'me'}
           records={view.who === 'me' ? myRecords : (view.who as Sailor).records}
           sailing={view.who === 'me' ? mySailing.map((r) => r.song) : (view.who as Sailor).sailing}
-          chests={view.who === 'me' ? mine.chests : (view.who as Sailor).chests}
+          pic={view.who === 'me' ? (me?.puniPic ?? me?.avatarUrl) : spriteUrl((view.who as Sailor).avatar)}
+          emoji={view.who === 'me' ? (neo?.emoji ?? '🦊') : '⛵'}
           soil={view.who === 'me' ? mine.soil : []}
-          onPlay={(songs, i) => play(view.who === 'me' ? '自分の島' : `@${(view.who as Sailor).handle} の島`, songs, i)}
+          onPlay={(songs, i) => play(view.who as Who, songs, i)}
           onSoil={() => ev.current?.onSoil?.()}
           onRelease={(id) => {
             mine.release(id);
@@ -285,11 +296,11 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
       {view.v === 'compose' && <ComposeChat onBury={(song) => (live ? setSkyKey(Date.now()) : mine.bury(song))} onOpenIsland={() => go({ v: 'island', who: 'me' })} />}
 
       {view.v === 'play' && (
-        <Player
-          key={`${view.title}-${view.start}-${view.songs[0]?.id}`}
-          title={view.title}
-          songs={view.songs}
+        <ShipPlayer
+          key={`${view.flyers.map((f) => f.key).join()}-${view.start}-${view.song}`}
+          flyers={view.flyers}
           start={view.start}
+          startSong={view.song}
           stars={mine.stars}
           onStar={(id, tier) => {
             mine.star(id, tier);
@@ -300,8 +311,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                 .catch(() => undefined);
             ev.current?.onStar?.();
           }}
-          owner={view.owner && view.owner !== 'me' && typeof view.owner === 'object' && 'userId' in view.owner ? view.owner.name : undefined}
-          onOwner={view.owner && typeof view.owner === 'object' && 'userId' in view.owner ? () => go({ v: 'island', who: view.owner! }) : undefined}
+          onOwner={(f) => go({ v: 'island', who: (f as SeaFlyer).owner })}
           onSwipe={() => ev.current?.onSwipe?.()}
         />
       )}
@@ -399,13 +409,71 @@ function Record({ song, spinning, className = '' }: { song: Song; spinning?: boo
   );
 }
 
+/**
+ * The island painting: where the owner's character stands (the DJ stage), in % of the picture.
+ * PLACEHOLDER (P-ART-1): until the Art workshop paints an empty island (Gemini credits ran out on
+ * 2026-10-07), the client's island art is used and the owner's character covers the painted DJ.
+ */
+const ISLAND = { src: stillUrl('mercury-island'), ratio: 1254 / 620, rider: { x: 51.2, y: 51.5, size: 17 } };
+/** The island is shown 4:3 (cropped at the sides): where the rider lands on that stage. */
+const ISLAND_STAGE = 4 / 3;
+const islandRider = (() => {
+  const k = ISLAND.ratio / ISLAND_STAGE; // how much wider the painting is than the stage
+  return { x: 50 + (ISLAND.rider.x - 50) * k, y: ISLAND.rider.y, size: ISLAND.rider.size * k };
+})();
+
+/** The island's wooden pier (a curved boardwalk with lanterns), drawn under the records. */
+function Pier() {
+  return (
+    <svg viewBox="0 0 1000 300" preserveAspectRatio="none" className="pointer-events-none absolute inset-x-0 bottom-0 h-[78%] w-full" aria-hidden>
+      <defs>
+        <pattern id="planks" width="34" height="300" patternUnits="userSpaceOnUse">
+          <rect width="34" height="300" fill="#7a4d26" />
+          <rect x="31" width="3" height="300" fill="#4a2c14" />
+          <rect x="6" y="40" width="14" height="2" fill="#8f5e31" opacity="0.6" />
+        </pattern>
+        <linearGradient id="pier-shade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffd9a0" stopOpacity="0.25" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.45" />
+        </linearGradient>
+        <radialGradient id="lamp">
+          <stop offset="0" stopColor="#fff3c4" />
+          <stop offset="0.35" stopColor="#ffc865" stopOpacity="0.9" />
+          <stop offset="1" stopColor="#ff9a2e" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* posts in the water */}
+      {[60, 200, 350, 500, 650, 800, 940].map((x) => (
+        <rect key={x} x={x - 8} y={x === 500 ? 250 : 215 + Math.abs(500 - x) / 20} width="16" height="70" fill="#2b1a0c" />
+      ))}
+      <path d="M0 110 Q500 30 1000 110 L1000 210 Q500 140 0 210 Z" fill="url(#planks)" />
+      <path d="M0 110 Q500 30 1000 110 L1000 210 Q500 140 0 210 Z" fill="url(#pier-shade)" />
+      <path d="M0 110 Q500 30 1000 110" fill="none" stroke="#a8743d" strokeWidth="7" />
+      <path d="M0 210 Q500 140 1000 210" fill="none" stroke="#3a2210" strokeWidth="9" />
+      {/* lanterns on the front edge */}
+      {[90, 270, 450, 630, 810, 960].map((x) => {
+        const y = 210 - 70 * (1 - Math.pow((x - 500) / 500, 2));
+        return (
+          <g key={x}>
+            <circle cx={x} cy={y - 18} r="34" fill="url(#lamp)" />
+            <rect x={x - 6} y={y - 28} width="12" height="18" rx="3" fill="#ffe7a8" />
+            <rect x={x - 3} y={y - 10} width="6" height="14" fill="#2b1a0c" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function IslandView({
   title,
   isMe,
+  pic,
+  emoji,
   records,
   sailing,
-  chests,
   soil,
+  action,
   onPlay,
   onSoil,
   onRelease,
@@ -413,10 +481,13 @@ function IslandView({
 }: {
   title: string;
   isMe: boolean;
+  pic?: string | null;
+  emoji: string;
   records: Song[];
   sailing: Song[];
-  chests: [number, number, number];
   soil: Song[];
+  /** top-right button (follow) */
+  action?: ReactNode;
   onPlay: (songs: Song[], i: number) => void;
   onSoil: () => void;
   onRelease: (id: string) => void;
@@ -424,16 +495,62 @@ function IslandView({
 }) {
   const [dig, setDig] = useState(false);
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto pb-6">
-      <div className="relative mx-auto max-w-2xl">
+    <div className="relative min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-[#0b2c7a] via-[#0a2266] to-[#06123a] pb-6">
+      <div className="relative mx-auto max-w-3xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={stillUrl('mercury-island')} alt="" className="w-full select-none" draggable={false} />
-        <div className="absolute inset-x-3 top-[calc(8px+env(safe-area-inset-top))] flex items-center justify-between">
-          <span className="rounded-full border border-cyan-200/40 bg-[#0a1430]/85 px-4 py-1.5 text-sm font-black tracking-wider">♫ {title.toUpperCase()} ISLAND</span>
-          <button onClick={() => say('島を飾るのは準備中です')} className="rounded-full border border-amber-300/60 bg-[#0a1430]/85 px-4 py-1.5 text-sm text-amber-100">
-            🏝 島を飾る
-          </button>
+        <img src={ISLAND.src} alt="" className="w-full select-none object-cover" style={{ aspectRatio: `${ISLAND_STAGE}` }} draggable={false} />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[16%] bg-gradient-to-b from-transparent to-[#0b2c7a]" />
+        {/* the owner is the island's DJ */}
+        <span
+          className="absolute flex aspect-square -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border-[3px] border-white/85 bg-[#1b1f3a] shadow-[0_0_28px_rgba(255,170,90,0.75)]"
+          style={{ left: `${islandRider.x}%`, top: `${islandRider.y}%`, width: `${islandRider.size}%`, animation: 'ufo 3s ease-in-out infinite' }}
+        >
+          {pic ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={pic} alt="" className="h-full w-full object-cover" draggable={false} />
+          ) : (
+            <span className="text-[clamp(28px,7vw,64px)] leading-none">{emoji}</span>
+          )}
+        </span>
+        <div className="absolute inset-x-3 top-[calc(8px+env(safe-area-inset-top))] flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate rounded-full border-2 border-fuchsia-300/60 bg-[#0a1430]/85 px-4 py-1.5 text-[clamp(14px,3vw,22px)] font-black tracking-wider shadow-[0_0_16px_rgba(240,120,255,0.4)]">
+              {title.toUpperCase()} ISLAND
+            </p>
+          </div>
+          {action ?? (
+            <button onClick={() => say('島を飾るのは準備中です')} className="shrink-0 rounded-full border border-amber-300/60 bg-[#0a1430]/85 px-4 py-1.5 text-sm text-amber-100">
+              🏝 島を飾る
+            </button>
+          )}
         </div>
+      </div>
+
+      {/* the pier: the records of this island (no play counts, no resident counts — client rule) */}
+      <div className="relative mx-auto -mt-[10%] max-w-3xl">
+        <Pier />
+        {records.length ? (
+          <div className="relative flex snap-x snap-mandatory gap-4 overflow-x-auto px-[8%] pb-10 pt-2 [scrollbar-width:none]">
+            {records.map((r, i) => (
+              <button key={r.id} onClick={() => onPlay(records, i)} className="w-[min(30%,150px)] shrink-0 snap-center text-center">
+                <Record song={r} />
+                <span className="mx-auto -mt-1 block h-2 w-[70%] rounded-full bg-cyan-300/80 shadow-[0_0_14px_4px_rgba(80,220,255,0.6)]" />
+                <span className="mt-2 block truncate rounded-md bg-black/45 px-1 py-0.5 text-[clamp(11px,2.2vw,14px)] font-bold">{r.title}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="relative px-6 pb-12 pt-10 text-center text-sm text-white/75">{isMe ? '出航した曲は、88時間の航海を終えると、この桟橋に飾られます。' : 'まだレコードはありません'}</p>
+        )}
+        {records.length > 3 && <p className="relative -mt-8 pb-3 text-center text-[11px] text-white/65">⟵ 左右にスワイプして曲をチェック ⟶</p>}
+      </div>
+
+      <div className="mx-auto mt-2 flex max-w-2xl flex-wrap justify-center gap-2 px-4">
+        {sailing.length > 0 && (
+          <button onClick={() => onPlay(sailing, 0)} className="rounded-full border border-cyan-200/40 bg-[#0a1430]/80 px-4 py-2 text-xs text-cyan-100">
+            🚢 いま航海中の曲を聴く
+          </button>
+        )}
         {isMe && (
           // the soil: demos are buried here
           <button
@@ -441,48 +558,11 @@ function IslandView({
               setDig(true);
               onSoil();
             }}
-            className="absolute left-1/2 top-[80%] -translate-x-1/2 rounded-full border border-amber-200/60 bg-[#3a2410]/90 px-4 py-1.5 text-sm shadow-lg"
+            className="rounded-full border border-amber-200/60 bg-[#3a2410]/90 px-4 py-2 text-xs"
           >
             ⛏ 土の中の曲
           </button>
         )}
-      </div>
-
-      <div className="mx-auto max-w-2xl px-4">
-        {/* no counts on anyone's island (client rule 2026-10-07) */}
-        {sailing.length > 0 && (
-          <button onClick={() => onPlay(sailing, 0)} className="mx-auto mt-1 block rounded-full border border-cyan-200/30 bg-[#0a1430]/80 px-4 py-1.5 text-xs text-cyan-200/90">
-            🚢 いま航海中の曲を聴く（88時間後に島に戻ってきます）
-          </button>
-        )}
-
-        <h3 className="mb-2 mt-4 text-xs tracking-widest text-white/60">島に飾られたレコード</h3>
-        {records.length ? (
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {records.map((r, i) => (
-              <button key={r.id} onClick={() => onPlay(records, i)} className="w-24 shrink-0 text-center">
-                <Record song={r} />
-                <p className="mt-1 truncate text-[11px] text-white/80">{r.title}</p>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-white/45">{isMe ? '出航した曲は、88時間の航海を終えると、ここに飾られます。' : 'まだレコードはありません'}</p>
-        )}
-
-        <div className="mt-5 grid grid-cols-3 gap-3">
-          {chests.map((c, i) => (
-            <button key={i} onClick={() => say(`★${i + 1}の宝箱：星${i + 1}をつけた曲が入っています`)} className="flex flex-col items-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={spriteUrl(`chest-${i + 1}`)} alt="" className="w-full max-w-[150px]" />
-              <span className="-mt-2 rounded-xl border border-amber-300/50 bg-[#0a1430]/90 px-3 py-1 text-center text-xs">
-                ★{i + 1}の宝箱
-                <br />
-                <b className="text-base">{c}</b> 枚
-              </span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {dig && (
@@ -520,136 +600,6 @@ function IslandView({
   );
 }
 
-function Player({
-  title,
-  songs,
-  start,
-  stars,
-  onStar,
-  onSwipe,
-  owner,
-  onOwner,
-}: {
-  title: string;
-  songs: Song[];
-  start: number;
-  stars: Record<string, number>;
-  onStar: (id: string, tier: 0 | 1 | 2 | 3) => void;
-  onSwipe: () => void;
-  owner?: string;
-  onOwner?: () => void;
-}) {
-  const [i, setI] = useState(start);
-  const [t, setT] = useState(0);
-  const at = (k: number) => songs[((k % songs.length) + songs.length) % songs.length];
-  const song = at(i);
-  const drag = useRef<{ x: number; dx: number } | null>(null);
-  const [dx, setDx] = useState(0);
-
-  useEffect(() => {
-    if (song.audioUrl) {
-      synth.stop();
-      void toggleAudio(song.audioUrl).catch(() => undefined);
-    } else synth.play(song.preset);
-    setT(0);
-    const id = setInterval(() => setT((v) => (v + 1 >= song.seconds ? 0 : v + 1)), 1000);
-    return () => {
-      clearInterval(id);
-      if (song.audioUrl) stopAudio();
-    };
-  }, [song]);
-
-  const go = (d: number) => {
-    setI((v) => v + d);
-    onSwipe();
-  };
-  const many = songs.length > 1;
-
-  return (
-    <div className="relative flex min-h-0 flex-1 flex-col">
-      <div className="pointer-events-none absolute inset-0 opacity-40 blur-2xl">
-        {song.cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={spriteUrl(song.cover)} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <Artwork hue={song.hue ?? 220} emoji="" className="h-full w-full" />
-        )}
-      </div>
-      <div className="relative px-4 pt-[calc(12px+env(safe-area-inset-top))] text-center">
-        <p className="text-sm tracking-[0.2em] text-white/75">⚓ {title}</p>
-        <p className="text-[11px] text-white/45">88時間以内の曲</p>
-        {onOwner && (
-          <button onClick={onOwner} className="mx-auto mt-1 block rounded-full border border-white/20 bg-black/30 px-3 py-1 text-xs text-white/85">
-            🏝 @{owner} の島へ ›
-          </button>
-        )}
-      </div>
-
-      <div
-        className="relative flex min-h-0 flex-1 touch-pan-y items-center justify-center overflow-hidden"
-        onPointerDown={(e) => (drag.current = { x: e.clientX, dx: 0 })}
-        onPointerMove={(e) => {
-          if (!drag.current) return;
-          drag.current.dx = e.clientX - drag.current.x;
-          setDx(drag.current.dx);
-        }}
-        onPointerUp={() => {
-          const d = drag.current?.dx ?? 0;
-          drag.current = null;
-          setDx(0);
-          if (Math.abs(d) > 50) go(d < 0 ? 1 : -1);
-        }}
-        onPointerCancel={() => {
-          drag.current = null;
-          setDx(0);
-        }}
-      >
-        {many && (
-          <button onClick={() => go(-1)} className="absolute left-0 top-1/2 w-[22%] -translate-x-[55%] -translate-y-1/2 opacity-70" aria-label="前の曲">
-            <Record song={at(i - 1)} />
-          </button>
-        )}
-        <div className="w-[min(64%,calc(100svh-420px))]" style={{ transform: `translateX(${dx}px) rotate(${dx / 20}deg)` }}>
-          <Record song={song} spinning />
-        </div>
-        {many && (
-          <button onClick={() => go(1)} className="absolute right-0 top-1/2 w-[22%] -translate-y-1/2 translate-x-[55%] opacity-70" aria-label="次の曲">
-            <Record song={at(i + 1)} />
-          </button>
-        )}
-      </div>
-
-      <div className="relative px-6 pb-3 text-center">
-        <p className="text-2xl font-black tracking-wide drop-shadow">{song.title}</p>
-        <p className="text-sm font-bold text-cyan-300">{song.artist}</p>
-        <div className="mx-auto mt-2 flex max-w-md items-center gap-3 text-xs text-white/70">
-          <span className="w-9 text-left">{fmt(t)}</span>
-          <div className="relative h-1.5 flex-1 rounded-full bg-white/15">
-            <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400" style={{ width: `${(t / song.seconds) * 100}%` }} />
-          </div>
-          <span className="w-9 text-right">{fmt(song.seconds)}</span>
-        </div>
-        <div className="mt-3 flex justify-center gap-4">
-          {([1, 2, 3] as const).map((n) => {
-            const on = (stars[song.id] ?? 0) >= n;
-            return (
-              <button
-                key={n}
-                onClick={() => onStar(song.id, stars[song.id] === n ? ((n - 1) as 0 | 1 | 2) : n)}
-                className={`flex h-12 w-12 items-center justify-center rounded-full border text-xl ${on ? 'border-amber-300 text-amber-300 shadow-[0_0_16px_rgba(255,200,80,0.6)]' : 'border-white/40 text-white/70'}`}
-                aria-label={`星${n}`}
-              >
-                {on ? '★' : '☆'}
-              </button>
-            );
-          })}
-        </div>
-        {many && <p className="mt-1 text-[10px] text-white/40">← スワイプで次の曲 →</p>}
-      </div>
-    </div>
-  );
-}
-
 /** A real island (live): records = songs back from 88 hours at sea; the soil = your saved songs. */
 function LiveIsland({
   who,
@@ -665,7 +615,7 @@ function LiveIsland({
   myId?: string;
   myName: string;
   refreshKey: number;
-  onPlay: (title: string, songs: Song[], i: number) => void;
+  onPlay: (songs: Song[], i: number, pic?: string | null) => void;
   onSoil: () => void;
   onReleased: () => void;
   say: (t: string) => void;
@@ -706,9 +656,26 @@ function LiveIsland({
         isMe={isMe}
         records={(profile?.works ?? []).map(songOf)}
         sailing={(profile?.flying ?? []).map(songOf)}
-        chests={[0, 0, 0]}
+        pic={profile?.author.pic}
+        emoji={neoForm(profile?.author.neoForm)?.emoji ?? '⛵'}
+        action={
+          !isMe && id ? (
+            <button
+              onClick={() => {
+                const on = !following;
+                setFollowing(on);
+                getApi()
+                  .followSaturnUser(id, on)
+                  .catch(() => undefined);
+              }}
+              className={`shrink-0 rounded-full border-2 px-4 py-1.5 text-sm font-bold ${following ? 'border-white/30 bg-[#0a1430]/85' : 'border-amber-300/80 bg-[#0a1430]/85 text-amber-200'}`}
+            >
+              {following ? 'フォロー中' : '＋ フォロー'}
+            </button>
+          ) : undefined
+        }
         soil={soil}
-        onPlay={(songs, i) => onPlay(isMe ? '自分の島' : `@${name} の島`, songs, i)}
+        onPlay={(songs, i) => onPlay(songs, i, profile?.author.pic)}
         onSoil={onSoil}
         onRelease={(songId) => {
           getApi()
@@ -721,20 +688,6 @@ function LiveIsland({
         }}
         say={say}
       />
-      {!isMe && id && (
-        <button
-          onClick={() => {
-            const on = !following;
-            setFollowing(on);
-            getApi()
-              .followSaturnUser(id, on)
-              .catch(() => undefined);
-          }}
-          className={`absolute right-3 top-[calc(52px+env(safe-area-inset-top))] rounded-full px-4 py-1.5 text-sm ${following ? 'border border-white/30 bg-[#0a1430]/85' : 'bg-violet-600'}`}
-        >
-          {following ? 'フォロー中' : 'フォロー'}
-        </button>
-      )}
     </div>
   );
 }
