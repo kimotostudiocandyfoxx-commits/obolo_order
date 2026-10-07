@@ -15,6 +15,9 @@ export interface SingSong {
   genre: string;
   mood: string;
   bpm: number;
+  /** the instrumental's key (0 = C) and scale — sent to Fish so the vocal matches */
+  keyRoot?: number;
+  scale?: 'major' | 'minor';
   sections: { name: SectionName; lines: { text: string }[] }[];
 }
 
@@ -23,7 +26,7 @@ export function singDirectionSystem(song: SingSong): string {
   const lyrics = song.sections.map((s) => `[${s.name}]\n${s.lines.map((l) => l.text).join('\n')}`).join('\n');
   return `SING_DIRECTION
 あなたはボーカルディレクター。下の日本語の歌を AI 歌手（Fish Audio S2.1）が歌うときの指示を決める。
-曲名: ${song.title} / ジャンル: ${song.genre} / 気分: ${song.mood || 'おまかせ'} / BPM: ${song.bpm}
+曲名: ${song.title} / ジャンル: ${song.genre} / 気分: ${song.mood || 'おまかせ'} / BPM: ${song.bpm}${song.keyRoot !== undefined && song.scale ? ` / キー: ${KEY_NAMES[song.keyRoot % 12]} ${song.scale}（伴奏と同じ。キーはこちらで指定するので、pitch_up / pitch_down は曲の中での上げ下げだけに使う）` : ''}
 歌詞:
 ${lyrics}
 ルール:
@@ -88,13 +91,23 @@ export function parseSingDirection(raw: string, song: Pick<SingSong, 'genre' | '
 }
 
 const tagText = (ts: string[]) => ts.map((t) => `[${t}]`).join('');
+const KEY_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 /**
- * The text Fish sings: "[singing][bright]" first, then each section with its tags, one lyric line
- * per line, [breath] after every n lines.
+ * The instrumental's key and tempo as natural-language tags (Fish S2.1 reads free-form tags), so
+ * the vocal is asked to sit in the same key: "[key: C major][tempo: 120 BPM]".
  */
-export function singText(song: Pick<SingSong, 'sections'>, d: SingDirection): string {
-  const out = [`[singing]${tagText(d.style)}`];
+export function keyTags(o: { keyRoot: number; scale: 'major' | 'minor'; bpm: number }): string {
+  return `[key: ${KEY_NAMES[((o.keyRoot % 12) + 12) % 12]} ${o.scale}][tempo: ${Math.round(o.bpm)} BPM]`;
+}
+
+/**
+ * The text Fish sings: "[singing]", the instrumental's key / tempo, the style tags, then each
+ * section with its tags, one lyric line per line, [breath] after every n lines.
+ */
+export function singText(song: Pick<SingSong, 'sections'> & Partial<Pick<SingSong, 'keyRoot' | 'scale' | 'bpm'>>, d: SingDirection): string {
+  const key = song.keyRoot !== undefined && song.scale && song.bpm ? keyTags({ keyRoot: song.keyRoot, scale: song.scale, bpm: song.bpm }) : '';
+  const out = [`[singing]${key}${tagText(d.style)}`];
   let n = 0;
   for (const s of song.sections) {
     const t = tagText(d.sections.find((x) => x.name === s.name)?.tags ?? []);

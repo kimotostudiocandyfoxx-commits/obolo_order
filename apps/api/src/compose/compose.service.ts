@@ -67,7 +67,7 @@ export class ComposeService {
     const instrumental = await this.media.audioByUrl(userId, body.instrumentalUrl);
     if (!instrumental) throw apiError(HttpStatus.NOT_FOUND, 'INSTRUMENTAL_NOT_FOUND', 'Make the instrumental first');
 
-    const song = { title: body.title, genre: body.genre, mood: body.mood, bpm: body.bpm, sections: body.sections };
+    const song = { title: body.title, genre: body.genre, mood: body.mood, bpm: body.bpm, keyRoot: body.keyRoot, scale: body.scale, sections: body.sections };
     let raw = '';
     try {
       raw = await this.llm.chat({ system: singDirectionSystem(song), history: [{ role: 'user', text: '歌い方を決めて' }], json: true, temperature: 0.6, maxOutputTokens: 400 });
