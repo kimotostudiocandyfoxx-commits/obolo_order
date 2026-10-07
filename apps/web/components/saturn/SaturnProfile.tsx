@@ -8,7 +8,6 @@ import { useAuth } from '@/lib/auth';
 import { residentProfile, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { PuniAvatar } from '@/components/puni/PuniAvatar';
 import { PuniPicMaker } from '@/components/puni/PuniPicMaker';
-import { PuniWardrobe } from '@/components/puni/PuniWardrobe';
 import { hueOf } from './BallAvatar';
 
 /**
@@ -36,7 +35,6 @@ export function SaturnProfile({
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState('');
-  const [wardrobe, setWardrobe] = useState(false);
   const [maker, setMaker] = useState(false);
   const [bounce, setBounce] = useState<number>();
 
@@ -150,14 +148,9 @@ export function SaturnProfile({
             </div>
 
             {profile.isMe && !editing && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button onClick={() => setMaker(true)} className="rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow">
-                  🎨 AIで絵のキャラ
-                </button>
-                <button onClick={() => setWardrobe(true)} className="rounded-full border-2 border-violet-200 py-2.5 text-sm font-black text-violet-600">
-                  🧩 パーツで着せ替え
-                </button>
-              </div>
+              <button onClick={() => setMaker(true)} className="mt-3 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow">
+                🎨 AIで絵のキャラを作る
+              </button>
             )}
             {profile.isMe ? (
               !editing && (
@@ -219,17 +212,6 @@ export function SaturnProfile({
           onSaved={(pic) => {
             setProfile((p) => (p ? { ...p, user: { ...p.user, pic } } : p));
             setMaker(false);
-            setBounce(Date.now());
-          }}
-        />
-      )}
-      {wardrobe && profile && (
-        <PuniWardrobe
-          start={profile.user.look ?? null}
-          onClose={() => setWardrobe(false)}
-          onSaved={(look) => {
-            setProfile((p) => (p ? { ...p, user: { ...p.user, look } } : p));
-            setWardrobe(false);
             setBounce(Date.now());
           }}
         />

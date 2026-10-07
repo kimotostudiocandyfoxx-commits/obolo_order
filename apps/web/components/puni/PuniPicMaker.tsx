@@ -155,7 +155,7 @@ export function PuniPicMaker({ onClose, onSaved }: { onClose: () => void; onSave
         </div>
         {me?.puniPic && (
           <button onClick={() => void save(null)} disabled={!!busy} className="mt-2 w-full text-center text-[11px] font-bold text-slate-400">
-            絵のキャラをやめる（パーツの姿にもどす）
+            絵のキャラをやめる（シンプルな丸にもどす）
           </button>
         )}
       </div>
