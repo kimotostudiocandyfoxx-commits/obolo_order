@@ -1,6 +1,6 @@
 'use client';
 
-import { JUPITER_DEFAULT_BRANCHES, JUPITER_VIDEO_SECONDS, neoForm, type JupiterAuthor, type JupiterFlyer, type JupiterPostView, type JupiterRootView } from '@obolo/shared';
+import { JUPITER_DEFAULT_BRANCHES, neoForm, type JupiterAuthor, type JupiterFlyer, type JupiterPostView, type JupiterRootView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -16,7 +16,7 @@ import { PostCircle, type CircleMedia } from './PostCircle';
  * Jupiter — "パタパタ" (client design 2026-10-05, docs/jupiter.md). Replaces spec §2.4.
  *  空 (sky): up to 8 butterflies float; each is someone's posts of the last 88 hours. Tap → see them
  *           all (☆ them); when you close it the butterfly flies off and another one takes its place.
- *  たまご: opens your 根っこ (private folder) → pick a photo / 8-second video → make a round post
+ *  たまご: opens your 根っこ (private folder) → pick a photo (videos live in Mars's 裏スタジオ) → make a round post
  *           (words, filter, branch) → it hatches into your butterfly.
  *  木 (tree): a profile. Leaves on the branches are posts that finished flying; the four branch
  *           signs can be renamed by the owner; 🦋 蝶を描いてもらう paints your butterfly.
@@ -232,25 +232,19 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
   // ---- adding to the roots / posting ----
   const [uploading, setUploading] = useState(false);
   const addFiles = async (files: FileList): Promise<RootView[]> => {
+    // Jupiter keeps photos; videos all go to Mars's 裏スタジオ (client decision 2026-10-07)
+    if (Array.from(files).some((f) => f.type.startsWith('video/'))) say('動画は、火星の裏スタジオにしまってね');
     if (!live) return (await local.addFiles(files)).map((r) => ({ id: r.id, media: localMedia(r) }));
     setUploading(true);
     const added: RootView[] = [];
     try {
       for (const f of Array.from(files)) {
-        const kind = f.type.startsWith('video/') ? 'video' : f.type.startsWith('image/') ? 'photo' : null;
-        if (!kind) continue;
-        let r: JupiterRootView;
-        if (kind === 'video') {
-          const v = await getApi().uploadVideo(f, JUPITER_VIDEO_SECONDS);
-          r = await getApi().addJupiterRoot({ mediaId: v.id, kind, ...(v.posterUrl ? { posterUrl: v.posterUrl } : {}) });
-        } else {
-          const ph = await getApi().uploadPhoto(f);
-          r = await getApi().addJupiterRoot({ mediaId: ph.id, kind });
-        }
-        added.push(liveRoot(r));
+        if (!f.type.startsWith('image/')) continue;
+        const ph = await getApi().uploadPhoto(f);
+        added.push(liveRoot(await getApi().addJupiterRoot({ mediaId: ph.id })));
       }
     } catch (e) {
-      say(e instanceof ApiError && (e.code === 'BAD_VIDEO' || e.code === 'BAD_IMAGE') ? 'この写真・動画は読みこめなかった…' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? '保存できる容量がいっぱいです' : 'うまく入れられなかった…もう一度');
+      say(e instanceof ApiError && e.code === 'BAD_IMAGE' ? 'この写真は読みこめなかった…' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? '保存できる容量がいっぱいです' : 'うまく入れられなかった…もう一度');
     } finally {
       setUploading(false);
     }
@@ -884,14 +878,17 @@ function RootsView({
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-[#a58c74]">自分だけのデータフォルダ。撮った写真・動画（{JUPITER_VIDEO_SECONDS}秒まで）は、まずここにしまわれます。</p>
+        <p className="mt-1 text-xs text-[#a58c74]">自分だけのデータフォルダ。撮った写真は、まずここにしまわれます。</p>
         <button onClick={() => input.current?.click()} disabled={uploading} className="mt-4 w-full rounded-2xl border-2 border-dashed border-[#d9c0a0] bg-white/50 py-4 text-sm disabled:opacity-60">
-          {uploading ? 'しまっています…（動画は少し時間がかかります）' : '＋ 写真・動画を入れる'}
+          {uploading ? 'しまっています…' : '＋ 写真を入れる'}
         </button>
+        <a href="/mars" className="mt-2 block text-center text-[11px] text-[#a58c74] underline">
+          🎬 動画は、火星の裏スタジオにしまうよ →
+        </a>
         <input
           ref={input}
           type="file"
-          accept="image/*,video/*"
+          accept="image/*"
           multiple
           className="hidden"
           onChange={(e) => {
@@ -947,7 +944,6 @@ function Compose({ item, live, myId, onBack, onPost }: { item: RootView; live: b
         <div className="mx-auto mt-4 w-[min(78vw,300px)]" style={{ containerType: 'inline-size' }}>
           <PostCircle media={item.media} filter={filter} text={text} live className="shadow-[0_12px_40px_rgba(120,80,40,0.3)]" />
         </div>
-        {item.media.kind === 'video' && <p className="mt-2 text-center text-[11px] text-[#a58c74]">動画は{JUPITER_VIDEO_SECONDS}秒まで（長い動画は最初の{JUPITER_VIDEO_SECONDS}秒）</p>}
         <div className="mt-4 flex items-center gap-2">
           <input value={text} onChange={(e) => setText(e.target.value.slice(0, 30))} placeholder="ひとこと（なくてもOK）" className="h-11 min-w-0 flex-1 rounded-full border border-[#e6d3bd] bg-white/80 px-4 text-[16px] outline-none" />
           <Mic value={text} onChange={(v) => setText(v.slice(0, 30))} />

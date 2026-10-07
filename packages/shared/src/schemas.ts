@@ -298,7 +298,8 @@ export type CreatePlazaBody = z.infer<typeof CreatePlazaBody>;
 // --- Jupiter ----------------------------------------------------------------------------------------
 
 /** Put an uploaded photo / video (POST /media/photo, /media/video?max=8) into your 根っこ. */
-export const JupiterRootBody = z.object({ mediaId: z.string().uuid(), kind: z.enum(['photo', 'video']), posterUrl: z.string().url().max(500).optional() });
+// Jupiter keeps photos only; videos all live in Mars's 裏スタジオ (client decision 2026-10-07)
+export const JupiterRootBody = z.object({ mediaId: z.string().uuid() });
 export type JupiterRootBody = z.infer<typeof JupiterRootBody>;
 
 export const JUPITER_FILTERS = ['none', 'warm', 'sepia', 'mono', 'soft'] as const;
@@ -315,3 +316,9 @@ export type CreateJupiterPostBody = z.infer<typeof CreateJupiterPostBody>;
 /** Rename one of the four branches on your tree. */
 export const JupiterBranchBody = z.object({ index: z.number().int().min(0).max(3), name: z.string().trim().min(1).max(8) });
 export type JupiterBranchBody = z.infer<typeof JupiterBranchBody>;
+
+// --- Mars -------------------------------------------------------------------------------------------
+
+/** Put an uploaded video (POST /media/video) into your 裏スタジオ (every video you keep lives here). */
+export const MarsBackstageBody = z.object({ mediaId: z.string().uuid(), posterUrl: z.string().url().max(500).optional(), seconds: z.number().min(0).max(600).optional(), title: z.string().trim().max(40).optional() });
+export type MarsBackstageBody = z.infer<typeof MarsBackstageBody>;

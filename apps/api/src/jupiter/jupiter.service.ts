@@ -24,7 +24,8 @@ const flyingSince = () => new Date(Date.now() - JUPITER_FLY_HOURS * 3600_000);
 
 /**
  * Jupiter — パタパタ (client design 2026-10-05, docs/jupiter.md).
- *  - 根っこ: your private folder; every photo / 8-second video lands here first
+ *  - 根っこ: your private folder; every photo lands here first (videos live in Mars's 裏スタジオ —
+ *    photos on Jupiter, videos on Mars, client decision 2026-10-07)
  *  - a post is made from a root item; it flies as a butterfly for 88 hours (the sky), then hangs
  *    on its branch of your tree as a leaf
  *  - the sky's tabs (every planet): みんな / フォロー / ダチ — one butterfly per person
@@ -49,23 +50,16 @@ export class JupiterService {
     return rows.map((r) => ({ id: r.id, kind: r.kind as 'photo' | 'video', url: r.url, posterUrl: r.posterUrl, createdAt: r.createdAt.toISOString() }));
   }
 
-  /** An upload (POST /media/photo or /media/video?max=8) goes into your roots. */
+  /** A photo upload (POST /media/photo) goes into your roots. Videos live in Mars's 裏スタジオ. */
   async addRoot(userId: string, body: JupiterRootBody): Promise<JupiterRootView> {
     const [m] = await this.db.write
       .select({ id: mediaObjects.id, url: mediaObjects.url, kind: mediaObjects.kind })
       .from(mediaObjects)
       .where(and(eq(mediaObjects.id, body.mediaId), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
-    if (!m || m.kind !== body.kind) throw apiError(HttpStatus.BAD_REQUEST, 'MEDIA_NOT_FOUND', 'Upload the photo or video first');
-    let posterUrl: string | null = null;
-    if (body.kind === 'video' && body.posterUrl) {
-      const [p] = await this.db.write
-        .select({ url: mediaObjects.url })
-        .from(mediaObjects)
-        .where(and(eq(mediaObjects.url, body.posterUrl), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'poster')));
-      posterUrl = p?.url ?? null;
-    }
-    const [r] = await this.db.write.insert(jupiterRoots).values({ userId, mediaId: m.id, kind: body.kind, url: m.url, posterUrl }).returning();
-    return { id: r.id, kind: body.kind, url: r.url, posterUrl: r.posterUrl, createdAt: r.createdAt.toISOString() };
+    if (m?.kind === 'video') throw apiError(HttpStatus.BAD_REQUEST, 'VIDEO_GOES_TO_MARS', 'Videos are kept in the Mars backstage studio');
+    if (!m || m.kind !== 'photo') throw apiError(HttpStatus.BAD_REQUEST, 'MEDIA_NOT_FOUND', 'Upload the photo first');
+    const [r] = await this.db.write.insert(jupiterRoots).values({ userId, mediaId: m.id, kind: 'photo', url: m.url }).returning();
+    return { id: r.id, kind: 'photo', url: r.url, posterUrl: null, createdAt: r.createdAt.toISOString() };
   }
 
   async removeRoot(userId: string, rootId: string): Promise<void> {

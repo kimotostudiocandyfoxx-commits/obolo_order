@@ -7,6 +7,7 @@ import { CREATORS, fmtLen, KIND_COLOR, POD_BOX, STUDIO, THEMES, type Creator, ty
 import { flying, hoursSince, useMars } from '@/lib/mars/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
+import { Backstage } from './Backstage';
 import { Frame } from './Frame';
 import { ShootChat } from './ShootChat';
 
@@ -354,7 +355,7 @@ function StudioView({
                 }}
                 className="flex-1 rounded-full border border-white/25 bg-[#1c0d08]/95 text-[clamp(8px,1.3vw,13px)] whitespace-nowrap"
               >
-                🔒 ロッカー {locker.length}
+                🔒 裏スタジオ {locker.length}
               </button>
               <button onClick={() => setDecor(true)} className="flex-1 rounded-full border border-amber-400/70 bg-[#1c0d08]/95 text-[clamp(8px,1.3vw,13px)] whitespace-nowrap text-amber-200">
                 🎨 飾る
@@ -419,7 +420,10 @@ function StudioView({
         </Sheet>
       )}
       {open && (
-        <Sheet onClose={() => setOpen(false)} title="🔒 ロッカー（未公開の映像）">
+        <Sheet onClose={() => setOpen(false)} title="🔒 裏スタジオ（自分だけ）">
+          <div className="max-h-[70svh] overflow-y-auto">
+          <Backstage />
+          <p className="mb-2 text-xs font-bold text-amber-100">🎞 撮影した映像（未公開）</p>
           <p className="mb-3 text-center text-[11px] text-white/55">公開すると、UFOになって88時間、ダチやフォロワーの星図をとびます。</p>
           <div className="space-y-3">
             {locker.map((v) => (
@@ -444,7 +448,8 @@ function StudioView({
                 </button>
               </div>
             ))}
-            {!locker.length && <p className="text-center text-xs text-white/50">ロッカーは空っぽです（撮影すると、ここにしまわれます）</p>}
+            {!locker.length && <p className="text-center text-xs text-white/50">撮影した映像はまだありません（撮影すると、ここにしまわれます）</p>}
+          </div>
           </div>
         </Sheet>
       )}

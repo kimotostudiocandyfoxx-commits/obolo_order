@@ -13,6 +13,7 @@ import {
   type JupiterPostView,
   type JupiterRootView,
   type JupiterTreeView,
+  type MarsBackstageVideo,
   type BuddyMessageView,
   type BuddyPersona,
   type InviteView,
@@ -72,6 +73,8 @@ interface DemoState {
   jroots?: (JupiterRootView & { owner: string })[];
   jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe'> & { owner: string; starredBy: string[] })[];
   jbranches?: Record<string, string[]>;
+  /** Mars 裏スタジオ (this browser only) */
+  backstage?: (MarsBackstageVideo & { owner: string })[];
   /** ひろば (みんな map) and who joined them */
   plazas?: { id: string; name: string; icon: string; members: string[]; base: number }[];
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
@@ -717,7 +720,7 @@ export class DemoApi implements Api {
 
   async addJupiterRoot(body: Parameters<Api['addJupiterRoot']>[0]) {
     const viewer = this.uid();
-    const r = { id: uid(), kind: body.kind, url: `idb:${body.mediaId}`, posterUrl: null, createdAt: now(), owner: viewer };
+    const r = { id: uid(), kind: 'photo' as const, url: `idb:${body.mediaId}`, posterUrl: null, createdAt: now(), owner: viewer };
     this.s.jroots = [r, ...(this.s.jroots ?? [])];
     this.save();
     const { owner: _o, ...view } = r;
@@ -784,6 +787,26 @@ export class DemoApi implements Api {
     return Object.keys(this.s.users)
       .filter((id) => !t || `${this.s.users[id].displayName} ${this.s.users[id].handle}`.toLowerCase().includes(t))
       .map((id) => this.jAuthor(id));
+  }
+
+  async marsBackstage() {
+    const viewer = this.uid();
+    return (this.s.backstage ?? []).filter((v) => v.owner === viewer).map(({ owner: _o, ...v }) => v);
+  }
+
+  async keepMarsVideo(body: Parameters<Api['keepMarsVideo']>[0]) {
+    const viewer = this.uid();
+    const v = { id: uid(), url: `idb:${body.mediaId}`, posterUrl: null, seconds: body.seconds ?? null, title: body.title ?? '', createdAt: now(), owner: viewer };
+    this.s.backstage = [v, ...(this.s.backstage ?? [])];
+    this.save();
+    const { owner: _o, ...view } = v;
+    return view;
+  }
+
+  async removeMarsVideo(id: string) {
+    const viewer = this.uid();
+    this.s.backstage = (this.s.backstage ?? []).filter((v) => !(v.id === id && v.owner === viewer));
+    this.save();
   }
 
   async batiEgg(food: string) {

@@ -226,6 +226,15 @@ export class HttpApi implements Api {
   searchJupiter(q: string) {
     return this.req<Awaited<ReturnType<Api['searchJupiter']>>>('GET', `/jupiter/users?q=${encodeURIComponent(q.trim())}`);
   }
+  marsBackstage() {
+    return this.req<Awaited<ReturnType<Api['marsBackstage']>>>('GET', '/mars/backstage');
+  }
+  keepMarsVideo(body: Parameters<Api['keepMarsVideo']>[0]) {
+    return this.req<Awaited<ReturnType<Api['keepMarsVideo']>>>('POST', '/mars/backstage', body);
+  }
+  async removeMarsVideo(id: string) {
+    await this.req<void>('DELETE', `/mars/backstage/${id}`);
+  }
   choosePuniPic(mediaId: string | null) {
     return this.req<Awaited<ReturnType<Api['choosePuniPic']>>>('POST', '/me/puni/pic', { mediaId });
   }

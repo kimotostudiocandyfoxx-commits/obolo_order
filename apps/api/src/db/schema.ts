@@ -232,6 +232,24 @@ export const saturnPosts = pgTable(
   ],
 );
 
+/** Mars 裏スタジオ: every video a member keeps (Jupiter is photos only — client decision 2026-10-07). Private. */
+export const marsBackstage = pgTable(
+  'mars_backstage',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    mediaId: uuid('media_id').references(() => mediaObjects.id),
+    url: text('url').notNull(),
+    posterUrl: text('poster_url'),
+    seconds: real('seconds'),
+    title: text('title').notNull().default(''),
+    ...timestamps,
+  },
+  (t) => [index('mars_backstage_user_idx').on(t.userId, t.createdAt)],
+);
+
 /** Jupiter 根っこ: a member's private folder of photos / videos (docs/jupiter.md). */
 export const jupiterRoots = pgTable(
   'jupiter_roots',

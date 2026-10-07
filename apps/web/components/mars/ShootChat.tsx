@@ -88,7 +88,7 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Vid
               </ol>
               {kept.has(m.video.id) ? (
                 <button onClick={onOpenStudio} className="mt-3 w-full rounded-full border border-orange-200/50 py-2 text-sm">
-                  🔒 ロッカーにしまいました → スタジオを見る
+                  🔒 裏スタジオにしまいました → スタジオを見る
                 </button>
               ) : (
                 <div className="mt-3 flex gap-2">
@@ -105,11 +105,11 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Vid
                     onClick={() => {
                       onKeep(m.video);
                       setKept((s) => new Set(s).add(m.video.id));
-                      say(hasBati ? 'スタジオのロッカーにしまったよ。公開すると、UFOになって88時間とんでいくよ。' : 'スタジオのロッカーにしまったケン。公開したら、UFOになって88時間とんでいくぞ！');
+                      say(hasBati ? '裏スタジオにしまったよ。公開すると、UFOになって88時間とんでいくよ。' : '裏スタジオにしまったケン。公開したら、UFOになって88時間とんでいくぞ！');
                     }}
                     className="flex-[2] rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 py-2 text-sm font-bold"
                   >
-                    🔒 ロッカーにしまう（未公開）
+                    🔒 裏スタジオにしまう（未公開）
                   </button>
                 </div>
               )}

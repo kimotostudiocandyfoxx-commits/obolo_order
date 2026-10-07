@@ -58,7 +58,7 @@ export const MEDIA_POLICY = {
 
 /** Jupiter: a post flies as a butterfly this long, then becomes a leaf on the tree. */
 export const JUPITER_FLY_HOURS = 88;
-/** Jupiter videos are cut to 8 seconds (client, 2026-10-05). */
-export const JUPITER_VIDEO_SECONDS = 8;
+/** Videos kept in Mars's 裏スタジオ are cut to this length (the media policy maximum). */
+export const MARS_VIDEO_SECONDS = 60;
 /** The four branches every tree starts with (renamable). */
 export const JUPITER_DEFAULT_BRANCHES = ['旅行', 'ごはん', 'おさんぽ', 'おまつり'];

@@ -378,3 +378,15 @@ export interface JupiterTreeView {
   followedByMe: boolean;
   isMe: boolean;
 }
+
+// --- Mars ---------------------------------------------------------------------------------------------
+
+/** A video in your 裏スタジオ (private): every video you keep lives on Mars. */
+export interface MarsBackstageVideo {
+  id: string;
+  url: string;
+  posterUrl: string | null;
+  seconds: number | null;
+  title: string;
+  createdAt: string;
+}

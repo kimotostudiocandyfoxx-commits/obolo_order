@@ -10,6 +10,8 @@ import type {
   JupiterPostView,
   JupiterRootView,
   JupiterTreeView,
+  MarsBackstageBody,
+  MarsBackstageVideo,
   CreateSaturnPostBody,
   InviteView,
   Locale,
@@ -156,14 +158,20 @@ export interface Api {
   // Jupiter — パタパタ
   jupiterSky(tab: 'all' | 'following' | 'friends'): Promise<JupiterFlyer[]>;
   jupiterRoots(): Promise<JupiterRootView[]>;
-  /** after POST /media/photo or /media/video?max=8 */
-  addJupiterRoot(body: { mediaId: string; kind: 'photo' | 'video'; posterUrl?: string }): Promise<JupiterRootView>;
+  /** after POST /media/photo (Jupiter is photos only; videos go to Mars's 裏スタジオ) */
+  addJupiterRoot(body: { mediaId: string }): Promise<JupiterRootView>;
   removeJupiterRoot(id: string): Promise<void>;
   createJupiterPost(body: CreateJupiterPostBody): Promise<JupiterPostView>;
   starJupiterPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;
   jupiterTree(userId: string): Promise<JupiterTreeView>;
   renameJupiterBranch(index: number, name: string): Promise<{ branches: string[] }>;
   searchJupiter(q: string): Promise<JupiterAuthor[]>;
+
+  // Mars 裏スタジオ: every video you keep
+  marsBackstage(): Promise<MarsBackstageVideo[]>;
+  /** after POST /media/video */
+  keepMarsVideo(body: MarsBackstageBody): Promise<MarsBackstageVideo>;
+  removeMarsVideo(id: string): Promise<void>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;

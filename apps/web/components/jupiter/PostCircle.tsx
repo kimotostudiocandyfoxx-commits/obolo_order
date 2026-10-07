@@ -13,7 +13,7 @@ export interface CircleMedia {
   sample?: { emoji: string; hue: number };
 }
 
-/** A round Jupiter post: photo, 8-second video (looped) or emoji sample, with filter and text. */
+/** A round Jupiter post: photo (or an older 8-second video, looped) or emoji sample, with filter and text. New videos live in Mars's 裏スタジオ. */
 export function PostCircle({
   media,
   filter = 'none',

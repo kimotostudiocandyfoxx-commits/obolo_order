@@ -7,7 +7,7 @@ import type { BranchId } from './residents';
 
 /**
  * The visitor's own Jupiter (docs/jupiter.md), kept on this device for the demo (P-JUP-2):
- *  - roots: private data folder — every photo / video they add lands here first
+ *  - roots: private data folder — every photo they add lands here first (videos live on Mars)
  *  - posts: round posts made from a root item; a post flies as a butterfly for 88 hours,
  *    then hangs on its branch as a leaf
  * Media files live in IndexedDB; this record only keeps their ids.
@@ -65,7 +65,8 @@ export function useJupiter() {
     async (files: FileList | File[]) => {
       const added: RootItem[] = [];
       for (const f of Array.from(files)) {
-        const kind: MediaKind | null = f.type.startsWith('video/') ? 'video' : f.type.startsWith('image/') ? 'photo' : null;
+        // photos only: videos are kept in Mars's 裏スタジオ (client decision 2026-10-07)
+        const kind: MediaKind | null = f.type.startsWith('image/') ? 'photo' : null;
         if (!kind) continue;
         const id = `r-${crypto.randomUUID()}`;
         await putBlob(id, f);
