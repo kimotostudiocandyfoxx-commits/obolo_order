@@ -404,3 +404,15 @@ body {
   from { transform: scale(1.02) translate(0, 0); }
   to { transform: scale(1.18) translate(-3%, -2%); }
 }
+
+/* ぷにぷに prototype: poke effects */
+@keyframes puniPop {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(var(--dx, 0), -70px) scale(1.15); opacity: 0; }
+}
+@keyframes puniPuff {
+  0% { transform: scale(0.3) translateX(0); opacity: 0.2; }
+  30% { opacity: 1; }
+  100% { transform: scale(1.9) translateX(-30px); opacity: 0; }
+}

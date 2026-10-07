@@ -69,6 +69,7 @@
 | P-SAT-4 | ✏️ | ころりんのサンプル住人 | 投稿が少ないうちは12人のサンプル住人で賑やかに見せる（声はブラウザの読み上げ） | `lib/saturnResidents.ts` |
 | P-SAT-5 | ✏️ | 土星「自分の声（AI）」 | 登録した自分の声（Fish）で投稿を読む。7つの読み方を Fish のタグに対応（元気に→`[excited]`、ゆっくり→`[calm]`＋速さ0.8、早口→`[hurried]`＋1.4、低い声で→`[low voice]`、高い声で→`[high-pitched voice]`、ささやき風→`[whispering]`、叫ぶ風→`[shouting]`）。効き具合は耳で調整。今は声を登録した人なら誰でも使える（ORDER 限定にするかは未決）。投稿時に1回生成（試し聞きは同じ文なら使い回し）、読み上げ回数（1日100回）に含める | `packages/shared/src/neoVoice.ts`、`apps/api/src/saturn/`、`apps/web/components/saturn/KororinWorld.tsx` |
 | P-SAT-6 | ✏️ | 土星のプロフィール画面の絵 | 画像生成AIはこの作業環境から使えないため、土星の世界と同じくコードで描いた仮絵（夜空〜ピンクの空、星、その人の小さな縞模様の惑星と輪、上にその人のころりん）。正式な絵が来たら差し替え。サンプル住人はフォロー不可・返信不可（住人同士のサンプル返信あり） | `apps/web/components/saturn/SaturnProfile.tsx`、`apps/web/lib/saturnResidents.ts` |
+| P-PUNI-1 | ✏️ | ぷにぷにキャラ（試作） | クライアント決定 2026-10-07：プロフィールのキャラは画像生成ではなくコードで描く（体は数種類＋部品の組み合わせ、AI は部品を選ぶだけ、足りない部品だけ AI がその場で描いて部品箱に追加 — 後者2つは未実装）。試作は `/preview/puni`：参考画像の5体（おにぎりくん・ゴリラ5454・ワニの女王・カバの紳士・ゴリラ4545）を丸い体（まる／たて長／どっしり）＋部品で描き直し、つつく・伸ばして投げる・転がる・床や仲間でつぶれる・起き上がる・まばたき・着せ替え。絵は Claude の仮絵 | `apps/web/lib/puni/`、`apps/web/components/puni/PuniStage.tsx` |
 | P-INV-1 | 🟡 | 1人が招待できる人数 | 30日で10人まで | `apps/api/src/invites/invites.service.ts` |
 | P-INV-2 | 🟡 | 招待の有効期限 | 14日 | 環境変数 `INVITE_TTL_DAYS` |
 | P-INV-3 | 🟡 | 未登録メールでのログイン | 「招待制です」とはっきり表示（＝登録の有無が分かってしまう）。メール送信を入れたら黙って「送信しました」にする | `apps/api/src/auth/auth.service.ts` |
