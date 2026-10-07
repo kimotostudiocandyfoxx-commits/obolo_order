@@ -437,3 +437,29 @@ body {
   0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(0.3); opacity: 0; }
 }
+
+/* Saturn ひろば map: islands float, and wobble on ゆらす */
+@keyframes islandBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes islandShake {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  20% {
+    transform: translate(-7px, -10px) rotate(-3deg);
+  }
+  45% {
+    transform: translate(6px, -4px) rotate(2.5deg);
+  }
+  70% {
+    transform: translate(-3px, -2px) rotate(-1deg);
+  }
+}

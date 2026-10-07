@@ -17,6 +17,7 @@ import {
   type InstrumentalResult,
   type SongEditResult,
   type SongView,
+  type PlazaView,
   type SaturnPostView,
   type SaturnProfileView,
   type PuniPicResult,
@@ -25,6 +26,18 @@ import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/loo
 import { putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
+
+/** Demo ひろば: name, landmark, people already there (the demo has no other members). */
+const DEMO_PLAZAS: [string, string, number][] = [
+  ['日本', '🏯', 9870],
+  ['K-POP好き', '🎤', 6220],
+  ['アメリカ', '🗽', 4105],
+  ['アニメ好き', '⛩️', 3900],
+  ['北海道', '⛄', 2340],
+  ['ゲーム好き', '🎮', 1820],
+  ['ラーメン好き', '🍜', 1290],
+  ['茨城', '🌸', 812],
+];
 
 /**
  * DEMO MODE — used when NEXT_PUBLIC_API_URL is empty (e.g. a Vercel preview before Cloud Run
@@ -43,11 +56,13 @@ interface DemoState {
   sessions: Record<string, string>; // token -> userId
   wallets: Record<string, { mana: number; entries: DemoWalletEntry[]; lastActivity: string }>;
   buddy: Record<string, { name: string; persona: BuddyPersona; memory: string[]; messages: BuddyMessageView[] }>;
-  posts: (Omit<SaturnPostView, 'starredByMe'> & { starredBy: string[] })[];
+  posts: (Omit<SaturnPostView, 'starredByMe'> & { starredBy: string[]; plazaId?: string | null })[];
   quota: Record<string, number>;
   pendingCodes: Record<string, string>;
   /** Saturn follows: follower id → followee ids */
   follows?: Record<string, string[]>;
+  /** ひろば (みんな map) and who joined them */
+  plazas?: { id: string; name: string; icon: string; members: string[]; base: number }[];
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
 }
 
@@ -327,13 +342,66 @@ export class DemoApi implements Api {
     return { ...rest, author: { ...rest.author, look }, starredByMe: starredBy.includes(viewer) };
   }
 
-  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit = 20) {
+  private plazaList() {
+    this.s.plazas ??= DEMO_PLAZAS.map(([name, icon, base], i) => ({ id: `plaza-${i}`, name, icon, members: [], base }));
+    return this.s.plazas;
+  }
+
+  private plazaView(p: NonNullable<DemoState['plazas']>[number]): PlazaView {
+    // the map can be looked at before signing in (previews)
+    let viewer = '';
+    try {
+      viewer = this.uid();
+    } catch {
+      /* logged out */
+    }
+    const live = this.s.posts.filter((x) => x.plazaId === p.id && !x.replyToId && Date.now() - new Date(x.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000);
+    const faces: PlazaView['faces'] = [];
+    for (const x of live) if (faces.length < 7 && !faces.some((f) => f.id === x.author.id)) faces.push({ id: x.author.id, neoForm: x.author.neoForm, look: this.s.users[x.author.id]?.look ?? x.author.look ?? null });
+    return { id: p.id, name: p.name, icon: p.icon, memberCount: p.base + p.members.length, voiceCount: live.length, joined: p.members.includes(viewer), faces };
+  }
+
+  async plazas(q?: string) {
+    const t = q?.trim().toLowerCase();
+    return this.plazaList()
+      .filter((p) => !t || p.name.toLowerCase().includes(t))
+      .map((p) => this.plazaView(p))
+      .sort((a, b) => b.memberCount - a.memberCount);
+  }
+
+  async plaza(id: string) {
+    const p = this.plazaList().find((x) => x.id === id);
+    if (!p) throw new ApiError(404, 'NOT_FOUND', 'Plaza not found');
+    return this.plazaView(p);
+  }
+
+  async createPlaza(body: Parameters<Api['createPlaza']>[0]) {
+    const list = this.plazaList();
+    const name = body.name.trim().replace(/\s+/g, ' ');
+    let p = list.find((x) => x.name === name);
+    if (!p) {
+      p = { id: `plaza-${uid()}`, name, icon: body.icon, members: [], base: 0 };
+      list.push(p);
+    }
+    return this.joinPlaza(p.id, true);
+  }
+
+  async joinPlaza(id: string, on: boolean) {
+    const viewer = this.uid();
+    const p = this.plazaList().find((x) => x.id === id);
+    if (!p) throw new ApiError(404, 'NOT_FOUND', 'Plaza not found');
+    p.members = on ? [...new Set([...p.members, viewer])] : p.members.filter((m) => m !== viewer);
+    this.save();
+    return this.plazaView(p);
+  }
+
+  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit = 20, plaza?: string) {
     const viewer = this.uid();
     const f = this.s.follows ?? {};
     const mutual = new Set((f[viewer] ?? []).filter((u) => (f[u] ?? []).includes(viewer)));
     const mine = tab === 'friends' ? mutual : new Set([...(f[viewer] ?? []), viewer]);
     const sorted = [...this.s.posts]
-      .filter((p) => !p.replyToId && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (!tab || tab === 'all' || mine.has(p.author.id)))
+      .filter((p) => !p.replyToId && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (plaza ? p.plazaId === plaza : !tab || tab === 'all' || mine.has(p.author.id)))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {
@@ -395,7 +463,9 @@ export class DemoApi implements Api {
     const quoted = target(body.repostOfId);
     if (replyTo) replyTo.replyCount = (replyTo.replyCount ?? 0) + 1;
     if (quoted) quoted.repostCount = (quoted.repostCount ?? 0) + 1;
+    if (body.plazaId && !replyTo) await this.joinPlaza(body.plazaId, true);
     const p = {
+      plazaId: replyTo ? null : (body.plazaId ?? null),
       replyToId: replyTo ? (replyTo.replyToId ?? replyTo.id) : null,
       repostOf: quoted ? { id: quoted.id, author: quoted.author, text: quoted.text, voiceUrl: quoted.voiceUrl } : null,
       id: uid(),

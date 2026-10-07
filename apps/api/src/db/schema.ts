@@ -213,14 +213,45 @@ export const saturnPosts = pgTable(
     repostOfId: uuid('repost_of_id'),
     replyCount: integer('reply_count').notNull().default(0),
     repostCount: integer('repost_count').notNull().default(0),
+    /** the ひろば it was dropped in (none: shown to followers only) */
+    plazaId: uuid('plaza_id'),
     aiGenerated: integer('ai_generated').notNull().default(0),
     ...timestamps,
   },
   (t) => [
     index('saturn_posts_created_idx').on(t.createdAt, t.id),
+    index('saturn_posts_plaza_idx').on(t.plazaId, t.createdAt),
     index('saturn_posts_user_idx').on(t.userId, t.createdAt),
     index('saturn_posts_reply_idx').on(t.replyToId, t.createdAt),
   ],
+);
+
+/** ひろば: Saturn's みんな map is made of these (client decision 2026-10-07). */
+export const saturnPlazas = pgTable(
+  'saturn_plazas',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    name: text('name').notNull(),
+    icon: text('icon').notNull().default('⭐'),
+    createdBy: uuid('created_by').references(() => users.id),
+    memberCount: integer('member_count').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex('saturn_plazas_name_idx').on(t.name), index('saturn_plazas_members_idx').on(t.memberCount)],
+);
+
+export const saturnPlazaMembers = pgTable(
+  'saturn_plaza_members',
+  {
+    plazaId: uuid('plaza_id')
+      .notNull()
+      .references(() => saturnPlazas.id),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('saturn_plaza_members_pair_idx').on(t.plazaId, t.userId), index('saturn_plaza_members_user_idx').on(t.userId)],
 );
 
 /** Saturn follows (spec §2.3 "standard SNS graph"). */

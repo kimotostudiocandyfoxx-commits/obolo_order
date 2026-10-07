@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LOCALES, SATURN_MAX_CHARS } from './config';
+import { LOCALES, PLAZA_ICONS, PLAZA_NAME_MAX, SATURN_MAX_CHARS } from './config';
 import { NEO_FORM_IDS } from './neo';
 import { VOICE_STYLE_IDS } from './neoVoice';
 import { PuniLook } from './puni';
@@ -68,6 +68,8 @@ export const CreateSaturnPostBody = z
     replyToId: z.string().uuid().optional(),
     /** a quote repost of this post */
     repostOfId: z.string().uuid().optional(),
+    /** dropped in this ひろば (Saturn's みんな map) */
+    plazaId: z.string().uuid().optional(),
   })
   .refine((b) => !!b.voiceMediaId !== !!b.voiceStyle, { message: 'either voiceMediaId or voiceStyle is required' });
 export type CreateSaturnPostBody = z.infer<typeof CreateSaturnPostBody>;
@@ -281,3 +283,10 @@ export const SongEditBody = z
   })
   .refine((b) => !!b.message || !!b.command, { message: 'message or command is required' });
 export type SongEditBody = z.infer<typeof SongEditBody>;
+
+/** ひろば (Saturn's みんな map, client decision 2026-10-07): a named place people gather in. */
+export const CreatePlazaBody = z.object({
+  name: z.string().trim().min(1).max(PLAZA_NAME_MAX),
+  icon: z.enum(PLAZA_ICONS),
+});
+export type CreatePlazaBody = z.infer<typeof CreatePlazaBody>;

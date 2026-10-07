@@ -142,6 +142,18 @@ export interface SaturnPostView {
   repostOf?: SaturnPostRef | null;
 }
 
+/** A ひろば on Saturn's みんな map. `faces` = a few people who spoke there lately (drawn on the island). */
+export interface PlazaView {
+  id: string;
+  name: string;
+  icon: string;
+  memberCount: number;
+  /** voices alive there now (88 hours) */
+  voiceCount: number;
+  joined: boolean;
+  faces: { id: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null }[];
+}
+
 /** A short form of a post, embedded in a quote repost. */
 export interface SaturnPostRef {
   id: string;

@@ -10,6 +10,10 @@ export const DEFAULT_LOCALE: Locale = 'ja';
 export const SATURN_MAX_CHARS = 280;
 /** Saturn voices vanish this many hours after they are dropped (client decision 2026-10-07). */
 export const SATURN_LIFETIME_HOURS = 88;
+/** ひろば names stay short enough for the label over the island. */
+export const PLAZA_NAME_MAX = 16;
+/** The landmark standing on a ひろば's island (PLACEHOLDER P-SAT-13: drawn art later). */
+export const PLAZA_ICONS = ['⭐', '🏯', '⛄', '🗽', '🌸', '⛩️', '🎤', '💜', '🎮', '🍜', '⚽', '🎵', '🐱', '🌊', '📚', '🎨', '🏔️', '🍰'] as const;
 /** PLACEHOLDER (P-SAT-1): max voice length for a Saturn post. */
 export const VOICE_MAX_SECONDS = 60;
 /** PLACEHOLDER (P-SAT-1): max upload size for a voice clip. */

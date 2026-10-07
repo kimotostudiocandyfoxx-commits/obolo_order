@@ -1,6 +1,6 @@
 'use client';
 
-import { neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type SaturnPostView } from '@obolo/shared';
+import { neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type PlazaView, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
@@ -13,6 +13,7 @@ import { playPop, unlockPop } from '@/lib/popSound';
 import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
 import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
+import { PlazaMap } from './PlazaMap';
 import { SaturnProfile } from './SaturnProfile';
 
 /**
@@ -24,6 +25,7 @@ import { SaturnProfile } from './SaturnProfile';
  * Bottom bar: ゆらす (shake) · 声をおとす (record & drop your voice) · おまかせ (play a random voice).
  * Under an opened voice, the people who answered line up as little balls: tap one → its voice
  * plays with a speech bubble. Names open the person's page (follow); 🔁 quotes the voice.
+ * みんな is the ひろば map (client design 2026-10-07): pick a ひろば → its voices fall here.
  */
 type Tab = 'all' | 'following' | 'friends';
 
@@ -52,6 +54,11 @@ export function KororinWorld({
   const { me } = useAuth();
   const [posts, setPosts] = useState<SaturnPostView[]>([]);
   const [tab, setTab] = useState<Tab>('all');
+  // みんな: the ひろば map, or inside one ひろば (the Day 4 tutorial skips the map)
+  const [plaza, setPlaza] = useState<PlazaView | null>(null);
+  const [mapShake, setMapShake] = useState(0);
+  const [mapRefresh, setMapRefresh] = useState(0);
+  const onMap = tab === 'all' && !plaza && !neoOnly;
   const [open, setOpen] = useState<SaturnPostView | null>(null);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
   const [composer, setComposer] = useState<false | { replyTo?: SaturnPostView; quote?: SaturnPostView }>(false);
@@ -72,8 +79,7 @@ export function KororinWorld({
   const openPostRef = useRef<SaturnPostView | null>(null);
   const detailRef = useRef(false);
   const meIdRef = useRef<string | undefined>(undefined);
-  const tabRef = useRef<Tab>('all');
-  tabRef.current = tab;
+  const scopeRef = useRef('');
 
   useEffect(() => {
     getApi()
@@ -131,13 +137,15 @@ export function KororinWorld({
   // only so many on the planet at once; when one pops, the next voice drops in from the sky
   const [tabCursor, setTabCursor] = useState<string | null>(null);
   const loadingMore = useRef(false);
+  const plazaId = tab === 'all' ? (plaza?.id ?? null) : null;
+  const fromList = tab !== 'all' || !!plazaId;
   useEffect(() => {
-    if (tab === 'all') return;
+    if (tab === 'all' && !plazaId) return;
     let live = true;
     setTabPosts(null);
     setTabCursor(null);
     getApi()
-      .saturnFeed(undefined, true, tab, 50)
+      .saturnFeed(undefined, true, tab, 50, plazaId ?? undefined)
       .then((p) => {
         if (!live) return;
         setTabPosts(p.items);
@@ -147,21 +155,31 @@ export function KororinWorld({
     return () => {
       live = false;
     };
-  }, [tab]);
+  }, [tab, plazaId]);
 
-  const unheard = useMemo(() => (tab === 'all' ? all : (tabPosts ?? [])).filter((p) => !heard.has(p.id)), [all, tab, tabPosts, heard]);
-  const cap = tab === 'all' ? Infinity : TAB_CAP[tab];
+  // inside a ひろば: its voices, topped up with a few residents while it is quiet
+  const source = useMemo(() => {
+    if (!fromList) return onMap ? [] : all;
+    const real = tabPosts ?? [];
+    if (tab !== 'all' || !tabPosts || real.length >= PLAZA_MIN) return real;
+    const h = hueOf(plazaId ?? '');
+    const fill = Array.from({ length: PLAZA_MIN - real.length }, (_, k) => SATURN_RESIDENTS[(h + k * 3) % SATURN_RESIDENTS.length]);
+    return [...real, ...fill.filter((x, i) => fill.indexOf(x) === i)];
+  }, [fromList, onMap, all, tabPosts, tab, plazaId]);
+  const unheard = useMemo(() => source.filter((p) => !heard.has(p.id)), [source, heard]);
+  const cap = tab === 'all' ? (plazaId ? TAB_CAP.plaza : Infinity) : TAB_CAP[tab];
   const shown = useMemo(() => unheard.slice(0, cap), [unheard, cap]);
+  scopeRef.current = `${tab}:${plazaId}`;
 
   // running low on voices waiting in line → fetch the next page
   useEffect(() => {
-    if (tab === 'all' || !tabPosts || !tabCursor || loadingMore.current || unheard.length > cap) return;
+    if (!fromList || !tabPosts || !tabCursor || loadingMore.current || unheard.length > cap) return;
     loadingMore.current = true;
-    const t = tab;
+    const key = `${tab}:${plazaId}`;
     getApi()
-      .saturnFeed(tabCursor, true, t, 50)
+      .saturnFeed(tabCursor, true, tab, 50, plazaId ?? undefined)
       .then((p) => {
-        if (t !== tabRef.current) return;
+        if (key !== scopeRef.current) return;
         setTabPosts((cur) => {
           const have = new Set((cur ?? []).map((x) => x.id));
           return [...(cur ?? []), ...p.items.filter((x) => !have.has(x.id))];
@@ -172,7 +190,7 @@ export function KororinWorld({
       .finally(() => {
         loadingMore.current = false;
       });
-  }, [tab, tabPosts, tabCursor, unheard.length, cap]);
+  }, [fromList, tab, plazaId, tabPosts, tabCursor, unheard.length, cap]);
 
   useEffect(() => {
     const el = stage.current;
@@ -193,8 +211,8 @@ export function KororinWorld({
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
           pic: p.author.pic ?? null,
           R: Math.min(
-            stageW * 0.17,
-            Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * (tab === 'all' ? 1 : popScale(p)),
+            stageW * (tab === 'friends' ? 0.16 : 0.12),
+            Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * popScale(p),
           ),
         };
       }),
@@ -287,8 +305,10 @@ export function KororinWorld({
       const r = SATURN_RESIDENTS.find((x) => x.id === p.id);
       if (r) Object.assign(r, upd(r));
       setPosts((cur) => [...cur]);
+      setTabPosts((cur) => (cur ? [...cur] : cur));
     } else {
       setPosts((cur) => cur.map(upd));
+      setTabPosts((cur) => (cur ? cur.map(upd) : cur));
       getApi()
         .starSaturnPost(p.id, on)
         .catch(() => undefined);
@@ -296,16 +316,32 @@ export function KororinWorld({
     if (on) events?.onStar?.();
   };
 
-  const shake = () => layer.current?.shake();
+  const shake = () => (onMap ? setMapShake(Date.now()) : layer.current?.shake());
 
-  const omakase = () => {
+  const enterPlaza = (p: PlazaView | null) => {
+    close();
+    setPlaza(p);
+    if (!p) setMapRefresh(Date.now());
+  };
+
+  const omakase = async () => {
+    // on the map: into a ひろば where someone is talking
+    if (onMap) {
+      const list = await getApi()
+        .plazas()
+        .catch(() => []);
+      const talking = list.filter((x) => x.voiceCount > 0);
+      const pool = talking.length ? talking : list;
+      if (pool.length) enterPlaza(pool[Math.floor(Math.random() * pool.length)]);
+      return;
+    }
     if (!shown.length) return;
     const p = shown[Math.floor(Math.random() * shown.length)];
     layer.current?.poke(p.id);
     listen(p);
   };
 
-  const onPosted = (p: SaturnPostView) => {
+  const onPosted = (p: SaturnPostView, into?: PlazaView | null) => {
     // a reply joins the row under its post instead of floating in the world
     if (p.replyToId) {
       setComposer(false);
@@ -320,6 +356,16 @@ export function KororinWorld({
     setPosts((cur) => [p, ...cur]);
     if (p.repostOf) setPosts((cur) => cur.map((x) => (x.id === p.repostOf!.id ? { ...x, repostCount: (x.repostCount ?? 0) + 1 } : x)));
     setComposer(false);
+    // dropped from the map into a ひろば: go there (its list is fetched fresh, with the new voice)
+    if (onMap) {
+      if (into) {
+        setPlaza(into);
+        setTimeout(() => listen(p), 1600);
+      }
+      events?.onPosted?.();
+      return;
+    }
+    if (fromList) setTabPosts((cur) => [p, ...(cur ?? []).filter((x) => x.id !== p.id)]);
     // it drops in from the sky; play your own voice once it has landed
     setTimeout(() => listen(p), 1300);
     events?.onPosted?.();
@@ -342,6 +388,7 @@ export function KororinWorld({
       <div className="pointer-events-none absolute right-[13%] top-[25%] h-[6vmin] min-h-10 w-[6vmin] min-w-10 rounded-full" style={{ background: 'radial-gradient(circle at 35% 30%, #fff6cf 0%, #f8c25a 45%, #e58f2c 100%)', boxShadow: '0 0 24px rgba(255,200,110,.55)' }} />
       <div className="pointer-events-none absolute left-[11%] top-[36%] h-[3.4vmin] min-h-6 w-[3.4vmin] min-w-6 rounded-full" style={{ background: 'radial-gradient(circle at 35% 30%, #ffffff 0%, #d9d2ff 60%, #b4a8f0 100%)', boxShadow: '0 0 16px rgba(220,210,255,.6)' }} />
       {/* the rings, seen from the surface: wide translucent arcs with dotted lines */}
+      {!onMap && (
       <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
         {[
           [62, 44, 9],
@@ -354,7 +401,9 @@ export function KororinWorld({
           </g>
         ))}
       </svg>
+      )}
       {/* the planet: concentric peach / pink stripes following its horizon */}
+      {!onMap && (
       <div
         className="pointer-events-none absolute rounded-[50%]"
         style={{
@@ -367,6 +416,10 @@ export function KororinWorld({
           boxShadow: 'inset 0 10px 18px rgba(255,255,255,.65), 0 -10px 40px rgba(255,190,225,.55)',
         }}
       />
+      )}
+
+      {/* みんな: the ひろば map */}
+      {onMap && <PlazaMap onEnter={enterPlaza} shakeKey={mapShake} refreshKey={mapRefresh} />}
 
       {/* characters: soft bodies on the planet */}
       <div ref={stage} className="absolute inset-0">
@@ -380,7 +433,7 @@ export function KororinWorld({
       {bursts.map((bu) => (
         <BubbleBurst key={bu.key} x={bu.x} y={bu.y} r={bu.r} onDone={() => setBursts((cur) => cur.filter((x) => x.key !== bu.key))} />
       ))}
-      {tab === 'all' && posts.length + SATURN_RESIDENTS.length > 0 && shown.length === 0 && (
+      {tab === 'all' && !onMap && source.length > 0 && shown.length === 0 && (
         <div className="absolute inset-x-0 top-[38%] z-[70] flex flex-col items-center gap-2 px-6 text-center">
           <p className="rounded-2xl bg-white/85 px-4 py-2 text-sm font-black text-[#5a3f8a] shadow">いまの声は、ぜんぶ聞いたよ。新しい声を待ってね</p>
           <button onClick={() => remember(new Set())} className="rounded-full bg-white/70 px-3 py-1 text-[11px] font-bold text-[#7a62b0]">
@@ -408,7 +461,7 @@ export function KororinWorld({
         </div>
         <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full border border-white/25 bg-white/15 p-1 backdrop-blur">
           {TABS.map(([k, label]) => (
-            <button key={k} onClick={() => setTab(k)} className={`rounded-full px-5 py-1.5 text-sm font-black transition ${tab === k ? 'bg-white text-[#4a3570] shadow-[0_3px_0_#e3cfae]' : 'text-white/90'}`}>
+            <button key={k} onClick={() => (k === 'all' && tab === 'all' && plaza ? enterPlaza(null) : setTab(k))} className={`rounded-full px-5 py-1.5 text-sm font-black transition ${tab === k ? 'bg-white text-[#4a3570] shadow-[0_3px_0_#e3cfae]' : 'text-white/90'}`}>
               {label}
             </button>
           ))}
@@ -418,10 +471,32 @@ export function KororinWorld({
             {tab === 'friends' ? 'ダチは、おたがいにフォローしている人。名前をタップしてページからフォローしてね' : 'まだ誰もフォローしていないよ。名前をタップして、その人のページからフォローしてね'}
           </p>
         )}
-        <p className="mx-auto mt-2 w-fit rounded-full bg-white/75 px-3.5 py-1 text-[12px] font-bold text-[#5a3f8a]">
-          <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-pink-400 align-middle" />
-          いま土星に {online} 人がころりん中
-        </p>
+        {tab === 'all' && plaza ? (
+          <div className="mx-auto mt-2 flex w-fit max-w-[94%] items-center gap-1.5 rounded-full bg-white/90 py-1 pl-1 pr-1 shadow">
+            <button onClick={() => enterPlaza(null)} className="flex h-8 items-center gap-1 rounded-full bg-[#f3ecff] px-3 text-[12px] font-black text-[#5a3f8a]" aria-label="back to map">
+              ← ひろば
+            </button>
+            <span className="text-lg leading-none">{plaza.icon}</span>
+            <span className="min-w-0 truncate text-sm font-black text-[#3d2a5c]">{plaza.name}</span>
+            <span className="shrink-0 text-[11px] font-bold text-[#8a76bd]">👤{plaza.memberCount.toLocaleString()}</span>
+            <button
+              onClick={() =>
+                void getApi()
+                  .joinPlaza(plaza.id, !plaza.joined)
+                  .then(setPlaza)
+                  .catch(() => undefined)
+              }
+              className={`h-8 shrink-0 rounded-full px-3 text-[12px] font-black ${plaza.joined ? 'bg-pink-100 text-pink-500' : 'bg-gradient-to-r from-pink-400 to-violet-400 text-white'}`}
+            >
+              {plaza.joined ? '参加中' : '参加する'}
+            </button>
+          </div>
+        ) : (
+          <p className="mx-auto mt-2 w-fit rounded-full bg-white/75 px-3.5 py-1 text-[12px] font-bold text-[#5a3f8a]">
+            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-pink-400 align-middle" />
+            いま土星に {online} 人がころりん中
+          </p>
+        )}
       </div>
 
       {/* the speech bubble: just the words, over the tapped character (positioned by the loop);
@@ -543,14 +618,23 @@ export function KororinWorld({
           >
             <MicIcon size={20} /> 声をおとす
           </button>
-          <button onClick={omakase} className="flex w-16 flex-col items-center gap-0.5 text-[11px] font-black text-[#6b5a8a]">
+          <button onClick={() => void omakase()} className="flex w-16 flex-col items-center gap-0.5 text-[11px] font-black text-[#6b5a8a]">
             <RandomIcon />
             おまかせ
           </button>
         </div>
       </div>
 
-      {composer && <DropComposer replyTo={composer.replyTo} quote={composer.quote} onClose={() => setComposer(false)} onPosted={onPosted} />}
+      {composer && (
+        <DropComposer
+          replyTo={composer.replyTo}
+          quote={composer.quote}
+          plaza={tab === 'all' && !neoOnly ? plaza : null}
+          choosePlaza={onMap && !composer.replyTo}
+          onClose={() => setComposer(false)}
+          onPosted={onPosted}
+        />
+      )}
       {profileId && (
         <SaturnProfile
           userId={profileId}
@@ -576,7 +660,9 @@ const TABS: [Tab, string][] = [
 ];
 
 /** How many characters a tab shows at once (client decision 2026-10-07; みんな/セカイ is still being designed). */
-const TAB_CAP: Record<Exclude<Tab, 'all'>, number> = { following: 22, friends: 8 };
+const TAB_CAP: Record<Exclude<Tab, 'all'> | 'plaza', number> = { following: 22, friends: 8, plaza: 22 };
+/** A quiet ひろば gets a few residents so it never feels empty. */
+const PLAZA_MIN = 6;
 /** ダチ are few, so they are drawn bigger. */
 const FRIENDS_SCALE = 1.45;
 
@@ -709,9 +795,15 @@ function DropComposer({
   onPosted,
   replyTo,
   quote,
+  plaza,
+  choosePlaza = false,
 }: {
   onClose: () => void;
-  onPosted: (p: SaturnPostView) => void;
+  onPosted: (p: SaturnPostView, into?: PlazaView | null) => void;
+  /** dropped in this ひろば (inside one) */
+  plaza?: PlazaView | null;
+  /** from the map: pick which ひろば to drop it in */
+  choosePlaza?: boolean;
   /** answering this voice (the reply lines up under it) */
   replyTo?: SaturnPostView;
   /** quoting this voice (🔁, with your own words and voice) */
@@ -727,6 +819,19 @@ function DropComposer({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
+  const [places, setPlaces] = useState<PlazaView[]>([]);
+  const [into, setInto] = useState<PlazaView | null>(plaza ?? null);
+  useEffect(() => {
+    if (!choosePlaza) return;
+    getApi()
+      .plazas()
+      .then((l) => {
+        const sorted = [...l.filter((x) => x.joined), ...l.filter((x) => !x.joined)].slice(0, 12);
+        setPlaces(sorted);
+        setInto((cur) => cur ?? sorted.find((x) => x.joined) ?? null);
+      })
+      .catch(() => undefined);
+  }, [choosePlaza]);
   const mic = useDictation({ field: box, value: text, onChange: setText, maxLength: SATURN_MAX_CHARS * 2 });
   const left = SATURN_MAX_CHARS - [...text].length;
   const canPost = !!text.trim() && left >= 0 && !busy && !mic.listening;
@@ -758,8 +863,9 @@ function DropComposer({
     setBusy(true);
     setErr(null);
     try {
-      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}) };
-      onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target }));
+      const where = replyTo ? null : into;
+      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}), ...(where ? { plazaId: where.id } : {}) };
+      onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target }), where);
     } catch {
       setErr('うまく落とせなかった…もう一度');
       setBusy(false);
@@ -782,6 +888,28 @@ function DropComposer({
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-violet-50 p-2">
             <PuniAvatar seed={(replyTo ?? quote)!.author.id} neo={(replyTo ?? quote)!.author.neoForm} look={(replyTo ?? quote)!.author.look} pic={(replyTo ?? quote)!.author.pic} size={26} />
             <p className="min-w-0 flex-1 truncate text-xs text-slate-600">{(replyTo ?? quote)!.text}</p>
+          </div>
+        )}
+
+        {!replyTo && plaza && (
+          <p className="mt-1 text-center text-[11px] font-bold text-[#8a76bd]">
+            {plaza.icon} {plaza.name} に落とすよ
+          </p>
+        )}
+        {choosePlaza && (
+          <div className="mt-3">
+            <p className="text-xs font-black text-[#8a76bd]">どのひろばに落とす？</p>
+            <div className="mt-1 flex gap-2 overflow-x-auto pb-1">
+              {places.map((x) => (
+                <button key={x.id} onClick={() => setInto(x)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${into?.id === x.id ? 'bg-violet-500 text-white' : 'bg-violet-50 text-[#7a62b0]'}`}>
+                  {x.icon} {x.name}
+                </button>
+              ))}
+              <button onClick={() => setInto(null)} className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${!into ? 'bg-violet-500 text-white' : 'bg-violet-50 text-[#7a62b0]'}`}>
+                ひろばに置かない
+              </button>
+            </div>
+            {!into && <p className="mt-0.5 text-[10px] text-slate-400">ひろばに置かない声は、フォロー・ダチの人にだけ届くよ</p>}
           </div>
         )}
 

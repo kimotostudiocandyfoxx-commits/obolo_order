@@ -129,14 +129,27 @@ export class HttpApi implements Api {
   followSaturnUser(userId: string, on: boolean) {
     return this.req<Awaited<ReturnType<Api['followSaturnUser']>>>(on ? 'POST' : 'DELETE', `/saturn/users/${userId}/follow`);
   }
-  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit?: number) {
+  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit?: number, plaza?: string) {
     const q = new URLSearchParams();
+    if (plaza) q.set('plaza', plaza);
     if (cursor) q.set('cursor', cursor);
     if (fresh) q.set('fresh', '1');
     if (tab && tab !== 'all') q.set('tab', tab);
     if (limit) q.set('limit', String(limit));
     const qs = q.toString();
     return this.req<Awaited<ReturnType<Api['saturnFeed']>>>('GET', `/saturn/posts${qs ? `?${qs}` : ''}`);
+  }
+  plazas(q?: string) {
+    return this.req<Awaited<ReturnType<Api['plazas']>>>('GET', `/saturn/plazas${q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : ''}`);
+  }
+  plaza(id: string) {
+    return this.req<Awaited<ReturnType<Api['plaza']>>>('GET', `/saturn/plazas/${id}`);
+  }
+  createPlaza(body: Parameters<Api['createPlaza']>[0]) {
+    return this.req<Awaited<ReturnType<Api['createPlaza']>>>('POST', '/saturn/plazas', body);
+  }
+  joinPlaza(id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['joinPlaza']>>>(on ? 'POST' : 'DELETE', `/saturn/plazas/${id}/join`);
   }
   createSaturnPost(body: Parameters<Api['createSaturnPost']>[0]) {
     return this.req<Awaited<ReturnType<Api['createSaturnPost']>>>('POST', '/saturn/posts', body);

@@ -3,12 +3,14 @@ import type {
   BuddyMessageView,
   BuddyProfileView,
   BuddyQuotaView,
+  CreatePlazaBody,
   CreateSaturnPostBody,
   InviteView,
   Locale,
   MyInviteView,
   Me,
   Paged,
+  PlazaView,
   SaturnPostView,
   SaturnProfileView,
   PuniPicBody,
@@ -103,7 +105,13 @@ export interface Api {
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
   uploadVideo(blob: Blob, maxSeconds: number): Promise<UploadedVideo>;
-  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit?: number): Promise<Paged<SaturnPostView>>;
+  /** `plaza`: only the voices dropped in that ひろば (みんな map) */
+  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit?: number, plaza?: string): Promise<Paged<SaturnPostView>>;
+  /** ひろば (みんな map): most members first; `q` searches the names */
+  plazas(q?: string): Promise<PlazaView[]>;
+  plaza(id: string): Promise<PlazaView>;
+  createPlaza(body: CreatePlazaBody): Promise<PlazaView>;
+  joinPlaza(id: string, on: boolean): Promise<PlazaView>;
   /** The voice replies under a post (oldest first). */
   saturnReplies(postId: string): Promise<SaturnPostView[]>;
   saturnProfile(userId: string): Promise<SaturnProfileView>;

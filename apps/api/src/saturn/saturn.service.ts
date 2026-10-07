@@ -9,6 +9,7 @@ import { follows, saturnPosts, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
+import { PlazaService } from './plaza.service';
 
 type PostRow = typeof saturnPosts.$inferSelect;
 type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
@@ -24,6 +25,7 @@ export class SaturnService {
     private readonly media: MediaService,
     @Inject(LLM) private readonly llm: LlmProvider,
     private readonly voices: VoiceService,
+    private readonly plazas: PlazaService,
   ) {}
 
   /**
@@ -31,9 +33,11 @@ export class SaturnService {
    * client decision 2026-10-07): みんな = everyone, フォロー = people the viewer follows (and the
    * viewer), ダチ = mutual follows only. PLACEHOLDER (P-SAT-2): ranking.
    */
-  async feed(viewerId: string, cursor?: string, limit = 20, fresh = false, tab: 'all' | 'following' | 'friends' = 'all'): Promise<Paged<SaturnPostView>> {
-    const scope =
-      tab === 'following'
+  async feed(viewerId: string, cursor?: string, limit = 20, fresh = false, tab: 'all' | 'following' | 'friends' = 'all', plazaId?: string): Promise<Paged<SaturnPostView>> {
+    // inside a ひろば (みんな map): only the voices dropped there
+    const scope = plazaId
+      ? eq(saturnPosts.plazaId, plazaId)
+      : tab === 'following'
         ? sql`(${saturnPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${saturnPosts.userId} = ${viewerId})`
         : tab === 'friends'
           ? sql`${saturnPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
@@ -145,6 +149,9 @@ export class SaturnService {
       repostOf = (await this.refs(this.db.write, [t.repostOfId ?? t.id])).get(t.repostOfId ?? t.id) ?? null;
       if (!repostOf) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Post not found');
     }
+    // dropped in a ひろば: it must exist, and you join it (a reply stays with its post)
+    const plazaId = body.plazaId && !replyToId ? body.plazaId : null;
+    if (plazaId) await this.plazas.ensureForPost(userId, plazaId);
     // check the words first: a flagged post must not cost a voice generation
     const mod = await moderateText(body.text, this.llm);
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
@@ -178,6 +185,7 @@ export class SaturnService {
           voiceDurationSec: body.voiceDurationSec ?? null,
           replyToId,
           repostOfId: repostOf?.id ?? null,
+          plazaId,
         })
         .returning();
       if (replyToId) await tx.update(saturnPosts).set({ replyCount: sql`${saturnPosts.replyCount} + 1` }).where(eq(saturnPosts.id, replyToId));
