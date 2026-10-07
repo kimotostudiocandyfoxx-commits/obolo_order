@@ -5,7 +5,7 @@
 //              same picture, so the clip loops seamlessly and the camera stays put), aspect?: '16:9'|'9:16', model? }
 // Jobs whose output folder already exists are skipped (delete the folder or change the id to redo).
 // Needs GEMINI_API_KEY. No dependencies (Node 20+ fetch).
-import { mkdir, readFile, writeFile, access } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, access, readdir, rm } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 
 const KEY = process.env.GEMINI_API_KEY;
@@ -102,5 +102,7 @@ for (const job of queue) {
   await writeFile(join(dir, 'job.json'), JSON.stringify(job, null, 2));
   if (job.kind === 'video') await video(job, dir);
   else await image(job, dir);
+  // nothing painted (an API error): leave no folder, so the next run tries again
+  if ((await readdir(dir)).every((f) => f === 'job.json')) await rm(dir, { recursive: true });
 }
 await writeFile('art/out/last-run.log', log.join('\n') + '\n');
