@@ -4,6 +4,7 @@ import { ORBIT_ORDER, PLANETS, type PlanetId } from '@obolo/shared';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import { useI18n } from '@/lib/i18n/client';
+import { usePlanetLock } from './PlanetLock';
 import { PlanetSphere } from './PlanetSphere';
 
 /**
@@ -76,6 +77,23 @@ function PlanetLink({
   delay?: number;
 }) {
   const live = PLANETS[id].demo === 'live';
+  // Venus / Neptune open after joining (client decision 2026-10-07)
+  const lock = usePlanetLock(id);
+  if (lock.locked) {
+    return (
+      <div className="absolute flex flex-col items-center opacity-55 grayscale-[60%]" style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }} aria-label={`${label}（${lock.note}）`}>
+        <span className="relative block">
+          <PlanetSphere id={id} size={`${sizePct}cqw`} />
+          <span className="absolute inset-0 flex items-center justify-center" style={{ fontSize: `${sizePct * 0.4}cqw` }}>
+            🔒
+          </span>
+        </span>
+        <span className="mt-[1.2cqw] whitespace-nowrap rounded-full px-[1.6cqw] py-[0.3cqw] font-bold text-white/80" style={{ fontSize: 'clamp(9px, 2.6cqw, 13px)', background: 'rgba(8,11,28,0.55)' }}>
+          {label}・{lock.note}
+        </span>
+      </div>
+    );
+  }
   return (
     <Link
       href={PLANETS[id].route}

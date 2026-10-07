@@ -1,6 +1,7 @@
 'use client';
 
 import { Artwork } from '@/components/Artwork';
+import { PlanetGate } from '@/components/PlanetLock';
 import { PlanetShell } from '@/components/PlanetShell';
 import { useToast } from '@/components/Toast';
 import { useI18n } from '@/lib/i18n/client';
@@ -13,6 +14,7 @@ export function NeptuneView() {
   const [hero, ...rest] = GAMES;
   return (
     <PlanetShell id="neptune">
+      <PlanetGate planet="neptune" name="海王星">
       <p className="mb-4 text-xs text-white/55">🎮 {m.neptune.lead}</p>
       <article className="card mb-4 overflow-hidden">
         <Artwork hue={hero.hue} emoji={hero.emoji} animated />
@@ -48,6 +50,7 @@ export function NeptuneView() {
         ))}
       </ul>
       {toast.node}
+      </PlanetGate>
     </PlanetShell>
   );
 }

@@ -6,6 +6,7 @@ import {
   MONTHLY_GRANT_MANA,
   neoVoiceUrl,
   SATURN_LIFETIME_HOURS,
+  nextJourneyDay,
   JUPITER_DEFAULT_BRANCHES,
   JUPITER_FLY_HOURS,
   type JupiterAuthor,
@@ -610,7 +611,7 @@ export class DemoApi implements Api {
     return this.patchMe((u) => {
       if (!u.journeyCompletedAt || u.journeyDay >= JOURNEY_DONE) return {};
       if (!skip && Date.now() < Date.parse(u.journeyCompletedAt) + JOURNEY_WAIT_MS) throw new ApiError(409, 'NOT_YET', 'not yet');
-      return { journeyDay: u.journeyDay + 1, journeyCompletedAt: null };
+      return { journeyDay: nextJourneyDay(u.journeyDay), journeyCompletedAt: null };
     });
   }
 

@@ -14,8 +14,8 @@ import type { Step } from './script';
  */
 export const DAY9: Step[] = [
   { t: 'bgm', track: 'opening' },
-  { t: 'still', image: 'venus-market' },
-  { t: 'caption', text: '金星で目を覚ました' }, // ✏️
+  { t: 'still', image: 'mars-city' },
+  { t: 'caption', text: '火星で目を覚ました' }, // ✏️ Venus left the journey (2026-10-07): the day starts on Mars
   { t: 'sprite', image: 'kimorin-1' },
   { t: 'say', who: 'KIMORIN', text: 'おはよう、よく眠れたか？' },
   { t: 'say', who: 'KIMORIN', text: 'よし、今日行く場所は冥王星！\nロケットに乗れ！' },
@@ -27,7 +27,7 @@ export const DAY9: Step[] = [
   { t: 'caption', text: '{bati}の元気がない' }, // ✏️
   { t: 'sprite', image: ['kimorin-1', '@bati-weak'] },
   { t: 'say', who: 'KIMORIN', text: '{bati}は、太陽の力……\n「マナ」というエネルギーで生きているんだ。' },
-  { t: 'say', who: 'KIMORIN', text: '土星、木星、火星、金星……\n{bati}は、マナを使っていろいろしたからな。' },
+  { t: 'say', who: 'KIMORIN', text: '土星、木星、水星、火星……\n{bati}は、マナを使っていろいろしたからな。' },
   { t: 'say', who: 'KIMORIN', text: 'マナが、なくなってきてるんだと思う。' },
   { t: 'say', who: 'KIMORIN', text: '一度、地球の結社に帰ろう。' },
   { t: 'sprite', image: null },

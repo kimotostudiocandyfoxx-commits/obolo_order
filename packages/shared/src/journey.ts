@@ -13,6 +13,35 @@ import type { PlanetId } from './planets';
  * Day 9 can only be finished after paying; after its countdown the visitor is an ORDER (10).
  */
 export const JOURNEY_LAST_DAY = 8;
+/**
+ * Venus left the journey (client decision 2026-10-07, before the 10/10 demo): the route is
+ * Moon → Saturn → Jupiter → Mercury → Mars → back to Earth → the Sun temple (Eclipse) → ORDER.
+ * Day 8 (Venus) is skipped: finishing day 7 opens the Eclipse day (9). Venus opens later.
+ */
+export const SKIPPED_DAYS: readonly number[] = [8];
+export function nextJourneyDay(day: number): number {
+  let d = day + 1;
+  while (SKIPPED_DAYS.includes(d)) d++;
+  return d;
+}
+
+/**
+ * Planets that open after joining (client decision 2026-10-07): one more each week after the
+ * Eclipse — Venus after 1 week, Neptune after 2, Pluto after 3 (Pluto is not built yet).
+ * PLACEHOLDER (P-JOURNEY-1): which planet opens in which week.
+ */
+export const LATER_PLANETS: readonly { planet: 'venus' | 'neptune' | 'pluto'; afterDays: number }[] = [
+  { planet: 'venus', afterDays: 7 },
+  { planet: 'neptune', afterDays: 14 },
+  { planet: 'pluto', afterDays: 21 },
+];
+/** When a later planet opens for this member (null = not a member yet); undefined = always open. */
+export function planetOpensAt(planet: string, orderedAt: string | null | undefined): Date | null | undefined {
+  const rule = LATER_PLANETS.find((p) => p.planet === planet);
+  if (!rule) return undefined;
+  if (!orderedAt) return null;
+  return new Date(new Date(orderedAt).getTime() + rule.afterDays * 24 * 3600_000);
+}
 export const JOURNEY_PAYMENT = 9;
 export const JOURNEY_DONE = 10;
 export const JOURNEY_WAIT_MS = 24 * 3600_000;
@@ -61,12 +90,13 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
   { day: 6, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
   // Mars comes before Venus (client, 2026-10-05)
   { day: 7, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
+  // day 8 (Venus) is skipped since 2026-10-07 — Venus opens a week after joining (kept for later)
   { day: 8, planet: 'venus', guides: ['KIMORIN', 'ロングG', 'ハットG', 'ボスG'], title: '金星へ', beats: ['金星に行く', 'ゴリラ3人組に出会う', '金星（グッズをつくって星で売り買い）で遊ぶ'] },
 ];
 
 /** Day 9 (client, 2026-10-06): not a planet visit — the way to ORDER. */
 export const ECLIPSE_DAY_BEATS = [
-  '金星で目を覚ます。今日は冥王星へ……のはずが、バティの元気がない',
+  '火星で目を覚ます。今日はもっと遠くの星へ……のはずが、バティの元気がない',
   'バティは太陽の力「マナ」で生きている。マナが切れかけているので地球の本部へ戻る',
   'MONBAN：太陽の神殿で、太陽と君の魂の一部をつなぐ「エクリプス」が必要',
   'エクリプスに成功した人がORDER。バティにマナを渡せて、自由に宇宙を旅できる',

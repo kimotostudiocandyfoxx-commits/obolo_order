@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import {
   JOURNEY_DONE,
+  nextJourneyDay,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
   type CompleteJourneyDayBody,
@@ -103,7 +104,7 @@ export class UsersService {
     }
     const [u] = await this.db.write
       .update(users)
-      .set({ journeyDay: cur.journeyDay + 1, journeyCompletedAt: null, updatedAt: new Date() })
+      .set({ journeyDay: nextJourneyDay(cur.journeyDay), journeyCompletedAt: null, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     return toMe(u);

@@ -15,7 +15,7 @@ export default function PreviewIndex() {
     { href: '/preview/play?day=6&at=choice', label: '6日目：フリージーの質問（ある／ない）から' },
     { href: '/preview/play?day=6&at=mercury', label: '6日目：水星（船の海と島）から' },
     { href: '/preview/play?day=7&at=mars', label: '7日目：火星（UFOの星図とスタジオ）から' },
-    { href: '/preview/play?day=8&at=venus', label: '8日目：金星（マーケット）から' },
+    { href: '/preview/play?day=8&at=venus', label: '（旅から外した）金星の日：マーケットから' },
     { href: '/preview/play?day=9&at=choice', label: '9日目：MONBANの「月88円」から（支払いはデモ）' },
     { href: '/preview/puni-image', label: 'ぷにぷにキャラの試作（絵のキャラ版・メッシュ変形）' },
     { href: '/preview/robot', label: 'ロボット声のテスト（土星チュートリアル用：録音→ロボット声で再生）' },

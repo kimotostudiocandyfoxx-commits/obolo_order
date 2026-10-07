@@ -49,7 +49,9 @@ export const DAY7: Step[] = [
   { t: 'sprite', image: 'hipokin' },
   { t: 'say', who: 'ヒポキン', text: '{name}の毎日も、一本の映画になる。\nまた見せに来い。' },
   { t: 'sprite', image: 'kimorin-8' },
-  { t: 'say', who: 'KIMORIN', text: '明日は金星だ。\n金星にも、オレの友達がいるケン！' },
+  // Venus left the journey (client 2026-10-07): Mars is the last planet before the Eclipse day
+  { t: 'say', who: 'KIMORIN', text: 'これで、星をぜんぶまわったケン。' },
+  { t: 'say', who: 'KIMORIN', text: '明日は、もっと遠くの星へ行くケン。\n遅れるなよ！' },
   { t: 'sprite', image: null },
   { t: 'end' },
 ];
