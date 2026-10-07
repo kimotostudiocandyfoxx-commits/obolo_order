@@ -68,6 +68,9 @@ export function KororinWorld({
   const stage = useRef<HTMLDivElement>(null);
   const layer = useRef<PuniLayerHandle>(null);
   const openRef = useRef<string | null>(null);
+  const openPostRef = useRef<SaturnPostView | null>(null);
+  const detailRef = useRef(false);
+  const meIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     getApi()
@@ -77,7 +80,42 @@ export function KororinWorld({
     return () => stopAudio();
   }, []);
 
-  useEffect(() => subscribeAudio((s) => setPlayingUrl(s.playing ? s.url : null)), []);
+  // voices you have heard pop like soap bubbles and stay gone (remembered on this device)
+  const heardKey = `obolo.saturn.heard.${me?.id ?? 'guest'}`;
+  const [heard, setHeard] = useState<Set<string>>(new Set());
+  const [bursts, setBursts] = useState<{ key: number; x: number; y: number; r: number }[]>([]);
+  useEffect(() => {
+    try {
+      setHeard(new Set(JSON.parse(localStorage.getItem(heardKey) ?? '[]') as string[]));
+    } catch {
+      setHeard(new Set());
+    }
+  }, [heardKey]);
+  const remember = (next: Set<string>) => {
+    setHeard(next);
+    try {
+      localStorage.setItem(heardKey, JSON.stringify([...next].slice(-600)));
+    } catch {
+      /* private mode: only for this visit */
+    }
+  };
+  const popRef = useRef<(id: string) => void>(() => {});
+  const pendingPop = useRef<string | null>(null);
+
+  useEffect(
+    () =>
+      subscribeAudio((st) => {
+        setPlayingUrl(st.playing ? st.url : null);
+        // the opened voice played to the end → it pops (not your own, not while its sheet is open)
+        const id = openRef.current;
+        const p = id ? openPostRef.current : null;
+        if (!st.playing && st.progress >= 0.97 && p && st.url === p.voiceUrl && p.author.id !== meIdRef.current) {
+          if (detailRef.current) pendingPop.current = p.id;
+          else popRef.current(p.id);
+        }
+      }),
+    [],
+  );
 
   // Real posts first, topped up with sample residents so the world never feels empty.
   const all = useMemo(() => {
@@ -96,7 +134,7 @@ export function KororinWorld({
       .catch(() => setTabPosts([]));
   }, [tab]);
 
-  const shown = useMemo(() => (tab === 'all' ? all : (tabPosts ?? [])), [all, tab, tabPosts]);
+  const shown = useMemo(() => (tab === 'all' ? all : (tabPosts ?? [])).filter((p) => !heard.has(p.id)), [all, tab, tabPosts, heard]);
 
   useEffect(() => {
     const el = stage.current;
@@ -139,6 +177,24 @@ export function KororinWorld({
     el.style.opacity = '1';
     if (tail.current) tail.current.style.left = `${Math.max(22, Math.min(cw - 22, b.x - left))}px`;
   }, []);
+
+  openPostRef.current = open;
+  detailRef.current = detail;
+  meIdRef.current = me?.id;
+  popRef.current = (id: string) => {
+    const b = layer.current?.blob(id);
+    if (b) setBursts((cur) => [...cur.slice(-6), { key: Date.now() + Math.random(), x: b.x, y: b.y, r: b.R }]);
+    if (openRef.current === id) close();
+    remember(new Set(heard).add(id));
+  };
+  // the sheet closed after the voice ended: pop now
+  useEffect(() => {
+    if (!detail && pendingPop.current) {
+      const id = pendingPop.current;
+      pendingPop.current = null;
+      popRef.current(id);
+    }
+  }, [detail]);
 
   const listen = useCallback(
     (p: SaturnPostView) => {
@@ -277,11 +333,24 @@ export function KororinWorld({
         }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
       </div>
 
+      {/* soap-bubble pops of the voices you heard */}
+      {bursts.map((bu) => (
+        <BubbleBurst key={bu.key} x={bu.x} y={bu.y} r={bu.r} onDone={() => setBursts((cur) => cur.filter((x) => x.key !== bu.key))} />
+      ))}
+      {tab === 'all' && posts.length + SATURN_RESIDENTS.length > 0 && shown.length === 0 && (
+        <div className="absolute inset-x-0 top-[38%] z-[70] flex flex-col items-center gap-2 px-6 text-center">
+          <p className="rounded-2xl bg-white/85 px-4 py-2 text-sm font-black text-[#5a3f8a] shadow">いまの声は、ぜんぶ聞いたよ。新しい声を待ってね</p>
+          <button onClick={() => remember(new Set())} className="rounded-full bg-white/70 px-3 py-1 text-[11px] font-bold text-[#7a62b0]">
+            聞いた声をもう一度ならべる
+          </button>
+        </div>
+      )}
+
       {/* header */}
       <div className="pt-safe absolute inset-x-0 top-0 z-[80] px-4">
         <div className="mt-2 flex items-center justify-between">
           <span className="flex items-center gap-2 text-2xl font-black tracking-wide text-white drop-shadow-[0_2px_0_rgba(80,40,140,.45)]">
-            <SaturnIcon /> ころりん
+            <SaturnIcon /> ころりんぱ
           </span>
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-sm font-black text-[#4a3570] shadow-[0_3px_0_#e3cfae]">
@@ -514,6 +583,36 @@ function RandomIcon() {
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6b5a8a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <path d="M20 11a8 8 0 0 0-14.3-4.5M4 13a8 8 0 0 0 14.3 4.5M5 3v4h4M19 21v-4h-4" />
     </svg>
+  );
+}
+
+/** A soap bubble popping: an iridescent ring that bursts into droplets (CSS, ~0.6 s). */
+function BubbleBurst({ x, y, r, onDone }: { x: number; y: number; r: number; onDone: () => void }) {
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    const t = setTimeout(() => done.current(), 700);
+    return () => clearTimeout(t);
+  }, []);
+  const size = r * 2.3;
+  return (
+    <div className="pointer-events-none absolute z-[60]" style={{ left: x - size / 2, top: y - size / 2, width: size, height: size }}>
+      <span
+        className="absolute inset-0 animate-[bubbleRing_0.45s_ease-out_forwards] rounded-full"
+        style={{ background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,.85), rgba(255,255,255,0) 30%), conic-gradient(from 30deg, #ffc6ea, #c9b8ff, #a8f0ff, #d8ffc6, #fff3b0, #ffc6ea)', mask: 'radial-gradient(circle, transparent 58%, #000 61%)', WebkitMask: 'radial-gradient(circle, transparent 58%, #000 61%)' }}
+      />
+      {Array.from({ length: 10 }, (_, i) => {
+        const a = (i / 10) * Math.PI * 2;
+        const d = size * (0.62 + (i % 3) * 0.12);
+        return (
+          <span
+            key={i}
+            className="absolute left-1/2 top-1/2 animate-[bubbleDrop_0.6s_ease-out_forwards] rounded-full bg-white/90"
+            style={{ width: 5 + (i % 3) * 2, height: 5 + (i % 3) * 2, ['--dx' as string]: `${Math.cos(a) * d}px`, ['--dy' as string]: `${Math.sin(a) * d}px`, boxShadow: '0 0 6px rgba(200,180,255,.9)' }}
+          />
+        );
+      })}
+    </div>
   );
 }
 

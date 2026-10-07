@@ -427,3 +427,13 @@ body {
 /* a poked figure shows its >_< eyes */
 .puni-poked [data-eyes='open'] { display: none; }
 .puni-poked [data-eyes='poked'] { display: inline !important; }
+/* ころりんぱ: a heard voice pops like a soap bubble */
+@keyframes bubbleRing {
+  0% { transform: scale(0.75); opacity: 1; }
+  70% { opacity: 0.9; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+@keyframes bubbleDrop {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(0.3); opacity: 0; }
+}
