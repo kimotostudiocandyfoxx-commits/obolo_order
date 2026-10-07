@@ -87,3 +87,26 @@ export async function transcodePhoto(data: Buffer): Promise<{ data: Buffer; widt
     .toBuffer({ resolveWithObject: true });
   return { data: out, width: info.width, height: info.height };
 }
+
+/**
+ * Mars posts are square (client decision 2026-10-07): centre-crop to a square, 720 px, H.264.
+ */
+export async function squareVideo(input: string, output: string, maxSeconds: number): Promise<void> {
+  const p = MEDIA_POLICY.video;
+  await run(
+    'ffmpeg',
+    [
+      '-y', '-hide_banner', '-loglevel', 'error',
+      '-i', input,
+      '-t', String(maxSeconds),
+      '-map', '0:v:0', '-map', '0:a:0?',
+      '-vf', "crop='min(iw,ih)':'min(iw,ih)',scale='min(720,iw)':-2,setsar=1",
+      '-c:v', 'libx264', '-preset', 'veryfast', '-profile:v', 'main', '-pix_fmt', 'yuv420p',
+      '-crf', '26', '-maxrate', p.maxrate, '-bufsize', p.bufsize,
+      '-c:a', 'aac', '-b:a', p.audioBitrate, '-ac', '2',
+      '-movflags', '+faststart', '-map_metadata', '-1',
+      output,
+    ],
+    300_000,
+  );
+}

@@ -12,6 +12,12 @@ import type {
   JupiterRootView,
   JupiterTreeView,
   MarsBackstageBody,
+  CreatePlanetPostBody,
+  PlanetFlyer,
+  PlanetPostView,
+  PlanetProfileView,
+  PlanetReplyView,
+  TimelinePlanet,
   MarsBackstageVideo,
   CreateSaturnPostBody,
   InviteView,
@@ -169,6 +175,16 @@ export interface Api {
   jupiterTree(userId: string): Promise<JupiterTreeView>;
   renameJupiterBranch(index: number, name: string): Promise<{ branches: string[] }>;
   searchJupiter(q: string): Promise<JupiterAuthor[]>;
+
+  /** your saved songs (the soil of your island); `posted` = already sent out as a ship */
+  savedSongs(): Promise<(SongView & { posted: boolean })[]>;
+  // Mercury & Mars timelines (songs / square movies)
+  planetSky(planet: TimelinePlanet, tab: 'all' | 'following' | 'friends'): Promise<PlanetFlyer[]>;
+  planetProfile(planet: TimelinePlanet, userId: string): Promise<PlanetProfileView>;
+  createPlanetPost(planet: TimelinePlanet, body: CreatePlanetPostBody): Promise<PlanetPostView>;
+  starPlanetPost(planet: TimelinePlanet, id: string, on: boolean): Promise<{ starredByMe: boolean }>;
+  planetReplies(planet: TimelinePlanet, id: string): Promise<PlanetReplyView[]>;
+  replyPlanet(planet: TimelinePlanet, id: string, text: string): Promise<PlanetReplyView>;
 
   // Mars 裏スタジオ: every video you keep
   marsBackstage(): Promise<MarsBackstageVideo[]>;

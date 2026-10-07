@@ -34,7 +34,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
     {
       who: 'partner',
       text: hasBati
-        ? '作曲しよう！ 今日あったこと、思ってること、なんでも話して。わたしが歌にするね。'
+        ? 'やあ、今日はどんな曲を作っちゃう？ 今日あったこと、思ってること、なんでも話して。わたしが歌にするね。'
         : '作曲するケン！ 今日あったこと、思ってること、なんでも話してみろ。オレが歌にしてやるケン。',
     },
   ]);

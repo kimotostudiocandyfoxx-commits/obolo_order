@@ -11,7 +11,7 @@ import {
   songEditSystem,
 } from '@obolo/ai';
 import type { SingBody, SingDirection, SongEditBody, SongEditCommand, SongEditResult, SongMix, SongPhrase, SongView, VoiceSlot } from '@obolo/shared';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
@@ -336,6 +336,17 @@ export class SongService {
   // --- save -------------------------------------------------------------------------------------
 
   /** 保存する: the member keeps this version (it is buried in their island on the client). */
+  /** Your saved songs (島の土 on Mercury), newest first; `posted` = already sent out as a ship. */
+  async saved(userId: string): Promise<(SongView & { posted: boolean })[]> {
+    const rows = await this.db.read
+      .select({ s: songs, posted: sql<boolean>`EXISTS (SELECT 1 FROM planet_posts pp WHERE pp.source_id = ${songs.id} AND pp.planet = 'mercury' AND pp.deleted_at IS NULL)` })
+      .from(songs)
+      .where(and(eq(songs.userId, userId), isNull(songs.deletedAt), isNotNull(songs.savedAt)))
+      .orderBy(desc(songs.savedAt))
+      .limit(100);
+    return rows.map(({ s, posted }) => ({ ...this.view(s), posted: !!posted }));
+  }
+
   async save(userId: string, id: string): Promise<SongView> {
     await this.owned(userId, id);
     const [row] = await this.db.write.update(songs).set({ savedAt: new Date(), updatedAt: new Date() }).where(eq(songs.id, id)).returning();

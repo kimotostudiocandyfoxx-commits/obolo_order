@@ -51,6 +51,12 @@ export class ComposeController {
     return this.songs.create(userId, b, `${req.protocol}://${req.get('host')}`);
   }
 
+  /** Your saved songs (the soil of your island on Mercury). */
+  @Get('songs')
+  saved(@UserId() userId: string) {
+    return this.songs.saved(userId);
+  }
+
   @Get('songs/:id')
   async song(@UserId() userId: string, @Param('id', ParseUUIDPipe) id: string) {
     return this.songs.get(userId, id);

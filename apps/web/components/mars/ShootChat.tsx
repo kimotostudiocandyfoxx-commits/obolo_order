@@ -25,7 +25,7 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Vid
     {
       who: 'partner',
       text: hasBati
-        ? '映像をつくろう！ 撮りたいこと、見せたい場面を話して。わたしが映像にするね。'
+        ? 'やあ、今日はどんなムービーを作っちゃう？ 撮りたいこと、見せたい場面を話して。わたしが映像にするね。'
         : '撮影するケン！ 撮りたいこと、見せたい場面を話してみろ。オレが映像にしてやるケン。',
     },
   ]);

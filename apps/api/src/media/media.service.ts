@@ -9,7 +9,8 @@ import { AppConfig, CONFIG } from '../config';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { mediaObjects, users } from '../db/schema';
-import { probe, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
+import { probe, squareVideo, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
+import { writeFile } from 'node:fs/promises';
 
 /** Spec §5: default per-user storage quota 1 GB across all planets. */
 export const STORAGE_QUOTA_BYTES = 1024 * 1024 * 1024;
@@ -172,6 +173,38 @@ export class MediaService {
     if (m.data) return m.data;
     const res = await fetch(m.url, { signal: AbortSignal.timeout(60_000) });
     return res.ok ? Buffer.from(await res.arrayBuffer()) : null;
+  }
+
+  /**
+   * A square copy of one of the user's videos (Mars posts are square): centre-cropped, with a
+   * poster. The original stays as it is in the 裏スタジオ.
+   */
+  async squareCopy(userId: string, url: string, maxSeconds: number, requestOrigin: string) {
+    const [m] = await this.db.write
+      .select({ data: mediaObjects.data, url: mediaObjects.url })
+      .from(mediaObjects)
+      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'video'), isNull(mediaObjects.deletedAt)));
+    if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Video not found');
+    const bytes = m.data ?? (await fetch(m.url, { signal: AbortSignal.timeout(120_000) }).then(async (r) => (r.ok ? Buffer.from(await r.arrayBuffer()) : null)));
+    if (!bytes) throw apiError(HttpStatus.BAD_GATEWAY, 'MEDIA_UNAVAILABLE', 'Could not read the video');
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-sq-'));
+    try {
+      await writeFile(join(dir, 'in'), bytes);
+      const out = join(dir, 'square.mp4');
+      try {
+        await squareVideo(join(dir, 'in'), out, maxSeconds);
+      } catch (e) {
+        this.log.warn(`square crop failed: ${e instanceof Error ? e.message : String(e)}`);
+        throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_VIDEO', 'Could not convert this video');
+      }
+      const info = await probe(out);
+      const poster = await videoPoster(out, join(dir, 'poster.png'));
+      const p = await this.store(userId, 'poster', 'image/webp', poster, requestOrigin);
+      const v = await this.store(userId, 'video', 'video/mp4', await readFile(out), requestOrigin);
+      return { url: v.url, posterUrl: p.url, seconds: Math.round(info.seconds * 10) / 10 };
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   }
 
   /** The bytes of one of the user's generated images (to edit it). */

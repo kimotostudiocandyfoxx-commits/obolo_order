@@ -16,6 +16,12 @@ import {
   type JupiterRootView,
   type JupiterTreeView,
   type MarsBackstageVideo,
+  type PlanetAuthor,
+  type PlanetFlyer,
+  type PlanetPostView,
+  type PlanetProfileView,
+  type PlanetReplyView,
+  type TimelinePlanet,
   type BuddyMessageView,
   type BuddyPersona,
   type InviteView,
@@ -76,6 +82,9 @@ interface DemoState {
   jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe' | 'replyCount' | 'repliers'> & { owner: string; starredBy: string[] })[];
   jreplies?: { id: string; postId: string; owner: string; text: string; createdAt: string }[];
   jbranches?: Record<string, string[]>;
+  /** Mercury / Mars posts (this browser only) */
+  pposts?: (Omit<PlanetPostView, 'author' | 'starredByMe' | 'repliers'> & { owner: string; starredBy: string[] })[];
+  preplies?: { id: string; postId: string; owner: string; text: string; createdAt: string }[];
   /** Mars 裏スタジオ (this browser only) */
   backstage?: (MarsBackstageVideo & { owner: string })[];
   /** ひろば (みんな map) and who joined them */
@@ -798,6 +807,91 @@ export class DemoApi implements Api {
     return Object.keys(this.s.users)
       .filter((id) => !t || `${this.s.users[id].displayName} ${this.s.users[id].handle}`.toLowerCase().includes(t))
       .map((id) => this.jAuthor(id));
+  }
+
+  // --- Mercury & Mars (demo: only the visitor's own posts; the screens draw the sample residents) ---
+  private pAuthor(id: string): PlanetAuthor {
+    const u = this.s.users[id];
+    return { id, handle: u?.handle ?? 'neo', displayName: u?.displayName ?? 'NEO', neoForm: u?.neoForm ?? null, pic: u?.puniPic ?? null };
+  }
+
+  private pView(p: NonNullable<DemoState['pposts']>[number], viewer: string): PlanetPostView {
+    const { owner, starredBy, ...rest } = p;
+    const rs = (this.s.preplies ?? []).filter((r) => r.postId === p.id);
+    return { ...rest, author: this.pAuthor(owner), starredByMe: starredBy.includes(viewer), repliers: [...new Set(rs.map((r) => r.owner).reverse())].slice(0, 3).map((o) => this.pAuthor(o)) };
+  }
+
+  async savedSongs() {
+    return [];
+  }
+
+  async planetSky(planet: TimelinePlanet, tab: 'all' | 'following' | 'friends'): Promise<PlanetFlyer[]> {
+    const viewer = this.uid();
+    const f = this.s.follows ?? {};
+    const cut = Date.now() - 88 * 3600_000;
+    const ok = (o: string) => tab === 'all' || o === viewer || (tab === 'following' ? (f[viewer] ?? []).includes(o) : (f[viewer] ?? []).includes(o) && (f[o] ?? []).includes(viewer));
+    const by = new Map<string, PlanetFlyer>();
+    for (const p of (this.s.pposts ?? []).filter((x) => x.planet === planet && new Date(x.createdAt).getTime() > cut && ok(x.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
+      const fl = by.get(p.owner) ?? { author: this.pAuthor(p.owner), posts: [] };
+      fl.posts.push(this.pView(p, viewer));
+      by.set(p.owner, fl);
+    }
+    return [...by.values()];
+  }
+
+  async planetProfile(planet: TimelinePlanet, userId: string): Promise<PlanetProfileView> {
+    const viewer = this.uid();
+    const cut = Date.now() - 88 * 3600_000;
+    const mine = (this.s.pposts ?? []).filter((p) => p.planet === planet && p.owner === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return {
+      author: this.pAuthor(userId),
+      flying: mine.filter((p) => new Date(p.createdAt).getTime() > cut).map((p) => this.pView(p, viewer)),
+      works: mine.filter((p) => new Date(p.createdAt).getTime() <= cut).map((p) => this.pView(p, viewer)),
+      followedByMe: (this.s.follows?.[viewer] ?? []).includes(userId),
+      isMe: viewer === userId,
+    };
+  }
+
+  async createPlanetPost(planet: TimelinePlanet, body: Parameters<Api['createPlanetPost']>[1]) {
+    const viewer = this.uid();
+    const v = planet === 'mars' ? (this.s.backstage ?? []).find((x) => x.id === body.sourceId && x.owner === viewer) : null;
+    if (planet === 'mars' && !v) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    const p = {
+      id: uid(),
+      planet,
+      owner: viewer,
+      kind: planet === 'mars' ? ('video' as const) : ('song' as const),
+      title: body.title || v?.title || '',
+      text: body.text ?? '',
+      url: v?.url ?? '',
+      posterUrl: null,
+      seconds: v?.seconds ?? null,
+      starredBy: [],
+      createdAt: now(),
+    };
+    this.s.pposts = [p, ...(this.s.pposts ?? [])];
+    this.save();
+    return this.pView(p, viewer);
+  }
+
+  async starPlanetPost(_planet: TimelinePlanet, id: string, on: boolean) {
+    const viewer = this.uid();
+    const p = (this.s.pposts ?? []).find((x) => x.id === id);
+    if (p) p.starredBy = on ? [...new Set([...p.starredBy, viewer])] : p.starredBy.filter((x) => x !== viewer);
+    this.save();
+    return { starredByMe: on };
+  }
+
+  async planetReplies(_planet: TimelinePlanet, id: string): Promise<PlanetReplyView[]> {
+    return (this.s.preplies ?? []).filter((r) => r.postId === id).map((r) => ({ id: r.id, author: this.pAuthor(r.owner), text: r.text, createdAt: r.createdAt }));
+  }
+
+  async replyPlanet(_planet: TimelinePlanet, id: string, text: string) {
+    const viewer = this.uid();
+    const r = { id: uid(), postId: id, owner: viewer, text: text.trim().slice(0, 120), createdAt: now() };
+    this.s.preplies = [...(this.s.preplies ?? []), r];
+    this.save();
+    return { id: r.id, author: this.pAuthor(viewer), text: r.text, createdAt: r.createdAt };
   }
 
   async marsBackstage() {

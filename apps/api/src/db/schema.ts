@@ -232,6 +232,48 @@ export const saturnPosts = pgTable(
   ],
 );
 
+/**
+ * Mercury (songs) and Mars (square movies) posts — 88 hours on the timelines, then on the
+ * owner's island / studio (client decision 2026-10-07: they work like Saturn / Jupiter).
+ */
+export const planetPosts = pgTable(
+  'planet_posts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    planet: text('planet').notNull(), // mercury | mars
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(), // song | video
+    sourceId: uuid('source_id'),
+    title: text('title').notNull().default(''),
+    text: text('text').notNull().default(''),
+    url: text('url').notNull(),
+    posterUrl: text('poster_url'),
+    seconds: real('seconds'),
+    starCount: integer('star_count').notNull().default(0),
+    replyCount: integer('reply_count').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index('planet_posts_planet_idx').on(t.planet, t.createdAt), index('planet_posts_user_idx').on(t.userId, t.planet, t.createdAt)],
+);
+
+export const planetReplies = pgTable(
+  'planet_replies',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => planetPosts.id),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    text: text('text').notNull(),
+    ...timestamps,
+  },
+  (t) => [index('planet_replies_post_idx').on(t.postId, t.createdAt)],
+);
+
 /** Mars 裏スタジオ: every video a member keeps (Jupiter is photos only — client decision 2026-10-07). Private. */
 export const marsBackstage = pgTable(
   'mars_backstage',

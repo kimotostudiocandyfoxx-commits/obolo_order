@@ -1,3 +1,4 @@
+import type { TimelinePlanet } from '@obolo/shared';
 import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
@@ -231,6 +232,27 @@ export class HttpApi implements Api {
   }
   searchJupiter(q: string) {
     return this.req<Awaited<ReturnType<Api['searchJupiter']>>>('GET', `/jupiter/users?q=${encodeURIComponent(q.trim())}`);
+  }
+  savedSongs() {
+    return this.req<Awaited<ReturnType<Api['savedSongs']>>>('GET', '/compose/songs');
+  }
+  planetSky(planet: TimelinePlanet, tab: 'all' | 'following' | 'friends') {
+    return this.req<Awaited<ReturnType<Api['planetSky']>>>('GET', `/planets/${planet}/sky${tab === 'all' ? '' : `?tab=${tab}`}`);
+  }
+  planetProfile(planet: TimelinePlanet, userId: string) {
+    return this.req<Awaited<ReturnType<Api['planetProfile']>>>('GET', `/planets/${planet}/profiles/${userId}`);
+  }
+  createPlanetPost(planet: TimelinePlanet, body: Parameters<Api['createPlanetPost']>[1]) {
+    return this.req<Awaited<ReturnType<Api['createPlanetPost']>>>('POST', `/planets/${planet}/posts`, body);
+  }
+  starPlanetPost(planet: TimelinePlanet, id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['starPlanetPost']>>>(on ? 'POST' : 'DELETE', `/planets/${planet}/posts/${id}/star`);
+  }
+  planetReplies(planet: TimelinePlanet, id: string) {
+    return this.req<Awaited<ReturnType<Api['planetReplies']>>>('GET', `/planets/${planet}/posts/${id}/replies`);
+  }
+  replyPlanet(planet: TimelinePlanet, id: string, text: string) {
+    return this.req<Awaited<ReturnType<Api['replyPlanet']>>>('POST', `/planets/${planet}/posts/${id}/replies`, { text });
   }
   marsBackstage() {
     return this.req<Awaited<ReturnType<Api['marsBackstage']>>>('GET', '/mars/backstage');

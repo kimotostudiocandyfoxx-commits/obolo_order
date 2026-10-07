@@ -394,3 +394,57 @@ export interface MarsBackstageVideo {
   title: string;
   createdAt: string;
 }
+
+// --- Mercury & Mars timelines (client decision 2026-10-07: they work like Saturn / Jupiter) ---------
+
+export type TimelinePlanet = 'mercury' | 'mars';
+
+/** Someone on Mercury / Mars: their picture (Saturn character) or NEO form. */
+export interface PlanetAuthor {
+  id: string;
+  handle: string;
+  displayName: string;
+  neoForm?: string | null;
+  pic?: string | null;
+}
+
+/**
+ * A post on Mercury (a song: round) or Mars (a movie: square). It sails / flies on the
+ * timelines for 88 hours, then stays on the owner's island / studio. No counts are sent
+ * (client rule 2026-10-07): only whether you starred it and who answered lately.
+ */
+export interface PlanetPostView {
+  id: string;
+  planet: TimelinePlanet;
+  author: PlanetAuthor;
+  kind: 'song' | 'video';
+  title: string;
+  text: string;
+  url: string;
+  posterUrl: string | null;
+  seconds: number | null;
+  starredByMe: boolean;
+  repliers: PlanetAuthor[];
+  createdAt: string;
+}
+
+export interface PlanetFlyer {
+  author: PlanetAuthor;
+  posts: PlanetPostView[];
+}
+
+/** An island (Mercury) / studio (Mars): still sailing / flying, and what stays there. */
+export interface PlanetProfileView {
+  author: PlanetAuthor;
+  flying: PlanetPostView[];
+  works: PlanetPostView[];
+  followedByMe: boolean;
+  isMe: boolean;
+}
+
+export interface PlanetReplyView {
+  id: string;
+  author: PlanetAuthor;
+  text: string;
+  createdAt: string;
+}

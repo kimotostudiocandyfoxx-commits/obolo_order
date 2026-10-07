@@ -326,3 +326,13 @@ export type JupiterBranchBody = z.infer<typeof JupiterBranchBody>;
 /** Put an uploaded video (POST /media/video) into your 裏スタジオ (every video you keep lives here). */
 export const MarsBackstageBody = z.object({ mediaId: z.string().uuid(), posterUrl: z.string().url().max(500).optional(), seconds: z.number().min(0).max(600).optional(), title: z.string().trim().max(40).optional() });
 export type MarsBackstageBody = z.infer<typeof MarsBackstageBody>;
+
+// --- Mercury & Mars posts --------------------------------------------------------------------------
+
+/** Mercury: post one of your songs (`sourceId` = song id). Mars: one of your 裏スタジオ videos. */
+export const CreatePlanetPostBody = z.object({
+  sourceId: z.string().uuid(),
+  title: z.string().trim().max(40).optional(),
+  text: z.string().trim().max(60).default(''),
+});
+export type CreatePlanetPostBody = z.infer<typeof CreatePlanetPostBody>;
