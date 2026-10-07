@@ -104,6 +104,8 @@ sa obolo-deployer;    DEPLOY_SA=obolo-deployer@$PROJECT_ID.iam.gserviceaccount.c
 sleep 5 # new service accounts take a moment to become visible to IAM
 for r in roles/cloudsql.client roles/secretmanager.secretAccessor; do bind "$RUNTIME_SA" $r; done
 for r in roles/run.admin roles/artifactregistry.writer roles/iam.serviceAccountUser; do bind "$DEPLOY_SA" $r; done
+# the Art workshop (.github/workflows/art.yml) paints UI art with Gemini: the deployer may read that one key
+gcloud secrets add-iam-policy-binding obolo-gemini-api-key --member="serviceAccount:$DEPLOY_SA" --role=roles/secretmanager.secretAccessor --quiet >/dev/null 2>&1 || true
 ok "obolo-api-runtime / obolo-deployer"
 
 say "GitHub Actions からのデプロイ許可（Workload Identity）"

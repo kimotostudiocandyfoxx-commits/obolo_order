@@ -1,10 +1,52 @@
 [
   {
-    "id": "test-mercury-sea-v1",
+    "id": "mercury-sea-bg-v1",
     "kind": "image",
-    "aspect": "4:3",
-    "count": 1,
-    "refs": ["apps/web/public/onboarding/mercury-sea.jpg"],
-    "prompt": "Repaint the attached picture as a clean BACKGROUND ONLY: the same magical night ocean with aurora, moon, glowing teal water and gentle waves, in exactly the same painterly anime style and colours — but with NO ships, NO boats, NO people, NO speech bubbles, NO text, NO user interface. Wide open water so small ships can be placed on top later. High detail, production quality."
+    "aspect": "16:9",
+    "count": 3,
+    "refs": [
+      "apps/web/public/onboarding/mercury-sea.jpg"
+    ],
+    "prompt": "Paint a clean BACKGROUND ONLY for a music app screen: the magical night ocean of the planet Mercury, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference. A huge full moon upper right, green and violet aurora ribbons across a starry sky, small glowing fairy-tale castle islands on the far left and far right horizon, and a wide expanse of glittering teal-blue water with gentle waves and moonlight sparkles filling the lower two thirds — open water where small ships will be placed later. Keep the moon and castles inside the central 75% width so the picture can be cropped to 4:3. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders. No boats or ships at all. Production quality, crisp, high detail."
+  },
+  {
+    "id": "mars-sky-city-bg-v1",
+    "kind": "image",
+    "aspect": "16:9",
+    "count": 3,
+    "refs": [
+      "apps/web/public/onboarding/mars-sky-city.jpg"
+    ],
+    "prompt": "Paint a clean BACKGROUND ONLY for a movie app screen: the night sky above a neon cyber city on Mars, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference. Distant glowing skyscrapers and holographic light along the bottom edge, red planet and small moons in a deep violet starry sky, soft glowing light trails swirling through the air — lots of open sky in the middle where small flying saucers will be placed later. Keep key elements inside the central 75% width so it can be cropped to 4:3. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders. No flying saucers or UFOs at all. Production quality, crisp, high detail."
+  },
+  {
+    "id": "mars-sky-canyon-bg-v1",
+    "kind": "image",
+    "aspect": "16:9",
+    "count": 3,
+    "refs": [
+      "apps/web/public/onboarding/mars-sky-canyon.jpg"
+    ],
+    "prompt": "Paint a clean BACKGROUND ONLY for a movie app screen: the red rocky canyon of Mars under a dark starry sky, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference. Towering red cliffs on both sides, a huge red planet and small moons in the sky, colourful glowing comet-like light trails sweeping across the valley — wide open space in the middle where small flying saucers will be placed later. Keep key elements inside the central 75% width so it can be cropped to 4:3. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders. No flying saucers, no film cameras, no signposts. Production quality, crisp, high detail."
+  },
+  {
+    "id": "ship-empty-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 3,
+    "refs": [
+      "apps/web/public/onboarding/ship-samurai806.webp"
+    ],
+    "prompt": "A single small DJ party boat, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference: an ornate dark-iron and brass hull lined with round glowing speakers, a big turntable deck on top, little lanterns at the bow and stern, cyan and magenta neon accents. The boat is EMPTY — nobody on board — with an open standing space in the middle of the deck where a character will be placed later. Three-quarter front view, the whole boat fully visible and centred with margin around it, a tiny bit of white water foam at the waterline only. Isolated on a perfectly flat, pure white (#FFFFFF) background. No sea, no sky, no shadow on the background. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders."
+  },
+  {
+    "id": "ufo-empty-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 3,
+    "refs": [
+      "apps/web/public/onboarding/pod-city-pen_lady.webp"
+    ],
+    "prompt": "A single small round flying-saucer pod, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference: a polished gunmetal ring-shaped saucer with glowing coloured lights around the rim (cyan, magenta, amber), riveted metal panels, an OPEN round cockpit hole in the top with NOBODY inside — a character will be placed in it later. Three-quarter front view seen slightly from above so the empty cockpit opening is visible, the whole saucer fully visible and centred with margin around it, a soft glow underneath. Isolated on a perfectly flat, pure white (#FFFFFF) background. No sky, no ground, no light trails, no shadow on the background. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders."
   }
 ]

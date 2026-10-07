@@ -37,6 +37,7 @@ jobs:
           node-version: 22
       - name: Paint
         run: |
+          # needs: gcloud secrets add-iam-policy-binding obolo-gemini-api-key --member=serviceAccount:<deploy SA> --role=roles/secretmanager.secretAccessor
           export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key)"
           node scripts/art/generate.mjs
       - name: Save the results to the branch
@@ -44,6 +45,7 @@ jobs:
         run: |
           git config user.name "art-workshop"
           git config user.email "art-workshop@users.noreply.github.com"
+          mkdir -p art/out
           git add art/out
           git diff --cached --quiet && exit 0
           git commit -m "Art workshop: new images / videos [skip ci]"
