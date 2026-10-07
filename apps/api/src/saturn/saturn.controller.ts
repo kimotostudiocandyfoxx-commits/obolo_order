@@ -17,8 +17,10 @@ export class SaturnController {
   ) {}
 
   @Get()
-  feed(@UserId() userId: string, @Query('cursor') cursor?: string, @Query('fresh') fresh?: string, @Query('tab') tab?: string) {
-    return this.saturn.feed(userId, cursor, 20, fresh === '1', tab === 'following' || tab === 'friends' ? tab : 'all');
+  feed(@UserId() userId: string, @Query('cursor') cursor?: string, @Query('fresh') fresh?: string, @Query('tab') tab?: string, @Query('limit') limit?: string) {
+    // a tab keeps up to 22 voices on screen and refills from this list (client decision 2026-10-07)
+    const n = Math.max(1, Math.min(50, Number(limit) || 20));
+    return this.saturn.feed(userId, cursor, n, fresh === '1', tab === 'following' || tab === 'friends' ? tab : 'all');
   }
 
   /** The voice replies under a post (little balls lined up under it). */

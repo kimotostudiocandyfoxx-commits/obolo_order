@@ -71,6 +71,8 @@ export function KororinWorld({
   const openPostRef = useRef<SaturnPostView | null>(null);
   const detailRef = useRef(false);
   const meIdRef = useRef<string | undefined>(undefined);
+  const tabRef = useRef<Tab>('all');
+  tabRef.current = tab;
 
   useEffect(() => {
     getApi()
@@ -125,16 +127,51 @@ export function KororinWorld({
   }, [posts]);
 
   // フォロー / ダチ (every planet has みんな・フォロー・ダチ): real posts only, fetched when the tab opens
+  // only so many on the planet at once; when one pops, the next voice drops in from the sky
+  const [tabCursor, setTabCursor] = useState<string | null>(null);
+  const loadingMore = useRef(false);
   useEffect(() => {
     if (tab === 'all') return;
+    let live = true;
     setTabPosts(null);
+    setTabCursor(null);
     getApi()
-      .saturnFeed(undefined, true, tab)
-      .then((p) => setTabPosts(p.items))
-      .catch(() => setTabPosts([]));
+      .saturnFeed(undefined, true, tab, 50)
+      .then((p) => {
+        if (!live) return;
+        setTabPosts(p.items);
+        setTabCursor(p.nextCursor);
+      })
+      .catch(() => live && setTabPosts([]));
+    return () => {
+      live = false;
+    };
   }, [tab]);
 
-  const shown = useMemo(() => (tab === 'all' ? all : (tabPosts ?? [])).filter((p) => !heard.has(p.id)), [all, tab, tabPosts, heard]);
+  const unheard = useMemo(() => (tab === 'all' ? all : (tabPosts ?? [])).filter((p) => !heard.has(p.id)), [all, tab, tabPosts, heard]);
+  const cap = tab === 'all' ? Infinity : TAB_CAP[tab];
+  const shown = useMemo(() => unheard.slice(0, cap), [unheard, cap]);
+
+  // running low on voices waiting in line → fetch the next page
+  useEffect(() => {
+    if (tab === 'all' || !tabPosts || !tabCursor || loadingMore.current || unheard.length > cap) return;
+    loadingMore.current = true;
+    const t = tab;
+    getApi()
+      .saturnFeed(tabCursor, true, t, 50)
+      .then((p) => {
+        if (t !== tabRef.current) return;
+        setTabPosts((cur) => {
+          const have = new Set((cur ?? []).map((x) => x.id));
+          return [...(cur ?? []), ...p.items.filter((x) => !have.has(x.id))];
+        });
+        setTabCursor(p.nextCursor);
+      })
+      .catch(() => setTabCursor(null))
+      .finally(() => {
+        loadingMore.current = false;
+      });
+  }, [tab, tabPosts, tabCursor, unheard.length, cap]);
 
   useEffect(() => {
     const el = stage.current;
@@ -154,10 +191,10 @@ export function KororinWorld({
           id: p.id,
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
           pic: p.author.pic ?? null,
-          R: Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))),
+          R: Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1),
         };
       }),
-    [shown, stageW],
+    [shown, stageW, tab],
   );
   const speakingId = shown.find((p) => p.voiceUrl === playingUrl)?.id ?? null;
 
@@ -524,6 +561,11 @@ const TABS: [Tab, string][] = [
   ['following', 'フォロー'],
   ['friends', 'ダチ'],
 ];
+
+/** How many characters a tab shows at once (client decision 2026-10-07; みんな/セカイ is still being designed). */
+const TAB_CAP: Record<Exclude<Tab, 'all'>, number> = { following: 22, friends: 8 };
+/** ダチ are few, so they are drawn bigger. */
+const FRIENDS_SCALE = 1.45;
 
 /** The planet's horizon (share of the stage): an ellipse whose top edge is the ground. */
 const PLANET = { top: 0.67, rx: 0.78, ry: 0.5 };

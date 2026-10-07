@@ -103,7 +103,7 @@ export interface Api {
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
   uploadVideo(blob: Blob, maxSeconds: number): Promise<UploadedVideo>;
-  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends'): Promise<Paged<SaturnPostView>>;
+  saturnFeed(cursor?: string, fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit?: number): Promise<Paged<SaturnPostView>>;
   /** The voice replies under a post (oldest first). */
   saturnReplies(postId: string): Promise<SaturnPostView[]>;
   saturnProfile(userId: string): Promise<SaturnProfileView>;

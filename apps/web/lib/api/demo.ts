@@ -327,7 +327,7 @@ export class DemoApi implements Api {
     return { ...rest, author: { ...rest.author, look }, starredByMe: starredBy.includes(viewer) };
   }
 
-  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following' | 'friends') {
+  async saturnFeed(cursor?: string, _fresh?: boolean, tab?: 'all' | 'following' | 'friends', limit = 20) {
     const viewer = this.uid();
     const f = this.s.follows ?? {};
     const mutual = new Set((f[viewer] ?? []).filter((u) => (f[u] ?? []).includes(viewer)));
@@ -337,8 +337,8 @@ export class DemoApi implements Api {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {
-      items: sorted.slice(start, start + 20).map((p) => this.view(p, viewer)),
-      nextCursor: start + 20 < sorted.length ? String(start + 20) : null,
+      items: sorted.slice(start, start + limit).map((p) => this.view(p, viewer)),
+      nextCursor: start + limit < sorted.length ? String(start + limit) : null,
     };
   }
 
