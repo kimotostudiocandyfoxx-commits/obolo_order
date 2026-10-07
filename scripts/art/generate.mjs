@@ -1,7 +1,8 @@
 // Art workshop (client request 2026-10-07): Claude Code designs the UI art, Gemini paints it.
 // Reads art/queue.json — a list of jobs — and writes the results to art/out/<id>/.
 //   image job: { id, kind: 'image', prompt, refs?: [repo paths], aspect?: '16:9'|'1:1'|'9:16'|'4:3'|'3:4', count?: n, model? }
-//   video job: { id, kind: 'video', prompt, image?: repo path (first frame), aspect?: '16:9'|'9:16', model? }
+//   video job: { id, kind: 'video', prompt, image?: repo path (first frame), loop?: true (the last frame is the
+//              same picture, so the clip loops seamlessly and the camera stays put), aspect?: '16:9'|'9:16', model? }
 // Jobs whose output folder already exists are skipped (delete the folder or change the id to redo).
 // Needs GEMINI_API_KEY. No dependencies (Node 20+ fetch).
 import { mkdir, readFile, writeFile, access } from 'node:fs/promises';
@@ -66,6 +67,7 @@ async function video(job, dir) {
       if (job.image) {
         const d = await inline(job.image);
         instance.image = { bytesBase64Encoded: d.inlineData.data, mimeType: d.inlineData.mimeType };
+        if (job.loop) instance.lastFrame = instance.image;
       }
       const op = await post(`${API}/models/${model}:predictLongRunning`, { instances: [instance], parameters: { aspectRatio: job.aspect || '16:9' } });
       let cur = op;
