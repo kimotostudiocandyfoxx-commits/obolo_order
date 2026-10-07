@@ -97,6 +97,7 @@
 | P-WALLET-1 | 🟡 | 月額 88 MANA の付与 | サブスク未接続のため、**新規登録時に 88 MANA を1回だけ付与**（台帳理由 `demo_grant`） |
 | P-MER-5 | 🟢 | 伴奏のAIモデル | **ACE-Step 1.5（MIT、商用OK）**（クライアント決定 2026-10-06、本番で伴奏ができることを確認済み）。設計図のテンポ・キー・長さ・伴奏のみを直接指定。DiT は `acestep-v15-turbo`（GitHub 変数 `ACE15_MODEL` で XL に切り替え可）。モデル本体のライセンスは Hugging Face のページで要確認。v1 は試験で使用（音がこもった雑音になった） | `gpu/music/app.py` |
 | P-MER-6 | ✏️ | 設計図のシンセ音を参考にさせるか | 既定はオフ（`ACE_REF_STRENGTH=0`）。v1 でシンセ音を参考にさせたら、こもった雑音になったため。必要なら GitHub 変数で 0.2 などに | `gpu/music/app.py` |
+| P-MER-7 | 🔴 | 作曲の待ち時間・仕上がり（あとで手直し） | 2026-10-07 クライアント試聴：歌入りの曲は「悪くはないけどよくもない」。GPU が寝ているときの起動に実測6〜10分。全惑星が仮で遊べるようになってから調整する。候補：①モデルをイメージに入れて起動を短縮 ②よく使う時間帯だけ GPU を起こす（`MUSIC_MIN_INSTANCES`、常時1台で月10万円前後）③歌の音程補正（伴奏のキーに寄せる）④歌い出し位置・ミックス音量（P-VOICE-6）⑤お手本メロディ（P-VOICE-5） | `gpu/music/`、`apps/api/src/compose/` |
 | P-VOICE-1 | 🟡 | 声のAI | Fish Audio API（有料・商用OK、クライアント決定 2026-10-07）、モデル `s2.1-pro`。1人2つの声（自分の声／バティの変声）をそれぞれ Fish の非公開ボイスモデルにする。読み上げ（TTS）は実装済み | `apps/api/src/voice/` |
 | P-VOICE-2 | 🟡 | 歌入れ（Fish の [singing]） | Fish に歌専用 API はなく、通常の TTS（`/v1/tts`）の文頭に `[singing]` を付けて歌わせる（クライアント提供の仕様 2026-10-07）。伴奏と同じキー・テンポを `[key: C major][tempo: 120 BPM]` のタグで Fish に渡す（効くかは耳で確認）。Gemini Flash-Lite が歌い方（全体タグ・パートごとのタグ `[pitch_up]` など・`[breath]`・速さ・音量）を決める。歌声は ffmpeg で歌詞の長さに合わせて伸縮（0.8〜1.25倍）し伴奏とミックス。**メロディを伴奏と正確に合わせる保証はない**（耳で確認して調整） | `packages/ai/src/sing.ts`、`apps/api/src/compose/mix.ts` |
 | P-VOICE-3 | ✏️ | 読み上げ・歌入れの回数 | 読み上げ 1人1日100回、歌入れ 1日10曲まで（料金未決） | `apps/api/src/voice/voice.controller.ts` |
