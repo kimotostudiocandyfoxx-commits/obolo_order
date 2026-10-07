@@ -91,3 +91,24 @@ export function neoFromReferencePrompt(a: { liked: string; twist: string }, vari
 export function refineLookPrompt(instruction: string): string {
   return `${STYLE} Edit the attached character image following this request: "${instruction}". Keep the same character identity, art style, framing and background. ${ORIGINAL}`;
 }
+
+/**
+ * Saturn picture character (client decision 2026-10-07): a round, glossy "mochi" mascot in the
+ * style of the attached style sheet (the client's reference characters). Plain white background
+ * so the server can cut it out. The body must be one round ball filling the frame — it is warped
+ * as a soft body in the app.
+ */
+export function puniPicPrompt(description: string, hasReference: boolean, variant: number): string {
+  const moods = ['happy and smiling', 'cheerful with a tiny wink feel', 'sleepy and calm', 'excited'];
+  return (
+    'Draw ONE cute kawaii mascot character in exactly the art style of the FIRST attached image (the style sheet): ' +
+    'a round, glossy, mochi-like ball body that is almost a perfect circle, soft pastel digital painting, a big soft highlight ' +
+    'on the upper left, gentle shading, small shiny dark eyes with white sparkles, a tiny "ω" cat mouth, pink blush on the cheeks, ' +
+    'tiny stubby arms and feet that stay close to the body. Accessories and patterns are painted ON or tightly around the round body. ' +
+    `Character concept: "${description}". Mood: ${moods[variant % moods.length]}. ` +
+    (hasReference ? 'Use the SECOND attached image only as loose inspiration for colours and motifs, turned into this round mascot. ' : '') +
+    'Composition: the round body is centered and fills about 80% of a square frame, front view, nothing cut off. ' +
+    'Background: plain flat pure white (#FFFFFF), no ground, no shadow, no other objects. No text, no letters, no logo, no watermark. ' +
+    ORIGINAL
+  );
+}

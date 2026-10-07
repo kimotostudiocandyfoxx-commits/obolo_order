@@ -19,6 +19,7 @@ import {
   type SongView,
   type SaturnPostView,
   type SaturnProfileView,
+  type PuniPicResult,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
 import { putBlob } from './idb';
@@ -468,6 +469,7 @@ export class DemoApi implements Api {
       orderedAt: null,
       voices: { self: false, bati: false },
       look: null,
+      puniPic: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };
@@ -552,6 +554,21 @@ export class DemoApi implements Api {
     const c = this.lookCache.find((x) => x.id === mediaId);
     if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
     return this.patchMe(() => ({ avatarUrl: c.url }));
+  }
+
+  // demo: the test pictures stand in for painted candidates
+  async puniPicCandidates(): Promise<PuniPicResult> {
+    await sleep(900);
+    const all = ['salmon', 'gray', 'green', 'purple', 'gorilla'].sort(() => Math.random() - 0.5).slice(0, 2);
+    const candidates = all.map((n) => ({ id: uid(), url: `/puni-test/${n}.png` }));
+    this.lookCache.push(...candidates);
+    return { candidates, left: 99 };
+  }
+
+  async choosePuniPic(mediaId: string | null) {
+    const url = mediaId ? this.lookCache.find((x) => x.id === mediaId)?.url : null;
+    if (mediaId && !url) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return this.patchMe(() => ({ puniPic: url ?? null }));
   }
 
   async batiEgg(food: string) {

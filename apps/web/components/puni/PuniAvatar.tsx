@@ -12,6 +12,7 @@ export function PuniAvatar({
   seed,
   neo,
   look,
+  pic,
   size,
   speaking = false,
   bounce,
@@ -20,11 +21,20 @@ export function PuniAvatar({
   seed: string;
   neo?: string | null;
   look?: PuniLook | null;
+  /** painted picture (wins over the look) */
+  pic?: string | null;
   size: number;
   speaking?: boolean;
   bounce?: number | string;
   poked?: boolean;
 }) {
+  if (pic)
+    return (
+      <span key={bounce} className={`inline-block ${bounce !== undefined ? 'animate-[puniSquish_0.55s_cubic-bezier(.3,1.6,.5,1)]' : ''} ${speaking ? 'animate-[wobble_0.6s_ease-in-out_infinite]' : ''}`} style={{ width: size, height: size, transformOrigin: '50% 85%' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={pic} alt="" width={size} height={size} className="h-full w-full object-contain drop-shadow-[0_2px_2px_rgba(60,20,100,.25)]" draggable={false} />
+      </span>
+    );
   if (!look)
     return (
       <span key={bounce} className={`inline-block ${bounce !== undefined ? 'animate-[puniSquish_0.55s_cubic-bezier(.3,1.6,.5,1)]' : ''}`} style={{ transformOrigin: '50% 85%' }}>

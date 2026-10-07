@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "puni_pic_url" text;

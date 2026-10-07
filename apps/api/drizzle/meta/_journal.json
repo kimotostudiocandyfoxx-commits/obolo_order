@@ -71,6 +71,13 @@
       "when": 1791339604066,
       "tag": "0009_puni_look",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791342536275,
+      "tag": "0010_puni_pic",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,7 @@ import { toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { residentProfile, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { PuniAvatar } from '@/components/puni/PuniAvatar';
+import { PuniPicMaker } from '@/components/puni/PuniPicMaker';
 import { PuniWardrobe } from '@/components/puni/PuniWardrobe';
 import { hueOf } from './BallAvatar';
 
@@ -36,6 +37,7 @@ export function SaturnProfile({
   const [editing, setEditing] = useState(false);
   const [bio, setBio] = useState('');
   const [wardrobe, setWardrobe] = useState(false);
+  const [maker, setMaker] = useState(false);
   const [bounce, setBounce] = useState<number>();
 
   useEffect(() => {
@@ -94,7 +96,7 @@ export function SaturnProfile({
           {resident && <span className="mt-2 rounded-full bg-white/80 px-3 py-1 text-[10px] font-bold text-violet-500">サンプルの住人</span>}
         </div>
         <button onClick={() => setBounce(Date.now())} className="absolute bottom-[44px] left-1/2 -translate-x-1/2 animate-[bob_3s_ease-in-out_infinite]" aria-label="squish">
-          {u && <PuniAvatar seed={u.id} neo={u.neoForm} look={u.look} size={110} bounce={bounce} speaking={!!playingUrl && posts.some((p) => p.voiceUrl === playingUrl)} />}
+          {u && <PuniAvatar seed={u.id} neo={u.neoForm} look={u.look} pic={u.pic} size={110} bounce={bounce} speaking={!!playingUrl && posts.some((p) => p.voiceUrl === playingUrl)} />}
         </button>
       </div>
 
@@ -148,12 +150,14 @@ export function SaturnProfile({
             </div>
 
             {profile.isMe && !editing && (
-              <button
-                onClick={() => setWardrobe(true)}
-                className="mt-3 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow"
-              >
-                👕 着せ替え（ぷにぷにの姿）
-              </button>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button onClick={() => setMaker(true)} className="rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow">
+                  🎨 AIで絵のキャラ
+                </button>
+                <button onClick={() => setWardrobe(true)} className="rounded-full border-2 border-violet-200 py-2.5 text-sm font-black text-violet-600">
+                  🧩 パーツで着せ替え
+                </button>
+              </div>
             )}
             {profile.isMe ? (
               !editing && (
@@ -209,6 +213,16 @@ export function SaturnProfile({
           </>
         )}
       </div>
+      {maker && profile && (
+        <PuniPicMaker
+          onClose={() => setMaker(false)}
+          onSaved={(pic) => {
+            setProfile((p) => (p ? { ...p, user: { ...p.user, pic } } : p));
+            setMaker(false);
+            setBounce(Date.now());
+          }}
+        />
+      )}
       {wardrobe && profile && (
         <PuniWardrobe
           start={profile.user.look ?? null}

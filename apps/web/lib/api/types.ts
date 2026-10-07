@@ -11,6 +11,8 @@ import type {
   Paged,
   SaturnPostView,
   SaturnProfileView,
+  PuniPicBody,
+  PuniPicResult,
   UpdateBuddyProfileBody,
   UpdateProfileBody,
   EntryKind,
@@ -127,6 +129,10 @@ export interface Api {
   /** One instruction → one new version of a candidate (3 per apprentice). */
   refineLook(mediaId: string, instruction: string): Promise<NeoLookResult>;
   chooseLook(mediaId: string): Promise<Me>;
+  /** Saturn picture character: 2 painted candidates from a description (+ optional inspiration picture). */
+  puniPicCandidates(body: PuniPicBody): Promise<PuniPicResult>;
+  /** Pick a candidate as your Saturn character (null = back to the code-drawn look). */
+  choosePuniPic(mediaId: string | null): Promise<Me>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;

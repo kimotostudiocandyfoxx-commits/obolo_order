@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { BatiEggBody, BatiNameBody, ChooseLookBody, NeoLookBody, RefineLookBody } from '@obolo/shared';
+import { BatiEggBody, BatiNameBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -45,6 +45,20 @@ export class LookController {
   @HttpCode(200)
   choose(@UserId() userId: string, @Body() body: unknown) {
     return this.look.choose(userId, parseBody(ChooseLookBody, body).mediaId);
+  }
+
+  /** Saturn picture character: 2 painted candidates (3 tries a day, P-PUNI-4). */
+  @Post('puni/pic/candidates')
+  @HttpCode(200)
+  async puniPic(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    await rateLimit(this.kv, `puni-pic:${userId}`, 4, 60);
+    return this.look.puniPicCandidates(userId, parseBody(PuniPicBody, body), origin(req), this.admin(token));
+  }
+
+  @Post('puni/pic')
+  @HttpCode(200)
+  choosePuniPic(@UserId() userId: string, @Body() body: unknown) {
+    return this.look.choosePuniPic(userId, parseBody(ChoosePuniPicBody, body).mediaId);
   }
 
   @Post('bati/egg')

@@ -123,6 +123,22 @@ export const NeoLookBody = z.union([
 ]);
 export type NeoLookBody = z.infer<typeof NeoLookBody>;
 
+/**
+ * Saturn picture character (client decision 2026-10-07): describe your character (and optionally
+ * attach a picture to take inspiration from) → the AI paints round ぷにぷに candidates.
+ */
+export const PuniPicBody = z.object({
+  description: z.string().trim().min(2).max(200),
+  /** a picture to take colours / motifs from (only handed to the model, never stored) */
+  reference: z.object({ mime: z.string().regex(/^image\//).max(60), data: z.string().min(100).max(6_000_000) }).optional(),
+  /** use the member's OBOLO NEO look as the reference */
+  useNeoLook: z.boolean().optional(),
+});
+export type PuniPicBody = z.infer<typeof PuniPicBody>;
+
+export const ChoosePuniPicBody = z.object({ mediaId: z.string().uuid().nullable() });
+export type ChoosePuniPicBody = z.infer<typeof ChoosePuniPicBody>;
+
 export const ChooseLookBody = z.object({ mediaId: z.string().uuid() });
 export type ChooseLookBody = z.infer<typeof ChooseLookBody>;
 

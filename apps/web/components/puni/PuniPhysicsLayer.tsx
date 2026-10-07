@@ -3,6 +3,7 @@
 import type { PuniLook } from '@obolo/shared';
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { createBlob, localPoints, poke, smoothPath, step, stretchMatrix, type Blob } from '@/lib/puni/physics';
+import { makeRenderer } from '@/lib/puni/gl';
 import { PuniBody, type PuniNodes } from './PuniBody';
 
 /**
@@ -16,6 +17,8 @@ export interface PuniItem {
   look: PuniLook;
   /** body radius in px */
   R: number;
+  /** a painted picture (round, transparent PNG): drawn warped onto the body instead of `look` */
+  pic?: string | null;
 }
 
 export interface PuniLayerHandle {
@@ -42,6 +45,10 @@ export const PuniPhysicsLayer = forwardRef<
 >(function PuniPhysicsLayer({ items, floorAt, onTap, onTapEmpty, onFrame, speakingId = null, className = '' }, ref) {
   const box = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
+  const glCanvas = useRef<HTMLCanvasElement>(null);
+  const pics = useRef(new Map<string, HTMLImageElement>());
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
   const [size, setSize] = useState({ W: 0, H: 0 });
   const blobs = useRef<Blob[]>([]);
   const nodes = useRef(new Map<string, PuniNodes>());
@@ -90,9 +97,27 @@ export const PuniPhysicsLayer = forwardRef<
     blob: (id) => blobs.current.find((x) => x.id === id),
   }));
 
+  // load the painted pictures (once per url)
+  useEffect(() => {
+    for (const it of items) {
+      if (!it.pic || pics.current.has(it.pic)) continue;
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = it.pic;
+      pics.current.set(it.pic, img);
+    }
+  }, [items]);
+
   // the loop
   useEffect(() => {
     if (!size.W) return;
+    const cv = glCanvas.current;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (cv) {
+      cv.width = size.W * dpr;
+      cv.height = size.H * dpr;
+    }
+    const gl = cv ? makeRenderer(cv) : null;
     let raf = 0;
     let last = performance.now();
     let blinkAt = last + 2000;
@@ -138,6 +163,17 @@ export const PuniPhysicsLayer = forwardRef<
           n.open.style.transform = blinking && b.id === blinkId ? 'scaleY(0.12)' : '';
         }
         if (n.poked) n.poked.style.display = poked ? '' : 'none';
+      }
+      // painted characters: WebGL mesh over the code-drawn ones
+      if (gl) {
+        gl.frame(W, H);
+        for (const it of itemsRef.current) {
+          if (!it.pic) continue;
+          const b = get(it.id);
+          const img = pics.current.get(it.pic);
+          const t = b && img && gl.texture(it.pic, img);
+          if (b && t) gl.draw(b, t);
+        }
       }
       cb.current.onFrame?.(get, W, H);
       raf = requestAnimationFrame(loop);
@@ -228,11 +264,11 @@ export const PuniPhysicsLayer = forwardRef<
               </feMerge>
             </filter>
           </defs>
-          {items.map((it) => (
-            <PuniBody key={it.id} look={{ ...it.look, id: it.id }} R={it.R} register={(n) => nodes.current.set(it.id, n)} />
-          ))}
+          {items.map((it) => (it.pic ? null : <PuniBody key={it.id} look={{ ...it.look, id: it.id }} R={it.R} register={(n) => nodes.current.set(it.id, n)} />))}
         </svg>
       )}
+      {/* painted characters (WebGL); touches go to the SVG underneath (hit-test is by position) */}
+      <canvas ref={glCanvas} className="pointer-events-none absolute inset-0 h-full w-full" />
     </div>
   );
 });

@@ -43,6 +43,8 @@ export const users = pgTable(
     bio: text('bio').notNull().default(''),
     /** the round ぷにぷに character (part ids, see @obolo/shared PuniLook) */
     lookJson: jsonb('look_json').$type<PuniLook>(),
+    /** the painted ぷにぷに picture (AI, transparent PNG on Bunny) */
+    puniPicUrl: text('puni_pic_url'),
     birthdate: date('birthdate'),
     country: text('country').notNull().default('JP'),
     locale: text('locale').notNull().default('ja'),

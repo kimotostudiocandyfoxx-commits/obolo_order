@@ -38,13 +38,16 @@ const LOOKS: Partial<PuniLook>[] = [
   { color: '#f4a3c4', tex: 'sesame', shape: 'tall' },
 ];
 
+/** Painted sample characters (cut from the client's reference image, test only — P-SAT-4). */
+const RESIDENT_PICS = ['/puni-test/salmon.png', '/puni-test/gray.png', undefined, '/puni-test/purple.png', undefined, undefined, '/puni-test/gorilla.png', undefined, '/puni-test/green.png'];
+
 function residentLook(i: number): PuniLook {
   return { ...base, ...LOOKS[i % LOOKS.length], medal: String(10 + i) };
 }
 
 export const SATURN_RESIDENTS: SaturnPostView[] = R.map(([id, name, neo, text], i) => ({
   id: `resident-${id}`,
-  author: { id: `resident-${id}`, handle: `neo_${id}`, displayName: name, neoForm: neo, look: residentLook(i) },
+  author: { id: `resident-${id}`, handle: `neo_${id}`, displayName: name, neoForm: neo, look: residentLook(i), pic: RESIDENT_PICS[i] ?? null },
   text,
   voiceUrl: `tts:${text}`,
   voiceSource: 'default',

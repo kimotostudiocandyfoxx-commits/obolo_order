@@ -32,6 +32,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId },
     look: u.lookJson ?? null,
+    puniPic: u.puniPicUrl ?? null,
     createdAt: u.createdAt.toISOString(),
   };
 }

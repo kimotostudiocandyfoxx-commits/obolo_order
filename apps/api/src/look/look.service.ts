@@ -1,6 +1,9 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { batiPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, refineLookPrompt } from '@obolo/ai';
-import { JOURNEY_DONE, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type RefineLookBody } from '@obolo/shared';
+import { batiPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { cutoutWhite } from '../media/cutout';
+import { JOURNEY_DONE, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -15,6 +18,12 @@ export const NEO_LOOK_TRIES = 3;
 export const NEO_LOOK_REFINES = 3;
 const CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
+/** PLACEHOLDER (P-PUNI-4): picture-character tries per member per day (2 candidates each, ~¥6 per image). */
+export const PUNI_PIC_TRIES = 3;
+const PUNI_PIC_CANDIDATES = 2;
+let styleSheet: Promise<GeneratedImage> | null = null;
+/** The client's reference characters, shown to the model as the style to follow. */
+const puniStyle = () => (styleSheet ??= readFile(resolve(__dirname, '../../assets/puni-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 
 /**
  * Day 3: generate the visitor's OBOLO NEO look from three answers and let them choose one.
@@ -100,6 +109,62 @@ export class LookService {
     const m = await this.media.getOwned(userId, mediaId, 'avatar');
     if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     const [u] = await this.db.write.update(users).set({ avatarUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    return toMe(u);
+  }
+
+  // --- Saturn picture character -------------------------------------------------------------
+
+  private puniKey(userId: string) {
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date());
+    return `puni:pic:${userId}:${day}`;
+  }
+
+  /**
+   * Paint round ぷにぷに candidates from a description (+ an optional inspiration picture) in the
+   * style of the client's reference characters, cut them out of the white background and store
+   * them as transparent PNGs. The member then picks one.
+   */
+  async puniPicCandidates(userId: string, body: PuniPicBody, origin: string, unlimited = false): Promise<PuniPicResult> {
+    const u = await this.user(userId);
+    await this.clean(body.description);
+    const key = this.puniKey(userId);
+    const used = Number((await this.kv.get(key)) ?? 0);
+    if (!unlimited && used >= PUNI_PIC_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'PUNI_PIC_TRIES', '今日はもう作れません');
+    const tries = await this.kv.incr(key, 60 * 60 * 26);
+    // the inspiration picture is only handed to the model, never stored
+    let reference: GeneratedImage | null = body.reference ? { data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime } : null;
+    if (!reference && body.useNeoLook && u.avatarUrl) {
+      const res = await fetch(u.avatarUrl, { signal: AbortSignal.timeout(20_000) }).catch(() => null);
+      if (res?.ok) reference = { data: Buffer.from(await res.arrayBuffer()), mime: res.headers.get('content-type') ?? 'image/png' };
+    }
+    const refs = [await puniStyle(), ...(reference ? [reference] : [])];
+    const made = await Promise.allSettled(Array.from({ length: PUNI_PIC_CANDIDATES }, (_, i) => this.images.generate(puniPicPrompt(body.description, !!reference, i), i, refs)));
+    const candidates = [];
+    for (const r of made) {
+      if (r.status !== 'fulfilled') {
+        this.log.warn(`puni pic generation failed: ${String(r.reason)}`);
+        continue;
+      }
+      try {
+        const png = await cutoutWhite(r.value.data);
+        const m = await this.media.storeImage(userId, 'avatar', 'image/png', png, origin);
+        candidates.push({ id: m.id, url: m.url });
+      } catch (e) {
+        this.log.warn(`puni pic cutout failed: ${String(e)}`);
+      }
+    }
+    return { candidates, left: unlimited ? 99 : Math.max(0, PUNI_PIC_TRIES - tries) };
+  }
+
+  /** Pick one of your candidates as your Saturn character (null = back to the code-drawn look). */
+  async choosePuniPic(userId: string, mediaId: string | null): Promise<Me> {
+    let url: string | null = null;
+    if (mediaId) {
+      const m = await this.media.getOwned(userId, mediaId, 'avatar');
+      if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
+      url = m.url;
+    }
+    const [u] = await this.db.write.update(users).set({ puniPicUrl: url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     return toMe(u);
   }
 

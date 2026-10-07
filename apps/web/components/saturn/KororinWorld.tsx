@@ -112,6 +112,7 @@ export function KororinWorld({
         return {
           id: p.id,
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
+          pic: p.author.pic ?? null,
           R: Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))),
         };
       }),
@@ -289,7 +290,7 @@ export function KororinWorld({
             </span>
             {me && (
               <button onClick={() => setProfileId(me.id)} className="flex h-11 w-11 items-center justify-center overflow-visible rounded-full border-[3px] border-white bg-[#4a3a6e] shadow-[0_3px_0_rgba(60,30,110,.35)]" aria-label="my page">
-                <PuniAvatar seed={me.id} neo={me.neoForm} look={me.look} size={34} />
+                <PuniAvatar seed={me.id} neo={me.neoForm} look={me.look} pic={me.puniPic} size={34} />
               </button>
             )}
           </div>
@@ -333,7 +334,7 @@ export function KororinWorld({
           <p className="relative mt-2 max-h-[30vh] overflow-y-auto text-[17px] font-black leading-relaxed">{open.text}</p>
           {open.repostOf && (
             <button onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)} className="relative mt-2 flex w-full items-center gap-2 rounded-2xl bg-[#f8f3ff] p-2 text-left">
-              <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} size={28} speaking={playingUrl === open.repostOf.voiceUrl} />
+              <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} pic={open.repostOf.author.pic} size={28} speaking={playingUrl === open.repostOf.voiceUrl} />
               <span className="min-w-0 flex-1">
                 <span className="block text-[10px] font-black text-[#a08fc4]">🔁 {open.repostOf.author.displayName}の声</span>
                 <span className="block truncate text-xs font-bold">{open.repostOf.text}</span>
@@ -366,7 +367,7 @@ export function KororinWorld({
                     style={{ marginLeft: i ? -12 : 0 }}
                     aria-label={`${rp.author.displayName}: ${rp.text}`}
                   >
-                    <PuniAvatar seed={rp.author.id} neo={rp.author.neoForm} look={rp.author.look} size={42} speaking={playingUrl === rp.voiceUrl} bounce={activeReply === rp.id ? `${rp.id}-on` : undefined} />
+                    <PuniAvatar seed={rp.author.id} neo={rp.author.neoForm} look={rp.author.look} pic={rp.author.pic} size={42} speaking={playingUrl === rp.voiceUrl} bounce={activeReply === rp.id ? `${rp.id}-on` : undefined} />
                   </button>
                 ))}
                 {replies.length > 5 && !allReplies && (
@@ -590,7 +591,7 @@ function DropComposer({
         </p>
         {(replyTo ?? quote) && (
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-violet-50 p-2">
-            <PuniAvatar seed={(replyTo ?? quote)!.author.id} neo={(replyTo ?? quote)!.author.neoForm} look={(replyTo ?? quote)!.author.look} size={26} />
+            <PuniAvatar seed={(replyTo ?? quote)!.author.id} neo={(replyTo ?? quote)!.author.neoForm} look={(replyTo ?? quote)!.author.look} pic={(replyTo ?? quote)!.author.pic} size={26} />
             <p className="min-w-0 flex-1 truncate text-xs text-slate-600">{(replyTo ?? quote)!.text}</p>
           </div>
         )}

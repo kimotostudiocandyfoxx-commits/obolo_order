@@ -30,6 +30,8 @@ export interface Me {
   voices: { self: boolean; bati: boolean };
   /** the round ぷにぷに character (null until dressed on the profile) */
   look: PuniLook | null;
+  /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
+  puniPic: string | null;
   createdAt: string;
 }
 
@@ -124,7 +126,7 @@ export interface BuddyChatResponse {
 
 export interface SaturnPostView {
   id: string;
-  author: { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null };
+  author: { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
   text: string;
   voiceUrl: string;
   voiceSource: 'recorded' | 'cloned' | 'default';
@@ -143,14 +145,14 @@ export interface SaturnPostView {
 /** A short form of a post, embedded in a quote repost. */
 export interface SaturnPostRef {
   id: string;
-  author: { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null };
+  author: { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
   text: string;
   voiceUrl: string;
 }
 
 /** Someone's Saturn page. */
 export interface SaturnProfileView {
-  user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string; look?: PuniLook | null };
+  user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string; look?: PuniLook | null; pic?: string | null };
   postCount: number;
   followers: number;
   following: number;
@@ -292,4 +294,10 @@ export interface SongEditResult {
   /** the GPU studio is starting: send `command` again once it is ready */
   pending?: 'MUSIC_WARMING';
   command?: SongEditCommand;
+}
+
+export interface PuniPicResult {
+  candidates: { id: string; url: string }[];
+  /** tries left today */
+  left: number;
 }

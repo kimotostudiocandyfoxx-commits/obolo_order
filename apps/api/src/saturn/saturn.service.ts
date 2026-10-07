@@ -11,9 +11,9 @@ import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 
 type PostRow = typeof saturnPosts.$inferSelect;
-type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null };
+type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
 
-const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, look: users.lookJson };
+const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, look: users.lookJson, pic: users.puniPicUrl };
 
 const alive = () => gt(saturnPosts.createdAt, new Date(Date.now() - SATURN_LIFETIME_HOURS * 3600_000));
 
