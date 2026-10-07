@@ -80,6 +80,9 @@ export function KororinWorld({
   const openPostRef = useRef<SaturnPostView | null>(null);
   const detailRef = useRef(false);
   const meIdRef = useRef<string | undefined>(undefined);
+  // the Day 4 tutorial keeps voices on screen (you star the one you just heard)
+  const tutorialRef = useRef(neoOnly);
+  tutorialRef.current = neoOnly;
   const scopeRef = useRef('');
 
   useEffect(() => {
@@ -124,7 +127,7 @@ export function KororinWorld({
         // the opened voice played to the end → it pops (not your own, not while its sheet is open)
         const id = openRef.current;
         const p = id ? openPostRef.current : null;
-        if (!st.playing && st.progress >= 0.97 && p && st.url === p.voiceUrl && p.author.id !== meIdRef.current) {
+        if (!st.playing && st.progress >= 0.97 && p && st.url === p.voiceUrl && p.author.id !== meIdRef.current && !tutorialRef.current) {
           if (detailRef.current) pendingPop.current = p.id;
           else popRef.current(p.id);
         }
