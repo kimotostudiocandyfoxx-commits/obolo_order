@@ -12,8 +12,8 @@ import { PatapataWorld } from './PatapataWorld';
  */
 type Wait = 'open' | 'close' | 'next' | 'egg' | 'pick' | 'post' | 'tree' | 'done';
 const STEPS: { text: string; wait: Wait; hint?: string }[] = [
-  { text: '空を舞っているのは、みんなの投稿DA。\n気になる蝶を、タップしてみるのDA。', wait: 'open', hint: '🦋 蝶をタップ' },
-  { text: '88時間以内の投稿は、ぜんぶ見られるのDA。\n見終わったら、とじるのDA。', wait: 'close', hint: '「とじる」をタップ' },
+  { text: '空を舞っているのは、みんなの投稿DA。\nみんな、丸いシール帳を持っているのDA。\n気になる蝶を、タップしてみるのDA。', wait: 'open', hint: '🦋 蝶をタップ' },
+  { text: '88時間以内の投稿は、ぜんぶ見られるのDA。\n見終わったら、シール帳をとじるのDA。', wait: 'close', hint: '「シール帳をとじる」をタップ' },
   { text: '見終わった蝶は飛んでいき、\nまた別の蝶がやってくるのDA。', wait: 'next' },
   { text: '次は君の番DA。\nたまごを押してみるのDA。', wait: 'egg', hint: '👇 たまごをタップ' },
   { text: 'ここは根っこ。君だけのデータフォルダDA。\n撮った写真は、まずここにしまわれるのDA。\n動画は、火星の裏スタジオにしまうのDA。\nひとつ選ぶのDA。', wait: 'pick', hint: '写真をひとつ選ぶ' },

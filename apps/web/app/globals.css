@@ -470,3 +470,23 @@ body {
   65% { opacity: 1; }
   100% { transform: translateY(-45%) scale(1.2); opacity: 0; }
 }
+
+/* Jupiter: the round sticker book opens (cover swings to the left), pages turn */
+@keyframes bookOpen {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-168deg); }
+}
+@keyframes bookIn {
+  0% { transform: scale(0.35) translateY(30%); opacity: 0; }
+  60% { transform: scale(1.04) translateY(0); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes pageFlip {
+  0% { transform: rotateY(-95deg); opacity: 0.4; }
+  100% { transform: rotateY(0deg); opacity: 1; }
+}
+@keyframes stickerPop {
+  0% { transform: scale(0.6) rotate(var(--tilt)); opacity: 0; }
+  70% { transform: scale(1.06) rotate(var(--tilt)); opacity: 1; }
+  100% { transform: scale(1) rotate(var(--tilt)); }
+}

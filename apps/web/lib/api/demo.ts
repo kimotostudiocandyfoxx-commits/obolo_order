@@ -676,7 +676,7 @@ export class DemoApi implements Api {
   async butterflyCandidates(): Promise<PuniPicResult> {
     await sleep(900);
     const all = ['kitsune', 'usagi', 'onigiri', 'pen_lady', 'wani_queen', 'samurai806'].sort(() => Math.random() - 0.5).slice(0, 2);
-    const candidates = all.map((n) => ({ id: uid(), url: `/onboarding/bf-${n}.webp` }));
+    const candidates = all.map((n) => ({ id: uid(), url: `/onboarding/bfb-${n}.webp` }));
     this.lookCache.push(...candidates);
     return { candidates, left: 99 };
   }

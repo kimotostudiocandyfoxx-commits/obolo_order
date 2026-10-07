@@ -450,22 +450,37 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
   );
 }
 
-/** Someone's posts of the last 88 hours, one after another (like stories). */
+/** Leather colours for the sticker-book covers (picked per person). */
+const COVERS = ['#3b2a20', '#22324a', '#6b2a22', '#2f4a3a', '#4a2f4f', '#5a4626', '#1f3f46'];
+const coverOf = (f: Flyer) => f.wing && !f.art && !f.src ? f.wing : COVERS[[...f.key].reduce((n, c) => n + c.charCodeAt(0), 0) % COVERS.length];
+
+/**
+ * Someone's posts as a round sticker book (client design 2026-10-07: every butterfly hugs one).
+ * The book pops out, its cover swings open, and each post is a round sticker on a round page;
+ * tap the right / left half (or つぎへ) to turn the pages.
+ */
 function StoryViewer({ flyer, start, onClose, onStar, onTree }: { flyer: Flyer; start: number; onClose: () => void; onStar: (p: ViewPost) => void; onTree?: () => void }) {
   const [i, setI] = useState(start);
+  const [dir, setDir] = useState(0);
   const post = flyer.posts[i];
-  const next = () => (i + 1 < flyer.posts.length ? setI(i + 1) : onClose());
-  const prev = () => setI(Math.max(0, i - 1));
+  const next = () => {
+    if (i + 1 >= flyer.posts.length) return onClose();
+    setDir(1);
+    setI(i + 1);
+  };
+  const prev = () => {
+    if (i === 0) return;
+    setDir(-1);
+    setI(i - 1);
+  };
   if (!post) return null;
+  const cover = coverOf(flyer);
+  const tilt = ((i * 37) % 9) - 4;
   return (
-    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#5b4330]/55 px-5 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md rounded-[2rem] bg-[#fffaf2] p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-3 flex gap-1">
-          {flyer.posts.map((p, k) => (
-            <span key={p.id} className={`h-1 flex-1 rounded-full ${k <= i ? 'bg-amber-400' : 'bg-amber-100'}`} />
-          ))}
-        </div>
-        <div className="mb-3 flex items-center gap-2">
+    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#5b4330]/60 px-4 backdrop-blur-sm" onClick={onClose}>
+      <div className="flex w-full max-w-md flex-col items-center" onClick={(e) => e.stopPropagation()}>
+        {/* who */}
+        <div className="mb-3 flex w-full items-center gap-2 rounded-full bg-[#fffaf2]/95 py-1 pl-1 pr-2 shadow">
           <button onClick={onTree} disabled={!onTree} className="flex min-w-0 items-center gap-2 text-left" aria-label="木をみる">
             <Butterfly art={flyer.art} src={flyer.src} emoji={flyer.emoji} img={flyer.img} wing={flyer.wing} size={40} />
             <span className="truncate font-bold">@{flyer.handle}</span>
@@ -476,21 +491,58 @@ function StoryViewer({ flyer, start, onClose, onStar, onTree }: { flyer: Flyer; 
             ✕
           </button>
         </div>
-        <div className="relative mx-auto w-[min(100%,340px)]" style={{ containerType: 'inline-size' }}>
-          <PostCircle media={post.media} filter={post.filter} text={post.text} live className="shadow-[0_12px_40px_rgba(120,80,40,0.3)]" />
-          <button onClick={prev} className="absolute inset-y-0 left-0 w-1/3" aria-label="まえ" />
-          <button onClick={next} className="absolute inset-y-0 right-0 w-1/3" aria-label="つぎ" />
+
+        {/* the round sticker book */}
+        <div className="relative aspect-square w-[min(86vw,420px)] animate-[bookIn_0.55s_ease-out]" style={{ perspective: 1400 }}>
+          {/* the page */}
+          <div
+            className="absolute inset-0 rounded-full border-[6px] shadow-[0_18px_40px_rgba(60,35,15,.45)]"
+            style={{ borderColor: cover, background: 'radial-gradient(circle at 45% 40%, #fffaf0 0%, #f6ead3 62%, #e9d6b4 100%)' }}
+          >
+            <div className="absolute inset-[5%] rounded-full border-2 border-dashed border-[#c9ab82]/70" />
+            {/* the turning page with its sticker */}
+            <div key={post.id} className="absolute inset-0" style={{ transformOrigin: '0% 50%', animation: dir ? 'pageFlip 0.45s ease-out' : undefined }}>
+              <div className="absolute inset-[15%]" style={{ containerType: 'inline-size', ['--tilt' as string]: `${tilt}deg`, animation: `stickerPop 0.45s ease-out ${dir ? '0.18s' : '0.55s'} both` }}>
+                <div className="h-full w-full rounded-full bg-white p-[3%] shadow-[0_6px_14px_rgba(90,60,30,.35)]">
+                  <PostCircle media={post.media} filter={post.filter} text={post.text} live />
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* ring binding on the left, clasp on the right */}
+          {[-30, -15, 0, 15, 30].map((d) => (
+            <span key={d} className="absolute left-[-1.5%] h-[5%] w-[7%] rounded-full border-[3px] border-[#c9a05a] bg-transparent shadow" style={{ top: `${47 + d}%` }} />
+          ))}
+          <span className="absolute right-[-3%] top-[44%] h-[12%] w-[9%] rounded-md border-2 border-[#c9a05a] shadow" style={{ background: cover }} />
+          {/* the cover swings open once */}
+          <div
+            className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full border-[6px] border-[#c9a05a] shadow-xl"
+            style={{ background: `radial-gradient(circle at 40% 35%, ${cover}cc, ${cover} 70%)`, transformOrigin: '0% 50%', backfaceVisibility: 'hidden', animation: 'bookOpen 0.7s ease-in-out 0.35s forwards' }}
+          >
+            <div className="absolute inset-[8%] rounded-full border-2 border-[#c9a05a]/70" />
+            <div className="opacity-90">
+              <Butterfly art={flyer.art} src={flyer.src} emoji={flyer.emoji} img={flyer.img} wing={flyer.wing} size={120} />
+            </div>
+          </div>
+          {/* turn the pages */}
+          <button onClick={prev} className="absolute inset-y-0 left-0 w-1/2" aria-label="まえ" />
+          <button onClick={next} className="absolute inset-y-0 right-0 w-1/2" aria-label="つぎ" />
         </div>
-        <div className="mt-3 flex items-center justify-center gap-3">
-          <p className="text-xs text-[#b09276]">{flyer.posts.length > 1 ? `${i + 1} / ${flyer.posts.length}（88時間以内の投稿）` : '88時間以内の投稿'}</p>
+
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="flex gap-1">
+            {flyer.posts.map((p, k) => (
+              <span key={p.id} className={`h-2 w-2 rounded-full ${k === i ? 'bg-amber-400' : 'bg-white/70'}`} />
+            ))}
+          </div>
           {post.star && (
-            <button onClick={() => onStar(post)} className={`rounded-full px-3 py-1 text-xs font-bold ${post.star.mine ? 'bg-amber-100 text-amber-600' : 'bg-white text-[#9b8068] shadow-sm'}`} aria-label="star">
+            <button onClick={() => onStar(post)} className={`rounded-full px-3 py-1 text-xs font-bold shadow-sm ${post.star.mine ? 'bg-amber-100 text-amber-600' : 'bg-white text-[#9b8068]'}`} aria-label="star">
               {post.star.mine ? '★' : '☆'} {post.star.count}
             </button>
           )}
         </div>
-        <button onClick={next} className="mt-3 w-full rounded-full bg-amber-500 py-2.5 text-sm font-bold text-white">
-          {i + 1 < flyer.posts.length ? 'つぎへ' : 'とじる'}
+        <button onClick={next} className="mt-3 w-[min(86vw,420px)] rounded-full bg-amber-500 py-2.5 text-sm font-bold text-white shadow">
+          {i + 1 < flyer.posts.length ? 'ページをめくる' : 'シール帳をとじる'}
         </button>
       </div>
     </div>

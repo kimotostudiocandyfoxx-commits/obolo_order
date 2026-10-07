@@ -100,7 +100,8 @@ export function refineLookPrompt(instruction: string): string {
  */
 /**
  * Jupiter butterfly (client request 2026-10-07: new art is made with Gemini): a cute chibi
- * character with butterfly wings, in the style of the client's パタパタ butterflies (style sheet).
+ * character with butterfly wings holding a round sticker book, in the style of the client's
+ * パタパタ butterflies (style sheet).
  */
 export function butterflyPrompt(description: string, hasReference: boolean, variant: number): string {
   const moods = ['happy and smiling', 'calm and gentle', 'proud and cheerful', 'shy with a soft smile'];
@@ -109,6 +110,8 @@ export function butterflyPrompt(description: string, hasReference: boolean, vari
     'soft hand-painted storybook illustration, warm muted colours, a round chubby little body standing upright, a big head, ' +
     'small shiny eyes, pink blush, two curly antennae on top, and two big rounded butterfly wings spread behind the body with ' +
     'pretty patterns that match the character (flowers, moons, stars, swirls). Outfit and accessories match the concept. ' +
+    'The character hugs a ROUND sticker book (a round album with ring binding on the left and a small clasp on the right) in ' +
+    'front of its belly with both hands, decorated to match the character, exactly like every character on the style sheet. ' +
     `Character concept: "${description}". Mood: ${moods[variant % moods.length]}. ` +
     (hasReference ? 'Use the SECOND attached image as the character to turn into this butterfly (keep its colours, face and motifs). ' : '') +
     'Composition: front view, the whole character and both wings fully visible and centered, filling about 85% of a square frame. ' +
