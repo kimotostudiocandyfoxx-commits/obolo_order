@@ -350,7 +350,7 @@ function MakeChat({ onList, onOpenShop }: { onList: (i: Item) => void; onOpenSho
         </div>
       )}
       <div className="flex items-center gap-2 border-t border-white/10 px-3 py-2">
-        <Mic onText={(t) => setText(t)} />
+        <Mic value={text} onChange={setText} />
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}

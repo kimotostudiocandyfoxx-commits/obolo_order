@@ -7,7 +7,7 @@ import { KororinWorld } from './KororinWorld';
 /**
  * Day 4 tutorial on top of ころりん, coached by たこ焼きブラザー / たこ焼きシスター.
  * Steps: listen to a voice → give a star → write something and have it read in the NEO voice
- * (choose the style) → why it is the NEO voice → done.
+ * (speak into the mic, record the voice) → the registered voice later → done.
  * PLACEHOLDER (P-OB-13): provisional lines by Claude.
  */
 type Who = 'brother' | 'sister';
@@ -17,8 +17,8 @@ const STEPS: { who: Who; text: string; wait: 'listen' | 'star' | 'post' | 'next'
   { who: 'brother', text: 'な？ 声で聞くと、気持ちがぜんぶ伝わるだろ？\nこれが土星だZE!!', wait: 'next' },
   { who: 'sister', text: 'いいなと思ったら、星をあげるといいわ。\n星は、そのまま気持ちになって届くわ。', wait: 'star' },
   { who: 'sister', text: '試しに呟いてみたらいいわ。', wait: 'post' },
-  { who: 'brother', text: '今はネオだから、ネオの声だZE!!', wait: 'next' },
-  { who: 'sister', text: 'ORDERになったら、登録した声にできるわ。', wait: 'next' },
+  { who: 'brother', text: 'マイクを押して話すだけで、文字になるんだZE!!\nそして声もそのまま土星にころがるZE!!', wait: 'next' },
+  { who: 'sister', text: 'ORDERになったら、登録した自分の声で\n読んでもらうこともできるわ。', wait: 'next' },
   { who: 'sister', text: 'あなたの声が、土星にころがったわ。\nこれが土星の遊び方だわ。', wait: 'done' },
 ];
 

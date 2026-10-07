@@ -10,6 +10,7 @@ import { GENRES, makeSong, pickGenre, songFromDesign, type Genre, type MadeSong 
 import { fmt } from '@/lib/mercury/sea';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
+import { useDictation } from '@/lib/useDictation';
 
 /**
  * 作曲 (Mercury) — PLACEHOLDER until the client's design (P-MER-3): talk to your partner and they
@@ -277,7 +278,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
       </div>
 
       <div className="flex items-center gap-2 border-t border-white/10 px-3 py-2">
-        <Mic onText={(t) => setText(t)} />
+        <Mic value={text} onChange={setText} />
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -560,37 +561,35 @@ function Sing({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => void 
   );
 }
 
-/** Voice input (the round device is voice first). Hidden where the browser can't listen. */
-type Recognition = { lang: string; interimResults: boolean; continuous: boolean; start(): void; stop(): void; onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null; onend: (() => void) | null };
-export function Mic({ onText }: { onText: (t: string) => void }) {
-  const [on, setOn] = useState(false);
-  const rec = useRef<Recognition | null>(null);
-  const [supported, setSupported] = useState(false);
-  useEffect(() => {
-    const w = window as unknown as { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
-    setSupported(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
-  }, []);
-  if (!supported) return null;
-  const toggle = () => {
-    if (on) {
-      rec.current?.stop();
-      return;
-    }
-    const w = window as unknown as { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
-    const R = w.SpeechRecognition || w.webkitSpeechRecognition!;
-    const r = new R();
-    r.lang = 'ja-JP';
-    r.interimResults = true;
-    r.continuous = false;
-    r.onresult = (e) => onText(Array.from(e.results).map((x) => x[0].transcript).join(''));
-    r.onend = () => setOn(false);
-    rec.current = r;
-    r.start();
-    setOn(true);
-  };
+/**
+ * Voice input next to a chat box (mic first, client decision 2026-10-07): tap to start, tap
+ * again to stop; the words go where the cursor is in the box beside it (select words to replace
+ * them). Hidden where the browser can't listen.
+ */
+export function Mic({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const btn = useRef<HTMLButtonElement>(null);
+  const field = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const mic = useDictation({ field, value, onChange });
+  if (!mic.supported) return null;
   return (
-    <button onClick={toggle} className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${on ? 'animate-pulse bg-rose-500' : 'bg-white/10'}`} aria-label={on ? '聞き取りを止める' : '話して入力'}>
-      🎙
+    <button
+      ref={btn}
+      onClick={() => {
+        field.current = btn.current?.parentElement?.querySelector('input, textarea') ?? null;
+        mic.toggle();
+      }}
+      className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white shadow ${mic.listening ? 'bg-gradient-to-br from-rose-400 to-pink-500' : 'bg-gradient-to-br from-[#f39bd0] to-[#b58cff]'}`}
+      aria-label={mic.listening ? '聞き取りを止める' : '話して入力'}
+    >
+      {mic.listening && <span className="absolute inset-0 animate-ping rounded-full bg-pink-400/40" />}
+      {mic.listening ? (
+        <span className="relative block h-3.5 w-3.5 rounded-sm bg-white" />
+      ) : (
+        <svg className="relative" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden>
+          <rect x="8.5" y="3" width="7" height="12" rx="3.5" fill="currentColor" />
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+        </svg>
+      )}
     </button>
   );
 }
