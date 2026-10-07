@@ -45,6 +45,11 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, busy, pending]);
   useEffect(() => () => synth.stop(), []);
+  // wake the GPU studio while we chat: a cold start takes 1-2 min, about as long as the talk,
+  // so the instrumental is usually ready to make by the time the song is written
+  useEffect(() => {
+    if (getApi().mode === 'live') void getApi().composeMusicStatus().catch(() => {});
+  }, []);
 
   const say = (t: string) => setMsgs((m) => [...m, { who: 'partner', text: t }]);
   // live: the partner and the song come from the AI (Gemini); demo: the offline song maker
@@ -296,7 +301,8 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
   const [state, setState] = useState<'idle' | 'working' | 'warming' | 'error'>('idle');
   const [err, setErr] = useState('');
   const [status, setStatus] = useState('');
-  // while warming, show what the GPU studio is doing (downloading the model, loading, or an error)
+  const makeRef = useRef<() => Promise<void>>(async () => {});
+  // while warming, show what the GPU studio is doing and start by itself as soon as it is ready
   useEffect(() => {
     if (state !== 'warming') return;
     let live = true;
@@ -304,7 +310,11 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
       try {
         const s = await getApi().composeMusicStatus();
         if (!live) return;
-        if (s.ready) setStatus('準備できた！もう一度押してね。');
+        if (s.ready) {
+          setStatus('準備できた！作曲を始めるね。');
+          void makeRef.current();
+          return;
+        }
         else if (s.error) setStatus(`スタジオの状態：${String(s.error).slice(0, 160)}`);
         else setStatus(`スタジオの状態：${String(s.phase ?? '起動中')}（${Number(s.seconds ?? 0)}秒・モデル ${Number(s.checkpointGB ?? 0)}GB）`);
       } catch {
@@ -312,7 +322,7 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
       }
     };
     void poll();
-    const t = setInterval(() => void poll(), 15000);
+    const t = setInterval(() => void poll(), 10000);
     return () => {
       live = false;
       clearInterval(t);
@@ -344,21 +354,25 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
       onMade(r.url);
       setState('idle');
     } catch (e) {
-      if (e instanceof ApiError && (e.code === 'MUSIC_WARMING' || e.status === 504)) setState('warming');
+      if (e instanceof ApiError && (e.code === 'MUSIC_WARMING' || e.status === 504)) {
+        setStatus('');
+        setState('warming');
+      }
       else {
         setErr(detail(e));
         setState('error');
       }
     }
   };
+  makeRef.current = make;
   return (
     <div className="mt-3 text-center">
-      <button onClick={() => void make()} disabled={state === 'working'} className="w-full rounded-full border border-violet-300/60 bg-violet-500/20 py-2 text-sm font-bold disabled:opacity-60">
+      <button onClick={() => void make()} disabled={state === 'working' || state === 'warming'} className="w-full rounded-full border border-violet-300/60 bg-violet-500/20 py-2 text-sm font-bold disabled:opacity-60">
         {state === 'working' ? '🎹 伴奏を作曲中…（1〜2分）' : '🎹 伴奏をつくる（AI）'}
       </button>
       {state === 'warming' && (
         <p className="mt-1.5 text-[11px] text-amber-200/80">
-          音楽スタジオ（GPU）を起動中…。1〜2分たったら、もう一度押してね。
+          音楽スタジオ（GPU）を起動中…。準備ができたら自動で作曲を始めるので、このまま待っててね。
           {status && <span className="mt-0.5 block text-white/60">{status}</span>}
         </p>
       )}
