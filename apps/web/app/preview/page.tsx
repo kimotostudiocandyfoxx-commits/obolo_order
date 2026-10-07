@@ -18,6 +18,7 @@ export default function PreviewIndex() {
     { href: '/preview/play?day=8&at=venus', label: '8日目：金星（マーケット）から' },
     { href: '/preview/play?day=9&at=choice', label: '9日目：MONBANの「月88円」から（支払いはデモ）' },
     { href: '/preview/puni', label: 'ぷにぷにキャラの試作（つつく・投げる・着せ替え）' },
+    { href: '/preview/puni-image', label: 'ぷにぷにキャラの試作（絵のキャラ版・メッシュ変形）' },
     { href: '/preview/play?world=venus', label: '金星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=mars', label: '火星だけ（チュートリアルなし）' },
     { href: '/preview/play?world=mercury', label: '水星だけ（チュートリアルなし）' },
