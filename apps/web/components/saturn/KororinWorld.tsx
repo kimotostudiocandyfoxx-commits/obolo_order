@@ -191,7 +191,10 @@ export function KororinWorld({
           id: p.id,
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
           pic: p.author.pic ?? null,
-          R: Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1),
+          R: Math.min(
+            stageW * 0.17,
+            Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * (tab === 'all' ? 1 : popScale(p)),
+          ),
         };
       }),
     [shown, stageW, tab],
@@ -566,6 +569,16 @@ const TABS: [Tab, string][] = [
 const TAB_CAP: Record<Exclude<Tab, 'all'>, number> = { following: 22, friends: 8 };
 /** ダチ are few, so they are drawn bigger. */
 const FRIENDS_SCALE = 1.45;
+
+/**
+ * Popular voices grow (client decision 2026-10-07): stars and replies make a character bigger,
+ * on a gentle log curve up to ×1.6 (☆10 ≈ ×1.26, ☆100 ≈ ×1.5). A reply counts as two stars.
+ * Not on みんな yet (being designed).
+ */
+function popScale(p: SaturnPostView): number {
+  const score = p.starCount + 2 * (p.replyCount ?? 0);
+  return 1 + Math.min(0.6, Math.log10(1 + Math.max(0, score)) * 0.25);
+}
 
 /** The planet's horizon (share of the stage): an ellipse whose top edge is the ground. */
 const PLANET = { top: 0.67, rx: 0.78, ry: 0.5 };
