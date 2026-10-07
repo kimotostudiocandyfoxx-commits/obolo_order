@@ -1,0 +1,7 @@
+{
+  "id": "mars-sky-city-loop-v1",
+  "kind": "video",
+  "aspect": "16:9",
+  "image": "apps/web/public/art/mars-sky-city.jpg",
+  "prompt": "Bring this painted neon city on Mars to life: the glowing light trails flow smoothly along their curves like streams of light, city windows and neon signs gently flicker, the stars twinkle, the red planet glows softly. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical."
+}

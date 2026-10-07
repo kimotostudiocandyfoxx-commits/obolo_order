@@ -1,0 +1,7 @@
+{
+  "id": "mercury-sea-loop-v1",
+  "kind": "video",
+  "aspect": "16:9",
+  "image": "apps/web/public/art/mercury-sea.jpg",
+  "prompt": "Bring this painted night ocean to life: the aurora ribbons slowly ripple and shimmer, the stars twinkle, soft moonlight glitters and dances across gentle rolling waves, tiny window lights in the far castles flicker warmly. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical."
+}
