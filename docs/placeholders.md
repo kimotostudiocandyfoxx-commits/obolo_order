@@ -175,3 +175,4 @@
 - **ホーム画面の配置**：ラフ画像がこのセッションに届いていなかったため、文章の指示（中央に地球、上に月、時計回りに 土星→木星→水星→金星→火星→天王星→海王星）で配置しました。ラフと違う点があれば `apps/web/components/SolarSystem.tsx` の `ORBIT_R` / `EARTH` / `BASE` で調整できます。
 - **Mercury の音源保存先**（仕様 §7.1「README に記載」）：音声は **Bunny Storage + CDN** に保存（Stream より安価）。
 - **デモモード**：`NEXT_PUBLIC_API_URL` が空のとき、Web は API なしで動く「デモモード」になります（データはその端末のブラウザ内だけ）。画面上部に黄色い帯で表示されます。
+- **P-ART-1 画像・動画の工房（2026-10-07）**：Claude Code が絵を設計して `art/queue.json` に書くと、GitHub Actions（`.github/workflows/art.yml`）の上で Gemini（画像：gemini-3-pro-image-preview）と Veo（動画：veo-3.1）が描き、`art/out/` に戻ります。採用した絵は `apps/web/public/art/` へ。背景は「絵だけ」を生成し、文字・ボタン・人（キャラ）は必ずコードで上にのせます（数字や文字の焼き込みを防ぐため）。船・UFO は白背景で生成して `scripts/art/cutout.py` で切り抜き、動く背景は `scripts/art/web-loop.sh` で軽い無音ループに変換。**まだの所**：土星・木星・金星などの背景の描き直し、Mercury のレコード絵、チュートリアル（見本）画面は旧い絵のまま。
