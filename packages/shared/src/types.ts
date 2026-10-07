@@ -169,11 +169,7 @@ export interface SaturnPostRef {
 /** Someone's Saturn page. */
 export interface SaturnProfileView {
   user: { id: string; handle: string; displayName: string; neoForm?: string | null; bio: string; look?: PuniLook | null; pic?: string | null };
-  postCount: number;
-  // no follower count anywhere in the app (client rule 2026-10-07): following yes, numbers of followers no
-  following: number;
-  /** stars their posts received */
-  stars: number;
+  // no counts on anyone's page (client rule 2026-10-07: no followers, following, friends or stars received)
   followedByMe: boolean;
   isMe: boolean;
 }
@@ -382,10 +378,7 @@ export interface JupiterTreeView {
   leaves: JupiterPostView[];
   /** still flying */
   flying: JupiterPostView[];
-  /** 実: stars received on Jupiter posts */
-  fruits: number;
-  /** トモダチ: mutual follows */
-  friends: number;
+  // no counts (client rule 2026-10-07): no fruits / friends numbers
   followedByMe: boolean;
   isMe: boolean;
 }

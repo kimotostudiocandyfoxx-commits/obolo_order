@@ -229,10 +229,10 @@ export function KororinWorld({
           pic: p.author.pic ?? null,
           photo: p.photoUrl ?? null,
           R: dense
-            ? Math.max(14, Math.min(30, stageW * 0.028 * (1 + (hueOf(p.id) % 3) * 0.12))) * (1 + (popScale(p) - 1) * 0.6)
+            ? Math.max(14, Math.min(30, stageW * 0.028 * (1 + (hueOf(p.id) % 3) * 0.12)))
             : Math.min(
             stageW * (tab === 'friends' ? 0.16 : 0.12),
-            Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * popScale(p),
+            Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1),
           ),
         };
       }),
@@ -473,9 +473,6 @@ export function KororinWorld({
             <SaturnIcon /> ころりんぱ
           </span>
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-sm font-black text-[#4a3570] shadow-[0_3px_0_#e3cfae]">
-              <StarIcon /> {all.reduce((a, p) => a + (p.author.id === me?.id ? p.starCount : 0), 0) || 0}
-            </span>
             {me && (
               <button onClick={() => setProfileId(me.id)} className="flex h-11 w-11 items-center justify-center overflow-visible rounded-full border-[3px] border-white bg-[#4a3a6e] shadow-[0_3px_0_rgba(60,30,110,.35)]" aria-label="my page">
                 <PuniAvatar seed={me.id} neo={me.neoForm} look={me.look} pic={me.puniPic} size={34} />
@@ -543,10 +540,10 @@ export function KororinWorld({
                 <span className="text-[#b4a3d8]">›</span>
               </button>
               <button onClick={() => setDetail(true)} className="flex h-7 items-center gap-1 rounded-full border border-violet-100 bg-white px-2 text-[11px] font-black text-[#7a62b0] shadow" aria-label="replies">
-                💬 {replies.length}
+                💬
               </button>
               <button onClick={() => void star(open)} className={`flex h-7 items-center gap-0.5 rounded-full border px-2 text-[11px] font-black shadow ${open.starredByMe ? 'border-amber-200 bg-amber-50 text-amber-500' : 'border-violet-100 bg-white text-[#7a62b0]'}`} aria-label="star">
-                {open.starredByMe ? '★' : '☆'} {open.starCount}
+                {open.starredByMe ? '★' : '☆'}
               </button>
             </span>
           </div>
@@ -584,7 +581,7 @@ export function KororinWorld({
             )}
             <div className="mt-3 rounded-[22px] bg-[#f6f0ff] p-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#8a76bd]">💬 リプ {replies.length}</span>
+                <span className="text-xs font-black text-[#8a76bd]">💬 リプ</span>
                 <span className="text-[10px] font-bold text-[#b3a5d6]">{replies.length ? 'アイコンをタップできくよ' : resident ? 'サンプルには返信できないよ' : 'まだリプはないよ'}</span>
               </div>
               {(() => {
@@ -610,8 +607,8 @@ export function KororinWorld({
                     </button>
                   ))}
                   {replies.length > 5 && !allReplies && (
-                    <button onClick={() => setAllReplies(true)} className="-ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[3px] border-white bg-white text-sm font-black text-[#8a76bd] shadow-sm">
-                      +{replies.length - 5}
+                    <button onClick={() => setAllReplies(true)} className="-ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[3px] border-white bg-white text-sm font-black text-[#8a76bd] shadow-sm" aria-label="もっと見る">
+                      …
                     </button>
                   )}
                 </div>
@@ -626,7 +623,7 @@ export function KororinWorld({
                 <MicIcon size={16} /> 声でかえす
               </button>
               <button onClick={() => !resident && setComposer({ quote: open })} disabled={resident} className="rounded-full bg-[#f3ecff] py-2.5 text-sm font-black text-[#5a3f8a] disabled:opacity-50">
-                🔁 引用 {open.repostCount ?? 0}
+                🔁 引用
               </button>
             </div>
           </div>
@@ -698,15 +695,6 @@ const PLAZA_MIN = 30;
 /** ダチ are few, so they are drawn bigger. */
 const FRIENDS_SCALE = 1.45;
 
-/**
- * Popular voices grow (client decision 2026-10-07): stars and replies make a character bigger,
- * on a gentle log curve up to ×1.6 (☆10 ≈ ×1.26, ☆100 ≈ ×1.5). A reply counts as two stars.
- * Not on みんな yet (being designed).
- */
-function popScale(p: SaturnPostView): number {
-  const score = p.starCount + 2 * (p.replyCount ?? 0);
-  return 1 + Math.min(0.6, Math.log10(1 + Math.max(0, score)) * 0.25);
-}
 
 /** The planet's horizon (share of the stage): an ellipse whose top edge is the ground. */
 const PLANET = { top: 0.67, rx: 0.78, ry: 0.5 };
@@ -736,13 +724,6 @@ function SaturnIcon() {
   );
 }
 
-function StarIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
-      <path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.5l1.3-6.6L2.5 9.3l6.6-.8z" fill="#ffcc3d" stroke="#e5a91c" strokeWidth="1.2" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function MicIcon({ size }: { size: number }) {
   return (

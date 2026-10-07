@@ -131,21 +131,7 @@ export function SaturnProfile({
               <p className="mt-3 whitespace-pre-wrap text-center text-sm leading-relaxed text-slate-600">{u.bio || (profile.isMe ? 'まだ自己紹介がないよ' : '')}</p>
             )}
 
-            {/* no follower count (client rule 2026-10-07) */}
-            <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl bg-violet-50/70 py-2.5 text-center">
-              {(
-                [
-                  ['声', profile.postCount],
-                  ['フォロー', profile.following],
-                  ['もらった星', profile.stars],
-                ] as const
-              ).map(([label, n]) => (
-                <div key={label}>
-                  <p className="text-base font-black text-violet-700">{n}</p>
-                  <p className="text-[10px] font-bold text-violet-400">{label}</p>
-                </div>
-              ))}
-            </div>
+            {/* no counts on anyone's page (client rule 2026-10-07: a social app parents can hand over — nobody is measured by numbers) */}
 
             {profile.isMe && !editing && (
               <button onClick={() => setMaker(true)} className="mt-3 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow">
@@ -197,7 +183,7 @@ export function SaturnProfile({
                       </p>
                     )}
                     <p className="mt-1 text-[10px] text-slate-400">
-                      ★ {p.starCount} ・ 💬 {p.replyCount ?? 0} ・ 🔁 {p.repostCount ?? 0} ・ {new Date(p.createdAt).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })}
+                      {new Date(p.createdAt).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' })}
                     </p>
                   </button>
                 </div>

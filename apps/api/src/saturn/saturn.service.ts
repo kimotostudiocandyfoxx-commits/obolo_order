@@ -221,20 +221,13 @@ export class SaturnService {
   async profile(viewerId: string, userId: string): Promise<SaturnProfileView> {
     const [u] = await this.db.read.select({ ...authorCols, bio: users.bio }).from(users).where(and(eq(users.id, userId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
-    // no follower count (client rule 2026-10-07): it is never counted or sent
-    const [[posts], [following], [mine]] = await Promise.all([
-      this.db.read
-        .select({ n: count(), stars: sum(saturnPosts.starCount) })
-        .from(saturnPosts)
-        .where(and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), isNull(saturnPosts.deletedAt), alive())),
-      this.db.read.select({ n: count() }).from(follows).where(eq(follows.followerId, userId)),
-      this.db.read.select({ n: count() }).from(follows).where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, userId))),
-    ]);
+    // no counts on anyone's page (client rule 2026-10-07): nothing is counted or sent
+    const [mine] = await this.db.read
+      .select({ n: count() })
+      .from(follows)
+      .where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, userId)));
     return {
       user: u,
-      postCount: posts?.n ?? 0,
-      stars: Number(posts?.stars ?? 0),
-      following: following?.n ?? 0,
       followedByMe: (mine?.n ?? 0) > 0,
       isMe: viewerId === userId,
     };

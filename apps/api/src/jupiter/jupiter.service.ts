@@ -136,7 +136,8 @@ export class JupiterService {
       .where(and(eq(users.id, userId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
     const since = flyingSince();
-    const [rows, [stars], [friends], [mine]] = await Promise.all([
+    // no counts (client rule 2026-10-07): no fruits / friends numbers
+    const [rows, [mine]] = await Promise.all([
       this.db.read
         .select({ p: jupiterPosts, u: authorCols })
         .from(jupiterPosts)
@@ -144,14 +145,6 @@ export class JupiterService {
         .where(and(eq(jupiterPosts.userId, userId), isNull(jupiterPosts.deletedAt)))
         .orderBy(desc(jupiterPosts.createdAt))
         .limit(300),
-      this.db.read
-        .select({ n: sum(jupiterPosts.starCount) })
-        .from(jupiterPosts)
-        .where(and(eq(jupiterPosts.userId, userId), isNull(jupiterPosts.deletedAt))),
-      this.db.read
-        .select({ n: count() })
-        .from(follows)
-        .where(and(eq(follows.followerId, userId), sql`${follows.followeeId} IN (SELECT follower_id FROM follows WHERE followee_id = ${userId})`)),
       this.db.read
         .select({ n: count() })
         .from(follows)
@@ -164,8 +157,6 @@ export class JupiterService {
       branches: branchNames(branches),
       leaves: views.filter((v) => new Date(v.createdAt) <= since),
       flying: views.filter((v) => new Date(v.createdAt) > since),
-      fruits: Number(stars?.n ?? 0),
-      friends: friends?.n ?? 0,
       followedByMe: (mine?.n ?? 0) > 0,
       isMe: viewerId === userId,
     };

@@ -133,7 +133,7 @@ export function VenusWorld({ events, overlay }: { events?: VenusEvents; overlay?
             </div>
             <p className="mt-3 text-center text-lg font-black">{open.name}</p>
             <p className="text-center text-xs text-white/60">
-              {open.kind} ・ つくった人 @{open.maker} ・ {open.sold}個売れた
+              {open.kind} ・ つくった人 @{open.maker}
             </p>
             {open.maker === 'you' || v.shop.some((s) => s.id === open.id) ? (
               <p className="mt-4 text-center text-sm text-amber-200">あなたの店の商品です（★{open.price}）</p>
@@ -200,7 +200,7 @@ function MyShop({ shop, collection, stars, onOpen }: { shop: Item[]; collection:
       <div className="mx-auto mt-2 max-w-3xl rounded-3xl border border-amber-300/40 bg-black/40 p-4 text-center">
         <p className="text-lg font-black tracking-wide text-amber-100">🏪 {(me?.displayName || 'neo').toUpperCase()} SHOP</p>
         <p className="mt-1 text-xs text-white/65">
-          商品 {shop.length} ・ 売れた数 {shop.reduce((a, i) => a + i.sold, 0)} ・ 売上 ★{earned} ・ 持っている星 ★{stars}
+          売上 ★{earned} ・ 持っている星 ★{stars}
         </p>
       </div>
       <h3 className="mx-auto mb-2 mt-4 max-w-3xl text-xs tracking-widest text-white/60">店に並べている商品</h3>

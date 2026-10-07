@@ -551,7 +551,7 @@ function StoryViewer({ flyer, start, onClose, onTree }: { flyer: Flyer; start: n
                 )}
                 {post.star && (
                   <button onClick={() => star(post)} className={`flex h-7 items-center rounded-full border px-2 text-[11px] font-bold shadow ${post.star.mine ? 'border-amber-200 bg-amber-50 text-amber-500' : 'border-[#ead9bf] bg-white/95 text-[#9b8068]'}`} aria-label="star">
-                    {post.star.mine ? '★' : '☆'} {post.star.count}
+                    {post.star.mine ? '★' : '☆'}
                   </button>
                 )}
                 {post.replies && (
@@ -567,7 +567,6 @@ function StoryViewer({ flyer, start, onClose, onTree }: { flyer: Flyer; start: n
                     ) : (
                       <span>💬</span>
                     )}
-                    {post.replies.count}
                   </button>
                 )}
               </div>
@@ -731,8 +730,6 @@ interface TreeData {
   wing?: string;
   branches: string[];
   leaves: ViewPost[];
-  fruits: number;
-  friends: number;
   flyer: Flyer | null;
   followed?: boolean;
   userId?: string;
@@ -770,11 +767,11 @@ function TreeView({
   useEffect(() => {
     if (who.kind === 'resident') {
       const r = who.r;
-      setData({ handle: r.handle, art: r.art, emoji: r.emoji, wing: r.wing, branches: [...JUPITER_DEFAULT_BRANCHES], leaves: residentPosts(r, false), fruits: r.fruits, friends: r.friends, flyer: residentFlyer });
+      setData({ handle: r.handle, art: r.art, emoji: r.emoji, wing: r.wing, branches: [...JUPITER_DEFAULT_BRANCHES], leaves: residentPosts(r, false), flyer: residentFlyer });
       return;
     }
     if (!live) {
-      setData({ ...me, branches: [...JUPITER_DEFAULT_BRANCHES], leaves: localLeaves, fruits: 0, friends: 0, flyer: localFlyer });
+      setData({ ...me, branches: [...JUPITER_DEFAULT_BRANCHES], leaves: localLeaves, flyer: localFlyer });
       return;
     }
     const id = who.kind === 'me' ? me.id : who.id;
@@ -792,8 +789,6 @@ function TreeView({
           ...look,
           branches: t.branches,
           leaves: t.leaves.map(liveView),
-          fruits: t.fruits,
-          friends: t.friends,
           followed: t.followedByMe,
           userId: t.author.id,
           flyer: flying.length ? { key: `tree-${t.author.id}`, userId: t.author.id, handle, ...look, hours: flying[0].hours, posts: flying, me: t.isMe } : null,
@@ -838,19 +833,10 @@ function TreeView({
             </button>
           )}
         </div>
-        <div className="mt-3 flex items-center justify-around text-center">
-          {[
-            ['葉', data.leaves.length],
-            ['実', data.fruits],
-            ['トモダチ', data.friends],
-          ].map(([k, v]) => (
-            <div key={k as string}>
-              <p className="text-[11px] tracking-widest text-[#a58c74]">{k}</p>
-              <p className="text-xl">{v}</p>
-            </div>
-          ))}
+        {/* no counts (client rule 2026-10-07: nobody is measured by numbers) */}
+        <div className="mt-3 flex items-center justify-end text-center">
           {!isMe && (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex gap-1.5">
               <button onClick={follow} className={`rounded-full px-4 py-1 text-xs ${data.followed ? 'bg-white/80' : 'bg-orange-400 text-white'}`}>
                 {data.followed ? 'フォロー中' : 'フォロー'}
               </button>
@@ -920,7 +906,7 @@ function TreeView({
       {all && (
         <div className="absolute inset-0 z-40 overflow-y-auto bg-[#fffaf2]/95 px-4 pb-24 pt-[calc(16px+env(safe-area-inset-top))]" onClick={() => setAll(false)}>
           <p className="mb-3 text-center text-sm tracking-widest">
-            @{data.handle} の写真（{data.leaves.length}）
+            @{data.handle} の写真
           </p>
           <div className="mx-auto grid max-w-lg grid-cols-3 gap-3" onClick={(e) => e.stopPropagation()}>
             {data.leaves.map((l, k) => (

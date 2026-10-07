@@ -99,12 +99,8 @@ export function residentReplies(postId: string): SaturnPostView[] {
 export function residentProfile(authorId: string): SaturnProfileView | null {
   const p = SATURN_RESIDENTS.find((x) => x.author.id === authorId);
   if (!p) return null;
-  const h = [...authorId].reduce((a, c) => a + c.charCodeAt(0), 0);
   return {
     user: { ...p.author, bio: 'サンプルの住人。土星でのんびりころりん中。' },
-    postCount: 1,
-    stars: p.starCount,
-    following: 10 + (h % 80),
     followedByMe: false,
     isMe: false,
   };

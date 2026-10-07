@@ -442,9 +442,6 @@ export class DemoApi implements Api {
     const f = this.s.follows ?? {};
     return {
       user: { ...a, bio: u?.bio ?? '' },
-      postCount: posts.length,
-      stars: posts.reduce((n, p) => n + p.starCount, 0),
-      following: (f[userId] ?? []).length,
       followedByMe: (f[viewer] ?? []).includes(userId),
       isMe: viewer === userId,
     };
@@ -780,8 +777,6 @@ export class DemoApi implements Api {
       branches: JUPITER_DEFAULT_BRANCHES.map((d, i) => this.s.jbranches?.[userId]?.[i] || d),
       leaves: mine.filter((p) => new Date(p.createdAt).getTime() <= since).map((p) => this.jView(p, viewer)),
       flying: mine.filter((p) => new Date(p.createdAt).getTime() > since).map((p) => this.jView(p, viewer)),
-      fruits: mine.reduce((n, p) => n + p.starCount, 0),
-      friends: (f[userId] ?? []).filter((o) => (f[o] ?? []).includes(userId)).length,
       followedByMe: (f[viewer] ?? []).includes(userId),
       isMe: viewer === userId,
     };
