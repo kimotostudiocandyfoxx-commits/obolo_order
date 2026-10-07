@@ -22,6 +22,12 @@ export function ArtStage({ name, reserve, focus = 50, children }: { name: string
     >
       {/* the poster is the still painting: it shows until (or if never) the loop plays */}
       <video
+        ref={(v) => {
+          // iOS Safari plays inline only when muted is set on the element itself
+          if (!v) return;
+          v.muted = true;
+          v.play().catch(() => undefined);
+        }}
         src={`${ART_BASE}/${name}.mp4`}
         poster={`${ART_BASE}/${name}.jpg`}
         autoPlay
