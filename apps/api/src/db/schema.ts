@@ -215,6 +215,8 @@ export const saturnPosts = pgTable(
     repostCount: integer('repost_count').notNull().default(0),
     /** the ひろば it was dropped in (none: shown to followers only) */
     plazaId: uuid('plaza_id'),
+    /** a photo posted with the voice (the character holds it) */
+    photoUrl: text('photo_url'),
     aiGenerated: integer('ai_generated').notNull().default(0),
     ...timestamps,
   },

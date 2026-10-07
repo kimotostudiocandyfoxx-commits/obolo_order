@@ -1,0 +1,1 @@
+ALTER TABLE "saturn_posts" ADD COLUMN "photo_url" text;

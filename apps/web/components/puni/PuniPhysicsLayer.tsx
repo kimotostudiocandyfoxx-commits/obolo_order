@@ -19,6 +19,8 @@ export interface PuniItem {
   R: number;
   /** a painted picture (round, transparent PNG): drawn warped onto the body instead of `look` */
   pic?: string | null;
+  /** a photo posted with the voice: the character holds it as a round picture in front of it */
+  photo?: string | null;
 }
 
 export interface PuniLayerHandle {
@@ -52,6 +54,7 @@ export const PuniPhysicsLayer = forwardRef<
   const [size, setSize] = useState({ W: 0, H: 0 });
   const blobs = useRef<Blob[]>([]);
   const nodes = useRef(new Map<string, PuniNodes>());
+  const held = useRef(new Map<string, HTMLDivElement>());
   const cb = useRef({ floorAt, onTap, onTapEmpty, onFrame, speakingId });
   cb.current = { floorAt, onTap, onTapEmpty, onFrame, speakingId };
 
@@ -175,6 +178,15 @@ export const PuniPhysicsLayer = forwardRef<
           if (b && t) gl.draw(b, t);
         }
       }
+      // held photos: upright in front of the body, squashing with it, swaying a little when moving
+      for (const [id, el] of held.current) {
+        const b = get(id);
+        if (!b) continue;
+        const d = b.R * 1.2;
+        const tilt = Math.max(-14, Math.min(14, b.vx * 0.02));
+        el.style.width = el.style.height = `${d.toFixed(0)}px`;
+        el.style.transform = `translate(${(b.x - d / 2).toFixed(1)}px, ${(b.y + b.cy + b.R * 0.38 - d / 2).toFixed(1)}px) rotate(${tilt.toFixed(1)}deg) scale(${b.sx.toFixed(3)}, ${b.sy.toFixed(3)})`;
+      }
       cb.current.onFrame?.(get, W, H);
       raf = requestAnimationFrame(loop);
     };
@@ -269,6 +281,28 @@ export const PuniPhysicsLayer = forwardRef<
       )}
       {/* painted characters (WebGL); touches go to the SVG underneath (hit-test is by position) */}
       <canvas ref={glCanvas} className="pointer-events-none absolute inset-0 h-full w-full" />
+      {/* photos the characters hold (positioned by the loop) */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {items.map((it) =>
+          it.photo ? (
+            <div
+              key={it.id}
+              ref={(el) => {
+                if (el) held.current.set(it.id, el);
+                else held.current.delete(it.id);
+              }}
+              className="absolute left-0 top-0"
+              style={{ transformOrigin: '50% 50%', transform: 'translate(-9999px, 0)' }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={it.photo} alt="" draggable={false} className="h-full w-full rounded-full border-[3px] border-white object-cover shadow-[0_4px_10px_rgba(60,20,110,.35)]" />
+              {/* little hands holding it */}
+              <span className="absolute left-[-8%] top-[38%] h-[26%] w-[26%] rounded-full border-2 border-white/70 shadow" style={{ background: it.look.color }} />
+              <span className="absolute right-[-8%] top-[38%] h-[26%] w-[26%] rounded-full border-2 border-white/70 shadow" style={{ background: it.look.color }} />
+            </div>
+          ) : null,
+        )}
+      </div>
     </div>
   );
 });

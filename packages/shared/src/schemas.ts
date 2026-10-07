@@ -70,6 +70,8 @@ export const CreateSaturnPostBody = z
     repostOfId: z.string().uuid().optional(),
     /** dropped in this ひろば (Saturn's みんな map) */
     plazaId: z.string().uuid().optional(),
+    /** a photo posted with it (id from POST /media/photo): the character holds it */
+    photoMediaId: z.string().uuid().optional(),
   })
   .refine((b) => !!b.voiceMediaId !== !!b.voiceStyle, { message: 'either voiceMediaId or voiceStyle is required' });
 export type CreateSaturnPostBody = z.infer<typeof CreateSaturnPostBody>;

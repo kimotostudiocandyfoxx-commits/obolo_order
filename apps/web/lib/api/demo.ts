@@ -23,7 +23,7 @@ import {
   type PuniPicResult,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
-import { putBlob } from './idb';
+import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
 
@@ -464,7 +464,17 @@ export class DemoApi implements Api {
     if (replyTo) replyTo.replyCount = (replyTo.replyCount ?? 0) + 1;
     if (quoted) quoted.repostCount = (quoted.repostCount ?? 0) + 1;
     if (body.plazaId && !replyTo) await this.joinPlaza(body.plazaId, true);
+    // demo: the photo stays in this browser, kept as a data URL so an <img> can show it
+    const blob = body.photoMediaId ? await getBlob(body.photoMediaId) : null;
+    const photoUrl = blob
+      ? await new Promise<string>((ok) => {
+          const r = new FileReader();
+          r.onload = () => ok(String(r.result));
+          r.readAsDataURL(blob);
+        })
+      : null;
     const p = {
+      photoUrl,
       plazaId: replyTo ? null : (body.plazaId ?? null),
       replyToId: replyTo ? (replyTo.replyToId ?? replyTo.id) : null,
       repostOf: quoted ? { id: quoted.id, author: quoted.author, text: quoted.text, voiceUrl: quoted.voiceUrl } : null,

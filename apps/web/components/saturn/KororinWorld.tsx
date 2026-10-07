@@ -210,6 +210,7 @@ export function KororinWorld({
           id: p.id,
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
           pic: p.author.pic ?? null,
+          photo: p.photoUrl ?? null,
           R: Math.min(
             stageW * (tab === 'friends' ? 0.16 : 0.12),
             Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * popScale(p),
@@ -505,6 +506,10 @@ export function KororinWorld({
         <div ref={card} className="pointer-events-none absolute left-0 top-0 z-[90] opacity-0">
           <div className="relative w-max max-w-[min(270px,calc(100vw-24px))] animate-[fadeUp_0.2s_ease-out] rounded-[22px] bg-white px-4 py-2.5 text-[16px] font-black leading-snug text-[#3d2a5c] shadow-[0_10px_30px_rgba(60,20,110,.28)]">
             <span ref={tail} className="absolute -bottom-2 h-4 w-4 -translate-x-1/2 rotate-45 rounded-[3px] bg-white" />
+            {open.photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={open.photoUrl} alt="" className="relative mb-1.5 h-32 w-32 rounded-2xl object-cover" />
+            )}
             <span className="relative line-clamp-5 pb-1.5 pr-2">{open.text}</span>
             <span className="pointer-events-auto absolute -bottom-3 -right-3 flex gap-1">
               <button onClick={() => setProfileId(open.author.id)} className="flex h-7 items-center gap-1 rounded-full border border-violet-100 bg-white py-0 pl-0.5 pr-2 text-[11px] font-black text-[#7a62b0] shadow" aria-label="profile">
@@ -540,6 +545,10 @@ export function KororinWorld({
               </button>
             </div>
             <p className="mt-2 text-sm font-bold leading-relaxed text-slate-600">{open.text}</p>
+            {open.photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={open.photoUrl} alt="" className="mt-2 max-h-72 w-full rounded-2xl bg-violet-50 object-contain" />
+            )}
             {open.repostOf && (
               <button onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)} className="mt-2 flex w-full items-center gap-2 rounded-2xl bg-[#f8f3ff] p-2 text-left">
                 <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} pic={open.repostOf.author.pic} size={28} speaking={playingUrl === open.repostOf.voiceUrl} />
@@ -773,6 +782,18 @@ function lifeLeft(createdAt: string) {
   return h <= 1 ? 'まもなく消える' : `のこり${Math.floor(h)}時間`;
 }
 
+/** A photo for a post, made smaller on the device first (≤1600 px JPEG) so it uploads quickly. */
+async function shrinkPhoto(f: File): Promise<Blob> {
+  const img = await createImageBitmap(f);
+  const k = Math.min(1, 1600 / Math.max(img.width, img.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(img.width * k);
+  c.height = Math.round(img.height * k);
+  c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+  img.close();
+  return new Promise((ok, ng) => c.toBlob((b) => (b ? ok(b) : ng(new Error('encode'))), 'image/jpeg', 0.86));
+}
+
 /** The reading styles, as the "バティに読んでもらう" choices. */
 const READ_LABELS: Record<string, string> = {
   genki: '元気に読む',
@@ -819,6 +840,18 @@ function DropComposer({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
+  // 📷 写真もつける: the character holds it on the planet
+  const [photo, setPhoto] = useState<{ blob: Blob; preview: string } | null>(null);
+  const pickPhoto = async (f: File | undefined) => {
+    if (!f) return;
+    setErr(null);
+    try {
+      const blob = await shrinkPhoto(f);
+      setPhoto({ blob, preview: URL.createObjectURL(blob) });
+    } catch {
+      setErr('この写真は読みこめなかった…別の写真でためしてね');
+    }
+  };
   const [places, setPlaces] = useState<PlazaView[]>([]);
   const [into, setInto] = useState<PlazaView | null>(plaza ?? null);
   useEffect(() => {
@@ -864,7 +897,8 @@ function DropComposer({
     setErr(null);
     try {
       const where = replyTo ? null : into;
-      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}), ...(where ? { plazaId: where.id } : {}) };
+      const photoMediaId = photo ? (await getApi().uploadPhoto(photo.blob)).id : undefined;
+      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}), ...(where ? { plazaId: where.id } : {}), ...(photoMediaId ? { photoMediaId } : {}) };
       onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target }), where);
     } catch {
       setErr('うまく落とせなかった…もう一度');
@@ -928,6 +962,24 @@ function DropComposer({
         <div className="mt-1 flex items-start justify-between gap-2 text-[10px] text-slate-400">
           <span>直したいところをタップ（なぞって選ぶ）→ 消して → もう一度 🎙</span>
           <span className={`shrink-0 text-xs ${left < 0 ? 'text-rose-500' : ''}`}>{left}</span>
+        </div>
+
+        {/* 📷 a photo to go with it: your character holds it */}
+        <div className="mt-3 flex items-center gap-3">
+          <label className="cursor-pointer rounded-full bg-sky-50 px-4 py-2 text-xs font-black text-sky-700">
+            📷 {photo ? '写真をかえる' : '写真もつける'}
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => void pickPhoto(e.target.files?.[0])} />
+          </label>
+          {photo && (
+            <span className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photo.preview} alt="" className="h-14 w-14 rounded-full border-[3px] border-white object-cover shadow" />
+              <button onClick={() => setPhoto(null)} className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-500 text-[10px] font-black text-white" aria-label="remove photo">
+                ✕
+              </button>
+            </span>
+          )}
+          {photo && <span className="text-[10px] text-slate-400">あなたのキャラが、この写真を持ってころがるよ</span>}
         </div>
 
         {/* Bati reads it */}

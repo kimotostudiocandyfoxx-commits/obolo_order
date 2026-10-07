@@ -140,6 +140,8 @@ export interface SaturnPostView {
   repostCount?: number;
   /** quote repost: the post it introduces (one level, no nesting) */
   repostOf?: SaturnPostRef | null;
+  /** a photo posted with the voice (the character holds it) */
+  photoUrl?: string | null;
 }
 
 /** A ひろば on Saturn's みんな map. `faces` = a few people who spoke there lately (drawn on the island). */

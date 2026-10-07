@@ -41,6 +41,9 @@ const LOOKS: Partial<PuniLook>[] = [
 /** Painted sample characters (cut from the client's reference image, test only — P-SAT-4). */
 const RESIDENT_PICS = ['/puni-test/salmon.png', '/puni-test/gray.png', undefined, '/puni-test/purple.png', undefined, undefined, '/puni-test/gorilla.png', undefined, '/puni-test/green.png'];
 
+/** A few residents posted a photo with their voice (their character holds it — P-SAT-14 sample). */
+const RESIDENT_PHOTOS: Record<string, string> = { r2: '/onboarding/cover-ramen.webp' };
+
 function residentLook(i: number): PuniLook {
   return { ...base, ...LOOKS[i % LOOKS.length], medal: String(10 + i) };
 }
@@ -55,6 +58,7 @@ export const SATURN_RESIDENTS: SaturnPostView[] = R.map(([id, name, neo, text], 
   starCount: 20 + ((i * 37) % 280),
   starredByMe: false,
   createdAt: new Date(Date.now() - (i + 1) * 47 * 60_000).toISOString(),
+  photoUrl: RESIDENT_PHOTOS[id] ?? null,
 }));
 
 /** Short sample replies the residents leave under each other's voices (P-SAT-4). */

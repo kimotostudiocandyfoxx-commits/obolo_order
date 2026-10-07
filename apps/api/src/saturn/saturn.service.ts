@@ -128,6 +128,7 @@ export class SaturnService {
       replyCount: p.replyCount,
       repostCount: p.repostCount,
       repostOf,
+      photoUrl: p.photoUrl,
     };
   }
 
@@ -152,6 +153,13 @@ export class SaturnService {
     // dropped in a ひろば: it must exist, and you join it (a reply stays with its post)
     const plazaId = body.plazaId && !replyToId ? body.plazaId : null;
     if (plazaId) await this.plazas.ensureForPost(userId, plazaId);
+    // a photo: one of your uploads (POST /media/photo, already re-encoded)
+    let photoUrl: string | null = null;
+    if (body.photoMediaId) {
+      const photo = await this.media.getOwned(userId, body.photoMediaId, 'photo');
+      if (!photo) throw apiError(HttpStatus.BAD_REQUEST, 'PHOTO_NOT_FOUND', 'Upload the photo first');
+      photoUrl = photo.url;
+    }
     // check the words first: a flagged post must not cost a voice generation
     const mod = await moderateText(body.text, this.llm);
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
@@ -186,6 +194,7 @@ export class SaturnService {
           replyToId,
           repostOfId: repostOf?.id ?? null,
           plazaId,
+          photoUrl,
         })
         .returning();
       if (replyToId) await tx.update(saturnPosts).set({ replyCount: sql`${saturnPosts.replyCount} + 1` }).where(eq(saturnPosts.id, replyToId));
