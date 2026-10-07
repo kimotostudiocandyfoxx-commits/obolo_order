@@ -48,5 +48,26 @@
       "apps/web/public/onboarding/pod-city-pen_lady.webp"
     ],
     "prompt": "A single small round flying-saucer pod, in exactly the same painterly, richly detailed anime-fantasy illustration style, colours and lighting as the attached reference: a polished gunmetal ring-shaped saucer with glowing coloured lights around the rim (cyan, magenta, amber), riveted metal panels, an OPEN round cockpit hole in the top with NOBODY inside — a character will be placed in it later. Three-quarter front view seen slightly from above so the empty cockpit opening is visible, the whole saucer fully visible and centred with margin around it, a soft glow underneath. Isolated on a perfectly flat, pure white (#FFFFFF) background. No sky, no ground, no light trails, no shadow on the background. Absolutely NO characters, NO people, NO animals, NO vehicles, NO speech bubbles, NO text, NO letters, NO signs, NO logos, NO user interface, NO frames or borders."
+  },
+  {
+    "id": "mercury-sea-loop-v1",
+    "kind": "video",
+    "aspect": "16:9",
+    "image": "apps/web/public/art/mercury-sea.jpg",
+    "prompt": "Bring this painted night ocean to life: the aurora ribbons slowly ripple and shimmer, the stars twinkle, soft moonlight glitters and dances across gentle rolling waves, tiny window lights in the far castles flicker warmly. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical."
+  },
+  {
+    "id": "mars-sky-city-loop-v1",
+    "kind": "video",
+    "aspect": "16:9",
+    "image": "apps/web/public/art/mars-sky-city.jpg",
+    "prompt": "Bring this painted neon city on Mars to life: the glowing light trails flow smoothly along their curves like streams of light, city windows and neon signs gently flicker, the stars twinkle, the red planet glows softly. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical."
+  },
+  {
+    "id": "mars-sky-canyon-loop-v1",
+    "kind": "video",
+    "aspect": "16:9",
+    "image": "apps/web/public/art/mars-sky-canyon.jpg",
+    "prompt": "Bring this painted red canyon on Mars to life: the colourful glowing light trails sweep and flow smoothly along their paths with sparkling particles, fine red dust drifts in the air, the stars twinkle, the big planet glows softly. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical."
   }
 ]
