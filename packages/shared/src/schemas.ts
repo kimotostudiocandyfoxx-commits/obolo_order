@@ -313,6 +313,10 @@ export const CreateJupiterPostBody = z.object({
 });
 export type CreateJupiterPostBody = z.infer<typeof CreateJupiterPostBody>;
 
+/** A reply to a Jupiter post. */
+export const JupiterReplyBody = z.object({ text: z.string().trim().min(1).max(120) });
+export type JupiterReplyBody = z.infer<typeof JupiterReplyBody>;
+
 /** Rename one of the four branches on your tree. */
 export const JupiterBranchBody = z.object({ index: z.number().int().min(0).max(3), name: z.string().trim().min(1).max(8) });
 export type JupiterBranchBody = z.infer<typeof JupiterBranchBody>;

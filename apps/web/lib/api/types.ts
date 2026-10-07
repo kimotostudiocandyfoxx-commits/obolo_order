@@ -8,6 +8,7 @@ import type {
   JupiterAuthor,
   JupiterFlyer,
   JupiterPostView,
+  JupiterReplyView,
   JupiterRootView,
   JupiterTreeView,
   MarsBackstageBody,
@@ -163,6 +164,8 @@ export interface Api {
   removeJupiterRoot(id: string): Promise<void>;
   createJupiterPost(body: CreateJupiterPostBody): Promise<JupiterPostView>;
   starJupiterPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;
+  jupiterReplies(postId: string): Promise<JupiterReplyView[]>;
+  replyJupiter(postId: string, text: string): Promise<JupiterReplyView>;
   jupiterTree(userId: string): Promise<JupiterTreeView>;
   renameJupiterBranch(index: number, name: string): Promise<{ branches: string[] }>;
   searchJupiter(q: string): Promise<JupiterAuthor[]>;

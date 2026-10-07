@@ -217,6 +217,12 @@ export class HttpApi implements Api {
   starJupiterPost(id: string, on: boolean) {
     return this.req<Awaited<ReturnType<Api['starJupiterPost']>>>(on ? 'POST' : 'DELETE', `/jupiter/posts/${id}/star`);
   }
+  jupiterReplies(postId: string) {
+    return this.req<Awaited<ReturnType<Api['jupiterReplies']>>>('GET', `/jupiter/posts/${postId}/replies`);
+  }
+  replyJupiter(postId: string, text: string) {
+    return this.req<Awaited<ReturnType<Api['replyJupiter']>>>('POST', `/jupiter/posts/${postId}/replies`, { text });
+  }
   jupiterTree(userId: string) {
     return this.req<Awaited<ReturnType<Api['jupiterTree']>>>('GET', `/jupiter/trees/${userId}`);
   }

@@ -354,6 +354,17 @@ export interface JupiterPostView {
   starCount: number;
   starredByMe: boolean;
   createdAt: string;
+  replyCount: number;
+  /** the latest few who replied (their butterflies are shown on the sticker) */
+  repliers: JupiterAuthor[];
+}
+
+/** A reply to a Jupiter post (words, spoken or typed). */
+export interface JupiterReplyView {
+  id: string;
+  author: JupiterAuthor;
+  text: string;
+  createdAt: string;
 }
 
 /** One butterfly in the sky: a person and their posts of the last 88 hours (newest first). */

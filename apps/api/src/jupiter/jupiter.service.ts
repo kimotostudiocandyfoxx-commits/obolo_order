@@ -7,6 +7,7 @@ import {
   type JupiterAuthor,
   type JupiterFlyer,
   type JupiterPostView,
+  type JupiterReplyView,
   type JupiterRootBody,
   type JupiterRootView,
   type JupiterTreeView,
@@ -14,7 +15,7 @@ import {
 import { and, count, desc, eq, gt, ilike, inArray, isNull, or, sql, sum } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { follows, jupiterPosts, jupiterRoots, mediaObjects, starEvents, users } from '../db/schema';
+import { follows, jupiterPosts, jupiterReplies, jupiterRoots, mediaObjects, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 
 type PostRow = typeof jupiterPosts.$inferSelect;
@@ -224,10 +225,67 @@ export class JupiterService {
           .where(and(eq(starEvents.userId, viewerId), eq(starEvents.targetType, 'jupiter_post'), inArray(starEvents.targetId, ids)))
       : [];
     const starred = new Set(mine.map((m) => m.id));
-    return rows.map(({ p, u }) => this.toView(p, u, starred.has(p.id)));
+    // the latest few repliers per post (their butterflies sit on the sticker)
+    const withReplies = rows.filter((r) => r.p.replyCount > 0).map((r) => r.p.id);
+    const recent = withReplies.length
+      ? await this.db.read
+          .select({ postId: jupiterReplies.postId, u: authorCols })
+          .from(jupiterReplies)
+          .innerJoin(users, eq(users.id, jupiterReplies.userId))
+          .where(and(inArray(jupiterReplies.postId, withReplies), isNull(jupiterReplies.deletedAt)))
+          .orderBy(desc(jupiterReplies.createdAt))
+          .limit(Math.min(400, withReplies.length * 12))
+      : [];
+    const repliers = new Map<string, JupiterAuthor[]>();
+    for (const r of recent) {
+      const list = repliers.get(r.postId) ?? [];
+      if (list.length < 3 && !list.some((a) => a.id === r.u.id)) list.push(r.u);
+      repliers.set(r.postId, list);
+    }
+    return rows.map(({ p, u }) => this.toView(p, u, starred.has(p.id), repliers.get(p.id) ?? []));
   }
 
-  private toView(p: PostRow, u: JupiterAuthor, starredByMe: boolean): JupiterPostView {
+  // --- replies -----------------------------------------------------------------------------------
+
+  async replies(postId: string): Promise<JupiterReplyView[]> {
+    const rows = await this.db.read
+      .select({ r: jupiterReplies, u: authorCols })
+      .from(jupiterReplies)
+      .innerJoin(users, eq(users.id, jupiterReplies.userId))
+      .where(and(eq(jupiterReplies.postId, postId), isNull(jupiterReplies.deletedAt)))
+      .orderBy(jupiterReplies.createdAt)
+      .limit(200);
+    return rows.map(({ r, u }) => ({ id: r.id, author: u, text: r.text, createdAt: r.createdAt.toISOString() }));
+  }
+
+  async reply(userId: string, postId: string, text: string): Promise<JupiterReplyView> {
+    const [post] = await this.db.write
+      .select({ id: jupiterPosts.id })
+      .from(jupiterPosts)
+      .where(and(eq(jupiterPosts.id, postId), isNull(jupiterPosts.deletedAt)));
+    if (!post) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Post not found');
+    const mod = await moderateText(text, this.llm);
+    if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This reply breaks the community rules');
+    const r = await this.db.write.transaction(async (tx) => {
+      const [row] = await tx.insert(jupiterReplies).values({ postId, userId, text }).returning();
+      await tx.update(jupiterPosts).set({ replyCount: sql`${jupiterPosts.replyCount} + 1` }).where(eq(jupiterPosts.id, postId));
+      return row;
+    });
+    const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
+    return { id: r.id, author, text: r.text, createdAt: r.createdAt.toISOString() };
+  }
+
+  async removeReply(userId: string, replyId: string): Promise<void> {
+    const res = await this.db.write
+      .update(jupiterReplies)
+      .set({ deletedAt: new Date() })
+      .where(and(eq(jupiterReplies.id, replyId), eq(jupiterReplies.userId, userId), isNull(jupiterReplies.deletedAt)))
+      .returning({ postId: jupiterReplies.postId });
+    if (!res.length) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
+    await this.db.write.update(jupiterPosts).set({ replyCount: sql`GREATEST(${jupiterPosts.replyCount} - 1, 0)` }).where(eq(jupiterPosts.id, res[0].postId));
+  }
+
+  private toView(p: PostRow, u: JupiterAuthor, starredByMe: boolean, repliers: JupiterAuthor[] = []): JupiterPostView {
     return {
       id: p.id,
       author: u,
@@ -240,6 +298,8 @@ export class JupiterService {
       starCount: p.starCount,
       starredByMe,
       createdAt: p.createdAt.toISOString(),
+      replyCount: p.replyCount,
+      repliers,
     };
   }
 }

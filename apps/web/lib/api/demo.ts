@@ -11,6 +11,7 @@ import {
   type JupiterAuthor,
   type JupiterFlyer,
   type JupiterPostView,
+  type JupiterReplyView,
   type JupiterRootView,
   type JupiterTreeView,
   type MarsBackstageVideo,
@@ -71,7 +72,8 @@ interface DemoState {
   follows?: Record<string, string[]>;
   /** Jupiter (パタパタ): roots, posts, branch names — this browser only */
   jroots?: (JupiterRootView & { owner: string })[];
-  jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe'> & { owner: string; starredBy: string[] })[];
+  jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe' | 'replyCount' | 'repliers'> & { owner: string; starredBy: string[] })[];
+  jreplies?: { id: string; postId: string; owner: string; text: string; createdAt: string }[];
   jbranches?: Record<string, string[]>;
   /** Mars 裏スタジオ (this browser only) */
   backstage?: (MarsBackstageVideo & { owner: string })[];
@@ -695,7 +697,9 @@ export class DemoApi implements Api {
 
   private jView(p: NonNullable<DemoState['jposts']>[number], viewer: string): JupiterPostView {
     const { owner, starredBy, ...rest } = p;
-    return { ...rest, author: this.jAuthor(owner), starredByMe: starredBy.includes(viewer) };
+    const replies = (this.s.jreplies ?? []).filter((r) => r.postId === p.id);
+    const repliers = [...new Set(replies.map((r) => r.owner).reverse())].slice(0, 3).map((o) => this.jAuthor(o));
+    return { ...rest, author: this.jAuthor(owner), starredByMe: starredBy.includes(viewer), replyCount: replies.length, repliers };
   }
 
   async jupiterSky(tab: 'all' | 'following' | 'friends') {
@@ -753,6 +757,18 @@ export class DemoApi implements Api {
     p.starCount = p.starredBy.length;
     this.save();
     return { starCount: p.starCount, starredByMe: on };
+  }
+
+  async jupiterReplies(postId: string): Promise<JupiterReplyView[]> {
+    return (this.s.jreplies ?? []).filter((r) => r.postId === postId).map((r) => ({ id: r.id, author: this.jAuthor(r.owner), text: r.text, createdAt: r.createdAt }));
+  }
+
+  async replyJupiter(postId: string, text: string) {
+    const viewer = this.uid();
+    const r = { id: uid(), postId, owner: viewer, text: text.trim().slice(0, 120), createdAt: now() };
+    this.s.jreplies = [...(this.s.jreplies ?? []), r];
+    this.save();
+    return { id: r.id, author: this.jAuthor(viewer), text: r.text, createdAt: r.createdAt };
   }
 
   async jupiterTree(userId: string): Promise<JupiterTreeView> {

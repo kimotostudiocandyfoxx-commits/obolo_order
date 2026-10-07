@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { CreateJupiterPostBody, JupiterBranchBody, JupiterRootBody } from '@obolo/shared';
+import { CreateJupiterPostBody, JupiterBranchBody, JupiterReplyBody, JupiterRootBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -60,6 +60,23 @@ export class JupiterController {
   @HttpCode(200)
   unstar(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
     return this.jupiter.setStar(userId, id, false);
+  }
+
+  @Get('posts/:id/replies')
+  replies(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.jupiter.replies(id);
+  }
+
+  @Post('posts/:id/replies')
+  async reply(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `jupiter-reply:${userId}`, 30, 600);
+    return this.jupiter.reply(userId, id, parseBody(JupiterReplyBody, body).text);
+  }
+
+  @Delete('replies/:id')
+  @HttpCode(204)
+  async removeReply(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    await this.jupiter.removeReply(userId, id);
   }
 
   @Get('trees/:id')

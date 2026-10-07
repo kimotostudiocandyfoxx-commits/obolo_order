@@ -283,9 +283,27 @@ export const jupiterPosts = pgTable(
     filter: text('filter').notNull().default('none'),
     branch: integer('branch').notNull().default(0),
     starCount: integer('star_count').notNull().default(0),
+    replyCount: integer('reply_count').notNull().default(0),
     ...timestamps,
   },
   (t) => [index('jupiter_posts_created_idx').on(t.createdAt), index('jupiter_posts_user_idx').on(t.userId, t.createdAt)],
+);
+
+/** Replies to Jupiter posts (words). */
+export const jupiterReplies = pgTable(
+  'jupiter_replies',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => jupiterPosts.id),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    text: text('text').notNull(),
+    ...timestamps,
+  },
+  (t) => [index('jupiter_replies_post_idx').on(t.postId, t.createdAt)],
 );
 
 /** ひろば: Saturn's みんな map is made of these (client decision 2026-10-07). */

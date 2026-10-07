@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { BRANCHES, FLY_HOURS, RESIDENTS, type Resident } from '@/lib/jupiter/residents';
+import { hueOf } from '@/components/saturn/BallAvatar';
 import { FILTERS, hoursSince, isFlying, useJupiter, type FilterId, type OwnPost, type RootItem } from '@/lib/jupiter/state';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { Mic } from '@/components/mercury/ComposeChat';
@@ -31,8 +32,21 @@ export interface ViewPost {
   hours: number;
   /** branch slot 0–3 */
   branch: number;
-  /** server posts can get stars */
   star?: { count: number; mine: boolean };
+  /** replies: how many, and the latest repliers' butterflies */
+  replies?: { count: number; who: Look[] };
+  /** sample residents' posts: stars stay on this device, replies are samples */
+  sample?: boolean;
+}
+
+/** How a butterfly is drawn (painted art, a picture with wings, or an emblem). */
+interface Look {
+  key: string;
+  art?: string;
+  src?: string | null;
+  emoji?: string;
+  img?: string | null;
+  wing?: string;
 }
 
 interface Flyer {
@@ -93,7 +107,22 @@ const residentPosts = (r: Resident, flying: boolean): ViewPost[] =>
   r.posts
     .filter((p) => (p.hoursAgo < FLY_HOURS) === flying)
     .sort((a, b) => a.hoursAgo - b.hoursAgo)
-    .map((p) => ({ id: p.id, media: { kind: 'photo', sample: { emoji: p.emoji, hue: p.hue } }, text: p.text, filter: 'none', hours: p.hoursAgo, branch: Math.max(0, BRANCH_IDS.indexOf(p.branch)) }));
+    .map((p) => {
+      // sample stars and replies (other residents answer), the same every time
+      const h = hueOf(p.id);
+      const who = Array.from({ length: h % 4 }, (_, k) => RESIDENTS[(h + k * 5) % RESIDENTS.length]).filter((x, k, a) => x.id !== r.id && a.indexOf(x) === k);
+      return {
+        id: p.id,
+        media: { kind: 'photo' as const, sample: { emoji: p.emoji, hue: p.hue } },
+        text: p.text,
+        filter: 'none' as FilterId,
+        hours: p.hoursAgo,
+        branch: Math.max(0, BRANCH_IDS.indexOf(p.branch)),
+        star: { count: 3 + (h % 40), mine: false },
+        replies: { count: who.length, who: who.map((x) => ({ key: x.id, art: x.art, emoji: x.emoji, wing: x.wing })) },
+        sample: true,
+      };
+    });
 
 const localMedia = (r: RootItem): CircleMedia => ({ kind: r.kind, url: r.blobId ? `idb:${r.blobId}` : undefined, sample: r.sample });
 const localView = (p: OwnPost): ViewPost => ({ id: p.id, media: localMedia(p.item), text: p.text, filter: p.filter, hours: hoursSince(p.createdAt), branch: Math.max(0, BRANCH_IDS.indexOf(p.branch)) });
@@ -105,6 +134,7 @@ const liveView = (p: JupiterPostView): ViewPost => ({
   hours: hoursSince(new Date(p.createdAt).getTime()),
   branch: p.branch,
   star: { count: p.starCount, mine: p.starredByMe },
+  replies: { count: p.replyCount ?? 0, who: (p.repliers ?? []).map((a) => ({ key: a.id, ...authorLook(a) })) },
 });
 const liveRoot = (r: JupiterRootView): RootView => ({ id: r.id, media: { kind: r.kind, url: r.url, poster: r.posterUrl } });
 const authorLook = (a: JupiterAuthor) => {
@@ -276,16 +306,6 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
     }, 1500);
   };
 
-  const star = async (p: ViewPost) => {
-    if (!p.star) return;
-    const on = !p.star.mine;
-    const upd = (x: ViewPost) => (x.id === p.id ? { ...x, star: { count: Math.max(0, x.star!.count + (on ? 1 : -1)), mine: on } } : x);
-    setViewer((v) => (v ? { ...v, flyer: { ...v.flyer, posts: v.flyer.posts.map(upd) } } : v));
-    getApi()
-      .starJupiterPost(p.id, on)
-      .catch(() => undefined);
-  };
-
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-[#fbe9d7] via-[#f4efe6] to-[#d9e8f5] text-[#7a5b3e]">
       <div className="pointer-events-none absolute left-[8%] top-[6%] h-20 w-20 rounded-full bg-white/50 blur-[1px]" aria-hidden />
@@ -420,9 +440,8 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
           flyer={viewer.flyer}
           start={viewer.start ?? 0}
           onClose={closeViewer}
-          onStar={star}
           onTree={
-            viewer.flyer.me
+            viewer.flyer.me || (!viewer.flyer.resident && !viewer.flyer.userId)
               ? undefined
               : () => {
                   const f = viewer.flyer;
@@ -459,12 +478,24 @@ const coverOf = (f: Flyer) => f.wing && !f.art && !f.src ? f.wing : COVERS[[...f
  * The book pops out, its cover swings open, and each post is a round sticker on a round page;
  * tap the right / left half (or つぎへ) to turn the pages.
  */
-function StoryViewer({ flyer, start, onClose, onStar, onTree }: { flyer: Flyer; start: number; onClose: () => void; onStar: (p: ViewPost) => void; onTree?: () => void }) {
+function StoryViewer({ flyer, start, onClose, onTree }: { flyer: Flyer; start: number; onClose: () => void; onTree?: () => void }) {
   const [i, setI] = useState(start);
   const [dir, setDir] = useState(0);
-  const post = flyer.posts[i];
+  const [posts, setPosts] = useState(flyer.posts);
+  const [talk, setTalk] = useState(false);
+  const post = posts[i];
+  const patch = (id: string, fn: (p: ViewPost) => ViewPost) => setPosts((cur) => cur.map((p) => (p.id === id ? fn(p) : p)));
+  const star = (p: ViewPost) => {
+    if (!p.star) return;
+    const on = !p.star.mine;
+    patch(p.id, (x) => ({ ...x, star: { count: Math.max(0, x.star!.count + (on ? 1 : -1)), mine: on } }));
+    if (!p.sample)
+      getApi()
+        .starJupiterPost(p.id, on)
+        .catch(() => undefined);
+  };
   const next = () => {
-    if (i + 1 >= flyer.posts.length) return onClose();
+    if (i + 1 >= posts.length) return onClose();
     setDir(1);
     setI(i + 1);
   };
@@ -507,6 +538,39 @@ function StoryViewer({ flyer, start, onClose, onStar, onTree }: { flyer: Flyer; 
                   <PostCircle media={post.media} filter={post.filter} text={post.text} live />
                 </div>
               </div>
+              {/* small badges at the sticker's lower right (like Saturn): who, stars, replies */}
+              <div className="absolute bottom-[9%] right-[2%] z-[3] flex items-center gap-1" style={{ animation: `fadeUp 0.3s ease-out ${dir ? '0.3s' : '0.9s'} both` }}>
+                {onTree && (
+                  <button onClick={onTree} className="flex h-7 items-center gap-0.5 rounded-full border border-[#ead9bf] bg-white/95 py-0 pl-0.5 pr-2 text-[11px] font-bold text-[#7a5b3e] shadow" aria-label="木をみる">
+                    <span className="flex h-6 w-6 items-center justify-center overflow-hidden">
+                      <Butterfly art={flyer.art} src={flyer.src} emoji={flyer.emoji} img={flyer.img} wing={flyer.wing} size={24} />
+                    </span>
+                    <span className="max-w-[5em] truncate">{flyer.handle}</span>
+                    <span className="text-[#c4a882]">›</span>
+                  </button>
+                )}
+                {post.star && (
+                  <button onClick={() => star(post)} className={`flex h-7 items-center rounded-full border px-2 text-[11px] font-bold shadow ${post.star.mine ? 'border-amber-200 bg-amber-50 text-amber-500' : 'border-[#ead9bf] bg-white/95 text-[#9b8068]'}`} aria-label="star">
+                    {post.star.mine ? '★' : '☆'} {post.star.count}
+                  </button>
+                )}
+                {post.replies && (
+                  <button onClick={() => setTalk(true)} className="flex h-7 items-center gap-1 rounded-full border border-[#ead9bf] bg-white/95 pl-1.5 pr-2 text-[11px] font-bold text-[#9b8068] shadow" aria-label="replies">
+                    {post.replies.who.length ? (
+                      <span className="flex -space-x-2">
+                        {post.replies.who.slice(0, 3).map((w) => (
+                          <span key={w.key} className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-[#fff6ea] ring-1 ring-white">
+                            <Butterfly art={w.art} src={w.src} emoji={w.emoji} img={w.img} wing={w.wing} size={24} />
+                          </span>
+                        ))}
+                      </span>
+                    ) : (
+                      <span>💬</span>
+                    )}
+                    {post.replies.count}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           {/* ring binding on the left, clasp on the right */}
@@ -531,19 +595,95 @@ function StoryViewer({ flyer, start, onClose, onStar, onTree }: { flyer: Flyer; 
 
         <div className="mt-4 flex items-center justify-center gap-3">
           <div className="flex gap-1">
-            {flyer.posts.map((p, k) => (
+            {posts.map((p, k) => (
               <span key={p.id} className={`h-2 w-2 rounded-full ${k === i ? 'bg-amber-400' : 'bg-white/70'}`} />
             ))}
           </div>
-          {post.star && (
-            <button onClick={() => onStar(post)} className={`rounded-full px-3 py-1 text-xs font-bold shadow-sm ${post.star.mine ? 'bg-amber-100 text-amber-600' : 'bg-white text-[#9b8068]'}`} aria-label="star">
-              {post.star.mine ? '★' : '☆'} {post.star.count}
-            </button>
-          )}
         </div>
         <button onClick={next} className="mt-3 w-[min(86vw,420px)] rounded-full bg-amber-500 py-2.5 text-sm font-bold text-white shadow">
-          {i + 1 < flyer.posts.length ? 'ページをめくる' : 'シール帳をとじる'}
+          {i + 1 < posts.length ? 'ページをめくる' : 'シール帳をとじる'}
         </button>
+      </div>
+      {talk && (
+        <Replies
+          post={post}
+          owner={flyer}
+          onClose={() => setTalk(false)}
+          onReplied={(who) => patch(post.id, (x) => ({ ...x, replies: { count: (x.replies?.count ?? 0) + 1, who: [who, ...(x.replies?.who ?? []).filter((w) => w.key !== who.key)].slice(0, 3) } }))}
+        />
+      )}
+    </div>
+  );
+}
+
+/** The replies under a post: who said what (with their butterflies), and your own reply (speak or type). */
+function Replies({ post, owner, onClose, onReplied }: { post: ViewPost; owner: Flyer; onClose: () => void; onReplied: (who: Look) => void }) {
+  const { me } = useAuth();
+  const [list, setList] = useState<{ id: string; look: Look; name: string; text: string }[] | null>(null);
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    if (post.sample) {
+      const lines = ['すてき！', 'いいなぁ〜', 'これ好き', 'おいしそう！', 'また見せてね', 'わかる〜'];
+      setList((post.replies?.who ?? []).map((w, k) => ({ id: `${post.id}-${k}`, look: w, name: w.key, text: lines[(hueOf(post.id) + k) % lines.length] })));
+      return;
+    }
+    getApi()
+      .jupiterReplies(post.id)
+      .then((r) => setList(r.map((x) => ({ id: x.id, look: { key: x.author.id, ...authorLook(x.author) }, name: x.author.displayName || x.author.handle, text: x.text }))))
+      .catch(() => setList([]));
+  }, [post]);
+  const send = async () => {
+    const t = text.trim();
+    if (!t) return;
+    setBusy(true);
+    setErr('');
+    try {
+      const r = await getApi().replyJupiter(post.id, t);
+      const look = { key: r.author.id, ...authorLook(r.author) };
+      setList((cur) => [...(cur ?? []), { id: r.id, look, name: r.author.displayName || r.author.handle, text: r.text }]);
+      setText('');
+      onReplied(look);
+    } catch (e) {
+      setErr(e instanceof ApiError && e.code === 'MODERATION' ? 'その言葉は使えないよ' : '送れなかった…もう一度');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="absolute inset-0 z-[60] flex items-end justify-center bg-[#5b4330]/40" onClick={onClose}>
+      <div className="pb-safe max-h-[70%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-[#fffaf2] p-4" onClick={(e) => e.stopPropagation()}>
+        <p className="text-center text-sm font-bold tracking-widest">@{owner.handle} へのリプ</p>
+        <div className="mt-3 space-y-2">
+          {list === null && <p className="text-center text-xs text-[#a58c74]">ひらいています…</p>}
+          {list?.length === 0 && <p className="text-center text-xs text-[#a58c74]">まだリプはありません。最初のひとことを送ってみよう</p>}
+          {list?.map((r) => (
+            <div key={r.id} className="flex items-start gap-2">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm">
+                <Butterfly art={r.look.art} src={r.look.src} emoji={r.look.emoji} img={r.look.img} wing={r.look.wing} size={36} />
+              </span>
+              <div className="min-w-0 rounded-2xl bg-white px-3 py-1.5 shadow-sm">
+                <p className="text-[10px] font-bold text-[#a58c74]">@{r.name}</p>
+                <p className="text-sm">{r.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        {post.sample ? (
+          <p className="mt-4 text-center text-[11px] text-[#a58c74]">サンプルの投稿には、リプできません</p>
+        ) : me ? (
+          <>
+            <div className="mt-4 flex items-center gap-2">
+              <input value={text} onChange={(e) => setText(e.target.value.slice(0, 120))} placeholder="ひとこと返す" className="h-11 min-w-0 flex-1 rounded-full border border-[#e6d3bd] bg-white px-4 text-[16px] outline-none" />
+              <Mic value={text} onChange={(v) => setText(v.slice(0, 120))} />
+            </div>
+            {err && <p className="mt-1 text-center text-xs text-rose-500">{err}</p>}
+            <button disabled={!text.trim() || busy} onClick={() => void send()} className="mt-2 w-full rounded-full bg-amber-500 py-2.5 text-sm font-bold text-white disabled:opacity-40">
+              {busy ? '送っています…' : '💬 リプする'}
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   );
