@@ -1,0 +1,9 @@
+{
+  "id": "mars-sky-canyon-loop-v2",
+  "kind": "video",
+  "aspect": "16:9",
+  "image": "apps/web/public/art/mars-sky-canyon.jpg",
+  "prompt": "Bring this painted red canyon on Mars to life: the colourful glowing light trails sweep and flow smoothly along their paths with sparkling particles, fine red dust drifts in the air, the stars twinkle, the big planet glows softly. The camera is completely still (tripod, locked-off): the cliffs, buildings, planet, moon and horizon do not move at all; only the lights, water, sky and particles move. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical.",
+  "loop": true,
+  "model": "veo-3.1-generate-preview"
+}
