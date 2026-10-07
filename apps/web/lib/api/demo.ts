@@ -279,6 +279,12 @@ export class DemoApi implements Api {
     return this.patchMe((u) => ({ voices: { ...(u.voices ?? { self: false, bati: false }), [body.slot]: true } }));
   }
 
+  // demo: no speech recognition here
+  async transcribe(): Promise<{ text: string }> {
+    await sleep(500);
+    return { text: '' };
+  }
+
   async speak(): Promise<{ url: string }> {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
   }

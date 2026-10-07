@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
-import { RegisterVoiceBody, SpeakBody } from '@obolo/shared';
+import { RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -22,6 +22,15 @@ export class VoiceController {
   async register(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `voice-reg:${userId}`, 10, 86400);
     return this.voice.register(userId, parseBody(RegisterVoiceBody, body));
+  }
+
+  /** Mic first: the words of a recording (PLACEHOLDER P-VOICE-7: 200 a day). */
+  @Post('transcribe')
+  @HttpCode(200)
+  async transcribe(@UserId() userId: string, @Body() body: unknown) {
+    const b = parseBody(TranscribeBody, body);
+    await rateLimit(this.kv, `voice-stt:${userId}`, 200, 86400);
+    return this.voice.transcribe(userId, b.mediaId);
   }
 
   /** PLACEHOLDER (P-VOICE-3): 100 read-alouds a day per member until pricing is decided. */

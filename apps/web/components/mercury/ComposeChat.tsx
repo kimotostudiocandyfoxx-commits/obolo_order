@@ -177,7 +177,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
         <Face face={partner.face} size={40} />
         <div>
           <p className="text-sm font-bold">{partner.name}と作曲</p>
-          <p className="text-[11px] text-white/50">話しかけると、{partner.name}が曲にしてくれる（{live ? 'AI作曲・伴奏と歌はこれから' : '仮の画面'}）</p>
+          <p className="text-[11px] text-white/50">話しかけると、{partner.name}が曲にしてくれる（{live ? '伴奏と歌も入れられるよ' : '仮の画面'}）</p>
         </div>
       </div>
 
@@ -447,7 +447,7 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
   if (song.instrumentalUrl) {
     return (
       <div className="mt-3 rounded-2xl bg-black/25 p-2">
-        <p className="mb-1 text-center text-[11px] text-violet-200/70">🎹 伴奏（AI）</p>
+        <p className="mb-1 text-center text-[11px] text-violet-200/70">🎹 伴奏</p>
         <audio src={song.instrumentalUrl} controls playsInline className="w-full" />
       </div>
     );
@@ -484,7 +484,7 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
   return (
     <div className="mt-3 text-center">
       <button onClick={() => void make()} disabled={state === 'working' || state === 'warming'} className="w-full rounded-full border border-violet-300/60 bg-violet-500/20 py-2 text-sm font-bold disabled:opacity-60">
-        {state === 'working' ? '🎹 伴奏を作曲中…（1〜2分）' : '🎹 伴奏をつくる（AI）'}
+        {state === 'working' ? '🎹 伴奏を作曲中…（1〜2分）' : '🎹 伴奏をつくる'}
       </button>
       {state === 'warming' && (
         <p className="mt-1.5 text-[11px] text-amber-200/80">

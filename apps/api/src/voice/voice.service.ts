@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { moderateText } from '@obolo/ai';
+import { type LlmProvider, moderateText } from '@obolo/ai';
+import { LLM } from '../infra/tokens';
 import { VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { spawn } from 'node:child_process';
@@ -38,6 +39,7 @@ export class VoiceService {
     @Inject(CONFIG) private readonly cfg: AppConfig,
     private readonly db: Database,
     private readonly media: MediaService,
+    @Inject(LLM) private readonly llm: LlmProvider,
   ) {}
 
   private key(): string {
@@ -86,6 +88,30 @@ export class VoiceService {
     if (old && old !== id) void deleteVoiceModel(key, old);
     this.log.log(`voice ${body.slot} registered for ${userId}`);
     return toMe(nu);
+  }
+
+  /**
+   * Speech → text from one of the member's own recordings (mic first: the recording is the
+   * post's voice, its words fill the text box). Converted to MP3 for the model.
+   */
+  async transcribe(userId: string, mediaId: string): Promise<{ text: string }> {
+    const src = await this.media.imageData(userId, mediaId, 'voice');
+    if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Recording not found');
+    if (!this.llm.transcribe) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'STT_OFF', 'Speech to text is not available');
+    let mp3: Buffer;
+    try {
+      mp3 = await toMp3(src.data);
+    } catch (e) {
+      this.log.warn(`stt convert failed: ${String(e)}`);
+      throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_AUDIO', 'Could not read this recording');
+    }
+    try {
+      const text = (await this.llm.transcribe(mp3, 'audio/mp3')).replace(/\s+/g, ' ').trim().slice(0, 600);
+      return { text };
+    } catch (e) {
+      this.log.warn(`stt failed: ${String(e)}`);
+      throw apiError(HttpStatus.BAD_GATEWAY, 'STT_FAILED', 'Could not turn the voice into text');
+    }
   }
 
   async speak(userId: string, body: SpeakBody, origin: string): Promise<{ url: string; mediaId: string }> {

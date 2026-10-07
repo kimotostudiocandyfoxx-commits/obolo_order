@@ -62,7 +62,7 @@ export class ComposeService {
       return parseComposeChat(raw);
     } catch (e) {
       this.log.warn(`chat failed: ${String(e)}`);
-      throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', `The partner could not answer: ${why(e)}`);
+      throw apiError(HttpStatus.BAD_GATEWAY, 'MAKE_FAILED', `The partner could not answer: ${why(e)}`);
     }
   }
 
@@ -80,6 +80,6 @@ export class ComposeService {
         this.log.warn(`design attempt ${attempt + 1} failed: ${String(e)}`);
       }
     }
-    throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', `The song could not be made: ${why(last)}`);
+    throw apiError(HttpStatus.BAD_GATEWAY, 'MAKE_FAILED', `The song could not be made: ${why(last)}`);
   }
 }

@@ -3,7 +3,7 @@
 import { SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
-import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
+import { playBlob, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useRecorder } from '@/lib/useRecorder';
@@ -524,11 +524,23 @@ function lifeLeft(createdAt: string) {
   return h <= 1 ? 'まもなく消える' : `のこり${Math.floor(h)}時間`;
 }
 
+/** The reading styles, as the "バティに読んでもらう" choices. */
+const READ_LABELS: Record<string, string> = {
+  genki: '元気に読む',
+  yukkuri: 'ゆっくり読む',
+  hayakuchi: '早口で読む',
+  hikui: '低い声で読む',
+  takai: '高い声で読む',
+  sasayaki: 'ささやき声で読む',
+  sakebu: '叫んで読む',
+};
+
 /**
- * 声をおとす (mic first, client decision 2026-10-07): tap the big mic, speak, tap again — the
- * words appear in the box (tap a spot / select words, delete, speak again to fix). The voice is
- * the member's own registered voice read by the AI in a chosen style (Fish Audio, P-SAT-5), or
- * a recording of their own voice. (The NEO voice was removed.)
+ * 声をおとす (client decision 2026-10-07, mic first): tap the big mic, speak, tap again — the
+ * recording IS the voice of the post, and its words fill the box (turned into text on the
+ * server). Fix the words by tapping / selecting a part, deleting it and using the small mic.
+ * "バティに読んでもらう" instead has Bati read the words in a chosen style (the member's
+ * registered Bati voice); only then do the styles appear.
  */
 function DropComposer({
   onClose,
@@ -539,7 +551,7 @@ function DropComposer({
 }: {
   onClose: () => void;
   onPosted: (p: SaturnPostView) => void;
-  /** the Day 4 tutorial: only a recording (no registered voice yet) */
+  /** the Day 4 tutorial: recording only */
   recordOnly: boolean;
   /** answering this voice (the reply lines up under it) */
   replyTo?: SaturnPostView;
@@ -548,35 +560,70 @@ function DropComposer({
 }) {
   const { me } = useAuth();
   const rec = useRecorder();
-  const hasOwnVoice = !!me?.voices?.self;
-  const [mode, setMode] = useState<'own' | 'record'>(hasOwnVoice && !recordOnly ? 'own' : 'record');
-  // own-voice previews cost a Fish call: keep the last one for the same text + style
-  const [ownPreview, setOwnPreview] = useState<{ key: string; url: string } | null>(null);
+  const [voice, setVoice] = useState<{ id: string; seconds: number } | null>(null);
+  const [toText, setToText] = useState(false);
+  const [bati, setBati] = useState(false);
+  const hasBatiVoice = !!me?.voices?.bati;
+  // Bati previews cost a voice call: keep the last one for the same text + style
+  const [batiPreview, setBatiPreview] = useState<{ key: string; url: string } | null>(null);
   const [previewing, setPreviewing] = useState(false);
   const [style, setStyle] = useState(VOICE_STYLES[0].id);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
-  const mic = useDictation({ field: box, value: text, onChange: setText, maxLength: SATURN_MAX_CHARS * 2 });
+  // the small mic: words only, at the cursor (to fix a part)
+  const fix = useDictation({ field: box, value: text, onChange: setText, maxLength: SATURN_MAX_CHARS * 2 });
   const left = SATURN_MAX_CHARS - [...text].length;
-  const canPost = !!text.trim() && left >= 0 && !busy && !mic.listening && ((mode === 'own' && hasOwnVoice) || (mode === 'record' && !!rec.blob && !rec.recording));
+  const canPost = !!text.trim() && left >= 0 && !busy && !rec.recording && !toText && !fix.listening && (bati ? hasBatiVoice : !!voice);
 
-  const preview = async () => {
+  // a finished recording: keep it as the voice and turn its words into text
+  useEffect(() => {
+    if (!rec.blob || rec.recording) return;
+    let on = true;
+    setToText(true);
+    setErr(null);
+    (async () => {
+      try {
+        const media = await getApi().uploadVoice(rec.blob!);
+        if (!on) return;
+        setVoice({ id: media.id, seconds: rec.duration });
+        const r = await getApi().transcribe(media.id).catch(() => ({ text: '' }));
+        if (on && r.text) setText(r.text.slice(0, SATURN_MAX_CHARS * 2));
+        else if (on) setErr('文字にできなかった…下の欄に書くか、小さいマイクで入れてね');
+      } catch {
+        if (on) setErr('声を保存できなかった…もう一度録音してね');
+      } finally {
+        if (on) setToText(false);
+      }
+    })();
+    return () => {
+      on = false;
+    };
+  }, [rec.blob, rec.recording]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggleRecord = () => {
+    if (rec.recording) return rec.stop();
+    fix.stop();
+    setVoice(null);
+    void rec.start();
+  };
+
+  const previewBati = async () => {
     const t = text.trim();
     if (!t) return;
     const key = `${style}:${t}`;
     setErr(null);
     try {
-      let url = ownPreview?.key === key ? ownPreview.url : null;
+      let url = batiPreview?.key === key ? batiPreview.url : null;
       if (!url) {
         setPreviewing(true);
-        url = (await getApi().speak({ slot: 'self', text: t, style })).url;
-        setOwnPreview({ key, url });
+        url = (await getApi().speak({ slot: 'bati', text: t, style })).url;
+        setBatiPreview({ key, url });
       }
       await toggleAudio(url);
     } catch {
-      setErr('自分の声で読めなかった…もう一度');
+      setErr('バティが読めなかった…もう一度');
     } finally {
       setPreviewing(false);
     }
@@ -587,24 +634,32 @@ function DropComposer({
     setErr(null);
     try {
       const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}) };
-      if (mode === 'own') {
-        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, ownVoice: true, ...target }));
-      } else {
-        if (!rec.blob) return;
-        const media = await getApi().uploadVoice(rec.blob);
-        onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceMediaId: media.id, voiceDurationSec: rec.duration, ...target }));
-      }
+      if (bati) onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target }));
+      else if (voice) onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceMediaId: voice.id, voiceDurationSec: voice.seconds, ...target }));
     } catch {
       setErr('うまく落とせなかった…もう一度');
       setBusy(false);
     }
   };
 
+  const caption = rec.error
+    ? rec.error === 'denied'
+      ? 'マイクを許可してね（設定 → Safari → マイク）'
+      : 'このブラウザでは録音できないよ'
+    : rec.recording
+      ? `録音中… ${rec.elapsed}秒　話しおわったら、もう一度タップ`
+      : toText
+        ? '文字にしています…'
+        : voice
+          ? 'もう一度押すと、録り直せるよ'
+          : 'タップして話してね（この声がそのまま土星に流れるよ）';
+
   return (
     <div
       className="absolute inset-0 z-[95] flex items-end justify-center bg-violet-950/50"
       onClick={() => {
-        mic.stop();
+        fix.stop();
+        if (rec.recording) rec.stop();
         onClose();
       }}
     >
@@ -619,87 +674,82 @@ function DropComposer({
           </div>
         )}
 
-        {/* mic first: speak → the words appear below */}
+        {/* the big mic: record → the voice of the post, and its words below */}
         <div className="mt-4">
-          <MicButton listening={mic.listening} interim={mic.interim} supported={mic.supported} error={mic.error} onToggle={mic.toggle} />
+          <MicButton listening={rec.recording} interim="" supported error={null} onToggle={toggleRecord} caption={caption} />
         </div>
-        <textarea
-          ref={box}
-          className={`mt-3 h-24 w-full resize-none rounded-2xl p-3 text-[16px] outline-none ${mic.listening ? 'bg-pink-50 ring-2 ring-pink-200' : 'bg-violet-50'}`}
-          placeholder={replyTo ? '🎙 を押して、どう返すか話してね' : quote ? '🎙 を押して、この声についてひとこと' : '🎙 を押して、いま思ったことを話してね'}
-          maxLength={SATURN_MAX_CHARS * 2}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+        {voice && !rec.recording && rec.blob && (
+          <button onClick={() => void playBlob(rec.blob!, 'drop-preview')} className="mx-auto mt-1 block rounded-full bg-violet-50 px-3 py-1 text-[11px] font-bold text-violet-600">
+            ▶ 録った声を聞く（{voice.seconds.toFixed(1)}秒）
+          </button>
+        )}
+        <div className="relative mt-3">
+          <textarea
+            ref={box}
+            className={`h-24 w-full resize-none rounded-2xl p-3 pr-12 text-[16px] outline-none ${fix.listening ? 'bg-pink-50 ring-2 ring-pink-200' : 'bg-violet-50'}`}
+            placeholder={toText ? '文字にしています…' : '話した言葉がここに入るよ'}
+            maxLength={SATURN_MAX_CHARS * 2}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          {fix.supported && (
+            <button
+              onClick={fix.toggle}
+              disabled={rec.recording}
+              className={`absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full text-white shadow disabled:opacity-40 ${fix.listening ? 'animate-pulse bg-rose-400' : 'bg-violet-400'}`}
+              aria-label={fix.listening ? '文字入力をとめる' : '話して文字を直す'}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
+                <rect x="8.5" y="3" width="7" height="12" rx="3.5" fill="currentColor" />
+                <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+              </svg>
+            </button>
+          )}
+        </div>
         <div className="mt-1 flex items-start justify-between gap-2 text-[10px] text-slate-400">
-          <span>直したいところは、そこをタップ（なぞって選ぶ）→ 消して → もう一度 🎙</span>
+          <span>{fix.listening ? fix.interim || 'きいてるよ…（直す言葉を話してね）' : '直したいところをタップ（なぞって選ぶ）→ 消して → 右下の小さい🎙で話す'}</span>
           <span className={`shrink-0 text-xs ${left < 0 ? 'text-rose-500' : ''}`}>{left}</span>
         </div>
 
+        {/* Bati reads it instead (only then the styles appear) */}
         {!recordOnly && (
-          <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full bg-violet-50 p-1">
-            {(
-              [
-                ['own', '自分の声（AI）'],
-                ['record', '自分で録音'],
-              ] as const
-            ).map(([k, label]) => (
-              <button key={k} onClick={() => setMode(k)} className={`rounded-full px-4 py-1.5 text-xs font-bold ${mode === k ? 'bg-violet-500 text-white' : 'text-violet-500'}`}>
-                {label}
-              </button>
-            ))}
+          <div className="mt-3">
+            <button
+              onClick={() => setBati((v) => !v)}
+              className={`w-full rounded-full py-2.5 text-sm font-black ${bati ? 'bg-amber-100 text-amber-700 ring-2 ring-amber-300' : 'bg-violet-50 text-violet-600'}`}
+            >
+              🐣 {bati ? 'バティが読むよ（もう一度押すと、自分の声にもどす）' : 'バティに読んでもらう'}
+            </button>
+            {bati && !hasBatiVoice && (
+              <a href="/voice" className="mt-2 block rounded-2xl bg-amber-50 p-3 text-center text-xs font-bold text-amber-700">
+                バティに読んでもらうには、先にバティの声を登録してね →
+              </a>
+            )}
+            {bati && hasBatiVoice && (
+              <>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {VOICE_STYLES.map((v) => (
+                    <button
+                      key={v.id}
+                      onClick={() => setStyle(v.id)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold ${style === v.id ? 'bg-amber-400 text-white' : 'bg-amber-50 text-amber-700'}`}
+                    >
+                      {READ_LABELS[v.id] ?? v.label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => void previewBati()}
+                  disabled={!text.trim() || previewing}
+                  className="mt-2 w-full rounded-full bg-amber-50 py-2 text-xs font-bold text-amber-700 disabled:opacity-40"
+                >
+                  {previewing ? 'バティが読んでいます…' : '▶ バティの声で聞いてみる'}
+                </button>
+              </>
+            )}
           </div>
         )}
 
-        {mode === 'own' && !hasOwnVoice ? (
-          <a href="/voice" className="mt-2 block rounded-2xl bg-violet-50 p-3 text-center text-xs font-bold text-violet-600">
-            自分の声で読んでもらうには、先に声を登録してね →
-          </a>
-        ) : mode === 'own' ? (
-          <>
-            <p className="mt-3 text-xs font-black text-violet-600">どんな感じで読んでもらう？</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {VOICE_STYLES.map((v) => (
-                <button
-                  key={v.id}
-                  onClick={() => setStyle(v.id)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-bold ${style === v.id ? 'bg-violet-500 text-white' : 'bg-violet-50 text-violet-600'}`}
-                >
-                  {v.label}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => void preview()}
-              disabled={!text.trim() || previewing}
-              className="mt-3 w-full rounded-full bg-violet-100 py-2.5 text-sm font-bold text-violet-700 disabled:opacity-40"
-            >
-              {previewing ? '自分の声で読んでいます…' : '▶ 自分の声で聞いてみる'}
-            </button>
-          </>
-        ) : (
-          <div className="mt-3">
-            <p className="text-xs font-black text-violet-600">声を録音してね（この声がそのまま流れるよ）</p>
-            <div className="mt-2 flex items-center gap-2">
-              {!rec.recording && !rec.blob && (
-                <button onClick={() => void rec.start()} disabled={mic.listening} className="rounded-full bg-rose-400 px-4 py-2 text-sm font-bold text-white disabled:opacity-40">
-                  ● 録音
-                </button>
-              )}
-              {rec.recording && (
-                <button onClick={rec.stop} className="animate-pulse rounded-full bg-rose-500 px-4 py-2 text-sm font-bold text-white">
-                  ■ 停止 {rec.elapsed}秒
-                </button>
-              )}
-              {rec.blob && !rec.recording && (
-                <button onClick={() => void rec.start()} disabled={mic.listening} className="rounded-full bg-violet-100 px-4 py-2 text-sm font-bold text-violet-600 disabled:opacity-40">
-                  ↺ 録り直す（{rec.duration.toFixed(1)}秒）
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-        {rec.error && mode === 'record' && <p className="mt-2 text-xs text-rose-500">{rec.error === 'denied' ? 'マイクを許可してください' : 'このブラウザでは録音できません'}</p>}
         {err && <p className="mt-2 text-xs text-rose-500">{err}</p>}
         <button
           disabled={!canPost}

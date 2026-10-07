@@ -61,6 +61,8 @@ export const CreateSaturnPostBody = z
     voiceStyle: z.enum(VOICE_STYLE_IDS).optional(),
     /** with voiceStyle: read it in the member's own registered voice (Fish Audio) instead of the NEO voice */
     ownVoice: z.boolean().optional(),
+    /** with voiceStyle: read by Bati (the member's registered Bati voice) — the "バティに読んでもらう" button */
+    readBy: z.enum(['self', 'bati']).optional(),
     voiceDurationSec: z.number().min(0).max(600).optional(),
     /** a voice reply to this post */
     replyToId: z.string().uuid().optional(),
@@ -205,6 +207,10 @@ export const SpeakBody = z.object({
   style: z.enum(VOICE_STYLE_IDS).optional(),
 });
 export type SpeakBody = z.infer<typeof SpeakBody>;
+
+/** Turn one of the member's own voice recordings (POST /media/voice) into text. */
+export const TranscribeBody = z.object({ mediaId: z.string().uuid() });
+export type TranscribeBody = z.infer<typeof TranscribeBody>;
 
 /**
  * Mercury 歌入れ: sing the song in a registered voice (Fish Audio, [singing] mode) and mix it with

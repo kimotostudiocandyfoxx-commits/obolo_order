@@ -149,9 +149,9 @@ export class SaturnService {
     const mod = await moderateText(body.text, this.llm);
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     let voice: { mediaId: string | null; url: string; source: 'recorded' | 'cloned' | 'default' };
-    if (body.ownVoice && body.voiceStyle) {
-      // the member's own registered voice, read by Fish Audio in the chosen style (P-SAT-5)
-      const v = await this.voices.readAloud(userId, { slot: 'self', text: body.text, style: body.voiceStyle }, origin);
+    if ((body.ownVoice || body.readBy) && body.voiceStyle) {
+      // read in a registered voice (own, or Bati's for "バティに読んでもらう") in the chosen style (P-SAT-5)
+      const v = await this.voices.readAloud(userId, { slot: body.readBy ?? 'self', text: body.text, style: body.voiceStyle }, origin);
       voice = { mediaId: null, url: v.url, source: 'cloned' };
     } else if (body.voiceMediaId) {
       const media = await this.media.getOwned(userId, body.voiceMediaId, 'voice');

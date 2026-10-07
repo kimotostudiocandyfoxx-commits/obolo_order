@@ -34,7 +34,7 @@ export default function LabPage() {
     <main className="min-h-svh bg-[#07060d] px-5 pb-24 pt-[calc(20px+env(safe-area-inset-top))] text-white">
       <h1 className="text-center text-lg tracking-[0.4em] text-amber-100">生成テスト</h1>
       <p className="mt-1 text-center text-xs text-white/55">
-        {api.mode === 'live' ? '本番の AI（Gemini）で生成します' : 'デモモードです（仮の絵）。本番の AI にはつながっていません'}
+        {api.mode === 'live' ? '本番（Gemini）で生成します' : 'デモモードです（仮の絵）。本番にはつながっていません'}
       </p>
       {!me ? (
         <p className="mt-8 text-center text-sm">

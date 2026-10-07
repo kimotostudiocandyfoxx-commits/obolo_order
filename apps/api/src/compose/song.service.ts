@@ -224,7 +224,7 @@ export class SongService {
         raw = await this.llm.chat({ system: songEditSystem(partner, ctx), history, json: true, temperature: 0.4, maxOutputTokens: 600 });
       } catch (e) {
         this.log.warn(`edit decision failed: ${String(e)}`);
-        throw apiError(HttpStatus.BAD_GATEWAY, 'AI_FAILED', `The partner could not answer: ${why(e)}`);
+        throw apiError(HttpStatus.BAD_GATEWAY, 'MAKE_FAILED', `The partner could not answer: ${why(e)}`);
       }
       const parsed = parseSongEdit(raw, ctx, partner);
       reply = parsed.reply;

@@ -77,7 +77,7 @@ export function PuniPicMaker({ onClose, onSaved }: { onClose: () => void; onSave
           <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-lg font-black text-violet-600 shadow" aria-label="back">
             ←
           </button>
-          <p className="text-sm font-black text-white drop-shadow">🎨 AIで絵のキャラを作る</p>
+          <p className="text-sm font-black text-white drop-shadow">🎨 キャラを描いてもらう</p>
           <span className="w-9" />
         </div>
         <button onClick={() => setBounce(Date.now())} className="relative mx-auto mt-2 flex h-[190px] w-[190px] items-center justify-center" aria-label="squish">

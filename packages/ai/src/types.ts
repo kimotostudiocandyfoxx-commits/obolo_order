@@ -18,6 +18,8 @@ export interface ChatRequest {
 export interface LlmProvider {
   readonly name: string;
   chat(req: ChatRequest): Promise<string>;
+  /** speech → text (the member's own recording becomes the words of their post) */
+  transcribe?(audio: Buffer, mime: string): Promise<string>;
 }
 
 export interface ModerationResult {

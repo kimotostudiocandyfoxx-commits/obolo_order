@@ -57,6 +57,32 @@ export class GeminiProvider implements LlmProvider {
     }
     throw lastErr;
   }
+
+  async transcribe(audio: Buffer, mime: string): Promise<string> {
+    let lastErr: unknown;
+    for (const model of this.models) {
+      try {
+        const res = await this.client.models.generateContent({
+          model,
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { inlineData: { mimeType: mime, data: audio.toString('base64') } },
+                { text: 'この音声で話されている言葉を、そのまま文字に起こしてください。話し言葉のまま、句読点は自然に入れる。説明や前置きは書かず、起こした文だけを出力。何も話していなければ空で返す。' },
+              ],
+            },
+          ],
+          config: { temperature: 0, maxOutputTokens: 600 },
+        });
+        return (res.text ?? '').trim();
+      } catch (e) {
+        lastErr = e;
+        if (!/404|not found|NOT_FOUND|is not supported/i.test(String(e))) throw e;
+      }
+    }
+    throw lastErr;
+  }
 }
 
 /** Fallback provider (spec §2.2/§7.4). Plain fetch to keep the dependency surface small. */
@@ -92,6 +118,10 @@ export class OpenAiProvider implements LlmProvider {
  */
 export class MockProvider implements LlmProvider {
   readonly name = 'mock';
+  /** Offline: there is no speech recognition, a fixed line keeps the flow testable. */
+  async transcribe(): Promise<string> {
+    return 'テストの声です';
+  }
   async chat(req: ChatRequest): Promise<string> {
     const last = [...req.history].reverse().find((t) => t.role === 'user')?.text ?? '';
     if (req.json && req.system.includes('SONG_DESIGN')) return mockSongDesign(last);
@@ -142,6 +172,12 @@ export class FallbackProvider implements LlmProvider {
       }
     }
     throw lastErr ?? new Error('No LLM provider configured');
+  }
+
+  async transcribe(audio: Buffer, mime: string): Promise<string> {
+    const p = this.providers.find((x) => x.transcribe);
+    if (!p?.transcribe) throw new Error('No speech-to-text provider');
+    return p.transcribe(audio, mime);
   }
 }
 

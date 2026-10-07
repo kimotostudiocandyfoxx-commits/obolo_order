@@ -11,6 +11,7 @@ export function MicButton({
   error,
   onToggle,
   size = 76,
+  caption,
 }: {
   listening: boolean;
   interim: string;
@@ -18,6 +19,8 @@ export function MicButton({
   error: 'denied' | 'failed' | null;
   onToggle: () => void;
   size?: number;
+  /** replaces the default hint under the button */
+  caption?: string;
 }) {
   return (
     <div className="flex flex-col items-center">
@@ -42,7 +45,8 @@ export function MicButton({
         )}
       </button>
       <p className="mt-2 min-h-[1.25rem] text-center text-xs font-black text-violet-500">
-        {!supported
+        {caption ??
+          (!supported
           ? 'この端末では音声入力が使えないので、文字で入力してね'
           : error === 'denied'
             ? 'マイクを許可してね（設定 → Safari → マイク）'
@@ -50,7 +54,7 @@ export function MicButton({
               ? 'うまく聞き取れなかった…もう一度タップしてね'
               : listening
                 ? interim || 'きいてるよ… 話しおわったら、もう一度タップ'
-                : 'タップして話してね'}
+                : 'タップして話してね')}
       </p>
     </div>
   );

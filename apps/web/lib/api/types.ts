@@ -91,6 +91,8 @@ export interface Api {
   registerVoice(body: RegisterVoiceBody): Promise<Me>;
   /** Read a text aloud in a registered voice (Fish Audio). */
   speak(body: SpeakBody): Promise<{ url: string }>;
+  /** The words of one of your recordings (from uploadVoice). */
+  transcribe(mediaId: string): Promise<{ text: string }>;
   /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */
   composeSing(body: SingBody): Promise<SongView>;
   /** 手直し: a chat message about a sung song (or a retried command) → the partner's reply + the new mix. */

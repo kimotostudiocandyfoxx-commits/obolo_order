@@ -149,7 +149,7 @@ export function SaturnProfile({
 
             {profile.isMe && !editing && (
               <button onClick={() => setMaker(true)} className="mt-3 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow">
-                🎨 AIで絵のキャラを作る
+                🎨 キャラを描いてもらう
               </button>
             )}
             {profile.isMe ? (

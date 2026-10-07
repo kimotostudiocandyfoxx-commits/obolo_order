@@ -32,7 +32,7 @@ export class SaturnController {
     const input = parseBody(CreateSaturnPostBody, body);
     await rateLimit(this.kv, `saturn-post:${userId}`, 10, 600);
     // own-voice posts are paid read-alouds: they share the read-aloud allowance (P-VOICE-3)
-    if (input.ownVoice) await rateLimit(this.kv, `voice-speak:${userId}`, 100, 86400);
+    if (input.ownVoice || input.readBy) await rateLimit(this.kv, `voice-speak:${userId}`, 100, 86400);
     return this.saturn.create(userId, input, `${req.protocol}://${req.get('host')}`);
   }
 
