@@ -339,7 +339,7 @@ export class SongService {
   /** Your saved songs (島の土 on Mercury), newest first; `posted` = already sent out as a ship. */
   async saved(userId: string): Promise<(SongView & { posted: boolean })[]> {
     const rows = await this.db.read
-      .select({ s: songs, posted: sql<boolean>`EXISTS (SELECT 1 FROM planet_posts pp WHERE pp.source_id = ${songs.id} AND pp.planet = 'mercury' AND pp.deleted_at IS NULL)` })
+      .select({ s: songs, posted: sql<boolean>`EXISTS (SELECT 1 FROM planet_posts pp WHERE pp.source_id = "songs"."id" AND pp.planet = 'mercury' AND pp.deleted_at IS NULL)` })
       .from(songs)
       .where(and(eq(songs.userId, userId), isNull(songs.deletedAt), isNotNull(songs.savedAt)))
       .orderBy(desc(songs.savedAt))

@@ -10,6 +10,7 @@ import { FILTERS, hoursSince, isFlying, useJupiter, type FilterId, type OwnPost,
 import { spriteUrl } from '@/lib/onboarding/media';
 import { Mic } from '@/components/mercury/ComposeChat';
 import { PuniPicMaker } from '@/components/puni/PuniPicMaker';
+import { usePartner } from '@/lib/partner';
 import { Butterfly } from './Butterfly';
 import { PostCircle, type CircleMedia } from './PostCircle';
 
@@ -1056,7 +1057,8 @@ function RootsView({
             </button>
           )}
         </div>
-        <p className="mt-1 text-xs text-[#a58c74]">自分だけのデータフォルダ。撮った写真は、まずここにしまわれます。</p>
+        <BatiSays text="やあ、今日はどんなシールを作っちゃう？ 根っこの写真を、ひとつ選んでね。" ken="よう、今日はどんなシールを作るケン？ 根っこの写真を、ひとつ選ぶケン。" />
+        <p className="mt-2 text-xs text-[#a58c74]">自分だけのデータフォルダ。撮った写真は、まずここにしまわれます。</p>
         <button onClick={() => input.current?.click()} disabled={uploading} className="mt-4 w-full rounded-2xl border-2 border-dashed border-[#d9c0a0] bg-white/50 py-4 text-sm disabled:opacity-60">
           {uploading ? 'しまっています…' : '＋ 写真を入れる'}
         </button>
@@ -1117,8 +1119,9 @@ function Compose({ item, live, myId, onBack, onPost }: { item: RootView; live: b
           <button onClick={onBack} className="text-2xl" aria-label="もどる">
             ‹
           </button>
-          <h2 className="tracking-[0.3em]">丸い投稿をつくる</h2>
+          <h2 className="tracking-[0.3em]">シールをつくる</h2>
         </div>
+        <BatiSays text="いい写真！ ひとことと加工をえらんで、丸いシールにしよう。" ken="いい写真だ！ ひとことと加工をえらんで、丸いシールにするケン。" />
         <div className="mx-auto mt-4 w-[min(78vw,300px)]" style={{ containerType: 'inline-size' }}>
           <PostCircle media={item.media} filter={filter} text={text} live className="shadow-[0_12px_40px_rgba(120,80,40,0.3)]" />
         </div>
@@ -1154,6 +1157,18 @@ function Compose({ item, live, myId, onBack, onPost }: { item: RootView; live: b
           {busy ? '飛ばしています…' : '🦋 投稿する（88時間、空を飛ぶ）'}
         </button>
       </div>
+    </div>
+  );
+}
+
+/** Bati (KIMORIN until the visitor has one) talks you through making a sticker (client 2026-10-07). */
+function BatiSays({ text, ken }: { text: string; ken: string }) {
+  const partner = usePartner();
+  return (
+    <div className="mt-3 flex items-end gap-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={partner.face} alt="" className="h-11 w-11 shrink-0 rounded-full border-2 border-white bg-[#fff6ea] object-cover shadow" />
+      <p className="rounded-2xl rounded-bl-sm bg-white/90 px-3 py-2 text-sm leading-relaxed shadow-sm">{partner.isBati ? text : ken}</p>
     </div>
   );
 }

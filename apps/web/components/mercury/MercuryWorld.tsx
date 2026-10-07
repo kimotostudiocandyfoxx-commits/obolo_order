@@ -1,10 +1,11 @@
 'use client';
 
-import { neoForm } from '@obolo/shared';
+import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { ApiError, getApi } from '@/lib/api';
 import { Artwork } from '@/components/Artwork';
 import { useAuth } from '@/lib/auth';
-import { fmt, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
+import { fmt, P, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
 import { ComposeChat } from './ComposeChat';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
@@ -18,7 +19,10 @@ import { stopAudio, toggleAudio } from '@/lib/audio';
  *  島 (profile): every user has an island. Released songs decorate it as records once back from
  *     sea; demos are buried in the soil (own island only) and set sail when released.
  *  作曲: talk to KIMORIN (Bati once the visitor has one) and they make a demo (placeholder chat).
- * Square stage with the controls underneath (docs/devices.md). VISUAL DEMO (P-MER-2).
+ * Square stage with the controls underneath (docs/devices.md).
+ * `live` (the /mercury page, client decision 2026-10-07): the sea, the islands and setting sail go
+ * through the server like Saturn / Jupiter — real ships take the slots of the sample ones; the
+ * samples keep the みんな sea lively. Without it (the Day 6 tutorial) everything stays on this device.
  */
 export interface MercuryEvents {
   onShip?: () => void;
@@ -29,13 +33,45 @@ export interface MercuryEvents {
   onRelease?: () => void;
 }
 
-type View = { v: 'sea' } | { v: 'compose' } | { v: 'island'; who: 'me' | Sailor } | { v: 'play'; title: string; songs: Song[]; start: number; back: View };
+type Who = 'me' | Sailor | { userId: string; name: string };
+type View = { v: 'sea' } | { v: 'compose' } | { v: 'island'; who: Who } | { v: 'play'; title: string; songs: Song[]; start: number; back: View; owner?: Who };
 
-export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; overlay?: ReactNode }) {
+/** A posted song as the sea / island show it (a record with an emoji until songs get covers). */
+const RECORD_EMOJI = ['🎵', '🎶', '🎤', '🎸', '🎹', '🥁', '🎧', '🎺'];
+const hash = (t: string) => [...t].reduce((n, c) => n + c.charCodeAt(0), 0);
+const songOf = (p: PlanetPostView): Song => ({
+  id: p.id,
+  title: p.title || '無題',
+  artist: p.author.displayName || p.author.handle,
+  emoji: RECORD_EMOJI[hash(p.id) % RECORD_EMOJI.length],
+  hue: hash(p.author.id) % 360,
+  seconds: Math.max(1, Math.round(p.seconds ?? 180)),
+  preset: P(96, 60, 'major', [0, 4, 5, 3], 'triangle'),
+  audioUrl: p.url,
+  hoursAgo: Math.floor((Date.now() - new Date(p.createdAt).getTime()) / 3600_000),
+});
+
+export function MercuryWorld({ events, overlay, live = false }: { events?: MercuryEvents; overlay?: ReactNode; live?: boolean }) {
   const { me } = useAuth();
   const mine = useMercury();
   const [view, setView] = useState<View>({ v: 'sea' });
-  const [tab, setTab] = useState<'all' | 'follow' | 'friend'>('friend');
+  const [tab, setTab] = useState<'all' | 'follow' | 'friend'>(live ? 'all' : 'friend');
+  // server data (live)
+  const [sky, setSky] = useState<PlanetFlyer[]>([]);
+  const [skyKey, setSkyKey] = useState(0);
+  useEffect(() => {
+    if (!live || !me) return;
+    let on = true;
+    getApi()
+      .planetSky('mercury', tab === 'all' ? 'all' : tab === 'follow' ? 'following' : 'friends')
+      .then((r) => on && setSky(r))
+      .catch(() => on && setSky([]));
+    return () => {
+      on = false;
+    };
+  }, [live, me, tab, skyKey]);
+  const realOthers = sky.filter((f) => f.author.id !== me?.id).slice(0, SAILORS.length);
+  const myLive = sky.find((f) => f.author.id === me?.id)?.posts.map(songOf) ?? [];
   const [toast, setToast] = useState<string | null>(null);
   const ev = useRef(events);
   ev.current = events;
@@ -43,10 +79,15 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
 
   const myHandle = me?.displayName || 'neo';
   const neo = neoForm(me?.neoForm);
-  const mySailing = mine.released.filter((r) => atSea(r.at));
+  const mySailing = live ? myLive.map((song) => ({ song, at: Date.now() - (song.hoursAgo ?? 0) * 3600_000 })) : mine.released.filter((r) => atSea(r.at));
   const myRecords = mine.released.filter((r) => !atSea(r.at)).map((r) => r.song);
-  const visible = (s: Sailor) => tab === 'all' || (tab === 'follow' ? s.follow : s.friend);
-  const sailingCount = SAILORS.filter(visible).length + (mySailing.length ? 1 : 0);
+  // live: real ships take the first slots; samples fill the rest of the みんな sea only
+  const visible = (s: Sailor) => {
+    const i = SAILORS.indexOf(s);
+    if (live) return i >= realOthers.length && tab === 'all';
+    return tab === 'all' || (tab === 'follow' ? s.follow : s.friend);
+  };
+  const sailingCount = SAILORS.filter(visible).length + realOthers.length + (mySailing.length ? 1 : 0);
 
   const say = (t: string) => {
     setToast(t);
@@ -57,7 +98,7 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
     setView(next);
     if (next.v === 'island' && next.who === 'me') ev.current?.onIsland?.();
   };
-  const play = (title: string, songs: Song[], start = 0) => go({ v: 'play', title, songs, start, back: view.v === 'play' ? view.back : view });
+  const play = (title: string, songs: Song[], start = 0, owner?: Who) => go({ v: 'play', title, songs, start, back: view.v === 'play' ? view.back : view, owner });
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#06123a] text-white">
@@ -102,6 +143,31 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
                   style={{ left: `${s.box.left + 2}%`, top: `${s.box.top + 2}%`, width: `${s.box.width - 4}%`, height: `${s.box.height - 4}%` }}
                 />
               ))}
+              {/* real ships (live) over the slots of the sample ones */}
+              {realOthers.map((f, i) => {
+                const b = SAILORS[i].box;
+                const songs = f.posts.map(songOf);
+                const name = f.author.displayName || f.author.handle;
+                return (
+                  <div key={f.author.id}>
+                    <div className="pointer-events-none absolute rounded-[30%] bg-[#0b3a8c]/80 blur-md" style={{ left: `${b.left + 2}%`, top: `${b.top + 2}%`, width: `${b.width - 4}%`, height: `${b.height - 4}%` }} />
+                    <button
+                      onClick={() => {
+                        play(`@${name} の船`, songs, 0, { userId: f.author.id, name });
+                        ev.current?.onShip?.();
+                      }}
+                      className="absolute flex flex-col items-center"
+                      style={{ left: `${b.left}%`, top: `${b.top}%`, width: `${Math.min(b.width, 24)}%`, animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}
+                      aria-label={`@${name}の船`}
+                    >
+                      <span className="mb-1 max-w-full truncate rounded-xl border border-amber-300/70 bg-[#0d1838]/90 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight">
+                        @{name}「{songs[0]?.title}」
+                      </span>
+                      <OwnShip emoji={neoForm(f.author.neoForm)?.emoji ?? '⛵'} img={f.author.pic} />
+                    </button>
+                  </div>
+                );
+              })}
               {mySailing.length > 0 && (
                 <button
                   onClick={() => {
@@ -117,7 +183,7 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
                     <br />
                     <span className="text-white/60">{hoursSince(mySailing[0].at) || 'たった今'}{hoursSince(mySailing[0].at) ? '時間前' : ''}</span>
                   </span>
-                  <OwnShip emoji={neo?.emoji ?? '🦊'} img={me?.avatarUrl} />
+                  <OwnShip emoji={neo?.emoji ?? '🦊'} img={me?.puniPic ?? me?.avatarUrl} />
                 </button>
               )}
             </div>
@@ -125,18 +191,29 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
         </div>
       )}
 
-      {view.v === 'island' && (
+      {view.v === 'island' && live && (view.who === 'me' || 'userId' in (view.who as object)) && (
+        <LiveIsland
+          who={view.who as 'me' | { userId: string; name: string }}
+          myId={me?.id}
+          myName={myHandle}
+          refreshKey={skyKey}
+          onPlay={(title, songs, i) => play(title, songs, i)}
+          onSoil={() => ev.current?.onSoil?.()}
+          onReleased={() => {
+            setSkyKey(Date.now());
+            say('🚢 出航！ 88時間、みんなの海を渡ります');
+            ev.current?.onRelease?.();
+          }}
+          say={say}
+        />
+      )}
+      {view.v === 'island' && !(live && (view.who === 'me' || 'userId' in (view.who as object))) && (
         <IslandView
-          title={view.who === 'me' ? myHandle : view.who.handle}
+          title={view.who === 'me' ? myHandle : (view.who as Sailor).handle}
           isMe={view.who === 'me'}
-          stats={
-            view.who === 'me'
-              ? { residents: 0, discovered: SAILORS.length, released: mine.released.length }
-              : { residents: view.who.residents, discovered: view.who.discovered, released: view.who.sailing.length + view.who.records.length }
-          }
-          records={view.who === 'me' ? myRecords : view.who.records}
-          sailing={view.who === 'me' ? mySailing.map((r) => r.song) : view.who.sailing}
-          chests={view.who === 'me' ? mine.chests : view.who.chests}
+          records={view.who === 'me' ? myRecords : (view.who as Sailor).records}
+          sailing={view.who === 'me' ? mySailing.map((r) => r.song) : (view.who as Sailor).sailing}
+          chests={view.who === 'me' ? mine.chests : (view.who as Sailor).chests}
           soil={view.who === 'me' ? mine.soil : []}
           onPlay={(songs, i) => play(view.who === 'me' ? '自分の島' : `@${(view.who as Sailor).handle} の島`, songs, i)}
           onSoil={() => ev.current?.onSoil?.()}
@@ -149,7 +226,7 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
         />
       )}
 
-      {view.v === 'compose' && <ComposeChat onBury={(song) => mine.bury(song)} onOpenIsland={() => go({ v: 'island', who: 'me' })} />}
+      {view.v === 'compose' && <ComposeChat onBury={(song) => (live ? setSkyKey(Date.now()) : mine.bury(song))} onOpenIsland={() => go({ v: 'island', who: 'me' })} />}
 
       {view.v === 'play' && (
         <Player
@@ -160,8 +237,15 @@ export function MercuryWorld({ events, overlay }: { events?: MercuryEvents; over
           stars={mine.stars}
           onStar={(id, tier) => {
             mine.star(id, tier);
+            // a real post: the star reaches its maker too (no counts are shown anywhere)
+            if (live && /^[0-9a-f-]{36}$/.test(id))
+              getApi()
+                .starPlanetPost('mercury', id, tier > 0)
+                .catch(() => undefined);
             ev.current?.onStar?.();
           }}
+          owner={view.owner && view.owner !== 'me' && typeof view.owner === 'object' && 'userId' in view.owner ? view.owner.name : undefined}
+          onOwner={view.owner && typeof view.owner === 'object' && 'userId' in view.owner ? () => go({ v: 'island', who: view.owner! }) : undefined}
           onSwipe={() => ev.current?.onSwipe?.()}
         />
       )}
@@ -195,7 +279,7 @@ function Tabs({ tab, setTab }: { tab: 'all' | 'follow' | 'friend'; setTab: (t: '
     <div className="mx-auto flex w-full max-w-md rounded-full border border-white/15 bg-black/30 p-1">
       {(
         [
-          ['all', '全部'],
+          ['all', 'みんな'],
           ['follow', 'フォロー'],
           ['friend', 'ダチ'],
         ] as const
@@ -250,7 +334,6 @@ function Record({ song, spinning, className = '' }: { song: Song; spinning?: boo
 function IslandView({
   title,
   isMe,
-  stats,
   records,
   sailing,
   chests,
@@ -262,7 +345,6 @@ function IslandView({
 }: {
   title: string;
   isMe: boolean;
-  stats: { residents: number; discovered: number; released: number };
   records: Song[];
   sailing: Song[];
   chests: [number, number, number];
@@ -293,18 +375,17 @@ function IslandView({
             }}
             className="absolute left-1/2 top-[80%] -translate-x-1/2 rounded-full border border-amber-200/60 bg-[#3a2410]/90 px-4 py-1.5 text-sm shadow-lg"
           >
-            ⛏ 土の中のデモ曲（{soil.length}）
+            ⛏ 土の中の曲
           </button>
         )}
       </div>
 
       <div className="mx-auto max-w-2xl px-4">
-        <p className="mx-auto -mt-2 w-fit rounded-full border border-white/20 bg-[#0a1430]/90 px-4 py-1.5 text-xs text-white/85">
-          👤 島の住人 {stats.residents.toLocaleString()}人 ・ 発見した島 {stats.discovered} ・ 出した曲 {stats.released}
-        </p>
-
+        {/* no counts on anyone's island (client rule 2026-10-07) */}
         {sailing.length > 0 && (
-          <p className="mt-3 text-center text-xs text-cyan-200/80">🚢 航海中の曲 {sailing.length}（88時間後に島に戻ってきます）</p>
+          <button onClick={() => onPlay(sailing, 0)} className="mx-auto mt-1 block rounded-full border border-cyan-200/30 bg-[#0a1430]/80 px-4 py-1.5 text-xs text-cyan-200/90">
+            🚢 いま航海中の曲を聴く（88時間後に島に戻ってきます）
+          </button>
         )}
 
         <h3 className="mb-2 mt-4 text-xs tracking-widest text-white/60">島に飾られたレコード</h3>
@@ -378,6 +459,8 @@ function Player({
   stars,
   onStar,
   onSwipe,
+  owner,
+  onOwner,
 }: {
   title: string;
   songs: Song[];
@@ -385,6 +468,8 @@ function Player({
   stars: Record<string, number>;
   onStar: (id: string, tier: 0 | 1 | 2 | 3) => void;
   onSwipe: () => void;
+  owner?: string;
+  onOwner?: () => void;
 }) {
   const [i, setI] = useState(start);
   const [t, setT] = useState(0);
@@ -424,7 +509,12 @@ function Player({
       </div>
       <div className="relative px-4 pt-[calc(12px+env(safe-area-inset-top))] text-center">
         <p className="text-sm tracking-[0.2em] text-white/75">⚓ {title}</p>
-        <p className="text-[11px] text-white/45">{many ? `88時間以内の曲 ${songs.length}曲` : '88時間以内の曲'}</p>
+        <p className="text-[11px] text-white/45">88時間以内の曲</p>
+        {onOwner && (
+          <button onClick={onOwner} className="mx-auto mt-1 block rounded-full border border-white/20 bg-black/30 px-3 py-1 text-xs text-white/85">
+            🏝 @{owner} の島へ ›
+          </button>
+        )}
       </div>
 
       <div
@@ -488,6 +578,95 @@ function Player({
         </div>
         {many && <p className="mt-1 text-[10px] text-white/40">← スワイプで次の曲 →</p>}
       </div>
+    </div>
+  );
+}
+
+/** A real island (live): records = songs back from 88 hours at sea; the soil = your saved songs. */
+function LiveIsland({
+  who,
+  myId,
+  myName,
+  refreshKey,
+  onPlay,
+  onSoil,
+  onReleased,
+  say,
+}: {
+  who: 'me' | { userId: string; name: string };
+  myId?: string;
+  myName: string;
+  refreshKey: number;
+  onPlay: (title: string, songs: Song[], i: number) => void;
+  onSoil: () => void;
+  onReleased: () => void;
+  say: (t: string) => void;
+}) {
+  const id = who === 'me' ? myId : who.userId;
+  const name = who === 'me' ? myName : who.name;
+  const [profile, setProfile] = useState<PlanetProfileView | null>(null);
+  const [soil, setSoil] = useState<Song[]>([]);
+  const [following, setFollowing] = useState(false);
+  const [key, setKey] = useState(0);
+  useEffect(() => {
+    if (!id) return;
+    getApi()
+      .planetProfile('mercury', id)
+      .then((p) => {
+        setProfile(p);
+        setFollowing(p.followedByMe);
+      })
+      .catch(() => setProfile(null));
+    if (who === 'me')
+      getApi()
+        .savedSongs()
+        .then((list) =>
+          setSoil(
+            list
+              .filter((x) => !x.posted)
+              .map((x) => ({ id: x.id, title: x.title, artist: myName, emoji: '🎵', hue: 30, seconds: Math.round(x.seconds), preset: P(96, 60, 'major', [0, 4, 5, 3], 'triangle'), audioUrl: x.url })),
+          ),
+        )
+        .catch(() => setSoil([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, refreshKey, key]);
+  const isMe = who === 'me' || id === myId;
+  return (
+    <div className="relative flex min-h-0 flex-1 flex-col">
+      <IslandView
+        title={name}
+        isMe={isMe}
+        records={(profile?.works ?? []).map(songOf)}
+        sailing={(profile?.flying ?? []).map(songOf)}
+        chests={[0, 0, 0]}
+        soil={soil}
+        onPlay={(songs, i) => onPlay(isMe ? '自分の島' : `@${name} の島`, songs, i)}
+        onSoil={onSoil}
+        onRelease={(songId) => {
+          getApi()
+            .createPlanetPost('mercury', { sourceId: songId, text: '' })
+            .then(() => {
+              setKey(Date.now());
+              onReleased();
+            })
+            .catch((e) => say(e instanceof ApiError && e.code === 'MODERATION' ? 'その曲名は使えないよ' : '出航できなかった…もう一度'));
+        }}
+        say={say}
+      />
+      {!isMe && id && (
+        <button
+          onClick={() => {
+            const on = !following;
+            setFollowing(on);
+            getApi()
+              .followSaturnUser(id, on)
+              .catch(() => undefined);
+          }}
+          className={`absolute right-3 top-[calc(52px+env(safe-area-inset-top))] rounded-full px-4 py-1.5 text-sm ${following ? 'border border-white/30 bg-[#0a1430]/85' : 'bg-violet-600'}`}
+        >
+          {following ? 'フォロー中' : 'フォロー'}
+        </button>
+      )}
     </div>
   );
 }

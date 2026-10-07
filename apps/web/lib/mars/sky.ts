@@ -31,7 +31,12 @@ export interface Video {
   scenes: string[];
   bgm: SynthPreset;
   hoursAgo?: number;
-  views?: string;
+  /** a real (square) movie posted on Mars, with its still */
+  url?: string;
+  poster?: string | null;
+  /** a real post (server id): it can get stars */
+  postId?: string;
+  starred?: boolean;
 }
 
 export interface Creator {
@@ -70,7 +75,7 @@ export const POD_BOX: Record<Theme, Record<string, { left: number; top: number; 
   },};
 
 let n = 0;
-const v = (title: string, kind: Kind, author: string, thumb: string | undefined, emoji: string, hue: number, seconds: number, scenes: string[], bgm: SynthPreset, hoursAgo: number, views: string): Video => ({
+const v = (title: string, kind: Kind, author: string, thumb: string | undefined, emoji: string, hue: number, seconds: number, scenes: string[], bgm: SynthPreset, hoursAgo: number, _views: string): Video => ({
   id: `v${++n}`,
   title,
   kind,
@@ -82,7 +87,6 @@ const v = (title: string, kind: Kind, author: string, thumb: string | undefined,
   scenes,
   bgm,
   hoursAgo,
-  views,
 });
 const POP = P(112, 64, 'major', [0, 4, 5, 3], 'triangle');
 const DARK = P(90, 57, 'minor', [0, 6, 5, 4], 'sawtooth');

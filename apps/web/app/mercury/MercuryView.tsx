@@ -16,7 +16,7 @@ export function MercuryView() {
       <DemoBanner />
       <RequireAuth>
         <div className="h-[calc(100svh-56px-env(safe-area-inset-top))]">
-          <MercuryWorld />
+          <MercuryWorld live />
         </div>
       </RequireAuth>
     </PlanetShell>

@@ -10,11 +10,25 @@ import { useBlobUrl } from '@/lib/jupiter/state';
  * (photos live on Jupiter). Private: only you see them. Add from the camera roll, watch, remove.
  * PLACEHOLDER (P-MARS-4): sending one of these to the 星図 comes with the Mars timeline on the server.
  */
-export function Backstage() {
+export function Backstage({ onPublish }: { onPublish?: () => void } = {}) {
   const [list, setList] = useState<MarsBackstageVideo[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [playing, setPlaying] = useState<MarsBackstageVideo | null>(null);
+  const [sending, setSending] = useState<string | null>(null);
+  // 公開: the video is cut square and flies as a UFO for 88 hours (the original stays here)
+  const publish = async (v: MarsBackstageVideo) => {
+    setSending(v.id);
+    setMsg('');
+    try {
+      await getApi().createPlanetPost('mars', { sourceId: v.id, title: v.title, text: '' });
+      onPublish?.();
+    } catch (e) {
+      setMsg(e instanceof ApiError && e.code === 'MODERATION' ? 'そのタイトルは使えないよ' : '公開できなかった…もう一度');
+    } finally {
+      setSending(null);
+    }
+  };
   const input = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -85,6 +99,11 @@ export function Backstage() {
                 ✕
               </button>
               <p className="mt-0.5 truncate text-[10px] text-white/60">{v.title || '動画'}</p>
+              {onPublish && (
+                <button onClick={() => void publish(v)} disabled={!!sending} className="mt-1 w-full rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 py-1 text-[10px] font-bold disabled:opacity-50">
+                  {sending === v.id ? '正方形にしています…' : '🛸 公開する'}
+                </button>
+              )}
             </div>
           ))}
         </div>

@@ -15,7 +15,7 @@ export function MarsView() {
       <DemoBanner />
       <RequireAuth>
         <div className="h-[calc(100svh-56px-env(safe-area-inset-top))]">
-          <MarsWorld />
+          <MarsWorld live />
         </div>
       </RequireAuth>
     </PlanetShell>

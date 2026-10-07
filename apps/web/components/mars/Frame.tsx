@@ -8,8 +8,13 @@ import { stillUrl } from '@/lib/onboarding/media';
 export function Frame({ video, playing = false, className = '' }: { video: Video; playing?: boolean; className?: string }) {
   return (
     <div className={`relative overflow-hidden bg-black ${className}`}>
-      <div className={`absolute inset-0 ${playing ? 'animate-[kenburns_14s_ease-in-out_infinite_alternate]' : ''}`}>
-        {video.thumb ? (
+      <div className={`absolute inset-0 ${playing && !video.url ? 'animate-[kenburns_14s_ease-in-out_infinite_alternate]' : ''}`}>
+        {video.url && playing ? (
+          <video src={video.url} poster={video.poster ?? undefined} autoPlay loop playsInline controls className="h-full w-full object-cover" />
+        ) : video.poster ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={video.poster} alt="" className="h-full w-full object-cover" draggable={false} />
+        ) : video.thumb ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={stillUrl(video.thumb)} alt="" className="h-full w-full object-cover" draggable={false} />
         ) : (
