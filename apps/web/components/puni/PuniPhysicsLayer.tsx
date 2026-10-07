@@ -48,9 +48,11 @@ export const PuniPhysicsLayer = forwardRef<
      * Each newly touched one squishes and is reported to `onTrace` (a tap is a chain of one).
      */
     onTrace?: (id: string) => void;
+    /** the finger lifted after tracing (a real tap for iPad Safari: sound may start here) */
+    onTraceEnd?: () => void;
     className?: string;
   }
->(function PuniPhysicsLayer({ items, floorAt, onTap, onTapEmpty, onFrame, speakingId = null, onTrace, className = '' }, ref) {
+>(function PuniPhysicsLayer({ items, floorAt, onTap, onTapEmpty, onFrame, speakingId = null, onTrace, onTraceEnd, className = '' }, ref) {
   const box = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const glCanvas = useRef<HTMLCanvasElement>(null);
@@ -61,8 +63,8 @@ export const PuniPhysicsLayer = forwardRef<
   const blobs = useRef<Blob[]>([]);
   const nodes = useRef(new Map<string, PuniNodes>());
   const held = useRef(new Map<string, HTMLDivElement>());
-  const cb = useRef({ floorAt, onTap, onTapEmpty, onFrame, speakingId, onTrace });
-  cb.current = { floorAt, onTap, onTapEmpty, onFrame, speakingId, onTrace };
+  const cb = useRef({ floorAt, onTap, onTapEmpty, onFrame, speakingId, onTrace, onTraceEnd });
+  cb.current = { floorAt, onTap, onTapEmpty, onFrame, speakingId, onTrace, onTraceEnd };
   // the chain being traced (ids) and the glowing line through them
   const chain = useRef<string[]>([]);
   const chainLine = useRef<SVGPolylineElement>(null);
@@ -138,6 +140,7 @@ export const PuniPhysicsLayer = forwardRef<
     const { W, H } = size;
     const world = { W, H, floor: H, floorAt: (x: number) => cb.current.floorAt(x, W, H) };
     const get = (id: string) => blobs.current.find((b) => b.id === id);
+    const resting = new Map<string, number>();
     const loop = (now: number) => {
       const dt = Math.min(1 / 30, (now - last) / 1000);
       last = now;
@@ -157,6 +160,14 @@ export const PuniPhysicsLayer = forwardRef<
       for (const b of blobs.current) {
         const n = nodes.current.get(b.id);
         if (!n?.outer || !n.rot) continue;
+        // a character at rest is not redrawn (a pile of 30–50 stays light); anything that moves,
+        // talks, blinks or is touched wakes it
+        let wobble = 0;
+        for (let i = 0; i < b.ov.length; i++) wobble = Math.max(wobble, Math.abs(b.ov[i]));
+        const still = Math.abs(b.vx) + Math.abs(b.vy) + Math.abs(b.av) * b.R < 4 && wobble < 6 && !b.poked && !b.drag && b !== sp && b.id !== blinkId;
+        const idle = (resting.get(b.id) ?? 0) + 1;
+        resting.set(b.id, still ? idle : 0);
+        if (still && idle > 20) continue;
         const [ma, mb, mc, md] = stretchMatrix(b);
         n.outer.setAttribute('transform', `translate(${b.x.toFixed(1)} ${b.y.toFixed(1)}) matrix(${ma.toFixed(3)} ${mb.toFixed(3)} ${mc.toFixed(3)} ${md.toFixed(3)} 0 0)`);
         const deg = (b.angle * 180) / Math.PI;
@@ -267,6 +278,7 @@ export const PuniPhysicsLayer = forwardRef<
     if (!pt || pt.id !== e.pointerId) return;
     if (cb.current.onTrace) {
       if (!chain.current.length && !pt.moved) cb.current.onTapEmpty?.();
+      else if (chain.current.length) cb.current.onTraceEnd?.();
       chain.current = [];
       return;
     }

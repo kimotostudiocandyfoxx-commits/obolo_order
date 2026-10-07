@@ -3,7 +3,7 @@
 import { neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type PlazaView, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
-import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
+import { primeAudio, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { residentReplies, SATURN_RESIDENTS } from '@/lib/saturnResidents';
 import { useDictation } from '@/lib/useDictation';
@@ -237,7 +237,7 @@ export function KororinWorld({
           pic: p.author.pic ?? null,
           photo: p.photoUrl ?? null,
           R: dense
-            ? Math.max(13, Math.min(26, stageW * 0.024 * (1 + (hueOf(p.id) % 3) * 0.12))) * (1 + (popScale(p) - 1) * 0.6)
+            ? Math.max(14, Math.min(30, stageW * 0.028 * (1 + (hueOf(p.id) % 3) * 0.12))) * (1 + (popScale(p) - 1) * 0.6)
             : Math.min(
             stageW * (tab === 'friends' ? 0.16 : 0.12),
             Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1) * popScale(p),
@@ -320,11 +320,22 @@ export function KororinWorld({
     }
     c.id = null;
   };
+  // iPad Safari lets sound start only when the finger lifts; after that first time, voices can
+  // start while still tracing
+  const unlocked = useRef(false);
   const onTrace = (id: string) => {
     const c = chain.current;
     if (c.id === id || c.queue.includes(id)) return;
     c.queue.push(id);
-    if (!c.id) nextRef.current();
+    if (!c.id && unlocked.current) nextRef.current();
+  };
+  const onTraceEnd = () => {
+    const c = chain.current;
+    if (c.id || !c.queue.length) return;
+    const first = shownRef.current.find((x) => x.id === c.queue[0]);
+    primeAudio(first?.voiceUrl.startsWith('tts:') ? 'tts' : 'el');
+    unlocked.current = true;
+    nextRef.current();
   };
 
   // the answers under the opened voice (sample residents answer each other)
@@ -486,7 +497,7 @@ export function KororinWorld({
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
           const p = shown.find((x) => x.id === id);
           if (p) listen(p);
-        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} onTrace={dense ? onTrace : undefined} />
+        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} onTrace={dense ? onTrace : undefined} onTraceEnd={onTraceEnd} />
       </div>
 
       {/* soap-bubble pops of the voices you heard */}
@@ -732,9 +743,9 @@ const TABS: [Tab, string][] = [
 ];
 
 /** How many characters a tab shows at once (client decision 2026-10-07; みんな/セカイ is still being designed). */
-const TAB_CAP: Record<Exclude<Tab, 'all'> | 'plaza', number> = { following: 22, friends: 8, plaza: 50 };
+const TAB_CAP: Record<Exclude<Tab, 'all'> | 'plaza', number> = { following: 22, friends: 8, plaza: 30 };
 /** A quiet ひろば is topped up with residents so it looks like a crowd (P-SAT-15). */
-const PLAZA_MIN = 50;
+const PLAZA_MIN = 30;
 /** ダチ are few, so they are drawn bigger. */
 const FRIENDS_SCALE = 1.45;
 
