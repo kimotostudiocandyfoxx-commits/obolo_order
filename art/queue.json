@@ -96,5 +96,57 @@
     "prompt": "Bring this painted red canyon on Mars to life: the colourful glowing light trails sweep and flow smoothly along their paths with sparkling particles, fine red dust drifts in the air, the stars twinkle, the big planet glows softly. The camera is completely still (tripod, locked-off): the cliffs, buildings, planet, moon and horizon do not move at all; only the lights, water, sky and particles move. Static locked-off camera, no camera movement, no zoom. Do NOT add any new objects, characters, vehicles, text or UI. Seamless gentle ambient motion that can loop, calm and magical.",
     "loop": true,
     "model": "veo-3.1-generate-preview"
+  },
+  {
+    "id": "bigship-sakura-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 2,
+    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: Japanese sakura — dark lacquered wood and gold, a big sail covered in pink cherry blossoms with one large glowing sakura emblem, paper lanterns, a small pagoda cabin at the stern, pink glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+  },
+  {
+    "id": "bigship-candy-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 2,
+    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: kawaii pastel — pink and baby-blue rounded hull like a toy, a heart-shaped balloon sail, ribbons, golden stars, pearls and soft clouds, pink glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+  },
+  {
+    "id": "bigship-pearl-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 2,
+    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: pearl shell yacht — iridescent mother-of-pearl hull, lavender translucent sails, scallop shells, strings of pearls, golden filigree railings, blue-violet glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+  },
+  {
+    "id": "bigship-pirate-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 2,
+    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: black-and-gold gothic pirate galleon — black sails with a golden compass emblem, ornate gold trims, warm lanterns, amber glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+  },
+  {
+    "id": "bigship-neon-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 2,
+    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: cyber neon — sleek dark metal hull with cyan and magenta neon lines, holographic sail, futuristic, cyan glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+  },
+  {
+    "id": "bigship-jungle-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 2,
+    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: tropical wood raft-ship — carved wood, palm leaves, tiki torches, flowers, a woven sail, green and orange glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+  },
+  {
+    "id": "island-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 4,
+    "refs": [
+      "art/refs/mercury-island-ref.jpg"
+    ],
+    "prompt": "Paint a music-island scene for a phone app, in the same glossy anime-fantasy style as the attached reference: a magical night ocean with green and violet aurora, a full moon, distant glowing fairy-tale castles on both horizons. In the centre, a small tropical island built like a music stage: a dark volcano covered with big round speakers and a glowing orange top, palm trees, hanging lanterns, a little bamboo music bar. On the top terrace in front of the volcano is a round DJ stage with turntables and an EMPTY standing spot behind them where a character will be placed later. In the front, a long curved wooden pier / boardwalk sweeps from left to right across the lower third, with small lanterns on its posts and NOTHING standing on it (records will be placed on it later). Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames. Do NOT copy any text, numbers, buttons or record discs from the reference. Production quality, crisp, high detail."
   }
 ]
