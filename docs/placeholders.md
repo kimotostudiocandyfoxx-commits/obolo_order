@@ -61,9 +61,10 @@
 | P-MER-2 | 🟡 | 水星のデータ | 船8人とその曲はサンプル（絵文字のレコード、音はシンセ）。自分のデモ曲3つはデザイン画のレコード。自分の島・星はこの端末だけに保存。友達の島へ行く入口はまだない | `lib/mercury/sea.ts`、`lib/mercury/state.ts` |
 | P-MER-3 | 🟡 | 水星の作曲 | **会話と曲の設計図は本物のAI（Gemini）**：パートナー（KIMORIN／バティ）と話す → ジャンルを選ぶ → 曲名・歌詞（ひらがな付き）・コード・テンポ・メロディ（1音ずつ）ができる。試し聴きはブラウザのシンセでメロディとコードを鳴らすだけ。**伴奏（MusicGen）と歌（DiffSinger）はまだ**（GPUサーバー待ち）。デモモードでは従来の仮の作曲 | `apps/api/src/compose/`、`packages/ai/src/song.ts`、`components/mercury/ComposeChat.tsx` |
 | P-JUP-1 | 🟡 | 木星（パタパタ）の画面 | クライアントのデザイン（空・木）どおりに実装。蝶と木の絵はモックから切り出したもの。正式な素材（蝶の絵、写真・文字なしの木）が届いたら差し替え | `components/jupiter/PatapataWorld.tsx`、`public/onboarding/bf-*.webp`、`jupiter-tree.webp` |
-| P-JUP-2 | 🟡 | 木星のデータ | 住人12人と投稿はサンプル（絵文字の写真）。自分の根っこ・投稿はこの端末だけに保存（サーバー未対応） | `lib/jupiter/residents.ts`、`lib/jupiter/state.ts` |
-| P-JUP-3 | 🟡 | 8秒を超える動画 | 拒否せず、最初の8秒をくり返し再生。切り出し画面はまだない | `components/jupiter/PostCircle.tsx` |
-| P-JUP-4 | ✏️ | 枝・実・加工 | 枝は4つ固定（旅行・ごはん・おさんぽ・おまつり：絵に描かれた札）。「実」は数字だけ。加工は5種類の色フィルター＋ひとこと | `lib/jupiter/residents.ts`、`lib/jupiter/state.ts` |
+| P-JUP-2 | ✏️ | 木星のデータ（サーバー接続済み 2026-10-07） | /jupiter はサーバーにつながった：根っこ（自分だけ）・投稿（88時間蝶→葉っぱ）・空（みんな／フォロー／ダチ、1人1匹）・木（葉／実＝もらった☆／トモダチ＝相互フォロー）・フォロー（土星と同じフォロー）・☆・探す（名前検索）。写真は WebP、動画は8秒に切って MP4＋ポスター画像。仮：みんなの空は、本物の蝶が8匹に満たないぶんサンプル住人12人で埋める（フォロー・ダチには出さない）。並び順は新しい順。5日目のチュートリアルは今まで通りこの端末だけで動く | `apps/api/src/jupiter/`、`apps/api/drizzle/0013_jupiter.sql`、`components/jupiter/PatapataWorld.tsx`、`lib/jupiter/residents.ts` |
+| P-JUP-3 | ✏️ | 8秒を超える動画 | サーバーで最初の8秒に切って保存（/jupiter）。チュートリアル（端末だけ）は最初の8秒をくり返し再生。切り出す場所を選ぶ画面はまだない | `apps/api/src/media/media.service.ts`、`components/jupiter/PostCircle.tsx` |
+| P-JUP-4 | ✏️ | 枝・実・加工 | 枝は4つ（最初は旅行・ごはん・おさんぽ・おまつり）。木の札をタップすると自分の木の枝の名前を変えられる（8文字まで。木の絵に描かれた札の上に、コードで描いた札を重ねている）。「実」＝木星の投稿にもらった☆の数（仮）。加工は5種類の色フィルター＋ひとこと（マイク入力可） | `components/jupiter/PatapataWorld.tsx`、`apps/api/src/jupiter/jupiter.service.ts` |
+| P-JUP-5 | ✏️ | 🦋 蝶を描いてもらう（Gemini） | クライアント依頼 2026-10-07（新しい絵は Gemini で）：自分の木の「🦋 蝶を描いてもらう」で、言葉（＋参考の絵／土星のキャラ／ネオの姿）から、パタパタの蝶の絵柄（モックの蝶8匹をまとめた見本 `assets/butterfly-style.jpg`）で2案を描く→白背景を切り抜いて透明PNG→選ぶと自分の蝶になる。1日3回（土星のキャラとは別に数える）。描いた蝶がない人は、土星のキャラ（なければネオの姿・紋章）に羽をつけて飛ぶ。この作業環境からは Gemini を呼べないため、本物の絵は本番で確認が必要 | `apps/api/src/look/look.service.ts`、`packages/ai/src/images.ts`（`butterflyPrompt`）、`components/puni/PuniPicMaker.tsx` |
 | P-VOICE-1 | ✏️ | ネオの声（読み上げ）※土星の投稿からは廃止（2026-10-07） | 端末の読み上げ機能で、7つの読み方（元気に／ゆっくり／早口／低い声で／高い声で／ささやき風／叫ぶ風）× ネオの姿ごとの声の高さ。本物のささやき・叫びは出せないので「〜風」。将来は Gemini などの表現力のある音声生成をサーバーで行い、音声ファイルにする（読み方の種類はそのまま） | `packages/shared/src/neoVoice.ts`、`apps/web/lib/audio.ts` |
 | P-SAT-3 | ✏️ | ころりんのアイコンの絵 | 丸い体＋顔＋ネオの姿のバッジ（SVGの仮絵） | `components/saturn/BallAvatar.tsx` |
 | P-SAT-4 | ✏️ | ころりんのサンプル住人 | 投稿が少ないうちは12人のサンプル住人で賑やかに見せる（声はブラウザの読み上げ） | `lib/saturnResidents.ts` |

@@ -55,3 +55,10 @@ export const MEDIA_POLICY = {
   },
   photo: { maxSide: 1600, quality: 80, maxUploadBytes: 25 * 1024 * 1024 },
 } as const;
+
+/** Jupiter: a post flies as a butterfly this long, then becomes a leaf on the tree. */
+export const JUPITER_FLY_HOURS = 88;
+/** Jupiter videos are cut to 8 seconds (client, 2026-10-05). */
+export const JUPITER_VIDEO_SECONDS = 8;
+/** The four branches every tree starts with (renamable). */
+export const JUPITER_DEFAULT_BRANCHES = ['旅行', 'ごはん', 'おさんぽ', 'おまつり'];

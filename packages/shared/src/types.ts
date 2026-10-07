@@ -32,6 +32,8 @@ export interface Me {
   look: PuniLook | null;
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
   puniPic: string | null;
+  /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */
+  butterfly: string | null;
   createdAt: string;
 }
 
@@ -314,4 +316,65 @@ export interface PuniPicResult {
   candidates: { id: string; url: string }[];
   /** tries left today */
   left: number;
+}
+
+// --- Jupiter (パタパタ, docs/jupiter.md) ------------------------------------------------------------
+
+/** Someone on Jupiter: how their butterfly is drawn. */
+export interface JupiterAuthor {
+  id: string;
+  handle: string;
+  displayName: string;
+  neoForm?: string | null;
+  /** painted butterfly (🦋 蝶を描いてもらう) */
+  butterfly?: string | null;
+  /** their Saturn character, shown with wings when there is no painted butterfly */
+  pic?: string | null;
+}
+
+/** A private 根っこ item: everything you add lands here first. */
+export interface JupiterRootView {
+  id: string;
+  kind: 'photo' | 'video';
+  url: string;
+  posterUrl: string | null;
+  createdAt: string;
+}
+
+export interface JupiterPostView {
+  id: string;
+  author: JupiterAuthor;
+  kind: 'photo' | 'video';
+  url: string;
+  posterUrl: string | null;
+  text: string;
+  filter: string;
+  /** branch slot 0–3 on the owner's tree */
+  branch: number;
+  starCount: number;
+  starredByMe: boolean;
+  createdAt: string;
+}
+
+/** One butterfly in the sky: a person and their posts of the last 88 hours (newest first). */
+export interface JupiterFlyer {
+  author: JupiterAuthor;
+  posts: JupiterPostView[];
+}
+
+/** Someone's tree (profile). */
+export interface JupiterTreeView {
+  author: JupiterAuthor;
+  /** the four branch names (signs on the tree) */
+  branches: string[];
+  /** posts that finished flying (older than 88 hours), newest first */
+  leaves: JupiterPostView[];
+  /** still flying */
+  flying: JupiterPostView[];
+  /** 実: stars received on Jupiter posts */
+  fruits: number;
+  /** トモダチ: mutual follows */
+  friends: number;
+  followedByMe: boolean;
+  isMe: boolean;
 }

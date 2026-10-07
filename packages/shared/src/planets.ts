@@ -33,7 +33,7 @@ export const PLANETS: Record<PlanetId, PlanetMeta> = {
   earth: { id: 'earth', emoji: '🌍', route: '/earth', colors: ['#7fd3ff', '#1d4fa8'], size: 1, demo: 'live' },
   moon: { id: 'moon', emoji: '🌙', route: '/moon', colors: ['#fdfbf2', '#9b9a94'], size: 0.62, demo: 'live' },
   saturn: { id: 'saturn', emoji: '🪐', route: '/saturn', colors: ['#f6e3b4', '#b88a4a'], size: 0.78, ring: true, demo: 'live' },
-  jupiter: { id: 'jupiter', emoji: '🟤', route: '/jupiter', colors: ['#f0c9a0', '#8a5530'], size: 0.86, demo: 'mock' },
+  jupiter: { id: 'jupiter', emoji: '🟤', route: '/jupiter', colors: ['#f0c9a0', '#8a5530'], size: 0.86, demo: 'live' },
   mercury: { id: 'mercury', emoji: '💧', route: '/mercury', colors: ['#c9f1ff', '#3d8fb8'], size: 0.62, demo: 'mock' },
   venus: { id: 'venus', emoji: '🟡', route: '/venus', colors: ['#fff3a8', '#d1a316'], size: 0.72, demo: 'mock' },
   mars: { id: 'mars', emoji: '🔥', route: '/mars', colors: ['#ffb38a', '#b8341b'], size: 0.66, demo: 'mock' },

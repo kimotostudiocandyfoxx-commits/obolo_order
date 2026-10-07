@@ -6,7 +6,10 @@ import { FILTERS, useBlobUrl, VIDEO_MAX_SECONDS, type FilterId, type MediaKind }
 
 export interface CircleMedia {
   kind: MediaKind;
-  blobId?: string;
+  /** https:// (uploaded) or idb:<id> (kept in this browser) */
+  url?: string;
+  /** a still for videos */
+  poster?: string | null;
   sample?: { emoji: string; hue: number };
 }
 
@@ -25,7 +28,8 @@ export function PostCircle({
   /** play videos (otherwise the first frame) */
   live?: boolean;
 }) {
-  const url = useBlobUrl(media.blobId);
+  const local = useBlobUrl(media.url?.startsWith('idb:') ? media.url.slice(4) : undefined);
+  const url = media.url?.startsWith('idb:') ? local : (media.url ?? null);
   const video = useRef<HTMLVideoElement>(null);
   const css = FILTERS.find((f) => f.id === filter)?.css ?? 'none';
 
@@ -49,6 +53,7 @@ export function PostCircle({
             playsInline
             loop
             preload="metadata"
+            poster={media.poster ?? undefined}
             className="h-full w-full object-cover"
             onTimeUpdate={(e) => {
               // 8-second limit: longer clips loop their first 8 seconds

@@ -6,6 +6,13 @@ import {
   MONTHLY_GRANT_MANA,
   neoVoiceUrl,
   SATURN_LIFETIME_HOURS,
+  JUPITER_DEFAULT_BRANCHES,
+  JUPITER_FLY_HOURS,
+  type JupiterAuthor,
+  type JupiterFlyer,
+  type JupiterPostView,
+  type JupiterRootView,
+  type JupiterTreeView,
   type BuddyMessageView,
   type BuddyPersona,
   type InviteView,
@@ -61,6 +68,10 @@ interface DemoState {
   pendingCodes: Record<string, string>;
   /** Saturn follows: follower id → followee ids */
   follows?: Record<string, string[]>;
+  /** Jupiter (パタパタ): roots, posts, branch names — this browser only */
+  jroots?: (JupiterRootView & { owner: string })[];
+  jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe'> & { owner: string; starredBy: string[] })[];
+  jbranches?: Record<string, string[]>;
   /** ひろば (みんな map) and who joined them */
   plazas?: { id: string; name: string; icon: string; members: string[]; base: number }[];
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
@@ -556,6 +567,7 @@ export class DemoApi implements Api {
       voices: { self: false, bati: false },
       look: null,
       puniPic: null,
+      butterfly: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
       createdAt: now(),
     };
@@ -655,6 +667,123 @@ export class DemoApi implements Api {
     const url = mediaId ? this.lookCache.find((x) => x.id === mediaId)?.url : null;
     if (mediaId && !url) throw new ApiError(404, 'NOT_FOUND', 'not found');
     return this.patchMe(() => ({ puniPic: url ?? null }));
+  }
+
+  // demo: the butterflies cut from the Jupiter mock stand in for painted candidates
+  async butterflyCandidates(): Promise<PuniPicResult> {
+    await sleep(900);
+    const all = ['kitsune', 'usagi', 'onigiri', 'pen_lady', 'wani_queen', 'samurai806'].sort(() => Math.random() - 0.5).slice(0, 2);
+    const candidates = all.map((n) => ({ id: uid(), url: `/onboarding/bf-${n}.webp` }));
+    this.lookCache.push(...candidates);
+    return { candidates, left: 99 };
+  }
+
+  async chooseButterfly(mediaId: string | null) {
+    const url = mediaId ? this.lookCache.find((x) => x.id === mediaId)?.url : null;
+    if (mediaId && !url) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return this.patchMe(() => ({ butterfly: url ?? null }));
+  }
+
+  // --- Jupiter (demo: only the visitor; the sample residents are drawn by the screen) ---
+  private jAuthor(id: string): JupiterAuthor {
+    const u = this.s.users[id];
+    return { id, handle: u?.handle ?? 'neo', displayName: u?.displayName ?? 'NEO', neoForm: u?.neoForm ?? null, butterfly: u?.butterfly ?? null, pic: u?.puniPic ?? null };
+  }
+
+  private jView(p: NonNullable<DemoState['jposts']>[number], viewer: string): JupiterPostView {
+    const { owner, starredBy, ...rest } = p;
+    return { ...rest, author: this.jAuthor(owner), starredByMe: starredBy.includes(viewer) };
+  }
+
+  async jupiterSky(tab: 'all' | 'following' | 'friends') {
+    const viewer = this.uid();
+    const f = this.s.follows ?? {};
+    const since = Date.now() - JUPITER_FLY_HOURS * 3600_000;
+    const ok = (o: string) => tab === 'all' || o === viewer || (tab === 'following' ? (f[viewer] ?? []).includes(o) : (f[viewer] ?? []).includes(o) && (f[o] ?? []).includes(viewer));
+    const flying = (this.s.jposts ?? []).filter((p) => new Date(p.createdAt).getTime() > since && ok(p.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const by = new Map<string, JupiterFlyer>();
+    for (const p of flying) {
+      const fl = by.get(p.owner) ?? { author: this.jAuthor(p.owner), posts: [] };
+      fl.posts.push(this.jView(p, viewer));
+      by.set(p.owner, fl);
+    }
+    return [...by.values()];
+  }
+
+  async jupiterRoots() {
+    const viewer = this.uid();
+    return (this.s.jroots ?? []).filter((r) => r.owner === viewer).map(({ owner: _o, ...r }) => r);
+  }
+
+  async addJupiterRoot(body: Parameters<Api['addJupiterRoot']>[0]) {
+    const viewer = this.uid();
+    const r = { id: uid(), kind: body.kind, url: `idb:${body.mediaId}`, posterUrl: null, createdAt: now(), owner: viewer };
+    this.s.jroots = [r, ...(this.s.jroots ?? [])];
+    this.save();
+    const { owner: _o, ...view } = r;
+    return view;
+  }
+
+  async removeJupiterRoot(id: string) {
+    const viewer = this.uid();
+    this.s.jroots = (this.s.jroots ?? []).filter((r) => !(r.id === id && r.owner === viewer));
+    this.save();
+  }
+
+  async createJupiterPost(body: Parameters<Api['createJupiterPost']>[0]) {
+    const viewer = this.uid();
+    const root = (this.s.jroots ?? []).find((r) => r.id === body.rootId && r.owner === viewer);
+    if (!root) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    const p = { id: uid(), owner: viewer, kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text ?? '', filter: body.filter ?? 'none', branch: body.branch, starCount: 0, starredBy: [], createdAt: now() };
+    this.s.jposts = [p, ...(this.s.jposts ?? [])];
+    this.save();
+    return this.jView(p, viewer);
+  }
+
+  async starJupiterPost(id: string, on: boolean) {
+    const viewer = this.uid();
+    const p = (this.s.jposts ?? []).find((x) => x.id === id);
+    if (!p) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    const has = p.starredBy.includes(viewer);
+    if (on && !has) p.starredBy.push(viewer);
+    if (!on && has) p.starredBy = p.starredBy.filter((x) => x !== viewer);
+    p.starCount = p.starredBy.length;
+    this.save();
+    return { starCount: p.starCount, starredByMe: on };
+  }
+
+  async jupiterTree(userId: string): Promise<JupiterTreeView> {
+    const viewer = this.uid();
+    const since = Date.now() - JUPITER_FLY_HOURS * 3600_000;
+    const mine = (this.s.jposts ?? []).filter((p) => p.owner === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const f = this.s.follows ?? {};
+    return {
+      author: this.jAuthor(userId),
+      branches: JUPITER_DEFAULT_BRANCHES.map((d, i) => this.s.jbranches?.[userId]?.[i] || d),
+      leaves: mine.filter((p) => new Date(p.createdAt).getTime() <= since).map((p) => this.jView(p, viewer)),
+      flying: mine.filter((p) => new Date(p.createdAt).getTime() > since).map((p) => this.jView(p, viewer)),
+      fruits: mine.reduce((n, p) => n + p.starCount, 0),
+      friends: (f[userId] ?? []).filter((o) => (f[o] ?? []).includes(userId)).length,
+      followedByMe: (f[viewer] ?? []).includes(userId),
+      isMe: viewer === userId,
+    };
+  }
+
+  async renameJupiterBranch(index: number, name: string) {
+    const viewer = this.uid();
+    this.s.jbranches ??= {};
+    const next = JUPITER_DEFAULT_BRANCHES.map((d, i) => this.s.jbranches?.[viewer]?.[i] || d);
+    next[index] = name.trim().slice(0, 8);
+    this.s.jbranches[viewer] = next;
+    this.save();
+    return { branches: next };
+  }
+
+  async searchJupiter(q: string) {
+    const t = q.trim().toLowerCase();
+    return Object.keys(this.s.users)
+      .filter((id) => !t || `${this.s.users[id].displayName} ${this.s.users[id].handle}`.toLowerCase().includes(t))
+      .map((id) => this.jAuthor(id));
   }
 
   async batiEgg(food: string) {

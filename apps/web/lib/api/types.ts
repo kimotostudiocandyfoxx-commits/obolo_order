@@ -3,7 +3,13 @@ import type {
   BuddyMessageView,
   BuddyProfileView,
   BuddyQuotaView,
+  CreateJupiterPostBody,
   CreatePlazaBody,
+  JupiterAuthor,
+  JupiterFlyer,
+  JupiterPostView,
+  JupiterRootView,
+  JupiterTreeView,
   CreateSaturnPostBody,
   InviteView,
   Locale,
@@ -143,6 +149,21 @@ export interface Api {
   puniPicCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   /** Pick a candidate as your Saturn character (null = back to the code-drawn look). */
   choosePuniPic(mediaId: string | null): Promise<Me>;
+  /** Jupiter: 🦋 蝶を描いてもらう (2 painted candidates, 3 tries a day) */
+  butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
+  chooseButterfly(mediaId: string | null): Promise<Me>;
+
+  // Jupiter — パタパタ
+  jupiterSky(tab: 'all' | 'following' | 'friends'): Promise<JupiterFlyer[]>;
+  jupiterRoots(): Promise<JupiterRootView[]>;
+  /** after POST /media/photo or /media/video?max=8 */
+  addJupiterRoot(body: { mediaId: string; kind: 'photo' | 'video'; posterUrl?: string }): Promise<JupiterRootView>;
+  removeJupiterRoot(id: string): Promise<void>;
+  createJupiterPost(body: CreateJupiterPostBody): Promise<JupiterPostView>;
+  starJupiterPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;
+  jupiterTree(userId: string): Promise<JupiterTreeView>;
+  renameJupiterBranch(index: number, name: string): Promise<{ branches: string[] }>;
+  searchJupiter(q: string): Promise<JupiterAuthor[]>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;

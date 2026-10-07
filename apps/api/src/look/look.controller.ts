@@ -61,6 +61,20 @@ export class LookController {
     return this.look.choosePuniPic(userId, parseBody(ChoosePuniPicBody, body).mediaId);
   }
 
+  /** Jupiter butterfly: 2 painted candidates (3 tries a day, P-JUP-5). */
+  @Post('butterfly/candidates')
+  @HttpCode(200)
+  async butterfly(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    await rateLimit(this.kv, `puni-pic:${userId}`, 4, 60);
+    return this.look.puniPicCandidates(userId, parseBody(PuniPicBody, body), origin(req), this.admin(token), 'butterfly');
+  }
+
+  @Post('butterfly')
+  @HttpCode(200)
+  chooseButterfly(@UserId() userId: string, @Body() body: unknown) {
+    return this.look.chooseButterfly(userId, parseBody(ChoosePuniPicBody, body).mediaId);
+  }
+
   @Post('bati/egg')
   @HttpCode(200)
   egg(@UserId() userId: string, @Body() body: unknown) {

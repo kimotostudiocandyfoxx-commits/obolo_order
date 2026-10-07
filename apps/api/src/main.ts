@@ -27,6 +27,7 @@ async function bootstrap() {
   // the NEO look can start from a reference image (sent once, never stored)
   app.use('/me/look', express.json({ limit: '3mb' }));
   app.use('/me/puni/pic/candidates', express.json({ limit: '8mb' }));
+  app.use('/me/butterfly/candidates', express.json({ limit: '8mb' }));
   // voice registration sends one recording (base64)
   app.use('/voice/register', express.json({ limit: '8mb' }));
   // Stripe signs the exact bytes it sends

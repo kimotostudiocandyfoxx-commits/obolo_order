@@ -12,7 +12,7 @@ export function JupiterView() {
       <DemoBanner />
       <RequireAuth>
         <div className="h-[calc(100svh-56px-env(safe-area-inset-top))]">
-          <PatapataWorld />
+          <PatapataWorld live />
         </div>
       </RequireAuth>
     </PlanetShell>

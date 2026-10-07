@@ -193,6 +193,39 @@ export class HttpApi implements Api {
   puniPicCandidates(body: Parameters<Api['puniPicCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['puniPicCandidates']>>>('POST', '/me/puni/pic/candidates', body);
   }
+  butterflyCandidates(body: Parameters<Api['butterflyCandidates']>[0]) {
+    return this.req<Awaited<ReturnType<Api['butterflyCandidates']>>>('POST', '/me/butterfly/candidates', body);
+  }
+  chooseButterfly(mediaId: string | null) {
+    return this.req<Awaited<ReturnType<Api['chooseButterfly']>>>('POST', '/me/butterfly', { mediaId });
+  }
+  jupiterSky(tab: 'all' | 'following' | 'friends') {
+    return this.req<Awaited<ReturnType<Api['jupiterSky']>>>('GET', `/jupiter/sky${tab === 'all' ? '' : `?tab=${tab}`}`);
+  }
+  jupiterRoots() {
+    return this.req<Awaited<ReturnType<Api['jupiterRoots']>>>('GET', '/jupiter/roots');
+  }
+  addJupiterRoot(body: Parameters<Api['addJupiterRoot']>[0]) {
+    return this.req<Awaited<ReturnType<Api['addJupiterRoot']>>>('POST', '/jupiter/roots', body);
+  }
+  async removeJupiterRoot(id: string) {
+    await this.req<void>('DELETE', `/jupiter/roots/${id}`);
+  }
+  createJupiterPost(body: Parameters<Api['createJupiterPost']>[0]) {
+    return this.req<Awaited<ReturnType<Api['createJupiterPost']>>>('POST', '/jupiter/posts', body);
+  }
+  starJupiterPost(id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['starJupiterPost']>>>(on ? 'POST' : 'DELETE', `/jupiter/posts/${id}/star`);
+  }
+  jupiterTree(userId: string) {
+    return this.req<Awaited<ReturnType<Api['jupiterTree']>>>('GET', `/jupiter/trees/${userId}`);
+  }
+  renameJupiterBranch(index: number, name: string) {
+    return this.req<Awaited<ReturnType<Api['renameJupiterBranch']>>>('PUT', '/jupiter/branches', { index, name });
+  }
+  searchJupiter(q: string) {
+    return this.req<Awaited<ReturnType<Api['searchJupiter']>>>('GET', `/jupiter/users?q=${encodeURIComponent(q.trim())}`);
+  }
   choosePuniPic(mediaId: string | null) {
     return this.req<Awaited<ReturnType<Api['choosePuniPic']>>>('POST', '/me/puni/pic', { mediaId });
   }

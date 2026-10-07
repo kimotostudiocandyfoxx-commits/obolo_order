@@ -98,6 +98,25 @@ export function refineLookPrompt(instruction: string): string {
  * so the server can cut it out. The body must be one round ball filling the frame — it is warped
  * as a soft body in the app.
  */
+/**
+ * Jupiter butterfly (client request 2026-10-07: new art is made with Gemini): a cute chibi
+ * character with butterfly wings, in the style of the client's パタパタ butterflies (style sheet).
+ */
+export function butterflyPrompt(description: string, hasReference: boolean, variant: number): string {
+  const moods = ['happy and smiling', 'calm and gentle', 'proud and cheerful', 'shy with a soft smile'];
+  return (
+    'Draw ONE cute chibi character with butterfly wings, in exactly the art style of the FIRST attached image (the style sheet): ' +
+    'soft hand-painted storybook illustration, warm muted colours, a round chubby little body standing upright, a big head, ' +
+    'small shiny eyes, pink blush, two curly antennae on top, and two big rounded butterfly wings spread behind the body with ' +
+    'pretty patterns that match the character (flowers, moons, stars, swirls). Outfit and accessories match the concept. ' +
+    `Character concept: "${description}". Mood: ${moods[variant % moods.length]}. ` +
+    (hasReference ? 'Use the SECOND attached image as the character to turn into this butterfly (keep its colours, face and motifs). ' : '') +
+    'Composition: front view, the whole character and both wings fully visible and centered, filling about 85% of a square frame. ' +
+    'Background: plain flat pure white (#FFFFFF), no ground, no shadow, no other objects. No text, no letters, no logo, no watermark. ' +
+    ORIGINAL
+  );
+}
+
 export function puniPicPrompt(description: string, hasReference: boolean, variant: number): string {
   const moods = ['happy and smiling', 'cheerful with a tiny wink feel', 'sleepy and calm', 'excited'];
   return (

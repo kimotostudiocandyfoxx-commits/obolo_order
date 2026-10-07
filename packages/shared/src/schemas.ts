@@ -139,6 +139,8 @@ export const PuniPicBody = z.object({
   reference: z.object({ mime: z.string().regex(/^image\//).max(60), data: z.string().min(100).max(6_000_000) }).optional(),
   /** use the member's OBOLO NEO look as the reference */
   useNeoLook: z.boolean().optional(),
+  /** Jupiter butterfly: use the member's Saturn character as the reference */
+  useSaturnPic: z.boolean().optional(),
 });
 export type PuniPicBody = z.infer<typeof PuniPicBody>;
 
@@ -292,3 +294,24 @@ export const CreatePlazaBody = z.object({
   icon: z.enum(PLAZA_ICONS),
 });
 export type CreatePlazaBody = z.infer<typeof CreatePlazaBody>;
+
+// --- Jupiter ----------------------------------------------------------------------------------------
+
+/** Put an uploaded photo / video (POST /media/photo, /media/video?max=8) into your 根っこ. */
+export const JupiterRootBody = z.object({ mediaId: z.string().uuid(), kind: z.enum(['photo', 'video']), posterUrl: z.string().url().max(500).optional() });
+export type JupiterRootBody = z.infer<typeof JupiterRootBody>;
+
+export const JUPITER_FILTERS = ['none', 'warm', 'sepia', 'mono', 'soft'] as const;
+
+/** A round post made from one of your roots. */
+export const CreateJupiterPostBody = z.object({
+  rootId: z.string().uuid(),
+  text: z.string().trim().max(30).default(''),
+  filter: z.enum(JUPITER_FILTERS).default('none'),
+  branch: z.number().int().min(0).max(3),
+});
+export type CreateJupiterPostBody = z.infer<typeof CreateJupiterPostBody>;
+
+/** Rename one of the four branches on your tree. */
+export const JupiterBranchBody = z.object({ index: z.number().int().min(0).max(3), name: z.string().trim().min(1).max(8) });
+export type JupiterBranchBody = z.infer<typeof JupiterBranchBody>;

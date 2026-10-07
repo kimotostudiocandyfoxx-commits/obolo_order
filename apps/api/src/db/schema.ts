@@ -45,6 +45,10 @@ export const users = pgTable(
     lookJson: jsonb('look_json').$type<PuniLook>(),
     /** the painted ぷにぷに picture (AI, transparent PNG on Bunny) */
     puniPicUrl: text('puni_pic_url'),
+    /** Jupiter: painted butterfly (PNG on Bunny) */
+    butterflyUrl: text('butterfly_url'),
+    /** Jupiter: the four branch names on the tree (null = the defaults) */
+    jupiterBranches: jsonb('jupiter_branches').$type<string[]>(),
     birthdate: date('birthdate'),
     country: text('country').notNull().default('JP'),
     locale: text('locale').notNull().default('ja'),
@@ -226,6 +230,44 @@ export const saturnPosts = pgTable(
     index('saturn_posts_user_idx').on(t.userId, t.createdAt),
     index('saturn_posts_reply_idx').on(t.replyToId, t.createdAt),
   ],
+);
+
+/** Jupiter 根っこ: a member's private folder of photos / videos (docs/jupiter.md). */
+export const jupiterRoots = pgTable(
+  'jupiter_roots',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    mediaId: uuid('media_id').references(() => mediaObjects.id),
+    kind: text('kind').notNull(), // photo | video
+    url: text('url').notNull(),
+    posterUrl: text('poster_url'),
+    ...timestamps,
+  },
+  (t) => [index('jupiter_roots_user_idx').on(t.userId, t.createdAt)],
+);
+
+/** Jupiter posts: a butterfly for 88 hours, then a leaf on the owner's tree. */
+export const jupiterPosts = pgTable(
+  'jupiter_posts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    rootId: uuid('root_id').references(() => jupiterRoots.id),
+    kind: text('kind').notNull(),
+    url: text('url').notNull(),
+    posterUrl: text('poster_url'),
+    text: text('text').notNull().default(''),
+    filter: text('filter').notNull().default('none'),
+    branch: integer('branch').notNull().default(0),
+    starCount: integer('star_count').notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index('jupiter_posts_created_idx').on(t.createdAt), index('jupiter_posts_user_idx').on(t.userId, t.createdAt)],
 );
 
 /** ひろば: Saturn's みんな map is made of these (client decision 2026-10-07). */

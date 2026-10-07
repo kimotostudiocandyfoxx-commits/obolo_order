@@ -4,12 +4,14 @@ import { spriteUrl } from '@/lib/onboarding/media';
 
 /**
  * A butterfly in the sky: the resident's cut-out art (from the client's パタパタ mock) or, for
- * anyone without art (e.g. the visitor's OBOLO NEO), their emblem between two flapping wings.
+ * anyone without art, their picture (Saturn character / OBOLO NEO) or emblem between two flapping
+ * wings. Members can have their own butterfly painted (🦋 蝶を描いてもらう).
  */
-export function Butterfly({ art, emoji, img, wing = '#e9b98a', size }: { art?: string; emoji?: string; img?: string | null; wing?: string; size: number }) {
-  if (art) {
+export function Butterfly({ art, src, emoji, img, wing = '#e9b98a', size }: { art?: string; src?: string | null; emoji?: string; img?: string | null; wing?: string; size: number }) {
+  // a painted butterfly: the mock's cut-outs (art) or one painted for the member (src)
+  if (art || src) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={spriteUrl(art)} alt="" draggable={false} style={{ width: size }} className="pointer-events-none select-none drop-shadow-[0_8px_14px_rgba(120,80,40,0.25)]" />;
+    return <img src={src || spriteUrl(art!)} alt="" draggable={false} style={{ width: size }} className="pointer-events-none select-none drop-shadow-[0_8px_14px_rgba(120,80,40,0.25)]" />;
   }
   return (
     <div className="relative" style={{ width: size, height: size * 0.82 }}>
