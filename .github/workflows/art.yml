@@ -40,13 +40,19 @@ jobs:
           # needs: gcloud secrets add-iam-policy-binding obolo-gemini-api-key --member=serviceAccount:<deploy SA> --role=roles/secretmanager.secretAccessor
           export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key)"
           node scripts/art/generate.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: art-out
+          path: art/out
+          if-no-files-found: ignore
       - name: Save the results to the branch
         if: always()
         run: |
           git config user.name "art-workshop"
           git config user.email "art-workshop@users.noreply.github.com"
           mkdir -p art/out
-          git add art/out
+          git add -f art/out
           git diff --cached --quiet && exit 0
           git commit -m "Art workshop: new images / videos [skip ci]"
           for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
