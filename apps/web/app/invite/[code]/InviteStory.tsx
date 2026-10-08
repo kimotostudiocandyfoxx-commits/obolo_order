@@ -17,7 +17,7 @@ import { clearDay1, loadDay1, saveDay1, type SavedDay1 } from '@/lib/onboarding/
 export function InviteStory({ code }: { code: string }) {
   const { m } = useI18n();
   const router = useRouter();
-  const { status, me, signIn, setMe } = useAuth();
+  const { status, me, signIn, setMe, signOut } = useAuth();
   const [invite, setInvite] = useState<InviteView | null>(null);
   const [error, setError] = useState<'invalid' | 'used' | 'expired' | 'member' | null>(null);
   const [saved, setSaved] = useState<SavedDay1 | null | undefined>(undefined);
@@ -112,6 +112,24 @@ export function InviteStory({ code }: { code: string }) {
       <div className="flex min-h-svh flex-col items-center justify-center gap-4 px-8 text-center">
         <p className="text-lg font-bold">{title}</p>
         {error === 'used' && <p className="text-sm text-white/60">{m.gate.usedLead}</p>}
+        {error === 'member' && me && (
+          // this device is logged in as someone else: the invited person logs out here first
+          <div className="max-w-sm rounded-2xl border border-white/15 bg-white/5 p-4 text-sm text-white/75">
+            <p>
+              この端末は <b className="text-white">{me.displayName || me.handle}</b>（{me.email}）でログインしています。
+            </p>
+            <p className="mt-2">招待された人として始めるときは、ログアウトしてから招待を受け取ってください。</p>
+            <button
+              onClick={() => {
+                setError(null);
+                void signOut();
+              }}
+              className="btn mt-3 w-full bg-amber-500 text-black"
+            >
+              ログアウトして招待を受け取る
+            </button>
+          </div>
+        )}
         <Link href={error === 'member' ? '/' : '/earth'} className="btn btn-primary">
           {error === 'member' ? m.gate.toHome : m.gate.member}
         </Link>
