@@ -201,5 +201,103 @@
     "aspect": "1:1",
     "count": 2,
     "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. Inside a cosy film studio on Mars: a big round window showing the red planet and stars, curved control desks with knobs and small screens, film reels, a vintage movie camera on a tripod, warm orange and violet lights, a round empty stage platform in the centre-left where a character will stand, and a wide empty wall area in the centre-right for movie frames. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders. Screens show only abstract colours."
+  },
+  {
+    "id": "s-bg-v1",
+    "kind": "image",
+    "aspect": "9:16",
+    "count": 2,
+    "prompt": "Art style (Saturn, the voice plazas): SOFT AIRBRUSHED PASTEL illustration — smooth dreamy gradients, gentle glow, very simple shapes, a palette of lavender, violet, candy pink and soft peach with tiny white stars. A tall phone background: a huge pastel Saturn with wide glowing rings sweeping diagonally across the upper part of a lavender-to-pink starry sky, soft clouds of stardust, lots of calm open space in the middle and bottom for content. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "j-bg-v1",
+    "kind": "image",
+    "aspect": "9:16",
+    "count": 2,
+    "prompt": "Art style (Jupiter, butterflies and stickers): CUT-PAPER COLLAGE — layered torn and cut paper shapes with soft paper texture and gentle shadows between layers, a warm palette of cream, peach, apricot, sage green and sky blue. A tall phone background: a soft paper sky with layered paper clouds, a big pale paper sun, tall paper trees with round leafy crowns along the left and right edges, little paper flowers and grass along the bottom — a wide calm open area in the middle for butterflies. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "moon-bg-v1",
+    "kind": "image",
+    "aspect": "9:16",
+    "count": 2,
+    "prompt": "Art style (the Moon, chatting with Bati): CHALK PASTEL ON DARK PAPER — soft chalky strokes, grainy texture, a palette of deep navy-black, silver grey, pale moon yellow and a hint of blue. A tall phone background: a deep starry night sky filling most of the picture (dark and calm, for chat bubbles on top), a small blue Earth rising near the top right, and the grey cratered surface of the Moon curving along the very bottom. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "earth-bg-v1",
+    "kind": "image",
+    "aspect": "9:16",
+    "count": 2,
+    "prompt": "Art style (Earth, home): NIGHT WATERCOLOUR — loose wet-on-wet washes, soft blooms of colour, deep blue and indigo with warm golden city-light dots. A tall phone background: the night side of planet Earth seen from orbit, its curve filling the bottom third with golden city lights and thin cloud washes, a calm deep blue starry space above (dark, for content on top). No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-moon-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a big full moon over calm waves. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-sakura-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: falling cherry blossoms at night. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-ocean-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a glowing jellyfish in deep water. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-city-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a quiet city skyline with lit windows. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-forest-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: fireflies in a dark forest. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-candy-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: pastel candy clouds and stars. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-space-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a ringed planet and shooting stars. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-fire-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a warm campfire with sparks. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-rain-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: rain drops and a lantern. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-cover-dawn-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a sunrise over the sea. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
   }
 ]
