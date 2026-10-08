@@ -10,6 +10,24 @@ import { getApi } from '@/lib/api';
  */
 const pairKey = (a: string, b: string) => [a, b].sort().join('_');
 
+/**
+ * The Firebase web config as pasted into NEXT_PUBLIC_FIREBASE_CONFIG: JSON, or the snippet the
+ * Firebase console shows (`const firebaseConfig = { apiKey: "…", … };`) — both work.
+ */
+export function parseConfig(raw: string): Record<string, string> {
+  const body = raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
+  try {
+    return JSON.parse(body);
+  } catch {
+    const json = body
+      .replace(/^\s*\/\/.*$/gm, '')
+      .replace(/([{,]\s*)([A-Za-z0-9_]+)\s*:/g, '$1"$2":')
+      .replace(/'/g, '"')
+      .replace(/,\s*}/g, '}');
+    return JSON.parse(json);
+  }
+}
+
 type Stored = { id: string; senderId: string; recipientId: string; kind: string; text: string; audioUrl: string | null; createdAt: string };
 
 export async function listenConversation(configJson: string, myId: string, peerId: string, onNew: (m: DmMessage[]) => void): Promise<() => void> {
@@ -18,7 +36,7 @@ export async function listenConversation(configJson: string, myId: string, peerI
     import('firebase/auth'),
     import('firebase/firestore'),
   ]);
-  const app = getApps().find((a) => a.name === 'obolo-comms') ?? initializeApp(JSON.parse(configJson), 'obolo-comms');
+  const app = getApps().find((a) => a.name === 'obolo-comms') ?? initializeApp(parseConfig(configJson), 'obolo-comms');
   const auth = getAuth(app);
   if (auth.currentUser?.uid !== myId) {
     const { token } = await getApi().firebaseToken();
