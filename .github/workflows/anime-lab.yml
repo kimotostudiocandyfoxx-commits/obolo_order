@@ -1,0 +1,53 @@
+name: Anime lab
+
+# Experiment (client request 2026-10-08): SD 1.5 + an anime LoRA, merged, exported to ONNX and run
+# in ONNX Runtime on CPU — quality / speed / size for the Mars MV キメ絵. Results → art/lab/.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/solar-system-home-planets-ew766y]
+    paths: ['scripts/anime-lab/**', '.github/workflows/anime-lab.yml']
+
+concurrency:
+  group: anime-lab
+  cancel-in-progress: true
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Make disk room (the models take ~15 GB)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          df -h /
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          pip install --quiet "diffusers>=0.30" transformers peft accelerate safetensors huggingface_hub "optimum[onnxruntime]" pillow
+          pip list 2>/dev/null | grep -iE "^(torch|diffusers|transformers|peft|optimum|onnxruntime|onnx) "
+      - name: Test photos (picsum / Unsplash licence)
+        run: |
+          mkdir -p work/in
+          for id in 64 1005 1011 1025 1062; do curl -sfL -o work/in/p$id.jpg "https://picsum.photos/id/$id/768/768"; done
+          ls -la work/in
+      - name: Run
+        run: python scripts/anime-lab/lab.py
+      - name: Save the results to the branch
+        if: always()
+        run: |
+          git config user.name "anime-lab"
+          git config user.email "anime-lab@users.noreply.github.com"
+          mkdir -p art/lab
+          git add -f art/lab
+          git diff --cached --quiet && exit 0
+          git commit -m "Anime lab: results [skip ci]"
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
