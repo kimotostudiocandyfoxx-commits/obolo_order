@@ -11,7 +11,7 @@ import { MarsWorld } from './MarsWorld';
 type Wait = 'ufo' | 'studio' | 'locker' | 'release' | 'done';
 const STEPS: { text: string; wait: Wait; hint?: string }[] = [
   { text: 'とんでいるUFOには、ダチが88時間以内に撮った映像が乗っている。\nひとつタップして見てみろ。', wait: 'ufo', hint: '🛸 UFOをタップ' },
-  { text: 'いい映像だろう。\n次は、お前のスタジオだ。\n下の「スタジオ」を押してみろ。', wait: 'studio', hint: '👇「スタジオ」' },
+  { text: 'いい映像だろう。\n次は、お前のスタジオだ。\n下の「myスタジオ」を押してみろ。', wait: 'studio', hint: '👇「myスタジオ」' },
   { text: 'ここがお前のスタジオだ。\nまだ公開していない映像は、裏スタジオにしまってある。\n開けてみろ。', wait: 'locker', hint: '🔒「裏スタジオ」' },
   { text: '公開すると、UFOになって88時間、\nダチやフォロワーの星図をとぶ。\nやってみろ。', wait: 'release', hint: '🛸「公開する」' },
   { text: 'とび終えた映像は、スタジオに並ぶ。\n「スタジオを飾る」で、郊外か街中かも選べるぞ。\nこれが火星の遊び方だ。', wait: 'done' },

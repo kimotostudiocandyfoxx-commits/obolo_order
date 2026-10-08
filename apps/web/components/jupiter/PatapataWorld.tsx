@@ -432,7 +432,7 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
                 <span className="text-[10px] tracking-widest">たまご</span>
               </button>
               <button onClick={() => go({ v: 'tree', who: { kind: 'me' } })} className={`flex items-center gap-2 text-sm ${view.v === 'tree' ? 'font-bold' : ''}`}>
-                🌳 木
+                🌳 myツリー
               </button>
             </div>
           </nav>

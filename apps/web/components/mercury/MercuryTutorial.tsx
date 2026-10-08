@@ -12,7 +12,7 @@ type Wait = 'ship' | 'star' | 'island' | 'soil' | 'release' | 'done';
 const STEPS: { text: string; wait: Wait; hint?: string }[] = [
   { text: '海を渡っているのは、ダチの船だ。\n船には、88時間以内に作った曲が積まれてる。\nひとつタップしてみろ。', wait: 'ship', hint: '🚢 船をタップ' },
   { text: 'いい音だろう。曲が何曲かあれば、\n横にスワイプで次の曲だ。\n気に入ったら、星を贈れ。星は3段階だ。', wait: 'star', hint: '☆ をタップ' },
-  { text: '贈った星の曲は、お前の島の宝箱にたまる。\n下の「島」を押してみろ。', wait: 'island', hint: '👇「島」をタップ' },
+  { text: '次は、お前の島だ。\n下の「myアイランド」を押してみろ。', wait: 'island', hint: '👇「myアイランド」をタップ' },
   { text: 'これがお前の島だ。\n発表していないデモ曲は、島の土に埋まってる。\n掘ってみろ。', wait: 'soil', hint: '⛏ 土の中をタップ' },
   { text: '曲を出航させると、船になって\n88時間、ダチやフォロワーの海を渡る。\nやってみろ。', wait: 'release', hint: '🚢「出航させる」' },
   { text: '88時間の航海を終えた船は、島に戻ってきて\nレコードとして飾られる。\nこれが水星の遊び方だ。', wait: 'done' },

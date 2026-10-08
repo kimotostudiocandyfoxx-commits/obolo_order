@@ -477,8 +477,9 @@ export function KororinWorld({
           </span>
           <div className="flex items-center gap-2">
             {me && (
-              <button onClick={() => setProfileId(me.id)} className="flex h-11 w-11 items-center justify-center overflow-visible rounded-full border-[3px] border-white bg-[#4a3a6e] shadow-[0_3px_0_rgba(60,30,110,.35)]" aria-label="my page">
+              <button onClick={() => setProfileId(me.id)} className="relative flex h-11 w-11 items-center justify-center overflow-visible rounded-full border-[3px] border-white bg-[#4a3a6e] shadow-[0_3px_0_rgba(60,30,110,.35)]" aria-label="my page">
                 <PuniAvatar seed={me.id} neo={me.neoForm} look={me.look} pic={me.puniPic} size={34} />
+                <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-1.5 text-[10px] font-black leading-4 text-[#5a3f8a] shadow">myころりん</span>
               </button>
             )}
           </div>

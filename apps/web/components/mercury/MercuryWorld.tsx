@@ -329,7 +329,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
           作曲
         </button>
         <button onClick={() => go({ v: 'island', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'island' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🏝️</span>島
+          <span className="text-2xl">🏝️</span>myアイランド
         </button>
       </nav>
 
@@ -512,7 +512,7 @@ function IslandView({
         <div className="absolute inset-x-3 top-[calc(8px+env(safe-area-inset-top))] flex items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate rounded-full border-2 border-fuchsia-300/60 bg-[#0a1430]/85 px-4 py-1.5 text-[clamp(14px,3vw,22px)] font-black tracking-wider shadow-[0_0_16px_rgba(240,120,255,0.4)]">
-              {title.toUpperCase()} ISLAND
+              {isMe ? 'myアイランド' : `${title.toUpperCase()} ISLAND`}
             </p>
           </div>
           {action ?? (

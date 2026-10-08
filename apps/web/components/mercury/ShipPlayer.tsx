@@ -216,7 +216,7 @@ export function ShipPlayer({
               onClick={() => onOwner(flyer)}
               className="flex h-12 shrink-0 items-center gap-1 rounded-full border border-cyan-200/50 bg-black/45 px-3 text-xs font-bold text-cyan-100 backdrop-blur"
             >
-              🏝 {flyer.isMe ? '自分の島へ' : 'この人の島へ'}
+              🏝 {flyer.isMe ? 'myアイランドへ' : 'この人の島へ'}
             </button>
           )}
         </div>

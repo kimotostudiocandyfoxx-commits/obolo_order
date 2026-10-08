@@ -370,7 +370,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           撮影
         </button>
         <button onClick={() => go(live ? { v: 'live-studio', who: 'me' } : { v: 'studio', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'studio' || view.v === 'live-studio' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🎬</span>スタジオ
+          <span className="text-2xl">🎬</span>myスタジオ
         </button>
       </nav>
 
@@ -488,7 +488,7 @@ function StudioView({
         )}
         {/* our title + stats over the ones drawn on the art */}
         <div className="absolute flex flex-col items-center justify-center rounded-2xl border border-amber-400/60 bg-[#1c0d08]/95 text-center shadow-[0_0_24px_rgba(255,150,60,0.35)]" style={{ ...pct(st.title), containerType: 'inline-size' }}>
-          <p className="truncate px-2 text-[clamp(14px,9cqw,44px)] font-black tracking-wide text-amber-50">{title.toUpperCase()} STUDIO</p>
+          <p className="truncate px-2 text-[clamp(14px,9cqw,44px)] font-black tracking-wide text-amber-50">{isMe ? 'myスタジオ' : `${title.toUpperCase()} STUDIO`}</p>
           <p className="text-[clamp(9px,3.4cqw,15px)] text-white/75">
             {flyingCount ? '🛸 いま映像がとんでいます' : 'ようこそ'}
           </p>

@@ -18,7 +18,7 @@ const STEPS: { text: string; wait: Wait; hint?: string }[] = [
   { text: '次は君の番DA。\nたまごを押してみるのDA。', wait: 'egg', hint: '👇 たまごをタップ' },
   { text: 'ここは根っこ。君だけのデータフォルダDA。\n撮った写真は、まずここにしまわれるのDA。\n動画は、火星の裏スタジオにしまうのDA。\nひとつ選ぶのDA。', wait: 'pick', hint: '写真をひとつ選ぶ' },
   { text: '文字を入れたり、加工したりして、\n丸い投稿をつくるのDA。\nできたら投稿するのDA！', wait: 'post', hint: '👇「投稿する」' },
-  { text: '君の投稿が蝶になったのDA。\n88時間、みんなの空を飛ぶのDA。\n「木」をのぞいてみるのDA。', wait: 'tree', hint: '👇「木」をタップ' },
+  { text: '君の投稿が蝶になったのDA。\n88時間、みんなの空を飛ぶのDA。\n「myツリー」をのぞいてみるのDA。', wait: 'tree', hint: '👇「myツリー」をタップ' },
   { text: 'これが君の木DA。\n飛び終えた蝶は、葉っぱになって枝に戻るのDA。\n根っこには、君だけの思い出がたまっていくのDA。', wait: 'done' },
 ];
 

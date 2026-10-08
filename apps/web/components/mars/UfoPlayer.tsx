@@ -198,7 +198,7 @@ export function UfoPlayer({
           )}
           {onStudio && (
             <button onClick={() => onStudio(member)} className="flex h-11 shrink-0 items-center gap-1 rounded-full border border-amber-300/60 bg-black/50 px-3 text-xs font-bold text-amber-100 backdrop-blur">
-              🎬 {member.isMe ? '自分のスタジオへ' : 'この人のスタジオへ'}
+              🎬 {member.isMe ? 'myスタジオへ' : 'この人のスタジオへ'}
             </button>
           )}
         </div>
