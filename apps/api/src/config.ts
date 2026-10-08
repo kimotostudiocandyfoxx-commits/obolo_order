@@ -94,6 +94,11 @@ const Env = z.object({
   VAPID_PRIVATE_KEY: secret(),
   VAPID_SUBJECT: z.string().default('mailto:no-reply@example.com'),
 
+  /** Mars MV: Bati's edit planner (Gemini), the anime model (ONNX, PLACEHOLDER P-MV-2: unset = a light filter), and how many video frames may go through it per MV. */
+  MV_PLAN_MODEL: z.string().default('gemini-2.5-flash-lite'),
+  ANIME_ONNX_URL: secret(),
+  MV_ANIME_FRAMES: z.coerce.number().default(160),
+
   /** Fish Audio API (voices: registration, read-aloud, singing). Unset = voice features off. */
   FISH_API_KEY: secret(),
   /** PLACEHOLDER (P-VOICE-1): Fish Audio model name (client: s2.1-pro). */

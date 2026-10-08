@@ -131,6 +131,32 @@ export class MediaService {
     return { id, url, mime, sizeBytes: data.length };
   }
 
+  /** Keep a file the server made for the user (an MV, its poster…). */
+  storeGenerated(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string) {
+    return this.store(userId, kind, mime, data, requestOrigin);
+  }
+
+  /** The bytes of one of the user's own files, found by its URL (MV materials, a song to put under it). */
+  async bytesByUrl(userId: string, url: string): Promise<Buffer | null> {
+    const [m] = await this.db.write
+      .select({ data: mediaObjects.data, url: mediaObjects.url })
+      .from(mediaObjects)
+      .where(and(eq(mediaObjects.url, url), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
+    if (!m) return null;
+    if (m.data) return m.data;
+    const res = await fetch(m.url, { signal: AbortSignal.timeout(120_000) });
+    return res.ok ? Buffer.from(await res.arrayBuffer()) : null;
+  }
+
+  /** One of the user's files by id (any kind): its URL. */
+  async ownedAny(userId: string, id: string) {
+    const [m] = await this.db.write
+      .select({ id: mediaObjects.id, url: mediaObjects.url, kind: mediaObjects.kind })
+      .from(mediaObjects)
+      .where(and(eq(mediaObjects.id, id), eq(mediaObjects.userId, userId), isNull(mediaObjects.deletedAt)));
+    return m ?? null;
+  }
+
   async getOwned(userId: string, id: string, kind: MediaKind) {
     const [m] = await this.db.write
       .select({ id: mediaObjects.id, url: mediaObjects.url })

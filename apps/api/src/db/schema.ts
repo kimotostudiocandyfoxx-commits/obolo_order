@@ -570,3 +570,31 @@ export const appSettings = pgTable('app_settings', {
   value: text('value').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Mars MV projects: a Mercury song + the materials sent in the chat → the MV (and its lyrics version). */
+export const mvProjects = pgTable(
+  'mv_projects',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    songId: uuid('song_id')
+      .notNull()
+      .references(() => songs.id),
+    /** collecting | rendering | done | failed */
+    status: text('status').notNull().default('collecting'),
+    materialsJson: jsonb('materials_json').$type<Record<string, unknown>[]>().notNull().default([]),
+    /** Bati's edit plan (kept so the lyrics version reuses it) */
+    planJson: jsonb('plan_json').$type<Record<string, unknown>>(),
+    videoUrl: text('video_url'),
+    lyricsVideoUrl: text('lyrics_video_url'),
+    posterUrl: text('poster_url'),
+    seconds: real('seconds'),
+    note: text('note'),
+    backstageId: uuid('backstage_id'),
+    error: text('error'),
+    ...timestamps,
+  },
+  (t) => [index('mv_projects_user_idx').on(t.userId, t.createdAt)],
+);

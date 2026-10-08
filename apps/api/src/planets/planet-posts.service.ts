@@ -1,10 +1,19 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { MARS_VIDEO_SECONDS, type CreatePlanetPostBody, type PlanetAuthor, type PlanetFlyer, type PlanetPostView, type PlanetProfileView, type PlanetReplyView, type TimelinePlanet } from '@obolo/shared';
-import { and, desc, eq, gt, inArray, isNull, sql } from 'drizzle-orm';
+import {
+  MARS_VIDEO_SECONDS,
+  type CreatePlanetPostBody,
+  type PlanetAuthor,
+  type PlanetFlyer,
+  type PlanetPostView,
+  type PlanetProfileView,
+  type PlanetReplyView,
+  type TimelinePlanet,
+} from '@obolo/shared';
+import { and, desc, eq, gt, inArray, isNull, or, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { follows, marsBackstage, planetPosts, planetReplies, songs, starEvents, users } from '../db/schema';
+import { follows, marsBackstage, mvProjects, planetPosts, planetReplies, songs, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 
@@ -49,8 +58,14 @@ export class PlanetPostsService {
         .from(marsBackstage)
         .where(and(eq(marsBackstage.id, body.sourceId), eq(marsBackstage.userId, userId), isNull(marsBackstage.deletedAt)));
       if (!v) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Pick a video from your 裏スタジオ');
-      // Mars posts are square: a centre-cropped copy; the original stays in the 裏スタジオ
-      const sq = await this.media.squareCopy(userId, v.url, MARS_VIDEO_SECONDS, origin);
+      // an MV Bati made is already square and may fly for the whole song (MV_MAX_SECONDS)
+      const [mv] = await this.db.write
+        .select({ id: mvProjects.id })
+        .from(mvProjects)
+        .where(and(eq(mvProjects.userId, userId), or(eq(mvProjects.videoUrl, v.url), eq(mvProjects.lyricsVideoUrl, v.url))))
+        .limit(1);
+      // other Mars posts are square: a centre-cropped copy; the original stays in the 裏スタジオ
+      const sq = mv ? { url: v.url, posterUrl: v.posterUrl, seconds: v.seconds } : await this.media.squareCopy(userId, v.url, MARS_VIDEO_SECONDS, origin);
       values = { planet, userId, kind: 'video', sourceId: v.id, title: body.title || v.title || '', text: body.text, url: sq.url, posterUrl: sq.posterUrl, seconds: sq.seconds };
     }
     const [p] = await this.db.write.insert(planetPosts).values(values).returning();
@@ -93,7 +108,10 @@ export class PlanetPostsService {
   }
 
   async profile(viewerId: string, planet: TimelinePlanet, userId: string): Promise<PlanetProfileView> {
-    const [u] = await this.db.read.select(authorCols).from(users).where(and(eq(users.id, userId), isNull(users.deletedAt)));
+    const [u] = await this.db.read
+      .select(authorCols)
+      .from(users)
+      .where(and(eq(users.id, userId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
     const [rows, [mine]] = await Promise.all([
       this.db.read
@@ -128,11 +146,17 @@ export class PlanetPostsService {
       if (!post) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Post not found');
       const delta = on
         ? (await tx.insert(starEvents).values({ userId, targetType: 'planet_post', targetId: postId, tier: 1 }).onConflictDoNothing().returning({ id: starEvents.id })).length
-        : -(await tx
-            .delete(starEvents)
-            .where(and(eq(starEvents.userId, userId), eq(starEvents.targetType, 'planet_post'), eq(starEvents.targetId, postId)))
-            .returning({ id: starEvents.id })).length;
-      if (delta) await tx.update(planetPosts).set({ starCount: sql`GREATEST(${planetPosts.starCount} + ${delta}, 0)` }).where(eq(planetPosts.id, postId));
+        : -(
+            await tx
+              .delete(starEvents)
+              .where(and(eq(starEvents.userId, userId), eq(starEvents.targetType, 'planet_post'), eq(starEvents.targetId, postId)))
+              .returning({ id: starEvents.id })
+          ).length;
+      if (delta)
+        await tx
+          .update(planetPosts)
+          .set({ starCount: sql`GREATEST(${planetPosts.starCount} + ${delta}, 0)` })
+          .where(eq(planetPosts.id, postId));
     });
     return { starredByMe: on };
   }
@@ -158,7 +182,10 @@ export class PlanetPostsService {
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This reply breaks the community rules');
     const r = await this.db.write.transaction(async (tx) => {
       const [row] = await tx.insert(planetReplies).values({ postId, userId, text }).returning();
-      await tx.update(planetPosts).set({ replyCount: sql`${planetPosts.replyCount} + 1` }).where(eq(planetPosts.id, postId));
+      await tx
+        .update(planetPosts)
+        .set({ replyCount: sql`${planetPosts.replyCount} + 1` })
+        .where(eq(planetPosts.id, postId));
       return row;
     });
     const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));

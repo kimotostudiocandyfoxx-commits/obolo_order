@@ -234,7 +234,10 @@ export class DemoApi implements Api {
       manaBalance: w.mana,
       earningsBalanceJpy: 0,
       manaExpiresAt: w.mana > 0 ? exp.toISOString() : null,
-      recent: w.entries.slice(-20).reverse().map((e) => ({ ...e, ledger: 'mana' as const })),
+      recent: w.entries
+        .slice(-20)
+        .reverse()
+        .map((e) => ({ ...e, ledger: 'mana' as const })),
     };
   }
 
@@ -383,7 +386,8 @@ export class DemoApi implements Api {
     }
     const live = this.s.posts.filter((x) => x.plazaId === p.id && !x.replyToId && Date.now() - new Date(x.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000);
     const faces: PlazaView['faces'] = [];
-    for (const x of live) if (faces.length < 7 && !faces.some((f) => f.id === x.author.id)) faces.push({ id: x.author.id, neoForm: x.author.neoForm, look: this.s.users[x.author.id]?.look ?? x.author.look ?? null });
+    for (const x of live)
+      if (faces.length < 7 && !faces.some((f) => f.id === x.author.id)) faces.push({ id: x.author.id, neoForm: x.author.neoForm, look: this.s.users[x.author.id]?.look ?? x.author.look ?? null });
     return { id: p.id, name: p.name, icon: p.icon, memberCount: p.base + p.members.length, voiceCount: live.length, joined: p.members.includes(viewer), faces };
   }
 
@@ -633,9 +637,7 @@ export class DemoApi implements Api {
     localStorage.setItem(key, String(used + 1));
     await new Promise((r) => setTimeout(r, 1800));
     const urls =
-      'reference' in body
-        ? await Promise.all([0, 1, 2, 3].map((v) => demoFromReference(`data:${body.reference.mime};base64,${body.reference.data}`, body, v + used * 4)))
-        : demoNeoLooks(body, used);
+      'reference' in body ? await Promise.all([0, 1, 2, 3].map((v) => demoFromReference(`data:${body.reference.mime};base64,${body.reference.data}`, body, v + used * 4))) : demoNeoLooks(body, used);
     this.lookCache = [...this.lookCache, ...urls.map((url) => ({ id: uid(), url }))];
     return { candidates: this.lookCache.slice(-urls.length), triesLeft: u.journeyDay < JOURNEY_DONE ? 3 - (used + 1) : 99, refinesLeft: this.refinesLeft() };
   }
@@ -747,7 +749,19 @@ export class DemoApi implements Api {
     const viewer = this.uid();
     const root = (this.s.jroots ?? []).find((r) => r.id === body.rootId && r.owner === viewer);
     if (!root) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    const p = { id: uid(), owner: viewer, kind: root.kind, url: root.url, posterUrl: root.posterUrl, text: body.text ?? '', filter: body.filter ?? 'none', branch: body.branch, starCount: 0, starredBy: [], createdAt: now() };
+    const p = {
+      id: uid(),
+      owner: viewer,
+      kind: root.kind,
+      url: root.url,
+      posterUrl: root.posterUrl,
+      text: body.text ?? '',
+      filter: body.filter ?? 'none',
+      branch: body.branch,
+      starCount: 0,
+      starredBy: [],
+      createdAt: now(),
+    };
     this.s.jposts = [p, ...(this.s.jposts ?? [])];
     this.save();
     return this.jView(p, viewer);
@@ -970,6 +984,26 @@ export class DemoApi implements Api {
     const viewer = this.uid();
     this.s.backstage = (this.s.backstage ?? []).filter((v) => !(v.id === id && v.owner === viewer));
     this.save();
+  }
+
+  // the MV studio needs the server (ffmpeg + the anime model)
+  async mvCreate(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvGet(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvAddMaterial(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvRemoveMaterial(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvRender(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+  async mvLyrics(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
   }
 
   async batiEgg(food: string) {

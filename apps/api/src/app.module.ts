@@ -30,6 +30,8 @@ import { MarsController } from './mars/mars.controller';
 import { PlanetPostsController } from './planets/planet-posts.controller';
 import { PlanetPostsService } from './planets/planet-posts.service';
 import { MarsService } from './mars/mars.service';
+import { MvController } from './mv/mv.controller';
+import { MvService } from './mv/mv.service';
 import { SaturnService } from './saturn/saturn.service';
 import { LookController } from './look/look.controller';
 import { LookService } from './look/look.service';
@@ -41,7 +43,50 @@ import { WalletController } from './wallet/wallet.controller';
 /** One module for the demo; split per planet (spec §4.3) as the surface grows. */
 @Module({
   imports: [InfraModule],
-  controllers: [HealthController, AuthController, UsersController, WalletController, BuddyController, MediaController, SaturnController, SaturnUsersController, SaturnPlazasController, JupiterController, MarsController, PlanetPostsController, InvitesController, LookController, BillingController, ComposeController, VoiceController, CommsController, AdminReportsController, PushController],
-  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, PlazaService, JupiterService, MarsService, PlanetPostsService, InvitesService, LookService, BillingService, ComposeService, SongService, VoiceService, CommsService, PushService],
+  controllers: [
+    HealthController,
+    AuthController,
+    UsersController,
+    WalletController,
+    BuddyController,
+    MediaController,
+    SaturnController,
+    SaturnUsersController,
+    SaturnPlazasController,
+    JupiterController,
+    MarsController,
+    PlanetPostsController,
+    InvitesController,
+    LookController,
+    BillingController,
+    ComposeController,
+    VoiceController,
+    CommsController,
+    AdminReportsController,
+    PushController,
+    MvController,
+  ],
+  providers: [
+    AuthGuard,
+    AuthService,
+    UsersService,
+    LedgerService,
+    BuddyService,
+    MediaService,
+    SaturnService,
+    PlazaService,
+    JupiterService,
+    MarsService,
+    PlanetPostsService,
+    InvitesService,
+    LookService,
+    BillingService,
+    ComposeService,
+    SongService,
+    VoiceService,
+    CommsService,
+    PushService,
+    MvService,
+  ],
 })
 export class AppModule {}

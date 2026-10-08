@@ -1,4 +1,4 @@
-import type { CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage } from '@obolo/shared';
+import type { CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -213,6 +213,14 @@ export interface Api {
   /** after POST /media/video */
   keepMarsVideo(body: MarsBackstageBody): Promise<MarsBackstageVideo>;
   removeMarsVideo(id: string): Promise<void>;
+  // Mars MV studio: a Mercury song + videos / photos → Bati's MV
+  mvCreate(songId: string): Promise<MvProjectView>;
+  mvGet(id: string): Promise<MvProjectView>;
+  mvAddMaterial(id: string, body: { mediaId: string; kind: 'photo' | 'video'; posterUrl?: string | null; seconds?: number | null }): Promise<MvProjectView>;
+  mvRemoveMaterial(id: string, mediaId: string): Promise<MvProjectView>;
+  /** waits until the MV is made (a minute or two) */
+  mvRender(id: string): Promise<MvProjectView>;
+  mvLyrics(id: string): Promise<MvProjectView>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;

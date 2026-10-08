@@ -1,4 +1,4 @@
-import type { TimelinePlanet } from '@obolo/shared';
+import type { MvProjectView, TimelinePlanet } from '@obolo/shared';
 import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
@@ -67,10 +67,7 @@ export class HttpApi implements Api {
     return this.req<Awaited<ReturnType<Api['updateBuddyProfile']>>>('PATCH', '/buddy/profile', body);
   }
   buddyMessages(cursor?: string) {
-    return this.req<Awaited<ReturnType<Api['buddyMessages']>>>(
-      'GET',
-      `/buddy/messages${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`,
-    );
+    return this.req<Awaited<ReturnType<Api['buddyMessages']>>>('GET', `/buddy/messages${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`);
   }
   buddyQuota() {
     return this.req<Awaited<ReturnType<Api['buddyQuota']>>>('GET', '/buddy/quota');
@@ -321,6 +318,24 @@ export class HttpApi implements Api {
   }
   async removeMarsVideo(id: string) {
     await this.req<void>('DELETE', `/mars/backstage/${id}`);
+  }
+  mvCreate(songId: string) {
+    return this.req<MvProjectView>('POST', '/mars/mv', { songId });
+  }
+  mvGet(id: string) {
+    return this.req<MvProjectView>('GET', `/mars/mv/${id}`);
+  }
+  mvAddMaterial(id: string, body: Parameters<Api['mvAddMaterial']>[1]) {
+    return this.req<MvProjectView>('POST', `/mars/mv/${id}/materials`, body);
+  }
+  mvRemoveMaterial(id: string, mediaId: string) {
+    return this.req<MvProjectView>('DELETE', `/mars/mv/${id}/materials/${mediaId}`);
+  }
+  mvRender(id: string) {
+    return this.req<MvProjectView>('POST', `/mars/mv/${id}/render`);
+  }
+  mvLyrics(id: string) {
+    return this.req<MvProjectView>('POST', `/mars/mv/${id}/lyrics`);
   }
   choosePuniPic(mediaId: string | null) {
     return this.req<Awaited<ReturnType<Api['choosePuniPic']>>>('POST', '/me/puni/pic', { mediaId });
