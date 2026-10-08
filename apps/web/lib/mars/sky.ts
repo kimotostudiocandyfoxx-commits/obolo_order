@@ -34,9 +34,10 @@ export interface Video {
   /** a real (square) movie posted on Mars, with its still */
   url?: string;
   poster?: string | null;
-  /** a real post (server id): it can get stars */
+  /** a real post (server id): it can get stars and replies; who replied (faces, never a count) */
   postId?: string;
   starred?: boolean;
+  repliers?: import('@obolo/shared').PlanetAuthor[];
 }
 
 export interface Creator {

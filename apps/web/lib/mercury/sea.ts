@@ -22,6 +22,9 @@ export interface Song {
   audioUrl?: string;
   /** hours since it was released */
   hoursAgo?: number;
+  /** a real post (server id): it can be answered; who replied (faces, never a count) */
+  postId?: string;
+  repliers?: import('@obolo/shared').PlanetAuthor[];
 }
 
 export interface Sailor {

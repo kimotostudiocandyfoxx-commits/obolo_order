@@ -52,6 +52,7 @@ export const videoOf = (p: PlanetPostView): Video => ({
   id: p.id,
   postId: p.id,
   starred: p.starredByMe,
+  repliers: p.repliers,
   title: p.title || p.text || 'ムービー',
   kind: 'MV',
   author: p.author.displayName || p.author.handle,

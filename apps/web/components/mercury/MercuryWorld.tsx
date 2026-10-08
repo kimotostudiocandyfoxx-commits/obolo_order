@@ -55,6 +55,8 @@ const songOf = (p: PlanetPostView): Song => ({
   preset: P(96, 60, 'major', [0, 4, 5, 3], 'triangle'),
   audioUrl: p.url,
   hoursAgo: Math.floor((Date.now() - new Date(p.createdAt).getTime()) / 3600_000),
+  postId: p.id,
+  repliers: p.repliers,
 });
 
 export function MercuryWorld({ events, overlay, live = false }: { events?: MercuryEvents; overlay?: ReactNode; live?: boolean }) {

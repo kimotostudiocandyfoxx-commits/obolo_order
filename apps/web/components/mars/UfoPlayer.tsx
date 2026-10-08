@@ -6,6 +6,8 @@ import { getApi } from '@/lib/api';
 import { fmtLen, KIND_COLOR, type Video } from '@/lib/mars/sky';
 import { synth } from '@/lib/synth';
 import { Frame } from './Frame';
+import { ReplierFaces, RepliesSheet } from '@/components/planets/RepliesSheet';
+import type { PlanetAuthor } from '@obolo/shared';
 
 /** One person in the Mars sky: their UFO and the movies it carries. */
 export type CrewMember = { key: string; name: string; img?: string | null; emoji: string; videos: Video[]; isMe?: boolean };
@@ -82,6 +84,9 @@ export function UfoPlayer({
   }, [video, real]);
   const scene = video.scenes[Math.floor(t / 4) % video.scenes.length];
   const peek = (d: number) => crew[wrap(u + d, n)];
+  const [replying, setReplying] = useState(false);
+  const [extra, setExtra] = useState<Record<string, PlanetAuthor[]>>({});
+  const repliers = [...(extra[video.id] ?? []), ...(video.repliers ?? [])].filter((a, i, all) => all.findIndex((b) => b.id === a.id) === i);
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -196,6 +201,14 @@ export function UfoPlayer({
               {isStarred ? '★' : '☆'}
             </button>
           )}
+          <button
+            onClick={() => setReplying(true)}
+            className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-white/35 bg-black/40 px-3 text-lg backdrop-blur"
+            aria-label="リプ"
+          >
+            💬
+            <ReplierFaces who={repliers} />
+          </button>
           {onStudio && (
             <button onClick={() => onStudio(member)} className="flex h-11 shrink-0 items-center gap-1 rounded-full border border-amber-300/60 bg-black/50 px-3 text-xs font-bold text-amber-100 backdrop-blur">
               🎬 {member.isMe ? 'myスタジオへ' : 'この人のスタジオへ'}
@@ -203,6 +216,15 @@ export function UfoPlayer({
           )}
         </div>
       </div>
+      {replying && (
+        <RepliesSheet
+          planet="mars"
+          postId={video.postId ?? null}
+          owner={member.name}
+          onClose={() => setReplying(false)}
+          onReplied={(who) => setExtra((cur) => ({ ...cur, [video.id]: [who, ...(cur[video.id] ?? [])] }))}
+        />
+      )}
     </div>
   );
 }

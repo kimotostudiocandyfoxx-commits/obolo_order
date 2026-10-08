@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArtBackdrop, pickShip, Vessel } from '@/components/art/Stage';
+import { ReplierFaces, RepliesSheet } from '@/components/planets/RepliesSheet';
+import type { PlanetAuthor } from '@obolo/shared';
 import { pauseAudio, resumeAudio, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { fmt, type Song } from '@/lib/mercury/sea';
 import { synth } from '@/lib/synth';
@@ -108,6 +110,10 @@ export function ShipPlayer({
   };
 
   const peek = (d: number) => flyers[wrap(u + d, n)];
+  const [replying, setReplying] = useState(false);
+  // who replied while you were here, on top of who had replied before
+  const [extra, setExtra] = useState<Record<string, PlanetAuthor[]>>({});
+  const repliers = [...(extra[song.id] ?? []), ...(song.repliers ?? [])].filter((a, i, all) => all.findIndex((b) => b.id === a.id) === i);
   const mine = stars[song.id] ?? 0;
 
   return (
@@ -211,6 +217,14 @@ export function ShipPlayer({
             {paused ? '▶' : '❚❚'}
           </button>
           <Star n={3} on={mine >= 3} onClick={() => onStar(song.id, mine === 3 ? 2 : 3)} />
+          <button
+            onClick={() => setReplying(true)}
+            className="flex h-12 shrink-0 items-center gap-1.5 rounded-full border border-white/35 bg-black/40 px-3 text-lg backdrop-blur"
+            aria-label="リプ"
+          >
+            💬
+            <ReplierFaces who={repliers} />
+          </button>
           {onOwner && (
             <button
               onClick={() => onOwner(flyer)}
@@ -221,6 +235,15 @@ export function ShipPlayer({
           )}
         </div>
       </div>
+      {replying && (
+        <RepliesSheet
+          planet="mercury"
+          postId={song.postId ?? null}
+          owner={flyer.name}
+          onClose={() => setReplying(false)}
+          onReplied={(who) => setExtra((cur) => ({ ...cur, [song.id]: [who, ...(cur[song.id] ?? [])] }))}
+        />
+      )}
     </div>
   );
 }
