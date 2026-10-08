@@ -904,6 +904,12 @@ export class DemoApi implements Api {
   private noComms(): never {
     throw new ApiError(403, 'NOT_MEMBER', 'Mail and phone need the server');
   }
+  async findPerson() {
+    return { person: null };
+  }
+  async followPerson(): Promise<never> {
+    return this.noComms();
+  }
   async dmMessages(): Promise<never[]> {
     return [];
   }

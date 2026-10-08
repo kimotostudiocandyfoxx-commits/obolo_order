@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { CALL_RING_SECONDS, type CallJoin, type CallView, type CommsContact, type CommsPerson, type CommsStatus, type DmMessage, type SendDmBody } from '@obolo/shared';
+import { CALL_RING_SECONDS, type CallJoin, type CallView, type CommsContact, type CommsFound, type CommsPerson, type CommsStatus, type DmMessage, type SendDmBody } from '@obolo/shared';
 import { and, desc, eq, gt, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
@@ -60,6 +60,35 @@ export class CommsService {
     if (userId === peerId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'That is you');
     if (!(await this.areFriends(userId, peerId))) throw apiError(HttpStatus.FORBIDDEN, 'NOT_FRIENDS', 'Only ダチ (people who follow each other) can write and call');
     if (!(await this.isMember(peerId))) throw apiError(HttpStatus.FORBIDDEN, 'PEER_NOT_MEMBER', 'They have not joined ORDER yet');
+  }
+
+  private async relation(userId: string, other: CommsPerson): Promise<CommsFound> {
+    const rows = await this.db.read
+      .select({ followerId: follows.followerId })
+      .from(follows)
+      .where(or(and(eq(follows.followerId, userId), eq(follows.followeeId, other.id)), and(eq(follows.followerId, other.id), eq(follows.followeeId, userId))));
+    return { ...other, followedByMe: rows.some((r) => r.followerId === userId), followsMe: rows.some((r) => r.followerId === other.id) };
+  }
+
+  /** Find someone by their exact user ID (to become ダチ from the mail / phone screens). */
+  async find(userId: string, handle: string): Promise<CommsFound | null> {
+    const h = handle.trim().replace(/^@/, '').toLowerCase();
+    if (!h) return null;
+    const [u] = await this.db.read
+      .select(personCols)
+      .from(users)
+      .where(and(sql`lower(${users.handle}) = ${h}`, isNull(users.deletedAt)));
+    if (!u || u.id === userId) return null;
+    return this.relation(userId, u);
+  }
+
+  async follow(userId: string, otherId: string, on: boolean): Promise<CommsFound> {
+    if (userId === otherId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'That is you');
+    const [u] = await this.db.read.select(personCols).from(users).where(and(eq(users.id, otherId), isNull(users.deletedAt)));
+    if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
+    if (on) await this.db.write.insert(follows).values({ followerId: userId, followeeId: otherId }).onConflictDoNothing();
+    else await this.db.write.delete(follows).where(and(eq(follows.followerId, userId), eq(follows.followeeId, otherId)));
+    return this.relation(userId, u);
   }
 
   async status(userId: string): Promise<CommsStatus> {

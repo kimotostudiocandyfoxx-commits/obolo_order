@@ -1,4 +1,4 @@
-import type { CallJoin, CallView, CommsContact, CommsStatus, DmMessage } from '@obolo/shared';
+import type { CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -190,6 +190,8 @@ export interface Api {
   // Earth mail & phone (members, between ダチ)
   commsStatus(): Promise<CommsStatus>;
   commsContacts(): Promise<CommsContact[]>;
+  findPerson(handle: string): Promise<{ person: CommsFound | null }>;
+  followPerson(id: string, on: boolean): Promise<CommsFound>;
   dmMessages(peerId: string, after?: string): Promise<DmMessage[]>;
   sendDm(peerId: string, body: { text: string; audioUrl?: string }): Promise<DmMessage>;
   readDm(peerId: string): Promise<void>;

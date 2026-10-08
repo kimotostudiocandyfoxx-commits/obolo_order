@@ -19,6 +19,11 @@ export type CommsStatus = {
   firebaseProjectId: string | null;
 };
 
+/** Someone found by their user ID, and how you two are connected (no counts). */
+export type CommsFound = CommsPerson & { followedByMe: boolean; followsMe: boolean };
+
+export const FollowBody = z.object({ on: z.boolean() });
+
 export type CommsContact = CommsPerson & { lastText: string | null; lastAt: string | null; unread: boolean };
 
 export type DmMessage = { id: string; fromMe: boolean; kind: 'text' | 'voice'; text: string; audioUrl: string | null; createdAt: string };

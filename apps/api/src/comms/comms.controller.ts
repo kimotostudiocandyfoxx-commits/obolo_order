@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
-import { SendDmBody, StartCallBody } from '@obolo/shared';
+import { FollowBody, SendDmBody, StartCallBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -19,6 +19,18 @@ export class CommsController {
   @Get('status')
   status(@UserId() userId: string) {
     return this.comms.status(userId);
+  }
+
+  @Get('find')
+  find(@UserId() userId: string, @Query('handle') handle?: string) {
+    return this.comms.find(userId, (handle ?? '').slice(0, 40)).then((person) => ({ person }));
+  }
+
+  @Post('follow/:id')
+  @HttpCode(200)
+  async follow(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `comms-follow:${userId}`, 60, 600);
+    return this.comms.follow(userId, id, parseBody(FollowBody, body).on);
   }
 
   @Get('contacts')

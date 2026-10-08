@@ -260,6 +260,12 @@ export class HttpApi implements Api {
   commsContacts() {
     return this.req<Awaited<ReturnType<Api['commsContacts']>>>('GET', '/comms/contacts');
   }
+  findPerson(handle: string) {
+    return this.req<Awaited<ReturnType<Api['findPerson']>>>('GET', `/comms/find?handle=${encodeURIComponent(handle)}`);
+  }
+  followPerson(id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['followPerson']>>>('POST', `/comms/follow/${id}`, { on });
+  }
   dmMessages(peerId: string, after?: string) {
     return this.req<Awaited<ReturnType<Api['dmMessages']>>>('GET', `/comms/messages/${peerId}${after ? `?after=${encodeURIComponent(after)}` : ''}`);
   }
