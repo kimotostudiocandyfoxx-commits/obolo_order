@@ -16,6 +16,23 @@ import type { Stylizer } from './stylize';
  */
 const PROMPT = 'anime style illustration, hand-drawn cel animation, clean line art, vibrant colors, soft light, same composition and same people';
 const NEGATIVE = 'photo, realistic, 3d, lowres, blurry, text, watermark, signature, nsfw, nude, deformed face, bad hands, extra fingers';
+
+/**
+ * How to ask a checkpoint. Animagine XL 4.0 (client choice 2026-10-08; CreativeML Open RAIL++-M) is an
+ * SDXL anime model that reads Danbooru-style tags with its quality tags, and likes Euler a at a low CFG
+ * (its model card); anything else gets the generic SD settings.
+ */
+export function novitaRecipe(model: string) {
+  if (/animagine/i.test(model))
+    return {
+      prompt: `anime coloring, anime screencap, ${PROMPT}, masterpiece, high score, great score, absurdres`,
+      negative: `lowres, bad anatomy, bad hands, text, error, missing finger, extra digits, fewer digits, cropped, worst quality, low quality, low score, bad score, average score, signature, watermark, username, blurry, photo, realistic, 3d, nsfw, nude`,
+      sampler: 'Euler a',
+      cfg: 5,
+      steps: 28,
+    };
+  return { prompt: `masterpiece, best quality, ${PROMPT}`, negative: NEGATIVE, sampler: 'DPM++ 2M Karras', cfg: 7, steps: 24 };
+}
 const SIDE = 1024;
 const log = new Logger('MvKeyArt');
 
@@ -63,6 +80,7 @@ export class KeyArtist {
   /** Novita AI img2img (v3 async): submit, then poll the task until the picture is there. */
   private async novitaDraw(src: Buffer): Promise<Buffer | null> {
     const side = this.o.novitaSide;
+    const recipe = novitaRecipe(this.o.novitaModel!);
     const img = await sharp(src).resize(side, side, { fit: 'cover' }).jpeg({ quality: 90 }).toBuffer();
     const headers = { 'content-type': 'application/json', authorization: `Bearer ${this.o.novitaKey}` };
     const res = await fetch('https://api.novita.ai/v3/async/img2img', {
@@ -73,14 +91,14 @@ export class KeyArtist {
         request: {
           model_name: this.o.novitaModel,
           image_base64: img.toString('base64'),
-          prompt: `masterpiece, best quality, ${PROMPT}`,
-          negative_prompt: NEGATIVE,
+          prompt: recipe.prompt,
+          negative_prompt: recipe.negative,
           width: side,
           height: side,
           image_num: 1,
-          steps: 24,
-          guidance_scale: 7,
-          sampler_name: 'DPM++ 2M Karras',
+          steps: recipe.steps,
+          guidance_scale: recipe.cfg,
+          sampler_name: recipe.sampler,
           strength: this.o.novitaStrength,
           seed: -1,
         },

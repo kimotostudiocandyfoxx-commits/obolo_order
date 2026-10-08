@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { KeyArtist } from './keyart';
+import { KeyArtist, novitaRecipe } from './keyart';
 import { Stylizer } from './stylize';
 
 const png = () =>
@@ -9,6 +9,16 @@ const png = () =>
     .toBuffer();
 const artist = (o: Partial<ConstructorParameters<typeof KeyArtist>[0]> = {}) =>
   new KeyArtist({ novitaKey: 'k', novitaModel: 'anime.safetensors', novitaStrength: 0.5, novitaSide: 512, geminiKey: 'g', geminiModel: 'gemini-x', stylizer: new Stylizer(undefined), ...o });
+
+describe('novitaRecipe', () => {
+  it('asks Animagine XL in its own way', () => {
+    const r = novitaRecipe('animagineXL40_v4Opt.safetensors');
+    expect(r.sampler).toBe('Euler a');
+    expect(r.cfg).toBe(5);
+    expect(r.prompt).toContain('masterpiece, high score');
+    expect(novitaRecipe('other.safetensors').sampler).toBe('DPM++ 2M Karras');
+  });
+});
 
 describe('KeyArtist (Novita)', () => {
   afterEach(() => vi.unstubAllGlobals());

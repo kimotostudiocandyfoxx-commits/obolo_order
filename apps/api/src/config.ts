@@ -104,7 +104,7 @@ const Env = z.object({
   NOVITA_API_KEY: secret(),
   NOVITA_MODEL: secret(),
   NOVITA_STRENGTH: z.coerce.number().min(0.1).max(0.9).default(0.5),
-  NOVITA_SIDE: z.coerce.number().default(768),
+  NOVITA_SIDE: z.coerce.number().default(1024),
   RUNWARE_API_KEY: secret(),
   RUNWARE_MODEL: secret(),
 

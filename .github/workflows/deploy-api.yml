@@ -125,6 +125,7 @@ jobs:
             RUNWARE_MODEL=${{ vars.RUNWARE_MODEL }}
             NOVITA_MODEL=${{ vars.NOVITA_MODEL }}
             NOVITA_STRENGTH=${{ vars.NOVITA_STRENGTH || '0.5' }}
+            NOVITA_SIDE=${{ vars.NOVITA_SIDE || '1024' }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
           secrets: ${{ steps.sec.outputs.list }}
 
