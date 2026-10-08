@@ -299,5 +299,19 @@
     "aspect": "1:1",
     "count": 1,
     "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, a limited palette of deep navy, teal, magenta-pink and warm lantern gold. A music record cover artwork: a sunrise over the sea. Simple bold composition centred in the square, fills the whole square edge to edge. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "s-island-v1",
+    "kind": "image",
+    "aspect": "4:3",
+    "count": 3,
+    "prompt": "Art style (Saturn, the voice plazas): SOFT AIRBRUSHED PASTEL illustration — smooth dreamy gradients, gentle glow, very simple rounded shapes, a palette of lavender, violet, candy pink, soft peach, mint green. One small FLOATING ISLAND in the sky, seen from slightly above: a round flat top of soft mint-green grass with a few tiny round bushes at the back edge, the underside a rounded chunk of warm peach and lavender earth with soft layered stripes, little fluffy white clouds hugging its lower sides. The grassy top is mostly EMPTY open space (characters and a landmark will be placed on it later). Centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background, no shadow, no scenery. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface."
+  },
+  {
+    "id": "app-icon-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 3,
+    "prompt": "A mobile app icon: a glowing ringed planet with a small moon orbiting it, surrounded by a few tiny twinkling stars, on a deep navy-to-violet gradient background that fills the whole square edge to edge. Soft airbrushed glow, simple bold shapes that read well at small sizes, magical and friendly. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface. No rounded-corner frame (the phone adds it)."
   }
 ]
