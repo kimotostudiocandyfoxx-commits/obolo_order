@@ -31,7 +31,7 @@ jobs:
           python-version: '3.11'
       - name: Install
         run: |
-          pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu
+          pip install --quiet "torch==2.4.1" --index-url https://download.pytorch.org/whl/cpu
           # optimum's ONNX exporter needs transformers 4.x (5.x dropped is_tf_available)
           pip install --quiet "diffusers==0.31.0" "transformers==4.46.3" "peft==0.13.2" "accelerate==1.1.1" "optimum[onnxruntime]==1.23.3" "onnx<1.17" safetensors "huggingface_hub<0.26" pillow
           pip list 2>/dev/null | grep -iE "^(torch|diffusers|transformers|peft|optimum|onnxruntime|onnx) "
