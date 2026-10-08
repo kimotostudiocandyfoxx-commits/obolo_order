@@ -81,15 +81,39 @@ See `metadata/painting_v1_20231211-043052.json`, `metadata/painting_script_capti
 
 This link is included as a public dataset reference related to the preserved landscape/anime-style training art
 ```
- ## Merge - base + LoRA (scale 0.8) fused and saved in 24s, 4.27 GB
+ ## Merge - base + LoRA (scale 0.8) fused and saved in 58s, 4.27 GB
  ## FAILED ``` Traceback (most recent call last):
-  File "/home/runner/work/obolo_order/obolo_order/scripts/anime-lab/lab.py", line 80, in <module>
-    from optimum.onnxruntime import ORTStableDiffusionImg2ImgPipeline
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/optimum/onnxruntime/__init__.py", line 18, in <module>
-    from ..utils import is_diffusers_available
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/optimum/utils/__init__.py", line 45, in <module>
-    from .input_generators import (
-  File "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/optimum/utils/input_generators.py", line 23, in <module>
-    from transformers.utils import is_tf_available, is_torch_available
-ImportError: cannot import name 'is_tf_available' from 'transformers.utils' (/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/transformers/utils/__init__.py)
+  File "/home/runner/work/obolo_order/obolo_order/scripts/anime-lab/lab.py", line 84, in <module>
+    ort = ORTStableDiffusionImg2ImgPipeline.from_pretrained('work/merged', export=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/onnxruntime/modeling_ort.py", line 737, in from_pretrained
+    return super().from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/modeling_base.py", line 438, in from_pretrained
+    return from_pretrained_method(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/onnxruntime/modeling_ort.py", line 600, in _from_transformers
+    return cls._export(
+           ^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/onnxruntime/modeling_diffusion.py", line 341, in _export
+    main_export(
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/exporters/onnx/__main__.py", line 373, in main_export
+    onnx_export_from_model(
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/exporters/onnx/convert.py", line 1193, in onnx_export_from_model
+    _, onnx_outputs = export_models(
+                      ^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/exporters/onnx/convert.py", line 783, in export_models
+    export(
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/exporters/onnx/convert.py", line 888, in export
+    export_output = export_pytorch(
+                    ^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/optimum/exporters/onnx/convert.py", line 584, in export_pytorch
+    onnx_export(
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/onnx/__init__.py", line 289, in export
+    from torch.onnx._internal.exporter import _compat
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/onnx/_internal/exporter/_compat.py", line 16, in <module>
+    from torch.onnx._internal.exporter import (
+  File "/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/torch/onnx/_internal/exporter/_core.py", line 19, in <module>
+    import onnxscript
+ModuleNotFoundError: No module named 'onnxscript'
  ```
