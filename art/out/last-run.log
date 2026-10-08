@@ -9,115 +9,23 @@
 - mercury-sea-loop-v2 (already made)
 - mars-sky-city-loop-v2 (already made)
 - mars-sky-canyon-loop-v2 (already made)
-✗ bigship-sakura-v1 #1 gemini-3-pro-image-preview: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-sakura-v1 #1 gemini-2.5-flash-image: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-candy-v1 #1 gemini-3-pro-image-preview: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-candy-v1 #1 gemini-2.5-flash-image: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-pearl-v1 #1 gemini-3-pro-image-preview: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-pearl-v1 #1 gemini-2.5-flash-image: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-pirate-v1 #1 gemini-3-pro-image-preview: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-pirate-v1 #1 gemini-2.5-flash-image: 402 {
-  "error": {
-    "code": 402,
-    "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
-    "status": "RESOURCE_EXHAUSTED"
-  }
-}
-
-✗ bigship-neon-v1 #1 gemini-3-pro-image-preview: 403 {
-  "error": {
-    "code": 403,
-    "message": "Your project has been denied access. Please contact support.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-
-✗ bigship-neon-v1 #1 gemini-2.5-flash-image: 403 {
-  "error": {
-    "code": 403,
-    "message": "Your project has been denied access. Please contact support.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-
-✗ bigship-jungle-v1 #1 gemini-3-pro-image-preview: 403 {
-  "error": {
-    "code": 403,
-    "message": "Your project has been denied access. Please contact support.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-
-✗ bigship-jungle-v1 #1 gemini-2.5-flash-image: 403 {
-  "error": {
-    "code": 403,
-    "message": "Your project has been denied access. Please contact support.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-
-✗ island-v1 #1 gemini-3-pro-image-preview: 403 {
-  "error": {
-    "code": 403,
-    "message": "Your project has been denied access. Please contact support.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-
-✗ island-v1 #1 gemini-2.5-flash-image: 403 {
-  "error": {
-    "code": 403,
-    "message": "Your project has been denied access. Please contact support.",
-    "status": "PERMISSION_DENIED"
-  }
-}
-
+✓ m-sea-bg-v1 #1 (gemini-2.5-flash-image)
+✓ m-sea-bg-v1 #2 (gemini-2.5-flash-image)
+✓ m-ship-sakura-v1 #1 (gemini-2.5-flash-image)
+✓ m-ship-candy-v1 #1 (gemini-2.5-flash-image)
+✓ m-ship-pearl-v1 #1 (gemini-2.5-flash-image)
+✓ m-ship-pirate-v1 #1 (gemini-2.5-flash-image)
+✓ m-ship-neon-v1 #1 (gemini-2.5-flash-image)
+✓ m-ship-jungle-v1 #1 (gemini-2.5-flash-image)
+✓ m-island-v1 #1 (gemini-2.5-flash-image)
+✓ m-island-v1 #2 (gemini-2.5-flash-image)
+✓ r-sky-city-v1 #1 (gemini-2.5-flash-image)
+✓ r-sky-city-v1 #2 (gemini-2.5-flash-image)
+✓ r-sky-canyon-v1 #1 (gemini-2.5-flash-image)
+✓ r-sky-canyon-v1 #2 (gemini-2.5-flash-image)
+✓ r-ufo-classic-v1 #1 (gemini-2.5-flash-image)
+✓ r-ufo-retro-v1 #1 (gemini-2.5-flash-image)
+✓ r-ufo-cosmo-v1 #1 (gemini-2.5-flash-image)
+✓ r-ufo-rust-v1 #1 (gemini-2.5-flash-image)
+✓ r-studio-v1 #1 (gemini-2.5-flash-image)
+✓ r-studio-v1 #2 (gemini-2.5-flash-image)
