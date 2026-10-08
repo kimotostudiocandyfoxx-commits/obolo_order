@@ -86,6 +86,11 @@ const Env = z.object({
   FIREBASE_SIGNER_SA: secret(),
   FIREBASE_SERVICE_ACCOUNT: secret(),
 
+  /** Web Push (incoming calls, mail). Unset = the server makes its own VAPID key pair once and keeps it in the DB. */
+  VAPID_PUBLIC_KEY: secret(),
+  VAPID_PRIVATE_KEY: secret(),
+  VAPID_SUBJECT: z.string().default('mailto:no-reply@example.com'),
+
   /** Fish Audio API (voices: registration, read-aloud, singing). Unset = voice features off. */
   FISH_API_KEY: secret(),
   /** PLACEHOLDER (P-VOICE-1): Fish Audio model name (client: s2.1-pro). */

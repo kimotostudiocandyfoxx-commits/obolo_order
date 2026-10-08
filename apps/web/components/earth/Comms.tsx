@@ -8,6 +8,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { connectAudio, type CallAudio } from '@/lib/comms/call';
 import { watchConversation } from '@/lib/comms/mail';
+import { disablePush, enablePush, pushState, type PushState } from '@/lib/push';
 
 /**
  * Earth mail & phone (client decision 2026-10-08): they open for each member after the ¥88
@@ -24,7 +25,11 @@ export function CommsTiles() {
   useEffect(() => {
     getApi()
       .commsStatus()
-      .then(setStatus)
+      .then((st) => {
+        setStatus(st);
+        // opened from a mail notification (/earth?open=mail)
+        if (st.open && new URLSearchParams(window.location.search).get('open') === 'mail') setOpen('mail');
+      })
       .catch(() => setStatus(null));
   }, []);
   useEffect(() => {
@@ -42,6 +47,7 @@ export function CommsTiles() {
         <Tile icon="✉️" title="メール" hint="ダチとメッセージ（声でも送れる）" locked={locked} dot={anyUnread} onClick={() => setOpen('mail')} />
         <Tile icon="📞" title="電話" hint="ダチと声で話す" locked={locked} onClick={() => setOpen('phone')} />
       </div>
+      {!locked && <PushToggle />}
       {status?.open && open === 'mail' && <MailScreen status={status} onClose={() => setOpen(null)} />}
       {status?.open && open === 'phone' && (
         <PhoneScreen
@@ -55,6 +61,48 @@ export function CommsTiles() {
       {status?.open && !call && <IncomingCall onAnswer={(view, join) => setCall({ view, join })} />}
       {call && <CallScreen initial={call.view} join={call.join} demo={status?.call !== 'agora'} onClose={() => setCall(null)} />}
     </>
+  );
+}
+
+/** 🔔 notifications for incoming calls and mail on this device (Web Push). */
+function PushToggle() {
+  const [state, setState] = useState<PushState | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    pushState()
+      .then(setState)
+      .catch(() => setState('unsupported'));
+  }, []);
+  if (!state || state === 'unsupported') return null;
+  if (state === 'needs-home-screen')
+    return (
+      <p className="card p-3 text-[11px] leading-relaxed text-white/60">
+        🔔 電話やメールのお知らせを受け取るには：Safari の「共有」ボタン →「ホーム画面に追加」で、ホーム画面のアプリから開いてね
+      </p>
+    );
+  if (state === 'denied') return <p className="card p-3 text-[11px] text-white/60">🔕 お知らせがブロックされています（設定 → 通知 から許可できます）</p>;
+  const on = state === 'on';
+  return (
+    <button
+      disabled={busy}
+      onClick={() => {
+        setBusy(true);
+        (on ? disablePush() : enablePush())
+          .then(setState)
+          .catch(() => setState('off'))
+          .finally(() => setBusy(false));
+      }}
+      className={`card flex w-full items-center gap-3 p-3 text-left disabled:opacity-60 ${on ? '' : 'hover:bg-white/10'}`}
+    >
+      <span className="text-2xl">{on ? '🔔' : '🔕'}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-bold">{on ? '電話とメールのお知らせ：オン' : '電話とメールのお知らせをオンにする'}</span>
+        <span className="block text-[11px] text-white/55">アプリを閉じていても、ダチからの電話とメールがわかるよ</span>
+      </span>
+      <span className={`h-6 w-11 shrink-0 rounded-full p-0.5 transition ${on ? 'bg-emerald-500' : 'bg-white/20'}`}>
+        <span className={`block h-5 w-5 rounded-full bg-white transition ${on ? 'translate-x-5' : ''}`} />
+      </span>
+    </button>
   );
 }
 

@@ -199,6 +199,8 @@ export interface Api {
   sendDm(peerId: string, body: { text: string; audioUrl?: string }): Promise<DmMessage>;
   readDm(peerId: string): Promise<void>;
   firebaseToken(): Promise<{ token: string; projectId: string | null }>;
+  subscribePush(sub: { endpoint: string; keys: { p256dh: string; auth: string } }): Promise<void>;
+  unsubscribePush(endpoint: string): Promise<void>;
   startCall(to: string): Promise<{ call: CallView; join: CallJoin }>;
   incomingCalls(): Promise<CallView[]>;
   getCall(id: string): Promise<CallView>;

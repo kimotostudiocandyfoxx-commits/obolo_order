@@ -286,6 +286,12 @@ export class HttpApi implements Api {
   async readDm(peerId: string) {
     await this.req('POST', `/comms/messages/${peerId}/read`);
   }
+  async subscribePush(sub: { endpoint: string; keys: { p256dh: string; auth: string } }) {
+    await this.req('POST', '/push/subscribe', sub);
+  }
+  async unsubscribePush(endpoint: string) {
+    await this.req('POST', '/push/unsubscribe', { endpoint });
+  }
   firebaseToken() {
     return this.req<Awaited<ReturnType<Api['firebaseToken']>>>('POST', '/comms/firebase-token');
   }

@@ -7,6 +7,7 @@ import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
 import { callSessions, dmMessages, follows, userBlocks, userReports, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
+import { PushService } from '../push/push.service';
 import { makeCallProvider, makeMailRealtime, pairKey, type CallProvider, type MailRealtime } from './providers';
 
 const personCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, pic: users.puniPicUrl };
@@ -31,6 +32,7 @@ export class CommsService {
     private readonly db: Database,
     @Inject(CONFIG) private readonly cfg: AppConfig,
     @Inject(LLM) private readonly llm: LlmProvider,
+    private readonly push: PushService,
   ) {
     this.calls = makeCallProvider(cfg);
     this.mail = makeMailRealtime(cfg);
@@ -149,6 +151,11 @@ export class CommsService {
     return { ok: true };
   }
 
+  private async nameOf(userId: string) {
+    const [u] = await this.db.read.select({ displayName: users.displayName, handle: users.handle }).from(users).where(eq(users.id, userId));
+    return u?.displayName || u?.handle || 'ダチ';
+  }
+
   async status(userId: string): Promise<CommsStatus> {
     return { open: await this.isMember(userId), mail: this.mail.kind, call: this.calls.kind, firebaseProjectId: this.mail.projectId };
   }
@@ -222,6 +229,8 @@ export class CommsService {
     this.mail
       .deliver(pairKey(userId, peerId), { id: m.id, senderId: userId, recipientId: peerId, kind: m.kind, text: m.text, audioUrl: m.audioUrl, createdAt: m.createdAt.toISOString() })
       .catch((e) => this.log.warn(`firebase deliver failed: ${String(e)}`));
+    // a notification on their devices (the text stays private: only who wrote)
+    void this.nameOf(userId).then((name) => this.push.notify(peerId, { title: `✉️ ${name}からメールが届いたよ`, body: 'ひらいて読んでみよう', url: '/earth?open=mail', tag: `dm-${userId}` }));
     return { id: m.id, fromMe: true, kind: m.kind as 'text' | 'voice', text: m.text, audioUrl: m.audioUrl, createdAt: m.createdAt.toISOString() };
   }
 
@@ -267,6 +276,8 @@ export class CommsService {
     await this.expireRinging();
     const channel = `obolo-${crypto.randomUUID()}`;
     const [row] = await this.db.write.insert(callSessions).values({ callerId: userId, calleeId: to, channel }).returning();
+    // ring their devices even when the app is closed
+    void this.nameOf(userId).then((name) => this.push.notify(to, { title: `📞 ${name}から電話`, body: 'タップして出る', url: '/earth', tag: `call-${row.id}` }));
     return { call: await this.view(row), join: this.calls.join(channel, agoraUid(userId)) };
   }
 

@@ -926,6 +926,10 @@ export class DemoApi implements Api {
     return this.noComms();
   }
   async readDm() {}
+  async subscribePush(): Promise<never> {
+    return this.noComms();
+  }
+  async unsubscribePush() {}
   async firebaseToken(): Promise<never> {
     return this.noComms();
   }

@@ -31,11 +31,13 @@
     "rxjs": "^7.8.2",
     "sharp": "^0.35.5",
     "stripe": "^23.0.0",
+    "web-push": "^3.6.7",
     "zod": "^4.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/pg": "^8.15.0",
+    "@types/web-push": "^3.6.4",
     "drizzle-kit": "^0.31.0"
   },
   "files": [
