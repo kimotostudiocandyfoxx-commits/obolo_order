@@ -14,17 +14,24 @@ export function PlanetShell({
   children,
   wide = false,
   bare = false,
+  backdrop,
 }: {
   id: PlanetId;
   children: ReactNode;
   wide?: boolean;
   /** bare = full-bleed content (Mercury feed) */
   bare?: boolean;
+  /** a painted background (Art workshop, public/art/<name>.jpg) behind the whole page */
+  backdrop?: string;
 }) {
   const { m } = useI18n();
   const meta = PLANETS[id];
   return (
-    <div className="min-h-svh">
+    <div className="relative min-h-svh">
+      {backdrop && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={`/art/${backdrop}.jpg`} alt="" aria-hidden className="pointer-events-none fixed inset-0 z-0 h-full w-full select-none object-cover opacity-90" />
+      )}
       <header className="pt-safe sticky top-0 z-30 border-b border-white/5 bg-[color:var(--color-space-950)]/80 backdrop-blur-md">
         <div className={`mx-auto flex h-14 items-center gap-2 px-3 ${wide ? 'max-w-3xl' : 'max-w-xl'}`}>
           <Link href="/" className="btn btn-ghost h-9 w-9 !p-0 text-lg" aria-label={m.common.home}>
@@ -46,7 +53,7 @@ export function PlanetShell({
           {m.common.sampleData} · {m.common.sampleDataHint}
         </div>
       )}
-      {bare ? children : <main className={`mx-auto px-4 pb-24 pt-4 ${wide ? 'max-w-3xl' : 'max-w-xl'}`}>{children}</main>}
+      <div className="relative z-10">{bare ? children : <main className={`mx-auto px-4 pb-24 pt-4 ${wide ? 'max-w-3xl' : 'max-w-xl'}`}>{children}</main>}</div>
     </div>
   );
 }

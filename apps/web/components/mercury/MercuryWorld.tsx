@@ -41,12 +41,15 @@ type SeaFlyer = Flyer & { owner: Who; title: string; sub?: string };
 
 /** A posted song as the sea / island show it (a record with an emoji until songs get covers). */
 const RECORD_EMOJI = ['🎵', '🎶', '🎤', '🎸', '🎹', '🥁', '🎧', '🎺'];
+const COVERS = ['moon', 'sakura', 'ocean', 'city', 'forest', 'candy', 'space', 'fire', 'rain', 'dawn'];
 const hash = (t: string) => [...t].reduce((n, c) => n + c.charCodeAt(0), 0);
 const songOf = (p: PlanetPostView): Song => ({
   id: p.id,
   title: p.title || '無題',
   artist: p.author.displayName || p.author.handle,
   emoji: RECORD_EMOJI[hash(p.id) % RECORD_EMOJI.length],
+  // a painted cover (Art workshop) until songs get their own
+  cover: `${ART_BASE}/cover-${COVERS[hash(p.id) % COVERS.length]}.jpg`,
   hue: hash(p.author.id) % 360,
   seconds: Math.max(1, Math.round(p.seconds ?? 180)),
   preset: P(96, 60, 'major', [0, 4, 5, 3], 'triangle'),
@@ -399,7 +402,7 @@ function Record({ song, spinning, className = '' }: { song: Song; spinning?: boo
       <div className={`absolute inset-0 ${spinning ? 'animate-[spin-slow_14s_linear_infinite]' : ''}`}>
         {song.cover ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={spriteUrl(song.cover)} alt="" className="h-full w-full object-cover" draggable={false} />
+          <img src={song.cover.startsWith('/') ? song.cover : spriteUrl(song.cover)} alt="" className="h-full w-full object-cover" draggable={false} />
         ) : (
           <Artwork hue={song.hue ?? 220} emoji={song.emoji ?? '🎵'} className="h-full w-full" />
         )}

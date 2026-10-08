@@ -16,7 +16,7 @@ export function EarthView() {
   const { status } = useAuth();
   const { m } = useI18n();
   return (
-    <PlanetShell id="earth">
+    <PlanetShell id="earth" backdrop="earth-bg">
       <DemoBanner />
       {status === 'loading' && <p className="py-16 text-center text-white/60">{m.common.loading}</p>}
       {status === 'guest' && <LoginCard />}

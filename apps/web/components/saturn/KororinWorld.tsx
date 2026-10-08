@@ -399,6 +399,9 @@ export function KororinWorld({
     <div className={`relative h-full w-full select-none overflow-hidden ${className}`} style={{ fontFamily: '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, sans-serif' }}>
       {/* sky: violet → pink, stars and sparkles, a golden orb and a pale moon */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#2f2268] via-[#6d48b0] to-[#e6a3cf]" />
+      {/* the painted sky (Art workshop, airbrushed pastel) over the gradient */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/art/saturn-bg.jpg" alt="" aria-hidden draggable={false} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-80 mix-blend-screen" />
       <div className="starfield" aria-hidden />
       {SPARKLES.map(([x, y, r], i) => (
         <svg key={i} className="pointer-events-none absolute animate-[twinkle_3s_ease-in-out_infinite]" style={{ left: `${x}%`, top: `${y}%`, width: r * 2, height: r * 2, animationDelay: `${(i % 6) * 0.45}s` }} viewBox={`${-r} ${-r} ${r * 2} ${r * 2}`} aria-hidden>

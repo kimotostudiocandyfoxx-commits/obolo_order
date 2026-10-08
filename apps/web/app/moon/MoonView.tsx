@@ -11,7 +11,7 @@ import { useI18n } from '@/lib/i18n/client';
 
 export function MoonView() {
   return (
-    <PlanetShell id="moon" bare>
+    <PlanetShell id="moon" bare backdrop="moon-bg">
       <div className="mx-auto flex h-[calc(100svh-56px-env(safe-area-inset-top))] max-w-xl flex-col">
         <DemoBanner />
         <RequireAuth>

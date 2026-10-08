@@ -309,6 +309,9 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-b from-[#fbe9d7] via-[#f4efe6] to-[#d9e8f5] text-[#7a5b3e]">
+      {/* the painted paper sky (Art workshop, cut-paper collage) */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/art/jupiter-bg.jpg" alt="" aria-hidden draggable={false} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-90" />
       <div className="pointer-events-none absolute left-[8%] top-[6%] h-20 w-20 rounded-full bg-white/50 blur-[1px]" aria-hidden />
       <div className="pointer-events-none absolute right-[6%] top-[14%] h-10 w-36 rounded-full bg-white/50 blur-sm" aria-hidden />
 
