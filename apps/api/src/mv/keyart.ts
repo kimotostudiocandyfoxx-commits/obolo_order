@@ -22,16 +22,17 @@ const NEGATIVE = 'photo, realistic, 3d, lowres, blurry, text, watermark, signatu
  * SDXL anime model that reads Danbooru-style tags with its quality tags, and likes Euler a at a low CFG
  * (its model card); anything else gets the generic SD settings.
  */
-export function novitaRecipe(model: string) {
+export function novitaRecipe(model: string, redraw = true) {
+  const base = redraw ? PROMPT : 'anime style illustration, cel animation, clean line art, vibrant colors, cinematic lighting';
   if (/animagine/i.test(model))
     return {
-      prompt: `anime coloring, anime screencap, ${PROMPT}, masterpiece, high score, great score, absurdres`,
+      prompt: `anime coloring, anime screencap, ${base}, masterpiece, high score, great score, absurdres`,
       negative: `lowres, bad anatomy, bad hands, text, error, missing finger, extra digits, fewer digits, cropped, worst quality, low quality, low score, bad score, average score, signature, watermark, username, blurry, photo, realistic, 3d, nsfw, nude`,
       sampler: 'Euler a',
       cfg: 5,
       steps: 28,
     };
-  return { prompt: `masterpiece, best quality, ${PROMPT}`, negative: NEGATIVE, sampler: 'DPM++ 2M Karras', cfg: 7, steps: 24 };
+  return { prompt: `masterpiece, best quality, ${base}`, negative: NEGATIVE, sampler: 'DPM++ 2M Karras', cfg: 7, steps: 24 };
 }
 const SIDE = 1024;
 const log = new Logger('MvKeyArt');
@@ -77,38 +78,69 @@ export class KeyArtist {
     return null;
   }
 
-  /** Novita AI img2img (v3 async): submit, then poll the task until the picture is there. */
+  /** Novita AI img2img (v3 async): the photo redrawn as an anime illustration. */
   private async novitaDraw(src: Buffer): Promise<Buffer | null> {
     const side = this.o.novitaSide;
     const recipe = novitaRecipe(this.o.novitaModel!);
     const img = await sharp(src).resize(side, side, { fit: 'cover' }).jpeg({ quality: 90 }).toBuffer();
+    return this.novitaTask('img2img', {
+      image_base64: img.toString('base64'),
+      prompt: recipe.prompt,
+      negative_prompt: recipe.negative,
+      width: side,
+      height: side,
+      strength: this.o.novitaStrength,
+      seed: -1,
+      steps: recipe.steps,
+      guidance_scale: recipe.cfg,
+      sampler_name: recipe.sampler,
+    });
+  }
+
+  /** Can scenes be painted from words (txt2img)? */
+  get canPaint() {
+    return this.novita;
+  }
+
+  /**
+   * One MV scene painted from words (Novita txt2img with the anime checkpoint). `tags` are the
+   * scene's own tags (character, place, action, light); the checkpoint's quality tags are added.
+   */
+  async paint(tags: string, seed: number): Promise<Buffer | null> {
+    if (!this.novita) return null;
+    const side = this.o.novitaSide;
+    const recipe = novitaRecipe(this.o.novitaModel!, false);
+    return this.novitaTask('txt2img', {
+      prompt: `${tags}, ${recipe.prompt}`.slice(0, 1500),
+      negative_prompt: recipe.negative,
+      width: side,
+      height: side,
+      seed,
+      steps: recipe.steps,
+      guidance_scale: recipe.cfg,
+      sampler_name: recipe.sampler,
+    }).catch((e) => {
+      log.warn(`novita paint: ${String(e).slice(0, 200)}`);
+      return null;
+    });
+  }
+
+  /** Submit a Novita v3 async task, then poll it until the picture is there (null = refused by the NSFW check). */
+  private async novitaTask(kind: 'img2img' | 'txt2img', request: Record<string, unknown>): Promise<Buffer | null> {
     const headers = { 'content-type': 'application/json', authorization: `Bearer ${this.o.novitaKey}` };
-    const res = await fetch('https://api.novita.ai/v3/async/img2img', {
+    const res = await fetch(`https://api.novita.ai/v3/async/${kind}`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        extra: { response_image_type: 'png', enable_nsfw_detection: true },
-        request: {
-          model_name: this.o.novitaModel,
-          image_base64: img.toString('base64'),
-          prompt: recipe.prompt,
-          negative_prompt: recipe.negative,
-          width: side,
-          height: side,
-          image_num: 1,
-          steps: recipe.steps,
-          guidance_scale: recipe.cfg,
-          sampler_name: recipe.sampler,
-          strength: this.o.novitaStrength,
-          seed: -1,
-        },
+        extra: { response_image_type: 'jpeg', enable_nsfw_detection: true },
+        request: { model_name: this.o.novitaModel, image_num: 1, ...request },
       }),
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) throw new Error(`submit ${res.status} ${(await res.text()).slice(0, 200)}`);
     const { task_id: taskId } = (await res.json()) as { task_id?: string };
     if (!taskId) throw new Error('no task_id');
-    const until = Date.now() + 120_000;
+    const until = Date.now() + 150_000;
     while (Date.now() < until) {
       await new Promise((r) => setTimeout(r, 1500));
       const r = await fetch(`https://api.novita.ai/v3/async/task-result?task_id=${encodeURIComponent(taskId)}`, { headers, signal: AbortSignal.timeout(20_000) });

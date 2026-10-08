@@ -99,6 +99,9 @@ const Env = z.object({
   ANIME_ONNX_URL: secret(),
   /** キメ絵 (keyart.ts): how many materials per MV are redrawn as anime illustrations */
   MV_KEY_CUTS: z.coerce.number().default(2),
+  /** Story MV: at most this many painted scenes per MV, and how many are painted at once */
+  MV_SCENES: z.coerce.number().min(4).max(60).default(30),
+  MV_PAINT_PARALLEL: z.coerce.number().min(1).max(16).default(6),
   MV_KEYART_MODEL: z.string().default('gemini-2.5-flash-image'),
   /** キメ絵 by Novita AI (client decision 2026-10-08): the key, the anime checkpoint, how far from the photo (0–1), the size */
   NOVITA_API_KEY: secret(),

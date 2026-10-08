@@ -9,12 +9,13 @@ import { apiError } from '../common/errors';
 import { phraseStarts } from '../compose/mix';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
-import { marsBackstage, mvProjects, songs } from '../db/schema';
+import { marsBackstage, mvProjects, songs, users } from '../db/schema';
 import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
 import { KeyArtist } from './keyart';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
+import { describeHero, planStory, storyToPlan, type StoryPlan } from './storyboard';
 import { Stylizer } from './stylize';
 
 type Row = typeof mvProjects.$inferSelect;
@@ -228,6 +229,129 @@ export class MvService {
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  }
+
+  /**
+   * Story MV (client decision 2026-10-08): no materials — Bati reads the song and the profile picture
+   * (the hero), writes a storyboard and every scene is painted as an anime picture (Novita), then
+   * edited on the beat. `mood` = what the creator said they want (may be empty: Bati decides).
+   */
+  async story(userId: string, id: string, origin: string, mood: string): Promise<MvProjectView> {
+    const p = await this.row(userId, id);
+    if (p.status === 'rendering' && p.updatedAt > new Date(Date.now() - 10 * 60_000)) throw apiError(HttpStatus.CONFLICT, 'BUSY', 'Already making it');
+    await this.db.write.update(mvProjects).set({ status: 'rendering', error: null, updatedAt: new Date() }).where(eq(mvProjects.id, id));
+    const s = await this.song(userId, p.songId);
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-mvs-'));
+    try {
+      const t0 = Date.now();
+      const seconds = Math.min(MV_MAX_SECONDS, s.seconds);
+      const audioBytes = await this.media.bytesByUrl(userId, s.mixUrl);
+      if (!audioBytes) throw new Error('song audio unavailable');
+      const audio = join(dir, 'song.m4a');
+      await writeFile(audio, audioBytes);
+      // the hero: the painted ぷにぷに picture, else the NEO look
+      const [u] = await this.db.read.select({ pic: users.puniPicUrl, avatar: users.avatarUrl }).from(users).where(eq(users.id, userId));
+      const picUrl = u?.pic ?? u?.avatar ?? null;
+      const picture = picUrl ? await this.pictureBytes(userId, picUrl) : null;
+      const hero = await describeHero(picture, this.cfg.GEMINI_API_KEY, this.cfg.MV_PLAN_MODEL);
+      const design = s.designJson as { bpm?: number; instrumentalPrompt?: string };
+      const bpm = Number(design.bpm) || 100;
+      const story: StoryPlan = await planStory(
+        {
+          title: s.title,
+          seconds,
+          bpm,
+          mood: mood.trim().slice(0, 200),
+          music: String(design.instrumentalPrompt ?? '').slice(0, 300),
+          lyrics: this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })),
+          hero,
+          maxScenes: this.cfg.MV_SCENES,
+        },
+        this.cfg.GEMINI_API_KEY,
+        this.cfg.MV_PLAN_MODEL,
+      );
+      // paint every scene (a few at a time); one seed per MV keeps the look together
+      const seed = Math.floor(Math.random() * 2 ** 31);
+      const pics: (string | null)[] = new Array(story.scenes.length).fill(null);
+      let next = 0;
+      const worker = async () => {
+        while (next < story.scenes.length) {
+          const k = next++;
+          const img = await this.keyArtist.paint(story.scenes[k].tags, seed + k);
+          if (img) {
+            pics[k] = join(dir, `scene-${k}.jpg`);
+            await sharp(img).jpeg({ quality: 92 }).toFile(pics[k]!);
+          }
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(this.cfg.MV_PAINT_PARALLEL, story.scenes.length) }, worker));
+      const painted = pics.filter(Boolean).length;
+      this.log.log(`MV ${id}: storyboard ${story.scenes.length} scenes, painted ${painted} in ${Math.round((Date.now() - t0) / 1000)}s`);
+      // a scene that could not be painted shows its neighbour (or, with nothing painted, a plain card)
+      const fallback = pics.find(Boolean) ?? (await this.plainCard(dir, s.title));
+      const materials = pics.map((f, k) => ({ kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? fallback }));
+      const plan = storyToPlan(story);
+      const out = await renderMv({ dir, materials, plan, audio, seconds, bpm, keyArtist: this.keyArtist, painted: true });
+      const v = await this.media.storeGenerated(userId, 'video', 'video/mp4', await readFile(out.video), origin);
+      const poster = await this.media.storeGenerated(userId, 'poster', 'image/webp', await readFile(out.poster), origin);
+      const info = await probe(out.video);
+      const [b] = await this.db.write
+        .insert(marsBackstage)
+        .values({ userId, mediaId: v.id, url: v.url, posterUrl: poster.url, seconds: info.seconds, title: `${s.title}（MV）`.slice(0, 40) })
+        .returning();
+      const [up] = await this.db.write
+        .update(mvProjects)
+        .set({
+          status: 'done',
+          planJson: { ...plan, mode: 'story', hero, style: story.style, scenes: story.scenes, painted } as never,
+          videoUrl: v.url,
+          lyricsVideoUrl: null,
+          posterUrl: poster.url,
+          seconds: info.seconds,
+          note: plan.note,
+          backstageId: b.id,
+          updatedAt: new Date(),
+        })
+        .where(eq(mvProjects.id, id))
+        .returning();
+      this.log.log(`MV ${id}: done in ${Math.round((Date.now() - t0) / 1000)}s`);
+      return this.view(up);
+    } catch (e) {
+      this.log.warn(`story MV failed: ${String(e).slice(0, 300)}`);
+      await this.db.write
+        .update(mvProjects)
+        .set({ status: 'failed', error: String(e).slice(0, 300), updatedAt: new Date() })
+        .where(eq(mvProjects.id, id));
+      throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MV_FAILED', 'Could not make the MV');
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  /** The profile picture as PNG (on a white card if it is see-through), or null. */
+  private async pictureBytes(userId: string, url: string): Promise<Buffer | null> {
+    try {
+      const own = await this.media.bytesByUrl(userId, url);
+      const raw = own ?? (await fetch(url, { signal: AbortSignal.timeout(30_000) }).then(async (r) => (r.ok ? Buffer.from(await r.arrayBuffer()) : null)));
+      if (!raw) return null;
+      return await sharp(raw).flatten({ background: '#ffffff' }).resize(512, 512, { fit: 'inside' }).png().toBuffer();
+    } catch {
+      return null;
+    }
+  }
+
+  /** A plain title card (only if not a single scene could be painted). */
+  private async plainCard(dir: string, title: string) {
+    const file = join(dir, 'card.jpg');
+    const esc = title.replace(/[<>&"]/g, '');
+    await sharp(
+      Buffer.from(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a1458"/><stop offset="1" stop-color="#e0559a"/></linearGradient></defs><rect width="1024" height="1024" fill="url(#g)"/><text x="512" y="540" font-size="72" fill="#fff" text-anchor="middle" font-family="Noto Sans CJK JP, sans-serif">${esc}</text></svg>`,
+      ),
+    )
+      .jpeg()
+      .toFile(file);
+    return file;
   }
 
   /** The same MV with the lyric lines on it (the picture is not edited again). */

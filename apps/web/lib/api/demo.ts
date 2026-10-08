@@ -1002,6 +1002,9 @@ export class DemoApi implements Api {
   async mvRender(): Promise<never> {
     throw new ApiError(501, 'DEMO', 'demo');
   }
+  async mvStory(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
   async mvLyrics(): Promise<never> {
     throw new ApiError(501, 'DEMO', 'demo');
   }

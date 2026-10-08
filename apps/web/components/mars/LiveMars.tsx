@@ -1,26 +1,29 @@
 'use client';
 
-import { MV_MAX_MATERIALS, MV_MAX_SECONDS, type MvProjectView, type SongView } from '@obolo/shared';
+import { type MvProjectView, type SongView } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { usePartner } from '@/lib/partner';
 import { Mic } from '@/components/mercury/ComposeChat';
 
 /**
  * 撮影 on Mars = the MV studio (client decision 2026-10-08). In the chat with Bati:
- * 「どんな映像を作る？」 (MV only for now) → pick one of your Mercury songs → send a few videos / photos
- * → Bati plans the edit, gives it the anime look and sends the finished MV → 「歌詞も入れる？」 →
- * the MV with the lyrics → 公開: it flies as a UFO for 88 hours (every MV also stays in your 裏スタジオ).
+ * 「どんな映像を作る？」 (MV only for now) → pick one of your Mercury songs → your profile picture is the
+ * hero; say what mood you want (or leave it to Bati) → Bati reads the lyrics and the tempo, writes a
+ * storyboard, paints every scene as an anime picture and sends the finished MV (story MV, 2026-10-08)
+ * → 「歌詞も入れる？」 → the MV with the lyrics → 公開: it flies as a UFO for 88 hours (every MV also
+ * stays in your 裏スタジオ).
  */
 type Media = { kind: 'photo' | 'video'; url: string; poster?: string | null };
 type Msg = { who: 'me' | 'partner'; text?: string; media?: Media };
-type Step = 'song' | 'materials' | 'rendering' | 'lyrics?' | 'lyrics' | 'publish' | 'busy';
+type Step = 'song' | 'mood' | 'rendering' | 'lyrics?' | 'lyrics' | 'publish' | 'busy';
 
 const WAIT = [
-  ['素材を見てるよ…', '素材を見てるケン…'],
-  ['曲のリズムに合わせて、どこに何を入れるか考え中…', '曲のリズムに合わせて、どこに何を入れるか考え中だ…'],
-  ['アニメっぽく描いてるよ。ちょっと時間がかかるから待っててね', 'アニメっぽく描いてるケン。ちょっと時間がかかるから待ってろ'],
-  ['つなげて、曲をのせてるよ…', 'つなげて、曲をのせてるケン…'],
+  ['歌詞とテンポを読んでるよ…', '歌詞とテンポを読んでるケン…'],
+  ['絵コンテを考えてるよ。どんな物語にしようかな…', '絵コンテを考えてるケン。どんな物語にするかな…'],
+  ['シーンを1枚ずつアニメの絵に描いてるよ。ちょっと待っててね', 'シーンを1枚ずつアニメの絵に描いてるケン。ちょっと待ってろ'],
+  ['リズムに合わせてつないで、曲をのせてるよ…', 'リズムに合わせてつないで、曲をのせてるケン…'],
   ['もうすぐ！ 仕上げ中…', 'もうすぐだ！ 仕上げ中…'],
 ];
 
@@ -37,11 +40,13 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
   const [step, setStep] = useState<Step>('song');
   const [songs, setSongs] = useState<SongView[] | null>(null);
   const [mv, setMv] = useState<MvProjectView | null>(null);
-  const [uploading, setUploading] = useState(0);
   const [title, setTitle] = useState('');
-  const input = useRef<HTMLInputElement>(null);
+  const [mood, setMood] = useState('');
+  const { me: account } = useAuth();
+  // the hero of the MV: the painted ぷにぷに picture, else the NEO look
+  const heroPic = account?.puniPic ?? account?.avatarUrl ?? null;
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, step, songs, uploading]);
+  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, step, songs]);
   const say = (text: string, media?: Media) => setMsgs((m) => [...m, { who: 'partner', text, media }]);
   const me = (m: Omit<Msg, 'who'>) => setMsgs((cur) => [...cur, { who: 'me', ...m }]);
   const oops = () => say(ken('ごめん、うまくいかなかった……もう一回ためしてね。', 'すまん、うまくいかなかったケン……もう一回ためしてみろ。'));
@@ -61,57 +66,28 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
       setMv(p);
       setTitle(`${s.title}（MV）`.slice(0, 40));
       say(
+        heroPic
+          ? ken(`「${s.title}」のMVだね！ 主人公はきみのプロフィールの絵にするよ。`, `「${s.title}」のMVか！ 主人公はおまえのプロフィールの絵だケン。`)
+          : ken(`「${s.title}」のMVだね！ プロフィールの絵がまだないから、主人公はおまかせで描くね。`, `「${s.title}」のMVか！ プロフィールの絵がまだないから、主人公はおまかせで描くケン。`),
+        heroPic ? { kind: 'photo', url: heroPic } : undefined,
+      );
+      say(
         ken(
-          `「${s.title}」のMVだね！ じゃあ素材を送って。動画や写真を、数本チャットで送ってね（${MV_MAX_MATERIALS}本まで）。`,
-          `「${s.title}」のMVか！ よし、素材を送るケン。動画や写真を、数本チャットで送れ（${MV_MAX_MATERIALS}本まで）。`,
+          'どんな雰囲気のMVにしたい？（たとえば「夜の街でエモく」「夏の海でさわやかに」）話しかけても、おまかせでもOKだよ。',
+          'どんな雰囲気のMVにする？（たとえば「夜の街でエモく」「夏の海でさわやかに」）話しかけても、おまかせでもいいケン。',
         ),
       );
-      setStep('materials');
+      setStep('mood');
     } catch {
       setStep('song');
       oops();
     }
   };
 
-  const send = async (files: FileList) => {
+  const make = async (wish: string) => {
     if (!mv) return;
-    let cur = mv;
-    const list = Array.from(files).slice(0, MV_MAX_MATERIALS - cur.materials.length);
-    setUploading(list.length);
-    let failed = false;
-    for (const f of list) {
-      try {
-        if (f.type.startsWith('video/')) {
-          const v = await getApi().uploadVideo(f, MV_MAX_SECONDS);
-          cur = await getApi().mvAddMaterial(cur.id, { mediaId: v.id, kind: 'video', posterUrl: v.posterUrl || null, seconds: v.seconds });
-          me({ media: { kind: 'video', url: v.url, poster: v.posterUrl } });
-        } else if (f.type.startsWith('image/')) {
-          const p = await getApi().uploadPhoto(f);
-          cur = await getApi().mvAddMaterial(cur.id, { mediaId: p.id, kind: 'photo' });
-          me({ media: { kind: 'photo', url: p.url } });
-        }
-      } catch {
-        failed = true;
-      }
-      setUploading((n) => n - 1);
-    }
-    setUploading(0);
-    setMv(cur);
-    if (failed) say(ken('送れなかった素材があったみたい……別のでためしてね。', '送れなかった素材があったケン……別のでためしてみろ。'));
-    else if (cur.materials.length)
-      say(
-        cur.materials.length >= MV_MAX_MATERIALS
-          ? ken('素材がそろったね！「これで作って」を押してね。', '素材がそろったケン！「これで作って」を押せ。')
-          : ken(
-              `いいね！ いま${cur.materials.length}本。もっと送ってもいいし、そろったら「これで作って」を押してね。`,
-              `いいな！ いま${cur.materials.length}本だ。もっと送ってもいいし、そろったら「これで作って」を押せ。`,
-            ),
-      );
-  };
-
-  const make = async () => {
-    if (!mv) return;
-    me({ text: 'これで作って！' });
+    me({ text: wish ? wish : 'おまかせで作って！' });
+    setMood('');
     setStep('rendering');
     let k = 0;
     say(ken(WAIT[0][0], WAIT[0][1]));
@@ -121,7 +97,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
       if (k === WAIT.length - 1) clearInterval(timer);
     }, 14_000);
     try {
-      const p = await getApi().mvRender(mv.id);
+      const p = await getApi().mvStory(mv.id, wish);
       setMv(p);
       say(ken(`できたよ！ ${p.note ?? ''}`, `できたケン！ ${p.note ?? ''}`), { kind: 'video', url: p.videoUrl!, poster: p.posterUrl });
       if (p.hasLyrics) {
@@ -132,11 +108,11 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
         setStep('publish');
       }
     } catch (e) {
-      setStep('materials');
+      setStep('mood');
       say(
         e instanceof ApiError && e.code === 'BUSY'
           ? ken('いま作ってる途中だよ。少し待ってね。', 'いま作ってる途中だケン。少し待て。')
-          : ken('ごめん、うまく作れなかった……素材を変えるか、もう一回ためしてね。', 'すまん、うまく作れなかったケン……素材を変えるか、もう一回ためしてみろ。'),
+          : ken('ごめん、うまく作れなかった……もう一回ためしてね。', 'すまん、うまく作れなかったケン……もう一回ためしてみろ。'),
       );
     } finally {
       clearInterval(timer);
@@ -230,12 +206,10 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
           </div>
         )}
 
-        {uploading > 0 && <p className="ml-auto w-fit rounded-full bg-white/10 px-3 py-1 text-xs text-white/70">送っています…（のこり{uploading}本）</p>}
-
         {working && (
           <div className="flex items-center gap-2 pl-12 text-xs text-amber-100/80">
             <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-amber-200/70 border-t-transparent" />
-            {ken('いま作ってるよ（1〜3分くらい）', 'いま作ってるケン（1〜3分くらい）')}
+            {step === 'lyrics' ? ken('歌詞を入れてるよ（1分くらい）', '歌詞を入れてるケン（1分くらい）') : ken('いま作ってるよ（2〜4分くらい）', 'いま作ってるケン（2〜4分くらい）')}
           </div>
         )}
 
@@ -273,33 +247,28 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
         <div ref={end} />
       </div>
 
-      {step === 'materials' && mv && (
-        <div className="mb-2 flex items-center gap-2">
-          <button
-            onClick={() => input.current?.click()}
-            disabled={uploading > 0 || mv.materials.length >= MV_MAX_MATERIALS}
-            className="h-11 flex-1 rounded-full bg-white/10 px-4 text-sm font-bold disabled:opacity-40"
-          >
-            📎 動画・写真を送る（{mv.materials.length}/{MV_MAX_MATERIALS}）
+      {step === 'mood' && mv && (
+        <div className="mb-2 space-y-2">
+          <div className="flex items-center gap-2">
+            <input
+              value={mood}
+              onChange={(e) => setMood(e.target.value.slice(0, 200))}
+              onKeyDown={(e) => e.key === 'Enter' && mood.trim() && void make(mood.trim())}
+              placeholder="どんな雰囲気にする？"
+              className="h-11 min-w-0 flex-1 rounded-full bg-white/10 px-4 text-[16px] outline-none"
+            />
+            <Mic value={mood} onChange={(v) => setMood(v.slice(0, 200))} />
+            <button
+              onClick={() => void make(mood.trim())}
+              disabled={!mood.trim()}
+              className="h-11 rounded-full bg-gradient-to-r from-fuchsia-600 to-violet-600 px-4 text-sm font-bold disabled:opacity-40"
+            >
+              送る
+            </button>
+          </div>
+          <button onClick={() => void make('')} className="h-10 w-full rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 text-sm font-bold">
+            ✨ おまかせで作って
           </button>
-          <button
-            onClick={() => void make()}
-            disabled={uploading > 0 || !mv.materials.length}
-            className="h-11 rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 px-4 text-sm font-bold disabled:opacity-40"
-          >
-            これで作って
-          </button>
-          <input
-            ref={input}
-            type="file"
-            accept="video/*,image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files?.length) void send(e.target.files);
-              e.target.value = '';
-            }}
-          />
         </div>
       )}
     </div>

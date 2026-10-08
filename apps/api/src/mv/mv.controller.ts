@@ -10,6 +10,7 @@ import { KV } from '../infra/tokens';
 import { MvService } from './mv.service';
 
 const MaterialBody = AddMvMaterialBody.extend({ posterUrl: z.string().url().max(500).nullish(), seconds: z.number().min(0).max(3600).nullish() });
+const StoryBody = z.object({ mood: z.string().trim().max(200).default('') });
 const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
 /** Mars MV studio: a Mercury song + videos / photos → Bati's MV (docs/placeholders.md P-MV). */
@@ -54,6 +55,14 @@ export class MvController {
   async render(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Req() req: Request) {
     await rateLimit(this.kv, `mv-render:${userId}`, 6, 3600);
     return this.mv.render(userId, id, origin(req));
+  }
+
+  /** Story MV: Bati paints the MV from the song and the profile picture (waits a minute or two). */
+  @Post(':id/story')
+  @HttpCode(200)
+  async story(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `mv-render:${userId}`, 6, 3600);
+    return this.mv.story(userId, id, origin(req), parseBody(StoryBody, body).mood);
   }
 
   @Post(':id/lyrics')

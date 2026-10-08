@@ -334,6 +334,9 @@ export class HttpApi implements Api {
   mvRender(id: string) {
     return this.req<MvProjectView>('POST', `/mars/mv/${id}/render`);
   }
+  mvStory(id: string, mood: string) {
+    return this.req<MvProjectView>('POST', `/mars/mv/${id}/story`, { mood });
+  }
   mvLyrics(id: string) {
     return this.req<MvProjectView>('POST', `/mars/mv/${id}/lyrics`);
   }

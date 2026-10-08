@@ -221,6 +221,8 @@ export interface Api {
   /** waits until the MV is made (a minute or two) */
   mvRender(id: string): Promise<MvProjectView>;
   mvLyrics(id: string): Promise<MvProjectView>;
+  /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) */
+  mvStory(id: string, mood: string): Promise<MvProjectView>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;

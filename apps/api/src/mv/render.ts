@@ -35,19 +35,20 @@ function motion(m: MvSegment['motion'], frames: number) {
   }
 }
 
-/** The picture effect of one cut (on the square SIDE×SIDE picture). */
-function effectFilter(e: MvEffect, beat: number) {
+/** The picture effect of one cut (on the square SIDE×SIDE picture). `painted` = already anime (no painted look on top). */
+function effectFilter(e: MvEffect, beat: number, painted = false) {
+  const look = painted ? 'null' : ANIME_FILTER;
   switch (e) {
     case 'POSTERIZE':
       // cel colours: 3 bits a channel, a little lift so shadows do not go black
-      return `${ANIME_FILTER},lutrgb=r='bitand(val,224)+16':g='bitand(val,224)+16':b='bitand(val,224)+16'`;
+      return `${look},lutrgb=r='bitand(val,224)+16':g='bitand(val,224)+16':b='bitand(val,224)+16'`;
     case 'GLITCH': {
       // colour split all along, plus a hard shake on every beat
       const hit = `lt(mod(t,${beat.toFixed(3)}),0.09)`;
-      return `${ANIME_FILTER},rgbashift=rh=-9:bh=9,noise=alls=9:allf=t,scale=${SIDE + 32}:${SIDE + 32},crop=${SIDE}:${SIDE}:x='16+if(${hit},14*sin(t*97),0)':y='16+if(${hit},10*cos(t*83),0)'`;
+      return `${look},rgbashift=rh=-9:bh=9,noise=alls=9:allf=t,scale=${SIDE + 32}:${SIDE + 32},crop=${SIDE}:${SIDE}:x='16+if(${hit},14*sin(t*97),0)':y='16+if(${hit},10*cos(t*83),0)'`;
     }
     default:
-      return ANIME_FILTER;
+      return look;
   }
 }
 
@@ -81,6 +82,8 @@ export async function renderMv(o: {
   seconds: number;
   bpm: number;
   keyArtist: KeyArtist;
+  /** the materials are anime pictures already (story MV): no painted look on top */
+  painted?: boolean;
 }): Promise<{ video: string; poster: string; keyCuts: number }> {
   const { dir } = o;
   const beat = 60 / (o.bpm || 100);
@@ -122,7 +125,7 @@ export async function renderMv(o: {
       base = `[0:v]crop='min(iw,ih)':'min(iw,ih)',scale=${SIDE}:${SIDE},fps=${FPS},setsar=1`;
     }
     // the キメ絵 are drawn already: they only get a white flash in
-    const look = key ? `fade=t=in:st=0:d=0.25:color=white` : effectFilter(s.effect, beat);
+    const look = key ? `fade=t=in:st=0:d=0.25:color=white` : effectFilter(s.effect, beat, o.painted);
     let graph = `${base},${look}[v]`;
     if (s.effect === 'SPEED_LINES') {
       inputs.push('-loop', '1', '-i', lines);
