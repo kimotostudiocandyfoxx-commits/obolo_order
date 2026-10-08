@@ -11,3 +11,6 @@ coverage/
 .DS_Store
 next-env.d.ts
 apps/web/public/onboarding-test/
+
+# Python bytecode
+__pycache__/
