@@ -36,6 +36,10 @@ export class MvService {
     @Inject(CONFIG) private readonly cfg: AppConfig,
   ) {
     this.keyArtist = new KeyArtist({
+      novitaKey: cfg.NOVITA_API_KEY,
+      novitaModel: cfg.NOVITA_MODEL,
+      novitaStrength: cfg.NOVITA_STRENGTH,
+      novitaSide: cfg.NOVITA_SIDE,
       runwareKey: cfg.RUNWARE_API_KEY,
       runwareModel: cfg.RUNWARE_MODEL,
       geminiKey: cfg.GEMINI_API_KEY,

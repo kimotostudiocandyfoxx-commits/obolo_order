@@ -71,6 +71,11 @@ jobs:
             if [ -n "${{ vars.AGORA_APP_ID }}" ]; then
               echo 'AGORA_APP_CERTIFICATE=obolo-agora-app-certificate:latest'
             fi
+            # Mars MV キメ絵 by Novita AI: switched on by the NOVITA_MODEL variable, after the API key
+            # was stored as obolo-novita-api-key
+            if [ -n "${{ vars.NOVITA_MODEL }}" ]; then
+              echo 'NOVITA_API_KEY=obolo-novita-api-key:latest'
+            fi
             # Mars MV キメ絵 by Runware: switched on by the RUNWARE_MODEL variable, after the API key
             # was stored as obolo-runware-api-key (without it the Gemini image model draws them)
             if [ -n "${{ vars.RUNWARE_MODEL }}" ]; then
@@ -118,6 +123,8 @@ jobs:
             MV_PLAN_MODEL=${{ vars.MV_PLAN_MODEL || 'gemini-2.5-flash-lite' }}
             MV_KEY_CUTS=${{ vars.MV_KEY_CUTS || '2' }}
             RUNWARE_MODEL=${{ vars.RUNWARE_MODEL }}
+            NOVITA_MODEL=${{ vars.NOVITA_MODEL }}
+            NOVITA_STRENGTH=${{ vars.NOVITA_STRENGTH || '0.5' }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
           secrets: ${{ steps.sec.outputs.list }}
 

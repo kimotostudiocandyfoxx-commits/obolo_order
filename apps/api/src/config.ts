@@ -100,6 +100,11 @@ const Env = z.object({
   /** キメ絵 (keyart.ts): how many materials per MV are redrawn as anime illustrations */
   MV_KEY_CUTS: z.coerce.number().default(2),
   MV_KEYART_MODEL: z.string().default('gemini-2.5-flash-image'),
+  /** キメ絵 by Novita AI (client decision 2026-10-08): the key, the anime checkpoint, how far from the photo (0–1), the size */
+  NOVITA_API_KEY: secret(),
+  NOVITA_MODEL: secret(),
+  NOVITA_STRENGTH: z.coerce.number().min(0.1).max(0.9).default(0.5),
+  NOVITA_SIDE: z.coerce.number().default(768),
   RUNWARE_API_KEY: secret(),
   RUNWARE_MODEL: secret(),
 
