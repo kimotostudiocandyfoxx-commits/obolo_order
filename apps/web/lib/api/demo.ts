@@ -910,6 +910,15 @@ export class DemoApi implements Api {
   async followPerson(): Promise<never> {
     return this.noComms();
   }
+  async blockPerson(): Promise<never> {
+    return this.noComms();
+  }
+  async blockedPeople(): Promise<never[]> {
+    return [];
+  }
+  async reportPerson(): Promise<never> {
+    return this.noComms();
+  }
   async dmMessages(): Promise<never[]> {
     return [];
   }

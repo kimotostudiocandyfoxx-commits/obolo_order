@@ -127,6 +127,13 @@
       "when": 1791420420374,
       "tag": "0017_earth_comms",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1791427899737,
+      "tag": "0018_comms_safety",
+      "breakpoints": true
     }
   ]
 }

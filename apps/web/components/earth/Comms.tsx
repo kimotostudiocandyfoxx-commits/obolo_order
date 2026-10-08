@@ -91,7 +91,7 @@ function Layer({ children }: { children: ReactNode }) {
   return ready ? createPortal(children, document.body) : null;
 }
 
-function Overlay({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
+function Overlay({ title, onBack, action, children }: { title: string; onBack: () => void; action?: ReactNode; children: ReactNode }) {
   return (
     <Layer>
       <div className="fixed inset-0 z-[120] flex flex-col bg-[#0b1530] backdrop-blur">
@@ -100,10 +100,159 @@ function Overlay({ title, onBack, children }: { title: string; onBack: () => voi
             ←
           </button>
           <p className="min-w-0 flex-1 truncate font-bold">{title}</p>
+          {action}
         </div>
         {children}
       </div>
     </Layer>
+  );
+}
+
+const REASONS = [
+  ['mean', 'いやなことを言われた'],
+  ['scary', 'こわい・あやしい'],
+  ['other', 'その他'],
+] as const;
+
+/**
+ * ⋯ → 通報する / ブロックする (client: a safe SNS for kids). A block ends the follows both ways and
+ * stops mail and calls; the other person is not told. Reports are kept for the team (P-COMMS-5).
+ */
+function SafetyMenu({ person, kind, onBlocked }: { person: CommsPerson; kind: 'mail' | 'call' | 'person'; onBlocked: () => void }) {
+  const [open, setOpen] = useState<'menu' | 'report' | 'block' | 'done' | null>(null);
+  const [doneText, setDoneText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const report = async (reason: (typeof REASONS)[number][0]) => {
+    setBusy(true);
+    try {
+      await getApi().reportPerson({ userId: person.id, kind, reason });
+      setDoneText('通報しました。運営が確認します。教えてくれてありがとう。');
+    } catch {
+      setDoneText('送れませんでした…もう一度ためしてね');
+    } finally {
+      setBusy(false);
+      setOpen('done');
+    }
+  };
+  const block = async () => {
+    setBusy(true);
+    try {
+      await getApi().blockPerson(person.id, true);
+      setOpen(null);
+      onBlocked();
+    } catch {
+      setDoneText('ブロックできませんでした…もう一度ためしてね');
+      setOpen('done');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <>
+      <button onClick={() => setOpen('menu')} className="btn btn-ghost h-9 w-9 !p-0 text-lg" aria-label="通報・ブロック">
+        ⋯
+      </button>
+      {open && (
+        <Layer>
+          <div className="fixed inset-0 z-[150] flex items-end justify-center bg-black/60" onClick={() => setOpen(null)}>
+            <div className="pb-safe w-full max-w-md rounded-t-3xl bg-[#121c3a] p-5" onClick={(e) => e.stopPropagation()}>
+              {open === 'menu' && (
+                <div className="space-y-2">
+                  <p className="pb-1 text-center text-sm text-white/60">{nameOf(person)}</p>
+                  <button onClick={() => setOpen('report')} className="w-full rounded-2xl bg-white/10 py-3 font-bold">
+                    🚩 通報する
+                  </button>
+                  <button onClick={() => setOpen('block')} className="w-full rounded-2xl bg-white/10 py-3 font-bold text-rose-300">
+                    🚫 ブロックする
+                  </button>
+                  <button onClick={() => setOpen(null)} className="w-full py-2 text-sm text-white/60">
+                    やめる
+                  </button>
+                </div>
+              )}
+              {open === 'report' && (
+                <div className="space-y-2">
+                  <p className="pb-1 text-center text-sm font-bold">どうしましたか？</p>
+                  {REASONS.map(([k, label]) => (
+                    <button key={k} disabled={busy} onClick={() => void report(k)} className="w-full rounded-2xl bg-white/10 py-3 disabled:opacity-50">
+                      {label}
+                    </button>
+                  ))}
+                  <p className="pt-1 text-center text-[11px] text-white/50">こまったときは、おうちの人にも話してね</p>
+                </div>
+              )}
+              {open === 'block' && (
+                <div className="space-y-3 text-center">
+                  <p className="font-bold">{nameOf(person)} をブロックしますか？</p>
+                  <p className="text-xs leading-relaxed text-white/60">
+                    おたがいのフォローが外れて、メールも電話もできなくなります。相手には知らされません。あとで「ブロックした人」から元に戻せます。
+                  </p>
+                  <button disabled={busy} onClick={() => void block()} className="w-full rounded-2xl bg-rose-500 py-3 font-bold disabled:opacity-50">
+                    ブロックする
+                  </button>
+                  <button onClick={() => setOpen(null)} className="w-full py-2 text-sm text-white/60">
+                    やめる
+                  </button>
+                </div>
+              )}
+              {open === 'done' && (
+                <div className="space-y-3 text-center">
+                  <p className="text-sm leading-relaxed">{doneText}</p>
+                  <button onClick={() => setOpen(null)} className="w-full rounded-2xl bg-white/10 py-3 font-bold">
+                    とじる
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </Layer>
+      )}
+    </>
+  );
+}
+
+/** The people you blocked, to unblock them. */
+function BlockedList({ onChange }: { onChange: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [list, setList] = useState<CommsFound[] | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    getApi()
+      .blockedPeople()
+      .then(setList)
+      .catch(() => setList([]));
+  }, [open]);
+  if (!open)
+    return (
+      <button onClick={() => setOpen(true)} className="mt-6 w-full py-2 text-center text-xs text-white/45 underline">
+        ブロックした人
+      </button>
+    );
+  return (
+    <div className="mt-6 rounded-2xl border border-white/10 p-3">
+      <p className="mb-2 text-xs font-bold text-white/60">🚫 ブロックした人</p>
+      {list?.length === 0 && <p className="text-center text-xs text-white/45">いません</p>}
+      {list?.map((p) => (
+        <div key={p.id} className="flex items-center gap-3 py-1.5">
+          <Face p={p} size={34} />
+          <p className="min-w-0 flex-1 truncate text-sm">{nameOf(p)}</p>
+          <button
+            onClick={() =>
+              void getApi()
+                .blockPerson(p.id, false)
+                .then(() => {
+                  setList((cur) => (cur ?? []).filter((x) => x.id !== p.id));
+                  onChange();
+                })
+                .catch(() => undefined)
+            }
+            className="rounded-full border border-white/25 px-3 py-1 text-xs"
+          >
+            ブロックをやめる
+          </button>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -185,22 +334,41 @@ function FindFriend({ onChange }: { onChange: () => void }) {
           <div className="min-w-0 flex-1">
             <p className="truncate font-bold">{nameOf(found)}</p>
             <p className="truncate text-[11px] text-white/55">
-              {found.followedByMe && found.followsMe
-                ? '🤝 ダチです。メールと電話ができます'
-                : found.followedByMe
-                  ? '相手がフォローしかえすとダチになります'
-                  : found.followsMe
-                    ? 'あなたをフォローしています。フォローするとダチ！'
-                    : `@${found.handle}`}
+              {found.blockedByMe
+                ? '🚫 ブロック中'
+                : found.followedByMe && found.followsMe
+                  ? '🤝 ダチです。メールと電話ができます'
+                  : found.followedByMe
+                    ? '相手がフォローしかえすとダチになります'
+                    : found.followsMe
+                      ? 'あなたをフォローしています。フォローするとダチ！'
+                      : `@${found.handle}`}
             </p>
           </div>
-          <button
-            onClick={() => void toggle(found)}
-            disabled={busy}
-            className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-50 ${found.followedByMe ? 'border border-white/30' : 'bg-violet-600'}`}
-          >
-            {found.followedByMe ? 'フォロー中' : 'フォローする'}
-          </button>
+          {found.blockedByMe ? (
+            <button
+              onClick={() =>
+                void getApi()
+                  .blockPerson(found.id, false)
+                  .then((r) => {
+                    setFound(r);
+                    onChange();
+                  })
+                  .catch(() => undefined)
+              }
+              className="shrink-0 rounded-full border border-white/30 px-4 py-2 text-sm font-bold"
+            >
+              ブロックをやめる
+            </button>
+          ) : (
+            <button
+              onClick={() => void toggle(found)}
+              disabled={busy}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-50 ${found.followedByMe ? 'border border-white/30' : 'bg-violet-600'}`}
+            >
+              {found.followedByMe ? 'フォロー中' : 'フォローする'}
+            </button>
+          )}
         </div>
       )}
     </div>
@@ -212,7 +380,18 @@ const NO_FRIENDS = 'まだダチがいません。上の「＋ ダチをさが�
 function MailScreen({ status, onClose }: { status: CommsStatus; onClose: () => void }) {
   const [contacts, reload] = useContacts();
   const [peer, setPeer] = useState<CommsContact | null>(null);
-  if (peer) return <Conversation status={status} peer={peer} onBack={() => setPeer(null)} />;
+  if (peer)
+    return (
+      <Conversation
+        status={status}
+        peer={peer}
+        onBack={() => setPeer(null)}
+        onBlocked={() => {
+          setPeer(null);
+          reload();
+        }}
+      />
+    );
   return (
     <Overlay title="✉️ メール" onBack={onClose}>
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
@@ -229,12 +408,13 @@ function MailScreen({ status, onClose }: { status: CommsStatus; onClose: () => v
             {c.unread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-rose-400" aria-label="未読" />}
           </button>
         ))}
+        <BlockedList onChange={reload} />
       </div>
     </Overlay>
   );
 }
 
-function Conversation({ status, peer, onBack }: { status: CommsStatus; peer: CommsContact; onBack: () => void }) {
+function Conversation({ status, peer, onBack, onBlocked }: { status: CommsStatus; peer: CommsContact; onBack: () => void; onBlocked: () => void }) {
   const { me } = useAuth();
   const [msgs, setMsgs] = useState<DmMessage[]>([]);
   const [text, setText] = useState('');
@@ -274,7 +454,7 @@ function Conversation({ status, peer, onBack }: { status: CommsStatus; peer: Com
   };
 
   return (
-    <Overlay title={nameOf(peer)} onBack={onBack}>
+    <Overlay title={nameOf(peer)} onBack={onBack} action={<SafetyMenu person={peer} kind="mail" onBlocked={onBlocked} />}>
       <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3">
         {!msgs.length && <p className="py-10 text-center text-sm text-white/50">{nameOf(peer)} にメッセージを送ってみよう</p>}
         {msgs.map((m) =>
@@ -333,8 +513,10 @@ function PhoneScreen({ onClose, onCall }: { onClose: () => void; onCall: (to: Co
             >
               📞
             </button>
+            <SafetyMenu person={c} kind="person" onBlocked={reload} />
           </div>
         ))}
+        <BlockedList onChange={reload} />
       </div>
     </Overlay>
   );
@@ -493,6 +675,13 @@ function CallScreen({ initial, join, demo, onClose }: { initial: CallView; join?
             {done ? '✕' : '📵'}
           </button>
         </div>
+        {done && (
+          // after a call: report or block if something was wrong
+          <div className="flex items-center gap-2 text-xs text-white/55">
+            こまったことがあったら
+            <SafetyMenu person={other} kind="call" onBlocked={onClose} />
+          </div>
+        )}
       </div>
     </Layer>
   );

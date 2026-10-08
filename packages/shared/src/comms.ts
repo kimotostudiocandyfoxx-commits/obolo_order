@@ -20,7 +20,16 @@ export type CommsStatus = {
 };
 
 /** Someone found by their user ID, and how you two are connected (no counts). */
-export type CommsFound = CommsPerson & { followedByMe: boolean; followsMe: boolean };
+export type CommsFound = CommsPerson & { followedByMe: boolean; followsMe: boolean; blockedByMe: boolean };
+
+/** Report someone (mail, a call, or the person). Kept for the team to review (P-COMMS-5). */
+export const ReportBody = z.object({
+  userId: z.string().uuid(),
+  kind: z.enum(['mail', 'call', 'person']),
+  reason: z.enum(['mean', 'scary', 'other']),
+  note: z.string().trim().max(300).default(''),
+});
+export type ReportBody = z.infer<typeof ReportBody>;
 
 export const FollowBody = z.object({ on: z.boolean() });
 

@@ -1,11 +1,11 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { CALL_RING_SECONDS, type CallJoin, type CallView, type CommsContact, type CommsFound, type CommsPerson, type CommsStatus, type DmMessage, type SendDmBody } from '@obolo/shared';
+import { CALL_RING_SECONDS, type CallJoin, type CallView, type CommsContact, type CommsFound, type CommsPerson, type CommsStatus, type DmMessage, type ReportBody, type SendDmBody } from '@obolo/shared';
 import { and, desc, eq, gt, inArray, isNull, lt, or, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
-import { callSessions, dmMessages, follows, users } from '../db/schema';
+import { callSessions, dmMessages, follows, userBlocks, userReports, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { makeCallProvider, makeMailRealtime, pairKey, type CallProvider, type MailRealtime } from './providers';
 
@@ -54,11 +54,22 @@ export class CommsService {
     return Number(rows[0]?.n ?? 0) === 2;
   }
 
-  /** Both are members and ダチ: they may write to and call each other. */
+  /** Blocks between two people: whether I blocked them, whether they blocked me. */
+  private async blocks(a: string, b: string) {
+    const rows = await this.db.read
+      .select({ blockerId: userBlocks.blockerId })
+      .from(userBlocks)
+      .where(or(and(eq(userBlocks.blockerId, a), eq(userBlocks.blockedId, b)), and(eq(userBlocks.blockerId, b), eq(userBlocks.blockedId, a))));
+    return { byMe: rows.some((r) => r.blockerId === a), byThem: rows.some((r) => r.blockerId === b) };
+  }
+
+  /** Both are members and ダチ (and nobody blocked anybody): they may write to and call each other. */
   private async mustReach(userId: string, peerId: string) {
     await this.mustBeMember(userId);
     if (userId === peerId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'That is you');
-    if (!(await this.areFriends(userId, peerId))) throw apiError(HttpStatus.FORBIDDEN, 'NOT_FRIENDS', 'Only ダチ (people who follow each other) can write and call');
+    const b = await this.blocks(userId, peerId);
+    // a block looks the same as "not ダチ" from either side (the blocked person is not told)
+    if (b.byMe || b.byThem || !(await this.areFriends(userId, peerId))) throw apiError(HttpStatus.FORBIDDEN, 'NOT_FRIENDS', 'Only ダチ (people who follow each other) can write and call');
     if (!(await this.isMember(peerId))) throw apiError(HttpStatus.FORBIDDEN, 'PEER_NOT_MEMBER', 'They have not joined ORDER yet');
   }
 
@@ -67,7 +78,8 @@ export class CommsService {
       .select({ followerId: follows.followerId })
       .from(follows)
       .where(or(and(eq(follows.followerId, userId), eq(follows.followeeId, other.id)), and(eq(follows.followerId, other.id), eq(follows.followeeId, userId))));
-    return { ...other, followedByMe: rows.some((r) => r.followerId === userId), followsMe: rows.some((r) => r.followerId === other.id) };
+    const b = await this.blocks(userId, other.id);
+    return { ...other, followedByMe: rows.some((r) => r.followerId === userId), followsMe: rows.some((r) => r.followerId === other.id), blockedByMe: b.byMe };
   }
 
   /** Find someone by their exact user ID (to become ダチ from the mail / phone screens). */
@@ -79,6 +91,8 @@ export class CommsService {
       .from(users)
       .where(and(sql`lower(${users.handle}) = ${h}`, isNull(users.deletedAt)));
     if (!u || u.id === userId) return null;
+    // someone who blocked you cannot be found by you
+    if ((await this.blocks(userId, u.id)).byThem) return null;
     return this.relation(userId, u);
   }
 
@@ -86,9 +100,51 @@ export class CommsService {
     if (userId === otherId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'That is you');
     const [u] = await this.db.read.select(personCols).from(users).where(and(eq(users.id, otherId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
+    const b = await this.blocks(userId, otherId);
+    if (on && b.byThem) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
+    if (on && b.byMe) throw apiError(HttpStatus.CONFLICT, 'BLOCKED', 'Unblock them first');
     if (on) await this.db.write.insert(follows).values({ followerId: userId, followeeId: otherId }).onConflictDoNothing();
     else await this.db.write.delete(follows).where(and(eq(follows.followerId, userId), eq(follows.followeeId, otherId)));
     return this.relation(userId, u);
+  }
+
+  /** Block (or unblock) someone: the follows end both ways, mail and calls stop. */
+  async block(userId: string, otherId: string, on: boolean): Promise<CommsFound> {
+    if (userId === otherId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'That is you');
+    const [u] = await this.db.read.select(personCols).from(users).where(eq(users.id, otherId));
+    if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
+    if (on) {
+      await this.db.write.transaction(async (tx) => {
+        await tx.insert(userBlocks).values({ blockerId: userId, blockedId: otherId }).onConflictDoNothing();
+        await tx.delete(follows).where(or(and(eq(follows.followerId, userId), eq(follows.followeeId, otherId)), and(eq(follows.followerId, otherId), eq(follows.followeeId, userId))));
+        // a call ringing between them stops
+        await tx
+          .update(callSessions)
+          .set({ status: 'ended', endedAt: new Date() })
+          .where(
+            and(
+              inArray(callSessions.status, ['ringing', 'active']),
+              or(and(eq(callSessions.callerId, userId), eq(callSessions.calleeId, otherId)), and(eq(callSessions.callerId, otherId), eq(callSessions.calleeId, userId))),
+            ),
+          );
+      });
+    } else {
+      await this.db.write.delete(userBlocks).where(and(eq(userBlocks.blockerId, userId), eq(userBlocks.blockedId, otherId)));
+    }
+    return this.relation(userId, u);
+  }
+
+  /** The people you blocked (to unblock them). */
+  async blocked(userId: string): Promise<CommsFound[]> {
+    const rows = await this.db.read.select(personCols).from(userBlocks).innerJoin(users, eq(users.id, userBlocks.blockedId)).where(eq(userBlocks.blockerId, userId));
+    return rows.map((u) => ({ ...u, followedByMe: false, followsMe: false, blockedByMe: true }));
+  }
+
+  async report(userId: string, body: ReportBody) {
+    if (userId === body.userId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'That is you');
+    await this.db.write.insert(userReports).values({ reporterId: userId, targetUserId: body.userId, kind: body.kind, reason: body.reason, note: body.note });
+    this.log.warn(`report: ${body.kind}/${body.reason} about ${body.userId}`);
+    return { ok: true };
   }
 
   async status(userId: string): Promise<CommsStatus> {
@@ -107,6 +163,7 @@ export class CommsService {
           eq(follows.followerId, userId),
           isNull(users.deletedAt),
           sql`EXISTS (SELECT 1 FROM ${follows} g WHERE g.follower_id = ${follows.followeeId} AND g.followee_id = ${userId})`,
+          sql`NOT EXISTS (SELECT 1 FROM ${userBlocks} b WHERE (b.blocker_id = ${userId} AND b.blocked_id = ${follows.followeeId}) OR (b.blocker_id = ${follows.followeeId} AND b.blocked_id = ${userId}))`,
         ),
       );
     if (!friends.length) return [];

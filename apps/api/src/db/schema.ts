@@ -507,3 +507,41 @@ export const callSessions = pgTable(
   },
   (t) => [index('call_sessions_callee_idx').on(t.calleeId, t.status, t.createdAt), index('call_sessions_caller_idx').on(t.callerId, t.createdAt)],
 );
+
+/** Earth: blocks (client: a safe SNS for kids). A block ends the follows both ways and stops mail / calls. */
+export const userBlocks = pgTable(
+  'user_blocks',
+  {
+    blockerId: uuid('blocker_id')
+      .notNull()
+      .references(() => users.id),
+    blockedId: uuid('blocked_id')
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('user_blocks_pair_idx').on(t.blockerId, t.blockedId), index('user_blocks_blocked_idx').on(t.blockedId)],
+);
+
+/** Reports from members (mail, calls, people), kept for the team to review. PLACEHOLDER (P-COMMS-5): no review screen yet. */
+export const userReports = pgTable(
+  'user_reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    reporterId: uuid('reporter_id')
+      .notNull()
+      .references(() => users.id),
+    targetUserId: uuid('target_user_id')
+      .notNull()
+      .references(() => users.id),
+    /** mail | call | person */
+    kind: text('kind').notNull(),
+    /** mean | scary | other */
+    reason: text('reason').notNull(),
+    note: text('note').notNull().default(''),
+    /** open | reviewed */
+    status: text('status').notNull().default('open'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('user_reports_status_idx').on(t.status, t.createdAt)],
+);

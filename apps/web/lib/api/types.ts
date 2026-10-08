@@ -192,6 +192,9 @@ export interface Api {
   commsContacts(): Promise<CommsContact[]>;
   findPerson(handle: string): Promise<{ person: CommsFound | null }>;
   followPerson(id: string, on: boolean): Promise<CommsFound>;
+  blockPerson(id: string, on: boolean): Promise<CommsFound>;
+  blockedPeople(): Promise<CommsFound[]>;
+  reportPerson(body: { userId: string; kind: 'mail' | 'call' | 'person'; reason: 'mean' | 'scary' | 'other'; note?: string }): Promise<void>;
   dmMessages(peerId: string, after?: string): Promise<DmMessage[]>;
   sendDm(peerId: string, body: { text: string; audioUrl?: string }): Promise<DmMessage>;
   readDm(peerId: string): Promise<void>;

@@ -5,7 +5,7 @@ import { and, asc, count, desc, eq, gt, inArray, isNull, lt, or, sql, sum, type 
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { follows, saturnPosts, starEvents, users } from '../db/schema';
+import { follows, saturnPosts, starEvents, userBlocks, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
@@ -237,6 +237,14 @@ export class SaturnService {
     if (viewerId === userId) throw apiError(HttpStatus.BAD_REQUEST, 'BAD_REQUEST', 'You cannot follow yourself');
     const [u] = await this.db.write.select({ id: users.id }).from(users).where(and(eq(users.id, userId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
+    if (on) {
+      // a block (either way, set on Earth) also stops following from here
+      const [blocked] = await this.db.write
+        .select({ id: userBlocks.blockerId })
+        .from(userBlocks)
+        .where(or(and(eq(userBlocks.blockerId, viewerId), eq(userBlocks.blockedId, userId)), and(eq(userBlocks.blockerId, userId), eq(userBlocks.blockedId, viewerId))));
+      if (blocked) throw apiError(HttpStatus.FORBIDDEN, 'BLOCKED', 'You cannot follow this person');
+    }
     if (on) await this.db.write.insert(follows).values({ followerId: viewerId, followeeId: userId }).onConflictDoNothing();
     else await this.db.write.delete(follows).where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, userId)));
     return this.profile(viewerId, userId);

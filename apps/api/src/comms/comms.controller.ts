@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
-import { FollowBody, SendDmBody, StartCallBody } from '@obolo/shared';
+import { FollowBody, ReportBody, SendDmBody, StartCallBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -31,6 +31,24 @@ export class CommsController {
   async follow(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
     await rateLimit(this.kv, `comms-follow:${userId}`, 60, 600);
     return this.comms.follow(userId, id, parseBody(FollowBody, body).on);
+  }
+
+  @Post('block/:id')
+  @HttpCode(200)
+  block(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown) {
+    return this.comms.block(userId, id, parseBody(FollowBody, body).on);
+  }
+
+  @Get('blocked')
+  blocked(@UserId() userId: string) {
+    return this.comms.blocked(userId);
+  }
+
+  @Post('report')
+  @HttpCode(200)
+  async report(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `report:${userId}`, 20, 3600);
+    return this.comms.report(userId, parseBody(ReportBody, body));
   }
 
   @Get('contacts')

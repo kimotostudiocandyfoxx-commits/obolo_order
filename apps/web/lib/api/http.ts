@@ -266,6 +266,15 @@ export class HttpApi implements Api {
   followPerson(id: string, on: boolean) {
     return this.req<Awaited<ReturnType<Api['followPerson']>>>('POST', `/comms/follow/${id}`, { on });
   }
+  blockPerson(id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['blockPerson']>>>('POST', `/comms/block/${id}`, { on });
+  }
+  blockedPeople() {
+    return this.req<Awaited<ReturnType<Api['blockedPeople']>>>('GET', '/comms/blocked');
+  }
+  async reportPerson(body: Parameters<Api['reportPerson']>[0]) {
+    await this.req('POST', '/comms/report', body);
+  }
   dmMessages(peerId: string, after?: string) {
     return this.req<Awaited<ReturnType<Api['dmMessages']>>>('GET', `/comms/messages/${peerId}${after ? `?after=${encodeURIComponent(after)}` : ''}`);
   }
