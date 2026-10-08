@@ -4,6 +4,8 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { BillingController } from './billing/billing.controller';
 import { BillingService } from './billing/billing.service';
+import { CommsController } from './comms/comms.controller';
+import { CommsService } from './comms/comms.service';
 import { ComposeController } from './compose/compose.controller';
 import { ComposeService } from './compose/compose.service';
 import { SongService } from './compose/song.service';
@@ -36,7 +38,7 @@ import { WalletController } from './wallet/wallet.controller';
 /** One module for the demo; split per planet (spec §4.3) as the surface grows. */
 @Module({
   imports: [InfraModule],
-  controllers: [HealthController, AuthController, UsersController, WalletController, BuddyController, MediaController, SaturnController, SaturnUsersController, SaturnPlazasController, JupiterController, MarsController, PlanetPostsController, InvitesController, LookController, BillingController, ComposeController, VoiceController],
-  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, PlazaService, JupiterService, MarsService, PlanetPostsService, InvitesService, LookService, BillingService, ComposeService, SongService, VoiceService],
+  controllers: [HealthController, AuthController, UsersController, WalletController, BuddyController, MediaController, SaturnController, SaturnUsersController, SaturnPlazasController, JupiterController, MarsController, PlanetPostsController, InvitesController, LookController, BillingController, ComposeController, VoiceController, CommsController],
+  providers: [AuthGuard, AuthService, UsersService, LedgerService, BuddyService, MediaService, SaturnService, PlazaService, JupiterService, MarsService, PlanetPostsService, InvitesService, LookService, BillingService, ComposeService, SongService, VoiceService, CommsService],
 })
 export class AppModule {}

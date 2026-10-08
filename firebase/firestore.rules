@@ -1,0 +1,17 @@
+rules_version = '2';
+// Earth mail (docs/earth-comms.md): the API writes every message (after its checks) with the
+// Admin SDK; members only READ the conversations they are in. Nobody writes from the app.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /dm/{pair} {
+      allow read: if request.auth != null && request.auth.uid in resource.data.members;
+      match /messages/{id} {
+        allow read: if request.auth != null
+          && request.auth.uid in get(/databases/$(database)/documents/dm/$(pair)).data.members;
+      }
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

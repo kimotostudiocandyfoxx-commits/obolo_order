@@ -69,6 +69,23 @@ const Env = z.object({
   /** Optional Price id (price_…). Unset = an inline ¥ORDER_PRICE_JPY monthly price. */
   STRIPE_PRICE_ID: secret(),
 
+  /**
+   * Earth mail & phone (client decision 2026-10-08: opened to each member after the ¥88 ORDER).
+   * PLACEHOLDER (P-COMMS-1): members only; false lets anyone logged in try it (demo / tests).
+   */
+  COMMS_MEMBERS_ONLY: bool(true),
+  /** Agora (phone). Without both, calls ring and connect in demo mode (no audio). */
+  AGORA_APP_ID: secret(),
+  AGORA_APP_CERTIFICATE: secret(),
+  /**
+   * Firebase (real-time mail). Recommended: Firebase added to this same GCP project — set
+   * FIREBASE_PROJECT_ID and the API signs in as its own service account (FIREBASE_SIGNER_SA, no
+   * key file). Or FIREBASE_SERVICE_ACCOUNT = a service account JSON. Neither = mail by polling.
+   */
+  FIREBASE_PROJECT_ID: secret(),
+  FIREBASE_SIGNER_SA: secret(),
+  FIREBASE_SERVICE_ACCOUNT: secret(),
+
   /** Fish Audio API (voices: registration, read-aloud, singing). Unset = voice features off. */
   FISH_API_KEY: secret(),
   /** PLACEHOLDER (P-VOICE-1): Fish Audio model name (client: s2.1-pro). */

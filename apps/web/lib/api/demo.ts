@@ -894,6 +894,45 @@ export class DemoApi implements Api {
     return { id: r.id, author: this.pAuthor(viewer), text: r.text, createdAt: r.createdAt };
   }
 
+  // Earth mail & phone need the server (members, between ダチ): closed in the browser-only demo
+  async commsStatus() {
+    return { open: false, mail: 'poll' as const, call: 'demo' as const, firebaseProjectId: null };
+  }
+  async commsContacts(): Promise<never[]> {
+    return [];
+  }
+  private noComms(): never {
+    throw new ApiError(403, 'NOT_MEMBER', 'Mail and phone need the server');
+  }
+  async dmMessages(): Promise<never[]> {
+    return [];
+  }
+  async sendDm(): Promise<never> {
+    return this.noComms();
+  }
+  async readDm() {}
+  async firebaseToken(): Promise<never> {
+    return this.noComms();
+  }
+  async startCall(): Promise<never> {
+    return this.noComms();
+  }
+  async incomingCalls(): Promise<never[]> {
+    return [];
+  }
+  async getCall(): Promise<never> {
+    return this.noComms();
+  }
+  async answerCall(): Promise<never> {
+    return this.noComms();
+  }
+  async declineCall(): Promise<never> {
+    return this.noComms();
+  }
+  async endCall(): Promise<never> {
+    return this.noComms();
+  }
+
   async marsBackstage() {
     const viewer = this.uid();
     return (this.s.backstage ?? []).filter((v) => v.owner === viewer).map(({ owner: _o, ...v }) => v);

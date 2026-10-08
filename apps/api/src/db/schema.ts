@@ -461,3 +461,49 @@ export const songs = pgTable(
   },
   (t) => [index('songs_user_idx').on(t.userId, t.createdAt)],
 );
+
+/**
+ * Earth: mail between ダチ (members only — client decision 2026-10-08). The API is the source of
+ * truth (membership, ダチ and moderation checks); Firebase only delivers them in real time.
+ */
+export const dmMessages = pgTable(
+  'dm_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    senderId: uuid('sender_id')
+      .notNull()
+      .references(() => users.id),
+    recipientId: uuid('recipient_id')
+      .notNull()
+      .references(() => users.id),
+    /** text | voice (a recorded message) */
+    kind: text('kind').notNull().default('text'),
+    text: text('text').notNull().default(''),
+    audioUrl: text('audio_url'),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('dm_messages_pair_idx').on(t.senderId, t.recipientId, t.createdAt), index('dm_messages_inbox_idx').on(t.recipientId, t.readAt)],
+);
+
+/** Earth: phone calls between ダチ. The API rings / answers / ends; the audio goes through Agora. */
+export const callSessions = pgTable(
+  'call_sessions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    callerId: uuid('caller_id')
+      .notNull()
+      .references(() => users.id),
+    calleeId: uuid('callee_id')
+      .notNull()
+      .references(() => users.id),
+    /** the Agora channel name */
+    channel: text('channel').notNull(),
+    /** ringing | active | declined | missed | ended */
+    status: text('status').notNull().default('ringing'),
+    answeredAt: timestamp('answered_at', { withTimezone: true }),
+    endedAt: timestamp('ended_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('call_sessions_callee_idx').on(t.calleeId, t.status, t.createdAt), index('call_sessions_caller_idx').on(t.callerId, t.createdAt)],
+);

@@ -66,6 +66,11 @@ jobs:
             if [ "${{ vars.FISH_ENABLED }}" = "true" ]; then
               echo 'FISH_API_KEY=obolo-fish-api-key:latest'
             fi
+            # Earth phone (Agora): switched on by the AGORA_APP_ID variable, after scripts/comms-setup.sh
+            # stored the App Certificate
+            if [ -n "${{ vars.AGORA_APP_ID }}" ]; then
+              echo 'AGORA_APP_CERTIFICATE=obolo-agora-app-certificate:latest'
+            fi
             if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
               echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
               echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'
@@ -97,6 +102,10 @@ jobs:
             BUNNY_CDN_HOST=${{ vars.BUNNY_CDN_HOST }}
             STRIPE_PUBLISHABLE_KEY=${{ vars.STRIPE_PUBLISHABLE_KEY }}
             STRIPE_PRICE_ID=${{ vars.STRIPE_PRICE_ID }}
+            COMMS_MEMBERS_ONLY=${{ vars.COMMS_MEMBERS_ONLY || 'true' }}
+            AGORA_APP_ID=${{ vars.AGORA_APP_ID }}
+            FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}
+            FIREBASE_SIGNER_SA=${{ env.RUNTIME_SA }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
           secrets: ${{ steps.sec.outputs.list }}
 

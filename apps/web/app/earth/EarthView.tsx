@@ -9,6 +9,7 @@ import { Avatar } from '@/components/Avatar';
 import { PlanetShell } from '@/components/PlanetShell';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { CommsTiles } from '@/components/earth/Comms';
 import { InviteCard } from './InviteCard';
 import { useI18n } from '@/lib/i18n/client';
 
@@ -146,9 +147,9 @@ function Home() {
         <p className="mt-2 text-[11px] text-white/45">{m.earth.bankHint}</p>
       </section>
       <InviteCard />
+      <CommsTiles />
       <div className="grid grid-cols-2 gap-3">
         <FeatureTile icon="🎙️" title={m.earth.voice} hint={m.earth.voiceHint} />
-        <FeatureTile icon="✉️" title={m.earth.messages} hint={m.earth.messagesHint} />
       </div>
       <button className="btn btn-ghost w-full" onClick={() => void signOut()}>
         {m.earth.logout}

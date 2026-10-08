@@ -254,6 +254,42 @@ export class HttpApi implements Api {
   replyPlanet(planet: TimelinePlanet, id: string, text: string) {
     return this.req<Awaited<ReturnType<Api['replyPlanet']>>>('POST', `/planets/${planet}/posts/${id}/replies`, { text });
   }
+  commsStatus() {
+    return this.req<Awaited<ReturnType<Api['commsStatus']>>>('GET', '/comms/status');
+  }
+  commsContacts() {
+    return this.req<Awaited<ReturnType<Api['commsContacts']>>>('GET', '/comms/contacts');
+  }
+  dmMessages(peerId: string, after?: string) {
+    return this.req<Awaited<ReturnType<Api['dmMessages']>>>('GET', `/comms/messages/${peerId}${after ? `?after=${encodeURIComponent(after)}` : ''}`);
+  }
+  sendDm(peerId: string, body: { text: string; audioUrl?: string }) {
+    return this.req<Awaited<ReturnType<Api['sendDm']>>>('POST', `/comms/messages/${peerId}`, body);
+  }
+  async readDm(peerId: string) {
+    await this.req('POST', `/comms/messages/${peerId}/read`);
+  }
+  firebaseToken() {
+    return this.req<Awaited<ReturnType<Api['firebaseToken']>>>('POST', '/comms/firebase-token');
+  }
+  startCall(to: string) {
+    return this.req<Awaited<ReturnType<Api['startCall']>>>('POST', '/comms/calls', { to });
+  }
+  incomingCalls() {
+    return this.req<Awaited<ReturnType<Api['incomingCalls']>>>('GET', '/comms/calls/incoming');
+  }
+  getCall(id: string) {
+    return this.req<Awaited<ReturnType<Api['getCall']>>>('GET', `/comms/calls/${id}`);
+  }
+  answerCall(id: string) {
+    return this.req<Awaited<ReturnType<Api['answerCall']>>>('POST', `/comms/calls/${id}/answer`);
+  }
+  declineCall(id: string) {
+    return this.req<Awaited<ReturnType<Api['declineCall']>>>('POST', `/comms/calls/${id}/decline`);
+  }
+  endCall(id: string) {
+    return this.req<Awaited<ReturnType<Api['endCall']>>>('POST', `/comms/calls/${id}/end`);
+  }
   marsBackstage() {
     return this.req<Awaited<ReturnType<Api['marsBackstage']>>>('GET', '/mars/backstage');
   }

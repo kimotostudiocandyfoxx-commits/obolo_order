@@ -1,3 +1,4 @@
+import type { CallJoin, CallView, CommsContact, CommsStatus, DmMessage } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -185,6 +186,20 @@ export interface Api {
   starPlanetPost(planet: TimelinePlanet, id: string, on: boolean): Promise<{ starredByMe: boolean }>;
   planetReplies(planet: TimelinePlanet, id: string): Promise<PlanetReplyView[]>;
   replyPlanet(planet: TimelinePlanet, id: string, text: string): Promise<PlanetReplyView>;
+
+  // Earth mail & phone (members, between ダチ)
+  commsStatus(): Promise<CommsStatus>;
+  commsContacts(): Promise<CommsContact[]>;
+  dmMessages(peerId: string, after?: string): Promise<DmMessage[]>;
+  sendDm(peerId: string, body: { text: string; audioUrl?: string }): Promise<DmMessage>;
+  readDm(peerId: string): Promise<void>;
+  firebaseToken(): Promise<{ token: string; projectId: string | null }>;
+  startCall(to: string): Promise<{ call: CallView; join: CallJoin }>;
+  incomingCalls(): Promise<CallView[]>;
+  getCall(id: string): Promise<CallView>;
+  answerCall(id: string): Promise<{ call: CallView; join: CallJoin }>;
+  declineCall(id: string): Promise<CallView>;
+  endCall(id: string): Promise<CallView>;
 
   // Mars 裏スタジオ: every video you keep
   marsBackstage(): Promise<MarsBackstageVideo[]>;

@@ -7,3 +7,4 @@ export * from './schemas';
 export * from './types';
 export * from './voice';
 export * from './puni';
+export * from './comms';
