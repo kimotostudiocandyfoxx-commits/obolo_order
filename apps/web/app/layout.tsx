@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   description: 'A social solar system connected by sound — 音でつながる、ひとつの太陽系',
   applicationName: 'Obolo Order',
   appleWebApp: { capable: true, title: 'Obolo Order', statusBarStyle: 'black-translucent' },
-  icons: { icon: '/icon.svg', apple: '/icon.svg' },
+  // app icon (Art workshop): Home Screen, notifications
+  icons: { icon: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }, { url: '/icon.svg' }], apple: '/apple-touch-icon.png' },
 };
 
 export const viewport: Viewport = {

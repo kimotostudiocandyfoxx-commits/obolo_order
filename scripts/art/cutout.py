@@ -48,6 +48,12 @@ if a.glow_below is not None:
     halo = np.isin(lab2, touch[touch > 0])
     glow = np.clip(dist / 170, 0, 1) ** 1.2
     alpha = np.where(halo, np.minimum(alpha, glow), alpha)
+# drop tiny specks far from the sprite (stray dots in the white would stretch the trim)
+lab4, n4 = ndimage.label(alpha > 0.04)
+if n4 > 1:
+    sizes4 = ndimage.sum(np.ones_like(alpha), lab4, index=np.arange(1, n4 + 1))
+    keep = np.flatnonzero(sizes4 >= sizes4.max() * 0.005) + 1
+    alpha = np.where(np.isin(lab4, keep) | (lab4 == 0), alpha, 0.0)
 # un-premultiply the white out of semi-transparent edge pixels
 a3 = np.maximum(alpha, 1e-3)[..., None]
 fg = np.clip((rgb - 255 * (1 - a3)) / a3, 0, 255)

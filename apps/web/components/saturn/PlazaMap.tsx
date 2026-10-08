@@ -198,14 +198,15 @@ export function Island({ plaza, w }: { plaza: Pick<PlazaView, 'id' | 'name' | 'i
     const fill = Array.from({ length: 4 - real.length }, (_, k) => SATURN_RESIDENTS[(h + k * 5) % SATURN_RESIDENTS.length].author);
     return [...real, ...fill];
   }, [plaza.faces, plaza.id]);
+  // where people stand on the island's grass (fractions of the island picture)
   const spots = [
-    [0.24, 0.47],
-    [0.72, 0.45],
-    [0.4, 0.58],
-    [0.6, 0.6],
-    [0.16, 0.6],
-    [0.84, 0.58],
-    [0.5, 0.68],
+    [0.24, 0.26],
+    [0.72, 0.24],
+    [0.4, 0.35],
+    [0.6, 0.37],
+    [0.16, 0.36],
+    [0.84, 0.34],
+    [0.5, 0.44],
   ];
   const f = Math.max(22, w * 0.15);
   return (
@@ -222,50 +223,16 @@ export function Island({ plaza, w }: { plaza: Pick<PlazaView, 'id' | 'name' | 'i
           {plaza.joined && <span className="ml-1 rounded-full bg-pink-100 px-1.5 text-[9px] text-pink-500">参加中</span>}
         </p>
       </div>
-      {/* the island */}
-      <svg className="absolute inset-x-0 bottom-0" width={w} height={w * 0.62} viewBox="0 0 200 124" aria-hidden>
-        <defs>
-          <linearGradient id={`earth-${plaza.id}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#c59670" />
-            <stop offset="1" stopColor="#8a6046" />
-          </linearGradient>
-          <radialGradient id={`grass-${plaza.id}`} cx="0.45" cy="0.35" r="0.7">
-            <stop offset="0" stopColor="#c8ec8a" />
-            <stop offset="1" stopColor="#86c25c" />
-          </radialGradient>
-        </defs>
-        {/* earth, with brick-ish layers */}
-        <path d="M14 44 Q100 70 186 44 L168 78 Q140 112 100 116 Q60 112 32 78 Z" fill={`url(#earth-${plaza.id})`} />
-        <path d="M24 62 Q100 86 176 62 M38 84 Q100 104 162 84" stroke="#7a523a" strokeOpacity=".35" strokeWidth="2" fill="none" />
-        {/* clouds */}
-        {[
-          [22, 66, 13],
-          [38, 74, 11],
-          [178, 66, 13],
-          [162, 75, 11],
-          [100, 112, 10],
-          [84, 108, 8],
-          [116, 108, 8],
-        ].map(([x, y, r], i) => (
-          <circle key={i} cx={x} cy={y} r={r} fill="#fff" fillOpacity=".92" />
-        ))}
-        {/* grass */}
-        <ellipse cx="100" cy="42" rx="88" ry="28" fill={`url(#grass-${plaza.id})`} />
-        <ellipse cx="100" cy="42" rx="88" ry="28" fill="none" stroke="#6ea84a" strokeOpacity=".5" strokeWidth="2" />
-        <ellipse cx="80" cy="34" rx="34" ry="8" fill="#fff" fillOpacity=".18" />
-        {/* little trees at the back */}
-        {[
-          [26, 32],
-          [176, 34],
-          [150, 22],
-        ].map(([x, y], i) => (
-          <g key={i}>
-            <rect x={x - 1.5} y={y} width="3" height="8" fill="#8a6046" />
-            <circle cx={x} cy={y - 2} r="8" fill="#5fae5a" />
-            <circle cx={x - 2} cy={y - 4} r="3" fill="#8fd27a" />
-          </g>
-        ))}
-      </svg>
+      {/* the island (Art workshop, airbrushed pastel); each plaza's a little different in colour */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/art/saturn-island.webp"
+        alt=""
+        aria-hidden
+        draggable={false}
+        className="pointer-events-none absolute inset-x-0 bottom-0 select-none"
+        style={{ width: w, height: w * 0.62, filter: `hue-rotate(${(hueOf(plaza.id) % 50) - 25}deg)` }}
+      />
       {/* the landmark */}
       <span className="absolute left-1/2 z-[1] -translate-x-1/2 leading-none drop-shadow-[0_4px_4px_rgba(60,20,90,.3)]" style={{ bottom: w * 0.37, fontSize: w * 0.26 }}>
         {plaza.icon}

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { P } from '@/lib/mercury/sea';
-import { CREATORS, fmtLen, KIND_COLOR, POD_BOX, STUDIO, THEMES, type Creator, type Theme, type Video } from '@/lib/mars/sky';
+import { CREATORS, fmtLen, KIND_COLOR, STUDIO, THEMES, type Creator, type Theme, type Video } from '@/lib/mars/sky';
 import { flying, hoursSince, useMars } from '@/lib/mars/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
@@ -112,7 +112,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
     }),
     ...CREATORS.filter(visible).map((c) => ({ key: c.id, name: c.handle, creator: c, videos: c.flying, img: SAMPLE_FACES.has(c.id) ? spriteUrl(`av-${c.id}`) : null, emoji: c.flying[0]?.emoji ?? '🛸' })),
   ].filter((m) => m.videos.length > 0);
-  const riders = live ? crew.slice(0, UFO_SLOTS.length).map((m) => ({ ...m, video: m.videos[0], mine: m.isMe })) : [];
+  const riders = crew.slice(0, UFO_SLOTS.length).map((m) => ({ ...m, video: m.videos[0], mine: m.isMe }));
 
   const say = (t: string) => {
     setToast(t);
@@ -157,8 +157,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
             </span>
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center p-2">
-            {live ? (
-              <ArtStage name={`mars-sky-${theme}`} reserve={210}>
+            <ArtStage name={`mars-sky-${theme}`} reserve={210}>
                 {riders.map((r, i) => {
                   const at = UFO_SLOTS[i];
                   return (
@@ -187,102 +186,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                     </button>
                   );
                 })}
-              </ArtStage>
-            ) : (
-              <div className="relative w-full max-w-[min(100%,calc((100svh-210px)*1.2))]" style={{ aspectRatio: '1254 / 1045' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={stillUrl(`mars-sky-${theme}`)} alt="" className="absolute inset-0 h-full w-full select-none rounded-xl" draggable={false} />
-                {/* hide the top of the mock's round 撮影 button at the bottom edge of the art */}
-                <div className="pointer-events-none absolute bottom-0 left-1/2 h-[9%] w-[18%] -translate-x-1/2 rounded-t-full bg-black/85 blur-md" />
-                {CREATORS.map((c, i) => {
-                  const b = POD_BOX[theme][c.id];
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => {
-                        playCrew(c.id);
-                        ev.current?.onUfo?.();
-                      }}
-                      className="absolute transition-opacity duration-500"
-                      style={{
-                        left: `${b.left}%`,
-                        top: `${b.top}%`,
-                        width: `${b.width}%`,
-                        height: `${b.height}%`,
-                        opacity: visible(c) ? 1 : 0,
-                        pointerEvents: visible(c) ? 'auto' : 'none',
-                        animation: `ufo ${3 + (i % 3) * 0.7}s ease-in-out ${i * 0.4}s infinite`,
-                      }}
-                      aria-label={`${c.handle}の映像：${c.flying[0]?.title}`}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={spriteUrl(`pod-${theme}-${c.id}`)} alt="" className="h-full w-full" draggable={false} />
-                    </button>
-                  );
-                })}
-                {CREATORS.filter((c) => !visible(c)).map((c) => {
-                  const b = POD_BOX[theme][c.id];
-                  return (
-                    <div
-                      key={`cover-${c.id}`}
-                      className={`pointer-events-none absolute rounded-[30%] blur-md ${theme === 'canyon' ? 'bg-[#7a3418]/85' : 'bg-[#2a1018]/85'}`}
-                      style={{ left: `${b.left + 2}%`, top: `${b.top + 2}%`, width: `${b.width - 4}%`, height: `${b.height - 4}%` }}
-                    />
-                  );
-                })}
-                {/* real UFOs (live) over the slots of the sample ones */}
-                {realOthers.map((f, i) => {
-                  const b = POD_BOX[theme][CREATORS[i].id];
-                  const videos = f.posts.map(videoOf);
-                  const name = f.author.displayName || f.author.handle;
-                  return (
-                    <div key={f.author.id}>
-                      <div
-                        className={`pointer-events-none absolute rounded-[30%] blur-md ${theme === 'canyon' ? 'bg-[#7a3418]/85' : 'bg-[#2a1018]/85'}`}
-                        style={{ left: `${b.left + 2}%`, top: `${b.top + 2}%`, width: `${b.width - 4}%`, height: `${b.height - 4}%` }}
-                      />
-                      <button
-                        onClick={() => {
-                          playCrew(f.author.id);
-                          ev.current?.onUfo?.();
-                        }}
-                        className="absolute flex items-center gap-[4%]"
-                        style={{ left: `${b.left}%`, top: `${b.top}%`, width: `${b.width}%`, animation: `ufo ${3 + (i % 3) * 0.7}s ease-in-out ${i * 0.4}s infinite` }}
-                        aria-label={`${name}の映像`}
-                      >
-                        <span className="w-[42%] shrink-0">
-                          <OwnUfo emoji={neoForm(f.author.neoForm)?.emoji ?? '🛸'} img={f.author.pic} />
-                        </span>
-                        <span className="min-w-0 flex-1 overflow-hidden rounded-lg border border-amber-300/70 bg-black/80 text-left">
-                          <span className="block aspect-square w-full overflow-hidden" style={{ containerType: 'inline-size' }}>
-                            <Frame video={videos[0]} className="h-full w-full" />
-                          </span>
-                          <span className="block truncate px-1 py-0.5 text-[clamp(7px,1.2vw,12px)]">{videos[0]?.title}</span>
-                        </span>
-                      </button>
-                    </div>
-                  );
-                })}
-                {myFlying.length > 0 && (
-                  <button
-                    onClick={() => {
-                      playCrew('me');
-                      ev.current?.onUfo?.();
-                    }}
-                    className="absolute flex flex-col items-center"
-                    style={{ left: theme === 'canyon' ? '81%' : '2%', top: theme === 'canyon' ? '33%' : '3%', width: '18%', animation: 'ufo 3.4s ease-in-out infinite' }}
-                    aria-label="自分のUFO"
-                  >
-                    <span className="mb-1 w-full rounded-lg border border-amber-300/70 bg-black/75 px-1.5 py-1 text-left text-[clamp(7px,1.3vw,12px)] leading-tight">
-                      {myFlying[0].video.title}
-                      <br />
-                      <span className="text-white/60">{hoursSince(myFlying[0].at) ? `${hoursSince(myFlying[0].at)}時間前` : 'たった今'}</span>
-                    </span>
-                    <OwnUfo emoji={neo?.emoji ?? '🦊'} img={me?.puniPic ?? me?.avatarUrl} />
-                  </button>
-                )}
-              </div>
-            )}
+            </ArtStage>
           </div>
         </div>
       )}
@@ -396,28 +300,6 @@ const UFO_SLOTS = [
 ];
 /** Sample creators that have a round face picture (public/onboarding/av-*.webp). */
 const SAMPLE_FACES = new Set(['onigiri', 'wani_queen', 'kaba_boss', 'gori4545', 'samurai806', 'kong_dread', 'pen_lady']);
-
-/** The visitor's UFO (no art yet): their OBOLO NEO in a little saucer. */
-function OwnUfo({ emoji, img }: { emoji: string; img?: string | null }) {
-  return (
-    <div className="relative w-full">
-      {img ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={img} alt="" className="absolute left-1/2 top-0 aspect-square w-[34%] -translate-x-1/2 rounded-full border-2 border-white/80 object-cover" />
-      ) : (
-        <span className="absolute left-1/2 top-[2%] -translate-x-1/2 text-[clamp(16px,3.2vw,32px)]">{emoji}</span>
-      )}
-      <svg viewBox="0 0 120 64" className="w-full drop-shadow-[0_6px_10px_rgba(0,0,0,0.6)]" aria-hidden>
-        <ellipse cx="60" cy="30" rx="28" ry="18" fill="#9fd6ff" opacity="0.35" />
-        <ellipse cx="60" cy="40" rx="56" ry="14" fill="#3b3b4a" stroke="#c9a24a" strokeWidth="3" />
-        {[24, 44, 64, 84, 100].map((x) => (
-          <circle key={x} cx={x} cy="42" r="4" fill="#ff7be5" />
-        ))}
-        <ellipse cx="60" cy="58" rx="22" ry="4" fill="#9a7bff" opacity="0.6" />
-      </svg>
-    </div>
-  );
-}
 
 function StudioView({
   theme,
