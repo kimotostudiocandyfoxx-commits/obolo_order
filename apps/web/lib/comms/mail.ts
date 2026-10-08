@@ -13,7 +13,8 @@ import { getApi } from '@/lib/api';
 const POLL_MS = 4000;
 
 export function watchConversation(status: CommsStatus, myId: string, peerId: string, onNew: (m: DmMessage[]) => void): () => void {
-  const firebaseConfig = process.env.NEXT_PUBLIC_FIREBASE_CONFIG;
+  // the server hands out the web config (GitHub Variables); a Vercel env var also works
+  const firebaseConfig = status.firebaseWeb ? JSON.stringify(status.firebaseWeb) : process.env.NEXT_PUBLIC_FIREBASE_CONFIG;
   if (status.mail === 'firebase' && firebaseConfig) {
     let stop = () => {};
     let cancelled = false;

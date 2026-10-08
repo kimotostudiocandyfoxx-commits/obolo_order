@@ -17,6 +17,8 @@ export type CommsStatus = {
   call: 'agora' | 'demo';
   /** Firebase project for the web SDK (null until Firebase is set up) */
   firebaseProjectId: string | null;
+  /** the Firebase web config for the app (public values), when set on the server */
+  firebaseWeb: { apiKey: string; appId: string; projectId: string; authDomain: string } | null;
 };
 
 /** Someone found by their user ID, and how you two are connected (no counts). */

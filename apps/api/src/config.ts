@@ -85,6 +85,9 @@ const Env = z.object({
   FIREBASE_PROJECT_ID: secret(),
   FIREBASE_SIGNER_SA: secret(),
   FIREBASE_SERVICE_ACCOUNT: secret(),
+  /** The Firebase web app's apiKey and appId (public values; the web app gets them from GET /comms/status). */
+  FIREBASE_WEB_API_KEY: secret(),
+  FIREBASE_WEB_APP_ID: secret(),
 
   /** Web Push (incoming calls, mail). Unset = the server makes its own VAPID key pair once and keeps it in the DB. */
   VAPID_PUBLIC_KEY: secret(),

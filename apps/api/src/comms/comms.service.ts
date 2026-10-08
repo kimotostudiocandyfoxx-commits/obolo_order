@@ -157,7 +157,9 @@ export class CommsService {
   }
 
   async status(userId: string): Promise<CommsStatus> {
-    return { open: await this.isMember(userId), mail: this.mail.kind, call: this.calls.kind, firebaseProjectId: this.mail.projectId };
+    const pid = this.mail.projectId;
+    const web = pid && this.cfg.FIREBASE_WEB_API_KEY && this.cfg.FIREBASE_WEB_APP_ID ? { apiKey: this.cfg.FIREBASE_WEB_API_KEY, appId: this.cfg.FIREBASE_WEB_APP_ID, projectId: pid, authDomain: `${pid}.firebaseapp.com` } : null;
+    return { open: await this.isMember(userId), mail: this.mail.kind, call: this.calls.kind, firebaseProjectId: pid, firebaseWeb: web };
   }
 
   /** Your ダチ, the latest conversations first. */

@@ -46,9 +46,9 @@ ORDER（¥88）に入ったメンバーに、地球の「✉️ メール」「�
 2. Cloud Shell で `bash scripts/comms-setup.sh`（手順1と同じスクリプト。Firestore の作成と権限の設定をします）
 3. Firebase コンソール → Firestore → **ルール** に `firebase/firestore.rules` の中身を貼って「公開」
 4. Firebase コンソール → プロジェクトの設定 →「アプリを追加」→ **Web** → 表示される `firebaseConfig` を確認
-5. Vercel（oboloorder-web）→ Settings → Environment Variables に
-   `NEXT_PUBLIC_FIREBASE_CONFIG` = その設定を1行のJSONで（例 `{"apiKey":"…","authDomain":"…","projectId":"obolo-order","appId":"…"}`）
-   ※ この値は公開されても大丈夫な設定です（守っているのはルールと API）
+5. その設定の **apiKey** と **appId** を、GitHub の Variables に `FIREBASE_WEB_API_KEY` / `FIREBASE_WEB_APP_ID` として追加
+   （API がアプリに渡すので Vercel の設定は不要。Vercel の `NEXT_PUBLIC_FIREBASE_CONFIG` に設定ごと貼っても動きます）
+   ※ どちらも公開されても大丈夫な値です（守っているのはルールと API）
 6. GitHub の **Variables** に `FIREBASE_PROJECT_ID` = `obolo-order` を追加
 7. API を再デプロイ（push）＋ Vercel を再デプロイ → メールが一瞬で届くようになる
 

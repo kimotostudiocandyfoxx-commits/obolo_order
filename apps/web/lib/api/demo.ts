@@ -896,7 +896,7 @@ export class DemoApi implements Api {
 
   // Earth mail & phone need the server (members, between ダチ): closed in the browser-only demo
   async commsStatus() {
-    return { open: false, mail: 'poll' as const, call: 'demo' as const, firebaseProjectId: null };
+    return { open: false, mail: 'poll' as const, call: 'demo' as const, firebaseProjectId: null, firebaseWeb: null };
   }
   async commsContacts(): Promise<never[]> {
     return [];

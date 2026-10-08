@@ -105,6 +105,8 @@ jobs:
             COMMS_MEMBERS_ONLY=${{ vars.COMMS_MEMBERS_ONLY || 'true' }}
             AGORA_APP_ID=${{ vars.AGORA_APP_ID }}
             FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}
+            FIREBASE_WEB_API_KEY=${{ vars.FIREBASE_WEB_API_KEY }}
+            FIREBASE_WEB_APP_ID=${{ vars.FIREBASE_WEB_APP_ID }}
             FIREBASE_SIGNER_SA=${{ env.RUNTIME_SA }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
           secrets: ${{ steps.sec.outputs.list }}
