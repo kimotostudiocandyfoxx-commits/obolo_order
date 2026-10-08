@@ -78,6 +78,7 @@ export class AuthService {
     await this.kv.del(`otp:${email}`);
 
     const [user] = await this.db.write.select().from(users).where(eq(users.email, email));
+    if (user?.suspendedAt) throw apiError(HttpStatus.FORBIDDEN, 'ACCOUNT_SUSPENDED', 'This account is suspended');
     if (user) return { kind: 'member', token: await this.createSession(user.id), user: toMe(user) };
     // Email ownership proven → hand over the invitation; the account is created at the name step.
     const inv = await this.pendingInvite(email);

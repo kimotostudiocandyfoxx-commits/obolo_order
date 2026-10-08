@@ -37,9 +37,11 @@ export class CommsService {
   }
 
   private async isMember(userId: string) {
+    const [u] = await this.db.read.select({ orderedAt: users.orderedAt, status: users.subscriptionStatus, suspendedAt: users.suspendedAt }).from(users).where(eq(users.id, userId));
+    // suspended by the team (a report review): nobody can reach them
+    if (!u || u.suspendedAt) return false;
     if (!this.cfg.COMMS_MEMBERS_ONLY) return true;
-    const [u] = await this.db.read.select({ orderedAt: users.orderedAt, status: users.subscriptionStatus }).from(users).where(eq(users.id, userId));
-    return !!u && (!!u.orderedAt || u.status === 'active');
+    return !!u.orderedAt || u.status === 'active';
   }
 
   private async mustBeMember(userId: string) {

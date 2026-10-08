@@ -54,6 +54,8 @@ export const users = pgTable(
     locale: text('locale').notNull().default('ja'),
     /** none | demo | active | past_due | canceled … (Stripe subscription status once paid). */
     subscriptionStatus: text('subscription_status').notNull().default('demo'),
+    /** Suspended by the team (a report review): cannot log in or use the app. */
+    suspendedAt: timestamp('suspended_at', { withTimezone: true }),
     /** Day 9: when the visitor paid for the Eclipse (became ORDER). Null = not paid yet. */
     orderedAt: timestamp('ordered_at', { withTimezone: true }),
     stripeCustomerId: text('stripe_customer_id'),

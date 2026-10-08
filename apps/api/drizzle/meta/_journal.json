@@ -134,6 +134,13 @@
       "when": 1791427899737,
       "tag": "0018_comms_safety",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1791430839302,
+      "tag": "0019_user_suspend",
+      "breakpoints": true
     }
   ]
 }

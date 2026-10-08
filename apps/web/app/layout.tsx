@@ -4,6 +4,7 @@ import { AuthProvider } from '@/lib/auth';
 import { I18nProvider } from '@/lib/i18n/client';
 import { getLocale } from '@/lib/i18n/server';
 import './globals.css';
+import { SuspendedNotice } from '@/components/SuspendedNotice';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <I18nProvider locale={locale}>
           <AuthProvider>
             <div className="relative z-10">{children}</div>
+            <SuspendedNotice />
           </AuthProvider>
         </I18nProvider>
       </body>

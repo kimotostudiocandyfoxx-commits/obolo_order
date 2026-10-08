@@ -34,6 +34,8 @@ export class HttpApi implements Api {
     const json = (await res.json().catch(() => null)) as { error?: { code: string; message: string } } | null;
     if (!res.ok) {
       if (res.status === 401) tokenStore.clear();
+      // suspended by the team (a report review): the app shows a notice over everything
+      if (json?.error?.code === 'ACCOUNT_SUSPENDED' && typeof window !== 'undefined') window.dispatchEvent(new Event('obolo:suspended'));
       throw new ApiError(res.status, json?.error?.code ?? 'ERROR', json?.error?.message ?? res.statusText);
     }
     return json as T;
