@@ -11,7 +11,8 @@ import { extname, join } from 'node:path';
 const KEY = process.env.GEMINI_API_KEY;
 if (!KEY) throw new Error('GEMINI_API_KEY is not set');
 const API = 'https://generativelanguage.googleapis.com/v1beta';
-const IMAGE_MODELS = (process.env.ART_IMAGE_MODELS || 'gemini-3-pro-image-preview,gemini-2.5-flash-image').split(',');
+// cheap model by default (client decision 2026-10-08: images only, cheap, lots); a job may still ask for another
+const IMAGE_MODELS = (process.env.ART_IMAGE_MODELS || 'gemini-2.5-flash-image').split(',');
 const VIDEO_MODELS = (process.env.ART_VIDEO_MODELS || 'veo-3.1-generate-preview,veo-3.0-generate-001').split(',');
 const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
 

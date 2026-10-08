@@ -98,55 +98,108 @@
     "model": "veo-3.1-generate-preview"
   },
   {
-    "id": "bigship-sakura-v1",
+    "id": "m-sea-bg-v1",
+    "kind": "image",
+    "aspect": "16:9",
+    "count": 2,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. A wide night ocean: a big round moon upper right, ribbons of aurora in a starry sky, two tiny fairy-tale castle islands on the far left and right horizon, calm sparkling water with soft moonlight reflections filling the lower two thirds as open space. Keep the moon and castles inside the central 75% width. No boats. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-ship-sakura-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. One DJ party ship: a dark lacquered wooden ship with a big sail of pink cherry blossoms, paper lanterns and a tiny pagoda cabin. Round glowing speaker cones set into the hull, a DJ booth with two turntables in the middle of the deck facing the viewer, and an EMPTY standing space right behind the booth (nobody on board). Three-quarter front view, the whole ship visible, a little white foam at the waterline only. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-ship-candy-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. One DJ party ship: a pastel pink and baby-blue toy-like ship with a heart-shaped balloon sail, ribbons, stars and pearls. Round glowing speaker cones set into the hull, a DJ booth with two turntables in the middle of the deck facing the viewer, and an EMPTY standing space right behind the booth (nobody on board). Three-quarter front view, the whole ship visible, a little white foam at the waterline only. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-ship-pearl-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. One DJ party ship: a mother-of-pearl shell yacht with lavender sails, scallop shells and strings of pearls. Round glowing speaker cones set into the hull, a DJ booth with two turntables in the middle of the deck facing the viewer, and an EMPTY standing space right behind the booth (nobody on board). Three-quarter front view, the whole ship visible, a little white foam at the waterline only. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-ship-pirate-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. One DJ party ship: a black-and-gold pirate galleon with a dark sail and warm lanterns. Round glowing speaker cones set into the hull, a DJ booth with two turntables in the middle of the deck facing the viewer, and an EMPTY standing space right behind the booth (nobody on board). Three-quarter front view, the whole ship visible, a little white foam at the waterline only. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-ship-neon-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. One DJ party ship: a sleek dark futuristic ship with cyan and magenta neon lines and a holographic sail. Round glowing speaker cones set into the hull, a DJ booth with two turntables in the middle of the deck facing the viewer, and an EMPTY standing space right behind the booth (nobody on board). Three-quarter front view, the whole ship visible, a little white foam at the waterline only. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-ship-jungle-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. One DJ party ship: a carved wooden tropical raft-ship with palm leaves, tiki torches and a woven sail. Round glowing speaker cones set into the hull, a DJ booth with two turntables in the middle of the deck facing the viewer, and an EMPTY standing space right behind the booth (nobody on board). Three-quarter front view, the whole ship visible, a little white foam at the waterline only. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "m-island-v1",
     "kind": "image",
     "aspect": "1:1",
     "count": 2,
-    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: Japanese sakura — dark lacquered wood and gold, a big sail covered in pink cherry blossoms with one large glowing sakura emblem, paper lanterns, a small pagoda cabin at the stern, pink glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
+    "prompt": "Art style (Mercury, the music sea): a hand-painted GOUACHE STORYBOOK illustration — visible soft brush texture, simplified rounded shapes, gentle painterly edges, a limited palette of deep navy, teal, magenta-pink and warm lantern gold, soft glowing lights, dreamy and cosy, like a page from a modern children's picture book. A music island at night: aurora and a big moon in the starry sky, tiny castle islands on the far horizon, calm sea. In the centre a small tropical island built like a music stage: a dark volcano studded with big round speakers and a glowing top, palm trees, hanging lanterns, a little bamboo music bar; on a round terrace in front of the volcano a DJ stage with turntables and an EMPTY standing spot behind them. Across the lower third, a long curved wooden pier sweeps from left to right with small lanterns on its posts and NOTHING standing on it. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
   },
   {
-    "id": "bigship-candy-v1",
+    "id": "r-sky-city-v1",
+    "kind": "image",
+    "aspect": "16:9",
+    "count": 2,
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. The night sky above a futuristic city on Mars: a skyline of tall towers with glowing windows along the bottom edge, a big rust-red planet and two small moons in a deep violet starry sky, a few long sweeping light trails across the sky — lots of open sky in the middle. Keep key elements inside the central 75% width. No spaceships. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "r-sky-canyon-v1",
+    "kind": "image",
+    "aspect": "16:9",
+    "count": 2,
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. A red rocky canyon on Mars under a dark starry sky: tall layered cliffs on both sides, a huge planet and small moons in the sky, a few glowing comet-like light trails sweeping across the valley — wide open space in the middle. Keep key elements inside the central 75% width. No spaceships. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "r-ufo-classic-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. One small flying saucer: a classic round silver flying saucer with a ring of coloured lights, with an OPEN round cockpit in the top and NOBODY inside (a character will be placed in it later). Three-quarter view from slightly above so the empty cockpit opening is visible, a soft beam of light under it. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "r-ufo-retro-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. One small flying saucer: a retro chrome saucer with three little legs and orange running lights, with an OPEN round cockpit in the top and NOBODY inside (a character will be placed in it later). Three-quarter view from slightly above so the empty cockpit opening is visible, a soft beam of light under it. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "r-ufo-cosmo-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. One small flying saucer: a violet and cream saucer with a glowing cyan rim, with an OPEN round cockpit in the top and NOBODY inside (a character will be placed in it later). Three-quarter view from slightly above so the empty cockpit opening is visible, a soft beam of light under it. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "r-ufo-rust-v1",
+    "kind": "image",
+    "aspect": "1:1",
+    "count": 1,
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. One small flying saucer: a rust-orange riveted saucer with a stripe of amber lights, with an OPEN round cockpit in the top and NOBODY inside (a character will be placed in it later). Three-quarter view from slightly above so the empty cockpit opening is visible, a soft beam of light under it. The object alone, centred with generous margin, isolated on a perfectly flat pure white (#FFFFFF) background with no texture, no shadow and no scenery on the background. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders."
+  },
+  {
+    "id": "r-studio-v1",
     "kind": "image",
     "aspect": "1:1",
     "count": 2,
-    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: kawaii pastel — pink and baby-blue rounded hull like a toy, a heart-shaped balloon sail, ribbons, golden stars, pearls and soft clouds, pink glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
-  },
-  {
-    "id": "bigship-pearl-v1",
-    "kind": "image",
-    "aspect": "1:1",
-    "count": 2,
-    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: pearl shell yacht — iridescent mother-of-pearl hull, lavender translucent sails, scallop shells, strings of pearls, golden filigree railings, blue-violet glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
-  },
-  {
-    "id": "bigship-pirate-v1",
-    "kind": "image",
-    "aspect": "1:1",
-    "count": 2,
-    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: black-and-gold gothic pirate galleon — black sails with a golden compass emblem, ornate gold trims, warm lanterns, amber glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
-  },
-  {
-    "id": "bigship-neon-v1",
-    "kind": "image",
-    "aspect": "1:1",
-    "count": 2,
-    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: cyber neon — sleek dark metal hull with cyan and magenta neon lines, holographic sail, futuristic, cyan glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
-  },
-  {
-    "id": "bigship-jungle-v1",
-    "kind": "image",
-    "aspect": "1:1",
-    "count": 2,
-    "prompt": "A single large luxurious DJ party ship for a night-sea music app, richly detailed glossy anime-fantasy illustration (like a premium mobile game key art). Three-quarter front view, the whole ship fully visible and centred with generous white margin. In the middle of the deck stands a DJ booth with two glowing turntables and a mixer, facing the viewer; directly BEHIND the booth there is an EMPTY open standing space where the DJ will be placed later — nobody is on board. Big round glowing speaker cones are set into the hull. Only a little white splash at the waterline. Isolated on a perfectly flat pure white (#FFFFFF) background, no sea, no sky, no shadow on the background. Theme: tropical wood raft-ship — carved wood, palm leaves, tiki torches, flowers, a woven sail, green and orange glowing speakers. Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames."
-  },
-  {
-    "id": "island-v1",
-    "kind": "image",
-    "aspect": "1:1",
-    "count": 4,
-    "refs": [
-      "art/refs/mercury-island-ref.jpg"
-    ],
-    "prompt": "Paint a music-island scene for a phone app, in the same glossy anime-fantasy style as the attached reference: a magical night ocean with green and violet aurora, a full moon, distant glowing fairy-tale castles on both horizons. In the centre, a small tropical island built like a music stage: a dark volcano covered with big round speakers and a glowing orange top, palm trees, hanging lanterns, a little bamboo music bar. On the top terrace in front of the volcano is a round DJ stage with turntables and an EMPTY standing spot behind them where a character will be placed later. In the front, a long curved wooden pier / boardwalk sweeps from left to right across the lower third, with small lanterns on its posts and NOTHING standing on it (records will be placed on it later). Absolutely NO characters, NO people, NO animals, NO text, NO letters, NO numbers, NO logos, NO user interface, NO frames. Do NOT copy any text, numbers, buttons or record discs from the reference. Production quality, crisp, high detail."
+    "prompt": "Art style (Mars, the movie planet): a RETRO SCI-FI SCREEN-PRINT POSTER — like a 1960s space-travel poster: flat bold colour shapes, slight print grain and halftone dots, simple geometric forms, a limited palette of rust orange, deep violet, cream and cyan accents, a few glowing highlights. Inside a cosy film studio on Mars: a big round window showing the red planet and stars, curved control desks with knobs and small screens, film reels, a vintage movie camera on a tripod, warm orange and violet lights, a round empty stage platform in the centre-left where a character will stand, and a wide empty wall area in the centre-right for movie frames. No characters, no people, no animals, no text, no letters, no numbers, no logos, no signs, no user interface, no frames or borders. Screens show only abstract colours."
   }
 ]
