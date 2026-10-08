@@ -22,7 +22,8 @@ LORA_SCALE = float(os.environ.get('LORA_SCALE', '0.8'))
 STRENGTHS = [float(s) for s in os.environ.get('STRENGTHS', '0.45,0.6').split(',')]
 STEPS = int(os.environ.get('STEPS', '20'))
 SIDE = 512
-PROMPT = 'anime style illustration, hand-drawn cel animation, clean line art, vibrant colors, soft light'
+# the LoRA's trigger words are "sms landscape" (its README)
+PROMPT = 'sms landscape, anime style illustration, hand-drawn cel animation, clean line art, vibrant colors, soft light'
 NEG = 'photo, realistic, lowres, blurry, text, watermark, nsfw, deformed face, extra fingers'
 OUT = 'art/lab'
 os.makedirs(OUT, exist_ok=True)
