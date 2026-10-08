@@ -9,7 +9,7 @@ import { CREATORS, fmtLen, KIND_COLOR, POD_BOX, STUDIO, THEMES, type Creator, ty
 import { flying, hoursSince, useMars } from '@/lib/mars/state';
 import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
-import { ArtStage, Vessel } from '@/components/art/Stage';
+import { ART_BASE, ArtStage, pickUfo, Vessel } from '@/components/art/Stage';
 import { Backstage } from './Backstage';
 import { Frame } from './Frame';
 import { UfoPlayer, type CrewMember } from './UfoPlayer';
@@ -134,7 +134,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
   };
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#140707] text-white">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#2a2140] text-white">
       {view.v === 'sky' && (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex items-center gap-2 px-3 pt-[calc(10px+env(safe-area-inset-top))]">
@@ -173,7 +173,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                     >
                       <span className="flex w-full items-end gap-[3%]" style={{ animation: `ufo ${3 + (i % 3) * 0.7}s ease-in-out ${i * 0.4}s infinite` }}>
                         <span className="w-[50%] shrink-0">
-                          <Vessel kind="ufo" img={r.img} emoji={r.emoji} />
+                          <Vessel ride={pickUfo(r.key)} img={r.img} emoji={r.emoji} />
                         </span>
                         <span className="mb-[6%] min-w-0 flex-1 overflow-hidden rounded-lg border border-amber-300/70 bg-black/80 text-left shadow-[0_0_18px_rgba(255,170,90,0.35)]">
                           <span className="block aspect-square w-full overflow-hidden" style={{ containerType: 'inline-size' }}>
@@ -433,6 +433,9 @@ function StudioView({
   followed,
   onFollow,
   onPublished,
+  layout,
+  pic,
+  emoji,
 }: {
   theme: Theme;
   title: string;
@@ -450,8 +453,12 @@ function StudioView({
   onFollow?: (on: boolean) => void;
   /** live: a 裏スタジオ video was sent out as a UFO */
   onPublished?: () => void;
+  /** live: the Art workshop studio, with its owner standing on the stage */
+  layout?: typeof LIVE_STUDIO;
+  pic?: string | null;
+  emoji?: string;
 }) {
-  const st = STUDIO[theme];
+  const st = layout ?? STUDIO[theme];
   const [decor, setDecor] = useState(false);
   const [open, setOpen] = useState(false);
   const [following, setFollowing] = useState(followed ?? false);
@@ -462,8 +469,23 @@ function StudioView({
     <div className="min-h-0 flex-1 overflow-y-auto pb-4">
       <div className="relative mx-auto w-full max-w-[min(100%,calc((100svh-150px)*1.1))]" style={{ aspectRatio: st.aspect }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={stillUrl(st.art)} alt="" className="absolute inset-0 h-full w-full select-none" draggable={false} />
-        <div className="pointer-events-none absolute bottom-0 left-1/2 h-[5%] w-[16%] -translate-x-1/2 rounded-t-full bg-black/85 blur-md" />
+        <img src={layout ? layout.src : stillUrl(st.art)} alt="" className="absolute inset-0 h-full w-full select-none" draggable={false} />
+        {layout ? (
+          // the owner stands on the studio's stage
+          <span
+            className="absolute flex aspect-square -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-[3px] border-[#f3e3c3] bg-[#2a2140] shadow-[0_0_24px_rgba(255,160,80,0.6)]"
+            style={{ left: `${layout.rider.x}%`, bottom: `${100 - layout.rider.bottom}%`, width: `${layout.rider.size}%`, animation: 'ufo 3s ease-in-out infinite' }}
+          >
+            {pic ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={pic} alt="" className="h-full w-full object-cover" draggable={false} />
+            ) : (
+              <span className="text-[clamp(24px,6vw,56px)] leading-none">{emoji ?? '🎬'}</span>
+            )}
+          </span>
+        ) : (
+          <div className="pointer-events-none absolute bottom-0 left-1/2 h-[5%] w-[16%] -translate-x-1/2 rounded-t-full bg-black/85 blur-md" />
+        )}
         {/* our title + stats over the ones drawn on the art */}
         <div className="absolute flex flex-col items-center justify-center rounded-2xl border border-amber-400/60 bg-[#1c0d08]/95 text-center shadow-[0_0_24px_rgba(255,150,60,0.35)]" style={{ ...pct(st.title), containerType: 'inline-size' }}>
           <p className="truncate px-2 text-[clamp(14px,9cqw,44px)] font-black tracking-wide text-amber-50">{title.toUpperCase()} STUDIO</p>
@@ -526,6 +548,17 @@ function StudioView({
           );
         })}
       </div>
+
+      {layout && works.length > st.slots.length && (
+        <div className="mx-auto mt-3 flex max-w-[min(100%,calc((100svh-150px)*1.1))] gap-3 overflow-x-auto px-3 pb-2">
+          {works.slice(st.slots.length).map((w, j) => (
+            <button key={w.id} onClick={() => onPlay(works, st.slots.length + j)} className="w-28 shrink-0 overflow-hidden rounded-xl border border-amber-300/50 bg-black/40 text-left">
+              <Frame video={w} className="aspect-square w-full" />
+              <p className="truncate px-1.5 py-1 text-[11px]">{w.title}</p>
+            </button>
+          ))}
+        </div>
+      )}
 
       {decor && (
         <Sheet onClose={() => setDecor(false)} title="🎨 スタジオを飾る">
@@ -606,6 +639,25 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
+/**
+ * The live studio (Art workshop, retro screen-print poster; square): the title over the top wall,
+ * the works on the big screen, the owner on the round stage — in % of the picture.
+ */
+const LIVE_STUDIO = {
+  src: `${ART_BASE}/mars-studio.jpg`,
+  art: 'mars-studio',
+  aspect: '1 / 1',
+  title: { left: 20, top: 1.5, width: 60, height: 10.5 },
+  buttons: { left: 60, top: 64.5, width: 37, height: 5 },
+  slots: [
+    { left: 60.5, top: 13, width: 36, height: 33 },
+    { left: 60.5, top: 47.5, width: 11.3, height: 15 },
+    { left: 72.8, top: 47.5, width: 11.3, height: 15 },
+    { left: 85.1, top: 47.5, width: 11.3, height: 15 },
+  ],
+  rider: { x: 52, bottom: 84, size: 17 },
+};
+
 /** A real studio (live): works = movies back from 88 hours in the sky; your 裏スタジオ inside. */
 function LiveStudio({
   theme,
@@ -670,6 +722,9 @@ function LiveStudio({
                   .catch(() => undefined)
         }
         onPublished={isMe ? onPosted : undefined}
+        layout={LIVE_STUDIO}
+        pic={profile?.author.pic}
+        emoji={neoForm(profile?.author.neoForm)?.emoji ?? '🛸'}
       />
       {toast && (
         <div className="absolute inset-x-0 bottom-6 z-[70] flex justify-center px-4">

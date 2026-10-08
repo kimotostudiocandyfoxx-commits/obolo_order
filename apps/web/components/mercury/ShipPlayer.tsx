@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ART_BASE, pickShip, Vessel } from '@/components/art/Stage';
+import { ArtBackdrop, pickShip, Vessel } from '@/components/art/Stage';
 import { pauseAudio, resumeAudio, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { fmt, type Song } from '@/lib/mercury/sea';
 import { synth } from '@/lib/synth';
@@ -112,23 +112,7 @@ export function ShipPlayer({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      {/* the moving sea */}
-      <video
-        ref={(v) => {
-          if (!v) return;
-          v.muted = true;
-          v.play().catch(() => undefined);
-        }}
-        src={`${ART_BASE}/mercury-sea.mp4`}
-        poster={`${ART_BASE}/mercury-sea.jpg`}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-        style={{ objectPosition: '62% 50%' }}
-      />
+      <ArtBackdrop name="mercury-sea" focus={62} />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#06123a]/30 via-transparent to-[#040a22]/95" />
 
       <div

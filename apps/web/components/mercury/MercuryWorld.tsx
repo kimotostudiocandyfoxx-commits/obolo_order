@@ -6,7 +6,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { Artwork } from '@/components/Artwork';
 import { useAuth } from '@/lib/auth';
 import { fmt, P, SAILORS, type Sailor, type Song } from '@/lib/mercury/sea';
-import { ArtStage, Vessel } from '@/components/art/Stage';
+import { ART_BASE, ArtStage, pickShip, Vessel } from '@/components/art/Stage';
 import { ComposeChat } from './ComposeChat';
 import { ShipPlayer, type Flyer } from './ShipPlayer';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
@@ -139,7 +139,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
   };
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#06123a] text-white">
+    <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0d2236] text-white">
       {view.v === 'sea' && (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pt-[calc(10px+env(safe-area-inset-top))]">
@@ -159,7 +159,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                         ev.current?.onShip?.();
                       }}
                       className="absolute flex flex-col items-center"
-                      style={{ left: `${at.x}%`, top: `${at.y}%`, width: `${at.w}%`, transform: 'translate(-50%, -100%)', zIndex: Math.round(at.y) }}
+                      style={{ left: `${at.x}%`, top: `${at.y}%`, width: `${at.w * Math.min(1, pickShip(r.key).ratio * 1.15)}%`, transform: 'translate(-50%, -100%)', zIndex: Math.round(at.y) }}
                       aria-label={`@${r.name}の船`}
                     >
                       <span className="flex w-full flex-col items-center" style={{ animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}>
@@ -167,7 +167,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
                           {r.isMe ? '新曲を出航！' : `@${r.name}`}「{r.title}」
                           {r.sub && <span className="block text-white/60">{r.sub}</span>}
                         </span>
-                        <Vessel kind="ship" img={r.img} emoji={r.emoji} />
+                        <Vessel ride={pickShip(r.key)} img={r.img} emoji={r.emoji} />
                       </span>
                     </button>
                   );
@@ -360,14 +360,14 @@ function Tabs({ tab, setTab }: { tab: 'all' | 'follow' | 'friend'; setTab: (t: '
 
 /** Where ships sail on the painted sea (4:3), front row first: bottom-centre of the ship, width — all in %. */
 const SEA_SLOTS = [
-  { x: 50, y: 97, w: 27 },
-  { x: 17, y: 93, w: 26 },
-  { x: 83, y: 94, w: 26 },
-  { x: 31, y: 76, w: 22 },
-  { x: 69, y: 77, w: 22 },
-  { x: 14, y: 61, w: 18 },
-  { x: 50, y: 59, w: 18 },
-  { x: 86, y: 62, w: 18 },
+  { x: 50, y: 97, w: 21 },
+  { x: 18, y: 93, w: 20 },
+  { x: 82, y: 94, w: 20 },
+  { x: 33, y: 77, w: 16 },
+  { x: 67, y: 78, w: 16 },
+  { x: 14, y: 63, w: 13 },
+  { x: 50, y: 61, w: 13 },
+  { x: 86, y: 64, w: 13 },
 ];
 
 /** The visitor's ship (no art yet): a little boat with their OBOLO NEO on deck. */
@@ -410,17 +410,11 @@ function Record({ song, spinning, className = '' }: { song: Song; spinning?: boo
 }
 
 /**
- * The island painting: where the owner's character stands (the DJ stage), in % of the picture.
- * PLACEHOLDER (P-ART-1): until the Art workshop paints an empty island (Gemini credits ran out on
- * 2026-10-07), the client's island art is used and the owner's character covers the painted DJ.
+ * The island painting (Art workshop, gouache picture book): shown 4:3 from the top of the square
+ * painting; the owner's character stands behind the DJ booth (centre, in % of that stage).
  */
-const ISLAND = { src: stillUrl('mercury-island'), ratio: 1254 / 620, rider: { x: 51.2, y: 51.5, size: 17 } };
-/** The island is shown 4:3 (cropped at the sides): where the rider lands on that stage. */
-const ISLAND_STAGE = 4 / 3;
-const islandRider = (() => {
-  const k = ISLAND.ratio / ISLAND_STAGE; // how much wider the painting is than the stage
-  return { x: 50 + (ISLAND.rider.x - 50) * k, y: ISLAND.rider.y, size: ISLAND.rider.size * k };
-})();
+const ISLAND = { src: `${ART_BASE}/mercury-island.jpg`, focusY: 20 };
+const islandRider = { x: 52.5, y: 60, size: 13 };
 
 /** The island's wooden pier (a curved boardwalk with lanterns), drawn under the records. */
 function Pier() {
@@ -495,11 +489,11 @@ function IslandView({
 }) {
   const [dig, setDig] = useState(false);
   return (
-    <div className="relative min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-[#0b2c7a] via-[#0a2266] to-[#06123a] pb-6">
+    <div className="relative min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-[#123a52] via-[#0d2a44] to-[#081a2e] pb-6">
       <div className="relative mx-auto max-w-3xl">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={ISLAND.src} alt="" className="w-full select-none object-cover" style={{ aspectRatio: `${ISLAND_STAGE}` }} draggable={false} />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[16%] bg-gradient-to-b from-transparent to-[#0b2c7a]" />
+        <img src={ISLAND.src} alt="" className="aspect-[4/3] w-full select-none object-cover" style={{ objectPosition: `50% ${ISLAND.focusY}%` }} draggable={false} />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[16%] bg-gradient-to-b from-transparent to-[#123a52]" />
         {/* the owner is the island's DJ */}
         <span
           className="absolute flex aspect-square -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden rounded-full border-[3px] border-white/85 bg-[#1b1f3a] shadow-[0_0_28px_rgba(255,170,90,0.75)]"

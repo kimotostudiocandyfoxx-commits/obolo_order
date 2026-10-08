@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ART_BASE, Vessel } from '@/components/art/Stage';
+import { ArtBackdrop, pickUfo, Vessel } from '@/components/art/Stage';
 import { getApi } from '@/lib/api';
 import { fmtLen, KIND_COLOR, type Video } from '@/lib/mars/sky';
 import { synth } from '@/lib/synth';
@@ -85,21 +85,7 @@ export function UfoPlayer({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      <video
-        ref={(v) => {
-          if (!v) return;
-          v.muted = true;
-          v.play().catch(() => undefined);
-        }}
-        src={`${ART_BASE}/mars-sky-${theme}.mp4`}
-        poster={`${ART_BASE}/mars-sky-${theme}.jpg`}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-      />
+      <ArtBackdrop name={`mars-sky-${theme}`} focus={50} />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/90" />
 
       <div
@@ -128,10 +114,10 @@ export function UfoPlayer({
         {n > 1 && (
           <>
             <button onClick={() => toMember(-1)} className="absolute bottom-[6%] left-0 w-[26%] -translate-x-[45%] opacity-55 blur-[1px]" aria-label={`${peek(-1).name}のUFO`}>
-              <Vessel kind="ufo" img={peek(-1).img} emoji={peek(-1).emoji} />
+              <Vessel ride={pickUfo(peek(-1).key)} img={peek(-1).img} emoji={peek(-1).emoji} />
             </button>
             <button onClick={() => toMember(1)} className="absolute bottom-[6%] right-0 w-[26%] translate-x-[45%] opacity-55 blur-[1px]" aria-label={`${peek(1).name}のUFO`}>
-              <Vessel kind="ufo" img={peek(1).img} emoji={peek(1).emoji} />
+              <Vessel ride={pickUfo(peek(1).key)} img={peek(1).img} emoji={peek(1).emoji} />
             </button>
           </>
         )}
@@ -153,7 +139,7 @@ export function UfoPlayer({
           {/* the light beam from the UFO up to its movie */}
           <div className="h-4 w-[30%] bg-gradient-to-t from-cyan-200/50 to-transparent blur-[2px]" />
           <div className="w-[min(36%,190px)]" style={{ animation: 'ufo 3s ease-in-out infinite' }}>
-            <Vessel kind="ufo" img={member.img} emoji={member.emoji} />
+            <Vessel ride={pickUfo(member.key)} img={member.img} emoji={member.emoji} />
           </div>
         </div>
       </div>

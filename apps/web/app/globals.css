@@ -505,3 +505,8 @@ body {
   30% { opacity: 1; }
   100% { transform: translateY(-60px) scale(1.1); opacity: 0; }
 }
+/* painted backgrounds drift slowly (no videos: client decision 2026-10-08) */
+@keyframes art-drift {
+  from { transform: scale(1.02) translate(0, 0); }
+  to { transform: scale(1.08) translate(-1.5%, -1%); }
+}

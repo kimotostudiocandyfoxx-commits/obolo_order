@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Art workshop: cut a sprite painted on flat white out of its background -> transparent webp.
 
-usage: python3 scripts/art/cutout.py <in.png> <out.webp> [--width 640] [--glow-below 0.7]
+usage: python3 scripts/art/cutout.py <in.png> <out.webp> [--width 640] [--glow-below 0.7] [--holes 400]
 
 Only the white connected to the picture's border is removed (white inside the sprite stays),
 with a soft edge so glows do not get a hard halo. The result is trimmed to its content.
@@ -19,6 +19,7 @@ ap.add_argument('src')
 ap.add_argument('dst')
 ap.add_argument('--width', type=int, default=640)
 ap.add_argument('--glow-below', type=float, default=None)
+ap.add_argument('--holes', type=int, default=0, help='also clear enclosed pure-white areas bigger than this many pixels')
 a = ap.parse_args()
 
 img = Image.open(a.src).convert('RGB')
@@ -29,6 +30,12 @@ near = dist < 40
 lab, _ = ndimage.label(near)
 border = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
 bg = np.isin(lab, border[border > 0])
+if a.holes:
+    # gaps of background seen through the sprite (between sails, ribbons…): nearly pure white blobs
+    lab3, n3 = ndimage.label(dist < 12)
+    sizes = ndimage.sum(np.ones_like(dist), lab3, index=np.arange(1, n3 + 1))
+    big = np.flatnonzero(sizes > a.holes) + 1
+    bg = bg | (np.isin(lab3, big) & ~bg)
 # soft alpha: inside the background region fade by how far from white; feather the edge
 alpha = np.where(bg, np.clip((dist - 8) / 32, 0, 1), 1.0)
 alpha = ndimage.gaussian_filter(alpha, 0.8)
