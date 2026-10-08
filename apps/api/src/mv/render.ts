@@ -1,18 +1,21 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import sharp from 'sharp';
 import { run } from '../media/transcode';
-import type { MvPlan, MvSegment } from './plan';
-import { ANIME_FILTER, type Stylizer } from './stylize';
+import type { KeyArtist } from './keyart';
+import type { MvEffect, MvPlan, MvSegment, MvTextEffect } from './plan';
 
 /**
- * The MV itself (ffmpeg, in the API image): every segment of Bati's plan becomes a square clip
- * (photos move — zoom / pan; videos are cut and cropped), with the anime look; the clips are joined,
- * faded and put under the song. The lyrics version burns the lines onto the finished MV.
+ * The MV itself (ffmpeg, in the API image; no cost per MV). Every cut of Bati's direction sheet
+ * becomes a square clip — photos move (zoom / pan), videos are cut and cropped, the キメ絵 are the
+ * anime illustrations — with its picture effect; the clips are joined, faded and put under the
+ * song. The lyrics version burns the lines onto the finished MV, each with its text effect.
  */
 const SIDE = 720;
 const FPS = 24;
-/** anime frames for video segments (8 fps, like hand-drawn animation) */
-const ANIME_FPS = 8;
+
+/** the light painted look every cut gets (not the キメ絵, they are drawn already) */
+export const ANIME_FILTER = 'hqdn3d=3:3:4:4,eq=saturation=1.45:contrast=1.12:brightness=0.02,unsharp=5:5:0.8';
 
 export type RenderMaterial = { kind: 'photo' | 'video'; file: string };
 
@@ -32,6 +35,41 @@ function motion(m: MvSegment['motion'], frames: number) {
   }
 }
 
+/** The picture effect of one cut (on the square SIDE×SIDE picture). */
+function effectFilter(e: MvEffect, beat: number) {
+  switch (e) {
+    case 'POSTERIZE':
+      // cel colours: 3 bits a channel, a little lift so shadows do not go black
+      return `${ANIME_FILTER},lutrgb=r='bitand(val,224)+16':g='bitand(val,224)+16':b='bitand(val,224)+16'`;
+    case 'GLITCH': {
+      // colour split all along, plus a hard shake on every beat
+      const hit = `lt(mod(t,${beat.toFixed(3)}),0.09)`;
+      return `${ANIME_FILTER},rgbashift=rh=-9:bh=9,noise=alls=9:allf=t,scale=${SIDE + 32}:${SIDE + 32},crop=${SIDE}:${SIDE}:x='16+if(${hit},14*sin(t*97),0)':y='16+if(${hit},10*cos(t*83),0)'`;
+    }
+    default:
+      return ANIME_FILTER;
+  }
+}
+
+/** Manga speed lines around the middle (transparent PNG). */
+async function speedLines(file: string) {
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const c = SIDE / 2;
+  const rays: string[] = [];
+  for (let k = 0; k < 90; k++) {
+    const a = (k / 90) * Math.PI * 2 + rnd() * 0.05;
+    const w = 0.004 + rnd() * 0.012;
+    const r0 = SIDE * (0.3 + rnd() * 0.18);
+    const r1 = SIDE;
+    const p = (r: number, d: number) => `${(c + Math.cos(a + d) * r).toFixed(1)},${(c + Math.sin(a + d) * r).toFixed(1)}`;
+    rays.push(`<polygon points="${p(r0, 0)} ${p(r1, -w)} ${p(r1, w)}" fill="white" fill-opacity="${(0.55 + rnd() * 0.4).toFixed(2)}"/>`);
+  }
+  await sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${SIDE}" height="${SIDE}">${rays.join('')}</svg>`))
+    .png()
+    .toFile(file);
+}
+
 const ff = (args: string[], timeout = 240_000) => run('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', ...args], timeout);
 const enc = ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p', '-r', String(FPS), '-an'];
 
@@ -41,49 +79,56 @@ export async function renderMv(o: {
   plan: MvPlan;
   audio: string;
   seconds: number;
-  stylizer: Stylizer;
-  /** how many video frames may go through the anime model (the rest get the filter) */
-  animeFrameBudget: number;
-}): Promise<{ video: string; poster: string }> {
+  bpm: number;
+  keyArtist: KeyArtist;
+}): Promise<{ video: string; poster: string; keyCuts: number }> {
   const { dir } = o;
-  // photos get their anime look once, whatever how many times they are used
-  const stillCache = new Map<number, string>();
-  const still = async (m: number, anime: boolean) => {
-    const key = anime ? m : -1 - m;
-    if (stillCache.has(key)) return stillCache.get(key)!;
-    const src = o.materials[m].file;
-    const out = join(dir, `still-${key}.png`);
-    if (anime && o.stylizer.usesModel) await writeFile(out, await o.stylizer.image(await readFile(src)));
-    else await ff(['-i', src, '-frames:v', '1', ...(anime ? ['-vf', ANIME_FILTER] : []), out]);
-    stillCache.set(key, out);
+  const beat = 60 / (o.bpm || 100);
+  const lines = join(dir, 'lines.png');
+  if (o.plan.segments.some((s) => s.effect === 'SPEED_LINES')) await speedLines(lines);
+
+  // キメ絵: one anime illustration per material marked key (a video gives the frame where its cut starts)
+  const keyArt = new Map<number, string | null>();
+  const keyOf = async (s: MvSegment) => {
+    if (keyArt.has(s.m)) return keyArt.get(s.m)!;
+    const mat = o.materials[s.m];
+    let src: Buffer;
+    if (mat.kind === 'video') {
+      const frame = join(dir, `key-src-${s.m}.png`);
+      await ff(['-ss', s.from.toFixed(2), '-i', mat.file, '-frames:v', '1', frame]);
+      src = await readFile(frame);
+    } else src = await readFile(mat.file);
+    const drawn = await o.keyArtist.draw(src).catch(() => null);
+    const out = drawn ? join(dir, `key-${s.m}.png`) : null;
+    if (out) await writeFile(out, drawn!);
+    keyArt.set(s.m, out);
     return out;
   };
 
-  let budget = o.animeFrameBudget;
   const clips: string[] = [];
   for (const [k, s] of o.plan.segments.entries()) {
     const mat = o.materials[s.m];
     const clip = join(dir, `clip-${k}.mp4`);
     const frames = Math.max(1, Math.round(s.dur * FPS));
-    const square = `scale=${SIDE * 2}:${SIDE * 2}:force_original_aspect_ratio=increase,crop=${SIDE * 2}:${SIDE * 2}`;
-    if (mat.kind === 'photo') {
-      const img = await still(s.m, s.anime);
-      await ff(['-loop', '1', '-i', img, '-vf', `${square},zoompan=${motion(s.motion, frames)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`, '-frames:v', String(frames), ...enc, clip]);
+    const key = s.key ? await keyOf(s) : null;
+    const big = `scale=${SIDE * 2}:${SIDE * 2}:force_original_aspect_ratio=increase,crop=${SIDE * 2}:${SIDE * 2}`;
+    const inputs: string[] = [];
+    let base: string;
+    if (key || mat.kind === 'photo') {
+      inputs.push('-loop', '1', '-i', key ?? mat.file);
+      base = `[0:v]${big},zoompan=${motion(s.motion === 'still' ? 'zoom-in' : s.motion, frames)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`;
     } else {
-      const crop = `crop='min(iw,ih)':'min(iw,ih)',scale=${SIDE}:${SIDE},setsar=1`;
-      const need = Math.ceil(s.dur * ANIME_FPS);
-      if (s.anime && o.stylizer.usesModel && need <= budget) {
-        // hand-drawn feel: 8 frames a second through the anime model
-        budget -= need;
-        const fdir = join(dir, `f-${k}`);
-        await run('mkdir', ['-p', fdir]);
-        await ff(['-ss', s.from.toFixed(2), '-t', s.dur.toFixed(2), '-i', mat.file, '-vf', `${crop},fps=${ANIME_FPS}`, join(fdir, '%04d.png')]);
-        for (const f of (await readdir(fdir)).filter((x) => x.endsWith('.png')).sort()) await writeFile(join(fdir, f), await o.stylizer.image(await readFile(join(fdir, f))));
-        await ff(['-framerate', String(ANIME_FPS), '-i', join(fdir, '%04d.png'), '-vf', `scale=${SIDE}:${SIDE},fps=${FPS},setsar=1`, '-t', s.dur.toFixed(2), ...enc, clip]);
-      } else {
-        await ff(['-ss', s.from.toFixed(2), '-t', s.dur.toFixed(2), '-i', mat.file, '-vf', `${crop},fps=${FPS}${s.anime ? `,${ANIME_FILTER}` : ''}`, ...enc, clip]);
-      }
+      inputs.push('-ss', s.from.toFixed(2), '-t', s.dur.toFixed(2), '-i', mat.file);
+      base = `[0:v]crop='min(iw,ih)':'min(iw,ih)',scale=${SIDE}:${SIDE},fps=${FPS},setsar=1`;
     }
+    // the キメ絵 are drawn already: they only get a white flash in
+    const look = key ? `fade=t=in:st=0:d=0.25:color=white` : effectFilter(s.effect, beat);
+    let graph = `${base},${look}[v]`;
+    if (s.effect === 'SPEED_LINES') {
+      inputs.push('-loop', '1', '-i', lines);
+      graph = `${base},${look}[b];[1:v]format=rgba,rotate=a='0.06*sin(n*2.7)':c=none:ow=iw:oh=ih[l];[b][l]overlay=shortest=1,format=yuv420p[v]`;
+    }
+    await ff([...inputs, '-filter_complex', graph, '-map', '[v]', '-frames:v', String(frames), ...enc, clip]);
     clips.push(clip);
   }
 
@@ -128,38 +173,78 @@ export async function renderMv(o: {
     ],
     600_000,
   );
+  // the poster: the first キメ絵 if there is one
+  const firstKey = o.plan.segments.reduce<{ t: number; at: number | null }>((a, s) => (a.at === null && s.key && keyArt.get(s.m) ? { t: a.t, at: a.t } : { t: a.t + s.dur, at: a.at }), {
+    t: 0,
+    at: null,
+  }).at;
   const poster = join(dir, 'poster.webp');
-  await ff(['-ss', Math.min(2, o.seconds / 3).toFixed(2), '-i', video, '-frames:v', '1', '-vf', 'scale=480:480', poster]);
-  return { video, poster };
+  await ff(['-ss', (firstKey !== null ? firstKey + 0.6 : Math.min(2, o.seconds / 3)).toFixed(2), '-i', video, '-frames:v', '1', '-vf', 'scale=480:480', poster]);
+  return { video, poster, keyCuts: [...keyArt.values()].filter(Boolean).length };
 }
 
-/** Lyric lines as an ASS subtitle file: big, rounded, outlined, at the bottom. */
-function assFile(lines: { t: number; end: number; text: string }[]) {
+export type LyricLine = { t: number; end: number; text: string; effect: MvTextEffect };
+
+/** Lyric lines as an ASS subtitle file, each line with its text effect. */
+function assFile(lines: LyricLine[]) {
   const ts = (s: number) => {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
-    const sec = (s % 60).toFixed(2).padStart(5, '0');
+    const sec = (Math.max(0, s) % 60).toFixed(2).padStart(5, '0');
     return `${h}:${String(m).padStart(2, '0')}:${sec}`;
   };
   const esc = (t: string) => t.replace(/[{}\\]/g, '').replace(/\n/g, '\\N');
+  const c = SIDE / 2;
+  const ev = (a: number, b: number, style: string, tags: string, text: string) => `Dialogue: 0,${ts(a)},${ts(b)},${style},,0,0,0,,{${tags}}${esc(text)}`;
+  const events: string[] = [];
+  for (const l of lines) {
+    switch (l.effect) {
+      case 'ZOOM_BURST':
+        events.push(ev(l.t, l.end, 'Big', `\\pos(${c},${c})\\fad(60,200)\\fscx190\\fscy190\\t(0,260,\\fscx100\\fscy100)`, l.text));
+        break;
+      case 'STROBO_FLASH': {
+        // yellow / white every 110 ms for the first second, then white
+        let tags = `\\pos(${c},${c})\\fad(0,200)\\c&H00E5FF&`;
+        for (let k = 1; k <= 9; k++) tags += `\\t(${k * 110},${k * 110 + 1},\\c&H${k % 2 ? 'FFFFFF' : '00E5FF'}&)`;
+        events.push(ev(l.t, l.end, 'Big', tags, l.text));
+        break;
+      }
+      case 'SHAKE_HARD': {
+        // shaking for the first second (short events at jumping positions), then still
+        const until = Math.min(l.end, l.t + 1);
+        let k = 0;
+        for (let t = l.t; t < until - 0.01; t += 0.07, k++) {
+          const dx = Math.round(Math.sin(k * 2.3) * 14);
+          const dy = Math.round(Math.cos(k * 3.1) * 10);
+          events.push(ev(t, Math.min(until, t + 0.07), 'Big', `\\pos(${c + dx},${c + dy})`, l.text));
+        }
+        if (until < l.end) events.push(ev(until, l.end, 'Big', `\\pos(${c},${c})\\fad(0,200)`, l.text));
+        break;
+      }
+      default:
+        events.push(ev(l.t, l.end, 'Lyric', '\\fad(200,200)', l.text));
+    }
+  }
   return [
     '[Script Info]',
     'ScriptType: v4.00+',
     `PlayResX: ${SIDE}`,
     `PlayResY: ${SIDE}`,
+    'WrapStyle: 0',
     '',
     '[V4+ Styles]',
     'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
     'Style: Lyric,Noto Sans CJK JP,46,&H00FFFFFF,&H00FFFFFF,&H00602A3A,&H80000000,1,0,0,0,100,100,1,0,1,4,2,2,40,40,56,1',
+    'Style: Big,Noto Sans CJK JP,62,&H00FFFFFF,&H00FFFFFF,&H00401860,&H90000000,1,0,0,0,100,100,2,0,1,6,3,5,30,30,30,1',
     '',
     '[Events]',
     'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
-    ...lines.map((l) => `Dialogue: 0,${ts(l.t)},${ts(l.end)},Lyric,,0,0,0,,{\\fad(200,200)}${esc(l.text)}`),
+    ...events,
   ].join('\n');
 }
 
 /** The MV with the lyric lines on it (the picture is not edited again). */
-export async function burnLyrics(dir: string, video: string, lines: { t: number; end: number; text: string }[]): Promise<string> {
+export async function burnLyrics(dir: string, video: string, lines: LyricLine[]): Promise<string> {
   const ass = join(dir, 'lyrics.ass');
   await writeFile(ass, assFile(lines));
   const out = join(dir, 'mv-lyrics.mp4');

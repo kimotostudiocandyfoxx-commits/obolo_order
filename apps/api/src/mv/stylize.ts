@@ -8,13 +8,11 @@ import type * as Ort from 'onnxruntime-node';
 import sharp from 'sharp';
 
 /**
- * Anime look for MV materials (client request 2026-10-08: ONNX Runtime).
- *  - ONNX: an image-to-image anime model (AnimeGAN-style: NHWC or NCHW float in [-1, 1]) loaded
- *    from ANIME_ONNX_URL (downloaded once per instance). PLACEHOLDER (P-MV-2): choose a model whose
- *    licence allows a paid service — the well-known AnimeGAN models are non-commercial only.
- *  - without a model: an ffmpeg filter that gives a light painted look (FILTER below).
+ * An anime model run in the API (ONNX Runtime, client request 2026-10-08), the last choice for the
+ * キメ絵 (keyart.ts): an image-to-image model (AnimeGAN-style: NHWC or NCHW float in [-1, 1]) loaded
+ * from ANIME_ONNX_URL (downloaded once per instance). PLACEHOLDER (P-MV-2): choose a model whose
+ * licence allows a paid service — the well-known AnimeGAN models are non-commercial only.
  */
-export const ANIME_FILTER = 'hqdn3d=3:3:4:4,eq=saturation=1.45:contrast=1.12:brightness=0.02,unsharp=5:5:0.8';
 
 const SIZE = 512;
 

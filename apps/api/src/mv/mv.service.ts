@@ -12,6 +12,7 @@ import { Database } from '../db/db';
 import { marsBackstage, mvProjects, songs } from '../db/schema';
 import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
+import { KeyArtist } from './keyart';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
 import { Stylizer } from './stylize';
@@ -28,13 +29,19 @@ type SongRow = typeof songs.$inferSelect;
 @Injectable()
 export class MvService {
   private readonly log = new Logger('MV');
-  private readonly stylizer: Stylizer;
+  private readonly keyArtist: KeyArtist;
   constructor(
     private readonly db: Database,
     private readonly media: MediaService,
     @Inject(CONFIG) private readonly cfg: AppConfig,
   ) {
-    this.stylizer = new Stylizer(cfg.ANIME_ONNX_URL);
+    this.keyArtist = new KeyArtist({
+      runwareKey: cfg.RUNWARE_API_KEY,
+      runwareModel: cfg.RUNWARE_MODEL,
+      geminiKey: cfg.GEMINI_API_KEY,
+      geminiModel: cfg.MV_KEYART_MODEL,
+      stylizer: new Stylizer(cfg.ANIME_ONNX_URL),
+    });
   }
 
   private async song(userId: string, songId: string): Promise<SongRow> {
@@ -67,7 +74,7 @@ export class MvService {
     return all
       .map((p, i) => ({ p, t: starts[i], next: i + 1 < all.length ? starts[i + 1] : Infinity }))
       .filter(({ p }) => p.text?.trim())
-      .map(({ p, t, next }) => ({ t, end: Math.min(next - 0.05, t + (Math.max(p.seconds, p.beats * spb) + 0.4) / tempo), text: p.text.trim() }));
+      .map(({ p, t, next }) => ({ t, end: Math.min(next - 0.05, t + (Math.max(p.seconds, p.beats * spb) + 0.4) / tempo), text: p.text.trim(), chorus: p.section === 'chorus' }));
   }
 
   private async view(p: Row): Promise<MvProjectView> {
@@ -175,12 +182,14 @@ export class MvService {
         files.push({ kind: m.kind, file, seconds: secs, preview });
       }
       if (!files.length) throw new Error('materials unavailable');
+      const bpm = Number((s.designJson as { bpm?: number }).bpm) || 100;
       const plan: MvPlan = await planMv(
-        { title: s.title, seconds, bpm: Number((s.designJson as { bpm?: number }).bpm) || 100, lyrics: this.lyricLines(s).map((l) => ({ t: l.t, text: l.text })), materials: files },
+        { title: s.title, seconds, bpm, lyrics: this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })), materials: files, keyCuts: this.cfg.MV_KEY_CUTS },
         this.cfg.GEMINI_API_KEY,
         this.cfg.MV_PLAN_MODEL,
       );
-      const out = await renderMv({ dir, materials: files, plan, audio, seconds, stylizer: this.stylizer, animeFrameBudget: this.cfg.MV_ANIME_FRAMES });
+      const out = await renderMv({ dir, materials: files, plan, audio, seconds, bpm, keyArtist: this.keyArtist });
+      this.log.log(`MV ${id}: ${plan.segments.length} cuts, ${out.keyCuts} キメ絵`);
       const v = await this.media.storeGenerated(userId, 'video', 'video/mp4', await readFile(out.video), origin);
       const poster = await this.media.storeGenerated(userId, 'poster', 'image/webp', await readFile(out.poster), origin);
       const info = await probe(out.video);
@@ -222,7 +231,9 @@ export class MvService {
     const p = await this.row(userId, id);
     if (!p.videoUrl) throw apiError(HttpStatus.BAD_REQUEST, 'NO_MV', 'Make the MV first');
     const s = await this.song(userId, p.songId);
-    const lines = this.lyricLines(s);
+    // each line with the text effect Bati chose when making the MV
+    const effects = ((p.planJson ?? {}) as Partial<MvPlan>).lyrics ?? [];
+    const lines = this.lyricLines(s).map((l, k) => ({ ...l, effect: effects[k] ?? ('MINIMAL_CHILL' as const) }));
     if (!lines.length) throw apiError(HttpStatus.BAD_REQUEST, 'NO_LYRICS', 'This song has no lyrics');
     const dir = await mkdtemp(join(tmpdir(), 'obolo-mvl-'));
     try {
