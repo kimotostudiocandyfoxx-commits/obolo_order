@@ -8,6 +8,8 @@ ARG ACE_REF=main
 RUN git clone --depth 1 --branch "$ACE_REF" https://github.com/ace-step/ACE-Step-1.5.git /opt/ace \
  && cd /opt/ace && UV_LINK_MODE=copy uv sync --frozen --no-dev --python /usr/local/bin/python3.11 \
  && rm -rf /root/.cache/uv
+# fast cold start: the weights are copied from the bucket with parallel downloads (app.py copy_weights)
+RUN uv pip install --python /opt/ace/.venv/bin/python "google-cloud-storage>=2.14" && rm -rf /root/.cache/uv
 ENV PATH=/opt/ace/.venv/bin:$PATH \
     ACESTEP_PROJECT_ROOT=/opt/ace \
     ACESTEP_CHECKPOINTS_DIR=/models/ace15 \

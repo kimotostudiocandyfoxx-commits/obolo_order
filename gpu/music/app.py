@@ -169,14 +169,68 @@ def download_models() -> None:
     print(f"checkpoints ready in {CKPT_DIR} ({dir_bytes(CKPT_DIR) / 1e9:.1f} GB)", flush=True)
 
 
+# Fast cold start (2026-10-08: reading the 10 GB of weights through the Cloud Storage volume took
+# 12+ minutes, ~14 MB/s). With CKPT_BUCKET set, the weights are first copied from the bucket into
+# memory (/tmp is RAM on Cloud Run) with parallel, sliced downloads, then loaded from there.
+CKPT_BUCKET = os.environ.get("CKPT_BUCKET", "")
+CKPT_PREFIX = os.environ.get("CKPT_PREFIX", "ace15").strip("/")
+LOCAL_CKPT = os.environ.get("LOCAL_CKPT_DIR", "/tmp/ace15")
+
+
+def copy_weights() -> str | None:
+    """Bucket → LOCAL_CKPT, in parallel. Returns the local folder, or None (then the volume is used)."""
+    if not CKPT_BUCKET:
+        return None
+    from google.cloud import storage
+    from google.cloud.storage import transfer_manager
+
+    t0 = time.time()
+    state["phase"] = "copying model"
+    bucket = storage.Client().bucket(CKPT_BUCKET)
+    blobs = [b for b in bucket.list_blobs(prefix=f"{CKPT_PREFIX}/") if not b.name.endswith("/") and "/.ready-" not in b.name]
+    big = [b for b in blobs if (b.size or 0) > 256 * 1024 * 1024]
+    small = [b for b in blobs if (b.size or 0) <= 256 * 1024 * 1024]
+    total = sum(b.size or 0 for b in blobs)
+
+    def dest(b) -> str:
+        path = os.path.join(LOCAL_CKPT, b.name[len(CKPT_PREFIX) + 1 :])
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        return path
+
+    # many small files at once, then each big file in 64 MB slices at once
+    results = transfer_manager.download_many(
+        [(b, dest(b)) for b in small], max_workers=32, worker_type=transfer_manager.THREAD, raise_exception=True
+    )
+    del results
+    for b in big:
+        transfer_manager.download_chunks_concurrently(b, dest(b), chunk_size=64 * 1024 * 1024, max_workers=16, worker_type=transfer_manager.THREAD)
+    sec = time.time() - t0
+    print(f"weights copied: {len(blobs)} files, {total / 1e9:.1f} GB in {sec:.0f}s ({total / 1e6 / max(sec, 0.1):.0f} MB/s)", flush=True)
+    return LOCAL_CKPT
+
+
 def load() -> None:
+    global CKPT_DIR
     state["loading"] = True
-    state["phase"] = "loading model"
     state["since"] = time.time()
     try:
+        try:
+            local = copy_weights()
+            if local:
+                # the engine reads its checkpoint folder from the environment when it is created
+                CKPT_DIR = local
+                os.environ["ACESTEP_CHECKPOINTS_DIR"] = local
+        except Exception as e:  # noqa: BLE001 — fall back to reading through the volume
+            print(f"weights copy failed, using the volume: {e!r}", flush=True)
+            traceback.print_exc()
+            import shutil
+
+            shutil.rmtree(LOCAL_CKPT, ignore_errors=True)  # /tmp is memory: give it back
+        state["phase"] = "loading model"
+
         state["engine"] = MusicGen() if ENGINE == "musicgen" else AceStep15()
         state["phase"] = "ready"
-        print(f"engine {ENGINE} ready", flush=True)
+        print(f"engine {ENGINE} ready in {time.time() - state['since']:.0f}s", flush=True)
     except Exception as e:  # noqa: BLE001 — reported by /health and /generate
         state["error"] = f"{e!r}"
         state["phase"] = "failed"

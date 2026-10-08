@@ -76,17 +76,19 @@ jobs:
           gcloud storage rsync -r $DEL /mnt/ace15 "gs://$BUCKET/ace15"
           echo ok | gcloud storage cp - "$MARK"
 
-      # MUSIC_MIN_INSTANCES=1 keeps one GPU awake (no cold start, billed around the clock)
+      # MUSIC_MIN_INSTANCES=1 keeps one GPU awake (no cold start, billed around the clock).
+      # Cold start: the weights (~10 GB) are copied from the bucket into memory in parallel
+      # (CKPT_BUCKET, app.py copy_weights), hence 24 GiB of memory (6 CPUs are needed for that).
       - name: Deploy (GPU)
         run: |
           gcloud beta run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --quiet \
             --no-allow-unauthenticated --service-account "$MUSIC_SA" \
             --gpu 1 --gpu-type nvidia-l4 --no-gpu-zonal-redundancy \
-            --cpu 4 --memory 16Gi --no-cpu-throttling \
+            --cpu 6 --memory 24Gi --no-cpu-throttling \
             --concurrency 1 --min-instances ${{ vars.MUSIC_MIN_INSTANCES || '0' }} --max-instances 1 --timeout 900 \
             --add-volume name=models,type=cloud-storage,bucket="$BUCKET" \
             --add-volume-mount volume=models,mount-path=/models \
-            --set-env-vars HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,MUSIC_ENGINE=${{ vars.MUSIC_ENGINE || 'acestep15' }},ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }},ACE_REF_STRENGTH=${{ vars.ACE_REF_STRENGTH || '0' }}
+            --set-env-vars CKPT_BUCKET="$BUCKET",CKPT_PREFIX=ace15,HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,MUSIC_ENGINE=${{ vars.MUSIC_ENGINE || 'acestep15' }},ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }},ACE_REF_STRENGTH=${{ vars.ACE_REF_STRENGTH || '0' }}
           URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
           echo "### Music GPU: $URL" >> "$GITHUB_STEP_SUMMARY"
           echo "次に Actions → Deploy API → Run workflow を実行してください（API がこの URL を使い始めます）" >> "$GITHUB_STEP_SUMMARY"
