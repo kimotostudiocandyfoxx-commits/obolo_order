@@ -1,0 +1,177 @@
+{
+  "round": "m04-motion",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.1,
+    "heroLikeness": 6.4,
+    "heroConsistency": 6,
+    "pictureQuality": 6.4,
+    "storyTelling": 5.3,
+    "lyricFit": 6.2,
+    "beatSync": 5.7,
+    "variety": 6.1,
+    "watchability": 6,
+    "kidsSafe": 7.2
+  },
+  "results": [
+    {
+      "id": "pop-bright",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "pop-bright~a",
+      "scenes": 15,
+      "painted": 15,
+      "seconds": {
+        "plan": 3,
+        "paint": 601,
+        "render": 14
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.5,
+        "pictureQuality": 6.6,
+        "storyTelling": 6,
+        "lyricFit": 6.7,
+        "beatSync": 5.8,
+        "variety": 6,
+        "watchability": 6.2,
+        "kidsSafe": 7.5,
+        "overall": 6.3,
+        "problems": [
+          "00:43 introduces an unexpected human character not established in the storyline.",
+          "00:25-00:29 feels repetitive with multiple continuous running angles.",
+          "Pacing relies heavily on static pan-and-scan camera motions."
+        ],
+        "fixIdeas": [
+          "Add '1girl, human' to negative prompts for cutaway scenery shots.",
+          "Vary camera perspectives during movement scenes using low angles or profile pans.",
+          "Align key pose shifts directly with the downbeats for tighter rhythmic flow."
+        ],
+        "bestMoments": [
+          "00:05 cute wake-up moment in bed matching the opening melody.",
+          "00:38 dynamic jump shot timing with the vocal climax."
+        ]
+      }
+    },
+    {
+      "id": "rock-run",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "rock-run~a",
+      "scenes": 15,
+      "painted": 15,
+      "seconds": {
+        "plan": 4,
+        "paint": 623,
+        "render": 15
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 5.4,
+        "pictureQuality": 6.9,
+        "storyTelling": 5.2,
+        "lyricFit": 6.2,
+        "beatSync": 6,
+        "variety": 6.4,
+        "watchability": 5.8,
+        "kidsSafe": 7.4,
+        "overall": 6,
+        "problems": [
+          "00:07 - Unrelated human girl appears instead of pure landscape scenery.",
+          "00:23 - Human character intrudes again on the night sky shot.",
+          "00:35 - Face mask anatomy distorts awkwardly during shouting expression."
+        ],
+        "fixIdeas": [
+          "Add '1girl, human' to negative prompts for scenery-only shots.",
+          "Clarify whether the hero wears a rigid mask or has an expressive face to avoid distortion.",
+          "Tighten transitions around lyric beat drops to maintain character momentum."
+        ],
+        "bestMoments": [
+          "00:03 - High-energy leap over the log with clean motion lines.",
+          "00:41 - Dynamic forward run along the illuminated trail."
+        ]
+      }
+    },
+    {
+      "id": "ballad-night",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "ballad-night~a",
+      "scenes": 12,
+      "painted": 12,
+      "seconds": {
+        "plan": 3,
+        "paint": 597,
+        "render": 16
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 6,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "0:39 Modern handheld microphone abruptly clashes with traditional fantasy atmosphere.",
+          "0:43 Cutaway to an unrelated human girl breaks narrative continuity.",
+          "0:52 Ending shot in a modern train interior clashes with the established shrine setting."
+        ],
+        "fixIdeas": [
+          "Replace modern microphone in prompt with mystical singing aura.",
+          "Keep hero in focus during the climax instead of cutting to random human characters.",
+          "Maintain ancient nighttime setting throughout the final sequence."
+        ],
+        "bestMoments": [
+          "0:05 Charming hero introduction under the moonlight.",
+          "0:47 Emotional firefly scene effectively complementing the chorus."
+        ]
+      }
+    },
+    {
+      "id": "edm-party",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "edm-party~a",
+      "scenes": 18,
+      "painted": 18,
+      "seconds": {
+        "plan": 3,
+        "paint": 606,
+        "render": 16
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 6,
+        "beatSync": 6,
+        "variety": 6,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:13 - An unintended human girl appears on stage despite 'no humans' prompt.",
+          "00:28 - DJ booth cut generates a random girl instead of empty scenery or the hero.",
+          "00:38 - Another human character appears overlooking the fireworks.",
+          "00:42 - Mascot posture briefly changes awkwardly to a four-legged stance.",
+          "00:44 - Outfit changes inconsistently into a festival kimono style."
+        ],
+        "fixIdeas": [
+          "Add strong negative prompt weights for human characters in scenery cuts.",
+          "Keep costume prompts strictly consistent across all scenes to prevent random outfit shifts.",
+          "Maintain the bipedal chibi pose consistently to avoid strange quadruped transitions."
+        ],
+        "bestMoments": [
+          "00:04 - Energetic introduction of the hero on the neon street.",
+          "00:23 - Dramatic close-up with glowing eyes matching the beat shift.",
+          "00:40 - Cheerful rooftop pose under the fireworks finale."
+        ]
+      }
+    }
+  ]
+}
