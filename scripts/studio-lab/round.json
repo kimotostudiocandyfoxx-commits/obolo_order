@@ -1,8 +1,8 @@
 {
-  "round": "r04-all-genres",
-  "note": "本番の新しい標準（LM あり・45秒・声域合わせの判定を修正）で、8つの曲調がどれも安定して良いかを確認する。",
+  "round": "r05-ending-voice",
+  "note": "①今の標準 ②[Intro]/[Outro] を付けて2小節長く。声を変える曲は、同じテイクの「変換前（スタジオの声）」も採点して、変換でどれだけ落ちるかを測る。音割れ防止のリミッターも入れた。",
   "needs": [
-    "/paint/warm"
+    "outro"
   ],
   "tune": {},
   "keepStems": false,
@@ -34,7 +34,10 @@
             "あしたもきっといいひ"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1000
+      }
     },
     {
       "id": "ballad-night",
@@ -63,7 +66,10 @@
             "きみがいたなつのひ"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1001
+      }
     },
     {
       "id": "rock-run",
@@ -92,7 +98,10 @@
             "ゆめはおわらない"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1002
+      }
     },
     {
       "id": "hiphop-chill",
@@ -121,7 +130,10 @@
             "まちのリズム"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1003
+      }
     },
     {
       "id": "edm-party",
@@ -150,7 +162,10 @@
             "パーティーはこれから"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1004
+      }
     },
     {
       "id": "kids-march",
@@ -177,7 +192,10 @@
             "ララララ またあした"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1005
+      }
     },
     {
       "id": "citypop-drive",
@@ -206,7 +224,10 @@
           ]
         }
       ],
-      "seconds": 46.2
+      "seconds": 46.2,
+      "tune": {
+        "seed": 1006
+      }
     },
     {
       "id": "folk-letter",
@@ -235,7 +256,24 @@
           ]
         }
       ],
-      "seconds": 45.7
+      "seconds": 45.7,
+      "tune": {
+        "seed": 1007
+      }
     }
-  ]
+  ],
+  "variants": [
+    {
+      "name": "std",
+      "tune": {}
+    },
+    {
+      "name": "outro",
+      "tune": {
+        "outro": true
+      },
+      "extraBars": 2
+    }
+  ],
+  "judgeStudioVoice": true
 }

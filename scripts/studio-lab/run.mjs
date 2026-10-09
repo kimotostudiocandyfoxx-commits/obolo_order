@@ -39,12 +39,12 @@ async function makeSong(c, v) {
   const body = {
     prompt: v.vocalWords ? songPromptWith(c.prompt, v.vocalWords) : songPrompt(c.prompt),
     lyrics: c.sections.flatMap((s) => s.lines.map((text) => ({ section: s.name, text }))),
-    seconds: c.seconds,
+    seconds: Math.round((c.seconds + ((v.extraBars ?? 0) * 240) / c.bpm) * 10) / 10,
     bpm: c.bpm,
     keyRoot: c.keyRoot ?? 0,
     scale: c.scale ?? 'major',
     language: 'ja',
-    ...(c.voice && voice ? { voice, similarity: c.similarity ?? 0.7 } : {}),
+    ...(c.voice && voice && v.voice !== false ? { voice, similarity: c.similarity ?? 0.7 } : {}),
     ...(round.tune ?? {}),
     ...(v.tune ?? {}),
     ...(c.tune ?? {}),
@@ -161,6 +161,8 @@ const results = [];
 const variants = round.variants ?? [{ name: '' }];
 for (const base of round.cases)
   for (const v of variants) {
+  // a variant can be only for the songs with a voice (onlyVoiced), e.g. the same song without the voice change
+  if (v.onlyVoiced && !base.voice) continue;
   const c = { ...base, id: v.name ? `${base.id}~${v.name}` : base.id };
   console.log(`== ${c.id}`);
   try {
@@ -172,6 +174,19 @@ for (const base of round.cases)
     const j = await judge(c, made.mix, made.sent.prompt);
     results.push({ id: c.id, variant: v.name, ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
     console.log(`${c.id}: overall ${j.overall ?? '?'} (${made.wall}s)`);
+    // the same take before the voice change: the studio's own vocal on the instrumental
+    if (made.voiced && round.judgeStudioVoice) {
+      const inst = join(OUT, '_inst.m4a');
+      const guide = join(OUT, '_guide.m4a');
+      writeFileSync(inst, Buffer.from(made.instrumental, 'base64'));
+      writeFileSync(guide, Buffer.from(made.guide, 'base64'));
+      const studio = join(OUT, `${c.id}@studio.m4a`);
+      spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', inst, '-i', guide, '-filter_complex', '[0:a][1:a]amix=inputs=2:normalize=0,alimiter=limit=0.89:level=false[o]', '-map', '[o]', '-c:a', 'aac', '-b:a', '160k', studio]);
+      for (const f of [inst, guide]) spawnSync('rm', ['-f', f]);
+      const js = await judge(c, readFileSync(studio).toString('base64'), made.sent.prompt);
+      results.push({ id: `${c.id}@studio`, variant: 'studio-voice', ok: true, file: studio, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: false, voiceNote: 'same take, studio voice', timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...measure(studio), judge: js });
+      console.log(`${c.id}@studio: overall ${js.overall ?? '?'}`);
+    }
   } catch (e) {
     results.push({ id: c.id, variant: v.name, ok: false, error: String(e).slice(0, 300) });
     console.log(`${c.id}: FAILED ${String(e).slice(0, 200)}`);

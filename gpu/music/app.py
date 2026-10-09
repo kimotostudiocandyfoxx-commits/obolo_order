@@ -162,7 +162,7 @@ def ace_song(engine: "AceStep15", r: "SongReq", seconds: float, out_dir: str) ->
     from acestep.inference import GenerationConfig, GenerationParams, generate_music
 
     key = f"{NAMES[r.keyRoot]} {'Major' if r.scale == 'major' else 'minor'}"
-    lyrics = format_lyrics(r.lyrics)
+    lyrics = format_lyrics(r.lyrics, r.outro)
     params = GenerationParams(
         task_type="text2music",
         caption=sung_caption(r),
@@ -209,9 +209,9 @@ def lm_handler():
         return _lm["h"]
 
 
-def format_lyrics(lines: list["LyricLine"]) -> str:
+def format_lyrics(lines: list["LyricLine"], outro: bool = False) -> str:
     """Our lines → ACE-Step lyrics with structure tags ([Verse] / [Chorus] / [Bridge])."""
-    out: list[str] = []
+    out: list[str] = ["[Intro]", ""] if outro else []
     last = None
     for l in lines:
         if l.section != last:
@@ -220,6 +220,8 @@ def format_lyrics(lines: list["LyricLine"]) -> str:
             out.append(f"[{l.section.capitalize()}]")
             last = l.section
         out.append(l.text.strip())
+    if outro:
+        out += ["", "[Outro]"]
     return "\n".join(out)[:4000]
 
 
@@ -370,7 +372,7 @@ def mix_stems(inst: str, vocals: str, out: str, seconds: float) -> None:
     fade_at = max(0.0, seconds - 1.5)
     graph = (
         "[1:a]highpass=f=80,acompressor=threshold=-18dB:ratio=3:attack=5:release=80,aecho=0.8:0.6:60|120:0.12|0.06,volume=1.15[v];"
-        f"[0:a][v]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,afade=t=out:st={fade_at:.2f}:d=1.5[o]"
+        f"[0:a][v]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100,alimiter=limit=0.84:level=false,afade=t=out:st={fade_at:.2f}:d=1.5[o]"
     )
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", inst, "-i", vocals, "-filter_complex", graph, "-map", "[o]", "-t", f"{seconds:.2f}", "-ar", "44100", out], check=True)
 
@@ -590,6 +592,8 @@ class SongReq(BaseModel):
     steps: int = Field(8, ge=4, le=64)
     shift: float = Field(3.0, ge=1.0, le=6.0)
     seed: int | None = Field(None, ge=0)
+    # [Intro] / [Outro] around the lyrics, so the song starts and ends like a song (lab r04: abrupt ends)
+    outro: bool = False
     # ACE-Step's 5Hz language model plans the song first ("thinking": melody/structure codes).
     # Studio lab r02 (2026-10-09): overall 6.9 with it vs 3.1 without (lines skipped, no singing) → on
     lm: bool = True
@@ -687,7 +691,7 @@ def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", 
     else:
         # the studio's own mix, faded at the end
         fade_at = max(0.0, seconds - 1.5)
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{seconds:.2f}", "-af", f"afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{seconds:.2f}", "-af", f"alimiter=limit=0.89:level=false,afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
     print(f"song: {len(r.lyrics)} lines, {seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, voice {t3 - t2:.1f}s ({how}), {len(lines)} line times", flush=True)
     return {
         "seconds": seconds,
@@ -766,7 +770,7 @@ def ace_extend(engine: "AceStep15", r: ExtendReq, out_dir: str) -> tuple[str, li
         chunk_mask_mode="explicit",
         repaint_wav_crossfade_sec=0.5,
         caption=sung_caption(r),
-        lyrics=format_lyrics(r.lyrics),
+        lyrics=format_lyrics(r.lyrics, r.outro),
         instrumental=False,
         vocal_language=r.language,
         bpm=r.bpm,
