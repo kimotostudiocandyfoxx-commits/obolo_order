@@ -39,6 +39,9 @@ class OrtCore:
         self.sess = ort.InferenceSession(path, so, providers=["CPUExecutionProvider"])
         self.inputs = [i.name for i in self.sess.get_inputs()]
 
+    def to(self, *_):  # apply_model moves the model to the device: ONNX Runtime already is there
+        return self
+
     def __call__(self, mix, magspec):
         x, xt = self.sess.run(None, {self.inputs[0]: mix.numpy(), self.inputs[1]: magspec.numpy()})
         return torch.from_numpy(x), torch.from_numpy(xt)
