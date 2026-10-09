@@ -1,6 +1,6 @@
 {
-  "round": "r05-ending-voice",
-  "note": "①今の標準 ②[Intro]/[Outro] を付けて2小節長く。声を変える曲は、同じテイクの「変換前（スタジオの声）」も採点して、変換でどれだけ落ちるかを測る。音割れ防止のリミッターも入れた。",
+  "round": "r06-stability",
+  "note": "新しい標準（イントロ・アウトロ付き、曲調ごとの歌い方の指示、リミッター強め）で、8曲調を2回ずつ作って安定性を見る（どちらの回も良いか）。",
   "needs": [
     "outro"
   ],
@@ -13,7 +13,7 @@
       "bpm": 112,
       "keyRoot": 0,
       "scale": "major",
-      "seconds": 45.0,
+      "seconds": 49.3,
       "voice": false,
       "sections": [
         {
@@ -35,9 +35,7 @@
           ]
         }
       ],
-      "tune": {
-        "seed": 1000
-      }
+      "genre": "pop"
     },
     {
       "id": "ballad-night",
@@ -45,7 +43,7 @@
       "bpm": 72,
       "keyRoot": 9,
       "scale": "minor",
-      "seconds": 50.0,
+      "seconds": 56.7,
       "voice": true,
       "sections": [
         {
@@ -67,9 +65,7 @@
           ]
         }
       ],
-      "tune": {
-        "seed": 1001
-      }
+      "genre": "ballad"
     },
     {
       "id": "rock-run",
@@ -77,7 +73,7 @@
       "bpm": 160,
       "keyRoot": 4,
       "scale": "minor",
-      "seconds": 45.0,
+      "seconds": 48.0,
       "voice": false,
       "sections": [
         {
@@ -99,9 +95,7 @@
           ]
         }
       ],
-      "tune": {
-        "seed": 1002
-      }
+      "genre": "rock"
     },
     {
       "id": "hiphop-chill",
@@ -109,7 +103,7 @@
       "bpm": 90,
       "keyRoot": 5,
       "scale": "major",
-      "seconds": 45.3,
+      "seconds": 50.6,
       "voice": true,
       "sections": [
         {
@@ -131,9 +125,7 @@
           ]
         }
       ],
-      "tune": {
-        "seed": 1003
-      }
+      "genre": "hiphop"
     },
     {
       "id": "edm-party",
@@ -141,7 +133,7 @@
       "bpm": 128,
       "keyRoot": 7,
       "scale": "major",
-      "seconds": 45.0,
+      "seconds": 48.8,
       "voice": false,
       "sections": [
         {
@@ -163,9 +155,7 @@
           ]
         }
       ],
-      "tune": {
-        "seed": 1004
-      }
+      "genre": "edm"
     },
     {
       "id": "kids-march",
@@ -173,7 +163,7 @@
       "bpm": 120,
       "keyRoot": 2,
       "scale": "major",
-      "seconds": 44.0,
+      "seconds": 48.0,
       "voice": true,
       "sections": [
         {
@@ -193,9 +183,7 @@
           ]
         }
       ],
-      "tune": {
-        "seed": 1005
-      }
+      "genre": "kids"
     },
     {
       "id": "citypop-drive",
@@ -224,10 +212,8 @@
           ]
         }
       ],
-      "seconds": 46.2,
-      "tune": {
-        "seed": 1006
-      }
+      "seconds": 50.8,
+      "genre": "pop"
     },
     {
       "id": "folk-letter",
@@ -256,24 +242,19 @@
           ]
         }
       ],
-      "seconds": 45.7,
-      "tune": {
-        "seed": 1007
-      }
+      "seconds": 51.4,
+      "genre": "pop"
     }
   ],
   "variants": [
     {
-      "name": "std",
+      "name": "a",
       "tune": {}
     },
     {
-      "name": "outro",
-      "tune": {
-        "outro": true
-      },
-      "extraBars": 2
+      "name": "b",
+      "tune": {}
     }
   ],
-  "judgeStudioVoice": true
+  "judgeStudioVoice": false
 }

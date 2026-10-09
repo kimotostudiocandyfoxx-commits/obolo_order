@@ -299,7 +299,8 @@ export function buildSongDesign(raw: string, partner: ComposePartner, genre: Com
  */
 export function songSeconds(bpm: number, lines: number, target = 45) {
   const bar = 240 / bpm;
-  const bars = Math.max(Math.round(target / bar), Math.ceil(lines * 1.5) + 3);
+  // + 2 bars for the intro / outro the studio now adds (studio lab r05: 7.7 vs 7.3 without)
+  const bars = Math.max(Math.round(target / bar), Math.ceil(lines * 1.5) + 3) + 2;
   return Math.round(bars * bar * 10) / 10;
 }
 

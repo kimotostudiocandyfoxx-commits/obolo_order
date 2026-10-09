@@ -21,13 +21,23 @@ const OUT = join('art/lab/studio', round.round);
 mkdirSync(OUT, { recursive: true });
 const voice = existsSync('art/lab/voice/2-reference.m4a') ? readFileSync('art/lab/voice/2-reference.m4a').toString('base64') : null;
 
-/** The same words the API adds (apps/api/src/compose/song.service.ts songPrompt) unless the round overrides it. */
-function songPrompt(instrumentalPrompt) {
+/** The same as apps/api/src/compose/song.service.ts vocalWords (keep in step). */
+function vocalWords(genre, instrumentalPrompt = '') {
+  const g = `${genre} ${instrumentalPrompt}`.toLowerCase();
+  if (/hip ?hop|rap|trap/.test(g)) return 'japanese rap vocal, rhythmic flow, clear diction, every word pronounced';
+  if (/kids|children|nursery/.test(g)) return 'bright cheerful japanese vocal, simple sing-along melody, clear diction';
+  if (/ballad/.test(g)) return 'emotional japanese vocal, smooth legato, clear lead singer';
+  if (/rock|punk|metal/.test(g)) return 'powerful japanese rock vocal, clear lead singer';
+  return 'catchy japanese pop vocal, clear lead singer, expressive singing';
+}
+
+/** The same words the API adds (songPrompt) unless the round overrides them. */
+function songPrompt(instrumentalPrompt, genre = '') {
   const base = instrumentalPrompt
     .replace(/\s*,?\s*(no vocals?|instrumental( only)?|without vocals?)\s*/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  return `${base}, ${round.vocalWords ?? 'catchy japanese pop vocal, clear lead singer, expressive singing'}`.slice(0, 500);
+  return `${base}, ${round.vocalWords ?? vocalWords(genre, base)}`.slice(0, 500);
 }
 
 function songPromptWith(p, words) {
@@ -37,7 +47,7 @@ function songPromptWith(p, words) {
 
 async function makeSong(c, v) {
   const body = {
-    prompt: v.vocalWords ? songPromptWith(c.prompt, v.vocalWords) : songPrompt(c.prompt),
+    prompt: v.vocalWords ? songPromptWith(c.prompt, v.vocalWords) : songPrompt(c.prompt, c.genre ?? ''),
     lyrics: c.sections.flatMap((s) => s.lines.map((text) => ({ section: s.name, text }))),
     seconds: Math.round((c.seconds + ((v.extraBars ?? 0) * 240) / c.bpm) * 10) / 10,
     bpm: c.bpm,

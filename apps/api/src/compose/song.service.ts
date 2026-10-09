@@ -34,13 +34,23 @@ interface StoredDesign {
   voiced?: boolean;
 }
 
+/** How the singer should sing, by genre (studio lab r05: rap lines were skipped / mumbled with pop words). */
+export function vocalWords(genre: string, instrumentalPrompt = '') {
+  const g = `${genre} ${instrumentalPrompt}`.toLowerCase();
+  if (/hip ?hop|rap|trap/.test(g)) return 'japanese rap vocal, rhythmic flow, clear diction, every word pronounced';
+  if (/kids|children|nursery/.test(g)) return 'bright cheerful japanese vocal, simple sing-along melody, clear diction';
+  if (/ballad/.test(g)) return 'emotional japanese vocal, smooth legato, clear lead singer';
+  if (/rock|punk|metal/.test(g)) return 'powerful japanese rock vocal, clear lead singer';
+  return 'catchy japanese pop vocal, clear lead singer, expressive singing';
+}
+
 /** What the music studio is asked for: the design's sound, with a lead vocal (not "no vocals"). */
-function songPrompt(instrumentalPrompt: string) {
+function songPrompt(instrumentalPrompt: string, genre = '') {
   const base = instrumentalPrompt
     .replace(/\s*,?\s*(no vocals?|instrumental( only)?|without vocals?)\s*/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-  return `${base}, catchy japanese pop vocal, clear lead singer, expressive singing`.slice(0, 500);
+  return `${base}, ${vocalWords(genre, base)}`.slice(0, 500);
 }
 
 /** Lyric lines (in order) with when they are sung: the studio's own times, else spread over the song. */
@@ -194,7 +204,7 @@ export class SongService {
     const lyrics = body.sections.flatMap((s) => s.lines.map((l) => l.text)).join('\n');
     if ((await moderateText(lyrics)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sung');
     if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
-    const prompt = songPrompt(body.instrumentalPrompt);
+    const prompt = songPrompt(body.instrumentalPrompt, body.genre);
     const made = await generateSong(this.cfg.MUSIC_URL, { ...body, prompt, voice: await this.voiceSample(userId) });
     const [mixM, vocM, instM, guideM] = await Promise.all([
       this.media.storeAudio(userId, 'audio/mp4', made.mix, origin),
@@ -482,7 +492,7 @@ export class SongService {
         const changes = new Map(command.edits.map((e) => [e.index, e.text]));
         lines = lines.map((l, i) => ({ ...l, text: changes.get(i) ?? l.text }));
       } else {
-        design.instrumentalPrompt = songPrompt(command.prompt);
+        design.instrumentalPrompt = songPrompt(command.prompt, design.genre);
       }
       const sections: FullSongBody['sections'] = [];
       for (const l of lines) {
