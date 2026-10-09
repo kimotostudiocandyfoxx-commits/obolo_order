@@ -44,7 +44,7 @@ describe('KeyArtist scenes', () => {
         throw new Error(`unexpected ${url}`);
       }),
     );
-    expect((await artist().paint('1girl, beach', 1))?.equals(out)).toBe(true);
+    expect((await artist().paintAll(['1girl, beach'], 1, 2))[0]?.equals(out)).toBe(true);
   }, 20_000);
 
   it('drops a picture the NSFW check does not pass', async () => {
@@ -57,32 +57,39 @@ describe('KeyArtist scenes', () => {
         throw new Error(`unexpected ${url}`);
       }),
     );
-    expect(await artist().paint('scenery', 1)).toBeNull();
+    expect(await artist().paintAll(['scenery'], 1, 2)).toEqual([null]);
   }, 20_000);
 
-  it('prefers our own GPU (Animagine recipe), falls back to Novita when it fails', async () => {
+  it('prefers our own GPU (one call, Animagine recipe), and sends only what it missed to Novita', async () => {
     const out = await png();
     const calls: string[] = [];
+    let polls = 0;
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string, init?: RequestInit) => {
         calls.push(url);
         if (url === 'https://gpu.example/paint') {
           const body = JSON.parse(String(init?.body));
-          expect(body.prompt).toContain('masterpiece, high score');
-          expect(body.seed).toBe(7);
+          expect(body.items.map((i: { seed: number }) => i.seed)).toEqual([7, 8]);
+          expect(body.items[0].prompt).toContain('1boy, safe, anime coloring');
+          expect(body.negative).toContain('explicit');
           expect((init?.headers as Record<string, string>).authorization).toBe('Bearer tok');
-          return Response.json({ image: out.toString('base64'), safe: true });
+          return Response.json({ images: [out.toString('base64'), null] });
         }
+        if (url.endsWith('/qwen-image-txt2img')) return Response.json({ task_id: 'q' });
+        if (url.includes('task-result')) return Response.json(polls++ < 0 ? {} : { task: { status: 'TASK_STATUS_SUCCEED' }, images: [{ image_url: 'https://cdn.example/z.png' }] });
+        if (url === 'https://cdn.example/z.png') return new Response(out);
         throw new Error(`unexpected ${url}`);
       }),
     );
     const a = artist({ paintUrl: 'https://gpu.example/', paintToken: async () => 'tok', novitaModel: 'animagineXL40_v4Opt.safetensors' });
-    expect((await a.paint('1boy', 7))?.equals(out)).toBe(true);
+    const got = await a.paintAll(['1boy', 'scenery'], 7, 4);
+    expect(got.every((b) => b?.equals(out))).toBe(true);
+    expect(calls.filter((c) => c.endsWith('/paint'))).toHaveLength(1);
+    expect(calls.filter((c) => c.endsWith('/qwen-image-txt2img'))).toHaveLength(1);
     expect(a.sceneBudget(30, 12)).toBe(30);
     expect(artist().sceneBudget(30, 12)).toBe(12);
-    expect(calls).toEqual(['https://gpu.example/paint']);
-  });
+  }, 20_000);
 
   it('a photo key cut no longer calls Novita (img2img is gone) and never Gemini when Novita is set', async () => {
     const calls: string[] = [];

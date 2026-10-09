@@ -274,21 +274,21 @@ export class MvService {
         this.cfg.GEMINI_API_KEY,
         this.cfg.MV_PLAN_MODEL,
       );
-      // paint every scene (a few at a time); one seed per MV keeps the look together
+      // paint every scene; one seed per MV keeps the look together
       const seed = Math.floor(Math.random() * 2 ** 31);
-      const pics: (string | null)[] = new Array(story.scenes.length).fill(null);
-      let next = 0;
-      const worker = async () => {
-        while (next < story.scenes.length) {
-          const k = next++;
-          const img = await this.keyArtist.paint(story.scenes[k].tags, seed + k);
-          if (img) {
-            pics[k] = join(dir, `scene-${k}.jpg`);
-            await sharp(img).jpeg({ quality: 92 }).toFile(pics[k]!);
-          }
-        }
-      };
-      await Promise.all(Array.from({ length: Math.min(this.cfg.MV_PAINT_PARALLEL, story.scenes.length) }, worker));
+      const drawn = await this.keyArtist.paintAll(
+        story.scenes.map((sc) => sc.tags),
+        seed,
+        this.cfg.MV_PAINT_PARALLEL,
+      );
+      const pics: (string | null)[] = await Promise.all(
+        drawn.map(async (img, k) => {
+          if (!img) return null;
+          const f = join(dir, `scene-${k}.jpg`);
+          await sharp(img).jpeg({ quality: 92 }).toFile(f);
+          return f;
+        }),
+      );
       const painted = pics.filter(Boolean).length;
       this.log.log(`MV ${id}: storyboard ${story.scenes.length} scenes, painted ${painted} in ${Math.round((Date.now() - t0) / 1000)}s`);
       // a scene that could not be painted shows its neighbour (or, with nothing painted, a plain card)

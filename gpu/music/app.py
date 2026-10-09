@@ -7,7 +7,9 @@ POST /song      {prompt, lyrics, seconds, bpm, keyRoot, scale, language, voice?}
                 time of every lyric line, and — with `voice` (the member's recording) — the vocal
                 turned into their voice by Seed-VC (svc_worker.py, zero-shot) and mixed again
                 (client decisions 2026-10-09: replace Fish line-by-line singing)
-GET  /health    → {ready, loading, error, engine}
+POST /paint     {items: [{prompt, seed}], negative, side, steps, cfg} → {images: [base64 JPEG | null]}
+                Mars MV scenes with Animagine XL 4.0 (paint.py; loaded on the first call)
+GET  /health    → {ready, loading, error, engine, painter}
 
 Only the API's service account may call it (Cloud Run IAM, no public access). The model loads in a
 background thread at start-up (weights cached on the Cloud Storage volume mounted at /models), so a
@@ -35,6 +37,7 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 from scipy.io import wavfile
 
+import paint as painter
 from render import render_guide
 
 ENGINE = os.environ.get("MUSIC_ENGINE", "acestep15")
@@ -502,6 +505,7 @@ def health():
         "cuda": cuda,
         "error": state["error"],
         "voice": svc_health(),
+        "painter": {k: v for k, v in painter.state.items() if k != "pipe"} | {"ready": painter.state["pipe"] is not None},
     }
 
 
@@ -601,3 +605,29 @@ def song(r: SongReq):
         raise HTTPException(500, f"song failed: {e!r}"[:400]) from e
     print(f"song: {len(r.lyrics)} lines, {r.seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, voice {t3 - t2:.1f}s ({how}), {len(lines)} line times", flush=True)
     return payload
+
+
+class PaintItem(BaseModel):
+    prompt: str = Field(min_length=1, max_length=2000)
+    seed: int = 0
+
+
+class PaintReq(BaseModel):
+    items: list[PaintItem] = Field(min_length=1, max_length=60)
+    negative: str = Field(default="", max_length=2000)
+    side: int = 1024
+    steps: int = Field(default=28, ge=8, le=60)
+    cfg: float = Field(default=5.0, ge=1.0, le=12.0)
+
+
+@app.post("/paint")
+def paint(r: PaintReq):
+    """Mars MV scenes, painted one after another (the API sends the whole storyboard in one call)."""
+    t0 = time.time()
+    painter.load(CKPT_BUCKET)
+    if painter.state["pipe"] is None:
+        raise HTTPException(500, f"painter failed to load: {painter.state['error']}")
+    t1 = time.time()
+    images = painter.paint([i.model_dump() for i in r.items], r.negative, r.side, r.steps, r.cfg)
+    print(f"paint: {sum(1 for i in images if i)}/{len(images)} pictures in {time.time() - t1:.0f}s (+{t1 - t0:.0f}s loading)", flush=True)
+    return {"images": images, "seconds": round(time.time() - t0, 1)}

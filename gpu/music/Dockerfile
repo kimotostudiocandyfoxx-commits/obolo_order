@@ -36,6 +36,6 @@ RUN git clone https://github.com/Plachtaa/seed-vc.git /opt/seedvc && cd /opt/see
 COPY svc_worker.py /app/svc_worker.py
 RUN cd /opt/seedvc && /opt/svc/bin/python /app/svc_worker.py download
 WORKDIR /app
-COPY app.py render.py svc_worker.py ./
+COPY app.py render.py svc_worker.py paint.py ./
 # model weights are cached on the Cloud Storage volume mounted at /models (downloaded on first start)
 CMD exec python -m uvicorn app:app --host 0.0.0.0 --port ${PORT} --workers 1

@@ -128,7 +128,7 @@ jobs:
             MV_PLAN_MODEL=${{ vars.MV_PLAN_MODEL || 'gemini-flash-lite-latest' }}
             MV_KEY_CUTS=${{ vars.MV_KEY_CUTS || '2' }}
             MV_QWEN_SCENES=${{ vars.MV_QWEN_SCENES || '12' }}
-            MV_GPU_PAINT=${{ vars.MV_GPU_PAINT || 'false' }}
+            MV_GPU_PAINT=${{ vars.MV_GPU_PAINT || (vars.MUSIC_REGION && 'true') || 'false' }}
             RUNWARE_MODEL=${{ vars.RUNWARE_MODEL }}
             NOVITA_MODEL=${{ vars.NOVITA_MODEL }}
             NOVITA_STRENGTH=${{ vars.NOVITA_STRENGTH || '0.5' }}

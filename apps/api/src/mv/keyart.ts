@@ -91,16 +91,30 @@ export class KeyArtist {
   }
 
   /**
-   * One MV scene painted from words. `tags` are the scene's own Danbooru-style tags (character,
-   * place, action, light). Our GPU paints them with Animagine XL 4.0 (its quality tags added);
-   * failing that, Novita Qwen-Image paints them as a TV-anime still.
+   * The storyboard's scenes painted from words, in order (null where a scene could not be painted).
+   * `tags` are each scene's Danbooru-style tags (character, place, action, light). Our GPU paints the
+   * whole list in one call with Animagine XL 4.0 (its quality tags added, the GPU serves one request
+   * at a time); anything it did not paint goes to Novita Qwen-Image, a few at a time, as TV-anime stills.
    */
-  async paint(tags: string, seed: number): Promise<Buffer | null> {
+  async paintAll(tags: string[], seed: number, parallel: number): Promise<(Buffer | null)[]> {
+    const out: (Buffer | null)[] = tags.map(() => null);
     if (this.o.paintUrl) {
-      const out = await this.gpuPaint(tags, seed).catch((e) => log.warn(`gpu paint: ${String(e).slice(0, 200)}`));
-      if (out) return out;
+      const got = await this.gpuPaint(tags, seed).catch((e) => {
+        log.warn(`gpu paint: ${String(e).slice(0, 200)}`);
+        return [] as (Buffer | null)[];
+      });
+      got.forEach((b, k) => (out[k] = b));
     }
-    if (!this.novita) return null;
+    if (!this.novita) return out;
+    const todo = out.map((b, k) => (b ? -1 : k)).filter((k) => k >= 0);
+    const worker = async () => {
+      for (let k = todo.shift(); k !== undefined; k = todo.shift()) out[k] = await this.qwenPaint(tags[k]);
+    };
+    await Promise.all(Array.from({ length: Math.max(1, Math.min(parallel, todo.length)) }, worker));
+    return out;
+  }
+
+  private async qwenPaint(tags: string): Promise<Buffer | null> {
     const side = this.o.novitaSide;
     return this.novitaTask('qwen-image-txt2img', {
       prompt: `Anime illustration, a still from a Japanese TV anime: cel shading, clean line art, vibrant colours, cinematic lighting. ${tags}. No text, no letters, no watermark, no frame.`.slice(0, 1900),
@@ -111,19 +125,26 @@ export class KeyArtist {
     });
   }
 
-  private async gpuPaint(tags: string, seed: number): Promise<Buffer | null> {
+  private async gpuPaint(tags: string[], seed: number): Promise<(Buffer | null)[]> {
     const recipe = novitaRecipe(this.o.novitaModel ?? 'animagine', false);
     const token = await this.o.paintToken?.();
     const res = await fetch(`${this.o.paintUrl!.replace(/\/$/, '')}/paint`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ prompt: `${tags}, ${recipe.prompt}`.slice(0, 1500), negative: recipe.negative, side: this.o.novitaSide, seed, steps: recipe.steps, cfg: recipe.cfg }),
-      signal: AbortSignal.timeout(180_000),
+      body: JSON.stringify({
+        // kids-friendly app: Animagine's "safe" rating tag, and the other ratings in the negative
+        items: tags.map((t, k) => ({ prompt: `${t}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + k })),
+        negative: `${recipe.negative}, sensitive, explicit, suggestive`,
+        side: this.o.novitaSide,
+        steps: recipe.steps,
+        cfg: recipe.cfg,
+      }),
+      // a cold GPU loads the painter first; ~8 s a picture after that
+      signal: AbortSignal.timeout(600_000),
     });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    const { image, safe } = (await res.json()) as { image?: string; safe?: boolean };
-    // kids-friendly app: a picture the safety check does not pass is never used
-    return image && safe !== false ? Buffer.from(image, 'base64') : null;
+    const { images } = (await res.json()) as { images?: (string | null)[] };
+    return (images ?? []).map((b) => (b ? Buffer.from(b, 'base64') : null));
   }
 
   /** Submit a Novita v3 async task, then poll it until the picture is there (null = refused by the NSFW check). */
