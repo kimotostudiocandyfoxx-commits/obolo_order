@@ -4,7 +4,9 @@
   "needs": [
     "outro"
   ],
-  "tune": {},
+  "tune": {
+    "outro": true
+  },
   "keepStems": false,
   "cases": [
     {
