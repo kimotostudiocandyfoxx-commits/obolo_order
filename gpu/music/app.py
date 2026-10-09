@@ -856,6 +856,8 @@ class PaintItem(BaseModel):
     seed: int = 0
     # a scene with the hero in it (painted looking at `reference`)
     hero: bool = False
+    # more things to keep out of this one picture (e.g. people in a scenery shot)
+    negative: str = Field(default="", max_length=500)
 
 
 class PaintReq(BaseModel):

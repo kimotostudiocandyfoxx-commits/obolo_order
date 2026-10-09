@@ -19,9 +19,14 @@ export const ANIME_FILTER = 'hqdn3d=3:3:4:4,eq=saturation=1.45:contrast=1.12:bri
 
 export type RenderMaterial = { kind: 'photo' | 'video'; file: string };
 
-function motion(m: MvSegment['motion'], frames: number) {
+function motion(m: MvSegment['motion'], frames: number, beat = 0.5) {
   const z = 1.18;
   switch (m) {
+    case 'pulse': {
+      // a small punch-in on every beat, easing out until the next one
+      const per = Math.max(1, beat * FPS).toFixed(3);
+      return `z='1.06+0.06*pow(1-mod(on,${per})/${per},3)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
+    }
     case 'zoom-in':
       return `z='min(1+${(0.18 / frames).toFixed(5)}*on,${z})':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'`;
     case 'zoom-out':
@@ -119,7 +124,7 @@ export async function renderMv(o: {
     let base: string;
     if (key || mat.kind === 'photo') {
       inputs.push('-loop', '1', '-i', key ?? mat.file);
-      base = `[0:v]${big},zoompan=${motion(s.motion === 'still' ? 'zoom-in' : s.motion, frames)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`;
+      base = `[0:v]${big},zoompan=${motion(s.motion === 'still' ? 'zoom-in' : s.motion, frames, beat)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`;
     } else {
       inputs.push('-ss', s.from.toFixed(2), '-t', s.dur.toFixed(2), '-i', mat.file);
       base = `[0:v]crop='min(iw,ih)':'min(iw,ih)',scale=${SIDE}:${SIDE},fps=${FPS},setsar=1`;

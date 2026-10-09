@@ -11,7 +11,8 @@ import { Logger } from '@nestjs/common';
  * Without a Gemini key (or if the answer is unusable) the sheet is made by rule: cuts on the beat,
  * the loud effects on the chorus.
  */
-export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still';
+/** pulse = a zoom that beats with the song (chorus shots, MV lab m03: "static, slideshow-like") */
+export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still' | 'pulse';
 export type MvEffect = 'POSTERIZE' | 'GLITCH' | 'SPEED_LINES' | 'NONE';
 export type MvTextEffect = 'SHAKE_HARD' | 'STROBO_FLASH' | 'ZOOM_BURST' | 'MINIMAL_CHILL';
 export type MvSegment = { m: number; dur: number; from: number; motion: MvMotion; effect: MvEffect; key: boolean };

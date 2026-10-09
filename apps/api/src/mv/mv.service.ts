@@ -16,7 +16,7 @@ import { idToken } from '../compose/music.client';
 import { KeyArtist } from './keyart';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
-import { describeHero, planStory, storyToPlan, type StoryPlan } from './storyboard';
+import { describeHero, isHuman, planStory, storyToPlan, type StoryPlan } from './storyboard';
 import { Stylizer } from './stylize';
 
 type Row = typeof mvProjects.$inferSelect;
@@ -276,7 +276,7 @@ export class MvService {
       );
       // paint every scene; one seed per MV keeps the look together
       const seed = Math.floor(Math.random() * 2 ** 31);
-      const drawn = await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF });
+      const drawn = await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) });
       const pics: (string | null)[] = await Promise.all(
         drawn.map(async (img, k) => {
           if (!img) return null;

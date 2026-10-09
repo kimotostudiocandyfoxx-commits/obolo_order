@@ -26,6 +26,11 @@ const gemini = (model: string) => `https://generativelanguage.googleapis.com/v1b
 /** A plain hero when there is no picture (or it cannot be read). */
 export const DEFAULT_HERO = '1girl, solo, short hair, bright eyes, hoodie, cheerful';
 
+/** The hero is a person (not a creature / mascot / animal), from its tags. */
+export function isHuman(heroTags: string) {
+  return /\b\d?(girl|boy|woman|man)s?\b/i.test(heroTags) && !/\b(creature|mascot|animal|robot)\b/i.test(heroTags);
+}
+
 /** The profile picture → tags for the hero (Gemini Flash-Lite, vision). */
 export async function describeHero(picture: Buffer | null, apiKey: string | undefined, model: string): Promise<string> {
   if (!picture || !apiKey) return DEFAULT_HERO;
@@ -72,10 +77,10 @@ function clean(tags: string) {
     .slice(0, 400);
 }
 
-/** How many scenes: one per ~2 bars, between 8 and maxScenes. */
+/** How many scenes: one per ~1.5 bars (MV lab m03: 6-second scenes dragged), between 8 and maxScenes. */
 export function sceneCount(i: Pick<StoryInput, 'seconds' | 'bpm' | 'maxScenes'>) {
   const bar = (60 / (i.bpm || 100)) * 4;
-  return Math.max(8, Math.min(i.maxScenes, Math.round(i.seconds / Math.max(2.4, bar * 2))));
+  return Math.max(8, Math.min(i.maxScenes, Math.round(i.seconds / Math.max(2.4, bar * 1.5))));
 }
 
 function chorusAt(i: StoryInput, t: number) {
@@ -131,6 +136,8 @@ export function ruleStory(i: StoryInput): StoryPlan {
 
 /** GLITCH only suits loud electronic / rock songs (MV lab m01: it clashed with soft songs) → speed lines. */
 function calmEffect(e: MvEffect, music: string): MvEffect {
+  // POSTERIZE banded the painted shading (MV lab m03) → none on painted scenes
+  if (e === 'POSTERIZE') return 'NONE';
   return e === 'GLITCH' && !/rock|edm|electro|metal|dubstep|techno|trap|punk/i.test(music) ? 'SPEED_LINES' : e;
 }
 
@@ -206,7 +213,7 @@ export async function planStory(i: StoryInput, apiKey: string | undefined, model
     i.lyrics.length ? `Lyric lines (start second [section]: text):\n${i.lyrics.map((l) => `${l.t.toFixed(1)} [${l.chorus ? 'chorus' : 'verse'}]: ${l.text}`).join('\n')}` : 'Instrumental, no lyrics.',
     i.mood ? `What the creator wants: ${i.mood}` : 'The creator left the mood to you: read it from the lyrics and the music.',
     `The hero is the creator's own character (${i.hero}).`,
-    `Write about ${n} scenes (at most ${i.maxScenes}) that tell one story following the lyrics: each scene shows what the lyric line playing under it is about. Keep places consistent within a section, change them between sections. The hero appears in most scenes; use a few hero-less scenery shots for breathing room.`,
+    `Write ${n} scenes (at most ${i.maxScenes}) that tell one story following the lyrics: each scene shows what the lyric line playing under it is about. Keep places consistent within a section, change them between sections. The hero appears in most scenes; use a few hero-less scenery shots for breathing room.`,
     'Start a new scene where a new lyric line starts, so the picture always shows the line being sung. Never put other people or a different character in the pictures: only the hero, or empty scenery (hero = false, "no humans").',
     'Verses calm (NONE, MINIMAL_CHILL lyrics); chorus big (close-ups, dynamic angles, low angle, SPEED_LINES, ZOOM_BURST / STROBO_FLASH lyrics; GLITCH / SHAKE_HARD only for loud rock or electronic songs). Vary shot sizes (wide, full body, upper body, close-up), places and light. End with a memorable closing image.',
     `Scene durations are whole beats and add up to ${i.seconds.toFixed(1)} seconds. Give exactly ${i.lyrics.length} lyric effects.`,
@@ -249,7 +256,9 @@ export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = [
     const n = bar && s.dur >= each * 1.5 ? Math.min(8, Math.floor(s.dur / each + 0.25)) : 1;
     for (let j = 0; j < n; j++) {
       const dur = j === n - 1 ? s.dur - each * (n - 1) : each;
-      segments.push({ m: k, dur, from: 0, motion: MOTIONS[(Math.max(0, MOTIONS.indexOf(first)) + j * 2 + (j >> 1)) % MOTIONS.length], effect: j === 0 ? s.effect : 'NONE', key: false });
+      const move = MOTIONS[(Math.max(0, MOTIONS.indexOf(first)) + j * 2 + (j >> 1)) % MOTIONS.length];
+      // in a chorus every other shot beats with the song
+      segments.push({ m: k, dur, from: 0, motion: chorus && j % 2 === 1 ? 'pulse' : move, effect: j === 0 ? s.effect : 'NONE', key: false });
     }
     t += s.dur;
   });

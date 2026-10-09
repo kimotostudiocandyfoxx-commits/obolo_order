@@ -38,7 +38,19 @@ const SIDE = 1024;
 
 /** One storyboard scene to paint: its tags, and whether the hero is in it. */
 export type PaintScene = { tags: string; hero?: boolean };
-export type PaintOptions = { reference?: Buffer | null; refScale?: number; steps?: number; warmMs?: number; pollMs?: number };
+/**
+ * People to keep out of a picture (MV lab m03: human silhouettes still walked into scenery shots):
+ * none in a scenery shot, and none next to a hero who is not human.
+ */
+export function keepOut(s: PaintScene, heroIsHuman = true) {
+  const people = '1girl, 1boy, multiple girls, multiple boys, human, person, silhouette, crowd';
+  return !s.hero || !heroIsHuman ? people : 'multiple girls, multiple boys, crowd, 2girls, 2boys';
+}
+
+export type PaintOptions = {
+  /** the hero is a person (1girl / 1boy…), not a creature or mascot */
+  heroIsHuman?: boolean;
+  reference?: Buffer | null; refScale?: number; steps?: number; warmMs?: number; pollMs?: number };
 const log = new Logger('MvKeyArt');
 
 export class KeyArtist {
@@ -168,7 +180,7 @@ export class KeyArtist {
         headers: { 'content-type': 'application/json', ...(await auth()) },
         body: JSON.stringify({
           // kids-friendly app: Animagine's "safe" rating tag, and the other ratings in the negative
-          items: part.map((s, k) => ({ prompt: `${s.tags}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + i + k, hero: !!s.hero })),
+          items: part.map((s, k) => ({ prompt: `${s.tags}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + i + k, hero: !!s.hero, negative: keepOut(s, opt.heroIsHuman) })),
           negative: `${recipe.negative}, sensitive, explicit, suggestive`,
           side: this.o.novitaSide,
           steps: opt.steps ?? recipe.steps,

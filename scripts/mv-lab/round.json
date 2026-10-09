@@ -1,8 +1,8 @@
 {
-  "round": "m03-hero",
-  "note": "m02 の反省（5.1）：主人公の説明がぶれて「ちびキャラ」「白いお面」が消えた → 説明を毎回同じに、体の比率と顔（お面）を必ず書く。参考画像の効き 0.6 と 0.8 を比べる。最後の長い場面も小節ごとに分ける。",
+  "round": "m04-motion",
+  "note": "m03（6.1）の反省：景色の場面に人影 → 絵ごとに「人なし」を禁止語で指定。ベタ塗り演出をやめる。場面を1.5小節ごとに増やす。サビは拍に合わせて画面が脈打つ。参考画像の効きは 0.6。",
   "hero": "art/lab/mv/hero.jpg",
-  "songs": "art/lab/studio/r06-stability/results.json",
+  "songs": "art/lab/studio/r07-takes/results.json",
   "painter": "gpu",
   "maxScenes": 30,
   "side": 768,
@@ -18,17 +18,11 @@
     {
       "id": "ballad-night",
       "song": "ballad-night~a"
-    }
-  ],
-  "heroRef": 0.6,
-  "variants": [
-    {
-      "name": "ref60",
-      "heroRef": 0.6
     },
     {
-      "name": "ref80",
-      "heroRef": 0.8
+      "id": "edm-party",
+      "song": "edm-party~a"
     }
-  ]
+  ],
+  "heroRef": 0.6
 }

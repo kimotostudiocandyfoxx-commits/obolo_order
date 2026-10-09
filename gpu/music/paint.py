@@ -154,7 +154,7 @@ def paint(items: list[dict], negative: str, side: int, steps: int, cfg: float, r
                     extra = {"ip_adapter_image": ref}
                 img = pipe(
                     prompt=it["prompt"],
-                    negative_prompt=negative,
+                    negative_prompt=f"{negative}, {it['negative']}" if it.get("negative") else negative,
                     width=side,
                     height=side,
                     num_inference_steps=steps,

@@ -14,7 +14,7 @@ import { join, resolve } from 'node:path';
 import sharp from 'sharp';
 import { KeyArtist } from '../src/mv/keyart';
 import { renderMv } from '../src/mv/render';
-import { describeHero, planStory, storyToPlan } from '../src/mv/storyboard';
+import { describeHero, isHuman, planStory, storyToPlan } from '../src/mv/storyboard';
 import { Stylizer } from '../src/mv/stylize';
 
 type Case = { id: string; song: string; mood?: string };
@@ -169,6 +169,7 @@ async function main() {
       const t1 = Date.now();
       const drawn = await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {
         reference: heroRef === 0 ? null : heroPic,
+        heroIsHuman: isHuman(hero),
         refScale: heroRef,
         steps,
       });
