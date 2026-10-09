@@ -1,0 +1,254 @@
+{
+  "round": "m03-hero",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.1,
+    "heroLikeness": 6.5,
+    "heroConsistency": 6.2,
+    "pictureQuality": 6.6,
+    "storyTelling": 5.7,
+    "lyricFit": 6.4,
+    "beatSync": 5.4,
+    "variety": 5.5,
+    "watchability": 6,
+    "kidsSafe": 7.2
+  },
+  "results": [
+    {
+      "id": "pop-bright~ref60",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "pop-bright~a",
+      "scenes": 8,
+      "painted": 8,
+      "seconds": {
+        "plan": 2,
+        "paint": 605,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.7,
+        "pictureQuality": 6.5,
+        "storyTelling": 5.8,
+        "lyricFit": 6.4,
+        "beatSync": 5.2,
+        "variety": 4.8,
+        "watchability": 5.6,
+        "kidsSafe": 7.4,
+        "overall": 5.9,
+        "problems": [
+          "0:14 Static running pose relies on linear zoom rather than fluid locomotion.",
+          "0:22 Repetitive frontal framing lowers visual interest.",
+          "0:38 The final sunset shot lingers too long without motion progression."
+        ],
+        "fixIdeas": [
+          "Incorporate varied profile or low-angle shots in the storyboard prompts.",
+          "Add animated mouth movement and step cycles to improve dynamism.",
+          "Shorten the concluding hold and cut to a scenic landscape detail."
+        ],
+        "bestMoments": [
+          "0:00 Cozy morning window opening establishes a warm mood.",
+          "0:22 Cheerful expression and speed lines fit the musical lift."
+        ]
+      }
+    },
+    {
+      "id": "pop-bright~ref80",
+      "ok": true,
+      "heroRef": 0.8,
+      "song": "pop-bright~a",
+      "scenes": 8,
+      "painted": 8,
+      "seconds": {
+        "plan": 2,
+        "paint": 594,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 5,
+        "pictureQuality": 7,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:24 - Mask morphs into oversized uncovered eyes, breaking character design.",
+          "00:37 - Final still shot lingers excessively without motion variety."
+        ],
+        "fixIdeas": [
+          "Reinforce mask prompt tokens to keep face design uniform.",
+          "Cut the final long shot into two shorter dynamic action beats."
+        ],
+        "bestMoments": [
+          "00:00 - Cozy morning window scene capturing gentle atmosphere.",
+          "00:32 - Energetic dash across the flower meadow."
+        ]
+      }
+    },
+    {
+      "id": "rock-run~ref60",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "rock-run~a",
+      "scenes": 14,
+      "painted": 14,
+      "seconds": {
+        "plan": 3,
+        "paint": 596,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 6.5,
+        "heroConsistency": 6.8,
+        "pictureQuality": 6.6,
+        "storyTelling": 6.2,
+        "lyricFit": 6.4,
+        "beatSync": 6,
+        "variety": 6.3,
+        "watchability": 6.4,
+        "kidsSafe": 7.5,
+        "overall": 6.5,
+        "problems": [
+          "00:08 Empty road cut lacks character presence and stalls momentum.",
+          "00:32 Sudden human silhouette breaks hero continuity.",
+          "00:44 Bedroom setting with headphones feels disconnected from the fantasy journey."
+        ],
+        "fixIdeas": [
+          "Replace empty scenic cuts with continuous tracking shots of the hero running.",
+          "Remove human reference prompts in sky cut to maintain solitary creature focus.",
+          "Ground the ending in the fantasy world rather than an abrupt modern room switch."
+        ],
+        "bestMoments": [
+          "00:01 Dynamic opening run through the forest matches beat.",
+          "00:23 Chorus leap with speed lines creates good energy.",
+          "00:35 Majestic multiple tails reveal against cosmic backdrop."
+        ]
+      }
+    },
+    {
+      "id": "rock-run~ref80",
+      "ok": true,
+      "heroRef": 0.8,
+      "song": "rock-run~a",
+      "scenes": 13,
+      "painted": 13,
+      "seconds": {
+        "plan": 3,
+        "paint": 615,
+        "render": 10
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 6.2,
+        "pictureQuality": 6.8,
+        "storyTelling": 5.8,
+        "lyricFit": 6.6,
+        "beatSync": 6.2,
+        "variety": 6.4,
+        "watchability": 6.5,
+        "kidsSafe": 7.2,
+        "overall": 6.4,
+        "problems": [
+          "00:04 Unintended human character appears in landscape shot.",
+          "00:12 Posterize filter creates distracting color banding.",
+          "00:27 Second appearance of out-of-place human figure.",
+          "00:40 Lingering static close-up slows down the ending."
+        ],
+        "fixIdeas": [
+          "Add negative prompts to strictly exclude human characters during scenery cuts.",
+          "Tone down or remove posterization filters to preserve smooth shading.",
+          "Cut final prolonged shot into multiple closing reaction angles."
+        ],
+        "bestMoments": [
+          "00:08 Energetic running sequence matching the beat.",
+          "00:21 Expressive vocal close-up with dynamic action lines."
+        ]
+      }
+    },
+    {
+      "id": "ballad-night~ref60",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "ballad-night~a",
+      "scenes": 8,
+      "painted": 8,
+      "seconds": {
+        "plan": 2,
+        "paint": 604,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "0:12 Empty room scene feels disconnected from character journey",
+          "0:35 Speed lines effect is slightly jarring for a slow ballad",
+          "0:55 Final scenery cut ends too abruptly"
+        ],
+        "fixIdeas": [
+          "Include character silhouette in the indoor transition shot",
+          "Replace speed lines with a gentle camera push-in",
+          "Extend final landscape duration to match audio fade"
+        ],
+        "bestMoments": [
+          "0:01 Atmospheric intro framing character under starry sky",
+          "0:51 Uplifting shot releasing the glowing light orb"
+        ]
+      }
+    },
+    {
+      "id": "ballad-night~ref80",
+      "ok": true,
+      "heroRef": 0.8,
+      "song": "ballad-night~a",
+      "scenes": 9,
+      "painted": 9,
+      "seconds": {
+        "plan": 2,
+        "paint": 595,
+        "render": 10
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.5,
+        "pictureQuality": 6.7,
+        "storyTelling": 5.2,
+        "lyricFit": 5.8,
+        "beatSync": 4.8,
+        "variety": 5.4,
+        "watchability": 5.5,
+        "kidsSafe": 7,
+        "overall": 5.7,
+        "problems": [
+          "00:00 - Opening shot is held too long without motion or visual progression.",
+          "00:12 - Abrupt transition to an empty library without establishing character presence.",
+          "00:46 - Microphones and modern singing gear clash with the fantasy design.",
+          "00:49 - Sudden introduction of an unrelated human girl breaks character narrative continuity."
+        ],
+        "fixIdeas": [
+          "Shorten opening static holds to 4-5 seconds to preserve visual momentum.",
+          "Place the hero directly inside the library setting to maintain spatial context.",
+          "Replace modern handheld microphone with magical singing particles or glowing aura.",
+          "Keep the fox spirit hero in the final climax instead of swapping to a human protagonist."
+        ],
+        "bestMoments": [
+          "00:18 - Expressive emotional crying face matching the melancholy vocal line.",
+          "00:26 - Smooth walking sequence crossing the bridge under the full moon."
+        ]
+      }
+    }
+  ]
+}
