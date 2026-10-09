@@ -290,7 +290,7 @@ export class MvService {
       // a scene that could not be painted shows its neighbour (or, with nothing painted, a plain card)
       const fallback = pics.find(Boolean) ?? (await this.plainCard(dir, s.title));
       const materials = pics.map((f, k) => ({ kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? fallback }));
-      const plan = storyToPlan(story);
+      const plan = storyToPlan(story, bpm, this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })));
       const out = await renderMv({ dir, materials, plan, audio, seconds, bpm, keyArtist: this.keyArtist, painted: true });
       const v = await this.media.storeGenerated(userId, 'video', 'video/mp4', await readFile(out.video), origin);
       const poster = await this.media.storeGenerated(userId, 'poster', 'image/webp', await readFile(out.poster), origin);

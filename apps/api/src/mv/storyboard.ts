@@ -126,6 +126,11 @@ export function ruleStory(i: StoryInput): StoryPlan {
   return { note: '歌詞の流れにあわせて、きみが主人公のアニメにしたよ。', style: 'anime', scenes, lyrics };
 }
 
+/** GLITCH only suits loud electronic / rock songs (MV lab m01: it clashed with soft songs) → speed lines. */
+function calmEffect(e: MvEffect, music: string): MvEffect {
+  return e === 'GLITCH' && !/rock|edm|electro|metal|dubstep|techno|trap|punk/i.test(music) ? 'SPEED_LINES' : e;
+}
+
 /** Make any storyboard safe: sane lengths, exactly the song's length, at most maxScenes, the hero's tags on hero scenes. */
 export function normalizeStory(p: Partial<StoryPlan>, i: StoryInput): StoryPlan {
   const rule = ruleStory(i);
@@ -141,9 +146,10 @@ export function normalizeStory(p: Partial<StoryPlan>, i: StoryInput): StoryPlan 
     scenes.push({
       dur,
       hero,
-      tags: [hero ? i.hero : '', own, style].filter(Boolean).join(', '),
+      // MV lab m01: hero-less shots got a random human girl → "no humans"; hero shots: the hero alone
+      tags: [hero ? `solo, ${i.hero}` : 'no humans, scenery', own.replace(/\b(1girl|1boy|2girls|2boys|girl|boy|person|people|crowd|human)s?\b,?/gi, ''), style].filter(Boolean).join(', '),
       motion: MOTIONS.includes(s.motion) || s.motion === 'still' ? s.motion : 'zoom-in',
-      effect: EFFECTS.includes(s.effect) ? s.effect : 'NONE',
+      effect: calmEffect(EFFECTS.includes(s.effect) ? s.effect : 'NONE', i.music),
     });
     t += dur;
   }
@@ -198,7 +204,8 @@ export async function planStory(i: StoryInput, apiKey: string | undefined, model
     i.mood ? `What the creator wants: ${i.mood}` : 'The creator left the mood to you: read it from the lyrics and the music.',
     `The hero is the creator's own character (${i.hero}).`,
     `Write about ${n} scenes (at most ${i.maxScenes}) that tell one story following the lyrics: each scene shows what the lyric line playing under it is about. Keep places consistent within a section, change them between sections. The hero appears in most scenes; use a few hero-less scenery shots for breathing room.`,
-    'Verses calm (NONE or POSTERIZE, MINIMAL_CHILL lyrics); chorus big (close-ups, dynamic angles, GLITCH / SPEED_LINES, ZOOM_BURST / STROBO_FLASH / SHAKE_HARD lyrics). Vary the motion.',
+    'Start a new scene where a new lyric line starts, so the picture always shows the line being sung. Never put other people or a different character in the pictures: only the hero, or empty scenery (hero = false, "no humans").',
+    'Verses calm (NONE, MINIMAL_CHILL lyrics); chorus big (close-ups, dynamic angles, low angle, SPEED_LINES, ZOOM_BURST / STROBO_FLASH lyrics; GLITCH / SHAKE_HARD only for loud rock or electronic songs). Vary shot sizes (wide, full body, upper body, close-up), places and light. End with a memorable closing image.',
     `Scene durations are whole beats and add up to ${i.seconds.toFixed(1)} seconds. Give exactly ${i.lyrics.length} lyric effects.`,
   ].join('\n');
   try {
@@ -221,8 +228,27 @@ export async function planStory(i: StoryInput, apiKey: string | undefined, model
   }
 }
 
-/** The storyboard as an edit plan for render.ts: scene k = picture k (already anime: no extra look). */
-export function storyToPlan(p: StoryPlan): MvPlan {
-  const segments: MvSegment[] = p.scenes.map((s, k) => ({ m: k, dur: s.dur, from: 0, motion: s.motion === 'still' ? 'zoom-in' : s.motion, effect: s.effect, key: false }));
+/**
+ * The storyboard as an edit plan for render.ts: scene k = picture k (already anime: no extra look).
+ * With the tempo, a long scene is cut on the bars into several shots of the same picture with
+ * different camera moves — every 2 bars in a verse, every bar in a chorus (MV lab m01: 4-second
+ * shots felt like a slideshow and missed the beat). More cuts, no more pictures to paint.
+ */
+export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = []): MvPlan {
+  const segments: MvSegment[] = [];
+  const bar = bpm ? (60 / bpm) * 4 : 0;
+  let t = 0;
+  p.scenes.forEach((s, k) => {
+    const first: MvSegment['motion'] = s.motion === 'still' ? 'zoom-in' : s.motion;
+    let chorus = false;
+    for (const l of lyrics) if (l.t <= t + 0.01) chorus = l.chorus;
+    const each = bar ? bar * (chorus ? 1 : 2) : s.dur;
+    const n = bar && s.dur >= each * 1.5 ? Math.min(4, Math.floor(s.dur / each + 0.25)) : 1;
+    for (let j = 0; j < n; j++) {
+      const dur = j === n - 1 ? s.dur - each * (n - 1) : each;
+      segments.push({ m: k, dur, from: 0, motion: MOTIONS[(Math.max(0, MOTIONS.indexOf(first)) + j * 2 + (j >> 1)) % MOTIONS.length], effect: j === 0 ? s.effect : 'NONE', key: false });
+    }
+    t += s.dur;
+  });
   return { note: p.note, segments, lyrics: p.lyrics };
 }

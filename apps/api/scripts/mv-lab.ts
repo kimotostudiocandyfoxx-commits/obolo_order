@@ -53,7 +53,7 @@ const artist = new KeyArtist({
   stylizer: new Stylizer(undefined),
 });
 
-type SongResult = { id: string; ok: boolean; file: string; seconds: number; lineTimes: { text: string; start: number; end: number }[]; sent: { bpm: number; prompt: string } };
+type SongResult = { id: string; ok: boolean; file: string; seconds: number; lineTimes: { text: string; start: number; end: number }[]; sent: { bpm: number; prompt: string; lyrics?: { section: string; text: string }[] } };
 
 async function judge(video: string, hero: Buffer, storyText: string, lyrics: string) {
   if (!GEMINI) return { error: 'no GEMINI_API_KEY' };
@@ -154,7 +154,7 @@ async function main() {
       const t0 = Date.now();
       const seconds = Math.min(90, s.seconds);
       const bpm = s.sent.bpm;
-      const lyrics = s.lineTimes.map((l) => ({ t: l.start, text: l.text, chorus: false }));
+      const lyrics = s.lineTimes.map((l, k) => ({ t: l.start, text: l.text, chorus: s.sent.lyrics?.[k]?.section === 'chorus' }));
       const story = await planStory(
         { title: c.song, seconds, bpm, mood: c.mood ?? '', music: s.sent.prompt.slice(0, 300), lyrics, hero, maxScenes: round.maxScenes },
         GEMINI,
@@ -181,7 +181,7 @@ async function main() {
       const materials = pics.map((f, k) => ({ kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? first }));
       const audio = join(dir, 'song.m4a');
       await copyFile(join(ROOT, s.file), audio);
-      const out = await renderMv({ dir, materials, plan: storyToPlan(story), audio, seconds, bpm, keyArtist: artist, painted: true });
+      const out = await renderMv({ dir, materials, plan: storyToPlan(story, bpm, lyrics), audio, seconds, bpm, keyArtist: artist, painted: true });
       const t3 = Date.now();
       const video = join(OUT, `${c.id}.mp4`);
       await copyFile(out.video, video);

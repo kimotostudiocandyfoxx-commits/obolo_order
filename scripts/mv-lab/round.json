@@ -1,23 +1,27 @@
 {
-  "round": "m01-baseline",
-  "note": "今の本番と同じ作り方（絵コンテ Gemini Flash-Lite、自前GPUの Animagine 768px、主人公の絵を見ながら描く IP-Adapter 0.6）。主人公はきもりん。",
+  "round": "m02-cuts-nohumans",
+  "note": "m01 の反省：主人公なしの場面は「人なし」、主人公の場面は「ひとりだけ」。グリッチは激しい曲だけ。長い場面は小節ごとに別カメラの複数カットに分ける（サビは1小節、Aメロは2小節）。歌詞の行が変わるところで場面を変える。",
   "hero": "art/lab/mv/hero.jpg",
-  "songs": "art/lab/studio/r04-all-genres/results.json",
+  "songs": "art/lab/studio/r05-ending-voice/results.json",
   "painter": "gpu",
   "maxScenes": 30,
   "side": 768,
   "cases": [
     {
       "id": "pop-bright",
-      "song": "pop-bright"
+      "song": "pop-bright~std"
     },
     {
       "id": "rock-run",
-      "song": "rock-run"
+      "song": "rock-run~std"
     },
     {
       "id": "ballad-night",
-      "song": "ballad-night"
+      "song": "ballad-night~std"
+    },
+    {
+      "id": "edm-party",
+      "song": "edm-party~std"
     }
   ],
   "heroRef": 0.6
