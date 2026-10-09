@@ -8,7 +8,12 @@ import time
 
 sys.path.insert(0, os.environ["APP_DIR"])
 sys.path.insert(0, os.getcwd())
+import inference  # noqa: E402  (Seed-VC)
 import svc_worker  # noqa: E402
+
+# on CPU, half precision (the GPU setting) is extremely slow: run the lab in full precision
+_load = inference.load_models
+inference.load_models = lambda a: _load(type(a)(**{**vars(a), "fp16": False}))
 
 t = time.time()
 svc_worker.load()
