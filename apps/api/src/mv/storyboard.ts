@@ -213,7 +213,7 @@ export async function planStory(i: StoryInput, apiKey: string | undefined, model
     `The hero is the creator's own character (${i.hero}).`,
     `Write ${n} scenes (at most ${i.maxScenes}) that tell one story following the lyrics: each scene shows what the lyric line playing under it is about. Keep places consistent within a section, change them between sections. Use a few wide views for breathing room.`,
     'Start a new scene where a new lyric line starts, so the picture always shows the line being sung. The hero is in every picture and is the only character: never other people or creatures (hero = false only for a wide view where the hero is small in the landscape). Keep one world for the whole MV (no modern gadgets or a different era unless the lyrics are about them).',
-    'Verses calm (NONE, MINIMAL_CHILL lyrics); chorus big (close-ups, dynamic angles, low angle, SPEED_LINES, ZOOM_BURST / STROBO_FLASH lyrics; GLITCH / SHAKE_HARD only for loud rock or electronic songs). Vary shot sizes (wide, full body, upper body, close-up), places and light. End with a memorable closing image.',
+    'Verses calm (NONE, MINIMAL_CHILL lyrics); chorus big (close-ups, dynamic angles, low angle, SPEED_LINES, ZOOM_BURST / STROBO_FLASH lyrics; GLITCH / SHAKE_HARD only for loud rock or electronic songs). Vary shot sizes (wide, full body, upper body, close-up) and angles (from the side, from behind, from above, low angle, looking back) — never two front-facing shots in a row; vary places and light. End with a memorable closing image.',
     `Scene durations are whole beats and add up to ${i.seconds.toFixed(1)} seconds. Give exactly ${i.lyrics.length} lyric effects.`,
   ].join('\n');
   try {
@@ -252,11 +252,16 @@ export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = [
     for (const l of lyrics) if (l.t <= t + 0.01) chorus = l.chorus;
     const each = bar ? bar * (chorus ? 1 : 2) : s.dur;
     const n = bar && s.dur >= each * 1.5 ? Math.min(8, Math.floor(s.dur / each + 0.25)) : 1;
+    const last = k === p.scenes.length - 1;
     for (let j = 0; j < n; j++) {
       const dur = j === n - 1 ? s.dur - each * (n - 1) : each;
       const move = MOTIONS[(Math.max(0, MOTIONS.indexOf(first)) + j * 2 + (j >> 1)) % MOTIONS.length];
+      // the long last scene (the outro) ends as a highlight reel: after two shots of it, the earlier
+      // pictures come back one per cut, and the closing picture returns for the very last shot
+      // (MV lab m05: "the final shot holds static for over ten seconds")
+      const back = last && j >= 2 && j < n - 1 && k > 0 ? Math.max(0, k - 1 - ((j - 2) * 2) % k) : k;
       // in a chorus every other shot beats with the song
-      segments.push({ m: k, dur, from: 0, motion: chorus && j % 2 === 1 ? 'pulse' : move, effect: j === 0 ? s.effect : 'NONE', key: false });
+      segments.push({ m: back, dur, from: 0, motion: (chorus || back !== k) && j % 2 === 1 ? 'pulse' : move, effect: j === 0 ? s.effect : 'NONE', key: false });
     }
     t += s.dur;
   });

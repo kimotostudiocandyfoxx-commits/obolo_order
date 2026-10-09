@@ -80,3 +80,15 @@ describe('story cuts on the bars', () => {
     expect(normalizeStory({ scenes: [{ dur: 4, tags: 'a', hero: true, motion: 'zoom-in', effect: 'GLITCH' }, { dur: 4, tags: 'b', hero: true, motion: 'zoom-in', effect: 'NONE' }, { dur: 4, tags: 'c', hero: true, motion: 'zoom-in', effect: 'NONE' }] }, { ...i, music: 'hard rock' }).scenes[0].effect).toBe('GLITCH');
   });
 });
+
+describe('story ending', () => {
+  it('a long last scene becomes a highlight reel of the earlier pictures, ending on its own picture', () => {
+    const sc = (dur: number) => ({ dur, tags: 'x', hero: true, motion: 'zoom-in' as const, effect: 'NONE' as const });
+    const plan = storyToPlan({ note: '', style: '', lyrics: [], scenes: [sc(4), sc(4), sc(4), sc(16)] }, 120, [{ t: 0, text: 'v', chorus: false }]);
+    const ending = plan.segments.filter((_, i) => i >= 3).map((s) => s.m);
+    expect(ending[0]).toBe(3);
+    expect(ending[1]).toBe(3);
+    expect(ending.slice(2, -1).every((m) => m < 3)).toBe(true);
+    expect(ending.at(-1)).toBe(3);
+  });
+});
