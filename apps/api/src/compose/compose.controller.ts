@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody } from '@obolo/shared';
+import { ComposeChatBody, ComposeDesignBody, InstrumentalBody, SingBody, SongEditBody, FullSongBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -49,6 +49,15 @@ export class ComposeController {
     const b = parseBody(SingBody, body);
     await rateLimit(this.kv, `compose-sing:${userId}`, 10, 86400);
     return this.songs.create(userId, b, `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** The whole song sung by the music studio (ACE-Step + HTDemucs, 2026-10-09). PLACEHOLDER (P-MER-7): 20 a day. */
+  @Post('song')
+  @HttpCode(200)
+  async fullSong(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    const b = parseBody(FullSongBody, body);
+    await rateLimit(this.kv, `compose-song:${userId}`, 20, 86400);
+    return this.songs.createFull(userId, b, `${req.protocol}://${req.get('host')}`);
   }
 
   /** Your saved songs (the soil of your island on Mercury). */

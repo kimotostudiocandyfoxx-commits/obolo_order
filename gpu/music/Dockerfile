@@ -10,6 +10,13 @@ RUN git clone --depth 1 --branch "$ACE_REF" https://github.com/ace-step/ACE-Step
  && rm -rf /root/.cache/uv
 # fast cold start: the weights are copied from the bucket with parallel downloads (app.py copy_weights)
 RUN uv pip install --python /opt/ace/.venv/bin/python "google-cloud-storage>=2.14" && rm -rf /root/.cache/uv
+# HTDemucs (Demucs v4, MIT) splits the sung song into vocals + instrumental (POST /song). Installed
+# without its own dependency pins so ACE-Step's PyTorch stays as it is; the weights are baked in.
+RUN uv pip install --python /opt/ace/.venv/bin/python --no-deps "demucs==4.0.1" "openunmix==1.3.0" \
+ && uv pip install --python /opt/ace/.venv/bin/python julius einops "dora-search>=0.1.12" pyyaml tqdm \
+ && rm -rf /root/.cache/uv
+ENV TORCH_HOME=/opt/torch
+RUN /opt/ace/.venv/bin/python -c "from demucs.pretrained import get_model; get_model('htdemucs_ft')"
 ENV PATH=/opt/ace/.venv/bin:$PATH \
     ACESTEP_PROJECT_ROOT=/opt/ace \
     ACESTEP_CHECKPOINTS_DIR=/models/ace15 \

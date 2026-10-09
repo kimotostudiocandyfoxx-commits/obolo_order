@@ -13,6 +13,7 @@ import type {
   JupiterRootView,
   JupiterTreeView,
   MarsBackstageBody,
+  FullSongBody,
   CreatePlanetPostBody,
   PlanetFlyer,
   PlanetPostView,
@@ -113,6 +114,8 @@ export interface Api {
   transcribe(mediaId: string): Promise<{ text: string }>;
   /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */
   composeSing(body: SingBody): Promise<SongView>;
+  /** the whole song sung by the music studio (ACE-Step + HTDemucs) */
+  composeFullSong(body: FullSongBody): Promise<SongView>;
   /** 手直し: a chat message about a sung song (or a retried command) → the partner's reply + the new mix. */
   composeSongEdit(id: string, body: SongEditBody): Promise<SongEditResult>;
   /** 保存する: keep this version of the song. */

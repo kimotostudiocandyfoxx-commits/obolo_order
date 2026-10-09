@@ -1,0 +1,28 @@
+name: Music lab
+
+# Checks the music studio's song helpers (gpu/music/app.py: lyrics format, HTDemucs split) on CPU
+# before they go to the GPU service (client decision 2026-10-09: ACE-Step sings, HTDemucs splits).
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/solar-system-home-planets-ew766y]
+    paths: ['scripts/music-lab/**', '.github/workflows/music-lab.yml']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install (same demucs install as gpu/music/Dockerfile, CPU torch)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          pip install --quiet "torch==2.4.1" --index-url https://download.pytorch.org/whl/cpu
+          pip install --quiet fastapi pydantic numpy scipy
+          pip install --quiet --no-deps "demucs==4.0.1" "openunmix==1.3.0"
+          pip install --quiet julius einops "dora-search>=0.1.12" pyyaml tqdm
+      - name: Test
+        run: python scripts/music-lab/test_song.py

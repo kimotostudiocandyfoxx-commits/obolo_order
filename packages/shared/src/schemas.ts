@@ -11,7 +11,10 @@ export type RequestCodeBody = z.infer<typeof RequestCodeBody>;
 
 export const VerifyCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
-  code: z.string().trim().regex(/^\d{6}$/),
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/),
 });
 export type VerifyCodeBody = z.infer<typeof VerifyCodeBody>;
 
@@ -136,7 +139,15 @@ export type NeoLookBody = z.infer<typeof NeoLookBody>;
 export const PuniPicBody = z.object({
   description: z.string().trim().min(2).max(200),
   /** a picture to take colours / motifs from (only handed to the model, never stored) */
-  reference: z.object({ mime: z.string().regex(/^image\//).max(60), data: z.string().min(100).max(6_000_000) }).optional(),
+  reference: z
+    .object({
+      mime: z
+        .string()
+        .regex(/^image\//)
+        .max(60),
+      data: z.string().min(100).max(6_000_000),
+    })
+    .optional(),
   /** use the member's OBOLO NEO look as the reference */
   useNeoLook: z.boolean().optional(),
   /** Jupiter butterfly: use the member's Saturn character as the reference */
@@ -201,7 +212,13 @@ export type InstrumentalBody = z.infer<typeof InstrumentalBody>;
 /** Voice registration: one recording of the fixed script (base64, ≤ ~4 MB before encoding). */
 export const RegisterVoiceBody = z.object({
   slot: z.enum(['self', 'bati']),
-  audio: z.object({ mime: z.string().regex(/^audio\//).max(60), data: z.string().min(100).max(6_000_000) }),
+  audio: z.object({
+    mime: z
+      .string()
+      .regex(/^audio\//)
+      .max(60),
+    data: z.string().min(100).max(6_000_000),
+  }),
 });
 export type RegisterVoiceBody = z.infer<typeof RegisterVoiceBody>;
 
@@ -233,7 +250,10 @@ export const SingBody = z.object({
     .array(
       z.object({
         name: z.enum(['verse', 'chorus', 'bridge']),
-        lines: z.array(z.object({ text: z.string().trim().min(1).max(40), beats: z.number().positive().max(64) })).min(1).max(8),
+        lines: z
+          .array(z.object({ text: z.string().trim().min(1).max(40), beats: z.number().positive().max(64) }))
+          .min(1)
+          .max(8),
       }),
     )
     .min(1)
@@ -248,6 +268,15 @@ export const SingBody = z.object({
 });
 export type SingBody = z.infer<typeof SingBody>;
 
+/**
+ * The whole song sung by the music studio (client decision 2026-10-09): ACE-Step makes the song with
+ * the lyrics, HTDemucs splits vocals / instrumental. Replaces instrumental + Fish line-by-line singing.
+ */
+export const FullSongBody = SingBody.omit({ melody: true, instrumentalUrl: true, slot: true }).extend({
+  seconds: z.number().min(10).max(180),
+});
+export type FullSongBody = z.infer<typeof FullSongBody>;
+
 /** A decided song edit (what the LLM chose from the chat message; see SongEditResult). */
 export const SongEditCommand = z.discriminatedUnion('action', [
   z.object({
@@ -258,7 +287,10 @@ export const SongEditCommand = z.discriminatedUnion('action', [
   }),
   z.object({
     action: z.literal('LYRICS_EDIT'),
-    edits: z.array(z.object({ index: z.number().int().min(0).max(47), text: z.string().trim().min(1).max(40) })).min(1).max(8),
+    edits: z
+      .array(z.object({ index: z.number().int().min(0).max(47), text: z.string().trim().min(1).max(40) }))
+      .min(1)
+      .max(8),
   }),
   z.object({
     action: z.literal('VOICE_REPLACE'),
@@ -280,7 +312,10 @@ export const SongEditBody = z
   .object({
     message: z.string().trim().min(1).max(300).optional(),
     /** the last few chat lines, so "もっと" / "さっきの" make sense */
-    history: z.array(z.object({ role: z.enum(['user', 'partner']), text: z.string().trim().min(1).max(400) })).max(10).default([]),
+    history: z
+      .array(z.object({ role: z.enum(['user', 'partner']), text: z.string().trim().min(1).max(400) }))
+      .max(10)
+      .default([]),
     partner: z.string().trim().min(1).max(20),
     isBati: z.boolean(),
     command: SongEditCommand.optional(),
@@ -324,7 +359,12 @@ export type JupiterBranchBody = z.infer<typeof JupiterBranchBody>;
 // --- Mars -------------------------------------------------------------------------------------------
 
 /** Put an uploaded video (POST /media/video) into your 裏スタジオ (every video you keep lives here). */
-export const MarsBackstageBody = z.object({ mediaId: z.string().uuid(), posterUrl: z.string().url().max(500).optional(), seconds: z.number().min(0).max(600).optional(), title: z.string().trim().max(40).optional() });
+export const MarsBackstageBody = z.object({
+  mediaId: z.string().uuid(),
+  posterUrl: z.string().url().max(500).optional(),
+  seconds: z.number().min(0).max(600).optional(),
+  title: z.string().trim().max(40).optional(),
+});
 export type MarsBackstageBody = z.infer<typeof MarsBackstageBody>;
 
 // --- Mercury & Mars posts --------------------------------------------------------------------------

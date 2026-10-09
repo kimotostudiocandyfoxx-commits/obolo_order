@@ -2,6 +2,9 @@
 OBOLO ORDER — Mercury instrumental generator (Cloud Run with an NVIDIA L4 GPU).
 
 POST /generate  {prompt, seconds, bpm, keyRoot, scale, progression, melody}  → audio/mp4 (AAC)
+POST /song      {prompt, lyrics, seconds, bpm, keyRoot, scale, language} → JSON: the whole song sung
+                (ACE-Step with the lyrics), split by HTDemucs into vocals + instrumental, and the time
+                of every lyric line (client decision 2026-10-09: replaces Fish line-by-line singing)
 GET  /health    → {ready, loading, error, engine}
 
 Only the API's service account may call it (Cloud Run IAM, no public access). The model loads in a
@@ -98,6 +101,119 @@ class AceStep15:
             if not result.success or not result.audios:
                 raise RuntimeError(f"ACE-Step 1.5: {result.error}")
             return read_audio(result.audios[0]["path"])
+
+
+def ace_song(engine: "AceStep15", r: "SongReq", seconds: float, out_dir: str) -> tuple[str, list[dict]]:
+    """The whole song with vocals (ACE-Step text2music with the lyrics) → (wav path, lyric line times)."""
+    from acestep.inference import GenerationConfig, GenerationParams, generate_music
+
+    key = f"{NAMES[r.keyRoot]} {'Major' if r.scale == 'major' else 'minor'}"
+    lyrics = format_lyrics(r.lyrics)
+    params = GenerationParams(
+        task_type="text2music",
+        caption=r.prompt[:512],
+        lyrics=lyrics,
+        instrumental=False,
+        vocal_language=r.language,
+        bpm=r.bpm,
+        keyscale=key,
+        timesignature="4",
+        duration=max(10.0, seconds),
+        inference_steps=8,
+        shift=3.0,
+        thinking=False,
+        use_cot_metas=False,
+        use_cot_caption=False,
+        use_cot_language=False,
+    )
+    config = GenerationConfig(batch_size=1, audio_format="wav", use_random_seed=True)
+    result = generate_music(engine.handler, None, params, config, save_dir=out_dir)
+    if not result.success or not result.audios:
+        raise RuntimeError(f"ACE-Step 1.5: {result.error}")
+    return result.audios[0]["path"], line_times(engine, result.extra_outputs or {}, seconds, r.language)
+
+
+def format_lyrics(lines: list["LyricLine"]) -> str:
+    """Our lines → ACE-Step lyrics with structure tags ([Verse] / [Chorus] / [Bridge])."""
+    out: list[str] = []
+    last = None
+    for l in lines:
+        if l.section != last:
+            if out:
+                out.append("")
+            out.append(f"[{l.section.capitalize()}]")
+            last = l.section
+        out.append(l.text.strip())
+    return "\n".join(out)[:4000]
+
+
+def line_times(engine: "AceStep15", extra: dict, seconds: float, language: str) -> list[dict]:
+    """When each lyric line is sung (ACE-Step's own cross-attention alignment). [] if not available."""
+    try:
+        need = ["pred_latents", "encoder_hidden_states", "encoder_attention_mask", "context_latents", "lyric_token_idss"]
+        if any(extra.get(k) is None for k in need):
+            return []
+        res = engine.handler.get_lyric_timestamp(
+            pred_latent=extra["pred_latents"][0:1],
+            encoder_hidden_states=extra["encoder_hidden_states"][0:1],
+            encoder_attention_mask=extra["encoder_attention_mask"][0:1],
+            context_latents=extra["context_latents"][0:1],
+            lyric_token_ids=extra["lyric_token_idss"][0:1],
+            total_duration_seconds=float(seconds),
+            vocal_language=language,
+            inference_steps=8,
+            seed=42,
+        )
+        if not res.get("success"):
+            print(f"lyric times: {res.get('error')}", flush=True)
+            return []
+        out = []
+        for st in res.get("sentence_timestamps") or []:
+            get = (lambda k: st.get(k)) if isinstance(st, dict) else (lambda k: getattr(st, k, None))
+            text = str(get("text") or "").strip()
+            if not text or text.startswith("["):  # structure tags are not sung
+                continue
+            out.append({"text": text, "start": float(get("start") or 0), "end": float(get("end") or 0)})
+        return out
+    except Exception as e:  # noqa: BLE001 — the song is still fine without the times
+        print(f"lyric times failed: {e!r}", flush=True)
+        return []
+
+
+# --- HTDemucs (Demucs v4, MIT): vocals / instrumental split ------------------------------------------
+
+_demucs = None
+
+
+def separate(wav_path: str, out_dir: str) -> tuple[str, str]:
+    """A song → (vocals.wav, instrumental.wav) with HTDemucs (fine-tuned htdemucs_ft by default)."""
+    global _demucs
+    import torch
+    from demucs.apply import apply_model
+    from demucs.pretrained import get_model
+
+    if _demucs is None:
+        _demucs = get_model(os.environ.get("DEMUCS_MODEL", "htdemucs_ft"))
+        _demucs.eval()
+    model = _demucs
+    sr = model.samplerate
+    # the model's own rate, stereo, float
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", wav_path, "-ac", "2", "-ar", str(sr), "-f", "f32le", "-"], check=True, capture_output=True).stdout
+    audio = torch.from_numpy(np.frombuffer(raw, dtype=np.float32).copy().reshape(-1, 2).T)
+    ref = audio.mean(0)
+    mean, std = ref.mean(), ref.std() + 1e-8
+    with torch.inference_mode():
+        stems = apply_model(model, ((audio - mean) / std)[None], device="cuda" if torch.cuda.is_available() else "cpu", split=True, overlap=0.25, progress=False)[0]
+    stems = stems * std + mean
+    names = list(model.sources)
+    vocals = stems[names.index("vocals")]
+    rest = sum(stems[i] for i, n in enumerate(names) if n != "vocals")
+    paths = []
+    for name, x in (("vocals", vocals), ("instrumental", rest)):
+        path = os.path.join(out_dir, f"{name}.wav")
+        wavfile.write(path, sr, np.clip(x.T.cpu().numpy(), -1, 1).astype(np.float32))
+        paths.append(path)
+    return paths[0], paths[1]
 
 
 class MusicGen:
@@ -262,6 +378,21 @@ class GenerateReq(BaseModel):
     melody: list[Note] = Field(default_factory=list, max_length=600)
 
 
+class LyricLine(BaseModel):
+    section: str = Field("verse", pattern="^(verse|chorus|bridge)$")
+    text: str = Field(min_length=1, max_length=80)
+
+
+class SongReq(BaseModel):
+    prompt: str = Field(min_length=1, max_length=500)
+    lyrics: list[LyricLine] = Field(min_length=1, max_length=48)
+    seconds: float = Field(60, ge=10, le=180)
+    bpm: int = Field(110, ge=40, le=220)
+    keyRoot: int = Field(0, ge=0, le=11)
+    scale: str = "major"
+    language: str = Field("ja", max_length=8)
+
+
 @app.get("/health")
 def health():
     try:
@@ -317,3 +448,49 @@ def generate(r: GenerateReq):
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "download":
     download_models()
+
+
+def file_m4a(path: str, stereo: bool = True) -> bytes:
+    with tempfile.TemporaryDirectory() as d:
+        out = os.path.join(d, "out.m4a")
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", path, "-ac", "2" if stereo else "1", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", out], check=True)
+        with open(out, "rb") as f:
+            return f.read()
+
+
+@app.post("/song")
+def song(r: SongReq):
+    """The whole song sung (ACE-Step), split into vocals + instrumental (HTDemucs), with line times."""
+    import base64
+
+    if state["error"]:
+        raise HTTPException(500, f"model failed to load: {state['error'][:300]}")
+    engine = state["engine"]
+    if engine is None:
+        return JSONResponse({"warming": True}, status_code=503)
+    if not isinstance(engine, AceStep15):
+        raise HTTPException(400, "songs with vocals need the ACE-Step engine")
+    t0 = time.time()
+    try:
+        with gen_lock, tempfile.TemporaryDirectory() as d:
+            wav, lines = ace_song(engine, r, r.seconds, d)
+            t1 = time.time()
+            vocals, inst = separate(wav, d)
+            t2 = time.time()
+            # the delivered mix: ACE-Step's own, faded at the end
+            mix = os.path.join(d, "mix.wav")
+            fade_at = max(0.0, r.seconds - 1.5)
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{r.seconds:.2f}", "-af", f"afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
+            payload = {
+                "seconds": r.seconds,
+                "lines": lines,
+                "mix": base64.b64encode(file_m4a(mix)).decode(),
+                "vocals": base64.b64encode(file_m4a(vocals)).decode(),
+                "instrumental": base64.b64encode(file_m4a(inst)).decode(),
+                "timings": {"song": round(t1 - t0, 1), "split": round(t2 - t1, 1)},
+            }
+    except Exception as e:  # noqa: BLE001
+        traceback.print_exc()
+        raise HTTPException(500, f"song failed: {e!r}"[:400]) from e
+    print(f"song: {len(r.lyrics)} lines, {r.seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, {len(lines)} line times", flush=True)
+    return payload

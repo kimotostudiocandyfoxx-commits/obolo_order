@@ -16,7 +16,10 @@ const GUIDE_SR = 22050;
 /** The melody (one note per mora) as a soft tone, mono 16-bit WAV. */
 export function guideWav(melody: { midi: number | null; beats: number }[], bpm: number, maxSeconds = 30): Buffer {
   const spb = 60 / bpm;
-  const total = Math.min(maxSeconds, melody.reduce((a, n) => a + n.beats * spb, 0));
+  const total = Math.min(
+    maxSeconds,
+    melody.reduce((a, n) => a + n.beats * spb, 0),
+  );
   const pcm = new Int16Array(Math.ceil(total * GUIDE_SR));
   let t0 = 0;
   for (const n of melody) {
@@ -132,6 +135,37 @@ export async function renderSong(o: { instrumental: Buffer; phrases: RenderPhras
     ].join(';');
     args.push('-filter_complex', graph, '-map', '[o]', '-ar', '44100', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', out);
     await run('ffmpeg', args, 180_000);
+    return { data: await readFile(out), seconds: Math.round((await probe(out)).seconds * 10) / 10 };
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+}
+
+/**
+ * A sung song from the music studio (ACE-Step + HTDemucs, 2026-10-09) re-mixed from its two stems:
+ * the vocal and instrumental volumes, the vocal coming in later (delayBeats), the whole-song tempo.
+ * (Per-line gaps do not apply: the vocal is one take.)
+ */
+export async function mixStems(o: { instrumental: Buffer; vocals: Buffer; bpm: number; mix: RenderMix }): Promise<{ data: Buffer; seconds: number }> {
+  const dir = await mkdtemp(join(tmpdir(), 'stems-'));
+  try {
+    const inst = join(dir, 'inst.m4a');
+    const voc = join(dir, 'voc.m4a');
+    const out = join(dir, 'song.m4a');
+    await writeFile(inst, o.instrumental);
+    await writeFile(voc, o.vocals);
+    const ms = Math.max(0, Math.round(o.mix.delayBeats * (60 / o.bpm) * 1000));
+    const tempo = Math.abs(o.mix.tempo - 1) > 0.001 ? `,atempo=${o.mix.tempo.toFixed(3)}` : '';
+    const graph = [
+      `[0:a]volume=${(10 ** (o.mix.bgmDb / 20)).toFixed(3)}[i]`,
+      `[1:a]${ms ? `adelay=${ms}:all=1,` : ''}volume=${(10 ** (o.mix.vocalDb / 20)).toFixed(3)}[v]`,
+      `[i][v]amix=inputs=2:duration=longest:normalize=0${tempo},loudnorm=I=-14:TP=-1.5:LRA=11[o]`,
+    ].join(';');
+    await run(
+      'ffmpeg',
+      ['-y', '-hide_banner', '-loglevel', 'error', '-i', inst, '-i', voc, '-filter_complex', graph, '-map', '[o]', '-ar', '44100', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', out],
+      180_000,
+    );
     return { data: await readFile(out), seconds: Math.round((await probe(out)).seconds * 10) / 10 };
   } finally {
     await rm(dir, { recursive: true, force: true });

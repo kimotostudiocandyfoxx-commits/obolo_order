@@ -1,13 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  buildSongDesign,
-  composeChatSystem,
-  type ChatTurn,
-  type LlmProvider,
-  moderateText,
-  parseComposeChat,
-  songDesignSystem,
-} from '@obolo/ai';
+import { buildSongDesign, composeChatSystem, type ChatTurn, type LlmProvider, moderateText, parseComposeChat, songDesignSystem } from '@obolo/ai';
 import type { ComposeChatBody, ComposeChatResult, ComposeDesignBody, InstrumentalBody, InstrumentalResult, SongDesign } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { MediaService } from '../media/media.service';
@@ -16,7 +8,10 @@ import { apiError } from '../common/errors';
 import { LLM } from '../infra/tokens';
 
 /** Short reason for the client (no secrets: provider error text only), so a failure can be diagnosed. */
-const why = (e: unknown) => String(e instanceof Error ? e.message : e).replace(/\s+/g, ' ').slice(0, 160);
+const why = (e: unknown) =>
+  String(e instanceof Error ? e.message : e)
+    .replace(/\s+/g, ' ')
+    .slice(0, 160);
 
 const turns = (h: ComposeChatBody['history']): ChatTurn[] => h.map((t) => ({ role: t.role === 'partner' ? 'assistant' : 'user', text: t.text }));
 
@@ -50,7 +45,10 @@ export class ComposeService {
   }
 
   private async checkWords(body: ComposeChatBody, deep: boolean) {
-    const said = body.history.filter((t) => t.role === 'user').map((t) => t.text).join('\n');
+    const said = body.history
+      .filter((t) => t.role === 'user')
+      .map((t) => t.text)
+      .join('\n');
     const m = await moderateText(said, deep ? this.llm : undefined);
     if (m.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot become a song');
   }

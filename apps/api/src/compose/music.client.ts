@@ -1,5 +1,5 @@
 import { HttpStatus, Logger } from '@nestjs/common';
-import type { InstrumentalBody } from '@obolo/shared';
+import type { FullSongBody, InstrumentalBody } from '@obolo/shared';
 import { apiError } from '../common/errors';
 
 const log = new Logger('Music');
@@ -63,4 +63,54 @@ export async function generateInstrumental(baseUrl: string, body: InstrumentalBo
     throw apiError(HttpStatus.BAD_GATEWAY, 'MUSIC_FAILED', `The instrumental could not be made (${res.status}): ${text}`);
   }
   return { data: Buffer.from(await res.arrayBuffer()), seconds: Number(res.headers.get('x-seconds')) || body.seconds };
+}
+
+export type MadeSong = {
+  seconds: number;
+  /** when each lyric line is sung (may be empty if the alignment failed) */
+  lines: { text: string; start: number; end: number }[];
+  mix: Buffer;
+  vocals: Buffer;
+  instrumental: Buffer;
+};
+
+/** Ask the GPU service for the whole song with vocals (ACE-Step) split by HTDemucs. AAC bytes. */
+export async function generateSong(baseUrl: string, body: FullSongBody & { prompt: string }): Promise<MadeSong> {
+  const url = baseUrl.replace(/\/$/, '');
+  const token = await idToken(url);
+  let res: Response;
+  try {
+    res = await fetch(`${url}/song`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({
+        prompt: body.prompt,
+        lyrics: body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text }))),
+        seconds: Math.max(10, Math.min(180, body.seconds)),
+        bpm: body.bpm,
+        keyRoot: body.keyRoot,
+        scale: body.scale,
+        language: 'ja',
+      }),
+      signal: AbortSignal.timeout(600_000),
+    });
+  } catch (e) {
+    log.warn(`music service unreachable: ${String(e)}`);
+    throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_WARMING', 'The music studio is starting up');
+  }
+  if (res.status === 503 || res.status === 429) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_WARMING', 'The music studio is starting up');
+  if (!res.ok) {
+    const text = (await res.text().catch(() => '')).slice(0, 200);
+    log.warn(`music service ${res.status}: ${text}`);
+    throw apiError(HttpStatus.BAD_GATEWAY, 'MUSIC_FAILED', `The song could not be made (${res.status}): ${text}`);
+  }
+  const j = (await res.json()) as { seconds: number; lines?: MadeSong['lines']; mix: string; vocals: string; instrumental: string; timings?: unknown };
+  log.log(`song made ${j.seconds}s, ${j.lines?.length ?? 0} line times ${JSON.stringify(j.timings ?? {})}`);
+  return {
+    seconds: Number(j.seconds) || body.seconds,
+    lines: Array.isArray(j.lines) ? j.lines : [],
+    mix: Buffer.from(j.mix, 'base64'),
+    vocals: Buffer.from(j.vocals, 'base64'),
+    instrumental: Buffer.from(j.instrumental, 'base64'),
+  };
 }

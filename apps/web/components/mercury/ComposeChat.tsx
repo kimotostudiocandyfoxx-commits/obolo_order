@@ -18,10 +18,7 @@ import { useDictation } from '@/lib/useDictation';
  * KIMORIN composes; afterwards Bati does. Voice first (the round device listens), typing to fix.
  * The finished demo is buried in the island's soil, ready to set sail.
  */
-type Msg =
-  | { who: 'partner'; text: string }
-  | { who: 'me'; text: string }
-  | { who: 'song'; song: MadeSong };
+type Msg = { who: 'partner'; text: string } | { who: 'me'; text: string } | { who: 'song'; song: MadeSong };
 
 export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) => void; onOpenIsland: () => void }) {
   const { me } = useAuth();
@@ -53,20 +50,26 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   // wake the GPU studio while we chat: a cold start takes 1-2 min, about as long as the talk,
   // so the instrumental is usually ready to make by the time the song is written
   useEffect(() => {
-    if (getApi().mode === 'live') void getApi().composeMusicStatus().catch(() => {});
+    if (getApi().mode === 'live')
+      void getApi()
+        .composeMusicStatus()
+        .catch(() => {});
   }, []);
 
   const say = (t: string) => setMsgs((m) => [...m, { who: 'partner', text: t }]);
   // live: the partner and the song come from the AI (Gemini); demo: the offline song maker
   const live = getApi().mode === 'live';
-  const history = (extra?: string) => [
-    ...msgs.flatMap((m) => (m.who === 'song' ? [] : [{ role: m.who === 'me' ? ('user' as const) : ('partner' as const), text: m.text.slice(0, 400) }])),
-    ...(extra ? [{ role: 'user' as const, text: extra.slice(0, 400) }] : []),
-  ].slice(-30);
+  const history = (extra?: string) =>
+    [
+      ...msgs.flatMap((m) => (m.who === 'song' ? [] : [{ role: m.who === 'me' ? ('user' as const) : ('partner' as const), text: m.text.slice(0, 400) }])),
+      ...(extra ? [{ role: 'user' as const, text: extra.slice(0, 400) }] : []),
+    ].slice(-30);
 
   const songMsg = (id: string) => msgs.find((m): m is Extract<Msg, { who: 'song' }> => m.who === 'song' && m.song.id === id)?.song;
   const updateSong = (id: string, v: SongView) =>
-    setMsgs((ms) => ms.map((x) => (x.who === 'song' && x.song.id === id ? { ...x, song: { ...x.song, songUrl: v.url, songId: v.id, instrumentalUrl: v.instrumentalUrl, seconds: Math.round(v.seconds) } } : x)));
+    setMsgs((ms) =>
+      ms.map((x) => (x.who === 'song' && x.song.id === id ? { ...x, song: { ...x.song, songUrl: v.url, songId: v.id, instrumentalUrl: v.instrumentalUrl, seconds: Math.round(v.seconds) } } : x)),
+    );
 
   /** One 手直し round: the message (or a command retried after the GPU warmed up) → reply + new mix. */
   const editSong = async (id: string, body: { message?: string; command?: SongEditCommand }) => {
@@ -177,7 +180,9 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
         <Face face={partner.face} size={40} />
         <div>
           <p className="text-sm font-bold">{partner.name}と作曲</p>
-          <p className="text-[11px] text-white/50">話しかけると、{partner.name}が曲にしてくれる（{live ? '伴奏と歌も入れられるよ' : '仮の画面'}）</p>
+          <p className="text-[11px] text-white/50">
+            話しかけると、{partner.name}が曲にしてくれる（{live ? '伴奏と歌も入れられるよ' : '仮の画面'}）
+          </p>
         </div>
       </div>
 
@@ -235,11 +240,6 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
               }}
               onIsland={onOpenIsland}
               live={live}
-              onInstrumental={(url) => {
-                synth.stop();
-                setPlaying(null);
-                setMsgs((ms) => ms.map((x) => (x.who === 'song' && x.song.id === m.song.id ? { ...x, song: { ...x.song, instrumentalUrl: url } } : x)));
-              }}
               onSung={(v) => {
                 synth.stop();
                 setPlaying(null);
@@ -265,9 +265,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
             </button>
           </div>
         )}
-        {warming && !busy && (
-          <p className="text-center text-[11px] text-amber-200/80">音楽スタジオ（GPU）を起動中…。準備できたら自動で伴奏を作り直すよ。</p>
-        )}
+        {warming && !busy && <p className="text-center text-[11px] text-amber-200/80">音楽スタジオ（GPU）を起動中…。準備できたら自動で伴奏を作り直すよ。</p>}
         {busy && (
           <div className="flex items-end gap-2">
             <Face face={partner.face} size={32} />
@@ -313,14 +311,12 @@ function SongCard({
   onAgain,
   onIsland,
   live,
-  onInstrumental,
   onSung,
   editing,
   onEdit,
   onEditDone,
 }: {
   live: boolean;
-  onInstrumental: (url: string) => void;
   onSung: (v: SongView) => void;
   editing: boolean;
   onEdit: () => void;
@@ -367,8 +363,7 @@ function SongCard({
           {song.design.chords.join(' → ')} ・ BPM {song.design.bpm} ・ ▶ はメロディの試し聴き
         </p>
       )}
-      {live && song.design && <Instrumental song={song} onMade={onInstrumental} />}
-      {live && song.design && song.instrumentalUrl && <Sing song={song} onMade={onSung} />}
+      {live && song.design && <FullSong song={song} onMade={onSung} />}
       {buried ? (
         <button onClick={onIsland} className="mt-3 w-full rounded-full border border-amber-200/50 bg-[#3a2410]/80 py-2 text-sm">
           ⛏ 保存して島の土に埋めました → 島を見る
@@ -410,10 +405,11 @@ function SongCard({
 }
 
 /**
- * Step 2 of composing: the instrumental from the design, made on the GPU service (Cloud Run L4).
- * A cold GPU needs a minute or two to start; the visitor is asked to press again.
+ * Step 2 of composing (client decision 2026-10-09): the whole song sung by the music studio on the
+ * GPU (Cloud Run L4) — ACE-Step makes the song with the lyrics, HTDemucs splits vocals and
+ * instrumental. A cold GPU needs a while to start: the card shows what it is doing and starts by itself.
  */
-function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) => void }) {
+function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => void }) {
   const [state, setState] = useState<'idle' | 'working' | 'warming' | 'error'>('idle');
   const [err, setErr] = useState('');
   const [status, setStatus] = useState('');
@@ -430,8 +426,7 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
           setStatus('準備できた！作曲を始めるね。');
           void makeRef.current();
           return;
-        }
-        else if (s.error) setStatus(`スタジオの状態：${String(s.error).slice(0, 160)}`);
+        } else if (s.error) setStatus(`スタジオの状態：${String(s.error).slice(0, 160)}`);
         else setStatus(`スタジオの状態：${String(s.phase ?? '起動中')}（${Number(s.seconds ?? 0)}秒・モデル ${Number(s.checkpointGB ?? 0)}GB）`);
       } catch {
         /* keep the last status */
@@ -444,11 +439,11 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
       clearInterval(t);
     };
   }, [state]);
-  if (song.instrumentalUrl) {
+  if (song.songUrl) {
     return (
       <div className="mt-3 rounded-2xl bg-black/25 p-2">
-        <p className="mb-1 text-center text-[11px] text-violet-200/70">🎹 伴奏</p>
-        <audio src={song.instrumentalUrl} controls playsInline className="w-full" />
+        <p className="mb-1 text-center text-[11px] text-fuchsia-200/80">🎤 歌入りの曲</p>
+        <audio key={song.songUrl} src={song.songUrl} controls playsInline className="w-full" />
       </div>
     );
   }
@@ -457,24 +452,25 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
     setState('working');
     setErr('');
     try {
-      const r = await getApi().composeInstrumental({
+      const r = await getApi().composeFullSong({
         title: d.title.slice(0, 40),
-        prompt: d.instrumentalPrompt,
-        seconds: d.seconds,
+        genre: d.genre,
+        mood: d.mood.slice(0, 30),
         bpm: d.bpm,
         keyRoot: d.keyRoot,
         scale: d.scale,
+        sections: d.sections.map((s) => ({ name: s.name, lines: s.lines.map((l) => ({ text: l.text.slice(0, 40), beats: l.notes.reduce((a, n) => a + n.beats, 0) })) })),
+        instrumentalPrompt: d.instrumentalPrompt,
         progression: d.progression,
-        melody: d.sections.flatMap((s) => s.lines).flatMap((l) => l.notes).map((n) => ({ midi: n.midi, beats: n.beats })).slice(0, 600),
+        seconds: Math.max(10, Math.min(180, d.seconds)),
       });
-      onMade(r.url);
+      onMade(r);
       setState('idle');
     } catch (e) {
       if (e instanceof ApiError && (e.code === 'MUSIC_WARMING' || e.status === 504)) {
         setStatus('');
         setState('warming');
-      }
-      else {
+      } else {
         setErr(detail(e));
         setState('error');
       }
@@ -483,8 +479,12 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
   makeRef.current = make;
   return (
     <div className="mt-3 text-center">
-      <button onClick={() => void make()} disabled={state === 'working' || state === 'warming'} className="w-full rounded-full border border-violet-300/60 bg-violet-500/20 py-2 text-sm font-bold disabled:opacity-60">
-        {state === 'working' ? '🎹 伴奏を作曲中…（1〜2分）' : '🎹 伴奏をつくる'}
+      <button
+        onClick={() => void make()}
+        disabled={state === 'working' || state === 'warming'}
+        className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 py-2 text-sm font-bold disabled:opacity-60"
+      >
+        {state === 'working' ? '🎤 歌入りで作曲中…（2〜3分）' : '🎤 歌入りで作曲する'}
       </button>
       {state === 'warming' && (
         <p className="mt-1.5 text-[11px] text-amber-200/80">
@@ -493,70 +493,6 @@ function Instrumental({ song, onMade }: { song: MadeSong; onMade: (url: string) 
         </p>
       )}
       {state === 'error' && <p className="mt-1.5 whitespace-pre-wrap text-[11px] text-rose-300">うまく作れなかった。{err}</p>}
-    </div>
-  );
-}
-
-/**
- * Step 3: the song sung in the member's own registered voice (Fish Audio [singing]) over the
- * instrumental. The AI picks how it is sung (tags, speed, volume) from the design.
- */
-function Sing({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => void }) {
-  const { me } = useAuth();
-  const [state, setState] = useState<'idle' | 'working' | 'error'>('idle');
-  const [err, setErr] = useState('');
-  const [how, setHow] = useState('');
-  if (song.songUrl) {
-    return (
-      <div className="mt-3 rounded-2xl bg-black/25 p-2">
-        <p className="mb-1 text-center text-[11px] text-fuchsia-200/80">🎤 歌入り（あなたの声）</p>
-        <audio key={song.songUrl} src={song.songUrl} controls playsInline className="w-full" />
-        {how && <p className="mt-1 text-center text-[10px] text-white/40">{how}</p>}
-      </div>
-    );
-  }
-  if (!me?.voices?.self) {
-    return (
-      <a href="/voice" className="mt-3 block w-full rounded-full border border-fuchsia-300/50 bg-fuchsia-500/10 py-2 text-center text-xs">
-        🎤 歌を入れるには、先に「自分の声」を登録してね →
-      </a>
-    );
-  }
-  const make = async () => {
-    const d = song.design!;
-    setState('working');
-    setErr('');
-    try {
-      const r = await getApi().composeSing({
-        title: d.title.slice(0, 40),
-        genre: d.genre,
-        mood: d.mood.slice(0, 30),
-        bpm: d.bpm,
-        keyRoot: d.keyRoot,
-        scale: d.scale,
-        sections: d.sections.map((s) => ({ name: s.name, lines: s.lines.map((l) => ({ text: l.text.slice(0, 40), beats: l.notes.reduce((a, n) => a + n.beats, 0) })) })),
-        melody: d.sections.flatMap((s) => s.lines).flatMap((l) => l.notes).map((n) => ({ midi: n.midi, beats: n.beats })).slice(0, 600),
-        instrumentalUrl: song.instrumentalUrl!,
-        instrumentalPrompt: d.instrumentalPrompt,
-        progression: d.progression,
-        seconds: d.seconds,
-        slot: 'self',
-      });
-      const dir = r.direction;
-      setHow(`歌い方：${[...dir.style, ...dir.sections.flatMap((s) => s.tags)].join(' / ')} ・ 速さ ${dir.speed} ・ 音量 ${dir.volume}dB`);
-      onMade(r);
-      setState('idle');
-    } catch (e) {
-      setErr(detail(e));
-      setState('error');
-    }
-  };
-  return (
-    <div className="mt-3 text-center">
-      <button onClick={() => void make()} disabled={state === 'working'} className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 py-2 text-sm font-bold disabled:opacity-60">
-        {state === 'working' ? '🎤 歌入れ中…（1〜2分）' : '🎤 自分の声で歌を入れる'}
-      </button>
-      {state === 'error' && <p className="mt-1.5 whitespace-pre-wrap text-[11px] text-rose-300">歌を入れられなかった。{err}</p>}
     </div>
   );
 }
