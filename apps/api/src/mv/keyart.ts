@@ -7,8 +7,8 @@ import type { Stylizer } from './stylize';
  * キメ絵 (client decision 2026-10-08): only the few cuts the direction sheet marks as key are
  * redrawn as an anime illustration by an image-to-image service — a few yen per MV, not every frame.
  * The first one that is set up is used:
- *  1. Novita AI (NOVITA_API_KEY + NOVITA_MODEL, client decision 2026-10-08): anime checkpoints,
- *     img2img, async (submit → poll). PLACEHOLDER (P-MV-2): the checkpoint's licence must allow a paid service.
+ *  1. (Novita's checkpoint img2img/txt2img routes were retired by Novita — 404 "route not found" since
+ *     2026-10; scenes are painted by `paint` below instead.)
  *  2. Runware (RUNWARE_API_KEY + RUNWARE_MODEL): the same idea, another cheap img2img API.
  *  3. Gemini image (MV_KEYART_MODEL) — only when neither of those is set up (dearer, and not an anime model).
  *  4. the ONNX model (ANIME_ONNX_URL), if one is set.
@@ -40,6 +40,9 @@ const log = new Logger('MvKeyArt');
 export class KeyArtist {
   constructor(
     private readonly o: {
+      /** our own GPU painter (gpu/music POST /paint, Animagine XL 4.0) — preferred when set */
+      paintUrl?: string;
+      paintToken?: () => Promise<string | undefined>;
       novitaKey?: string;
       novitaModel?: string;
       novitaStrength: number;
@@ -53,7 +56,7 @@ export class KeyArtist {
   ) {}
 
   private get novita() {
-    return !!(this.o.novitaKey && this.o.novitaModel);
+    return !!this.o.novitaKey;
   }
   private get runwareOn() {
     return !!(this.o.runwareKey && this.o.runwareModel);
@@ -62,10 +65,6 @@ export class KeyArtist {
   /** One picture → the same picture as an anime illustration (PNG), or null. */
   async draw(input: Buffer): Promise<Buffer | null> {
     const src = await sharp(input).rotate().resize(SIDE, SIDE, { fit: 'cover' }).jpeg({ quality: 88 }).toBuffer();
-    if (this.novita) {
-      const out = await this.novitaDraw(src).catch((e) => log.warn(`novita: ${String(e).slice(0, 200)}`));
-      if (out) return out;
-    }
     if (this.runwareOn) {
       const out = await this.runware(src).catch((e) => log.warn(`runware: ${String(e).slice(0, 200)}`));
       if (out) return out;
@@ -78,63 +77,62 @@ export class KeyArtist {
     return null;
   }
 
-  /** Novita AI img2img (v3 async): the photo redrawn as an anime illustration. */
-  private async novitaDraw(src: Buffer): Promise<Buffer | null> {
-    const side = this.o.novitaSide;
-    const recipe = novitaRecipe(this.o.novitaModel!);
-    const img = await sharp(src).resize(side, side, { fit: 'cover' }).jpeg({ quality: 90 }).toBuffer();
-    return this.novitaTask('img2img', {
-      image_base64: img.toString('base64'),
-      prompt: recipe.prompt,
-      negative_prompt: recipe.negative,
-      width: side,
-      height: side,
-      strength: this.o.novitaStrength,
-      seed: -1,
-      steps: recipe.steps,
-      guidance_scale: recipe.cfg,
-      sampler_name: recipe.sampler,
-    });
-  }
-
-  /** Can scenes be painted from words (txt2img)? */
+  /** Can scenes be painted from words? */
   get canPaint() {
-    return this.novita;
+    return !!this.o.paintUrl || this.novita;
   }
 
   /**
-   * One MV scene painted from words (Novita txt2img with the anime checkpoint). `tags` are the
-   * scene's own tags (character, place, action, light); the checkpoint's quality tags are added.
+   * How many scenes one MV may paint: our own GPU paints the whole storyboard (seconds of GPU time),
+   * Novita Qwen-Image costs about 3 yen a picture, so fewer scenes (each shown longer) there.
+   */
+  sceneBudget(max: number, qwenMax: number) {
+    return this.o.paintUrl ? max : Math.min(max, qwenMax);
+  }
+
+  /**
+   * One MV scene painted from words. `tags` are the scene's own Danbooru-style tags (character,
+   * place, action, light). Our GPU paints them with Animagine XL 4.0 (its quality tags added);
+   * failing that, Novita Qwen-Image paints them as a TV-anime still.
    */
   async paint(tags: string, seed: number): Promise<Buffer | null> {
+    if (this.o.paintUrl) {
+      const out = await this.gpuPaint(tags, seed).catch((e) => log.warn(`gpu paint: ${String(e).slice(0, 200)}`));
+      if (out) return out;
+    }
     if (!this.novita) return null;
     const side = this.o.novitaSide;
-    const recipe = novitaRecipe(this.o.novitaModel!, false);
-    return this.novitaTask('txt2img', {
-      prompt: `${tags}, ${recipe.prompt}`.slice(0, 1500),
-      negative_prompt: recipe.negative,
-      width: side,
-      height: side,
-      seed,
-      steps: recipe.steps,
-      guidance_scale: recipe.cfg,
-      sampler_name: recipe.sampler,
+    return this.novitaTask('qwen-image-txt2img', {
+      prompt: `Anime illustration, a still from a Japanese TV anime: cel shading, clean line art, vibrant colours, cinematic lighting. ${tags}. No text, no letters, no watermark, no frame.`.slice(0, 1900),
+      size: `${side}*${side}`,
     }).catch((e) => {
       log.warn(`novita paint: ${String(e).slice(0, 200)}`);
       return null;
     });
   }
 
+  private async gpuPaint(tags: string, seed: number): Promise<Buffer | null> {
+    const recipe = novitaRecipe(this.o.novitaModel ?? 'animagine', false);
+    const token = await this.o.paintToken?.();
+    const res = await fetch(`${this.o.paintUrl!.replace(/\/$/, '')}/paint`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ prompt: `${tags}, ${recipe.prompt}`.slice(0, 1500), negative: recipe.negative, side: this.o.novitaSide, seed, steps: recipe.steps, cfg: recipe.cfg }),
+      signal: AbortSignal.timeout(180_000),
+    });
+    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
+    const { image, safe } = (await res.json()) as { image?: string; safe?: boolean };
+    // kids-friendly app: a picture the safety check does not pass is never used
+    return image && safe !== false ? Buffer.from(image, 'base64') : null;
+  }
+
   /** Submit a Novita v3 async task, then poll it until the picture is there (null = refused by the NSFW check). */
-  private async novitaTask(kind: 'img2img' | 'txt2img', request: Record<string, unknown>): Promise<Buffer | null> {
+  private async novitaTask(kind: 'qwen-image-txt2img', request: Record<string, unknown>): Promise<Buffer | null> {
     const headers = { 'content-type': 'application/json', authorization: `Bearer ${this.o.novitaKey}` };
     const res = await fetch(`https://api.novita.ai/v3/async/${kind}`, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        extra: { response_image_type: 'jpeg', enable_nsfw_detection: true },
-        request: { model_name: this.o.novitaModel, image_num: 1, ...request },
-      }),
+      body: JSON.stringify(request),
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) throw new Error(`submit ${res.status} ${(await res.text()).slice(0, 200)}`);

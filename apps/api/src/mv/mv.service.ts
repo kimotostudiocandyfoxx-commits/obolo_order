@@ -12,6 +12,7 @@ import { Database } from '../db/db';
 import { marsBackstage, mvProjects, songs, users } from '../db/schema';
 import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
+import { idToken } from '../compose/music.client';
 import { KeyArtist } from './keyart';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
@@ -36,7 +37,10 @@ export class MvService {
     private readonly media: MediaService,
     @Inject(CONFIG) private readonly cfg: AppConfig,
   ) {
+    const gpu = cfg.MV_GPU_PAINT && cfg.MUSIC_URL ? cfg.MUSIC_URL.replace(/\/$/, '') : undefined;
     this.keyArtist = new KeyArtist({
+      paintUrl: gpu,
+      paintToken: gpu ? () => idToken(gpu) : undefined,
       novitaKey: cfg.NOVITA_API_KEY,
       novitaModel: cfg.NOVITA_MODEL,
       novitaStrength: cfg.NOVITA_STRENGTH,
@@ -265,7 +269,7 @@ export class MvService {
           music: String(design.instrumentalPrompt ?? '').slice(0, 300),
           lyrics: this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })),
           hero,
-          maxScenes: this.cfg.MV_SCENES,
+          maxScenes: this.keyArtist.sceneBudget(this.cfg.MV_SCENES, this.cfg.MV_QWEN_SCENES),
         },
         this.cfg.GEMINI_API_KEY,
         this.cfg.MV_PLAN_MODEL,

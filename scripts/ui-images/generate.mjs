@@ -6,7 +6,9 @@
  *
  * Models:
  *  - "qwen"      Qwen-Image (strong at text and layouts: app screens, buttons, Japanese words). ~$0.02 / image
- *  - "animagine" Animagine XL 4.0 opt (anime characters / scenes, the MV style). very cheap
+ *  - "animagine" anime characters / scenes (the MV style). Novita retired its checkpoint routes
+ *                (txt2img 404 since 2026-10), so for now these are painted by Qwen-Image too, with an
+ *                anime-still style added to the prompt.
  * An item is painted once; change its id (e.g. -v2) or set "redo": true to paint it again.
  * At most MAX_IMAGES pictures per run (cost guard).
  */
@@ -17,7 +19,6 @@ const KEY = process.env.NOVITA_API_KEY;
 const QUEUE = process.env.QUEUE ?? 'design/ui-queue.json';
 const OUT = process.env.OUT ?? 'design/ui/out';
 const MAX_IMAGES = Number(process.env.MAX_IMAGES ?? 24);
-const ANIMAGINE = process.env.NOVITA_MODEL ?? 'animagineXL40_v4Opt_1310654.safetensors';
 if (!KEY) throw new Error('NOVITA_API_KEY is not set');
 mkdirSync(OUT, { recursive: true });
 
@@ -36,33 +37,16 @@ function sizeOf(it) {
 
 async function submit(it) {
   const { w, h } = sizeOf(it);
-  if (it.model === 'animagine') {
-    const res = await fetch('https://api.novita.ai/v3/async/txt2img', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        extra: { response_image_type: 'jpeg', enable_nsfw_detection: true },
-        request: {
-          model_name: ANIMAGINE,
-          prompt: `${it.prompt}, masterpiece, high score, great score, absurdres`,
-          negative_prompt: it.negative ?? 'lowres, bad anatomy, bad hands, text, error, worst quality, low quality, signature, watermark, nsfw',
-          width: Math.round(w / 8) * 8,
-          height: Math.round(h / 8) * 8,
-          image_num: Math.min(4, Math.max(1, it.n ?? 1)),
-          steps: 28,
-          guidance_scale: 5,
-          sampler_name: 'Euler a',
-          seed: it.seed ?? -1,
-        },
-      }),
-    });
-    if (!res.ok) throw new Error(`submit ${res.status} ${(await res.text()).slice(0, 200)}`);
-    return (await res.json()).task_id;
-  }
   const res = await fetch('https://api.novita.ai/v3/async/qwen-image-txt2img', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ prompt: it.prompt, size: `${w}*${h}` }),
+    body: JSON.stringify({
+      prompt:
+        it.model === 'animagine'
+          ? `Anime illustration, a still from a Japanese TV anime: cel shading, clean line art, vibrant colours. ${it.prompt}. No text, no watermark.${it.negative ? ` Avoid: ${it.negative}.` : ''}`
+          : it.prompt,
+      size: `${w}*${h}`,
+    }),
   });
   if (!res.ok) throw new Error(`submit ${res.status} ${(await res.text()).slice(0, 200)}`);
   return (await res.json()).task_id;
@@ -90,7 +74,7 @@ const work = [...todo];
 async function worker() {
   while (work.length) {
     const it = work.shift();
-    const n = it.model === 'animagine' ? Math.min(4, Math.max(1, it.n ?? 1)) : 1;
+    const n = 1;
     if (painted + n > MAX_IMAGES) {
       skipped++;
       log.push(`- ⏭ ${it.id}: 今回の上限（${MAX_IMAGES}枚）を超えるので次回`);

@@ -105,6 +105,10 @@ const Env = z.object({
   MV_KEY_CUTS: z.coerce.number().default(2),
   /** Story MV: at most this many painted scenes per MV, and how many are painted at once */
   MV_SCENES: z.coerce.number().min(4).max(60).default(30),
+  /** scenes per MV when Novita Qwen-Image paints them (about 3 yen a picture) */
+  MV_QWEN_SCENES: z.coerce.number().min(4).max(60).default(12),
+  /** paint MV scenes with Animagine XL on our own GPU (gpu/music POST /paint) */
+  MV_GPU_PAINT: bool(false),
   MV_PAINT_PARALLEL: z.coerce.number().min(1).max(16).default(6),
   MV_KEYART_MODEL: z.string().default('gemini-2.5-flash-image'),
   /** キメ絵 by Novita AI (client decision 2026-10-08): the key, the anime checkpoint, how far from the photo (0–1), the size */

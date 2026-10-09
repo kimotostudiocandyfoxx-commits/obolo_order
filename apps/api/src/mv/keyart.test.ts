@@ -20,22 +20,19 @@ describe('novitaRecipe', () => {
   });
 });
 
-describe('KeyArtist (Novita)', () => {
+describe('KeyArtist scenes', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('submits img2img, polls until done and downloads the picture; Gemini is not used', async () => {
+  it('paints a scene with Novita Qwen-Image (the checkpoint routes are gone), polls, downloads', async () => {
     const out = await png();
-    const calls: string[] = [];
     let polls = 0;
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string, init?: RequestInit) => {
-        calls.push(url);
-        if (url.endsWith('/v3/async/img2img')) {
+        if (url.endsWith('/v3/async/qwen-image-txt2img')) {
           const body = JSON.parse(String(init?.body));
-          expect(body.request.model_name).toBe('anime.safetensors');
-          expect(body.request.strength).toBe(0.5);
-          expect(body.request.image_base64.length).toBeGreaterThan(100);
+          expect(body.prompt).toContain('1girl, beach');
+          expect(body.size).toBe('512*512');
           expect((init?.headers as Record<string, string>).authorization).toBe('Bearer k');
           return Response.json({ task_id: 't1' });
         }
@@ -47,35 +44,56 @@ describe('KeyArtist (Novita)', () => {
         throw new Error(`unexpected ${url}`);
       }),
     );
-    const got = await artist().draw(await png());
-    expect(got?.equals(out)).toBe(true);
-    expect(calls.some((c) => c.includes('generativelanguage'))).toBe(false);
+    expect((await artist().paint('1girl, beach', 1))?.equals(out)).toBe(true);
   }, 20_000);
 
   it('drops a picture the NSFW check does not pass', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) => {
-        if (url.endsWith('/img2img')) return Response.json({ task_id: 't2' });
+        if (url.endsWith('/qwen-image-txt2img')) return Response.json({ task_id: 't2' });
         if (url.includes('task-result'))
           return Response.json({ task: { status: 'TASK_STATUS_SUCCEED' }, images: [{ image_url: 'https://cdn.example/y.png', nsfw_detection_result: { valid: false } }] });
         throw new Error(`unexpected ${url}`);
       }),
     );
-    expect(await artist().draw(await png())).toBeNull();
+    expect(await artist().paint('scenery', 1)).toBeNull();
   }, 20_000);
 
-  it('a failed task falls back to the cel effect (null), not to Gemini', async () => {
+  it('prefers our own GPU (Animagine recipe), falls back to Novita when it fails', async () => {
+    const out = await png();
+    const calls: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        calls.push(url);
+        if (url === 'https://gpu.example/paint') {
+          const body = JSON.parse(String(init?.body));
+          expect(body.prompt).toContain('masterpiece, high score');
+          expect(body.seed).toBe(7);
+          expect((init?.headers as Record<string, string>).authorization).toBe('Bearer tok');
+          return Response.json({ image: out.toString('base64'), safe: true });
+        }
+        throw new Error(`unexpected ${url}`);
+      }),
+    );
+    const a = artist({ paintUrl: 'https://gpu.example/', paintToken: async () => 'tok', novitaModel: 'animagineXL40_v4Opt.safetensors' });
+    expect((await a.paint('1boy', 7))?.equals(out)).toBe(true);
+    expect(a.sceneBudget(30, 12)).toBe(30);
+    expect(artist().sceneBudget(30, 12)).toBe(12);
+    expect(calls).toEqual(['https://gpu.example/paint']);
+  });
+
+  it('a photo key cut no longer calls Novita (img2img is gone) and never Gemini when Novita is set', async () => {
     const calls: string[] = [];
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) => {
         calls.push(url);
-        if (url.endsWith('/img2img')) return Response.json({ task_id: 't3' });
-        return Response.json({ task: { status: 'TASK_STATUS_FAILED', reason: 'x' } });
+        throw new Error('no network');
       }),
     );
     expect(await artist().draw(await png())).toBeNull();
-    expect(calls.some((c) => c.includes('generativelanguage'))).toBe(false);
-  }, 20_000);
+    expect(calls).toEqual([]);
+  });
 });

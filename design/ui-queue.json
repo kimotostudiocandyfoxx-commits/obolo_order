@@ -12,7 +12,8 @@
       "model": "animagine",
       "n": 1,
       "size": "832*1216",
-      "prompt": "1boy, solo, fox mask, white mask with blue patterns, red hooded robe, cheerful, waving, starry space background, anime style"
+      "prompt": "1boy, solo, fox mask, white mask with blue patterns, red hooded robe, cheerful, waving, starry space background, anime style",
+      "redo": true
     }
   ]
 }

@@ -8,7 +8,7 @@ const log = new Logger('Music');
  * The GPU music service is private (Cloud Run IAM): on Cloud Run the API asks the metadata server
  * for an ID token for it. Locally (no metadata server) the call goes without one.
  */
-async function idToken(audience: string): Promise<string | undefined> {
+export async function idToken(audience: string): Promise<string | undefined> {
   if (!process.env.K_SERVICE) return undefined;
   const res = await fetch(`http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=${encodeURIComponent(audience)}`, {
     headers: { 'Metadata-Flavor': 'Google' },
