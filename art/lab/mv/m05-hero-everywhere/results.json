@@ -1,0 +1,172 @@
+{
+  "round": "m05-hero-everywhere",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.1,
+    "heroLikeness": 6.4,
+    "heroConsistency": 6.4,
+    "pictureQuality": 6.7,
+    "storyTelling": 5.7,
+    "lyricFit": 6.7,
+    "beatSync": 5.8,
+    "variety": 5.5,
+    "watchability": 6,
+    "kidsSafe": 7.3
+  },
+  "results": [
+    {
+      "id": "pop-bright",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "pop-bright~a",
+      "scenes": 11,
+      "painted": 11,
+      "seconds": {
+        "plan": 3,
+        "paint": 609,
+        "render": 12
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.5,
+        "pictureQuality": 6.7,
+        "storyTelling": 6.2,
+        "lyricFit": 7,
+        "beatSync": 5.8,
+        "variety": 5.9,
+        "watchability": 6.3,
+        "kidsSafe": 7.4,
+        "overall": 6.4,
+        "problems": [
+          "00:16 Tear rendering causes slight distortion around the mask boundary.",
+          "00:34 Sudden appearance of an asphalt roadway disrupts the fantasy meadow atmosphere.",
+          "00:42 Mask mouth area clips into human teeth geometry during laughing shot."
+        ],
+        "fixIdeas": [
+          "Adjust negative prompts to keep mask solid and avoid human facial features emerging beneath it.",
+          "Unify background prompts to prevent modern roads from appearing in nature scenes.",
+          "Align camera movements and cuts more closely with primary rhythmic accents."
+        ],
+        "bestMoments": [
+          "00:00 Welcoming opening stretch on the bed establishing tone.",
+          "00:38 Dynamic sprint with speed lines matching musical peak."
+        ]
+      }
+    },
+    {
+      "id": "rock-run",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "rock-run~a",
+      "scenes": 13,
+      "painted": 13,
+      "seconds": {
+        "plan": 3,
+        "paint": 600,
+        "render": 15
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 7,
+        "pictureQuality": 7,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 6,
+        "variety": 6,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:15 Mask becomes facial skin and mouth moves directly instead of staying an accessory",
+          "00:38 Final shot holds static for over ten seconds with minimal action"
+        ],
+        "fixIdeas": [
+          "Keep the white mask rigid or add distinct straps to maintain the original prop look",
+          "Add extra transition cuts or camera moves during the long concluding note"
+        ],
+        "bestMoments": [
+          "00:23 Dynamic shout frame matching the chorus peak",
+          "00:26 Starry night sky jump fitting the magical lyrics"
+        ]
+      }
+    },
+    {
+      "id": "ballad-night",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "ballad-night~a",
+      "scenes": 11,
+      "painted": 11,
+      "seconds": {
+        "plan": 3,
+        "paint": 606,
+        "render": 16
+      },
+      "judge": {
+        "heroLikeness": 6.2,
+        "heroConsistency": 5.4,
+        "pictureQuality": 6.6,
+        "storyTelling": 5.7,
+        "lyricFit": 6.4,
+        "beatSync": 6.1,
+        "variety": 5.2,
+        "watchability": 5.9,
+        "kidsSafe": 7.4,
+        "overall": 5.9,
+        "problems": [
+          "00:00 - Face alternates between an organic feline face and a hard mask across scenes.",
+          "00:42 - Speed lines and mouth movement feel slightly mismatched with the stiff mask design.",
+          "00:50 - Abrupt lighting change to daytime disrupts the nocturnal mood without transition."
+        ],
+        "fixIdeas": [
+          "Standardize mask prompts to prevent shifting between a painted face and a wearable mask.",
+          "Introduce dynamic profile angles and distance framing rather than centered medium shots.",
+          "Use soft dissolves or lighting fades for flashback cuts entering the chorus."
+        ],
+        "bestMoments": [
+          "00:17 - Cozy candlelight composition in the library background.",
+          "00:42 - Chorus burst with aurora borealis and emotional gesture."
+        ]
+      }
+    },
+    {
+      "id": "edm-party",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "edm-party~a",
+      "scenes": 13,
+      "painted": 13,
+      "seconds": {
+        "plan": 3,
+        "paint": 598,
+        "render": 15
+      },
+      "judge": {
+        "heroLikeness": 6.4,
+        "heroConsistency": 6.8,
+        "pictureQuality": 6.6,
+        "storyTelling": 4.8,
+        "lyricFit": 6.2,
+        "beatSync": 5.4,
+        "variety": 5,
+        "watchability": 5.8,
+        "kidsSafe": 7.3,
+        "overall": 6,
+        "problems": [
+          "00:07 - Repetitive front-facing framing diminishes visual momentum.",
+          "00:33 - Constant radial speed lines create visual clutter during the chorus.",
+          "00:41 - A handheld microphone appears suddenly without narrative setup."
+        ],
+        "fixIdeas": [
+          "Introduce dynamic camera angles and wider perspective shots.",
+          "Reduce speed-line intensity in favor of diverse lighting effects.",
+          "Incorporate minor narrative interactions with the neon cityscape."
+        ],
+        "bestMoments": [
+          "00:00 - Charming 2D translation of the original 3D mascot design.",
+          "00:33 - Energetic beat drop transition to the glowing dance stage."
+        ]
+      }
+    }
+  ]
+}
