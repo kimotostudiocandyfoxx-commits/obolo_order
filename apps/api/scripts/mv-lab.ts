@@ -145,6 +145,7 @@ async function main() {
   const hero = await describeHero(heroPic, GEMINI, PLAN_MODEL);
   console.log(`hero tags: ${hero}`);
   const results: Record<string, unknown>[] = [];
+  const toJudge: (() => Promise<unknown>)[] = [];
   for (const base of round.cases)
   for (const v of round.variants ?? [{ name: '' }]) {
     const c = { ...base, id: v.name ? `${base.id}~${v.name}` : base.id };
@@ -194,7 +195,11 @@ async function main() {
       await copyFile(out.video, video);
       const storyText = [`style: ${story.style}`, ...story.scenes.map((sc, k) => `${k + 1}. ${sc.dur.toFixed(1)}s ${sc.hero ? '[hero] ' : ''}${sc.motion}/${sc.effect}: ${sc.tags}`)].join('\n');
       await writeFile(join(OUT, `${c.id}-storyboard.txt`), storyText);
-      const j = await judge(video, heroPic, storyText, s.lineTimes.map((l) => `${l.start.toFixed(1)}s ${l.text}`).join('\n'));
+      // judged after every MV is made: judging takes minutes, and the GPU would end itself meanwhile
+      // (each MV then paid a cold start — about 8 minutes of GPU)
+      const lyricText = s.lineTimes.map((l) => `${l.start.toFixed(1)}s ${l.text}`).join('\n');
+      const j: Record<string, unknown> = {};
+      toJudge.push(async () => Object.assign(j, await judge(video, heroPic, storyText, lyricText)));
       const painted = drawn.filter(Boolean).length;
       results.push({
         id: c.id,
@@ -206,7 +211,7 @@ async function main() {
         seconds: { plan: Math.round((t1 - t0) / 1000), paint: Math.round((t2 - t1) / 1000), render: Math.round((t3 - t2) / 1000) },
         judge: j,
       });
-      console.log(`${c.id}: overall ${(j as { overall?: number }).overall ?? '?'} — ${painted}/${story.scenes.length} painted in ${Math.round((t2 - t1) / 1000)}s`);
+      console.log(`${c.id}: ${painted}/${story.scenes.length} painted in ${Math.round((t2 - t1) / 1000)}s`);
     } catch (e) {
       results.push({ id: c.id, ok: false, error: String(e).slice(0, 300) });
       console.log(`${c.id}: FAILED ${String(e).slice(0, 300)}`);
@@ -214,6 +219,7 @@ async function main() {
       await rm(dir, { recursive: true, force: true });
     }
   }
+  for (const go of toJudge) await go();
   const keys = ['overall', 'heroLikeness', 'heroConsistency', 'pictureQuality', 'storyTelling', 'lyricFit', 'beatSync', 'variety', 'watchability', 'kidsSafe'];
   const ok = results.filter((r) => r.ok) as { id: string; judge: Record<string, unknown>; scenes: number; painted: number; seconds: Record<string, number> }[];
   const avg = Object.fromEntries(keys.map((k) => [k, Math.round((ok.reduce((a, r) => a + (Number(r.judge[k]) || 0), 0) / Math.max(1, ok.length)) * 10) / 10]));
