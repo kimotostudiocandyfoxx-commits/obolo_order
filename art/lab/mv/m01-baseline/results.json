@@ -1,0 +1,131 @@
+{
+  "round": "m01-baseline",
+  "hero": "creature, chibi, animal ears, fox ears, white mask, glowing blue eyes, blue markings, hooded robe, red robe, multiple tails, white tails, black tails, orange tails, paw gloves, white paws, blue paw pads, gem brooch, fantasy creature",
+  "avg": {
+    "overall": 6.2,
+    "heroLikeness": 6.9,
+    "heroConsistency": 5.8,
+    "pictureQuality": 6.6,
+    "storyTelling": 5.5,
+    "lyricFit": 6,
+    "beatSync": 5.5,
+    "variety": 5.9,
+    "watchability": 6.2,
+    "kidsSafe": 7.5
+  },
+  "results": [
+    {
+      "id": "pop-bright",
+      "ok": true,
+      "song": "pop-bright",
+      "scenes": 11,
+      "painted": 11,
+      "seconds": {
+        "plan": 3,
+        "paint": 600,
+        "render": 14
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 5.9,
+        "pictureQuality": 7.2,
+        "storyTelling": 5.8,
+        "lyricFit": 6.7,
+        "beatSync": 6,
+        "variety": 6.1,
+        "watchability": 6.4,
+        "kidsSafe": 8,
+        "overall": 6.3,
+        "problems": [
+          "0:12 Human schoolgirl abruptly replaces the hero character.",
+          "0:24 Digital RGB split glitch disrupts the soft anime aesthetic.",
+          "0:32 Close-up repetition with heavy glitch artifacts."
+        ],
+        "fixIdeas": [
+          "Replace scene 4 with hero interacting with nature.",
+          "Remove chromatic aberration and glitch filters across all cuts.",
+          "Introduce secondary actions or props to enhance visual variety."
+        ],
+        "bestMoments": [
+          "0:00 Cozy and expressive morning wake-up cut.",
+          "0:28 Dynamic joy jump synchronizing with chorus energy."
+        ]
+      }
+    },
+    {
+      "id": "rock-run",
+      "ok": true,
+      "song": "rock-run",
+      "scenes": 6,
+      "painted": 6,
+      "seconds": {
+        "plan": 2,
+        "paint": 588,
+        "render": 16
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 5,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 5,
+        "beatSync": 5,
+        "variety": 6,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:14 timing mismatch with lyrics describing falling earlier in song",
+          "00:37 abrupt replacement of protagonist with unrelated human character"
+        ],
+        "fixIdeas": [
+          "Realign image cuts to match specific lyric actions like falling and standing",
+          "Keep hero present in the final stargazing shot for narrative continuity"
+        ],
+        "bestMoments": [
+          "00:01 energetic running animation matching the song intro",
+          "00:25 dynamic power-up pose at the musical climax"
+        ]
+      }
+    },
+    {
+      "id": "ballad-night",
+      "ok": true,
+      "song": "ballad-night",
+      "scenes": 8,
+      "painted": 8,
+      "seconds": {
+        "plan": 2,
+        "paint": 587,
+        "render": 12
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.5,
+        "pictureQuality": 6.7,
+        "storyTelling": 5.8,
+        "lyricFit": 6.4,
+        "beatSync": 5.4,
+        "variety": 5.6,
+        "watchability": 6.2,
+        "kidsSafe": 7.4,
+        "overall": 6.3,
+        "problems": [
+          "00:33 sudden appearance of human girl without prior setup",
+          "00:39 chromatic glitch filter clashes with calm art style",
+          "00:14 empty background shot lingers without character engagement"
+        ],
+        "fixIdeas": [
+          "Establish connection with the companion character earlier in storyboard",
+          "Replace glitch effect with soft glowing particle transitions",
+          "Add subtle character animation instead of basic camera pans"
+        ],
+        "bestMoments": [
+          "00:00 charming character introduction in midnight street",
+          "00:06 tranquil library scene showing memory motif",
+          "00:45 warm sunset conclusion balancing the night theme"
+        ]
+      }
+    }
+  ]
+}
