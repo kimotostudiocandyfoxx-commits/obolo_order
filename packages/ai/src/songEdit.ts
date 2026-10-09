@@ -9,7 +9,7 @@
  *  - VOICE_REPLACE      lines sung by the other registered voice      → Fish for those lines only
  *  - TIMING_EDIT        vocal entry delay, silence after a line       → re-mix only (no AI cost)
  *  - GENRE_EDIT         a new instrumental with the same key / tempo  → ACE-Step only, vocal kept
- *  - SONG_EXTEND        2番 / 大サビ / ~2-minute version: new lines     → ACE-Step continues the song
+ *  - SONG_EXTEND        2番 / 大サビ / ~2-minute version: new lines     → the longer song sung again
  *  - CHAT               a question / unclear request                  → answer only
  */
 import { SongEditCommand, type SongEditAction, type SongMix, type SongPhrase } from '@obolo/shared';
@@ -60,7 +60,7 @@ ${lines}
 - VOICE_REPLACE: 行を別の声で歌い直す。"indexes": [行番号…], "voice": "self"（自分の声）か "bati"（バティの声）。「声B」「叫び・エモい方」はバティの声のこと。
 - TIMING_EDIT: タイミング。"delay_beats": 歌い出しを今から何拍遅らせるか（早めるならマイナス）。"gap_after": 行番号, "gap_seconds": その行の後の間の秒数（0 で間をなくす）。
 - GENRE_EDIT: 歌詞と歌はそのままで伴奏だけ作り直す。"prompt": 新しい伴奏の英語の指示（genre, instruments, mood）。BPM とキーは変えられない（自動で今のものが付く）。"no vocals" を含める。
-- SONG_EXTEND: 曲を長くする。今の曲はそのまま残して、後ろに新しいパートを足す。"kind" と "sections"（足すパートと新しい歌詞）を出す。
+- SONG_EXTEND: 曲を長くする。今の歌詞はそのままで、後ろに新しいパートを足した長い版を歌い直す（1番の歌い方も少し変わる）。"kind" と "sections"（足すパートと新しい歌詞）を出す。
   - "second"（2番を作りたい）: [{"name":"verse","lines":[新しいAメロ4行]},{"name":"chorus","lines":[サビ4行。1番のサビを少し変えてもよい]}]
   - "bigchorus"（大サビ・Cメロ・ラスサビを作りたい）: [{"name":"bridge","lines":[盛り上がるCメロ2〜4行]},{"name":"chorus","lines":[ラストのサビ4行]}]
   - "long"（2分の曲にしたい・フルで聴きたい）: 2番と大サビの両方: verse, chorus, bridge, chorus の4つ。

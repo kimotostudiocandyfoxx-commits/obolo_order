@@ -465,23 +465,15 @@ export class SongService {
       // LYRICS_EDIT / GENRE_EDIT: the whole song again; SONG_EXTEND: the song kept, new parts sung after it
       if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
       let lines = phrases.map((p) => ({ section: p.section, text: p.text }));
-      let extend: { src: Buffer; keep: number } | undefined;
       let length = design.seconds;
       if (command.action === 'SONG_EXTEND') {
+        // studio lab r03 (2026-10-09): singing the longer song again with all the lines (8.5–9 / 10)
+        // beat continuing the kept song with a repaint (4.5–5: the new lines were not sung) → again
         const added = command.sections.flatMap((sec) => sec.lines.map((text) => ({ section: sec.name, text })));
         if (lines.length + added.length > 48) return { reply: say('もうこれ以上は長くできないみたい…！', 'もうこれ以上は長くできないケン…！'), action: 'CHAT', song: this.view(row) };
         if ((await moderateText(added.map((l) => l.text).join('\n'), this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sung');
-        const src = await this.media.audioByUrl(userId, row.mixUrl);
-        if (!src) throw apiError(HttpStatus.NOT_FOUND, 'SONG_NOT_FOUND', 'The song is missing');
-        const spb = 60 / design.bpm;
-        const tempo = mix.tempo || 1;
-        // keep the song up to just after its last sung line (its ending fades out, so not that)
-        const last = phrases[phrases.length - 1];
-        const lastEnd = last ? (last.startBeat * spb + last.seconds) / tempo : row.seconds - 3;
-        const keep = Math.max(5, Math.min(row.seconds - 1.5, lastEnd + 1));
-        // two bars a new line, plus a two-bar ending
-        length = Math.min(180, Math.round((keep + (added.length * 2 + 2) * 4 * spb) * 10) / 10);
-        extend = { src, keep };
+        // two bars a new line on top of the song as it is
+        length = Math.min(180, Math.round((design.seconds + added.length * 2 * 4 * (60 / design.bpm)) * 10) / 10);
         lines = [...lines, ...added];
         design.seconds = length;
       } else if (command.action === 'LYRICS_EDIT') {
@@ -513,7 +505,7 @@ export class SongService {
           seconds: Math.max(10, Math.min(180, length)),
           prompt: design.instrumentalPrompt,
           voice: await this.voiceSample(userId),
-        }, extend);
+        });
       } catch (e) {
         if (e instanceof HttpException && (e.getResponse() as { error?: { code?: string } })?.error?.code === 'MUSIC_WARMING') {
           return {
