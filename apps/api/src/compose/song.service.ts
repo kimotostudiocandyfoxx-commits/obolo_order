@@ -26,8 +26,12 @@ interface StoredDesign {
   lineMelody: { midi: number | null; beats: number }[][];
   /** 'acestep' = sung by the music studio as one take (2026-10-09); absent = Fish line by line */
   engine?: 'acestep';
-  /** acestep: the vocal stem (HTDemucs) — the instrumental stem is songs.instrumental_url */
+  /** acestep: the vocal stem (HTDemucs; in the member's voice when Seed-VC could) — the instrumental stem is songs.instrumental_url */
   vocalsUrl?: string;
+  /** acestep: the studio's own vocal before the voice change (for swapping voices later) */
+  guideUrl?: string;
+  /** acestep: whether the vocal is in the member's voice */
+  voiced?: boolean;
 }
 
 /** What the music studio is asked for: the design's sound, with a lead vocal (not "no vocals"). */
@@ -191,11 +195,12 @@ export class SongService {
     if ((await moderateText(lyrics)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sung');
     if (!this.cfg.MUSIC_URL) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'MUSIC_OFF', 'The music studio is not connected yet');
     const prompt = songPrompt(body.instrumentalPrompt);
-    const made = await generateSong(this.cfg.MUSIC_URL, { ...body, prompt });
-    const [mixM, vocM, instM] = await Promise.all([
+    const made = await generateSong(this.cfg.MUSIC_URL, { ...body, prompt, voice: await this.voiceSample(userId) });
+    const [mixM, vocM, instM, guideM] = await Promise.all([
       this.media.storeAudio(userId, 'audio/mp4', made.mix, origin),
       this.media.storeAudio(userId, 'audio/mp4', made.vocals, origin),
       this.media.storeAudio(userId, 'audio/mp4', made.instrumental, origin),
+      this.media.storeAudio(userId, 'audio/mp4', made.guide, origin),
     ]);
     const lines = body.sections.flatMap((s) => s.lines.map((l) => ({ section: s.name, text: l.text })));
     const phrases = timedPhrases(lines, made, body.bpm, vocM.url);
@@ -211,6 +216,8 @@ export class SongService {
       lineMelody: [],
       engine: 'acestep',
       vocalsUrl: vocM.url,
+      guideUrl: guideM.url,
+      voiced: made.voiced,
     };
     const mix: SongMix = { ...DEFAULT_MIX, gaps: phrases.map(() => 0) };
     const [row] = await this.db.write
@@ -227,8 +234,16 @@ export class SongService {
         seconds: made.seconds,
       })
       .returning();
-    this.log.log(`song ${row.id} ${userId} "${body.title}" sung by the studio, ${phrases.length} lines (${made.lines.length} timed) ${made.seconds}s`);
+    this.log.log(
+      `song ${row.id} ${userId} "${body.title}" sung by the studio (${made.voiced ? 'member voice' : 'studio voice'}: ${made.voiceNote}), ${phrases.length} lines (${made.lines.length} timed) ${made.seconds}s`,
+    );
     return this.view(row);
+  }
+
+  /** The member's own voice recording (Seed-VC reference), if they registered after 2026-10-09. */
+  private async voiceSample(userId: string): Promise<Buffer | null> {
+    const [u] = await this.db.read.select({ url: users.voiceSelfUrl }).from(users).where(eq(users.id, userId));
+    return u?.url ? await this.media.audioByUrl(userId, u.url) : null;
   }
 
   /** One lyric line → Fish (its own call) → trimmed MP3 on Bunny. */
@@ -478,6 +493,7 @@ export class SongService {
           progression: design.progression,
           seconds: Math.max(10, Math.min(180, design.seconds)),
           prompt: design.instrumentalPrompt,
+          voice: await this.voiceSample(userId),
         });
       } catch (e) {
         if (e instanceof HttpException && (e.getResponse() as { error?: { code?: string } })?.error?.code === 'MUSIC_WARMING') {
@@ -491,11 +507,15 @@ export class SongService {
         }
         throw e;
       }
-      const [mixM, vocM, instM] = await Promise.all([
+      const [mixM, vocM, instM, guideM] = await Promise.all([
         this.media.storeAudio(userId, 'audio/mp4', made.mix, origin),
         this.media.storeAudio(userId, 'audio/mp4', made.vocals, origin),
         this.media.storeAudio(userId, 'audio/mp4', made.instrumental, origin),
+        this.media.storeAudio(userId, 'audio/mp4', made.guide, origin),
       ]);
+      if (design.guideUrl && !row.savedAt) void this.media.removeByUrl(userId, design.guideUrl).catch(() => undefined);
+      design.guideUrl = guideM.url;
+      design.voiced = made.voiced;
       mixUrl = mixM.url;
       vocalsUrl = vocM.url;
       instrumentalUrl = instM.url;

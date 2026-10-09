@@ -65,7 +65,7 @@ export class VoiceService {
     return slot === 'self' ? 'voiceSelfId' : 'voiceBatiId';
   }
 
-  async register(userId: string, body: RegisterVoiceBody): Promise<Me> {
+  async register(userId: string, body: RegisterVoiceBody, origin: string): Promise<Me> {
     const key = this.key();
     const raw = Buffer.from(body.audio.data, 'base64');
     if (raw.length < 5_000) throw apiError(HttpStatus.BAD_REQUEST, 'VOICE_TOO_SHORT', 'The recording is too short');
@@ -80,12 +80,17 @@ export class VoiceService {
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
     const id = await createVoiceModel(key, { title: `obolo-${userId.slice(0, 8)}-${body.slot}`, audio: mp3, filename: `${body.slot}.mp3`, mime: 'audio/mpeg', text: VOICE_SCRIPTS[body.slot] });
     const old = u[this.col(body.slot)];
+    // the recording itself is kept too: songs are sung in it (Seed-VC reference, 2026-10-09)
+    const sample = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
+    const urlCol = body.slot === 'self' ? 'voiceSelfUrl' : 'voiceBatiUrl';
+    const oldSample = u[urlCol];
     const [nu] = await this.db.write
       .update(users)
-      .set({ [this.col(body.slot)]: id, updatedAt: new Date() })
+      .set({ [this.col(body.slot)]: id, [urlCol]: sample.url, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     if (old && old !== id) void deleteVoiceModel(key, old);
+    if (oldSample && oldSample !== sample.url) void this.media.removeByUrl(userId, oldSample).catch(() => undefined);
     this.log.log(`voice ${body.slot} registered for ${userId}`);
     return toMe(nu);
   }

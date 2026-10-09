@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [claude/solar-system-home-planets-ew766y]
-    paths: ['scripts/music-lab/**', '.github/workflows/music-lab.yml']
+    paths: ['scripts/music-lab/**', '.github/workflows/music-lab.yml', 'gpu/music/svc_worker.py']
 
 jobs:
   test:
@@ -27,3 +27,40 @@ jobs:
           pip install --quiet julius einops "dora-search>=0.1.12" pyyaml tqdm
       - name: Test
         run: python scripts/music-lab/test_song.py
+
+  seedvc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Seed-VC (same pins as gpu/music/Dockerfile, CPU torch)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          git clone -q https://github.com/Plachtaa/seed-vc.git /tmp/seedvc && cd /tmp/seedvc && git checkout -q 51383efd921027683c89e5348211d93ff12ac2a8
+          pip install --quiet "torch==2.4.0" "torchaudio==2.4.0" --index-url https://download.pytorch.org/whl/cpu
+          pip install --quiet "scipy==1.13.1" "librosa==0.10.2" "huggingface-hub>=0.28.1" "munch==4.0.0" "einops==0.8.0" \
+            "descript-audio-codec==1.0.0" "transformers==4.46.3" "soundfile==0.12.1" "numpy==1.26.4" pyyaml matplotlib tqdm
+      - name: Convert a sung vocal into another voice
+        run: |
+          mkdir -p art/lab/voice
+          cd /tmp/seedvc
+          APP_DIR=$GITHUB_WORKSPACE/gpu/music OUT=$GITHUB_WORKSPACE/art/lab/voice/converted.wav python $GITHUB_WORKSPACE/scripts/music-lab/test_seedvc.py
+          cd $GITHUB_WORKSPACE
+          ffmpeg -y -loglevel error -i "/tmp/seedvc/examples/source/TECHNOPOLIS - 2085 [vocals]_[cut_14sec].wav" -c:a aac -b:a 128k art/lab/voice/1-source.m4a
+          ffmpeg -y -loglevel error -i /tmp/seedvc/examples/reference/s1p1.wav -c:a aac -b:a 128k art/lab/voice/2-reference.m4a
+          ffmpeg -y -loglevel error -i art/lab/voice/converted.wav -c:a aac -b:a 128k art/lab/voice/3-converted.m4a && rm art/lab/voice/converted.wav
+      - name: Save the samples to the branch
+        if: success()
+        run: |
+          git config user.name "music-lab"
+          git config user.email "music-lab@users.noreply.github.com"
+          git add -f art/lab/voice
+          git diff --cached --quiet && exit 0
+          git commit -m "Music lab: Seed-VC sample [skip ci]"
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
+

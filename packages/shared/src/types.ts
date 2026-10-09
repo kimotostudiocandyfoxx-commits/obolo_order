@@ -26,8 +26,9 @@ export interface Me {
   bati: BatiView | null;
   /** Day 9: when the Eclipse was paid for (null = not yet). */
   orderedAt: string | null;
-  /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice. */
-  voices: { self: boolean; bati: boolean };
+  /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice.
+   *  `selfSings` = the recording is kept, so songs are sung in it (Seed-VC; registered before 2026-10-09 = no). */
+  voices: { self: boolean; bati: boolean; selfSings?: boolean };
   /** the round ぷにぷに character (null until dressed on the profile) */
   look: PuniLook | null;
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
@@ -41,9 +42,7 @@ export interface Me {
  * Day 9 "エクリプス" payment (¥88/month). `stripe`: mount Stripe Embedded Checkout with the client
  * secret, then confirm the session. `demo`: billing is not configured — confirm with /me/order.
  */
-export type OrderCheckout =
-  | { mode: 'stripe'; publishableKey: string; clientSecret: string; sessionId: string }
-  | { mode: 'demo' };
+export type OrderCheckout = { mode: 'stripe'; publishableKey: string; clientSecret: string; sessionId: string } | { mode: 'demo' };
 
 export interface BatiView {
   /** favourite food the egg was made from */
@@ -70,9 +69,7 @@ export interface NeoLookResult {
 export type EntryKind = 'member' | 'invited';
 
 /** POST /auth/verify returns a session for members, or the invitation to start Day 1 for invitees. */
-export type VerifyResult =
-  | { kind: 'member'; token: string; user: Me }
-  | { kind: 'invited'; inviteCode: string; inviterName: string };
+export type VerifyResult = { kind: 'member'; token: string; user: Me } | { kind: 'invited'; inviteCode: string; inviterName: string };
 
 export interface InviteView {
   code: string;

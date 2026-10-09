@@ -19,9 +19,9 @@ export class VoiceController {
 
   @Post('register')
   @HttpCode(200)
-  async register(@UserId() userId: string, @Body() body: unknown) {
+  async register(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-reg:${userId}`, 10, 86400);
-    return this.voice.register(userId, parseBody(RegisterVoiceBody, body));
+    return this.voice.register(userId, parseBody(RegisterVoiceBody, body), `${req.protocol}://${req.get('host')}`);
   }
 
   /** Mic first: the words of a recording (PLACEHOLDER P-VOICE-7: 200 a day). */

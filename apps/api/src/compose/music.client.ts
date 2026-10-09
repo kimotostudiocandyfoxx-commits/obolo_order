@@ -70,12 +70,17 @@ export type MadeSong = {
   /** when each lyric line is sung (may be empty if the alignment failed) */
   lines: { text: string; start: number; end: number }[];
   mix: Buffer;
+  /** the vocal as delivered (in the member's voice when `voiced`) */
   vocals: Buffer;
+  /** the studio's own vocal (kept so a voice can be swapped without singing again) */
+  guide: Buffer;
   instrumental: Buffer;
+  voiced: boolean;
+  voiceNote: string;
 };
 
 /** Ask the GPU service for the whole song with vocals (ACE-Step) split by HTDemucs. AAC bytes. */
-export async function generateSong(baseUrl: string, body: FullSongBody & { prompt: string }): Promise<MadeSong> {
+export async function generateSong(baseUrl: string, body: FullSongBody & { prompt: string; voice?: Buffer | null; similarity?: number }): Promise<MadeSong> {
   const url = baseUrl.replace(/\/$/, '');
   const token = await idToken(url);
   let res: Response;
@@ -91,6 +96,8 @@ export async function generateSong(baseUrl: string, body: FullSongBody & { promp
         keyRoot: body.keyRoot,
         scale: body.scale,
         language: 'ja',
+        // the member's recording: Seed-VC sings the song in their voice (zero-shot)
+        ...(body.voice ? { voice: body.voice.toString('base64'), similarity: body.similarity ?? 0.7 } : {}),
       }),
       signal: AbortSignal.timeout(600_000),
     });
@@ -104,13 +111,26 @@ export async function generateSong(baseUrl: string, body: FullSongBody & { promp
     log.warn(`music service ${res.status}: ${text}`);
     throw apiError(HttpStatus.BAD_GATEWAY, 'MUSIC_FAILED', `The song could not be made (${res.status}): ${text}`);
   }
-  const j = (await res.json()) as { seconds: number; lines?: MadeSong['lines']; mix: string; vocals: string; instrumental: string; timings?: unknown };
-  log.log(`song made ${j.seconds}s, ${j.lines?.length ?? 0} line times ${JSON.stringify(j.timings ?? {})}`);
+  const j = (await res.json()) as {
+    seconds: number;
+    lines?: MadeSong['lines'];
+    mix: string;
+    vocals: string;
+    guide?: string;
+    instrumental: string;
+    voiced?: boolean;
+    voiceNote?: string;
+    timings?: unknown;
+  };
+  log.log(`song made ${j.seconds}s, ${j.lines?.length ?? 0} line times, voice: ${j.voiced ? 'member' : 'studio'} (${j.voiceNote ?? ''}) ${JSON.stringify(j.timings ?? {})}`);
   return {
     seconds: Number(j.seconds) || body.seconds,
     lines: Array.isArray(j.lines) ? j.lines : [],
     mix: Buffer.from(j.mix, 'base64'),
     vocals: Buffer.from(j.vocals, 'base64'),
+    guide: Buffer.from(j.guide ?? j.vocals, 'base64'),
+    voiced: !!j.voiced,
+    voiceNote: String(j.voiceNote ?? ''),
     instrumental: Buffer.from(j.instrumental, 'base64'),
   };
 }

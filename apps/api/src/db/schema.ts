@@ -64,6 +64,9 @@ export const users = pgTable(
      *  their own voice (Saturn, singing) and the voice they gave Bati (a changed voice). */
     voiceSelfId: text('voice_self_id'),
     voiceBatiId: text('voice_bati_id'),
+    /** the recordings themselves (2026-10-09): the voice reference Seed-VC sings songs in */
+    voiceSelfUrl: text('voice_self_url'),
+    voiceBatiUrl: text('voice_bati_url'),
     voiceId: text('voice_id'),
     virtualAccountNo: text('virtual_account_no'),
     kycStatus: text('kyc_status').notNull().default('none'),

@@ -407,9 +407,10 @@ function SongCard({
 /**
  * Step 2 of composing (client decision 2026-10-09): the whole song sung by the music studio on the
  * GPU (Cloud Run L4) — ACE-Step makes the song with the lyrics, HTDemucs splits vocals and
- * instrumental. A cold GPU needs a while to start: the card shows what it is doing and starts by itself.
+ * instrumental, Seed-VC turns the vocal into the member's registered voice. A cold GPU needs a while to start: the card shows what it is doing and starts by itself.
  */
 function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => void }) {
+  const { me } = useAuth();
   const [state, setState] = useState<'idle' | 'working' | 'warming' | 'error'>('idle');
   const [err, setErr] = useState('');
   const [status, setStatus] = useState('');
@@ -493,6 +494,11 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
         </p>
       )}
       {state === 'error' && <p className="mt-1.5 whitespace-pre-wrap text-[11px] text-rose-300">うまく作れなかった。{err}</p>}
+      {state === 'idle' && !me?.voices?.selfSings && (
+        <a href="/voice" className="mt-2 block text-[11px] text-fuchsia-200/80 underline">
+          {me?.voices?.self ? '🎤 声を登録しなおすと、あなたの声で歌うよ →' : '🎤 声を登録すると、あなたの声で歌うよ →'}
+        </a>
+      )}
     </div>
   );
 }

@@ -23,7 +23,19 @@ ENV PATH=/opt/ace/.venv/bin:$PATH \
     HF_HOME=/models/hf \
     MUSIC_ENGINE=acestep15 \
     PYTHONUNBUFFERED=1 PORT=8080
+# Seed-VC (GPL-3.0): zero-shot singing voice conversion into the member's voice (svc_worker.py).
+# Its own environment, as Seed-VC pins them (PyTorch 2.4, transformers 4.46); the checkpoints
+# (singing DiT, BigVGAN, Whisper, RMVPE, CAM++) are baked in under /opt/seedvc/checkpoints.
+ARG SEEDVC_REF=51383efd921027683c89e5348211d93ff12ac2a8
+RUN git clone https://github.com/Plachtaa/seed-vc.git /opt/seedvc && cd /opt/seedvc && git checkout "$SEEDVC_REF" \
+ && uv venv /opt/svc --python /usr/local/bin/python3.11 \
+ && uv pip install --python /opt/svc/bin/python "torch==2.4.0" "torchaudio==2.4.0" --index-url https://download.pytorch.org/whl/cu121 \
+ && uv pip install --python /opt/svc/bin/python "scipy==1.13.1" "librosa==0.10.2" "huggingface-hub>=0.28.1" "munch==4.0.0" "einops==0.8.0" \
+      "descript-audio-codec==1.0.0" "transformers==4.46.3" "soundfile==0.12.1" "numpy==1.26.4" pyyaml matplotlib tqdm \
+ && rm -rf /root/.cache/uv
+COPY svc_worker.py /app/svc_worker.py
+RUN cd /opt/seedvc && /opt/svc/bin/python /app/svc_worker.py download
 WORKDIR /app
-COPY app.py render.py ./
+COPY app.py render.py svc_worker.py ./
 # model weights are cached on the Cloud Storage volume mounted at /models (downloaded on first start)
 CMD exec python -m uvicorn app:app --host 0.0.0.0 --port ${PORT} --workers 1

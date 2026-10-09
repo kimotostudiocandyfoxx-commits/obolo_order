@@ -78,13 +78,14 @@ jobs:
 
       # MUSIC_MIN_INSTANCES=1 keeps one GPU awake (no cold start, billed around the clock).
       # Cold start: the weights (~10 GB) are copied from the bucket into memory in parallel
-      # (CKPT_BUCKET, app.py copy_weights), hence 24 GiB of memory (6 CPUs are needed for that).
+      # (CKPT_BUCKET, app.py copy_weights), and the Seed-VC worker runs next to ACE-Step: 32 GiB
+      # of memory (Cloud Run needs 8 CPUs for that).
       - name: Deploy (GPU)
         run: |
           gcloud beta run deploy "$SERVICE" --image "$IMAGE" --region "$REGION" --quiet \
             --no-allow-unauthenticated --service-account "$MUSIC_SA" \
             --gpu 1 --gpu-type nvidia-l4 --no-gpu-zonal-redundancy \
-            --cpu 6 --memory 24Gi --no-cpu-throttling \
+            --cpu 8 --memory 32Gi --no-cpu-throttling \
             --concurrency 1 --min-instances ${{ vars.MUSIC_MIN_INSTANCES || '0' }} --max-instances 1 --timeout 900 \
             --add-volume name=models,type=cloud-storage,bucket="$BUCKET" \
             --add-volume-mount volume=models,mount-path=/models \

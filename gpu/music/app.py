@@ -2,9 +2,11 @@
 OBOLO ORDER — Mercury instrumental generator (Cloud Run with an NVIDIA L4 GPU).
 
 POST /generate  {prompt, seconds, bpm, keyRoot, scale, progression, melody}  → audio/mp4 (AAC)
-POST /song      {prompt, lyrics, seconds, bpm, keyRoot, scale, language} → JSON: the whole song sung
-                (ACE-Step with the lyrics), split by HTDemucs into vocals + instrumental, and the time
-                of every lyric line (client decision 2026-10-09: replaces Fish line-by-line singing)
+POST /song      {prompt, lyrics, seconds, bpm, keyRoot, scale, language, voice?} → JSON: the whole song
+                sung (ACE-Step with the lyrics), split by HTDemucs into vocals + instrumental, the
+                time of every lyric line, and — with `voice` (the member's recording) — the vocal
+                turned into their voice by Seed-VC (svc_worker.py, zero-shot) and mixed again
+                (client decisions 2026-10-09: replace Fish line-by-line singing)
 GET  /health    → {ready, loading, error, engine}
 
 Only the API's service account may call it (Cloud Run IAM, no public access). The model loads in a
@@ -18,6 +20,7 @@ ENGINE (MUSIC_ENGINE):
             a cover source; off by default (the v1 test with the guide came out muffled / noisy).
   musicgen  — MusicGen-Melody (CC-BY-NC weights: tests only, never for the paid service).
 """
+import json
 import os
 import subprocess
 import sys
@@ -218,6 +221,87 @@ def separate(wav_path: str, out_dir: str) -> tuple[str, str]:
     return paths[0], paths[1]
 
 
+# --- Seed-VC (svc_worker.py, its own environment) ----------------------------------------------------
+
+SVC_PORT = int(os.environ.get("SVC_PORT", "8091"))
+SVC_PYTHON = os.environ.get("SVC_PYTHON", "/opt/svc/bin/python")
+SVC_DIR = os.environ.get("SVC_DIR", "/opt/seedvc")
+_svc_proc = None
+
+
+def start_svc() -> None:
+    """Start the Seed-VC worker next to us (if it is installed)."""
+    global _svc_proc
+    if not (os.path.exists(SVC_PYTHON) and os.path.isdir(SVC_DIR)):
+        print("seed-vc not installed: songs keep the studio's voice", flush=True)
+        return
+    env = {**os.environ, "SVC_PORT": str(SVC_PORT), "HF_HUB_OFFLINE": "1", "PYTHONUNBUFFERED": "1"}
+    _svc_proc = subprocess.Popen([SVC_PYTHON, os.path.join(os.path.dirname(os.path.abspath(__file__)), "svc_worker.py")], cwd=SVC_DIR, env=env)
+
+
+def svc_call(method: str, path: str, body: dict | None = None, timeout: float = 5) -> dict:
+    import urllib.error
+    import urllib.request
+
+    req = urllib.request.Request(f"http://127.0.0.1:{SVC_PORT}{path}", method=method, data=json.dumps(body).encode() if body is not None else None, headers={"content-type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read() or b"{}")
+    except urllib.error.HTTPError as e:
+        return json.loads(e.read() or b"{}") | {"ok": False, "status": e.code}
+
+
+def svc_health() -> dict:
+    if _svc_proc is None:
+        return {"ready": False, "error": "not installed"}
+    if _svc_proc.poll() is not None:
+        return {"ready": False, "error": f"exited ({_svc_proc.returncode})"}
+    try:
+        return svc_call("GET", "/health")
+    except Exception as e:  # noqa: BLE001
+        return {"ready": False, "error": f"starting ({e!r})"[:120]}
+
+
+def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float) -> tuple[str | None, str]:
+    """The sung vocal in the member's voice (Seed-VC), or (None, why) to keep the studio's voice."""
+    import base64
+
+    h = svc_health()
+    if not h.get("ready"):
+        # the worker loads with the engine: give it a little more time on a cold start
+        for _ in range(60):
+            time.sleep(2)
+            h = svc_health()
+            if h.get("ready") or (h.get("error") and "starting" not in str(h.get("error"))):
+                break
+    if not h.get("ready"):
+        return None, f"seed-vc not ready: {h.get('error')}"
+    ref_raw = os.path.join(out_dir, "voice.in")
+    with open(ref_raw, "wb") as f:
+        f.write(base64.b64decode(voice_b64))
+    ref = os.path.join(out_dir, "voice.wav")
+    # the reference: mono 44.1 kHz, silences trimmed, at most 25 s
+    trim = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.05"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ref_raw, "-af", f"{trim},areverse,{trim},areverse", "-t", "25", "-ac", "1", "-ar", "44100", ref], check=True)
+    src = os.path.join(out_dir, "vocals-mono.wav")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vocals, "-ac", "1", "-ar", "44100", src], check=True)
+    out = os.path.join(out_dir, "vocals-member.wav")
+    res = svc_call("POST", "/convert", {"source": src, "target": ref, "out": out, "steps": 30, "cfg": cfg}, timeout=600)
+    if not res.get("ok"):
+        return None, f"seed-vc failed: {res.get('error')}"
+    return out, f"octave shift {res.get('shift', 0)}, {res.get('seconds')}s"
+
+
+def mix_stems(inst: str, vocals: str, out: str, seconds: float) -> None:
+    """Instrumental + (converted) vocal → the song: a little compression and room on the voice."""
+    fade_at = max(0.0, seconds - 1.5)
+    graph = (
+        "[1:a]highpass=f=80,acompressor=threshold=-18dB:ratio=3:attack=5:release=80,aecho=0.8:0.6:60|120:0.12|0.06,volume=1.15[v];"
+        f"[0:a][v]amix=inputs=2:duration=longest:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=11,afade=t=out:st={fade_at:.2f}:d=1.5[o]"
+    )
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", inst, "-i", vocals, "-filter_complex", graph, "-map", "[o]", "-t", f"{seconds:.2f}", "-ar", "44100", out], check=True)
+
+
 class MusicGen:
     max_seconds = 30
 
@@ -360,6 +444,7 @@ def load() -> None:
 @app.on_event("startup")
 def start() -> None:
     threading.Thread(target=load, daemon=True).start()
+    start_svc()
 
 
 # --- API ------------------------------------------------------------------------------------------
@@ -393,6 +478,10 @@ class SongReq(BaseModel):
     keyRoot: int = Field(0, ge=0, le=11)
     scale: str = "major"
     language: str = Field("ja", max_length=8)
+    # the member's voice recording (base64, any ffmpeg format, ≤ ~30 s) → Seed-VC; absent = studio voice
+    voice: str | None = Field(None, max_length=3_000_000)
+    # how close to the member's voice (Seed-VC classifier-free guidance, 0–1)
+    similarity: float = Field(0.7, ge=0, le=1)
 
 
 @app.get("/health")
@@ -412,6 +501,7 @@ def health():
         "checkpointGB": round(dir_bytes(CKPT_DIR) / 1e9, 2) if os.path.isdir(CKPT_DIR) else 0,
         "cuda": cuda,
         "error": state["error"],
+        "voice": svc_health(),
     }
 
 
@@ -479,20 +569,35 @@ def song(r: SongReq):
             t1 = time.time()
             vocals, inst = separate(wav, d)
             t2 = time.time()
-            # the delivered mix: ACE-Step's own, faded at the end
             mix = os.path.join(d, "mix.wav")
-            fade_at = max(0.0, r.seconds - 1.5)
-            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{r.seconds:.2f}", "-af", f"afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
+            voiced, how = (None, "no voice sent")
+            if r.voice:
+                try:
+                    voiced, how = to_voice(vocals, r.voice, d, r.similarity)
+                except Exception as e:  # noqa: BLE001 — the song is still delivered in the studio's voice
+                    traceback.print_exc()
+                    voiced, how = None, f"seed-vc error: {e!r}"[:200]
+            t3 = time.time()
+            if voiced:
+                mix_stems(inst, voiced, mix, r.seconds)
+            else:
+                # the studio's own mix, faded at the end
+                fade_at = max(0.0, r.seconds - 1.5)
+                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{r.seconds:.2f}", "-af", f"afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
             payload = {
                 "seconds": r.seconds,
                 "lines": lines,
                 "mix": base64.b64encode(file_m4a(mix)).decode(),
-                "vocals": base64.b64encode(file_m4a(vocals)).decode(),
+                "vocals": base64.b64encode(file_m4a(voiced or vocals)).decode(),
+                # the studio's own vocal (kept so a voice can be swapped later without singing again)
+                "guide": base64.b64encode(file_m4a(vocals)).decode(),
                 "instrumental": base64.b64encode(file_m4a(inst)).decode(),
-                "timings": {"song": round(t1 - t0, 1), "split": round(t2 - t1, 1)},
+                "voiced": bool(voiced),
+                "voiceNote": how,
+                "timings": {"song": round(t1 - t0, 1), "split": round(t2 - t1, 1), "voice": round(t3 - t2, 1)},
             }
     except Exception as e:  # noqa: BLE001
         traceback.print_exc()
         raise HTTPException(500, f"song failed: {e!r}"[:400]) from e
-    print(f"song: {len(r.lyrics)} lines, {r.seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, {len(lines)} line times", flush=True)
+    print(f"song: {len(r.lyrics)} lines, {r.seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, voice {t3 - t2:.1f}s ({how}), {len(lines)} line times", flush=True)
     return payload
