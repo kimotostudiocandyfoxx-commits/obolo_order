@@ -600,6 +600,9 @@ class SongReq(BaseModel):
     # with a member's recording: the studio sings in the member's register (male / female vocal from
     # the recording's pitch), so Seed-VC needs no octave jump (r02: octave jumps sounded robotic)
     matchVoice: bool = True
+    # takes sung; Whisper hears each and the one that sang the lyrics best is kept (studio lab r06:
+    # the same song came out 8.2 one time and 3.8 the next, the bad ones skipping or garbling lines)
+    takes: int = Field(2, ge=1, le=3)
     voiceSteps: int = Field(30, ge=10, le=100)
 
 
@@ -670,12 +673,12 @@ def file_m4a(path: str, stereo: bool = True) -> bytes:
             return f.read()
 
 
-def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", seconds: float, d: str, t0: float) -> dict:
+def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", seconds: float, d: str, t0: float, split: tuple[str, str] | None = None) -> dict:
     """A sung song (wav) → split (HTDemucs), voice (Seed-VC, if a recording came), mixed; the API's JSON."""
     import base64
 
     t1 = time.time()
-    vocals, inst = separate(wav, d)
+    vocals, inst = split or separate(wav, d)
     t2 = time.time()
     mix = os.path.join(d, "mix.wav")
     voiced, how = (None, "no voice sent")
@@ -730,11 +733,50 @@ def song(r: SongReq):
     t0 = time.time()
     try:
         with gen_lock, tempfile.TemporaryDirectory() as d:
-            wav, lines = ace_song(engine, r, r.seconds, d)
-            return finish_song(engine, wav, lines, r, r.seconds, d, t0)
+            best = None
+            heard = []
+            for k in range(r.takes):
+                dk = os.path.join(d, f"take{k}")
+                os.makedirs(dk)
+                rk = r.model_copy(update={"seed": (r.seed + k) if r.seed is not None else None})
+                wav, lines = ace_song(engine, rk, r.seconds, dk)
+                if r.takes == 1:
+                    best = (1.0, wav, lines, None)
+                    break
+                split = separate(wav, dk)
+                score, text = sung_score(split[0], r)
+                heard.append({"score": round(score, 3), "text": text[:300]})
+                print(f"take {k + 1}/{r.takes}: lyrics heard {score:.2f}", flush=True)
+                if best is None or score > best[0]:
+                    best = (score, wav, lines, split)
+            payload = finish_song(engine, best[1], best[2], r, r.seconds, d, t0, split=best[3])
+            payload["takes"] = heard
+            return payload
     except Exception as e:  # noqa: BLE001
         traceback.print_exc()
         raise HTTPException(500, f"song failed: {e!r}"[:400]) from e
+
+
+def sung_score(vocals: str, r: "SongReq") -> tuple[float, str]:
+    """How much of the lyrics a take really sang: Whisper's hearing vs the lyrics (0–1, -1 if unknown)."""
+    import difflib
+    import re
+    import unicodedata
+
+    def norm(t: str) -> str:
+        t = unicodedata.normalize("NFKC", t)
+        t = "".join(chr(ord(c) - 0x60) if "ァ" <= c <= "ヶ" else c for c in t)  # katakana → hiragana
+        return re.sub(r"[\s、。，．,.!?！？「」『』()（）ー〜~…・-]", "", t)
+
+    mono = vocals + ".16k.wav"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vocals, "-ac", "1", "-ar", "16000", mono], check=True)
+    res = svc_call("POST", "/transcribe", {"path": mono, "language": r.language}, timeout=300)
+    if not res.get("ok"):
+        print(f"transcribe failed: {res.get('error')}", flush=True)
+        return -1.0, ""
+    heard = res.get("text", "")
+    want = norm("".join(l.text for l in r.lyrics))
+    return difflib.SequenceMatcher(None, want, norm(heard), autojunk=False).ratio(), heard
 
 
 class ExtendReq(SongReq):

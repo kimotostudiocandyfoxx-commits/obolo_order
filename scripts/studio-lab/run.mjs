@@ -182,7 +182,7 @@ for (const base of round.cases)
     if (round.keepStems) writeFileSync(join(OUT, `${c.id}-vocals.m4a`), Buffer.from(made.vocals, 'base64'));
     const m = measure(mix);
     const j = await judge(c, made.mix, made.sent.prompt);
-    results.push({ id: c.id, variant: v.name, ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
+    results.push({ id: c.id, variant: v.name, ok: true, takes: made.takes, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
     console.log(`${c.id}: overall ${j.overall ?? '?'} (${made.wall}s)`);
     // the same take before the voice change: the studio's own vocal on the instrumental
     if (made.voiced && round.judgeStudioVoice) {
@@ -276,7 +276,7 @@ const lines = [
     .flatMap((r) => [
       `## ${r.id}`,
       `- heard: ${r.judge.heard ?? ''}`,
-      `- voice: ${r.voiceNote} · timings ${JSON.stringify(r.timings)} · ${r.lines} line times`,
+      `- voice: ${r.voiceNote} · timings ${JSON.stringify(r.timings)} · ${r.lines} line times${r.takes?.length ? ` · takes heard ${r.takes.map((t) => t.score).join(' / ')}` : ''}`,
       ...(r.judge.problems ?? []).map((p) => `- problem: ${p}`),
       ...(r.judge.fixIdeas ?? []).map((p) => `- idea: ${p}`),
       ...(r.judge.error ? [`- judge error: ${r.judge.error}`] : []),
