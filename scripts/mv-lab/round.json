@@ -1,0 +1,14 @@
+{
+  "round": "m01-baseline",
+  "note": "今の本番と同じ作り方（絵コンテ Gemini Flash-Lite、自前GPUの Animagine で全場面）。主人公はきもりん（狐面のフードキャラ）。",
+  "hero": "art/lab/mv/hero.jpg",
+  "songs": "art/lab/studio/r01-baseline/results.json",
+  "painter": "gpu",
+  "maxScenes": 30,
+  "side": 768,
+  "cases": [
+    { "id": "pop-bright", "song": "pop-bright" },
+    { "id": "rock-run", "song": "rock-run" },
+    { "id": "ballad-night", "song": "ballad-night" }
+  ]
+}

@@ -148,7 +148,7 @@ for (const c of round.cases) {
     if (round.keepStems) writeFileSync(join(OUT, `${c.id}-vocals.m4a`), Buffer.from(made.vocals, 'base64'));
     const m = measure(mix);
     const j = await judge(c, made.mix);
-    results.push({ id: c.id, ok: true, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
+    results.push({ id: c.id, ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
     console.log(`${c.id}: overall ${j.overall ?? '?'} (${made.wall}s)`);
   } catch (e) {
     results.push({ id: c.id, ok: false, error: String(e).slice(0, 300) });
