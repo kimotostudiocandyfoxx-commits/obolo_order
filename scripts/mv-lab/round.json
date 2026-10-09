@@ -1,28 +1,34 @@
 {
-  "round": "m02-cuts-nohumans",
-  "note": "m01 の反省：主人公なしの場面は「人なし」、主人公の場面は「ひとりだけ」。グリッチは激しい曲だけ。長い場面は小節ごとに別カメラの複数カットに分ける（サビは1小節、Aメロは2小節）。歌詞の行が変わるところで場面を変える。",
+  "round": "m03-hero",
+  "note": "m02 の反省（5.1）：主人公の説明がぶれて「ちびキャラ」「白いお面」が消えた → 説明を毎回同じに、体の比率と顔（お面）を必ず書く。参考画像の効き 0.6 と 0.8 を比べる。最後の長い場面も小節ごとに分ける。",
   "hero": "art/lab/mv/hero.jpg",
-  "songs": "art/lab/studio/r05-ending-voice/results.json",
+  "songs": "art/lab/studio/r06-stability/results.json",
   "painter": "gpu",
   "maxScenes": 30,
   "side": 768,
   "cases": [
     {
       "id": "pop-bright",
-      "song": "pop-bright~std"
+      "song": "pop-bright~a"
     },
     {
       "id": "rock-run",
-      "song": "rock-run~std"
+      "song": "rock-run~a"
     },
     {
       "id": "ballad-night",
-      "song": "ballad-night~std"
-    },
-    {
-      "id": "edm-party",
-      "song": "edm-party~std"
+      "song": "ballad-night~a"
     }
   ],
-  "heroRef": 0.6
+  "heroRef": 0.6,
+  "variants": [
+    {
+      "name": "ref60",
+      "heroRef": 0.6
+    },
+    {
+      "name": "ref80",
+      "heroRef": 0.8
+    }
+  ]
 }

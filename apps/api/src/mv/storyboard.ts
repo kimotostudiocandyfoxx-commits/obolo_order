@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import sharp from 'sharp';
 import type { MvEffect, MvMotion, MvPlan, MvSegment, MvTextEffect } from './plan';
 
 /**
@@ -37,14 +38,16 @@ export async function describeHero(picture: Buffer | null, apiKey: string | unde
           {
             role: 'user',
             parts: [
-              { inlineData: { mimeType: 'image/png', data: picture.toString('base64') } },
+              { inlineData: { mimeType: 'image/jpeg', data: (await sharp(picture).rotate().flatten({ background: '#ffffff' }).resize(768, 768, { fit: 'inside' }).jpeg({ quality: 90 }).toBuffer()).toString('base64') } },
               {
-                text: 'This is the hero of an anime music video. Describe how they look as Danbooru-style tags for an anime image model, so the same character can be drawn in many scenes: subject (1girl / 1boy / creature…), hair, eyes, skin, outfit, colours, accessories, body shape. 10–20 tags, comma-separated, English, nothing about the background or pose. Kids-friendly.',
+                // MV lab m02: a loose description lost "chibi" and the white mask → a tall fox-man in a black visor
+                text: 'This is the hero of an anime music video. Describe how they look as Danbooru-style tags for an anime image model, so exactly the same character can be drawn in many scenes. In this order: 1) subject (1girl / 1boy / creature / mascot…), 2) body proportions (chibi / small / tall / round…), 3) face exactly (if the face is a mask: its colour, shape and markings; otherwise hair and eyes), 4) ears, tail(s), 5) outfit with colours, 6) accessories, 7) the 2–3 main colours. 12–22 tags, comma-separated, English, nothing about the background, pose or expression. Kids-friendly.',
               },
             ],
           },
         ],
-        generationConfig: { responseMimeType: 'application/json', responseSchema: { type: 'OBJECT', properties: { tags: { type: 'STRING' } }, required: ['tags'] }, temperature: 0.2 },
+        // the same picture always gives the same tags
+        generationConfig: { responseMimeType: 'application/json', responseSchema: { type: 'OBJECT', properties: { tags: { type: 'STRING' } }, required: ['tags'] }, temperature: 0, seed: 7 },
       }),
       signal: AbortSignal.timeout(30_000),
     });
@@ -243,7 +246,7 @@ export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = [
     let chorus = false;
     for (const l of lyrics) if (l.t <= t + 0.01) chorus = l.chorus;
     const each = bar ? bar * (chorus ? 1 : 2) : s.dur;
-    const n = bar && s.dur >= each * 1.5 ? Math.min(4, Math.floor(s.dur / each + 0.25)) : 1;
+    const n = bar && s.dur >= each * 1.5 ? Math.min(8, Math.floor(s.dur / each + 0.25)) : 1;
     for (let j = 0; j < n; j++) {
       const dur = j === n - 1 ? s.dur - each * (n - 1) : each;
       segments.push({ m: k, dur, from: 0, motion: MOTIONS[(Math.max(0, MOTIONS.indexOf(first)) + j * 2 + (j >> 1)) % MOTIONS.length], effect: j === 0 ? s.effect : 'NONE', key: false });

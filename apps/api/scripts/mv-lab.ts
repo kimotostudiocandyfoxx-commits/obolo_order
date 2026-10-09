@@ -31,6 +31,8 @@ type Round = {
   heroRef?: number;
   steps?: number;
   planModel?: string;
+  /** recipes to compare on every case (each overrides heroRef / steps) */
+  variants?: { name: string; heroRef?: number; steps?: number }[];
   cases: Case[];
 };
 
@@ -143,7 +145,11 @@ async function main() {
   const hero = await describeHero(heroPic, GEMINI, PLAN_MODEL);
   console.log(`hero tags: ${hero}`);
   const results: Record<string, unknown>[] = [];
-  for (const c of round.cases) {
+  for (const base of round.cases)
+  for (const v of round.variants ?? [{ name: '' }]) {
+    const c = { ...base, id: v.name ? `${base.id}~${v.name}` : base.id };
+    const heroRef = v.heroRef ?? round.heroRef ?? 0.6;
+    const steps = v.steps ?? round.steps;
     const s = songs.find((x) => x.id === c.song && x.ok);
     if (!s) {
       results.push({ id: c.id, ok: false, error: `song ${c.song} not in ${round.songs}` });
@@ -162,9 +168,9 @@ async function main() {
       );
       const t1 = Date.now();
       const drawn = await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {
-        reference: round.heroRef === 0 ? null : heroPic,
-        refScale: round.heroRef ?? 0.6,
-        steps: round.steps,
+        reference: heroRef === 0 ? null : heroPic,
+        refScale: heroRef,
+        steps,
       });
       const t2 = Date.now();
       await sheet(drawn, join(OUT, `${c.id}-scenes.jpg`));
@@ -192,6 +198,7 @@ async function main() {
       results.push({
         id: c.id,
         ok: true,
+        heroRef,
         song: c.song,
         scenes: story.scenes.length,
         painted,
