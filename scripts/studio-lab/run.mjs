@@ -8,7 +8,7 @@
  * env: MUSIC_URL, MUSIC_TOKEN (ID token for the private GPU service), GEMINI_API_KEY,
  *      ROUND_FILE (default scripts/studio-lab/round.json), JUDGE_MODEL
  */
-import { execFileSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -30,9 +30,14 @@ function songPrompt(instrumentalPrompt) {
   return `${base}, ${round.vocalWords ?? 'catchy japanese pop vocal, clear lead singer, expressive singing'}`.slice(0, 500);
 }
 
-async function makeSong(c) {
+function songPromptWith(p, words) {
+  const base = p.replace(/\s*,?\s*(no vocals?|instrumental( only)?|without vocals?)\s*/gi, ' ').replace(/\s+/g, ' ').trim();
+  return `${base}, ${words}`.slice(0, 500);
+}
+
+async function makeSong(c, v) {
   const body = {
-    prompt: songPrompt(c.prompt),
+    prompt: v.vocalWords ? songPromptWith(c.prompt, v.vocalWords) : songPrompt(c.prompt),
     lyrics: c.sections.flatMap((s) => s.lines.map((text) => ({ section: s.name, text }))),
     seconds: c.seconds,
     bpm: c.bpm,
@@ -41,6 +46,7 @@ async function makeSong(c) {
     language: 'ja',
     ...(c.voice && voice ? { voice, similarity: c.similarity ?? 0.7 } : {}),
     ...(round.tune ?? {}),
+    ...(v.tune ?? {}),
     ...(c.tune ?? {}),
   };
   const until = Date.now() + 20 * 60_000;
@@ -65,12 +71,10 @@ async function makeSong(c) {
 }
 
 function measure(file) {
+  // ffmpeg writes its measurements to stderr
   const run = (args) => {
-    try {
-      return execFileSync('ffmpeg', args, { stdio: ['ignore', 'pipe', 'pipe'] }).toString();
-    } catch (e) {
-      return String(e.stderr ?? '');
-    }
+    const r = spawnSync('ffmpeg', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    return `${r.stdout ?? ''}${r.stderr ?? ''}`;
   };
   const loud = run(['-hide_banner', '-nostats', '-i', file, '-af', 'ebur128=peak=true', '-f', 'null', '-']);
   const I = Number(/I:\s+(-?[\d.]+) LUFS/.exec(loud.split('Summary:').pop() ?? '')?.[1]);
@@ -93,7 +97,7 @@ Score each 1-10 (10 = release quality on a streaming service, 5 = clearly amateu
 - artifacts: 10 = no glitches/noise/dropouts/garbled parts at all.
 Also: overall (1-10), heard: the Japanese words you actually hear (hiragana, short), problems: concrete list with timestamps (mm:ss), fixIdeas: what to change in the generation recipe.`;
 
-async function judge(c, mixB64) {
+async function judge(c, mixB64, style) {
   if (!GEMINI) return { error: 'no GEMINI_API_KEY' };
   const lyrics = c.sections.map((s) => `[${s.name}]\n${s.lines.join('\n')}`).join('\n\n');
   const schema = {
@@ -117,7 +121,7 @@ async function judge(c, mixB64) {
             role: 'user',
             parts: [
               { inlineData: { mimeType: 'audio/mp4', data: mixB64 } },
-              { text: `${RUBRIC}\n\nRequested style: ${c.prompt}\nTempo ${c.bpm} BPM.\n\nExpected lyrics:\n${lyrics}` },
+              { text: `${RUBRIC}\n\nRequested style (a song WITH vocals): ${style}\nTempo ${c.bpm} BPM.\n\nExpected lyrics:\n${lyrics}` },
             ],
           },
         ],
@@ -139,27 +143,34 @@ async function judge(c, mixB64) {
 }
 
 const results = [];
-for (const c of round.cases) {
+const variants = round.variants ?? [{ name: '' }];
+for (const base of round.cases)
+  for (const v of variants) {
+  const c = { ...base, id: v.name ? `${base.id}~${v.name}` : base.id };
   console.log(`== ${c.id}`);
   try {
-    const made = await makeSong(c);
+    const made = await makeSong(c, v);
     const mix = join(OUT, `${c.id}.m4a`);
     writeFileSync(mix, Buffer.from(made.mix, 'base64'));
     if (round.keepStems) writeFileSync(join(OUT, `${c.id}-vocals.m4a`), Buffer.from(made.vocals, 'base64'));
     const m = measure(mix);
-    const j = await judge(c, made.mix);
-    results.push({ id: c.id, ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
+    const j = await judge(c, made.mix, made.sent.prompt);
+    results.push({ id: c.id, variant: v.name, ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: made.wall, lines: made.lines?.length ?? 0, ...m, judge: j, sent: { ...made.sent, voice: made.sent.voice ? '(sample)' : undefined } });
     console.log(`${c.id}: overall ${j.overall ?? '?'} (${made.wall}s)`);
   } catch (e) {
-    results.push({ id: c.id, ok: false, error: String(e).slice(0, 300) });
+    results.push({ id: c.id, variant: v.name, ok: false, error: String(e).slice(0, 300) });
     console.log(`${c.id}: FAILED ${String(e).slice(0, 200)}`);
   }
-}
+  }
 
 const keys = ['overall', 'vocalNaturalness', 'pitch', 'diction', 'melody', 'arrangement', 'mix', 'genreFit', 'artifacts'];
 const avg = Object.fromEntries(keys.map((k) => [k, Math.round((results.filter((r) => r.ok && typeof r.judge?.[k] === 'number').reduce((a, r) => a + r.judge[k], 0) / Math.max(1, results.filter((r) => r.ok && typeof r.judge?.[k] === 'number').length)) * 10) / 10]));
+const avgOf = (rs) => Object.fromEntries(keys.map((k) => [k, Math.round((rs.filter((r) => r.ok && typeof r.judge?.[k] === 'number').reduce((a, r) => a + r.judge[k], 0) / Math.max(1, rs.filter((r) => r.ok && typeof r.judge?.[k] === 'number').length)) * 10) / 10]));
+const byVariant = variants.map((v) => ({ name: v.name || '(one recipe)', v, avg: avgOf(results.filter((r) => r.variant === v.name)) }));
 const lines = [
   `# Studio lab — ${round.round}`,
+  '',
+  ...byVariant.map((b) => `- **${b.name}** ${JSON.stringify({ tune: b.v.tune ?? {}, words: b.v.vocalWords ?? undefined })}: ${keys.map((k) => `${k} ${b.avg[k]}`).join(' · ')}`),
   '',
   round.note ? `${round.note}\n` : '',
   `recipe: ${JSON.stringify(round.tune ?? {})} / vocal words: ${round.vocalWords ?? '(app default)'}`,
@@ -187,5 +198,5 @@ const lines = [
     ]),
 ];
 writeFileSync(join(OUT, 'report.md'), lines.join('\n'));
-writeFileSync(join(OUT, 'results.json'), JSON.stringify({ round: round.round, avg, results }, null, 2));
+writeFileSync(join(OUT, 'results.json'), JSON.stringify({ round: round.round, avg, byVariant: byVariant.map((b) => ({ name: b.name, avg: b.avg })), results }, null, 2));
 console.log(lines.join('\n'));
