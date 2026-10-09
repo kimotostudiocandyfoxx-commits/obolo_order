@@ -30,6 +30,7 @@ class OrtCore:
     """The exported core network behind the same interface apply_model expects."""
 
     def __init__(self, torch_core, path):
+        self.torch_core = torch_core
         self.segment = torch_core.segment
         self.samplerate = torch_core.samplerate
         self.audio_channels = torch_core.audio_channels
@@ -39,8 +40,15 @@ class OrtCore:
         self.sess = ort.InferenceSession(path, so, providers=["CPUExecutionProvider"])
         self.inputs = [i.name for i in self.sess.get_inputs()]
 
-    def to(self, *_):  # apply_model moves the model to the device: ONNX Runtime already is there
+    # apply_model moves the model to the device and sets eval mode: nothing to do for ONNX Runtime
+    def to(self, *_):
         return self
+
+    def eval(self):
+        return self
+
+    def __getattr__(self, name):  # anything else apply_model reads comes from the PyTorch model
+        return getattr(self.__dict__["torch_core"], name)
 
     def __call__(self, mix, magspec):
         x, xt = self.sess.run(None, {self.inputs[0]: mix.numpy(), self.inputs[1]: magspec.numpy()})
