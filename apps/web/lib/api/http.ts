@@ -96,6 +96,12 @@ export class HttpApi implements Api {
   registerVoice(body: Parameters<Api['registerVoice']>[0]) {
     return this.req<Awaited<ReturnType<Api['registerVoice']>>>('POST', '/voice/register', body);
   }
+  getJob(id: string) {
+    return this.req<Awaited<ReturnType<Api['getJob']>>>('GET', `/jobs/${id}`);
+  }
+  activeJobs() {
+    return this.req<Awaited<ReturnType<Api['activeJobs']>>>('GET', '/jobs');
+  }
   composeFullSong(body: Parameters<Api['composeFullSong']>[0]) {
     return this.req<Awaited<ReturnType<Api['composeFullSong']>>>('POST', '/compose/song', body);
   }
@@ -338,10 +344,10 @@ export class HttpApi implements Api {
     return this.req<MvProjectView>('POST', `/mars/mv/${id}/render`);
   }
   mvStory(id: string, mood: string) {
-    return this.req<MvProjectView>('POST', `/mars/mv/${id}/story`, { mood });
+    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood });
   }
   mvLyrics(id: string) {
-    return this.req<MvProjectView>('POST', `/mars/mv/${id}/lyrics`);
+    return this.req<Awaited<ReturnType<Api['mvLyrics']>>>('POST', `/mars/mv/${id}/lyrics`);
   }
   choosePuniPic(mediaId: string | null) {
     return this.req<Awaited<ReturnType<Api['choosePuniPic']>>>('POST', '/me/puni/pic', { mediaId });

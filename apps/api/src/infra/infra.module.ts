@@ -4,7 +4,7 @@ import { AppConfig, CONFIG, loadConfig } from '../config';
 import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
-import { BullQueue, InlineQueue, JobQueue } from './queue';
+import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
 import { EMAIL, IMAGES, KV, LLM, QUEUE } from './tokens';
 
 @Global()
@@ -20,6 +20,11 @@ import { EMAIL, IMAGES, KV, LLM, QUEUE } from './tokens';
         if (c.QUEUE_DRIVER === 'bullmq') {
           if (!c.REDIS_URL) throw new Error('QUEUE_DRIVER=bullmq requires REDIS_URL');
           return new BullQueue(c.REDIS_URL);
+        }
+        if (c.QUEUE_DRIVER === 'cloudtasks') {
+          if (!c.CLOUD_TASKS_QUEUE || !c.JOBS_TARGET_URL || !c.JOBS_INVOKER_SA) throw new Error('QUEUE_DRIVER=cloudtasks requires CLOUD_TASKS_QUEUE, JOBS_TARGET_URL and JOBS_INVOKER_SA');
+          // the task waits as long as a request may run on Cloud Run (deploy --timeout=900)
+          return new CloudTasksQueue({ queue: c.CLOUD_TASKS_QUEUE, target: c.JOBS_TARGET_URL, invoker: c.JOBS_INVOKER_SA, deadlineSeconds: 900 });
         }
         return new InlineQueue();
       },

@@ -601,3 +601,31 @@ export const mvProjects = pgTable(
   },
   (t) => [index('mv_projects_user_idx').on(t.userId, t.createdAt)],
 );
+
+/**
+ * Long work done in the background (client decision 2026-10-09: 受付 → 順番に処理 → できたら通知):
+ * a song sung by the music studio, a story MV, the lyrics on an MV. The app polls the row (and gets a
+ * push when it is done); the work itself runs through the job queue (Cloud Tasks in production).
+ */
+export const jobs = pgTable(
+  'jobs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(), // song | mv-story | mv-lyrics
+    status: text('status').notNull().default('queued'), // queued | running | done | failed
+    /** where the work is (shown to the member while they wait) */
+    stage: text('stage'),
+    inputJson: jsonb('input_json').$type<Record<string, unknown>>().notNull(),
+    resultJson: jsonb('result_json').$type<Record<string, unknown>>(),
+    errorCode: text('error_code'),
+    error: text('error'),
+    attempts: integer('attempts').notNull().default(0),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    finishedAt: timestamp('finished_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('jobs_user_idx').on(t.userId, t.createdAt)],
+);

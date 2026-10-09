@@ -162,6 +162,13 @@
       "when": 1791507017736,
       "tag": "0022_voice_samples",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791507941424,
+      "tag": "0023_jobs",
+      "breakpoints": true
     }
   ]
 }

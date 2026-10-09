@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Artwork } from '@/components/Artwork';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { waitJob } from '@/lib/jobs';
 import { usePartner } from '@/lib/partner';
 import type { SongEditCommand, SongView } from '@obolo/shared';
 import { GENRES, makeSong, pickGenre, songFromDesign, type Genre, type MadeSong } from '@/lib/mercury/compose';
@@ -414,8 +415,7 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
   const [state, setState] = useState<'idle' | 'working' | 'warming' | 'error'>('idle');
   const [err, setErr] = useState('');
   const [status, setStatus] = useState('');
-  const makeRef = useRef<() => Promise<void>>(async () => {});
-  // while warming, show what the GPU studio is doing and start by itself as soon as it is ready
+  // while the job waits for the GPU studio to wake up, show what the studio is doing
   useEffect(() => {
     if (state !== 'warming') return;
     let live = true;
@@ -425,7 +425,6 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
         if (!live) return;
         if (s.ready) {
           setStatus('準備できた！作曲を始めるね。');
-          void makeRef.current();
           return;
         } else if (s.error) setStatus(`スタジオの状態：${String(s.error).slice(0, 160)}`);
         else setStatus(`スタジオの状態：${String(s.phase ?? '起動中')}（${Number(s.seconds ?? 0)}秒・モデル ${Number(s.checkpointGB ?? 0)}GB）`);
@@ -453,7 +452,7 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
     setState('working');
     setErr('');
     try {
-      const r = await getApi().composeFullSong({
+      const job = await getApi().composeFullSong({
         title: d.title.slice(0, 40),
         genre: d.genre,
         mood: d.mood.slice(0, 30),
@@ -465,19 +464,18 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
         progression: d.progression,
         seconds: Math.max(10, Math.min(180, d.seconds)),
       });
-      onMade(r);
+      // queued: the studio works on it (waking up first if it sleeps); a push comes when it is done
+      const done = await waitJob(job, (stage) => {
+        if (stage === 'warming') setState('warming');
+        else if (stage === 'singing') setState('working');
+      });
+      onMade(done.result!.song!);
       setState('idle');
     } catch (e) {
-      if (e instanceof ApiError && (e.code === 'MUSIC_WARMING' || e.status === 504)) {
-        setStatus('');
-        setState('warming');
-      } else {
-        setErr(detail(e));
-        setState('error');
-      }
+      setErr(detail(e));
+      setState('error');
     }
   };
-  makeRef.current = make;
   return (
     <div className="mt-3 text-center">
       <button
@@ -485,11 +483,12 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
         disabled={state === 'working' || state === 'warming'}
         className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 py-2 text-sm font-bold disabled:opacity-60"
       >
-        {state === 'working' ? '🎤 歌入りで作曲中…（2〜3分）' : '🎤 歌入りで作曲する'}
+        {state === 'working' ? '🎤 歌入りで作曲中…（2〜3分）' : state === 'warming' ? '🎤 受けつけたよ（スタジオ起動中）' : '🎤 歌入りで作曲する'}
       </button>
+      {(state === 'working' || state === 'warming') && <p className="mt-1 text-[10px] text-white/50">アプリを閉じても大丈夫。できたら通知するね</p>}
       {state === 'warming' && (
         <p className="mt-1.5 text-[11px] text-amber-200/80">
-          音楽スタジオ（GPU）を起動中…。準備ができたら自動で作曲を始めるので、このまま待っててね。
+          音楽スタジオ（GPU）を起動中…。準備ができたら自動で作曲を始めるよ。
           {status && <span className="mt-0.5 block text-white/60">{status}</span>}
         </p>
       )}

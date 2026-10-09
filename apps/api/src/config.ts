@@ -32,7 +32,11 @@ const Env = z.object({
   /** Upstash: rediss://default:TOKEN@HOST:6379 . Empty = in-memory store (single-instance dev only). */
   REDIS_URL: secret(),
   /** "inline" runs jobs in-process after the response; "bullmq" pushes to Redis for apps/api worker. */
-  QUEUE_DRIVER: z.enum(['inline', 'bullmq']).default('inline'),
+  QUEUE_DRIVER: z.enum(['inline', 'bullmq', 'cloudtasks']).default('inline'),
+  /** cloudtasks: projects/P/locations/L/queues/Q, the API's own URL (tasks call it back), the service account the calls are signed as */
+  CLOUD_TASKS_QUEUE: secret(),
+  JOBS_TARGET_URL: secret(),
+  JOBS_INVOKER_SA: secret(),
 
   /** Comma-separated exact origins and/or regexes wrapped in slashes, e.g.
    *  https://obolo.app,/^https:\/\/obolo-order-.*\.vercel\.app$/ */

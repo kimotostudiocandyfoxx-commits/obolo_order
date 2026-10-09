@@ -4,6 +4,7 @@ import { type MvProjectView, type SongView } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { waitJob } from '@/lib/jobs';
 import { usePartner } from '@/lib/partner';
 import { Mic } from '@/components/mercury/ComposeChat';
 
@@ -90,6 +91,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
     setMood('');
     setStep('rendering');
     let k = 0;
+    say(ken('受けつけたよ！ アプリを閉じても、できたら通知するね。', '受けつけたケン！ アプリを閉じても、できたら通知するぞ。'));
     say(ken(WAIT[0][0], WAIT[0][1]));
     const timer = setInterval(() => {
       k = Math.min(k + 1, WAIT.length - 1);
@@ -97,7 +99,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
       if (k === WAIT.length - 1) clearInterval(timer);
     }, 14_000);
     try {
-      const p = await getApi().mvStory(mv.id, wish);
+      const p = (await waitJob(await getApi().mvStory(mv.id, wish))).result!.mv!;
       setMv(p);
       say(ken(`できたよ！ ${p.note ?? ''}`, `できたケン！ ${p.note ?? ''}`), { kind: 'video', url: p.videoUrl!, poster: p.posterUrl });
       if (p.hasLyrics) {
@@ -131,7 +133,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
     setStep('lyrics');
     say(ken('まかせて！ 歌詞を入れてるよ…', 'まかせろ！ 歌詞を入れてるケン…'));
     try {
-      const p = await getApi().mvLyrics(mv.id);
+      const p = (await waitJob(await getApi().mvLyrics(mv.id))).result!.mv!;
       setMv(p);
       setTitle((t) => t.replace('（MV）', '（MV・歌詞つき）').slice(0, 40));
       say(ken('歌詞つきのMVができたよ！ こっちも裏スタジオにしまっておいたよ。公開する？', '歌詞つきのMVができたケン！ こっちも裏スタジオにしまっておいたぞ。公開するか？'), {

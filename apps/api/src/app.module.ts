@@ -30,6 +30,8 @@ import { MarsController } from './mars/mars.controller';
 import { PlanetPostsController } from './planets/planet-posts.controller';
 import { PlanetPostsService } from './planets/planet-posts.service';
 import { MarsService } from './mars/mars.service';
+import { InternalJobsController, JobsController } from './jobs/jobs.controller';
+import { JobsService } from './jobs/jobs.service';
 import { MvController } from './mv/mv.controller';
 import { MvService } from './mv/mv.service';
 import { SaturnService } from './saturn/saturn.service';
@@ -65,6 +67,8 @@ import { WalletController } from './wallet/wallet.controller';
     AdminReportsController,
     PushController,
     MvController,
+    JobsController,
+    InternalJobsController,
   ],
   providers: [
     AuthGuard,
@@ -87,6 +91,7 @@ import { WalletController } from './wallet/wallet.controller';
     CommsService,
     PushService,
     MvService,
+    JobsService,
   ],
 })
 export class AppModule {}

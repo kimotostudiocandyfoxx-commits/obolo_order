@@ -7,6 +7,7 @@ import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { JobsService } from '../jobs/jobs.service';
 import { MvService } from './mv.service';
 
 const MaterialBody = AddMvMaterialBody.extend({ posterUrl: z.string().url().max(500).nullish(), seconds: z.number().min(0).max(3600).nullish() });
@@ -19,6 +20,7 @@ const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 export class MvController {
   constructor(
     private readonly mv: MvService,
+    private readonly jobs: JobsService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -57,18 +59,21 @@ export class MvController {
     return this.mv.render(userId, id, origin(req));
   }
 
-  /** Story MV: Bati paints the MV from the song and the profile picture (waits a minute or two). */
+  /** Story MV: Bati paints the MV from the song and the profile picture — a background job (GET /jobs/:id, push when done). */
   @Post(':id/story')
-  @HttpCode(200)
+  @HttpCode(202)
   async story(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `mv-render:${userId}`, 6, 3600);
-    return this.mv.story(userId, id, origin(req), parseBody(StoryBody, body).mood);
+    await this.mv.get(userId, id); // yours? (fails before queueing)
+    return this.jobs.create(userId, 'mv-story', { mvId: id, mood: parseBody(StoryBody, body).mood, origin: origin(req) });
   }
 
+  /** The same MV with the lyrics on it — a background job too. */
   @Post(':id/lyrics')
-  @HttpCode(200)
+  @HttpCode(202)
   async lyrics(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Req() req: Request) {
     await rateLimit(this.kv, `mv-lyrics:${userId}`, 6, 3600);
-    return this.mv.withLyrics(userId, id, origin(req));
+    await this.mv.get(userId, id);
+    return this.jobs.create(userId, 'mv-lyrics', { mvId: id, origin: origin(req) });
   }
 }

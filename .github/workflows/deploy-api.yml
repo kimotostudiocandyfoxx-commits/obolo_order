@@ -103,7 +103,12 @@ jobs:
           env_vars: |
             NODE_ENV=production
             MIGRATE_ON_START=true
-            QUEUE_DRIVER=inline
+            # background jobs (songs, MVs): Cloud Tasks once scripts/jobs-setup.sh made the queue and the
+            # CLOUD_TASKS_QUEUE variable is set; until then they run in-process (inline)
+            QUEUE_DRIVER=${{ vars.CLOUD_TASKS_QUEUE && 'cloudtasks' || 'inline' }}
+            CLOUD_TASKS_QUEUE=${{ vars.CLOUD_TASKS_QUEUE }}
+            JOBS_TARGET_URL=${{ format('https://{0}-{1}.{2}.run.app', env.SERVICE, vars.GCP_PROJECT_NUMBER, env.REGION) }}
+            JOBS_INVOKER_SA=${{ env.RUNTIME_SA }}
             CORS_ORIGINS=${{ env.CORS_ORIGINS }}
             WEB_ORIGIN=${{ vars.WEB_ORIGIN }}
             AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || 'true' }}

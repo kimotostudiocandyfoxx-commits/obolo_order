@@ -1,4 +1,4 @@
-import type { CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, MvProjectView } from '@obolo/shared';
+import type { CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -114,8 +114,11 @@ export interface Api {
   transcribe(mediaId: string): Promise<{ text: string }>;
   /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */
   composeSing(body: SingBody): Promise<SongView>;
-  /** the whole song sung by the music studio (ACE-Step + HTDemucs) */
-  composeFullSong(body: FullSongBody): Promise<SongView>;
+  /** the whole song sung by the music studio (ACE-Step + HTDemucs + Seed-VC) — a background job */
+  composeFullSong(body: FullSongBody): Promise<JobView>;
+  /** background work (a song, an MV): poll until done */
+  getJob(id: string): Promise<JobView>;
+  activeJobs(): Promise<{ jobs: JobView[] }>;
   /** 手直し: a chat message about a sung song (or a retried command) → the partner's reply + the new mix. */
   composeSongEdit(id: string, body: SongEditBody): Promise<SongEditResult>;
   /** 保存する: keep this version of the song. */
@@ -223,9 +226,10 @@ export interface Api {
   mvRemoveMaterial(id: string, mediaId: string): Promise<MvProjectView>;
   /** waits until the MV is made (a minute or two) */
   mvRender(id: string): Promise<MvProjectView>;
-  mvLyrics(id: string): Promise<MvProjectView>;
-  /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) */
-  mvStory(id: string, mood: string): Promise<MvProjectView>;
+  /** the lyrics on the MV — a background job */
+  mvLyrics(id: string): Promise<JobView>;
+  /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) — a background job */
+  mvStory(id: string, mood: string): Promise<JobView>;
   batiEgg(food: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;

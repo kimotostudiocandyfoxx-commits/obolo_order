@@ -333,8 +333,16 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
   }
 
-  async composeFullSong(): Promise<SongView> {
+  async composeFullSong(): Promise<never> {
     throw new ApiError(501, 'DEMO', 'demo');
+  }
+
+  async getJob(): Promise<never> {
+    throw new ApiError(501, 'DEMO', 'demo');
+  }
+
+  async activeJobs() {
+    return { jobs: [] };
   }
 
   async composeSing(): Promise<SongView> {

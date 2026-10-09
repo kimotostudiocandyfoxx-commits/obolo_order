@@ -7,6 +7,7 @@ import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { ComposeService } from './compose.service';
+import { JobsService } from '../jobs/jobs.service';
 import { SongService } from './song.service';
 
 /** Mercury 作曲 (see ComposeService). */
@@ -16,6 +17,7 @@ export class ComposeController {
   constructor(
     private readonly compose: ComposeService,
     private readonly songs: SongService,
+    private readonly jobs: JobsService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -51,13 +53,17 @@ export class ComposeController {
     return this.songs.create(userId, b, `${req.protocol}://${req.get('host')}`);
   }
 
-  /** The whole song sung by the music studio (ACE-Step + HTDemucs, 2026-10-09). PLACEHOLDER (P-MER-7): 20 a day. */
+  /**
+   * The whole song sung by the music studio (ACE-Step + HTDemucs + Seed-VC, 2026-10-09), as a
+   * background job: answers at once with the job; GET /jobs/:id until it is done (and a push).
+   * PLACEHOLDER (P-MER-7): 20 a day.
+   */
   @Post('song')
-  @HttpCode(200)
+  @HttpCode(202)
   async fullSong(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     const b = parseBody(FullSongBody, body);
     await rateLimit(this.kv, `compose-song:${userId}`, 20, 86400);
-    return this.songs.createFull(userId, b, `${req.protocol}://${req.get('host')}`);
+    return this.jobs.create(userId, 'song', { body: b, origin: `${req.protocol}://${req.get('host')}` });
   }
 
   /** Your saved songs (the soil of your island on Mercury). */
