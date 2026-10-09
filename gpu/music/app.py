@@ -188,6 +188,8 @@ _demucs = None
 def separate(wav_path: str, out_dir: str) -> tuple[str, str]:
     """A song → (vocals.wav, instrumental.wav) with HTDemucs (fine-tuned htdemucs_ft by default)."""
     global _demucs
+    # demucs 4.0.1 checkpoints are full pickles; PyTorch >= 2.6 loads weights-only by default
+    os.environ.setdefault("TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD", "1")
     import torch
     from demucs.apply import apply_model
     from demucs.pretrained import get_model

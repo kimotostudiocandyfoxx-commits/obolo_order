@@ -15,7 +15,7 @@ RUN uv pip install --python /opt/ace/.venv/bin/python "google-cloud-storage>=2.1
 RUN uv pip install --python /opt/ace/.venv/bin/python --no-deps "demucs==4.0.1" "openunmix==1.3.0" \
  && uv pip install --python /opt/ace/.venv/bin/python julius einops "dora-search>=0.1.12" pyyaml tqdm \
  && rm -rf /root/.cache/uv
-ENV TORCH_HOME=/opt/torch
+ENV TORCH_HOME=/opt/torch TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
 RUN /opt/ace/.venv/bin/python -c "from demucs.pretrained import get_model; get_model('htdemucs_ft')"
 ENV PATH=/opt/ace/.venv/bin:$PATH \
     ACESTEP_PROJECT_ROOT=/opt/ace \
