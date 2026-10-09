@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['claude/**', main]
-    paths: ['design/ui-queue.json']
+    paths: ['design/ui-queue.json', 'scripts/ui-images/diag.sh']
 
 concurrency:
   group: ui-images-${{ github.ref }}
@@ -36,6 +36,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Novita routes check (only when the diag script changed)
+        if: ${{ hashFiles('scripts/ui-images/diag.sh') != '' && contains(github.event.head_commit.message, 'novita-diag') }}
+        run: |
+          export NOVITA_API_KEY="$(gcloud secrets versions access latest --secret=obolo-novita-api-key)"
+          bash scripts/ui-images/diag.sh
       - name: Paint
         run: |
           # needs (once): gcloud secrets add-iam-policy-binding obolo-novita-api-key --member=serviceAccount:<deploy SA> --role=roles/secretmanager.secretAccessor

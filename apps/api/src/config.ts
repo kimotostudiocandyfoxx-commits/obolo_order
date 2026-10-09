@@ -99,7 +99,7 @@ const Env = z.object({
   VAPID_SUBJECT: z.string().default('mailto:no-reply@example.com'),
 
   /** Mars MV: Bati's direction sheet (Gemini) and the last-choice anime model for the キメ絵 (ONNX, PLACEHOLDER P-MV-2). */
-  MV_PLAN_MODEL: z.string().default('gemini-2.5-flash-lite'),
+  MV_PLAN_MODEL: z.string().default('gemini-flash-lite-latest'),
   ANIME_ONNX_URL: secret(),
   /** キメ絵 (keyart.ts): how many materials per MV are redrawn as anime illustrations */
   MV_KEY_CUTS: z.coerce.number().default(2),
