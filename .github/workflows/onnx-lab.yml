@@ -29,11 +29,9 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
           git clone -q --depth 1 https://github.com/sevagh/demucs.onnx.git /tmp/demucsonnx
           pip install --quiet "torch==2.4.1" "torchaudio==2.4.1" --index-url https://download.pytorch.org/whl/cpu
-          pip install --quiet onnx onnxruntime numpy -e /tmp/demucsonnx/demucs-for-onnx
+          pip install --quiet "onnx==1.16.2" "onnxruntime==1.19.2" "numpy<2" -e /tmp/demucsonnx/demucs-for-onnx
       - name: Export htdemucs_ft_vocals and compare with PyTorch
         run: |
-          python /tmp/demucsonnx/scripts/convert-pth-to-onnx.py /tmp/onnx --ft-vocals
-          ls -la /tmp/onnx
           REPORT=art/lab/onnx/htdemucs.md python scripts/onnx-lab/htdemucs_onnx.py /tmp/onnx/htdemucs_ft_vocals.onnx
       - name: Save the report
         if: always()
@@ -58,7 +56,7 @@ jobs:
           git clone -q https://github.com/Plachtaa/seed-vc.git /tmp/seedvc && cd /tmp/seedvc && git checkout -q 51383efd921027683c89e5348211d93ff12ac2a8
           pip install --quiet "torch==2.4.0" "torchaudio==2.4.0" --index-url https://download.pytorch.org/whl/cpu
           pip install --quiet "scipy==1.13.1" "librosa==0.10.2" "huggingface-hub>=0.28.1" "munch==4.0.0" "einops==0.8.0" \
-            "descript-audio-codec==1.0.0" "transformers==4.46.3" "soundfile==0.12.1" "numpy==1.26.4" pyyaml matplotlib tqdm onnx onnxruntime
+            "descript-audio-codec==1.0.0" "transformers==4.46.3" "soundfile==0.12.1" "numpy==1.26.4" pyyaml matplotlib tqdm "onnx==1.16.2" "onnxruntime==1.19.2"
       - name: Export the parts and compare with PyTorch
         run: |
           cd /tmp/seedvc && REPORT=$GITHUB_WORKSPACE/art/lab/onnx/seedvc.md python $GITHUB_WORKSPACE/scripts/onnx-lab/seedvc_onnx.py

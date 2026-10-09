@@ -54,9 +54,22 @@ def song(seconds=30, sr=44100):
     return torch.from_numpy(np.frombuffer(raw, dtype=np.float32).copy().reshape(-1, 2).T)
 
 
-torch_model = get_model("htdemucs_ft_vocals" if os.environ.get("FT", "1") == "1" else "htdemucs")
-core = torch_model.models[0] if hasattr(torch_model, "models") else torch_model
+# htdemucs_ft is a bag of four fine-tuned models, one per source: take the one weighted for vocals
+bag = get_model("htdemucs_ft")
+vi_bag = list(bag.sources).index("vocals")
+core = max(zip(bag.models, bag.weights), key=lambda mw: mw[1][vi_bag])[0]
 core.eval()
+if not os.path.exists(ONNX):
+    # export the core (STFT / iSTFT outside, as demucs.onnx's convert-pth-to-onnx.py does)
+    from demucs.htdemucs import standalone_magnitude, standalone_spec
+    from torch.nn import functional as F
+
+    wav = torch.randn(1, 2, 343980)
+    wav = F.pad(wav, (0, int(core.segment * core.samplerate) - wav.shape[-1]))
+    os.makedirs(os.path.dirname(ONNX), exist_ok=True)
+    t = time.time()
+    torch.onnx.export(core, (wav, standalone_magnitude(standalone_spec(wav))), ONNX, export_params=True, opset_version=17, do_constant_folding=True, input_names=["mix", "spec"], output_names=["x", "xt"])
+    print(f"exported in {time.time() - t:.0f}s", flush=True)
 mix = song()
 ref = mix.mean(0)
 x = ((mix - ref.mean()) / (ref.std() + 1e-8))[None]
