@@ -6,6 +6,13 @@
       "model": "qwen",
       "size": "864*1536",
       "prompt": "A mobile app screen mockup, portrait, dark purple space theme with stars. Top bar title \"火星\". A chat between a cute fox mascot and the user. Mascot speech bubble: \"どんな雰囲気のMVにする？\". At the bottom a rounded input box with a microphone button and a big orange-pink gradient button \"おまかせで作って\". Clean, cute, rounded UI, Japanese text."
+    },
+    {
+      "id": "sample-kimorin-v1",
+      "model": "animagine",
+      "n": 1,
+      "size": "832*1216",
+      "prompt": "1boy, solo, fox mask, white mask with blue patterns, red hooded robe, cheerful, waving, starry space background, anime style"
     }
   ]
 }
