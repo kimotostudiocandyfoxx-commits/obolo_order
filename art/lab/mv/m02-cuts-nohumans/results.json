@@ -1,0 +1,167 @@
+{
+  "round": "m02-cuts-nohumans",
+  "hero": "creature, fox, non-human, mask, cat mask, glowing eyes, animal ears, fox ears, multiple tails, hooded cloak, red robe, blue jewelry, full body, solo",
+  "avg": {
+    "overall": 5.1,
+    "heroLikeness": 4.3,
+    "heroConsistency": 5.3,
+    "pictureQuality": 6.2,
+    "storyTelling": 5.4,
+    "lyricFit": 6.3,
+    "beatSync": 5,
+    "variety": 5.3,
+    "watchability": 5.1,
+    "kidsSafe": 7
+  },
+  "results": [
+    {
+      "id": "pop-bright",
+      "ok": true,
+      "song": "pop-bright~std",
+      "scenes": 7,
+      "painted": 7,
+      "seconds": {
+        "plan": 2,
+        "paint": 593,
+        "render": 12
+      },
+      "judge": {
+        "heroLikeness": 4,
+        "heroConsistency": 4,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 6,
+        "watchability": 5,
+        "kidsSafe": 7,
+        "overall": 5,
+        "problems": [
+          "00:00 Proportion and mask design deviate significantly from reference chibi doll aesthetic.",
+          "00:31 Mask style and color abruptly shift from white kitsune to dark visor.",
+          "00:37 Scenery cut lingers too long without hero presence."
+        ],
+        "fixIdeas": [
+          "Add chibi body proportions and specific blue mask markings to the character prompt.",
+          "Maintain consistent mask tokens across prompts to avoid spontaneous mask mutations.",
+          "Shorten static environment shots to keep pacing brisk."
+        ],
+        "bestMoments": [
+          "00:07 Peaceful window scene complementing the morning lyrics.",
+          "00:15 Smooth walking progression along the town street."
+        ]
+      }
+    },
+    {
+      "id": "rock-run",
+      "ok": true,
+      "song": "rock-run~std",
+      "scenes": 5,
+      "painted": 5,
+      "seconds": {
+        "plan": 2,
+        "paint": 594,
+        "render": 11
+      },
+      "judge": {
+        "heroLikeness": 4,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 6,
+        "watchability": 5,
+        "kidsSafe": 7,
+        "overall": 5,
+        "problems": [
+          "00:00 - Head and mask design alter the reference chibi mask into a fox muzzle with a small half-mask.",
+          "00:15 - Shots rely on basic pans across static illustrations instead of fluid character motion.",
+          "00:39 - Final shout reveals animal fangs and mouth, breaking the solid mask aesthetic."
+        ],
+        "fixIdeas": [
+          "Specify a smooth full-face porcelain mask with painted blue eyes in the negative prompts to avoid snout generation.",
+          "Add more cut transitions and animated overlay effects to match the vocal pacing."
+        ],
+        "bestMoments": [
+          "00:27 - Moonlit temple composition complements the vocal swell.",
+          "00:39 - Climax framing and speed lines deliver good energy."
+        ]
+      }
+    },
+    {
+      "id": "ballad-night",
+      "ok": true,
+      "song": "ballad-night~std",
+      "scenes": 8,
+      "painted": 8,
+      "seconds": {
+        "plan": 2,
+        "paint": 596,
+        "render": 13
+      },
+      "judge": {
+        "heroLikeness": 4,
+        "heroConsistency": 5,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 5,
+        "kidsSafe": 7,
+        "overall": 5,
+        "problems": [
+          "0:07 Reference chibi proportions are lost in favor of a tall humanoid fox.",
+          "0:14 Hero mask abruptly turns from white to black and stays inconsistent.",
+          "0:26 Static framing persists across verses with limited cinematic movement."
+        ],
+        "fixIdeas": [
+          "Enforce chibi body proportions and white mask details in prompts.",
+          "Use stronger motion prompts and camera pans to match musical energy shifts."
+        ],
+        "bestMoments": [
+          "0:00 Atmospheric opening town shot with falling meteor streaks.",
+          "0:26 Dynamic speed-line framing on the chorus drop."
+        ]
+      }
+    },
+    {
+      "id": "edm-party",
+      "ok": true,
+      "song": "edm-party~std",
+      "scenes": 8,
+      "painted": 8,
+      "seconds": {
+        "plan": 2,
+        "paint": 607,
+        "render": 13
+      },
+      "judge": {
+        "heroLikeness": 5.2,
+        "heroConsistency": 6.3,
+        "pictureQuality": 6.8,
+        "storyTelling": 4.5,
+        "lyricFit": 6.1,
+        "beatSync": 5,
+        "variety": 4.2,
+        "watchability": 5.3,
+        "kidsSafe": 7,
+        "overall": 5.4,
+        "problems": [
+          "00:00 - Character proportions shifted from original chibi mascot to tall anthro anime silhouette with half-mask.",
+          "00:30 - Final shot drags on for fourteen seconds with minimal visual progression.",
+          "00:31 - Character robe opens exposing chest, diverging from the original modest layered robe design."
+        ],
+        "fixIdeas": [
+          "Add 'chibi, cute mascot proportions, full face mask' to generation prompts to better match source reference.",
+          "Split the long finale at 00:30 into faster cuts with close-up dance moves synced to the chorus."
+        ],
+        "bestMoments": [
+          "00:19 - Energetic leap synced well with upbeat chorus tempo.",
+          "00:08 - Clean pose transition aligning nicely with the vocal cue."
+        ]
+      }
+    }
+  ]
+}
