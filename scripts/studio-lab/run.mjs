@@ -97,7 +97,7 @@ Score each 1-10 (10 = release quality on a streaming service, 5 = clearly amateu
 - artifacts: 10 = no glitches/noise/dropouts/garbled parts at all.
 Also: overall (1-10), heard: the Japanese words you actually hear (hiragana, short), problems: concrete list with timestamps (mm:ss), fixIdeas: what to change in the generation recipe.`;
 
-async function judge(c, mixB64, style) {
+async function judge(c, mixB64, style, before) {
   if (!GEMINI) return { error: 'no GEMINI_API_KEY' };
   const lyrics = c.sections.map((s) => `[${s.name}]\n${s.lines.join('\n')}`).join('\n\n');
   const schema = {
@@ -120,6 +120,7 @@ async function judge(c, mixB64, style) {
           {
             role: 'user',
             parts: [
+              ...(before ? [{ text: 'BEFORE (the original song the member liked):' }, { inlineData: { mimeType: 'audio/mp4', data: before } }, { text: 'AFTER (the longer version, judge THIS one):' }] : []),
               { inlineData: { mimeType: 'audio/mp4', data: mixB64 } },
               { text: `${RUBRIC}\n\nRequested style (a song WITH vocals): ${style}\nTempo ${c.bpm} BPM.\n\nExpected lyrics:\n${lyrics}` },
             ],
@@ -179,9 +180,9 @@ for (const base of round.cases)
 
 // extensions (2番 / 大サビ / longer): the finished song made longer by POST /extend, judged with all its lyrics
 for (const x of round.extend ?? []) {
-  const from = results.find((r) => r.ok && r.id.split('~')[0] === x.of);
+  const from = results.find((r) => r.ok && r.id.split('~')[0] === x.of && (!x.variant || r.variant === x.variant));
   const base = round.cases.find((c) => c.id === x.of);
-  const id = `${x.of}+${x.name}`;
+  const id = `${x.of}+${x.name}${x.mode === 'regen' ? '~regen' : ''}`;
   console.log(`== ${id}`);
   if (!from || !base) {
     results.push({ id, variant: 'extend', ok: false, error: `no finished ${x.of} to extend` });
@@ -197,17 +198,24 @@ for (const x of round.extend ?? []) {
       voice: from.sent.voice ? voice : undefined,
       lyrics: c.sections.flatMap((s) => s.lines.map((text) => ({ section: s.name, text }))),
       seconds: x.seconds,
-      src: readFileSync(from.file).toString('base64'),
-      keep,
+      ...(x.mode === 'regen' ? {} : { src: readFileSync(from.file).toString('base64'), keep }),
     };
     const t0 = Date.now();
-    const res = await fetch(`${MUSIC_URL}/extend`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(900_000) });
+    // repaint: the original kept, the rest sung after it; regen: the whole longer song again with the same seed
+    const res = await fetch(`${MUSIC_URL}/${x.mode === 'regen' ? 'song' : 'extend'}`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(900_000) });
     if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 300)}`);
     const made = await res.json();
     const mix = join(OUT, `${id}.m4a`);
     writeFileSync(mix, Buffer.from(made.mix, 'base64'));
     const m = measure(mix);
-    const j = await judge(c, made.mix, `${body.prompt}. The first ${keep.toFixed(0)} s are the original song, the rest was added later (2nd verse / big chorus): also judge whether the join is seamless and the new part sounds like the same song and singer.`);
+    const j = await judge(
+      c,
+      made.mix,
+      x.mode === 'regen'
+        ? `${body.prompt}. This longer version was made again from scratch with the added lyrics: also judge whether its first part still sounds like the BEFORE song (same melody, singer, arrangement) and whether the added part fits.`
+        : `${body.prompt}. The first ${keep.toFixed(0)} s are the BEFORE song, kept as it was; the rest was added (2nd verse / big chorus): also judge whether the join is seamless and the new part sounds like the same song and singer.`,
+      readFileSync(from.file).toString('base64'),
+    );
     results.push({ id, variant: 'extend', ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: Math.round((Date.now() - t0) / 1000), lines: made.lines?.length ?? 0, keep, ...m, judge: j });
     console.log(`${id}: overall ${j.overall ?? '?'}`);
   } catch (e) {

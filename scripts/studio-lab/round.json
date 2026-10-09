@@ -1,7 +1,9 @@
 {
-  "round": "r02-lm",
-  "note": "新方針：基本は45秒前後（Aメロ4行＋サビ4行）。LM なし／ありを比べる。気に入った曲に「2番」「大サビ」を後から足す（/extend）テストも入れる。",
-  "tune": {},
+  "round": "r03-voice-extend",
+  "note": "LM を標準に。声を変える曲（ballad / hiphop / kids）で、歌手の声域をユーザーの声に合わせる（matchVoice）あり・なし、変換の細かさ（voiceSteps 50）を比べる。2番・大サビは LM の良い曲に、①そのまま後ろに続ける（repaint）②同じ種で長い版を作り直す（regen）を比べる。",
+  "tune": {
+    "lm": true
+  },
   "keepStems": false,
   "cases": [
     {
@@ -31,7 +33,10 @@
             "あしたもきっといいひ"
           ]
         }
-      ]
+      ],
+      "tune": {
+        "seed": 1234
+      }
     },
     {
       "id": "ballad-night",
@@ -60,36 +65,10 @@
             "きみがいたなつのひ"
           ]
         }
-      ]
-    },
-    {
-      "id": "rock-run",
-      "prompt": "energetic japanese rock instrumental, distorted electric guitars, bass, powerful drums, anime opening style, 160 bpm, E minor, no vocals",
-      "bpm": 160,
-      "keyRoot": 4,
-      "scale": "minor",
-      "seconds": 45.0,
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "はしれ はしれ かぜをきって",
-            "まけないこころ もやしてゆけ",
-            "たおれたって なんどでも",
-            "たちあがるんだ"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "いまだ さけべ ぼくらのうた",
-            "やみをきりさく ひかりになれ",
-            "とどけ とどけ そらのかなた",
-            "ゆめはおわらない"
-          ]
-        }
-      ]
+      ],
+      "tune": {
+        "seed": 4321
+      }
     },
     {
       "id": "hiphop-chill",
@@ -116,35 +95,6 @@
             "ぼくらのペースで ステップふんで",
             "きょうもいいかんじ ほらきこえる",
             "まちのリズム"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "edm-party",
-      "prompt": "upbeat japanese edm instrumental, bright synth leads, four on the floor kick, big build up and drop, 128 bpm, G major, no vocals",
-      "bpm": 128,
-      "keyRoot": 7,
-      "scale": "major",
-      "seconds": 45.0,
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "ネオンのなか ステップふんで",
-            "こころのおと ボリュームあげて",
-            "みんなでいっしょに てをあげて",
-            "いまはじまるよ"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "おどれ おどれ よるがあけるまで",
-            "ひかりのなかで とびはねよう",
-            "ぼくらはいま むてきなんだ",
-            "パーティーはこれから"
           ]
         }
       ]
@@ -179,13 +129,19 @@
   ],
   "variants": [
     {
-      "name": "base",
+      "name": "match",
       "tune": {}
     },
     {
-      "name": "lm",
+      "name": "nomatch",
       "tune": {
-        "lm": true
+        "matchVoice": false
+      }
+    },
+    {
+      "name": "match50",
+      "tune": {
+        "voiceSteps": 50
       }
     }
   ],
@@ -213,7 +169,35 @@
             "あしたもきっといいひ"
           ]
         }
-      ]
+      ],
+      "variant": "match"
+    },
+    {
+      "of": "pop-bright",
+      "name": "2ban",
+      "seconds": 79.3,
+      "sections": [
+        {
+          "name": "verse",
+          "lines": [
+            "ゆうやけのみち かげがのびて",
+            "きょうのできごと はなしながら",
+            "ちいさなけんか すぐなかなおり",
+            "またあるきだす"
+          ]
+        },
+        {
+          "name": "chorus",
+          "lines": [
+            "きみとならどこまでも",
+            "そらはいつもあおいから",
+            "わらってうたおう いまここで",
+            "あしたもきっといいひ"
+          ]
+        }
+      ],
+      "variant": "match",
+      "mode": "regen"
     },
     {
       "of": "ballad-night",
@@ -236,10 +220,36 @@
             "きみがいたなつのひ"
           ]
         }
-      ]
+      ],
+      "variant": "match"
+    },
+    {
+      "of": "ballad-night",
+      "name": "oosabi",
+      "seconds": 80.0,
+      "sections": [
+        {
+          "name": "bridge",
+          "lines": [
+            "もしもあのひにもどれたら",
+            "ぼくはなんていうだろう"
+          ]
+        },
+        {
+          "name": "chorus",
+          "lines": [
+            "あいたいよ いまでもずっと",
+            "ことばにできないおもい",
+            "このうたにのせて とどけたい",
+            "きみがいたなつのひ"
+          ]
+        }
+      ],
+      "variant": "match",
+      "mode": "regen"
     }
   ],
   "needs": [
-    "/extend"
+    "matchVoice"
   ]
 }

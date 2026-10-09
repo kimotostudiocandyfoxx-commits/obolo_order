@@ -111,6 +111,51 @@ class AceStep15:
             return read_audio(result.audios[0]["path"])
 
 
+def voice_register(voice_b64: str) -> str | None:
+    """'male' / 'female' from the member's recording (median pitch), or None if it cannot tell."""
+    import base64
+
+    import torch
+    import torchaudio
+
+    try:
+        with tempfile.TemporaryDirectory() as d:
+            raw, wav = os.path.join(d, "v.in"), os.path.join(d, "v.wav")
+            with open(raw, "wb") as f:
+                f.write(base64.b64decode(voice_b64))
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", raw, "-t", "25", "-ac", "1", "-ar", "16000", wav], check=True)
+            sr, x = wavfile.read(wav)
+        x = torch.tensor(x.astype(np.float32) / 32768.0)
+        # loud frames only, then the pitch of each 50 ms frame
+        frames = x[: len(x) // 800 * 800].reshape(-1, 800)
+        loud = frames[frames.pow(2).mean(1).sqrt() > 0.02]
+        if len(loud) < 10:
+            return None
+        f0 = torchaudio.functional.detect_pitch_frequency(loud.reshape(1, -1), sr, freq_low=70, freq_high=500)
+        f0 = f0[(f0 > 70) & (f0 < 500)]
+        if f0.numel() < 10:
+            return None
+        med = float(f0.median())
+        print(f"voice register: median {med:.0f} Hz", flush=True)
+        return "male" if med < 165 else "female"
+    except Exception as e:  # noqa: BLE001
+        print(f"voice register failed: {e!r}", flush=True)
+        return None
+
+
+def sung_caption(r: "SongReq") -> str:
+    """The caption, with the singer in the member's register when their voice will replace it."""
+    import re
+
+    cap = r.prompt
+    if r.voice and r.matchVoice:
+        reg = voice_register(r.voice)
+        if reg:
+            cap = re.sub(r"\b(fe)?male (lead )?(vocals?|singer)\b", "", cap, flags=re.I)
+            cap = f"{cap}, {reg} lead vocal"
+    return re.sub(r"\s*,\s*,+", ", ", cap).strip(" ,")[:512]
+
+
 def ace_song(engine: "AceStep15", r: "SongReq", seconds: float, out_dir: str) -> tuple[str, list[dict]]:
     """The whole song with vocals (ACE-Step text2music with the lyrics) → (wav path, lyric line times)."""
     from acestep.inference import GenerationConfig, GenerationParams, generate_music
@@ -119,7 +164,7 @@ def ace_song(engine: "AceStep15", r: "SongReq", seconds: float, out_dir: str) ->
     lyrics = format_lyrics(r.lyrics)
     params = GenerationParams(
         task_type="text2music",
-        caption=r.prompt[:512],
+        caption=sung_caption(r),
         lyrics=lyrics,
         instrumental=False,
         vocal_language=r.language,
@@ -289,7 +334,7 @@ def svc_health() -> dict:
         return {"ready": False, "error": f"starting ({e!r})"[:120]}
 
 
-def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float) -> tuple[str | None, str]:
+def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int = 30) -> tuple[str | None, str]:
     """The sung vocal in the member's voice (Seed-VC), or (None, why) to keep the studio's voice."""
     import base64
 
@@ -313,7 +358,7 @@ def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float) -> tuple[str
     src = os.path.join(out_dir, "vocals-mono.wav")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vocals, "-ac", "1", "-ar", "44100", src], check=True)
     out = os.path.join(out_dir, "vocals-member.wav")
-    res = svc_call("POST", "/convert", {"source": src, "target": ref, "out": out, "steps": 30, "cfg": cfg}, timeout=600)
+    res = svc_call("POST", "/convert", {"source": src, "target": ref, "out": out, "steps": steps, "cfg": cfg}, timeout=600)
     if not res.get("ok"):
         return None, f"seed-vc failed: {res.get('error')}"
     return out, f"octave shift {res.get('shift', 0)}, {res.get('seconds')}s"
@@ -544,8 +589,13 @@ class SongReq(BaseModel):
     steps: int = Field(8, ge=4, le=64)
     shift: float = Field(3.0, ge=1.0, le=6.0)
     seed: int | None = Field(None, ge=0)
-    # ACE-Step's 5Hz language model plans the song first ("thinking": melody/structure codes)
-    lm: bool = False
+    # ACE-Step's 5Hz language model plans the song first ("thinking": melody/structure codes).
+    # Studio lab r02 (2026-10-09): overall 6.9 with it vs 3.1 without (lines skipped, no singing) → on
+    lm: bool = True
+    # with a member's recording: the studio sings in the member's register (male / female vocal from
+    # the recording's pitch), so Seed-VC needs no octave jump (r02: octave jumps sounded robotic)
+    matchVoice: bool = True
+    voiceSteps: int = Field(30, ge=10, le=100)
 
 
 @app.get("/health")
@@ -626,7 +676,7 @@ def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", 
     voiced, how = (None, "no voice sent")
     if r.voice:
         try:
-            voiced, how = to_voice(vocals, r.voice, d, r.similarity)
+            voiced, how = to_voice(vocals, r.voice, d, r.similarity, r.voiceSteps)
         except Exception as e:  # noqa: BLE001 — the song is still delivered in the studio's voice
             traceback.print_exc()
             voiced, how = None, f"seed-vc error: {e!r}"[:200]
@@ -714,7 +764,7 @@ def ace_extend(engine: "AceStep15", r: ExtendReq, out_dir: str) -> tuple[str, li
         repainting_end=-1,
         chunk_mask_mode="explicit",
         repaint_wav_crossfade_sec=0.5,
-        caption=r.prompt[:512],
+        caption=sung_caption(r),
         lyrics=format_lyrics(r.lyrics),
         instrumental=False,
         vocal_language=r.language,
