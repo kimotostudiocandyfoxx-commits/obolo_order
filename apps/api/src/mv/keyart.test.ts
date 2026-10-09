@@ -44,7 +44,7 @@ describe('KeyArtist scenes', () => {
         throw new Error(`unexpected ${url}`);
       }),
     );
-    expect((await artist().paintAll(['1girl, beach'], 1, 2))[0]?.equals(out)).toBe(true);
+    expect((await artist().paintAll([{ tags: '1girl, beach' }], 1, 2))[0]?.equals(out)).toBe(true);
   }, 20_000);
 
   it('drops a picture the NSFW check does not pass', async () => {
@@ -57,7 +57,7 @@ describe('KeyArtist scenes', () => {
         throw new Error(`unexpected ${url}`);
       }),
     );
-    expect(await artist().paintAll(['scenery'], 1, 2)).toEqual([null]);
+    expect(await artist().paintAll([{ tags: 'scenery' }], 1, 2)).toEqual([null]);
   }, 20_000);
 
   it('prefers our own GPU (one call, Animagine recipe), and sends only what it missed to Novita', async () => {
@@ -73,6 +73,9 @@ describe('KeyArtist scenes', () => {
           expect(body.items.map((i: { seed: number }) => i.seed)).toEqual([7, 8]);
           expect(body.items[0].prompt).toContain('1boy, safe, anime coloring');
           expect(body.negative).toContain('explicit');
+          expect(body.items.map((i: { hero: boolean }) => i.hero)).toEqual([true, false]);
+          expect(body.refScale).toBe(0.5);
+          expect(body.reference.length).toBeGreaterThan(100);
           expect((init?.headers as Record<string, string>).authorization).toBe('Bearer tok');
           return Response.json({ images: [out.toString('base64'), null] });
         }
@@ -83,7 +86,7 @@ describe('KeyArtist scenes', () => {
       }),
     );
     const a = artist({ paintUrl: 'https://gpu.example/', paintToken: async () => 'tok', novitaModel: 'animagineXL40_v4Opt.safetensors' });
-    const got = await a.paintAll(['1boy', 'scenery'], 7, 4);
+    const got = await a.paintAll([{ tags: '1boy', hero: true }, { tags: 'scenery' }], 7, 4, { reference: out, refScale: 0.5 });
     expect(got.every((b) => b?.equals(out))).toBe(true);
     expect(calls.filter((c) => c.endsWith('/paint'))).toHaveLength(1);
     expect(calls.filter((c) => c.endsWith('/qwen-image-txt2img'))).toHaveLength(1);

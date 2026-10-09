@@ -669,6 +669,8 @@ def song(r: SongReq):
 class PaintItem(BaseModel):
     prompt: str = Field(min_length=1, max_length=2000)
     seed: int = 0
+    # a scene with the hero in it (painted looking at `reference`)
+    hero: bool = False
 
 
 class PaintReq(BaseModel):
@@ -677,6 +679,9 @@ class PaintReq(BaseModel):
     side: int = 1024
     steps: int = Field(default=28, ge=8, le=60)
     cfg: float = Field(default=5.0, ge=1.0, le=12.0)
+    # the hero's own picture (base64) and how strongly the hero scenes follow it (IP-Adapter)
+    reference: str | None = Field(default=None, max_length=4_000_000)
+    refScale: float = Field(default=0.6, ge=0.0, le=1.0)
 
 
 @app.post("/paint")
@@ -687,6 +692,6 @@ def paint(r: PaintReq):
     if painter.state["pipe"] is None:
         raise HTTPException(500, f"painter failed to load: {painter.state['error']}")
     t1 = time.time()
-    images = painter.paint([i.model_dump() for i in r.items], r.negative, r.side, r.steps, r.cfg)
+    images = painter.paint([i.model_dump() for i in r.items], r.negative, r.side, r.steps, r.cfg, r.reference, r.refScale)
     print(f"paint: {sum(1 for i in images if i)}/{len(images)} pictures in {time.time() - t1:.0f}s (+{t1 - t0:.0f}s loading)", flush=True)
     return {"images": images, "seconds": round(time.time() - t0, 1)}

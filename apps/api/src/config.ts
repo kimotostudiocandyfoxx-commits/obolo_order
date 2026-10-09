@@ -109,13 +109,15 @@ const Env = z.object({
   MV_QWEN_SCENES: z.coerce.number().min(4).max(60).default(12),
   /** paint MV scenes with Animagine XL on our own GPU (gpu/music POST /paint) */
   MV_GPU_PAINT: bool(false),
+  /** how strongly hero scenes follow the hero's own picture (IP-Adapter on our GPU; 0 = tags only) */
+  MV_HERO_REF: z.coerce.number().min(0).max(1).default(0.6),
   MV_PAINT_PARALLEL: z.coerce.number().min(1).max(16).default(6),
   MV_KEYART_MODEL: z.string().default('gemini-2.5-flash-image'),
   /** キメ絵 by Novita AI (client decision 2026-10-08): the key, the anime checkpoint, how far from the photo (0–1), the size */
   NOVITA_API_KEY: secret(),
   NOVITA_MODEL: secret(),
   NOVITA_STRENGTH: z.coerce.number().min(0.1).max(0.9).default(0.5),
-  NOVITA_SIDE: z.coerce.number().default(1024),
+  NOVITA_SIDE: z.coerce.number().default(768),
   RUNWARE_API_KEY: secret(),
   RUNWARE_MODEL: secret(),
 

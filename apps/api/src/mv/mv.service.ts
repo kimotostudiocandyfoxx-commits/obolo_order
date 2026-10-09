@@ -276,11 +276,7 @@ export class MvService {
       );
       // paint every scene; one seed per MV keeps the look together
       const seed = Math.floor(Math.random() * 2 ** 31);
-      const drawn = await this.keyArtist.paintAll(
-        story.scenes.map((sc) => sc.tags),
-        seed,
-        this.cfg.MV_PAINT_PARALLEL,
-      );
+      const drawn = await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF });
       const pics: (string | null)[] = await Promise.all(
         drawn.map(async (img, k) => {
           if (!img) return null;

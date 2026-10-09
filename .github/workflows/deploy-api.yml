@@ -129,10 +129,11 @@ jobs:
             MV_KEY_CUTS=${{ vars.MV_KEY_CUTS || '2' }}
             MV_QWEN_SCENES=${{ vars.MV_QWEN_SCENES || '12' }}
             MV_GPU_PAINT=${{ vars.MV_GPU_PAINT || (vars.MUSIC_REGION && 'true') || 'false' }}
+            MV_HERO_REF=${{ vars.MV_HERO_REF || '0.6' }}
             RUNWARE_MODEL=${{ vars.RUNWARE_MODEL }}
             NOVITA_MODEL=${{ vars.NOVITA_MODEL }}
             NOVITA_STRENGTH=${{ vars.NOVITA_STRENGTH || '0.5' }}
-            NOVITA_SIDE=${{ vars.NOVITA_SIDE || '1024' }}
+            NOVITA_SIDE=${{ vars.NOVITA_SIDE || '768' }}
             MUSIC_URL=${{ vars.MUSIC_REGION && format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) || '' }}
           secrets: ${{ steps.sec.outputs.list }}
 

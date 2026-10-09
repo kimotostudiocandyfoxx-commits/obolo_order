@@ -101,17 +101,56 @@ def load(bucket_name: str) -> None:
             traceback.print_exc()
 
 
-def paint(items: list[dict], negative: str, side: int, steps: int, cfg: float) -> list[str | None]:
-    """Each item {prompt, seed} → a JPEG (base64), in order; None where one failed."""
+IP_REPO = os.environ.get("PAINT_IP_REPO", "h94/IP-Adapter")
+IP_WEIGHT = os.environ.get("PAINT_IP_WEIGHT", "ip-adapter-plus_sdxl_vit-h.safetensors")
+
+
+def _ip_adapter(pipe) -> None:
+    """IP-Adapter (SDXL, ViT-H): the hero's own picture steers every hero scene, so the creator's
+    character looks like itself and the same in every scene (tags alone cannot draw an original
+    character). Loaded the first time a reference picture comes."""
+    if state.get("ip"):
+        return
     import torch
+    from transformers import CLIPVisionModelWithProjection
+
+    t = time.time()
+    enc = CLIPVisionModelWithProjection.from_pretrained(IP_REPO, subfolder="models/image_encoder", torch_dtype=torch.float16)
+    pipe.image_encoder = enc.to("cuda")
+    pipe.load_ip_adapter(IP_REPO, subfolder="sdxl_models", weight_name=IP_WEIGHT, image_encoder_folder=None)
+    state["ip"] = True
+    print(f"paint: IP-Adapter ready in {time.time() - t:.0f}s", flush=True)
+
+
+def paint(items: list[dict], negative: str, side: int, steps: int, cfg: float, ref_b64: str | None = None, ref_scale: float = 0.6) -> list[str | None]:
+    """Each item {prompt, seed, hero} → a JPEG (base64), in order; None where one failed.
+    With a reference picture, the hero scenes are painted looking at it (IP-Adapter, ref_scale)."""
+    import torch
+    from PIL import Image
 
     pipe = state["pipe"]
     side = max(512, min(1536, side // 64 * 64))
     out: list[str | None] = []
     with paint_lock:
+        ref = None
+        if ref_b64:
+            try:
+                _ip_adapter(pipe)
+                ref = Image.open(io.BytesIO(base64.b64decode(ref_b64))).convert("RGB")
+            except Exception as e:  # noqa: BLE001 — paint without it
+                print(f"paint: no IP-Adapter ({e!r})", flush=True)
+                traceback.print_exc()
+        elif state.get("ip"):
+            pipe.unload_ip_adapter()
+            state["ip"] = False
         for it in items:
             try:
                 g = torch.Generator(device="cuda").manual_seed(int(it.get("seed", 0)) % 2**31)
+                extra = {}
+                if ref is not None:
+                    # every call needs the picture once the adapter is in; scale 0 = not used for this scene
+                    pipe.set_ip_adapter_scale(ref_scale if it.get("hero") else 0.0)
+                    extra = {"ip_adapter_image": ref}
                 img = pipe(
                     prompt=it["prompt"],
                     negative_prompt=negative,
@@ -120,6 +159,7 @@ def paint(items: list[dict], negative: str, side: int, steps: int, cfg: float) -
                     num_inference_steps=steps,
                     guidance_scale=cfg,
                     generator=g,
+                    **extra,
                 ).images[0]
                 buf = io.BytesIO()
                 img.save(buf, format="JPEG", quality=90)

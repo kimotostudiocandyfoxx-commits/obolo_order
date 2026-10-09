@@ -35,6 +35,10 @@ export function novitaRecipe(model: string, redraw = true) {
   return { prompt: `masterpiece, best quality, ${base}`, negative: NEGATIVE, sampler: 'DPM++ 2M Karras', cfg: 7, steps: 24 };
 }
 const SIDE = 1024;
+
+/** One storyboard scene to paint: its tags, and whether the hero is in it. */
+export type PaintScene = { tags: string; hero?: boolean };
+export type PaintOptions = { reference?: Buffer | null; refScale?: number; steps?: number };
 const log = new Logger('MvKeyArt');
 
 export class KeyArtist {
@@ -96,10 +100,11 @@ export class KeyArtist {
    * whole list in one call with Animagine XL 4.0 (its quality tags added, the GPU serves one request
    * at a time); anything it did not paint goes to Novita Qwen-Image, a few at a time, as TV-anime stills.
    */
-  async paintAll(tags: string[], seed: number, parallel: number): Promise<(Buffer | null)[]> {
+  async paintAll(scenes: PaintScene[], seed: number, parallel: number, opt: PaintOptions = {}): Promise<(Buffer | null)[]> {
+    const tags = scenes.map((s) => s.tags);
     const out: (Buffer | null)[] = tags.map(() => null);
     if (this.o.paintUrl) {
-      const got = await this.gpuPaint(tags, seed).catch((e) => {
+      const got = await this.gpuPaint(scenes, seed, opt).catch((e) => {
         log.warn(`gpu paint: ${String(e).slice(0, 200)}`);
         return [] as (Buffer | null)[];
       });
@@ -125,19 +130,22 @@ export class KeyArtist {
     });
   }
 
-  private async gpuPaint(tags: string[], seed: number): Promise<(Buffer | null)[]> {
+  private async gpuPaint(scenes: PaintScene[], seed: number, opt: PaintOptions): Promise<(Buffer | null)[]> {
     const recipe = novitaRecipe(this.o.novitaModel ?? 'animagine', false);
     const token = await this.o.paintToken?.();
+    // the hero's own picture: the hero scenes are painted looking at it (IP-Adapter on our GPU)
+    const reference = opt.reference ? (await sharp(opt.reference).rotate().flatten({ background: '#ffffff' }).resize(512, 512, { fit: 'contain', background: '#ffffff' }).jpeg({ quality: 90 }).toBuffer()).toString('base64') : undefined;
     const res = await fetch(`${this.o.paintUrl!.replace(/\/$/, '')}/paint`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({
         // kids-friendly app: Animagine's "safe" rating tag, and the other ratings in the negative
-        items: tags.map((t, k) => ({ prompt: `${t}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + k })),
+        items: scenes.map((s, k) => ({ prompt: `${s.tags}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + k, hero: !!s.hero })),
         negative: `${recipe.negative}, sensitive, explicit, suggestive`,
         side: this.o.novitaSide,
-        steps: recipe.steps,
+        steps: opt.steps ?? recipe.steps,
         cfg: recipe.cfg,
+        ...(reference ? { reference, refScale: opt.refScale ?? 0.6 } : {}),
       }),
       // a cold GPU loads the painter first; ~8 s a picture after that
       signal: AbortSignal.timeout(600_000),
