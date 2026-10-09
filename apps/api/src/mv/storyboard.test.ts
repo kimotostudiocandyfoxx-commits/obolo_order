@@ -65,14 +65,15 @@ describe('story cuts on the bars', () => {
     expect(storyToPlan(story).segments).toHaveLength(2);
   });
 
-  it('hero-less scenes never draw people; GLITCH only on loud songs', () => {
+  it('the hero is in every picture (a "scenery" scene is a wide view), never other people; GLITCH only on loud songs', () => {
     const i = { title: 't', seconds: 12, bpm: 120, mood: '', music: 'soft piano ballad', lyrics: [], hero: 'fox', maxScenes: 10 };
     const p = normalizeStory({ style: 'x', scenes: [
       { dur: 4, tags: '1girl, park', hero: false, motion: 'zoom-in', effect: 'GLITCH' },
       { dur: 4, tags: 'running', hero: true, motion: 'zoom-in', effect: 'NONE' },
       { dur: 4, tags: 'sky', hero: true, motion: 'zoom-in', effect: 'NONE' },
     ] }, i);
-    expect(p.scenes[0].tags.startsWith('no humans, scenery')).toBe(true);
+    expect(p.scenes[0].hero).toBe(true);
+    expect(p.scenes[0].tags.startsWith('solo, fox, wide shot, scenery, small figure')).toBe(true);
     expect(p.scenes[0].tags).not.toContain('1girl');
     expect(p.scenes[0].effect).toBe('SPEED_LINES');
     expect(p.scenes[1].tags.startsWith('solo, fox')).toBe(true);

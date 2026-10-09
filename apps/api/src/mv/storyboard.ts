@@ -150,26 +150,24 @@ export function normalizeStory(p: Partial<StoryPlan>, i: StoryInput): StoryPlan 
   for (const s of (p.scenes ?? []).slice(0, i.maxScenes)) {
     if (t >= i.seconds - 0.05) break;
     const dur = Math.min(Math.max(Number(s.dur) || 3, 1.2), 12, i.seconds - t);
-    const hero = s.hero !== false;
-    const own = clean(s.tags ?? '');
-    if (!own) continue;
+    // MV lab m04: the hero-less scenery shots (club, stage, rooftop) kept painting stray people even
+    // with "no humans" → the hero is in every picture; a "scenery" shot shows them small in a wide view
+    const own = clean(s.tags ?? '').replace(/\b(1girl|1boy|2girls|2boys|girl|boy|person|people|crowd|human|no humans)s?\b,?/gi, '');
+    if (!own.trim()) continue;
+    const wide = s.hero === false ? 'wide shot, scenery, small figure, ' : '';
     scenes.push({
       dur,
-      hero,
-      // MV lab m01: hero-less shots got a random human girl → "no humans"; hero shots: the hero alone
-      tags: [hero ? `solo, ${i.hero}` : 'no humans, scenery', own.replace(/\b(1girl|1boy|2girls|2boys|girl|boy|person|people|crowd|human)s?\b,?/gi, ''), style].filter(Boolean).join(', '),
+      hero: true,
+      tags: [`solo, ${i.hero}`, `${wide}${own}`, style].filter(Boolean).join(', '),
       motion: MOTIONS.includes(s.motion) || s.motion === 'still' ? s.motion : 'zoom-in',
       effect: calmEffect(EFFECTS.includes(s.effect) ? s.effect : 'NONE', i.music),
     });
     t += dur;
   }
   if (scenes.length < 3) return rule;
-  // stretch the last scene to the end (or add one more from the rule storyboard)
-  if (t < i.seconds - 0.05) {
-    const rest = i.seconds - t;
-    if (rest <= 4 || scenes.length >= i.maxScenes) scenes[scenes.length - 1].dur += rest;
-    else scenes.push({ ...rule.scenes[rule.scenes.length - 1], dur: rest });
-  }
+  // stretch the last scene to the end (its shots are cut on the bars) — a rule scene added here had
+  // other tags and changed the hero's outfit at the very end (MV lab m04)
+  if (t < i.seconds - 0.05) scenes[scenes.length - 1].dur += i.seconds - t;
   const lyrics = i.lyrics.map((_, k) => (TEXT_EFFECTS.includes(p.lyrics?.[k] as MvTextEffect) ? (p.lyrics![k] as MvTextEffect) : rule.lyrics[k]));
   return { note: (p.note || '').slice(0, 160) || rule.note, style, scenes, lyrics };
 }
@@ -213,8 +211,8 @@ export async function planStory(i: StoryInput, apiKey: string | undefined, model
     i.lyrics.length ? `Lyric lines (start second [section]: text):\n${i.lyrics.map((l) => `${l.t.toFixed(1)} [${l.chorus ? 'chorus' : 'verse'}]: ${l.text}`).join('\n')}` : 'Instrumental, no lyrics.',
     i.mood ? `What the creator wants: ${i.mood}` : 'The creator left the mood to you: read it from the lyrics and the music.',
     `The hero is the creator's own character (${i.hero}).`,
-    `Write ${n} scenes (at most ${i.maxScenes}) that tell one story following the lyrics: each scene shows what the lyric line playing under it is about. Keep places consistent within a section, change them between sections. The hero appears in most scenes; use a few hero-less scenery shots for breathing room.`,
-    'Start a new scene where a new lyric line starts, so the picture always shows the line being sung. Never put other people or a different character in the pictures: only the hero, or empty scenery (hero = false, "no humans").',
+    `Write ${n} scenes (at most ${i.maxScenes}) that tell one story following the lyrics: each scene shows what the lyric line playing under it is about. Keep places consistent within a section, change them between sections. Use a few wide views for breathing room.`,
+    'Start a new scene where a new lyric line starts, so the picture always shows the line being sung. The hero is in every picture and is the only character: never other people or creatures (hero = false only for a wide view where the hero is small in the landscape). Keep one world for the whole MV (no modern gadgets or a different era unless the lyrics are about them).',
     'Verses calm (NONE, MINIMAL_CHILL lyrics); chorus big (close-ups, dynamic angles, low angle, SPEED_LINES, ZOOM_BURST / STROBO_FLASH lyrics; GLITCH / SHAKE_HARD only for loud rock or electronic songs). Vary shot sizes (wide, full body, upper body, close-up), places and light. End with a memorable closing image.',
     `Scene durations are whole beats and add up to ${i.seconds.toFixed(1)} seconds. Give exactly ${i.lyrics.length} lyric effects.`,
   ].join('\n');
