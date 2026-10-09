@@ -1,14 +1,24 @@
 {
   "round": "m01-baseline",
-  "note": "今の本番と同じ作り方（絵コンテ Gemini Flash-Lite、自前GPUの Animagine で全場面）。主人公はきもりん（狐面のフードキャラ）。",
+  "note": "今の本番と同じ作り方（絵コンテ Gemini Flash-Lite、自前GPUの Animagine 768px、主人公の絵を見ながら描く IP-Adapter 0.6）。主人公はきもりん。",
   "hero": "art/lab/mv/hero.jpg",
-  "songs": "art/lab/studio/r01-baseline/results.json",
+  "songs": "art/lab/studio/r04-all-genres/results.json",
   "painter": "gpu",
   "maxScenes": 30,
   "side": 768,
   "cases": [
-    { "id": "pop-bright", "song": "pop-bright" },
-    { "id": "rock-run", "song": "rock-run" },
-    { "id": "ballad-night", "song": "ballad-night" }
-  ]
+    {
+      "id": "pop-bright",
+      "song": "pop-bright"
+    },
+    {
+      "id": "rock-run",
+      "song": "rock-run"
+    },
+    {
+      "id": "ballad-night",
+      "song": "ballad-night"
+    }
+  ],
+  "heroRef": 0.6
 }

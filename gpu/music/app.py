@@ -137,7 +137,8 @@ def voice_register(voice_b64: str) -> str | None:
             return None
         med = float(f0.median())
         print(f"voice register: median {med:.0f} Hz", flush=True)
-        return "male" if med < 165 else "female"
+        # speaking pitch: men ~85–180 Hz, women ~165–255 Hz; studio lab r03: a male reference read 167 Hz
+        return "male" if med < 185 else "female"
     except Exception as e:  # noqa: BLE001
         print(f"voice register failed: {e!r}", flush=True)
         return None
@@ -820,6 +821,31 @@ class PaintReq(BaseModel):
     # the hero's own picture (base64) and how strongly the hero scenes follow it (IP-Adapter)
     reference: str | None = Field(default=None, max_length=4_000_000)
     refScale: float = Field(default=0.6, ge=0.0, le=1.0)
+
+
+class WarmReq(BaseModel):
+    ip: bool = False
+
+
+@app.post("/paint/warm")
+def paint_warm(r: WarmReq):
+    """Load the painter (and the IP-Adapter) in the background and answer at once: the API polls
+    /health until painter.ready, then sends the scenes (a cold load takes minutes, longer than an
+    HTTP client waits for an answer)."""
+
+    def go():
+        painter.load(CKPT_BUCKET)
+        if r.ip and painter.state["pipe"] is not None:
+            with painter.paint_lock:
+                try:
+                    painter._ip_adapter(painter.state["pipe"])
+                except Exception as e:  # noqa: BLE001
+                    print(f"paint: IP-Adapter failed to load: {e!r}", flush=True)
+                    painter.state["ipError"] = repr(e)[:200]
+
+    if painter.state["pipe"] is None or (r.ip and not painter.state.get("ip")):
+        threading.Thread(target=go, daemon=True).start()
+    return {k: v for k, v in painter.state.items() if k != "pipe"} | {"ready": painter.state["pipe"] is not None}
 
 
 @app.post("/paint")

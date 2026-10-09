@@ -10,7 +10,7 @@ on:
     paths: ['scripts/mv-lab/**', '.github/workflows/mv-lab.yml', 'apps/api/scripts/mv-lab.ts']
 
 concurrency:
-  group: studio-lab
+  group: mv-lab
   cancel-in-progress: false
 
 env:
@@ -21,7 +21,7 @@ env:
 jobs:
   songs:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 200
     permissions:
       contents: write
       id-token: write
@@ -29,6 +29,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
+      - name: Wait for the round's songs (made by the Studio lab)
+        run: |
+          SONGS=$(node -e "console.log(require('./scripts/mv-lab/round.json').songs)")
+          for i in $(seq 1 120); do [ -f "$SONGS" ] && break; sleep 60; git pull -q origin "${GITHUB_REF_NAME}"; done
+          test -f "$SONGS"
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ env.WIF_PROVIDER }}

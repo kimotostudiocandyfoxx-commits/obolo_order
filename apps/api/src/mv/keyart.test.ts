@@ -64,10 +64,15 @@ describe('KeyArtist scenes', () => {
     const out = await png();
     const calls: string[] = [];
     let polls = 0;
+    let warms = 0;
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string, init?: RequestInit) => {
         calls.push(url);
+        if (url === 'https://gpu.example/paint/warm') {
+          warms++;
+          return Response.json(warms < 2 ? { ready: false } : { ready: true, ip: true });
+        }
         if (url === 'https://gpu.example/paint') {
           const body = JSON.parse(String(init?.body));
           expect(body.items.map((i: { seed: number }) => i.seed)).toEqual([7, 8]);
@@ -86,9 +91,10 @@ describe('KeyArtist scenes', () => {
       }),
     );
     const a = artist({ paintUrl: 'https://gpu.example/', paintToken: async () => 'tok', novitaModel: 'animagineXL40_v4Opt.safetensors' });
-    const got = await a.paintAll([{ tags: '1boy', hero: true }, { tags: 'scenery' }], 7, 4, { reference: out, refScale: 0.5 });
+    const got = await a.paintAll([{ tags: '1boy', hero: true }, { tags: 'scenery' }], 7, 4, { reference: out, refScale: 0.5, pollMs: 1 });
     expect(got.every((b) => b?.equals(out))).toBe(true);
     expect(calls.filter((c) => c.endsWith('/paint'))).toHaveLength(1);
+    expect(warms).toBe(2);
     expect(calls.filter((c) => c.endsWith('/qwen-image-txt2img'))).toHaveLength(1);
     expect(a.sceneBudget(30, 12)).toBe(30);
     expect(artist().sceneBudget(30, 12)).toBe(12);

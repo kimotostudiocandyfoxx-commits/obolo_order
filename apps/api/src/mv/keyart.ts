@@ -38,7 +38,7 @@ const SIDE = 1024;
 
 /** One storyboard scene to paint: its tags, and whether the hero is in it. */
 export type PaintScene = { tags: string; hero?: boolean };
-export type PaintOptions = { reference?: Buffer | null; refScale?: number; steps?: number };
+export type PaintOptions = { reference?: Buffer | null; refScale?: number; steps?: number; warmMs?: number; pollMs?: number };
 const log = new Logger('MvKeyArt');
 
 export class KeyArtist {
@@ -132,27 +132,56 @@ export class KeyArtist {
 
   private async gpuPaint(scenes: PaintScene[], seed: number, opt: PaintOptions): Promise<(Buffer | null)[]> {
     const recipe = novitaRecipe(this.o.novitaModel ?? 'animagine', false);
-    const token = await this.o.paintToken?.();
+    const base = this.o.paintUrl!.replace(/\/$/, '');
+    const auth = async (): Promise<Record<string, string>> => {
+      const token = await this.o.paintToken?.();
+      return token ? { authorization: `Bearer ${token}` } : {};
+    };
     // the hero's own picture: the hero scenes are painted looking at it (IP-Adapter on our GPU)
     const reference = opt.reference ? (await sharp(opt.reference).rotate().flatten({ background: '#ffffff' }).resize(512, 512, { fit: 'contain', background: '#ffffff' }).jpeg({ quality: 90 }).toBuffer()).toString('base64') : undefined;
-    const res = await fetch(`${this.o.paintUrl!.replace(/\/$/, '')}/paint`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({
-        // kids-friendly app: Animagine's "safe" rating tag, and the other ratings in the negative
-        items: scenes.map((s, k) => ({ prompt: `${s.tags}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + k, hero: !!s.hero })),
-        negative: `${recipe.negative}, sensitive, explicit, suggestive`,
-        side: this.o.novitaSide,
-        steps: opt.steps ?? recipe.steps,
-        cfg: recipe.cfg,
-        ...(reference ? { reference, refScale: opt.refScale ?? 0.6 } : {}),
-      }),
-      // a cold GPU loads the painter first; ~8 s a picture after that
-      signal: AbortSignal.timeout(600_000),
-    });
-    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
-    const { images } = (await res.json()) as { images?: (string | null)[] };
-    return (images ?? []).map((b) => (b ? Buffer.from(b, 'base64') : null));
+
+    // 1. wake the painter and wait for it: a cold GPU (weights, then the painter) takes minutes, longer
+    //    than an HTTP answer may take (Node's fetch gives up after 5 minutes without one) — 2026-10-09
+    //    logs: "gpu paint: fetch failed" after a cold start, and Qwen painted the MV instead (~33 yen)
+    const until = Date.now() + (opt.warmMs ?? 9 * 60_000);
+    for (let first = true; ; first = false) {
+      const res = await fetch(`${base}/paint/warm`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(await auth()) },
+        body: JSON.stringify({ ip: !!reference }),
+        signal: AbortSignal.timeout(120_000),
+      }).catch(() => null);
+      const st = res?.ok ? ((await res.json()) as { ready?: boolean; ip?: boolean; error?: string | null; ipError?: string }) : null;
+      if (st?.error) throw new Error(`painter: ${st.error}`);
+      if (st?.ready && (!reference || st.ip || st.ipError)) break;
+      if (Date.now() > until) throw new Error('painter did not wake up in time');
+      if (first) log.log('waking the GPU painter…');
+      await new Promise((r) => setTimeout(r, opt.pollMs ?? 10_000));
+    }
+
+    // 2. the scenes, a few per call (each call well under the 5-minute limit)
+    const out: (Buffer | null)[] = [];
+    for (let i = 0; i < scenes.length; i += 8) {
+      const part = scenes.slice(i, i + 8);
+      const res = await fetch(`${base}/paint`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(await auth()) },
+        body: JSON.stringify({
+          // kids-friendly app: Animagine's "safe" rating tag, and the other ratings in the negative
+          items: part.map((s, k) => ({ prompt: `${s.tags}, safe, ${recipe.prompt}`.slice(0, 1900), seed: seed + i + k, hero: !!s.hero })),
+          negative: `${recipe.negative}, sensitive, explicit, suggestive`,
+          side: this.o.novitaSide,
+          steps: opt.steps ?? recipe.steps,
+          cfg: recipe.cfg,
+          ...(reference ? { reference, refScale: opt.refScale ?? 0.6 } : {}),
+        }),
+        signal: AbortSignal.timeout(280_000),
+      });
+      if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
+      const { images } = (await res.json()) as { images?: (string | null)[] };
+      part.forEach((_, k) => out.push(images?.[k] ? Buffer.from(images[k]!, 'base64') : null));
+    }
+    return out;
   }
 
   /** Submit a Novita v3 async task, then poll it until the picture is there (null = refused by the NSFW check). */

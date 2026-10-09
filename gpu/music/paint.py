@@ -141,8 +141,9 @@ def paint(items: list[dict], negative: str, side: int, steps: int, cfg: float, r
                 print(f"paint: no IP-Adapter ({e!r})", flush=True)
                 traceback.print_exc()
         elif state.get("ip"):
-            pipe.unload_ip_adapter()
-            state["ip"] = False
+            # loaded but no picture this time: every hero scene paints from its words (scale 0)
+            ref = Image.new("RGB", (224, 224), "white")
+            ref_scale = 0.0
         for it in items:
             try:
                 g = torch.Generator(device="cuda").manual_seed(int(it.get("seed", 0)) % 2**31)
