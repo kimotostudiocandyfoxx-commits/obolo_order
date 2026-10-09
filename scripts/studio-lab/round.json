@@ -1,0 +1,62 @@
+{
+  "round": "r01-baseline",
+  "note": "今の本番と同じ作り方（ACE-Step turbo 8 steps, shift 3, LM なし）。6曲中3曲は声を Seed-VC で変える。",
+  "tune": {},
+  "keepStems": false,
+  "cases": [
+    {
+      "id": "pop-bright",
+      "prompt": "bright japanese pop instrumental, acoustic guitar, piano, light drums, 112 bpm, C major, no vocals",
+      "bpm": 112, "keyRoot": 0, "scale": "major", "seconds": 60, "voice": false,
+      "sections": [
+        { "name": "verse", "lines": ["あさのひかり まどをあけて", "きのうのなみだ かぜにとばそう", "ちいさなゆめ ポケットにいれて", "きょうもあるきだす"] },
+        { "name": "chorus", "lines": ["きみとならどこまでも", "そらはいつもあおいから", "わらってうたおう いまここで", "あしたもきっといいひ"] }
+      ]
+    },
+    {
+      "id": "ballad-night",
+      "prompt": "emotional japanese ballad instrumental, grand piano, soft strings, slow tempo, 72 bpm, A minor, no vocals",
+      "bpm": 72, "keyRoot": 9, "scale": "minor", "seconds": 75, "voice": true,
+      "sections": [
+        { "name": "verse", "lines": ["よるのまちに ほしがおちて", "とおいきおく そっとひらく", "なまえをよんだ こえがふるえて", "まだきみをさがしてる"] },
+        { "name": "chorus", "lines": ["あいたいよ いまでもずっと", "ことばにできないおもい", "このうたにのせて とどけたい", "きみがいたなつのひ"] }
+      ]
+    },
+    {
+      "id": "rock-run",
+      "prompt": "energetic japanese rock instrumental, distorted electric guitars, bass, powerful drums, anime opening style, 160 bpm, E minor, no vocals",
+      "bpm": 160, "keyRoot": 4, "scale": "minor", "seconds": 60, "voice": false,
+      "sections": [
+        { "name": "verse", "lines": ["はしれ はしれ かぜをきって", "まけないこころ もやしてゆけ", "たおれたって なんどでも", "たちあがるんだ"] },
+        { "name": "chorus", "lines": ["いまだ さけべ ぼくらのうた", "やみをきりさく ひかりになれ", "とどけ とどけ そらのかなた", "ゆめはおわらない"] }
+      ]
+    },
+    {
+      "id": "hiphop-chill",
+      "prompt": "chill japanese hip hop instrumental, lo-fi boom bap drums, warm rhodes piano, deep bass, 90 bpm, F major, no vocals",
+      "bpm": 90, "keyRoot": 5, "scale": "major", "seconds": 60, "voice": true,
+      "sections": [
+        { "name": "verse", "lines": ["ゆうがたのこうえん ブランコゆれる", "ポケットのなかには あめがふたつ", "ともだちとわらう いつものばしょ", "このまちがすきなんだ"] },
+        { "name": "chorus", "lines": ["ゆっくりいこうぜ あせらずに", "ぼくらのペースで ステップふんで", "きょうもいいかんじ ほらきこえる", "まちのリズム"] }
+      ]
+    },
+    {
+      "id": "edm-party",
+      "prompt": "upbeat japanese edm instrumental, bright synth leads, four on the floor kick, big build up and drop, 128 bpm, G major, no vocals",
+      "bpm": 128, "keyRoot": 7, "scale": "major", "seconds": 60, "voice": false,
+      "sections": [
+        { "name": "verse", "lines": ["ネオンのなか ステップふんで", "こころのおと ボリュームあげて", "みんなでいっしょに てをあげて", "いまはじまるよ"] },
+        { "name": "chorus", "lines": ["おどれ おどれ よるがあけるまで", "ひかりのなかで とびはねよう", "ぼくらはいま むてきなんだ", "パーティーはこれから"] }
+      ]
+    },
+    {
+      "id": "kids-march",
+      "prompt": "cheerful kids song instrumental, ukulele, glockenspiel, hand claps, playful march, 120 bpm, D major, no vocals",
+      "bpm": 120, "keyRoot": 2, "scale": "major", "seconds": 45, "voice": true,
+      "sections": [
+        { "name": "verse", "lines": ["くまさん うさぎさん おはようさん", "もりのみちを いっしょにあるこう", "どんぐりひろって ポケットいっぱい"] },
+        { "name": "chorus", "lines": ["ララララ たのしいね", "みんなでうたえば もっとたのしい", "ララララ またあした"] }
+      ]
+    }
+  ]
+}

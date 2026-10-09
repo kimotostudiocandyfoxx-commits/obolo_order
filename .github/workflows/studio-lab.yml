@@ -1,0 +1,72 @@
+name: Studio lab
+
+# Song quality loop (client request 2026-10-09): makes the round's test songs on the real GPU studio,
+# judges each by ear (Gemini) and measures it, and commits art/lab/studio/<round>/ (mixes + report).
+# A round is started by changing scripts/studio-lab/round.json (or run by hand).
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**']
+    paths: ['scripts/studio-lab/**', '.github/workflows/studio-lab.yml']
+
+concurrency:
+  group: studio-lab
+  cancel-in-progress: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  MUSIC_URL: ${{ format('https://obolo-music-{0}.{1}.run.app', vars.GCP_PROJECT_NUMBER, vars.MUSIC_REGION) }}
+
+jobs:
+  songs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - id: idtok
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+          token_format: id_token
+          id_token_audience: ${{ env.MUSIC_URL }}
+          id_token_include_email: true
+          create_credentials_file: false
+          export_environment_variables: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Recent studio / MV logs (for the cost check; only in this log, not committed)
+        continue-on-error: true
+        run: |
+          gcloud logging read 'resource.type="cloud_run_revision" AND (textPayload:"MV " OR textPayload:"paint" OR textPayload:"painter" OR textPayload:"idle for" OR textPayload:"engine acestep15 ready" OR textPayload:"weights copied" OR textPayload:"song:")' \
+            --freshness=1d --limit=80 --format='value(timestamp,resource.labels.service_name,textPayload)' | cut -c1-260
+      - name: Make and judge the songs
+        env:
+          MUSIC_TOKEN: ${{ steps.idtok.outputs.id_token }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          # needs (once): gcloud secrets add-iam-policy-binding obolo-gemini-api-key --member=serviceAccount:<deploy SA> --role=roles/secretmanager.secretAccessor
+          export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key 2>/dev/null || true)"
+          [ -n "$GEMINI_API_KEY" ] || echo "::warning::no access to obolo-gemini-api-key: the songs are made but not judged"
+          node scripts/studio-lab/run.mjs
+      - name: Save the round to the branch
+        if: always()
+        run: |
+          git config user.name "studio-lab"
+          git config user.email "studio-lab@users.noreply.github.com"
+          git add -f art/lab/studio
+          git diff --cached --quiet && exit 0
+          git commit -m "Studio lab: round results [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

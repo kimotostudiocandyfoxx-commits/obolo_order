@@ -125,18 +125,40 @@ def ace_song(engine: "AceStep15", r: "SongReq", seconds: float, out_dir: str) ->
         keyscale=key,
         timesignature="4",
         duration=max(10.0, seconds),
-        inference_steps=8,
-        shift=3.0,
-        thinking=False,
+        inference_steps=r.steps,
+        shift=r.shift,
+        thinking=r.lm,
         use_cot_metas=False,
         use_cot_caption=False,
         use_cot_language=False,
+        **({"seed": r.seed} if r.seed is not None else {}),
     )
-    config = GenerationConfig(batch_size=1, audio_format="wav", use_random_seed=True)
-    result = generate_music(engine.handler, None, params, config, save_dir=out_dir)
+    config = GenerationConfig(batch_size=1, audio_format="wav", use_random_seed=r.seed is None, **({"seeds": [r.seed]} if r.seed is not None else {}))
+    result = generate_music(engine.handler, lm_handler() if r.lm else None, params, config, save_dir=out_dir)
     if not result.success or not result.audios:
         raise RuntimeError(f"ACE-Step 1.5: {result.error}")
     return result.audios[0]["path"], line_times(engine, result.extra_outputs or {}, seconds, r.language)
+
+
+ACE_LM = os.environ.get("ACE_LM_MODEL", "acestep-5Hz-lm-1.7B")
+_lm: dict = {"h": None}
+_lm_lock = threading.Lock()
+
+
+def lm_handler():
+    """ACE-Step's 5Hz LM (loaded on first use; PyTorch backend so it shares the card politely)."""
+    with _lm_lock:
+        if _lm["h"] is None:
+            from acestep.llm_inference import LLMHandler
+
+            t = time.time()
+            h = LLMHandler()
+            msg, ok = h.initialize(checkpoint_dir=CKPT_DIR, lm_model_path=ACE_LM, backend="pt", device="cuda")
+            if not ok:
+                raise RuntimeError(f"ACE-Step LM init failed: {msg}")
+            print(f"LM {ACE_LM} ready in {time.time() - t:.0f}s", flush=True)
+            _lm["h"] = h
+        return _lm["h"]
 
 
 def format_lyrics(lines: list["LyricLine"]) -> str:
@@ -444,10 +466,41 @@ def load() -> None:
         state["loading"] = False
 
 
+# --- idle exit ------------------------------------------------------------------------------------
+# A Cloud Run GPU instance is billed for as long as it exists, and an idle one may be kept for up to
+# ~15 minutes after the last request (≈ 60 yen of L4 time for nothing). With no request for
+# IDLE_EXIT_SECONDS the instance ends itself; the next request starts a fresh one (cold start).
+IDLE_EXIT_SECONDS = int(os.environ.get("IDLE_EXIT_SECONDS", "0"))
+busy = {"n": 0, "last": time.time()}
+
+
+@app.middleware("http")
+async def track(request, call_next):
+    busy["n"] += 1
+    try:
+        return await call_next(request)
+    finally:
+        busy["n"] -= 1
+        busy["last"] = time.time()
+
+
+def idle_watch() -> None:
+    while True:
+        time.sleep(15)
+        if state["loading"] or painter.load_lock.locked():
+            busy["last"] = time.time()
+            continue
+        if busy["n"] == 0 and time.time() - busy["last"] > IDLE_EXIT_SECONDS:
+            print(f"idle for {IDLE_EXIT_SECONDS}s: ending this instance (GPU billing stops)", flush=True)
+            os._exit(0)
+
+
 @app.on_event("startup")
 def start() -> None:
     threading.Thread(target=load, daemon=True).start()
     start_svc()
+    if IDLE_EXIT_SECONDS > 0:
+        threading.Thread(target=idle_watch, daemon=True).start()
 
 
 # --- API ------------------------------------------------------------------------------------------
@@ -485,6 +538,12 @@ class SongReq(BaseModel):
     voice: str | None = Field(None, max_length=3_000_000)
     # how close to the member's voice (Seed-VC classifier-free guidance, 0–1)
     similarity: float = Field(0.7, ge=0, le=1)
+    # tuning (the studio lab tries these; the app leaves them at the defaults)
+    steps: int = Field(8, ge=4, le=64)
+    shift: float = Field(3.0, ge=1.0, le=6.0)
+    seed: int | None = Field(None, ge=0)
+    # ACE-Step's 5Hz language model plans the song first ("thinking": melody/structure codes)
+    lm: bool = False
 
 
 @app.get("/health")

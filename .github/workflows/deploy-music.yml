@@ -89,7 +89,7 @@ jobs:
             --concurrency 1 --min-instances ${{ vars.MUSIC_MIN_INSTANCES || '0' }} --max-instances 1 --timeout 900 \
             --add-volume name=models,type=cloud-storage,bucket="$BUCKET" \
             --add-volume-mount volume=models,mount-path=/models \
-            --set-env-vars CKPT_BUCKET="$BUCKET",CKPT_PREFIX=ace15,HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,MUSIC_ENGINE=${{ vars.MUSIC_ENGINE || 'acestep15' }},ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }},ACE_REF_STRENGTH=${{ vars.ACE_REF_STRENGTH || '0' }}
+            --set-env-vars CKPT_BUCKET="$BUCKET",CKPT_PREFIX=ace15,HF_HOME=/models/hf,ACESTEP_CHECKPOINTS_DIR=/models/ace15,MUSIC_ENGINE=${{ vars.MUSIC_ENGINE || 'acestep15' }},ACE15_MODEL=${{ vars.ACE15_MODEL || 'acestep-v15-turbo' }},ACE_REF_STRENGTH=${{ vars.ACE_REF_STRENGTH || '0' }},IDLE_EXIT_SECONDS=${{ vars.MUSIC_IDLE_EXIT_SECONDS || '240' }}
           URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
           echo "### Music GPU: $URL" >> "$GITHUB_STEP_SUMMARY"
           echo "次に Actions → Deploy API → Run workflow を実行してください（API がこの URL を使い始めます）" >> "$GITHUB_STEP_SUMMARY"
