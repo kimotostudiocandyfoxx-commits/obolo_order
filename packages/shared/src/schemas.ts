@@ -304,6 +304,15 @@ export const SongEditCommand = z.discriminatedUnion('action', [
     gapSeconds: z.number().min(0).max(8).optional(),
   }),
   z.object({ action: z.literal('GENRE_EDIT'), prompt: z.string().trim().min(3).max(400) }),
+  // the song made longer (client decision 2026-10-09): 2番 / 大サビ / a ~2-minute version, new lines after the old ones
+  z.object({
+    action: z.literal('SONG_EXTEND'),
+    kind: z.enum(['second', 'bigchorus', 'long']),
+    sections: z
+      .array(z.object({ name: z.enum(['verse', 'chorus', 'bridge']), lines: z.array(z.string().trim().min(1).max(40)).min(1).max(8) }))
+      .min(1)
+      .max(4),
+  }),
 ]);
 export type SongEditCommand = z.infer<typeof SongEditCommand>;
 

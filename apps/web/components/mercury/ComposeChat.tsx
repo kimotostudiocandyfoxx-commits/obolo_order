@@ -226,8 +226,8 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
                 setEditing(m.song.id);
                 say(
                   hasBati
-                    ? 'どこを直す？ 「もう少し速く」「歌を大きく」「サビの歌詞を変えて」「サビだけわたしの声で」「歌い出しを遅らせて」「ロックっぽくして」…なんでも言ってね！'
-                    : 'どこを直すケン？ 「もう少し速く」「歌を大きく」「サビの歌詞を変えて」「サビだけバティの声で」「歌い出しを遅らせて」「ロックっぽくして」…なんでも言ってみろ！',
+                    ? 'どこを直す？ 「もう少し速く」「歌を大きく」「サビの歌詞を変えて」「サビだけわたしの声で」「ロックっぽくして」「2番も作って」「大サビを足して」…なんでも言ってね！'
+                    : 'どこを直すケン？ 「もう少し速く」「歌を大きく」「サビの歌詞を変えて」「サビだけバティの声で」「ロックっぽくして」「2番も作って」「大サビを足して」…なんでも言ってみろ！',
                 );
               }}
               onEditDone={() => {
@@ -270,7 +270,7 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
         {busy && (
           <div className="flex items-end gap-2">
             <Face face={partner.face} size={32} />
-            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{typing ? '……' : editing ? '♪ 手直し中…（歌い直し・伴奏の作り直しは1〜2分）' : '♪ 作曲中…'}</p>
+            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{typing ? '……' : editing ? '♪ 手直し中…（歌い直し・2番や大サビの追加は1〜2分）' : '♪ 作曲中…'}</p>
           </div>
         )}
         <div ref={end} />

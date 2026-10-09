@@ -7,6 +7,8 @@ POST /song      {prompt, lyrics, seconds, bpm, keyRoot, scale, language, voice?}
                 time of every lyric line, and — with `voice` (the member's recording) — the vocal
                 turned into their voice by Seed-VC (svc_worker.py, zero-shot) and mixed again
                 (client decisions 2026-10-09: replace Fish line-by-line singing)
+POST /extend    {…/song fields, src, keep} → the same JSON: the song made longer (2番 / 大サビ),
+                the first `keep` seconds untouched, the rest newly sung by ACE-Step (repaint)
 POST /paint     {items: [{prompt, seed}], negative, side, steps, cfg} → {images: [base64 JPEG | null]}
                 Mars MV scenes with Animagine XL 4.0 (paint.py; loaded on the first call)
 GET  /health    → {ready, loading, error, engine, painter}
@@ -529,7 +531,7 @@ class LyricLine(BaseModel):
 class SongReq(BaseModel):
     prompt: str = Field(min_length=1, max_length=500)
     lyrics: list[LyricLine] = Field(min_length=1, max_length=48)
-    seconds: float = Field(60, ge=10, le=180)
+    seconds: float = Field(45, ge=10, le=180)
     bpm: int = Field(110, ge=40, le=220)
     keyRoot: int = Field(0, ge=0, le=11)
     scale: str = "major"
@@ -613,58 +615,144 @@ def file_m4a(path: str, stereo: bool = True) -> bytes:
             return f.read()
 
 
-@app.post("/song")
-def song(r: SongReq):
-    """The whole song sung (ACE-Step), split into vocals + instrumental (HTDemucs), with line times."""
+def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", seconds: float, d: str, t0: float) -> dict:
+    """A sung song (wav) → split (HTDemucs), voice (Seed-VC, if a recording came), mixed; the API's JSON."""
     import base64
 
+    t1 = time.time()
+    vocals, inst = separate(wav, d)
+    t2 = time.time()
+    mix = os.path.join(d, "mix.wav")
+    voiced, how = (None, "no voice sent")
+    if r.voice:
+        try:
+            voiced, how = to_voice(vocals, r.voice, d, r.similarity)
+        except Exception as e:  # noqa: BLE001 — the song is still delivered in the studio's voice
+            traceback.print_exc()
+            voiced, how = None, f"seed-vc error: {e!r}"[:200]
+    t3 = time.time()
+    if voiced:
+        mix_stems(inst, voiced, mix, seconds)
+    else:
+        # the studio's own mix, faded at the end
+        fade_at = max(0.0, seconds - 1.5)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{seconds:.2f}", "-af", f"afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
+    print(f"song: {len(r.lyrics)} lines, {seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, voice {t3 - t2:.1f}s ({how}), {len(lines)} line times", flush=True)
+    return {
+        "seconds": seconds,
+        "lines": lines,
+        "mix": base64.b64encode(file_m4a(mix)).decode(),
+        "vocals": base64.b64encode(file_m4a(voiced or vocals)).decode(),
+        # the studio's own vocal (kept so a voice can be swapped later without singing again)
+        "guide": base64.b64encode(file_m4a(vocals)).decode(),
+        "instrumental": base64.b64encode(file_m4a(inst)).decode(),
+        "voiced": bool(voiced),
+        "voiceNote": how,
+        "timings": {"song": round(t1 - t0, 1), "split": round(t2 - t1, 1), "voice": round(t3 - t2, 1)},
+    }
+
+
+def ready_engine() -> "AceStep15":
     if state["error"]:
         raise HTTPException(500, f"model failed to load: {state['error'][:300]}")
     engine = state["engine"]
     if engine is None:
-        return JSONResponse({"warming": True}, status_code=503)
+        raise HTTPException(503, "warming")
     if not isinstance(engine, AceStep15):
         raise HTTPException(400, "songs with vocals need the ACE-Step engine")
+    return engine
+
+
+@app.post("/song")
+def song(r: SongReq):
+    """The whole song sung (ACE-Step), split into vocals + instrumental (HTDemucs), with line times."""
+    try:
+        engine = ready_engine()
+    except HTTPException as e:
+        if e.status_code == 503:
+            return JSONResponse({"warming": True}, status_code=503)
+        raise
     t0 = time.time()
     try:
         with gen_lock, tempfile.TemporaryDirectory() as d:
             wav, lines = ace_song(engine, r, r.seconds, d)
-            t1 = time.time()
-            vocals, inst = separate(wav, d)
-            t2 = time.time()
-            mix = os.path.join(d, "mix.wav")
-            voiced, how = (None, "no voice sent")
-            if r.voice:
-                try:
-                    voiced, how = to_voice(vocals, r.voice, d, r.similarity)
-                except Exception as e:  # noqa: BLE001 — the song is still delivered in the studio's voice
-                    traceback.print_exc()
-                    voiced, how = None, f"seed-vc error: {e!r}"[:200]
-            t3 = time.time()
-            if voiced:
-                mix_stems(inst, voiced, mix, r.seconds)
-            else:
-                # the studio's own mix, faded at the end
-                fade_at = max(0.0, r.seconds - 1.5)
-                subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-t", f"{r.seconds:.2f}", "-af", f"afade=t=out:st={fade_at:.2f}:d=1.5", mix], check=True)
-            payload = {
-                "seconds": r.seconds,
-                "lines": lines,
-                "mix": base64.b64encode(file_m4a(mix)).decode(),
-                "vocals": base64.b64encode(file_m4a(voiced or vocals)).decode(),
-                # the studio's own vocal (kept so a voice can be swapped later without singing again)
-                "guide": base64.b64encode(file_m4a(vocals)).decode(),
-                "instrumental": base64.b64encode(file_m4a(inst)).decode(),
-                "voiced": bool(voiced),
-                "voiceNote": how,
-                "timings": {"song": round(t1 - t0, 1), "split": round(t2 - t1, 1), "voice": round(t3 - t2, 1)},
-            }
+            return finish_song(engine, wav, lines, r, r.seconds, d, t0)
     except Exception as e:  # noqa: BLE001
         traceback.print_exc()
         raise HTTPException(500, f"song failed: {e!r}"[:400]) from e
-    print(f"song: {len(r.lyrics)} lines, {r.seconds:.0f}s — sung {t1 - t0:.1f}s, split {t2 - t1:.1f}s, voice {t3 - t2:.1f}s ({how}), {len(lines)} line times", flush=True)
-    return payload
 
+
+class ExtendReq(SongReq):
+    # the finished song as the member has it (base64, any ffmpeg format): it stays as it is up to `keep`
+    src: str = Field(max_length=12_000_000)
+    # seconds of the original kept untouched; the rest (up to `seconds`) is newly sung
+    keep: float = Field(ge=5, le=170)
+
+
+def ace_extend(engine: "AceStep15", r: ExtendReq, out_dir: str) -> tuple[str, list[dict]]:
+    """The song made longer (client decision 2026-10-09: 2番 / 大サビ / 2分版 on request): the original
+    is padded with silence to the new length and ACE-Step repaints from `keep` on, with the whole
+    lyrics (old + new lines), so the new part continues the same song."""
+    import base64
+
+    from acestep.inference import GenerationConfig, GenerationParams, generate_music
+
+    src_in = os.path.join(out_dir, "src_in")
+    with open(src_in, "wb") as f:
+        f.write(base64.b64decode(r.src))
+    src = os.path.join(out_dir, "src.wav")
+    # the kept part, then silence to the new length (stereo 48 kHz like ACE-Step's own output)
+    subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error", "-i", src_in, "-t", f"{r.keep:.2f}", "-af", f"apad=whole_dur={r.seconds:.2f}", "-ar", "48000", "-ac", "2", src],
+        check=True,
+    )
+    key = f"{NAMES[r.keyRoot]} {'Major' if r.scale == 'major' else 'minor'}"
+    params = GenerationParams(
+        task_type="repaint",
+        src_audio=src,
+        repainting_start=max(0.0, r.keep - 1.0),
+        repainting_end=-1,
+        chunk_mask_mode="explicit",
+        repaint_wav_crossfade_sec=0.5,
+        caption=r.prompt[:512],
+        lyrics=format_lyrics(r.lyrics),
+        instrumental=False,
+        vocal_language=r.language,
+        bpm=r.bpm,
+        keyscale=key,
+        timesignature="4",
+        duration=r.seconds,
+        inference_steps=r.steps,
+        shift=r.shift,
+        thinking=False,
+        **({"seed": r.seed} if r.seed is not None else {}),
+    )
+    config = GenerationConfig(batch_size=1, audio_format="wav", use_random_seed=r.seed is None, **({"seeds": [r.seed]} if r.seed is not None else {}))
+    result = generate_music(engine.handler, None, params, config, save_dir=out_dir)
+    if not result.success or not result.audios:
+        raise RuntimeError(f"ACE-Step 1.5 repaint: {result.error}")
+    return result.audios[0]["path"], line_times(engine, result.extra_outputs or {}, r.seconds, r.language)
+
+
+@app.post("/extend")
+def extend(r: ExtendReq):
+    """The member's song with new parts after it (2番, 大サビ, a longer version), split / voiced / mixed like /song."""
+    try:
+        engine = ready_engine()
+    except HTTPException as e:
+        if e.status_code == 503:
+            return JSONResponse({"warming": True}, status_code=503)
+        raise
+    if r.seconds <= r.keep + 5:
+        raise HTTPException(400, "the new length must be longer than the kept part")
+    t0 = time.time()
+    try:
+        with gen_lock, tempfile.TemporaryDirectory() as d:
+            wav, lines = ace_extend(engine, r, d)
+            return finish_song(engine, wav, lines, r, r.seconds, d, t0)
+    except Exception as e:  # noqa: BLE001
+        traceback.print_exc()
+        raise HTTPException(500, f"extend failed: {e!r}"[:400]) from e
 
 class PaintItem(BaseModel):
     prompt: str = Field(min_length=1, max_length=2000)

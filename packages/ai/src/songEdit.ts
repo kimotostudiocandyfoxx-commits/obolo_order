@@ -9,6 +9,7 @@
  *  - VOICE_REPLACE      lines sung by the other registered voice      → Fish for those lines only
  *  - TIMING_EDIT        vocal entry delay, silence after a line       → re-mix only (no AI cost)
  *  - GENRE_EDIT         a new instrumental with the same key / tempo  → ACE-Step only, vocal kept
+ *  - SONG_EXTEND        2番 / 大サビ / ~2-minute version: new lines     → ACE-Step continues the song
  *  - CHAT               a question / unclear request                  → answer only
  */
 import { SongEditCommand, type SongEditAction, type SongMix, type SongPhrase } from '@obolo/shared';
@@ -59,12 +60,17 @@ ${lines}
 - VOICE_REPLACE: 行を別の声で歌い直す。"indexes": [行番号…], "voice": "self"（自分の声）か "bati"（バティの声）。「声B」「叫び・エモい方」はバティの声のこと。
 - TIMING_EDIT: タイミング。"delay_beats": 歌い出しを今から何拍遅らせるか（早めるならマイナス）。"gap_after": 行番号, "gap_seconds": その行の後の間の秒数（0 で間をなくす）。
 - GENRE_EDIT: 歌詞と歌はそのままで伴奏だけ作り直す。"prompt": 新しい伴奏の英語の指示（genre, instruments, mood）。BPM とキーは変えられない（自動で今のものが付く）。"no vocals" を含める。
-- CHAT: 質問・感想・意味が分からない頼み・できない頼み（BPM やキーの変更、曲を長くする等）。返事で聞き返すか、できることを提案する。
+- SONG_EXTEND: 曲を長くする。今の曲はそのまま残して、後ろに新しいパートを足す。"kind" と "sections"（足すパートと新しい歌詞）を出す。
+  - "second"（2番を作りたい）: [{"name":"verse","lines":[新しいAメロ4行]},{"name":"chorus","lines":[サビ4行。1番のサビを少し変えてもよい]}]
+  - "bigchorus"（大サビ・Cメロ・ラスサビを作りたい）: [{"name":"bridge","lines":[盛り上がるCメロ2〜4行]},{"name":"chorus","lines":[ラストのサビ4行]}]
+  - "long"（2分の曲にしたい・フルで聴きたい）: 2番と大サビの両方: verse, chorus, bridge, chorus の4つ。
+  新しい歌詞はあなたが考える。1番の続きの物語にして、言葉の長さは1番の行とそろえる（各行40文字以内）。今の曲がもう長い（2番やCメロがある）なら、足せるものだけ足す。
+- CHAT: 質問・感想・意味が分からない頼み・できない頼み（BPM やキーの変更等）。返事で聞き返すか、できることを提案する。
 ルール:
 - reply は1〜2文。キャラクターとして、これから何をするかを短く言う（例「了解！サビだけバティの声で歌い直すね！」）。
 - 子どもも使うので健全な言葉で。歌詞も健全に。
 出力は JSON だけ:
-{"reply":"返事","action":"VOLUME_TEMPO_EDIT|LYRICS_EDIT|VOICE_REPLACE|TIMING_EDIT|GENRE_EDIT|CHAT", …命令ごとの項目}`;
+{"reply":"返事","action":"VOLUME_TEMPO_EDIT|LYRICS_EDIT|VOICE_REPLACE|TIMING_EDIT|GENRE_EDIT|SONG_EXTEND|CHAT", …命令ごとの項目}`;
 }
 
 const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : typeof v === 'string' && v.trim() && Number.isFinite(Number(v)) ? Number(v) : undefined);
@@ -132,6 +138,22 @@ export function parseSongEdit(raw: string, c: Pick<SongEditContext, 'phrases' | 
         cmd = { action: j.action, delayBeats, ...(gapAfter !== undefined && gapSeconds !== undefined ? { gapAfter, gapSeconds } : {}) };
       break;
     }
+    case 'SONG_EXTEND': {
+      const kind = ['second', 'bigchorus', 'long'].includes(String(j.kind)) ? String(j.kind) : undefined;
+      const sections = (Array.isArray(j.sections) ? (j.sections as { name?: unknown; lines?: unknown }[]) : [])
+        .map((sec) => ({
+          name: ['verse', 'chorus', 'bridge'].includes(String(sec?.name)) ? String(sec.name) : '',
+          lines: (Array.isArray(sec?.lines) ? (sec.lines as unknown[]) : [])
+            .map((l) => (typeof l === 'string' ? l : typeof (l as { text?: unknown })?.text === 'string' ? String((l as { text: string }).text) : ''))
+            .map((l) => l.replace(/\[[^\]]*\]/g, '').trim().slice(0, 40))
+            .filter(Boolean)
+            .slice(0, 8),
+        }))
+        .filter((sec) => sec.name && sec.lines.length)
+        .slice(0, 4);
+      if (kind && sections.length) cmd = { action: j.action, kind, sections };
+      break;
+    }
     case 'GENRE_EDIT': {
       const p = typeof (j.prompt ?? j.new_ace_step_prompt) === 'string' ? String(j.prompt ?? j.new_ace_step_prompt).trim().slice(0, 400) : '';
       if (p.length >= 3) cmd = { action: j.action, prompt: p };
@@ -161,6 +183,9 @@ export function applyMixEdit(mix: SongMix, cmd: SongEditCommand, phraseCount: nu
 /** Offline answer (no API key): a few keywords → a command, so the edit flow can be tried locally. */
 export function mockSongEdit(said: string): string {
   const r = (reply: string, o: Record<string, unknown>) => JSON.stringify({ reply, ...o });
+  if (/2番|二番/.test(said))
+    return r('2番を作るね！', { action: 'SONG_EXTEND', kind: 'second', sections: [{ name: 'verse', lines: ['ゆうやけのみち かげがのびて', 'きょうのできごと はなしながら', 'ちいさなけんか すぐなかなおり', 'またあるきだす'] }, { name: 'chorus', lines: ['きみとならどこまでも', 'そらはいつもあおいから', 'わらってうたおう いまここで', 'あしたもきっといいひ'] }] });
+  if (/大サビ|Cメロ|ラスサビ/.test(said)) return r('大サビを足すね！', { action: 'SONG_EXTEND', kind: 'bigchorus', sections: [{ name: 'bridge', lines: ['もしもあしたが みえなくても', 'このうたが みちしるべ'] }, { name: 'chorus', lines: ['きみとならどこまでも', 'そらはいつもあおいから', 'わらってうたおう いまここで', 'あしたもきっといいひ'] }] });
   if (/ロック|バラード|ジャンル|伴奏を変え/.test(said)) return r('伴奏を作り直すね！', { action: 'GENRE_EDIT', prompt: 'hard rock instrumental, distorted electric guitar, drums, bass, high energy, no vocals' });
   if (/バティ|声B/.test(said)) return r('サビをバティの声で歌い直すね！', { action: 'VOICE_REPLACE', indexes: [4, 5, 6, 7], voice: 'bati' });
   if (/歌詞/.test(said)) return r('最初の行の歌詞を変えるね！', { action: 'LYRICS_EDIT', edits: [{ index: 0, text: 'きょうはとくべつなひ' }] });

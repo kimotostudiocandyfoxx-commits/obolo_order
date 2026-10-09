@@ -293,7 +293,7 @@ export interface SongView {
   savedAt: string | null;
 }
 
-export type SongEditAction = 'VOLUME_TEMPO_EDIT' | 'LYRICS_EDIT' | 'VOICE_REPLACE' | 'TIMING_EDIT' | 'GENRE_EDIT' | 'CHAT';
+export type SongEditAction = 'VOLUME_TEMPO_EDIT' | 'LYRICS_EDIT' | 'VOICE_REPLACE' | 'TIMING_EDIT' | 'GENRE_EDIT' | 'SONG_EXTEND' | 'CHAT';
 
 export interface SongEditResult {
   /** the partner's answer in the chat */

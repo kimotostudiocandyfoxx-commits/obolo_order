@@ -142,6 +142,20 @@ async function judge(c, mixB64, style) {
   return { error: 'no answer' };
 }
 
+// the round may need what a GPU deploy is still bringing (round.needs: paths in the service's API)
+for (const need of round.needs ?? []) {
+  const until = Date.now() + 75 * 60_000;
+  for (;;) {
+    const api = await fetch(`${MUSIC_URL}/openapi.json`, { headers: { authorization: `Bearer ${TOKEN}` }, signal: AbortSignal.timeout(600_000) })
+      .then((r) => (r.ok ? r.text() : ''))
+      .catch(() => '');
+    if (api.includes(need)) break;
+    if (Date.now() > until) throw new Error(`the GPU studio still has no ${need}`);
+    console.log(`waiting for the GPU deploy (${need})`);
+    await new Promise((r) => setTimeout(r, 60_000));
+  }
+}
+
 const results = [];
 const variants = round.variants ?? [{ name: '' }];
 for (const base of round.cases)
@@ -162,6 +176,45 @@ for (const base of round.cases)
     console.log(`${c.id}: FAILED ${String(e).slice(0, 200)}`);
   }
   }
+
+// extensions (2番 / 大サビ / longer): the finished song made longer by POST /extend, judged with all its lyrics
+for (const x of round.extend ?? []) {
+  const from = results.find((r) => r.ok && r.id.split('~')[0] === x.of);
+  const base = round.cases.find((c) => c.id === x.of);
+  const id = `${x.of}+${x.name}`;
+  console.log(`== ${id}`);
+  if (!from || !base) {
+    results.push({ id, variant: 'extend', ok: false, error: `no finished ${x.of} to extend` });
+    continue;
+  }
+  try {
+    const last = from.lineTimes.at(-1);
+    // keep up to just after the last sung line (before the original fade-out)
+    const keep = Math.min(from.seconds - 1.5, last ? last.end + 1.0 : from.seconds - 3);
+    const c = { ...base, id, sections: [...base.sections, ...x.sections] };
+    const body = {
+      ...from.sent,
+      voice: from.sent.voice ? voice : undefined,
+      lyrics: c.sections.flatMap((s) => s.lines.map((text) => ({ section: s.name, text }))),
+      seconds: x.seconds,
+      src: readFileSync(from.file).toString('base64'),
+      keep,
+    };
+    const t0 = Date.now();
+    const res = await fetch(`${MUSIC_URL}/extend`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${TOKEN}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(900_000) });
+    if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 300)}`);
+    const made = await res.json();
+    const mix = join(OUT, `${id}.m4a`);
+    writeFileSync(mix, Buffer.from(made.mix, 'base64'));
+    const m = measure(mix);
+    const j = await judge(c, made.mix, `${body.prompt}. The first ${keep.toFixed(0)} s are the original song, the rest was added later (2nd verse / big chorus): also judge whether the join is seamless and the new part sounds like the same song and singer.`);
+    results.push({ id, variant: 'extend', ok: true, file: mix, lineTimes: made.lines ?? [], seconds: made.seconds, voiced: made.voiced, voiceNote: made.voiceNote, timings: made.timings, wall: Math.round((Date.now() - t0) / 1000), lines: made.lines?.length ?? 0, keep, ...m, judge: j });
+    console.log(`${id}: overall ${j.overall ?? '?'}`);
+  } catch (e) {
+    results.push({ id, variant: 'extend', ok: false, error: String(e).slice(0, 300) });
+    console.log(`${id}: FAILED ${String(e).slice(0, 200)}`);
+  }
+}
 
 const keys = ['overall', 'vocalNaturalness', 'pitch', 'diction', 'melody', 'arrangement', 'mix', 'genreFit', 'artifacts'];
 const avg = Object.fromEntries(keys.map((k) => [k, Math.round((results.filter((r) => r.ok && typeof r.judge?.[k] === 'number').reduce((a, r) => a + r.judge[k], 0) / Math.max(1, results.filter((r) => r.ok && typeof r.judge?.[k] === 'number').length)) * 10) / 10]));

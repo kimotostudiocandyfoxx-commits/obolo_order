@@ -80,12 +80,17 @@ export type MadeSong = {
 };
 
 /** Ask the GPU service for the whole song with vocals (ACE-Step) split by HTDemucs. AAC bytes. */
-export async function generateSong(baseUrl: string, body: FullSongBody & { prompt: string; voice?: Buffer | null; similarity?: number }): Promise<MadeSong> {
+export async function generateSong(
+  baseUrl: string,
+  body: FullSongBody & { prompt: string; voice?: Buffer | null; similarity?: number },
+  /** POST /extend: the finished song (`src`) kept up to `keep` seconds, the rest newly sung */
+  extend?: { src: Buffer; keep: number },
+): Promise<MadeSong> {
   const url = baseUrl.replace(/\/$/, '');
   const token = await idToken(url);
   let res: Response;
   try {
-    res = await fetch(`${url}/song`, {
+    res = await fetch(`${url}/${extend ? 'extend' : 'song'}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({
@@ -98,6 +103,7 @@ export async function generateSong(baseUrl: string, body: FullSongBody & { promp
         language: 'ja',
         // the member's recording: Seed-VC sings the song in their voice (zero-shot)
         ...(body.voice ? { voice: body.voice.toString('base64'), similarity: body.similarity ?? 0.7 } : {}),
+        ...(extend ? { src: extend.src.toString('base64'), keep: Math.round(extend.keep * 100) / 100 } : {}),
       }),
       signal: AbortSignal.timeout(600_000),
     });

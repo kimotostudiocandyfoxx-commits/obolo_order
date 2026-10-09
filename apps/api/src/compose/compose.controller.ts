@@ -84,7 +84,7 @@ export class ComposeController {
     const b = parseBody(SongEditBody, body);
     await rateLimit(this.kv, `compose-edit:${userId}`, 40, 86400);
     // a genre edit runs the GPU: it also counts as an instrumental (P-MER-4)
-    if (b.command?.action === 'GENRE_EDIT') await rateLimit(this.kv, `compose-inst:${userId}`, 30, 86400);
+    if (b.command?.action === 'GENRE_EDIT' || b.command?.action === 'SONG_EXTEND') await rateLimit(this.kv, `compose-inst:${userId}`, 30, 86400);
     return this.songs.edit(userId, id, b, `${req.protocol}://${req.get('host')}`);
   }
 

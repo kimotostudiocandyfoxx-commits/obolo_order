@@ -16,6 +16,17 @@ const ctx: SongEditContext = {
 const bati = { name: 'ポチ', isBati: true };
 
 describe('song edit', () => {
+  it('2番 / 大サビ: new sections after the song, tags stripped, bad parts dropped', () => {
+    const p = parseSongEdit(
+      '{"reply":"2番を作るね！","action":"SONG_EXTEND","kind":"second","sections":[{"name":"verse","lines":["[sing] ゆうやけのみち","かげがのびて"]},{"name":"outro","lines":["x"]},{"name":"chorus","lines":[{"text":"きみとなら"}]}]}',
+      ctx,
+      bati,
+    );
+    expect(p.action).toBe('SONG_EXTEND');
+    expect(p.command).toEqual({ action: 'SONG_EXTEND', kind: 'second', sections: [{ name: 'verse', lines: ['ゆうやけのみち', 'かげがのびて'] }, { name: 'chorus', lines: ['きみとなら'] }] });
+    expect(parseSongEdit('{"reply":"x","action":"SONG_EXTEND","kind":"forever","sections":[{"name":"verse","lines":["a"]}]}', ctx, bati).action).toBe('CHAT');
+  });
+
   it('lists the lines with their numbers', () => {
     const s = songEditSystem(bati, ctx);
     expect(s.startsWith('SONG_EDIT')).toBe(true);

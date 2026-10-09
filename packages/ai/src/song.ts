@@ -275,7 +275,6 @@ export function buildSongDesign(raw: string, partner: ComposePartner, genre: Com
       return { text: l.text, kana: toHiragana(l.kana), notes };
     }),
   }));
-  const beats = sections.flatMap((s) => s.lines).flatMap((l) => l.notes).reduce((a, n) => a + n.beats, 0);
   return {
     title,
     emoji: str(j.emoji, 4, '🎵'),
@@ -289,8 +288,19 @@ export function buildSongDesign(raw: string, partner: ComposePartner, genre: Com
     sections,
     instrumentalPrompt: str(j.instrumentalPrompt, 400, `${g} instrumental, ${bpm} bpm, ${NAMES[root]} ${scale}, no vocals`),
     comment: str(j.comment, 120, partner.isBati ? 'できたよ！聴いてみて。' : 'できたケン！聴いてみろ。'),
-    seconds: Math.round((beats * 60) / bpm),
+    seconds: songSeconds(bpm, sections.reduce((a, sec) => a + sec.lines.length, 0)),
   };
+}
+
+/**
+ * How long a new song is (client decision 2026-10-09): about 45 seconds — Aメロ + サビ, short enough
+ * to listen to right away; 2番 / 大サビ / a longer version are added later on request. Whole bars,
+ * and never fewer than 1.5 bars a line plus an intro and an ending (slow songs get a little longer).
+ */
+export function songSeconds(bpm: number, lines: number, target = 45) {
+  const bar = 240 / bpm;
+  const bars = Math.max(Math.round(target / bar), Math.ceil(lines * 1.5) + 3);
+  return Math.round(bars * bar * 10) / 10;
 }
 
 /** Offline answer (no API key): a small song built from the visitor's words. */
