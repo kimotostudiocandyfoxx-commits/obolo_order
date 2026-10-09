@@ -1,0 +1,11 @@
+{
+  "note": "UIの画像を作るリスト。項目を足して push すると GitHub Actions（ui-images.yml）が Novita で描いて design/ui/out/ に保存する。使い方は docs/handoff/ui-images.md",
+  "items": [
+    {
+      "id": "sample-mars-mv-chat-v1",
+      "model": "qwen",
+      "size": "864*1536",
+      "prompt": "A mobile app screen mockup, portrait, dark purple space theme with stars. Top bar title \"火星\". A chat between a cute fox mascot and the user. Mascot speech bubble: \"どんな雰囲気のMVにする？\". At the bottom a rounded input box with a microphone button and a big orange-pink gradient button \"おまかせで作って\". Clean, cute, rounded UI, Japanese text."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+name: UI images
+
+# UI image workshop (client request 2026-10-09): the design chat adds items to design/ui-queue.json
+# and pushes; this paints the new ones with Novita AI (Qwen-Image for screens, Animagine XL for
+# characters) and commits them to design/ui/out/ on the same branch. See docs/handoff/ui-images.md.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**', main]
+    paths: ['design/ui-queue.json']
+
+concurrency:
+  group: ui-images-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  paint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Paint
+        run: |
+          # needs (once): gcloud secrets add-iam-policy-binding obolo-novita-api-key --member=serviceAccount:<deploy SA> --role=roles/secretmanager.secretAccessor
+          export NOVITA_API_KEY="$(gcloud secrets versions access latest --secret=obolo-novita-api-key)"
+          export NOVITA_MODEL="${{ vars.NOVITA_MODEL }}"
+          node scripts/ui-images/generate.mjs
+      - name: Save the pictures to the branch
+        if: always()
+        run: |
+          git config user.name "ui-images"
+          git config user.email "ui-images@users.noreply.github.com"
+          git add -f design/ui/out
+          git diff --cached --quiet && exit 0
+          git commit -m "UI images: new pictures [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
