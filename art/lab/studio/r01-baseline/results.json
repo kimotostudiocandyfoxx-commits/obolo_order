@@ -1,0 +1,498 @@
+{
+  "round": "r01-baseline",
+  "avg": {
+    "overall": 4,
+    "vocalNaturalness": 4.1,
+    "pitch": 5.7,
+    "diction": 4.4,
+    "melody": 4.9,
+    "arrangement": 4.7,
+    "mix": 5.3,
+    "genreFit": 4.4,
+    "artifacts": 5.1
+  },
+  "results": [
+    {
+      "id": "pop-bright",
+      "ok": true,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 15.2,
+        "split": 12.4,
+        "voice": 0
+      },
+      "wall": 38,
+      "lines": 8,
+      "lufs": null,
+      "truePeak": null,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 3,
+        "pitch": 5,
+        "diction": 3.5,
+        "melody": 4,
+        "arrangement": 2,
+        "mix": 4.5,
+        "genreFit": 3,
+        "artifacts": 2.5,
+        "overall": 2.5,
+        "problems": [
+          "00:17 - Vocals enter despite the prompt requesting 'no vocals'.",
+          "00:17-00:33 - The singer only repeats the first phrase ('あさのひかり まどをあけて') twice and misses the rest of the verse and chorus.",
+          "00:35-01:00 - The track completely cuts out into dead silence for the remaining 25 seconds."
+        ],
+        "fixIdeas": [
+          "Remove vocal tokens completely if an instrumental is desired, or prompt properly for a full verse/chorus vocal performance.",
+          "Extend generation continuity and prevent premature track termination/silence before the 1-minute mark."
+        ],
+        "heard": "あさのひかり まどをあけて あさのひかり まどをあけて"
+      },
+      "sent": {
+        "prompt": "bright japanese pop , acoustic guitar, piano, light drums, 112 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "あさのひかり まどをあけて"
+          },
+          {
+            "section": "verse",
+            "text": "きのうのなみだ かぜにとばそう"
+          },
+          {
+            "section": "verse",
+            "text": "ちいさなゆめ ポケットにいれて"
+          },
+          {
+            "section": "verse",
+            "text": "きょうもあるきだす"
+          },
+          {
+            "section": "chorus",
+            "text": "きみとならどこまでも"
+          },
+          {
+            "section": "chorus",
+            "text": "そらはいつもあおいから"
+          },
+          {
+            "section": "chorus",
+            "text": "わらってうたおう いまここで"
+          },
+          {
+            "section": "chorus",
+            "text": "あしたもきっといいひ"
+          }
+        ],
+        "seconds": 60,
+        "bpm": 112,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "ballad-night",
+      "ok": true,
+      "voiced": true,
+      "voiceNote": "octave shift -12, 28.8s",
+      "timings": {
+        "song": 4,
+        "split": 7.6,
+        "voice": 31.5
+      },
+      "wall": 59,
+      "lines": 8,
+      "lufs": null,
+      "truePeak": null,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 4.5,
+        "pitch": 6.5,
+        "diction": 5,
+        "melody": 6.5,
+        "arrangement": 5.5,
+        "mix": 5.5,
+        "genreFit": 4,
+        "artifacts": 5.5,
+        "overall": 5,
+        "problems": [
+          "00:00-00:14 The prompt requested an 'instrumental' with 'no vocals', but male AI vocals are present throughout the track.",
+          "00:26-00:30 Lyrics mismatch: 'こえがふるえて' was skipped, and 'なまえをよんだ' was sung as 'なまえをよんで'.",
+          "00:48-00:54 Lyrics mismatch/hallucination: Sang 'このたびをとどけて' instead of 'このうたにのせて とどけたい'.",
+          "00:14-01:03 Vocals sound distinctly synthetic and rigid with noticeable phasey/metallic processing.",
+          "01:04-01:15 Long empty tail with sparse piano trailing into silence."
+        ],
+        "fixIdeas": [
+          "If an instrumental track is required, remove lyrics from the generation input and toggle the instrumental switch / negative prompt for vocals.",
+          "Ensure phrase segmentation in the lyrics prompt to prevent dropping lines like 'こえがふるえて'.",
+          "Add more organic vibrato and acoustic reverb to reduce the robotic timbre of the AI vocal."
+        ],
+        "heard": "よるのまちにほしがおちて とおいきおく そっとひらく なまえをよんで まだきみをさがしてる あいたいよ いまでもずっと ことばにできないおもい このたびをとどけて きみが きみがいたなつのひ"
+      },
+      "sent": {
+        "prompt": "emotional japanese ballad , grand piano, soft strings, slow tempo, 72 bpm, A minor, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "よるのまちに ほしがおちて"
+          },
+          {
+            "section": "verse",
+            "text": "とおいきおく そっとひらく"
+          },
+          {
+            "section": "verse",
+            "text": "なまえをよんだ こえがふるえて"
+          },
+          {
+            "section": "verse",
+            "text": "まだきみをさがしてる"
+          },
+          {
+            "section": "chorus",
+            "text": "あいたいよ いまでもずっと"
+          },
+          {
+            "section": "chorus",
+            "text": "ことばにできないおもい"
+          },
+          {
+            "section": "chorus",
+            "text": "このうたにのせて とどけたい"
+          },
+          {
+            "section": "chorus",
+            "text": "きみがいたなつのひ"
+          }
+        ],
+        "seconds": 75,
+        "bpm": 72,
+        "keyRoot": 9,
+        "scale": "minor",
+        "language": "ja",
+        "voice": "(sample)",
+        "similarity": 0.7
+      }
+    },
+    {
+      "id": "rock-run",
+      "ok": true,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 3.3,
+        "split": 6.6,
+        "voice": 0
+      },
+      "wall": 20,
+      "lines": 8,
+      "lufs": null,
+      "truePeak": null,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 3,
+        "pitch": 4,
+        "diction": 1,
+        "melody": 3,
+        "arrangement": 7,
+        "mix": 6,
+        "genreFit": 7,
+        "artifacts": 5,
+        "overall": 3,
+        "problems": [
+          "00:00-01:00: 指定された歌詞（はしれ はしれ... 等）が一切歌われておらず、インスト主体のトラックになっている",
+          "00:24-00:30: 歌詞のない不自然なフェイク・掛け声（Yeah, Oh）のみが挿入されている",
+          "00:48-00:54: メロディや歌詞のない断片的なAIボーカルのハルシネーションが発生している"
+        ],
+        "fixIdeas": [
+          "プロンプト内に『no vocals』と歌詞が同居して指示が矛盾しているため、『no vocals』を削除して『powerful energetic male vocal』または『female vocal』を明記する",
+          "歌詞ブロック（[verse]、[chorus]）が正しく認識されるようプロンプトの構成を整理して再生成する"
+        ],
+        "heard": "（かしなし / かけごえのみ）"
+      },
+      "sent": {
+        "prompt": "energetic japanese rock , distorted electric guitars, bass, powerful drums, anime opening style, 160 bpm, E minor, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "はしれ はしれ かぜをきって"
+          },
+          {
+            "section": "verse",
+            "text": "まけないこころ もやしてゆけ"
+          },
+          {
+            "section": "verse",
+            "text": "たおれたって なんどでも"
+          },
+          {
+            "section": "verse",
+            "text": "たちあがるんだ"
+          },
+          {
+            "section": "chorus",
+            "text": "いまだ さけべ ぼくらのうた"
+          },
+          {
+            "section": "chorus",
+            "text": "やみをきりさく ひかりになれ"
+          },
+          {
+            "section": "chorus",
+            "text": "とどけ とどけ そらのかなた"
+          },
+          {
+            "section": "chorus",
+            "text": "ゆめはおわらない"
+          }
+        ],
+        "seconds": 60,
+        "bpm": 160,
+        "keyRoot": 4,
+        "scale": "minor",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "hiphop-chill",
+      "ok": true,
+      "voiced": true,
+      "voiceNote": "octave shift 0, 18.1s",
+      "timings": {
+        "song": 3.3,
+        "split": 6.6,
+        "voice": 18.4
+      },
+      "wall": 42,
+      "lines": 8,
+      "lufs": null,
+      "truePeak": null,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5,
+        "pitch": 6,
+        "diction": 4,
+        "melody": 5.5,
+        "arrangement": 6,
+        "mix": 5.5,
+        "genreFit": 6.5,
+        "artifacts": 6.5,
+        "overall": 5,
+        "problems": [
+          "00:25: 「ブランコゆれる」が「いこゆれる」と発音され歌詞が脱落している",
+          "00:27-00:30: 「あめがふたつ」「ともだちとわらう いつものばしょ」のフレーズが完全にスキップされている",
+          "00:49-00:54: 「ほらきこえる まちのリズム」が「まちきこえる」と縮まり、最後はハミングでごまかされている",
+          "00:00-00:22: 1分の尺に対してイントロが22秒と長すぎる",
+          "ボーカルがドライでオケの上に浮いており、リバーブや空間処理の馴染みが甘い"
+        ],
+        "fixIdeas": [
+          "プロンプト内に「no vocals」と歌詞が同時に存在しているため、インスト指定を削除しチル系ボーカル（chill laid-back male vocalsなど）を明記する",
+          "歌詞の脱落を防ぐため、1行あたりの音節数をメロディの小節に合わせて調整し再生成する",
+          "イントロを8小節程度（約10秒）に収まるようプロンプトや構成タグを調整する"
+        ],
+        "heard": "いぇー いぇー ゆうがたのこうえん いこゆれる ぽけっと まちが すきなんだ ゆっくりいこうぜ あせらずに ぼくらのぺーすで すてっぷふんで きょうもいいかんじ まちきこえる うー"
+      },
+      "sent": {
+        "prompt": "chill japanese hip hop , lo-fi boom bap drums, warm rhodes piano, deep bass, 90 bpm, F major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "ゆうがたのこうえん ブランコゆれる"
+          },
+          {
+            "section": "verse",
+            "text": "ポケットのなかには あめがふたつ"
+          },
+          {
+            "section": "verse",
+            "text": "ともだちとわらう いつものばしょ"
+          },
+          {
+            "section": "verse",
+            "text": "このまちがすきなんだ"
+          },
+          {
+            "section": "chorus",
+            "text": "ゆっくりいこうぜ あせらずに"
+          },
+          {
+            "section": "chorus",
+            "text": "ぼくらのペースで ステップふんで"
+          },
+          {
+            "section": "chorus",
+            "text": "きょうもいいかんじ ほらきこえる"
+          },
+          {
+            "section": "chorus",
+            "text": "まちのリズム"
+          }
+        ],
+        "seconds": 60,
+        "bpm": 90,
+        "keyRoot": 5,
+        "scale": "major",
+        "language": "ja",
+        "voice": "(sample)",
+        "similarity": 0.7
+      }
+    },
+    {
+      "id": "edm-party",
+      "ok": true,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 3.3,
+        "split": 6.6,
+        "voice": 0
+      },
+      "wall": 21,
+      "lines": 8,
+      "lufs": null,
+      "truePeak": null,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5,
+        "pitch": 7,
+        "diction": 6,
+        "melody": 5.5,
+        "arrangement": 3,
+        "mix": 5,
+        "genreFit": 2.5,
+        "artifacts": 6,
+        "overall": 4,
+        "problems": [
+          "0:00 - 0:09: Weird vocal stutter loop at the start instead of an instrumental intro.",
+          "Lyrical mismatch: completely skips the first two lines of the verse ('ネオンのなか...' and 'こころのおと...') as well as the final chorus line ('パーティーはこれから').",
+          "0:49: The drop completely falls flat; instead of an energetic 128 BPM four-on-the-floor EDM drop with bright synth leads, it slows into a sparse, half-time beat with almost no lead melody.",
+          "Prompt conflict: vocals are present despite 'no vocals' in the requested genre tags."
+        ],
+        "fixIdeas": [
+          "If an instrumental track is desired, remove lyrics completely and specify instrumental in both positive tags and negative prompt.",
+          "Strengthen genre tags with specific EDM subgenres (e.g., 'festival EDM', 'progressive house drop', 'driving 128 bpm 4-on-the-floor kick') to avoid sluggish half-time drops.",
+          "Format lyrics strictly with structure tags [Intro], [Verse], [Pre-Chorus], [Chorus] to prevent the AI from skipping sections."
+        ],
+        "heard": "みんな みんな みんな みんなでいっしょにてをあげて おどれ おどれ よるがあけるまで ひかりのなかで とびはねよう ぼくらはいま むてきなんだ はーー"
+      },
+      "sent": {
+        "prompt": "upbeat japanese edm , bright synth leads, four on the floor kick, big build up and drop, 128 bpm, G major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "ネオンのなか ステップふんで"
+          },
+          {
+            "section": "verse",
+            "text": "こころのおと ボリュームあげて"
+          },
+          {
+            "section": "verse",
+            "text": "みんなでいっしょに てをあげて"
+          },
+          {
+            "section": "verse",
+            "text": "いまはじまるよ"
+          },
+          {
+            "section": "chorus",
+            "text": "おどれ おどれ よるがあけるまで"
+          },
+          {
+            "section": "chorus",
+            "text": "ひかりのなかで とびはねよう"
+          },
+          {
+            "section": "chorus",
+            "text": "ぼくらはいま むてきなんだ"
+          },
+          {
+            "section": "chorus",
+            "text": "パーティーはこれから"
+          }
+        ],
+        "seconds": 60,
+        "bpm": 128,
+        "keyRoot": 7,
+        "scale": "major",
+        "language": "ja"
+      }
+    },
+    {
+      "id": "kids-march",
+      "ok": true,
+      "voiced": true,
+      "voiceNote": "octave shift -12, 13.5s",
+      "timings": {
+        "song": 2.9,
+        "split": 5.1,
+        "voice": 13.8
+      },
+      "wall": 33,
+      "lines": 6,
+      "lufs": null,
+      "truePeak": null,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 4,
+        "pitch": 5.5,
+        "diction": 7,
+        "melody": 5,
+        "arrangement": 4.5,
+        "mix": 5,
+        "genreFit": 3.5,
+        "artifacts": 5,
+        "overall": 4.5,
+        "problems": [
+          "00:00-00:08 冒頭の手拍子のみのイントロが長く、コード感やメロディ楽器が入ってこないため寂しい印象です。",
+          "00:09-00:36 プロンプトに「no vocals / instrumental」が指定されているにもかかわらずボーカルが生成されています。",
+          "00:09-00:23 ボーカルのトーンが子供向けにしては低く平坦で、AI特有のフォルマントの不自然さ・機械的な質感があります。",
+          "00:37-00:39 曲の末尾で意図しない「てびょうし」という不自然な話し声・ノイズが混入しています。"
+        ],
+        "fixIdeas": [
+          "インストゥルメンタルを厳密に出力したい場合は、歌詞欄を空欄にするかInstrumentalトグルを有効にしてください。",
+          "子供向け楽曲として歌唱を入れる場合は、明るい女性ボーカル（female vocal, upbeat, bright tone）を指定してピッチ感と活気を向上させてください。",
+          "ウクレレやグロッケンシュピールなどのアコースティック楽器の音圧と華やかさを強調するプロンプト調整を行ってください。"
+        ],
+        "heard": "くまさん うさぎさん おはようさん もりのみちを いっしょにあるこう どんぐりひろって ポケットいっぱい らららら たのしいね みんなでうたえば もっとたのしい らららら またあした"
+      },
+      "sent": {
+        "prompt": "cheerful kids song , ukulele, glockenspiel, hand claps, playful march, 120 bpm, D major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "くまさん うさぎさん おはようさん"
+          },
+          {
+            "section": "verse",
+            "text": "もりのみちを いっしょにあるこう"
+          },
+          {
+            "section": "verse",
+            "text": "どんぐりひろって ポケットいっぱい"
+          },
+          {
+            "section": "chorus",
+            "text": "ララララ たのしいね"
+          },
+          {
+            "section": "chorus",
+            "text": "みんなでうたえば もっとたのしい"
+          },
+          {
+            "section": "chorus",
+            "text": "ララララ またあした"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 120,
+        "keyRoot": 2,
+        "scale": "major",
+        "language": "ja",
+        "voice": "(sample)",
+        "similarity": 0.7
+      }
+    }
+  ]
+}
