@@ -1,0 +1,4 @@
+# one Cloud Logging filter per line (comment lines start with #); freshness in FRESHNESS below
+FRESHNESS=1d
+resource.type="cloud_run_revision" AND resource.labels.service_name="obolo-music" AND (textPayload:"voice register" OR textPayload:"LM " OR textPayload:"seed-vc" OR textPayload:"paint" OR textPayload:"painter" OR textPayload:"idle for" OR textPayload:"ready in" OR textPayload:"weights copied")
+resource.type="cloud_run_revision" AND resource.labels.service_name="obolo-api" AND (textPayload:"MV " OR textPayload:"gpu paint" OR textPayload:"novita paint" OR textPayload:"storyboard")

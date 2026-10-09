@@ -1,0 +1,35 @@
+name: Cloud logs
+
+# Prints recent Cloud Run logs for the filters in scripts/cloud-logs/query.txt (for Claude to read in
+# the job log; nothing is committed). Run by changing that file, or by hand.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**']
+    paths: ['scripts/cloud-logs/query.txt']
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  logs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Logs
+        run: |
+          F=$(grep '^FRESHNESS=' scripts/cloud-logs/query.txt | cut -d= -f2); F=${F:-1d}
+          grep -v '^#' scripts/cloud-logs/query.txt | grep -v '^FRESHNESS=' | grep -v '^\s*$' | while read -r q; do
+            echo "=================== $q"
+            gcloud logging read "$q" --freshness="$F" --limit=150 --order=asc --format='value(timestamp,resource.labels.service_name,textPayload)' | cut -c1-300
+          done
