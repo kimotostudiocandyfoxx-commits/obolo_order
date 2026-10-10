@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "id": "sample-kimorin-intro-v1",
+      "size": "portrait",
+      "quality": "medium",
+      "refs": ["design/story/refs/kimorin.jpg"],
+      "prompt": "The same character as the reference picture (KIMORIN: a small chibi fox-spirit with a white mask with blue markings, red hooded robe, many white-and-black tails), standing on a tiny floating island in outer space, waving hello to the viewer. Soft Japanese anime illustration, warm light, stars and a ringed planet behind. No text."
+    }
+  ]
+}
