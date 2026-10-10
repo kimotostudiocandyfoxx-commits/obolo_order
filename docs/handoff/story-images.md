@@ -1,14 +1,14 @@
 # 物語の画像をくり返し作る方法（物語担当チャット向け）
 
-物語の場面・キャラ・背景の絵を、**OpenAI GPT Image 2** で何枚でも作って見比べられます。
-この作業環境から OpenAI には直接つながらないので、**GitHub Actions が代わりに描いてブランチに保存** します。
+物語の場面・キャラ・背景の絵を、**Seedream 5.0 Pro**（ByteDance）で何枚でも作って見比べられます。
+この作業環境から画像サービスには直接つながらないので、**GitHub Actions が代わりに描いてブランチに保存** します。
 
 ## しくみ
 
 ```
 あなた：design/story-queue.json に「描いてほしい絵」を足す → commit → push
       ↓（GitHub Actions「Story images」が自動で動く。1〜3分）
-GitHub：GPT Image 2 で描いて design/story/out/<id>-1.jpg に保存 → 同じブランチに commit
+GitHub：Seedream 5.0 Pro で描いて design/story/out/<id>-1.jpg に保存 → 同じブランチに commit
       ↓
 あなた：pull → 画像を開いて見る → 直してまた足す（くり返し）
 ```
@@ -23,7 +23,6 @@ GitHub：GPT Image 2 で描いて design/story/out/<id>-1.jpg に保存 → 同�
     {
       "id": "ch1-arrival-v1",
       "size": "landscape",
-      "quality": "medium",
       "refs": ["design/story/refs/kimorin.jpg"],
       "prompt": "The same character as the reference picture (KIMORIN ...), arriving at a small island floating in space ... Soft Japanese anime illustration. No text."
     }
@@ -35,10 +34,9 @@ GitHub：GPT Image 2 で描いて design/story/out/<id>-1.jpg に保存 → 同�
 |---|---|
 | `id` | ファイル名になる（英数字とハイフン）。`章-場面-版` がおすすめ：`ch1-arrival-v2` |
 | `prompt` | 英語がおすすめ。何が・どこで・どんな光・どんな画風か。絵の中に文字を入れたいときは `"…"` で囲んで書く |
-| `size` | `portrait`（縦 1024×1536、省略時）／`landscape`（横 1536×1024）／`square`（1024×1024） |
-| `quality` | `low`（約1.5円・ラフ確認用）／`medium`（約9円・省略時）／`high`（約35円・決定稿だけ） |
+| `size` | `portrait`（縦 1152×1536、省略時）／`landscape`（横 1536×1152）／`square`（1536×1536）／`"幅x高さ"` |
 | `n` | 1回に何枚（1〜4）。案を見比べたいときに |
-| `refs` | **参考画像**（最大8枚、リポジトリ内のパス）。キャラの見た目や画風をそろえたいときに必ず使う |
+| `refs` | **参考画像**（最大10枚、リポジトリ内のパス）。キャラの見た目や画風をそろえたいときに必ず使う |
 
 ### キャラをそろえるコツ
 - キャラの設定画は `design/story/refs/` に置く（きもりん：`design/story/refs/kimorin.jpg`）。新しいキャラの設定画を作ったら、気に入った出力を `design/story/refs/` にコピーして、次からそれを `refs` に入れる。
@@ -68,6 +66,6 @@ until git fetch -q origin <いまのブランチ> && git log --format=%s HEAD..F
 ## 決まりごと
 
 - 1回の push で描くのは **16枚まで**（超えた分は次の push のときに描かれる）。
-- 費用の目安：medium 1枚 約9円、high 1枚 約35円。**ラフは low、決定稿だけ high。1日 1,000円を超えそうなときは、先にクライアントに確認**する。
-- 子ども向けアプリなので、怖すぎる・暴力的・性的な絵は描かない（OpenAI 側でも断られる）。
+- 費用の目安：1枚 約7円（参考画像は2枚目から1枚 約0.5円）。**1日 1,000円を超えそうなときは、先にクライアントに確認**する。
+- 子ども向けアプリなので、怖すぎる・暴力的・性的な絵は描かない。
 - 画面の中に「AI」という言葉は出さない。

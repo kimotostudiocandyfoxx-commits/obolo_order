@@ -1,7 +1,7 @@
 name: Story images
 
 # Story image workshop (client request 2026-10-10): the story-design chat adds items to
-# design/story-queue.json and pushes; this paints the new ones with OpenAI GPT Image 2 and commits
+# design/story-queue.json and pushes; this paints the new ones with Seedream 5.0 Pro and commits
 # them to design/story/out/ on the same branch. See docs/handoff/story-images.md.
 on:
   workflow_dispatch:
@@ -38,9 +38,11 @@ jobs:
           node-version: 22
       - name: Paint
         run: |
-          # needs (once): the key in Secret Manager as obolo-openai-api-key, readable by the deploy SA
-          export OPENAI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-openai-api-key)"
-          export OPENAI_IMAGE_MODEL="${{ vars.OPENAI_IMAGE_MODEL || 'gpt-image-2' }}"
+          # needs (once): the key in Secret Manager as obolo-seedream-api-key, readable by the deploy SA;
+          # variable SEEDREAM_PROVIDER = runware (default) or ark (BytePlus ModelArk)
+          export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          export SEEDREAM_PROVIDER="${{ vars.SEEDREAM_PROVIDER || 'runware' }}"
+          export SEEDREAM_MODEL="${{ vars.SEEDREAM_MODEL }}"
           node scripts/story-images/generate.mjs
       - name: Save the pictures to the branch
         if: always()
