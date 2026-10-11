@@ -218,11 +218,14 @@ export async function photoAnime(painter: StyledPainter, photos: { photo: Buffer
       taskType: 'imageInference',
       taskUUID: randomUUID(),
       model: SEEDREAM,
+      // the hero is the traveller (client 2026-10-11: KIMORIN travels Busan, eats the food in the
+      // photos, wanders the streets) — exactly one of them in every picture, never two
       positivePrompt: [
-        `Redraw the first reference photo as a breathtaking still from a high-end Japanese anime film: the same place, the same food and the same composition (${p.caption}).`,
-        'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food rendering, crisp line art.',
-        heroRef ? 'Add the character from the second reference picture into the scene, exactly the same design, colours and proportions, enjoying the moment (eating, looking around, cheering), as the main character.' : '',
-        'No text, no letters, no logos, no watermark. People in the background only as small simple passers-by.',
+        `A breathtaking still from a high-end Japanese anime film. The place, the food and the composition come from the first reference photo (${p.caption}) — keep them the same.`,
+        heroRef
+          ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
+          : '',
+        'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
       ]
         .filter(Boolean)
         .join(' '),
