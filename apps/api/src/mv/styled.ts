@@ -218,7 +218,7 @@ export async function photoAnime(
   opt: { seedream?: number[]; heroLook?: string; strength?: number; seed?: number; grid?: boolean } = {},
 ): Promise<(Buffer | null)[]> {
   painter.lastCostUsd = 0;
-  if (opt.grid) return seedreamGrid(painter, photos, hero);
+  if (opt.grid) return seedreamSheets(painter, photos, hero);
   const keyAt = new Set(opt.seedream ?? photos.map((_, k) => k));
   const cheapAt = photos.map((_, k) => k).filter((k) => !keyAt.has(k));
   const [keys, cheap] = await Promise.all([
@@ -328,48 +328,60 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
 }
 
 /**
- * Four photos in one Seedream picture (cost test 2026-10-11): a 2x2 sheet of four anime stills,
- * one per photo, cut apart afterwards — 1536px makes 768px panels, the MV's own size — so a
- * picture costs ~7 yen for four scenes. A leftover photo or two get their own picture.
+ * Four scenes in one Seedream picture (MV lab m12: 6.2 at ~27 yen against 6.0 at ~100 for one
+ * picture each): a 2x2 sheet of four anime stills cut apart afterwards — 1536px makes 768px panels,
+ * just above the MV's 720 (nothing is made above 720p, docs/media.md) — so ~7 yen buys four scenes.
+ * A scene is a photo to redraw (photo MV) or words (story MV). A short last sheet repeats earlier
+ * scenes in its empty panels (the same price either way) and drops them.
  */
-async function seedreamGrid(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+export async function seedreamSheets(painter: StyledPainter, items: { caption: string; photo?: Buffer }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+  if (!items.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 86 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
   const groups: number[][] = [];
-  for (let i = 0; i + 4 <= photos.length; i += 4) groups.push([i, i + 1, i + 2, i + 3]);
-  const rest = photos.map((_, k) => k).slice(groups.length * 4);
+  for (let i = 0; i < items.length; i += 4) groups.push([0, 1, 2, 3].map((j) => (i + j < items.length ? i + j : (i + j) % items.length)));
   const where = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
   let e = 0;
   let w = 0;
   const tasks = await Promise.all(
-    groups.map(async (g) => ({
-      taskType: 'imageInference',
-      taskUUID: randomUUID(),
-      model: SEEDREAM,
-      positivePrompt: [
-        'A 2x2 sheet of four separate square stills from the same high-end Japanese anime film, four equal panels split by thin straight white gutters, each panel a complete picture on its own.',
-        ...g.map((k, j) => {
-          const shot = MEAL.test(photos[k].caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length];
-          return `Panel ${j + 1} (${where[j]}): redraw reference photo ${j + (heroRef ? 2 : 1)} (${photos[k].caption}) — the same place and food. ${shot}`;
-        }),
-        heroRef
-          ? 'In every panel the traveller is the character from reference picture 1 (exactly the same design, colours and proportions), shown exactly once per panel, really doing what the photo shows — eating the food with relish or walking the streets.'
-          : '',
-        'Pictures for children: drinks are juice, tea or water only, never alcohol. Cinematic anime lighting, glowing colours, rich hand-painted backgrounds, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small passers-by.',
-      ]
-        .filter(Boolean)
-        .join(' '),
-      width: 1536,
-      height: 1536,
-      numberResults: 1,
-      outputType: 'URL',
-      outputFormat: 'JPG',
-      includeCost: true,
-      referenceImages: [...(heroRef ? [heroRef] : []), ...(await Promise.all(g.map((k) => jpg(photos[k].photo, 1024))))],
-    })),
+    groups.map(async (g) => {
+      const refs: string[] = heroRef ? [heroRef] : [];
+      const panels: string[] = [];
+      for (const [j, k] of g.entries()) {
+        const it = items[k];
+        const shot = MEAL.test(it.caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length];
+        if (it.photo) {
+          refs.push(await jpg(it.photo, 1024));
+          panels.push(`Panel ${j + 1} (${where[j]}): redraw reference picture ${refs.length} (${it.caption}) — the same place and food. ${shot}`);
+        } else panels.push(`Panel ${j + 1} (${where[j]}): ${it.caption}. ${it.caption.includes('wide shot') ? '' : shot}`);
+      }
+      return {
+        taskType: 'imageInference',
+        taskUUID: randomUUID(),
+        model: SEEDREAM,
+        positivePrompt: [
+          'A 2x2 sheet of four separate square stills from the same high-end Japanese anime film, four equal panels split by thin straight white gutters, each panel a complete picture on its own, all in the same 2D anime style (no photographic parts).',
+          ...panels,
+          heroRef
+            ? 'In every panel the main character is the one from reference picture 1 (exactly the same design, colours and proportions), shown exactly once per panel, really doing what the panel describes.'
+            : '',
+          'Pictures for children: drinks are juice, tea or water only, never alcohol. Cinematic anime lighting, glowing colours, rich hand-painted backgrounds, crisp line art. No text, no letters, no logos, no watermark. Other people only as small passers-by.',
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .slice(0, 3000),
+        width: 1536,
+        height: 1536,
+        numberResults: 1,
+        outputType: 'URL',
+        outputFormat: 'JPG',
+        includeCost: true,
+        ...(refs.length ? { referenceImages: refs } : {}),
+      };
+    }),
   );
-  const [sheets, single] = await Promise.all([painter.run(tasks), seedreamPhotos(painter, rest.map((k) => photos[k]), hero)]);
-  const out: (Buffer | null)[] = photos.map(() => null);
+  const sheets = await painter.run(tasks);
+  const out: (Buffer | null)[] = items.map(() => null);
   await Promise.all(
     groups.map(async (g, gi) => {
       const img = sheets[gi];
@@ -381,6 +393,7 @@ async function seedreamGrid(painter: StyledPainter, photos: { photo: Buffer; cap
       const trim = Math.round(W * 0.012);
       await Promise.all(
         g.map(async (k, j) => {
+          if (gi * 4 + j >= items.length) return; // a repeat filling an empty panel
           const left = (j % 2) * Math.floor(W / 2) + trim;
           const top = Math.floor(j / 2) * Math.floor(H / 2) + trim;
           out[k] = await sharp(img)
@@ -392,6 +405,5 @@ async function seedreamGrid(painter: StyledPainter, photos: { photo: Buffer; cap
       );
     }),
   );
-  rest.forEach((k, j) => (out[k] = single[j] ?? null));
   return out;
 }

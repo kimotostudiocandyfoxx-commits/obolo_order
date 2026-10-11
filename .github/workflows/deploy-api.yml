@@ -81,6 +81,10 @@ jobs:
             if [ -n "${{ vars.RUNWARE_MODEL }}" ]; then
               echo 'RUNWARE_API_KEY=obolo-runware-api-key:latest'
             fi
+            # MV plan A (docs/mv-plans.md): Seedream sheets on Runware, the key stored as obolo-seedream-api-key
+            if [ "${{ vars.MV_PLAN }}" = "A" ]; then
+              echo 'MV_RUNWARE_KEY=obolo-seedream-api-key:latest'
+            fi
             if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
               echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
               echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'
@@ -128,7 +132,9 @@ jobs:
             MV_PLAN_MODEL=${{ vars.MV_PLAN_MODEL || 'gemini-flash-lite-latest' }}
             MV_KEY_CUTS=${{ vars.MV_KEY_CUTS || '2' }}
             MV_QWEN_SCENES=${{ vars.MV_QWEN_SCENES || '12' }}
-            MV_GPU_PAINT=${{ vars.MV_GPU_PAINT || (vars.MUSIC_REGION && 'true') || 'false' }}
+            MV_PLAN=${{ vars.MV_PLAN }}
+            MV_SHEET_SCENES=${{ vars.MV_SHEET_SCENES || '12' }}
+            MV_GPU_PAINT=${{ vars.MV_GPU_PAINT || (vars.MV_PLAN == 'B' && 'true') || (vars.MUSIC_REGION && 'true') || 'false' }}
             MV_HERO_REF=${{ vars.MV_HERO_REF || '0.6' }}
             RUNWARE_MODEL=${{ vars.RUNWARE_MODEL }}
             NOVITA_MODEL=${{ vars.NOVITA_MODEL }}

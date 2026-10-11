@@ -120,6 +120,15 @@ const Env = z.object({
   NOVITA_SIDE: z.coerce.number().default(768),
   RUNWARE_API_KEY: secret(),
   RUNWARE_MODEL: secret(),
+  /**
+   * How story MVs are painted (client decision 2026-10-11, docs/mv-plans.md). Unset = as before.
+   *  A: Seedream 5.0 Pro on Runware, four scenes per picture (~7 yen for four) — while there are few members
+   *  B: our own GPU kept running (MUSIC_MIN_INSTANCES=1) with open models — once there are many
+   */
+  MV_PLAN: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['A', 'B']).optional()),
+  /** plan A: the Runware key (secret obolo-seedream-api-key) and how many scenes an MV gets (4 per picture) */
+  MV_RUNWARE_KEY: secret(),
+  MV_SHEET_SCENES: z.coerce.number().min(4).max(32).default(12),
 
   /** Fish Audio API (voices: registration, read-aloud, singing). Unset = voice features off. */
   FISH_API_KEY: secret(),

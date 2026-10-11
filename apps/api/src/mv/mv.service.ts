@@ -14,6 +14,7 @@ import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
 import { idToken } from '../compose/music.client';
 import { KeyArtist } from './keyart';
+import { seedreamSheets, StyledPainter } from './styled';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
 import { describeHero, isHuman, planStory, storyToPlan, type StoryPlan } from './storyboard';
@@ -32,6 +33,8 @@ type SongRow = typeof songs.$inferSelect;
 export class MvService {
   private readonly log = new Logger('MV');
   private readonly keyArtist: KeyArtist;
+  /** plan A (MV_PLAN=A): Seedream sheets on Runware */
+  private readonly sheets: StyledPainter | null;
   constructor(
     private readonly db: Database,
     private readonly media: MediaService,
@@ -51,6 +54,7 @@ export class MvService {
       geminiModel: cfg.MV_KEYART_MODEL,
       stylizer: new Stylizer(cfg.ANIME_ONNX_URL),
     });
+    this.sheets = cfg.MV_PLAN === 'A' && cfg.MV_RUNWARE_KEY ? new StyledPainter({ key: cfg.MV_RUNWARE_KEY }) : null;
   }
 
   private async song(userId: string, songId: string): Promise<SongRow> {
@@ -269,14 +273,19 @@ export class MvService {
           music: String(design.instrumentalPrompt ?? '').slice(0, 300),
           lyrics: this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })),
           hero,
-          maxScenes: this.keyArtist.sceneBudget(this.cfg.MV_SCENES, this.cfg.MV_QWEN_SCENES),
+          maxScenes: this.sheets ? this.cfg.MV_SHEET_SCENES : this.keyArtist.sceneBudget(this.cfg.MV_SCENES, this.cfg.MV_QWEN_SCENES),
         },
         this.cfg.GEMINI_API_KEY,
         this.cfg.MV_PLAN_MODEL,
       );
       // paint every scene; one seed per MV keeps the look together
       const seed = Math.floor(Math.random() * 2 ** 31);
-      const drawn = await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) });
+      // plan A: four scenes per Seedream picture; plan B / unset: our GPU (else Qwen) via the key artist
+      if (this.sheets) this.sheets.lastCostUsd = 0;
+      const drawn = this.sheets
+        ? await seedreamSheets(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture)
+        : await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) });
+      if (this.sheets) this.log.log(`MV ${id}: plan A paint cost ${Math.round(this.sheets.lastCostUsd * 150)} yen`);
       const pics: (string | null)[] = await Promise.all(
         drawn.map(async (img, k) => {
           if (!img) return null;
