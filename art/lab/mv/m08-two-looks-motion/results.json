@@ -1,0 +1,134 @@
+{
+  "round": "m08-two-looks-motion",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.1,
+    "heroLikeness": 7,
+    "heroConsistency": 6.3,
+    "pictureQuality": 6.4,
+    "storyTelling": 5.3,
+    "lyricFit": 6.1,
+    "beatSync": 5.5,
+    "variety": 5,
+    "watchability": 6,
+    "kidsSafe": 7.4
+  },
+  "results": [
+    {
+      "id": "pop-bright",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "pop-bright~a",
+      "scenes": 9,
+      "painted": 9,
+      "costYen": 17.8,
+      "seconds": {
+        "plan": 3,
+        "paint": 140,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 7.1,
+        "heroConsistency": 6.7,
+        "pictureQuality": 7,
+        "storyTelling": 5.4,
+        "lyricFit": 6,
+        "beatSync": 5.6,
+        "variety": 4.9,
+        "watchability": 6.1,
+        "kidsSafe": 7.8,
+        "overall": 6.2,
+        "problems": [
+          "00:27 Chorus holds on a single static visual for too long.",
+          "00:43 Repeating previous chorus cuts reduces novelty."
+        ],
+        "fixIdeas": [
+          "Add intermediate chorus poses or camera angles to maintain energy.",
+          "Incorporate mild 2D character animation rather than still image zooms."
+        ],
+        "bestMoments": [
+          "00:08 Charming transition into storybook watercolor chibi style.",
+          "00:27 Dramatic visual upgrade aligning with the chorus drop."
+        ]
+      }
+    },
+    {
+      "id": "rock-run",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "rock-run~a",
+      "scenes": 9,
+      "painted": 9,
+      "costYen": 17.1,
+      "seconds": {
+        "plan": 3,
+        "paint": 126,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:39-00:45 Rapid strobing between two repeated stills disrupts flow.",
+          "00:00-00:22 Verses rely on mostly static single-pose illustrations."
+        ],
+        "fixIdeas": [
+          "Provide fresh animated action frames for the chorus climax rather than oscillating between repeated images.",
+          "Introduce camera pan speed variations and subtle character animation during verse sections."
+        ],
+        "bestMoments": [
+          "00:24 Chorus impact with full cinematic moonlit visual.",
+          "00:38 Scenic sunrise hilltop perspective."
+        ]
+      }
+    },
+    {
+      "id": "ballad-night",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "ballad-night~a",
+      "scenes": 11,
+      "painted": 11,
+      "costYen": 11.9,
+      "seconds": {
+        "plan": 3,
+        "paint": 119,
+        "render": 12
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.2,
+        "pictureQuality": 6.1,
+        "storyTelling": 5.4,
+        "lyricFit": 6.3,
+        "beatSync": 6,
+        "variety": 5.2,
+        "watchability": 5.9,
+        "kidsSafe": 7.4,
+        "overall": 6,
+        "problems": [
+          "00:05 Background environments in the early verses are minimal and lack visual depth.",
+          "00:26 Consecutive cuts overuse identical radial speed line overlays.",
+          "00:44 Final chorus shot remains completely static for more than ten seconds."
+        ],
+        "fixIdeas": [
+          "Add camera pans and drifting particle effects during the static chorus key visual.",
+          "Introduce more scenic background elements in verse prompts to reinforce world-building.",
+          "Vary framing and transition effects leading into the chorus instead of repeating speed lines."
+        ],
+        "bestMoments": [
+          "00:44 Stylistic switch to the cinematic render matching the chorus musical drop.",
+          "00:12 Soft profile shot delivering appropriate melancholic tone."
+        ]
+      }
+    }
+  ]
+}
