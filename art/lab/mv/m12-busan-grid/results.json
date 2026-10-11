@@ -1,0 +1,59 @@
+{
+  "round": "m12-busan-grid",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.2,
+    "heroLikeness": 7,
+    "heroConsistency": 5.5,
+    "pictureQuality": 6.5,
+    "storyTelling": 6,
+    "lyricFit": 7,
+    "beatSync": 5.8,
+    "variety": 5.7,
+    "watchability": 6.3,
+    "kidsSafe": 7.5
+  },
+  "results": [
+    {
+      "id": "grid",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 12,
+      "costYen": 27.4,
+      "seconds": {
+        "plan": 0,
+        "paint": 153,
+        "render": 11
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 5.5,
+        "pictureQuality": 6.5,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5.8,
+        "variety": 5.7,
+        "watchability": 6.3,
+        "kidsSafe": 7.5,
+        "overall": 6.2,
+        "problems": [
+          "00:00 - Style shifts between live-action photo composite and illustrated anime.",
+          "00:10 - Character anatomy and mask details vary across eating shots.",
+          "00:33 - Repetitive medium shots focusing purely on food bowls."
+        ],
+        "fixIdeas": [
+          "Enforce a unified 2D anime rendering style prompt to eliminate photo-composite look.",
+          "Add more action and travel activities beyond eating meals to diversify the storyboard.",
+          "Incorporate varied camera angles and dynamic cuts matching musical cues."
+        ],
+        "bestMoments": [
+          "00:04 - Beach establishing shot capturing the character's full outfit.",
+          "00:11 - Expressive eating shot with puffed cheeks.",
+          "00:41 - Warm close-up finale over the steaming soup."
+        ]
+      }
+    }
+  ]
+}
