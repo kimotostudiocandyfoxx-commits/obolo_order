@@ -1,0 +1,139 @@
+{
+  "round": "m11-busan-cheap",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 5.6,
+    "heroLikeness": 5.4,
+    "heroConsistency": 4.5,
+    "pictureQuality": 5.7,
+    "storyTelling": 5.8,
+    "lyricFit": 6.4,
+    "beatSync": 5.3,
+    "variety": 5.4,
+    "watchability": 5.7,
+    "kidsSafe": 7.2
+  },
+  "results": [
+    {
+      "id": "cheap60",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 4.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 40,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 5,
+        "heroConsistency": 4,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:08 Hero scale shrinks to miniature figurine on table.",
+          "00:23 Hero morphs into tall stylized figure, losing core proportions.",
+          "00:26 Hero partially merges into fried food plate."
+        ],
+        "fixIdeas": [
+          "Lock character scale and model sheet across interior scenes.",
+          "Standardize costume details and chibi proportions in prompts.",
+          "Increase cut rhythm variety during chorus."
+        ],
+        "bestMoments": [
+          "00:04 Opening beach shot establishing Busan atmosphere.",
+          "00:15 Table feast composition matching lyrics nicely."
+        ]
+      }
+    },
+    {
+      "id": "cheap75",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 3.8,
+      "seconds": {
+        "plan": 0,
+        "paint": 38,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 5.4,
+        "heroConsistency": 4.8,
+        "pictureQuality": 5.8,
+        "storyTelling": 5.2,
+        "lyricFit": 6.3,
+        "beatSync": 4.9,
+        "variety": 5,
+        "watchability": 5.3,
+        "kidsSafe": 7.2,
+        "overall": 5.2,
+        "problems": [
+          "00:08 Hero facial features and cloak details morph noticeably.",
+          "00:11 Duplicated hero clones appear inside fish tanks.",
+          "00:33 Odd scaling with character sitting inside a tiny pot.",
+          "00:38 Morphing artifacts and inconsistent character anatomy."
+        ],
+        "fixIdeas": [
+          "Enforce strict negative prompting for duplicate characters.",
+          "Standardize hero model sheet prompts for cloak and mask consistency.",
+          "Vary composition beyond repetitive table-level food closeups."
+        ],
+        "bestMoments": [
+          "00:01 Scenic intro shot overlooking the bay.",
+          "00:23 Atmospheric stroll through the night market."
+        ]
+      }
+    },
+    {
+      "id": "mix3",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 25.4,
+      "seconds": {
+        "plan": 0,
+        "paint": 126,
+        "render": 9
+      },
+      "judge": {
+        "heroLikeness": 5.8,
+        "heroConsistency": 4.6,
+        "pictureQuality": 5.2,
+        "storyTelling": 6.1,
+        "lyricFit": 6.8,
+        "beatSync": 5.9,
+        "variety": 6.2,
+        "watchability": 5.8,
+        "kidsSafe": 7.5,
+        "overall": 5.7,
+        "problems": [
+          "00:19 Abrupt jump between flat 2D art and 3D rendered style.",
+          "00:26 Hero scale and anatomy fluctuate heavily around the food plates.",
+          "00:38 Mask detailing and tail counts lose reference fidelity."
+        ],
+        "fixIdeas": [
+          "Enforce consistent 2D anime style keywords across all storyboard prompts.",
+          "Use image prompt conditioning to lock mask patterns and robe details.",
+          "Adjust edit cut points to land firmly on drum transients."
+        ],
+        "bestMoments": [
+          "00:04 Atmospheric stroll along the beach.",
+          "00:30 Charming street-side dining composition."
+        ]
+      }
+    }
+  ]
+}
