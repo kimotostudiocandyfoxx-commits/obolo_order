@@ -1,0 +1,58 @@
+{
+  "round": "m09-busan-photos",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6,
+    "heroLikeness": 7,
+    "heroConsistency": 7,
+    "pictureQuality": 7,
+    "storyTelling": 5,
+    "lyricFit": 7,
+    "beatSync": 5,
+    "variety": 4,
+    "watchability": 5,
+    "kidsSafe": 7
+  },
+  "results": [
+    {
+      "id": "busan",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 100.2,
+      "seconds": {
+        "plan": 0,
+        "paint": 409,
+        "render": 16
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 7,
+        "pictureQuality": 7,
+        "storyTelling": 5,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 4,
+        "watchability": 5,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:04 Repetitive center-framed eating compositions.",
+          "00:35 Alcoholic beverage depicted on table.",
+          "00:23 Abrupt and repetitive action lines."
+        ],
+        "fixIdeas": [
+          "Incorporate diverse camera angles such as wide shots and over-the-shoulder perspectives.",
+          "Replace beer visuals with juice or tea.",
+          "Refine transitions to align naturally with musical accents."
+        ],
+        "bestMoments": [
+          "00:00 Atmospheric morning hotel lighting.",
+          "00:11 Detailed aquarium market background."
+        ]
+      }
+    }
+  ]
+}
