@@ -25,8 +25,8 @@ type Case = {
   song: string;
   mood?: string;
   photos?: string;
-  /** photo MV: seedream = every photo by Seedream (~7 yen each), cheap = all Animagine img2img (~0.3 yen), mix = Seedream on `keys` chorus photos only */
-  photoMode?: 'seedream' | 'cheap' | 'mix';
+  /** photo MV: seedream = every photo by Seedream (~7 yen each), cheap = all Animagine img2img (~0.3 yen), mix = Seedream on `keys` chorus photos only, grid = four photos in one Seedream picture (~2 yen a scene) */
+  photoMode?: 'seedream' | 'cheap' | 'mix' | 'grid';
   keys?: number;
   /** img2img strength for the cheap photos (0..1, higher = further from the photo) */
   strength?: number;
@@ -144,7 +144,7 @@ ${lyrics}`;
 /** Which photos Seedream redraws: all, none, or `keys` of the chorus ones spread evenly. */
 function seedreamPhotos(c: Case, story: StoryPlan, lyrics: { t: number; chorus: boolean }[]): number[] | undefined {
   const mode = c.photoMode ?? 'seedream';
-  if (mode === 'seedream') return undefined;
+  if (mode === 'seedream' || mode === 'grid') return undefined;
   if (mode === 'cheap') return [];
   const chorusAt = (t: number) => {
     let ch = false;
@@ -234,6 +234,7 @@ async function main() {
             seedream: seedreamPhotos(c, story, lyrics),
             heroLook: hero,
             strength: c.strength,
+            grid: c.photoMode === 'grid',
             seed: Math.floor(Math.random() * 2 ** 31),
           })
         : round.painter === 'styled'

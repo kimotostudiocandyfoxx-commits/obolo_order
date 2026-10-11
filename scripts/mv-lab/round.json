@@ -1,6 +1,6 @@
 {
-  "round": "m11-busan-cheap",
-  "note": "コスト比較：全部 Animagine（安いアニメモデル）で写真を描き直す版（強さ0.6 / 0.75）と、サビの3枚だけ Seedream・残り Animagine の版。曲は r08 の良い方。",
+  "round": "m12-busan-grid",
+  "note": "コスト試験：Seedream 1枚に写真4枚分の場面を2×2で描かせて切り分ける（1場面 約2円）。13枚 = 4枚描き。曲は r08 の良い方。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
@@ -8,26 +8,10 @@
   "side": 768,
   "cases": [
     {
-      "id": "cheap60",
+      "id": "grid",
       "song": "best:busan-kpop",
       "photos": "art/lab/busan/photos.json",
-      "photoMode": "cheap",
-      "strength": 0.6
-    },
-    {
-      "id": "cheap75",
-      "song": "best:busan-kpop",
-      "photos": "art/lab/busan/photos.json",
-      "photoMode": "cheap",
-      "strength": 0.75
-    },
-    {
-      "id": "mix3",
-      "song": "best:busan-kpop",
-      "photos": "art/lab/busan/photos.json",
-      "photoMode": "mix",
-      "keys": 3,
-      "strength": 0.7
+      "photoMode": "grid"
     }
   ],
   "heroRef": 0.6

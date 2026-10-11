@@ -215,9 +215,10 @@ export async function photoAnime(
   photos: { photo: Buffer; caption: string }[],
   hero: Buffer | null,
   /** which photos Seedream redraws (~7 yen each); the rest go to Animagine img2img (~0.3 yen). All when omitted. */
-  opt: { seedream?: number[]; heroLook?: string; strength?: number; seed?: number } = {},
+  opt: { seedream?: number[]; heroLook?: string; strength?: number; seed?: number; grid?: boolean } = {},
 ): Promise<(Buffer | null)[]> {
   painter.lastCostUsd = 0;
+  if (opt.grid) return seedreamGrid(painter, photos, hero);
   const keyAt = new Set(opt.seedream ?? photos.map((_, k) => k));
   const cheapAt = photos.map((_, k) => k).filter((k) => !keyAt.has(k));
   const [keys, cheap] = await Promise.all([
@@ -276,23 +277,24 @@ async function animaginePhotos(
   return painter.run(make(false));
 }
 
+// a different camera for every picture (m09: thirteen centred eating shots in a row bored the judge)
+const EAT_SHOTS = [
+  'Camera: over-the-shoulder from behind the character, the food filling the foreground.',
+  'Camera: side profile, the character mid-bite with chopsticks, cheeks full and happy.',
+  'Camera: top-down view of the whole table, the character leaning in from one edge.',
+  'Camera: close-up of the character’s delighted face, the food blurred big in the foreground.',
+  'Camera: three-quarter view from a low angle across the table, steam rising between the character and the lens.',
+];
+const WALK_SHOTS = [
+  'Camera: wide establishing shot, the character small in the frame seen from behind, taking in the whole place.',
+  'Camera: low angle, the character striding toward the lens with the place towering behind.',
+  'Camera: side tracking shot, the character strolling past and looking around in wonder.',
+];
+
 async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
   if (!photos.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
-  // a different camera for every picture (m09: thirteen centred eating shots in a row bored the judge)
-  const eatShots = [
-    'Camera: over-the-shoulder from behind the character, the food filling the foreground.',
-    'Camera: side profile, the character mid-bite with chopsticks, cheeks full and happy.',
-    'Camera: top-down view of the whole table, the character leaning in from one edge.',
-    'Camera: close-up of the character’s delighted face, the food blurred big in the foreground.',
-    'Camera: three-quarter view from a low angle across the table, steam rising between the character and the lens.',
-  ];
-  const walkShots = [
-    'Camera: wide establishing shot, the character small in the frame seen from behind, taking in the whole place.',
-    'Camera: low angle, the character striding toward the lens with the place towering behind.',
-    'Camera: side tracking shot, the character strolling past and looking around in wonder.',
-  ];
   let e = 0;
   let w = 0;
   const tasks = await Promise.all(
@@ -307,7 +309,7 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
         heroRef
           ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
           : '',
-        MEAL.test(p.caption) ? eatShots[e++ % eatShots.length] : walkShots[w++ % walkShots.length],
+        MEAL.test(p.caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length],
         'A picture for children: any drink on the table is juice, tea or water — never beer, wine or other alcohol.',
         'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
       ]
@@ -323,4 +325,73 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
     })),
   );
   return painter.run(tasks);
+}
+
+/**
+ * Four photos in one Seedream picture (cost test 2026-10-11): a 2x2 sheet of four anime stills,
+ * one per photo, cut apart afterwards — 1536px makes 768px panels, the MV's own size — so a
+ * picture costs ~7 yen for four scenes. A leftover photo or two get their own picture.
+ */
+async function seedreamGrid(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+  const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 86 }).toBuffer()).toString('base64')}`;
+  const heroRef = hero ? await jpg(hero, 1024) : null;
+  const groups: number[][] = [];
+  for (let i = 0; i + 4 <= photos.length; i += 4) groups.push([i, i + 1, i + 2, i + 3]);
+  const rest = photos.map((_, k) => k).slice(groups.length * 4);
+  const where = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+  let e = 0;
+  let w = 0;
+  const tasks = await Promise.all(
+    groups.map(async (g) => ({
+      taskType: 'imageInference',
+      taskUUID: randomUUID(),
+      model: SEEDREAM,
+      positivePrompt: [
+        'A 2x2 sheet of four separate square stills from the same high-end Japanese anime film, four equal panels split by thin straight white gutters, each panel a complete picture on its own.',
+        ...g.map((k, j) => {
+          const shot = MEAL.test(photos[k].caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length];
+          return `Panel ${j + 1} (${where[j]}): redraw reference photo ${j + (heroRef ? 2 : 1)} (${photos[k].caption}) — the same place and food. ${shot}`;
+        }),
+        heroRef
+          ? 'In every panel the traveller is the character from reference picture 1 (exactly the same design, colours and proportions), shown exactly once per panel, really doing what the photo shows — eating the food with relish or walking the streets.'
+          : '',
+        'Pictures for children: drinks are juice, tea or water only, never alcohol. Cinematic anime lighting, glowing colours, rich hand-painted backgrounds, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small passers-by.',
+      ]
+        .filter(Boolean)
+        .join(' '),
+      width: 1536,
+      height: 1536,
+      numberResults: 1,
+      outputType: 'URL',
+      outputFormat: 'JPG',
+      includeCost: true,
+      referenceImages: [...(heroRef ? [heroRef] : []), ...(await Promise.all(g.map((k) => jpg(photos[k].photo, 1024))))],
+    })),
+  );
+  const [sheets, single] = await Promise.all([painter.run(tasks), seedreamPhotos(painter, rest.map((k) => photos[k]), hero)]);
+  const out: (Buffer | null)[] = photos.map(() => null);
+  await Promise.all(
+    groups.map(async (g, gi) => {
+      const img = sheets[gi];
+      if (!img) return;
+      const meta = await sharp(img).metadata();
+      const W = meta.width ?? 1536;
+      const H = meta.height ?? 1536;
+      // each quarter, a little inside so the gutters fall away
+      const trim = Math.round(W * 0.012);
+      await Promise.all(
+        g.map(async (k, j) => {
+          const left = (j % 2) * Math.floor(W / 2) + trim;
+          const top = Math.floor(j / 2) * Math.floor(H / 2) + trim;
+          out[k] = await sharp(img)
+            .extract({ left, top, width: Math.floor(W / 2) - trim * 2, height: Math.floor(H / 2) - trim * 2 })
+            .resize(768, 768)
+            .jpeg({ quality: 92 })
+            .toBuffer();
+        }),
+      );
+    }),
+  );
+  rest.forEach((k, j) => (out[k] = single[j] ?? null));
+  return out;
 }
