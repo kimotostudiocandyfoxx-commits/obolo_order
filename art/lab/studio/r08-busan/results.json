@@ -1,0 +1,315 @@
+{
+  "round": "r08-busan",
+  "avg": {
+    "overall": 6,
+    "vocalNaturalness": 6,
+    "pitch": 6,
+    "diction": 6,
+    "melody": 6,
+    "arrangement": 5.5,
+    "mix": 6,
+    "genreFit": 6,
+    "artifacts": 5.5
+  },
+  "byVariant": [
+    {
+      "name": "a",
+      "avg": {
+        "overall": 6,
+        "vocalNaturalness": 6,
+        "pitch": 6,
+        "diction": 6,
+        "melody": 6,
+        "arrangement": 5,
+        "mix": 6,
+        "genreFit": 7,
+        "artifacts": 6
+      }
+    },
+    {
+      "name": "b",
+      "avg": {
+        "overall": 6,
+        "vocalNaturalness": 6,
+        "pitch": 6,
+        "diction": 6,
+        "melody": 6,
+        "arrangement": 6,
+        "mix": 6,
+        "genreFit": 5,
+        "artifacts": 5
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "busan-kpop~a",
+      "variant": "a",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.25,
+          "text": "朝のまっつまありがとう おがるさかのざわんできかんけけちゃんかんじゃんけたひびちでこれほらふたちででこれ真んじゃましそばならないmememememememememememememememememememememememememememe"
+        },
+        {
+          "score": 0.716,
+          "text": "朝のファッパシア 窓いっぱいの海 ソンボの空に足跡つけて カニが踊る 朝場のざわめき 勘じゃんけしゃん 非心地で恋した 人じゃましそう 止まらない ネオンの南部といよはこれから 時期を片手に笑い合おうさあやなまま会いに来るよ"
+        }
+      ],
+      "file": "art/lab/studio/r08-busan/busan-kpop~a.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の釜山 窓いっぱいの海",
+          "start": 0.32,
+          "end": 3.76
+        },
+        {
+          "text": "ソンドの砂に 足あとつけて",
+          "start": 3.84,
+          "end": 7.84
+        },
+        {
+          "text": "カニがおどる 市場のざわめき",
+          "start": 7.92,
+          "end": 12
+        },
+        {
+          "text": "カンジャンケジャン 一口で恋した",
+          "start": 12.08,
+          "end": 15.44
+        },
+        {
+          "text": "チンチャ マシッソ 止まらない",
+          "start": 16.08,
+          "end": 19.04
+        },
+        {
+          "text": "ネオンの南浦洞 夜はこれから",
+          "start": 19.12,
+          "end": 23.28
+        },
+        {
+          "text": "チキンを片手に 笑い合おう",
+          "start": 23.36,
+          "end": 26.64
+        },
+        {
+          "text": "釜山 また会いに来るよ",
+          "start": 26.72,
+          "end": 48.32
+        }
+      ],
+      "seconds": 48.8,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 120.1,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 129,
+      "lines": 8,
+      "lufs": -16,
+      "truePeak": -0.8,
+      "silenceSec": 2.4,
+      "judge": {
+        "vocalNaturalness": 6,
+        "pitch": 6,
+        "diction": 6,
+        "melody": 6,
+        "arrangement": 5,
+        "mix": 6,
+        "genreFit": 7,
+        "artifacts": 6,
+        "overall": 6,
+        "problems": [
+          "00:08 - 'カニ' sounds slightly like 'カミ'",
+          "00:20 - Pronunciation of '南浦洞' is rushed and slightly unnatural",
+          "00:33-00:48 - Track leaves an extended repetitive instrumental drop that ends abruptly without resolution"
+        ],
+        "fixIdeas": [
+          "Refine phonetic prompting for foreign place names like Nampo-dong to ensure clear syllabic delivery",
+          "Add structure tags for an outro to prevent unresolved trailing beats"
+        ],
+        "heard": "あさのぷさん まどいっぱいのうみ そんどのすなに あしあとつけて かみがおどる いちばのざわめき かんじゃんけじゃん ひとくちでこいした ちんちゃましっそ とまらない ねおんのなんぽどん よるはこれから ちきんをかたてに わらいあおう ぷさん またあいにくるよ"
+      },
+      "sent": {
+        "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, japanese rap vocal, rhythmic flow, clear diction, every word pronounced",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の釜山 窓いっぱいの海"
+          },
+          {
+            "section": "verse",
+            "text": "ソンドの砂に 足あとつけて"
+          },
+          {
+            "section": "verse",
+            "text": "カニがおどる 市場のざわめき"
+          },
+          {
+            "section": "verse",
+            "text": "カンジャンケジャン 一口で恋した"
+          },
+          {
+            "section": "chorus",
+            "text": "チンチャ マシッソ 止まらない"
+          },
+          {
+            "section": "chorus",
+            "text": "ネオンの南浦洞 夜はこれから"
+          },
+          {
+            "section": "chorus",
+            "text": "チキンを片手に 笑い合おう"
+          },
+          {
+            "section": "chorus",
+            "text": "釜山 また会いに来るよ"
+          }
+        ],
+        "seconds": 48.8,
+        "bpm": 128,
+        "keyRoot": 6,
+        "scale": "minor",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "busan-kpop~b",
+      "variant": "b",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.432,
+          "text": "何色のカニアーバのざわめきそののスーツチケットカニが踊るシツバのざわめきガンジャンケジャン一口で恋してんちんじゃましそう止まらないレオンのないラップと夜はme"
+        },
+        {
+          "score": 0.599,
+          "text": "朝の2倍さまどいっぱいの海 ソンドの砂に足跡つけて カニが踊る 失敗のざわめき 勘じゃんけじゃん引きと口で恋し 神社マシンソング止まらない 手を飲みな人の夜はこれから 資金を盾に割りようme"
+        }
+      ],
+      "file": "art/lab/studio/r08-busan/busan-kpop~b.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の釜山 窓いっぱいの海",
+          "start": 0.16,
+          "end": 3.92
+        },
+        {
+          "text": "ソンドの砂に 足あとつけて",
+          "start": 4,
+          "end": 7.84
+        },
+        {
+          "text": "カニがおどる 市場のざわめき",
+          "start": 7.92,
+          "end": 12
+        },
+        {
+          "text": "カンジャンケジャン 一口で恋した",
+          "start": 12.08,
+          "end": 15.6
+        },
+        {
+          "text": "チンチャ マシッソ 止まらない",
+          "start": 15.76,
+          "end": 19.2
+        },
+        {
+          "text": "ネオンの南浦洞 夜はこれから",
+          "start": 19.28,
+          "end": 22.8
+        },
+        {
+          "text": "チキンを片手に 笑い合おう",
+          "start": 22.88,
+          "end": 26.8
+        },
+        {
+          "text": "釜山 また会いに来るよ",
+          "start": 26.8,
+          "end": 48.08
+        }
+      ],
+      "seconds": 48.8,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 43.8,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 53,
+      "lines": 8,
+      "lufs": -12.8,
+      "truePeak": -1,
+      "silenceSec": 1.6,
+      "judge": {
+        "vocalNaturalness": 6,
+        "pitch": 6,
+        "diction": 6,
+        "melody": 6,
+        "arrangement": 6,
+        "mix": 6,
+        "genreFit": 5,
+        "artifacts": 5,
+        "overall": 6,
+        "problems": [
+          "00:12 Diction on fast lines is slightly blurred",
+          "00:31 Vocal ends early leaving a sparse instrumental section with looping tail"
+        ],
+        "fixIdeas": [
+          "Prompt for more rhythmic rap cadence rather than melodic singing",
+          "Refine arrangement tags to structure a clear outro section"
+        ],
+        "heard": "あさのぷさん まどいっぱいのうみ そんどのすなに あしあとつけて かにがおどる しじょうのざわめき かんじゃんけじゃん ひとくちでこいした ちんちゃましっそ とまらない ねおんのなんぽどん よるはこれから ちきんをかたてに わらいあおう ぷさん またあいにくるよ"
+      },
+      "sent": {
+        "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, japanese rap vocal, rhythmic flow, clear diction, every word pronounced",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の釜山 窓いっぱいの海"
+          },
+          {
+            "section": "verse",
+            "text": "ソンドの砂に 足あとつけて"
+          },
+          {
+            "section": "verse",
+            "text": "カニがおどる 市場のざわめき"
+          },
+          {
+            "section": "verse",
+            "text": "カンジャンケジャン 一口で恋した"
+          },
+          {
+            "section": "chorus",
+            "text": "チンチャ マシッソ 止まらない"
+          },
+          {
+            "section": "chorus",
+            "text": "ネオンの南浦洞 夜はこれから"
+          },
+          {
+            "section": "chorus",
+            "text": "チキンを片手に 笑い合おう"
+          },
+          {
+            "section": "chorus",
+            "text": "釜山 また会いに来るよ"
+          }
+        ],
+        "seconds": 48.8,
+        "bpm": 128,
+        "keyRoot": 6,
+        "scale": "minor",
+        "language": "ja",
+        "outro": true
+      }
+    }
+  ]
+}
