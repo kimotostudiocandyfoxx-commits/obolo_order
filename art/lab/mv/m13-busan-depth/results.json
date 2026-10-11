@@ -1,0 +1,96 @@
+{
+  "round": "m13-busan-depth",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.2,
+    "heroLikeness": 7.1,
+    "heroConsistency": 6.5,
+    "pictureQuality": 6.3,
+    "storyTelling": 6.1,
+    "lyricFit": 7.2,
+    "beatSync": 5.6,
+    "variety": 5.2,
+    "watchability": 6.2,
+    "kidsSafe": 6.9
+  },
+  "results": [
+    {
+      "id": "flat",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 36.6,
+      "seconds": {
+        "plan": 0,
+        "paint": 134,
+        "render": 14
+      },
+      "judge": {
+        "heroLikeness": 7.2,
+        "heroConsistency": 7,
+        "pictureQuality": 6.5,
+        "storyTelling": 6.2,
+        "lyricFit": 7.3,
+        "beatSync": 6.1,
+        "variety": 5.4,
+        "watchability": 6.3,
+        "kidsSafe": 6.8,
+        "overall": 6.4,
+        "problems": [
+          "0:19 Drink visually resembles beer rather than a soft beverage.",
+          "0:26 Excessive repetition of food-eating shots in the second half.",
+          "0:34 Anime speed lines feel disconnected from realistic photographic plates."
+        ],
+        "fixIdeas": [
+          "Prompt clearly for child-friendly juice or tea to avoid alcoholic beverage confusion.",
+          "Introduce varied activities like shopping or sightseeing to break up meal scenes.",
+          "Remove stylized comic speed overlays in favor of subtle camera zooms."
+        ],
+        "bestMoments": [
+          "0:04 Cheerful walk on Songdo beach showing full costume silhouette.",
+          "0:11 Cute pose peering into the crab market tank."
+        ]
+      }
+    },
+    {
+      "id": "depth",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 36.6,
+      "seconds": {
+        "plan": 0,
+        "paint": 0,
+        "render": 55
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "0:19 - Beverage mug resembles beer, slightly blurring kids-safe tone.",
+          "0:30 - Repetitive montage of seated dining shots slows pacing."
+        ],
+        "fixIdeas": [
+          "Replace amber drink with clearly labeled juice or milk.",
+          "Add varied outdoor sightseeing activities during the outro chorus."
+        ],
+        "bestMoments": [
+          "0:11 - Playful framing looking into the seafood market tank.",
+          "0:04 - Clean scenic shot strolling on the sunny beach."
+        ]
+      }
+    }
+  ]
+}
