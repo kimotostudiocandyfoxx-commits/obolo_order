@@ -1,0 +1,58 @@
+{
+  "round": "m10-busan-traveller",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6,
+    "heroLikeness": 7,
+    "heroConsistency": 6,
+    "pictureQuality": 6,
+    "storyTelling": 6,
+    "lyricFit": 7,
+    "beatSync": 5,
+    "variety": 5,
+    "watchability": 6,
+    "kidsSafe": 7
+  },
+  "results": [
+    {
+      "id": "busan",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 100.2,
+      "seconds": {
+        "plan": 0,
+        "paint": 418,
+        "render": 10
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:00 Hood design is missing in the opening shot compared to reference.",
+          "00:15 Repetitive seated dining compositions throughout the middle section.",
+          "00:23 Static manga speed lines feel misaligned with relaxed travel mood."
+        ],
+        "fixIdeas": [
+          "Add walking and exploration scenes to vary table-focused shots.",
+          "Enforce hood prompt consistency across interior shots.",
+          "Introduce subtle character animation over static camera pans."
+        ],
+        "bestMoments": [
+          "00:10 Enjoyable character expression during the seafood market scene.",
+          "00:04 Atmospheric scenic shot along the beach."
+        ]
+      }
+    }
+  ]
+}
