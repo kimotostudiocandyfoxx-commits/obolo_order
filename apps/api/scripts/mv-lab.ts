@@ -13,7 +13,9 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import sharp from 'sharp';
 import { KeyArtist } from '../src/mv/keyart';
-import { renderMv } from '../src/mv/render';
+import { DepthModel } from '../src/mv/depth';
+import { addParallax } from '../src/mv/parallax';
+import { burnLyrics, renderMv } from '../src/mv/render';
 import { describeHero, isHuman, planStory, storyToPlan } from '../src/mv/storyboard';
 import { photoAnime, StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
 import type { StoryPlan } from '../src/mv/storyboard';
@@ -30,6 +32,11 @@ type Case = {
   keys?: number;
   /** img2img strength for the cheap photos (0..1, higher = further from the photo) */
   strength?: number;
+  /** override the round's parallax / lyrics for this case */
+  parallax?: boolean;
+  lyrics?: boolean;
+  /** reuse the stills an earlier round saved (art/lab/mv/<round>/<id>-stills) instead of painting */
+  stills?: string;
 };
 type Round = {
   round: string;
@@ -45,6 +52,9 @@ type Round = {
   heroRef?: number;
   steps?: number;
   planModel?: string;
+  /** stills move in 2.5D (depth + Gemini's camera moves); the lyrics are burnt on (the app's lyric effects) */
+  parallax?: boolean;
+  lyrics?: boolean;
   /** recipes to compare on every case (each overrides heroRef / steps) */
   variants?: { name: string; heroRef?: number; steps?: number }[];
   cases: Case[];
@@ -55,6 +65,7 @@ const round = JSON.parse(readFileSync(resolve(ROOT, process.env.ROUND_FILE ?? 's
 const OUT = join(ROOT, 'art/lab/mv', round.round);
 mkdirSync(OUT, { recursive: true });
 const GEMINI = process.env.GEMINI_API_KEY;
+const depthModel = new DepthModel();
 const PLAN_MODEL = round.planModel ?? 'gemini-flash-lite-latest';
 const JUDGE_MODEL = process.env.JUDGE_MODEL ?? 'gemini-flash-latest';
 const gpu = round.painter === 'gpu' && process.env.MUSIC_URL ? process.env.MUSIC_URL : undefined;
@@ -229,7 +240,9 @@ async function main() {
       const t1 = Date.now();
       // the two-look MV: chorus scenes merge into the key visuals, the rest are chibi cuts
       const shown = round.painter === 'styled' && !photoList ? twoLooks(story, lyrics, 2) : story;
-      const drawn = photoList
+      const drawn = c.stills
+        ? await Promise.all(story.scenes.map((_, k) => readFile(resolve(ROOT, c.stills!, `scene-${k}.jpg`)).catch(() => null)))
+        : photoList
         ? await photoAnime(styled!, photoList.map((p) => ({ photo: readFileSync(resolve(ROOT, p.file)), caption: p.caption })), heroPic, {
             seedream: seedreamPhotos(c, story, lyrics),
             heroLook: hero,
@@ -248,6 +261,9 @@ async function main() {
       const costYen = styled ? Math.round(styled.lastCostUsd * 150 * 10) / 10 : null;
       const t2 = Date.now();
       await sheet(drawn, join(OUT, `${c.id}-scenes.jpg`));
+      // the stills, for a later round to reuse (no second paint bill)
+      mkdirSync(join(OUT, `${c.id}-stills`), { recursive: true });
+      await Promise.all(drawn.map((img, k) => (img ? sharp(img).jpeg({ quality: 90 }).toFile(join(OUT, `${c.id}-stills`, `scene-${k}.jpg`)) : null)));
       const pics = await Promise.all(
         drawn.map(async (img, k) => {
           if (!img) return null;
@@ -258,10 +274,23 @@ async function main() {
       );
       const first = pics.find(Boolean);
       if (!first) throw new Error('no scene could be painted');
-      const materials = pics.map((f, k) => ({ kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? first }));
+      const moves = (c.parallax ?? round.parallax) ? await addParallax(pics, shown.scenes.map((sc) => sc.tags), depthModel, { key: GEMINI, model: PLAN_MODEL }) : pics.map(() => null);
+      if (c.parallax ?? round.parallax) console.log(`${c.id}: parallax ${moves.filter(Boolean).length}/${pics.length}: ${moves.map((m) => m?.move ?? '-').join(' ')}`);
+      const materials = pics.map((f, k) => {
+        const own = f ? k : pics.slice(0, k).reduce((a, x, j) => (x ? j : a), -1);
+        const mv = own >= 0 ? moves[own] : null;
+        return { kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? first, depth: mv?.depth ?? null, parallax: mv ?? null };
+      });
       const audio = join(dir, 'song.m4a');
       await copyFile(join(ROOT, s.file), audio);
-      const out = await renderMv({ dir, materials, plan: storyToPlan(shown, bpm, lyrics), audio, seconds, bpm, keyArtist: artist, painted: true });
+      const mvPlan = storyToPlan(shown, bpm, lyrics);
+      const out = await renderMv({ dir, materials, plan: mvPlan, audio, seconds, bpm, keyArtist: artist, painted: true });
+      if (c.lyrics ?? round.lyrics)
+        out.video = await burnLyrics(
+          dir,
+          out.video,
+          s.lineTimes.map((l, k) => ({ t: l.start, end: l.end, text: l.text, effect: mvPlan.lyrics[k] ?? 'MINIMAL_CHILL' })),
+        );
       const t3 = Date.now();
       const video = join(OUT, `${c.id}.mp4`);
       await copyFile(out.video, video);

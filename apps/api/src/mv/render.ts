@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import sharp from 'sharp';
 import { run } from '../media/transcode';
 import type { KeyArtist } from './keyart';
+import { parallaxGraph, type Parallax } from './parallax';
 import type { MvEffect, MvPlan, MvSegment, MvTextEffect } from './plan';
 
 /**
@@ -17,7 +18,8 @@ const FPS = 24;
 /** the light painted look every cut gets (not the キメ絵, they are drawn already) */
 export const ANIME_FILTER = 'hqdn3d=3:3:4:4,eq=saturation=1.45:contrast=1.12:brightness=0.02,unsharp=5:5:0.8';
 
-export type RenderMaterial = { kind: 'photo' | 'video'; file: string };
+/** `depth` (a grey picture, white = near) and `parallax` (its camera move, `focus` = the depth kept still) make a still move in 2.5D */
+export type RenderMaterial = { kind: 'photo' | 'video'; file: string; depth?: string | null; parallax?: (Parallax & { focus: number }) | null };
 
 function motion(m: MvSegment['motion'], frames: number, beat = 0.5) {
   const z = 1.18;
@@ -128,7 +130,17 @@ export async function renderMv(o: {
     const big = `scale=${SIDE * 2}:${SIDE * 2}:force_original_aspect_ratio=increase,crop=${SIDE * 2}:${SIDE * 2}`;
     const inputs: string[] = [];
     let base: string;
-    if (key || mat.kind === 'photo') {
+    let pre: string | null = null;
+    if (!key && mat.kind === 'photo' && mat.depth && mat.parallax) {
+      // 2.5D: near and far move apart; the chorus cuts keep their punch on the beat
+      inputs.push('-loop', '1', '-framerate', String(FPS), '-i', mat.file, '-loop', '1', '-framerate', String(FPS), '-i', mat.depth);
+      const p = { ...mat.parallax };
+      // a scene cut into several bars swings back and forth instead of repeating the same slide
+      const nth = o.plan.segments.slice(0, k).filter((x) => x.m === s.m).length;
+      if (nth % 2 === 1) p.move = ({ 'orbit-left': 'orbit-right', 'orbit-right': 'orbit-left', 'crane-up': 'crane-down', 'crane-down': 'crane-up', 'dolly-in': 'dolly-out', 'dolly-out': 'dolly-in' } as const)[p.move];
+      pre = parallaxGraph(p, mat.parallax.focus, s.dur, SIDE, s.motion === 'pulse' ? beat : undefined).replace(/\[v\]$/, '[pv]');
+      base = '[pv]null';
+    } else if (key || mat.kind === 'photo') {
       inputs.push('-loop', '1', '-i', key ?? mat.file);
       base = `[0:v]${big},zoompan=${motion(s.motion === 'still' ? 'zoom-in' : s.motion, frames, beat)}:d=${frames}:s=${SIDE}x${SIDE}:fps=${FPS},setsar=1`;
     } else {
@@ -139,9 +151,11 @@ export async function renderMv(o: {
     const look = key ? `fade=t=in:st=0:d=0.25:color=white` : effectFilter(s.effect, beat, o.painted);
     let graph = `${base},${look}[v]`;
     if (s.effect === 'SPEED_LINES') {
+      const li = pre ? 2 : 1;
       inputs.push('-loop', '1', '-i', lines);
-      graph = `${base},${look}[b];[1:v]format=rgba,rotate=a='0.06*sin(n*2.7)':c=none:ow=iw:oh=ih[l];[b][l]overlay=shortest=1,format=yuv420p[v]`;
+      graph = `${base},${look}[b];[${li}:v]format=rgba,rotate=a='0.06*sin(n*2.7)':c=none:ow=iw:oh=ih[l];[b][l]overlay=shortest=1,format=yuv420p[v]`;
     }
+    if (pre) graph = `${pre};${graph}`;
     await ff([...inputs, '-filter_complex', graph, '-map', '[v]', '-frames:v', String(frames), ...enc, clip]);
     clips.push(clip);
   }
@@ -199,7 +213,11 @@ export async function renderMv(o: {
 
 export type LyricLine = { t: number; end: number; text: string; effect: MvTextEffect };
 
-/** Lyric lines as an ASS subtitle file, each line with its text effect. */
+/**
+ * Lyric lines as an ASS subtitle file, each line with its text effect (client 2026-10-11: show the
+ * lyrics in a cool way). Every line comes in letter by letter, the sung part fills with colour as it
+ * goes (karaoke, spread over the line), and a soft glow sits behind the letters.
+ */
 function assFile(lines: LyricLine[]) {
   const ts = (s: number) => {
     const h = Math.floor(s / 3600);
@@ -207,20 +225,42 @@ function assFile(lines: LyricLine[]) {
     const sec = (Math.max(0, s) % 60).toFixed(2).padStart(5, '0');
     return `${h}:${String(m).padStart(2, '0')}:${sec}`;
   };
-  const esc = (t: string) => t.replace(/[{}\\]/g, '').replace(/\n/g, '\\N');
+  const clean = (t: string) => t.replace(/[{}\\]/g, '').replace(/\n/g, ' ');
   const c = SIDE / 2;
-  const ev = (a: number, b: number, style: string, tags: string, text: string) => `Dialogue: 0,${ts(a)},${ts(b)},${style},,0,0,0,,{${tags}}${esc(text)}`;
+  const ev = (layer: number, a: number, b: number, style: string, text: string) => `Dialogue: ${layer},${ts(a)},${ts(b)},${style},,0,0,0,,${text}`;
+  /** the letters one by one: each fades / pops in `step` ms after the one before, and fills in time with the singing */
+  const letters = (text: string, dur: number, pop: 'rise' | 'burst', karaoke: boolean) => {
+    const chars = [...clean(text)];
+    const sung = chars.filter((ch) => ch.trim()).length || 1;
+    const step = Math.min(45, (dur * 1000 * 0.35) / sung);
+    const fill = Math.max(1, Math.round((dur * 100 * 0.85) / sung)); // centiseconds a letter
+    let k = 0;
+    return chars
+      .map((ch) => {
+        if (!ch.trim()) return ch;
+        const d = Math.round(k++ * step);
+        const inTag =
+          pop === 'burst'
+            ? `\\alpha&HFF&\\fscx30\\fscy30\\frz-10\\t(${d},${d + 130},\\alpha&H00&\\fscx128\\fscy128\\frz0)\\t(${d + 130},${d + 260},\\fscx100\\fscy100)`
+            : `\\alpha&HFF&\\fscy40\\t(${d},${d + 200},\\alpha&H00&\\fscy100)`;
+        return `{${inTag}${karaoke ? `\\kf${fill}` : ''}}${ch}`;
+      })
+      .join('');
+  };
   const events: string[] = [];
   for (const l of lines) {
+    const dur = Math.max(0.3, l.end - l.t);
     switch (l.effect) {
       case 'ZOOM_BURST':
-        events.push(ev(l.t, l.end, 'Big', `\\pos(${c},${c})\\fad(60,200)\\fscx190\\fscy190\\t(0,260,\\fscx100\\fscy100)`, l.text));
+        events.push(ev(0, l.t, l.end, 'Glow', `{\\pos(${c},${c})\\fad(500,200)\\blur9}${clean(l.text)}`));
+        events.push(ev(1, l.t, l.end, 'Big', `{\\pos(${c},${c})\\fad(0,200)}${letters(l.text, dur, 'burst', true)}`));
         break;
       case 'STROBO_FLASH': {
         // yellow / white every 110 ms for the first second, then white
-        let tags = `\\pos(${c},${c})\\fad(0,200)\\c&H00E5FF&`;
-        for (let k = 1; k <= 9; k++) tags += `\\t(${k * 110},${k * 110 + 1},\\c&H${k % 2 ? 'FFFFFF' : '00E5FF'}&)`;
-        events.push(ev(l.t, l.end, 'Big', tags, l.text));
+        let tags = `\\pos(${c},${c})\\fad(0,200)\\1c&H00E5FF&`;
+        for (let k = 1; k <= 9; k++) tags += `\\t(${k * 110},${k * 110 + 1},\\1c&H${k % 2 ? 'FFFFFF' : '00E5FF'}&)`;
+        events.push(ev(0, l.t, l.end, 'Glow', `{\\pos(${c},${c})\\fad(500,200)\\blur9}${clean(l.text)}`));
+        events.push(ev(1, l.t, l.end, 'Big', `{${tags}}${letters(l.text, dur, 'burst', false)}`));
         break;
       }
       case 'SHAKE_HARD': {
@@ -230,13 +270,14 @@ function assFile(lines: LyricLine[]) {
         for (let t = l.t; t < until - 0.01; t += 0.07, k++) {
           const dx = Math.round(Math.sin(k * 2.3) * 14);
           const dy = Math.round(Math.cos(k * 3.1) * 10);
-          events.push(ev(t, Math.min(until, t + 0.07), 'Big', `\\pos(${c + dx},${c + dy})`, l.text));
+          events.push(ev(1, t, Math.min(until, t + 0.07), 'Big', `{\\pos(${c + dx},${c + dy})}${clean(l.text)}`));
         }
-        if (until < l.end) events.push(ev(until, l.end, 'Big', `\\pos(${c},${c})\\fad(0,200)`, l.text));
+        if (until < l.end) events.push(ev(1, until, l.end, 'Big', `{\\pos(${c},${c})\\fad(0,200)}${clean(l.text)}`));
         break;
       }
       default:
-        events.push(ev(l.t, l.end, 'Lyric', '\\fad(200,200)', l.text));
+        events.push(ev(0, l.t, l.end, 'GlowLow', `{\\fad(200,200)\\blur7}${clean(l.text)}`));
+        events.push(ev(1, l.t, l.end, 'Lyric', `{\\fad(0,200)}${letters(l.text, dur, 'rise', true)}`));
     }
   }
   return [
@@ -248,8 +289,11 @@ function assFile(lines: LyricLine[]) {
     '',
     '[V4+ Styles]',
     'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
-    'Style: Lyric,Noto Sans CJK JP,46,&H00FFFFFF,&H00FFFFFF,&H00602A3A,&H80000000,1,0,0,0,100,100,1,0,1,4,2,2,40,40,56,1',
-    'Style: Big,Noto Sans CJK JP,62,&H00FFFFFF,&H00FFFFFF,&H00401860,&H90000000,1,0,0,0,100,100,2,0,1,6,3,5,30,30,30,1',
+    // karaoke: the letters start white (Secondary) and fill warm yellow (Primary) as they are sung
+    'Style: Lyric,Noto Sans CJK JP,44,&H0066E6FF,&H00FFFFFF,&H00502040,&H80000000,1,0,0,0,100,100,2,0,1,3.5,1.5,2,40,40,60,1',
+    'Style: GlowLow,Noto Sans CJK JP,44,&HFF000000,&HFF000000,&H40B060FF,&HFF000000,1,0,0,0,100,100,2,0,1,10,0,2,40,40,60,1',
+    'Style: Big,Noto Sans CJK JP,58,&H0066E6FF,&H00FFFFFF,&H00401860,&H90000000,1,0,0,0,100,100,3,0,1,5,2,5,30,30,30,1',
+    'Style: Glow,Noto Sans CJK JP,58,&HFF000000,&HFF000000,&H30C050FF,&HFF000000,1,0,0,0,100,100,3,0,1,14,0,5,30,30,30,1',
     '',
     '[Events]',
     'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',

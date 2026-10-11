@@ -125,6 +125,9 @@ const Env = z.object({
    *  A: Seedream 5.0 Pro on Runware, four scenes per picture (~7 yen for four) — while there are few members
    *  B: our own GPU kept running (MUSIC_MIN_INSTANCES=1) with open models — once there are many
    */
+  /** Story MV stills move in 2.5D (depth picture on the API's CPU + Gemini's camera moves); the depth model's ONNX (default Depth Anything V2 Small) */
+  MV_PARALLAX: bool(false),
+  MV_DEPTH_ONNX_URL: secret(),
   MV_PLAN: z.preprocess((v) => (v === '' ? undefined : v), z.enum(['A', 'B']).optional()),
   /** plan A: the Runware key (secret obolo-seedream-api-key) and how many scenes an MV gets (4 per picture) */
   MV_RUNWARE_KEY: secret(),

@@ -13,7 +13,9 @@ import { marsBackstage, mvProjects, songs, users } from '../db/schema';
 import { probe, run } from '../media/transcode';
 import { MediaService } from '../media/media.service';
 import { idToken } from '../compose/music.client';
+import { DepthModel } from './depth';
 import { KeyArtist } from './keyart';
+import { addParallax } from './parallax';
 import { seedreamSheets, StyledPainter } from './styled';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
@@ -35,6 +37,7 @@ export class MvService {
   private readonly keyArtist: KeyArtist;
   /** plan A (MV_PLAN=A): Seedream sheets on Runware */
   private readonly sheets: StyledPainter | null;
+  private readonly depth: DepthModel;
   constructor(
     private readonly db: Database,
     private readonly media: MediaService,
@@ -54,6 +57,7 @@ export class MvService {
       geminiModel: cfg.MV_KEYART_MODEL,
       stylizer: new Stylizer(cfg.ANIME_ONNX_URL),
     });
+    this.depth = new DepthModel(cfg.MV_DEPTH_ONNX_URL || undefined);
     this.sheets = cfg.MV_PLAN === 'A' && cfg.MV_RUNWARE_KEY ? new StyledPainter({ key: cfg.MV_RUNWARE_KEY }) : null;
   }
 
@@ -298,7 +302,18 @@ export class MvService {
       this.log.log(`MV ${id}: storyboard ${story.scenes.length} scenes, painted ${painted} in ${Math.round((Date.now() - t0) / 1000)}s`);
       // a scene that could not be painted shows its neighbour (or, with nothing painted, a plain card)
       const fallback = pics.find(Boolean) ?? (await this.plainCard(dir, s.title));
-      const materials = pics.map((f, k) => ({ kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? fallback }));
+      // 2.5D: each still's depth and camera move (a still without them keeps the plain zoom / pan)
+      const moves = this.cfg.MV_PARALLAX
+        ? await addParallax(pics, story.scenes.map((sc) => sc.tags), this.depth, { key: this.cfg.GEMINI_API_KEY, model: this.cfg.MV_PLAN_MODEL }).catch((e) => {
+            this.log.warn(`MV ${id}: parallax skipped: ${String(e).slice(0, 200)}`);
+            return pics.map(() => null);
+          })
+        : pics.map(() => null);
+      const materials = pics.map((f, k) => {
+        const own = f ? k : pics.slice(0, k).reduce((a, x, j) => (x ? j : a), -1);
+        const mv = own >= 0 ? moves[own] : null;
+        return { kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? fallback, depth: mv?.depth ?? null, parallax: mv ?? null };
+      });
       const plan = storyToPlan(story, bpm, this.lyricLines(s).map((l) => ({ t: l.t, text: l.text, chorus: l.chorus })));
       const out = await renderMv({ dir, materials, plan, audio, seconds, bpm, keyArtist: this.keyArtist, painted: true });
       const v = await this.media.storeGenerated(userId, 'video', 'video/mp4', await readFile(out.video), origin);
