@@ -50,8 +50,8 @@ export class StyledPainter {
   }
 
   /** Some imageInference tasks, their pictures in the same order (null where one failed). */
+  /** (adds to lastCostUsd; the caller resets it) */
   async run(tasks: Record<string, unknown>[]): Promise<(Buffer | null)[]> {
-    this.lastCostUsd = 0;
     const ids = tasks.map((t) => String(t.taskUUID));
     // a few at a time (Runware's per-request limits); each failure only loses its own picture
     const out: (Buffer | null)[] = [];
@@ -210,11 +210,77 @@ export function twoLooks(p: StoryPlan, lyrics: { t: number; chorus: boolean }[],
  * high-end anime stills — the same place, food and composition — with the hero (their character)
  * in each picture. One picture per photo, in the photos' order.
  */
-export async function photoAnime(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+export async function photoAnime(
+  painter: StyledPainter,
+  photos: { photo: Buffer; caption: string }[],
+  hero: Buffer | null,
+  /** which photos Seedream redraws (~7 yen each); the rest go to Animagine img2img (~0.3 yen). All when omitted. */
+  opt: { seedream?: number[]; heroLook?: string; strength?: number; seed?: number } = {},
+): Promise<(Buffer | null)[]> {
+  painter.lastCostUsd = 0;
+  const keyAt = new Set(opt.seedream ?? photos.map((_, k) => k));
+  const cheapAt = photos.map((_, k) => k).filter((k) => !keyAt.has(k));
+  const [keys, cheap] = await Promise.all([
+    seedreamPhotos(painter, photos.filter((_, k) => keyAt.has(k)), hero),
+    cheapAt.length ? animaginePhotos(painter, cheapAt.map((k) => photos[k]), hero, opt) : Promise.resolve([] as (Buffer | null)[]),
+  ]);
+  let a = 0;
+  let b = 0;
+  return photos.map((_, k) => (keyAt.has(k) ? keys[a++] : cheap[b++]) ?? null);
+}
+
+const MEAL = /soup|stew|chicken|crab|noodle|shrimp|plate|bowl|pot|feast|breakfast|meal|food|rice|stall/i;
+
+/**
+ * The cheap photo look (client 2026-10-11: cut the cost): Animagine XL img2img over the photo — the
+ * place and food stay where they are, redrawn as anime — with the hero painted in from its tags and
+ * its own picture (IP-Adapter). About 0.3 yen a picture against ~7 for Seedream.
+ */
+async function animaginePhotos(
+  painter: StyledPainter,
+  photos: { photo: Buffer; caption: string }[],
+  hero: Buffer | null,
+  opt: { heroLook?: string; strength?: number; seed?: number },
+): Promise<(Buffer | null)[]> {
+  if (!photos.length) return [];
+  const model = await painter.chibi();
+  const side = 1024;
+  const sq = async (b: Buffer, fit: 'cover' | 'inside') =>
+    `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit }).jpeg({ quality: 90 }).toBuffer()).toString('base64')}`;
+  const ref = hero ? await sq(hero, 'inside') : null;
+  const look = (opt.heroLook ?? '').split(',').slice(0, 10).join(',');
+  const seeds = await Promise.all(photos.map((p) => sq(p.photo, 'cover')));
+  const make = (withRef: boolean) =>
+    photos.map((p, k) => ({
+      taskType: 'imageInference',
+      taskUUID: randomUUID(),
+      model,
+      seedImage: seeds[k],
+      strength: opt.strength ?? 0.7,
+      positivePrompt: `masterpiece, high score, anime screencap, anime film still, solo, one character, ${look}, ${MEAL.test(p.caption) ? 'sitting at the table eating happily, holding chopsticks' : 'walking and looking around in wonder'}, ${p.caption}, detailed anime background, cinematic lighting, vivid colours, juice or tea only`.slice(0, 2000),
+      negativePrompt: `${CHIBI_NEGATIVE}, beer, wine, alcohol, two characters, duplicate`,
+      width: side,
+      height: side,
+      steps: 28,
+      CFGScale: 6,
+      seed: ((opt.seed ?? 7) + k) % 2 ** 31,
+      numberResults: 1,
+      outputType: 'URL',
+      outputFormat: 'JPG',
+      includeCost: true,
+      ...(withRef && ref ? { ipAdapters: [{ model: IP_ADAPTER, guideImage: ref, weight: 0.6 }] } : {}),
+    }));
+  const withRef = await painter.run(make(true));
+  if (withRef.some(Boolean) || !ref) return withRef;
+  log.warn('photo img2img with IP-Adapter painted nothing, without it');
+  return painter.run(make(false));
+}
+
+async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+  if (!photos.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
   // a different camera for every picture (m09: thirteen centred eating shots in a row bored the judge)
-  const meal = /soup|stew|chicken|crab|noodle|shrimp|plate|bowl|pot|feast|breakfast|meal|food|rice|stall/i;
   const eatShots = [
     'Camera: over-the-shoulder from behind the character, the food filling the foreground.',
     'Camera: side profile, the character mid-bite with chopsticks, cheeks full and happy.',
@@ -241,7 +307,7 @@ export async function photoAnime(painter: StyledPainter, photos: { photo: Buffer
         heroRef
           ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
           : '',
-        meal.test(p.caption) ? eatShots[e++ % eatShots.length] : walkShots[w++ % walkShots.length],
+        MEAL.test(p.caption) ? eatShots[e++ % eatShots.length] : walkShots[w++ % walkShots.length],
         'A picture for children: any drink on the table is juice, tea or water — never beer, wine or other alcohol.',
         'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
       ]

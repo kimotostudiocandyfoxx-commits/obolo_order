@@ -1,6 +1,6 @@
 {
-  "round": "m10-busan-traveller",
-  "note": "実験の2回目：きもりんが釜山を旅する設定（1枚に1回だけ登場）。写真ごとにカメラを変え、飲み物はジュースかお茶に（m09 の指摘）。曲は r08 の良い方。",
+  "round": "m11-busan-cheap",
+  "note": "コスト比較：全部 Animagine（安いアニメモデル）で写真を描き直す版（強さ0.6 / 0.75）と、サビの3枚だけ Seedream・残り Animagine の版。曲は r08 の良い方。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
@@ -8,9 +8,26 @@
   "side": 768,
   "cases": [
     {
-      "id": "busan",
+      "id": "cheap60",
       "song": "best:busan-kpop",
-      "photos": "art/lab/busan/photos.json"
+      "photos": "art/lab/busan/photos.json",
+      "photoMode": "cheap",
+      "strength": 0.6
+    },
+    {
+      "id": "cheap75",
+      "song": "best:busan-kpop",
+      "photos": "art/lab/busan/photos.json",
+      "photoMode": "cheap",
+      "strength": 0.75
+    },
+    {
+      "id": "mix3",
+      "song": "best:busan-kpop",
+      "photos": "art/lab/busan/photos.json",
+      "photoMode": "mix",
+      "keys": 3,
+      "strength": 0.7
     }
   ],
   "heroRef": 0.6

@@ -20,7 +20,17 @@ import type { StoryPlan } from '../src/mv/storyboard';
 import { Stylizer } from '../src/mv/stylize';
 
 /** song: an id in the songs file, or "best:<case>" = its best-judged take; photos: a photos.json (photo MV) */
-type Case = { id: string; song: string; mood?: string; photos?: string };
+type Case = {
+  id: string;
+  song: string;
+  mood?: string;
+  photos?: string;
+  /** photo MV: seedream = every photo by Seedream (~7 yen each), cheap = all Animagine img2img (~0.3 yen), mix = Seedream on `keys` chorus photos only */
+  photoMode?: 'seedream' | 'cheap' | 'mix';
+  keys?: number;
+  /** img2img strength for the cheap photos (0..1, higher = further from the photo) */
+  strength?: number;
+};
 type Round = {
   round: string;
   note?: string;
@@ -131,6 +141,26 @@ ${lyrics}`;
   return { error: 'no answer' };
 }
 
+/** Which photos Seedream redraws: all, none, or `keys` of the chorus ones spread evenly. */
+function seedreamPhotos(c: Case, story: StoryPlan, lyrics: { t: number; chorus: boolean }[]): number[] | undefined {
+  const mode = c.photoMode ?? 'seedream';
+  if (mode === 'seedream') return undefined;
+  if (mode === 'cheap') return [];
+  const chorusAt = (t: number) => {
+    let ch = false;
+    for (const l of lyrics) if (l.t <= t + 0.01) ch = l.chorus;
+    return ch;
+  };
+  let t = 0;
+  const inChorus: number[] = [];
+  story.scenes.forEach((sc, k) => {
+    if (chorusAt(t + sc.dur / 2)) inChorus.push(k);
+    t += sc.dur;
+  });
+  const n = Math.min(c.keys ?? 3, inChorus.length);
+  return Array.from({ length: n }, (_, j) => inChorus[Math.floor(((j + 0.5) * inChorus.length) / n)]);
+}
+
 /** One scene per photo over the song, on whole beats; the chorus photos pulse (storyToPlan cuts them). */
 function photoStory(photos: { caption: string }[], seconds: number, bpm: number, lyrics: { t: number; chorus: boolean }[]): StoryPlan {
   const beat = 60 / bpm;
@@ -200,7 +230,12 @@ async function main() {
       // the two-look MV: chorus scenes merge into the key visuals, the rest are chibi cuts
       const shown = round.painter === 'styled' && !photoList ? twoLooks(story, lyrics, 2) : story;
       const drawn = photoList
-        ? await photoAnime(styled!, photoList.map((p) => ({ photo: readFileSync(resolve(ROOT, p.file)), caption: p.caption })), heroPic)
+        ? await photoAnime(styled!, photoList.map((p) => ({ photo: readFileSync(resolve(ROOT, p.file)), caption: p.caption })), heroPic, {
+            seedream: seedreamPhotos(c, story, lyrics),
+            heroLook: hero,
+            strength: c.strength,
+            seed: Math.floor(Math.random() * 2 ** 31),
+          })
         : round.painter === 'styled'
           ? await styled!.paint((shown as TwoLookPlan).scenes, hero, heroPic, Math.floor(Math.random() * 2 ** 31))
           : await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {
