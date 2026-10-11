@@ -17,9 +17,13 @@ const API = 'https://api.runware.ai/v1';
 export const SEEDREAM = 'bytedance:seedream@5.0-pro';
 /** found once with Runware's modelSearch when not given (MV_CHIBI_MODEL) */
 const CHIBI_SEARCH = 'Animagine XL 4.0';
-const CHIBI_LOOK = 'chibi, super deformed, cute, round, simple pastel colours, crayon texture, thick soft outlines, flat colours, simple background, masterpiece, high score, great score';
+// MV lab m06: "super deformed" alone gave wallpaper collages of many faces and spiky mecha looks →
+// one small round character, full body, soft crayon picture-book look
+const CHIBI_LOOK = 'solo, one character, chibi, full body, small round body, cute, soft crayon drawing, picture book illustration, pastel colours, soft outlines, simple background, masterpiece, high score';
 const CHIBI_NEGATIVE =
-  'realistic, 3d, photo, lowres, bad anatomy, bad hands, text, watermark, signature, nsfw, nude, sensitive, explicit, 1girl, 1boy, multiple girls, multiple boys, human, person, crowd, worst quality, low quality';
+  'multiple views, collage, pattern, wallpaper, repeated, many faces, character sheet, comic panels, spiky, armor, mecha, angular, realistic, 3d, photo, lowres, bad anatomy, text, watermark, signature, nsfw, nude, sensitive, explicit, 1girl, 1boy, human, person, crowd, worst quality, low quality';
+/** Runware's IP-Adapter for SDXL: the chibi cuts look at the hero's own picture too */
+const IP_ADAPTER = process.env.MV_CHIBI_IP_ADAPTER || 'runware:55@1';
 
 type RunwareImage = { taskUUID?: string; imageURL?: string; imageBase64Data?: string; cost?: number };
 
@@ -86,11 +90,12 @@ export class StyledPainter {
       if (!chibiIdx.length) return;
       const model = await this.chibi();
       const ids = chibiIdx.map(() => randomUUID());
-      const tasks = chibiIdx.map((k, j) => ({
+      const make = (withRef: boolean) => chibiIdx.map((k, j) => ({
         taskType: 'imageInference',
         taskUUID: ids[j],
         model,
-        positivePrompt: `${scenes[k].tags}, ${CHIBI_LOOK}`.slice(0, 2000),
+        // the hero's main points only (the long list made busy pictures) and what happens in the scene
+        positivePrompt: `${CHIBI_LOOK}, ${heroLook.split(',').slice(0, 8).join(',')}, ${scenes[k].tags.replace(heroLook, '').replace(/^solo,\s*/, '')}`.slice(0, 2000),
         negativePrompt: CHIBI_NEGATIVE,
         width: side,
         height: side,
@@ -101,8 +106,17 @@ export class StyledPainter {
         outputType: 'URL',
         outputFormat: 'JPG',
         includeCost: true,
+        ...(withRef && ref ? { ipAdapters: [{ model: IP_ADAPTER, guideImage: ref, weight: 0.6 }] } : {}),
       }));
-      const got = await this.fetchAll(await this.call(tasks), ids);
+      let images: RunwareImage[];
+      try {
+        images = await this.call(make(true));
+      } catch (e) {
+        // the adapter refused (model id / parameter): paint from the words alone
+        log.warn(`chibi with IP-Adapter failed, without it: ${String(e).slice(0, 200)}`);
+        images = await this.call(make(false));
+      }
+      const got = await this.fetchAll(images, ids);
       chibiIdx.forEach((k, j) => (out[k] = got[j]));
     };
 

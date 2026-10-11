@@ -1,6 +1,6 @@
 {
-  "round": "m06-two-looks",
-  "note": "クライアント決定「B」：Aメロ・イントロはわざと絵柄を変えたちびキャラ／クレヨン調（Runware の Animagine、1枚約0.3円）、サビは Seedream 5.0 Pro の本気の決め絵2枚（設定画を見ながら、1枚約7円）を小節ごとのカットに。GPU 起動なし。",
+  "round": "m07-two-looks-chibi",
+  "note": "m06（5.9、1本約15円）：サビの Seedream の決め絵は設定画どおり。Aメロのちびキャラが壁紙のような顔の集合やトゲトゲのメカ風になった → ちびキャラも設定画を見ながら（IP-Adapter）、1体だけ・全身・絵本のクレヨン調に。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r07-takes/results.json",
   "painter": "styled",
