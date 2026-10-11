@@ -1,0 +1,49 @@
+{
+  "round": "s01-search",
+  "note": "まず Runware にある「参考画像を読める」安いモデルを探す（検索だけ・無料）。",
+  "search": [
+    "qwen image edit",
+    "qwen image",
+    "flux kontext",
+    "flux.2",
+    "flux 2 klein",
+    "hunyuan image",
+    "seededit",
+    "seedream 4",
+    "gemini flash image",
+    "nano banana",
+    "gpt image",
+    "ideogram",
+    "kling",
+    "omnigen",
+    "bagel",
+    "step1x",
+    "hidream",
+    "uso",
+    "dreamo",
+    "pulid",
+    "instantid",
+    "illustrious",
+    "noobai"
+  ],
+  "hero": "art/lab/mv/hero.jpg",
+  "photos": [
+    {
+      "file": "art/lab/busan/photos/02.jpg",
+      "caption": "walking along Songdo beach, wide sandy beach, tall glass towers, dramatic clouds, sea breeze"
+    },
+    {
+      "file": "art/lab/busan/photos/05.jpg",
+      "caption": "a feast of soy-marinated raw crab (ganjang gejang) with green chilli, a bowl of rice with egg yolk and roe, side dishes"
+    },
+    {
+      "file": "art/lab/busan/photos/07.jpg",
+      "caption": "Nampo-dong shopping street at dusk, neon signs, crowds, a deep blue evening sky"
+    },
+    {
+      "file": "art/lab/busan/photos/09.jpg",
+      "caption": "sweet shrimp on ice, fresh sea urchin, crispy fried shrimp heads and a little stew pot on a fire"
+    }
+  ],
+  "models": []
+}

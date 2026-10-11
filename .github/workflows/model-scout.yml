@@ -1,0 +1,50 @@
+name: Model scout
+
+# Cheaper picture models for the MV (client request 2026-10-11): searches Runware's catalogue and
+# lets each candidate paint the same KIMORIN tests, with what each cost. See scripts/model-scout/.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**', main]
+    paths: ['scripts/model-scout/**', '.github/workflows/model-scout.yml']
+
+concurrency:
+  group: model-scout-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Scout
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          node scripts/model-scout/scout.mjs
+      - name: Save the round to the branch
+        if: always()
+        run: |
+          git config user.name "model-scout"
+          git config user.email "model-scout@users.noreply.github.com"
+          mkdir -p art/lab/scout && git add -f art/lab/scout
+          git diff --cached --quiet && exit 0
+          git commit -m "Model scout: round results [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
