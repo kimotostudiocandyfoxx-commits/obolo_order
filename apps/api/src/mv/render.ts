@@ -22,6 +22,12 @@ export type RenderMaterial = { kind: 'photo' | 'video'; file: string };
 function motion(m: MvSegment['motion'], frames: number, beat = 0.5) {
   const z = 1.18;
   switch (m) {
+    case 'face':
+      // a quick push towards the upper middle, where the character's face usually is
+      return `z='min(1.15+${(0.25 / frames).toFixed(5)}*on,1.4)':x='iw/2-(iw/zoom/2)':y='ih*0.3-(ih/zoom/2)+ih/zoom/2*0.4'`;
+    case 'tilt-up':
+      // from the feet up to the face
+      return `z='1.3':x='iw/2-(iw/zoom/2)':y='(ih-ih/zoom)*(1-on/${frames})'`;
     case 'pulse': {
       // a small punch-in on every beat, easing out until the next one
       const per = Math.max(1, beat * FPS).toFixed(3);

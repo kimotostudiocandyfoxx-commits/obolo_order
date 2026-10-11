@@ -255,11 +255,13 @@ export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = [
     const last = k === p.scenes.length - 1;
     for (let j = 0; j < n; j++) {
       const dur = j === n - 1 ? s.dur - each * (n - 1) : each;
-      const move = MOTIONS[(Math.max(0, MOTIONS.indexOf(first)) + j * 2 + (j >> 1)) % MOTIONS.length];
+      // a long chorus shot of one picture (the key visuals) also gets close-ups and tilts (m07: "static")
+      const moves: MvSegment['motion'][] = chorus && n > 2 ? ['zoom-out', 'face', 'tilt-up', 'pan-left', 'face', 'pan-right'] : MOTIONS;
+      const move = moves[(Math.max(0, moves.indexOf(first)) + j * 2 + (j >> 1)) % moves.length];
       // the long last scene (the outro) ends as a highlight reel: after two shots of it, the earlier
       // pictures come back one per cut, and the closing picture returns for the very last shot
       // (MV lab m05: "the final shot holds static for over ten seconds")
-      const back = last && j >= 2 && j < n - 1 && k > 0 ? Math.max(0, k - 1 - ((j - 2) * 2) % k) : k;
+      const back = last && j >= 2 && j < n - 1 && j % 2 === 0 && k > 0 ? Math.max(0, k - 1 - (j - 2) % k) : k;
       // in a chorus every other shot beats with the song
       segments.push({ m: back, dur, from: 0, motion: (chorus || back !== k) && j % 2 === 1 ? 'pulse' : move, effect: j === 0 ? s.effect : 'NONE', key: false });
     }

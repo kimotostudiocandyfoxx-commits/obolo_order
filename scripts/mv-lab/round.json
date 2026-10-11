@@ -1,6 +1,6 @@
 {
-  "round": "m07-two-looks-chibi",
-  "note": "m06（5.9、1本約15円）：サビの Seedream の決め絵は設定画どおり。Aメロのちびキャラが壁紙のような顔の集合やトゲトゲのメカ風になった → ちびキャラも設定画を見ながら（IP-Adapter）、1体だけ・全身・絵本のクレヨン調に。",
+  "round": "m08-two-looks-motion",
+  "note": "m07（6.1、1本約18円）：ちびキャラはかわいくなった。背景が空っぽ → 場所がわかるクレヨンの背景に。サビの決め絵が止まって見える → 顔への寄り・下から上へのティルトなどカメラの動きを増やす。最後のハイライトのチカチカ → 入れ替えを1つおきに。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r07-takes/results.json",
   "painter": "styled",

@@ -19,7 +19,8 @@ export const SEEDREAM = 'bytedance:seedream@5.0-pro';
 const CHIBI_SEARCH = 'Animagine XL 4.0';
 // MV lab m06: "super deformed" alone gave wallpaper collages of many faces and spiky mecha looks →
 // one small round character, full body, soft crayon picture-book look
-const CHIBI_LOOK = 'solo, one character, chibi, full body, small round body, cute, soft crayon drawing, picture book illustration, pastel colours, soft outlines, simple background, masterpiece, high score';
+// m07: "simple background" left empty pictures → a soft crayon background that shows the place
+const CHIBI_LOOK = 'solo, one character, chibi, full body, small round body, cute, soft crayon drawing, picture book illustration, pastel colours, soft outlines, detailed soft crayon background showing the place, masterpiece, high score';
 const CHIBI_NEGATIVE =
   'multiple views, collage, pattern, wallpaper, repeated, many faces, character sheet, comic panels, spiky, armor, mecha, angular, realistic, 3d, photo, lowres, bad anatomy, text, watermark, signature, nsfw, nude, sensitive, explicit, 1girl, 1boy, human, person, crowd, worst quality, low quality';
 /** Runware's IP-Adapter for SDXL: the chibi cuts look at the hero's own picture too */
@@ -95,7 +96,7 @@ export class StyledPainter {
         taskUUID: ids[j],
         model,
         // the hero's main points only (the long list made busy pictures) and what happens in the scene
-        positivePrompt: `${CHIBI_LOOK}, ${heroLook.split(',').slice(0, 8).join(',')}, ${scenes[k].tags.replace(heroLook, '').replace(/^solo,\s*/, '')}`.slice(0, 2000),
+        positivePrompt: `${CHIBI_LOOK}, ${heroLook.split(',').slice(0, 8).join(',')}, ${scenes[k].tags.replace(heroLook, '').replace(/^solo,\s*/, '').replace(/small figure,?\s*/g, '')}`.slice(0, 2000),
         negativePrompt: CHIBI_NEGATIVE,
         width: side,
         height: side,

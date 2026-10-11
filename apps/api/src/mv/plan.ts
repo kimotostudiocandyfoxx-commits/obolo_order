@@ -12,7 +12,7 @@ import { Logger } from '@nestjs/common';
  * the loud effects on the chorus.
  */
 /** pulse = a zoom that beats with the song (chorus shots, MV lab m03: "static, slideshow-like") */
-export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still' | 'pulse';
+export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still' | 'pulse' | 'face' | 'tilt-up';
 export type MvEffect = 'POSTERIZE' | 'GLITCH' | 'SPEED_LINES' | 'NONE';
 export type MvTextEffect = 'SHAKE_HARD' | 'STROBO_FLASH' | 'ZOOM_BURST' | 'MINIMAL_CHILL';
 export type MvSegment = { m: number; dur: number; from: number; motion: MvMotion; effect: MvEffect; key: boolean };
