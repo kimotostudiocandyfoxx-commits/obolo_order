@@ -67,11 +67,17 @@ Neighbouring pictures should not repeat the same move; vary it like a real film.
     const j = (await res.json()) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
     const got = JSON.parse(j.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]') as Partial<Parallax>[];
     const clamp = (v: unknown, lo: number, hi: number, d: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(lo, Math.min(hi, v)) : d);
+    // m13: Gemini chose dolly-in for 6 of 13 — a move used more than its share gives way to the next unused one
+    const cap = Math.ceil(pictures.length / 4) + 1;
+    const used = new Map<ParallaxMove, number>();
     return rule.map((r, k) => {
       const g = got[k];
       if (!g) return r;
+      let move = PARALLAX_MOVES.includes(g.move as ParallaxMove) ? (g.move as ParallaxMove) : r.move;
+      if ((used.get(move) ?? 0) >= cap) move = [...PARALLAX_MOVES].sort((a, b) => (used.get(a) ?? 0) - (used.get(b) ?? 0))[0];
+      used.set(move, (used.get(move) ?? 0) + 1);
       return {
-        move: PARALLAX_MOVES.includes(g.move as ParallaxMove) ? (g.move as ParallaxMove) : r.move,
+        move,
         fx: clamp(g.fx, 0.1, 0.9, 0.5),
         fy: clamp(g.fy, 0.1, 0.9, 0.5),
         strength: clamp(g.strength, 0.5, 1.5, 1),

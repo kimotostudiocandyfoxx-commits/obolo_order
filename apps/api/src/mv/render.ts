@@ -227,6 +227,8 @@ function assFile(lines: LyricLine[]) {
   };
   const clean = (t: string) => t.replace(/[{}\\]/g, '').replace(/\n/g, ' ');
   const c = SIDE / 2;
+  // the big chorus lines sit low (m13: in the middle they covered the character's face)
+  const cy = Math.round(SIDE * 0.74);
   const ev = (layer: number, a: number, b: number, style: string, text: string) => `Dialogue: ${layer},${ts(a)},${ts(b)},${style},,0,0,0,,${text}`;
   /** the letters one by one: each fades / pops in `step` ms after the one before, and fills in time with the singing */
   const letters = (text: string, dur: number, pop: 'rise' | 'burst', karaoke: boolean) => {
@@ -252,14 +254,14 @@ function assFile(lines: LyricLine[]) {
     const dur = Math.max(0.3, l.end - l.t);
     switch (l.effect) {
       case 'ZOOM_BURST':
-        events.push(ev(0, l.t, l.end, 'Glow', `{\\pos(${c},${c})\\fad(500,200)\\blur9}${clean(l.text)}`));
-        events.push(ev(1, l.t, l.end, 'Big', `{\\pos(${c},${c})\\fad(0,200)}${letters(l.text, dur, 'burst', true)}`));
+        events.push(ev(0, l.t, l.end, 'Glow', `{\\pos(${c},${cy})\\fad(500,200)\\blur9}${clean(l.text)}`));
+        events.push(ev(1, l.t, l.end, 'Big', `{\\pos(${c},${cy})\\fad(0,200)}${letters(l.text, dur, 'burst', true)}`));
         break;
       case 'STROBO_FLASH': {
         // yellow / white every 110 ms for the first second, then white
-        let tags = `\\pos(${c},${c})\\fad(0,200)\\1c&H00E5FF&`;
+        let tags = `\\pos(${c},${cy})\\fad(0,200)\\1c&H00E5FF&`;
         for (let k = 1; k <= 9; k++) tags += `\\t(${k * 110},${k * 110 + 1},\\1c&H${k % 2 ? 'FFFFFF' : '00E5FF'}&)`;
-        events.push(ev(0, l.t, l.end, 'Glow', `{\\pos(${c},${c})\\fad(500,200)\\blur9}${clean(l.text)}`));
+        events.push(ev(0, l.t, l.end, 'Glow', `{\\pos(${c},${cy})\\fad(500,200)\\blur9}${clean(l.text)}`));
         events.push(ev(1, l.t, l.end, 'Big', `{${tags}}${letters(l.text, dur, 'burst', false)}`));
         break;
       }
@@ -270,9 +272,9 @@ function assFile(lines: LyricLine[]) {
         for (let t = l.t; t < until - 0.01; t += 0.07, k++) {
           const dx = Math.round(Math.sin(k * 2.3) * 14);
           const dy = Math.round(Math.cos(k * 3.1) * 10);
-          events.push(ev(1, t, Math.min(until, t + 0.07), 'Big', `{\\pos(${c + dx},${c + dy})}${clean(l.text)}`));
+          events.push(ev(1, t, Math.min(until, t + 0.07), 'Big', `{\\pos(${c + dx},${cy + dy})}${clean(l.text)}`));
         }
-        if (until < l.end) events.push(ev(1, until, l.end, 'Big', `{\\pos(${c},${c})\\fad(0,200)}${clean(l.text)}`));
+        if (until < l.end) events.push(ev(1, until, l.end, 'Big', `{\\pos(${c},${cy})\\fad(0,200)}${clean(l.text)}`));
         break;
       }
       default:
