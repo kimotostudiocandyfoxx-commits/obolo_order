@@ -15,6 +15,7 @@ import sharp from 'sharp';
 import { KeyArtist } from '../src/mv/keyart';
 import { renderMv } from '../src/mv/render';
 import { describeHero, isHuman, planStory, storyToPlan } from '../src/mv/storyboard';
+import { StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
 import { Stylizer } from '../src/mv/stylize';
 
 type Case = { id: string; song: string; mood?: string };
@@ -24,7 +25,8 @@ type Round = {
   hero: string;
   /** studio-lab results.json the songs come from */
   songs: string;
-  painter: 'gpu' | 'qwen';
+  /** styled = the two-look MV (chibi verses on Runware Animagine, Seedream key visuals on the chorus) */
+  painter: 'gpu' | 'qwen' | 'styled';
   maxScenes: number;
   side?: number;
   /** IP-Adapter strength for hero scenes (0 = tags only) */
@@ -54,6 +56,8 @@ const artist = new KeyArtist({
   geminiModel: 'none',
   stylizer: new Stylizer(undefined),
 });
+
+const styled = round.painter === 'styled' && process.env.RUNWARE_API_KEY ? new StyledPainter({ key: process.env.RUNWARE_API_KEY, chibiModel: process.env.MV_CHIBI_MODEL || undefined }) : null;
 
 type SongResult = { id: string; ok: boolean; file: string; seconds: number; lineTimes: { text: string; start: number; end: number }[]; sent: { bpm: number; prompt: string; lyrics?: { section: string; text: string }[] } };
 
@@ -88,7 +92,7 @@ Score each 1-10 (10 = a fan-made MV people would rewatch and share, 5 = obviousl
 - overall.
 Also bestMoments, problems (with mm:ss) and fixIdeas (what to change in the storyboard prompt, the painting prompt, the cut pacing or the effects).
 
-Storyboard used:
+${round.painter === 'styled' ? 'Direction: the verses are DELIBERATELY drawn as cute chibi / crayon cuts and the chorus as full cinematic key visuals of the same character — judge whether this switch of look works as direction (like an anime opening going all-out on the chorus), not as an inconsistency.\n\n' : ''}Storyboard used:
 ${storyText}
 
 Lyrics:
@@ -168,12 +172,18 @@ async function main() {
         PLAN_MODEL,
       );
       const t1 = Date.now();
-      const drawn = await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {
-        reference: heroRef === 0 ? null : heroPic,
-        heroIsHuman: isHuman(hero),
-        refScale: heroRef,
-        steps,
-      });
+      // the two-look MV: chorus scenes merge into the key visuals, the rest are chibi cuts
+      const shown = round.painter === 'styled' ? twoLooks(story, lyrics, 2) : story;
+      const drawn =
+        round.painter === 'styled'
+          ? await styled!.paint((shown as TwoLookPlan).scenes, hero, heroPic, Math.floor(Math.random() * 2 ** 31))
+          : await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {
+              reference: heroRef === 0 ? null : heroPic,
+              heroIsHuman: isHuman(hero),
+              refScale: heroRef,
+              steps,
+            });
+      const costYen = styled ? Math.round(styled.lastCostUsd * 150 * 10) / 10 : null;
       const t2 = Date.now();
       await sheet(drawn, join(OUT, `${c.id}-scenes.jpg`));
       const pics = await Promise.all(
@@ -189,11 +199,11 @@ async function main() {
       const materials = pics.map((f, k) => ({ kind: 'photo' as const, file: f ?? pics.slice(0, k).reverse().find(Boolean) ?? first }));
       const audio = join(dir, 'song.m4a');
       await copyFile(join(ROOT, s.file), audio);
-      const out = await renderMv({ dir, materials, plan: storyToPlan(story, bpm, lyrics), audio, seconds, bpm, keyArtist: artist, painted: true });
+      const out = await renderMv({ dir, materials, plan: storyToPlan(shown, bpm, lyrics), audio, seconds, bpm, keyArtist: artist, painted: true });
       const t3 = Date.now();
       const video = join(OUT, `${c.id}.mp4`);
       await copyFile(out.video, video);
-      const storyText = [`style: ${story.style}`, ...story.scenes.map((sc, k) => `${k + 1}. ${sc.dur.toFixed(1)}s ${sc.hero ? '[hero] ' : ''}${sc.motion}/${sc.effect}: ${sc.tags}`)].join('\n');
+      const storyText = [`style: ${shown.style}`, ...shown.scenes.map((sc, k) => `${k + 1}. ${sc.dur.toFixed(1)}s ${sc.hero ? '[hero] ' : ''}${sc.motion}/${sc.effect}: ${sc.tags}`)].join('\n');
       await writeFile(join(OUT, `${c.id}-storyboard.txt`), storyText);
       // judged after every MV is made: judging takes minutes, and the GPU would end itself meanwhile
       // (each MV then paid a cold start — about 8 minutes of GPU)
@@ -206,12 +216,13 @@ async function main() {
         ok: true,
         heroRef,
         song: c.song,
-        scenes: story.scenes.length,
+        scenes: shown.scenes.length,
         painted,
+        costYen,
         seconds: { plan: Math.round((t1 - t0) / 1000), paint: Math.round((t2 - t1) / 1000), render: Math.round((t3 - t2) / 1000) },
         judge: j,
       });
-      console.log(`${c.id}: ${painted}/${story.scenes.length} painted in ${Math.round((t2 - t1) / 1000)}s`);
+      console.log(`${c.id}: ${painted}/${shown.scenes.length} painted${costYen !== null ? ` (${costYen} yen)` : ''} in ${Math.round((t2 - t1) / 1000)}s`);
     } catch (e) {
       results.push({ id: c.id, ok: false, error: String(e).slice(0, 300) });
       console.log(`${c.id}: FAILED ${String(e).slice(0, 300)}`);
@@ -232,11 +243,11 @@ async function main() {
     '',
     `**average**: ${keys.map((k) => `${k} ${avg[k]}`).join(' · ')}`,
     '',
-    `| case | ${keys.join(' | ')} | painted | paint s |`,
-    `|---|${keys.map(() => '---').join('|')}|---|---|`,
+    `| case | ${keys.join(' | ')} | painted | paint s | yen |`,
+    `|---|${keys.map(() => '---').join('|')}|---|---|---|`,
     ...results.map((r) =>
       r.ok
-        ? `| ${r.id} | ${keys.map((k) => (r as { judge: Record<string, unknown> }).judge[k] ?? '?').join(' | ')} | ${(r as { painted: number }).painted}/${(r as { scenes: number }).scenes} | ${(r as { seconds: Record<string, number> }).seconds.paint} |`
+        ? `| ${r.id} | ${keys.map((k) => (r as { judge: Record<string, unknown> }).judge[k] ?? '?').join(' | ')} | ${(r as { painted: number }).painted}/${(r as { scenes: number }).scenes} | ${(r as { seconds: Record<string, number> }).seconds.paint} | ${(r as { costYen?: number | null }).costYen ?? '-'} |`
         : `| ${r.id} | FAILED: ${r.error} |`,
     ),
     '',

@@ -1,9 +1,9 @@
 {
-  "round": "m05-hero-everywhere",
-  "note": "m04（6.1）の反省：景色だけの場面に知らない人が出続けた → 全部の場面にきもりん（景色の場面は引きの画で小さく）。最後の場面を別ルールの絵で足さない（衣装が変わった）。1つの世界観で通す。",
+  "round": "m06-two-looks",
+  "note": "クライアント決定「B」：Aメロ・イントロはわざと絵柄を変えたちびキャラ／クレヨン調（Runware の Animagine、1枚約0.3円）、サビは Seedream 5.0 Pro の本気の決め絵2枚（設定画を見ながら、1枚約7円）を小節ごとのカットに。GPU 起動なし。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r07-takes/results.json",
-  "painter": "gpu",
+  "painter": "styled",
   "maxScenes": 30,
   "side": 768,
   "cases": [
@@ -18,10 +18,6 @@
     {
       "id": "ballad-night",
       "song": "ballad-night~a"
-    },
-    {
-      "id": "edm-party",
-      "song": "edm-party~a"
     }
   ],
   "heroRef": 0.6

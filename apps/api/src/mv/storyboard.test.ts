@@ -92,3 +92,23 @@ describe('story ending', () => {
     expect(ending.at(-1)).toBe(3);
   });
 });
+
+describe('two looks (chibi verses, key-visual chorus)', () => {
+  it('merges the chorus into at most two key scenes, the rest stays chibi', async () => {
+    const { twoLooks } = await import('./styled');
+    const sc = (dur: number, tags: string) => ({ dur, tags, hero: true, motion: 'zoom-in' as const, effect: 'NONE' as const });
+    const p = twoLooks(
+      { note: '', style: '', lyrics: [], scenes: [sc(4, 'v1'), sc(4, 'v2'), sc(3, 'c1'), sc(3, 'c2'), sc(3, 'c3'), sc(3, 'c4'), sc(4, 'out')] },
+      [{ t: 0, chorus: false }, { t: 8, chorus: true }, { t: 20, chorus: false }],
+    );
+    expect(p.scenes.map((s) => [s.tier, s.dur])).toEqual([
+      ['chibi', 4],
+      ['chibi', 4],
+      ['key', 6],
+      ['key', 6],
+      ['chibi', 4],
+    ]);
+    expect(p.scenes[2].tags).toBe('c1');
+    expect(p.scenes[3].tags).toBe('c3');
+  });
+});
