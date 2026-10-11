@@ -1,23 +1,16 @@
 {
-  "round": "m08-two-looks-motion",
-  "note": "m07（6.1、1本約18円）：ちびキャラはかわいくなった。背景が空っぽ → 場所がわかるクレヨンの背景に。サビの決め絵が止まって見える → 顔への寄り・下から上へのティルトなどカメラの動きを増やす。最後のハイライトのチカチカ → 入れ替えを1つおきに。",
+  "round": "m09-busan-photos",
+  "note": "実験：釜山旅行の写真13枚を Seedream 5.0 Pro で神作画アニメに描き直し、きもりんを登場させた MV（曲は r08 の K-POP 風、2回作った良い方）。",
   "hero": "art/lab/mv/hero.jpg",
-  "songs": "art/lab/studio/r07-takes/results.json",
+  "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
   "maxScenes": 30,
   "side": 768,
   "cases": [
     {
-      "id": "pop-bright",
-      "song": "pop-bright~a"
-    },
-    {
-      "id": "rock-run",
-      "song": "rock-run~a"
-    },
-    {
-      "id": "ballad-night",
-      "song": "ballad-night~a"
+      "id": "busan",
+      "song": "best:busan-kpop",
+      "photos": "art/lab/busan/photos.json"
     }
   ],
   "heroRef": 0.6

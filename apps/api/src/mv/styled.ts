@@ -49,6 +49,23 @@ export class StyledPainter {
     return j.data ?? [];
   }
 
+  /** Some imageInference tasks, their pictures in the same order (null where one failed). */
+  async run(tasks: Record<string, unknown>[]): Promise<(Buffer | null)[]> {
+    this.lastCostUsd = 0;
+    const ids = tasks.map((t) => String(t.taskUUID));
+    // a few at a time (Runware's per-request limits); each failure only loses its own picture
+    const out: (Buffer | null)[] = [];
+    for (let i = 0; i < tasks.length; i += 5) {
+      const part = tasks.slice(i, i + 5);
+      const images = await this.call(part, 300_000).catch((e) => {
+        log.warn(`runware: ${String(e).slice(0, 300)}`);
+        return [] as RunwareImage[];
+      });
+      out.push(...(await this.fetchAll(images, ids.slice(i, i + 5))));
+    }
+    return out;
+  }
+
   /** The Animagine model's AIR id on Runware (searched once). */
   async chibi(): Promise<string> {
     if (this.chibiModel) return this.chibiModel;
@@ -186,4 +203,37 @@ export function twoLooks(p: StoryPlan, lyrics: { t: number; chorus: boolean }[],
     else scenes.push(Object.assign({ ...s, tier: 'key' as Tier, effect: s.effect === 'GLITCH' ? 'SPEED_LINES' : s.effect }, { part }));
   }
   return { ...p, scenes };
+}
+
+/**
+ * Photo MV (experiment 2026-10-11): the member's own trip photos redrawn by Seedream 5.0 Pro as
+ * high-end anime stills — the same place, food and composition — with the hero (their character)
+ * in each picture. One picture per photo, in the photos' order.
+ */
+export async function photoAnime(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+  const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
+  const heroRef = hero ? await jpg(hero, 1024) : null;
+  const tasks = await Promise.all(
+    photos.map(async (p) => ({
+      taskType: 'imageInference',
+      taskUUID: randomUUID(),
+      model: SEEDREAM,
+      positivePrompt: [
+        `Redraw the first reference photo as a breathtaking still from a high-end Japanese anime film: the same place, the same food and the same composition (${p.caption}).`,
+        'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food rendering, crisp line art.',
+        heroRef ? 'Add the character from the second reference picture into the scene, exactly the same design, colours and proportions, enjoying the moment (eating, looking around, cheering), as the main character.' : '',
+        'No text, no letters, no logos, no watermark. People in the background only as small simple passers-by.',
+      ]
+        .filter(Boolean)
+        .join(' '),
+      width: 1536,
+      height: 1536,
+      numberResults: 1,
+      outputType: 'URL',
+      outputFormat: 'JPG',
+      includeCost: true,
+      referenceImages: [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])],
+    })),
+  );
+  return painter.run(tasks);
 }

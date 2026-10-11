@@ -1,0 +1,18 @@
+{
+  "note": "釜山旅行の写真（物語の順）。caption は Seedream への説明。",
+  "photos": [
+    { "file": "art/lab/busan/photos/01.jpg", "caption": "waking up in a hotel room, big window with a bright morning view of the Busan sea, ships and a cable car, sunlight on white sheets" },
+    { "file": "art/lab/busan/photos/02.jpg", "caption": "walking along Songdo beach, wide sandy beach, tall glass towers, dramatic clouds, sea breeze" },
+    { "file": "art/lab/busan/photos/03.jpg", "caption": "a cosy Korean breakfast: seaweed soup bubbling in a black stone pot, a pot of rice and little side dishes" },
+    { "file": "art/lab/busan/photos/04.jpg", "caption": "the fish market: big glass tanks full of king crabs and snow crabs, bright blue water" },
+    { "file": "art/lab/busan/photos/05.jpg", "caption": "a feast of soy-marinated raw crab (ganjang gejang) with green chilli, a bowl of rice with egg yolk and roe, side dishes" },
+    { "file": "art/lab/busan/photos/06.jpg", "caption": "a Korean street-food stall: crispy fried chicken skin piled high and corn dogs, glowing red-and-black signs" },
+    { "file": "art/lab/busan/photos/07.jpg", "caption": "Nampo-dong shopping street at dusk, neon signs, crowds, a deep blue evening sky" },
+    { "file": "art/lab/busan/photos/08.jpg", "caption": "a huge plate of Korean fried chicken, glossy soy-garlic and spicy green-chilli sauces" },
+    { "file": "art/lab/busan/photos/09.jpg", "caption": "sweet shrimp on ice, fresh sea urchin, crispy fried shrimp heads and a little stew pot on a fire" },
+    { "file": "art/lab/busan/photos/10.jpg", "caption": "a small stew pot over a candle flame at night, glazed shrimp and grilled tofu, a cold glass of fizzy drink" },
+    { "file": "art/lab/busan/photos/11.jpg", "caption": "a steaming bowl of Busan pork-and-rice soup (dwaeji gukbap), sliced pork, chives and lettuce" },
+    { "file": "art/lab/busan/photos/12.jpg", "caption": "spicy soft tofu stew bubbling red in a stone pot, purple rice in a hot stone bowl" },
+    { "file": "art/lab/busan/photos/13.jpg", "caption": "back home: a bowl of mixed noodles with chashu and a rice box, a happy last meal of the trip" }
+  ]
+}

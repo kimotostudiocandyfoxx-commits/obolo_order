@@ -15,10 +15,12 @@ import sharp from 'sharp';
 import { KeyArtist } from '../src/mv/keyart';
 import { renderMv } from '../src/mv/render';
 import { describeHero, isHuman, planStory, storyToPlan } from '../src/mv/storyboard';
-import { StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
+import { photoAnime, StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
+import type { StoryPlan } from '../src/mv/storyboard';
 import { Stylizer } from '../src/mv/stylize';
 
-type Case = { id: string; song: string; mood?: string };
+/** song: an id in the songs file, or "best:<case>" = its best-judged take; photos: a photos.json (photo MV) */
+type Case = { id: string; song: string; mood?: string; photos?: string };
 type Round = {
   round: string;
   note?: string;
@@ -92,7 +94,7 @@ Score each 1-10 (10 = a fan-made MV people would rewatch and share, 5 = obviousl
 - overall.
 Also bestMoments, problems (with mm:ss) and fixIdeas (what to change in the storyboard prompt, the painting prompt, the cut pacing or the effects).
 
-${round.painter === 'styled' ? 'Direction: the verses are DELIBERATELY drawn as cute chibi / crayon cuts and the chorus as full cinematic key visuals of the same character — judge whether this switch of look works as direction (like an anime opening going all-out on the chorus), not as an inconsistency.\n\n' : ''}Storyboard used:
+${round.painter === 'styled' && !round.cases.some((c) => c.photos) ? 'Direction: the verses are DELIBERATELY drawn as cute chibi / crayon cuts and the chorus as full cinematic key visuals of the same character — judge whether this switch of look works as direction (like an anime opening going all-out on the chorus), not as an inconsistency.\n\n' : ''}Storyboard used:
 ${storyText}
 
 Lyrics:
@@ -129,6 +131,20 @@ ${lyrics}`;
   return { error: 'no answer' };
 }
 
+/** One scene per photo over the song, on whole beats; the chorus photos pulse (storyToPlan cuts them). */
+function photoStory(photos: { caption: string }[], seconds: number, bpm: number, lyrics: { t: number; chorus: boolean }[]): StoryPlan {
+  const beat = 60 / bpm;
+  const each = Math.max(beat * 4, Math.round(seconds / photos.length / beat) * beat);
+  let t = 0;
+  const scenes = photos.map((p, k) => {
+    const dur = k === photos.length - 1 ? Math.max(beat * 4, seconds - t) : Math.min(each, Math.max(beat, seconds - t - beat * 4 * (photos.length - k - 1)));
+    t += dur;
+    const chorus = lyrics.some((l) => l.chorus && l.t <= t - dur + 0.01);
+    return { dur, tags: p.caption, hero: true, motion: (['zoom-in', 'pan-left', 'zoom-out', 'pan-right'] as const)[k % 4], effect: chorus && k % 3 === 0 ? ('SPEED_LINES' as const) : ('NONE' as const) };
+  });
+  return { note: '旅の写真をアニメにしたよ', style: 'anime film', scenes, lyrics: lyrics.map((l) => (l.chorus ? 'ZOOM_BURST' : 'MINIMAL_CHILL')) };
+}
+
 async function sheet(files: (Buffer | null)[], out: string) {
   const cell = 192;
   const cols = 6;
@@ -155,7 +171,12 @@ async function main() {
     const c = { ...base, id: v.name ? `${base.id}~${v.name}` : base.id };
     const heroRef = v.heroRef ?? round.heroRef ?? 0.6;
     const steps = v.steps ?? round.steps;
-    const s = songs.find((x) => x.id === c.song && x.ok);
+    const s = c.song.startsWith('best:')
+      ? songs
+          .filter((x) => x.ok && x.id.split('~')[0] === c.song.slice(5))
+          .sort((a, b) => (Number((b as { judge?: { overall?: number } }).judge?.overall) || 0) - (Number((a as { judge?: { overall?: number } }).judge?.overall) || 0))[0]
+      : songs.find((x) => x.id === c.song && x.ok);
+    if (s) console.log(`${c.id}: song ${s.id}`);
     if (!s) {
       results.push({ id: c.id, ok: false, error: `song ${c.song} not in ${round.songs}` });
       continue;
@@ -166,16 +187,21 @@ async function main() {
       const seconds = Math.min(90, s.seconds);
       const bpm = s.sent.bpm;
       const lyrics = s.lineTimes.map((l, k) => ({ t: l.start, text: l.text, chorus: s.sent.lyrics?.[k]?.section === 'chorus' }));
-      const story = await planStory(
-        { title: c.song, seconds, bpm, mood: c.mood ?? '', music: s.sent.prompt.slice(0, 300), lyrics, hero, maxScenes: round.maxScenes },
-        GEMINI,
-        PLAN_MODEL,
-      );
+      // photo MV: one scene per photo, in order, on the beats; otherwise Bati's storyboard
+      const photoList = c.photos ? (JSON.parse(readFileSync(resolve(ROOT, c.photos), 'utf8')) as { photos: { file: string; caption: string }[] }).photos : null;
+      const story = photoList
+        ? photoStory(photoList, seconds, bpm, lyrics)
+        : await planStory(
+            { title: c.song, seconds, bpm, mood: c.mood ?? '', music: s.sent.prompt.slice(0, 300), lyrics, hero, maxScenes: round.maxScenes },
+            GEMINI,
+            PLAN_MODEL,
+          );
       const t1 = Date.now();
       // the two-look MV: chorus scenes merge into the key visuals, the rest are chibi cuts
-      const shown = round.painter === 'styled' ? twoLooks(story, lyrics, 2) : story;
-      const drawn =
-        round.painter === 'styled'
+      const shown = round.painter === 'styled' && !photoList ? twoLooks(story, lyrics, 2) : story;
+      const drawn = photoList
+        ? await photoAnime(styled!, photoList.map((p) => ({ photo: readFileSync(resolve(ROOT, p.file)), caption: p.caption })), heroPic)
+        : round.painter === 'styled'
           ? await styled!.paint((shown as TwoLookPlan).scenes, hero, heroPic, Math.floor(Math.random() * 2 ** 31))
           : await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {
               reference: heroRef === 0 ? null : heroPic,

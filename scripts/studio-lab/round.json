@@ -1,6 +1,6 @@
 {
-  "round": "r07-takes",
-  "note": "r06 は声を変える曲の当たり外れが大きかった（3.8〜8.2）。2テイク歌わせて、Whisper が歌詞をよく聞き取れた方を残す（takes=2）。8曲調×2回で r06 と比べる。",
+  "round": "r08-busan",
+  "note": "実験：釜山旅行の写真から作る、ハイテンポでかっこいい K-POP 風の曲（45秒前後・Aメロ＋サビ）。2回作って良い方を MV に使う。",
   "needs": [
     "takes"
   ],
@@ -8,246 +8,6 @@
     "outro": true
   },
   "keepStems": false,
-  "cases": [
-    {
-      "id": "pop-bright",
-      "prompt": "bright japanese pop instrumental, acoustic guitar, piano, light drums, 112 bpm, C major, no vocals",
-      "bpm": 112,
-      "keyRoot": 0,
-      "scale": "major",
-      "seconds": 49.3,
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "あさのひかり まどをあけて",
-            "きのうのなみだ かぜにとばそう",
-            "ちいさなゆめ ポケットにいれて",
-            "きょうもあるきだす"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "きみとならどこまでも",
-            "そらはいつもあおいから",
-            "わらってうたおう いまここで",
-            "あしたもきっといいひ"
-          ]
-        }
-      ],
-      "genre": "pop"
-    },
-    {
-      "id": "ballad-night",
-      "prompt": "emotional japanese ballad instrumental, grand piano, soft strings, slow tempo, 72 bpm, A minor, no vocals",
-      "bpm": 72,
-      "keyRoot": 9,
-      "scale": "minor",
-      "seconds": 56.7,
-      "voice": true,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "よるのまちに ほしがおちて",
-            "とおいきおく そっとひらく",
-            "なまえをよんだ こえがふるえて",
-            "まだきみをさがしてる"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "あいたいよ いまでもずっと",
-            "ことばにできないおもい",
-            "このうたにのせて とどけたい",
-            "きみがいたなつのひ"
-          ]
-        }
-      ],
-      "genre": "ballad"
-    },
-    {
-      "id": "rock-run",
-      "prompt": "energetic japanese rock instrumental, distorted electric guitars, bass, powerful drums, anime opening style, 160 bpm, E minor, no vocals",
-      "bpm": 160,
-      "keyRoot": 4,
-      "scale": "minor",
-      "seconds": 48.0,
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "はしれ はしれ かぜをきって",
-            "まけないこころ もやしてゆけ",
-            "たおれたって なんどでも",
-            "たちあがるんだ"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "いまだ さけべ ぼくらのうた",
-            "やみをきりさく ひかりになれ",
-            "とどけ とどけ そらのかなた",
-            "ゆめはおわらない"
-          ]
-        }
-      ],
-      "genre": "rock"
-    },
-    {
-      "id": "hiphop-chill",
-      "prompt": "chill japanese hip hop instrumental, lo-fi boom bap drums, warm rhodes piano, deep bass, 90 bpm, F major, no vocals",
-      "bpm": 90,
-      "keyRoot": 5,
-      "scale": "major",
-      "seconds": 50.6,
-      "voice": true,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "ゆうがたのこうえん ブランコゆれる",
-            "ポケットのなかには あめがふたつ",
-            "ともだちとわらう いつものばしょ",
-            "このまちがすきなんだ"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "ゆっくりいこうぜ あせらずに",
-            "ぼくらのペースで ステップふんで",
-            "きょうもいいかんじ ほらきこえる",
-            "まちのリズム"
-          ]
-        }
-      ],
-      "genre": "hiphop"
-    },
-    {
-      "id": "edm-party",
-      "prompt": "upbeat japanese edm instrumental, bright synth leads, four on the floor kick, big build up and drop, 128 bpm, G major, no vocals",
-      "bpm": 128,
-      "keyRoot": 7,
-      "scale": "major",
-      "seconds": 48.8,
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "ネオンのなか ステップふんで",
-            "こころのおと ボリュームあげて",
-            "みんなでいっしょに てをあげて",
-            "いまはじまるよ"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "おどれ おどれ よるがあけるまで",
-            "ひかりのなかで とびはねよう",
-            "ぼくらはいま むてきなんだ",
-            "パーティーはこれから"
-          ]
-        }
-      ],
-      "genre": "edm"
-    },
-    {
-      "id": "kids-march",
-      "prompt": "cheerful kids song instrumental, ukulele, glockenspiel, hand claps, playful march, 120 bpm, D major, no vocals",
-      "bpm": 120,
-      "keyRoot": 2,
-      "scale": "major",
-      "seconds": 48.0,
-      "voice": true,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "くまさん うさぎさん おはようさん",
-            "もりのみちを いっしょにあるこう",
-            "どんぐりひろって ポケットいっぱい"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "ララララ たのしいね",
-            "みんなでうたえば もっとたのしい",
-            "ララララ またあした"
-          ]
-        }
-      ],
-      "genre": "kids"
-    },
-    {
-      "id": "citypop-drive",
-      "prompt": "japanese city pop instrumental, groovy slap bass, electric piano, funky guitar cutting, 80s retro, 104 bpm, D major, no vocals",
-      "bpm": 104,
-      "keyRoot": 2,
-      "scale": "major",
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "よるのハイウェイ ライトがながれる",
-            "ラジオからきこえる なつかしいうた",
-            "まどをあけたら かぜがわらう",
-            "どこまでもいこう"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "きらめくまちを ぬけだして",
-            "ふたりだけの ドライブ",
-            "ほしぞらのした うたいながら",
-            "ゆめのつづきへ"
-          ]
-        }
-      ],
-      "seconds": 50.8,
-      "genre": "pop"
-    },
-    {
-      "id": "folk-letter",
-      "prompt": "warm japanese acoustic folk instrumental, fingerpicked acoustic guitar, soft harmonica, gentle and nostalgic, 84 bpm, G major, no vocals",
-      "bpm": 84,
-      "keyRoot": 7,
-      "scale": "major",
-      "voice": true,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "ふるさとのえきに おりたつと",
-            "かわらないけしき むかえてくれた",
-            "おかあさんのこえ とおくから",
-            "おかえりときこえた"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "ありがとう いえなかったこと",
-            "このうたにこめて おくるよ",
-            "いつまでも げんきでいてね",
-            "またかえるからね"
-          ]
-        }
-      ],
-      "seconds": 51.4,
-      "genre": "pop"
-    }
-  ],
   "variants": [
     {
       "name": "a",
@@ -258,5 +18,36 @@
       "tune": {}
     }
   ],
-  "judgeStudioVoice": false
+  "cases": [
+    {
+      "id": "busan-kpop",
+      "genre": "pop",
+      "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, no vocals",
+      "bpm": 128,
+      "keyRoot": 6,
+      "scale": "minor",
+      "voice": false,
+      "sections": [
+        {
+          "name": "verse",
+          "lines": [
+            "朝の釜山 窓いっぱいの海",
+            "ソンドの砂に 足あとつけて",
+            "カニがおどる 市場のざわめき",
+            "カンジャンケジャン 一口で恋した"
+          ]
+        },
+        {
+          "name": "chorus",
+          "lines": [
+            "チンチャ マシッソ 止まらない",
+            "ネオンの南浦洞 夜はこれから",
+            "チキンを片手に 笑い合おう",
+            "釜山 また会いに来るよ"
+          ]
+        }
+      ],
+      "seconds": 48.8
+    }
+  ]
 }
