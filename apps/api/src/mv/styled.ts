@@ -213,6 +213,22 @@ export function twoLooks(p: StoryPlan, lyrics: { t: number; chorus: boolean }[],
 export async function photoAnime(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
+  // a different camera for every picture (m09: thirteen centred eating shots in a row bored the judge)
+  const meal = /soup|stew|chicken|crab|noodle|shrimp|plate|bowl|pot|feast|breakfast|meal|food|rice|stall/i;
+  const eatShots = [
+    'Camera: over-the-shoulder from behind the character, the food filling the foreground.',
+    'Camera: side profile, the character mid-bite with chopsticks, cheeks full and happy.',
+    'Camera: top-down view of the whole table, the character leaning in from one edge.',
+    'Camera: close-up of the character’s delighted face, the food blurred big in the foreground.',
+    'Camera: three-quarter view from a low angle across the table, steam rising between the character and the lens.',
+  ];
+  const walkShots = [
+    'Camera: wide establishing shot, the character small in the frame seen from behind, taking in the whole place.',
+    'Camera: low angle, the character striding toward the lens with the place towering behind.',
+    'Camera: side tracking shot, the character strolling past and looking around in wonder.',
+  ];
+  let e = 0;
+  let w = 0;
   const tasks = await Promise.all(
     photos.map(async (p) => ({
       taskType: 'imageInference',
@@ -225,6 +241,8 @@ export async function photoAnime(painter: StyledPainter, photos: { photo: Buffer
         heroRef
           ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
           : '',
+        meal.test(p.caption) ? eatShots[e++ % eatShots.length] : walkShots[w++ % walkShots.length],
+        'A picture for children: any drink on the table is juice, tea or water — never beer, wine or other alcohol.',
         'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
       ]
         .filter(Boolean)

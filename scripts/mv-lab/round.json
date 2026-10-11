@@ -1,6 +1,6 @@
 {
-  "round": "m09-busan-photos",
-  "note": "実験：釜山旅行の写真13枚を Seedream 5.0 Pro で神作画アニメに描き直し、きもりんを登場させた MV（曲は r08 の K-POP 風、2回作った良い方）。",
+  "round": "m10-busan-traveller",
+  "note": "実験の2回目：きもりんが釜山を旅する設定（1枚に1回だけ登場）。写真ごとにカメラを変え、飲み物はジュースかお茶に（m09 の指摘）。曲は r08 の良い方。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
