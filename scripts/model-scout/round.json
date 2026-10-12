@@ -1,31 +1,7 @@
 {
-  "round": "s01-search",
-  "note": "まず Runware にある「参考画像を読める」安いモデルを探す（検索だけ・無料）。",
-  "search": [
-    "qwen image edit",
-    "qwen image",
-    "flux kontext",
-    "flux.2",
-    "flux 2 klein",
-    "hunyuan image",
-    "seededit",
-    "seedream 4",
-    "gemini flash image",
-    "nano banana",
-    "gpt image",
-    "ideogram",
-    "kling",
-    "omnigen",
-    "bagel",
-    "step1x",
-    "hidream",
-    "uso",
-    "dreamo",
-    "pulid",
-    "instantid",
-    "illustrious",
-    "noobai"
-  ],
+  "round": "s02-cheap-models",
+  "note": "Seedream の代わり候補8種に、同じキモリンの課題（写真1枚＋キモリン／写真4枚の4コマ）を描かせて、費用と出来を比べる。",
+  "search": [],
   "hero": "art/lab/mv/hero.jpg",
   "photos": [
     {
@@ -45,5 +21,46 @@
       "caption": "sweet shrimp on ice, fresh sea urchin, crispy fried shrimp heads and a little stew pot on a fire"
     }
   ],
-  "models": []
+  "models": [
+    {
+      "name": "flux2-klein-4b",
+      "model": "runware:400@4",
+      "maxRefs": 4
+    },
+    {
+      "name": "flux2-klein-9b",
+      "model": "runware:400@2",
+      "maxRefs": 4
+    },
+    {
+      "name": "flux2-dev",
+      "model": "runware:400@1",
+      "maxRefs": 6
+    },
+    {
+      "name": "qwen-edit-plus",
+      "model": "runware:108@22",
+      "maxRefs": 3
+    },
+    {
+      "name": "qwen-2.1-turbo",
+      "model": "alibaba:qwen-image@2.1-turbo",
+      "maxRefs": 3
+    },
+    {
+      "name": "nano-banana-2-lite",
+      "model": "google:nano-banana@2-lite",
+      "maxRefs": 5
+    },
+    {
+      "name": "gpt-image-1-mini",
+      "model": "openai:1@2",
+      "maxRefs": 5
+    },
+    {
+      "name": "kling-image-o3",
+      "model": "klingai:kling-image@o3",
+      "maxRefs": 5
+    }
+  ]
 }

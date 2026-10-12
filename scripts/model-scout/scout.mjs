@@ -59,12 +59,12 @@ const photos = (round.photos ?? []).map((p) => ({ file: p.file, caption: p.capti
 const HERO_TXT =
   'the character from the reference picture (a small chibi fox spirit: white mask face with blue markings and glowing blue eyes, fox ears, red hooded robe, many white-and-black tails, white paws, blue gem necklace) — exactly the same design, colours and proportions, exactly once';
 const singlePrompt = (p) =>
-  `A breathtaking still from a high-end Japanese anime film, fully drawn in 2D anime style. The place and food come from the photo reference (${p.caption}). In it is ${HERO_TXT}, happily doing what the photo shows. Children's picture: drinks are juice or tea. No text, no watermark.`;
+  `A breathtaking still from a high-end Japanese anime film, fully drawn in 2D anime style. The place and food come from the photo in reference picture 2 (${p.caption}). In it is ${HERO_TXT.replace('the reference picture', 'reference picture 1')}, happily doing what the photo shows. Children's picture: drinks are juice or tea. No text, no watermark.`;
 const gridPrompt = (ps) =>
   [
     'A 2x2 sheet of four separate square stills from the same high-end Japanese anime film, four equal panels split by thin straight white gutters, all fully drawn in 2D anime style.',
-    ...ps.map((p, j) => `Panel ${j + 1}: redraw photo reference ${j + 1} (${p.caption}).`),
-    `In every panel the main character is ${HERO_TXT} per panel, really doing what the panel shows. Children's pictures: drinks are juice or tea. No text, no watermark.`,
+    ...ps.map((p, j) => `Panel ${j + 1}: redraw the photo in reference picture ${j + 2} (${p.caption}).`),
+    `In every panel the main character is ${HERO_TXT.replace('the reference picture', 'reference picture 1')} per panel, really doing what the panel shows. Children's pictures: drinks are juice or tea. No text, no watermark.`,
   ].join(' ');
 
 /** one task; `refs` sent the way the model takes them (top-level referenceImages, or inputs.referenceImages) */
@@ -118,7 +118,7 @@ if (round.models?.length) {
     if (photos.length >= 4 && m.grid !== false) {
       const four = photos.slice(0, 4);
       const [gw, gh] = m.gridSize ?? [Math.max(w, 1024), Math.max(h, 1024)];
-      report.push(await paint(m, 'grid', gridPrompt(four), [...four.map((p) => dataUri(p.file)), heroRef], gw, gh));
+      report.push(await paint(m, 'grid', gridPrompt(four), [heroRef, ...four.map((p) => dataUri(p.file))], gw, gh));
     }
     report.push('');
   }
