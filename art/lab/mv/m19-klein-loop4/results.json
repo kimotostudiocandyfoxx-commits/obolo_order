@@ -1,0 +1,179 @@
+{
+  "round": "m19-klein-loop4",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 5.9,
+    "heroLikeness": 6.8,
+    "heroConsistency": 6,
+    "pictureQuality": 6.1,
+    "storyTelling": 5.8,
+    "lyricFit": 6.9,
+    "beatSync": 5.3,
+    "variety": 5,
+    "watchability": 5.8,
+    "kidsSafe": 7.3
+  },
+  "results": [
+    {
+      "id": "photo~a",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 2.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 26,
+        "render": 37
+      },
+      "judge": {
+        "heroLikeness": 6.2,
+        "heroConsistency": 4.8,
+        "pictureQuality": 6.4,
+        "storyTelling": 5.8,
+        "lyricFit": 6.8,
+        "beatSync": 5.2,
+        "variety": 4.6,
+        "watchability": 5.7,
+        "kidsSafe": 7.5,
+        "overall": 5.8,
+        "problems": [
+          "00:11 Character mask disappears, revealing an unexpected human anime face.",
+          "00:38 Unintended duplication creates two identical heroes in the same shot.",
+          "00:42 Face mask is missing again, breaking character continuity.",
+          "Pervasive repetitive framing with character centered behind food tables."
+        ],
+        "fixIdeas": [
+          "Add negative prompts for human faces and emphasize porcelain fox mask consistency.",
+          "Specify 'solo, 1girl/1creature' in negative prompts to avoid accidental clones.",
+          "Introduce dynamic camera angles like walking wide shots and close-ups to reduce repetition."
+        ],
+        "bestMoments": [
+          "00:04 Songdo beach establishing view with clean cityscape backdrop.",
+          "00:19 Cozy night street market atmosphere with vivid lighting."
+        ]
+      }
+    },
+    {
+      "id": "photo~b",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 2.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 24,
+        "render": 36
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6,
+        "pictureQuality": 5.8,
+        "storyTelling": 5.5,
+        "lyricFit": 6.7,
+        "beatSync": 5,
+        "variety": 5.3,
+        "watchability": 5.6,
+        "kidsSafe": 7.5,
+        "overall": 5.8,
+        "problems": [
+          "00:23 Character cloned into two identical figures sitting across from each other.",
+          "00:26 Hero mask transforms into an uncovered cat face instead of a mask.",
+          "00:30-00:46 Repetitive dining poses and minimal animation motion throughout second half."
+        ],
+        "fixIdeas": [
+          "Prompt explicitly for a single character to avoid duplicate twins in scene 7.",
+          "Enforce consistent mask coverage across eating scenes instead of revealing a cat snout.",
+          "Vary camera angles and activities beyond medium eating shots in the latter half."
+        ],
+        "bestMoments": [
+          "00:00 Opening hotel shot introduces character silhouette and ocean backdrop faithfully.",
+          "00:15 Camera shot captures an engaging travel vlogging vibe with nice food detail."
+        ]
+      }
+    },
+    {
+      "id": "story~a",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 7,
+      "painted": 7,
+      "costYen": 3.9,
+      "seconds": {
+        "plan": 3,
+        "paint": 11,
+        "render": 32
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:33 Character mask unnaturally morphs into a real mouth to eat food.",
+          "00:46 Inconsistent face markings and messy hand anatomy holding chopsticks.",
+          "00:00-00:30 Repetitive center-weighted poses across early scenes."
+        ],
+        "fixIdeas": [
+          "Prompt for character to hold food near mask rather than eating directly.",
+          "Add side profiles and varying camera distances to improve visual rhythm.",
+          "Align visual cut transitions directly to the musical downbeats."
+        ],
+        "bestMoments": [
+          "00:00 Beautiful adaptation of the reference character to the beach setting.",
+          "00:16 Engaging seafood market shot matching the lyrics."
+        ]
+      }
+    },
+    {
+      "id": "story~b",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 12,
+      "painted": 12,
+      "costYen": 6.2,
+      "seconds": {
+        "plan": 3,
+        "paint": 16,
+        "render": 37
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 7,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 6,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:34 static back view lacks motion",
+          "00:38-00:47 rapid looping of reused frames causes repetition",
+          "00:00-00:32 repetitive centered composition across multiple shots"
+        ],
+        "fixIdeas": [
+          "Incorporate three-quarter angles and dynamic action poses",
+          "Replace rapid recycling of scenes in the drop with unique animated cuts",
+          "Vary character framing beyond centered medium-full shots"
+        ],
+        "bestMoments": [
+          "00:04 colorful beach walk matching lyrics",
+          "00:12 cute food stall interaction scene"
+        ]
+      }
+    }
+  ]
+}
