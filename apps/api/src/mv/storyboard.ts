@@ -250,7 +250,8 @@ export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = [
     const first: MvSegment['motion'] = s.motion === 'still' ? 'zoom-in' : s.motion;
     let chorus = false;
     for (const l of lyrics) if (l.t <= t + 0.01) chorus = l.chorus;
-    const each = bar ? bar * (chorus ? 1 : 2) : s.dur;
+    // a fast song cuts on every half bar in the chorus (m16: "tighten cuts closer to the drums")
+    const each = bar ? bar * (chorus ? (bpm! >= 110 ? 0.5 : 1) : 2) : s.dur;
     const n = bar && s.dur >= each * 1.5 ? Math.min(8, Math.floor(s.dur / each + 0.25)) : 1;
     const last = k === p.scenes.length - 1;
     for (let j = 0; j < n; j++) {

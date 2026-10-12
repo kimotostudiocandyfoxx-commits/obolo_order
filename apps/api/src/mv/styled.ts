@@ -235,7 +235,7 @@ export async function photoAnime(
   const keyAt = new Set(opt.seedream ?? photos.map((_, k) => k));
   const cheapAt = photos.map((_, k) => k).filter((k) => !keyAt.has(k));
   const [keys, cheap] = await Promise.all([
-    seedreamPhotos(painter, photos.filter((_, k) => keyAt.has(k)), hero, opt.model),
+    seedreamPhotos(painter, photos.filter((_, k) => keyAt.has(k)), hero, opt.model, opt.heroLook),
     cheapAt.length ? animaginePhotos(painter, cheapAt.map((k) => photos[k]), hero, opt) : Promise.resolve([] as (Buffer | null)[]),
   ]);
   let a = 0;
@@ -306,14 +306,19 @@ const ADMIRE_SHOTS = [
   'The character points happily at the dish while the cook serves it. Camera: wide shot of the whole shop.',
   'The character carries the dish to its seat with both paws, careful and proud. Camera: side tracking shot.',
 ];
+const TAKEAWAY_SHOTS = [
+  'The character walks out into the street outside with this food in a little takeaway cup or box, looking around happily. Camera: low angle, the street behind.',
+  'The character stands at the shop counter on tiptoe, receiving this food from the cook. Camera: wide shot of the shop.',
+  'The character runs towards the table carrying this food, tails swinging. Camera: side tracking shot with motion.',
+];
 const WALK_SHOTS = [
   'Camera: wide establishing shot, the character small in the frame seen from behind, taking in the whole place.',
   'Camera: low angle, the character striding toward the lens with the place towering behind.',
   'Camera: side tracking shot, the character strolling past and looking around in wonder.',
 ];
 
-async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER): Promise<(Buffer | null)[]> {
-  return paintScenes(painter, photos, hero, m);
+async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER, heroLook = ''): Promise<(Buffer | null)[]> {
+  return paintScenes(painter, photos, hero, m, heroLook);
 }
 
 /** The character's face as drawn (m14: klein opened the mask into a mouth while eating). */
@@ -323,7 +328,14 @@ const KEEP_FACE = 'Keep the character’s face exactly as in its reference pictu
  * One picture per scene with a model that reads reference pictures (PAINTERS). A scene is a photo
  * to redraw (photo MV: reference 1 = the photo, 2 = the hero) or words (story MV: reference 1 = the hero).
  */
-export async function paintScenes(painter: StyledPainter, items: { caption: string; photo?: Buffer }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER): Promise<(Buffer | null)[]> {
+export async function paintScenes(
+  painter: StyledPainter,
+  items: { caption: string; photo?: Buffer }[],
+  hero: Buffer | null,
+  m: Painter = SEEDREAM_PAINTER,
+  /** the hero in words (describeHero's tags): the small models keep the design better told it too (m16: the mask became a child's face) */
+  heroLook = '',
+): Promise<(Buffer | null)[]> {
   if (!items.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
@@ -335,7 +347,9 @@ export async function paintScenes(painter: StyledPainter, items: { caption: stri
     items.map(async (p) => {
       const refs = p.photo ? [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])] : heroRef ? [heroRef] : [];
       const meal = MEAL.test(p.caption);
-      const shot = meal ? (meals++ % 2 ? ADMIRE_SHOTS[a++ % ADMIRE_SHOTS.length] : EAT_SHOTS[e++ % EAT_SHOTS.length]) : WALK_SHOTS[w++ % WALK_SHOTS.length];
+      // meals in thirds: eating, not eaten yet, and on the move with it (m16: "static seated tables")
+      const turn = meal ? meals++ % 3 : -1;
+      const shot = turn === 0 ? EAT_SHOTS[e++ % EAT_SHOTS.length] : turn === 1 ? ADMIRE_SHOTS[a++ % ADMIRE_SHOTS.length] : turn === 2 ? TAKEAWAY_SHOTS[w % TAKEAWAY_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length];
       // the hero is the traveller (client 2026-10-11: KIMORIN travels Busan, eats the food in the
       // photos, wanders the streets) — exactly one of them in every picture, never two
       const lines = p.photo
@@ -358,6 +372,7 @@ export async function paintScenes(painter: StyledPainter, items: { caption: stri
         positivePrompt: [
           ...lines,
           heroRef ? KEEP_FACE : '',
+          heroRef && heroLook ? `The character, in words: ${heroLook.split(',').slice(0, 12).join(',')}.` : '',
           'A picture for children: any drink is juice, tea or water — never beer, wine or other alcohol.',
           'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art, fully drawn in 2D anime style. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
         ]

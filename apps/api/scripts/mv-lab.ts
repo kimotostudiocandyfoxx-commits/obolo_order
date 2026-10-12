@@ -255,7 +255,7 @@ async function main() {
             seed: Math.floor(Math.random() * 2 ** 31),
           })
         : round.painter === 'styled' && c.model
-          ? await paintScenes(styled!, story.scenes.map((sc) => ({ caption: sc.tags })), heroPic, PAINTERS[c.model])
+          ? await paintScenes(styled!, story.scenes.map((sc) => ({ caption: sc.tags })), heroPic, PAINTERS[c.model], hero)
         : round.painter === 'styled'
           ? await styled!.paint((shown as TwoLookPlan).scenes, hero, heroPic, Math.floor(Math.random() * 2 ** 31))
           : await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {

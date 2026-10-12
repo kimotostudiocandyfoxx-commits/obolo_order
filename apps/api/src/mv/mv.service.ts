@@ -289,7 +289,7 @@ export class MvService {
       const drawn = this.sheets
         ? this.cfg.MV_PAINTER === 'seedream'
           ? await seedreamSheets(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture)
-          : await paintScenes(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture, PAINTERS[this.cfg.MV_PAINTER])
+          : await paintScenes(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture, PAINTERS[this.cfg.MV_PAINTER], hero)
         : await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) });
       if (this.sheets) this.log.log(`MV ${id}: plan A paint cost ${Math.round(this.sheets.lastCostUsd * 150)} yen`);
       const pics: (string | null)[] = await Promise.all(
