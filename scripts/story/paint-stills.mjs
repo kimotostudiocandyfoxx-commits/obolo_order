@@ -43,7 +43,10 @@ const CAST = {
   ロングG: 'apps/web/public/onboarding/longg.webp',
   たこ焼きブラザー: 'apps/web/public/onboarding/takoyaki-brother.webp',
   たこ焼きシスター: 'apps/web/public/onboarding/takoyaki-sister.webp',
+  大根カイザー: 'apps/web/public/onboarding/kaiser-face.webp',
 };
+// other ways the text names them
+const ALIAS = { 大根: '大根カイザー', カイザー: '大根カイザー', キモリン: 'KIMORIN' };
 const mime = (p) => (/\.png$/i.test(p) ? 'image/png' : /\.webp$/i.test(p) ? 'image/webp' : 'image/jpeg');
 const dataUri = (p) => `data:${mime(p)};base64,${readFileSync(p).toString('base64')}`;
 
@@ -75,7 +78,8 @@ async function english(desc) {
 
 async function paint(s) {
   const scene = await english(s.desc);
-  const who = Object.keys(CAST).filter((n) => s.desc.includes(n) && existsSync(CAST[n]));
+  const named = new Set([...Object.keys(CAST).filter((n) => s.desc.includes(n)), ...Object.entries(ALIAS).filter(([a]) => s.desc.includes(a)).map(([, n]) => n)]);
+  const who = [...named].filter((n) => existsSync(CAST[n]));
   const refs = [...who.map((n) => CAST[n]), ...STYLE].slice(0, 6);
   const prompt = [
     'A vertical key-art still for a Japanese anime adventure, the finest cinematic anime film quality: painterly, deep space-fantasy mood, warm gold light against dark blues, rich detail, strong composition with a clear focal point.',
@@ -121,7 +125,8 @@ const log = [];
 let yen = 0;
 for (const s of todo) {
   try {
-    const r = await paint(s);
+    // Runware sometimes times out a Seedream task (504): one more try
+    const r = await paint(s).catch((e) => (/504|Timeout/i.test(String(e)) ? paint(s) : Promise.reject(e)));
     yen += r.cost * 150;
     log.push(`- ✅ ${s.id}${r.who.length ? `（${r.who.join('・')}）` : ''}: ${s.desc.slice(0, 60)}…\n  - order: ${r.prompt.replace(/^.*?Scene: /, '').slice(0, 400)}`);
   } catch (e) {
