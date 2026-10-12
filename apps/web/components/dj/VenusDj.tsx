@@ -10,7 +10,7 @@ export function VenusDj({ demo = [], backHref }: { demo?: DjTrack[]; backHref?: 
   useEffect(() => {
     getApi()
       .savedSongs()
-      .then((list) => setSongs([...list.map((s) => ({ title: s.title, url: s.url, bpm: s.bpm || null })), ...demo]))
+      .then((list) => setSongs([...list.map((s) => ({ title: s.title, url: s.url, bpm: s.bpm || null, videoUrl: s.mvUrl ?? null })), ...demo]))
       .catch(() => undefined);
   }, [demo]);
   return <DjController songs={songs} backHref={backHref} />;

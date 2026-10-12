@@ -50,6 +50,60 @@ function useDeck(deck: Deck) {
   }, [deck]);
 }
 
+/**
+ * Each deck's MV (Venus VJ, client 2026-10-12): a muted video kept in step with the deck — same
+ * position, same speed (the tempo slider), stopping with it — drawn on the platter and mixed in the
+ * VJ screen. Not crossOrigin: the CDN may not send CORS, and drawing (not reading) a video is fine.
+ */
+const VIDEOS = new WeakMap<Deck, HTMLVideoElement>();
+
+function useDeckVideo(deck: Deck) {
+  const url = deck.meta?.videoUrl ?? null;
+  useEffect(() => {
+    if (!url) {
+      VIDEOS.delete(deck);
+      return;
+    }
+    const v = document.createElement('video');
+    v.muted = true;
+    v.setAttribute('muted', '');
+    v.playsInline = true;
+    v.setAttribute('playsinline', '');
+    v.preload = 'auto';
+    v.src = url;
+    VIDEOS.set(deck, v);
+    let raf = 0;
+    const tick = () => {
+      const p = deck.position();
+      if (deck.playing) {
+        v.playbackRate = Math.max(0.5, Math.min(2, deck.rate));
+        if (v.paused) void v.play().catch(() => undefined);
+        if (Math.abs(v.currentTime - p) > 0.25) v.currentTime = p;
+      } else {
+        if (!v.paused) v.pause();
+        if (Math.abs(v.currentTime - p) > 0.05) v.currentTime = p;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      v.pause();
+      v.removeAttribute('src');
+      v.load();
+      if (VIDEOS.get(deck) === v) VIDEOS.delete(deck);
+    };
+  }, [deck, url]);
+}
+
+/** A video drawn to fill a square (cover), centred. */
+function cover(g: CanvasRenderingContext2D, v: HTMLVideoElement, S: number, zoom = 1) {
+  const w = v.videoWidth || 1;
+  const h = v.videoHeight || 1;
+  const sc = (Math.max(S / w, S / h)) * zoom;
+  g.drawImage(v, (S - w * sc) / 2, (S - h * sc) / 2, w * sc, h * sc);
+}
+
 /** Put a child at (angle°, radius as a fraction of R) from a circle's centre (0° = right, 90° = down). */
 const polar = (D: number, deg: number, r: number): CSSProperties => {
   const a = (deg * Math.PI) / 180;
@@ -129,6 +183,7 @@ function Body({ D, step }: { D: number; step: number }) {
 function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D: number; k: number; songs: DjTrack[] }) {
   const deck = engine.decks[i];
   useDeck(deck);
+  useDeckVideo(deck);
   const [fx, setFx] = useState<{ type: FxType; amount: number }>({ type: 'echo', amount: 0 });
   const [pick, setPick] = useState(false);
   const [loading, setLoading] = useState('');
@@ -138,10 +193,10 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   const at = (deg: number, r: number) => polar(D, i === 0 ? deg : 180 - deg, r);
   const b = Math.round(26 * k);
 
-  const load = async (data: ArrayBuffer, title: string, bpm: number | null, source: 'song' | 'file') => {
+  const load = async (data: ArrayBuffer, title: string, bpm: number | null, source: 'song' | 'file', videoUrl: string | null = null) => {
     setLoading(title);
     try {
-      await engine.load(i, data, { title, bpm, source });
+      await engine.load(i, data, { title, bpm, source, videoUrl });
     } finally {
       setLoading('');
     }
@@ -244,11 +299,11 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
               key={s.url}
               onClick={async () => {
                 setPick(false);
-                await load(await (await fetch(s.url)).arrayBuffer(), s.title, s.bpm, 'song');
+                await load(await (await fetch(s.url)).arrayBuffer(), s.title, s.bpm, 'song', s.videoUrl ?? null);
               }}
               className="block w-full truncate rounded px-2 py-2 text-left hover:bg-white/5"
             >
-              ♪ {s.title} <span className="text-[10px] text-white/40">{s.bpm ? `${s.bpm} BPM` : ''}</span>
+              {s.videoUrl ? '🎬' : '♪'} {s.title} <span className="text-[10px] text-white/40">{s.bpm ? `${s.bpm} BPM` : ''}</span>
             </button>
           ))}
           <button onClick={() => file.current?.click()} className="mt-1 block w-full rounded px-2 py-2 text-left text-white/70">
@@ -297,6 +352,25 @@ function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1;
     for (let n = 0; n < 40; n++) level += data.current[n];
     level = level / (40 * 255);
     g.clearRect(0, 0, S, S);
+    const video = VIDEOS.get(deck);
+    if (video && video.readyState >= 2) {
+      // the song's MV on the record, upright; a lit marker on the rim turns with the record
+      g.save();
+      g.beginPath();
+      g.arc(S / 2, S / 2, S / 2, 0, Math.PI * 2);
+      g.clip();
+      cover(g, video, S);
+      g.restore();
+      g.strokeStyle = DECK_COLOR[i];
+      g.globalAlpha = 0.5 + level * 0.5;
+      g.lineWidth = S / 40;
+      g.beginPath();
+      const a0 = (angle * Math.PI) / 180 - Math.PI / 2;
+      g.arc(S / 2, S / 2, S / 2 - S / 80, a0 - 0.25, a0 + 0.25);
+      g.stroke();
+      g.globalAlpha = 1;
+      return;
+    }
     g.save();
     g.translate(S / 2, S / 2);
     g.rotate((angle * Math.PI) / 180);
@@ -392,7 +466,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
 }
 
 /**
- * The VJ view: each deck's picture — its MV when the song has one (later), else visuals drawn from its
+ * The VJ view: each deck's picture — its MV when the song has one, else visuals drawn from its
  * sound in the deck's colour — mixed like the sound: crossfader and channel faders.
  */
 function VjScreen({ engine, size }: { engine: DjEngine; size: number }) {
@@ -407,19 +481,49 @@ function VjScreen({ engine, size }: { engine: DjEngine; size: number }) {
     let t = 0;
     const draw = () => {
       t += 1 / 60;
-      g.globalCompositeOperation = 'source-over';
-      g.fillStyle = 'rgba(4,6,10,0.35)';
-      g.fillRect(0, 0, S, S);
-      g.globalCompositeOperation = 'lighter';
       const xf = engine.crossfader;
+      const mixes = engine.decks.map((d, i) => (i === 0 ? Math.cos((xf * Math.PI) / 2) : Math.sin((xf * Math.PI) / 2)) * d.faderValue);
+      // the MVs first: deck A as the base, deck B over it by its share of the mix — a real crossfade,
+      // with a little push-in on the low end so the picture moves with the beat
+      const vids = engine.decks.map((d) => {
+        const v = VIDEOS.get(d);
+        return v && v.readyState >= 2 ? v : null;
+      });
+      let kick = 0;
       engine.decks.forEach((d, i) => {
-        const mix = (i === 0 ? Math.cos((xf * Math.PI) / 2) : Math.sin((xf * Math.PI) / 2)) * d.faderValue;
-        if (mix < 0.02) return;
         d.analyser.getByteFrequencyData(buf.current[i]);
+        kick += (buf.current[i][2] / 255) * mixes[i];
+      });
+      const total = mixes.reduce((a, m, i) => a + (vids[i] ? m : 0), 0);
+      g.globalCompositeOperation = 'source-over';
+      if (total > 0.02) {
+        g.globalAlpha = 1;
+        g.fillStyle = '#000';
+        g.fillRect(0, 0, S, S);
+        const zoom = 1.02 + kick * 0.06;
+        let first = true;
+        vids.forEach((v, i) => {
+          if (!v || mixes[i] < 0.02) return;
+          g.globalAlpha = first ? 1 : mixes[i] / total;
+          cover(g, v, S, zoom);
+          first = false;
+        });
+        // quieter mix → darker picture
+        g.globalAlpha = Math.max(0, 1 - Math.min(1, Math.max(...mixes) * 1.3));
+        g.fillStyle = '#000';
+        g.fillRect(0, 0, S, S);
+      } else {
+        g.fillStyle = 'rgba(4,6,10,0.35)';
+        g.fillRect(0, 0, S, S);
+      }
+      g.globalCompositeOperation = 'lighter';
+      engine.decks.forEach((d, i) => {
+        const mix = mixes[i];
+        if (mix < 0.02) return;
         const f = buf.current[i];
         const col = DECK_COLOR[i];
         g.strokeStyle = col;
-        g.globalAlpha = Math.min(1, mix * 1.2);
+        g.globalAlpha = Math.min(1, mix * 1.2) * (vids[i] ? 0.12 : 1);
         // rings that swell with the lows, rays with the highs
         for (let r = 0; r < 4; r++) {
           const v = f[2 + r * 3] / 255;

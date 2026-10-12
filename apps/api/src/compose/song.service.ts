@@ -593,12 +593,17 @@ export class SongService {
   /** Your saved songs (島の土 on Mercury), newest first; `posted` = already sent out as a ship. */
   async saved(userId: string): Promise<(SongView & { posted: boolean })[]> {
     const rows = await this.db.read
-      .select({ s: songs, posted: sql<boolean>`EXISTS (SELECT 1 FROM planet_posts pp WHERE pp.source_id = "songs"."id" AND pp.planet = 'mercury' AND pp.deleted_at IS NULL)` })
+      .select({
+        s: songs,
+        posted: sql<boolean>`EXISTS (SELECT 1 FROM planet_posts pp WHERE pp.source_id = "songs"."id" AND pp.planet = 'mercury' AND pp.deleted_at IS NULL)`,
+        // the latest finished MV of the song (Venus VJ plays it with the song)
+        mvUrl: sql<string | null>`(SELECT mp.video_url FROM mv_projects mp WHERE mp.song_id = "songs"."id" AND mp.status = 'done' AND mp.video_url IS NOT NULL ORDER BY mp.updated_at DESC LIMIT 1)`,
+      })
       .from(songs)
       .where(and(eq(songs.userId, userId), isNull(songs.deletedAt), isNotNull(songs.savedAt)))
       .orderBy(desc(songs.savedAt))
       .limit(100);
-    return rows.map(({ s, posted }) => ({ ...this.view(s), posted: !!posted }));
+    return rows.map(({ s, posted, mvUrl }) => ({ ...this.view(s), posted: !!posted, mvUrl: mvUrl ?? null }));
   }
 
   async save(userId: string, id: string): Promise<SongView> {

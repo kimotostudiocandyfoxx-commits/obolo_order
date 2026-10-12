@@ -291,6 +291,8 @@ export interface SongView {
   direction: SingDirection;
   seconds: number;
   savedAt: string | null;
+  /** the song's latest finished MV (Mars), for the Venus VJ — only in the saved-songs list */
+  mvUrl?: string | null;
 }
 
 export type SongEditAction = 'VOLUME_TEMPO_EDIT' | 'LYRICS_EDIT' | 'VOICE_REPLACE' | 'TIMING_EDIT' | 'GENRE_EDIT' | 'SONG_EXTEND' | 'CHAT';
