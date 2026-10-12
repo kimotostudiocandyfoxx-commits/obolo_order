@@ -56,9 +56,12 @@ describe('story cuts on the bars', () => {
       { dur: 8, tags: 'a', hero: true, motion: 'zoom-in' as const, effect: 'NONE' as const },
       { dur: 4, tags: 'b', hero: true, motion: 'pan-left' as const, effect: 'SPEED_LINES' as const },
     ] };
-    // 120 BPM: a bar is 2 s; verse until 8 s, chorus after
+    // 120 BPM: a bar is 2 s; verse until 8 s (two-bar shots), chorus after (half-bar shots: a fast song)
     const plan = storyToPlan(story, 120, [{ t: 0, text: 'v', chorus: false }, { t: 8, text: 'c', chorus: true }]);
-    expect(plan.segments.map((s) => [s.m, s.dur])).toEqual([[0, 4], [0, 4], [1, 2], [1, 2]]);
+    expect(plan.segments.map((s) => [s.m, s.dur])).toEqual([[0, 4], [0, 4], [1, 1], [1, 1], [0, 1], [1, 1]]); // the last scene ends as a highlight reel
+    expect(plan.segments.map((s) => !!s.chorus)).toEqual([false, false, true, true, true, true]);
+    // a slower song keeps whole bars in the chorus (100 BPM: 2.4 s)
+    expect(storyToPlan({ ...story, scenes: [story.scenes[0], { ...story.scenes[1], dur: 4.8 }] }, 100, [{ t: 0, text: 'v', chorus: false }, { t: 8, text: 'c', chorus: true }]).segments.filter((s) => s.chorus).map((s) => s.dur)).toEqual([2.4, 2.4]);
     expect(plan.segments[0].motion).not.toBe(plan.segments[1].motion);
     expect(plan.segments[2].effect).toBe('SPEED_LINES');
     expect(plan.segments[3].effect).toBe('NONE');
