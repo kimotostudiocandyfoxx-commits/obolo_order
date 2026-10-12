@@ -1,0 +1,96 @@
+{
+  "round": "m18-klein-loop3",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 5.8,
+    "heroLikeness": 6.5,
+    "heroConsistency": 5.9,
+    "pictureQuality": 6.2,
+    "storyTelling": 5.2,
+    "lyricFit": 6.1,
+    "beatSync": 4.9,
+    "variety": 5.3,
+    "watchability": 5.6,
+    "kidsSafe": 7.2
+  },
+  "results": [
+    {
+      "id": "photo",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 2.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 17,
+        "render": 60
+      },
+      "judge": {
+        "heroLikeness": 6.2,
+        "heroConsistency": 5.4,
+        "pictureQuality": 5.8,
+        "storyTelling": 5.2,
+        "lyricFit": 6,
+        "beatSync": 5,
+        "variety": 5.5,
+        "watchability": 5.4,
+        "kidsSafe": 7.2,
+        "overall": 5.6,
+        "problems": [
+          "0:11 Mask detail morphs into an animated anime face inconsistently.",
+          "0:24 White flash frame interrupts transition pacing.",
+          "0:30 Sudden style switch to physical plush model."
+        ],
+        "fixIdeas": [
+          "Keep mask prompts locked to reference design.",
+          "Remove blank cut at transition point around 0:24.",
+          "Ensure consistent 2D anime styling in render prompts."
+        ],
+        "bestMoments": [
+          "0:04 Wide scenic beach introduction.",
+          "0:19 Food stall evening sequence."
+        ]
+      }
+    },
+    {
+      "id": "story",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 7,
+      "painted": 7,
+      "costYen": 3.2,
+      "seconds": {
+        "plan": 3,
+        "paint": 8,
+        "render": 53
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.4,
+        "pictureQuality": 6.5,
+        "storyTelling": 5.2,
+        "lyricFit": 6.2,
+        "beatSync": 4.8,
+        "variety": 5,
+        "watchability": 5.8,
+        "kidsSafe": 7.2,
+        "overall": 5.9,
+        "problems": [
+          "00:24 mask changes into an expressive animated mouth contrary to design",
+          "00:33 final beat drop lacks cut variety and energy"
+        ],
+        "fixIdeas": [
+          "Increase cut frequency during chorus and outro to match rhythm",
+          "Prompt rigid mask features to maintain exact face geometry"
+        ],
+        "bestMoments": [
+          "00:07 front reveal on beach captures character costume nicely",
+          "00:25 cute food stall scene fitting the bright travel theme"
+        ]
+      }
+    }
+  ]
+}
