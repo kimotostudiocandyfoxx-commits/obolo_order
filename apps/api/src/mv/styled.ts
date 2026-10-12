@@ -15,6 +15,19 @@ const log = new Logger('MvStyled');
 const API = 'https://api.runware.ai/v1';
 
 export const SEEDREAM = 'bytedance:seedream@5.0-pro';
+/**
+ * A picture model that reads reference pictures (Model scout s02, 2026-10-12, Runware's own cost):
+ * Seedream 5.0 Pro ~9 yen a picture; FLUX.2 [klein] 4B 0.19 yen, 9B 0.37 yen; Qwen-Image 2.1 Turbo
+ * 2.1 yen — all kept KIMORIN. `single` / `sheet` = picture sizes (one scene / a 2x2 sheet).
+ */
+export type Painter = { model: string; single: number; sheet: number; maxRefs: number };
+export const SEEDREAM_PAINTER: Painter = { model: SEEDREAM, single: 1536, sheet: 1536, maxRefs: 10 };
+export const PAINTERS: Record<string, Painter> = {
+  seedream: SEEDREAM_PAINTER,
+  'klein-4b': { model: 'runware:400@4', single: 1024, sheet: 1440, maxRefs: 4 },
+  'klein-9b': { model: 'runware:400@2', single: 1024, sheet: 1440, maxRefs: 4 },
+  'qwen-turbo': { model: 'alibaba:qwen-image@2.1-turbo', single: 1024, sheet: 1440, maxRefs: 3 },
+};
 /** found once with Runware's modelSearch when not given (MV_CHIBI_MODEL) */
 const CHIBI_SEARCH = 'Animagine XL 4.0';
 // MV lab m06: "super deformed" alone gave wallpaper collages of many faces and spiky mecha looks →
@@ -215,14 +228,14 @@ export async function photoAnime(
   photos: { photo: Buffer; caption: string }[],
   hero: Buffer | null,
   /** which photos Seedream redraws (~7 yen each); the rest go to Animagine img2img (~0.3 yen). All when omitted. */
-  opt: { seedream?: number[]; heroLook?: string; strength?: number; seed?: number; grid?: boolean } = {},
+  opt: { seedream?: number[]; heroLook?: string; strength?: number; seed?: number; grid?: boolean; model?: Painter } = {},
 ): Promise<(Buffer | null)[]> {
   painter.lastCostUsd = 0;
-  if (opt.grid) return seedreamSheets(painter, photos, hero);
+  if (opt.grid) return seedreamSheets(painter, photos, hero, opt.model);
   const keyAt = new Set(opt.seedream ?? photos.map((_, k) => k));
   const cheapAt = photos.map((_, k) => k).filter((k) => !keyAt.has(k));
   const [keys, cheap] = await Promise.all([
-    seedreamPhotos(painter, photos.filter((_, k) => keyAt.has(k)), hero),
+    seedreamPhotos(painter, photos.filter((_, k) => keyAt.has(k)), hero, opt.model),
     cheapAt.length ? animaginePhotos(painter, cheapAt.map((k) => photos[k]), hero, opt) : Promise.resolve([] as (Buffer | null)[]),
   ]);
   let a = 0;
@@ -291,7 +304,7 @@ const WALK_SHOTS = [
   'Camera: side tracking shot, the character strolling past and looking around in wonder.',
 ];
 
-async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER): Promise<(Buffer | null)[]> {
   if (!photos.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
@@ -301,7 +314,7 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
     photos.map(async (p) => ({
       taskType: 'imageInference',
       taskUUID: randomUUID(),
-      model: SEEDREAM,
+      model: m.model,
       // the hero is the traveller (client 2026-10-11: KIMORIN travels Busan, eats the food in the
       // photos, wanders the streets) — exactly one of them in every picture, never two
       positivePrompt: [
@@ -315,13 +328,13 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
       ]
         .filter(Boolean)
         .join(' '),
-      width: 1536,
-      height: 1536,
+      width: m.single,
+      height: m.single,
       numberResults: 1,
       outputType: 'URL',
       outputFormat: 'JPG',
       includeCost: true,
-      referenceImages: [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])],
+      referenceImages: [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])].slice(0, m.maxRefs),
     })),
   );
   return painter.run(tasks);
@@ -334,7 +347,7 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
  * A scene is a photo to redraw (photo MV) or words (story MV). A short last sheet repeats earlier
  * scenes in its empty panels (the same price either way) and drops them.
  */
-export async function seedreamSheets(painter: StyledPainter, items: { caption: string; photo?: Buffer }[], hero: Buffer | null): Promise<(Buffer | null)[]> {
+export async function seedreamSheets(painter: StyledPainter, items: { caption: string; photo?: Buffer }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER): Promise<(Buffer | null)[]> {
   if (!items.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 86 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
@@ -358,7 +371,7 @@ export async function seedreamSheets(painter: StyledPainter, items: { caption: s
       return {
         taskType: 'imageInference',
         taskUUID: randomUUID(),
-        model: SEEDREAM,
+        model: m.model,
         positivePrompt: [
           'A 2x2 sheet of four separate square stills from the same high-end Japanese anime film, four equal panels split by thin straight white gutters, each panel a complete picture on its own, all in the same 2D anime style (no photographic parts).',
           ...panels,
@@ -370,13 +383,13 @@ export async function seedreamSheets(painter: StyledPainter, items: { caption: s
           .filter(Boolean)
           .join(' ')
           .slice(0, 3000),
-        width: 1536,
-        height: 1536,
+        width: m.sheet,
+        height: m.sheet,
         numberResults: 1,
         outputType: 'URL',
         outputFormat: 'JPG',
         includeCost: true,
-        ...(refs.length ? { referenceImages: refs } : {}),
+        ...(refs.length ? { referenceImages: refs.slice(0, m.maxRefs) } : {}),
       };
     }),
   );

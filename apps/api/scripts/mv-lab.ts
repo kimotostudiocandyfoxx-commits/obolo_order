@@ -17,7 +17,7 @@ import { DepthModel } from '../src/mv/depth';
 import { addParallax } from '../src/mv/parallax';
 import { burnLyrics, renderMv } from '../src/mv/render';
 import { describeHero, isHuman, planStory, storyToPlan } from '../src/mv/storyboard';
-import { photoAnime, StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
+import { PAINTERS, photoAnime, StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
 import type { StoryPlan } from '../src/mv/storyboard';
 import { Stylizer } from '../src/mv/stylize';
 
@@ -32,6 +32,8 @@ type Case = {
   keys?: number;
   /** img2img strength for the cheap photos (0..1, higher = further from the photo) */
   strength?: number;
+  /** photo MV: which picture model paints (styled.ts PAINTERS: seedream, klein-4b, klein-9b, qwen-turbo) */
+  model?: string;
   /** override the round's parallax / lyrics for this case */
   parallax?: boolean;
   lyrics?: boolean;
@@ -248,6 +250,7 @@ async function main() {
             heroLook: hero,
             strength: c.strength,
             grid: c.photoMode === 'grid',
+            model: c.model ? PAINTERS[c.model] : undefined,
             seed: Math.floor(Math.random() * 2 ** 31),
           })
         : round.painter === 'styled'

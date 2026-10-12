@@ -1,6 +1,6 @@
 {
-  "round": "m13-busan-depth",
-  "note": "奥行きの動き＋かっこいい歌詞の試験：flat = 4コマ方式の絵をそのまま（今まで通りの動き・歌詞なし）、depth = 同じ絵に奥行きの動き（ジェミニがカメラを決める）と1文字ずつ出る歌詞。絵代は flat の1回だけ。",
+  "round": "m14-busan-cheap-models",
+  "note": "Seedream をやめる試験：FLUX.2 klein 4B（1枚0.2円）/ 9B（0.4円）で写真1枚ずつ、Qwen-Image 2.1 Turbo（2円）で4コマ。どれも奥行きの動き＋新しい歌詞つき。前回の Seedream 4コマ版（約37円・6.4/6.0）と比べる。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
@@ -8,20 +8,31 @@
   "side": 768,
   "cases": [
     {
-      "id": "flat",
+      "id": "klein4b",
       "song": "best:busan-kpop",
       "photos": "art/lab/busan/photos.json",
-      "photoMode": "grid",
-      "parallax": false,
-      "lyrics": false
+      "parallax": true,
+      "lyrics": true,
+      "photoMode": "seedream",
+      "model": "klein-4b"
     },
     {
-      "id": "depth",
+      "id": "klein9b",
       "song": "best:busan-kpop",
       "photos": "art/lab/busan/photos.json",
-      "stills": "art/lab/mv/m13-busan-depth/flat-stills",
       "parallax": true,
-      "lyrics": true
+      "lyrics": true,
+      "photoMode": "seedream",
+      "model": "klein-9b"
+    },
+    {
+      "id": "qwen-grid",
+      "song": "best:busan-kpop",
+      "photos": "art/lab/busan/photos.json",
+      "parallax": true,
+      "lyrics": true,
+      "photoMode": "grid",
+      "model": "qwen-turbo"
     }
   ],
   "heroRef": 0.6
