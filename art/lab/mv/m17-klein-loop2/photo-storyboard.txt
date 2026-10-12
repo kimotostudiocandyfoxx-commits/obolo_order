@@ -1,0 +1,14 @@
+style: anime film
+1. 3.8s [hero] zoom-in/NONE: waking up in a hotel room, big window with a bright morning view of the Busan sea, ships and a cable car, sunlight on white sheets
+2. 3.8s [hero] pan-left/NONE: walking along Songdo beach, wide sandy beach, tall glass towers, dramatic clouds, sea breeze
+3. 3.8s [hero] zoom-out/NONE: a cosy Korean breakfast: seaweed soup bubbling in a black stone pot, a pot of rice and little side dishes
+4. 3.8s [hero] pan-right/NONE: the fish market: big glass tanks full of king crabs and snow crabs, bright blue water
+5. 3.8s [hero] zoom-in/NONE: a feast of soy-marinated raw crab (ganjang gejang) with green chilli, a bowl of rice with egg yolk and roe, side dishes
+6. 3.8s [hero] pan-left/NONE: a Korean street-food stall: crispy fried chicken skin piled high and corn dogs, glowing red-and-black signs
+7. 3.8s [hero] zoom-out/SPEED_LINES: Nampo-dong shopping street at dusk, neon signs, crowds, a deep blue evening sky
+8. 3.8s [hero] pan-right/NONE: a huge plate of Korean fried chicken, glossy soy-garlic and spicy green-chilli sauces
+9. 3.8s [hero] zoom-in/NONE: sweet shrimp on ice, fresh sea urchin, crispy fried shrimp heads and a little stew pot on a fire
+10. 3.8s [hero] pan-left/SPEED_LINES: a small stew pot over a candle flame at night, glazed shrimp and grilled tofu, a cold glass of fizzy drink
+11. 3.8s [hero] zoom-out/NONE: a steaming bowl of Busan pork-and-rice soup (dwaeji gukbap), sliced pork, chives and lettuce
+12. 3.8s [hero] pan-right/NONE: spicy soft tofu stew bubbling red in a stone pot, purple rice in a hot stone bowl
+13. 3.8s [hero] zoom-in/SPEED_LINES: back home: a bowl of mixed noodles with chashu and a rice box, a happy last meal of the trip
