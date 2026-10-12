@@ -1,0 +1,1149 @@
+{
+  "round": "r09-tempo",
+  "avg": {
+    "overall": 5.8,
+    "vocalNaturalness": 5.7,
+    "pitch": 6.3,
+    "diction": 5.9,
+    "melody": 6.1,
+    "arrangement": 5.5,
+    "mix": 6,
+    "genreFit": 5.5,
+    "artifacts": 5.8
+  },
+  "byVariant": [
+    {
+      "name": "base",
+      "avg": {
+        "overall": 5.8,
+        "vocalNaturalness": 5.8,
+        "pitch": 6.1,
+        "diction": 5.7,
+        "melody": 6,
+        "arrangement": 5.6,
+        "mix": 5.9,
+        "genreFit": 5.9,
+        "artifacts": 5.4
+      }
+    },
+    {
+      "name": "bpm115",
+      "avg": {
+        "overall": 5.8,
+        "vocalNaturalness": 5.5,
+        "pitch": 6.5,
+        "diction": 5.4,
+        "melody": 6.3,
+        "arrangement": 5.7,
+        "mix": 6.2,
+        "genreFit": 5.6,
+        "artifacts": 5.9
+      }
+    },
+    {
+      "name": "x1.1",
+      "avg": {
+        "overall": 5.8,
+        "vocalNaturalness": 5.9,
+        "pitch": 6.2,
+        "diction": 5.7,
+        "melody": 6,
+        "arrangement": 5.4,
+        "mix": 6,
+        "genreFit": 5.5,
+        "artifacts": 6.1
+      }
+    },
+    {
+      "name": "x1.2",
+      "avg": {
+        "overall": 5.7,
+        "vocalNaturalness": 5.7,
+        "pitch": 6.5,
+        "diction": 6.7,
+        "melody": 6.3,
+        "arrangement": 5.5,
+        "mix": 6,
+        "genreFit": 5.1,
+        "artifacts": 5.8
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "busan-kpop~base",
+      "variant": "base",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.636,
+          "text": "朝の末夜 窓いっぱい飲み 袖の砂に足預けて 中に頃 ジュッパーのざわめき ガンジャンケジャン一口で恋し ちんちゃまましそう止まらない メオンのナナパッド 夜はこれから 時計を勝手に笑い合おうご視聴ありがとうございました"
+        },
+        {
+          "score": 0.652,
+          "text": "朝ののかゆめ 窓いっぱいの海 そのの砂に足へ続けてる 身がおぼる 白羽の騒めき 勘じゃん 賢じゃん 一口で恋した小さましそう 止まらない ネオンの七度と 夜はこれが ジーンを片手に笑い合おうme"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/busan-kpop~base.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の釜山 窓いっぱいの海",
+          "start": 0.32,
+          "end": 3.92
+        },
+        {
+          "text": "ソンドの砂に 足あとつけて",
+          "start": 4,
+          "end": 7.84
+        },
+        {
+          "text": "カニがおどる 市場のざわめき",
+          "start": 7.92,
+          "end": 11.68
+        },
+        {
+          "text": "カンジャンケジャン 一口で恋した",
+          "start": 11.76,
+          "end": 15.52
+        },
+        {
+          "text": "チンチャ マシッソ 止まらない",
+          "start": 16,
+          "end": 19.2
+        },
+        {
+          "text": "ネオンの南浦洞 夜はこれから",
+          "start": 19.28,
+          "end": 23.44
+        },
+        {
+          "text": "チキンを片手に 笑い合おう",
+          "start": 23.52,
+          "end": 27.04
+        },
+        {
+          "text": "釜山 また会いに来るよ",
+          "start": 27.12,
+          "end": 48.32
+        }
+      ],
+      "seconds": 48.8,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 121.2,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 130,
+      "lines": 8,
+      "lufs": -13.5,
+      "truePeak": -1.2,
+      "silenceSec": 1.7,
+      "judge": {
+        "vocalNaturalness": 5.5,
+        "pitch": 6.2,
+        "diction": 6.4,
+        "melody": 6,
+        "arrangement": 5.2,
+        "mix": 5.8,
+        "genreFit": 4.8,
+        "artifacts": 5.8,
+        "overall": 5.6,
+        "problems": [
+          "0:00-0:30 Vocal style is cute melodic idol singing rather than the requested cool Japanese rap flow.",
+          "0:31-0:48 Track transitions into an extended instrumental drop and cuts off abruptly without an outro."
+        ],
+        "fixIdeas": [
+          "Add rap and spoken-flow descriptors while reducing kawaii/anime vocal style tags.",
+          "Adjust structural prompts to generate a definitive ending instead of trailing off."
+        ],
+        "heard": "あさのぷさん まどいっぱいのうみ そんどのすなに あしあとつけて かにがおどる いちばのざわめき かんじゃんけじゃん ひとくちでこいした ちんちゃましっそ とまらない ねおんのなんぽどん よるはこれから ちきんをかたてに わらいあおう ぷさん またあいにくるよ"
+      },
+      "sent": {
+        "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, japanese rap vocal, rhythmic flow, clear diction, every word pronounced",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の釜山 窓いっぱいの海"
+          },
+          {
+            "section": "verse",
+            "text": "ソンドの砂に 足あとつけて"
+          },
+          {
+            "section": "verse",
+            "text": "カニがおどる 市場のざわめき"
+          },
+          {
+            "section": "verse",
+            "text": "カンジャンケジャン 一口で恋した"
+          },
+          {
+            "section": "chorus",
+            "text": "チンチャ マシッソ 止まらない"
+          },
+          {
+            "section": "chorus",
+            "text": "ネオンの南浦洞 夜はこれから"
+          },
+          {
+            "section": "chorus",
+            "text": "チキンを片手に 笑い合おう"
+          },
+          {
+            "section": "chorus",
+            "text": "釜山 また会いに来るよ"
+          }
+        ],
+        "seconds": 48.8,
+        "bpm": 128,
+        "keyRoot": 6,
+        "scale": "minor",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "busan-kpop~bpm115",
+      "variant": "bpm115",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.545,
+          "text": "朝の博多に彷徨いっぱいのってそのボーナーにスイーバーのざわめき人血で残した死者なしそこまらないレオンはこれからジッキンを片手に笑い合おうさままたいにくるよ次回予告"
+        },
+        {
+          "score": 0.011,
+          "text": "ララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララララ"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/busan-kpop~bpm115.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の釜山 窓いっぱいの海",
+          "start": 0.32,
+          "end": 6.72
+        },
+        {
+          "text": "ソンドの砂に 足あとつけて",
+          "start": 6.8,
+          "end": 8.24
+        },
+        {
+          "text": "カニがおどる 市場のざわめき",
+          "start": 8.24,
+          "end": 10.8
+        },
+        {
+          "text": "カンジャンケジャン 一口で恋した",
+          "start": 10.88,
+          "end": 13.68
+        },
+        {
+          "text": "チンチャ マシッソ 止まらない",
+          "start": 15.68,
+          "end": 18
+        },
+        {
+          "text": "ネオンの南浦洞 夜はこれから",
+          "start": 18.08,
+          "end": 21.44
+        },
+        {
+          "text": "チキンを片手に 笑い合おう",
+          "start": 21.52,
+          "end": 24.8
+        },
+        {
+          "text": "釜山 また会いに来るよ",
+          "start": 24.88,
+          "end": 48.32
+        }
+      ],
+      "seconds": 48.8,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 45.6,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 55,
+      "lines": 8,
+      "lufs": -13.7,
+      "truePeak": 0.4,
+      "silenceSec": 1.9,
+      "judge": {
+        "vocalNaturalness": 5.2,
+        "pitch": 6.1,
+        "diction": 4.8,
+        "melody": 5.8,
+        "arrangement": 5.2,
+        "mix": 5.9,
+        "genreFit": 5.4,
+        "artifacts": 5.1,
+        "overall": 5.4,
+        "problems": [
+          "0:06-0:11 歌詞の一部が脱落し混ざっている",
+          "0:27-0:48 後半がボーカルチョップの繰り返しになり末尾が無音で終わる"
+        ],
+        "fixIdeas": [
+          "テンポ設定を少し抑えて歌詞の詰め込みと滑舌崩れを防ぐ",
+          "セクション構成プロンプトを整理してアウトロまで展開を持たせる"
+        ],
+        "heard": "あさのぷさんまどいっぱいのうみそんどのすなにしーばのざわめきひとくちでこいしたちんちゃましっそとまらないねおんのわこれからちきんをかたてにわらいあおうぷさんまたあいにくるよ"
+      },
+      "sent": {
+        "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, japanese rap vocal, rhythmic flow, clear diction, every word pronounced",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の釜山 窓いっぱいの海"
+          },
+          {
+            "section": "verse",
+            "text": "ソンドの砂に 足あとつけて"
+          },
+          {
+            "section": "verse",
+            "text": "カニがおどる 市場のざわめき"
+          },
+          {
+            "section": "verse",
+            "text": "カンジャンケジャン 一口で恋した"
+          },
+          {
+            "section": "chorus",
+            "text": "チンチャ マシッソ 止まらない"
+          },
+          {
+            "section": "chorus",
+            "text": "ネオンの南浦洞 夜はこれから"
+          },
+          {
+            "section": "chorus",
+            "text": "チキンを片手に 笑い合おう"
+          },
+          {
+            "section": "chorus",
+            "text": "釜山 また会いに来るよ"
+          }
+        ],
+        "seconds": 48.8,
+        "bpm": 147,
+        "keyRoot": 6,
+        "scale": "minor",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "busan-kpop~x1.1",
+      "variant": "x1.1",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.56,
+          "text": "朝の発車の窓いっぱいの海 損倒の寸れに足熱つける カニが踊るさずばのざわめき 勘弱 キルチャンひとひちで恋しば 沈ましそっとまらない 目を乗るなペトッド夜はこれから 地次を蹴ってみ笑い合おうはいよ大山 また会いに来るよ"
+        },
+        {
+          "score": 0.373,
+          "text": "風の山に 馬がいっぱい乗る 鮮魚の砂に足跡 ガンディーが踊る 背とばのざわめき カンジャンケチャン 人事で恋したme"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/busan-kpop~x1.1.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の釜山 窓いっぱいの海",
+          "start": 0.14545454545454545,
+          "end": 3.5636363636363635
+        },
+        {
+          "text": "ソンドの砂に 足あとつけて",
+          "start": 3.6363636363636362,
+          "end": 6.763636363636364
+        },
+        {
+          "text": "カニがおどる 市場のざわめき",
+          "start": 6.836363636363635,
+          "end": 10.545454545454545
+        },
+        {
+          "text": "カンジャンケジャン 一口で恋した",
+          "start": 10.618181818181817,
+          "end": 13.818181818181817
+        },
+        {
+          "text": "チンチャ マシッソ 止まらない",
+          "start": 14.109090909090908,
+          "end": 17.381818181818183
+        },
+        {
+          "text": "ネオンの南浦洞 夜はこれから",
+          "start": 17.454545454545453,
+          "end": 21.09090909090909
+        },
+        {
+          "text": "チキンを片手に 笑い合おう",
+          "start": 21.163636363636364,
+          "end": 24.218181818181815
+        },
+        {
+          "text": "釜山 また会いに来るよ",
+          "start": 24.29090909090909,
+          "end": 43.92727272727272
+        }
+      ],
+      "seconds": 44.4,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 44.2,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 53,
+      "lines": 8,
+      "lufs": -15,
+      "truePeak": -0.2,
+      "silenceSec": 1.9,
+      "judge": {
+        "vocalNaturalness": 5.8,
+        "pitch": 6.3,
+        "diction": 6.4,
+        "melody": 6,
+        "arrangement": 4.8,
+        "mix": 5.9,
+        "genreFit": 5,
+        "artifacts": 6.2,
+        "overall": 5.5,
+        "problems": [
+          "0:28 - Vocals cut off completely, leaving a repetitive instrumental loop to the end.",
+          "0:00 - Style is upbeat cute idol-pop singing rather than the requested K-pop rap flow."
+        ],
+        "fixIdeas": [
+          "Prompt explicitly for rap cadence, cadence timing, and rhythmic delivery.",
+          "Balance section durations to avoid dead instrumental sections after verse/chorus."
+        ],
+        "heard": "あさのぷさん まどいっぱいのうみ そんどのすなに あしあとつけて かにがおどる いちばのざわめき かんじゃんけじゃん ひとくちでこいした ちんちゃましっそ とまらない ねおんのなんぽど よるはこれから ちきんをかたてに わらいあおう ぷさん またあいにくるよ"
+      },
+      "sent": {
+        "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, japanese rap vocal, rhythmic flow, clear diction, every word pronounced",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の釜山 窓いっぱいの海"
+          },
+          {
+            "section": "verse",
+            "text": "ソンドの砂に 足あとつけて"
+          },
+          {
+            "section": "verse",
+            "text": "カニがおどる 市場のざわめき"
+          },
+          {
+            "section": "verse",
+            "text": "カンジャンケジャン 一口で恋した"
+          },
+          {
+            "section": "chorus",
+            "text": "チンチャ マシッソ 止まらない"
+          },
+          {
+            "section": "chorus",
+            "text": "ネオンの南浦洞 夜はこれから"
+          },
+          {
+            "section": "chorus",
+            "text": "チキンを片手に 笑い合おう"
+          },
+          {
+            "section": "chorus",
+            "text": "釜山 また会いに来るよ"
+          }
+        ],
+        "seconds": 48.8,
+        "bpm": 128,
+        "keyRoot": 6,
+        "scale": "minor",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "busan-kpop~x1.2",
+      "variant": "x1.2",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.624,
+          "text": "朝の小山といっぱいの海 ソノの砂に足跡つけて カニが踊る 唾のざわめき カンジャンキッチャン ひとこちで恋した 神社のシステム止まらない レオンのみなププトヨはこれから チ地金を片手にわいわいあお 立ち止まるなら 会いに行くよ"
+        },
+        {
+          "score": 0.6,
+          "text": "朝の空白山の一杯の 山道の空にカニが踊る スバのざわめきカンちゃん ゲーちゃん ひとこっちで恋したちっちゃわしそう そっとまらないでオンの並ぶと 夜はこれがチキンの片手に笑い白車もまた会いに来るよ"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/busan-kpop~x1.2.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の釜山 窓いっぱいの海",
+          "start": 0.13333333333333333,
+          "end": 3.066666666666667
+        },
+        {
+          "text": "ソンドの砂に 足あとつけて",
+          "start": 3.1333333333333333,
+          "end": 6.266666666666667
+        },
+        {
+          "text": "カニがおどる 市場のざわめき",
+          "start": 6.333333333333333,
+          "end": 9.466666666666667
+        },
+        {
+          "text": "カンジャンケジャン 一口で恋した",
+          "start": 9.533333333333333,
+          "end": 12.6
+        },
+        {
+          "text": "チンチャ マシッソ 止まらない",
+          "start": 13.266666666666667,
+          "end": 16
+        },
+        {
+          "text": "ネオンの南浦洞 夜はこれから",
+          "start": 16.06666666666667,
+          "end": 19
+        },
+        {
+          "text": "チキンを片手に 笑い合おう",
+          "start": 19.066666666666666,
+          "end": 23.066666666666666
+        },
+        {
+          "text": "釜山 また会いに来るよ",
+          "start": 23.133333333333336,
+          "end": 40.2
+        }
+      ],
+      "seconds": 40.7,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 44.6,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 54,
+      "lines": 8,
+      "lufs": -13.1,
+      "truePeak": -0.9,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5.5,
+        "pitch": 6.5,
+        "diction": 6.5,
+        "melody": 6,
+        "arrangement": 5.5,
+        "mix": 6,
+        "genreFit": 5,
+        "artifacts": 6,
+        "overall": 5.5,
+        "problems": [
+          "0:10 カンジャンケジャン付近の滑舌が早口でやや不明瞭",
+          "0:26 後半がボーカルなしのシンセドロップのみで展開が偏っている"
+        ],
+        "fixIdeas": [
+          "ラップスタイルを指示してBPMを抑えリズムのメリハリをつける",
+          "コーラスのボーカルパートを後半まで配置する構成にする"
+        ],
+        "heard": "あさのぷさん まどいっぱいのうみ そんどのすなに あしあとつけて かにがおどる いちばのざわめき かんじゃんけじゃん ひとくちでこいした ちんちゃましっそ とまらない ねおんのなんぽど よるはこれから ちきんをかたてに わらいあおう ぷさん またあいにくるよ"
+      },
+      "sent": {
+        "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, japanese rap vocal, rhythmic flow, clear diction, every word pronounced",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の釜山 窓いっぱいの海"
+          },
+          {
+            "section": "verse",
+            "text": "ソンドの砂に 足あとつけて"
+          },
+          {
+            "section": "verse",
+            "text": "カニがおどる 市場のざわめき"
+          },
+          {
+            "section": "verse",
+            "text": "カンジャンケジャン 一口で恋した"
+          },
+          {
+            "section": "chorus",
+            "text": "チンチャ マシッソ 止まらない"
+          },
+          {
+            "section": "chorus",
+            "text": "ネオンの南浦洞 夜はこれから"
+          },
+          {
+            "section": "chorus",
+            "text": "チキンを片手に 笑い合おう"
+          },
+          {
+            "section": "chorus",
+            "text": "釜山 また会いに来るよ"
+          }
+        ],
+        "seconds": 48.8,
+        "bpm": 128,
+        "keyRoot": 6,
+        "scale": "minor",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "mercury-pop~base",
+      "variant": "base",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.544,
+          "text": "朝の光が窓を叩くまだ眠い目をこすりながら君の声が聞こえた気がして僕は小さく笑ってんだme"
+        },
+        {
+          "score": 0.563,
+          "text": "朝の光が窓を叩くまだ眠い目をこすりながら君の声が聞こえ気がして僕は小さく笑ってみたme"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/mercury-pop~base.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0.48,
+          "end": 14.547
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 14.627,
+          "end": 19.183
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 19.263,
+          "end": 24.458
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 24.538,
+          "end": 28.455
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 28.854,
+          "end": 35.249
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 35.249,
+          "end": 37.647
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 37.726,
+          "end": 39.005
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 39.005,
+          "end": 42.362
+        }
+      ],
+      "seconds": 45,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 40.8,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 49,
+      "lines": 8,
+      "lufs": -12.8,
+      "truePeak": -1.5,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 6,
+        "pitch": 6,
+        "diction": 5,
+        "melody": 6,
+        "arrangement": 6,
+        "mix": 6,
+        "genreFit": 7,
+        "artifacts": 5,
+        "overall": 6,
+        "problems": [
+          "00:31-00:44: Chorus lyrics diverge significantly from the prompt, skipping lines and altering order.",
+          "00:35-00:38: Vocal phrasing becomes slurred and garbled around the pocket line."
+        ],
+        "fixIdeas": [
+          "Adjust section tags and syllabic spacing to prevent lyric skipping in the chorus.",
+          "Regenerate with a new seed to resolve phrasing blur in the transition."
+        ],
+        "heard": "あさのひかりが まどをたたく まだねむいめを こすりながら きみのこえが きこえたきがして ぼくはちいさく わらってみた はしりだそう ぽけっとにつまえ ちいさな きっとはれるよ"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 100,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "mercury-pop~bpm115",
+      "variant": "bpm115",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.531,
+          "text": "流れが窓を叩く まだに目をこすりながら君の声が 声がきこら気がし僕は小さく笑ってみた走り出そう 店の空へme"
+        },
+        {
+          "score": 0.47,
+          "text": "朝の光が間を叩く まだ眠い目をこすりながら君の声が聞こえた気がして 僕は手にいたme"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/mercury-pop~bpm115.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0,
+          "end": 0
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 0,
+          "end": 0
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 0,
+          "end": 18.623
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 18.703,
+          "end": 25.337
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 25.737,
+          "end": 30.773
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 30.853,
+          "end": 34.849
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 34.929,
+          "end": 40.284
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 40.284,
+          "end": 44.041
+        }
+      ],
+      "seconds": 45,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 41.3,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 49,
+      "lines": 8,
+      "lufs": -12.9,
+      "truePeak": -2.1,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5.8,
+        "pitch": 6.8,
+        "diction": 5.9,
+        "melody": 6.7,
+        "arrangement": 6.2,
+        "mix": 6.4,
+        "genreFit": 5.8,
+        "artifacts": 6.6,
+        "overall": 6.2,
+        "problems": [
+          "00:09 missed 'あさの' in lyrics",
+          "00:18 stuttered phrase 'こえが'",
+          "00:00 synth-pop instrumentation outweighs acoustic elements"
+        ],
+        "fixIdeas": [
+          "Prompt acoustic guitar and piano more heavily over synth leads",
+          "Adjust phonetic spacing to prevent repeated words"
+        ],
+        "heard": "あかりが まどをたたく まだねむいめを こすりながら きみのこえが こえがきこえたきがして ぼくはちいさく わらってみた はしりだそう すいせいのそらへ ちいさなゆめを ぽけっとにつめて きみとうたえば こわくないよ あしたはきっと はれるから"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 115,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "mercury-pop~x1.1",
+      "variant": "x1.1",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.439,
+          "text": "窓を立てるまだない目をこすり長く君の声が聞こえた気がした僕は小さく笑ってみたme"
+        },
+        {
+          "score": 0.725,
+          "text": "朝の瓦礫が窓叩くまだ眠い目を擦りながら声が聞こえてきたく僕は小さく笑ってみた走り出そう 理性の空で小さな夢をボケに詰めて君と誰か怖くないよ明日はきっと晴れるから"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/mercury-pop~x1.1.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0.4363636363636363,
+          "end": 4.36
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 4.432727272727273,
+          "end": 8.719090909090907
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 8.791818181818181,
+          "end": 13.224545454545455
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 13.297272727272727,
+          "end": 17.366363636363637
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 17.73,
+          "end": 22.16181818181818
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 22.16181818181818,
+          "end": 25.940909090909088
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 26.01363636363636,
+          "end": 32.33454545454545
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 32.33454545454545,
+          "end": 34.805454545454545
+        }
+      ],
+      "seconds": 40.9,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 41.1,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 49,
+      "lines": 8,
+      "lufs": -13,
+      "truePeak": -1.4,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 6,
+        "pitch": 6,
+        "diction": 5,
+        "melody": 6,
+        "arrangement": 6,
+        "mix": 6,
+        "genreFit": 6,
+        "artifacts": 6,
+        "overall": 6,
+        "problems": [
+          "00:09 'きみの' is omitted or unclear before '声が'",
+          "00:20 '水星の空へ' is mispronounced as 'みせのそらへ'"
+        ],
+        "fixIdeas": [
+          "Provide phonetic hiragana in prompt to prevent misreading kanji",
+          "Reroll segment to ensure all lyrics in the verse are vocalized"
+        ],
+        "heard": "あさのひかりがまどをたたく まだねむいめをこすりながら こえがきこえたきがして ぼくはちいさくわらってみた はしりだそうみせのそらへ ちいさなゆめをぽけっとにつめて きみとうたえばこわくないよ あしたはきっとはれるから"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 100,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "outro": true
+      }
+    },
+    {
+      "id": "mercury-pop~x1.2",
+      "variant": "x1.2",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.513,
+          "text": "明日の光が窓を叩くまだ眠い目をこすりながら君の声が聞こえた気がして僕はチークあってみた走り出そう見せるご視聴ありがとうございました"
+        },
+        {
+          "score": 0.752,
+          "text": "朝の光が窓を叩く まだ眠い目をこすりながら君の声が聞こえた気がして僕は小さく笑ってみたい走り出そう水星の空へ小さな夢をポケットに詰め"
+        }
+      ],
+      "file": "art/lab/studio/r09-tempo/mercury-pop~x1.2.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0.4,
+          "end": 12.455833333333333
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 12.522499999999999,
+          "end": 16.18583333333333
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 16.2525,
+          "end": 20.448333333333334
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 20.448333333333334,
+          "end": 24.245
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 24.445,
+          "end": 28.375
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 28.44166666666667,
+          "end": 31.83833333333334
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 31.83833333333334,
+          "end": 36.634166666666665
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 36.700833333333335,
+          "end": 37.233333333333334
+        }
+      ],
+      "seconds": 37.5,
+      "voiced": false,
+      "voiceNote": "no voice sent",
+      "timings": {
+        "song": 41.7,
+        "split": 0,
+        "voice": 0
+      },
+      "wall": 50,
+      "lines": 8,
+      "lufs": -13.9,
+      "truePeak": -1.4,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5.8,
+        "pitch": 6.4,
+        "diction": 6.8,
+        "melody": 6.5,
+        "arrangement": 5.4,
+        "mix": 6,
+        "genreFit": 5.2,
+        "artifacts": 5.5,
+        "overall": 5.8,
+        "problems": [
+          "0:25 - Synth-pop instrumentation diverges from requested acoustic guitar and piano setup.",
+          "0:32 - Chorus is abruptly cut short before completing the full lyric set.",
+          "0:12 - Vocal processing has a slight synthetic, metallic sheen."
+        ],
+        "fixIdeas": [
+          "Strengthen acoustic instrumentation prompts and reduce synth tags.",
+          "Adjust pacing or song structure to fit the entire lyrical section within the duration.",
+          "Apply gentle de-essing and EQ to soften artificial vocal top-end."
+        ],
+        "heard": "あさのひかりが まどをたたく まだねむいめを こすりながら きみのこえが きこえたきがして ぼくはちいさく わらってみた はしりだそう すいせいのそらへ ちいさなゆめを ぽけっとにつめて"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 100,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "outro": true
+      }
+    }
+  ]
+}
