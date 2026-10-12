@@ -16,6 +16,8 @@ export interface DjTrack {
   bpm: number | null;
   /** the song's MV, for the VJ (platter and the round screen) */
   videoUrl?: string | null;
+  /** the song's jacket: turns on the platter when there is no MV */
+  coverUrl?: string | null;
 }
 
 export function DjController({ songs = [], backHref }: { songs?: DjTrack[]; backHref?: string }) {

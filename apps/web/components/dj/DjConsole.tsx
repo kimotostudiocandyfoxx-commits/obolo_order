@@ -97,11 +97,26 @@ function useDeckVideo(deck: Deck) {
 }
 
 /** A video drawn to fill a square (cover), centred. */
-function cover(g: CanvasRenderingContext2D, v: HTMLVideoElement, S: number, zoom = 1) {
-  const w = v.videoWidth || 1;
-  const h = v.videoHeight || 1;
+function cover(g: CanvasRenderingContext2D, v: HTMLVideoElement | HTMLImageElement, S: number, zoom = 1) {
+  const w = ('videoWidth' in v ? v.videoWidth : v.naturalWidth) || 1;
+  const h = ('videoHeight' in v ? v.videoHeight : v.naturalHeight) || 1;
   const sc = (Math.max(S / w, S / h)) * zoom;
   g.drawImage(v, (S - w * sc) / 2, (S - h * sc) / 2, w * sc, h * sc);
+}
+
+/** Jackets, loaded once each; `onLoad` redraws whoever asked while it was still loading. */
+const COVER_IMAGES = new Map<string, HTMLImageElement>();
+function coverImage(url: string | null | undefined, onLoad: () => void): HTMLImageElement | null {
+  if (!url) return null;
+  let img = COVER_IMAGES.get(url);
+  if (!img) {
+    img = new Image();
+    img.src = url;
+    COVER_IMAGES.set(url, img);
+  }
+  if (img.complete && img.naturalWidth) return img;
+  img.addEventListener('load', onLoad, { once: true });
+  return null;
 }
 
 /** Put a child at (angle°, radius as a fraction of R) from a circle's centre (0° = right, 90° = down). */
@@ -193,10 +208,10 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   const at = (deg: number, r: number) => polar(D, i === 0 ? deg : 180 - deg, r);
   const b = Math.round(26 * k);
 
-  const load = async (data: ArrayBuffer, title: string, bpm: number | null, source: 'song' | 'file', videoUrl: string | null = null) => {
+  const load = async (data: ArrayBuffer, title: string, bpm: number | null, source: 'song' | 'file', videoUrl: string | null = null, coverUrl: string | null = null) => {
     setLoading(title);
     try {
-      await engine.load(i, data, { title, bpm, source, videoUrl });
+      await engine.load(i, data, { title, bpm, source, videoUrl, coverUrl });
     } finally {
       setLoading('');
     }
@@ -347,7 +362,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
               key={s.url}
               onClick={async () => {
                 setPick(false);
-                await load(await (await fetch(s.url)).arrayBuffer(), s.title, s.bpm, 'song', s.videoUrl ?? null);
+                await load(await (await fetch(s.url)).arrayBuffer(), s.title, s.bpm, 'song', s.videoUrl ?? null, s.coverUrl ?? null);
               }}
               className="block w-full truncate rounded px-2 py-2 text-left hover:bg-white/5"
             >
@@ -394,6 +409,7 @@ function Pill({ children, color, k, lit }: { children: ReactNode; color: string;
 function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1; angle: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const data = useRef(new Uint8Array(128));
+  const [, redraw] = useReducer((n: number) => n + 1, 0);
   useEffect(() => {
     const c = ref.current;
     if (!c) return;
@@ -419,6 +435,39 @@ function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1;
       g.beginPath();
       const a0 = (angle * Math.PI) / 180 - Math.PI / 2;
       g.arc(S / 2, S / 2, S / 2 - S / 80, a0 - 0.25, a0 + 0.25);
+      g.stroke();
+      g.globalAlpha = 1;
+      return;
+    }
+    const jacket = coverImage(deck.meta?.coverUrl, redraw);
+    if (jacket) {
+      // no MV: the jacket turns with the record, a spindle hole in the middle
+      g.save();
+      g.beginPath();
+      g.arc(S / 2, S / 2, S / 2, 0, Math.PI * 2);
+      g.clip();
+      g.translate(S / 2, S / 2);
+      g.rotate((angle * Math.PI) / 180);
+      g.translate(-S / 2, -S / 2);
+      cover(g, jacket, S);
+      g.restore();
+      // the grooves' sheen, brighter with the sound
+      g.strokeStyle = `rgba(0,0,0,${0.35 - level * 0.2})`;
+      g.lineWidth = S / 200;
+      for (let r = S * 0.2; r < S / 2; r += S / 40) {
+        g.beginPath();
+        g.arc(S / 2, S / 2, r, 0, Math.PI * 2);
+        g.stroke();
+      }
+      g.fillStyle = '#05080c';
+      g.beginPath();
+      g.arc(S / 2, S / 2, S * 0.04, 0, Math.PI * 2);
+      g.fill();
+      g.strokeStyle = DECK_COLOR[i];
+      g.lineWidth = S / 80;
+      g.globalAlpha = 0.5 + level * 0.5;
+      g.beginPath();
+      g.arc(S / 2, S / 2, S / 2 - S / 160, 0, Math.PI * 2);
       g.stroke();
       g.globalAlpha = 1;
       return;

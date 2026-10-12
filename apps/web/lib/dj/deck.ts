@@ -26,6 +26,8 @@ export interface TrackMeta {
   source: 'song' | 'file';
   /** the MV to show as VJ (later) */
   videoUrl?: string | null;
+  /** the jacket, turning on the platter when there is no MV */
+  coverUrl?: string | null;
 }
 
 export class Deck {

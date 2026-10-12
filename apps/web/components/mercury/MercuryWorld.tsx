@@ -12,6 +12,7 @@ import { ShipPlayer, type Flyer } from './ShipPlayer';
 import { atSea, hoursSince, useMercury } from '@/lib/mercury/state';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { synth } from '@/lib/synth';
+import { songCover } from '@/lib/songCover';
 
 /**
  * Mercury — the planet of music (client design 2026-10-05 v2, docs/mercury.md).
@@ -41,7 +42,6 @@ type SeaFlyer = Flyer & { owner: Who; title: string; sub?: string };
 
 /** A posted song as the sea / island show it (a record with an emoji until songs get covers). */
 const RECORD_EMOJI = ['🎵', '🎶', '🎤', '🎸', '🎹', '🥁', '🎧', '🎺'];
-const COVERS = ['moon', 'sakura', 'ocean', 'city', 'forest', 'candy', 'space', 'fire', 'rain', 'dawn'];
 const hash = (t: string) => [...t].reduce((n, c) => n + c.charCodeAt(0), 0);
 const songOf = (p: PlanetPostView): Song => ({
   id: p.id,
@@ -49,7 +49,7 @@ const songOf = (p: PlanetPostView): Song => ({
   artist: p.author.displayName || p.author.handle,
   emoji: RECORD_EMOJI[hash(p.id) % RECORD_EMOJI.length],
   // a painted cover (Art workshop) until songs get their own
-  cover: `${ART_BASE}/cover-${COVERS[hash(p.id) % COVERS.length]}.jpg`,
+  cover: songCover(p.id),
   hue: hash(p.author.id) % 360,
   seconds: Math.max(1, Math.round(p.seconds ?? 180)),
   preset: P(96, 60, 'major', [0, 4, 5, 3], 'triangle'),
