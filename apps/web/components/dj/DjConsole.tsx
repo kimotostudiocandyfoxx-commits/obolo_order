@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useReducer, useRef, useState, type CSSProperties, type PointerEvent as RPointerEvent, type ReactNode } from 'react';
 import { HOT_CUES, JUMP_SIZES, TEMPO_RANGE, type Deck } from '@/lib/dj/deck';
 import type { DjEngine } from '@/lib/dj/engine';
 import { FX_NAMES, FX_TYPES, type FxType } from '@/lib/dj/fx';
@@ -497,10 +497,10 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
       {/* the two waveforms across the top: deck A above, deck B below */}
       <div style={{ ...box(0, -0.6), width: D * 0.66 }} className="flex flex-col gap-0.5">
         {([0, 1] as const).map((i) => (
-          <div key={i}>
+          <WaveTouch key={i} deck={engine.decks[i]}>
             <TrackLine deck={engine.decks[i]} i={i} k={k} />
             <Wave deck={engine.decks[i]} h={16 * k} />
-          </div>
+          </WaveTouch>
         ))}
       </div>
       {/* EQ + filter, a column per deck */}
@@ -669,6 +669,51 @@ function TrackLine({ deck, i, k }: { deck: Deck; i: 0 | 1; k: number }) {
 }
 
 /** A deck's waveform around the playhead (±4 s), lows red, mids green, highs blue. */
+/**
+ * Touching a deck's waveform (client 2026-10-12): the finger holds the track (it stops), a swipe moves it
+ * — left = ahead (fast), right = back (rewind), with the sound following the finger — and letting go
+ * plays on as before. A quick tap with no swipe = play / stop.
+ */
+function WaveTouch({ deck, children }: { deck: Deck; children: ReactNode }) {
+  const st = useRef<{ x: number; t: number; t0: number; moved: boolean; id: number } | null>(null);
+  const down = (e: RPointerEvent<HTMLDivElement>) => {
+    if (st.current || !deck.buffer) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* a synthetic event has no pointer to capture */
+    }
+    st.current = { x: e.clientX, t: performance.now(), t0: performance.now(), moved: false, id: e.pointerId };
+    deck.jogStart(true);
+  };
+  const move = (e: RPointerEvent<HTMLDivElement>) => {
+    const s = st.current;
+    if (!s || e.pointerId !== s.id) return;
+    const dx = e.clientX - s.x;
+    if (!s.moved && Math.abs(dx) < 4) return;
+    s.moved = true;
+    const t = performance.now();
+    // the waveform shows WAVE_SPAN seconds across its width: the track moves with the finger
+    deck.jogMove((-dx / e.currentTarget.clientWidth) * WAVE_SPAN, (t - s.t) / 1000);
+    st.current = { ...s, x: e.clientX, t };
+  };
+  const up = (e: RPointerEvent<HTMLDivElement>) => {
+    const s = st.current;
+    if (!s || e.pointerId !== s.id) return;
+    st.current = null;
+    deck.jogEnd();
+    if (!s.moved && performance.now() - s.t0 < 300) deck.toggle();
+  };
+  return (
+    <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} className="select-none" style={{ touchAction: 'none' }}>
+      {children}
+    </div>
+  );
+}
+
+/** seconds of track across the waveform */
+const WAVE_SPAN = 8;
+
 function Wave({ deck, h }: { deck: Deck; h: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useDeck(deck);
@@ -680,7 +725,7 @@ function Wave({ deck, h }: { deck: Deck; h: number }) {
     const H = (c.height = c.clientHeight * devicePixelRatio);
     g.clearRect(0, 0, W, H);
     const p = deck.position();
-    const span = 8;
+    const span = WAVE_SPAN;
     const draw = (band: Float32Array, col: string, scale: number) => {
       g.fillStyle = col;
       for (let x = 0; x < W; x++) {

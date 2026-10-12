@@ -67,6 +67,7 @@ export class Deck {
   private at = { input: 0, ctx: 0 };
   private bend = 0;
   private scratch: { wasPlaying: boolean } | null = null;
+  private scratchHold: ReturnType<typeof setTimeout> | null = null;
   private cueHeld = false;
   private listeners = new Set<() => void>();
 
@@ -378,6 +379,12 @@ export class Deck {
       this.at = { input: p, ctx: this.ctx.currentTime };
       // a short burst of sound at the hand's speed (backwards by stepping the position back)
       void this.stretch.schedule({ active: speed > 0.05, input: Math.max(0, p), rate: Math.max(0.05, Math.min(4, speed)), semitones: this.keylock ? 0 : 12 * Math.log2(Math.max(0.05, Math.min(4, speed))) });
+      // the hand stops moving (no more events) → the sound stops too
+      if (this.scratchHold) clearTimeout(this.scratchHold);
+      this.scratchHold = setTimeout(() => {
+        this.scratchHold = null;
+        if (this.scratch) void this.stretch.schedule({ active: false, input: this.position() });
+      }, 80);
       this.emit();
     } else if (this.playing) {
       this.bend = Math.max(-0.3, Math.min(0.3, (seconds / Math.max(dt, 0.016)) * 0.25));
@@ -392,6 +399,8 @@ export class Deck {
     if (this.scratch) {
       const was = this.scratch.wasPlaying;
       this.scratch = null;
+      if (this.scratchHold) clearTimeout(this.scratchHold);
+      this.scratchHold = null;
       this.playing = was;
       this.send({ active: was });
     } else if (this.bend) {
