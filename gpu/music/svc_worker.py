@@ -41,7 +41,7 @@ def load():
     print(f"seed-vc ready in {time.time() - t:.0f}s on {inference.device}", flush=True)
 
 
-def convert(source: str, target: str, out: str, steps: int = 30, cfg: float = 0.7) -> dict:
+def convert(source: str, target: str, out: str, steps: int = 30, cfg: float = 0.7, lift: float = 0.0) -> dict:
     """The sung vocal `source` in the voice of `target` (pitch kept; moved by an octave if the
     reference voice sits far from it, so the song's key stays right)."""
     import librosa
@@ -93,7 +93,9 @@ def convert(source: str, target: str, out: str, steps: int = 30, cfg: float = 0.
         shift = 0
         v_ori, v_alt = f0_ori[f0_ori > 1], f0_alt[f0_alt > 1]
         if v_ori.numel() > 10 and v_alt.numel() > 10:
-            gap = 12 * float(torch.log2(torch.median(v_ori) / torch.median(v_alt)))
+            # `lift`: how far a spoken reference sits below the same person singing (semitones) —
+            # without it a man's speaking voice read as an octave under his singing (r10: -12 every time)
+            gap = 12 * float(torch.log2(torch.median(v_ori) / torch.median(v_alt))) + lift
             if abs(gap) >= 8:
                 shift = 12 if gap > 0 else -12
         shifted = f0_alt.clone()
@@ -197,7 +199,7 @@ class Handler(BaseHTTPRequestHandler):
                 if self.path.startswith("/transcribe"):
                     res = transcribe(req["path"], req.get("language", "ja"))
                 else:
-                    res = convert(req["source"], req["target"], req["out"], int(req.get("steps", 30)), float(req.get("cfg", 0.7)))
+                    res = convert(req["source"], req["target"], req["out"], int(req.get("steps", 30)), float(req.get("cfg", 0.7)), float(req.get("lift", 0)))
             self._send(200, res)
         except Exception as e:  # noqa: BLE001
             traceback.print_exc()

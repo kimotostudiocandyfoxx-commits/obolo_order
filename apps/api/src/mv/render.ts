@@ -256,7 +256,10 @@ function assFile(lines: LyricLine[]) {
       .join('');
   };
   const events: string[] = [];
-  for (const l of lines) {
+  for (const [i, raw] of lines.entries()) {
+    // a line leaves before the next one comes in (m17: "repeated subtitle text" — two lines on screen at once)
+    const next = lines[i + 1]?.t;
+    const l = next !== undefined && raw.end > next - 0.05 ? { ...raw, end: Math.max(raw.t + 0.3, next - 0.05) } : raw;
     const dur = Math.max(0.3, l.end - l.t);
     switch (l.effect) {
       case 'ZOOM_BURST':

@@ -1,8 +1,8 @@
 {
-  "round": "r10-voice",
-  "note": "声の似方の試験（2026-10-12）：同じ曲・同じ録音で ①今まで通りの下ごしらえ ②新しい下ごしらえ（雑音を減らす・間を詰める・音量をそろえる）③新しい下ごしらえ＋6秒だけの録音。likeness＝話者モデルで測った似ている度（試験用・アプリには出さない）。",
+  "round": "r11-voice-octave",
+  "note": "r10 で毎回「1オクターブ下げ」が起きていた（話し声は歌声より低いのに同じに比べていた）。オクターブ判定に話し声→歌声の差を足す：lift 0（今まで）/ 4 / 6 半音。どれが自然で似るか。下ごしらえは clean。",
   "needs": [
-    "voicePrep"
+    "voiceLift"
   ],
   "tune": {
     "outro": true
@@ -10,22 +10,24 @@
   "keepStems": false,
   "variants": [
     {
-      "name": "plain",
+      "name": "lift0",
       "tune": {
-        "voicePrep": "plain"
+        "voicePrep": "clean",
+        "voiceLift": 0
       }
     },
     {
-      "name": "clean",
+      "name": "lift4",
       "tune": {
-        "voicePrep": "clean"
+        "voicePrep": "clean",
+        "voiceLift": 4
       }
     },
     {
-      "name": "clean-6s",
-      "voiceFile": "art/lab/voice/ref-6s.m4a",
+      "name": "lift6",
       "tune": {
-        "voicePrep": "clean"
+        "voicePrep": "clean",
+        "voiceLift": 6
       }
     }
   ],

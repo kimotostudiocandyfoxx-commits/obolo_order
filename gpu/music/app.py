@@ -337,7 +337,7 @@ def svc_health() -> dict:
         return {"ready": False, "error": f"starting ({e!r})"[:120]}
 
 
-def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int = 30, prep: str = "clean") -> tuple[str | None, str]:
+def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int = 30, prep: str = "clean", lift: float = 0.0) -> tuple[str | None, str]:
     """The sung vocal in the member's voice (Seed-VC), or (None, why) to keep the studio's voice."""
     import base64
 
@@ -367,7 +367,7 @@ def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int =
     src = os.path.join(out_dir, "vocals-mono.wav")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vocals, "-ac", "1", "-ar", "44100", src], check=True)
     out = os.path.join(out_dir, "vocals-member.wav")
-    res = svc_call("POST", "/convert", {"source": src, "target": ref, "out": out, "steps": steps, "cfg": cfg}, timeout=600)
+    res = svc_call("POST", "/convert", {"source": src, "target": ref, "out": out, "steps": steps, "cfg": cfg, "lift": lift}, timeout=600)
     if not res.get("ok"):
         return None, f"seed-vc failed: {res.get('error')}"
     like = f", likeness {res['likeness']} (studio voice {res.get('likenessBefore')})" if res.get("likeness") is not None else ""
@@ -613,6 +613,8 @@ class SongReq(BaseModel):
     voiceSteps: int = Field(30, ge=10, le=100)
     # how the member's recording is prepared before Seed-VC reads it (see to_voice)
     voicePrep: str = Field("clean", pattern="^(clean|plain)$")
+    # semitones a spoken recording sits below the same voice singing, for the octave check (0 = off)
+    voiceLift: float = Field(0, ge=0, le=12)
 
 
 @app.get("/health")
@@ -693,7 +695,7 @@ def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", 
     voiced, how = (None, "no voice sent")
     if r.voice:
         try:
-            voiced, how = to_voice(vocals, r.voice, d, r.similarity, r.voiceSteps, r.voicePrep)
+            voiced, how = to_voice(vocals, r.voice, d, r.similarity, r.voiceSteps, r.voicePrep, r.voiceLift)
         except Exception as e:  # noqa: BLE001 — the song is still delivered in the studio's voice
             traceback.print_exc()
             voiced, how = None, f"seed-vc error: {e!r}"[:200]

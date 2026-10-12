@@ -373,7 +373,8 @@ export async function paintScenes(
           ...lines,
           heroRef ? KEEP_FACE : '',
           heroRef && heroLook ? `The character, in words: ${heroLook.split(',').slice(0, 12).join(',')}.` : '',
-          'A picture for children: any drink is juice, tea or water — never beer, wine or other alcohol.',
+          // m17: "never beer" drew beer (a small model reads the word, not the never) → name only the drinks we want
+          'Any glass on the table holds orange juice, green tea or milk.',
           'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art, fully drawn in 2D anime style. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
         ]
           .filter(Boolean)
@@ -430,7 +431,7 @@ export async function seedreamSheets(painter: StyledPainter, items: { caption: s
           heroRef
             ? `In every panel the main character is the one from reference picture 1 (exactly the same design, colours and proportions), shown exactly once per panel, really doing what the panel describes. ${KEEP_FACE}`
             : '',
-          'Pictures for children: drinks are juice, tea or water only, never alcohol. Cinematic anime lighting, glowing colours, rich hand-painted backgrounds, crisp line art. No text, no letters, no logos, no watermark. Other people only as small passers-by.',
+          'Any glass holds orange juice, green tea or milk. Cinematic anime lighting, glowing colours, rich hand-painted backgrounds, crisp line art. No text, no letters, no logos, no watermark. Other people only as small passers-by.',
         ]
           .filter(Boolean)
           .join(' ')
