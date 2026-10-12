@@ -5,6 +5,7 @@ import { useEffect, useReducer, useRef, useState, type CSSProperties, type Point
 import { HOT_CUES, JUMP_SIZES, TEMPO_RANGE, type Deck } from '@/lib/dj/deck';
 import type { DjEngine } from '@/lib/dj/engine';
 import { FX_NAMES, FX_TYPES, type FxType } from '@/lib/dj/fx';
+import { SAMPLES, type SampleId } from '@/lib/dj/sampler';
 import { Fader, Jog, Knob, Pad } from './controls';
 import type { DjTrack } from './DjController';
 
@@ -391,6 +392,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
 }
 
 const LOOP_COLOR = '#3cf0c8';
+const SAMPLER_COLOR = '#ff4fa3';
 /** 0.25 → 1/4, 4 → 4 */
 const beatsLabel = (n: number) => (n < 1 ? `1/${1 / n}` : String(n));
 
@@ -518,6 +520,10 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
   // the bottom knob of each column is the FX knob: FILTER or one of the effects, picked from its menu
   const [mode, setMode] = useState<FxMode[]>(['filter', 'filter']);
   const [menu, setMenu] = useState<0 | 1 | null>(null);
+  // a sampler pad either side of the mixer, each with its own sound
+  const [samples, setSamples] = useState<SampleId[]>(['horn', 'siren']);
+  const [samplePick, setSamplePick] = useState<0 | 1 | null>(null);
+  const [hit, setHit] = useState<0 | 1 | null>(null);
   const applyFx = (i: 0 | 1, m: FxMode, v: number) => (m === 'filter' ? engine.decks[i].setFilter(v) : engine.decks[i].setFx(m, v));
   const set = (i: 0 | 1, key: 'high' | 'mid' | 'low' | 'filter' | 'fader', v: number) => {
     setS((prev) => prev.map((x, j) => (j === i ? { ...x, [key]: v } : x)));
@@ -571,6 +577,58 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
           />
         </div>
       ))}
+      {/* the sampler: a pad (fires the sound) and えらぶ (picks it) on each side */}
+      {([0, 1] as const).map((side) => {
+        const sm = SAMPLES.find((x) => x.id === samples[side])!;
+        return (
+          <div key={`s${side}`}>
+            <div style={box(side === 0 ? -0.8 : 0.8, -0.12)}>
+              <button
+                onPointerDown={() => {
+                  void engine.sampler.play(sm.id, engine.beat);
+                  setHit(side);
+                  setTimeout(() => setHit((h) => (h === side ? null : h)), 160);
+                }}
+                className="flex select-none flex-col items-center justify-center rounded-full border-2 font-bold"
+                style={{ width: 34 * k, height: 34 * k, touchAction: 'none', borderColor: SAMPLER_COLOR, background: hit === side ? `${SAMPLER_COLOR}88` : '#0b0807', boxShadow: `0 0 ${(hit === side ? 16 : 6) * k}px ${SAMPLER_COLOR}${hit === side ? '' : '66'}`, color: '#fff' }}
+              >
+                <span style={{ fontSize: 12 * k, lineHeight: 1 }}>{sm.icon}</span>
+                <span style={{ fontSize: 6.5 * k, letterSpacing: 0.5 }}>{sm.name}</span>
+              </button>
+            </div>
+            <div style={box(side === 0 ? -0.8 : 0.8, 0.14)}>
+              <button
+                onClick={() => setSamplePick(samplePick === side ? null : side)}
+                className="select-none whitespace-nowrap rounded-full border font-bold"
+                style={{ fontSize: 7 * k, padding: `${2 * k}px ${6 * k}px`, borderColor: samplePick === side ? SAMPLER_COLOR : 'rgba(201,151,79,0.5)', color: 'rgba(255,255,255,0.8)', background: '#0e0a08' }}
+              >
+                えらぶ
+              </button>
+            </div>
+          </div>
+        );
+      })}
+      {samplePick !== null && (
+        <>
+          <div className="absolute inset-0 z-30" onPointerDown={() => setSamplePick(null)} />
+          <div style={{ ...box(samplePick === 0 ? -0.3 : 0.3, 0.05), zIndex: 31 }} className="grid grid-cols-3 gap-1 rounded-xl border border-[#c9974f]/50 bg-[#120c09]/95 p-1.5 shadow-xl">
+            {SAMPLES.map((x) => (
+              <button
+                key={x.id}
+                onClick={() => {
+                  setSamples((prev) => prev.map((v, j) => (j === samplePick ? x.id : v)));
+                  setSamplePick(null);
+                }}
+                className="flex flex-col items-center rounded-lg border px-2 py-1 font-bold"
+                style={{ fontSize: Math.max(9, 9 * k), borderColor: x.id === samples[samplePick] ? SAMPLER_COLOR : 'rgba(255,255,255,0.12)', background: x.id === samples[samplePick] ? `${SAMPLER_COLOR}40` : 'transparent', color: '#fff' }}
+              >
+                <span style={{ fontSize: Math.max(16, 16 * k) }}>{x.icon}</span>
+                {x.name}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       {/* the FX menu (long press on the FX knob) */}
       {menu !== null && (
         <>

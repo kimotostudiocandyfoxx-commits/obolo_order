@@ -1,4 +1,5 @@
 import { Deck, TEMPO_RANGE, type TrackMeta } from './deck';
+import { Sampler } from './sampler';
 
 /**
  * The Venus DJ engine (client request 2026-10-12): two decks, a crossfader and the master out, on one
@@ -9,6 +10,7 @@ import { Deck, TEMPO_RANGE, type TrackMeta } from './deck';
  */
 export class DjEngine {
   readonly decks: [Deck, Deck];
+  readonly sampler: Sampler;
   private readonly master: GainNode;
   private crossfade = 0.5;
 
@@ -28,6 +30,9 @@ export class DjEngine {
     limiter.release.value = 0.12;
     a.out.connect(this.master);
     b.out.connect(this.master);
+    this.sampler = new Sampler(ctx);
+    this.sampler.out.connect(this.master);
+    this.sampler.warm();
     this.master.connect(limiter).connect(ctx.destination);
     this.setCrossfader(0.5);
   }
@@ -61,6 +66,13 @@ export class DjEngine {
     const t = this.ctx.currentTime;
     this.decks[0].xf.gain.setTargetAtTime(Math.cos((this.crossfade * Math.PI) / 2), t, 0.005);
     this.decks[1].xf.gain.setTargetAtTime(Math.sin((this.crossfade * Math.PI) / 2), t, 0.005);
+  }
+
+  /** seconds per beat of the deck that leads (the louder playing one), for the sampler's riser */
+  get beat() {
+    const playing = this.decks.filter((d) => d.playing);
+    const lead = playing.sort((x, y) => y.faderValue - x.faderValue)[0] ?? this.decks[0];
+    return lead.beat;
   }
 
   setMaster(v: number) {
