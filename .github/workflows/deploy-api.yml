@@ -134,6 +134,7 @@ jobs:
             MV_QWEN_SCENES=${{ vars.MV_QWEN_SCENES || '12' }}
             MV_PLAN=${{ vars.MV_PLAN }}
             MV_SHEET_SCENES=${{ vars.MV_SHEET_SCENES || '12' }}
+            MV_PAINTER=${{ vars.MV_PAINTER || 'klein-4b' }}
             MV_GPU_PAINT=${{ vars.MV_GPU_PAINT || (vars.MV_PLAN == 'B' && 'true') || (vars.MUSIC_REGION && 'true') || 'false' }}
             MV_HERO_REF=${{ vars.MV_HERO_REF || '0.6' }}
             MV_PARALLAX=${{ vars.MV_PARALLAX || 'false' }}

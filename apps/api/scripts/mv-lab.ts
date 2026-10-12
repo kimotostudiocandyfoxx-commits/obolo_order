@@ -17,7 +17,7 @@ import { DepthModel } from '../src/mv/depth';
 import { addParallax } from '../src/mv/parallax';
 import { burnLyrics, renderMv } from '../src/mv/render';
 import { describeHero, isHuman, planStory, storyToPlan } from '../src/mv/storyboard';
-import { PAINTERS, photoAnime, StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
+import { paintScenes, PAINTERS, photoAnime, StyledPainter, twoLooks, type TwoLookPlan } from '../src/mv/styled';
 import type { StoryPlan } from '../src/mv/storyboard';
 import { Stylizer } from '../src/mv/stylize';
 
@@ -241,7 +241,8 @@ async function main() {
           );
       const t1 = Date.now();
       // the two-look MV: chorus scenes merge into the key visuals, the rest are chibi cuts
-      const shown = round.painter === 'styled' && !photoList ? twoLooks(story, lyrics, 2) : story;
+      // a story MV with a chosen model paints one picture per scene (the app's plan A), else the two looks
+      const shown = round.painter === 'styled' && !photoList && !c.model ? twoLooks(story, lyrics, 2) : story;
       const drawn = c.stills
         ? await Promise.all(story.scenes.map((_, k) => readFile(resolve(ROOT, c.stills!, `scene-${k}.jpg`)).catch(() => null)))
         : photoList
@@ -253,6 +254,8 @@ async function main() {
             model: c.model ? PAINTERS[c.model] : undefined,
             seed: Math.floor(Math.random() * 2 ** 31),
           })
+        : round.painter === 'styled' && c.model
+          ? await paintScenes(styled!, story.scenes.map((sc) => ({ caption: sc.tags })), heroPic, PAINTERS[c.model])
         : round.painter === 'styled'
           ? await styled!.paint((shown as TwoLookPlan).scenes, hero, heroPic, Math.floor(Math.random() * 2 ** 31))
           : await artist.paintAll(story.scenes, Math.floor(Math.random() * 2 ** 31), 6, {

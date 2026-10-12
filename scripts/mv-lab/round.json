@@ -1,38 +1,18 @@
 {
-  "round": "m14-busan-cheap-models",
-  "note": "Seedream をやめる試験：FLUX.2 klein 4B（1枚0.2円）/ 9B（0.4円）で写真1枚ずつ、Qwen-Image 2.1 Turbo（2円）で4コマ。どれも奥行きの動き＋新しい歌詞つき。前回の Seedream 4コマ版（約37円・6.4/6.0）と比べる。",
+  "round": "m15-story-klein",
+  "note": "アプリ本番の A 方式（写真なし・歌詞からお話を作る MV）を FLUX.2 klein 4B の1枚描きで。奥行きの動き＋新しい歌詞つき。顔をそのまま保つ指示を追加。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
-  "maxScenes": 30,
+  "maxScenes": 12,
   "side": 768,
   "cases": [
     {
-      "id": "klein4b",
+      "id": "story-klein4b",
       "song": "best:busan-kpop",
-      "photos": "art/lab/busan/photos.json",
+      "model": "klein-4b",
       "parallax": true,
-      "lyrics": true,
-      "photoMode": "seedream",
-      "model": "klein-4b"
-    },
-    {
-      "id": "klein9b",
-      "song": "best:busan-kpop",
-      "photos": "art/lab/busan/photos.json",
-      "parallax": true,
-      "lyrics": true,
-      "photoMode": "seedream",
-      "model": "klein-9b"
-    },
-    {
-      "id": "qwen-grid",
-      "song": "best:busan-kpop",
-      "photos": "art/lab/busan/photos.json",
-      "parallax": true,
-      "lyrics": true,
-      "photoMode": "grid",
-      "model": "qwen-turbo"
+      "lyrics": true
     }
   ],
   "heroRef": 0.6

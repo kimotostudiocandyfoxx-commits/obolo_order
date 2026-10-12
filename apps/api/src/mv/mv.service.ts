@@ -16,7 +16,7 @@ import { idToken } from '../compose/music.client';
 import { DepthModel } from './depth';
 import { KeyArtist } from './keyart';
 import { addParallax } from './parallax';
-import { seedreamSheets, StyledPainter } from './styled';
+import { paintScenes, PAINTERS, seedreamSheets, StyledPainter } from './styled';
 import { planMv, type MvPlan } from './plan';
 import { burnLyrics, renderMv } from './render';
 import { describeHero, isHuman, planStory, storyToPlan, type StoryPlan } from './storyboard';
@@ -284,10 +284,12 @@ export class MvService {
       );
       // paint every scene; one seed per MV keeps the look together
       const seed = Math.floor(Math.random() * 2 ** 31);
-      // plan A: four scenes per Seedream picture; plan B / unset: our GPU (else Qwen) via the key artist
+      // plan A: one picture per scene on Runware (FLUX.2 klein 4B by default; Seedream = four per sheet); plan B / unset: our GPU (else Qwen) via the key artist
       if (this.sheets) this.sheets.lastCostUsd = 0;
       const drawn = this.sheets
-        ? await seedreamSheets(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture)
+        ? this.cfg.MV_PAINTER === 'seedream'
+          ? await seedreamSheets(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture)
+          : await paintScenes(this.sheets, story.scenes.map((sc) => ({ caption: sc.tags })), picture, PAINTERS[this.cfg.MV_PAINTER])
         : await this.keyArtist.paintAll(story.scenes, seed, this.cfg.MV_PAINT_PARALLEL, { reference: picture, refScale: this.cfg.MV_HERO_REF, heroIsHuman: isHuman(hero) });
       if (this.sheets) this.log.log(`MV ${id}: plan A paint cost ${Math.round(this.sheets.lastCostUsd * 150)} yen`);
       const pics: (string | null)[] = await Promise.all(

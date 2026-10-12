@@ -132,6 +132,8 @@ const Env = z.object({
   /** plan A: the Runware key (secret obolo-seedream-api-key) and how many scenes an MV gets (4 per picture) */
   MV_RUNWARE_KEY: secret(),
   MV_SHEET_SCENES: z.coerce.number().min(4).max(32).default(12),
+  /** plan A's picture model (styled.ts PAINTERS). klein-4b = FLUX.2 [klein] 4B, Apache-2.0 — the same model plan B can run on our GPU */
+  MV_PAINTER: z.enum(['klein-4b', 'klein-9b', 'qwen-turbo', 'seedream']).default('klein-4b'),
 
   /** Fish Audio API (voices: registration, read-aloud, singing). Unset = voice features off. */
   FISH_API_KEY: secret(),

@@ -305,37 +305,63 @@ const WALK_SHOTS = [
 ];
 
 async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; caption: string }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER): Promise<(Buffer | null)[]> {
-  if (!photos.length) return [];
+  return paintScenes(painter, photos, hero, m);
+}
+
+/** The character's face as drawn (m14: klein opened the mask into a mouth while eating). */
+const KEEP_FACE = 'Keep the character’s face exactly as in its reference picture — the same face design and markings, never a new mouth or a changed face.';
+
+/**
+ * One picture per scene with a model that reads reference pictures (PAINTERS). A scene is a photo
+ * to redraw (photo MV: reference 1 = the photo, 2 = the hero) or words (story MV: reference 1 = the hero).
+ */
+export async function paintScenes(painter: StyledPainter, items: { caption: string; photo?: Buffer }[], hero: Buffer | null, m: Painter = SEEDREAM_PAINTER): Promise<(Buffer | null)[]> {
+  if (!items.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
   let e = 0;
   let w = 0;
   const tasks = await Promise.all(
-    photos.map(async (p) => ({
-      taskType: 'imageInference',
-      taskUUID: randomUUID(),
-      model: m.model,
+    items.map(async (p) => {
+      const refs = p.photo ? [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])] : heroRef ? [heroRef] : [];
+      const shot = MEAL.test(p.caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length];
       // the hero is the traveller (client 2026-10-11: KIMORIN travels Busan, eats the food in the
       // photos, wanders the streets) — exactly one of them in every picture, never two
-      positivePrompt: [
-        `A breathtaking still from a high-end Japanese anime film. The place, the food and the composition come from the first reference photo (${p.caption}) — keep them the same.`,
-        heroRef
-          ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
-          : '',
-        MEAL.test(p.caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length],
-        'A picture for children: any drink on the table is juice, tea or water — never beer, wine or other alcohol.',
-        'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
-      ]
-        .filter(Boolean)
-        .join(' '),
-      width: m.single,
-      height: m.single,
-      numberResults: 1,
-      outputType: 'URL',
-      outputFormat: 'JPG',
-      includeCost: true,
-      referenceImages: [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])].slice(0, m.maxRefs),
-    })),
+      const lines = p.photo
+        ? [
+            `A breathtaking still from a high-end Japanese anime film. The place, the food and the composition come from the first reference photo (${p.caption}) — keep them the same.`,
+            heroRef
+              ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
+              : '',
+            shot,
+          ]
+        : [
+            `A breathtaking still from a high-end Japanese anime film: ${p.caption}.`,
+            heroRef ? 'The main character is the one in the reference picture (exactly the same design, colours and proportions), shown exactly once, really doing what the scene describes.' : '',
+            p.caption.includes('wide shot') ? '' : shot,
+          ];
+      return {
+        taskType: 'imageInference',
+        taskUUID: randomUUID(),
+        model: m.model,
+        positivePrompt: [
+          ...lines,
+          heroRef ? KEEP_FACE : '',
+          'A picture for children: any drink is juice, tea or water — never beer, wine or other alcohol.',
+          'Cinematic anime lighting, glowing colours, rich detailed hand-painted background, appetising food, crisp line art, fully drawn in 2D anime style. No text, no letters, no logos, no watermark. Other people only as small simple passers-by in the background.',
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .slice(0, 3000),
+        width: m.single,
+        height: m.single,
+        numberResults: 1,
+        outputType: 'URL',
+        outputFormat: 'JPG',
+        includeCost: true,
+        ...(refs.length ? { referenceImages: refs.slice(0, m.maxRefs) } : {}),
+      };
+    }),
   );
   return painter.run(tasks);
 }
@@ -376,7 +402,7 @@ export async function seedreamSheets(painter: StyledPainter, items: { caption: s
           'A 2x2 sheet of four separate square stills from the same high-end Japanese anime film, four equal panels split by thin straight white gutters, each panel a complete picture on its own, all in the same 2D anime style (no photographic parts).',
           ...panels,
           heroRef
-            ? 'In every panel the main character is the one from reference picture 1 (exactly the same design, colours and proportions), shown exactly once per panel, really doing what the panel describes.'
+            ? `In every panel the main character is the one from reference picture 1 (exactly the same design, colours and proportions), shown exactly once per panel, really doing what the panel describes. ${KEEP_FACE}`
             : '',
           'Pictures for children: drinks are juice, tea or water only, never alcohol. Cinematic anime lighting, glowing colours, rich hand-painted backgrounds, crisp line art. No text, no letters, no logos, no watermark. Other people only as small passers-by.',
         ]
