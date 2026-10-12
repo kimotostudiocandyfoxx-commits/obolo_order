@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { HOT_CUES, TEMPO_RANGE, type Deck } from '@/lib/dj/deck';
+import { HOT_CUES, JUMP_SIZES, TEMPO_RANGE, type Deck } from '@/lib/dj/deck';
 import type { DjEngine } from '@/lib/dj/engine';
 import { FX_NAMES, FX_TYPES, type FxType } from '@/lib/dj/fx';
 import { Fader, Jog, Knob, Pad } from './controls';
@@ -185,6 +185,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   useDeck(deck);
   useDeckVideo(deck);
   const [pick, setPick] = useState(false);
+  const [jumpPick, setJumpPick] = useState(false);
   const [loading, setLoading] = useState('');
   const file = useRef<HTMLInputElement>(null);
   const color = DECK_COLOR[i];
@@ -256,7 +257,14 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
           </Pad>
         </div>
       ))}
-      {/* beat jump low on the inner side, side by side (◀◀ on the left on both decks), by the loop size */}
+      {/* beat jump low on the inner side, side by side (◀◀ on the left on both decks); the distance above them, tap to pick */}
+      <div style={at(40.9, 0.69)}>
+        <Pad onDown={() => setJumpPick(!jumpPick)} className="border-0 bg-transparent">
+          <span style={{ ...ring(jumpPick, '#f5c66b'), width: b * 1.9, borderRadius: 999 }} className="flex items-center justify-center whitespace-nowrap border">
+            JUMP {beatsLabel(deck.jumpBeats)}
+          </span>
+        </Pad>
+      </div>
       {(
         [
           [-1, '◀◀'],
@@ -312,6 +320,26 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
         </Pad>
       </div>
 
+      {jumpPick && (
+        <>
+          <div className="absolute inset-0 z-30" onPointerDown={() => setJumpPick(false)} />
+          <div style={{ ...at(20, 0.5), zIndex: 31 }} className="grid grid-cols-4 gap-1 rounded-xl border border-[#c9974f]/50 bg-[#120c09]/95 p-1.5 shadow-xl">
+            <span className="col-span-4 px-1 text-center text-white/60" style={{ fontSize: Math.max(9, 9 * k) }}>
+              ジャンプする拍
+            </span>
+            {JUMP_SIZES.map((n) => (
+              <button
+                key={n}
+                onClick={() => (deck.setJumpBeats(n), setJumpPick(false))}
+                className="rounded-lg border font-bold"
+                style={{ minWidth: 34 * Math.max(1, k), padding: `${6 * Math.max(1, k)}px 0`, fontSize: Math.max(11, 11 * k), borderColor: n === deck.jumpBeats ? '#f5c66b' : 'rgba(255,255,255,0.12)', color: n === deck.jumpBeats ? '#fff' : 'rgba(255,255,255,0.75)', background: n === deck.jumpBeats ? '#f5c66b40' : 'transparent' }}
+              >
+                {beatsLabel(n)}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       {pick && (
         <div className="absolute z-30 max-h-[70%] overflow-y-auto rounded-xl border border-[#c9974f]/40 bg-[#120c09]/95 p-2 text-sm shadow-xl" style={{ left: '12%', right: '12%', top: '18%' }}>
           {songs.map((s) => (

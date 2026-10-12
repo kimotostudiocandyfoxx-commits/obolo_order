@@ -11,8 +11,10 @@ import { DeckFx, type FxType } from './fx';
  */
 export const TEMPO_RANGE = 0.16;
 export const HOT_CUES = 4;
-/** loop / beat jump sizes, in beats */
+/** loop sizes, in beats */
 export const LOOP_SIZES = [0.25, 0.5, 1, 2, 4, 8, 16, 32];
+/** beat jump distances, in beats */
+export const JUMP_SIZES = [0.5, 1, 2, 4, 8, 16, 32];
 
 export interface TrackMeta {
   title: string;
@@ -52,8 +54,10 @@ export class Deck {
   hotCues: (number | null)[] = Array(HOT_CUES).fill(null);
   /** the loop playing now (track seconds), or null */
   loop: { start: number; end: number } | null = null;
-  /** the loop's length and the beat jump's distance, in beats (one size for both) */
+  /** the loop's length, in beats */
   loopBeats = 4;
+  /** the beat jump's distance, in beats */
+  jumpBeats = 4;
   /** a peak per 1/100 s, for the waveform */
   peaks: Float32Array = new Float32Array(0);
   /** the same per frequency band (low < 250 Hz, mid, high > 4 kHz), 0–1 each — the coloured waveform */
@@ -227,10 +231,15 @@ export class Deck {
     this.emit();
   }
 
-  /** Beat jump: `loopBeats` beats back / ahead, on the beat; a loop playing moves along with it. */
+  setJumpBeats(n: number) {
+    this.jumpBeats = n;
+    this.emit();
+  }
+
+  /** Beat jump: `jumpBeats` beats back / ahead, on the beat; a loop playing moves along with it. */
   beatJump(dir: -1 | 1) {
     if (!this.buffer) return;
-    const d = dir * this.gridBeat * this.loopBeats;
+    const d = dir * this.gridBeat * this.jumpBeats;
     const p = this.position() + d;
     if (p < 0 || p > this.duration - 0.05) return;
     if (this.loop) this.loop = { start: this.loop.start + d, end: this.loop.end + d };
