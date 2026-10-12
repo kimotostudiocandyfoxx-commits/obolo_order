@@ -13,7 +13,7 @@ export interface CastMember {
 
 export const CAST: CastMember[] = [
   { name: 'KIMORIN', sprite: 'kimorin-1' },
-  { name: 'OBOLON' },
+  { name: 'OBOLON', sprite: 'obolon' },
   { name: 'MONBAN' },
   { name: 'バティ', sprite: '@bati' },
   { name: 'たこ焼きブラザー', sprite: 'takoyaki-brother' },
@@ -21,7 +21,7 @@ export const CAST: CastMember[] = [
   { name: '大根カイザー' },
   { name: 'フリージー', sprite: 'freezy' },
   { name: 'ヒポキン', sprite: 'hipokin' },
-  { name: 'ロングG' },
+  { name: 'ロングG', sprite: 'longg' },
   { name: 'ハットG', sprite: 'hatg' },
   { name: 'ボスG', sprite: 'bossg' },
   { name: 'うんちピンポンくん' },

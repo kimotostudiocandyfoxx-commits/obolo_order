@@ -75,3 +75,41 @@ describe('story reader', () => {
     expect(r.videos.has('1')).toBe(true);
   });
 });
+
+import { Story } from './runtime';
+
+describe('story runtime', () => {
+  const story = new Story(parseFile(MD, 'P01', 'P01/c01.md'));
+  const o = { notes: false, states: [] };
+  const run = (picks: number[]) => {
+    let st = story.start();
+    const seen: string[] = [];
+    for (let n = 0; n < 40; n++) {
+      const { st: s, shown } = story.next(st, o);
+      st = s;
+      if (shown.k === 'end') break;
+      if (shown.k === 'choice') {
+        const opt = shown.options[picks.shift() ?? 0];
+        seen.push(`?${opt.label}`);
+        st = story.choose(st, opt);
+        continue;
+      }
+      seen.push(shown.k === 'say' ? `${shown.who}:${shown.text}` : shown.k === 'narr' ? `N:${shown.text}` : shown.k === 'sceneStart' ? `#${shown.scene.id}` : shown.k);
+      st = story.advance(st);
+    }
+    return seen;
+  };
+  it('plays the chosen branch, skips the others, follows a scene jump', () => {
+    const open = run([0, 0]);
+    expect(open.slice(0, 5)).toEqual(['#D01-S001', 'video', 'N:宛名はない。', '?封を開く', 'card']);
+    expect(open).not.toContain('N:封筒は光りつづける。');
+    expect(open).toContain('?本部へ向かう');
+    expect(open).toContain('#D01-S002');
+    expect(open).toContain('MONBAN:誰だお前…');
+  });
+  it('a later branch key goes on with the lines after the branches', () => {
+    const hold = run([1]);
+    expect(hold).toContain('N:封筒は光りつづける。');
+    expect(hold).not.toContain('card');
+  });
+});
