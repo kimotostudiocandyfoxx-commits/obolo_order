@@ -227,13 +227,13 @@ function Mixer({ engine }: { engine: DjEngine }) {
   return (
     <div className="flex w-full justify-around">
       {([0, 1] as const).map((i) => (
-        <div key={i} className="flex flex-col items-center gap-1">
-          <Knob label="TRIM" size={34} value={s[i].trim} min={0} max={2} center={1} onChange={(v) => set(i, 'trim', v)} />
-          <Knob label="HI" size={34} value={s[i].high} min={-26} max={6} center={0} onChange={(v) => set(i, 'high', v)} />
-          <Knob label="MID" size={34} value={s[i].mid} min={-26} max={6} center={0} onChange={(v) => set(i, 'mid', v)} />
-          <Knob label="LOW" size={34} value={s[i].low} min={-26} max={6} center={0} onChange={(v) => set(i, 'low', v)} />
-          <Knob label="FILTER" size={34} value={s[i].filter} min={-1} max={1} center={0} color="#9be37a" onChange={(v) => set(i, 'filter', v)} />
-          <Fader value={s[i].fader} length={84} onChange={(v) => set(i, 'fader', v)} />
+        <div key={i} className="flex flex-col items-center gap-0.5">
+          <Knob label="TRIM" size={30} value={s[i].trim} min={0} max={2} center={1} onChange={(v) => set(i, 'trim', v)} />
+          <Knob label="HI" size={30} value={s[i].high} min={-26} max={6} center={0} onChange={(v) => set(i, 'high', v)} />
+          <Knob label="MID" size={30} value={s[i].mid} min={-26} max={6} center={0} onChange={(v) => set(i, 'mid', v)} />
+          <Knob label="LOW" size={30} value={s[i].low} min={-26} max={6} center={0} onChange={(v) => set(i, 'low', v)} />
+          <Knob label="FILTER" size={30} value={s[i].filter} min={-1} max={1} center={0} color="#9be37a" onChange={(v) => set(i, 'filter', v)} />
+          <Fader value={s[i].fader} length={66} onChange={(v) => set(i, 'fader', v)} />
         </div>
       ))}
     </div>

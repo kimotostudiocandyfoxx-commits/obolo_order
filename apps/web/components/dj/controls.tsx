@@ -16,31 +16,50 @@ function capture(e: RPointerEvent) {
   }
 }
 
-/** A knob: drag up / down (or turn). `center` = the value a double tap returns to. */
-export function Knob({ label, value, min, max, center, onChange, color = '#f5c66b', size = 54 }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number }) {
-  const start = useRef<{ y: number; v: number } | null>(null);
+/**
+ * A knob (client 2026-10-12): pointing straight up = `center` (0 dB, filter off, no effect…);
+ * swipe up = more (+, turns right), swipe down = less (−, turns left); a double tap goes back to center.
+ * Below center and above center each get half a turn of travel, whatever their size in units
+ * (EQ: −26 dB … 0 … +6 dB), so the middle always looks like the middle.
+ */
+export function Knob({ label, value, min, max, center = min, onChange, color = '#f5c66b', size = 54 }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number }) {
+  // position −1 … 0 … +1 (0 = center)
+  const toPos = (v: number) => (v >= center ? (max > center ? (v - center) / (max - center) : 0) : center > min ? -(center - v) / (center - min) : 0);
+  const toVal = (p: number) => (p >= 0 ? center + p * (max - center) : center + p * (center - min));
+  const start = useRef<{ y: number; p: number } | null>(null);
   const last = useRef(0);
-  const frac = (value - min) / (max - min);
-  const angle = -135 + frac * 270;
+  const pos = toPos(value);
+  const angle = pos * 135;
   const down = (e: RPointerEvent) => {
     capture(e);
     const now = Date.now();
-    if (now - last.current < 300 && center !== undefined) onChange(center);
+    // double tap: back to center, and the drag that follows starts from there
+    if (now - last.current < 350) {
+      last.current = 0;
+      onChange(center);
+      start.current = { y: e.clientY, p: 0 };
+      return;
+    }
     last.current = now;
-    start.current = { y: e.clientY, v: value };
+    start.current = { y: e.clientY, p: pos };
   };
   const move = (e: RPointerEvent) => {
     if (!start.current) return;
-    const dv = ((start.current.y - e.clientY) / 160) * (max - min);
-    onChange(Math.max(min, Math.min(max, start.current.v + dv)));
+    // 110 px of swipe = from the middle to one end
+    const p = Math.max(-1, Math.min(1, start.current.p + (start.current.y - e.clientY) / 110));
+    onChange(toVal(min === center ? Math.max(0, p) : p));
   };
+  const r = 42;
+  const circ = 2 * Math.PI * r;
   return (
     <div className="flex select-none flex-col items-center gap-0.5" style={{ touchAction: 'none' }}>
-      <div onPointerDown={down} onPointerMove={move} onPointerUp={() => (start.current = null)} onPointerCancel={() => (start.current = null)} className="relative rounded-full border border-white/15 bg-[#1b1830] shadow-inner" style={{ width: size, height: size }}>
+      <div onPointerDown={down} onPointerMove={move} onPointerUp={() => (start.current = null)} onPointerCancel={() => (start.current = null)} className="relative rounded-full border border-white/15 bg-[#1b1830] shadow-inner" style={{ width: size, height: size, touchAction: 'none' }}>
         <svg viewBox="0 0 100 100" className="absolute inset-0">
-          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" strokeDasharray="198 300" transform="rotate(135 50 50)" />
-          <circle cx="50" cy="50" r="42" fill="none" stroke={color} strokeWidth="8" strokeDasharray={`${198 * frac} 300`} transform="rotate(135 50 50)" />
+          <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" strokeDasharray={`${circ * 0.75} ${circ}`} transform="rotate(135 50 50)" />
+          {/* the lit arc runs from the top (center) to the pointer */}
+          <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="8" strokeDasharray={`${(circ * Math.abs(angle)) / 360} ${circ}`} transform={`rotate(${-90 + Math.min(0, angle)} 50 50)`} />
           <line x1="50" y1="50" x2="50" y2="16" stroke="white" strokeWidth="6" strokeLinecap="round" transform={`rotate(${angle} 50 50)`} />
+          <circle cx="50" cy="5" r="3" fill="rgba(255,255,255,0.5)" />
         </svg>
       </div>
       <span className="text-[9px] tracking-wider text-white/60">{label}</span>
