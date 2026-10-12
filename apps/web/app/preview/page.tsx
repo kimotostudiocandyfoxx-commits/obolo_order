@@ -9,6 +9,7 @@ import { STORIES } from '@/lib/onboarding/stories';
 export default function PreviewIndex() {
   const days = Object.keys(STORIES).map(Number).sort((a, b) => a - b);
   const jumps: { href: string; label: string }[] = [
+    { href: '/preview/dj', label: '🎧 金星 DJ（音声エンジンの仮画面・横向き）' },
     { href: '/preview/story', label: '📖 新しい物語の台本（全場面・どの場面からでも／戻る・演出メモ）' },
     { href: '/preview/play?day=3&at=neo', label: '3日目：ネオの姿えらびから' },
     { href: '/preview/play?day=4&at=saturn', label: '4日目：ころりんぱ（土星で遊ぶ）から' },

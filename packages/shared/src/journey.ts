@@ -14,9 +14,10 @@ import type { PlanetId } from './planets';
  */
 export const JOURNEY_LAST_DAY = 8;
 /**
- * Venus left the journey (client decision 2026-10-07, before the 10/10 demo): the route is
- * Moon → Saturn → Jupiter → Mercury → Mars → back to Earth → the Sun temple (Eclipse) → ORDER.
- * Day 8 (Venus) is skipped: finishing day 7 opens the Eclipse day (9). Venus opens later.
+ * The route: Moon → Saturn → Jupiter → Mercury → Mars → Venus (client, 2026-10-12: Venus is back, as the
+ * DJ / VJ planet) → back to Earth → the Sun temple (Eclipse) → ORDER.
+ * PLACEHOLDER (P-JOURNEY-2): day 8 (Venus) is still skipped — finishing day 7 opens the Eclipse day (9) —
+ * until Venus's DJ tutorial is written into the new story; then empty this list.
  */
 export const SKIPPED_DAYS: readonly number[] = [8];
 export function nextJourneyDay(day: number): number {
@@ -27,11 +28,11 @@ export function nextJourneyDay(day: number): number {
 
 /**
  * Planets that open after joining (client decision 2026-10-07): one more each week after the
- * Eclipse — Venus after 1 week, Neptune after 2, Pluto after 3 (Pluto is not built yet).
+ * Eclipse — Neptune after 2 weeks, Pluto after 3 (Pluto is not built yet).
  * PLACEHOLDER (P-JOURNEY-1): which planet opens in which week.
  */
 export const LATER_PLANETS: readonly { planet: 'venus' | 'neptune' | 'pluto'; afterDays: number }[] = [
-  { planet: 'venus', afterDays: 7 },
+  // (Venus is on the journey again since 2026-10-12, open like the other journey planets)
   { planet: 'neptune', afterDays: 14 },
   { planet: 'pluto', afterDays: 21 },
 ];
@@ -90,8 +91,9 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
   { day: 6, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
   // Mars comes before Venus (client, 2026-10-05)
   { day: 7, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
-  // day 8 (Venus) is skipped since 2026-10-07 — Venus opens a week after joining (kept for later)
-  { day: 8, planet: 'venus', guides: ['KIMORIN', 'ロングG', 'ハットG', 'ボスG'], title: '金星へ', beats: ['金星に行く', 'ゴリラ3人組に出会う', '金星（グッズをつくって星で売り買い）で遊ぶ'] },
+  // Venus is the DJ / VJ planet, visited after Mars (client, 2026-10-12): the order is Saturn → Jupiter →
+  // Mercury → Mars → Venus. Day 8 stays in SKIPPED_DAYS until its new tutorial (in the rewritten story) is in.
+  { day: 8, planet: 'venus', guides: ['KIMORIN', 'ロングG', 'ハットG', 'ボスG'], title: '金星へ', beats: ['金星に行く', 'ゴリラ3人組に出会う', '金星で、水星の曲・火星のMVを DJ・VJ してみる'] },
 ];
 
 /** Day 9 (client, 2026-10-06): not a planet visit — the way to ORDER. */
