@@ -3,7 +3,7 @@
 MV の絵の描き方は2通り用意してあり、**GitHub の変数 `MV_PLAN` ひとつで切り替える**。
 どちらも「受付 → 順番に処理 → できたら通知」（jobs + プッシュ通知）の上で動く。画質は 720p まで（docs/media.md）。
 
-| | A：Runware 4コマ（今） | B：自社 GPU 回しっぱなし（人が増えたら） |
+| | A：Runware（今） | B：自社 GPU 回しっぱなし（人が増えたら） |
 |---|---|---|
 | 絵 | **FLUX.2 [klein] 4B**（Apache-2.0）を Runware で、1場面1枚（`paintScenes`、`MV_PAINTER`） | **同じ FLUX.2 [klein] 4B** を自社 GPU（obolo-music）で動かす（準備中：`gpu/music/paint.py` に入れる） |
 | 1本の費用 | 12場面 ≈ **約2.3円**（Model scout s02：1枚0.19円。MV lab m14：写真13枚で2.5円・6点 ＝ Seedream 4コマ版 約37円と同じ点） | 描いている時間だけ（1枚 数秒〜1分）。ただし GPU 1台が **月 約7〜11万円**（見込み）かかる |
