@@ -5,13 +5,13 @@
  */
 export type VisualId = 'flash' | 'glitch' | 'invert' | 'mirror' | 'stars' | 'rainbow';
 
-export const VISUALS: { id: VisualId; name: string; icon: string }[] = [
-  { id: 'flash', name: 'FLASH', icon: '⚪' },
-  { id: 'glitch', name: 'GLITCH', icon: '📺' },
-  { id: 'invert', name: 'INVERT', icon: '🌗' },
-  { id: 'mirror', name: 'MIRROR', icon: '🔮' },
-  { id: 'stars', name: 'STARS', icon: '✨' },
-  { id: 'rainbow', name: 'RAINBOW', icon: '🌈' },
+export const VISUALS: { id: VisualId; name: string; short: string }[] = [
+  { id: 'flash', name: 'FLASH', short: 'FLASH' },
+  { id: 'glitch', name: 'GLITCH', short: 'GLITCH' },
+  { id: 'invert', name: 'INVERT', short: 'INVERT' },
+  { id: 'mirror', name: 'MIRROR', short: 'MIRROR' },
+  { id: 'stars', name: 'STARS', short: 'STARS' },
+  { id: 'rainbow', name: 'RAINBOW', short: 'RAINBOW' },
 ];
 
 /** how long each lasts, seconds */

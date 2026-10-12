@@ -8,6 +8,7 @@ import { FX_NAMES, FX_TYPES, type FxType } from '@/lib/dj/fx';
 import { SAMPLES, type SampleId } from '@/lib/dj/sampler';
 import { VISUALS, type VisualId } from '@/lib/dj/visuals';
 import { Fader, Jog, Knob, Pad } from './controls';
+import { PadIcon } from './icons';
 import type { DjTrack } from './DjController';
 import { ART, FONT_NUM, FONT_UI, FONTS_HREF, HOT_CUE_COLORS, NEON, neon } from './skin';
 
@@ -151,7 +152,8 @@ export function DjConsole({ engine, songs, backHref }: { engine: DjEngine; songs
           <div className="absolute" style={{ left: 2 * step, top: 0, width: D, height: D }}>
             <DeckCircle engine={engine} i={1} D={D} k={k} songs={songs} />
           </div>
-          <div className="absolute" style={{ left: step, top: 0, width: D, height: D }}>
+          {/* the mixer's square box overlaps both decks: only its controls catch touches (the ½ / ×2 near it were dead) */}
+          <div className="pointer-events-none absolute" style={{ left: step, top: 0, width: D, height: D }}>
             <MixerCircle engine={engine} D={D} k={k} />
           </div>
         </div>
@@ -267,8 +269,8 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
 
       {/* the platter */}
       <div style={polar(D, 0, 0)}>
-        <Jog size={D * 0.56} skin={ART.jog} color={color} led={0.9} angle={angle} onStart={(top) => deck.jogStart(top)} onTurn={(turns, dt) => deck.jogMove(turns * 1.8, dt)} onEnd={() => deck.jogEnd()}>
-          <Platter deck={deck} size={D * 0.56} i={i} angle={angle} />
+        <Jog size={D * 0.6} skin={ART.jog} color={color} led={0.9} angle={angle} onStart={(top) => deck.jogStart(top)} onTurn={(turns, dt) => deck.jogMove(turns * 1.8, dt)} onEnd={() => deck.jogEnd()}>
+          <Platter deck={deck} size={D * 0.6} i={i} angle={angle} />
         </Jog>
       </div>
 
@@ -298,7 +300,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
         </div>
       ))}
       {/* beat jump in one row under the platter, on the mixer side: ◀◀ JUMP ▶▶ (◀◀ on the left on both decks); tap JUMP to pick the distance */}
-      <div style={xy(0.34, 0.64)}>
+      <div style={xy(0.34, 0.68)}>
         <Pad onDown={() => setJumpPick(!jumpPick)} className="border-0 bg-transparent">
           <span style={{ ...ring(jumpPick, '#f5c66b'), width: b * 1.6, borderRadius: 999 }} className="flex items-center justify-center whitespace-nowrap border">
             JUMP {beatsLabel(deck.jumpBeats)}
@@ -311,7 +313,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
           [1, '▶▶'],
         ] as const
       ).map(([dir, label]) => (
-        <div key={label} style={xy(dir === (i === 0 ? -1 : 1) ? 0.1 : 0.58, 0.64)}>
+        <div key={label} style={xy(dir === (i === 0 ? -1 : 1) ? 0.1 : 0.58, 0.68)}>
           <Pad onDown={() => deck.beatJump(dir)} className="border-0 bg-transparent">
             <span style={ring(false)} className="flex items-center justify-center border">
               {label}
@@ -349,14 +351,14 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
           </span>
         </Pad>
       </div>
-      <div style={at(122, 0.84)}>
+      <div style={at(126, 0.86)}>
         <Pad onDown={() => deck.cueDown()} onUp={() => deck.cueUp()} className="border-0 bg-transparent">
           <Pill color={ORANGE} k={k} lit>
             CUE
           </Pill>
         </Pad>
       </div>
-      <div style={at(95, 0.84)}>
+      <div style={at(101, 0.84)}>
         <Pad onDown={() => deck.toggle()} className="border-0 bg-transparent">
           <Pill color={NEON.green} k={k} lit={deck.playing}>
             ▶❚❚
@@ -366,7 +368,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
 
       {jumpPick && (
         <>
-          <div className="absolute inset-0 z-30" onPointerDown={() => setJumpPick(false)} />
+          <div className="fixed inset-0 z-30" onPointerDown={() => setJumpPick(false)} />
           <div style={{ ...at(20, 0.5), zIndex: 31 }} className="grid grid-cols-4 gap-1 rounded-xl border border-[#c9974f]/50 bg-[#120c09]/95 p-1.5 shadow-xl">
             <span className="col-span-4 px-1 text-center text-white/60" style={{ fontSize: Math.max(9, 9 * k) }}>
               ジャンプする拍
@@ -437,7 +439,7 @@ function Pill({ children, color, k, lit }: { children: ReactNode; color: string;
 }
 
 /** the share of the jog wheel its centre screen takes */
-const PLATTER_SCREEN = 0.6;
+const PLATTER_SCREEN = 0.64;
 
 /** The platter's picture: glowing swirls turning with the record, brighter with the sound. */
 function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1; angle: number }) {
@@ -581,11 +583,11 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
     for (const i of [0, 1] as const) engine.decks[i].setFader(0.85);
   }, [engine]);
   const R = D / 2;
-  const box = (x: number, y: number): CSSProperties => ({ position: 'absolute', left: R + x * R, top: R + y * R, transform: 'translate(-50%, -50%)' });
+  const box = (x: number, y: number): CSSProperties => ({ position: 'absolute', left: R + x * R, top: R + y * R, transform: 'translate(-50%, -50%)', pointerEvents: 'auto' });
   const ks = 22 * k;
 
   return (
-    <div className="absolute inset-0">
+    <div className="pointer-events-none absolute inset-0">
       {/* the two waveforms across the top: deck A above, deck B below */}
       <div style={{ ...box(0, -0.6), width: D * 0.66 }} className="flex flex-col gap-0.5">
         {([0, 1] as const).map((i) => (
@@ -636,8 +638,10 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
                 className="flex select-none flex-col items-center justify-center rounded-full"
                 style={{ ...neon(col, hit === side, k), borderWidth: 2 * k, width: 36 * k, height: 36 * k, touchAction: 'none', color: '#fff' }}
               >
-                <span style={{ fontSize: 12 * k, lineHeight: 1 }}>{sm.icon}</span>
-                <span style={{ fontSize: 6 * k, letterSpacing: 0.3 }}>{sm.name}</span>
+                <span style={{ color: hit === side ? '#fff' : col, lineHeight: 0 }}>
+                  <PadIcon id={sm.id} size={14 * k} />
+                </span>
+                <span style={{ fontSize: 5.8 * k, letterSpacing: '0.04em', marginTop: 1 * k }}>{sm.short}</span>
               </button>
             </div>
             <div style={box(side === 0 ? -0.8 : 0.8, 0.18)}>
@@ -654,9 +658,12 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
       })}
       {samplePick !== null && (
         <>
-          <div className="absolute inset-0 z-30" onPointerDown={() => setSamplePick(null)} />
-          <div style={{ ...box(samplePick === 0 ? -0.3 : 0.3, 0.05), zIndex: 31 }} className="grid grid-cols-3 gap-1 rounded-xl border border-[#c9974f]/50 bg-[#120c09]/95 p-1.5 shadow-xl">
-            <span className="col-span-3 text-center text-white/60" style={{ fontSize: Math.max(9, 9 * k) }}>
+          <div className="pointer-events-auto fixed inset-0 z-30" onPointerDown={() => setSamplePick(null)} />
+          <div
+            style={{ ...box(samplePick === 0 ? -0.3 : 0.12, 0.05), zIndex: 31, gridTemplateColumns: `repeat(${samplePick === 0 ? 3 : 4}, auto)`, borderColor: `${SAMPLER_COLOR[samplePick]}66`, boxShadow: `0 0 18px ${SAMPLER_COLOR[samplePick]}44, 0 10px 30px rgba(0,0,0,0.8)` }}
+            className="grid gap-1 rounded-xl border bg-[#0b0c11]/95 p-1.5 backdrop-blur"
+          >
+            <span className="text-center font-bold tracking-[0.2em] text-white/60" style={{ gridColumn: '1 / -1', fontSize: Math.max(9, 9 * k) }}>
               {samplePick === 0 ? '映像のサンプラー' : '音のサンプラー'}
             </span>
             {(samplePick === 0 ? VISUALS : SAMPLES).map((x) => {
@@ -669,10 +676,10 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
                     setPicked((prev) => (samplePick === 0 ? [x.id as VisualId, prev[1]] : [prev[0], x.id as SampleId]));
                     setSamplePick(null);
                   }}
-                  className="flex flex-col items-center rounded-lg border px-2 py-1 font-bold"
-                  style={{ fontSize: Math.max(9, 9 * k), borderColor: on ? col : 'rgba(255,255,255,0.12)', background: on ? `${col}40` : 'transparent', color: '#fff' }}
+                  className="flex flex-col items-center gap-0.5 whitespace-nowrap rounded-lg px-2 py-1.5"
+                  style={{ ...neon(col, on, 1), fontSize: Math.max(9, 8.5 * k) }}
                 >
-                  <span style={{ fontSize: Math.max(16, 16 * k) }}>{x.icon}</span>
+                  <PadIcon id={x.id} size={Math.max(18, 18 * k)} />
                   {x.name}
                 </button>
               );
@@ -683,7 +690,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
       {/* the FX menu (long press on the FX knob) */}
       {menu !== null && (
         <>
-          <div className="absolute inset-0 z-30" onPointerDown={() => setMenu(null)} />
+          <div className="pointer-events-auto fixed inset-0 z-30" onPointerDown={() => setMenu(null)} />
           <div style={{ ...box(menu === 0 ? -0.3 : 0.3, 0.3), zIndex: 31 }} className="flex flex-col gap-1 rounded-xl border border-[#c9974f]/50 bg-[#120c09]/95 p-1.5 shadow-xl">
             {FX_MODES.map((m) => (
               <button
