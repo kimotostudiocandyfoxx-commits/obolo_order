@@ -23,7 +23,8 @@ function capture(e: RPointerEvent) {
  * (EQ: −26 dB … 0 … +6 dB), so the middle always looks like the middle.
  * With `onMenu`, a long press (held still) opens a menu (the mixer's FX knob: pick the effect).
  */
-export function Knob({ label, value, min, max, center = min, onChange, color = '#f5c66b', size = 54, onMenu }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number; onMenu?: () => void }) {
+export function Knob({ label, value, min, max, center = min, onChange, color = '#f5c66b', size = 54, onMenu, cap }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number; onMenu?: () => void; cap?: string }) {
+  const [capOk, setCapOk] = useState(true);
   // position −1 … 0 … +1 (0 = center)
   const toPos = (v: number) => (v >= center ? (max > center ? (v - center) / (max - center) : 0) : center > min ? -(center - v) / (center - min) : 0);
   const toVal = (p: number) => (p >= 0 ? center + p * (max - center) : center + p * (center - min));
@@ -69,26 +70,45 @@ export function Knob({ label, value, min, max, center = min, onChange, color = '
     const p = Math.max(-1, Math.min(1, start.current.p + (start.current.y - e.clientY) / 110));
     onChange(toVal(min === center ? Math.max(0, p) : p));
   };
-  const r = 42;
+  const r = 46;
   const circ = 2 * Math.PI * r;
+  const lit = Math.abs(pos) > 0.01;
   return (
     <div className="flex select-none flex-col items-center gap-0.5" style={{ touchAction: 'none' }}>
-      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} className="relative rounded-full border border-white/15 bg-[#1b1830] shadow-inner" style={{ width: size, height: size, touchAction: 'none' }}>
-        <svg viewBox="0 0 100 100" className="absolute inset-0">
-          <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" strokeDasharray={`${circ * 0.75} ${circ}`} transform="rotate(135 50 50)" />
-          {/* the lit arc runs from the top (center) to the pointer */}
-          <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="8" strokeDasharray={`${(circ * Math.abs(angle)) / 360} ${circ}`} transform={`rotate(${-90 + Math.min(0, angle)} 50 50)`} />
-          <line x1="50" y1="50" x2="50" y2="16" stroke="white" strokeWidth="6" strokeLinecap="round" transform={`rotate(${angle} 50 50)`} />
-          <circle cx="50" cy="5" r="3" fill="rgba(255,255,255,0.5)" />
+      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} className="relative rounded-full" style={{ width: size, height: size, touchAction: 'none' }}>
+        {/* the neon track around the knob: lit from the top (center) to where it points */}
+        <svg viewBox="0 0 100 100" className="absolute inset-0 overflow-visible">
+          <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="5" strokeDasharray={`${circ * 0.75} ${circ}`} transform="rotate(135 50 50)" />
+          <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(circ * Math.abs(angle)) / 360} ${circ}`} transform={`rotate(${-90 + Math.min(0, angle)} 50 50)`} style={{ filter: lit ? `drop-shadow(0 0 3px ${color})` : undefined }} />
+          <circle cx="50" cy="1.5" r="2.2" fill={lit ? color : 'rgba(255,255,255,0.45)'} />
         </svg>
+        {/* the cap: a machined knob picture turning with the value, or a drawn one */}
+        <div className="absolute overflow-hidden rounded-full" style={{ inset: '13%', transform: `rotate(${angle}deg)`, boxShadow: '0 3px 6px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.6)' }}>
+          {cap && capOk ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={cap} alt="" draggable={false} onError={() => setCapOk(false)} className="h-full w-full object-cover" />
+          ) : (
+            <svg viewBox="0 0 100 100" className="h-full w-full">
+              <defs>
+                <radialGradient id="kcap" cx="45%" cy="35%" r="70%">
+                  <stop offset="0" stopColor="#5b606b" />
+                  <stop offset="0.6" stopColor="#23262d" />
+                  <stop offset="1" stopColor="#0c0d10" />
+                </radialGradient>
+              </defs>
+              <circle cx="50" cy="50" r="50" fill="url(#kcap)" />
+              <line x1="50" y1="50" x2="50" y2="8" stroke="white" strokeWidth="7" strokeLinecap="round" />
+            </svg>
+          )}
+        </div>
       </div>
-      <span className="text-[9px] tracking-wider text-white/60">{label}</span>
+      <span className="text-[9px] font-bold tracking-[0.14em] text-white/70">{label}</span>
     </div>
   );
 }
 
 /** A fader: vertical (channel) or horizontal (crossfader). value 0–1. */
-export function Fader({ value, onChange, horizontal = false, length = 140, label, center }: { value: number; onChange: (v: number) => void; horizontal?: boolean; length?: number; label?: string; center?: number }) {
+export function Fader({ value, onChange, horizontal = false, length = 140, label, center, color = '#ffffff' }: { value: number; onChange: (v: number) => void; horizontal?: boolean; length?: number; label?: string; center?: number; color?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const last = useRef(0);
   const set = (e: RPointerEvent) => {
@@ -112,14 +132,25 @@ export function Fader({ value, onChange, horizontal = false, length = 140, label
         ref={ref}
         onPointerDown={down}
         onPointerMove={(e) => e.buttons && set(e)}
-        className="relative rounded-full bg-black/50"
-        style={horizontal ? { width: length, height: 34 } : { width: 34, height: length }}
+        className="relative rounded-full"
+        style={{ ...(horizontal ? { width: length, height: 34 } : { width: 34, height: length }), background: 'linear-gradient(180deg, rgba(0,0,0,0.55), rgba(20,22,28,0.55))', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.06)' }}
       >
-        <div className="absolute rounded-full bg-white/10" style={horizontal ? { left: 12, right: 12, top: 15, height: 4 } : { top: 12, bottom: 12, left: 15, width: 4 }} />
+        {/* the slot, with tick marks */}
+        <div className="absolute rounded-full bg-black" style={{ ...(horizontal ? { left: 12, right: 12, top: 15, height: 4 } : { top: 12, bottom: 12, left: 15, width: 4 }), boxShadow: `0 0 4px ${color}55` }} />
+        {Array.from({ length: 9 }, (_, n) => (
+          <div key={n} className="absolute bg-white/20" style={horizontal ? { left: `calc(12px + ${n / 8} * (100% - 24px))`, top: 6, width: 1, height: n % 4 ? 3 : 5 } : { top: `calc(12px + ${n / 8} * (100% - 24px))`, left: 6, height: 1, width: n % 4 ? 3 : 5 }} />
+        ))}
+        {/* the cap: brushed metal with a neon line across it */}
         <div
-          className="absolute rounded-md border border-white/40 bg-gradient-to-b from-[#e8e3f5] to-[#9d98b3] shadow"
-          style={horizontal ? { width: 22, height: 30, top: 2, left: `calc(${value * 100}% - ${value * 22}px)` } : { width: 30, height: 22, left: 2, top: `calc(${(1 - value) * 100}% - ${(1 - value) * 22}px)` }}
-        />
+          className="absolute rounded-[5px]"
+          style={{
+            ...(horizontal ? { width: 22, height: 30, top: 2, left: `calc(${value * 100}% - ${value * 22}px)` } : { width: 30, height: 22, left: 2, top: `calc(${(1 - value) * 100}% - ${(1 - value) * 22}px)` }),
+            background: 'linear-gradient(180deg, #f2f4f8 0%, #9ea4b0 45%, #5d636e 55%, #c3c8d1 100%)',
+            boxShadow: '0 3px 6px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.9)',
+          }}
+        >
+          <div className="absolute" style={{ ...(horizontal ? { left: 10, top: 3, bottom: 3, width: 2 } : { top: 10, left: 3, right: 3, height: 2 }), background: color, boxShadow: `0 0 4px ${color}, 0 0 8px ${color}` }} />
+        </div>
       </div>
       {label && <span className="text-[9px] tracking-wider text-white/60">{label}</span>}
     </div>
@@ -130,8 +161,9 @@ export function Fader({ value, onChange, horizontal = false, length = 140, label
  * The jog wheel. Turning reports the change in angle (turns); a touch near the middle is "top" (scratch),
  * near the edge is the rim (bend). `angle` turns the platter on screen.
  */
-export function Jog({ size, angle, onStart, onTurn, onEnd, children }: { size: number; angle: number; onStart: (top: boolean) => void; onTurn: (turns: number, dt: number) => void; onEnd: () => void; children?: ReactNode }) {
+export function Jog({ size, angle, onStart, onTurn, onEnd, children, skin, color = '#ffc24a', led = 0.86 }: { size: number; angle: number; onStart: (top: boolean) => void; onTurn: (turns: number, dt: number) => void; onEnd: () => void; children?: ReactNode; skin?: string; color?: string; led?: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [skinOk, setSkinOk] = useState(true);
   const st = useRef<{ a: number; t: number; id: number } | null>(null);
   const angleOf = (e: RPointerEvent) => {
     const r = ref.current!.getBoundingClientRect();
@@ -161,10 +193,19 @@ export function Jog({ size, angle, onStart, onTurn, onEnd, children }: { size: n
     onEnd();
   };
   return (
-    <div ref={ref} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} className="relative select-none rounded-full border-4 border-[#3a3556] bg-[radial-gradient(circle,#2a2640_0%,#14121f_70%)] shadow-[0_8px_30px_rgba(0,0,0,0.6)]" style={{ width: size, height: size, touchAction: 'none' }}>
-      <div className="absolute inset-[14%] rounded-full border border-white/10" style={{ transform: `rotate(${angle}deg)` }}>
-        <div className="absolute left-1/2 top-1 h-[18%] w-1.5 -translate-x-1/2 rounded-full bg-amber-300" />
-      </div>
+    <div ref={ref} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} className="relative select-none rounded-full" style={{ width: size, height: size, touchAction: 'none', boxShadow: `0 10px 30px rgba(0,0,0,0.85), 0 0 ${size * 0.06}px ${color}33` }}>
+      {skin && skinOk ? (
+        // the jog wheel picture (CDJ-style metal, painted): it stays still like the real one
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={skin} alt="" draggable={false} onError={() => setSkinOk(false)} className="pointer-events-none absolute inset-0 h-full w-full rounded-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 rounded-full border-4 border-[#3a3556] bg-[radial-gradient(circle,#2a2640_0%,#14121f_70%)]" />
+      )}
+      {/* the position light running round the ring, as on a CDJ */}
+      <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0" style={{ transform: `rotate(${angle}deg)` }}>
+        <circle cx="50" cy={50 - led * 50} r="2.2" fill="#fff" style={{ filter: `drop-shadow(0 0 2px ${color}) drop-shadow(0 0 4px ${color})` }} />
+        <path d={`M ${50 - 9} ${50 - led * 50 + 0.6} A ${led * 50} ${led * 50} 0 0 1 50 ${50 - led * 50}`} fill="none" stroke={color} strokeWidth="1.6" strokeLinecap="round" opacity="0.8" style={{ filter: `drop-shadow(0 0 2px ${color})` }} />
+      </svg>
       <div className="absolute inset-0 flex items-center justify-center">{children}</div>
     </div>
   );

@@ -9,17 +9,17 @@ import { SAMPLES, type SampleId } from '@/lib/dj/sampler';
 import { VISUALS, type VisualId } from '@/lib/dj/visuals';
 import { Fader, Jog, Knob, Pad } from './controls';
 import type { DjTrack } from './DjController';
+import { ART, FONT_NUM, FONT_UI, FONTS_HREF, HOT_CUE_COLORS, NEON, neon } from './skin';
 
 /**
  * The Venus DJ console in the client's shape (reference picture 2026-10-12): three circles side by
- * side — deck A, the mixer, deck B — on a dark wooden body with gold rims, orange and blue light.
+ * side — deck A, the mixer, deck B — now in brushed dark metal with a neon rim (skin.ts).
  * The mixer's middle holds a small round screen: the VJ view (the decks' MVs, or visuals from the
  * sound when a song has no MV), mixed by the crossfader. Button positions are provisional until
  * the client settles them.
  *
  * Everything is sized from one circle's diameter D, so it fits any landscape phone.
  */
-const GOLD = '#c9974f';
 const ORANGE = '#ff9a3c';
 const BLUE = '#3cc8ff';
 const DECK_COLOR = [BLUE, ORANGE] as const;
@@ -137,7 +137,11 @@ export function DjConsole({ engine, songs, backHref }: { engine: DjEngine; songs
   const k = D / 330; // 1 at the design size (an 844 × 390 phone)
 
   return (
-    <div className="fixed inset-0 z-[300] overflow-hidden bg-[radial-gradient(ellipse_at_center,#1d1510_0%,#070506_70%)] text-white" style={{ touchAction: 'none' }}>
+    <div
+      className="fixed inset-0 z-[300] overflow-hidden bg-[#05060a] text-white"
+      style={{ touchAction: 'none', fontFamily: FONT_UI, backgroundImage: `radial-gradient(ellipse at center, rgba(5,6,10,0.35) 0%, rgba(5,6,10,0.85) 70%), url(${ART.club})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
+      <link rel="stylesheet" href={FONTS_HREF} precedence="default" />
       <div className="flex h-full items-center justify-center portrait:hidden">
         <div className="relative" style={{ width: W, height: D }}>
           <Body D={D} step={step} />
@@ -162,37 +166,63 @@ export function DjConsole({ engine, songs, backHref }: { engine: DjEngine; songs
   );
 }
 
-/** The wooden body: the three circles as one shape with a gold rim, the mixer's panel on top. */
+/**
+ * The body: the three circles as one shape in brushed dark metal with a neon rim (blue → violet →
+ * orange, deck A to deck B), the decks sunk in dark wells, the mixer's panel in front with a chrome ring.
+ */
 function Body({ D, step }: { D: number; step: number }) {
   const R = D / 2;
   const cx = [R, R + step, R + 2 * step];
+  const W = D + 2 * step;
   return (
-    <svg className="pointer-events-none absolute inset-0" width={D + 2 * step} height={D} style={{ overflow: 'visible', filter: 'drop-shadow(0 14px 30px rgba(0,0,0,0.8))' }}>
+    <svg className="pointer-events-none absolute inset-0" width={W} height={D} style={{ overflow: 'visible', filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.9))' }}>
       <defs>
-        <radialGradient id="wood" cx="50%" cy="40%" r="60%">
-          <stop offset="0" stopColor="#5a2a14" />
-          <stop offset="0.7" stopColor="#3a1a0c" />
-          <stop offset="1" stopColor="#24100a" />
+        <pattern id="metal" patternUnits="userSpaceOnUse" width={D * 0.9} height={D * 0.9}>
+          <rect width={D * 0.9} height={D * 0.9} fill="#15171c" />
+          <image href={ART.metal} width={D * 0.9} height={D * 0.9} preserveAspectRatio="xMidYMid slice" opacity={0.9} />
+        </pattern>
+        <linearGradient id="rim" x1="0" x2={W} y1="0" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor={NEON.blue} />
+          <stop offset="0.5" stopColor={NEON.violet} />
+          <stop offset="1" stopColor={NEON.orange} />
+        </linearGradient>
+        <radialGradient id="well" cx="50%" cy="50%" r="50%">
+          <stop offset="0.8" stopColor="#0a0b0f" />
+          <stop offset="0.97" stopColor="#030304" />
+          <stop offset="1" stopColor="#24272e" />
         </radialGradient>
-        <radialGradient id="panel" cx="50%" cy="45%" r="55%">
-          <stop offset="0" stopColor="#1a1714" />
-          <stop offset="1" stopColor="#0b0908" />
+        <radialGradient id="panel" cx="50%" cy="40%" r="60%">
+          <stop offset="0" stopColor="rgba(40,44,54,0.55)" />
+          <stop offset="1" stopColor="rgba(5,6,9,0.85)" />
         </radialGradient>
+        <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e9edf5" />
+          <stop offset="0.45" stopColor="#5b616e" />
+          <stop offset="0.55" stopColor="#2a2e36" />
+          <stop offset="1" stopColor="#a9b0bd" />
+        </linearGradient>
+        <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur stdDeviation={D * 0.012} />
+        </filter>
       </defs>
-      {/* gold outline of the whole shape: strokes under the fills */}
+      {/* the neon rim of the whole shape: a soft glow under a sharp line, both under the fills */}
       {cx.map((x) => (
-        <circle key={`o${x}`} cx={x} cy={R} r={R - 2} fill="none" stroke={GOLD} strokeWidth={4} />
+        <circle key={`g${x}`} cx={x} cy={R} r={R - 2} fill="none" stroke="url(#rim)" strokeWidth={D * 0.03} filter="url(#glow)" opacity={0.85} />
       ))}
       {cx.map((x) => (
-        <circle key={`f${x}`} cx={x} cy={R} r={R - 3} fill="url(#wood)" />
+        <circle key={`o${x}`} cx={x} cy={R} r={R - 1.5} fill="none" stroke="url(#rim)" strokeWidth={3} />
       ))}
-      {/* the decks' dark rings */}
+      {cx.map((x) => (
+        <circle key={`f${x}`} cx={x} cy={R} r={R - 3} fill="url(#metal)" />
+      ))}
+      {/* the decks' wells */}
       {[cx[0], cx[2]].map((x) => (
-        <circle key={`r${x}`} cx={x} cy={R} r={R * 0.93} fill="#140c08" stroke="rgba(201,151,79,0.45)" strokeWidth={1.5} />
+        <circle key={`r${x}`} cx={x} cy={R} r={R * 0.93} fill="url(#well)" />
       ))}
-      {/* the mixer's round panel, in front of the decks */}
-      <circle cx={cx[1]} cy={R} r={R * 0.95} fill={GOLD} />
-      <circle cx={cx[1]} cy={R} r={R * 0.93} fill="url(#panel)" />
+      {/* the mixer's round panel, in front of the decks: a chrome ring, metal, a dark glass tint */}
+      <circle cx={cx[1]} cy={R} r={R * 0.955} fill="url(#chrome)" />
+      <circle cx={cx[1]} cy={R} r={R * 0.935} fill="url(#metal)" />
+      <circle cx={cx[1]} cy={R} r={R * 0.935} fill="url(#panel)" />
     </svg>
   );
 }
@@ -222,16 +252,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   };
   const pos = deck.position();
   const angle = ((pos / 1.8) * 360) % 360;
-  const ring = (active: boolean, c: string = color): CSSProperties => ({
-    width: b,
-    height: b,
-    borderRadius: '50%',
-    fontSize: 7.5 * k,
-    boxShadow: active ? `0 0 ${8 * k}px ${c}` : 'inset 0 1px 2px rgba(255,255,255,0.15)',
-    borderColor: active ? c : 'rgba(201,151,79,0.5)',
-    color: active ? '#fff' : 'rgba(255,255,255,0.75)',
-    background: active ? `${c}55` : '#0e0a08',
-  });
+  const ring = (active: boolean, c: string = color): CSSProperties => ({ ...neon(c, active, k), width: b, height: b, borderRadius: '50%', fontSize: 8.5 * k });
 
   return (
     <div className="absolute inset-0">
@@ -246,8 +267,8 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
 
       {/* the platter */}
       <div style={polar(D, 0, 0)}>
-        <Jog size={D * 0.54} angle={angle} onStart={(top) => deck.jogStart(top)} onTurn={(turns, dt) => deck.jogMove(turns * 1.8, dt)} onEnd={() => deck.jogEnd()}>
-          <Platter deck={deck} size={D * 0.54} i={i} angle={angle} />
+        <Jog size={D * 0.56} skin={ART.jog} color={color} led={0.9} angle={angle} onStart={(top) => deck.jogStart(top)} onTurn={(turns, dt) => deck.jogMove(turns * 1.8, dt)} onEnd={() => deck.jogEnd()}>
+          <Platter deck={deck} size={D * 0.56} i={i} angle={angle} />
         </Jog>
       </div>
 
@@ -255,7 +276,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       {Array.from({ length: HOT_CUES }, (_, n) => (
         <div key={n} style={at(-150 + n * 13, 0.84)}>
           <Pad onDown={() => deck.hotCue(n)} onLong={() => deck.clearHotCue(n)} className="border-0 bg-transparent">
-            <span style={ring(deck.hotCues[n] !== null, '#9be37a')} className="flex items-center justify-center border">{n + 1}</span>
+            <span style={ring(deck.hotCues[n] !== null, HOT_CUE_COLORS[n])} className="flex items-center justify-center border">{n + 1}</span>
           </Pad>
         </div>
       ))}
@@ -302,12 +323,16 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       {/* tempo on the outer side, KEY (key lock) under it */}
       <div style={at(180, 0.8)}>
         <div className="flex flex-col items-center" style={{ gap: 4 * k }}>
-          <div style={{ width: 34 * k, height: 106 * k }}>
-            <div className="flex flex-col items-center" style={{ width: 34, transform: `scale(${k})`, transformOrigin: 'top left' }}>
-              <span className="text-[8px] tabular-nums text-white/60">{(deck.tempo * 100).toFixed(1)}%</span>
-              <Fader value={(deck.tempo / TEMPO_RANGE + 1) / 2} length={80} center={0.5} onChange={(v) => deck.setTempo((v * 2 - 1) * TEMPO_RANGE)} />
+          <div style={{ width: 34 * k, height: 80 * k }}>
+            <div style={{ width: 34, transform: `scale(${k})`, transformOrigin: 'top left' }}>
+              <Fader color={color} value={(deck.tempo / TEMPO_RANGE + 1) / 2} length={80} center={0.5} onChange={(v) => deck.setTempo((v * 2 - 1) * TEMPO_RANGE)} />
             </div>
           </div>
+          {/* the tempo now, under its fader */}
+          <span className="tabular-nums" style={{ fontFamily: FONT_NUM, fontSize: 7 * k, color, textShadow: `0 0 ${4 * k}px ${color}` }}>
+            {deck.tempo >= 0 ? '+' : ''}
+            {(deck.tempo * 100).toFixed(1)}%
+          </span>
           <Pad onDown={() => deck.setKeylock(!deck.keylock)} className="border-0 bg-transparent">
             <span style={{ ...ring(deck.keylock, '#f5c66b'), width: b * 1.3, borderRadius: 999 }} className="flex items-center justify-center border">
               KEY
@@ -333,7 +358,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       </div>
       <div style={at(95, 0.84)}>
         <Pad onDown={() => deck.toggle()} className="border-0 bg-transparent">
-          <Pill color={BLUE} k={k} lit={deck.playing}>
+          <Pill color={NEON.green} k={k} lit={deck.playing}>
             ▶❚❚
           </Pill>
         </Pad>
@@ -403,13 +428,16 @@ const beatsLabel = (n: number) => (n < 1 ? `1/${1 / n}` : String(n));
 function Pill({ children, color, k, lit }: { children: ReactNode; color: string; k: number; lit?: boolean }) {
   return (
     <span
-      className="flex items-center justify-center rounded-full border-2 font-bold"
-      style={{ width: 48 * k, height: 26 * k, fontSize: 10 * k, borderColor: color, color: lit ? '#fff' : color, background: lit ? `${color}40` : '#0b0807', boxShadow: lit ? `0 0 ${12 * k}px ${color}` : `0 0 ${5 * k}px ${color}55` }}
+      className="flex items-center justify-center rounded-full"
+      style={{ ...neon(color, !!lit, k), borderWidth: 2 * k, width: 50 * k, height: 27 * k, fontSize: 11 * k, letterSpacing: '0.12em' }}
     >
       {children}
     </span>
   );
 }
+
+/** the share of the jog wheel its centre screen takes */
+const PLATTER_SCREEN = 0.6;
 
 /** The platter's picture: glowing swirls turning with the record, brighter with the sound. */
 function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1; angle: number }) {
@@ -420,7 +448,7 @@ function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1;
     const c = ref.current;
     if (!c) return;
     const g = c.getContext('2d')!;
-    const S = (c.width = c.height = Math.round(size * 0.8 * devicePixelRatio));
+    const S = (c.width = c.height = Math.round(size * PLATTER_SCREEN * devicePixelRatio));
     deck.analyser.getByteFrequencyData(data.current);
     let level = 0;
     for (let n = 0; n < 40; n++) level += data.current[n];
@@ -510,7 +538,12 @@ function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1;
     g.lineWidth = S / 120;
     g.stroke();
   });
-  return <canvas ref={ref} className="pointer-events-none rounded-full" style={{ width: size * 0.8, height: size * 0.8 }} />;
+  // the jog's centre screen, in a gold bezel like the wheel's own
+  return (
+    <div className="pointer-events-none rounded-full p-[2px]" style={{ background: 'linear-gradient(160deg, #ffe3a3, #b07a2a 40%, #5a3a10 60%, #e8c06a)', boxShadow: '0 0 8px rgba(0,0,0,0.9), inset 0 0 2px rgba(0,0,0,0.8)' }}>
+      <canvas ref={ref} className="block rounded-full bg-black" style={{ width: size * PLATTER_SCREEN, height: size * PLATTER_SCREEN }} />
+    </div>
+  );
 }
 
 /** The FX knob's choices: the filter is one of the effects (client 2026-10-12). */
@@ -565,10 +598,11 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
       {/* EQ + filter, a column per deck */}
       {([0, 1] as const).map((i) => (
         <div key={i} style={box(i === 0 ? -0.52 : 0.52, 0.2)} className="flex flex-col items-center">
-          <Knob label="HI" size={ks} value={s[i].high} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'high', v)} />
-          <Knob label="MID" size={ks} value={s[i].mid} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'mid', v)} />
-          <Knob label="LOW" size={ks} value={s[i].low} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'low', v)} />
+          <Knob cap={ART.knob} label="HI" size={ks} value={s[i].high} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'high', v)} />
+          <Knob cap={ART.knob} label="MID" size={ks} value={s[i].mid} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'mid', v)} />
+          <Knob cap={ART.knob} label="LOW" size={ks} value={s[i].low} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'low', v)} />
           <Knob
+            cap={ART.knob}
             label={`${FX_LABEL[mode[i]]} ▾`}
             size={ks}
             value={s[i].filter}
@@ -590,7 +624,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
         return (
           <div key={`s${side}`}>
             <div style={box(side === 0 ? -0.8 : 0.8, -0.2)} className="pointer-events-none text-center font-bold tracking-wider">
-              <span style={{ fontSize: 6 * k, color: `${col}cc` }}>{side === 0 ? 'VISUAL' : 'SOUND'}</span>
+              <span style={{ fontSize: 6.5 * k, letterSpacing: '0.2em', color: col, textShadow: `0 0 ${4 * k}px ${col}` }}>{side === 0 ? 'VISUAL' : 'SOUND'}</span>
             </div>
             <div style={box(side === 0 ? -0.8 : 0.8, -0.06)}>
               <button
@@ -599,8 +633,8 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
                   setHit(side);
                   setTimeout(() => setHit((h) => (h === side ? null : h)), 160);
                 }}
-                className="flex select-none flex-col items-center justify-center rounded-full border-2 font-bold"
-                style={{ width: 34 * k, height: 34 * k, touchAction: 'none', borderColor: col, background: hit === side ? `${col}88` : '#0b0807', boxShadow: `0 0 ${(hit === side ? 16 : 6) * k}px ${col}${hit === side ? '' : '66'}`, color: '#fff' }}
+                className="flex select-none flex-col items-center justify-center rounded-full"
+                style={{ ...neon(col, hit === side, k), borderWidth: 2 * k, width: 36 * k, height: 36 * k, touchAction: 'none', color: '#fff' }}
               >
                 <span style={{ fontSize: 12 * k, lineHeight: 1 }}>{sm.icon}</span>
                 <span style={{ fontSize: 6 * k, letterSpacing: 0.3 }}>{sm.name}</span>
@@ -609,8 +643,8 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
             <div style={box(side === 0 ? -0.8 : 0.8, 0.18)}>
               <button
                 onClick={() => setSamplePick(samplePick === side ? null : side)}
-                className="select-none whitespace-nowrap rounded-full border font-bold"
-                style={{ fontSize: 7 * k, padding: `${2 * k}px ${6 * k}px`, borderColor: samplePick === side ? col : 'rgba(201,151,79,0.5)', color: 'rgba(255,255,255,0.8)', background: '#0e0a08' }}
+                className="select-none whitespace-nowrap rounded-full"
+                style={{ ...neon(col, samplePick === side, k), fontSize: 7.5 * k, padding: `${2 * k}px ${7 * k}px` }}
               >
                 えらぶ
               </button>
@@ -668,7 +702,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
       {([0, 1] as const).map((i) => (
         <div key={`f${i}`} style={{ ...box(i === 0 ? -0.2 : 0.2, 0.36) }}>
           <div style={{ transform: `scale(${k * 0.85})` }}>
-            <Fader value={s[i].fader} length={78} onChange={(v) => set(i, 'fader', v)} />
+            <Fader color={DECK_COLOR[i]} value={s[i].fader} length={78} onChange={(v) => set(i, 'fader', v)} />
           </div>
         </div>
       ))}
@@ -679,7 +713,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
       {/* crossfader at the bottom */}
       <div style={box(0, 0.74)}>
         <div style={{ transform: `scale(${k})` }}>
-          <Fader horizontal value={xf} length={120} center={0.5} onChange={(v) => (setXf(v), engine.setCrossfader(v))} />
+          <Fader horizontal color={NEON.violet} value={xf} length={120} center={0.5} onChange={(v) => (setXf(v), engine.setCrossfader(v))} />
         </div>
       </div>
     </div>
@@ -783,12 +817,13 @@ function TrackLine({ deck, i, k }: { deck: Deck; i: 0 | 1; k: number }) {
   useDeck(deck);
   return (
     <div className="flex items-center gap-1 truncate" style={{ fontSize: 8 * k, lineHeight: 1.3 }}>
-      <span className="rounded-sm px-1 font-bold text-black" style={{ background: DECK_COLOR[i] }}>
+      <span className="rounded-sm px-1 font-bold text-black" style={{ background: DECK_COLOR[i], fontFamily: FONT_NUM, boxShadow: `0 0 ${5 * k}px ${DECK_COLOR[i]}` }}>
         {i === 0 ? 'A' : 'B'}
       </span>
       <span className="min-w-0 flex-1 truncate text-white/80">{deck.meta?.title ?? '—'}</span>
-      <span className="tabular-nums" style={{ color: DECK_COLOR[i] }}>
+      <span className="tabular-nums" style={{ color: DECK_COLOR[i], fontFamily: FONT_NUM, fontWeight: 800, textShadow: `0 0 ${4 * k}px ${DECK_COLOR[i]}` }}>
         {deck.bpm ? deck.bpm.toFixed(1) : '--.-'}
+        <span style={{ fontSize: '0.7em', marginLeft: 2, opacity: 0.7 }}>BPM</span>
       </span>
     </div>
   );
@@ -887,7 +922,7 @@ function Wave({ deck, h }: { deck: Deck; h: number }) {
       mark(deck.loop.end, LOOP_COLOR);
     }
     mark(deck.cue, '#ffb340');
-    deck.hotCues.forEach((x) => x !== null && mark(x, '#9be37a'));
+    deck.hotCues.forEach((x, n) => x !== null && mark(x, HOT_CUE_COLORS[n]));
     g.fillStyle = '#fff';
     g.fillRect(W / 2 - 1, 0, 2 * devicePixelRatio, H);
   });
