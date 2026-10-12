@@ -29,6 +29,10 @@ export class Deck {
   /** the crossfader's side of this deck (the engine sets it) */
   readonly xf: GainNode;
   readonly fx: DeckFx;
+  /** the deck's sound after its fader, for the level light and the VJ visuals */
+  readonly analyser: AnalyserNode;
+  /** the channel fader as set (0–1), for the VJ mix */
+  faderValue = 0.85;
   private readonly trim: GainNode;
   private readonly low: BiquadFilterNode;
   private readonly mid: BiquadFilterNode;
@@ -86,6 +90,10 @@ export class Deck {
     stretch.connect(this.trim).connect(this.low).connect(this.mid).connect(this.high).connect(this.hp).connect(this.lp);
     this.lp.connect(this.fx.input);
     this.fx.output.connect(this.fader).connect(this.xf).connect(this.out);
+    this.analyser = ctx.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.analyser.smoothingTimeConstant = 0.7;
+    this.fader.connect(this.analyser);
     void stretch.setUpdateInterval(0.05, (t) => {
       this.at = { input: t, ctx: ctx.currentTime };
       this.emit();
@@ -257,6 +265,7 @@ export class Deck {
   }
 
   setFader(v: number) {
+    this.faderValue = Math.max(0, Math.min(1, v));
     // a slight curve: the top of the fader is where the level is
     this.fader.gain.setTargetAtTime(Math.pow(Math.max(0, Math.min(1, v)), 1.6), this.ctx.currentTime, 0.01);
   }

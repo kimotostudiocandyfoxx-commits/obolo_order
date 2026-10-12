@@ -51,6 +51,11 @@ export class DjEngine {
   }
 
   /** 0 = only deck A … 1 = only deck B, equal-power in between. */
+  /** the crossfader as set (0 = A … 1 = B), for the VJ mix */
+  get crossfader() {
+    return this.crossfade;
+  }
+
   setCrossfader(x: number) {
     this.crossfade = Math.max(0, Math.min(1, x));
     const t = this.ctx.currentTime;
