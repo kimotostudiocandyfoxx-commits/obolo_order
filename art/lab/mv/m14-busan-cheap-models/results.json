@@ -1,0 +1,139 @@
+{
+  "round": "m14-busan-cheap-models",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6,
+    "heroLikeness": 6.6,
+    "heroConsistency": 6.6,
+    "pictureQuality": 6.2,
+    "storyTelling": 5.6,
+    "lyricFit": 7,
+    "beatSync": 5.1,
+    "variety": 4.9,
+    "watchability": 5.9,
+    "kidsSafe": 6.7
+  },
+  "results": [
+    {
+      "id": "klein4b",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 2.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 17,
+        "render": 57
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 6,
+        "pictureQuality": 6,
+        "storyTelling": 5,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:04 Repetitive table-eating composition dominates almost every cut.",
+          "00:11 Mask face morphs into an open mouth rather than remaining a fixed mask.",
+          "00:34 Speed line effects are overused on static dining actions."
+        ],
+        "fixIdeas": [
+          "Add non-eating travel actions like walking or exploring markets.",
+          "Specify in prompts to keep the mask rigid without an articulated mouth.",
+          "Vary camera distances with wider establishing shots and tight macro food cuts."
+        ],
+        "bestMoments": [
+          "00:00 Peaceful opening scene framing the ocean view.",
+          "00:15 Rich depiction of the local crab dishes."
+        ]
+      }
+    },
+    {
+      "id": "klein9b",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 4.8,
+      "seconds": {
+        "plan": 0,
+        "paint": 20,
+        "render": 56
+      },
+      "judge": {
+        "heroLikeness": 6.8,
+        "heroConsistency": 6.9,
+        "pictureQuality": 6.7,
+        "storyTelling": 5.8,
+        "lyricFit": 6.9,
+        "beatSync": 5.2,
+        "variety": 4.8,
+        "watchability": 5.8,
+        "kidsSafe": 7.2,
+        "overall": 6,
+        "problems": [
+          "0:04 Repetitive composition with character seated facing front eating food across too many consecutive cuts.",
+          "0:23 Static panning and zoom effects feel repetitive and slideshow-like.",
+          "0:32 Rapid succession of similar food eating scenes near the end lacks rhythmic synchrony."
+        ],
+        "fixIdeas": [
+          "Vary character actions beyond sitting and eating, such as walking or interacting with locals.",
+          "Incorporate more distinct wide and close-up camera angles to break visual monotony.",
+          "Align final rapid cuts to dynamic musical cues instead of uniform image swapping."
+        ],
+        "bestMoments": [
+          "0:01 Scenic opening hotel view overlooking the harbor.",
+          "0:11 Lively seafood market interaction with detailed tank art."
+        ]
+      }
+    },
+    {
+      "id": "qwen-grid",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 8.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 37,
+        "render": 52
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 7,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 6,
+        "overall": 6,
+        "problems": [
+          "00:30 repetitive eating shots in final half",
+          "00:34 presence of beer glasses in kids-focused app",
+          "00:45 final shot style clash with live photo appearance"
+        ],
+        "fixIdeas": [
+          "Vary character poses beyond sitting at tables eating",
+          "Replace alcoholic drinks with soft drinks or tea",
+          "Maintain consistent anime aesthetic in final food plate shot"
+        ],
+        "bestMoments": [
+          "00:00 opening window view establishing atmosphere",
+          "00:11 lively aquarium crab market scene",
+          "00:23 dramatic street framing with speed lines"
+        ]
+      }
+    }
+  ]
+}
