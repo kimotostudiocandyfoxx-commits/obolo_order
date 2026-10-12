@@ -21,30 +21,55 @@ function capture(e: RPointerEvent) {
  * swipe up = more (+, turns right), swipe down = less (−, turns left); a double tap goes back to center.
  * Below center and above center each get half a turn of travel, whatever their size in units
  * (EQ: −26 dB … 0 … +6 dB), so the middle always looks like the middle.
+ * With `onMenu`, a long press or a double tap opens a menu instead (the mixer's FX knob: pick the effect).
  */
-export function Knob({ label, value, min, max, center = min, onChange, color = '#f5c66b', size = 54 }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number }) {
+export function Knob({ label, value, min, max, center = min, onChange, color = '#f5c66b', size = 54, onMenu }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number; onMenu?: () => void }) {
   // position −1 … 0 … +1 (0 = center)
   const toPos = (v: number) => (v >= center ? (max > center ? (v - center) / (max - center) : 0) : center > min ? -(center - v) / (center - min) : 0);
   const toVal = (p: number) => (p >= 0 ? center + p * (max - center) : center + p * (center - min));
   const start = useRef<{ y: number; p: number } | null>(null);
   const last = useRef(0);
+  const long = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopLong = () => {
+    if (long.current) clearTimeout(long.current);
+    long.current = null;
+  };
+  useEffect(() => stopLong, []);
   const pos = toPos(value);
   const angle = pos * 135;
   const down = (e: RPointerEvent) => {
     capture(e);
     const now = Date.now();
-    // double tap: back to center, and the drag that follows starts from there
     if (now - last.current < 350) {
       last.current = 0;
+      // double tap: the menu, or back to center (the drag that follows starts from there)
+      if (onMenu) {
+        start.current = null;
+        onMenu();
+        return;
+      }
       onChange(center);
       start.current = { y: e.clientY, p: 0 };
       return;
     }
     last.current = now;
     start.current = { y: e.clientY, p: pos };
+    // long press (held still): the menu
+    if (onMenu)
+      long.current = setTimeout(() => {
+        long.current = null;
+        start.current = null;
+        last.current = 0;
+        onMenu();
+      }, 500);
+  };
+  const up = () => {
+    stopLong();
+    start.current = null;
   };
   const move = (e: RPointerEvent) => {
     if (!start.current) return;
+    if (long.current && Math.abs(start.current.y - e.clientY) > 6) stopLong();
     // 110 px of swipe = from the middle to one end
     const p = Math.max(-1, Math.min(1, start.current.p + (start.current.y - e.clientY) / 110));
     onChange(toVal(min === center ? Math.max(0, p) : p));
@@ -53,7 +78,7 @@ export function Knob({ label, value, min, max, center = min, onChange, color = '
   const circ = 2 * Math.PI * r;
   return (
     <div className="flex select-none flex-col items-center gap-0.5" style={{ touchAction: 'none' }}>
-      <div onPointerDown={down} onPointerMove={move} onPointerUp={() => (start.current = null)} onPointerCancel={() => (start.current = null)} className="relative rounded-full border border-white/15 bg-[#1b1830] shadow-inner" style={{ width: size, height: size, touchAction: 'none' }}>
+      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} className="relative rounded-full border border-white/15 bg-[#1b1830] shadow-inner" style={{ width: size, height: size, touchAction: 'none' }}>
         <svg viewBox="0 0 100 100" className="absolute inset-0">
           <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" strokeDasharray={`${circ * 0.75} ${circ}`} transform="rotate(135 50 50)" />
           {/* the lit arc runs from the top (center) to the pointer */}

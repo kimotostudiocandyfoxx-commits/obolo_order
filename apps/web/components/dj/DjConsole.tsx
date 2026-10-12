@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useReducer, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { HOT_CUES, TEMPO_RANGE, type Deck } from '@/lib/dj/deck';
 import type { DjEngine } from '@/lib/dj/engine';
-import { FX_TYPES, type FxType } from '@/lib/dj/fx';
+import { FX_NAMES, FX_TYPES, type FxType } from '@/lib/dj/fx';
 import { Fader, Jog, Knob, Pad } from './controls';
 import type { DjTrack } from './DjController';
 
@@ -184,7 +184,6 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   const deck = engine.decks[i];
   useDeck(deck);
   useDeckVideo(deck);
-  const [fx, setFx] = useState<{ type: FxType; amount: number }>({ type: 'echo', amount: 0 });
   const [pick, setPick] = useState(false);
   const [loading, setLoading] = useState('');
   const file = useRef<HTMLInputElement>(null);
@@ -213,7 +212,6 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
     color: active ? '#fff' : 'rgba(255,255,255,0.75)',
     background: active ? `${c}55` : '#0e0a08',
   });
-  const FXN: Record<FxType, string> = { echo: 'ECHO', reverb: 'REV', flanger: 'FLNG', sweep: 'SWP' };
 
   return (
     <div className="absolute inset-0">
@@ -233,7 +231,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
         </Jog>
       </div>
 
-      {/* hot cues on the upper outer arc, effects on the upper inner arc */}
+      {/* hot cues on the upper outer arc */}
       {Array.from({ length: HOT_CUES }, (_, n) => (
         <div key={n} style={at(-150 + n * 13, 0.84)}>
           <Pad onDown={() => deck.hotCue(n)} onLong={() => deck.clearHotCue(n)} className="border-0 bg-transparent">
@@ -241,39 +239,29 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
           </Pad>
         </div>
       ))}
-      {FX_TYPES.map((t, n) => (
-        <div key={t} style={at(-68 + n * 13, 0.84)}>
-          <Pad onDown={() => (setFx({ ...fx, type: t }), deck.setFx(t, fx.amount))} active={false} className="border-0 bg-transparent">
-            <span style={ring(fx.type === t && fx.amount > 0.01)} className="flex items-center justify-center border">
-              {FXN[t]}
+
+      {/* tempo on the outer side, KEY (key lock) under it */}
+      <div style={at(180, 0.8)}>
+        <div className="flex flex-col items-center" style={{ gap: 4 * k }}>
+          <div style={{ width: 34 * k, height: 106 * k }}>
+            <div className="flex flex-col items-center" style={{ width: 34, transform: `scale(${k})`, transformOrigin: 'top left' }}>
+              <span className="text-[8px] tabular-nums text-white/60">{(deck.tempo * 100).toFixed(1)}%</span>
+              <Fader value={(deck.tempo / TEMPO_RANGE + 1) / 2} length={80} center={0.5} onChange={(v) => deck.setTempo((v * 2 - 1) * TEMPO_RANGE)} />
+            </div>
+          </div>
+          <Pad onDown={() => deck.setKeylock(!deck.keylock)} className="border-0 bg-transparent">
+            <span style={{ ...ring(deck.keylock, '#f5c66b'), width: b * 1.3, borderRadius: 999 }} className="flex items-center justify-center border">
+              KEY
             </span>
           </Pad>
         </div>
-      ))}
-      <div style={at(-22, 0.62)}>
-        <Knob label="FX" size={28 * k} value={fx.amount} min={0} max={1} center={0} color={color} onChange={(v) => (setFx({ ...fx, amount: v }), deck.setFx(fx.type, v))} />
       </div>
 
-      {/* tempo on the outer side */}
-      <div style={at(180, 0.8)}>
-        <div className="flex flex-col items-center" style={{ transform: `scale(${k})` }}>
-          <span className="text-[8px] tabular-nums text-white/60">{(deck.tempo * 100).toFixed(1)}%</span>
-          <Fader value={(deck.tempo / TEMPO_RANGE + 1) / 2} length={80} center={0.5} onChange={(v) => deck.setTempo((v * 2 - 1) * TEMPO_RANGE)} />
-        </div>
-      </div>
-
-      {/* SYNC and KEY low on the sides, CUE and play at the bottom */}
+      {/* SYNC low on the side, CUE and play at the bottom */}
       <div style={at(140, 0.8)}>
         <Pad onDown={() => engine.sync(i)} className="border-0 bg-transparent">
           <span style={{ ...ring(false), width: b * 1.4, borderRadius: 999 }} className="flex items-center justify-center border">
             SYNC
-          </span>
-        </Pad>
-      </div>
-      <div style={at(42, 0.68)}>
-        <Pad onDown={() => deck.setKeylock(!deck.keylock)} className="border-0 bg-transparent">
-          <span style={{ ...ring(deck.keylock, '#f5c66b'), width: b * 1.3, borderRadius: 999 }} className="flex items-center justify-center border">
-            KEY
           </span>
         </Pad>
       </div>
@@ -406,15 +394,32 @@ function Platter({ deck, size, i, angle }: { deck: Deck; size: number; i: 0 | 1;
   return <canvas ref={ref} className="pointer-events-none rounded-full" style={{ width: size * 0.8, height: size * 0.8 }} />;
 }
 
+/** The FX knob's choices: the filter is one of the effects (client 2026-10-12). */
+type FxMode = 'filter' | FxType;
+const FX_MODES: FxMode[] = ['filter', ...FX_TYPES];
+const FX_LABEL: Record<FxMode, string> = { filter: 'FILTER', ...FX_NAMES };
+
 function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number }) {
   const [s, setS] = useState(() => [0, 1].map(() => ({ high: 0, mid: 0, low: 0, filter: 0, fader: 0.85 })));
   const [xf, setXf] = useState(0.5);
+  // the bottom knob of each column is the FX knob: FILTER or one of the effects, picked from its menu
+  const [mode, setMode] = useState<FxMode[]>(['filter', 'filter']);
+  const [menu, setMenu] = useState<0 | 1 | null>(null);
+  const applyFx = (i: 0 | 1, m: FxMode, v: number) => (m === 'filter' ? engine.decks[i].setFilter(v) : engine.decks[i].setFx(m, v));
   const set = (i: 0 | 1, key: 'high' | 'mid' | 'low' | 'filter' | 'fader', v: number) => {
     setS((prev) => prev.map((x, j) => (j === i ? { ...x, [key]: v } : x)));
     const d = engine.decks[i];
-    if (key === 'filter') d.setFilter(v);
+    if (key === 'filter') applyFx(i, mode[i], v);
     else if (key === 'fader') d.setFader(v);
     else d.setEq(key, v);
+  };
+  const pickFx = (i: 0 | 1, m: FxMode) => {
+    setMenu(null);
+    if (m === mode[i]) return;
+    // the old one off, the new one starts at zero
+    applyFx(i, mode[i], 0);
+    setMode((prev) => prev.map((x, j) => (j === i ? m : x)));
+    setS((prev) => prev.map((x, j) => (j === i ? { ...x, filter: 0 } : x)));
   };
   useEffect(() => {
     for (const i of [0, 1] as const) engine.decks[i].setFader(0.85);
@@ -440,9 +445,37 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
           <Knob label="HI" size={ks} value={s[i].high} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'high', v)} />
           <Knob label="MID" size={ks} value={s[i].mid} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'mid', v)} />
           <Knob label="LOW" size={ks} value={s[i].low} min={-26} max={6} center={0} color={DECK_COLOR[i]} onChange={(v) => set(i, 'low', v)} />
-          <Knob label="FILTER" size={ks} value={s[i].filter} min={-1} max={1} center={0} color="#9be37a" onChange={(v) => set(i, 'filter', v)} />
+          <Knob
+            label={`${FX_LABEL[mode[i]]} ▾`}
+            size={ks}
+            value={s[i].filter}
+            min={mode[i] === 'filter' ? -1 : 0}
+            max={1}
+            center={0}
+            color={mode[i] === 'filter' ? '#9be37a' : '#ff6ad5'}
+            onChange={(v) => set(i, 'filter', v)}
+            onMenu={() => setMenu(i)}
+          />
         </div>
       ))}
+      {/* the FX menu (long press / double tap on the FX knob) */}
+      {menu !== null && (
+        <>
+          <div className="absolute inset-0 z-30" onPointerDown={() => setMenu(null)} />
+          <div style={{ ...box(menu === 0 ? -0.3 : 0.3, 0.3), zIndex: 31 }} className="flex flex-col gap-1 rounded-xl border border-[#c9974f]/50 bg-[#120c09]/95 p-1.5 shadow-xl">
+            {FX_MODES.map((m) => (
+              <button
+                key={m}
+                onClick={() => pickFx(menu, m)}
+                className="rounded-lg border px-3 py-1.5 text-left font-bold tracking-wider"
+                style={{ fontSize: Math.max(10, 10 * k), borderColor: m === mode[menu] ? DECK_COLOR[menu] : 'rgba(255,255,255,0.12)', color: m === mode[menu] ? '#fff' : 'rgba(255,255,255,0.75)', background: m === mode[menu] ? `${DECK_COLOR[menu]}40` : 'transparent' }}
+              >
+                {FX_LABEL[m]}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
       {/* channel faders either side of the VJ screen */}
       {([0, 1] as const).map((i) => (
         <div key={`f${i}`} style={{ ...box(i === 0 ? -0.2 : 0.2, 0.36) }}>
