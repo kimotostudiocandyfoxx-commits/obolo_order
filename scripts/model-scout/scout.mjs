@@ -136,14 +136,22 @@ if (round.heroes?.length && round.scenes?.length) {
   let total = 0;
   for (const h of round.heroes) {
     report.push(`### ${h.name}`, '');
+    // a hero can be drawn first from words (`make`): a round ぷにぷに character on white, like the app's own
+    if (h.make && !h.file) {
+      const [d] = await call([task({ ...m, refs: 'none' }, h.make, [], 1024, 1024)]);
+      h.file = join(OUT, `${h.name}-ref.jpg`);
+      writeFileSync(h.file, Buffer.from(await (await fetch(d.imageURL)).arrayBuffer()));
+      total += d.cost ?? 0;
+    }
     const ref = dataUri(h.file);
     const results = await Promise.all(
       round.scenes.map(async (sc, k) => {
         const prompt = [
           `A still from a high-end Japanese anime film, fully drawn in 2D anime style: ${sc}.`,
           `The main character is the one in the reference picture — exactly the same design, colours, outfit and accessories (${h.look}) — shown exactly once.`,
-          'Keep its face, headwear, eyewear and outfit exactly as in the reference; never draw an open mouth or teeth the reference does not have.',
-          'Any glass on the table holds orange juice, green tea or milk. Rich detailed background, cinematic lighting. No text, no watermark.',
+          // s03: naming "eyewear" here put glasses on characters that have none → only the hero's own words
+          'Keep its face and everything it wears exactly as in the reference — add nothing it does not have; never draw an open mouth or teeth the reference does not have.',
+          `${/eat|ramen|food|table/.test(sc) ? 'Any glass on the table holds orange juice, green tea or milk. ' : ''}Rich detailed background, cinematic lighting. No text, no watermark.`,
         ].join(' ');
         try {
           const [d] = await call([task({ ...m, refs: 'top' }, prompt, [ref], 1024, 1024)]);

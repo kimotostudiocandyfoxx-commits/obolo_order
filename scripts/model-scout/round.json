@@ -1,6 +1,6 @@
 {
-  "round": "s03-characters",
-  "note": "キャラの特徴（帽子・サングラス・服など）が FLUX.2 klein 4B でどこまで保たれるか。7キャラ×4場面（1枚0.19円）。",
+  "round": "s04-puni-characters",
+  "note": "アプリの「ぷにぷにキャラ」（丸い体＋小物で個性）で試す。まず klein 4B で丸キャラを3体描き、それぞれ4場面。s03 の反省：「メガネ」などの言葉を出さない／飲み物は食事の場面だけ。KIMORIN もやり直し。",
   "search": [],
   "models": [],
   "heroes": [
@@ -10,34 +10,19 @@
       "look": "small chibi fox spirit, white mask face with blue markings, red hooded robe, many black-and-white tails, blue gem necklace"
     },
     {
-      "name": "hatg",
-      "file": "art/lab/heroes/hatg.jpg",
-      "look": "black gorilla, yellow patterned bucket hat, round gold sunglasses, gold chain necklace"
+      "name": "salmon",
+      "make": "A cute round squishy mascot character (a soft round body like a mochi ball, small arms and feet), full body, front view, standing on a plain white background, Japanese anime style, salmon-pink body with white stripes like salmon sushi, a small gold crown on top, big happy eyes.",
+      "look": "round salmon-pink mochi body with white stripes, small gold crown, big happy eyes"
     },
     {
-      "name": "hipokin",
-      "file": "art/lab/heroes/hipokin.jpg",
-      "look": "dark grey hippo gentleman, black three-piece suit, red patterned tie, glowing blue eyes"
+      "name": "star",
+      "make": "A cute round squishy mascot character (a soft round body like a mochi ball, small arms and feet), full body, front view, standing on a plain white background, Japanese anime style, mint-green body, star-shaped pink sunglasses, a tiny red baseball cap worn backwards.",
+      "look": "round mint-green mochi body, pink star-shaped sunglasses, small red cap worn backwards"
     },
     {
-      "name": "freezy",
-      "file": "art/lab/heroes/freezy.jpg",
-      "look": "shaggy black-haired spirit with a wooden board face, three yellow eyes, curled moustache, purple sparks"
-    },
-    {
-      "name": "bossg",
-      "file": "art/lab/heroes/bossg.jpg",
-      "look": "muscular black gorilla, many gold chains, gold cuffs with blue lights, black shorts"
-    },
-    {
-      "name": "penlady",
-      "file": "art/lab/heroes/av-pen_lady.jpg",
-      "look": "penguin lady with long black hair, black suit jacket, red bow"
-    },
-    {
-      "name": "onigiri",
-      "file": "art/lab/heroes/av-onigiri.jpg",
-      "look": "round white rice ball character with a happy face, pink cheeks, black seaweed wrap"
+      "name": "cloud",
+      "make": "A cute round squishy mascot character (a soft round body like a mochi ball, small arms and feet), full body, front view, standing on a plain white background, Japanese anime style, fluffy white cloud body, a yellow raincoat hood, rosy cheeks, a little blue scarf.",
+      "look": "round fluffy white cloud body, yellow raincoat hood, blue scarf, rosy cheeks"
     }
   ],
   "scenes": [
