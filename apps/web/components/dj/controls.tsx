@@ -21,7 +21,7 @@ function capture(e: RPointerEvent) {
  * swipe up = more (+, turns right), swipe down = less (−, turns left); a double tap goes back to center.
  * Below center and above center each get half a turn of travel, whatever their size in units
  * (EQ: −26 dB … 0 … +6 dB), so the middle always looks like the middle.
- * With `onMenu`, a long press or a double tap opens a menu instead (the mixer's FX knob: pick the effect).
+ * With `onMenu`, a long press (held still) opens a menu (the mixer's FX knob: pick the effect).
  */
 export function Knob({ label, value, min, max, center = min, onChange, color = '#f5c66b', size = 54, onMenu }: { label: string; value: number; min: number; max: number; center?: number; onChange: (v: number) => void; color?: string; size?: number; onMenu?: () => void }) {
   // position −1 … 0 … +1 (0 = center)
@@ -42,12 +42,7 @@ export function Knob({ label, value, min, max, center = min, onChange, color = '
     const now = Date.now();
     if (now - last.current < 350) {
       last.current = 0;
-      // double tap: the menu, or back to center (the drag that follows starts from there)
-      if (onMenu) {
-        start.current = null;
-        onMenu();
-        return;
-      }
+      // double tap: back to center (the drag that follows starts from there)
       onChange(center);
       start.current = { y: e.clientY, p: 0 };
       return;

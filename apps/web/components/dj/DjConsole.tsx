@@ -458,7 +458,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
           />
         </div>
       ))}
-      {/* the FX menu (long press / double tap on the FX knob) */}
+      {/* the FX menu (long press on the FX knob) */}
       {menu !== null && (
         <>
           <div className="absolute inset-0 z-30" onPointerDown={() => setMenu(null)} />
