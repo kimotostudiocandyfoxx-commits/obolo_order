@@ -126,6 +126,16 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
       </div>
       <p className="mt-3 text-[11px] text-white/50">この文を、声に出して読んでね（{VOICE_SAMPLE_SECONDS.min}〜{VOICE_SAMPLE_SECONDS.max}秒）{slot === 'bati' ? '。バティにあげたい声色で！' : ''}</p>
       <p className="mt-1 rounded-2xl bg-black/30 p-3 text-sm leading-relaxed">{VOICE_SCRIPTS[slot]}</p>
+      {slot === 'self' && (
+        // what makes the singing voice come out like you (studio lab r10, 2026-10-12): a clean recording
+        // matters more than a long one — only the first ~25 s of voice are read
+        <ul className="mt-2 space-y-0.5 rounded-2xl bg-amber-300/10 p-3 text-[11px] leading-relaxed text-amber-100/80">
+          <li>🤫 しずかな部屋で（テレビや音楽は止めてね）</li>
+          <li>📱 スマホと口は、手のひら2つ分くらいはなす</li>
+          <li>🗣 いつもの声で、はっきり。とちゅうで長く止まらない</li>
+          <li>⏱ 15〜25秒くらいでじゅうぶん（それより長くても同じだよ）</li>
+        </ul>
+      )}
       <div className="mt-3 flex items-center gap-2">
         {phase === 'recording' ? (
           <button onClick={stop} className="flex-1 animate-pulse rounded-full bg-rose-500 py-2.5 text-sm font-bold">
