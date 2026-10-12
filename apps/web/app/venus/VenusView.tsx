@@ -4,11 +4,11 @@ import { DemoBanner } from '@/components/DemoBanner';
 import { PlanetShell } from '@/components/PlanetShell';
 import { PlanetGate } from '@/components/PlanetLock';
 import { RequireAuth } from '@/components/RequireAuth';
-import { VenusWorld } from '@/components/venus/VenusWorld';
+import { VenusDj } from '@/components/dj/VenusDj';
 
 /**
- * Venus — the planet of making things: make in-game goods, buy and sell them with stars
- * (client decision 2026-10-05, docs/venus.md; replaces spec §2.6's square reels).
+ * Venus — the DJ / VJ planet: mix your own Mercury songs (and, later, Mars MVs) on two decks
+ * (client decision 2026-10-12, docs/venus.md). The goods shop of 2026-10-05 is retired.
  */
 export function VenusView() {
   return (
@@ -16,9 +16,7 @@ export function VenusView() {
       <DemoBanner />
       <RequireAuth>
         <PlanetGate planet="venus" name="金星">
-        <div className="h-[calc(100svh-56px-env(safe-area-inset-top))]">
-          <VenusWorld />
-        </div>
+        <VenusDj backHref="/" />
         </PlanetGate>
       </RequireAuth>
     </PlanetShell>

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { HOT_CUES, TEMPO_RANGE, type Deck } from '@/lib/dj/deck';
 import { DjEngine } from '@/lib/dj/engine';
@@ -17,7 +18,7 @@ export interface DjTrack {
   bpm: number | null;
 }
 
-export function DjController({ songs = [] }: { songs?: DjTrack[] }) {
+export function DjController({ songs = [], backHref }: { songs?: DjTrack[]; backHref?: string }) {
   const [engine, setEngine] = useState<DjEngine | null>(null);
   const [starting, setStarting] = useState(false);
   const [err, setErr] = useState('');
@@ -37,7 +38,12 @@ export function DjController({ songs = [] }: { songs?: DjTrack[] }) {
 
   if (!engine)
     return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 bg-[#0b0916] px-6 text-white">
+      <div className="fixed inset-0 z-[300] flex flex-col items-center justify-center gap-4 bg-[#0b0916] px-6 text-white">
+        {backHref && (
+          <Link href={backHref} className="absolute left-3 top-[calc(8px+env(safe-area-inset-top))] rounded-full bg-white/10 px-3 py-1 text-xs text-white/80">
+            ← もどる
+          </Link>
+        )}
         <p className="text-lg tracking-[0.3em] text-amber-100">VENUS DJ</p>
         <button onClick={() => void start()} disabled={starting} className="rounded-full bg-amber-400 px-8 py-3 font-bold text-black disabled:opacity-50">
           {starting ? '準備中…' : 'はじめる'}
@@ -48,10 +54,15 @@ export function DjController({ songs = [] }: { songs?: DjTrack[] }) {
     );
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#0b0916] text-white" style={{ touchAction: 'none' }}>
+    <div className="fixed inset-0 z-[300] overflow-hidden bg-[#0b0916] text-white" style={{ touchAction: 'none' }}>
       <div className="flex h-full portrait:hidden">
         <DeckPanel engine={engine} i={0} songs={songs} />
         <div className="flex w-[22%] min-w-[170px] flex-col items-center justify-between border-x border-white/10 bg-black/30 px-1 py-2">
+          {backHref && (
+            <Link href={backHref} className="self-start rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/70">
+              ← もどる
+            </Link>
+          )}
           <Mixer engine={engine} />
           <Fader horizontal value={xf} length={150} center={0.5} label="CROSSFADER" onChange={(v) => (setXf(v), engine.setCrossfader(v))} />
         </div>
