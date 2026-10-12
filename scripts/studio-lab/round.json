@@ -1,8 +1,8 @@
 {
-  "round": "r09-tempo",
-  "note": "テンポ試験（クライアント案 2026-10-12）：同じ曲を ①そのまま ②最初から1.15倍の BPM で作る ③できた曲を1.1倍速 ④1.2倍速（音の高さはそのまま）。どれが一番「良い曲」に聞こえるか。",
+  "round": "r10-voice",
+  "note": "声の似方の試験（2026-10-12）：同じ曲・同じ録音で ①今まで通りの下ごしらえ ②新しい下ごしらえ（雑音を減らす・間を詰める・音量をそろえる）③新しい下ごしらえ＋6秒だけの録音。likeness＝話者モデルで測った似ている度（試験用・アプリには出さない）。",
   "needs": [
-    "takes"
+    "voicePrep"
   ],
   "tune": {
     "outro": true
@@ -10,64 +10,34 @@
   "keepStems": false,
   "variants": [
     {
-      "name": "base",
-      "tune": {}
+      "name": "plain",
+      "tune": {
+        "voicePrep": "plain"
+      }
     },
     {
-      "name": "bpm115",
-      "bpmScale": 1.15,
-      "tune": {}
+      "name": "clean",
+      "tune": {
+        "voicePrep": "clean"
+      }
     },
     {
-      "name": "x1.1",
-      "speed": 1.1,
-      "tune": {}
-    },
-    {
-      "name": "x1.2",
-      "speed": 1.2,
-      "tune": {}
+      "name": "clean-6s",
+      "voiceFile": "art/lab/voice/ref-6s.m4a",
+      "tune": {
+        "voicePrep": "clean"
+      }
     }
   ],
   "cases": [
     {
-      "id": "busan-kpop",
-      "genre": "pop",
-      "prompt": "modern K-pop dance track, punchy 808 bass, bright synth plucks, trap hi-hats, big catchy hook, stylish and cool, 128 bpm, F# minor, no vocals",
-      "bpm": 128,
-      "keyRoot": 6,
-      "scale": "minor",
-      "voice": false,
-      "sections": [
-        {
-          "name": "verse",
-          "lines": [
-            "朝の釜山 窓いっぱいの海",
-            "ソンドの砂に 足あとつけて",
-            "カニがおどる 市場のざわめき",
-            "カンジャンケジャン 一口で恋した"
-          ]
-        },
-        {
-          "name": "chorus",
-          "lines": [
-            "チンチャ マシッソ 止まらない",
-            "ネオンの南浦洞 夜はこれから",
-            "チキンを片手に 笑い合おう",
-            "釜山 また会いに来るよ"
-          ]
-        }
-      ],
-      "seconds": 48.8
-    },
-    {
-      "id": "mercury-pop",
+      "id": "voice-pop",
       "genre": "pop",
       "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, no vocals",
       "bpm": 100,
       "keyRoot": 0,
       "scale": "major",
-      "voice": false,
+      "voice": true,
       "sections": [
         {
           "name": "verse",

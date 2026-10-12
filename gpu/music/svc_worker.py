@@ -128,9 +128,23 @@ def convert(source: str, target: str, out: str, steps: int = 30, cfg: float = 0.
                 processed += vc.size(2) - overlap_frame_len
         out_wave = torch.tensor(np.concatenate(chunks))[None, :].float()
         torchaudio.save(out, out_wave.cpu(), sr)
+
+        # how close the voice came out (for the studio lab only — never shown to members): cosine of
+        # the speaker model's embeddings, reference vs the converted vocal, and vs the studio vocal before
+        def embed(wave16):
+            f = torchaudio.compliance.kaldi.fbank(wave16, num_mel_bins=80, dither=0, sample_frequency=16000)
+            return campplus_model((f - f.mean(dim=0, keepdim=True)).unsqueeze(0))
+
+        try:
+            out16 = torchaudio.functional.resample(out_wave.to(device), sr, 16000)
+            cos = torch.nn.functional.cosine_similarity
+            likeness = round(float(cos(embed(out16), style2).mean()), 3)
+            before = round(float(cos(embed(src16), style2).mean()), 3)
+        except Exception:  # noqa: BLE001
+            likeness, before = None, None
     sec = time.time() - t0
     print(f"seed-vc: {out_wave.size(-1) / sr:.1f}s of vocal in {sec:.1f}s (octave shift {shift})", flush=True)
-    return {"ok": True, "shift": shift, "seconds": round(sec, 1)}
+    return {"ok": True, "shift": shift, "seconds": round(sec, 1), "likeness": likeness, "likenessBefore": before}
 
 
 WHISPER = os.environ.get("WHISPER_MODEL", "openai/whisper-large-v3-turbo")

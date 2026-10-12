@@ -337,7 +337,7 @@ def svc_health() -> dict:
         return {"ready": False, "error": f"starting ({e!r})"[:120]}
 
 
-def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int = 30) -> tuple[str | None, str]:
+def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int = 30, prep: str = "clean") -> tuple[str | None, str]:
     """The sung vocal in the member's voice (Seed-VC), or (None, why) to keep the studio's voice."""
     import base64
 
@@ -355,16 +355,23 @@ def to_voice(vocals: str, voice_b64: str, out_dir: str, cfg: float, steps: int =
     with open(ref_raw, "wb") as f:
         f.write(base64.b64decode(voice_b64))
     ref = os.path.join(out_dir, "voice.wav")
-    # the reference: mono 44.1 kHz, silences trimmed, at most 25 s
+    # the reference: mono 44.1 kHz, at most 25 s (Seed-VC reads no more: a longer recording does not help).
+    # "clean" (2026-10-12): rumble cut, light noise reduction, every pause longer than 0.35 s taken out
+    # (so the 25 s are all voice), the level evened — "plain" only trims the silence at both ends
     trim = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.05"
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ref_raw, "-af", f"{trim},areverse,{trim},areverse", "-t", "25", "-ac", "1", "-ar", "44100", ref], check=True)
+    if prep == "plain":
+        af = f"{trim},areverse,{trim},areverse"
+    else:
+        af = f"highpass=f=70,afftdn=nf=-25,{trim},silenceremove=stop_periods=-1:stop_duration=0.35:stop_threshold=-45dB,loudnorm=I=-20:TP=-2"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", ref_raw, "-af", af, "-t", "25", "-ac", "1", "-ar", "44100", ref], check=True)
     src = os.path.join(out_dir, "vocals-mono.wav")
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", vocals, "-ac", "1", "-ar", "44100", src], check=True)
     out = os.path.join(out_dir, "vocals-member.wav")
     res = svc_call("POST", "/convert", {"source": src, "target": ref, "out": out, "steps": steps, "cfg": cfg}, timeout=600)
     if not res.get("ok"):
         return None, f"seed-vc failed: {res.get('error')}"
-    return out, f"octave shift {res.get('shift', 0)}, {res.get('seconds')}s"
+    like = f", likeness {res['likeness']} (studio voice {res.get('likenessBefore')})" if res.get("likeness") is not None else ""
+    return out, f"octave shift {res.get('shift', 0)}, {res.get('seconds')}s{like}"
 
 
 def mix_stems(inst: str, vocals: str, out: str, seconds: float) -> None:
@@ -604,6 +611,8 @@ class SongReq(BaseModel):
     # the same song came out 8.2 one time and 3.8 the next, the bad ones skipping or garbling lines)
     takes: int = Field(2, ge=1, le=3)
     voiceSteps: int = Field(30, ge=10, le=100)
+    # how the member's recording is prepared before Seed-VC reads it (see to_voice)
+    voicePrep: str = Field("clean", pattern="^(clean|plain)$")
 
 
 @app.get("/health")
@@ -684,7 +693,7 @@ def finish_song(engine: "AceStep15", wav: str, lines: list[dict], r: "SongReq", 
     voiced, how = (None, "no voice sent")
     if r.voice:
         try:
-            voiced, how = to_voice(vocals, r.voice, d, r.similarity, r.voiceSteps)
+            voiced, how = to_voice(vocals, r.voice, d, r.similarity, r.voiceSteps, r.voicePrep)
         except Exception as e:  # noqa: BLE001 — the song is still delivered in the studio's voice
             traceback.print_exc()
             voiced, how = None, f"seed-vc error: {e!r}"[:200]

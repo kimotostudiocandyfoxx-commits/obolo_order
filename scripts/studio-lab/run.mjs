@@ -55,7 +55,8 @@ async function makeSong(c, v) {
     keyRoot: c.keyRoot ?? 0,
     scale: c.scale ?? 'major',
     language: 'ja',
-    ...(c.voice && voice && v.voice !== false ? { voice, similarity: c.similarity ?? 0.7 } : {}),
+    // a variant can sing with another recording (voiceFile), e.g. a shorter one
+    ...(c.voice && voice && v.voice !== false ? { voice: v.voiceFile ? readFileSync(v.voiceFile).toString('base64') : voice, similarity: c.similarity ?? 0.7 } : {}),
     ...(round.tune ?? {}),
     ...(v.tune ?? {}),
     ...(c.tune ?? {}),
