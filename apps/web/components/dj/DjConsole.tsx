@@ -240,6 +240,38 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
         </div>
       ))}
 
+      {/* loop (½ · LOOP · ×2) on the upper inner arc; ½ stays on the left on both decks */}
+      {(
+        [
+          [-68, '½', () => deck.resizeLoop(-1), false],
+          [-55, `LOOP ${beatsLabel(deck.loopBeats)}`, () => deck.toggleLoop(), true],
+          [-42, '×2', () => deck.resizeLoop(1), false],
+        ] as const
+      ).map(([deg, label, fn, main], n) => (
+        <div key={`l${n}`} style={at(i === 0 ? deg : -110 - deg, 0.84)}>
+          <Pad onDown={fn} className="border-0 bg-transparent">
+            <span style={main ? { ...ring(deck.loop !== null, LOOP_COLOR), width: b * 1.9, borderRadius: 999 } : ring(false)} className="flex items-center justify-center whitespace-nowrap border">
+              {label}
+            </span>
+          </Pad>
+        </div>
+      ))}
+      {/* beat jump low on the inner side, side by side (◀◀ on the left on both decks), by the loop size */}
+      {(
+        [
+          [-1, '◀◀'],
+          [1, '▶▶'],
+        ] as const
+      ).map(([dir, label]) => (
+        <div key={label} style={at(dir === (i === 0 ? -1 : 1) ? 55.9 : 45, dir === (i === 0 ? -1 : 1) ? 0.75 : 0.877)}>
+          <Pad onDown={() => deck.beatJump(dir)} className="border-0 bg-transparent">
+            <span style={ring(false)} className="flex items-center justify-center border">
+              {label}
+            </span>
+          </Pad>
+        </div>
+      ))}
+
       {/* tempo on the outer side, KEY (key lock) under it */}
       <div style={at(180, 0.8)}>
         <div className="flex flex-col items-center" style={{ gap: 4 * k }}>
@@ -314,6 +346,10 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
     </div>
   );
 }
+
+const LOOP_COLOR = '#3cf0c8';
+/** 0.25 → 1/4, 4 → 4 */
+const beatsLabel = (n: number) => (n < 1 ? `1/${1 / n}` : String(n));
 
 function Pill({ children, color, k, lit }: { children: ReactNode; color: string; k: number; lit?: boolean }) {
   return (
@@ -641,6 +677,15 @@ function Wave({ deck, h }: { deck: Deck; h: number }) {
     if (deck.meta?.bpm) {
       const b = 60 / deck.meta.bpm;
       for (let t = deck.meta.firstBeat + Math.ceil((p - span / 2 - deck.meta.firstBeat) / b) * b; t < p + span / 2; t += b) mark(t, 'rgba(255,255,255,0.16)');
+    }
+    // the loop: a lit band
+    if (deck.loop) {
+      const x0 = ((deck.loop.start - (p - span / 2)) / span) * W;
+      const x1 = ((deck.loop.end - (p - span / 2)) / span) * W;
+      g.fillStyle = 'rgba(60,240,200,0.22)';
+      g.fillRect(x0, 0, x1 - x0, H);
+      mark(deck.loop.start, LOOP_COLOR);
+      mark(deck.loop.end, LOOP_COLOR);
     }
     mark(deck.cue, '#ffb340');
     deck.hotCues.forEach((x) => x !== null && mark(x, '#9be37a'));

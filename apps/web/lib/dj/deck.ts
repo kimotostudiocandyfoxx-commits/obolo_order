@@ -11,6 +11,8 @@ import { DeckFx, type FxType } from './fx';
  */
 export const TEMPO_RANGE = 0.16;
 export const HOT_CUES = 4;
+/** loop / beat jump sizes, in beats */
+export const LOOP_SIZES = [0.25, 0.5, 1, 2, 4, 8, 16, 32];
 
 export interface TrackMeta {
   title: string;
@@ -48,6 +50,10 @@ export class Deck {
   keylock = true;
   cue = 0;
   hotCues: (number | null)[] = Array(HOT_CUES).fill(null);
+  /** the loop playing now (track seconds), or null */
+  loop: { start: number; end: number } | null = null;
+  /** the loop's length and the beat jump's distance, in beats (one size for both) */
+  loopBeats = 4;
   /** a peak per 1/100 s, for the waveform */
   peaks: Float32Array = new Float32Array(0);
   /** the same per frequency band (low < 250 Hz, mid, high > 4 kHz), 0–1 each — the coloured waveform */
@@ -126,7 +132,10 @@ export class Deck {
 
   /** Where the track is now. */
   position(): number {
-    const p = this.playing ? this.at.input + (this.ctx.currentTime - this.at.ctx) * this.rate * (1 + this.bend) : this.at.input;
+    let p = this.playing ? this.at.input + (this.ctx.currentTime - this.at.ctx) * this.rate * (1 + this.bend) : this.at.input;
+    // inside a loop the worklet wraps round at its end: so does the guess between its updates
+    const l = this.loop;
+    if (l && p >= l.end && this.at.input < l.end + 0.05) p = l.start + ((p - l.start) % (l.end - l.start));
     return Math.max(0, Math.min(this.duration, p));
   }
 
@@ -157,8 +166,9 @@ export class Deck {
     }, () => undefined);
     this.cue = meta.firstBeat;
     this.hotCues = Array(HOT_CUES).fill(null);
+    this.loop = null;
     this.at = { input: this.cue, ctx: this.ctx.currentTime };
-    await this.stretch.schedule({ active: false, input: this.cue, rate: this.rate, semitones: this.semitones() });
+    await this.stretch.schedule({ active: false, input: this.cue, rate: this.rate, semitones: this.semitones(), loopStart: 0, loopEnd: 0 });
     this.fx.setBeat(this.beat);
     this.emit();
   }
@@ -170,8 +180,62 @@ export class Deck {
 
   private send(extra: { active?: boolean; input?: number } = {}) {
     const input = extra.input ?? this.position();
+    // a jump out of the loop (hot cue, CUE, the wheel) lets the loop go
+    if (this.loop && (input < this.loop.start - 0.01 || input > this.loop.end + 0.01)) this.loop = null;
     this.at = { input, ctx: this.ctx.currentTime };
-    void this.stretch.schedule({ active: this.playing, input, rate: Math.max(0.01, this.rate * (1 + this.bend)), semitones: this.semitones(), ...extra });
+    void this.stretch.schedule({ active: this.playing, input, rate: Math.max(0.01, this.rate * (1 + this.bend)), semitones: this.semitones(), loopStart: this.loop?.start ?? 0, loopEnd: this.loop?.end ?? 0, ...extra });
+  }
+
+  // --- loop and beat jump ----------------------------------------------------------------------
+
+  /** one beat in track seconds (the grid the loop and the jump snap to) */
+  private get gridBeat() {
+    return this.meta?.bpm ? 60 / this.meta.bpm : 0.5;
+  }
+
+  /** LOOP: on → a loop of `loopBeats` from the beat just passed; on again → off (the track plays on). */
+  toggleLoop() {
+    if (!this.buffer) return;
+    if (this.loop) {
+      const p = this.position();
+      this.loop = null;
+      this.send({ input: p });
+    } else {
+      const b = this.gridBeat;
+      const first = this.meta?.firstBeat ?? 0;
+      const p = this.position();
+      // short loops snap to their own size, longer ones to the beat
+      const step = this.loopBeats < 1 ? b * this.loopBeats : b;
+      const start = Math.max(0, first + Math.floor((p - first) / step + 1e-6) * step);
+      this.loop = { start, end: Math.min(this.duration, start + b * this.loopBeats) };
+      this.send({ input: p });
+    }
+    this.emit();
+  }
+
+  /** ½ / ×2: the size for the next loop and jump; a loop playing now shrinks / grows from its start. */
+  resizeLoop(dir: -1 | 1) {
+    const i = LOOP_SIZES.indexOf(this.loopBeats) + dir;
+    if (i < 0 || i >= LOOP_SIZES.length) return;
+    this.loopBeats = LOOP_SIZES[i];
+    if (this.loop) {
+      const p = this.position();
+      this.loop = { start: this.loop.start, end: Math.min(this.duration, this.loop.start + this.gridBeat * this.loopBeats) };
+      const len = this.loop.end - this.loop.start;
+      this.send({ input: p >= this.loop.end ? this.loop.start + ((p - this.loop.start) % len) : p });
+    }
+    this.emit();
+  }
+
+  /** Beat jump: `loopBeats` beats back / ahead, on the beat; a loop playing moves along with it. */
+  beatJump(dir: -1 | 1) {
+    if (!this.buffer) return;
+    const d = dir * this.gridBeat * this.loopBeats;
+    const p = this.position() + d;
+    if (p < 0 || p > this.duration - 0.05) return;
+    if (this.loop) this.loop = { start: this.loop.start + d, end: this.loop.end + d };
+    this.send({ input: p });
+    this.emit();
   }
 
   play() {
