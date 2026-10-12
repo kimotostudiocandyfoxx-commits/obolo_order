@@ -1,5 +1,6 @@
 import { Deck, TEMPO_RANGE, type TrackMeta } from './deck';
 import { Sampler } from './sampler';
+import { VisualSampler } from './visuals';
 
 /**
  * The Venus DJ engine (client request 2026-10-12): two decks, a crossfader and the master out, on one
@@ -11,6 +12,8 @@ import { Sampler } from './sampler';
 export class DjEngine {
   readonly decks: [Deck, Deck];
   readonly sampler: Sampler;
+  /** the picture sampler (one-shots on the VJ screen) */
+  readonly visuals = new VisualSampler();
   private readonly master: GainNode;
   private crossfade = 0.5;
 

@@ -1,6 +1,6 @@
 /**
- * The sampler (client request 2026-10-12): one-shot DJ sounds — horn, siren… — fired from the pads
- * either side of the mixer. Every sound is synthesised here on first use (an offline render, kept), so
+ * The sound sampler (client request 2026-10-12): one-shot DJ sounds — horn, siren… — fired from the pad
+ * on the mixer's right (the left one is the picture sampler, visuals.ts). Every sound is synthesised here on first use (an offline render, kept), so
  * there are no sample files to license or download.
  */
 export type SampleId = 'horn' | 'siren' | 'laser' | 'riser' | 'boom' | 'clap';
