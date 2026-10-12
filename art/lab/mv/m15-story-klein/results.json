@@ -1,0 +1,58 @@
+{
+  "round": "m15-story-klein",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6,
+    "heroLikeness": 7,
+    "heroConsistency": 7,
+    "pictureQuality": 6,
+    "storyTelling": 6,
+    "lyricFit": 7,
+    "beatSync": 5,
+    "variety": 5,
+    "watchability": 6,
+    "kidsSafe": 7
+  },
+  "results": [
+    {
+      "id": "story-klein4b",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 7,
+      "painted": 7,
+      "costYen": 0.6,
+      "seconds": {
+        "plan": 2,
+        "paint": 13,
+        "render": 52
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 7,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:16 Centered front-facing staging feels repetitive across sequential cuts.",
+          "00:25 Mouth opening through the solid mask looks unnatural.",
+          "00:33 Pacing on the music drop lacks kinetic motion and beat punch."
+        ],
+        "fixIdeas": [
+          "Introduce dynamic camera angles and varying perspectives in storyboard prompts.",
+          "Adjust eating prompts so the character holds food without clipping through mask.",
+          "Increase cut frequency and camera velocity during the beat drop."
+        ],
+        "bestMoments": [
+          "00:01 Atmospheric morning coastal view establishing the trip.",
+          "00:46 Vibrant night market food shot matching the upbeat conclusion."
+        ]
+      }
+    }
+  ]
+}
