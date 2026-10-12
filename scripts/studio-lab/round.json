@@ -1,6 +1,6 @@
 {
-  "round": "r08-busan",
-  "note": "実験：釜山旅行の写真から作る、ハイテンポでかっこいい K-POP 風の曲（45秒前後・Aメロ＋サビ）。2回作って良い方を MV に使う。",
+  "round": "r09-tempo",
+  "note": "テンポ試験（クライアント案 2026-10-12）：同じ曲を ①そのまま ②最初から1.15倍の BPM で作る ③できた曲を1.1倍速 ④1.2倍速（音の高さはそのまま）。どれが一番「良い曲」に聞こえるか。",
   "needs": [
     "takes"
   ],
@@ -10,11 +10,22 @@
   "keepStems": false,
   "variants": [
     {
-      "name": "a",
+      "name": "base",
       "tune": {}
     },
     {
-      "name": "b",
+      "name": "bpm115",
+      "bpmScale": 1.15,
+      "tune": {}
+    },
+    {
+      "name": "x1.1",
+      "speed": 1.1,
+      "tune": {}
+    },
+    {
+      "name": "x1.2",
+      "speed": 1.2,
       "tune": {}
     }
   ],
@@ -48,6 +59,36 @@
         }
       ],
       "seconds": 48.8
+    },
+    {
+      "id": "mercury-pop",
+      "genre": "pop",
+      "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, no vocals",
+      "bpm": 100,
+      "keyRoot": 0,
+      "scale": "major",
+      "voice": false,
+      "sections": [
+        {
+          "name": "verse",
+          "lines": [
+            "朝の光が 窓をたたく",
+            "まだ眠い目を こすりながら",
+            "きみの声が 聞こえた気がして",
+            "ぼくは小さく 笑ってみた"
+          ]
+        },
+        {
+          "name": "chorus",
+          "lines": [
+            "走り出そう 水星の空へ",
+            "ちいさな夢を ポケットにつめて",
+            "きみと歌えば こわくないよ",
+            "明日はきっと 晴れるから"
+          ]
+        }
+      ],
+      "seconds": 45
     }
   ]
 }

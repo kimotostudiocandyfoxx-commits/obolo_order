@@ -50,7 +50,8 @@ async function makeSong(c, v) {
     prompt: v.vocalWords ? songPromptWith(c.prompt, v.vocalWords) : songPrompt(c.prompt, c.genre ?? ''),
     lyrics: c.sections.flatMap((s) => s.lines.map((text) => ({ section: s.name, text }))),
     seconds: Math.round((c.seconds + ((v.extraBars ?? 0) * 240) / c.bpm) * 10) / 10,
-    bpm: c.bpm,
+    // a variant can make the song at a faster tempo (client idea 2026-10-12: young listeners like it fast)
+    bpm: Math.round(c.bpm * (v.bpmScale ?? 1)),
     keyRoot: c.keyRoot ?? 0,
     scale: c.scale ?? 'major',
     language: 'ja',
@@ -179,6 +180,18 @@ for (const base of round.cases)
     const made = await makeSong(c, v);
     const mix = join(OUT, `${c.id}.m4a`);
     writeFileSync(mix, Buffer.from(made.mix, 'base64'));
+    if (v.bpmScale) c.bpm = Math.round(c.bpm * v.bpmScale);
+    // or play the finished song faster afterwards (same pitch, ffmpeg atempo): the line times shrink with it
+    if (v.speed && v.speed !== 1) {
+      const raw = join(OUT, `_${c.id}-raw.m4a`);
+      writeFileSync(raw, Buffer.from(made.mix, 'base64'));
+      spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-filter:a', `atempo=${v.speed}`, '-c:a', 'aac', '-b:a', '192k', mix]);
+      spawnSync('rm', ['-f', raw]);
+      made.mix = readFileSync(mix).toString('base64');
+      made.seconds = Math.round((made.seconds / v.speed) * 10) / 10;
+      made.lines = (made.lines ?? []).map((l) => ({ ...l, start: l.start / v.speed, end: l.end / v.speed }));
+      c.bpm = Math.round(c.bpm * v.speed);
+    }
     if (round.keepStems) writeFileSync(join(OUT, `${c.id}-vocals.m4a`), Buffer.from(made.vocals, 'base64'));
     const m = measure(mix);
     const j = await judge(c, made.mix, made.sent.prompt);
