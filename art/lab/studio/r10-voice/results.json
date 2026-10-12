@@ -1,0 +1,474 @@
+{
+  "round": "r10-voice",
+  "avg": {
+    "overall": 5.7,
+    "vocalNaturalness": 5.4,
+    "pitch": 6.3,
+    "diction": 6.2,
+    "melody": 6.3,
+    "arrangement": 5.8,
+    "mix": 6.2,
+    "genreFit": 5.9,
+    "artifacts": 6
+  },
+  "byVariant": [
+    {
+      "name": "plain",
+      "avg": {
+        "overall": 5.8,
+        "vocalNaturalness": 5.5,
+        "pitch": 6.2,
+        "diction": 5.8,
+        "melody": 6.4,
+        "arrangement": 6,
+        "mix": 6.1,
+        "genreFit": 5.9,
+        "artifacts": 5.7
+      }
+    },
+    {
+      "name": "clean",
+      "avg": {
+        "overall": 6.3,
+        "vocalNaturalness": 5.8,
+        "pitch": 6.8,
+        "diction": 6.7,
+        "melody": 6.6,
+        "arrangement": 6.5,
+        "mix": 6.4,
+        "genreFit": 6.8,
+        "artifacts": 6.2
+      }
+    },
+    {
+      "name": "clean-6s",
+      "avg": {
+        "overall": 5,
+        "vocalNaturalness": 5,
+        "pitch": 6,
+        "diction": 6,
+        "melody": 6,
+        "arrangement": 5,
+        "mix": 6,
+        "genreFit": 5,
+        "artifacts": 6
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "voice-pop~plain",
+      "variant": "plain",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.814,
+          "text": "朝の光が窓をまだ眠い目をこすりながら君の声が聞こえた気がして僕は小さく笑ってみた走り出そう人生の空へ小さな冒険に詰めて君と歌えば怖くないよ明日はきっと晴れるから"
+        },
+        {
+          "score": 0.592,
+          "text": "朝の光が窓を叩くまだ眠い目をこすりながら君の声が聞こえた気がして僕は小さく笑ってみた走り出す次回予告"
+        }
+      ],
+      "file": "art/lab/studio/r10-voice/voice-pop~plain.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0.48,
+          "end": 9.032
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 9.112,
+          "end": 13.988
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 14.067,
+          "end": 19.103
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 19.183,
+          "end": 23.339
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 23.739,
+          "end": 28.615
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 28.694,
+          "end": 32.851
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 32.931,
+          "end": 37.806
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 37.886,
+          "end": 42.043
+        }
+      ],
+      "seconds": 45,
+      "voiced": true,
+      "voiceNote": "octave shift -12, 17.7s, likeness 0.615 (studio voice 0.288)",
+      "timings": {
+        "song": 124.6,
+        "split": 0,
+        "voice": 20.2
+      },
+      "wall": 157,
+      "lines": 8,
+      "lufs": -13.7,
+      "truePeak": -1,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5.5,
+        "pitch": 6.2,
+        "diction": 5.8,
+        "melody": 6.4,
+        "arrangement": 6,
+        "mix": 6.1,
+        "genreFit": 5.9,
+        "artifacts": 5.7,
+        "overall": 5.8,
+        "problems": [
+          "00:07 missing phrase たたく",
+          "00:24 noticeable synthetic tuning timbre",
+          "00:41 abrupt ending cutoff"
+        ],
+        "fixIdeas": [
+          "Prompt for more natural vocal acoustics rather than electro-pop tuning",
+          "Ensure rhythmic space in prompt structure to avoid dropped syllables"
+        ],
+        "heard": "あさのひかりが まどを まだねむいめを こすりながら きみのこえが きこえたきがして ぼくはちいさく わらってみた はしりだそう すいせいのそらへ ちいさなゆめを ポケットにつめて きみとうたえば こわくないよ あしたはきっと はれるから"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 100,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "voice": "(sample)",
+        "similarity": 0.7,
+        "outro": true,
+        "voicePrep": "plain"
+      }
+    },
+    {
+      "id": "voice-pop~clean",
+      "variant": "clean",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.841,
+          "text": "朝の光が窓を叩くまだ眠い目をこすりながら君の声が聞こえた気がして僕はしわだってみた走り出そう水星の空小さな夢をポケットに詰めて君と歌えば 怖くないよ明日はきっと晴れるから"
+        },
+        {
+          "score": 0.722,
+          "text": "朝の光が窓を叩く まだ眠り目をこすりながら君の声が聞こえた気がして 僕は小さく笑ってみた走り出そう店の空へ 小さな夢をポケットに詰めてme"
+        }
+      ],
+      "file": "art/lab/studio/r10-voice/voice-pop~clean.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0.48,
+          "end": 5.995
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 6.075,
+          "end": 10.71
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 10.79,
+          "end": 15.746
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 15.826,
+          "end": 19.423
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 19.822,
+          "end": 24.858
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 24.938,
+          "end": 29.734
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 29.813,
+          "end": 36.128
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 36.128,
+          "end": 38.206
+        }
+      ],
+      "seconds": 45,
+      "voiced": true,
+      "voiceNote": "octave shift -12, 12.9s, likeness 0.638 (studio voice 0.19)",
+      "timings": {
+        "song": 42.7,
+        "split": 0,
+        "voice": 13.5
+      },
+      "wall": 68,
+      "lines": 8,
+      "lufs": -13,
+      "truePeak": 1,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5.8,
+        "pitch": 6.8,
+        "diction": 6.7,
+        "melody": 6.6,
+        "arrangement": 6.5,
+        "mix": 6.4,
+        "genreFit": 6.8,
+        "artifacts": 6.2,
+        "overall": 6.3,
+        "problems": [
+          "00:00 - 00:20: Vocal displays noticeable synthetic, formant-quantized processing.",
+          "00:22 - 00:24: Lyric pronunciation around 'suisei no sora' lacks phonetic clarity.",
+          "00:38 - 00:44: Abrupt musical fade-out and lingering tail cut."
+        ],
+        "fixIdeas": [
+          "Use a more natural acoustic vocal model to reduce synthetic formant artifacts.",
+          "Adjust phoneme emphasis for 'suisei' to ensure accurate lyric delivery.",
+          "Extend the outro with a proper instrumental cadence and natural decay."
+        ],
+        "heard": "あさのひかりがまどをたたくまだねむいめをこすりながらきみのこえがきこえたきがしてぼくはちいさくわらってみたはしりだそうすいせいのそらへちいさなゆめをぽけっとにつめてきみとうたえばこわくないよあしたはきっとはれるから"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 100,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "voice": "(sample)",
+        "similarity": 0.7,
+        "outro": true,
+        "voicePrep": "clean"
+      }
+    },
+    {
+      "id": "voice-pop~clean-6s",
+      "variant": "clean-6s",
+      "ok": true,
+      "takes": [
+        {
+          "score": 0.75,
+          "text": "朝の光が窓を叩く まだ眠い目をぼすりながら君の声が聞こえた気がしたの空へ小さな夢をポケットにいて君と歌えば怖くないよ明日はいっと晴れるから"
+        },
+        {
+          "score": 0.667,
+          "text": "朝の光がおたくまだ眠い目をこすりながら君の声が死ぬ僕は小さく笑ってみた走り出す寂しいの空へ小さな夢をポケットに寝よう君らはきっと明日はきっと春から"
+        }
+      ],
+      "file": "art/lab/studio/r10-voice/voice-pop~clean-6s.m4a",
+      "lineTimes": [
+        {
+          "text": "朝の光が 窓をたたく",
+          "start": 0.48,
+          "end": 5.355
+        },
+        {
+          "text": "まだ眠い目を こすりながら",
+          "start": 5.435,
+          "end": 10.231
+        },
+        {
+          "text": "きみの声が 聞こえた気がして",
+          "start": 10.311,
+          "end": 15.346
+        },
+        {
+          "text": "ぼくは小さく 笑ってみた",
+          "start": 15.426,
+          "end": 20.382
+        },
+        {
+          "text": "走り出そう 水星の空へ",
+          "start": 20.782,
+          "end": 26.616
+        },
+        {
+          "text": "ちいさな夢を ポケットにつめて",
+          "start": 26.696,
+          "end": 30.933
+        },
+        {
+          "text": "きみと歌えば こわくないよ",
+          "start": 31.012,
+          "end": 37.327
+        },
+        {
+          "text": "明日はきっと 晴れるから",
+          "start": 37.327,
+          "end": 39.565
+        }
+      ],
+      "seconds": 45,
+      "voiced": true,
+      "voiceNote": "octave shift -12, 10.5s, likeness 0.588 (studio voice 0.217)",
+      "timings": {
+        "song": 43.2,
+        "split": 0,
+        "voice": 10.9
+      },
+      "wall": 66,
+      "lines": 8,
+      "lufs": -12.6,
+      "truePeak": -0.6,
+      "silenceSec": 0,
+      "judge": {
+        "vocalNaturalness": 5,
+        "pitch": 6,
+        "diction": 6,
+        "melody": 6,
+        "arrangement": 5,
+        "mix": 6,
+        "genreFit": 5,
+        "artifacts": 6,
+        "overall": 5,
+        "problems": [
+          "00:01-00:20: Vocals sound noticeably robotic and synthetic rather than acoustic and expressive.",
+          "00:21-00:40: Instrumentation features heavy synth elements rather than organic acoustic guitar and piano."
+        ],
+        "fixIdeas": [
+          "Emphasize acoustic instruments and reduce electro-pop keywords in the generation prompt.",
+          "Specify an organic human tone to prevent synthetic voice processing."
+        ],
+        "heard": "あさのひかりがまどをたたくまだねむいめをこすりながらきみのこえがきこえたきがしてぼくはちいさくわらってみたはしりだそうすいせいのそらへちいさなゆめをぽけっとにつめてきみとうたえばこわくないよあしたはきっとはれるから"
+      },
+      "sent": {
+        "prompt": "bright Japanese pop, acoustic guitar, piano, light drums, warm and catchy, 100 bpm, C major, catchy japanese pop vocal, clear lead singer, expressive singing",
+        "lyrics": [
+          {
+            "section": "verse",
+            "text": "朝の光が 窓をたたく"
+          },
+          {
+            "section": "verse",
+            "text": "まだ眠い目を こすりながら"
+          },
+          {
+            "section": "verse",
+            "text": "きみの声が 聞こえた気がして"
+          },
+          {
+            "section": "verse",
+            "text": "ぼくは小さく 笑ってみた"
+          },
+          {
+            "section": "chorus",
+            "text": "走り出そう 水星の空へ"
+          },
+          {
+            "section": "chorus",
+            "text": "ちいさな夢を ポケットにつめて"
+          },
+          {
+            "section": "chorus",
+            "text": "きみと歌えば こわくないよ"
+          },
+          {
+            "section": "chorus",
+            "text": "明日はきっと 晴れるから"
+          }
+        ],
+        "seconds": 45,
+        "bpm": 100,
+        "keyRoot": 0,
+        "scale": "major",
+        "language": "ja",
+        "voice": "(sample)",
+        "similarity": 0.7,
+        "outro": true,
+        "voicePrep": "clean"
+      }
+    }
+  ]
+}
