@@ -1,0 +1,43 @@
+{
+  "note": "Venus DJ の UI 素材（Seedream 5.0 Pro）。id ごとに1回だけ描く。描き直しは redo に id を足す。保存先 apps/web/public/dj/art/<id>.jpg",
+  "dir": "dj/art",
+  "always": "Photorealistic premium product render, ultra sharp, high dynamic range. No text, no letters, no numbers, no logos, no brand names, no watermark.",
+  "items": [
+    {
+      "id": "jog-a",
+      "w": 2048, "h": 2048, "size": [720, 720],
+      "prompt": "Perfectly top-down orthographic view of a flagship professional DJ media player jog wheel, exactly circular, centered, filling 96% of the square frame. From the outside in: a thick outer ring of black anodized aluminium with fine precise knurled grip ridges all around its edge; a thin bright cyan LED light ring; a wide satin brushed silver metal platter with fine concentric machining lines and one soft diagonal specular highlight; in the middle a large perfectly round flat glossy black glass disc (plain, empty, deep black, 56% of the full diameter) with a thin chrome bezel. Pure black background outside the wheel. Dramatic studio lighting."
+    },
+    {
+      "id": "jog-b",
+      "w": 2048, "h": 2048, "size": [720, 720],
+      "prompt": "Perfectly top-down orthographic view of a luxury club DJ turntable jog platter, exactly circular, centered, filling 96% of the square frame. Outer edge: gunmetal dark chrome ring with fine knurling; inside it a ring of tiny warm amber and magenta LEDs glowing; a dark smoked brushed titanium platter with very fine concentric grooves like a vinyl record catching rim light; at the center a large perfectly round flat glossy black glass disc (plain, empty, 56% of the full diameter) with a polished gold bezel. Pure black background outside the platter. Moody dramatic lighting."
+    },
+    {
+      "id": "knob-a",
+      "w": 2048, "h": 2048, "size": [256, 256],
+      "prompt": "Perfectly top-down orthographic view of one premium DJ mixer rotary knob, exactly circular, centered, filling 92% of the square frame: a black soft-touch knurled rubber skirt with fine vertical ridges around the edge, a machined brushed aluminium top cap with a fine concentric spun-metal finish, and one thin bright white indicator line running from the centre straight up to the top edge. Pure black background. Studio lighting with a crisp ring highlight."
+    },
+    {
+      "id": "knob-b",
+      "w": 2048, "h": 2048, "size": [256, 256],
+      "prompt": "Perfectly top-down orthographic view of one boutique DJ mixer knob, exactly circular, centered, filling 92% of the square frame: a glossy black ceramic body with a fine knurled edge, a concave dark gunmetal cap with concentric spun-metal rings, and a thin glowing white indicator notch running from the centre straight up to the top edge. Pure black background. Dramatic studio rim lighting."
+    },
+    {
+      "id": "metal",
+      "w": 2048, "h": 2048, "size": [720, 720],
+      "prompt": "Flat top-down seamless texture of a dark graphite brushed metal surface: very fine straight horizontal hairline brushing, subtle micro sparkle, deep charcoal almost black, perfectly even lighting with no vignette, no gradient, no objects, no edges. Tileable material swatch."
+    },
+    {
+      "id": "club-a",
+      "w": 2560, "h": 1440, "size": [1280, 720],
+      "prompt": "Wide cinematic background for a nightclub DJ booth: a dark club seen from behind the decks, deep navy and black, soft out-of-focus bokeh of magenta, cyan and warm gold lights, thin haze light beams falling from the ceiling, a faint glowing planet-like orb in the far haze. Very dark overall (mostly near-black) so controls drawn on top stand out. No people, no faces."
+    },
+    {
+      "id": "club-b",
+      "w": 2560, "h": 1440, "size": [1280, 720],
+      "prompt": "Wide cinematic background: a futuristic open-air DJ stage floating in space at night, a huge softly glowing golden planet Venus in the distant haze, stars, laser beams in cyan and magenta sweeping through light fog, extremely dark overall (mostly near-black) with lights only at the edges and the far distance so controls drawn on top stand out. Defocused, dreamy, no people, no faces."
+    }
+  ],
+  "redo": []
+}
