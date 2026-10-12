@@ -339,13 +339,16 @@ export async function paintScenes(
   if (!items.length) return [];
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
+  // a close-up of the hero's face as one more reference (m16–m18: the small model kept turning the
+  // face — a mask here — into a new face): the top of the picture, where a character's face is
+  const faceRef = hero ? await faceCrop(hero).catch(() => null) : null;
   let e = 0;
   let a = 0;
   let w = 0;
   let meals = 0;
   const tasks = await Promise.all(
     items.map(async (p) => {
-      const refs = p.photo ? [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])] : heroRef ? [heroRef] : [];
+      const refs = [...(p.photo ? [await jpg(p.photo, 1280)] : []), ...(heroRef ? [heroRef] : []), ...(faceRef ? [faceRef] : [])].slice(0, m.maxRefs);
       const meal = MEAL.test(p.caption);
       // meals in thirds: eating, not eaten yet, and on the move with it (m16: "static seated tables")
       const turn = meal ? meals++ % 3 : -1;
@@ -372,6 +375,7 @@ export async function paintScenes(
         positivePrompt: [
           ...lines,
           heroRef ? KEEP_FACE : '',
+          faceRef && refs.includes(faceRef) ? 'The last reference picture is a close-up of the same character’s face: copy that face exactly.' : '',
           heroRef && heroLook ? `The character, in words: ${heroLook.split(',').slice(0, 12).join(',')}.` : '',
           // m17: "never beer" drew beer (a small model reads the word, not the never) → name only the drinks we want
           'Any glass on the table holds orange juice, green tea or milk.',
@@ -386,11 +390,21 @@ export async function paintScenes(
         outputType: 'URL',
         outputFormat: 'JPG',
         includeCost: true,
-        ...(refs.length ? { referenceImages: refs.slice(0, m.maxRefs) } : {}),
+        ...(refs.length ? { referenceImages: refs } : {}),
       };
     }),
   );
   return painter.run(tasks);
+}
+
+/** The hero's face: the picture trimmed to the character, its top 45%, the middle 70% across. */
+async function faceCrop(hero: Buffer): Promise<string> {
+  const trimmed = await sharp(hero).rotate().flatten({ background: '#ffffff' }).trim({ threshold: 20 }).toBuffer({ resolveWithObject: true });
+  const { width: W, height: H } = trimmed.info;
+  const w = Math.round(W * 0.7);
+  const h = Math.min(H, Math.round(Math.max(H * 0.45, w)));
+  const face = await sharp(trimmed.data).extract({ left: Math.round((W - w) / 2), top: 0, width: w, height: h }).resize(768, 768, { fit: 'contain', background: '#ffffff' }).jpeg({ quality: 88 }).toBuffer();
+  return `data:image/jpeg;base64,${face.toString('base64')}`;
 }
 
 /**

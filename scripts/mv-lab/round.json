@@ -1,6 +1,6 @@
 {
-  "round": "m18-klein-loop3",
-  "note": "品質ループ3回目：「ビールはだめ」と書くと小さいモデルはビールを描く → 飲み物はオレンジジュース・緑茶・牛乳とだけ書く／歌詞は次の行が出る前に消える（2行重なり対策）。",
+  "round": "m19-klein-loop4",
+  "note": "品質ループ4回目：キモリンの顔のアップを参考画像にもう1枚足す（お面が別の顔に変わる対策）／サビの白フラッシュをやめる（「空白のコマ」と言われた）。採点のぶれを見るため同じ条件で2回ずつ作る（a / b）。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
@@ -24,5 +24,13 @@
       "lyrics": true
     }
   ],
-  "heroRef": 0.6
+  "heroRef": 0.6,
+  "variants": [
+    {
+      "name": "a"
+    },
+    {
+      "name": "b"
+    }
+  ]
 }

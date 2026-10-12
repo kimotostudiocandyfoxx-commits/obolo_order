@@ -151,9 +151,9 @@ export async function renderMv(o: {
     }
     // the キメ絵 are drawn already: they only get a white flash in
     // 2.5D stills drop the manga speed lines (m13/m14: "disconnected", "overused"); the moving depth does that work.
-    // A chorus cut flashes in white on the beat.
     const effect = pre && s.effect === 'SPEED_LINES' ? 'NONE' : s.effect;
-    const flash = s.chorus && !key ? `,fade=t=in:st=0:d=0.12:color=white` : '';
+    // (a white flash on chorus cuts was tried in m16–m18 and read as "a blank frame interrupting": off)
+    const flash = '';
     const look = key ? `fade=t=in:st=0:d=0.25:color=white` : `${effectFilter(effect, beat, o.painted)}${flash}`;
     let graph = `${base},${look}[v]`;
     if (effect === 'SPEED_LINES') {
