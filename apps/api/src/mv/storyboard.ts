@@ -263,7 +263,7 @@ export function storyToPlan(p: StoryPlan, bpm?: number, lyrics: StoryLyric[] = [
       // (MV lab m05: "the final shot holds static for over ten seconds")
       const back = last && j >= 2 && j < n - 1 && j % 2 === 0 && k > 0 ? Math.max(0, k - 1 - (j - 2) % k) : k;
       // in a chorus every other shot beats with the song
-      segments.push({ m: back, dur, from: 0, motion: (chorus || back !== k) && j % 2 === 1 ? 'pulse' : move, effect: j === 0 ? s.effect : 'NONE', key: false });
+      segments.push({ m: back, dur, from: 0, motion: (chorus || back !== k) && j % 2 === 1 ? 'pulse' : move, effect: j === 0 ? s.effect : 'NONE', key: false, chorus });
     }
     t += s.dur;
   });

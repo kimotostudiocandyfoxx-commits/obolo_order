@@ -138,7 +138,9 @@ export async function renderMv(o: {
       // a scene cut into several bars swings back and forth instead of repeating the same slide
       const nth = o.plan.segments.slice(0, k).filter((x) => x.m === s.m).length;
       if (nth % 2 === 1) p.move = ({ 'orbit-left': 'orbit-right', 'orbit-right': 'orbit-left', 'crane-up': 'crane-down', 'crane-down': 'crane-up', 'dolly-in': 'dolly-out', 'dolly-out': 'dolly-in' } as const)[p.move];
-      pre = parallaxGraph(p, mat.parallax.focus, s.dur, SIDE, s.motion === 'pulse' ? beat : undefined).replace(/\[v\]$/, '[pv]');
+      // the chorus moves bolder and every cut punches on the beat (m15: "the drop lacks kinetic motion")
+      if (s.chorus) p.strength = Math.min(1.6, p.strength * 1.35);
+      pre = parallaxGraph(p, mat.parallax.focus, s.dur, SIDE, s.motion === 'pulse' || s.chorus ? beat : undefined).replace(/\[v\]$/, '[pv]');
       base = '[pv]null';
     } else if (key || mat.kind === 'photo') {
       inputs.push('-loop', '1', '-i', key ?? mat.file);
@@ -148,9 +150,13 @@ export async function renderMv(o: {
       base = `[0:v]crop='min(iw,ih)':'min(iw,ih)',scale=${SIDE}:${SIDE},fps=${FPS},setsar=1`;
     }
     // the キメ絵 are drawn already: they only get a white flash in
-    const look = key ? `fade=t=in:st=0:d=0.25:color=white` : effectFilter(s.effect, beat, o.painted);
+    // 2.5D stills drop the manga speed lines (m13/m14: "disconnected", "overused"); the moving depth does that work.
+    // A chorus cut flashes in white on the beat.
+    const effect = pre && s.effect === 'SPEED_LINES' ? 'NONE' : s.effect;
+    const flash = s.chorus && !key ? `,fade=t=in:st=0:d=0.12:color=white` : '';
+    const look = key ? `fade=t=in:st=0:d=0.25:color=white` : `${effectFilter(effect, beat, o.painted)}${flash}`;
     let graph = `${base},${look}[v]`;
-    if (s.effect === 'SPEED_LINES') {
+    if (effect === 'SPEED_LINES') {
       const li = pre ? 2 : 1;
       inputs.push('-loop', '1', '-i', lines);
       graph = `${base},${look}[b];[${li}:v]format=rgba,rotate=a='0.06*sin(n*2.7)':c=none:ow=iw:oh=ih[l];[b][l]overlay=shortest=1,format=yuv420p[v]`;

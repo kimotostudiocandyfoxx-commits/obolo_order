@@ -1,6 +1,6 @@
 {
-  "round": "m15-story-klein",
-  "note": "アプリ本番の A 方式（写真なし・歌詞からお話を作る MV）を FLUX.2 klein 4B の1枚描きで。奥行きの動き＋新しい歌詞つき。顔をそのまま保つ指示を追加。",
+  "round": "m16-klein-loop1",
+  "note": "品質ループ1回目（FLUX.2 klein 4B）：食べ物は口に運ぶ直前で止める＋口を足さない指示／料理の写真の半分は「眺める・撮る・運ぶ」など食べない場面／サビは動きを強く・拍ごとに寄る・白フラッシュ／奥行きの絵では集中線をやめる。",
   "hero": "art/lab/mv/hero.jpg",
   "songs": "art/lab/studio/r08-busan/results.json",
   "painter": "styled",
@@ -8,7 +8,16 @@
   "side": 768,
   "cases": [
     {
-      "id": "story-klein4b",
+      "id": "photo",
+      "photos": "art/lab/busan/photos.json",
+      "photoMode": "seedream",
+      "song": "best:busan-kpop",
+      "model": "klein-4b",
+      "parallax": true,
+      "lyrics": true
+    },
+    {
+      "id": "story",
       "song": "best:busan-kpop",
       "model": "klein-4b",
       "parallax": true,

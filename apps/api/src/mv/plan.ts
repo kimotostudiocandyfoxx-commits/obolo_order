@@ -15,7 +15,7 @@ import { Logger } from '@nestjs/common';
 export type MvMotion = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right' | 'still' | 'pulse' | 'face' | 'tilt-up';
 export type MvEffect = 'POSTERIZE' | 'GLITCH' | 'SPEED_LINES' | 'NONE';
 export type MvTextEffect = 'SHAKE_HARD' | 'STROBO_FLASH' | 'ZOOM_BURST' | 'MINIMAL_CHILL';
-export type MvSegment = { m: number; dur: number; from: number; motion: MvMotion; effect: MvEffect; key: boolean };
+export type MvSegment = { m: number; dur: number; from: number; motion: MvMotion; effect: MvEffect; key: boolean; chorus?: boolean };
 export type MvPlan = { note: string; segments: MvSegment[]; lyrics: MvTextEffect[] };
 
 export type PlanMaterial = { kind: 'photo' | 'video'; seconds: number | null; preview: Buffer | null };

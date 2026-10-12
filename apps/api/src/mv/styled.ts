@@ -291,12 +291,20 @@ async function animaginePhotos(
 }
 
 // a different camera for every picture (m09: thirteen centred eating shots in a row bored the judge)
+// m14/m15: an open mouth through a mask while chewing → the food is held up, about to be eaten
 const EAT_SHOTS = [
   'Camera: over-the-shoulder from behind the character, the food filling the foreground.',
-  'Camera: side profile, the character mid-bite with chopsticks, cheeks full and happy.',
+  'Camera: side profile, the character lifting a bite on chopsticks towards its face, eyes shining.',
   'Camera: top-down view of the whole table, the character leaning in from one edge.',
   'Camera: close-up of the character’s delighted face, the food blurred big in the foreground.',
   'Camera: three-quarter view from a low angle across the table, steam rising between the character and the lens.',
+];
+// every other meal is not eaten yet: the travel around the food (m13–m15: "too many eating shots in a row")
+const ADMIRE_SHOTS = [
+  'The character has not started eating: it gazes at the food with sparkling eyes, paws together in delight. Camera: low angle across the table.',
+  'The character holds up a small camera to take a picture of the food. Camera: from behind its shoulder.',
+  'The character points happily at the dish while the cook serves it. Camera: wide shot of the whole shop.',
+  'The character carries the dish to its seat with both paws, careful and proud. Camera: side tracking shot.',
 ];
 const WALK_SHOTS = [
   'Camera: wide establishing shot, the character small in the frame seen from behind, taking in the whole place.',
@@ -309,7 +317,7 @@ async function seedreamPhotos(painter: StyledPainter, photos: { photo: Buffer; c
 }
 
 /** The character's face as drawn (m14: klein opened the mask into a mouth while eating). */
-const KEEP_FACE = 'Keep the character’s face exactly as in its reference picture — the same face design and markings, never a new mouth or a changed face.';
+const KEEP_FACE = 'Keep the character’s face exactly as in its reference picture — the same face design, markings and expression shape; never draw an open mouth or teeth that the reference does not have.';
 
 /**
  * One picture per scene with a model that reads reference pictures (PAINTERS). A scene is a photo
@@ -320,18 +328,21 @@ export async function paintScenes(painter: StyledPainter, items: { caption: stri
   const jpg = async (b: Buffer, side: number) => `data:image/jpeg;base64,${(await sharp(b).rotate().flatten({ background: '#ffffff' }).resize(side, side, { fit: 'inside' }).jpeg({ quality: 88 }).toBuffer()).toString('base64')}`;
   const heroRef = hero ? await jpg(hero, 1024) : null;
   let e = 0;
+  let a = 0;
   let w = 0;
+  let meals = 0;
   const tasks = await Promise.all(
     items.map(async (p) => {
       const refs = p.photo ? [await jpg(p.photo, 1280), ...(heroRef ? [heroRef] : [])] : heroRef ? [heroRef] : [];
-      const shot = MEAL.test(p.caption) ? EAT_SHOTS[e++ % EAT_SHOTS.length] : WALK_SHOTS[w++ % WALK_SHOTS.length];
+      const meal = MEAL.test(p.caption);
+      const shot = meal ? (meals++ % 2 ? ADMIRE_SHOTS[a++ % ADMIRE_SHOTS.length] : EAT_SHOTS[e++ % EAT_SHOTS.length]) : WALK_SHOTS[w++ % WALK_SHOTS.length];
       // the hero is the traveller (client 2026-10-11: KIMORIN travels Busan, eats the food in the
       // photos, wanders the streets) — exactly one of them in every picture, never two
       const lines = p.photo
         ? [
             `A breathtaking still from a high-end Japanese anime film. The place, the food and the composition come from the first reference photo (${p.caption}) — keep them the same.`,
             heroRef
-              ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually doing what the photo shows — eating this food with relish, sitting at this table, walking these streets, gazing at this view. Exactly one of this character; never two copies.'
+              ? 'The traveller in this film is the character from the second reference picture (exactly the same design, colours and proportions): show that character exactly once in the scene, actually being in this place — at this table, in these streets, at this view — as the camera note says. Exactly one of this character; never two copies.'
               : '',
             shot,
           ]
