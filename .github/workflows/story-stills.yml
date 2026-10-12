@@ -1,0 +1,53 @@
+name: Story stills
+
+# The story's still pictures (client decision 2026-10-12): the ids listed in
+# design/story-stills-queue.json are painted with Seedream 5.0 Pro from the story import's
+# 〔一枚絵：…〕 text and saved to apps/web/public/story/stills/ (see scripts/story/paint-stills.mjs).
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**', main]
+    paths: ['design/story-stills-queue.json']
+
+concurrency:
+  group: story-stills-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  paint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Paint
+        run: |
+          export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key 2>/dev/null || true)"
+          command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          node scripts/story/paint-stills.mjs
+      - name: Save the pictures to the branch
+        if: always()
+        run: |
+          git config user.name "story-stills"
+          git config user.email "story-stills@users.noreply.github.com"
+          git add -f apps/web/public/story/stills docs/story-import/stills-last-run.md
+          git diff --cached --quiet && exit 0
+          git commit -m "Story stills: new pictures [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

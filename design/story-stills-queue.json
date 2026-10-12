@@ -1,0 +1,10 @@
+{
+  "note": "一枚絵の注文。paint に場面の一枚絵ID（docs/story-import/stills.md）を足すか \"all\"。描き直しは redo に。",
+  "paint": [
+    "D01-S002-1",
+    "L2-MERCURY-S001-1",
+    "L2-JUPITER-S001-1",
+    "L3-RECORDER-S007-1"
+  ],
+  "redo": []
+}
