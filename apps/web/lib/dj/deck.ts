@@ -46,6 +46,8 @@ export class Deck {
   hotCues: (number | null)[] = Array(HOT_CUES).fill(null);
   /** a peak per 1/100 s, for the waveform */
   peaks: Float32Array = new Float32Array(0);
+  /** the same per frequency band (low < 250 Hz, mid, high > 4 kHz), 0–1 each — the coloured waveform */
+  bands: { low: Float32Array; mid: Float32Array; high: Float32Array } | null = null;
 
   // where the track was at the last known moment (for a smooth position between worklet updates)
   private at = { input: 0, ctx: 0 };
@@ -137,6 +139,14 @@ export class Deck {
     this.buffer = buffer;
     this.meta = meta;
     this.peaks = peaksOf(buffer);
+    this.bands = null;
+    // the bands take a moment (three offline filter passes): drawn when ready
+    void bandsOf(buffer).then((b) => {
+      if (this.buffer === buffer) {
+        this.bands = b;
+        this.emit();
+      }
+    }, () => undefined);
     this.cue = meta.firstBeat;
     this.hotCues = Array(HOT_CUES).fill(null);
     this.at = { input: this.cue, ctx: this.ctx.currentTime };
@@ -322,4 +332,51 @@ function peaksOf(b: AudioBuffer): Float32Array {
     out[i] = m;
   }
   return out;
+}
+
+/**
+ * How loud the lows, mids and highs are per 10 ms (client 2026-10-12: the usual DJ colours — low red,
+ * mid green, high blue). The track is filtered three times offline (low-pass 250 Hz, band-pass around
+ * 1 kHz, high-pass 4 kHz); each band is scaled to its own loud parts so all three show.
+ */
+async function bandsOf(b: AudioBuffer): Promise<{ low: Float32Array; mid: Float32Array; high: Float32Array }> {
+  // a lower sample rate is plenty for a picture and quicker on a phone
+  const sr = 22050;
+  const len = Math.ceil(b.duration * sr);
+  const pass = async (make: (ctx: OfflineAudioContext) => AudioNode[]) => {
+    const ctx = new OfflineAudioContext(1, len, sr);
+    const src = ctx.createBufferSource();
+    src.buffer = b;
+    const chain = make(ctx);
+    let node: AudioNode = src;
+    for (const n of chain) node = node.connect(n);
+    node.connect(ctx.destination);
+    src.start();
+    const out = (await ctx.startRendering()).getChannelData(0);
+    const step = Math.floor(sr / 100);
+    const n = Math.floor(out.length / step);
+    const env = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      let m = 0;
+      for (let j = i * step; j < (i + 1) * step; j += 2) m = Math.max(m, Math.abs(out[j]));
+      env[i] = m;
+    }
+    // scale to the band's own loud parts (98th percentile)
+    const top = Float32Array.from(env).sort()[Math.floor(n * 0.98)] || 1;
+    for (let i = 0; i < n; i++) env[i] = Math.min(1, env[i] / top);
+    return env;
+  };
+  const biquad = (ctx: OfflineAudioContext, type: BiquadFilterType, f: number, q = 0.7) => {
+    const x = ctx.createBiquadFilter();
+    x.type = type;
+    x.frequency.value = f;
+    x.Q.value = q;
+    return x;
+  };
+  const [low, mid, high] = await Promise.all([
+    pass((c) => [biquad(c, 'lowpass', 250), biquad(c, 'lowpass', 250)]),
+    pass((c) => [biquad(c, 'highpass', 250), biquad(c, 'lowpass', 4000)]),
+    pass((c) => [biquad(c, 'highpass', 4000), biquad(c, 'highpass', 4000)]),
+  ]);
+  return { low, mid, high };
 }

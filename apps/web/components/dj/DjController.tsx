@@ -253,12 +253,33 @@ function Wave({ deck, color }: { deck: Deck; color: string }) {
     const p = deck.position();
     const span = 8;
     const peaks = deck.peaks;
-    g.fillStyle = color;
-    for (let x = 0; x < W; x++) {
-      const t = p - span / 2 + (x / W) * span;
-      const v = peaks[Math.floor(t * 100)] ?? 0;
-      g.globalAlpha = t < p ? 0.45 : 0.9;
-      g.fillRect(x, H / 2 - (v * H) / 2, 1, v * H);
+    const bands = deck.bands;
+    if (bands) {
+      // the usual DJ colours (client 2026-10-12): low red outside, mid green inside it, high blue in the
+      // middle — a kick drum shows as a tall red spike, hi-hats as blue; the played part is dimmer
+      const layers: [Float32Array, string, number][] = [
+        [bands.low, '#ff3b30', 1],
+        [bands.mid, '#34e05a', 0.72],
+        [bands.high, '#3a8bff', 0.48],
+      ];
+      for (const [band, col, scale] of layers) {
+        g.fillStyle = col;
+        for (let x = 0; x < W; x++) {
+          const t = p - span / 2 + (x / W) * span;
+          const v = (band[Math.floor(t * 100)] ?? 0) * scale * 0.95;
+          g.globalAlpha = t < p ? 0.5 : 1;
+          g.fillRect(x, H / 2 - (v * H) / 2, 1, v * H);
+        }
+      }
+      g.globalCompositeOperation = 'source-over';
+    } else {
+      g.fillStyle = color;
+      for (let x = 0; x < W; x++) {
+        const t = p - span / 2 + (x / W) * span;
+        const v = peaks[Math.floor(t * 100)] ?? 0;
+        g.globalAlpha = t < p ? 0.45 : 0.9;
+        g.fillRect(x, H / 2 - (v * H) / 2, 1, v * H);
+      }
     }
     g.globalAlpha = 1;
     const mark = (t: number, col: string) => {
