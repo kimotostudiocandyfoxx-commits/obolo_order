@@ -1,0 +1,96 @@
+{
+  "round": "m16-klein-loop1",
+  "hero": "creature, chibi, white mask, blue markings, blue glowing eyes, fox ears, multiple tails, red hooded robe, white and black tails, white paws, blue gem necklace, red, white, blue",
+  "avg": {
+    "overall": 6.3,
+    "heroLikeness": 6.5,
+    "heroConsistency": 5.9,
+    "pictureQuality": 6.6,
+    "storyTelling": 6.2,
+    "lyricFit": 7.1,
+    "beatSync": 5.4,
+    "variety": 5.7,
+    "watchability": 6.3,
+    "kidsSafe": 7.3
+  },
+  "results": [
+    {
+      "id": "photo",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 13,
+      "painted": 13,
+      "costYen": 2.5,
+      "seconds": {
+        "plan": 0,
+        "paint": 20,
+        "render": 57
+      },
+      "judge": {
+        "heroLikeness": 6,
+        "heroConsistency": 5,
+        "pictureQuality": 6,
+        "storyTelling": 6,
+        "lyricFit": 7,
+        "beatSync": 5,
+        "variety": 5,
+        "watchability": 6,
+        "kidsSafe": 7,
+        "overall": 6,
+        "problems": [
+          "00:08 Face design shifts from full porcelain mask to a human child face with face paint.",
+          "00:26 Repetitive dining poses dominate the entire second half of the clip.",
+          "00:30 Minor hand and chopstick anatomy distortions during eating frames."
+        ],
+        "fixIdeas": [
+          "Reinforce 'blank kitsune mask without visible human face' in negative prompts.",
+          "Introduce movement shots like walking markets instead of static seated dining tables.",
+          "Tighten edit cuts closer to drum transients in the chorus."
+        ],
+        "bestMoments": [
+          "00:00 Atmospheric opening looking out at the Busan coastline.",
+          "00:11 Colorful seafood market tank frame matching the lyric mood."
+        ]
+      }
+    },
+    {
+      "id": "story",
+      "ok": true,
+      "heroRef": 0.6,
+      "song": "best:busan-kpop",
+      "scenes": 7,
+      "painted": 7,
+      "costYen": 3.2,
+      "seconds": {
+        "plan": 3,
+        "paint": 8,
+        "render": 52
+      },
+      "judge": {
+        "heroLikeness": 7,
+        "heroConsistency": 6.8,
+        "pictureQuality": 7.2,
+        "storyTelling": 6.4,
+        "lyricFit": 7.1,
+        "beatSync": 5.8,
+        "variety": 6.3,
+        "watchability": 6.5,
+        "kidsSafe": 7.5,
+        "overall": 6.6,
+        "problems": [
+          "00:16 Pacing slows with repetitive posture during the market scene.",
+          "00:33 Long duration on the rear walking shot reduces visual energy."
+        ],
+        "fixIdeas": [
+          "Shorten shot durations to align transitions with the musical tempo.",
+          "Introduce active hand gestures and eating animations instead of static holds."
+        ],
+        "bestMoments": [
+          "00:08 Beach walking scene showing good character fidelity.",
+          "00:26 Food tasting scene with cheerful character expression."
+        ]
+      }
+    }
+  ]
+}
