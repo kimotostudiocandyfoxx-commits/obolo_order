@@ -126,3 +126,40 @@ if (round.models?.length) {
 
 writeFileSync(join(OUT, 'report.md'), report.join('\n'));
 console.log(report.join('\n'));
+
+// 3. character test (client direction 2026-10-12: members show who they are by features — a hat's
+//    colour, the shape of sunglasses — not a face): each hero picture × each scene with one model,
+//    words for the hero from `look`; a contact sheet per hero is made by the workflow's report step
+if (round.heroes?.length && round.scenes?.length) {
+  const m = round.heroModel ?? { name: 'klein-4b', model: 'runware:400@4', maxRefs: 4 };
+  report.push(`## Characters — ${m.name}`, '');
+  let total = 0;
+  for (const h of round.heroes) {
+    report.push(`### ${h.name}`, '');
+    const ref = dataUri(h.file);
+    const results = await Promise.all(
+      round.scenes.map(async (sc, k) => {
+        const prompt = [
+          `A still from a high-end Japanese anime film, fully drawn in 2D anime style: ${sc}.`,
+          `The main character is the one in the reference picture — exactly the same design, colours, outfit and accessories (${h.look}) — shown exactly once.`,
+          'Keep its face, headwear, eyewear and outfit exactly as in the reference; never draw an open mouth or teeth the reference does not have.',
+          'Any glass on the table holds orange juice, green tea or milk. Rich detailed background, cinematic lighting. No text, no watermark.',
+        ].join(' ');
+        try {
+          const [d] = await call([task({ ...m, refs: 'top' }, prompt, [ref], 1024, 1024)]);
+          const img = Buffer.from(await (await fetch(d.imageURL)).arrayBuffer());
+          const file = `${h.name}-${k + 1}.jpg`;
+          writeFileSync(join(OUT, file), img);
+          total += d.cost ?? 0;
+          return `- ✅ ${sc.slice(0, 60)} → ${file}`;
+        } catch (e) {
+          return `- ❌ ${sc.slice(0, 60)}: ${String(e).slice(0, 200)}`;
+        }
+      }),
+    );
+    report.push(...results, '');
+  }
+  report.push(`費用: ${(total * YEN).toFixed(1)}円`, '');
+}
+
+writeFileSync(join(OUT, 'report.md'), report.join('\n'));

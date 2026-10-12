@@ -1,66 +1,49 @@
 {
-  "round": "s02-cheap-models",
-  "note": "Seedream の代わり候補8種に、同じキモリンの課題（写真1枚＋キモリン／写真4枚の4コマ）を描かせて、費用と出来を比べる。",
+  "round": "s03-characters",
+  "note": "キャラの特徴（帽子・サングラス・服など）が FLUX.2 klein 4B でどこまで保たれるか。7キャラ×4場面（1枚0.19円）。",
   "search": [],
-  "hero": "art/lab/mv/hero.jpg",
-  "photos": [
+  "models": [],
+  "heroes": [
     {
-      "file": "art/lab/busan/photos/02.jpg",
-      "caption": "walking along Songdo beach, wide sandy beach, tall glass towers, dramatic clouds, sea breeze"
+      "name": "kimorin",
+      "file": "art/lab/heroes/kimorin.jpg",
+      "look": "small chibi fox spirit, white mask face with blue markings, red hooded robe, many black-and-white tails, blue gem necklace"
     },
     {
-      "file": "art/lab/busan/photos/05.jpg",
-      "caption": "a feast of soy-marinated raw crab (ganjang gejang) with green chilli, a bowl of rice with egg yolk and roe, side dishes"
+      "name": "hatg",
+      "file": "art/lab/heroes/hatg.jpg",
+      "look": "black gorilla, yellow patterned bucket hat, round gold sunglasses, gold chain necklace"
     },
     {
-      "file": "art/lab/busan/photos/07.jpg",
-      "caption": "Nampo-dong shopping street at dusk, neon signs, crowds, a deep blue evening sky"
+      "name": "hipokin",
+      "file": "art/lab/heroes/hipokin.jpg",
+      "look": "dark grey hippo gentleman, black three-piece suit, red patterned tie, glowing blue eyes"
     },
     {
-      "file": "art/lab/busan/photos/09.jpg",
-      "caption": "sweet shrimp on ice, fresh sea urchin, crispy fried shrimp heads and a little stew pot on a fire"
+      "name": "freezy",
+      "file": "art/lab/heroes/freezy.jpg",
+      "look": "shaggy black-haired spirit with a wooden board face, three yellow eyes, curled moustache, purple sparks"
+    },
+    {
+      "name": "bossg",
+      "file": "art/lab/heroes/bossg.jpg",
+      "look": "muscular black gorilla, many gold chains, gold cuffs with blue lights, black shorts"
+    },
+    {
+      "name": "penlady",
+      "file": "art/lab/heroes/av-pen_lady.jpg",
+      "look": "penguin lady with long black hair, black suit jacket, red bow"
+    },
+    {
+      "name": "onigiri",
+      "file": "art/lab/heroes/av-onigiri.jpg",
+      "look": "round white rice ball character with a happy face, pink cheeks, black seaweed wrap"
     }
   ],
-  "models": [
-    {
-      "name": "flux2-klein-4b",
-      "model": "runware:400@4",
-      "maxRefs": 4
-    },
-    {
-      "name": "flux2-klein-9b",
-      "model": "runware:400@2",
-      "maxRefs": 4
-    },
-    {
-      "name": "flux2-dev",
-      "model": "runware:400@1",
-      "maxRefs": 6
-    },
-    {
-      "name": "qwen-edit-plus",
-      "model": "runware:108@22",
-      "maxRefs": 3
-    },
-    {
-      "name": "qwen-2.1-turbo",
-      "model": "alibaba:qwen-image@2.1-turbo",
-      "maxRefs": 3
-    },
-    {
-      "name": "nano-banana-2-lite",
-      "model": "google:nano-banana@2-lite",
-      "maxRefs": 5
-    },
-    {
-      "name": "gpt-image-1-mini",
-      "model": "openai:1@2",
-      "maxRefs": 5
-    },
-    {
-      "name": "kling-image-o3",
-      "model": "klingai:kling-image@o3",
-      "maxRefs": 5
-    }
+  "scenes": [
+    "walking along a sunny beach with tall city towers behind",
+    "sitting at a small restaurant table about to eat a bowl of ramen, chopsticks raised",
+    "walking through a neon shopping street at night, looking around in wonder",
+    "seen from behind, looking at fish tanks full of crabs in a market"
   ]
 }
