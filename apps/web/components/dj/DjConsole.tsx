@@ -10,7 +10,8 @@ import { VISUALS, type VisualId } from '@/lib/dj/visuals';
 import { Fader, Jog, Knob, Pad } from './controls';
 import { PadIcon } from './icons';
 import type { DjTrack } from './DjController';
-import { ART, FONT_NUM, FONT_UI, FONTS_HREF, HOT_CUE_COLORS, NEON, neon } from './skin';
+import './fonts';
+import { ART, FONT_NUM, FONT_UI, HOT_CUE_COLORS, NEON, neon } from './skin';
 
 /**
  * The Venus DJ console in the client's shape (reference picture 2026-10-12): three circles side by
@@ -142,7 +143,6 @@ export function DjConsole({ engine, songs, backHref }: { engine: DjEngine; songs
       className="fixed inset-0 z-[300] overflow-hidden bg-[#05060a] text-white"
       style={{ touchAction: 'none', fontFamily: FONT_UI, backgroundImage: `radial-gradient(ellipse at center, rgba(5,6,10,0.35) 0%, rgba(5,6,10,0.85) 70%), url(${ART.club})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
-      <link rel="stylesheet" href={FONTS_HREF} precedence="default" />
       <div className="flex h-full items-center justify-center portrait:hidden">
         <div className="relative" style={{ width: W, height: D }}>
           <Body D={D} step={step} />
@@ -256,14 +256,16 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   const pos = deck.position();
   const angle = ((pos / 1.8) * 360) % 360;
   const ring = (active: boolean, c: string = color): CSSProperties => ({ ...neon(c, active, k), width: b, height: b, borderRadius: '50%', fontSize: 8.5 * k });
+  // a pill: a little slimmer than a round button, as wide as its longest label plus even padding
+  const pill = (active: boolean, c: string, w: number, font = 7.5): CSSProperties => ({ ...neon(c, active, k), width: b * w, height: b * 0.84, borderRadius: 999, fontSize: font * k, letterSpacing: '0.04em' });
 
   return (
     <div className="absolute inset-0">
       {/* load a song: the button at the top of the ring (the title shows over the waveform) */}
       <div style={at(L.load, L.r)}>
         <Pad onDown={() => setPick(!pick)} className="border-0 bg-transparent">
-          <span style={{ ...ring(pick), width: b * 1.5, borderRadius: 999 }} className="flex items-center justify-center border">
-            {loading ? '…' : '♪ LOAD'}
+          <span style={pill(pick, color, 1.5, 8)} className="flex items-center justify-center border">
+            {loading ? '…' : 'LOAD'}
           </span>
         </Pad>
       </div>
@@ -294,7 +296,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       ).map(([deg, label, fn, main], n) => (
         <div key={`l${n}`} style={at(deg, main ? L.pill : L.r)}>
           <Pad onDown={fn} className="border-0 bg-transparent">
-            <span style={main ? { ...ring(deck.loop !== null, LOOP_COLOR), width: b * 1.45, borderRadius: 999, fontSize: 7.5 * k, letterSpacing: '0.02em' } : ring(false)} className="flex items-center justify-center whitespace-nowrap border">
+            <span style={main ? pill(deck.loop !== null, LOOP_COLOR, 1.6, 7) : ring(false)} className="flex items-center justify-center whitespace-nowrap border">
               {label}
             </span>
           </Pad>
@@ -303,7 +305,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       {/* beat jump along the lower arc on the mixer side: ◀◀ JUMP ▶▶ (◀◀ on the left on both decks); tap JUMP to pick the distance */}
       <div style={at(L.jump[1], L.pill)}>
         <Pad onDown={() => setJumpPick(!jumpPick)} className="border-0 bg-transparent">
-          <span style={{ ...ring(jumpPick, '#f5c66b'), width: b * 1.2, borderRadius: 999, fontSize: 7 * k, letterSpacing: '0.02em' }} className="flex items-center justify-center whitespace-nowrap border">
+          <span style={pill(jumpPick, '#f5c66b', 1.6, 6.8)} className="flex items-center justify-center whitespace-nowrap border">
             JUMP {beatsLabel(deck.jumpBeats)}
           </span>
         </Pad>
@@ -347,7 +349,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       {/* SYNC low on the outer side; CUE and play side by side right under the platter */}
       <div style={at(L.sync, L.pill)}>
         <Pad onDown={() => engine.sync(i)} className="border-0 bg-transparent">
-          <span style={{ ...ring(false), width: b * 1.4, borderRadius: 999 }} className="flex items-center justify-center border">
+          <span style={pill(false, color, 1.5, 7.5)} className="flex items-center justify-center border">
             SYNC
           </span>
         </Pad>
@@ -361,9 +363,9 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       </div>
       <div style={at(L.play, L.playR)}>
         <Pad onDown={() => deck.toggle()} className="border-0 bg-transparent">
-          <Pill color={NEON.green} k={k} size={42} lit={deck.playing}>
+          <Pill color={NEON.green} k={k} size={39} lit={deck.playing}>
             {/* play ▶ and pause ❚❚ drawn as one clean mark */}
-            <svg viewBox="0 0 28 16" width={22 * k} height={12.5 * k} fill="currentColor" aria-label="play / pause">
+            <svg viewBox="0 0 28 16" width={20 * k} height={11.5 * k} fill="currentColor" aria-label="play / pause">
               <path d="M1 1.5v13l10.5-6.5z" />
               <rect x="16" y="1.5" width="3.6" height="13" rx="0.8" />
               <rect x="22.4" y="1.5" width="3.6" height="13" rx="0.8" />
@@ -445,15 +447,15 @@ const L = {
   cues: [-148, -134, -120, -106],
   load: -90,
   /** ½, LOOP, ×2 */
-  loop: [-73.6, -56.2, -38.8],
+  loop: [-75, -56.5, -38],
   /** ◀◀, JUMP, ▶▶ */
-  jump: [73, 57.5, 42],
+  jump: [76, 57.5, 39.5],
   /** play: the big round button right under the jog; CUE beside it on the outer side */
-  play: 90,
+  play: 93,
   playR: 0.75,
-  cue: 110,
+  cue: 113,
   cueR: 0.78,
-  sync: 128,
+  sync: 134,
   /** the tempo column (fader, %, round KEY) on the outer side, a little below the middle */
   tempo: 0.72,
   tempoDrop: 0.055,
@@ -649,7 +651,7 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
           />
         </div>
       ))}
-      {/* the samplers: a pad (fires it) and えらぶ (picks it) on each side — left = picture, right = sound */}
+      {/* the samplers: a pad (fires it) and SELECT (picks it) on each side — left = picture, right = sound */}
       {([0, 1] as const).map((side) => {
         const list = side === 0 ? VISUALS : SAMPLES;
         const sm = list.find((x) => x.id === picked[side])!;
@@ -676,13 +678,20 @@ function MixerCircle({ engine, D, k }: { engine: DjEngine; D: number; k: number 
                 <span style={{ fontSize: 5.8 * k, letterSpacing: '0.04em', marginTop: 1 * k }}>{sm.short}</span>
               </button>
             </div>
-            <div style={box(side === 0 ? -0.74 : 0.74, 0.17)}>
+            <div style={box(side === 0 ? -0.79 : 0.79, 0.15)}>
               <button
                 onClick={() => setSamplePick(samplePick === side ? null : side)}
-                className="select-none whitespace-nowrap rounded-full"
-                style={{ ...neon(col, samplePick === side, k), fontSize: 7.5 * k, padding: `${2 * k}px ${7 * k}px` }}
+                aria-label={side === 0 ? '映像のサンプラーを選ぶ' : '音のサンプラーを選ぶ'}
+                className="flex select-none items-center justify-center rounded-full"
+                style={{ ...neon(col, samplePick === side, k), width: 21 * k, height: 21 * k }}
               >
-                えらぶ
+                {/* a grid mark: pick from the set */}
+                <svg viewBox="0 0 10 10" width={8.5 * k} height={8.5 * k} fill="currentColor" aria-hidden>
+                  <rect x="0" y="0" width="4" height="4" rx="1" />
+                  <rect x="6" y="0" width="4" height="4" rx="1" />
+                  <rect x="0" y="6" width="4" height="4" rx="1" />
+                  <rect x="6" y="6" width="4" height="4" rx="1" />
+                </svg>
               </button>
             </div>
           </div>

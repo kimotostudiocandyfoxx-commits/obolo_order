@@ -102,6 +102,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@fontsource/orbitron':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/rajdhani':
+        specifier: 5.3.0
+        version: 5.3.0
       '@obolo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -909,6 +915,12 @@ packages:
 
   '@firebase/webchannel-wrapper@1.0.7':
     resolution: {integrity: sha512-phBFwieDLvkZGYN9CE9ZFNEIoBVksprzsnCzQejCmCHtgwCXReeuRpoEGN9C4EbhONztv8NRV1tau6Rb9pONwQ==}
+
+  '@fontsource/orbitron@5.3.0':
+    resolution: {integrity: sha512-+BhPsbUAo/AF7sRcf+TEexm+EWWkgTiR9Zwb7AhYIPkc5oplfvw0C45Oc2xlKPhwVEmxG8hHuA6/Ansbl+Bc6w==}
+
+  '@fontsource/rajdhani@5.3.0':
+    resolution: {integrity: sha512-oBJgSIibWJvVBKseme1JczqPLoDHN97LHti4uh0LjfcJqQoVmnQQlRKIpEjTJV559rmVQ6qbVZZwKwk2wkBTtw==}
 
   '@google-cloud/firestore@7.11.6':
     resolution: {integrity: sha512-EW/O8ktzwLfyWBOsNuhRoMi8lrC3clHM5LVFhGvO1HCsLozCOOXRAlHrYBoE6HL42Sc8yYMuCb2XqcnJ4OOEpw==}
@@ -3813,6 +3825,10 @@ snapshots:
       tslib: 2.8.1
 
   '@firebase/webchannel-wrapper@1.0.7': {}
+
+  '@fontsource/orbitron@5.3.0': {}
+
+  '@fontsource/rajdhani@5.3.0': {}
 
   '@google-cloud/firestore@7.11.6':
     dependencies:

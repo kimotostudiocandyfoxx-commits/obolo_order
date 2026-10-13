@@ -15,8 +15,8 @@ export const ART = {
   stage: '/dj/art/club-b.jpg',
 };
 
-/** labels: a squared, technical face; numbers: a wide display face (Google Fonts, loaded by the console) */
-export const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@600;700&display=swap';
+/** labels: a squared, technical face; numbers: a wide display face (both SIL OFL, bundled with the app via
+ * @fontsource and imported by fonts.ts, so they load offline too and text never falls back to a wider face) */
 export const FONT_UI = "'Rajdhani', 'M PLUS Rounded 1c', system-ui, sans-serif";
 export const FONT_NUM = "'Orbitron', 'Rajdhani', system-ui, sans-serif";
 

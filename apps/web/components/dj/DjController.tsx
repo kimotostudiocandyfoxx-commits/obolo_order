@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { DjEngine } from '@/lib/dj/engine';
 import { DjConsole } from './DjConsole';
-import { ART, FONT_NUM, FONT_UI, FONTS_HREF, NEON, neon } from './skin';
+import './fonts';
+import { ART, FONT_NUM, FONT_UI, NEON, neon } from './skin';
 
 /**
  * The Venus DJ (client request 2026-10-12): a start screen (iOS needs a tap before any sound), then
@@ -44,7 +45,6 @@ export function DjController({ songs = [], backHref }: { songs?: DjTrack[]; back
       className="fixed inset-0 z-[300] flex flex-col items-center justify-center gap-5 bg-[#05060a] px-6 text-white"
       style={{ fontFamily: FONT_UI, backgroundImage: `radial-gradient(ellipse at center, rgba(5,6,10,0.25) 0%, rgba(5,6,10,0.8) 75%), url(${ART.stage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
     >
-      <link rel="stylesheet" href={FONTS_HREF} precedence="default" />
       {backHref && (
         <Link href={backHref} className="absolute left-3 top-[calc(8px+env(safe-area-inset-top))] rounded-full bg-white/10 px-3 py-1 text-xs text-white/80">
           ← もどる

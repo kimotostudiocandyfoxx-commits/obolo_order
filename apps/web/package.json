@@ -10,6 +10,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@fontsource/orbitron": "5.3.0",
+    "@fontsource/rajdhani": "5.3.0",
     "@obolo/shared": "workspace:*",
     "@stripe/stripe-js": "^10.0.0",
     "agora-rtc-sdk-ng": "^4.24.8",
