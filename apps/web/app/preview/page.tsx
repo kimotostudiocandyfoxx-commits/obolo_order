@@ -11,6 +11,7 @@ export default function PreviewIndex() {
   const jumps: { href: string; label: string }[] = [
     { href: '/preview/dj', label: '🎧 金星 DJ（音声エンジンの仮画面・横向き）' },
     { href: '/preview/story', label: '📖 新しい物語の台本（全場面・どの場面からでも／戻る・演出メモ）' },
+    { href: '/preview/story-assets', label: '🎨 物語の素材（人物・場所・声・効果音／候補の見比べ）' },
     { href: '/preview/play?day=3&at=neo', label: '3日目：ネオの姿えらびから' },
     { href: '/preview/play?day=4&at=saturn', label: '4日目：ころりんぱ（土星で遊ぶ）から' },
     { href: '/preview/play?day=5&at=jupiter', label: '5日目：パタパタ（木星で遊ぶ）から' },

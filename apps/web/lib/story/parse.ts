@@ -17,6 +17,10 @@ export type Line =
   /** a still picture to paint (〔一枚絵：…〕 / 〔到着の一枚絵：…〕): `id` is made from the scene */
   | { k: 'still'; id: string; desc: string; arrival: boolean }
   | { k: 'bg'; id: string }
+  /** a sound effect (〔SE：…〕 — the text is the order for the sound) */
+  | { k: 'se'; text: string }
+  /** background music: 〔BGM：name〕 starts it (the same name is the same tune), 〔BGM止め〕 stops it (name null) */
+  | { k: 'bgm'; name: string | null }
   /** an app screen (〔画面：…〕), a making flow (〔制作：…〕), an input (〔入力：…〕), a button (〔ボタン：…〕) */
   | { k: 'ui'; kind: 'screen' | 'make' | 'input' | 'button' | 'confirm' | 'done'; text: string; feature: string }
   /** a paper / sign / letter shown as a card: 〔札〕〔招待状〕〔手紙〕… with its text */
@@ -104,6 +108,9 @@ function bracket(v: string, scene: string, n: { still: number }): Line {
   if ((m = t.match(/^動画\s*([0-9０-９A-Za-z][0-9０-９A-Za-z\-ー－]*)/))) return { k: 'video', id: m[1].replace(/[０-９]/g, (d) => String('０１２３４５６７８９'.indexOf(d))).replace(/[ー－]/g, '-') };
   if ((m = t.match(/^(到着の)?一枚絵[：:](.*)$/s))) return { k: 'still', id: `${scene}-${++n.still}`, desc: m[2].trim(), arrival: !!m[1] };
   if ((m = t.match(/^背景[\s：:]+([A-Za-z0-9_\-]+)/))) return { k: 'bg', id: m[1] };
+  if ((m = t.match(/^(?:SE|ＳＥ|効果音)[：:](.*)$/s))) return { k: 'se', text: m[1].trim() };
+  if (/^(?:BGM|ＢＧＭ)\s*(?:を)?(?:止め|停止|とめ|消)/.test(t)) return { k: 'bgm', name: null };
+  if ((m = t.match(/^(?:BGM|ＢＧＭ)[：:](.*)$/s))) return { k: 'bgm', name: m[1].trim() };
   if ((m = t.match(/^画面[：:](.*)$/s))) return ui('screen', m[1]);
   if ((m = t.match(/^制作[：:](.*)$/s))) return ui('make', m[1]);
   if ((m = t.match(/^入力[：:](.*)$/s))) return ui('input', m[1]);
@@ -318,7 +325,7 @@ export function walk(lines: Line[], fn: (l: Line) => void) {
 }
 
 /** Problems a writer can fix, and lists of what is still to be made. */
-export function check(scenes: Scene[], speakers: string[]): { issues: Issue[]; unknownSpeakers: Map<string, number>; stills: { scene: string; id: string; desc: string; arrival: boolean }[]; screens: { scene: string; kind: string; text: string; feature: string }[]; videos: Set<string>; vars: Map<string, number> } {
+export function check(scenes: Scene[], speakers: string[]): { issues: Issue[]; unknownSpeakers: Map<string, number>; stills: { scene: string; id: string; desc: string; arrival: boolean }[]; screens: { scene: string; kind: string; text: string; feature: string }[]; videos: Set<string>; vars: Map<string, number>; sounds: Map<string, string[]>; music: Map<string, string[]>; backgrounds: Map<string, string[]> } {
   const ids = new Set(scenes.map((s) => s.id));
   const issues: Issue[] = [];
   const unknownSpeakers = new Map<string, number>();
@@ -326,6 +333,11 @@ export function check(scenes: Scene[], speakers: string[]): { issues: Issue[]; u
   const screens: { scene: string; kind: string; text: string; feature: string }[] = [];
   const videos = new Set<string>();
   const vars = new Map<string, number>();
+  // sound effects / tunes / backgrounds → the scenes that use them
+  const sounds = new Map<string, string[]>();
+  const music = new Map<string, string[]>();
+  const backgrounds = new Map<string, string[]>();
+  const use = (m: Map<string, string[]>, k: string, scene: string) => m.set(k, [...new Set([...(m.get(k) ?? []), scene])]);
   const known = new Set(speakers);
   const seen = new Set<string>();
   for (const s of scenes) {
@@ -343,6 +355,9 @@ export function check(scenes: Scene[], speakers: string[]): { issues: Issue[]; u
       if (l.k === 'still') stills.push({ scene: s.id, id: l.id, desc: l.desc, arrival: l.arrival });
       if (l.k === 'ui') screens.push({ scene: s.id, kind: l.kind, text: l.text, feature: l.feature });
       if (l.k === 'video') videos.add(l.id);
+      if (l.k === 'se') use(sounds, l.text, s.id);
+      if (l.k === 'bgm' && l.name) use(music, l.name, s.id);
+      if (l.k === 'bg') use(backgrounds, l.id, s.id);
       if (l.k === 'choice') {
         // a choice where no option has → just goes on whichever is picked (fine); a mix is suspicious
         const some = l.options.some((o) => o.to);
@@ -363,5 +378,5 @@ export function check(scenes: Scene[], speakers: string[]): { issues: Issue[]; u
     });
     for (const nx of s.next) if (!ids.has(nx)) issues.push({ scene: s.id, level: 'warn', msg: `行き先に書かれた場面 ${nx} がない` });
   }
-  return { issues, unknownSpeakers, stills, screens, videos, vars };
+  return { issues, unknownSpeakers, stills, screens, videos, vars, sounds, music, backgrounds };
 }

@@ -1,0 +1,11 @@
+{
+  "note": "描く絵の注文。paint に人物・場所の名前を足すと、人物表・場所表の説明から候補を n 枚ずつ描く。説明がまだなら desc で仮の説明を渡せる。描き直しは redo。",
+  "n": 3,
+  "paint": [
+    {
+      "name": "エビ",
+      "desc": "(仮・パイプラインの試し) a small cheerful shrimp creature shaped like a piece of ebi nigiri sushi: a glossy orange-red shrimp body lying on a soft white rice-ball body, big round friendly eyes, tiny arms, long curling antennae, standing on two little feet; welcoming and chatty"
+    }
+  ],
+  "redo": []
+}

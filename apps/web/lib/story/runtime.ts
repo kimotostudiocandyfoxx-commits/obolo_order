@@ -21,6 +21,8 @@ export interface RunState {
   chosen: string[];
   /** the last still / background put up, and who spoke last */
   picture: { kind: 'still' | 'bg' | 'video'; id: string; desc?: string } | null;
+  /** the tune playing (〔BGM：…〕 until 〔BGM止め〕); kept in the state so going back / resuming plays it again */
+  bgm?: string | null;
 }
 
 export interface Options {
@@ -30,7 +32,7 @@ export interface Options {
   states: string[];
 }
 
-export type Shown = Exclude<Line, { k: 'branch' | 'when' | 'example' | 'merge' | 'goto' | 'bg' }> | { k: 'sceneStart'; scene: Scene } | { k: 'end' };
+export type Shown = Exclude<Line, { k: 'branch' | 'when' | 'example' | 'merge' | 'goto' | 'bg' | 'se' | 'bgm' }> | { k: 'sceneStart'; scene: Scene } | { k: 'end' };
 
 export class Story {
   readonly byId = new Map<string, Scene>();
@@ -78,8 +80,19 @@ export class Story {
     return null;
   }
 
-  /** Move to the next line that is shown, and return it. */
-  next(prev: RunState, o: Options): { st: RunState; shown: Shown } {
+  /**
+   * Move to the next line that is shown, and return it. Sound effects met on the way do not stop the
+   * story: they come back in `se`, to play as the line appears.
+   */
+  next(prev: RunState, o: Options): { st: RunState; shown: Shown; se: string[] } {
+    const r = this.step(prev, o);
+    return { ...r, se: this.pending };
+  }
+
+  private pending: string[] = [];
+
+  private step(prev: RunState, o: Options): { st: RunState; shown: Shown } {
+    this.pending = [];
     let st: RunState = { ...prev, stack: prev.stack.map((f) => ({ ...f })) };
     for (let guard = 0; guard < 5000; guard++) {
       const scene = this.byId.get(st.scene);
@@ -123,6 +136,14 @@ export class Story {
           continue;
         case 'bg':
           st.picture = { kind: 'bg', id: l.id };
+          top.i++;
+          continue;
+        case 'se':
+          this.pending.push(l.text);
+          top.i++;
+          continue;
+        case 'bgm':
+          st.bgm = l.name;
           top.i++;
           continue;
         case 'goto': {

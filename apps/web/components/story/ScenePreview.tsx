@@ -36,6 +36,8 @@ const save = (k: string, v: unknown) => {
 export function ScenePreview() {
   const [story, setStory] = useState<Story | null>(null);
   const [stills, setStills] = useState<Set<string>>(new Set());
+  // standing pictures made after cast.ts (public/story/cast/manifest.json: name or alias → picture)
+  const [sprites, setSprites] = useState<Record<string, string>>({});
   const [err, setErr] = useState('');
   const [vars, setVars] = useState<Vars>(DEFAULT_VARS);
   const [opts, setOpts] = useState<Options>({ notes: false, states: [] });
@@ -53,6 +55,7 @@ export function ScenePreview() {
         setStory(new Story(parts.flat()));
         const m = await fetch('/story/stills/manifest.json').then((r) => (r.ok ? (r.json() as Promise<string[]>) : []), () => []);
         setStills(new Set(m));
+        setSprites(await fetch('/story/cast/manifest.json').then((r) => (r.ok ? (r.json() as Promise<Record<string, string>>) : {}), () => ({})));
       } catch (e) {
         setErr(String(e));
       }
@@ -100,9 +103,10 @@ export function ScenePreview() {
   const speaker = shown?.k === 'say' ? shown.who : null;
   const sprite = useMemo(() => {
     if (!speaker) return null;
+    if (sprites[speaker]) return sprites[speaker];
     const c = CAST.find((m) => m.name === speaker);
     return c?.sprite && !c.sprite.startsWith('@') ? spriteUrl(c.sprite) : null;
-  }, [speaker]);
+  }, [speaker, sprites]);
 
   if (err) return <p className="p-6 text-sm text-rose-300">読み込めませんでした: {err}</p>;
   if (!story || !shown || !st) return <div className="fixed inset-0 bg-black" />;
