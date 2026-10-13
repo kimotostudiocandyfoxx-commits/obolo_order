@@ -1,53 +1,55 @@
-# 物語の声 — 2026-10-13T03:47:00.106Z
+# 物語の声 — 2026-10-13T04:52:14.946Z
 
 モデル: gemini-2.5-pro-preview-tts
-声の候補: 12人 ／ 本番の声: 0人・0/0行（今回 0行、名前の入る行 0行は対象外）
+声の候補: 12人 ／ 本番の声: 9人・131行（決まった人のセリフ 2518行のうち、今回 131行・残り 2287行、名前の入る行 82行は対象外）
 
-- ✅ KIMORIN 1（Puck）7.7秒
-- ✅ KIMORIN 2（Fenrir）7.5秒
-- ✅ KIMORIN 3（Sadachbia）8.1秒
-- ✅ KIMORIN 4（Laomedeia）8.2秒
-- ✅ OBOLON 1（Charon）11.1秒
-- ✅ OBOLON 2（Gacrux）11.3秒
-- ✅ OBOLON 3（Algieba）11.5秒
-- ✅ OBOLON 4（Alnilam）11.3秒
-- ✅ MONBAN 1（Algenib）11.4秒
-- ✅ MONBAN 2（Orus）12.0秒
-- ✅ MONBAN 3（Iapetus）14.6秒
-- ✅ MONBAN 4（Schedar）11.5秒
-- ✅ フリージー 1（Enceladus）13.6秒
-- ✅ フリージー 2（Umbriel）11.5秒
-- ✅ フリージー 3（Schedar）10.5秒
-- ✅ フリージー 4（Zubenelgenubi）12.2秒
-- ✅ ヒポキン 1（Orus）8.3秒
-- ✅ ヒポキン 2（Gacrux）8.8秒
-- ✅ ヒポキン 3（Alnilam）7.8秒
-- ✅ ヒポキン 4（Rasalgethi）8.4秒
-- ✅ たこ焼きブラザー 1（Fenrir）8.3秒
-- ✅ たこ焼きブラザー 2（Algenib）8.0秒
-- ✅ たこ焼きブラザー 3（Sadaltager）8.1秒
-- ✅ たこ焼きブラザー 4（Alnilam）8.2秒
-- ✅ たこ焼きシスター 1（Kore）7.4秒
-- ✅ たこ焼きシスター 2（Despina）7.3秒
-- ✅ たこ焼きシスター 3（Erinome）8.0秒
-- ✅ たこ焼きシスター 4（Vindemiatrix）7.7秒
-- ✅ 大根カイザー 1（Gacrux）11.2秒
-- ✅ 大根カイザー 2（Charon）9.0秒
-- ✅ 大根カイザー 3（Rasalgethi）11.2秒
-- ✅ 大根カイザー 4（Algenib）10.5秒
-- ✅ うんちピンポンくん 1（Puck）5.9秒
-- ✅ うんちピンポンくん 2（Laomedeia）6.1秒
-- ✅ うんちピンポンくん 3（Leda）7.1秒
-- ✅ うんちピンポンくん 4（Zephyr）5.7秒
-- ✅ ボスG 1（Gacrux）7.5秒
-- ✅ ボスG 2（Algenib）6.1秒
-- ✅ ボスG 3（Alnilam）7.5秒
-- ✅ ボスG 4（Sadaltager）8.7秒
-- ✅ ハットG 1（Achird）6.3秒
-- ✅ ハットG 2（Zubenelgenubi）5.5秒
-- ✅ ハットG 3（Callirrhoe）6.6秒
-- ✅ ハットG 4（Umbriel）7.0秒
-- ✅ ロングG 1（Aoede）4.2秒
-- ✅ ロングG 2（Umbriel）4.7秒
-- ✅ ロングG 3（Sulafat）5.8秒
-- ✅ ロングG 4（Achernar）5.3秒
+- ❌ KIMORIN 1（録音から）: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ✅ OBOLON 1（Gacrux-+0.7st-echo）12.0秒
+- ✅ OBOLON 2（Gacrux-+0.7st-echo）11.5秒
+- ✅ フリージー 1（Schedar）9.5秒
+- ✅ フリージー 2（Schedar-+1st）8.7秒
+- ✅ フリージー 3（Schedar-+2st）8.2秒
+- ✅ ヒポキン 1（Gacrux--3st）9.2秒
+- ✅ ヒポキン 2（Charon--3st）8.7秒
+- ✅ ヒポキン 3（Algieba--3st）9.0秒
+- ✅ ヒポキン 4（Alnilam--4st）8.3秒
+- ✅ 大根カイザー 1（Gacrux--6st-growl）10.9秒
+- ✅ 大根カイザー 2（Algenib--6st-growl）10.7秒
+- ✅ 大根カイザー 3（Charon--7st-growl）9.6秒
+- ✅ 大根カイザー 4（Gacrux--8st-growl）11.4秒
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「…………。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「……間に合ったケン？」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「……抜けんケン。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「押したらわかるケン！」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「逆ケン逆ケン逆ケン！」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「……正面から、失礼しますケン。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「……どうも、ケン。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「よっ、ブラザー！」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「オレが旅の案内人、KIMORINだケン！」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「……バレたケン。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「……え、なんでこっち見るん。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「オレは、人生で失敗したことが一度もないケ」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「お、おなかが、すいた……？」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「こんにちは……？」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ うんちピンポンくん「ブッブー♪」: Error: 200 {"candidates":[{"finishReason":"OTHER","index":0}],"usageMetadata":{"promptTokenCount":86,"totalTokenCount":86,"promptTokensDetails":[{"modality":"TE
+- ❌ KIMORIN「……〈入力語〉。」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ KIMORIN「これはオレが開発したアイテムやけん！　ど」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
+- ❌ たこ焼きシスター「……別に。」: Error: 200 {"candidates":[{"finishReason":"OTHER","index":0}],"usageMetadata":{"promptTokenCount":64,"totalTokenCount":64,"promptTokensDetails":[{"modality":"TE
+- ❌ KIMORIN「たとえば――オレは、遅刻してない！」: Error: FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)
