@@ -1,5 +1,15 @@
 ﻿# Obolo Order — Full Product & Engineering Specification
-### For Claude Code — Complete Design Document v1.7.1
+### For Claude Code — Complete Design Document v1.8
+### v1.8: Commerce & wallet simplified (client decision 2026-10-13).
+###       (a) NO bank feature: users do not open bank accounts in-app (no GMO BaaS per-user
+###       accounts, no "Earth Bank"). Earth has a private WALLET instead: EARNINGS are shown
+###       only to the user and can be paid out to the user's own existing bank account.
+###       (b) Uranus is no longer a 1-user-1-shop mall. It is the SKY ATELIER (users display
+###       their own goods) + the OBOLO SHOP (おぼろ商店), where the COMPANY is the seller of
+###       approved, made-to-order goods and the creator receives a royalty share.
+###       (c) Goods are bought with CASH (Stripe card, same customer as the ¥88 plan), never
+###       with MANA. MANA is spent only on generating artwork. Shopify is NOT used.
+###       Research memos: docs/天王星_アトリエ_設計メモ.md, docs/地球の銀行_調査メモ.md.
 ### v1.7.1: Full-document consistency audit — fixed residual contradictions (Venus is
 ###         SQUARE not vertical; Stars replace likes everywhere; v1.4 changelog annotated
 ###         as superseded by the v1.6 scout model; Phase 2 Mercury includes the discovery
@@ -62,8 +72,9 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
    single grid layout, no orientation handling).
 4. **Your own voice, everywhere.** Users register their voice once; the platform can speak,
    sing, and post in the user's own voice via voice cloning (with strict consent controls).
-5. **MANA (マナ) — one internal currency for everything.** Generation credits, purchases,
-   tips, and game billing are all denominated in MANA.
+5. **MANA (マナ) — the internal currency for creating.** Generation credits, tips, and game
+   billing are denominated in MANA. Physical goods (Uranus / Oboro Shop) are bought with cash,
+   never MANA (v1.8).
 6. **Creators keep 92%** on the game store (Neptune) — vs Apple's 30% cut.
 
 ---
@@ -72,14 +83,14 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 
 | # | Planet | Role | Analogy | Key difference |
 |---|--------|------|---------|----------------|
-| 🌍 | Earth | Home: profile / mail / phone / Bank | — | One virtual bank account per user |
+| 🌍 | Earth | Home: profile / mail / phone / Wallet | — | Private wallet: earnings visible only to you, payout to your own bank account |
 | 🌙 | Moon | AI companion chat with "Buddy" (バティ) | Gemini/ChatGPT | Talks to a *character*, not a faceless AI |
 | 🪐 | Saturn | Voice-native microblogging | X (Twitter) | Tap a post → hear the poster's VOICE |
 | 🟤 | Jupiter | Photo posts | Instagram | Audio attachment is MANDATORY |
 | 💧 | Mercury | Music streaming + AI music creation | Spotify | Users generate & publish songs (self-hosted pipeline) |
 | 🟡 | Venus | Short-form SQUARE reels | TikTok/Reels-style feed | Paid-members-only posting = quality; SQUARE (1:1) video only |
 | 🔥 | Mars | Long-form video | Netflix/YouTube | Anime/drama/long video, SQUARE format |
-| ⭕ | Uranus | E-commerce mall | Amazon | Print-on-demand: zero inventory risk for sellers |
+| ⭕ | Uranus | Sky Atelier + Oboro Shop | SUZURI / LINE Creators | Display your goods; approved items sold by the Oboro Shop made-to-order; creator gets a royalty |
 | 🔵 | Neptune | Game store | App Store | Only 8% platform fee (creators keep 92%) |
 
 ### 2.1 🌍 Earth — Home
@@ -91,8 +102,11 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
     no real-time call infrastructure needed for async voice messaging.
   - Text messages / mail-style long-form: same thread model, audio attachment optional.
   - Real-time voice calls ("phone"): phase 2+, via Agora (WebRTC-class SDK).
-- **Bank**: each user gets one virtual bank account (see §7.2, GMO Aozora BaaS).
-- MANA wallet UI: balance, purchase, earnings ledger, withdrawal request.
+- **Wallet (v1.8 — replaces the former "Bank")**: MANA balance & purchase, plus the private
+  EARNINGS balance (royalties etc.), visible only to the user (never shown to others, no
+  public sales counts). "Pay out" transfers EARNINGS to the user's own existing bank account
+  (§7.2). Users do NOT open bank accounts in the app. Avoid the word "銀行/Bank" in UI names
+  (Banking Act naming restriction — legal check).
 - Voice registration flow (see §6.3): user records a short sample → VoiceID created.
 
 ### 2.2 🌙 Moon — AI Buddy "バティ (Bati)"
@@ -149,13 +163,27 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 - Long video hosting: anime, drama, creator series. SQUARE (1:1) player.
 - Bunny Stream; optional DRM add-on for premium/licensed content (OPEN: phase 2).
 
-### 2.8 ⭕ Uranus — E-Commerce Mall (zero-inventory)
-- Multi-vendor marketplace: each user/creator can open a shop (1 user = 1 shop).
-- Implementation: **Shopify + multi-vendor marketplace app** (e.g., ShipTurtle class)
-  + **Print-on-Demand** fulfillment (Printful class): order → produce → ship, automated.
-- **Zero inventory risk for sellers** — production starts only after an order is placed.
-- Payments in MANA (converted at settlement); creator payout via earnings ledger.
-- Cross-link: Neptune game characters can become Uranus merchandise.
+### 2.8 ⭕ Uranus — Sky Atelier + Oboro Shop (v1.8, made-to-order)
+- **Sky Atelier**: every user has an atelier (floating in the sky) where they display goods
+  made from their own works (T-shirt, mug, acrylic stand, sticker, can badge, tote…), chosen
+  from company-provided templates. Displaying is free; MANA is spent only if new artwork is
+  generated.
+- **Oboro Shop (おぼろ商店)**: the user may *apply* to have a displayed item sold. Review checks
+  rights and safety only (third-party IP/likeness, harmful content) — never quality; a
+  rejection always says what to fix. The **company is the seller** (one 特定商取引法 notice),
+  so minors never become merchants and no user address is disclosed.
+- **Made-to-order (POD)**: on order, the factory produces and ships directly to the buyer under
+  the OBOLO name. Delivery estimate is shown as a date range on product page, cart, final
+  confirmation and e-mail (start ~10–20 days, tighten with real data); auto-notify on delay
+  with "wait / refund" choice. Returns: defective/wrong items only (返品特約 displayed).
+- **Payment**: cash via Stripe (saved card of the ¥88 plan customer), captured at order.
+  **No MANA for buying or selling.**
+- **Royalty**: creator's share credits EARNINGS after the defect window (e.g. 7 days after
+  delivery); monthly close. Shown only to the creator. Under-18: guardian consent to apply and
+  to register a payout account.
+- Factories: adapter layer (template → factory). Candidates: Image Magic (production API),
+  Printio (public API) — see docs/天王星_アトリエ_設計メモ.md. Shopify is not used.
+- Cross-link: Neptune game characters can become Uranus goods.
 
 ### 2.9 🔵 Neptune — Game Store (8% fee)
 - In-app game store for **HTML5/browser games** (no App Store / Google Play intermediary).
@@ -181,7 +209,7 @@ fantasy/space world. 1 MANA = ¥1 (DECIDED — keeps pricing legible).
 | Generate 1 song (premium via Mureka API) | 30 MANA |
 | High-quality image generation | 20 MANA |
 | Video generation | 50 MANA |
-| Purchases on Uranus (goods) | item price in MANA |
+| Artwork generation for Uranus goods | image generation price (goods themselves are bought with cash, never MANA — v1.8) |
 | In-game billing on Neptune | item price in MANA |
 | Tips to posts (Saturn/Jupiter/Venus/Mars) | any amount (92% to author) |
 
@@ -199,7 +227,7 @@ We therefore maintain TWO strictly separated ledgers per user:
 
 ```
 Ledger A: MANA balance  (spend-only, non-redeemable, non-transferable between users)
-Ledger B: EARNINGS balance (JPY-denominated revenue: LabelGrid royalties, Uranus sales,
+Ledger B: EARNINGS balance (JPY-denominated revenue: LabelGrid royalties, Oboro Shop royalties,
           Neptune 92% share, received tips)
 
 Flows:
@@ -231,8 +259,8 @@ Regulatory notes to embed as code comments + compliance checklist:
 | MANA spend | Atomic decrement, append-only ledger | App DB only (bank untouched) |
 | LabelGrid royalties | Payout in JPY → obolo records label account → **92% to artist's EARNINGS / 8% platform share** | LabelGrid + app DB |
 | YouTube channel revenue | Scouted tracks curated by staff onto the company's 1M-subscriber YouTube channel → ad revenue → **same 92/8 split into artist EARNINGS (JPY)** | YouTube + app DB |
-| Earth Bank balance display | User's EARNINGS + virtual-account deposits surface as their "Earth Bank balance" in-app (balance inquiry via GMO Aozora API) | GMO Aozora + app DB |
-| Uranus sale | Buyer pays MANA → seller EARNINGS credited in JPY equivalent (minus platform fee) | App DB |
+| Wallet display (v1.8) | User's EARNINGS shown privately in the Earth wallet (no in-app bank account) | App DB |
+| Oboro Shop sale (v1.8) | Buyer pays cash via Stripe (company is seller) → factory order → after defect window, creator royalty credited to EARNINGS (JPY) | Stripe + factory API + app DB |
 | Neptune game billing | Buyer pays MANA → developer EARNINGS 92%, platform 8% | App DB |
 | Withdrawal | User request → EARNINGS → JPY transfer to verified bank account | GMO Aozora transfer API |
 
@@ -259,7 +287,7 @@ Per-planet cost table (v1 defaults; ALL values admin-tunable):
 | 💧 Mercury | streaming | song 10 MANA; premium (Mureka) 30 MANA; in-app publish free; obolo records distribution 500 MANA/release |
 | 🟡 Venus | watching | posting free (within storage quota); tips (92% to author) |
 | 🔥 Mars | watching | uploads free (within quota, over-quota via add-on); paid series: creator sets MANA price, 92% to creator |
-| ⭕ Uranus | browsing | opening a shop free; buyers pay item price in MANA; sales settle to seller EARNINGS |
+| ⭕ Uranus | browsing; buying goods with cash | displaying in own atelier free; new artwork = image generation MANA; Oboro Shop sales pay a royalty to creator EARNINGS (v1.8) |
 | 🔵 Neptune | playing | in-game items in MANA (92% to dev); game listing 100 MANA (proposal — spam gate; see OPEN #11) |
 
 User-facing value framing (for marketing copy): "¥88/month = make 8 songs, or 58 extra
@@ -303,9 +331,9 @@ apps/worker-audio   — GPU jobs: instrumental generation, DiffSinger, GPT-SoVIT
 packages/ledger     — MANA/EARNINGS double-entry ledger (pure, well-tested)
 packages/media      — Bunny upload/transcode/CDN helpers
 packages/ai         — LLM wrapper (Gemini/OpenAI), prompt templates, Buddy persona
-packages/payments   — GMO Aozora BaaS client, subscription billing, payouts
+packages/payments   — Stripe billing (¥88 plan, goods checkout), GMO Aozora corporate transfer (payouts)
 packages/distro     — LabelGrid client (release creation, royalty sync)
-packages/shop       — Shopify multi-vendor + POD integration
+packages/shop       — Oboro Shop: templates, applications/review, orders, POD factory adapters
 ```
 
 ---
@@ -336,8 +364,11 @@ star_events(id, user_id, target_type, target_id, tier INT CHECK (tier BETWEEN 1 
 star_playlists(user_id, tier)  -- auto-generated per user; tracks move between tiers.
 venus_reels(id, user_id, video_id /*bunny*/, duration_sec, /*1:1 enforced*/ ...)
 mars_videos(id, user_id, video_id, title, series_id NULL, is_drm, ...)
-uranus_shops(id, user_id, shopify_vendor_ref, status)
-uranus_products(id, shop_id, pod_provider_ref, price_mana, status)
+uranus_atelier_items(id, user_id, template_id, artwork_ref, displayed, created_at)
+uranus_applications(id, item_id, status /*pending|approved|needs_fix*/, review_note, decided_at)
+uranus_products(id, item_id, factory, factory_product_ref, price_jpy, royalty_jpy, status)
+uranus_orders(id, product_id, buyer_id, stripe_payment_ref, factory_order_ref, tracking_no,
+              eta_from, eta_to, status, royalty_settled_at NULL)
 neptune_games(id, user_id, title, bundle_url /*HTML5*/, status, fee_bps DEFAULT 800) -- 8%
 neptune_purchases(id, game_id, buyer_id, amount_mana, dev_share_jpy, platform_share_jpy)
 
@@ -463,21 +494,29 @@ User prompt (e.g. "切ない夜のラブソング、女性ボーカル")
 - Bunny Storage + CDN: Jupiter images, Saturn voice clips, voice samples.
 - Upload flow: server-issued signed upload URLs; webhook on encode completion.
 
-### 7.2 GMO Aozora Net Bank BaaS (Earth Bank)
+### 7.2 GMO Aozora Net Bank — corporate API for payouts (v1.8: no per-user bank accounts)
 - Start in the free **sunabar** sandbox; production requires a corporate account + vetting.
 - **Virtual account method (DECIDED for MVP)**: one corporate account; issue one virtual
   account number per user via API. Deposits to that number are auto-attributed to the user
   via webhook → drive subscription status and MANA top-ups.
 - Payouts: transfer API pays EARNINGS withdrawals to the user's verified bank account.
-- True per-user real bank accounts (full BaaS embedded banking) = phase 2 (requires eKYC
-  and bank-side approval). Keep the abstraction layer (`BankProvider` interface) so this
-  upgrade is a drop-in.
+- ~~True per-user real bank accounts (full BaaS embedded banking) = phase 2~~ → DROPPED (v1.8):
+  the partner pays the bank (no fee income to us), likely needs a 銀行代理業 licence, and under-15
+  users cannot get debit cards. Payouts go to the user's own existing bank account instead.
+- Do not let users spend EARNINGS balance inside the app (holding user funds for payments
+  risks 資金移動業 / prepaid-instrument rules) — legal check before any such feature.
 
-### 7.3 Shopify (Uranus)
-- One Shopify store + multi-vendor marketplace app (ShipTurtle-class) = 1 user : 1 shop.
-- POD fulfillment (Printful-class): order → auto produce → ship. Sellers never hold stock.
-- Settlement: customer pays in MANA on our platform; we settle with vendors monthly via
-  EARNINGS ledger (JPY). Reconciliation job required (orders ↔ payouts).
+### 7.3 Oboro Shop & POD factories (Uranus, v1.8 — Shopify NOT used)
+- Self-built shop (templates, applications/review, checkout, orders) on our own stack.
+- Checkout: Stripe, payment captured at order time (authorizations expire in ~7 days and
+  cannot be extended for Japanese merchants; made-to-order needs longer). Order confirmation
+  e-mail doubles as the 特定商取引法 §13 notice.
+- `FactoryAdapter` interface (createOrder, getStatus, tracking webhooks, cancel); template →
+  factory mapping in config, max 2 factories. Start: Printio (public API) to build/test the
+  flow; main candidate Image Magic production API (inquiry-based, 1–2 months onboarding).
+- ETA engine: business days (excl. holidays/factory closures) + buffer + peak-season surcharge,
+  one calculation shared by product page / cart / confirmation / e-mail.
+- Royalty settlement job: after defect window → EARNINGS credit; reconciliation orders ↔ payouts.
 
 ### 7.4 LLM providers (Moon + composer + moderation)
 - Provider-agnostic wrapper: `chat(persona, history)`, `composeSongSpec(prompt)`,
@@ -507,7 +546,7 @@ User prompt (e.g. "切ない夜のラブソング、女性ボーカル")
 ## 8. SECURITY, PRIVACY, COMPLIANCE
 
 - Japanese law touchpoints: Payment Services Act (prepaid instruments — see §3.2),
-  Act on Specified Commercial Transactions (Uranus sales pages), Provider Liability
+  Act on Specified Commercial Transactions (Oboro Shop — company is the seller; 返品特約), Provider Liability
   Limitation Act (UGC moderation + takedown flow), APPI (personal data; voice data is
   sensitive — encrypt at rest, strict access logs), Copyright Act (AI-generated music
   policy: user attests originality; DMCA-like takedown endpoint).
@@ -538,7 +577,7 @@ Mercury: TikTok-style discovery feed with Loops, 3-tier Stars and auto playlists
 (§2.5), plus the self-hosted song pipeline v1 (no voice cloning yet).
 
 **Phase 3 — Economy planets**
-Uranus (Shopify mall + POD), Neptune (HTML5 game store, 92/8 split), LabelGrid
+Uranus (Sky Atelier + Oboro Shop, made-to-order POD, cash checkout), Neptune (HTML5 game store, 92/8 split), LabelGrid
 distribution + royalty ingestion, EARNINGS withdrawals via GMO transfer API.
 
 **Phase 4 — Voice identity everywhere**
