@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T03:41:57.774Z",
+ "made": "2026-10-13T03:55:48.876Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -58,10 +58,14 @@
    "id": "c-1n955os",
    "uses": 29,
    "aliases": [],
-   "status": "needs-sheet",
+   "status": "candidates",
    "sprite": null,
    "client": [],
-   "candidates": [],
+   "candidates": [
+    "/story/candidates/cast/c-1n955os/1.jpg",
+    "/story/candidates/cast/c-1n955os/2.jpg",
+    "/story/candidates/cast/c-1n955os/3.jpg"
+   ],
    "pick": null,
    "sheet": null
   },
