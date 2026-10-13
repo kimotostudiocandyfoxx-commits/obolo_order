@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T05:00:00.178Z",
+ "made": "2026-10-13T05:02:57.450Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -82,36 +82,6 @@
    "sheet": null
   },
   {
-   "name": "シャリ",
-   "id": "c-fjx88v",
-   "uses": 18,
-   "aliases": [],
-   "status": "arrived",
-   "sprite": null,
-   "client": [
-    "01-main.png",
-    "99-sheet.webp"
-   ],
-   "candidates": [],
-   "pick": "client",
-   "sheet": null
-  },
-  {
-   "name": "ガリ",
-   "id": "c-1rspier",
-   "uses": 13,
-   "aliases": [],
-   "status": "arrived",
-   "sprite": null,
-   "client": [
-    "01-main.png",
-    "99-sheet.webp"
-   ],
-   "candidates": [],
-   "pick": "client",
-   "sheet": null
-  },
-  {
    "name": "リトル",
    "id": "c-681psc",
    "uses": 12,
@@ -121,21 +91,6 @@
    "client": [],
    "candidates": [],
    "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "ウニ",
-   "id": "c-1ri2kie",
-   "uses": 12,
-   "aliases": [],
-   "status": "arrived",
-   "sprite": null,
-   "client": [
-    "01-main.png",
-    "99-sheet.webp"
-   ],
-   "candidates": [],
-   "pick": "client",
    "sheet": null
   },
   {
@@ -187,21 +142,6 @@
    "sheet": null
   },
   {
-   "name": "イカ",
-   "id": "c-1io7qo8",
-   "uses": 10,
-   "aliases": [],
-   "status": "arrived",
-   "sprite": null,
-   "client": [
-    "01-main.png",
-    "99-sheet.webp"
-   ],
-   "candidates": [],
-   "pick": "client",
-   "sheet": null
-  },
-  {
    "name": "ファーザー",
    "id": "c-1olizt3",
    "uses": 9,
@@ -223,21 +163,6 @@
    "client": [],
    "candidates": [],
    "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "サーモン",
-   "id": "c-1yrwtf7",
-   "uses": 9,
-   "aliases": [],
-   "status": "arrived",
-   "sprite": null,
-   "client": [
-    "01-main.png",
-    "99-sheet.webp"
-   ],
-   "candidates": [],
-   "pick": "client",
    "sheet": null
   },
   {
@@ -754,6 +679,81 @@
    "client": [],
    "candidates": [],
    "pick": null,
+   "sheet": null
+  },
+  {
+   "name": "シャリ",
+   "id": "c-fjx88v",
+   "uses": 18,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-fjx88v.webp",
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "ガリ",
+   "id": "c-1rspier",
+   "uses": 13,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1rspier.webp",
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "ウニ",
+   "id": "c-1ri2kie",
+   "uses": 12,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1ri2kie.webp",
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "イカ",
+   "id": "c-1io7qo8",
+   "uses": 10,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1io7qo8.webp",
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "サーモン",
+   "id": "c-1yrwtf7",
+   "uses": 9,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1yrwtf7.webp",
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
    "sheet": null
   }
  ],
