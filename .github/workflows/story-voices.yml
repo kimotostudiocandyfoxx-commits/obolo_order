@@ -46,7 +46,9 @@ jobs:
         run: |
           git config user.name "story-voices"
           git config user.email "story-voices@users.noreply.github.com"
-          git add -f apps/web/public/story/voices docs/story-import/voices-last-run.md 2>/dev/null || true
+          for p in apps/web/public/story/voices docs/story-import/voices-last-run.md; do
+            [ -e "$p" ] && git add -f "$p"
+          done
           git diff --cached --quiet && exit 0
           git commit -m "Story voices: new takes [skip ci]"
           for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

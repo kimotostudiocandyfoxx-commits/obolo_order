@@ -1,11 +1,78 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CAST } from '@/lib/story/cast';
 import type { Scene } from '@/lib/story/parse';
 import { Story, type Options, type RunState, type Shown } from '@/lib/story/runtime';
 import { hasMotion, motionUrl, spriteUrl } from '@/lib/onboarding/media';
+import { voiceKey } from '@/lib/story/voice';
+
+/**
+ * Sound for the read-through: each line's voice (public/story/voices/manifest.json, by voiceKey), the
+ * sound effects met before a line (public/story/sound/manifest.json "se": text → file) and the tune
+ * (manifest "bgm": name → file, looped). One element each, unlocked on the first tap (iOS only lets a
+ * tap start sound).
+ */
+function useStorySound(on: boolean) {
+  const els = useRef<{ voice: HTMLAudioElement; se: HTMLAudioElement[]; bgm: HTMLAudioElement } | null>(null);
+  const [voices, setVoices] = useState<Record<string, string>>({});
+  const [sound, setSound] = useState<{ se?: Record<string, string>; bgm?: Record<string, string> }>({});
+  const tune = useRef<string | null>(null);
+  useEffect(() => {
+    els.current = { voice: new Audio(), se: [new Audio(), new Audio(), new Audio()], bgm: Object.assign(new Audio(), { loop: true, volume: 0.35 }) };
+    const get = (u: string) => fetch(u).then((r) => (r.ok ? r.json() : {}), () => ({}));
+    void get('/story/voices/manifest.json').then(setVoices);
+    void get('/story/sound/manifest.json').then(setSound);
+    return () => {
+      const e = els.current;
+      if (e) [e.voice, e.bgm, ...e.se].forEach((a) => a.pause());
+    };
+  }, []);
+  const unlock = useCallback(() => {
+    const e = els.current;
+    if (!e || (e.voice as HTMLAudioElement & { unlocked?: boolean }).unlocked) return;
+    for (const a of [e.voice, e.bgm, ...e.se]) {
+      a.muted = true;
+      void a.play().catch(() => undefined);
+      a.pause();
+      a.muted = false;
+    }
+    (e.voice as HTMLAudioElement & { unlocked?: boolean }).unlocked = true;
+  }, []);
+  const play = useCallback(
+    (shown: Shown | null, se: string[], bgm: string | null | undefined) => {
+      const e = els.current;
+      if (!e) return;
+      // the tune: change only when it changes
+      const want = on && bgm ? sound.bgm?.[bgm] ?? null : null;
+      if (want !== tune.current) {
+        tune.current = want;
+        e.bgm.pause();
+        if (want) {
+          e.bgm.src = want;
+          void e.bgm.play().catch(() => undefined);
+        }
+      }
+      if (!on) return e.voice.pause();
+      se.forEach((t, k) => {
+        const f = sound.se?.[t];
+        const a = e.se[k % e.se.length];
+        if (!f) return;
+        a.src = f;
+        void a.play().catch(() => undefined);
+      });
+      e.voice.pause();
+      const f = shown?.k === 'say' ? voices[voiceKey(shown.who, shown.act, shown.text)] : undefined;
+      if (f) {
+        e.voice.src = f;
+        void e.voice.play().catch(() => undefined);
+      }
+    },
+    [on, voices, sound],
+  );
+  return { unlock, play };
+}
 
 /**
  * /preview/story — the imported story (docs/story-rewrite → public/story/*.json) played scene by
@@ -40,7 +107,9 @@ export function ScenePreview() {
   const [sprites, setSprites] = useState<Record<string, string>>({});
   const [err, setErr] = useState('');
   const [vars, setVars] = useState<Vars>(DEFAULT_VARS);
-  const [opts, setOpts] = useState<Options>({ notes: false, states: [] });
+  const [opts, setOpts] = useState<Options & { sound?: boolean }>({ notes: false, states: [], sound: true });
+  const audio = useStorySound(opts.sound !== false);
+  const [se, setSe] = useState<string[]>([]);
   const [st, setSt] = useState<RunState | null>(null);
   const [shown, setShown] = useState<Shown | null>(null);
   const [back, setBack] = useState<RunState[]>([]);
@@ -61,7 +130,7 @@ export function ScenePreview() {
       }
     })();
     setVars(load(`${KEY}-vars`, DEFAULT_VARS));
-    setOpts(load(`${KEY}-opts`, { notes: false, states: [] }));
+    setOpts(load(`${KEY}-opts`, { notes: false, states: [], sound: true }));
   }, []);
 
   const show = useCallback(
@@ -71,6 +140,7 @@ export function ScenePreview() {
       if (push && st) setBack((b) => [...b.slice(-150), st]);
       setSt(r.st);
       setShown(r.shown);
+      setSe(r.se);
       save(KEY, r.st);
     },
     [story, opts, st],
@@ -89,7 +159,15 @@ export function ScenePreview() {
     setPanel('none');
     show(story.start(id));
   };
-  const tap = () => st && story && show(story.advance(st));
+  // play the line's voice, its sound effects and the tune as it appears
+  useEffect(() => {
+    audio.play(shown, se, st?.bgm);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown]);
+  const tap = () => {
+    audio.unlock();
+    if (st && story) show(story.advance(st));
+  };
   const undo = () => {
     const prev = back[back.length - 1];
     if (!prev || !story) return;
@@ -266,7 +344,7 @@ function ScenePicker({ story, current, onPick }: { story: Story; current: string
   );
 }
 
-function Settings({ vars, opts, onVars, onOpts, chosen }: { vars: Vars; opts: Options; onVars: (v: Vars) => void; onOpts: (o: Options) => void; chosen: string[] }) {
+function Settings({ vars, opts, onVars, onOpts, chosen }: { vars: Vars; opts: Options & { sound?: boolean }; onVars: (v: Vars) => void; onOpts: (o: Options & { sound?: boolean }) => void; chosen: string[] }) {
   const labels: Record<keyof Vars, string> = { name: '{name} 名前', inviter: '{inviter} 招待した人', neo: '{neo} ネオの名前', bati: '{bati} バティの名前', food: '{food} 好きな食べ物', age: '{age}' };
   const toggle = (s: string) => onOpts({ ...opts, states: opts.states.includes(s) ? opts.states.filter((x) => x !== s) : [...opts.states, s] });
   return (
@@ -274,6 +352,10 @@ function Settings({ vars, opts, onVars, onOpts, chosen }: { vars: Vars; opts: Op
       <label className="flex items-center gap-2">
         <input type="checkbox" checked={opts.notes} onChange={(e) => onOpts({ ...opts, notes: e.target.checked })} />
         演出メモ（〔…〕）も表示する
+      </label>
+      <label className="mt-3 flex items-center gap-2">
+        <input type="checkbox" checked={opts.sound !== false} onChange={(e) => onOpts({ ...opts, sound: e.target.checked })} />
+        声・効果音・BGM を鳴らす（作ったものだけ）
       </label>
       <p className="mb-2 mt-6 text-xs text-white/50">状態（（mana_low）などの行を出す）</p>
       <div className="flex flex-wrap gap-2">
