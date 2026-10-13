@@ -108,8 +108,10 @@ async function gemini(model: string, s: Spec, brief: string, act: string | undef
     const j = (await res.json().catch(() => ({}))) as { candidates?: { content?: { parts?: { inlineData?: { data?: string; mimeType?: string } }[] } }[]; error?: { message: string } };
     const part = j.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
     if (!part) {
-      if (res.status === 429 || res.status >= 500) {
-        await new Promise((r) => setTimeout(r, 5000 * (attempt + 1)));
+      // busy, or a short line it would not voice this time (finishReason OTHER): try again
+      const other = JSON.stringify(j).includes('"OTHER"');
+      if (res.status === 429 || res.status >= 500 || (other && attempt < 3)) {
+        await new Promise((r) => setTimeout(r, (other ? 1500 : 5000) * (attempt + 1)));
         continue;
       }
       throw new Error(`${res.status} ${j.error?.message ?? JSON.stringify(j).slice(0, 200)}`);

@@ -16,5 +16,5 @@ export function voiceKey(who: string, act: string | undefined, text: string): st
   return h1.toString(36) + h2.toString(36);
 }
 
-/** A line that can be voiced ahead of time (no per-member names in it). */
-export const voiceable = (text: string) => !/\{[a-z_]+\}/.test(text);
+/** A line that can be voiced ahead of time: no per-member names, and words to say (「…………。」 is a silence). */
+export const voiceable = (text: string) => !/\{[a-z_]+\}/.test(text) && /[\p{L}\p{N}]/u.test(text.replace(/[ー〜～]/g, ''));
