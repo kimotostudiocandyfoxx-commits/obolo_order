@@ -240,8 +240,9 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   const color = DECK_COLOR[i];
   // deck B is deck A mirrored: angles θ → 180° − θ
   const at = (deg: number, r: number) => polar(D, i === 0 ? deg : 180 - deg, r);
-  // the same by x, y (fractions of R from the centre, x towards the mixer on deck A)
-  const xy = (x: number, y: number) => at((Math.atan2(y, x) * 180) / Math.PI, Math.hypot(x, y));
+  // a left / right pair that should read the same on both decks (½ before ×2, ◀◀ before ▶▶):
+  // deck B takes the partner's spot, so the mirror does not swap them
+  const pair = (deg: number, partner: number) => (i === 0 ? deg : partner);
   const b = Math.round(26 * k);
 
   const load = async (data: ArrayBuffer, title: string, bpm: number | null, source: 'song' | 'file', videoUrl: string | null = null, coverUrl: string | null = null) => {
@@ -259,7 +260,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
   return (
     <div className="absolute inset-0">
       {/* load a song: the button at the top of the ring (the title shows over the waveform) */}
-      <div style={at(-90, 0.84)}>
+      <div style={at(L.load, L.r)}>
         <Pad onDown={() => setPick(!pick)} className="border-0 bg-transparent">
           <span style={{ ...ring(pick), width: b * 1.5, borderRadius: 999 }} className="flex items-center justify-center border">
             {loading ? '…' : '♪ LOAD'}
@@ -276,7 +277,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
 
       {/* hot cues on the upper outer arc */}
       {Array.from({ length: HOT_CUES }, (_, n) => (
-        <div key={n} style={at(-150 + n * 13, 0.84)}>
+        <div key={n} style={at(L.cues[n], L.r)}>
           <Pad onDown={() => deck.hotCue(n)} onLong={() => deck.clearHotCue(n)} className="border-0 bg-transparent">
             <span style={ring(deck.hotCues[n] !== null, HOT_CUE_COLORS[n])} className="flex items-center justify-center border">{n + 1}</span>
           </Pad>
@@ -286,23 +287,23 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       {/* loop (½ · LOOP · ×2) on the upper inner arc; ½ stays on the left on both decks */}
       {(
         [
-          [-68, '½', () => deck.resizeLoop(-1), false],
-          [-55, `LOOP ${beatsLabel(deck.loopBeats)}`, () => deck.toggleLoop(), true],
-          [-42, '×2', () => deck.resizeLoop(1), false],
+          [pair(L.loop[0], L.loop[2]), '½', () => deck.resizeLoop(-1), false],
+          [L.loop[1], `LOOP ${beatsLabel(deck.loopBeats)}`, () => deck.toggleLoop(), true],
+          [pair(L.loop[2], L.loop[0]), '×2', () => deck.resizeLoop(1), false],
         ] as const
       ).map(([deg, label, fn, main], n) => (
-        <div key={`l${n}`} style={at(i === 0 ? deg : -110 - deg, 0.84)}>
+        <div key={`l${n}`} style={at(deg, L.r)}>
           <Pad onDown={fn} className="border-0 bg-transparent">
-            <span style={main ? { ...ring(deck.loop !== null, LOOP_COLOR), width: b * 1.9, borderRadius: 999 } : ring(false)} className="flex items-center justify-center whitespace-nowrap border">
+            <span style={main ? { ...ring(deck.loop !== null, LOOP_COLOR), width: b * 1.7, borderRadius: 999 } : ring(false)} className="flex items-center justify-center whitespace-nowrap border">
               {label}
             </span>
           </Pad>
         </div>
       ))}
-      {/* beat jump in one row under the platter, on the mixer side: ◀◀ JUMP ▶▶ (◀◀ on the left on both decks); tap JUMP to pick the distance */}
-      <div style={xy(0.34, 0.68)}>
+      {/* beat jump along the lower arc on the mixer side: ◀◀ JUMP ▶▶ (◀◀ on the left on both decks); tap JUMP to pick the distance */}
+      <div style={at(L.jump[1], L.r)}>
         <Pad onDown={() => setJumpPick(!jumpPick)} className="border-0 bg-transparent">
-          <span style={{ ...ring(jumpPick, '#f5c66b'), width: b * 1.6, borderRadius: 999 }} className="flex items-center justify-center whitespace-nowrap border">
+          <span style={{ ...ring(jumpPick, '#f5c66b'), width: b * 1.35, borderRadius: 999, fontSize: 7.5 * k }} className="flex items-center justify-center whitespace-nowrap border">
             JUMP {beatsLabel(deck.jumpBeats)}
           </span>
         </Pad>
@@ -313,7 +314,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
           [1, '▶▶'],
         ] as const
       ).map(([dir, label]) => (
-        <div key={label} style={xy(dir === (i === 0 ? -1 : 1) ? 0.1 : 0.58, 0.68)}>
+        <div key={label} style={at(dir < 0 ? pair(L.jump[0], L.jump[2]) : pair(L.jump[2], L.jump[0]), L.r)}>
           <Pad onDown={() => deck.beatJump(dir)} className="border-0 bg-transparent">
             <span style={ring(false)} className="flex items-center justify-center border">
               {label}
@@ -323,7 +324,7 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
       ))}
 
       {/* tempo on the outer side, KEY (key lock) under it */}
-      <div style={at(180, 0.8)}>
+      <div style={{ ...at(180, L.tempo), marginTop: (L.tempoDrop * D) / 2 }}>
         <div className="flex flex-col items-center" style={{ gap: 4 * k }}>
           <div style={{ width: 34 * k, height: 80 * k }}>
             <div style={{ width: 34, transform: `scale(${k})`, transformOrigin: 'top left' }}>
@@ -343,22 +344,22 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
         </div>
       </div>
 
-      {/* SYNC low on the side, CUE and play at the bottom */}
-      <div style={at(140, 0.8)}>
+      {/* SYNC low on the outer side; CUE and play side by side right under the platter */}
+      <div style={at(L.sync, L.r)}>
         <Pad onDown={() => engine.sync(i)} className="border-0 bg-transparent">
           <span style={{ ...ring(false), width: b * 1.4, borderRadius: 999 }} className="flex items-center justify-center border">
             SYNC
           </span>
         </Pad>
       </div>
-      <div style={at(126, 0.86)}>
+      <div style={at(L.cue, L.big)}>
         <Pad onDown={() => deck.cueDown()} onUp={() => deck.cueUp()} className="border-0 bg-transparent">
           <Pill color={ORANGE} k={k} lit>
             CUE
           </Pill>
         </Pad>
       </div>
-      <div style={at(101, 0.84)}>
+      <div style={at(L.play, L.big)}>
         <Pad onDown={() => deck.toggle()} className="border-0 bg-transparent">
           <Pill color={NEON.green} k={k} lit={deck.playing}>
             ▶❚❚
@@ -427,11 +428,35 @@ const SAMPLER_COLOR = ['#6ae0ff', '#ff4fa3'] as const;
 /** 0.25 → 1/4, 4 → 4 */
 const beatsLabel = (n: number) => (n < 1 ? `1/${1 / n}` : String(n));
 
+/**
+ * Where the deck's controls sit (deck A; deck B is its mirror): angles in degrees (0° = towards the
+ * mixer, 90° = down) on a ring between the jog wheel (radius 0.6 R) and the rim. Worked out so nothing
+ * overlaps: round buttons 14° apart on radius 0.8; the mixer's circle covers the ring below |34°|.
+ */
+const L = {
+  r: 0.8,
+  /** CUE / play (bigger round buttons) */
+  big: 0.78,
+  cues: [-146, -132, -118, -104],
+  load: -88,
+  /** ½, LOOP, ×2 */
+  loop: [-71.6, -54.2, -36.8],
+  /** ◀◀, JUMP, ▶▶ */
+  jump: [66, 50, 34],
+  play: 80,
+  cue: 100,
+  sync: 124,
+  /** the tempo column (fader, %, KEY) on the outer side */
+  tempo: 0.75,
+  /** …a little below the middle, clear of hot cue 1 */
+  tempoDrop: 0.04,
+};
+
 function Pill({ children, color, k, lit }: { children: ReactNode; color: string; k: number; lit?: boolean }) {
   return (
     <span
       className="flex items-center justify-center rounded-full"
-      style={{ ...neon(color, !!lit, k), borderWidth: 2 * k, width: 50 * k, height: 27 * k, fontSize: 11 * k, letterSpacing: '0.12em' }}
+      style={{ ...neon(color, !!lit, k), borderWidth: 2 * k, width: 32 * k, height: 32 * k, fontSize: 9.5 * k, letterSpacing: '0.08em' }}
     >
       {children}
     </span>
