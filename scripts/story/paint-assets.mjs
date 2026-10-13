@@ -46,12 +46,13 @@ function order(item) {
       id: person.id,
       refs: CAST_STYLE,
       prompt: [
-        'Character design for a warm, kid-friendly Japanese anime adventure, the finest anime film quality.',
+        // the house style is the existing cast: detailed, painterly dark fantasy — not cute 3D, not flat anime
+        `A character for the same world as the ${CAST_STYLE.length} reference characters, drawn in exactly their illustration style: highly detailed hand-painted rendering, rich tactile materials (fur, cloth, carved wood, metal, embroidery), intricate ornamental patterns, a slightly eerie yet charming dark-fantasy mood, muted deep colours with a few glowing accents. Not a 3D render, not chibi, not flat cartoon.`,
         `The character: ${desc}.`,
         sheet.personality ? `Personality to show in the pose and the face: ${sheet.personality}.` : '',
         'Full body, standing, facing the viewer slightly turned, the whole figure inside the frame with clear space all around, centered.',
-        'Plain flat light grey background (#d8d8d8), soft even light, no ground shadow, no other characters, no props unless described.',
-        `Match the art style, line work and colouring of the ${CAST_STYLE.length} reference characters (style only — not their designs).`,
+        'Plain flat light grey background (#c8c8c8), soft even light, no ground shadow, no other characters, no props unless described.',
+        'Copy the references for style only — do not copy their designs.',
         NO_TEXT,
       ]
         .filter(Boolean)
