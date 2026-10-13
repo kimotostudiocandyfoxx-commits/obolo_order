@@ -17,6 +17,11 @@
    "takes": [
     {
      "voice": "Gacrux-+0.7st-echo-hq",
+     "file": "/story/voices/audition/obolon/1-Gacrux-+0.7st-echo-hq.mp3",
+     "seconds": 10.392
+    },
+    {
+     "voice": "Gacrux-+0.7st-echo-hq",
      "file": "/story/voices/audition/obolon/2-Gacrux-+0.7st-echo-hq.mp3",
      "seconds": 11.112
     }
@@ -294,6 +299,7 @@
   "ハットG": "Sadaltager-hq",
   "ロングG": "Gacrux-hq",
   "ヒポキン": "Alnilam--4st-hq",
+  "フリージー": "Schedar--3st-hq",
   "大根カイザー": "Gacrux--6st-growl-hq"
  },
  "model": "gemini-2.5-pro-preview-tts"
