@@ -1,0 +1,5 @@
+{
+  "note": "効果音とBGM。se：〔SE：…〕の文 → 音のファイル（/story/sound/…）か合成の種類（sparkle chime bell gong magic whoosh pop boing knock ding heartbeat blip thud）か \"none\"。書いていない SE は文の言葉から合成の種類を推測（lib/story/sfx.ts）。bgm：〔BGM：名前〕→ 音のファイル。",
+  "se": {},
+  "bgm": {}
+}

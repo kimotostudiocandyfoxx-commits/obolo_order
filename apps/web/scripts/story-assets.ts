@@ -17,6 +17,7 @@ import { join, resolve } from 'node:path';
 import { check, type Scene } from '../lib/story/parse';
 import { CAST } from '../lib/story/cast';
 import { castSheets, idOf, placeSheets, type CastSheet, type PlaceSheet } from '../lib/story/sheets';
+import { PRESETS, presetFor } from '../lib/story/sfx';
 
 const ROOT = resolve(__dirname, '../../..');
 const PUB = join(ROOT, 'apps/web/public');
@@ -83,9 +84,26 @@ const places = [...placeNames].map((name) => {
 });
 
 // --- sounds and tunes ----------------------------------------------------------------------------
-const soundMan = json<{ se?: Record<string, string>; bgm?: Record<string, string> }>(join(STORY, 'sound/manifest.json'), {});
-const sounds = [...r.sounds].map(([text, sc]) => ({ text, scenes: sc, file: soundMan.se?.[text] ?? null }));
-const music = [...r.music].map(([name, sc]) => ({ name, scenes: sc, file: soundMan.bgm?.[name] ?? null }));
+// design/story-sounds.json: { "se": { "<SE text>": "/story/sound/x.mp3" | "<preset>" | "none" }, "bgm": { "<name>": "/story/sound/y.mp3" } }
+// an SE with no entry gets a synthesised preset when its words suggest one (lib/story/sfx.ts)
+const soundCfg = json<{ se?: Record<string, string>; bgm?: Record<string, string> }>(join(ROOT, 'design/story-sounds.json'), {});
+const seOf = (text: string): { file: string | null; preset: string | null } => {
+  const v = soundCfg.se?.[text];
+  if (v === 'none') return { file: null, preset: null };
+  if (v && (PRESETS as readonly string[]).includes(v)) return { file: null, preset: v };
+  if (v) return { file: v, preset: null };
+  return { file: null, preset: presetFor(text) };
+};
+const sounds = [...r.sounds].map(([text, sc]) => ({ text, scenes: sc, ...seOf(text) }));
+const music = [...r.music].map(([name, sc]) => ({ name, scenes: sc, file: soundCfg.bgm?.[name] ?? null }));
+mkdirSync(join(STORY, 'sound'), { recursive: true });
+writeFileSync(
+  join(STORY, 'sound/manifest.json'),
+  JSON.stringify({
+    se: Object.fromEntries(sounds.filter((s) => s.file || s.preset).map((s) => [s.text, s.file ?? `synth:${s.preset}`])),
+    bgm: Object.fromEntries(music.filter((m) => m.file).map((m) => [m.name, m.file])),
+  }),
+);
 
 mkdirSync(join(STORY, 'cast'), { recursive: true });
 writeFileSync(join(STORY, 'assets.json'), JSON.stringify({ made: new Date().toISOString(), sheets: { cast: castSheet.length, places: placeSheet.length }, cast, places, sounds, music }, null, 1));
@@ -99,7 +117,7 @@ const md = [
   '',
   `- 人物 ${cast.length}人：${count(cast).map(([s, n]) => `${STATUS_JA[s]} ${n}`).join('／')}`,
   `- 場所 ${places.length}か所：${count(places).map(([s, n]) => `${STATUS_JA[s]} ${n}`).join('／')}`,
-  `- 効果音 ${sounds.length}種（音あり ${sounds.filter((s) => s.file).length}）／ BGM ${music.length}曲（音あり ${music.filter((m) => m.file).length}）`,
+  `- 効果音 ${sounds.length}種（音のファイル ${sounds.filter((s) => s.file).length}・合成で鳴らす ${sounds.filter((s) => s.preset).length}・本物の音が必要 ${sounds.filter((s) => !s.file && !s.preset).length}）／ BGM ${music.length}曲（音あり ${music.filter((m) => m.file).length}）`,
   '',
   '一覧と候補の見比べ：`/preview/story-assets`',
   '',
@@ -117,7 +135,7 @@ const md = [
   '',
   '## 効果音（〔SE：…〕）',
   '',
-  ...(sounds.length ? sounds.map((s) => `- ${s.file ? '🔊' : '⬜'} ${s.text}（${s.scenes.join('、')}）`) : ['（台本にまだない）']),
+  ...(sounds.length ? sounds.map((s) => `- ${s.file ? '🔊' : s.preset ? `🎹 ${s.preset}` : '⬜ 本物の音が必要'} ${s.text}（${s.scenes.join('、')}）`) : ['（台本にまだない）']),
   '',
   '## BGM（〔BGM：…〕）',
   '',

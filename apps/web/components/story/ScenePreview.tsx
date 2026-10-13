@@ -7,6 +7,7 @@ import type { Scene } from '@/lib/story/parse';
 import { Story, type Options, type RunState, type Shown } from '@/lib/story/runtime';
 import { hasMotion, motionUrl, spriteUrl } from '@/lib/onboarding/media';
 import { voiceKey } from '@/lib/story/voice';
+import { playPreset, type Preset } from '@/lib/story/sfx';
 
 /**
  * Sound for the read-through: each line's voice (public/story/voices/manifest.json, by voiceKey), the
@@ -19,6 +20,7 @@ function useStorySound(on: boolean) {
   const [voices, setVoices] = useState<Record<string, string>>({});
   const [sound, setSound] = useState<{ se?: Record<string, string>; bgm?: Record<string, string> }>({});
   const tune = useRef<string | null>(null);
+  const synth = useRef<AudioContext | null>(null);
   useEffect(() => {
     els.current = { voice: new Audio(), se: [new Audio(), new Audio(), new Audio()], bgm: Object.assign(new Audio(), { loop: true, volume: 0.35 }) };
     const get = (u: string) => fetch(u).then((r) => (r.ok ? r.json() : {}), () => ({}));
@@ -39,6 +41,9 @@ function useStorySound(on: boolean) {
       a.muted = false;
     }
     (e.voice as HTMLAudioElement & { unlocked?: boolean }).unlocked = true;
+    // the synthesised sound effects: a context made (and resumed) inside the tap
+    synth.current ??= new AudioContext();
+    void synth.current.resume();
   }, []);
   const play = useCallback(
     (shown: Shown | null, se: string[], bgm: string | null | undefined) => {
@@ -59,6 +64,10 @@ function useStorySound(on: boolean) {
         const f = sound.se?.[t];
         const a = e.se[k % e.se.length];
         if (!f) return;
+        if (f.startsWith('synth:')) {
+          if (synth.current) playPreset(synth.current, f.slice(6) as Preset);
+          return;
+        }
         a.src = f;
         void a.play().catch(() => undefined);
       });

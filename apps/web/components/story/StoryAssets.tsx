@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { PRESETS, playPreset } from '@/lib/story/sfx';
 
 /**
  * /preview/story-assets (client plan 2026-10-13): everything the story needs — people, places, sound
@@ -35,7 +36,7 @@ interface Assets {
   sheets: { cast: number; places: number };
   cast: Person[];
   places: Place[];
-  sounds: { text: string; scenes: string[]; file: string | null }[];
+  sounds: { text: string; scenes: string[]; file: string | null; preset: string | null }[];
   music: { name: string; scenes: string[]; file: string | null }[];
 }
 interface Voices {
@@ -145,13 +146,14 @@ export function StoryAssets() {
 
       {tab === 'sound' && (
         <div className="grid gap-4 text-sm">
+          <Presets />
           <section>
             <p className="mb-2 text-xs text-white/50">効果音（〔SE：…〕）</p>
             {!a.sounds.length && <p className="text-xs text-white/40">台本にまだありません。</p>}
             {a.sounds.map((s) => (
               <div key={s.text} className="mb-2 flex items-center gap-2">
                 <span className="min-w-0 flex-1 truncate">{s.text}</span>
-                {s.file ? <audio controls preload="none" src={s.file} className="h-8 w-40" /> : <span className="text-[11px] text-white/40">まだ</span>}
+                {s.file ? <audio controls preload="none" src={s.file} className="h-8 w-40" /> : s.preset ? <span className="text-[11px] text-amber-200">合成：{s.preset}</span> : <span className="text-[11px] text-white/40">本物の音が必要</span>}
               </div>
             ))}
           </section>
@@ -193,5 +195,30 @@ function Thumb({ src, label, picked, contain }: { src: string; label: string; pi
       <img src={src} alt="" className={`aspect-[9/16] w-full ${contain ? 'object-contain' : 'object-cover'}`} />
       <span className="absolute left-1 top-1 rounded-full bg-black/70 px-2 text-[11px] font-bold text-amber-200">{label}</span>
     </a>
+  );
+}
+
+/** The synthesised sound effects, to hear each (lib/story/sfx.ts). */
+function Presets() {
+  const ctx = useRef<AudioContext | null>(null);
+  return (
+    <section>
+      <p className="mb-2 text-xs text-white/50">合成で鳴らせる効果音（タップで試聴）</p>
+      <div className="flex flex-wrap gap-2">
+        {PRESETS.map((p) => (
+          <button
+            key={p}
+            onClick={() => {
+              ctx.current ??= new AudioContext();
+              void ctx.current.resume();
+              playPreset(ctx.current, p);
+            }}
+            className="rounded-full bg-white/10 px-3 py-1 text-xs"
+          >
+            {p}
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
