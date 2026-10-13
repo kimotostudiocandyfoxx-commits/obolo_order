@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T05:07:52.143Z",
+ "made": "2026-10-13T05:50:22.365Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -9,18 +9,6 @@
    "name": "MONBAN",
    "id": "monban",
    "uses": 299,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "大根カイザー",
-   "id": "c-16ueow0",
-   "uses": 290,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -607,6 +595,24 @@
    "client": [],
    "candidates": [],
    "pick": null,
+   "sheet": null
+  },
+  {
+   "name": "大根カイザー",
+   "id": "c-16ueow0",
+   "uses": 290,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-16ueow0.webp",
+   "client": [
+    "01-form1.jpg",
+    "02-form2.jpg",
+    "03-form3.jpg",
+    "04-form4.jpg",
+    "05-form5.jpg"
+   ],
+   "candidates": [],
+   "pick": "client:5",
    "sheet": null
   },
   {
