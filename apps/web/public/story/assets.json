@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T03:59:31.261Z",
+ "made": "2026-10-13T04:03:18.392Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -50,22 +50,6 @@
    "sprite": null,
    "client": [],
    "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "エビ",
-   "id": "c-1n955os",
-   "uses": 29,
-   "aliases": [],
-   "status": "candidates",
-   "sprite": null,
-   "client": [],
-   "candidates": [
-    "/story/candidates/cast/c-1n955os/1.jpg",
-    "/story/candidates/cast/c-1n955os/2.jpg",
-    "/story/candidates/cast/c-1n955os/3.jpg"
-   ],
    "pick": null,
    "sheet": null
   },
@@ -727,6 +711,22 @@
    "client": [],
    "candidates": [],
    "pick": null,
+   "sheet": null
+  },
+  {
+   "name": "エビ",
+   "id": "c-1n955os",
+   "uses": 29,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1n955os.webp",
+   "client": [],
+   "candidates": [
+    "/story/candidates/cast/c-1n955os/1.jpg",
+    "/story/candidates/cast/c-1n955os/2.jpg",
+    "/story/candidates/cast/c-1n955os/3.jpg"
+   ],
+   "pick": "2",
    "sheet": null
   },
   {

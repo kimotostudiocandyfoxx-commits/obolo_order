@@ -1,3 +1,3 @@
 # 物語の素材・本番入れ
 
-（新しく入れるものなし）
+- ✅ 人物 エビ ← apps/web/public/story/candidates/cast/c-1n955os/2.jpg（598×661）
