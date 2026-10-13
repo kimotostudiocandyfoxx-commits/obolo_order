@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T04:06:14.015Z",
+ "made": "2026-10-13T05:00:00.178Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -86,11 +86,14 @@
    "id": "c-fjx88v",
    "uses": 18,
    "aliases": [],
-   "status": "needs-sheet",
+   "status": "arrived",
    "sprite": null,
-   "client": [],
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
    "candidates": [],
-   "pick": null,
+   "pick": "client",
    "sheet": null
   },
   {
@@ -98,11 +101,14 @@
    "id": "c-1rspier",
    "uses": 13,
    "aliases": [],
-   "status": "needs-sheet",
+   "status": "arrived",
    "sprite": null,
-   "client": [],
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
    "candidates": [],
-   "pick": null,
+   "pick": "client",
    "sheet": null
   },
   {
@@ -122,11 +128,14 @@
    "id": "c-1ri2kie",
    "uses": 12,
    "aliases": [],
-   "status": "needs-sheet",
+   "status": "arrived",
    "sprite": null,
-   "client": [],
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
    "candidates": [],
-   "pick": null,
+   "pick": "client",
    "sheet": null
   },
   {
@@ -182,11 +191,14 @@
    "id": "c-1io7qo8",
    "uses": 10,
    "aliases": [],
-   "status": "needs-sheet",
+   "status": "arrived",
    "sprite": null,
-   "client": [],
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
    "candidates": [],
-   "pick": null,
+   "pick": "client",
    "sheet": null
   },
   {
@@ -218,11 +230,14 @@
    "id": "c-1yrwtf7",
    "uses": 9,
    "aliases": [],
-   "status": "needs-sheet",
+   "status": "arrived",
    "sprite": null,
-   "client": [],
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
    "candidates": [],
-   "pick": null,
+   "pick": "client",
    "sheet": null
   },
   {

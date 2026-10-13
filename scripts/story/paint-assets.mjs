@@ -38,16 +38,20 @@ function order(item) {
   if (!person && !place) return { name, error: 'assets.json にない名前（台本・人物表・場所表のどれにも出てこない）' };
   const sheet = (person ?? place).sheet ?? {};
   const desc = (typeof item === 'object' && item.desc) || sheet.look;
+  // style references for this one (e.g. the client's sheets of the same family), else the house style
+  const own = typeof item === 'object' && Array.isArray(item.refs) ? item.refs.filter(existsSync) : [];
   if (!desc) return { name, error: '見た目の説明がない（人物表・場所表の「見た目」か、queue の desc で渡す）' };
   if (person)
     return {
       name,
       kind: 'cast',
       id: person.id,
-      refs: CAST_STYLE,
+      refs: own.length ? own : CAST_STYLE,
       prompt: [
         // the house style is the existing cast: detailed, painterly dark fantasy — not cute 3D, not flat anime
-        `A character for the same world as the ${CAST_STYLE.length} reference characters, drawn in exactly their illustration style: highly detailed hand-painted rendering, rich tactile materials (fur, cloth, carved wood, metal, embroidery), intricate ornamental patterns, a slightly eerie yet charming dark-fantasy mood, muted deep colours with a few glowing accents. Not a 3D render, not chibi, not flat cartoon.`,
+        own.length
+          ? `A character of the same family as the ${own.length} reference characters, drawn in exactly their illustration style (the same line work, shading, face and proportions). Not a 3D render.`
+          : `A character for the same world as the ${CAST_STYLE.length} reference characters, drawn in exactly their illustration style: highly detailed hand-painted rendering, rich tactile materials (fur, cloth, carved wood, metal, embroidery), intricate ornamental patterns, a slightly eerie yet charming dark-fantasy mood, muted deep colours with a few glowing accents. Not a 3D render, not chibi, not flat cartoon.`,
         `The character: ${desc}.`,
         sheet.personality ? `Personality to show in the pose and the face: ${sheet.personality}.` : '',
         'Full body, standing, facing the viewer slightly turned, centered; the figure fills about 85% of the picture height, with a little clear space all around it.',
