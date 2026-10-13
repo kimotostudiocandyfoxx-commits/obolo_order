@@ -44,11 +44,22 @@ jobs:
       - name: Save to the branch
         if: always()
         run: |
+          # keep what this run made, move onto the branch as it is now, then commit (no rebase conflicts)
+          OUT="$(mktemp -d)"
+          for p in apps/web/public/story/voices docs/story-import/voices-last-run.md; do
+            [ -e "$p" ] && mkdir -p "$OUT/$(dirname "$p")" && cp -r "$p" "$OUT/$(dirname "$p")/"
+          done
           git config user.name "story-voices"
           git config user.email "story-voices@users.noreply.github.com"
-          for p in apps/web/public/story/voices docs/story-import/voices-last-run.md; do
-            [ -e "$p" ] && git add -f "$p"
+          for i in 1 2 3 4; do
+            git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q --hard "origin/${GITHUB_REF_NAME}"
+            cp -r "$OUT"/. .
+            for p in apps/web/public/story/voices docs/story-import/voices-last-run.md; do
+              [ -e "$p" ] && git add -f "$p"
+            done
+            git diff --cached --quiet && exit 0
+            git commit -q -m "Story voices: new takes [skip ci]"
+            git push -q origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
           done
-          git diff --cached --quiet && exit 0
-          git commit -m "Story voices: new takes [skip ci]"
-          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
+          exit 1

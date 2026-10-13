@@ -60,12 +60,24 @@ jobs:
       - name: Save to the branch
         if: always()
         run: |
+          # keep what this run made, move onto the branch as it is now (others may have pushed),
+          # rebuild the asset list there, then commit — so generated files never conflict
+          OUT="$(mktemp -d)"
+          for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/promoted.json docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md; do
+            [ -e "$p" ] && mkdir -p "$OUT/$(dirname "$p")" && cp -r "$p" "$OUT/$(dirname "$p")/"
+          done
           git config user.name "story-assets"
           git config user.email "story-assets@users.noreply.github.com"
-          # only the paths that exist (one missing path makes git add refuse them all)
-          for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/assets.json apps/web/public/story/promoted.json docs/story-import/assets.md docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md; do
-            [ -e "$p" ] && git add -f "$p"
+          for i in 1 2 3 4; do
+            git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q --hard "origin/${GITHUB_REF_NAME}"
+            cp -r "$OUT"/. .
+            bash scripts/story/assets.sh >/dev/null
+            for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/assets.json apps/web/public/story/promoted.json apps/web/public/story/sound docs/story-import/assets.md docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md; do
+              [ -e "$p" ] && git add -f "$p"
+            done
+            git diff --cached --quiet && exit 0
+            git commit -q -m "Story assets: candidates / picks [skip ci]"
+            git push -q origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep $((i * 5))
           done
-          git diff --cached --quiet && exit 0
-          git commit -m "Story assets: candidates / picks [skip ci]"
-          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
+          exit 1
