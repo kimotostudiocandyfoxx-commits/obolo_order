@@ -130,6 +130,7 @@ export function Fader({ value, onChange, horizontal = false, length = 140, label
     <div className="flex select-none flex-col items-center gap-1" style={{ touchAction: 'none' }}>
       <div
         ref={ref}
+        data-part
         onPointerDown={down}
         onPointerMove={(e) => e.buttons && set(e)}
         className="relative rounded-full"
