@@ -50,7 +50,7 @@ function order(item) {
         `A character for the same world as the ${CAST_STYLE.length} reference characters, drawn in exactly their illustration style: highly detailed hand-painted rendering, rich tactile materials (fur, cloth, carved wood, metal, embroidery), intricate ornamental patterns, a slightly eerie yet charming dark-fantasy mood, muted deep colours with a few glowing accents. Not a 3D render, not chibi, not flat cartoon.`,
         `The character: ${desc}.`,
         sheet.personality ? `Personality to show in the pose and the face: ${sheet.personality}.` : '',
-        'Full body, standing, facing the viewer slightly turned, the whole figure inside the frame with clear space all around, centered.',
+        'Full body, standing, facing the viewer slightly turned, centered; the figure fills about 85% of the picture height, with a little clear space all around it.',
         'Plain flat light grey background (#c8c8c8), soft even light, no ground shadow, no other characters, no props unless described.',
         'Copy the references for style only — do not copy their designs.',
         NO_TEXT,
@@ -127,6 +127,8 @@ for (const item of queue.paint ?? []) {
   const bad = results.find((x) => x.status === 'rejected');
   log.push(`- ${ok.length ? '✅' : '❌'} ${o.name}（${o.kind === 'cast' ? '人物' : '場所'}・${o.id}）候補 ${ok.length}/${N}${bad ? ` — ${String(bad.reason).slice(0, 200)}` : ''}\n  - 注文: ${o.prompt.slice(0, 300)}…`);
 }
+// redo is done once: clear it so the next run does not paint the same again
+if ((queue.redo ?? []).length) writeFileSync('design/story-assets-queue.json', JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
 const report = [`# 物語の素材・候補 — ${new Date().toISOString()}`, '', `Seedream 5.0 Pro / 約${Math.round(yen)}円`, '', ...(log.length ? log : ['（新しく描くものなし）']), ''].join('\n');
 writeFileSync('docs/story-import/assets-paint-last-run.md', report);
 console.log(report);

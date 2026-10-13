@@ -63,7 +63,7 @@ jobs:
           # keep what this run made, move onto the branch as it is now (others may have pushed),
           # rebuild the asset list there, then commit — so generated files never conflict
           OUT="$(mktemp -d)"
-          for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/promoted.json docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md; do
+          for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/promoted.json docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md design/story-assets-queue.json; do
             [ -e "$p" ] && mkdir -p "$OUT/$(dirname "$p")" && cp -r "$p" "$OUT/$(dirname "$p")/"
           done
           git config user.name "story-assets"
@@ -72,7 +72,7 @@ jobs:
             git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q --hard "origin/${GITHUB_REF_NAME}"
             cp -r "$OUT"/. .
             bash scripts/story/assets.sh >/dev/null
-            for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/assets.json apps/web/public/story/promoted.json apps/web/public/story/sound docs/story-import/assets.md docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md; do
+            for p in apps/web/public/story/candidates apps/web/public/story/cast apps/web/public/story/places apps/web/public/story/assets.json apps/web/public/story/promoted.json apps/web/public/story/sound docs/story-import/assets.md docs/story-import/assets-paint-last-run.md docs/story-import/assets-promote-last-run.md design/story-assets-queue.json; do
               [ -e "$p" ] && git add -f "$p"
             done
             git diff --cached --quiet && exit 0
