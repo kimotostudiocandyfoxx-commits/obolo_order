@@ -10,6 +10,11 @@
 ###       (c) Goods are bought with CASH (Stripe card, same customer as the ¥88 plan), never
 ###       with MANA. MANA is spent only on generating artwork. Shopify is NOT used.
 ###       Research memos: docs/天王星_アトリエ_設計メモ.md, docs/地球の銀行_調査メモ.md.
+###       (d) Neptune is PLAY-FIRST: launch with company-made games only. Users make games
+###       only via company templates ("your character stars in it") for the PLAYER title;
+###       full from-scratch game creation is an invite-only creator mode opened later to
+###       users who finished the story and raise their hand. User-to-user game sales and
+###       the 92/8 store split are deferred until that mode exists.
 ### v1.7.1: Full-document consistency audit — fixed residual contradictions (Venus is
 ###         SQUARE not vertical; Stars replace likes everywhere; v1.4 changelog annotated
 ###         as superseded by the v1.6 scout model; Phase 2 Mercury includes the discovery
@@ -75,7 +80,7 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 5. **MANA (マナ) — the internal currency for creating.** Generation credits, tips, and game
    billing are denominated in MANA. Physical goods (Uranus / Oboro Shop) are bought with cash,
    never MANA (v1.8).
-6. **Creators keep 92%** on the game store (Neptune) — vs Apple's 30% cut.
+6. **Creators keep 92%** wherever creator revenue exists (obolo records, Oboro Shop royalty terms TBD, Neptune creator mode later).
 
 ---
 
@@ -91,7 +96,7 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 | 🟡 | Venus | Short-form SQUARE reels | TikTok/Reels-style feed | Paid-members-only posting = quality; SQUARE (1:1) video only |
 | 🔥 | Mars | Long-form video | Netflix/YouTube | Anime/drama/long video, SQUARE format |
 | ⭕ | Uranus | Sky Atelier + Oboro Shop | SUZURI / LINE Creators | Display your goods; approved items sold by the Oboro Shop made-to-order; creator gets a royalty |
-| 🔵 | Neptune | Game store | App Store | Only 8% platform fee (creators keep 92%) |
+| 🔵 | Neptune | Game arcade (play-first) | App Store | Company-made games to play; template games starring your own characters; creator mode later (invite-only) |
 
 ### 2.1 🌍 Earth — Home
 - User profile, settings, subscription status.
@@ -185,14 +190,25 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
   Printio (public API) — see docs/天王星_アトリエ_設計メモ.md. Shopify is not used.
 - Cross-link: Neptune game characters can become Uranus goods.
 
-### 2.9 🔵 Neptune — Game Store (8% fee)
-- In-app game store for **HTML5/browser games** (no App Store / Google Play intermediary).
-- Creators publish original games (characters/music from their own IP welcome).
-- In-game purchases are billed in MANA.
-- **Revenue split: 92% developer / 8% platform.** Automated split at purchase time.
-- Legal basis (Japan): the Mobile Software Competition Act (in force since 2025-12-18)
-  allows alternative billing / off-store distribution. HTML5 games served in our own
-  WebView/PWA avoid the 30% store fee entirely.
+### 2.9 🔵 Neptune — Game Arcade, play-first (v1.8)
+- **Launch: play only.** A small set of HTML5/browser games made by the company, free to play
+  in our own WebView/PWA (no App Store / Google Play intermediary). No user-to-user game sales
+  and no in-game MANA billing at launch.
+- **Template games (PLAYER title, 3rd loop):** the user picks a company-made game template
+  (runner / puzzle / rhythm / board, 3–4 types) and drops in their own assets — characters
+  (stickers), songs, anime scenes, my-places — then sets start / change / ending scenes and a
+  title. Reusing existing assets costs (almost) no MANA; new artwork follows normal image
+  generation pricing with a pre-use confirmation. Satisfies the PLAYER condition (one playable
+  game: start → control → change → end, play-tested by the user).
+- **Creator mode (later, invite-only):** from-scratch game creation is offered only to users who
+  finished the story and raise their hand; invites go out in small batches as the tooling
+  matures (~6 months after launch as a first target). Delivered as one out-of-story letter
+  (EX-NEPTUNE-S001). Generation for full games is MANA-heavy — price it separately.
+- **Deferred until creator mode:** listing other users' games, in-game purchases, the 92/8
+  split (keep `neptune_games.fee_bps` for then). Legal note: if users later buy *other users'*
+  game items with MANA, MANA would pay third parties (第三者型前払式支払手段 risk) — design that
+  flow with counsel before enabling (same reasoning as Uranus, v1.8).
+- Cross-link: Neptune game characters can become Uranus goods.
 
 ---
 
@@ -210,7 +226,7 @@ fantasy/space world. 1 MANA = ¥1 (DECIDED — keeps pricing legible).
 | High-quality image generation | 20 MANA |
 | Video generation | 50 MANA |
 | Artwork generation for Uranus goods | image generation price (goods themselves are bought with cash, never MANA — v1.8) |
-| In-game billing on Neptune | item price in MANA |
+| In-game billing on Neptune | deferred until creator mode (v1.8) |
 | Tips to posts (Saturn/Jupiter/Venus/Mars) | any amount (92% to author) |
 
 ### 3.1.1 MANA expiry policy (DECIDED v1.3)
@@ -261,7 +277,7 @@ Regulatory notes to embed as code comments + compliance checklist:
 | YouTube channel revenue | Scouted tracks curated by staff onto the company's 1M-subscriber YouTube channel → ad revenue → **same 92/8 split into artist EARNINGS (JPY)** | YouTube + app DB |
 | Wallet display (v1.8) | User's EARNINGS shown privately in the Earth wallet (no in-app bank account) | App DB |
 | Oboro Shop sale (v1.8) | Buyer pays cash via Stripe (company is seller) → factory order → after defect window, creator royalty credited to EARNINGS (JPY) | Stripe + factory API + app DB |
-| Neptune game billing | Buyer pays MANA → developer EARNINGS 92%, platform 8% | App DB |
+| Neptune game billing | Deferred until creator mode (v1.8); then design with counsel (MANA to third parties) | — |
 | Withdrawal | User request → EARNINGS → JPY transfer to verified bank account | GMO Aozora transfer API |
 
 ---
@@ -272,7 +288,7 @@ Principles (brand-level, do not change without client sign-off):
 1. **VIEWING is free on every planet** — that is what the ¥88 buys.
 2. **CREATING/GENERATING costs MANA** — generation burns real GPU/API cost.
 3. **EARNING returns 92% to the creator / 8% platform** — same split everywhere
-   (obolo records, Neptune, tips, paid Mars series). Consistency is the brand.
+   (obolo records, tips, paid Mars series; Neptune once creator mode opens). Consistency is the brand.
 4. The ¥88 subscription includes a **monthly grant of 88 MANA** (1 MANA = ¥1).
    Grant lands on the subscription renewal date; grant MANA follows the same expiry rule.
 
@@ -288,7 +304,7 @@ Per-planet cost table (v1 defaults; ALL values admin-tunable):
 | 🟡 Venus | watching | posting free (within storage quota); tips (92% to author) |
 | 🔥 Mars | watching | uploads free (within quota, over-quota via add-on); paid series: creator sets MANA price, 92% to creator |
 | ⭕ Uranus | browsing; buying goods with cash | displaying in own atelier free; new artwork = image generation MANA; Oboro Shop sales pay a royalty to creator EARNINGS (v1.8) |
-| 🔵 Neptune | playing | in-game items in MANA (92% to dev); game listing 100 MANA (proposal — spam gate; see OPEN #11) |
+| 🔵 Neptune | playing company games (free) | template game: reuse assets ≈ free, new art = image MANA; creator mode & store split deferred (v1.8) |
 
 User-facing value framing (for marketing copy): "¥88/month = make 8 songs, or 58 extra
 Buddy chats + 3 songs." Keep this arithmetic true when tuning prices.
@@ -577,7 +593,7 @@ Mercury: TikTok-style discovery feed with Loops, 3-tier Stars and auto playlists
 (§2.5), plus the self-hosted song pipeline v1 (no voice cloning yet).
 
 **Phase 3 — Economy planets**
-Uranus (Sky Atelier + Oboro Shop, made-to-order POD, cash checkout), Neptune (HTML5 game store, 92/8 split), LabelGrid
+Uranus (Sky Atelier + Oboro Shop, made-to-order POD, cash checkout), Neptune (play-first arcade + template games; creator mode later), LabelGrid
 distribution + royalty ingestion, EARNINGS withdrawals via GMO transfer API.
 
 **Phase 4 — Voice identity everywhere**
@@ -603,4 +619,6 @@ first — it is the highest-risk module.
 9. ~~MANA expiry~~ → DECIDED: 1 year from last activity. Must appear in the Terms of Service.
 10. obolo records operations: scout threshold tuning (Loops/Stars), audit sampling
     rate, and the label's release terms text (legal review of the artist-facing agreement).
-11. Neptune game listing fee 100 MANA (spam gate) — confirm or drop before Phase 3.
+11. Neptune game listing fee 100 MANA (spam gate) — deferred with creator mode (v1.8).
+12. Oboro Shop royalty rate per template (vs the 92/8 brand rule — royalty is a share of margin, not price) and payout schedule.
+13. Neptune creator-mode invitation criteria and timing.
