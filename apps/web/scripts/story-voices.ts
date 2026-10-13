@@ -269,7 +269,10 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   for (const j of jobs) byName.set(j.name, [...(byName.get(j.name) ?? []), j]);
   const mixed: typeof jobs = [];
   for (let k = 0; mixed.length < jobs.length; k++) for (const list of byName.values()) if (list[k]) mixed.push(list[k]);
-  const todo = mixed.slice(0, MAX);
+  // without the Fish key, cloned voices wait (one note, not one per line)
+  const waiting = FISH ? [] : [...new Set(mixed.filter((j) => j.s.fish).map((j) => j.name))];
+  if (waiting.length) log.push(`- ⏸ ${waiting.join('・')}: 録音から作る声は Fish Audio のキー待ち（Secret Manager: obolo-fish-api-key）。${mixed.filter((j) => j.s.fish).length}行は後で作る`);
+  const todo = mixed.filter((j) => FISH || !j.s.fish).slice(0, MAX);
   let made = 0;
   // the Fish model (if any) is made before the parallel run
   for (const j of todo) if (j.s.fish && !j.s.model) await fishModel(j.s, j.name, names).catch((e) => log.push(`- ❌ ${j.name}: ${String(e).slice(0, 200)}`));
