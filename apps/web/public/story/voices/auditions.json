@@ -58,19 +58,24 @@
    "line": "曲がるたびに、少し凍る。灯台の前で、みんな曲がる。入ってくる船も、出ていく船も、ない。",
    "takes": [
     {
-     "voice": "Schedar",
-     "file": "/story/voices/audition/c-1l8fmea/1-Schedar.mp3",
-     "seconds": 9.456
+     "voice": "Algenib",
+     "file": "/story/voices/audition/c-1l8fmea/1-Algenib.mp3",
+     "seconds": 9.12
     },
     {
-     "voice": "Schedar-+1st",
-     "file": "/story/voices/audition/c-1l8fmea/2-Schedar-+1st.mp3",
-     "seconds": 8.688
+     "voice": "Rasalgethi",
+     "file": "/story/voices/audition/c-1l8fmea/2-Rasalgethi.mp3",
+     "seconds": 8.928
     },
     {
-     "voice": "Schedar-+2st",
-     "file": "/story/voices/audition/c-1l8fmea/3-Schedar-+2st.mp3",
-     "seconds": 8.16
+     "voice": "Sadaltager",
+     "file": "/story/voices/audition/c-1l8fmea/3-Sadaltager.mp3",
+     "seconds": 9.768
+    },
+    {
+     "voice": "Schedar--3st",
+     "file": "/story/voices/audition/c-1l8fmea/4-Schedar--3st.mp3",
+     "seconds": 9.48
     }
    ]
   },
@@ -292,7 +297,9 @@
   "うんちピンポンくん": "Leda",
   "ボスG": "Algenib",
   "ハットG": "Sadaltager",
-  "ロングG": "Gacrux"
+  "ロングG": "Gacrux",
+  "ヒポキン": "Alnilam--4st",
+  "大根カイザー": "Gacrux--6st-growl"
  },
  "model": "gemini-2.5-pro-preview-tts"
 }
