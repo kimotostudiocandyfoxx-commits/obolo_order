@@ -6,7 +6,10 @@
     "サーモン": "client",
     "シャリ": "client",
     "ウニ": "client",
-    "大根カイザー": "client:5"
+    "大根カイザー": "client:5",
+    "エビ": "client",
+    "うんちピンポンくん": "client",
+    "カニ": "client"
   },
   "places": {}
 }
