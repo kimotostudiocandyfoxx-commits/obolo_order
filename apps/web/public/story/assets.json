@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T06:01:55.115Z",
+ "made": "2026-10-13T06:17:23.326Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -18,18 +18,6 @@
    "sheet": null
   },
   {
-   "name": "うんちピンポンくん",
-   "id": "c-131ge3q",
-   "uses": 41,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
    "name": "小箱",
    "id": "c-xxfhwd",
    "uses": 31,
@@ -38,22 +26,6 @@
    "sprite": null,
    "client": [],
    "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "エビ",
-   "id": "c-1n955os",
-   "uses": 29,
-   "aliases": [],
-   "status": "candidates",
-   "sprite": null,
-   "client": [],
-   "candidates": [
-    "/story/candidates/cast/c-1n955os/1.jpg",
-    "/story/candidates/cast/c-1n955os/2.jpg",
-    "/story/candidates/cast/c-1n955os/3.jpg"
-   ],
    "pick": null,
    "sheet": null
   },
@@ -109,18 +81,6 @@
    "name": "笑い声の箱",
    "id": "c-itoct5",
    "uses": 11,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "カニ",
-   "id": "c-1jne43",
-   "uses": 10,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -669,6 +629,21 @@
    "sheet": null
   },
   {
+   "name": "うんちピンポンくん",
+   "id": "c-131ge3q",
+   "uses": 41,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-131ge3q.webp",
+   "client": [
+    "01-main.png",
+    "99-original.jpg"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
    "name": "ハットG",
    "id": "c-1pvfg32",
    "uses": 39,
@@ -678,6 +653,25 @@
    "client": [],
    "candidates": [],
    "pick": null,
+   "sheet": null
+  },
+  {
+   "name": "エビ",
+   "id": "c-1n955os",
+   "uses": 29,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1n955os.webp",
+   "client": [
+    "01-main.png",
+    "99-original.jpg"
+   ],
+   "candidates": [
+    "/story/candidates/cast/c-1n955os/1.jpg",
+    "/story/candidates/cast/c-1n955os/2.jpg",
+    "/story/candidates/cast/c-1n955os/3.jpg"
+   ],
+   "pick": "client",
    "sheet": null
   },
   {
@@ -732,6 +726,21 @@
    "client": [
     "01-main.png",
     "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "カニ",
+   "id": "c-1jne43",
+   "uses": 10,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1jne43.webp",
+   "client": [
+    "01-main.png",
+    "99-original.jpg"
    ],
    "candidates": [],
    "pick": "client",

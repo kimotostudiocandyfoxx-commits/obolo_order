@@ -4,5 +4,8 @@
  "cast:サーモン": "client",
  "cast:ウニ": "client",
  "cast:シャリ": "client",
- "cast:大根カイザー": "client:5"
+ "cast:大根カイザー": "client:5",
+ "cast:エビ": "client",
+ "cast:うんちピンポンくん": "client",
+ "cast:カニ": "client"
 }
