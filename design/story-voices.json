@@ -40,18 +40,20 @@
     },
     {
       "name": "フリージー",
-      "brief": "Freezy: a talking refrigerator who loves music; upbeat, bright and full of energy, quick and bouncy, still with his dry cold jokes but said cheerfully with a grin",
+      "brief": "Freezy: a talking refrigerator who loves music; sounds like a cheerful middle-aged guy, an energetic, slightly gruff 'ossan' uncle with a warm husky voice, lively and full of fun, telling dry cold jokes with a laugh in his voice",
       "voices": [
         {
-          "voice": "Schedar"
+          "voice": "Algenib"
+        },
+        {
+          "voice": "Rasalgethi"
+        },
+        {
+          "voice": "Sadaltager"
         },
         {
           "voice": "Schedar",
-          "pitch": 1
-        },
-        {
-          "voice": "Schedar",
-          "pitch": 2
+          "pitch": -3
         }
       ]
     },
@@ -181,7 +183,16 @@
     "うんちピンポンくん": "Leda",
     "ボスG": "Algenib",
     "ハットG": "Sadaltager",
-    "ロングG": "Gacrux"
+    "ロングG": "Gacrux",
+    "ヒポキン": {
+      "voice": "Alnilam",
+      "pitch": -4
+    },
+    "大根カイザー": {
+      "voice": "Gacrux",
+      "pitch": -6,
+      "growl": 0.5
+    }
   },
   "redo": [],
   "batch": 150
