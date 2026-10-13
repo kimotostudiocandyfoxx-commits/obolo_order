@@ -173,7 +173,8 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
   made from their own works (T-shirt, mug, acrylic stand, sticker, can badge, tote…), chosen
   from company-provided templates. Displaying is free; MANA is spent only if new artwork is
   generated.
-- **Oboro Shop (おぼろ商店)**: the user may *apply* to have a displayed item sold. Review checks
+- **Oboro Shop (おぼろ商店)**: from the 3rd loop (SHAPER chapter) on, the user may *apply* to have a
+  displayed item sold (2nd loop: make & display only; the shop is browse-only). Review checks
   rights and safety only (third-party IP/likeness, harmful content) — never quality; a
   rejection always says what to fix. The **company is the seller** (one 特定商取引法 notice),
   so minors never become merchants and no user address is disclosed.
@@ -290,6 +291,9 @@ Principles (brand-level, do not change without client sign-off):
 3. **EARNING returns 92% to the creator / 8% platform** — same split everywhere
    (obolo records, tips, paid Mars series; Neptune once creator mode opens). Consistency is the brand.
 4. The ¥88 subscription includes a **monthly grant of 88 MANA** (1 MANA = ¥1).
+   Subscription final-confirmation screen (特定商取引法 最終確認画面) must show: price, monthly
+   renewal date, that it renews automatically, and how to cancel (story D08-S006). The
+   in-story explanation never shows the MANA number (story rule).
    Grant lands on the subscription renewal date; grant MANA follows the same expiry rule.
 
 Per-planet cost table (v1 defaults; ALL values admin-tunable):
