@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T06:17:23.326Z",
+ "made": "2026-10-13T06:27:13.866Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -516,7 +516,9 @@
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/kimorin-1.webp",
-   "client": [],
+   "client": [
+    "00-official.png"
+   ],
    "candidates": [],
    "pick": null,
    "sheet": null
