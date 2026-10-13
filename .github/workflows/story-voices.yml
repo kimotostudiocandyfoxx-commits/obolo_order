@@ -39,6 +39,10 @@ jobs:
       - name: Voices
         run: |
           export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key)"
+          # KIMORIN is cloned from a recording with Fish Audio (if the key is in Secret Manager)
+          export FISH_API_KEY="$(gcloud secrets versions access latest --secret=obolo-fish-api-key 2>/dev/null || true)"
+          sudo apt-get install -y -qq rubberband-cli >/dev/null 2>&1 || true
+          ffmpeg -hide_banner -filters | grep -q rubberband || echo "::warning::ffmpeg has no rubberband filter"
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
           npx --yes tsx@4.19.2 apps/web/scripts/story-voices.ts
       - name: Save to the branch
@@ -46,7 +50,7 @@ jobs:
         run: |
           # keep what this run made, move onto the branch as it is now, then commit (no rebase conflicts)
           OUT="$(mktemp -d)"
-          for p in apps/web/public/story/voices docs/story-import/voices-last-run.md; do
+          for p in apps/web/public/story/voices docs/story-import/voices-last-run.md design/story-voices.json; do
             [ -e "$p" ] && mkdir -p "$OUT/$(dirname "$p")" && cp -r "$p" "$OUT/$(dirname "$p")/"
           done
           git config user.name "story-voices"
@@ -54,7 +58,7 @@ jobs:
           for i in 1 2 3 4; do
             git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q --hard "origin/${GITHUB_REF_NAME}"
             cp -r "$OUT"/. .
-            for p in apps/web/public/story/voices docs/story-import/voices-last-run.md; do
+            for p in apps/web/public/story/voices docs/story-import/voices-last-run.md design/story-voices.json; do
               [ -e "$p" ] && git add -f "$p"
             done
             git diff --cached --quiet && exit 0

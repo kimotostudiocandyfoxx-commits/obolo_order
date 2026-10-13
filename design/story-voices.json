@@ -1,19 +1,186 @@
 {
-  "note": "物語の声。auditions：人物ごとに同じセリフを4つの声で読む（/preview/story-assets の「声」で聴き比べ）。決まったら chosen に \"名前\": \"声の名前\" → その人の全セリフを作る。redo に名前で作り直し。brief は声の演技の指示（英語）。",
+  "note": "物語の声。auditions：人物ごとに同じセリフを声の候補で読む（/preview/story-assets の「声」）。chosen：決まった声（\"Gemini の声の名前\" か { voice, pitch（半音）, echo（0〜1）, growl（0〜1）, brief } か { fish: 録音ファイル } ）→ その人の全セリフを作る。声を変えたら redo に名前を入れて作り直し。",
   "auditions": [
-    { "name": "KIMORIN", "brief": "KIMORIN: a young, cheeky, over-confident boy inventor who fails a lot but is never scared; loud, bright, quick, a little show-off, speaks with a playful Hakata accent (ends lines with ケン / やけん)", "voices": ["Puck", "Fenrir", "Sadachbia", "Laomedeia"] },
-    { "name": "OBOLON", "brief": "OBOLON: the calm, kind master of a secret society; short questions, long deliberate pauses where the text has 、、、 (silence as a skill), warm and low, never preachy", "voices": ["Charon", "Gacrux", "Algieba", "Alnilam"] },
-    { "name": "MONBAN", "brief": "MONBAN: the silent gatekeeper; very few words, trailing off with …, low, grave and quiet but not scary, a hidden gentleness", "voices": ["Algenib", "Orus", "Iapetus", "Schedar"] },
-    { "name": "フリージー", "brief": "Freezy: a talking refrigerator who loves music; flat, deadpan, dry and cool, tells cold jokes with no expression, calm tempo", "voices": ["Enceladus", "Umbriel", "Schedar", "Zubenelgenubi"] },
-    { "name": "ヒポキン", "brief": "Hipokin: a hippo king who acts like a film director; short punchy instructions, confident, a bit theatrical, snaps his fingers", "voices": ["Orus", "Gacrux", "Alnilam", "Rasalgethi"] },
-    { "name": "たこ焼きブラザー", "brief": "Takoyaki Brother: a big, scary-looking but very kind takoyaki man; loud, energetic, says ZE!! at the end of lines, warm underneath", "voices": ["Fenrir", "Algenib", "Sadaltager", "Alnilam"] },
-    { "name": "たこ焼きシスター", "brief": "Takoyaki Sister: a cool-headed young woman who decides for herself; calm, clear, short sharp remarks, ends lines with わ", "voices": ["Kore", "Despina", "Erinome", "Vindemiatrix"] },
-    { "name": "大根カイザー", "brief": "Daikon Kaiser: a radish emperor; grand, pompous, booming, deeply moved by his own words, ends lines with DA, funny without knowing it", "voices": ["Gacrux", "Charon", "Rasalgethi", "Algenib"] },
-    { "name": "うんちピンポンくん", "brief": "Unchi Pinpon-kun: KIMORIN's tiny silly companion creature; squeaky, cheerful, a little clumsy, very cute", "voices": ["Puck", "Laomedeia", "Leda", "Zephyr"] },
-    { "name": "ボスG", "brief": "Boss G: the leader of three gorillas on Venus who guide music and style; deep, relaxed, wise, cool like a veteran DJ", "voices": ["Gacrux", "Algenib", "Alnilam", "Sadaltager"] },
-    { "name": "ハットG", "brief": "Hat G: a stylish gorilla in a hat; friendly, easy-going, encouraging, a smile in the voice", "voices": ["Achird", "Zubenelgenubi", "Callirrhoe", "Umbriel"] },
-    { "name": "ロングG", "brief": "Long G: a tall dreamy gorilla; soft, breezy, poetic, unhurried", "voices": ["Aoede", "Umbriel", "Sulafat", "Achernar"] }
+    {
+      "name": "KIMORIN",
+      "brief": "KIMORIN: a young, cheeky, over-confident boy inventor who fails a lot but is never scared; loud, bright, quick, a little show-off, speaks with a playful Hakata accent (ends lines with ケン / やけん)",
+      "voices": [
+        {
+          "fish": "design/story/voices/kimorin-sample.m4a",
+          "label": "録音から"
+        }
+      ]
+    },
+    {
+      "name": "OBOLON",
+      "brief": "OBOLON: the calm, kind master of a secret society; short questions, long deliberate pauses where the text has 、、、 (silence as a skill), warm and low, never preachy",
+      "voices": [
+        {
+          "voice": "Gacrux",
+          "pitch": 0.7,
+          "echo": 0.3
+        },
+        {
+          "voice": "Gacrux",
+          "pitch": 0.7,
+          "echo": 0.6
+        }
+      ]
+    },
+    {
+      "name": "MONBAN",
+      "brief": "MONBAN: the silent gatekeeper; very few words, trailing off with …, low, grave and quiet but not scary, a hidden gentleness",
+      "voices": [
+        "Algenib",
+        "Orus",
+        "Iapetus",
+        "Schedar"
+      ]
+    },
+    {
+      "name": "フリージー",
+      "brief": "Freezy: a talking refrigerator who loves music; upbeat, bright and full of energy, quick and bouncy, still with his dry cold jokes but said cheerfully with a grin",
+      "voices": [
+        {
+          "voice": "Schedar"
+        },
+        {
+          "voice": "Schedar",
+          "pitch": 1
+        },
+        {
+          "voice": "Schedar",
+          "pitch": 2
+        }
+      ]
+    },
+    {
+      "name": "ヒポキン",
+      "brief": "Hipokin: a hippo king who acts like a film director; a very deep, smooth, dandy baritone, slow and confident, effortlessly cool and charming, short punchy instructions, snaps his fingers",
+      "voices": [
+        {
+          "voice": "Gacrux",
+          "pitch": -3
+        },
+        {
+          "voice": "Charon",
+          "pitch": -3
+        },
+        {
+          "voice": "Algieba",
+          "pitch": -3
+        },
+        {
+          "voice": "Alnilam",
+          "pitch": -4
+        }
+      ]
+    },
+    {
+      "name": "たこ焼きブラザー",
+      "brief": "Takoyaki Brother: a big, scary-looking but very kind takoyaki man; loud, energetic, says ZE!! at the end of lines, warm underneath",
+      "voices": [
+        "Fenrir",
+        "Algenib",
+        "Sadaltager",
+        "Alnilam"
+      ]
+    },
+    {
+      "name": "たこ焼きシスター",
+      "brief": "Takoyaki Sister: a cool-headed young woman who decides for herself; calm, clear, short sharp remarks, ends lines with わ",
+      "voices": [
+        "Kore",
+        "Despina",
+        "Erinome",
+        "Vindemiatrix"
+      ]
+    },
+    {
+      "name": "大根カイザー",
+      "brief": "Daikon Kaiser: a giant radish emperor who sounds like a kaiju monster; enormous, booming, thick and very low, rumbling, grand and pompous, deeply moved by his own words, ends lines with DA",
+      "voices": [
+        {
+          "voice": "Gacrux",
+          "pitch": -6,
+          "growl": 0.5
+        },
+        {
+          "voice": "Algenib",
+          "pitch": -6,
+          "growl": 0.6
+        },
+        {
+          "voice": "Charon",
+          "pitch": -7,
+          "growl": 0.6
+        },
+        {
+          "voice": "Gacrux",
+          "pitch": -8,
+          "growl": 0.85
+        }
+      ]
+    },
+    {
+      "name": "うんちピンポンくん",
+      "brief": "Unchi Pinpon-kun: KIMORIN's tiny silly companion creature; squeaky, cheerful, a little clumsy, very cute",
+      "voices": [
+        "Puck",
+        "Laomedeia",
+        "Leda",
+        "Zephyr"
+      ]
+    },
+    {
+      "name": "ボスG",
+      "brief": "Boss G: the leader of three gorillas on Venus who guide music and style; deep, relaxed, wise, cool like a veteran DJ",
+      "voices": [
+        "Gacrux",
+        "Algenib",
+        "Alnilam",
+        "Sadaltager"
+      ]
+    },
+    {
+      "name": "ハットG",
+      "brief": "Hat G: a stylish gorilla in a hat; friendly, easy-going, encouraging, a smile in the voice",
+      "voices": [
+        "Achird",
+        "Zubenelgenubi",
+        "Callirrhoe",
+        "Umbriel"
+      ]
+    },
+    {
+      "name": "ロングG",
+      "brief": "Long G: a tall dreamy gorilla; soft, breezy, poetic, unhurried",
+      "voices": [
+        "Aoede",
+        "Umbriel",
+        "Sulafat",
+        "Achernar"
+      ]
+    }
   ],
-  "chosen": {},
-  "redo": []
+  "chosen": {
+    "KIMORIN": {
+      "fish": "design/story/voices/kimorin-sample.m4a",
+      "label": "録音から"
+    },
+    "OBOLON": {
+      "voice": "Gacrux",
+      "pitch": 0.7,
+      "echo": 0.3
+    },
+    "MONBAN": "Algenib",
+    "たこ焼きブラザー": "Algenib",
+    "たこ焼きシスター": "Kore",
+    "うんちピンポンくん": "Leda",
+    "ボスG": "Algenib",
+    "ハットG": "Sadaltager",
+    "ロングG": "Gacrux"
+  },
+  "redo": [],
+  "batch": 150
 }
