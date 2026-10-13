@@ -176,7 +176,7 @@
    "flags": [
     "f_sun_kimorin_leave(stay/go/silent)",
     "f_sun_later(true)",
-    "参照 f_l3_wv_duet（P11 WEAVER-S007：duet／duet_laterの人は「船で{neo}と一番を作ったやつの、続き」）"
+    "参照 f_l3_wv_duet（P11 WEAVER-S006（母港の夜）：duet／duet_laterの人は「母港の船で{neo}と一番を作ったやつの、続き」）"
    ],
    "saveEvents": [],
    "holdResume": "RESUME@L3-SUN-S005／KIMORINが帰った後はRESUME@L3-SUN-S006",
@@ -549,7 +549,7 @@
    "where": "L3-SUN-S010"
   },
   {
-   "item": "P11 L3-WEAVER-S007 KIMORINとのデュエット（二番に{neo}が一番を足した曲）→三番＝終わりを一人で録る／譜面『一番』の横の『{neo}と』（duetの人だけ）",
+   "item": "P11 L3-WEAVER-S006（母港の夜） KIMORINとのデュエット（二番に{neo}が一番を足した曲）→三番＝終わりを一人で録る／譜面『一番』の横の『{neo}と』（duetの人だけ）",
    "where": "L3-SUN-S005・L3-SUN-S010"
   }
  ],
@@ -862,6 +862,7 @@
  },
  "revision": [
   "／第10ラウンド（decisions_round10 T1〜T3・P14）：S005・S010にKIMORINとのデュエット（P11 f_l3_wv_duet）の差分。T2は該当台詞なし・S010の設計注に照れではない旨。T3はS011設計注に連絡の範囲。核心二行と無言は不変",
-  "第12稿（decisions_round12 W1）：太陽終章の「店」「売れ残り」「在庫」「開店」をKIMORINの「アトリエ」に揃えた（c01 S001・S002、c02 S005、c04 S010。本文・見出し・設計注・メタ）。核心二行と直後の無言は不変"
+  "第12稿（decisions_round12 W1）：太陽終章の「店」「売れ残り」「在庫」「開店」をKIMORINの「アトリエ」に揃えた（c01 S001・S002、c02 S005、c04 S010。本文・見出し・設計注・メタ）。核心二行と直後の無言は不変",
+  "第13稿（decisions_round13 X1・X2・X4）：L3-SUN-S005（c02）：KIMORINの三番の台詞『船で{neo}と一番を作ったやつ』→『母港の船で…』（X4：フィーチャリングをR&Bの夜島から母港の夜へ移したP11 L3-WEAVER-S006に合わせる）；確認のみ：OBOLON『形を与え、遊べる世界を、作った。』はX2（型にはめ込んで作るゲームも称号条件どおり作品）と矛盾しないため不変。水星の島の言及（浜の色等）はmyアイランドのことで不変。核心二行と直後の無言は不変"
  ]
 }
