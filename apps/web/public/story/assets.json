@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T05:50:22.365Z",
+ "made": "2026-10-13T06:01:55.115Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -605,11 +605,16 @@
    "status": "ready",
    "sprite": "/story/cast/c-16ueow0.webp",
    "client": [
-    "01-form1.jpg",
-    "02-form2.jpg",
-    "03-form3.jpg",
-    "04-form4.jpg",
-    "05-form5.jpg"
+    "01-form1.png",
+    "02-form2.png",
+    "03-form3.png",
+    "04-form4.png",
+    "05-form5.png",
+    "99-original-form1.jpg",
+    "99-original-form2.jpg",
+    "99-original-form3.jpg",
+    "99-original-form4.jpg",
+    "99-original-form5.jpg"
    ],
    "candidates": [],
    "pick": "client:5",
