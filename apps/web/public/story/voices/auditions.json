@@ -1,0 +1,318 @@
+{
+ "auditions": [
+  {
+   "name": "KIMORIN",
+   "line": "宇宙行ったことあるけんって、友達に自慢したい……！　SNSはダメって昨日聞いたけん、口で！",
+   "takes": [
+    {
+     "voice": "Puck",
+     "file": "/story/voices/audition/kimorin/1-Puck.mp3",
+     "seconds": 7.6509583333333335
+    },
+    {
+     "voice": "Fenrir",
+     "file": "/story/voices/audition/kimorin/2-Fenrir.mp3",
+     "seconds": 7.450958333333333
+    },
+    {
+     "voice": "Sadachbia",
+     "file": "/story/voices/audition/kimorin/3-Sadachbia.mp3",
+     "seconds": 8.090958333333333
+    },
+    {
+     "voice": "Laomedeia",
+     "file": "/story/voices/audition/kimorin/4-Laomedeia.mp3",
+     "seconds": 8.210958333333334
+    }
+   ]
+  },
+  {
+   "name": "OBOLON",
+   "line": "何かの偶然、何かの欲望、何かの閃き、\nいつだって、何かによって、何かが生まれる。",
+   "takes": [
+    {
+     "voice": "Charon",
+     "file": "/story/voices/audition/obolon/1-Charon.mp3",
+     "seconds": 11.050958333333334
+    },
+    {
+     "voice": "Gacrux",
+     "file": "/story/voices/audition/obolon/2-Gacrux.mp3",
+     "seconds": 11.330958333333333
+    },
+    {
+     "voice": "Algieba",
+     "file": "/story/voices/audition/obolon/3-Algieba.mp3",
+     "seconds": 11.490958333333333
+    },
+    {
+     "voice": "Alnilam",
+     "file": "/story/voices/audition/obolon/4-Alnilam.mp3",
+     "seconds": 11.290958333333334
+    }
+   ]
+  },
+  {
+   "name": "MONBAN",
+   "line": "入らなければ、相棒は、月で眠って待つ…。作ったものは、見に来られる…。手紙も、残る…。",
+   "takes": [
+    {
+     "voice": "Algenib",
+     "file": "/story/voices/audition/monban/1-Algenib.mp3",
+     "seconds": 11.410958333333333
+    },
+    {
+     "voice": "Orus",
+     "file": "/story/voices/audition/monban/2-Orus.mp3",
+     "seconds": 12.010958333333333
+    },
+    {
+     "voice": "Iapetus",
+     "file": "/story/voices/audition/monban/3-Iapetus.mp3",
+     "seconds": 14.570958333333333
+    },
+    {
+     "voice": "Schedar",
+     "file": "/story/voices/audition/monban/4-Schedar.mp3",
+     "seconds": 11.450958333333332
+    }
+   ]
+  },
+  {
+   "name": "フリージー",
+   "line": "曲がるたびに、少し凍る。灯台の前で、みんな曲がる。入ってくる船も、出ていく船も、ない。",
+   "takes": [
+    {
+     "voice": "Enceladus",
+     "file": "/story/voices/audition/c-1l8fmea/1-Enceladus.mp3",
+     "seconds": 13.610958333333333
+    },
+    {
+     "voice": "Umbriel",
+     "file": "/story/voices/audition/c-1l8fmea/2-Umbriel.mp3",
+     "seconds": 11.490958333333333
+    },
+    {
+     "voice": "Schedar",
+     "file": "/story/voices/audition/c-1l8fmea/3-Schedar.mp3",
+     "seconds": 10.450958333333332
+    },
+    {
+     "voice": "Zubenelgenubi",
+     "file": "/story/voices/audition/c-1l8fmea/4-Zubenelgenubi.mp3",
+     "seconds": 12.170958333333333
+    }
+   ]
+  },
+  {
+   "name": "ヒポキン",
+   "line": "まだ公開していない映像は、そこにしまってある。裏スタジオだ。開けられるのは、お前だけだ。",
+   "takes": [
+    {
+     "voice": "Orus",
+     "file": "/story/voices/audition/c-13wd9v8/1-Orus.mp3",
+     "seconds": 8.250958333333333
+    },
+    {
+     "voice": "Gacrux",
+     "file": "/story/voices/audition/c-13wd9v8/2-Gacrux.mp3",
+     "seconds": 8.770958333333333
+    },
+    {
+     "voice": "Alnilam",
+     "file": "/story/voices/audition/c-13wd9v8/3-Alnilam.mp3",
+     "seconds": 7.770958333333334
+    },
+    {
+     "voice": "Rasalgethi",
+     "file": "/story/voices/audition/c-13wd9v8/4-Rasalgethi.mp3",
+     "seconds": 8.370958333333334
+    }
+   ]
+  },
+  {
+   "name": "たこ焼きブラザー",
+   "line": "すまねぇ。俺は人の顔を覚えるのが苦手でな。どこで会ったZE？ 祭りか？ 港か？",
+   "takes": [
+    {
+     "voice": "Fenrir",
+     "file": "/story/voices/audition/c-op0tl3/1-Fenrir.mp3",
+     "seconds": 8.290958333333334
+    },
+    {
+     "voice": "Algenib",
+     "file": "/story/voices/audition/c-op0tl3/2-Algenib.mp3",
+     "seconds": 8.010958333333333
+    },
+    {
+     "voice": "Sadaltager",
+     "file": "/story/voices/audition/c-op0tl3/3-Sadaltager.mp3",
+     "seconds": 8.050958333333334
+    },
+    {
+     "voice": "Alnilam",
+     "file": "/story/voices/audition/c-op0tl3/4-Alnilam.mp3",
+     "seconds": 8.170958333333333
+    }
+   ]
+  },
+  {
+   "name": "たこ焼きシスター",
+   "line": "今日は、好きな広場で過ごしていいのよ。\nここにない話をしたくなったら、君の広場も作れるわ。",
+   "takes": [
+    {
+     "voice": "Kore",
+     "file": "/story/voices/audition/c-105b577/1-Kore.mp3",
+     "seconds": 7.370958333333333
+    },
+    {
+     "voice": "Despina",
+     "file": "/story/voices/audition/c-105b577/2-Despina.mp3",
+     "seconds": 7.290958333333333
+    },
+    {
+     "voice": "Erinome",
+     "file": "/story/voices/audition/c-105b577/3-Erinome.mp3",
+     "seconds": 7.970958333333333
+    },
+    {
+     "voice": "Vindemiatrix",
+     "file": "/story/voices/audition/c-105b577/4-Vindemiatrix.mp3",
+     "seconds": 7.690958333333334
+    }
+   ]
+  },
+  {
+   "name": "大根カイザー",
+   "line": "見ずともよいDA。だが、読むがよい。……いや、読まずともよい。だが、一行だけ……いや……",
+   "takes": [
+    {
+     "voice": "Gacrux",
+     "file": "/story/voices/audition/c-16ueow0/1-Gacrux.mp3",
+     "seconds": 11.210958333333334
+    },
+    {
+     "voice": "Charon",
+     "file": "/story/voices/audition/c-16ueow0/2-Charon.mp3",
+     "seconds": 9.010958333333333
+    },
+    {
+     "voice": "Rasalgethi",
+     "file": "/story/voices/audition/c-16ueow0/3-Rasalgethi.mp3",
+     "seconds": 11.170958333333333
+    },
+    {
+     "voice": "Algenib",
+     "file": "/story/voices/audition/c-16ueow0/4-Algenib.mp3",
+     "seconds": 10.490958333333333
+    }
+   ]
+  },
+  {
+   "name": "うんちピンポンくん",
+   "line": "ピンポン♪ ふういんされし、つばさがーーー！ きょうも、うずくーーー！",
+   "takes": [
+    {
+     "voice": "Puck",
+     "file": "/story/voices/audition/c-131ge3q/1-Puck.mp3",
+     "seconds": 5.890958333333334
+    },
+    {
+     "voice": "Laomedeia",
+     "file": "/story/voices/audition/c-131ge3q/2-Laomedeia.mp3",
+     "seconds": 6.050958333333333
+    },
+    {
+     "voice": "Leda",
+     "file": "/story/voices/audition/c-131ge3q/3-Leda.mp3",
+     "seconds": 7.050958333333333
+    },
+    {
+     "voice": "Zephyr",
+     "file": "/story/voices/audition/c-131ge3q/4-Zephyr.mp3",
+     "seconds": 5.730958333333334
+    }
+   ]
+  },
+  {
+   "name": "ボスG",
+   "line": "一枚なら、同じ一枚を両方にのせろ。終わりと始まりを、つなぐ。",
+   "takes": [
+    {
+     "voice": "Gacrux",
+     "file": "/story/voices/audition/c-1hwam1f/1-Gacrux.mp3",
+     "seconds": 7.450958333333333
+    },
+    {
+     "voice": "Algenib",
+     "file": "/story/voices/audition/c-1hwam1f/2-Algenib.mp3",
+     "seconds": 6.050958333333333
+    },
+    {
+     "voice": "Alnilam",
+     "file": "/story/voices/audition/c-1hwam1f/3-Alnilam.mp3",
+     "seconds": 7.450958333333333
+    },
+    {
+     "voice": "Sadaltager",
+     "file": "/story/voices/audition/c-1hwam1f/4-Sadaltager.mp3",
+     "seconds": 8.650958333333334
+    }
+   ]
+  },
+  {
+   "name": "ハットG",
+   "line": "月で選んできた姿か。……そのまま、立てばいい。ここには、楽屋は、ない。",
+   "takes": [
+    {
+     "voice": "Achird",
+     "file": "/story/voices/audition/c-1pvfg32/1-Achird.mp3",
+     "seconds": 6.290958333333333
+    },
+    {
+     "voice": "Zubenelgenubi",
+     "file": "/story/voices/audition/c-1pvfg32/2-Zubenelgenubi.mp3",
+     "seconds": 5.490958333333333
+    },
+    {
+     "voice": "Callirrhoe",
+     "file": "/story/voices/audition/c-1pvfg32/3-Callirrhoe.mp3",
+     "seconds": 6.5709583333333335
+    },
+    {
+     "voice": "Umbriel",
+     "file": "/story/voices/audition/c-1pvfg32/4-Umbriel.mp3",
+     "seconds": 6.970958333333333
+    }
+   ]
+  },
+  {
+   "name": "ロングG",
+   "line": "……星が、さっき、一曲ぶん、速さを変えてた。",
+   "takes": [
+    {
+     "voice": "Aoede",
+     "file": "/story/voices/audition/c-1pm5jmk/1-Aoede.mp3",
+     "seconds": 4.210958333333333
+    },
+    {
+     "voice": "Umbriel",
+     "file": "/story/voices/audition/c-1pm5jmk/2-Umbriel.mp3",
+     "seconds": 4.690958333333334
+    },
+    {
+     "voice": "Sulafat",
+     "file": "/story/voices/audition/c-1pm5jmk/3-Sulafat.mp3",
+     "seconds": 5.770958333333334
+    },
+    {
+     "voice": "Achernar",
+     "file": "/story/voices/audition/c-1pm5jmk/4-Achernar.mp3",
+     "seconds": 5.250958333333333
+    }
+   ]
+  }
+ ],
+ "chosen": {},
+ "model": "gemini-2.5-pro-preview-tts"
+}
