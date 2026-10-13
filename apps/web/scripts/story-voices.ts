@@ -39,6 +39,8 @@ interface Spec {
   pitch?: number;
   echo?: number;
   growl?: number;
+  /** keep the voice's size when shifting (default) or let it grow / shrink with the pitch */
+  formant?: 'preserved' | 'shifted';
   brief?: string;
   /** shown on the audition page */
   label?: string;
@@ -59,7 +61,7 @@ interface Config {
 const cfg = json<Config>(CONFIG, { auditions: [], chosen: {} });
 const spec = (v: VoiceRef): Spec => (typeof v === 'string' ? { voice: v } : v);
 const labelOf = (s: Spec) =>
-  s.label ?? [s.fish ? 'clone' : s.voice, s.pitch ? `${s.pitch > 0 ? '+' : ''}${s.pitch}st` : '', s.echo ? 'echo' : '', s.growl ? 'growl' : ''].filter(Boolean).join('-');
+  s.label ?? [s.fish ? 'clone' : s.voice, s.pitch ? `${s.pitch > 0 ? '+' : ''}${s.pitch}st` : '', s.formant === 'shifted' ? 'big' : '', s.echo ? 'echo' : '', s.growl ? 'growl' : '', 'hq'].filter(Boolean).join('-');
 
 const idx = json<{ parts: string[] }>(join(STORY, 'index.json'), { parts: [] });
 const scenes: Scene[] = idx.parts.flatMap((p) => json<Scene[]>(join(STORY, `${p}.json`), []));
@@ -80,11 +82,13 @@ const pickTts = (names: string[]) => {
 /** raw audio → mp3, with the spec's pitch / echo / growl and a level */
 function finish(input: string, inputArgs: string[], s: Spec, out: string) {
   const f: string[] = [];
+  // rubberband at its best quality (the default "speed" setting sounded robotic)
+  const rb = (st: number, formant: string) => `rubberband=pitch=${Math.pow(2, st / 12).toFixed(4)}:formant=${formant}:pitchq=quality:transients=smooth:window=long:smoothing=on:phase=independent`;
   if (s.growl) {
     // a monster: formants pulled down with the pitch, grit, weight in the low end
-    f.push(`rubberband=pitch=${Math.pow(2, (s.pitch ?? -6) / 12).toFixed(4)}:formant=shifted`);
+    f.push(rb(s.pitch ?? -6, 'shifted'));
     f.push(`bass=g=${(6 * s.growl).toFixed(1)}:f=120`, `asoftclip=type=tanh:threshold=${(1 - 0.5 * s.growl).toFixed(2)}`, 'lowpass=f=7000');
-  } else if (s.pitch) f.push(`rubberband=pitch=${Math.pow(2, s.pitch / 12).toFixed(4)}:formant=preserved`);
+  } else if (s.pitch) f.push(rb(s.pitch, s.formant ?? 'preserved'));
   if (s.echo) {
     const d = (0.25 + 0.35 * s.echo).toFixed(2);
     f.push(`aecho=0.85:0.75:170|340:${d}|${(+d / 2).toFixed(2)}`);

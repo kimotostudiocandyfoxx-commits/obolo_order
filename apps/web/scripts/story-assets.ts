@@ -66,6 +66,11 @@ const cast = [...names].map((name) => {
   const candidates = ls(join(STORY, 'candidates/cast', id)).filter((f) => /\.jpg$/.test(f)).sort().map((f) => `/story/candidates/cast/${id}/${f}`);
   const status: Status = sprite || known?.startsWith('@') ? 'ready' : client.length ? 'arrived' : sheet?.designed ? 'waiting' : candidates.length ? 'candidates' : sheet?.look ? 'orderable' : 'needs-sheet';
   if (sprite) for (const n of [name, ...aliases]) spriteManifest[n] = sprite;
+  // forms (大根カイザー's five): <id>-f<k>.webp → "name#k", chosen in the script by （第k形態）
+  for (const f of ls(join(STORY, 'cast')).filter((f) => f.startsWith(`${id}-f`) && f.endsWith('.webp'))) {
+    const k = f.slice(id.length + 2, -5);
+    for (const n of [name, ...aliases]) spriteManifest[`${n}#${k}`] = `/story/cast/${f}`;
+  }
   const n = [name, ...aliases].reduce((a, k) => a + (uses.get(k) ?? 0), 0);
   return { name, id, uses: n, aliases, status, sprite, client, candidates, pick: picks.cast?.[name] ?? null, sheet: sheet ?? null };
 });

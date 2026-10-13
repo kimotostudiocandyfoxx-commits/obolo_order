@@ -18,3 +18,14 @@ export function voiceKey(who: string, act: string | undefined, text: string): st
 
 /** A line that can be voiced ahead of time: no per-member names, and words to say (「…………。」 is a silence). */
 export const voiceable = (text: string) => !/\{[a-z_]+\}/.test(text) && /[\p{L}\p{N}]/u.test(text.replace(/[ー〜～]/g, ''));
+
+/** A form named in how a line is said: （第2形態）（形態3）（二の姿） → 2 / 3 / 2; else null. */
+export function formOf(act: string | undefined): number | null {
+  if (!act) return null;
+  const m = act.match(/(?:第\s*)?([1-9１-９一二三四五六七八九])\s*(?:形態|の姿|段階)|形態\s*([1-9１-９])/);
+  if (!m) return null;
+  const c = m[1] ?? m[2];
+  const d = '１２３４５６７８９'.indexOf(c);
+  const j = '一二三四五六七八九'.indexOf(c);
+  return d >= 0 ? d + 1 : j >= 0 ? j + 1 : Number(c);
+}

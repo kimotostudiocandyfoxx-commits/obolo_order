@@ -5,7 +5,8 @@
     "ガリ": "client",
     "サーモン": "client",
     "シャリ": "client",
-    "ウニ": "client"
+    "ウニ": "client",
+    "大根カイザー": "client:5"
   },
   "places": {}
 }

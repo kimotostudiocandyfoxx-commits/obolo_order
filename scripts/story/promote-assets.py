@@ -3,7 +3,9 @@
 The client's picks → the pictures the app uses (client plan 2026-10-13). Run by
 .github/workflows/story-assets.yml when design/story-picks.json changes.
 
-  picks: { "cast": { "エビ": "2" | "client" }, "places": { "mercury-beach": "1" | "client" } }
+  picks: { "cast": { "エビ": "2" | "client" | "client:5" }, "places": { "mercury-beach": "1" | "client" } }
+  "client:N": the client's folder holds several forms (01-…, 02-…; 99-… are reference sheets, skipped):
+  each becomes <id>-f<k>.webp, and form N is also the standing picture <id>.webp
 
 - people: the candidate (public/story/candidates/cast/<id>/<n>.jpg) or the client's first picture
   (design/story/cast/<name>/) is cut out of its background unless it already has one transparent —
@@ -40,8 +42,21 @@ def cutout(img: Image.Image) -> Image.Image:
     return remove(img.convert("RGB"), session=_session, alpha_matting=False)
 
 
+def person(src: Path) -> Image.Image:
+    """cut out, trimmed to the figure, at most 1280 tall"""
+    img = cutout(Image.open(src).convert("RGBA"))
+    box = img.getchannel("A").point(lambda a: 255 if a > 16 else 0).getbbox()
+    if box:
+        m = int(0.02 * max(img.size))
+        img = img.crop((max(0, box[0] - m), max(0, box[1] - m), min(img.width, box[2] + m), min(img.height, box[3] + m)))
+    if img.height > 1280:
+        img = img.resize((round(img.width * 1280 / img.height), 1280), Image.LANCZOS)
+    (PUB / "story/cast").mkdir(parents=True, exist_ok=True)
+    return img
+
+
 def source(kind: str, entry: dict, pick: str) -> Path | None:
-    if pick == "client":
+    if pick.startswith("client"):
         folder = Path("design/story") / kind / entry["name"]
         files = sorted(p for p in folder.glob("*") if p.suffix.lower() in IMG) if folder.exists() else []
         return files[0] if files else None
@@ -61,13 +76,20 @@ for name, pick in (picks.get("cast") or {}).items():
         continue
     if out.exists() and done.get(f"cast:{name}") == str(pick):
         continue
-    img = cutout(Image.open(src).convert("RGBA"))
-    box = img.getchannel("A").point(lambda a: 255 if a > 16 else 0).getbbox()
-    if box:
-        m = int(0.02 * max(img.size))
-        img = img.crop((max(0, box[0] - m), max(0, box[1] - m), min(img.width, box[2] + m), min(img.height, box[3] + m)))
-    if img.height > 1280:
-        img = img.resize((round(img.width * 1280 / img.height), 1280), Image.LANCZOS)
+    if str(pick).startswith("client:"):
+        # several forms: every picture in the folder, form N also as the standing picture
+        folder = Path("design/story/cast") / entry["name"]
+        forms = sorted(p for p in folder.glob("*") if p.suffix.lower() in IMG and not p.name.startswith("99-"))
+        n = int(str(pick).split(":")[1])
+        for k, f in enumerate(forms, 1):
+            img = person(f)
+            img.save(PUB / "story/cast" / f"{entry['id']}-f{k}.webp", "WEBP", quality=90, method=6)
+            if k == n:
+                img.save(out, "WEBP", quality=90, method=6)
+        done[f"cast:{name}"] = str(pick)
+        log.append(f"- ✅ 人物 {name}：{len(forms)}形態（標準は{n}）")
+        continue
+    img = person(src)
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out, "WEBP", quality=90, method=6)
     done[f"cast:{name}"] = str(pick)

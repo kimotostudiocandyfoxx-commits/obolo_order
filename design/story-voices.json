@@ -1,5 +1,5 @@
 {
-  "note": "物語の声。auditions：人物ごとに同じセリフを声の候補で読む（/preview/story-assets の「声」）。chosen：決まった声（\"Gemini の声の名前\" か { voice, pitch（半音）, echo（0〜1）, growl（0〜1）, brief } か { fish: 録音ファイル } ）→ その人の全セリフを作る。声を変えたら redo に名前を入れて作り直し。",
+  "note": "物語の声。auditions：人物ごとに同じセリフを声の候補で読む（/preview/story-assets の「声」）。chosen：決まった声（\"Gemini の声の名前\" か { voice, pitch（半音）, echo（0〜1）, growl（0〜1）, brief } か { fish: 録音ファイル } ）→ その人の全セリフを作る。声を変えたら redo に名前を入れて作り直し。 batch：本番セリフを1回に何行作るか（0＝作らない。クライアントの OK まで 0）。",
   "auditions": [
     {
       "name": "KIMORIN",
@@ -43,17 +43,21 @@
       "brief": "Freezy: a talking refrigerator who loves music; sounds like a cheerful middle-aged guy, an energetic, slightly gruff 'ossan' uncle with a warm husky voice, lively and full of fun, telling dry cold jokes with a laugh in his voice",
       "voices": [
         {
-          "voice": "Algenib"
-        },
-        {
-          "voice": "Rasalgethi"
-        },
-        {
-          "voice": "Sadaltager"
+          "voice": "Schedar",
+          "pitch": -3
         },
         {
           "voice": "Schedar",
-          "pitch": -3
+          "pitch": -2
+        },
+        {
+          "voice": "Schedar",
+          "pitch": -3,
+          "formant": "shifted"
+        },
+        {
+          "voice": "Schedar",
+          "label": "Schedar-nopitch"
         }
       ]
     },
@@ -195,5 +199,5 @@
     }
   },
   "redo": [],
-  "batch": 150
+  "batch": 0
 }

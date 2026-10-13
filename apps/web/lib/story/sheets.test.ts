@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { castSheets, idOf, placeSheets } from './sheets';
 import { parseFile } from './parse';
 import { Story } from './runtime';
+import { formOf } from './voice';
 
 describe('cast / place sheets', () => {
   it('reads one block per person, with design, look, voice and aliases', () => {
@@ -37,5 +38,14 @@ describe('SE / BGM in the script', () => {
     r = s.next(s.advance(r.st), o);
     expect(r.shown).toMatchObject({ k: 'narr' });
     expect(r.st.bgm).toBeNull();
+  });
+});
+
+describe('forms', () => {
+  it('reads a form from how a line is said', () => {
+    expect(formOf('第2形態')).toBe(2);
+    expect(formOf('第３形態で')).toBe(3);
+    expect(formOf('五の姿')).toBe(5);
+    expect(formOf('小声で')).toBeNull();
   });
 });

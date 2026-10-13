@@ -6,7 +6,7 @@ import { CAST } from '@/lib/story/cast';
 import type { Scene } from '@/lib/story/parse';
 import { Story, type Options, type RunState, type Shown } from '@/lib/story/runtime';
 import { hasMotion, motionUrl, spriteUrl } from '@/lib/onboarding/media';
-import { voiceKey } from '@/lib/story/voice';
+import { formOf, voiceKey } from '@/lib/story/voice';
 import { playPreset, type Preset } from '@/lib/story/sfx';
 
 /**
@@ -190,10 +190,13 @@ export function ScenePreview() {
   const speaker = shown?.k === 'say' ? shown.who : null;
   const sprite = useMemo(() => {
     if (!speaker) return null;
+    // a form named in the line (大根カイザー（第2形態）「…」) picks that form's picture
+    const form = shown?.k === 'say' ? formOf(shown.act) : null;
+    if (form && sprites[`${speaker}#${form}`]) return sprites[`${speaker}#${form}`];
     if (sprites[speaker]) return sprites[speaker];
     const c = CAST.find((m) => m.name === speaker);
     return c?.sprite && !c.sprite.startsWith('@') ? spriteUrl(c.sprite) : null;
-  }, [speaker, sprites]);
+  }, [speaker, sprites, shown]);
 
   if (err) return <p className="p-6 text-sm text-rose-300">読み込めませんでした: {err}</p>;
   if (!story || !shown || !st) return <div className="fixed inset-0 bg-black" />;
