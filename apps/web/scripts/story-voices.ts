@@ -127,7 +127,10 @@ async function gemini(model: string, s: Spec, brief: string, act: string | undef
 
 /** The recording's words (Fish wants a transcript with the sample). */
 async function transcribe(file: string, names: string[]): Promise<string> {
-  const model = names.find((n) => /^gemini-2\.5-flash$/.test(n)) ?? names.find((n) => /flash/.test(n) && !/tts|image|live|lite/.test(n)) ?? 'gemini-2.5-flash';
+  // the newest general flash model (old ones are retired for new keys): the -latest alias if offered
+  const flash = names.filter((n) => /flash/.test(n) && !/tts|image|live|lite|audio|embed|exp|preview/.test(n));
+  const ver = (n: string) => Number(n.match(/(\d+(?:\.\d+)?)/)?.[1] ?? 0);
+  const model = flash.includes('gemini-flash-latest') ? 'gemini-flash-latest' : flash.sort((a, b) => ver(b) - ver(a))[0] ?? 'gemini-flash-latest';
   const mime = extname(file) === '.wav' ? 'audio/wav' : extname(file) === '.mp3' ? 'audio/mpeg' : 'audio/mp4';
   const res = await fetch(`${API}/models/${model}:generateContent`, {
     method: 'POST',
@@ -142,8 +145,15 @@ async function transcribe(file: string, names: string[]): Promise<string> {
 }
 
 /** A Fish voice model from the recording, made once (its id goes back into the config). */
+// one model per recording (the audition and the real lines share it), made once per run
+const fishMaking = new Map<string, Promise<string>>();
 async function fishModel(s: Spec, name: string, names: string[]): Promise<string> {
   if (s.model) return s.model;
+  if (!fishMaking.has(s.fish!)) fishMaking.set(s.fish!, makeFishModel({ ...s }, name, names));
+  s.model = await fishMaking.get(s.fish!)!;
+  return s.model;
+}
+async function makeFishModel(s: Spec, name: string, names: string[]): Promise<string> {
   if (!FISH) throw new Error('FISH_API_KEY is not set (Secret Manager: obolo-fish-api-key)');
   const file = join(ROOT, s.fish!);
   const text = await transcribe(file, names);
