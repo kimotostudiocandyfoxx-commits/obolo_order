@@ -3,7 +3,13 @@
   {
    "name": "KIMORIN",
    "line": "宇宙行ったことあるけんって、友達に自慢したい……！　SNSはダメって昨日聞いたけん、口で！",
-   "takes": []
+   "takes": [
+    {
+     "voice": "録音から",
+     "file": "/story/voices/audition/kimorin/1-録音から.mp3",
+     "seconds": 7.488
+    }
+   ]
   },
   {
    "name": "OBOLON",

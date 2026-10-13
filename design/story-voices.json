@@ -7,7 +7,8 @@
       "voices": [
         {
           "fish": "design/story/voices/kimorin-sample.m4a",
-          "label": "録音から"
+          "label": "録音から",
+          "model": "84b27f575dba40e4bc7cabe20ac11b0f"
         }
       ]
     },
@@ -166,7 +167,8 @@
   "chosen": {
     "KIMORIN": {
       "fish": "design/story/voices/kimorin-sample.m4a",
-      "label": "録音から"
+      "label": "録音から",
+      "model": "84b27f575dba40e4bc7cabe20ac11b0f"
     },
     "OBOLON": {
       "voice": "Gacrux",
