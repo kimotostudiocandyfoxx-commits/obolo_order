@@ -141,6 +141,8 @@ export interface SaturnPostView {
   repostOf?: SaturnPostRef | null;
   /** a photo posted with the voice (the character holds it) */
   photoUrl?: string | null;
+  /** only in its author's own room (自分の部屋): nobody else ever sees it */
+  room?: boolean;
 }
 
 /** A ひろば on Saturn's みんな map. `faces` = a few people who spoke there lately (drawn on the island). */

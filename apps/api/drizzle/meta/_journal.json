@@ -176,6 +176,13 @@
       "when": 1791508001424,
       "tag": "0024_journey_seven_days",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1791508061424,
+      "tag": "0025_saturn_room",
+      "breakpoints": true
     }
   ]
 }

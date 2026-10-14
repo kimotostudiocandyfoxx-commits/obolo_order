@@ -443,7 +443,7 @@ export class DemoApi implements Api {
     const mutual = new Set((f[viewer] ?? []).filter((u) => (f[u] ?? []).includes(viewer)));
     const mine = tab === 'friends' ? mutual : new Set([...(f[viewer] ?? []), viewer]);
     const sorted = [...this.s.posts]
-      .filter((p) => !p.replyToId && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (plaza ? p.plazaId === plaza : !tab || tab === 'all' || mine.has(p.author.id)))
+      .filter((p) => !p.replyToId && !p.room && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (plaza ? p.plazaId === plaza : !tab || tab === 'all' || mine.has(p.author.id)))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {
@@ -475,8 +475,10 @@ export class DemoApi implements Api {
 
   async saturnUserPosts(userId: string) {
     const viewer = this.uid();
+    // your own page is your room: everything you made stays; others see what is still on the planet
+    const own = viewer === userId;
     const items = this.s.posts
-      .filter((p) => p.author.id === userId && !p.replyToId)
+      .filter((p) => p.author.id === userId && !p.replyToId && (own || (!p.room && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000)))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .map((p) => this.view(p, viewer));
     return { items, nextCursor: null };
@@ -501,7 +503,8 @@ export class DemoApi implements Api {
     const quoted = target(body.repostOfId);
     if (replyTo) replyTo.replyCount = (replyTo.replyCount ?? 0) + 1;
     if (quoted) quoted.repostCount = (quoted.repostCount ?? 0) + 1;
-    if (body.plazaId && !replyTo) await this.joinPlaza(body.plazaId, true);
+    const room = !!body.room && !replyTo;
+    if (body.plazaId && !replyTo && !room) await this.joinPlaza(body.plazaId, true);
     // demo: the photo stays in this browser, kept as a data URL so an <img> can show it
     const blob = body.photoMediaId ? await getBlob(body.photoMediaId) : null;
     const photoUrl = blob
@@ -513,7 +516,8 @@ export class DemoApi implements Api {
       : null;
     const p = {
       photoUrl,
-      plazaId: replyTo ? null : (body.plazaId ?? null),
+      plazaId: replyTo || room ? null : (body.plazaId ?? null),
+      room,
       replyToId: replyTo ? (replyTo.replyToId ?? replyTo.id) : null,
       repostOf: quoted ? { id: quoted.id, author: quoted.author, text: quoted.text, voiceUrl: quoted.voiceUrl } : null,
       id: uid(),

@@ -14,7 +14,7 @@ import { JupiterTutorial } from '@/components/jupiter/JupiterTutorial';
 import { MarsTutorial } from '@/components/mars/MarsTutorial';
 import { MercuryTutorial } from '@/components/mercury/MercuryTutorial';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
-import { SaturnTutorial } from '@/components/saturn/SaturnTutorial';
+import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import {
   AgeInput,
@@ -22,7 +22,6 @@ import {
   BookButton,
   DAY1_SEALS,
   FxLayer,
-  KororinStep,
   NeoNameInput,
   PauseScreen,
   playSfx,
@@ -508,7 +507,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           ))}
         </Buttons>
       )}
-      {started && step?.t === 'saturn' && <SaturnTutorial onDone={next} />}
+      {started && step?.t === 'saturn' && (
+        <SaturnLesson
+          bati={v.bati || 'バティ'}
+          neo={v.neo || v.name}
+          batiImage={v.batiImage}
+          onDone={(choice) => {
+            remember('f_d04_kororin', choice);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
       {started && step?.t === 'jupiter' && <JupiterTutorial onDone={next} />}
       {started && step?.t === 'mercury' && <MercuryTutorial onDone={next} />}
       {started && step?.t === 'mars' && <MarsTutorial onDone={next} />}
@@ -588,19 +597,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           fresh={step.n}
           onClose={() => {
             remember(`seal.${step.n}`, '1');
-            run(iRef.current + 1);
-          }}
-        />
-      )}
-      {started && step?.t === 'kororin' && (
-        <KororinStep
-          bati={v.bati || 'バティ'}
-          batiImage={v.batiImage}
-          face={v.look}
-          onDone={(text) => {
-            // PLACEHOLDER (P-SAT-*): the first journey's kororin stays in your own room — kept with the
-            // day's answers (with the time), sent to nobody
-            remember('kororin', JSON.stringify({ text, at: new Date().toISOString() }));
             run(iRef.current + 1);
           }}
         />

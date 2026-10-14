@@ -75,6 +75,11 @@ export const CreateSaturnPostBody = z
     plazaId: z.string().uuid().optional(),
     /** a photo posted with it (id from POST /media/photo): the character holds it */
     photoMediaId: z.string().uuid().optional(),
+    /**
+     * Flown to your own room only (自分の部屋, story 2026-10-14): never shown on the planet, in a ひろば or
+     * to anyone else — kept for you (a memo, a diary). The first journey's kororins are all like this.
+     */
+    room: z.boolean().optional(),
   })
   .refine((b) => !!b.voiceMediaId !== !!b.voiceStyle, { message: 'either voiceMediaId or voiceStyle is required' });
 export type CreateSaturnPostBody = z.infer<typeof CreateSaturnPostBody>;

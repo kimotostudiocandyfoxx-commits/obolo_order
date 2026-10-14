@@ -162,7 +162,7 @@ export function SaturnProfile({
               </button>
             )}
 
-            <p className="mb-2 mt-5 text-xs font-black text-violet-500">🎙 {u.displayName}の声</p>
+            <p className="mb-2 mt-5 text-xs font-black text-violet-500">{profile.isMe ? '🏠 自分の部屋のコロリン' : `🎙 ${u.displayName}の声`}</p>
             {!posts.length && <p className="py-6 text-center text-xs text-slate-400">まだ声がないよ</p>}
             <div className="space-y-2">
               {posts.map((p) => (
@@ -176,7 +176,7 @@ export function SaturnProfile({
                   </button>
                   <button onClick={() => onOpenPost(p)} className="min-w-0 flex-1 text-left">
                     <p className="text-sm font-bold leading-snug">{p.text}</p>
-                    <p className="text-[10px] text-pink-400">のこり{Math.max(0, Math.floor(SATURN_LIFETIME_HOURS - (Date.now() - new Date(p.createdAt).getTime()) / 3600_000))}時間で消える</p>
+                    <p className="text-[10px] text-pink-400">{postWhere(p)}</p>
                     {p.repostOf && (
                       <p className="mt-1 truncate rounded-xl bg-white/80 px-2 py-1 text-[11px] text-slate-500">
                         🔁 {p.repostOf.author.displayName}「{p.repostOf.text}」
@@ -252,4 +252,14 @@ function ProfileArt({ hue }: { hue: number }) {
       <circle cx="300" cy="214" r="2" fill="#fff" opacity=".7" />
     </svg>
   );
+}
+
+/**
+ * Where a kororin is (story 2026-10-14): only in your room, still out on the planet (hours left), or
+ * back in your room after its 88 hours.
+ */
+function postWhere(p: SaturnPostView): string {
+  if (p.room) return '🔒 自分の部屋だけ（誰にも見えない）';
+  const left = Math.floor(SATURN_LIFETIME_HOURS - (Date.now() - new Date(p.createdAt).getTime()) / 3600_000);
+  return left > 0 ? `のこり${left}時間で部屋に帰ってくる` : '🏠 部屋に帰ってきた';
 }

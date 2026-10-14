@@ -58,7 +58,10 @@ export type Step =
   | { t: 'sprite'; image: string | string[] | null }
   /** Still background image (public/onboarding/<image>.jpg) for scenes without a motion yet. */
   | { t: 'still'; image: string }
-  /** Saturn ("ころりん") tutorial: the visitor listens, gives a star and drops their own voice. */
+  /**
+   * Saturn: the story's kororin lesson on top of the real world (ころりんぱ) — listen, drop your own voice
+   * to your own room (or skip), ☆ the brother's sneeze. Saves answers.f_d04_kororin (try/skip).
+   */
   | { t: 'saturn' }
   /** Jupiter tutorial (Day 5), coached by 大根カイザー. Placeholder screen until the client's UI arrives. */
   | { t: 'jupiter' }
@@ -103,8 +106,6 @@ export type Step =
   | { t: 'se'; sound: SoundFx }
   /** A picture effect over the background (null = clear). Continues immediately. */
   | { t: 'fx'; fx: PictureFx | null }
-  /** Saturn: murmur to the Bati → it makes a kororin → tap it to hear it → fly it to your own room. */
-  | { t: 'kororin' }
   /** Ends the day here (「やめておく」, Day 2). The next visit starts again at the label `resume`. */
   | { t: 'pause'; resume: string }
   /** Choose one of the eight OBOLO NEO forms (Day 3). Saved on the account. Fallback for 'look'. */

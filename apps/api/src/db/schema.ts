@@ -226,6 +226,8 @@ export const saturnPosts = pgTable(
     plazaId: uuid('plaza_id'),
     /** a photo posted with the voice (the character holds it) */
     photoUrl: text('photo_url'),
+    /** 1 = flown to the author's own room only (自分の部屋): never on the planet or shown to others */
+    room: integer('room').notNull().default(0),
     aiGenerated: integer('ai_generated').notNull().default(0),
     ...timestamps,
   },

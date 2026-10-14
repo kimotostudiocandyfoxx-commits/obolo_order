@@ -31,9 +31,9 @@ import { SaturnProfile } from './SaturnProfile';
 type Tab = 'all' | 'following' | 'friends';
 
 export interface KororinEvents {
-  onListen?: () => void;
-  onStar?: () => void;
-  onPosted?: () => void;
+  onListen?: (p: SaturnPostView) => void;
+  onStar?: (p: SaturnPostView) => void;
+  onPosted?: (p: SaturnPostView) => void;
 }
 
 export function KororinWorld({
@@ -42,8 +42,17 @@ export function KororinWorld({
   className = '',
   neoOnly = false,
   highlightDrop = false,
+  extra,
+  roomOnly = false,
 }: {
   events?: KororinEvents;
+  /** The story's own kororins (KIMORIN⭐︎'s, the brother's sneeze): placed on the planet first. */
+  extra?: SaturnPostView[];
+  /**
+   * The first journey (story 2026-10-14): voices are flown to your own room only (自分の部屋) — the
+   * plaza opens on the second journey. No tabs or map; your kororin talks once, then rolls home.
+   */
+  roomOnly?: boolean;
   /** Day 4 tutorial (kept for its caller; posting is the same: Bati reads). */
   neoOnly?: boolean;
   /** Make the 声をおとす button pulse (tutorial cue). */
@@ -137,10 +146,10 @@ export function KororinWorld({
 
   // Real posts first, topped up with sample residents so the world never feels empty.
   const all = useMemo(() => {
-    const real = posts;
+    const real = [...(extra ?? []), ...posts];
     const fill = SATURN_RESIDENTS.slice(0, Math.max(0, 16 - real.length));
     return [...real, ...fill];
-  }, [posts]);
+  }, [posts, extra]);
 
   // フォロー / ダチ (every planet has みんな・フォロー・ダチ): real posts only, fetched when the tab opens
   // only so many on the planet at once; when one pops, the next voice drops in from the sky
@@ -283,7 +292,7 @@ export function KororinWorld({
       setOpen(p);
       setActiveReply(null);
       void toggleAudio(p.voiceUrl).catch(() => undefined);
-      events?.onListen?.();
+      events?.onListen?.(p);
     },
     [events],
   );
@@ -333,7 +342,7 @@ export function KororinWorld({
         .starSaturnPost(p.id, on)
         .catch(() => undefined);
     }
-    if (on) events?.onStar?.();
+    if (on) events?.onStar?.(p);
   };
 
   const shake = () => (onMap ? setMapShake(Date.now()) : layer.current?.shake());
@@ -370,7 +379,7 @@ export function KororinWorld({
       setPosts((cur) => cur.map(bump));
       setOpen((o) => (o ? bump(o) : o));
       setTimeout(() => playReply(p), 400);
-      events?.onPosted?.();
+      events?.onPosted?.(p);
       return;
     }
     setPosts((cur) => [p, ...cur]);
@@ -382,14 +391,24 @@ export function KororinWorld({
         setPlaza(into);
         setTimeout(() => listen(p), 1600);
       }
-      events?.onPosted?.();
+      events?.onPosted?.(p);
       return;
     }
     if (fromList) setTabPosts((cur) => [p, ...(cur ?? []).filter((x) => x.id !== p.id)]);
     // it drops in from the sky; play your own voice once it has landed
     setTimeout(() => listen(p), 1300);
-    events?.onPosted?.();
+    // a room-only kororin talks once, then rolls home to your room (it never stays on the planet)
+    if (p.room) {
+      setTimeout(() => {
+        popRef.current(p.id);
+        setPosts((cur) => cur.filter((x) => x.id !== p.id));
+        setToast('🏠 自分の部屋に、ころころ転がっていった');
+        setTimeout(() => setToast(null), 3200);
+      }, 6500);
+    }
+    events?.onPosted?.(p);
   };
+  const [toast, setToast] = useState<string | null>(null);
 
   const online = shown.length + 47;
   const shownReplies = allReplies ? replies : replies.slice(0, 5);
@@ -479,11 +498,12 @@ export function KororinWorld({
             {me && (
               <button onClick={() => setProfileId(me.id)} className="relative flex h-11 w-11 items-center justify-center overflow-visible rounded-full border-[3px] border-white bg-[#4a3a6e] shadow-[0_3px_0_rgba(60,30,110,.35)]" aria-label="my page">
                 <PuniAvatar seed={me.id} neo={me.neoForm} look={me.look} pic={me.puniPic} size={34} />
-                <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-1.5 text-[10px] font-black leading-4 text-[#5a3f8a] shadow">myころりん</span>
+                <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-1.5 text-[10px] font-black leading-4 text-[#5a3f8a] shadow">自分の部屋</span>
               </button>
             )}
           </div>
         </div>
+        {!roomOnly && (
         <div className="mx-auto mt-3 flex w-fit gap-1 rounded-full border border-white/25 bg-white/15 p-1 backdrop-blur">
           {TABS.map(([k, label]) => (
             <button key={k} onClick={() => (k === 'all' && tab === 'all' && plaza ? enterPlaza(null) : setTab(k))} className={`rounded-full px-5 py-1.5 text-sm font-black transition ${tab === k ? 'bg-white text-[#4a3570] shadow-[0_3px_0_#e3cfae]' : 'text-white/90'}`}>
@@ -491,6 +511,7 @@ export function KororinWorld({
             </button>
           ))}
         </div>
+        )}
         {tab !== 'all' && tabPosts && !tabPosts.length && (
           <p className="mx-auto mt-2 w-fit max-w-[90%] rounded-2xl bg-white/85 px-3 py-1.5 text-center text-[11px] font-bold text-[#5a3f8a]">
             {tab === 'friends' ? 'ダチは、おたがいにフォローしている人。名前をタップしてページからフォローしてね' : 'まだ誰もフォローしていないよ。名前をタップして、その人のページからフォローしてね'}
@@ -663,7 +684,8 @@ export function KororinWorld({
           replyTo={composer.replyTo}
           quote={composer.quote}
           plaza={tab === 'all' && !neoOnly ? plaza : null}
-          choosePlaza={onMap && !composer.replyTo}
+          choosePlaza={onMap && !composer.replyTo && !roomOnly}
+          roomOnly={roomOnly && !composer.replyTo && !composer.quote}
           onClose={() => setComposer(false)}
           onPosted={onPosted}
         />
@@ -678,6 +700,11 @@ export function KororinWorld({
             listen(p);
           }}
         />
+      )}
+      {toast && (
+        <div className="pointer-events-none absolute inset-x-0 top-[44%] z-[96] flex justify-center">
+          <p className="animate-[fadeUp_0.4s_ease-out] rounded-full bg-white/90 px-4 py-2 text-sm font-black text-[#5a3f8a] shadow-lg">{toast}</p>
+        </div>
       )}
       {overlay}
     </div>
@@ -845,7 +872,10 @@ function DropComposer({
   quote,
   plaza,
   choosePlaza = false,
+  roomOnly = false,
 }: {
+  /** the first journey: fly it to your own room only (the plaza opens on the second journey) */
+  roomOnly?: boolean;
   onClose: () => void;
   onPosted: (p: SaturnPostView, into?: PlazaView | null) => void;
   /** dropped in this ひろば (inside one) */
@@ -918,8 +948,27 @@ function DropComposer({
       const where = replyTo ? null : into;
       const photoMediaId = photo ? (await getApi().uploadPhoto(photo.blob)).id : undefined;
       const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}), ...(where ? { plazaId: where.id } : {}), ...(photoMediaId ? { photoMediaId } : {}) };
-      onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target }), where);
+      onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target, ...(roomOnly ? { room: true } : {}) }), where);
     } catch {
+      // the story previews (nobody logged in): a kororin that lives only on this screen
+      if (roomOnly && !me) {
+        onPosted(
+          {
+            id: `preview-${Date.now()}`,
+            author: { id: 'preview-me', handle: 'neo', displayName: 'あなた' },
+            text: text.trim(),
+            voiceUrl: neoVoiceUrl(style, null, text.trim()),
+            voiceSource: 'default',
+            voiceDurationSec: null,
+            starCount: 0,
+            starredByMe: false,
+            createdAt: new Date().toISOString(),
+            room: true,
+          },
+          null,
+        );
+        return;
+      }
       setErr('うまく落とせなかった…もう一度');
       setBusy(false);
     }
@@ -1048,8 +1097,16 @@ function DropComposer({
           onClick={() => void post()}
           className="mt-4 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-3.5 text-base font-black text-white disabled:opacity-40"
         >
-          {busy ? 'おとしています…' : replyTo ? '💬 返信する' : quote ? '🔁 引用しておとす' : '🎙 土星におとす'}
+          {busy ? (roomOnly ? '飛ばしています…' : 'おとしています…') : replyTo ? '💬 返信する' : quote ? '🔁 引用しておとす' : roomOnly ? '🏠 自分の部屋に飛ばす' : '🎙 土星におとす'}
         </button>
+        {roomOnly && (
+          <>
+            <button disabled className="mt-2 w-full rounded-full bg-violet-50 py-2.5 text-sm font-black text-violet-300">
+              広場に飛ばす
+            </button>
+            <p className="mt-1 text-center text-[11px] font-bold text-slate-400">広場に飛ばせるのは、二周目の旅から</p>
+          </>
+        )}
       </div>
     </div>
   );

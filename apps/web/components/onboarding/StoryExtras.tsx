@@ -1,8 +1,6 @@
 'use client';
 
-import { neoVoiceUrl } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { toggleAudio } from '@/lib/audio';
 import { motionUrl, spriteUrl } from '@/lib/onboarding/media';
 import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
 import { playPreset } from '@/lib/story/sfx';
@@ -11,7 +9,7 @@ import { useDictation } from '@/lib/useDictation';
 /**
  * Pieces of the first journey's story (docs/story-rewrite/土星まで_UI引き継ぎ.md, 2026-10-14) that the
  * player shows on top of the pictures: the age answer, the eight riddle cards and the riddle book,
- * Bluena's square screen, Saturn's kororins, the "stop for today" and the 88-minute screens.
+ * Bluena's square screen, the picture effects, the "stop for today" and the 88-minute screens.
  */
 
 // --- sound effects ---------------------------------------------------------------------------------
@@ -344,82 +342,6 @@ export function FxLayer({ fx }: { fx: PictureFx | null }) {
         <div className="absolute bottom-[34svh] left-1/2 -translate-x-1/2 animate-[kororinDrop_1.2s_cubic-bezier(.3,1.4,.6,1)]">
           <Takoyaki size={96} hue={24} speaking={fx === 'ring-drop'} />
           {fx === 'ring-star' && <span className="absolute -right-4 -top-5 animate-[fadeUp_0.4s_ease-out] text-4xl text-amber-300 drop-shadow-[0_0_14px_rgba(255,214,120,0.9)]">★</span>}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
- * Saturn (D04-S005, try): murmur to the Bati (🎙 or type) → the Bati makes a kororin → tap it to hear
- * your words → 〔自分の部屋に飛ばす〕. On the first journey the kororin goes to your own room only
- * (the plaza opens on the second journey). PLACEHOLDER (P-SAT-7/8): read by the device voice until the
- * Bati's voice is registered; saved with the day's answers (not sent to anyone).
- */
-export function KororinStep({ bati, batiImage, face, onDone }: { bati: string; batiImage?: string; face?: string; onDone: (text: string) => void }) {
-  const [text, setText] = useState('');
-  const [phase, setPhase] = useState<'say' | 'making' | 'made' | 'flying'>('say');
-  const [speaking, setSpeaking] = useState(false);
-  const words = text.trim();
-  const speak = async () => {
-    setSpeaking(true);
-    try {
-      await toggleAudio(neoVoiceUrl('genki', null, words));
-    } catch {
-      /* ignore */
-    }
-    setTimeout(() => setSpeaking(false), Math.min(6000, 600 + [...words].length * 160));
-  };
-  if (phase === 'say')
-    return (
-      <div className={panel}>
-        <div className="mx-auto mb-8 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-          <p className="text-center text-sm tracking-widest text-amber-100">{bati}に向かって、独り言みたいにつぶやく</p>
-          <VoiceField value={text} onChange={setText} placeholder="いま思ったこと" maxLength={60} multiline />
-          <button
-            className={gold}
-            disabled={!words}
-            onClick={() => {
-              setPhase('making');
-              setTimeout(() => setPhase('made'), 1600);
-            }}
-          >
-            {bati}に、つぶやく
-          </button>
-        </div>
-      </div>
-    );
-  return (
-    <div className="absolute inset-0 z-20 flex flex-col items-center justify-end bg-black/30 pb-[calc(9svh+env(safe-area-inset-bottom))]">
-      {phase === 'making' && batiImage && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={batiImage} alt="" className="mb-10 h-40 w-40 animate-[shake_0.4s_ease-in-out_infinite] rounded-[2rem] object-cover" />
-      )}
-      {phase !== 'making' && (
-        <button
-          onClick={speak}
-          className={`mb-6 transition-all duration-[1400ms] ${phase === 'flying' ? 'translate-x-[60vw] translate-y-[20svh] rotate-[540deg] opacity-0' : 'animate-[fadeUp_0.5s_ease-out]'}`}
-          aria-label="コロリンをタップ"
-        >
-          <Takoyaki face={face} size={150} speaking={speaking} />
-        </button>
-      )}
-      {phase === 'made' && (
-        <div className="flex w-full max-w-sm flex-col gap-3 px-6">
-          <p className="text-center text-xs text-white/60">コロリンをタップすると、喋ります</p>
-          <button
-            className={gold}
-            onClick={() => {
-              setPhase('flying');
-              setTimeout(() => onDone(words), 1500);
-            }}
-          >
-            自分の部屋に飛ばす
-          </button>
-          <button className={`${plain} opacity-40`} disabled>
-            広場に飛ばす
-          </button>
-          <p className="text-center text-[11px] text-white/50">広場に飛ばせるのは、二周目の旅から</p>
         </div>
       )}
     </div>

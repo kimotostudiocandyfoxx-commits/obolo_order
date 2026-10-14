@@ -93,14 +93,12 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
     }
     expect(steps.some((s) => s.t === 'say' && s.who === 'OBOLON' && s.text.includes('地球と、月と、太陽'))).toBe(true);
   });
-  it('kororin (or skip), then the ring, then riddle 2, then the letter from Jupiter', () => {
+  it('the kororin lesson on the real Saturn world, then riddle 2, then the letter from Jupiter', () => {
     const t = kinds(steps);
-    expect(t.indexOf('kororin')).toBeGreaterThan(0);
-    expect(t.indexOf('seal')).toBeGreaterThan(t.indexOf('kororin'));
+    expect(t.indexOf('saturn')).toBeGreaterThan(0);
+    expect(t.indexOf('seal')).toBeGreaterThan(t.indexOf('saturn'));
     expect(steps.find((s) => s.t === 'seal')).toEqual({ t: 'seal', n: 2 });
     expect(steps.findIndex((s) => s.t === 'letter')).toBeGreaterThan(t.indexOf('seal'));
-    const skip = labelIndex(steps, 'skip');
-    expect(steps.slice(skip).some((s) => s.t === 'seal')).toBe(true);
   });
 });
 

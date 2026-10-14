@@ -42,12 +42,18 @@ export class SaturnService {
         : tab === 'friends'
           ? sql`${saturnPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
           : undefined;
-    return this.page(viewerId, and(isNull(saturnPosts.replyToId), alive(), scope), cursor, limit, fresh);
+    // voices flown to their author's own room never fall on the planet
+    return this.page(viewerId, and(isNull(saturnPosts.replyToId), eq(saturnPosts.room, 0), alive(), scope), cursor, limit, fresh);
   }
 
-  /** Someone's posts (their page), replies left out. */
+  /**
+   * Someone's posts (their page), replies left out. Your own page is your room (自分の部屋, story
+   * 2026-10-14): every kororin you made stays there — the room-only ones and the ones back from the
+   * planet after 88 hours. Others see only what is still out on the planet.
+   */
   async userPosts(viewerId: string, userId: string, cursor?: string, limit = 30): Promise<Paged<SaturnPostView>> {
-    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), alive()), cursor, limit, true);
+    const own = viewerId === userId;
+    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), own ? undefined : and(eq(saturnPosts.room, 0), alive())), cursor, limit, true);
   }
 
   /** The voice replies under a post, oldest first (they line up as little balls under it). */
@@ -129,6 +135,7 @@ export class SaturnService {
       repostCount: p.repostCount,
       repostOf,
       photoUrl: p.photoUrl,
+      room: p.room === 1,
     };
   }
 
@@ -151,7 +158,9 @@ export class SaturnService {
       if (!repostOf) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Post not found');
     }
     // dropped in a ひろば: it must exist, and you join it (a reply stays with its post)
-    const plazaId = body.plazaId && !replyToId ? body.plazaId : null;
+    // your own room only: not in a ひろば (a reply always stays with its post)
+    const room = !!body.room && !replyToId;
+    const plazaId = body.plazaId && !replyToId && !room ? body.plazaId : null;
     if (plazaId) await this.plazas.ensureForPost(userId, plazaId);
     // a photo: one of your uploads (POST /media/photo, already re-encoded)
     let photoUrl: string | null = null;
@@ -195,6 +204,7 @@ export class SaturnService {
           repostOfId: repostOf?.id ?? null,
           plazaId,
           photoUrl,
+          room: room ? 1 : 0,
         })
         .returning();
       if (replyToId) await tx.update(saturnPosts).set({ replyCount: sql`${saturnPosts.replyCount} + 1` }).where(eq(saturnPosts.id, replyToId));
