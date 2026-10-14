@@ -100,7 +100,7 @@ OBOLO ORDER は招待制なので、最初の1人は運営が招待します。
 3. 管理トークン・招待する人のメール・招待者名（例：KIMORIN）を入れて「招待リンクをつくる」
 4. できたリンクを、その人に送る（メール自動送信は準備中）
 
-## Stripe（9日目の月88円の支払い）
+## Stripe（7日目・エクリプスの月88円の支払い）
 
 キーを入れるまでは**デモモード**（「支払う」を押すと請求なしで ORDER になる）。まずはテストモードのキーで試す。
 
@@ -113,7 +113,7 @@ curl -fsSL https://raw.githubusercontent.com/kimotostudiocandyfoxx-commits/obolo
 
 3. GitHub → Settings → Secrets and variables → Actions → **Variables** に `STRIPE_PUBLISHABLE_KEY` = **公開可能キー（pk_test_…）** を追加
 4. GitHub → Actions → Deploy API → Run workflow
-5. 9日目の支払いで、テスト用カード `4242 4242 4242 4242`（期限は未来の日付、CVC は好きな3桁）を使う → Stripe の「サブスクリプション」に出れば成功
+5. 7日目（エクリプス）の支払いで、テスト用カード `4242 4242 4242 4242`（期限は未来の日付、CVC は好きな3桁）を使う → Stripe の「サブスクリプション」に出れば成功
 
 本番にするときは、本番キー（sk_live_… / pk_live_…）で 2〜4 をもう一度。
 Webhook（解約や支払い失敗を反映）は任意：スクリプトの最後に出る URL を Stripe の「Webhook」に登録し、whsec_… をスクリプトで保存 → Deploy API。

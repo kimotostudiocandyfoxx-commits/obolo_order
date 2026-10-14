@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Stores the Stripe keys for the Day 9 Eclipse payment in Secret Manager (docs/deploy.md "Stripe").
+# Stores the Stripe keys for the Eclipse payment (journey day 7) in Secret Manager (docs/deploy.md "Stripe").
 # Run it in Cloud Shell. Re-running adds a new version of each secret (e.g. test → live keys).
 # The API only reads them once the GitHub variable STRIPE_PUBLISHABLE_KEY is set (see the end).
 set -uo pipefail

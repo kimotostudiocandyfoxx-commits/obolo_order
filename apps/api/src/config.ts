@@ -64,7 +64,7 @@ const Env = z.object({
   OPENAI_API_KEY: secret(),
   OPENAI_MODEL: z.string().optional(),
 
-  /** Stripe (Day 9 Eclipse, ¥88/month). Without the secret key the payment runs in demo mode
+  /** Stripe (the Eclipse day 7, ¥88/month). Without the secret key the payment runs in demo mode
    *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */
   STRIPE_SECRET_KEY: secret(),
   STRIPE_PUBLISHABLE_KEY: secret(),

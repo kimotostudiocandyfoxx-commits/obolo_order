@@ -50,7 +50,7 @@ jobs:
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
-      # Stripe (Day 9 payment) is switched on by the STRIPE_PUBLISHABLE_KEY variable, after
+      # Stripe (the Eclipse payment, day 7) is switched on by the STRIPE_PUBLISHABLE_KEY variable, after
       # scripts/stripe-setup.sh stored the secret key. Without it the payment runs in demo mode.
       - name: Secrets
         id: sec
