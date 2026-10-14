@@ -1,113 +1,282 @@
 import type { Step } from './script';
 
 /**
- * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
- * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
- * DAY 7 (was day 9) 【エクリプス】 — client's script (2026-10-06) + provisional lines by Claude (✏️, P-OB-19).
- * Flow: [認証] → wake up on Venus → KIMORIN: today, Pluto! → "あ、ちょっと待って" — Bati is weak:
- * it lives on the Sun's power "mana" and used it up on the planets → back to the society's HQ on
- * Earth (motion 9-1, not made yet; then Day 1's HQ motions 6 / 7 / 9) → MONBAN: "おかえり" →
- * the Eclipse: link your soul to the Sun at the Sun temple; whoever succeeds is an ORDER and can
- * give Bati mana → the secret rocket costs ¥88 a month → OK → payment (Stripe, inside the story)
- * → "エクリプス用のロケットに案内する" → launch to the Sun (motion 9-2, not made yet) → the Sun temple:
- * KIMORIN shows the "akashic record"-like thing, OBOLON appears: "you were connected from the
- * start — feel it" → fade to white → back at HQ: "旅の続きは明日から。また明日！" → countdown → ORDER.
- * "もう少し考える" brings MONBAN's question back.
+ * DAY 7 【火星 → 地球 → 太陽】 the Eclipse day — the story of 2026-10-14 (docs/story-rewrite/
+ * 太陽まで_UI引き継ぎ.md §8, D08-S001〜S006; the Sun temple D08-S007〜S012 from wip/P04/c03.md).
+ * Back on Earth OBOLON and MONBAN explain: no joining fee — ¥88 a month is the mana that wells up in you
+ * after the Eclipse, never raised, stop any time (M-R20). 「今はやめておく」 really stops here (resume at the
+ * choice). 「エクリプスを始める」 → the final confirmation and payment by the visitor's own hand (EclipsePay)
+ * → KIMORIN⭐︎ jumps in → the Sun temple: riddle 2 「表現者」, the Eclipse, riddle 1 「OBOLOは、町の名前」,
+ * the film of the seven days, the residents' congratulations, the letter → back on Earth, ∞ stands up as 8.
+ * The day ends as an ORDER with no 24-hour wait (StoryDay advances at once).
+ * The 88 minutes run in the rocket from Mars; the temples of Earth don't count ('clock' off, M-R22).
  */
 export const DAY7: Step[] = [
   { t: 'bgm', track: 'opening' },
+  { t: 'caption', text: '7日目' },
+  // D08-S001 地球へ帰る
   { t: 'still', image: 'mars-city' },
-  { t: 'caption', text: '火星で目を覚ました' }, // ✏️ Venus left the journey (2026-10-07): the day starts on Mars
-  { t: 'sprite', image: 'kimorin-1' },
-  { t: 'say', who: 'KIMORIN', text: 'おはよう、よく眠れたか？' },
-  { t: 'say', who: 'KIMORIN', text: 'よし、今日行く場所は冥王星！\nロケットに乗れ！' },
+  { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },
+  { t: 'say', who: 'ヒポキン', text: 'おはよう。……見学は、終わりだな。地球へ帰れ。' },
+  { t: 'say', who: 'KIMORIN', text: 'おはようございます。……では、問いただしに参りましょう。この結社の、本当の狙いを。' },
+  { t: 'action', label: 'ロケットで地球に帰る' },
   { t: 'sprite', image: null },
-  { t: 'action', label: 'ロケットに乗る' }, // ✏️
-  { t: 'sprite', image: 'kimorin-3' },
-  { t: 'say', who: 'KIMORIN', text: 'あ、ちょっと待って。' },
-  { t: 'sprite', image: '@bati-weak' },
-  { t: 'caption', text: '{bati}の元気がない' }, // ✏️
-  { t: 'sprite', image: ['kimorin-1', '@bati-weak'] },
-  { t: 'say', who: 'KIMORIN', text: '{bati}は、太陽の力……\n「マナ」というエネルギーで生きているんだ。' },
-  { t: 'say', who: 'KIMORIN', text: '土星、木星、水星、火星……\n{bati}は、マナを使っていろいろしたからな。' },
-  { t: 'say', who: 'KIMORIN', text: 'マナが、なくなってきてるんだと思う。' },
-  { t: 'say', who: 'KIMORIN', text: '一度、地球の結社に帰ろう。' },
-  { t: 'sprite', image: null },
-  { t: 'action', label: 'ロケットで地球に帰る' }, // ✏️
-  { t: 'video', motion: '9-1' }, // ロケットで地球の本部へ（動画・未着）
+  { t: 'se', sound: 'whoosh' },
+  { t: 'still', image: 's/rocket-space' },
+  { t: 'clock', on: true },
+  { t: 'still', image: 's/rocket-earth' },
 
-  // the society's HQ on Earth (Day 1's motions)
-  { t: 'loop', motion: 6 }, // 「本部に到着しました」is in the video itself
-  { t: 'action', label: '中に入る' },
+  // D08-S002 OBOLONの「おかえり」と、KIMORINの質問
+  { t: 'clock', on: false },
+  { t: 'video', motion: 12 },
+  { t: 'bgm', track: 'obolon' },
+  { t: 'loop', motion: 13 },
+  { t: 'caption', text: '地球の神殿に戻った' },
+  { t: 'say', who: 'OBOLON', text: '、、、おかえり。' },
+  { t: 'say', who: 'OBOLON', text: '4つの星は、、、どうだった？' },
+  { t: 'choice', key: 'f_d08_how', options: [{ label: '楽しかった', goto: 'how-fun' }, { label: '疲れた', goto: 'how-tired' }, { label: 'まだ、わからない', goto: 'how-unsure' }] },
+  { t: 'label', id: 'how-fun' },
+  { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
+  { t: 'goto', id: 'monban' },
+  { t: 'label', id: 'how-tired' },
+  { t: 'say', who: 'OBOLON', text: '、、、そうか。よく、歩いたな。' },
+  { t: 'goto', id: 'monban' },
+  { t: 'label', id: 'how-unsure' },
+  { t: 'say', who: 'OBOLON', text: '、、、そうか。それで、いい。' },
+  { t: 'label', id: 'monban' },
   { t: 'bgm', track: 'monban' },
-  { t: 'video', motion: 7 },
-  { t: 'loop', motion: 9 },
-  { t: 'say', who: 'MONBAN', text: 'おかえり…。\n楽しめたか…？' },
-  { t: 'say', who: 'KIMORIN', text: 'MONBAN、大変なんだ。\n{bati}のマナが、なくなりそうなんだ。' }, // ✏️ (KIMORIN explains)
-  { t: 'say', who: 'MONBAN', text: '……{bati}のマナが、もうすぐ消えそうだ。' },
-  { t: 'say', who: 'MONBAN', text: 'このままだと…{bati}は、消えてしまう。' },
-  { t: 'say', who: 'MONBAN', text: '{name}、君は太陽の神殿に向かい…\n太陽と、君の魂の一部がつながる必要がある。' },
-  { t: 'say', who: 'MONBAN', text: 'このことを、結社の言葉で\n「エクリプス」という。' },
-  { t: 'say', who: 'MONBAN', text: 'エクリプスが無事に成功した者が、ORDERと呼ばれ…\n{bati}に「マナ」を渡せるようになる。' },
-  { t: 'say', who: 'MONBAN', text: 'そして、自由に宇宙を遊んだり、\n旅をしたりすることができる。' },
-  { t: 'say', who: 'MONBAN', text: 'ただ、太陽の神殿は、とてつもなく暑い。\n普通のロケットだったら、一瞬で溶けてしまう。' },
-  { t: 'say', who: 'MONBAN', text: 'だから、結社の秘密ロケットを\n使わないといけない。' },
-  { t: 'say', who: 'MONBAN', text: 'この秘密ロケットと君の魂の一部を、太陽とリンクさせておく間…\nどうしても経費がかかってしまう。' },
-  { t: 'say', who: 'MONBAN', text: '日本円にしたら、月88円だ。' },
-  { t: 'label', id: 'ask' },
-  { t: 'say', who: 'MONBAN', text: '払えるなら、今からエクリプスを開始する。' },
-  {
-    t: 'choice',
-    key: 'eclipse',
-    options: [{ label: 'OK', goto: 'pay' }, { label: 'もう少し考える' }], // ✏️ the second option
-  },
-  // ✏️ not yet — MONBAN waits and asks again
-  { t: 'label', id: 'later' },
-  { t: 'say', who: 'MONBAN', text: '……そうか。\n{bati}のために、よく考えてくれ。' },
-  { t: 'goto', id: 'ask' },
+  { t: 'video', motion: 27 }, // 黒い煙が湧き、MONBANが現れる
+  { t: 'loop', motion: 28 },
+  { t: 'say', who: 'MONBAN', text: '……見学は、終わりだ…。ここで、決めていい…。急がなくていい…。' },
+  { t: 'say', who: 'MONBAN', text: '太陽の神殿で、『エクリプス』をする…。太陽と、お前の魂をつなぐ儀式だ…。\n成功すれば、お前は、ORDERになる…。' },
+  { t: 'say', who: 'MONBAN', text: 'ORDERになれば、ほかの星にも行ける…。切符の裏の、錠の星だ…。' },
+  { t: 'say', who: 'MONBAN', text: 'それに、エクリプスを受ければ…お前の体から、マナが湧くようになる…。ジェムがなくても、魔法が唱えられる…。' },
+  { t: 'say', who: 'MONBAN', text: '……ここには、勝手に流れてくる広告もない…。知らない誰かの『おすすめ』も、流れてこない…。あるのは、誰かが自分の言葉で作ったものだけだ…。灯りは、みんなの88円で、ともしている…。' },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: '……ほら、来ました。入会費です。' },
+  { t: 'say', who: 'KIMORIN', text: 'ついに、化けの皮が、剥がれましたね。' },
+  { t: 'say', who: 'OBOLON', text: '、、、入会費は、ない。' },
+  { t: 'say', who: 'KIMORIN', text: '……は？' },
+  { t: 'say', who: 'OBOLON', text: 'エクリプスを受けると、、、毎月、体から、マナが湧く。' },
+  { t: 'say', who: 'OBOLON', text: 'その分が、、、月に、88円だ。' },
+  { t: 'say', who: 'KIMORIN', text: '…………。' },
+  { t: 'say', who: 'KIMORIN', text: '……つまり、入会費は、タダ、ということですね？' },
+  { t: 'say', who: 'OBOLON', text: '、、、そうだ。' },
+  { t: 'say', who: 'KIMORIN', text: '……うまい言い方を、しますね。' },
+  { t: 'say', who: 'KIMORIN', text: 'では、いくつか、お伺いしましょうか。' },
+  { t: 'say', who: 'KIMORIN', text: '月に88円、と言って、あとから、値上がりしていくのでしょう？' },
+  { t: 'say', who: 'OBOLON', text: '、、、値上げは、しない。' },
+  { t: 'say', who: 'KIMORIN', text: 'やめたくなったら？　どうせ、やめさせてくれない仕組みでしょう？' },
+  { t: 'say', who: 'OBOLON', text: '、、、いつでも、やめられる。やめ方は、支払いの画面に、書いてある。' },
+  { t: 'say', who: 'KIMORIN', text: 'マナは？　足りなくなったら、どうせ、買わせるのでしょう？' },
+  { t: 'say', who: 'OBOLON', text: '、、、買い足すことも、できる。でも、毎月湧く分で、十分、遊べる。' },
+  { t: 'say', who: 'KIMORIN', text: '……ORDERにならなかったら？　{bati}も、ピンポンくんも、消える？' },
+  { t: 'say', who: 'OBOLON', text: '、、、消えない。月で、待っている。作ったものも、見に来られる。' },
+  { t: 'say', who: 'うんちピンポンくん', text: '……ピンポン♪' },
+  { t: 'say', who: 'KIMORIN', text: '…………。' },
+  { t: 'say', who: 'KIMORIN', text: 'バカバカしい。私は、帰ります。' },
+  { t: 'say', who: 'KIMORIN', text: 'そして、お母さんに、言ってやります。' },
+  { t: 'say', who: 'KIMORIN', text: 'さようなら。' },
+  { t: 'sprite', image: null }, // ローブの裾をひるがえして、門の外へ。扇の尾が、ぴん、と立っている
+  { t: 'say', who: 'MONBAN', text: '……行ったな…。' },
+  { t: 'notice', text: '月額88円（毎月のマナの代金）。値上げはしません。いつでもやめられます。やめ方は、支払いの画面に書いてあります' },
 
+  // D08-S003 選べる一手
+  { t: 'label', id: 'decide' },
+  { t: 'ticket', flip: true }, // 金色の切符の裏の星図。錠の金星・天王星・海王星、いちばん奥に太陽
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
+  { t: 'say', who: 'MONBAN', text: 'ORDERにならなければ、ネオのまま、ここで止まる…。それも、道だ…。' },
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: 'ボクは、どっちでもいいよ。{neo}が決めたほうで、待ってる。' },
+  { t: 'sprite', image: null },
+  { t: 'say', who: 'MONBAN', text: '払えるなら、今からエクリプスを始める…。' },
+  { t: 'choice', key: 'f_d08_decide', options: [{ label: 'エクリプスを始める', goto: 'pay' }, { label: '今はやめておく' }] },
+
+  // D08-S005 今はやめておく（ここで止まる）
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: 'じゃあ、ボク、月で待ってるね。' },
+  { t: 'sprite', image: null },
+  { t: 'say', who: 'MONBAN', text: '{bati}は、月で待っている…。\nいつでも、会いにこい…。' },
+  { t: 'notice', text: 'いつ戻っても、今日のこの場面から続きを遊べます。作ったものと手紙は、いつでも見られます' },
+  { t: 'pause', resume: 'decide' },
+
+  // D08-S006 エクリプスを始める（支払いは本人の手で）
   { t: 'label', id: 'pay' },
-  { t: 'order', cancel: 'later' },
+  { t: 'say', who: 'MONBAN', text: '……分かった。' },
+  { t: 'say', who: 'MONBAN', text: 'この先は、お前の手で、押せ…。' },
+  { t: 'order', cancel: 'back' },
   { t: 'say', who: 'MONBAN', text: 'よし、分かった。' },
   { t: 'say', who: 'MONBAN', text: 'それでは、エクリプス用のロケットに案内する。' },
-
-  // the Eclipse (client script 2026-10-06, second part)
-  { t: 'bgm', track: 'opening' },
   { t: 'action', label: 'ロケットに乗る' },
-  { t: 'video', motion: '9-2' }, // 秘密ロケットで太陽へ発射（動画・未着）
-  { t: 'still', image: 'sun-temple' }, // ✏️ placeholder backdrop drawn by Claude
-  { t: 'caption', text: '太陽の神殿に着いた' }, // ✏️
-  { t: 'sprite', image: 'kimorin-3' },
-  { t: 'say', who: 'KIMORIN', text: 'ここが、太陽の神殿やけんね。' },
-  { t: 'say', who: 'KIMORIN', text: 'あそこに見える、すごそうなものが……\nうーん、なんて……説明すればいいのかな……' },
-  { t: 'say', who: 'KIMORIN', text: 'まあ、アカシックレコードみたいな\n言い方をする人もいるが……' },
-  { t: 'bgm', track: 'obolon' },
-  { t: 'sprite', image: ['kimorin-3', 'obolon'] }, // OBOLON drawn after motion 13 (✏️)
-  { t: 'caption', text: 'OBOLONが現れた' },
-  { t: 'say', who: 'KIMORIN', text: 'あ、OBOLON出てきた！' },
-  { t: 'say', who: 'KIMORIN', text: 'OBOLONは、地球と月と太陽を\n自由に行き来できるんだ。' },
-  { t: 'sprite', image: 'obolon' },
-  { t: 'say', who: 'OBOLON', text: '{name}の魂の一部と、\n太陽をつなげにきた。……と思うが、' },
-  { t: 'say', who: 'OBOLON', text: 'そうじゃない、、、、、' },
-  { t: 'say', who: 'OBOLON', text: '実は、、、\n最初から、つながってるんだ。' },
-  { t: 'say', who: 'OBOLON', text: '太陽だけじゃない。\nあれとも、俺とも、地球とも、' },
-  { t: 'say', who: 'OBOLON', text: '想像しうる全てと、\nつながってるんだ。' },
-  { t: 'sprite', image: ['kimorin-8', 'obolon'] },
-  { t: 'say', who: 'KIMORIN', text: 'そうそう！\nそれに気づく、そして受け入れる。' },
-  { t: 'say', who: 'OBOLON', text: 'いや、違う。\n繋がっている、それを感じる。' },
-  { t: 'say', who: 'KIMORIN', text: 'そういうことやけんね！' },
-  { t: 'bgm', track: null },
-  { t: 'whiteout' },
-  { t: 'black' },
-
-  // back at the society's HQ on Earth
-  { t: 'bgm', track: 'opening' },
-  { t: 'loop', motion: 6 },
-  { t: 'caption', text: '地球の結社に帰ってきた' }, // ✏️
-  { t: 'sprite', image: 'kimorin-1' },
-  { t: 'say', who: 'KIMORIN', text: '宇宙旅行、楽しかったね。' },
-  { t: 'say', who: 'KIMORIN', text: 'これからは、明日から、\n旅の続きに出よう！' },
-  { t: 'say', who: 'KIMORIN', text: 'じゃあ、また明日！\nバイバイ！' },
+  { t: 'still', image: 's/launch-pit' }, // ロケットの扉が、ゆっくり閉まっていく
+  { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 外から
+  { t: 'sprite', image: 'kimorin-sun' }, // 閉まりかけた扉のすき間に、白い面がぬっと
+  { t: 'say', who: 'KIMORIN', text: 'そのロケットに、私も、乗ります。' },
+  { t: 'say', who: 'KIMORIN', text: '……お待たせいたしました。私も、ORDERになることにしました。' },
+  { t: 'sprite', image: ['kimorin-sun', '@bati'] },
+  { t: 'say', who: 'バティ', text: 'KIMORIN⭐︎！' },
+  { t: 'say', who: 'KIMORIN', text: '……母に、言ってやりました。そうしたら、『88円なら、なっておきなさい』と。' },
+  { t: 'say', who: 'KIMORIN', text: '私は、発明家です。新しい発明は、新しい体験に、こそ、あります。' },
+  { t: 'say', who: 'KIMORIN', text: 'そして、私は、全ての謎を解き明かし、コスモスを見つけ、宝を、手に入れてみせます。' },
+  { t: 'say', who: 'KIMORIN', text: 'それを、母に、プレゼントするのです！' },
+  { t: 'say', who: 'KIMORIN', text: 'はははははは！' },
   { t: 'sprite', image: null },
+  { t: 'se', sound: 'whoosh' }, // 扉が閉まる。ロケットが、太陽へ飛び立つ
+  { t: 'still', image: 's/rocket-sun' },
+  { t: 'goto', id: 'sun' },
+  // the payment screen's 「戻る」
+  { t: 'label', id: 'back' },
+  { t: 'say', who: 'MONBAN', text: '戻るか…。' },
+  { t: 'goto', id: 'decide' },
+
+  // D08-S007 太陽の神殿
+  { t: 'label', id: 'sun' },
+  { t: 'bgm', track: 'obolon' },
+  { t: 'still', image: 'sun-temple' },
+  { t: 'caption', text: '太陽の神殿に着いた' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: 'あそこに見える、すごそうなものは……ええ、知っていますとも。宇宙ぜんぶの記憶、のようなものです。……たぶん。' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'caption', text: 'OBOLONが現れた' },
+  { t: 'branch', key: 'd1.f_d01_talk', cases: { 話を聞いてみる: 'sun-talk' }, otherwise: 'sun-quiet' },
+  { t: 'label', id: 'sun-talk' },
+  { t: 'say', who: 'OBOLON', text: '{neo}。1日目、宇宙に行きたいか、\n聞いたな。' },
+  { t: 'say', who: 'OBOLON', text: 'お前は、『{choice1}』と、\n言った。' },
+  { t: 'say', who: 'OBOLON', text: '、、、今は、もう、\n答えは、いらないな。' },
+  { t: 'goto', id: 'sun-both' },
+  { t: 'label', id: 'sun-quiet' },
+  { t: 'say', who: 'OBOLON', text: '、、、来たな。' },
+  { t: 'label', id: 'sun-both' },
+  { t: 'say', who: 'OBOLON', text: '{neo}の魂の一部と、\n太陽をつなげにきた。……と思うが、' },
+  { t: 'say', who: 'OBOLON', text: 'そうじゃない、、、、、' },
+  { t: 'say', who: 'OBOLON', text: 'その前に、、、' },
+  { t: 'se', sound: 'blip' },
+  { t: 'screen', open: true }, // スクリーンの奥から、MONBANが、普通に歩いてくる
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'バティ', text: '…………歩いてる。' },
+  { t: 'say', who: 'KIMORIN', text: '出ましたね、MONBAN。\nまた、止めにいらしたのですか。' },
+  { t: 'say', who: 'MONBAN', text: '……いや。' },
+  { t: 'say', who: 'MONBAN', text: 'そいつは、もうネオじゃない…。\n聞かせてやれ…。' },
+  { t: 'screen', open: false },
+
+  // D08-S009 「わかりやすく、言う。」
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'branch', key: 'd1.f_d01_talk', cases: { 話を聞いてみる: 'easy-talk' }, otherwise: 'easy-quiet' },
+  { t: 'label', id: 'easy-talk' },
+  { t: 'say', who: 'OBOLON', text: '{neo}、1日目に、\n言いかけたこと、覚えてるか。' },
+  { t: 'goto', id: 'easy' },
+  { t: 'label', id: 'easy-quiet' },
+  { t: 'say', who: 'OBOLON', text: '{neo}、旅で何度も、\n聞きかけた言葉が、あるな。' },
+  { t: 'label', id: 'easy' },
+  { t: 'say', who: 'OBOLON', text: 'わかりやすく、言う。' },
+  { t: 'say', who: 'OBOLON', text: '結社の仲間は、全員、\n表現者、なんだ。' },
+  { t: 'say', who: 'OBOLON', text: '土星の輪、木星の蝶、\n水星の船、火星の光。' },
+  { t: 'say', who: 'KIMORIN', text: '……ですが、何も作らない人も、たくさんいますよね。' },
+  { t: 'say', who: 'OBOLON', text: '誰も、感じなくなった、わけではない。' },
+  { t: 'say', who: 'OBOLON', text: '『みんなが観てるから、俺も観る』…\n『誰も言わないなら、言わない』…' },
+  { t: 'say', who: 'OBOLON', text: 'それを、続けた結果、だ。' },
+  { t: 'say', who: 'OBOLON', text: 'お前が、そう感じたのなら、、、\nその気持ちは、なかったことに、しなくていい。' },
+
+  // D08-S010 全員、表現者／札2が開く
+  { t: 'say', who: 'KIMORIN', text: '土星も木星も水星も火星も、ぜんぶ、そのための旅だったのですね。' },
+  { t: 'say', who: 'KIMORIN', text: '……お待ちを。全員、表現者……ということは、表現者は、天才の私だけでは、ない……？' },
+  { t: 'say', who: 'OBOLON', text: '宇宙を変えるのは、一人ではない。' },
+  { t: 'say', who: 'KIMORIN', text: '一人ではない。つまり、私と、もう一人、ですね。' },
+  { t: 'say', who: 'うんちピンポンくん', text: 'ブッブー♪' },
+  { t: 'say', who: 'OBOLON', text: '誰かの感じたことが、、、別の誰かへ、届く。' },
+  { t: 'say', who: 'OBOLON', text: '作る日も、見ている日も、休む日もある。\n表現者という言葉は、創作の命令ではない。' },
+  { t: 'se', sound: 'chime' },
+  { t: 'seal', n: 2, open: true }, // 札2のひびが割れ、「OBOLO ORDERは全員……」の続きに「表現者」の字
+  { t: 'caption', text: '謎2が開いた' },
+  { t: 'sprite', image: ['obolon', '@bati'] },
+  { t: 'say', who: 'バティ', text: 'この宇宙って、ずっと画面の向こうにあるの？' },
+  { t: 'say', who: 'OBOLON', text: 'そして、、、\n太陽と、つなげる必要は、ない。' },
+  { t: 'say', who: 'OBOLON', text: '実は、、、\n最初から、つながってるんだ。' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: 'ええ、ええ。それに気づく。そして、受け入れる。' },
+  { t: 'say', who: 'OBOLON', text: 'いや、違う。\n繋がっている、それを感じる。' },
+  { t: 'say', who: 'KIMORIN', text: '……そういうことです。' },
+  { t: 'se', sound: 'ding' }, // 袖の中でボタンを押す
+  { t: 'say', who: 'OBOLON', text: '表現は、、、\nつながっているから、届く。' },
+  { t: 'screen', open: true },
+  { t: 'say', who: 'MONBAN', text: '謎は、8つ…。\n今日、1つ開いた…。' },
+  { t: 'say', who: 'MONBAN', text: '残りの7つは…\nORDERとして、確かめに行け…。' },
+  { t: 'say', who: 'バティ', text: 'コスモス……{food}の仲間かな。' },
+  { t: 'say', who: 'KIMORIN', text: '食べ物では、ないと思いますよ。' },
+  { t: 'say', who: 'MONBAN', text: '……ORDERに、なってから、考えろ…。' },
+  { t: 'screen', open: false },
+  { t: 'sprite', image: null },
+  { t: 'whiteout' },
+
+  // D08-S011 エクリプス／上映「{neo}の7日間」
+  { t: 'still', image: 'sun-temple' },
+  { t: 'se', sound: 'magic' }, // 太陽の光が、{neo}と{bati}に流れこむ。となりで、KIMORINとピンポンくんにも
+  { t: 'sprite', image: ['kimorin-sun', '@bati'] },
+  { t: 'say', who: 'バティ', text: '……{neo}？\nからだが、あったかい！' },
+  { t: 'say', who: 'KIMORIN', text: '……あたたかい光ですね。これで、{neo}も私も、ORDER……ということで、よろしいのですか？' },
+  { t: 'caption', text: 'ORDERになった' },
+  { t: 'seal', n: 1, open: true }, // 札1「OBOLOとは」の細い線と灯りが光り、札がほどける
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: 'OBOLOは、、、町の名前だ。' },
+  { t: 'say', who: 'OBOLON', text: 'OBOLO ORDERとは、、、OBOLOに住む、住人たちの、ことだ。' },
+  { t: 'say', who: 'KIMORIN', text: '秘密結社、と名乗っておいて……ご近所さん、ということですか。' },
+  { t: 'caption', text: '謎1が開いた' },
+  { t: 'sprite', image: null },
+  { t: 'made', what: 'film' }, // 上映「{neo}の7日間」：つぶやき→シール→曲→MV、一本の光の線
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'ORDERか！\nおめでとうだZE!!' },
+  { t: 'say', who: 'たこ焼きシスター', text: '……おめでとう、{neo}。\nわたしも、うれしいわ。' },
+  { t: 'sprite', image: 'daikon-kaiser' },
+  { t: 'say', who: '大根カイザー', text: '表現とは、命を残すこと。\n……いい言葉DA。' },
+  { t: 'sprite', image: 'freezy' },
+  { t: 'say', who: 'フリージー', text: 'おめでとう。\n……心まで、解凍されそうだ。' },
+  { t: 'sprite', image: 'hipokin' },
+  { t: 'se', sound: 'knock' }, // パチン。火星の街じゅうに「CONGRATULATIONS」
+  { t: 'caption', text: 'CONGRATULATIONS' },
+  { t: 'sprite', image: null },
+  { t: 'letter', text: '{neo}へ\nようこそ、宇宙へ✌️\nby {inviter}' },
+  { t: 'choice', key: 'f_d08_letter', options: [{ label: '大事にしまう' }, { label: 'あとで' }] },
+  { t: 'notice', text: '返事は、二周目の旅を終えると届けられるようになります' },
+
+  // D08-S012 MONBANが笑う／∞を立てる
+  { t: 'black' },
+  { t: 'caption', text: '地球の結社に戻った' },
+  { t: 'bgm', track: 'monban' },
+  { t: 'loop', motion: 9 },
+  { t: 'say', who: 'MONBAN', text: '……よく来たな、ORDER。' },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: '……今、MONBANが笑いました？' },
+  { t: 'say', who: 'MONBAN', text: '……笑っていない…。' },
+  { t: 'say', who: 'MONBAN', text: '{neo}…。ORDERは、終わりではない…。\n通過点だ…。' },
+  { t: 'say', who: 'MONBAN', text: 'この先の旅にも、区切りがある…。区切りごとに、呼び名がある…。' },
+  { t: 'say', who: 'MONBAN', text: '最後は、太陽で、振り返れ…。' },
+  { t: 'say', who: 'MONBAN', text: '{neo}…。毎日、88分…\n宇宙が開く…。' },
+  { t: 'say', who: 'MONBAN', text: '時間が来たら…\n俺が、告げる…。' },
+  { t: 'say', who: 'MONBAN', text: '……ORDERになった者は…招待したい者がいれば…招待しても、いい…。' },
+  { t: 'say', who: 'KIMORIN', text: 'はい、来ました。招待マルチ、確定。おつ。' },
+  { t: 'say', who: 'KIMORIN', text: '化けの皮が、剥がれましたね。' },
+  { t: 'say', who: 'KIMORIN', text: '誘えば誘うほど、安くなる。そんなんなんでしょ？' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、逆だ。' },
+  { t: 'say', who: 'OBOLON', text: '招待された者は、、、まだ、自分で、マナを作れない。だから、、、マナジェムを買って、送る必要がある。' },
+  { t: 'say', who: 'OBOLON', text: '、、、88円だ。' },
+  { t: 'say', who: 'KIMORIN', text: 'なんて、不合理な仕組み。' },
+  { t: 'say', who: 'KIMORIN', text: '人を招待するのに、なんで、招待する人が、お金を払わないといけないんだ。' },
+  { t: 'say', who: 'KIMORIN', text: 'バカバカしい。招待する、バカは、いません。' },
+  { t: 'say', who: 'OBOLON', text: '∞を、立ててみろ。' },
+  { t: 'action', label: '∞を立てる' },
+  { t: 'caption', text: '∞　→　8' },
+  { t: 'say', who: 'OBOLON', text: '、、、8に、なる。' },
+  { t: 'say', who: 'OBOLON', text: '無限は、区切ると、\n宝物に、なる。' },
+  { t: 'say', who: 'OBOLON', text: 'いま見ている宇宙も、、、\n場所が変われば、違って見える。' },
+  { t: 'say', who: 'OBOLON', text: 'その問いは、、、持っていけ。' },
+  { t: 'say', who: 'MONBAN', text: '残りの時間は…\n外の世界で、生きろ…。' },
+  { t: 'say', who: 'KIMORIN', text: '宇宙旅行、楽しかったですね。' },
+  { t: 'say', who: 'KIMORIN', text: 'では、また明日。\nごきげんよう。' },
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: 'またね、{neo}！' },
+  { t: 'sprite', image: null },
+  { t: 'notice', text: 'ORDER。次の旅から、作ったものを「ダチ」に届けられるようになります' },
+  { t: 'caption', text: '一周目の旅、おわり' },
   { t: 'end' },
 ];

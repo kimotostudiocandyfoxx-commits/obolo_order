@@ -21,7 +21,9 @@ export type Speaker =
   | 'ボスG'
   | 'バティ'
   | 'うんちピンポンくん'
-  | 'コロリン';
+  | 'コロリン'
+  /** a voice not seen yet (（声）「おい。」) */
+  | '？？？';
 
 /** Synthesised sound effects (lib/story/sfx.ts presets). */
 export type SoundFx = 'sparkle' | 'chime' | 'bell' | 'gong' | 'magic' | 'whoosh' | 'pop' | 'boing' | 'knock' | 'ding' | 'heartbeat' | 'blip' | 'thud';
@@ -63,12 +65,14 @@ export type Step =
    * to your own room (or skip), ☆ the brother's sneeze. Saves answers.f_d04_kororin (try/skip).
    */
   | { t: 'saturn' }
-  /** Jupiter tutorial (Day 5), coached by 大根カイザー. Placeholder screen until the client's UI arrives. */
+  /** Jupiter (day 4): two of the kororins become stickers → sticker book → sticker butterflies. Saves answers.stickers. */
   | { t: 'jupiter' }
-  /** Mercury sea-chart tutorial (Day 6), coached by フリージー. */
+  /** Mercury (day 5): one sticker becomes a song (lyrics → touch up → feel → sung); its jacket spins. Saves answers.song. */
   | { t: 'mercury' }
-  /** Mars tutorial (Day 7), coached by ヒポキン. */
+  /** Mars (day 6): the song gets an MV from the visitor's wish; kept in the 裏スタジオ. Saves answers.mv. */
   | { t: 'mars' }
+  /** Show what was made: the MV on Mars's big screen, … (tap to continue). */
+  | { t: 'made'; what: 'mv' | 'film' }
   /** Venus tutorial (Day 8), coached by the gorilla trio. */
   | { t: 'venus' }
   /** Fade the whole screen to white (~3 s), then continue; the next still/motion fades in from white. */
@@ -98,8 +102,15 @@ export type Step =
   | { t: 'neoname'; placeholder: string; submit: string }
   /** Day 1: the eight riddle cards rise in a ring, 1・7・8 get their words, and they become the riddle book. */
   | { t: 'riddles' }
-  /** The riddle book opens and seal `n` gets its words (Day 3: 2 「OBOLO ORDERは全員」→「表現者」). */
-  | { t: 'seal'; n: number }
+  /**
+   * The riddle book opens and card `n` gets its words (day 3: 2 「OBOLO ORDERは全員……」). `open`: its
+   * answer opens too (day 7 at the Sun: 2 「表現者」, 1 「OBOLOは、町の名前」).
+   */
+  | { t: 'seal'; n: number; open?: boolean }
+  /** The space ticket with its four stamp slots; `stamp` presses that planet's stamp, `flip` shows the star map on the back. */
+  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars'; flip?: boolean }
+  /** The day's 88 minutes (M-R22): on from the first rocket departure, off in the temples of Earth and the Moon. */
+  | { t: 'clock'; on: boolean }
   /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */
   | { t: 'screen'; open: boolean }
   /** A sound effect (synthesised). Continues immediately. */
@@ -125,6 +136,11 @@ export type Step =
   | { t: 'order'; cancel: string }
   /** A handwritten-style letter card. Tap to continue. */
   | { t: 'letter'; text: string }
+  /**
+   * Go to a label by an earlier day's answer (Me.story, e.g. "d1.f_d01_talk"): `cases` maps answers to
+   * labels, `otherwise` is the label for anything else (or no answer).
+   */
+  | { t: 'branch'; key: string; cases: Record<string, string>; otherwise: string }
   | { t: 'label'; id: string }
   | { t: 'goto'; id: string }
   | { t: 'end' };
@@ -143,6 +159,10 @@ export interface StoryVars {
   age?: string;
   /** KIMORIN is shown as "KIMORIN⭐︎" (his NEO name, from the Moon's naming on). */
   kimorinStar?: boolean;
+  /** Earlier days' answers ("d1.choice1" …), for 'branch' steps and {choice1}. */
+  story?: Record<string, string>;
+  /** What earlier days made (kororins → stickers → song → MV): lib/onboarding/made.ts. */
+  made?: import('./made').Made;
   inviter: string;
   /** Name of the chosen OBOLO NEO form ({neo}). */
   neo?: string;
@@ -160,7 +180,8 @@ export function fill(text: string, v: StoryVars): string {
     .replaceAll('{neo}', v.neo || '…')
     .replaceAll('{bati}', v.bati || 'バティ')
     .replaceAll('{food}', v.batiFood || '…')
-    .replaceAll('{age}', v.age || '…');
+    .replaceAll('{age}', v.age || '…')
+    .replaceAll('{choice1}', v.story?.['d1.choice1'] || '…');
 }
 
 /** The name shown on a line: the Bati's own name, KIMORIN⭐︎ after his naming. */

@@ -15,10 +15,12 @@ export interface OrderApi {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * Day 9: MONBAN asked for the ¥88/month for the secret rocket and the visitor pressed OK.
- * Shows what they are paying for, then Stripe Embedded Checkout inside the story (no redirect, so
- * the story goes on right after paying). Demo mode (no Stripe key on the server) pays without a charge.
- * PLACEHOLDER (P-BILL-3): the wording of the terms below must be checked by the client.
+ * Day 7 (D08-S006): the visitor chose to begin the Eclipse. The final confirmation (M-R20): ¥88 a month
+ * (tax included, the monthly mana), the renewal day, that it renews by itself, and how to stop — then
+ * Stripe Embedded Checkout inside the story (no redirect, so the story goes on right after paying).
+ * Demo mode (no Stripe key on the server) pays without a charge. Minors are checked on the payment side.
+ * PLACEHOLDER (P-BILL-3): the wording must be checked by the operator; the 〔設定〕→〔毎月のマナ〕→〔やめる〕
+ * screen does not exist yet (P-BILL-4: the operator stops it in Stripe).
  */
 export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; paid: boolean; onPaid: () => void; onCancel: () => void }) {
   const [phase, setPhase] = useState<'loading' | 'stripe' | 'demo' | 'confirming' | 'error'>('loading');
@@ -114,6 +116,10 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
   };
 
   if (paid) return null;
+  const today = new Date();
+  const renewDay = today.getDate();
+  const next = new Date(today.getFullYear(), today.getMonth() + 1, Math.min(renewDay, new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate()));
+  const nextRenew = next.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
   return (
     <div className="pt-safe pb-safe fixed inset-0 z-[90] animate-[fadeUp_0.5s_ease-out] overflow-y-auto bg-black/85 backdrop-blur-sm">
       <div className="mx-auto flex min-h-full max-w-md flex-col px-4 py-6">
@@ -121,17 +127,30 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
           <span className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-200/20 blur-2xl" />
           <p className="text-[11px] tracking-[0.5em] text-amber-200/70">ECLIPSE</p>
           <p className="mt-1 text-lg tracking-[0.2em] text-amber-50">エクリプス</p>
-          <p className="mt-3 text-3xl tracking-wider text-amber-100">
-            月{ORDER_PRICE_JPY}円<span className="ml-1 text-xs text-white/50">（税込）</span>
-          </p>
-          <ul className="mt-3 space-y-1 text-left text-[13px] leading-relaxed text-white/75">
-            <li>✦ 結社の秘密ロケットで、太陽の神殿へ</li>
-            <li>✦ 君の魂の一部と太陽をつなぎ、ORDERになる</li>
-            <li>✦ バティにマナを渡せる。自由に宇宙を遊び、旅ができる</li>
-          </ul>
-          <p className="mt-3 text-left text-[11px] leading-relaxed text-white/45">
-            毎月自動で更新されます。解約はいつでもでき、次の更新日から請求が止まります。
-          </p>
+          <p className="mt-1 text-xs tracking-widest text-white/50">支払いの最終確認</p>
+          <dl className="mt-3 space-y-2.5 text-left text-[13px] leading-relaxed text-white/80">
+            <div>
+              <dt className="text-[11px] text-amber-200/70">値段</dt>
+              <dd>
+                月額<span className="mx-0.5 text-lg text-amber-100">{ORDER_PRICE_JPY}円</span>（税込・毎月のマナの代金）。初回は今日
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] text-amber-200/70">毎月の更新日</dt>
+              <dd>
+                毎月{renewDay}日。次の更新日は{nextRenew}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] text-amber-200/70">自動で続きます</dt>
+              <dd>やめるまで、毎月の更新日に、月額{ORDER_PRICE_JPY}円のお支払いが自動で行われます</dd>
+            </div>
+            <div>
+              <dt className="text-[11px] text-amber-200/70">やめ方</dt>
+              <dd>〔設定〕→〔毎月のマナ〕→〔やめる〕から、いつでも。やめると、次の更新日から支払いが止まります。作ったものは消えません</dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-left text-[10px] leading-relaxed text-white/40">入会費はありません。値上げはしません。</p>
         </div>
 
         <div className="mt-4 flex-1">
@@ -169,7 +188,7 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
 
         {phase !== 'confirming' && (
           <button onClick={onCancel} className="mt-4 self-center py-2 text-xs tracking-widest text-white/50 underline">
-            やっぱり、もう少し考える
+            戻る
           </button>
         )}
       </div>

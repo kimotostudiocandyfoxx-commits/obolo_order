@@ -1,14 +1,15 @@
 import type { Step } from './script';
 
 /**
- * DAY 3 【月 → 土星】 — the story of 2026-10-14 (docs/story-rewrite/土星まで_UI引き継ぎ.md §9,
+ * DAY 3 【月 → 土星】 — the story of 2026-10-14 (docs/story-rewrite/太陽まで_UI引き継ぎ.md §8,
  * D04-S002〜D04-S007; the scene ids say D04 but it is day 3). Starts after the email check (StoryDay).
  * OBOLON cannot leave Earth / the Moon / the Sun, so he hands over Bluena: its square screen shows MONBAN
- * at the HQ gate (MONBAN never leaves the HQ). From here the day's space time counts toward 88 minutes
- * (SYS-S001, see StoryDay). Saturn: the gaudy temple, たこ焼きブラザー & シスター, the kororin lesson
- * (the first journey's kororins go to your own room only), the sky ring, riddle 2 「表現者」, and
- * 大根カイザー's letter from Jupiter.
- * Saved: Bluena, f_d04_kororin (try/skip) and the kororin, seal 2, f_d04_jupiter_letter.
+ * at the HQ gate (MONBAN never leaves the HQ). The day's 88 minutes start when the rocket leaves the Moon
+ * ('clock' step, M-R22). Saturn: the gaudy temple, たこ焼きブラザー & シスター, then the kororin lesson on
+ * the real Saturn world (client 2026-10-14: day 3 only teaches how to murmur — three kororins by mic, to
+ * your own room; everything else opens on the second journey), the residents' ring and the brother's
+ * sneeze, riddle card 2 gets its words (the answer opens on day 7), 大根カイザー's letter, the Saturn stamp.
+ * Saved: Bluena, the three kororins (room-only Saturn posts), card 2's words, the Saturn stamp.
  */
 export const DAY3: Step[] = [
   { t: 'bgm', track: 'obolon' },
@@ -46,13 +47,14 @@ export const DAY3: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/rocket-space' },
+  { t: 'clock', on: true }, // the day's 88 minutes start here (not shown)
   { t: 'action', label: 'Bluenaで投影する' },
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
-  { t: 'say', who: 'MONBAN', text: '本日…土星に行けば…謎が、一つ…解けることになると、思う…。' },
+  { t: 'say', who: 'MONBAN', text: '本日…土星に行けば…謎の、ヒントが…転がっていると、思う…。' },
   { t: 'say', who: 'KIMORIN', text: 'え、そうなの？' },
-  { t: 'say', who: 'MONBAN', text: 'ああ…。OBOLO ORDERとは…何の集まりなのか…わかるだろう…。' },
+  { t: 'say', who: 'MONBAN', text: 'ああ…。OBOLO ORDERとは…何の集まりなのか…そのヒントだ…。' },
   { t: 'say', who: 'KIMORIN', text: '……気になるな。' },
   { t: 'say', who: 'MONBAN', text: '土星には…たこ焼きブラザーと、たこ焼きシスターが、住んでいる…。' },
   { t: 'say', who: 'MONBAN', text: '二人に会って…土星で、遊んでこい…。' },
@@ -87,21 +89,19 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'たこ焼きシスター', text: 'でも、土星は、文字に声を乗っけてくれるの。' },
   { t: 'say', who: 'たこ焼きブラザー', text: 'まぁ、まずは遊んでみるZE!!' },
 
-  // D04-S005〜S006 コロリン／土星の空のリング：the real Saturn world (ころりんぱ) with the story's lines
-  // on top — KIMORIN⭐︎'s kororin, つぶやいてみる（自分の部屋に飛ばす）／今日はつぶやかない, the brother's
-  // sneeze and ☆, 「全員、表現者」 (components/saturn/SaturnLesson.tsx). Saves f_d04_kororin (try/skip).
+  // D04-S005〜S006 コロリン／土星の空のリング: the real Saturn world (ころりんぱ) with the story's lines
+  // on top — KIMORIN⭐︎'s kororin, three kororins of your own by mic to your own room, the residents' ring,
+  // the brother's sneeze and KIMORIN's ☆ (components/saturn/SaturnLesson.tsx).
   { t: 'bgm', track: null },
   { t: 'sprite', image: null },
   { t: 'saturn' },
   { t: 'bgm', track: 'opening' },
   { t: 'still', image: 's/saturn-sky' },
   { t: 'se', sound: 'chime' },
-  { t: 'seal', n: 2 }, // 鞄の中で謎の書が開き、封印2に字が浮かぶ
-  { t: 'caption', text: '謎2が解けた' },
-  { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
-  { t: 'say', who: 'KIMORIN', text: '……MONBANの言った通りでした。全員、表現者。' },
-  { t: 'say', who: 'KIMORIN', text: 'つまり、くしゃみのブラザーも、表現者。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'そうだZE!!' },
+  { t: 'seal', n: 2 }, // 鞄の中で謎の書が開き、札2に「OBOLO ORDERは全員……」の文字（続きは、まだ白紙）
+  { t: 'caption', text: '謎の書に、文字が浮かんだ' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……OBOLO ORDERは、全員……？　続きが、ありませんね。' },
 
   // D04-S007 木星の王様の手紙／いちばん遠い星
   { t: 'still', image: 's/saturn-inside' },
@@ -109,7 +109,7 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'たこ焼きブラザー', text: 'そうだ。けさ、輪に乗って、手紙が流れてきたZE。' },
   { t: 'sprite', image: null },
   { t: 'still', image: 's/kaiser-letter' }, // 大根の形の封蝋。差出人：木星　大根カイザー
-  { t: 'letter', text: '木星の木が、眠ってしまったDA。\n来てほしいDA。\n\n木星　大根カイザー' },
+  { t: 'letter', text: '木星にも、遊びに来るDA。\n\n木星　大根カイザー' },
   { t: 'still', image: 's/saturn-inside' },
   { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
   { t: 'say', who: 'たこ焼きシスター', text: '木星の王様ね。' },
@@ -126,6 +126,9 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……あれは、ブラザーのくしゃみです。' },
   { t: 'say', who: 'バティ', text: '……コスモスじゃない？' },
   { t: 'say', who: 'KIMORIN', text: 'まだ、流れていますね。' },
+  { t: 'sprite', image: null },
+  { t: 'ticket', stamp: 'saturn' },
+  { t: 'caption', text: '切符に、土星のスタンプが押された' },
   { t: 'caption', text: 'また明日' },
   { t: 'end' },
 ];

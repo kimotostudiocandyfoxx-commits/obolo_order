@@ -138,13 +138,23 @@ export function NeoNameInput({ placeholder, submit, onSubmit }: { placeholder: s
 // --- the riddle cards and the book -----------------------------------------------------------------
 /** The eight seals of the riddle book. `answer` appears once the riddle is solved. */
 export const SEALS: Record<number, { q: string; answer?: string }> = {
-  1: { q: 'OBOLOとは' },
-  2: { q: 'OBOLO ORDERは全員', answer: '表現者' },
+  1: { q: 'OBOLOとは', answer: 'OBOLOは、町の名前' },
+  2: { q: 'OBOLO ORDERは全員……', answer: '表現者' },
+  3: { q: '結社の目的とは' },
+  6: { q: 'オボロンは……' },
   7: { q: 'コスモスは' },
   8: { q: '宝は' },
 };
-/** Seals whose words appear on Day 1. */
+/** Cards whose words appear on Day 1. */
 export const DAY1_SEALS = [1, 7, 8];
+/** The words on the riddle cards by the journey day you are on (2 on Saturn, 3 on Jupiter, 6 on Mercury). */
+export function knownSealsOn(day: number): number[] {
+  return [...DAY1_SEALS, ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : [])];
+}
+/** Answers that are open (both at the Sun, on day 7 — so from ORDER on). */
+export function solvedSealsOn(day: number): number[] {
+  return day >= 8 ? [1, 2] : [];
+}
 
 function Card({ n, lit, size = 64, style }: { n: number; lit: boolean; size?: number; style?: React.CSSProperties }) {
   return (
@@ -212,7 +222,7 @@ export function RiddleBook({ known, solved, fresh, onClose }: { known: number[];
     return () => clearTimeout(t);
   }, [fresh]);
   return (
-    <button className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/80 px-5 backdrop-blur-sm" onClick={onClose}>
+    <button className="absolute inset-0 z-[60] flex flex-col items-center justify-center bg-black/80 px-5 backdrop-blur-sm" onClick={() => reveal && onClose()}>
       <p className="mb-4 text-sm tracking-[0.5em] text-amber-200/80">謎の書</p>
       <div className="grid w-full max-w-sm animate-[fadeUp_0.6s_ease-out] grid-cols-2 gap-3 rounded-3xl border border-amber-200/30 bg-[radial-gradient(ellipse_at_top,#3a2614_0%,#160d06_80%)] p-4 shadow-[0_0_60px_rgba(255,200,120,0.2)]">
         {Array.from({ length: 8 }, (_, k) => {
@@ -225,7 +235,7 @@ export function RiddleBook({ known, solved, fresh, onClose }: { known: number[];
               key={n}
               className={`relative flex min-h-24 flex-col items-center justify-center rounded-2xl border px-2 py-3 text-center transition-all duration-1000 ${has ? 'border-amber-200/70 bg-amber-200/10' : 'border-amber-200/15 bg-black/30'} ${isFresh ? 'shadow-[0_0_30px_rgba(255,214,140,0.7)]' : ''}`}
             >
-              <span className="absolute left-2 top-1.5 text-[10px] text-amber-200/60">封印 {n}</span>
+              <span className="absolute left-2 top-1.5 text-[10px] text-amber-200/60">札 {n}</span>
               {has ? <span className="text-sm leading-snug text-amber-50 [word-break:keep-all]">{SEALS[n]?.q}</span> : <span className="text-xs text-white/20">　</span>}
               {ans && <span className="mt-1 animate-[fadeUp_1s_ease-out] text-lg font-bold tracking-widest text-amber-200">{ans}</span>}
             </div>
@@ -246,6 +256,99 @@ export function BookButton({ onClick }: { onClick: () => void }) {
         <path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5C4.7 20 4 19.3 4 18.5v-13ZM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5v-13Z" />
       </svg>
       謎の書
+    </button>
+  );
+}
+
+// --- the space ticket ------------------------------------------------------------------------------
+export const STAMPS = [
+  { id: 'saturn', label: '土星', icon: '🪐' },
+  { id: 'jupiter', label: '木星', icon: '🌳' },
+  { id: 'mercury', label: '水星', icon: '🌊' },
+  { id: 'mars', label: '火星', icon: '🎬' },
+] as const;
+export type StampId = (typeof STAMPS)[number]['id'];
+/** The stamps you have by the journey day you are on (a planet's stamp is pressed at the end of its day). */
+export function stampsOn(day: number): StampId[] {
+  return STAMPS.filter((_, k) => day >= 4 + k).map((s) => s.id);
+}
+
+/**
+ * The tour ticket (M-R18): a long golden ticket with four star-shaped stamp slots — Saturn, Jupiter,
+ * Mercury, Mars. `fresh` stamps one now; `flip` turns it over: the star map, the four planets joined
+ * by a gold line, and Venus, Uranus, Neptune locked 『ORDERのみ』. Tap to continue.
+ */
+export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; onDone: () => void }) {
+  const [pressed, setPressed] = useState(!fresh);
+  const [back, setBack] = useState(false);
+  useEffect(() => {
+    const ts = [setTimeout(() => setPressed(true), 700)];
+    if (flip) ts.push(setTimeout(() => setBack(true), 2200));
+    return () => ts.forEach(clearTimeout);
+  }, [flip]);
+  const has = (id: StampId) => stamps.includes(id) || (id === fresh && pressed);
+  return (
+    <button className="absolute inset-0 z-[12] flex flex-col items-center justify-center bg-black/70 px-6" onClick={onDone}>
+      <div className="relative w-[min(78vw,320px)] animate-[fadeUp_0.6s_ease-out] [perspective:900px]">
+        <div className={`relative transition-transform duration-1000 [transform-style:preserve-3d] ${back ? '[transform:rotateY(180deg)]' : ''}`}>
+          {/* front */}
+          <div className="rounded-2xl border border-amber-200/70 bg-gradient-to-b from-[#3a2a10] to-[#120c04] p-4 shadow-[0_0_50px_rgba(255,200,110,0.35)] [backface-visibility:hidden]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/onboarding/s/ticket.jpg" alt="" className="mx-auto h-40 w-auto rounded-xl object-cover" />
+            <p className="mt-2 text-center text-xs tracking-[0.5em] text-amber-200/80">宇宙行きの切符</p>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {STAMPS.map((s) => (
+                <div key={s.id} className="flex flex-col items-center gap-1">
+                  <span
+                    className={`flex h-12 w-12 items-center justify-center text-2xl transition-all duration-500 [clip-path:polygon(50%_0,61%_35%,98%_35%,68%_57%,79%_91%,50%_70%,21%_91%,32%_57%,2%_35%,39%_35%)] ${has(s.id) ? 'scale-100 bg-amber-300' : 'bg-amber-100/15'} ${s.id === fresh && pressed ? 'animate-[fadeUp_0.5s_ease-out]' : ''}`}
+                  >
+                    {has(s.id) ? s.icon : ''}
+                  </span>
+                  <span className="text-[10px] text-amber-100/70">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* back: the star map */}
+          <div className="absolute inset-0 rounded-2xl border border-amber-200/70 bg-[radial-gradient(ellipse_at_center,#1d1640_0%,#07060d_80%)] p-4 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <svg viewBox="0 0 300 300" className="h-full w-full" aria-hidden>
+              <polyline points="40,230 95,180 150,200 205,150" fill="none" stroke="#fcd34d" strokeWidth="2" />
+              {[
+                [40, 230, '土星'],
+                [95, 180, '木星'],
+                [150, 200, '水星'],
+                [205, 150, '火星'],
+              ].map(([x, y, t]) => (
+                <g key={String(t)}>
+                  <circle cx={Number(x)} cy={Number(y)} r="9" fill="#fcd34d" />
+                  <text x={Number(x)} y={Number(y) + 24} textAnchor="middle" fontSize="11" fill="#fde68a">
+                    {t}
+                  </text>
+                </g>
+              ))}
+              {[
+                [235, 95, '金星'],
+                [170, 70, '天王星'],
+                [95, 95, '海王星'],
+              ].map(([x, y, t]) => (
+                <g key={String(t)} opacity=".75">
+                  <circle cx={Number(x)} cy={Number(y)} r="9" fill="none" stroke="#a5b4fc" strokeDasharray="3 3" />
+                  <text x={Number(x)} y={Number(y) + 4} textAnchor="middle" fontSize="10">
+                    🔒
+                  </text>
+                  <text x={Number(x)} y={Number(y) + 24} textAnchor="middle" fontSize="11" fill="#c7d2fe">
+                    {t}
+                  </text>
+                </g>
+              ))}
+              <text x="165" y="35" textAnchor="middle" fontSize="13" fill="#fde68a" letterSpacing="3">
+                ORDERのみ
+              </text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <span className="pb-safe absolute bottom-6 text-xs tracking-widest text-white/50">TAP</span>
     </button>
   );
 }
@@ -377,7 +480,7 @@ export function TimeUpOverlay({ muted, onDone }: { muted: boolean; onDone: () =>
       <BluenaScreen open={stage !== 'closed'} />
       {stage === 'line' && (
         <button className="absolute inset-0 flex items-end justify-center" onClick={() => setStage('closed')}>
-          <Line who="MONBAN">……時間だ…。地球に、帰ってこい…。</Line>
+          <Line who="MONBAN">……時間だ…。Bluenaが、停止する…。地球に、戻ってこい…。</Line>
         </button>
       )}
       {stage === 'closed' && (

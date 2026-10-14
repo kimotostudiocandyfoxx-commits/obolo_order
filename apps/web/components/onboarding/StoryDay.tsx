@@ -1,26 +1,32 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { JOURNEY_PAYMENT } from '@obolo/shared';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPlayer';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { demoBati } from '@/lib/look';
+import { realLessonApi } from '@/lib/onboarding/lessonApi';
+import { madeFrom } from '@/lib/onboarding/made';
 import { clearDay, loadDay, saveDay } from '@/lib/onboarding/progress';
 import type { DayStory } from '@/lib/onboarding/stories';
 import { clearLookDraft } from './LookMaker';
+import { knownSealsOn, solvedSealsOn, stampsOn } from './StoryExtras';
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 /**
  * The day's space time (SYS-S001, story 2026-10-14): Bluena works 88 minutes a day; after that MONBAN
  * calls you back to Earth and the day's story continues tomorrow from the same scene.
- * PLACEHOLDER (P-SPACE-88, 引き継ぎ §7-1): counted from day 3 (Bluena) on, only while the story screen is
- * open and visible, per calendar day on this device.
+ * M-R22: counted from the day's first rocket departure (a 'clock' step in the script), not in the temples
+ * of Earth and the Moon; nothing is shown. PLACEHOLDER (P-SPACE-88): only while the story screen is open and
+ * visible, per calendar day on this device. The day after a cut-off starts with the email check again, from
+ * the scene that was cut.
  */
 const SPACE_MINUTES = 88;
 const today = () => new Date().toLocaleDateString('sv-SE');
-function useSpaceClock(userId: string | undefined, on: boolean) {
+function useSpaceClock(userId: string | undefined, on: boolean, running: boolean) {
   const key = `obolo.space.${userId}`;
   const read = useCallback((): { date: string; ms: number; over: boolean } => {
     try {
@@ -41,6 +47,8 @@ function useSpaceClock(userId: string | undefined, on: boolean) {
     [key],
   );
   const [state, setState] = useState({ timeUp: false, over: false });
+  const runningRef = useRef(running);
+  runningRef.current = running;
   useEffect(() => {
     if (!on || !userId) return;
     const v = read();
@@ -50,7 +58,7 @@ function useSpaceClock(userId: string | undefined, on: boolean) {
       const now = Date.now();
       const step = Math.min(now - last, 10_000);
       last = now;
-      if (document.visibilityState !== 'visible') return;
+      if (document.visibilityState !== 'visible' || !runningRef.current) return;
       const cur = read();
       const next = { ...cur, ms: cur.ms + step };
       write(next);
@@ -61,9 +69,30 @@ function useSpaceClock(userId: string | undefined, on: boolean) {
   }, [on, userId, read, write]);
   const finish = useCallback(() => {
     write({ ...read(), over: true });
+    try {
+      localStorage.setItem(`${key}.cut`, today());
+    } catch {
+      /* ignore */
+    }
     setState({ timeUp: true, over: true });
-  }, [read, write]);
-  return { ...state, finish };
+  }, [read, write, key]);
+  /** the last day was cut by the 88 minutes (on an earlier date): ask for the email code again */
+  const cutBefore = useCallback(() => {
+    try {
+      const d = localStorage.getItem(`${key}.cut`);
+      return !!d && d !== today();
+    } catch {
+      return false;
+    }
+  }, [key]);
+  const clearCut = useCallback(() => {
+    try {
+      localStorage.removeItem(`${key}.cut`);
+    } catch {
+      /* ignore */
+    }
+  }, [key]);
+  return { ...state, finish, cutBefore, clearCut };
 }
 
 /** A scripted journey day (2+): [認証] → story → (HomeGate shows the "また明日" countdown). */
@@ -71,14 +100,17 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
   const { me, setMe } = useAuth();
   const [saved, setSaved] = useState<StoryProgress | null | undefined>(undefined);
   const [passed, setPassed] = useState(false);
-  const space = useSpaceClock(me?.id, day >= 3);
+  // the clock runs only between 'clock' steps (from the first rocket of the day; not in the temples)
+  const [clockOn, setClockOn] = useState(false);
+  const space = useSpaceClock(me?.id, day >= 3, clockOn);
 
   useEffect(() => {
     if (!me) return;
     const s = loadDay(day, me.id);
     setSaved(s);
-    // Re-opening mid-story does not ask for the code again.
-    if (!story.auth || (s && s.i > 0)) setPassed(true);
+    // Re-opening mid-story does not ask for the code again — except the day after the 88 minutes ran out
+    if (!story.auth || (s && s.i > 0 && !space.cutBefore())) setPassed(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day, me, story.auth]);
 
   const onProgress = useCallback((p: StoryProgress) => me && saveDay(day, me.id, p), [day, me]);
@@ -87,7 +119,9 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       if (!me) return;
       setTimeout(async () => {
         try {
-          setMe(await getApi().completeJourneyDay(day, answers));
+          const done = await getApi().completeJourneyDay(day, answers);
+          // the Eclipse day ends as an ORDER: no 24-hour wait after it
+          setMe(day === JOURNEY_PAYMENT ? await getApi().advanceJourney(true) : done);
         } finally {
           clearDay(day, me.id);
           clearLookDraft();
@@ -99,7 +133,15 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
 
   if (!me || saved === undefined) return <div className="fixed inset-0 bg-black" />;
   if (space.over) return <SpaceOver />;
-  if (!passed) return <DayAuth onPassed={() => setPassed(true)} />;
+  if (!passed)
+    return (
+      <DayAuth
+        onPassed={() => {
+          space.clearCut();
+          setPassed(true);
+        }}
+      />
+    );
   return (
     <StoryPlayer
       steps={story.steps}
@@ -113,9 +155,14 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFood: me.bati?.food,
         look: me.avatarUrl ?? undefined,
+        story: me.story,
+        made: madeFrom(me.story),
       }}
+      lessonApi={realLessonApi}
       // the riddle book: 1・7・8 from day 1; 2 (「表現者」) solved on day 3, Saturn
-      seals={{ known: [1, 7, 8, ...(day >= 4 ? [2] : [])], solved: day >= 4 ? [2] : [] }}
+      seals={{ known: knownSealsOn(day), solved: solvedSealsOn(day) }}
+      stamps={stampsOn(day)}
+      onClock={setClockOn}
       timeUp={space.timeUp}
       onTimeUp={space.finish}
       initial={saved}

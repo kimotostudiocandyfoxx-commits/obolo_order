@@ -104,10 +104,17 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
 
 describe('the Eclipse day (7)', () => {
   const steps = STORIES[7].steps;
-  it('MONBAN asks for the 88 yen, OK leads to the payment', () => {
-    const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'eclipse');
-    const ok = steps[c].t === 'choice' ? steps[c].options.find((o) => o.label === 'OK') : undefined;
-    const pay = labelIndex(steps, ok!.goto!);
-    expect(steps[pay + 1]).toEqual({ t: 'order', cancel: 'later' });
+  it('エクリプスを始める leads to the payment by the visitor; 今はやめておく stops at the choice', () => {
+    const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'f_d08_decide');
+    const opts = steps[c].t === 'choice' ? steps[c].options : [];
+    const pay = labelIndex(steps, opts[0].goto!);
+    expect(steps.slice(pay, pay + 4).find((s) => s.t === 'order')).toEqual({ t: 'order', cancel: 'back' });
+    const stop = steps.slice(c + 1).find((s) => s.t === 'pause');
+    expect(stop).toEqual({ t: 'pause', resume: 'decide' });
+  });
+  it('the Sun temple opens riddles 2 and 1, then the film of the seven days', () => {
+    const opened = steps.filter((s) => s.t === 'seal' && s.open).map((s) => (s.t === 'seal' ? s.n : 0));
+    expect(opened).toEqual([2, 1]);
+    expect(steps.some((s) => s.t === 'made' && s.what === 'film')).toBe(true);
   });
 });

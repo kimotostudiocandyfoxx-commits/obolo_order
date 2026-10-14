@@ -1,31 +1,35 @@
 'use client';
 
 import { neoVoiceUrl, type SaturnPostView } from '@obolo/shared';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { KororinWorld } from './KororinWorld';
 
 /**
  * Day 3 on Saturn (story 2026-10-14, D04-S005〜S006): the story IS the how-to of the real Saturn world
- * (ころりんぱ). たこ焼きブラザー・シスター and KIMORIN⭐︎ talk on top of it while the visitor uses it:
+ * (ころりんぱ). たこ焼きブラザー・シスター and KIMORIN⭐︎ talk on top of it while the visitor uses it.
+ * Client 2026-10-14: day 3 only teaches how to murmur — the visitor makes three kororins by mic (or typing)
+ * and flies them to their own room; every other button opens on the second journey.
  *  - KIMORIN⭐︎ murmurs 「ラーメン食べたい。」 → his kororin falls in → tap it → 「たこ焼き食べたい。」
- *  - 声をおとす: speak to the Bati → it reads it → 〔自分の部屋に飛ばす〕 (the first journey: own room only;
- *    the plaza opens on the second journey) — or 「今日はつぶやかない」
- *  - the residents' kororins; the brother's sneeze falls → tap it → ☆ (no count anywhere)
- *  - 「OBOLO ORDERは、みーんな、表現者なんだZE!!」 → back to the story (riddle 2)
- * The lines are the story's (§9); the hint cards are its 〔画面：…〕 notes.
+ *  - 声をおとす ×3: speak to the Bati → it reads it → 〔自分の部屋に飛ばす〕 (the plaza: second journey)
+ *  - the residents' ring; the brother's sneeze falls → tap it → KIMORIN⭐︎ presses ☆ (no count anywhere)
+ * The lines are the story's (§8); the hint cards are its 〔画面：…〕 notes ("広場" in the ring note is said
+ * as 土星の空のリング so it does not clash with 〔広場に飛ばす〕, §3-1).
  */
 type Who = 'brother' | 'sister' | 'kimorin' | 'bati' | 'guide';
-type Wait = 'next' | 'listen-kimorin' | 'listen-sneeze' | 'star' | 'choose' | 'post' | 'done';
+type Wait = 'next' | 'listen-kimorin' | 'listen-sneeze' | 'post' | 'done';
 interface Line {
   who: Who;
   text: string;
   wait: Wait;
   /** drop one of the story's kororins when this line appears */
   drop?: 'kimorin' | 'sneeze';
-  /** branch: only after つぶやいてみる / 今日はつぶやかない */
-  only?: 'try' | 'skip';
+  /** KIMORIN⭐︎ presses ☆ on the sneeze (a ★ pops) */
+  star?: boolean;
 }
+
+/** how many kororins the visitor makes today */
+export const KORORIN_GOAL = 3;
 
 const LINES: Line[] = [
   { who: 'kimorin', text: 'なんだこれ。', wait: 'next' },
@@ -43,16 +47,16 @@ const LINES: Line[] = [
   { who: 'brother', text: 'そして、人に見せたいものだけを広場に飛ばし、見せないものは自分の部屋に飛ばせばいいんだZE。', wait: 'next' },
   { who: 'brother', text: 'だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。', wait: 'next' },
   { who: 'brother', text: 'みんなの広場に飛ばしたコロリンも、88時間経ったら、自分の部屋に帰ってくるZE。', wait: 'next' },
-  { who: 'guide', text: '〔🎙 声をおとす〕を押して、{bati}に向かって、独り言みたいにつぶやく（文字で打ってもいい）→ {bati}がコロリンにする → タップすると喋る → 〔自分の部屋に飛ばす〕\n広場に飛ばせるのは、二周目の旅から', wait: 'choose' },
-  { who: 'guide', text: '👇〔声をおとす〕をタップして、{bati}につぶやいてみよう', wait: 'post', only: 'try' },
-  { who: 'bati', text: 'できた！　ボクが作った、{neo}のコロリン！', wait: 'next', only: 'try' },
-  { who: 'sister', text: 'いいわ。つぶやきたくなったら、いつでもどうぞ。', wait: 'next', only: 'skip' },
-  { who: 'guide', text: 'コロリンは、いつでも作れます（今日でなくても）', wait: 'next', only: 'skip' },
-  { who: 'guide', text: 'コロリンが、ころん、と落ちてきた。\n広場のコロリンをタップすると、声が聞けます。☆を押すと「いいな」の印（☆の数は、どこにも出ません）', wait: 'listen-sneeze', drop: 'sneeze' },
-  { who: 'brother', text: '……俺のだZE。押すボタンを、間違えたZE。', wait: 'star' },
-  { who: 'brother', text: '……くしゃみに、星がついたZE。', wait: 'next' },
-  { who: 'sister', text: 'うまく言えなくても、くしゃみでも、いいの。出したら、それはもう、表現よ。', wait: 'next' },
-  { who: 'brother', text: 'だから、OBOLO ORDERは、みーんな、表現者なんだZE!!', wait: 'done' },
+  { who: 'guide', text: '〔🎙 声をおとす〕を押して、{bati}に向かって、独り言みたいにつぶやく（文字で打ってもいい）→ {bati}がコロリンにする → タップすると喋る → 〔自分の部屋に飛ばす〕\n広場に飛ばせるのは、二周目の旅から', wait: 'next' },
+  { who: 'guide', text: '今日は、コロリンを3つ作ってみよう。\n👇〔声をおとす〕をタップして、{bati}につぶやく', wait: 'post' },
+  { who: 'bati', text: 'できた！　ボクが作った、{neo}のコロリン！', wait: 'next' },
+  { who: 'guide', text: 'もう一つ。いま思ったこと、きょうあったこと、なんでも。\n👇〔声をおとす〕', wait: 'post' },
+  { who: 'guide', text: 'あと一つ。\n👇〔声をおとす〕', wait: 'post' },
+  { who: 'guide', text: 'コロリンは、あなたの部屋に、日付と時刻つきで残ります。誰にも送られません', wait: 'next' },
+  { who: 'guide', text: '土星の空を、住人たちのコロリンが、リングになって舞っている。\n空のリングのコロリンをタップすると、声が聞けます。☆を押すと「いいな」の印（☆の数は、どこにも出ません）', wait: 'listen-sneeze', drop: 'sneeze' },
+  { who: 'brother', text: '……俺のだZE。押すボタンを、間違えたZE。', wait: 'next' },
+  { who: 'brother', text: '……くしゃみに、星がついたZE。', wait: 'next', star: true },
+  { who: 'sister', text: 'うまく言えなくても、くしゃみでも、いいの。出したら、それはもう、表現よ。', wait: 'done' },
 ];
 
 const NAMES: Record<Who, string> = { brother: 'たこ焼きブラザー', sister: 'たこ焼きシスター', kimorin: 'KIMORIN⭐︎', bati: 'バティ', guide: '' };
@@ -73,10 +77,10 @@ const storyPost = (id: string, name: string, pic: string, text: string, style: s
 const KIMORIN_KORORIN = storyPost('story-kimorin', 'KIMORIN⭐︎', spriteUrl('kimorin-face'), 'たこ焼き食べたい。', 'genki');
 const SNEEZE_KORORIN = storyPost('story-sneeze', 'たこ焼きブラザー', spriteUrl('takoyaki-brother-face'), '……へっくしゅん！', 'hikui');
 
-export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; neo: string; batiImage?: string; onDone: (choice: 'try' | 'skip') => void }) {
-  const [branch, setBranch] = useState<'try' | 'skip' | null>(null);
-  const lines = useMemo(() => LINES.filter((l) => !l.only || l.only === branch), [branch]);
+export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; neo: string; batiImage?: string; onDone: (made: string[]) => void }) {
+  const lines = LINES;
   const [i, setI] = useState(0);
+  const [made, setMade] = useState<string[]>([]);
   const line = lines[i];
   // the story's kororins stay once dropped
   const dropped = new Set(lines.slice(0, i + 1).flatMap((l) => (l.drop ? [l.drop] : [])));
@@ -96,11 +100,22 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
             advanceOn('listen-kimorin', p.id === KIMORIN_KORORIN.id);
             advanceOn('listen-sneeze', p.id === SNEEZE_KORORIN.id);
           },
-          onStar: (p) => advanceOn('star', p.id === SNEEZE_KORORIN.id),
-          onPosted: () => advanceOn('post'),
+          onPosted: (p) => {
+            setMade((m) => [...m, p.text]);
+            advanceOn('post');
+          },
         }}
         overlay={
           line && (
+            <>
+            {line.star && (
+              <span className="pointer-events-none absolute bottom-[34%] left-1/2 z-[210] -translate-x-1/2 animate-[fadeUp_0.5s_ease-out] text-6xl text-amber-300 drop-shadow-[0_0_18px_rgba(255,214,120,0.9)]">★</span>
+            )}
+            {batiImage && (
+              // the Bati stays in one place on screen (M-R14)
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={batiImage} alt="" className="pointer-events-none absolute bottom-[calc(96px+env(safe-area-inset-bottom))] left-3 z-[190] h-16 w-16 rounded-2xl border-2 border-white/70 object-cover shadow-lg" aria-hidden />
+            )}
             <div className="pointer-events-none absolute inset-x-0 top-[calc(96px+env(safe-area-inset-top))] z-[200] flex justify-center px-3">
               <div key={i} className="pointer-events-auto flex w-full max-w-md animate-[fadeUp_0.4s_ease-out] items-end gap-2">
                 {line.who === 'bati' && batiImage ? (
@@ -121,41 +136,26 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
                         つぎへ
                       </button>
                     )}
-                    {line.wait === 'choose' && (
-                      <>
-                        <button
-                          onClick={() => {
-                            setBranch('skip');
-                            setI(i + 1);
-                          }}
-                          className="rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold text-white"
-                        >
-                          今日はつぶやかない
-                        </button>
-                        <button
-                          onClick={() => {
-                            setBranch('try');
-                            setI(i + 1);
-                          }}
-                          className="rounded-full bg-pink-400 px-4 py-1.5 text-xs font-black text-white"
-                        >
-                          つぶやいてみる
-                        </button>
-                      </>
-                    )}
                     {line.wait === 'done' && (
-                      <button onClick={() => onDone(branch ?? 'skip')} className="rounded-full bg-violet-500 px-4 py-1.5 text-xs font-bold text-white">
+                      <button onClick={() => onDone(made)} className="rounded-full bg-violet-500 px-4 py-1.5 text-xs font-bold text-white">
                         つぎへ
                       </button>
                     )}
                     {(line.wait === 'listen-kimorin' || line.wait === 'listen-sneeze') && (
                       <span className="animate-pulse text-[11px] font-bold text-pink-400">👆 落ちてきたコロリンをタップ</span>
                     )}
-                    {line.wait === 'star' && <span className="animate-pulse text-[11px] font-bold text-pink-500">☆ を、そっと押してみよう</span>}
+                    {line.wait === 'post' && (
+                      <span className="flex gap-1" aria-label="kororins">
+                        {Array.from({ length: KORORIN_GOAL }, (_, k) => (
+                          <span key={k} className={`h-2.5 w-2.5 rounded-full ${k < made.length ? 'bg-pink-400' : 'bg-white/30'}`} />
+                        ))}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
+            </>
           )
         }
       />

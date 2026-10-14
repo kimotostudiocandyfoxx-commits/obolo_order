@@ -16,7 +16,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'caption', text: '2日目' },
   // D02-S001 宇宙行きの切符
-  { t: 'still', image: 's/ticket' },
+  { t: 'ticket' }, // 細長い金色の切符。下に、星の形のスタンプ欄が4つ（土星・木星・水星・火星）
   { t: 'se', sound: 'sparkle' },
   { t: 'caption', text: '宇宙行きの切符を手に入れた' },
   { t: 'action', label: '本部へ向かう' },
@@ -46,7 +46,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'まあ、このKIMORINが、こいつらの正体を暴いてみせましょう。' },
   { t: 'say', who: 'KIMORIN', text: 'さあ、それでは入りましょう。' },
 
-  // D02-S004 めちゃくちゃ行きたい
+  // D02-S004 お金は、かからない
   { t: 'video', motion: 12 },
   { t: 'bgm', track: 'obolon' },
   { t: 'loop', motion: 13 },
@@ -65,15 +65,19 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……いえ。まあまあ、ですね。' },
   { t: 'say', who: 'OBOLON', text: '、、、お前は、宇宙に、行ってみたいと思うか？' },
   { t: 'say', who: 'KIMORIN', text: 'う、、、宇宙？' },
-  { t: 'say', who: 'KIMORIN', text: 'めちゃくちゃ行きたい！' },
+  { t: 'say', who: 'KIMORIN', text: '……お金が、かかりますよね？　もちろん。' },
+  { t: 'say', who: 'OBOLON', text: '、、、かからない。' },
+  { t: 'say', who: 'KIMORIN', text: '…………。' },
+  { t: 'say', who: 'KIMORIN', text: 'では、行きます。宇宙行きの切符、私の家に、送っといてください。' },
   { t: 'bgm', track: 'monban' },
-  { t: 'video', motion: 27 }, // 黒い煙が湧き、MONBANが現れる
+  { t: 'video', motion: 27 }, // 黒い煙が湧き、MONBANが現れる。手に、小さな石と、古い革の本
   { t: 'loop', motion: 28 },
   { t: 'sprite', image: ['', 'kimorin-1'] },
-  { t: 'say', who: 'MONBAN', text: '……これを、持っていけ…。マナジェムだ…。' },
+  { t: 'say', who: 'MONBAN', text: '……これを、持っていけ…。マナジェムと…謎の書だ…。' },
+  { t: 'say', who: 'MONBAN', text: 'この結社には…謎が、8個ある…。' },
   { t: 'say', who: 'KIMORIN', text: 'なんやこれ！　光っとる！　どういう仕組みや！' },
-  { t: 'say', who: 'OBOLON', text: '明日、お前の家に、宇宙行きの切符を送る。' },
-  // KIMORIN dashes out of the gate, a point of light … and is back at once with the golden ticket
+  { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' }, // 鼻歌。門の外へ歩いていく
+  // KIMORIN becomes a point of light in the sky … and is back at once with the golden ticket
   { t: 'sprite', image: null },
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/ticket' },
@@ -136,11 +140,11 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目、3回目と答えてしまった場合。それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' },
-  { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、この秘密結社に入る資格はない。ここで脱落。' },
+  { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、OBOLO ORDERになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
   { t: 'se', sound: 'ding' },
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また正解してしまった。' },
-  { t: 'say', who: 'OBOLON', text: '、、、いや。入る資格を試したり、脱落など、存在しない。' },
+  { t: 'say', who: 'OBOLON', text: '、、、いや。ORDERになる資格を試したり、脱落など、存在しない。' },
   { t: 'say', who: 'OBOLON', text: 'そもそも、OBOLO ORDERは、完全招待制だ。招待された者しか、来られない。それだけで、十分だ。' },
   { t: 'say', who: 'OBOLON', text: 'それに、ここのことを、外で話したかったら、話していい。' },
   { t: 'say', who: 'OBOLON', text: 'ただ、一つだけ、条件がある。姿と名前を、変えることだ。' },
@@ -190,6 +194,7 @@ export const DAY2: Step[] = [
   { t: 'neoname', placeholder: 'ネオとしての名前', submit: 'この名前にする' },
   { t: 'say', who: 'OBOLON', text: '{neo}、、、いい名前だ。' },
   { t: 'say', who: 'OBOLON', text: 'お前たちは、、、今、宇宙見学の、旅行中だ。' },
+  { t: 'say', who: 'OBOLON', text: '見学できるのは、、、4つの星だ。' },
   { t: 'say', who: 'OBOLON', text: 'そんなお前たちのことを、、、OBOLO NEO、と呼ぶ。' },
   { t: 'say', who: 'OBOLON', text: '今日から、、、お前は、OBOLO NEO、{neo}だ。' },
   { t: 'label', id: 'confirm' },

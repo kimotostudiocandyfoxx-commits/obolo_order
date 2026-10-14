@@ -525,3 +525,15 @@ body {
   20% { opacity: 1; }
   100% { transform: translate(-50%, 0) scale(1); }
 }
+/* Jupiter: a sticker butterfly drifting around the great tree */
+@keyframes stickerFly {
+  0%, 100% { transform: translate(0, 0) rotate(-4deg); }
+  25% { transform: translate(8vw, -9svh) rotate(5deg); }
+  50% { transform: translate(-4vw, -16svh) rotate(-3deg); }
+  75% { transform: translate(-10vw, -6svh) rotate(4deg); }
+}
+/* Mercury: the song's ship sails out to sea */
+@keyframes shipOut {
+  from { transform: translate(-30vw, 0) scale(1.15); }
+  to { transform: translate(60vw, -6svh) scale(0.55); }
+}

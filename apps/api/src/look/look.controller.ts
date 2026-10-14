@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { BatiEggBody, BatiNameBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody } from '@obolo/shared';
+import { BatiEggBody, BatiNameBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -67,6 +67,14 @@ export class LookController {
   async butterfly(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
     await rateLimit(this.kv, `puni-pic:${userId}`, 4, 60);
     return this.look.puniPicCandidates(userId, parseBody(PuniPicBody, body), origin(req), this.admin(token), 'butterfly');
+  }
+
+  /** Jupiter (first journey): Bati draws a sticker's picture from its words. */
+  @Post('sticker/art')
+  @HttpCode(200)
+  async stickerArt(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    await rateLimit(this.kv, `sticker-art:${userId}`, 4, 60);
+    return this.look.stickerArt(userId, parseBody(StickerArtBody, body), origin(req), this.admin(token));
   }
 
   @Post('butterfly')

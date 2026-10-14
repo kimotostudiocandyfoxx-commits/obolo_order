@@ -1,9 +1,9 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { batiPrompt, butterflyPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { cutoutWhite } from '../media/cutout';
-import { JOURNEY_DONE, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { JOURNEY_DONE, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -24,6 +24,8 @@ const CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
 /** PLACEHOLDER (P-PUNI-4): picture-character tries per member per day (2 candidates each, ~¥6 per image). */
 export const PUNI_PIC_TRIES = 3;
+/** PLACEHOLDER (P-JUP-20): Bati's sticker pictures per member per day. */
+export const STICKER_ART_TRIES = 8;
 const PUNI_PIC_CANDIDATES = 2;
 let styleSheet: Promise<GeneratedImage> | null = null;
 /** The client's reference characters, shown to the model as the style to follow. */
@@ -172,6 +174,21 @@ export class LookService {
       }
     }
     return { candidates, left: unlimited ? 99 : Math.max(0, PUNI_PIC_TRIES - tries) };
+  }
+
+  /**
+   * Jupiter (first journey): Bati draws a sticker's picture from its words. PLACEHOLDER (P-JUP-20): a few a
+   * day per member (~¥6 each); the mana gem's glow is not wired to it yet.
+   */
+  async stickerArt(userId: string, body: StickerArtBody, origin: string, unlimited = false): Promise<{ id: string; url: string }> {
+    await this.clean(body.text);
+    const key = `${this.puniKey(userId)}:sticker`;
+    const used = Number((await this.kv.get(key)) ?? 0);
+    if (!unlimited && used >= STICKER_ART_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'STICKER_TRIES', '今日はもう描けません');
+    await this.kv.incr(key, 60 * 60 * 26);
+    const img = await this.images.generate(stickerArtPrompt(body.text), 0, []);
+    const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
+    return { id: m.id, url: m.url };
   }
 
   /** Pick one of your painted candidates as your Jupiter butterfly (null = back to the default). */

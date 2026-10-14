@@ -35,6 +35,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
     butterfly: u.butterflyUrl ?? null,
+    story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^d\d+\./.test(k))),
     createdAt: u.createdAt.toISOString(),
   };
 }

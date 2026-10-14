@@ -202,6 +202,9 @@ export class HttpApi implements Api {
   puniPicCandidates(body: Parameters<Api['puniPicCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['puniPicCandidates']>>>('POST', '/me/puni/pic/candidates', body);
   }
+  stickerArt(text: string) {
+    return this.req<{ id: string; url: string }>('POST', '/me/sticker/art', { text });
+  }
   butterflyCandidates(body: Parameters<Api['butterflyCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['butterflyCandidates']>>>('POST', '/me/butterfly/candidates', body);
   }

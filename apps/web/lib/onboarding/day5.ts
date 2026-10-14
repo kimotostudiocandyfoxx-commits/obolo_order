@@ -1,72 +1,88 @@
 import type { Step } from './script';
 
 /**
- * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
- * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
- * DAY 5 (was day 6) 【水星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-15).
- * Flow: [認証] → wake up on Jupiter → KIMORIN: rocket to Mercury (motion 6-1) → Mercury: a sea with
- * floating islands, land on one (6-2) → Mercury temple (6-3) → フリージー (KIMORIN's friend)
- * → "have you ever put your feelings on sound?" ある / ない → Mercury sea chart tutorial (the
- * client's design: islands per genre, swipe through songs) → countdown.
- * Motions 6-1…6-3 are not made yet (placeholder screen). Art: freezy.webp (client, 2026-10-05).
+ * DAY 5 【木星 → 水星】 — the story of 2026-10-14 (docs/story-rewrite/太陽まで_UI引き継ぎ.md §8, D06-S001〜S008).
+ * Mercury's play screen (D06-S005〜S007 were left to the UI): one of yesterday's two stickers becomes a
+ * song — {bati}'s lyric draft, touched up by the visitor, a feel, then {bati} sings it; the sticker is the
+ * record's jacket and spins while it plays; the song sails out as a ship (components/mercury/MercuryLesson.tsx;
+ * client 2026-10-14). Saves answers.song.
  */
 export const DAY5: Step[] = [
   { t: 'bgm', track: 'opening' },
+  { t: 'caption', text: '5日目' },
+  // D06-S001 木星の朝
   { t: 'still', image: 'jupiter-kaiser' },
-  { t: 'caption', text: '木星で目を覚ました' }, // ✏️
-  { t: 'sprite', image: 'kimorin-1' },
-  { t: 'say', who: 'KIMORIN', text: 'おはよう、よく眠れたか？' },
-  { t: 'say', who: 'KIMORIN', text: '今日は水星に行こう。\nロケットに乗れ！' },
-  { t: 'sprite', image: null },
-  { t: 'action', label: 'ロケットに乗る' }, // ✏️
-  { t: 'video', motion: '6-1' }, // ロケットで水星へ（動画・未着）
-  { t: 'video', motion: '6-2' }, // 水星：海に浮かぶ島に着陸（動画・未着）
-  { t: 'caption', text: '水星に到着した' }, // ✏️
-  { t: 'sprite', image: 'kimorin-3' },
-  { t: 'say', who: 'KIMORIN', text: '着いたケン！\n神殿は、あの島の上だ。' }, // ✏️
-  { t: 'sprite', image: null },
-  { t: 'action', label: '水星の神殿へ向かう' }, // ✏️
-  { t: 'video', motion: '6-3' }, // 水星の神殿へ（動画・未着）
+  { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
+  { t: 'say', who: '大根カイザー', text: 'おはようDA。よく眠れたかDA？' },
+  { t: 'say', who: '大根カイザー', text: '今日は水星DA。ロケットに乗るDA！' },
+  { t: 'say', who: 'KIMORIN', text: 'おはようございます。……もう、ロケットが待っていますね。' },
+  { t: 'action', label: 'ロケットに乗る' },
 
-  { t: 'sprite', image: 'freezy' },
-  { t: 'caption', text: 'フリージーが現れた' }, // ✏️
-  // ✏️ KIMORIN introduces his friend
-  { t: 'sprite', image: ['kimorin-1', 'freezy'] },
-  { t: 'say', who: 'KIMORIN', text: 'よっ、フリージー！\n今日は新入りを連れてきたケン。' },
-  { t: 'sprite', image: 'freezy' },
-  // client's lines
-  { t: 'say', who: 'フリージー', text: '音楽の惑星、水星へようこそ。\nよく来たな、{name}。' },
-  { t: 'say', who: 'フリージー', text: '自分の思いだったり、起こった出来事を\n音に乗っけたことはあるか？' },
-  {
-    t: 'choice',
-    key: 'music',
-    options: [
-      { label: 'ある', goto: 'mer-yes' },
-      { label: 'ない', goto: 'mer-no' },
-    ],
-  },
-  { t: 'label', id: 'mer-yes' },
-  { t: 'say', who: 'フリージー', text: 'ほう、なかなかやるな。' }, // ✏️
-  { t: 'goto', id: 'mer-power' },
-  { t: 'label', id: 'mer-no' },
-  { t: 'say', who: 'フリージー', text: 'そうか。なら今日が、はじめての日だ。' }, // ✏️
-  { t: 'label', id: 'mer-power' },
-  { t: 'say', who: 'フリージー', text: '実はな、音に乗っけると\n100倍のパワーを持つ。' },
-  { t: 'say', who: 'フリージー', text: '今日食べたラーメンが美味しかった。\n学校に遅刻しそうだ。' },
-  { t: 'say', who: 'フリージー', text: 'そんな自分の日常のことを、\n歌にしてみよう。' },
-  { t: 'say', who: 'フリージー', text: '……口で説明しても、わかりにくいよな。' },
-  { t: 'say', who: 'フリージー', text: 'よし、それでは\n実際に遊んでみよう。' },
+  // D06-S002 食べ物推理／氷の大陸に着陸
+  { t: 'sprite', image: null },
+  { t: 'se', sound: 'whoosh' },
+  { t: 'still', image: 's/rocket-space' },
+  { t: 'clock', on: true },
+  { t: 'se', sound: 'blip' },
+  { t: 'screen', open: true },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: 'OBOLO ORDERは全員、食べ物なんだ。' },
+  { t: 'say', who: 'KIMORIN', text: 'たこ焼き、大根ときて。次は、パスタ伯爵が、いるんだろう。' },
+  { t: 'say', who: 'MONBAN', text: '水星には…冷蔵庫の、フリージーが、いる…。' },
+  { t: 'screen', open: false },
+  { t: 'say', who: 'KIMORIN', text: 'やっぱり、冷蔵庫でしたか。' },
+  { t: 'still', image: 's/rocket-mercury' },
+  { t: 'say', who: 'KIMORIN', text: 'ロケットを着陸させようにも、全部、海やん。' },
+  { t: 'say', who: 'KIMORIN', text: 'どこに、ロケットを着陸させれば、いいのでしょう。' },
+  { t: 'say', who: 'KIMORIN', text: 'あそこは、凍っている。氷の大陸が、ある。' },
+  { t: 'say', who: 'KIMORIN', text: 'そこに、止めよう。' },
+  { t: 'sprite', image: null },
+  { t: 'se', sound: 'whoosh' },
+  { t: 'still', image: 's/mercury-ice' },
+  { t: 'caption', text: '水星に着いた' },
 
+  // D06-S003 冷蔵庫のフリージー
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: 'うー、寒い。やっぱ、冷えてるな。' },
+  { t: 'say', who: 'KIMORIN', text: 'もしかして、、、ということは、近くに、冷蔵庫いる？' },
+  { t: 'say', who: '？？？', text: 'その通りだ。' },
+  { t: 'sprite', image: ['freezy', 'kimorin-sun'] }, // 氷の上に、白い冷蔵庫が一台。ぶーん、と鳴っている
+  { t: 'caption', text: 'フリージーが現れた' },
+  { t: 'say', who: 'フリージー', text: '俺の氷の島に、何の用だ。' },
+  { t: 'say', who: 'KIMORIN', text: '俺たちは、ネオだ。' },
+  { t: 'say', who: 'フリージー', text: 'なんだ、ネオか。じゃあ、水星に遊びに来たってことだな。' },
+  { t: 'say', who: 'フリージー', text: 'ようこそ。俺は、フリージーだ。' },
+  { t: 'say', who: 'フリージー', text: '一緒に、水星で、遊んじゃおうぜ。' },
+
+  // D06-S005〜S007 水星の遊ぶ画面：シールから歌へ → ジャケットが回る → 最初の一隻
   { t: 'bgm', track: null },
   { t: 'sprite', image: null },
   { t: 'mercury' },
-
-  // ✏️ after playing
   { t: 'bgm', track: 'opening' },
-  { t: 'sprite', image: 'freezy' },
-  { t: 'say', who: 'フリージー', text: '{name}の日常も、立派な歌になる。\nまた聴かせてくれ。' },
-  { t: 'sprite', image: 'kimorin-8' },
-  { t: 'say', who: 'KIMORIN', text: '明日は金星だ。\n金星にも、オレの友達がいるケン！' },
+
+  // D06-S008 冷蔵庫の中の図／札6
+  { t: 'still', image: 'mercury-island' },
+  { t: 'sprite', image: ['freezy', '@bati'] },
+  { t: 'say', who: 'バティ', text: '船、まだ見えるかな！' },
+  { t: 'sprite', image: ['freezy', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: '{bati}、よく頑張りましたね。' },
+  { t: 'say', who: 'フリージー', text: '……今日は、ここまでにしよう。' }, // 細い腕で、自分の扉の取っ手をつかむ
+  { t: 'say', who: 'フリージー', text: '太陽が輪になる時の、OBOLONだ。オボロンは……' }, // 扉の内側に、太陽を囲む細い光の輪の図
+  { t: 'say', who: 'フリージー', text: '……おっと。これ以上は、喋らないほうがいいな。' },
+  { t: 'say', who: 'フリージー', text: 'いずれ、知ることになる。' },
+  { t: 'sprite', image: ['freezy', '@bati'] },
+  { t: 'say', who: 'バティ', text: 'いまの輪っかが、OBOLONなの？' },
+  { t: 'se', sound: 'chime' },
+  { t: 'seal', n: 6 }, // 謎の書の札6に「オボロンは……」の文字
+  { t: 'caption', text: '謎の書に、文字が浮かんだ' },
   { t: 'sprite', image: null },
+  { t: 'ticket', stamp: 'mercury' },
+  { t: 'caption', text: '切符に、水星のスタンプが押された' },
+  { t: 'sprite', image: ['kimorin-sun', '@bati'] },
+  { t: 'say', who: 'KIMORIN', text: '明日は、火星。' }, // 切符の最後の空いた欄を見て、丸いサングラスをかける
+  { t: 'say', who: 'バティ', text: '……いま、かっこつけた？' },
+  { t: 'say', who: 'KIMORIN', text: 'ええ。少し。' },
+  { t: 'sprite', image: null },
+  { t: 'caption', text: 'また明日' },
   { t: 'end' },
 ];

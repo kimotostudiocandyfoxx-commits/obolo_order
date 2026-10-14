@@ -9,9 +9,70 @@ import { VenusWorld } from '@/components/venus/VenusWorld';
 import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
+import { knownSealsOn, solvedSealsOn, stampsOn } from '@/components/onboarding/StoryExtras';
 import { neoForm } from '@obolo/shared';
-import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
+import { demoBati, demoStickerArt, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
+import type { LessonApi } from '@/lib/onboarding/lessonApi';
+import type { Made } from '@/lib/onboarding/made';
 import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** No server: Bati's drawings are drawn here, the song is the opening BGM, the MV a story clip. */
+const fakeLessonApi: LessonApi = {
+  stickerArt: async (text) => {
+    await wait(1500);
+    return { url: await demoStickerArt(text) };
+  },
+  uploadPhoto: async (blob) => ({ url: URL.createObjectURL(blob) }),
+  lyrics: async (words) => {
+    await wait(1500);
+    const line = (text: string) => ({ text, kana: text, notes: [] });
+    return {
+      title: words.slice(0, 12),
+      emoji: '🎵',
+      genre: 'pop',
+      mood: 'bright',
+      bpm: 112,
+      keyRoot: 0,
+      scale: 'major',
+      progression: [0, 4, 5, 3],
+      chords: ['C', 'G', 'Am', 'F'],
+      sections: [
+        { name: 'verse', lines: [line(words), line('きょうも、空を見上げてた')] },
+        { name: 'chorus', lines: [line('ころがれ、ころがれ、星まで'), line(words)] },
+      ],
+      instrumentalPrompt: '',
+      comment: 'できたよ！',
+      seconds: 60,
+    };
+  },
+  sing: async (d, onStage) => {
+    onStage?.('singing');
+    await wait(3000);
+    onStage?.(null);
+    return { id: 'preview-song', title: d.title, url: '/onboarding/bgm-opening.m4a' };
+  },
+  saveSong: async () => {},
+  mv: async (song) => {
+    await wait(4000);
+    return { id: 'preview-mv', url: '/onboarding/m3-3.mp4', poster: null, title: song.title };
+  },
+};
+
+/** What the earlier days made, for previewing a day on its own. */
+function previewMade(day: number): Made {
+  const kororins = ['きょうの空、ひろかった', 'ラーメンの湯気がきれい', 'くしゃみ三回'];
+  const stickers = [
+    { text: kororins[0], url: null },
+    { text: kororins[1], url: null },
+  ];
+  return {
+    kororins: day >= 4 ? kororins : undefined,
+    stickers: day >= 5 ? stickers : undefined,
+    song: day >= 6 ? { id: 'preview-song', title: 'きょうの空', url: '/onboarding/bgm-opening.m4a', jacket: null, words: kororins[0] } : undefined,
+    mv: day >= 7 ? { id: 'preview-mv', url: '/onboarding/m3-3.mp4', poster: null, title: 'きょうの空' } : undefined,
+  };
+}
 
 /**
  * /preview/play?day=N[&at=<step type>][&timeup=1] — plays one day's story from the start (or from its first
@@ -104,8 +165,12 @@ function PreviewPlay() {
           bati: day >= 3 ? 'ぽん' : undefined,
           batiImage: day >= 3 ? demoBati('ラーメン') : undefined,
           kimorinStar: day >= 3,
+          made: previewMade(day),
+          story: { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる' },
         }}
-        seals={{ known: day >= 2 ? [1, 7, 8, ...(day >= 4 ? [2] : [])] : [], solved: day >= 4 ? [2] : [] }}
+        lessonApi={fakeLessonApi}
+        seals={{ known: day >= 2 ? knownSealsOn(day) : [], solved: solvedSealsOn(day) }}
+        stamps={stampsOn(day)}
         timeUp={timeUp}
         onTimeUp={() => setEnded(true)}
         onNeoName={async () => {}}

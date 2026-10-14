@@ -107,7 +107,7 @@ export const DAY1: Step[] = [
   { t: 'notice', text: '謎の書は、いつでも開けます。\n残りの札は旅の中で文字が浮かび、答えは旅を進めると読めるようになります' },
   { t: 'say', who: 'OBOLON', text: '{name}。もし、宇宙に興味があるなら、、、' },
   { t: 'say', who: 'OBOLON', text: '明日、宇宙行きの切符を送る。' },
-  { t: 'say', who: 'MONBAN', text: 'それにもしORDERに入るなら…金もかかる。' },
+  { t: 'say', who: 'MONBAN', text: 'それにもしORDERになるなら…金もかかる。' },
   { t: 'say', who: 'MONBAN', text: '決めるのは…旅を見てからで、いい…。' },
   { t: 'say', who: 'MONBAN', text: '、、、そうだ。' },
   { t: 'say', who: 'MONBAN', text: '{inviter}から手紙を預かっている。受け取れ。' },

@@ -10,9 +10,12 @@ import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { NeoChooser } from './NeoChooser';
-import { JupiterTutorial } from '@/components/jupiter/JupiterTutorial';
-import { MarsTutorial } from '@/components/mars/MarsTutorial';
-import { MercuryTutorial } from '@/components/mercury/MercuryTutorial';
+import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
+import { MarsLesson } from '@/components/mars/MarsLesson';
+import { MercuryLesson } from '@/components/mercury/MercuryLesson';
+import type { LessonApi } from '@/lib/onboarding/lessonApi';
+import { madeFrom } from '@/lib/onboarding/made';
+import { FilmReel } from './FilmReel';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
@@ -28,6 +31,8 @@ import {
   RiddleBook,
   RiddleCards,
   SEALS,
+  type StampId,
+  TicketCard,
   TimeUpOverlay,
   unlockSfx,
   VoiceField,
@@ -71,6 +76,12 @@ interface Props {
   onNeoName?: (name: string) => Promise<void>;
   /** Riddle-book seals already known / solved on earlier days (this day's steps add to them). */
   seals?: { known: number[]; solved: number[] };
+  /** The planet lessons' server calls (stickers, lyrics, songs, MVs). */
+  lessonApi?: LessonApi;
+  /** The ticket's stamps from earlier days. */
+  stamps?: StampId[];
+  /** 'clock' steps: the day's 88 minutes run (on) or pause (off) — M-R22. */
+  onClock?: (on: boolean) => void;
   /**
    * The day's space time is over (88 minutes, SYS-S001): at the next calm moment MONBAN calls the
    * visitor back on Bluena's screen, then `onTimeUp`. Never during drawing, saving or paying.
@@ -86,7 +97,7 @@ const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 /** How far above the bottom the question stays while an input panel is open (px). */
 const PROMPT_LIFT: Record<string, number> = { name: 230, batiname: 230, neoname: 260, age: 270, egg: 300 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, seals, timeUp, onTimeUp, onPause, onEnd }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -112,6 +123,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   /** 'whiteout' step: the screen fades to white; the next scene fades in from it. */
   const [white, setWhite] = useState(false);
   const runRef = useRef<(from: number) => void>(() => {});
+  const varsRef = useRef(vars);
+  varsRef.current = vars;
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
   const placeholderTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -148,12 +161,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     age: answers.age ?? vars.age,
   };
   if (answers.neoName) v.neo = answers.neoName;
+  // what earlier days made, with today's pieces on top
+  const todayMade = madeFrom(undefined, answers);
+  v.made = { ...vars.made, ...Object.fromEntries(Object.entries(todayMade).filter(([, x]) => x !== undefined)) };
   // KIMORIN is "KIMORIN⭐︎" from his naming on the Moon (a day that starts later passes kimorinStar)
   const starAt = steps.findIndex((s) => s.t === 'say' && s.who === 'OBOLON' && s.text.includes('KIMORIN⭐︎。'));
   if (starAt >= 0 && i > starAt) v.kimorinStar = true;
   // the riddle book: seals known from earlier days + this day's
   const knownSeals = [...new Set([...(seals?.known ?? []), ...(answers.book ? DAY1_SEALS : []), ...Object.keys(answers).flatMap((k) => (/^seal\.\d$/.test(k) ? [Number(k.slice(5))] : []))])];
-  const solvedSeals = [...new Set([...(seals?.solved ?? []), ...knownSeals.filter((n) => answers[`seal.${n}`] && SEALS[n]?.answer)])];
+  const solvedSeals = [...new Set([...(seals?.solved ?? []), ...Object.keys(answers).flatMap((k) => (/^open\.\d$/.test(k) && SEALS[Number(k.slice(5))]?.answer ? [Number(k.slice(5))] : []))])];
+  // the ticket's stamps: earlier days' + this day's
+  const stampList = [...new Set([...(stamps ?? []), ...Object.keys(answers).flatMap((k) => (k.startsWith('stamp.') ? [k.slice(6) as StampId] : []))])];
   /** '@bati' / '@egg' / '@me' sprites are the visitor's own pictures ('@bati-weak': out of mana). */
   const spriteSrc = (n: string) =>
     !n ? null : n === '@bati' || n === '@bati-weak' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
@@ -207,6 +225,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           n++;
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
+        else if (s.t === 'branch') n = labelIndex(steps, s.cases[varsRef.current.story?.[s.key] ?? ''] ?? s.otherwise);
         else if (s.t === 'still') {
           setWhite(false);
           setStill(s.image);
@@ -225,6 +244,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           n++;
         } else if (s.t === 'screen') {
           setScreen(s.open);
+          n++;
+        } else if (s.t === 'clock') {
+          onClock?.(s.on);
           n++;
         } else if (s.t === 'pause') {
           // the day ends here; the saved progress points at the question to come back to
@@ -280,7 +302,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
       }
     },
-    [steps, playMedia, setI, onEnd, clearCaptions, onPause],
+    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock],
   );
   runRef.current = run;
 
@@ -361,6 +383,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (lastFx?.t === 'fx') setFx(lastFx.fx);
     const lastScreen = before.find((s) => s.t === 'screen');
     if (lastScreen?.t === 'screen') setScreen(lastScreen.open);
+    const lastClock = before.find((s) => s.t === 'clock');
+    if (lastClock?.t === 'clock') onClock?.(lastClock.on);
     const lastBack = before.find((s) => s.t === 'still' || s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo' || s.t === 'black');
     const onStill = lastBack?.t === 'still';
     if (lastBack?.t === 'still') {
@@ -369,7 +393,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
     const lastSprite = before.find((s) => s.t === 'sprite' || s.t === 'video');
     if (lastSprite?.t === 'sprite') setSprite(lastSprite.image);
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'se', 'fx', 'screen', 'pause'].includes(cur.t)) {
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'se', 'fx', 'screen', 'pause', 'clock', 'branch'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -512,15 +536,66 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bati={v.bati || 'バティ'}
           neo={v.neo || v.name}
           batiImage={v.batiImage}
-          onDone={(choice) => {
-            remember('f_d04_kororin', choice);
+          onDone={(made) => {
+            // the day's kororins (their words) — Jupiter turns two of them into stickers tomorrow
+            remember('f_d04_kororin', made.length ? 'try' : 'skip');
+            remember('kororins', JSON.stringify(made));
             run(iRef.current + 1);
           }}
         />
       )}
-      {started && step?.t === 'jupiter' && <JupiterTutorial onDone={next} />}
-      {started && step?.t === 'mercury' && <MercuryTutorial onDone={next} />}
-      {started && step?.t === 'mars' && <MarsTutorial onDone={next} />}
+      {started && step?.t === 'jupiter' && lessonApi && (
+        <JupiterLesson
+          api={lessonApi}
+          kororins={v.made?.kororins ?? []}
+          neo={v.neo || v.name}
+          bati={v.bati || 'バティ'}
+          batiImage={v.batiImage}
+          onDone={(stickers) => {
+            remember('stickers', JSON.stringify(stickers));
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'mercury' && lessonApi && (
+        <MercuryLesson
+          api={lessonApi}
+          stickers={v.made?.stickers ?? []}
+          neo={v.neo || v.name}
+          bati={v.bati || 'バティ'}
+          batiImage={v.batiImage}
+          onDone={(song) => {
+            remember('song', JSON.stringify(song));
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'mars' && lessonApi && (
+        <MarsLesson
+          api={lessonApi}
+          song={v.made?.song ?? null}
+          neo={v.neo || v.name}
+          bati={v.bati || 'バティ'}
+          batiImage={v.batiImage}
+          onDone={(mv) => {
+            remember('mv', JSON.stringify(mv));
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'made' && step.what === 'film' && <FilmReel made={v.made ?? {}} neo={v.neo || v.name} muted={muted} onDone={next} />}
+      {started && step?.t === 'made' && step.what === 'mv' && (
+        <button className="absolute inset-0 z-[12] flex flex-col items-center justify-center bg-black/55 px-4" onClick={next}>
+          <div className="w-full max-w-lg animate-[fadeUp_0.6s_ease-out] rounded-xl border-[6px] border-[#2a2a2a] bg-black shadow-[0_0_80px_rgba(255,120,80,0.45)]">
+            {v.made?.mv ? (
+              <video src={v.made.mv.url} poster={v.made.mv.poster ?? undefined} autoPlay playsInline controls muted={muted} className="aspect-video w-full object-contain" />
+            ) : (
+              <div className="flex aspect-video w-full items-center justify-center text-amber-100/70">夕焼け</div>
+            )}
+          </div>
+          <span className="pb-safe absolute bottom-6 text-xs tracking-widest text-white/50">TAP</span>
+        </button>
+      )}
       {started && step?.t === 'venus' && <VenusTutorial onDone={next} />}
       {started && step?.t === 'order' && orderApi && (
         <EclipsePay api={orderApi} paid={!!ordered} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
@@ -593,10 +668,21 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'seal' && (
         <RiddleBook
           known={[...new Set([...knownSeals, step.n])]}
-          solved={[...new Set([...solvedSeals, step.n])]}
+          solved={step.open ? [...new Set([...solvedSeals, step.n])] : solvedSeals}
           fresh={step.n}
           onClose={() => {
-            remember(`seal.${step.n}`, '1');
+            remember(step.open ? `open.${step.n}` : `seal.${step.n}`, '1');
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'ticket' && (
+        <TicketCard
+          stamps={stampList}
+          fresh={step.stamp}
+          flip={step.flip}
+          onDone={() => {
+            if (step.stamp) remember(`stamp.${step.stamp}`, '1');
             run(iRef.current + 1);
           }}
         />

@@ -264,7 +264,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       <Panel>
         <Obolon>どんな姿にしたい？</Obolon>
         <p className="mt-2 rounded-xl bg-white/5 p-3 text-[11px] leading-relaxed text-white/60">
-          声か文字で伝えるか、画像を選んでください。好きなキャラや絵でもかまいません（自分の顔写真でなくていい）。画像は参考に読むだけで、保存はしません。そっくりそのままの姿にはならず、あなただけの姿に描きかえます。
+          声か文字で伝えるか、画像を選んでください。好きな雰囲気の絵や写真でもかまいません。人の顔写真や、ほかの作品のキャラそのものは使えません。画像は参考に読むだけで、保存はしません。
         </p>
         <div className="mt-3">
           <VoiceField value={draft.words} onChange={(w) => save({ ...draft, words: w })} placeholder="例：星の杖を持った、青いオオカミ" maxLength={120} multiline />

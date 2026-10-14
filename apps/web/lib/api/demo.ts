@@ -38,7 +38,7 @@ import {
   type SaturnProfileView,
   type PuniPicResult,
 } from '@obolo/shared';
-import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
+import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
 import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
@@ -623,12 +623,13 @@ export class DemoApi implements Api {
   }
 
   async completeJourneyDay(day: number, answers?: Record<string, string>) {
-    void answers;
     return this.patchMe((u) => {
       if (u.journeyDay !== day || u.journeyCompletedAt) return {};
-      // day 9 (the Eclipse day) ends only after paying
+      // the Eclipse day ends only after paying
       if (day === JOURNEY_PAYMENT && !u.orderedAt) throw new ApiError(402, 'ORDER_REQUIRED', 'not paid');
-      return { journeyCompletedAt: now() };
+      // what was made today, for the next days' stories (like the server's onboardingJson)
+      const story = { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`d${day}.${k}`, v])) };
+      return { journeyCompletedAt: now(), story };
     });
   }
 
@@ -707,6 +708,11 @@ export class DemoApi implements Api {
   }
 
   // demo: the butterflies cut from the Jupiter mock stand in for painted candidates
+  async stickerArt(text: string) {
+    await new Promise((r) => setTimeout(r, 1500));
+    return { id: uid(), url: demoStickerArt(text) };
+  }
+
   async butterflyCandidates(): Promise<PuniPicResult> {
     await sleep(900);
     const all = ['kitsune', 'usagi', 'onigiri', 'pen_lady', 'wani_queen', 'samurai806'].sort(() => Math.random() - 0.5).slice(0, 2);

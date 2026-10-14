@@ -168,6 +168,8 @@ export interface Api {
   /** Jupiter: 🦋 蝶を描いてもらう (2 painted candidates, 3 tries a day) */
   butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   chooseButterfly(mediaId: string | null): Promise<Me>;
+  /** Jupiter (first journey): Bati draws a sticker's picture from its words (kept only for you). */
+  stickerArt(text: string): Promise<{ id: string; url: string }>;
 
   // Jupiter — パタパタ
   jupiterSky(tab: 'all' | 'following' | 'friends'): Promise<JupiterFlyer[]>;

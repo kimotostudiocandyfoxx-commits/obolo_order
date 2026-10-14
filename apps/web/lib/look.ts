@@ -185,3 +185,12 @@ export async function demoRefine(url: string, instruction: string, n: number): P
   g.fillText('✦', 430, 70);
   return c.toDataURL('image/jpeg', 0.82);
 }
+
+/** Demo stand-in for Bati's sticker picture: a round painted-looking sticker in a colour of the words. */
+export function demoStickerArt(text: string): string {
+  const h = [...text].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 11) % 360;
+  const emoji = pick(FOODS, text, '') || ['🌙', '🌊', '🌸', '⭐', '🍀', '🎈', '🔥', '☁️'][h % 8];
+  return svgUrl(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><radialGradient id="s" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="hsl(${h},85%,88%)"/><stop offset="1" stop-color="hsl(${(h + 40) % 360},65%,58%)"/></radialGradient></defs><rect width="512" height="512" fill="#fff"/><circle cx="256" cy="256" r="236" fill="#fff" stroke="#eee" stroke-width="6"/><circle cx="256" cy="256" r="214" fill="url(#s)"/><circle cx="190" cy="180" r="40" fill="#fff" opacity=".35"/><text x="256" y="290" font-size="190" text-anchor="middle" dominant-baseline="middle">${emoji}</text></svg>`,
+  );
+}

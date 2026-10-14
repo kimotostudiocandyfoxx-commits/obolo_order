@@ -95,6 +95,15 @@ export function neoMorePrompt(variant: number): string {
   return `${STYLE} Draw a new variation of the character in the attached image: keep its feel, animal, colours and art style, but change details (pose, small accessories, expression, outfit details). ${lean(variant)} Pose: ${POSES[variant % POSES.length]}. ${ORIGINAL}`;
 }
 
+/** Jupiter (first journey): Bati draws a sticker's picture from its words (a round sticker, no letters). */
+export function stickerArtPrompt(words: string): string {
+  return (
+    'A round illustrated sticker on a plain white background: warm, soft hand-painted storybook style, gentle colours, ' +
+    `one simple cute scene that shows this feeling or moment: "${words}". ` +
+    'Fill the circle, a thin white sticker border around it. No text, no letters, no numbers, no logo, no watermark. Do not draw real people or their faces.'
+  );
+}
+
 /** Day 4: the newborn Bati, a small round creature inspired by the visitor's favourite food. */
 export function batiPrompt(food: string): string {
   return `${STYLE} The character is a newborn magical partner creature called Bati: small, round and chubby, with big sparkling eyes, whose body, colors and accessories are inspired by "${food}". It looks friendly and happy, as if it just hatched from an egg (a few eggshell pieces nearby).`;

@@ -35,6 +35,12 @@ export interface Me {
   puniPic: string | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */
   butterfly: string | null;
+  /**
+   * What the member made and chose on each journey day, as saved with the day ("d3.kororins",
+   * "d4.stickers", "d5.song" …): the next day's story picks them up (Jupiter's stickers from Saturn's
+   * kororins, Mercury's song from a sticker, Mars's MV from the song).
+   */
+  story?: Record<string, string>;
   createdAt: string;
 }
 
