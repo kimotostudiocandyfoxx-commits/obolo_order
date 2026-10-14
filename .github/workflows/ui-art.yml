@@ -2,11 +2,12 @@ name: UI art
 
 # UI art (client request 2026-10-12): the pictures listed in design/ui-art-queue.json are
 # painted with Seedream 5.0 Pro and saved under apps/web/public (see scripts/ui-art/paint.mjs).
+# The story's backgrounds and items (design/story-art-queue.json → public/onboarding/s) go the same way.
 on:
   workflow_dispatch:
   push:
     branches: ['claude/**', main]
-    paths: ['design/ui-art-queue.json']
+    paths: ['design/ui-art-queue.json', 'design/story-art-queue.json']
 
 concurrency:
   group: ui-art-${{ github.ref }}
@@ -40,12 +41,13 @@ jobs:
           export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
           node scripts/ui-art/paint.mjs
+          node scripts/ui-art/paint.mjs design/story-art-queue.json
       - name: Save the pictures to the branch
         if: always()
         run: |
           git config user.name "ui-art"
           git config user.email "ui-art@users.noreply.github.com"
-          git add -f apps/web/public/dj/art
+          git add -f apps/web/public/dj/art apps/web/public/onboarding/s design/ui-art-queue.json design/story-art-queue.json
           git diff --cached --quiet && exit 0
           git commit -m "UI art: new pictures [skip ci]"
           for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

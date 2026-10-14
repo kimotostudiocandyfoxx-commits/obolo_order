@@ -4,8 +4,12 @@
  * from — the Venus DJ's jog wheel, knob caps, metal, backdrop… Run by .github/workflows/ui-art.yml when
  * design/ui-art-queue.json changes.
  *
- * Each queue item: { id, prompt, w, h, size: [w, h] } — painted at w×h, saved at `size` (nothing above
- * 720p, docs/media.md) as apps/web/public/<dir>/<id>.jpg. An id is painted once; "redo": [ids] repaints.
+ * Each queue item: { id, prompt, w, h, size: [w, h], refs?: [paths] } — painted at w×h, saved at `size`
+ * (nothing above 720p, docs/media.md) as apps/web/public/<dir>/<id>.jpg. An id is painted once; "redo": [ids]
+ * repaints. `refs` (or the queue's own `refs`) are style / character reference images.
+ *
+ *   node scripts/ui-art/paint.mjs [queue file]   (default design/ui-art-queue.json; the story uses
+ *   design/story-art-queue.json)
  */
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
@@ -14,11 +18,16 @@ import { join } from 'node:path';
 
 const KEY = process.env.SEEDREAM_API_KEY;
 if (!KEY) throw new Error('SEEDREAM_API_KEY is not set');
-const queue = JSON.parse(readFileSync('design/ui-art-queue.json', 'utf8'));
+const QUEUE = process.argv[2] ?? 'design/ui-art-queue.json';
+const queue = JSON.parse(readFileSync(QUEUE, 'utf8'));
+const mime = (p) => (/\.png$/i.test(p) ? 'image/png' : /\.webp$/i.test(p) ? 'image/webp' : 'image/jpeg');
+const dataUri = (p) => `data:${mime(p)};base64,${readFileSync(p).toString('base64')}`;
 const OUT = join('apps/web/public', queue.dir ?? 'ui-art');
 mkdirSync(OUT, { recursive: true });
 const redo = new Set(queue.redo ?? []);
 const todo = queue.items.filter((x) => redo.has(x.id) || !existsSync(join(OUT, `${x.id}.jpg`)));
+
+const refsOf = (x) => (x.refs ?? queue.refs ?? []).filter(existsSync);
 
 async function paint(x) {
   const res = await fetch('https://api.runware.ai/v1', {
@@ -36,6 +45,7 @@ async function paint(x) {
         outputType: 'URL',
         outputFormat: 'JPG',
         includeCost: true,
+        ...(refsOf(x).length ? { referenceImages: refsOf(x).map(dataUri) } : {}),
       },
     ]),
     signal: AbortSignal.timeout(300_000),
@@ -64,6 +74,8 @@ await Promise.all(
     }
   }),
 );
+// redo is done once: clear it so the next run does not paint the same again
+if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
 const report = [`# UI art — ${new Date().toISOString()}`, '', `Seedream 5.0 Pro / ${todo.length}枚 / 約${Math.round(yen)}円`, '', ...log.sort(), ''].join('\n');
 writeFileSync(join(OUT, 'last-run.md'), report);
 console.log(report);
