@@ -1,5 +1,5 @@
 {
-  "note": "物語（一周目1〜3日目）の背景・持ち物・立ち絵（Seedream 5.0 Pro）。id ごとに1回だけ描く。描き直しは redo に id を足す。保存先 apps/web/public/onboarding/s/<id>.jpg。kimorin-* は灰色の背景で描いて、あとで切り抜いて onboarding/<id>.webp にする",
+  "note": "物語（一周目1〜7日目）の背景・持ち物・立ち絵（Seedream 5.0 Pro）。id ごとに1回だけ描く。描き直しは redo に id を足す。保存先 apps/web/public/onboarding/s/<id>.jpg。kimorin-* は灰色の背景で描いて、あとで切り抜いて onboarding/<id>.webp にする",
   "dir": "onboarding/s",
   "refs": [
     "design/story/refs/style-obolon-temple.jpg",
