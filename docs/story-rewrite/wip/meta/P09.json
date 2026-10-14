@@ -560,7 +560,7 @@
   "（第17稿）静かなピンポン♪（本当にいい時）はP09で0回になった（旧L2-RETURN-S002の1回を削除）。全編5回以下の配分（decisions_round8 D-3）の数え直しは通し点検で",
   "（第17稿）付録（appendix.md）のフラグ表から f_l2_uranus_arrive／f_l2_uranus_scroll／f_l2_neptune_compass／f_l2_return_arrive／f_l2_return_button／f_l2_return_watch／f_l2_return_pin／f_l2_return_peace を外し、f_l2_neptune_route1（slope/river/tako）・route2（right/left）の値を更新する必要（統合担当）",
   "（第18稿）付録（appendix.md）のフラグ表から f_l2_want を外す必要（統合担当）。EX-NEPTUNE-S001のsceneID欄の「P09 L2-NEPTUNE-S002（エンドロールの右に曲がった鉛筆の字）」の参照は、エンドロールの字を削除したので外す必要（EX担当）",
-  "（第20稿M-R28）f_minna_open は L2-RETURN-S008 で立てなくなった。三周目のはじめ（L3-RECORDER-S001の前後）で立てる必要（P11側の担当）。f_invite_entry_open もS008では立てない（土星から使える・P05はフラグなし）。付録のフラグ表・解放時期の表（appendix.md）の更新は統合担当",
+  "（第20稿M-R28）f_minna_open は L2-RETURN-S008 で立てなくなった。三周目のはじめ（L3-RECORDER-S001の前後）で立てる必要（P11側の担当）。【第20稿通し点検：P11 L3-RECORDER-S001で立てる形に設置済み】f_invite_entry_open もS008では立てない（土星から使える・P05はフラグなし）。付録のフラグ表・解放時期の表（appendix.md）の更新は統合担当",
   "（第20稿M-R28）{inviter}は自動ではダチにならない前提で書いた（L2-EARTH-S001でダチはKIMORIN⭐︎だけ）。招待してくれた人を最初からダチにするかは利用者確認"
  ],
  "sceneMerges": [

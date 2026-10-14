@@ -100,7 +100,8 @@
    ],
    "flags": [
     "f_l3_rec_seed",
-    "f_l3_rec_review"
+    "f_l3_rec_review",
+    "f_minna_open（＝true。三周目の入口で「みんな」「フォロー」を解放。第20稿M-R28でP09 L2-RETURN-S008から移した）"
    ],
    "saveEvents": [
     "種の選択を非公開で記録（変更可）。"
