@@ -133,7 +133,7 @@ const hueOf = (text: string, fallback: number) => {
 };
 
 /** Demo stand-in for a look made from a reference: the picture as an emblem on a hooded robe. */
-export async function demoFromReference(refUrl: string, a: { liked: string; twist: string }, variant: number): Promise<string> {
+export async function demoFromReference(refUrl: string, a: { liked?: string; twist?: string }, variant: number): Promise<string> {
   const img = await loadImage(refUrl);
   const c = document.createElement('canvas');
   c.width = c.height = 512;
@@ -142,7 +142,7 @@ export async function demoFromReference(refUrl: string, a: { liked: string; twis
   g.fillRect(0, 0, 512, 512);
   g.fillStyle = '#fff';
   for (let k = 0; k < 24; k++) g.fillRect((k * 97 + variant * 31) % 512, (k * 53 + variant * 17) % 300, 2, 2);
-  const hue = (hueOf(a.twist, 260) + variant * 25) % 360;
+  const hue = (hueOf(a.twist ?? '', 260) + variant * 25) % 360;
   g.fillStyle = `hsl(${hue},60%,40%)`;
   g.strokeStyle = `hsl(${(hue + 40) % 360},80%,70%)`;
   g.lineWidth = 8;

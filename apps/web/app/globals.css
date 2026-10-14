@@ -510,3 +510,18 @@ body {
   from { transform: scale(1.02) translate(0, 0); }
   to { transform: scale(1.08) translate(-1.5%, -1%); }
 }
+
+/* Saturn sky: kororins circling as a ring (a tilted ellipse, nearer ones bigger) */
+@keyframes kororinOrbit {
+  0% { transform: translate(0, -14svh) scale(0.7); z-index: 0; }
+  25% { transform: translate(44vw, 0) scale(1); }
+  50% { transform: translate(0, 14svh) scale(1.25); z-index: 2; }
+  75% { transform: translate(-44vw, 0) scale(1); }
+  100% { transform: translate(0, -14svh) scale(0.7); }
+}
+/* one kororin falls down to your feet */
+@keyframes kororinDrop {
+  0% { transform: translate(-50%, -50svh) scale(0.4); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(-50%, 0) scale(1); }
+}

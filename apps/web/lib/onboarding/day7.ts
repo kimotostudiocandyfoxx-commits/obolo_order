@@ -1,7 +1,9 @@
 import type { Step } from './script';
 
 /**
- * DAY 9 【エクリプス】 — client's script (2026-10-06) + provisional lines by Claude (✏️, P-OB-19).
+ * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
+ * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
+ * DAY 7 (was day 9) 【エクリプス】 — client's script (2026-10-06) + provisional lines by Claude (✏️, P-OB-19).
  * Flow: [認証] → wake up on Venus → KIMORIN: today, Pluto! → "あ、ちょっと待って" — Bati is weak:
  * it lives on the Sun's power "mana" and used it up on the planets → back to the society's HQ on
  * Earth (motion 9-1, not made yet; then Day 1's HQ motions 6 / 7 / 9) → MONBAN: "おかえり" →
@@ -12,7 +14,7 @@ import type { Step } from './script';
  * start — feel it" → fade to white → back at HQ: "旅の続きは明日から。また明日！" → countdown → ORDER.
  * "もう少し考える" brings MONBAN's question back.
  */
-export const DAY9: Step[] = [
+export const DAY7: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'still', image: 'mars-city' },
   { t: 'caption', text: '火星で目を覚ました' }, // ✏️ Venus left the journey (2026-10-07): the day starts on Mars

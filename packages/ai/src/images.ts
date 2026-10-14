@@ -62,10 +62,37 @@ const STYLE =
   'single character, full body, centered, facing the viewer, on a deep starry night-sky background with a faint glow. ' +
   'Square image. No text, no letters, no logo, no watermark.';
 
-/** Day 3: the visitor's OBOLO NEO look from three answers. */
-export function neoLookPrompt(a: { animal: string; color: string; mood: string }, variant: number): string {
-  const poses = ['standing proudly', 'waving one paw', 'with a small cape fluttering', 'holding a tiny glowing star'];
-  return `${STYLE} The character is an anthropomorphic ${a.animal} apprentice of a secret society, wearing a hooded robe whose main color is ${a.color}. Mood and vibe: ${a.mood}. Pose: ${poses[variant % poses.length]}.`;
+/**
+ * The water basin always shows four looks (story 2026-10-14): two boyish and two girlish — the story
+ * never asks for a gender. `variant` 0–1 = boyish, 2–3 = girlish.
+ */
+const POSES = ['standing proudly', 'waving one hand', 'with a small cape fluttering', 'holding a tiny glowing star'];
+const lean = (variant: number) =>
+  variant % 4 < 2 ? 'The character has a boyish look (face, hair and outfit read as a boy).' : 'The character has a girlish look (face, hair and outfit read as a girl).';
+const neo = (variant: number) => `The character is a young apprentice of a secret society (an "OBOLO NEO"), wearing a hooded robe. ${lean(variant)} Pose: ${POSES[variant % POSES.length]}.`;
+const any = (v: string | undefined, d: string) => (!v || /おまかせ/.test(v) ? d : v);
+
+/** Day 2: the visitor's OBOLO NEO look from OBOLON's questions (animal, colours, mood, what they are into). */
+export function neoLookPrompt(a: { animal: string; color: string; mood: string; hobby?: string }, variant: number): string {
+  const hobby = a.hobby && !/パス/.test(a.hobby) ? ` They are into ${a.hobby}: show it as one small item or accent they carry.` : '';
+  return `${STYLE} ${neo(variant)} The character is an anthropomorphic ${any(a.animal, 'animal of your choice')}; the robe's main colours are ${any(a.color, 'colours of your choice')}. Mood and vibe: ${any(a.mood, 'your choice')}.${hobby}`;
+}
+
+/** Day 2: in the visitor's own words. */
+export function neoWordsPrompt(words: string, variant: number): string {
+  return `${STYLE} ${neo(variant)} The visitor describes the look they want in their own words: "${words}". Follow it closely. ${ORIGINAL}`;
+}
+
+/** Day 2: おまかせ — the basin draws freely. */
+export function neoOmakasePrompt(variant: number): string {
+  const animals = ['fox', 'cat', 'rabbit', 'owl', 'wolf', 'bear', 'small dragon', 'deer'];
+  const colours = ['deep blue and silver', 'crimson and gold', 'violet and white', 'emerald and black', 'warm orange and cream'];
+  return `${STYLE} ${neo(variant)} The character is an anthropomorphic ${animals[(variant * 3 + Date.now()) % animals.length]} in ${colours[(variant + Date.now()) % colours.length]}. Make it charming and surprising.`;
+}
+
+/** Day 2: "この感じで、もっと見る" — four new looks close to the attached one. */
+export function neoMorePrompt(variant: number): string {
+  return `${STYLE} Draw a new variation of the character in the attached image: keep its feel, animal, colours and art style, but change details (pose, small accessories, expression, outfit details). ${lean(variant)} Pose: ${POSES[variant % POSES.length]}. ${ORIGINAL}`;
 }
 
 /** Day 4: the newborn Bati, a small round creature inspired by the visitor's favourite food. */
@@ -82,9 +109,10 @@ const ORIGINAL =
  * Day 3 (client decision 2026-10-05): start from a reference image the visitor likes. KIMORIN asks
  * which part they love (`liked`) and what twist makes it theirs (`twist`), so only elements are taken.
  */
-export function neoFromReferencePrompt(a: { liked: string; twist: string }, variant: number): string {
-  const poses = ['standing proudly', 'waving one hand', 'with a small cape fluttering', 'holding a tiny glowing star'];
-  return `${STYLE} Use the attached image ONLY as loose inspiration for this element: "${a.liked}". ${ORIGINAL} Add this personal twist: "${a.twist}". The character is an apprentice of a secret society wearing a hooded robe. Pose: ${poses[variant % poses.length]}.`;
+export function neoFromReferencePrompt(a: { liked?: string; twist?: string }, variant: number): string {
+  const liked = a.liked ? `ONLY as loose inspiration for this element: "${a.liked}"` : 'ONLY as loose inspiration (colours, motifs, mood)';
+  const twist = a.twist ? ` Add this personal twist: "${a.twist}".` : '';
+  return `${STYLE} Use the attached image ${liked}. ${ORIGINAL}${twist} ${neo(variant)}`;
 }
 
 /** Day 3: refine the chosen look with one instruction ("bluer", "longer ears"…). */

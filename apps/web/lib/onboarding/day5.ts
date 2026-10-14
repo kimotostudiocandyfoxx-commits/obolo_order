@@ -1,14 +1,16 @@
 import type { Step } from './script';
 
 /**
- * DAY 6 【水星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-15).
+ * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
+ * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
+ * DAY 5 (was day 6) 【水星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-15).
  * Flow: [認証] → wake up on Jupiter → KIMORIN: rocket to Mercury (motion 6-1) → Mercury: a sea with
  * floating islands, land on one (6-2) → Mercury temple (6-3) → フリージー (KIMORIN's friend)
  * → "have you ever put your feelings on sound?" ある / ない → Mercury sea chart tutorial (the
  * client's design: islands per genre, swipe through songs) → countdown.
  * Motions 6-1…6-3 are not made yet (placeholder screen). Art: freezy.webp (client, 2026-10-05).
  */
-export const DAY6: Step[] = [
+export const DAY5: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'still', image: 'jupiter-kaiser' },
   { t: 'caption', text: '木星で目を覚ました' }, // ✏️

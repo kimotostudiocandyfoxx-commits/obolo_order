@@ -2,11 +2,40 @@
  * Story script engine types. The scripts themselves (day1.ts, later day2.ts …) are plain data so the
  * wording, order and motions can be changed without touching the player.
  *
- * Text placeholders: {name} = the name the visitor told OBOLON, {inviter} = who invited them.
+ * Text placeholders: {name} = the name the visitor told OBOLON, {inviter} = who invited them, {age} = times round
+ * the Sun, {neo} = the NEO name, {food} = the favourite food, {bati} = the Bati's name.
  */
 import type { MotionId } from './media';
 
-export type Speaker = 'MONBAN' | 'OBOLON' | 'KIMORIN' | 'たこ焼きブラザー' | 'たこ焼きシスター' | '大根カイザー' | 'フリージー' | 'ヒポキン' | 'ロングG' | 'ハットG' | 'ボスG' | 'バティ';
+export type Speaker =
+  | 'MONBAN'
+  | 'OBOLON'
+  | 'KIMORIN'
+  | 'たこ焼きブラザー'
+  | 'たこ焼きシスター'
+  | '大根カイザー'
+  | 'フリージー'
+  | 'ヒポキン'
+  | 'ロングG'
+  | 'ハットG'
+  | 'ボスG'
+  | 'バティ'
+  | 'うんちピンポンくん'
+  | 'コロリン';
+
+/** Synthesised sound effects (lib/story/sfx.ts presets). */
+export type SoundFx = 'sparkle' | 'chime' | 'bell' | 'gong' | 'magic' | 'whoosh' | 'pop' | 'boing' | 'knock' | 'ding' | 'heartbeat' | 'blip' | 'thud';
+
+/** Picture effects drawn over the background ('fx' steps). */
+export type PictureFx =
+  /** Saturn: KIMORIN⭐︎'s kororin (a takoyaki with KIMORIN's face) */
+  | 'kimorin-kororin'
+  /** Saturn: the residents' kororins circle the sky as a ring */
+  | 'ring'
+  /** …one falls down to your feet */
+  | 'ring-drop'
+  /** …and gets a ☆ (the count is never shown) */
+  | 'ring-star';
 
 export type Step =
   /**
@@ -45,28 +74,51 @@ export type Step =
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: MotionId }
-  /** Narration line (e.g. "MONBANが現れた"). Tap to continue. */
+  /** テロップ: a short line in the middle of the screen (e.g. "MONBANが現れた"). Never spoken. Tap to continue. */
   | { t: 'caption'; text: string }
+  /** 〔画面：…〕 a short guidance note about how something works (e.g. the riddle book). Tap to continue. */
+  | { t: 'notice'; text: string }
   /** Character line. Tap to continue. */
   | { t: 'say'; who: Speaker; text: string }
   /** A single button the visitor must press ("封を開く"). */
   | { t: 'action'; label: string }
-  /** Several buttons. The answer is saved under `key`; `goto` jumps to a label. */
-  | { t: 'choice'; key: string; options: { label: string; goto?: string }[] }
-  /** Name input (Day 1: creates the account from the invitation; Day 3: the NEO name). */
+  /**
+   * Several buttons. The answer is saved under `key`; `goto` jumps to a label. `prompt` is shown above
+   * the buttons (a confirmation, e.g. "この姿と名前を…保存します").
+   */
+  | { t: 'choice'; key: string; options: { label: string; goto?: string }[]; prompt?: string }
+  /** Name input (Day 1: creates the account from the invitation). */
   | { t: 'name'; placeholder: string; submit: string }
+  /** Day 1: how many times you went round the Sun (age, optional). 「言わない」 jumps to `skip`. Saved as answers.age. */
+  | { t: 'age'; skip: string }
+  /** Day 2: the name as an OBOLO NEO ({neo}); it becomes the display name. */
+  | { t: 'neoname'; placeholder: string; submit: string }
+  /** Day 1: the eight riddle cards rise in a ring, 1・7・8 get their words, and they become the riddle book. */
+  | { t: 'riddles' }
+  /** The riddle book opens and seal `n` gets its words (Day 3: 2 「OBOLO ORDERは全員」→「表現者」). */
+  | { t: 'seal'; n: number }
+  /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */
+  | { t: 'screen'; open: boolean }
+  /** A sound effect (synthesised). Continues immediately. */
+  | { t: 'se'; sound: SoundFx }
+  /** A picture effect over the background (null = clear). Continues immediately. */
+  | { t: 'fx'; fx: PictureFx | null }
+  /** Saturn: murmur to the Bati → it makes a kororin → tap it to hear it → fly it to your own room. */
+  | { t: 'kororin' }
+  /** Ends the day here (「やめておく」, Day 2). The next visit starts again at the label `resume`. */
+  | { t: 'pause'; resume: string }
   /** Choose one of the eight OBOLO NEO forms (Day 3). Saved on the account. Fallback for 'look'. */
   | { t: 'neo' }
-  /** Day 3: three questions → four generated OBOLO NEO looks → choose one (or a preset form). */
+  /** Day 2: OBOLON's questions / own words or a picture / おまかせ → the water basin's four looks → choose one. */
   | { t: 'look' }
-  /** Day 3: the favourite food → the Bati egg. */
-  | { t: 'egg' }
-  /** Day 4: the egg hatches (the Bati image is generated meanwhile). */
+  /** The favourite food → the Bati (Day 2: the food is given to the egg on the altar). */
+  | { t: 'egg'; submit?: string }
+  /** The egg hatches (the Bati image is generated meanwhile). */
   | { t: 'hatch' }
-  /** Day 4: name the newborn Bati. */
+  /** Name the newborn Bati. */
   | { t: 'batiname'; placeholder: string; submit: string }
   /**
-   * Day 9: the Eclipse payment (¥88/month, Stripe inside the story). Continues once paid;
+   * The Eclipse day (7): the payment (¥88/month, Stripe inside the story). Continues once paid;
    * "もう少し考える" jumps to the `cancel` label.
    */
   | { t: 'order'; cancel: string }
@@ -86,6 +138,10 @@ export interface TimedCaption {
 
 export interface StoryVars {
   name: string;
+  /** Times round the Sun ({age}). */
+  age?: string;
+  /** KIMORIN is shown as "KIMORIN⭐︎" (his NEO name, from the Moon's naming on). */
+  kimorinStar?: boolean;
   inviter: string;
   /** Name of the chosen OBOLO NEO form ({neo}). */
   neo?: string;
@@ -102,7 +158,15 @@ export function fill(text: string, v: StoryVars): string {
     .replaceAll('{inviter}', v.inviter || '…')
     .replaceAll('{neo}', v.neo || '…')
     .replaceAll('{bati}', v.bati || 'バティ')
-    .replaceAll('{food}', v.batiFood || '…');
+    .replaceAll('{food}', v.batiFood || '…')
+    .replaceAll('{age}', v.age || '…');
+}
+
+/** The name shown on a line: the Bati's own name, KIMORIN⭐︎ after his naming. */
+export function speakerName(who: Speaker, v: StoryVars): string {
+  if (who === 'バティ') return v.bati || 'バティ';
+  if (who === 'KIMORIN' && v.kimorinStar) return 'KIMORIN⭐︎';
+  return who;
 }
 
 export function labelIndex(steps: Step[], id: string): number {

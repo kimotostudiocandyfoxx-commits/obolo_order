@@ -18,10 +18,10 @@ const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 /**
  * Everything in front of the solar system (client decision 2026-10-04):
  *   guest            → email entry (invited → Day 1, member → continue)
- *   day 1–8, playing → that day's story (Day 1 = /invite story)
- *   day finished     → "〇〇、また明日。" 24 h countdown (or 明日まで待てへん)
- *   day 9            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
- *   day 10 (ORDER)   → the solar system
+ *   day 1–6, playing → that day's story (Day 1 = /invite story)
+ *   day finished     → "〇〇、また明日。" 24 h countdown (or 明日まで待てない)
+ *   day 7            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
+ *   day 8 (ORDER)    → the solar system
  */
 export function HomeGate({ children }: { children: ReactNode }) {
   const { status, me, setMe } = useAuth();

@@ -76,7 +76,7 @@ export const users = pgTable(
     invitedByName: text('invited_by_name'),
     /** 8-day journey (see @obolo/shared journey.ts): 1–8 = day to play, 9 = the Eclipse day (payment), 10 = ORDER member.
      *  Accounts created before the journey existed default to 10. */
-    journeyDay: integer('journey_day').notNull().default(10),
+    journeyDay: integer('journey_day').notNull().default(8),
     /** When the current day was finished; the next day unlocks 24 h later (or by skipping). */
     journeyCompletedAt: timestamp('journey_completed_at', { withTimezone: true }),
     /** OBOLO NEO form chosen on Day 3 (see @obolo/shared neo.ts). */

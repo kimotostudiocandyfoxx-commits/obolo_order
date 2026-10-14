@@ -5,16 +5,19 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { fileToReference } from '@/lib/look';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { NeoChooser } from './NeoChooser';
+import { VoiceField } from './StoryExtras';
 
 /**
- * Day 3: making the visitor's OBOLO NEO look (client decisions 2026-10-05).
- *  - 画像から: a reference picture they like. KIMORIN asks TWO questions so the result is original:
- *      1) which part of it they love (only that is taken), 2) what twist makes it theirs.
- *    The picture is only read for the request, never stored, and the prompt forbids copying any
- *    existing character.
- *  - 質問から: three questions (animal / colour / vibe), for anyone without a picture.
- *  Four candidates (3 tries), then refine the chosen one in words (3 times). If generation fails,
- *  the eight preset forms are offered so the story always moves on.
+ * Day 2 on the Moon (D03-S004, story 2026-10-14): the visitor's OBOLO NEO look, drawn by the water basin.
+ *  - three ways in: OBOLON's questions (animal → up to two colours → mood → what they are into, may
+ *    pass) / in their own words or a picture / おまかせ. Gender is never asked.
+ *  - the basin draws four looks (two boyish, two girlish). Pick one → 〔これにする〕〔この感じで、もっと
+ *    見る〕〔ひとこと足す〕, or 〔最初から描き直す〕 — as often as they like (no count is shown; the
+ *    server keeps a hidden ceiling, P-OB-18).
+ *  - a picture is only read for the request, never stored, and the prompt forbids copying a character.
+ *  - while it draws: KIMORIN whispers 「腕、80本。」, the water splashes, OBOLON 「水盤は、本人の言葉しか、聞かない。」
+ *  - if drawing fails, the eight preset forms are offered so the story always moves on.
+ * The answers and the last four looks are kept for this visit, so 「もう一度選ぶ」 comes back to them.
  */
 export interface LookApi {
   candidates(body: NeoLookBody): Promise<NeoLookResult>;
@@ -23,82 +26,112 @@ export interface LookApi {
   chooseForm(formId: string): Promise<void>;
 }
 
-type Phase = 'entry' | 'upload' | 'liked' | 'twist' | 'ask' | 'making' | 'pick' | 'refine' | 'failed' | 'forms';
+type Phase = 'entry' | 'animal' | 'color' | 'mood' | 'hobby' | 'alt' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
 
-const Q3 = [
-  { key: 'animal', label: '好きな動物は？', chips: ['キツネ', 'ネコ', 'ウサギ', 'オオカミ', 'フクロウ', 'リュウ'] },
-  { key: 'color', label: '好きな色は？', chips: ['赤', '青', '紫', '金', '黒', '白'] },
-  { key: 'mood', label: 'どんな雰囲気になりたい？', chips: ['ミステリアス', 'クール', 'かわいい', '元気', 'やさしい', '強そう'] },
-] as const;
-const LIKED = ['色づかい', '服・フード', '耳やしっぽ', '目つき', '全体の雰囲気'];
-const TWIST = ['色を自分の好きな色に変える', '別の動物にする', '星の杖を持たせる', 'マントをつける', '体に模様を入れる'];
-const REFINE = ['もっと明るく', 'もっとクールに', '色を青に', '目をやさしく', '小物を足して'];
-const WAIT = ['いい感じだケン…', '星のかけらを集めてるケン…', 'もう少しだ…！', '創って創って、創りまくるケン…'];
+const ANIMALS = ['犬', '猫', '狐', 'うさぎ', 'くま', '鳥', '竜', 'おまかせ'];
+const COLORS: { name: string; css: string }[] = [
+  { name: '赤', css: '#e0453a' },
+  { name: '橙', css: '#f08a2c' },
+  { name: '黄', css: '#f2cf3a' },
+  { name: '緑', css: '#3fae5a' },
+  { name: '水色', css: '#5cc6e8' },
+  { name: '青', css: '#3360d8' },
+  { name: '紫', css: '#8a4fd0' },
+  { name: '桃', css: '#f08ab8' },
+  { name: '白', css: '#f4f1ea' },
+  { name: '黒', css: '#1d1b22' },
+  { name: '金', css: 'linear-gradient(135deg,#f7e08a,#b8862b)' },
+  { name: '銀', css: 'linear-gradient(135deg,#f2f4f7,#9aa3ad)' },
+];
+const MOODS = ['かっこいい', 'かわいい', 'クール', 'ふしぎ', 'おもしろい', 'おまかせ'];
+const HOBBIES = ['音楽', 'スポーツ', 'ゲーム', '絵', '料理・食べること', 'ファッション', '読書・アニメ'];
+const ADD = ['もっとかっこよく', 'もっとかわいく', '色を明るく', '目をやさしく', '小物を足して'];
+const DRAFT = 'obolo.look.draft';
+
+interface Draft {
+  ans: { animal: string; color: string[]; mood: string; hobby: string };
+  words: string;
+  cands: NeoLookCandidate[];
+}
+const emptyDraft: Draft = { ans: { animal: '', color: [], mood: '', hobby: '' }, words: '', cands: [] };
+function loadDraft(): Draft {
+  try {
+    const raw = sessionStorage.getItem(DRAFT);
+    return raw ? { ...emptyDraft, ...(JSON.parse(raw) as Draft) } : emptyDraft;
+  } catch {
+    return emptyDraft;
+  }
+}
 
 export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string | null) => void }) {
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [phase, setPhase] = useState<Phase>('entry');
-  const [ans, setAns] = useState({ animal: '', color: '', mood: '' });
   const [ref, setRef] = useState<{ mime: 'image/jpeg'; data: string; url: string } | null>(null);
-  const [liked, setLiked] = useState('');
-  const [twist, setTwist] = useState('');
-  const [cands, setCands] = useState<NeoLookCandidate[]>([]);
-  const [left, setLeft] = useState(3);
-  const [refinesLeft, setRefinesLeft] = useState(3);
+  const [free, setFree] = useState('');
   const [sel, setSel] = useState<NeoLookCandidate | null>(null);
-  const [history, setHistory] = useState<NeoLookCandidate[]>([]);
   const [instruction, setInstruction] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [w, setW] = useState(0);
-  const back = useRef<Phase>('entry');
+  const [tired, setTired] = useState(false);
+  const last = useRef<NeoLookBody | null>(null);
   const file = useRef<HTMLInputElement>(null);
+
+  // coming back (「もう一度選ぶ」): the answers and the last four looks are still there
   useEffect(() => {
-    if (phase !== 'making') return;
-    const id = setInterval(() => setW((x) => x + 1), 2200);
-    return () => clearInterval(id);
-  }, [phase]);
-
-  const fail = (e: unknown, to: Phase) => {
-    setErr(e instanceof Error ? e.message : String(e));
-    setPhase(to);
-  };
-
-  const make = async () => {
-    setErr(null);
-    back.current = phase;
-    setPhase('making');
+    const d = loadDraft();
+    setDraft(d);
+    if (d.cands.length) setPhase('pick');
+  }, []);
+  const save = (d: Draft) => {
+    setDraft(d);
     try {
-      const body: NeoLookBody = ref ? { reference: { mime: ref.mime, data: ref.data }, liked, twist } : ans;
+      sessionStorage.setItem(DRAFT, JSON.stringify(d));
+    } catch {
+      /* ignore */
+    }
+  };
+  const ans = draft.ans;
+  const setAns = (a: Partial<Draft['ans']>) => save({ ...draft, ans: { ...ans, ...a } });
+
+  const draw = async (body: NeoLookBody) => {
+    setErr(null);
+    last.current = body;
+    setPhase('making');
+    const started = Date.now();
+    try {
       const r = await api.candidates(body);
-      setLeft(r.triesLeft);
-      if (r.refinesLeft !== undefined) setRefinesLeft(r.refinesLeft);
+      // let the basin scene play out (KIMORIN's whisper, the splash, OBOLON's line)
+      await new Promise((ok) => setTimeout(ok, Math.max(0, 5200 - (Date.now() - started))));
       if (!r.candidates.length) return setPhase('failed');
-      setCands(r.candidates);
+      save({ ...draft, cands: r.candidates });
       setSel(null);
       setPhase('pick');
     } catch (e) {
-      if (/作り直せません|LOOK_TRIES/.test(String(e))) setLeft(0);
-      fail(e, cands.length ? 'pick' : 'failed');
+      if (/作り直せません|LOOK_TRIES/.test(String(e))) {
+        setTired(true);
+        return setPhase(draft.cands.length ? 'pick' : 'failed');
+      }
+      setErr(e instanceof Error ? e.message : String(e));
+      setPhase(draft.cands.length ? 'pick' : 'failed');
     }
   };
 
-  const refine = async () => {
+  const add = async () => {
     if (!sel || !instruction.trim()) return;
     setErr(null);
     setPhase('making');
     try {
       const r = await api.refine(sel.id, instruction.trim());
-      if (r.refinesLeft !== undefined) setRefinesLeft(r.refinesLeft);
       if (r.candidates[0]) {
-        setHistory((h) => [...h, sel]);
+        save({ ...draft, cands: draft.cands.map((c) => (c.id === sel.id ? r.candidates[0] : c)) });
         setSel(r.candidates[0]);
         setInstruction('');
-      } else setErr('うまく描き直せなかったケン……');
-      setPhase('refine');
+      } else setErr('うまく描き変わらなかった……もう一度');
     } catch (e) {
-      if (/描き直せません|LOOK_REFINES/.test(String(e))) setRefinesLeft(0);
-      fail(e, 'refine');
+      if (/描き直せません|LOOK_REFINES/.test(String(e))) setTired(true);
+      else setErr(e instanceof Error ? e.message : String(e));
     }
+    setPhase('chosen');
   };
 
   const decide = async () => {
@@ -122,50 +155,124 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       />
     );
 
-  if (phase === 'making')
-    return (
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/80 backdrop-blur-sm">
-        <div className="relative h-40 w-40">
-          <span className="absolute inset-0 animate-ping rounded-full bg-amber-200/20" />
-          <span className="absolute inset-6 animate-[spin-slow_6s_linear_infinite] rounded-full border-2 border-dashed border-amber-200/60" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={spriteUrl('kimorin-face')} alt="" className="absolute inset-10 rounded-full" />
-        </div>
-        <p className="tracking-widest text-amber-100">{WAIT[w % WAIT.length]}</p>
-        <p className="text-xs text-white/50">君の姿を創っています（30秒ほど）</p>
-      </div>
-    );
+  if (phase === 'making') return <Basin />;
 
   if (phase === 'entry')
     return (
       <Panel>
-        <Kimorin>どうやって創る？</Kimorin>
-        <div className="mt-4 flex flex-col gap-2">
-          <Gold onClick={() => setPhase('upload')}>🖼 イメージに近い画像から創る</Gold>
-          <button
-            onClick={() => {
-              setRef(null);
-              setPhase('ask');
-            }}
-            className="rounded-full border border-white/30 py-3 text-sm"
-          >
-            💬 質問に答えて創る
-          </button>
+        <Obolon>どんな見た目に、なりたい？</Obolon>
+        <p className="mt-2 text-center text-[11px] leading-relaxed text-white/55">最後に、水盤が描いた4枚から1枚を選びます</p>
+        <div className="mt-3 flex flex-col gap-2">
+          <Gold onClick={() => setPhase('animal')}>質問に答える</Gold>
+          <Plain onClick={() => setPhase('alt')}>自分の言葉か画像で伝える</Plain>
+          <Plain onClick={() => draw({ omakase: true })}>おまかせにする</Plain>
         </div>
       </Panel>
     );
 
-  if (phase === 'upload')
+  if (phase === 'animal')
     return (
       <Panel>
-        <Kimorin>{'イメージに近い画像を見せてくれ。\n好きなキャラの絵でも、ペットや物の写真でもいいケン。'}</Kimorin>
+        <Obolon>好きな動物は？</Obolon>
+        <Chips items={ANIMALS} value={ans.animal} onPick={(v) => (setAns({ animal: v }), setFree(''), setPhase('color'))} />
+        <p className="mt-3 text-xs text-white/50">自由に言う</p>
+        <VoiceField value={free} onChange={setFree} placeholder="例：しろくま" />
+        <div className="mt-2 flex flex-col gap-2">
+          <Gold disabled={!free.trim()} onClick={() => (setAns({ animal: free.trim() }), setFree(''), setPhase('color'))}>
+            これにする
+          </Gold>
+          <Back onClick={() => setPhase('entry')} />
+        </div>
+      </Panel>
+    );
+
+  if (phase === 'color')
+    return (
+      <Panel>
+        <Obolon>好きな色は？</Obolon>
+        <p className="mt-1 text-center text-[11px] text-white/50">2つまで選べます</p>
+        <div className="mt-3 grid grid-cols-6 gap-2">
+          {COLORS.map((c) => {
+            const on = ans.color.includes(c.name);
+            return (
+              <button
+                key={c.name}
+                onClick={() => setAns({ color: on ? ans.color.filter((x) => x !== c.name) : [...ans.color, c.name].slice(-2) })}
+                className={`flex flex-col items-center gap-1 rounded-xl py-1.5 ${on ? 'bg-amber-200/20 ring-2 ring-amber-200' : ''}`}
+                aria-label={c.name}
+              >
+                <span className="h-8 w-8 rounded-full border border-white/40" style={{ background: c.css }} />
+                <span className="text-[10px] text-white/70">{c.name}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 flex flex-col gap-2">
+          <Gold disabled={!ans.color.length} onClick={() => setPhase('mood')}>
+            つぎへ
+          </Gold>
+          <Plain onClick={() => (setAns({ color: [] }), setPhase('mood'))}>おまかせ</Plain>
+          <Back onClick={() => setPhase('animal')} />
+        </div>
+      </Panel>
+    );
+
+  if (phase === 'mood')
+    return (
+      <Panel>
+        <Obolon>どんな雰囲気が、いい？</Obolon>
+        <Chips items={MOODS} value={ans.mood} onPick={(v) => (setAns({ mood: v }), setPhase('hobby'))} />
+        <Back onClick={() => setPhase('color')} />
+      </Panel>
+    );
+
+  if (phase === 'hobby')
+    return (
+      <Panel>
+        <Obolon>今、ハマってることは？</Obolon>
+        <p className="mt-1 text-center text-[11px] text-white/50">ハマっていることは、持ち物やワンポイントになります</p>
+        <Chips items={HOBBIES} value={ans.hobby} onPick={(v) => setAns({ hobby: v })} />
+        <p className="mt-3 text-xs text-white/50">自由に言う</p>
+        <VoiceField value={free} onChange={setFree} placeholder="例：カメラ" />
+        <div className="mt-2 flex flex-col gap-2">
+          <Gold
+            disabled={!free.trim() && !ans.hobby}
+            onClick={() => {
+              const hobby = free.trim() || ans.hobby;
+              const d = { ...draft, ans: { ...ans, hobby } };
+              save(d);
+              void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby });
+            }}
+          >
+            水盤に描いてもらう
+          </Gold>
+          <Plain
+            onClick={() => {
+              save({ ...draft, ans: { ...ans, hobby: '' } });
+              void draw({ animal: ans.animal || 'おまかせ', color: ans.color.join('と') || 'おまかせ', mood: ans.mood || 'おまかせ' });
+            }}
+          >
+            パス
+          </Plain>
+          <Back onClick={() => setPhase('mood')} />
+        </div>
+      </Panel>
+    );
+
+  if (phase === 'alt')
+    return (
+      <Panel>
+        <Obolon>どんな姿にしたい？</Obolon>
         <p className="mt-2 rounded-xl bg-white/5 p-3 text-[11px] leading-relaxed text-white/60">
-          画像は「イメージの参考」にするだけで、保存はしません。そっくりそのままのキャラクターは作れません。いいところだけもらって、君だけのオリジナルに創りかえます。
+          声か文字で伝えるか、画像を選んでください。好きなキャラや絵でもかまいません（自分の顔写真でなくていい）。画像は参考に読むだけで、保存はしません。そっくりそのままの姿にはならず、あなただけの姿に描きかえます。
         </p>
-        {ref ? (
+        <div className="mt-3">
+          <VoiceField value={draft.words} onChange={(w) => save({ ...draft, words: w })} placeholder="例：星の杖を持った、青いオオカミ" maxLength={120} multiline />
+        </div>
+        {ref && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={ref.url} alt="" className="mx-auto mt-3 max-h-48 rounded-2xl" />
-        ) : null}
+          <img src={ref.url} alt="" className="mx-auto mt-2 max-h-36 rounded-2xl" />
+        )}
         <input
           ref={file}
           type="file"
@@ -178,53 +285,19 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             try {
               setRef(await fileToReference(f));
             } catch {
-              setErr('この画像は読み込めなかったケン');
+              setErr('この画像は読み込めませんでした');
             }
           }}
         />
         <div className="mt-3 flex flex-col gap-2">
-          <button onClick={() => file.current?.click()} className="rounded-full border border-amber-200/50 py-3 text-sm">
-            {ref ? '別の画像にする' : '＋ 画像を選ぶ'}
-          </button>
-          <Gold disabled={!ref} onClick={() => setPhase('liked')}>
-            この画像でいく
+          <Plain onClick={() => file.current?.click()}>{ref ? '別の画像にする' : '＋ 画像を選ぶ'}</Plain>
+          <Gold
+            disabled={!ref && !draft.words.trim()}
+            onClick={() => draw(ref ? { reference: { mime: ref.mime, data: ref.data }, ...(draft.words.trim() ? { twist: draft.words.trim().slice(0, 60) } : {}) } : { words: draft.words.trim() })}
+          >
+            水盤に描いてもらう
           </Gold>
           <Back onClick={() => setPhase('entry')} />
-          {err && <p className="text-center text-xs text-rose-300">{err}</p>}
-        </div>
-      </Panel>
-    );
-
-  // KIMORIN's originality question 1: take only the part they love
-  if (phase === 'liked')
-    return (
-      <Panel>
-        {ref && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={ref.url} alt="" className="mx-auto mb-3 max-h-28 rounded-xl opacity-80" />
-        )}
-        <Kimorin>{'いい画像だケン。\nこの絵の、どこがいちばん好きだ？\nそこだけを、いただくぞ。'}</Kimorin>
-        <Field value={liked} onChange={setLiked} chips={LIKED} placeholder="例：フードとサングラス" />
-        <div className="mt-3 flex flex-col gap-2">
-          <Gold disabled={!liked.trim()} onClick={() => setPhase('twist')}>
-            つぎへ
-          </Gold>
-          <Back onClick={() => setPhase('upload')} />
-        </div>
-      </Panel>
-    );
-
-  // KIMORIN's originality question 2: their own twist
-  if (phase === 'twist')
-    return (
-      <Panel>
-        <Kimorin>{'そのままだと、ただのマネだからな。\nそこに、君だけのアレンジを足すケン。\n何を変える？ 何を足す？'}</Kimorin>
-        <Field value={twist} onChange={setTwist} chips={TWIST} placeholder="例：色を青にして、星の杖を持たせる" />
-        <div className="mt-3 flex flex-col gap-2">
-          <Gold disabled={!twist.trim()} onClick={make}>
-            ✦ 姿を創る（あと{left}回）
-          </Gold>
-          <Back onClick={() => setPhase('liked')} />
           {err && <p className="text-center text-xs text-rose-300">{err}</p>}
         </div>
       </Panel>
@@ -233,107 +306,117 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   if (phase === 'failed')
     return (
       <Panel>
-        <p className="text-center text-amber-100">うまく創れなかったケン……</p>
-        <p className="mt-1 text-center text-xs text-white/55">{left > 0 ? 'もう一度ためすか、用意した姿から選んでくれ。' : '用意した姿から選んでくれ。'}</p>
+        <p className="text-center text-amber-100">{tired ? '水盤が、今日は疲れてしまった……' : '水盤が、うまく描けなかった……'}</p>
+        <p className="mt-1 text-center text-xs text-white/55">{tired ? '用意された姿から選んでください。' : 'もう一度ためすか、用意された姿から選んでください。'}</p>
         <div className="mt-4 flex flex-col gap-2">
-          {left > 0 && <Gold onClick={() => setPhase(ref ? 'twist' : 'ask')}>もう一度創る（あと{left}回）</Gold>}
-          <button onClick={() => setPhase('forms')} className="rounded-full border border-white/30 py-3 text-sm">
-            用意された8つの姿から選ぶ
-          </button>
+          {!tired && <Gold onClick={() => (last.current ? draw(last.current) : setPhase('entry'))}>もう一度描いてもらう</Gold>}
+          <Plain onClick={() => setPhase('forms')}>用意された8つの姿から選ぶ</Plain>
         </div>
       </Panel>
     );
 
-  if (phase === 'pick')
-    return (
-      <Panel>
-        <Kimorin>気に入った姿をえらぶケン</Kimorin>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {cands.map((c) => (
-            <button key={c.id} onClick={() => setSel(c)} className={`overflow-hidden rounded-2xl border-4 transition ${sel?.id === c.id ? 'scale-[1.03] border-amber-300 shadow-[0_0_24px_rgba(255,200,90,0.6)]' : 'border-transparent opacity-85'}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={c.url} alt="" className="aspect-square w-full object-cover" />
-            </button>
-          ))}
-        </div>
-        <div className="mt-4 flex flex-col gap-2">
-          <Gold disabled={!sel} onClick={() => setPhase('refine')}>
-            この姿で進む
-          </Gold>
-          {left > 0 ? (
-            <button onClick={() => setPhase(ref ? 'liked' : 'ask')} className="rounded-full border border-white/30 py-2.5 text-sm">
-              最初から作り直す（あと{left}回）
-            </button>
-          ) : (
-            <p className="text-center text-xs text-white/50">最初からの作り直しはもうできないケン</p>
-          )}
-          {err && <p className="text-center text-xs text-rose-300">{err}</p>}
-        </div>
-      </Panel>
-    );
-
-  if (phase === 'refine' && sel)
+  if ((phase === 'chosen' || phase === 'add') && sel)
     return (
       <Panel>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={sel.url} alt="" className="mx-auto aspect-square w-[min(70vw,300px)] rounded-3xl border-2 border-amber-200/60 object-cover shadow-[0_0_30px_rgba(255,200,90,0.35)]" />
-        {history.length > 0 && (
-          <div className="mt-2 flex justify-center gap-2">
-            {history.map((h) => (
-              <button
-                key={h.id}
-                onClick={() => {
-                  setHistory((x) => [...x.filter((y) => y.id !== h.id), sel]);
-                  setSel(h);
-                }}
-                className="h-12 w-12 overflow-hidden rounded-lg border border-white/30 opacity-70"
-                aria-label="前の姿にもどす"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={h.url} alt="" className="h-full w-full object-cover" />
-              </button>
-            ))}
+        <img src={sel.url} alt="" className="mx-auto aspect-square w-[min(66vw,280px)] rounded-3xl border-2 border-amber-200/60 object-cover shadow-[0_0_30px_rgba(255,200,90,0.35)]" />
+        {phase === 'chosen' ? (
+          <div className="mt-4 flex flex-col gap-2">
+            <Gold disabled={busy} onClick={decide}>
+              {busy ? '……' : 'これにする'}
+            </Gold>
+            {!tired && <Plain onClick={() => draw({ like: sel.id })}>この感じで、もっと見る</Plain>}
+            {!tired && <Plain onClick={() => setPhase('add')}>ひとこと足す</Plain>}
+            <Back onClick={() => setPhase('pick')} label="4枚にもどる" />
+            {err && <p className="text-center text-xs text-rose-300">{err}</p>}
+          </div>
+        ) : (
+          <div className="mt-3">
+            <Obolon>どう、変えたい？</Obolon>
+            <div className="mt-2">
+              <VoiceField value={instruction} onChange={setInstruction} placeholder="例：もっとかっこよく" maxLength={60} />
+            </div>
+            <div className="mt-1 flex flex-wrap justify-center gap-1.5">
+              {ADD.map((c) => (
+                <button key={c} onClick={() => setInstruction(c)} className={`rounded-full px-3 py-1 text-xs ${instruction === c ? 'bg-amber-300 font-bold text-black' : 'bg-white/10 text-white/80'}`}>
+                  {c}
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 flex flex-col gap-2">
+              <Gold disabled={!instruction.trim()} onClick={add}>
+                少しだけ描き変える
+              </Gold>
+              <Back onClick={() => setPhase('chosen')} />
+            </div>
           </div>
         )}
-        <div className="mt-3">
-          <Kimorin>{refinesLeft > 0 ? 'もっとこうしたい、はあるか？\nなければ、これで決まりだケン。' : 'これで決まりだな。いい姿だケン！'}</Kimorin>
-        </div>
-        {refinesLeft > 0 && <Field value={instruction} onChange={setInstruction} chips={REFINE} placeholder="例：耳をもう少し長く" />}
-        <div className="mt-3 flex flex-col gap-2">
-          {refinesLeft > 0 && (
-            <button disabled={!instruction.trim()} onClick={refine} className="rounded-full border border-amber-200/60 py-3 text-sm disabled:opacity-40">
-              ✎ 描き直す（あと{refinesLeft}回）
-            </button>
-          )}
-          <Gold disabled={busy} onClick={decide}>
-            {busy ? '……' : 'この姿にする'}
-          </Gold>
-          <Back onClick={() => setPhase('pick')} label="候補にもどる" />
-          {err && <p className="text-center text-xs text-rose-300">{err}</p>}
-        </div>
       </Panel>
     );
 
-  // 質問から: three questions
-  const ready = ans.animal.trim() && ans.color.trim() && ans.mood.trim();
+  // pick one of the four
   return (
     <Panel>
-      <div className="space-y-4">
-        {Q3.map((q) => (
-          <div key={q.key}>
-            <p className="mb-1.5 text-sm tracking-widest text-amber-100">{q.label}</p>
-            <Field value={ans[q.key]} onChange={(v) => setAns({ ...ans, [q.key]: v })} chips={[...q.chips]} placeholder="自由に書いてもOK" />
-          </div>
+      <Obolon>水盤が、4つの姿を描いた。</Obolon>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        {draft.cands.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => (setSel(c), setPhase('chosen'))}
+            className="overflow-hidden rounded-2xl border-2 border-amber-200/30 transition active:scale-[0.97]"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={c.url} alt="" className="aspect-square w-full object-cover" />
+          </button>
         ))}
-        <div className="flex flex-col gap-2 pt-1">
-          <Gold disabled={!ready} onClick={make}>
-            ✦ 姿を創る（あと{left}回）
-          </Gold>
-          <Back onClick={() => setPhase('entry')} />
-          {err && <p className="text-center text-xs text-rose-300">{err}</p>}
-        </div>
+      </div>
+      <div className="mt-3 flex flex-col gap-2">
+        {!tired ? (
+          <Plain onClick={() => (setRef(null), setPhase('entry'))}>最初から描き直す</Plain>
+        ) : (
+          <p className="text-center text-xs text-white/50">水盤が今日は疲れてしまった……この4枚から選んでください</p>
+        )}
+        {err && <p className="text-center text-xs text-rose-300">{err}</p>}
       </div>
     </Panel>
+  );
+}
+
+/** Forget the kept answers and looks (after the look is saved). */
+export function clearLookDraft() {
+  try {
+    sessionStorage.removeItem(DRAFT);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** While the basin draws: KIMORIN whispers into it, the water splashes, OBOLON explains. */
+function Basin() {
+  const [k, setK] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setK((x) => x + 1), 1700);
+    return () => clearInterval(id);
+  }, []);
+  const lines: [string, string][] = [
+    ['', '水面に、描きかけの姿がゆらゆら映る……'],
+    ['KIMORIN', '腕、80本。'],
+    ['', 'ぴしゃっ。しずくが、KIMORINの額に当たる'],
+    ['OBOLON', '水盤は、、、本人の言葉しか、聞かない。'],
+  ];
+  const [who, text] = k < lines.length ? lines[k] : ['', '水盤が、描いている……'];
+  return (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/70 px-6 backdrop-blur-[2px]">
+      <div className="relative h-44 w-72">
+        <span className="absolute inset-x-0 bottom-0 h-20 rounded-[50%] border border-sky-100/40 bg-[radial-gradient(ellipse_at_center,rgba(190,225,255,0.45)_0%,rgba(80,120,170,0.15)_60%,transparent_75%)]" />
+        <span className="absolute inset-x-10 bottom-5 h-10 animate-pulse rounded-[50%] bg-sky-100/25 blur-md" />
+        {k === 2 && <span className="absolute bottom-14 left-1/2 h-10 w-1 -translate-x-1/2 animate-[fadeUp_0.4s_ease-out] rounded-full bg-sky-100/80" />}
+      </div>
+      <div key={k} className="min-h-16 animate-[fadeUp_0.5s_ease-out] text-center">
+        {who && <p className="text-xs tracking-[0.25em] text-amber-200/80">{who}</p>}
+        <p className="mt-1 text-[17px] text-amber-50">{text}</p>
+      </div>
+    </div>
   );
 }
 
@@ -345,33 +428,24 @@ function Panel({ children }: { children: ReactNode }) {
   );
 }
 
-function Kimorin({ children }: { children: ReactNode }) {
+function Obolon({ children }: { children: ReactNode }) {
   return (
     <div className="flex items-start gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={spriteUrl('kimorin-face')} alt="" className="h-10 w-10 shrink-0 rounded-full" />
+      <img src={spriteUrl('obolon')} alt="" className="h-10 w-10 shrink-0 object-contain" />
       <p className="whitespace-pre-wrap rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2 text-[15px] leading-relaxed text-amber-50">{children}</p>
     </div>
   );
 }
 
-function Field({ value, onChange, chips, placeholder }: { value: string; onChange: (v: string) => void; chips: string[]; placeholder: string }) {
+function Chips({ items, value, onPick }: { items: string[]; value: string; onPick: (v: string) => void }) {
   return (
-    <div className="mt-2">
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value.slice(0, 60))}
-        className="w-full rounded-full border border-amber-200/50 bg-black/60 px-5 py-2.5 text-white outline-none"
-        style={{ fontSize: 16 }}
-        placeholder={placeholder}
-      />
-      <div className="mt-1.5 flex flex-wrap gap-1.5">
-        {chips.map((c) => (
-          <button key={c} onClick={() => onChange(c)} className={`rounded-full px-3 py-1 text-xs ${value === c ? 'bg-amber-300 font-bold text-black' : 'bg-white/10 text-white/80'}`}>
-            {c}
-          </button>
-        ))}
-      </div>
+    <div className="mt-3 flex flex-wrap justify-center gap-2">
+      {items.map((c) => (
+        <button key={c} onClick={() => onPick(c)} className={`rounded-full px-4 py-2 text-sm ${value === c ? 'bg-amber-300 font-bold text-black' : 'border border-amber-200/30 bg-white/5 text-white/85'}`}>
+          {c}
+        </button>
+      ))}
     </div>
   );
 }
@@ -379,6 +453,14 @@ function Field({ value, onChange, chips, placeholder }: { value: string; onChang
 function Gold({ children, onClick, disabled }: { children: ReactNode; onClick: () => void; disabled?: boolean }) {
   return (
     <button onClick={onClick} disabled={disabled} className="w-full rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-lg tracking-widest text-amber-50 disabled:opacity-40">
+      {children}
+    </button>
+  );
+}
+
+function Plain({ children, onClick }: { children: ReactNode; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="w-full rounded-full border border-white/30 py-3 text-sm tracking-wider text-white/85">
       {children}
     </button>
   );

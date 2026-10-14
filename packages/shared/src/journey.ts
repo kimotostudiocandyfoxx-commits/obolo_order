@@ -1,25 +1,23 @@
 import type { PlanetId } from './planets';
 
 /**
- * The journey every invited person goes through before becoming an ORDER member
- * (client decisions 2026-10-04 / 10-06). One day unlocks 24 h after the previous one is finished
- * (or immediately with "明日まで待てへん"). Days 1–8 visit the planets; day 9 is the Eclipse day:
- * Bati runs out of mana, MONBAN explains the Eclipse (linking your soul to the Sun) and asks for
- * the ¥88/month for the secret rocket (payment inside the story). Paying makes you an ORDER member.
- * Until then the visitor is an apprentice, an "OBOLO NEO".
+ * The journey every invited person goes through before becoming an ORDER member. One day unlocks 24 h
+ * after the previous one is finished (or immediately with "明日まで待てない").
  *
- * Stored on the user as `journeyDay` (1–8 = day to play, 9 = the Eclipse day, 10 = ORDER member)
+ * The first journey is seven days (story 2026-10-14, docs/story-rewrite/土星まで_UI引き継ぎ.md): KIMORIN
+ * is no longer a guide but a fellow NEO who travels with you, and the Moon moved into day 2, so every
+ * later day came one day earlier:
+ *   1 Earth (the invitation, MONBAN, OBOLON) · 2 Earth → the Moon (KIMORIN, the NEO look, name, Bati) ·
+ *   3 Saturn · 4 Jupiter · 5 Mercury · 6 Mars · 7 back to Earth, the Eclipse (¥88/month inside the story).
+ * Venus is not on the first journey.
+ *
+ * Stored on the user as `journeyDay` (1–6 = day to play, 7 = the Eclipse day, 8 = ORDER member)
  * plus `journeyCompletedAt` (set when the current day is finished, cleared when the next starts).
- * Day 9 can only be finished after paying; after its countdown the visitor is an ORDER (10).
+ * Day 7 can only be finished after paying; after its countdown the visitor is an ORDER (8).
  */
-export const JOURNEY_LAST_DAY = 8;
-/**
- * The route: Moon → Saturn → Jupiter → Mercury → Mars → Venus (client, 2026-10-12: Venus is back, as the
- * DJ / VJ planet) → back to Earth → the Sun temple (Eclipse) → ORDER.
- * PLACEHOLDER (P-JOURNEY-2): day 8 (Venus) is still skipped — finishing day 7 opens the Eclipse day (9) —
- * until Venus's DJ tutorial is written into the new story; then empty this list.
- */
-export const SKIPPED_DAYS: readonly number[] = [8];
+export const JOURNEY_LAST_DAY = 6;
+/** Days that exist in the numbering but are not played (none since the seven-day journey). */
+export const SKIPPED_DAYS: readonly number[] = [];
 export function nextJourneyDay(day: number): number {
   let d = day + 1;
   while (SKIPPED_DAYS.includes(d)) d++;
@@ -32,7 +30,7 @@ export function nextJourneyDay(day: number): number {
  * PLACEHOLDER (P-JOURNEY-1): which planet opens in which week.
  */
 export const LATER_PLANETS: readonly { planet: 'venus' | 'neptune' | 'pluto'; afterDays: number }[] = [
-  // (Venus is on the journey again since 2026-10-12, open like the other journey planets)
+  // (Venus is not on the first journey since 2026-10-14; ORDER members can visit it like the other planets)
   { planet: 'neptune', afterDays: 14 },
   { planet: 'pluto', afterDays: 21 },
 ];
@@ -43,8 +41,8 @@ export function planetOpensAt(planet: string, orderedAt: string | null | undefin
   if (!orderedAt) return null;
   return new Date(new Date(orderedAt).getTime() + rule.afterDays * 24 * 3600_000);
 }
-export const JOURNEY_PAYMENT = 9;
-export const JOURNEY_DONE = 10;
+export const JOURNEY_PAYMENT = 7;
+export const JOURNEY_DONE = 8;
 export const JOURNEY_WAIT_MS = 24 * 3600_000;
 
 export interface JourneyDayMeta {
@@ -58,45 +56,34 @@ export interface JourneyDayMeta {
 }
 
 export const JOURNEY: readonly JourneyDayMeta[] = [
-  { day: 1, planet: 'earth', guides: ['MONBAN', 'OBOLON'], title: '招待状が届く', beats: ['招待状が届く', '本部に行く'] },
+  { day: 1, planet: 'earth', guides: ['MONBAN', 'OBOLON'], title: '招待状が届く', beats: ['招待状が届く', '本部の門でMONBAN', '地球の神殿でOBOLON', '8つの謎の札と謎の書', '招待者からの手紙とマナジェム'] },
   {
     day: 2,
-    planet: 'earth',
-    guides: ['KIMORIN'],
-    title: 'もう一度、招待状',
-    beats: ['もう一度招待状が届く', '本部に行く', '案内人KIMORINがいる', '説明を受ける', '宇宙に行くことを同意する'],
-  },
-  {
-    day: 3,
     planet: 'moon',
     guides: ['KIMORIN', 'OBOLON'],
-    title: '月へ',
+    title: 'KIMORINと、月へ',
     beats: [
       '宇宙行きの切符が届く',
-      'KIMORINと月に行く',
-      '月の神殿につく',
-      'OBOLO NEO（見習いの姿）を質問から生成して選ぶ',
-      'ネオとしての名前を決める',
-      '好きな食べ物を答えて、バティのたまごを受け取る',
+      '本部の門で、KIMORIN（同じ招待客）が後ろから現れる',
+      'KIMORINと宇宙へ行くことにする',
+      'ロケットで月へ',
+      'ネオの姿を4枚から選び、ネオの名前を決める',
+      '好きな食べ物を答えて、バティが生まれ、名前をつける',
     ],
   },
   {
-    day: 4,
+    day: 3,
     planet: 'saturn',
     guides: ['たこ焼きブラザー', 'たこ焼きシスター'],
     title: '土星へ',
-    beats: ['たまごからバティが生まれ、名前をつける', '土星に行く', '案内人たこ焼きブラザー・たこ焼きシスターに出会う', '土星の楽しみ方（声の出るTwitter）を教わる', '投稿してみる'],
+    beats: ['Bluenaを手に入れる', '土星へ行く', 'たこ焼きブラザー・シスターに出会う', 'コロリンで遊ぶ（自分の部屋に飛ばす）', '謎2「OBOLO ORDERは全員、表現者」が解ける'],
   },
-  { day: 5, planet: 'jupiter', guides: ['KIMORIN', '大根カイザー'], title: '木星へ', beats: ['木星に行く', '大根カイザーに出会う', '木星（パタパタ）で遊ぶ'] },
-  { day: 6, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
-  // Mars comes before Venus (client, 2026-10-05)
-  { day: 7, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
-  // Venus is the DJ / VJ planet, visited after Mars (client, 2026-10-12): the order is Saturn → Jupiter →
-  // Mercury → Mars → Venus. Day 8 stays in SKIPPED_DAYS until its new tutorial (in the rewritten story) is in.
-  { day: 8, planet: 'venus', guides: ['KIMORIN', 'ロングG', 'ハットG', 'ボスG'], title: '金星へ', beats: ['金星に行く', 'ゴリラ3人組に出会う', '金星で、水星の曲・火星のMVを DJ・VJ してみる'] },
+  { day: 4, planet: 'jupiter', guides: ['KIMORIN', '大根カイザー'], title: '木星へ', beats: ['木星に行く', '大根カイザーに出会う', '木星（パタパタ）で遊ぶ'] },
+  { day: 5, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
+  { day: 6, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
 ];
 
-/** Day 9 (client, 2026-10-06): not a planet visit — the way to ORDER. */
+/** Day 7 (the Eclipse day): not a planet visit — the way to ORDER. (Old wording: still to be rewritten in the new story.) */
 export const ECLIPSE_DAY_BEATS = [
   '火星で目を覚ます。今日はもっと遠くの星へ……のはずが、バティの元気がない',
   'バティは太陽の力「マナ」で生きている。マナが切れかけているので地球の本部へ戻る',
@@ -113,7 +100,7 @@ export function journeyMeta(day: number): JourneyDayMeta | undefined {
 }
 
 /**
- * After day 9's countdown the visitor is an ORDER and the journey goes on in the solar system.
+ * After day 7's countdown the visitor is an ORDER and the journey goes on in the solar system.
  * Bati receiving mana / evolving into its ORDER form is not scripted yet.
  */
 export const AFTER_JOURNEY = ['ORDER として旅の続きへ（太陽系）', 'バティにマナが渡り、ORDERの姿に進化する（台本待ち）'] as const;

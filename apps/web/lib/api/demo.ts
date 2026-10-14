@@ -640,23 +640,31 @@ export class DemoApi implements Api {
     });
   }
 
-  // Demo looks: SVG portraits built in the browser (lib/look.ts); 4 candidates, 3 tries.
+  // Demo looks: SVG portraits built in the browser (lib/look.ts); 4 candidates per round, hidden ceiling
+  // like the API (NEO_LOOK_TRIES / NEO_LOOK_REFINES = 8).
   async lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     const u = this.s.users[this.uid()];
     const key = `obolo.look.tries.${u.id}`;
     const used = Number(localStorage.getItem(key) ?? 0);
-    if (u.journeyDay < JOURNEY_DONE && used >= 3) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
+    if (u.journeyDay < JOURNEY_DONE && used >= 8) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
     localStorage.setItem(key, String(used + 1));
     await new Promise((r) => setTimeout(r, 1800));
-    const urls =
-      'reference' in body ? await Promise.all([0, 1, 2, 3].map((v) => demoFromReference(`data:${body.reference.mime};base64,${body.reference.data}`, body, v + used * 4))) : demoNeoLooks(body, used);
+    let urls: string[];
+    if ('reference' in body) urls = await Promise.all([0, 1, 2, 3].map((v) => demoFromReference(`data:${body.reference.mime};base64,${body.reference.data}`, body, v + used * 4)));
+    else if ('like' in body) {
+      const src = this.lookCache.find((c) => c.id === body.like);
+      if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
+      urls = await Promise.all([0, 1, 2, 3].map((v) => demoRefine(src.url, '', v + used * 4)));
+    } else if ('words' in body) urls = demoNeoLooks({ animal: body.words, color: body.words, mood: body.words }, used);
+    else if ('omakase' in body) urls = demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, used);
+    else urls = demoNeoLooks(body, used);
     this.lookCache = [...this.lookCache, ...urls.map((url) => ({ id: uid(), url }))];
-    return { candidates: this.lookCache.slice(-urls.length), triesLeft: u.journeyDay < JOURNEY_DONE ? 3 - (used + 1) : 99, refinesLeft: this.refinesLeft() };
+    return { candidates: this.lookCache.slice(-urls.length), triesLeft: u.journeyDay < JOURNEY_DONE ? 8 - (used + 1) : 99, refinesLeft: this.refinesLeft() };
   }
 
   private refinesLeft() {
     const u = this.s.users[this.uid()];
-    return u.journeyDay < JOURNEY_DONE ? Math.max(0, 3 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
+    return u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
   }
 
   async refineLook(mediaId: string, instruction: string) {
@@ -664,12 +672,12 @@ export class DemoApi implements Api {
     if (this.refinesLeft() <= 0) throw new ApiError(429, 'LOOK_REFINES', 'もう描き直せません');
     const src = this.lookCache.find((c) => c.id === mediaId);
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    const n = 3 - this.refinesLeft();
+    const n = 8 - this.refinesLeft();
     localStorage.setItem(`obolo.look.refines.${u.id}`, String(n + 1));
     await new Promise((r) => setTimeout(r, 1500));
     const c = { id: uid(), url: await demoRefine(src.url, instruction, n) };
     this.lookCache.push(c);
-    return { candidates: [c], triesLeft: u.journeyDay < JOURNEY_DONE ? Math.max(0, 3 - Number(localStorage.getItem(`obolo.look.tries.${u.id}`) ?? 0)) : 99, refinesLeft: this.refinesLeft() };
+    return { candidates: [c], triesLeft: u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.tries.${u.id}`) ?? 0)) : 99, refinesLeft: this.refinesLeft() };
   }
   private lookCache: { id: string; url: string }[] = [];
 

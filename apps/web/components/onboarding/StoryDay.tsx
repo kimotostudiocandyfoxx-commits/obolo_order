@@ -8,14 +8,70 @@ import { useI18n } from '@/lib/i18n/client';
 import { demoBati } from '@/lib/look';
 import { clearDay, loadDay, saveDay } from '@/lib/onboarding/progress';
 import type { DayStory } from '@/lib/onboarding/stories';
+import { clearLookDraft } from './LookMaker';
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+
+/**
+ * The day's space time (SYS-S001, story 2026-10-14): Bluena works 88 minutes a day; after that MONBAN
+ * calls you back to Earth and the day's story continues tomorrow from the same scene.
+ * PLACEHOLDER (P-SPACE-88, 引き継ぎ §7-1): counted from day 3 (Bluena) on, only while the story screen is
+ * open and visible, per calendar day on this device.
+ */
+const SPACE_MINUTES = 88;
+const today = () => new Date().toLocaleDateString('sv-SE');
+function useSpaceClock(userId: string | undefined, on: boolean) {
+  const key = `obolo.space.${userId}`;
+  const read = useCallback((): { date: string; ms: number; over: boolean } => {
+    try {
+      const v = JSON.parse(localStorage.getItem(key) ?? 'null') as { date: string; ms: number; over: boolean } | null;
+      return v && v.date === today() ? v : { date: today(), ms: 0, over: false };
+    } catch {
+      return { date: today(), ms: 0, over: false };
+    }
+  }, [key]);
+  const write = useCallback(
+    (v: { date: string; ms: number; over: boolean }) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(v));
+      } catch {
+        /* ignore */
+      }
+    },
+    [key],
+  );
+  const [state, setState] = useState({ timeUp: false, over: false });
+  useEffect(() => {
+    if (!on || !userId) return;
+    const v = read();
+    setState({ timeUp: v.ms >= SPACE_MINUTES * 60_000, over: v.over });
+    let last = Date.now();
+    const id = setInterval(() => {
+      const now = Date.now();
+      const step = Math.min(now - last, 10_000);
+      last = now;
+      if (document.visibilityState !== 'visible') return;
+      const cur = read();
+      const next = { ...cur, ms: cur.ms + step };
+      write(next);
+      if (next.ms >= SPACE_MINUTES * 60_000) setState((s) => ({ ...s, timeUp: true }));
+      if (!next.over) setState((s) => (s.over ? { ...s, over: false } : s));
+    }, 5_000);
+    return () => clearInterval(id);
+  }, [on, userId, read, write]);
+  const finish = useCallback(() => {
+    write({ ...read(), over: true });
+    setState({ timeUp: true, over: true });
+  }, [read, write]);
+  return { ...state, finish };
+}
 
 /** A scripted journey day (2+): [認証] → story → (HomeGate shows the "また明日" countdown). */
 export function StoryDay({ day, story }: { day: number; story: DayStory }) {
   const { me, setMe } = useAuth();
   const [saved, setSaved] = useState<StoryProgress | null | undefined>(undefined);
   const [passed, setPassed] = useState(false);
+  const space = useSpaceClock(me?.id, day >= 3);
 
   useEffect(() => {
     if (!me) return;
@@ -34,6 +90,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
           setMe(await getApi().completeJourneyDay(day, answers));
         } finally {
           clearDay(day, me.id);
+          clearLookDraft();
         }
       }, 1500);
     },
@@ -41,6 +98,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
   );
 
   if (!me || saved === undefined) return <div className="fixed inset-0 bg-black" />;
+  if (space.over) return <SpaceOver />;
   if (!passed) return <DayAuth onPassed={() => setPassed(true)} />;
   return (
     <StoryPlayer
@@ -48,14 +106,24 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       vars={{
         name: me.displayName,
         inviter: me.invitedByName ?? 'KIMORIN',
+        // from day 3 the display name is the NEO name (set on the Moon)
+        neo: day >= 3 ? me.displayName : undefined,
+        kimorinStar: day >= 3,
         bati: me.bati?.name ?? undefined,
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFood: me.bati?.food,
         look: me.avatarUrl ?? undefined,
       }}
+      // the riddle book: 1・7・8 from day 1; 2 (「表現者」) solved on day 3, Saturn
+      seals={{ known: [1, 7, 8, ...(day >= 4 ? [2] : [])], solved: day >= 4 ? [2] : [] }}
+      timeUp={space.timeUp}
+      onTimeUp={space.finish}
       initial={saved}
       onProgress={onProgress}
       onName={async (n) => {
+        setMe(await getApi().updateMe({ displayName: n }));
+      }}
+      onNeoName={async (n) => {
         setMe(await getApi().updateMe({ displayName: n }));
       }}
       onNeo={async (id) => {
@@ -101,6 +169,17 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       }}
       onEnd={onEnd}
     />
+  );
+}
+
+/** SYS-S001 afterwards: today's space time is over; tomorrow the story continues from the same scene. */
+function SpaceOver() {
+  return (
+    <main className="pt-safe pb-safe flex min-h-svh flex-col items-center justify-center gap-3 bg-black px-8 text-center" style={{ fontFamily: SERIF }}>
+      <span className="mb-4 h-3 w-3 rounded-full bg-sky-100 shadow-[0_0_40px_12px_rgba(140,200,255,0.45)]" />
+      <p className="text-lg tracking-[0.2em] text-amber-100">今日の宇宙の時間は終わりです</p>
+      <p className="text-sm text-white/60">次の日は、この場面の続きから</p>
+    </main>
   );
 }
 

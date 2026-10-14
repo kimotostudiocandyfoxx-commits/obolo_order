@@ -74,7 +74,7 @@ export class UsersService {
 
   /**
    * The story of `day` was finished. Idempotent; never moves the journey backwards.
-   * Day 9 (the Eclipse day) can only be finished after paying; the next day is ORDER (10).
+   * Day 7 (the Eclipse day) can only be finished after paying; the next day is ORDER (8).
    */
   async completeJourneyDay(userId: string, body: CompleteJourneyDayBody): Promise<Me> {
     const cur = await this.load(userId);
@@ -94,7 +94,7 @@ export class UsersService {
 
   /**
    * Start the next day: allowed 24 h after the current day was finished, or immediately with
-   * skip ("明日まで待てへん"). PLACEHOLDER (P-OB-3): skipping is free and unlimited for now.
+   * skip ("明日まで待てない"). PLACEHOLDER (P-OB-3): skipping is free and unlimited for now.
    */
   async advanceJourney(userId: string, skip: boolean): Promise<Me> {
     const cur = await this.load(userId);

@@ -1,14 +1,16 @@
 import type { Step } from './script';
 
 /**
- * DAY 7 【火星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-16).
+ * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
+ * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
+ * DAY 6 (was day 7) 【火星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-16).
  * Mars comes before Venus (client, 2026-10-05): Venus is day 8.
  * Flow: [認証] → wake up on Mercury → KIMORIN: rocket to Mars (motion 7-1) → the future city of Mars
  * (7-2) → ヒポキン, the hippo king (KIMORIN's friend) → "Mars is the planet where videos gather"
  * → Mars tutorial (the client's design: UFO timeline, studio, locker) → countdown.
  * Motions 7-1 / 7-2 are not made yet. Art: mars-city.jpg, hipokin.webp (client, 2026-10-05).
  */
-export const DAY7: Step[] = [
+export const DAY6: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'still', image: 'mercury-island' },
   { t: 'caption', text: '水星で目を覚ました' }, // ✏️

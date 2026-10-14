@@ -23,7 +23,7 @@ type Msg = { who: 'partner'; text: string } | { who: 'me'; text: string } | { wh
 
 export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) => void; onOpenIsland: () => void }) {
   const { me } = useAuth();
-  // Bati exists only for ORDER members (journeyDay 10) — until then KIMORIN composes.
+  // Bati exists only for ORDER members (journeyDay ≥ JOURNEY_DONE) — until then KIMORIN composes.
   const partner = usePartner();
   const hasBati = partner.isBati;
   const artist = me?.displayName || 'neo';

@@ -13,18 +13,18 @@ export interface Me {
   country: string;
   locale: Locale;
   subscriptionStatus: 'none' | 'demo' | 'active' | 'past_due' | 'canceled';
-  /** 1–8 = journey day to play, 9 = the Eclipse day (story + payment), 10 = ORDER member. */
+  /** 1–6 = journey day to play, 7 = the Eclipse day (story + payment), 8 = ORDER member. */
   journeyDay: number;
   /** Set when the current day has been finished (the next unlocks 24 h later or by skipping). */
   journeyCompletedAt: string | null;
   invitedByName: string | null;
-  /** OBOLO NEO form id (Day 3), null until chosen. */
+  /** OBOLO NEO form id (Day 2, on the Moon), null until chosen. */
   neoForm: string | null;
-  /** Generated OBOLO NEO look (Day 3), null until chosen — falls back to the neoForm emblem. */
+  /** Generated OBOLO NEO look (Day 2, on the Moon), null until chosen — falls back to the neoForm emblem. */
   avatarUrl: string | null;
-  /** The visitor's Bati: egg on Day 3 (food), hatched and named on Day 4. */
+  /** The visitor's Bati: born and named on Day 2 on the Moon (from the favourite food). */
   bati: BatiView | null;
-  /** Day 9: when the Eclipse was paid for (null = not yet). */
+  /** Day 7: when the Eclipse was paid for (null = not yet). */
   orderedAt: string | null;
   /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice.
    *  `selfSings` = the recording is kept, so songs are sung in it (Seed-VC; registered before 2026-10-09 = no). */

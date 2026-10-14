@@ -110,12 +110,14 @@ export const AdvanceJourneyBody = z.object({
 });
 export type AdvanceJourneyBody = z.infer<typeof AdvanceJourneyBody>;
 
-/** Day 3: the three questions for generating the OBOLO NEO look (client decision 2026-10-05). */
+/** Day 2 on the Moon: how the OBOLO NEO look is asked for (story 2026-10-14: questions / own words or a picture / おまかせ). */
 export const NeoLookBody = z.union([
+  /** OBOLON's questions (story 2026-10-14): animal, up to two colours, mood, and what they are into (may be passed) */
   z.object({
     animal: z.string().trim().min(1).max(30),
     color: z.string().trim().min(1).max(30),
     mood: z.string().trim().min(1).max(40),
+    hobby: z.string().trim().max(40).optional(),
   }),
   /** From a reference image (client decision 2026-10-05). The image is only read, never stored. */
   z.object({
@@ -124,11 +126,17 @@ export const NeoLookBody = z.union([
       /** base64, already downscaled by the client (≤ ~1.5 MB) */
       data: z.string().min(100).max(2_000_000),
     }),
-    /** KIMORIN's question 1: the part of the image they love */
-    liked: z.string().trim().min(1).max(60),
-    /** KIMORIN's question 2: their own twist */
-    twist: z.string().trim().min(1).max(60),
+    /** the part of the image they love (optional since the 2026-10-14 story) */
+    liked: z.string().trim().max(60).optional(),
+    /** their own twist (optional since the 2026-10-14 story) */
+    twist: z.string().trim().max(60).optional(),
   }),
+  /** In their own words ("自分の言葉で伝える") */
+  z.object({ words: z.string().trim().min(1).max(120) }),
+  /** おまかせ: the water basin draws freely */
+  z.object({ omakase: z.literal(true) }),
+  /** "この感じで、もっと見る": four new looks based on one of their candidates */
+  z.object({ like: z.string().min(1).max(64) }),
 ]);
 export type NeoLookBody = z.infer<typeof NeoLookBody>;
 

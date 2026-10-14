@@ -1,7 +1,9 @@
 import type { Step } from './script';
 
 /**
- * DAY 8 【金星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-17).
+ * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
+ * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
+ * Venus (was day 8; not on the first journey since 2026-10-14) 【金星】 — client's script (2026-10-05) + provisional lines by Claude (✏️, P-OB-17).
  * Venus is now the planet of making things: make in-game goods and items, buy and sell them with
  * the stars collected on the other planets (no real money, no real products). Replaces spec's reels.
  * Flow: [認証] → wake up on Mars → KIMORIN: off to Venus by rocket (motion 8-1) → the gorilla trio
@@ -10,7 +12,7 @@ import type { Step } from './script';
  * Art: longg/hatg/bossg.webp (client, 2026-10-05); the Venus backdrop is still generated.
  * Who says which of the client's lines is Claude's choice (✏️).
  */
-export const DAY8: Step[] = [
+export const VENUS_DAY: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'still', image: 'mars-city' },
   { t: 'caption', text: '火星で目を覚ました' }, // ✏️

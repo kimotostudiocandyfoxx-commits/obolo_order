@@ -9,7 +9,8 @@ describe('day 1 script', () => {
       if (s.t === 'choice') for (const o of s.options) if (o.goto) expect(() => labelIndex(DAY1, o.goto!)).not.toThrow();
     }
   });
-  it('starts with motion 1 and ends with end', () => {
+  it('starts with the 1日目 caption and motion 1, and ends with end', () => {
+    expect(DAY1.find((s) => s.t === 'caption')).toEqual({ t: 'caption', text: '1日目' });
     expect(DAY1.find((s) => s.t === 'video')).toEqual({ t: 'video', motion: 1 });
     expect(DAY1[DAY1.length - 1]).toEqual({ t: 'end' });
   });
@@ -29,7 +30,7 @@ describe('day 1 script', () => {
     expect(bgmAt(DAY1, 1)).toBe('opening');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 7))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'name'))).toBe('obolon');
-    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい！待て！'))).toBe('monban');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい、そこまでだ。'))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');
   });
   it('lets the visitor read during motion 17, with 19 chained after it', () => {
@@ -39,15 +40,14 @@ describe('day 1 script', () => {
     // resuming during those lines shows 19's last frame
     expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
   });
-  it('MONBAN shouts on a black screen before motion 27', () => {
-    const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい！待て！');
+  it('MONBAN steps in on a black screen before motion 27', () => {
+    const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい、そこまでだ。');
     expect(DAY1[i - 1]).toEqual({ t: 'black' });
     expect(DAY1[i + 1]).toEqual({ t: 'video', motion: 27 });
     expect(mediaAt(DAY1, i)).toBeNull();
   });
-  it('shows the temple caption during motion 12 and loops motion 13 behind OBOLON', () => {
+  it('loops motion 13 behind OBOLON', () => {
     const i = DAY1.findIndex((s) => s.t === 'video' && s.motion === 12);
-    expect(DAY1[i]).toMatchObject({ captions: [{ text: '地球の神殿に到着した' }] });
     expect(DAY1[i + 1]).toEqual({ t: 'bgm', track: 'obolon' });
     expect(DAY1[i + 2]).toEqual({ t: 'loop', motion: 13 });
     const name = DAY1.findIndex((s) => s.t === 'name');

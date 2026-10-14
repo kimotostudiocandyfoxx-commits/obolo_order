@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { PatapataWorld } from '@/components/jupiter/PatapataWorld';
 import { MarsWorld } from '@/components/mars/MarsWorld';
 import { VenusWorld } from '@/components/venus/VenusWorld';
@@ -11,11 +11,12 @@ import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { neoForm } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
-import { STORIES } from '@/lib/onboarding/stories';
+import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
 
 /**
- * /preview/play?day=N[&at=<step type>] — plays one day's story from the start (or from its first
+ * /preview/play?day=N[&at=<step type>][&timeup=1] — plays one day's story from the start (or from its first
  * step of that type, e.g. at=jupiter) with a test name. Nothing is saved to the account.
+ * timeup=1: the 88 minutes of space time run out 20 seconds in (SYS-S001).
  * /preview/play?world=jupiter | saturn | mercury | mars | venus — that planet's world on its own.
  */
 export default function PreviewPlayPage() {
@@ -36,6 +37,12 @@ function PreviewPlay() {
   const [refines, setRefines] = useState(0);
   const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
   const [ordered, setOrdered] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
+  useEffect(() => {
+    if (q.get('timeup') !== '1') return;
+    const t = setTimeout(() => setTimeUp(true), 20_000);
+    return () => clearTimeout(t);
+  }, [q]);
 
   if (q.get('world') === 'venus') {
     return (
@@ -78,11 +85,12 @@ function PreviewPlay() {
     );
   }
 
-  const story = STORIES[day];
+  const story = STORIES[day] ?? PREVIEW_ONLY[day];
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   if (ended) return <Ended text={`${day}日目 おわり`} again={`/preview/play?day=${day}${at ? `&at=${at}` : ''}`} />;
 
-  const start = at ? Math.max(0, story.steps.findIndex((s) => s.t === at)) : 0;
+  // at=<step type> (its first step) or i=<step index>
+  const start = q.get('i') ? Number(q.get('i')) : at ? Math.max(0, story.steps.findIndex((s) => s.t === at)) : 0;
   return (
     <>
       <StoryPlayer
@@ -91,11 +99,16 @@ function PreviewPlay() {
         vars={{
           name: 'テスト',
           inviter: 'KIMORIN',
-          neo: neoForm(neo)?.name,
-          batiFood: day >= 4 ? 'ラーメン' : undefined,
-          bati: day >= 5 ? 'ラーメンバティ' : undefined,
-          batiImage: day >= 5 ? demoBati('ラーメン') : undefined,
+          neo: neoForm(neo)?.name ?? (day >= 3 ? 'ミナト⭐︎' : undefined),
+          batiFood: day >= 3 ? 'ラーメン' : undefined,
+          bati: day >= 3 ? 'ぽん' : undefined,
+          batiImage: day >= 3 ? demoBati('ラーメン') : undefined,
+          kimorinStar: day >= 3,
         }}
+        seals={{ known: day >= 2 ? [1, 7, 8, ...(day >= 4 ? [2] : [])] : [], solved: day >= 4 ? [2] : [] }}
+        timeUp={timeUp}
+        onTimeUp={() => setEnded(true)}
+        onNeoName={async () => {}}
         initial={start > 0 ? { i: start, name: 'テスト', answers: {} } : null}
         onProgress={() => {}}
         onName={async () => {}}
@@ -106,7 +119,9 @@ function PreviewPlay() {
             const urls =
               'reference' in a
                 ? await Promise.all([0, 1, 2, 3].map((k) => demoFromReference(`data:${a.reference.mime};base64,${a.reference.data}`, a, k + round * 4)))
-                : demoNeoLooks(a, round);
+                : 'like' in a
+                  ? await Promise.all([0, 1, 2, 3].map((k) => demoRefine(cands.find((c) => c.id === a.like)?.url ?? '', '', k + round * 4)))
+                  : demoNeoLooks('animal' in a ? a : { animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, round);
             const c = urls.map((url, k) => ({ id: `${round}-${k}`, url }));
             setCands((x) => [...x, ...c]);
             setRound(round + 1);

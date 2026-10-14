@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { demoBati, eggSvg } from '@/lib/look';
+import { VoiceField } from './StoryExtras';
 
-/** Day 3: the favourite food the Bati egg is made from (client decision 2026-10-05). */
-const FOODS = ['ラーメン', 'カレー', 'おすし', 'ケーキ', 'たこ焼き', 'おにぎり'];
+/** Day 2 on the Moon: the favourite food the Bati is born from (examples from the story, 2026-10-14). */
+const FOODS = ['おにぎり', 'カレー', 'いちご', 'ラーメン', 'おすし', 'たこ焼き'];
 
-export function EggStep({ onEgg }: { onEgg: (food: string) => Promise<void> }) {
+export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: string) => Promise<void>; submit?: string }) {
   const [food, setFood] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -25,14 +26,7 @@ export function EggStep({ onEgg }: { onEgg: (food: string) => Promise<void> }) {
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-20">
       <div className="mx-auto mb-10 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-        <input
-          className="rounded-full border border-amber-200/60 bg-black/60 px-6 py-3.5 text-center tracking-widest text-amber-50 outline-none placeholder:text-white/35"
-          style={{ fontSize: 18 }}
-          maxLength={30}
-          placeholder="好きな食べ物"
-          value={food}
-          onChange={(e) => setFood(e.target.value)}
-        />
+        <VoiceField value={food} onChange={setFood} placeholder="好きな食べ物" maxLength={30} />
         <div className="flex flex-wrap justify-center gap-1.5">
           {FOODS.map((f) => (
             <button key={f} onClick={() => setFood(f)} className={`rounded-full px-3 py-1 text-xs ${food === f ? 'bg-amber-300 font-bold text-black' : 'bg-white/10 text-white/80'}`}>
@@ -41,7 +35,7 @@ export function EggStep({ onEgg }: { onEgg: (food: string) => Promise<void> }) {
           ))}
         </div>
         <button onClick={go} disabled={!food.trim() || busy} className="rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-lg tracking-widest text-amber-50 disabled:opacity-40">
-          {busy ? '……' : 'たまごを受け取る'}
+          {busy ? '……' : submit}
         </button>
         {err && <p className="text-center text-sm text-rose-300">{err}</p>}
       </div>
@@ -49,7 +43,7 @@ export function EggStep({ onEgg }: { onEgg: (food: string) => Promise<void> }) {
   );
 }
 
-/** Day 4: the egg wobbles and cracks while the Bati is generated, then the newborn appears. */
+/** The egg wobbles and cracks while the Bati is generated, then the newborn appears. */
 export function HatchStep({ food, onHatch, onDone }: { food: string; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
   const [url, setUrl] = useState<string | null>(null);
   const [stage, setStage] = useState<'wobble' | 'flash' | 'born'>('wobble');

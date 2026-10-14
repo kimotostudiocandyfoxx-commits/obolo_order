@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { batiPrompt, butterflyPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { batiPrompt, butterflyPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { cutoutWhite } from '../media/cutout';
@@ -13,9 +13,13 @@ import { IMAGES, KV, LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 
-/** Generations per OBOLO NEO (client decision 2026-10-05: 4 candidates, 3 tries). */
-export const NEO_LOOK_TRIES = 3;
-export const NEO_LOOK_REFINES = 3;
+/**
+ * Generations per OBOLO NEO. The story (2026-10-14) lets the visitor redraw "何度でも", so the screen
+ * shows no count; PLACEHOLDER (P-OB-18): a hidden ceiling keeps one apprentice's cost bounded
+ * (4 images per round, ~¥6 each) — at the ceiling the preset forms are offered.
+ */
+export const NEO_LOOK_TRIES = 8;
+export const NEO_LOOK_REFINES = 8;
 const CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
 /** PLACEHOLDER (P-PUNI-4): picture-character tries per member per day (2 candidates each, ~¥6 per image). */
@@ -29,9 +33,9 @@ let butterflySheet: Promise<GeneratedImage> | null = null;
 const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '../../assets/butterfly-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 
 /**
- * Day 3: generate the visitor's OBOLO NEO look from three answers and let them choose one.
- * Day 3 → 4: the Bati egg is made from their favourite food; it hatches (image generated) and is
- * named the next morning. If image generation fails the client falls back to the preset forms /
+ * Day 2 on the Moon: generate the visitor's OBOLO NEO look (questions / own words or a picture /
+ * おまかせ / more like one of the candidates) and let them choose one. Then the Bati is born from their
+ * favourite food (image generated) and named, the same day. If image generation fails the client falls back to the preset forms /
  * an emoji Bati, so the journey never stops.
  */
 @Injectable()
@@ -58,10 +62,19 @@ export class LookService {
 
   async candidates(userId: string, body: NeoLookBody, origin: string, unlimited = false): Promise<NeoLookResult> {
     const u = await this.user(userId);
-    const fromRef = 'reference' in body;
-    await this.clean(fromRef ? `${body.liked} ${body.twist}` : `${body.animal} ${body.color} ${body.mood}`);
+    const words =
+      'reference' in body ? `${body.liked ?? ''} ${body.twist ?? ''}` : 'words' in body ? body.words : 'animal' in body ? `${body.animal} ${body.color} ${body.mood} ${body.hobby ?? ''}` : '';
+    if (words.trim()) await this.clean(words);
     // the reference image is only handed to the model, never stored (copyright, client decision 2026-10-05)
-    const refs: GeneratedImage[] = fromRef ? [{ data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime }] : [];
+    const refs: GeneratedImage[] = [];
+    if ('reference' in body) refs.push({ data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime });
+    if ('like' in body) {
+      const src = await this.media.imageData(userId, body.like, 'avatar');
+      if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
+      refs.push(src);
+    }
+    const prompt = (i: number) =>
+      'reference' in body ? neoFromReferencePrompt(body, i) : 'words' in body ? neoWordsPrompt(body.words, i) : 'like' in body ? neoMorePrompt(i) : 'omakase' in body ? neoOmakasePrompt(i) : neoLookPrompt(body, i);
     const key = `look:tries:${userId}`;
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
@@ -70,7 +83,7 @@ export class LookService {
 
     const made = await Promise.allSettled(
       Array.from({ length: CANDIDATES }, (_, i) =>
-        this.images.generate(fromRef ? neoFromReferencePrompt(body, i) : neoLookPrompt(body, i), i, refs),
+        this.images.generate(prompt(i), i, refs),
       ),
     );
     const candidates = [];

@@ -1,24 +1,32 @@
 import Link from 'next/link';
 import { JOURNEY } from '@obolo/shared';
-import { STORIES } from '@/lib/onboarding/stories';
+import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
 
 /**
  * /preview — check each day's story on its own without walking the journey from day 1.
  * Nothing here touches the account's journey or story progress.
  */
 export default function PreviewIndex() {
-  const days = Object.keys(STORIES).map(Number).sort((a, b) => a - b);
+  const days = Object.keys({ ...STORIES, ...PREVIEW_ONLY }).map(Number).sort((a, b) => a - b);
   const jumps: { href: string; label: string }[] = [
     { href: '/preview/dj', label: '🎧 金星 DJ（音声エンジンの仮画面・横向き）' },
     { href: '/preview/story', label: '📖 新しい物語の台本（全場面・どの場面からでも／戻る・演出メモ）' },
     { href: '/preview/story-assets', label: '🎨 物語の素材（人物・場所・声・効果音／候補の見比べ）' },
-    { href: '/preview/play?day=3&at=neo', label: '3日目：ネオの姿えらびから' },
-    { href: '/preview/play?day=4&at=saturn', label: '4日目：ころりんぱ（土星で遊ぶ）から' },
-    { href: '/preview/play?day=5&at=jupiter', label: '5日目：パタパタ（木星で遊ぶ）から' },
-    { href: '/preview/play?day=6&at=choice', label: '6日目：フリージーの質問（ある／ない）から' },
-    { href: '/preview/play?day=6&at=mercury', label: '6日目：水星（船の海と島）から' },
-    { href: '/preview/play?day=7&at=mars', label: '7日目：火星（UFOの星図とスタジオ）から' },
-    { href: '/preview/play?day=9&at=choice', label: '9日目：MONBANの「月88円」から（支払いはデモ）' },
+    { href: '/preview/play?day=2&at=look', label: '2日目：月の神殿・ネオの姿づくりから' },
+    { href: '/preview/play?day=2&at=egg', label: '2日目：バティ誕生から' },
+    { href: '/preview/play?day=2&at=pause', label: '2日目：「やめておく」（その日を終える）' },
+    { href: '/preview/play?day=1&at=riddles', label: '1日目：8つの謎の札から' },
+    { href: '/preview/play?day=3&at=screen', label: '3日目：Bluenaの投影から' },
+    { href: '/preview/play?day=3&at=screen&timeup=1', label: '3日目：88分を過ぎたとき（20秒後に割りこみ）' },
+    { href: '/preview/play?day=3&at=seal', label: '3日目：謎2が解けるところから' },
+    { href: '/preview/play?day=3&at=kororin', label: '3日目：コロリン（つぶやいて自分の部屋へ）から' },
+    { href: '/preview/play?day=3&at=fx', label: '3日目：KIMORIN⭐︎のコロリンから' },
+    { href: '/preview/play?day=4&at=jupiter', label: '4日目：パタパタ（木星で遊ぶ）から' },
+    { href: '/preview/play?day=5&at=choice', label: '5日目：フリージーの質問（ある／ない）から' },
+    { href: '/preview/play?day=5&at=mercury', label: '5日目：水星（船の海と島）から' },
+    { href: '/preview/play?day=6&at=mars', label: '6日目：火星（UFOの星図とスタジオ）から' },
+    { href: '/preview/play?day=7&at=choice', label: '7日目：MONBANの「月88円」から（支払いはデモ）' },
+    { href: '/preview/play?day=8', label: '（一周目には出ない）金星：ゴリラ3人組（旧8日目の台本）' },
     { href: '/preview/puni-image', label: 'ぷにぷにキャラの試作（絵のキャラ版・メッシュ変形）' },
     { href: '/preview/robot', label: 'ロボット声のテスト（土星チュートリアル用：録音→ロボット声で再生）' },
     { href: '/preview/play?world=mars', label: '火星だけ（チュートリアルなし）' },
@@ -35,7 +43,7 @@ export default function PreviewIndex() {
         {days.map((d) => (
           <Link key={d} href={`/preview/play?day=${d}`} className="rounded-2xl border border-amber-200/30 bg-white/5 px-4 py-3">
             <span className="text-amber-100">{d}日目</span>
-            <span className="ml-3 text-sm text-white/70">{JOURNEY.find((j) => j.day === d)?.title ?? (d === 9 ? 'エクリプス（ORDERへ）' : '')}</span>
+            <span className="ml-3 text-sm text-white/70">{JOURNEY.find((j) => j.day === d)?.title ?? (d === 7 ? 'エクリプス（ORDERへ）' : d === 8 ? '金星（一周目には出ない・旧台本）' : '')}</span>
           </Link>
         ))}
       </div>

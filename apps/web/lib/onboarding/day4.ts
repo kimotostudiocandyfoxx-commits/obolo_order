@@ -1,7 +1,9 @@
 import type { Step } from './script';
 
 /**
- * DAY 5 【木星】 — client outline (2026-10-04) + provisional lines by Claude (✏️, P-OB-14).
+ * PLACEHOLDER (story 2026-10-14): renumbered for the seven-day journey; the lines are still the old
+ * story's (KIMORIN as the guide, 「〜ケン」) until the story chat rewrites this day.
+ * DAY 4 (was day 5) 【木星】 — client outline (2026-10-04) + provisional lines by Claude (✏️, P-OB-14).
  * Flow: [認証] → wake up on Saturn → to Jupiter (motion 5-1, not made yet) → Jupiter temple
  * (motion 5-2, not made yet) → KIMORIN introduces his friend 大根カイザー → Kaiser explains Jupiter
  * (client's lines) → Jupiter play screen (client is designing it: P-JUP-1, placeholder for now)
@@ -9,7 +11,7 @@ import type { Step } from './script';
  * 大根カイザー ends his sentences with 「DA」 (client, 2026-10-04). KIMORIN travels along.
  * Art: jupiter-kaiser.jpg (client's Jupiter world with 大根カイザー).
  */
-export const DAY5: Step[] = [
+export const DAY4: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'still', image: 'saturn-temple' },
   { t: 'caption', text: '土星で目を覚ました' }, // ✏️

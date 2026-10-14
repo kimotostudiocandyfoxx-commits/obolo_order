@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { JOURNEY_DONE } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { LookMaker } from '@/components/onboarding/LookMaker';
 import { getApi } from '@/lib/api';
@@ -67,11 +68,11 @@ export default function LabPage() {
 
           <section className="mx-auto mt-5 max-w-md rounded-2xl border border-white/15 bg-white/5 p-4">
             <p className="text-xs text-white/60">
-              旅の日を移動（管理トークンが必要）　いま：{me.journeyDay >= 10 ? 'ORDER' : `${me.journeyDay}日目`}
+              旅の日を移動（管理トークンが必要）　いま：{me.journeyDay >= JOURNEY_DONE ? 'ORDER' : `${me.journeyDay}日目`}
               {me.orderedAt ? '・支払い済み' : ''}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
+              {[1, 2, 3, 4, 5, 6, 7].map((d) => (
                 <button
                   key={d}
                   disabled={!admin || busy}
@@ -93,7 +94,7 @@ export default function LabPage() {
               ))}
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-white/45">
-              9 を押す → トップを開くと9日目が最初から始まります（支払いもやり直せます）。Stripe のテストはこれで。
+              7 を押す → トップを開くと7日目（エクリプス）が最初から始まります（支払いもやり直せます）。Stripe のテストはこれで。
             </p>
           </section>
 

@@ -15,7 +15,24 @@ import { MarsTutorial } from '@/components/mars/MarsTutorial';
 import { MercuryTutorial } from '@/components/mercury/MercuryTutorial';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnTutorial } from '@/components/saturn/SaturnTutorial';
-import { bgmAt, fill, labelIndex, mediaAt, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
+import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
+import {
+  AgeInput,
+  BluenaScreen,
+  BookButton,
+  DAY1_SEALS,
+  FxLayer,
+  KororinStep,
+  NeoNameInput,
+  PauseScreen,
+  playSfx,
+  RiddleBook,
+  RiddleCards,
+  SEALS,
+  TimeUpOverlay,
+  unlockSfx,
+  VoiceField,
+} from './StoryExtras';
 
 /**
  * Full-screen story player used by the invite-only onboarding.
@@ -48,15 +65,29 @@ interface Props {
   onHatch?: () => Promise<string>;
   /** Day 4 'batiname' step. */
   onBatiName?: (name: string) => Promise<void>;
-  /** Day 9 'order' step: the Eclipse payment. `ordered` = already paid. */
+  /** The Eclipse day's 'order' step: the payment. `ordered` = already paid. */
   orderApi?: OrderApi;
   ordered?: boolean;
+  /** Day 2 'neoname' step: the NEO name (becomes the display name). */
+  onNeoName?: (name: string) => Promise<void>;
+  /** Riddle-book seals already known / solved on earlier days (this day's steps add to them). */
+  seals?: { known: number[]; solved: number[] };
+  /**
+   * The day's space time is over (88 minutes, SYS-S001): at the next calm moment MONBAN calls the
+   * visitor back on Bluena's screen, then `onTimeUp`. Never during drawing, saving or paying.
+   */
+  timeUp?: boolean;
+  onTimeUp?: () => void;
+  /** 'pause' step: the day stops here (progress already points at the question to come back to). */
+  onPause?: () => void;
   onEnd: (answers: Record<string, string>) => void;
 }
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+/** How far above the bottom the question stays while an input panel is open (px). */
+const PROMPT_LIFT: Record<string, number> = { name: 230, batiname: 230, neoname: 260, age: 270, egg: 300 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onEnd }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, seals, timeUp, onTimeUp, onPause, onEnd }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -98,6 +129,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   }, []);
   const bgm = useRef<Bgm | null>(null);
   bgm.current ??= new Bgm();
+  /** Picture effect ('fx' steps) and Bluena's square screen ('screen' steps). */
+  const [fx, setFx] = useState<PictureFx | null>(null);
+  const [screen, setScreen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [timeUpShown, setTimeUpShown] = useState(false);
+  const mutedRef = useRef(false);
 
   const step = steps[i];
   const v: StoryVars = {
@@ -108,10 +146,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     batiImage: answers.batiImage ?? vars.batiImage,
     batiFood: answers.food ?? vars.batiFood,
     look: answers.look ?? vars.look,
+    age: answers.age ?? vars.age,
   };
+  if (answers.neoName) v.neo = answers.neoName;
+  // KIMORIN is "KIMORIN⭐︎" from his naming on the Moon (a day that starts later passes kimorinStar)
+  const starAt = steps.findIndex((s) => s.t === 'say' && s.who === 'OBOLON' && s.text.includes('KIMORIN⭐︎。'));
+  if (starAt >= 0 && i > starAt) v.kimorinStar = true;
+  // the riddle book: seals known from earlier days + this day's
+  const knownSeals = [...new Set([...(seals?.known ?? []), ...(answers.book ? DAY1_SEALS : []), ...Object.keys(answers).flatMap((k) => (/^seal\.\d$/.test(k) ? [Number(k.slice(5))] : []))])];
+  const solvedSeals = [...new Set([...(seals?.solved ?? []), ...knownSeals.filter((n) => answers[`seal.${n}`] && SEALS[n]?.answer)])];
   /** '@bati' / '@egg' / '@me' sprites are the visitor's own pictures ('@bati-weak': out of mana). */
   const spriteSrc = (n: string) =>
-    n === '@bati' || n === '@bati-weak' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
+    !n ? null : n === '@bati' || n === '@bati-weak' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
   /** Remember an answer (saved with the progress) without moving on. */
   const remember = (key: string, value: string) => {
     const a = { ...stateRef.current.answers, [key]: value };
@@ -172,6 +218,25 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'sprite') {
           setSprite(s.image);
           n++;
+        } else if (s.t === 'se') {
+          playSfx(s.sound, mutedRef.current);
+          n++;
+        } else if (s.t === 'fx') {
+          setFx(s.fx);
+          n++;
+        } else if (s.t === 'screen') {
+          setScreen(s.open);
+          n++;
+        } else if (s.t === 'pause') {
+          // the day ends here; the saved progress points at the question to come back to
+          bgm.current?.fadeOut();
+          setScreen(false);
+          let r = labelIndex(steps, s.resume);
+          while (steps[r]?.t === 'label') r++;
+          setI(r);
+          setPaused(true);
+          onPause?.();
+          return;
         } else if (s.t === 'black') {
           bgQueue.current = [];
           setBlackout(true);
@@ -216,7 +281,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
       }
     },
-    [steps, playMedia, setI, onEnd, clearCaptions],
+    [steps, playMedia, setI, onEnd, clearCaptions, onPause],
   );
   runRef.current = run;
 
@@ -271,6 +336,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   );
 
   useEffect(() => {
+    mutedRef.current = muted;
     bgm.current?.setMuted(muted);
     dual.current?.setMuted(muted);
   }, [muted]);
@@ -278,34 +344,38 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   /** First tap: unlocks audio/video on iOS and starts (or resumes) the story inside the gesture. */
   const start = () => {
     setStarted(true);
+    unlockSfx();
     // Start the music inside the gesture (fresh start: the first track; resume: the track at that point).
     const firstBgm = steps.find((s) => s.t === 'bgm');
     bgm.current?.unlock(i === 0 ? (firstBgm?.t === 'bgm' ? firstBgm.track : null) : bgmAt(steps, i));
     const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
-    if (i === 0 || ['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout'].includes(cur.t)) {
+    if (i === 0) {
+      run(0);
+      return;
+    }
+    // resuming: restore what was on screen — the still (if newer than the last motion), the
+    // characters, the picture effect and Bluena's screen — then the motion behind them
+    const before = steps.slice(0, i).reverse();
+    const lastFx = before.find((s) => s.t === 'fx');
+    if (lastFx?.t === 'fx') setFx(lastFx.fx);
+    const lastScreen = before.find((s) => s.t === 'screen');
+    if (lastScreen?.t === 'screen') setScreen(lastScreen.open);
+    const lastBack = before.find((s) => s.t === 'still' || s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo' || s.t === 'black');
+    const onStill = lastBack?.t === 'still';
+    if (lastBack?.t === 'still') {
+      setStill(lastBack.image);
+      setReady(true);
+    }
+    const lastSprite = before.find((s) => s.t === 'sprite' || s.t === 'video');
+    if (lastSprite?.t === 'sprite') setSprite(lastSprite.image);
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'se', 'fx', 'screen', 'pause'].includes(cur.t)) {
       run(i);
       return;
     }
-    for (let k = i - 1; k >= 0; k--) {
-      const s = steps[k];
-      if (s.t === 'video' || s.t === 'loop') break;
-      if (s.t === 'still') {
-        setStill(s.image);
-        setReady(true);
-        break;
-      }
-    }
-    for (let k = i - 1; k >= 0; k--) {
-      const s = steps[k];
-      if (s.t === 'sprite') {
-        setSprite(s.image);
-        break;
-      }
-      if (s.t === 'video') break;
-    }
     const m = mediaAt(steps, i);
+    if (onStill) return; // the still covers the screen: no motion needed behind it
     if (m) playMedia(m.motion, m.loop, !m.loop);
     else {
       setBlackout(true);
@@ -322,10 +392,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     run(goto ? labelIndex(steps, goto) : iRef.current + 1);
   };
 
-  const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter');
+  const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice');
+  // SYS-S001: only at a calm moment (a line, a button) — never while drawing, saving or paying
+  const calm = step && ['caption', 'say', 'letter', 'notice', 'action', 'choice'].includes(step.t);
+  useEffect(() => {
+    if (timeUp && calm && started && !paused) setTimeUpShown(true);
+  }, [timeUp, calm, started, paused]);
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
-  const prev = steps[i - 1];
-  const prompt = step && (step.t === 'choice' || step.t === 'name' || step.t === 'action' || step.t === 'egg' || step.t === 'batiname') && prev?.t === 'say' ? prev : null;
+  let pk = i - 1;
+  while (steps[pk]?.t === 'label') pk--;
+  const prev = steps[pk];
+  const prompt =
+    step && ['choice', 'name', 'action', 'egg', 'batiname', 'age', 'neoname'].includes(step.t) && !(step.t === 'choice' && step.prompt) && prev?.t === 'say' ? prev : null;
 
   return (
     <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
@@ -369,12 +447,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
               key={name}
               src={src}
               alt=""
-              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${name === 'obolon' ? 'bottom-[40%] h-[22%]' : name === '@bati-weak' ? 'bottom-[26%] h-[30%] rotate-[-6deg] rounded-[2rem] border-2 border-white/20 opacity-80 brightness-75 saturate-[.35]' : own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : 'bottom-[24%] h-[50%]'}`}
+              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${name === 'obolon' ? 'bottom-[40%] h-[22%]' : name === 'kimorin-dragon' ? 'bottom-[18%] h-[66%]' : name === 'monban' ? 'bottom-[20%] h-[58%]' : name === 'unchi-pinpon' ? 'bottom-[26%] h-[26%]' : name === '@bati-weak' ? 'bottom-[26%] h-[30%] rotate-[-6deg] rounded-[2rem] border-2 border-white/20 opacity-80 brightness-75 saturate-[.35]' : own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : screen ? 'bottom-[22%] h-[36%]' : 'bottom-[24%] h-[50%]'}`}
               style={spriteSlot(k, arr.length)}
               aria-hidden
             />
           );
         })}
+      <FxLayer fx={fx} />
+      <BluenaScreen open={screen} />
       {overlayCaption && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[calc(18vh+env(safe-area-inset-bottom))] z-[6] flex animate-[fadeUp_0.8s_ease-out] justify-center">
           <div className="flex items-center gap-3 rounded-full bg-black/55 px-6 py-3 text-lg tracking-[0.2em] text-amber-100 backdrop-blur-sm">
@@ -398,10 +478,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />}
 
       {started && prompt && (
-        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 64 + 40 : step?.t === 'name' || step?.t === 'batiname' ? 200 : step?.t === 'egg' ? 250 : 150}px + env(safe-area-inset-bottom))` }}>
+        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 64 + 40 : PROMPT_LIFT[step?.t ?? ''] ?? 150}px + env(safe-area-inset-bottom))` }}>
           <div className="relative mx-auto w-full max-w-xl rounded-2xl border border-amber-200/35 bg-black/60 px-5 pb-5 pt-7 backdrop-blur-md">
             <span className="absolute -top-3.5 left-5 rounded-full border border-amber-200/50 bg-black px-3 py-0.5 text-xs font-bold tracking-[0.25em] text-amber-200">
-              {prompt.who === 'バティ' ? v.bati || 'バティ' : prompt.who}
+              {speakerName(prompt.who, v)}
             </span>
             <p className="whitespace-pre-wrap text-[17px] leading-relaxed">{fill(prompt.text, v)}</p>
           </div>
@@ -411,6 +491,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <Buttons>
           <GoldButton onClick={next}>{step.label}</GoldButton>
         </Buttons>
+      )}
+      {started && step?.t === 'choice' && step.prompt && (
+        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step.options.length * 64 + 40}px + env(safe-area-inset-bottom))` }}>
+          <div className="mx-auto w-full max-w-xl rounded-2xl border border-amber-200/50 bg-black/70 px-5 py-4 text-center backdrop-blur-md">
+            <p className="whitespace-pre-wrap text-[16px] leading-relaxed text-amber-50">{fill(step.prompt, v)}</p>
+          </div>
+        </div>
       )}
       {started && step?.t === 'choice' && (
         <Buttons>
@@ -448,6 +535,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {started && step?.t === 'egg' && (
         <EggStep
+          submit={step.submit}
           onEgg={async (food) => {
             await onEgg?.(food);
             remember('food', food);
@@ -461,6 +549,58 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
           onDone={(url) => {
             remember('batiImage', url);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'age' && (
+        <AgeInput
+          onAnswer={(age) => {
+            remember('age', age);
+            run(iRef.current + 1);
+          }}
+          onSkip={() => run(labelIndex(steps, step.skip))}
+        />
+      )}
+      {started && step?.t === 'neoname' && (
+        <NeoNameInput
+          placeholder={step.placeholder}
+          submit={step.submit}
+          onSubmit={async (n) => {
+            await onNeoName?.(n);
+            remember('neoName', n);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'riddles' && (
+        <RiddleCards
+          onDone={() => {
+            remember('book', '1');
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'seal' && (
+        <RiddleBook
+          known={[...new Set([...knownSeals, step.n])]}
+          solved={[...new Set([...solvedSeals, step.n])]}
+          fresh={step.n}
+          onClose={() => {
+            remember(`seal.${step.n}`, '1');
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'kororin' && (
+        <KororinStep
+          bati={v.bati || 'バティ'}
+          batiImage={v.batiImage}
+          face={v.look}
+          onDone={(text) => {
+            // PLACEHOLDER (P-SAT-*): the first journey's kororin stays in your own room — kept with the
+            // day's answers (with the time), sent to nobody
+            remember('kororin', JSON.stringify({ text, at: new Date().toISOString() }));
             run(iRef.current + 1);
           }}
         />
@@ -515,6 +655,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </button>
       )}
 
+      {started && knownSeals.length > 0 && step?.t !== 'seal' && step?.t !== 'riddles' && <BookButton onClick={() => setBookOpen(true)} />}
+      {bookOpen && <RiddleBook known={knownSeals} solved={solvedSeals} onClose={() => setBookOpen(false)} />}
+      {paused && <PauseScreen />}
+      {timeUpShown && (
+        <TimeUpOverlay
+          muted={muted}
+          onDone={() => {
+            setScreen(false);
+            onTimeUp?.();
+          }}
+        />
+      )}
+
       {started && (
         <button
           className="pt-safe absolute right-3 top-3 z-40 rounded-full bg-black/40 px-3 py-1.5 text-sm text-white/70"
@@ -529,9 +682,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 }
 
 function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: () => void }) {
-  const text = step.t === 'caption' || step.t === 'say' || step.t === 'letter' ? fill(step.text, vars) : '';
+  const text = step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' ? fill(step.text, vars) : '';
   const chars = [...text];
-  const [shown, setShown] = useState(step.t === 'letter' ? chars.length : 0);
+  const [shown, setShown] = useState(step.t === 'letter' || step.t === 'notice' ? chars.length : 0);
   const done = shown >= chars.length;
 
   useEffect(() => {
@@ -557,6 +710,17 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
     );
   }
 
+  if (step.t === 'notice') {
+    return (
+      <button className="absolute inset-0 z-10 flex items-center justify-center bg-black/45 px-8" onClick={tap}>
+        <div className="w-full max-w-sm animate-[fadeUp_0.5s_ease-out] whitespace-pre-wrap rounded-2xl border border-amber-200/40 bg-black/75 px-6 py-5 text-center text-[15px] leading-relaxed text-amber-50 [word-break:keep-all] backdrop-blur-md">
+          {text}
+        </div>
+        <Cue />
+      </button>
+    );
+  }
+
   if (step.t === 'caption') {
     return (
       <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" onClick={tap}>
@@ -570,7 +734,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
     );
   }
 
-  const who = step.t === 'say' ? (step.who === 'バティ' ? vars.bati || 'バティ' : step.who) : '';
+  const who = step.t === 'say' ? speakerName(step.who, vars) : '';
   return (
     <button className="absolute inset-0 z-10 flex items-end justify-center" onClick={tap}>
       <div className="pb-safe w-full bg-gradient-to-t from-black via-black/80 to-transparent px-4 pt-16">
@@ -639,15 +803,7 @@ function NameInput({
   return (
     <form onSubmit={go} className="pb-safe absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-20">
       <div className="mx-auto mb-10 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-        <input
-          className="rounded-full border border-amber-200/60 bg-black/60 px-6 py-3.5 text-center text-lg tracking-widest text-amber-50 outline-none placeholder:text-white/35 focus:border-amber-100"
-          style={{ fontSize: 18 }}
-          maxLength={20}
-          autoFocus
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
+        <VoiceField value={value} onChange={setValue} placeholder={placeholder} />
         <GoldButton onClick={() => undefined}>{busy ? '……' : submit}</GoldButton>
         {err && <p className="text-center text-sm text-rose-300">{err}</p>}
       </div>
