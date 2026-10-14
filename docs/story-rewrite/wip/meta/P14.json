@@ -51,14 +51,13 @@
       "title": "太陽への門",
       "origRef": "4-I「帰還の門」MONBAN「太陽への門だ…。／覚えているか…。」",
       "where": "三周目・終章・地球の本部奥の太陽への門",
-      "summary": "太陽への門でMONBAN「覚えているか…。」、バティ（mana_low/mana_ok）、MONBAN「{inviter}のマナジェムから…始まった…。」。KIMORINは兜とたこ焼きでラスボス戦のつもりで来るが、ボスはいない（KIMORINは仕切らない）。神殿へ向かう／今日はここまで（本当に止まる）。",
+      "summary": "太陽への門でMONBAN「覚えているか…。」、バティ（最初の見学ツアーを振り返る一言）、MONBAN「{inviter}のマナジェムから…始まった…。」。KIMORINは兜とたこ焼きでラスボス戦のつもりで来るが、ボスはいない（KIMORINは仕切らない）。神殿へ向かう／今日はここまで（本当に止まる）。",
       "choices": [
         "神殿へ向かう→S002",
         "今日はここまで→本部の星図（停止）"
       ],
       "flags": [
         "f_sun_gate(go/stop)",
-        "参照：mana_low/mana_ok（8日目の記録）",
         "参照：f_l3_player_done"
       ],
       "saveEvents": [],
