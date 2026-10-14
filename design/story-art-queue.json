@@ -216,6 +216,86 @@
         "design/story/refs/style-monban.jpg"
       ],
       "prompt": "IGNORE the style note about backgrounds: this is a character picture. Exactly the hooded figure of the reference image: a tall mysterious gatekeeper in a long black hooded robe with fine gold embroidery, the face hidden in the darkness of the hood except for ONE single glowing golden eye, a ring of golden light (a halo of fine geometric gold lines) floating behind the back, wisps of black smoke at the feet. Full body, standing, facing the viewer, centred, the figure fills 88% of the picture height. Plain flat light grey background (#c8c8c8), soft even light, no ground shadow."
+    },
+    {
+      "id": "rocket-jupiter",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Inside an old brass rocket cabin: a large round porthole window framed in riveted brass; outside, the huge planet Jupiter with green and cream stripes (a forest planet, faint green bands) approaches, filling much of the window, against black space full of stars. Warm dim cabin light. Lower third calm and simple."
+    },
+    {
+      "id": "rocket-mercury",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Inside an old brass rocket cabin: a large round porthole window framed in riveted brass; outside, a small planet entirely covered by a glowing blue ocean approaches, a white frozen continent on one side, against black space full of stars. Warm dim cabin light. Lower third calm and simple."
+    },
+    {
+      "id": "rocket-mars",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Inside an old brass rocket cabin: a large round porthole window framed in riveted brass; outside, the red planet Mars approaches, tiny lights of a futuristic city of tall screen towers on its surface, against black space full of stars. Warm dim cabin light. Lower third calm and simple."
+    },
+    {
+      "id": "rocket-earth",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Inside an old brass rocket cabin: a large round porthole window framed in riveted brass; outside, the blue Earth grows larger and larger, warm and welcoming, against black space full of stars. Warm dim cabin light. Lower third calm and simple."
+    },
+    {
+      "id": "rocket-sun",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Inside an old brass rocket cabin: a large round porthole window framed in riveted brass; outside, the Sun fills the window with blinding gold and white light, solar flares curling, a ring of light around it, against black space full of stars. Warm dim cabin light. Lower third calm and simple."
+    },
+    {
+      "id": "jupiter-forest",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "A vast mystical forest on Jupiter: gigantic ancient trees reaching up to the sky, sunlight streaming through the leaves in beams, tiny glowing particles of light floating in the air, mossy ground, soft green and gold. Peaceful and sacred. No people. Lower third calm and simple."
+    },
+    {
+      "id": "mercury-ice",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "On Mercury: a white frozen ice continent at the edge of a glowing blue ocean that covers the whole planet, an old brass rocket has landed on the ice, frosty air, cold blue light, gentle waves, a few ice floes. No people. Lower third calm and simple."
+    },
+    {
+      "id": "earth-hall",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "A dark grand temple hall on Earth full of antique golden armillary spheres and celestial globes, a single pillar of white-gold light falling from the ceiling in the centre (empty inside), polished black floor with golden star patterns. Mysterious, sacred, black and gold. No people. Lower third calm and simple."
     }
   ],
   "redo": []
