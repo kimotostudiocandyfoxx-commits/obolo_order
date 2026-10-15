@@ -207,7 +207,14 @@
       "brief": "Bati: a tiny newborn magical creature, the player's partner; a cheerful, innocent, childlike voice, bright and bouncy, curious about everything, kind"
     }
   },
-  "redo": [],
+  "redo": [
+    "OBOLON",
+    "ヒポキン",
+    "フリージー",
+    "大根カイザー",
+    "バティ",
+    "コロリン"
+  ],
   "batch": 900,
   "parts": [
     "P01",
@@ -215,7 +222,11 @@
     "P03",
     "P04"
   ],
-  "redoLines": [],
+  "redoLines": [
+    "変な声出すの恥ずかしいー！",
+    "では、KIMORIN⭐︎で。",
+    "OBOLON、それは喋りすぎだ。"
+  ],
   "tempo": 1.3,
   "special": [
     {

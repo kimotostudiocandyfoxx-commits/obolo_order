@@ -92,7 +92,15 @@ const atempo = (r: number) => (Math.abs(r - 1) < 0.001 ? [] : [`atempo=${r.toFix
 function finish(input: string, inputArgs: string[], s: Spec, out: string) {
   const f: string[] = [HEAD];
   // rubberband at its best quality (the default "speed" setting sounded robotic)
-  const rb = (st: number, formant: string) => `rubberband=pitch=${Math.pow(2, st / 12).toFixed(4)}:formant=${formant}:pitchq=quality:transients=smooth:window=long:smoothing=on:phase=independent`;
+  // ffmpeg's rubberband loses the last moment of the line and ends on a click: give it a second of silence to
+  // chew on, drop the click at the very end, then trim the silence that is left
+  const rb = (st: number, formant: string) =>
+    [
+      'apad=pad_dur=1',
+      `rubberband=pitch=${Math.pow(2, st / 12).toFixed(4)}:formant=${formant}:pitchq=quality:transients=smooth:window=long:smoothing=on:phase=independent`,
+      'areverse,atrim=start=0.25,asetpts=N/SR/TB',
+      'silenceremove=start_periods=1:start_duration=0:start_threshold=-50dB:start_silence=0.12,areverse',
+    ].join(',');
   if (s.growl) {
     // a monster: formants pulled down with the pitch, grit, weight in the low end
     f.push(rb(s.pitch ?? -6, 'shifted'));
@@ -321,7 +329,19 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     const file = `/story/voices/lines/${j.key}.mp3`;
     try {
       const tmp = join(PUB, `${file}.new.mp3`);
-      await speak(j.name, j.s, j.brief, j.act, j.text, tmp);
+      // a take that is far too short for its words was cut off by the voice service: try again (keep the longest)
+      const chars = j.text.replace(/[\s、。，．！？!?…・「」『』（）()〜ー＊*“”"-]/g, '').length;
+      let best = 0;
+      for (let take = 0; take < 3; take++) {
+        const t = join(PUB, `${file}.take.mp3`);
+        await speak(j.name, j.s, j.brief, j.act, j.text, t);
+        const sec = seconds(t);
+        if (sec > best) {
+          best = sec;
+          renameSync(t, tmp);
+        } else rmSync(t);
+        if (chars < 6 || chars / best <= 13) break;
+      }
       renameSync(tmp, join(PUB, file));
       manifest[j.key] = file;
       made++;

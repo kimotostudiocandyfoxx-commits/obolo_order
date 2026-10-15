@@ -155,6 +155,7 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
   const [agreed, setAgreed] = useState(false);
   const [asking, setAsking] = useState(false);
   const [typing, setTyping] = useState(false);
+  const [micFail, setMicFail] = useState(false);
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
   const [star, setStar] = useState(false);
@@ -237,7 +238,9 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
     if (busy || !beat) return;
     if (beat.k === 'recWeird' && !agreed) return setAsking(true);
     if (!rec.on) {
-      if (!(await rec.start())) setTyping(true);
+      if (await rec.start()) return setMicFail(false);
+      setMicFail(true);
+      if (beat.k === 'recNormal') setTyping(true);
       return;
     }
     const blob = await rec.stop();
@@ -358,18 +361,38 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
                     <Choice onClick={() => setWeird(null)}>吹きこみ直す</Choice>
                   </div>
                 ) : (
-                  <button onClick={() => void tapBati()} disabled={busy} className={`relative h-24 w-24 rounded-full border-2 p-1 transition ${rec.on ? 'border-rose-300 bg-rose-400/40' : 'border-white/80 bg-white/20'} disabled:opacity-60`} aria-label={rec.on ? '録音をとめる' : `${bati}に話しかける`}>
-                    {rec.on && <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/40" />}
-                    {batiImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={batiImage} alt="" className="relative h-full w-full rounded-full object-cover" />
+                  // a big, plain mic: tap to talk, tap again to stop ({bati} listens from its shoulder)
+                  <button
+                    onClick={() => void tapBati()}
+                    disabled={busy}
+                    className={`relative flex h-32 w-32 items-center justify-center rounded-full border-4 shadow-[0_8px_30px_rgba(60,20,90,0.45)] transition active:scale-95 disabled:opacity-60 ${rec.on ? 'border-rose-200 bg-gradient-to-b from-rose-400 to-rose-600' : 'border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500'} ${!rec.on && !busy ? 'animate-[hintGlow_2.2s_ease-in-out_infinite]' : ''}`}
+                    aria-label={rec.on ? '録音をとめる' : '録音する'}
+                  >
+                    {rec.on && <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/50" />}
+                    {rec.on ? (
+                      <span className="relative h-11 w-11 rounded-lg bg-white" />
                     ) : (
-                      <span className="relative flex h-full w-full items-center justify-center text-3xl">🎙</span>
+                      <svg viewBox="0 0 24 24" className="relative h-16 w-16 fill-white drop-shadow" aria-hidden>
+                        <path d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V5a3.5 3.5 0 0 0-7 0v6a3.5 3.5 0 0 0 3.5 3.5Z" />
+                        <path d="M18.5 11a.9.9 0 0 0-1.8 0 4.7 4.7 0 0 1-9.4 0 .9.9 0 0 0-1.8 0 6.5 6.5 0 0 0 5.6 6.4V20H8.8a.9.9 0 0 0 0 1.8h6.4a.9.9 0 0 0 0-1.8H12.9v-2.6a6.5 6.5 0 0 0 5.6-6.4Z" />
+                      </svg>
                     )}
-                    <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm shadow">🎙</span>
+                    {batiImage && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={batiImage} alt="" className="absolute -left-3 -top-3 h-12 w-12 rounded-full border-2 border-white object-cover shadow" />
+                    )}
                   </button>
                 )}
-                <p className="mt-2 h-4 text-[11px] font-bold text-[#4a2f78]">{busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : ''}</p>
+                {!(beat?.k === 'recWeird' && weird && !rec.on) && (
+                  <p className="mt-3 rounded-full bg-[rgba(20,12,36,0.72)] px-4 py-1.5 text-[14px] font-bold text-white">
+                    {busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : micFail ? 'マイクが使えないみたい' : 'タップして、話してね'}
+                  </p>
+                )}
+                {micFail && beat?.k === 'recWeird' && !rec.on && (
+                  <button onClick={next} className="mt-2 text-[13px] text-white/80 underline">
+                    いまは吹きこまない
+                  </button>
+                )}
                 {/* the way out for anyone who cannot speak */}
                 <button onClick={() => (beat?.k === 'recWeird' ? next() : setTyping(true))} className="absolute bottom-[calc(14px+env(safe-area-inset-bottom))] right-4 p-2 text-lg text-white/45" aria-label="文字で入力">
                   ⌨
