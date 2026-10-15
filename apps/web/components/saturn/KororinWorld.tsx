@@ -522,7 +522,6 @@ export function KororinWorld({
             </button>
             <span className="text-lg leading-none">{plaza.icon}</span>
             <span className="min-w-0 truncate text-sm font-black text-[#3d2a5c]">{plaza.name}</span>
-            <span className="shrink-0 text-[11px] font-bold text-[#8a76bd]">👤{plaza.memberCount.toLocaleString()}</span>
             <button
               onClick={() =>
                 void getApi()

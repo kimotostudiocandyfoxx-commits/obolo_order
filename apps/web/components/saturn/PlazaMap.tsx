@@ -214,14 +214,7 @@ export function Island({ plaza, w }: { plaza: Pick<PlazaView, 'id' | 'name' | 'i
       {/* name card */}
       <div className="absolute left-1/2 top-0 z-[3] -translate-x-1/2 whitespace-nowrap rounded-2xl bg-white/95 px-3 py-1 text-center shadow-[0_4px_12px_rgba(60,20,110,.22)]">
         <p className="max-w-[9em] truncate text-[13px] font-black leading-tight text-[#3d2a5c]">{plaza.name}</p>
-        <p className="flex items-center justify-center gap-1 text-[11px] font-bold leading-tight text-[#8a76bd]">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="#e58ab9" aria-hidden>
-            <circle cx="12" cy="7" r="5" />
-            <path d="M2 23c0-6 4.5-9 10-9s10 3 10 9z" />
-          </svg>
-          {plaza.memberCount.toLocaleString()}
-          {plaza.joined && <span className="ml-1 rounded-full bg-pink-100 px-1.5 text-[9px] text-pink-500">参加中</span>}
-        </p>
+        {plaza.joined && <p className="text-[9px] font-bold leading-tight text-pink-500">参加中</p>}
       </div>
       {/* the island (Art workshop, airbrushed pastel); each plaza's a little different in colour */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
