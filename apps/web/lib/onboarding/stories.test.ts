@@ -110,7 +110,7 @@ describe('the Eclipse day (7)', () => {
     const pay = labelIndex(steps, opts[0].goto!);
     expect(steps.slice(pay, pay + 4).find((s) => s.t === 'order')).toEqual({ t: 'order', cancel: 'back' });
     const stop = steps.slice(c + 1).find((s) => s.t === 'pause');
-    expect(stop).toEqual({ t: 'pause', resume: 'decide' });
+    expect(stop).toEqual({ t: 'pause', resume: 'resume' });
   });
   it('the Sun temple opens riddles 2 and 1, then the film of the seven days', () => {
     const opened = steps.filter((s) => s.t === 'seal' && s.open).map((s) => (s.t === 'seal' ? s.n : 0));

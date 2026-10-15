@@ -141,6 +141,7 @@ export function InviteStory({ code }: { code: string }) {
 
   return (
     <StoryPlayer
+      textOnly
       steps={DAY1}
       vars={{ name: me?.displayName ?? '', inviter: invite.inviterName }}
       initial={saved}

@@ -169,6 +169,7 @@ function PreviewPlay() {
           story: { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる' },
         }}
         lessonApi={fakeLessonApi}
+        textOnly={day <= 3}
         seals={{ known: day >= 2 ? knownSealsOn(day) : [], solved: solvedSealsOn(day) }}
         stamps={stampsOn(day)}
         timeUp={timeUp}

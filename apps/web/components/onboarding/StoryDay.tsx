@@ -159,6 +159,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         made: madeFrom(me.story),
       }}
       lessonApi={realLessonApi}
+      textOnly={day <= 3}
       // the riddle book: 1・7・8 from day 1; 2 (「表現者」) solved on day 3, Saturn
       seals={{ known: knownSealsOn(day), solved: solvedSealsOn(day) }}
       stamps={stampsOn(day)}

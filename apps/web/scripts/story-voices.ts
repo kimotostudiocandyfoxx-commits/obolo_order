@@ -262,6 +262,12 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   writeFileSync(join(STORY, 'voices/auditions.json'), JSON.stringify({ ...out, chosen: chosenLabels, model: tts }, null, 1));
 
   // --- the real lines of people whose voice is chosen ---
+  // "parts": only these parts are voiced now (the first journey = P01–P04); "redoLines": lines (their words,
+  // or a part of them) to say again; lines no longer in the story lose their files (cleanup)
+  const parts = (cfg.parts as string[] | undefined) ?? idx.parts;
+  const redoLines = (cfg.redoLines as string[] | undefined) ?? [];
+  const spoken = new Map<string, { act?: string; text: string }[]>();
+  for (const p of parts) for (const sc of json<Scene[]>(join(STORY, `${p}.json`), [])) walk(sc.lines, (l) => l.k === 'say' && spoken.set(l.who, [...(spoken.get(l.who) ?? []), { act: l.act, text: l.text }]));
   const manifestPath = join(STORY, 'voices/manifest.json');
   const manifest = json<Record<string, string>>(manifestPath, {});
   const jobs: { name: string; s: Spec; brief: string; act?: string; text: string; key: string }[] = [];
@@ -270,13 +276,14 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     const s = spec(ref);
     const brief = s.brief ?? cfg.auditions.find((a) => a.name === name)?.brief ?? '';
     const again = redo.has(name);
-    for (const l of said.get(name) ?? []) {
+    for (const l of spoken.get(name) ?? []) {
       if (!voiceable(l.text)) {
         skipped++;
         continue;
       }
       const key = voiceKey(name, l.act, l.text);
-      if (!again && manifest[key] && existsSync(join(PUB, manifest[key]))) continue;
+      const once = redoLines.some((r) => r && l.text.includes(r));
+      if (!again && !once && manifest[key] && existsSync(join(PUB, manifest[key]))) continue;
       if (!jobs.some((j) => j.key === key)) jobs.push({ name, s, brief, act: l.act, text: l.text, key });
     }
   }
@@ -309,7 +316,7 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
 
   // Fish model ids made this run go back into the config; redo is done once
   writeFileSync(CONFIG, JSON.stringify({ ...cfg, redo: [] }, null, 2) + '\n');
-  const total = [...said.entries()].filter(([n]) => cfg.chosen[n]).reduce((a, [, ls]) => a + ls.filter((l) => voiceable(l.text)).length, 0);
+  const total = [...spoken.entries()].filter(([n]) => cfg.chosen[n]).reduce((a, [, ls]) => a + ls.filter((l) => voiceable(l.text)).length, 0);
   const report = [
     `# 物語の声 — ${new Date().toISOString()}`,
     '',

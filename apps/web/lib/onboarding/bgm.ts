@@ -23,6 +23,8 @@ export class Bgm {
   private el: HTMLAudioElement | null = null;
   private track: string | null = null;
   private muted = false;
+  /** the mixer's music volume × the dip while a line is spoken (story mixer, 2026-10-15) */
+  private scale = 1;
   /** Pauses we cause ourselves (incl. src changes, whose events arrive later) are ignored. */
   private ignorePauseUntil = 0;
   private swapTimer: ReturnType<typeof setTimeout> | null = null;
@@ -92,6 +94,12 @@ export class Bgm {
     this.swapTimer = setTimeout(() => this.stopNow(), seconds * 1000 + 100);
   }
 
+  /** Music volume 0–1 (the mixer × the dip under voices). Element volume is fixed on iOS: there only the Web Audio fallback follows. */
+  setScale(v: number, seconds = 0.35) {
+    this.scale = Math.max(0, Math.min(1, v));
+    if (this.track) this.fadeTo(this.level(), seconds);
+  }
+
   setMuted(m: boolean) {
     this.muted = m;
     if (this.el) this.el.muted = m;
@@ -114,7 +122,7 @@ export class Bgm {
   }
 
   private level() {
-    return this.track ? bgmLevel(this.track) : 0;
+    return this.track ? bgmLevel(this.track) * this.scale : 0;
   }
 
   private stopNow() {
@@ -200,7 +208,7 @@ export class Bgm {
     const t = ctx.currentTime;
     this.gain.gain.cancelScheduledValues(t);
     this.gain.gain.setValueAtTime(0, t);
-    this.gain.gain.linearRampToValueAtTime(this.muted ? 0 : bgmLevel(track), t + fadeIn);
+    this.gain.gain.linearRampToValueAtTime(this.muted ? 0 : bgmLevel(track) * this.scale, t + fadeIn);
     src.start(t, offset % buf.duration);
     this.source = src;
   }

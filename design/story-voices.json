@@ -1,5 +1,5 @@
 {
-  "note": "物語の声。auditions：人物ごとに同じセリフを声の候補で読む（/preview/story-assets の「声」）。chosen：決まった声（\"Gemini の声の名前\" か { voice, pitch（半音）, echo（0〜1）, growl（0〜1）, brief } か { fish: 録音ファイル } ）→ その人の全セリフを作る。声を変えたら redo に名前を入れて作り直し。 batch：本番セリフを1回に何行作るか（0＝作らない。クライアントの OK まで 0）。",
+  "note": "物語の声。auditions：人物ごとに同じセリフを声の候補で読む（/preview/story-assets の「声」）。chosen：決まった声（\"Gemini の声の名前\" か { voice, pitch（半音）, echo（0〜1）, growl（0〜1）, brief } か { fish: 録音ファイル } ）→ その人の全セリフを作る。声を変えたら redo に名前を入れて作り直し。 batch：本番セリフを1回に何行作るか（0＝作らない。クライアントの OK まで 0）。 parts：声を作る部（一周目＝P01〜P04）。redoLines：作り直したいセリフ（その言葉かその一部）を入れると、その行だけ作り直す。台本から消えたセリフの声は自動で消す。",
   "auditions": [
     {
       "name": "KIMORIN",
@@ -200,8 +200,20 @@
       "voice": "Gacrux",
       "pitch": -6,
       "growl": 0.5
+    },
+    "バティ": {
+      "voice": "Leda",
+      "pitch": 3,
+      "brief": "Bati: a tiny newborn magical creature, the player's partner; a cheerful, innocent, childlike voice, bright and bouncy, curious about everything, kind"
     }
   },
   "redo": [],
-  "batch": 0
+  "batch": 900,
+  "parts": [
+    "P01",
+    "P02",
+    "P03",
+    "P04"
+  ],
+  "redoLines": []
 }

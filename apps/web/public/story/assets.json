@@ -1,5 +1,5 @@
 {
- "made": "2026-10-13T06:27:13.866Z",
+ "made": "2026-10-15T06:30:38.807Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -8,127 +8,7 @@
   {
    "name": "MONBAN",
    "id": "monban",
-   "uses": 299,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "小箱",
-   "id": "c-xxfhwd",
-   "uses": 31,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "いとこ",
-   "id": "c-170zl6e",
-   "uses": 19,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "リトル",
-   "id": "c-681psc",
-   "uses": 12,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "ブラザー",
-   "id": "c-jz0v2y",
-   "uses": 12,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "おじいちゃん",
-   "id": "c-reucfy",
-   "uses": 11,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "笑い声の箱",
-   "id": "c-itoct5",
-   "uses": 11,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "ファーザー",
-   "id": "c-1olizt3",
-   "uses": 9,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "オートンたち",
-   "id": "c-1yduvvi",
-   "uses": 9,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "マザー",
-   "id": "c-hdnvij",
-   "uses": 8,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "おばあちゃん",
-   "id": "c-hwp0ug",
-   "uses": 6,
+   "uses": 119,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -140,18 +20,6 @@
   {
    "name": "スクリーンのKIMORIN",
    "id": "c-1mshd1n",
-   "uses": 6,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "オートン",
-   "id": "c-1dtwrue",
    "uses": 5,
    "aliases": [],
    "status": "needs-sheet",
@@ -162,8 +30,8 @@
    "sheet": null
   },
   {
-   "name": "ゲームのオートン",
-   "id": "c-86ypta",
+   "name": "ブラザー",
+   "id": "c-jz0v2y",
    "uses": 5,
    "aliases": [],
    "status": "needs-sheet",
@@ -174,8 +42,8 @@
    "sheet": null
   },
   {
-   "name": "???",
-   "id": "c-yciw7o",
+   "name": "MIKIE⭐︎の曲",
+   "id": "c-vhp768",
    "uses": 4,
    "aliases": [],
    "status": "needs-sheet",
@@ -186,33 +54,9 @@
    "sheet": null
   },
   {
-   "name": "小箱の群れ",
-   "id": "c-dh0ao1",
-   "uses": 4,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "オートンの群れ",
-   "id": "c-1rvhxg8",
-   "uses": 4,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "ゲームのKIMORIN",
-   "id": "c-rox5bu",
-   "uses": 4,
+   "name": "コロリン",
+   "id": "c-1qju2sy",
+   "uses": 3,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -224,18 +68,6 @@
   {
    "name": "スクリーンのうんちピンポンくん",
    "id": "c-v6fvt7",
-   "uses": 4,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "灰色の小箱",
-   "id": "c-1jrr147",
    "uses": 3,
    "aliases": [],
    "status": "needs-sheet",
@@ -246,21 +78,9 @@
    "sheet": null
   },
   {
-   "name": "ピッピ",
-   "id": "c-1riwyws",
-   "uses": 3,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "灯り",
-   "id": "c-kwom0s",
-   "uses": 3,
+   "name": "ゲームのKIMORIN",
+   "id": "c-rox5bu",
+   "uses": 2,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -272,18 +92,6 @@
   {
    "name": "ゲームの{bati}",
    "id": "c-1qs8a1n",
-   "uses": 3,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "採点ハンマー",
-   "id": "c-1g0ty23",
    "uses": 2,
    "aliases": [],
    "status": "needs-sheet",
@@ -294,33 +102,9 @@
    "sheet": null
   },
   {
-   "name": "左のオートン",
-   "id": "c-1wgdpja",
-   "uses": 2,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "中央のオートン",
-   "id": "c-q7gnjr",
-   "uses": 2,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "右下のオートン",
-   "id": "c-pwxlkw",
-   "uses": 2,
+   "name": "D07-S006の",
+   "id": "c-jwgpnq",
+   "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -332,18 +116,6 @@
   {
    "name": "ゲームのじいちゃん",
    "id": "c-1dn2evi",
-   "uses": 2,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "D01-S003の",
-   "id": "c-1mdnt1t",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -354,8 +126,8 @@
    "sheet": null
   },
   {
-   "name": "この場面の",
-   "id": "c-1im733c",
+   "name": "漫画",
+   "id": "c-1qfe6gz",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -366,8 +138,8 @@
    "sheet": null
   },
   {
-   "name": "翼なら",
-   "id": "c-1o2mny",
+   "name": "ピクセル",
+   "id": "c-1vqsjea",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -378,92 +150,8 @@
    "sheet": null
   },
   {
-   "name": "架空の入力例",
-   "id": "c-qnw6bi",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "選択肢",
-   "id": "c-bxwkxn",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "小さな小箱",
-   "id": "c-11zjich",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "鞄のオートン",
-   "id": "c-15ne00o",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "太い声",
-   "id": "c-drs0k1",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "言葉からのときはバティ",
-   "id": "c-c6gg63",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "二匹",
-   "id": "c-5xcw46",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "鐘のオートン",
-   "id": "c-19qzuqc",
+   "name": "笑い声の箱",
+   "id": "c-itoct5",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -486,20 +174,8 @@
    "sheet": null
   },
   {
-   "name": "定期ロケットのアナウンス",
-   "id": "c-4s5gtf",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "ほかの",
-   "id": "c-2fpfyv",
+   "name": "作るときに",
+   "id": "c-1kcajbw",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -512,7 +188,7 @@
   {
    "name": "KIMORIN",
    "id": "kimorin",
-   "uses": 1615,
+   "uses": 361,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/kimorin-1.webp",
@@ -526,7 +202,7 @@
   {
    "name": "バティ",
    "id": "c-1xpkc0o",
-   "uses": 895,
+   "uses": 285,
    "aliases": [],
    "status": "ready",
    "sprite": null,
@@ -536,9 +212,21 @@
    "sheet": null
   },
   {
+   "name": "OBOLON",
+   "id": "obolon",
+   "uses": 216,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/onboarding/obolon.webp",
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "ヒポキン",
    "id": "c-13wd9v8",
-   "uses": 446,
+   "uses": 157,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/hipokin.webp",
@@ -550,7 +238,7 @@
   {
    "name": "フリージー",
    "id": "c-1l8fmea",
-   "uses": 341,
+   "uses": 118,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/freezy.webp",
@@ -562,7 +250,7 @@
   {
    "name": "大根カイザー",
    "id": "c-16ueow0",
-   "uses": 290,
+   "uses": 75,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-16ueow0.webp",
@@ -583,21 +271,9 @@
    "sheet": null
   },
   {
-   "name": "OBOLON",
-   "id": "obolon",
-   "uses": 255,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/onboarding/obolon.webp",
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
    "name": "たこ焼きブラザー",
    "id": "c-op0tl3",
-   "uses": 143,
+   "uses": 37,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-brother.webp",
@@ -609,7 +285,7 @@
   {
    "name": "たこ焼きシスター",
    "id": "c-105b577",
-   "uses": 121,
+   "uses": 30,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-sister.webp",
@@ -621,7 +297,7 @@
   {
    "name": "ボスG",
    "id": "c-1hwam1f",
-   "uses": 61,
+   "uses": 13,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/bossg.webp",
@@ -633,7 +309,7 @@
   {
    "name": "うんちピンポンくん",
    "id": "c-131ge3q",
-   "uses": 41,
+   "uses": 9,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-131ge3q.webp",
@@ -646,21 +322,9 @@
    "sheet": null
   },
   {
-   "name": "ハットG",
-   "id": "c-1pvfg32",
-   "uses": 39,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/onboarding/hatg.webp",
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
    "name": "エビ",
    "id": "c-1n955os",
-   "uses": 29,
+   "uses": 7,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-1n955os.webp",
@@ -677,24 +341,12 @@
    "sheet": null
   },
   {
-   "name": "ロングG",
-   "id": "c-1pm5jmk",
-   "uses": 26,
+   "name": "サーモン",
+   "id": "c-1yrwtf7",
+   "uses": 7,
    "aliases": [],
    "status": "ready",
-   "sprite": "/onboarding/longg.webp",
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "シャリ",
-   "id": "c-fjx88v",
-   "uses": 18,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/story/cast/c-fjx88v.webp",
+   "sprite": "/story/cast/c-1yrwtf7.webp",
    "client": [
     "01-main.png",
     "99-sheet.webp"
@@ -706,7 +358,7 @@
   {
    "name": "ガリ",
    "id": "c-1rspier",
-   "uses": 13,
+   "uses": 5,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-1rspier.webp",
@@ -719,24 +371,9 @@
    "sheet": null
   },
   {
-   "name": "ウニ",
-   "id": "c-1ri2kie",
-   "uses": 12,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/story/cast/c-1ri2kie.webp",
-   "client": [
-    "01-main.png",
-    "99-sheet.webp"
-   ],
-   "candidates": [],
-   "pick": "client",
-   "sheet": null
-  },
-  {
    "name": "カニ",
    "id": "c-1jne43",
-   "uses": 10,
+   "uses": 5,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-1jne43.webp",
@@ -751,7 +388,7 @@
   {
    "name": "イカ",
    "id": "c-1io7qo8",
-   "uses": 10,
+   "uses": 5,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-1io7qo8.webp",
@@ -764,12 +401,12 @@
    "sheet": null
   },
   {
-   "name": "サーモン",
-   "id": "c-1yrwtf7",
-   "uses": 9,
+   "name": "ウニ",
+   "id": "c-1ri2kie",
+   "uses": 5,
    "aliases": [],
    "status": "ready",
-   "sprite": "/story/cast/c-1yrwtf7.webp",
+   "sprite": "/story/cast/c-1ri2kie.webp",
    "client": [
     "01-main.png",
     "99-sheet.webp"
@@ -777,22 +414,36 @@
    "candidates": [],
    "pick": "client",
    "sheet": null
-  }
- ],
- "places": [
+  },
   {
-   "name": "m3-7",
-   "id": "m3-7",
-   "scenes": [
-    "D04-S001"
-   ],
+   "name": "シャリ",
+   "id": "c-fjx88v",
+   "uses": 4,
+   "aliases": [],
    "status": "ready",
-   "image": "/onboarding/m3-7.jpg",
+   "sprite": "/story/cast/c-fjx88v.webp",
+   "client": [
+    "01-main.png",
+    "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "ハットG",
+   "id": "c-1pvfg32",
+   "uses": 4,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/onboarding/hatg.webp",
    "client": [],
    "candidates": [],
    "pick": null,
    "sheet": null
-  },
+  }
+ ],
+ "places": [
   {
    "name": "saturn-temple",
    "id": "saturn-temple",
@@ -811,7 +462,6 @@
    "name": "jupiter-kaiser",
    "id": "jupiter-kaiser",
    "scenes": [
-    "D05-S002",
     "D06-S001"
    ],
    "status": "ready",
@@ -825,7 +475,6 @@
    "name": "mercury-island",
    "id": "mercury-island",
    "scenes": [
-    "D06-S002",
     "D07-S001"
    ],
    "status": "ready",
@@ -839,8 +488,7 @@
    "name": "mars-city",
    "id": "mars-city",
    "scenes": [
-    "D07-S001",
-    "D08-S001"
+    "D07-S001"
    ],
    "status": "ready",
    "image": "/onboarding/mars-city.jpg",
@@ -850,10 +498,22 @@
    "sheet": null
   },
   {
+   "name": "sun-inside",
+   "id": "sun-inside",
+   "scenes": [
+    "D08-S007"
+   ],
+   "status": "needs-sheet",
+   "image": null,
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "sun-temple",
    "id": "sun-temple",
    "scenes": [
-    "D08-S007",
     "L3-SUN-S003"
    ],
    "status": "ready",

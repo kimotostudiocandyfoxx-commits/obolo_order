@@ -35,6 +35,7 @@ import {
   TicketCard,
   TimeUpOverlay,
   unlockSfx,
+  MicAllowed,
   VoiceField,
 } from './StoryExtras';
 
@@ -91,13 +92,15 @@ interface Props {
   /** 'pause' step: the day stops here (progress already points at the question to come back to). */
   onPause?: () => void;
   onEnd: (answers: Record<string, string>) => void;
+  /** Day 1 until Saturn: answers are typed, no mic (M-R41) */
+  textOnly?: boolean;
 }
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 /** How far above the bottom the question stays while an input panel is open (px). */
 const PROMPT_LIFT: Record<string, number> = { name: 230, batiname: 230, neoname: 260, age: 270, egg: 300 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -429,6 +432,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     step && ['choice', 'name', 'action', 'egg', 'batiname', 'age', 'neoname'].includes(step.t) && !(step.t === 'choice' && step.prompt) && prev?.t === 'say' ? prev : null;
 
   return (
+    <MicAllowed.Provider value={!textOnly}>
     <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
       {/* blurred backdrop so 9:16 motions fill wider screens (iPad) without cropping */}
       {backdrop && (
@@ -760,6 +764,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </button>
       )}
     </div>
+    </MicAllowed.Provider>
   );
 }
 

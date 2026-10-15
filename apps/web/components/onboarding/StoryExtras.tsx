@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motionUrl, spriteUrl } from '@/lib/onboarding/media';
 import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
 import { playPreset } from '@/lib/story/sfx';
@@ -34,6 +34,12 @@ export function playSfx(sound: SoundFx, muted: boolean) {
 
 // --- a text box with the mic first ----------------------------------------------------------------
 /** Mic-first text input in the story's gold style: tap the mic and speak, or type. */
+/**
+ * Day 1 until Saturn: words are typed, no mic (story M-R41, 2026-10-15 — the voice comes out first on
+ * Saturn). StoryPlayer provides false for those days.
+ */
+export const MicAllowed = createContext(true);
+
 export function VoiceField({
   value,
   onChange,
@@ -49,6 +55,7 @@ export function VoiceField({
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const mic = useDictation({ field: ref, value, onChange, maxLength });
+  const withMic = useContext(MicAllowed);
   const cls = `min-w-0 flex-1 rounded-3xl border bg-black/60 px-5 py-3 text-amber-50 outline-none placeholder:text-white/35 ${mic.listening ? 'border-rose-300' : 'border-amber-200/60 focus:border-amber-100'}`;
   return (
     <div>
@@ -58,6 +65,7 @@ export function VoiceField({
         ) : (
           <input ref={ref} className={`${cls} text-center tracking-widest`} style={{ fontSize: 18 }} maxLength={maxLength} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
         )}
+        {withMic && (
         <button
           type="button"
           onClick={mic.toggle}
@@ -71,9 +79,10 @@ export function VoiceField({
             <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
           </svg>
         </button>
+        )}
       </div>
       <p className="mt-1 min-h-4 text-center text-[11px] text-amber-100/60">
-        {mic.listening ? mic.interim || 'きいています… 話しおわったら、もう一度タップ' : mic.error === 'denied' ? 'マイクを許可してください' : mic.supported ? '🎙 を押して話すか、文字で入力' : ''}
+        {!withMic ? '' : mic.listening ? mic.interim || 'きいています… 話しおわったら、もう一度タップ' : mic.error === 'denied' ? 'マイクを許可してください' : mic.supported ? '🎙 を押して話すか、文字で入力' : ''}
       </p>
     </div>
   );
