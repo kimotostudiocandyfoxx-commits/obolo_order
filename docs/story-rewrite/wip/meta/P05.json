@@ -37,7 +37,7 @@
    "gag": {
     "device": "招待のくだり（利用者の台本：「はい、来ました。招待マルチ、確定。おつ。」→「逆だZE。」→「バカバカしい。招待する、バカは、いません。」）／KIMORINのコロリン「たこ焼き食べたい。」→バティ「……また、それ！」",
     "fromDesire": "KIMORINの疑い深さと強がり",
-    "choiceVariation": "S004 send／look／skip。S010 たこ焼き兄妹とダチになる／あとで（M-R45）"
+    "choiceVariation": "S004 send／look／skip"
    }
   }
  ],
@@ -137,20 +137,14 @@
    "title": "木星が開いた",
    "origRef": "4-3「こんなに違う気持ちが、君の中にあったのね。」「土星の基本は、ばっちりだZE!!」「次は木星。」／台帳⑥／U2③",
    "where": "二周目・土星・神殿→輪の縁",
-   "summary": "シスター「ダチと、どんどん、声を届け合ってね。」→ブラザー「次は、木星だZE!!」→〔テロップ：木星が開いた〕→〔画面：土星でコロリンをダチに届ける、ダチの部屋をのぞくのは、このあとも自由にできます〕→土星クリア→L2-JUPITER-S001（P06）。第20稿 M-R45：冒頭で、たこ焼きブラザー「俺たちとも、ダチになるZE!!」［ダチになる／あとで］（friend：〔テロップ：たこ焼きブラザーとたこ焼きシスターがダチになった〕→住人の作品の〔画面〕（住人の印・本物のダチが先・いつでも減らせる。初めて住人とダチになった時に一度だけ）／later：シスター「いいわ。いつでもどうぞ。」）→シスター「ダチと、どんどん、声を届け合ってね。」へ",
-   "choices": [
-    "friend/later（たこ焼きブラザーとシスターとダチになる／あとで）"
-   ],
+   "summary": "シスター「ダチと、どんどん、声を届け合ってね。」→ブラザー「次は、木星だZE!!」→〔テロップ：木星が開いた〕→〔画面：土星でコロリンをダチに届ける、ダチの部屋をのぞくのは、このあとも自由にできます〕→土星クリア→L2-JUPITER-S001（P06）",
+   "choices": [],
    "flags": [
-    "f_l2_saturn_clear",
-    "f_l2_dachi_takoyaki"
+    "f_l2_saturn_clear"
    ],
-   "saveEvents": [
-    "friendのとき二人が住人の印つきでダチに加わる（作品はダチの部屋に流れる。M-R45）"
-   ],
+   "saveEvents": [],
    "holdResume": "RESUME@L2-SATURN-S010",
-   "mystery": "変化なし（開いているのは謎2のみ）",
-   "consent": "ダチになるのは本人の選択（あとでも可）"
+   "mystery": "変化なし（開いているのは謎2のみ）"
   }
  ],
  "plants": [
@@ -335,8 +329,7 @@
   "土星クリア条件を『屋台三つ＋myころりん』に読み替えてよいか（原本は8広場）",
   "月の話す窓（バティとのチャット）を、星休め（P10）の月の案内でも扱うか",
   "プロフィールの姿を後から月以外でも変えられるか。物語は『月でいつでも』としてよいか",
-  "第20稿（M-R37の点検）：plants・payoffs・provisional・inconsistencies・unverified・sceneIdMapの一部は第18〜19稿の内容のまま（はじめて棚・myころりん・持っていくメモ・水盤のMONBAN・屋台など、第20稿 M-R30〜M-R34で削った場面・台詞を指す項目がある）。統合時に整理が要る。付録のフラグ表も、廃止（f_l2_moon_try・f_l2_moon_fantasy・f_l2_moon_saveas・f_l2_moon_clear・f_l2_saturn_tutorial・f_l2_saturn_1・f_l2_saturn_voice_style・f_l2_saturn_3・f_l2_saturn_6・f_l2_saturn_timeline・f_l2_saturn_take・f_l2_saturn_korori）と新設（f_l2_moon_chat・f_l2_saturn_dachi・f_dachi_kimorin・f_dachi_inviter）の反映が要る",
-  "住人の作品の〔画面〕は土星で「ダチになる」を選んだ時に一度だけ出す。土星で「あとで」を選んだ人には、初めて住人とダチになった星で出す（アプリ側で一度だけの表示を管理）。"
+  "第20稿（M-R37の点検）：plants・payoffs・provisional・inconsistencies・unverified・sceneIdMapの一部は第18〜19稿の内容のまま（はじめて棚・myころりん・持っていくメモ・水盤のMONBAN・屋台など、第20稿 M-R30〜M-R34で削った場面・台詞を指す項目がある）。統合時に整理が要る。付録のフラグ表も、廃止（f_l2_moon_try・f_l2_moon_fantasy・f_l2_moon_saveas・f_l2_moon_clear・f_l2_saturn_tutorial・f_l2_saturn_1・f_l2_saturn_voice_style・f_l2_saturn_3・f_l2_saturn_6・f_l2_saturn_timeline・f_l2_saturn_take・f_l2_saturn_korori）と新設（f_l2_moon_chat・f_l2_saturn_dachi・f_dachi_kimorin・f_dachi_inviter）の反映が要る"
  ],
  "sceneIdMap": [
   {
@@ -482,8 +475,7 @@
    "M-R17：L2-SATURN-S010 木星の遠景『葉のほとんどない大きな木』（世界樹が弱っている前振り）を『大きな木』に",
    "sceneID・フラグ名・行き先・選択肢の値は不変。L2-EARTH-S001／月／S001／S004／S009に困っている話はなし",
    "M-R27（第20稿）：うんちピンポンくんのブッブー♪を全廃（ピンポンくんはKIMORINの味方）。L2-SATURN-S004の「ブッブー♪」の行を削除し、KIMORINが自分で「……正確に申しますと、大きすぎて、まだ外側しか、いただいていません。」と言い直す形に。〔叫んで〕のピンポンくんの読み上げは残す。台帳⑰⑱・device・summary・payoffを本文に合わせた。sceneID・フラグ・行き先は不変。過去の稿の記録（round11〜18のブッブー記述）は履歴として残す",
-   "M-R28（第20稿・届く範囲）：L2-EARTH-S001の〔画面〕を『届け先はダチだけ。いまのダチはKIMORIN⭐︎。土星から招待した人・名前で探しておたがいに承認した人もダチに』に（『ほかの人とつながる機能はひと巡り後』を削除。MONBANの「仲間と話す場所」は帰還の連絡室と設計注に）。L2-MOON-S002のプロフィールの見え方を『二周目はダチだけ、三周目のはじめに「みんな」』に。L2-SATURN-S001の設計注に〔みんな〕〔フォロー〕は三周目のはじめと明記。L2-SATURN-S004の招待のくだり（台詞は不変）の直後に、ダチになる二つの方法の〔画面〕を一行。sceneID・フラグ・行き先は不変",
-   "第20稿（decisions_round19 M-R45）：L2-SATURN-S010の頭に、たこ焼きブラザーの一言のダチの誘い＋選択（f_l2_dachi_takoyaki）と、住人の作品の流れ方の〔画面〕（一度だけ）を足した。S001ではなくS010にしたのは、S004のKIMORINの握手とダチの一覧の流れを崩さないため。"
+   "M-R28（第20稿・届く範囲）：L2-EARTH-S001の〔画面〕を『届け先はダチだけ。いまのダチはKIMORIN⭐︎。土星から招待した人・名前で探しておたがいに承認した人もダチに』に（『ほかの人とつながる機能はひと巡り後』を削除。MONBANの「仲間と話す場所」は帰還の連絡室と設計注に）。L2-MOON-S002のプロフィールの見え方を『二周目はダチだけ、三周目のはじめに「みんな」』に。L2-SATURN-S001の設計注に〔みんな〕〔フォロー〕は三周目のはじめと明記。L2-SATURN-S004の招待のくだり（台詞は不変）の直後に、ダチになる二つの方法の〔画面〕を一行。sceneID・フラグ・行き先は不変"
   ]
  },
  "sceneIds": [
