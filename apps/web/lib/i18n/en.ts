@@ -91,7 +91,7 @@ const en: Messages = {
     mercury: { name: 'Mercury', role: 'Discover & make music' },
     venus: { name: 'Venus', role: 'Make goods, trade them for stars' },
     mars: { name: 'Mars', role: 'Video (every video lives in your backstage)' },
-    uranus: { name: 'Uranus', role: 'Zero-inventory mall' },
+    uranus: { name: 'Uranus', role: 'Planet of ateliers' },
     neptune: { name: 'Neptune', role: 'Game store' },
   },
   earth: {

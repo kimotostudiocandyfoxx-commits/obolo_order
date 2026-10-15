@@ -29,7 +29,9 @@ export function nextJourneyDay(day: number): number {
  * Eclipse — Neptune after 2 weeks, Pluto after 3 (Pluto is not built yet).
  * PLACEHOLDER (P-JOURNEY-1): which planet opens in which week.
  */
-export const LATER_PLANETS: readonly { planet: 'venus' | 'neptune' | 'pluto'; afterDays: number }[] = [
+export const LATER_PLANETS: readonly { planet: 'venus' | 'uranus' | 'neptune' | 'pluto'; afterDays: number }[] = [
+  // Uranus (your atelier) is the second journey: it opens with ORDER (client 2026-10-15)
+  { planet: 'uranus', afterDays: 0 },
   // (Venus is not on the first journey since 2026-10-14; ORDER members can visit it like the other planets)
   { planet: 'neptune', afterDays: 14 },
   { planet: 'pluto', afterDays: 21 },

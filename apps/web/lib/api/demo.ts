@@ -1,4 +1,6 @@
 import {
+  EMPTY_ATELIER,
+  type AtelierLayout,
   BUDDY_FREE_DAILY_MESSAGES,
   JOURNEY_DONE,
   JOURNEY_PAYMENT,
@@ -87,6 +89,7 @@ interface DemoState {
   preplies?: { id: string; postId: string; owner: string; text: string; createdAt: string }[];
   /** Mars 裏スタジオ (this browser only) */
   backstage?: (MarsBackstageVideo & { owner: string })[];
+  ateliers?: Record<string, AtelierLayout>;
   /** ひろば (みんな map) and who joined them */
   plazas?: { id: string; name: string; icon: string; members: string[]; base: number }[];
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
@@ -994,6 +997,16 @@ export class DemoApi implements Api {
   }
   async endCall(): Promise<never> {
     return this.noComms();
+  }
+
+  async atelier() {
+    return this.s.ateliers?.[this.uid()] ?? EMPTY_ATELIER;
+  }
+
+  async saveAtelier(layout: AtelierLayout) {
+    this.s.ateliers = { ...(this.s.ateliers ?? {}), [this.uid()]: layout };
+    this.save();
+    return layout;
   }
 
   async marsBackstage() {

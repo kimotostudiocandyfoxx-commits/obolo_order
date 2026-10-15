@@ -322,6 +322,12 @@ export class HttpApi implements Api {
   endCall(id: string) {
     return this.req<Awaited<ReturnType<Api['endCall']>>>('POST', `/comms/calls/${id}/end`);
   }
+  atelier() {
+    return this.req<Awaited<ReturnType<Api['atelier']>>>('GET', '/me/atelier');
+  }
+  saveAtelier(layout: Parameters<Api['saveAtelier']>[0]) {
+    return this.req<Awaited<ReturnType<Api['saveAtelier']>>>('PUT', '/me/atelier', layout);
+  }
   marsBackstage() {
     return this.req<Awaited<ReturnType<Api['marsBackstage']>>>('GET', '/mars/backstage');
   }

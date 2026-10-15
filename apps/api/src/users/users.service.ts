@@ -1,9 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import {
+  EMPTY_ATELIER,
   JOURNEY_DONE,
   nextJourneyDay,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
+  type AtelierLayout,
   type CompleteJourneyDayBody,
   type Locale,
   type Me,
@@ -65,6 +67,20 @@ export class UsersService {
       .where(eq(users.id, userId))
       .returning();
     return toMe(u);
+  }
+
+  /** Uranus: your atelier; only ORDER members have one (the second journey). */
+  async getAtelier(userId: string): Promise<AtelierLayout> {
+    const u = await this.load(userId);
+    if (!u.orderedAt) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
+    return u.atelierJson ?? EMPTY_ATELIER;
+  }
+
+  async saveAtelier(userId: string, layout: AtelierLayout): Promise<AtelierLayout> {
+    const u = await this.load(userId);
+    if (!u.orderedAt) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
+    await this.db.write.update(users).set({ atelierJson: layout, updatedAt: new Date() }).where(eq(users.id, userId));
+    return layout;
   }
 
   private async load(userId: string) {

@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { PuniLook } from '@obolo/shared';
+import type { AtelierLayout, PuniLook } from '@obolo/shared';
 import {
   bigint,
   check,
@@ -88,6 +88,8 @@ export const users = pgTable(
     batiImageUrl: text('bati_image_url'),
     batiName: text('bati_name'),
     onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
+    /** Uranus: your atelier (AtelierLayout); null = not decorated yet */
+    atelierJson: jsonb('atelier_json').$type<AtelierLayout>(),
     lastActivityAt: timestamp('last_activity_at', { withTimezone: true }).notNull().defaultNow(),
     ...timestamps,
   },

@@ -1,47 +1,29 @@
 'use client';
 
-import { Artwork } from '@/components/Artwork';
+import { PlanetGate } from '@/components/PlanetLock';
 import { PlanetShell } from '@/components/PlanetShell';
-import { useToast } from '@/components/Toast';
-import { useI18n } from '@/lib/i18n/client';
-import { PRODUCTS, tr } from '@/lib/samples';
+import { Atelier } from '@/components/uranus/Atelier';
 
-/** Uranus (spec §2.8): multi-vendor POD mall, prices in MANA. VISUAL DEMO — no purchases (P-DEMO-1). */
+/**
+ * Uranus (client decision 2026-10-15): the planet of ateliers. Each member has an atelier of their own to
+ * decorate (second journey, from ORDER). The OBOLO商店 in the middle of Uranus — buying, and selling your own
+ * goods by application — opens on the third journey; until then its shutter is down.
+ */
 export function UranusView() {
-  const { m, locale } = useI18n();
-  const toast = useToast();
-  const shops = [...new Set(PRODUCTS.map((p) => p.shop))];
   return (
-    <PlanetShell id="uranus" wide>
-      <p className="mb-4 text-xs text-white/55">📦 {m.uranus.lead}</p>
-      <div className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4">
-        {shops.map((s) => (
-          <span key={s} className="chip shrink-0 bg-white/10 px-3 py-1.5 text-white/80">
-            🏪 {s}
-          </span>
-        ))}
-      </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {PRODUCTS.map((p) => (
-          <article key={p.id} className="card overflow-hidden">
-            <div className="relative">
-              <Artwork hue={p.hue} emoji={p.emoji} />
-              <span className="chip absolute left-2 top-2 bg-black/55 text-white">{m.uranus.pod}</span>
-            </div>
-            <div className="p-3">
-              <div className="truncate text-sm font-bold">{tr(p.name, locale)}</div>
-              <div className="truncate text-[11px] text-white/45">{p.shop}</div>
-              <div className="mt-2 flex items-center justify-between">
-                <span className="font-black text-[color:var(--color-mana)]">✦ {p.priceMana.toLocaleString()}</span>
-                <button className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold" onClick={() => toast.show(m.common.comingSoon)}>
-                  {m.uranus.buy}
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-      {toast.node}
+    <PlanetShell id="uranus">
+      <PlanetGate planet="uranus" name="天王星">
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[repeating-linear-gradient(0deg,#8b8fa3_0_4px,#6d7186_4px_8px)] text-xl">🏪</span>
+          <div className="min-w-0 flex-1 leading-tight">
+            <div className="text-sm font-black">OBOLO商店</div>
+            <div className="text-[11px] text-white/55">天王星のまんなかのお店。シャッターは、まだ閉まっている</div>
+          </div>
+          <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-[10px] text-white/50">三周目の旅から</span>
+        </div>
+        <h1 className="mb-2 text-center text-sm font-black tracking-widest text-cyan-100">わたしのアトリエ</h1>
+        <Atelier />
+      </PlanetGate>
     </PlanetShell>
   );
 }

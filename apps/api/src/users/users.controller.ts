@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { AdvanceJourneyBody, CompleteJourneyDayBody, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
+import { AdvanceJourneyBody, AtelierLayout, CompleteJourneyDayBody, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
@@ -22,6 +22,17 @@ export class UsersController {
   @Patch()
   update(@UserId() userId: string, @Body() body: unknown) {
     return this.users.updateMe(userId, parseBody(UpdateProfileBody, body));
+  }
+
+  /** Uranus: your atelier (second journey, from ORDER) */
+  @Get('atelier')
+  atelier(@UserId() userId: string) {
+    return this.users.getAtelier(userId);
+  }
+
+  @Put('atelier')
+  saveAtelier(@UserId() userId: string, @Body() body: unknown) {
+    return this.users.saveAtelier(userId, parseBody(AtelierLayout, body));
   }
 
   @Post('journey/complete')

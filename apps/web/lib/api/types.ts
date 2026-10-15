@@ -1,4 +1,4 @@
-import type { CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -218,6 +218,9 @@ export interface Api {
 
   // Mars 裏スタジオ: every video you keep
   marsBackstage(): Promise<MarsBackstageVideo[]>;
+  /** Uranus: your atelier (ORDER members) */
+  atelier(): Promise<AtelierLayout>;
+  saveAtelier(layout: AtelierLayout): Promise<AtelierLayout>;
   /** after POST /media/video */
   keepMarsVideo(body: MarsBackstageBody): Promise<MarsBackstageVideo>;
   removeMarsVideo(id: string): Promise<void>;

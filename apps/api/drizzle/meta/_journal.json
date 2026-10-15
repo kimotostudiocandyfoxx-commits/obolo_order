@@ -183,6 +183,13 @@
       "when": 1791508061424,
       "tag": "0025_saturn_room",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792036903145,
+      "tag": "0026_atelier",
+      "breakpoints": true
     }
   ]
 }

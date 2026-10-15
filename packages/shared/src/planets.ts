@@ -37,7 +37,7 @@ export const PLANETS: Record<PlanetId, PlanetMeta> = {
   mercury: { id: 'mercury', emoji: '💧', route: '/mercury', colors: ['#c9f1ff', '#3d8fb8'], size: 0.62, demo: 'live' },
   venus: { id: 'venus', emoji: '🟡', route: '/venus', colors: ['#fff3a8', '#d1a316'], size: 0.72, demo: 'mock' },
   mars: { id: 'mars', emoji: '🔥', route: '/mars', colors: ['#ffb38a', '#b8341b'], size: 0.66, demo: 'live' },
-  uranus: { id: 'uranus', emoji: '⭕', route: '/uranus', colors: ['#d4fbff', '#4fb4c0'], size: 0.74, demo: 'mock' },
+  uranus: { id: 'uranus', emoji: '⭕', route: '/uranus', colors: ['#d4fbff', '#4fb4c0'], size: 0.74, demo: 'live' },
   neptune: { id: 'neptune', emoji: '🔵', route: '/neptune', colors: ['#a9c4ff', '#2836a8'], size: 0.74, demo: 'mock' },
 };
 

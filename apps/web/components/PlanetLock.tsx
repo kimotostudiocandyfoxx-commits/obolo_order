@@ -10,7 +10,7 @@ export function usePlanetLock(planet: string): { locked: boolean; note: string }
   const { me } = useAuth();
   const opens = planetOpensAt(planet, me?.orderedAt);
   if (opens === undefined) return { locked: false, note: '' };
-  if (opens === null) return { locked: true, note: '入会後にひらく' };
+  if (opens === null) return { locked: true, note: 'ORDERになるとひらく' };
   const left = Math.ceil((opens.getTime() - Date.now()) / (24 * 3600_000));
   return left > 0 ? { locked: true, note: `あと${left}日でひらく` } : { locked: false, note: '' };
 }
