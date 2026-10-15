@@ -34,7 +34,7 @@ KIMORIN「さあ、それでは入りましょう。」
 OBOLON「{name}、待ってた。」
 〔黒い球が、KIMORINのほうへ向く〕
 OBOLON「俺の名前はOBOLON、双子座だ。」
-KIMORIN「……なんやこいつ。」
+KIMORIN「なんやこの喋る黒い玉は！　宙に浮いとる！　どういう仕組み！？」
 OBOLON「ここは、宇宙秘密結社だ。」
 KIMORIN「宇宙秘密結社……。」
 OBOLON「実はな、お前は、、、」
