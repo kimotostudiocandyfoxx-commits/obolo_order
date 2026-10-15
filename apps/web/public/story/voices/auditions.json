@@ -18,12 +18,12 @@
     {
      "voice": "Gacrux-+0.7st-echo-hq",
      "file": "/story/voices/audition/obolon/1-Gacrux-+0.7st-echo-hq.mp3",
-     "seconds": 9.984
+     "seconds": 7.368
     },
     {
      "voice": "Gacrux-+0.7st-echo-hq",
      "file": "/story/voices/audition/obolon/2-Gacrux-+0.7st-echo-hq.mp3",
-     "seconds": 10.104
+     "seconds": 8.16
     }
    ]
   },
@@ -60,22 +60,22 @@
     {
      "voice": "Schedar--3st-hq",
      "file": "/story/voices/audition/c-1l8fmea/1-Schedar--3st-hq.mp3",
-     "seconds": 9.36
+     "seconds": 7.68
     },
     {
      "voice": "Schedar--2st-hq",
      "file": "/story/voices/audition/c-1l8fmea/2-Schedar--2st-hq.mp3",
-     "seconds": 8.04
+     "seconds": 7.248
     },
     {
      "voice": "Schedar--3st-big-hq",
      "file": "/story/voices/audition/c-1l8fmea/3-Schedar--3st-big-hq.mp3",
-     "seconds": 8.928
+     "seconds": 7.176
     },
     {
      "voice": "Schedar-nopitch",
      "file": "/story/voices/audition/c-1l8fmea/4-Schedar-nopitch.mp3",
-     "seconds": 10.008
+     "seconds": 6.672
     }
    ]
   },
@@ -86,22 +86,22 @@
     {
      "voice": "Gacrux--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/1-Gacrux--3st-hq.mp3",
-     "seconds": 8.4
+     "seconds": 6.144
     },
     {
      "voice": "Charon--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/2-Charon--3st-hq.mp3",
-     "seconds": 8.88
+     "seconds": 6
     },
     {
      "voice": "Algieba--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/3-Algieba--3st-hq.mp3",
-     "seconds": 8.328
+     "seconds": 7.272
     },
     {
      "voice": "Alnilam--4st-hq",
      "file": "/story/voices/audition/c-13wd9v8/4-Alnilam--4st-hq.mp3",
-     "seconds": 9.216
+     "seconds": 6.24
     }
    ]
   },
@@ -164,22 +164,22 @@
     {
      "voice": "Gacrux--6st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/1-Gacrux--6st-growl-hq.mp3",
-     "seconds": 9.48
+     "seconds": 8.16
     },
     {
      "voice": "Algenib--6st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/2-Algenib--6st-growl-hq.mp3",
-     "seconds": 10.848
+     "seconds": 8.496
     },
     {
      "voice": "Charon--7st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/3-Charon--7st-growl-hq.mp3",
-     "seconds": 8.928
+     "seconds": 7.536
     },
     {
      "voice": "Gacrux--8st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/4-Gacrux--8st-growl-hq.mp3",
-     "seconds": 11.928
+     "seconds": 8.448
     }
    ]
   },
