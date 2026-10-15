@@ -173,7 +173,7 @@ export class Bgm {
       if (!ctx) return Promise.reject(new Error('no audio context'));
       p = fetch(bgmUrl(track))
         .then((r) => r.arrayBuffer())
-        .then((b) => new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(b, res, rej)));
+        .then((b) => ctx.decodeAudioData(b));
       // keep memory low: only the current track stays decoded
       this.buffers.clear();
       this.buffers.set(track, p);

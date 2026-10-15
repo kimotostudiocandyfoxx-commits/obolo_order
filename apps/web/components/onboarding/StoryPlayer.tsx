@@ -867,7 +867,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   if (step.t === 'caption' && step.when === 'inviterMessage') {
     const [words, from] = text.split('\u3000');
     return (
-      <button className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/70 px-8" onClick={() => onNext()}>
+      <button className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 px-8 backdrop-blur-[3px]" onClick={() => onNext()}>
         <p className="animate-[subIn_2.6s_ease-out_both] text-center text-[19px] leading-relaxed tracking-[0.08em] text-amber-50 [word-break:keep-all]">{words}</p>
         {from && <p className="mt-3 animate-[subIn_2.6s_ease-out_0.4s_both] text-[13px] tracking-[0.3em] text-amber-200/80">— {from}</p>}
         <Cue />
