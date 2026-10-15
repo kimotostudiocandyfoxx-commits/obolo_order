@@ -409,7 +409,6 @@ export function KororinWorld({
   };
   const [toast, setToast] = useState<string | null>(null);
 
-  const online = shown.length + 47;
   const shownReplies = allReplies ? replies : replies.slice(0, 5);
   const resident = !!open?.id.startsWith('resident-');
 
@@ -536,12 +535,7 @@ export function KororinWorld({
               {plaza.joined ? '参加中' : '参加する'}
             </button>
           </div>
-        ) : (
-          <p className="mx-auto mt-2 w-fit rounded-full bg-white/75 px-3.5 py-1 text-[12px] font-bold text-[#5a3f8a]">
-            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-pink-400 align-middle" />
-            いま土星に {online} 人がころりん中
-          </p>
-        )}
+        ) : null}
       </div>
 
       {/* the speech bubble: just the words, over the tapped character (positioned by the loop);
