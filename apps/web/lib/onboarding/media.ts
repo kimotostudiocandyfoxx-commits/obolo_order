@@ -15,6 +15,8 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 27, 28, 29,
   // Day 2
   '2-1', '2-2', '2-3', '2-9', '2-10',
+  // motion 7 in two (client 2026-10-15): the doors close / MONBAN appears in the smoke
+  '7-a', '7-b',
   // Day 3
   '3-1', '3-3', '3-4', '3-6', '3-7',
   // Day 4

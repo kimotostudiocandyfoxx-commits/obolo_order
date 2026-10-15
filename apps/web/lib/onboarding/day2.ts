@@ -25,12 +25,13 @@ export const DAY2: Step[] = [
   { t: 'video', motion: '2-3' }, // 雲を抜けて本部へ
   { t: 'loop', motion: 6 },
   { t: 'action', label: '中に入る' },
-  { t: 'video', motion: 11 }, // 門の光の中へ一歩
+  // 門の光の中へ一歩 — 扉が閉まって、それからMONBANが現れる（クライアント 2026-10-15：動画7を二つに分けた）
+  { t: 'video', motion: '7-a' }, // 門に寄っていき、扉が閉まる
   { t: 'bgm', track: null },
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' },
   { t: 'sprite', image: 'kimorin-1' }, // ふり返ると、深い赤のローブ、狐の耳の白い面
   { t: 'bgm', track: 'monban' },
-  { t: 'video', motion: 7 }, // 黒い煙が湧き、MONBANが現れる
+  { t: 'video', motion: '7-b' }, // 黒い煙が湧き、MONBANが現れる
   { t: 'loop', motion: 9 },
   { t: 'sprite', image: ['', 'kimorin-1'] },
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
@@ -45,6 +46,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'こいつらは、大してすごくもないことを、めちゃくちゃすごそうに言い、そのあとに、超高額の入会費を請求してくるに違いありません。' },
   { t: 'say', who: 'KIMORIN', text: 'まあ、このKIMORINが、こいつらの正体を暴いてみせましょう。' },
   { t: 'say', who: 'KIMORIN', text: 'さあ、それでは入りましょう。' },
+  { t: 'sprite', image: null },
+  { t: 'video', motion: 11 }, // 門が開き、光の中へ
 
   // D02-S004 お金は、かからない
   { t: 'video', motion: 12 },
