@@ -150,7 +150,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'ここは……ええ、知っていますとも。太陽の、中です。……たぶん。' },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] }, // 光の玉の手前に、光の柱が立ちのぼり、黒い球が浮かぶ
   { t: 'caption', text: 'OBOLONが現れた' },
-  { t: 'branch', key: 'd1.f_d01_talk', cases: { 話を聞いてみる: 'sun-talk' }, otherwise: 'sun-quiet' },
+  { t: 'branch', key: 'd1.choice1', cases: { 行きたい: 'sun-talk', 行きたくない: 'sun-talk', まだわかんない: 'sun-talk' }, otherwise: 'sun-quiet' },
   { t: 'label', id: 'sun-talk' },
   { t: 'say', who: 'OBOLON', text: '{neo}。1日目、宇宙に行きたいか、\n聞いたな。' },
   { t: 'say', who: 'OBOLON', text: 'お前は、『{choice1}』と、\n言った。' },
@@ -163,7 +163,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'だから、、、聞かせよう。' },
 
   // D08-S009 「わかりやすく、言う。」
-  { t: 'branch', key: 'd1.f_d01_talk', cases: { 話を聞いてみる: 'easy-talk' }, otherwise: 'easy-quiet' },
+  { t: 'branch', key: 'd1.choice1', cases: { 行きたい: 'easy-talk', 行きたくない: 'easy-talk', まだわかんない: 'easy-talk' }, otherwise: 'easy-quiet' },
   { t: 'label', id: 'easy-talk' },
   { t: 'say', who: 'OBOLON', text: '{neo}、1日目に、\n言いかけたこと、覚えてるか。' },
   { t: 'goto', id: 'easy' },

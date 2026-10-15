@@ -6,7 +6,9 @@ import type { Step } from './script';
  * The client's Day-1 motions are kept where they match the story (client, 2026-10-14: "1日目は今の画像や
  * 動画でそのまんま"): 1–4 invitation, 5–6 HQ, 7/9 MONBAN, 10 the invitation floats, 11 the gate opens,
  * 12–13 the temple and OBOLON, 14–17/19 the universe, 27–28 MONBAN steps in, 29 the letter.
- * Saved: name, age (optional), f_d01_talk, choice1 (not used later yet), the riddle book (seals 1・7・8),
+ * The age question and the 「少し話す、どうする？」 choice were cut (client 2026-10-15): after the name OBOLON goes
+ * straight on to 「ここは、宇宙秘密結社だ。」.
+ * Saved: name, choice1 (day 7 quotes it), the riddle book (seals 1・7・8),
  * the letter and the mana gem.
  */
 export const DAY1: Step[] = [
@@ -53,19 +55,6 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'お前の名前は？' },
   { t: 'name', placeholder: '名前', submit: '名乗る' },
   { t: 'say', who: 'OBOLON', text: '{name}か、いいな。' },
-  { t: 'say', who: 'OBOLON', text: '{name}、お前は、\n何回、太陽をまわった？' },
-  { t: 'age', skip: 'age-none' },
-  { t: 'say', who: 'OBOLON', text: '{age}回か。\nいい、旅だ。' },
-  { t: 'goto', id: 'age-done' },
-  { t: 'label', id: 'age-none' },
-  { t: 'say', who: 'OBOLON', text: 'そうか。' },
-  { t: 'label', id: 'age-done' },
-  { t: 'say', who: 'OBOLON', text: '、、、せっかく、来てくれた。' },
-  { t: 'say', who: 'OBOLON', text: '俺で良ければ、少し話す、どうする？' },
-  { t: 'choice', key: 'f_d01_talk', options: [{ label: '話を聞いてみる' }, { label: 'やめておく', goto: 'decline' }] },
-
-  // talk
-  { t: 'say', who: 'OBOLON', text: 'そうか。' },
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
   { t: 'say', who: 'OBOLON', text: '{name}、\nお前は、宇宙に、行ってみたいと思うか？' },
   { t: 'choice', key: 'choice1', options: [{ label: '行きたい' }, { label: '行きたくない' }, { label: 'まだわかんない' }] },
@@ -92,14 +81,6 @@ export const DAY1: Step[] = [
   { t: 'black' },
   { t: 'say', who: 'MONBAN', text: 'おい、そこまでだ。' },
   { t: 'video', motion: 27 },
-  { t: 'loop', motion: 28 },
-  { t: 'goto', id: 'riddles' },
-
-  // decline
-  { t: 'label', id: 'decline' },
-  { t: 'say', who: 'OBOLON', text: 'そうか。' },
-  { t: 'bgm', track: 'monban' },
-  { t: 'video', motion: 27 }, // 暗がりから、MONBANが現れる
   { t: 'loop', motion: 28 },
 
   // D01-S012 8つの謎の札、手紙とマナジェム

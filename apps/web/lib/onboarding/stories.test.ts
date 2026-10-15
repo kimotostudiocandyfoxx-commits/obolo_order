@@ -35,16 +35,16 @@ describe('all day scripts', () => {
 
 describe('day 1 (story 2026-10-14)', () => {
   const steps = STORIES[1].steps;
-  it('asks the name, then the age (optional), then hands over the riddle book, the letter and the gem', () => {
+  it('asks the name (no age since 2026-10-15), then hands over the riddle book, the letter and the gem', () => {
     const t = kinds(steps);
-    expect(t.indexOf('name')).toBeLessThan(t.indexOf('age'));
-    expect(t.indexOf('age')).toBeLessThan(t.indexOf('riddles'));
+    expect(t).not.toContain('age');
+    expect(t.indexOf('name')).toBeLessThan(t.indexOf('riddles'));
     expect(t.indexOf('riddles')).toBeLessThan(t.indexOf('letter'));
     expect(steps.some((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBe(true);
   });
-  it('declining OBOLON still reaches the riddles', () => {
-    const decline = labelIndex(steps, 'decline');
-    expect(steps.slice(decline).some((s) => s.t === 'riddles')).toBe(true);
+  it('goes from the name straight on to 「ここは、宇宙秘密結社だ。」 (client 2026-10-15)', () => {
+    const n = steps.findIndex((s) => s.t === 'name');
+    expect(steps.slice(n + 1, n + 3).map((s) => (s.t === 'say' ? s.text : s.t))).toEqual(['{name}か、いいな。', 'ここは、宇宙秘密結社だ。']);
   });
   it('has no guide KIMORIN on day 1', () => {
     expect(steps.some((s) => s.t === 'say' && s.who === 'KIMORIN')).toBe(false);
