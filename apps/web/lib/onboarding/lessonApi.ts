@@ -17,8 +17,8 @@ export interface LessonApi {
   sing(design: SongDesign, onStage?: (stage: string | null) => void): Promise<{ id: string; title: string; url: string }>;
   /** keep the song on your shelf */
   saveSong(id: string): Promise<void>;
-  /** Bati's MV for the song from the visitor's wish (a background job: a few minutes) */
-  mv(song: SongMade, wish: string): Promise<MvMade>;
+  /** Bati's MV for the song from the visitor's taps (a background job: a few minutes); `lyrics` = the lyrics on it too */
+  mv(song: SongMade, wish: string, lyrics: boolean): Promise<MvMade>;
 }
 
 /** The instrumental for a chosen style (the lyric draft keeps its own melody and words). */
@@ -54,9 +54,10 @@ export const realLessonApi: LessonApi = {
   async saveSong(id) {
     await getApi().composeSongSave(id);
   },
-  async mv(song, wish) {
+  async mv(song, wish, lyrics) {
     const p = await getApi().mvCreate(song.id);
-    const made = (await waitJob(await getApi().mvStory(p.id, wish))).result!.mv!;
-    return { id: made.id, url: made.videoUrl!, poster: made.posterUrl ?? null, title: `${song.title}（MV）` };
+    let made = (await waitJob(await getApi().mvStory(p.id, wish))).result!.mv!;
+    if (lyrics) made = (await waitJob(await getApi().mvLyrics(made.id))).result!.mv!;
+    return { id: made.id, url: (lyrics && made.lyricsVideoUrl) || made.videoUrl!, poster: made.posterUrl ?? null, title: `${song.title}（MV）` };
   },
 };

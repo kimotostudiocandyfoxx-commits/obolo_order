@@ -53,9 +53,9 @@ const fakeLessonApi: LessonApi = {
     return { id: 'preview-song', title: d.title, url: '/onboarding/bgm-opening.m4a' };
   },
   saveSong: async () => {},
-  mv: async (song) => {
+  mv: async (song, _wish, lyrics) => {
     await wait(4000);
-    return { id: 'preview-mv', url: '/onboarding/m3-3.mp4', poster: null, title: song.title };
+    return { id: 'preview-mv', url: '/onboarding/m3-3.mp4', poster: null, title: lyrics ? `${song.title}（歌詞つき）` : song.title };
   },
 };
 

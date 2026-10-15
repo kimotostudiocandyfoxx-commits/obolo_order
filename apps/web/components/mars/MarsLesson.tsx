@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Record } from '@/components/mercury/MercuryLesson';
 import { Big, LessonShell, Later, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
-import { VoiceField } from '@/components/onboarding/StoryExtras';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { MvMade, SongMade } from '@/lib/onboarding/made';
 
@@ -12,11 +11,13 @@ import type { MvMade, SongMade } from '@/lib/onboarding/made';
  *  1. ヒポキン: you shoot on the screen in your hand — ✨星図 / 🎥 撮影 / 🎬 myスタジオ (KIMORIN⭐︎ presses
  *     myスタジオ first: empty — that is where films go after shooting)
  *  2. 🎥 撮影 → today it is an MV: pick the song (yesterday's)
- *  3. tell {bati} what you want to see (speak / type / pick / おまかせ) → mana asked → {bati} makes the MV
+ *  3. three taps for {bati} (the first journey: nothing to type) — how to show it (🎨 pictures only / 🔤 with the
+ *     lyrics), the scene (or おまかせ: {bati} reads it from the lyrics), the air → mana asked → {bati} makes the MV
+ *     (client 2026-10-15)
  *  4. ▶ watch it first → 〔🔒 裏スタジオにしまう〕 (only you can see it; 〔🛸 届ける〕 is the next journey)
  * The lines are this app's (the story left D07-S004〜S005 to the UI); ヒポキン is a film director (カット).
  */
-type Phase = 'intro' | 'tabs' | 'studio' | 'song' | 'wish' | 'mana' | 'making' | 'failed' | 'made' | 'kept';
+type Phase = 'intro' | 'tabs' | 'studio' | 'song' | 'show' | 'scene' | 'air' | 'mana' | 'making' | 'failed' | 'made' | 'kept';
 type Who = 'hipokin' | 'kimorin' | 'bati' | 'guide';
 const WHO: Record<Who, { sprite?: string; name?: string }> = {
   hipokin: { sprite: 'hipokin', name: 'ヒポキン' },
@@ -24,7 +25,21 @@ const WHO: Record<Who, { sprite?: string; name?: string }> = {
   bati: { name: 'バティ' },
   guide: {},
 };
-const WISHES = ['夜の海を、小さな船が進む', '夕焼けの街を、歩いていく', '星空の下で、踊る'];
+const SHOWS = [
+  { id: 'pictures', label: '🎨 絵で見せる', note: '絵だけで、お話にする' },
+  { id: 'lyrics', label: '🔤 歌詞も見せる', note: '絵の上に、歌詞が出る' },
+];
+const SCENES = [
+  { label: '🌌 夜空と星', wish: '夜空と星の下で' },
+  { label: '🌇 夕焼けの街', wish: '夕焼けの街を歩いていく' },
+  { label: '🌊 海と船', wish: '海を小さな船が進む' },
+  { label: '✨ おまかせ', wish: '' },
+];
+const AIRS = [
+  { label: 'きらきら明るく', wish: 'きらきら明るく' },
+  { label: 'しっとり静かに', wish: 'しっとり静かに' },
+  { label: 'わくわく元気に', wish: 'わくわく元気に' },
+];
 const WAITING: { who: Who; text: string }[] = [
   { who: 'bati', text: '絵を30枚描くよ！　ちょっと時間かかるね！' },
   { who: 'kimorin', text: '……待つのは、得意ですよ。' },
@@ -35,6 +50,8 @@ const WAITING: { who: Who; text: string }[] = [
 export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: LessonApi; song: SongMade | null; neo: string; bati: string; batiImage?: string; onDone: (mv: MvMade) => void }) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [k, setK] = useState(0);
+  const [lyricsOn, setLyricsOn] = useState(false);
+  const [scene, setScene] = useState('');
   const [wish, setWish] = useState('');
   const [mv, setMv] = useState<MvMade | null>(null);
   const [wk, setWk] = useState(0);
@@ -48,7 +65,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
     setWk(0);
     const timer = setInterval(() => setWk((x) => Math.min(x + 1, WAITING.length - 1)), 9000);
     try {
-      setMv(await api.mv(song, wish.trim()));
+      setMv(await api.mv(song, wish.trim(), lyricsOn));
       setPhase('made');
     } catch {
       setPhase('failed');
@@ -71,7 +88,9 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
     actions = <NextButton onClick={() => (k < 2 ? setK(2) : setPhase('tabs'))} />;
   } else if (phase === 'tabs') coach = line('guide', '〔🎥 撮影〕をタップ');
   else if (phase === 'song') coach = line('hipokin', '今日は、MVだ。曲に、映像をつけるやつだ。');
-  else if (phase === 'wish') coach = line('bati', 'どんな場面を見たい？　しゃべっても、打っても、選んでもいいよ。');
+  else if (phase === 'show') coach = line('bati', 'どうやって見せる？');
+  else if (phase === 'scene') coach = line('bati', 'どんな場面がいい？　わからなかったら、おまかせでいいよ。歌詞から考えるね！');
+  else if (phase === 'air') coach = line('bati', 'さいごに、どんな空気？');
   else if (phase === 'mana') coach = line('bati', 'MVにするのに、マナを少し使うけど、いい？');
   else if (phase === 'making') coach = line(WAITING[wk].who, WAITING[wk].text);
   else if (phase === 'failed') coach = line('bati', 'フィルムが、ちょっと絡まっちゃった……。もう1回、撮ってもいい？');
@@ -98,7 +117,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
                 ✨ 星図
                 <span className="block text-[10px] font-bold">二周目から</span>
               </button>
-              <button onClick={() => setPhase(song ? 'song' : 'wish')} className="animate-pulse rounded-2xl bg-rose-500 py-4 text-sm font-black text-white shadow">
+              <button onClick={() => setPhase(song ? 'song' : 'show')} className="animate-pulse rounded-2xl bg-rose-500 py-4 text-sm font-black text-white shadow">
                 🎥 撮影
               </button>
               <button onClick={() => setPhase('studio')} className="rounded-2xl bg-slate-100 py-4 text-sm font-black text-slate-500">
@@ -112,7 +131,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
       {phase === 'song' && song && (
         <Panel>
           <p className="text-center text-sm font-black text-rose-600">🎵 曲を選ぶ</p>
-          <button onClick={() => setPhase('wish')} className="mt-3 flex w-full items-center gap-4 rounded-3xl bg-rose-50 p-3 text-left active:scale-[0.98]">
+          <button onClick={() => setPhase('show')} className="mt-3 flex w-full items-center gap-4 rounded-3xl bg-rose-50 p-3 text-left active:scale-[0.98]">
             <Record s={{ text: song.words, url: song.jacket }} playing={false} size={90} />
             <span>
               <span className="block text-xs text-rose-400">きのうの曲</span>
@@ -122,29 +141,64 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
         </Panel>
       )}
 
-      {phase === 'wish' && (
+      {phase === 'show' && (
         <Panel>
-          <VoiceField value={wish} onChange={setWish} placeholder="例：夜の海を、小さな船が進む" maxLength={60} multiline />
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {WISHES.map((w) => (
-              <button key={w} onClick={() => setWish(w)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${wish === w ? 'bg-rose-500 text-white' : 'bg-rose-50 text-rose-600'}`}>
-                {w}
+          <div className="grid grid-cols-2 gap-2">
+            {SHOWS.map((o) => (
+              <button
+                key={o.id}
+                onClick={() => {
+                  setLyricsOn(o.id === 'lyrics');
+                  setPhase('scene');
+                }}
+                className="rounded-2xl bg-rose-50 px-2 py-4 text-center active:scale-95"
+              >
+                <span className="block text-sm font-black text-rose-600">{o.label}</span>
+                <span className="mt-1 block text-[11px] text-rose-400">{o.note}</span>
               </button>
             ))}
           </div>
-          <div className="mt-3 space-y-2">
-            <Big tone="rose" disabled={!wish.trim() || !song} onClick={() => setPhase('mana')}>
-              これで撮る
-            </Big>
-            <Soft
-              disabled={!song}
-              onClick={() => {
-                setWish('');
-                setPhase('mana');
-              }}
-            >
-              おまかせ
-            </Soft>
+        </Panel>
+      )}
+
+      {phase === 'scene' && (
+        <Panel>
+          <div className="grid grid-cols-2 gap-2">
+            {SCENES.map((o) => (
+              <button
+                key={o.label}
+                onClick={() => {
+                  setScene(o.wish);
+                  if (o.wish) setPhase('air');
+                  else {
+                    setWish('');
+                    setPhase('mana');
+                  }
+                }}
+                className="rounded-2xl bg-rose-50 py-4 text-sm font-black text-rose-600 active:scale-95"
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </Panel>
+      )}
+
+      {phase === 'air' && (
+        <Panel>
+          <div className="space-y-2">
+            {AIRS.map((o) => (
+              <button
+                key={o.label}
+                onClick={() => {
+                  setWish(`${scene}。${o.wish}`);
+                  setPhase('mana');
+                }}
+                className="w-full rounded-2xl bg-rose-50 py-3.5 text-sm font-black text-rose-600 active:scale-95"
+              >
+                {o.label}
+              </button>
+            ))}
           </div>
         </Panel>
       )}
@@ -155,7 +209,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
             <Big tone="violet" onClick={() => void make()}>
               使う
             </Big>
-            <Soft onClick={() => setPhase('wish')}>やめる</Soft>
+            <Soft onClick={() => setPhase('show')}>やめる</Soft>
           </div>
         </Panel>
       )}
@@ -181,7 +235,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
             <Big tone="rose" onClick={() => setPhase('kept')}>
               🔒 裏スタジオにしまう
             </Big>
-            <Soft onClick={() => setPhase('wish')}>もう一回つくる</Soft>
+            <Soft onClick={() => setPhase('show')}>もう一回つくる</Soft>
             <Later label="🛸 届ける" />
           </div>
         </Panel>
