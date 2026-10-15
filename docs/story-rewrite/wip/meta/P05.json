@@ -8,49 +8,46 @@
     "L2-EARTH-S001"
    ],
    "gag": {
-    "device": "ダチの一覧に顔の丸がひとつだけ→「一人で、全員です。」",
-    "fromDesire": "KIMORINの見栄",
-    "choiceVariation": "go＝ロケットで月へ／stop＝止まれる（選択から再開）"
+    "device": "なし（第20稿 M-R30・M-R33で、ダチの欄と「一人で、全員です。」を削除）",
+    "fromDesire": "—",
+    "choiceVariation": "go＝月へ／stop＝止まれる（選択から再開）"
    }
   },
   {
    "id": "L2-MOON",
-   "title": "二周目・月（姿を試す・戻す・決める）",
+   "title": "二周目・月（バティに聞く・姿を変える）",
    "sceneIds": [
     "L2-MOON-S001",
     "L2-MOON-S002"
    ],
    "gag": {
-    "device": "袖が〔色を青に〕に触れて空色→「……戻せ…。」→漆黒マントで白い面だけ浮いて「こちらです。」／「ぜんぶ、赤！」で赤くなるのはバティ自身／二枚翼を試して「やはり、片翼のほうが美しい。」／敬語のピンポンくん→「私が、二人いるようですね。」",
-    "fromDesire": "KIMORINの漆黒マント／バティの赤くしたい欲",
-    "choiceVariation": "S001は look／item／culture／word／keep。S002は ok／more／keep_original／hold（holdで本当に止まれる）"
+    "device": "KIMORIN「うんちピンポンくんに、羽を、つけてください。」→羽→「ピンポン♪」→「……素敵です。」",
+    "fromDesire": "KIMORINのピンポンくんへの愛着",
+    "choiceVariation": "S001 ask／later、S002 change／keep"
    }
   },
   {
    "id": "L2-SATURN",
-   "title": "二周目・土星（毎日の一言・日付で振り返る・myころりん）",
+   "title": "二周目・土星（ダチの部屋・ダチになる・ダチに届ける）",
    "sceneIds": [
     "L2-SATURN-S001",
     "L2-SATURN-S004",
-    "L2-SATURN-S005",
-    "L2-SATURN-S007",
-    "L2-SATURN-S009",
     "L2-SATURN-S010"
    ],
    "gag": {
-    "device": "〔ゆらす〕で星ごと揺れ、宙のたこ焼きを口で受ける／☆の数を探して「見ない。」／「美味です」→自分で正確に言い直した小声の本音を〔叫んで〕読む／早口のオチをバティが「間」で読み直す／『暗黒の螺旋回廊ころりん』をたこ焼きが追い越す→「長編の成功」→「ええ音、やん。」",
-    "fromDesire": "KIMORINの押してから考える・評価を見たい・すごい名前をつけたい欲／いとこの笑ってほしい焦り",
-    "choiceVariation": "S001 touch／skip、S004 real／fantasy／listen、S005 real／fantasy／listen／pass、S007 write／listen／pass、S009 pick／new／none、S010 straight／loop"
+    "device": "招待のくだり（利用者の台本：「はい、来ました。招待マルチ、確定。おつ。」→「逆だZE。」→「バカバカしい。招待する、バカは、いません。」）／KIMORINのコロリン「たこ焼き食べたい。」→バティ「……また、それ！」",
+    "fromDesire": "KIMORINの疑い深さと強がり",
+    "choiceVariation": "S004 send／look／skip"
    }
   }
  ],
  "scenes": [
   {
    "sceneId": "L2-EARTH-S001",
-   "title": "来たか、ORDER…。／ダチの欄は、一人",
+   "title": "来たか、ORDER…。",
    "origRef": "4-2「来たか、ORDER…。」「まずは、土星へ行け…。」",
    "where": "二周目・出発・地球の結社",
-   "summary": "MONBANが現れ原本4-2の台詞。KIMORINがダチになり、一覧に一人だけ（「一人で、全員です。」）。二周目の届け先はダチだけ（いまはKIMORIN⭐︎。土星から招待・名前で探す＋おたがいの承認でダチが増える）（画面）。MONBANの「仲間と話す場所」は帰還で開く連絡室。ブラザーとシスターの便り。月に寄ってから土星へ（画面）。go＝月へ／stop＝止まれる",
+   "summary": "〔テロップ：二周目のはじまり〕。地球の神殿にMONBAN「来たか、ORDER…。」「旅の、続きを、してこい…。まずは、月へ…。」→月へ向かう／今日はここまで（KIMORIN「では、私も今日はここまで。」）。ブラザーとシスターの便り・ダチの欄・「一人で、全員です」は削除（M-R30・M-R32・M-R33）",
    "choices": [
     "go",
     "stop"
@@ -64,170 +61,88 @@
   },
   {
    "sceneId": "L2-MOON-S001",
-   "title": "水盤、ふたたび／試して、戻す",
+   "title": "バティに聞く",
    "origRef": "原本4-5a（旧金星アトリエ）バティ「赤くする？ロン毛にする？…」ハットG「迷ったら、試して戻せばいい。」／デモLookMaker",
    "where": "二周目・月・神殿の水盤",
-   "summary": "水盤のチュートリアル（言う／札→試す→〔前の姿にもどす〕）。KIMORINの袖で空色→戻す→漆黒マントで面だけ浮く。Bluenaのスクリーン越しにMONBAN「迷ったら…試して、戻せばいい…。」。バティの「ぜんぶ赤」でバティだけ赤（変わるのは話した人だけ）。{neo}は5択で試す",
+   "summary": "〔テロップ：月に着いた〕。OBOLON「、、、来たか。」「ORDERになった、今なら、、、{bati}と、魔法が、使える。」「知りたいことを、聞いてみろ。{bati}が、調べてくれる。」→バティ「なんでも聞いて！　ボク、調べるの、得意なんだ！」→〔画面〕バティに聞く（🎙か文字）→聞いてみる（架空の例：土星の輪）／あとで→〔⚙︎ バティの設定〕の案内。雑談・悩み相談の形にはしない（M-R33）。MONBANは出さない",
    "choices": [
-    "look",
-    "item",
-    "culture",
-    "word",
-    "keep"
+    "ask",
+    "later"
    ],
    "flags": [
-    "f_l2_moon_try",
-    "f_l2_moon_parts"
+    "f_l2_moon_chat"
    ],
    "saveEvents": [
-    "試しの下書き（本人だけ・新しく描かない）"
+    "聞いた内容は本人だけ（記録を残すかは設定で選べる）"
    ],
-   "holdResume": "［今日はここまで］→RESUME@L2-MOON-S001",
+   "holdResume": "RESUME@L2-MOON-S001",
    "mystery": "変化なし（開いているのは謎2のみ）"
   },
   {
    "sceneId": "L2-MOON-S002",
-   "title": "現実にない姿／プロフィールの顔",
+   "title": "姿を変える",
    "origRef": "原本4-5a「現実にない姿でもいいんだね！」「小さくなっても、君って分かるね！」「最後は、君が決めろ。」「あとから変えてもいい。」／デモapp/moon・PhotoCropper",
    "where": "二周目・月・神殿の水盤",
-   "summary": "現実にない姿のパーツ。KIMORINは二枚目の翼を試して「やはり、片翼のほうが美しい。」（P02 D03の回収）。丸でプロフィールの顔を合わせる。Bluena越しにMONBAN「最後は…お前が、決めろ…。」→ok／more／keep_original／hold。月の話す窓と〔⚙︎ バティの設定〕（敬語のピンポンくん）",
+   "summary": "水盤。OBOLON「姿も、、、変えられる。変えたいところや、足したいものは、あるか？」→KIMORIN「うんちピンポンくんに、羽を、つけてください。」→天使の羽→「ピンポン♪」→KIMORIN「……素敵です。」→姿を変えてみる（〔画面〕水盤に言うか札を選ぶ・〔前の姿にもどす〕・決めた時だけ一枚描く→プロフィールの確認）／このままでいい→〔画面：姿は、あとから、いつでも変えられます〕→土星へ",
    "choices": [
-    "ok",
-    "more",
-    "keep_original",
-    "hold"
+    "change",
+    "keep"
    ],
    "flags": [
-    "f_l2_moon_fantasy",
     "f_l2_moon_look",
-    "f_l2_moon_saveas",
-    "f_l2_moon_profile_saved",
-    "f_l2_moon_clear"
+    "f_l2_moon_profile_saved"
    ],
    "saveEvents": [
-    "okは決めた姿を一枚描く（使用の確認・数値なし）→プロフィール",
-    "keep_originalは描かずに保存"
+    "changeで決めた姿だけ一枚描く（使用の確認・数値なし）→本人の操作でプロフィールに"
    ],
-   "holdResume": "hold等→RESUME@L2-MOON-S002",
+   "holdResume": "制作の中止・［もどる］→RESUME@L2-MOON-S002（下書きは残る）",
    "mystery": "変化なし（開いているのは謎2のみ）"
   },
   {
    "sceneId": "L2-SATURN-S001",
-   "title": "おかえりだZE!!／さわって聞く",
+   "title": "おかえり／ダチの部屋",
    "origRef": "4-3「おかえりだZE!!」／デモKororinWorld・SaturnTutorial",
    "where": "二周目・土星・大階段→大窓",
-   "summary": "テロップで到着。ブラザー「おかえりだZE!!」。シスターのチュートリアル：KIMORINが〔ゆらす〕で星ごと揺らす→玉をさわって聞く・☆・💬（☆の数は出ない）。屋台が輪で回ってくる",
-   "choices": [
-    "touch",
-    "skip"
-   ],
-   "flags": [
-    "f_l2_saturn_tutorial"
-   ],
+   "summary": "〔テロップ：土星に着いた〕。ブラザー「おかえりだZE!!」シスター「おかえり。ORDERになったのね。」「今日から、土星に〔ダチの部屋〕ができるわ。」ブラザー「自分の部屋だけじゃねぇ。ダチのコロリンが、届くようになるZE!!」→〔画面〕ダチの部屋（ダチのコロリンが届く・自分のコロリンは〔ダチに届ける〕）。〔みんな〕〔フォロー〕のタブは出さない（三周目）",
+   "choices": [],
+   "flags": [],
    "saveEvents": [],
    "holdResume": "RESUME@L2-SATURN-S001",
    "mystery": "変化なし（開いているのは謎2のみ）"
   },
   {
    "sceneId": "L2-SATURN-S004",
-   "title": "はふはふ亭：はじめての「声をおとす」",
+   "title": "ダチになる／ダチに届ける",
    "origRef": "6-2①「名前だけじゃ、味がしないZE!!」、4-3「思ったことを、まず自分に残す…」「届けた言葉は88時間、輪を巡るわ。…」",
    "where": "二周目・土星・輪の上の屋台",
-   "summary": "顔ほどのたこ焼きに「美味です」→自分で「正確に申しますと」→「外側しか、いただいていません」を〔叫んで〕読む。〔声をおとす〕の手順（🎙／文字→読み方→玉→思い出メモ）。real／fantasy／listen。原本のシスターの二台詞（まず自分に残す／88時間）。招待のくだりの後、ダチになる二つの方法（〔招待状〕＋マナジェム／〔名前で探す〕＋おたがいの承認）を〔画面〕で一行",
+   "summary": "〔仮〕。KIMORIN「では、ダチに、なりましょう。……というか、もう、ダチですよね？」→握手→〔テロップ：KIMORIN⭐︎がダチになった〕→バティ「あれは？」ブラザー「招待者の、{inviter}だZE。」→〔テロップ：{inviter}がダチになった〕→招待のくだり（利用者の台本のまま：「招待など、可能なのですか？」〜「招待する、バカは、いません。」）→〔画面〕ダチになる二つの方法（招待状＋マナジェム／名前で探す＋おたがいの承認）→コロリンを作ってダチに届ける／ダチの部屋をのぞく（KIMORINのコロリン「たこ焼き食べたい。」バティ「……また、それ！」）／今はいい",
    "choices": [
-    "real",
-    "fantasy",
-    "listen"
+    "send",
+    "look",
+    "skip"
    ],
    "flags": [
-    "f_l2_saturn_1",
-    "f_l2_saturn_voice_style"
+    "f_l2_saturn_dachi",
+    "f_dachi_kimorin",
+    "f_dachi_inviter"
    ],
    "saveEvents": [
-    "思い出メモ1件（real・fantasy、本人だけ・日付つき）"
+    "sendでコロリンをダチに届ける（届け先はダチだけ・88時間で輪からおりて自分の部屋には残る）"
    ],
    "holdResume": "RESUME@L2-SATURN-S004",
    "mystery": "変化なし（開いているのは謎2のみ）"
   },
   {
-   "sceneId": "L2-SATURN-S005",
-   "title": "早口亭：「間」の印",
-   "origRef": "6-2③・6-8③（いとこ：急がなくても笑えると気づく）",
-   "where": "二周目・土星・輪の上",
-   "summary": "いとこの早口のオチ（間なし）は誰にも届かない→いとこ「今のが、間なし。ここでは、間を置いて遊ぶんだ。」→「間」の印の画面→バティが間をあけて読み直すと、いとこが自分の話で吹き出す。4択",
-   "choices": [
-    "real",
-    "fantasy",
-    "listen",
-    "pass"
-   ],
-   "flags": [
-    "f_l2_saturn_3"
-   ],
-   "saveEvents": [
-    "思い出メモ1件（real・fantasy）"
-   ],
-   "holdResume": "RESUME@L2-SATURN-S005",
-   "mystery": "変化なし（開いているのは謎2のみ）"
-  },
-  {
-   "sceneId": "L2-SATURN-S007",
-   "title": "よわび：焦げた卵",
-   "origRef": "6-2⑥・6-8⑥「卵、焦がしちゃった。」",
-   "where": "二周目・土星・弱火の厨房",
-   "summary": "マザーの焦げた卵（原本台詞）。マザー「こういう日も、ここに残しておくの。」うまくいかなかった日も一語で自分だけに残せる。write／listen／pass。マザーは皿を片づけて「また焼いてみる」",
-   "choices": [
-    "write",
-    "listen",
-    "pass"
-   ],
-   "flags": [
-    "f_l2_saturn_6"
-   ],
-   "saveEvents": [
-    "思い出メモ1件（write、画面に大きく出さない）"
-   ],
-   "holdResume": "RESUME@L2-SATURN-S007",
-   "mystery": "変化なし（開いているのは謎2のみ）"
-  },
-  {
-   "sceneId": "L2-SATURN-S009",
-   "title": "myころりん：日付で振り返る／持っていくメモ",
-   "origRef": "4-3「8広場の最後に回収する場面」「見せるために話さなくていい。…」／v6 V6-2",
-   "where": "二周目・土星・神殿",
-   "summary": "〔myころりん〕で思い出メモを日付ごとに見返し、一周目までさかのぼる。原本のシスター・ブラザーの台詞。持っていくメモ pick／new／none",
-   "choices": [
-    "pick",
-    "new",
-    "none"
-   ],
-   "flags": [
-    "f_l2_saturn_timeline",
-    "f_l2_saturn_take"
-   ],
-   "saveEvents": [
-    "new：思い出メモ（本人だけ）"
-   ],
-   "holdResume": "RESUME@L2-SATURN-S009",
-   "mystery": "変化なし（開いているのは謎2のみ）"
-  },
-  {
    "sceneId": "L2-SATURN-S010",
-   "title": "はじめて棚／myころりん完成→木星へ",
+   "title": "木星が開いた",
    "origRef": "4-3「こんなに違う気持ちが、君の中にあったのね。」「土星の基本は、ばっちりだZE!!」「次は木星。」／台帳⑥／U2③",
    "where": "二周目・土星・神殿→輪の縁",
-   "summary": "はじめて棚（来た順）。名前で詰まったKIMORINが{neo}に先を譲る→{neo}のころりん完成（道の形2択）。『暗黒の螺旋回廊ころりん』が長すぎて「長編の成功」→いい音で漏れと静かなピンポン。土星クリア。木星の遠景とKIMORIN「次は木星。……言葉に、姿がつくのでしょうか。」",
-   "choices": [
-    "straight",
-    "loop"
-   ],
+   "summary": "シスター「ダチと、どんどん、声を届け合ってね。」→ブラザー「次は、木星だZE!!」→〔テロップ：木星が開いた〕→〔画面：土星でコロリンをダチに届ける、ダチの部屋をのぞくのは、このあとも自由にできます〕→土星クリア→L2-JUPITER-S001（P06）",
+   "choices": [],
    "flags": [
-    "f_l2_saturn_korori",
     "f_l2_saturn_clear"
    ],
-   "saveEvents": [
-    "myころりんへの記録（本人だけ）"
-   ],
+   "saveEvents": [],
    "holdResume": "RESUME@L2-SATURN-S010",
    "mystery": "変化なし（開いているのは謎2のみ）"
   }
@@ -413,7 +328,8 @@
   "「間」の印（文中に一つ置ける記号）を、画面で実装可能な操作として残してよいか",
   "土星クリア条件を『屋台三つ＋myころりん』に読み替えてよいか（原本は8広場）",
   "月の話す窓（バティとのチャット）を、星休め（P10）の月の案内でも扱うか",
-  "プロフィールの姿を後から月以外でも変えられるか。物語は『月でいつでも』としてよいか"
+  "プロフィールの姿を後から月以外でも変えられるか。物語は『月でいつでも』としてよいか",
+  "第20稿（M-R37の点検）：plants・payoffs・provisional・inconsistencies・unverified・sceneIdMapの一部は第18〜19稿の内容のまま（はじめて棚・myころりん・持っていくメモ・水盤のMONBAN・屋台など、第20稿 M-R30〜M-R34で削った場面・台詞を指す項目がある）。統合時に整理が要る。付録のフラグ表も、廃止（f_l2_moon_try・f_l2_moon_fantasy・f_l2_moon_saveas・f_l2_moon_clear・f_l2_saturn_tutorial・f_l2_saturn_1・f_l2_saturn_voice_style・f_l2_saturn_3・f_l2_saturn_6・f_l2_saturn_timeline・f_l2_saturn_take・f_l2_saturn_korori）と新設（f_l2_moon_chat・f_l2_saturn_dachi・f_dachi_kimorin・f_dachi_inviter）の反映が要る"
  ],
  "sceneIdMap": [
   {
@@ -568,9 +484,6 @@
   "L2-MOON-S002",
   "L2-SATURN-S001",
   "L2-SATURN-S004",
-  "L2-SATURN-S005",
-  "L2-SATURN-S007",
-  "L2-SATURN-S009",
   "L2-SATURN-S010"
  ],
  "cutLog": [
@@ -698,6 +611,11 @@
    "sceneId": "L2-SATURN-S010",
    "action": "削除（第20稿）",
    "reason": "木星の遠景の『葉のほとんどない』（困っている星の前振り）を削除"
+  },
+  {
+   "sceneId": "L2-EARTH-S001／L2-MOON-S001／S002／L2-SATURN-S001／S004／S010",
+   "action": "第20稿（M-R37の点検）：メタを本文に合わせた",
+   "reason": "第20稿 M-R30・M-R32・M-R33・M-R34で本文を組み直した後、場面の要約・選択・フラグが旧稿のままだったため、本文どおりに更新。S005・S007・S009は欠番としてscenes・sceneIds・章から外した。S010に〔画面：〜は、このあとも自由にできます〕を一行足した（木星以降と同じ形）"
   }
  ]
 }
