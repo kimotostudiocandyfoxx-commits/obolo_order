@@ -240,5 +240,6 @@ export interface Api {
   batiHatch(): Promise<Me>;
   batiName(name: string): Promise<Me>;
   myInvites(): Promise<MyInviteView[]>;
-  createInvite(email: string): Promise<MyInviteView>;
+  /** `message`: a few words of your own printed on the invitation (optional) */
+  createInvite(email: string, message?: string): Promise<MyInviteView>;
 }

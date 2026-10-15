@@ -25,9 +25,9 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is seven days; every countdown says 明日まで待てない', () => {
+  it('the first journey is seven days; every countdown says 明日まで待てない (day 2: もちろん…)', () => {
     expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(Object.values(STORIES).every((d) => d.skipLabel === DEFAULT_SKIP_LABEL)).toBe(true);
+    expect(Object.entries(STORIES).every(([d, s]) => s.skipLabel === (d === '2' ? 'もちろん明日まで待てない' : DEFAULT_SKIP_LABEL))).toBe(true);
     expect(DEFAULT_SKIP_LABEL).toBe('明日まで待てない');
     expect(STORIES[JOURNEY_PAYMENT].steps.some((s) => s.t === 'order')).toBe(true);
   });
@@ -35,12 +35,14 @@ describe('all day scripts', () => {
 
 describe('day 1 (story 2026-10-14)', () => {
   const steps = STORIES[1].steps;
-  it('asks the name (no age since 2026-10-15), then hands over the riddle book, the letter and the gem', () => {
+  it('asks the name (no age), and MONBAN offers the ticket; the riddles, the gem and the letter are not on day 1 (story 2026-10-15)', () => {
     const t = kinds(steps);
     expect(t).not.toContain('age');
-    expect(t.indexOf('name')).toBeLessThan(t.indexOf('riddles'));
-    expect(t.indexOf('riddles')).toBeLessThan(t.indexOf('letter'));
-    expect(steps.some((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBe(true);
+    expect(t).not.toContain('riddles');
+    expect(t).not.toContain('letter');
+    const c = steps.find((s) => s.t === 'choice' && s.key === 'f_d01_ticket');
+    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['切符を受け取る', '受け取らない']);
+    expect(steps.some((s) => s.t === 'caption' && s.text.includes('{inviter_message}') && s.when === 'inviterMessage')).toBe(true);
   });
   it('goes from the name straight on to 「ここは、宇宙秘密結社だ。」 (client 2026-10-15)', () => {
     const n = steps.findIndex((s) => s.t === 'name');
@@ -66,14 +68,14 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const p = steps[pause] as { resume: string };
     expect(labelIndex(steps, p.resume)).toBe(c - 1);
   });
-  it('the look, the NEO name, saving, then the Bati is born and named — all on day 2', () => {
+  it('the gem and the riddle book at the launch pit, then the look, the NEO name, the Bati is born and named — all on day 2', () => {
     const t = kinds(steps);
+    expect(t.indexOf('riddles')).toBeLessThan(t.indexOf('look'));
+    expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('riddles'));
     expect(t.indexOf('look')).toBeLessThan(t.indexOf('neoname'));
     expect(t.indexOf('neoname')).toBeLessThan(t.indexOf('egg'));
     expect(t.indexOf('egg')).toBeLessThan(t.indexOf('hatch'));
     expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
-    const save = steps.find((s) => s.t === 'choice' && s.key === 'save');
-    expect(save).toMatchObject({ prompt: expect.stringContaining('プロフィールとして保存') });
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'sprite' && s.image === 'kimorin-dragon');

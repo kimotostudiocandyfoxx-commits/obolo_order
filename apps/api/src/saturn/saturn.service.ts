@@ -173,7 +173,13 @@ export class SaturnService {
     const mod = await moderateText(body.text, this.llm);
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This post breaks the community rules');
     let voice: { mediaId: string | null; url: string; source: 'recorded' | 'cloned' | 'default' };
-    if (body.readBy === 'bati' && body.voiceStyle) {
+    if (body.readBy === 'kororin' && body.voiceStyle) {
+      // the kororin speaks in the funny voice blown in on Saturn (M-R41); without one, Bati reads it
+      const v =
+        (await this.voices.readAloud(userId, { slot: 'kororin', text: body.text, style: body.voiceStyle }, origin).catch(() => null)) ??
+        (await this.voices.readByBati(userId, { text: body.text, style: body.voiceStyle }, origin));
+      voice = v ? { mediaId: null, url: v.url, source: 'cloned' } : { mediaId: null, url: neoVoiceUrl(body.voiceStyle, author?.neoForm, body.text), source: 'default' };
+    } else if (body.readBy === 'bati' && body.voiceStyle) {
       // Bati reads every post (client decision 2026-10-07): the registered Bati voice, the shared
       // default voice, or — when neither exists — the device's reading voice (P-SAT-8)
       const v = await this.voices.readByBati(userId, { text: body.text, style: body.voiceStyle }, origin);

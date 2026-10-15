@@ -65,7 +65,7 @@ export const CreateSaturnPostBody = z
     /** with voiceStyle: read it in the member's own registered voice (Fish Audio) instead of the NEO voice */
     ownVoice: z.boolean().optional(),
     /** with voiceStyle: read by Bati (the member's registered Bati voice) — the "バティに読んでもらう" button */
-    readBy: z.enum(['self', 'bati']).optional(),
+    readBy: z.enum(['self', 'bati', 'kororin']).optional(),
     voiceDurationSec: z.number().min(0).max(600).optional(),
     /** a voice reply to this post */
     replyToId: z.string().uuid().optional(),
@@ -94,6 +94,8 @@ export type AcceptInviteBody = z.infer<typeof AcceptInviteBody>;
 
 export const CreateInviteBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
+  /** a few words of your own, printed on the invitation (optional) */
+  message: z.string().trim().max(60).optional(),
 });
 export type CreateInviteBody = z.infer<typeof CreateInviteBody>;
 
@@ -224,7 +226,11 @@ export type InstrumentalBody = z.infer<typeof InstrumentalBody>;
 
 /** Voice registration: one recording of the fixed script (base64, ≤ ~4 MB before encoding). */
 export const RegisterVoiceBody = z.object({
-  slot: z.enum(['self', 'bati']),
+  slot: z.enum(['self', 'bati', 'kororin']),
+  /** the words said in the recording, when it is not the slot's fixed script (Saturn: your own murmur) */
+  text: z.string().trim().min(1).max(300).optional(),
+  /** shift the recording before it becomes the voice, in semitones (Saturn: your voice +2 for Bati, M-R41) */
+  pitch: z.number().int().min(-6).max(6).optional(),
   audio: z.object({
     mime: z
       .string()
@@ -237,7 +243,7 @@ export type RegisterVoiceBody = z.infer<typeof RegisterVoiceBody>;
 
 /** Speak a text in one of the member's registered voices (Saturn read-aloud, Bati's lines). */
 export const SpeakBody = z.object({
-  slot: z.enum(['self', 'bati']),
+  slot: z.enum(['self', 'bati', 'kororin']),
   text: z.string().trim().min(1).max(300),
   /** one of VOICE_STYLES (元気に, ささやき風 …) — read with that style's Fish tag */
   style: z.enum(VOICE_STYLE_IDS).optional(),

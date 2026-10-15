@@ -239,6 +239,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         const s = steps[n];
         if (!s) return;
         if (s.t === 'label') n++;
+        else if (s.t === 'caption' && s.when && !varsRef.current[s.when]) n++;
         else if (s.t === 'bgm') {
           bgm.current?.set(s.track);
           n++;

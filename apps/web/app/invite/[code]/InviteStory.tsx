@@ -34,7 +34,7 @@ export function InviteStory({ code }: { code: string }) {
     const resuming = status === 'authed' && playingDay1;
     setSaved(s && (s.code === code || code === 'resume') ? s : null);
     if (resuming) {
-      setInvite({ code, inviterName: me?.invitedByName ?? '', status: 'accepted', expiresAt: '' });
+      setInvite({ code, inviterName: me?.invitedByName ?? '', inviterMessage: me?.invitedByMessage ?? null, status: 'accepted', expiresAt: '' });
       return;
     }
     if (code === 'resume') {
@@ -143,7 +143,7 @@ export function InviteStory({ code }: { code: string }) {
     <StoryPlayer
       textOnly
       steps={DAY1}
-      vars={{ name: me?.displayName ?? '', inviter: invite.inviterName }}
+      vars={{ name: me?.displayName ?? '', inviter: invite.inviterName, inviterMessage: invite.inviterMessage ?? undefined }}
       initial={saved}
       onProgress={onProgress}
       onName={onName}

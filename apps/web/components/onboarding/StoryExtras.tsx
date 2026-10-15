@@ -148,8 +148,8 @@ export function NeoNameInput({ placeholder, submit, onSubmit }: { placeholder: s
 // --- the riddle cards and the book -----------------------------------------------------------------
 /** The eight seals of the riddle book. `answer` appears once the riddle is solved. */
 export const SEALS: Record<number, { q: string; answer?: string }> = {
-  1: { q: 'OBOLOとは', answer: 'OBOLOは、町の名前' },
-  2: { q: 'OBOLO ORDERは全員……', answer: '表現者' },
+  1: { q: 'oboloとは', answer: 'oboloは、街の名前' },
+  2: { q: 'Obolo Orderは全員……', answer: '表現者' },
   3: { q: '結社の目的とは' },
   6: { q: 'オボロンは……' },
   7: { q: 'コスモスは' },
@@ -159,7 +159,8 @@ export const SEALS: Record<number, { q: string; answer?: string }> = {
 export const DAY1_SEALS = [1, 7, 8];
 /** The words on the riddle cards by the journey day you are on (2 on Saturn, 3 on Jupiter, 6 on Mercury). */
 export function knownSealsOn(day: number): number[] {
-  return [...DAY1_SEALS, ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : [])];
+  // the book is handed over at the launch pit on day 2 (story M-R61): from day 3 the first three are known
+  return [...(day >= 3 ? DAY1_SEALS : []), ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : [])];
 }
 /** Answers that are open (both at the Sun, on day 7 — so from ORDER on). */
 export function solvedSealsOn(day: number): number[] {

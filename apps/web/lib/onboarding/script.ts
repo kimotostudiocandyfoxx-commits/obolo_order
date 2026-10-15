@@ -95,7 +95,8 @@ export type Step =
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: MotionId }
   /** テロップ: a short line in the middle of the screen (e.g. "MONBANが現れた"). Never spoken. Tap to continue. */
-  | { t: 'caption'; text: string }
+  /** a title; `when`: only if that story value is there (e.g. the inviter's words) */
+  | { t: 'caption'; text: string; when?: 'inviterMessage' }
   /** 〔画面：…〕 a short guidance note about how something works (e.g. the riddle book). Tap to continue. */
   | { t: 'notice'; text: string }
   /** Character line. Tap to continue. */
@@ -168,6 +169,8 @@ export interface TimedCaption {
 
 export interface StoryVars {
   name: string;
+  /** The inviter's own words on the invitation ({inviter_message}); empty = not shown. */
+  inviterMessage?: string;
   /** Times round the Sun ({age}). */
   age?: string;
   /** KIMORIN is shown as "KIMORIN⭐︎" (his NEO name, from the Moon's naming on). */
@@ -189,6 +192,7 @@ export interface StoryVars {
 export function fill(text: string, v: StoryVars): string {
   return text
     .replaceAll('{name}', v.name || '…')
+    .replaceAll('{inviter_message}', v.inviterMessage || '')
     .replaceAll('{inviter}', v.inviter || '…')
     .replaceAll('{neo}', v.neo || '…')
     .replaceAll('{bati}', v.bati || 'バティ')

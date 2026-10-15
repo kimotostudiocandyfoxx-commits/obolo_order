@@ -1,15 +1,15 @@
 import type { Step } from './script';
 
 /**
- * DAY 1 【地球の本部】 — the story of 2026-10-14 (docs/story-rewrite/土星まで_UI引き継ぎ.md §9,
- * D01-S001〜D01-S012). From the invitation to MONBAN's 「じゃあ、また明日会おう…。」.
- * The client's Day-1 motions are kept where they match the story (client, 2026-10-14: "1日目は今の画像や
- * 動画でそのまんま"): 1–4 invitation, 5–6 HQ, 7/9 MONBAN, 10 the invitation floats, 11 the gate opens,
- * 12–13 the temple and OBOLON, 14–17/19 the universe, 27–28 MONBAN steps in, 29 the letter.
- * The age question and the 「少し話す、どうする？」 choice were cut (client 2026-10-15): after the name OBOLON goes
- * straight on to 「ここは、宇宙秘密結社だ。」.
- * Saved: name, choice1 (day 7 quotes it), the riddle book (seals 1・7・8),
- * the letter and the mana gem.
+ * DAY 1 【地球の本部】 — the story of 2026-10-15 (review/DAY1.md, story 3b44a0b; M-R44〜M-R61).
+ * From the invitation to MONBAN's 「わかった、それではまた明日会おう。」. The invitation carries the inviter's
+ * own words ({inviter_message}) when they wrote some. OBOLON asks the name (no age, no "shall I talk"),
+ * talks until 「oboloとは、、、」 and MONBAN stops him; MONBAN offers the ticket ［切符を受け取る／受け取らない］
+ * (受け取らない stops the day at the choice). The riddles, the gem and the letter moved to day 2.
+ * The client's Day-1 motions are kept where they match the story: 1–4 invitation, 5–6 HQ, 7/9 MONBAN,
+ * 10 the invitation floats, 11 the gate opens, 12–13 the temple and OBOLON, 14–17/19 the universe,
+ * 27–28 MONBAN steps in.
+ * Saved: name, choice1 (day 7 quotes it), f_d01_ticket.
  */
 export const DAY1: Step[] = [
   // BGM (client, 2026-10-04): opening → MONBAN's theme from MONBAN → OBOLON's theme from OBOLON.
@@ -22,6 +22,7 @@ export const DAY1: Step[] = [
   { t: 'action', label: '封を開く' },
   { t: 'video', motion: 3 },
   { t: 'loop', motion: 4 }, // 招待状（文字は動画の中）
+  { t: 'caption', text: '「{inviter_message}」　{inviter}', when: 'inviterMessage' }, // 招待した人のひとこと（書いていなければ出さない）
   { t: 'action', label: '本部へ向かう' },
 
   // D01-S003 本部とMONBAN
@@ -69,44 +70,35 @@ export const DAY1: Step[] = [
   // the lines below are read WHILE motion 17 plays; 19 follows right after (client, 2026-10-04)
   { t: 'bgvideo', motion: 17, then: [19] },
   { t: 'say', who: 'OBOLON', text: '何かの偶然、何かの欲望、何かの閃き、\nいつだって、何かによって、何かが生まれる。' },
-  { t: 'say', who: 'OBOLON', text: '“OBOLO ORDER”\nそれは、新しい何かを、生み出す者達' },
-  { t: 'say', who: 'OBOLON', text: '楽しむ心があれば\n曲、映像、物語、服、食べ物。' },
-  { t: 'say', who: 'OBOLON', text: '万物が、創れる。' },
-  { t: 'say', who: 'OBOLON', text: 'いや、創るだけじゃない。届ける。' },
-  { t: 'say', who: 'OBOLON', text: '……伝わりにくいか…。' },
+  { t: 'say', who: 'OBOLON', text: '“Obolo Order”\nそれは、新しい何かを、生み出す者達' },
+  { t: 'say', who: 'OBOLON', text: '楽しむ心が、万物を創る。' },
+  { t: 'say', who: 'OBOLON', text: '創るだけじゃない。' },
+  { t: 'say', who: 'OBOLON', text: 'そう、\nobolo…とはなんなのか' },
   { t: 'say', who: 'OBOLON', text: 'わかりやすく、言う。' },
-  { t: 'say', who: 'OBOLON', text: 'OBOLOとは、、、、' },
-  // 暗転 → MONBAN steps in front of OBOLON
+  { t: 'say', who: 'OBOLON', text: 'oboloとは、、、' },
+  // 黒い球の後ろに、日食のような金の光の輪 → 暗転
   { t: 'bgm', track: 'monban' },
   { t: 'black' },
-  { t: 'say', who: 'MONBAN', text: 'おい、そこまでだ。' },
-  { t: 'video', motion: 27 },
+  { t: 'say', who: 'MONBAN', text: 'おい待て、そこまでだ。' },
+  { t: 'say', who: 'MONBAN', text: 'OBOLON、それは喋りすぎだ。' },
+  { t: 'video', motion: 27 }, // 光が戻る。金の光の輪を背負ったMONBANが、OBOLONの前に立っている
   { t: 'loop', motion: 28 },
 
-  // D01-S012 8つの謎の札、手紙とマナジェム
-  { t: 'label', id: 'riddles' },
-  { t: 'say', who: 'MONBAN', text: 'この秘密結社には…謎が、8個ある…。' },
-  { t: 'say', who: 'MONBAN', text: '宇宙へ行き…解き明かしてこい…。' },
-  { t: 'say', who: 'MONBAN', text: 'そして…コスモスを見つけよ…。宝は、そこにある…。' },
-  { t: 'riddles' }, // 8枚の札 → 1・7・8に字 → 謎の書
-  { t: 'se', sound: 'chime' },
-  { t: 'caption', text: '謎の書を手に入れた' },
-  { t: 'notice', text: '謎の書は、いつでも開けます。\n残りの札は旅の中で文字が浮かび、答えは旅を進めると読めるようになります' },
-  { t: 'say', who: 'OBOLON', text: '{name}。もし、宇宙に興味があるなら、、、' },
-  { t: 'say', who: 'OBOLON', text: '明日、宇宙行きの切符を送る。' },
-  { t: 'say', who: 'MONBAN', text: 'それにもしORDERになるなら…金もかかる。' },
-  { t: 'say', who: 'MONBAN', text: '決めるのは…旅を見てからで、いい…。' },
-  { t: 'say', who: 'MONBAN', text: '、、、そうだ。' },
-  { t: 'say', who: 'MONBAN', text: '{inviter}から手紙を預かっている。受け取れ。' },
-  { t: 'video', motion: 29 },
-  { t: 'letter', text: '{name}へ\n宇宙で待ってる✌️ウヒョヒョ\nby {inviter}' },
-  { t: 'say', who: 'MONBAN', text: '手紙と…いっしょに、これも…。' },
-  { t: 'still', image: 's/gem' },
-  { t: 'se', sound: 'sparkle' },
-  { t: 'caption', text: 'マナジェムを手に入れた' },
-  { t: 'say', who: 'MONBAN', text: 'マナジェムだ…。\n{inviter}が、お前に宛てて、用意した…。' },
-  { t: 'say', who: 'MONBAN', text: '使い方は…そのうち、わかる…。' },
-  { t: 'loop', motion: 28 },
-  { t: 'say', who: 'MONBAN', text: 'じゃあ、また明日会おう…。' },
+  // D01-S012 宇宙へ行ってみるか？
+  { t: 'cam', move: 'in', focus: '50% 30%' },
+  { t: 'say', who: 'MONBAN', text: 'お前はORDERに招待されてここに来た。' },
+  { t: 'say', who: 'MONBAN', text: 'だから知る権利がある。' },
+  { t: 'say', who: 'MONBAN', text: 'もし宇宙やこの秘密結社に興味があるなら、' },
+  { t: 'say', who: 'MONBAN', text: '明日、お前に宇宙行きの切符を送るが' },
+  { t: 'say', who: 'MONBAN', text: '宇宙へ行ってみるか？' },
+  { t: 'label', id: 'ticket' },
+  { t: 'choice', key: 'f_d01_ticket', options: [{ label: '切符を受け取る', goto: 'take' }, { label: '受け取らない' }] },
+  { t: 'say', who: 'MONBAN', text: '……そうか…。気が変わったら、また来い…。' },
+  { t: 'pause', resume: 'ticket' }, // 今日はここで終わる。次に開くと、この選択から
+  { t: 'label', id: 'take' },
+  { t: 'say', who: 'MONBAN', text: 'わかった、それではまた明日会おう。' },
+  { t: 'cam', move: 'out' },
+  { t: 'motes', count: 60 }, // 金と黒の都が、光の粒になってほどけ、真っ暗な宇宙に戻る
+  { t: 'black' },
   { t: 'end' },
 ];

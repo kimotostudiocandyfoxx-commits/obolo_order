@@ -18,6 +18,8 @@ export interface Me {
   /** Set when the current day has been finished (the next unlocks 24 h later or by skipping). */
   journeyCompletedAt: string | null;
   invitedByName: string | null;
+  /** the words on the invitation that brought them */
+  invitedByMessage?: string | null;
   /** OBOLO NEO form id (Day 2, on the Moon), null until chosen. */
   neoForm: string | null;
   /** Generated OBOLO NEO look (Day 2, on the Moon), null until chosen — falls back to the neoForm emblem. */
@@ -28,7 +30,7 @@ export interface Me {
   orderedAt: string | null;
   /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice.
    *  `selfSings` = the recording is kept, so songs are sung in it (Seed-VC; registered before 2026-10-09 = no). */
-  voices: { self: boolean; bati: boolean; selfSings?: boolean };
+  voices: { self: boolean; bati: boolean; selfSings?: boolean; kororin?: boolean };
   /** the round ぷにぷに character (null until dressed on the profile) */
   look: PuniLook | null;
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
@@ -80,6 +82,8 @@ export type VerifyResult = { kind: 'member'; token: string; user: Me } | { kind:
 export interface InviteView {
   code: string;
   inviterName: string;
+  /** the inviter's own words on the invitation (null = none) */
+  inviterMessage?: string | null;
   status: 'pending' | 'accepted' | 'revoked' | 'expired';
   expiresAt: string;
 }

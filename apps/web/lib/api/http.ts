@@ -376,7 +376,7 @@ export class HttpApi implements Api {
   myInvites() {
     return this.req<Awaited<ReturnType<Api['myInvites']>>>('GET', '/invites');
   }
-  createInvite(email: string) {
-    return this.req<Awaited<ReturnType<Api['createInvite']>>>('POST', '/invites', { email });
+  createInvite(email: string, message?: string) {
+    return this.req<Awaited<ReturnType<Api['createInvite']>>>('POST', '/invites', { email, ...(message?.trim() ? { message: message.trim() } : {}) });
   }
 }

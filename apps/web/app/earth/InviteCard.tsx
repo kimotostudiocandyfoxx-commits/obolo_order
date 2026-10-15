@@ -9,6 +9,7 @@ import { useI18n } from '@/lib/i18n/client';
 export function InviteCard() {
   const { m } = useI18n();
   const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [list, setList] = useState<MyInviteView[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -26,9 +27,10 @@ export function InviteCard() {
     setBusy(true);
     setErr(null);
     try {
-      const inv = await getApi().createInvite(email.trim());
+      const inv = await getApi().createInvite(email.trim(), message);
       setList((l) => [inv, ...l]);
       setEmail('');
+      setMessage('');
     } catch (e) {
       setErr(e instanceof ApiError ? e.message : m.common.error);
     } finally {
@@ -51,7 +53,7 @@ export function InviteCard() {
     <section className="card p-5">
       <h3 className="text-sm font-bold text-white/70">✉︎ {m.earth.invite}</h3>
       <p className="mt-1 text-[11px] text-white/45">{m.earth.inviteLead}</p>
-      <form onSubmit={create} className="mt-3 flex gap-2">
+      <form onSubmit={create} className="mt-3 flex flex-wrap gap-2">
         <input
           className="input flex-1"
           type="email"
@@ -59,6 +61,14 @@ export function InviteCard() {
           placeholder={m.earth.email}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+        {/* the inviter's own words, printed on the invitation (story M-R61) */}
+        <input
+          className="input order-last w-full text-sm"
+          maxLength={60}
+          placeholder="招待状に書くひとこと（なくてもいい）"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
         />
         <button className="btn btn-primary shrink-0 !px-4 text-sm" disabled={busy || !email}>
           {m.earth.inviteSend}

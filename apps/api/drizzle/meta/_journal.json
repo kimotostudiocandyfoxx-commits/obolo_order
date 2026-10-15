@@ -190,6 +190,20 @@
       "when": 1792036903145,
       "tag": "0026_atelier",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792066168218,
+      "tag": "0027_invite_message",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792066300428,
+      "tag": "0028_kororin_voice",
+      "breakpoints": true
     }
   ]
 }

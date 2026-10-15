@@ -281,11 +281,20 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   const manifest = json<Record<string, string>>(manifestPath, {});
   const jobs: { name: string; s: Spec; brief: string; act?: string; text: string; key: string }[] = [];
   let skipped = 0;
-  for (const [name, ref] of Object.entries(cfg.chosen)) {
-    const s = spec(ref);
-    const brief = s.brief ?? cfg.auditions.find((a) => a.name === name)?.brief ?? '';
+  // "special": a line said in another way — { who, text?, act?, as?, spec } (as = borrow that person's voice,
+  // spec = changes on top, e.g. KIMORIN's tremendously funny voice: a higher pitch)
+  type Special = { who: string; text?: string; act?: string; as?: string; spec?: Spec };
+  const specials = (cfg.special as Special[] | undefined) ?? [];
+  const voiced = new Set([...Object.keys(cfg.chosen), ...specials.map((x) => x.who)]);
+  for (const name of voiced) {
+    const ref = cfg.chosen[name];
     const again = redo.has(name);
     for (const l of spoken.get(name) ?? []) {
+      const sp = specials.find((x) => x.who === name && (!x.text || l.text.includes(x.text)) && (!x.act || (l.act ?? '').includes(x.act)));
+      const baseRef = sp?.as ? cfg.chosen[sp.as] : ref;
+      if (!baseRef) continue;
+      const s = { ...spec(baseRef), ...(sp?.spec ?? {}) };
+      const brief = s.brief ?? cfg.auditions.find((a) => a.name === (sp?.as ?? name))?.brief ?? '';
       if (!voiceable(l.text)) {
         skipped++;
         continue;
@@ -322,7 +331,7 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
     }
   });
   // the app plays a line by who + words: a line with a stage direction (〔…〕) is also found without it
-  for (const [name] of Object.entries(cfg.chosen))
+  for (const name of voiced)
     for (const l of spoken.get(name) ?? []) {
       if (!l.act) continue;
       const file = manifest[voiceKey(name, l.act, l.text)];

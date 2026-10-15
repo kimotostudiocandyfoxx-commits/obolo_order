@@ -12,10 +12,15 @@ import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
 
-/** Any browser recording (webm / mp4 / …) → 44.1 kHz mono MP3 with ffmpeg, trimmed to 30 s. */
-function toMp3(input: Buffer): Promise<Buffer> {
+/**
+ * Any browser recording (webm / mp4 / …) → 44.1 kHz mono MP3 with ffmpeg, trimmed to 30 s; `semitones`
+ * shifts the pitch and keeps the speed (Saturn: your voice a little higher for Bati).
+ */
+function toMp3(input: Buffer, semitones = 0): Promise<Buffer> {
+  const r = Math.pow(2, semitones / 12);
+  const shift = semitones ? ['-af', `asetrate=${Math.round(44100 * r)},aresample=44100,atempo=${(1 / r).toFixed(5)}`] : [];
   return new Promise((resolve, reject) => {
-    const p = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', '-t', '30', '-ac', '1', '-ar', '44100', '-b:a', '128k', '-f', 'mp3', 'pipe:1']);
+    const p = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', '-t', '30', '-ac', '1', '-ar', '44100', ...shift, '-b:a', '128k', '-f', 'mp3', 'pipe:1']);
     const out: Buffer[] = [];
     let err = '';
     p.stdout.on('data', (d: Buffer) => out.push(d));
@@ -62,7 +67,7 @@ export class VoiceService {
   }
 
   private col(slot: VoiceSlot) {
-    return slot === 'self' ? 'voiceSelfId' : 'voiceBatiId';
+    return slot === 'self' ? 'voiceSelfId' : slot === 'kororin' ? 'voiceKororinId' : 'voiceBatiId';
   }
 
   async register(userId: string, body: RegisterVoiceBody, origin: string): Promise<Me> {
@@ -71,18 +76,18 @@ export class VoiceService {
     if (raw.length < 5_000) throw apiError(HttpStatus.BAD_REQUEST, 'VOICE_TOO_SHORT', 'The recording is too short');
     let mp3: Buffer;
     try {
-      mp3 = await toMp3(raw);
+      mp3 = await toMp3(raw, body.pitch ?? 0);
     } catch (e) {
       this.log.warn(`convert failed: ${String(e)}`);
       throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'BAD_AUDIO', 'Could not read this recording');
     }
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
-    const id = await createVoiceModel(key, { title: `obolo-${userId.slice(0, 8)}-${body.slot}`, audio: mp3, filename: `${body.slot}.mp3`, mime: 'audio/mpeg', text: VOICE_SCRIPTS[body.slot] });
+    const id = await createVoiceModel(key, { title: `obolo-${userId.slice(0, 8)}-${body.slot}`, audio: mp3, filename: `${body.slot}.mp3`, mime: 'audio/mpeg', text: body.text ?? VOICE_SCRIPTS[body.slot] });
     const old = u[this.col(body.slot)];
     // the recording itself is kept too: songs are sung in it (Seed-VC reference, 2026-10-09)
     const sample = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
-    const urlCol = body.slot === 'self' ? 'voiceSelfUrl' : 'voiceBatiUrl';
+    const urlCol = body.slot === 'self' ? 'voiceSelfUrl' : body.slot === 'kororin' ? 'voiceKororinUrl' : 'voiceBatiUrl';
     const oldSample = u[urlCol];
     const [nu] = await this.db.write
       .update(users)

@@ -19,6 +19,7 @@ export const INVITES_PER_MONTH = 10;
 const toView = (i: typeof invites.$inferSelect): InviteView => ({
   code: i.code,
   inviterName: i.inviterName,
+  inviterMessage: i.message ?? null,
   status: i.status === 'pending' && i.expiresAt < new Date() ? 'expired' : (i.status as InviteView['status']),
   expiresAt: i.expiresAt.toISOString(),
 });
@@ -51,7 +52,7 @@ export class InvitesService {
   }
 
   /** A member invites someone. */
-  async createByMember(userId: string, email: string) {
+  async createByMember(userId: string, email: string, message?: string) {
     const [me] = await this.db.write.select().from(users).where(eq(users.id, userId));
     if (!me) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
     const since = new Date(Date.now() - 30 * 86400_000);
@@ -60,7 +61,7 @@ export class InvitesService {
       .from(invites)
       .where(and(eq(invites.inviterUserId, userId), gte(invites.createdAt, since)));
     if (n >= INVITES_PER_MONTH) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'INVITE_LIMIT', 'Invitation limit reached');
-    return this.create(email, me.displayName, me.id, me.locale as Locale);
+    return this.create(email, me.displayName, me.id, me.locale as Locale, message);
   }
 
   /** Operator-issued invitation (bootstraps the first members). */
@@ -68,7 +69,7 @@ export class InvitesService {
     return this.create(email, inviterName, null, 'ja');
   }
 
-  private async create(email: string, inviterName: string, inviterUserId: string | null, locale: Locale) {
+  private async create(email: string, inviterName: string, inviterUserId: string | null, locale: Locale, message?: string) {
     const [member] = await this.db.write.select({ id: users.id }).from(users).where(eq(users.email, email));
     if (member) throw apiError(HttpStatus.CONFLICT, 'ALREADY_MEMBER', 'This person is already a member');
     const code = randomBytes(12).toString('base64url');
@@ -79,6 +80,7 @@ export class InvitesService {
         email,
         inviterName,
         inviterUserId,
+        message: message?.trim() || null,
         expiresAt: new Date(Date.now() + this.cfg.INVITE_TTL_DAYS * 86400_000),
       })
       .returning();
@@ -116,6 +118,7 @@ export class InvitesService {
           locale: 'ja',
           invitedByUserId: inv.inviterUserId,
           invitedByName: inv.inviterName,
+          invitedByMessage: inv.message,
           journeyDay: 1,
         })
         .returning();

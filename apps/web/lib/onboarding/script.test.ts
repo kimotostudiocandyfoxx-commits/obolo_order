@@ -30,7 +30,7 @@ describe('day 1 script', () => {
     expect(bgmAt(DAY1, 1)).toBe('opening');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 7))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'name'))).toBe('obolon');
-    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい、そこまでだ。'))).toBe('monban');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。'))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');
   });
   it('lets the visitor read during motion 17, with 19 chained after it', () => {
@@ -41,9 +41,9 @@ describe('day 1 script', () => {
     expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
   });
   it('MONBAN steps in on a black screen before motion 27', () => {
-    const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい、そこまでだ。');
+    const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。');
     expect(DAY1[i - 1]).toEqual({ t: 'black' });
-    expect(DAY1[i + 1]).toEqual({ t: 'video', motion: 27 });
+    expect(DAY1[i + 2]).toEqual({ t: 'video', motion: 27 });
     expect(mediaAt(DAY1, i)).toBeNull();
   });
   it('loops motion 13 behind OBOLON', () => {

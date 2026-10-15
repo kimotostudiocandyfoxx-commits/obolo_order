@@ -24,7 +24,8 @@ export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
   1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false },
-  2: { steps: DAY2, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
+  // the end of day 2 (the Moon): 「もちろん明日まで待てない」 (story M-R67)
+  2: { steps: DAY2, skipLabel: 'もちろん明日まで待てない', auth: true },
   3: { steps: DAY3, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
   4: { steps: DAY4, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
   5: { steps: DAY5, skipLabel: DEFAULT_SKIP_LABEL, auth: true },

@@ -1,5 +1,5 @@
 {
- "made": "2026-10-15T06:30:38.807Z",
+ "made": "2026-10-15T12:14:28.670Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -8,7 +8,19 @@
   {
    "name": "MONBAN",
    "id": "monban",
-   "uses": 119,
+   "uses": 123,
+   "aliases": [],
+   "status": "needs-sheet",
+   "sprite": null,
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
+   "name": "ブラザー",
+   "id": "c-jz0v2y",
+   "uses": 6,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -30,9 +42,9 @@
    "sheet": null
   },
   {
-   "name": "ブラザー",
-   "id": "c-jz0v2y",
-   "uses": 5,
+   "name": "MIKIE⭐︎の曲",
+   "id": "c-vhp768",
+   "uses": 4,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -42,8 +54,8 @@
    "sheet": null
   },
   {
-   "name": "MIKIE⭐︎の曲",
-   "id": "c-vhp768",
+   "name": "MIKIE⭐︎",
+   "id": "c-np4654",
    "uses": 4,
    "aliases": [],
    "status": "needs-sheet",
@@ -188,7 +200,7 @@
   {
    "name": "KIMORIN",
    "id": "kimorin",
-   "uses": 361,
+   "uses": 380,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/kimorin-1.webp",
@@ -214,7 +226,7 @@
   {
    "name": "OBOLON",
    "id": "obolon",
-   "uses": 216,
+   "uses": 209,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/obolon.webp",
@@ -226,7 +238,7 @@
   {
    "name": "ヒポキン",
    "id": "c-13wd9v8",
-   "uses": 157,
+   "uses": 160,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/hipokin.webp",
@@ -238,7 +250,7 @@
   {
    "name": "フリージー",
    "id": "c-1l8fmea",
-   "uses": 118,
+   "uses": 120,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/freezy.webp",
@@ -250,7 +262,7 @@
   {
    "name": "大根カイザー",
    "id": "c-16ueow0",
-   "uses": 75,
+   "uses": 77,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-16ueow0.webp",
@@ -273,7 +285,7 @@
   {
    "name": "たこ焼きブラザー",
    "id": "c-op0tl3",
-   "uses": 37,
+   "uses": 38,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-brother.webp",
@@ -285,7 +297,7 @@
   {
    "name": "たこ焼きシスター",
    "id": "c-105b577",
-   "uses": 30,
+   "uses": 32,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-sister.webp",
@@ -297,7 +309,7 @@
   {
    "name": "ボスG",
    "id": "c-1hwam1f",
-   "uses": 13,
+   "uses": 15,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/bossg.webp",
@@ -309,7 +321,7 @@
   {
    "name": "うんちピンポンくん",
    "id": "c-131ge3q",
-   "uses": 9,
+   "uses": 11,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-131ge3q.webp",

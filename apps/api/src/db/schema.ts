@@ -64,6 +64,9 @@ export const users = pgTable(
      *  their own voice (Saturn, singing) and the voice they gave Bati (a changed voice). */
     voiceSelfId: text('voice_self_id'),
     voiceBatiId: text('voice_bati_id'),
+    /** the kororin voice: the funny voice blown in on Saturn (story M-R41) */
+    voiceKororinId: text('voice_kororin_id'),
+    voiceKororinUrl: text('voice_kororin_url'),
     /** the recordings themselves (2026-10-09): the voice reference Seed-VC sings songs in */
     voiceSelfUrl: text('voice_self_url'),
     voiceBatiUrl: text('voice_bati_url'),
@@ -74,6 +77,8 @@ export const users = pgTable(
     /** Invite-only (client decision 2026-10-04): who invited this user. */
     invitedByUserId: uuid('invited_by_user_id'),
     invitedByName: text('invited_by_name'),
+    /** The words on the invitation that brought them (kept for the story when it is reopened). */
+    invitedByMessage: text('invited_by_message'),
     /** 8-day journey (see @obolo/shared journey.ts): 1–8 = day to play, 9 = the Eclipse day (payment), 10 = ORDER member.
      *  Accounts created before the journey existed default to 10. */
     journeyDay: integer('journey_day').notNull().default(8),
@@ -432,6 +437,8 @@ export const invites = pgTable(
     inviterUserId: uuid('inviter_user_id').references(() => users.id),
     /** Snapshot shown in the story ("（招待者名）から招待されたのか…"). */
     inviterName: text('inviter_name').notNull(),
+    /** The inviter's own words on the invitation (story M-R61, {inviter_message}); null = none. */
+    message: text('message'),
     email: text('email').notNull(),
     status: text('status').notNull().default('pending'), // pending | accepted | revoked
     acceptedUserId: uuid('accepted_user_id').references(() => users.id),

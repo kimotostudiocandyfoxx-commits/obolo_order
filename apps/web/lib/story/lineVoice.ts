@@ -101,3 +101,10 @@ export class LineVoice {
     this.el = null;
   }
 }
+
+/** The voice file of a story line (who + words as written), or null. For kororins the story drops in. */
+export async function lineVoiceUrl(who: string, text: string, act?: string): Promise<string | null> {
+  if (!voiceable(text)) return null;
+  const m = await loadManifest();
+  return m[voiceKey(who, act, text)] ?? m[voiceKey(who, undefined, text)] ?? null;
+}

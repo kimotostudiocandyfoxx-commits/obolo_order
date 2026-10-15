@@ -43,7 +43,10 @@ export function KororinWorld({
   highlightDrop = false,
   extra,
   roomOnly = false,
+  noBar = false,
 }: {
+  /** the story's lesson brings its own mic (the Bati): no bottom bar */
+  noBar?: boolean;
   events?: KororinEvents;
   /** The story's own kororins (KIMORIN⭐︎'s, the brother's sneeze): placed on the planet first. */
   extra?: SaturnPostView[];
@@ -648,7 +651,7 @@ export function KororinWorld({
       )}
 
       {/* bottom bar */}
-      <div className="pb-safe absolute inset-x-0 bottom-0 z-[85] flex justify-center px-4 pb-4">
+      <div className={`pb-safe absolute inset-x-0 bottom-0 z-[85] flex justify-center px-4 pb-4 ${noBar ? 'hidden' : ''}`}>
         <div className="flex items-center gap-1 rounded-[30px] bg-white/95 px-3 py-2 shadow-[0_8px_30px_rgba(80,30,130,.25)]">
           <button onClick={shake} className="flex w-16 flex-col items-center gap-0.5 text-[11px] font-black text-[#6b5a8a]">
             <ShakeIcon />

@@ -2,22 +2,20 @@
 
 import type { NeoLookBody, NeoLookCandidate, NeoLookResult } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { fileToReference } from '@/lib/look';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { NeoChooser } from './NeoChooser';
 import { VoiceField } from './StoryExtras';
 
 /**
- * Day 2 on the Moon (D03-S004, story 2026-10-14): the visitor's OBOLO NEO look, drawn by the water basin.
- *  - three ways in: OBOLON's questions (animal → up to two colours → mood → what they are into, may
- *    pass) / in their own words or a picture / おまかせ. Gender is never asked.
+ * Day 2 on the Moon (D03-S004, story 2026-10-15, M-R64 / production UI 20): the visitor's NEO look, drawn
+ * by the water basin — short, so nobody gets stuck (the second journey's Moon can redo it).
+ *  - OBOLON asks four questions with buttons: animal (or in their own words) → up to two colours (KIMORIN:
+ *    「腕は80本？」) → mood → what they are into (or their own words, or pass). Gender is never asked.
  *  - the basin draws four looks (two boyish, two girlish). Pick one → 〔これにする〕〔この感じで、もっと
- *    見る〕〔ひとこと足す〕, or 〔最初から描き直す〕 — as often as they like (no count is shown; the
- *    server keeps a hidden ceiling, P-OB-18).
- *  - a picture is only read for the request, never stored, and the prompt forbids copying a character.
- *  - while it draws: KIMORIN whispers 「腕、80本。」, the water splashes, OBOLON 「水盤は、本人の言葉しか、聞かない。」
+ *    見る〕〔ひとこと足す〕, or 〔最初から描き直す〕 (four new ones from the same answers). No count is shown;
+ *    the server keeps a hidden ceiling (P-OB-18).
  *  - if drawing fails, the eight preset forms are offered so the story always moves on.
- * The answers and the last four looks are kept for this visit, so 「もう一度選ぶ」 comes back to them.
+ * The answers and the last four looks are kept for this visit.
  */
 export interface LookApi {
   candidates(body: NeoLookBody): Promise<NeoLookResult>;
@@ -26,7 +24,7 @@ export interface LookApi {
   chooseForm(formId: string): Promise<void>;
 }
 
-type Phase = 'entry' | 'animal' | 'color' | 'mood' | 'hobby' | 'alt' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
+type Phase = 'animal' | 'color' | 'mood' | 'hobby' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
 
 const ANIMALS = ['犬', '猫', '狐', 'うさぎ', 'くま', '鳥', '竜', 'おまかせ'];
 const COLORS: { name: string; css: string }[] = [
@@ -43,8 +41,8 @@ const COLORS: { name: string; css: string }[] = [
   { name: '金', css: 'linear-gradient(135deg,#f7e08a,#b8862b)' },
   { name: '銀', css: 'linear-gradient(135deg,#f2f4f7,#9aa3ad)' },
 ];
-const MOODS = ['かっこいい', 'かわいい', 'クール', 'ふしぎ', 'おもしろい', 'おまかせ'];
-const HOBBIES = ['音楽', 'スポーツ', 'ゲーム', '絵', '料理・食べること', 'ファッション', '読書・アニメ'];
+const MOODS = ['かっこいい', 'かわいい', 'クール', 'パーティーが好き', 'おまかせ'];
+const HOBBIES = ['スポーツ', 'ゲーム', 'パーティー'];
 const ADD = ['もっとかっこよく', 'もっとかわいく', '色を明るく', '目をやさしく', '小物を足して'];
 const DRAFT = 'obolo.look.draft';
 
@@ -65,8 +63,7 @@ function loadDraft(): Draft {
 
 export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string | null) => void }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [phase, setPhase] = useState<Phase>('entry');
-  const [ref, setRef] = useState<{ mime: 'image/jpeg'; data: string; url: string } | null>(null);
+  const [phase, setPhase] = useState<Phase>('animal');
   const [free, setFree] = useState('');
   const [sel, setSel] = useState<NeoLookCandidate | null>(null);
   const [instruction, setInstruction] = useState('');
@@ -74,7 +71,6 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   const [err, setErr] = useState<string | null>(null);
   const [tired, setTired] = useState(false);
   const last = useRef<NeoLookBody | null>(null);
-  const file = useRef<HTMLInputElement>(null);
 
   // coming back (「もう一度選ぶ」): the answers and the last four looks are still there
   useEffect(() => {
@@ -157,23 +153,10 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
 
   if (phase === 'making') return <Basin />;
 
-  if (phase === 'entry')
-    return (
-      <Panel>
-        <Obolon>どんな見た目に、なりたい？</Obolon>
-        <p className="mt-2 text-center text-[11px] leading-relaxed text-white/55">最後に、水盤が描いた4枚から1枚を選びます</p>
-        <div className="mt-3 flex flex-col gap-2">
-          <Gold onClick={() => setPhase('animal')}>質問に答える</Gold>
-          <Plain onClick={() => setPhase('alt')}>自分の言葉か画像で伝える</Plain>
-          <Plain onClick={() => draw({ omakase: true })}>おまかせにする</Plain>
-        </div>
-      </Panel>
-    );
-
   if (phase === 'animal')
     return (
       <Panel>
-        <Obolon>好きな動物は？</Obolon>
+        <Obolon>{'どんな見た目に、なりたい？\nそうだ、好きな動物は？'}</Obolon>
         <Chips items={ANIMALS} value={ans.animal} onPick={(v) => (setAns({ animal: v }), setFree(''), setPhase('color'))} />
         <p className="mt-3 text-xs text-white/50">自由に言う</p>
         <VoiceField value={free} onChange={setFree} placeholder="例：しろくま" />
@@ -181,7 +164,6 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
           <Gold disabled={!free.trim()} onClick={() => (setAns({ animal: free.trim() }), setFree(''), setPhase('color'))}>
             これにする
           </Gold>
-          <Back onClick={() => setPhase('entry')} />
         </div>
       </Panel>
     );
@@ -189,6 +171,8 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   if (phase === 'color')
     return (
       <Panel>
+        <Kimorin>腕は80本？</Kimorin>
+        <div className="mt-2" />
         <Obolon>好きな色は？</Obolon>
         <p className="mt-1 text-center text-[11px] text-white/50">2つまで選べます</p>
         <div className="mt-3 grid grid-cols-6 gap-2">
@@ -230,15 +214,22 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     return (
       <Panel>
         <Obolon>今、ハマってることは？</Obolon>
-        <p className="mt-1 text-center text-[11px] text-white/50">ハマっていることは、持ち物やワンポイントになります</p>
-        <Chips items={HOBBIES} value={ans.hobby} onPick={(v) => setAns({ hobby: v })} />
+        <Chips
+          items={HOBBIES}
+          value={ans.hobby}
+          onPick={(hobby) => {
+            const d = { ...draft, ans: { ...ans, hobby } };
+            save(d);
+            void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby });
+          }}
+        />
         <p className="mt-3 text-xs text-white/50">自由に言う</p>
         <VoiceField value={free} onChange={setFree} placeholder="例：カメラ" />
         <div className="mt-2 flex flex-col gap-2">
           <Gold
-            disabled={!free.trim() && !ans.hobby}
+            disabled={!free.trim()}
             onClick={() => {
-              const hobby = free.trim() || ans.hobby;
+              const hobby = free.trim();
               const d = { ...draft, ans: { ...ans, hobby } };
               save(d);
               void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby });
@@ -259,57 +250,13 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       </Panel>
     );
 
-  if (phase === 'alt')
-    return (
-      <Panel>
-        <Obolon>どんな姿にしたい？</Obolon>
-        <p className="mt-2 rounded-xl bg-white/5 p-3 text-[11px] leading-relaxed text-white/60">
-          声か文字で伝えるか、画像を選んでください。好きな雰囲気の絵や写真でもかまいません。人の顔写真や、ほかの作品のキャラそのものは使えません。画像は参考に読むだけで、保存はしません。
-        </p>
-        <div className="mt-3">
-          <VoiceField value={draft.words} onChange={(w) => save({ ...draft, words: w })} placeholder="例：星の杖を持った、青いオオカミ" maxLength={120} multiline />
-        </div>
-        {ref && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={ref.url} alt="" className="mx-auto mt-2 max-h-36 rounded-2xl" />
-        )}
-        <input
-          ref={file}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={async (e) => {
-            const f = e.target.files?.[0];
-            e.target.value = '';
-            if (!f) return;
-            try {
-              setRef(await fileToReference(f));
-            } catch {
-              setErr('この画像は読み込めませんでした');
-            }
-          }}
-        />
-        <div className="mt-3 flex flex-col gap-2">
-          <Plain onClick={() => file.current?.click()}>{ref ? '別の画像にする' : '＋ 画像を選ぶ'}</Plain>
-          <Gold
-            disabled={!ref && !draft.words.trim()}
-            onClick={() => draw(ref ? { reference: { mime: ref.mime, data: ref.data }, ...(draft.words.trim() ? { twist: draft.words.trim().slice(0, 60) } : {}) } : { words: draft.words.trim() })}
-          >
-            水盤に描いてもらう
-          </Gold>
-          <Back onClick={() => setPhase('entry')} />
-          {err && <p className="text-center text-xs text-rose-300">{err}</p>}
-        </div>
-      </Panel>
-    );
-
   if (phase === 'failed')
     return (
       <Panel>
         <p className="text-center text-amber-100">{tired ? '水盤が、今日は疲れてしまった……' : '水盤が、うまく描けなかった……'}</p>
         <p className="mt-1 text-center text-xs text-white/55">{tired ? '用意された姿から選んでください。' : 'もう一度ためすか、用意された姿から選んでください。'}</p>
         <div className="mt-4 flex flex-col gap-2">
-          {!tired && <Gold onClick={() => (last.current ? draw(last.current) : setPhase('entry'))}>もう一度描いてもらう</Gold>}
+          {!tired && <Gold onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>もう一度描いてもらう</Gold>}
           <Plain onClick={() => setPhase('forms')}>用意された8つの姿から選ぶ</Plain>
         </div>
       </Panel>
@@ -372,7 +319,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       </div>
       <div className="mt-3 flex flex-col gap-2">
         {!tired ? (
-          <Plain onClick={() => (setRef(null), setPhase('entry'))}>最初から描き直す</Plain>
+          <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>最初から描き直す</Plain>
         ) : (
           <p className="text-center text-xs text-white/50">水盤が今日は疲れてしまった……この4枚から選んでください</p>
         )}
@@ -398,19 +345,13 @@ function Basin() {
     const id = setInterval(() => setK((x) => x + 1), 1700);
     return () => clearInterval(id);
   }, []);
-  const lines: [string, string][] = [
-    ['', '水面に、描きかけの姿がゆらゆら映る……'],
-    ['KIMORIN', '腕、80本。'],
-    ['', 'ぴしゃっ。しずくが、KIMORINの額に当たる'],
-    ['OBOLON', '水盤は、、、本人の言葉しか、聞かない。'],
-  ];
+  const lines: [string, string][] = [['', '水盤が光って、姿が浮かんでくる……']];
   const [who, text] = k < lines.length ? lines[k] : ['', '水盤が、描いている……'];
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/70 px-6 backdrop-blur-[2px]">
-      <div className="relative h-44 w-72">
+      <div className="relative h-44 w-72" aria-hidden>
         <span className="absolute inset-x-0 bottom-0 h-20 rounded-[50%] border border-sky-100/40 bg-[radial-gradient(ellipse_at_center,rgba(190,225,255,0.45)_0%,rgba(80,120,170,0.15)_60%,transparent_75%)]" />
         <span className="absolute inset-x-10 bottom-5 h-10 animate-pulse rounded-[50%] bg-sky-100/25 blur-md" />
-        {k === 2 && <span className="absolute bottom-14 left-1/2 h-10 w-1 -translate-x-1/2 animate-[fadeUp_0.4s_ease-out] rounded-full bg-sky-100/80" />}
       </div>
       <div key={k} className="min-h-16 animate-[fadeUp_0.5s_ease-out] text-center">
         {who && <p className="text-xs tracking-[0.25em] text-amber-200/80">{who}</p>}
@@ -424,6 +365,16 @@ function Panel({ children }: { children: ReactNode }) {
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 max-h-[90svh] overflow-y-auto rounded-t-3xl border-t border-amber-200/30 bg-black/85 px-5 pb-8 pt-5 backdrop-blur-md">
       <div className="mx-auto max-w-md">{children}</div>
+    </div>
+  );
+}
+
+function Kimorin({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex items-start justify-end gap-2">
+      <p className="whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-white/10 px-3 py-2 text-[15px] leading-relaxed text-amber-50">{children}</p>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={spriteUrl('kimorin-sun')} alt="" className="h-10 w-10 shrink-0 object-contain object-top" />
     </div>
   );
 }

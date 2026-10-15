@@ -92,7 +92,7 @@ interface DemoState {
   ateliers?: Record<string, AtelierLayout>;
   /** ひろば (みんな map) and who joined them */
   plazas?: { id: string; name: string; icon: string; members: string[]; base: number }[];
-  invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null }>;
+  invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
 }
 
 /** Demo invitation that always works: /invite/demo (inviter = KIMORIN). */
@@ -321,7 +321,7 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
-  async registerVoice(body: { slot: 'self' | 'bati' }) {
+  async registerVoice(body: { slot: 'self' | 'bati' | 'kororin' }) {
     await sleep(800);
     return this.patchMe((u) => ({ voices: { ...(u.voices ?? { self: false, bati: false }), [body.slot]: true } }));
   }
@@ -573,7 +573,7 @@ export class DemoApi implements Api {
     }
     const inv = this.invites()[code];
     if (!inv) throw new ApiError(404, 'INVITE_NOT_FOUND', 'not found');
-    return { code, inviterName: inv.inviterName, status: inv.status, expiresAt: new Date(Date.parse(inv.createdAt) + 14 * 86400_000).toISOString() };
+    return { code, inviterName: inv.inviterName, inviterMessage: inv.message ?? null, status: inv.status, expiresAt: new Date(Date.parse(inv.createdAt) + 14 * 86400_000).toISOString() };
   }
 
   async acceptInvite(code: string, displayName: string) {
@@ -603,6 +603,7 @@ export class DemoApi implements Api {
       puniPic: null,
       butterfly: null,
       invitedByName: inv?.inviterName ?? 'KIMORIN',
+      invitedByMessage: inv?.message ?? null,
       createdAt: now(),
     };
     this.s.users[id] = user;
@@ -1096,10 +1097,10 @@ export class DemoApi implements Api {
       .reverse();
   }
 
-  async createInvite(email: string) {
+  async createInvite(email: string, message?: string) {
     const id = this.uid();
     const code = Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(16).padStart(2, '0')).join('');
-    const inv = { code, inviterName: this.s.users[id].displayName, email, status: 'pending' as const, createdAt: now(), inviterId: id };
+    const inv = { code, inviterName: this.s.users[id].displayName, email, status: 'pending' as const, createdAt: now(), inviterId: id, message: message?.trim().slice(0, 60) || null };
     this.invites()[code] = inv;
     this.save();
     return { ...inv, expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
