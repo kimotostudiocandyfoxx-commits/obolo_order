@@ -79,9 +79,18 @@ const pickTts = (names: string[]) => {
   return tts[0];
 };
 
+/**
+ * Speed and the silence before the first word (client 2026-10-15: every voice 1.3× faster, same key, no
+ * silence at the head): "tempo" in the config (default 1.3), applied to every new file; files made before
+ * are brought to the current tempo once (voices/tempo.json remembers what each file has).
+ */
+const TEMPO = Number((cfg as { tempo?: number }).tempo ?? 1.3);
+const HEAD = 'silenceremove=start_periods=1:start_duration=0:start_threshold=-42dB:start_silence=0.04';
+const atempo = (r: number) => (Math.abs(r - 1) < 0.001 ? [] : [`atempo=${r.toFixed(4)}`]);
+
 /** raw audio → mp3, with the spec's pitch / echo / growl and a level */
 function finish(input: string, inputArgs: string[], s: Spec, out: string) {
-  const f: string[] = [];
+  const f: string[] = [HEAD];
   // rubberband at its best quality (the default "speed" setting sounded robotic)
   const rb = (st: number, formant: string) => `rubberband=pitch=${Math.pow(2, st / 12).toFixed(4)}:formant=${formant}:pitchq=quality:transients=smooth:window=long:smoothing=on:phase=independent`;
   if (s.growl) {
@@ -93,7 +102,7 @@ function finish(input: string, inputArgs: string[], s: Spec, out: string) {
     const d = (0.25 + 0.35 * s.echo).toFixed(2);
     f.push(`aecho=0.85:0.75:170|340:${d}|${(+d / 2).toFixed(2)}`);
   }
-  f.push('loudnorm=I=-18:TP=-1.5');
+  f.push(...atempo(TEMPO), 'loudnorm=I=-18:TP=-1.5');
   mkdirSync(join(out, '..'), { recursive: true });
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputArgs, '-i', input, '-af', f.join(','), '-ac', '1', '-b:a', '64k', out]);
 }
@@ -312,10 +321,53 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
       log.push(`- ❌ ${j.name}「${j.text.slice(0, 20)}」: ${String(e).slice(0, 160)}`);
     }
   });
+  // the app plays a line by who + words: a line with a stage direction (〔…〕) is also found without it
+  for (const [name] of Object.entries(cfg.chosen))
+    for (const l of spoken.get(name) ?? []) {
+      if (!l.act) continue;
+      const file = manifest[voiceKey(name, l.act, l.text)];
+      const plain = voiceKey(name, undefined, l.text);
+      if (file && !manifest[plain]) manifest[plain] = file;
+    }
+  // every line file at the current tempo, without silence at the head (files made this run already are)
+  const tempoPath = join(STORY, 'voices/tempo.json');
+  const tempoOf = json<Record<string, number>>(tempoPath, {});
+  for (const j of todo) tempoOf[`/story/voices/lines/${j.key}.mp3`] = TEMPO;
+  let retimed = 0;
+  for (const file of new Set(Object.values(manifest))) {
+    const had = tempoOf[file] ?? 1;
+    const path = join(PUB, file);
+    if (Math.abs(had - TEMPO) < 0.001 || !existsSync(path)) continue;
+    const tmp = `${path}.t.mp3`;
+    try {
+      execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', path, '-af', [HEAD, ...atempo(TEMPO / had)].join(','), '-ac', '1', '-b:a', '64k', tmp]);
+      renameSync(tmp, path);
+      tempoOf[file] = TEMPO;
+      retimed++;
+    } catch (e) {
+      log.push(`- ❌ 速さの変更 ${file}: ${String(e).slice(0, 120)}`);
+    }
+  }
+  if (retimed) log.push(`- ⏩ 前に作った声 ${retimed}個を ${TEMPO}倍速・頭の無音なしにした`);
+  // cleanup: voices of lines that are no longer in any part of the story
+  const alive = new Set<string>();
+  for (const [name, ls] of said) for (const l of ls) alive.add(voiceKey(name, l.act, l.text)).add(voiceKey(name, undefined, l.text));
+  let removed = 0;
+  for (const [k, file] of Object.entries(manifest)) {
+    if (alive.has(k)) continue;
+    delete manifest[k];
+    if (!Object.values(manifest).includes(file) && existsSync(join(PUB, file))) {
+      rmSync(join(PUB, file));
+      removed++;
+    }
+  }
+  if (removed) log.push(`- 🧹 台本から消えたセリフの声 ${removed}個を消した`);
   writeFileSync(manifestPath, JSON.stringify(manifest));
+  const live = new Set(Object.values(manifest));
+  writeFileSync(tempoPath, JSON.stringify(Object.fromEntries(Object.entries(tempoOf).filter(([f]) => live.has(f)))));
 
-  // Fish model ids made this run go back into the config; redo is done once
-  writeFileSync(CONFIG, JSON.stringify({ ...cfg, redo: [] }, null, 2) + '\n');
+  // Fish model ids made this run go back into the config; redo / redoLines are done once
+  writeFileSync(CONFIG, JSON.stringify({ ...cfg, redo: [], redoLines: [] }, null, 2) + '\n');
   const total = [...spoken.entries()].filter(([n]) => cfg.chosen[n]).reduce((a, [, ls]) => a + ls.filter((l) => voiceable(l.text)).length, 0);
   const report = [
     `# 物語の声 — ${new Date().toISOString()}`,
