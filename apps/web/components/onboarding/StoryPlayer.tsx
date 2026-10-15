@@ -16,7 +16,7 @@ import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, Smoke, speakerSprite } from '@/components/story/Stage';
-import { ActionButton, Choice, DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
+import { ActionButton, Choice, DialogueWindow, IconButton, MixerPanel, Telop, useHint } from '@/components/story/parts';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { FilmReel } from './FilmReel';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
@@ -570,28 +570,20 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />}
 
       {started && prompt && (
-        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 64 + 40 : PROMPT_LIFT[step?.t ?? ''] ?? 150}px + env(safe-area-inset-bottom))` }}>
+        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 50 + 36 : step?.t === 'action' ? 86 : PROMPT_LIFT[step?.t ?? ''] ?? 150}px + env(safe-area-inset-bottom))` }}>
           <DialogueWindow name={speakerName(prompt.who, v)}>{fill(prompt.text, v)}</DialogueWindow>
         </div>
       )}
       {started && step?.t === 'action' && (
-        <Buttons>
-          <GoldButton onClick={next}>{step.label}</GoldButton>
-        </Buttons>
+        <Buttons key={i} labels={[step.label]} onPick={() => next()} />
       )}
       {started && step?.t === 'choice' && step.prompt && (
-        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step.options.length * 64 + 40}px + env(safe-area-inset-bottom))` }}>
+        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step.options.length * 50 + 36}px + env(safe-area-inset-bottom))` }}>
           <DialogueWindow>{fill(step.prompt, v)}</DialogueWindow>
         </div>
       )}
       {started && step?.t === 'choice' && (
-        <Buttons>
-          {step.options.map((o) => (
-            <Choice key={o.label} onClick={() => choose(step.key, o.label, o.goto)}>
-              {o.label}
-            </Choice>
-          ))}
-        </Buttons>
+        <Buttons key={i} labels={step.options.map((o) => o.label)} onPick={(k) => choose(step.key, step.options[k].label, step.options[k].goto)} />
       )}
       {started && step?.t === 'saturn' && (
         <SaturnLesson
@@ -799,7 +791,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </button>
       )}
 
-      {started && knownSeals.length > 0 && step?.t !== 'seal' && step?.t !== 'riddles' && <BookButton onClick={() => setBookOpen(true)} />}
+      {started && knownSeals.length > 0 && step?.t !== 'seal' && step?.t !== 'riddles' && step?.t !== 'video' && step?.t !== 'whiteout' && <BookButton onClick={() => setBookOpen(true)} />}
       {bookOpen && <RiddleBook known={knownSeals} solved={solvedSeals} onClose={() => setBookOpen(false)} />}
       {paused && <PauseScreen />}
       {timeUpShown && (
@@ -812,7 +804,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
 
-      {started && (
+      {started && step?.t !== 'video' && step?.t !== 'whiteout' && (
         <div className="pt-safe absolute right-3 top-3 z-40 flex gap-2">
           <IconButton icon="mixer" label="音の大きさ" onClick={() => setMixerOpen(true)} />
           <IconButton icon={muted ? 'mute' : 'sound'} label={muted ? '音を出す' : '音を消す'} onClick={() => setMuted((m) => !m)} />
@@ -884,7 +876,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   const who = step.t === 'say' ? speakerName(step.who, vars) : '';
   return (
     <button className="absolute inset-0 z-10 flex items-end justify-center" onClick={tap}>
-      <div className="pb-safe w-full bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pt-16">
+      <div className="pb-safe w-full px-0 pt-16">
         <div className="mb-5 animate-[fadeUp_0.25s_ease-out]">
           <DialogueWindow name={who} done={done}>
             {visible}
@@ -905,21 +897,37 @@ function Cue() {
   );
 }
 
-function Buttons({ children }: { children: React.ReactNode }) {
+/**
+ * Choices and the story's actions (production UI 19): small speech bubbles from the visitor's side,
+ * coming up one after another; the one tapped is said (it stays lit a moment). The first few glow.
+ */
+function Buttons({ labels, onPick }: { labels: string[]; onPick: (k: number) => void }) {
+  const hint = useHint();
+  const [said, setSaid] = useState<number | null>(null);
   return (
-    <div className="pb-safe absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/70 to-transparent px-6 pt-10">
-      <div className="mx-auto mb-5 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">{children}</div>
+    <div className="pb-safe pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4">
+      <div className="pointer-events-auto mx-auto mb-5 flex max-w-xl flex-col items-end gap-2">
+        {labels.map((l, k) => (
+          <Choice
+            key={l}
+            k={k}
+            hint={hint}
+            on={said === k}
+            disabled={said !== null && said !== k}
+            onClick={() => {
+              if (said !== null) return;
+              setSaid(k);
+              setTimeout(() => onPick(k), 380);
+            }}
+          >
+            {l}
+          </Choice>
+        ))}
+      </div>
     </div>
   );
 }
 
-function GoldButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <ActionButton type="submit" onClick={onClick}>
-      {children}
-    </ActionButton>
-  );
-}
 
 function NameInput({
   placeholder,
@@ -949,10 +957,12 @@ function NameInput({
     }
   };
   return (
-    <form onSubmit={go} className="pb-safe absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-20">
-      <div className="mx-auto mb-10 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-        <VoiceField value={value} onChange={setValue} placeholder={placeholder} />
-        <GoldButton onClick={() => undefined}>{busy ? '……' : submit}</GoldButton>
+    <form onSubmit={go} className="pb-safe absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 pt-16">
+      <div className="mx-auto mb-8 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col items-end gap-3">
+        <div className="w-full">
+          <VoiceField value={value} onChange={setValue} placeholder={placeholder} />
+        </div>
+        <ActionButton type="submit" disabled={!value.trim() || busy}>{busy ? '……' : submit}</ActionButton>
         {err && <p className="text-center text-sm text-rose-300">{err}</p>}
       </div>
     </form>

@@ -1,11 +1,16 @@
 'use client';
 
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 
 /**
- * The story's UI parts (production UI 6, 2026-10-15): painted without letters (Seedream,
- * design/ui-parts-queue.json → public/ui/parts/<id>.webp) and stretched with border-image so the ornate
- * ends and corners keep their shape. Dark fantasy + gold light; nothing that looks like a web button.
+ * The story's UI parts (production UI 6 + 19, 2026-10-15). The rule (client): the motion is anime, the
+ * parts are as small and quiet as they can be.
+ *  - lines: a thin translucent band over the picture, a small name, tap anywhere to go on (a blinking mark)
+ *  - titles: like film subtitles — thin letters that come and go, no band
+ *  - choices and actions: small speech bubbles from your side; tapping one is saying it
+ *  - a big, clear button only at a moment of decision (paying, agreeing how a voice is used): DecisionButton
+ *  - the first few times, what can be tapped glows softly; the touch area is larger than it looks
+ * The painted frames (Seedream, public/ui/parts) are kept for the decision button.
  * /preview/parts shows them all.
  */
 const P = (id: string) => `/ui/parts/${id}.webp`;
@@ -18,71 +23,86 @@ const frame = (id: string, slice: string, width: string): CSSProperties => ({
   borderImage: `url(${P(id)}) ${slice} fill / ${width} / 0 stretch`,
 });
 
-/** The dialogue window, with the speaker's name plate on its upper left. */
+/** The first few prompts glow so it is clear where to tap (then never again on this device). */
+const HINT_KEY = 'obolo.story.hints';
+export function useHint(): boolean {
+  const [on] = useState(() => {
+    try {
+      const n = Number(localStorage.getItem(HINT_KEY) ?? 0);
+      localStorage.setItem(HINT_KEY, String(n + 1));
+      return n < 4;
+    } catch {
+      return false;
+    }
+  });
+  return on;
+}
+
+/** A spoken line: a thin translucent band over the picture with a small name. */
 export function DialogueWindow({ name, children, done, style }: { name?: string; children: ReactNode; done?: boolean; style?: CSSProperties }) {
   return (
     <div className="relative mx-auto w-full max-w-xl" style={{ fontFamily: SERIF, ...style }}>
-      <div className="relative min-h-[8.5rem] px-2 pb-3 pt-4 text-left text-amber-50" style={frame('dialog', '70 70 70 70', '22px')}>
-        <p className="whitespace-pre-wrap text-[17px] leading-[1.75] tracking-[0.04em] [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">{children}</p>
+      <div className="relative bg-[linear-gradient(180deg,rgba(6,5,10,0)_0%,rgba(6,5,10,0.55)_18%,rgba(6,5,10,0.62)_100%)] px-5 pb-4 pt-3 text-left text-amber-50">
+        <span className="absolute inset-x-6 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(245,212,138,0.55),transparent)]" />
+        {name && <NamePlate name={name} />}
+        <p className="min-h-[3.4em] whitespace-pre-wrap text-[16.5px] leading-[1.75] tracking-[0.04em] [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">{children}</p>
         {done && <NextMark />}
       </div>
-      {name && (
-        <div className="absolute -top-5 left-3">
-          <NamePlate name={name} />
-        </div>
-      )}
     </div>
   );
 }
 
 export function NamePlate({ name }: { name: string }) {
-  return (
-    <span className="inline-block min-w-[7rem] px-1 text-center text-[13px] font-bold leading-6 tracking-[0.25em] text-amber-200 [text-shadow:0_0_8px_rgba(255,200,110,0.5)]" style={{ fontFamily: SERIF, ...frame('nameplate', '40 90 40 90', '8px 22px') }}>
-      {name}
-    </span>
-  );
+  return <span className="mb-0.5 block text-[11.5px] tracking-[0.3em] text-amber-200/90 [text-shadow:0_0_6px_rgba(255,200,110,0.45)]">{name}</span>;
 }
 
-/** A small jewel arrow: the line is all out, tap to go on. */
+/** A small blinking mark at the end: the line is all out, tap anywhere. */
 export function NextMark() {
-  return (
-    <span className="absolute bottom-1 right-2 block h-3.5 w-3.5 animate-[nextBob_1.2s_ease-in-out_infinite]" aria-hidden>
-      <svg viewBox="0 0 20 20" className="h-full w-full drop-shadow-[0_0_6px_rgba(255,210,120,0.9)]">
-        <path d="M3 5 L10 15 L17 5 L10 8 Z" fill="#f5d48a" stroke="#fff3cf" strokeWidth="0.8" />
-      </svg>
-    </span>
-  );
+  return <span className="absolute bottom-3 right-4 block h-1.5 w-1.5 animate-[nextBob_1.2s_ease-in-out_infinite] rounded-full bg-amber-200 shadow-[0_0_8px_2px_rgba(255,210,120,0.7)]" aria-hidden />;
 }
 
-/** A title across the screen: 〔テロップ：…〕 (1日目, 本部に到着しました, MONBANが現れた, …). */
+/** 〔テロップ：…〕 like a film subtitle: thin letters that come and go, no band. */
 export function Telop({ text, style }: { text: string; style?: CSSProperties }) {
   return (
-    <div className="relative mx-auto flex aspect-[7/1] w-[min(92vw,560px)] items-center justify-center bg-[length:100%_100%] bg-no-repeat px-[9%]" style={{ backgroundImage: `url(${P('telop')})`, fontFamily: SERIF, ...style }}>
-      <span className="truncate text-[clamp(15px,4.4vw,22px)] tracking-[0.22em] text-amber-100 [text-shadow:0_0_12px_rgba(255,200,110,0.6)]">{text}</span>
-    </div>
+    <p className="mx-auto max-w-[90vw] animate-[subIn_2.6s_ease-out_both] text-center text-[clamp(14px,4vw,19px)] font-light tracking-[0.35em] text-amber-50/95 [text-shadow:0_0_14px_rgba(0,0,0,0.95),0_0_4px_rgba(0,0,0,0.9)]" style={{ fontFamily: SERIF, ...style }}>
+      {text}
+    </p>
   );
 }
 
-/** A choice. `on` = the one being pressed / picked. */
-export function Choice({ children, onClick, on = false, disabled = false }: { children: ReactNode; onClick?: () => void; on?: boolean; disabled?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`group relative block w-full text-center text-[16px] tracking-[0.12em] [word-break:keep-all] transition-opacity disabled:opacity-40 ${on ? 'text-[#2a1600]' : 'text-amber-50'}`}
-      style={{ fontFamily: SERIF, ...frame(on ? 'choice-on' : 'choice', on ? '70 110 70 110' : '40 90 40 90', on ? '22px 44px' : '14px 34px') }}
-    >
-      <span className={`relative block py-1.5 ${on ? 'font-bold' : ''}`}>{children}</span>
-      {!on && <span className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-active:opacity-100" style={frame('choice-on', '70 110 70 110', '22px 44px')} aria-hidden />}
-    </button>
-  );
-}
-
-/** The one big action of a moment (〔ボタン：封を開く〕, 名乗る, …). */
-export function ActionButton({ children, onClick, disabled = false, type = 'button' }: { children: ReactNode; onClick?: () => void; disabled?: boolean; type?: 'button' | 'submit' }) {
+/**
+ * A choice (or the story's action, 〔ボタン：封を開く〕): a small speech bubble from your side.
+ * `k` staggers bubbles that come up together; `hint` glows softly.
+ */
+export function Choice({ children, onClick, on = false, disabled = false, k = 0, hint = false, type = 'button' }: { children: ReactNode; onClick?: () => void; on?: boolean; disabled?: boolean; k?: number; hint?: boolean; type?: 'button' | 'submit' }) {
   return (
     <button
       type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className="group relative -m-2 block p-2 text-right disabled:opacity-40"
+      style={{ animation: `bubbleIn 0.45s ease-out ${0.12 * k}s both`, fontFamily: SERIF }}
+    >
+      <span
+        className={`relative inline-block max-w-[78vw] rounded-[18px] rounded-br-[5px] border px-4 py-2 text-left text-[15px] leading-snug tracking-[0.06em] [word-break:keep-all] transition-colors ${on ? 'border-amber-200/80 bg-amber-200/90 text-[#2a1600]' : 'border-amber-100/35 bg-[rgba(10,8,14,0.62)] text-amber-50 group-active:border-amber-200/80 group-active:bg-amber-200/25'}`}
+        style={hint && !on ? { animation: 'hintGlow 1.8s ease-in-out infinite' } : undefined}
+      >
+        {children}
+      </span>
+    </button>
+  );
+}
+/** The story's own actions use the same bubble. */
+export const ActionButton = ({ children, onClick, disabled = false, type = 'button', hint = false }: { children: ReactNode; onClick?: () => void; disabled?: boolean; type?: 'button' | 'submit'; hint?: boolean }) => (
+  <Choice onClick={onClick} disabled={disabled} type={type} hint={hint}>
+    {children}
+  </Choice>
+);
+
+/** The one big, clear button — only at a moment of decision (paying, agreeing how a voice is used). */
+export function DecisionButton({ children, onClick, disabled = false }: { children: ReactNode; onClick?: () => void; disabled?: boolean }) {
+  return (
+    <button
       onClick={onClick}
       disabled={disabled}
       className="relative block w-full text-center text-[17px] tracking-[0.18em] text-amber-50 transition-opacity [text-shadow:0_0_10px_rgba(255,200,110,0.55)] [word-break:keep-all] active:opacity-80 disabled:opacity-40"
@@ -93,20 +113,16 @@ export function ActionButton({ children, onClick, disabled = false, type = 'butt
   );
 }
 
-/** A text box in the story's frame (typed answers: name, food, …). */
+/** A typed answer (name, food, …): a thin line, no box. */
 export function FieldFrame({ children }: { children: ReactNode }) {
-  return (
-    <div className="relative w-full" style={frame('field', '40 150 40 150', '12px 40px')}>
-      {children}
-    </div>
-  );
+  return <div className="relative w-full border-b border-amber-100/45 pb-0.5 focus-within:border-amber-200/90">{children}</div>;
 }
 
 /** Round gold icon buttons (sound on / off, the riddle book). Drawn in SVG until the painted medallions arrive. */
 export function IconButton({ icon, onClick, label, style }: { icon: 'sound' | 'mute' | 'book' | 'mixer'; onClick: () => void; label: string; style?: CSSProperties }) {
   return (
-    <button onClick={onClick} aria-label={label} className="relative flex h-10 w-10 items-center justify-center rounded-full border border-amber-200/70 bg-[radial-gradient(circle_at_35%_30%,#2b2215,#0b0805_70%)] shadow-[0_0_14px_rgba(255,200,110,0.35),inset_0_0_0_2px_rgba(0,0,0,0.6)] active:opacity-80" style={style}>
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="#f3d08a" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <button onClick={onClick} aria-label={label} className="relative -m-1.5 flex h-11 w-11 items-center justify-center rounded-full opacity-55 transition-opacity active:opacity-100" style={style}>
+      <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" fill="none" stroke="#f3d08a" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         {icon === 'book' ? (
           <>
             <path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z" />
@@ -139,7 +155,7 @@ export function MixerPanel({ mix, onChange, onClose }: { mix: { bgm: number; se:
     { key: 'voice', label: '声' },
   ];
   return (
-    <div className="w-[min(86vw,340px)] px-4 py-4 text-amber-50" style={{ fontFamily: SERIF, ...frame('dialog', '70 70 70 70', '22px') }}>
+    <div className="w-[min(86vw,340px)] rounded-2xl border border-amber-100/20 bg-[rgba(8,6,12,0.82)] px-5 py-5 text-amber-50 backdrop-blur-sm" style={{ fontFamily: SERIF }}>
       <p className="mb-3 text-center text-sm tracking-[0.4em] text-amber-200">音の大きさ</p>
       {rows.map((r) => (
         <label key={r.key} className="mb-3 flex items-center gap-3 text-[14px] tracking-[0.15em]">

@@ -57,7 +57,7 @@ export function VoiceField({
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const mic = useDictation({ field: ref, value, onChange, maxLength });
   const withMic = useContext(MicAllowed);
-  const cls = `min-w-0 flex-1 rounded-3xl border bg-black/60 px-5 py-3 text-amber-50 outline-none placeholder:text-white/35 ${mic.listening ? 'border-rose-300' : 'border-amber-200/60 focus:border-amber-100'}`;
+  const cls = `min-w-0 flex-1 border-b bg-transparent px-2 py-2 text-amber-50 outline-none placeholder:text-white/35 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] ${mic.listening ? 'border-rose-300' : 'border-amber-100/45 focus:border-amber-200/90'}`;
   return (
     <div>
       <div className="flex items-center gap-2">

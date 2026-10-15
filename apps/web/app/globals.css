@@ -575,3 +575,16 @@ body {
 .story-range::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -8px; height: 20px; width: 20px; border-radius: 9999px; border: 2px solid #fbe7b0; background: radial-gradient(circle at 35% 30%, #3a2c16, #0b0805 70%); box-shadow: 0 0 10px rgba(255, 200, 110, 0.7); }
 .story-range::-moz-range-track { height: 4px; border-radius: 9999px; background: linear-gradient(90deg, #b8893a, #f6dc9a); }
 .story-range::-moz-range-thumb { height: 18px; width: 18px; border-radius: 9999px; border: 2px solid #fbe7b0; background: #0b0805; }
+@keyframes subIn {
+  0% { opacity: 0; transform: translateY(4px); }
+  18% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 1; }
+}
+@keyframes bubbleIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes hintGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 214, 140, 0); }
+  50% { box-shadow: 0 0 16px 3px rgba(255, 214, 140, 0.55); }
+}

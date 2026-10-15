@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Cast, Motes } from '@/components/story/Stage';
-import { ActionButton, Choice, DialogueWindow, FieldFrame, IconButton, MixerPanel, NamePlate, SERIF, Telop } from '@/components/story/parts';
+import { ActionButton, Choice, DecisionButton, DialogueWindow, FieldFrame, IconButton, MixerPanel, SERIF, Telop } from '@/components/story/parts';
 import { DEFAULT_MIX } from '@/lib/story/lineVoice';
 
 /**
@@ -25,14 +25,14 @@ export default function PartsPage() {
         </Link>
         <h1 className="mt-4 text-center text-sm tracking-[0.5em] text-amber-200">物語の部品</h1>
 
-        <Section title="テロップ">
+        <Section title="テロップ：映画の字幕のように（枠も帯もなし）">
           <Telop text="1日目" />
           <div className="h-3" />
           <Telop text="MONBANが現れた" />
         </Section>
 
-        <Section title="会話ウィンドウ・名前札">
-          <div className="pt-6">
+        <Section title="セリフ：絵を隠さない薄い帯と、小さな名前（画面のどこをタップしても進む）">
+          <div className="pt-2">
             <DialogueWindow name="MONBAN" done>
               誰だお前…ここは秘密結社だ…。
             </DialogueWindow>
@@ -40,27 +40,29 @@ export default function PartsPage() {
           <div className="mt-8">
             <DialogueWindow name="OBOLON">{'“OBOLO ORDER”\nそれは、新しい何かを、生み出す者達'}</DialogueWindow>
           </div>
-          <div className="mt-6 flex justify-center gap-3">
-            <NamePlate name="KIMORIN⭐︎" />
-            <NamePlate name="バティ" />
-          </div>
+
         </Section>
 
-        <Section title="選択肢（押すと金色に）">
-          <div className="mx-auto flex max-w-sm flex-col gap-3">
-            {['話を聞いてみる', 'やめておく'].map((o) => (
-              <Choice key={o} on={picked === o} onClick={() => setPicked(o)}>
+        <Section title="選択肢：自分の側から出る小さな吹き出し（押すと、それが自分のセリフになる）">
+          <div className="flex flex-col items-end gap-2">
+            {['行きたい', '行きたくない', 'まだわかんない'].map((o, k) => (
+              <Choice key={o} k={k} hint={k === 0 && !picked} on={picked === o} onClick={() => setPicked(o)}>
                 {o}
               </Choice>
             ))}
           </div>
         </Section>
 
-        <Section title="ボタン">
-          <div className="mx-auto max-w-sm">
+        <Section title="物語の中の行動も、同じ吹き出し">
+          <div className="flex flex-col items-end gap-2">
             <ActionButton>封を開く</ActionButton>
-            <div className="h-3" />
             <ActionButton>門をくぐり、地球の神殿に向かう</ActionButton>
+          </div>
+        </Section>
+
+        <Section title="大きくはっきりしたボタンは「決断の瞬間」だけ（支払い・声の使い方の同意）">
+          <div className="mx-auto max-w-sm">
+            <DecisionButton>支払う</DecisionButton>
           </div>
         </Section>
 
@@ -69,12 +71,13 @@ export default function PartsPage() {
             <FieldFrame>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder="名前" className="w-full bg-transparent py-1.5 text-center text-[18px] tracking-widest text-amber-50 outline-none placeholder:text-white/35" />
             </FieldFrame>
-            <div className="h-3" />
-            <ActionButton disabled={!name.trim()}>名乗る</ActionButton>
+            <div className="mt-3 flex justify-end">
+              <ActionButton disabled={!name.trim()}>名乗る</ActionButton>
+            </div>
           </div>
         </Section>
 
-        <Section title="小さなボタン（謎の書・音の大きさ・音のオン／オフ）">
+        <Section title="すみの小さな印（謎の書・音の大きさ・音のオン／オフ）。演出が流れている間は消える">
           <div className="flex justify-center gap-4">
             <IconButton icon="book" label="謎の書" onClick={() => undefined} />
             <IconButton icon="mixer" label="音の大きさ" onClick={() => undefined} />
