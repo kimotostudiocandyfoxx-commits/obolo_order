@@ -24,7 +24,11 @@ export const VOICE_STYLES: readonly VoiceStyle[] = [
   { id: 'takai', label: '高い声で', rate: 1.05, pitch: 1.85, volume: 1, fish: { tag: '[high-pitched voice]', speed: 1.05 } },
   { id: 'sasayaki', label: 'ささやき風', rate: 0.82, pitch: 1.15, volume: 0.4, fish: { tag: '[whispering]', speed: 0.9 } },
   { id: 'sakebu', label: '叫ぶ風', rate: 1.25, pitch: 1.6, volume: 1, fish: { tag: '[shouting]', speed: 1.1 } },
+  // Saturn reads every kororin this way since 2026-10-15 (the reading styles were dropped; the others stay for old posts)
+  { id: 'futsu', label: 'ふつう', rate: 1, pitch: 1.2, volume: 1, fish: { tag: '', speed: 1 } },
 ];
+/** How a kororin is read (no choosing since 2026-10-15). */
+export const KORORIN_VOICE_STYLE = 'futsu';
 
 export const VOICE_STYLE_IDS = VOICE_STYLES.map((s) => s.id) as [string, ...string[]];
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, VOICE_STYLES, type PlazaView, type SaturnPostView } from '@obolo/shared';
+import { KORORIN_VOICE_STYLE, neoVoiceUrl, SATURN_LIFETIME_HOURS, SATURN_MAX_CHARS, type PlazaView, type SaturnPostView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
@@ -13,7 +13,6 @@ import { playPop, unlockPop } from '@/lib/popSound';
 import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
 import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
-import { PhotoCropper } from './PhotoCropper';
 import { PlazaMap } from './PlazaMap';
 import { SaturnProfile } from './SaturnProfile';
 
@@ -848,22 +847,12 @@ function lifeLeft(createdAt: string) {
   return h <= 1 ? 'まもなく消える' : `のこり${Math.floor(h)}時間`;
 }
 
-/** The reading styles, as the "バティに読んでもらう" choices. */
-const READ_LABELS: Record<string, string> = {
-  genki: '元気に読む',
-  yukkuri: 'ゆっくり読む',
-  hayakuchi: '早口で読む',
-  hikui: '低い声で読む',
-  takai: '高い声で読む',
-  sasayaki: 'ささやき声で読む',
-  sakebu: '叫んで読む',
-};
-
 /**
  * 声をおとす (client decisions 2026-10-07): the mic is for typing — tap the big mic, speak, tap
  * again; the words appear at the cursor (fix a part: tap / select it, delete, speak again).
- * Every post is read by Bati (the member's registered Bati voice) in a chosen reading style;
- * nobody's raw recording is used (noise). Without a registered Bati voice a temporary one reads.
+ * Every post is read by Bati (the member's registered Bati voice), always the same plain way (the reading
+ * styles and the photo were dropped, client 2026-10-15); nobody's raw recording is used (noise). Without a
+ * registered Bati voice a temporary one reads.
  */
 function DropComposer({
   onClose,
@@ -892,15 +881,11 @@ function DropComposer({
   // previews cost a voice call: keep the last one for the same text + style
   const [preview, setPreview] = useState<{ key: string; url: string } | null>(null);
   const [previewing, setPreviewing] = useState(false);
-  const [style, setStyle] = useState(VOICE_STYLES[0].id);
+  const style = KORORIN_VOICE_STYLE;
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const box = useRef<HTMLTextAreaElement>(null);
-  // 📷 写真もつける: the character holds it on the planet
-  // (fitted into the round frame first: photos on Saturn are round)
-  const [photo, setPhoto] = useState<{ blob: Blob; preview: string } | null>(null);
-  const [cropping, setCropping] = useState<File | null>(null);
   const [places, setPlaces] = useState<PlazaView[]>([]);
   const [into, setInto] = useState<PlazaView | null>(plaza ?? null);
   useEffect(() => {
@@ -946,8 +931,7 @@ function DropComposer({
     setErr(null);
     try {
       const where = replyTo ? null : into;
-      const photoMediaId = photo ? (await getApi().uploadPhoto(photo.blob)).id : undefined;
-      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}), ...(where ? { plazaId: where.id } : {}), ...(photoMediaId ? { photoMediaId } : {}) };
+      const target = { ...(replyTo ? { replyToId: replyTo.id } : {}), ...(quote ? { repostOfId: quote.id } : {}), ...(where ? { plazaId: where.id } : {}) };
       onPosted(await getApi().createSaturnPost({ text: text.trim(), voiceStyle: style, readBy: 'bati', ...target, ...(roomOnly ? { room: true } : {}) }), where);
     } catch {
       // the story previews (nobody logged in): a kororin that lives only on this screen
@@ -1032,57 +1016,8 @@ function DropComposer({
           <span className={`shrink-0 text-xs ${left < 0 ? 'text-rose-500' : ''}`}>{left}</span>
         </div>
 
-        {/* 📷 a photo to go with it: your character holds it */}
-        <div className="mt-3 flex items-center gap-3">
-          <label className="shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-sky-50 px-4 py-2 text-xs font-black text-sky-700">
-            📷 {photo ? '写真をかえる' : '写真もつける'}
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                e.target.value = '';
-                if (f) setCropping(f);
-              }}
-            />
-          </label>
-          {photo && (
-            <span className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photo.preview} alt="" className="h-14 w-14 rounded-full border-[3px] border-white object-cover shadow" />
-              <button onClick={() => setPhoto(null)} className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-slate-500 text-[10px] font-black text-white" aria-label="remove photo">
-                ✕
-              </button>
-            </span>
-          )}
-          {photo && <span className="text-[10px] text-slate-400">あなたのキャラに、この写真がついてころがるよ</span>}
-        </div>
-        {cropping && (
-          <PhotoCropper
-            file={cropping}
-            onCancel={() => setCropping(null)}
-            onDone={(blob) => {
-              setCropping(null);
-              setPhoto({ blob, preview: URL.createObjectURL(blob) });
-            }}
-          />
-        )}
-
         {/* Bati reads it */}
-        <p className="mt-3 text-xs font-black text-amber-700">🐣 バティがどんなふうに読む？</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {VOICE_STYLES.map((v) => (
-            <button
-              key={v.id}
-              onClick={() => setStyle(v.id)}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${style === v.id ? 'bg-amber-400 text-white' : 'bg-amber-50 text-amber-700'}`}
-            >
-              {READ_LABELS[v.id] ?? v.label}
-            </button>
-          ))}
-        </div>
-        <button onClick={() => void listen()} disabled={!text.trim() || previewing} className="mt-2 w-full rounded-full bg-amber-50 py-2 text-xs font-bold text-amber-700 disabled:opacity-40">
+        <button onClick={() => void listen()} disabled={!text.trim() || previewing} className="mt-3 w-full rounded-full bg-amber-50 py-2 text-xs font-bold text-amber-700 disabled:opacity-40">
           {previewing ? 'バティが読んでいます…' : '▶ バティの声で聞いてみる'}
         </button>
         {!hasBatiVoice && (

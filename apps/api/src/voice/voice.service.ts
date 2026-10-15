@@ -148,7 +148,7 @@ export class VoiceService {
   private async readWith(ref: string, userId: string, body: SpeakBody, origin: string, key: string): Promise<{ url: string; mediaId: string }> {
     const style = VOICE_STYLES.find((s) => s.id === body.style);
     const mp3 = await textToSpeech(key, this.cfg.FISH_MODEL, {
-      text: style ? `${style.fish.tag} ${body.text}` : body.text,
+      text: style ? `${style.fish.tag} ${body.text}`.trim() : body.text,
       referenceId: ref,
       ...(style ? { prosody: { speed: style.fish.speed, volume: 0 } } : {}),
     });
