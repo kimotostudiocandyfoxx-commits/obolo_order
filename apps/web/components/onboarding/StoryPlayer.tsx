@@ -538,7 +538,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       </Camera>
       {sprite && (
         <Cast
-          names={(Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean)}
+          names={Array.isArray(sprite) ? sprite : [sprite]}
           src={(n) => spriteSrc(n) ?? null}
           speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
           talking={talking}

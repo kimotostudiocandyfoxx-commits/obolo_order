@@ -27,8 +27,12 @@ export interface CharSpec {
 
 const CHAR: Record<string, CharSpec> = {
   monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225] },
-  'kimorin-sun': { bottom: 10, height: 64, face: 0.22, tint: '#8a3a2e' },
-  kimorin: { bottom: 10, height: 64, face: 0.22, tint: '#8a3a2e' },
+  'kimorin-sun': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
+  kimorin: { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
+  'kimorin-1': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
+  'kimorin-2': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
+  'kimorin-3': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
+  'kimorin-8': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
   obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a' },
   'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a' },
@@ -44,8 +48,8 @@ export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWi
 /** Which picture on stage is the one who speaks. */
 const SPEAKER: Record<string, string[]> = {
   MONBAN: ['monban'],
-  KIMORIN: ['kimorin-sun', 'kimorin', 'kimorin-dragon'],
-  'KIMORIN⭐︎': ['kimorin-sun', 'kimorin'],
+  KIMORIN: ['kimorin-sun', 'kimorin', 'kimorin-1', 'kimorin-2', 'kimorin-3', 'kimorin-8', 'kimorin-dragon'],
+  'KIMORIN⭐︎': ['kimorin-sun', 'kimorin', 'kimorin-1'],
   OBOLON: ['obolon'],
   バティ: ['@bati', '@bati-weak'],
   たこ焼きブラザー: ['takoyaki-brother'],
@@ -55,9 +59,11 @@ const SPEAKER: Record<string, string[]> = {
   ヒポキン: ['hipokin'],
   うんちピンポンくん: ['unchi-pinpon'],
 };
+/** The one speaking is not among the pictures on stage (in the video, or off screen). */
+export const OFFSTAGE = '__offstage__';
 export function speakerSprite(who: string | null | undefined, names: string[]): string | null {
   if (!who) return null;
-  return (SPEAKER[who] ?? []).find((n) => names.includes(n)) ?? null;
+  return (SPEAKER[who] ?? []).find((n) => names.includes(n)) ?? OFFSTAGE;
 }
 
 /** Blinks every few seconds (true while the eyes are shut). */
@@ -105,7 +111,10 @@ export function Cast({
   slot: (k: number, n: number) => CSSProperties;
   className?: string;
 }) {
-  const bust = names.length > 1 && !!speaking;
+  // '' keeps a slot empty (someone in the video stands there); the one speaking may be off the cast
+  // (OFFSTAGE: in the video) — then everyone on the cast steps back
+  const real = names.filter(Boolean);
+  const bust = real.length > 1 && !!speaking && speaking !== OFFSTAGE;
   const tint = speaking ? charSpec(speaking).tint : '#000';
   return (
     <>
@@ -116,6 +125,7 @@ export function Cast({
         aria-hidden
       />
       {names.map((name, k) => {
+        if (!name) return null;
         const url = src(name);
         if (!url) return null;
         return (
@@ -127,7 +137,9 @@ export function Cast({
             bust={bust && speaking === name}
             hidden={bust && speaking !== name}
             talking={talking && speaking === name}
-            style={slot(k, names.length)}
+            // beside someone in the video ('' slot): a little smaller, kept inside the screen
+            style={real.length < names.length ? { left: `${names.length === 2 ? [30, 70][k] : [22, 50, 78][k] ?? 50}%` } : slot(k, names.length)}
+            scale={real.length < names.length ? 0.74 : 1}
             className={className}
           />
         );
@@ -136,8 +148,9 @@ export function Cast({
   );
 }
 
-function Character({ name, url, lit, bust, hidden, talking, style, className }: { name: string; url: string; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; style: CSSProperties; className: string }) {
-  const spec = charSpec(name);
+function Character({ name, url, lit, bust, hidden, talking, style, className, scale = 1 }: { name: string; url: string; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; style: CSSProperties; className: string; scale?: number }) {
+  const base = charSpec(name);
+  const spec = { ...base, height: base.height * scale };
   const shut = useBlink(!!spec.eye);
   const own = name.startsWith('@') && name !== '@egg';
   // the bust-up: the same picture, bigger, its face near the upper third of the screen
