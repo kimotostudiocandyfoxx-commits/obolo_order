@@ -228,7 +228,7 @@ function PreviewPlay() {
 
 function BackLink() {
   return (
-    <Link href="/preview" className="fixed left-3 top-[calc(8px+env(safe-area-inset-top))] z-[400] rounded-full bg-black/45 px-3 py-1 text-xs text-white/80 backdrop-blur">
+    <Link href="/preview" className="fixed left-1/2 top-[calc(10px+env(safe-area-inset-top))] z-[400] -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-[10px] text-white/60 backdrop-blur">
       ← 確認用ページ
     </Link>
   );

@@ -1,0 +1,264 @@
+'use client';
+
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+
+/**
+ * The story's stage (production UI 3–4, 11–12, 2026-10-15). Layers, back to front:
+ *   background (far / mid / near) → characters → effects → words → UI
+ * Characters: the one speaking is lit, the others step back into the dark. When several are on stage and
+ * one speaks, the camera cuts to that one's bust-up, and the background changes with the cut (blurred,
+ * tinted with that character's colour). While a voice plays the speaker's mouth moves (a small bob, or a
+ * mouth picture when the character has one) and now and then the eyes blink.
+ * Only position, scale and opacity animate (lightness rule).
+ */
+export interface CharSpec {
+  /** where the feet stand (from the bottom) and how tall, in % of the screen */
+  bottom: number;
+  height: number;
+  /** the face's height in the picture (0–1 from the top): the bust-up zooms here */
+  face: number;
+  /** the character's colour for the bust-up background */
+  tint: string;
+  /** a glowing eye that blinks and pulses with the voice (x, y in the picture, 0–1) */
+  eye?: [number, number];
+  /** pictures for expressions: name → file (onboarding/<file>.webp) */
+  faces?: Record<string, string>;
+}
+
+const CHAR: Record<string, CharSpec> = {
+  monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225] },
+  'kimorin-sun': { bottom: 10, height: 64, face: 0.22, tint: '#8a3a2e' },
+  kimorin: { bottom: 10, height: 64, face: 0.22, tint: '#8a3a2e' },
+  'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
+  obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a' },
+  'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a' },
+  'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a' },
+  'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a' },
+  freezy: { bottom: 8, height: 64, face: 0.25, tint: '#5aa8d8' },
+  hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a' },
+  'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a' },
+};
+const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
+export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);
+
+/** Which picture on stage is the one who speaks. */
+const SPEAKER: Record<string, string[]> = {
+  MONBAN: ['monban'],
+  KIMORIN: ['kimorin-sun', 'kimorin', 'kimorin-dragon'],
+  'KIMORIN⭐︎': ['kimorin-sun', 'kimorin'],
+  OBOLON: ['obolon'],
+  バティ: ['@bati', '@bati-weak'],
+  たこ焼きブラザー: ['takoyaki-brother'],
+  たこ焼きシスター: ['takoyaki-sister'],
+  大根カイザー: ['daikon-kaiser'],
+  フリージー: ['freezy'],
+  ヒポキン: ['hipokin'],
+  うんちピンポンくん: ['unchi-pinpon'],
+};
+export function speakerSprite(who: string | null | undefined, names: string[]): string | null {
+  if (!who) return null;
+  return (SPEAKER[who] ?? []).find((n) => names.includes(n)) ?? null;
+}
+
+/** Blinks every few seconds (true while the eyes are shut). */
+function useBlink(on: boolean) {
+  const [shut, setShut] = useState(false);
+  useEffect(() => {
+    if (!on) return;
+    let t: ReturnType<typeof setTimeout>;
+    const loop = () => {
+      t = setTimeout(
+        () => {
+          setShut(true);
+          t = setTimeout(() => {
+            setShut(false);
+            loop();
+          }, 130);
+        },
+        2600 + Math.random() * 3200,
+      );
+    };
+    loop();
+    return () => clearTimeout(t);
+  }, [on]);
+  return shut;
+}
+
+export function Cast({
+  names,
+  src,
+  speaking,
+  talking,
+  expressions = {},
+  slot,
+  className = '',
+}: {
+  names: string[];
+  src: (name: string) => string | null;
+  /** the picture of the one speaking now (null = nobody) */
+  speaking: string | null;
+  /** a voice is playing */
+  talking: boolean;
+  /** 〔表情：…〕 per picture */
+  expressions?: Record<string, string>;
+  /** spreads several characters across the screen */
+  slot: (k: number, n: number) => CSSProperties;
+  className?: string;
+}) {
+  const bust = names.length > 1 && !!speaking;
+  const tint = speaking ? charSpec(speaking).tint : '#000';
+  return (
+    <>
+      {/* the bust-up's background: the scene behind goes soft and takes the speaker's colour */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[3] transition-opacity duration-300"
+        style={{ opacity: bust ? 1 : 0, backdropFilter: 'blur(7px) brightness(0.55)', WebkitBackdropFilter: 'blur(7px) brightness(0.55)', background: `radial-gradient(ellipse at 50% 38%, ${tint}55 0%, transparent 62%), linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55))` }}
+        aria-hidden
+      />
+      {names.map((name, k) => {
+        const url = src(name);
+        if (!url) return null;
+        return (
+          <Character
+            key={name}
+            name={name}
+            url={expressions[name] && charSpec(name).faces?.[expressions[name]] ? `/onboarding/${charSpec(name).faces![expressions[name]]}.webp` : url}
+            lit={!speaking || speaking === name}
+            bust={bust && speaking === name}
+            hidden={bust && speaking !== name}
+            talking={talking && speaking === name}
+            style={slot(k, names.length)}
+            className={className}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+function Character({ name, url, lit, bust, hidden, talking, style, className }: { name: string; url: string; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; style: CSSProperties; className: string }) {
+  const spec = charSpec(name);
+  const shut = useBlink(!!spec.eye);
+  const own = name.startsWith('@') && name !== '@egg';
+  // the bust-up: the same picture, bigger, its face near the upper third of the screen
+  const zoom = bust ? Math.min(2.4, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6))) : 1;
+  const box: CSSProperties = {
+    ...style,
+    ...(bust ? { left: '50%', maxWidth: '96%' } : {}),
+    bottom: `${spec.bottom}%`,
+    height: `${spec.height}%`,
+    transformOrigin: `50% ${spec.face * 100}%`,
+    transform: `translateX(-50%) translateY(${bust ? `${-12 - (spec.face - 0.2) * 40}%` : '0'}) scale(${zoom})`,
+    opacity: hidden ? 0 : 1,
+    transition: 'transform 320ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out, left 320ms ease-out',
+  };
+  return (
+    <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden>
+      <div className="relative h-full" style={talking ? { animation: 'lipBob 0.22s ease-in-out infinite' } : undefined}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt=""
+          draggable={false}
+          className={`h-full w-auto max-w-none select-none object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`}
+          style={{ filter: lit ? 'none' : 'brightness(0.45) saturate(0.7)' }}
+        />
+        {spec.eye && (
+          <span
+            className="absolute h-[3.2%] w-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-100"
+            style={{
+              left: `${spec.eye[0] * 100}%`,
+              top: `${spec.eye[1] * 100}%`,
+              background: 'radial-gradient(circle, rgba(255,236,170,0.95) 0%, rgba(255,190,80,0.55) 40%, transparent 72%)',
+              opacity: shut ? 0 : talking ? 1 : lit ? 0.55 : 0.2,
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** 〔カットイン：…〕 a character slides across a gold band for a moment. */
+export function CutIn({ url, onDone }: { url: string; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 1500);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-[30%] z-[8] h-[26%] overflow-hidden" aria-hidden>
+      <div className="absolute inset-0 animate-[cutinSlide_1.5s_ease-out_forwards] bg-[linear-gradient(90deg,transparent,rgba(30,20,8,0.92)_12%,rgba(30,20,8,0.92)_88%,transparent)]">
+        <div className="absolute inset-x-0 top-0 h-px bg-amber-200/80 shadow-[0_0_12px_rgba(255,210,120,0.9)]" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-amber-200/80 shadow-[0_0_12px_rgba(255,210,120,0.9)]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt="" className="absolute left-1/2 top-0 h-[260%] -translate-x-1/2 object-contain object-top" />
+      </div>
+    </div>
+  );
+}
+
+/** 〔登場：煙〕 black smoke wells up where someone appears. */
+export function Smoke() {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden" aria-hidden>
+      {[0, 1, 2, 3, 4].map((k) => (
+        <span
+          key={k}
+          className="absolute bottom-[8%] block h-[46%] w-[70%] rounded-full"
+          style={{
+            left: `${38 + (k - 2) * 7}%`,
+            background: 'radial-gradient(ellipse at center, rgba(8,6,10,0.95) 0%, rgba(20,16,24,0.7) 40%, transparent 70%)',
+            animation: `smokeRise 1.8s ease-out ${k * 0.12}s forwards`,
+            opacity: 0,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Gold motes drifting up (at most 150 at once — lightness rule). */
+export function Motes({ count = 40 }: { count?: number }) {
+  const n = Math.min(150, count);
+  // placed after mounting (random positions would differ between the server's HTML and the browser)
+  const [motes, setMotes] = useState<{ left: number; top: number; size: number; dur: number; delay: number }[]>([]);
+  useEffect(() => {
+    setMotes(
+      Array.from({ length: n }, () => ({
+        left: Math.random() * 100,
+        top: 70 + Math.random() * 40,
+        size: 1.5 + Math.random() * 2.5,
+        dur: 9 + Math.random() * 10,
+        delay: -Math.random() * 18,
+      })),
+    );
+  }, [n]);
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[5] overflow-hidden" aria-hidden>
+      {motes.map((m, k) => (
+        <span
+          key={k}
+          className="absolute block rounded-full bg-amber-100"
+          style={{ left: `${m.left}%`, top: `${m.top}%`, width: m.size, height: m.size, boxShadow: '0 0 6px 1px rgba(255,214,140,0.8)', animation: `moteRise ${m.dur}s linear ${m.delay}s infinite` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** 〔カメラ：寄る／引く／揺れ〕 on whatever is inside (the background layers). */
+export function Camera({ move, focus = '50% 40%', children }: { move: 'in' | 'out' | 'shake' | null; focus?: string; children: ReactNode }) {
+  return (
+    <div
+      className="absolute inset-0"
+      style={{
+        transformOrigin: focus,
+        transform: move === 'in' ? 'scale(1.18)' : 'scale(1)',
+        transition: 'transform 700ms cubic-bezier(.2,.7,.2,1)',
+        animation: move === 'shake' ? 'camShake 0.5s ease-in-out 2' : undefined,
+      }}
+    >
+      {children}
+    </div>
+  );
+}

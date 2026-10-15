@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { motionUrl, spriteUrl } from '@/lib/onboarding/media';
 import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
 import { playPreset } from '@/lib/story/sfx';
+import { IconButton } from '@/components/story/parts';
 import { useDictation } from '@/lib/useDictation';
 
 /**
@@ -23,10 +24,10 @@ export function unlockSfx() {
     /* no audio */
   }
 }
-export function playSfx(sound: SoundFx, muted: boolean) {
-  if (muted || !ctx) return;
+export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
+  if (muted || !ctx || volume <= 0) return;
   try {
-    playPreset(ctx, sound, 0.45);
+    playPreset(ctx, sound, 0.45 * volume);
   } catch {
     /* ignore */
   }
@@ -260,12 +261,9 @@ export function RiddleBook({ known, solved, fresh, onClose }: { known: number[];
 /** The small book button (top left) once the riddle book is in your hands. */
 export function BookButton({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick} className="pt-safe absolute left-3 top-3 z-40 flex items-center gap-1.5 rounded-full border border-amber-200/40 bg-black/50 px-3 py-1.5 text-xs tracking-widest text-amber-100/90 backdrop-blur-sm" aria-label="謎の書をひらく">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-        <path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5C4.7 20 4 19.3 4 18.5v-13ZM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5v-13Z" />
-      </svg>
-      謎の書
-    </button>
+    <div className="pt-safe absolute left-3 top-3 z-40">
+      <IconButton icon="book" label="謎の書をひらく" onClick={onClick} />
+    </div>
   );
 }
 

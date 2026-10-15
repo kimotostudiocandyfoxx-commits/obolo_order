@@ -12,6 +12,7 @@ import type { Step } from './script';
 export const DAY1: Step[] = [
   // BGM (client, 2026-10-04): opening → MONBAN's theme from MONBAN → OBOLON's theme from OBOLON.
   { t: 'bgm', track: 'opening' },
+  { t: 'motes', count: 36 }, // 金色の光の粒（演出）
   { t: 'caption', text: '1日目' },
   // D01-S001 招待状
   { t: 'video', motion: 1 }, // 招待信号を受信しました（文字は動画の中）
@@ -26,13 +27,18 @@ export const DAY1: Step[] = [
   { t: 'loop', motion: 6 }, // 「本部に到着しました」は動画の中
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
-  { t: 'video', motion: 7 },
-  { t: 'caption', text: 'MONBANが現れた' },
+  { t: 'motes', count: 0 },
+  { t: 'video', motion: 7 }, // 門の前に黒い煙が湧き、MONBANが現れる
   { t: 'loop', motion: 9 },
+  { t: 'cam', move: 'shake' },
+  { t: 'caption', text: 'MONBANが現れた' },
+  { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
   { t: 'say', who: 'MONBAN', text: '誰だお前…ここは秘密結社だ…。' },
   { t: 'say', who: 'MONBAN', text: 'この先はORDERしか入れない…帰れ…。' },
+  { t: 'cam', move: 'out' },
   { t: 'action', label: '招待状を見せる' },
-  { t: 'video', motion: 10 },
+  { t: 'video', motion: 10 }, // 招待状が、MONBANの両手の上に光りながら浮かぶ
+  { t: 'cam', move: 'in', focus: '50% 30%' },
   { t: 'say', who: 'MONBAN', text: 'なるほど…。\n{inviter}から…招待されたのか…。' },
   { t: 'say', who: 'MONBAN', text: '門をくぐり、地球の神殿に行け…。' },
   { t: 'video', motion: 11 }, // 門が開く

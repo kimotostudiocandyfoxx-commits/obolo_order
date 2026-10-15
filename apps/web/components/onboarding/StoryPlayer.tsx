@@ -15,6 +15,9 @@ import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
+import { Camera, Cast, CutIn, Motes, Smoke, speakerSprite } from '@/components/story/Stage';
+import { ActionButton, Choice, DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
+import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { FilmReel } from './FilmReel';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
@@ -151,6 +154,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [paused, setPaused] = useState(false);
   const [timeUpShown, setTimeUpShown] = useState(false);
   const mutedRef = useRef(false);
+  // the stage (production UI 3–5): camera, expressions, cut-ins, smoke, motes, voices, the mixer
+  const [cam, setCam] = useState<{ move: 'in' | 'out' | 'shake'; focus?: string } | null>(null);
+  const [expressions, setExpressions] = useState<Record<string, string>>({});
+  const [cutin, setCutin] = useState<string | null>(null);
+  const [smoke, setSmoke] = useState(0);
+  const [motes, setMotes] = useState(0);
+  const [talking, setTalking] = useState(false);
+  const [mix, setMix] = useState<Mix>(() => (typeof window === 'undefined' ? { bgm: 0.8, se: 0.8, voice: 1 } : loadMix()));
+  const mixRef = useRef(mix);
+  mixRef.current = mix;
+  const [mixerOpen, setMixerOpen] = useState(false);
+  const voice = useRef<LineVoice | null>(null);
+  if (typeof window !== 'undefined') voice.current ??= new LineVoice();
 
   const step = steps[i];
   const v: StoryVars = {
@@ -240,8 +256,37 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setSprite(s.image);
           n++;
         } else if (s.t === 'se') {
-          playSfx(s.sound, mutedRef.current);
+          playSfx(s.sound, mutedRef.current, mixRef.current.se);
           n++;
+        } else if (s.t === 'cam') {
+          setCam({ move: s.move, focus: s.focus });
+          if (s.move === 'shake') setTimeout(() => setCam((c) => (c?.move === 'shake' ? null : c)), 1100);
+          n++;
+        } else if (s.t === 'face') {
+          setExpressions((e) => ({ ...e, [s.who]: s.expr }));
+          n++;
+        } else if (s.t === 'cutin') {
+          setCutin(s.who);
+          n++;
+        } else if (s.t === 'motes') {
+          setMotes(s.count);
+          n++;
+        } else if (s.t === 'enter') {
+          // the "appearance" pattern: smoke first, then the character is there
+          if (s.fx !== 'light') setSmoke((k) => k + 1);
+          const who = s.who;
+          setTimeout(() => setSprite((cur) => (Array.isArray(cur) ? (cur.includes(who) ? cur : [...cur, who]) : cur && cur !== who ? [cur, who] : who)), s.fx === 'light' ? 0 : 650);
+          n++;
+        } else if (s.t === 'arrive') {
+          // the "arrival" pattern: the new place under a title; waits for a tap
+          setWhite(false);
+          setSprite(null);
+          setCam(null);
+          setStill(s.image);
+          setReady(true);
+          setBlackout(false);
+          setI(n);
+          return;
         } else if (s.t === 'fx') {
           setFx(s.fx);
           n++;
@@ -290,6 +335,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           clearStillOnShow.current = true;
           bgQueue.current = [];
           setSprite(null);
+          setCam(null);
           clearCaptions();
           pendingCaptions.current = s.captions ?? [];
           playMedia(s.motion, false);
@@ -363,12 +409,34 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     mutedRef.current = muted;
     bgm.current?.setMuted(muted);
     dual.current?.setMuted(muted);
+    voice.current?.setMuted(muted);
   }, [muted]);
+
+  // the mixer: music (dipping while someone speaks), sounds, voices
+  useEffect(() => {
+    saveMix(mix);
+    voice.current?.setVolume(mix.voice);
+    bgm.current?.setScale(mix.bgm * (talking ? VOICE_DIP : 1), talking ? 0.25 : 0.6);
+  }, [mix, talking]);
+  useEffect(() => {
+    const vc = voice.current;
+    if (!vc) return;
+    vc.onSpeaking = setTalking;
+    return () => vc.dispose();
+  }, []);
+  // each spoken line plays its voice (when it has one)
+  const sayNow = started && steps[i]?.t === 'say' ? (steps[i] as Extract<Step, { t: 'say' }>) : null;
+  useEffect(() => {
+    if (sayNow) void voice.current?.say(sayNow.who, sayNow.text);
+    else voice.current?.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i, started]);
 
   /** First tap: unlocks audio/video on iOS and starts (or resumes) the story inside the gesture. */
   const start = () => {
     setStarted(true);
     unlockSfx();
+    voice.current?.unlock();
     // Start the music inside the gesture (fresh start: the first track; resume: the track at that point).
     const firstBgm = steps.find((s) => s.t === 'bgm');
     bgm.current?.unlock(i === 0 ? (firstBgm?.t === 'bgm' ? firstBgm.track : null) : bgmAt(steps, i));
@@ -409,7 +477,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
   };
 
-  const next = () => run(iRef.current + 1);
+  const next = () => {
+    voice.current?.stop();
+    run(iRef.current + 1);
+  };
 
   const choose = (key: string, label: string, goto?: string) => {
     const a = { ...stateRef.current.answers, [key]: label };
@@ -418,7 +489,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     run(goto ? labelIndex(steps, goto) : iRef.current + 1);
   };
 
-  const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice');
+  const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' || step.t === 'arrive');
   // SYS-S001: only at a calm moment (a line, a button) — never while drawing, saving or paying
   const calm = step && ['caption', 'say', 'letter', 'notice', 'action', 'choice'].includes(step.t);
   useEffect(() => {
@@ -439,6 +510,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         // eslint-disable-next-line @next/next/no-img-element
         <img src={backdrop} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" aria-hidden />
       )}
+      {/* the background layers move with the camera (〔カメラ：寄る／揺れ〕) */}
+      <Camera move={cam?.move ?? null} focus={cam?.focus}>
       {/* double-buffered motion videos (see DualVideo) */}
       <div className="absolute inset-0 z-0">
         {[videoA, videoB].map((ref, k) => (
@@ -460,35 +533,27 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
       {still && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
+        <img key={still} src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
       )}
-      {sprite &&
-        (Array.isArray(sprite) ? sprite : [sprite]).map((name, k, arr) => {
-          const src = spriteSrc(name);
-          if (!src) return null;
-          // the visitor's own pictures are square paintings: shown as rounded cards
-          const own = name.startsWith('@') && name !== '@egg';
-          return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={name}
-              src={src}
-              alt=""
-              className={`pointer-events-none absolute z-[3] -translate-x-1/2 animate-[spriteIn_0.45s_ease-out] object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.55)] ${name === 'obolon' ? 'bottom-[40%] h-[22%]' : name === 'kimorin-dragon' ? 'bottom-[18%] h-[66%]' : name === 'monban' ? 'bottom-[20%] h-[58%]' : name === 'unchi-pinpon' ? 'bottom-[26%] h-[26%]' : name === '@bati-weak' ? 'bottom-[26%] h-[30%] rotate-[-6deg] rounded-[2rem] border-2 border-white/20 opacity-80 brightness-75 saturate-[.35]' : own ? 'bottom-[30%] h-[34%] rounded-[2rem] border-2 border-amber-200/50' : name === '@egg' ? 'bottom-[30%] h-[36%] animate-[bob_3s_ease-in-out_infinite]' : screen ? 'bottom-[22%] h-[36%]' : 'bottom-[24%] h-[50%]'}`}
-              style={spriteSlot(k, arr.length)}
-              aria-hidden
-            />
-          );
-        })}
+      </Camera>
+      {sprite && (
+        <Cast
+          names={(Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean)}
+          src={(n) => spriteSrc(n) ?? null}
+          speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
+          talking={talking}
+          expressions={expressions}
+          slot={spriteSlot}
+        />
+      )}
+      {smoke > 0 && <Smoke key={smoke} />}
+      {motes > 0 && <Motes count={motes} />}
+      {cutin && spriteSrc(cutin) && <CutIn key={cutin} url={spriteSrc(cutin)!} onDone={() => setCutin(null)} />}
       <FxLayer fx={fx} />
       <BluenaScreen open={screen} />
       {overlayCaption && (
         <div className="pointer-events-none absolute inset-x-0 bottom-[calc(18vh+env(safe-area-inset-bottom))] z-[6] flex animate-[fadeUp_0.8s_ease-out] justify-center">
-          <div className="flex items-center gap-3 rounded-full bg-black/55 px-6 py-3 text-lg tracking-[0.2em] text-amber-100 backdrop-blur-sm">
-            <span className="h-px w-6 bg-amber-200/60" />
-            {fill(overlayCaption, v)}
-            <span className="h-px w-6 bg-amber-200/60" />
-          </div>
+          <Telop text={fill(overlayCaption, v)} />
         </div>
       )}
 
@@ -506,12 +571,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 
       {started && prompt && (
         <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 64 + 40 : PROMPT_LIFT[step?.t ?? ''] ?? 150}px + env(safe-area-inset-bottom))` }}>
-          <div className="relative mx-auto w-full max-w-xl rounded-2xl border border-amber-200/35 bg-black/60 px-5 pb-5 pt-7 backdrop-blur-md">
-            <span className="absolute -top-3.5 left-5 rounded-full border border-amber-200/50 bg-black px-3 py-0.5 text-xs font-bold tracking-[0.25em] text-amber-200">
-              {speakerName(prompt.who, v)}
-            </span>
-            <p className="whitespace-pre-wrap text-[17px] leading-relaxed">{fill(prompt.text, v)}</p>
-          </div>
+          <DialogueWindow name={speakerName(prompt.who, v)}>{fill(prompt.text, v)}</DialogueWindow>
         </div>
       )}
       {started && step?.t === 'action' && (
@@ -521,17 +581,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {started && step?.t === 'choice' && step.prompt && (
         <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step.options.length * 64 + 40}px + env(safe-area-inset-bottom))` }}>
-          <div className="mx-auto w-full max-w-xl rounded-2xl border border-amber-200/50 bg-black/70 px-5 py-4 text-center backdrop-blur-md">
-            <p className="whitespace-pre-wrap text-[16px] leading-relaxed text-amber-50">{fill(step.prompt, v)}</p>
-          </div>
+          <DialogueWindow>{fill(step.prompt, v)}</DialogueWindow>
         </div>
       )}
       {started && step?.t === 'choice' && (
         <Buttons>
           {step.options.map((o) => (
-            <GoldButton key={o.label} onClick={() => choose(step.key, o.label, o.goto)}>
+            <Choice key={o.label} onClick={() => choose(step.key, o.label, o.goto)}>
               {o.label}
-            </GoldButton>
+            </Choice>
           ))}
         </Buttons>
       )}
@@ -724,7 +782,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             <span className="h-3 w-3 rounded-full bg-amber-100 shadow-[0_0_40px_12px_rgba(255,214,140,0.7)]" />
           </span>
           <span className="text-lg tracking-[0.3em] text-amber-100">{i === 0 ? '信号を受信する' : '続きから'}</span>
-          <span className="text-xs tracking-widest text-white/40">TAP · 🔊 音を出してお楽しみください</span>
+          <span className="text-xs tracking-[0.3em] text-white/40">音を出してお楽しみください</span>
         </button>
       )}
 
@@ -755,13 +813,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
 
       {started && (
-        <button
-          className="pt-safe absolute right-3 top-3 z-40 rounded-full bg-black/40 px-3 py-1.5 text-sm text-white/70"
-          onClick={() => setMuted((m) => !m)}
-          aria-label={muted ? 'unmute' : 'mute'}
-        >
-          {muted ? '🔇' : '🔊'}
-        </button>
+        <div className="pt-safe absolute right-3 top-3 z-40 flex gap-2">
+          <IconButton icon="mixer" label="音の大きさ" onClick={() => setMixerOpen(true)} />
+          <IconButton icon={muted ? 'mute' : 'sound'} label={muted ? '音を出す' : '音を消す'} onClick={() => setMuted((m) => !m)} />
+        </div>
+      )}
+      {mixerOpen && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setMixerOpen(false)}>
+          <div onClick={(e) => e.stopPropagation()}>
+            <MixerPanel mix={mix} onChange={setMix} onClose={() => setMixerOpen(false)} />
+          </div>
+        </div>
       )}
     </div>
     </MicAllowed.Provider>
@@ -769,7 +831,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 }
 
 function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: () => void }) {
-  const text = step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' ? fill(step.text, vars) : '';
+  const text = step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' ? fill(step.text, vars) : step.t === 'arrive' ? fill(step.caption, vars) : '';
   const chars = [...text];
   const [shown, setShown] = useState(step.t === 'letter' || step.t === 'notice' ? chars.length : 0);
   const done = shown >= chars.length;
@@ -800,23 +862,21 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   if (step.t === 'notice') {
     return (
       <button className="absolute inset-0 z-10 flex items-center justify-center bg-black/45 px-8" onClick={tap}>
-        <div className="w-full max-w-sm animate-[fadeUp_0.5s_ease-out] whitespace-pre-wrap rounded-2xl border border-amber-200/40 bg-black/75 px-6 py-5 text-center text-[15px] leading-relaxed text-amber-50 [word-break:keep-all] backdrop-blur-md">
-          {text}
+        <div className="w-full max-w-sm animate-[fadeUp_0.5s_ease-out] text-center [word-break:keep-all]">
+          <DialogueWindow>{text}</DialogueWindow>
         </div>
         <Cue />
       </button>
     );
   }
 
-  if (step.t === 'caption') {
+  if (step.t === 'caption' || step.t === 'arrive') {
     return (
-      <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" onClick={tap}>
-        <div className="flex items-center gap-3 rounded-full bg-black/55 px-6 py-3 text-lg tracking-[0.2em] text-amber-100 backdrop-blur-sm">
-          <span className="h-px w-6 bg-amber-200/60" />
-          {visible}
-          <span className="h-px w-6 bg-amber-200/60" />
+      <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" onClick={() => onNext()}>
+        <div className="animate-[fadeUp_0.8s_ease-out]">
+          <Telop text={text} />
         </div>
-        {done && <Cue />}
+        <Cue />
       </button>
     );
   }
@@ -824,13 +884,11 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   const who = step.t === 'say' ? speakerName(step.who, vars) : '';
   return (
     <button className="absolute inset-0 z-10 flex items-end justify-center" onClick={tap}>
-      <div className="pb-safe w-full bg-gradient-to-t from-black via-black/80 to-transparent px-4 pt-16">
-        <div className="relative mx-auto mb-6 min-h-36 w-full max-w-xl rounded-2xl border border-amber-200/35 bg-black/60 px-5 pb-6 pt-7 text-left backdrop-blur-md">
-          <span className="absolute -top-3.5 left-5 rounded-full border border-amber-200/50 bg-black px-3 py-0.5 text-xs font-bold tracking-[0.25em] text-amber-200">
-            {who}
-          </span>
-          <p className="whitespace-pre-wrap text-[17px] leading-relaxed">{visible}</p>
-          {done && <span className="absolute bottom-2 right-4 animate-bounce text-amber-200/80">▼</span>}
+      <div className="pb-safe w-full bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pt-16">
+        <div className="mb-5 animate-[fadeUp_0.25s_ease-out]">
+          <DialogueWindow name={who} done={done}>
+            {visible}
+          </DialogueWindow>
         </div>
       </div>
     </button>
@@ -838,7 +896,13 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
 }
 
 function Cue() {
-  return <span className="pb-safe absolute bottom-6 left-1/2 -translate-x-1/2 animate-pulse text-xs tracking-widest text-white/50">TAP</span>;
+  return (
+    <span className="pb-safe absolute bottom-6 left-1/2 block h-4 w-4 -translate-x-1/2" aria-hidden>
+      <svg viewBox="0 0 20 20" className="h-full w-full animate-[nextBob_1.2s_ease-in-out_infinite] drop-shadow-[0_0_6px_rgba(255,210,120,0.9)]">
+        <path d="M3 5 L10 15 L17 5 L10 8 Z" fill="#f5d48a" />
+      </svg>
+    </span>
+  );
 }
 
 function Buttons({ children }: { children: React.ReactNode }) {
@@ -851,12 +915,9 @@ function Buttons({ children }: { children: React.ReactNode }) {
 
 function GoldButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <button
-      onClick={onClick}
-      className="min-h-13 rounded-full border border-amber-200/70 bg-black/50 px-5 py-3.5 text-[17px] tracking-[0.08em] text-amber-50 [word-break:keep-all] shadow-[0_0_24px_rgba(255,210,130,0.25)] backdrop-blur-sm transition active:scale-[0.97] active:bg-amber-200/20"
-    >
+    <ActionButton type="submit" onClick={onClick}>
       {children}
-    </button>
+    </ActionButton>
   );
 }
 
@@ -909,8 +970,7 @@ function MotionPlaceholder({ motion }: { motion: MotionId }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,#2a2140_0%,#07060d_70%)]">
       <div className="starfield" aria-hidden />
-      <span className="text-xs tracking-[0.4em] text-amber-200/70">MOTION {motion}</span>
-      <span className="mt-2 text-[11px] text-white/35">（動画準備中 · PLACEHOLDER）</span>
+      <span className="sr-only">{motion}</span>
     </div>
   );
 }

@@ -9,6 +9,8 @@ import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
 export default function PreviewIndex() {
   const days = Object.keys({ ...STORIES, ...PREVIEW_ONLY }).map(Number).sort((a, b) => a - b);
   const jumps: { href: string; label: string }[] = [
+    { href: '/preview/parts', label: '✨ 物語の部品（会話の枠・名前札・テロップ・選択肢・ボタン・舞台）' },
+    { href: '/preview/play?day=1', label: '1日目：冒頭（招待状からMONBANまで）の試作' },
     { href: '/preview/dj', label: '🎧 金星 DJ（音声エンジンの仮画面・横向き）' },
     { href: '/preview/story', label: '📖 新しい物語の台本（全場面・どの場面からでも／戻る・演出メモ）' },
     { href: '/preview/story-assets', label: '🎨 物語の素材（人物・場所・声・効果音／候補の見比べ）' },

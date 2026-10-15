@@ -73,6 +73,19 @@ export type Step =
   | { t: 'mars' }
   /** Show what was made: the MV on Mars's big screen, … (tap to continue). */
   | { t: 'made'; what: 'mv' | 'film' }
+  // --- the stage's directions (production UI 3, 2026-10-15) ---
+  /** 〔カメラ：寄る／引く／揺れ〕 on the background; `focus` = where it moves in ("50% 30%") */
+  | { t: 'cam'; move: 'in' | 'out' | 'shake'; focus?: string }
+  /** 〔表情：驚き〕 a character's expression (its picture name on stage) */
+  | { t: 'face'; who: string; expr: string }
+  /** 〔カットイン：MONBAN〕 */
+  | { t: 'cutin'; who: string }
+  /** 〔登場：煙〕 the "appearance" pattern: smoke wells up, the character stands there (added to the cast) */
+  | { t: 'enter'; who: string; fx?: 'smoke' | 'light' }
+  /** 〔移動：惑星到着〕〔テロップ：到着〕 the "arrival" pattern: the new place fades in under a title (tap) */
+  | { t: 'arrive'; image: string; caption: string }
+  /** gold motes drifting up (0 = none; at most 150) */
+  | { t: 'motes'; count: number }
   /** Venus tutorial (Day 8), coached by the gorilla trio. */
   | { t: 'venus' }
   /** Fade the whole screen to white (~3 s), then continue; the next still/motion fades in from white. */
