@@ -296,6 +296,16 @@
         1280
       ],
       "prompt": "A dark grand temple hall on Earth full of antique golden armillary spheres and celestial globes, a single pillar of white-gold light falling from the ceiling in the centre (empty inside), polished black floor with golden star patterns. Mysterious, sacred, black and gold. No people. Lower third calm and simple."
+    },
+    {
+      "id": "sun-inside",
+      "w": 1440,
+      "h": 2560,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Inside the Sun: a vast warm world of soft white and golden light with no up or down, no ground, only a rippling mirror-like surface of light far below like water, gentle haze, and far away in the upper middle a huge slowly turning orb of brilliant golden-white light with faint concentric rings. Calm, sacred, dreamlike, luminous yet with deep golden shadows at the edges so text and characters drawn on top remain readable. Empty space in the lower half for characters. No people, no buildings."
     }
   ],
   "redo": []
