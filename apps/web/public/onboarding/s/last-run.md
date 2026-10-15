@@ -1,5 +1,4 @@
-# UI art — 2026-10-15T06:36:20.845Z
+# UI art — 2026-10-15T06:37:42.699Z
 
-Seedream 5.0 Pro / 1枚 / 約15円
+Seedream 5.0 Pro / 0枚 / 約0円
 
-- ✅ sun-inside
