@@ -334,7 +334,7 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
             {/* {bati} is the mic: a round button at the bottom */}
             {recording && (
               <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-center px-5 pb-8">
-                <p className="mb-3 max-w-sm text-center text-[14px] leading-relaxed text-white [text-shadow:0_1px_4px_rgba(0,0,0,0.9)]">
+                <p className="mb-3 max-w-sm rounded-2xl bg-[rgba(20,12,36,0.72)] px-4 py-2.5 text-center text-[14px] leading-relaxed text-white backdrop-blur-sm">
                   {beat?.k === 'recWeird' ? (
                     <>
                       変な声で、言ってみよう「{WEIRD}」
@@ -369,7 +369,7 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
                     <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white text-sm shadow">🎙</span>
                   </button>
                 )}
-                <p className="mt-2 h-4 text-[11px] text-white/80">{busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : ''}</p>
+                <p className="mt-2 h-4 text-[11px] font-bold text-[#4a2f78]">{busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : ''}</p>
                 {/* the way out for anyone who cannot speak */}
                 <button onClick={() => (beat?.k === 'recWeird' ? next() : setTyping(true))} className="absolute bottom-[calc(14px+env(safe-area-inset-bottom))] right-4 p-2 text-lg text-white/45" aria-label="文字で入力">
                   ⌨

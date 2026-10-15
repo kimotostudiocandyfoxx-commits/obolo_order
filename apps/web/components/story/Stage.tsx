@@ -21,6 +21,8 @@ export interface CharSpec {
   tint: string;
   /** a glowing eye that blinks and pulses with the voice (x, y in the picture, 0–1) */
   eye?: [number, number];
+  /** how far the bust-up may zoom (small round characters stay small) */
+  bustMax?: number;
   /** pictures for expressions: name → file (onboarding/<file>.webp) */
   faces?: Record<string, string>;
 }
@@ -34,13 +36,13 @@ const CHAR: Record<string, CharSpec> = {
   'kimorin-3': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-8': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
-  obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a' },
+  obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
   'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a' },
   'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a' },
   'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a' },
   freezy: { bottom: 8, height: 64, face: 0.25, tint: '#5aa8d8' },
   hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a' },
-  'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a' },
+  'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4 },
 };
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
 export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);
@@ -154,7 +156,7 @@ function Character({ name, url, lit, bust, hidden, talking, style, className, sc
   const shut = useBlink(!!spec.eye);
   const own = name.startsWith('@') && name !== '@egg';
   // the bust-up: the same picture, bigger, its face near the upper third of the screen
-  const zoom = bust ? Math.min(2.4, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6))) : 1;
+  const zoom = bust ? Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6))) : 1;
   const box: CSSProperties = {
     ...style,
     ...(bust ? { left: '50%', maxWidth: '96%' } : {}),
