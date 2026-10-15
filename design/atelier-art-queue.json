@@ -1,0 +1,148 @@
+{
+  "note": "天王星のアトリエのかざり（Seedream 5.0 Pro）。灰色の背景で描いて、あとで切り抜いて public/atelier/<id>.webp にする。id ごとに1回だけ描く。描き直しは redo に id を足す",
+  "dir": "atelier/raw",
+  "always": "A single object for a cozy children's room decoration game, soft pastel storybook illustration, gentle watercolor-like shading with clean edges, warm and friendly, high detail. Centered on a perfectly flat plain light grey background (#c8c8c8), nothing else in the picture, no shadow on the background, the whole object fully inside the frame with margin. No text, no letters, no numbers, no logos, no watermark, no people.",
+  "items": [
+    {
+      "id": "plant",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a cute potted plant with round leaves in a small terracotta pot"
+    },
+    {
+      "id": "lamp",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a cozy standing floor lamp with a warm glowing round shade"
+    },
+    {
+      "id": "bookshelf",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a small wooden bookshelf full of colorful picture books and a tiny globe"
+    },
+    {
+      "id": "sofa",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a small cozy two-seat sofa in soft mint green with two cushions"
+    },
+    {
+      "id": "rug",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a round fluffy rug with a star pattern, seen from a low front angle, flat on the floor"
+    },
+    {
+      "id": "easel",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a wooden painter's easel holding a blank canvas, with a paint palette leaning on it"
+    },
+    {
+      "id": "garland",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a string garland of little paper stars and moons hanging in a gentle curve"
+    },
+    {
+      "id": "window",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "an arched window showing a night sky with a crescent moon, stars and a ringed planet, with small curtains"
+    },
+    {
+      "id": "clock",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a round cute wall clock with a moon-shaped face, no numbers on it"
+    },
+    {
+      "id": "table",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a small round wooden side table with a teacup on it"
+    },
+    {
+      "id": "rocket",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a toy rocket model on a little stand, cream and gold with round windows"
+    },
+    {
+      "id": "crystal",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a glowing violet crystal cluster on a small cushion, sparkling softly"
+    },
+    {
+      "id": "shelf",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a short floating wooden wall shelf with a tiny plant and a candle"
+    },
+    {
+      "id": "cat",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "prompt": "a sleeping round cream-colored cat curled up on a cushion"
+    }
+  ],
+  "redo": []
+}
