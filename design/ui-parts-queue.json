@@ -1,0 +1,122 @@
+{
+  "note": "物語画面の部品（本番UI化 6、2026-10-15）。文字なしで描いて、灰色の背景を切り抜いて public/ui/parts/<id>.webp。id ごとに1回だけ描く。描き直しは redo に id を足す",
+  "dir": "ui/parts/raw",
+  "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+  ],
+  "always": "Game UI asset for a dark fantasy mobile story game, in the style of the reference pictures: deep glossy black lacquer and smoked glass with fine engraved gold filigree and soft glowing gold light, elegant, celestial (stars, compass, armillary motifs), premium console-game quality, crisp clean edges, symmetrical, seen perfectly straight from the front, flat orthographic, no perspective. The object is centered on a perfectly flat plain light grey background (#c8c8c8) with generous margin, nothing else in the picture, no shadow on the background. Copy the references for the style only, not their content. No text, no letters, no numbers, no writing, no logos, no watermark anywhere.",
+  "items": [
+    {
+      "id": "dialog",
+      "w": 2400,
+      "h": 800,
+      "size": [
+        1200,
+        400
+      ],
+      "prompt": "A wide horizontal dialogue window frame: a dark smoked-glass black panel with rounded corners, a thin double gold engraved border, small four-pointed gold stars and delicate filigree flourishes at the four corners, a faint gold glow along the top edge. The inside of the panel is plain empty dark glass (to put text on)."
+    },
+    {
+      "id": "nameplate",
+      "w": 2000,
+      "h": 600,
+      "size": [
+        800,
+        240
+      ],
+      "prompt": "A small horizontal name plaque: black enamel with a thin gold rim, both ends cut into elegant pointed tips with a tiny gold diamond on each end, the inside plain empty black (to put a name on)."
+    },
+    {
+      "id": "telop",
+      "w": 2400,
+      "h": 480,
+      "size": [
+        1200,
+        240
+      ],
+      "prompt": "A long thin horizontal ornamental banner made of gold light: a dark translucent black band with thin gold lines along the top and bottom edges that fade out toward both ends, and a small gold compass-star ornament at the center of each edge. The middle of the band is plain empty dark (to put a title on)."
+    },
+    {
+      "id": "choice",
+      "w": 2000,
+      "h": 480,
+      "size": [
+        1000,
+        240
+      ],
+      "prompt": "A horizontal choice button: a black lacquer capsule with a thin gold rim, a small gold four-pointed star at the left end and the right end, subtle gold sheen, the inside plain empty black (to put a label on)."
+    },
+    {
+      "id": "choice-on",
+      "w": 2000,
+      "h": 480,
+      "size": [
+        1000,
+        240
+      ],
+      "prompt": "A horizontal choice button in its selected state: a glowing warm gold capsule with a bright gold rim and soft golden light bloom around it, a small brighter star at the left end and the right end, the inside smooth gold gradient with no pattern (to put a label on)."
+    },
+    {
+      "id": "next",
+      "w": 800,
+      "h": 800,
+      "size": [
+        240,
+        240
+      ],
+      "prompt": "A small downward-pointing ornate gold arrowhead / chevron, like a jewel, glowing softly, very simple and small in the middle of the picture."
+    },
+    {
+      "id": "icon-sound",
+      "w": 800,
+      "h": 800,
+      "size": [
+        240,
+        240
+      ],
+      "prompt": "A round gold medallion button with a black enamel center, and in the center an engraved gold symbol of a small horn speaker with three curved sound waves."
+    },
+    {
+      "id": "icon-mute",
+      "w": 800,
+      "h": 800,
+      "size": [
+        240,
+        240
+      ],
+      "prompt": "A round gold medallion button with a black enamel center, and in the center an engraved gold symbol of a small horn speaker with a thin diagonal slash through it (muted)."
+    },
+    {
+      "id": "icon-book",
+      "w": 800,
+      "h": 800,
+      "size": [
+        240,
+        240
+      ],
+      "prompt": "A round gold medallion button with a black enamel center, and in the center an engraved gold symbol of a closed old leather book with a star on its cover."
+    },
+    {
+      "id": "field",
+      "w": 2400,
+      "h": 600,
+      "size": [
+        1200,
+        300
+      ],
+      "prompt": "A horizontal text input field frame: a dark smoked-glass rounded rectangle with a thin gold border and tiny gold corner ornaments, the inside plain empty dark (to type text in)."
+    },
+    {
+      "id": "button",
+      "w": 2000,
+      "h": 560,
+      "size": [
+        1000,
+        280
+      ],
+      "prompt": "A large horizontal action button: an ornate black and gold plaque with a slightly arched top edge, thick gold rim with engraved filigree, small glowing gold gems at the left and right ends, the inside plain empty black with a faint gold glow at the center (to put a label on)."
+    }
+  ],
+  "redo": []
+}
