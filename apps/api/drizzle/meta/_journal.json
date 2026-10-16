@@ -204,6 +204,13 @@
       "when": 1792066300428,
       "tag": "0028_kororin_voice",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792111831010,
+      "tag": "0029_line_voices",
+      "breakpoints": true
     }
   ]
 }

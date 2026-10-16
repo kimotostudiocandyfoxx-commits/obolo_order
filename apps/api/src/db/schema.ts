@@ -18,6 +18,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   real,
   text,
   timestamp,
@@ -639,4 +640,22 @@ export const jobs = pgTable(
     ...timestamps,
   },
   (t) => [index('jobs_user_idx').on(t.userId, t.createdAt)],
+);
+
+/**
+ * Story lines voiced with the member's names in them (client decision 2026-10-16): one file per line and
+ * per wording — `hash` covers the words with the names filled in and the voice, so a changed name or a
+ * changed line gets a new file and the old one is simply not asked for any more.
+ */
+export const lineVoices = pgTable(
+  'line_voices',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    hash: text('hash').notNull(),
+    url: text('url').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.hash] })],
 );

@@ -13,4 +13,6 @@ npx --yes tsx@4.19.2 apps/web/scripts/story-import.ts "$DIR" "$BRANCH の ${DIR#
 # cast.md / places.md: next to the parts, or one level up (docs/story-rewrite/)
 SHEETS="$DIR"; [ -f "$SHEETS/cast.md" ] || SHEETS="$TMP/docs/story-rewrite"
 npx --yes tsx@4.19.2 apps/web/scripts/story-assets.ts "$SHEETS"
+# the lines with members' names in them, for the server to voice per member
+npx --yes tsx@4.19.2 apps/web/scripts/story-voices.ts --names-only
 rm -rf "$TMP"

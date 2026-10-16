@@ -6,6 +6,7 @@ import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
 import { playPreset } from '@/lib/story/sfx';
 import { IconButton } from '@/components/story/parts';
 import { useDictation } from '@/lib/useDictation';
+import { nameCharsOk } from '@obolo/shared';
 
 /**
  * Pieces of the first journey's story (docs/story-rewrite/土星まで_UI引き継ぎ.md, 2026-10-14) that the
@@ -115,13 +116,19 @@ export function AgeInput({ onAnswer, onSkip }: { onAnswer: (age: string) => void
 }
 
 // --- Day 2: the NEO name ---------------------------------------------------------------------------
+/** Names are written in hiragana, katakana or English letters (client decision 2026-10-16: the voices read them right). */
+export function NameRule({ value }: { value: string }) {
+  const bad = !!value.trim() && !nameCharsOk(value);
+  return <p className={`w-full text-center text-xs ${bad ? 'text-amber-200' : 'text-white/55'}`}>{bad ? 'ひらがな・カタカナ・英語で入れてね' : 'ひらがな・カタカナ・英語で'}</p>;
+}
+
 export function NeoNameInput({ placeholder, submit, onSubmit }: { placeholder: string; submit: string; onSubmit: (name: string) => Promise<void> }) {
   const [v, setV] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const go = async () => {
     const n = v.trim();
-    if (!n) return;
+    if (!n || !nameCharsOk(n)) return;
     setBusy(true);
     setErr(null);
     try {
@@ -135,9 +142,10 @@ export function NeoNameInput({ placeholder, submit, onSubmit }: { placeholder: s
     <div className={panel}>
       <div className="mx-auto mb-8 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
         <VoiceField value={v} onChange={setV} placeholder={placeholder} />
-        <button className={gold} disabled={!v.trim() || busy} onClick={go}>
+        <button className={gold} disabled={!v.trim() || !nameCharsOk(v) || busy} onClick={go}>
           {busy ? '……' : submit}
         </button>
+        <NameRule value={v} />
         <p className="text-center text-xs text-white/50">名前は、あとでいつでも変えられます</p>
         {err && <p className="text-center text-sm text-rose-300">{err}</p>}
       </div>

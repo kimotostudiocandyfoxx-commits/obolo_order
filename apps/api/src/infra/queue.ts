@@ -8,12 +8,14 @@ import { createRedis } from './kv';
  * - "bullmq": pushes to Redis; `apps/api/dist/worker.js` (a separate Cloud Run service or
  *   GPU worker pool later) consumes it. Handlers are identical in both modes.
  */
-export type JobName = 'buddy.summarize' | 'jobs.run';
+export type JobName = 'buddy.summarize' | 'jobs.run' | 'voice.line';
 
 export interface JobPayloads {
   'buddy.summarize': { userId: string };
   /** a row of the jobs table (song, story MV, MV lyrics — JobsService) */
   'jobs.run': { jobId: string };
+  /** a story line voiced with the member's names in it (LineVoiceService) */
+  'voice.line': { userId: string; hash: string; origin: string; who: string; act?: string; text: string; spec: import('@obolo/shared').StoryVoiceSpec; brief: string; model: string; tempo: number };
 }
 
 export type JobHandler<N extends JobName> = (payload: JobPayloads[N]) => Promise<void>;

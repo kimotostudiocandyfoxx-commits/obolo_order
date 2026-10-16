@@ -2,6 +2,9 @@
 
 import { voiceKey, voiceable } from './voice';
 
+/** a line with a member's name in it ({name} {neo} {bati} …) */
+export const hasNames = (text: string) => /\{[a-z_]+\}/.test(text);
+
 /**
  * The story's spoken lines (production UI 5, 2026-10-15): every line that has a voice file plays it
  * (public/story/voices/manifest.json, made by .github/workflows/story-voices.yml, one file per line named
@@ -78,13 +81,30 @@ export class LineVoice {
     if (this.el) this.el.muted = m;
   }
 
+  /** this member's own voices of the lines with names in them (voiceKey of the line as written → file) */
+  private personal: Record<string, string> = {};
+  setPersonal(voices: Record<string, string>) {
+    this.personal = voices;
+  }
+
   /** Speak this line if it has a voice. `who` / `text` as written in the story (before names are filled in). */
   async say(who: string, text: string, act?: string) {
     this.stop();
     const t = ++this.token;
+    if (hasNames(text)) {
+      // a line with the member's names: their own voice of it, once made (silent until then)
+      const url = this.personal[voiceKey(who, act, text)] ?? this.personal[voiceKey(who, undefined, text)];
+      if (url) this.play(url);
+      return;
+    }
     if (!voiceable(text)) return;
     const url = (await loadManifest())[voiceKey(who, act, text)];
-    if (!url || t !== this.token || !this.el) return;
+    if (!url || t !== this.token) return;
+    this.play(url);
+  }
+
+  private play(url: string) {
+    if (!this.el) return;
     this.el.src = url;
     this.el.volume = this.volume;
     this.el.muted = this.muted;

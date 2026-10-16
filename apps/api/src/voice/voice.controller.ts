@@ -1,11 +1,12 @@
 import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
-import { RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
+import { LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { LineVoiceService } from './line-voice.service';
 import { VoiceService } from './voice.service';
 
 /** Member voices (see VoiceService). */
@@ -14,6 +15,7 @@ import { VoiceService } from './voice.service';
 export class VoiceController {
   constructor(
     private readonly voice: VoiceService,
+    private readonly lines: LineVoiceService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -39,5 +41,13 @@ export class VoiceController {
   async speak(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-speak:${userId}`, 100, 86400);
     return this.voice.speak(userId, parseBody(SpeakBody, body), `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** The story lines with the member's names in them: the voiced ones, and the rest start being voiced (poll). */
+  @Post('lines')
+  @HttpCode(200)
+  async lineVoices(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `voice-lines:${userId}`, 40, 60);
+    return this.lines.get(userId, parseBody(LineVoicesBody, body), `${req.protocol}://${req.get('host')}`);
   }
 }

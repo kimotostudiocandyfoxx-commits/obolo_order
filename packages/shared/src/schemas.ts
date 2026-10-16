@@ -250,6 +250,23 @@ export const SpeakBody = z.object({
 });
 export type SpeakBody = z.infer<typeof SpeakBody>;
 
+/**
+ * The story lines with the member's names in them (name-lines.json keys) for the day being played: the
+ * ones already voiced come back as files, the others are made in the background (poll again).
+ */
+const storyName = z.string().trim().max(24).optional();
+export const LineVoicesBody = z.object({
+  names: z.object({ name: storyName, neo: storyName, bati: storyName, food: storyName, inviter: storyName }),
+  keys: z.array(z.string().regex(/^[a-z0-9]{4,32}$/)).max(120),
+});
+export type LineVoicesBody = z.infer<typeof LineVoicesBody>;
+export interface LineVoicesView {
+  /** key → the voice file */
+  voices: Record<string, string>;
+  /** lines still being voiced */
+  pending: number;
+}
+
 /** Turn one of the member's own voice recordings (POST /media/voice) into text. */
 export const TranscribeBody = z.object({ mediaId: z.string().uuid() });
 export type TranscribeBody = z.infer<typeof TranscribeBody>;

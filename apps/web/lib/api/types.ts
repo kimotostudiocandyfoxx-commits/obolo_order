@@ -1,4 +1,4 @@
-import type { AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -112,6 +112,8 @@ export interface Api {
   speak(body: SpeakBody): Promise<{ url: string }>;
   /** The words of one of your recordings (from uploadVoice). */
   transcribe(mediaId: string): Promise<{ text: string }>;
+  /** story lines with the member's names in them: voiced ones back, the rest being voiced (poll) */
+  lineVoices(body: LineVoicesBody): Promise<LineVoicesView>;
   /** Sing the song in a registered voice and mix it over its instrumental (Fish [singing] + ffmpeg). */
   composeSing(body: SingBody): Promise<SongView>;
   /** the whole song sung by the music studio (ACE-Step + HTDemucs + Seed-VC) — a background job */

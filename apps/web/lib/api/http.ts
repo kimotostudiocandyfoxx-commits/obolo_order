@@ -1,4 +1,4 @@
-import type { MvProjectView, TimelinePlanet } from '@obolo/shared';
+import type { LineVoicesBody, LineVoicesView, MvProjectView, TimelinePlanet } from '@obolo/shared';
 import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
@@ -116,6 +116,10 @@ export class HttpApi implements Api {
   }
   transcribe(mediaId: string) {
     return this.req<{ text: string }>('POST', '/voice/transcribe', { mediaId });
+  }
+
+  lineVoices(body: LineVoicesBody) {
+    return this.req<LineVoicesView>('POST', '/voice/lines', body);
   }
   speak(body: Parameters<Api['speak']>[0]) {
     return this.req<Awaited<ReturnType<Api['speak']>>>('POST', '/voice/speak', body);

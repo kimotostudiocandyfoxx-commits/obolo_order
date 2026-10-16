@@ -21,6 +21,8 @@ import { extname, join, resolve } from 'node:path';
 import { walk, type Scene } from '../lib/story/parse';
 import { idOf } from '../lib/story/sheets';
 import { voiceKey, voiceable } from '../lib/story/voice';
+// by path: this runs without an install (the workflow), and the file has no imports of its own
+import { storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
 
 const ROOT = resolve(__dirname, '../../..');
 const PUB = join(ROOT, 'apps/web/public');
@@ -28,7 +30,9 @@ const STORY = join(PUB, 'story');
 const CONFIG = join(ROOT, 'design/story-voices.json');
 const KEY = process.env.GEMINI_API_KEY;
 const FISH = process.env.FISH_API_KEY;
-if (!KEY) throw new Error('GEMINI_API_KEY is not set');
+/** --names-only: just write name-lines.json (no voices made, no key needed) */
+const NAMES_ONLY = process.argv.includes('--names-only');
+if (!KEY && !NAMES_ONLY) throw new Error('GEMINI_API_KEY is not set');
 const json = <T>(p: string, d: T): T => (existsSync(p) ? (JSON.parse(readFileSync(p, 'utf8')) as T) : d);
 const MAX = Number(process.env.MAX_LINES ?? (json<{ batch?: number }>(join(ROOT, 'design/story-voices.json'), {}).batch ?? 400));
 
@@ -88,37 +92,15 @@ const TEMPO = Number((cfg as { tempo?: number }).tempo ?? 1.3);
 const HEAD = 'silenceremove=start_periods=1:start_duration=0:start_threshold=-42dB:start_silence=0.04';
 const atempo = (r: number) => (Math.abs(r - 1) < 0.001 ? [] : [`atempo=${r.toFixed(4)}`]);
 
-/** raw audio → mp3, with the spec's pitch / echo / growl and a level */
+/** raw audio → mp3, with the spec's pitch / echo / growl, the tempo and a level (the same sound as members' lines) */
 function finish(input: string, inputArgs: string[], s: Spec, out: string) {
-  const f: string[] = [HEAD];
-  // rubberband at its best quality (the default "speed" setting sounded robotic)
-  // ffmpeg's rubberband loses the last moment of the line and ends on a click: give it a second of silence to
-  // chew on, drop the click at the very end, then trim the silence that is left
-  const rb = (st: number, formant: string) =>
-    [
-      'apad=pad_dur=1',
-      `rubberband=pitch=${Math.pow(2, st / 12).toFixed(4)}:formant=${formant}:pitchq=quality:transients=smooth:window=long:smoothing=on:phase=independent`,
-      'areverse,atrim=start=0.25,asetpts=N/SR/TB',
-      'silenceremove=start_periods=1:start_duration=0:start_threshold=-50dB:start_silence=0.12,areverse',
-    ].join(',');
-  if (s.growl) {
-    // a monster: formants pulled down with the pitch, grit, weight in the low end
-    f.push(rb(s.pitch ?? -6, 'shifted'));
-    f.push(`bass=g=${(6 * s.growl).toFixed(1)}:f=120`, `asoftclip=type=tanh:threshold=${(1 - 0.5 * s.growl).toFixed(2)}`, 'lowpass=f=7000');
-  } else if (s.pitch) f.push(rb(s.pitch, s.formant ?? 'preserved'));
-  if (s.echo) {
-    const d = (0.25 + 0.35 * s.echo).toFixed(2);
-    f.push(`aecho=0.85:0.75:170|340:${d}|${(+d / 2).toFixed(2)}`);
-  }
-  f.push(...atempo(TEMPO), 'loudnorm=I=-18:TP=-1.5');
   mkdirSync(join(out, '..'), { recursive: true });
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputArgs, '-i', input, '-af', f.join(','), '-ac', '1', '-b:a', '64k', out]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputArgs, '-i', input, '-af', storyVoiceFilter(s, TEMPO), '-ac', '1', '-b:a', '64k', out]);
 }
 const seconds = (file: string) => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file]).toString().trim());
 
 async function gemini(model: string, s: Spec, brief: string, act: string | undefined, text: string, out: string) {
-  const how = act ? ` This time it is said ${act} (stage direction, in Japanese: 「${act}」).` : '';
-  const prompt = `You are voicing a character in a Japanese anime adventure for children. ${s.brief ?? brief}.${how} Speak only the Japanese line below, in character, naturally — do not read these instructions.\n\n${text.replace(/\n/g, ' ')}`;
+  const prompt = storyVoicePrompt(s.brief ?? brief, act, text);
   for (let attempt = 0; attempt < 4; attempt++) {
     const res = await fetch(`${API}/models/${model}:generateContent`, {
       method: 'POST',
@@ -221,6 +203,41 @@ async function fishSpeak(s: Spec, text: string, out: string) {
   throw new Error('fish kept failing');
 }
 
+// "special": a line said in another way — { who, text?, act?, as?, spec } (as = borrow that person's voice,
+// spec = changes on top, e.g. KIMORIN's tremendously funny voice: a higher pitch)
+type Special = { who: string; text?: string; act?: string; as?: string; spec?: Spec };
+const specials = (cfg.special as Special[] | undefined) ?? [];
+/** The voice a line is said in (null = that person has no voice yet). */
+function voiceFor(name: string, l: { act?: string; text: string }): { s: Spec; brief: string } | null {
+  const sp = specials.find((x) => x.who === name && (!x.text || l.text.includes(x.text)) && (!x.act || (l.act ?? '').includes(x.act)));
+  const baseRef = sp?.as ? cfg.chosen[sp.as] : cfg.chosen[name];
+  if (!baseRef) return null;
+  const s = { ...spec(baseRef), ...(sp?.spec ?? {}) };
+  return { s, brief: s.brief ?? cfg.auditions.find((a) => a.name === (sp?.as ?? name))?.brief ?? '' };
+}
+
+/**
+ * public/story/voices/name-lines.json: every line with a member's name in it ({name} {neo} {bati} …), in
+ * the whole story, with its voice — the server voices them for each member (@obolo/shared storyVoice).
+ */
+function writeNameLines(model: string) {
+  const out: NameLines = { model, tempo: TEMPO, lines: {} };
+  for (const [name, ls] of said)
+    for (const l of ls) {
+      if (!/\{[a-z_]+\}/.test(l.text)) continue;
+      const v = voiceFor(name, l);
+      if (!v) continue;
+      // the Fish model id is enough for the server; the recording's path is not needed there
+      const { fish, ...rest } = v.s;
+      const line = { who: name, ...(l.act ? { act: l.act } : {}), text: l.text, spec: fish ? { ...rest, fish: 'clone' } : rest, brief: v.brief };
+      out.lines[voiceKey(name, l.act, l.text)] = line;
+      out.lines[voiceKey(name, undefined, l.text)] ??= line;
+    }
+  mkdirSync(join(STORY, 'voices'), { recursive: true });
+  writeFileSync(join(STORY, 'voices/name-lines.json'), JSON.stringify(out));
+  return Object.keys(out.lines).length;
+}
+
 /** Run jobs a few at a time. */
 async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   let i = 0;
@@ -230,6 +247,11 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
 }
 
 (async () => {
+  if (NAMES_ONLY) {
+    const model = json<{ model?: string }>(join(STORY, 'voices/auditions.json'), {}).model ?? 'gemini-2.5-pro-preview-tts';
+    console.log(`name-lines.json: ${writeNameLines(model)} keys`);
+    return;
+  }
   const names = await models();
   const tts = pickTts(names);
   const log: string[] = [];
@@ -289,20 +311,13 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   const manifest = json<Record<string, string>>(manifestPath, {});
   const jobs: { name: string; s: Spec; brief: string; act?: string; text: string; key: string }[] = [];
   let skipped = 0;
-  // "special": a line said in another way — { who, text?, act?, as?, spec } (as = borrow that person's voice,
-  // spec = changes on top, e.g. KIMORIN's tremendously funny voice: a higher pitch)
-  type Special = { who: string; text?: string; act?: string; as?: string; spec?: Spec };
-  const specials = (cfg.special as Special[] | undefined) ?? [];
   const voiced = new Set([...Object.keys(cfg.chosen), ...specials.map((x) => x.who)]);
   for (const name of voiced) {
-    const ref = cfg.chosen[name];
     const again = redo.has(name);
     for (const l of spoken.get(name) ?? []) {
-      const sp = specials.find((x) => x.who === name && (!x.text || l.text.includes(x.text)) && (!x.act || (l.act ?? '').includes(x.act)));
-      const baseRef = sp?.as ? cfg.chosen[sp.as] : ref;
-      if (!baseRef) continue;
-      const s = { ...spec(baseRef), ...(sp?.spec ?? {}) };
-      const brief = s.brief ?? cfg.auditions.find((a) => a.name === (sp?.as ?? name))?.brief ?? '';
+      const v = voiceFor(name, l);
+      if (!v) continue;
+      const { s, brief } = v;
       if (!voiceable(l.text)) {
         skipped++;
         continue;
@@ -395,6 +410,8 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   const live = new Set(Object.values(manifest));
   writeFileSync(tempoPath, JSON.stringify(Object.fromEntries(Object.entries(tempoOf).filter(([f]) => live.has(f)))));
 
+  const nameKeys = writeNameLines(tts);
+  log.push(`- 🏷 名前の入るセリフ ${nameKeys}個の一覧（name-lines.json）: 会員ごとに、名前が決まったら裏で声を作る`);
   // Fish model ids made this run go back into the config; redo / redoLines are done once
   writeFileSync(CONFIG, JSON.stringify({ ...cfg, redo: [], redoLines: [] }, null, 2) + '\n');
   const total = [...spoken.entries()].filter(([n]) => cfg.chosen[n]).reduce((a, [, ls]) => a + ls.filter((l) => voiceable(l.text)).length, 0);

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { hasMotion, motionUrl, spriteUrl, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
-import { neoForm } from '@obolo/shared';
+import { nameCharsOk, neoForm } from '@obolo/shared';
 import { eggSvg } from '@/lib/look';
 import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
@@ -18,6 +18,7 @@ import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, Smoke, speakerSprite } from '@/components/story/Stage';
 import { ActionButton, Choice, DialogueWindow, IconButton, MixerPanel, Telop, useHint } from '@/components/story/parts';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
+import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
@@ -40,6 +41,7 @@ import {
   unlockSfx,
   MicAllowed,
   VoiceField,
+  NameRule,
 } from './StoryExtras';
 
 /**
@@ -425,6 +427,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     vc.onSpeaking = setTalking;
     return () => vc.dispose();
   }, []);
+  // the lines with the member's names in them: their own voices, made in the background
+  useNameVoices(voice.current, steps, { name: v.name, neo: v.neo, bati: answers.batiName ?? vars.bati, food: v.batiFood, inviter: v.inviter });
   // each spoken line plays its voice (when it has one)
   const sayNow = started && steps[i]?.t === 'say' ? (steps[i] as Extract<Step, { t: 'say' }>) : null;
   useEffect(() => {
@@ -959,7 +963,7 @@ function NameInput({
   const go = async (e: FormEvent) => {
     e.preventDefault();
     const n = value.trim();
-    if (!n) return;
+    if (!n || !nameCharsOk(n)) return;
     setBusy(true);
     setErr(null);
     try {
@@ -975,7 +979,8 @@ function NameInput({
         <div className="w-full">
           <VoiceField value={value} onChange={setValue} placeholder={placeholder} />
         </div>
-        <ActionButton type="submit" disabled={!value.trim() || busy}>{busy ? '……' : submit}</ActionButton>
+        <ActionButton type="submit" disabled={!value.trim() || !nameCharsOk(value) || busy}>{busy ? '……' : submit}</ActionButton>
+        <NameRule value={value} />
         {err && <p className="text-center text-sm text-rose-300">{err}</p>}
       </div>
     </form>

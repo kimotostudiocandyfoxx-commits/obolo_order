@@ -332,6 +332,11 @@ export class DemoApi implements Api {
     return { text: '' };
   }
 
+  // demo: no voices are made here (the lines with names stay silent)
+  async lineVoices(): Promise<{ voices: Record<string, string>; pending: number }> {
+    return { voices: {}, pending: 0 };
+  }
+
   async speak(): Promise<{ url: string }> {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
   }

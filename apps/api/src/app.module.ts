@@ -13,6 +13,7 @@ import { ComposeController } from './compose/compose.controller';
 import { ComposeService } from './compose/compose.service';
 import { SongService } from './compose/song.service';
 import { VoiceController } from './voice/voice.controller';
+import { LineVoiceService } from './voice/line-voice.service';
 import { VoiceService } from './voice/voice.service';
 import { BuddyController } from './buddy/buddy.controller';
 import { BuddyService } from './buddy/buddy.service';
@@ -88,6 +89,7 @@ import { WalletController } from './wallet/wallet.controller';
     ComposeService,
     SongService,
     VoiceService,
+    LineVoiceService,
     CommsService,
     PushService,
     MvService,

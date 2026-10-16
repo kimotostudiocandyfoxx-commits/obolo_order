@@ -49,6 +49,8 @@ const Env = z.object({
   INVITE_TTL_DAYS: z.coerce.number().default(14),
   /** Web origin used in invitation emails, e.g. https://obolo-order-web.vercel.app */
   WEB_ORIGIN: secret(),
+  /** the story lines with members' names in them (default: WEB_ORIGIN/story/voices/name-lines.json) */
+  NAME_LINES_URL: z.string().optional(),
   /** PLACEHOLDER (P-AUTH-2): until an email provider is wired, return the login code in the API
    *  response so the demo works. MUST be false in production. */
   AUTH_DEMO_SHOW_CODE: bool(false),

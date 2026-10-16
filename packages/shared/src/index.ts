@@ -11,3 +11,4 @@ export * from './comms';
 export * from './mv';
 export * from './jobs';
 export * from './atelier';
+export * from './storyVoice';
