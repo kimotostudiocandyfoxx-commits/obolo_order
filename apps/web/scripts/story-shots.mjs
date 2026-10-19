@@ -43,8 +43,8 @@ const page = await browser.newPage({ viewport: { width: Number(args.width ?? 390
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));
 if (args.webm) {
-  await page.route(/\/onboarding\/m[\d-]+\.mp4$/, async (route) => {
-    const m = route.request().url().match(/(m[\d-]+)\.mp4$/)[1];
+  await page.route(/\/onboarding\/m[\w-]+\.mp4$/, async (route) => {
+    const m = route.request().url().match(/(m[\w-]+)\.mp4$/)[1];
     const f = join(args.webm, `${m}.webm`);
     if (existsSync(f)) await route.fulfill({ status: 200, contentType: 'video/webm', body: readFileSync(f) });
     else await route.continue();
@@ -90,7 +90,7 @@ for (let k = 0; k < 400 && shot < max; k++) {
     }
   }
   if (clicked) continue;
-  const buttons = page.locator('main button:visible, form button:visible, div.flex-col > button:visible');
+  const buttons = page.locator('button[data-reply]:visible, main button:visible, form button:visible, div.flex-col > button:visible');
   const n = await buttons.count();
   if (n > 0 && n < 6) {
     await buttons.first().click().catch(() => {});

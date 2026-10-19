@@ -84,6 +84,8 @@ export type Step =
   | { t: 'enter'; who: string; fx?: 'smoke' | 'light' }
   /** 〔移動：惑星到着〕〔テロップ：到着〕 the "arrival" pattern: the new place fades in under a title (tap) */
   | { t: 'arrive'; image: string; caption: string }
+  /** Day 1: the seal glows, the envelope bursts into light, the invitation card rises (words set in code) */
+  | { t: 'invitation' }
   /** gold motes drifting up (0 = none; at most 150) */
   | { t: 'motes'; count: number }
   /** Venus tutorial (Day 8), coached by the gorilla trio. */

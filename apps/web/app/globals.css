@@ -588,3 +588,34 @@ body {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255, 214, 140, 0); }
   50% { box-shadow: 0 0 16px 3px rgba(255, 214, 140, 0.55); }
 }
+
+/* the story as a chat (components/story/Chat.tsx) */
+@keyframes chatIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes chatInR {
+  from { opacity: 0; transform: translate(10px, 10px) scale(0.97); filter: blur(2px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+@keyframes cueBlink {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+@keyframes faceTalk {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 214, 140, 0); }
+  50% { box-shadow: 0 0 14px 3px rgba(255, 214, 140, 0.65); }
+}
+
+/* Day 1's invitation (components/story/Invitation.tsx) */
+@keyframes sealLean { from { transform: scale(1); } to { transform: scale(1.12) translateY(-2%); } }
+@keyframes sealSpin { from { transform: rotate(0deg) scale(0.4); opacity: 0; } 30% { opacity: 1; } to { transform: rotate(540deg) scale(1.25); opacity: 1; } }
+@keyframes sealRing { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(3.4); opacity: 0; } }
+@keyframes sealGlow { from { transform: scale(0.3); opacity: 0; } to { transform: scale(2.6); opacity: 1; } }
+@keyframes cardRise { from { transform: translateY(14%) scale(0.9); opacity: 0; filter: brightness(1.8) blur(4px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes cardShine { from { transform: translateX(-60%); opacity: 1; } to { transform: translateX(60%); opacity: 0; } }
+@keyframes inkIn { from { opacity: 0; filter: blur(3px); transform: translateY(3px); } to { opacity: 1; filter: none; transform: none; } }

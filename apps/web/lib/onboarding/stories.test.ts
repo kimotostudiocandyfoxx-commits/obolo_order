@@ -42,7 +42,8 @@ describe('day 1 (story 2026-10-14)', () => {
     expect(t).not.toContain('letter');
     const c = steps.find((s) => s.t === 'choice' && s.key === 'f_d01_ticket');
     expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['切符を受け取る', '受け取らない']);
-    expect(steps.some((s) => s.t === 'caption' && s.text.includes('{inviter_message}') && s.when === 'inviterMessage')).toBe(true);
+    // the inviter's own words are on the invitation card itself (set in code, only when written)
+    expect(steps.some((s) => s.t === 'invitation')).toBe(true);
   });
   it('goes from the name straight on to 「ここは、宇宙秘密結社だ。」 (client 2026-10-15)', () => {
     const n = steps.findIndex((s) => s.t === 'name');

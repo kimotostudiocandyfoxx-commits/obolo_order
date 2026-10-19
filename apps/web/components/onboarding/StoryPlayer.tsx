@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
@@ -16,20 +16,21 @@ import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, Smoke, speakerSprite } from '@/components/story/Stage';
-import { ActionButton, Choice, DialogueWindow, IconButton, MixerPanel, Telop, useHint } from '@/components/story/parts';
+import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
-import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
+import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
+import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
+import { Invitation } from '@/components/story/Invitation';
 import {
   AgeInput,
   BluenaScreen,
   BookButton,
   DAY1_SEALS,
   FxLayer,
-  NeoNameInput,
   PauseScreen,
   playSfx,
   RiddleBook,
@@ -40,8 +41,6 @@ import {
   TimeUpOverlay,
   unlockSfx,
   MicAllowed,
-  VoiceField,
-  NameRule,
 } from './StoryExtras';
 
 /**
@@ -102,8 +101,43 @@ interface Props {
 }
 
 const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
-/** How far above the bottom the question stays while an input panel is open (px). */
-const PROMPT_LIFT: Record<string, number> = { name: 230, batiname: 230, neoname: 260, age: 270, egg: 300 };
+
+// --- the story as a chat (client decision 2026-10-19) ---
+/** a line of the scene's thread, as written (names are filled in when shown) */
+type ChatRaw = { id: string; kind: 'them'; who: Speaker; text: string } | { id: string; kind: 'me'; text: string; action?: boolean } | { id: string; kind: 'sys'; text: string };
+/** each speaker's face in the thread */
+const AVATARS: Partial<Record<Speaker, Avatar>> = {
+  MONBAN: { src: '/story/avatars/monban.webp', dark: true },
+  OBOLON: { src: '/story/avatars/obolon.webp', dark: true },
+  KIMORIN: { src: '/story/avatars/kimorin.webp' },
+  たこ焼きブラザー: { src: '/story/avatars/brother.webp' },
+  たこ焼きシスター: { src: '/story/avatars/sister.webp' },
+  うんちピンポンくん: { src: '/story/avatars/pinpon.webp' },
+  大根カイザー: { src: '/onboarding/kaiser-face.webp' },
+  フリージー: { src: '/onboarding/freezy-face.webp' },
+  ヒポキン: { src: '/onboarding/hipokin-face.webp' },
+  ロングG: { src: '/onboarding/longg-face.webp' },
+  ハットG: { src: '/onboarding/hatg-face.webp' },
+  ボスG: { src: '/onboarding/bossg-face.webp' },
+};
+/** the day's title (「1日目」) stays a quiet title over the picture, not a line of the thread */
+const DAY_TITLE = /^\d+日目$/;
+/** a step that goes into the thread when it is reached */
+function chatLine(s: Step, id: string): ChatRaw | null {
+  if (s.t === 'say') return { id, kind: 'them', who: s.who, text: s.text };
+  if (s.t === 'caption' && !DAY_TITLE.test(s.text) && !s.when) return { id, kind: 'sys', text: s.text };
+  if (s.t === 'notice') return { id, kind: 'sys', text: s.text };
+  if (s.t === 'arrive') return { id, kind: 'sys', text: s.caption };
+  return null;
+}
+/** room the replies / message bar take at the bottom (px) */
+function chatBottom(s: Step | undefined): number {
+  if (!s) return 28;
+  if (s.t === 'action') return 78;
+  if (s.t === 'choice') return s.options.length > 2 ? 128 : 78;
+  if (s.t === 'name' || s.t === 'batiname' || s.t === 'neoname') return 112;
+  return 30;
+}
 
 export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
@@ -142,6 +176,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const pendingCaptions = useRef<TimedCaption[]>([]);
   const captionTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [overlayCaption, setOverlayCaption] = useState<string | null>(null);
+  // the scene's thread (cleared when the scene changes: a motion, an arrival, black)
+  const [log, setLog] = useState<ChatRaw[]>([]);
+  const addLine = useCallback((e: ChatRaw | null) => {
+    if (e) setLog((l) => (l[l.length - 1]?.id === e.id ? l : [...l, e]));
+  }, []);
+  const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
+  /** Day 1's invitation card is on screen */
+  const [invite, setInvite] = useState(false);
   const clearCaptions = useCallback(() => {
     captionTimers.current.forEach(clearTimeout);
     captionTimers.current = [];
@@ -288,6 +330,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setStill(s.image);
           setReady(true);
           setBlackout(false);
+          setInvite(false);
+          setLog([]);
+          addLine(chatLine(s, `s${n}`));
+          setI(n);
+          return;
+        } else if (s.t === 'invitation') {
+          setLog([]);
+          setInvite(true);
           setI(n);
           return;
         } else if (s.t === 'fx') {
@@ -312,6 +362,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'black') {
           bgQueue.current = [];
           setBlackout(true);
+          setLog([]);
           dual.current?.pauseAll();
           n++;
         } else if (s.t === 'loop') {
@@ -329,6 +380,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'whiteout') {
           setSprite(null);
           setWhite(true);
+          setLog([]);
           setI(n);
           const after = n + 1;
           setTimeout(() => runRef.current(after), 3400);
@@ -339,12 +391,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bgQueue.current = [];
           setSprite(null);
           setCam(null);
+          setLog([]);
+          setInvite(false);
           clearCaptions();
           pendingCaptions.current = s.captions ?? [];
           playMedia(s.motion, false);
           setI(n);
           return;
         } else {
+          addLine(chatLine(s, `s${n}`));
           setI(n);
           if (s.t === 'end') {
             bgm.current?.fadeOut();
@@ -354,7 +409,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
       }
     },
-    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock],
+    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine],
   );
   runRef.current = run;
 
@@ -469,7 +524,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
     const lastSprite = before.find((s) => s.t === 'sprite' || s.t === 'video');
     if (lastSprite?.t === 'sprite') setSprite(lastSprite.image);
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'se', 'fx', 'screen', 'pause', 'clock', 'branch'].includes(cur.t)) {
+    // the invitation card stays up after it opened (until the next motion)
+    const lastCard = before.find((s) => s.t === 'invitation' || s.t === 'video' || s.t === 'arrive');
+    if (lastCard?.t === 'invitation') setInvite(true);
+    // the thread starts again from the line on screen (or the question being answered)
+    let q = i - 1;
+    while (steps[q]?.t === 'label') q--;
+    addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'se', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -572,15 +634,33 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
 
       {/* tap layer for dialogue */}
-      {started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />}
-
-      {started && prompt && (
-        <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step?.t === 'choice' ? step.options.length * 50 + 36 : step?.t === 'action' ? 86 : PROMPT_LIFT[step?.t ?? ''] ?? 150}px + env(safe-area-inset-bottom))` }}>
-          <DialogueWindow name={speakerName(prompt.who, v)}>{fill(prompt.text, v)}</DialogueWindow>
-        </div>
+      {/* the thread: a line is tapped through anywhere (the newest finishes typing first) */}
+      {started && step && chatLine(step, '') ? (
+        <button className="absolute inset-0 z-10 cursor-default" aria-label="つぎへ" onClick={() => (reveal.current.done ? next() : reveal.current.finish())} />
+      ) : (
+        started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
+      {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} onOpened={() => run(iRef.current + 1)} />}
+      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
+        <ChatLog
+          entries={log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : AVATARS[e.who] } : { ...e, text: fill(e.text, v) }))}
+          talking={talking}
+          reveal={reveal}
+          live={step.t === 'say'}
+          bottom={chatBottom(step)}
+        />
+      )}
+
       {started && step?.t === 'action' && (
-        <Buttons key={i} labels={[step.label]} onPick={() => next()} />
+        <ReplyChips
+          key={i}
+          action
+          options={[step.label]}
+          onPick={() => {
+            addLine({ id: `a${i}`, kind: 'me', text: step.label, action: true });
+            next();
+          }}
+        />
       )}
       {started && step?.t === 'choice' && step.prompt && (
         <div className="pointer-events-none absolute inset-x-0 z-10 px-4" style={{ bottom: `calc(${step.options.length * 50 + 36}px + env(safe-area-inset-bottom))` }}>
@@ -588,7 +668,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </div>
       )}
       {started && step?.t === 'choice' && (
-        <Buttons key={i} labels={step.options.map((o) => o.label)} onPick={(k) => choose(step.key, step.options[k].label, step.options[k].goto)} />
+        <ReplyChips
+          key={i}
+          options={step.options.map((o) => o.label)}
+          onPick={(k) => {
+            addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
+            choose(step.key, step.options[k].label, step.options[k].goto);
+          }}
+        />
       )}
       {started && step?.t === 'saturn' && (
         <SaturnLesson
@@ -706,12 +793,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
       {started && step?.t === 'neoname' && (
-        <NeoNameInput
+        <MessageBar
+          key={i}
           placeholder={step.placeholder}
-          submit={step.submit}
-          onSubmit={async (n) => {
+          valid={nameCharsOk}
+          note={(t) => <NameNote value={t} extra="名前は、あとでいつでも変えられます" />}
+          onSend={async (n) => {
             await onNeoName?.(n);
             remember('neoName', n);
+            addLine({ id: `n${i}`, kind: 'me', text: n });
             run(iRef.current + 1);
           }}
         />
@@ -747,26 +837,31 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
       {started && step?.t === 'batiname' && (
-        <NameInput
+        <MessageBar
+          key={i}
           placeholder={step.placeholder}
-          submit={step.submit}
-          initial=""
-          onSubmit={async (n) => {
+          valid={nameCharsOk}
+          note={(t) => <NameNote value={t} />}
+          onSend={async (n) => {
             await onBatiName?.(n);
             remember('batiName', n);
+            addLine({ id: `n${i}`, kind: 'me', text: n });
             run(iRef.current + 1);
           }}
         />
       )}
       {started && step?.t === 'name' && (
-        <NameInput
+        <MessageBar
+          key={i}
           placeholder={step.placeholder}
-          submit={step.submit}
           initial={name}
-          onSubmit={async (n) => {
+          valid={nameCharsOk}
+          note={(t) => <NameNote value={t} />}
+          onSend={async (n) => {
             await onName(n);
             stateRef.current = { ...stateRef.current, name: n };
             setName(n);
+            addLine({ id: `n${i}`, kind: 'me', text: n });
             run(iRef.current + 1);
           }}
         />
@@ -904,6 +999,12 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   );
 }
 
+/** under the message bar: names in hiragana, katakana or English (the voices read them right) */
+function NameNote({ value, extra }: { value: string; extra?: string }) {
+  const bad = !!value.trim() && !nameCharsOk(value);
+  return <p className={`text-[11px] tracking-wide ${bad ? 'text-amber-200' : 'text-white/45'}`}>{bad ? 'ひらがな・カタカナ・英語で入れてね' : `ひらがな・カタカナ・英語で${extra ? `　${extra}` : ''}`}</p>;
+}
+
 function Cue() {
   return (
     <span className="pb-safe absolute bottom-6 left-1/2 block h-4 w-4 -translate-x-1/2" aria-hidden>
@@ -914,78 +1015,6 @@ function Cue() {
   );
 }
 
-/**
- * Choices and the story's actions (production UI 19): small speech bubbles from the visitor's side,
- * coming up one after another; the one tapped is said (it stays lit a moment). The first few glow.
- */
-function Buttons({ labels, onPick }: { labels: string[]; onPick: (k: number) => void }) {
-  const hint = useHint();
-  const [said, setSaid] = useState<number | null>(null);
-  return (
-    <div className="pb-safe pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4">
-      <div className="pointer-events-auto mx-auto mb-5 flex max-w-xl flex-col items-end gap-2">
-        {labels.map((l, k) => (
-          <Choice
-            key={l}
-            k={k}
-            hint={hint}
-            on={said === k}
-            disabled={said !== null && said !== k}
-            onClick={() => {
-              if (said !== null) return;
-              setSaid(k);
-              setTimeout(() => onPick(k), 380);
-            }}
-          >
-            {l}
-          </Choice>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-
-function NameInput({
-  placeholder,
-  submit,
-  initial,
-  onSubmit,
-}: {
-  placeholder: string;
-  submit: string;
-  initial: string;
-  onSubmit: (name: string) => Promise<void>;
-}) {
-  const [value, setValue] = useState(initial);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const go = async (e: FormEvent) => {
-    e.preventDefault();
-    const n = value.trim();
-    if (!n || !nameCharsOk(n)) return;
-    setBusy(true);
-    setErr(null);
-    try {
-      await onSubmit(n);
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : String(e));
-      setBusy(false);
-    }
-  };
-  return (
-    <form onSubmit={go} className="pb-safe absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-6 pt-16">
-      <div className="mx-auto mb-8 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col items-end gap-3">
-        <div className="w-full">
-          <VoiceField value={value} onChange={setValue} placeholder={placeholder} />
-        </div>
-        <ActionButton type="submit" disabled={!value.trim() || !nameCharsOk(value) || busy}>{busy ? '……' : submit}</ActionButton>
-        <NameRule value={value} />
-        {err && <p className="text-center text-sm text-rose-300">{err}</p>}
-      </div>
-    </form>
-  );
-}
 
 /** Spread 1–3 standing characters across the screen (three get a wider spread and narrower slots). */
 function spriteSlot(k: number, n: number) {

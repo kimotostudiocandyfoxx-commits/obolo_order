@@ -16,28 +16,26 @@ export const DAY1: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'motes', count: 36 }, // 金色の光の粒（演出）
   { t: 'caption', text: '1日目' },
-  // D01-S001 招待状
-  { t: 'video', motion: 1 }, // 招待信号を受信しました（文字は動画の中）
-  { t: 'loop', motion: 2 },
+  // D01-S001 招待状 (production 2026-10-19: no words painted in the pictures — they are set in code)
+  { t: 'video', motion: '1-c' }, // 光の粒がらせんを描いて集まり、封筒になる
+  { t: 'caption', text: '招待信号を受信しました' },
   { t: 'action', label: '封を開く' },
-  { t: 'video', motion: 3 },
-  { t: 'loop', motion: 4 }, // 招待状（文字は動画の中）
-  { t: 'caption', text: '「{inviter_message}」　{inviter}', when: 'inviterMessage' }, // 招待した人のひとこと（書いていなければ出さない）
+  { t: 'invitation' }, // 封印が光って回り、封筒が開く → 招待状（招待者と「{inviter_message}」はカードの中）
   { t: 'action', label: '本部へ向かう' },
 
   // D01-S003 本部とMONBAN
-  { t: 'video', motion: 5 },
-  { t: 'loop', motion: 6 }, // 「本部に到着しました」は動画の中
+  { t: 'video', motion: '5-c' }, // 招待状が折り鶴になって、本部へ飛ぶ
+  { t: 'arrive', image: 's/d1-gate', caption: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
-  { t: 'video', motion: 7 }, // 門の前に黒い煙が湧き、MONBANが現れる
+  { t: 'video', motion: '7-c' }, // 門の前に黒い煙が湧き、MONBANが現れる
   { t: 'loop', motion: 9 },
   { t: 'cam', move: 'shake' },
   { t: 'caption', text: 'MONBANが現れた' },
   { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
-  { t: 'say', who: 'MONBAN', text: '誰だお前…ここは秘密結社だ…。' },
-  { t: 'say', who: 'MONBAN', text: 'この先はORDERしか入れない…帰れ…。' },
+  { t: 'say', who: 'MONBAN', text: '誰だお前…。\nここは秘密結社だ…。' },
+  { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
   { t: 'cam', move: 'out' },
   { t: 'action', label: '招待状を見せる' },
   { t: 'video', motion: 10 }, // 招待状が、MONBANの両手の上に光りながら浮かぶ
@@ -86,7 +84,7 @@ export const DAY1: Step[] = [
 
   // D01-S012 宇宙へ行ってみるか？
   { t: 'cam', move: 'in', focus: '50% 30%' },
-  { t: 'say', who: 'MONBAN', text: 'お前はORDERに招待されてここに来た。' },
+  { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待されてここに来た。' },
   { t: 'say', who: 'MONBAN', text: 'だから知る権利がある。' },
   { t: 'say', who: 'MONBAN', text: 'もし宇宙やこの秘密結社に興味があるなら、' },
   { t: 'say', who: 'MONBAN', text: '明日、お前に宇宙行きの切符を送るが' },

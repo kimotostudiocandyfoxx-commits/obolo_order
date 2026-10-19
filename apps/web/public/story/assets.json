@@ -1,5 +1,5 @@
 {
- "made": "2026-10-15T12:14:28.670Z",
+ "made": "2026-10-19T07:54:45.628Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -8,7 +8,7 @@
   {
    "name": "MONBAN",
    "id": "monban",
-   "uses": 123,
+   "uses": 126,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -200,7 +200,7 @@
   {
    "name": "KIMORIN",
    "id": "kimorin",
-   "uses": 380,
+   "uses": 391,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/kimorin-1.webp",
@@ -212,21 +212,9 @@
    "sheet": null
   },
   {
-   "name": "バティ",
-   "id": "c-1xpkc0o",
-   "uses": 285,
-   "aliases": [],
-   "status": "ready",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
    "name": "OBOLON",
    "id": "obolon",
-   "uses": 209,
+   "uses": 212,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/obolon.webp",
@@ -238,7 +226,7 @@
   {
    "name": "ヒポキン",
    "id": "c-13wd9v8",
-   "uses": 160,
+   "uses": 163,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/hipokin.webp",
@@ -250,7 +238,7 @@
   {
    "name": "フリージー",
    "id": "c-1l8fmea",
-   "uses": 120,
+   "uses": 130,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/freezy.webp",
@@ -262,7 +250,7 @@
   {
    "name": "大根カイザー",
    "id": "c-16ueow0",
-   "uses": 77,
+   "uses": 78,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-16ueow0.webp",
@@ -283,9 +271,21 @@
    "sheet": null
   },
   {
+   "name": "バティ",
+   "id": "c-1xpkc0o",
+   "uses": 37,
+   "aliases": [],
+   "status": "ready",
+   "sprite": null,
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "たこ焼きブラザー",
    "id": "c-op0tl3",
-   "uses": 38,
+   "uses": 34,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-brother.webp",
@@ -297,7 +297,7 @@
   {
    "name": "たこ焼きシスター",
    "id": "c-105b577",
-   "uses": 32,
+   "uses": 30,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-sister.webp",
@@ -383,21 +383,6 @@
    "sheet": null
   },
   {
-   "name": "カニ",
-   "id": "c-1jne43",
-   "uses": 5,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/story/cast/c-1jne43.webp",
-   "client": [
-    "01-main.png",
-    "99-original.jpg"
-   ],
-   "candidates": [],
-   "pick": "client",
-   "sheet": null
-  },
-  {
    "name": "イカ",
    "id": "c-1io7qo8",
    "uses": 5,
@@ -422,6 +407,21 @@
    "client": [
     "01-main.png",
     "99-sheet.webp"
+   ],
+   "candidates": [],
+   "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "カニ",
+   "id": "c-1jne43",
+   "uses": 4,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/story/cast/c-1jne43.webp",
+   "client": [
+    "01-main.png",
+    "99-original.jpg"
    ],
    "candidates": [],
    "pick": "client",
