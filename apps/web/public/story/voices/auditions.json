@@ -2,12 +2,12 @@
  "auditions": [
   {
    "name": "KIMORIN",
-   "line": "前と後ろの物語を持つ者……ですか。ふむ。おめでとうございます。私も、すぐに追いつきますよ。",
+   "line": "そうですか、、、\nまぁ確かにこんな美しい景色の中で眠りにつくのは悪いことではありませんね。",
    "takes": [
     {
      "voice": "録音から",
      "file": "/story/voices/audition/kimorin/1-録音から.mp3",
-     "seconds": 9.744
+     "seconds": 5.616
     }
    ]
   },
@@ -107,27 +107,27 @@
   },
   {
    "name": "たこ焼きブラザー",
-   "line": "みんなの広場に飛ばしたコロリンも、88時間経ったら、自分の部屋に帰ってくるZE。",
+   "line": "注文すれば、家に届くZE。値段と送料と届け先を見て、欲しかったら注文するZE。",
    "takes": [
     {
      "voice": "Fenrir-hq",
      "file": "/story/voices/audition/c-op0tl3/1-Fenrir-hq.mp3",
-     "seconds": 7.08
+     "seconds": 6.336
     },
     {
      "voice": "Algenib-hq",
      "file": "/story/voices/audition/c-op0tl3/2-Algenib-hq.mp3",
-     "seconds": 8.208
+     "seconds": 5.28
     },
     {
      "voice": "Sadaltager-hq",
      "file": "/story/voices/audition/c-op0tl3/3-Sadaltager-hq.mp3",
-     "seconds": 6.816
+     "seconds": 6
     },
     {
      "voice": "Alnilam-hq",
      "file": "/story/voices/audition/c-op0tl3/4-Alnilam-hq.mp3",
-     "seconds": 7.08
+     "seconds": 6.264
     }
    ]
   },
