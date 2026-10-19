@@ -10,7 +10,8 @@ import { useEffect, useState } from 'react';
  * changes.
  */
 const ENVELOPE = '/onboarding/s/d1-envelope-still.jpg';
-const CARD = '/onboarding/s/d1-invitation.jpg';
+/** the client's card with its words taken out (they are set below, in the same places) */
+const CARD = '/onboarding/s/d1-invitation-card.jpg';
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 export function Invitation({ inviter, message, onOpened, settled }: { inviter: string; message?: string; onOpened: () => void; settled?: boolean }) {
@@ -29,9 +30,12 @@ export function Invitation({ inviter, message, onOpened, settled }: { inviter: s
     <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden bg-black">
       {/* the envelope: the camera leans in to the seal, which wakes up */}
       {phase !== 'card' && (
-        <div className="absolute inset-0 animate-[sealLean_2.2s_cubic-bezier(.4,0,.2,1)_both]">
+        <div className="absolute inset-0 animate-[sealLean_2.4s_cubic-bezier(.4,0,.2,1)_both]">
+          {/* shown like the motion it continues (whole picture, blurred copy behind) so nothing jumps */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ENVELOPE} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <img src={ENVELOPE} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" aria-hidden />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ENVELOPE} alt="" className="absolute inset-0 h-full w-full object-contain" />
           <div className="absolute left-[51.5%] top-1/2 h-0 w-0">
             <span className="absolute -left-[70px] -top-[70px] h-[140px] w-[140px] animate-[sealSpin_1.7s_ease-in_both] rounded-full" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(255,226,150,0.85), transparent 30%, rgba(255,226,150,0.6), transparent 60%, rgba(255,240,200,0.9), transparent 85%)', mixBlendMode: 'screen', filter: 'blur(2px)' }} />
             {[0, 1, 2].map((k) => (
@@ -67,33 +71,43 @@ export function Invitation({ inviter, message, onOpened, settled }: { inviter: s
   );
 }
 
-/** The card's words, laid over the blank card in the places the client's design has them. */
+/** The card's words, set over the blank card exactly where the client's design has them (% of the card). */
 function CardWords({ inviter, message, settled }: { inviter: string; message?: string; settled?: boolean }) {
-  const line = (k: number) => (settled ? undefined : { animation: `inkIn 0.9s ${0.55 + k * 0.16}s ease-out both` });
+  const at = (top: number, k: number, x = 50) => ({
+    top: `${top}%`,
+    left: `${x}%`,
+    transform: 'translateX(-50%)',
+    ...(settled ? {} : { animation: `inkIn 0.9s ${0.55 + k * 0.16}s ease-out both` }),
+  });
+  const ink = 'absolute whitespace-nowrap text-center text-[#3a2914]';
   return (
-    <div className="absolute inset-x-[17%] top-[19.5%] bottom-[12%] flex flex-col items-center text-center text-[#3a2914]" style={{ fontFamily: SERIF }}>
-      <p className="text-[9px] tracking-[0.35em] text-[#8a6a33]" style={line(0)}>
+    <div className="absolute inset-0" style={{ fontFamily: SERIF, containerType: 'inline-size' }}>
+      <p className={`${ink} text-[2.3cqw] tracking-[0.32em] text-[#6e5328]`} style={at(27.6, 0)}>
         ― INVITATION ―
       </p>
-      <p className="mt-[2.5%] text-[min(7.6vw,30px)] font-semibold tracking-[0.18em]" style={line(1)}>
+      <p className={`${ink} text-[8.2cqw] font-semibold leading-none tracking-[0.16em]`} style={at(31.6, 1)}>
         本部招待状
       </p>
-      <div className="mt-[5%] space-y-[3%] text-[min(3.1vw,12.5px)] leading-[1.9] tracking-[0.06em]" style={line(2)}>
-        <p>あなたは、この扉を開くための<br />招待を受けています。</p>
-        <p>この先にあるのは、<br />Obolo Order 本部。</p>
-      </div>
-      <span className="my-[5%] h-px w-3/4 bg-gradient-to-r from-transparent via-[#b48a45] to-transparent" style={line(3)} />
-      <div className="flex items-baseline gap-3" style={line(4)}>
-        <span className="text-[min(2.7vw,11px)] tracking-[0.2em] text-[#7a5c2c]">招待者</span>
-        <span className="text-[min(5.6vw,22px)] font-semibold tracking-[0.12em]">{inviter}</span>
+      <p className={`${ink} text-[3.4cqw] leading-[1.95] tracking-[0.05em]`} style={at(39.4, 2)}>
+        あなたは、この扉を開くための
+        <br />
+        招待を受けています。
+      </p>
+      <p className={`${ink} text-[3.4cqw] leading-[1.95] tracking-[0.05em]`} style={at(49.2, 3)}>
+        この先にあるのは、
+        <br />
+        Obolo Order 本部。
+      </p>
+      <div className={`${ink} flex items-baseline gap-[3cqw]`} style={at(61.2, 4, 47)}>
+        <span className="text-[2.9cqw] tracking-[0.2em] text-[#6e5328]">招待者</span>
+        <span className="text-[6.4cqw] font-semibold tracking-[0.1em]">{inviter}</span>
       </div>
       {message && (
-        <p className="mt-[3.5%] max-w-full px-1 text-[min(3.6vw,14.5px)] italic leading-[1.7] tracking-[0.04em] text-[#5a3d17] [word-break:keep-all]" style={line(5)}>
+        <p className={`${ink} max-w-[66cqw] whitespace-normal text-[3.5cqw] italic leading-[1.6] text-[#5a3d17] [word-break:keep-all]`} style={{ ...at(66.6, 5), width: 'max-content' }}>
           「{message}」
         </p>
       )}
-      <span className="my-[5%] h-px w-3/4 bg-gradient-to-r from-transparent via-[#b48a45] to-transparent" style={line(6)} />
-      <p className="text-[min(4.8vw,19px)] font-semibold leading-[1.6] tracking-[0.14em]" style={line(7)}>
+      <p className={`${ink} text-[6.2cqw] font-semibold leading-[1.45] tracking-[0.14em]`} style={at(77.2, 6, 44.5)}>
         本部への来訪を
         <br />
         歓迎します。

@@ -612,7 +612,7 @@ body {
 }
 
 /* Day 1's invitation (components/story/Invitation.tsx) */
-@keyframes sealLean { from { transform: scale(1); } to { transform: scale(1.12) translateY(-2%); } }
+@keyframes sealLean { from { transform: scale(1); } to { transform: scale(1.08); } }
 @keyframes sealSpin { from { transform: rotate(0deg) scale(0.4); opacity: 0; } 30% { opacity: 1; } to { transform: rotate(540deg) scale(1.25); opacity: 1; } }
 @keyframes sealRing { from { transform: scale(0.5); opacity: 0.9; } to { transform: scale(3.4); opacity: 0; } }
 @keyframes sealGlow { from { transform: scale(0.3); opacity: 0; } to { transform: scale(2.6); opacity: 1; } }

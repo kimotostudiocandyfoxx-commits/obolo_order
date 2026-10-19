@@ -131,7 +131,8 @@ function TheirLine({
   reveal: React.MutableRefObject<ChatReveal> | null;
   live: boolean;
 }) {
-  const chars = [...entry.text];
+  // the society's name never breaks across lines
+  const chars = [...entry.text.replace(/Obolo Order/g, 'Obolo\u00a0Order')];
   // a moment of "…" before the words (shorter for short lines), then they type in
   const [phase, setPhase] = useState<'dots' | 'typing' | 'done'>(fresh ? 'dots' : 'done');
   const [n, setN] = useState(fresh ? 0 : chars.length);
