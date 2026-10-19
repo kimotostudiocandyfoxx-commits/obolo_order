@@ -306,6 +306,45 @@
         1280
       ],
       "prompt": "Inside the Sun: a vast warm world of soft white and golden light with no up or down, no ground, only a rippling mirror-like surface of light far below like water, gentle haze, and far away in the upper middle a huge slowly turning orb of brilliant golden-white light with faint concentric rings. Calm, sacred, dreamlike, luminous yet with deep golden shadows at the edges so text and characters drawn on top remain readable. Empty space in the lower half for characters. No people, no buildings."
+    },
+    {
+      "id": "d1-envelope",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "refs": [
+        "design/story/refs/client/envelope.webp"
+      ],
+      "prompt": "A beige paper envelope floating in pitch-black outer space, sealed with a gold compass-rose seal and a golden tassel, golden rings of light and fine gold light particles around it, a bright golden star above it, its reflection on a dark glossy floor below. Reproduce the reference picture as faithfully as possible — same composition, same objects, same colours, same lighting, same ornament — but with absolutely no text, letters, kana, kanji or writing anywhere (the empty places where words were become clean background)."
+    },
+    {
+      "id": "d1-invitation",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "refs": [
+        "design/story/refs/client/invitation.webp"
+      ],
+      "prompt": "An ornate parchment invitation card standing upright in black starry space with golden light rays: cream parchment, cut corners, thin gold border lines, a gold compass-rose emblem at the top centre, thin gold divider lines, a gold wax seal with a golden tassel at the bottom right. The card's face is completely BLANK parchment — no title, no words, no names, no signature. Reproduce the reference picture as faithfully as possible — same composition, same objects, same colours, same lighting, same ornament — but with absolutely no text, letters, kana, kanji or writing anywhere (the empty places where words were become clean background)."
+    },
+    {
+      "id": "d1-gate",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "refs": [
+        "design/story/refs/client/headquarters-gate.webp"
+      ],
+      "prompt": "A black-and-gold city of tall spires under a sunset sky with golden glowing clouds; in the centre a huge gate, above it a ring holding an armillary sphere, beyond the gate a domed temple glowing gold; a polished black stone floor with gold lines and a compass emblem leading to the gate; banners on both sides. The sky at the top is clear of any words. Reproduce the reference picture as faithfully as possible — same composition, same objects, same colours, same lighting, same ornament — but with absolutely no text, letters, kana, kanji or writing anywhere (the empty places where words were become clean background)."
     }
   ],
   "redo": []
