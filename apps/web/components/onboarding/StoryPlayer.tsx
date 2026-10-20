@@ -671,7 +671,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
-      {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} onOpened={() => run(iRef.current + 1)} />}
+      {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
       {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
         // a soft shade under the thread so it reads on any picture
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[10] h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />

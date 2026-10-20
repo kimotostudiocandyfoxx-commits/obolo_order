@@ -621,3 +621,10 @@ body {
 @keyframes inkIn { from { opacity: 0; filter: blur(3px); transform: translateY(3px); } to { opacity: 1; filter: none; transform: none; } }
 @keyframes cardOut { from { transform: translateY(20%) scale(0.52); opacity: 0; filter: brightness(2) blur(6px); } 35% { opacity: 1; } to { transform: none; opacity: 1; filter: none; } }
 @keyframes wordsOff { 0% { opacity: 1; filter: none; text-shadow: none; } 40% { opacity: 1; color: #fff3cf; text-shadow: 0 0 10px rgba(255, 220, 140, 0.95); } 100% { opacity: 0; transform: translate(-50%, -14px); filter: blur(4px); color: #fff3cf; text-shadow: 0 0 18px rgba(255, 220, 140, 0.9); } }
+/* the invitation's words seep out of the paper like ink, glowing gold first (client 2026-10-20: 神秘的な魔法のように、にじみ出る) */
+@keyframes inkBleed {
+  0% { opacity: 0; filter: blur(9px); color: #f8dfa0; text-shadow: 0 0 22px rgba(255, 214, 140, 0.95); -webkit-mask-size: 0% 0%; mask-size: 0% 0%; }
+  35% { opacity: 0.9; filter: blur(3px); color: #e2b766; text-shadow: 0 0 16px rgba(255, 214, 140, 0.85); }
+  70% { opacity: 1; filter: blur(0.6px); color: #9a7034; text-shadow: 0 0 8px rgba(255, 214, 140, 0.45); }
+  100% { opacity: 1; filter: none; text-shadow: 0 0 0 rgba(255, 214, 140, 0); -webkit-mask-size: 340% 340%; mask-size: 340% 340%; }
+}
