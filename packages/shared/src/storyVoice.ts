@@ -68,11 +68,17 @@ export function storyVoiceFilter(s: StoryVoiceSpec, tempo: number): string {
       'areverse,atrim=start=0.25,asetpts=N/SR/TB',
       'silenceremove=start_periods=1:start_duration=0:start_threshold=-50dB:start_silence=0.12,areverse',
     ].join(',');
-  if (s.growl) {
+  // a small shift (OBOLON's 0.7): resample it — rubberband left little clicks that the echo then repeated
+  // (2026-10-20: 「カチカチ」 under OBOLON); a resample changes the voice's size a hair, inaudible this close
+  const small = !!s.pitch && Math.abs(s.pitch) <= 1.5 && !s.growl && s.formant !== 'shifted';
+  if (small) {
+    const r = Math.pow(2, s.pitch! / 12);
+    f.push(`aresample=48000,asetrate=${(48000 * r).toFixed(2)},aresample=48000,atempo=${(1 / r).toFixed(5)}`);
+  } else if (s.growl) {
     // a monster: formants pulled down with the pitch, grit, weight in the low end
     f.push(rb(s.pitch ?? -6, 'shifted'));
     f.push(`bass=g=${(6 * s.growl).toFixed(1)}:f=120`, `asoftclip=type=tanh:threshold=${(1 - 0.5 * s.growl).toFixed(2)}`, 'lowpass=f=7000');
-  } else if (s.pitch) f.push(rb(s.pitch, s.formant ?? 'preserved'));
+  } else if (s.pitch && !small) f.push(rb(s.pitch, s.formant ?? 'preserved'));
   if (s.echo) {
     const d = (0.25 + 0.35 * s.echo).toFixed(2);
     f.push(`aecho=0.85:0.75:170|340:${d}|${(+d / 2).toFixed(2)}`);
@@ -82,8 +88,17 @@ export function storyVoiceFilter(s: StoryVoiceSpec, tempo: number): string {
   return f.join(',');
 }
 
+/**
+ * The words as the voice should read them: roman words it gets wrong are given in kana (「obolo」 was read
+ * as 「おぼろん」 — client 2026-10-20). Only what is spoken changes; the line on screen stays as written.
+ */
+export const STORY_READINGS: [RegExp, string][] = [[/(?<![A-Za-z])obolo(?![A-Za-z])/g, 'オボロ']];
+export function speakText(text: string): string {
+  return STORY_READINGS.reduce((t, [re, kana]) => t.replace(re, kana), text.replace(/\n/g, ' '));
+}
+
 /** What the Gemini voice is told before the line. */
 export function storyVoicePrompt(brief: string, act: string | undefined, text: string): string {
   const how = act ? ` This time it is said ${act} (stage direction, in Japanese: 「${act}」).` : '';
-  return `You are voicing a character in a Japanese anime adventure for children. ${brief}.${how} Speak only the Japanese line below, in character, naturally — do not read these instructions.\n\n${text.replace(/\n/g, ' ')}`;
+  return `You are voicing a character in a Japanese anime adventure for children. ${brief}.${how} Speak only the Japanese line below, in character, naturally — do not read these instructions.\n\n${speakText(text)}`;
 }

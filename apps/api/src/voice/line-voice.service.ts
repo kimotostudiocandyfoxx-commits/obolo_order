@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
-import { fillNames, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
+import { fillNames, speakText, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
@@ -149,7 +149,7 @@ export class LineVoiceService implements OnModuleInit {
 
   private async fish(p: JobPayloads['voice.line'], filter: string): Promise<Buffer> {
     if (!this.cfg.FISH_API_KEY) throw new Error('FISH_API_KEY is not set');
-    const raw = await textToSpeech(this.cfg.FISH_API_KEY, this.cfg.FISH_MODEL, { text: p.text.replace(/\n/g, ' '), referenceId: p.spec.model! });
+    const raw = await textToSpeech(this.cfg.FISH_API_KEY, this.cfg.FISH_MODEL, { text: speakText(p.text), referenceId: p.spec.model! });
     return finish(raw, [], filter);
   }
 

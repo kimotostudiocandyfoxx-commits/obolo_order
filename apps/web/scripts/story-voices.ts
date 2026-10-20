@@ -22,7 +22,7 @@ import { walk, type Scene } from '../lib/story/parse';
 import { idOf } from '../lib/story/sheets';
 import { nameRest, voiceKey, voiceable } from '../lib/story/voice';
 // by path: this runs without an install (the workflow), and the file has no imports of its own
-import { storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
+import { speakText, storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
 
 const ROOT = resolve(__dirname, '../../..');
 const PUB = join(ROOT, 'apps/web/public');
@@ -183,7 +183,7 @@ async function fishSpeak(s: Spec, text: string, out: string) {
     const res = await fetch('https://api.fish.audio/v1/tts', {
       method: 'POST',
       headers: { authorization: `Bearer ${FISH}`, 'content-type': 'application/json', model: process.env.FISH_MODEL ?? 's2.1-pro' },
-      body: JSON.stringify({ text: text.replace(/\n/g, ' '), reference_id: s.model, format: 'mp3', mp3_bitrate: 128, latency: 'normal', normalize: true }),
+      body: JSON.stringify({ text: speakText(text), reference_id: s.model, format: 'mp3', mp3_bitrate: 128, latency: 'normal', normalize: true }),
       signal: AbortSignal.timeout(180_000),
     });
     if (!res.ok) {

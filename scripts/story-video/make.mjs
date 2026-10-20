@@ -28,6 +28,7 @@ const API = 'https://api.runware.ai/v1';
 const mime = (p) => (/\.png$/i.test(p) ? 'image/png' : /\.webp$/i.test(p) ? 'image/webp' : 'image/jpeg');
 const dataUri = (p) => `data:${mime(p)};base64,${readFileSync(p).toString('base64')}`;
 const redo = new Set(queue.redo ?? []);
+const log = [];
 const todo = (queue.items ?? []).filter((x) => redo.has(x.id) || !existsSync(join(OUT, `m${x.id}.mp4`)));
 
 async function call(tasks) {
@@ -43,6 +44,19 @@ async function call(tasks) {
 }
 
 async function make(x) {
+  try {
+    return await makeOnce(x, !!x.audio);
+  } catch (e) {
+    // the sound option is the least certain part of the request: without it, try once more
+    if (x.audio && /audio|providerSettings|unsupported|invalid/i.test(String(e))) {
+      log.push(`- ⚠️ m${x.id}: 音つきが通らず、音なしで作り直し（${String(e).slice(0, 160)}）`);
+      return makeOnce(x, false);
+    }
+    throw e;
+  }
+}
+
+async function makeOnce(x, audio) {
   const taskUUID = randomUUID();
   const [w, h] = x.resolution === '480p' ? [480, 864] : [720, 1280];
   const frameImages = [
@@ -64,7 +78,7 @@ async function make(x) {
       includeCost: true,
       ...(frameImages.length ? { frameImages } : {}),
       ...(refs.length ? { referenceImages: refs.map(dataUri) } : {}),
-      ...(x.audio ? { providerSettings: { bytedance: { audio: true } } } : {}),
+      ...(audio ? { providerSettings: { bytedance: { audio: true } } } : {}),
     },
   ]);
   // the motion is made in the background: ask for it until it is there (up to ~12 minutes)
@@ -92,7 +106,6 @@ function squeeze(src, out, upscale) {
   }
 }
 
-const log = [];
 let usd = 0;
 for (const x of todo) {
   try {

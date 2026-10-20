@@ -3,5 +3,53 @@
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
   "redo": [],
-  "items": []
+  "items": [
+    {
+      "id": "d1-open",
+      "duration": 5,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d1-envelope-still.jpg",
+      "last": "apps/web/public/onboarding/s/d1-invitation-card.jpg",
+      "prompt": "The gold compass-rose seal on the floating envelope glows brighter and slowly turns; golden light seeps out along the envelope's edges; the flap lifts open and a parchment invitation card slides up out of the envelope, rising and growing until it stands upright filling the frame, surrounded by golden sparkles in black starry space. The card is completely blank, no writing. Camera slowly pushes in. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d1-fold",
+      "duration": 5,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d1-invitation-card.jpg",
+      "last": "design/story/frames/m5-crane-start.jpg",
+      "prompt": "By magic, the blank parchment invitation card lifts off and folds itself crease by crease — corners tucking in, wings forming — into a white-and-gold origami crane, which spreads its wings among drifting gold sparkles in black starry space, glowing softly at its folds. Smooth, graceful, continuous origami motion. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d1-arrive",
+      "duration": 5,
+      "audio": true,
+      "first": "design/story/frames/m5-crane-clouds.jpg",
+      "last": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "prompt": "The white origami crane glides on through glowing golden clouds, then dives down toward a black-and-gold city of tall spires under a sunset sky, flies along the polished stone avenue and vanishes into the light of the great gate; the camera follows and settles, looking straight at the gate. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d1-gate-loop",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "last": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "prompt": "Almost still shot of the same picture: the golden clouds drift very slowly across the sunset sky, lights twinkle along the spires and the floor, a few gold motes float upward. Locked-off camera, no cuts, seamless loop."
+    },
+    {
+      "id": "d1-monban",
+      "duration": 6,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "last": "apps/web/public/onboarding/m9-l.jpg",
+      "prompt": "The giant doors of the gate swing shut with a heavy rumble and the light inside goes out; the camera moves in to the closed dark doors; black smoke wells up from the floor in front of them, and out of the smoke rises a tall hooded figure in a long black robe with fine gold patterns, a single golden eye glowing under the hood, a large golden magic-circle halo lighting up behind his head. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d1-turn",
+      "duration": 5,
+      "audio": true,
+      "first": "apps/web/public/onboarding/m28-l.jpg",
+      "last": "apps/web/public/onboarding/m28-l.jpg",
+      "prompt": "The hooded gatekeeper in the black-and-gold robe, golden halo behind his head, slowly turns his head and shoulders to look back over his shoulder at someone behind him, holds the look for a moment, then turns back to face forward. Slow, heavy, deliberate movement; locked-off camera; the robe sways slightly. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    }
+  ]
 }
