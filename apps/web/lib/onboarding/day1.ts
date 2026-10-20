@@ -20,20 +20,26 @@ export const DAY1: Step[] = [
   { t: 'video', motion: '1-c' }, // 光の粒がらせんを描いて集まり、封筒になる
   { t: 'caption', text: '招待信号を受信しました' },
   { t: 'action', label: '封を開く' },
-  { t: 'video', motion: '3-z' }, // 封印が光って回り、封筒が開く
-  { t: 'se', sound: 'chime' }, // 招待状が光の中から現れる音
-  { t: 'invitation' }, // 光の中から招待状が出てくる（招待者と「{inviter_message}」はカードの中）
+  // Seedance clips (2026-10-20): each starts and ends on the pictures around it
+  { t: 'se', sound: 'magic' },
+  { t: 'video', motion: 'd1-open' }, // 封印が光って回り、封筒が開いて、白紙の招待状が出てくる
+  { t: 'se', sound: 'chime' }, // 文字がにじみ出る
+  { t: 'invitation', fromMotion: true }, // 招待状の文字（招待者と「{inviter_message}」もカードの中）
   { t: 'action', label: '本部へ向かう' },
 
   // D01-S003 本部とMONBAN
   { t: 'se', sound: 'magic' }, // 文字が光って浮かび、消える
-  { t: 'video', motion: '5-c' }, // 文字が光って消え、招待状が折り鶴になって本部へ飛ぶ
-  { t: 'loop', motion: '6-c' },
+  { t: 'video', motion: 'd1-fold' }, // 白紙になった招待状が、折り鶴に折りたたまれる
+  { t: 'video', motion: '5-f' }, // 鶴が星空を飛ぶ
+  { t: 'se', sound: 'whoosh' },
+  { t: 'video', motion: 'd1-arrive' }, // 金の雲を抜けて都へ降り、門の光に飛びこむ
+  { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
-  { t: 'video', motion: '7-c' }, // 門が閉まり、門の前に黒い煙が湧いて、MONBANが現れる
+  { t: 'se', sound: 'thud' },
+  { t: 'video', motion: 'd1-monban' }, // 門が閉まり、門の前に黒い煙が湧いて、MONBANが現れる
   { t: 'loop', motion: '9-l' },
   { t: 'cam', move: 'shake' },
   { t: 'caption', text: 'MONBANが現れた' },
@@ -85,9 +91,10 @@ export const DAY1: Step[] = [
   { t: 'bgm', track: 'monban' },
   { t: 'black' },
   { t: 'say', who: 'MONBAN', text: 'おい待て、そこまでだ。' },
-  { t: 'say', who: 'MONBAN', text: 'OBOLON、それは喋りすぎだ。' },
-  { t: 'video', motion: 27 }, // 光が戻る。金の光の輪を背負ったMONBANが、OBOLONの前に立っている
+  { t: 'video', motion: '27-c' }, // 光が戻る。金の光の輪を背負ったMONBANが、OBOLONの前に立っている
+  { t: 'video', motion: 'd1-turn' }, // MONBANが振り返る（client 2026-10-20）
   { t: 'loop', motion: '28-l' },
+  { t: 'say', who: 'MONBAN', text: 'OBOLON、それは喋りすぎだ。' },
 
   // D01-S012 宇宙へ行ってみるか？
   { t: 'cam', move: 'in', focus: '50% 30%' },

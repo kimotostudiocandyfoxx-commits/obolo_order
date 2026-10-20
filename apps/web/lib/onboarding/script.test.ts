@@ -21,16 +21,16 @@ describe('day 1 script', () => {
     expect(fill('{name}へ by {inviter}', { name: 'ユウ', inviter: 'KIMORIN' })).toBe('ユウへ by KIMORIN');
   });
   it('restores the right background when resuming', () => {
-    // the invitation card is set in code over the envelope that opened (motion 3, its painted words cropped out)
+    // the invitation's words are set in code over the blank card the Seedance motion ends on
     const i = DAY1.findIndex((s) => s.t === 'action' && s.label === '本部へ向かう');
-    expect(DAY1[i - 1]).toEqual({ t: 'invitation' });
-    expect(mediaAt(DAY1, i)).toEqual({ motion: '3-z', loop: false });
+    expect(DAY1[i - 1]).toEqual({ t: 'invitation', fromMotion: true });
+    expect(mediaAt(DAY1, i)).toEqual({ motion: 'd1-open', loop: false });
   });
   it('every BGM track has a file and the music is set from the first step', () => {
     const fs = require('node:fs') as typeof import('node:fs');
     for (const s of DAY1) if (s.t === 'bgm' && s.track) expect(fs.existsSync(`public/onboarding/bgm-${s.track}.m4a`)).toBe(true);
     expect(bgmAt(DAY1, 1)).toBe('opening');
-    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === '7-c'))).toBe('monban');
+    expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'video' && s.motion === 'd1-monban'))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'name'))).toBe('obolon');
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。'))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');
@@ -42,10 +42,12 @@ describe('day 1 script', () => {
     // resuming during those lines shows 19's last frame
     expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
   });
-  it('MONBAN steps in on a black screen before motion 27', () => {
+  it('MONBAN steps in on a black screen, turns round, then speaks to OBOLON (client 2026-10-20)', () => {
     const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。');
     expect(DAY1[i - 1]).toEqual({ t: 'black' });
-    expect(DAY1[i + 2]).toEqual({ t: 'video', motion: 27 });
+    expect(DAY1[i + 1]).toEqual({ t: 'video', motion: '27-c' });
+    expect(DAY1[i + 2]).toEqual({ t: 'video', motion: 'd1-turn' });
+    expect(DAY1[i + 4]).toMatchObject({ t: 'say', text: 'OBOLON、それは喋りすぎだ。' });
     expect(mediaAt(DAY1, i)).toBeNull();
   });
   it('loops motion 13 behind OBOLON', () => {

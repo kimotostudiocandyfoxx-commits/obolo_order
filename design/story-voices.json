@@ -215,7 +215,9 @@
     "P03",
     "P04"
   ],
-  "redoLines": [],
+  "redoLines": [
+    "、、、Obolo Orderは、完全招待制だ。"
+  ],
   "tempo": 1.3,
   "special": [
     {
