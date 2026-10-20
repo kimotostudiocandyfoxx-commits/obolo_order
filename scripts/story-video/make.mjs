@@ -39,7 +39,7 @@ async function call(tasks) {
     signal: AbortSignal.timeout(120_000),
   });
   const j = await res.json().catch(() => ({}));
-  if (!res.ok || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 400)}`);
+  if (!res.ok || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 1500)}`);
   return j.data ?? [];
 }
 
@@ -58,26 +58,24 @@ async function make(x) {
 
 async function makeOnce(x, audio) {
   const taskUUID = randomUUID();
-  const [w, h] = x.resolution === '480p' ? [480, 864] : [720, 1280];
+  const w = x.resolution === '480p' ? 480 : 720;
   const frameImages = [
     ...(x.first ? [{ inputImage: dataUri(x.first), frame: 'first' }] : []),
     ...(x.last ? [{ inputImage: dataUri(x.last), frame: 'last' }] : []),
   ];
-  const refs = (x.refs ?? []).filter(existsSync);
-  await call([
+    await call([
     {
       taskType: 'videoInference',
       taskUUID,
       model: MODEL,
       positivePrompt: `${x.prompt} ${queue.always ?? ''}`.trim().slice(0, 3000),
       duration: x.duration ?? 5,
-      width: w,
-      height: h,
       outputFormat: 'MP4',
       deliveryMethod: 'async',
       includeCost: true,
       ...(frameImages.length ? { frameImages } : {}),
-      ...(refs.length ? { referenceImages: refs.map(dataUri) } : {}),
+      // the shape and size come from the first frame (Seedance 2.5 takes no width / height); character
+      // references are not taken this way either — the first / last frames carry the look
       ...(audio ? { providerSettings: { bytedance: { audio: true } } } : {}),
     },
   ]);
@@ -112,7 +110,7 @@ for (const x of todo) {
     usd += await make(x);
     log.push(`- ✅ m${x.id}（${x.duration ?? 5}秒・${x.resolution ?? '720p'}）`);
   } catch (e) {
-    log.push(`- ❌ m${x.id}: ${String(e).slice(0, 400)}`);
+    log.push(`- ❌ m${x.id}: ${String(e).slice(0, 1500)}`);
   }
 }
 if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
