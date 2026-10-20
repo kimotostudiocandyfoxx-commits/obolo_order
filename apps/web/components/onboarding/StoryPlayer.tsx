@@ -100,7 +100,7 @@ interface Props {
   textOnly?: boolean;
 }
 
-const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 // --- the story as a chat (client decision 2026-10-19) ---
 /** a line of the scene's thread, as written (names are filled in when shown) */
@@ -182,8 +182,25 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (e) setLog((l) => (l[l.length - 1]?.id === e.id ? l : [...l, e]));
   }, []);
   const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
-  /** Day 1's invitation card is on screen */
-  const [invite, setInvite] = useState(false);
+  /** Day 1's invitation card is on screen (leaving: its words lift away as the next motion starts under it) */
+  const [invite, setInviteState] = useState(false);
+  const [inviteLeaving, setInviteLeaving] = useState(false);
+  const inviteOn = useRef(false);
+  const setInvite = useCallback((on: boolean) => {
+    inviteOn.current = on;
+    setInviteState(on);
+    if (on) setInviteLeaving(false);
+  }, []);
+  const leaveInvite = useCallback(() => {
+    if (!inviteOn.current) return;
+    inviteOn.current = false;
+    setInviteLeaving(true);
+    setTimeout(() => {
+      if (inviteOn.current) return;
+      setInviteState(false);
+      setInviteLeaving(false);
+    }, 1500);
+  }, []);
   const clearCaptions = useCallback(() => {
     captionTimers.current.forEach(clearTimeout);
     captionTimers.current = [];
@@ -285,7 +302,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         if (s.t === 'label') n++;
         else if (s.t === 'caption' && s.when && !varsRef.current[s.when]) n++;
         else if (s.t === 'bgm') {
-          bgm.current?.set(s.track);
+          if (s.track === null && s.fade) bgm.current?.fadeOut(s.fade);
+          else bgm.current?.set(s.track);
           n++;
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
@@ -395,7 +413,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setSprite(null);
           setCam(null);
           setLog([]);
-          setInvite(false);
+          leaveInvite();
           clearCaptions();
           pendingCaptions.current = s.captions ?? [];
           playMedia(s.motion, false);
@@ -412,7 +430,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
       }
     },
-    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine],
+    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine, setInvite, leaveInvite],
   );
   runRef.current = run;
 
@@ -489,6 +507,16 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   useNameVoices(voice.current, steps, { name: v.name, neo: v.neo, bati: answers.batiName ?? vars.bati, food: v.batiFood, inviter: v.inviter });
   // each spoken line plays its voice (when it has one)
   const sayNow = started && steps[i]?.t === 'say' ? (steps[i] as Extract<Step, { t: 'say' }>) : null;
+  // the next line's voice is fetched while this one is read, so it starts the moment it shows
+  useEffect(() => {
+    for (let k = i + 1; k < Math.min(steps.length, i + 8); k++) {
+      const s = steps[k];
+      if (s.t === 'say') {
+        void voice.current?.prefetch(s.who, s.text);
+        break;
+      }
+    }
+  }, [i, steps]);
   useEffect(() => {
     if (sayNow) void voice.current?.say(sayNow.who, sayNow.text);
     else voice.current?.stop();
@@ -643,7 +671,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
-      {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} onOpened={() => run(iRef.current + 1)} />}
+      {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} onOpened={() => run(iRef.current + 1)} />}
       {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
         // a soft shade under the thread so it reads on any picture
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[10] h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />

@@ -29,3 +29,12 @@ export function formOf(act: string | undefined): number | null {
   const j = '一二三四五六七八九'.indexOf(c);
   return d >= 0 ? d + 1 : j >= 0 ? j + 1 : Number(c);
 }
+
+/**
+ * A line that starts with a member's name and a pause (「{name}、\nお前は…」): the words after the name, so they
+ * can be voiced ahead of time and spoken while the member's own voice of the whole line is not made yet.
+ */
+export function nameRest(text: string): string | null {
+  const r = text.replace(/^\{[a-z_]+\}(?:[、,，]\s*\n?|\n)/, '');
+  return r !== text && voiceable(r) ? r : null;
+}

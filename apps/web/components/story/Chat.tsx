@@ -27,8 +27,9 @@ export interface Avatar {
   dark?: boolean;
 }
 
-const SANS = '"Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif';
-const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+/** every word of the story in Mincho (client 2026-10-20) */
+const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+const SANS = SERIF;
 
 /** The live state of the newest line (typing / revealed), so a tap can finish it first. */
 export interface ChatReveal {
@@ -52,7 +53,7 @@ export function ChatLog({
   /** the newest line is the one being read now (shows the tap mark when it is done) */
   live: boolean;
 }) {
-  const shown = entries.slice(-7);
+  const shown = entries.slice(-5);
   const last = shown[shown.length - 1];
   return (
     <div

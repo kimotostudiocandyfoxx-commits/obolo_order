@@ -16,21 +16,25 @@ export const DAY1: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'motes', count: 36 }, // 金色の光の粒（演出）
   { t: 'caption', text: '1日目' },
-  // D01-S001 招待状 (production 2026-10-19: no words painted in the pictures — they are set in code)
+  // D01-S001 招待状 (production 2026-10-19/20: the client's motions with their painted words taken out; words set in code)
   { t: 'video', motion: '1-c' }, // 光の粒がらせんを描いて集まり、封筒になる
   { t: 'caption', text: '招待信号を受信しました' },
   { t: 'action', label: '封を開く' },
-  { t: 'invitation' }, // 封印が光って回り、封筒が開く → 招待状（招待者と「{inviter_message}」はカードの中）
+  { t: 'video', motion: '3-z' }, // 封印が光って回り、封筒が開く
+  { t: 'se', sound: 'chime' }, // 招待状が光の中から現れる音
+  { t: 'invitation' }, // 光の中から招待状が出てくる（招待者と「{inviter_message}」はカードの中）
   { t: 'action', label: '本部へ向かう' },
 
   // D01-S003 本部とMONBAN
-  { t: 'video', motion: '5-c' }, // 招待状が折り鶴になって、本部へ飛ぶ
-  { t: 'arrive', image: 's/d1-gate', caption: '本部に到着しました' },
+  { t: 'se', sound: 'magic' }, // 文字が光って浮かび、消える
+  { t: 'video', motion: '5-c' }, // 文字が光って消え、招待状が折り鶴になって本部へ飛ぶ
+  { t: 'loop', motion: '6-c' },
+  { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
-  { t: 'video', motion: '7-c' }, // 門の前に黒い煙が湧き、MONBANが現れる
-  { t: 'loop', motion: 9 },
+  { t: 'video', motion: '7-c' }, // 門が閉まり、門の前に黒い煙が湧いて、MONBANが現れる
+  { t: 'loop', motion: '9-l' },
   { t: 'cam', move: 'shake' },
   { t: 'caption', text: 'MONBANが現れた' },
   { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
@@ -41,12 +45,15 @@ export const DAY1: Step[] = [
   { t: 'video', motion: 10 }, // 招待状が、MONBANの両手の上に光りながら浮かぶ
   { t: 'cam', move: 'in', focus: '50% 30%' },
   { t: 'say', who: 'MONBAN', text: 'なるほど…。\n{inviter}から…招待されたのか…。' },
+  { t: 'cam', move: 'out' },
+  { t: 'bgvideo', motion: 11 }, // 門が開く — その間に「門をくぐり…」（client 2026-10-20）
   { t: 'say', who: 'MONBAN', text: '門をくぐり、地球の神殿に行け…。' },
-  { t: 'video', motion: 11 }, // 門が開く
   { t: 'action', label: '門をくぐり、地球の神殿に向かう' },
 
   // D01-S006 OBOLON
-  { t: 'video', motion: 12 },
+  // MONBAN's theme fades slowly while we walk in, gone before OBOLON's light falls (client 2026-10-20)
+  { t: 'bgm', track: null, fade: 6 },
+  { t: 'video', motion: 12, captions: [{ text: '地球の神殿に着いた', from: 2.2, to: 6.2 }] }, // 門をくぐり、神殿の中へ → 光の柱
   { t: 'bgm', track: 'obolon' },
   { t: 'loop', motion: 13 },
   { t: 'caption', text: 'OBOLONが現れた' },
@@ -60,12 +67,12 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'そうか。' },
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、' },
   { t: 'say', who: 'OBOLON', text: '、、、もう宇宙にいる。' },
-  { t: 'video', motion: 14 }, // 天井が夜空になる
-  { t: 'loop', motion: 15 },
+  // the universe plays behind the words: OBOLON talks as the Earth comes up, and on through the
+  // galaxy (a tap goes on while the motions keep playing — client 2026-10-20)
+  { t: 'bgvideo', motion: 14, then: [15] }, // 天井が夜空になり、地球が浮かぶ
   { t: 'say', who: 'OBOLON', text: 'この星、地球は\n宇宙の中にある。' },
-  { t: 'video', motion: 16 },
+  { t: 'bgvideo', motion: 16 }, // 宇宙へ引いていく
   { t: 'say', who: 'OBOLON', text: '地球も、俺も、お前も。\n想像しうる全てが\n宇宙、そこで生まれる。' },
-  // the lines below are read WHILE motion 17 plays; 19 follows right after (client, 2026-10-04)
   { t: 'bgvideo', motion: 17, then: [19] },
   { t: 'say', who: 'OBOLON', text: '何かの偶然、何かの欲望、何かの閃き、\nいつだって、何かによって、何かが生まれる。' },
   { t: 'say', who: 'OBOLON', text: '“Obolo Order”\nそれは、新しい何かを、生み出す者達' },
@@ -80,11 +87,13 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'MONBAN', text: 'おい待て、そこまでだ。' },
   { t: 'say', who: 'MONBAN', text: 'OBOLON、それは喋りすぎだ。' },
   { t: 'video', motion: 27 }, // 光が戻る。金の光の輪を背負ったMONBANが、OBOLONの前に立っている
-  { t: 'loop', motion: 28 },
+  { t: 'loop', motion: '28-l' },
 
   // D01-S012 宇宙へ行ってみるか？
   { t: 'cam', move: 'in', focus: '50% 30%' },
-  { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待されてここに来た。' },
+  // the client's lines (2026-10-20)
+  { t: 'say', who: 'MONBAN', text: 'それより先はObolo Orderしか知ることができない。' },
+  { t: 'say', who: 'MONBAN', text: 'ただ、お前はObolo Orderに招待されてここに来た。' },
   { t: 'say', who: 'MONBAN', text: 'だから知る権利がある。' },
   { t: 'say', who: 'MONBAN', text: 'もし宇宙やこの秘密結社に興味があるなら、' },
   { t: 'say', who: 'MONBAN', text: '明日、お前に宇宙行きの切符を送るが' },

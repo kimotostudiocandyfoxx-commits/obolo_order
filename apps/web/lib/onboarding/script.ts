@@ -46,7 +46,7 @@ export type Step =
    */
   | { t: 'video'; motion: MotionId; captions?: TimedCaption[] }
   /** Switch background music (crossfade). null = fade out. Continues immediately. */
-  | { t: 'bgm'; track: string | null }
+  | { t: 'bgm'; track: string | null; /** null + fade: a slow fade-out over this many seconds */ fade?: number }
   /**
    * Play a motion once IN THE BACKGROUND and continue immediately, so the dialogue can be read while
    * it plays. `then` motions follow automatically when it ends; the last one holds its final frame.

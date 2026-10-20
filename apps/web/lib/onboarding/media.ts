@@ -18,7 +18,9 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   // motion 7 in two (client 2026-10-15): the doors close / MONBAN appears in the smoke
   '7-a', '7-b',
   // Day 1 without the words painted in (production 2026-10-19): the words are set in code
-  '1-c', '5-c', '7-c',
+  '1-c', '3-z', '5-c', '6-c', '7-c',
+  // loops without their fade to black at both ends (no dark flash where they loop)
+  '9-l', '28-l',
   // Day 3
   '3-1', '3-3', '3-4', '3-6', '3-7',
   // Day 4

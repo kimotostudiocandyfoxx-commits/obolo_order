@@ -20,7 +20,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { extname, join, resolve } from 'node:path';
 import { walk, type Scene } from '../lib/story/parse';
 import { idOf } from '../lib/story/sheets';
-import { voiceKey, voiceable } from '../lib/story/voice';
+import { nameRest, voiceKey, voiceable } from '../lib/story/voice';
 // by path: this runs without an install (the workflow), and the file has no imports of its own
 import { storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
 
@@ -307,6 +307,12 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   const redoLines = (cfg.redoLines as string[] | undefined) ?? [];
   const spoken = new Map<string, { act?: string; text: string }[]>();
   for (const p of parts) for (const sc of json<Scene[]>(join(STORY, `${p}.json`), [])) walk(sc.lines, (l) => l.k === 'say' && spoken.set(l.who, [...(spoken.get(l.who) ?? []), { act: l.act, text: l.text }]));
+  // "extra": lines the client added in the app before the story has them ({ who, text, act? })
+  const extra = (cfg.extra as { who: string; text: string; act?: string }[] | undefined) ?? [];
+  for (const x of extra) {
+    spoken.set(x.who, [...(spoken.get(x.who) ?? []), { act: x.act, text: x.text }]);
+    said.set(x.who, [...(said.get(x.who) ?? []), { act: x.act, text: x.text }]);
+  }
   const manifestPath = join(STORY, 'voices/manifest.json');
   const manifest = json<Record<string, string>>(manifestPath, {});
   const jobs: { name: string; s: Spec; brief: string; act?: string; text: string; key: string }[] = [];
@@ -320,6 +326,11 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
       const { s, brief } = v;
       if (!voiceable(l.text)) {
         skipped++;
+        // a line that starts with a name (「{name}、お前は…」): its words after the name are voiced too
+        const rest = nameRest(l.text);
+        const rk = rest && voiceKey(name, l.act, rest);
+        if (rest && rk && (again || redoLines.some((r) => r && l.text.includes(r)) || !manifest[rk] || !existsSync(join(PUB, manifest[rk]))) && !jobs.some((j) => j.key === rk))
+          jobs.push({ name, s, brief, act: l.act, text: rest, key: rk });
         continue;
       }
       const key = voiceKey(name, l.act, l.text);
@@ -372,6 +383,9 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
       const file = manifest[voiceKey(name, l.act, l.text)];
       const plain = voiceKey(name, undefined, l.text);
       if (file && !manifest[plain]) manifest[plain] = file;
+      const rest = nameRest(l.text);
+      const restFile = rest && manifest[voiceKey(name, l.act, rest)];
+      if (rest && restFile && !manifest[voiceKey(name, undefined, rest)]) manifest[voiceKey(name, undefined, rest)] = restFile;
     }
   // every line file at the current tempo, without silence at the head (files made this run already are)
   const tempoPath = join(STORY, 'voices/tempo.json');
@@ -395,7 +409,12 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   if (retimed) log.push(`- ⏩ 前に作った声 ${retimed}個を ${TEMPO}倍速・頭の無音なしにした`);
   // cleanup: voices of lines that are no longer in any part of the story
   const alive = new Set<string>();
-  for (const [name, ls] of said) for (const l of ls) alive.add(voiceKey(name, l.act, l.text)).add(voiceKey(name, undefined, l.text));
+  for (const [name, ls] of said)
+    for (const l of ls) {
+      alive.add(voiceKey(name, l.act, l.text)).add(voiceKey(name, undefined, l.text));
+      const rest = nameRest(l.text);
+      if (rest) alive.add(voiceKey(name, l.act, rest)).add(voiceKey(name, undefined, rest));
+    }
   let removed = 0;
   for (const [k, file] of Object.entries(manifest)) {
     if (alive.has(k)) continue;

@@ -21,10 +21,10 @@ describe('day 1 script', () => {
     expect(fill('{name}へ by {inviter}', { name: 'ユウ', inviter: 'KIMORIN' })).toBe('ユウへ by KIMORIN');
   });
   it('restores the right background when resuming', () => {
-    // the invitation card is set in code over motion 1's last frame (the envelope)
+    // the invitation card is set in code over the envelope that opened (motion 3, its painted words cropped out)
     const i = DAY1.findIndex((s) => s.t === 'action' && s.label === '本部へ向かう');
     expect(DAY1[i - 1]).toEqual({ t: 'invitation' });
-    expect(mediaAt(DAY1, i)).toEqual({ motion: '1-c', loop: false });
+    expect(mediaAt(DAY1, i)).toEqual({ motion: '3-z', loop: false });
   });
   it('every BGM track has a file and the music is set from the first step', () => {
     const fs = require('node:fs') as typeof import('node:fs');
@@ -36,7 +36,7 @@ describe('day 1 script', () => {
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');
   });
   it('lets the visitor read during motion 17, with 19 chained after it', () => {
-    const i = DAY1.findIndex((s) => s.t === 'bgvideo');
+    const i = DAY1.findIndex((s) => s.t === 'bgvideo' && s.motion === 17);
     expect(DAY1[i]).toEqual({ t: 'bgvideo', motion: 17, then: [19] });
     expect(DAY1[i + 1]).toMatchObject({ t: 'say', text: expect.stringContaining('何かの偶然') });
     // resuming during those lines shows 19's last frame

@@ -273,7 +273,7 @@ function MakePlaza({ initial, onClose, onMade }: { initial: string; onClose: () 
   };
 
   return (
-    <div className="fixed inset-0 z-[160] flex items-end justify-center bg-violet-950/50" style={{ fontFamily: '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, sans-serif' }} onClick={onClose}>
+    <div className="fixed inset-0 z-[160] flex items-end justify-center bg-violet-950/50" style={{ fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif' }} onClick={onClose}>
       <div className="pb-safe max-h-[92%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 text-[#3d2a5c]" onClick={(e) => e.stopPropagation()}>
         <p className="text-center text-sm font-black text-violet-600">新しいひろばをつくる</p>
         <div className="mx-auto mt-2 w-[180px]">

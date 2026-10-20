@@ -49,6 +49,17 @@ describe('day 1 (story 2026-10-14)', () => {
     const n = steps.findIndex((s) => s.t === 'name');
     expect(steps.slice(n + 1, n + 3).map((s) => (s.t === 'say' ? s.text : s.t))).toEqual(['{name}か、いいな。', 'ここは、宇宙秘密結社だ。']);
   });
+  it('the client corrections of 2026-10-20: the gate line while it opens, the temple title, MONBAN before the ticket', () => {
+    const g = steps.findIndex((s) => s.t === 'bgvideo' && s.motion === 11);
+    expect(steps[g + 1]).toMatchObject({ t: 'say', text: '門をくぐり、地球の神殿に行け…。' });
+    const v12 = steps.find((s) => s.t === 'video' && s.motion === 12);
+    expect(v12?.t === 'video' && v12.captions?.[0].text).toBe('地球の神殿に着いた');
+    const k = steps.findIndex((s) => s.t === 'say' && s.text === 'それより先はObolo Orderしか知ることができない。');
+    expect(steps[k + 1]).toMatchObject({ t: 'say', text: 'ただ、お前はObolo Orderに招待されてここに来た。' });
+    expect(steps[k + 2]).toMatchObject({ t: 'say', text: 'だから知る権利がある。' });
+    // the loops behind MONBAN no longer fade to black where they loop
+    expect(steps.some((s) => s.t === 'loop' && (s.motion === 9 || s.motion === 28))).toBe(false);
+  });
   it('has no guide KIMORIN on day 1', () => {
     expect(steps.some((s) => s.t === 'say' && s.who === 'KIMORIN')).toBe(false);
     expect(steps.some((s) => s.t === 'say' && /案内人/.test(s.text))).toBe(false);

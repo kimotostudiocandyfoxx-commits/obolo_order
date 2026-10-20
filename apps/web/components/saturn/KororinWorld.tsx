@@ -416,7 +416,7 @@ export function KororinWorld({
   const resident = !!open?.id.startsWith('resident-');
 
   return (
-    <div className={`relative h-full w-full select-none overflow-hidden ${className}`} style={{ fontFamily: '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, sans-serif' }}>
+    <div className={`relative h-full w-full select-none overflow-hidden ${className}`} style={{ fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif' }}>
       {/* sky: violet → pink, stars and sparkles, a golden orb and a pale moon */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#2f2268] via-[#6d48b0] to-[#e6a3cf]" />
       {/* the painted sky (Art workshop, airbrushed pastel) over the gradient */}

@@ -619,3 +619,5 @@ body {
 @keyframes cardRise { from { transform: translateY(14%) scale(0.9); opacity: 0; filter: brightness(1.8) blur(4px); } to { transform: none; opacity: 1; filter: none; } }
 @keyframes cardShine { from { transform: translateX(-60%); opacity: 1; } to { transform: translateX(60%); opacity: 0; } }
 @keyframes inkIn { from { opacity: 0; filter: blur(3px); transform: translateY(3px); } to { opacity: 1; filter: none; transform: none; } }
+@keyframes cardOut { from { transform: translateY(20%) scale(0.52); opacity: 0; filter: brightness(2) blur(6px); } 35% { opacity: 1; } to { transform: none; opacity: 1; filter: none; } }
+@keyframes wordsOff { 0% { opacity: 1; filter: none; text-shadow: none; } 40% { opacity: 1; color: #fff3cf; text-shadow: 0 0 10px rgba(255, 220, 140, 0.95); } 100% { opacity: 0; transform: translate(-50%, -14px); filter: blur(4px); color: #fff3cf; text-shadow: 0 0 18px rgba(255, 220, 140, 0.9); } }

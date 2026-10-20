@@ -18,7 +18,7 @@ export interface CoachLine {
 
 export function LessonShell({ bg, tint = 'from-black/10 via-transparent to-black/60', coach, actions, children }: { bg: string; tint?: string; coach: CoachLine | null; actions?: ReactNode; children?: ReactNode }) {
   return (
-    <div className="fixed inset-0 z-[150] overflow-hidden bg-black text-white" style={{ fontFamily: '"M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", system-ui, sans-serif' }}>
+    <div className="fixed inset-0 z-[150] overflow-hidden bg-black text-white" style={{ fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={bg} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
       <div className={`absolute inset-0 bg-gradient-to-b ${tint}`} />
