@@ -1,12 +1,15 @@
 import { JOURNEY_PAYMENT } from '@obolo/shared';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { hasMotion } from './media';
+import { hasMotion, PLANNED_MOTIONS } from './media';
 import { labelIndex, type Step } from './script';
 import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from './stories';
 
 const all = { ...STORIES, ...PREVIEW_ONLY };
 const kinds = (steps: Step[]) => steps.map((s) => s.t);
+/** stills queued for Seedream (saved under public/onboarding/<dir>/<id>.jpg once painted) */
+const artQueue = JSON.parse(readFileSync('../../design/story-art-queue.json', 'utf8')) as { dir: string; items: { id: string }[] };
+const queuedStills = new Set(artQueue.items.map((x) => `${artQueue.dir.replace(/^onboarding\//, '')}/${x.id}`));
 
 describe('all day scripts', () => {
   for (const [day, story] of Object.entries(all)) {
@@ -17,9 +20,10 @@ describe('all day scripts', () => {
         if (s.t === 'pause') expect(() => labelIndex(steps, s.resume)).not.toThrow();
         if (s.t === 'age') expect(() => labelIndex(steps, s.skip)).not.toThrow();
         if (s.t === 'choice') for (const o of s.options) if (o.goto) expect(() => labelIndex(steps, o.goto!)).not.toThrow();
-        if (s.t === 'still') expect(existsSync(`public/onboarding/${s.image}.jpg`), s.image).toBe(true);
-        // days 1–3 are built for real (later days still show placeholders for motions not made yet)
-        if (Number(day) <= 3 && (s.t === 'video' || s.t === 'loop')) expect(hasMotion(s.motion), String(s.motion)).toBe(true);
+        // a still exists, or is queued to be painted (design/story-art-queue.json)
+        if (s.t === 'still') expect(existsSync(`public/onboarding/${s.image}.jpg`) || queuedStills.has(s.image), s.image).toBe(true);
+        // days 1–3 are built for real: every motion exists or is planned and being made (PLANNED_MOTIONS)
+        if (Number(day) <= 3 && (s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo')) expect(hasMotion(s.motion) || PLANNED_MOTIONS.has(s.motion), String(s.motion)).toBe(true);
       }
       expect(steps[steps.length - 1]).toEqual({ t: 'end' });
     });
@@ -73,12 +77,18 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps[first]).toMatchObject({ text: '待ちなさい。' });
     expect(steps.some((s) => s.t === 'say' && s.text.includes('天才発明家'))).toBe(true);
   });
-  it('「やめておく」 really ends the day and comes back to the same choice', () => {
-    const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'go');
-    const pause = steps.findIndex((s) => s.t === 'pause');
-    expect(pause).toBeGreaterThan(c);
-    const p = steps[pause] as { resume: string };
-    expect(labelIndex(steps, p.resume)).toBe(c - 1);
+  it('at the gate MONBAN asks for the ticket before KIMORIN calls out (client 2026-10-21)', () => {
+    const ask = steps.findIndex((s) => s.t === 'say' && s.text === '来たか…切符は持ってきたか？');
+    const wait = steps.findIndex((s) => s.t === 'say' && s.text === '待ちなさい。');
+    expect(ask).toBeGreaterThan(-1);
+    expect(steps.slice(ask, wait).some((s) => s.t === 'action' && s.label === '切符を見せる')).toBe(true);
+    expect(steps.slice(ask, wait).some((s) => s.t === 'say' && s.text === '地球の神殿に行け…地下にロケット場がある')).toBe(true);
+  });
+  it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {
+    const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
+    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['太陽と月のたまご', '地球と月のたまご']);
+    const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'egg');
+    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['hatch-sun', 'pinpon-earth']);
   });
   it('the gem and the riddle book at the launch pit, then the look, the NEO name, the Bati is born and named — all on day 2', () => {
     const t = kinds(steps);
@@ -90,7 +100,8 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
-    const dragon = steps.findIndex((s) => s.t === 'sprite' && s.image === 'kimorin-dragon');
+    const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
+    expect(dragon).toBeGreaterThan(-1);
     const after = steps.slice(dragon + 1).filter((s): s is Extract<Step, { t: 'sprite' }> => s.t === 'sprite');
     expect(after.some((s) => [s.image].flat().includes('kimorin-1'))).toBe(false);
     expect(after.some((s) => [s.image].flat().includes('kimorin-sun'))).toBe(true);

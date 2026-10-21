@@ -307,7 +307,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           n++;
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
-        else if (s.t === 'branch') n = labelIndex(steps, s.cases[varsRef.current.story?.[s.key] ?? ''] ?? s.otherwise);
+        // an answer given earlier today first (the egg), else one from an earlier day
+        else if (s.t === 'branch') n = labelIndex(steps, s.cases[stateRef.current.answers[s.key] ?? varsRef.current.story?.[s.key] ?? ''] ?? s.otherwise);
         else if (s.t === 'still') {
           setWhite(false);
           setStill(s.image);
