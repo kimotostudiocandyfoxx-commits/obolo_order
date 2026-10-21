@@ -63,14 +63,19 @@ async function paint(x) {
 
 const log = [];
 let yen = 0;
+// a few at a time: a burst of tasks is what made Runware time out (504)
+const retry = (x, n) => paint(x).catch((e) => (n > 0 && /504|Timeout|timeout/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
+let next = 0;
 await Promise.all(
-  todo.map(async (x) => {
-    try {
-      // Runware sometimes times out a Seedream task (504): one more try
-      yen += (await paint(x).catch((e) => (/504|Timeout/i.test(String(e)) ? paint(x) : Promise.reject(e)))) * 150;
-      log.push(`- ✅ ${x.id}`);
-    } catch (e) {
-      log.push(`- ❌ ${x.id}: ${String(e).slice(0, 300)}`);
+  Array.from({ length: 4 }, async () => {
+    while (next < todo.length) {
+      const x = todo[next++];
+      try {
+        yen += (await retry(x, 2)) * 150;
+        log.push(`- ✅ ${x.id}`);
+      } catch (e) {
+        log.push(`- ❌ ${x.id}: ${String(e).slice(0, 300)}`);
+      }
     }
   }),
 );
