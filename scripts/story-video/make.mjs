@@ -105,14 +105,21 @@ function squeeze(src, out, upscale) {
 }
 
 let usd = 0;
-for (const x of todo) {
-  try {
-    usd += await make(x);
-    log.push(`- ✅ m${x.id}（${x.duration ?? 5}秒・${x.resolution ?? '720p'}）`);
-  } catch (e) {
-    log.push(`- ❌ m${x.id}: ${String(e).slice(0, 1500)}`);
-  }
-}
+// three at a time
+let next = 0;
+await Promise.all(
+  Array.from({ length: 3 }, async () => {
+    while (next < todo.length) {
+      const x = todo[next++];
+      try {
+        usd += await make(x);
+        log.push(`- ✅ m${x.id}（${x.duration ?? 5}秒・${x.resolution ?? '720p'}）`);
+      } catch (e) {
+        log.push(`- ❌ m${x.id}: ${String(e).slice(0, 1500)}`);
+      }
+    }
+  }),
+);
 if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
 mkdirSync('docs/story-import', { recursive: true });
 const report = [`# 物語の動画 — ${new Date().toISOString()}`, '', `${MODEL} / ${todo.length}本 / 約${Math.round(usd * 150)}円`, '', ...log, ''].join('\n');

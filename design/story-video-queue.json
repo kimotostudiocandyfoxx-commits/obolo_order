@@ -50,6 +50,116 @@
       "first": "apps/web/public/onboarding/m28-l.jpg",
       "last": "apps/web/public/onboarding/m28-l.jpg",
       "prompt": "The hooded gatekeeper in the black-and-gold robe, golden halo behind his head, slowly turns his head and shoulders to look back over his shoulder at someone behind him, holds the look for a moment, then turns back to face forward. Slow, heavy, deliberate movement; locked-off camera; the robe sways slightly. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d2-ticket",
+      "duration": 5,
+      "first": "design/story/frames/m1-star.jpg",
+      "last": "apps/web/public/onboarding/s/d2-ticket.jpg",
+      "prompt": "In pitch-black space a bright golden star flares; golden light particles spiral in and gather into a long slender cream-and-gold space ticket that settles upright, glowing softly. The ticket has no writing."
+    },
+    {
+      "id": "d2-ticket-give",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/m9-l.jpg",
+      "last": "apps/web/public/onboarding/s/d2-monban-ticket.jpg",
+      "prompt": "The hooded gatekeeper in front of the gate slowly lowers his gaze and opens his gloved hands; a slender golden space ticket floats down, glowing, and hovers above his palms; a golden magic circle lights up on the floor."
+    },
+    {
+      "id": "d2-kimorin-turn",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "last": "apps/web/public/onboarding/s/d2-kimorin-gate.jpg",
+      "prompt": "The camera, facing the great glowing gate, swings around smoothly to look back down the avenue behind — and there stands a small fox-masked character in a deep-red hooded robe with round dark sunglasses, his fan of tail feathers spreading open. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-kimorin-face",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-gate-two.jpg",
+      "last": "apps/web/public/onboarding/s/d2-kimorin-close.jpg",
+      "prompt": "The small fox-masked character in the red robe stops, turns away from the tall hooded gatekeeper to face the camera directly, and the camera moves in close to his face (round dark sunglasses over his eyes). This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-floor-open",
+      "duration": 5,
+      "first": "design/story/frames/m13-hall.jpg",
+      "prompt": "In the golden temple hall, around the base of the pillar of light under the floating black sphere, the polished floor glows along a circle and slides open, revealing a long spiral stone staircase winding down into candle-lit darkness; the camera tilts down into it."
+    },
+    {
+      "id": "d2-descend",
+      "duration": 5,
+      "last": "apps/web/public/onboarding/s/d2-launch-pit.jpg",
+      "prompt": "First-person descent down a long spiral stone staircase lit by candles in a deep round shaft; at the bottom it opens into a vast carved stone hall with red banners and a magic circle on the floor, where a slender black rocket with gold ornaments and pink-cyan neon lines stands; the camera settles looking at the rocket."
+    },
+    {
+      "id": "d2-gem",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-gem-palm.jpg",
+      "prompt": "Close-up: the translucent oval stone resting on the open palm glows; golden light swirls slowly inside it, mixed with blue light and tiny sparkles; its glow gently pulses. Very slight camera push-in."
+    },
+    {
+      "id": "d2-launch",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-launch-pit.jpg",
+      "last": "apps/web/public/onboarding/s/d2-rocket-space.jpg",
+      "prompt": "The rocket's hatch closes; candle flames flicker and dust stirs as its three nozzles ignite; it rises up the long round shaft, bursts out into the night and climbs through black space away from the blue Earth."
+    },
+    {
+      "id": "d2-landing",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-rocket-space.jpg",
+      "last": "design/story/refs/client/moon-temple-aerial-1.jpg",
+      "prompt": "The rocket cruises through space; the grey cratered Moon grows ahead; it glides down over the lunar surface toward a white temple with blue magic-circle floors inside a crater and lands gently beside it, dust drifting; the camera settles high above the temple with the Earth in the sky."
+    },
+    {
+      "id": "d2-moon-enter",
+      "duration": 5,
+      "first": "design/story/refs/client/moon-temple-aerial-1.jpg",
+      "last": "apps/web/public/onboarding/s/d2-moon-in.jpg",
+      "prompt": "The camera glides down from above the white moon temple, through its arches, into the marble interior where a round shallow water basin lies in the centre of the blue magic circles and a black sphere floats in a pillar of light above it."
+    },
+    {
+      "id": "d2-dragon",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-dragon.jpg",
+      "prompt": "The giant white-scaled dragon in the red fox-hood robe, his dozens of muscular arms raised, pops all his party crackers at once — streams of colourful confetti and paper ribbons burst and rain down through the moon temple, light sticks waving. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-altar",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-moon-in.jpg",
+      "last": "apps/web/public/onboarding/s/d2-altar.jpg",
+      "prompt": "The pillar of light around the black sphere stretches out and reaches deep into the temple; the camera follows it to a small white marble altar where two yin-yang eggs (a sun-and-moon egg and an earth-and-moon egg) light up side by side."
+    },
+    {
+      "id": "d2-hatch-sun",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-egg-sun.jpg",
+      "prompt": "The glowing gemstone in front of the sun-and-moon yin-yang egg flares; warm golden light streams into the egg; a crack runs across its shell with light bursting through; the shell splits open in a flash of warm light that fills the frame."
+    },
+    {
+      "id": "d2-hatch-earth",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-egg-earth.jpg",
+      "prompt": "The glowing gemstone in front of the earth-and-moon yin-yang egg flares; blue light streams into the egg; a crack runs across its shell with light bursting through; the shell splits open in a flash of blue-white light that fills the frame."
+    },
+    {
+      "id": "d2-pinpon-earth",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-egg-earth.jpg",
+      "prompt": "The earth-and-moon yin-yang egg on the altar cracks; out bounces a cute shiny round creature shaped like a brown swirl soft-serve shell with a golden band and golden stars, big glossy eyes and rosy cheeks, smiling, hopping happily on the altar."
+    },
+    {
+      "id": "d2-pinpon-sun",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-egg-sun.jpg",
+      "prompt": "The sun-and-moon yin-yang egg on the altar cracks; out bounces a cute shiny round creature shaped like a brown swirl soft-serve shell with a golden band and golden stars, big glossy eyes and rosy cheeks, smiling, hopping happily on the altar."
+    },
+    {
+      "id": "d2-moon-night",
+      "duration": 5,
+      "first": "design/story/refs/client/moon-temple-aerial-2.jpg",
+      "prompt": "Night on the Moon: the white temple in its crater, the blue Earth hanging in the black sky, a few lights glowing inside; the camera slowly pulls back and up, very calm and quiet."
     }
   ]
 }
