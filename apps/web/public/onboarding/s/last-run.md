@@ -1,6 +1,8 @@
-# UI art — 2026-10-22T04:13:27.579Z
+# UI art — 2026-10-22T06:05:44.904Z
 
-Seedream 5.0 Pro / 2枚 / 約9円
+Seedream 5.0 Pro / 4枚 / 約8円
 
-- ✅ d2-hall-kimorin
-- ✅ d2-hall-run
+- ✅ d2-gate-inside-kimorin
+- ✅ d2-gate-two-inside
+- ✅ d2-kimorin-close-in
+- ✅ d2-kimorin-close-up-in
