@@ -26,6 +26,8 @@ export class DualVideo {
   private url: string | null = null;
   private muted = false;
   private pending: HTMLVideoElement | null = null;
+  /** the motion coming up (preload) */
+  private next: string | null = null;
 
   constructor(
     private readonly els: [HTMLVideoElement, HTMLVideoElement],
@@ -84,6 +86,21 @@ export class DualVideo {
       return;
     }
     this.startIn(el, t);
+  }
+
+  /**
+   * Start loading the motion that comes next in the hidden element while a play-once motion is on screen,
+   * so the next one starts the instant this one ends (the crane's flight stalled between its clips while
+   * each file was fetched — client 2026-10-22). Not during a loop: the hidden element holds its restart.
+   */
+  preload(url: string) {
+    this.next = url;
+    this.loadNext();
+  }
+
+  private loadNext() {
+    if (!this.next || this.loop || this.pending || this.next === this.url) return;
+    this.setSrc(this.backEl, this.next);
   }
 
   /** Retry after onBlocked (call from a tap). Returns false if the file itself is broken. */
@@ -151,6 +168,7 @@ export class DualVideo {
     }
     this.pending = null;
     if (this.url) this.cb.onShown(this.url);
+    this.loadNext();
     // Pre-load the same motion at 0:00 in the hidden element for a seamless loop restart.
     if (this.loop && this.url) {
       this.setSrc(old, this.url);

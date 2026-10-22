@@ -39,9 +39,8 @@ export const DAY1: Step[] = [
   { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
   { t: 'se', sound: 'thud' },
-  { t: 'video', motion: 'd1-monban' }, // 門が閉まり、門の前に黒い煙が湧いて、MONBANが現れる
-  { t: 'loop', motion: '9-l' },
-  { t: 'cam', move: 'shake' },
+  { t: 'video', motion: 'd1-monban' }, // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる
+  { t: 'loop', motion: '9-l' }, // no camera shake here: it looked cheap (client 2026-10-22)
   { t: 'caption', text: 'MONBANが現れた' },
   { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
   { t: 'say', who: 'MONBAN', text: '誰だお前…。\nここは秘密結社だ…。' },
@@ -59,7 +58,7 @@ export const DAY1: Step[] = [
   // D01-S006 OBOLON
   // MONBAN's theme fades slowly while we walk in, gone before OBOLON's light falls (client 2026-10-20)
   { t: 'bgm', track: null, fade: 6 },
-  { t: 'video', motion: 12, captions: [{ text: '地球の神殿に着いた', from: 2.2, to: 6.2 }] }, // 門をくぐり、神殿の中へ → 光の柱
+  { t: 'video', motion: 12, captions: [{ text: '地球の神殿に着いた', from: 4.2, to: 8.2 }] }, // 門をくぐり、神殿の中へ → 光の柱
   { t: 'bgm', track: 'obolon' },
   { t: 'loop', motion: 13 },
   { t: 'caption', text: 'OBOLONが現れた' },
@@ -92,7 +91,6 @@ export const DAY1: Step[] = [
   { t: 'black' },
   { t: 'say', who: 'MONBAN', text: 'おい待て、そこまでだ。' },
   { t: 'video', motion: '27-c' }, // 光が戻る。金の光の輪を背負ったMONBANが、OBOLONの前に立っている
-  { t: 'video', motion: 'd1-turn' }, // MONBANが振り返る（client 2026-10-20）
   { t: 'loop', motion: '28-l' },
   { t: 'say', who: 'MONBAN', text: 'OBOLON、それは喋りすぎだ。' },
 

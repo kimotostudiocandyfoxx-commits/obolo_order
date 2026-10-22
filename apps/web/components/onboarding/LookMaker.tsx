@@ -213,7 +213,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   if (phase === 'hobby')
     return (
       <Panel>
-        <Obolon>今、ハマってることは？</Obolon>
+        <Obolon>今、好きなことは？</Obolon>
         <Chips
           items={HOBBIES}
           value={ans.hobby}

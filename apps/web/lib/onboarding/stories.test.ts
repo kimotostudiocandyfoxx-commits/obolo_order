@@ -77,12 +77,13 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps[first]).toMatchObject({ text: '待ちなさい。' });
     expect(steps.some((s) => s.t === 'say' && s.text.includes('天才発明家'))).toBe(true);
   });
-  it('at the gate MONBAN asks for the ticket before KIMORIN calls out (client 2026-10-21)', () => {
-    const ask = steps.findIndex((s) => s.t === 'say' && s.text === '来たか…切符は持ってきたか？');
+  it('at the gate: a step into the light, KIMORIN calls out, then MONBAN comes out of the smoke (client 2026-10-22)', () => {
+    const go = steps.findIndex((s) => s.t === 'action' && s.label === '中に入る');
     const wait = steps.findIndex((s) => s.t === 'say' && s.text === '待ちなさい。');
-    expect(ask).toBeGreaterThan(-1);
-    expect(steps.slice(ask, wait).some((s) => s.t === 'action' && s.label === '切符を見せる')).toBe(true);
-    expect(steps.slice(ask, wait).some((s) => s.t === 'say' && s.text === '地球の神殿に行け…地下にロケット場がある')).toBe(true);
+    const who = steps.findIndex((s) => s.t === 'say' && s.text === '誰だお前…。');
+    expect(steps.slice(go, wait).some((s) => s.t === 'video' && s.motion === 'd2-step-in')).toBe(true);
+    expect(steps.slice(wait, who).some((s) => s.t === 'video' && s.motion === 'd2-monban-smoke')).toBe(true);
+    expect(steps.some((s) => s.t === 'say' && s.text.startsWith('来たか'))).toBe(false);
   });
   it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');

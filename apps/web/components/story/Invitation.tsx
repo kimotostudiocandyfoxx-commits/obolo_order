@@ -77,10 +77,10 @@ function CardWords({ inviter, message, settled, leaving }: { inviter: string; me
   const ink = 'absolute whitespace-nowrap text-center text-[#3a2914]';
   return (
     <div className="absolute inset-0" style={{ fontFamily: SERIF, containerType: 'inline-size' }}>
-      <p className={`${ink} text-[2.3cqw] tracking-[0.32em] text-[#6e5328]`} style={at(27.6, 0)}>
+      <p className={`${ink} text-[2.3cqw] tracking-[0.32em] text-[#6e5328]`} style={at(29.2, 0)}>
         ― INVITATION ―
       </p>
-      <p className={`${ink} text-[8.2cqw] font-semibold leading-none tracking-[0.16em]`} style={at(31.6, 1)}>
+      <p className={`${ink} text-[8.2cqw] font-semibold leading-none tracking-[0.16em]`} style={at(32.6, 1)}>
         本部招待状
       </p>
       <p className={`${ink} text-[3.4cqw] leading-[1.95] tracking-[0.05em]`} style={at(39.4, 2)}>
@@ -102,7 +102,7 @@ function CardWords({ inviter, message, settled, leaving }: { inviter: string; me
           「{message}」
         </p>
       )}
-      <p className={`${ink} text-[6.2cqw] font-semibold leading-[1.45] tracking-[0.14em]`} style={at(77.2, 6, 44.5)}>
+      <p className={`${ink} text-[5.8cqw] font-semibold leading-[1.45] tracking-[0.14em]`} style={at(76.2, 6, 41.5)}>
         本部への来訪を
         <br />
         歓迎します。

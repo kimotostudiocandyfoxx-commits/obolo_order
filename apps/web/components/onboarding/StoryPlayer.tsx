@@ -532,6 +532,27 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       }
     }
   }, [i, steps]);
+  // the next motion loads behind the one on screen
+  useEffect(() => {
+    if (!started) return;
+    for (let k = i + 1; k < Math.min(steps.length, i + 12); k++) {
+      const s = steps[k];
+      if (s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo') {
+        if (hasMotion(s.motion)) dual.current?.preload(motionUrl(s.motion));
+        break;
+      }
+    }
+  }, [i, steps, started]);
+  // the next theme is decoded ahead
+  useEffect(() => {
+    for (let k = i + 1; k < Math.min(steps.length, i + 30); k++) {
+      const s = steps[k];
+      if (s.t === 'bgm') {
+        bgm.current?.prefetch(s.track);
+        break;
+      }
+    }
+  }, [i, steps]);
   useEffect(() => {
     if (sayNow) void voice.current?.say(sayNow.who, sayNow.text);
     else voice.current?.stop();

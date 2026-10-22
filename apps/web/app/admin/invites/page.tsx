@@ -12,7 +12,7 @@ export default function AdminInvitesPage() {
   const base = (process.env.NEXT_PUBLIC_API_URL ?? '').trim().replace(/\/$/, '');
   const [token, setToken] = useState('');
   const [email, setEmail] = useState('');
-  const [inviterName, setInviterName] = useState('KIMORIN');
+  const [inviterName, setInviterName] = useState('木元 駿之介');
   const [links, setLinks] = useState<{ email: string; url: string }[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

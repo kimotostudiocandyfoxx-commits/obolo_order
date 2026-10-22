@@ -38,6 +38,7 @@ export function HomeGate({ children }: { children: ReactNode }) {
         name={me.displayName}
         completedAt={me.journeyCompletedAt}
         skipLabel={STORIES[day]?.skipLabel}
+        skippedText={STORIES[day]?.skippedText}
         onUnlocked={async (skipped) => {
           const elapsed = Date.now() >= Date.parse(me.journeyCompletedAt!) + JOURNEY_WAIT_MS;
           setMe(await getApi().advanceJourney(skipped || !elapsed));

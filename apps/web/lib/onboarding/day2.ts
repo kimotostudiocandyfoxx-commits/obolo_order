@@ -1,10 +1,9 @@
 import type { Step } from './script';
 
 /**
- * DAY 2 【地球 → 月】 — the story of 2026-10-19 (review/DAY2.md, story f1f633d; M-R76〜M-R81) with the
- * client's corrections of 2026-10-21 (docs/story-rewrite/day2-video-plan.md):
- *  - at the gate MONBAN is there first: 「来たか…切符は持ってきたか？」→ the ticket → 「地球の神殿に行け…地下に
- *    ロケット場がある」, then KIMORIN's 「待ちなさい。」 behind you (no second smoke)
+ * DAY 2 【地球 → 月】 — the client's script of 2026-10-22 (sent to the story chat), on the story of 2026-10-19
+ * (review/DAY2.md, story f1f633d; M-R76〜M-R81):
+ *  - at the gate: one step into the light, KIMORIN's 「待ちなさい。」 behind you, then MONBAN out of black smoke
  *  - KIMORIN's 24-hour skip: he stops dead at the gate and runs all the way back into the hall, clutching
  *    the ticket, out of breath
  *  - the ticket has no 同行者 line
@@ -23,33 +22,27 @@ export const DAY2: Step[] = [
   { t: 'caption', text: '宇宙行きの切符を手に入れた' },
   { t: 'action', label: '本部へ向かう' },
 
-  // D02-S002 待ちなさい
+  // D02-S002 お待ちなさい（client 2026-10-22: KIMORIN first, then MONBAN out of the smoke）
   { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'action', label: '中に入る' },
+  { t: 'bgm', track: null, fade: 2 },
+  { t: 'video', motion: 'd2-step-in' }, // 門の光の中へ一歩踏み出した、その時
+  { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
+  { t: 'video', motion: 'd2-kimorin-turn' }, // ふり返る。深い赤のローブ、狐の耳の白い面、扇のように広がる羽の尾
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'thud' },
-  { t: 'video', motion: 'd1-monban' }, // 扉が閉まり、黒い煙からMONBANが現れる
-  { t: 'loop', motion: '9-l' },
-  { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
-  { t: 'action', label: '切符を見せる' },
-  { t: 'se', sound: 'chime' },
-  { t: 'video', motion: 'd2-ticket-give' }, // 切符が光りながら、MONBANの両手の上に浮かぶ
-  { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
-  { t: 'action', label: '地球の神殿に行く' },
-  { t: 'bgm', track: null, fade: 1.5 },
-  { t: 'say', who: 'KIMORIN', text: '待ちなさい。' },
-  { t: 'video', motion: 'd2-kimorin-turn' }, // ふり返ると、サングラスの KIMORIN が石畳に立っている
-  { t: 'bgm', track: 'opening' },
+  { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
   { t: 'still', image: 's/d2-gate-two' }, // KIMORINとMONBANが向き合う
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
-  { t: 'say', who: 'KIMORIN', text: '私ですか？、、、私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
+  { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'say', who: 'MONBAN', text: 'ここは秘密結社だ…' },
   { t: 'say', who: 'KIMORIN', text: '秘密結社？　……なんとも、怪しい。' },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
   { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
   { t: 'se', sound: 'pop' }, // KIMORINがローブの袖から招待状を出して、MONBANに渡す
   { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。門をくぐり、地球の神殿に行け…。' },
-  { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINがこちらに向き直り、顔に寄る
+  { t: 'bgm', track: 'opening' },
+  { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
   { t: 'say', who: 'KIMORIN', text: 'おや、そこのあなた、もしかして、あなたも招待客？' },
   { t: 'say', who: 'KIMORIN', text: '気をつけなさい。私は、この世のすべての仕組みを理解しているので、わかります。' },
   { t: 'say', who: 'KIMORIN', text: 'こいつらは、大してすごくもないことを、めちゃくちゃすごそうに言い、そのあとに、超高額の入会費を請求してくる詐欺グループに違いありません。' },
@@ -62,32 +55,33 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: null, fade: 5 },
   { t: 'video', motion: 12 },
   { t: 'bgm', track: 'obolon' },
-  { t: 'still', image: 's/d2-hall-kimorin' }, // 金色の大広間。光の柱の中にOBOLON、手前にKIMORIN
-  { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' },
+  { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、手前にKIMORIN
+  { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'se', sound: 'boing' },
   { t: 'bgvideo', motion: 'd2-kimorin-startle' }, // KIMORINがのけぞる
   { t: 'say', who: 'KIMORIN', text: 'うわ！なんやこの喋る黒い玉は！　宙に浮いとる！　どういう仕組み！？' },
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
   { t: 'say', who: 'KIMORIN', text: '宇宙秘密結社?…すごそう...' },
-  { t: 'say', who: 'OBOLON', text: 'お前は、、、、、、もう宇宙にいる。' },
-  { t: 'bgvideo', motion: 14, then: [15] }, // 天井が夜空になり、金の輪をまとった地球が浮かぶ
+  { t: 'say', who: 'OBOLON', text: 'お前は宇宙に行ってみたいと思うか？' },
+  { t: 'say', who: 'KIMORIN', text: 'え？宇宙、、、行きたい' },
+  { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
+  { t: 'bgvideo', motion: 14, then: [15] }, // 天井が夜空になり、金の輪をまとった地球が浮かび、ゆっくり回る
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
-  { t: 'say', who: 'OBOLON', text: '宇宙に、行ってみたいと思うか？' },
-  { t: 'say', who: 'KIMORIN', text: 'え！宇宙行きたい！、、、、は！、、ごほん！' },
-  { t: 'say', who: 'KIMORIN', text: 'これはこれは、、手の込んだ手品ですね、、。宇宙に行くって、もちろん、、お金が、、かかりますよねー？' },
-  { t: 'say', who: 'OBOLON', text: 'かからない。' },
+  { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。どうだ、宇宙へ行ってみるか？' }, // MONBANが入り口から歩きながら
+  { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
+  { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、\nとても手の込んだ手品ですね、、。\n宇宙に行きたいかですって？\nふふ、、\nもちろんそれには、、お金が、かかりますよねー？' },
+  { t: 'say', who: 'MONBAN', text: 'かからない。' },
   { t: 'say', who: 'KIMORIN', text: 'え？　本当に？' },
-  { t: 'say', who: 'OBOLON', text: 'うん。' },
+  { t: 'say', who: 'MONBAN', text: '本当だ' },
   { t: 'say', who: 'KIMORIN', text: '後から請求書を送ってきたりしない？' },
   { t: 'say', who: 'OBOLON', text: 'しない。' },
   { t: 'say', who: 'KIMORIN', text: '…………。' },
-  { t: 'say', who: 'MONBAN', text: 'お前は招待された...だから知る権利がある。' }, // MONBANが、入り口から歩いてくる
-  { t: 'say', who: 'KIMORIN', text: '、、、そうですか、では、行きます。宇宙行きの切符、私の家に、送っといてください。' },
-  { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 鼻歌で門の外へ。扇の尾をぱたぱた振って、光の点になって空へ
+  { t: 'say', who: 'KIMORIN', text: '、、、そうですか！\nそれではめちゃくちゃ宇宙に行かせていただきます！宇宙行きの切符、私の家に、送っといてください。' },
+  { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 咳払いして、ローブの裾をひるがえし、鼻歌で門の外へ。扇の尾をぱたぱた、光の点になって空へ
   { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' },
   { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-kimorin-back' }, // 光の点が戻って門の前で急停止 → 大広間まで全力で走って戻る
-  { t: 'still', image: 's/d2-hall-run' }, // 切符を握りしめて、肩で息をしている
+  { t: 'video', motion: 'd2-kimorin-back' }, // 光の点が戻って門の前で急停止 → 切符を握りしめ、ダッシュで神殿に戻る
+  { t: 'still', image: 's/d2-hall-run' }, // 肩で息をしている
   { t: 'say', who: 'KIMORIN', text: 'どういう仕組みかわからんけど……24時間、スキップできた！' },
   { t: 'say', who: 'OBOLON', text: '、、、では、、、宇宙へ、行こう。' },
   { t: 'se', sound: 'magic' },
@@ -132,11 +126,11 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
   { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
   { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。\nそれでは私たちも行きましょう。。。コスモスへ！' },
-  { t: 'say', who: 'MONBAN', text: '、、、月だ' },
+  { t: 'say', who: 'MONBAN', text: '月だ' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
   { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-launch' }, // ロケットが閉まり、竪穴を上って宇宙へ
+  { t: 'video', motion: 'd2-launch' }, // ロケットが閉まり、出発する
   { t: 'bgvideo', motion: 'd2-rocket-in' }, // ロケットの中。KIMORINが、窓の外の地球を見ている
   { t: 'say', who: 'KIMORIN', text: 'ロケット広すぎませんか？2人で乗るのもったいないですよ。' },
   { t: 'say', who: 'KIMORIN', text: 'みてください、、、なんと、、美しい、、、。' },
@@ -155,43 +149,45 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-moon-kimorin' }, // 黒い球が、くるりとKIMORINのほうへ向く
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
   { t: 'say', who: 'KIMORIN', text: '私は、、、、、、12回目です。' },
-  { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……
-  { t: 'video', motion: 'd2-pinpon' }, // 銀色の小さな箱を、ゆっくりこちらに見せる。ボタンのふちが金色に光る
+  { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
+  { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
-  { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
+  { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポーン2.5』です。' },
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
   { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。間違えていたらどうしよう。と、頭を抱える人も少なくない。' },
-  { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
+  { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポーン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
-  { t: 'still', image: 's/d2-moon-kimorin' },
+  { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' },
   { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
-  { t: 'se', sound: 'ding' },
+  { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
   { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？そうなの？、、、、は！ゴホンゴホン！なるほどなるほど、、そうですか。確かにそうですよね？あなた達は詐欺グループだから、脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？\nでは一つお聞きしてもいいですか？\nここのことをSNSに書いてもいいですか？' },
+  { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？、、、、は！、、ゴホンゴホン！なるほどなるほど、、そうですか。確かにそうですよね？あなた達詐欺グループソボロオーダーさん達は脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？' }, // (ピンとくる)
+  { t: 'say', who: 'OBOLON', text: '....' },
+  { t: 'say', who: 'KIMORIN', text: 'それでは一つお聞きしてもいいですか？\nここのことをSNSに書いてもいいですか？' },
   { t: 'say', who: 'OBOLON', text: 'だめだ' },
-  { t: 'say', who: 'KIMORIN', text: 'はい出ました、詐欺グループ確定オツ。SNSに書くな。は詐欺鉄板の流れ。手口など色々バレたらまずいですもんねー？' },
+  { t: 'say', who: 'KIMORIN', text: 'はい出ました、詐欺グループ確定オツ。SNSに書くな。は詐欺手口の王道テク鉄板の流れ。そりゃ色々バレたら、まずいですもんねー？' },
   { t: 'say', who: 'OBOLON', text: 'そのままでは、だめだ。ただ条件を守れば、ここのことを、自由に話していい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？条件？' },
   { t: 'say', who: 'OBOLON', text: '姿と名前を、変えることだ。' },
-  { t: 'say', who: 'OBOLON', text: '秘密結社用の、姿と名前に、なってもらう。その姿と名前で話すのなら、問題は、ない。' },
-  { t: 'say', who: 'KIMORIN', text: 'ほう。' },
-  { t: 'say', who: 'OBOLON', text: 'では、秘密結社としての姿に、なってもらう。' },
-  { t: 'say', who: 'OBOLON', text: 'どんな姿に、なりたいか伝えてくれたら、俺が魔法を唱え、その姿にする。' },
+  { t: 'say', who: 'OBOLON', text: '秘密結社用の、姿と名前に、なってもらう。その姿と名前で話すのなら、問題は、ない。' }, // 黒い球が、KIMORINのほうへ向く
+  { t: 'say', who: 'KIMORIN', text: 'ほう。新しい姿とは、、、仮装でもするのですか？' },
+  { t: 'say', who: 'OBOLON', text: 'どんな姿になりたいか、伝えてくれたら、俺が魔法を唱え、その姿にする。' },
   { t: 'say', who: 'KIMORIN', text: 'え？魔法？　……魔法、使えるのですか？' },
   { t: 'say', who: 'OBOLON', text: '使える。お前も、宇宙を旅していたら、、、そのうち、使えるようになる。' },
   { t: 'say', who: 'KIMORIN', text: 'え！？！？マジで！？' }, // 面の目の切れ目が、青く光る
-  { t: 'say', who: 'KIMORIN', text: '魔法ってことは、じゃあ、どんな見た目にも、なれるん？' },
+  { t: 'say', who: 'KIMORIN', text: 'では魔法ってことは、じゃあ、どんな見た目にも、なれるんですか？' }, // 興奮気味（はぁはぁしてる感じ）
   { t: 'say', who: 'OBOLON', text: 'なれる。だが、、、最初は、いっぱい望みすぎないほうがいい。変になるから。' },
   { t: 'say', who: 'OBOLON', text: '旅を続けて、自分で魔法を使えるようになったら、、、ちょっとずつ、自分の好きな見た目に変えていく、それがいい。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、、、、じゃあ、、' },
   { t: 'say', who: 'KIMORIN', text: '筋肉ムキムキの、腕80本の、パーティーが大好きなドラゴン！' }, // 両腕を広げる
   { t: 'say', who: 'OBOLON', text: '、、、大丈夫か？' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' },
+  { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
   { t: 'se', sound: 'magic' },
   { t: 'video', motion: 'd2-transform' }, // マナジェムから光が水盤へ。水が立ち上がってKIMORINを包む
   { t: 'caption', text: 'KIMORIN⭐︎のマナジェム　−3マナ' },
@@ -209,14 +205,14 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '次は、、、{name}だ。' },
   { t: 'look' },
   { t: 'sprite', image: ['kimorin-sun', '@me'] },
-  { t: 'say', who: 'KIMORIN', text: '……よく似合っていますね。私ほどではありませんが。' },
+  { t: 'say', who: 'KIMORIN', text: 'あなたも、よく似合っていますね。私ほどではありませんが。' },
 
   // D03-S005 名前と、バティ誕生
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'OBOLON', text: '次は、、、名前だ。' },
   { t: 'say', who: 'OBOLON', text: '秘密結社用の、名前は、、どうする？' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'say', who: 'KIMORIN', text: '私は、KIMORINという、親からもらったこの名前を、気に入っています。できれば、変えたくありません。' },
-  { t: 'say', who: 'OBOLON', text: '、、、それだと、ダメだ。変えないと、いけない。' },
+  { t: 'say', who: 'OBOLON', text: '、、、それだと、ダメだ。変えないとこの先にいけない。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか。わかりました。' },
   { t: 'say', who: 'KIMORIN', text: 'では、KIMORIN⭐︎で。' },
   { t: 'say', who: 'OBOLON', text: 'わかった。では、KIMORIN⭐︎。よろしく。' },
@@ -229,9 +225,13 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '厳密には、一人では、魔法は使えない。相方と、力を合わせて、魔法を唱えるんだ。' },
   { t: 'say', who: 'OBOLON', text: 'こっちに、来い。' },
   { t: 'sprite', image: null },
-  { t: 'video', motion: 'd2-altar' }, // 光の柱が奥へ。祭壇の二つのたまご（太陽と月／地球と月）
+  { t: 'video', motion: 'd2-altar' }, // 光の柱が神殿の奥へ。小さな祭壇に、たまごが二つ（太陽と月／地球と月）
   { t: 'still', image: 's/d2-altar' },
-  { t: 'say', who: 'OBOLON', text: '好きなほうを、、、選べ。' },
+  { t: 'say', who: 'OBOLON', text: 'たまごの前に、、、マナジェムを、置け。' },
+  { t: 'action', label: 'マナジェムを置く' },
+  { t: 'se', sound: 'chime' }, // たまごの前にマナジェムを置く。隣で、KIMORIN⭐︎も自分のマナジェムを置く
+  { t: 'say', who: 'OBOLON', text: '太陽と月と地球。陰と陽の力で、、、このたまごは、生まれた。' },
+  { t: 'say', who: 'OBOLON', text: 'どちらか好きな方を選べ' },
   { t: 'choice', key: 'egg', options: [{ label: '太陽と月のたまご', goto: 'egg-sun' }, { label: '地球と月のたまご', goto: 'egg-earth' }] },
   { t: 'label', id: 'egg-sun' },
   { t: 'still', image: 's/d2-egg-sun' },
@@ -239,17 +239,14 @@ export const DAY2: Step[] = [
   { t: 'label', id: 'egg-earth' },
   { t: 'still', image: 's/d2-egg-earth' },
   { t: 'label', id: 'egg-gem' },
-  { t: 'say', who: 'OBOLON', text: 'たまごの前に、、、マナジェムを、置け。' }, // KIMORIN⭐︎が、残ったたまごの前に立つ
-  { t: 'action', label: 'マナジェムを置く' },
-  { t: 'se', sound: 'chime' }, // 隣で、KIMORIN⭐︎も、残ったたまごの前に自分のマナジェムを置く
-  { t: 'say', who: 'OBOLON', text: '陰と、陽の力で、、、このたまごは、生まれた。' },
-  { t: 'say', who: 'OBOLON', text: 'ここにマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
-  { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' },
+  { t: 'say', who: 'KIMORIN', text: 'そうですか、私はこちらいいですです。' }, // 選ばれなかった方のたまごを選ぶ
+  { t: 'say', who: 'OBOLON', text: 'この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
+  { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 動揺して照れる
   { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },
   { t: 'say', who: 'OBOLON', text: 'お前の、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。' },
   { t: 'egg', submit: 'これにする' },
   { t: 'say', who: 'OBOLON', text: '{food}、か。愛が伝わってくる。わかった。' },
-  { t: 'se', sound: 'magic' }, // マナジェムが光る。二つの光がまざり合って、たまごの中へ
+  { t: 'se', sound: 'magic' }, // マナジェムが光る。こちらの体からも、あたたかい光。二つの光がまざり合って、たまごの中へ
   { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'hatch-sun' }, otherwise: 'hatch-earth' },
   { t: 'label', id: 'hatch-sun' },
   { t: 'video', motion: 'd2-hatch-sun' }, // 選んだたまごにひびが入り、光が弾ける
@@ -278,12 +275,12 @@ export const DAY2: Step[] = [
   { t: 'label', id: 'pinpon' },
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
   { t: 'say', who: 'OBOLON', text: 'これが、、、お前の、相方だ。' },
-  { t: 'say', who: 'KIMORIN', text: 'こ、、、これが、、、オレの、、、相方？' }, // 面の目の切れ目から、青い光がぽろぽろ
+  { t: 'say', who: 'KIMORIN', text: 'こ、、、これが、、私の、、相方？' }, // 面の目の切れ目から、青い光がぽろぽろ
   { t: 'say', who: 'OBOLON', text: 'うん、そうだ。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな時も、私のことを肯定してくれてましたね、、、' },
   { t: 'say', who: 'KIMORIN', text: 'やっと、会えましたね。' },
   { t: 'say', who: 'OBOLON', text: '名前を、つけろ' },
-  { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん' },
+  { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん、、、' },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪　ピンポン♪' }, // KIMORIN⭐︎のまわりを、ぴょんぴょん跳ねる
   { t: 'sprite', image: ['obolon', '@bati'] },
   { t: 'say', who: 'OBOLON', text: 'お前も、、、名前を、つけてやれ。' },
@@ -299,9 +296,16 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '明日は、、、土星へ、旅立つ。' },
   { t: 'say', who: 'OBOLON', text: '今日は、、、月で、眠れ。' },
   { t: 'say', who: 'KIMORIN', text: 'え！？全然まだこのままいけますよ。' },
-  { t: 'say', who: 'OBOLON', text: '先を急がない。目の前を味わう。今を感じる。大事なことだ。' },
+  { t: 'say', who: 'OBOLON', text: '急がない。焦らない。目の前を味わう。今を感じる。大事なことだ。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、、、\nまぁ確かにこんな美しい景色の中で眠りにつくのは悪いことではありませんね。' },
+  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
+  { t: 'say', who: 'うんちピンポンくん', text: 'ピンポーン！' },
   { t: 'sprite', image: null },
-  { t: 'video', motion: 'd2-moon-night' }, // 夜の月の神殿。青い地球の下、ゆっくり引いていく
+  { t: 'bgm', track: null, fade: 3 },
+  { t: 'black' }, // 暗くフェード
+  { t: 'still', image: 's/d2-moon-bed' }, // 月の神殿のベッドに横たわるKIMORINとうんちピンポンくん
+  { t: 'say', who: 'KIMORIN', text: 'では、寝るとしますか。うんちピンポン君、いや、うんぽん' },
+  { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
+  { t: 'black' }, // 暗くフェード
   { t: 'end' },
 ];

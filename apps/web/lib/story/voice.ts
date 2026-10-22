@@ -31,10 +31,12 @@ export function formOf(act: string | undefined): number | null {
 }
 
 /**
- * A line that starts with a member's name and a pause (「{name}、\nお前は…」): the words after the name, so they
- * can be voiced ahead of time and spoken while the member's own voice of the whole line is not made yet.
+ * A line that starts with a member's name and a pause (「{name}、\nお前は…」), or names who sent them
+ * (「{inviter}から…」): the words without the name, so they can be voiced ahead of time and spoken while the member's own voice of the whole line is not made yet.
  */
 export function nameRest(text: string): string | null {
-  const r = text.replace(/^\{[a-z_]+\}(?:[、,，]\s*\n?|\n)/, '');
+  // 「{name}、\nお前は…」→「お前は…」; 「なるほど…。\n{inviter}から…招待されたのか…。」→「なるほど…。\n招待されたのか…。」
+  // (an inviter's name in kanji is never voiced: the client asked for the line without it, 2026-10-22)
+  const r = text.replace(/^\{[a-z_]+\}(?:[、,，]\s*\n?|\n)/, '').replace(/\{[a-z_]+\}から…*/, '');
   return r !== text && voiceable(r) ? r : null;
 }

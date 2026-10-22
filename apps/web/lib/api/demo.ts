@@ -95,7 +95,7 @@ interface DemoState {
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
 }
 
-/** Demo invitation that always works: /invite/demo (inviter = KIMORIN). */
+/** Demo invitation that always works: /invite/demo (inviter = 木元 駿之介, the very first inviter). */
 export const DEMO_INVITE_CODE = 'demo';
 
 // v2: the 8-day journey. Data from older demo builds is discarded so everyone starts at the entry screen.
@@ -171,7 +171,7 @@ export class DemoApi implements Api {
   }
 
   /**
-   * Demo entry: a member gets a login code; ANY other email is treated as invited by KIMORIN so the
+   * Demo entry: a member gets a login code; ANY other email is treated as invited by 木元 駿之介 so the
    * demo can be walked without an operator (PLACEHOLDER P-INV-4 — the real API refuses strangers).
    */
   async requestCode(email: string) {
@@ -180,7 +180,7 @@ export class DemoApi implements Api {
     const member = Object.values(this.s.users).some((u) => u.email === e);
     if (!member && !Object.values(this.invites()).some((i) => i.email === e && i.status === 'pending')) {
       const code = Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(16).padStart(2, '0')).join('');
-      this.invites()[code] = { code, inviterName: 'KIMORIN', email: e, status: 'pending', createdAt: now(), inviterId: null };
+      this.invites()[code] = { code, inviterName: '木元 駿之介', email: e, status: 'pending', createdAt: now(), inviterId: null };
     }
     const code = String(Math.floor(100000 + Math.random() * 900000));
     this.s.pendingCodes[e] = code;
@@ -574,7 +574,7 @@ export class DemoApi implements Api {
   async getInvite(code: string): Promise<InviteView> {
     await sleep(200);
     if (code === DEMO_INVITE_CODE) {
-      return { code, inviterName: 'KIMORIN', status: 'pending', expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
+      return { code, inviterName: '木元 駿之介', status: 'pending', expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
     }
     const inv = this.invites()[code];
     if (!inv) throw new ApiError(404, 'INVITE_NOT_FOUND', 'not found');
@@ -607,7 +607,7 @@ export class DemoApi implements Api {
       look: null,
       puniPic: null,
       butterfly: null,
-      invitedByName: inv?.inviterName ?? 'KIMORIN',
+      invitedByName: inv?.inviterName ?? '木元 駿之介',
       invitedByMessage: inv?.message ?? null,
       createdAt: now(),
     };

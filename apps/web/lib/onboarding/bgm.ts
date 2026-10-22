@@ -6,20 +6,21 @@ import { bgmLevel, bgmUrl } from './media';
 /**
  * Background music for the story.
  *
- * Mode "element" (default): a plain <audio> element, played exactly like the motion videos, which
- * are known to be audible on iPad. It is NOT routed through Web Audio (on some iOS versions a
- * MediaElementSource comes out silent). Level = the file's own loudness (−16 LUFS) × the per-track
- * level where the browser allows element volume; on iOS (fixed volume) it plays at full level.
+ * Mode "buffer" (default since 2026-10-22): the track is decoded and looped with Web Audio, like the
+ * line voices. iOS paused the <audio> element whenever a motion with sound started, and the switch to
+ * Web Audio after that left a gap (the client heard the music break off and come back during the
+ * crane's flight); element volume is also fixed on iOS, so its fades and the dip under voices did
+ * nothing there. The next track is decoded ahead (prefetch) so a theme lands on its cue.
  *
- * Mode "buffer" (automatic fallback): if iOS refuses or interrupts the element (e.g. while a video
- * with sound plays), the track is decoded and looped with Web Audio instead.
+ * Mode "element" (fallback without Web Audio): a plain <audio> element (not a MediaElementSource,
+ * which on some iOS versions comes out silent).
  *
  * unlock() must be called from the visitor's first tap.
  */
 type Mode = 'element' | 'buffer';
 
 export class Bgm {
-  private mode: Mode = 'element';
+  private mode: Mode = 'buffer';
   private el: HTMLAudioElement | null = null;
   private track: string | null = null;
   private muted = false;
@@ -42,6 +43,12 @@ export class Bgm {
     // Web Audio is only needed for the fallback, but unlock it now while we have a gesture.
     hasPlaybackSession();
     this.ctx = unlockAudio();
+    if (this.ctx) {
+      this.mode = 'buffer';
+      if (track) this.play(track, 0.6);
+      return;
+    }
+    this.mode = 'element';
     if (!this.el) {
       const el = new Audio();
       el.loop = true;
@@ -98,6 +105,11 @@ export class Bgm {
   setScale(v: number, seconds = 0.35) {
     this.scale = Math.max(0, Math.min(1, v));
     if (this.track) this.fadeTo(this.level(), seconds);
+  }
+
+  /** Decode a track that comes up soon, so it starts on its cue. */
+  prefetch(track: string | null) {
+    if (track && this.mode === 'buffer' && this.ctx) void this.load(track).catch(() => undefined);
   }
 
   setMuted(m: boolean) {
@@ -174,9 +186,10 @@ export class Bgm {
       p = fetch(bgmUrl(track))
         .then((r) => r.arrayBuffer())
         .then((b) => ctx.decodeAudioData(b));
-      // keep memory low: only the current track stays decoded
-      this.buffers.clear();
+      // keep memory low: the playing track and the one coming up
+      for (const k of [...this.buffers.keys()]) if (k !== this.track) this.buffers.delete(k);
       this.buffers.set(track, p);
+      p.catch(() => this.buffers.delete(track));
     }
     return p;
   }

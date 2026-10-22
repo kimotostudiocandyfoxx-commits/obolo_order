@@ -18,14 +18,16 @@ export interface DayStory {
   skipLabel: string;
   /** Day 2+ start with the email check (the 6-digit code). Day 1 starts from the invitation. */
   auth: boolean;
+  /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */
+  skippedText?: string;
 }
 
 export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
   1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false },
-  // the end of day 2 (the Moon): 「もちろん明日まで待てない」 (story M-R67)
-  2: { steps: DAY2, skipLabel: 'もちろん明日まで待てない', auth: true },
+  // the end of day 2 (the Moon): 「もちろん明日まで待てない」 (story M-R67) → 〔テロップ：24時間スキップした〕 (client 2026-10-22)
+  2: { steps: DAY2, skipLabel: 'もちろん明日まで待てない', auth: true, skippedText: '24時間スキップした' },
   3: { steps: DAY3, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
   4: { steps: DAY4, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
   5: { steps: DAY5, skipLabel: DEFAULT_SKIP_LABEL, auth: true },

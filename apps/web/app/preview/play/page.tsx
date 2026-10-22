@@ -159,7 +159,7 @@ function PreviewPlay() {
         steps={story.steps}
         vars={{
           name: 'テスト',
-          inviter: 'KIMORIN',
+          inviter: '木元 駿之介',
           inviterMessage: q.get('msg') === '0' ? undefined : '宇宙で待ってる✌️ウヒョヒョ',
           neo: neoForm(neo)?.name ?? (day >= 3 ? 'ミナト⭐︎' : undefined),
           batiFood: day >= 3 ? 'ラーメン' : undefined,

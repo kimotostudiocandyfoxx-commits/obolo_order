@@ -27,7 +27,10 @@ export function TomorrowScreen({
   completedAt,
   onUnlocked,
   skipLabel,
+  skippedText,
 }: {
+  /** The caption after a skip (default: the door opened). */
+  skippedText?: string;
   /** Per-day wording of the skip button (default: m.gate.cantWait = 明日まで待てへん). */
   skipLabel?: string;
   name: string;
@@ -118,7 +121,7 @@ export function TomorrowScreen({
     >
       {phase === 'open' ? (
         <div className="animate-[fadeUp_1.2s_ease-out]">
-          <p className="text-2xl tracking-[0.25em] text-amber-50">{t(m.gate.doorOpened, { name })}</p>
+          <p className="text-2xl tracking-[0.25em] text-amber-50">{skipped.current && skippedText ? skippedText : t(m.gate.doorOpened, { name })}</p>
         </div>
       ) : (
         <>

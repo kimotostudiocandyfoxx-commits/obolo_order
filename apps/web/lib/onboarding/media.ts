@@ -22,7 +22,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   // loops without their fade to black at both ends (no dark flash where they loop)
   '9-l', '28-l',
   // made with Seedance 2.5 (2026-10-20): the joins of day 1
-  'd1-open', 'd1-fold', 'd1-arrive', 'd1-gate-loop', 'd1-monban', 'd1-turn',
+  'd1-open', 'd1-fold', 'd1-arrive', 'd1-gate-loop', 'd1-monban',
   // made with Seedance 2.5 (2026-10-21): day 2 (docs/story-rewrite/day2-video-plan.md)
   'd2-ticket', 'd2-ticket-give', 'd2-kimorin-turn', 'd2-kimorin-face', 'd2-glasses-up', 'd2-kimorin-startle',
   'd2-kimorin-leave', 'd2-kimorin-back', 'd2-floor-open', 'd2-descend', 'd2-gem', 'd2-cards', 'd2-book',
@@ -39,7 +39,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  * Motions planned and being made (Seedance, docs/story-rewrite/day2-video-plan.md): until they arrive the
  * story shows a placeholder; the test of days 1–3 lets these through and nothing else.
  */
-export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
+export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>(['d2-step-in', 'd2-monban-smoke']);
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;

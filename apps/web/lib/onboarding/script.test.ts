@@ -42,12 +42,12 @@ describe('day 1 script', () => {
     // resuming during those lines shows 19's last frame
     expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
   });
-  it('MONBAN steps in on a black screen, turns round, then speaks to OBOLON (client 2026-10-20)', () => {
+  it('MONBAN steps in on a black screen, then speaks to OBOLON (no turn: client 2026-10-22)', () => {
     const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。');
     expect(DAY1[i - 1]).toEqual({ t: 'black' });
     expect(DAY1[i + 1]).toEqual({ t: 'video', motion: '27-c' });
-    expect(DAY1[i + 2]).toEqual({ t: 'video', motion: 'd1-turn' });
-    expect(DAY1[i + 4]).toMatchObject({ t: 'say', text: 'OBOLON、それは喋りすぎだ。' });
+    expect(DAY1[i + 2]).toEqual({ t: 'loop', motion: '28-l' });
+    expect(DAY1[i + 3]).toMatchObject({ t: 'say', text: 'OBOLON、それは喋りすぎだ。' });
     expect(mediaAt(DAY1, i)).toBeNull();
   });
   it('loops motion 13 behind OBOLON', () => {

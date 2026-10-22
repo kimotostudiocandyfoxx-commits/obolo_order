@@ -2,7 +2,10 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "d1-monban",
+    "d2-kimorin-turn"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -37,19 +40,11 @@
     },
     {
       "id": "d1-monban",
-      "duration": 6,
+      "duration": 8,
       "audio": true,
       "first": "apps/web/public/onboarding/s/d1-gate.jpg",
       "last": "apps/web/public/onboarding/m9-l.jpg",
-      "prompt": "The giant doors of the gate swing shut with a heavy rumble and the light inside goes out; the camera moves in to the closed dark doors; black smoke wells up from the floor in front of them, and out of the smoke rises a tall hooded figure in a long black robe with fine gold patterns, a single golden eye glowing under the hood, a large golden magic-circle halo lighting up behind his head. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
-    },
-    {
-      "id": "d1-turn",
-      "duration": 5,
-      "audio": true,
-      "first": "apps/web/public/onboarding/m28-l.jpg",
-      "last": "apps/web/public/onboarding/m28-l.jpg",
-      "prompt": "The hooded gatekeeper in the black-and-gold robe, golden halo behind his head, slowly turns his head and shoulders to look back over his shoulder at someone behind him, holds the look for a moment, then turns back to face forward. Slow, heavy, deliberate movement; locked-off camera; the robe sways slightly. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+      "prompt": "One continuous shot, no cuts: the camera keeps gliding forward along the polished stone avenue toward the great gate the whole time, as if the viewer is walking up to it; while we approach, the giant doors swing shut with a heavy rumble and the golden light inside narrows to a thin line and goes out; the camera arrives close in front of the closed dark doors; black smoke wells up from the floor in front of them, and out of the smoke rises a tall hooded figure in a long black robe with fine gold patterns, a single golden eye glowing under the hood, a large golden magic-circle halo lighting up behind his head. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
     },
     {
       "id": "d2-ticket",
@@ -68,9 +63,10 @@
     {
       "id": "d2-kimorin-turn",
       "duration": 5,
-      "first": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "first": "apps/web/public/onboarding/s/d2-gate-near.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-gate.jpg",
-      "prompt": "The camera, facing the great glowing gate, swings around smoothly to look back down the avenue behind — and there stands a small fox-masked character in a deep-red hooded robe with round dark sunglasses, his fan of tail feathers spreading open. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "The camera stands close before the great glowing gate, stops, and swings around smoothly to look back down the avenue behind — and there stands a small fox-masked character in a deep-red hooded robe with round dark sunglasses, his fan of tail feathers spreading open. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech.",
+      "audio": true
     },
     {
       "id": "d2-kimorin-face",
@@ -226,6 +222,26 @@
       "first": "apps/web/public/onboarding/s/d2-dragon.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-after.jpg",
       "prompt": "The giant many-armed dragon glows, shrinks and folds back in a swirl of light and water drops, becoming again the small fox-masked character in the red robe, now with one little white dragon wing between his tail feathers and his round sunglasses up on his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-step-in",
+      "duration": 4,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "last": "apps/web/public/onboarding/s/d2-gate-near.jpg",
+      "prompt": "The camera takes a slow, steady step forward along the polished stone avenue toward the great open gate glowing with golden light, as if the viewer walks into its light, and comes to a stop close in front of it. One continuous shot. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d2-monban-smoke",
+      "duration": 5,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d2-kimorin-gate.jpg",
+      "last": "apps/web/public/onboarding/s/d2-gate-two.jpg",
+      "refs": [
+        "design/story/refs/client/monban.jpg",
+        "design/story/refs/client/kimorin-entrance.jpg"
+      ],
+      "prompt": "On the stone avenue before the great gate, black smoke suddenly wells up from the floor beside the small fox-masked character in the red robe and sunglasses, who leans back in surprise; out of the smoke rises a tall hooded gatekeeper in a long black robe with fine gold patterns, a single golden eye under the hood and a golden magic-circle halo behind his head; the camera eases back so both stand facing each other before the glowing gate. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
     }
   ],
   "parallel": 4
