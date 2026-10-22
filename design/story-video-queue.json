@@ -2,7 +2,10 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "d1-monban",
+    "d2-kimorin-turn"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -37,11 +40,11 @@
     },
     {
       "id": "d1-monban",
-      "duration": 8,
+      "duration": 10,
       "audio": true,
       "first": "apps/web/public/onboarding/s/d1-gate.jpg",
       "last": "apps/web/public/onboarding/m9-l.jpg",
-      "prompt": "One continuous shot, no cuts: the camera keeps gliding forward along the polished stone avenue toward the great gate the whole time, as if the viewer is walking up to it; while we approach, the giant doors swing shut with a heavy rumble and the golden light inside narrows to a thin line and goes out; the camera arrives close in front of the closed dark doors; black smoke wells up from the floor in front of them, and out of the smoke rises a tall hooded figure in a long black robe with fine gold patterns, a single golden eye glowing under the hood, a large golden magic-circle halo lighting up behind his head. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+      "prompt": "A single unbroken take with no cuts and no jumps: a slow, steady dolly forward along the polished stone avenue toward the great gate, never stopping. As the camera travels, the giant doors swing shut with a heavy rumble and the golden light inside narrows to a thin line and goes out. The camera keeps moving forward smoothly until the closed dark doors fill the frame; black smoke wells up from the floor in front of them, and out of the smoke rises a tall hooded figure in a long black robe with fine gold patterns, a single golden eye glowing under the hood, a large golden magic-circle halo lighting up behind his head. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
     },
     {
       "id": "d2-ticket",
@@ -62,7 +65,7 @@
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-gate-near.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-gate.jpg",
-      "prompt": "The camera stands close before the great glowing gate, stops, and swings around smoothly to look back down the avenue behind — and there stands a small fox-masked character in a deep-red hooded robe with round dark sunglasses, his fan of tail feathers spreading open. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech.",
+      "prompt": "A single unbroken take with no cuts: the camera, close before the great glowing gate, turns smoothly sideways and around, as if the viewer looks back over the shoulder at the voice that called; a few steps away on the stone avenue stands a small fox-masked character in a deep-red hooded robe with round dark sunglasses, already facing the camera, hands on hips, his fan of white, black and red tail feathers spreading open behind him. The camera settles on him. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech.",
       "audio": true
     },
     {
