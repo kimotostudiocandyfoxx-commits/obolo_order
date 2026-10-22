@@ -29,6 +29,8 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   'd2-launch', 'd2-rocket-in', 'd2-landing', 'd2-moon-enter', 'd2-pinpon', 'd2-transform', 'd2-dragon',
   'd2-kimorin-back-normal', 'd2-altar', 'd2-hatch-sun', 'd2-hatch-earth', 'd2-pinpon-earth', 'd2-pinpon-sun',
   'd2-moon-night',
+  // the gate of the script of 2026-10-22
+  'd2-step-in', 'd2-monban-smoke',
   // Day 3
   '3-1', '3-3', '3-4', '3-6', '3-7',
   // Day 4
@@ -39,7 +41,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  * Motions planned and being made (Seedance, docs/story-rewrite/day2-video-plan.md): until they arrive the
  * story shows a placeholder; the test of days 1–3 lets these through and nothing else.
  */
-export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>(['d2-step-in', 'd2-monban-smoke']);
+export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;
