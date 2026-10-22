@@ -185,7 +185,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
   /** Day 1's invitation card is on screen (leaving: its words lift away as the next motion starts under it) */
   /** the space ticket picture as the scene (a `ticket` step with no stamp or flip): stays until the next scene */
-  const [ticketArt, setTicketArt] = useState<{ dest?: string } | null>(null);
+  const [ticketArt, setTicketArt] = useState<{ dest?: string; leaving?: boolean } | null>(null);
+  /** a motion that starts from the ticket picture (the paper airplane): the words lift off and the ticket hands over to it */
+  const leaveTicket = useCallback(() => {
+    setTicketArt((t) => (t && !t.leaving ? { ...t, leaving: true } : t));
+    setTimeout(() => setTicketArt((t) => (t?.leaving ? null : t)), 1300);
+  }, []);
   const [invite, setInviteState] = useState(false);
   const [inviteLeaving, setInviteLeaving] = useState(false);
   const inviteOn = useRef(false);
@@ -427,7 +432,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setSprite(null);
           setCam(null);
           setLog([]);
-          setTicketArt(null);
+          leaveTicket();
           leaveInvite();
           clearCaptions();
           pendingCaptions.current = s.captions ?? [];
@@ -445,7 +450,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
       }
     },
-    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine, setInvite, leaveInvite],
+    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine, setInvite, leaveInvite, leaveTicket],
   );
   runRef.current = run;
 
@@ -712,7 +717,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
-      {ticketArt && <TicketArt dest={ticketArt.dest} stamped={(id) => stampList.includes(id)} />}
+      {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
       {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
         // a soft shade under the thread so it reads on any picture

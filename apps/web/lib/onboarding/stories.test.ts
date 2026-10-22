@@ -77,13 +77,16 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps[first]).toMatchObject({ text: '待ちなさい。' });
     expect(steps.some((s) => s.t === 'say' && s.text.includes('天才発明家'))).toBe(true);
   });
-  it('at the gate: a step into the light, KIMORIN calls out, then MONBAN comes out of the smoke (client 2026-10-22)', () => {
-    const go = steps.findIndex((s) => s.t === 'action' && s.label === '中に入る');
-    const wait = steps.findIndex((s) => s.t === 'say' && s.text === '待ちなさい。');
-    const who = steps.findIndex((s) => s.t === 'say' && s.text === '誰だお前…。');
-    expect(steps.slice(go, wait).some((s) => s.t === 'video' && s.motion === 'd2-step-in')).toBe(true);
-    expect(steps.slice(wait, who).some((s) => s.t === 'video' && s.motion === 'd2-monban-smoke')).toBe(true);
-    expect(steps.some((s) => s.t === 'say' && s.text.startsWith('来たか'))).toBe(false);
+  it('the gate: the plane, MONBAN takes the ticket, through the gate, then KIMORIN behind you (client 2026-10-22)', () => {
+    const at = (f: (s: Step) => boolean) => steps.findIndex(f);
+    const plane = at((s) => s.t === 'video' && s.motion === 'd2-plane');
+    const close = at((s) => s.t === 'video' && s.motion === 'd1-monban');
+    const give = at((s) => s.t === 'video' && s.motion === 'd2-ticket-give');
+    const through = at((s) => s.t === 'video' && s.motion === '12-a');
+    const wait = at((s) => s.t === 'say' && s.text === '待ちなさい。');
+    const smoke = at((s) => s.t === 'video' && s.motion === 'd2-monban-smoke');
+    const into = at((s) => s.t === 'video' && s.motion === '12-b');
+    expect([plane, close, give, through, wait, smoke, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
   });
   it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');

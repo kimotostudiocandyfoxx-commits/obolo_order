@@ -22,17 +22,33 @@ export const DAY2: Step[] = [
   { t: 'caption', text: '宇宙行きの切符を手に入れた' },
   { t: 'action', label: '本部へ向かう' },
 
-  // D02-S002 お待ちなさい（client 2026-10-22: KIMORIN first, then MONBAN out of the smoke）
+  // D02-S002 お待ちなさい（client 2026-10-22, second pass）: the ticket folds into a paper airplane and flies to
+  // the HQ; at the gate the doors close and MONBAN appears, takes the ticket, the gate opens; on the way in
+  // KIMORIN calls from behind — the rest is seen looking back out through the gate
+  { t: 'se', sound: 'magic' },
+  { t: 'video', motion: 'd2-plane' }, // 切符が紙飛行機になって飛び、本部の門の前に着く
   { t: 'loop', motion: 'd1-gate-loop' },
+  { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
+  { t: 'bgm', track: 'monban' },
+  { t: 'se', sound: 'thud' },
+  { t: 'video', motion: 'd1-monban' }, // 門へ進みながら、門が閉まる → 黒い煙からMONBANが現れる
+  { t: 'loop', motion: '9-l' },
+  { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
+  { t: 'action', label: '切符を見せる' },
+  { t: 'se', sound: 'chime' },
+  { t: 'video', motion: 'd2-ticket-give' }, // 切符が光りながら、MONBANの両手の上に浮かぶ
+  { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
+  { t: 'bgvideo', motion: 11 }, // 門が開く
+  { t: 'action', label: '地球の神殿に向かう' },
   { t: 'bgm', track: null, fade: 2 },
-  { t: 'video', motion: 'd2-step-in' }, // 門の光の中へ一歩踏み出した、その時
+  { t: 'video', motion: '12-a' }, // 門をくぐる
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
-  { t: 'video', motion: 'd2-kimorin-turn' }, // ふり返る。深い赤のローブ、狐の耳の白い面、扇のように広がる羽の尾
+  { t: 'video', motion: 'd2-look-back' }, // ふり返ると、門の中に、サングラスのKIMORIN
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'thud' },
   { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
-  { t: 'still', image: 's/d2-gate-two' }, // KIMORINとMONBANが向き合う
+  { t: 'still', image: 's/d2-gate-two-inside' }, // KIMORINとMONBANが向き合う（門の内側から）
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'say', who: 'MONBAN', text: 'ここは秘密結社だ…' },
@@ -46,14 +62,13 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'おや、そこのあなた、もしかして、あなたも招待客？' },
   { t: 'say', who: 'KIMORIN', text: '気をつけなさい。私は、この世のすべての仕組みを理解しているので、わかります。' },
   { t: 'say', who: 'KIMORIN', text: 'こいつらは、大してすごくもないことを、めちゃくちゃすごそうに言い、そのあとに、超高額の入会費を請求してくる詐欺グループに違いありません。' },
-  { t: 'say', who: 'KIMORIN', text: 'まあ、このKIMORINが、こいつらの正体を暴いてみせましょう。' },
+  { t: 'say', who: 'KIMORIN', text: 'まあ、この天才発明家KIMORINが、こいつらの正体を暴いてみせましょう。' },
   { t: 'video', motion: 'd2-glasses-up' }, // サングラスをおでこに上げる（ここから通常時の姿）
   { t: 'say', who: 'KIMORIN', text: 'さあ、それでは入りましょう。' },
-  { t: 'video', motion: 11 }, // 門が開き、光の中へ
 
   // D02-S004 お金は、かからない
   { t: 'bgm', track: null, fade: 5 },
-  { t: 'video', motion: 12 },
+  { t: 'video', motion: '12-b' }, // 神殿の奥へ → 天球儀の大広間、光の柱
   { t: 'bgm', track: 'obolon' },
   { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、手前にKIMORIN
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く

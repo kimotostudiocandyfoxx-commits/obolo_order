@@ -241,6 +241,14 @@
         "design/story/refs/client/kimorin-entrance.jpg"
       ],
       "prompt": "On the stone avenue before the great gate, black smoke suddenly wells up from the floor beside the small fox-masked character in the red robe and sunglasses, who leans back in surprise; out of the smoke rises a tall hooded gatekeeper in a long black robe with fine gold patterns, a single golden eye under the hood and a golden magic-circle halo behind his head; the camera eases back so both stand facing each other before the glowing gate. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only quiet sound effects that match the action (magical shimmer, paper, wings, wind, rumble, smoke) — no music, no voices, no speech."
+    },
+    {
+      "id": "d2-plane",
+      "duration": 10,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d2-ticket.jpg",
+      "last": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "prompt": "One continuous shot: by magic, the slender golden space ticket lifts off and folds itself crease by crease into a golden paper airplane, which glides off through black starry space trailing gold sparkles; the camera follows it as it sails through glowing golden clouds, dives down toward a black-and-gold city of tall spires under a sunset sky, skims along the polished stone avenue and gently comes down in front of the great gate, dissolving into golden sparkles; the camera settles, looking straight at the gate. Sound: only quiet sound effects that match the action (magical shimmer, paper, wind) — no music, no voices, no speech."
     }
   ],
   "parallel": 4

@@ -19,11 +19,11 @@ const STARS: { id: StampId; x: number; label: string }[] = [
   { id: 'mars', x: 65.6, label: '火星' },
 ];
 
-export function TicketArt({ dest, stamped, fresh, pressed }: { dest?: string; stamped: (id: StampId) => boolean; fresh?: StampId; pressed?: boolean }) {
-  const ink = (k: number) => ({ animation: `inkBleed 2.2s ${0.4 + k * 0.4}s cubic-bezier(.3,.1,.2,1) both`, WebkitMaskImage: 'radial-gradient(closest-side, #000 55%, transparent 100%)', maskImage: 'radial-gradient(closest-side, #000 55%, transparent 100%)', WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat', WebkitMaskPosition: 'center', maskPosition: 'center' });
+export function TicketArt({ dest, stamped, fresh, pressed, leaving }: { dest?: string; stamped: (id: StampId) => boolean; fresh?: StampId; pressed?: boolean; leaving?: boolean }) {
+  const ink = (k: number) => (leaving ? { animation: `wordsOff 0.8s ${k * 0.06}s ease-in forwards` } : { animation: `inkBleed 2.2s ${0.4 + k * 0.4}s cubic-bezier(.3,.1,.2,1) both`, WebkitMaskImage: 'radial-gradient(closest-side, #000 55%, transparent 100%)', maskImage: 'radial-gradient(closest-side, #000 55%, transparent 100%)', WebkitMaskRepeat: 'no-repeat', maskRepeat: 'no-repeat', WebkitMaskPosition: 'center', maskPosition: 'center' });
   const at = (top: number, x = 50) => ({ top: `${top}%`, left: `${x}%`, transform: 'translateX(-50%)' });
   return (
-    <div className="absolute inset-0 overflow-hidden bg-black">
+    <div className={`absolute inset-0 overflow-hidden bg-black transition-opacity duration-500 ${leaving ? 'opacity-0 delay-700' : ''}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={ART} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" aria-hidden />
       <div className="absolute inset-0 flex items-center justify-center">
