@@ -2,9 +2,7 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [
-    "d2-kimorin-back"
-  ],
+  "redo": [],
   "items": [
     {
       "id": "d1-open",
