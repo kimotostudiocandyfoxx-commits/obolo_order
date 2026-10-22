@@ -89,7 +89,8 @@
       "id": "d2-descend",
       "duration": 5,
       "last": "apps/web/public/onboarding/s/d2-launch-pit.jpg",
-      "prompt": "First-person descent down a long spiral stone staircase lit by candles in a deep round shaft; at the bottom it opens into a vast carved stone hall with red banners and a magic circle on the floor, where a slender black rocket with gold ornaments and pink-cyan neon lines stands; the camera settles looking at the rocket."
+      "prompt": "First-person descent down a long spiral stone staircase lit by candles in a deep round shaft; at the bottom it opens into a vast carved stone hall with red banners and a magic circle on the floor, where a slender black rocket with gold ornaments and pink-cyan neon lines stands; the camera settles looking at the rocket.",
+      "first": "design/story/frames/d2-floor-open-end.jpg"
     },
     {
       "id": "d2-gem",
