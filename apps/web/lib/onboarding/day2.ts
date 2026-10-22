@@ -44,6 +44,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: null, fade: 2 },
   { t: 'video', motion: '12-a' }, // 門をくぐる
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
+  { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd2-look-back' }, // ふり返ると、門の中に、サングラスのKIMORIN
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'thud' },
