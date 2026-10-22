@@ -1,15 +1,21 @@
-# 物語の動画 — 2026-10-20T04:04:44.771Z
+# 物語の動画 — 2026-10-22T00:03:56.336Z
 
-bytedance:seedance@2.5 / 6本 / 約1083円
+bytedance:seedance@2.5 / 17本 / 約350円
 
-- ⚠️ md1-open: 音つきが通らず、音なしで作り直し（Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the s）
-- ✅ md1-open（5秒・720p）
-- ⚠️ md1-fold: 音つきが通らず、音なしで作り直し（Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the s）
-- ✅ md1-fold（5秒・720p）
-- ⚠️ md1-arrive: 音つきが通らず、音なしで作り直し（Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the s）
-- ✅ md1-arrive（5秒・720p）
-- ✅ md1-gate-loop（5秒・720p）
-- ⚠️ md1-monban: 音つきが通らず、音なしで作り直し（Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the s）
-- ✅ md1-monban（6秒・720p）
-- ⚠️ md1-turn: 音つきが通らず、音なしで作り直し（Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the s）
-- ✅ md1-turn（5秒・720p）
+- ✅ md2-ticket-give（5秒・720p）
+- ✅ md2-kimorin-turn（5秒・720p）
+- ❌ md2-floor-open: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"4aabc358-8e83-4433-bd10-b89d5bcbfdf6"}]
+- ❌ md2-descend: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"68b82bda-4f4f-40f0-a01c-1e868e739cfc"}]
+- ❌ md2-gem: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"a9639064-e56c-46ad-9b28-ac170900a3b0"}]
+- ❌ md2-launch: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"d5a62e93-50fe-4dc1-bcac-c05aea529690"}]
+- ❌ md2-landing: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"a8a02f7d-12c8-4e8d-8939-64415c4c7873"}]
+- ❌ md2-moon-enter: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"1d6cff49-a242-4e14-9ac4-2b3d6ac54699"}]
+- ❌ md2-dragon: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"7e65ccb2-bf19-4303-83b7-f1b8705e7806"}]
+- ❌ md2-altar: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"41ba7c2f-f7b5-4fb0-bf3a-74ed3067a592"}]
+- ❌ md2-hatch-sun: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"44129099-2ead-411c-a52c-666801ed40fa"}]
+- ❌ md2-hatch-earth: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"4e301ca9-3c8a-4f1a-8eab-47f8e432bcf8"}]
+- ❌ md2-pinpon-earth: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"c88a72d0-b894-4db2-bd33-7d5ff690e7ca"}]
+- ❌ md2-pinpon-sun: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"35ceecb3-c182-4fdf-91fc-eae38e538612"}]
+- ❌ md2-moon-night: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 30.1152 credits are currently reserved for requests in progress, and this request needs 7.4293 credits. Please wait for those requests to complete before submitting another request.","taskType":"videoInference","reservedCredits":30.1152,"taskCredits":7.4293,"taskUUID":"acc1952f-fbf5-43a3-8386-ca12610ad255"}]
+- ✅ md2-ticket（5秒・720p）
+- ✅ md2-kimorin-face（5秒・720p）
