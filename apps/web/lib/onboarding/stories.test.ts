@@ -85,7 +85,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const through = at((s) => s.t === 'video' && s.motion === '12-a');
     const wait = at((s) => s.t === 'say' && s.text === '待ちなさい。');
     const smoke = at((s) => s.t === 'video' && s.motion === 'd2-monban-smoke');
-    const into = at((s) => s.t === 'video' && s.motion === '12-b');
+    const into = at((s) => s.t === 'video' && s.motion === 'd2-walk-in');
     expect([plane, close, give, through, wait, smoke, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
   });
   it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {

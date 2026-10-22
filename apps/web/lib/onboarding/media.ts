@@ -45,7 +45,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  * Motions planned and being made (Seedance, docs/story-rewrite/day2-video-plan.md): until they arrive the
  * story shows a placeholder; the test of days 1–3 lets these through and nothing else.
  */
-export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
+export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>(['d2-kimorin-walkup', 'd2-walk-in', 'd2-obolon-appear']);
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;

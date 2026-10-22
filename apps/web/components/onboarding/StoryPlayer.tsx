@@ -417,6 +417,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setTicketArt(null);
           playMedia(s.motion, false);
           n++;
+        } else if (s.t === 'wait') {
+          setI(n);
+          const after = n + 1;
+          setTimeout(() => runRef.current(after), s.s * 1000);
+          return;
         } else if (s.t === 'whiteout') {
           setSprite(null);
           setWhite(true);
@@ -608,7 +613,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     let q = i - 1;
     while (steps[q]?.t === 'label') q--;
     addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'se', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'se', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }

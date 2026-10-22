@@ -765,6 +765,38 @@
         1280
       ],
       "always": false
+    },
+    {
+      "id": "d2-hall-dark-kimorin",
+      "refs": [
+        "design/story/frames/d1-hall.jpg",
+        "design/story/refs/client/kimorin-normal.jpg",
+        "apps/web/public/onboarding/s/d2-kimorin-close-up-in.jpg"
+      ],
+      "prompt": "Edit the first picture: the same dark-gold hall with the golden armillary spheres, the arches of gold rings and the reflective floor with magic circles, same camera and framing — but almost dark: the pillar of light and the black sphere are not there yet, only faint gold glints in the darkness. Only add KIMORIN, full body, seen from behind, standing in the middle of the floor a little way ahead of the camera, looking up into the dark. KIMORIN is the small cute fox-masked character of the reference pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers. His round dark sunglasses are pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false
+    },
+    {
+      "id": "d2-gate-inside-kimorin-leave",
+      "refs": [
+        "apps/web/public/onboarding/s/d2-gate-inside.jpg",
+        "design/story/refs/client/kimorin-normal.jpg",
+        "apps/web/public/onboarding/s/d2-kimorin-close-up-in.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the view exactly as it is — looking out through the great dark-gold gate from inside, the armillary sphere above the arch, the lanterns, the sunset sky and the avenue of spires through the arch, the same camera, framing, light and colors. Only add KIMORIN, full body, seen from behind in the lower foreground, strutting happily toward the arch, his fan of tail feathers swaying to one side. KIMORIN is the small cute fox-masked character of the reference pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers. His round dark sunglasses are pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false
     }
   ],
   "redo": []

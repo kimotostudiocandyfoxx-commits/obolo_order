@@ -45,7 +45,8 @@ export const DAY2: Step[] = [
   { t: 'video', motion: '12-a' }, // 門をくぐる
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
   { t: 'se', sound: 'whoosh' },
-  { t: 'video', motion: 'd2-look-back' }, // ふり返ると、門の中に、サングラスのKIMORIN
+  { t: 'video', motion: 'd2-look-back' }, // ふり返る：門の内側から入口のほうを見た景色
+  { t: 'video', motion: 'd2-kimorin-walkup' }, // 奥の通路から、KIMORINがゆっくり門まで歩いてくる → 顔のドアップ（劇場版アニメのように）
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'thud' },
   { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
@@ -69,8 +70,9 @@ export const DAY2: Step[] = [
 
   // D02-S004 お金は、かからない
   { t: 'bgm', track: null, fade: 5 },
-  { t: 'video', motion: '12-b' }, // 神殿の奥へ → 天球儀の大広間、光の柱
+  { t: 'video', motion: 'd2-walk-in' }, // KIMORINが前を歩き、地球の神殿の中へ → 暗い天球儀の大広間
   { t: 'bgm', track: 'obolon' },
+  { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
   { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、手前にKIMORIN
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'se', sound: 'boing' },
@@ -82,6 +84,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'え？宇宙、、、行きたい' },
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
   { t: 'bgvideo', motion: 14, then: [15] }, // 天井が夜空になり、金の輪をまとった地球が浮かび、ゆっくり回る
+  { t: 'wait', s: 3.5 }, // 地球が出てから（client 2026-10-22）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。どうだ、宇宙へ行ってみるか？' }, // MONBANが入り口から歩きながら
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
@@ -93,7 +96,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'しない。' },
   { t: 'say', who: 'KIMORIN', text: '…………。' },
   { t: 'say', who: 'KIMORIN', text: '、、、そうですか！\nそれではめちゃくちゃ宇宙に行かせていただきます！宇宙行きの切符、私の家に、送っといてください。' },
-  { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 咳払いして、ローブの裾をひるがえし、鼻歌で門の外へ。扇の尾をぱたぱた、光の点になって空へ
+  { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 門の内側から入口のほうを見た景色で。 咳払いして、ローブの裾をひるがえし、鼻歌で門の外へ。扇の尾をぱたぱた、光の点になって空へ
   { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' },
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd2-kimorin-back' }, // 光の点が戻って門の前で急停止 → 切符を握りしめ、ダッシュで神殿に戻る

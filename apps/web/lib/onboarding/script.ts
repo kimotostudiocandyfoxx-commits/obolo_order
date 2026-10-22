@@ -92,6 +92,8 @@ export type Step =
   | { t: 'venus' }
   /** Fade the whole screen to white (~3 s), then continue; the next still/motion fades in from white. */
   | { t: 'whiteout' }
+  /** Let a moment play before the next step (e.g. the Earth comes up before KIMORIN gasps). */
+  | { t: 'wait'; s: number }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */
