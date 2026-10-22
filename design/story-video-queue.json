@@ -2,7 +2,10 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "d2-kimorin-startle",
+    "d2-kimorin-back"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -166,7 +169,8 @@
       "id": "d2-kimorin-startle",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
-      "prompt": "Comedy beat in the golden temple hall: the small fox-masked character in the red robe jumps back in shock at the floating black sphere, leaning far back with his arms flung up and his fan of tail feathers bristling, then freezes, staring. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "Comedy beat in the dark-gold hall with golden armillary spheres and a thin pillar of light: the small fox-masked character in the red robe jumps back in shock at the floating black sphere, leaning far back with his arms flung up and his fan of tail feathers bristling, then freezes, staring. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "audio": true
     },
     {
       "id": "d2-kimorin-leave",
@@ -179,7 +183,8 @@
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d1-gate.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-run.jpg",
-      "prompt": "Comedy beat: a bright point of light streaks back down from the sky and screeches to a halt in front of the great gate, becoming the small fox-masked character in the red robe; he immediately dashes at tremendous speed through the gate and into the golden temple hall, skidding to a stop, bent over and panting, clutching a golden ticket to his chest. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "Comedy beat: a bright point of light streaks back down from the sky and screeches to a halt in front of the great gate, becoming the small fox-masked character in the red robe; he immediately dashes at tremendous speed through the gate and into the dark-gold hall with golden armillary spheres and a thin pillar of light, skidding to a stop, bent over and panting, clutching a golden ticket to his chest. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "audio": true
     },
     {
       "id": "d2-cards",
