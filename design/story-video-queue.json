@@ -160,6 +160,71 @@
       "duration": 5,
       "first": "design/story/refs/client/moon-temple-aerial-2.jpg",
       "prompt": "Night on the Moon: the white temple in its crater, the blue Earth hanging in the black sky, a few lights glowing inside; the camera slowly pulls back and up, very calm and quiet."
+    },
+    {
+      "id": "d2-glasses-up",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-kimorin-close.jpg",
+      "last": "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
+      "prompt": "Close-up: the small fox-masked character raises one white gloved hand and pushes his round dark sunglasses up off his face onto the top of his hood, with a confident little tilt of the head. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-kimorin-startle",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
+      "prompt": "Comedy beat in the golden temple hall: the small fox-masked character in the red robe jumps back in shock at the floating black sphere, leaning far back with his arms flung up and his fan of tail feathers bristling, then freezes, staring. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-kimorin-leave",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-kimorin-walk.jpg",
+      "prompt": "Seen from behind, the small fox-masked character struts happily out through the glowing gate, his fan of tail feathers swishing left and right in rhythm as if he were humming; then he turns into a bright point of light and shoots up into the sunset sky, vanishing among the clouds. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-kimorin-back",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d1-gate.jpg",
+      "last": "apps/web/public/onboarding/s/d2-hall-run.jpg",
+      "prompt": "Comedy beat: a bright point of light streaks back down from the sky and screeches to a halt in front of the great gate, becoming the small fox-masked character in the red robe; he immediately dashes at tremendous speed through the gate and into the golden temple hall, skidding to a stop, bent over and panting, clutching a golden ticket to his chest. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-cards",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-monban-pit.jpg",
+      "last": "apps/web/public/onboarding/s/d2-cards.jpg",
+      "prompt": "In the candle-lit launch pit, behind the tall hooded gatekeeper, eight blank golden cards rise one after another out of thin air with a soft glow and settle into a wide arc above and behind him."
+    },
+    {
+      "id": "d2-book",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-cards.jpg",
+      "last": "apps/web/public/onboarding/s/d2-book.jpg",
+      "prompt": "The eight golden cards behind the gatekeeper dissolve into streams of golden light particles that swirl down toward the camera and pour into an old brown leather book held in two hands, which closes with a soft golden glow."
+    },
+    {
+      "id": "d2-rocket-in",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-rocket-in.jpg",
+      "prompt": "Inside the rocket with purple and cyan neon: the small fox-masked character stands at the big window gazing down at the glowing night Earth below; sushi plates glide along the lane; the camera slowly drifts closer. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-pinpon",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-pinpon.jpg",
+      "prompt": "Close-up: the small fox-masked character slowly holds out the little silver box on his gloved palm toward the camera; the gold rim around its round glass button begins to glow and pulse. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-transform",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-moon-kimorin.jpg",
+      "prompt": "In the moon temple: a thin stream of golden light spills from the gemstone in the fox-masked character's hand into the round water basin; the water rises up in a glowing spiral and wraps around him completely, ending in a burst of white light. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-kimorin-back-normal",
+      "duration": 5,
+      "first": "apps/web/public/onboarding/s/d2-dragon.jpg",
+      "last": "apps/web/public/onboarding/s/d2-kimorin-after.jpg",
+      "prompt": "The giant many-armed dragon glows, shrinks and folds back in a swirl of light and water drops, becoming again the small fox-masked character in the red robe, now with one little white dragon wing between his tail feathers and his round sunglasses up on his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
     }
   ]
 }

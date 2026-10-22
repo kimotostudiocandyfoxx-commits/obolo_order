@@ -44,6 +44,21 @@ async function call(tasks) {
 }
 
 async function make(x) {
+  // credit still reserved by a request that is finishing: wait and ask again (up to ~5 minutes)
+  for (let k = 0; ; k++) {
+    try {
+      return await makeWithSound(x);
+    } catch (e) {
+      if (k < 10 && /concurrentRequestLimitExceeded|Insufficient available balance/i.test(String(e))) {
+        await new Promise((r) => setTimeout(r, 30_000));
+        continue;
+      }
+      throw e;
+    }
+  }
+}
+
+async function makeWithSound(x) {
   try {
     return await makeOnce(x, !!x.audio);
   } catch (e) {
@@ -105,10 +120,11 @@ function squeeze(src, out, upscale) {
 }
 
 let usd = 0;
-// three at a time
+// one at a time by default (each request reserves credit up front; parallel requests ran the balance
+// out — 2026-10-22); the queue's "parallel" can raise it
 let next = 0;
 await Promise.all(
-  Array.from({ length: 3 }, async () => {
+  Array.from({ length: queue.parallel ?? 1 }, async () => {
     while (next < todo.length) {
       const x = todo[next++];
       try {
