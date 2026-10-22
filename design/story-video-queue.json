@@ -2,7 +2,9 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "d2-kimorin-leave"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -174,8 +176,9 @@
     {
       "id": "d2-kimorin-leave",
       "duration": 5,
-      "first": "apps/web/public/onboarding/s/d2-kimorin-walk.jpg",
-      "prompt": "Seen from behind, the small fox-masked character struts happily out through the glowing gate, his fan of tail feathers swishing left and right in rhythm as if he were humming; then he turns into a bright point of light and shoots up into the sunset sky, vanishing among the clouds. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "first": "apps/web/public/onboarding/s/d2-gate-inside-kimorin-leave.jpg",
+      "prompt": "Seen from inside the great gate, looking out at the sunset avenue of spires: the small fox-masked character struts happily away from the camera out through the arch, his fan of tail feathers swishing left and right in rhythm as if he were humming; out on the avenue he turns into a bright point of light that shoots up into the sunset sky and disappears. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: soft footsteps and a sparkling whoosh — no music, no voices, no speech, no singing.",
+      "audio": true
     },
     {
       "id": "d2-kimorin-back",
@@ -259,6 +262,22 @@
       "first": "apps/web/public/onboarding/s/d2-gate-inside.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg",
       "prompt": "A dramatic theatrical-anime entrance, one unbroken take: looking out through the great gate from inside at the sunset avenue of spires, a small silhouette appears far down the avenue and walks slowly, steadily toward the gate, backlit by the low sun, the fan of tail feathers swaying with each step; the camera slowly pushes in to meet him, lower and closer, his deep-red robe and white fox mask with round dark sunglasses catching the golden light, until he stops in the arch in a big close-up of his face filling the frame. While he wears his round dark sunglasses, their black lenses completely hide his eyes — no glow and no eyes ever show through, above or around them. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only soft footsteps, robe rustle and wind — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "d2-walk-in",
+      "duration": 10,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d2-kimorin-close-up-in.jpg",
+      "last": "apps/web/public/onboarding/s/d2-hall-dark-kimorin.jpg",
+      "prompt": "One unbroken take: in close-up inside the great gate, the small fox-masked character (sunglasses pushed up on his hood) turns around and walks ahead of the camera; the camera follows a few steps behind him along a polished avenue of gold-lit spires toward a vast domed temple, through its tall doors and a dim corridor, into a huge, almost dark hall with golden armillary spheres and arches of gold rings, where he stops in the middle of the floor and looks up into the darkness. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only footsteps, robe rustle and a deep hall ambience — no music, no voices, no speech."
+    },
+    {
+      "id": "d2-obolon-appear",
+      "duration": 5,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d2-hall-dark-kimorin.jpg",
+      "last": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
+      "prompt": "In the dark hall with golden armillary spheres, a thin pillar of golden light falls from high above onto the center of the floor, the magic circles on the floor light up, the gold rings of the hall glow, and a black sphere with two closed crescent eyes appears floating in the pillar of light; the small fox-masked character in the red robe steps back to the side, staring up at it, as the camera eases around to see him and the sphere. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: a deep shimmering chime and rising hum — no music, no voices, no speech."
     }
   ],
   "parallel": 4
