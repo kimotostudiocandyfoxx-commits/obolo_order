@@ -152,10 +152,10 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
-  { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポーン2.5』です。' },
+  { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
   { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。間違えていたらどうしよう。と、頭を抱える人も少なくない。' },
-  { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポーン2.5』さえあれば、もう安心。' },
+  { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
@@ -239,7 +239,7 @@ export const DAY2: Step[] = [
   { t: 'label', id: 'egg-earth' },
   { t: 'still', image: 's/d2-egg-earth' },
   { t: 'label', id: 'egg-gem' },
-  { t: 'say', who: 'KIMORIN', text: 'そうですか、私はこちらいいですです。' }, // 選ばれなかった方のたまごを選ぶ
+  { t: 'say', who: 'KIMORIN', text: 'そうですか、私はこちらでいいです。' }, // 選ばれなかった方のたまごを選ぶ
   { t: 'say', who: 'OBOLON', text: 'この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
   { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 動揺して照れる
   { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },

@@ -439,11 +439,12 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/earth-temple-hall.jpg",
-        "design/story/refs/client/obolon.jpg"
+        "design/story/frames/d1-hall.jpg",
+        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
+        "design/story/refs/client/kimorin-normal.jpg"
       ],
-      "prompt": "The golden temple hall of the reference (huge golden ring of light at the top of the stairs, polished reflecting floor, lanterns). OBOLON floats inside a pillar of light in front of the ring; KIMORIN stands in the lower foreground at the side, looking up at him. OBOLON exactly as in the reference: a pure black floating sphere with a thin glowing white rim like an eclipse corona and two white crescent eyes (closed smiling eyes), no mouth. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and vermilion feather tails behind; his eyes NEVER open — only thin glowing blue slits on the white mask, no other eyes anywhere. His round sunglasses rest up on his forehead above the mask (normal look). IMPORTANT: KIMORIN's eyes are NOT covered — his round dark sunglasses are pushed right up and rest on top of his hood above the mask, clearly away from the face; the two thin glowing blue slit eyes on the white mask are fully visible and closed (never open, no other eyes)."
+      "prompt": "Edit the first picture: keep the hall of the first picture exactly as it is — the same dark-gold hall with the golden armillary spheres on both sides, the arches of fine gold rings, the reflective floor with the glowing magic circles, the thin pillar of light in the middle with the small black sphere with closed eyes floating low in it, the same camera, framing, light and colors. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. Only add KIMORIN, full body, standing on the floor in the lower right foreground, turned toward the black sphere and looking up at it, lit warmly by the hall's golden light, with a soft reflection on the floor. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "always": false
     },
     {
       "id": "d2-hall-run",
@@ -454,12 +455,13 @@
         1280
       ],
       "refs": [
+        "design/story/frames/d1-hall.jpg",
+        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
         "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/earth-temple-hall.jpg",
-        "design/story/refs/client/monban.jpg",
-        "design/story/refs/client/obolon.jpg"
+        "design/story/refs/client/monban.jpg"
       ],
-      "prompt": "The golden temple hall. KIMORIN in the foreground, out of breath and bent forward, both hands clutching a golden space ticket to his chest; behind him OBOLON floats in the pillar of light and MONBAN stands nearby. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and vermilion feather tails behind; his eyes NEVER open — only thin glowing blue slits on the white mask, no other eyes anywhere. His round sunglasses rest up on his forehead above the mask (normal look). OBOLON exactly as in the reference: a pure black floating sphere with a thin glowing white rim like an eclipse corona and two white crescent eyes (closed smiling eyes), no mouth. MONBAN exactly as in the reference: tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black veil inside the hood with a single golden eye, a golden magic-circle halo behind his head, black gloves. IMPORTANT: KIMORIN's eyes are NOT covered — his round dark sunglasses are pushed right up and rest on top of his hood above the mask, clearly away from the face; the two thin glowing blue slit eyes on the white mask are fully visible and closed (never open, no other eyes)."
+      "prompt": "Edit the first picture: keep the hall of the first picture exactly as it is — the same dark-gold hall with the golden armillary spheres on both sides, the arches of fine gold rings, the reflective floor with the glowing magic circles, the thin pillar of light in the middle with the small black sphere with closed eyes floating low in it, the same camera, framing, light and colors. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. Only add two figures: in the lower foreground KIMORIN, full body, out of breath and bent forward, both hands clutching a slender golden space ticket to his chest; and at the left, a little further back, the tall hooded gatekeeper of the fourth picture (long black robe with fine gold patterns, a single golden eye under the hood, a golden magic-circle halo behind his head) standing calmly. Both lit warmly by the hall's golden light, with soft reflections on the floor. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "always": false
     },
     {
       "id": "d2-kimorin-walk",
@@ -700,5 +702,8 @@
       "prompt": "Night inside the white stone moon temple: a big soft bed with silver-white sheets under tall arched windows, the blue Earth glowing in the black starry sky outside. KIMORIN lies in the bed under the blanket, head on the pillow, relaxed and sleepy, and beside him on the pillow the small glossy round swirl-topped soft-serve-shaped creature of the reference (うんちピンポンくん) snuggles up. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on his forehead, one small white dragon wing between his tail feathers. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Calm, cozy, soft blue moonlight."
     }
   ],
-  "redo": []
+  "redo": [
+    "d2-hall-kimorin",
+    "d2-hall-run"
+  ]
 }

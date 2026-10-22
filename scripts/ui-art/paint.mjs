@@ -4,7 +4,7 @@
  * from — the Venus DJ's jog wheel, knob caps, metal, backdrop… Run by .github/workflows/ui-art.yml when
  * design/ui-art-queue.json changes.
  *
- * Each queue item: { id, prompt, w, h, size: [w, h], refs?: [paths] } — painted at w×h, saved at `size`
+ * Each queue item: { id, prompt, w, h, size: [w, h], refs?: [paths], always?: false } — painted at w×h, saved at `size`
  * (nothing above 720p, docs/media.md) as apps/web/public/<dir>/<id>.jpg. An id is painted once; "redo": [ids]
  * repaints. `refs` (or the queue's own `refs`) are style / character reference images.
  *
@@ -38,7 +38,8 @@ async function paint(x) {
         taskType: 'imageInference',
         taskUUID: randomUUID(),
         model: 'bytedance:seedream@5.0-pro',
-        positivePrompt: `${x.prompt} ${queue.always ?? ''}`.slice(0, 3000),
+        // always: false — a picture that edits its first ref (the place kept exactly) skips the queue's style line
+        positivePrompt: `${x.prompt} ${x.always === false ? '' : (queue.always ?? '')}`.slice(0, 3000),
         width: x.w,
         height: x.h,
         numberResults: 1,
