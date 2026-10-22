@@ -35,6 +35,8 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   '12-a', '12-b',
   // the paper airplane (Seedance) and the look back through the gate (a whip pan made from its two pictures)
   'd2-plane', 'd2-look-back',
+  // KIMORIN's entrance up the avenue, his walk into the temple, OBOLON's light (client 2026-10-22)
+  'd2-kimorin-walkup', 'd2-walk-in', 'd2-obolon-appear',
   // Day 3
   '3-1', '3-3', '3-4', '3-6', '3-7',
   // Day 4
@@ -45,7 +47,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  * Motions planned and being made (Seedance, docs/story-rewrite/day2-video-plan.md): until they arrive the
  * story shows a placeholder; the test of days 1–3 lets these through and nothing else.
  */
-export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>(['d2-kimorin-walkup', 'd2-walk-in', 'd2-obolon-appear']);
+export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;
