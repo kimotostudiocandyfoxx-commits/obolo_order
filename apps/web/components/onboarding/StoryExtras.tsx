@@ -5,6 +5,7 @@ import { motionUrl, spriteUrl } from '@/lib/onboarding/media';
 import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
 import { playPreset } from '@/lib/story/sfx';
 import { IconButton } from '@/components/story/parts';
+import { TicketArt } from '@/components/story/Ticket';
 import { useDictation } from '@/lib/useDictation';
 import { nameCharsOk } from '@obolo/shared';
 
@@ -290,8 +291,8 @@ export function stampsOn(day: number): StampId[] {
 }
 
 /**
- * The tour ticket (M-R18): a long golden ticket with four star-shaped stamp slots — Saturn, Jupiter,
- * Mercury, Mars. `fresh` stamps one now; `flip` turns it over: the star map, the four planets joined
+ * The tour ticket (M-R18): the ticket picture with four star-shaped stamp slots — Saturn, Jupiter,
+ * Mercury, Mars. `fresh` stamps one now; `flip` turns to the back: the star map, the four planets joined
  * by a gold line, and Venus, Uranus, Neptune locked 『ORDERのみ』. Tap to continue.
  */
 export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; onDone: () => void }) {
@@ -304,29 +305,12 @@ export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[];
   }, [flip]);
   const has = (id: StampId) => stamps.includes(id) || (id === fresh && pressed);
   return (
-    <button className="absolute inset-0 z-[12] flex flex-col items-center justify-center bg-black/70 px-6" onClick={onDone}>
-      <div className="relative w-[min(78vw,320px)] animate-[fadeUp_0.6s_ease-out] [perspective:900px]">
-        <div className={`relative transition-transform duration-1000 [transform-style:preserve-3d] ${back ? '[transform:rotateY(180deg)]' : ''}`}>
-          {/* front */}
-          <div className="rounded-2xl border border-amber-200/70 bg-gradient-to-b from-[#3a2a10] to-[#120c04] p-4 shadow-[0_0_50px_rgba(255,200,110,0.35)] [backface-visibility:hidden]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/onboarding/s/ticket.jpg" alt="" className="mx-auto h-40 w-auto rounded-xl object-cover" />
-            <p className="mt-2 text-center text-xs tracking-[0.5em] text-amber-200/80">宇宙行きの切符</p>
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {STAMPS.map((s) => (
-                <div key={s.id} className="flex flex-col items-center gap-1">
-                  <span
-                    className={`flex h-12 w-12 items-center justify-center text-2xl transition-all duration-500 [clip-path:polygon(50%_0,61%_35%,98%_35%,68%_57%,79%_91%,50%_70%,21%_91%,32%_57%,2%_35%,39%_35%)] ${has(s.id) ? 'scale-100 bg-amber-300' : 'bg-amber-100/15'} ${s.id === fresh && pressed ? 'animate-[fadeUp_0.5s_ease-out]' : ''}`}
-                  >
-                    {has(s.id) ? s.icon : ''}
-                  </span>
-                  <span className="text-[10px] text-amber-100/70">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+    <button className="absolute inset-0 z-[12]" onClick={onDone}>
+      <TicketArt stamped={has} fresh={fresh} pressed={pressed} />
+      <div className={`absolute inset-0 flex items-center justify-center bg-black/70 px-6 transition-opacity duration-1000 ${back ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
+        <div className="relative aspect-square w-[min(78vw,320px)]">
           {/* back: the star map */}
-          <div className="absolute inset-0 rounded-2xl border border-amber-200/70 bg-[radial-gradient(ellipse_at_center,#1d1640_0%,#07060d_80%)] p-4 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          <div className="absolute inset-0 rounded-2xl border border-amber-200/70 bg-[radial-gradient(ellipse_at_center,#1d1640_0%,#07060d_80%)] p-4">
             <svg viewBox="0 0 300 300" className="h-full w-full" aria-hidden>
               <polyline points="40,230 95,180 150,200 205,150" fill="none" stroke="#fcd34d" strokeWidth="2" />
               {[
@@ -364,7 +348,7 @@ export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[];
           </div>
         </div>
       </div>
-      <span className="pb-safe absolute bottom-6 text-xs tracking-widest text-white/50">TAP</span>
+      <span className="pb-safe absolute bottom-6 left-1/2 -translate-x-1/2 text-xs tracking-widest text-white/50">TAP</span>
     </button>
   );
 }

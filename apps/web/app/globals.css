@@ -628,3 +628,10 @@ body {
   70% { opacity: 1; filter: blur(0.6px); color: #9a7034; text-shadow: 0 0 8px rgba(255, 214, 140, 0.45); }
   100% { opacity: 1; filter: none; text-shadow: 0 0 0 rgba(255, 214, 140, 0); -webkit-mask-size: 340% 340%; mask-size: 340% 340%; }
 }
+
+/* a ticket stamp pressed: comes down big, lands with a small bounce */
+@keyframes stampIn {
+  0% { transform: scale(2.4) rotate(-14deg); opacity: 0; }
+  60% { transform: scale(0.92) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1.1) rotate(0); opacity: 1; }
+}

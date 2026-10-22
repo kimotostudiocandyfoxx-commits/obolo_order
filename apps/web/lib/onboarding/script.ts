@@ -123,8 +123,11 @@ export type Step =
    * answer opens too (day 7 at the Sun: 2 「表現者」, 1 「OBOLOは、町の名前」).
    */
   | { t: 'seal'; n: number; open?: boolean }
-  /** The space ticket with its four stamp slots; `stamp` presses that planet's stamp, `flip` shows the star map on the back. */
-  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars'; flip?: boolean }
+  /**
+   * The space ticket with its four stamp slots; `stamp` presses that planet's stamp, `flip` shows the star map on the back
+   * (both wait for a tap). With neither it is the scene itself — `dest` its 本日の目的地 — and stays until the next scene.
+   */
+  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars'; flip?: boolean; dest?: string }
   /** The day's 88 minutes (M-R22): on from the first rocket departure, off in the temples of Earth and the Moon. */
   | { t: 'clock'; on: boolean }
   /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */

@@ -19,7 +19,7 @@ export const DAY2: Step[] = [
   // D02-S001 宇宙行きの切符
   { t: 'se', sound: 'sparkle' },
   { t: 'video', motion: 'd2-ticket' }, // 光の粒が集まって、細長い金色の切符になる
-  { t: 'ticket' }, // 切符の文字（宇宙行きの切符／本日の目的地）と星のスタンプ欄4つ
+  { t: 'ticket', dest: '地球 → 月' }, // 切符の文字（宇宙行きの切符／本日の目的地）と星のスタンプ欄4つ
   { t: 'caption', text: '宇宙行きの切符を手に入れた' },
   { t: 'action', label: '本部へ向かう' },
 
@@ -97,7 +97,7 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-descend' }, // らせん階段を降りると、発射場とロケット
   { t: 'still', image: 's/d2-launch-pit' },
   { t: 'caption', text: 'ロケット発射場に着いた' },
-  { t: 'sprite', image: ['monban', 'obolon', 'kimorin-1'] },
+  { t: 'still', image: 's/d2-monban-pit' }, // ロケットの前のMONBAN（話し手はチャットのアイコンで）
   { t: 'say', who: 'OBOLON', text: 'これがロケットだ。月に行く。乗れ。' },
   { t: 'say', who: 'MONBAN', text: 'では、いってこい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？あなた達は乗らないのですか？' },
@@ -128,11 +128,9 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-book' }, // 札が光の粒になって、古い革の本に吸いこまれる
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: '謎の書を手に入れた' },
-  { t: 'still', image: 's/d2-launch-pit' },
-  { t: 'sprite', image: ['monban', 'obolon', 'kimorin-1'] },
+  { t: 'still', image: 's/d2-monban-pit' },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
-  { t: 'se', sound: 'sparkle' },
-  { t: 'sprite', image: ['monban', '', 'kimorin-1'] }, // OBOLONが消える
+  { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
   { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。\nそれでは私たちも行きましょう。。。コスモスへ！' },
   { t: 'say', who: 'MONBAN', text: '、、、月だ' },
   { t: 'action', label: 'ロケットに乗る' },

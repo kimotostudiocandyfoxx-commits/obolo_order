@@ -25,6 +25,7 @@ import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { Invitation } from '@/components/story/Invitation';
+import { TicketArt } from '@/components/story/Ticket';
 import {
   AgeInput,
   BluenaScreen,
@@ -183,6 +184,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   }, []);
   const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
   /** Day 1's invitation card is on screen (leaving: its words lift away as the next motion starts under it) */
+  /** the space ticket picture as the scene (a `ticket` step with no stamp or flip): stays until the next scene */
+  const [ticketArt, setTicketArt] = useState<{ dest?: string } | null>(null);
   const [invite, setInviteState] = useState(false);
   const [inviteLeaving, setInviteLeaving] = useState(false);
   const inviteOn = useRef(false);
@@ -309,8 +312,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
         // an answer given earlier today first (the egg), else one from an earlier day
         else if (s.t === 'branch') n = labelIndex(steps, s.cases[stateRef.current.answers[s.key] ?? varsRef.current.story?.[s.key] ?? ''] ?? s.otherwise);
-        else if (s.t === 'still') {
+        else if (s.t === 'ticket' && !s.stamp && !s.flip) {
+          setTicketArt({ dest: s.dest });
+          setReady(true);
+          setBlackout(false);
+          n++;
+        } else if (s.t === 'still') {
           setWhite(false);
+          setTicketArt(null);
           setStill(s.image);
           // a still is a full background: lift the start light / black screen
           setReady(true);
@@ -346,6 +355,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setWhite(false);
           setSprite(null);
           setCam(null);
+          setTicketArt(null);
           setStill(s.image);
           setReady(true);
           setBlackout(false);
@@ -383,6 +393,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           return;
         } else if (s.t === 'black') {
           bgQueue.current = [];
+          setTicketArt(null);
           setBlackout(true);
           setLog([]);
           dual.current?.pauseAll();
@@ -391,12 +402,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setWhite(false);
           clearStillOnShow.current = true;
           bgQueue.current = [];
+          setTicketArt(null);
           playMedia(s.motion, true);
           n++;
         } else if (s.t === 'bgvideo') {
           setWhite(false);
           clearStillOnShow.current = true;
           bgQueue.current = [...(s.then ?? [])];
+          setTicketArt(null);
           playMedia(s.motion, false);
           n++;
         } else if (s.t === 'whiteout') {
@@ -414,6 +427,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setSprite(null);
           setCam(null);
           setLog([]);
+          setTicketArt(null);
           leaveInvite();
           clearCaptions();
           pendingCaptions.current = s.captions ?? [];
@@ -559,6 +573,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     // the invitation card stays up after it opened (until the next motion)
     const lastCard = before.find((s) => s.t === 'invitation' || s.t === 'video' || s.t === 'arrive');
     if (lastCard?.t === 'invitation') setInvite(true);
+    const lastTicket = before.find((s) => s.t === 'ticket' || s.t === 'still' || s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo' || s.t === 'black' || s.t === 'arrive');
+    if (lastTicket?.t === 'ticket' && !lastTicket.stamp && !lastTicket.flip) {
+      setTicketArt({ dest: lastTicket.dest });
+      setReady(true);
+    }
     // the thread starts again from the line on screen (or the question being answered)
     let q = i - 1;
     while (steps[q]?.t === 'label') q--;
@@ -672,6 +691,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
+      {ticketArt && <TicketArt dest={ticketArt.dest} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
       {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
         // a soft shade under the thread so it reads on any picture
@@ -861,7 +881,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'ticket' && (
+      {started && step?.t === 'ticket' && (step.stamp || step.flip) && (
         <TicketCard
           stamps={stampList}
           fresh={step.stamp}
