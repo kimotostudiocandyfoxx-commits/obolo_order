@@ -95,7 +95,7 @@ async function listen(file, prompt) {
   if (!key) return null;
   try {
     const wav = execFileSync('ffmpeg', ['-loglevel', 'error', '-i', file, '-ac', '1', '-ar', '16000', '-t', '75', '-f', 'mp3', 'pipe:1'], { maxBuffer: 64 << 20 });
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent', {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
@@ -107,7 +107,7 @@ async function listen(file, prompt) {
       signal: AbortSignal.timeout(120_000),
     });
     const j = await res.json();
-    return j.candidates?.[0]?.content?.parts?.map((p) => p.text).join(' ').replace(/\s+/g, ' ').trim() ?? null;
+    return j.candidates?.[0]?.content?.parts?.map((p) => p.text).join(' ').replace(/\s+/g, ' ').trim() ?? `（聞けなかった：${res.status} ${JSON.stringify(j.error ?? j).slice(0, 200)}）`;
   } catch (e) {
     return `（聞けなかった：${String(e).slice(0, 120)}）`;
   }
