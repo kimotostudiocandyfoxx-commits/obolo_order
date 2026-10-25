@@ -648,3 +648,12 @@ body {
   0% { transform: translateY(2%) scale(0.97); opacity: 0.7; }
   100% { transform: none; opacity: 1; }
 }
+
+/* the characters' life (numbers in lib/story/motion.ts, passed as CSS variables) */
+@keyframes breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(calc(1 + var(--breath, 0.009))); } }
+@keyframes hop { 0%, 100% { transform: none; } 40% { transform: translateY(var(--hop, -2%)); } }
+@keyframes tailSway { 0%, 100% { transform: rotate(calc(var(--tail, 2deg) * -1)); } 50% { transform: rotate(var(--tail, 2deg)); } }
+@keyframes eyeGlow { 0%, 100% { opacity: var(--eyeMin, 0.35); } 50% { opacity: var(--eyeMax, 0.95); } }
+@keyframes reactJump { 0% { transform: none; } 35% { transform: translateY(var(--jump, -5%)) scale(1.02); } 55% { transform: translateX(-1%); } 70% { transform: translateX(1%); } 100% { transform: none; } }
+@keyframes reactTremble { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(var(--trem, 1.5px)); } 75% { transform: translateX(calc(var(--trem, 1.5px) * -1)); } }
+@keyframes reactStare { from { transform: scale(1); } to { transform: scale(var(--stare, 1.06)); } }

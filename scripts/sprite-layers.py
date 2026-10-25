@@ -136,3 +136,10 @@ if gl is not None:
         glow = Image.fromarray((eye * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(3))
         ga = np.asarray(glow).astype(np.float32) / 255
         save(f'{stem}-eyes', gl.astype(np.float32), np.clip(ga * 1.3, 0, 1) * al)
+
+# record which layers this pose has (the stage reads apps/web/lib/story/sprite-layers.json)
+import json, os
+reg_path = 'apps/web/lib/story/sprite-layers.json'
+reg = json.load(open(reg_path)) if os.path.exists(reg_path) else {}
+reg[stem] = sorted(k for k in ('body', 'tail', 'mouth', 'eyes') if os.path.exists(f'{out}/{stem}-{k}.webp'))
+json.dump(dict(sorted(reg.items())), open(reg_path, 'w'), indent=1)

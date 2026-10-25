@@ -1,6 +1,11 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { MOTION } from '@/lib/story/motion';
+import LAYERS from '@/lib/story/sprite-layers.json';
+
+/** a small motion that goes with a line (lib/story/expression.ts reactFor) */
+export type Reaction = 'shock' | 'stare' | 'tremble';
 
 /**
  * The story's stage (production UI 3–4, 11–12, 2026-10-15). Layers, back to front:
@@ -28,14 +33,19 @@ export interface CharSpec {
 }
 
 /** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
-const facesOf = (char: string, exprs: string[]) => Object.fromEntries(exprs.map((e) => [e, `${char}-x-${e}`]));
-const KIMORIN_FACES = facesOf('kimorin', ['talk', 'lecture', 'joy', 'point', 'shock', 'smug', 'tears', 'think']);
-const MONBAN_FACES = facesOf('monban', ['talk', 'point', 'arms', 'stop']);
+const facesOf = (stem: string, exprs: string[]) => Object.fromEntries(exprs.map((e) => [e, `${stem}-${e}`]));
+const POSES = ['talk', 'lecture', 'joy', 'point', 'shock', 'smug', 'tears', 'think'];
+/** KIMORIN after the dragon (sunglasses up, the small wing) */
+const KIMORIN_FACES = facesOf('kimorin-x', POSES);
+const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
 
 const CHAR: Record<string, CharSpec> = {
   // MONBAN's glowing eye is placed on the standing picture; on the pose pictures the eye is painted in
   monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225], faces: MONBAN_FACES },
   'kimorin-sun': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: KIMORIN_FACES },
+  // KIMORIN before the dragon (no wing) and at the gate (sunglasses on, no eye glow)
+  'kimorin-n': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-n', POSES) },
+  'kimorin-g': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-g', POSES) },
   kimorin: { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-1': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-2': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
@@ -56,7 +66,7 @@ export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWi
 /** Which picture on stage is the one who speaks. */
 const SPEAKER: Record<string, string[]> = {
   MONBAN: ['monban'],
-  KIMORIN: ['kimorin-sun', 'kimorin', 'kimorin-1', 'kimorin-2', 'kimorin-3', 'kimorin-8', 'kimorin-dragon'],
+  KIMORIN: ['kimorin-sun', 'kimorin-n', 'kimorin-g', 'kimorin', 'kimorin-1', 'kimorin-2', 'kimorin-3', 'kimorin-8', 'kimorin-dragon'],
   'KIMORIN⭐︎': ['kimorin-sun', 'kimorin', 'kimorin-1'],
   OBOLON: ['obolon'],
   バティ: ['@bati', '@bati-weak'],
@@ -104,9 +114,15 @@ export function Cast({
   speaking,
   talking,
   expressions = {},
+  level,
+  react,
   slot,
   className = '',
 }: {
+  /** the voice's loudness now (lip sync) */
+  level?: () => number;
+  /** the speaker's reaction to the line */
+  react?: Reaction;
   names: string[];
   src: (name: string) => string | null;
   /** the picture of the one speaking now (null = nobody) */
@@ -124,8 +140,17 @@ export function Cast({
   const real = names.filter(Boolean);
   const bust = real.length > 1 && !!speaking && speaking !== OFFSTAGE;
   const tint = speaking ? charSpec(speaking).tint : '#000';
+  // MONBAN comes and goes with black smoke
+  const [smoke, setSmoke] = useState(0);
+  const hadMonban = useRef(real.includes('monban'));
+  useEffect(() => {
+    const has = real.includes('monban');
+    if (has !== hadMonban.current) setSmoke((k) => k + 1);
+    hadMonban.current = has;
+  }, [real]);
   return (
     <>
+      {smoke > 0 && <Smoke key={smoke} />}
       {/* the bust-up's background: the scene behind goes soft and takes the speaker's colour */}
       <div
         className="pointer-events-none absolute inset-0 z-[3] transition-opacity duration-300"
@@ -146,6 +171,8 @@ export function Cast({
             bust={bust && speaking === name}
             hidden={bust && speaking !== name}
             talking={talking && speaking === name}
+            level={level}
+            react={speaking === name ? react : undefined}
             // beside someone in the video ('' slot): a little smaller, kept inside the screen
             style={real.length < names.length ? { left: `${names.length === 2 ? [30, 70][k] : [22, 50, 78][k] ?? 50}%` } : slot(k, names.length)}
             scale={real.length < names.length ? 0.74 : 1}
@@ -157,11 +184,46 @@ export function Cast({
   );
 }
 
-function Character({ name, url, posed, lit, bust, hidden, talking, style, className, scale = 1 }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; style: CSSProperties; className: string; scale?: number }) {
+/** the parts a layered pose has (scripts/sprite-layers.py writes the list) */
+const layersOf = (url: string): string[] => {
+  const stem = url.match(/\/onboarding\/([^/]+)\.webp$/)?.[1];
+  return (stem && (LAYERS as Record<string, string[]>)[stem]) || [];
+};
+
+function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1 }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number }) {
   const base = charSpec(name);
   const spec = { ...base, height: base.height * scale };
   const shut = useBlink(!!spec.eye && !posed);
   const own = name.startsWith('@') && name !== '@egg';
+  const parts = layersOf(url);
+  const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp$/, `-${k}.webp`) : null);
+  const mouth = layer('mouth');
+  // lip sync: the open-mouth patch follows the voice's loudness (held a moment so it does not flicker)
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!talking || !mouth || !level) return setOpen(false);
+    let raf = 0;
+    let last = 0;
+    let cur = false;
+    const tick = (t: number) => {
+      const want = level() > MOTION.lip.open;
+      if (want !== cur && t - last > MOTION.lip.holdMs) {
+        cur = want;
+        last = t;
+        setOpen(want);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [talking, mouth, level]);
+  // the speaker takes the floor: a small hop (once each time this one starts speaking among others)
+  const [hop, setHop] = useState(0);
+  const wasLit = useRef(lit);
+  useEffect(() => {
+    if (lit && !wasLit.current) setHop((h) => h + 1);
+    wasLit.current = lit;
+  }, [lit]);
   // the bust-up: the same picture, bigger, its face near the upper third of the screen
   const zoom = bust ? Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6))) : 1;
   const box: CSSProperties = {
@@ -174,29 +236,61 @@ function Character({ name, url, posed, lit, bust, hidden, talking, style, classN
     opacity: hidden ? 0 : 1,
     transition: 'transform 320ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out, left 320ms ease-out',
   };
+  const dim = lit ? 'none' : `brightness(${MOTION.dim.brightness}) saturate(${MOTION.dim.saturate})`;
+  const img = `h-full w-auto max-w-none select-none object-contain`;
+  // breathing while quiet; the reaction of the line on top
+  const life: CSSProperties = {
+    ['--breath' as string]: `${MOTION.breath.amount / 100}`,
+    ['--hop' as string]: `${-MOTION.hop.height}%`,
+    ['--jump' as string]: `${-MOTION.react.shock.jump}%`,
+    ['--trem' as string]: `${MOTION.react.tremble.px}px`,
+    ['--stare' as string]: `${MOTION.react.stare.zoom}`,
+    transformOrigin: '50% 100%',
+    animation:
+      react === 'shock'
+        ? `reactJump ${MOTION.react.shock.ms}ms cubic-bezier(.2,1.6,.4,1)`
+        : react === 'tremble'
+          ? `reactTremble ${MOTION.react.tremble.ms}ms linear 8`
+          : react === 'stare'
+            ? `reactStare ${MOTION.react.stare.ms}ms ease-out forwards`
+            : !talking && MOTION.breath.amount
+              ? `breathe ${MOTION.breath.period}ms ease-in-out infinite`
+              : undefined,
+  };
   return (
     <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden>
-      <div className="relative h-full" style={talking ? { animation: 'lipBob 0.22s ease-in-out infinite' } : undefined}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={url}
-          src={url}
-          alt=""
-          draggable={false}
-          className={`h-full w-auto max-w-none select-none object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''} ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`}
-          style={{ filter: lit ? 'none' : 'brightness(0.45) saturate(0.7)' }}
-        />
-        {spec.eye && !posed && (
-          <span
-            className="absolute h-[3.2%] w-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-100"
-            style={{
-              left: `${spec.eye[0] * 100}%`,
-              top: `${spec.eye[1] * 100}%`,
-              background: 'radial-gradient(circle, rgba(255,236,170,0.95) 0%, rgba(255,190,80,0.55) 40%, transparent 72%)',
-              opacity: shut ? 0 : talking ? 1 : lit ? 0.55 : 0.2,
-            }}
-          />
-        )}
+      <div key={hop} className="relative h-full" style={hop ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
+        <div className="relative h-full" style={{ ...life, ...(talking && !mouth ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
+          <div key={url} className={`relative h-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim }}>
+            {layer('tail') && (
+              // the tail feathers sway on their own, behind the body
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={layer('tail')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ transformOrigin: '50% 78%', animation: MOTION.tail.deg ? `tailSway ${MOTION.tail.period}ms ease-in-out infinite` : undefined, ['--tail' as string]: `${MOTION.tail.deg}deg` }} />
+            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
+            {mouth && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={mouth} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ opacity: open ? 1 : 0 }} />
+            )}
+            {layer('eyes') && (
+              // KIMORIN's eye slits: a glow that breathes (the sunglasses poses have none)
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={layer('eyes')!} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ animation: `eyeGlow ${MOTION.eyes.period}ms ease-in-out infinite`, ['--eyeMin' as string]: `${MOTION.eyes.min}`, ['--eyeMax' as string]: `${MOTION.eyes.max}` }} />
+            )}
+          </div>
+          {spec.eye && !posed && (
+            <span
+              className="absolute h-[3.2%] w-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-100"
+              style={{
+                left: `${spec.eye[0] * 100}%`,
+                top: `${spec.eye[1] * 100}%`,
+                background: 'radial-gradient(circle, rgba(255,236,170,0.95) 0%, rgba(255,190,80,0.55) 40%, transparent 72%)',
+                opacity: shut ? 0 : talking ? 1 : lit ? 0.55 : 0.2,
+              }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

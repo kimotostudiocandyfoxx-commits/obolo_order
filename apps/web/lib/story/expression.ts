@@ -27,3 +27,11 @@ export function exprFor(who: string, text: string): string {
   for (const [re, e] of RULES[who] ?? []) if (re.test(text)) return e;
   return 'talk';
 }
+
+/** The small motion that goes with a line: surprise jumps, a silent 「……」 leans in, a flustered stammer trembles. */
+export function reactFor(who: string, text: string): 'shock' | 'stare' | 'tremble' | undefined {
+  if (/^[…。、\s]+$/.test(text)) return 'stare';
+  if (/もも|ももも|ア、、、|ゴホン|、、、は！|え？、、/.test(text)) return 'tremble';
+  if (exprFor(who, text) === 'shock') return 'shock';
+  return undefined;
+}

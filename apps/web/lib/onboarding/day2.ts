@@ -52,7 +52,8 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'smoke' },
   { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
-  { t: 'still', image: 's/d2-gate-two-inside' }, // KIMORINとMONBANが向き合う（門の内側から）
+  { t: 'still', image: 's/d2-gate-inside' }, // 門の内側から入口を見た景色
+  { t: 'sprite', image: ['monban', 'kimorin-g'] }, // 立ち絵が動く試作（client 2026-10-25）：話す方が前に出る
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'say', who: 'MONBAN', text: 'ここは秘密結社だ…' },
@@ -171,7 +172,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'ちなみに、、、秘密結社は、初めてか？' },
   { t: 'choice', key: 'times', options: [{ label: '1回目' }, { label: '2回目' }, { label: '3回目以上' }] },
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
-  { t: 'still', image: 's/d2-moon-kimorin' }, // 黒い球が、くるりとKIMORINのほうへ向く
+  { t: 'still', image: 's/d2-moon-in' }, // 黒い球が、くるりとKIMORINのほうへ向く
+  { t: 'sprite', image: ['', 'kimorin-n'] }, // 立ち絵が動く試作：光の柱のOBOLONの前に、KIMORIN（ドラゴンの前の姿）
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
   { t: 'say', who: 'KIMORIN', text: '私は、、、、、、12回目です。' },
   { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
@@ -183,7 +185,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。間違えていたらどうしよう。と、頭を抱える人も少なくない。' },
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
-  { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
+  { t: 'still', image: 's/d2-moon-in' }, // シーン……
+  { t: 'sprite', image: ['', 'kimorin-n'] },
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' },

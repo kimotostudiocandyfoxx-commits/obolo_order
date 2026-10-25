@@ -57,6 +57,9 @@ function loadManifest() {
 export class LineVoice {
   private ctx: AudioContext | null = null;
   private gain: GainNode | null = null;
+  /** the voice's loudness, for the speaker's lip sync */
+  private analyser: AnalyserNode | null = null;
+  private wave: Float32Array<ArrayBuffer> | null = null;
   private src: AudioBufferSourceNode | null = null;
   private el: HTMLAudioElement | null = null;
   private volume = DEFAULT_MIX.voice;
@@ -80,6 +83,10 @@ export class LineVoice {
       this.gain = this.ctx.createGain();
       this.gain.gain.value = this.muted ? 0 : this.volume;
       this.gain.connect(masterBus(this.ctx));
+      this.analyser = this.ctx.createAnalyser();
+      this.analyser.fftSize = 512;
+      this.wave = new Float32Array(this.analyser.fftSize);
+      this.gain.connect(this.analyser);
     }
     if (!this.ctx && !this.el) {
       const el = new Audio();
@@ -107,6 +114,15 @@ export class LineVoice {
       this.el.volume = this.volume;
       this.el.muted = this.muted;
     }
+  }
+
+  /** How loud the line playing now is (0–1, RMS): the speaker's mouth opens above MOTION.lip.open. */
+  level(): number {
+    if (!this.analyser || !this.wave || !this.src) return 0;
+    this.analyser.getFloatTimeDomainData(this.wave);
+    let sum = 0;
+    for (let k = 0; k < this.wave.length; k++) sum += this.wave[k] * this.wave[k];
+    return Math.sqrt(sum / this.wave.length) / Math.max(0.05, this.volume);
   }
 
   setPersonal(voices: Record<string, string>) {

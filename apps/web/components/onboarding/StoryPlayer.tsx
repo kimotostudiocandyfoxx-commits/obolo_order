@@ -16,7 +16,7 @@ import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/components/story/Stage';
-import { exprFor } from '@/lib/story/expression';
+import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
@@ -533,6 +533,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the lines with the member's names in them: their own voices, made in the background
   useNameVoices(voice.current, steps, { name: v.name, neo: v.neo, bati: answers.batiName ?? vars.bati, food: v.batiFood, inviter: v.inviter });
   // each spoken line plays its voice (when it has one)
+  // the voice's loudness for the speaker's lip sync, and the line's small reaction
+  const voiceLevel = useCallback(() => voice.current?.level() ?? 0, []);
+  const sayReact = steps[i]?.t === 'say' ? reactFor((steps[i] as Extract<Step, { t: 'say' }>).who, (steps[i] as Extract<Step, { t: 'say' }>).text) : undefined;
   // KIMORIN / MONBAN speaking over a still that does not show them: their pose picture steps in (client
   // 2026-10-25). KIMORIN only once his look of the day is on stage (kimorin-sun: after the dragon on day 2).
   const autoStandee = (() => {
@@ -715,7 +718,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       </Camera>
       {!sprite && autoStandee && (
-        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} slot={spriteSlot} />
+        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
       )}
       {sprite && (
         <Cast
@@ -724,6 +727,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
           talking={talking}
           expressions={sayExpressions(expressions)}
+          level={voiceLevel}
+          react={sayReact}
           slot={spriteSlot}
         />
       )}
