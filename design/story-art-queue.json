@@ -969,6 +969,230 @@
         "design/story/refs/monban-grey.jpg"
       ],
       "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality 3D anime character render, soft even studio light. No text, no letters, no logos, no watermark. The character is MONBAN exactly as in the first reference picture: a tall hooded gatekeeper in a long black robe with fine gold patterns, a single glowing golden eye under the hood, a large golden magic-circle halo behind his head; calm, mysterious, imposing but not scary. Pose: one hand raised palm forward, saying stop."
+    },
+    {
+      "id": "kimorin-n-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-lecture",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-lecture",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-point",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-point",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-smug",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-smug",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-tears",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-tears",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-think",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression, framing, size, light and grey background — but remove the small white dragon wing completely, so only the fan of white, black and red-tipped tail feathers is behind him. The round dark sunglasses stay pushed up on top of the hood and the thin glowing blue eye slits stay visible. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-think",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the same character, pose, hands, expression of the mouth, framing, size, light and grey background — with two changes only: remove the small white dragon wing completely, and the round dark sunglasses are now worn over his eyes (not on the hood): their black lenses completely hide the eye slits — no glow and no eyes show through, above or around them. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
     }
   ],
   "redo": []
