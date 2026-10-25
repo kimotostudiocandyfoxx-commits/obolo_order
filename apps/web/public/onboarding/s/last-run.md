@@ -1,8 +1,20 @@
-# UI art — 2026-10-25T04:36:29.304Z
+# UI art — 2026-10-25T05:01:08.062Z
 
-Seedream 5.0 Pro / 4枚 / 約8円
+Seedream 5.0 Pro / 16枚 / 約29円
 
-- ✅ kimorin-x-joy
-- ✅ kimorin-x-point
-- ✅ kimorin-x-tears
-- ✅ kimorin-x-think
+- ✅ kimorin-g-joy
+- ✅ kimorin-g-lecture
+- ✅ kimorin-g-point
+- ✅ kimorin-g-shock
+- ✅ kimorin-g-smug
+- ✅ kimorin-g-talk
+- ✅ kimorin-g-tears
+- ✅ kimorin-g-think
+- ✅ kimorin-n-joy
+- ✅ kimorin-n-lecture
+- ✅ kimorin-n-point
+- ✅ kimorin-n-shock
+- ✅ kimorin-n-smug
+- ✅ kimorin-n-talk
+- ✅ kimorin-n-tears
+- ✅ kimorin-n-think
