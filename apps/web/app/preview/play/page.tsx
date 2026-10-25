@@ -12,6 +12,8 @@ import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { knownSealsOn, solvedSealsOn, stampsOn } from '@/components/onboarding/StoryExtras';
 import { neoForm } from '@obolo/shared';
 import { demoBati, demoStickerArt, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
+import { getApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { Made } from '@/lib/onboarding/made';
 import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
@@ -99,6 +101,11 @@ function PreviewPlay() {
   const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
   const [ordered, setOrdered] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
+  // logged in to the real API: the look and Bati are painted for real (Gemini) and saved to the account,
+  // like a member's first journey; otherwise demo pictures drawn in the browser
+  const { me, setMe } = useAuth();
+  const live = getApi().mode === 'live' && !!me && q.get('demo') !== '1';
+  const [batiFood, setBatiFood] = useState('ラーメン');
   useEffect(() => {
     if (q.get('timeup') !== '1') return;
     const t = setTimeout(() => setTimeUp(true), 20_000);
@@ -180,7 +187,19 @@ function PreviewPlay() {
         onProgress={() => {}}
         onName={async () => {}}
         onNeo={async (id) => setNeo(id)}
-        lookApi={{
+        lookApi={live ? {
+          candidates: (a) => getApi().lookCandidates(a),
+          refine: (id, instruction) => getApi().refineLook(id, instruction),
+          choose: async (id) => {
+            const u = await getApi().chooseLook(id);
+            setMe(u);
+            return u.avatarUrl ?? '';
+          },
+          chooseForm: async (id) => {
+            setMe(await getApi().updateMe({ neoForm: id }));
+            setNeo(id);
+          },
+        } : {
           candidates: async (a) => {
             await new Promise((r) => setTimeout(r, 1500));
             const urls =
@@ -205,12 +224,26 @@ function PreviewPlay() {
           choose: async (id) => cands.find((c) => c.id === id)?.url ?? '',
           chooseForm: async (id) => setNeo(id),
         }}
-        onEgg={async () => {}}
-        onHatch={async () => {
-          await new Promise((r) => setTimeout(r, 1500));
-          return '';
+        onEgg={async (food) => {
+          setBatiFood(food);
+          if (live) setMe(await getApi().batiEgg(food));
         }}
-        onBatiName={async () => {}}
+        onHatch={async () => {
+          if (live) {
+            try {
+              const u = await getApi().batiHatch();
+              setMe(u);
+              return u.bati?.imageUrl ?? demoBati(batiFood);
+            } catch {
+              return demoBati(batiFood);
+            }
+          }
+          await new Promise((r) => setTimeout(r, 1500));
+          return demoBati(batiFood);
+        }}
+        onBatiName={async (n) => {
+          if (live) setMe(await getApi().batiName(n));
+        }}
         ordered={ordered}
         orderApi={{
           checkout: async () => ({ mode: 'demo' }),
@@ -222,15 +255,15 @@ function PreviewPlay() {
         }}
         onEnd={() => setTimeout(() => setEnded(true), 1200)}
       />
-      <BackLink />
+      <BackLink live={live} />
     </>
   );
 }
 
-function BackLink() {
+function BackLink({ live }: { live?: boolean }) {
   return (
     <Link href="/preview" className="fixed left-1/2 top-[calc(10px+env(safe-area-inset-top))] z-[400] -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-[10px] text-white/60 backdrop-blur">
-      ← 確認用ページ
+      ← 確認用ページ{live ? '・本番生成' : ''}
     </Link>
   );
 }
