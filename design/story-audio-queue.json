@@ -141,32 +141,38 @@
     {
       "id": "comedy",
       "kind": "bgm",
-      "duration": 60,
-      "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
+      "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
     },
     {
       "id": "space",
       "kind": "bgm",
-      "duration": 60,
       "prompt": "Adventurous space-travel background music: soaring strings and warm synth pads, gentle driving pulse, wonder and excitement, a rocket flying through stars toward the moon. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
     },
     {
       "id": "moon",
       "kind": "bgm",
-      "duration": 60,
-      "prompt": "Calm, serene background music for a white stone temple on the moon: soft harp, celesta, airy pads and a gentle flute, peaceful and mysterious, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
+      "prompt": "Calm, serene background music for a white stone temple on the moon: soft harp, celesta, airy pads and a gentle flute, peaceful and mysterious, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
     },
     {
       "id": "tender",
       "kind": "bgm",
-      "duration": 60,
       "prompt": "Warm, tender background music for the birth of a small companion creature: music box, soft piano and warm strings, heart-warming and gentle, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
     },
     {
-      "id": "comedy-el",
+      "id": "comedy-ace",
       "kind": "bgm",
       "duration": 60,
-      "model": "elevenlabs:1@1",
+      "model": "runware:ace-step@v1.5-xl-sft",
       "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
     }
   ]
