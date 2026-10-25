@@ -3,9 +3,7 @@
   "sfxModel": "mirelo:1@1",
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
-  "redo": [
-    "ding"
-  ],
+  "redo": [],
   "probe": [],
   "items": [
     {
