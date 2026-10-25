@@ -1,12 +1,44 @@
-# UI art — 2026-10-25T05:04:32.677Z
+# UI art — 2026-10-25T05:11:16.945Z
 
-Seedream 5.0 Pro / 8枚 / 約14円
+Seedream 5.0 Pro / 40枚 / 約72円
 
-- ✅ kimorin-x-joy-o
-- ✅ kimorin-x-lecture-o
-- ✅ kimorin-x-point-o
-- ✅ kimorin-x-shock-o
-- ✅ kimorin-x-smug-o
-- ✅ kimorin-x-talk-o
-- ✅ kimorin-x-tears-o
-- ✅ kimorin-x-think-o
+- ✅ kimorin-g-joy-notail
+- ✅ kimorin-g-joy-o
+- ✅ kimorin-g-lecture-notail
+- ✅ kimorin-g-lecture-o
+- ✅ kimorin-g-point-notail
+- ✅ kimorin-g-point-o
+- ✅ kimorin-g-shock-notail
+- ✅ kimorin-g-shock-o
+- ✅ kimorin-g-smug-notail
+- ✅ kimorin-g-smug-o
+- ✅ kimorin-g-talk-notail
+- ✅ kimorin-g-talk-o
+- ✅ kimorin-g-tears-notail
+- ✅ kimorin-g-tears-o
+- ✅ kimorin-g-think-notail
+- ✅ kimorin-g-think-o
+- ✅ kimorin-n-joy-notail
+- ✅ kimorin-n-joy-o
+- ✅ kimorin-n-lecture-notail
+- ✅ kimorin-n-lecture-o
+- ✅ kimorin-n-point-notail
+- ✅ kimorin-n-point-o
+- ✅ kimorin-n-shock-notail
+- ✅ kimorin-n-shock-o
+- ✅ kimorin-n-smug-notail
+- ✅ kimorin-n-smug-o
+- ✅ kimorin-n-talk-notail
+- ✅ kimorin-n-talk-o
+- ✅ kimorin-n-tears-notail
+- ✅ kimorin-n-tears-o
+- ✅ kimorin-n-think-notail
+- ✅ kimorin-n-think-o
+- ✅ kimorin-x-joy-notail
+- ✅ kimorin-x-lecture-notail
+- ✅ kimorin-x-point-notail
+- ✅ kimorin-x-shock-notail
+- ✅ kimorin-x-smug-notail
+- ✅ kimorin-x-talk-notail
+- ✅ kimorin-x-tears-notail
+- ✅ kimorin-x-think-notail
