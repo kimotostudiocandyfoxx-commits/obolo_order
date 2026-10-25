@@ -1305,6 +1305,230 @@
         "apps/web/public/onboarding/s/kimorin-x-think.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, wing, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-lecture-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-point-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-smug-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-tears-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-think-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-lecture-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-point-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-smug-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-tears-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-g-think-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, tail feathers, sunglasses, framing, size, light and grey background — and change only the small mouth on the white mask: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
     }
   ],
   "redo": []
