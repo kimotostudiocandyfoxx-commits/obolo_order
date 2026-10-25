@@ -184,6 +184,86 @@
       "duration": 60,
       "model": "runware:ace-step@v1.5-xl-sft",
       "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
+    },
+    {
+      "id": "launch",
+      "kind": "bgm",
+      "prompt": "Mysterious, adventurous music for a vast underground stone hall where a rocket waits: low strings, deep drums, a curious celesta motif, anticipation building. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "party",
+      "kind": "bgm",
+      "prompt": "Over-the-top festive comedy music for a giant party-loving dragon with eighty arms: brass fanfare, bouncy swing, cowbell, confetti energy, funny and grand. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "night",
+      "kind": "bgm",
+      "prompt": "A soft lullaby for falling asleep in a moon temple under the blue Earth: music box, harp and warm pads, very slow, dreamy. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "saturn",
+      "kind": "bgm",
+      "prompt": "Groovy, gaudy, funny music for a flashy golden temple on Saturn ruled by two takoyaki siblings: funky bass, brass hits, wah guitar, playful and loud but friendly. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "sun",
+      "kind": "bgm",
+      "prompt": "Radiant, sacred music inside the Sun: shimmering high strings, warm brass swells, bright pads, awe and warmth, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "eclipse",
+      "kind": "bgm",
+      "prompt": "An emotional, solemn climax for a ritual where a black sun covers the light and a golden ring remains: building strings, piano, soft choir-like pads (no words), deeply moving. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "city",
+      "kind": "bgm",
+      "prompt": "Majestic, mysterious music for arriving at a black-and-gold city of spires at sunset: noble horns, harp glissandi, deep strings, grand but quiet enough for dialogue. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "ending",
+      "kind": "bgm",
+      "prompt": "A hopeful, gentle ending theme after a seven-day journey through space: piano and strings, warm and bittersweet, rising at the end. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
     }
   ],
   "listen": []
