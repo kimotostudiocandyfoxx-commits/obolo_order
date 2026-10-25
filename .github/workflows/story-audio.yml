@@ -38,6 +38,7 @@ jobs:
       - name: Make
         run: |
           export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key)"
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
           node scripts/story-audio/make.mjs
       - name: Save to the branch

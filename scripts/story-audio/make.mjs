@@ -23,6 +23,8 @@ const API = 'https://api.runware.ai/v1';
 const redo = new Set(queue.redo ?? []);
 const fileOf = (x) => join(OUT, x.kind === 'bgm' ? `bgm-${x.id}.m4a` : `se-${x.id}.mp3`);
 const todo = (queue.items ?? []).filter((x) => redo.has(x.id) || !existsSync(fileOf(x)));
+/** "listen": [ids] — Gemini listens to tracks already made, into the report */
+const listenOnly = (queue.items ?? []).filter((x) => (queue.listen ?? []).includes(x.id) && existsSync(fileOf(x)));
 const log = [];
 
 async function call(tasks) {
@@ -87,6 +89,30 @@ async function make(x) {
   return d.cost ?? 0;
 }
 
+/** Gemini listens to a made track and says what it hears (no vocals? the mood, does it loop, a score) */
+async function listen(file, prompt) {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return null;
+  try {
+    const wav = execFileSync('ffmpeg', ['-loglevel', 'error', '-i', file, '-ac', '1', '-ar', '16000', '-t', '75', '-f', 'mp3', 'pipe:1'], { maxBuffer: 64 << 20 });
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify({
+        contents: [{ parts: [
+          { inlineData: { mimeType: 'audio/mp3', data: wav.toString('base64') } },
+          { text: `This is background music made for a Japanese anime fantasy story game. It was asked for as: "${prompt}". Listen and answer in Japanese, in 3 short lines: 1) 歌声・人の声が入っているか（はい/いいえ） 2) 雰囲気と楽器（ひとことで） 3) 依頼に合っているか、BGMとしての質を10点満点で、ループに向くか。` },
+        ] }],
+      }),
+      signal: AbortSignal.timeout(120_000),
+    });
+    const j = await res.json();
+    return j.candidates?.[0]?.content?.parts?.map((p) => p.text).join(' ').replace(/\s+/g, ' ').trim() ?? null;
+  } catch (e) {
+    return `（聞けなかった：${String(e).slice(0, 120)}）`;
+  }
+}
+
 for (const w of queue.probe ?? []) await probe(w);
 let usd = 0;
 let next = 0;
@@ -96,14 +122,16 @@ await Promise.all(
       const x = todo[next++];
       try {
         usd += await make(x);
-        log.push(`- ✅ ${x.kind}-${x.id}（${x.duration ?? '-'}秒）`);
+        const heard = x.kind === 'bgm' ? await listen(fileOf(x), x.prompt) : null;
+        log.push(`- ✅ ${x.kind}-${x.id}（${x.duration ?? '-'}秒）${heard ? `\n  - 聞いた感じ：${heard}` : ''}`);
       } catch (e) {
         log.push(`- ❌ ${x.kind}-${x.id}: ${String(e).slice(0, 1200)}`);
       }
     }
   }),
 );
-if ((queue.redo ?? []).length || (queue.probe ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [], probe: [] }, null, 2) + '\n');
+for (const x of listenOnly) log.push(`- 👂 ${x.kind}-${x.id}：${(await listen(fileOf(x), x.prompt)) ?? '（鍵がない）'}`);
+if ((queue.redo ?? []).length || (queue.probe ?? []).length || (queue.listen ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [], probe: [], listen: [] }, null, 2) + '\n');
 mkdirSync('docs/story-import', { recursive: true });
 const report = [`# 物語の音 — ${new Date().toISOString()}`, '', `${todo.length}本 / 約${Math.round(usd * 150)}円`, '', ...log, ''].join('\n');
 writeFileSync('docs/story-import/audio-last-run.md', report);
