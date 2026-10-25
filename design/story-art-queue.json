@@ -2587,7 +2587,7 @@
         720,
         1280
       ],
-      "prompt": "A distant field at night with soft white round tent lights scattered like lanterns, completely out of focus, dreamy bokeh, stars above."
+      "prompt": "A distant field at night with small white round dome tents glowing softly from inside, scattered far away like lanterns, completely out of focus, dreamy bokeh, stars above. Drawn in the painterly anime film style of the game (like the reference pictures): hand-painted anime illustration, clean anime shapes and soft cel shading, not a photograph."
     },
     {
       "id": "sig-hand",
@@ -2599,9 +2599,10 @@
       ],
       "refs": [
         "design/story/refs/client/envelope.webp",
+        "design/story/refs/style-gate.jpg",
         "design/story/refs/style-obolon-temple.jpg"
       ],
-      "prompt": "Close-up on a wooden desk at night lit by a warm lamp: only a person's hands are visible (no face), pressing a golden compass-shaped wax seal onto a golden envelope with a tassel, exactly the envelope design of the first reference picture. The seal begins to glow gold. Finest anime film quality, painterly, warm gold and deep shadow. No text."
+      "prompt": "Close-up on a wooden desk at night lit by a warm lamp: only a person's hands are visible (no face), pressing a golden compass-shaped wax seal onto a golden envelope with a tassel, exactly the envelope design of the first reference picture. The seal begins to glow gold. Drawn in the painterly anime film style of the game (like the reference pictures): hand-painted anime illustration, clean anime shapes and soft cel shading, not a photograph. Warm gold and deep shadow. No text."
     },
     {
       "id": "sig-window",
@@ -2612,10 +2613,15 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/envelope.webp"
+        "design/story/refs/client/envelope.webp",
+        "design/story/refs/style-gate.jpg"
       ],
-      "prompt": "A golden envelope with a tassel (the envelope of the reference picture) flying through the night sky over a sea of city lights, gliding toward one warmly lit window of an ordinary home in the distance, golden sparkles trailing behind it. Finest anime film quality, cinematic. No text."
+      "prompt": "A golden envelope with a tassel (the envelope of the reference picture) flying through the night sky over a sea of city lights, gliding toward one warmly lit window of an ordinary home in the distance, golden sparkles trailing behind it. Drawn in the painterly anime film style of the game (like the reference pictures): hand-painted anime illustration, clean anime shapes and soft cel shading, not a photograph. No text."
     }
   ],
-  "redo": []
+  "redo": [
+    "sig-window",
+    "sig-f5-tents",
+    "sig-hand"
+  ]
 }
