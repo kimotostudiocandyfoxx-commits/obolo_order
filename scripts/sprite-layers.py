@@ -87,9 +87,12 @@ save(stem, rgb, al)
 nt = load(f'{stem}-notail')
 if nt is not None:
     al_body, _ = alpha_of(nt)
-    tail = np.clip(al - al_body, 0, 1)
-    tail = np.asarray(Image.fromarray((tail * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))).astype(np.float32) / 255
-    body = np.clip(al - tail, 0, 1)
+    # the edit leaves faint outlines where the feathers were: an opening removes thin leftovers
+    hard = Image.fromarray(((al_body > 0.5) * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(7)).filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(1.1))
+    al_body = np.minimum(al_body, np.asarray(hard).astype(np.float32) / 255)
+    # the body is what the tail-less painting still has; everything else of the figure is tail
+    body = al * al_body
+    tail = np.clip(al * (1 - al_body), 0, 1)
     save(f'{stem}-body', rgb, body)
     save(f'{stem}-tail', rgb, tail)
 
