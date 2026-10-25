@@ -1,6 +1,5 @@
-# UI art — 2026-10-25T05:52:24.806Z
+# UI art — 2026-10-25T05:55:34.856Z
 
-Seedream 5.0 Pro / 2枚 / 約9円
+Seedream 5.0 Pro / 1枚 / 約7円
 
-- ✅ d2-hall-sky
-- ✅ d2-hall-sky-monban
+- ✅ d2-hall-sky-empty
