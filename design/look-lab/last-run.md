@@ -1,0 +1,72 @@
+# Look lab — 2026-10-25T07:01:04.671Z
+
+68枚 / 約485円
+
+- ✅ bati-moon-1
+- ✅ bati-moon-1-cake-gemini
+- ✅ bati-moon-1-cake-seedream
+- ✅ bati-moon-1-ramen-gemini
+- ✅ bati-moon-2
+- ✅ bati-moon-3
+- ✅ bati-moon-3-cake-gemini
+- ✅ bati-moon-3-cake-seedream
+- ✅ bati-moon-3-ramen-gemini
+- ✅ bati-moon-4
+- ✅ bati-moon-5
+- ✅ bati-moon-6
+- ✅ bati-moon-7
+- ✅ bati-moon-8
+- ✅ bati-sun-1
+- ✅ bati-sun-1-cake-gemini
+- ✅ bati-sun-1-ramen-gemini
+- ✅ bati-sun-1-ramen-seedream
+- ✅ bati-sun-2
+- ✅ bati-sun-3
+- ✅ bati-sun-3-cake-gemini
+- ✅ bati-sun-3-cake-seedream
+- ✅ bati-sun-3-ramen-seedream
+- ✅ bati-sun-4
+- ✅ bati-sun-5
+- ✅ bati-sun-6
+- ✅ bati-sun-7
+- ✅ bati-sun-8
+- ✅ look-a0-gemini
+- ✅ look-a0-gemini-pro
+- ✅ look-a0-seedream
+- ✅ look-a0r0-gemini
+- ✅ look-a0r0-seedream
+- ✅ look-a0r1-gemini
+- ✅ look-a0r1-seedream
+- ✅ look-a0r2-gemini
+- ✅ look-a0r2-seedream
+- ✅ look-a0r3-gemini
+- ✅ look-a0r3-seedream
+- ✅ look-a1-gemini
+- ✅ look-a1-gemini-pro
+- ✅ look-a1-seedream
+- ✅ look-a2-gemini
+- ✅ look-a2-gemini-pro
+- ✅ look-a2-seedream
+- ✅ look-a3-gemini
+- ✅ look-a3-gemini-pro
+- ✅ look-a3-seedream
+- ✅ look-b0-gemini
+- ✅ look-b0-seedream
+- ✅ look-b1-gemini
+- ✅ look-b1-seedream
+- ✅ look-b2-gemini
+- ✅ look-b2-seedream
+- ✅ look-b3-gemini
+- ✅ look-b3-seedream
+- ✅ look-c0-gemini
+- ✅ look-c0-seedream
+- ✅ look-c1-gemini
+- ✅ look-c1-seedream
+- ✅ look-c2-gemini
+- ✅ look-c2-seedream
+- ✅ look-c3-gemini
+- ✅ look-c3-seedream
+- ❌ bati-moon-1-ramen-seedream: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ bati-moon-3-ramen-seedream: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ bati-sun-1-cake-seedream: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ bati-sun-3-ramen-gemini: Error: no image: {"candidates":[{"finishReason":"NO_IMAGE","index":0}],"usageMetadata":{"promptTokenCount":385,"totalTokenCount":385,"promptTokensDetails":[{"modality":"TEXT","tokenCount":127},{"modality":"IMAGE","tokenCount":258}],"serviceTier":"standard"},"modelVersion":"gemini-2.5-flash-image","r
