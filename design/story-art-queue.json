@@ -971,8 +971,5 @@
       "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality 3D anime character render, soft even studio light. No text, no letters, no logos, no watermark. The character is MONBAN exactly as in the first reference picture: a tall hooded gatekeeper in a long black robe with fine gold patterns, a single glowing golden eye under the hood, a large golden magic-circle halo behind his head; calm, mysterious, imposing but not scary. Pose: one hand raised palm forward, saying stop."
     }
   ],
-  "redo": [
-    "kimorin-x-talk",
-    "kimorin-x-shock"
-  ]
+  "redo": []
 }
