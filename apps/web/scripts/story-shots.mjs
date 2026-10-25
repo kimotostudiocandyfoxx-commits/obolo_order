@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Phone-width screenshots of a story day (production UI 2, 2026-10-15): opens /preview/play, taps through
+ * Phone-width screenshots of a story day (production UI 2, 2026-10-15): opens /kakunin-5798f28713/play, taps through
  * like a visitor (lines, buttons, choices — the first option) and saves a picture each time the screen
  * changes, until `--until` text appears or `--max` pictures.
  *
@@ -51,7 +51,7 @@ if (args.webm) {
   });
 }
 const q = new URLSearchParams({ day: args.day ?? '1', ...(args.at ? { at: args.at } : {}), ...(args.i ? { i: args.i } : {}) });
-await page.goto(`${base}/preview/play?${q}`, { waitUntil: 'networkidle', timeout: 180_000 });
+await page.goto(`${base}/kakunin-5798f28713/play?${q}`, { waitUntil: 'networkidle', timeout: 180_000 });
 await page.waitForTimeout(800);
 
 let shot = 0;

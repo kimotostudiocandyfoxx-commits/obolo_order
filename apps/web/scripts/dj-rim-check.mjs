@@ -9,7 +9,7 @@ let bad = 0;
 for (const [w, h] of [[844, 390], [932, 430], [667, 375]]) {
   const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 2 });
   await p.route('**/dj-demo/*.mp4', (r) => { const n = r.request().url().match(/(busan-[a-z]+)\.mp4/)[1]; r.fulfill({ status: 200, contentType: 'video/webm', body: readFileSync(`${n}.webm`) }); });
-  await p.goto('http://localhost:3111/preview/dj', { waitUntil: 'networkidle', timeout: 120000 });
+  await p.goto('http://localhost:3111/kakunin-5798f28713/dj', { waitUntil: 'networkidle', timeout: 120000 });
   await p.click('text=はじめる');
   await p.waitForTimeout(2000);
   const res = await p.evaluate(() => {

@@ -84,7 +84,7 @@ function useStorySound(on: boolean) {
 }
 
 /**
- * /preview/story — the imported story (docs/story-rewrite → public/story/*.json) played scene by
+ * /kakunin-5798f28713/story — the imported story (docs/story-rewrite → public/story/*.json) played scene by
  * scene, for the client's final read-through on the real screen (client decision 2026-10-12):
  * jump to any scene, go back a step, show the stage notes, set the names and states used in the
  * text. App screens that do not exist yet show as a card and let the story go on.
@@ -230,7 +230,7 @@ export function ScenePreview() {
 
       {/* the read-through tools */}
       <div className="absolute inset-x-0 top-0 z-20 flex items-center gap-2 bg-gradient-to-b from-black/80 to-transparent px-3 pb-6 pt-[calc(8px+env(safe-area-inset-top))] text-xs">
-        <Link href="/preview" className="rounded-full bg-black/50 px-3 py-1 text-white/80">←</Link>
+        <Link href="/kakunin-5798f28713" className="rounded-full bg-black/50 px-3 py-1 text-white/80">←</Link>
         <button onClick={() => setPanel(panel === 'scenes' ? 'none' : 'scenes')} className="min-w-0 flex-1 truncate rounded-full bg-black/50 px-3 py-1 text-left text-amber-100">
           {scene ? `${scene.id}｜${scene.title}` : ''}
         </button>

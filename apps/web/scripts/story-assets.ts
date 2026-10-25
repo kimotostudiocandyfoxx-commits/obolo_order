@@ -124,7 +124,7 @@ const md = [
   `- 場所 ${places.length}か所：${count(places).map(([s, n]) => `${STATUS_JA[s]} ${n}`).join('／')}`,
   `- 効果音 ${sounds.length}種（音のファイル ${sounds.filter((s) => s.file).length}・合成で鳴らす ${sounds.filter((s) => s.preset).length}・本物の音が必要 ${sounds.filter((s) => !s.file && !s.preset).length}）／ BGM ${music.length}曲（音あり ${music.filter((m) => m.file).length}）`,
   '',
-  '一覧と候補の見比べ：`/preview/story-assets`',
+  '一覧と候補の見比べ：`/kakunin-5798f28713/story-assets`',
   '',
   '## 人物',
   '',

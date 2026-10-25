@@ -7,7 +7,7 @@ import { ActionButton, Choice, DecisionButton, DialogueWindow, FieldFrame, IconB
 import { DEFAULT_MIX } from '@/lib/story/lineVoice';
 
 /**
- * /preview/parts — the story's UI parts on one page (production UI 6, 2026-10-15): the dialogue window and
+ * /kakunin-5798f28713/parts — the story's UI parts on one page (production UI 6, 2026-10-15): the dialogue window and
  * name plate, titles, choices, the action button, the text box, the icon buttons, the mixer, and the stage
  * (the speaker lit, the others in the dark; the bust-up when several are on stage).
  */
@@ -20,7 +20,7 @@ export default function PartsPage() {
   return (
     <main className="min-h-svh bg-[#07060d] pb-24 text-white" style={{ fontFamily: SERIF }}>
       <div className="mx-auto max-w-xl px-4">
-        <Link href="/preview" className="mt-3 inline-block text-xs text-white/50">
+        <Link href="/kakunin-5798f28713" className="mt-3 inline-block text-xs text-white/50">
           ← 確認用ページ
         </Link>
         <h1 className="mt-4 text-center text-sm tracking-[0.5em] text-amber-200">物語の部品</h1>

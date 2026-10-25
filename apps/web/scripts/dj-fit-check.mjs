@@ -7,7 +7,7 @@ const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 let bad = 0;
 for (const [w, h] of [[844, 390], [667, 375]]) {
   const p = await b.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 2 });
-  await p.goto('http://localhost:3111/preview/dj', { waitUntil: 'networkidle', timeout: 120000 });
+  await p.goto('http://localhost:3111/kakunin-5798f28713/dj', { waitUntil: 'networkidle', timeout: 120000 });
   await p.click('text=はじめる');
   await p.waitForTimeout(2000);
   await p.evaluate(() => document.fonts.ready);

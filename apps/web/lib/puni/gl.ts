@@ -1,6 +1,6 @@
 /**
  * Painted ぷにぷに: a round picture warped onto a soft body with WebGL (no seams).
- * Shared by the Saturn world and the /preview/puni-image prototype.
+ * Shared by the Saturn world and the /kakunin-5798f28713/puni-image prototype.
  */
 import { localPoints, N, stretchMatrix, type Blob } from './physics';
 

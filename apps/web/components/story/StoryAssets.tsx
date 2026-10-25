@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PRESETS, playPreset } from '@/lib/story/sfx';
 
 /**
- * /preview/story-assets (client plan 2026-10-13): everything the story needs — people, places, sound
+ * /kakunin-5798f28713/story-assets (client plan 2026-10-13): everything the story needs — people, places, sound
  * effects, tunes, voices — with where each stands, from public/story/assets.json (scripts/story-assets.ts).
  * Candidates are numbered: the client picks by number ("エビは2"), the pick goes in design/story-picks.json.
  */
@@ -72,7 +72,7 @@ export function StoryAssets() {
   return (
     <div className="min-h-dvh bg-[#07060d] px-4 pb-16 pt-[calc(12px+env(safe-area-inset-top))] text-white">
       <div className="mb-3 flex items-center gap-2">
-        <Link href="/preview" className="rounded-full bg-white/10 px-3 py-1 text-xs">←</Link>
+        <Link href="/kakunin-5798f28713" className="rounded-full bg-white/10 px-3 py-1 text-xs">←</Link>
         <h1 className="text-sm font-bold tracking-widest text-amber-100">物語の素材</h1>
         <span className="ml-auto text-[10px] text-white/40">人物表 {a.sheets.cast || '未着'} ／ 場所表 {a.sheets.places || '未着'}</span>
       </div>

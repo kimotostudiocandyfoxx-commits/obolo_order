@@ -3,7 +3,7 @@
  * design/story-voices.json changes.
  *
  *  - auditions: for each person, the same line read by several voices, to compare and choose
- *    (public/story/voices/audition/<id>/<k>-<label>.mp3 + auditions.json — /preview/story-assets「声」)
+ *    (public/story/voices/audition/<id>/<k>-<label>.mp3 + auditions.json — /kakunin-5798f28713/story-assets「声」)
  *  - lines: every spoken line of a person whose voice is chosen, one file per line named by
  *    lib/story/voice.ts voiceKey (public/story/voices/lines/<key>.mp3 + manifest.json). Lines with
  *    per-member names are skipped. MAX_LINES per run (default 400).

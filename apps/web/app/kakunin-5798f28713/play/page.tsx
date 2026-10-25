@@ -77,10 +77,10 @@ function previewMade(day: number): Made {
 }
 
 /**
- * /preview/play?day=N[&at=<step type>][&timeup=1] — plays one day's story from the start (or from its first
+ * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1] — plays one day's story from the start (or from its first
  * step of that type, e.g. at=jupiter) with a test name. Nothing is saved to the account.
  * timeup=1: the 88 minutes of space time run out 20 seconds in (SYS-S001).
- * /preview/play?world=jupiter | saturn | mercury | mars | venus — that planet's world on its own.
+ * /kakunin-5798f28713/play?world=jupiter | saturn | mercury | mars | venus — that planet's world on its own.
  */
 export default function PreviewPlayPage() {
   return (
@@ -155,7 +155,7 @@ function PreviewPlay() {
 
   const story = STORIES[day] ?? PREVIEW_ONLY[day];
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
-  if (ended) return <Ended text={`${day}日目 おわり`} again={`/preview/play?day=${day}${at ? `&at=${at}` : ''}`} />;
+  if (ended) return <Ended text={`${day}日目 おわり`} again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}`} />;
 
   // at=<step type> (its first step) or i=<step index>
   const start = q.get('i') ? Number(q.get('i')) : at ? Math.max(0, story.steps.findIndex((s) => s.t === at)) : 0;
@@ -263,7 +263,7 @@ function PreviewPlay() {
 
 function BackLink({ live }: { live?: boolean }) {
   return (
-    <Link href="/preview" className="fixed left-1/2 top-[calc(10px+env(safe-area-inset-top))] z-[400] -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-[10px] text-white/60 backdrop-blur">
+    <Link href="/kakunin-5798f28713" className="fixed left-1/2 top-[calc(10px+env(safe-area-inset-top))] z-[400] -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-[10px] text-white/60 backdrop-blur">
       ← 確認用ページ{live ? '・本番生成' : ''}
     </Link>
   );
@@ -278,7 +278,7 @@ function Ended({ text, again }: { text: string; again?: string }) {
           もう一度
         </a>
       )}
-      <Link href="/preview" className="text-sm text-white/60 underline">
+      <Link href="/kakunin-5798f28713" className="text-sm text-white/60 underline">
         確認用ページへもどる
       </Link>
     </main>

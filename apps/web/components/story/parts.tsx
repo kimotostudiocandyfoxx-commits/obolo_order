@@ -11,7 +11,7 @@ import { useState, type CSSProperties, type ReactNode } from 'react';
  *  - a big, clear button only at a moment of decision (paying, agreeing how a voice is used): DecisionButton
  *  - the first few times, what can be tapped glows softly; the touch area is larger than it looks
  * The painted frames (Seedream, public/ui/parts) are kept for the decision button.
- * /preview/parts shows them all.
+ * /kakunin-5798f28713/parts shows them all.
  */
 const P = (id: string) => `/ui/parts/${id}.webp`;
 export const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
