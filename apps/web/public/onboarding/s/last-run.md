@@ -1,5 +1,5 @@
-# UI art — 2026-10-25T08:14:17.841Z
+# UI art — 2026-10-25T08:38:23.793Z
 
-Seedream 5.0 Pro / 1枚 / 約7円
+Seedream 5.0 Pro / 1枚 / 約8円
 
-- ✅ rec-w-snow
+- ✅ kimorin-inv-white-2
