@@ -3,7 +3,10 @@
   "sfxModel": "mirelo:1@1",
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
-  "redo": [],
+  "redo": [
+    "sun",
+    "ending"
+  ],
   "probe": [],
   "items": [
     {
@@ -228,7 +231,7 @@
     {
       "id": "sun",
       "kind": "bgm",
-      "prompt": "Radiant, sacred music inside the Sun: shimmering high strings, warm brass swells, bright pads, awe and warmth, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "prompt": "Radiant, sacred music inside the Sun: shimmering high strings, warm brass swells, bright pads, awe and warmth, slow. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
       "settings": {
         "settings": {
           "instrumental": true
@@ -258,7 +261,7 @@
     {
       "id": "ending",
       "kind": "bgm",
-      "prompt": "A hopeful, gentle ending theme after a seven-day journey through space: piano and strings, warm and bittersweet, rising at the end. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "prompt": "A hopeful, gentle ending theme after a seven-day journey through space: piano and strings, warm and bittersweet, rising at the end. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
       "settings": {
         "settings": {
           "instrumental": true

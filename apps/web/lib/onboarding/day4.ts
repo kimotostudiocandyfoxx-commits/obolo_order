@@ -86,6 +86,7 @@ export const DAY4: Step[] = [
   { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: '明日は、水星へ行くDA。' },
   { t: 'sprite', image: null },
+  { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'jupiter' },
   { t: 'caption', text: '切符に、木星のスタンプが押された' },
   { t: 'caption', text: 'また明日' },

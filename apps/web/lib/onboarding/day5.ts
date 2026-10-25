@@ -76,6 +76,7 @@ export const DAY5: Step[] = [
   { t: 'seal', n: 6 }, // 謎の書の札6に「オボロンは……」の文字
   { t: 'caption', text: '謎の書に、文字が浮かんだ' },
   { t: 'sprite', image: null },
+  { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'mercury' },
   { t: 'caption', text: '切符に、水星のスタンプが押された' },
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },

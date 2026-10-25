@@ -25,13 +25,14 @@ export const DAY2: Step[] = [
   // D02-S002 お待ちなさい（client 2026-10-22, second pass）: the ticket folds into a paper airplane and flies to
   // the HQ; at the gate the doors close and MONBAN appears, takes the ticket, the gate opens; on the way in
   // KIMORIN calls from behind — the rest is seen looking back out through the gate
-  { t: 'se', sound: 'magic' },
+  { t: 'se', sound: 'paper' }, // 切符が折りたたまれる
+  { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）
   { t: 'video', motion: 'd2-plane' }, // 切符が紙飛行機になって飛び、本部の門の前に着く
   { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
-  { t: 'se', sound: 'thud' },
+  { t: 'se', sound: 'gate-close' },
   { t: 'video', motion: 'd1-monban' }, // 門へ進みながら、門が閉まる → 黒い煙からMONBANが現れる
   { t: 'loop', motion: '9-l' },
   { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
@@ -46,9 +47,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd2-look-back' }, // ふり返る：門の内側から入口のほうを見た景色
+  { t: 'se', sound: 'footsteps' },
   { t: 'video', motion: 'd2-kimorin-walkup' }, // 奥の通路から、KIMORINがゆっくり門まで歩いてくる → 顔のドアップ（劇場版アニメのように）
   { t: 'bgm', track: 'monban' },
-  { t: 'se', sound: 'thud' },
+  { t: 'se', sound: 'smoke' },
   { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
   { t: 'still', image: 's/d2-gate-two-inside' }, // KIMORINとMONBANが向き合う（門の内側から）
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
@@ -59,7 +61,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
   { t: 'se', sound: 'pop' }, // KIMORINがローブの袖から招待状を出して、MONBANに渡す
   { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。門をくぐり、地球の神殿に行け…。' },
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'comedy' }, // KIMORINの「気をつけなさい」
   { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
   { t: 'say', who: 'KIMORIN', text: 'おや、そこのあなた、もしかして、あなたも招待客？' },
   { t: 'say', who: 'KIMORIN', text: '気をつけなさい。私は、この世のすべての仕組みを理解しているので、わかります。' },
@@ -72,6 +74,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: null, fade: 5 },
   { t: 'video', motion: 'd2-walk-in' }, // KIMORINが前を歩き、地球の神殿の中へ → 暗い天球儀の大広間
   { t: 'bgm', track: 'obolon' },
+  { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
   { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、手前にKIMORIN
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
@@ -88,6 +91,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。どうだ、宇宙へ行ってみるか？' }, // MONBANが入り口から歩きながら
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
+  { t: 'bgm', track: 'comedy' }, // お金の話から、KIMORINの調子が戻る
   { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、\nとても手の込んだ手品ですね、、。\n宇宙に行きたいかですって？\nふふ、、\nもちろんそれには、、お金が、かかりますよねー？' },
   { t: 'say', who: 'MONBAN', text: 'かからない。' },
   { t: 'say', who: 'KIMORIN', text: 'え？　本当に？' },
@@ -107,6 +111,7 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-floor-open' }, // 光の柱の足もとの床が丸く開き、長いらせん階段
 
   // D02-S009 ロケット発射場／マナジェムと8つの謎
+  { t: 'bgm', track: 'launch' },
   { t: 'video', motion: 'd2-descend' }, // らせん階段を降りると、発射場とロケット
   { t: 'still', image: 's/d2-launch-pit' },
   { t: 'caption', text: 'ロケット発射場に着いた' },
@@ -148,7 +153,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '月だ' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
-  { t: 'se', sound: 'whoosh' },
+  { t: 'bgm', track: 'space' },
+  { t: 'se', sound: 'rocket' },
   { t: 'video', motion: 'd2-launch' }, // ロケットが閉まり、出発する
   { t: 'bgvideo', motion: 'd2-rocket-in' }, // ロケットの中。KIMORINが、窓の外の地球を見ている
   { t: 'say', who: 'KIMORIN', text: 'ロケット広すぎませんか？2人で乗るのもったいないですよ。' },
@@ -158,7 +164,7 @@ export const DAY2: Step[] = [
   { t: 'caption', text: '月に着いた' },
 
   // D03-S003 月の神殿／パーティー好きのドラゴン（2日目のまま続く）
-  { t: 'bgm', track: 'obolon' },
+  { t: 'bgm', track: 'moon' },
   { t: 'video', motion: 'd2-moon-enter' }, // 神殿の中へ。床の水盤、光の柱の中のOBOLON
   { t: 'still', image: 's/d2-moon-in' },
   { t: 'say', who: 'OBOLON', text: '、、、来たか。' },
@@ -169,6 +175,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
   { t: 'say', who: 'KIMORIN', text: '私は、、、、、、12回目です。' },
   { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
+  { t: 'bgm', track: 'comedy' }, // ピンポン2.5の発表
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
   { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
@@ -190,6 +197,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'それでは一つお聞きしてもいいですか？\nここのことをSNSに書いてもいいですか？' },
   { t: 'say', who: 'OBOLON', text: 'だめだ' },
   { t: 'say', who: 'KIMORIN', text: 'はい出ました、詐欺グループ確定オツ。SNSに書くな。は詐欺手口の王道テク鉄板の流れ。そりゃ色々バレたら、まずいですもんねー？' },
+  { t: 'bgm', track: 'moon' },
   { t: 'say', who: 'OBOLON', text: 'そのままでは、だめだ。ただ条件を守れば、ここのことを、自由に話していい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？条件？' },
   { t: 'say', who: 'OBOLON', text: '姿と名前を、変えることだ。' },
@@ -210,11 +218,14 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'magic' },
   { t: 'video', motion: 'd2-transform' }, // マナジェムから光が水盤へ。水が立ち上がってKIMORINを包む
   { t: 'caption', text: 'KIMORIN⭐︎のマナジェム　−3マナ' },
-  { t: 'se', sound: 'pop' },
+  { t: 'bgm', track: 'party' },
+  { t: 'se', sound: 'crackers' },
   { t: 'video', motion: 'd2-dragon' }, // 腕80本のドラゴン。いっせいにクラッカー、紙吹雪
+  { t: 'bgm', track: null, fade: 1.5 }, // シーン……
   { t: 'say', who: 'KIMORIN', text: '……やっぱり、戻してください。' }, // シーン……
   { t: 'se', sound: 'magic' },
   { t: 'video', motion: 'd2-kimorin-back-normal' }, // 光が引いて、いつものKIMORINに。尾のあいだに小さなドラゴンの羽
+  { t: 'bgm', track: 'moon' },
   { t: 'still', image: 's/d2-kimorin-after' },
   { t: 'say', who: 'KIMORIN', text: '……これは、足し算をしまくった後、いいもの以外を引き算する。そういう仕組みなのです。' },
   { t: 'say', who: 'KIMORIN', text: 'たった2工程で、最高の姿になれました。成功です。' },
@@ -266,6 +277,8 @@ export const DAY2: Step[] = [
   { t: 'egg', submit: 'これにする' },
   { t: 'say', who: 'OBOLON', text: '{food}、か。愛が伝わってくる。わかった。' },
   { t: 'se', sound: 'magic' }, // マナジェムが光る。こちらの体からも、あたたかい光。二つの光がまざり合って、たまごの中へ
+  { t: 'bgm', track: 'tender' },
+  { t: 'se', sound: 'egg-crack' },
   { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'hatch-sun' }, otherwise: 'hatch-earth' },
   { t: 'label', id: 'hatch-sun' },
   { t: 'video', motion: 'd2-hatch-sun' }, // 選んだたまごにひびが入り、光が弾ける
@@ -285,6 +298,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪ → シーン……
   { t: 'se', sound: 'magic' }, // KIMORIN⭐︎のマナジェムが光り、たまごの中へ
   { t: 'sprite', image: null },
+  { t: 'se', sound: 'egg-crack' },
   { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'pinpon-earth' }, otherwise: 'pinpon-sun' },
   { t: 'label', id: 'pinpon-earth' },
   { t: 'video', motion: 'd2-pinpon-earth' }, // 残ったたまご（地球と月）が割れて、うんちピンポンくんが跳ね出る
@@ -309,6 +323,7 @@ export const DAY2: Step[] = [
   { t: 'caption', text: '{bati}が相方になった' },
 
   // D03-S009 月で眠る
+  { t: 'bgm', track: 'night' },
   { t: 'still', image: 's/d2-moon-in' },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'OBOLON', text: 'これで、、、宇宙の旅の、準備が、整った。' },
@@ -320,7 +335,7 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポーン！' },
   { t: 'sprite', image: null },
-  { t: 'bgm', track: null, fade: 3 },
+  { t: 'bgm', track: null, fade: 4 },
   { t: 'black' }, // 暗くフェード
   { t: 'still', image: 's/d2-moon-bed' }, // 月の神殿のベッドに横たわるKIMORINとうんちピンポンくん
   { t: 'say', who: 'KIMORIN', text: 'では、寝るとしますか。うんちピンポン君、いや、うんぽん' },

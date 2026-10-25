@@ -38,7 +38,7 @@ export const DAY1: Step[] = [
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
-  { t: 'se', sound: 'thud' },
+  { t: 'se', sound: 'gate-close' },
   { t: 'video', motion: 'd1-monban' }, // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる
   { t: 'loop', motion: '9-l' }, // no camera shake here: it looked cheap (client 2026-10-22)
   { t: 'caption', text: 'MONBANが現れた' },

@@ -132,7 +132,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'それを、母に、プレゼントするのです！' },
   { t: 'say', who: 'KIMORIN', text: 'はははははは！' },
   { t: 'sprite', image: null },
-  { t: 'se', sound: 'whoosh' }, // 扉が閉まる。ロケットが、太陽へ飛び立つ
+  { t: 'se', sound: 'rocket' }, // 扉が閉まる。ロケットが、太陽へ飛び立つ
   { t: 'goto', id: 'sun' },
   // the payment screen's 「戻る」
   { t: 'label', id: 'back' },
@@ -192,7 +192,7 @@ export const DAY7: Step[] = [
 
   // D08-S011 エクリプス
   { t: 'still', image: 's/sun-inside' }, // 黒い球が、遠くの大きな光の玉に重なる。光が隠れて、金色の輪だけが残る
-  { t: 'bgm', track: 'obolon' }, // 音楽が、静かに始まる
+  { t: 'bgm', track: 'eclipse' }, // 音楽が、静かに始まる（エクリプスの曲、2026-10-25）
   { t: 'se', sound: 'magic' }, // 金色の輪から、光の粒が、雪のように降ってくる。{neo}の胸に、小さな光の泉
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
   { t: 'say', who: 'バティ', text: '……{neo}？\nからだが、あったかい！' },

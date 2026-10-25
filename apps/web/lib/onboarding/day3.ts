@@ -12,7 +12,7 @@ import type { Step } from './script';
  * Saved: Bluena, the three kororins (room-only Saturn posts), card 2's words, the Saturn stamp.
  */
 export const DAY3: Step[] = [
-  { t: 'bgm', track: 'obolon' },
+  { t: 'bgm', track: 'moon' }, // 月の神殿の朝（2026-10-25）
   { t: 'caption', text: '3日目' },
   // D04-S002 おはようございます／Bluena
   { t: 'still', image: 's/moon-temple' }, // 月の神殿。窓の外に、青い地球
@@ -56,8 +56,8 @@ export const DAY3: Step[] = [
   { t: 'notice', text: '宇宙の画面（正方形）は、Bluenaが映しているものです。\n一日88分を過ぎると、Bluenaが止まり、地球に帰ります。次の日に、また続きから' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
-  { t: 'bgm', track: 'opening' },
-  { t: 'se', sound: 'whoosh' }, // ロケットが、月から飛び立つ
+  { t: 'bgm', track: 'space' },
+  { t: 'se', sound: 'rocket' }, // ロケットが、月から飛び立つ
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true }, // the day's 88 minutes start here (not shown)
   { t: 'action', label: 'Bluenaで投影する' },
@@ -78,6 +78,7 @@ export const DAY3: Step[] = [
   { t: 'se', sound: 'whoosh' },
 
   // D04-S003 趣味の悪い神殿
+  { t: 'bgm', track: 'saturn' },
   { t: 'arrive', image: 's/saturn-outside', caption: '土星の神殿に着いた' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '土星の神殿、趣味悪いなぁ。' },
@@ -109,7 +110,7 @@ export const DAY3: Step[] = [
   { t: 'sprite', image: null },
   { t: 'saturn' },
   // D04-S007 いちばん遠い星
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'night' },
   { t: 'still', image: 's/saturn-night' }, // 神殿の石段。頭上で、輪が、ごう、と回る
   { t: 'caption', text: 'その夜' },
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
@@ -117,6 +118,7 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……あれは、ブラザーのくしゃみです。' }, // {bati}が遠くを指さす先、輪のいちばん遠い縁を流れる点。丸いサングラスをかけて、じっと見る
   { t: 'say', who: 'KIMORIN', text: 'まだ、流れていますね。' },
   { t: 'sprite', image: null },
+  { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'saturn' },
   { t: 'caption', text: '切符に、土星のスタンプが押された' },
   { t: 'caption', text: 'また明日' },

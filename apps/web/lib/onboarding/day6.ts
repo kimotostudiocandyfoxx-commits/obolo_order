@@ -93,6 +93,7 @@ export const DAY6: Step[] = [
   { t: 'screen', open: false },
   { t: 'say', who: 'KIMORIN', text: '……いつも、いい所で出てきますね。明日まで、とは？' },
   { t: 'sprite', image: null },
+  { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'mars', flip: true }, // 4つの欄が全部うまり、切符が金色に光って、ひとりでに裏返る
   { t: 'caption', text: '4つの星を、見学した' },
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
