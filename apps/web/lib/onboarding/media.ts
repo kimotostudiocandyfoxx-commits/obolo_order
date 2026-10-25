@@ -32,7 +32,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   // the gate of the script of 2026-10-22
   'd2-step-in', 'd2-monban-smoke',
   // motion 12 in two (client 2026-10-22, day 2): through the gate | on into the hall — KIMORIN calls in between
-  '12-a', '12-b',
+  '12-a', '12-b', 'd2-sky', 'd2-monban-walkin',
   // the paper airplane (Seedance) and the look back through the gate (a whip pan made from its two pictures)
   'd2-plane', 'd2-look-back',
   // KIMORIN's entrance up the avenue, his walk into the temple, OBOLON's light (client 2026-10-22)
@@ -47,7 +47,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  * Motions planned and being made (Seedance, docs/story-rewrite/day2-video-plan.md): until they arrive the
  * story shows a placeholder; the test of days 1–3 lets these through and nothing else.
  */
-export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>(['d2-sky', 'd2-monban-walkin']);
+export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
 
 /**
  * Sound effects that have a made file (onboarding/se-<id>.mp3, design/story-audio-queue.json). Others are

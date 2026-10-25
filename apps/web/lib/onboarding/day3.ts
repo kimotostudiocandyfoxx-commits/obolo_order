@@ -46,7 +46,7 @@ export const DAY3: Step[] = [
   { t: 'still', image: 's/moon-temple' },
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true }, // 神殿の白い壁に、正方形のスクリーン。門の前のMONBAN
-  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'sprite', image: ['', 'kimorin-sun', 'unchi-pinpon'] },
   { t: 'say', who: 'MONBAN', text: '……聞こえるか…。' },
   { t: 'say', who: 'KIMORIN', text: '……これは....すごい発明品ですね。まぁ私の発明の方がすごいですけど。ね？うんぽん？' },
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポンうんポン！' },
