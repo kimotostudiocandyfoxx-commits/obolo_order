@@ -4,15 +4,7 @@
   "musicModel": null,
   "parallel": 3,
   "redo": [],
-  "probe": [
-    "music",
-    "minimax",
-    "lyria",
-    "stable audio",
-    "ace-step",
-    "seed audio",
-    "elevenlabs"
-  ],
+  "probe": [],
   "items": [
     {
       "id": "sparkle",

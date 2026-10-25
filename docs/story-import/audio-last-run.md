@@ -1,0 +1,134 @@
+# 物語の音 — 2026-10-25T04:23:30.697Z
+
+22本 / 約32円
+
+- 🔎 「music」: 
+  - minimax:music@2.6 — MiniMax Music 2.6 (audio)
+  - minimax:music@cover — MiniMax Music Cover (audio)
+  - civitai:1070048@1201086 — Hans Platz | Hans der Aufrechte | Feuerschwanz | The Dark Side Of The Moon | Musician (lora)
+  - civitai:371966@415509 — Matama "Loco Musica" Akoya (阿古屋 真球) - Gushing over Magical Girls (魔法少女にあこがれて) (lora)
+  - civitai:316928@355447 — Matama "Loco Musica" Akoya (阿古屋 真球) - Gushing over Magical Girls (魔法少女にあこがれて) (lora)
+  - civitai:1043166@1170423 — ZH LoRA | Hali'a/Halia Beamer | American TikTok star, influencer & musician (lora)
+  - civitai:1144247@1286906 — Alicia Witt (Flux) - Televison and Movie Actress and Musician (lora)
+  - civitai:1067411@1198039 — Ben Metzner | Prinz R. Hodenherz III | Feuerschwanz | dArtgnan | Musician (lora)
+  - civitai:1074134@1205788 — Susan Ann Sulley "Human League" (Flux) - British Singer/Musician (lora)
+  - civitai:1103531@1239662 — Jane Wiedlin "The Go-Gos" (Flux) - Musician/Guitarist/Singer (lora)
+  - civitai:490045@544916 — Jewel ... (the musician this time, not the pornstar) (embeddings)
+  - civitai:999249@1119817 — Saleka for Pony (actress from Trap and musician!) (lora)
+  - civitai:1049011@1177042 — Diva Satanica | Rocío Vázquez | Blood Hunter | Nervosa | Musician (lora)
+  - civitai:1195386@1345923 — Candy Kane (Flux) - Adult Actress and Blues Musician (lora)
+  - civitai:1188643@1338083 — Archy Jay "The Snake Charmer" (Flux) - Musician(Bagpipes) (lora)
+  - civitai:1106213@1242802 — Heidi The Butcher | Heidi Shepherd | Butcher Babies | Musician (lora)
+  - civitai:1188663@1338106 — Jane Espie "The Phantom Piper" (Flux) - Musician/Bagpiper (lora)
+  - civitai:1103538@1239674 — Aimee Mann "Til Tuesday" (Flux) - Musician/Singer/Songwriter (lora)
+  - civitai:1054939@1183697 — Alicia Vigil | Vigil Of War | DragonForce | Musician (lora)
+  - civitai:1057978@1187206 — Ashley 'Ash' Costello | New Years Day | Musician (lora)
+  - civitai:1189583@1339231 — Michalina Malisz - singer/musician/hurdy gurdy player (lora)
+  - civitai:1131761@1272342 — Alecia 'Mixi' Demner | Stitched Up Heart | Musician (lora)
+  - civitai:1120925@1259813 — Elina Siirala | Leaves' Eyes | Angel Nation | Musician (lora)
+  - civitai:482185@536258 — Jewell (not the musician, the pornstar...) (embeddings)
+  - civitai:1177894@1325442 — Shirley Manson (Flux) - Musician and Actress (lora)
+  - civitai:1274612@1437898 — Angela Di Vincenzo | Secret Rule | Musician (lora)
+  - civitai:1212997@1366339 — Tanya Tucker (Flux) - Country Singer/Musician (lora)
+  - civitai:994319@1114121 — Inés Adam From Pacifica - (Argentinian Musician) (lora)
+  - civitai:1202287@1353816 — Jewel "Jewel Kilcher" (Flux) - Musician/Singer (lora)
+  - civitai:1135748@1276968 — Alessia Scolletti | Era | Temperance | Musician | V2.0 (lora)
+  - civitai:1099044@1234567 — Ylva Eriksson | Brothers Of Metal | Musician (lora)
+  - civitai:962779@1077922 — Melissa Naschenweng [FLUX] - Musician and Singer (lora)
+  - civitai:1143068@1285544 — Amanda Somerville | Trillium | Exit Eden | Musician (lora)
+  - civitai:1072911@1204374 — Peter Henrici | Hauptmann Feuerschwanz | Feuerschwanz | Musician (lora)
+  - civitai:1079274@1211708 — Chiara Tricarico | Moonlight Haze | Temperance | Musician (lora)
+  - civitai:283107@318643 — River Phoenix - Actor and musician (embeddings)
+  - civitai:1139245@1281180 — Alessia Lanzone | Frozen Crown | Musician (lora)
+  - civitai:1275346@1438722 — Suzanne Vega (Flux) - Singer/Musician (lora)
+  - civitai:1198615@1349680 — Bonnie Tyler (Flux) - Singer/Musician (lora)
+  - civitai:1183653@1332198 — Coté de Pablo | Actress | Musician (lora)
+  - civitai:1061091@1190787 — Alessia Scolletti | Era | Temperance | Musician (lora)
+  - civitai:1275327@1438701 — Fiona Apple (Flux) - Singer/Musician (lora)
+  - civitai:1033382@1159022 — Joan Jett | Musician | 1980s-1990s (lora)
+  - civitai:1275364@1438743 — Joan Jett (Flux) - Singer/Musician (lora)
+  - civitai:1223837@1378879 — Lindsey Stirling (FLux) - Musician/Violinist (lora)
+  - civitai:1275337@1438712 — Dolores O'Riordan (Flux) - Singer/Musician (lora)
+  - civitai:1023989@1148283 — Lita Ford | Musician | 1980s-90s (lora)
+  - civitai:1110000@1247183 — Barbara Blackthorne | Empress | Musician | V2 (lora)
+  - civitai:1180616@1328612 — Kim Wilde (Flux) - Singer/Musician (lora)
+  - civitai:1042462@1169648 — Angela Gossow | Arch Enemy | Musician (lora)
+- 🔎 「minimax」: 
+  - minimax:m3.1@flash — MiniMax M3.1 Flash (text)
+  - minimax:h3@fast — MiniMax H3 Fast (video)
+  - minimax:h3@max-turbo — MiniMax H3 Max Turbo (video)
+  - minimax:h3@max — MiniMax H3 Max (video)
+  - minimax:h3@0 — MiniMax H3 (video)
+  - minimax:m3@0 — MiniMax M3 (text)
+  - minimax:music@2.6 — MiniMax Music 2.6 (audio)
+  - minimax:m2.7@0 — MiniMax M2.7 (text)
+  - minimax:speech@2.8 — MiniMax Speech 2.8 (audio)
+  - minimax:4@2 — MiniMax Hailuo 2.3 Fast (video)
+  - minimax:4@1 — MiniMax Hailuo 2.3 (video)
+  - minimax:music@cover — MiniMax Music Cover (audio)
+  - minimax:m2.7@highspeed — MiniMax M2.7 Highspeed (text)
+  - minimax:3@1 — MiniMax Hailuo 02 (video)
+  - minimax:2@3 — MiniMax 01 Live (video)
+  - minimax:2@1 — MiniMax 01 Director (video)
+  - minimax:1@1 — MiniMax 01 (video)
+- 🔎 「lyria」: 
+  - civitai:830855@929322 — Illyria (Flux) - Angel BTVS spinoff series (lora)
+  - civitai:1143787@1286375 — Valyrian characters | @debustee style (lora)
+  - civitai:173340@194643 — Treeelyria (lora)
+  - civitai:395305@440903 — olyriaroy (lora)
+  - civitai:817032@913635 — Djeeta & Lyria from Granblue Fantasy [Pony XL | LoRA] (lora)
+  - civitai:817032@985777 — Djeeta & Lyria from Granblue Fantasy [Pony XL | LoRA] (lora)
+  - civitai:816715@913336 — Djeeta & Lyria from Granblue Fantasy) [SDXL | LoRA] (lora)
+  - civitai:488113@542767 — Lyria - Granblue Fantasy | ルリア グランブルーファンタージ (6 costumes) (lora)
+  - civitai:793680@897537 — Lyria-Pony (Granblue Fantasy) [PonyXL LoRA] (lora)
+  - civitai:932481@1043792 — Lyria| Granblue Fantasy| ルリア|グランブルーファンタージ (lora)
+  - civitai:687918@769940 — Lyria (Glunblue Fantasy) for FLUX1 (lora)
+  - civitai:864964@967874 — Lyria from Granblue Fantasy [Pony] (lora)
+  - civitai:1230075@1386070 — Lyria from Granblue Fantasy [IllustriousXL] (lora)
+  - civitai:490926@545917 — Lyria-XL (Granblue Fantasy) (lora)
+  - civitai:329155@368845 — Lyria from Granblue Fantasy (lora)
+  - civitai:57350@61777 — Lyria LoRa (Granblue Fantasy) (lora)
+  - civitai:57350@61761 — Lyria LoRa (Granblue Fantasy) (lora)
+  - civitai:93485@99687 — Lyria (granblue fantasy) (lycoris)
+  - civitai:131006@143893 — Lyria (Granblue Fantasy) (lora)
+- 🔎 「stable audio」: なし
+- 🔎 「ace-step」: 
+  - runware:ace-step@v1.5-xl-base — ACE-Step v1.5 XL Base (audio)
+  - runware:ace-step@v1.5-xl-sft — ACE-Step v1.5 XL SFT (audio)
+  - runware:ace-step@v1.5-xl-turbo — ACE-Step v1.5 XL Turbo (audio)
+  - runware:ace-step@v1.5-base — ACE-Step v1.5 Base (audio)
+  - runware:ace-step@v1.5-turbo — ACE-Step v1.5 Turbo (audio)
+- 🔎 「seed audio」: 
+  - bytedance:seed-audio@1.0 — Seed Audio 1.0 (audio)
+- 🔎 「elevenlabs」: 
+  - elevenlabs:27@1 — Eleven v3 (audio)
+  - elevenlabs:25@1 — Eleven Turbo v2.5 (audio)
+  - elevenlabs:24@1 — Eleven Flash v2.5 (audio)
+  - elevenlabs:26@1 — Eleven Multilingual v2 (audio)
+  - elevenlabs:22@1 — Eleven Flash v2 (audio)
+  - elevenlabs:20@1 — Eleven Monolingual v1 (audio)
+  - elevenlabs:23@1 — Eleven Turbo v2 (audio)
+  - elevenlabs:21@1 — Eleven Multilingual v1 (audio)
+  - elevenlabs:1@1 — ElevenLabs Music V1 (audio)
+- ✅ se-sparkle（2秒）
+- ✅ se-chime（2.5秒）
+- ✅ se-bell（3秒）
+- ✅ se-magic（3秒）
+- ✅ se-gong（4秒）
+- ✅ se-whoosh（2秒）
+- ✅ se-pop（1秒）
+- ✅ se-boing（1.5秒）
+- ✅ se-knock（1.5秒）
+- ✅ se-ding（2秒）
+- ✅ se-heartbeat（3秒）
+- ✅ se-blip（1秒）
+- ✅ se-thud（2秒）
+- ✅ se-gate-close（4秒）
+- ✅ se-smoke（3秒）
+- ✅ se-rocket（5秒）
+- ✅ se-crackers（3秒）
+- ✅ se-egg-crack（2.5秒）
+- ✅ se-paper（2秒）
+- ✅ se-stamp（1.2秒）
+- ✅ se-footsteps（4秒）
+- ✅ se-portal（3秒）
