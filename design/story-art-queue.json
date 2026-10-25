@@ -2089,6 +2089,39 @@
         "apps/web/public/onboarding/s/kimorin-n-think.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "d2-hall-sky",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
+        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
+        "design/story/refs/client/kimorin-normal.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the hall, the camera, the framing, the floor with the glowing magic circles, the golden armillary spheres on both sides, the thin pillar of light with the small black sphere with closed eyes floating low in it, and KIMORIN in the lower right foreground exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. KIMORIN now tilts his head back, looking straight up at the Earth in awe. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-hall-sky-monban",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
+        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
+        "design/story/refs/client/kimorin-normal.jpg",
+        "design/story/refs/client/monban.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the hall, the camera, the framing, the floor with the glowing magic circles, the golden armillary spheres on both sides, the thin pillar of light with the small black sphere with closed eyes floating low in it, and KIMORIN in the lower right foreground exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. KIMORIN stands in the lower right foreground looking up at the Earth in awe. Add one more figure: at the left, a little further back, the tall hooded gatekeeper of the fourth picture (long black robe with fine gold patterns, a single golden eye under the hood, a golden magic-circle halo behind his head) standing calmly, facing KIMORIN, as if he has just walked in from the entrance; lit by the starlight and gold, with a soft reflection on the floor. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
     }
   ],
   "redo": []
