@@ -1,0 +1,450 @@
+{
+  "note": "プロフィール画像とバティの描き比べ（2026-10-25）。scripts/look-lab/run.mjs",
+  "redo": [],
+  "items": [
+    {
+      "id": "look-a0-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood and cloak are deep blue, the hair is silver. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-a0-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood and cloak are deep blue, the hair is silver. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-a0-gemini-pro",
+      "engine": "gemini-pro",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood and cloak are deep blue, the hair is silver. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-a1-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hair is deep blue, the animal ears are silver, the hood is dark with deep blue lining. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-a1-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hair is deep blue, the animal ears are silver, the hood is dark with deep blue lining. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-a1-gemini-pro",
+      "engine": "gemini-pro",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hair is deep blue, the animal ears are silver, the hood is dark with deep blue lining. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-a2-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood and cloak are deep blue, the inner fur of the animal ears and the tips of the hair are silver. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-a2-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood and cloak are deep blue, the inner fur of the animal ears and the tips of the hair are silver. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-a2-gemini-pro",
+      "engine": "gemini-pro",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood and cloak are deep blue, the inner fur of the animal ears and the tips of the hair are silver. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-a3-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood is silver with deep blue trim, the hair and the ears are deep blue. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-a3-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood is silver with deep blue trim, the hair and the ears are deep blue. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-a3-gemini-pro",
+      "engine": "gemini-pro",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Tall pointed fox ears come out through openings in the hood. Mood and expression: calm, cool and composed. Colours: the hood is silver with deep blue trim, the hair and the ears are deep blue. They love video games (a tiny glowing game controller charm). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-b0-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hood and cloak are soft pink, the hair is white. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-b0-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hood and cloak are soft pink, the hair is white. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-b1-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hair is soft pink, the animal ears are white, the hood is dark with soft pink lining. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-b1-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hair is soft pink, the animal ears are white, the hood is dark with soft pink lining. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-b2-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hood and cloak are soft pink, the inner fur of the animal ears and the tips of the hair are white. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-b2-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hood and cloak are soft pink, the inner fur of the animal ears and the tips of the hair are white. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-b3-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hood is white with soft pink trim, the hair and the ears are soft pink. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-b3-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Soft cat ears come out through openings in the hood. Mood and expression: sweet, cute and gentle. Colours: the hood is white with soft pink trim, the hair and the ears are soft pink. They love baking sweets (a small whisk charm or a cookie). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-c0-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hood and cloak are crimson red, the hair is black. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-c0-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hood and cloak are crimson red, the hair is black. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-c1-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hair is crimson red, the animal ears are black, the hood is dark with crimson red lining. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-c1-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hair is crimson red, the animal ears are black, the hood is dark with crimson red lining. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-c2-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hood and cloak are crimson red, the inner fur of the animal ears and the tips of the hair are black. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-c2-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hood and cloak are crimson red, the inner fur of the animal ears and the tips of the hair are black. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a boy."
+    },
+    {
+      "id": "look-c3-seedream",
+      "engine": "seedream",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hood is black with crimson red trim, the hair and the ears are crimson red. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-c3-gemini",
+      "engine": "gemini",
+      "prompt": "Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, painterly and cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, the face clearly visible, attractive and friendly, a young person in their late teens. The character is a member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow over the forehead, fine gold embroidery along the hood's edge. Small curved dragon horns and fin-shaped dragon ears come out through openings in the hood. Mood and expression: brave, heroic and cool. Colours: the hood is black with crimson red trim, the hair and the ears are crimson red. They love football (a small football emblem on the cloak). Background: a dark night with soft golden glints and faint stars, softly blurred. Square image, suitable as a round profile icon (the face in the middle). Safe for children. No text, no letters, no logo, no watermark. An original character, not resembling any existing character. The character reads as a girl."
+    },
+    {
+      "id": "look-a0r0-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 1 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-seedream.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r1-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 2 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-seedream.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r2-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 3 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-seedream.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r3-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 4 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-seedream.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r0-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 1 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-gemini.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r1-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 2 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-gemini.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r2-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 3 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-gemini.jpg"
+      ]
+    },
+    {
+      "id": "look-a0r3-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the attached character portrait following this request: \"the hair longer, and a small star-shaped earring\". Keep the same character, face, oversized hood, animal ears, colours, art style, framing and background; make variation 4 of 4 (small natural differences in expression and the angle of the head). No text, no letters.",
+      "refs": [
+        "design/look-lab/look-a0-gemini.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-1",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a perfectly round ball body with tiny stubby feet and little arms. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-2",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a teardrop-shaped body like a small flame, tiny arms. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-3",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a tiny chubby dragon with small wings and a short tail. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-4",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a chick-like body standing on two little legs with small wing-arms. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-5",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a small four-legged fox-cub body with a fluffy tail. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-6",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a soft squishy slime blob with a little sprout on top. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-7",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a tiny lion cub with a fluffy round mane like sun rays. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-8",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a small round hedgehog with soft spikes. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny golden sun mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-1",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a small rabbit with long floppy ears. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-2",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a round little owl with big wings folded. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-3",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a floating jellyfish-like body with short soft tentacles. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-4",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a small cat sitting with a long curled tail. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-5",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a soft round seal pup like a mochi. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-6",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a tiny floating spirit with a wispy star-shaped tail. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-7",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a small chubby penguin. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-moon-8",
+      "engine": "seedream",
+      "prompt": "A cute newborn magical partner creature, full body, centered with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. High-quality 3D anime mascot render, soft even studio light, big sparkling friendly eyes, round soft shapes, very cute for children, never scary. Body type: a round fluffy puffball with small bat-like wings. Its body is a plain soft cream-white blank base design (it will be recoloured later), with a tiny silver crescent moon mark on its forehead. No text, no letters, no logo, no watermark. An original creature, not resembling any existing character.",
+      "w": 1536,
+      "h": 1536
+    },
+    {
+      "id": "bati-sun-1-ramen-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-1-ramen-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-1-cake-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-1-cake-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-3-ramen-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-3-ramen-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-3-cake-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-sun-3-cake-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-sun-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-1-ramen-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-1-ramen-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-1-cake-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-1-cake-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-1.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-3-ramen-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-3-ramen-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"ラーメン (ramen)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-3-cake-seedream",
+      "engine": "seedream",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-3.jpg"
+      ]
+    },
+    {
+      "id": "bati-moon-3-cake-gemini",
+      "engine": "gemini",
+      "prompt": "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. Restyle only its colours, textures, patterns and small accessories so it is clearly inspired by \"いちごのショートケーキ (strawberry shortcake)\": the colours and textures of the food become its skin or fur, and small parts of the food become its ears, tufts, a little hat or the tip of its tail. It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.",
+      "refs": [
+        "design/look-lab/bati-moon-3.jpg"
+      ]
+    }
+  ]
+}
