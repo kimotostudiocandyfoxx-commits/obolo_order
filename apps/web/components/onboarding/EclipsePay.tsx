@@ -13,6 +13,7 @@ export interface OrderApi {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 /**
  * Day 7 (D08-S006): the visitor chose to begin the Eclipse. The final confirmation (M-R20): ¥88 a month
@@ -121,36 +122,46 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
   const next = new Date(today.getFullYear(), today.getMonth() + 1, Math.min(renewDay, new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate()));
   const nextRenew = next.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
   return (
-    <div className="pt-safe pb-safe fixed inset-0 z-[90] animate-[fadeUp_0.5s_ease-out] overflow-y-auto bg-black/85 backdrop-blur-sm">
-      <div className="mx-auto flex min-h-full max-w-md flex-col px-4 py-6">
-        <div className="relative overflow-hidden rounded-3xl border border-amber-200/40 bg-gradient-to-b from-amber-200/10 to-black px-6 py-5 text-center">
-          <span className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-200/20 blur-2xl" />
-          <p className="text-[11px] tracking-[0.5em] text-amber-200/70">ECLIPSE</p>
-          <p className="mt-1 text-lg tracking-[0.2em] text-amber-50">エクリプス</p>
-          <p className="mt-1 text-xs tracking-widest text-white/50">支払いの最終確認</p>
-          <dl className="mt-3 space-y-2.5 text-left text-[13px] leading-relaxed text-white/80">
-            <div>
-              <dt className="text-[11px] text-amber-200/70">値段</dt>
-              <dd>
-                月額<span className="mx-0.5 text-lg text-amber-100">{ORDER_PRICE_JPY}円</span>（税込・毎月のマナの代金）。初回は今日
-              </dd>
-            </div>
-            <div>
-              <dt className="text-[11px] text-amber-200/70">毎月の更新日</dt>
+    <div
+      className="pt-safe pb-safe fixed inset-0 z-[90] animate-[fadeUp_0.6s_ease-out] overflow-y-auto"
+      style={{ fontFamily: SERIF, background: 'radial-gradient(ellipse at 50% 18%, rgba(255,196,110,0.18) 0%, rgba(40,24,6,0.9) 38%, #050403 72%)' }}
+    >
+      <div className="mx-auto flex min-h-full max-w-md flex-col px-5 py-6">
+        {/* the eclipse: a black sun in a slowly turning golden corona */}
+        <div className="relative mx-auto mt-2 h-28 w-28" aria-hidden>
+          <span className="absolute inset-0 animate-[spin_28s_linear_infinite] rounded-full opacity-90" style={{ background: 'conic-gradient(from 0deg, rgba(255,214,140,0) 0deg, rgba(255,214,140,0.85) 40deg, rgba(255,240,200,0) 90deg, rgba(255,214,140,0.7) 160deg, rgba(255,214,140,0) 220deg, rgba(255,230,170,0.9) 290deg, rgba(255,214,140,0) 360deg)', filter: 'blur(6px)' }} />
+          <span className="absolute inset-[14%] rounded-full bg-black shadow-[0_0_40px_12px_rgba(255,200,120,0.55),inset_0_0_18px_rgba(255,220,160,0.25)]" />
+          <span className="absolute inset-[14%] rounded-full ring-1 ring-amber-100/70" />
+        </div>
+        <p className="mt-4 text-center text-[11px] tracking-[0.6em] text-amber-200/80">ECLIPSE</p>
+        <p className="mt-1 text-center text-[26px] tracking-[0.3em] text-amber-50">エクリプス</p>
+        <p className="mt-1 text-center text-xs tracking-[0.3em] text-white/55">支払いの最終確認</p>
+
+        <div className="relative mt-5 overflow-hidden rounded-2xl border border-amber-200/45 bg-gradient-to-b from-[#2a1d0b]/90 to-black/90 px-6 py-5 shadow-[0_0_50px_rgba(255,200,120,0.18)]">
+          <span className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-amber-100/80 to-transparent" />
+          <p className="text-center text-white/80">
+            <span className="text-sm tracking-[0.2em]">月額</span>
+            <span className="mx-1.5 text-[40px] leading-none tracking-wide text-amber-50 drop-shadow-[0_0_12px_rgba(255,214,140,0.55)]">{ORDER_PRICE_JPY}</span>
+            <span className="text-sm">円</span>
+          </p>
+          <p className="mt-1 text-center text-[12px] text-white/60">税込・毎月のマナの代金。初回は今日</p>
+          <dl className="mt-4 divide-y divide-amber-200/15 text-left text-[13px] leading-relaxed text-white/85">
+            <div className="py-2.5">
+              <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">毎月の更新日</dt>
               <dd>
                 毎月{renewDay}日。次の更新日は{nextRenew}
               </dd>
             </div>
-            <div>
-              <dt className="text-[11px] text-amber-200/70">自動で続きます</dt>
+            <div className="py-2.5">
+              <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">自動で続きます</dt>
               <dd>やめるまで、毎月の更新日に、月額{ORDER_PRICE_JPY}円のお支払いが自動で行われます</dd>
             </div>
-            <div>
-              <dt className="text-[11px] text-amber-200/70">やめ方</dt>
+            <div className="py-2.5">
+              <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">やめ方</dt>
               <dd>〔設定〕→〔毎月のマナ〕→〔やめる〕から、いつでも。やめると、次の更新日から支払いが止まります。作ったものは消えません</dd>
             </div>
           </dl>
-          <p className="mt-3 text-left text-[10px] leading-relaxed text-white/40">入会費はありません。値上げはしません。</p>
+          <p className="mt-2 text-left text-[11px] leading-relaxed text-white/50">入会費はありません。値上げはしません。</p>
         </div>
 
         <div className="mt-4 flex-1">
@@ -163,7 +174,7 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
               <p className="text-center text-xs text-amber-200/70">デモモード：実際の請求はありません</p>
               <button
                 onClick={() => void payDemo()}
-                className="w-full rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-lg tracking-[0.25em] text-amber-50 shadow-[0_0_30px_rgba(255,210,130,0.3)]"
+                className="w-full rounded-full border border-amber-100/90 bg-gradient-to-b from-[#f6dc9a] via-[#d9a94e] to-[#9c6a1f] py-4 text-lg tracking-[0.4em] text-[#2a1806] shadow-[0_0_36px_rgba(255,210,130,0.45)] active:scale-[0.98]"
               >
                 支払う
               </button>

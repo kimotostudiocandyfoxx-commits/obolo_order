@@ -8,7 +8,7 @@ import type { Step } from './script';
  * ('clock' step, M-R22). Saturn: the gaudy temple, たこ焼きブラザー & シスター, then the kororin lesson on
  * the real Saturn world (client 2026-10-14: day 3 only teaches how to murmur — three kororins by mic, to
  * your own room; everything else opens on the second journey), the residents' ring and the brother's
- * sneeze, riddle card 2 gets its words (the answer opens on day 7), 大根カイザー's letter, the Saturn stamp.
+ * sneeze, the Saturn stamp. Riddle card 2 gets its words during MONBAN's call from the rocket (story 49a3048).
  * Saved: Bluena, the three kororins (room-only Saturn posts), card 2's words, the Saturn stamp.
  */
 export const DAY3: Step[] = [
@@ -67,6 +67,8 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'MONBAN', text: '本日…土星に行けば…謎の、ヒントが…転がっていると、思う…。' },
   { t: 'say', who: 'KIMORIN', text: 'え、そうなの？' },
   { t: 'say', who: 'MONBAN', text: 'ああ…。Obolo Orderとは…何の集まりなのか…そのヒントだ…。' },
+  { t: 'se', sound: 'chime' },
+  { t: 'seal', n: 2 }, // 謎の書が宙に浮き、ひとりでに開く。札2に「Obolo Orderは全員……」が滲み出る
   { t: 'say', who: 'KIMORIN', text: '……気になる。' },
   { t: 'say', who: 'MONBAN', text: '土星には…たこ焼きブラザーと、たこ焼きシスターが、住んでいる…。' },
   { t: 'say', who: 'MONBAN', text: '二人に会って…土星で、遊んでこい…。' },
@@ -106,36 +108,13 @@ export const DAY3: Step[] = [
   { t: 'bgm', track: null },
   { t: 'sprite', image: null },
   { t: 'saturn' },
+  // D04-S007 いちばん遠い星
   { t: 'bgm', track: 'opening' },
-  { t: 'still', image: 's/saturn-sky' },
-  { t: 'se', sound: 'chime' },
-  { t: 'seal', n: 2 }, // 鞄の中で謎の書が開き、札2に「Obolo Orderは全員……」の文字（続きは、まだ白紙）
-  { t: 'caption', text: '謎の書に、文字が浮かんだ' },
-  { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……Obolo Orderは、全員……？　続きが、ありませんね。' },
-
-  // D04-S007 木星の王様の手紙／いちばん遠い星
-  { t: 'still', image: 's/saturn-inside' },
-  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'そうだ。けさ、輪に乗って、手紙が流れてきたZE。' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/kaiser-letter' }, // 大根の形の封蝋。差出人：木星　大根カイザー
-  { t: 'letter', text: '木星にも、遊びに来るDA。\n\n木星　大根カイザー' },
-  { t: 'still', image: 's/saturn-inside' },
-  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
-  { t: 'say', who: 'たこ焼きシスター', text: '木星の王様ね。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '明日は木星だZE!!　遅れるんじゃねぇZE!!' },
-  { t: 'sprite', image: '@bati' },
-  { t: 'say', who: 'バティ', text: '木星も、いっしょに行こうね！　次は、どんな言葉を持っていこうか！' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/saturn-night' },
+  { t: 'still', image: 's/saturn-night' }, // 神殿の石段。頭上で、輪が、ごう、と回る
   { t: 'caption', text: 'その夜' },
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
-  { t: 'say', who: 'KIMORIN', text: '{neo}が1日目に聞いたという、コスモス。……私の推理では、遠い星の名前です。' },
-  { t: 'say', who: 'バティ', text: '遠い星！　……いちばん遠いの、探す。' },
-  { t: 'say', who: 'バティ', text: 'あった！　いちばん遠くで、ちょっとだけ動いてる！' },
-  { t: 'say', who: 'KIMORIN', text: '……あれは、ブラザーのくしゃみです。' }, // 丸いサングラスをかけて、じっと見る
-  { t: 'say', who: 'バティ', text: '……コスモスじゃない？' },
+  { t: 'say', who: 'KIMORIN', text: 'MONBANが言っていた、コスモス。……私の推理では、遠い星の名前です。' },
+  { t: 'say', who: 'KIMORIN', text: '……あれは、ブラザーのくしゃみです。' }, // {bati}が遠くを指さす先、輪のいちばん遠い縁を流れる点。丸いサングラスをかけて、じっと見る
   { t: 'say', who: 'KIMORIN', text: 'まだ、流れていますね。' },
   { t: 'sprite', image: null },
   { t: 'ticket', stamp: 'saturn' },
