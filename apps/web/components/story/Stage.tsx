@@ -138,7 +138,7 @@ export function Cast({
   // '' keeps a slot empty (someone in the video stands there); the one speaking may be off the cast
   // (OFFSTAGE: in the video) — then everyone on the cast steps back
   const real = names.filter(Boolean);
-  const bust = real.length > 1 && !!speaking && speaking !== OFFSTAGE;
+  const bust = (real.length > 1 || (MOTION.soloBust && real.includes(speaking ?? ''))) && !!speaking && speaking !== OFFSTAGE;
   const tint = speaking ? charSpec(speaking).tint : '#000';
   // MONBAN comes and goes with black smoke
   const [smoke, setSmoke] = useState(0);

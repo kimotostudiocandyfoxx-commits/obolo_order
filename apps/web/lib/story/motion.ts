@@ -25,6 +25,8 @@ export const MOTION = {
     /** shaken 「もももちろん」: a small tremble */
     tremble: { px: 1.6, ms: 90 },
   },
+  /** a character alone on stage comes up close while speaking, like two do (false: stays standing) */
+  soloBust: true,
   /** the ones not speaking step back into the dark */
   dim: { brightness: 0.45, saturate: 0.7 },
 } as const;
