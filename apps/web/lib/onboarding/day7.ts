@@ -47,8 +47,8 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'OBOLON', text: '、、、そうか。それで、いい。' },
   { t: 'label', id: 'monban' },
   { t: 'bgm', track: 'monban' },
-  { t: 'video', motion: 27 }, // 黒い煙が湧き、MONBANが現れる
-  { t: 'loop', motion: 28 },
+  { t: 'video', motion: '27-c' }, // 黒い煙が湧き、MONBANが現れる（字幕を消した版）
+  { t: 'loop', motion: '28-l' },
   { t: 'say', who: 'MONBAN', text: '……見学は、終わりだ…。ここで、決めていい…。急がなくていい…。' },
   { t: 'say', who: 'MONBAN', text: '太陽の神殿で、『エクリプス』をする…。太陽と、お前の魂をつなぐ儀式だ…。\n成功すれば、お前は、ORDERになる…。' },
   { t: 'say', who: 'MONBAN', text: 'ORDERになれば、ほかの星にも行ける…。切符の裏の、錠の星だ…。' },

@@ -635,3 +635,10 @@ body {
   60% { transform: scale(0.92) rotate(3deg); opacity: 1; }
   100% { transform: scale(1.1) rotate(0); opacity: 1; }
 }
+
+/* the Eclipse paid: the golden corona flares out and fills the screen with light */
+@keyframes coronaFlare {
+  0% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(9); opacity: 0.9; background: rgba(255, 240, 205, 0.35); }
+  100% { transform: scale(16); opacity: 0; background: rgba(255, 245, 220, 0.6); }
+}

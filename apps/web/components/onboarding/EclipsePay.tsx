@@ -24,7 +24,7 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  * screen does not exist yet (P-BILL-4: the operator stops it in Stripe).
  */
 export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; paid: boolean; onPaid: () => void; onCancel: () => void }) {
-  const [phase, setPhase] = useState<'loading' | 'stripe' | 'demo' | 'confirming' | 'error'>('loading');
+  const [phase, setPhase] = useState<'loading' | 'stripe' | 'demo' | 'confirming' | 'error' | 'done'>('loading');
   const [err, setErr] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const box = useRef<HTMLDivElement>(null);
@@ -80,10 +80,12 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attempt, paid]);
 
+  // paid: the golden corona flares out over the screen, then the story goes on
   const finishNow = () => {
     if (done.current) return;
     done.current = true;
-    onPaidRef.current();
+    setPhase('done');
+    setTimeout(() => onPaidRef.current(), 1600);
   };
 
   const finish = async (sessionId: string) => {
@@ -197,7 +199,12 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
           )}
         </div>
 
-        {phase !== 'confirming' && (
+        {phase === 'done' && (
+          <div className="pointer-events-none fixed inset-0 z-[95] flex items-center justify-center" aria-hidden>
+            <span className="h-28 w-28 animate-[coronaFlare_1.6s_cubic-bezier(.2,.7,.2,1)_forwards] rounded-full" style={{ boxShadow: '0 0 60px 30px rgba(255,214,140,0.9), inset 0 0 40px rgba(255,236,190,0.9)' }} />
+          </div>
+        )}
+        {phase !== 'confirming' && phase !== 'done' && (
           <button onClick={onCancel} className="mt-4 self-center py-2 text-xs tracking-widest text-white/50 underline">
             戻る
           </button>
