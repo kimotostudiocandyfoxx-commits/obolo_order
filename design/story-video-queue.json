@@ -2,7 +2,9 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "sig-streak"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -353,11 +355,124 @@
     {
       "id": "sig-streak",
       "duration": 5,
-      "audio": true,
+      "audio": false,
       "always": false,
       "first": "apps/web/public/onboarding/s/sig-earth-threads.jpg",
       "last": "apps/web/public/onboarding/s/sig-space-anime.jpg",
-      "prompt": "Vertical 9:16 cinematic shot. The golden threads rising from the Earth's night side gather into one bright golden streak that shoots past the camera into deep space; as it passes, the whole picture turns from photographic reality into a painted anime film world of stars and violet nebula, the streak leaving a glittering trail. Sound: a rising shimmer and one clear bell-like tone — no music, no voices, no speech, no singing."
+      "prompt": "Vertical 9:16 cinematic shot. The golden threads rising from the Earth's night side gather into one bright golden streak that shoots past the camera into deep space; as it passes, the whole picture turns from photographic reality into a painted anime film world of stars and violet nebula, the streak leaving a glittering trail."
+    },
+    {
+      "id": "sig-f1",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-f1-ring.jpg",
+      "prompt": "The golden ring of light slowly brightens and turns, its black centre perfectly still, glittering dust drifting. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "sig-f2",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-f2-gate.jpg",
+      "prompt": "Slow push in toward the hooded figure before the great gate; the golden halo outline behind its head glows faintly; dust in the air. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "sig-f3",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-f3-cards.jpg",
+      "prompt": "The eight blank golden cards float and turn slowly in the dark, glowing one after another. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "sig-f4",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-f4-turntable.jpg",
+      "prompt": "Close-up: the record spins in the beam of light, the tonearm lowers slowly, the needle hovering just above the groove, not yet touching. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "sig-f5",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-f5-tents.jpg",
+      "prompt": "The out-of-focus white tent lights in the far field glow and flicker softly, the camera drifting sideways, never coming into focus. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "sig-hand",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-hand.jpg",
+      "prompt": "Close-up on the desk: the hands press the golden compass seal firmly onto the golden envelope, lift it away, the tassel swings, and the seal begins to glow bright gold. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "sig-fly",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-window.jpg",
+      "prompt": "The golden envelope glides through the night sky over the sea of city lights toward one warm window, the camera following it closely, golden sparkles trailing; at the end it rushes toward the camera, fills the frame and bursts into countless golden light particles. Painted anime film style of the game, cinematic, slow and mysterious."
+    },
+    {
+      "id": "rec-crest",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-crest.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. The antique golden emblem in the dark, a single narrow beam of light slowly sweeping across it, dust floating, film flicker.",
+      "always": false
+    },
+    {
+      "id": "rec-wcity",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-w-city.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. Slow push over the night city where nearly every window glows cold pale screen-blue, flickering slightly.",
+      "always": false
+    },
+    {
+      "id": "rec-wcanal",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-w-canal.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. Slow glide along the canal at night, every window glowing cold screen-blue, the blue reflected in the still water.",
+      "always": false
+    },
+    {
+      "id": "rec-train",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-train.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. Inside the late-night train: the passengers sway slightly with the motion, all looking down at the small glowing screens in their hands, city lights sliding past the windows.",
+      "always": false
+    },
+    {
+      "id": "rec-3am",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-3am.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. The dark bedroom at 3 a.m.: only the thumb moves, swiping up on the glowing screen, again and again, without stopping; the cold light flickers on the pillow.",
+      "always": false
+    },
+    {
+      "id": "rec-feed",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-feed.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. Close-up on the phone screen: beautiful picture cards scroll upward endlessly — perfect breakfasts, perfect trips, perfect smiles, glossy adverts — never stopping, no readable words.",
+      "always": false
+    },
+    {
+      "id": "rec-meal",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-meal.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. The warm soup's last wisp of steam fades away and the soup goes still and cold, while the hands above keep scrolling through pictures of perfect meals on the phone.",
+      "always": false
+    },
+    {
+      "id": "rec-wait",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec-wait.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. The phone on the desk lights up and dims; the hand picks it up, looks, puts it down, then picks it up again; the message waits, no reply.",
+      "always": false
     }
   ],
   "parallel": 4

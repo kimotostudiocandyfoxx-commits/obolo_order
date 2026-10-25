@@ -2776,5 +2776,7 @@
       "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, exactly the art style, proportions and size of the first reference picture. No text, no letters, no logos, no watermark. The character is KIMORIN from the first reference picture: a small fox whose own face looks like a white fox mask (it is his real face, not a mask) with blue spiral cheeks and a blue mark on the forehead, thin eye slits, white-and-blue fox ears, and a fan of white, black and red-tipped tail feathers that grow from his body — keep the face, ears and tail exactly as in the reference. Only his clothes and eyewear change: NO red robe, NO sunglasses. He wears goggles over his eyes: while the goggles are on, the eyes do not glow and cannot be seen through them. A mischievous, suspicious inventor. Outfit 3, 'night workshop' in black and white: a dark navy work jumpsuit covered in pockets with white patches sewn on, a tool harness, big round welding goggles over the eyes, and a small mechanical gadget with a little antenna on top of his head."
     }
   ],
-  "redo": []
+  "redo": [
+    "rec-w-snow"
+  ]
 }
