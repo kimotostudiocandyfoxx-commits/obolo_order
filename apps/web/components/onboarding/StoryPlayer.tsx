@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { hasMotion, motionUrl, spriteUrl, stillUrl, type MotionId } from '@/lib/onboarding/media';
+import { hasMotion, motionUrl, spriteUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { nameCharsOk, neoForm } from '@obolo/shared';
@@ -533,11 +533,23 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the lines with the member's names in them: their own voices, made in the background
   useNameVoices(voice.current, steps, { name: v.name, neo: v.neo, bati: answers.batiName ?? vars.bati, food: v.batiFood, inviter: v.inviter });
   // each spoken line plays its voice (when it has one)
-  // the speaker's face and gesture for this line (picked from the words; a 'face' step still wins until the next line)
-  const sayExpressions = (set: Record<string, string>) => {
+  // KIMORIN / MONBAN speaking over a still that does not show them: their pose picture steps in (client
+  // 2026-10-25). KIMORIN only once his look of the day is on stage (kimorin-sun: after the dragon on day 2).
+  const autoStandee = (() => {
     const st = steps[i];
-    if (st?.t !== 'say' || !sprite) return set;
-    const names = (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean);
+    if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;
+    if (st.who === 'MONBAN') return stillShows(still, 'MONBAN') ? null : 'monban';
+    if (st.who === 'KIMORIN') {
+      const seen = steps.slice(0, i).some((x) => x.t === 'sprite' && (Array.isArray(x.image) ? x.image : [x.image]).includes('kimorin-sun'));
+      return seen && !stillShows(still, 'KIMORIN') ? 'kimorin-sun' : null;
+    }
+    return null;
+  })();
+  // the speaker's face and gesture for this line (picked from the words; a 'face' step still wins until the next line)
+  const sayExpressions = (set: Record<string, string>, on?: string[]) => {
+    const st = steps[i];
+    if (st?.t !== 'say' || (!sprite && !on)) return set;
+    const names = on ?? (Array.isArray(sprite) ? sprite : [sprite]).filter((x): x is string => !!x);
     const who = speakerSprite(st.who, names);
     return who && who !== OFFSTAGE ? { ...set, [who]: exprFor(st.who, st.text) } : set;
   };
@@ -702,6 +714,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <img key={still} src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
       )}
       </Camera>
+      {!sprite && autoStandee && (
+        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} slot={spriteSlot} />
+      )}
       {sprite && (
         <Cast
           names={Array.isArray(sprite) ? sprite : [sprite]}

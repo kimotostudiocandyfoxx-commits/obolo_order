@@ -58,6 +58,22 @@ export const SE_FILES: ReadonlySet<string> = new Set<string>([
 ]);
 export const seUrl = (id: string) => `${MEDIA_BASE}/se-${id}.mp3`;
 
+/**
+ * Who is already drawn in a still (so their standee is not added over it while they speak). Stills named
+ * with kimorin / monban show them; the rest are listed.
+ */
+const STILL_CAST: Record<string, string[]> = {
+  's/d2-gate-two-inside': ['KIMORIN', 'MONBAN'],
+  's/d2-hall-run': ['KIMORIN', 'MONBAN', 'OBOLON'],
+  's/d2-moon-bed': ['KIMORIN'],
+  's/d2-launch-pit': [],
+};
+export function stillShows(still: string, who: string): boolean {
+  const w = who.startsWith('KIMORIN') ? 'KIMORIN' : who;
+  if (STILL_CAST[still]) return STILL_CAST[still].includes(w);
+  return (w === 'KIMORIN' && still.includes('kimorin')) || (w === 'MONBAN' && still.includes('monban'));
+}
+
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;
 export const hasMotion = (n: MotionId) => AVAILABLE_MOTIONS.has(n);
