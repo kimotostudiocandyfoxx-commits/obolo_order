@@ -2617,6 +2617,120 @@
         "design/story/refs/style-gate.jpg"
       ],
       "prompt": "A golden envelope with a tassel (the envelope of the reference picture) flying through the night sky over a sea of city lights, gliding toward one warmly lit window of an ordinary home in the distance, golden sparkles trailing behind it. Drawn in the painterly anime film style of the game (like the reference pictures): hand-painted anime illustration, clean anime shapes and soft cel shading, not a photograph. No text."
+    },
+    {
+      "id": "rec-crest",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 photograph of an old archive film frame: in deep darkness, an embossed antique golden emblem of a secret society — a compass rose inside fine rings with a small black circle at its centre — lit by a single narrow beam, dust in the air, heavy film grain, scratches. No letters, no text."
+    },
+    {
+      "id": "rec-w-city",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/sig-w4-city.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the place, the camera, the framing and the night exactly the same. Now almost every window glows with the same cold, pale blue-white light of screens, flickering slightly, instead of warm lamplight; the golden streak is gone. Photographic, indistinguishable from real footage. No text."
+    },
+    {
+      "id": "rec-w-snow",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/sig-w1-snow.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the place, the camera, the framing and the night exactly the same. Now almost every window glows with the same cold, pale blue-white light of screens, flickering slightly, instead of warm lamplight; the golden streak is gone. Photographic, indistinguishable from real footage. No text."
+    },
+    {
+      "id": "rec-w-canal",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/sig-w6-canal.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the place, the camera, the framing and the night exactly the same. Now almost every window glows with the same cold, pale blue-white light of screens, flickering slightly, instead of warm lamplight; the golden streak is gone. Photographic, indistinguishable from real footage. No text."
+    },
+    {
+      "id": "rec-train",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: large-format cinema camera, natural light, subtle film grain, shallow depth of field, cool muted colour grading. No readable text, no logos, no brand, no real app or social network interface. Faces never clearly shown: seen from behind, in profile in shadow, or only hands. Calm, not sad, nobody crying. Inside a late-night commuter train: rows of passengers, seated and standing, every one of them looking down at the small glowing screen in their hands, their faces lit only from below by cold blue light, nobody looking at each other, the dark city sliding past the windows."
+    },
+    {
+      "id": "rec-3am",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: large-format cinema camera, natural light, subtle film grain, shallow depth of field, cool muted colour grading. No readable text, no logos, no brand, no real app or social network interface. Faces never clearly shown: seen from behind, in profile in shadow, or only hands. Calm, not sad, nobody crying. A dark bedroom at 3 a.m.: a person lying in bed seen from the side in shadow, only the cold light of a phone screen on their face and pillow, a thumb resting on the glass mid-swipe; a clock-less dark room, curtains, quiet."
+    },
+    {
+      "id": "rec-feed",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: large-format cinema camera, natural light, subtle film grain, shallow depth of field, cool muted colour grading. No readable text, no logos, no brand, no real app or social network interface. Faces never clearly shown: seen from behind, in profile in shadow, or only hands. Calm, not sad, nobody crying. Extreme close-up of a phone screen held in a dark room: on it, a vertical stream of beautiful made-up picture cards sliding upward — a perfect breakfast, a perfect beach trip, a perfect smiling group, an advert with a glossy product — all slightly blurred by motion, with no readable words, no numbers, no buttons, no logos, a fictional interface of plain rounded cards only."
+    },
+    {
+      "id": "rec-meal",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: large-format cinema camera, natural light, subtle film grain, shallow depth of field, cool muted colour grading. No readable text, no logos, no brand, no real app or social network interface. Faces never clearly shown: seen from behind, in profile in shadow, or only hands. Calm, not sad, nobody crying. At a small kitchen table at night: a warm homemade bowl of soup with the last thin wisp of steam, a spoon untouched beside it; above it a person's hands hold a phone whose screen shows a picture of a perfect glossy restaurant meal; the real soup is going cold, unnoticed."
+    },
+    {
+      "id": "rec-wait",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: large-format cinema camera, natural light, subtle film grain, shallow depth of field, cool muted colour grading. No readable text, no logos, no brand, no real app or social network interface. Faces never clearly shown: seen from behind, in profile in shadow, or only hands. Calm, not sad, nobody crying. Close-up of a phone lying face-up on a wooden desk at night, its screen lit with a single sent message bubble and two tiny abstract check-mark shapes (no readable text); a hand hovering just above it, about to pick it up again; a dim lamp."
     }
   ],
   "redo": [
