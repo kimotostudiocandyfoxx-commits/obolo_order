@@ -1,9 +1,18 @@
-# UI art — 2026-10-25T07:45:52.898Z
+# UI art — 2026-10-25T07:54:03.742Z
 
-Seedream 5.0 Pro / 5枚 / 約16円
+Seedream 5.0 Pro / 14枚 / 約30円
 
-- ✅ sig-f5-tents
-- ✅ sig-window
-- ❌ sig-f1-ring: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ sig-f3-cards: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ sig-hand: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ✅ kimorin-inv-black
+- ✅ kimorin-inv-night
+- ✅ kimorin-inv-white
+- ✅ rec-3am
+- ✅ rec-crest
+- ✅ rec-feed
+- ✅ rec-meal
+- ✅ rec-train
+- ✅ rec-w-canal
+- ✅ rec-w-city
+- ✅ rec-wait
+- ✅ sig-f1-ring
+- ✅ sig-f3-cards
+- ❌ rec-w-snow: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
