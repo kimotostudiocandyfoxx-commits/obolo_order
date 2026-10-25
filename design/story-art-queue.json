@@ -2774,6 +2774,21 @@
         "apps/web/public/onboarding/s/kimorin-n-talk.jpg"
       ],
       "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, exactly the art style, proportions and size of the first reference picture. No text, no letters, no logos, no watermark. The character is KIMORIN from the first reference picture: a small fox whose own face looks like a white fox mask (it is his real face, not a mask) with blue spiral cheeks and a blue mark on the forehead, thin eye slits, white-and-blue fox ears, and a fan of white, black and red-tipped tail feathers that grow from his body — keep the face, ears and tail exactly as in the reference. Only his clothes and eyewear change: NO red robe, NO sunglasses. He wears goggles over his eyes: while the goggles are on, the eyes do not glow and cannot be seen through them. A mischievous, suspicious inventor. Outfit 3, 'night workshop' in black and white: a dark navy work jumpsuit covered in pockets with white patches sewn on, a tool harness, big round welding goggles over the eyes, and a small mechanical gadget with a little antenna on top of his head."
+    },
+    {
+      "id": "kimorin-inv-white-2",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-white.jpg",
+        "design/story/refs/client/pinpon25.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the character, his face, ears, tail feathers, the patched white lab coat, the tool belt, the brass goggles, the pose, the framing, the size, the light and the flat grey background exactly the same. Change only the device: remove the silver box from his chest pocket. Instead, the device of the second picture is now in two parts joined by a thin coiled cable: (1) a small silver handheld unit with one big round push button, held in his right hand, his thumb on the button; (2) a small silver box worn on top of his head between his ears, like a little hat, with a tiny speaker grille on its front and a small round display showing a glowing double circle (◎). The coiled cable runs from the handheld button up to the box on his head. No text, no letters, no logos. Keep the flat plain mid-grey background (#808080). While the goggles are on, his eyes do not glow and cannot be seen."
     }
   ],
   "redo": []
