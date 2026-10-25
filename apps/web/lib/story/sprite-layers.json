@@ -134,5 +134,44 @@
   "eyes",
   "mouth",
   "tail"
+ ],
+ "monban-x-arms": [
+  "eyes"
+ ],
+ "monban-x-point": [
+  "eyes"
+ ],
+ "monban-x-stop": [
+  "eyes"
+ ],
+ "monban-x-talk": [
+  "eyes"
+ ],
+ "takoyaki-brother-x-joy": [
+  "mouth"
+ ],
+ "takoyaki-brother-x-shock": [
+  "mouth"
+ ],
+ "takoyaki-brother-x-talk": [
+  "mouth"
+ ],
+ "takoyaki-sister-x-joy": [
+  "mouth"
+ ],
+ "takoyaki-sister-x-shock": [
+  "mouth"
+ ],
+ "takoyaki-sister-x-talk": [
+  "mouth"
+ ],
+ "unchi-pinpon-x-joy": [
+  "mouth"
+ ],
+ "unchi-pinpon-x-shock": [
+  "mouth"
+ ],
+ "unchi-pinpon-x-talk": [
+  "mouth"
  ]
 }

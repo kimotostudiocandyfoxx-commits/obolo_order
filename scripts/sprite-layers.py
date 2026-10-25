@@ -5,7 +5,8 @@
   <stem>-tail.webp   the tail feathers alone (they sway)
   <stem>-mouth.webp  only the pixels of the open mouth   (from <stem>-o.jpg; laid over while speaking)
   <stem>-eyes.webp   the eye slits glowing brighter (from <stem>-glow.jpg; laid over, breathing; not for sunglasses on)
-Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes]
+Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--face 0.4,0.75]
+(--face: where the face is, as fractions of the figure's height; default the top 42%)
 The paintings are on flat #808080; the open-mouth and tail-less ones were edited from the closed one, so
 they line up; the mouth patch keeps only the changed pixels around the face (no flicker elsewhere)."""
 import sys
@@ -15,6 +16,9 @@ from PIL import Image, ImageFilter
 
 src, out, stem = sys.argv[1], sys.argv[2], sys.argv[3]
 no_eyes = '--no-eyes' in sys.argv
+FACE = (0.0, 0.42)
+if '--face' in sys.argv:
+    FACE = tuple(float(v) for v in sys.argv[sys.argv.index('--face') + 1].split(','))
 MAX_H = 1100
 
 
@@ -100,7 +104,7 @@ if nt is not None:
 op = load(f'{stem}-o')
 if op is not None:
     diff = np.abs(op - base).max(axis=2)
-    face_y0, face_y1 = int(ys.min()), int(ys.min() + (ys.max() - ys.min()) * 0.42)
+    face_y0, face_y1 = int(ys.min() + (ys.max() - ys.min()) * FACE[0]), int(ys.min() + (ys.max() - ys.min()) * FACE[1])
     m = np.zeros((h, w), bool)
     m[face_y0:face_y1] = diff[face_y0:face_y1] > 38
     # keep the biggest connected blob (the mouth), grow it a little, feather
@@ -132,7 +136,7 @@ if op is not None:
 gl = None if no_eyes else load(f'{stem}-glow')
 if gl is not None:
     diff = np.abs(gl - base).max(axis=2)
-    face_y0, face_y1 = int(ys.min()), int(ys.min() + (ys.max() - ys.min()) * 0.42)
+    face_y0, face_y1 = int(ys.min() + (ys.max() - ys.min()) * FACE[0]), int(ys.min() + (ys.max() - ys.min()) * FACE[1])
     eye = np.zeros((h, w), bool)
     eye[face_y0:face_y1] = diff[face_y0:face_y1] > 45
     if eye.sum() > 20:
