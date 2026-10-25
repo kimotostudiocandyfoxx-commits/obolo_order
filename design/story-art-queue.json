@@ -2444,6 +2444,177 @@
         "apps/web/public/onboarding/s/monban-x-stop.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, halo, framing, size, light and grey background — and change only the single eye under the hood: it glows much brighter, an intense luminous golden light with a soft halo around it. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "sig-w1-snow",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: shot on a large-format cinema camera with an anamorphic lens, natural night light, subtle film grain, shallow depth of field, rich but natural colour grading, quiet and beautiful. No famous landmarks, no readable signs, no shop names, no logos, no text anywhere. People only small and seen from behind, if at all. A small northern town at night in deep snow: a narrow snowy street of wooden houses with warm glowing windows, gentle snowfall, a lone figure far away walking home seen from behind. High in the night sky, one thin golden streak of light crosses silently between the stars, like a slow golden shooting star."
+    },
+    {
+      "id": "sig-w2-desert",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: shot on a large-format cinema camera with an anamorphic lens, natural night light, subtle film grain, shallow depth of field, rich but natural colour grading, quiet and beautiful. No famous landmarks, no readable signs, no shop names, no logos, no text anywhere. People only small and seen from behind, if at all. A desert town of rounded earthen houses at night under an enormous clear starry sky with the Milky Way, a few warm lantern-lit windows, sand dunes behind. High in the night sky, one thin golden streak of light crosses silently between the stars, like a slow golden shooting star."
+    },
+    {
+      "id": "sig-w3-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: shot on a large-format cinema camera with an anamorphic lens, natural night light, subtle film grain, shallow depth of field, rich but natural colour grading, quiet and beautiful. No famous landmarks, no readable signs, no shop names, no logos, no text anywhere. People only small and seen from behind, if at all. A tropical seaside village at night: palm trees, small wooden houses on stilts with warm lights, calm moonlit waves washing the shore. High in the night sky, one thin golden streak of light crosses silently between the stars, like a slow golden shooting star."
+    },
+    {
+      "id": "sig-w4-city",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: shot on a large-format cinema camera with an anamorphic lens, natural night light, subtle film grain, shallow depth of field, rich but natural colour grading, quiet and beautiful. No famous landmarks, no readable signs, no shop names, no logos, no text anywhere. People only small and seen from behind, if at all. A vast modern megacity at night seen from a high rooftop: endless towers and streets of light stretching to the horizon, light haze, nothing readable. High in the night sky, one thin golden streak of light crosses silently between the stars, like a slow golden shooting star."
+    },
+    {
+      "id": "sig-w5-mountain",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: shot on a large-format cinema camera with an anamorphic lens, natural night light, subtle film grain, shallow depth of field, rich but natural colour grading, quiet and beautiful. No famous landmarks, no readable signs, no shop names, no logos, no text anywhere. People only small and seen from behind, if at all. A mountain village at night on steep terraced fields, scattered warm house lights, thin mist in the valley, distant dark peaks under stars. High in the night sky, one thin golden streak of light crosses silently between the stars, like a slow golden shooting star."
+    },
+    {
+      "id": "sig-w6-canal",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: shot on a large-format cinema camera with an anamorphic lens, natural night light, subtle film grain, shallow depth of field, rich but natural colour grading, quiet and beautiful. No famous landmarks, no readable signs, no shop names, no logos, no text anywhere. People only small and seen from behind, if at all. An old canal town at night: stone bridges, old houses along the water, warm windows reflected in the still canal, a small moored boat. High in the night sky, one thin golden streak of light crosses silently between the stars, like a slow golden shooting star."
+    },
+    {
+      "id": "sig-earth-threads",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph from low Earth orbit, indistinguishable from real footage: the night side of the Earth, continents traced by city lights, a thin blue atmosphere glow on the curved horizon. From many places all over the night side, dozens of thin golden threads of light rise from the cities up into space, converging toward one point among the stars above. Photorealistic, deep black space, no text."
+    },
+    {
+      "id": "sig-space-anime",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Deep space in the finest anime film style: a field of stars and soft violet-blue nebula, and one bright thin golden streak of light crossing the frame diagonally, leaving a glittering trail."
+    },
+    {
+      "id": "sig-f1-ring",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "A ring of golden light floating in black space, perfectly round, its centre completely black, like a golden eclipse corona; dust glittering."
+    },
+    {
+      "id": "sig-f2-gate",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "A tall hooded figure in a long black robe standing in shadow before an enormous closed ornate gate, seen from a low angle, face hidden in darkness, only a faint golden halo outline behind the head."
+    },
+    {
+      "id": "sig-f3-cards",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Eight blank golden cards floating in a row in darkness, slowly glowing, no writing on any of them."
+    },
+    {
+      "id": "sig-f4-turntable",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "A record turntable spinning in near darkness, a beam of golden light from above, the tonearm with the needle hovering just above the record, close-up, dramatic."
+    },
+    {
+      "id": "sig-f5-tents",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "A distant field at night with soft white round tent lights scattered like lanterns, completely out of focus, dreamy bokeh, stars above."
+    },
+    {
+      "id": "sig-hand",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "refs": [
+        "design/story/refs/client/envelope.webp",
+        "design/story/refs/style-obolon-temple.jpg"
+      ],
+      "prompt": "Close-up on a wooden desk at night lit by a warm lamp: only a person's hands are visible (no face), pressing a golden compass-shaped wax seal onto a golden envelope with a tassel, exactly the envelope design of the first reference picture. The seal begins to glow gold. Finest anime film quality, painterly, warm gold and deep shadow. No text."
+    },
+    {
+      "id": "sig-window",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "refs": [
+        "design/story/refs/client/envelope.webp"
+      ],
+      "prompt": "A golden envelope with a tassel (the envelope of the reference picture) flying through the night sky over a sea of city lights, gliding toward one warmly lit window of an ordinary home in the distance, golden sparkles trailing behind it. Finest anime film quality, cinematic. No text."
     }
   ],
   "redo": []
