@@ -53,6 +53,50 @@ export class MockImageProvider implements ImageProvider {
   }
 }
 
+/**
+ * Seedream 5.0 Pro on Runware (client decision 2026-10-25: the looks and the Bati are painted by Seedream —
+ * the most beautiful in the side-by-side test, ~2–7 yen a picture). `refs` are handed as reference images.
+ */
+export class SeedreamImageProvider implements ImageProvider {
+  readonly name = 'seedream';
+  constructor(
+    private readonly apiKey: string,
+    private readonly side = 1536,
+  ) {}
+  async generate(prompt: string, _seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
+    const res = await fetch('https://api.runware.ai/v1', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify([
+        {
+          taskType: 'imageInference',
+          taskUUID: crypto.randomUUID(),
+          model: 'bytedance:seedream@5.0-pro',
+          positivePrompt: prompt.slice(0, 3000),
+          width: this.side,
+          height: this.side,
+          numberResults: 1,
+          outputType: 'URL',
+          outputFormat: 'JPG',
+          ...(refs.length ? { referenceImages: refs.map((r) => `data:${r.mime};base64,${r.data.toString('base64')}`) } : {}),
+        },
+      ]),
+      signal: AbortSignal.timeout(180_000),
+    });
+    const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string }[]; errors?: unknown[] };
+    const url = j.data?.[0]?.imageURL;
+    if (!res.ok || j.errors?.length || !url) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);
+    const img = await fetch(url, { signal: AbortSignal.timeout(60_000) });
+    if (!img.ok) throw new Error(`Seedream image ${img.status}`);
+    return { data: Buffer.from(await img.arrayBuffer()), mime: 'image/jpeg' };
+  }
+}
+
+/** The looks and the Bati: Seedream when its key is set, else the general image provider. */
+export function createLookImageProvider(cfg: { runwareKey?: string; geminiApiKey?: string; imageModel?: string }): ImageProvider {
+  return cfg.runwareKey ? new SeedreamImageProvider(cfg.runwareKey) : createImageProvider(cfg);
+}
+
 export function createImageProvider(cfg: { geminiApiKey?: string; imageModel?: string }): ImageProvider {
   return cfg.geminiApiKey ? new GeminiImageProvider(cfg.geminiApiKey, cfg.imageModel || 'gemini-2.5-flash-image') : new MockImageProvider();
 }
@@ -63,37 +107,90 @@ const STYLE =
   'Square image. No text, no letters, no logo, no watermark.';
 
 /**
- * The water basin always shows four looks (story 2026-10-14): two boyish and two girlish — the story
- * never asks for a gender. `variant` 0–1 = boyish, 2–3 = girlish.
+ * The OBOLO NEO look (client decision 2026-10-25): one house style for everyone — a semi-real portrait in an
+ * oversized, mysterious secret-society hood, the chosen animal's ears through the hood, the chosen colours
+ * in the hood, the hair or the ears, and round gold-rimmed sunglasses that always hide the eyes (so anyone
+ * can feel it is them; the second rule: here you change your look). Four pictures: two boyish, two girlish
+ * (gender is never asked), each with the colours placed differently; skin tones vary for people everywhere.
  */
-const POSES = ['standing proudly', 'waving one hand', 'with a small cape fluttering', 'holding a tiny glowing star'];
-const lean = (variant: number) =>
-  variant % 4 < 2 ? 'The character has a boyish look (face, hair and outfit read as a boy).' : 'The character has a girlish look (face, hair and outfit read as a girl).';
-const neo = (variant: number) => `The character is a young apprentice of a secret society (an "OBOLO NEO"), wearing a hooded robe. ${lean(variant)} Pose: ${POSES[variant % POSES.length]}.`;
+const LOOK_STYLE =
+  'Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, ' +
+  "painterly cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, a young person in their " +
+  'late teens with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood ' +
+  "pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow, fine gold embroidery along the hood's edge. " +
+  'Round sunglasses with thin gold frames and pitch-black lenses with a faint golden reflection are always worn: the eyes are never visible. ' +
+  'Background: a dark night with soft golden glints and faint stars, softly blurred. Square image that works as a round profile icon (the face in ' +
+  'the middle). Safe for children. No text, no letters, no logo, no watermark.';
+const LEAN = ['The character reads as a boy.', 'The character reads as a girl.'];
+const SKIN = ['fair skin', 'light olive skin', 'warm brown skin', 'deep brown skin', 'light tan skin', 'golden-beige skin'];
+const EARS: Record<string, string> = {
+  犬: 'soft dog ears',
+  猫: 'cat ears',
+  狐: 'tall pointed fox ears',
+  うさぎ: 'long rabbit ears',
+  くま: 'small round bear ears',
+  鳥: 'feathered ear tufts like a small bird',
+  竜: 'small curved dragon horns and fin-shaped dragon ears',
+};
+const OMAKASE_EARS = Object.values(EARS);
+const MOOD: Record<string, string> = {
+  かっこいい: 'brave, heroic and cool',
+  かわいい: 'sweet, cute and gentle',
+  クール: 'calm, cool and composed',
+  パーティーが好き: 'playful, cheerful and festive',
+};
+const OMAKASE_COLOURS = ['deep blue and silver', 'crimson and gold', 'violet and white', 'emerald and black', 'warm orange and cream', 'soft pink and white'];
 const any = (v: string | undefined, d: string) => (!v || /おまかせ/.test(v) ? d : v);
+const pick = <T>(xs: T[], k: number) => xs[((k % xs.length) + xs.length) % xs.length];
+/** where the two colours go, one way per picture */
+const PLACE = [
+  (a: string, b: string) => `the hood and cloak are ${a}, the hair is ${b}`,
+  (a: string, b: string) => `the hair is ${a}, the animal ears are ${b}, the hood is dark with ${a} lining`,
+  (a: string, b: string) => `the hood and cloak are ${a}, the inner fur of the ears and the tips of the hair are ${b}`,
+  (a: string, b: string) => `the hood is ${b} with ${a} trim, the hair and the ears are ${a}`,
+];
+const who = (variant: number, round = 0) => `${LEAN[variant % 2]} The character has ${pick(SKIN, variant * 2 + round * 3)}.`;
+const colours = (c: string | undefined, variant: number) => {
+  const [a, b] = any(c, pick(OMAKASE_COLOURS, variant)).split(/と|and|,|、/).map((x) => x.trim()).filter(Boolean);
+  return PLACE[variant % PLACE.length](a, b ?? a);
+};
+const ears = (animal: string | undefined, variant: number) => {
+  const a = any(animal, '');
+  return a ? (EARS[a] ?? `the ears of a ${a}`) : pick(OMAKASE_EARS, variant + Date.now());
+};
 
-/** Day 2: the visitor's OBOLO NEO look from OBOLON's questions (animal, colours, mood, what they are into). */
-export function neoLookPrompt(a: { animal: string; color: string; mood: string; hobby?: string }, variant: number): string {
-  const hobby = a.hobby && !/パス/.test(a.hobby) ? ` They are into ${a.hobby}: show it as one small item or accent they carry.` : '';
-  return `${STYLE} ${neo(variant)} The character is an anthropomorphic ${any(a.animal, 'animal of your choice')}; the robe's main colours are ${any(a.color, 'colours of your choice')}. Mood and vibe: ${any(a.mood, 'your choice')}.${hobby}`;
+/** Day 2: OBOLON's questions (animal, colours, mood, what they are into). */
+export function neoLookPrompt(a: { animal: string; color: string; mood: string; hobby?: string }, variant: number, round = 0): string {
+  const hobby = a.hobby && !/パス/.test(a.hobby) ? ` They love ${a.hobby}: show it as one small charm or accent they wear.` : '';
+  const mood = MOOD[a.mood] ?? any(a.mood, 'mysterious and kind');
+  return `${LOOK_STYLE} ${capital(ears(a.animal, variant))} come out through openings in the hood. Mood and expression: ${mood}. Colours: ${colours(a.color, variant)}.${hobby} ${who(variant, round)} ${ORIGINAL}`;
 }
 
-/** Day 2: in the visitor's own words. */
-export function neoWordsPrompt(words: string, variant: number): string {
-  return `${STYLE} ${neo(variant)} The visitor describes the look they want in their own words: "${words}". Follow it closely. ${ORIGINAL}`;
+/** Day 2: in the visitor's own words (the hood and the sunglasses stay). */
+export function neoWordsPrompt(words: string, variant: number, round = 0): string {
+  return `${LOOK_STYLE} The visitor describes the look they want in their own words: "${words}". Follow it closely, within the hood and sunglasses style. ${who(variant, round)} ${ORIGINAL}`;
 }
 
-/** Day 2: おまかせ — the basin draws freely. */
-export function neoOmakasePrompt(variant: number): string {
-  const animals = ['fox', 'cat', 'rabbit', 'owl', 'wolf', 'bear', 'small dragon', 'deer'];
-  const colours = ['deep blue and silver', 'crimson and gold', 'violet and white', 'emerald and black', 'warm orange and cream'];
-  return `${STYLE} ${neo(variant)} The character is an anthropomorphic ${animals[(variant * 3 + Date.now()) % animals.length]} in ${colours[(variant + Date.now()) % colours.length]}. Make it charming and surprising.`;
+/** Day 2: おまかせ. */
+export function neoOmakasePrompt(variant: number, round = 0): string {
+  return `${LOOK_STYLE} ${capital(pick(OMAKASE_EARS, variant * 3 + round))} come out through openings in the hood. Colours: ${colours(undefined, variant + round)}. Make it charming and surprising. ${who(variant, round)} ${ORIGINAL}`;
 }
 
-/** Day 2: "この感じで、もっと見る" — four new looks close to the attached one. */
+/** "この感じで、もっと見る": four new looks close to the attached one. */
 export function neoMorePrompt(variant: number): string {
-  return `${STYLE} Draw a new variation of the character in the attached image: keep its feel, animal, colours and art style, but change details (pose, small accessories, expression, outfit details). ${lean(variant)} Pose: ${POSES[variant % POSES.length]}. ${ORIGINAL}`;
+  return `${LOOK_STYLE} Draw a new variation of the character in the attached image: keep its feel, animal ears, colours and art style, but change details (expression, the angle of the head, small accessories, hair). ${ORIGINAL}`;
 }
+
+/**
+ * The one refine (client decision 2026-10-25): the visitor picks the closest of the four and says what to
+ * change → four pictures with the request, clearly the same person, a little different from each other.
+ */
+export function refineLookPrompt(instruction: string, variant = 0): string {
+  const ways = ['a gentle smile', 'a confident look', 'the head tilted a little', 'a calm expression, the face turned slightly'];
+  return `Edit the attached character portrait following this request: "${instruction}". Keep the same character identity, the oversized hood, the animal ears, the round gold-rimmed sunglasses hiding the eyes, the colours, the art style, the framing and the background. Variation ${variant + 1} of 4: ${pick(ways, variant)}. No text, no letters. ${ORIGINAL}`;
+}
+
+const capital = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
 /** Jupiter (first journey): Bati draws a sticker's picture from its words (a round sticker, no letters). */
 export function stickerArtPrompt(words: string): string {
@@ -104,8 +201,19 @@ export function stickerArtPrompt(words: string): string {
   );
 }
 
-/** Day 4: the newborn Bati, a small round creature inspired by the visitor's favourite food. */
-export function batiPrompt(food: string): string {
+/**
+ * The newborn Bati (client decision 2026-10-25): the egg holds one of eight prepared body types (no misses —
+ * apps/api/assets/bati/<egg>-<n>.jpg, painted on flat grey); the favourite food is mixed into that body.
+ * Without the body picture (no file), the old free drawing.
+ */
+export function batiPrompt(food: string, fromBody = false): string {
+  if (fromBody)
+    return (
+      "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. " +
+      `Restyle its colours, patterns and small accessories so it is clearly inspired by "${food}": the food's colours become its colours, and small parts of the food ` +
+      'become a little hat, ear tips, tufts, cheeks or the tip of its tail. Its skin or fur stays soft, smooth and clean (no raw food texture all over the body, ' +
+      'no meat on its skin). It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.'
+    );
   return `${STYLE} The character is a newborn magical partner creature called Bati: small, round and chubby, with big sparkling eyes, whose body, colors and accessories are inspired by "${food}". It looks friendly and happy, as if it just hatched from an egg (a few eggshell pieces nearby).`;
 }
 
@@ -121,13 +229,9 @@ const ORIGINAL =
 export function neoFromReferencePrompt(a: { liked?: string; twist?: string }, variant: number): string {
   const liked = a.liked ? `ONLY as loose inspiration for this element: "${a.liked}"` : 'ONLY as loose inspiration (colours, motifs, mood)';
   const twist = a.twist ? ` Add this personal twist: "${a.twist}".` : '';
-  return `${STYLE} Use the attached image ${liked}. ${ORIGINAL}${twist} ${neo(variant)}`;
+  return `${LOOK_STYLE} Use the attached image ${liked}. ${ORIGINAL}${twist} ${who(variant)}`;
 }
 
-/** Day 3: refine the chosen look with one instruction ("bluer", "longer ears"…). */
-export function refineLookPrompt(instruction: string): string {
-  return `${STYLE} Edit the attached character image following this request: "${instruction}". Keep the same character identity, art style, framing and background. ${ORIGINAL}`;
-}
 
 /**
  * Saturn picture character (client decision 2026-10-07): a round, glossy "mochi" mascot in the

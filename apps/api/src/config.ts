@@ -60,6 +60,8 @@ const Env = z.object({
   EMAIL_FROM: z.string().default('Obolo Order <no-reply@example.com>'),
 
   GEMINI_API_KEY: secret(),
+  /** the looks and the Bati painted by Seedream on Runware (client decision 2026-10-25; secret obolo-seedream-api-key) */
+  LOOK_RUNWARE_KEY: secret(),
   GEMINI_MODEL: z.string().optional(),
   /** PLACEHOLDER (P-AI-3): image model for the NEO look / Bati. */
   GEMINI_IMAGE_MODEL: z.string().optional(),

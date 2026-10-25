@@ -4,23 +4,23 @@ import sharp from 'sharp';
  * Cut a character out of a plain white background (Saturn picture characters): flood-fill the
  * near-white pixels connected to the image border (so white INSIDE the character — rice, shine —
  * stays), soften the edge, then crop to a square around the character with a little margin and
- * return a 512 px transparent PNG.
+ * return a 512 px transparent PNG. `bg`: another flat background colour (the Bati's mid-grey).
  */
-export async function cutoutWhite(input: Buffer, out = 512): Promise<Buffer> {
+export async function cutoutWhite(input: Buffer, out = 512, bg: [number, number, number] = [255, 255, 255]): Promise<Buffer> {
   const { data, info } = await sharp(input).ensureAlpha().resize(720, 720, { fit: 'inside' }).raw().toBuffer({ resolveWithObject: true });
   const W = info.width;
   const H = info.height;
   const px = new Uint8Array(data.buffer, data.byteOffset, data.length);
-  // how far from white each pixel is (0 = pure white)
+  // how far from the background colour each pixel is (0 = the background itself)
   const dist = new Uint8Array(W * H);
-  for (let i = 0; i < W * H; i++) dist[i] = 255 - Math.min(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]);
+  for (let i = 0; i < W * H; i++) dist[i] = Math.max(Math.abs(px[i * 4] - bg[0]), Math.abs(px[i * 4 + 1] - bg[1]), Math.abs(px[i * 4 + 2] - bg[2]));
   const BG = 28; // still background
   const EDGE = 90; // fades in up to here at the border of the character
-  const bg = new Uint8Array(W * H);
+  const isBg = new Uint8Array(W * H);
   const stack: number[] = [];
   const seed = (i: number) => {
-    if (!bg[i] && dist[i] <= BG) {
-      bg[i] = 1;
+    if (!isBg[i] && dist[i] <= BG) {
+      isBg[i] = 1;
       stack.push(i);
     }
   };
@@ -48,12 +48,12 @@ export async function cutoutWhite(input: Buffer, out = 512): Promise<Buffer> {
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
       const i = y * W + x;
-      if (bg[i]) {
+      if (isBg[i]) {
         px[i * 4 + 3] = 0;
         continue;
       }
       // soft edge: a pixel touching the background fades by how white it is
-      const touches = (x > 0 && bg[i - 1]) || (x < W - 1 && bg[i + 1]) || (y > 0 && bg[i - W]) || (y < H - 1 && bg[i + W]);
+      const touches = (x > 0 && isBg[i - 1]) || (x < W - 1 && isBg[i + 1]) || (y > 0 && isBg[i - W]) || (y < H - 1 && isBg[i + W]);
       if (touches && dist[i] < EDGE) px[i * 4 + 3] = Math.round(Math.max(0, Math.min(1, (dist[i] - BG) / (EDGE - BG))) * 255);
       minX = Math.min(minX, x);
       maxX = Math.max(maxX, x);

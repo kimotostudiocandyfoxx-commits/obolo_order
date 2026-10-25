@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { cutoutWhite } from '../media/cutout';
 import { JOURNEY_DONE, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
@@ -9,7 +9,7 @@ import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
-import { IMAGES, KV, LLM } from '../infra/tokens';
+import { IMAGES, KV, LLM, LOOK_IMAGES } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 
@@ -19,7 +19,8 @@ import { toMe } from '../users/users.service';
  * (4 images per round, ~¥6 each) — at the ceiling the preset forms are offered.
  */
 export const NEO_LOOK_TRIES = 8;
-export const NEO_LOOK_REFINES = 8;
+/** One refine (client decision 2026-10-25): four pictures with the request; the hidden ceiling stays generous. */
+export const NEO_LOOK_REFINES = 4;
 const CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
 /** PLACEHOLDER (P-PUNI-4): picture-character tries per member per day (2 candidates each, ~¥6 per image). */
@@ -32,6 +33,9 @@ let styleSheet: Promise<GeneratedImage> | null = null;
 const puniStyle = () => (styleSheet ??= readFile(resolve(__dirname, '../../assets/puni-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 let butterflySheet: Promise<GeneratedImage> | null = null;
 /** The client's パタパタ butterflies (cut from the Jupiter mock), the style to follow. */
+/** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg). */
+const BATI_DIR = resolve(__dirname, '../../assets/bati');
+const BATI_GREY: [number, number, number] = [128, 128, 128];
 const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '../../assets/butterfly-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 
 /**
@@ -47,6 +51,8 @@ export class LookService {
     private readonly db: Database,
     private readonly media: MediaService,
     @Inject(IMAGES) private readonly images: ImageProvider,
+    /** the looks and the Bati: Seedream (client decision 2026-10-25) */
+    @Inject(LOOK_IMAGES) private readonly looks: ImageProvider,
     @Inject(LLM) private readonly llm: LlmProvider,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
@@ -75,9 +81,18 @@ export class LookService {
       if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
       refs.push(src);
     }
-    const prompt = (i: number) =>
-      'reference' in body ? neoFromReferencePrompt(body, i) : 'words' in body ? neoWordsPrompt(body.words, i) : 'like' in body ? neoMorePrompt(i) : 'omakase' in body ? neoOmakasePrompt(i) : neoLookPrompt(body, i);
     const key = `look:tries:${userId}`;
+    const round = Number((await this.kv.get(key)) ?? 0);
+    const prompt = (i: number) =>
+      'reference' in body
+        ? neoFromReferencePrompt(body, i)
+        : 'words' in body
+          ? neoWordsPrompt(body.words, i, round)
+          : 'like' in body
+            ? neoMorePrompt(i)
+            : 'omakase' in body
+              ? neoOmakasePrompt(i, round)
+              : neoLookPrompt(body, i, round);
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');
@@ -85,7 +100,7 @@ export class LookService {
 
     const made = await Promise.allSettled(
       Array.from({ length: CANDIDATES }, (_, i) =>
-        this.images.generate(prompt(i), i, refs),
+        this.looks.generate(prompt(i), i, refs),
       ),
     );
     const candidates = [];
@@ -102,7 +117,7 @@ export class LookService {
     return limited ? Math.max(0, NEO_LOOK_REFINES - Number((await this.kv.get(`look:refine:${userId}`)) ?? 0)) : 99;
   }
 
-  /** One instruction → one new version of the chosen candidate (3 times per apprentice). */
+  /** The one refine: the chosen candidate + what to change → four versions to decide from. */
   async refine(userId: string, body: RefineLookBody, origin: string, unlimited = false): Promise<NeoLookResult> {
     const u = await this.user(userId);
     await this.clean(body.instruction);
@@ -111,13 +126,13 @@ export class LookService {
     const src = await this.media.imageData(userId, body.mediaId, 'avatar');
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
+    const made = await Promise.allSettled(Array.from({ length: CANDIDATES }, (_, i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src])));
     const candidates = [];
-    try {
-      const img = await this.images.generate(refineLookPrompt(body.instruction), 0, [src]);
-      const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
-      candidates.push({ id: m.id, url: m.url });
-    } catch (e) {
-      this.log.warn(`look refine failed: ${String(e)}`);
+    for (const r of made) {
+      if (r.status === 'fulfilled') {
+        const m = await this.media.storeImage(userId, 'avatar', r.value.mime, r.value.data, origin);
+        candidates.push({ id: m.id, url: m.url });
+      } else this.log.warn(`look refine failed: ${String(r.reason)}`);
     }
     const tries = Number((await this.kv.get(`look:tries:${userId}`)) ?? 0);
     return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
@@ -222,6 +237,8 @@ export class LookService {
       .set({ batiFood: body.food, batiImageUrl: null, batiName: null, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
+    // which egg: its body types (kept beside the account until the hatching)
+    await this.kv.set(`bati:egg:${userId}`, body.egg ?? 'sun', TRY_TTL);
     return toMe(u);
   }
 
@@ -231,14 +248,25 @@ export class LookService {
     if (!u.batiFood) throw apiError(HttpStatus.CONFLICT, 'NO_EGG', 'No egg yet');
     if (u.batiImageUrl) return toMe(u);
     try {
-      const img = await this.images.generate(batiPrompt(u.batiFood));
-      const m = await this.media.storeImage(userId, 'bati', img.mime, img.data, origin);
+      const body = await this.batiBody((await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
+      const img = await this.looks.generate(batiPrompt(u.batiFood, !!body), 0, body ? [body] : []);
+      // painted on the body's flat grey: cut out, so the Bati stands on the stage like the others
+      const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
+      const m = png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin);
       const [nu] = await this.db.write.update(users).set({ batiImageUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
       return toMe(nu);
     } catch (e) {
       this.log.warn(`bati generation failed: ${String(e)}`);
       return toMe(u);
     }
+  }
+
+  /** One of the egg's eight body types, at random (none on disk → null, the free drawing). */
+  private async batiBody(egg: string): Promise<GeneratedImage | null> {
+    const files = (await readdir(BATI_DIR).catch(() => [] as string[])).filter((f) => f.startsWith(`${egg === 'earth' ? 'moon' : 'sun'}-`));
+    if (!files.length) return null;
+    const f = files[Math.floor(Math.random() * files.length)];
+    return { data: await readFile(resolve(BATI_DIR, f)), mime: 'image/jpeg' };
   }
 
   async name(userId: string, name: string): Promise<Me> {

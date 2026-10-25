@@ -11,9 +11,10 @@ import { VoiceField } from './StoryExtras';
  * by the water basin — short, so nobody gets stuck (the second journey's Moon can redo it).
  *  - OBOLON asks four questions with buttons: animal (or in their own words) → up to two colours (KIMORIN:
  *    「腕は80本？」) → mood → what they are into (or their own words, or pass). Gender is never asked.
- *  - the basin draws four looks (two boyish, two girlish). Pick one → 〔これにする〕〔この感じで、もっと
- *    見る〕〔ひとこと足す〕, or 〔最初から描き直す〕 (four new ones from the same answers). No count is shown;
- *    the server keeps a hidden ceiling (P-OB-18).
+ *  - the basin draws four looks (two boyish, two girlish; semi-real, a big hood, round sunglasses — client
+ *    2026-10-25). Pick the closest → 〔これにする〕 or 〔ここを変えたい〕: one wish → four looks with it, and
+ *    the visitor decides from those (one refine; the look can be changed later). Before that, 〔最初から描き
+ *    直す〕 draws four new ones from the same answers. No count is shown; the server keeps a hidden ceiling.
  *  - if drawing fails, the eight preset forms are offered so the story always moves on.
  * The answers and the last four looks are kept for this visit.
  */
@@ -43,13 +44,15 @@ const COLORS: { name: string; css: string }[] = [
 ];
 const MOODS = ['かっこいい', 'かわいい', 'クール', 'パーティーが好き', 'おまかせ'];
 const HOBBIES = ['スポーツ', 'ゲーム', 'パーティー'];
-const ADD = ['もっとかっこよく', 'もっとかわいく', '色を明るく', '目をやさしく', '小物を足して'];
+const ADD = ['もっとかっこよく', 'もっとかわいく', '色を明るく', '髪を長く', '小物を足して'];
 const DRAFT = 'obolo.look.draft';
 
 interface Draft {
   ans: { animal: string; color: string[]; mood: string; hobby: string };
   words: string;
   cands: NeoLookCandidate[];
+  /** the four are the refined ones: decide from them */
+  refined?: boolean;
 }
 const emptyDraft: Draft = { ans: { animal: '', color: [], mood: '', hobby: '' }, words: '', cands: [] };
 function loadDraft(): Draft {
@@ -99,7 +102,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       // let the basin scene play out (KIMORIN's whisper, the splash, OBOLON's line)
       await new Promise((ok) => setTimeout(ok, Math.max(0, 5200 - (Date.now() - started))));
       if (!r.candidates.length) return setPhase('failed');
-      save({ ...draft, cands: r.candidates });
+      save({ ...draft, cands: r.candidates, refined: false });
       setSel(null);
       setPhase('pick');
     } catch (e) {
@@ -118,11 +121,13 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     setPhase('making');
     try {
       const r = await api.refine(sel.id, instruction.trim());
-      if (r.candidates[0]) {
-        save({ ...draft, cands: draft.cands.map((c) => (c.id === sel.id ? r.candidates[0] : c)) });
-        setSel(r.candidates[0]);
+      if (r.candidates.length) {
+        save({ ...draft, cands: r.candidates, refined: true });
+        setSel(null);
         setInstruction('');
-      } else setErr('うまく描き変わらなかった……もう一度');
+        return setPhase('pick');
+      }
+      setErr('うまく描き変わらなかった……もう一度');
     } catch (e) {
       if (/描き直せません|LOOK_REFINES/.test(String(e))) setTired(true);
       else setErr(e instanceof Error ? e.message : String(e));
@@ -272,8 +277,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             <Gold disabled={busy} onClick={decide}>
               {busy ? '……' : 'これにする'}
             </Gold>
-            {!tired && <Plain onClick={() => draw({ like: sel.id })}>この感じで、もっと見る</Plain>}
-            {!tired && <Plain onClick={() => setPhase('add')}>ひとこと足す</Plain>}
+            {!tired && !draft.refined && <Plain onClick={() => setPhase('add')}>ここを変えたい</Plain>}
             <Back onClick={() => setPhase('pick')} label="4枚にもどる" />
             {err && <p className="text-center text-xs text-rose-300">{err}</p>}
           </div>
@@ -292,7 +296,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             </div>
             <div className="mt-3 flex flex-col gap-2">
               <Gold disabled={!instruction.trim()} onClick={add}>
-                少しだけ描き変える
+                この要望で、4つ描いてもらう
               </Gold>
               <Back onClick={() => setPhase('chosen')} />
             </div>
@@ -304,7 +308,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   // pick one of the four
   return (
     <Panel>
-      <Obolon>水盤が、4つの姿を描いた。</Obolon>
+      <Obolon>{draft.refined ? '要望を足して、4つの姿を描いた。' : '水盤が、4つの姿を描いた。'}</Obolon>
       <div className="mt-3 grid grid-cols-2 gap-3">
         {draft.cands.map((c) => (
           <button
@@ -318,7 +322,9 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
         ))}
       </div>
       <div className="mt-3 flex flex-col gap-2">
-        {!tired ? (
+        {draft.refined ? (
+          <p className="text-center text-xs text-white/50">この4つから決めてください。姿は、あとでまた変えられます</p>
+        ) : !tired ? (
           <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>最初から描き直す</Plain>
         ) : (
           <p className="text-center text-xs text-white/50">水盤が今日は疲れてしまった……この4枚から選んでください</p>

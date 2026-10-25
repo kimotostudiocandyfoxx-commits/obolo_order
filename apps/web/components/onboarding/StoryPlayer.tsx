@@ -72,7 +72,7 @@ interface Props {
   /** Day 3 'look' step: generate and choose the OBOLO NEO look. */
   lookApi?: LookApi;
   /** Day 3 'egg' step. */
-  onEgg?: (food: string) => Promise<void>;
+  onEgg?: (food: string, egg: 'sun' | 'earth') => Promise<void>;
   /** Day 4 'hatch' step: resolves with the Bati picture. */
   onHatch?: () => Promise<string>;
   /** Day 4 'batiname' step. */
@@ -896,7 +896,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <EggStep
           submit={step.submit}
           onEgg={async (food) => {
-            await onEgg?.(food);
+            // the egg chosen on the altar picks the Bati's body types (client decision 2026-10-25)
+            await onEgg?.(food, /地球/.test(answers.egg ?? '') ? 'earth' : 'sun');
             remember('food', food);
             run(iRef.current + 1);
           }}

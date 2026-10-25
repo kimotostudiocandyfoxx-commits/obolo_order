@@ -368,8 +368,8 @@ export class HttpApi implements Api {
   chooseLook(mediaId: string) {
     return this.req<Awaited<ReturnType<Api['chooseLook']>>>('POST', '/me/look', { mediaId });
   }
-  batiEgg(food: string) {
-    return this.req<Awaited<ReturnType<Api['batiEgg']>>>('POST', '/me/bati/egg', { food });
+  batiEgg(food: string, egg?: 'sun' | 'earth') {
+    return this.req<Awaited<ReturnType<Api['batiEgg']>>>('POST', '/me/bati/egg', { food, egg });
   }
   batiHatch() {
     return this.req<Awaited<ReturnType<Api['batiHatch']>>>('POST', '/me/bati/hatch');

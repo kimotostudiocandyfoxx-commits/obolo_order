@@ -216,17 +216,18 @@ function PreviewPlay() {
           refine: async (id, instruction) => {
             await new Promise((r) => setTimeout(r, 1200));
             const src = cands.find((c) => c.id === id);
-            const c = { id: `r${refines}`, url: await demoRefine(src?.url ?? '', instruction, refines) };
-            setCands((x) => [...x, c]);
+            // the one refine: four looks with the wish (client 2026-10-25)
+            const c = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: `r${refines}-${k}`, url: await demoRefine(src?.url ?? '', instruction, refines * 4 + k) })));
+            setCands((x) => [...x, ...c]);
             setRefines(refines + 1);
-            return { candidates: [c], triesLeft: Math.max(0, 3 - round), refinesLeft: 2 - refines };
+            return { candidates: c, triesLeft: Math.max(0, 3 - round), refinesLeft: 2 - refines };
           },
           choose: async (id) => cands.find((c) => c.id === id)?.url ?? '',
           chooseForm: async (id) => setNeo(id),
         }}
-        onEgg={async (food) => {
+        onEgg={async (food, egg) => {
           setBatiFood(food);
-          if (live) setMe(await getApi().batiEgg(food));
+          if (live) setMe(await getApi().batiEgg(food, egg));
         }}
         onHatch={async () => {
           if (live) {

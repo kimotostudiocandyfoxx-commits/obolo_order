@@ -1,11 +1,11 @@
 import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/common';
-import { createImageProvider, createLlm, LlmProvider } from '@obolo/ai';
+import { createImageProvider, createLookImageProvider, createLlm, LlmProvider } from '@obolo/ai';
 import { AppConfig, CONFIG, loadConfig } from '../config';
 import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { EMAIL, IMAGES, KV, LLM, QUEUE } from './tokens';
+import { EMAIL, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from './tokens';
 
 @Global()
 @Module({
@@ -36,6 +36,12 @@ import { EMAIL, IMAGES, KV, LLM, QUEUE } from './tokens';
       useFactory: (c: AppConfig) => createImageProvider({ geminiApiKey: c.GEMINI_API_KEY, imageModel: c.GEMINI_IMAGE_MODEL }),
     },
     {
+      // the looks and the Bati (client decision 2026-10-25): Seedream on Runware once its key is set
+      provide: LOOK_IMAGES,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig) => createLookImageProvider({ runwareKey: c.LOOK_RUNWARE_KEY, geminiApiKey: c.GEMINI_API_KEY, imageModel: c.GEMINI_IMAGE_MODEL }),
+    },
+    {
       provide: LLM,
       inject: [CONFIG],
       useFactory: (c: AppConfig): LlmProvider => {
@@ -52,7 +58,7 @@ import { EMAIL, IMAGES, KV, LLM, QUEUE } from './tokens';
       },
     },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, IMAGES, LOOK_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

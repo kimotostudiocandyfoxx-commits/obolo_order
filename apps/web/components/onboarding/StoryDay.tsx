@@ -189,8 +189,8 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
           setMe(await getApi().updateMe({ neoForm: id }));
         },
       }}
-      onEgg={async (food) => {
-        setMe(await getApi().batiEgg(food));
+      onEgg={async (food, egg) => {
+        setMe(await getApi().batiEgg(food, egg));
       }}
       onHatch={async () => {
         try {

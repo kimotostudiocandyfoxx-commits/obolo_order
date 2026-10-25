@@ -177,7 +177,8 @@ export const ChooseLookBody = z.object({ mediaId: z.string().uuid() });
 export type ChooseLookBody = z.infer<typeof ChooseLookBody>;
 
 /** Day 3: the favourite food the Bati egg is made from. */
-export const BatiEggBody = z.object({ food: z.string().trim().min(1).max(40) });
+/** `egg`: the egg chosen on the altar — its eight prepared body types (client decision 2026-10-25) */
+export const BatiEggBody = z.object({ food: z.string().trim().min(1).max(40), egg: z.enum(['sun', 'earth']).optional() });
 export type BatiEggBody = z.infer<typeof BatiEggBody>;
 
 /** Day 4: the newborn Bati's name. */

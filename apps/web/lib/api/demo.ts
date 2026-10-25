@@ -689,9 +689,10 @@ export class DemoApi implements Api {
     const n = 8 - this.refinesLeft();
     localStorage.setItem(`obolo.look.refines.${u.id}`, String(n + 1));
     await new Promise((r) => setTimeout(r, 1500));
-    const c = { id: uid(), url: await demoRefine(src.url, instruction, n) };
-    this.lookCache.push(c);
-    return { candidates: [c], triesLeft: u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.tries.${u.id}`) ?? 0)) : 99, refinesLeft: this.refinesLeft() };
+    // the one refine: four looks with the wish (client 2026-10-25)
+    const c = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: uid(), url: await demoRefine(src.url, instruction, n * 4 + k) })));
+    this.lookCache.push(...c);
+    return { candidates: c, triesLeft: u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.tries.${u.id}`) ?? 0)) : 99, refinesLeft: this.refinesLeft() };
   }
   private lookCache: { id: string; url: string }[] = [];
 
@@ -1058,7 +1059,7 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
-  async batiEgg(food: string) {
+  async batiEgg(food: string, _egg?: 'sun' | 'earth') {
     return this.patchMe(() => ({ bati: { food, name: null, imageUrl: null } }));
   }
 

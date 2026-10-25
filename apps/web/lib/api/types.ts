@@ -237,7 +237,8 @@ export interface Api {
   mvLyrics(id: string): Promise<JobView>;
   /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) — a background job */
   mvStory(id: string, mood: string): Promise<JobView>;
-  batiEgg(food: string): Promise<Me>;
+  /** `egg`: the egg chosen on the altar ('sun' = 太陽と月, 'earth' = 地球と月) */
+  batiEgg(food: string, egg?: 'sun' | 'earth'): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;
   batiName(name: string): Promise<Me>;
