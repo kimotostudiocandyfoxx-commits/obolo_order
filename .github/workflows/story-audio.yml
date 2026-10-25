@@ -1,0 +1,51 @@
+name: Story audio
+
+# Story sound made by Claude Code (client 2026-10-25): design/story-audio-queue.json changed →
+# Runware audio models make each new sound effect / track (scripts/story-audio/make.mjs).
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**', main]
+    paths: ['design/story-audio-queue.json']
+
+concurrency:
+  group: story-audio-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Make
+        run: |
+          export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          node scripts/story-audio/make.mjs
+      - name: Save to the branch
+        if: always()
+        run: |
+          git config user.name "story-audio"
+          git config user.email "story-audio@users.noreply.github.com"
+          git add -f docs/story-import/audio-last-run.md design/story-audio-queue.json; git add -f apps/web/public/onboarding/se-*.mp3 || true; git add -f apps/web/public/onboarding/bgm-*.m4a || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Story audio: new sounds [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

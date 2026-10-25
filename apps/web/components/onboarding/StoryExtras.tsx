@@ -1,9 +1,9 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { motionUrl, spriteUrl } from '@/lib/onboarding/media';
+import { motionUrl, SE_FILES, seUrl, spriteUrl } from '@/lib/onboarding/media';
 import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
-import { playPreset } from '@/lib/story/sfx';
+import { playPreset, type Preset } from '@/lib/story/sfx';
 import { IconButton } from '@/components/story/parts';
 import { TicketArt } from '@/components/story/Ticket';
 import { useDictation } from '@/lib/useDictation';
@@ -26,13 +26,45 @@ export function unlockSfx() {
     /* no audio */
   }
 }
+/** the made sounds a story sound falls back to when its file is not there */
+const NEAREST: Record<string, Preset> = { 'gate-close': 'thud', smoke: 'whoosh', rocket: 'whoosh', crackers: 'pop', 'egg-crack': 'pop', paper: 'whoosh', stamp: 'thud', footsteps: 'knock', portal: 'magic' };
+const seBuffers = new Map<string, Promise<AudioBuffer | null>>();
+function seBuffer(id: string): Promise<AudioBuffer | null> {
+  let p = seBuffers.get(id);
+  if (!p && ctx) {
+    const c = ctx;
+    p = fetch(seUrl(id))
+      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+      .then((b) => c.decodeAudioData(b))
+      .catch(() => null);
+    seBuffers.set(id, p);
+  }
+  return p ?? Promise.resolve(null);
+}
+/** Fetch a made sound ahead, so it plays on its cue. */
+export function prefetchSfx(sound: SoundFx) {
+  if (SE_FILES.has(sound)) void seBuffer(sound);
+}
 export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
   if (muted || !ctx || volume <= 0) return;
-  try {
-    playPreset(ctx, sound, 0.45 * volume);
-  } catch {
-    /* ignore */
-  }
+  const c = ctx;
+  const synth = () => {
+    try {
+      playPreset(c, (NEAREST[sound] ?? sound) as Preset, 0.45 * volume);
+    } catch {
+      /* ignore */
+    }
+  };
+  if (!SE_FILES.has(sound)) return synth();
+  void seBuffer(sound).then((buf) => {
+    if (!buf) return synth();
+    const src = c.createBufferSource();
+    const g = c.createGain();
+    g.gain.value = 0.8 * volume;
+    src.buffer = buf;
+    src.connect(g).connect(c.destination);
+    src.start();
+  });
 }
 
 // --- a text box with the mic first ----------------------------------------------------------------

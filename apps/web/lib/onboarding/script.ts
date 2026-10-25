@@ -26,7 +26,10 @@ export type Speaker =
   | '？？？';
 
 /** Synthesised sound effects (lib/story/sfx.ts presets). */
-export type SoundFx = 'sparkle' | 'chime' | 'bell' | 'gong' | 'magic' | 'whoosh' | 'pop' | 'boing' | 'knock' | 'ding' | 'heartbeat' | 'blip' | 'thud';
+export type SoundFx =
+  | 'sparkle' | 'chime' | 'bell' | 'gong' | 'magic' | 'whoosh' | 'pop' | 'boing' | 'knock' | 'ding' | 'heartbeat' | 'blip' | 'thud'
+  // recorded-style sounds made for the story (2026-10-25); without their file they fall back to the nearest preset
+  | 'gate-close' | 'smoke' | 'rocket' | 'crackers' | 'egg-crack' | 'paper' | 'stamp' | 'footsteps' | 'portal';
 
 /** Picture effects drawn over the background ('fx' steps). */
 export type PictureFx =

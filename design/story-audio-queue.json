@@ -1,0 +1,150 @@
+{
+  "note": "Claude Code が作る物語の音（Runwareの音声モデル）。items に { id, kind: se|bgm, prompt, duration } を足して push すると作る（id ごとに1回。作り直しは redo）。se → apps/web/public/onboarding/se-<id>.mp3、bgm → bgm-<id>.m4a。probe に言葉を入れると、その名前のモデル一覧を報告に出す。",
+  "sfxModel": "mirelo:1@1",
+  "musicModel": null,
+  "parallel": 3,
+  "redo": [],
+  "probe": [
+    "music",
+    "minimax",
+    "lyria",
+    "stable audio",
+    "ace-step",
+    "seed audio",
+    "elevenlabs"
+  ],
+  "items": [
+    {
+      "id": "sparkle",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "magical sparkling twinkle, a soft shimmer of tiny glass bells and glitter, fantasy game, clean"
+    },
+    {
+      "id": "chime",
+      "kind": "se",
+      "duration": 2.5,
+      "prompt": "a single warm magical chime with a gentle shimmering tail, fantasy, clean, no music"
+    },
+    {
+      "id": "bell",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "one clear small brass bell ring with natural decay, clean"
+    },
+    {
+      "id": "gong",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "a deep temple gong strike with long resonant decay, mysterious"
+    },
+    {
+      "id": "magic",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "a magic spell being cast: rising shimmering whoosh with sparkles and a soft glowing hum, fantasy anime"
+    },
+    {
+      "id": "whoosh",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "a fast smooth air whoosh passing by, cinematic, clean"
+    },
+    {
+      "id": "pop",
+      "kind": "se",
+      "duration": 1,
+      "prompt": "a cute soft bubbly pop, cartoon, clean"
+    },
+    {
+      "id": "boing",
+      "kind": "se",
+      "duration": 1.5,
+      "prompt": "a comic springy boing for a character jumping back in surprise, cartoon"
+    },
+    {
+      "id": "knock",
+      "kind": "se",
+      "duration": 1.5,
+      "prompt": "two knocks on a heavy wooden door, clean"
+    },
+    {
+      "id": "ding",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "a cheerful quiz show correct-answer sound, two bright ascending ding-dong chimes, ピンポンピンポン"
+    },
+    {
+      "id": "heartbeat",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "two slow heavy heartbeats, deep, close"
+    },
+    {
+      "id": "blip",
+      "kind": "se",
+      "duration": 1,
+      "prompt": "a soft futuristic device blip, a hologram switching on, clean"
+    },
+    {
+      "id": "thud",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "a heavy dull thud of a huge stone gate shutting, deep impact with a short rumble"
+    },
+    {
+      "id": "gate-close",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "giant ancient stone-and-gold gate doors swinging shut with a deep grinding rumble and a heavy final boom"
+    },
+    {
+      "id": "smoke",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "thick dark magical smoke billowing up with a low airy rumble and a mysterious hiss"
+    },
+    {
+      "id": "rocket",
+      "kind": "se",
+      "duration": 5,
+      "prompt": "a rocket engine igniting and launching, deep rumble rising into a roaring lift-off, cinematic"
+    },
+    {
+      "id": "crackers",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "many party poppers going off at once, pan pa-pa-pa-pan, with confetti rustle, festive"
+    },
+    {
+      "id": "egg-crack",
+      "kind": "se",
+      "duration": 2.5,
+      "prompt": "an egg shell cracking open in a few small cracks then a soft magical pop, cute"
+    },
+    {
+      "id": "paper",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "crisp paper folding quickly, a few soft folds, clean"
+    },
+    {
+      "id": "stamp",
+      "kind": "se",
+      "duration": 1.2,
+      "prompt": "a rubber stamp pressed firmly on thick paper, a satisfying thunk"
+    },
+    {
+      "id": "footsteps",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "small soft footsteps walking on polished stone in a large hall, light echo"
+    },
+    {
+      "id": "portal",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "a glowing light pillar descending from above with a deep shimmering hum, holy, magical"
+    }
+  ]
+}

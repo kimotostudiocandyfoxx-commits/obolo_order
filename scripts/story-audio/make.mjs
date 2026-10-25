@@ -1,0 +1,110 @@
+/**
+ * Story sound made by Claude Code (client 2026-10-25: the synthesised beeps and the three themes felt like
+ * a demo): sound effects and background music on Runware's audio models, run by
+ * .github/workflows/story-audio.yml when design/story-audio-queue.json changes.
+ *
+ * Each queue item: { id, kind: "se" | "bgm", prompt, duration?, model?, settings? }
+ *  - se  → apps/web/public/onboarding/se-<id>.mp3 (mono, peak-normalised, trimmed silence)
+ *  - bgm → apps/web/public/onboarding/bgm-<id>.m4a (AAC, loudness −16 LUFS like the client's tracks)
+ * An id is made once; "redo": [ids] makes it again. "probe": ["music", …] lists Runware models whose name
+ * matches, into the report (to find the music model's id). Report: docs/story-import/audio-last-run.md.
+ */
+import { execFileSync } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const KEY = process.env.RUNWARE_API_KEY;
+if (!KEY) throw new Error('RUNWARE_API_KEY is not set');
+const QUEUE = process.argv[2] ?? 'design/story-audio-queue.json';
+const queue = JSON.parse(readFileSync(QUEUE, 'utf8'));
+const OUT = 'apps/web/public/onboarding';
+const API = 'https://api.runware.ai/v1';
+const redo = new Set(queue.redo ?? []);
+const fileOf = (x) => join(OUT, x.kind === 'bgm' ? `bgm-${x.id}.m4a` : `se-${x.id}.mp3`);
+const todo = (queue.items ?? []).filter((x) => redo.has(x.id) || !existsSync(fileOf(x)));
+const log = [];
+
+async function call(tasks) {
+  const res = await fetch(API, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${KEY}` },
+    body: JSON.stringify(tasks),
+    signal: AbortSignal.timeout(180_000),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 1500)}`);
+  return j.data ?? [];
+}
+
+/** the models Runware has for a word (to find the right ids) */
+async function probe(word) {
+  try {
+    const d = await call([{ taskType: 'modelSearch', taskUUID: randomUUID(), search: word, limit: 50 }]);
+    const list = (d[0]?.results ?? d).map((m) => `${m.air ?? m.model ?? ''} — ${m.name ?? ''} (${m.category ?? m.type ?? ''})`);
+    log.push(`- 🔎 「${word}」: ${list.length ? '' : 'なし'}`, ...list.slice(0, 50).map((l) => `  - ${l}`));
+  } catch (e) {
+    log.push(`- 🔎 「${word}」: ${String(e).slice(0, 400)}`);
+  }
+}
+
+async function make(x) {
+  const taskUUID = randomUUID();
+  const model = x.model ?? (x.kind === 'bgm' ? queue.musicModel : queue.sfxModel);
+  if (!model) throw new Error('no model for this kind yet');
+  const first = await call([
+    {
+      taskType: 'audioInference',
+      taskUUID,
+      model,
+      positivePrompt: x.prompt,
+      ...(x.duration ? { duration: x.duration } : {}),
+      outputType: 'URL',
+      outputFormat: 'MP3',
+      deliveryMethod: 'async',
+      includeCost: true,
+      ...(x.settings ?? {}),
+    },
+  ]);
+  let d = first.find((r) => r.taskUUID === taskUUID && r.audioURL);
+  for (let k = 0; !d && k < 120; k++) {
+    await new Promise((r) => setTimeout(r, 5000));
+    const got = (await call([{ taskType: 'getResponse', taskUUID }])).find((r) => r.taskUUID === taskUUID);
+    if (got?.status === 'error') throw new Error(JSON.stringify(got).slice(0, 600));
+    if (got?.audioURL) d = got;
+  }
+  if (!d) throw new Error('the sound did not come back in time');
+  const raw = join(OUT, `_${x.id}.mp3`);
+  writeFileSync(raw, Buffer.from(await (await fetch(d.audioURL)).arrayBuffer()));
+  const out = fileOf(x);
+  if (x.kind === 'bgm') {
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-ac', '2', '-ar', '44100', '-c:a', 'aac', '-b:a', '128k', out]);
+  } else {
+    // trim silence at both ends, peak at −1 dB, mono, light
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,dynaudnorm=p=0.89:m=10', '-ac', '1', '-ar', '44100', '-b:a', '96k', out]);
+  }
+  rmSync(raw);
+  return d.cost ?? 0;
+}
+
+for (const w of queue.probe ?? []) await probe(w);
+let usd = 0;
+let next = 0;
+await Promise.all(
+  Array.from({ length: queue.parallel ?? 3 }, async () => {
+    while (next < todo.length) {
+      const x = todo[next++];
+      try {
+        usd += await make(x);
+        log.push(`- ✅ ${x.kind}-${x.id}（${x.duration ?? '-'}秒）`);
+      } catch (e) {
+        log.push(`- ❌ ${x.kind}-${x.id}: ${String(e).slice(0, 1200)}`);
+      }
+    }
+  }),
+);
+if ((queue.redo ?? []).length || (queue.probe ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [], probe: [] }, null, 2) + '\n');
+mkdirSync('docs/story-import', { recursive: true });
+const report = [`# 物語の音 — ${new Date().toISOString()}`, '', `${todo.length}本 / 約${Math.round(usd * 150)}円`, '', ...log, ''].join('\n');
+writeFileSync('docs/story-import/audio-last-run.md', report);
+console.log(report);

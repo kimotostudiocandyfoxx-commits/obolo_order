@@ -15,7 +15,8 @@ import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
-import { Camera, Cast, CutIn, Motes, Smoke, speakerSprite } from '@/components/story/Stage';
+import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/components/story/Stage';
+import { exprFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
@@ -34,6 +35,7 @@ import {
   FxLayer,
   PauseScreen,
   playSfx,
+  prefetchSfx,
   RiddleBook,
   RiddleCards,
   SEALS,
@@ -531,6 +533,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the lines with the member's names in them: their own voices, made in the background
   useNameVoices(voice.current, steps, { name: v.name, neo: v.neo, bati: answers.batiName ?? vars.bati, food: v.batiFood, inviter: v.inviter });
   // each spoken line plays its voice (when it has one)
+  // the speaker's face and gesture for this line (picked from the words; a 'face' step still wins until the next line)
+  const sayExpressions = (set: Record<string, string>) => {
+    const st = steps[i];
+    if (st?.t !== 'say' || !sprite) return set;
+    const names = (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean);
+    const who = speakerSprite(st.who, names);
+    return who && who !== OFFSTAGE ? { ...set, [who]: exprFor(st.who, st.text) } : set;
+  };
   const sayNow = started && steps[i]?.t === 'say' ? (steps[i] as Extract<Step, { t: 'say' }>) : null;
   // the next line's voice is fetched while this one is read, so it starts the moment it shows
   useEffect(() => {
@@ -553,6 +563,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       }
     }
   }, [i, steps, started]);
+  // the sounds coming up are fetched ahead
+  useEffect(() => {
+    for (let k = i; k < Math.min(steps.length, i + 10); k++) {
+      const s = steps[k];
+      if (s.t === 'se') prefetchSfx(s.sound);
+    }
+  }, [i, steps]);
   // the next theme is decoded ahead
   useEffect(() => {
     for (let k = i + 1; k < Math.min(steps.length, i + 30); k++) {
@@ -691,7 +708,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           src={(n) => spriteSrc(n) ?? null}
           speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
           talking={talking}
-          expressions={expressions}
+          expressions={sayExpressions(expressions)}
           slot={spriteSlot}
         />
       )}

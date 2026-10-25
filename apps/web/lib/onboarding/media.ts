@@ -49,6 +49,13 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  */
 export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
 
+/**
+ * Sound effects that have a made file (onboarding/se-<id>.mp3, design/story-audio-queue.json). Others are
+ * synthesised in the browser (lib/story/sfx.ts).
+ */
+export const SE_FILES: ReadonlySet<string> = new Set<string>([]);
+export const seUrl = (id: string) => `${MEDIA_BASE}/se-${id}.mp3`;
+
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;
 export const hasMotion = (n: MotionId) => AVAILABLE_MOTIONS.has(n);
