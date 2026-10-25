@@ -276,6 +276,22 @@
       "first": "apps/web/public/onboarding/s/d2-hall-dark-kimorin.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
       "prompt": "In the dark hall with golden armillary spheres, a thin pillar of golden light falls from high above onto the center of the floor, the magic circles on the floor light up, the gold rings of the hall glow, and a black sphere with two closed crescent eyes appears floating in the pillar of light; the small fox-masked character in the red robe steps back to the side, staring up at it, as the camera eases around to see him and the sphere. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: a deep shimmering chime and rising hum — no music, no voices, no speech."
+    },
+    {
+      "id": "d2-sky",
+      "duration": 10,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
+      "last": "apps/web/public/onboarding/s/d2-hall-sky.jpg",
+      "prompt": "One unbroken take in the dark-gold hall with golden armillary spheres: the camera stays almost still. The high ceiling and the gold arches above slowly dissolve into glittering light and open into a deep starry night sky with a soft violet-blue nebula; high above the floating black sphere, the planet Earth fades in, blue and white, wrapped in thin luminous golden rings, and turns slowly. The small fox-masked character in the red robe in the lower right foreground stays where he is the whole time, slowly tilting his head back to look up at the Earth in awe, his fan of tail feathers rising a little. The hall below fills with soft blue starlight. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: a deep shimmering swell, wind of space and a soft chime — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "d2-monban-walkin",
+      "duration": 5,
+      "audio": true,
+      "first": "apps/web/public/onboarding/s/d2-hall-sky.jpg",
+      "last": "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg",
+      "prompt": "One unbroken take in the hall under the open starry sky with the ringed Earth floating above: the tall hooded gatekeeper in the long black robe with gold patterns and a golden magic-circle halo behind his head walks calmly into the frame from the left edge, with slow heavy steps, his robe trailing, and stops on the left, a little behind the black sphere, facing the small fox-masked character in the red robe, who stays in the lower right foreground and turns his head a little toward him. The gatekeeper has a single golden eye under the hood and carries nothing in his hands. The camera stays still. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: slow footsteps on stone, robe rustle, a soft space hum — no music, no voices, no speech, no singing."
     }
   ],
   "parallel": 4

@@ -47,7 +47,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
  * Motions planned and being made (Seedance, docs/story-rewrite/day2-video-plan.md): until they arrive the
  * story shows a placeholder; the test of days 1–3 lets these through and nothing else.
  */
-export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
+export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>(['d2-sky', 'd2-monban-walkin']);
 
 /**
  * Sound effects that have a made file (onboarding/se-<id>.mp3, design/story-audio-queue.json). Others are

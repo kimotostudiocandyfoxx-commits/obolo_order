@@ -77,20 +77,28 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'obolon' },
   { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
-  { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、手前にKIMORIN
+  { t: 'still', image: 's/d2-hall' }, // 天球儀の大広間。光の柱の中にOBOLON
+  { t: 'sprite', image: ['', 'kimorin-n'] }, // 話すKIMORINの立ち絵（ドラゴンの前の姿）
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'se', sound: 'boing' },
+  { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-kimorin-startle' }, // KIMORINがのけぞる
   { t: 'say', who: 'KIMORIN', text: 'うわ！なんやこの喋る黒い玉は！　宙に浮いとる！　どういう仕組み！？' },
+  { t: 'still', image: 's/d2-hall' },
+  { t: 'sprite', image: ['', 'kimorin-n'] },
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
   { t: 'say', who: 'KIMORIN', text: '宇宙秘密結社?…すごそう...' },
   { t: 'say', who: 'OBOLON', text: 'お前は宇宙に行ってみたいと思うか？' },
   { t: 'say', who: 'KIMORIN', text: 'え？宇宙、、、行きたい' },
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
-  { t: 'bgvideo', motion: 14, then: [15] }, // 天井が夜空になり、金の輪をまとった地球が浮かび、ゆっくり回る
+  { t: 'sprite', image: null },
+  { t: 'bgvideo', motion: 'd2-sky' }, // 2日目用（client 2026-10-25）：大広間の天井が夜空に溶け、金の輪をまとった地球が浮かぶ。KIMORINは手前で見上げる
   { t: 'wait', s: 3.5 }, // 地球が出てから（client 2026-10-22）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
+  { t: 'bgvideo', motion: 'd2-monban-walkin' }, // 星空の下、MONBANが入り口から歩いてきて、KIMORINの横に立つ
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。どうだ、宇宙へ行ってみるか？' }, // MONBANが入り口から歩きながら
+  { t: 'still', image: 's/d2-hall-sky-empty' }, // 星空の大広間（人物なし）
+  { t: 'sprite', image: ['monban', 'kimorin-n'] },
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
   { t: 'bgm', track: 'comedy' }, // お金の話から、KIMORINの調子が戻る
   { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、\nとても手の込んだ手品ですね、、。\n宇宙に行きたいかですって？\nふふ、、\nもちろんそれには、、お金が、かかりますよねー？' },
@@ -101,6 +109,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'しない。' },
   { t: 'say', who: 'KIMORIN', text: '…………。' },
   { t: 'say', who: 'KIMORIN', text: '、、、そうですか！\nそれではめちゃくちゃ宇宙に行かせていただきます！宇宙行きの切符、私の家に、送っといてください。' },
+  { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 門の内側から入口のほうを見た景色で。 咳払いして、ローブの裾をひるがえし、鼻歌で門の外へ。扇の尾をぱたぱた、光の点になって空へ
   { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' },
   { t: 'se', sound: 'whoosh' },

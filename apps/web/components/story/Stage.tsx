@@ -38,6 +38,9 @@ const POSES = ['talk', 'lecture', 'joy', 'point', 'shock', 'smug', 'tears', 'thi
 /** KIMORIN after the dragon (sunglasses up, the small wing) */
 const KIMORIN_FACES = facesOf('kimorin-x', POSES);
 const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
+/** pictures that have been cut into layers (scripts/sprite-layers.py) — for the newer casts, only those */
+const madeFaces = (stem: string, exprs: string[]) => facesOf(stem, exprs.filter((e) => `${stem}-${e}` in LAYERS));
+const FRIEND = ['talk', 'joy', 'shock'];
 
 const CHAR: Record<string, CharSpec> = {
   // MONBAN's glowing eye is placed on the standing picture; on the pose pictures the eye is painted in
@@ -53,12 +56,12 @@ const CHAR: Record<string, CharSpec> = {
   'kimorin-8': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
   obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
-  'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a' },
-  'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a' },
+  'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a', faces: madeFaces('takoyaki-brother-x', FRIEND) },
+  'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a', faces: madeFaces('takoyaki-sister-x', FRIEND) },
   'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a' },
   freezy: { bottom: 8, height: 64, face: 0.25, tint: '#5aa8d8' },
   hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a' },
-  'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4 },
+  'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
 };
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
 export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);

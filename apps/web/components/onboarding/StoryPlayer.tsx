@@ -537,14 +537,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const voiceLevel = useCallback(() => voice.current?.level() ?? 0, []);
   const sayReact = steps[i]?.t === 'say' ? reactFor((steps[i] as Extract<Step, { t: 'say' }>).who, (steps[i] as Extract<Step, { t: 'say' }>).text) : undefined;
   // KIMORIN / MONBAN speaking over a still that does not show them: their pose picture steps in (client
-  // 2026-10-25). KIMORIN only once his look of the day is on stage (kimorin-sun: after the dragon on day 2).
+  // 2026-10-25). KIMORIN in the look he last had on stage that day (kimorin-g at the gate with the
+  // sunglasses on, kimorin-n before the dragon, kimorin-sun after); none yet → he stays off.
   const autoStandee = (() => {
     const st = steps[i];
     if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;
     if (st.who === 'MONBAN') return stillShows(still, 'MONBAN') ? null : 'monban';
-    if (st.who === 'KIMORIN') {
-      const seen = steps.slice(0, i).some((x) => x.t === 'sprite' && (Array.isArray(x.image) ? x.image : [x.image]).includes('kimorin-sun'));
-      return seen && !stillShows(still, 'KIMORIN') ? 'kimorin-sun' : null;
+    if (st.who === 'KIMORIN' && !stillShows(still, 'KIMORIN')) {
+      for (let k = i - 1; k >= 0; k--) {
+        const x = steps[k];
+        if (x.t !== 'sprite') continue;
+        const look = (Array.isArray(x.image) ? x.image : [x.image]).find((n) => n === 'kimorin-sun' || n === 'kimorin-n' || n === 'kimorin-g');
+        if (look) return look;
+      }
     }
     return null;
   })();
