@@ -264,6 +264,41 @@
           "instrumental": true
         }
       }
+    },
+    {
+      "id": "signal",
+      "kind": "bgm",
+      "prompt": "A cinematic film-trailer-quality opening score, about 45 seconds, like the first minute of a great fantasy film: it begins almost silent with a deep, distant sub-bass tone and soft night ambience, a quiet felt piano motif of a few notes, slowly warm strings rise as the camera lifts from the cities of the Earth into space, a shimmering golden swell, then five short low hits spaced apart (for quick mysterious images), a warm intimate moment, a final luminous swell that dissolves into glittering particles and silence. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "record",
+      "kind": "bgm",
+      "prompt": "A quiet, uneasy but gentle documentary-style score for an old archive film: a slow ticking pulse like a film projector, a soft detuned music-box and a low cello drone, cold and hollow as the colours drain from the world, never sad or scary, restrained and mysterious, ending in near silence. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "sub-hit",
+      "kind": "se",
+      "prompt": "A deep cinematic sub-bass hit with a long soft tail, dark and mysterious, for a quick cut in a film trailer."
+    },
+    {
+      "id": "projector",
+      "kind": "se",
+      "prompt": "An old 16mm film projector running: steady mechanical clatter of the film sprockets and a soft motor hum, recorded in a quiet room."
+    },
+    {
+      "id": "seal-press",
+      "kind": "se",
+      "prompt": "A wax seal pressed onto a thick paper envelope, then a soft magical golden chime as the seal glows."
     }
   ],
   "listen": []
