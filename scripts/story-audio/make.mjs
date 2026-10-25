@@ -80,8 +80,8 @@ async function make(x) {
   if (x.kind === 'bgm') {
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-ac', '2', '-ar', '44100', '-c:a', 'aac', '-b:a', '128k', out]);
   } else {
-    // trim silence at both ends, peak at −1 dB, mono, light
-    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,dynaudnorm=p=0.89:m=10', '-ac', '1', '-ar', '44100', '-b:a', '96k', out]);
+    // trim silence at both ends, loudness −18 LUFS (a touch under the music and voices), mono, light
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-af', 'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,loudnorm=I=-18:TP=-1.5:LRA=11', '-ac', '1', '-ar', '44100', '-b:a', '96k', out]);
   }
   rmSync(raw);
   return d.cost ?? 0;
