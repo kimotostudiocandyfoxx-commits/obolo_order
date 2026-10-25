@@ -1865,6 +1865,230 @@
         "apps/web/public/onboarding/s/kimorin-g-think.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, robe, hood, ears, mask, sunglasses, framing, size, light — but remove the whole fan of tail feathers behind him (and the small dragon wing if there is one), so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-talk-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-lecture-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-joy-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-point-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-shock-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-smug-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-tears-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-x-think-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-talk-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-lecture-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-joy-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-point-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-shock-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-smug-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-tears-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
+    },
+    {
+      "id": "kimorin-n-think-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, tail, mask markings, framing, size, light and grey background — and change only the two thin eye slits on the mask: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark. This fox-masked character's eyes never open."
     }
   ],
   "redo": []
