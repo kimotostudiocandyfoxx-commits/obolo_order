@@ -2122,6 +2122,20 @@
         "design/story/refs/client/monban.jpg"
       ],
       "prompt": "Edit the first picture: keep the hall, the camera, the framing, the floor with the glowing magic circles, the golden armillary spheres on both sides, the thin pillar of light with the small black sphere with closed eyes floating low in it, and KIMORIN in the lower right foreground exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. KIMORIN stands in the lower right foreground looking up at the Earth in awe. Add one more figure: at the left, a little further back, the tall hooded gatekeeper of the fourth picture (long black robe with fine gold patterns, a single golden eye under the hood, a golden magic-circle halo behind his head) standing calmly, facing KIMORIN, as if he has just walked in from the entrance; lit by the starlight and gold, with a soft reflection on the floor. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+    },
+    {
+      "id": "d2-hall-sky-empty",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/d2-hall.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the hall, the camera, the framing, the reflective floor with the glowing magic circles, the golden armillary spheres on both sides, the pillars and the thin pillar of light with the black sphere with closed eyes floating in it exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. No people, no characters. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark."
     }
   ],
   "redo": []
