@@ -53,7 +53,9 @@ export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
  * Sound effects that have a made file (onboarding/se-<id>.mp3, design/story-audio-queue.json). Others are
  * synthesised in the browser (lib/story/sfx.ts).
  */
-export const SE_FILES: ReadonlySet<string> = new Set<string>([]);
+export const SE_FILES: ReadonlySet<string> = new Set<string>([
+  'bell', 'blip', 'boing', 'chime', 'crackers', 'ding', 'egg-crack', 'footsteps', 'gate-close', 'gong', 'heartbeat', 'knock', 'magic', 'paper', 'pop', 'portal', 'rocket', 'smoke', 'sparkle', 'stamp', 'thud', 'whoosh',
+]);
 export const seUrl = (id: string) => `${MEDIA_BASE}/se-${id}.mp3`;
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;

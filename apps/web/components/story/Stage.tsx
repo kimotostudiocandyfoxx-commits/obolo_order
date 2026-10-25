@@ -27,9 +27,15 @@ export interface CharSpec {
   faces?: Record<string, string>;
 }
 
+/** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
+const facesOf = (char: string, exprs: string[]) => Object.fromEntries(exprs.map((e) => [e, `${char}-x-${e}`]));
+const KIMORIN_FACES = facesOf('kimorin', ['talk', 'lecture', 'shock', 'smug']);
+const MONBAN_FACES = facesOf('monban', ['talk', 'point', 'arms', 'stop']);
+
 const CHAR: Record<string, CharSpec> = {
-  monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225] },
-  'kimorin-sun': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
+  // MONBAN's glowing eye is placed on the standing picture; on the pose pictures the eye is painted in
+  monban: { bottom: 8, height: 74, face: 0.24, tint: '#c99a4a', eye: [0.507, 0.225], faces: MONBAN_FACES },
+  'kimorin-sun': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: KIMORIN_FACES },
   kimorin: { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-1': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-2': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
@@ -135,6 +141,7 @@ export function Cast({
             key={name}
             name={name}
             url={expressions[name] && charSpec(name).faces?.[expressions[name]] ? `/onboarding/${charSpec(name).faces![expressions[name]]}.webp` : url}
+            posed={!!(expressions[name] && charSpec(name).faces?.[expressions[name]])}
             lit={!speaking || speaking === name}
             bust={bust && speaking === name}
             hidden={bust && speaking !== name}
@@ -150,10 +157,10 @@ export function Cast({
   );
 }
 
-function Character({ name, url, lit, bust, hidden, talking, style, className, scale = 1 }: { name: string; url: string; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; style: CSSProperties; className: string; scale?: number }) {
+function Character({ name, url, posed, lit, bust, hidden, talking, style, className, scale = 1 }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; style: CSSProperties; className: string; scale?: number }) {
   const base = charSpec(name);
   const spec = { ...base, height: base.height * scale };
-  const shut = useBlink(!!spec.eye);
+  const shut = useBlink(!!spec.eye && !posed);
   const own = name.startsWith('@') && name !== '@egg';
   // the bust-up: the same picture, bigger, its face near the upper third of the screen
   const zoom = bust ? Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6))) : 1;
@@ -172,13 +179,14 @@ function Character({ name, url, lit, bust, hidden, talking, style, className, sc
       <div className="relative h-full" style={talking ? { animation: 'lipBob 0.22s ease-in-out infinite' } : undefined}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          key={url}
           src={url}
           alt=""
           draggable={false}
-          className={`h-full w-auto max-w-none select-none object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`}
+          className={`h-full w-auto max-w-none select-none object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''} ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`}
           style={{ filter: lit ? 'none' : 'brightness(0.45) saturate(0.7)' }}
         />
-        {spec.eye && (
+        {spec.eye && !posed && (
           <span
             className="absolute h-[3.2%] w-[7%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity duration-100"
             style={{
