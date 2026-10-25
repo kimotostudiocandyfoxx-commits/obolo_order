@@ -537,7 +537,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     for (let k = i + 1; k < Math.min(steps.length, i + 8); k++) {
       const s = steps[k];
       if (s.t === 'say') {
-        void voice.current?.prefetch(s.who, s.text);
+        void voice.current?.prefetch(s.voice ?? s.who, s.text);
         break;
       }
     }
@@ -564,7 +564,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
   }, [i, steps]);
   useEffect(() => {
-    if (sayNow) void voice.current?.say(sayNow.who, sayNow.text);
+    if (sayNow) void voice.current?.say(sayNow.voice ?? sayNow.who, sayNow.text);
     else voice.current?.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, started]);

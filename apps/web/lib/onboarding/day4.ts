@@ -45,9 +45,9 @@ export const DAY4: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: 'すごいな、、、神秘的な森だ。' },
   { t: 'action', label: '森を探索する' },
-  { t: 'say', who: '？？？', text: 'おい。' },
+  { t: 'say', who: '？？？', text: 'おい。', voice: '大根カイザー' },
   { t: 'say', who: 'KIMORIN', text: 'ん？　どこだ？' },
-  { t: 'say', who: '？？？', text: 'ここDA。' },
+  { t: 'say', who: '？？？', text: 'ここDA。', voice: '大根カイザー' },
   { t: 'say', who: 'KIMORIN', text: 'どこだ？' },
   { t: 'still', image: 'jupiter-kaiser' }, // 並んだ木のうちの一本だけ、幹が白くて太い。大根だった
   { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },

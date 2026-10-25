@@ -104,7 +104,7 @@ export type Step =
   /** 〔画面：…〕 a short guidance note about how something works (e.g. the riddle book). Tap to continue. */
   | { t: 'notice'; text: string }
   /** Character line. Tap to continue. */
-  | { t: 'say'; who: Speaker; text: string }
+  | { t: 'say'; who: Speaker; text: string; /** whose voice speaks it, when the name on screen hides them (「？？？」) */ voice?: Speaker }
   /** A single button the visitor must press ("封を開く"). */
   | { t: 'action'; label: string }
   /**

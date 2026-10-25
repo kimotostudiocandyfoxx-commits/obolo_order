@@ -45,7 +45,7 @@ export const DAY5: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: 'うー、寒い。やっぱ、冷えてるな。' },
   { t: 'say', who: 'KIMORIN', text: 'もしかして、、、ということは、近くに、冷蔵庫いる？' },
-  { t: 'say', who: '？？？', text: 'その通りだ。' },
+  { t: 'say', who: '？？？', text: 'その通りだ。', voice: 'フリージー' },
   { t: 'sprite', image: ['freezy', 'kimorin-sun'] }, // 氷の上に、白い冷蔵庫が一台。ぶーん、と鳴っている
   { t: 'caption', text: 'フリージーが現れた' },
   { t: 'say', who: 'フリージー', text: '俺の氷の島に、何の用だ。' },
