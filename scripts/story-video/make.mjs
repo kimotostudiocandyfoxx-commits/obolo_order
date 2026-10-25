@@ -83,7 +83,8 @@ async function makeOnce(x, audio) {
       taskType: 'videoInference',
       taskUUID,
       model: MODEL,
-      positivePrompt: `${x.prompt} ${queue.always ?? ''}`.trim().slice(0, 3000),
+      // always: false — a shot in its own look (the live-action-like openings) skips the queue's anime style line
+      positivePrompt: `${x.prompt} ${x.always === false ? '' : (queue.always ?? '')}`.trim().slice(0, 3000),
       duration: x.duration ?? 5,
       outputFormat: 'MP4',
       deliveryMethod: 'async',

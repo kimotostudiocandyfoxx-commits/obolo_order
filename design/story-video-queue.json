@@ -292,6 +292,72 @@
       "first": "apps/web/public/onboarding/s/d2-hall-sky.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg",
       "prompt": "One unbroken take in the hall under the open starry sky with the ringed Earth floating above: the tall hooded gatekeeper in the long black robe with gold patterns and a golden magic-circle halo behind his head walks calmly into the frame from the left edge, with slow heavy steps, his robe trailing, and stops on the left, a little behind the black sphere, facing the small fox-masked character in the red robe, who stays in the lower right foreground and turns his head a little toward him. The gatekeeper has a single golden eye under the hood and carries nothing in his hands. The camera stays still. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: slow footsteps on stone, robe rustle, a soft space hum — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-w1",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w1-snow.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. A snowy northern town at night: the camera dollies slowly forward along the snowy street at eye level, snowflakes drifting through the warm light of the windows, a far figure walking home. Halfway through, one thin golden streak of light glides silently across the sky between the stars; nobody notices it. Sound: soft wind, snow, a distant muffled town. — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-w2",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w2-desert.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. A desert town of earthen houses at night: the camera cranes slowly upward from the rooftops to the vast Milky Way, sand drifting in a light breeze. Halfway through, one thin golden streak of light glides silently across the sky between the stars; nobody notices it. Sound: desert wind, a distant chime of a goat bell. — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-w3",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w3-sea.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. A tropical seaside village at night: the camera tracks slowly sideways along the shore, palm leaves swaying, moonlit waves washing in and the house lights reflected on the wet sand. Halfway through, one thin golden streak of light glides silently across the sky between the stars; nobody notices it. The streak reflects on the sea. Sound: waves, insects, palm leaves. — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-w4",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w4-city.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. A vast megacity at night from a high rooftop: the camera pushes slowly forward out over the edge, the endless lights of streets and towers below, a thin haze. Halfway through, one thin golden streak of light glides silently across the sky between the stars; nobody notices it. Sound: a low far city hum, wind. — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-w5",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w5-mountain.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. A mountain village on terraced fields at night: the camera pans slowly across the valley, thin mist drifting between the terraces, scattered warm house lights. Halfway through, one thin golden streak of light glides silently across the sky between the stars; nobody notices it. Sound: crickets, a soft stream. — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-w6",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w6-canal.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. An old canal town at night: the camera glides slowly low over the still water toward a stone bridge, warm windows reflected and rippling. Halfway through, one thin golden streak of light glides silently across the sky between the stars; nobody notices it. Sound: water lapping, a far bell. — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-rise",
+      "duration": 8,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-w4-city.jpg",
+      "last": "apps/web/public/onboarding/s/sig-earth-threads.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage: large-format cinema camera, anamorphic lens, natural night light, subtle film grain, shallow depth of field, a slow, smooth, professional camera move. No readable signs or logos, no text. People only small and from behind. One unbroken take: the camera rises from the night city straight up into the sky, through a layer of clouds lit from below, higher and higher until the curved night side of the Earth fills the frame, its cities like scattered gold dust; from many places all over the night side, thin golden threads of light rise up into space. Sound: the city hum fading away, wind through the clouds, then the deep silence of space with a low resonant tone — no music, no voices, no speech, no singing."
+    },
+    {
+      "id": "sig-streak",
+      "duration": 5,
+      "audio": true,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/sig-earth-threads.jpg",
+      "last": "apps/web/public/onboarding/s/sig-space-anime.jpg",
+      "prompt": "Vertical 9:16 cinematic shot. The golden threads rising from the Earth's night side gather into one bright golden streak that shoots past the camera into deep space; as it passes, the whole picture turns from photographic reality into a painted anime film world of stars and violet nebula, the streak leaving a glittering trail. Sound: a rising shimmer and one clear bell-like tone — no music, no voices, no speech, no singing."
     }
   ],
   "parallel": 4
