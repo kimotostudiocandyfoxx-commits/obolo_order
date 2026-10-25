@@ -29,7 +29,7 @@ export interface CharSpec {
 
 /** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
 const facesOf = (char: string, exprs: string[]) => Object.fromEntries(exprs.map((e) => [e, `${char}-x-${e}`]));
-const KIMORIN_FACES = facesOf('kimorin', ['talk', 'lecture', 'shock', 'smug']);
+const KIMORIN_FACES = facesOf('kimorin', ['talk', 'lecture', 'joy', 'point', 'shock', 'smug', 'tears', 'think']);
 const MONBAN_FACES = facesOf('monban', ['talk', 'point', 'arms', 'stop']);
 
 const CHAR: Record<string, CharSpec> = {
