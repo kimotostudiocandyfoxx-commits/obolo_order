@@ -2136,6 +2136,314 @@
         "apps/web/public/onboarding/s/d2-hall.jpg"
       ],
       "prompt": "Edit the first picture: keep the hall, the camera, the framing, the reflective floor with the glowing magic circles, the golden armillary spheres on both sides, the pillars and the thin pillar of light with the black sphere with closed eyes floating in it exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. No people, no characters. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "takoyaki-brother-x-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/takoyaki-brother-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a hulking dark-blue scaly brute with a golden takoyaki-patterned dome head, a wide toothy grin, long whiskers, chains on his wrists and ankles, a ragged chain-mail skirt. Pose: standing, one big clawed hand raised a little, speaking."
+    },
+    {
+      "id": "takoyaki-brother-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-brother-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "takoyaki-brother-x-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/takoyaki-brother-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a hulking dark-blue scaly brute with a golden takoyaki-patterned dome head, a wide toothy grin, long whiskers, chains on his wrists and ankles, a ragged chain-mail skirt. Pose: laughing loudly, both fists raised high, the grin wide."
+    },
+    {
+      "id": "takoyaki-brother-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-brother-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "takoyaki-brother-x-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/takoyaki-brother-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a hulking dark-blue scaly brute with a golden takoyaki-patterned dome head, a wide toothy grin, long whiskers, chains on his wrists and ankles, a ragged chain-mail skirt. Pose: leaning back in surprise, both hands up, mouth wide open."
+    },
+    {
+      "id": "takoyaki-brother-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-brother-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "takoyaki-sister-x-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/takoyaki-sister-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a tall slender woman with a round cracked takoyaki-ball head with a small sleepy face, long pale-blue hair falling like strands, a long dark violet gown with fine gold patterns. Pose: standing gracefully, one hand lifted softly, speaking."
+    },
+    {
+      "id": "takoyaki-sister-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-sister-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "takoyaki-sister-x-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/takoyaki-sister-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a tall slender woman with a round cracked takoyaki-ball head with a small sleepy face, long pale-blue hair falling like strands, a long dark violet gown with fine gold patterns. Pose: both hands clasped in front of her chest, delighted, head tilted."
+    },
+    {
+      "id": "takoyaki-sister-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-sister-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "takoyaki-sister-x-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/takoyaki-sister-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a tall slender woman with a round cracked takoyaki-ball head with a small sleepy face, long pale-blue hair falling like strands, a long dark violet gown with fine gold patterns. Pose: both hands raised to her cheeks in surprise, leaning back a little."
+    },
+    {
+      "id": "takoyaki-sister-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-sister-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "unchi-pinpon-x-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/unchi-pinpon-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a cute round swirled soft-serve-shaped creature in golden-brown with cream stripes, little gold stars and a heart on it, big shiny brown eyes, pink cheeks and a small smiling mouth. Pose: facing the viewer, a small happy smile, as if chatting."
+    },
+    {
+      "id": "unchi-pinpon-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "unchi-pinpon-x-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/unchi-pinpon-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a cute round swirled soft-serve-shaped creature in golden-brown with cream stripes, little gold stars and a heart on it, big shiny brown eyes, pink cheeks and a small smiling mouth. Pose: bouncing with joy, eyes squeezed shut into happy arcs, big open smile, sparkles."
+    },
+    {
+      "id": "unchi-pinpon-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "unchi-pinpon-x-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/unchi-pinpon-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality anime character render, soft even studio light, exactly the same art style, colors, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: a cute round swirled soft-serve-shaped creature in golden-brown with cream stripes, little gold stars and a heart on it, big shiny brown eyes, pink cheeks and a small smiling mouth. Pose: startled, eyes wide and round, a small round open mouth, leaning back."
+    },
+    {
+      "id": "unchi-pinpon-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colors, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "monban-x-talk-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, halo, framing, size, light and grey background — and change only the single eye under the hood: it glows much brighter, an intense luminous golden light with a soft halo around it. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "monban-x-point-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, halo, framing, size, light and grey background — and change only the single eye under the hood: it glows much brighter, an intense luminous golden light with a soft halo around it. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "monban-x-arms-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-arms.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, halo, framing, size, light and grey background — and change only the single eye under the hood: it glows much brighter, an intense luminous golden light with a soft halo around it. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "monban-x-stop-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-stop.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, halo, framing, size, light and grey background — and change only the single eye under the hood: it glows much brighter, an intense luminous golden light with a soft halo around it. Nothing else changes. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters, no logos, no watermark."
     }
   ],
   "redo": []

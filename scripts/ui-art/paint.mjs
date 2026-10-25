@@ -66,20 +66,30 @@ const log = [];
 let yen = 0;
 // a few at a time: a burst of tasks is what made Runware time out (504)
 const retry = (x, n) => paint(x).catch((e) => (n > 0 && /504|Timeout|timeout/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
-let next = 0;
-await Promise.all(
-  Array.from({ length: 4 }, async () => {
-    while (next < todo.length) {
-      const x = todo[next++];
-      try {
-        yen += (await retry(x, 2)) * 150;
-        log.push(`- ✅ ${x.id}`);
-      } catch (e) {
-        log.push(`- ❌ ${x.id}: ${String(e).slice(0, 300)}`);
+// in passes: a picture that edits one painted in this run (its ref still missing) waits for the next pass
+const waits = (x) => (x.refs ?? []).some((r) => !existsSync(r) && todo.some((y) => y !== x && join(OUT, `${y.id}.jpg`) === r));
+let left = todo;
+while (left.length) {
+  const batch = left.filter((x) => !waits(x));
+  if (!batch.length) break;
+  left = left.filter((x) => !batch.includes(x));
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: 4 }, async () => {
+      while (next < batch.length) {
+        const x = batch[next++];
+        try {
+          yen += (await retry(x, 2)) * 150;
+          log.push(`- ✅ ${x.id}`);
+        } catch (e) {
+          log.push(`- ❌ ${x.id}: ${String(e).slice(0, 300)}`);
+        }
       }
-    }
-  }),
-);
+    }),
+  );
+}
+// what waits on a picture that failed stays for the next run
+for (const x of left) log.push(`- ⏸ ${x.id}: 元の絵ができなかったので次回`);
 // redo is done once: clear it so the next run does not paint the same again
 if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
 const report = [`# UI art — ${new Date().toISOString()}`, '', `Seedream 5.0 Pro / ${todo.length}枚 / 約${Math.round(yen)}円`, '', ...log.sort(), ''].join('\n');
