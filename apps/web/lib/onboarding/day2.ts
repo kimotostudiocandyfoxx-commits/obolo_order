@@ -362,7 +362,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: null, fade: 4 },
   { t: 'black' }, // 暗くフェード
   { t: 'still', image: 's/d2-moon-bed' }, // 月の神殿のベッドに横たわるKIMORINとうんちピンポンくん
-  { t: 'say', who: 'KIMORIN', text: 'では、寝るとしますか。うんちピンポン君、いや、うんぽん' },
+  { t: 'say', who: 'KIMORIN', text: 'では、寝るとしますか。うんちピンポンくん、いや、うんぽん' },
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
   { t: 'black' }, // 暗くフェード
   { t: 'end' },
