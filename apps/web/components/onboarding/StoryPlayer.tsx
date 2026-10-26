@@ -540,7 +540,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const voiceLevel = useCallback(() => voice.current?.level() ?? 0, []);
   const sayReact = steps[i]?.t === 'say' ? reactFor((steps[i] as Extract<Step, { t: 'say' }>).who, (steps[i] as Extract<Step, { t: 'say' }>).text) : undefined;
   // KIMORIN / MONBAN speaking over a still that does not show them: their pose picture steps in (client
-  // 2026-10-25). KIMORIN in the look he last had on stage that day (kimorin-g at the gate with the
+  // 2026-10-25). KIMORIN in the look he last had on stage that day (kimorin-i / -iu: the inventor, goggles on / up; kimorin-g at the gate with the
   // sunglasses on, kimorin-n before the dragon, kimorin-sun after); none yet → he stays off.
   const autoStandee = (() => {
     const st = steps[i];
@@ -550,7 +550,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       for (let k = i - 1; k >= 0; k--) {
         const x = steps[k];
         if (x.t !== 'sprite') continue;
-        const look = (Array.isArray(x.image) ? x.image : [x.image]).find((n) => n === 'kimorin-sun' || n === 'kimorin-n' || n === 'kimorin-g');
+        const look = (Array.isArray(x.image) ? x.image : [x.image]).find((n) => n === 'kimorin-sun' || n === 'kimorin-n' || n === 'kimorin-g' || n === 'kimorin-i' || n === 'kimorin-iu');
         if (look) return look;
       }
     }

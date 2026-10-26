@@ -49,6 +49,10 @@ const CHAR: Record<string, CharSpec> = {
   // KIMORIN before the dragon (no wing) and at the gate (sunglasses on, no eye glow)
   'kimorin-n': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-n', POSES) },
   'kimorin-g': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-g', POSES) },
+  // KIMORIN's first look, the suspicious inventor (story M-R100): goggles on at the gate, pushed up from the
+  // startle in the Earth temple until the Moon
+  'kimorin-i': { bottom: 10, height: 58, face: 0.22, tint: '#b8b0a0', faces: madeFaces('kimorin-i', POSES) },
+  'kimorin-iu': { bottom: 10, height: 58, face: 0.22, tint: '#b8b0a0', faces: madeFaces('kimorin-iu', POSES) },
   kimorin: { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-1': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-2': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
@@ -69,7 +73,7 @@ export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWi
 /** Which picture on stage is the one who speaks. */
 const SPEAKER: Record<string, string[]> = {
   MONBAN: ['monban'],
-  KIMORIN: ['kimorin-sun', 'kimorin-n', 'kimorin-g', 'kimorin', 'kimorin-1', 'kimorin-2', 'kimorin-3', 'kimorin-8', 'kimorin-dragon'],
+  KIMORIN: ['kimorin-sun', 'kimorin-n', 'kimorin-g', 'kimorin-i', 'kimorin-iu', 'kimorin', 'kimorin-1', 'kimorin-2', 'kimorin-3', 'kimorin-8', 'kimorin-dragon'],
   'KIMORIN⭐︎': ['kimorin-sun', 'kimorin', 'kimorin-1'],
   OBOLON: ['obolon'],
   バティ: ['@bati', '@bati-weak'],
