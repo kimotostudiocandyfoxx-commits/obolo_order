@@ -2,7 +2,9 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "d2-kimorin-walkup"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -261,7 +263,8 @@
       "duration": 10,
       "audio": false,
       "first": "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-      "prompt": "A dramatic theatrical-anime entrance, one unbroken take: looking out through the great gate from inside at the sunset avenue of spires, a small silhouette appears far down the avenue and walks slowly, steadily toward the gate, backlit by the low sun, the fan of tail feathers swaying with each step and the long white lab coat flapping; in the second half the camera moves forward steadily to meet him, lower and closer, and he keeps walking until he fills the frame — until the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button stops in the arch in a big close-up of his face filling the frame, the brass goggles catching the golden light. His round brass goggles are worn over his eyes: no eyes or glow show through them. Sound: only soft footsteps and wind — no music, no voices, no speech, no singing. The shot must END as a big close-up of his face and goggles filling the frame."
+      "prompt": "A dramatic theatrical-anime entrance, one unbroken take: looking out through the great gate from inside at the sunset avenue of spires, a small silhouette appears far down the avenue and walks slowly, steadily toward the gate, backlit by the low sun, the fan of tail feathers swaying with each step and the long white lab coat flapping; in the second half the camera moves forward steadily to meet him, lower and closer, and he keeps walking until he fills the frame — until the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button stops in the arch in a big close-up of his face filling the frame, the brass goggles catching the golden light. His round brass goggles are worn over his eyes: no eyes or glow show through them. Sound: only soft footsteps and wind — no music, no voices, no speech, no singing. The shot must END as a big close-up of his face and goggles filling the frame. He is KIMORIN exactly as in the last picture: a white fox-mask-like face with blue spiral cheeks and a blue leaf mark, white-and-blue ears — never an orange or realistic fox.",
+      "last": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg"
     },
     {
       "id": "d2-walk-in",
