@@ -3,6 +3,8 @@
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
   "redo": [
+    "d2-kimorin-face",
+    "d2-kimorin-startle",
     "d2-kimorin-walkup",
     "d2-obolon-appear",
     "d2-pinpon",
@@ -77,7 +79,7 @@
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-gate-two-inside.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg",
-      "prompt": "At the gate: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button is about to walk through, stops, and turns to face the camera with a suspicious, knowing look, coming into a close-up. His round brass goggles are worn over his eyes: no eyes or glow show through them.",
+      "prompt": "At the gate: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button is about to walk through, stops, and turns to face the camera with a suspicious, knowing look, coming into a close-up. His round brass goggles are worn over his eyes: no eyes or glow show through them. The goggle lenses stay dark and opaque the whole time: no light, no glow and no eyes show through them, ever.",
       "audio": false
     },
     {
@@ -175,7 +177,7 @@
       "id": "d2-kimorin-startle",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
-      "prompt": "Comedy beat in the dark-gold hall with golden armillary spheres and a thin pillar of light: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button jumps back in shock at the floating black sphere, leaning far back, tail feathers bristling, and with one paw he pushes his brass goggles up onto his forehead to see better — his thin eye slits light up bright blue — then freezes, staring. Before he pushes them up, the goggles hide his eyes completely.",
+      "prompt": "Comedy beat in the dark-gold hall with golden armillary spheres and a thin pillar of light: the small fox character with the white fox-mask-like face, in the patched white lab coat with a small silver box on his head, jumps back in shock at the floating black sphere, leaning far back with his tail feathers bristling; then he grabs his round brass goggles with one paw and pushes them up onto his forehead, and his own thin eye slits are revealed, glowing blue; he freezes, staring. The black sphere stays calm and still, its two crescent eyes closed, no light coming from it. Before he pushes them up, the goggle lenses are dark and hide his eyes completely.",
       "audio": false
     },
     {
