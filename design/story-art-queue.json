@@ -4502,6 +4502,49 @@
         "apps/web/public/onboarding/s/kimorin-xs-joy.jpg",
         "apps/web/public/onboarding/s/unchi-pinpon-x-joy.jpg"
       ]
+    },
+    {
+      "id": "jupiter-daikon",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/jupiter-forest.jpg",
+        "apps/web/public/onboarding/s/daikon-kaiser-x-talk.jpg"
+      ],
+      "prompt": "Same vast mystical Jupiter forest as the first picture, same light, same painterly style. Among the gigantic trees, one \"tree\" is actually a giant white daikon radish standing upright: a thick, smooth white trunk exactly like the radish of the second picture, its crown of big fresh blue-green leaves up among the treetops, so it blends in with the forest at first glance. It stands at the left-middle, its foot on the mossy ground. Light beams and floating particles. Lower third calm, open mossy ground. No face drawn on the radish, no people, no text."
+    },
+    {
+      "id": "mercury-port",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/mercury-ice.jpg"
+      ],
+      "prompt": "The edge of a great white ice continent on Mercury, an ocean planet: a small quiet harbor carved into the ice, a simple wooden pier on the glittering blue sea that goes on to the horizon with no land anywhere, soft sunlight in bands on the waves, a few drifting ice floes, a little golden rocket resting on the ice in the distance. Clear, fresh and calm, painterly anime film quality like the first picture. Lower third: the flat ice of the harbor, open. No people, no text."
+    },
+    {
+      "id": "mars-screens",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/rocket-mars.jpg"
+      ],
+      "prompt": "A futuristic city on Mars at dusk: a red sand plain with dozens of tall slender towers, and every tower wall and the underside of every bridge between them is made of glowing screens, each screen showing a different small handmade video — a dancing paper figure, a painted sea, a cat, a hand drawing, fireworks, a little band playing (all simple, colourful, no letters, no logos, no faces close up). Warm, lively and hopeful, cinematic painterly anime film quality like the first picture. Lower third: the empty red-sand plaza at the city entrance. No people, no text."
     }
   ],
   "redo": []
