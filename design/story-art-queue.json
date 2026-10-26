@@ -3729,7 +3729,7 @@
       "refs": [
         "apps/web/public/onboarding/s/kimorin-x-joy.jpg"
       ],
-      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, red robe, hood, tail feathers, the small dragon wing, framing, size, light and grey background — but his round dark sunglasses are no longer pushed up on the hood: they are worn over his eyes, so the eye slits are completely hidden behind the black lenses, no glow showing. Keep the flat plain mid-grey background (#808080). No text, no letters."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, red robe, hood, tail feathers, the small dragon wing, framing, size, light and grey background — but IMPORTANT: his round dark sunglasses (black round lenses, thin frame) are clearly visible, sitting on his face over his eyes —  so the eye slits are completely hidden behind the black lenses, no glow showing. Keep the flat plain mid-grey background (#808080). No text, no letters."
     },
     {
       "id": "kimorin-xs-joy-o",
@@ -3970,5 +3970,9 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, hood, ears, sunglasses, framing, size, light — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "kimorin-xs-joy",
+    "kimorin-xs-joy-notail",
+    "kimorin-xs-joy-o"
+  ]
 }
