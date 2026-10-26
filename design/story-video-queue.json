@@ -2,7 +2,16 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "d2-kimorin-back",
+    "d2-kimorin-leave",
+    "d2-kimorin-startle",
+    "d2-obolon-appear",
+    "d2-pinpon",
+    "d2-rocket-in",
+    "d2-sky",
+    "d2-transform"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -168,23 +177,23 @@
       "id": "d2-kimorin-startle",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
-      "prompt": "Comedy beat in the dark-gold hall with golden armillary spheres and a thin pillar of light: the small fox-masked character in the red robe jumps back in shock at the floating black sphere, leaning far back with his arms flung up and his fan of tail feathers bristling, then freezes, staring. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
-      "audio": true
+      "prompt": "Comedy beat in the dark-gold hall with golden armillary spheres and a thin pillar of light: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button jumps back in shock at the floating black sphere, leaning far back, tail feathers bristling, and with one paw he pushes his brass goggles up onto his forehead to see better — his thin eye slits light up bright blue — then freezes, staring. Before he pushes them up, the goggles hide his eyes completely.",
+      "audio": false
     },
     {
       "id": "d2-kimorin-leave",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-gate-inside-kimorin-leave.jpg",
-      "prompt": "Seen from inside the great gate, looking out at the sunset avenue of spires: the small fox-masked character struts happily away from the camera out through the arch, his fan of tail feathers swishing left and right in rhythm as if he were humming; out on the avenue he turns into a bright point of light that shoots up into the sunset sky and disappears. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: soft footsteps and a sparkling whoosh — no music, no voices, no speech, no singing.",
-      "audio": true
+      "prompt": "Seen from inside the great gate, looking out at the sunset avenue of spires: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button struts happily away from the camera out through the arch, his fan of tail feathers swishing left and right in rhythm as if he were humming; out on the avenue he turns into a bright point of light that shoots up into the sunset sky and disappears. His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits, no other eyes anywhere.",
+      "audio": false
     },
     {
       "id": "d2-kimorin-back",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-gate-inside.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-run.jpg",
-      "prompt": "Comedy beat, seen from inside the great gate looking out at the sunset avenue: a bright point of light streaks back down from the sky at the end of the avenue and screeches to a halt just outside the arch, becoming the small fox-masked character in the red robe with sunglasses pushed up on his hood, clutching a golden ticket; he immediately dashes at tremendous speed through the gate past the camera and into the dark-gold hall with golden armillary spheres and a thin pillar of light, where he stops, out of breath. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only whoosh, skid and quick footsteps — no music, no voices, no speech.",
-      "audio": true
+      "prompt": "Comedy beat, seen from inside the great gate looking out at the sunset avenue: a bright point of light streaks back down from the sky at the end of the avenue and screeches to a halt just outside the arch, becoming the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button, clutching a golden ticket; he immediately dashes at tremendous speed through the gate past the camera and into the dark-gold hall with golden armillary spheres and a thin pillar of light, where he stops, out of breath. His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits, no other eyes anywhere.",
+      "audio": false
     },
     {
       "id": "d2-cards",
@@ -204,19 +213,22 @@
       "id": "d2-rocket-in",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-rocket-in.jpg",
-      "prompt": "Inside the rocket with purple and cyan neon: the small fox-masked character stands at the big window gazing down at the glowing night Earth below; sushi plates glide along the lane; the camera slowly drifts closer. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "Inside the rocket with purple and cyan neon: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button stands at the big window gazing down at the glowing night Earth below; sushi plates glide along the lane; the camera slowly drifts closer. His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits, no other eyes anywhere.",
+      "audio": false
     },
     {
       "id": "d2-pinpon",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-pinpon.jpg",
-      "prompt": "Close-up: the small fox-masked character slowly holds out the little silver box on his gloved palm toward the camera; the gold rim around its round glass button begins to glow and pulse. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "Close-up: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button slowly holds out the small silver handheld button on his gloved palm toward the camera and presses it with his thumb; the dark screen of the little silver box on his head lights up with a glowing double circle (◎). His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits, no other eyes anywhere.",
+      "audio": false
     },
     {
       "id": "d2-transform",
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-moon-kimorin.jpg",
-      "prompt": "In the moon temple: a thin stream of golden light spills from the gemstone in the fox-masked character's hand into the round water basin; the water rises up in a glowing spiral and wraps around him completely, ending in a burst of white light. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "In the moon temple: a thin stream of golden light spills from the gemstone in the paw of the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button into the round water basin; the water rises up in a glowing spiral and wraps around him completely, ending in a burst of white light. His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits, no other eyes anywhere.",
+      "audio": false
     },
     {
       "id": "d2-kimorin-back-normal",
@@ -272,18 +284,18 @@
     {
       "id": "d2-obolon-appear",
       "duration": 5,
-      "audio": true,
+      "audio": false,
       "first": "apps/web/public/onboarding/s/d2-hall-dark-kimorin.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
-      "prompt": "In the dark hall with golden armillary spheres, a thin pillar of golden light falls from high above onto the center of the floor, the magic circles on the floor light up, the gold rings of the hall glow, and a black sphere with two closed crescent eyes appears floating in the pillar of light; the small fox-masked character in the red robe steps back to the side, staring up at it, as the camera eases around to see him and the sphere. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: a deep shimmering chime and rising hum — no music, no voices, no speech."
+      "prompt": "In the dark hall with golden armillary spheres, a thin pillar of golden light falls from high above onto the center of the floor, the magic circles on the floor light up, the gold rings of the hall glow, and a black sphere with two closed crescent eyes appears floating in the pillar of light; the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button steps back to the side, staring up at it, as the camera eases around to see him and the sphere. His brass goggles are over his eyes: his eyes cannot be seen and do not glow."
     },
     {
       "id": "d2-sky",
       "duration": 10,
-      "audio": true,
+      "audio": false,
       "first": "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-sky.jpg",
-      "prompt": "One unbroken take in the dark-gold hall with golden armillary spheres: the camera stays almost still. The high ceiling and the gold arches above slowly dissolve into glittering light and open into a deep starry night sky with a soft violet-blue nebula; high above the floating black sphere, the planet Earth fades in, blue and white, wrapped in thin luminous golden rings, and turns slowly. The small fox-masked character in the red robe in the lower right foreground stays where he is the whole time, slowly tilting his head back to look up at the Earth in awe, his fan of tail feathers rising a little. The hall below fills with soft blue starlight. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: a deep shimmering swell, wind of space and a soft chime — no music, no voices, no speech, no singing."
+      "prompt": "One unbroken take in the dark-gold hall with golden armillary spheres: the camera stays almost still. The high ceiling and the gold arches above slowly dissolve into glittering light and open into a deep starry night sky with a soft violet-blue nebula; high above the floating black sphere, the planet Earth fades in, blue and white, wrapped in thin luminous golden rings, and turns slowly. the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box on his head and a coiled cable to a handheld button in the lower right foreground stays where he is the whole time, slowly tilting his head back to look up at the Earth in awe. His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits, no other eyes anywhere."
     },
     {
       "id": "d2-monban-walkin",
