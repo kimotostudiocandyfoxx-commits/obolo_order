@@ -3,7 +3,10 @@
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
   "redo": [
-    "rec-meal"
+    "rec-meal",
+    "sig-f4",
+    "sig-hand",
+    "sig-streak"
   ],
   "items": [
     {

@@ -121,6 +121,7 @@ function squeeze(src, out, upscale) {
 }
 
 let usd = 0;
+const failed = new Set();
 // one at a time by default (each request reserves credit up front; parallel requests ran the balance
 // out — 2026-10-22); the queue's "parallel" can raise it
 let next = 0;
@@ -132,12 +133,14 @@ await Promise.all(
         usd += await make(x);
         log.push(`- ✅ m${x.id}（${x.duration ?? 5}秒・${x.resolution ?? '720p'}）`);
       } catch (e) {
+        failed.add(x.id);
         log.push(`- ❌ m${x.id}: ${String(e).slice(0, 1500)}`);
       }
     }
   }),
 );
-if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
+// a redo that failed (the service busy, a refusal) stays queued for the next push
+if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: queue.redo.filter((id) => failed.has(id)) }, null, 2) + '\n');
 mkdirSync('docs/story-import', { recursive: true });
 const report = [`# 物語の動画 — ${new Date().toISOString()}`, '', `${MODEL} / ${todo.length}本 / 約${Math.round(usd * 150)}円`, '', ...log, ''].join('\n');
 writeFileSync('docs/story-import/video-last-run.md', report);
