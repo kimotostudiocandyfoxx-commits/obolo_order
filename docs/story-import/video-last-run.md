@@ -1,7 +1,5 @@
-# 物語の動画 — 2026-10-26T02:00:28.022Z
+# 物語の動画 — 2026-10-26T02:01:38.999Z
 
-bytedance:seedance@2.5 / 3本 / 約0円
+bytedance:seedance@2.5 / 1本 / 約0円
 
-- ❌ msig-f4: Error: 500 {"data":[{"taskUUID":"7e80fe4f-f5e0-44a2-805b-4bacae2e3a27","taskType":"videoInference","status":"processing"}]}
-- ❌ msig-streak: Error: 500 {"data":[{"taskUUID":"4f7c0f98-0da2-46f7-9c02-ccc076c06b77","taskType":"videoInference","status":"processing"}]}
-- ❌ msig-hand: Error: 500 {"data":[{"taskUUID":"9db787d1-5ecb-487a-bc4b-93ce4e73a9b9","taskType":"videoInference","status":"processing"}]}
+- ❌ mrec-teens: Error: 207 [{"code":"internalError","message":"An internal error occurred and your request was not processed. If this persists, contact support quoting incident ID c941c97f-898a-42bb-bd6a-e9be5a218b3d.","documentation":"https://runware.ai/docs","incidentId":"c941c97f-898a-42bb-bd6a-e9be5a218b3d","taskUUID":"23205124-40b1-40a9-9da1-2f8f59cabb3e"}]
