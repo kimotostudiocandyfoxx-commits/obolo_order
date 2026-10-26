@@ -102,7 +102,7 @@ const FLY: Line[] = [
 
 const SPEAKER: Record<Who, string> = { kaiser: '大根カイザー', kimorin: 'KIMORIN', pinpon: 'うんちピンポンくん', bati: 'バティ', guide: '' };
 const NAMES: Record<Who, string> = { kaiser: '大根カイザー', kimorin: 'KIMORIN⭐︎', pinpon: 'うんちピンポンくん', bati: 'バティ', guide: '' };
-const SPRITES: Partial<Record<Who, string>> = { kaiser: 'daikon-kaiser', kimorin: 'kimorin-sun', pinpon: 'unchi-pinpon' };
+const SPRITES: Partial<Record<Who, string>> = { kaiser: 'kaiser1-x-talk', kimorin: 'kimorin-sun', pinpon: 'unchi-pinpon' };
 
 /** A square record jacket: the picture (or a soft colour) with the words. */
 export function Sticker({ s, size = 140, spin = false }: { s: StickerMade; size?: number; spin?: boolean }) {

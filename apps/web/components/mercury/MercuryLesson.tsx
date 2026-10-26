@@ -68,7 +68,7 @@ const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }
 ];
 const SPEAKER: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN', bati: 'バティ', guide: '', song: '', choir: '' };
 const NAMES: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN⭐︎', bati: 'バティ', guide: '', song: 'KIMORIN⭐︎の曲', choir: '合唱' };
-const SPRITES: Partial<Record<Who, string>> = { freezy: 'freezy', kimorin: 'kimorin-sun' };
+const SPRITES: Partial<Record<Who, string>> = { freezy: 'freezy-x-talk', kimorin: 'kimorin-sun' };
 const NONE_SOUNDS = [
   { id: 'ice', label: '冷蔵庫の中の、氷の音', mark: '🧊' },
   { id: 'hum', label: '冷蔵庫のうなり', mark: '〰️' },

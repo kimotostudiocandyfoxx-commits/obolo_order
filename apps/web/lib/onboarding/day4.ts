@@ -50,7 +50,7 @@ export const DAY4: Step[] = [
   { t: 'say', who: '？？？', text: 'ここダ。', voice: '大根カイザー' },
   { t: 'say', who: 'KIMORIN', text: 'どこですか？' },
   { t: 'still', image: 's/jupiter-daikon' }, // 並んだ木のうちの一本だけ、幹が白くて太い。大根だった
-  { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
+  { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
   { t: 'caption', text: '大根カイザーが現れた' },
   { t: 'say', who: '大根カイザー', text: '木星で、何をしているダ？　お前ら、誰ダ？' },
   { t: 'say', who: 'KIMORIN', text: '私たちは、ネオです。' },
@@ -66,7 +66,7 @@ export const DAY4: Step[] = [
 
   // D05-S009 畑から門番／札3
   { t: 'still', image: 's/jupiter-daikon' },
-  { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
+  { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: 'よい機会ダ。王として、結社の大事な話をしてやろう。' },
   { t: 'say', who: '大根カイザー', text: 'Obolo Orderが、なぜ集まり、何をめざしておるのか、ダ。' },
   { t: 'say', who: '大根カイザー', text: '結社の目的とは……' },
@@ -83,7 +83,7 @@ export const DAY4: Step[] = [
   { t: 'se', sound: 'chime' },
   { t: 'seal', n: 3 }, // 謎の書の札3に「結社の目的とは」の文字
   { t: 'caption', text: '謎の書に、文字が浮かんだ' },
-  { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
+  { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: '明日は、水星へ行くダ。' },
   { t: 'sprite', image: null },
   { t: 'se', sound: 'stamp' },
