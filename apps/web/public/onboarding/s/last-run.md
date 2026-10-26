@@ -1,28 +1,20 @@
-# UI art — 2026-10-26T07:11:17.693Z
+# UI art — 2026-10-26T09:34:39.146Z
 
-Seedream 5.0 Pro / 24枚 / 約43円
+Seedream 5.0 Pro / 16枚 / 約29円
 
 - ✅ kimorin-xs-joy
 - ✅ kimorin-xs-joy-notail
 - ✅ kimorin-xs-joy-o
-- ✅ kimorin-xs-lecture
-- ✅ kimorin-xs-lecture-notail
-- ✅ kimorin-xs-lecture-o
-- ✅ kimorin-xs-point
-- ✅ kimorin-xs-point-notail
-- ✅ kimorin-xs-point-o
-- ✅ kimorin-xs-shock
-- ✅ kimorin-xs-shock-notail
-- ✅ kimorin-xs-shock-o
-- ✅ kimorin-xs-smug
-- ✅ kimorin-xs-smug-notail
-- ✅ kimorin-xs-smug-o
-- ✅ kimorin-xs-talk
-- ✅ kimorin-xs-talk-notail
-- ✅ kimorin-xs-talk-o
-- ✅ kimorin-xs-tears
-- ✅ kimorin-xs-tears-notail
-- ✅ kimorin-xs-tears-o
-- ✅ kimorin-xs-think
-- ✅ kimorin-xs-think-notail
-- ✅ kimorin-xs-think-o
+- ✅ launch-clouds
+- ✅ rec2-docs
+- ✅ rec2-facedown
+- ✅ rec2-hum
+- ✅ rec2-map
+- ✅ rec2-needle
+- ✅ rec2-photos
+- ✅ rec2-tap
+- ✅ rec3-monban
+- ✅ rec3-space
+- ✅ rec3-warm-canal
+- ✅ rec3-warm-city
+- ✅ rec3-warm-snow
