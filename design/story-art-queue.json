@@ -637,10 +637,10 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/moon-temple-inside.jpg"
+        "apps/web/public/onboarding/s/d2-kimorin-after.jpg"
       ],
-      "prompt": "Inside the moon temple by the water basin: KIMORIN back to his usual small self, full body, facing the camera, with one small white dragon wing now between his fan of tail feathers. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and vermilion feather tails behind; his eyes NEVER open — only thin glowing blue slits on the white mask, no other eyes anywhere. His round sunglasses rest up on his forehead above the mask (normal look). IMPORTANT: KIMORIN's eyes are NOT covered — his round dark sunglasses are pushed right up and rest on top of his hood above the mask, clearly away from the face; the two thin glowing blue slit eyes on the white mask are fully visible and closed (never open, no other eyes). One small white dragon wing clearly sticks out between his fan of tail feathers."
+      "prompt": "Edit the first picture: keep everything exactly the same — the moon temple, the light, the framing, KIMORIN's pose, red robe, hood, tail feathers and the small white dragon wing — but he now wears his round dark sunglasses over his eyes (black round lenses with a thin frame), the eye slits hidden behind them, no glow. No text, no letters.",
+      "always": false
     },
     {
       "id": "d2-altar",
@@ -694,11 +694,10 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/unchi-pinpon-kun.jpg",
-        "design/story/refs/client/moon-temple-inside.jpg"
+        "apps/web/public/onboarding/s/d2-moon-bed.jpg"
       ],
-      "prompt": "Night inside the white stone moon temple: a big soft bed with silver-white sheets under tall arched windows, the blue Earth glowing in the black starry sky outside. KIMORIN lies in the bed under the blanket, head on the pillow, relaxed and sleepy, and beside him on the pillow the small glossy round swirl-topped soft-serve-shaped creature of the reference (うんちピンポンくん) snuggles up. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on his forehead, one small white dragon wing between his tail feathers. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Calm, cozy, soft blue moonlight."
+      "prompt": "Edit the first picture: keep everything exactly the same — the bed, the room, the light, the framing, KIMORIN and the little round creature asleep — but KIMORIN still has his round dark sunglasses on over his closed eyes while he sleeps (a little funny). No text, no letters.",
+      "always": false
     },
     {
       "id": "d2-gate-inside-kimorin",
@@ -4159,7 +4158,262 @@
         1280
       ],
       "prompt": "Out of a red dust storm on Mars, a futuristic city of dozens of slender towers rises, its tower walls and the undersides of its bridges covered in glowing screens showing colourful handmade videos and animations (no readable text, no logos); red sand and haze."
+    },
+    {
+      "id": "daikon-kaiser-x-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/daikon-kaiser-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the proud daikon-radish king. Pose: standing tall, one hand raised, speaking grandly."
+    },
+    {
+      "id": "daikon-kaiser-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/daikon-kaiser-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "daikon-kaiser-x-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/daikon-kaiser-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the proud daikon-radish king. Pose: laughing proudly, both arms raised, delighted."
+    },
+    {
+      "id": "daikon-kaiser-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/daikon-kaiser-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "daikon-kaiser-x-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/daikon-kaiser-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the proud daikon-radish king. Pose: leaning back in surprise, hands up."
+    },
+    {
+      "id": "daikon-kaiser-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/daikon-kaiser-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "freezy-x-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/freezy-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture. Pose: standing calmly, one hand lifted, speaking."
+    },
+    {
+      "id": "freezy-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/freezy-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "freezy-x-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/freezy-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture. Pose: happy, both hands raised, smiling."
+    },
+    {
+      "id": "freezy-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/freezy-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "freezy-x-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/freezy-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture. Pose: startled, leaning back, hands up."
+    },
+    {
+      "id": "freezy-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/freezy-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "hipokin-x-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/hipokin-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture. Pose: standing, one hand held out, speaking calmly."
+    },
+    {
+      "id": "hipokin-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/hipokin-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "hipokin-x-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/hipokin-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture. Pose: pleased, arms open, smiling."
+    },
+    {
+      "id": "hipokin-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/hipokin-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "hipokin-x-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/hipokin-grey.jpg"
+      ],
+      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture. Pose: surprised, leaning back, hands raised."
+    },
+    {
+      "id": "hipokin-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/hipokin-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "d2-kimorin-after",
+    "d2-moon-bed"
+  ]
 }
