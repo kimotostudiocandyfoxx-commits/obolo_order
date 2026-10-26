@@ -3634,10 +3634,5 @@
       "prompt": "Edit the first picture: keep everything exactly the same — the hall, the pillar of light, the black sphere, the camera, the framing, the light and the small fox character in the white lab coat in the same place and pose — but his brass goggles are now pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters."
     }
   ],
-  "redo": [
-    "d2-hall-sky-monban",
-    "d2-kimorin-close-in",
-    "kimorin-i-think-o",
-    "kimorin-iu-point-glow"
-  ]
+  "redo": []
 }
