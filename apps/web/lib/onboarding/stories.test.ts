@@ -141,9 +141,9 @@ describe('the Eclipse day (7)', () => {
     const stop = steps.slice(c + 1).find((s) => s.t === 'pause');
     expect(stop).toEqual({ t: 'pause', resume: 'resume' });
   });
-  it('the Sun temple opens riddles 2 and 1, then the film of the seven days', () => {
+  it('the Sun temple opens riddles 2, 1 and (after the archive films) 4, then the film of the seven days', () => {
     const opened = steps.filter((s) => s.t === 'seal' && s.open).map((s) => (s.t === 'seal' ? s.n : 0));
-    expect(opened).toEqual([2, 1]);
+    expect(opened).toEqual([2, 1, 4]);
     expect(steps.some((s) => s.t === 'made' && s.what === 'film')).toBe(true);
   });
 });
