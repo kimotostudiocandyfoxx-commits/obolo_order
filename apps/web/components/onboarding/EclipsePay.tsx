@@ -19,12 +19,14 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  * Day 7 (D08-S006): the visitor chose to begin the Eclipse. The final confirmation (M-R20): ¥88 a month
  * (tax included, the monthly mana), the renewal day, that it renews by itself, and how to stop — then
  * Stripe Embedded Checkout inside the story (no redirect, so the story goes on right after paying).
- * Demo mode (no Stripe key on the server) pays without a charge. Minors are checked on the payment side.
+ * Demo mode (no Stripe key on the server) pays without a charge. Under 18 needs a guardian's consent (story M-R113):
+ * the visitor ticks one line (18 or over, or a guardian agreed) before the payment form opens.
  * PLACEHOLDER (P-BILL-3): the wording must be checked by the operator; the 〔設定〕→〔毎月のマナ〕→〔やめる〕
  * screen does not exist yet (P-BILL-4: the operator stops it in Stripe).
  */
 export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; paid: boolean; onPaid: () => void; onCancel: () => void }) {
   const [phase, setPhase] = useState<'loading' | 'stripe' | 'demo' | 'confirming' | 'error' | 'done'>('loading');
+  const [consent, setConsent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const box = useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
   }, [paid]);
 
   useEffect(() => {
-    if (paid) return;
+    if (paid || !consent) return;
     let cancelled = false;
     let destroy: (() => void) | undefined;
     (async () => {
@@ -78,7 +80,7 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
       destroy?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attempt, paid]);
+  }, [attempt, paid, consent]);
 
   // paid: the golden corona flares out over the screen, then the story goes on
   const finishNow = () => {
@@ -166,10 +168,18 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
           <p className="mt-2 text-left text-[11px] leading-relaxed text-white/50">入会費はありません。値上げはしません。</p>
         </div>
 
+        <label className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200/25 bg-black/30 px-4 py-3 text-left text-[13px] leading-relaxed text-white/85">
+          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-amber-300" />
+          <span>
+            18歳以上です。18歳未満の場合は、家の人の同意をもらっています。
+            <span className="block text-[11px] text-white/50">18歳未満の人は、家の人と一緒に読んでから進んでください</span>
+          </span>
+        </label>
+
         <div className="mt-4 flex-1">
           {/* Stripe Embedded Checkout mounts here */}
           <div ref={box} className={phase === 'stripe' ? 'overflow-hidden rounded-2xl bg-white' : 'hidden'} />
-          {phase === 'loading' && <p className="py-10 text-center text-sm tracking-widest text-amber-100/70">秘密ロケットの手配中……</p>}
+          {phase === 'loading' && consent && <p className="py-10 text-center text-sm tracking-widest text-amber-100/70">秘密ロケットの手配中……</p>}
           {phase === 'confirming' && <p className="py-10 text-center text-sm tracking-widest text-amber-100/80">エクリプスの準備をしています……</p>}
           {phase === 'demo' && (
             <div className="flex flex-col items-center gap-3 py-4">
