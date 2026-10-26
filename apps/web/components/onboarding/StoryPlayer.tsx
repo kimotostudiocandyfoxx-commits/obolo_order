@@ -542,6 +542,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // KIMORIN / MONBAN speaking over a still that does not show them: their pose picture steps in (client
   // 2026-10-25). KIMORIN in the look he last had on stage that day (kimorin-i / -iu: the inventor, goggles on / up; kimorin-g at the gate with the
   // sunglasses on, kimorin-n before the dragon, kimorin-sun after); none yet → he stays off.
+  // KIMORIN's look on stage now (the last kimorin-* standee of the day): his chat icon follows it
+  const kimorinLook = (() => {
+    for (let k = i; k >= 0; k--) {
+      const x = steps[k];
+      if (x?.t !== 'sprite') continue;
+      const look = (Array.isArray(x.image) ? x.image : [x.image]).find((n) => n === 'kimorin-sun' || n === 'kimorin-n' || n === 'kimorin-g' || n === 'kimorin-i' || n === 'kimorin-iu');
+      if (look) return look;
+    }
+    return null;
+  })();
+  const kimorinAvatar: Avatar | undefined = kimorinLook === 'kimorin-i' || kimorinLook === 'kimorin-iu' ? { src: `/story/avatars/${kimorinLook}.webp` } : undefined;
   const autoStandee = (() => {
     const st = steps[i];
     if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;
@@ -795,7 +806,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
         <ChatLog
-          entries={log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : AVATARS[e.who] } : { ...e, text: fill(e.text, v) }))}
+          entries={log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }))}
           talking={talking}
           reveal={reveal}
           live={step.t === 'say' && !mustWait}
