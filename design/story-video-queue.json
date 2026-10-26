@@ -3,14 +3,7 @@
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
   "redo": [
-    "d2-kimorin-face",
-    "d2-kimorin-startle",
-    "d2-kimorin-walkup",
-    "d2-obolon-appear",
-    "d2-pinpon",
-    "d2-sky",
-    "d2-transform",
-    "d2-walk-in"
+    "d2-obolon-appear"
   ],
   "items": [
     {
