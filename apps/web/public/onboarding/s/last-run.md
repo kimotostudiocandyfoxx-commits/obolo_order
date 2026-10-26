@@ -1,7 +1,7 @@
-# UI art — 2026-10-26T22:58:12.504Z
+# UI art — 2026-10-26T23:01:07.471Z
 
 Seedream 5.0 Pro / 3枚 / 約7円
 
-- ✅ freezy-x-joy
-- ✅ freezy-x-shock
-- ✅ freezy-x-talk
+- ✅ freezy-x-joy-o
+- ✅ freezy-x-shock-o
+- ✅ freezy-x-talk-o
