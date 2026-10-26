@@ -1,5 +1,6 @@
-# 物語の音 — 2026-10-26T20:08:29.960Z
+# 物語の音 — 2026-10-26T20:20:23.908Z
 
-1本 / 約0円
+1本 / 約23円
 
-- ❌ bgm-kimorin-ballad: Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'lyrics' parameter. This parameter is not supported for the selected model. Allowed values are: \"positivePrompt\", \"seed\", \"inputs\", \"settings\", \"includeCost\", \"deliveryMethod\", \"webhookURL\", \"uploadEndpoint\", \"outputFormat\", \"outputQuality\", \"audioSettings\", \"numberResults\".","documentation":"https://runware.ai/docs/audio-inference#request-parameters","parameter":"lyrics","allowedValues":["positivePrompt","seed","inputs","settings","includeCost","deliveryMethod","webhookURL","uploadEndpoint","outputFormat","outputQuality","audioSettings","numberResults"],"taskUUID":"2d9dfb29-9dd4-45fe-9e0d-82c1e451a0c5"}]
+- ✅ bgm-kimorin-ballad（-秒）
+  - 聞いた感じ：1) **歌声・人の声**：はい（男性ボーカル、合唱、シャウト） 2) **雰囲気・楽器**：ドラマチックかつシュール・コミカル／ストリングス、金管、ティンパニ、ピアノ、混声クワイア 3) **評価**：依頼の「感動的な涙を誘うバラード」とはかけ離れネタ曲寄り（適合度：3/10点）、劇的な幕引きで終わるため通常のBGMループには不向き
