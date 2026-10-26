@@ -2,7 +2,12 @@
   "note": "Claude Code が作る物語の動画（Seedance 2.5・Runware）。items に { id, prompt, first?, last?, refs?, duration?, resolution?, audio? } を足して push すると作る（id ごとに1回。作り直しは redo に id）。保存先 apps/web/public/onboarding/m<id>.mp4（720×1280・1MB以下）。めやす：720p 約35円/秒、480p 約15円/秒。 parallel：同時に作る本数（既定1。残高に余裕があれば4）。",
   "model": "bytedance:seedance@2.5",
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
-  "redo": [],
+  "redo": [
+    "rec-meal",
+    "sig-f4",
+    "sig-hand",
+    "sig-streak"
+  ],
   "items": [
     {
       "id": "d1-open",
@@ -357,7 +362,7 @@
       "always": false,
       "first": "apps/web/public/onboarding/s/sig-earth-threads.jpg",
       "last": "apps/web/public/onboarding/s/sig-space-anime.jpg",
-      "prompt": "Vertical 9:16 cinematic shot. The golden threads rising from the Earth's night side gather into one bright golden streak that shoots past the camera into deep space; as it passes, the whole picture turns from photographic reality into a painted anime film world of stars and violet nebula, the streak leaving a glittering trail."
+      "prompt": "Vertical 9:16 cinematic shot, ONE continuous unbroken take with no cut and no white flash: the golden threads rising from the Earth's night side slowly draw together above the planet and merge into one bright golden streak, which then glides smoothly away into deep space while the picture gently transforms from photographic reality into a painted anime world of stars and violet nebula, the streak leaving a glittering trail. Smooth, continuous camera."
     },
     {
       "id": "sig-f1",
@@ -385,7 +390,7 @@
       "duration": 5,
       "audio": false,
       "first": "apps/web/public/onboarding/s/sig-f4-turntable.jpg",
-      "prompt": "Close-up: the record spins in the beam of light, the tonearm lowers slowly, the needle hovering just above the groove, not yet touching. Painted anime film style of the game, cinematic, slow and mysterious."
+      "prompt": "Close-up: the record spins in the beam of light; the tonearm moves slowly from its pivot at the back right and lowers its needle toward the outer edge of the record, stopping just above the groove, not yet touching. Correct turntable mechanics. Painted anime film style of the game, cinematic."
     },
     {
       "id": "sig-f5",
@@ -399,7 +404,7 @@
       "duration": 5,
       "audio": false,
       "first": "apps/web/public/onboarding/s/sig-hand.jpg",
-      "prompt": "Close-up on the desk: the hands press the golden compass seal firmly onto the golden envelope, lift it away, the tassel swings, and the seal begins to glow bright gold. Painted anime film style of the game, cinematic,. Quiet ambient room tone only."
+      "prompt": "Close-up on the desk: the hand lowers the golden compass-shaped seal stamp and presses it firmly down into a pool of golden wax on the envelope's flap, holds it for a moment, then lifts the stamp away, revealing the compass imprint pressed into the wax; the imprint begins to glow bright gold and the tassel swings. Painted anime film style of the game, cinematic. Quiet room tone only."
     },
     {
       "id": "sig-fly",
@@ -461,7 +466,7 @@
       "duration": 5,
       "audio": false,
       "first": "apps/web/public/onboarding/s/rec-meal.jpg",
-      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. The warm soup's last wisp of steam fades away and the soup goes still and cold, while the hands above keep scrolling through pictures of perfect meals on the phone.",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film, cool muted colours, heavy grain. The last wisp of steam fades from the warm soup and it goes still and cold, while behind it the two hands hold the phone steadily and the thumb slowly scrolls through pictures of perfect meals. Natural, anatomically correct hands; the hands barely move except the thumb. No readable text.",
       "always": false
     },
     {

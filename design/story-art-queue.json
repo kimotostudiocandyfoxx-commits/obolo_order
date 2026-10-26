@@ -2577,7 +2577,7 @@
         720,
         1280
       ],
-      "prompt": "A record turntable spinning in near darkness, a beam of golden light from above, the tonearm with the needle hovering just above the record, close-up, dramatic."
+      "prompt": "A record turntable in near darkness, a beam of golden light from above, close-up three-quarter view: a black vinyl record spinning on the platter; the tonearm swings in from its pivot at the back right corner of the turntable and its small needle head hovers just above the outer edge of the record's grooves, a few millimetres above the vinyl, about to touch down. Correct, realistic turntable mechanics. Dramatic, mysterious."
     },
     {
       "id": "sig-f5-tents",
@@ -2718,7 +2718,7 @@
       ],
       "always": false,
       "refs": [],
-      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage: large-format cinema camera, natural light, subtle film grain, shallow depth of field, cool muted colour grading. No readable text, no logos, no brand, no real app or social network interface. Faces never clearly shown: seen from behind, in profile in shadow, or only hands. Calm, not sad, nobody crying. At a small kitchen table at night: a warm homemade bowl of soup with the last thin wisp of steam, a spoon untouched beside it; above it a person's hands hold a phone whose screen shows a picture of a perfect glossy restaurant meal; the real soup is going cold, unnoticed."
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, subtle film grain, cool muted grading. At a small kitchen table at night: in the foreground a warm homemade bowl of soup with a last thin wisp of steam and an untouched spoon. Behind it, a person (only the forearms and hands visible, no face) holds a phone naturally in both hands, anatomically correct hands with five fingers each, the thumb resting on the screen; the screen shows a glossy picture of a perfect restaurant meal, no readable text, no logos."
     },
     {
       "id": "rec-wait",
@@ -2789,7 +2789,38 @@
         "design/story/refs/client/pinpon25.jpg"
       ],
       "prompt": "Edit the first picture: keep the character, his face, ears, tail feathers, the patched white lab coat, the tool belt, the brass goggles, the pose, the framing, the size, the light and the flat grey background exactly the same. Change only the device: remove the silver box from his chest pocket. Instead, the device of the second picture is now in two parts joined by a thin coiled cable: (1) a small silver handheld unit with one big round push button, held in his right hand, his thumb on the button; (2) a small silver box worn on top of his head between his ears, like a little hat, with a tiny speaker grille on its front and a small round display showing a glowing double circle (◎). The coiled cable runs from the handheld button up to the box on his head. No text, no letters, no logos. Keep the flat plain mid-grey background (#808080). While the goggles are on, his eyes do not glow and cannot be seen."
+    },
+    {
+      "id": "kimorin-inv",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-white-2.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, face, ears, tail feathers, white lab coat, tool belt, brass goggles, the handheld button, the coiled cable, the box on his head, the pose, framing, size, light and the flat grey background. Change only the small round display on the box on his head: it is switched off — a plain dark glass screen showing nothing, no symbol, no glow. No text, no letters."
+    },
+    {
+      "id": "kimorin-inv-ring",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-white-2.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same, but his thumb is pressing the button on the handheld unit, and the small round display on the box on his head lights up bright with a glowing double circle (◎), a soft glow around the box, as if it just rang. No text, no letters. Keep the flat grey background."
     }
   ],
-  "redo": []
+  "redo": [
+    "rec-meal",
+    "sig-f4-turntable"
+  ]
 }
