@@ -589,7 +589,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
     return null;
   })();
-  const kimorinAvatar: Avatar | undefined = kimorinLook === 'kimorin-i' || kimorinLook === 'kimorin-iu' ? { src: `/story/avatars/${kimorinLook}.webp` } : undefined;
+  // the inventor (day 2 until the Moon), then the round sunglasses over his eyes (story M-R112)
+  const kimorinAvatar: Avatar | undefined =
+    kimorinLook === 'kimorin-i' || kimorinLook === 'kimorin-iu' ? { src: `/story/avatars/${kimorinLook}.webp` } : kimorinLook === 'kimorin-sun' ? { src: '/story/avatars/kimorin-glasses.webp' } : undefined;
   const autoStandee = (() => {
     const st = steps[i];
     if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;

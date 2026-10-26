@@ -35,11 +35,14 @@ export interface CharSpec {
 /** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
 const facesOf = (stem: string, exprs: string[]) => Object.fromEntries(exprs.map((e) => [e, `${stem}-${e}`]));
 const POSES = ['talk', 'lecture', 'joy', 'point', 'shock', 'smug', 'tears', 'think'];
-/** KIMORIN after the dragon (sunglasses up, the small wing) */
-const KIMORIN_FACES = facesOf('kimorin-x', POSES);
-const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
 /** pictures that have been cut into layers (scripts/sprite-layers.py) — for the newer casts, only those */
 const madeFaces = (stem: string, exprs: string[]) => facesOf(stem, exprs.filter((e) => `${stem}-${e}` in LAYERS));
+/**
+ * KIMORIN after the dragon (the small wing): from the Moon on his round sunglasses are over his eyes (story
+ * M-R112) — the sunglasses-on poses as they are cut, the sunglasses-up ones (eyes glowing) for the rest
+ */
+const KIMORIN_FACES = { ...facesOf('kimorin-x', POSES), ...madeFaces('kimorin-xs', POSES) };
+const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
 const FRIEND = ['talk', 'joy', 'shock'];
 
 const CHAR: Record<string, CharSpec> = {
