@@ -3620,5 +3620,9 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "d2-hall-sky-monban",
+    "kimorin-i-think-o",
+    "kimorin-iu-point-glow"
+  ]
 }

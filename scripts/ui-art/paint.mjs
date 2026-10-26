@@ -52,7 +52,9 @@ async function paint(x) {
     signal: AbortSignal.timeout(300_000),
   });
   const j = await res.json().catch(() => ({}));
-  if (!res.ok || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
+  // the service sometimes answers 500 with the finished picture in it (2026-10-26): take the picture
+  const got = !j.errors?.length && j.data?.[0]?.imageURL;
+  if ((!res.ok && !got) || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
   const d = j.data?.[0];
   const raw = join(OUT, `_${x.id}.jpg`);
   writeFileSync(raw, Buffer.from(await (await fetch(d.imageURL)).arrayBuffer()));
