@@ -4454,6 +4454,54 @@
         "apps/web/public/onboarding/s/jupiter-forest.jpg"
       ],
       "prompt": "Same vast mystical Jupiter forest as the reference picture, same light and style. In the lower middle, at the foot of the giant trees on the mossy ground, stands an old, small, moss-covered stone stand, about knee high, with one square shallow recess on its top face, the size of a record jacket, empty. Light beams fall on it. Upper two thirds open forest and light. No people, no text."
+    },
+    {
+      "id": "mars-frame-sunset",
+      "w": 2048,
+      "h": 1152,
+      "size": [
+        960,
+        540
+      ],
+      "always": false,
+      "prompt": "A single frame of an old cinema film, horizontal 16:9: a wide red-gold sunset over a calm horizon, soft film grain, warm and nostalgic, painterly anime film quality. No people, no text."
+    },
+    {
+      "id": "mars-frame-sea",
+      "w": 2048,
+      "h": 1152,
+      "size": [
+        960,
+        540
+      ],
+      "always": false,
+      "prompt": "A single frame of an old cinema film, horizontal 16:9: the night sea under moonlight, one tiny boat with a lantern far away, soft film grain, painterly anime film quality. No people, no text."
+    },
+    {
+      "id": "mars-frame-stars",
+      "w": 2048,
+      "h": 1152,
+      "size": [
+        960,
+        540
+      ],
+      "always": false,
+      "prompt": "A single frame of an old cinema film, horizontal 16:9: a sky full of stars and the Milky Way above a quiet hill, soft film grain, painterly anime film quality. No people, no text."
+    },
+    {
+      "id": "mv-kimorin-slide",
+      "w": 2048,
+      "h": 1152,
+      "size": [
+        960,
+        540
+      ],
+      "always": false,
+      "prompt": "A single frame of a Hollywood blockbuster, horizontal 16:9: on a red Martian hill stands a gigantic shining golden slide reaching up into the clouds. Halfway down it, the small fox character of the first picture (white fox-mask-like face, deep red robe and hood, gold round sunglasses, a fan of white, black and red tail feathers streaming) and the little character of the second picture slide down side by side in slow motion, with great dignity. Golden confetti and light burst everywhere, epic cinematic lighting, painterly anime film quality. No text.",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-xs-joy.jpg",
+        "apps/web/public/onboarding/s/unchi-pinpon-x-joy.jpg"
+      ]
     }
   ],
   "redo": []

@@ -668,3 +668,9 @@ body {
 @keyframes reactJump { 0% { transform: none; } 35% { transform: translateY(var(--jump, -5%)) scale(1.02); } 55% { transform: translateX(-1%); } 70% { transform: translateX(1%); } 100% { transform: none; } }
 @keyframes reactTremble { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(var(--trem, 1.5px)); } 75% { transform: translateX(calc(var(--trem, 1.5px) * -1)); } }
 @keyframes reactStare { from { transform: scale(1); } to { transform: scale(var(--stare, 1.06)); } }
+
+/* a still that slowly drifts like a camera move (KIMORIN⭐︎'s MV still until its clip is made) */
+@keyframes kenBurns {
+  from { transform: scale(1.02) translate(0, 0); }
+  to { transform: scale(1.15) translate(-3%, -2%); }
+}

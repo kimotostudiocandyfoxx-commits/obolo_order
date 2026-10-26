@@ -939,8 +939,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           neo={v.neo || v.name}
           bati={v.bati || 'バティ'}
           batiImage={v.batiImage}
-          onDone={(mv) => {
-            remember('mv', JSON.stringify(mv));
+          onDone={(r) => {
+            if (r.mv) remember('mv', JSON.stringify(r.mv));
+            remember('f_d07_screen', r.mv ? 'big' : 'pick');
+            if (r.frame) remember('mars_frame', r.frame);
             run(iRef.current + 1);
           }}
         />
@@ -952,7 +954,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             {v.made?.mv ? (
               <video src={v.made.mv.url} poster={v.made.mv.poster ?? undefined} autoPlay playsInline controls muted={muted} className="aspect-video w-full object-contain" />
             ) : (
-              <div className="flex aspect-video w-full items-center justify-center text-amber-100/70">夕焼け</div>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={`/onboarding/s/mars-frame-${answers.mars_frame ?? 'sunset'}.jpg`} alt="" className="aspect-video w-full object-cover" />
             )}
           </div>
           <span className="pb-safe absolute bottom-6 text-xs tracking-widest text-white/50">TAP</span>
