@@ -148,7 +148,20 @@ export function IconButton({ icon, onClick, label, style }: { icon: 'sound' | 'm
 }
 
 /** The three volumes (music / sounds / voices), kept on this device. */
-export function MixerPanel({ mix, onChange, onClose }: { mix: { bgm: number; se: number; voice: number }; onChange: (m: { bgm: number; se: number; voice: number }) => void; onClose?: () => void }) {
+export function MixerPanel({
+  mix,
+  onChange,
+  onClose,
+  noWait,
+  onNoWait,
+}: {
+  mix: { bgm: number; se: number; voice: number };
+  onChange: (m: { bgm: number; se: number; voice: number }) => void;
+  onClose?: () => void;
+  /** "声を待たずに進む" (M-R102): kept at the bottom, for playing without hearing the voices */
+  noWait?: boolean;
+  onNoWait?: (on: boolean) => void;
+}) {
   const rows: { key: 'bgm' | 'se' | 'voice'; label: string }[] = [
     { key: 'bgm', label: '音楽' },
     { key: 'se', label: '効果音' },
@@ -172,6 +185,15 @@ export function MixerPanel({ mix, onChange, onClose }: { mix: { bgm: number; se:
           />
         </label>
       ))}
+      {onNoWait && (
+        <label className="mt-4 flex items-center justify-between gap-3 border-t border-amber-100/10 pt-3 text-[12px] tracking-[0.12em] text-amber-50/70">
+          <span>
+            声を待たずに進む
+            <span className="block text-[10px] tracking-normal text-amber-50/40">声が聞こえにくい時や、音を出せない場所で</span>
+          </span>
+          <input type="checkbox" checked={!!noWait} onChange={(e) => onNoWait(e.target.checked)} className="h-5 w-5 accent-amber-300" />
+        </label>
+      )}
       {onClose && (
         <div className="mx-auto mt-2 w-40">
           <Choice onClick={onClose}>とじる</Choice>

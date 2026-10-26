@@ -18,6 +18,7 @@ import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/components/story/Stage';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
+import { markHeard, noWaitVoice, setNoWaitVoice, wasHeard } from '@/lib/story/heard';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
@@ -236,6 +237,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const mixRef = useRef(mix);
   mixRef.current = mix;
   const [mixerOpen, setMixerOpen] = useState(false);
+  const [noWait, setNoWait] = useState(false);
+  useEffect(() => setNoWait(noWaitVoice()), []);
   const voice = useRef<LineVoice | null>(null);
   if (typeof window !== 'undefined') voice.current ??= new LineVoice();
 
@@ -664,8 +667,28 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   };
 
   const next = () => {
+    const st = steps[iRef.current];
+    if (st?.t === 'say') markHeard(st.who, st.text);
     voice.current?.stop();
     run(iRef.current + 1);
+  };
+  // M-R102: a first-time line moves on only after its voice (a tap meanwhile shows the rest of the words);
+  // a line heard before goes any time; "声を待たずに進む" or the voices turned off lift the wait; core lines hold
+  const sayStep = step?.t === 'say' ? step : null;
+  // never stuck behind a voice that did not end: past the line's own length, the tap goes through
+  const [waitOver, setWaitOver] = useState(false);
+  useEffect(() => {
+    setWaitOver(false);
+    if (steps[i]?.t !== 'say') return;
+    const t = setTimeout(() => setWaitOver(true), 4000 + (steps[i] as { text: string }).text.length * 260);
+    return () => clearTimeout(t);
+  }, [i, steps]);
+  const mustWait = !!sayStep && talking && !waitOver && (!!sayStep.hold || (!noWait && mix.voice > 0 && !wasHeard(sayStep.who, sayStep.text)));
+  const tapLine = () => {
+    if (sayStep && !sayStep.hold && wasHeard(sayStep.who, sayStep.text)) return next();
+    if (!reveal.current.done) return reveal.current.finish();
+    if (mustWait) return;
+    next();
   };
 
   const choose = (key: string, label: string, goto?: string) => {
@@ -760,7 +783,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {/* tap layer for dialogue */}
       {/* the thread: a line is tapped through anywhere (the newest finishes typing first) */}
       {started && step && chatLine(step, '') ? (
-        <button className="absolute inset-0 z-10 cursor-default" aria-label="つぎへ" onClick={() => (reveal.current.done ? next() : reveal.current.finish())} />
+        <button className="absolute inset-0 z-10 cursor-default" aria-label="つぎへ" onClick={tapLine} />
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
@@ -775,7 +798,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           entries={log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : AVATARS[e.who] } : { ...e, text: fill(e.text, v) }))}
           talking={talking}
           reveal={reveal}
-          live={step.t === 'say'}
+          live={step.t === 'say' && !mustWait}
           bottom={chatBottom(step)}
         />
       )}
@@ -1043,7 +1066,16 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {mixerOpen && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setMixerOpen(false)}>
           <div onClick={(e) => e.stopPropagation()}>
-            <MixerPanel mix={mix} onChange={setMix} onClose={() => setMixerOpen(false)} />
+            <MixerPanel
+              mix={mix}
+              onChange={setMix}
+              onClose={() => setMixerOpen(false)}
+              noWait={noWait}
+              onNoWait={(on) => {
+                setNoWait(on);
+                setNoWaitVoice(on);
+              }}
+            />
           </div>
         </div>
       )}
