@@ -1,7 +1,8 @@
-# UI art — 2026-10-26T19:39:48.288Z
+# UI art — 2026-10-26T21:50:41.801Z
 
-Seedream 5.0 Pro / 3枚 / 約7円
+Seedream 5.0 Pro / 4枚 / 約8円
 
-- ✅ jupiter-daikon
-- ✅ mars-screens
-- ✅ mercury-port
+- ✅ ref-freezy
+- ✅ ref-kaiser-1
+- ✅ ref-kaiser-2
+- ✅ ref-kaiser-3
