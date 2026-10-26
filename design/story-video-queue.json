@@ -537,6 +537,106 @@
       "audio": false,
       "first": "apps/web/public/onboarding/s/saturn-outside.jpg",
       "prompt": "Flying low over the sunset red-brown land of Saturn under the huge rings, the camera glides toward a round terraced temple of red-brown stone with big octopus statues on both sides of its stairs, slowing to a stop before it. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "rec2-facedown",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-facedown.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. In the grey room, the person slowly turns the glowing phone face down on the desk; the screen light disappears and the room sinks into quiet darkness.",
+      "always": false
+    },
+    {
+      "id": "rec2-hum",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-hum.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Close-up: the small red recording light of the old cassette recorder glows steadily, the tape reels turn slowly, a hand rests near the microphone as someone hums softly.",
+      "always": false
+    },
+    {
+      "id": "rec2-tap",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-tap.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Close-up: fingers tap a steady rhythm on the wooden desk, the pencil bouncing slightly, a soft lamp glow.",
+      "always": false
+    },
+    {
+      "id": "rec2-needle",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-needle.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Close-up: the needle sits in the groove of the spinning record; warm colour blooms outward from the record and slowly spreads across the grey room.",
+      "always": false
+    },
+    {
+      "id": "rec2-docs",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-docs.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Slow push over the old typewritten papers with blacked-out lines under the lamp, warm colour, dust in the light.",
+      "always": false
+    },
+    {
+      "id": "rec2-photos",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-photos.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Slow drift over the scattered old photographs of people seen from behind or only their hands with instruments and notebooks, warm sepia.",
+      "always": false
+    },
+    {
+      "id": "rec2-map",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec2-map.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Slow push over the old world map; the small golden ring marks catch the lamplight one after another and glow faintly.",
+      "always": false
+    },
+    {
+      "id": "rec3-monban",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec3-monban.jpg",
+      "prompt": "Vertical 9:16, an old archive film with heavy grain and scratches: the tall hooded gatekeeper stands in the dark before the huge gate, slowly lifting the old sheet of paper to read it; dust drifts; film flicker. Face hidden. Painterly dark fantasy."
+    },
+    {
+      "id": "rec3-warm-city",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec3-warm-city.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Over the night city, warm lights come on in the windows one after another, and small warm lights begin to float up from them into the sky like lanterns.",
+      "always": false
+    },
+    {
+      "id": "rec3-warm-canal",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec3-warm-canal.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: heavy grain, slow, quiet, professional camera. Faces never clearly shown. No readable text. Along the canal, warm lights come on in the windows one by one, reflected in the water, and small warm lights float up into the night sky.",
+      "always": false
+    },
+    {
+      "id": "rec3-rise",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec3-warm-snow.jpg",
+      "prompt": "Vertical 9:16 cinematic shot. From the snowy town, the small warm lights rise from the windows up into the night sky; as they rise, the picture gently turns from photographic reality into a painted anime world, and the lights become stars among the anime stars."
+    },
+    {
+      "id": "rec3-space",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rec3-space.jpg",
+      "prompt": "In deep anime space, small clusters of warm golden lights glow softly here and there among the stars like little towns of light; on the night side of the blue Earth below, one small cluster of the same lights glows. The camera stays far away, drifting very slowly. Painted anime film style of the game, cinematic, slow and hopeful."
+    },
+    {
+      "id": "launch-clouds",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/launch-clouds.jpg",
+      "prompt": "The rocket punches up through the thick layer of white clouds on a pillar of fire and white smoke, the sky above darkening from blue to the black of space, the first stars appearing; the camera stays below, looking up as it rises away. Painted anime film style of the game, cinematic, epic."
     }
   ],
   "parallel": 4
