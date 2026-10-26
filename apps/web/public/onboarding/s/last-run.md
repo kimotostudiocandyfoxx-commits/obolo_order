@@ -1,5 +1,5 @@
-# UI art — 2026-10-26T01:44:28.872Z
+# UI art — 2026-10-26T01:55:14.302Z
 
-Seedream 5.0 Pro / 1枚 / 約8円
+Seedream 5.0 Pro / 1枚 / 約7円
 
-- ✅ sig-f4-turntable
+- ✅ rec-teens
