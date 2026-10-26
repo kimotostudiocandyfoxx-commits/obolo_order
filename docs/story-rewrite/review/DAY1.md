@@ -90,7 +90,8 @@ MONBAN「OBOLON、それは喋りすぎだ。」
 
 ## D01-S012｜宇宙へ行ってみるか？
 
-MONBAN「お前はObolo Orderに招待されてここに来た。」
+MONBAN「それより先はObolo Orderしか知ることができない。」
+MONBAN「ただ、お前はObolo Orderに招待されてここに来た。」
 MONBAN「だから知る権利がある。」
 MONBAN「もし宇宙やこの秘密結社に興味があるなら、」
 MONBAN「明日、お前に宇宙行きの切符を送るが」
