@@ -1,61 +1,27 @@
-# UI art — 2026-10-26T02:45:27.494Z
+# UI art — 2026-10-26T03:05:31.259Z
 
-Seedream 5.0 Pro / 57枚 / 約101円
+Seedream 5.0 Pro / 23枚 / 約38円
 
 - ⏸ kimorin-iu-shock-glow: 元の絵ができなかったので次回
 - ⏸ kimorin-iu-shock-notail: 元の絵ができなかったので次回
 - ⏸ kimorin-iu-shock-o: 元の絵ができなかったので次回
-- ⏸ kimorin-iu-think-glow: 元の絵ができなかったので次回
-- ⏸ kimorin-iu-think-notail: 元の絵ができなかったので次回
-- ⏸ kimorin-iu-think-o: 元の絵ができなかったので次回
-- ✅ kimorin-i-joy
-- ✅ kimorin-i-joy-notail
-- ✅ kimorin-i-joy-o
-- ✅ kimorin-i-lecture
-- ✅ kimorin-i-lecture-notail
-- ✅ kimorin-i-lecture-o
-- ✅ kimorin-i-point
-- ✅ kimorin-i-point-notail
-- ✅ kimorin-i-point-o
-- ✅ kimorin-i-shock
-- ✅ kimorin-i-shock-notail
-- ✅ kimorin-i-shock-o
-- ✅ kimorin-i-smug
-- ✅ kimorin-i-smug-notail
-- ✅ kimorin-i-smug-o
-- ✅ kimorin-i-talk
-- ✅ kimorin-i-talk-o
-- ✅ kimorin-i-tears
-- ✅ kimorin-i-tears-notail
-- ✅ kimorin-i-tears-o
-- ✅ kimorin-i-think
-- ✅ kimorin-i-think-notail
-- ✅ kimorin-inv-up
-- ✅ kimorin-iu-joy
-- ✅ kimorin-iu-joy-glow
-- ✅ kimorin-iu-joy-notail
-- ✅ kimorin-iu-joy-o
-- ✅ kimorin-iu-lecture
-- ✅ kimorin-iu-lecture-glow
-- ✅ kimorin-iu-lecture-notail
-- ✅ kimorin-iu-lecture-o
-- ✅ kimorin-iu-point
-- ✅ kimorin-iu-point-o
-- ✅ kimorin-iu-smug
-- ✅ kimorin-iu-smug-glow
-- ✅ kimorin-iu-smug-notail
-- ✅ kimorin-iu-smug-o
-- ✅ kimorin-iu-talk
-- ✅ kimorin-iu-talk-glow
-- ✅ kimorin-iu-talk-notail
-- ✅ kimorin-iu-talk-o
-- ✅ kimorin-iu-tears
-- ✅ kimorin-iu-tears-glow
-- ✅ kimorin-iu-tears-notail
-- ✅ kimorin-iu-tears-o
-- ❌ kimorin-i-talk-notail: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"17f35566-1643-477f-945e-289802605abc","taskUUID":"7559dfa9-7d57-4397-a439-cc3b401d1601","cost":0.04815,"seed":1600914467,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/17f35566-1643-477f-945e-289802605abc.jpg"}]}
-- ❌ kimorin-i-think-o: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"43ee9b2f-87bc-4bc8-b352-efca8d8b21ff","taskUUID":"13e06a8a-6acd-414e-8d33-d544d9a75e19","cost":0.04815,"seed":243470519,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/43ee9b2f-87bc-4bc8-b352-efca8d8b21ff.jpg"}]}
-- ❌ kimorin-iu-point-glow: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"519a2dfb-11cd-4733-a0ed-794e8635b572","taskUUID":"b955864a-f932-4bf6-8bec-18be6fbc63af","cost":0.04815,"seed":383716400,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/519a2dfb-11cd-4733-a0ed-794e8635b572.jpg"}]}
-- ❌ kimorin-iu-point-notail: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"4070d7b3-cf55-4406-aec6-9c2a58cdda9c","taskUUID":"d9cc44c4-0c84-4076-ade0-8af0a3b2f5c8","cost":0.04815,"seed":324213,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/4070d7b3-cf55-4406-aec6-9c2a58cdda9c.jpg"}]}
-- ❌ kimorin-iu-shock: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"1c6fe455-8ea4-4d90-8428-420818209e42","taskUUID":"ea2a60d5-759e-41bc-a6a1-91682bae2ffe","cost":0.04815,"seed":1401888582,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/1c6fe455-8ea4-4d90-8428-420818209e42.jpg"}]}
-- ❌ kimorin-iu-think: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"a40fb89a-5f51-49ed-a485-fa3beee4bdd9","taskUUID":"e70f44d0-9e73-47dc-9cae-5eee0fa70743","cost":0.04815,"seed":1982707042,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/a40fb89a-5f51-49ed-a485-fa3beee4bdd9.jpg"}]}
+- ✅ d2-gate-inside-kimorin-leave
+- ✅ d2-gate-two-inside
+- ✅ d2-hall-dark-kimorin
+- ✅ d2-hall-kimorin
+- ✅ d2-hall-run
+- ✅ d2-hall-sky
+- ✅ d2-kimorin-close-in
+- ✅ d2-moon-kimorin
+- ✅ d2-pinpon
+- ✅ d2-rocket-in
+- ✅ kimorin-i-talk-notail
+- ✅ kimorin-iu-point-notail
+- ✅ kimorin-iu-think
+- ✅ kimorin-iu-think-glow
+- ✅ kimorin-iu-think-notail
+- ✅ kimorin-iu-think-o
+- ❌ d2-hall-sky-monban: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"24eb3515-afbc-4def-b16f-e4e1928d16aa","taskUUID":"c3c31e06-c914-4f47-8ae8-4cde7672940a","cost":0.05136,"seed":1701379484,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/24eb3515-afbc-4def-b16f-e4e1928d16aa.jpg"}]}
+- ❌ kimorin-i-think-o: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"0145a59e-2c8f-4af6-9313-2d9be1ef6140","taskUUID":"c92de407-94ee-47b4-ba7c-e38c98f6f6a9","cost":0.04815,"seed":2070714395,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/0145a59e-2c8f-4af6-9313-2d9be1ef6140.jpg"}]}
+- ❌ kimorin-iu-point-glow: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"1c993997-64b3-4d6e-a12a-e92c46b29cae","taskUUID":"3793406f-2f5f-4ea5-b0d3-79c6bfc9a749","cost":0.04815,"seed":287275577,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/1c993997-64b3-4d6e-a12a-e92c46b29cae.jpg"}]}
+- ❌ kimorin-iu-shock: Error: 500 {"data":[{"taskType":"imageInference","imageUUID":"74b41065-d9e2-4c79-a91a-d6e6d52c4ab5","taskUUID":"c580b386-637c-4d33-afb7-5fff113f1dbd","cost":0.04815,"seed":391530612,"imageURL":"https://im.runware.ai/image/os/a06dlim3/ws/3/ii/74b41065-d9e2-4c79-a91a-d6e6d52c4ab5.jpg"}]}

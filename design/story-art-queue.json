@@ -3620,17 +3620,5 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": [
-    "d2-gate-inside-kimorin-leave",
-    "d2-gate-two-inside",
-    "d2-hall-dark-kimorin",
-    "d2-hall-kimorin",
-    "d2-hall-run",
-    "d2-hall-sky",
-    "d2-hall-sky-monban",
-    "d2-kimorin-close-in",
-    "d2-moon-kimorin",
-    "d2-pinpon",
-    "d2-rocket-in"
-  ]
+  "redo": []
 }
