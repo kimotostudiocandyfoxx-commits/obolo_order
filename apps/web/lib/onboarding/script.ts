@@ -65,7 +65,7 @@ export type Step =
   | { t: 'still'; image: string }
   /**
    * Saturn: the story's kororin lesson on top of the real world (ころりんぱ) — listen, drop your own voice
-   * to your own room (or skip), ☆ the brother's sneeze. Saves answers.f_d04_kororin (try/skip).
+   * to your own room (or skip), the sister's sunset kororin. Saves answers.f_d04_kororin (try/skip).
    */
   | { t: 'saturn' }
   /** Jupiter (day 4): two of the kororins become stickers → sticker book → sticker butterflies. Saves answers.stickers. */

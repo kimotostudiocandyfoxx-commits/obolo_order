@@ -8,7 +8,7 @@ import type { Step } from './script';
  * ('clock' step, M-R22). Saturn: the gaudy temple, たこ焼きブラザー & シスター, then the kororin lesson on
  * the real Saturn world (client 2026-10-14: day 3 only teaches how to murmur — three kororins by mic, to
  * your own room; everything else opens on the second journey), the residents' ring and the brother's
- * sneeze, the Saturn stamp. Riddle card 2 gets its words during MONBAN's call from the rocket (story 49a3048).
+ * far point KIMORIN calls the Cosmos (M-R107), the Saturn stamp. Riddle card 2 gets its words during MONBAN's call from the rocket (story 49a3048).
  * Saved: Bluena, the three kororins (room-only Saturn posts), card 2's words, the Saturn stamp.
  */
 export const DAY3: Step[] = [
@@ -119,7 +119,7 @@ export const DAY3: Step[] = [
 
   // D04-S005〜S006 コロリン／土星の空のリング: the real Saturn world (ころりんぱ) with the story's lines
   // on top — KIMORIN⭐︎'s kororin, three kororins of your own by mic to your own room, the residents' ring,
-  // the brother's sneeze and KIMORIN's ☆ (components/saturn/SaturnLesson.tsx).
+  // the sister's sunset kororin (components/saturn/SaturnLesson.tsx).
   { t: 'bgm', track: null },
   { t: 'sprite', image: null },
   { t: 'saturn' },
@@ -129,8 +129,8 @@ export const DAY3: Step[] = [
   { t: 'caption', text: 'その夜' },
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
   { t: 'say', who: 'KIMORIN', text: 'MONBANが言っていた、コスモス。……私の推理では、遠い星の名前です。' },
-  { t: 'say', who: 'KIMORIN', text: '……あれは、ブラザーのくしゃみです。' }, // {bati}が遠くを指さす先、輪のいちばん遠い縁を流れる点。丸いサングラスをかけて、じっと見る
-  { t: 'say', who: 'KIMORIN', text: 'まだ、流れていますね。' },
+  { t: 'say', who: 'KIMORIN', text: '……見つけました。あれが、コスモスです。' }, // {bati}が遠くを指さす先、輪のいちばん遠い縁を流れる米粒より小さい点。丸いサングラスを押し上げて、じっと見る（M-R107）
+  { t: 'say', who: 'KIMORIN', text: '……今日のところは、逃がしてあげましょう。' }, // 点は、ふっと消える
   { t: 'sprite', image: null },
   { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'saturn' },

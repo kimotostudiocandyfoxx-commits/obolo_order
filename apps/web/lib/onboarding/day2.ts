@@ -154,7 +154,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '8個も？' },
   { t: 'say', who: 'MONBAN', text: '宇宙へ行き…解き明かしてこい…。' },
   { t: 'say', who: 'KIMORIN', text: '解き明かしたらなんかいいことあるんですか？' },
-  { t: 'say', who: 'MONBAN', text: 'コスモスを見つけよ…。宝は、そこにある。' },
+  { t: 'say', who: 'MONBAN', text: 'コスモスを見つけよ…。そこに、お前の宝がある…。' },
   { t: 'say', who: 'KIMORIN', text: 'た...宝!?!?....よし...コスモスいっぱい見つけよ。' },
   { t: 'riddles' }, // 8枚のうち3枚に文字が滲み出る（1・7・8）
   { t: 'video', motion: 'd2-book' }, // 札が光の粒になって、古い革の本に吸いこまれる

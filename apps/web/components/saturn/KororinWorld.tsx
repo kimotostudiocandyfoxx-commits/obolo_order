@@ -48,7 +48,7 @@ export function KororinWorld({
   /** the story's lesson brings its own mic (the Bati): no bottom bar */
   noBar?: boolean;
   events?: KororinEvents;
-  /** The story's own kororins (KIMORIN⭐︎'s, the brother's sneeze): placed on the planet first. */
+  /** The story's own kororins (KIMORIN⭐︎'s, the sister's sunset): placed on the planet first. */
   extra?: SaturnPostView[];
   /**
    * The first journey (story 2026-10-14): voices are flown to your own room only (自分の部屋) — the

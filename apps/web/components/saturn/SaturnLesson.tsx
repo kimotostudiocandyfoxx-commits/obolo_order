@@ -17,16 +17,16 @@ import { KororinWorld } from './KororinWorld';
  *     うんちピンポンくん; a slip of paper with words to read for anyone who cannot think of any)
  *  2. after a spoken murmur: make {bati}'s voice your voice a little higher too? ［する／今のままでいい］
  *  3. the brother's how-to, then ［もうひとつ、つぶやいてみる／今日は、ここまで］ (topics to start from)
- *  4. the residents' ring and the brother's sneeze (kept as it was until the client decides)
+ *  4. the residents' ring: a kororin rolls to your feet — the sister's 「……今日の夕焼け、きれいだったわ。」 (story M-R107)
  * The mic is {bati} itself (a round button at the bottom); a small ⌨ in the corner is the way out for
  * anyone who cannot speak (then {bati}'s voice reads the kororin). The lines are the story's.
  */
 type Who = 'brother' | 'sister' | 'kimorin' | 'pinpon' | 'bati' | 'guide';
 type Beat =
-  | { k: 'say'; who: Who; text: string; drop?: 'kimorin' | 'sneeze'; star?: boolean }
+  | { k: 'say'; who: Who; text: string; drop?: 'kimorin'; star?: boolean }
   | { k: 'note'; text: string }
   | { k: 'recNormal'; prompt: 'first' | 'topics' }
-  | { k: 'listen'; id: 'kimorin' | 'mine' | 'sneeze'; text?: string }
+  | { k: 'listen'; id: 'kimorin' | 'mine' | 'sunset'; text?: string }
   | { k: 'batiVoice' }
   | { k: 'choice' }
   | { k: 'done' };
@@ -36,6 +36,8 @@ const NAMES: Record<Who, string> = { brother: 'たこ焼きブラザー', sister
 const SPRITES: Partial<Record<Who, string>> = { brother: 'takoyaki-brother', sister: 'takoyaki-sister', kimorin: 'kimorin-sun', pinpon: 'unchi-pinpon' };
 
 /** KIMORIN⭐︎'s words for the stone (his kororin says them in his voice two semitones up) */
+/** the residents' kororin that rolls to your feet on Saturn (story M-R107) */
+const SISTER_SUNSET = '……今日の夕焼け、きれいだったわ。';
 const KIMORIN_STONE = 'ぷりぷりぷりり！ぷりぷりぷりり！うひょひょひょげへへ！ぷりぷりぷりりり！うん！うん！うんちピンポーン大正かーい！ぷり！げへへへ！ぷりぷり滑り台でボカーン！';
 /** the slip of paper KIMORIN⭐︎ hands over, for anyone who cannot think of words */
 const PAPER = 'ぷりぷりぷりり！うひょひょひょ！げへへ！うん！うん！うんちピンポーン！だいせいかーい！ぷり！げへへへ！ぷりぷりブランコでボカーン！';
@@ -74,12 +76,9 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'brother', text: 'だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
   { k: 'note', text: '〔🎙〕を押して、{bati}に向かって、独り言みたいにつぶやく（声を出せない時は、すみの⌨で文字でも）→ {bati}がコロリンにする → タップすると喋る → 〔自分の部屋に飛ばす〕\n人に届けられるのは、二周目の旅から' },
   { k: 'choice' },
-  // D04-S006 土星の空のリング（今のまま：利用者が決めるまで）
-  { k: 'note', text: '土星の空を、住人たちのコロリンが、リングになって舞っている。\n広場のコロリンをタップすると、声が聞けます。☆を押すと「いいな」の印（☆の数は、どこにも出ません）' },
-  { k: 'listen', id: 'sneeze' },
-  { k: 'say', who: 'brother', text: '……俺のだZE。押すボタンを、間違えたZE。' },
-  { k: 'say', who: 'brother', text: '……くしゃみに、星がついたZE。', star: true }, // KIMORINが〔☆〕を、そっと押す
-  { k: 'say', who: 'sister', text: 'うまく言えなくても、くしゃみでも、いいの。出したら、それはもう、表現よ。' },
+  // D04-S006 土星の空のリング (story M-R107): a kororin rolls to your feet — the sister's sunset
+  { k: 'note', text: '空を舞う住人たちのコロリンをタップすると、声が聞けます' },
+  { k: 'listen', id: 'sunset' },
   { k: 'done' },
 ];
 // the branch after the choice
@@ -208,9 +207,9 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
           setExtra((x) => [storyPost('story-kimorin', 'KIMORIN⭐︎', spriteUrl('kimorin-face'), KIMORIN_STONE, u ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, KIMORIN_STONE)), ...x]),
         );
     }
-    if (beat.k === 'listen' && beat.id === 'sneeze')
-      void lineVoiceUrl('コロリン', '……へっくしゅん！').then((u) =>
-        setExtra((x) => [...x, storyPost('story-sneeze', 'たこ焼きブラザー', spriteUrl('takoyaki-brother-face'), '……へっくしゅん！', u ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, '……へっくしゅん！'))]),
+    if (beat.k === 'listen' && beat.id === 'sunset')
+      void lineVoiceUrl('コロリン', SISTER_SUNSET).then((u) =>
+        setExtra((x) => [...x, storyPost('story-sunset', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, u ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, SISTER_SUNSET))]),
       );
     if (beat.k === 'done') onDone(made);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,7 +319,7 @@ export function SaturnLesson({ bati, neo, batiImage, onDone }: { bati: string; n
         events={{
           onListen: (p) => {
             if (beat?.k !== 'listen') return;
-            const ok = beat.id === 'kimorin' ? p.id === 'story-kimorin' : beat.id === 'sneeze' ? p.id === 'story-sneeze' : !p.id.startsWith('story-');
+            const ok = beat.id === 'kimorin' ? p.id === 'story-kimorin' : beat.id === 'sunset' ? p.id === 'story-sunset' : !p.id.startsWith('story-');
             if (ok) next();
           },
         }}
