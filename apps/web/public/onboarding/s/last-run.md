@@ -1,7 +1,8 @@
-# UI art — 2026-10-26T19:25:52.166Z
+# UI art — 2026-10-26T19:33:43.099Z
 
-Seedream 5.0 Pro / 3枚 / 約7円
+Seedream 5.0 Pro / 4枚 / 約8円
 
-- ✅ jacket-kaiser
-- ✅ jacket-puripuri
-- ✅ jupiter-stone
+- ✅ mars-frame-sea
+- ✅ mars-frame-stars
+- ✅ mars-frame-sunset
+- ✅ mv-kimorin-slide
