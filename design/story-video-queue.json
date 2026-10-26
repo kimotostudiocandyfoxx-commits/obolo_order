@@ -488,6 +488,55 @@
       "audio": false,
       "first": "apps/web/public/onboarding/s/sig-hand-end.jpg",
       "prompt": "Continuing the close-up on the desk: the hands draw back; the sealed golden envelope with its glowing compass seal slowly rises off the desk by itself and floats in the air, turning gently, glowing brighter; then it dissolves from its edges into countless golden light particles, and the swirl of particles streams straight toward the camera, as if flying out of the screen to the viewer, filling the frame with warm golden light, which fades softly to black. No house, no window, no destination shown. Painted anime film style of the game, cinematic, mysterious and warm."
+    },
+    {
+      "id": "d2-reveal",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg",
+      "prompt": "A dramatic entrance beat, one unbroken take: from the close-up of the small fox character's white fox-mask-like face, the camera pulls back and circles slightly as a gust of wind makes his patched white lab coat flare out, his fan of white, black and red-tipped tail feathers bursts open wide behind him like a fan, and the low sunset light glints off his round brass goggles in a bright flash. His goggles stay over his eyes: no eyes or glow show through them. The small silver box on his head and the coiled cable to his handheld button stay with him. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "launch-door",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/launch-pit.jpg",
+      "prompt": "In the launch pit: the camera pushes in toward the waiting rocket; its heavy round door swings shut and locks with a hiss of steam, warning lights blinking. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "launch-fire",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/launch-pit.jpg",
+      "prompt": "Ignition: brilliant flames burst from under the rocket, enormous clouds of white smoke billow out and fill the launch pit, the ground shakes, sparks fly. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "launch-lift",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/launch-pit.jpg",
+      "prompt": "Liftoff: the rocket rises slowly, then faster, out of the billowing white smoke on a pillar of fire; the camera tilts up to follow it into the sky. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "launch-window",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-earth.jpg",
+      "prompt": "Inside the rocket, looking out of the big round window: the round blue Earth glows in the black of space, slowly turning, stars all around; a calm, awe-filled moment. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "saturn-rings",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-saturn.jpg",
+      "prompt": "The rocket glides toward Saturn and passes underneath its enormous rings, the rings sweeping overhead across the whole sky, ice and dust glittering, sunset light. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "saturn-temple-in",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/saturn-outside.jpg",
+      "prompt": "Flying low over the sunset red-brown land of Saturn under the huge rings, the camera glides toward a round terraced temple of red-brown stone with big octopus statues on both sides of its stairs, slowing to a stop before it. Painted anime film style of the game, cinematic, epic, smooth professional camera."
     }
   ],
   "parallel": 4

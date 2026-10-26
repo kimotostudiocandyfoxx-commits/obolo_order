@@ -299,6 +299,21 @@
       "id": "seal-press",
       "kind": "se",
       "prompt": "A wax seal pressed onto a thick paper envelope, then a soft magical golden chime as the seal glows."
+    },
+    {
+      "id": "record2",
+      "kind": "bgm",
+      "prompt": "A score for an old archive film that comes back to life, about 100 seconds: it starts grey and quiet with a faint projector-like ticking, then a single soft hummed-like melody on a warm instrument, a gentle beat of fingers tapping that grows into a groove, a vinyl crackle and a warm bass as colour returns, then a solemn, steady passage for three old rules, and a final luminous, hopeful swell as warm lights rise into the stars, ending softly. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "rocket-roar",
+      "kind": "se",
+      "prompt": "A rocket launch: a deep rumbling ignition, a huge roar of engines and billowing smoke, rising and fading into the distance."
     }
   ],
   "listen": []
