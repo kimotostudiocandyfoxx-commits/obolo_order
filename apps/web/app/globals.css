@@ -532,6 +532,17 @@ body {
   50% { transform: translate(-4vw, -16svh) rotate(-3deg); }
   75% { transform: translate(-10vw, -6svh) rotate(4deg); }
 }
+/* Jupiter: a jacket opens and closes like wings and flaps round the stone (M-R89) */
+@keyframes jacketFlap {
+  0%, 100% { transform: translate(0, 0) scaleX(1) rotate(-4deg); }
+  10% { transform: translate(2vw, -3svh) scaleX(0.35) rotate(2deg); }
+  20% { transform: translate(4vw, -6svh) scaleX(1) rotate(5deg); }
+  35% { transform: translate(8vw, -10svh) scaleX(0.35) rotate(-2deg); }
+  50% { transform: translate(-2vw, -15svh) scaleX(1) rotate(-3deg); }
+  65% { transform: translate(-8vw, -9svh) scaleX(0.35) rotate(3deg); }
+  80% { transform: translate(-10vw, -4svh) scaleX(1) rotate(4deg); }
+  90% { transform: translate(-5vw, -1svh) scaleX(0.35) rotate(0deg); }
+}
 /* Mercury: the song's ship sails out to sea */
 @keyframes shipOut {
   from { transform: translate(-30vw, 0) scale(1.15); }
