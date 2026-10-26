@@ -318,7 +318,10 @@
     {
       "id": "kimorin-ballad",
       "kind": "bgm",
-      "prompt": "A tearful, hugely epic orchestral power ballad: sweeping strings, grand piano, timpani, building to a giant choir chorus that shouts one big word together twice, like a triumphant explosion. Cinematic, heartfelt, almost too dramatic. No lead vocals except the choir."
+      "prompt": "Epic tearful orchestral power ballad, sweeping strings, grand piano, timpani, a male lead singing with deep emotion, a huge choir joining in the chorus. Cinematic, heartfelt, almost too dramatic.",
+      "settings": {
+        "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
+      }
     }
   ],
   "listen": []
