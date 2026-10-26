@@ -835,7 +835,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'film' && (
         <button
           onClick={endFilm}
-          className="absolute right-4 top-[calc(14px+env(safe-area-inset-top))] z-[60] rounded-full border border-white/30 bg-black/40 px-4 py-1.5 text-xs tracking-[0.3em] text-white/80 backdrop-blur"
+          className="absolute bottom-[calc(28px+env(safe-area-inset-bottom))] right-4 z-[60] rounded-full border border-white/30 bg-black/40 px-4 py-1.5 text-xs tracking-[0.3em] text-white/80 backdrop-blur"
           style={{ fontFamily: '"Shippori Mincho", serif' }}
         >
           スキップ
