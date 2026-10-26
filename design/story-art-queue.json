@@ -4129,6 +4129,36 @@
         "apps/web/public/onboarding/s/launch-pit.jpg"
       ],
       "prompt": "The same rocket as in the reference picture, seen from below and to the side, punching up through a thick layer of white clouds on a pillar of fire and white smoke, the sky above turning from blue to the black of space with the first stars."
+    },
+    {
+      "id": "arr-jupiter-canopy",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Flying low over an endless primeval forest of giant trees on Jupiter, the treetops stretching to the horizon, under a sky of soft green and cream striped clouds; a clearing far ahead."
+    },
+    {
+      "id": "arr-mercury-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Below the clouds of Mercury: an endless ocean glowing softly blue from within, gentle waves to every horizon, no land anywhere, a warm sun haze."
+    },
+    {
+      "id": "arr-mars-city",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Out of a red dust storm on Mars, a futuristic city of dozens of slender towers rises, its tower walls and the undersides of its bridges covered in glowing screens showing colourful handmade videos and animations (no readable text, no logos); red sand and haze."
     }
   ],
   "redo": [

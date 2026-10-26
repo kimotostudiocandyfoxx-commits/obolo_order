@@ -637,6 +637,48 @@
       "audio": false,
       "first": "apps/web/public/onboarding/s/launch-clouds.jpg",
       "prompt": "The rocket punches up through the thick layer of white clouds on a pillar of fire and white smoke, the sky above darkening from blue to the black of space, the first stars appearing; the camera stays below, looking up as it rises away. Painted anime film style of the game, cinematic, epic."
+    },
+    {
+      "id": "arr-moon-land",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-moon.jpg",
+      "prompt": "The rocket descends gently onto a vast plain of white lunar sand, dust billowing softly as it lands; the blue Earth floats in the black sky above. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "arr-moon-temple",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/moon-surface.jpg",
+      "prompt": "From the white sand plain under the floating blue Earth, the camera glides toward a temple of white stone and slowly closes in on its entrance. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "arr-jupiter-in",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-jupiter.jpg",
+      "prompt": "The rocket dives into the green and cream striped clouds of Jupiter, swirling cloud bands rushing past the window, until the clouds part. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "arr-mercury-in",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-mercury.jpg",
+      "prompt": "The rocket descends toward Mercury's softly glowing blue sea and drops through the clouds. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "arr-mars-in",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-mars.jpg",
+      "prompt": "The rocket flies into a swirling red sandstorm on Mars, red dust streaming past, the light dimming to deep red. Painted anime film style of the game, cinematic, epic, smooth professional camera."
+    },
+    {
+      "id": "arr-sun-in",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/rocket-sun.jpg",
+      "prompt": "The window fills with the white-hot burning sun, enormous flames and loops of fire writhing across its surface, the light growing brighter and brighter until the rocket is swallowed into pure white light. Painted anime film style of the game, cinematic, epic, smooth professional camera."
     }
   ],
   "parallel": 4
