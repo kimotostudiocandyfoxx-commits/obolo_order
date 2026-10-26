@@ -11,7 +11,7 @@ export const DAY5: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'caption', text: '5日目' },
   // D06-S001 木星の朝
-  { t: 'still', image: 'jupiter-kaiser' },
+  { t: 'still', image: 's/jupiter-daikon' },
   { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: 'おはようダ。よく眠れたかダ？' },
   { t: 'say', who: '大根カイザー', text: '今日は水星ダ。ロケットに乗るダ！' },
@@ -61,7 +61,7 @@ export const DAY5: Step[] = [
   { t: 'bgm', track: 'opening' },
 
   // D06-S008 冷蔵庫の中の図／札6
-  { t: 'still', image: 'mercury-island' },
+  { t: 'still', image: 's/mercury-port' },
   { t: 'sprite', image: ['freezy', 'kimorin-sun'] },
   { t: 'branch', key: 'f_song_from', cases: { none: 'd5-shut' }, otherwise: 'd5-praise' },
   { t: 'label', id: 'd5-praise' },

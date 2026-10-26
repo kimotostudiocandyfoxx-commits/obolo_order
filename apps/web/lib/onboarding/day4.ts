@@ -49,7 +49,7 @@ export const DAY4: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'ん？　どこですか？' },
   { t: 'say', who: '？？？', text: 'ここダ。', voice: '大根カイザー' },
   { t: 'say', who: 'KIMORIN', text: 'どこですか？' },
-  { t: 'still', image: 'jupiter-kaiser' }, // 並んだ木のうちの一本だけ、幹が白くて太い。大根だった
+  { t: 'still', image: 's/jupiter-daikon' }, // 並んだ木のうちの一本だけ、幹が白くて太い。大根だった
   { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
   { t: 'caption', text: '大根カイザーが現れた' },
   { t: 'say', who: '大根カイザー', text: '木星で、何をしているダ？　お前ら、誰ダ？' },
@@ -65,7 +65,7 @@ export const DAY4: Step[] = [
   { t: 'bgm', track: 'opening' },
 
   // D05-S009 畑から門番／札3
-  { t: 'still', image: 'jupiter-kaiser' },
+  { t: 'still', image: 's/jupiter-daikon' },
   { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: 'よい機会ダ。王として、結社の大事な話をしてやろう。' },
   { t: 'say', who: '大根カイザー', text: 'Obolo Orderが、なぜ集まり、何をめざしておるのか、ダ。' },

@@ -12,7 +12,7 @@ export const DAY6: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'caption', text: '6日目' },
   // D07-S001 火星へ
-  { t: 'still', image: 'mercury-island' },
+  { t: 'still', image: 's/mercury-port' },
   { t: 'sprite', image: ['freezy', 'kimorin-sun'] },
   { t: 'say', who: 'フリージー', text: 'おはよう。よく眠れたか？' },
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。' },
@@ -34,7 +34,7 @@ export const DAY6: Step[] = [
   { t: 'sprite', image: null },
   { t: 'still', image: 's/rocket-mars' },
   { t: 'se', sound: 'whoosh' },
-  { t: 'still', image: 'mars-city' },
+  { t: 'still', image: 's/mars-screens' },
   { t: 'caption', text: '火星に着いた' },
   { t: 'action', label: '火星の未来都市へ向かう' },
 
@@ -64,7 +64,7 @@ export const DAY6: Step[] = [
   { t: 'mars' },
 
   // D07-S006 大スクリーンに映す
-  { t: 'still', image: 'mars-city' },
+  { t: 'still', image: 's/mars-screens' },
   { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },
   { t: 'label', id: 'big' },
   { t: 'say', who: 'ヒポキン', text: '街いちばんの、大スクリーンに映す。いいか。' },

@@ -17,7 +17,7 @@ export const DAY7: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'caption', text: '7日目' },
   // D08-S001 地球へ帰る
-  { t: 'still', image: 'mars-city' },
+  { t: 'still', image: 's/mars-screens' },
   { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },
   { t: 'say', who: 'ヒポキン', text: 'おはよう。……見学は、終わりだな。地球へ帰れ。' },
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。……では、問いただしに参りましょう。この結社の、本当の狙いを。' },
