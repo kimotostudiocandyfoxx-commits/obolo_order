@@ -4692,9 +4692,5 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": [
-    "freezy-x-joy",
-    "freezy-x-shock",
-    "freezy-x-talk"
-  ]
+  "redo": []
 }
