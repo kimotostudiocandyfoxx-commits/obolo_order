@@ -167,9 +167,30 @@ def record():
     return out, [v1, v2, v3]
 
 
+def launch():
+    """#3 ロケットの発射 (D02-S009): the door, the fire, liftoff, through the clouds, the Earth in the window"""
+    p, t = [], 0.0
+    for k, (c, st, d) in enumerate([('launch-door', 0.3, 4.0), ('launch-fire', 0.2, 4.4), ('launch-lift', 0.2, 4.6), ('launch-clouds', 0.2, 4.6), ('launch-window', 0.2, 4.8)]):
+        p.append(seg(f'l{k}', c, st, d, fade_in=0.4 if k == 0 else 0, fade_out=0.6 if k == 4 else 0))
+        t += d
+    v = concat('launch', p)
+    return mix('rocket-launch', v, t, f'{O}/bgm-launch.m4a', 0.8, [(f'{O}/se-rocket-roar.mp3', 4.0, 1.0)])
+
+
+def saturn():
+    """#5 土星への到着 (D04-S003): under the rings, then the octopus temple"""
+    p = [seg('sa0', 'saturn-rings', 0.2, 4.6, fade_in=0.4), seg('sa1', 'saturn-temple-in', 0.2, 4.6, fade_out=0.5)]
+    v = concat('saturn', p)
+    return mix('saturn-arrival', v, 9.2, f'{O}/bgm-saturn.m4a', 0.85, [])
+
+
 if __name__ == '__main__':
     which = sys.argv[1:] or ['signal', 'record']
     if 'signal' in which:
         print(signal())
     if 'record' in which:
         print(record())
+    if 'launch' in which:
+        print(launch())
+    if 'saturn' in which:
+        print(saturn())

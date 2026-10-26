@@ -49,6 +49,7 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-look-back' }, // ふり返る：門の内側から入口のほうを見た景色
   { t: 'se', sound: 'footsteps' },
   { t: 'video', motion: 'd2-kimorin-walkup' }, // 奥の通路から、KIMORINがゆっくり門まで歩いてくる → 顔のドアップ（劇場版アニメのように）
+  { t: 'video', motion: 'd2-reveal' }, // 豪華映像 #2 KIMORINの登場（M-R90）：白衣がひるがえり、扇の尾が一気に開き、ゴーグルが夕日を反射（目は光らない）
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'smoke' },
   { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
@@ -167,9 +168,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '月だ' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
+  { t: 'film', id: 'launch', parts: 5 }, // 豪華映像 #3 ロケットの発射（M-R90）：扉が閉まる → 炎と白い煙 → 雲を突き抜け、空が青から黒へ → 窓の外に丸い青い地球
   { t: 'bgm', track: 'space' },
-  { t: 'se', sound: 'rocket' },
-  { t: 'video', motion: 'd2-launch' }, // ロケットが閉まり、出発する
   { t: 'bgvideo', motion: 'd2-rocket-in' }, // ロケットの中。KIMORINが、窓の外の地球を見ている
   { t: 'say', who: 'KIMORIN', text: 'ロケット広すぎませんか？2人で乗るのもったいないですよ。' },
   { t: 'say', who: 'KIMORIN', text: 'みてください、、、なんと、、美しい、、、。' },

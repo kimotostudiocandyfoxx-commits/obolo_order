@@ -83,6 +83,7 @@ export const DAY3: Step[] = [
 
   // D04-S003 趣味の悪い神殿（story 9ec42f9, M-R85）
   { t: 'say', who: 'KIMORIN', text: '見てください。土星に着きました。' },
+  { t: 'film', id: 'saturn', parts: 2 }, // 豪華映像 #5 土星への到着（M-R90）：輪の下をくぐる → 赤茶の大地 → タコの石像の神殿
   { t: 'bgm', track: 'saturn' },
   { t: 'arrive', image: 's/saturn-outside', caption: '土星の神殿に着いた' },
   { t: 'sprite', image: 'kimorin-sun' },

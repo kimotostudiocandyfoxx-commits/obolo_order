@@ -32,7 +32,7 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   // the gate of the script of 2026-10-22
   'd2-step-in', 'd2-monban-smoke',
   // motion 12 in two (client 2026-10-22, day 2): through the gate | on into the hall — KIMORIN calls in between
-  '12-a', '12-b', 'd2-sky', 'd2-monban-walkin',
+  '12-a', '12-b', 'd2-sky', 'd2-monban-walkin', 'd2-reveal',
   // the paper airplane (Seedance) and the look back through the gate (a whip pan made from its two pictures)
   'd2-plane', 'd2-look-back',
   // KIMORIN's entrance up the avenue, his walk into the temple, OBOLON's light (client 2026-10-22)
