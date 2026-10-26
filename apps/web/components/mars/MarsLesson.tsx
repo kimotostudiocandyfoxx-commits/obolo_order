@@ -169,7 +169,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
   }
 
   return (
-    <LessonShell bg="/art/mars-studio.jpg" coach={coach} actions={actions}>
+    <LessonShell bg="/onboarding/s/mars-screens.jpg" coach={coach} actions={actions}>
       {batiImage && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={batiImage} alt="" className="pointer-events-none absolute bottom-[calc(16px+env(safe-area-inset-bottom))] left-3 z-[170] h-16 w-16 rounded-2xl border-2 border-white/70 object-cover shadow-lg" aria-hidden />
