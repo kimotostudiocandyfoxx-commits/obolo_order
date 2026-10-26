@@ -13,43 +13,43 @@
   },
   {
    "name": "OBOLON",
-   "line": "争いがなくても、、、毎日がつまらなくて、心も体も、疲れていたら。、、、それは、ゴールか？",
+   "line": "招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。",
    "takes": [
     {
      "voice": "Gacrux-+0.7st-echo-hq",
      "file": "/story/voices/audition/obolon/1-Gacrux-+0.7st-echo-hq.mp3",
-     "seconds": 8.472
+     "seconds": 7.08
     },
     {
      "voice": "Gacrux-+0.7st-echo-hq",
      "file": "/story/voices/audition/obolon/2-Gacrux-+0.7st-echo-hq.mp3",
-     "seconds": 7.272
+     "seconds": 7.368
     }
    ]
   },
   {
    "name": "MONBAN",
-   "line": "紹介したい者がいたら、でいい…。\nひとりで作るのも、仲間と遊ぶのも、自由だ…。",
+   "line": "Obolo Orderにならなければ、ネオのまま、ここで止まる…。それも、道だ…。",
    "takes": [
     {
      "voice": "Algenib-hq",
      "file": "/story/voices/audition/monban/1-Algenib-hq.mp3",
-     "seconds": 10.656
+     "seconds": 6.48
     },
     {
      "voice": "Orus-hq",
      "file": "/story/voices/audition/monban/2-Orus-hq.mp3",
-     "seconds": 9.36
+     "seconds": 6.024
     },
     {
      "voice": "Iapetus-hq",
      "file": "/story/voices/audition/monban/3-Iapetus-hq.mp3",
-     "seconds": 9.36
+     "seconds": 5.76
     },
     {
      "voice": "Schedar-hq",
      "file": "/story/voices/audition/monban/4-Schedar-hq.mp3",
-     "seconds": 7.896
+     "seconds": 7.584
     }
    ]
   },
@@ -81,27 +81,27 @@
   },
   {
    "name": "ヒポキン",
-   "line": "なお、三つ以外の曲にも、あとから映像は付けられる。\nどこまで付けるかも、お前が選んでいい。",
+   "line": "選んで、並べて、見せる。それも、DJの腕だ。\n作品がまだなくても、場所だけ先に作っていい。",
    "takes": [
     {
      "voice": "Gacrux--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/1-Gacrux--3st-hq.mp3",
-     "seconds": 6.144
+     "seconds": 7.248
     },
     {
      "voice": "Charon--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/2-Charon--3st-hq.mp3",
-     "seconds": 6
+     "seconds": 6.264
     },
     {
      "voice": "Algieba--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/3-Algieba--3st-hq.mp3",
-     "seconds": 7.272
+     "seconds": 6.6
     },
     {
      "voice": "Alnilam--4st-hq",
      "file": "/story/voices/audition/c-13wd9v8/4-Alnilam--4st-hq.mp3",
-     "seconds": 6.24
+     "seconds": 7.2
     }
    ]
   },
@@ -133,53 +133,53 @@
   },
   {
    "name": "たこ焼きシスター",
-   "line": "ここにない話をしたくなったら、君の広場も作れるわ。\nそれは、次の旅からね。",
+   "line": ".....吹き込みが終わったら、バティが魔法で石をコロリンにしてくれるワ",
    "takes": [
     {
      "voice": "Kore-hq",
      "file": "/story/voices/audition/c-105b577/1-Kore-hq.mp3",
-     "seconds": 6.936
+     "seconds": 3.816
     },
     {
      "voice": "Despina-hq",
      "file": "/story/voices/audition/c-105b577/2-Despina-hq.mp3",
-     "seconds": 6.288
+     "seconds": 3.576
     },
     {
      "voice": "Erinome-hq",
      "file": "/story/voices/audition/c-105b577/3-Erinome-hq.mp3",
-     "seconds": 6.768
+     "seconds": 4.176
     },
     {
      "voice": "Vindemiatrix-hq",
      "file": "/story/voices/audition/c-105b577/4-Vindemiatrix-hq.mp3",
-     "seconds": 6.048
+     "seconds": 3.72
     }
    ]
   },
   {
    "name": "大根カイザー",
-   "line": "焦って、撮らなくても、いいDA。思い出は、あとから、作れるDA。さあ、遊んでみるDA！",
+   "line": "保存してから、届けるか決めればよいダ。\n君だけの根っこに、しまっておくのもよいダ。",
    "takes": [
     {
      "voice": "Gacrux--6st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/1-Gacrux--6st-growl-hq.mp3",
-     "seconds": 8.16
+     "seconds": 6.792
     },
     {
      "voice": "Algenib--6st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/2-Algenib--6st-growl-hq.mp3",
-     "seconds": 8.496
+     "seconds": 6.048
     },
     {
      "voice": "Charon--7st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/3-Charon--7st-growl-hq.mp3",
-     "seconds": 7.536
+     "seconds": 7.08
     },
     {
      "voice": "Gacrux--8st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/4-Gacrux--8st-growl-hq.mp3",
-     "seconds": 8.448
+     "seconds": 6.648
     }
    ]
   },
@@ -211,79 +211,79 @@
   },
   {
    "name": "ボスG",
-   "line": "ここからは、お前のステージだ。誰に見せるかは、自分で決めろ。",
+   "line": "ここは、いつでも回していい。\nお前の曲と、お前の声と、お前の映像でな。",
    "takes": [
     {
      "voice": "Gacrux-hq",
      "file": "/story/voices/audition/c-1hwam1f/1-Gacrux-hq.mp3",
-     "seconds": 5.448
+     "seconds": 7.464
     },
     {
      "voice": "Algenib-hq",
      "file": "/story/voices/audition/c-1hwam1f/2-Algenib-hq.mp3",
-     "seconds": 5.64
+     "seconds": 5.856
     },
     {
      "voice": "Alnilam-hq",
      "file": "/story/voices/audition/c-1hwam1f/3-Alnilam-hq.mp3",
-     "seconds": 5.256
+     "seconds": 6.432
     },
     {
      "voice": "Sadaltager-hq",
      "file": "/story/voices/audition/c-1hwam1f/4-Sadaltager-hq.mp3",
-     "seconds": 6.36
+     "seconds": 6.672
     }
    ]
   },
   {
    "name": "ハットG",
-   "line": "今日は、霧は、出してない。",
+   "line": "火星で映像をつけた曲は、映像もいっしょに切り替わる。映すのも、DJのうちだ。",
    "takes": [
     {
      "voice": "Achird-hq",
      "file": "/story/voices/audition/c-1pvfg32/1-Achird-hq.mp3",
-     "seconds": 2.568
+     "seconds": 5.28
     },
     {
      "voice": "Zubenelgenubi-hq",
      "file": "/story/voices/audition/c-1pvfg32/2-Zubenelgenubi-hq.mp3",
-     "seconds": 2.28
+     "seconds": 4.824
     },
     {
      "voice": "Callirrhoe-hq",
      "file": "/story/voices/audition/c-1pvfg32/3-Callirrhoe-hq.mp3",
-     "seconds": 3.288
+     "seconds": 5.088
     },
     {
      "voice": "Umbriel-hq",
      "file": "/story/voices/audition/c-1pvfg32/4-Umbriel-hq.mp3",
-     "seconds": 2.328
+     "seconds": 5.064
     }
    ]
   },
   {
    "name": "ロングG",
-   "line": "……星が、さっき、一曲ぶん、速さを変えてた。",
+   "line": "……速さを、そろえろ。",
    "takes": [
     {
      "voice": "Aoede-hq",
      "file": "/story/voices/audition/c-1pm5jmk/1-Aoede-hq.mp3",
-     "seconds": 4.848
+     "seconds": 1.656
     },
     {
      "voice": "Umbriel-hq",
      "file": "/story/voices/audition/c-1pm5jmk/2-Umbriel-hq.mp3",
-     "seconds": 5.04
+     "seconds": 1.728
     },
     {
      "voice": "Sulafat-hq",
      "file": "/story/voices/audition/c-1pm5jmk/3-Sulafat-hq.mp3",
-     "seconds": 5.496
+     "seconds": 2.232
     },
     {
      "voice": "Achernar-hq",
      "file": "/story/voices/audition/c-1pm5jmk/4-Achernar-hq.mp3",
-     "seconds": 5.016
+     "seconds": 1.8
     }
    ]
   }
