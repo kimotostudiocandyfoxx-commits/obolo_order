@@ -8,7 +8,7 @@ import type { Step } from './script';
  * choice, {bati} comes back from the Moon). 「エクリプスを始める」 → the final confirmation and payment by the
  * visitor's own hand (EclipsePay) → KIMORIN⭐︎ jumps in → the rocket flies into the Sun (story 2026-10-15:
  * no MONBAN, OBOLON only, background sun-inside): riddle 2 「DJ」 (M-R86), the Eclipse, riddle 1 「oboloは、町の名前」,
- * the archive films (M-R90), riddle 4 「ナガレ」, the film of the seven days (UI, client 2026-10-14) → 一周目の旅、おわり. Invitations are the
+ * the archive films (M-R90), riddle 4 「ナガレ」 → 一周目の旅、おわり (the film of the seven days was taken out, client 2026-10-26). Invitations are the
  * second journey's Saturn now.
  * The day ends as an ORDER with no 24-hour wait (StoryDay advances at once).
  * The 88 minutes run in the rocket from Mars; the temples of Earth don't count ('clock' off, M-R22).
@@ -213,7 +213,6 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……なるほど……全然わからん。' },
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
   { t: 'sprite', image: null },
-  { t: 'made', what: 'film' }, // 上映「{neo}の7日間」（UI、クライアント 2026-10-14。招待した人の手紙は M-R61 で招待状へ移ったので出さない）
   { t: 'bgm', track: null }, // 音楽が、ゆっくり消えていく。白い光の中に、金色の輪だけが残る
   { t: 'caption', text: '一周目の旅、おわり' },
   { t: 'end' },
