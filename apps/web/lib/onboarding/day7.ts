@@ -50,8 +50,8 @@ export const DAY7: Step[] = [
   { t: 'video', motion: '27-c' }, // 黒い煙が湧き、MONBANが現れる（字幕を消した版）
   { t: 'loop', motion: '28-l' },
   { t: 'say', who: 'MONBAN', text: '……見学は、終わりだ…。ここで、決めていい…。急がなくていい…。' },
-  { t: 'say', who: 'MONBAN', text: '太陽の神殿で、『エクリプス』をする…。太陽と、お前の魂をつなぐ儀式だ…。\n成功すれば、お前は、ORDERになる…。' },
-  { t: 'say', who: 'MONBAN', text: 'ORDERになれば、ほかの星にも行ける…。切符の裏の、錠の星だ…。' },
+  { t: 'say', who: 'MONBAN', text: '太陽の神殿で、『エクリプス』をする…。太陽と、お前の魂をつなぐ儀式だ…。\n成功すれば、お前は、Obolo Orderになる…。' },
+  { t: 'say', who: 'MONBAN', text: 'Obolo Orderになれば、ほかの星にも行ける…。切符の裏の、錠の星だ…。' },
   { t: 'say', who: 'MONBAN', text: 'それに、エクリプスを受ければ…お前の体から、マナが湧くようになる…。ジェムがなくても、魔法が唱えられる…。' },
   { t: 'say', who: 'MONBAN', text: '……ここには、勝手に流れてくる広告もない…。知らない誰かの『おすすめ』も、流れてこない…。あるのは、誰かが自分の言葉で作ったものだけだ…。灯りは、みんなの88円で、ともしている…。' },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
@@ -72,7 +72,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'OBOLON', text: '、、、いつでも、やめられる。やめ方は、支払いの画面に、書いてある。' },
   { t: 'say', who: 'KIMORIN', text: 'マナは？　足りなくなったら、どうせ、買わせるのでしょう？' },
   { t: 'say', who: 'OBOLON', text: '、、、買い足すことも、できる。でも、毎月湧く分で、十分、遊べる。' },
-  { t: 'say', who: 'KIMORIN', text: '……ORDERにならなかったら？　{bati}も、ピンポンくんも、消える？' },
+  { t: 'say', who: 'KIMORIN', text: '……Obolo Orderにならなかったら？　{bati}も、ピンポンくんも、消える？' },
   { t: 'say', who: 'OBOLON', text: '、、、消えない。月で、待っている。作ったものも、見に来られる。' },
   { t: 'say', who: 'うんちピンポンくん', text: '……ピンポン♪' },
   { t: 'say', who: 'KIMORIN', text: '…………。' },
@@ -87,7 +87,7 @@ export const DAY7: Step[] = [
   { t: 'label', id: 'decide' },
   { t: 'ticket', flip: true }, // 金色の切符の裏の星図。土星〜火星までつながって止まり、錠の金星・天王星・海王星、いちばん奥に太陽
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
-  { t: 'say', who: 'MONBAN', text: 'ORDERにならなければ、ネオのまま、ここで止まる…。それも、道だ…。' },
+  { t: 'say', who: 'MONBAN', text: 'Obolo Orderにならなければ、ネオのまま、ここで止まる…。それも、道だ…。' },
   { t: 'sprite', image: '@bati' },
   { t: 'say', who: 'バティ', text: 'ボクは、どっちでもいいよ。{neo}が決めたほうで、待ってる。' },
   { t: 'sprite', image: null },
@@ -123,7 +123,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 外から
   { t: 'sprite', image: 'kimorin-sun' }, // 閉まりかけた扉のすき間に、白い面がぬっと差しこまれる
   { t: 'say', who: 'KIMORIN', text: 'そのロケットに、私も、乗ります。' },
-  { t: 'say', who: 'KIMORIN', text: '……お待たせいたしました。私も、ORDERになることにしました。' }, // 扉がもう一度開く。裾を整えて乗りこんでくる
+  { t: 'say', who: 'KIMORIN', text: '……お待たせいたしました。私も、Obolo Orderになることにしました。' }, // 扉がもう一度開く。裾を整えて乗りこんでくる
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
   { t: 'say', who: 'バティ', text: 'KIMORIN⭐︎！' },
   { t: 'say', who: 'KIMORIN', text: '……母に、言ってやりました。そうしたら、『88円なら、なっておきなさい』と。' },
@@ -181,12 +181,12 @@ export const DAY7: Step[] = [
   { t: 'seal', n: 2, open: true }, // 札2のひびが割れ、「OBOLO ORDERは全員……」の続きに「表現者」の字
   { t: 'caption', text: '謎2が開いた' },
   { t: 'say', who: 'OBOLON', text: '謎は、8つ。、、、今日、1つ開いた。' },
-  { t: 'say', who: 'OBOLON', text: '残りの7つは、、、ORDERとして、確かめに行け。' },
+  { t: 'say', who: 'OBOLON', text: '残りの7つは、、、Obolo Orderとして、確かめに行け。' },
   { t: 'sprite', image: ['obolon', '@bati'] }, // 札7「コスモスは」の字が、かすかに光る
   { t: 'say', who: 'バティ', text: 'コスモス……{food}の仲間かな。' },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'KIMORIN', text: '食べ物では、ないと思いますよ。' },
-  { t: 'say', who: 'OBOLON', text: '、、、ORDERに、なってから、考えろ。' },
+  { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderに、なってから、考えろ。' },
   { t: 'sprite', image: null },
   { t: 'whiteout' },
 
@@ -196,8 +196,8 @@ export const DAY7: Step[] = [
   { t: 'se', sound: 'magic' }, // 金色の輪から、光の粒が、雪のように降ってくる。{neo}の胸に、小さな光の泉
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
   { t: 'say', who: 'バティ', text: '……{neo}？\nからだが、あったかい！' },
-  { t: 'say', who: 'KIMORIN', text: '……あたたかい光ですね。これで、{neo}も私も、ORDER……ということで、よろしいのですか？' },
-  { t: 'caption', text: 'ORDERになった' },
+  { t: 'say', who: 'KIMORIN', text: '……あたたかい光ですね。これで、{neo}も私も、Obolo Order……ということで、よろしいのですか？' },
+  { t: 'caption', text: 'Obolo Orderになった' },
   { t: 'seal', n: 1, open: true }, // 札1「OBOLOとは」の細い線と灯りが光り、札がほどける
   { t: 'sprite', image: 'obolon' },
   { t: 'say', who: 'OBOLON', text: 'OBOLOは、、、街の名前だ。' },

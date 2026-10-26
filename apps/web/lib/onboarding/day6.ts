@@ -98,7 +98,7 @@ export const DAY6: Step[] = [
   { t: 'caption', text: '4つの星を、見学した' },
   { t: 'sprite', image: ['kimorin-sun', '@bati'] },
   { t: 'say', who: 'KIMORIN', text: '……見学ツアーは、ここまで、ということですか。' },
-  { t: 'say', who: 'KIMORIN', text: '……続きは、ORDERになってから。ほら、やっぱり、お金です。' },
+  { t: 'say', who: 'KIMORIN', text: '……続きは、Obolo Orderになってから。ほら、やっぱり、お金です。' },
   { t: 'say', who: 'バティ', text: 'まだ、行ってない星が、あるね。' },
   { t: 'sprite', image: null },
   { t: 'end' },

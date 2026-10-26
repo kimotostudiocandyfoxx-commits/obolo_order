@@ -10,7 +10,7 @@ export function usePlanetLock(planet: string): { locked: boolean; note: string }
   const { me } = useAuth();
   const opens = planetOpensAt(planet, me?.orderedAt);
   if (opens === undefined) return { locked: false, note: '' };
-  if (opens === null) return { locked: true, note: 'ORDERになるとひらく' };
+  if (opens === null) return { locked: true, note: 'Obolo Orderになるとひらく' };
   const left = Math.ceil((opens.getTime() - Date.now()) / (24 * 3600_000));
   return left > 0 ? { locked: true, note: `あと${left}日でひらく` } : { locked: false, note: '' };
 }
@@ -27,7 +27,7 @@ export function PlanetGate({ planet, name, children }: { planet: string; name: s
       <p className="text-5xl">🔒</p>
       <p className="mt-4 text-lg font-black">{name}は、まだひらいていない</p>
       <p className="mt-2 text-sm text-white/70">{note}</p>
-      <p className="mt-1 text-xs text-white/50">ORDER になると、1週間ごとに新しい星がひらいていくよ</p>
+      <p className="mt-1 text-xs text-white/50">Obolo Order になると、1週間ごとに新しい星がひらいていくよ</p>
       <Link href="/" className="mt-6 rounded-full bg-white/15 px-6 py-2 text-sm">
         宇宙地図にもどる
       </Link>

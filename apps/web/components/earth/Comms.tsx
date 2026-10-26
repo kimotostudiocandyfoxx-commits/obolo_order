@@ -113,7 +113,7 @@ function Tile({ icon, title, hint, locked, dot, onClick }: { icon: string; title
       <div className="text-2xl">{icon}</div>
       <div className="mt-1 text-sm font-bold">{title}</div>
       <p className="mt-1 text-[11px] leading-snug text-white/55">{hint}</p>
-      {locked && <span className="chip mt-2 bg-white/10 text-white/60">🔒 ORDERに入るとひらきます</span>}
+      {locked && <span className="chip mt-2 bg-white/10 text-white/60">🔒 Obolo Orderに入るとひらきます</span>}
     </button>
   );
 }
@@ -554,7 +554,7 @@ function PhoneScreen({ onClose, onCall }: { onClose: () => void; onCall: (to: Co
             <button
               onClick={() => {
                 setErr('');
-                onCall(c).catch((e) => setErr(e instanceof ApiError && e.code === 'PEER_NOT_MEMBER' ? 'まだORDERに入っていない人には電話できません' : 'かけられなかった…もう一度'));
+                onCall(c).catch((e) => setErr(e instanceof ApiError && e.code === 'PEER_NOT_MEMBER' ? 'まだObolo Orderに入っていない人には電話できません' : 'かけられなかった…もう一度'));
               }}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500 text-xl shadow-[0_0_14px_rgba(60,220,140,0.5)]"
               aria-label={`${nameOf(c)}に電話する`}

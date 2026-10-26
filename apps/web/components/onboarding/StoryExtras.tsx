@@ -374,7 +374,7 @@ export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[];
                 </g>
               ))}
               <text x="165" y="35" textAnchor="middle" fontSize="13" fill="#fde68a" letterSpacing="3">
-                ORDERのみ
+                Obolo Orderのみ
               </text>
             </svg>
           </div>

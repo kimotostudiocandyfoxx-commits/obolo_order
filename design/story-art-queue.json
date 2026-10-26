@@ -2817,6 +2817,18 @@
         "apps/web/public/onboarding/s/kimorin-inv-white-2.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same, but his thumb is pressing the button on the handheld unit, and the small round display on the box on his head lights up bright with a glowing double circle (◎), a soft glow around the box, as if it just rang. No text, no letters. Keep the flat grey background."
+    },
+    {
+      "id": "rec-teens",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, subtle film grain, cool muted grading. Two teenagers walking side by side along a quiet evening street, seen from behind at a slight angle, faces not visible, each looking down at the glowing phone in their own hands, not talking, a small gap between them; street lights, calm, not sad, no small children. No readable text, no logos."
     }
   ],
   "redo": []
