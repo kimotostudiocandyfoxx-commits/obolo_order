@@ -31,7 +31,7 @@ type Beat =
   | { k: 'done' };
 
 const KIMORIN_WORDS = 'ぷりぷりぷりり！　ぷりぷりぷりり！　うひょひょひょげへへ！……ぷりぷり滑り台でボカーン！';
-const KIMORIN_JACKET: StickerMade = { text: 'プリプリ・ボカン', url: '/onboarding/s/jacket-puripuri.jpg' };
+export const KIMORIN_JACKET: StickerMade = { text: 'プリプリ・ボカン', url: '/onboarding/s/jacket-puripuri.jpg' };
 const KAISER_JACKET: StickerMade = { text: '百聞は、一見にしかず', url: '/onboarding/s/jacket-kaiser.jpg' };
 
 // D05-S005〜S006 (before the visitor's turn)

@@ -926,7 +926,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bati={v.bati || 'バティ'}
           batiImage={v.batiImage}
           onDone={(song) => {
-            remember('song', JSON.stringify(song));
+            remember('f_song_from', song ? 'made' : 'none');
+            if (song) remember('song', JSON.stringify(song));
             run(iRef.current + 1);
           }}
         />
