@@ -126,7 +126,12 @@
         720,
         1280
       ],
-      "prompt": "Inside a white marble Moon temple, a soft pillar of white-gold light. Two small smooth round devices, each the size of a palm, gently descend through the light: sleek polished pearl-white orbs with a thin glowing blue band around the middle and a tiny lens. Floating sparkles. Lower third calm and simple."
+      "prompt": "Edit the first picture (the white moon temple with its pillar of light): keep the temple, the camera, the framing and the light. Two small identical devices float gently down inside the pillar of light, one above the other: each is exactly the device of the second picture — a small, flat, round white puck with a soft violet glowing rim, a dark glass top showing a glowing image of the blue Earth and the Moon, and a small round lens on its side. Painterly anime film quality like the first picture. No text, no letters.",
+      "refs": [
+        "apps/web/public/onboarding/s/moon-temple.jpg",
+        "design/story/refs/props/bluena.webp"
+      ],
+      "always": false
     },
     {
       "id": "saturn-outside",
@@ -4412,5 +4417,7 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "bluena"
+  ]
 }
