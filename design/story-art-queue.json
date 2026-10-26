@@ -4648,7 +4648,53 @@
         "design/story/refs/cast/kaiser-journey1-ref.jpg"
       ],
       "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the first-journey Daikon Kaiser (white daikon on its roots, no arms, cigar, crown of leaves). Expression: surprised, eyes and brows raised high, mouth open, the cigar tipping down."
+    },
+    {
+      "id": "kaiser1-x-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kaiser1-x-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kaiser1-x-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kaiser1-x-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kaiser1-x-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kaiser1-x-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "freezy-x-joy-o",
+    "freezy-x-shock-o",
+    "freezy-x-talk-o"
+  ]
 }
