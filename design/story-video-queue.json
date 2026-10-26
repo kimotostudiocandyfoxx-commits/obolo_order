@@ -475,6 +475,14 @@
       "first": "apps/web/public/onboarding/s/rec-wait.jpg",
       "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film: cool muted colours, heavy grain, slow, quiet, professional camera. No readable text, no logos. Faces never clearly shown. Calm, not sad. The phone on the desk lights up and dims; the hand picks it up, looks, puts it down, then picks it up again; the message waits, no reply.",
       "always": false
+    },
+    {
+      "id": "rec-teens",
+      "duration": 5,
+      "audio": false,
+      "always": false,
+      "first": "apps/web/public/onboarding/s/rec-teens.jpg",
+      "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film, cool muted colours, heavy grain. The two teenagers keep walking slowly side by side down the evening street, away from the camera, each looking down at their own glowing phone, not talking; the camera follows gently behind. Faces never shown. No readable text."
     }
   ],
   "parallel": 4
