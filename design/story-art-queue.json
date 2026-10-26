@@ -3968,6 +3968,167 @@
         "apps/web/public/onboarding/s/kimorin-xs-think.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, robe, hood, ears, sunglasses, framing, size, light — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "rec2-facedown",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. A grey, dim room at night: a person seen from behind at a desk turns their glowing phone face down onto the desk; the room goes darker. The whole picture is almost colourless, grey and quiet."
+    },
+    {
+      "id": "rec2-hum",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. Close-up of an old portable cassette recorder on a wooden desk, its small red recording light glowing; a person's face out of frame, only their chin and hand near the microphone, as if humming softly. The whole picture is almost colourless, grey and quiet. Only the small red light has colour."
+    },
+    {
+      "id": "rec2-tap",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. Another small room: close-up of fingers tapping a rhythm on a wooden desk next to a notebook and a pencil, a single lamp. The whole picture is almost colourless, grey and quiet."
+    },
+    {
+      "id": "rec2-needle",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. Close-up of a vinyl record turntable in a dark room: the needle has just dropped onto the spinning record; the first warm light of colour blooms around the record."
+    },
+    {
+      "id": "rec2-docs",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. Old typewritten documents spread on a desk under a lamp, most lines blacked out with thick black marker; the only readable word, typed in small letters, is \"obolo\". Warm colour has come back."
+    },
+    {
+      "id": "rec2-photos",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. Old faded photographs scattered on a desk: people seen only from behind or only their hands — playing a guitar, writing in a notebook, holding an old tape recorder, at a small drum. Warm sepia colour."
+    },
+    {
+      "id": "rec2-map",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, an old archive film: heavy grain, slightly faded, cool muted grading. No readable text except where described, no logos, no brands. Faces never clearly shown: from behind, in shadow, or only hands. Calm, not sad. An old hand-drawn world map on aged paper, no place names readable, with small golden ring marks scattered in many places all over the continents. Warm lamplight."
+    },
+    {
+      "id": "rec3-monban",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [],
+      "prompt": "Vertical 9:16, an old archive film frame with heavy grain and scratches: in the darkness before a huge ornate gate, the silhouette of a tall hooded gatekeeper (long black robe with faint gold patterns, a faint golden halo outline behind the head), holding an old sheet of paper in both hands, reading it. Painterly dark fantasy, the face hidden. No readable text."
+    },
+    {
+      "id": "rec3-warm-city",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/sig-w4-city.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the place, the camera, the framing and the night exactly the same; the golden streak is gone. Every window glows with warm, soft golden lamplight, colourful and alive, and a few small warm lights are beginning to float up from the windows into the sky like lanterns. Photographic, indistinguishable from real footage, a little film grain. No text."
+    },
+    {
+      "id": "rec3-warm-canal",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/sig-w6-canal.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the place, the camera, the framing and the night exactly the same; the golden streak is gone. Every window glows with warm, soft golden lamplight, colourful and alive, and a few small warm lights are beginning to float up from the windows into the sky like lanterns. Photographic, indistinguishable from real footage, a little film grain. No text."
+    },
+    {
+      "id": "rec3-warm-snow",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/sig-w1-snow.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the place, the camera, the framing and the night exactly the same; the golden streak is gone. Every window glows with warm, soft golden lamplight, colourful and alive, and a few small warm lights are beginning to float up from the windows into the sky like lanterns. Photographic, indistinguishable from real footage, a little film grain. No text."
+    },
+    {
+      "id": "rec3-space",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "prompt": "Deep space in the finest anime film style: small clusters of warm golden lights glowing here and there among the stars like little towns of light, and below, the night side of the blue Earth with one small cluster of the same warm lights on it. Calm, hopeful, beautiful."
+    },
+    {
+      "id": "launch-clouds",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "refs": [
+        "apps/web/public/onboarding/s/launch-pit.jpg"
+      ],
+      "prompt": "The same rocket as in the reference picture, seen from below and to the side, punching up through a thick layer of white clouds on a pillar of fire and white smoke, the sky above turning from blue to the black of space with the first stars."
     }
   ],
   "redo": [
