@@ -737,7 +737,7 @@
         "apps/web/public/onboarding/s/d2-kimorin-close-in-v1.jpg",
         "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are worn over his eyes: his eyes do not glow and cannot be seen. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. IMPORTANT: his round brass goggles are pulled DOWN and worn over his eyes, covering them completely like dark glasses; his eyes do not glow and cannot be seen at all. The goggles are NOT on his forehead. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "w": 1152,
       "h": 2048,
       "size": [
@@ -3622,6 +3622,7 @@
   ],
   "redo": [
     "d2-hall-sky-monban",
+    "d2-kimorin-close-in",
     "kimorin-i-think-o",
     "kimorin-iu-point-glow"
   ]
