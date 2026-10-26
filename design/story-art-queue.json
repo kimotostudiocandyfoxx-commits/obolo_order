@@ -4553,7 +4553,7 @@
         "design/story/refs/cast/freezy-art-1.webp",
         "design/story/refs/takoyaki-brother-grey.jpg"
       ],
-      "prompt": "A character reference picture for a mobile story game: a single full-body character standing, centered, front three-quarter view, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Art style exactly like the LAST picture: realistic dark-fantasy 3DCG, rich materials, fine detail, soft even studio light. No text, no letters, no symbols you can read, no logos, no watermark. The character is FREEZY, designed in the first two pictures (keep his design exactly, but NOT their drawing style): his head and body are one tall old white refrigerator with two doors, the white enamel a little worn and frosted, cold mist leaking from the door seams; on the upper door three glowing golden eyes in a triangle and a big black curled moustache; a huge wild mane of long shaggy black hair bursting out around the fridge; a dark ragged robe over his shoulders with faded paper charms stuck on it (blank, no letters); a thick straw rope tied round his waist with two small brass bells; long pale clawed hands coming out of the robe, bare clawed feet. Calm, cool, a little mysterious but kind. His hands are empty (no fan, nothing held).",
+      "prompt": "A character reference picture for a mobile story game: a single full-body character standing, centered, front three-quarter view, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Art style exactly like the LAST picture: realistic dark-fantasy 3DCG, rich materials, fine detail, soft even studio light. No text, no letters, no symbols you can read, no logos, no watermark. The character is FREEZY, designed in the first two pictures (keep his design exactly, but NOT their drawing style): his head and body are one tall, very old refrigerator turned yokai (a Japanese tsukumogami spirit object): its once-white enamel yellowed, cracked and chipped with rust blooming at the edges and corners, dented doors, a bent old chrome handle, rough frost and icicles crusted along the seams, cold mist seeping out, old peeling paper charms and a frayed shimenawa-like cord stuck to it — clearly ancient, haunted and alive, not a clean modern appliance; on the upper door three glowing golden eyes in a triangle and a big black curled moustache; a huge wild mane of long shaggy black hair bursting out around the fridge; a dark ragged robe over his shoulders with faded paper charms stuck on it (blank, no letters); a thick straw rope tied round his waist with two small brass bells; long pale clawed hands coming out of the robe, bare clawed feet. Calm, cool, a little mysterious but kind. His hands are empty (no fan, nothing held).",
       "w": 1152,
       "h": 1536,
       "size": [
@@ -4692,5 +4692,7 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "ref-freezy"
+  ]
 }
