@@ -4415,6 +4415,45 @@
         "apps/web/public/onboarding/s/hipokin-x-shock.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "jacket-puripuri",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-joy.jpg"
+      ],
+      "prompt": "A square record jacket painted as a grand, serious classical oil painting worthy of a heavy gilded museum frame, with visible brush strokes and rich old-master varnish. The little character of the reference picture (copy its shape, colours and face exactly) slides down a huge shining golden slide with great dignity and majesty, like a king. Behind him the deep night sky bursts with one enormous golden firework. Dramatic chiaroscuro light. The whole square is the painting. No text, no letters, no frame drawn."
+    },
+    {
+      "id": "jacket-kaiser",
+      "w": 1536,
+      "h": 1536,
+      "size": [
+        720,
+        720
+      ],
+      "always": false,
+      "prompt": "A square record jacket: one single large fresh green leaf, painted in delicate Japanese watercolor on warm cream paper, soft light, a lot of quiet space around it. Calm and wise. The whole square is the picture. No text, no letters."
+    },
+    {
+      "id": "jupiter-stone",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/jupiter-forest.jpg"
+      ],
+      "prompt": "Same vast mystical Jupiter forest as the reference picture, same light and style. In the lower middle, at the foot of the giant trees on the mossy ground, stands an old, small, moss-covered stone stand, about knee high, with one square shallow recess on its top face, the size of a record jacket, empty. Light beams fall on it. Upper two thirds open forest and light. No people, no text."
     }
   ],
   "redo": []
