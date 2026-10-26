@@ -479,6 +479,13 @@
       "always": false,
       "first": "apps/web/public/onboarding/s/rec-teens.jpg",
       "prompt": "Vertical 9:16, indistinguishable from real live-action cinema footage, an old archive film, cool muted colours, heavy grain. The two teenagers keep walking slowly side by side down the evening street, away from the camera, each looking down at their own glowing phone, not talking; the camera follows gently behind. Faces never shown. No readable text."
+    },
+    {
+      "id": "sig-lift",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/sig-hand-end.jpg",
+      "prompt": "Continuing the close-up on the desk: the hands draw back; the sealed golden envelope with its glowing compass seal slowly rises off the desk by itself and floats in the air, turning gently, glowing brighter; then it dissolves from its edges into countless golden light particles, and the swirl of particles streams straight toward the camera, as if flying out of the screen to the viewer, filling the frame with warm golden light, which fades softly to black. No house, no window, no destination shown. Painted anime film style of the game, cinematic, mysterious and warm."
     }
   ],
   "parallel": 4
