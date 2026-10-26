@@ -3631,8 +3631,10 @@
       "refs": [
         "apps/web/public/onboarding/s/d2-hall-kimorin.jpg"
       ],
-      "prompt": "Edit the first picture: keep everything exactly the same — the hall, the pillar of light, the black sphere, the camera, the framing, the light and the small fox character in the white lab coat in the same place and pose — but his brass goggles are now pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters."
+      "prompt": "Edit the first picture: keep everything exactly the same — the hall, the pillar of light, the black sphere, the camera, the framing, the light and the small fox character in the white lab coat in the same place and pose — keep the small silver box with the dark screen on top of his head between his ears and the coiled cable to his handheld button — but his brass goggles are now pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "d2-hall-kimorin-up"
+  ]
 }

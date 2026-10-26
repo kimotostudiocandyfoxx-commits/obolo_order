@@ -4,12 +4,16 @@
   "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed dark fantasy with glowing gold light, the finest anime film quality, smooth camera. No text, no letters, no logos, no watermark.",
   "redo": [
     "d2-kimorin-back",
+    "d2-kimorin-face",
     "d2-kimorin-leave",
     "d2-kimorin-startle",
+    "d2-kimorin-walkup",
+    "d2-monban-walkin",
     "d2-obolon-appear",
     "d2-pinpon",
     "d2-rocket-in",
-    "d2-transform"
+    "d2-transform",
+    "d2-walk-in"
   ],
   "items": [
     {
@@ -78,8 +82,8 @@
       "duration": 5,
       "first": "apps/web/public/onboarding/s/d2-gate-two-inside.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg",
-      "prompt": "Under the arch of the great gate, seen from inside: the small fox-masked character in the red robe and sunglasses starts to walk in past the tall hooded gatekeeper, stops, turns to face the camera directly, and the camera moves in close to his face, the sunset arch softly out of focus behind him. While he wears his round dark sunglasses, their black lenses completely hide his eyes — no glow and no eyes ever show through, above or around them. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only quiet sound effects that match the action (magical shimmer, wind, rumble, smoke, footsteps) — no music, no voices, no speech.",
-      "audio": true
+      "prompt": "At the gate: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button is about to walk through, stops, and turns to face the camera with a suspicious, knowing look, coming into a close-up. His round brass goggles are worn over his eyes: no eyes or glow show through them.",
+      "audio": false
     },
     {
       "id": "d2-floor-open",
@@ -267,18 +271,18 @@
     {
       "id": "d2-kimorin-walkup",
       "duration": 10,
-      "audio": true,
+      "audio": false,
       "first": "apps/web/public/onboarding/s/d2-gate-inside.jpg",
       "last": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg",
-      "prompt": "A dramatic theatrical-anime entrance, one unbroken take: looking out through the great gate from inside at the sunset avenue of spires, a small silhouette appears far down the avenue and walks slowly, steadily toward the gate, backlit by the low sun, the fan of tail feathers swaying with each step; the camera slowly pushes in to meet him, lower and closer, his deep-red robe and white fox mask with round dark sunglasses catching the golden light, until he stops in the arch in a big close-up of his face filling the frame. While he wears his round dark sunglasses, their black lenses completely hide his eyes — no glow and no eyes ever show through, above or around them. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only soft footsteps, robe rustle and wind — no music, no voices, no speech, no singing."
+      "prompt": "A dramatic theatrical-anime entrance, one unbroken take: looking out through the great gate from inside at the sunset avenue of spires, a small silhouette appears far down the avenue and walks slowly, steadily toward the gate, backlit by the low sun, the fan of tail feathers swaying with each step and the long white lab coat flapping; the camera slowly pushes in to meet him, lower and closer, until the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button stops in the arch in a big close-up of his face filling the frame, the brass goggles catching the golden light. His round brass goggles are worn over his eyes: no eyes or glow show through them. Sound: only soft footsteps and wind — no music, no voices, no speech, no singing."
     },
     {
       "id": "d2-walk-in",
       "duration": 10,
-      "audio": true,
-      "first": "apps/web/public/onboarding/s/d2-kimorin-close-up-in.jpg",
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/d2-kimorin-close-in.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-dark-kimorin.jpg",
-      "prompt": "One unbroken take: in close-up inside the great gate, the small fox-masked character (sunglasses pushed up on his hood) turns around and walks ahead of the camera; the camera follows a few steps behind him along a polished avenue of gold-lit spires toward a vast domed temple, through its tall doors and a dim corridor, into a huge, almost dark hall with golden armillary spheres and arches of gold rings, where he stops in the middle of the floor and looks up into the darkness. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: only footsteps, robe rustle and a deep hall ambience — no music, no voices, no speech."
+      "prompt": "One unbroken take: the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button walks ahead of the camera through the great gate and into the Earth temple, along a dark corridor, into a vast dark hall with golden armillary spheres faintly glinting; he stops in the middle and looks up into the dark. His round brass goggles are worn over his eyes: no eyes or glow show through them."
     },
     {
       "id": "d2-obolon-appear",
@@ -299,10 +303,10 @@
     {
       "id": "d2-monban-walkin",
       "duration": 5,
-      "audio": true,
+      "audio": false,
       "first": "apps/web/public/onboarding/s/d2-hall-sky.jpg",
       "last": "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg",
-      "prompt": "One unbroken take in the hall under the open starry sky with the ringed Earth floating above: the tall hooded gatekeeper in the long black robe with gold patterns and a golden magic-circle halo behind his head walks calmly into the frame from the left edge, with slow heavy steps, his robe trailing, and stops on the left, a little behind the black sphere, facing the small fox-masked character in the red robe, who stays in the lower right foreground and turns his head a little toward him. The gatekeeper has a single golden eye under the hood and carries nothing in his hands. The camera stays still. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Sound: slow footsteps on stone, robe rustle, a soft space hum — no music, no voices, no speech, no singing."
+      "prompt": "One unbroken take in the hall under the open starry sky with the ringed Earth floating above: the tall hooded gatekeeper in the long black robe with gold patterns and a golden magic-circle halo behind his head walks calmly into the frame from the left edge, with slow heavy steps, his robe trailing, and stops on the left, a little behind the black sphere, facing the small fox character with the white fox-mask-like face, in the patched white lab coat with a tool belt, a small silver box with a dark screen on his head and a coiled cable to a handheld button, who stays in the lower right foreground and turns his head a little toward him. The gatekeeper has a single golden eye under the hood and carries nothing in his hands. The camera stays still. His brass goggles are pushed up on his forehead; his eyes are thin glowing blue slits."
     },
     {
       "id": "sig-w1",
