@@ -12,6 +12,10 @@ import type { Step } from './script';
  * Saved: name, choice1 (day 7 quotes it), f_d01_ticket.
  */
 export const DAY1: Step[] = [
+  // D01-S000 招待信号 (M-R90/M-R93, client 2026-10-26): the luxury film — night scenes around the world, a golden
+  // streak, the Earth's golden threads, the fragments, the seal; the envelope streams to the viewer as light.
+  // Skippable; once seen it does not play again.
+  { t: 'film', id: 'signal', parts: 10 },
   // BGM (client, 2026-10-04): opening → MONBAN's theme from MONBAN → OBOLON's theme from OBOLON.
   { t: 'bgm', track: 'opening' },
   { t: 'motes', count: 36 }, // 金色の光の粒（演出）

@@ -76,7 +76,9 @@ export function stillShows(still: string, who: string): boolean {
 
 export const motionUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.mp4`;
 export const posterUrl = (n: MotionId) => `${MEDIA_BASE}/m${n}.jpg`;
-export const hasMotion = (n: MotionId) => AVAILABLE_MOTIONS.has(n);
+export const hasMotion = (n: MotionId) => AVAILABLE_MOTIONS.has(n) || (typeof n === 'string' && n.startsWith('film-'));
+/** a luxury film's parts and its sound (scripts/films/split.py): mfilm-<id>-<k>.mp4 and bgm-film-<id>.m4a */
+export const filmParts = (id: string, n: number): MotionId[] => Array.from({ length: n }, (_, k) => `film-${id}-${k + 1}`);
 
 /** Character images shown over the motions (transparent WebP). */
 export const spriteUrl = (name: string) => `${MEDIA_BASE}/${name}.webp`;

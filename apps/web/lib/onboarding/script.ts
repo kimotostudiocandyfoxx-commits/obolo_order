@@ -107,6 +107,11 @@ export type Step =
   /** 〔画面：…〕 a short guidance note about how something works (e.g. the riddle book). Tap to continue. */
   | { t: 'notice'; text: string }
   /** Character line. Tap to continue. */
+  /**
+   * A luxury film (M-R90, client 2026-10-26): silent parts played one after another with the film's sound on
+   * the music channel; 〔スキップ〕 at the corner; once watched (or skipped) it does not play again.
+   */
+  | { t: 'film'; id: string; parts: number }
   | {
       t: 'say';
       who: Speaker;

@@ -19,6 +19,7 @@ import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/co
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { markHeard, noWaitVoice, setNoWaitVoice, wasHeard } from '@/lib/story/heard';
+import { filmWatched, markFilmWatched } from '@/lib/story/films';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
@@ -435,6 +436,27 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           const after = n + 1;
           setTimeout(() => runRef.current(after), 3400);
           return;
+        } else if (s.t === 'film') {
+          // a film watched before (or skipped) does not play again, also after a restart
+          if (filmWatched(s.id)) {
+            n++;
+            continue;
+          }
+          setWhite(false);
+          clearStillOnShow.current = true;
+          bgQueue.current = [];
+          setSprite(null);
+          setCam(null);
+          setLog([]);
+          leaveTicket();
+          leaveInvite();
+          clearCaptions();
+          filmPart.current = 0;
+          bgm.current?.set(`film-${s.id}`);
+          playMedia(`film-${s.id}-1`, false);
+          if (s.parts > 1) dual.current?.preload(motionUrl(`film-${s.id}-2`));
+          setI(n);
+          return;
         } else if (s.t === 'video') {
           setWhite(false);
           clearStillOnShow.current = true;
@@ -464,9 +486,24 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   );
   runRef.current = run;
 
+  const filmPart = useRef(0);
+  const endFilm = () => {
+    const s = steps[iRef.current];
+    if (s?.t !== 'film') return;
+    markFilmWatched(s.id);
+    bgm.current?.fadeOut(0.8);
+    run(iRef.current + 1);
+  };
   const onEndedRef = useRef(() => {});
   onEndedRef.current = () => {
     const s = steps[iRef.current];
+    if (s?.t === 'film') {
+      const k = ++filmPart.current;
+      if (k >= s.parts) return endFilm();
+      playMedia(`film-${s.id}-${k + 1}`, false);
+      if (k + 1 < s.parts) dual.current?.preload(motionUrl(`film-${s.id}-${k + 2}`));
+      return;
+    }
     if (s?.t === 'video') {
       clearCaptions();
       run(iRef.current + 1);
@@ -591,6 +628,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (!started) return;
     for (let k = i + 1; k < Math.min(steps.length, i + 12); k++) {
       const s = steps[k];
+      if (s.t === 'film') {
+        if (!filmWatched(s.id)) dual.current?.preload(motionUrl(`film-${s.id}-1`));
+        break;
+      }
       if (s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo') {
         if (hasMotion(s.motion)) dual.current?.preload(motionUrl(s.motion));
         break;
@@ -791,6 +832,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </div>
       )}
 
+      {started && step?.t === 'film' && (
+        <button
+          onClick={endFilm}
+          className="absolute right-4 top-[calc(14px+env(safe-area-inset-top))] z-[60] rounded-full border border-white/30 bg-black/40 px-4 py-1.5 text-xs tracking-[0.3em] text-white/80 backdrop-blur"
+          style={{ fontFamily: '"Shippori Mincho", serif' }}
+        >
+          スキップ
+        </button>
+      )}
       {/* tap layer for dialogue */}
       {/* the thread: a line is tapped through anywhere (the newest finishes typing first) */}
       {started && step && chatLine(step, '') ? (

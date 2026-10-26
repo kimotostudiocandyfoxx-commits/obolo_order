@@ -202,6 +202,16 @@ export const DAY7: Step[] = [
   { t: 'sprite', image: 'obolon' },
   { t: 'say', who: 'OBOLON', text: 'OBOLOは、、、街の名前だ。' },
   { t: 'caption', text: '謎1が開いた' },
+  // D08-S011b 記録映像 (M-R90/M-R104): MONBAN on the Bluena screen, then the archive film (Record I so far)
+  { t: 'say', who: 'OBOLON', text: 'Obolo Orderにだけ、、、見せる、記録がある。' },
+  { t: 'sprite', image: null },
+  { t: 'screen', open: true }, // Bluenaのスクリーンに、門の前のMONBAN
+  { t: 'say', who: 'MONBAN', text: '……よく見ておけ…。これが…ナガレだ…。' },
+  { t: 'screen', open: false },
+  { t: 'film', id: 'record1', parts: 9 }, // 記録 I　ナガレ（記録 II・III はこれから）
+  { t: 'sprite', image: ['kimorin-sun', 'obolon'] },
+  { t: 'say', who: 'KIMORIN', text: '……なるほど……全然わからん。' },
+  { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
   { t: 'sprite', image: null },
   { t: 'made', what: 'film' }, // 上映「{neo}の7日間」（UI、クライアント 2026-10-14）
   { t: 'letter', text: '{neo}へ\nようこそ、宇宙へ✌️\nby {inviter}' }, // 光の中に、小さな封筒が一つ、ふわりと浮かぶ
