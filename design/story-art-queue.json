@@ -2829,6 +2829,804 @@
       "always": false,
       "refs": [],
       "prompt": "Vertical 9:16 cinematic photograph, indistinguishable from real live-action film footage, subtle film grain, cool muted grading. Two teenagers walking side by side along a quiet evening street, seen from behind at a slight angle, faces not visible, each looking down at the glowing phone in their own hands, not talking, a small gap between them; street lights, calm, not sad, no small children. No readable text, no logos."
+    },
+    {
+      "id": "kimorin-inv-up",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, face, ears, tail feathers, white lab coat, tool belt, the handheld button, the coiled cable, the box on his head with its dark screen, the pose, framing, size, light and the flat grey background — but the brass goggles are now pushed up onto his forehead (resting just under the box), and his own eyes show: thin glowing blue eye slits on his white face, exactly like a fox-mask face. No other eyes. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: one paw held out palm up, explaining politely, a calm closed-mouth smile. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-talk-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-lecture",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: one paw raised with the index finger pointing up, the other paw open to the side, lecturing proudly. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-lecture-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-lecture-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: both arms flung wide open, delighted, the mouth open in a big happy smile. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-joy-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-point",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: one arm stretched out pointing at the viewer, the other paw loosely at the side, sure of himself. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-point-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-point-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: leaning back in shock, both paws raised beside the head, tail feathers bristling, the mouth a small round 'o'. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-shock-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-smug",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: one paw on the hip and the other paw at the chin, head tilted, a smug little smile. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-smug-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-smug-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-tears",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: both paws clasped at the chest, deeply moved, small drops of blue light falling from his eyes like tears. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-tears-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-tears-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-i-think",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay over his eyes: his eyes do not glow and cannot be seen. Pose: one paw at the chin, head tilted to one side, pondering, closed mouth. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-i-think-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-i-think-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-i-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-talk",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw held out palm up, explaining politely, a calm closed-mouth smile. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-talk-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-talk-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-talk-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-talk.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-lecture",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw raised with the index finger pointing up, the other paw open to the side, lecturing proudly. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-lecture-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-lecture-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-lecture-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-lecture.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-joy",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: both arms flung wide open, delighted, the mouth open in a big happy smile. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-joy-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-joy-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-joy-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-joy.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-point",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one arm stretched out pointing at the viewer, the other paw loosely at the side, sure of himself. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-point-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-point-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-point-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-point.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-shock",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: leaning back in shock, both paws raised beside the head, tail feathers bristling, the mouth a small round 'o'. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-shock-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-shock-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-shock-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-shock.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-smug",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw on the hip and the other paw at the chin, head tilted, a smug little smile. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-smug-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-smug-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-smug-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-smug.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-tears",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: both paws clasped at the chest, deeply moved, small drops of blue light falling from his eyes like tears. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-tears-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-tears-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-tears-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-tears.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-think",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+      ],
+      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw at the chin, head tilted to one side, pondering, closed mouth. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "kimorin-iu-think-o",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, tail, framing, size, light and grey background — and change only his small mouth: it is now open, as if speaking a syllable (a small open cute mouth showing a little pink inside). Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-think-notail",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, coat, goggles, box, cable, ears, framing, size, light — but remove the whole fan of tail feathers behind him, so the flat grey background shows where they were. Keep the flat plain mid-grey background (#808080), no floor, no shadow. No text, no letters."
+    },
+    {
+      "id": "kimorin-iu-think-glow",
+      "w": 1152,
+      "h": 1536,
+      "size": [
+        864,
+        1152
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-iu-think.jpg"
+      ],
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
   "redo": []
