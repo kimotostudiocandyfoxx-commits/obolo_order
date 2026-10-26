@@ -30,26 +30,26 @@ type Beat =
   | { k: 'done' };
 
 const BEATS: Beat[] = [
-  { k: 'say', who: 'kaiser', text: '木星は、命が宿る星DA。' },
-  { k: 'say', who: 'kaiser', text: '見た景色も、食べたご飯も、ふと思った言葉も。ここでは『シール』になって、思い出として残るのDA。' },
+  { k: 'say', who: 'kaiser', text: '木星は、命が宿る星ダ。' },
+  { k: 'say', who: 'kaiser', text: '見た景色も、食べたご飯も、ふと思った言葉も。ここでは『シール』になって、思い出として残るのダ。' },
   {
     k: 'say',
     who: 'kaiser',
     text: '百聞は、一見にしかず。……いい言葉DA。我が考えたDA。',
     choices: [
-      { label: '「それ、昔からあることわざだよ」', reply: { who: 'kaiser', text: '……なんと。先に言った者が、おったのDA。' } },
+      { label: '「それ、昔からあることわざだよ」', reply: { who: 'kaiser', text: '……なんと。先に言った者が、おったのダ。' } },
       { label: '黙って見ている', reply: { who: 'kimorin', text: '……自分で言って、自分で感動していますね。' } },
     ],
   },
-  { k: 'say', who: 'kaiser', text: 'きのう土星で、コロリンを作ったな。その言葉から、シールを作るDA。' },
-  { k: 'say', who: 'kaiser', text: '形にしたい言葉を、2つ選ぶDA。' },
+  { k: 'say', who: 'kaiser', text: 'きのう土星で、コロリンを作ったな。その言葉から、シールを作るダ。' },
+  { k: 'say', who: 'kaiser', text: '形にしたい言葉を、2つ選ぶダ。' },
   { k: 'pick' },
   { k: 'make', n: 0 },
   { k: 'make', n: 1 },
   { k: 'say', who: 'guide', text: 'シールを、{neo}だけの根っこにしまいました。誰にも送られていません' },
-  { k: 'say', who: 'kaiser', text: 'シールが2枚たまったら、それは『シール帳』DA。' },
+  { k: 'say', who: 'kaiser', text: 'シールが2枚たまったら、それは『シール帳』ダ。' },
   { k: 'book' },
-  { k: 'say', who: 'kaiser', text: '木星ではな、蝶は『シール』を持って飛ぶDA。' },
+  { k: 'say', who: 'kaiser', text: '木星ではな、蝶は『シール』を持って飛ぶダ。' },
   { k: 'fly' },
   { k: 'done' },
 ];

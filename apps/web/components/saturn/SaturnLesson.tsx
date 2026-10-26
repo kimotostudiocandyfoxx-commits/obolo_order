@@ -37,7 +37,7 @@ const SPRITES: Partial<Record<Who, string>> = { brother: 'takoyaki-brother', sis
 
 /** KIMORIN⭐︎'s words for the stone (his kororin says them in his voice two semitones up) */
 /** the residents' kororin that rolls to your feet on Saturn (story M-R107) */
-const SISTER_SUNSET = '……今日の夕焼け、きれいだったわ。';
+const SISTER_SUNSET = '……今日の夕焼け、きれいだったワ。';
 const KIMORIN_STONE = 'ぷりぷりぷりり！ぷりぷりぷりり！うひょひょひょげへへ！ぷりぷりぷりりり！うん！うん！うんちピンポーン大正かーい！ぷり！げへへへ！ぷりぷり滑り台でボカーン！';
 /** the slip of paper KIMORIN⭐︎ hands over, for anyone who cannot think of words */
 const PAPER = 'ぷりぷりぷりり！うひょひょひょ！げへへ！うん！うん！うんちピンポーン！だいせいかーい！ぷり！げへへへ！ぷりぷりブランコでボカーン！';
@@ -45,22 +45,22 @@ const PAPER = 'ぷりぷりぷりり！うひょひょひょ！げへへ！う�
 const BEATS: Beat[] = [
   // D04-S005 コロリン: outside the temple, a heap of round Saturn stones
   { k: 'say', who: 'brother', text: '土星は原石の星だZE!!' },
-  { k: 'say', who: 'sister', text: 'この原石になんでもいいから言葉を吹き込んでみるといいわ' },
+  { k: 'say', who: 'sister', text: 'この原石になんでもいいから言葉を吹き込んでみるといいワ' },
   { k: 'say', who: 'kimorin', text: '本当になんでもいいんですか？' },
   { k: 'say', who: 'brother', text: 'なんでもいいZE!!' },
-  { k: 'say', who: 'sister', text: '最初はお試しだから“こんにちは”とか、一言で大丈夫だわ。' },
+  { k: 'say', who: 'sister', text: '最初はお試しだから“こんにちは”とか、一言で大丈夫だワ。' },
   { k: 'say', who: 'kimorin', text: 'わかりました。\nでは、、。' },
   { k: 'say', who: 'kimorin', text: KIMORIN_STONE },
-  { k: 'say', who: 'sister', text: '.....吹き込みが終わったら、バティが魔法で石をコロリンにしてくれるわ' }, // シーン……みんなが無言でKIMORINを見つめる
+  { k: 'say', who: 'sister', text: '.....吹き込みが終わったら、バティが魔法で石をコロリンにしてくれるワ' }, // シーン……みんなが無言でKIMORINを見つめる
   { k: 'say', who: 'pinpon', text: 'ピンポーン！', drop: 'kimorin' }, // うんちピンポンくんが石にタッチ → KIMORINの見た目のコロリン
   { k: 'say', who: 'kimorin', text: 'なんですかこのかわいいたこ焼きは！' },
   { k: 'say', who: 'brother', text: 'これはコロリンだZE!!' },
-  { k: 'say', who: 'sister', text: 'コロリンを、タップしてみるといいわ。' },
+  { k: 'say', who: 'sister', text: 'コロリンを、タップしてみるといいワ。' },
   { k: 'say', who: 'kimorin', text: 'タッチ..' },
   { k: 'listen', id: 'kimorin' },
   { k: 'say', who: 'kimorin', text: '楽しいですね。' }, // シーン……
   { k: 'say', who: 'sister', text: 'そう、コロリンは喋るの。' },
-  { k: 'say', who: 'sister', text: '{neo}もやってみたらいいわ。' },
+  { k: 'say', who: 'sister', text: '{neo}もやってみたらいいワ。' },
   { k: 'say', who: 'brother', text: 'なんでもいいから石に声を吹き込むんだZE！' },
   { k: 'say', who: 'kimorin', text: '思いつかない時は、これを読んでください。' },
   { k: 'note', text: `紙に書いてある言葉：\n${PAPER}` },
@@ -83,7 +83,7 @@ const BEATS: Beat[] = [
 ];
 // the branch after the choice
 const TRY: Beat[] = [{ k: 'recNormal', prompt: 'topics' }, { k: 'listen', id: 'mine' }, { k: 'note', text: '−1マナ' }, { k: 'say', who: 'bati', text: 'できた！　ボクが作った、{neo}のコロリン！' }, { k: 'note', text: 'コロリンは、あなたの部屋に、日付と時刻つきで残ります。誰にも送られません' }];
-const SKIP: Beat[] = [{ k: 'say', who: 'sister', text: 'いいわ。つぶやきたくなったら、いつでもどうぞ。' }, { k: 'note', text: 'コロリンは、いつでも作れます（今日でなくても）' }];
+const SKIP: Beat[] = [{ k: 'say', who: 'sister', text: 'いいワ。つぶやきたくなったら、いつでもどうぞ。' }, { k: 'note', text: 'コロリンは、いつでも作れます（今日でなくても）' }];
 const TOPICS = [
   { t: '今したいこと', ex: '滑り台でボカーン！' },
   { t: '最近驚いたこと', ex: 'え！？わき毛ってこんなに美味しいの？' },

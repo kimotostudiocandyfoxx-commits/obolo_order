@@ -13,8 +13,8 @@ export const DAY5: Step[] = [
   // D06-S001 木星の朝
   { t: 'still', image: 'jupiter-kaiser' },
   { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
-  { t: 'say', who: '大根カイザー', text: 'おはようDA。よく眠れたかDA？' },
-  { t: 'say', who: '大根カイザー', text: '今日は水星DA。ロケットに乗るDA！' },
+  { t: 'say', who: '大根カイザー', text: 'おはようダ。よく眠れたかダ？' },
+  { t: 'say', who: '大根カイザー', text: '今日は水星ダ。ロケットに乗るダ！' },
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。……もう、ロケットが待っていますね。' },
   { t: 'action', label: 'ロケットに乗る' },
 
