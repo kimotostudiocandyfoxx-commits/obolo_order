@@ -189,10 +189,11 @@ export function NeoNameInput({ placeholder, submit, onSubmit }: { placeholder: s
 // --- the riddle cards and the book -----------------------------------------------------------------
 /** The eight seals of the riddle book. `answer` appears once the riddle is solved. */
 export const SEALS: Record<number, { q: string; answer?: string }> = {
-  1: { q: 'oboloとは', answer: 'oboloは、街の名前' },
-  2: { q: 'Obolo Orderは全員……', answer: '表現者' },
+  1: { q: 'oboloとは', answer: 'oboloは、町の名前。DJの町' },
+  2: { q: 'Obolo Orderは全員……', answer: 'DJ' },
   3: { q: '結社の目的とは' },
-  6: { q: 'オボロンは……' },
+  4: { q: 'Obolo Orderの敵は……', answer: 'ナガレ' },
+  6: { q: 'OBOLONは……' },
   7: { q: 'コスモスは' },
   8: { q: '宝は' },
 };
@@ -201,11 +202,11 @@ export const DAY1_SEALS = [1, 7, 8];
 /** The words on the riddle cards by the journey day you are on (2 on Saturn, 3 on Jupiter, 6 on Mercury). */
 export function knownSealsOn(day: number): number[] {
   // the book is handed over at the launch pit on day 2 (story M-R61): from day 3 the first three are known
-  return [...(day >= 3 ? DAY1_SEALS : []), ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : [])];
+  return [...(day >= 3 ? DAY1_SEALS : []), ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : []), ...(day >= 7 ? [4] : [])];
 }
-/** Answers that are open (both at the Sun, on day 7 — so from ORDER on). */
+/** Answers that are open (1, 2 and 4 at the Sun, on day 7 — so from ORDER on). */
 export function solvedSealsOn(day: number): number[] {
-  return day >= 8 ? [1, 2] : [];
+  return day >= 8 ? [1, 2, 4] : [];
 }
 
 function Card({ n, lit, size = 64, style }: { n: number; lit: boolean; size?: number; style?: React.CSSProperties }) {
@@ -325,7 +326,7 @@ export function stampsOn(day: number): StampId[] {
 /**
  * The tour ticket (M-R18): the ticket picture with four star-shaped stamp slots — Saturn, Jupiter,
  * Mercury, Mars. `fresh` stamps one now; `flip` turns to the back: the star map, the four planets joined
- * by a gold line, and Venus, Uranus, Neptune locked 『ORDERのみ』. Tap to continue.
+ * by a gold line, and Venus, Uranus, Neptune locked 『Obolo Orderのみ』. Tap to continue.
  */
 export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; onDone: () => void }) {
   const [pressed, setPressed] = useState(!fresh);

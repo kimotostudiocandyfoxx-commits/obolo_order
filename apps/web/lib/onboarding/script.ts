@@ -137,8 +137,8 @@ export type Step =
   /** Day 1: the eight riddle cards rise in a ring, 1・7・8 get their words, and they become the riddle book. */
   | { t: 'riddles' }
   /**
-   * The riddle book opens and card `n` gets its words (day 3: 2 「OBOLO ORDERは全員……」). `open`: its
-   * answer opens too (day 7 at the Sun: 2 「表現者」, 1 「OBOLOは、町の名前」).
+   * The riddle book opens and card `n` gets its words (day 3: 2 「Obolo Orderは全員……」). `open`: its
+   * answer opens too (day 7 at the Sun: 2 「DJ」, 1 「oboloは、町の名前」, 4 「ナガレ」).
    */
   | { t: 'seal'; n: number; open?: boolean }
   /**

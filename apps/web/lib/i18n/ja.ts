@@ -35,7 +35,7 @@ const ja = {
   },
   entry: {
     title: 'メールアドレスを入力してください',
-    lead: '招待を受けたアドレス、またはORDERのアドレス',
+    lead: '招待を受けたアドレス、またはObolo Orderのアドレス',
     next: '次へ',
     codeSent: '{email} に6桁のコードを送りました',
     demoCode: 'デモ用コード: {code}（自動で入力済み）',
@@ -45,7 +45,7 @@ const ja = {
     wrongCode: 'コードが違います',
     demoHint: 'デモモード：どのアドレスでも KIMORIN からの招待として入れます',
     authTitle: '認証',
-    authLead: 'ORDERのメールアドレスを入力してください',
+    authLead: 'Obolo Orderのメールアドレスを入力してください',
     authMismatch: '登録されているアドレスと一致しません',
   },
   journey: {
@@ -67,11 +67,11 @@ const ja = {
   gate: {
     inviteOnly: 'OBOLO ORDER は完全招待制です',
     inviteOnlyLead: '招待メールに届いたリンクから、本部へお越しください。',
-    member: 'ORDERの方はこちら（ログイン）',
+    member: 'Obolo Orderの方はこちら（ログイン）',
     demoInvite: 'デモ用の招待状を開く',
     invalid: 'この招待は見つかりません',
     used: 'この招待はすでに使われています',
-    usedLead: 'すでにORDERの方は、地球からログインしてください。',
+    usedLead: 'すでにObolo Orderの方は、地球からログインしてください。',
     expired: 'この招待は有効期限が切れています',
     alreadyMember: 'この招待はもう受け取っています。ホームから続きへどうぞ',
     toHome: 'ホームへ',
@@ -95,7 +95,7 @@ const ja = {
   },
   earth: {
     loginTitle: '地球にようこそ',
-    loginLead: 'ORDERの方はメールアドレスでログイン（新規の方は招待リンクから）',
+    loginLead: 'Obolo Orderの方はメールアドレスでログイン（新規の方は招待リンクから）',
     notInvited: 'このメールアドレスはORDERに登録されていません。OBOLO ORDER は招待制です。',
     invite: '仲間を招待する',
     inviteLead: '招待されたメールアドレスの人だけが本部に入れます',
