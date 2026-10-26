@@ -174,7 +174,9 @@
     "KIMORIN": {
       "fish": "design/story/voices/kimorin-sample.m4a",
       "label": "録音から",
-      "model": "84b27f575dba40e4bc7cabe20ac11b0f"
+      "model": "84b27f575dba40e4bc7cabe20ac11b0f",
+      "pitch": -1,
+      "tempo": 0.85
     },
     "OBOLON": {
       "voice": "Gacrux",
@@ -207,7 +209,9 @@
       "brief": "Bati: a tiny newborn magical creature, the player's partner; a cheerful, innocent, childlike voice, bright and bouncy, curious about everything, kind"
     }
   },
-  "redo": [],
+  "redo": [
+    "KIMORIN"
+  ],
   "batch": 900,
   "parts": [
     "P01",
@@ -759,6 +763,158 @@
     {
       "who": "OBOLON",
       "text": "眺めているうちに、、、自分の声を、忘れる。"
+    },
+    {
+      "who": "MONBAN",
+      "text": "お前はObolo Orderに招待された...だから知る権利がある。"
+    },
+    {
+      "who": "MONBAN",
+      "text": "どうだ、宇宙へ行ってみるか？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "これはこれは、、、とても手の込んだ手品ですね、、。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "宇宙に行きたいかですって？ふふ、、"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "もちろんそれには、、お金が、かかりますよねー？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "…………。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "、、、そうですか！それではめちゃくちゃ宇宙に行かせていただきます！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "宇宙行きの切符、私の家に、送っといてください。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "すごい、、全然どういう仕組みかわからん、、、。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "それでは私たちも行きましょう。。。コスモスへ！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "変な答えを言ってしまったらどうしよう。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "間違えていたらどうしよう。と、頭を抱える人も少なくない。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。"
+    },
+    {
+      "who": "OBOLON",
+      "text": "、、、Obolo Orderは、完全招待制だ。"
+    },
+    {
+      "who": "OBOLON",
+      "text": "招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "え？、、そうなの？、、、、は！、、ゴホンゴホン！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "なるほどなるほど、、そうですか。確かにそうですよね？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "あなた達詐欺グループソボロオーダーさん達は脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？"
+    },
+    {
+      "who": "OBOLON",
+      "text": "...."
+    },
+    {
+      "who": "KIMORIN",
+      "text": "はい出ました、詐欺グループ確定オツ。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "SNSに書くな。は詐欺手口の王道テク鉄板の流れ。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "そりゃ色々バレたら、まずいですもんねー？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "私は、KIMORINという、親からもらったこの名前を、気に入っています。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "できれば、変えたくありません。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "おはようございます。いつまで寝ているのですか？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "私はもちろんスキップさせていただきました。これ待つ人いるんですかね？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "さぁ、早く、冒険の続きをしますよ。謎を、解き明かさねば。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "そしてコスモスを見つけ、宝を手に入れるのです。"
+    },
+    {
+      "who": "OBOLON",
+      "text": "Bluena（ブルーナ）だ。"
+    },
+    {
+      "who": "OBOLON",
+      "text": "地球のブルーに、月のルナ、その名の通り、地球と月、宇宙を繋げるものだ。"
+    },
+    {
+      "who": "OBOLON",
+      "text": "星を越えても、、、これで繋がれる。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "遊び、、？いえ、、、私達はコスモスを見つけ、宝を手に入れたいのです。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "その為に謎を解き明かしに土星にきました！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "決して遊びなどではありません。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "、、、ふふふふ。もももちろん発明はとても楽しい遊びです。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "私は遊びを仕事に、仕事を遊びにするという発明をしたのです。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "そう、そんな私からすると謎解きも、宝探しも、この土星の旅も楽しみの一環、つまり遊びなのです。"
     }
   ]
 }

@@ -48,6 +48,8 @@ interface Spec {
   brief?: string;
   /** shown on the audition page */
   label?: string;
+  /** this speaker's own speed on top of "tempo" (KIMORIN 0.85: calmer and slower, client 2026-10-26) */
+  tempo?: number;
 }
 type VoiceRef = string | Spec;
 interface Audition {

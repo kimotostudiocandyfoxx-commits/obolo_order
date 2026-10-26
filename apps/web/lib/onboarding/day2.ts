@@ -96,19 +96,23 @@ export const DAY2: Step[] = [
   { t: 'wait', s: 3.5 }, // 地球が出てから（client 2026-10-22）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
   { t: 'bgvideo', motion: 'd2-monban-walkin' }, // 星空の下、MONBANが入り口から歩いてきて、KIMORINの横に立つ
-  { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。どうだ、宇宙へ行ってみるか？' }, // MONBANが入り口から歩きながら
+  { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' }, // MONBANが入り口から歩きながら
+  { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'still', image: 's/d2-hall-sky-empty' }, // 星空の大広間（人物なし）
   { t: 'sprite', image: ['monban', 'kimorin-n'] },
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
   { t: 'bgm', track: 'comedy' }, // お金の話から、KIMORINの調子が戻る
-  { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、\nとても手の込んだ手品ですね、、。\n宇宙に行きたいかですって？\nふふ、、\nもちろんそれには、、お金が、かかりますよねー？' },
+  { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、とても手の込んだ手品ですね、、。' },
+  { t: 'say', who: 'KIMORIN', text: '宇宙に行きたいかですって？ふふ、、' }, // 長いセリフを分けた（client 2026-10-26）
+  { t: 'say', who: 'KIMORIN', text: 'もちろんそれには、、お金が、かかりますよねー？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'MONBAN', text: 'かからない。' },
   { t: 'say', who: 'KIMORIN', text: 'え？　本当に？' },
   { t: 'say', who: 'MONBAN', text: '本当だ' },
   { t: 'say', who: 'KIMORIN', text: '後から請求書を送ってきたりしない？' },
   { t: 'say', who: 'OBOLON', text: 'しない。' },
   { t: 'say', who: 'KIMORIN', text: '…………。' },
-  { t: 'say', who: 'KIMORIN', text: '、、、そうですか！\nそれではめちゃくちゃ宇宙に行かせていただきます！宇宙行きの切符、私の家に、送っといてください。' },
+  { t: 'say', who: 'KIMORIN', text: '、、、そうですか！それではめちゃくちゃ宇宙に行かせていただきます！' },
+  { t: 'say', who: 'KIMORIN', text: '宇宙行きの切符、私の家に、送っといてください。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-kimorin-leave' }, // 門の内側から入口のほうを見た景色で。 咳払いして、ローブの裾をひるがえし、鼻歌で門の外へ。扇の尾をぱたぱた、光の点になって空へ
   { t: 'say', who: 'KIMORIN', text: 'ふんふ、ふーん♪　宇宙、宇宙♪　うっちゅう、うっちゅう〜♪' },
@@ -159,7 +163,8 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-monban-pit' },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
   { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
-  { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。\nそれでは私たちも行きましょう。。。コスモスへ！' },
+  { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。' },
+  { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。コスモスへ！' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'MONBAN', text: '月だ' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
@@ -191,24 +196,31 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
   { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
-  { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。間違えていたらどうしよう。と、頭を抱える人も少なくない。' },
+  { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。' },
+  { t: 'say', who: 'KIMORIN', text: '間違えていたらどうしよう。と、頭を抱える人も少なくない。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
   { t: 'still', image: 's/d2-moon-in' }, // シーン……
   { t: 'sprite', image: ['', 'kimorin-n'] },
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
-  { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' },
+  { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。' },
+  { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
   { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
-  { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？、、、、は！、、ゴホンゴホン！なるほどなるほど、、そうですか。確かにそうですよね？あなた達詐欺グループソボロオーダーさん達は脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？' }, // (ピンとくる)
+  { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },
+  { t: 'say', who: 'OBOLON', text: '招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' }, // 長いセリフを分けた（client 2026-10-26）
+  { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？、、、、は！、、ゴホンゴホン！' }, // (ピンとくる)
+  { t: 'say', who: 'KIMORIN', text: 'なるほどなるほど、、そうですか。確かにそうですよね？' }, // 長いセリフを分けた（client 2026-10-26）
+  { t: 'say', who: 'KIMORIN', text: 'あなた達詐欺グループソボロオーダーさん達は脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'OBOLON', text: '....' },
   { t: 'say', who: 'KIMORIN', text: 'それでは一つお聞きしてもいいですか？\nここのことをSNSに書いてもいいですか？' },
   { t: 'say', who: 'OBOLON', text: 'だめだ' },
-  { t: 'say', who: 'KIMORIN', text: 'はい出ました、詐欺グループ確定オツ。SNSに書くな。は詐欺手口の王道テク鉄板の流れ。そりゃ色々バレたら、まずいですもんねー？' },
+  { t: 'say', who: 'KIMORIN', text: 'はい出ました、詐欺グループ確定オツ。' },
+  { t: 'say', who: 'KIMORIN', text: 'SNSに書くな。は詐欺手口の王道テク鉄板の流れ。' }, // 長いセリフを分けた（client 2026-10-26）
+  { t: 'say', who: 'KIMORIN', text: 'そりゃ色々バレたら、まずいですもんねー？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'bgm', track: 'moon' },
   { t: 'say', who: 'OBOLON', text: 'そのままでは、だめだ。ただ条件を守れば、ここのことを、自由に話していい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？条件？' },
@@ -253,7 +265,8 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'OBOLON', text: '次は、、、名前だ。' },
   { t: 'say', who: 'OBOLON', text: '秘密結社用の、名前は、、どうする？' }, // 黒い球が、KIMORINのほうへ向く
-  { t: 'say', who: 'KIMORIN', text: '私は、KIMORINという、親からもらったこの名前を、気に入っています。できれば、変えたくありません。' },
+  { t: 'say', who: 'KIMORIN', text: '私は、KIMORINという、親からもらったこの名前を、気に入っています。' },
+  { t: 'say', who: 'KIMORIN', text: 'できれば、変えたくありません。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'OBOLON', text: '、、、それだと、ダメだ。変えないとこの先にいけない。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか。わかりました。' },
   { t: 'say', who: 'KIMORIN', text: 'では、KIMORIN⭐︎で。' },

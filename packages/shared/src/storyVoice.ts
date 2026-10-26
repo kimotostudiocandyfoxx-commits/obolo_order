@@ -17,6 +17,8 @@ export interface StoryVoiceSpec {
   formant?: 'preserved' | 'shifted';
   brief?: string;
   label?: string;
+  /** this speaker's own speed on top of the story tempo (KIMORIN 0.85: calmer, client 2026-10-26) */
+  tempo?: number;
 }
 
 /** public/story/voices/name-lines.json */
@@ -83,7 +85,8 @@ export function storyVoiceFilter(s: StoryVoiceSpec, tempo: number): string {
     const d = (0.25 + 0.35 * s.echo).toFixed(2);
     f.push(`aecho=0.85:0.75:170|340:${d}|${(+d / 2).toFixed(2)}`);
   }
-  if (Math.abs(tempo - 1) >= 0.001) f.push(`atempo=${tempo.toFixed(4)}`);
+  const speed = tempo * (s.tempo ?? 1);
+  if (Math.abs(speed - 1) >= 0.001) f.push(`atempo=${speed.toFixed(4)}`);
   f.push('loudnorm=I=-18:TP=-1.5');
   return f.join(',');
 }
