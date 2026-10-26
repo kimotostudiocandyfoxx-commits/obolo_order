@@ -35,6 +35,9 @@ async function call(tasks) {
     signal: AbortSignal.timeout(180_000),
   });
   const j = await res.json().catch(() => ({}));
+  // a task still being made comes back as 500 with its data and no errors (2026-10-26): not a failure
+  const stillMaking = !res.ok && !j.errors?.length && Array.isArray(j.data) && j.data.length > 0 && j.data.every((d) => !d.status || d.status === 'processing');
+  if (stillMaking) return j.data;
   if (!res.ok || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 1500)}`);
   return j.data ?? [];
 }
