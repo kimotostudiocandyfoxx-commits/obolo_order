@@ -1,5 +1,7 @@
-# UI art — 2026-10-26T19:00:44.162Z
+# UI art — 2026-10-26T19:25:52.166Z
 
-Seedream 5.0 Pro / 1枚 / 約8円
+Seedream 5.0 Pro / 3枚 / 約7円
 
-- ✅ bluena
+- ✅ jacket-kaiser
+- ✅ jacket-puripuri
+- ✅ jupiter-stone
