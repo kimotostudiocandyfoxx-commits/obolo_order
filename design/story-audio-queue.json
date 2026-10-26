@@ -320,7 +320,9 @@
       "kind": "bgm",
       "prompt": "Epic tearful orchestral power ballad, sweeping strings, grand piano, timpani, a male lead singing with deep emotion, a huge choir joining in the chorus. Cinematic, heartfelt, almost too dramatic.",
       "settings": {
-        "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
+        "settings": {
+          "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
+        }
       }
     }
   ],
