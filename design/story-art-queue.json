@@ -439,11 +439,10 @@
         1280
       ],
       "refs": [
-        "design/story/frames/d1-hall.jpg",
-        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
-        "design/story/refs/client/kimorin-normal.jpg"
+        "apps/web/public/onboarding/s/d2-hall-kimorin-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: keep the hall of the first picture exactly as it is — the same dark-gold hall with the golden armillary spheres on both sides, the arches of fine gold rings, the reflective floor with the glowing magic circles, the thin pillar of light in the middle with the small black sphere with closed eyes floating low in it, the same camera, framing, light and colors. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. Only add KIMORIN, full body, standing on the floor in the lower right foreground, turned toward the black sphere and looking up at it, lit warmly by the hall's golden light, with a soft reflection on the floor. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are worn over his eyes: his eyes do not glow and cannot be seen. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "always": false
     },
     {
@@ -455,12 +454,10 @@
         1280
       ],
       "refs": [
-        "design/story/frames/d1-hall.jpg",
-        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/monban.jpg"
+        "apps/web/public/onboarding/s/d2-hall-run-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: keep the hall of the first picture exactly as it is — the same dark-gold hall with the golden armillary spheres on both sides, the arches of fine gold rings, the reflective floor with the glowing magic circles, the thin pillar of light in the middle with the small black sphere with closed eyes floating low in it, the same camera, framing, light and colors. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. Only add two figures: in the lower foreground KIMORIN, full body, out of breath and bent forward, both hands clutching a slender golden space ticket to his chest; and at the left, a little further back, the tall hooded gatekeeper of the fourth picture (long black robe with fine gold patterns, a single golden eye under the hood, a golden magic-circle halo behind his head) standing calmly. Both lit warmly by the hall's golden light, with soft reflections on the floor. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "always": false
     },
     {
@@ -567,10 +564,11 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/rocket-inside-b.jpg",
-        "design/story/refs/client/kimorin-normal.jpg"
+        "apps/web/public/onboarding/s/d2-rocket-in-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "A vertical view inside the rocket of the reference: purple and cyan neon, a big window with the night Earth below, a conveyor lane of domed sushi plates by the window, a glowing dance floor and bar further back. KIMORIN stands by the window gazing out at the Earth, seen in three-quarter view. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and vermilion feather tails behind; his eyes NEVER open — only thin glowing blue slits on the white mask, no other eyes anywhere. His round sunglasses rest up on his forehead above the mask (normal look). IMPORTANT: KIMORIN's eyes are NOT covered — his round dark sunglasses are pushed right up and rest on top of his hood above the mask, clearly away from the face; the two thin glowing blue slit eyes on the white mask are fully visible and closed (never open, no other eyes)."
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
+      "always": false
     },
     {
       "id": "d2-moon-in",
@@ -595,11 +593,11 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/moon-temple-inside.jpg",
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/obolon.jpg"
+        "apps/web/public/onboarding/s/d2-moon-kimorin-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Inside the moon temple: KIMORIN stands at the edge of the round shallow water basin in the centre, arms spread wide; OBOLON floats in a pillar of light beyond the basin. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and vermilion feather tails behind; his eyes NEVER open — only thin glowing blue slits on the white mask, no other eyes anywhere. His round sunglasses rest up on his forehead above the mask (normal look). OBOLON exactly as in the reference: a pure black floating sphere with a thin glowing white rim like an eclipse corona and two white crescent eyes (closed smiling eyes), no mouth. IMPORTANT: KIMORIN's eyes are NOT covered — his round dark sunglasses are pushed right up and rest on top of his hood above the mask, clearly away from the face; the two thin glowing blue slit eyes on the white mask are fully visible and closed (never open, no other eyes). KIMORIN is large in the frame, in the lower half, seen from the front."
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
+      "always": false
     },
     {
       "id": "d2-pinpon",
@@ -610,10 +608,11 @@
         1280
       ],
       "refs": [
-        "design/story/refs/client/pinpon25.jpg",
-        "design/story/refs/client/kimorin-normal.jpg"
+        "apps/web/public/onboarding/s/d2-pinpon-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Close-up: KIMORIN's white gloved hand with blue paw pads holds up, palm open, the small silver box of the reference with its round glass button whose rim glows gold; KIMORIN's masked face out of focus behind. KIMORIN is a small cute fox-masked character exactly as in the reference: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and vermilion feather tails behind; his eyes NEVER open — only thin glowing blue slits on the white mask, no other eyes anywhere. His round sunglasses rest up on his forehead above the mask (normal look). No letters. IMPORTANT: KIMORIN's eyes are NOT covered — his round dark sunglasses are pushed right up and rest on top of his hood above the mask, clearly away from the face; the two thin glowing blue slit eyes on the white mask are fully visible and closed (never open, no other eyes)."
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. He presses the button in his paw. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
+      "always": false
     },
     {
       "id": "d2-dragon",
@@ -720,12 +719,10 @@
     {
       "id": "d2-gate-two-inside",
       "refs": [
-        "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-        "design/story/refs/client/kimorin-entrance.jpg",
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/monban.jpg"
+        "apps/web/public/onboarding/s/d2-gate-two-inside-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: keep the view of the first picture exactly as it is — looking back out through the great dark-gold gate from inside, the round armillary sphere above the arch, the lanterns, the sunset sky and the long avenue of spires through the arch, the same camera, framing, light and colors. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. Only add two figures in the arch opening, facing each other in profile: the tall hooded gatekeeper on the left and the small KIMORIN on the right looking up at him, both backlit by the sunset. The gatekeeper is the tall hooded figure of the reference: long black robe with fine gold patterns, a single golden eye under the hood, a golden magic-circle halo behind his head. KIMORIN is the small cute fox-masked character of the reference pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers. He wears round dark sunglasses over his eyes; their black lenses completely hide the eye slits — no glow and no eyes show through, above or around the sunglasses. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are worn over his eyes: his eyes do not glow and cannot be seen. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "w": 1152,
       "h": 2048,
       "size": [
@@ -737,11 +734,10 @@
     {
       "id": "d2-kimorin-close-in",
       "refs": [
-        "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-        "design/story/refs/client/kimorin-entrance.jpg",
-        "design/story/refs/client/kimorin-normal.jpg"
+        "apps/web/public/onboarding/s/d2-kimorin-close-in-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Close-up from the chest up of KIMORIN facing the camera, inside the great gate; behind him, softly out of focus, the arch of the first picture with the sunset sky and the avenue of spires. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. KIMORIN is the small cute fox-masked character of the reference pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers. He wears round dark sunglasses over his eyes; their black lenses completely hide the eye slits — no glow and no eyes show through, above or around the sunglasses. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are worn over his eyes: his eyes do not glow and cannot be seen. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "w": 1152,
       "h": 2048,
       "size": [
@@ -769,11 +765,10 @@
     {
       "id": "d2-hall-dark-kimorin",
       "refs": [
-        "design/story/frames/d1-hall.jpg",
-        "design/story/refs/client/kimorin-normal.jpg",
-        "apps/web/public/onboarding/s/d2-kimorin-close-up-in.jpg"
+        "apps/web/public/onboarding/s/d2-hall-dark-kimorin-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: the same dark-gold hall with the golden armillary spheres, the arches of gold rings and the reflective floor with magic circles, same camera and framing — but almost dark: the pillar of light and the black sphere are not there yet, only faint gold glints in the darkness. Only add KIMORIN, full body, seen from behind, standing in the middle of the floor a little way ahead of the camera, looking up into the dark. KIMORIN is the small cute fox-masked character of the reference pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers. His round dark sunglasses are pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are worn over his eyes: his eyes do not glow and cannot be seen. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "w": 1152,
       "h": 2048,
       "size": [
@@ -785,11 +780,10 @@
     {
       "id": "d2-gate-inside-kimorin-leave",
       "refs": [
-        "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-        "design/story/refs/client/kimorin-normal.jpg",
-        "apps/web/public/onboarding/s/d2-kimorin-close-up-in.jpg"
+        "apps/web/public/onboarding/s/d2-gate-inside-kimorin-leave-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: keep the view exactly as it is — looking out through the great dark-gold gate from inside, the armillary sphere above the arch, the lanterns, the sunset sky and the avenue of spires through the arch, the same camera, framing, light and colors. Only add KIMORIN, full body, seen from behind in the lower foreground, strutting happily toward the arch, his fan of tail feathers swaying to one side. KIMORIN is the small cute fox-masked character of the reference pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers. His round dark sunglasses are pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark.",
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture.",
       "w": 1152,
       "h": 2048,
       "size": [
@@ -2100,11 +2094,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
-        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
-        "design/story/refs/client/kimorin-normal.jpg"
+        "apps/web/public/onboarding/s/d2-hall-sky-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: keep the hall, the camera, the framing, the floor with the glowing magic circles, the golden armillary spheres on both sides, the thin pillar of light with the small black sphere with closed eyes floating low in it, and KIMORIN in the lower right foreground exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. KIMORIN now tilts his head back, looking straight up at the Earth in awe. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture."
     },
     {
       "id": "d2-hall-sky-monban",
@@ -2116,12 +2109,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/d2-hall-kimorin.jpg",
-        "apps/web/public/onboarding/s/d2-kimorin-close-up.jpg",
-        "design/story/refs/client/kimorin-normal.jpg",
-        "design/story/refs/client/monban.jpg"
+        "apps/web/public/onboarding/s/d2-hall-sky-monban-v1.jpg",
+        "apps/web/public/onboarding/s/kimorin-inv.jpg"
       ],
-      "prompt": "Edit the first picture: keep the hall, the camera, the framing, the floor with the glowing magic circles, the golden armillary spheres on both sides, the thin pillar of light with the small black sphere with closed eyes floating low in it, and KIMORIN in the lower right foreground exactly as they are. Only change the ceiling and the upper half of the picture: the high ceiling has dissolved into an open, deep starry night sky full of stars and a soft violet-blue nebula, and high above the black sphere floats the planet Earth, blue and white, wrapped in thin luminous golden rings like an armillary sphere, glowing gently; the hall below is lit by soft blue starlight mixed with the warm gold. KIMORIN stands in the lower right foreground looking up at the Earth in awe. Add one more figure: at the left, a little further back, the tall hooded gatekeeper of the fourth picture (long black robe with fine gold patterns, a single golden eye under the hood, a golden magic-circle halo behind his head) standing calmly, facing KIMORIN, as if he has just walked in from the entrance; lit by the starlight and gold, with a soft reflection on the floor. Vertical 9:16, cinematic anime film quality, no text, no letters, no logos, no watermark. KIMORIN is the small cute fox-masked character of the second and third pictures, exactly as there: deep-red hooded robe with silver trim, white fox mask with blue spiral cheeks and a blue mark on the forehead, white-and-blue fox ears, a fan of white, black and red tail feathers, round dark sunglasses pushed up on top of his hood. This fox-masked character's eyes never open: only thin glowing blue slits on the white mask, no other eyes anywhere."
+      "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture."
     },
     {
       "id": "d2-hall-sky-empty",
@@ -3629,5 +3620,17 @@
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel — and change only the two thin eye slits: they glow much brighter, an intense luminous cyan-blue light with a soft halo around each slit. Keep the flat plain mid-grey background (#808080). No text, no letters."
     }
   ],
-  "redo": []
+  "redo": [
+    "d2-gate-inside-kimorin-leave",
+    "d2-gate-two-inside",
+    "d2-hall-dark-kimorin",
+    "d2-hall-kimorin",
+    "d2-hall-run",
+    "d2-hall-sky",
+    "d2-hall-sky-monban",
+    "d2-kimorin-close-in",
+    "d2-moon-kimorin",
+    "d2-pinpon",
+    "d2-rocket-in"
+  ]
 }
