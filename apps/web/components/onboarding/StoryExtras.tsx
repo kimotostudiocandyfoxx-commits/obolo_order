@@ -1,5 +1,6 @@
 'use client';
 
+import { isDemoMode } from '@/lib/onboarding/demoMode';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motionUrl, SE_FILES, seUrl, spriteUrl } from '@/lib/onboarding/media';
 import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
@@ -81,17 +82,22 @@ export function VoiceField({
   placeholder,
   maxLength = 20,
   multiline = false,
+  light = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder: string;
   maxLength?: number;
   multiline?: boolean;
+  /** on a white panel (the planet lessons): dark text */
+  light?: boolean;
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const mic = useDictation({ field: ref, value, onChange, maxLength });
   const withMic = useContext(MicAllowed);
-  const cls = `min-w-0 flex-1 border-b bg-transparent px-2 py-2 text-amber-50 outline-none placeholder:text-white/35 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] ${mic.listening ? 'border-rose-300' : 'border-amber-100/45 focus:border-amber-200/90'}`;
+  const cls = light
+    ? `min-w-0 flex-1 rounded-xl border bg-white px-3 py-2 text-slate-800 outline-none placeholder:text-slate-400 ${mic.listening ? 'border-rose-400' : 'border-slate-300 focus:border-amber-400'}`
+    : `min-w-0 flex-1 border-b bg-transparent px-2 py-2 text-amber-50 outline-none placeholder:text-white/35 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] ${mic.listening ? 'border-rose-300' : 'border-amber-100/45 focus:border-amber-200/90'}`;
   return (
     <div>
       <div className="flex items-center gap-2">
@@ -116,6 +122,11 @@ export function VoiceField({
         </button>
         )}
       </div>
+      {isDemoMode() && !value && (
+        <button type="button" onClick={() => onChange(placeholder.split('／')[0].slice(0, maxLength))} className={`mt-1.5 text-[11px] tracking-wider underline ${light ? 'text-amber-600' : 'text-amber-200/70'}`}>
+          例で進む
+        </button>
+      )}
       <p className="mt-1 min-h-4 text-center text-[11px] text-amber-100/60">
         {!withMic ? '' : mic.listening ? mic.interim || 'きいています… 話しおわったら、もう一度タップ' : mic.error === 'denied' ? 'マイクを許可してください' : mic.supported ? '🎙 を押して話すか、文字で入力' : ''}
       </p>

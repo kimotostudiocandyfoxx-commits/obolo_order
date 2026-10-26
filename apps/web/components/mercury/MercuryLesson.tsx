@@ -346,7 +346,7 @@ export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: {
                 )}
               </p>
               <div className="mt-3">
-                <VoiceField value={words} onChange={setWords} placeholder={from === 'prev' ? 'うれしかった／ちょっとさみしかった／まだ言葉にならない' : '海のこと／冷蔵庫のこと／いま思ったこと'} maxLength={60} />
+                <VoiceField light value={words} onChange={setWords} placeholder={from === 'prev' ? 'うれしかった／ちょっとさみしかった／まだ言葉にならない' : '海のこと／冷蔵庫のこと／いま思ったこと'} maxLength={60} />
               </div>
               <div className="mt-3 space-y-2">
                 <Big

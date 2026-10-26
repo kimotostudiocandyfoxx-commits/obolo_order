@@ -53,7 +53,8 @@ export function ChatLog({
   /** the newest line is the one being read now (shows the tap mark when it is done) */
   live: boolean;
 }) {
-  const shown = entries.slice(-5);
+  // three bubbles at most; the older ones fade and shrink fast so they don't sit over the standing pictures (story chat, 2026-10-26)
+  const shown = entries.slice(-3);
   const last = shown[shown.length - 1];
   return (
     <div
@@ -62,6 +63,7 @@ export function ChatLog({
         bottom: `calc(${bottom}px + env(safe-area-inset-bottom))`,
         top: '18%',
         fontFamily: SANS,
+        background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.28) 45%, transparent 100%)',
         WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 62%, transparent 100%)',
         maskImage: 'linear-gradient(to top, #000 0%, #000 62%, transparent 100%)',
       }}
@@ -72,7 +74,7 @@ export function ChatLog({
           const prev = shown[k - 1];
           const grouped = e.kind === 'them' && prev?.kind === 'them' && prev.who === e.who;
           return (
-            <div key={e.id} style={{ opacity: Math.max(0.32, 1 - age * 0.16), transition: 'opacity 500ms ease' }}>
+            <div key={e.id} style={{ opacity: age === 0 ? 1 : age === 1 ? 0.5 : 0.22, transform: age ? `scale(${age === 1 ? 0.95 : 0.9})` : undefined, transformOrigin: e.kind === 'me' ? 'bottom right' : 'bottom left', transition: 'opacity 400ms ease, transform 400ms ease' }}>
               {e.kind === 'sys' ? (
                 <SysLine text={e.text} />
               ) : e.kind === 'me' ? (

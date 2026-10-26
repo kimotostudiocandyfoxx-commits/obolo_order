@@ -1,24 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { StoryPlayer } from "@/components/onboarding/StoryPlayer";
-import {
-  knownSealsOn,
-  solvedSealsOn,
-  stampsOn,
-} from "@/components/onboarding/StoryExtras";
-import {
-  demoBati,
-  demoStickerArt,
-  demoFromReference,
-  demoNeoLooks,
-  demoRefine,
-} from "@/lib/look";
-import { getApi } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-import type { LessonApi } from "@/lib/onboarding/lessonApi";
-import type { Made } from "@/lib/onboarding/made";
-import type { Step, StoryVars } from "@/lib/onboarding/script";
+import { useState } from 'react';
+import { setDemoMode } from '@/lib/onboarding/demoMode';
+import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
+import { knownSealsOn, solvedSealsOn, stampsOn } from '@/components/onboarding/StoryExtras';
+import { demoBati, demoStickerArt, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
+import { getApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import type { LessonApi } from '@/lib/onboarding/lessonApi';
+import type { Made } from '@/lib/onboarding/made';
+import type { Step, StoryVars } from '@/lib/onboarding/script';
 
 /**
  * One day of the first journey with no server (the review pages and the testers' link): the look and
@@ -37,45 +28,45 @@ export const fakeLessonApi: LessonApi = {
     const line = (text: string) => ({ text, kana: text, notes: [] });
     return {
       title: words.slice(0, 12),
-      emoji: "🎵",
-      genre: "pop",
-      mood: "bright",
+      emoji: '🎵',
+      genre: 'pop',
+      mood: 'bright',
       bpm: 112,
       keyRoot: 0,
-      scale: "major",
+      scale: 'major',
       progression: [0, 4, 5, 3],
-      chords: ["C", "G", "Am", "F"],
+      chords: ['C', 'G', 'Am', 'F'],
       sections: [
         {
-          name: "verse",
-          lines: [line(words), line("きょうも、空を見上げてた")],
+          name: 'verse',
+          lines: [line(words), line('きょうも、空を見上げてた')],
         },
         {
-          name: "chorus",
-          lines: [line("ころがれ、ころがれ、星まで"), line(words)],
+          name: 'chorus',
+          lines: [line('ころがれ、ころがれ、星まで'), line(words)],
         },
       ],
-      instrumentalPrompt: "",
-      comment: "できたよ！",
+      instrumentalPrompt: '',
+      comment: 'できたよ！',
       seconds: 60,
     };
   },
   sing: async (d, onStage) => {
-    onStage?.("singing");
+    onStage?.('singing');
     await wait(3000);
     onStage?.(null);
     return {
-      id: "preview-song",
+      id: 'preview-song',
       title: d.title,
-      url: "/onboarding/bgm-opening.m4a",
+      url: '/onboarding/bgm-opening.m4a',
     };
   },
   saveSong: async () => {},
   mv: async (song, _wish, lyrics) => {
     await wait(4000);
     return {
-      id: "preview-mv",
-      url: "/onboarding/m3-3.mp4",
+      id: 'preview-mv',
+      url: '/onboarding/m3-3.mp4',
       poster: null,
       title: lyrics ? `${song.title}（歌詞つき）` : song.title,
     };
@@ -84,11 +75,7 @@ export const fakeLessonApi: LessonApi = {
 
 /** What the earlier days made, for previewing a day on its own. */
 export function previewMade(day: number): Made {
-  const kororins = [
-    "きょうの空、ひろかった",
-    "ラーメンの湯気がきれい",
-    "くしゃみ三回",
-  ];
+  const kororins = ['きょうの空、ひろかった', 'ラーメンの湯気がきれい', 'くしゃみ三回'];
   const stickers = [
     { text: kororins[0], url: null },
     { text: kororins[1], url: null },
@@ -99,9 +86,9 @@ export function previewMade(day: number): Made {
     song:
       day >= 6
         ? {
-            id: "preview-song",
-            title: "きょうの空",
-            url: "/onboarding/bgm-opening.m4a",
+            id: 'preview-song',
+            title: 'きょうの空',
+            url: '/onboarding/bgm-opening.m4a',
             jacket: null,
             words: kororins[0],
           }
@@ -109,10 +96,10 @@ export function previewMade(day: number): Made {
     mv:
       day >= 7
         ? {
-            id: "preview-mv",
-            url: "/onboarding/m3-3.mp4",
+            id: 'preview-mv',
+            url: '/onboarding/m3-3.mp4',
             poster: null,
-            title: "きょうの空",
+            title: 'きょうの空',
           }
         : undefined,
   };
@@ -149,11 +136,12 @@ export function DemoDay({
   onBatiName?: (name: string) => void;
   onBati?: (url: string) => void;
 }) {
+  setDemoMode(!live);
   const [round, setRound] = useState(0);
   const [refines, setRefines] = useState(0);
   const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
   const [ordered, setOrdered] = useState(false);
-  const [batiFood, setBatiFood] = useState("ラーメン");
+  const [batiFood, setBatiFood] = useState('ラーメン');
   const { setMe } = useAuth();
   const done = (url: string) => {
     onBati?.(url);
@@ -173,7 +161,7 @@ export function DemoDay({
       timeUp={timeUp}
       onTimeUp={onTimeUp}
       onNeoName={async (n) => onNeoName?.(n)}
-      initial={start > 0 ? { i: start, name: "テスト", answers: {} } : null}
+      initial={start > 0 ? { i: start, name: 'テスト', answers: {} } : null}
       onProgress={() => {}}
       onName={async (n) => onName?.(n)}
       onNeo={async (id) => onNeoForm?.(id)}
@@ -185,7 +173,7 @@ export function DemoDay({
               choose: async (id) => {
                 const u = await getApi().chooseLook(id);
                 setMe(u);
-                return u.avatarUrl ?? "";
+                return u.avatarUrl ?? '';
               },
               chooseForm: async (id) => {
                 setMe(await getApi().updateMe({ neoForm: id }));
@@ -196,33 +184,17 @@ export function DemoDay({
               candidates: async (a) => {
                 await new Promise((r) => setTimeout(r, 1500));
                 const urls =
-                  "reference" in a
-                    ? await Promise.all(
-                        [0, 1, 2, 3].map((k) =>
-                          demoFromReference(
-                            `data:${a.reference.mime};base64,${a.reference.data}`,
-                            a,
-                            k + round * 4,
-                          ),
-                        ),
-                      )
-                    : "like" in a
-                      ? await Promise.all(
-                          [0, 1, 2, 3].map((k) =>
-                            demoRefine(
-                              cands.find((c) => c.id === a.like)?.url ?? "",
-                              "",
-                              k + round * 4,
-                            ),
-                          ),
-                        )
+                  'reference' in a
+                    ? await Promise.all([0, 1, 2, 3].map((k) => demoFromReference(`data:${a.reference.mime};base64,${a.reference.data}`, a, k + round * 4)))
+                    : 'like' in a
+                      ? await Promise.all([0, 1, 2, 3].map((k) => demoRefine(cands.find((c) => c.id === a.like)?.url ?? '', '', k + round * 4)))
                       : demoNeoLooks(
-                          "animal" in a
+                          'animal' in a
                             ? a
                             : {
-                                animal: "おまかせ",
-                                color: "おまかせ",
-                                mood: "おまかせ",
+                                animal: 'おまかせ',
+                                color: 'おまかせ',
+                                mood: 'おまかせ',
                               },
                           round,
                         );
@@ -242,11 +214,7 @@ export function DemoDay({
                 const c = await Promise.all(
                   [0, 1, 2, 3].map(async (k) => ({
                     id: `r${refines}-${k}`,
-                    url: await demoRefine(
-                      src?.url ?? "",
-                      instruction,
-                      refines * 4 + k,
-                    ),
+                    url: await demoRefine(src?.url ?? '', instruction, refines * 4 + k),
                   })),
                 );
                 setCands((x) => [...x, ...c]);
@@ -257,7 +225,7 @@ export function DemoDay({
                   refinesLeft: 2 - refines,
                 };
               },
-              choose: async (id) => cands.find((c) => c.id === id)?.url ?? "",
+              choose: async (id) => cands.find((c) => c.id === id)?.url ?? '',
               chooseForm: async (id) => onNeoForm?.(id),
             }
       }
@@ -285,7 +253,7 @@ export function DemoDay({
       }}
       ordered={ordered}
       orderApi={{
-        checkout: async () => ({ mode: "demo" }),
+        checkout: async () => ({ mode: 'demo' }),
         confirm: async () => {},
         demo: async () => {
           await new Promise((r) => setTimeout(r, 800));

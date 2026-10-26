@@ -298,7 +298,7 @@ export function MarsLesson({ api, song, neo, bati, batiImage, onDone }: { api: L
         <Panel>
           <p className="text-center text-sm font-black text-rose-600">撮りたい場面を話してみよう</p>
           <div className="mt-3">
-            <VoiceField value={words} onChange={setWords} placeholder="夜の海を、小さな船が、まっすぐ進む" maxLength={60} />
+            <VoiceField light value={words} onChange={setWords} placeholder="夜の海を、小さな船が、まっすぐ進む" maxLength={60} />
           </div>
           <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-400">本当にいる人の顔や名前、ほかの人の作品のキャラクターは、映像にしません</p>
           <div className="mt-3 space-y-2">

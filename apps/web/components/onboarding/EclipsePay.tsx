@@ -3,6 +3,7 @@
 import { ORDER_PRICE_JPY, type OrderCheckout } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { ApiError } from '@/lib/api';
+import { LineVoice } from '@/lib/story/lineVoice';
 
 export interface OrderApi {
   checkout(): Promise<OrderCheckout>;
@@ -26,6 +27,13 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  */
 export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; paid: boolean; onPaid: () => void; onCancel: () => void }) {
   const [phase, setPhase] = useState<'loading' | 'stripe' | 'demo' | 'confirming' | 'error' | 'done'>('loading');
+  useEffect(() => {
+    if (phase !== 'error') return;
+    const v = new LineVoice();
+    v.unlock();
+    void v.say('MONBAN', '……まだ、終わっていない…。決めたら、また来い…。');
+    return () => v.dispose();
+  }, [phase]);
   const [consent, setConsent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -194,7 +202,12 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
           )}
           {phase === 'error' && (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <p className="text-sm text-rose-300">{err ?? 'うまくいかなかった。'}</p>
+              <p className="text-sm font-bold text-rose-300">支払いは完了していません</p>
+              {err && <p className="text-xs text-rose-200/70">{err}</p>}
+              {/* D08-S006: the payment did not go through */}
+              <p className="text-[13px] text-amber-100/90">
+                <span className="mr-1 text-[11px] text-amber-200/60">MONBAN</span>……まだ、終わっていない…。決めたら、また来い…。
+              </p>
               <button
                 onClick={() => {
                   setErr(null);
@@ -203,7 +216,10 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
                 }}
                 className="rounded-full border border-amber-200/60 px-6 py-2.5 text-sm tracking-widest text-amber-100"
               >
-                もう一度
+                もう一度ためす
+              </button>
+              <button onClick={onCancel} className="text-xs tracking-widest text-white/50 underline">
+                戻る
               </button>
             </div>
           )}

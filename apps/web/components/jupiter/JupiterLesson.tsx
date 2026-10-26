@@ -314,7 +314,7 @@ export function JupiterLesson({ api, kororins, neo, bati, batiImage, onDone }: {
           )}
           {mode === 'new' ? (
             <div className="mt-3 space-y-2">
-              <VoiceField value={words} onChange={setWords} placeholder="森のこと／大根カイザーのこと／いま思ったこと" maxLength={30} />
+              <VoiceField light value={words} onChange={setWords} placeholder="森のこと／大根カイザーのこと／いま思ったこと" maxLength={30} />
               <Big tone="amber" disabled={!words.trim()} onClick={() => startMake(words.trim())}>
                 この言葉で、ジャケットをつくる
               </Big>
