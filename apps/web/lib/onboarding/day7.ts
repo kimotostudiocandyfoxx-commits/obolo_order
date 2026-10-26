@@ -208,7 +208,8 @@ export const DAY7: Step[] = [
   { t: 'screen', open: true }, // Bluenaのスクリーンに、門の前のMONBAN
   { t: 'say', who: 'MONBAN', text: '……よく見ておけ…。これが…ナガレだ…。' },
   { t: 'screen', open: false },
-  { t: 'film', id: 'record1', parts: 9 }, // 記録 I　ナガレ（記録 II・III はこれから）
+  { t: 'film', id: 'record1', parts: 9 }, // 記録 I　ナガレ
+  { t: 'film', id: 'record23', parts: 16 }, // 記録 II　Obolo Order ／ 記録 III　掟（MONBANの読み上げ）→ 世界の窓に灯り → 宇宙の星
   { t: 'sprite', image: ['kimorin-sun', 'obolon'] },
   { t: 'say', who: 'KIMORIN', text: '……なるほど……全然わからん。' },
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' },

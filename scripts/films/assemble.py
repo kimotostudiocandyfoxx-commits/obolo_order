@@ -184,6 +184,46 @@ def saturn():
     return mix('saturn-arrival', v, 9.2, f'{O}/bgm-saturn.m4a', 0.85, [])
 
 
+def record23():
+    """#10 記録 II Obolo Order / 記録 III 掟 (D08-S011b): grey → a hum, a beat, the needle → colour; the papers,
+    the map; MONBAN reads the three rules (his voice only); the world's windows warm; the lights rise to stars"""
+    p, t, cues = [], 0.0, []
+    def title(name, text):
+        b = black(name + 'b', 2.4)
+        cap = caption_png(name, [text], 46)
+        out = f'{W}/{name}.mp4'
+        run('-i', b, '-loop', '1', '-i', cap, '-filter_complex', '[1:v]format=rgba,fade=in:st=0.2:d=0.6:alpha=1,fade=out:st=1.8:d=0.5:alpha=1[c];[0:v][c]overlay=0:0:shortest=1', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', out)
+        return out
+    p.append(title('t2', '記録 II　Obolo Order')); t += 2.4
+    for k, (c, st, d, vf) in enumerate([('rec2-facedown', 0.3, 4.0, FILM + ',hue=s=0.2'), ('rec2-hum', 0.3, 4.0, FILM + ',hue=s=0.35'), ('rec2-tap', 0.3, 4.0, FILM + ',hue=s=0.4'),
+                                         ('rec2-needle', 0.2, 4.8, FILM), ('rec2-docs', 0.3, 4.0, FILM), ('rec2-photos', 0.3, 4.0, FILM), ('rec2-map', 0.3, 4.2, FILM)]):
+        if os.path.exists(f'{O}/m{c}.mp4'):
+            p.append(seg(f'r2{k}', c, st, d, vf)); t += d
+    p.append(title('t3', '記録 III　掟')); t += 2.4
+    # MONBAN reads the rules over his shadow (slowed and held so the five lines fit), then the windows
+    lines = ['……掟、その一…。結社は、静かな招待だけで、広がる…。', '……ナガレは、数と、騒ぎで、広がるからだ…。', '……掟、その二…。ここでは、姿と名前を、変える…。', '……外の数で、比べられないためだ…。', '……掟、その三…。来るのも、去るのも、自由だ…。']
+    at = t + 0.6
+    for ln in lines:
+        f = voice('MONBAN', ln)
+        if f:
+            cues.append((f, at, 1.0))
+            at += float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f]).decode()) + 0.7
+    span = max(10.0, at - t)
+    out = f'{W}/r3m.mp4'
+    run('-i', f'{O}/mrec3-monban.mp4', '-vf', f'scale=720:1280,setsar=1,setpts=2.0*PTS,fps={FPS},tpad=stop_mode=clone:stop_duration=30,{FILM}', '-t', f'{span:.2f}', '-an', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', out)
+    p.append(out); t += span
+    for k, (c, st, d) in enumerate([('rec3-warm-city', 0.3, 4.2), ('rec3-warm-canal', 0.3, 4.2), ('rec3-rise', 0.1, 4.9), ('rec3-space', 0.1, 4.8)]):
+        p.append(seg(f'r3{k}', c, st, d, FILM if k < 2 else '', fade_out=0.8 if k == 3 else 0)); t += d
+    # the crest, the film running out to white
+    end = f'{W}/r3end.mp4'
+    run('-i', f'{O}/mrec-crest.mp4', '-vf', f'scale=720:1280,setsar=1,fps={FPS},{FILM},fade=out:st=2.2:d=1.0:color=white', '-t', '3.2', '-an', '-c:v', 'libx264', '-crf', '18', '-pix_fmt', 'yuv420p', end)
+    p.append(end); t += 3.2
+    v = concat('record23', p)
+    music = f'{O}/bgm-record2.m4a' if os.path.exists(f'{O}/bgm-record2.m4a') else f'{O}/bgm-record.m4a'
+    cues.append((f'{O}/se-projector.mp3', 0.0, 0.3))
+    return mix('record-23', v, t, music, 0.6, cues)
+
+
 if __name__ == '__main__':
     which = sys.argv[1:] or ['signal', 'record']
     if 'signal' in which:
@@ -194,3 +234,5 @@ if __name__ == '__main__':
         print(launch())
     if 'saturn' in which:
         print(saturn())
+    if 'record23' in which:
+        print(record23())
