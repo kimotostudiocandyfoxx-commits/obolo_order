@@ -65,9 +65,9 @@ const CHAR: Record<string, CharSpec> = {
   obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
   'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a', faces: madeFaces('takoyaki-brother-x', FRIEND) },
   'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a', faces: madeFaces('takoyaki-sister-x', FRIEND) },
-  'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a' },
-  freezy: { bottom: 8, height: 64, face: 0.25, tint: '#5aa8d8' },
-  hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a' },
+  'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a', faces: madeFaces('daikon-kaiser-x', FRIEND) },
+  freezy: { bottom: 8, height: 64, face: 0.25, tint: '#5aa8d8', faces: madeFaces('freezy-x', FRIEND) },
+  hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a', faces: madeFaces('hipokin-x', FRIEND) },
   'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
 };
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };

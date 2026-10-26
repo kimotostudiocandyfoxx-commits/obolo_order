@@ -27,7 +27,7 @@ const FRIEND: Rule[] = [
   [/！|♪|素敵|大好き|カッケー|よろしく|遊びましょう/, 'joy'],
 ];
 
-const RULES: Record<string, Rule[]> = { KIMORIN, 'KIMORIN⭐︎': KIMORIN, MONBAN, たこ焼きブラザー: FRIEND, たこ焼きシスター: FRIEND, うんちピンポンくん: FRIEND };
+const RULES: Record<string, Rule[]> = { KIMORIN, 'KIMORIN⭐︎': KIMORIN, MONBAN, たこ焼きブラザー: FRIEND, たこ焼きシスター: FRIEND, うんちピンポンくん: FRIEND, 大根カイザー: FRIEND, フリージー: FRIEND, ヒポキン: FRIEND };
 
 export function exprFor(who: string, text: string): string {
   for (const [re, e] of RULES[who] ?? []) if (re.test(text)) return e;
