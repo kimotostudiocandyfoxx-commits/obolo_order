@@ -1,486 +1,484 @@
 {
- "note": "Claude Code が作る物語の音（Runwareの音声モデル）。items に { id, kind: se|bgm, prompt, duration } を足して push すると作る（id ごとに1回。作り直しは redo）。se → apps/web/public/onboarding/se-<id>.mp3、bgm → bgm-<id>.m4a。probe に言葉を入れると、その名前のモデル一覧を報告に出す。 効果音は Seed Audio（2026-10-27 利用者の決定。Mirelo より自然）。無音の取り直しは置きかえず、redo に残る。",
- "sfxModel": "bytedance:seed-audio@1.0",
- "musicModel": "minimax:music@2.6",
- "parallel": 3,
- "redo": [
-  "boing"
- ],
- "probe": [],
- "items": [
-  {
-   "id": "sparkle",
-   "kind": "se",
-   "duration": 2,
-   "prompt": "Tiny glittering sparkles of light twinkling and fading, delicate and magical, clean high-quality sound design. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "chime",
-   "kind": "se",
-   "duration": 2.5,
-   "prompt": "A single bright magical chime with a soft shimmering tail, like a riddle being revealed. Clean, elegant, high quality. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "bell",
-   "kind": "se",
-   "duration": 3,
-   "prompt": "One clear small brass hand bell rung once in a quiet stone temple, a bright strike with a natural long ringing decay. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "gong",
-   "kind": "se",
-   "duration": 4,
-   "prompt": "A huge bronze temple gong struck once with a padded mallet: a deep, mysterious low boom that swells and shimmers for several seconds. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "magic",
-   "kind": "se",
-   "duration": 3,
-   "prompt": "A magical spell being cast: a shimmering rising swell of glittering chimes and a soft whoosh of light, ending in a warm sparkle. Cinematic fantasy film sound design, clean, high quality. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "whoosh",
-   "kind": "se",
-   "duration": 2,
-   "prompt": "A fast cinematic whoosh as something flies past the camera, deep and airy, clean, high-quality film sound design. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "pop",
-   "kind": "se",
-   "duration": 1,
-   "prompt": "A cute soft bubbly pop, like a soap bubble bursting near the ear, light and playful. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "boing",
-   "kind": "se",
-   "duration": 1.5,
-   "prompt": "A purely mechanical cartoon spring sound: a metal coil spring plucked once, \"boing\", bouncy and wobbly, short. Only the spring, no people, no human voice, no scream, no shout, no music."
-  },
-  {
-   "id": "knock",
-   "kind": "se",
-   "duration": 1.5,
-   "prompt": "Two firm knocks on a heavy old wooden door in a quiet hall, solid wood resonance. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "ding",
-   "kind": "se",
-   "duration": 2,
-   "prompt": "a cheerful TV quiz show correct-answer jingle: two bright bell tones going up, ding-dong, clean, short. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "heartbeat",
-   "kind": "se",
-   "duration": 3,
-   "prompt": "Two slow, heavy, deep heartbeats heard from very close, tense and quiet. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "blip",
-   "kind": "se",
-   "duration": 1,
-   "prompt": "A soft futuristic device blip as a small hologram screen switches on: a gentle rising digital tone with a faint shimmer. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "thud",
-   "kind": "se",
-   "duration": 2,
-   "prompt": "A heavy dull thud of a huge stone slab settling into place, deep low impact with a short rumble of dust. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "gate-close",
-   "kind": "se",
-   "duration": 4,
-   "prompt": "A huge ancient stone-and-iron gate slowly closing with a deep rumble, then a heavy booming thud that echoes in a vast hall. Cinematic, high quality. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "smoke",
-   "kind": "se",
-   "duration": 3,
-   "prompt": "Thick dark magical smoke billowing up suddenly: a low airy whoosh with a soft rumbling swirl that fades. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "rocket",
-   "kind": "se",
-   "duration": 5,
-   "prompt": "A golden rocket igniting and lifting off: deep rumble rising into a powerful roaring thrust that moves away. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "crackers",
-   "kind": "se",
-   "duration": 3,
-   "prompt": "Many party poppers going off at once, pan pa-pa-pa-pan, with paper confetti fluttering down. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "egg-crack",
-   "kind": "se",
-   "duration": 2.5,
-   "prompt": "A magical egg shell cracking open: a few small crisp cracks, then a soft pop as the shell breaks. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "paper",
-   "kind": "se",
-   "duration": 2,
-   "prompt": "Crisp thick paper being folded quickly into a paper airplane: a few soft folds and creases. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "stamp",
-   "kind": "se",
-   "duration": 1.2,
-   "prompt": "A rubber stamp pressed firmly onto thick paper on a wooden desk: a crisp satisfying thump. Close, clean, high quality foley. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "footsteps",
-   "kind": "se",
-   "duration": 4,
-   "prompt": "Small soft footsteps walking on polished stone in a large echoing hall, unhurried. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "portal",
-   "kind": "se",
-   "duration": 3,
-   "prompt": "A glowing pillar of light descending from above: a deep shimmering hum that swells with sparkling high tones. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "comedy",
-   "kind": "bgm",
-   "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
+  "note": "Claude Code が作る物語の音（Runwareの音声モデル）。items に { id, kind: se|bgm, prompt, duration } を足して push すると作る（id ごとに1回。作り直しは redo）。se → apps/web/public/onboarding/se-<id>.mp3、bgm → bgm-<id>.m4a。probe に言葉を入れると、その名前のモデル一覧を報告に出す。 効果音は Seed Audio（2026-10-27 利用者の決定。Mirelo より自然）。無音の取り直しは置きかえず、redo に残る。",
+  "sfxModel": "bytedance:seed-audio@1.0",
+  "musicModel": "minimax:music@2.6",
+  "parallel": 3,
+  "redo": [],
+  "probe": [],
+  "items": [
+    {
+      "id": "sparkle",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "Tiny glittering sparkles of light twinkling and fading, delicate and magical, clean high-quality sound design. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "chime",
+      "kind": "se",
+      "duration": 2.5,
+      "prompt": "A single bright magical chime with a soft shimmering tail, like a riddle being revealed. Clean, elegant, high quality. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "bell",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "One clear small brass hand bell rung once in a quiet stone temple, a bright strike with a natural long ringing decay. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "gong",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "A huge bronze temple gong struck once with a padded mallet: a deep, mysterious low boom that swells and shimmers for several seconds. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "magic",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "A magical spell being cast: a shimmering rising swell of glittering chimes and a soft whoosh of light, ending in a warm sparkle. Cinematic fantasy film sound design, clean, high quality. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "whoosh",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "A fast cinematic whoosh as something flies past the camera, deep and airy, clean, high-quality film sound design. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "pop",
+      "kind": "se",
+      "duration": 1,
+      "prompt": "A cute soft bubbly pop, like a soap bubble bursting near the ear, light and playful. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "boing",
+      "kind": "se",
+      "duration": 1.5,
+      "prompt": "A purely mechanical cartoon spring sound: a metal coil spring plucked once, \"boing\", bouncy and wobbly, short. Only the spring, no people, no human voice, no scream, no shout, no music."
+    },
+    {
+      "id": "knock",
+      "kind": "se",
+      "duration": 1.5,
+      "prompt": "Two firm knocks on a heavy old wooden door in a quiet hall, solid wood resonance. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "ding",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "a cheerful TV quiz show correct-answer jingle: two bright bell tones going up, ding-dong, clean, short. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "heartbeat",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "Two slow, heavy, deep heartbeats heard from very close, tense and quiet. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "blip",
+      "kind": "se",
+      "duration": 1,
+      "prompt": "A soft futuristic device blip as a small hologram screen switches on: a gentle rising digital tone with a faint shimmer. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "thud",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "A heavy dull thud of a huge stone slab settling into place, deep low impact with a short rumble of dust. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "gate-close",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "A huge ancient stone-and-iron gate slowly closing with a deep rumble, then a heavy booming thud that echoes in a vast hall. Cinematic, high quality. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "smoke",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "Thick dark magical smoke billowing up suddenly: a low airy whoosh with a soft rumbling swirl that fades. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "rocket",
+      "kind": "se",
+      "duration": 5,
+      "prompt": "A golden rocket igniting and lifting off: deep rumble rising into a powerful roaring thrust that moves away. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "crackers",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "Many party poppers going off at once, pan pa-pa-pa-pan, with paper confetti fluttering down. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "egg-crack",
+      "kind": "se",
+      "duration": 2.5,
+      "prompt": "A magical egg shell cracking open: a few small crisp cracks, then a soft pop as the shell breaks. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "paper",
+      "kind": "se",
+      "duration": 2,
+      "prompt": "Crisp thick paper being folded quickly into a paper airplane: a few soft folds and creases. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "stamp",
+      "kind": "se",
+      "duration": 1.2,
+      "prompt": "A rubber stamp pressed firmly onto thick paper on a wooden desk: a crisp satisfying thump. Close, clean, high quality foley. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "footsteps",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "Small soft footsteps walking on polished stone in a large echoing hall, unhurried. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "portal",
+      "kind": "se",
+      "duration": 3,
+      "prompt": "A glowing pillar of light descending from above: a deep shimmering hum that swells with sparkling high tones. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "comedy",
+      "kind": "bgm",
+      "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "space",
+      "kind": "bgm",
+      "prompt": "Adventurous space-travel background music: soaring strings and warm synth pads, gentle driving pulse, wonder and excitement, a rocket flying through stars toward the moon. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "moon",
+      "kind": "bgm",
+      "prompt": "Calm, serene background music for a white stone temple on the moon: soft harp, celesta, airy pads and a gentle flute, peaceful and mysterious, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "tender",
+      "kind": "bgm",
+      "prompt": "Warm, tender background music for the birth of a small companion creature: music box, soft piano and warm strings, heart-warming and gentle, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "comedy-ace",
+      "kind": "bgm",
+      "duration": 60,
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
+    },
+    {
+      "id": "launch",
+      "kind": "bgm",
+      "prompt": "Mysterious, adventurous music for a vast underground stone hall where a rocket waits: low strings, deep drums, a curious celesta motif, anticipation building. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "party",
+      "kind": "bgm",
+      "prompt": "Over-the-top festive comedy music for a giant party-loving dragon with eighty arms: brass fanfare, bouncy swing, cowbell, confetti energy, funny and grand. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "night",
+      "kind": "bgm",
+      "prompt": "A soft lullaby for falling asleep in a moon temple under the blue Earth: music box, harp and warm pads, very slow, dreamy. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "saturn",
+      "kind": "bgm",
+      "prompt": "Groovy, gaudy, funny music for a flashy golden temple on Saturn ruled by two takoyaki siblings: funky bass, brass hits, wah guitar, playful and loud but friendly. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "sun",
+      "kind": "bgm",
+      "prompt": "Radiant, sacred music inside the Sun: shimmering high strings, warm brass swells, bright pads, awe and warmth, slow. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "eclipse",
+      "kind": "bgm",
+      "prompt": "An emotional, solemn climax for a ritual where a black sun covers the light and a golden ring remains: building strings, piano, soft choir-like pads (no words), deeply moving. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "city",
+      "kind": "bgm",
+      "prompt": "Majestic, mysterious music for arriving at a black-and-gold city of spires at sunset: noble horns, harp glissandi, deep strings, grand but quiet enough for dialogue. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "ending",
+      "kind": "bgm",
+      "prompt": "A hopeful, gentle ending theme after a seven-day journey through space: piano and strings, warm and bittersweet, rising at the end. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "signal",
+      "kind": "bgm",
+      "prompt": "A cinematic film-trailer-quality opening score, about 45 seconds, like the first minute of a great fantasy film: it begins almost silent with a deep, distant sub-bass tone and soft night ambience, a quiet felt piano motif of a few notes, slowly warm strings rise as the camera lifts from the cities of the Earth into space, a shimmering golden swell, then five short low hits spaced apart (for quick mysterious images), a warm intimate moment, a final luminous swell that dissolves into glittering particles and silence. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "record",
+      "kind": "bgm",
+      "prompt": "A quiet, uneasy but gentle documentary-style score for an old archive film: a slow ticking pulse like a film projector, a soft detuned music-box and a low cello drone, cold and hollow as the colours drain from the world, never sad or scary, restrained and mysterious, ending in near silence. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "sub-hit",
+      "kind": "se",
+      "prompt": "A deep cinematic sub-bass hit with a long soft tail, dark and weighty, for a dramatic title. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "projector",
+      "kind": "se",
+      "prompt": "An old 16mm film projector running: steady mechanical clatter of the film gate and the hum of the motor. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "seal-press",
+      "kind": "se",
+      "prompt": "One single wax seal stamp pressed firmly and slowly onto a thick paper envelope on a wooden desk: a soft heavy press, a tiny squeeze of warm wax, then the brass stamp lifted away with a faint click. Only once, about two seconds. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "record2",
+      "kind": "bgm",
+      "prompt": "A score for an old archive film that comes back to life, about 100 seconds: it starts grey and quiet with a faint projector-like ticking, then a single soft hummed-like melody on a warm instrument, a gentle beat of fingers tapping that grows into a groove, a vinyl crackle and a warm bass as colour returns, then a solemn, steady passage for three old rules, and a final luminous, hopeful swell as warm lights rise into the stars, ending softly. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
+    },
+    {
+      "id": "rocket-roar",
+      "kind": "se",
+      "prompt": "A rocket launch: a deep rumbling ignition, a huge roar of engines and the rattle of the launch pad. High quality, realistic and rich, clean recording, no music, no voices."
+    },
+    {
+      "id": "kimorin-ballad",
+      "kind": "bgm",
+      "prompt": "Epic tearful orchestral power ballad, sweeping strings, grand piano, timpani, a male lead singing with deep emotion, a huge choir joining in the chorus. Cinematic, heartfelt, almost too dramatic.",
+      "settings": {
+        "settings": {
+          "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
+        }
+      }
+    },
+    {
+      "id": "jupiter-mm",
+      "kind": "bgm",
+      "model": "minimax:music@2.6",
+      "prompt": "Mystical ancient forest theme for a fantasy anime film: gentle harp, warm strings, soft wooden flute and a low choir hum, slow and sacred, sunlight through giant trees, wonder and calm. Orchestral, high quality, no vocals.",
+      "settings": {
+        "settings": {
+          "lyrics": "[Instrumental]"
+        }
+      }
+    },
+    {
+      "id": "jupiter-ace",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Mystical ancient forest theme for a fantasy anime film: gentle harp, warm strings, soft wooden flute and a low choir hum, slow and sacred, sunlight through giant trees, wonder and calm. Orchestral, high quality, no vocals.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "morning",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A gentle morning wake-up theme for a fantasy anime: soft piano, light celesta, warm strings, a calm new day on another planet, hopeful. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "jupiter-play",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Light playful creative theme in a magical forest: plucked strings, marimba, flute, soft percussion, curious and warm, making something by hand. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mercury",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Cool, clear ocean-planet theme: glassy bells, airy synth pads, slow strings, the sound of a vast quiet sea and ice, calm and wide. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mercury-play",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Chill creative music-making theme: soft beat, warm electric piano, gentle bass, a little icy shimmer, relaxed and inspiring. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mars",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Cinematic futuristic city theme at dusk: warm analog synths, pulsing bass, soft drums, strings, a city made of glowing screens, hopeful and grand. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mars-play",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Upbeat film-making theme: driving light drums, synth arpeggio, bright strings, the excitement of shooting your first movie. Orchestral/cinematic, high quality, purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "arrive",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A short magical arrival fanfare: rising strings and brass swell, a shimmering cymbal, landing on a warm major chord, about ten seconds. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "riddle",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A short mysterious reveal sting: a low drone, a soft gong, glittering chimes as ancient letters appear, about six seconds. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "farewell",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A tender end-of-day theme: solo piano with soft strings, warm and a little nostalgic, 'see you tomorrow'. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "earth-decide",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A serious, gentle theme for an important choice: slow piano, cello, soft choir pad, warm and honest, no pressure. Orchestral/cinematic, high quality, purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      },
+      "id": "venus",
+      "kind": "bgm",
+      "prompt": "Warm golden nightclub-meets-open-air-festival theme for a planet that is a giant spinning vinyl record: smooth disco house groove at 118 BPM, funky bass, soft electric piano, shimmering pads, a little vinyl crackle, inviting and cool, loopable. Purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, steady to the end."
+    },
+    {
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      },
+      "id": "dj-practice",
+      "kind": "bgm",
+      "prompt": "A plain DJ practice rhythm at exactly 120 BPM: steady four-on-the-floor kick, offbeat open hi-hat, clap on 2 and 4, a simple one-note bassline, no melody, no build-ups, no breaks, perfectly even from the first bar to the last, clean mix for beatmatching. Purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, steady to the end."
     }
-   }
-  },
-  {
-   "id": "space",
-   "kind": "bgm",
-   "prompt": "Adventurous space-travel background music: soaring strings and warm synth pads, gentle driving pulse, wonder and excitement, a rocket flying through stars toward the moon. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "moon",
-   "kind": "bgm",
-   "prompt": "Calm, serene background music for a white stone temple on the moon: soft harp, celesta, airy pads and a gentle flute, peaceful and mysterious, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "tender",
-   "kind": "bgm",
-   "prompt": "Warm, tender background music for the birth of a small companion creature: music box, soft piano and warm strings, heart-warming and gentle, slow. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "comedy-ace",
-   "kind": "bgm",
-   "duration": 60,
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Playful comedic background music: bouncy pizzicato strings, bassoon, light woodwinds and a little glockenspiel, mischievous and cute, moderate tempo, for a self-proclaimed genius fox inventor's funny moments. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game."
-  },
-  {
-   "id": "launch",
-   "kind": "bgm",
-   "prompt": "Mysterious, adventurous music for a vast underground stone hall where a rocket waits: low strings, deep drums, a curious celesta motif, anticipation building. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "party",
-   "kind": "bgm",
-   "prompt": "Over-the-top festive comedy music for a giant party-loving dragon with eighty arms: brass fanfare, bouncy swing, cowbell, confetti energy, funny and grand. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "night",
-   "kind": "bgm",
-   "prompt": "A soft lullaby for falling asleep in a moon temple under the blue Earth: music box, harp and warm pads, very slow, dreamy. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "saturn",
-   "kind": "bgm",
-   "prompt": "Groovy, gaudy, funny music for a flashy golden temple on Saturn ruled by two takoyaki siblings: funky bass, brass hits, wah guitar, playful and loud but friendly. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "sun",
-   "kind": "bgm",
-   "prompt": "Radiant, sacred music inside the Sun: shimmering high strings, warm brass swells, bright pads, awe and warmth, slow. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "eclipse",
-   "kind": "bgm",
-   "prompt": "An emotional, solemn climax for a ritual where a black sun covers the light and a golden ring remains: building strings, piano, soft choir-like pads (no words), deeply moving. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "city",
-   "kind": "bgm",
-   "prompt": "Majestic, mysterious music for arriving at a black-and-gold city of spires at sunset: noble horns, harp glissandi, deep strings, grand but quiet enough for dialogue. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "ending",
-   "kind": "bgm",
-   "prompt": "A hopeful, gentle ending theme after a seven-day journey through space: piano and strings, warm and bittersweet, rising at the end. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "signal",
-   "kind": "bgm",
-   "prompt": "A cinematic film-trailer-quality opening score, about 45 seconds, like the first minute of a great fantasy film: it begins almost silent with a deep, distant sub-bass tone and soft night ambience, a quiet felt piano motif of a few notes, slowly warm strings rise as the camera lifts from the cities of the Earth into space, a shimmering golden swell, then five short low hits spaced apart (for quick mysterious images), a warm intimate moment, a final luminous swell that dissolves into glittering particles and silence. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "record",
-   "kind": "bgm",
-   "prompt": "A quiet, uneasy but gentle documentary-style score for an old archive film: a slow ticking pulse like a film projector, a soft detuned music-box and a low cello drone, cold and hollow as the colours drain from the world, never sad or scary, restrained and mysterious, ending in near silence. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "sub-hit",
-   "kind": "se",
-   "prompt": "A deep cinematic sub-bass hit with a long soft tail, dark and weighty, for a dramatic title. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "projector",
-   "kind": "se",
-   "prompt": "An old 16mm film projector running: steady mechanical clatter of the film gate and the hum of the motor. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "seal-press",
-   "kind": "se",
-   "prompt": "One single wax seal stamp pressed firmly and slowly onto a thick paper envelope on a wooden desk: a soft heavy press, a tiny squeeze of warm wax, then the brass stamp lifted away with a faint click. Only once, about two seconds. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "record2",
-   "kind": "bgm",
-   "prompt": "A score for an old archive film that comes back to life, about 100 seconds: it starts grey and quiet with a faint projector-like ticking, then a single soft hummed-like melody on a warm instrument, a gentle beat of fingers tapping that grows into a groove, a vinyl crackle and a warm bass as colour returns, then a solemn, steady passage for three old rules, and a final luminous, hopeful swell as warm lights rise into the stars, ending softly. Strictly instrumental: no human voice of any kind — no singing, no humming, no choir, no vocal pads, no spoken words.",
-   "settings": {
-    "settings": {
-     "instrumental": true
-    }
-   }
-  },
-  {
-   "id": "rocket-roar",
-   "kind": "se",
-   "prompt": "A rocket launch: a deep rumbling ignition, a huge roar of engines and the rattle of the launch pad. High quality, realistic and rich, clean recording, no music, no voices."
-  },
-  {
-   "id": "kimorin-ballad",
-   "kind": "bgm",
-   "prompt": "Epic tearful orchestral power ballad, sweeping strings, grand piano, timpani, a male lead singing with deep emotion, a huge choir joining in the chorus. Cinematic, heartfelt, almost too dramatic.",
-   "settings": {
-    "settings": {
-     "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
-    }
-   }
-  },
-  {
-   "id": "jupiter-mm",
-   "kind": "bgm",
-   "model": "minimax:music@2.6",
-   "prompt": "Mystical ancient forest theme for a fantasy anime film: gentle harp, warm strings, soft wooden flute and a low choir hum, slow and sacred, sunlight through giant trees, wonder and calm. Orchestral, high quality, no vocals.",
-   "settings": {
-    "settings": {
-     "lyrics": "[Instrumental]"
-    }
-   }
-  },
-  {
-   "id": "jupiter-ace",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Mystical ancient forest theme for a fantasy anime film: gentle harp, warm strings, soft wooden flute and a low choir hum, slow and sacred, sunlight through giant trees, wonder and calm. Orchestral, high quality, no vocals.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "morning",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "A gentle morning wake-up theme for a fantasy anime: soft piano, light celesta, warm strings, a calm new day on another planet, hopeful. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "jupiter-play",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Light playful creative theme in a magical forest: plucked strings, marimba, flute, soft percussion, curious and warm, making something by hand. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "mercury",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Cool, clear ocean-planet theme: glassy bells, airy synth pads, slow strings, the sound of a vast quiet sea and ice, calm and wide. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "mercury-play",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Chill creative music-making theme: soft beat, warm electric piano, gentle bass, a little icy shimmer, relaxed and inspiring. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "mars",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Cinematic futuristic city theme at dusk: warm analog synths, pulsing bass, soft drums, strings, a city made of glowing screens, hopeful and grand. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "mars-play",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "Upbeat film-making theme: driving light drums, synth arpeggio, bright strings, the excitement of shooting your first movie. Orchestral/cinematic, high quality, purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "arrive",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "A short magical arrival fanfare: rising strings and brass swell, a shimmering cymbal, landing on a warm major chord, about ten seconds. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "riddle",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "A short mysterious reveal sting: a low drone, a soft gong, glittering chimes as ancient letters appear, about six seconds. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "farewell",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "A tender end-of-day theme: solo piano with soft strings, warm and a little nostalgic, 'see you tomorrow'. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "id": "earth-decide",
-   "kind": "bgm",
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "prompt": "A serious, gentle theme for an important choice: slow piano, cello, soft choir pad, warm and honest, no pressure. Orchestral/cinematic, high quality, purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, loopable, steady to the end.",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   }
-  },
-  {
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   },
-   "id": "venus",
-   "kind": "bgm",
-   "prompt": "Warm golden nightclub-meets-open-air-festival theme for a planet that is a giant spinning vinyl record: smooth disco house groove at 118 BPM, funky bass, soft electric piano, shimmering pads, a little vinyl crackle, inviting and cool, loopable. Purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, steady to the end."
-  },
-  {
-   "model": "runware:ace-step@v1.5-xl-sft",
-   "settings": {
-    "settings": {
-     "lyrics": "[instrumental]"
-    }
-   },
-   "id": "dj-practice",
-   "kind": "bgm",
-   "prompt": "A plain DJ practice rhythm at exactly 120 BPM: steady four-on-the-floor kick, offbeat open hi-hat, clap on 2 and 4, a simple one-note bassline, no melody, no build-ups, no breaks, perfectly even from the first bar to the last, clean mix for beatmatching. Purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, steady to the end."
-  }
- ],
- "listen": []
+  ],
+  "listen": []
 }
