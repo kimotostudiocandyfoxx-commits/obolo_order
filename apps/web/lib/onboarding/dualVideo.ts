@@ -63,7 +63,7 @@ export class DualVideo {
 
   setMuted(m: boolean) {
     this.muted = m;
-    for (const el of this.els) el.muted = m;
+    for (const el of this.els) el.muted = m || (this.loop && el === this.frontEl);
   }
 
   /** Show a motion. freeze = show its last frame without playing (resuming mid-story). */
@@ -73,7 +73,8 @@ export class DualVideo {
     this.url = url;
     const el = this.backEl;
     this.pending = el;
-    el.muted = this.muted;
+    // a loop's own sound repeating every few seconds stood out (the HQ gate, client 2026-10-26): loops are silent
+    el.muted = this.muted || loop;
     this.setSrc(el, url);
 
     if (freeze) {

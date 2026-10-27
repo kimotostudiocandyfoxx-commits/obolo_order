@@ -1203,6 +1203,8 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
     );
   }
 
+  // the day's title (「1日目」) goes on by itself: right after the opening film nobody knew a tap was wanted (client 2026-10-26)
+  if (step.t === 'caption' && DAY_TITLE.test(text)) return <DayTitle text={text} onNext={onNext} />;
   if (step.t === 'caption' || step.t === 'arrive') {
     return (
       <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" onClick={() => onNext()}>
@@ -1232,6 +1234,21 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
 function NameNote({ value, extra }: { value: string; extra?: string }) {
   const bad = !!value.trim() && !nameCharsOk(value);
   return <p className={`text-[11px] tracking-wide ${bad ? 'text-amber-200' : 'text-white/45'}`}>{bad ? 'ひらがな・カタカナ・英語で入れてね' : `ひらがな・カタカナ・英語で${extra ? `　${extra}` : ''}`}</p>;
+}
+
+function DayTitle({ text, onNext }: { text: string; onNext: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onNext, 2600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <button className="absolute inset-0 z-10 flex items-center justify-center" onClick={onNext}>
+      <span className="animate-[subIn_2.6s_ease-out_both] text-3xl tracking-[0.5em] text-amber-100 drop-shadow-[0_0_18px_rgba(255,210,120,0.6)]" style={{ fontFamily: '"Shippori Mincho", serif' }}>
+        {text}
+      </span>
+    </button>
+  );
 }
 
 function Cue() {

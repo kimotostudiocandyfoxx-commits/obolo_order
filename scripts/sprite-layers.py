@@ -94,9 +94,13 @@ if nt is not None:
     # the edit leaves faint outlines where the feathers were: an opening removes thin leftovers
     hard = Image.fromarray(((al_body > 0.5) * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(7)).filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(1.1))
     al_body = np.minimum(al_body, np.asarray(hard).astype(np.float32) / 255)
-    # the body is what the tail-less painting still has; everything else of the figure is tail
-    body = al * al_body
-    tail = np.clip(al * (1 - al_body), 0, 1)
+    # the body is what the tail-less painting still has, grown a little so its own outline stays with it;
+    # the tail is only what lies clearly outside the body (else the body's edge swayed with the tail —
+    # client 2026-10-26). Where they meet, the body layer keeps the full figure's pixels.
+    grown = Image.fromarray(((al_body > 0.5) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(11)).filter(ImageFilter.GaussianBlur(2))
+    gb = np.asarray(grown).astype(np.float32) / 255
+    body = al * gb
+    tail = np.clip(al * (1 - gb), 0, 1)
     save(f'{stem}-body', rgb, body)
     save(f'{stem}-tail', rgb, tail)
 
@@ -116,17 +120,24 @@ if op is not None:
         n_id += 1
         q = deque([(y0, x0)])
         lab[y0, x0] = n_id
-        cnt = 0
+        cnt = sy = sx = 0
         while q:
             y, x = q.popleft()
             cnt += 1
+            sy += y
+            sx += x
             for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                 ny, nx = y + dy, x + dx
                 if 0 <= ny < h and 0 <= nx < w and m[ny, nx] and not lab[ny, nx]:
                     lab[ny, nx] = n_id
                     q.append((ny, nx))
-        if cnt > best_n:
-            best, best_n = n_id, cnt
+        # the mouth is low in the face and near the middle: a patch up where the eyes are (an edit that
+        # also touched the eyes) loses to it (client 2026-10-26: eyes flapping instead of the mouth)
+        low = (sy / cnt - face_y0) / max(1, face_y1 - face_y0)
+        mid = 1 - min(1.0, abs(sx / cnt - (xs.min() + xs.max()) / 2) / max(1, (xs.max() - xs.min()) / 2))
+        score = cnt * (0.15 + low) * (0.4 + mid)
+        if cnt >= 25 and score > best_n:
+            best, best_n = n_id, score
     if best:
         mm = Image.fromarray(((lab == best) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.GaussianBlur(2.5))
         mask = np.asarray(mm).astype(np.float32) / 255 * al
