@@ -492,6 +492,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (s?.t !== 'film') return;
     markFilmWatched(s.id);
     bgm.current?.fadeOut(0.8);
+    // the film's last frame does not stay under what follows (「1日目」 sat on the snowy village)
+    dual.current?.pauseAll();
+    setBlackout(true);
     run(iRef.current + 1);
   };
   const onEndedRef = useRef(() => {});
