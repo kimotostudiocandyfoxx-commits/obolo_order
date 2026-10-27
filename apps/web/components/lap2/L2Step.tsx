@@ -6,6 +6,7 @@ import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
 import { BatiAsk } from './BatiAsk';
 import { DaydreamJacket } from './DaydreamJacket';
+import { HomewardGame } from './HomewardGame';
 import { L2Screen } from './L2Screen';
 import { PlazaMaker } from './PlazaMaker';
 import { Relook } from './Relook';
@@ -38,6 +39,8 @@ export function L2Step({
       return <PlazaMaker onDone={onDone} />;
     case 'jacket':
       return <DaydreamJacket api={lessonApi} bati={v.bati ?? ''} fill={fill} onDone={onDone} />;
+    case 'game':
+      return <HomewardGame watch={answers.game === 'KIMORINが遊ぶのを、となりで見る'} onDone={onDone} />;
     case 'booth':
       return (
         <VenusLesson
