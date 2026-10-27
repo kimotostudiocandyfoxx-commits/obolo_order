@@ -4759,8 +4759,29 @@
         "design/story/refs/client/rocket.jpg",
         "apps/web/public/onboarding/s/arr-mercury-sea.jpg"
       ],
-      "prompt": "The golden rocket of the first picture flies low over the endless glittering blue ocean of the second picture (Mercury, a planet of sea): seen from outside and a little above, the rocket small in the middle of the frame skimming the waves, a trail of spray behind it, bands of sunlight on the water, no land anywhere to the horizon. Wide, open and a little lonely. Painterly anime film quality. No text."
+      "prompt": "Wide shot from far away and a little above: the golden rocket of the first picture, small in the middle of the frame (about a tenth of the picture's width), flies level and fast just above the endless glittering blue ocean of the second picture, a long trail of spray behind it, bands of sunlight on the water, no land anywhere to the horizon. Wide, open and a little lonely. Painterly anime film quality. No text."
     }
   ],
-  "redo": []
+  "redo": [
+    "kaiser1-x-joy-o",
+    "kaiser1-x-shock-o",
+    "kaiser1-x-talk-o",
+    "kimorin-iu-joy-notail",
+    "kimorin-iu-joy-o",
+    "kimorin-iu-lecture-notail",
+    "kimorin-iu-lecture-o",
+    "kimorin-iu-point-notail",
+    "kimorin-iu-point-o",
+    "kimorin-iu-shock-notail",
+    "kimorin-iu-shock-o",
+    "kimorin-iu-smug-notail",
+    "kimorin-iu-smug-o",
+    "kimorin-iu-talk-notail",
+    "kimorin-iu-talk-o",
+    "kimorin-iu-tears-notail",
+    "kimorin-iu-tears-o",
+    "kimorin-iu-think-notail",
+    "kimorin-iu-think-o",
+    "rocket-over-sea"
+  ]
 }
