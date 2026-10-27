@@ -9,7 +9,7 @@
  * An id is made once; "redo": [ids] makes it again. "probe": ["music", …] lists Runware models whose name
  * matches, into the report (to find the music model's id). Report: docs/story-import/audio-last-run.md.
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -81,6 +81,13 @@ async function make(x) {
   if (!d) throw new Error('the sound did not come back in time');
   const raw = join(OUT, `_${x.id}.mp3`);
   writeFileSync(raw, Buffer.from(await (await fetch(d.audioURL)).arrayBuffer()));
+  // a silent take never replaces a sound (a Seed Audio stamp came back silent, 2026-10-27)
+  const vol = spawnSync('ffmpeg', ['-hide_banner', '-i', raw, '-af', 'volumedetect', '-f', 'null', '-'], { encoding: 'utf8' }).stderr ?? '';
+  const peak = Number(/max_volume: (-?[\d.]+|-inf) dB/.exec(vol)?.[1] ?? '-inf');
+  if (!(peak > -40)) {
+    rmSync(raw);
+    throw new Error(`silent take (peak ${peak} dB)`);
+  }
   const out = fileOf(x);
   if (x.kind === 'bgm') {
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-ac', '2', '-ar', '44100', '-c:a', 'aac', '-b:a', '128k', out]);
@@ -93,7 +100,7 @@ async function make(x) {
 }
 
 /** Gemini listens to a made track and says what it hears (no vocals? the mood, does it loop, a score) */
-async function listen(file, prompt) {
+async function listen(file, prompt, kind = 'bgm') {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return null;
   try {
@@ -104,7 +111,12 @@ async function listen(file, prompt) {
       body: JSON.stringify({
         contents: [{ parts: [
           { inlineData: { mimeType: 'audio/mp3', data: wav.toString('base64') } },
-          { text: `This is background music made for a Japanese anime fantasy story game. It was asked for as: "${prompt}". Listen and answer in Japanese, in 3 short lines: 1) 歌声・人の声が入っているか（はい/いいえ） 2) 雰囲気と楽器（ひとことで） 3) 依頼に合っているか、BGMとしての質を10点満点で、ループに向くか。` },
+          {
+            text:
+              kind === 'se'
+                ? `This is a sound effect made for a Japanese anime fantasy story game. It was asked for as: "${prompt}". Listen and answer in Japanese, in 2 short lines: 1) 何の音に聞こえるか（ひとことで）、声や音楽が混ざっていないか 2) 依頼に合っているか、効果音としての質（安っぽくないか）を10点満点で。`
+                : `This is background music made for a Japanese anime fantasy story game. It was asked for as: "${prompt}". Listen and answer in Japanese, in 3 short lines: 1) 歌声・人の声が入っているか（はい/いいえ） 2) 雰囲気と楽器（ひとことで） 3) 依頼に合っているか、BGMとしての質を10点満点で、ループに向くか。`,
+          },
         ] }],
       }),
       signal: AbortSignal.timeout(120_000),
@@ -119,22 +131,25 @@ async function listen(file, prompt) {
 for (const w of queue.probe ?? []) await probe(w);
 let usd = 0;
 let next = 0;
+/** ids that failed stay in redo for the next run (a silent or timed-out take) */
+const failed = [];
 await Promise.all(
   Array.from({ length: queue.parallel ?? 3 }, async () => {
     while (next < todo.length) {
       const x = todo[next++];
       try {
         usd += await make(x);
-        const heard = x.kind === 'bgm' ? await listen(fileOf(x), x.prompt) : null;
+        const heard = await listen(fileOf(x), x.prompt, x.kind);
         log.push(`- ✅ ${x.kind}-${x.id}（${x.duration ?? '-'}秒）${heard ? `\n  - 聞いた感じ：${heard}` : ''}`);
       } catch (e) {
+        failed.push(x.id);
         log.push(`- ❌ ${x.kind}-${x.id}: ${String(e).slice(0, 1200)}`);
       }
     }
   }),
 );
 for (const x of listenOnly) log.push(`- 👂 ${x.kind}-${x.id}：${(await listen(fileOf(x), x.prompt)) ?? '（鍵がない）'}`);
-if ((queue.redo ?? []).length || (queue.probe ?? []).length || (queue.listen ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [], probe: [], listen: [] }, null, 2) + '\n');
+if ((queue.redo ?? []).length || (queue.probe ?? []).length || (queue.listen ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: failed.filter((id) => redo.has(id)), probe: [], listen: [] }, null, 2) + '\n');
 mkdirSync('docs/story-import', { recursive: true });
 const report = [`# 物語の音 — ${new Date().toISOString()}`, '', `${todo.length}本 / 約${Math.round(usd * 150)}円`, '', ...log, ''].join('\n');
 writeFileSync('docs/story-import/audio-last-run.md', report);

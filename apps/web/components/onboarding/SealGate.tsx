@@ -45,7 +45,7 @@ export function SealGate({ onOpen }: { onOpen: () => void }) {
             {mark(sound, setSound, '音が出せる場所にいる')}
             {mark(voice, setVoice, '声を出せる（話しても大丈夫な）場所にいる')}
           </div>
-          <p className="relative mt-6 max-w-xs text-center text-[12px] leading-relaxed tracking-[0.06em] text-white/55">この宇宙は、あなたの声で作ります。電車やバスの中ではなく、家など、ゆっくりできる場所で開いてください</p>
+          <p className="relative mt-6 max-w-xs text-center text-[12px] leading-relaxed tracking-[0.06em] text-white/55">この先は、あなたの声で進みます。電車やバスの中ではなく、家など、ゆっくりできる場所で開いてください</p>
           <button
             disabled={!ready}
             onClick={() => {

@@ -1,142 +1,168 @@
 {
- "note": "Claude Code が作る物語の音（Runwareの音声モデル）。items に { id, kind: se|bgm, prompt, duration } を足して push すると作る（id ごとに1回。作り直しは redo）。se → apps/web/public/onboarding/se-<id>.mp3、bgm → bgm-<id>.m4a。probe に言葉を入れると、その名前のモデル一覧を報告に出す。",
- "sfxModel": "mirelo:1@1",
+ "note": "Claude Code が作る物語の音（Runwareの音声モデル）。items に { id, kind: se|bgm, prompt, duration } を足して push すると作る（id ごとに1回。作り直しは redo）。se → apps/web/public/onboarding/se-<id>.mp3、bgm → bgm-<id>.m4a。probe に言葉を入れると、その名前のモデル一覧を報告に出す。 効果音は Seed Audio（2026-10-27 利用者の決定。Mirelo より自然）。無音の取り直しは置きかえず、redo に残る。",
+ "sfxModel": "bytedance:seed-audio@1.0",
  "musicModel": "minimax:music@2.6",
  "parallel": 3,
- "redo": [],
+ "redo": [
+  "sparkle",
+  "chime",
+  "bell",
+  "gong",
+  "magic",
+  "whoosh",
+  "pop",
+  "boing",
+  "knock",
+  "heartbeat",
+  "blip",
+  "thud",
+  "gate-close",
+  "smoke",
+  "rocket",
+  "crackers",
+  "egg-crack",
+  "paper",
+  "stamp",
+  "footsteps",
+  "portal",
+  "sub-hit",
+  "projector",
+  "seal-press",
+  "rocket-roar"
+ ],
  "probe": [],
  "items": [
   {
    "id": "sparkle",
    "kind": "se",
    "duration": 2,
-   "prompt": "magical sparkling twinkle, a soft shimmer of tiny glass bells and glitter, fantasy game, clean"
+   "prompt": "Tiny glittering sparkles of light twinkling and fading, delicate and magical, clean high-quality sound design. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "chime",
    "kind": "se",
    "duration": 2.5,
-   "prompt": "a single warm magical chime with a gentle shimmering tail, fantasy, clean, no music"
+   "prompt": "A single bright magical chime with a soft shimmering tail, like a riddle being revealed. Clean, elegant, high quality. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "bell",
    "kind": "se",
    "duration": 3,
-   "prompt": "one clear small brass bell ring with natural decay, clean"
+   "prompt": "One clear small brass hand bell rung once in a quiet stone temple, a bright strike with a natural long ringing decay. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "gong",
    "kind": "se",
    "duration": 4,
-   "prompt": "a deep temple gong strike with long resonant decay, mysterious"
+   "prompt": "A huge bronze temple gong struck once with a padded mallet: a deep, mysterious low boom that swells and shimmers for several seconds. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "magic",
    "kind": "se",
    "duration": 3,
-   "prompt": "a magic spell being cast: rising shimmering whoosh with sparkles and a soft glowing hum, fantasy anime"
+   "prompt": "A magical spell being cast: a shimmering rising swell of glittering chimes and a soft whoosh of light, ending in a warm sparkle. Cinematic fantasy film sound design, clean, high quality. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "whoosh",
    "kind": "se",
    "duration": 2,
-   "prompt": "a fast smooth air whoosh passing by, cinematic, clean"
+   "prompt": "A fast cinematic whoosh as something flies past the camera, deep and airy, clean, high-quality film sound design. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "pop",
    "kind": "se",
    "duration": 1,
-   "prompt": "a cute soft bubbly pop, cartoon, clean"
+   "prompt": "A cute soft bubbly pop, like a soap bubble bursting near the ear, light and playful. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "boing",
    "kind": "se",
    "duration": 1.5,
-   "prompt": "a comic springy boing for a character jumping back in surprise, cartoon"
+   "prompt": "A comic springy boing of a cartoon character jumping back in surprise, bouncy metal spring, playful. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "knock",
    "kind": "se",
    "duration": 1.5,
-   "prompt": "two knocks on a heavy wooden door, clean"
+   "prompt": "Two firm knocks on a heavy old wooden door in a quiet hall, solid wood resonance. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "ding",
    "kind": "se",
    "duration": 2,
-   "prompt": "a cheerful TV quiz show correct-answer jingle: two bright bell tones going up, ding-dong, clean, short"
+   "prompt": "a cheerful TV quiz show correct-answer jingle: two bright bell tones going up, ding-dong, clean, short. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "heartbeat",
    "kind": "se",
    "duration": 3,
-   "prompt": "two slow heavy heartbeats, deep, close"
+   "prompt": "Two slow, heavy, deep heartbeats heard from very close, tense and quiet. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "blip",
    "kind": "se",
    "duration": 1,
-   "prompt": "a soft futuristic device blip, a hologram switching on, clean"
+   "prompt": "A soft futuristic device blip as a small hologram screen switches on: a gentle rising digital tone with a faint shimmer. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "thud",
    "kind": "se",
    "duration": 2,
-   "prompt": "a heavy dull thud of a huge stone gate shutting, deep impact with a short rumble"
+   "prompt": "A heavy dull thud of a huge stone slab settling into place, deep low impact with a short rumble of dust. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "gate-close",
    "kind": "se",
    "duration": 4,
-   "prompt": "giant ancient stone-and-gold gate doors swinging shut with a deep grinding rumble and a heavy final boom"
+   "prompt": "A huge ancient stone-and-iron gate slowly closing with a deep rumble, then a heavy booming thud that echoes in a vast hall. Cinematic, high quality. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "smoke",
    "kind": "se",
    "duration": 3,
-   "prompt": "thick dark magical smoke billowing up with a low airy rumble and a mysterious hiss"
+   "prompt": "Thick dark magical smoke billowing up suddenly: a low airy whoosh with a soft rumbling swirl that fades. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "rocket",
    "kind": "se",
    "duration": 5,
-   "prompt": "a rocket engine igniting and launching, deep rumble rising into a roaring lift-off, cinematic"
+   "prompt": "A golden rocket igniting and lifting off: deep rumble rising into a powerful roaring thrust that moves away. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "crackers",
    "kind": "se",
    "duration": 3,
-   "prompt": "many party poppers going off at once, pan pa-pa-pa-pan, with confetti rustle, festive"
+   "prompt": "Many party poppers going off at once, pan pa-pa-pa-pan, with paper confetti fluttering down. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "egg-crack",
    "kind": "se",
    "duration": 2.5,
-   "prompt": "an egg shell cracking open in a few small cracks then a soft magical pop, cute"
+   "prompt": "A magical egg shell cracking open: a few small crisp cracks, then a soft pop as the shell breaks. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "paper",
    "kind": "se",
    "duration": 2,
-   "prompt": "crisp paper folding quickly, a few soft folds, clean"
+   "prompt": "Crisp thick paper being folded quickly into a paper airplane: a few soft folds and creases. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "stamp",
    "kind": "se",
    "duration": 1.2,
-   "prompt": "a rubber stamp pressed firmly on thick paper, a satisfying thunk"
+   "prompt": "A rubber stamp pressed firmly onto thick paper on a wooden desk: a crisp satisfying thump. Close, clean, high quality foley. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "footsteps",
    "kind": "se",
    "duration": 4,
-   "prompt": "small soft footsteps walking on polished stone in a large hall, light echo"
+   "prompt": "Small soft footsteps walking on polished stone in a large echoing hall, unhurried. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "portal",
    "kind": "se",
    "duration": 3,
-   "prompt": "a glowing light pillar descending from above with a deep shimmering hum, holy, magical"
+   "prompt": "A glowing pillar of light descending from above: a deep shimmering hum that swells with sparkling high tones. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "comedy",
@@ -288,17 +314,17 @@
   {
    "id": "sub-hit",
    "kind": "se",
-   "prompt": "A deep cinematic sub-bass hit with a long soft tail, dark and mysterious, for a quick cut in a film trailer."
+   "prompt": "A deep cinematic sub-bass hit with a long soft tail, dark and weighty, for a dramatic title. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "projector",
    "kind": "se",
-   "prompt": "An old 16mm film projector running: steady mechanical clatter of the film sprockets and a soft motor hum, recorded in a quiet room."
+   "prompt": "An old 16mm film projector running: steady mechanical clatter of the film gate and the hum of the motor. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "seal-press",
    "kind": "se",
-   "prompt": "A wax seal pressed onto a thick paper envelope, then a soft magical golden chime as the seal glows."
+   "prompt": "A wax seal pressed firmly onto a thick paper envelope, then a soft lift of the stamp. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "record2",
@@ -313,7 +339,7 @@
   {
    "id": "rocket-roar",
    "kind": "se",
-   "prompt": "A rocket launch: a deep rumbling ignition, a huge roar of engines and billowing smoke, rising and fading into the distance."
+   "prompt": "A rocket launch: a deep rumbling ignition, a huge roar of engines and the rattle of the launch pad. High quality, realistic and rich, clean recording, no music, no voices."
   },
   {
    "id": "kimorin-ballad",
@@ -324,42 +350,6 @@
      "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
     }
    }
-  },
-  {
-   "id": "magic-v2",
-   "kind": "se",
-   "model": "bytedance:seed-audio@1.0",
-   "prompt": "A magical spell being cast: a shimmering rising swell of glittering chimes and a soft whoosh of light, ending in a warm sparkle. Cinematic fantasy film sound design, clean, high quality."
-  },
-  {
-   "id": "whoosh-v2",
-   "kind": "se",
-   "model": "bytedance:seed-audio@1.0",
-   "prompt": "A fast cinematic whoosh as something flies past the camera, deep and airy, clean, high-quality film sound design."
-  },
-  {
-   "id": "gate-close-v2",
-   "kind": "se",
-   "model": "bytedance:seed-audio@1.0",
-   "prompt": "A huge ancient stone-and-iron gate slowly closing with a deep rumble, then a heavy booming thud that echoes in a vast hall. Cinematic, high quality."
-  },
-  {
-   "id": "stamp-v2",
-   "kind": "se",
-   "model": "bytedance:seed-audio@1.0",
-   "prompt": "A rubber stamp pressed firmly onto thick paper on a wooden desk: a crisp satisfying thump. Close, clean, high quality foley."
-  },
-  {
-   "id": "chime-v2",
-   "kind": "se",
-   "model": "bytedance:seed-audio@1.0",
-   "prompt": "A single bright magical chime with a soft shimmering tail, like a riddle being revealed. Clean, elegant, high quality."
-  },
-  {
-   "id": "sparkle-v2",
-   "kind": "se",
-   "model": "bytedance:seed-audio@1.0",
-   "prompt": "Tiny glittering sparkles of light twinkling and fading, delicate and magical, clean high-quality sound design."
   },
   {
    "id": "jupiter-mm",
