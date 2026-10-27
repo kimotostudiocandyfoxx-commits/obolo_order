@@ -62,3 +62,7 @@
 - 歌を流す画面は <audio> ではなく、物語ですでに鳴らせる状態の AudioContext で鳴らす（タップの外で始まる <audio> は iOS で止められる）。〔スキップ〕は右上のミュートと重ならない右下。
 - MIKIE⭐︎の絵（M-R135）：3案とも右腕（画面の左）がフック、左腕がガトリング。立ち絵は2案目（フックを軽く上げる）を切り抜き → onboarding/mikie.webp、猫のみーちゃん → mii.webp。プロンプトでは「HER RIGHT ARM (on the viewer's LEFT side)」と左右を画面の向きで書くと、取り違えない。
 - 物語の画面は「話している人」だけを大きく映す。MIKIE⭐︎のように話さない人物は、その人だけの sprite ＋ caption の場面を作らないと映らない。
+- 二周目の本物の画面（components/lap2）：BatiAsk（buddy chat）、Relook（今の姿を refine。mediaId なし＝今の姿）、PlazaMaker（access 'me'）、DaydreamJacket、VenusLesson booth、SongShow、Theater（marsBackstage＋MV＋oshi('mv')）、PlaceSong（savedSongs＋KIMORINの『2』）、GoodsPress（見本だけ、注文しない）、HomewardGame、RoundCards。L2Step が what で振り分け、残りは L2Screen の台本パネル。
+- まだパネルのまま：招待状（マナジェムの購入の手続きが未実装）、木・島を飾る、テーマの島、連絡室の交換台、商店の札。
+- 台本の決まり：ナレーション調のテロップは出さない（「〇〇が現れた」「〇〇が開いた」の形だけ）。ト書きは立ち絵の動き・間で見せる。
+- 歩かせて確かめる道具：scratchpad/l2w.mjs <終わった章の数> <出力> [止める文字]（PICK は「押す順」に並べる。いつも出ているボタンを先に置くと、そこで回り続ける）。
