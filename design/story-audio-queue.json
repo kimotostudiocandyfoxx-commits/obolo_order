@@ -4,16 +4,7 @@
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
   "redo": [],
-  "probe": [
-    "sound",
-    "sfx",
-    "audio",
-    "music",
-    "eleven",
-    "stable",
-    "foley",
-    "ace"
-  ],
+  "probe": [],
   "items": [
     {
       "id": "sparkle",
