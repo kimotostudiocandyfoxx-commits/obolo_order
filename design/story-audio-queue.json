@@ -360,6 +360,28 @@
       "kind": "se",
       "model": "bytedance:seed-audio@1.0",
       "prompt": "Tiny glittering sparkles of light twinkling and fading, delicate and magical, clean high-quality sound design."
+    },
+    {
+      "id": "jupiter-mm",
+      "kind": "bgm",
+      "model": "minimax:music@2.6",
+      "prompt": "Mystical ancient forest theme for a fantasy anime film: gentle harp, warm strings, soft wooden flute and a low choir hum, slow and sacred, sunlight through giant trees, wonder and calm. Orchestral, high quality, no vocals.",
+      "settings": {
+        "settings": {
+          "lyrics": "[Instrumental]"
+        }
+      }
+    },
+    {
+      "id": "jupiter-ace",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Mystical ancient forest theme for a fantasy anime film: gentle harp, warm strings, soft wooden flute and a low choir hum, slow and sacred, sunlight through giant trees, wonder and calm. Orchestral, high quality, no vocals.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
     }
   ],
   "listen": []
