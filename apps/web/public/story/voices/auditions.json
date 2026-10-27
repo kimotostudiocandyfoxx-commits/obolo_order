@@ -29,27 +29,27 @@
   },
   {
    "name": "MONBAN",
-   "line": "Obolo Orderにならなければ、ネオのまま、ここで止まる…。それも、道だ…。",
+   "line": "……切符の裏の、錠も、開いた…。天王星と、海王星…。旅の、終わりのほうで、行ける…。",
    "takes": [
     {
      "voice": "Algenib-hq",
      "file": "/story/voices/audition/monban/1-Algenib-hq.mp3",
-     "seconds": 6.48
+     "seconds": 8.184
     },
     {
      "voice": "Orus-hq",
      "file": "/story/voices/audition/monban/2-Orus-hq.mp3",
-     "seconds": 6.024
+     "seconds": 7.536
     },
     {
      "voice": "Iapetus-hq",
      "file": "/story/voices/audition/monban/3-Iapetus-hq.mp3",
-     "seconds": 5.76
+     "seconds": 9.024
     },
     {
      "voice": "Schedar-hq",
      "file": "/story/voices/audition/monban/4-Schedar-hq.mp3",
-     "seconds": 7.584
+     "seconds": 8.904
     }
    ]
   },
@@ -81,53 +81,53 @@
   },
   {
    "name": "ヒポキン",
-   "line": "選んで、並べて、見せる。それも、DJの腕だ。\n作品がまだなくても、場所だけ先に作っていい。",
+   "line": "なお、三つ以外の曲にも、あとから映像は付けられる。\nどこまで付けるかも、お前が選んでいい。",
    "takes": [
     {
      "voice": "Gacrux--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/1-Gacrux--3st-hq.mp3",
-     "seconds": 7.248
+     "seconds": 6.6
     },
     {
      "voice": "Charon--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/2-Charon--3st-hq.mp3",
-     "seconds": 6.264
+     "seconds": 6.672
     },
     {
      "voice": "Algieba--3st-hq",
      "file": "/story/voices/audition/c-13wd9v8/3-Algieba--3st-hq.mp3",
-     "seconds": 6.6
+     "seconds": 6.984
     },
     {
      "voice": "Alnilam--4st-hq",
      "file": "/story/voices/audition/c-13wd9v8/4-Alnilam--4st-hq.mp3",
-     "seconds": 7.2
+     "seconds": 5.496
     }
    ]
   },
   {
    "name": "たこ焼きブラザー",
-   "line": "注文すれば、家に届くZE。値段と送料と届け先を見て、欲しかったら注文するZE。",
+   "line": "地図で、扉だけ見えてた星だZE。Obolo Orderになった者だけが、入れるZE。",
    "takes": [
     {
      "voice": "Fenrir-hq",
      "file": "/story/voices/audition/c-op0tl3/1-Fenrir-hq.mp3",
-     "seconds": 6.336
+     "seconds": 4.872
     },
     {
      "voice": "Algenib-hq",
      "file": "/story/voices/audition/c-op0tl3/2-Algenib-hq.mp3",
-     "seconds": 5.28
+     "seconds": 4.8
     },
     {
      "voice": "Sadaltager-hq",
      "file": "/story/voices/audition/c-op0tl3/3-Sadaltager-hq.mp3",
-     "seconds": 6
+     "seconds": 4.992
     },
     {
      "voice": "Alnilam-hq",
      "file": "/story/voices/audition/c-op0tl3/4-Alnilam-hq.mp3",
-     "seconds": 6.264
+     "seconds": 5.472
     }
    ]
   },
@@ -159,27 +159,27 @@
   },
   {
    "name": "大根カイザー",
-   "line": "保存してから、届けるか決めればよいダ。\n君だけの根っこに、しまっておくのもよいダ。",
+   "line": "今日は、まだ見たことのないものを描くダ。撮っていなくても、思い描いたものは、描けるダ。",
    "takes": [
     {
      "voice": "Gacrux--6st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/1-Gacrux--6st-growl-hq.mp3",
-     "seconds": 6.792
+     "seconds": 6.24
     },
     {
      "voice": "Algenib--6st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/2-Algenib--6st-growl-hq.mp3",
-     "seconds": 6.048
+     "seconds": 7.2
     },
     {
      "voice": "Charon--7st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/3-Charon--7st-growl-hq.mp3",
-     "seconds": 7.08
+     "seconds": 6.912
     },
     {
      "voice": "Gacrux--8st-growl-hq",
      "file": "/story/voices/audition/c-16ueow0/4-Gacrux--8st-growl-hq.mp3",
-     "seconds": 6.648
+     "seconds": 7.128
     }
    ]
   },
@@ -211,79 +211,79 @@
   },
   {
    "name": "ボスG",
-   "line": "ここは、いつでも回していい。\nお前の曲と、お前の声と、お前の映像でな。",
+   "line": "ゆっくり回せば、二つの曲が、溶けあう。すっと回せば、ぱっと切りかわる。",
    "takes": [
     {
      "voice": "Gacrux-hq",
      "file": "/story/voices/audition/c-1hwam1f/1-Gacrux-hq.mp3",
-     "seconds": 7.464
+     "seconds": 6.168
     },
     {
      "voice": "Algenib-hq",
      "file": "/story/voices/audition/c-1hwam1f/2-Algenib-hq.mp3",
-     "seconds": 5.856
+     "seconds": 6.216
     },
     {
      "voice": "Alnilam-hq",
      "file": "/story/voices/audition/c-1hwam1f/3-Alnilam-hq.mp3",
-     "seconds": 6.432
+     "seconds": 5.808
     },
     {
      "voice": "Sadaltager-hq",
      "file": "/story/voices/audition/c-1hwam1f/4-Sadaltager-hq.mp3",
-     "seconds": 6.672
+     "seconds": 5.712
     }
    ]
   },
   {
    "name": "ハットG",
-   "line": "火星で映像をつけた曲は、映像もいっしょに切り替わる。映すのも、DJのうちだ。",
+   "line": "サビの頭に置けば、いきなり山から入る。静かな所に置けば、そっと入る。",
    "takes": [
     {
      "voice": "Achird-hq",
      "file": "/story/voices/audition/c-1pvfg32/1-Achird-hq.mp3",
-     "seconds": 5.28
+     "seconds": 4.848
     },
     {
      "voice": "Zubenelgenubi-hq",
      "file": "/story/voices/audition/c-1pvfg32/2-Zubenelgenubi-hq.mp3",
-     "seconds": 4.824
+     "seconds": 5.208
     },
     {
      "voice": "Callirrhoe-hq",
      "file": "/story/voices/audition/c-1pvfg32/3-Callirrhoe-hq.mp3",
-     "seconds": 5.088
+     "seconds": 5.016
     },
     {
      "voice": "Umbriel-hq",
      "file": "/story/voices/audition/c-1pvfg32/4-Umbriel-hq.mp3",
-     "seconds": 5.064
+     "seconds": 4.608
     }
    ]
   },
   {
    "name": "ロングG",
-   "line": "……速さを、そろえろ。",
+   "line": "……速さは、もう、そろえられるな。",
    "takes": [
     {
      "voice": "Aoede-hq",
      "file": "/story/voices/audition/c-1pm5jmk/1-Aoede-hq.mp3",
-     "seconds": 1.656
+     "seconds": 2.136
     },
     {
      "voice": "Umbriel-hq",
      "file": "/story/voices/audition/c-1pm5jmk/2-Umbriel-hq.mp3",
-     "seconds": 1.728
+     "seconds": 2.448
     },
     {
      "voice": "Sulafat-hq",
      "file": "/story/voices/audition/c-1pm5jmk/3-Sulafat-hq.mp3",
-     "seconds": 2.232
+     "seconds": 2.712
     },
     {
      "voice": "Achernar-hq",
      "file": "/story/voices/audition/c-1pm5jmk/4-Achernar-hq.mp3",
-     "seconds": 1.8
+     "seconds": 2.544
     }
    ]
   }
