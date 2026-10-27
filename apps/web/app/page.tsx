@@ -3,6 +3,7 @@
 import { DemoBanner } from '@/components/DemoBanner';
 import { HomeGate } from '@/components/HomeGate';
 import { LangToggle } from '@/components/LangToggle';
+import { Lap2Chip } from '@/components/lap2/Lap2Chip';
 import { ManaChip } from '@/components/ManaChip';
 import { OshiShelf } from '@/components/OshiShelf';
 import { SolarSystem } from '@/components/SolarSystem';
@@ -25,6 +26,7 @@ function SolarHome({ hint, legend, tagline }: { hint: string; legend: string; ta
           Obolo Order
         </h1>
         <div className="flex items-center gap-2">
+          <Lap2Chip />
           <OshiShelf />
           <ManaChip />
           <LangToggle />

@@ -1,5 +1,8 @@
 'use client';
 
+import { L2Screen } from '@/components/lap2/L2Screen';
+import { SongShow } from '@/components/lap2/SongShow';
+import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
@@ -982,6 +985,20 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             run(iRef.current + 1);
           }}
         />
+      )}
+      {started && step?.t === 'l2' && (
+        <L2Screen
+          key={i}
+          what={step.what}
+          fill={(t) => fill(t, v)}
+          onDone={(a) => {
+            for (const [k, val] of Object.entries(a)) remember(k, val);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'song' && (
+        <SongShow key={i} src={MIKIE_DRILL.src} title={MIKIE_DRILL.title} poster="/onboarding/mikie.webp" lines={MIKIE_DRILL.lines} muted={muted} onDone={next} />
       )}
       {started && step?.t === 'made' && step.what === 'film' && <FilmReel made={v.made ?? {}} neo={v.neo || v.name} muted={muted} onDone={next} />}
       {started && step?.t === 'made' && step.what === 'mv' && (

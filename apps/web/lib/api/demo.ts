@@ -7,6 +7,8 @@ import {
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
   MAKE_COST,
+  LAP2,
+  lap2Done,
   type MakeKind,
   STARTER_GEM_MANA,
   neoVoiceUrl,
@@ -644,6 +646,14 @@ export class DemoApi implements Api {
       // what was made today, for the next days' stories (like the server's onboardingJson)
       const story = { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`d${day}.${k}`, v])) };
       return { journeyCompletedAt: now(), story };
+    });
+  }
+
+  async completeLap2(chapter: number, answers?: Record<string, string>) {
+    return this.patchMe((u) => {
+      if (!u.orderedAt || chapter !== lap2Done(u.story)) return {};
+      const id = LAP2[chapter].id;
+      return { story: { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`l2.${id}.${k}`, v])), 'l2.done': String(chapter + 1) } };
     });
   }
 

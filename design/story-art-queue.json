@@ -4905,6 +4905,90 @@
     "design/story/refs/kimorin-sun-grey.jpg"
    ],
    "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours and finish as the first picture. No text, no letters, no logos, no watermark. The character: Mii-chan, a small round fluffy house cat (a Bati companion), cream and brown tabby, big friendly eyes, sitting and looking up happily. Cute, kids-friendly."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "uranus-field",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "Uranus, above the clouds: a soft meadow floating on a sea of pale cyan clouds under a blue-green sky, the planet's huge ring standing sideways and slowly turning in the sky. Dotted across the meadow, clean white round planet-shaped atelier pods about five metres wide, each with one small round window; a winding path between them with a small three-wheeled scooter parked; in the middle distance a large floating island with a little shop building. Painterly anime film quality in the palette of the reference. No people, no text, no letters."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "uranus-press",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "On a small floating island at the root of Uranus's sideways ring: a big black iron printing press with one large wheel handle, standing on a stone platform, pale blue-green sky and clouds around, small white planet-shaped atelier pods in the distance. Painterly anime film quality in the palette of the reference. No people, no text, no letters."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "uranus-shop",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "Inside a small cosy shop on a floating island above the clouds: wooden shelves with sample goods — mugs, T-shirts folded, tote bags, acrylic stands, badges, stickers — each with a small blank paper tag, no shopkeeper, warm light from a round window, one empty shelf at the very back. Painterly anime film quality in the palette of the reference. No people, no text, no letters."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "neptune-islands",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "Neptune: over a deep blue ocean of slowly swirling white storm clouds, flat floating islands — one a giant board-game track island, one a hedge maze island, one a miniature model town island — connected by thin glowing light bridges; at the foot of the nearest bridge a small wooden signboard (blank). Painterly anime film quality in the palette of the reference. No people, no text, no letters."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "neptune-town",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "A floating island on Neptune that is a miniature model town: little houses, a slope road, a river with a small bridge, a tiny takoyaki stall, all like a diorama, seen from slightly above, deep blue stormy sky behind, a small gate at one end and one small house at the other. Painterly anime film quality in the palette of the reference. No people, no text, no letters."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "earth-comms",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "The comms room of an old secret-society temple on Earth: a whole wall of an antique telephone switchboard with hundreds of plug holes and brass fittings, only a few with name plates, cords hanging; an old wooden desk in the corner with a white envelope and a magnifying glass; warm lamplight, an iron door standing open. Painterly anime film quality in the palette of the reference. No people, no text, no letters."
   }
  ],
  "redo": []

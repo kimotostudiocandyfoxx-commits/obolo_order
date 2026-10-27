@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { AdvanceJourneyBody, AtelierLayout, CompleteJourneyDayBody, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
+import { AdvanceJourneyBody, AtelierLayout, CompleteJourneyDayBody, CompleteLap2Body, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
@@ -39,6 +39,13 @@ export class UsersController {
   @HttpCode(200)
   completeDay(@UserId() userId: string, @Body() body: unknown) {
     return this.users.completeJourneyDay(userId, parseBody(CompleteJourneyDayBody, body));
+  }
+
+  /** the second journey: a chapter finished (shared/lap2.ts) */
+  @Post('lap2/complete')
+  @HttpCode(200)
+  completeLap2(@UserId() userId: string, @Body() body: unknown) {
+    return this.users.completeLap2(userId, parseBody(CompleteLap2Body, body));
   }
 
   /** Operator testing from /lab: needs the admin token (404 otherwise). */

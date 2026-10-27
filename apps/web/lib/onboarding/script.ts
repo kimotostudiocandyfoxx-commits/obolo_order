@@ -82,6 +82,10 @@ export type Step =
   | { t: 'venus' }
   /** Show what was made: the MV on Mars's big screen, … (tap to continue). */
   | { t: 'made'; what: 'mv' | 'film' }
+  /** the second journey's screens (components/lap2/L2Screen.tsx); what they decide joins the answers */
+  | { t: 'l2'; what: import('./lap2').L2What }
+  /** a song played whole over a poster with its lines (L2-MARS-S001 『MIKIE⭐︎ドリル』, M-R134); 〔スキップ〕 at the corner */
+  | { t: 'song'; id: 'mikie-drill' }
   // --- the stage's directions (production UI 3, 2026-10-15) ---
   /** 〔カメラ：寄る／引く／揺れ〕 on the background; `focus` = where it moves in ("50% 30%") */
   | { t: 'cam'; move: 'in' | 'out' | 'shake'; focus?: string }

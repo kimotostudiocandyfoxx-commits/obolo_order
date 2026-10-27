@@ -8,6 +8,9 @@ import {
   MONTHLY_GRANT_MANA,
   type AtelierLayout,
   type CompleteJourneyDayBody,
+  type CompleteLap2Body,
+  LAP2,
+  lap2Done,
   type Locale,
   type Me,
   type UpdateProfileBody,
@@ -40,7 +43,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
     butterfly: u.butterflyUrl ?? null,
-    story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^d\d+\./.test(k))),
+    story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2)\./.test(k))),
     createdAt: u.createdAt.toISOString(),
   };
 }
@@ -115,6 +118,26 @@ export class UsersService {
       .set({
         journeyCompletedAt: new Date(),
         onboardingJson: { ...cur.onboardingJson, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`d${body.day}.${k}`, v])) },
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(u);
+  }
+
+  /**
+   * A chapter of the second journey was finished (Obolo Order only). Chapters go in order and never back;
+   * finishing one again (a replay) keeps what was made then.
+   */
+  async completeLap2(userId: string, body: CompleteLap2Body): Promise<Me> {
+    const cur = await this.load(userId);
+    const story = (cur.onboardingJson ?? {}) as Record<string, string>;
+    if (!cur.orderedAt || body.chapter !== lap2Done(story)) return toMe(cur);
+    const id = LAP2[body.chapter].id;
+    const [u] = await this.db.write
+      .update(users)
+      .set({
+        onboardingJson: { ...story, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`l2.${id}.${k}`, v])), 'l2.done': String(body.chapter + 1) },
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))

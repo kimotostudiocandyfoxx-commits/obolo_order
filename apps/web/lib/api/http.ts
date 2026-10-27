@@ -181,6 +181,10 @@ export class HttpApi implements Api {
   acceptInvite(code: string, displayName: string) {
     return this.req<Awaited<ReturnType<Api['acceptInvite']>>>('POST', `/invites/${encodeURIComponent(code)}/accept`, { displayName });
   }
+  completeLap2(chapter: number, answers?: Record<string, string>) {
+    return this.req<Awaited<ReturnType<Api['completeLap2']>>>('POST', '/me/lap2/complete', { chapter, answers });
+  }
+
   completeJourneyDay(day: number, answers?: Record<string, string>) {
     return this.req<Awaited<ReturnType<Api['completeJourneyDay']>>>('POST', '/me/journey/complete', { day, answers });
   }

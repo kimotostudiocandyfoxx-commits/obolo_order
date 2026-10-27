@@ -148,6 +148,8 @@ export interface Api {
   getInvite(code: string): Promise<InviteView>;
   acceptInvite(code: string, displayName: string): Promise<{ token: string; user: Me; isNew: boolean }>;
   completeJourneyDay(day: number, answers?: Record<string, string>): Promise<Me>;
+  /** the second journey: chapter `chapter` (shared LAP2) finished */
+  completeLap2(chapter: number, answers?: Record<string, string>): Promise<Me>;
   /** Operator testing (/lab, admin token): move this account to a journey day. */
   jumpJourney(day: number): Promise<Me>;
   /** Start the next day (skip = "明日まで待てへん"). */

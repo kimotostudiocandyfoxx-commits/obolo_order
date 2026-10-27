@@ -1,8 +1,9 @@
 'use client';
 
-import { JOURNEY_DONE, JOURNEY_WAIT_MS } from '@obolo/shared';
+import { JOURNEY_DONE, JOURNEY_WAIT_MS, LAP2_DONE, lap2Done } from '@obolo/shared';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
+import { Lap2Story } from '@/components/lap2/Lap2Story';
 import { EntryScreen } from '@/components/onboarding/EntryScreen';
 import { JourneyDayScreen } from '@/components/onboarding/JourneyDayScreen';
 import { StoryDay } from '@/components/onboarding/StoryDay';
@@ -21,7 +22,7 @@ const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
  *   day 1–6, playing → that day's story (Day 1 = /invite story)
  *   day finished     → "〇〇、また明日。" 24 h countdown (or 明日まで待てない)
  *   day 7            → the Eclipse day: story with the ¥88/month payment inside, then "また明日" too
- *   day 8 (ORDER)    → the solar system
+ *   day 9, ORDER     → the second journey (once per visit, until it is done; components/lap2) → the solar system
  */
 export function HomeGate({ children }: { children: ReactNode }) {
   const { status, me, setMe } = useAuth();
@@ -30,7 +31,10 @@ export function HomeGate({ children }: { children: ReactNode }) {
   if (status === 'guest' || !me) return <EntryScreen />;
 
   const day = me.journeyDay;
-  if (day >= JOURNEY_DONE) return <>{children}</>;
+  if (day >= JOURNEY_DONE) {
+    if (me.orderedAt && lap2Done(me.story) < LAP2_DONE) return <Lap2Gate>{children}</Lap2Gate>;
+    return <>{children}</>;
+  }
   if (me.journeyCompletedAt) {
     return (
       <TomorrowScreen
@@ -50,6 +54,38 @@ export function HomeGate({ children }: { children: ReactNode }) {
   const story = STORIES[day];
   if (story) return <StoryDay key={day} day={day} story={story} />;
   return <JourneyDayScreen key={day} day={day} />;
+}
+
+/** the second journey opens with the app (L2-EARTH 「次に宇宙を開くと」); left for today, the map stays until the next visit */
+export const LAP2_LATER = 'obolo.lap2.later';
+export const LAP2_OPEN = 'obolo:lap2';
+function Lap2Gate({ children }: { children: ReactNode }) {
+  const [later, setLater] = useState<boolean | null>(null);
+  useEffect(() => {
+    try {
+      setLater(sessionStorage.getItem(LAP2_LATER) === '1');
+    } catch {
+      setLater(false);
+    }
+    // 〔旅の続き〕 on the map opens it again
+    const open = () => setLater(false);
+    window.addEventListener(LAP2_OPEN, open);
+    return () => window.removeEventListener(LAP2_OPEN, open);
+  }, []);
+  if (later === null) return <div className="fixed inset-0 bg-black" />;
+  if (later) return <>{children}</>;
+  return (
+    <Lap2Story
+      onLeave={() => {
+        try {
+          sessionStorage.setItem(LAP2_LATER, '1');
+        } catch {
+          /* ignore */
+        }
+        setLater(true);
+      }}
+    />
+  );
 }
 
 function ResumeStory() {
