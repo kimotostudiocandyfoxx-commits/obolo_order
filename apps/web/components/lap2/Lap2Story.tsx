@@ -85,6 +85,7 @@ export function Lap2Story({ onLeave }: { onLeave: () => void }) {
       onProgress={onProgress}
       onName={async () => undefined}
       ordered
+      autoStart={!at.resumed && at.chapter !== start}
       onPause={() => setTimeout(onLeave, 1200)}
       onEnd={(answers) => {
         save(k, null);

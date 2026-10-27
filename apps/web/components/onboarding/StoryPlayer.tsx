@@ -108,6 +108,8 @@ interface Props {
   onEnd: (answers: Record<string, string>) => void;
   /** Day 1 until Saturn: answers are typed, no mic (M-R41) */
   textOnly?: boolean;
+  /** straight on from a tap that already woke the sound (the second journey's next chapter): no start screen */
+  autoStart?: boolean;
 }
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -149,7 +151,7 @@ function chatBottom(s: Step | undefined): number {
   return 30;
 }
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -730,6 +732,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       setReady(true);
     }
   };
+
+  // the second journey's next chapter, straight from 〔…へ向かう〕: the sound is already awake
+  useEffect(() => {
+    if (autoStart) start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const next = () => {
     const st = steps[iRef.current];
