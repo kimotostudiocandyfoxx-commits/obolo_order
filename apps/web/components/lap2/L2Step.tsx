@@ -8,6 +8,7 @@ import { BatiAsk } from './BatiAsk';
 import { DaydreamJacket } from './DaydreamJacket';
 import { HomewardGame } from './HomewardGame';
 import { L2Screen } from './L2Screen';
+import { PlaceSong } from './PlaceSong';
 import { PlazaMaker } from './PlazaMaker';
 import { Relook } from './Relook';
 import { RoundCards } from './RoundCards';
@@ -42,6 +43,8 @@ export function L2Step({
       return <DaydreamJacket api={lessonApi} bati={v.bati ?? ''} fill={fill} onDone={onDone} />;
     case 'round-cards':
       return <RoundCards answers={answers} look={v.look} onDone={() => onDone({})} />;
+    case 'place-song':
+      return <PlaceSong onDone={onDone} />;
     case 'game':
       return <HomewardGame watch={answers.game === 'KIMORINが遊ぶのを、となりで見る'} onDone={onDone} />;
     case 'booth':
