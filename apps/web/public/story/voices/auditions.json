@@ -185,27 +185,27 @@
   },
   {
    "name": "うんちピンポンくん",
-   "line": "ピンポン♪　ピンポン♪",
+   "line": "OK！　ほかに、加えたい要素、ある？",
    "takes": [
     {
      "voice": "Puck-hq",
      "file": "/story/voices/audition/c-131ge3q/1-Puck-hq.mp3",
-     "seconds": 3.408
+     "seconds": 2.496
     },
     {
      "voice": "Laomedeia-hq",
      "file": "/story/voices/audition/c-131ge3q/2-Laomedeia-hq.mp3",
-     "seconds": 2.4
+     "seconds": 2.928
     },
     {
      "voice": "Leda-hq",
      "file": "/story/voices/audition/c-131ge3q/3-Leda-hq.mp3",
-     "seconds": 2.28
+     "seconds": 2.592
     },
     {
      "voice": "Zephyr-hq",
      "file": "/story/voices/audition/c-131ge3q/4-Zephyr-hq.mp3",
-     "seconds": 2.256
+     "seconds": 2.784
     }
    ]
   },
