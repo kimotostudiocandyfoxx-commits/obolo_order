@@ -1,5 +1,6 @@
-# UI art — 2026-10-27T03:08:09.763Z
+# UI art — 2026-10-27T03:35:21.441Z
 
-Seedream 5.0 Pro / 1枚 / 約15円
+Seedream 5.0 Pro / 2枚 / 約14円
 
-- ✅ kororin-kimorin80
+- ✅ mars-studio-canyon
+- ✅ mars-studio-ship
