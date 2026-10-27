@@ -60,7 +60,8 @@ export class BillingService {
     if (!pk) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'BILLING_MISCONFIGURED', 'STRIPE_PUBLISHABLE_KEY is not set');
     const u = await this.load(userId);
     if (u.orderedAt) throw apiError(HttpStatus.CONFLICT, 'ALREADY_ORDERED', 'Already an ORDER member');
-    if (u.journeyDay !== JOURNEY_PAYMENT) throw apiError(HttpStatus.CONFLICT, 'NOT_ECLIPSE_DAY', 'Not the Eclipse day yet');
+    // the Sun day, or later as a resident who comes back for the Eclipse (draft 21, D08-S005)
+    if (u.journeyDay < JOURNEY_PAYMENT) throw apiError(HttpStatus.CONFLICT, 'NOT_ECLIPSE_DAY', 'Not the Eclipse day yet');
 
     let customer = u.stripeCustomerId;
     if (!customer) {

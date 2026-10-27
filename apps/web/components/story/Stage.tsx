@@ -71,6 +71,10 @@ const CHAR: Record<string, CharSpec> = {
   freezy: { bottom: 8, height: 50, face: 0.2, tint: '#5aa8d8', faces: madeFaces('freezy-x', FRIEND) },
   hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a', faces: madeFaces('hipokin-x', FRIEND) },
   'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
+  // Venus's gorilla bosses (client art 2026-10-05; draft 21 brings them into the first journey)
+  bossg: { bottom: 6, height: 70, face: 0.18, tint: '#3a3a40' },
+  hatg: { bottom: 6, height: 66, face: 0.2, tint: '#c8a030' },
+  longg: { bottom: 6, height: 70, face: 0.18, tint: '#a07ac8' },
 };
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
 export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);
@@ -88,6 +92,9 @@ const SPEAKER: Record<string, string[]> = {
   フリージー: ['freezy'],
   ヒポキン: ['hipokin'],
   うんちピンポンくん: ['unchi-pinpon'],
+  ボスG: ['bossg'],
+  ハットG: ['hatg'],
+  ロングG: ['longg'],
 };
 /** The one speaking is not among the pictures on stage (in the video, or off screen). */
 export const OFFSTAGE = '__offstage__';

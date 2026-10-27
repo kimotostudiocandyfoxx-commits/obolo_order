@@ -5,11 +5,11 @@ import { DAY4 } from './day4';
 import { DAY5 } from './day5';
 import { DAY6 } from './day6';
 import { DAY7 } from './day7';
+import { DAY8 } from './day8';
 import type { Step } from './script';
-import { VENUS_DAY } from './venus';
 
 /**
- * Scripted journey days (seven-day first journey, story 2026-10-14). Days without a script show the
+ * Scripted journey days (eight-day first journey, story draft 21). Days without a script show the
  * placeholder JourneyDayScreen.
  */
 export interface DayStory {
@@ -32,11 +32,10 @@ export const STORIES: Record<number, DayStory> = {
   4: { steps: DAY4, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
   5: { steps: DAY5, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
   6: { steps: DAY6, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
-  // the Eclipse day: payment inside the story; after its countdown the visitor is an ORDER
   7: { steps: DAY7, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
+  // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
+  8: { steps: DAY8, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
 };
 
-/** Not on the first journey (2026-10-14): Venus's old day, kept for the preview pages only. */
-export const PREVIEW_ONLY: Record<number, DayStory> = {
-  8: { steps: VENUS_DAY, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
-};
+/** Days shown only on the preview pages (none now: Venus is day 7 of the first journey since draft 21). */
+export const PREVIEW_ONLY: Record<number, DayStory> = {};

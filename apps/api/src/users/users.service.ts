@@ -92,12 +92,11 @@ export class UsersService {
 
   /**
    * The story of `day` was finished. Idempotent; never moves the journey backwards.
-   * Day 7 (the Eclipse day) can only be finished after paying; the next day is ORDER (8).
+   * Day 8 (the Sun) ends paid (ORDER) or not (a resident, draft 21); either way the journey is then done.
    */
   async completeJourneyDay(userId: string, body: CompleteJourneyDayBody): Promise<Me> {
     const cur = await this.load(userId);
     if (cur.journeyDay !== body.day || cur.journeyCompletedAt) return toMe(cur);
-    if (body.day === JOURNEY_PAYMENT && !cur.orderedAt) throw apiError(HttpStatus.PAYMENT_REQUIRED, 'ORDER_REQUIRED', 'The Eclipse has not been paid for');
     const [u] = await this.db.write
       .update(users)
       .set({
@@ -152,7 +151,8 @@ export class UsersService {
    */
   async demoOrder(userId: string): Promise<Me> {
     const cur = await this.load(userId);
-    if (cur.journeyDay !== JOURNEY_PAYMENT || cur.orderedAt) return toMe(cur);
+    // the Sun day, or later as a resident (the Eclipse can be taken any time: D08-S005)
+    if (cur.journeyDay < JOURNEY_PAYMENT || cur.orderedAt) return toMe(cur);
     return this.markOrdered(userId, { subscriptionStatus: 'demo' });
   }
 

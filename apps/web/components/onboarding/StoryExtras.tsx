@@ -233,9 +233,9 @@ export function knownSealsOn(day: number): number[] {
   // the book is handed over at the launch pit on day 2 (story M-R61): from day 3 the first three are known
   return [...(day >= 3 ? DAY1_SEALS : []), ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : []), ...(day >= 7 ? [4] : [])];
 }
-/** Answers that are open (1, 2 and 4 at the Sun, on day 7 — so from ORDER on). */
-export function solvedSealsOn(day: number): number[] {
-  return day >= 8 ? [1, 2, 4] : [];
+/** Answers that are open: 2 and 4 at the Sun for everyone (day 8), 1 with the Eclipse (draft 21) — so from day 9 on. */
+export function solvedSealsOn(day: number, ordered = true): number[] {
+  return day >= 9 ? (ordered ? [1, 2, 4] : [2, 4]) : [];
 }
 
 function Card({ n, lit, size = 64, style }: { n: number; lit: boolean; size?: number; style?: React.CSSProperties }) {

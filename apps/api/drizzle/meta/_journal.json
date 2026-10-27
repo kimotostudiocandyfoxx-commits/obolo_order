@@ -211,6 +211,13 @@
       "when": 1792111831010,
       "tag": "0029_line_voices",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1793071961306,
+      "tag": "0030_journey_eight_days",
+      "breakpoints": true
     }
   ]
 }

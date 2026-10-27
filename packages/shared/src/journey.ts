@@ -8,14 +8,15 @@ import type { PlanetId } from './planets';
  * is no longer a guide but a fellow NEO who travels with you, and the Moon moved into day 2, so every
  * later day came one day earlier:
  *   1 Earth (the invitation, MONBAN, OBOLON) · 2 Earth → the Moon (KIMORIN, the NEO look, name, Bati) ·
- *   3 Saturn · 4 Jupiter · 5 Mercury · 6 Mars · 7 back to Earth, the Eclipse (¥88/month inside the story).
- * Venus is not on the first journey.
+ *   3 Saturn · 4 Jupiter · 5 Mercury · 6 Mars · 7 Venus · 8 Earth → the Sun.
+ * Draft 21 (M-R124): everyone makes everything on the first journey and lives in space from then on; at the
+ * Sun the Eclipse is a choice — 〔エクリプスを受ける〕 (¥88/month: ORDER) or 〔今は、住人のままでいる〕 (free).
  *
- * Stored on the user as `journeyDay` (1–6 = day to play, 7 = the Eclipse day, 8 = ORDER member)
- * plus `journeyCompletedAt` (set when the current day is finished, cleared when the next starts).
- * Day 7 can only be finished after paying; after its countdown the visitor is an ORDER (8).
+ * Stored on the user as `journeyDay` (1–7 = day to play, 8 = the Sun day, 9 = done) plus
+ * `journeyCompletedAt` (set when the current day is finished, cleared when the next starts). Day 8 can be
+ * finished paid or not; after it the visitor is an ORDER (`orderedAt` set) or a resident (not set).
  */
-export const JOURNEY_LAST_DAY = 6;
+export const JOURNEY_LAST_DAY = 7;
 /** Days that exist in the numbering but are not played (none since the seven-day journey). */
 export const SKIPPED_DAYS: readonly number[] = [];
 export function nextJourneyDay(day: number): number {
@@ -43,8 +44,8 @@ export function planetOpensAt(planet: string, orderedAt: string | null | undefin
   if (!orderedAt) return null;
   return new Date(new Date(orderedAt).getTime() + rule.afterDays * 24 * 3600_000);
 }
-export const JOURNEY_PAYMENT = 7;
-export const JOURNEY_DONE = 8;
+export const JOURNEY_PAYMENT = 8;
+export const JOURNEY_DONE = 9;
 export const JOURNEY_WAIT_MS = 24 * 3600_000;
 
 export interface JourneyDayMeta {
@@ -83,6 +84,7 @@ export const JOURNEY: readonly JourneyDayMeta[] = [
   { day: 4, planet: 'jupiter', guides: ['KIMORIN', '大根カイザー'], title: '木星へ', beats: ['木星に行く', '大根カイザーに出会う', '木星（パタパタ）で遊ぶ'] },
   { day: 5, planet: 'mercury', guides: ['KIMORIN', 'フリージー'], title: '水星へ', beats: ['水星に行く', 'フリージーに出会う', '水星（船の海と島）で遊ぶ'] },
   { day: 6, planet: 'mars', guides: ['KIMORIN', 'ヒポキン'], title: '火星へ', beats: ['火星に行く', '未来都市でヒポキンに出会う', '火星（映像の惑星）で遊ぶ'] },
+  { day: 7, planet: 'venus', guides: ['KIMORIN', 'ボスG', 'ハットG', 'ロングG'], title: '金星へ', beats: ['金星に行く', 'ボスGたちに出会う', 'かんたんDJで自分の曲を回す', '〔🎤 見せる〕でダチに届ける'] },
 ];
 
 /** Day 7 (the Eclipse day): not a planet visit — the way to ORDER. (Old wording: still to be rewritten in the new story.) */

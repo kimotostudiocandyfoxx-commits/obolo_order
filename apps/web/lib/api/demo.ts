@@ -634,8 +634,6 @@ export class DemoApi implements Api {
   async completeJourneyDay(day: number, answers?: Record<string, string>) {
     return this.patchMe((u) => {
       if (u.journeyDay !== day || u.journeyCompletedAt) return {};
-      // the Eclipse day ends only after paying
-      if (day === JOURNEY_PAYMENT && !u.orderedAt) throw new ApiError(402, 'ORDER_REQUIRED', 'not paid');
       // what was made today, for the next days' stories (like the server's onboardingJson)
       const story = { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`d${day}.${k}`, v])) };
       return { journeyCompletedAt: now(), story };
@@ -1085,7 +1083,7 @@ export class DemoApi implements Api {
 
   async becomeOrder() {
     await sleep(600);
-    return this.patchMe((u) => (u.journeyDay === JOURNEY_PAYMENT && !u.orderedAt ? { orderedAt: now(), subscriptionStatus: 'demo' } : {}));
+    return this.patchMe((u) => (u.journeyDay >= JOURNEY_PAYMENT && !u.orderedAt ? { orderedAt: now(), subscriptionStatus: 'demo' } : {}));
   }
 
   async myInvites() {

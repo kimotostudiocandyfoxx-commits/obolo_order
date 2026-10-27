@@ -25,6 +25,7 @@ import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
 import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
+import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { Invitation } from '@/components/story/Invitation';
@@ -959,6 +960,20 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             remember('f_d07_send', r.sent ? 'send' : 'keep');
             remember('f_d07_screen', r.mv ? 'big' : 'pick');
             if (r.frame) remember('mars_frame', r.frame);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'venus' && (
+        <VenusLesson
+          song={v.made?.song ?? null}
+          mv={v.made?.mv ?? null}
+          kororins={v.made?.kororins ?? []}
+          neo={v.neo || v.name}
+          inviter={v.inviter || 'ともだち'}
+          onDone={(r) => {
+            remember('f_d07v_show', r.shown ? 'dachi' : 'self');
+            remember('f_d07v_mode', r.mode);
             run(iRef.current + 1);
           }}
         />

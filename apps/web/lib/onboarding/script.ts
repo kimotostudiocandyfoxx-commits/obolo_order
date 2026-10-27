@@ -78,6 +78,8 @@ export type Step =
   | { t: 'mercury' }
   /** Mars (day 6): the song gets an MV from the visitor's wish; kept in the 裏スタジオ. Saves answers.mv. */
   | { t: 'mars' }
+  /** Venus (day 7, draft 21): the easy DJ — practice rhythm → your song, a kororin at the seam, 〔🎤 見せる〕. Saves answers.f_d07v_show. */
+  | { t: 'venus' }
   /** Show what was made: the MV on Mars's big screen, … (tap to continue). */
   | { t: 'made'; what: 'mv' | 'film' }
   // --- the stage's directions (production UI 3, 2026-10-15) ---
@@ -149,7 +151,7 @@ export type Step =
    * The space ticket with its four stamp slots; `stamp` presses that planet's stamp, `flip` shows the star map on the back
    * (both wait for a tap). With neither it is the scene itself — `dest` its 本日の目的地 — and stays until the next scene.
    */
-  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars'; flip?: boolean; dest?: string }
+  | { t: 'ticket'; stamp?: 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'; flip?: boolean; dest?: string }
   /** The day's 88 minutes (M-R22): on from the first rocket departure, off in the temples of Earth and the Moon. */
   | { t: 'clock'; on: boolean }
   /** Bluena projects (open) or closes the square screen: MONBAN at the HQ gate. */

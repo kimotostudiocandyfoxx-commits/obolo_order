@@ -29,8 +29,8 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is seven days; every countdown says 明日まで待てない (day 2: もちろん…)', () => {
-    expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+  it('the first journey is eight days (draft 21); every countdown says 明日まで待てない (day 2: もちろん…)', () => {
+    expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     expect(Object.entries(STORIES).every(([d, s]) => s.skipLabel === (d === '2' ? 'もちろん明日まで待てない' : DEFAULT_SKIP_LABEL))).toBe(true);
     expect(DEFAULT_SKIP_LABEL).toBe('明日まで待てない');
     expect(STORIES[JOURNEY_PAYMENT].steps.some((s) => s.t === 'order')).toBe(true);
@@ -131,19 +131,33 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
   });
 });
 
-describe('the Eclipse day (7)', () => {
+describe('Venus (day 7, draft 21)', () => {
   const steps = STORIES[7].steps;
-  it('エクリプスを始める leads to the payment by the visitor; 今はやめておく stops at the choice', () => {
+  it('the easy DJ, then the fifth stamp', () => {
+    const v = steps.findIndex((s) => s.t === 'venus');
+    expect(v).toBeGreaterThan(0);
+    expect(steps.slice(v).find((s) => s.t === 'ticket')).toEqual({ t: 'ticket', stamp: 'venus' });
+  });
+});
+
+describe('the Sun day (8, draft 21)', () => {
+  const steps = STORIES[8].steps;
+  it('record I for everyone, then 〔エクリプスを受ける〕 leads to the payment; 〔今は、住人のままでいる〕 ends the journey as a resident', () => {
     const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'f_d08_decide');
+    const record1 = steps.findIndex((s) => s.t === 'film' && s.id === 'record1');
+    expect(record1).toBeGreaterThan(0);
+    expect(record1).toBeLessThan(c);
     const opts = steps[c].t === 'choice' ? steps[c].options : [];
+    expect(opts.map((o) => o.label)).toEqual(['エクリプスを受ける', '今は、住人のままでいる']);
     const pay = labelIndex(steps, opts[0].goto!);
     expect(steps.slice(pay, pay + 4).find((s) => s.t === 'order')).toEqual({ t: 'order', cancel: 'back' });
-    const stop = steps.slice(c + 1).find((s) => s.t === 'pause');
-    expect(stop).toEqual({ t: 'pause', resume: 'resume' });
+    expect(steps.slice(c + 1).find((s) => s.t === 'end' || s.t === 'order')?.t).toBe('end');
   });
-  it('the Sun temple opens riddles 2, 1 and (after the archive films) 4, and the journey ends (no film of the seven days, client 2026-10-26)', () => {
+  it('riddles 2 and 4 open for everyone, riddle 1 and records II・III only after the Eclipse', () => {
     const opened = steps.filter((s) => s.t === 'seal' && s.open).map((s) => (s.t === 'seal' ? s.n : 0));
-    expect(opened).toEqual([2, 1, 4]);
+    expect(opened).toEqual([2, 4, 1]);
+    const pay = labelIndex(steps, 'pay');
+    expect(steps.findIndex((s) => s.t === 'film' && s.id === 'record23')).toBeGreaterThan(pay);
     expect(steps.some((s) => s.t === 'made' && s.what === 'film')).toBe(false);
   });
 });
