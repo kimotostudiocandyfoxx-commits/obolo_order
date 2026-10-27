@@ -6,10 +6,10 @@ def git(p): return subprocess.run(["git","-C",REPO,"show",f"{B}:{p}"],capture_ou
 STR=r"'((?:[^'\\]|\\.)*)'"
 def unesc(s): return s.replace("\\'","'").replace("\\n","\n")
 app=collections.OrderedDict()   # scene -> list of (kind, who, text, day)
-for d in range(1,8):
+for d in range(1,10):
     src=git(f"apps/web/lib/onboarding/day{d}.ts"); scene=f"day{d}-head"
     for ln in src.split("\n"):
-        m=re.search(r"//\s*(D0\d-S\d+[a-z]?)",ln)
+        m=re.search(r"//\s*(D0\dV?-S\d+[a-z]?)",ln)
         if m and "t:" not in ln.split("//")[0]: scene=m.group(1)
         code=ln.split("//")[0] if "t:" in ln else ""
         if not code: continue
@@ -34,7 +34,7 @@ for p in files:
 scr=collections.OrderedDict()
 for f in sorted(glob.glob(STORY+"/parts/P0[1-4]/*.md")):
     s=open(f).read()
-    for m in re.finditer(r"^### (D0\d-S\d+[a-z]?)｜.*?(?=^### |\Z)",s,re.S|re.M):
+    for m in re.finditer(r"^### (D0\dV?-S\d+[a-z]?)｜.*?(?=^### |\Z)",s,re.S|re.M):
         b=m.group(0); i=b.find("**本文**"); j=b.find("**選択ごとの行き先"); body=b[i+6:j]
         L=[]
         for ln in body.split("\n"):
