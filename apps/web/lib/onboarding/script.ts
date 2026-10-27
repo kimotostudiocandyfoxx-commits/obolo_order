@@ -97,8 +97,6 @@ export type Step =
   | { t: 'invitation'; /** the motion before ends on the blank card: the words just seep in */ fromMotion?: boolean }
   /** gold motes drifting up (0 = none; at most 150) */
   | { t: 'motes'; count: number }
-  /** Venus tutorial (Day 8), coached by the gorilla trio. */
-  | { t: 'venus' }
   /** Fade the whole screen to white (~3 s), then continue; the next still/motion fades in from white. */
   | { t: 'whiteout' }
   /** Let a moment play before the next step (e.g. the Earth comes up before KIMORIN gasps). */

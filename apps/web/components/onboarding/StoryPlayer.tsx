@@ -23,7 +23,6 @@ import { filmWatched, markFilmWatched } from '@/lib/story/films';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
-import { VenusTutorial } from '@/components/venus/VenusTutorial';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
@@ -992,7 +991,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <span className="pb-safe absolute bottom-6 text-xs tracking-widest text-white/50">TAP</span>
         </button>
       )}
-      {started && step?.t === 'venus' && <VenusTutorial onDone={next} />}
       {started && step?.t === 'order' && orderApi && (
         <EclipsePay api={orderApi} paid={!!ordered} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
       )}

@@ -18,7 +18,7 @@ const STARS: { id: StampId; x: number; label: string }[] = [
   { id: 'mercury', x: 55, label: '水星' },
   { id: 'mars', x: 65.6, label: '火星' },
   // not in the picture: drawn in code, floating up once Mars is stamped (draft 21)
-  { id: 'venus', x: 76.2, label: '金星' },
+  { id: 'venus', x: 71.4, label: '金星' },
 ];
 
 export function TicketArt({ dest, stamped, fresh, pressed, leaving }: { dest?: string; stamped: (id: StampId) => boolean; fresh?: StampId; pressed?: boolean; leaving?: boolean }) {
