@@ -26,7 +26,7 @@
 - ACE-Step はいつも約60秒。短いジングル（到着・謎）は、作ったあと先頭の数秒を切って効果音にする（se-arrive, se-riddle）。
 - 場面ごとに曲を変える：朝（morning）→ ロケット（space）→ 到着ジングル → 星の曲 → 遊ぶ画面（◯◯-play）→ 星の曲 → 謎のジングル → また明日（farewell）。
 - 効果音は Seed Audio（bytedance:seed-audio@1.0、利用者の決定 2026-10-27）。プロンプトは「何が・どこで・どう響くか」まで書き、最後に no music, no voices。無音の取り直しは make.mjs が弾いて redo に残す。効果音も Gemini が聞いて点数を報告に出す。
-- **効果音のファイルは、入れたら音の大きさを測る**（loudnorm の Input Integrated）。se-ding が無音（-inf）のまま入っていて、ピンポン♪が鳴っていなかった。-inf や -27 より小さいものは作り直す。
+- **効果音のファイルは、入れたら音の大きさを測る**（loudnorm の Input Integrated）。se-ding が無音（-inf）のまま入っていて、ピンポン♪が鳴っていなかった。-inf や -27 より小さいものは疑う。ただし0.4秒より短い音（pop など）は Integrated が -inf になるので、volumedetect の max_volume（ピーク）で見る。
 - 利用者が作った音（pinpon-press.wav など）は、うしろの無音だけ切り、音そのものは変えない。長い音は「次のタップで消える」鳴らし方（StoryExtras の LONG / fadeLongSfx）。こもった音は lowpass 650Hz を2回。
 
 ## 確認のしかた
