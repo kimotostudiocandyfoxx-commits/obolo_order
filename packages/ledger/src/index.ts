@@ -17,6 +17,8 @@ export type LedgerKind = 'mana' | 'earnings';
 export const MANA_REASONS = [
   'monthly_grant',
   'demo_grant',
+  // the mana gem from the inviter on the first journey (story draft 21, M-R132)
+  'starter_gem',
   'topup',
   'buddy_overage',
   'generation',

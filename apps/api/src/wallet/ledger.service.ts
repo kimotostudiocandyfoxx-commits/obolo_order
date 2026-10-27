@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { applyDelta, assertInteger, ManaReason } from '@obolo/ledger';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { applyDelta, assertInteger, LedgerError, ManaReason } from '@obolo/ledger';
+import { MAKE_COST, type MakeKind } from '@obolo/shared';
+import { randomUUID } from 'node:crypto';
+import { apiError } from '../common/errors';
 import { eq } from 'drizzle-orm';
-import type { Db } from '../db/db';
+import type { Database, Db } from '../db/db';
 import { manaLedger, users, wallets } from '../db/schema';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
@@ -50,5 +53,26 @@ export class LedgerService {
     // Any purchase / earn / spend resets the 1-year expiry clock (spec §3.1.1).
     await tx.update(users).set({ lastActivityAt: now }).where(eq(users.id, e.userId));
     return row;
+  }
+
+  /**
+   * Making with mana (story M-R132, D08-S002's table): takes the cost from the gem / the month's mana before
+   * the work is made. Not enough → 402 NO_MANA (「マナジェムが、光らなくなった」; a resident is then offered the
+   * Eclipse). Returns `refund`, to give it back when the making fails.
+   */
+  async charge(db: Database, userId: string, kind: MakeKind, refId?: string): Promise<{ refund: () => Promise<void> }> {
+    const amount = MAKE_COST[kind];
+    const key = `make:${kind}:${userId}:${randomUUID()}`;
+    try {
+      await db.write.transaction((tx) => this.applyMana(tx, { userId, delta: -amount, reason: 'generation', idempotencyKey: key, refType: kind, refId }));
+    } catch (e) {
+      if (e instanceof LedgerError) throw apiError(HttpStatus.PAYMENT_REQUIRED, 'NO_MANA', 'マナジェムが、光らなくなった');
+      throw e;
+    }
+    return {
+      refund: async () => {
+        await db.write.transaction((tx) => this.applyMana(tx, { userId, delta: amount, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId }));
+      },
+    };
   }
 }

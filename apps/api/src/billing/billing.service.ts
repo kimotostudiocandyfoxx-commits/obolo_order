@@ -127,6 +127,15 @@ export class BillingService {
         if (s.client_reference_id && this.paid(s)) await this.record(s.client_reference_id, s);
         break;
       }
+      case 'invoice.paid': {
+        // each paid month refills the gem (the first month is granted with the order itself; same key, so once)
+        const inv = event.data.object;
+        const customer = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id;
+        if (!customer) break;
+        const [u] = await this.db.write.select({ id: users.id }).from(users).where(eq(users.stripeCustomerId, customer));
+        if (u) await this.users.grantMonth(u.id, new Date(inv.created * 1000));
+        break;
+      }
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
         const sub = event.data.object;

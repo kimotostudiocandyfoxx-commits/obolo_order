@@ -123,12 +123,12 @@ export class InvitesService {
         })
         .returning();
       await tx.insert(wallets).values({ userId: u.id });
-      if (this.cfg.DEMO_SIGNUP_GRANT_MANA > 0) {
-        // PLACEHOLDER (P-WALLET-1): stands in for the monthly 88 MANA subscription grant.
+      if (this.cfg.STARTER_GEM_MANA > 0) {
+        // the mana gem, the inviter's gift: the first journey's making, each once more (story M-R132)
         await this.ledger.applyMana(tx, {
           userId: u.id,
-          delta: this.cfg.DEMO_SIGNUP_GRANT_MANA,
-          reason: 'demo_grant',
+          delta: this.cfg.STARTER_GEM_MANA,
+          reason: 'starter_gem',
           idempotencyKey: idempotencyKey('signup-grant', u.id, 'v1'),
         });
       }

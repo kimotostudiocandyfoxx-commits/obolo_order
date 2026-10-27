@@ -36,6 +36,8 @@ export class HttpApi implements Api {
       if (res.status === 401) tokenStore.clear();
       // suspended by the team (a report review): the app shows a notice over everything
       if (json?.error?.code === 'ACCOUNT_SUSPENDED' && typeof window !== 'undefined') window.dispatchEvent(new Event('obolo:suspended'));
+      // the gem ran dry on a making: one notice for the whole app (components/NoManaNotice.tsx)
+      if (json?.error?.code === 'NO_MANA' && typeof window !== 'undefined') window.dispatchEvent(new Event('obolo:nomana'));
       throw new ApiError(res.status, json?.error?.code ?? 'ERROR', json?.error?.message ?? res.statusText);
     }
     return json as T;

@@ -9,6 +9,8 @@ import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { JobsService } from '../jobs/jobs.service';
 import { MvService } from './mv.service';
+import { Database } from '../db/db';
+import { LedgerService } from '../wallet/ledger.service';
 
 const MaterialBody = AddMvMaterialBody.extend({ posterUrl: z.string().url().max(500).nullish(), seconds: z.number().min(0).max(3600).nullish() });
 const StoryBody = z.object({ mood: z.string().trim().max(200).default('') });
@@ -21,6 +23,8 @@ export class MvController {
   constructor(
     private readonly mv: MvService,
     private readonly jobs: JobsService,
+    private readonly ledger: LedgerService,
+    private readonly db: Database,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -65,7 +69,14 @@ export class MvController {
   async story(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `mv-render:${userId}`, 6, 3600);
     await this.mv.get(userId, id); // yours? (fails before queueing)
-    return this.jobs.create(userId, 'mv-story', { mvId: id, mood: parseBody(StoryBody, body).mood, origin: origin(req) });
+    // an MV costs mana (8): taken before the shoot; given back if the job cannot be queued
+    const fee = await this.ledger.charge(this.db, userId, 'mv', id);
+    try {
+      return await this.jobs.create(userId, 'mv-story', { mvId: id, mood: parseBody(StoryBody, body).mood, origin: origin(req) });
+    } catch (e) {
+      await fee.refund();
+      throw e;
+    }
   }
 
   /** The same MV with the lyrics on it — a background job too. */

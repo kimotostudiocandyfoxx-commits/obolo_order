@@ -26,6 +26,15 @@ export const BUDDY_FREE_DAILY_MESSAGES = 30;
 export const BUDDY_OVERAGE_MANA = 1;
 /** Spec §3.4 — monthly grant included in the ¥88 subscription. */
 export const MONTHLY_GRANT_MANA = 88;
+/**
+ * The first mana gem, the inviter's gift (story M-R124/M-R132): enough to make everything on the first journey
+ * once and redo each once (look 3+3, kororin design 3+3, jacket art 3+3, song 2+2, MV 8+8 = 38) and a little more.
+ * PLACEHOLDER (P-WALLET-2): the operator decides the number.
+ */
+export const STARTER_GEM_MANA = 40;
+/** What making costs (the story's table, D08-S002). Voice kororins, photo / words-only jackets, delivering and DJ are free. */
+export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8 } as const;
+export type MakeKind = keyof typeof MAKE_COST;
 /** Spec §1.1 — subscription price in JPY. */
 export const SUBSCRIPTION_PRICE_JPY = 88;
 

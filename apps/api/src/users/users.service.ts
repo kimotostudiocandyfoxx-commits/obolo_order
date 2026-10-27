@@ -5,6 +5,7 @@ import {
   nextJourneyDay,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
+  MONTHLY_GRANT_MANA,
   type AtelierLayout,
   type CompleteJourneyDayBody,
   type Locale,
@@ -15,6 +16,7 @@ import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
+import { LedgerService } from '../wallet/ledger.service';
 
 export function toMe(u: typeof users.$inferSelect): Me {
   return {
@@ -45,7 +47,18 @@ export function toMe(u: typeof users.$inferSelect): Me {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly db: Database) {}
+  constructor(
+    private readonly db: Database,
+    private readonly ledger: LedgerService,
+  ) {}
+
+  /** an Obolo Order's gem fills each month (88). One key per user per month, so webhooks repeating is harmless. */
+  async grantMonth(userId: string, at = new Date()) {
+    const month = at.toISOString().slice(0, 7);
+    await this.db.write.transaction((tx) =>
+      this.ledger.applyMana(tx, { userId, delta: MONTHLY_GRANT_MANA, reason: 'monthly_grant', idempotencyKey: `monthly:${userId}:${month}` }),
+    );
+  }
 
   async getMe(userId: string): Promise<Me> {
     const [u] = await this.db.write.select().from(users).where(and(eq(users.id, userId), isNull(users.deletedAt)));
@@ -166,6 +179,8 @@ export class UsersService {
       .set({ ...s, orderedAt: new Date(), updatedAt: new Date() })
       .where(and(eq(users.id, userId), isNull(users.orderedAt)))
       .returning();
-    return u ? toMe(u) : this.getMe(userId);
+    if (!u) return this.getMe(userId);
+    await this.grantMonth(userId);
+    return toMe(u);
   }
 }

@@ -9,6 +9,8 @@ import { KV } from '../infra/tokens';
 import { ComposeService } from './compose.service';
 import { JobsService } from '../jobs/jobs.service';
 import { SongService } from './song.service';
+import { Database } from '../db/db';
+import { LedgerService } from '../wallet/ledger.service';
 
 /** Mercury 作曲 (see ComposeService). */
 @Controller('compose')
@@ -18,6 +20,8 @@ export class ComposeController {
     private readonly compose: ComposeService,
     private readonly songs: SongService,
     private readonly jobs: JobsService,
+    private readonly ledger: LedgerService,
+    private readonly db: Database,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -63,7 +67,14 @@ export class ComposeController {
   async fullSong(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     const b = parseBody(FullSongBody, body);
     await rateLimit(this.kv, `compose-song:${userId}`, 20, 86400);
-    return this.jobs.create(userId, 'song', { body: b, origin: `${req.protocol}://${req.get('host')}` });
+    // a song costs mana (2): taken before the studio starts; given back if the job cannot be queued
+    const fee = await this.ledger.charge(this.db, userId, 'song');
+    try {
+      return await this.jobs.create(userId, 'song', { body: b, origin: `${req.protocol}://${req.get('host')}` });
+    } catch (e) {
+      await fee.refund();
+      throw e;
+    }
   }
 
   /** Your saved songs (the soil of your island on Mercury). */

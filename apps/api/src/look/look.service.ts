@@ -3,10 +3,11 @@ import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, typ
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { cutoutWhite } from '../media/cutout';
-import { JOURNEY_DONE, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
+import { LedgerService } from '../wallet/ledger.service';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { IMAGES, KV, LLM, LOOK_IMAGES } from '../infra/tokens';
@@ -55,7 +56,13 @@ export class LookService {
     @Inject(LOOK_IMAGES) private readonly looks: ImageProvider,
     @Inject(LLM) private readonly llm: LlmProvider,
     @Inject(KV) private readonly kv: KvStore,
+    private readonly ledger: LedgerService,
   ) {}
+
+  /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
+  private async fee(userId: string, kind: MakeKind, unlimited: boolean) {
+    return unlimited ? { refund: async () => undefined } : this.ledger.charge(this.db, userId, kind);
+  }
 
   private async user(userId: string) {
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
@@ -96,6 +103,7 @@ export class LookService {
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');
+    const fee = await this.fee(userId, 'look', unlimited);
     const tries = await this.kv.incr(key, TRY_TTL);
 
     const made = await Promise.allSettled(
@@ -103,6 +111,7 @@ export class LookService {
         this.looks.generate(prompt(i), i, refs),
       ),
     );
+    if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
       if (r.status === 'fulfilled') {
@@ -125,8 +134,10 @@ export class LookService {
     if (limited && (await this.refinesLeft(userId, true)) <= 0) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', 'もう描き直せません');
     const src = await this.media.imageData(userId, body.mediaId, 'avatar');
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
+    const fee = await this.fee(userId, 'look', unlimited);
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
     const made = await Promise.allSettled(Array.from({ length: CANDIDATES }, (_, i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src])));
+    if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
       if (r.status === 'fulfilled') {
@@ -172,6 +183,8 @@ export class LookService {
       if (res?.ok) reference = { data: Buffer.from(await res.arrayBuffer()), mime: res.headers.get('content-type') ?? 'image/png' };
     }
     const refs = [kind === 'butterfly' ? await butterflyStyle() : await puniStyle(), ...(reference ? [reference] : [])];
+    // the kororin design costs mana (3, M-R132)
+    const fee = kind === 'puni' ? await this.fee(userId, 'kororinDesign', unlimited) : { refund: async () => undefined };
     const prompt = kind === 'butterfly' ? butterflyPrompt : puniPicPrompt;
     const made = await Promise.allSettled(Array.from({ length: kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES }, (_, i) => this.images.generate(prompt(body.description, !!reference, i), i, refs)));
     const candidates = [];
@@ -188,6 +201,7 @@ export class LookService {
         this.log.warn(`puni pic cutout failed: ${String(e)}`);
       }
     }
+    if (!candidates.length) await fee.refund();
     return { candidates, left: unlimited ? 99 : Math.max(0, PUNI_PIC_TRIES - tries) };
   }
 
@@ -201,9 +215,16 @@ export class LookService {
     const used = Number((await this.kv.get(key)) ?? 0);
     if (!unlimited && used >= STICKER_ART_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'STICKER_TRIES', '今日はもう描けません');
     await this.kv.incr(key, 60 * 60 * 26);
-    const img = await this.images.generate(stickerArtPrompt(body.text), 0, []);
-    const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
-    return { id: m.id, url: m.url };
+    // {bati}'s jacket picture costs mana (3); photos and words-only jackets never come here
+    const fee = await this.fee(userId, 'jacketArt', unlimited);
+    try {
+      const img = await this.images.generate(stickerArtPrompt(body.text), 0, []);
+      const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
+      return { id: m.id, url: m.url };
+    } catch (e) {
+      await fee.refund();
+      throw e;
+    }
   }
 
   /** Pick one of your painted candidates as your Jupiter butterfly (null = back to the default). */

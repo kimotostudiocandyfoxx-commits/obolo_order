@@ -161,8 +161,8 @@ const Env = z.object({
   BUDDY_FREE_DAILY: z.coerce.number().default(30),
   /** Spec §2.2 overage (1 MANA/msg). Demo: billing off → blocked after the quota. */
   BUDDY_OVERAGE_ENABLED: bool(false),
-  /** PLACEHOLDER (P-WALLET-1): MANA credited on sign-up while subscriptions are not live. */
-  DEMO_SIGNUP_GRANT_MANA: z.coerce.number().default(88),
+  /** The first mana gem credited on sign-up (story M-R132, about 40; the operator decides — STARTER_GEM_MANA). */
+  STARTER_GEM_MANA: z.coerce.number().default(40),
 
   /** Bunny Storage (PLACEHOLDER P-MEDIA-1). If any is missing, media is stored in Postgres (dev only). */
   BUNNY_STORAGE_ZONE: secret(),

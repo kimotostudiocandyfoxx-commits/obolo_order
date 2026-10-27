@@ -6,7 +6,9 @@ import {
   JOURNEY_DONE,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
-  MONTHLY_GRANT_MANA,
+  MAKE_COST,
+  type MakeKind,
+  STARTER_GEM_MANA,
   neoVoiceUrl,
   SATURN_LIFETIME_HOURS,
   nextJourneyDay,
@@ -618,9 +620,9 @@ export class DemoApi implements Api {
     };
     this.s.users[id] = user;
     this.s.wallets[id] = {
-      mana: MONTHLY_GRANT_MANA,
+      mana: STARTER_GEM_MANA,
       lastActivity: now(),
-      entries: [{ id: uid(), delta: MONTHLY_GRANT_MANA, reason: 'demo_grant', createdAt: now() }],
+      entries: [{ id: uid(), delta: STARTER_GEM_MANA, reason: 'starter_gem', createdAt: now() }],
     };
     if (inv) inv.status = 'accepted';
     const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
@@ -659,11 +661,26 @@ export class DemoApi implements Api {
 
   // Demo looks: SVG portraits built in the browser (lib/look.ts); 4 candidates per round, hidden ceiling
   // like the API (NEO_LOOK_TRIES / NEO_LOOK_REFINES = 8).
+  /** a making takes mana from the gem like the API (MAKE_COST, M-R132); a dry gem → 402 NO_MANA + the notice */
+  private charge(kind: MakeKind) {
+    const w = this.s.wallets[this.uid()];
+    const amount = MAKE_COST[kind];
+    if (!w || w.mana < amount) {
+      window.dispatchEvent(new Event('obolo:nomana'));
+      throw new ApiError(402, 'NO_MANA', 'マナジェムが、光らなくなった');
+    }
+    w.mana -= amount;
+    w.lastActivity = now();
+    w.entries.push({ id: uid(), delta: -amount, reason: 'generation', createdAt: now() });
+    this.save();
+  }
+
   async lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     const u = this.s.users[this.uid()];
     const key = `obolo.look.tries.${u.id}`;
     const used = Number(localStorage.getItem(key) ?? 0);
     if (u.journeyDay < JOURNEY_DONE && used >= 8) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
+    this.charge('look');
     localStorage.setItem(key, String(used + 1));
     await new Promise((r) => setTimeout(r, 1800));
     let urls: string[];
@@ -690,6 +707,7 @@ export class DemoApi implements Api {
     const src = this.lookCache.find((c) => c.id === mediaId);
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
     const n = 8 - this.refinesLeft();
+    this.charge('look');
     localStorage.setItem(`obolo.look.refines.${u.id}`, String(n + 1));
     await new Promise((r) => setTimeout(r, 1500));
     // the one refine: four looks with the wish (client 2026-10-25)
@@ -707,6 +725,7 @@ export class DemoApi implements Api {
 
   // demo: the test pictures stand in for painted candidates
   async puniPicCandidates(): Promise<PuniPicResult> {
+    this.charge('kororinDesign');
     await sleep(900);
     const all = ['salmon', 'gray', 'green', 'purple', 'gorilla'].sort(() => Math.random() - 0.5).slice(0, 2);
     const candidates = all.map((n) => ({ id: uid(), url: `/puni-test/${n}.png` }));
@@ -748,6 +767,7 @@ export class DemoApi implements Api {
 
   // demo: the butterflies cut from the Jupiter mock stand in for painted candidates
   async stickerArt(text: string) {
+    this.charge('jacketArt');
     await new Promise((r) => setTimeout(r, 1500));
     return { id: uid(), url: demoStickerArt(text) };
   }
