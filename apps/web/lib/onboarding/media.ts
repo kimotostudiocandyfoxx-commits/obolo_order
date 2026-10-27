@@ -68,7 +68,7 @@ const STILL_CAST: Record<string, string[]> = {
   's/d2-moon-bed': ['KIMORIN'],
   's/d2-launch-pit': [],
   's/d2-invite-hand': ['KIMORIN', 'MONBAN'],
-  's/rocket-over-sea': [],
+  's/rocket-over-sea': ['KIMORIN'], // he speaks from inside the rocket: the picture stays clear
 };
 export function stillShows(still: string, who: string): boolean {
   const w = who.startsWith('KIMORIN') ? 'KIMORIN' : who;
