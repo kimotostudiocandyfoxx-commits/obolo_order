@@ -324,6 +324,42 @@
           "lyrics": "[verse]\nぷりぷりぷりり\nうひょひょひょ　げへへ\nぷりぷり　滑り台で\n[chorus]\nボカーン！　ボカーン！\nボカーン！　ボカーン！"
         }
       }
+    },
+    {
+      "id": "magic-v2",
+      "kind": "se",
+      "model": "bytedance:seed-audio@1.0",
+      "prompt": "A magical spell being cast: a shimmering rising swell of glittering chimes and a soft whoosh of light, ending in a warm sparkle. Cinematic fantasy film sound design, clean, high quality."
+    },
+    {
+      "id": "whoosh-v2",
+      "kind": "se",
+      "model": "bytedance:seed-audio@1.0",
+      "prompt": "A fast cinematic whoosh as something flies past the camera, deep and airy, clean, high-quality film sound design."
+    },
+    {
+      "id": "gate-close-v2",
+      "kind": "se",
+      "model": "bytedance:seed-audio@1.0",
+      "prompt": "A huge ancient stone-and-iron gate slowly closing with a deep rumble, then a heavy booming thud that echoes in a vast hall. Cinematic, high quality."
+    },
+    {
+      "id": "stamp-v2",
+      "kind": "se",
+      "model": "bytedance:seed-audio@1.0",
+      "prompt": "A rubber stamp pressed firmly onto thick paper on a wooden desk: a crisp satisfying thump. Close, clean, high quality foley."
+    },
+    {
+      "id": "chime-v2",
+      "kind": "se",
+      "model": "bytedance:seed-audio@1.0",
+      "prompt": "A single bright magical chime with a soft shimmering tail, like a riddle being revealed. Clean, elegant, high quality."
+    },
+    {
+      "id": "sparkle-v2",
+      "kind": "se",
+      "model": "bytedance:seed-audio@1.0",
+      "prompt": "Tiny glittering sparkles of light twinkling and fading, delicate and magical, clean high-quality sound design."
     }
   ],
   "listen": []
