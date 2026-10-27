@@ -68,7 +68,7 @@ const CHAR: Record<string, CharSpec> = {
   'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a', faces: madeFaces('daikon-kaiser-x', FRIEND) },
   // the Kaiser grows each journey (client 2026-10-26): 1 the stern daikon on its roots (design/story/refs/cast/kaiser-journey1*)
   kaiser1: { bottom: 6, height: 72, face: 0.35, tint: '#7aa84a', faces: madeFaces('kaiser1-x', FRIEND) },
-  freezy: { bottom: 8, height: 64, face: 0.25, tint: '#5aa8d8', faces: madeFaces('freezy-x', FRIEND) },
+  freezy: { bottom: 8, height: 50, face: 0.2, tint: '#5aa8d8', faces: madeFaces('freezy-x', FRIEND) },
   hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a', faces: madeFaces('hipokin-x', FRIEND) },
   'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
 };
