@@ -1,4 +1,4 @@
-import type { SongDesign } from '@obolo/shared';
+import type { DeliverBody, SongDesign } from '@obolo/shared';
 import { getApi } from '@/lib/api';
 import { waitJob } from '@/lib/jobs';
 import type { MvMade, SongMade } from './made';
@@ -23,6 +23,10 @@ export interface LessonApi {
   kororinDesigns(description: string): Promise<{ id: string; url: string }[]>;
   /** the picked design becomes the look of the kororins to come */
   chooseKororin(id: string): Promise<void>;
+  /** Saturn D04-S005c: the inviter becomes a dachi (both ways) */
+  befriendInviter(): Promise<void>;
+  /** 〔ダチへ〕: the work goes to every dachi's 〔推し〕 for 88 hours */
+  deliver(body: Partial<DeliverBody> & Pick<DeliverBody, 'kind'>): Promise<void>;
 }
 
 /** The instrumental for a chosen style (the lyric draft keeps its own melody and words). */
@@ -63,6 +67,12 @@ export const realLessonApi: LessonApi = {
   },
   async chooseKororin(id) {
     await getApi().choosePuniPic(id);
+  },
+  async befriendInviter() {
+    await getApi().befriendInviter();
+  },
+  async deliver(body) {
+    await getApi().deliver(body);
   },
   async mv(song, wish, lyrics) {
     const p = await getApi().mvCreate(song.id);

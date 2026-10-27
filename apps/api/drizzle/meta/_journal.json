@@ -218,6 +218,13 @@
       "when": 1793071961306,
       "tag": "0030_journey_eight_days",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1793083857627,
+      "tag": "0031_deliveries",
+      "breakpoints": true
     }
   ]
 }

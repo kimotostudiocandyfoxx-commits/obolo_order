@@ -28,6 +28,9 @@ export const fakeLessonApi: LessonApi = {
     return ['salmon', 'green', 'purple', 'gray'].map((n) => ({ id: n, url: `/puni-test/${n}.png` }));
   },
   chooseKororin: async () => undefined,
+  // the previews have nobody to deliver to; the demo API keeps it in this browser
+  befriendInviter: async () => void (await getApi().befriendInviter().catch(() => null)),
+  deliver: async (b) => void (await getApi().deliver(b).catch(() => null)),
   lyrics: async (words) => {
     await wait(1500);
     const line = (text: string) => ({ text, kana: text, notes: [] });

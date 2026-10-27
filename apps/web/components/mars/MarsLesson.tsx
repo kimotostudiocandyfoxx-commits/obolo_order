@@ -663,7 +663,13 @@ export function MarsLesson({
                 ✓ ダチへ（{inviter}・KIMORIN⭐︎）
               </div>
               <p className="text-center text-[11px] text-slate-400">88時間、ダチの星図をとんで、あなたのスタジオに戻ります</p>
-              <Big tone="rose" onClick={anext}>
+              <Big
+                tone="rose"
+                onClick={() => {
+                  if (mv) void api.deliver({ kind: 'mv', title: mv.title.slice(0, 60), url: mv.url, posterUrl: mv.poster ?? undefined, refId: /^[0-9a-f-]{36}$/.test(mv.id) ? mv.id : undefined }).catch(() => undefined);
+                  anext();
+                }}
+              >
                 とばす
               </Big>
             </div>

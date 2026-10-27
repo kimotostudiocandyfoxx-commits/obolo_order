@@ -18,6 +18,8 @@ import { VoiceService } from './voice/voice.service';
 import { BuddyController } from './buddy/buddy.controller';
 import { BuddyService } from './buddy/buddy.service';
 import { HealthController } from './health.controller';
+import { DachiController } from './dachi/dachi.controller';
+import { DachiService } from './dachi/dachi.service';
 import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
@@ -70,6 +72,7 @@ import { WalletController } from './wallet/wallet.controller';
     MvController,
     JobsController,
     InternalJobsController,
+    DachiController,
   ],
   providers: [
     AuthGuard,
@@ -94,6 +97,7 @@ import { WalletController } from './wallet/wallet.controller';
     PushService,
     MvService,
     JobsService,
+    DachiService,
   ],
 })
 export class AppModule {}

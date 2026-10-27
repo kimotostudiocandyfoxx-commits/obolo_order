@@ -1,4 +1,5 @@
 import {
+  type DeliveryView,
   EMPTY_ATELIER,
   type AtelierLayout,
   BUDDY_FREE_DAILY_MESSAGES,
@@ -79,6 +80,10 @@ interface DemoState {
   pendingCodes: Record<string, string>;
   /** Saturn follows: follower id → followee ids */
   follows?: Record<string, string[]>;
+  /** the inviter became a dachi (Saturn D04-S005c) */
+  dachiInviter?: boolean;
+  /** works delivered to the dachi (〔推し〕) */
+  deliveries?: DeliveryView[];
   /** Jupiter (パタパタ): roots, posts, branch names — this browser only */
   jroots?: (JupiterRootView & { owner: string })[];
   jposts?: (Omit<JupiterPostView, 'author' | 'starredByMe' | 'replyCount' | 'repliers'> & { owner: string; starredBy: string[] })[];
@@ -707,6 +712,32 @@ export class DemoApi implements Api {
     const candidates = all.map((n) => ({ id: uid(), url: `/puni-test/${n}.png` }));
     this.lookCache.push(...candidates);
     return { candidates, left: 99 };
+  }
+
+  // demo: the dachi live in this browser — the inviter becomes one on Saturn; deliveries to them are kept
+  // here (there is nobody on the other side, so 〔推し〕 shows what you sent, as the dachi would see it)
+  async dachi() {
+    const inviter = this.s.users[this.uid()]?.invitedByName;
+    return this.s.dachiInviter && inviter ? [{ id: 'demo-inviter', displayName: inviter, pic: null }] : [];
+  }
+  async befriendInviter() {
+    this.s.dachiInviter = true;
+    this.save();
+    const inviter = this.s.users[this.uid()]?.invitedByName;
+    return inviter ? { id: 'demo-inviter', displayName: inviter, pic: null } : null;
+  }
+  async deliver(body: Parameters<Api['deliver']>[0]) {
+    const to = (await this.dachi()).length;
+    if (to) {
+      const me = this.s.users[this.uid()];
+      (this.s.deliveries ??= []).unshift({ id: uid(), kind: body.kind, title: body.title ?? '', text: body.text ?? '', url: body.url ?? null, posterUrl: body.posterUrl ?? null, from: { id: me.id, displayName: me.displayName, pic: null }, createdAt: now(), returnsAt: new Date(Date.now() + 88 * 3600_000).toISOString() });
+      this.save();
+    }
+    return { to };
+  }
+  async oshi(kind?: Parameters<Api['oshi']>[0]) {
+    const since = Date.now() - 88 * 3600_000;
+    return (this.s.deliveries ?? []).filter((d) => new Date(d.createdAt).getTime() > since && (!kind || d.kind === kind));
   }
 
   async choosePuniPic(mediaId: string | null) {

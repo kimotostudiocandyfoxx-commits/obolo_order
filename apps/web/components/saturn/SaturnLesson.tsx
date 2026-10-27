@@ -268,6 +268,8 @@ export function SaturnLesson({
       void lineVoiceUrl('コロリン', SISTER_SUNSET).then((u) =>
         setExtra((x) => [...x, storyPost('story-sunset', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, u ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, SISTER_SUNSET))]),
       );
+    // D04-S005c: the inviter really becomes a dachi here
+    if (beat.k === 'note' && beat.text === '{inviter}がダチになった') void api?.befriendInviter().catch(() => undefined);
     if (beat.k === 'done') onDone(made);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, beats]);
@@ -358,6 +360,11 @@ export function SaturnLesson({
     next();
   };
   const sent = (yes: boolean) => {
+    if (yes) {
+      const mine = [...extra].reverse().find((p) => !p.id.startsWith('story-'));
+      const url = mine?.voiceUrl && /^https?:/.test(mine.voiceUrl) ? mine.voiceUrl : undefined;
+      void api?.deliver({ kind: 'kororin', text: (made[made.length - 1] ?? '').slice(0, 200), url, refId: mine && /^[0-9a-f-]{36}$/.test(mine.id) ? mine.id : undefined }).catch(() => undefined);
+    }
     insert(yes ? SENT : NOT_SENT);
     next();
   };

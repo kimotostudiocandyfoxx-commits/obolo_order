@@ -975,6 +975,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           kororins={v.made?.kororins ?? []}
           neo={v.neo || v.name}
           inviter={v.inviter || 'ともだち'}
+          deliver={lessonApi ? (b) => lessonApi.deliver(b) : undefined}
           onDone={(r) => {
             remember('f_d07v_show', r.shown ? 'dachi' : 'self');
             remember('f_d07v_mode', r.mode);

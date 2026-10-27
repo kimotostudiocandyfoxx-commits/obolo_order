@@ -90,6 +90,7 @@ export function VenusLesson({
   kororins,
   neo,
   inviter,
+  deliver,
   onDone,
 }: {
   song: SongMade | null;
@@ -97,6 +98,8 @@ export function VenusLesson({
   kororins: string[];
   neo: string;
   inviter: string;
+  /** 〔🎤 届ける〕: the set (your song and its MV) goes to the dachi's night sky */
+  deliver?: (body: { kind: 'stage'; title?: string; url?: string; posterUrl?: string }) => Promise<void>;
   onDone: (r: { shown: boolean; mode: 'self' | 'auto' }) => void;
 }) {
   const [steps, setSteps] = useState<Step[]>(OPEN);
@@ -476,7 +479,13 @@ export function VenusLesson({
                 ダチへ（{inviter}・KIMORIN⭐︎）
               </div>
               <p className="text-center text-[11px] text-slate-400">いま回したセット（音と映像）が、88時間、ダチの夜空を流れます。88時間たつと、あなたのステージの記録に戻ります</p>
-              <Big tone="amber" onClick={next}>
+              <Big
+                tone="amber"
+                onClick={() => {
+                  if (song) void deliver?.({ kind: 'stage', title: song.title.slice(0, 60), url: /^https?:/.test(song.url) ? song.url : undefined, posterUrl: mv?.poster ?? undefined }).catch(() => undefined);
+                  next();
+                }}
+              >
                 🎤 届ける
               </Big>
             </div>

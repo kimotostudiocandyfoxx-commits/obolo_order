@@ -429,3 +429,37 @@ export const CreatePlanetPostBody = z.object({
   text: z.string().trim().max(60).default(''),
 });
 export type CreatePlanetPostBody = z.infer<typeof CreatePlanetPostBody>;
+
+// --- ダチに届ける (story draft 21, M-R124: the first journey delivers to the dachi: {inviter} and KIMORIN⭐︎) ---
+export const DELIVERY_KINDS = ['kororin', 'jacket', 'song', 'mv', 'stage'] as const;
+export type DeliveryKind = (typeof DELIVERY_KINDS)[number];
+/** a delivery stays in the dachi's 〔推し〕 for 88 hours, then goes home to the maker's place */
+export const DELIVERY_HOURS = 88;
+export const DeliverBody = z.object({
+  kind: z.enum(DELIVERY_KINDS),
+  title: z.string().trim().max(60).default(''),
+  text: z.string().trim().max(200).default(''),
+  /** the sound / picture / film of the work */
+  url: z.string().url().max(2000).optional(),
+  posterUrl: z.string().url().max(2000).optional(),
+  /** the work's own id where it has one (a Saturn post, a song, an MV) */
+  refId: z.string().uuid().optional(),
+});
+export type DeliverBody = z.infer<typeof DeliverBody>;
+export interface DachiView {
+  id: string;
+  displayName: string;
+  pic: string | null;
+}
+export interface DeliveryView {
+  id: string;
+  kind: DeliveryKind;
+  title: string;
+  text: string;
+  url: string | null;
+  posterUrl: string | null;
+  from: DachiView;
+  createdAt: string;
+  /** when it goes home (88 hours after it was sent) */
+  returnsAt: string;
+}

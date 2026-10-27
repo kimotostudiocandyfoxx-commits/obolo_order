@@ -406,6 +406,31 @@ export const follows = pgTable(
   (t) => [uniqueIndex('follows_pair_idx').on(t.followerId, t.followeeId), index('follows_followee_idx').on(t.followeeId)],
 );
 
+/**
+ * ダチに届ける (story draft 21): one row per recipient — the sender's dachi (mutual follows) at the moment
+ * of sending. Shown in the recipient's 〔推し〕 for 88 hours (DELIVERY_HOURS), then it is home again.
+ */
+export const deliveries = pgTable(
+  'deliveries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    fromUserId: uuid('from_user_id')
+      .notNull()
+      .references(() => users.id),
+    toUserId: uuid('to_user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(), // kororin | jacket | song | mv | stage
+    title: text('title').notNull().default(''),
+    text: text('text').notNull().default(''),
+    url: text('url'),
+    posterUrl: text('poster_url'),
+    refId: uuid('ref_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('deliveries_to_idx').on(t.toUserId, t.createdAt), index('deliveries_from_idx').on(t.fromUserId, t.createdAt)],
+);
+
 /** Stars are platform-wide (spec v1.6). On Mercury they carry tiers 1–3; elsewhere tier = 1. */
 export const starEvents = pgTable(
   'star_events',

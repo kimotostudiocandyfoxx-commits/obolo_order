@@ -20,6 +20,8 @@ import { MyTree, TREE_COLORS, TREE_DECOS, TREE_DEFAULT, TREE_SHAPES, type TreeLo
 export interface JupiterLessonApi {
   stickerArt(text: string): Promise<{ url: string }>;
   uploadPhoto(blob: Blob): Promise<{ url: string }>;
+  /** 〔🦋 飛ばす〕 to the dachi */
+  deliver?(body: { kind: 'jacket'; title?: string; url?: string }): Promise<void>;
 }
 
 type Who = 'kaiser' | 'kimorin' | 'pinpon' | 'bati' | 'guide';
@@ -692,6 +694,7 @@ export function JupiterLesson({
               <Big
                 tone="sky"
                 onClick={() => {
+                  if (mine) void api.deliver?.({ kind: 'jacket', title: mine.text.slice(0, 60), url: mine.url && /^https?:/.test(mine.url) ? mine.url : undefined }).catch(() => undefined);
                   setPost('fly');
                   setTimeout(() => {
                     setPost('gone');

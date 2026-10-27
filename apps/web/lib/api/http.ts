@@ -362,6 +362,18 @@ export class HttpApi implements Api {
   mvLyrics(id: string) {
     return this.req<Awaited<ReturnType<Api['mvLyrics']>>>('POST', `/mars/mv/${id}/lyrics`);
   }
+  dachi() {
+    return this.req<Awaited<ReturnType<Api['dachi']>>>('GET', '/dachi');
+  }
+  befriendInviter() {
+    return this.req<Awaited<ReturnType<Api['befriendInviter']>>>('POST', '/dachi/inviter', {});
+  }
+  deliver(body: Parameters<Api['deliver']>[0]) {
+    return this.req<Awaited<ReturnType<Api['deliver']>>>('POST', '/dachi/deliver', body);
+  }
+  oshi(kind?: Parameters<Api['oshi']>[0]) {
+    return this.req<Awaited<ReturnType<Api['oshi']>>>('GET', `/dachi/oshi${kind ? `?kind=${kind}` : ''}`);
+  }
   choosePuniPic(mediaId: string | null) {
     return this.req<Awaited<ReturnType<Api['choosePuniPic']>>>('POST', '/me/puni/pic', { mediaId });
   }

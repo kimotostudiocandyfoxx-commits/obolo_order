@@ -710,7 +710,13 @@ export function MercuryLesson({
               <div className="rounded-2xl bg-sky-50 p-3 text-center text-[14px] font-bold text-sky-700 ring-2 ring-sky-300">
                 ✓ ダチへ（{inviter}・KIMORIN⭐︎）
               </div>
-              <Big tone="sky" onClick={anext}>
+              <Big
+                tone="sky"
+                onClick={() => {
+                  if (song) void api.deliver({ kind: 'song', title: song.title.slice(0, 60), url: song.url, posterUrl: record.url && /^https?:/.test(record.url) ? record.url : undefined, refId: /^[0-9a-f-]{36}$/.test(song.id) ? song.id : undefined }).catch(() => undefined);
+                  anext();
+                }}
+              >
                 🚢 出航
               </Big>
             </div>
