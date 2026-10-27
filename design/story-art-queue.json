@@ -4803,6 +4803,49 @@
     "apps/web/public/onboarding/s/mars-screens.jpg"
    ],
    "prompt": "A small film studio made from a landed retro spaceship in the middle of the Mars town of the picture: the round silver ship stands on three legs between the buildings full of glowing screens, its hatch open as a studio door with a red carpet, a spotlight and a vintage film camera beside it, neon lights reflecting on its hull, dusk sky. Same painterly anime film style and palette as the picture. Wide view, the studio in the middle, no people. No text."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "rocket-venus",
+   "refs": [
+    "design/story/refs/client/rocket.jpg",
+    "apps/web/public/onboarding/s/rocket-space.jpg"
+   ],
+   "prompt": "Inside the golden rocket of the first picture flying through dark space as in the second picture: through the round window ahead, a planet glowing soft gold comes closer, and its whole surface shows fine concentric grooves like a giant vinyl record. Painterly anime film quality. No people, no text."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "venus-stage",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "Venus as a planet that is one giant slowly spinning vinyl record: a vast golden-black ground of shining concentric grooves to the horizon, and rising from it an enormous tone-arm like a crane, with a round open-air stage at its base — a circular stage with a DJ booth in the middle, two turntables, string lights and stage lamps lighting up one by one, a warm golden dusk sky with soft clouds. Wide view from the audience side, the stage in the lower middle, no people. Painterly anime film quality in the palette of the reference. No text."
+  },
+  {
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "id": "venus-night",
+   "refs": [
+    "apps/web/public/onboarding/s/arr-mars-city.jpg"
+   ],
+   "prompt": "Night on Venus, a planet that is one giant vinyl record: under the huge tone-arm, the edge of a round open-air stage, small footlights making warm circles on the ground, the shining grooves of the record ground fading into the dark, a deep starry sky with a faint aurora. Quiet and tender. Painterly anime film quality. No people, no text."
   }
  ],
  "redo": []
