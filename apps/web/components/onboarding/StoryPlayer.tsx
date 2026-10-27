@@ -1,5 +1,6 @@
 'use client';
 
+import { DaydreamJacket } from '@/components/lap2/DaydreamJacket';
 import { L2Screen } from '@/components/lap2/L2Screen';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
@@ -1010,7 +1011,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'l2' && step.what !== 'booth' && (
+      {started && step?.t === 'l2' && step.what === 'jacket' && (
+        <DaydreamJacket
+          key={i}
+          api={lessonApi}
+          bati={v.bati ?? ''}
+          fill={(t) => fill(t, v)}
+          onDone={(a) => {
+            for (const [k, val] of Object.entries(a)) remember(k, val);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'l2' && !['booth', 'jacket'].includes(step.what) && (
         <L2Screen
           key={i}
           what={step.what}
