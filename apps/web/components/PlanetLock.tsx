@@ -4,6 +4,7 @@ import { planetOpensAt } from '@obolo/shared';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useAuth } from '@/lib/auth';
+import { useResident } from './onboarding/EclipseGuide';
 
 /** When a later planet opens for the signed-in member (client decision 2026-10-07). */
 export function usePlanetLock(planet: string): { locked: boolean; note: string } {
@@ -21,6 +22,7 @@ export function usePlanetLock(planet: string): { locked: boolean; note: string }
  */
 export function PlanetGate({ planet, name, children }: { planet: string; name: string; children: ReactNode }) {
   const { locked, note } = usePlanetLock(planet);
+  const resident = useResident();
   if (!locked) return <>{children}</>;
   return (
     <div className="flex h-[calc(100svh-56px-env(safe-area-inset-top))] flex-col items-center justify-center px-8 text-center">
@@ -28,7 +30,12 @@ export function PlanetGate({ planet, name, children }: { planet: string; name: s
       <p className="mt-4 text-lg font-black">{name}は、まだひらいていない</p>
       <p className="mt-2 text-sm text-white/70">{note}</p>
       <p className="mt-1 text-xs text-white/50">Obolo Order になると、1週間ごとに新しい星がひらいていくよ</p>
-      <Link href="/" className="mt-6 rounded-full bg-white/15 px-6 py-2 text-sm">
+      {resident && (
+        <Link href="/eclipse" className="mt-6 rounded-full border border-amber-200/60 bg-amber-200/10 px-6 py-2 text-sm text-amber-100">
+          太陽の神殿へ
+        </Link>
+      )}
+      <Link href="/" className="mt-3 rounded-full bg-white/15 px-6 py-2 text-sm">
         宇宙地図にもどる
       </Link>
     </div>

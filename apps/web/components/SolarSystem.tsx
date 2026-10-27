@@ -2,7 +2,8 @@
 
 import { ORBIT_ORDER, PLANETS, type PlanetId } from '@obolo/shared';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
+import { EclipseGuide, useResident } from './onboarding/EclipseGuide';
 import { useI18n } from '@/lib/i18n/client';
 import { usePlanetLock } from './PlanetLock';
 import { PlanetSphere } from './PlanetSphere';
@@ -79,9 +80,19 @@ function PlanetLink({
   const live = PLANETS[id].demo === 'live';
   // Venus / Neptune open after joining (client decision 2026-10-07)
   const lock = usePlanetLock(id);
+  const resident = useResident();
+  const [guide, setGuide] = useState(false);
   if (lock.locked) {
+    // a resident pressing a locked door: the Eclipse guide (M-R124 D08-S005); nothing shows it otherwise
     return (
-      <div className="absolute flex flex-col items-center opacity-55 grayscale-[60%]" style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }} aria-label={`${label}（${lock.note}）`}>
+      <div
+        role={resident ? 'button' : undefined}
+        onClick={resident ? () => setGuide(true) : undefined}
+        className="absolute flex flex-col items-center opacity-55 grayscale-[60%]"
+        style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}
+        aria-label={`${label}（${lock.note}）`}
+      >
+        {guide && <EclipseGuide what={`${label}の扉`} onClose={() => setTimeout(() => setGuide(false))} />}
         <span className="relative block">
           <PlanetSphere id={id} size={`${sizePct}cqw`} />
           <span className="absolute inset-0 flex items-center justify-center" style={{ fontSize: `${sizePct * 0.4}cqw` }}>
