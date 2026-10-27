@@ -1,5 +1,6 @@
 'use client';
 
+import { BatiAsk } from '@/components/lap2/BatiAsk';
 import { DaydreamJacket } from '@/components/lap2/DaydreamJacket';
 import { L2Screen } from '@/components/lap2/L2Screen';
 import { Relook } from '@/components/lap2/Relook';
@@ -1033,7 +1034,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'l2' && !['booth', 'jacket', 'relook'].includes(step.what) && (
+      {started && step?.t === 'l2' && step.what === 'ask' && (
+        <BatiAsk
+          key={i}
+          bati={v.bati ?? ''}
+          onDone={(a) => {
+            for (const [k, val] of Object.entries(a)) remember(k, val);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'l2' && !['booth', 'jacket', 'relook', 'ask'].includes(step.what) && (
         <L2Screen
           key={i}
           what={step.what}
