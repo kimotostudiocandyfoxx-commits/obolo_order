@@ -4846,6 +4846,65 @@
     "apps/web/public/onboarding/s/arr-mars-city.jpg"
    ],
    "prompt": "Night on Venus, a planet that is one giant vinyl record: under the huge tone-arm, the edge of a round open-air stage, small footlights making warm circles on the ground, the shining grooves of the record ground fading into the dark, a deep starry sky with a faint aurora. Quiet and tender. Painterly anime film quality. No people, no text."
+  },
+  {
+   "id": "mikie-cand-1",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    864,
+    1152
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kimorin-sun-grey.jpg",
+    "design/story/refs/kimorin-sunglasses.jpg"
+   ],
+   "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours and finish as the first picture. No text, no letters, no logos, no watermark. The character: MIKIE, a petite cheerful Japanese mother in her 40s-50s, shoulder-length black hair with bangs, a vivid magenta flowy blouse, a small pendant necklace, a bright patterned skirt, round dark sunglasses exactly like the ones in the second picture that fully hide her eyes, a warm gentle smile. Not resembling any real person. Her arms are cartoon prosthetics, very clearly drawn: HER RIGHT ARM (on the viewer's LEFT side of the picture) ends below the elbow in a shiny silver pirate captain's hook; HER LEFT ARM (on the viewer's RIGHT side of the picture) is a small cute kitchen gatling gun with a rotating barrel cluster, little bottles of salt, pepper, soy sauce and mayonnaise loaded in it. Both legs normal, with simple shoes. Pose: front view, bowing slightly and politely with a smile, the hook and the gatling arm both visible at her sides."
+  },
+  {
+   "id": "mikie-cand-2",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    864,
+    1152
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kimorin-sun-grey.jpg",
+    "design/story/refs/kimorin-sunglasses.jpg"
+   ],
+   "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours and finish as the first picture. No text, no letters, no logos, no watermark. The character: MIKIE, a petite cheerful Japanese mother in her 40s-50s, shoulder-length black hair with bangs, a vivid magenta flowy blouse, a small pendant necklace, a bright patterned skirt, round dark sunglasses exactly like the ones in the second picture that fully hide her eyes, a warm gentle smile. Not resembling any real person. Her arms are cartoon prosthetics, very clearly drawn: HER RIGHT ARM (on the viewer's LEFT side of the picture) ends below the elbow in a shiny silver pirate captain's hook; HER LEFT ARM (on the viewer's RIGHT side of the picture) is a small cute kitchen gatling gun with a rotating barrel cluster, little bottles of salt, pepper, soy sauce and mayonnaise loaded in it. Both legs normal, with simple shoes. Pose: front view, standing straight and smiling, raising the hook arm a little in greeting, the gatling arm resting at her side."
+  },
+  {
+   "id": "mikie-cand-3",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    864,
+    1152
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kimorin-sun-grey.jpg",
+    "design/story/refs/kimorin-sunglasses.jpg"
+   ],
+   "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours and finish as the first picture. No text, no letters, no logos, no watermark. The character: MIKIE, a petite cheerful Japanese mother in her 40s-50s, shoulder-length black hair with bangs, a vivid magenta flowy blouse, a small pendant necklace, a bright patterned skirt, round dark sunglasses exactly like the ones in the second picture that fully hide her eyes, a warm gentle smile. Not resembling any real person. Her arms are cartoon prosthetics, very clearly drawn: HER RIGHT ARM (on the viewer's LEFT side of the picture) ends below the elbow in a shiny silver pirate captain's hook; HER LEFT ARM (on the viewer's RIGHT side of the picture) is a small cute kitchen gatling gun with a rotating barrel cluster, little bottles of salt, pepper, soy sauce and mayonnaise loaded in it. Both legs normal, with simple shoes. Pose: three-quarter view facing slightly to the viewer's left, smiling, the hook and the gatling arm both clearly visible."
+  },
+  {
+   "id": "mikie-cat",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    864,
+    1152
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kimorin-sun-grey.jpg"
+   ],
+   "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours and finish as the first picture. No text, no letters, no logos, no watermark. The character: Mii-chan, a small round fluffy house cat (a Bati companion), cream and brown tabby, big friendly eyes, sitting and looking up happily. Cute, kids-friendly."
   }
  ],
  "redo": []
