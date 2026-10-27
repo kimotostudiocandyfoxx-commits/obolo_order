@@ -934,10 +934,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           stickers={v.made?.stickers ?? []}
           neo={v.neo || v.name}
           bati={v.bati || 'バティ'}
+          inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
-          onDone={(song) => {
+          onDone={(song, island, sailed) => {
             remember('f_song_from', song ? 'made' : 'none');
             if (song) remember('song', JSON.stringify(song));
+            remember('my_island', JSON.stringify(island));
+            remember('f_d06_sail', sailed ? 'sail' : 'keep');
             run(iRef.current + 1);
           }}
         />
@@ -948,9 +951,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           song={v.made?.song ?? null}
           neo={v.neo || v.name}
           bati={v.bati || 'バティ'}
+          inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
           onDone={(r) => {
             if (r.mv) remember('mv', JSON.stringify(r.mv));
+            if (r.studio) remember('my_studio', r.studio);
+            remember('f_d07_send', r.sent ? 'send' : 'keep');
             remember('f_d07_screen', r.mv ? 'big' : 'pick');
             if (r.frame) remember('mars_frame', r.frame);
             run(iRef.current + 1);

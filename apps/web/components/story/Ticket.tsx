@@ -17,6 +17,8 @@ const STARS: { id: StampId; x: number; label: string }[] = [
   { id: 'jupiter', x: 44.2, label: '木星' },
   { id: 'mercury', x: 55, label: '水星' },
   { id: 'mars', x: 65.6, label: '火星' },
+  // not in the picture: drawn in code, floating up once Mars is stamped (draft 21)
+  { id: 'venus', x: 76.2, label: '金星' },
 ];
 
 export function TicketArt({ dest, stamped, fresh, pressed, leaving }: { dest?: string; stamped: (id: StampId) => boolean; fresh?: StampId; pressed?: boolean; leaving?: boolean }) {
@@ -49,12 +51,18 @@ export function TicketArt({ dest, stamped, fresh, pressed, leaving }: { dest?: s
           {/* the star stamps along the bottom */}
           {STARS.map((s) => {
             const on = stamped(s.id);
+            if (s.id === 'venus' && !on && !stamped('mars')) return null;
             return (
               <span key={s.id} className="absolute flex flex-col items-center" style={{ top: '82%', left: `${s.x}%`, transform: 'translateX(-50%)' }}>
                 <span
                   className={`block h-[6.2cqw] w-[6.2cqw] transition-all duration-500 [clip-path:polygon(50%_0,61%_35%,98%_35%,68%_57%,79%_91%,50%_70%,21%_91%,32%_57%,2%_35%,39%_35%)] ${on ? 'scale-110 bg-gradient-to-b from-[#ffe7a3] to-[#c8902e] shadow-[0_0_14px_rgba(255,214,140,0.9)]' : 'bg-transparent'} ${s.id === fresh && pressed ? 'animate-[stampIn_0.6s_cubic-bezier(.2,1.6,.4,1)_both]' : ''}`}
                 />
-                {on && <span className="mt-[0.6cqw] text-[1.9cqw] tracking-[0.1em] text-[#7a5c2c]">{s.label}</span>}
+                {s.id === 'venus' && !on && (
+                  <svg viewBox="0 0 24 24" className="absolute top-0 h-[6.2cqw] w-[6.2cqw] animate-[fadeUp_1.2s_ease-out]" aria-hidden>
+                    <path d="M12 0.5 14.6 8.4 23 8.4 16.3 13.4 18.9 21.6 12 16.6 5.1 21.6 7.7 13.4 1 8.4 9.4 8.4Z" fill="none" stroke="#a8823f" strokeWidth="0.9" />
+                  </svg>
+                )}
+                {(on || s.id === 'venus') && <span className="mt-[0.6cqw] text-[1.9cqw] tracking-[0.1em] text-[#7a5c2c]">{s.label}</span>}
               </span>
             );
           })}

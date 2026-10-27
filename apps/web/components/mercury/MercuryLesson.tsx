@@ -3,22 +3,23 @@
 import type { SongDesign } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { KIMORIN_JACKET, Sticker } from '@/components/jupiter/JupiterLesson';
-import { Big, LessonShell, Later, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
+import { Big, LessonShell, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
 import { STYLE_SOUND, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { SongMade, StickerMade } from '@/lib/onboarding/made';
 import { LineVoice } from '@/lib/story/lineVoice';
+import { ISLAND_BEACHES, ISLAND_LIGHTS, ISLAND_SHAPES, MyIsland, islandOmakase, type IslandLook } from './MyIsland';
 
 /**
  * Day 5 on Mercury (first journey; story D06-S005〜S007, M-R89/M-R91/M-R114): yesterday's jacket gets its
  * song. フリージー teaches, KIMORIN⭐︎ goes first — his 『プリプリ・ボカン』 as a tearful epic ballad with
  * a choir shouting 「ボカーン！」 — then the visitor: the jacket's song (or new words), add a feeling or
  * pass → the feel → {bati}'s lyric draft (tap a line to touch it up) → mana asked → {bati} sings it → the
- * record spins → 〔🔒 土の中にしまう〕 → the song becomes a ship and sails out (a story picture: nothing is
- * sent; 〔🚢 出航させる〕 is second journey). Not making one is a real choice (a sound of the island
- * sails instead). The lines are the story's, word for word, so their voices play.
+ * record spins → 〔🔒 土の中にしまう〕 (always: Mars needs it). Draft 21 (M-R124/125): everyone makes one;
+ * the song may sail to the dachi's sea (〔🚢 出航させる〕→〔ダチへ〕→〔🚢 出航〕), KIMORIN⭐︎'s ship comes into
+ * the 〔推し〕 sea, then 🏝️ myアイランド rises (D06-S007b). The lines are the story's, word for word.
  */
-type Phase = 'intro' | 'choose' | 'hold' | 'words' | 'style' | 'writing' | 'lyrics' | 'mana' | 'singing' | 'failed' | 'song' | 'saved' | 'none' | 'ship';
+type Phase = 'intro' | 'choose' | 'hold' | 'words' | 'style' | 'writing' | 'lyrics' | 'mana' | 'singing' | 'failed' | 'song' | 'after';
 const FEELS: { id: string; label: string }[] = [
   { id: 'pop', label: 'ポップ' },
   { id: 'rock', label: 'ロック' },
@@ -47,7 +48,7 @@ const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }
   { who: 'kimorin', text: '……では、聴いてから、計算します。' },
   { who: 'freezy', text: '今日食べたラーメンが美味しかった。学校に遅刻しそうだ。そんな自分の日常のことを、歌にしてみよう。' },
   { who: 'freezy', text: '土星の言葉も、木星のジャケットも、音がつけば、もっと伝わる。' },
-  { who: 'freezy', text: 'できた曲は、船になって海に出る。' },
+  { who: 'freezy', text: 'できた曲は、船になって、ダチの海に出る。' },
   { who: 'freezy', text: '習うより、慣れろ、だ。さあ、作ってみよう。', scene: 'bar' },
   { who: 'freezy', text: '真ん中の〔♫+ 作曲〕だ。', scene: 'bar-glow' },
   { who: 'kimorin', text: 'お待ちを。きのうのジャケットで。……天才の手本です。', scene: 'demo' },
@@ -60,11 +61,20 @@ const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }
 const SPEAKER: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN', bati: 'バティ', guide: '', song: '', choir: '' };
 const NAMES: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN⭐︎', bati: 'バティ', guide: '', song: 'KIMORIN⭐︎の曲', choir: '合唱' };
 const SPRITES: Partial<Record<Who, string>> = { freezy: 'freezy-x-talk', kimorin: 'kimorin-sun' };
-const NONE_SOUNDS = [
-  { id: 'ice', label: '冷蔵庫の中の、氷の音', mark: '🧊' },
-  { id: 'hum', label: '冷蔵庫のうなり', mark: '〰️' },
-  { id: 'bati', label: '{bati}の声', mark: '🥚' },
-];
+// after the song is put in the soil (D06-S007 最初の一隻 → D06-S007b myアイランド)
+type After =
+  | { k: 'line'; l: Line }
+  | { k: 'sail' } // 〔ダチの海に出航させる〕〔今は、土の中にしまっておく〕
+  | { k: 'post' } // 〔🚢 出航させる〕 → 〔ダチへ〕 → 〔🚢 出航〕
+  | { k: 'ship'; who: 'mine' | 'kimorin' }
+  | { k: 'oshi' } // KIMORIN⭐︎'s ship comes into the 〔推し〕 sea: tap it, the ballad plays
+  | { k: 'bar' } // 🏝️ myアイランド glows
+  | { k: 'edit' }
+  | { k: 'rise' }
+  | { k: 'end' };
+const fr = (text: string): After => ({ k: 'line', l: { who: 'freezy', text } });
+const ki = (text: string): After => ({ k: 'line', l: { who: 'kimorin', text } });
+const gd = (text: string): After => ({ k: 'line', l: { who: 'guide', text } });
 
 /** The record: the jacket on it, spinning while it plays. */
 export function Record({ s, playing, size = 200 }: { s: StickerMade; playing: boolean; size?: number }) {
@@ -80,19 +90,74 @@ export function Record({ s, playing, size = 200 }: { s: StickerMade; playing: bo
   );
 }
 
-function Bar({ glow }: { glow?: boolean }) {
+function Bar({ glow, lit = 1, onTap }: { glow?: boolean; lit?: number; onTap?: () => void }) {
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-[175] flex justify-center gap-3 bg-gradient-to-t from-black/60 to-transparent px-4 pb-5 pt-8">
       {['🗺️ 海図', '♫+ 作曲', '🏝️ myアイランド'].map((l, k) => (
-        <div key={l} className={`rounded-2xl px-4 py-2.5 text-sm font-black ${k === 1 ? `bg-sky-300 text-sky-900 ${glow ? 'animate-pulse ring-4 ring-sky-200' : ''}` : 'bg-white/20 text-white/80'}`}>
+        <button key={l} disabled={k !== lit || !onTap} onClick={onTap} className={`rounded-2xl px-4 py-2.5 text-sm font-black ${k === lit ? `bg-sky-300 text-sky-900 ${glow ? 'animate-pulse ring-4 ring-sky-200' : ''}` : 'bg-white/20 text-white/80'}`}>
           {l}
-        </div>
+        </button>
       ))}
     </div>
   );
 }
 
-export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: { api: LessonApi; stickers: StickerMade[]; neo: string; bati: string; batiImage?: string; onDone: (song: SongMade | null) => void }) {
+/** 🏝️ myアイランド: shape, beach, light (unpicked = おまかせ), a name if you like → 〔この島にする〕 */
+function IslandEditor({ neo, onMake, onHold }: { neo: string; onMake: (l: IslandLook) => void; onHold: () => void }) {
+  const [pick, setPick] = useState<Partial<IslandLook>>({});
+  const [name, setName] = useState('');
+  const auto = islandOmakase(neo);
+  const look: IslandLook = { shape: pick.shape ?? auto.shape, beach: pick.beach ?? auto.beach, light: pick.light ?? auto.light, name };
+  const rows = [
+    { key: 'shape' as const, name: '形', opts: ISLAND_SHAPES },
+    { key: 'beach' as const, name: '浜', opts: ISLAND_BEACHES },
+    { key: 'light' as const, name: '灯り', opts: ISLAND_LIGHTS },
+  ];
+  return (
+    <div className="space-y-3">
+      <p className="text-center text-sm font-black text-sky-700">🏝️ myアイランド</p>
+      <div className="flex justify-center rounded-2xl bg-gradient-to-b from-sky-200 to-sky-400 py-2">
+        <MyIsland look={look} width={200} />
+      </div>
+      {rows.map((row) => (
+        <div key={row.key} className="flex items-center gap-2">
+          <span className="w-10 shrink-0 text-[12px] font-bold text-slate-400">{row.name}</span>
+          <div className="flex flex-wrap gap-1.5">
+            {row.opts.map((o) => (
+              <button key={o.v} onClick={() => setPick((x) => ({ ...x, [row.key]: o.v }))} className={`rounded-full px-3 py-1.5 text-[13px] font-bold ${pick[row.key] === o.v ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+      <input value={name} onChange={(e) => setName(e.target.value.slice(0, 12))} placeholder="島の名前（なくてもいい）" className="w-full rounded-xl bg-slate-50 px-3 py-2 text-[16px] outline-none ring-1 ring-slate-200" />
+      <p className="text-center text-[11px] leading-relaxed text-slate-400">選ばなければ、おまかせ。土の中の曲も、帰ってきた船も、ここに集まります（船の帰る小さな桟橋は、どの島にもつきます）。あとで変えられます</p>
+      <Big tone="sky" onClick={() => onMake(look)}>
+        この島にする
+      </Big>
+      <Soft onClick={onHold}>今はここで止める</Soft>
+    </div>
+  );
+}
+
+export function MercuryLesson({
+  api,
+  stickers,
+  neo,
+  bati,
+  inviter,
+  batiImage,
+  onDone,
+}: {
+  api: LessonApi;
+  stickers: StickerMade[];
+  neo: string;
+  bati: string;
+  inviter: string;
+  batiImage?: string;
+  onDone: (song: SongMade | null, island: IslandLook, sailed: boolean) => void;
+}) {
   const [phase, setPhase] = useState<Phase>('intro');
   const [k, setK] = useState(0);
   const [reply, setReply] = useState<Line[] | null>(null);
@@ -109,13 +174,19 @@ export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: {
   const [stage, setStage] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [heard, setHeard] = useState(false);
-  const [noneSound, setNoneSound] = useState<string | null>(null);
-  const [shipK, setShipK] = useState(0);
+  const [after, setAfter] = useState<After[]>([]);
+  const [ak, setAk] = useState(0);
+  const [sailed, setSailed] = useState(false);
+  const [post, setPost] = useState<'post' | 'to'>('post');
+  const [oshi, setOshi] = useState<'coming' | 'here' | 'open'>('coming');
+  const [look, setLook] = useState<IslandLook | null>(null);
+  const [islandHold, setIslandHold] = useState(false);
+  const [rise, setRise] = useState<0 | 1 | 2>(0);
   const [cue, setCue] = useState<Line | null>(null);
   const audio = useRef<HTMLAudioElement>(null);
   const ballad = useRef<HTMLAudioElement>(null);
   const voice = useRef<LineVoice | null>(null);
-  const fill = (t: string) => t.replaceAll('{neo}', neo).replaceAll('{bati}', bati);
+  const fill = (t: string) => t.replaceAll('{neo}', neo).replaceAll('{bati}', bati).replaceAll('{inviter}', inviter);
   const lineOf = (l: Line): CoachLine => ({ sprite: l.who === 'bati' ? batiImage : SPRITES[l.who], name: l.who === 'bati' ? bati : NAMES[l.who] || undefined, text: fill(l.text) });
   const speak = (l: Line) => {
     if (SPEAKER[l.who]) void voice.current?.say(SPEAKER[l.who], l.text);
@@ -175,21 +246,62 @@ export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: {
     setDesign((d) => (d ? { ...d, sections: d.sections.map((s, a) => (a !== si ? s : { ...s, lines: s.lines.map((l, b) => (b !== li ? l : { ...l, text })) })) } : d));
   const record: StickerMade = from === 'prev' && jacket ? jacket : { text: design?.title ?? song?.title ?? (words.trim() || '氷の島'), url: null };
 
-  const shipLines: Line[] = [
-    { who: 'guide', text: '港の船は、お話の中の船です。曲は送られません' },
-    { who: 'guide', text: '{neo}の最初の一隻が、海に出た' },
-    { who: 'kimorin', text: '出た……！　船、出たケン！' },
-    { who: 'kimorin', text: '……失礼。見事な船出ですね。' },
-    noneSound
-      ? { who: 'freezy', text: '{neo}の選んだ音も、海に出た。……また聴かせてくれ。' }
-      : heard
-        ? { who: 'freezy', text: '{neo}の言葉は、ちゃんと歌になった。また聴かせてくれ。' }
-        : { who: 'freezy', text: '聴くのは、あとでいい。また聴かせてくれ。' },
+  const ab = phase === 'after' ? after[ak] : undefined;
+  const anext = () => setAk((x) => x + 1);
+  const ainsert = (more: After[]) => setAfter((a) => [...a.slice(0, ak + 1), ...more, ...a.slice(ak + 1)]);
+  const putAway = () => {
+    setAfter([
+      gd('曲を、{neo}だけの〔⛏ 土の中の曲〕にしまいました。誰にも送られていません。しまった曲は、このあと作る〔🏝️ myアイランド〕の土の中から、いつでも聴けます'),
+      fr('次は、出航だ。お前の曲を、ダチの海に出す。'),
+      gd('〔🚢 出航させる〕を押すと、曲が船になって、ダチの海を88時間めぐり、このあと作るmyアイランドの桟橋に戻ります（届くのはダチだけ。いまのダチは、{inviter}とKIMORIN⭐︎です）'),
+      gd('〔🗺️ 海図〕を開くと、上の〔推し〕に、ダチの船が入ってきます。タップすると聴けます（押した時だけ鳴ります）'),
+      { k: 'sail' },
+    ]);
+    setAk(0);
+    setPhase('after');
+  };
+  const closing = (): After[] => [
+    heard ? fr('{neo}の言葉は、ちゃんと歌になった。また聴かせてくれ。') : fr('聴くのは、あとでいい。また聴かせてくれ。'),
+    ki('では、私も。'),
+    { k: 'ship', who: 'kimorin' },
+    { k: 'oshi' },
+    { k: 'line', l: { who: 'choir', text: 'ボカーン！　ボカーン！' } },
+    ki('……二回目でも、泣けますね。'),
+    fr('次は、音楽が帰る場所だ。どんな島にするかは、お前が決めろ。'),
+    { k: 'bar' },
+    { k: 'edit' },
+    { k: 'rise' },
+    ki('……島とは、生えるものだったのですね。'),
+    ...(sailed ? [gd('出航した船は、88時間ダチの海をめぐって、この島の桟橋に戻ります。戻った曲は、浜にレコードとして並びます')] : []),
+    gd('myアイランドができた'),
+    { k: 'end' },
   ];
+  // each line plays its voice; the ships sail on their own; KIMORIN⭐︎'s ship waits for a tap; the island rises
   useEffect(() => {
-    if (phase === 'ship') speak(shipLines[shipK]);
+    if (!ab) return;
+    if (ab.k === 'line') speak(ab.l);
+    if (ab.k === 'ship') {
+      const t = setTimeout(anext, 3200);
+      return () => clearTimeout(t);
+    }
+    if (ab.k === 'oshi') {
+      setOshi('coming');
+      const t = setTimeout(() => setOshi('here'), 1800);
+      return () => clearTimeout(t);
+    }
+    if (ab.k === 'rise') {
+      setRise(0);
+      const a = setTimeout(() => setRise(1), 500);
+      const b = setTimeout(() => setRise(2), 2600);
+      const c = setTimeout(anext, 3800);
+      return () => [a, b, c].forEach(clearTimeout);
+    }
+    if (ab.k === 'end') {
+      ballad.current?.pause();
+      onDone(song ? { id: song.id, title: song.title, url: song.url, jacket: record.url, words: record.text } : null, look ?? islandOmakase(neo), sailed);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, shipK]);
+  }, [ab]);
 
   let coach: CoachLine | null = cue ? lineOf(cue) : null;
   let actions: React.ReactNode = null;
@@ -226,27 +338,16 @@ export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: {
   else if (phase === 'writing') coach = { text: '✍️ 歌詞を考えています…' };
   else if (phase === 'singing' && stage === 'warming') coach = { text: '♪ 作曲中…　音のスタジオが、目をさましています' };
   else if (phase === 'song' && cue?.text === '−2マナ') actions = <NextButton onClick={() => setCue({ who: 'guide', text: '聴いたら〔🔒 土の中にしまう〕を押します（自動ではしまいません）' })} />;
-  else if (phase === 'saved') {
-    coach = lineOf({ who: 'guide', text: '曲を、{neo}だけの〔⛏ 土の中の曲〕にしまいました。誰にも送られていません。しまった曲は、右の〔🏝️ myアイランド〕の空き地の土の中から、いつでも聴けます。〔🚢 出航させる〕（届ける）は、二周目からひらきます' });
-    actions = <NextButton onClick={() => setPhase('ship')} />;
-  } else if (phase === 'none' && noneSound) actions = <NextButton onClick={() => setPhase('ship')} />;
-  else if (phase === 'ship') {
-    coach = lineOf(shipLines[shipK]);
-    actions = (
-      <NextButton
-        onClick={() => {
-          if (shipK < shipLines.length - 1) setShipK(shipK + 1);
-          else onDone(song && !noneSound ? { id: song.id, title: song.title, url: song.url, jacket: record.url, words: record.text } : null);
-        }}
-      />
-    );
+  else if (phase === 'after') {
+    coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: '下の右の〔🏝️ myアイランド〕を押す' } : ab?.k === 'oshi' && oshi === 'here' ? { text: '上の〔推し〕の海に、小さな船が一隻。タップしてみよう' } : null;
+    if (ab?.k === 'line') actions = <NextButton onClick={anext} />;
   }
 
   return (
     <LessonShell bg="/onboarding/s/mercury-ice.jpg" coach={coach} actions={actions}>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio ref={ballad} src="/onboarding/bgm-kimorin-ballad.m4a" preload="auto" />
-      {batiImage && phase !== 'ship' && (
+      {batiImage && phase !== 'after' && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={batiImage} alt="" className="pointer-events-none absolute bottom-[calc(16px+env(safe-area-inset-bottom))] left-3 z-[170] h-16 w-16 rounded-2xl border-2 border-white/70 object-cover shadow-lg" aria-hidden />
       )}
@@ -288,14 +389,6 @@ export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: {
             >
               新しく作る
             </Big>
-            <Soft
-              onClick={() => {
-                setPhase('none');
-                said({ who: 'freezy', text: 'なら、選べ。ここでいちばん耳に残った音はどれだ。それを海に流す。' });
-              }}
-            >
-              今日は作らない
-            </Soft>
             <Soft
               onClick={() => {
                 setPhase('hold');
@@ -483,47 +576,119 @@ export function MercuryLesson({ api, stickers, neo, bati, batiImage, onDone }: {
               onClick={() => {
                 audio.current?.pause();
                 void api.saveSong(song.id).catch(() => undefined);
-                setPhase('saved');
+                putAway();
               }}
             >
               🔒 土の中にしまう
             </Big>
             <Soft onClick={() => setPhase('lyrics')}>歌詞を直して、作り直す</Soft>
-            <Later label="🚢 出航させる" />
           </div>
         </Panel>
       )}
 
-      {phase === 'none' && !noneSound && (
+      {ab?.k === 'sail' && (
         <Panel>
           <div className="space-y-2">
-            {NONE_SOUNDS.map((s) => (
-              <Soft
-                key={s.id}
-                onClick={() => {
-                  setNoneSound(s.id);
-                  if (s.id === 'hum') said({ who: 'kimorin', text: '冷蔵庫の、うなり。……渋い選択です。' });
-                  else setCue({ who: 'guide', text: `${fill(s.label)}を、海に流します` });
-                }}
-              >
-                {s.mark} {fill(s.label)}
-              </Soft>
-            ))}
+            <Big
+              tone="sky"
+              onClick={() => {
+                setSailed(true);
+                setPost('post');
+                ainsert([{ k: 'post' }, { k: 'ship', who: 'mine' }, gd('{neo}の最初の一隻が、ダチの海へ出た'), ki('出た……！　船、出たケン！'), ki('……失礼。見事な船出ですね。'), ...closing()]);
+                anext();
+              }}
+            >
+              ダチの海に出航させる
+            </Big>
+            <Soft
+              onClick={() => {
+                ainsert([fr('出航は、いつでもできる。'), gd('〔⛏ 土の中の曲〕から、いつでも〔🚢 出航させる〕を押せます'), ...closing()]);
+                anext();
+              }}
+            >
+              今は、土の中にしまっておく
+            </Soft>
           </div>
         </Panel>
       )}
-
-      {phase === 'ship' && (
-        <div className="pointer-events-none absolute bottom-[18svh] left-[30%] z-[160] animate-[shipOut_9s_ease-in_forwards]">
+      {ab?.k === 'post' && (
+        <Panel>
+          {post === 'post' ? (
+            <Big tone="sky" onClick={() => setPost('to')}>
+              🚢 出航させる
+            </Big>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-center text-[13px] text-slate-500">行き先</p>
+              <div className="rounded-2xl bg-sky-50 p-3 text-center text-[14px] font-bold text-sky-700 ring-2 ring-sky-300">
+                ダチへ（{inviter}・KIMORIN⭐︎）
+              </div>
+              <Big tone="sky" onClick={anext}>
+                🚢 出航
+              </Big>
+            </div>
+          )}
+        </Panel>
+      )}
+      {ab?.k === 'ship' && (
+        <div className="pointer-events-none absolute bottom-[18svh] left-[30%] z-[160] animate-[shipOut_3.4s_ease-in_forwards]">
           <div className="relative flex flex-col items-center">
-            {noneSound ? (
-              <span className="text-5xl drop-shadow-xl">{NONE_SOUNDS.find((s) => s.id === noneSound)?.mark}</span>
-            ) : (
-              <Sticker s={record} size={100} />
-            )}
+            <Sticker s={ab.who === 'mine' ? record : KIMORIN_JACKET} size={100} />
             <span className="-mt-2 text-7xl drop-shadow-xl">⛵</span>
           </div>
         </div>
+      )}
+      {ab?.k === 'oshi' && (
+        <div className="absolute inset-x-0 top-[calc(17svh+env(safe-area-inset-top))] z-[185] flex flex-col items-center">
+          <span className="rounded-full bg-black/40 px-4 py-1 text-[13px] font-bold text-sky-100">推し</span>
+          <button
+            onClick={() => {
+              if (oshi !== 'here') return;
+              setOshi('open');
+              if (ballad.current) {
+                ballad.current.currentTime = 0;
+                void ballad.current.play().catch(() => undefined);
+              }
+              setTimeout(anext, 900);
+            }}
+            className={`mt-2 flex flex-col items-center transition-all duration-[1600ms] ${oshi === 'coming' ? 'translate-x-[60vw] opacity-0' : 'translate-x-0 opacity-100'}`}
+          >
+            <span className="relative flex flex-col items-center">
+              <span className="rounded-sm bg-white/90 px-1.5 text-[10px] font-bold text-stone-700">KIMORIN⭐︎</span>
+              <span className="text-5xl drop-shadow-xl">⛵</span>
+            </span>
+          </button>
+        </div>
+      )}
+      {ab?.k === 'bar' && <Bar glow lit={2} onTap={anext} />}
+      {phase === 'after' && ak >= after.findIndex((x) => x.k === 'rise') && after.some((x) => x.k === 'rise') && ab?.k !== 'edit' && (
+        <div className="pointer-events-none absolute inset-x-0 top-[30svh] z-[160] flex justify-center">
+          <MyIsland look={look ?? islandOmakase(neo)} rise={ab?.k === 'rise' ? rise : 2} records={1} width={320} />
+        </div>
+      )}
+      {ab?.k === 'edit' && (
+        <Panel>
+          {islandHold ? (
+            <div className="space-y-3 text-center">
+              <p className="text-sm text-slate-500">次は、ここから。閉じても、だいじょうぶです</p>
+              <Big tone="sky" onClick={() => setIslandHold(false)}>
+                続ける
+              </Big>
+            </div>
+          ) : (
+            <IslandEditor
+              neo={neo}
+              onMake={(l) => {
+                setLook(l);
+                anext();
+              }}
+              onHold={() => {
+                setIslandHold(true);
+                said({ who: 'freezy', text: '海は、逃げん。' });
+              }}
+            />
+          )}
+        </Panel>
       )}
     </LessonShell>
   );

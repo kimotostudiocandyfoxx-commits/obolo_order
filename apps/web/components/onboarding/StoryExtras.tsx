@@ -345,6 +345,8 @@ export const STAMPS = [
   { id: 'jupiter', label: '木星', icon: '🌳' },
   { id: 'mercury', label: '水星', icon: '🌊' },
   { id: 'mars', label: '火星', icon: '🎬' },
+  // draft 21 (M-R124): Venus joins the first journey — its slot floats up at the end of Mars
+  { id: 'venus', label: '金星', icon: '🎤' },
 ] as const;
 export type StampId = (typeof STAMPS)[number]['id'];
 /** The stamps you have by the journey day you are on (a planet's stamp is pressed at the end of its day). */
@@ -354,8 +356,8 @@ export function stampsOn(day: number): StampId[] {
 
 /**
  * The tour ticket (M-R18): the ticket picture with four star-shaped stamp slots — Saturn, Jupiter,
- * Mercury, Mars. `fresh` stamps one now; `flip` turns to the back: the star map, the four planets joined
- * by a gold line, and Venus, Uranus, Neptune locked 『Obolo Orderのみ』. Tap to continue.
+ * Mercury, Mars (+ Venus, draft 21). `fresh` stamps one now; `flip` turns to the back: the star map, the
+ * four planets joined by a gold line running on to Venus, and Uranus, Neptune locked 『Obolo Orderのみ』.
  */
 export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; onDone: () => void }) {
   const [pressed, setPressed] = useState(!fresh);
@@ -375,6 +377,7 @@ export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[];
           <div className="absolute inset-0 rounded-2xl border border-amber-200/70 bg-[radial-gradient(ellipse_at_center,#1d1640_0%,#07060d_80%)] p-4">
             <svg viewBox="0 0 300 300" className="h-full w-full" aria-hidden>
               <polyline points="40,230 95,180 150,200 205,150" fill="none" stroke="#fcd34d" strokeWidth="2" />
+              <line x1="205" y1="150" x2="235" y2="95" stroke="#fcd34d" strokeWidth="1.2" strokeDasharray="2 3" className="animate-pulse" />
               {[
                 [40, 230, '土星'],
                 [95, 180, '木星'],
@@ -388,8 +391,13 @@ export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[];
                   </text>
                 </g>
               ))}
+              <g>
+                <circle cx="235" cy="95" r="9" fill="none" stroke="#fcd34d" strokeWidth="1.5" className="animate-pulse" />
+                <text x="235" y="119" textAnchor="middle" fontSize="11" fill="#fde68a">
+                  金星
+                </text>
+              </g>
               {[
-                [235, 95, '金星'],
                 [170, 70, '天王星'],
                 [95, 95, '海王星'],
               ].map(([x, y, t]) => (

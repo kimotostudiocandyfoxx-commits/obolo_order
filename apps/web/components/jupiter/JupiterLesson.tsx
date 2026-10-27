@@ -438,7 +438,7 @@ export function JupiterLesson({
         </Panel>
       )}
 
-      {beat?.k === 'make' && draft && (
+      {beat?.k === 'make' && draft && fly < 0 && !tree && (
         <Panel>
           <div className="flex justify-center">
             <div className={make === 'drawing' || make === 'spell' ? 'animate-pulse' : ''}>
@@ -669,7 +669,7 @@ export function JupiterLesson({
         </Panel>
       )}
       {tb?.k === 'oshi' && (
-        <div className="absolute inset-x-0 top-[calc(8px+env(safe-area-inset-top))] z-[185] flex flex-col items-center">
+        <div className="absolute inset-x-0 top-[calc(17svh+env(safe-area-inset-top))] z-[185] flex flex-col items-center">
           <span className="rounded-full bg-black/40 px-4 py-1 text-[13px] font-bold text-amber-100">推し</span>
           <button
             onClick={() => oshi === 'here' && setOshi('open')}
