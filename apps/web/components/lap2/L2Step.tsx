@@ -6,6 +6,7 @@ import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
 import { BatiAsk } from './BatiAsk';
 import { DaydreamJacket } from './DaydreamJacket';
+import { GoodsPress } from './GoodsPress';
 import { HomewardGame } from './HomewardGame';
 import { L2Screen } from './L2Screen';
 import { PlaceSong } from './PlaceSong';
@@ -48,6 +49,13 @@ export function L2Step({
       return <PlaceSong onDone={onDone} />;
     case 'theater':
       return <Theater mv={v.made?.mv ?? null} onDone={onDone} />;
+    case 'goods':
+      return (
+        <GoodsPress
+          pictures={[...(v.made?.stickers ?? []), ...(v.made?.song?.jacket ? [{ text: v.made.song.title, url: v.made.song.jacket }] : []), ...(v.look ? [{ text: v.neo || v.name, url: v.look }] : [])]}
+          onDone={onDone}
+        />
+      );
     case 'game':
       return <HomewardGame watch={answers.game === 'KIMORINが遊ぶのを、となりで見る'} onDone={onDone} />;
     case 'booth':
