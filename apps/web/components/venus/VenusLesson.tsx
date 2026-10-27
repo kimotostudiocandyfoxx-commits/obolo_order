@@ -25,6 +25,8 @@ const NAMES: Record<Who, string> = { bossg: 'ボスG', hatg: 'ハットG', longg
 const SPRITES: Partial<Record<Who, string>> = { bossg: 'bossg', hatg: 'hatg', longg: 'longg', kimorin: 'kimorin-sun' };
 const PRACTICE = '/onboarding/bgm-dj-practice.m4a';
 const BALLAD = '/onboarding/bgm-kimorin-ballad.m4a';
+/** Hat G's desk: each press of 〔あかり〕 is another colour */
+const LIGHTS = ['#ff5ab4', '#5ad2ff', '#ffd25a', '#8a5aff', '#5aff9a'];
 const PRACTICE_JACKET: StickerMade = { text: '練習用のリズム', url: null };
 
 type Step =
@@ -39,6 +41,7 @@ type Step =
   | { k: 'join' } // おまかせ: 〔つなぐ〕
   | { k: 'turning' } // the planet turns at the song's speed; the MV on the stage screen
   | { k: 'kororin' } // ⑤ 〔コロリン〕
+  | { k: 'lights' } // the back booth: 〔あかり〕
   | { k: 'night' }
   | { k: 'show' } // 〔ダチに見せる〕〔見せない〕
   | { k: 'post' } // 〔🎤 見せる〕 → 〔ダチへ〕 → 〔🎤 届ける〕
@@ -80,6 +83,29 @@ const AFTER: Step[] = [
   L('guide', '〔🎤 見せる〕を押すと、いま回したセット（音と映像）が録られ、ダチ（{inviter}とKIMORIN⭐︎）の夜空に88時間流れます。88時間たつと、あなたのステージの記録に戻ります。押さなければ録られず、どこにも送られません'),
   { k: 'show' },
 ];
+/**
+ * The back booth (second journey, L2-VENUS-S002): your song on both decks (the same record with the 〔印〕
+ * somewhere else), SYNC, the fader at your speed, 〔あかり〕 from Hat G's desk. The night and 〔🎤 見せる〕 stay
+ * in the story. `self`: they mixed by hand on the first journey (the gorillas say less).
+ */
+const booth = (self: boolean, kororin: boolean): Step[] => [
+  L('guide', '左の台に、{neo}の曲。右の台にも、同じ一枚'),
+  { k: 'load' },
+  L('hatg', self ? '印は、出だしだけじゃない。' : '右のレコードの、入りたい所に、印をつける。'),
+  L('hatg', 'サビの頭に置けば、いきなり山から入る。静かな所に置けば、そっと入る。'),
+  { k: 'cue' },
+  L('longg', self ? '……速さは、もう、そろえられるな。' : '……速さを、そろえろ。'),
+  { k: 'sync' },
+  L('bossg', 'つまみは、速さでも、語れる。'),
+  L('bossg', 'ゆっくり回せば、二つの曲が、溶けあう。すっと回せば、ぱっと切りかわる。'),
+  { k: 'fade' },
+  L('hatg', '映像は、こっちの卓で、俺が見ている。'),
+  L('hatg', '絵のない所は、光で照らせ。'),
+  { k: 'lights' },
+  { k: 'turning' },
+  ...(kororin ? [{ k: 'kororin' } as Step] : []),
+  { k: 'end' },
+];
 const SHOWN: Step[] = [{ k: 'post' }, L('guide', '届けました'), L('kimorin', '……私の夜空にも、届くのですね。では、今夜は、起きて待ちます。'), { k: 'end' }];
 const NOT_SHOWN: Step[] = [L('bossg', '見せるのは、いつでもいい。'), { k: 'end' }];
 
@@ -92,6 +118,7 @@ export function VenusLesson({
   inviter,
   deliver,
   onDone,
+  booth: inBooth,
 }: {
   song: SongMade | null;
   mv: MvMade | null;
@@ -101,8 +128,11 @@ export function VenusLesson({
   /** 〔🎤 届ける〕: the set (your song and its MV) goes to the dachi's night sky */
   deliver?: (body: { kind: 'stage'; title?: string; url?: string; posterUrl?: string }) => Promise<void>;
   onDone: (r: { shown: boolean; mode: 'self' | 'auto' }) => void;
+  /** the back booth of the second journey (your song into your song); `self` = mixed by hand on the first journey */
+  booth?: { self: boolean };
 }) {
-  const [steps, setSteps] = useState<Step[]>(OPEN);
+  const [steps, setSteps] = useState<Step[]>(() => (inBooth ? booth(inBooth.self, kororins.length > 0) : OPEN));
+  const [light, setLight] = useState<string | null>(null);
   const [i, setI] = useState(0);
   const [mode, setMode] = useState<'self' | 'auto'>('self');
   const [hold, setHold] = useState(false);
@@ -184,7 +214,7 @@ export function VenusLesson({
     setBusy(true);
     try {
       const e = engine();
-      await e.decks[k].load(k === 0 ? PRACTICE : (song?.url ?? PRACTICE), k === 0 ? 120 : null);
+      await e.decks[k].load(k === 0 && !inBooth ? PRACTICE : (song?.url ?? PRACTICE), k === 0 && !inBooth ? 120 : null);
       if (k === 0) e.decks[0].play(0);
     } catch {
       /* no sound (no file / no audio): the steps still go on */
@@ -287,6 +317,7 @@ export function VenusLesson({
   else if (step?.k === 'sync') coach = { text: '③〔SYNC〕を押す（左右の拍がそろうと、光ります）' };
   else if (step?.k === 'fade') coach = { text: '④真ん中のつまみを、ゆっくり右へ' };
   else if (step?.k === 'join') coach = { text: '〔つなぐ〕が光ったら、押す' };
+  else if (step?.k === 'lights') coach = { text: '〔あかり〕を押すと、ステージの光の色が変わります（押すたびに、ちがう色）' };
   else if (step?.k === 'kororin') coach = { text: '⑤つなぎ目で〔コロリン〕を押すと、自分のコロリンの声がひとつ落ちる' };
 
   const night = steps.findIndex((s) => s.k === 'night') <= i && steps.some((s) => s.k === 'night');
@@ -295,7 +326,7 @@ export function VenusLesson({
   const glow = (on: boolean) => (on ? 'animate-[hintGlow_2.2s_ease-in-out_infinite] ring-4 ring-amber-200' : '');
   const deckOn = (k: 0 | 1) => (demo ? true : !!dj.current?.decks[k].playing);
   const spin = (k: 0 | 1) => (deckOn(k) ? ((Date.now() / (k ? 1000 / ((dj.current?.decks[1].rate ?? 1) * 1.1) : 909)) * 60) % 360 : 0);
-  const showDesk = !night && step && !['how'].includes(step.k) && (i >= 3 || demo);
+  const showDesk = !night && step && !['how'].includes(step.k) && (i >= 3 || demo || !!inBooth);
 
   return (
     <LessonShell bg={night ? '/onboarding/s/venus-night.jpg' : '/onboarding/s/venus-stage.jpg'} coach={coach} actions={actions}>
@@ -318,13 +349,14 @@ export function VenusLesson({
             ) : (
               <div className="flex h-full w-full items-center justify-center text-[11px] tracking-[0.3em] text-white/30">STAGE</div>
             )}
+            {light && <span className="pointer-events-none absolute inset-0 mix-blend-screen transition-colors duration-500" style={{ background: `radial-gradient(circle at 50% 20%, ${light}, transparent 75%)` }} />}
             {drop && <span className="absolute inset-x-3 bottom-2 animate-[fadeUp_0.4s_ease-out] rounded-full bg-white/90 px-3 py-1 text-center text-[12px] font-bold text-violet-700">🪐 {drop.length > 24 ? `${drop.slice(0, 24)}…` : drop}</span>}
           </div>
 
           {/* the two platters, each with its square jacket */}
           <div className="flex w-full max-w-sm justify-between">
             {([0, 1] as const).map((k) => {
-              const j = demo ? KIMORIN_JACKET : k === 0 ? PRACTICE_JACKET : right;
+              const j = demo ? KIMORIN_JACKET : k === 0 && !inBooth ? PRACTICE_JACKET : right;
               const has = demo || loaded[k];
               const canLoad = step?.k === 'load' && !loaded[k];
               return (
@@ -388,7 +420,15 @@ export function VenusLesson({
             <button onClick={() => void dropKororin()} disabled={step?.k !== 'kororin'} className={`rounded-xl px-4 py-2 text-[13px] font-black ${step?.k === 'kororin' ? 'bg-violet-400 text-white' : 'bg-white/10 text-white/60'} ${glow(step?.k === 'kororin')}`}>
               コロリン
             </button>
-            <button disabled className="rounded-xl bg-white/5 px-3 py-2 text-[12px] text-white/40">
+            <button
+              onClick={() => {
+                if (!inBooth || !(step?.k === 'lights' || light)) return;
+                setLight((c) => LIGHTS[(LIGHTS.indexOf(c ?? '') + 1) % LIGHTS.length]);
+                if (step?.k === 'lights') setTimeout(next, 1400);
+              }}
+              disabled={!inBooth || !(step?.k === 'lights' || light)}
+              className={`rounded-xl px-3 py-2 text-[12px] ${inBooth && (step?.k === 'lights' || light) ? 'bg-white/15 text-white' : 'bg-white/5 text-white/40'} ${glow(step?.k === 'lights')}`}
+            >
               あかり
             </button>
             <button disabled className="rounded-xl bg-white/5 px-3 py-2 text-[12px] text-white/40">

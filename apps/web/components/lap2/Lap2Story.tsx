@@ -49,7 +49,8 @@ function carried(story: Record<string, string> | undefined): Record<string, stri
  */
 export function Lap2Story({ onLeave }: { onLeave: () => void }) {
   const { me, setMe } = useAuth();
-  const start = lap2Done(me?.story);
+  // the chapter this visit opened on (after a chapter is saved, me.story moves on)
+  const [start] = useState(() => lap2Done(me?.story));
   const [at, setAt] = useState({ chapter: start, resumed: start > 0 });
   const k = me ? key(me.id, at.chapter, at.resumed) : '';
   const steps = useMemo(() => lap2Steps(at.chapter, at.resumed), [at]);

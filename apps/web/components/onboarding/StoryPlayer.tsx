@@ -995,7 +995,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'l2' && (
+      {started && step?.t === 'l2' && step.what === 'booth' && (
+        <VenusLesson
+          key={i}
+          booth={{ self: (answers.l1_dj ?? v.story?.['d7.f_d07v_mode']) === 'self' }}
+          song={v.made?.song ?? null}
+          mv={v.made?.mv ?? null}
+          kororins={v.made?.kororins ?? []}
+          neo={v.neo || v.name}
+          inviter={v.inviter}
+          onDone={() => {
+            remember('l2_synced', 'yes');
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'l2' && step.what !== 'booth' && (
         <L2Screen
           key={i}
           what={step.what}
