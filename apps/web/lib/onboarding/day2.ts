@@ -191,7 +191,7 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: ['', 'kimorin-iu'] }, // 光の柱のOBOLONの前に、KIMORIN（発明家・ゴーグルは額。ドラゴンの前）
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
   { t: 'say', who: 'KIMORIN', text: '私は、、、、、、12回目です。' },
-  { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
+  { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
   { t: 'bgm', track: 'comedy' }, // ピンポン2.5の発表
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
@@ -209,7 +209,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
-  { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪
+  { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
   { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },
   { t: 'say', who: 'OBOLON', text: '招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' }, // 長いセリフを分けた（client 2026-10-26）
@@ -329,7 +329,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '次は、、、KIMORIN⭐︎だ。好きな食べ物は？' },
   { t: 'say', who: 'KIMORIN', text: '私の好きな食べ物は、、、、、' },
   { t: 'say', who: 'KIMORIN', text: '……うんち。' },
-  { t: 'se', sound: 'ding' }, // ポチッ。ピンポンピンポン♪ → シーン……
+  { t: 'se', sound: 'pinpon-muffled' }, // ポチッ。ピンポンピンポン♪ → シーン……
   { t: 'se', sound: 'magic' }, // KIMORIN⭐︎のマナジェムが光り、たまごの中へ
   { t: 'sprite', image: null },
   { t: 'se', sound: 'egg-crack' },

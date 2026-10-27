@@ -31,7 +31,9 @@ export type SoundFx =
   // recorded-style sounds made for the story (2026-10-25); without their file they fall back to the nearest preset
   | 'gate-close' | 'smoke' | 'rocket' | 'crackers' | 'egg-crack' | 'paper' | 'stamp' | 'footsteps' | 'portal'
   // a planet's arrival fanfare and the riddle-book sting (ACE-Step, 2026-10-27)
-  | 'arrive' | 'riddle';
+  | 'arrive' | 'riddle'
+  // the client's own Pinpon 2.5 press (M-R128): it rings on behind the lines and fades on the next tap; muffled from inside the egg
+  | 'pinpon' | 'pinpon-muffled';
 
 /** Picture effects drawn over the background ('fx' steps). */
 export type PictureFx =

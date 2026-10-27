@@ -26,6 +26,8 @@
 - ACE-Step はいつも約60秒。短いジングル（到着・謎）は、作ったあと先頭の数秒を切って効果音にする（se-arrive, se-riddle）。
 - 場面ごとに曲を変える：朝（morning）→ ロケット（space）→ 到着ジングル → 星の曲 → 遊ぶ画面（◯◯-play）→ 星の曲 → 謎のジングル → また明日（farewell）。
 - 効果音は Mirelo（今の音）と Seed Audio（v2）を聞き比べ中。
+- **効果音のファイルは、入れたら音の大きさを測る**（loudnorm の Input Integrated）。se-ding が無音（-inf）のまま入っていて、ピンポン♪が鳴っていなかった。-inf や -27 より小さいものは作り直す。
+- 利用者が作った音（pinpon-press.wav など）は、うしろの無音だけ切り、音そのものは変えない。長い音は「次のタップで消える」鳴らし方（StoryExtras の LONG / fadeLongSfx）。こもった音は lowpass 650Hz を2回。
 
 ## 確認のしかた
 - 画面は /kakunin-…/play?day=N&demo=1（&i=手順の番号、&at=遊ぶ画面）。手順の番号は scratchpad の idx.ts で探せる。

@@ -46,6 +46,20 @@ function seBuffer(id: string): Promise<AudioBuffer | null> {
 export function prefetchSfx(sound: SoundFx) {
   if (SE_FILES.has(sound)) void seBuffer(sound);
 }
+/** sounds that ring on behind the next lines until the player taps on (fadeLongSfx) */
+const LONG: ReadonlySet<string> = new Set(['pinpon', 'pinpon-muffled']);
+const ringing = new Set<GainNode>();
+/** Fade out the sounds that ring on (a tap moved the story on). */
+export function fadeLongSfx(ms = 400) {
+  if (!ctx) return;
+  const t = ctx.currentTime;
+  for (const g of ringing) {
+    g.gain.cancelScheduledValues(t);
+    g.gain.setValueAtTime(g.gain.value, t);
+    g.gain.linearRampToValueAtTime(0, t + ms / 1000);
+  }
+  ringing.clear();
+}
 export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
   if (muted || !ctx || volume <= 0) return;
   const c = ctx;
@@ -64,6 +78,10 @@ export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
     g.gain.value = 0.8 * volume;
     src.buffer = buf;
     src.connect(g).connect(c.destination);
+    if (LONG.has(sound)) {
+      ringing.add(g);
+      src.onended = () => ringing.delete(g);
+    }
     src.start();
   });
 }

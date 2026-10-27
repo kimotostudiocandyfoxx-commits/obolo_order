@@ -36,6 +36,7 @@ import {
   DAY1_SEALS,
   FxLayer,
   PauseScreen,
+  fadeLongSfx,
   playSfx,
   prefetchSfx,
   RiddleBook,
@@ -727,6 +728,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const st = steps[iRef.current];
     if (st?.t === 'say') markHeard(st.who, st.text);
     voice.current?.stop();
+    fadeLongSfx();
     run(iRef.current + 1);
   };
   // M-R102: a first-time line moves on only after its voice (a tap meanwhile shows the rest of the words);
