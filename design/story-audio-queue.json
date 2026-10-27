@@ -3,7 +3,10 @@
   "sfxModel": "mirelo:1@1",
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
-  "redo": [],
+  "redo": [
+    "mars-play",
+    "earth-decide"
+  ],
   "probe": [],
   "items": [
     {
@@ -442,7 +445,7 @@
       "id": "mars-play",
       "kind": "bgm",
       "model": "runware:ace-step@v1.5-xl-sft",
-      "prompt": "Upbeat film-making theme: driving light drums, synth arpeggio, bright strings, the excitement of shooting your first movie. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "prompt": "Upbeat film-making theme: driving light drums, synth arpeggio, bright strings, the excitement of shooting your first movie. Orchestral/cinematic, high quality, purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, loopable, steady to the end.",
       "settings": {
         "settings": {
           "lyrics": "[instrumental]"
@@ -486,7 +489,7 @@
       "id": "earth-decide",
       "kind": "bgm",
       "model": "runware:ace-step@v1.5-xl-sft",
-      "prompt": "A serious, gentle theme for an important choice: slow piano, cello, soft choir pad, warm and honest, no pressure. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "prompt": "A serious, gentle theme for an important choice: slow piano, cello, soft choir pad, warm and honest, no pressure. Orchestral/cinematic, high quality, purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, loopable, steady to the end.",
       "settings": {
         "settings": {
           "lyrics": "[instrumental]"

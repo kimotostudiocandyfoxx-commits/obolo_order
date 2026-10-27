@@ -8,7 +8,7 @@ import type { Step } from './script';
  * (components/mercury/MercuryLesson.tsx). Saves answers.song (none = f_song_from 'none').
  */
 export const DAY5: Step[] = [
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'morning' }, // scene music (ACE-Step, 2026-10-27)
   { t: 'caption', text: '5日目' },
   // D06-S001 木星の朝
   { t: 'still', image: 's/jupiter-daikon' },
@@ -23,6 +23,7 @@ export const DAY5: Step[] = [
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true },
+  { t: 'bgm', track: 'space' },
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
@@ -40,6 +41,8 @@ export const DAY5: Step[] = [
   { t: 'sprite', image: null },
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/mercury-ice' },
+  { t: 'se', sound: 'arrive' },
+  { t: 'bgm', track: 'mercury' },
   { t: 'caption', text: '水星に着いた' },
 
   // D06-S003 冷蔵庫のフリージー
@@ -56,10 +59,10 @@ export const DAY5: Step[] = [
   { t: 'say', who: 'フリージー', text: '一緒に、水星で、遊んじゃおうぜ。' },
 
   // D06-S005〜S007 水星の遊ぶ画面：KIMORINの見本（泣けるバラード『プリプリ・ボカン』）→ ジャケットの曲 → 最初の一隻
-  { t: 'bgm', track: null },
+  { t: 'bgm', track: 'mercury-play' },
   { t: 'sprite', image: null },
   { t: 'mercury' },
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'mercury' },
 
   // D06-S008 冷蔵庫の中の図／札6
   { t: 'still', image: 's/mercury-port' },
@@ -79,7 +82,7 @@ export const DAY5: Step[] = [
   { t: 'screen', open: false },
   { t: 'say', who: 'フリージー', text: 'ははは。そうか、そうだったな。' },
   { t: 'say', who: 'フリージー', text: 'まぁ、どうせそのうち、わかる時が来る。' },
-  { t: 'se', sound: 'chime' },
+  { t: 'se', sound: 'riddle' },
   { t: 'seal', n: 6 }, // 謎の書の札6に「OBOLONは……」の文字
   { t: 'caption', text: '謎の書に、文字が浮かんだ' },
   { t: 'sprite', image: null },
@@ -89,6 +92,7 @@ export const DAY5: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '明日は、火星。' }, // 切符の最後の空いた欄を見て、丸いサングラスを、指でくいっとかけ直す
   { t: 'sprite', image: null },
+  { t: 'bgm', track: 'farewell' },
   { t: 'caption', text: 'また明日' },
   { t: 'end' },
 ];

@@ -9,7 +9,7 @@ import type { Step } from './script';
  * frame: f_d07_screen 'pick', mars_frame).
  */
 export const DAY6: Step[] = [
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'morning' }, // scene music (ACE-Step, 2026-10-27)
   { t: 'caption', text: '6日目' },
   // D07-S001 火星へ
   { t: 'still', image: 's/mercury-port' },
@@ -22,6 +22,7 @@ export const DAY6: Step[] = [
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true },
+  { t: 'bgm', track: 'space' },
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
@@ -35,6 +36,8 @@ export const DAY6: Step[] = [
   { t: 'still', image: 's/rocket-mars' },
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/mars-screens' },
+  { t: 'se', sound: 'arrive' },
+  { t: 'bgm', track: 'mars' },
   { t: 'caption', text: '火星に着いた' },
   { t: 'action', label: '火星の未来都市へ向かう' },
 
@@ -51,7 +54,7 @@ export const DAY6: Step[] = [
   { t: 'say', who: 'ヒポキン', text: '外の画面は、勝手に流れてくる。ここの画面は、自分で押したものしか、映らない。' },
   { t: 'say', who: 'KIMORIN', text: '……では、この塔の画面ぜんぶ、誰かが押したのですか。さぞ、指がお疲れでしょう。' },
   { t: 'say', who: 'ヒポキン', text: '……そうだ。一つずつ、誰かが自分で選んで、押した。だから、映っている。' },
-  { t: 'se', sound: 'chime' },
+  { t: 'se', sound: 'riddle' },
   { t: 'seal', n: 4 }, // 謎の書が、ひとりでに開く。札4に「Obolo Orderの敵は……」が滲み出る（答えは7日目）
   { t: 'caption', text: '謎の書に、文字が浮かんだ' },
   { t: 'say', who: 'KIMORIN', text: '……敵？　物騒ですね。' },
@@ -59,9 +62,10 @@ export const DAY6: Step[] = [
   { t: 'say', who: 'ヒポキン', text: '……見せてみろ。' },
 
   // D07-S004〜S005 火星の遊ぶ画面：話した場面からMV（KIMORINの『プリプリ・ボカン』MVも）→ ▶で見る → 裏スタジオにしまう／作らない人は古いフィルムの一コマ
-  { t: 'bgm', track: null },
+  { t: 'bgm', track: 'mars-play' },
   { t: 'sprite', image: null },
   { t: 'mars' },
+  { t: 'bgm', track: 'mars' },
 
   // D07-S006 大スクリーンに映す
   { t: 'still', image: 's/mars-screens' },
@@ -90,7 +94,7 @@ export const DAY6: Step[] = [
   { t: 'label', id: 'night' },
 
   // D07-S007 街じゅうのMONBAN／4つ目のスタンプ
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'night' },
   { t: 'caption', text: 'その夜' },
   { t: 'say', who: 'ヒポキン', text: '土星で声、木星でジャケ、' },
   { t: 'say', who: 'ヒポキン', text: '水星で曲、火星で映像。' },
@@ -113,6 +117,7 @@ export const DAY6: Step[] = [
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……見学ツアーは、ここまで、ということですか。' },
   { t: 'say', who: 'KIMORIN', text: '……続きは、Obolo Orderになってから。ほら、やっぱり、お金です。' },
+  { t: 'bgm', track: 'farewell' },
   { t: 'sprite', image: null },
   { t: 'end' },
 ];

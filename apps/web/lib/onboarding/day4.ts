@@ -11,7 +11,7 @@ import type { Step } from './script';
  * Saves answers.stickers (the jacket).
  */
 export const DAY4: Step[] = [
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'morning' }, // scene music (ACE-Step, 2026-10-27)
   { t: 'caption', text: '4日目' },
   // D05-S001 朝の土星
   { t: 'still', image: 's/saturn-inside' },
@@ -25,6 +25,7 @@ export const DAY4: Step[] = [
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true },
+  { t: 'bgm', track: 'space' },
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
@@ -41,6 +42,8 @@ export const DAY4: Step[] = [
   { t: 'still', image: 's/rocket-jupiter' },
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/jupiter-forest' },
+  { t: 'se', sound: 'arrive' },
+  { t: 'bgm', track: 'jupiter' },
   { t: 'caption', text: '木星に着いた' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: 'すごい、、、神秘的な森ですね。' },
@@ -59,10 +62,10 @@ export const DAY4: Step[] = [
   { t: 'say', who: '大根カイザー', text: '我が、木星の遊び方を、教えてやるダ。' },
 
   // D05-S005〜S008 木星の遊ぶ画面：言葉をジャケットに（KIMORINの見本『プリプリ・ボカン』→自分の1枚）→ 石に置くとパタパタ飛ぶ
-  { t: 'bgm', track: null },
+  { t: 'bgm', track: 'jupiter-play' },
   { t: 'sprite', image: null },
   { t: 'jupiter' },
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'jupiter' },
 
   // D05-S009 畑から門番／札3
   { t: 'still', image: 's/jupiter-daikon' },
@@ -80,7 +83,7 @@ export const DAY4: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'ですが、私には分かります。結社の目的——お金を集める組織、でしょう？' }, // 丸いサングラスを、指でくいっとかけ直す
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポンピンポン♪' },
   { t: 'say', who: '大根カイザー', text: '……続きは、もう少し旅をしてからダ。' },
-  { t: 'se', sound: 'chime' },
+  { t: 'se', sound: 'riddle' },
   { t: 'seal', n: 3 }, // 謎の書の札3に「結社の目的とは」の文字
   { t: 'caption', text: '謎の書に、文字が浮かんだ' },
   { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
@@ -89,6 +92,7 @@ export const DAY4: Step[] = [
   { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'jupiter' },
   { t: 'caption', text: '切符に、木星のスタンプが押された' },
+  { t: 'bgm', track: 'farewell' },
   { t: 'caption', text: 'また明日' },
   { t: 'end' },
 ];

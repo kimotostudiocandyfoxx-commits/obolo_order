@@ -14,7 +14,7 @@ import type { Step } from './script';
  * The 88 minutes run in the rocket from Mars; the temples of Earth don't count ('clock' off, M-R22).
  */
 export const DAY7: Step[] = [
-  { t: 'bgm', track: 'opening' },
+  { t: 'bgm', track: 'morning' },
   { t: 'caption', text: '7日目' },
   // D08-S001 地球へ帰る
   { t: 'still', image: 's/mars-screens' },
@@ -26,6 +26,7 @@ export const DAY7: Step[] = [
   { t: 'se', sound: 'whoosh' },
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true },
+  { t: 'bgm', track: 'space' },
   { t: 'still', image: 's/rocket-earth' },
 
   // D08-S002 OBOLONの「おかえり」と、KIMORINの質問
@@ -86,6 +87,7 @@ export const DAY7: Step[] = [
 
   // D08-S003 選べる一手
   { t: 'label', id: 'decide' },
+  { t: 'bgm', track: 'earth-decide' },
   { t: 'ticket', flip: true }, // 金色の切符の裏の星図。土星〜火星までつながって止まり、錠の金星・天王星・海王星、いちばん奥に太陽
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
   { t: 'say', who: 'MONBAN', text: 'Obolo Orderにならなければ、ネオのまま、ここで止まる…。それも、道だ…。' },
@@ -172,7 +174,7 @@ export const DAY7: Step[] = [
   // D08-S010 全員、DJ／札2が開く
   { t: 'say', who: 'KIMORIN', text: '……七日かけて、レコード箱に、材料を詰めていたのですね。' },
   { t: 'say', who: 'KIMORIN', text: '……台所にあるもの、では、なかったのですね。' },
-  { t: 'se', sound: 'chime' },
+  { t: 'se', sound: 'riddle' },
   { t: 'seal', n: 2, open: true }, // 札2のひびが割れ、「Obolo Orderは全員……」の続きに「DJ」の字。札1に星図の線と灯り（閉じたまま）
   { t: 'caption', text: '謎2が開いた' },
   { t: 'say', who: 'OBOLON', text: '謎は、8つ。' },
@@ -205,7 +207,7 @@ export const DAY7: Step[] = [
   { t: 'film', id: 'record1', parts: 9 }, // 記録 I　ナガレ
   { t: 'film', id: 'record23', parts: 16 }, // 記録 II　Obolo Order ／ 記録 III　掟（MONBANの読み上げ）→ 世界の窓に灯り → 宇宙の星
   // 白い光の中。金色の輪だけが残っている
-  { t: 'se', sound: 'chime' },
+  { t: 'se', sound: 'riddle' },
   { t: 'seal', n: 4, open: true }, // 札4の続きに「ナガレ」の字
   { t: 'caption', text: '謎4が開いた' },
   { t: 'sprite', image: ['kimorin-sun', 'obolon'] },

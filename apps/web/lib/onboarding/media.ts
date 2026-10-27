@@ -54,7 +54,7 @@ export const PLANNED_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([]);
  * synthesised in the browser (lib/story/sfx.ts).
  */
 export const SE_FILES: ReadonlySet<string> = new Set<string>([
-  'bell', 'blip', 'boing', 'chime', 'crackers', 'ding', 'egg-crack', 'footsteps', 'gate-close', 'gong', 'heartbeat', 'knock', 'magic', 'paper', 'pop', 'portal', 'rocket', 'smoke', 'sparkle', 'stamp', 'thud', 'whoosh',
+  'bell', 'blip', 'boing', 'chime', 'crackers', 'ding', 'egg-crack', 'footsteps', 'gate-close', 'gong', 'heartbeat', 'knock', 'magic', 'paper', 'pop', 'portal', 'rocket', 'smoke', 'sparkle', 'stamp', 'thud', 'whoosh', 'arrive', 'riddle',
 ]);
 export const seUrl = (id: string) => `${MEDIA_BASE}/se-${id}.mp3`;
 
