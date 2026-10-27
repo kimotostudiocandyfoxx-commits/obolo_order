@@ -382,6 +382,116 @@
           "lyrics": "[instrumental]"
         }
       }
+    },
+    {
+      "id": "morning",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A gentle morning wake-up theme for a fantasy anime: soft piano, light celesta, warm strings, a calm new day on another planet, hopeful. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "jupiter-play",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Light playful creative theme in a magical forest: plucked strings, marimba, flute, soft percussion, curious and warm, making something by hand. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mercury",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Cool, clear ocean-planet theme: glassy bells, airy synth pads, slow strings, the sound of a vast quiet sea and ice, calm and wide. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mercury-play",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Chill creative music-making theme: soft beat, warm electric piano, gentle bass, a little icy shimmer, relaxed and inspiring. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mars",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Cinematic futuristic city theme at dusk: warm analog synths, pulsing bass, soft drums, strings, a city made of glowing screens, hopeful and grand. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "mars-play",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "Upbeat film-making theme: driving light drums, synth arpeggio, bright strings, the excitement of shooting your first movie. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "arrive",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A short magical arrival fanfare: rising strings and brass swell, a shimmering cymbal, landing on a warm major chord, about ten seconds. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "riddle",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A short mysterious reveal sting: a low drone, a soft gong, glittering chimes as ancient letters appear, about six seconds. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "farewell",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A tender end-of-day theme: solo piano with soft strings, warm and a little nostalgic, 'see you tomorrow'. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
+    },
+    {
+      "id": "earth-decide",
+      "kind": "bgm",
+      "model": "runware:ace-step@v1.5-xl-sft",
+      "prompt": "A serious, gentle theme for an important choice: slow piano, cello, soft choir pad, warm and honest, no pressure. Orchestral/cinematic, high quality, no vocals, no singing, loopable, steady to the end.",
+      "settings": {
+        "settings": {
+          "lyrics": "[instrumental]"
+        }
+      }
     }
   ],
   "listen": []
