@@ -371,11 +371,17 @@ export const SongEditBody = z
 export type SongEditBody = z.infer<typeof SongEditBody>;
 
 /** ひろば (Saturn's みんな map, client decision 2026-10-07): a named place people gather in. */
+export const PLAZA_ACCESS = ['open', 'me'] as const;
 export const CreatePlazaBody = z.object({
   name: z.string().trim().min(1).max(PLAZA_NAME_MAX),
   icon: z.enum(PLAZA_ICONS),
+  /**
+   * who may come in (L2-SATURN-S004): `open` = anyone (the みんな map), `me` = only me — not on the map,
+   * and its kororins never reach 〔推し〕 or the planet
+   */
+  access: z.enum(PLAZA_ACCESS).default('open'),
 });
-export type CreatePlazaBody = z.infer<typeof CreatePlazaBody>;
+export type CreatePlazaBody = z.input<typeof CreatePlazaBody>;
 
 // --- Jupiter ----------------------------------------------------------------------------------------
 

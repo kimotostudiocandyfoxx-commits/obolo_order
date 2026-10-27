@@ -100,7 +100,7 @@ interface DemoState {
   backstage?: (MarsBackstageVideo & { owner: string })[];
   ateliers?: Record<string, AtelierLayout>;
   /** ひろば (みんな map) and who joined them */
-  plazas?: { id: string; name: string; icon: string; members: string[]; base: number }[];
+  plazas?: { id: string; name: string; icon: string; members: string[]; base: number; owner?: string }[];
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
 }
 
@@ -417,13 +417,19 @@ export class DemoApi implements Api {
     const faces: PlazaView['faces'] = [];
     for (const x of live)
       if (faces.length < 7 && !faces.some((f) => f.id === x.author.id)) faces.push({ id: x.author.id, neoForm: x.author.neoForm, look: this.s.users[x.author.id]?.look ?? x.author.look ?? null });
-    return { id: p.id, name: p.name, icon: p.icon, memberCount: p.base + p.members.length, voiceCount: live.length, joined: p.members.includes(viewer), faces };
+    return { id: p.id, name: p.name, icon: p.icon, memberCount: p.base + p.members.length, voiceCount: live.length, joined: p.members.includes(viewer), faces, access: p.owner ? 'me' : 'open' };
   }
 
   async plazas(q?: string) {
     const t = q?.trim().toLowerCase();
+    let viewer = '';
+    try {
+      viewer = this.uid();
+    } catch {
+      /* logged out */
+    }
     return this.plazaList()
-      .filter((p) => !t || p.name.toLowerCase().includes(t))
+      .filter((p) => (!p.owner || p.owner === viewer) && (!t || p.name.toLowerCase().includes(t)))
       .map((p) => this.plazaView(p))
       .sort((a, b) => b.memberCount - a.memberCount);
   }
@@ -437,9 +443,11 @@ export class DemoApi implements Api {
   async createPlaza(body: Parameters<Api['createPlaza']>[0]) {
     const list = this.plazaList();
     const name = body.name.trim().replace(/\s+/g, ' ');
-    let p = list.find((x) => x.name === name);
+    // 'me': the maker's own (L2-SATURN-S004), never shared by name
+    const owner = body.access === 'me' ? this.uid() : undefined;
+    let p = owner ? undefined : list.find((x) => x.name === name && !x.owner);
     if (!p) {
-      p = { id: `plaza-${uid()}`, name, icon: body.icon, members: [], base: 0 };
+      p = { id: `plaza-${uid()}`, name, icon: body.icon, members: [], base: 0, owner };
       list.push(p);
     }
     return this.joinPlaza(p.id, true);

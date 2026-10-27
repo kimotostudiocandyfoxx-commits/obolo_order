@@ -5,7 +5,7 @@ import { and, asc, count, desc, eq, gt, inArray, isNull, lt, or, sql, sum, type 
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
-import { follows, saturnPosts, starEvents, userBlocks, users } from '../db/schema';
+import { follows, saturnPlazas, saturnPosts, starEvents, userBlocks, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
@@ -17,6 +17,8 @@ type Author = { id: string; handle: string; displayName: string; neoForm?: strin
 const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, look: users.lookJson, pic: users.puniPicUrl };
 
 const alive = () => gt(saturnPosts.createdAt, new Date(Date.now() - SATURN_LIFETIME_HOURS * 3600_000));
+/** voices dropped in a ひろば that is its maker's alone stay inside it (L2-SATURN-S004) */
+const notInPrivatePlaza = () => sql`(${saturnPosts.plazaId} IS NULL OR ${saturnPosts.plazaId} NOT IN (SELECT ${saturnPlazas.id} FROM ${saturnPlazas} WHERE ${saturnPlazas.access} <> 'open'))`;
 
 @Injectable()
 export class SaturnService {
@@ -42,8 +44,10 @@ export class SaturnService {
         : tab === 'friends'
           ? sql`${saturnPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
           : undefined;
+    // inside a ひろば only its maker may look when it is theirs alone; everywhere else such voices never show
+    if (plazaId) await this.plazas.get(viewerId, plazaId);
     // voices flown to their author's own room never fall on the planet
-    return this.page(viewerId, and(isNull(saturnPosts.replyToId), eq(saturnPosts.room, 0), alive(), scope), cursor, limit, fresh);
+    return this.page(viewerId, and(isNull(saturnPosts.replyToId), eq(saturnPosts.room, 0), alive(), scope, plazaId ? undefined : notInPrivatePlaza()), cursor, limit, fresh);
   }
 
   /**
@@ -53,7 +57,7 @@ export class SaturnService {
    */
   async userPosts(viewerId: string, userId: string, cursor?: string, limit = 30): Promise<Paged<SaturnPostView>> {
     const own = viewerId === userId;
-    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), own ? undefined : and(eq(saturnPosts.room, 0), alive())), cursor, limit, true);
+    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), own ? undefined : and(eq(saturnPosts.room, 0), alive(), notInPrivatePlaza())), cursor, limit, true);
   }
 
   /** The voice replies under a post, oldest first (they line up as little balls under it). */

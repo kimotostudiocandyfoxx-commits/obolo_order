@@ -165,6 +165,8 @@ export interface PlazaView {
   voiceCount: number;
   joined: boolean;
   faces: { id: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null }[];
+  /** 'open' (the みんな map) or 'me' (only its maker) */
+  access: 'open' | 'me';
 }
 
 /** A short form of a post, embedded in a quote repost. */

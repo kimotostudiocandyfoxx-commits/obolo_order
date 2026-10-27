@@ -1,9 +1,6 @@
 'use client';
 
-import { BatiAsk } from '@/components/lap2/BatiAsk';
-import { DaydreamJacket } from '@/components/lap2/DaydreamJacket';
-import { L2Screen } from '@/components/lap2/L2Screen';
-import { Relook } from '@/components/lap2/Relook';
+import { L2Step } from '@/components/lap2/L2Step';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -998,56 +995,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'l2' && step.what === 'booth' && (
-        <VenusLesson
-          key={i}
-          booth={{ self: (answers.l1_dj ?? v.story?.['d7.f_d07v_mode']) === 'self' }}
-          song={v.made?.song ?? null}
-          mv={v.made?.mv ?? null}
-          kororins={v.made?.kororins ?? []}
-          neo={v.neo || v.name}
-          inviter={v.inviter}
-          onDone={() => {
-            remember('l2_synced', 'yes');
-            run(iRef.current + 1);
-          }}
-        />
-      )}
-      {started && step?.t === 'l2' && step.what === 'jacket' && (
-        <DaydreamJacket
-          key={i}
-          api={lessonApi}
-          bati={v.bati ?? ''}
-          fill={(t) => fill(t, v)}
-          onDone={(a) => {
-            for (const [k, val] of Object.entries(a)) remember(k, val);
-            run(iRef.current + 1);
-          }}
-        />
-      )}
-      {started && step?.t === 'l2' && step.what === 'relook' && (
-        <Relook
-          key={i}
-          onDone={(a) => {
-            for (const [k, val] of Object.entries(a)) remember(k, val);
-            run(iRef.current + 1);
-          }}
-        />
-      )}
-      {started && step?.t === 'l2' && step.what === 'ask' && (
-        <BatiAsk
-          key={i}
-          bati={v.bati ?? ''}
-          onDone={(a) => {
-            for (const [k, val] of Object.entries(a)) remember(k, val);
-            run(iRef.current + 1);
-          }}
-        />
-      )}
-      {started && step?.t === 'l2' && !['booth', 'jacket', 'relook', 'ask'].includes(step.what) && (
-        <L2Screen
+      {started && step?.t === 'l2' && (
+        <L2Step
           key={i}
           what={step.what}
+          vars={v}
+          answers={answers}
+          lessonApi={lessonApi}
           fill={(t) => fill(t, v)}
           onDone={(a) => {
             for (const [k, val] of Object.entries(a)) remember(k, val);

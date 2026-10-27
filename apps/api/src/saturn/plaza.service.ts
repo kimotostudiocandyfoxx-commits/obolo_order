@@ -1,7 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import { SATURN_LIFETIME_HOURS, type CreatePlazaBody, type PlazaView } from '@obolo/shared';
-import { and, count, desc, eq, gt, ilike, inArray, isNull, sql } from 'drizzle-orm';
+import { and, count, desc, eq, gt, ilike, inArray, isNull, or, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { saturnPlazaMembers, saturnPlazas, saturnPosts, users } from '../db/schema';
@@ -13,6 +13,8 @@ type PlazaRow = typeof saturnPlazas.$inferSelect;
  * ひろば (client decision 2026-10-07): Saturn's みんな tab is a map of named places floating on
  * the rings (日本, 北海道, K-POP好き …). Anyone can make one, join one, search them, and drop voices
  * in them. PLACEHOLDER (P-SAT-13): ordering is by members; drawn island art later.
+ * A ひろば may be the maker's own (access 'me', L2-SATURN-S004): only they see it, join it and drop voices
+ * in it, and its voices stay out of every other feed.
  */
 @Injectable()
 export class PlazaService {
@@ -26,7 +28,7 @@ export class PlazaService {
     const rows = await this.db.read
       .select()
       .from(saturnPlazas)
-      .where(and(isNull(saturnPlazas.deletedAt), term ? ilike(saturnPlazas.name, `%${term.replace(/[%_\\]/g, (c) => `\\${c}`)}%`) : undefined))
+      .where(and(isNull(saturnPlazas.deletedAt), or(eq(saturnPlazas.access, 'open'), eq(saturnPlazas.createdBy, viewerId)), term ? ilike(saturnPlazas.name, `%${term.replace(/[%_\\]/g, (c) => `\\${c}`)}%`) : undefined))
       .orderBy(desc(saturnPlazas.memberCount), saturnPlazas.createdAt)
       .limit(limit);
     return this.views(viewerId, rows);
@@ -37,19 +39,28 @@ export class PlazaService {
       .select()
       .from(saturnPlazas)
       .where(and(eq(saturnPlazas.id, id), isNull(saturnPlazas.deletedAt)));
-    if (!row) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Plaza not found');
+    if (!row || !this.canEnter(row, viewerId)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Plaza not found');
     return (await this.views(viewerId, [row]))[0];
   }
 
-  /** Makes a ひろば and joins it (a name that already exists: you join that one). */
+  private canEnter(row: Pick<PlazaRow, 'access' | 'createdBy'>, userId: string) {
+    return row.access === 'open' || row.createdBy === userId;
+  }
+
+  /** Makes a ひろば and joins it (an open name that already exists: you join that one). */
   async create(userId: string, body: CreatePlazaBody): Promise<PlazaView> {
     const name = body.name.replace(/\s+/g, ' ');
-    const [same] = await this.db.write.select().from(saturnPlazas).where(and(eq(saturnPlazas.name, name), isNull(saturnPlazas.deletedAt)));
-    if (same) return this.join(userId, same.id, true);
+    const access = body.access ?? 'open';
     const mod = await moderateText(name, this.llm);
     if (mod.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'This name breaks the community rules');
+    if (access === 'me') {
+      const [mine] = await this.db.write.insert(saturnPlazas).values({ name, icon: body.icon, createdBy: userId, access }).returning();
+      return this.join(userId, mine.id, true);
+    }
+    const [same] = await this.db.write.select().from(saturnPlazas).where(and(eq(saturnPlazas.name, name), eq(saturnPlazas.access, 'open'), isNull(saturnPlazas.deletedAt)));
+    if (same) return this.join(userId, same.id, true);
     const [row] = await this.db.write.insert(saturnPlazas).values({ name, icon: body.icon, createdBy: userId }).onConflictDoNothing().returning();
-    const id = row?.id ?? (await this.db.write.select({ id: saturnPlazas.id }).from(saturnPlazas).where(eq(saturnPlazas.name, name)))[0]?.id;
+    const id = row?.id ?? (await this.db.write.select({ id: saturnPlazas.id }).from(saturnPlazas).where(and(eq(saturnPlazas.name, name), eq(saturnPlazas.access, 'open'))))[0]?.id;
     if (!id) throw apiError(HttpStatus.CONFLICT, 'CONFLICT', 'Could not make the plaza');
     return this.join(userId, id, true);
   }
@@ -57,10 +68,10 @@ export class PlazaService {
   async join(userId: string, plazaId: string, on: boolean): Promise<PlazaView> {
     await this.db.write.transaction(async (tx) => {
       const [p] = await tx
-        .select({ id: saturnPlazas.id })
+        .select({ id: saturnPlazas.id, access: saturnPlazas.access, createdBy: saturnPlazas.createdBy })
         .from(saturnPlazas)
         .where(and(eq(saturnPlazas.id, plazaId), isNull(saturnPlazas.deletedAt)));
-      if (!p) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Plaza not found');
+      if (!p || (on && !this.canEnter(p, userId))) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Plaza not found');
       const changed = on
         ? (await tx.insert(saturnPlazaMembers).values({ plazaId, userId }).onConflictDoNothing().returning({ u: saturnPlazaMembers.userId })).length
         : -(await tx
@@ -76,10 +87,10 @@ export class PlazaService {
   /** For a post dropped in a ひろば: it must exist; the author joins it. */
   async ensureForPost(userId: string, plazaId: string): Promise<void> {
     const [p] = await this.db.write
-      .select({ id: saturnPlazas.id })
+      .select({ id: saturnPlazas.id, access: saturnPlazas.access, createdBy: saturnPlazas.createdBy })
       .from(saturnPlazas)
       .where(and(eq(saturnPlazas.id, plazaId), isNull(saturnPlazas.deletedAt)));
-    if (!p) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Plaza not found');
+    if (!p || !this.canEnter(p, userId)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Plaza not found');
     await this.join(userId, plazaId, true);
   }
 
@@ -120,6 +131,7 @@ export class PlazaService {
       voiceCount: n.get(r.id) ?? 0,
       joined: joined.has(r.id),
       faces: faces.get(r.id) ?? [],
+      access: r.access === 'me' ? 'me' : 'open',
     }));
   }
 }

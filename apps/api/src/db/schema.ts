@@ -372,9 +372,11 @@ export const saturnPlazas = pgTable(
     icon: text('icon').notNull().default('⭐'),
     createdBy: uuid('created_by').references(() => users.id),
     memberCount: integer('member_count').notNull().default(0),
+    /** 'open' = on the みんな map; 'me' = only its maker (L2-SATURN-S004) — names need not be unique then */
+    access: text('access').notNull().default('open'),
     ...timestamps,
   },
-  (t) => [uniqueIndex('saturn_plazas_name_idx').on(t.name), index('saturn_plazas_members_idx').on(t.memberCount)],
+  (t) => [uniqueIndex('saturn_plazas_name_idx').on(t.name).where(sql`${t.access} = 'open'`), index('saturn_plazas_members_idx').on(t.memberCount)],
 );
 
 export const saturnPlazaMembers = pgTable(

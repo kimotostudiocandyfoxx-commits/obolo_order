@@ -59,6 +59,11 @@ export const L2_SATURN: Step[] = [
   { t: 'say', who: 'たこ焼きシスター', text: 'どんな話をする場所にしたい？　声で、言ってみて。' },
   { t: 'sprite', image: null },
   { t: 'l2', what: 'plaza' },
+  { t: 'branch', key: 'plaza', cases: { later: 'slater' }, otherwise: 'sopen' },
+  { t: 'label', id: 'slater' },
+  { t: 'sprite', image: 'takoyaki-sister' },
+  { t: 'say', who: 'たこ焼きシスター', text: '話したいことができたら、その時に作ればいいワ。' },
+  { t: 'label', id: 'sopen' },
 
   // L2-SATURN-S010 木星が開いた
   { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
