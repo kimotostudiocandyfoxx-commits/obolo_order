@@ -2,6 +2,7 @@
 
 import { DaydreamJacket } from '@/components/lap2/DaydreamJacket';
 import { L2Screen } from '@/components/lap2/L2Screen';
+import { Relook } from '@/components/lap2/Relook';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -1023,7 +1024,16 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'l2' && !['booth', 'jacket'].includes(step.what) && (
+      {started && step?.t === 'l2' && step.what === 'relook' && (
+        <Relook
+          key={i}
+          onDone={(a) => {
+            for (const [k, val] of Object.entries(a)) remember(k, val);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'l2' && !['booth', 'jacket', 'relook'].includes(step.what) && (
         <L2Screen
           key={i}
           what={step.what}

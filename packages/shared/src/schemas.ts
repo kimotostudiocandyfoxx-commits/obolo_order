@@ -194,7 +194,8 @@ export const ConfirmOrderBody = z.object({ sessionId: z.string().min(8).max(255)
 export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;
 
 /** Day 3: refine the chosen look with one instruction (3 times). */
-export const RefineLookBody = z.object({ mediaId: z.string().uuid(), instruction: z.string().trim().min(1).max(60) });
+/** `mediaId` left out: the look worn now (the second journey's basin, L2-MOON-S002, changes the current look) */
+export const RefineLookBody = z.object({ mediaId: z.string().uuid().optional(), instruction: z.string().trim().min(1).max(60) });
 export type RefineLookBody = z.infer<typeof RefineLookBody>;
 
 /** Mercury 作曲: the conversation so far (the partner's and the visitor's lines). */

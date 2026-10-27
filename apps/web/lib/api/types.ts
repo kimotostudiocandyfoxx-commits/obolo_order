@@ -163,7 +163,8 @@ export interface Api {
   // --- Day 3/4: generated OBOLO NEO look and the Bati egg (client decision 2026-10-05)
   lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;
   /** One instruction → one new version of a candidate (3 per apprentice). */
-  refineLook(mediaId: string, instruction: string): Promise<NeoLookResult>;
+  /** `mediaId` null: change the look worn now (the second journey's basin) */
+  refineLook(mediaId: string | null, instruction: string): Promise<NeoLookResult>;
   chooseLook(mediaId: string): Promise<Me>;
   /** Saturn picture character: 2 painted candidates from a description (+ optional inspiration picture). */
   puniPicCandidates(body: PuniPicBody): Promise<PuniPicResult>;

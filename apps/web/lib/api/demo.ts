@@ -711,10 +711,11 @@ export class DemoApi implements Api {
     return u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
   }
 
-  async refineLook(mediaId: string, instruction: string) {
+  async refineLook(mediaId: string | null, instruction: string) {
     const u = this.s.users[this.uid()];
     if (this.refinesLeft() <= 0) throw new ApiError(429, 'LOOK_REFINES', 'もう描き直せません');
-    const src = this.lookCache.find((c) => c.id === mediaId);
+    // null: the look worn now (the second journey's basin)
+    const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
     const n = 8 - this.refinesLeft();
     this.charge('look');

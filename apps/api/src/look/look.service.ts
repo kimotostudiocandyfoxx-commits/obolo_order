@@ -132,7 +132,7 @@ export class LookService {
     await this.clean(body.instruction);
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     if (limited && (await this.refinesLeft(userId, true)) <= 0) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', 'もう描き直せません');
-    const src = await this.media.imageData(userId, body.mediaId, 'avatar');
+    const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     const fee = await this.fee(userId, 'look', unlimited);
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
@@ -147,6 +147,14 @@ export class LookService {
     }
     const tries = Number((await this.kv.get(`look:tries:${userId}`)) ?? 0);
     return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
+  }
+
+  /** the look worn now, as a picture to change */
+  private async current(userId: string, url: string | null): Promise<{ data: Buffer; mime: string } | null> {
+    const data = url ? await this.media.bytesByUrl(userId, url) : null;
+    if (!data) return null;
+    const mime = data[0] === 0x89 ? 'image/png' : data[0] === 0xff ? 'image/jpeg' : 'image/webp';
+    return { data, mime };
   }
 
   async choose(userId: string, mediaId: string): Promise<Me> {
