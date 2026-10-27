@@ -4762,21 +4762,5 @@
       "prompt": "The golden rocket of the first picture flies low over the endless glittering blue ocean of the second picture (Mercury, a planet of sea): seen from outside and a little above, the rocket small in the middle of the frame skimming the waves, a trail of spray behind it, bands of sunlight on the water, no land anywhere to the horizon. Wide, open and a little lonely. Painterly anime film quality. No text."
     }
   ],
-  "redo": [
-    "d2-egg-earth",
-    "d2-egg-sun",
-    "kaiser1-x-joy",
-    "kaiser1-x-shock",
-    "kaiser1-x-talk",
-    "kimorin-iu-joy",
-    "kimorin-iu-lecture",
-    "kimorin-iu-point",
-    "kimorin-iu-shock",
-    "kimorin-iu-smug",
-    "kimorin-iu-talk",
-    "kimorin-iu-tears",
-    "kimorin-iu-think",
-    "ref-kaiser-1",
-    "ref-kaiser-2"
-  ]
+  "redo": []
 }
