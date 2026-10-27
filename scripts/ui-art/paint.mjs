@@ -49,7 +49,7 @@ async function paint(x) {
         ...(refsOf(x).length ? { referenceImages: refsOf(x).map(dataUri) } : {}),
       },
     ]),
-    signal: AbortSignal.timeout(300_000),
+    signal: AbortSignal.timeout(180_000),
   });
   const j = await res.json().catch(() => ({}));
   // the service sometimes answers 500 with the finished picture in it (2026-10-26): take the picture
@@ -57,7 +57,7 @@ async function paint(x) {
   if ((!res.ok && !got) || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
   const d = j.data?.[0];
   const raw = join(OUT, `_${x.id}.jpg`);
-  writeFileSync(raw, Buffer.from(await (await fetch(d.imageURL)).arrayBuffer()));
+  writeFileSync(raw, Buffer.from(await (await fetch(d.imageURL, { signal: AbortSignal.timeout(60_000) })).arrayBuffer()));
   const [w, h] = x.size;
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-vf', `scale=${w}:${h}:flags=lanczos`, '-q:v', '2', join(OUT, `${x.id}.jpg`)]);
   rmSync(raw);
@@ -66,8 +66,13 @@ async function paint(x) {
 
 const log = [];
 let yen = 0;
+// the job is stopped at 30 minutes and then saves nothing it had not finished: stop starting new pictures at
+// 22 minutes; what is left (and what failed) stays in redo for the next run (2026-10-27: a stuck task ate a run)
+const START = Date.now();
+const late = () => Date.now() - START > 22 * 60_000;
+const failed = new Set();
 // a few at a time: a burst of tasks is what made Runware time out (504)
-const retry = (x, n) => paint(x).catch((e) => (n > 0 && /504|Timeout|timeout/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
+const retry = (x, n) => paint(x).catch((e) => (n > 0 && !late() && /504|Timeout|timeout|abort/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
 // in passes: a picture that edits one painted in this run (its ref still missing) waits for the next pass
 const waits = (x) => (x.refs ?? []).some((r) => !existsSync(r) && todo.some((y) => y !== x && join(OUT, `${y.id}.jpg`) === r));
 let left = todo;
@@ -80,10 +85,16 @@ while (left.length) {
     Array.from({ length: 4 }, async () => {
       while (next < batch.length) {
         const x = batch[next++];
+        if (late()) {
+          failed.add(x.id);
+          log.push(`- ⏸ ${x.id}: 時間切れ、次回`);
+          continue;
+        }
         try {
-          yen += (await retry(x, 2)) * 150;
+          yen += (await retry(x, 1)) * 150;
           log.push(`- ✅ ${x.id}`);
         } catch (e) {
+          failed.add(x.id);
           log.push(`- ❌ ${x.id}: ${String(e).slice(0, 300)}`);
         }
       }
@@ -91,9 +102,12 @@ while (left.length) {
   );
 }
 // what waits on a picture that failed stays for the next run
-for (const x of left) log.push(`- ⏸ ${x.id}: 元の絵ができなかったので次回`);
-// redo is done once: clear it so the next run does not paint the same again
-if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: [] }, null, 2) + '\n');
+for (const x of left) {
+  failed.add(x.id);
+  log.push(`- ⏸ ${x.id}: 元の絵ができなかったので次回`);
+}
+// redo is done once: keep only what was not painted (failed, waiting, out of time)
+if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: (queue.redo ?? []).filter((id) => failed.has(id)) }, null, 2) + '\n');
 const report = [`# UI art — ${new Date().toISOString()}`, '', `Seedream 5.0 Pro / ${todo.length}枚 / 約${Math.round(yen)}円`, '', ...log.sort(), ''].join('\n');
 writeFileSync(join(OUT, 'last-run.md'), report);
 console.log(report);
