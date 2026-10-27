@@ -109,6 +109,16 @@ export const L2_MARS: Step[] = [
   { t: 'say', who: 'ヒポキン', text: '……話してみろ。' },
   { t: 'sprite', image: null },
   { t: 'l2', what: 'theater' }, // テーマ→赤い幕→〔幕を、上げろ〕→一本目→順→ダチに見せる
+  { t: 'caption', text: '上映館ができた' },
+  { t: 'branch', key: 'theater', cases: { show: 'tshow' }, otherwise: 'tprivate' },
+  { t: 'label', id: 'tshow' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……では、最前列を、予約いたします。' },
+  { t: 'goto', id: 'tdone' },
+  { t: 'label', id: 'tprivate' },
+  { t: 'sprite', image: 'hipokin' },
+  { t: 'say', who: 'ヒポキン', text: '見せるのは、いつでもいい。' },
+  { t: 'label', id: 'tdone' },
   { t: 'sprite', image: 'hipokin' },
   { t: 'say', who: 'ヒポキン', text: '……いい館だ。' },
 

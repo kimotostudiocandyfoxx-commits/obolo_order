@@ -12,6 +12,7 @@ import { PlaceSong } from './PlaceSong';
 import { PlazaMaker } from './PlazaMaker';
 import { Relook } from './Relook';
 import { RoundCards } from './RoundCards';
+import { Theater } from './Theater';
 
 /**
  * One second-journey screen ({ t: 'l2', what }): the makers built so far, else the script's panel (L2Screen).
@@ -45,6 +46,8 @@ export function L2Step({
       return <RoundCards answers={answers} look={v.look} onDone={() => onDone({})} />;
     case 'place-song':
       return <PlaceSong onDone={onDone} />;
+    case 'theater':
+      return <Theater mv={v.made?.mv ?? null} onDone={onDone} />;
     case 'game':
       return <HomewardGame watch={answers.game === 'KIMORINが遊ぶのを、となりで見る'} onDone={onDone} />;
     case 'booth':
