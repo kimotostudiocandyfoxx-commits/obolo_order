@@ -52,7 +52,7 @@ export function L2Step({
     case 'goods':
       return (
         <GoodsPress
-          pictures={[...(v.made?.stickers ?? []), ...(v.made?.song?.jacket ? [{ text: v.made.song.title, url: v.made.song.jacket }] : []), ...(v.look ? [{ text: v.neo || v.name, url: v.look }] : [])]}
+          pictures={[...(v.made?.stickers ?? []), ...(v.made?.song?.jacket ? [{ text: v.made.song.title, url: v.made.song.jacket }] : []), ...(v.look ? [{ text: v.neo || v.name, url: v.look }] : []), { text: v.neo || v.name || 'Obolo', url: null }]}
           onDone={onDone}
         />
       );
