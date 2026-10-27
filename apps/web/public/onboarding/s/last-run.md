@@ -1,23 +1,24 @@
-# UI art — 2026-10-27T00:32:43.732Z
+# UI art — 2026-10-27T01:33:37.628Z
 
-Seedream 5.0 Pro / 19枚 / 約30円
+Seedream 5.0 Pro / 20枚 / 約37円
 
-- ✅ d2-egg-earth
-- ✅ d2-egg-earth-gem
-- ✅ d2-egg-sun
-- ✅ d2-egg-sun-gem
-- ✅ d2-invite-hand
-- ✅ kaiser1-x-joy
-- ✅ kaiser1-x-shock
-- ✅ kaiser1-x-talk
-- ✅ kimorin-iu-joy
-- ✅ kimorin-iu-lecture
-- ✅ kimorin-iu-point
-- ✅ kimorin-iu-shock
-- ✅ kimorin-iu-smug
-- ✅ kimorin-iu-talk
-- ✅ kimorin-iu-tears
-- ✅ kimorin-iu-think
-- ✅ ref-kaiser-1
-- ✅ ref-kaiser-2
+- ✅ kaiser1-x-joy-o
+- ✅ kaiser1-x-shock-o
+- ✅ kaiser1-x-talk-o
+- ✅ kimorin-iu-joy-notail
+- ✅ kimorin-iu-joy-o
+- ✅ kimorin-iu-lecture-notail
+- ✅ kimorin-iu-lecture-o
+- ✅ kimorin-iu-point-notail
+- ✅ kimorin-iu-point-o
+- ✅ kimorin-iu-shock-notail
+- ✅ kimorin-iu-shock-o
+- ✅ kimorin-iu-smug-notail
+- ✅ kimorin-iu-smug-o
+- ✅ kimorin-iu-talk-notail
+- ✅ kimorin-iu-talk-o
+- ✅ kimorin-iu-tears-notail
+- ✅ kimorin-iu-tears-o
+- ✅ kimorin-iu-think-notail
+- ✅ kimorin-iu-think-o
 - ✅ rocket-over-sea
