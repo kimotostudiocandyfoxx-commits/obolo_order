@@ -662,8 +662,11 @@ export function MercuryLesson({
       )}
       {ab?.k === 'bar' && <Bar glow lit={2} onTap={anext} />}
       {phase === 'after' && ak >= after.findIndex((x) => x.k === 'rise') && after.some((x) => x.k === 'rise') && ab?.k !== 'edit' && (
-        <div className="pointer-events-none absolute inset-x-0 top-[30svh] z-[160] flex justify-center">
-          <MyIsland look={look ?? islandOmakase(neo)} rise={ab?.k === 'rise' ? rise : 2} records={1} width={320} />
+        <div className="pointer-events-none absolute inset-x-0 top-[26svh] z-[160] flex justify-center px-5">
+          {/* the sea off the harbour, where the island rises */}
+          <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/40 bg-gradient-to-b from-sky-300 via-sky-400 to-sky-700 px-3 pb-2 pt-6 shadow-2xl">
+            <MyIsland look={look ?? islandOmakase(neo)} rise={ab?.k === 'rise' ? rise : 2} records={1} width={320} />
+          </div>
         </div>
       )}
       {ab?.k === 'edit' && (

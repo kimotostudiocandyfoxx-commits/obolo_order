@@ -563,7 +563,7 @@ export function MarsLesson({
             {placed && mv && (
               <div className="absolute bottom-3 left-1/2 w-[58%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-amber-200 bg-black shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {mv.poster ? <img src={mv.poster} alt="" className="aspect-video w-full object-cover" /> : <div className="aspect-video w-full bg-stone-800" />}
+                {mv.poster ? <img src={mv.poster} alt="" className="aspect-video w-full object-cover" /> : <video src={mv.url} muted autoPlay loop playsInline className="aspect-video w-full object-cover" />}
               </div>
             )}
             {ab?.k === 'ufo' && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 animate-[shipOut_3s_ease-in_forwards] text-6xl drop-shadow-xl">🛸</span>}

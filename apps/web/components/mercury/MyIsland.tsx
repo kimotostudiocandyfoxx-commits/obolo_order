@@ -26,7 +26,7 @@ export const ISLAND_LIGHTS: { v: IslandLook['light']; label: string }[] = [
 /** おまかせ: one of each, from the name (or a coin) */
 export function islandOmakase(seed: string): IslandLook {
   const h = [...(seed || 'island')].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 11);
-  return { shape: ISLAND_SHAPES[h % 3].v, beach: ISLAND_BEACHES[(h >> 3) % 4].v, light: ISLAND_LIGHTS[(h >> 6) % 3].v, name: '' };
+  return { shape: ISLAND_SHAPES[h % 3].v, beach: ISLAND_BEACHES[(h >>> 3) % 4].v, light: ISLAND_LIGHTS[(h >>> 6) % 3].v, name: '' };
 }
 
 /** rise: 0 under the sea → 1 rising (water falling off its edges) → 2 up, the light on */
