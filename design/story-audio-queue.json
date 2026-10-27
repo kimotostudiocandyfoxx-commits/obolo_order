@@ -3,10 +3,7 @@
   "sfxModel": "mirelo:1@1",
   "musicModel": "minimax:music@2.6",
   "parallel": 3,
-  "redo": [
-    "mars-play",
-    "earth-decide"
-  ],
+  "redo": [],
   "probe": [],
   "items": [
     {
