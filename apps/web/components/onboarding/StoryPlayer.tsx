@@ -901,7 +901,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <SaturnLesson
           bati={v.bati || 'バティ'}
           neo={v.neo || v.name}
+          inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
+          api={lessonApi ?? undefined}
           onDone={(made) => {
             // the day's kororins (their words) — Jupiter turns two of them into stickers tomorrow
             remember('f_d04_kororin', made.length ? 'try' : 'skip');
@@ -916,9 +918,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           kororins={v.made?.kororins ?? []}
           neo={v.neo || v.name}
           bati={v.bati || 'バティ'}
+          inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
-          onDone={(stickers) => {
+          onDone={(stickers, tree, sent) => {
             remember('stickers', JSON.stringify(stickers));
+            remember('my_tree', JSON.stringify(tree));
+            remember('f_d05_send', sent ? 'send' : 'keep');
             run(iRef.current + 1);
           }}
         />

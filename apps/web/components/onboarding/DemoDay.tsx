@@ -23,6 +23,11 @@ export const fakeLessonApi: LessonApi = {
     return { url: await demoStickerArt(text) };
   },
   uploadPhoto: async (blob) => ({ url: URL.createObjectURL(blob) }),
+  kororinDesigns: async () => {
+    await wait(1500);
+    return ['salmon', 'green', 'purple', 'gray'].map((n) => ({ id: n, url: `/puni-test/${n}.png` }));
+  },
+  chooseKororin: async () => undefined,
   lyrics: async (words) => {
     await wait(1500);
     const line = (text: string) => ({ text, kana: text, notes: [] });

@@ -9,7 +9,9 @@ import type { Step } from './script';
  * the real Saturn world (client 2026-10-14: day 3 only teaches how to murmur — three kororins by mic, to
  * your own room; everything else opens on the second journey), the residents' ring and the brother's
  * far point KIMORIN calls the Cosmos (M-R107), the Saturn stamp. Riddle card 2 gets its words during MONBAN's call from the rocket (story 49a3048).
- * Saved: Bluena, the three kororins (room-only Saturn posts), card 2's words, the Saturn stamp.
+ * Draft 21 (M-R124〜126): the record I teaser on the rocket; the voice kororin is free; the kororin design
+ * (D04-S005b); KIMORIN⭐︎ and {inviter} become dachi and a kororin can be delivered (D04-S005c).
+ * Saved: Bluena, the kororins, the design, card 2's words, the Saturn stamp.
  */
 export const DAY3: Step[] = [
   { t: 'bgm', track: 'moon' }, // 月の神殿の朝（2026-10-25）
@@ -68,6 +70,17 @@ export const DAY3: Step[] = [
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
+  // draft 21 (M-R126): the Day 3 teaser — fragments of record I, no explanation (cut from record I's clips)
+  { t: 'say', who: 'MONBAN', text: '……出発の前に…ひとつ、見せておく…。' },
+  { t: 'say', who: 'MONBAN', text: '……Obolo Orderは…何のために、あるのか…。' },
+  { t: 'screen', open: false },
+  { t: 'film', id: 'teaser', parts: 1 }, // 夜の窓 → 止まらない親指 → 夜の電車で下を向くみんな → 窓の灯りから色が抜ける → 真っ暗
+  { t: 'bgm', track: 'space' },
+  { t: 'still', image: 's/rocket-space' },
+  { t: 'screen', open: true },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: '……今のは、何ですか？' },
+  { t: 'say', who: 'MONBAN', text: '……答えは…旅の終わりに、見せる…。' },
   { t: 'say', who: 'MONBAN', text: '本日…土星に行けば…謎の、ヒントが…転がっている。' },
   { t: 'say', who: 'KIMORIN', text: 'え、そうなの？' },
   { t: 'say', who: 'MONBAN', text: 'ああ…。そもそもObolo Orderとは…何の集まりなのか…そのヒントだ…。' },

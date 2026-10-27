@@ -27,7 +27,7 @@ const TRY_TTL = 60 * 60 * 24 * 60;
 export const PUNI_PIC_TRIES = 3;
 /** PLACEHOLDER (P-JUP-20): Bati's sticker pictures per member per day. */
 export const STICKER_ART_TRIES = 8;
-const PUNI_PIC_CANDIDATES = 2;
+const PUNI_PIC_CANDIDATES = 4; // Saturn kororin design (story D04-S005b): four to pick from
 let styleSheet: Promise<GeneratedImage> | null = null;
 /** The client's reference characters, shown to the model as the style to follow. */
 const puniStyle = () => (styleSheet ??= readFile(resolve(__dirname, '../../assets/puni-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
@@ -173,7 +173,7 @@ export class LookService {
     }
     const refs = [kind === 'butterfly' ? await butterflyStyle() : await puniStyle(), ...(reference ? [reference] : [])];
     const prompt = kind === 'butterfly' ? butterflyPrompt : puniPicPrompt;
-    const made = await Promise.allSettled(Array.from({ length: PUNI_PIC_CANDIDATES }, (_, i) => this.images.generate(prompt(body.description, !!reference, i), i, refs)));
+    const made = await Promise.allSettled(Array.from({ length: kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES }, (_, i) => this.images.generate(prompt(body.description, !!reference, i), i, refs)));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {

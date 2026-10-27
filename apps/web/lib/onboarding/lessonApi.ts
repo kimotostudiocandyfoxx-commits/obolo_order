@@ -19,6 +19,10 @@ export interface LessonApi {
   saveSong(id: string): Promise<void>;
   /** Bati's MV for the song from the visitor's taps (a background job: a few minutes); `lyrics` = the lyrics on it too */
   mv(song: SongMade, wish: string, lyrics: boolean): Promise<MvMade>;
+  /** Saturn (D04-S005b): four kororin designs from the answers, drawn from the NEO look */
+  kororinDesigns(description: string): Promise<{ id: string; url: string }[]>;
+  /** the picked design becomes the look of the kororins to come */
+  chooseKororin(id: string): Promise<void>;
 }
 
 /** The instrumental for a chosen style (the lyric draft keeps its own melody and words). */
@@ -53,6 +57,12 @@ export const realLessonApi: LessonApi = {
   },
   async saveSong(id) {
     await getApi().composeSongSave(id);
+  },
+  async kororinDesigns(description) {
+    return (await getApi().puniPicCandidates({ description: description.slice(0, 200), useNeoLook: true })).candidates;
+  },
+  async chooseKororin(id) {
+    await getApi().choosePuniPic(id);
   },
   async mv(song, wish, lyrics) {
     const p = await getApi().mvCreate(song.id);

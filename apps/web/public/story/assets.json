@@ -1,5 +1,5 @@
 {
- "made": "2026-10-26T19:19:43.089Z",
+ "made": "2026-10-27T02:27:37.926Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -8,7 +8,7 @@
   {
    "name": "MONBAN",
    "id": "monban",
-   "uses": 146,
+   "uses": 152,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -66,8 +66,8 @@
    "sheet": null
   },
   {
-   "name": "コロリン",
-   "id": "c-1qju2sy",
+   "name": "合唱",
+   "id": "c-yyz7jm",
    "uses": 2,
    "aliases": [],
    "status": "needs-sheet",
@@ -102,32 +102,20 @@
    "sheet": null
   },
   {
+   "name": "コロリン",
+   "id": "c-1qju2sy",
+   "uses": 1,
+   "aliases": [],
+   "status": "needs-sheet",
+   "sprite": null,
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "KIMORINの曲",
    "id": "c-1h7n1z6",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "合唱",
-   "id": "c-yyz7jm",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "D07-S006の",
-   "id": "c-jwgpnq",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -176,7 +164,7 @@
   {
    "name": "KIMORIN",
    "id": "kimorin",
-   "uses": 456,
+   "uses": 483,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/kimorin-1.webp",
@@ -190,7 +178,7 @@
   {
    "name": "OBOLON",
    "id": "obolon",
-   "uses": 234,
+   "uses": 236,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/obolon.webp",
@@ -202,7 +190,7 @@
   {
    "name": "ヒポキン",
    "id": "c-13wd9v8",
-   "uses": 170,
+   "uses": 172,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/hipokin.webp",
@@ -214,7 +202,7 @@
   {
    "name": "フリージー",
    "id": "c-1l8fmea",
-   "uses": 133,
+   "uses": 136,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/freezy.webp",
@@ -226,7 +214,7 @@
   {
    "name": "大根カイザー",
    "id": "c-16ueow0",
-   "uses": 71,
+   "uses": 83,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-16ueow0.webp",
@@ -249,7 +237,7 @@
   {
    "name": "たこ焼きブラザー",
    "id": "c-op0tl3",
-   "uses": 44,
+   "uses": 51,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-brother.webp",
@@ -261,7 +249,7 @@
   {
    "name": "バティ",
    "id": "c-1xpkc0o",
-   "uses": 39,
+   "uses": 43,
    "aliases": [],
    "status": "ready",
    "sprite": null,
@@ -273,7 +261,7 @@
   {
    "name": "たこ焼きシスター",
    "id": "c-105b577",
-   "uses": 31,
+   "uses": 43,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/takoyaki-sister.webp",
@@ -285,7 +273,7 @@
   {
    "name": "ボスG",
    "id": "c-1hwam1f",
-   "uses": 22,
+   "uses": 18,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/bossg.webp",
@@ -297,7 +285,7 @@
   {
    "name": "うんちピンポンくん",
    "id": "c-131ge3q",
-   "uses": 15,
+   "uses": 17,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-131ge3q.webp",
@@ -344,6 +332,18 @@
    "sheet": null
   },
   {
+   "name": "ハットG",
+   "id": "c-1pvfg32",
+   "uses": 6,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/onboarding/hatg.webp",
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "ガリ",
    "id": "c-1rspier",
    "uses": 5,
@@ -371,18 +371,6 @@
    ],
    "candidates": [],
    "pick": "client",
-   "sheet": null
-  },
-  {
-   "name": "ハットG",
-   "id": "c-1pvfg32",
-   "uses": 5,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/onboarding/hatg.webp",
-   "client": [],
-   "candidates": [],
-   "pick": null,
    "sheet": null
   },
   {
