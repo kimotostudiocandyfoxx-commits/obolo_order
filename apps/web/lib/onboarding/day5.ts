@@ -31,7 +31,8 @@ export const DAY5: Step[] = [
   { t: 'say', who: 'MONBAN', text: '水星には…冷蔵庫の、フリージーが、いる…。' },
   { t: 'screen', open: false },
   { t: 'say', who: 'KIMORIN', text: 'やっぱり、冷蔵庫でしたか。' },
-  { t: 'still', image: 's/rocket-mercury' },
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/rocket-over-sea' }, // 見わたすかぎりの海の上を、ロケットが飛ぶ（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'ロケットを着陸させようにも、全部、海やん。' },
   { t: 'say', who: 'KIMORIN', text: 'どこに、ロケットを着陸させれば、いいのでしょう。' },
   { t: 'say', who: 'KIMORIN', text: 'あそこは、凍っていますね。氷の大陸が、あります。' },
@@ -67,11 +68,17 @@ export const DAY5: Step[] = [
   { t: 'label', id: 'd5-praise' },
   { t: 'say', who: 'KIMORIN', text: '{bati}、よく頑張りましたね。' },
   { t: 'label', id: 'd5-shut' },
-  { t: 'say', who: 'フリージー', text: '……今日は、ここまでにしよう。' }, // 細い腕で、自分の扉の取っ手をつかむ
-  { t: 'say', who: 'フリージー', text: '太陽が輪になる時の、OBOLONだ。OBOLONは……' }, // 扉の内側に、太陽を囲む細い光の輪の図
-  // フリージーが、はっとして、扉をぱたんと閉める
-  { t: 'say', who: 'フリージー', text: '……おっと。これ以上は、喋らないほうがいいな。' },
-  { t: 'say', who: 'フリージー', text: 'いずれ、知ることになる。' },
+  // the client's lines (2026-10-26): Freezy starts to tell about OBOLON, MONBAN cuts in on the Bluena screen
+  { t: 'say', who: 'フリージー', text: 'あ、そうだ、せっかく水星に来たんだ。面白い話をしてやる。' },
+  { t: 'say', who: 'フリージー', text: 'OBOLONには、会ったか？' },
+  { t: 'say', who: 'KIMORIN', text: 'はい、会いました。' },
+  { t: 'say', who: 'フリージー', text: 'あのOBOLONはな……実はな……' },
+  { t: 'se', sound: 'blip' }, // ピピッ。Bluenaが勝手に光り、スクリーンに門の前のMONBAN
+  { t: 'screen', open: true },
+  { t: 'say', who: 'MONBAN', text: 'おい、フリージー…。そいつらは、まだネオだ…。それは、喋りすぎだ…。' },
+  { t: 'screen', open: false },
+  { t: 'say', who: 'フリージー', text: 'ははは。そうか、そうだったな。' },
+  { t: 'say', who: 'フリージー', text: 'まぁ、どうせそのうち、わかる時が来る。' },
   { t: 'se', sound: 'chime' },
   { t: 'seal', n: 6 }, // 謎の書の札6に「OBOLONは……」の文字
   { t: 'caption', text: '謎の書に、文字が浮かんだ' },

@@ -92,7 +92,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
     expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['太陽と月のたまご', '地球と月のたまご']);
     const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'egg');
-    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['hatch-sun', 'pinpon-earth']);
+    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'hatch-sun', 'pinpon-earth']);
   });
   it('the gem and the riddle book at the launch pit, then the look, the NEO name, the Bati is born and named — all on day 2', () => {
     const t = kinds(steps);

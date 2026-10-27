@@ -15,7 +15,7 @@
  * formants, saturation, low end). A Fish model is made once from the recording (Gemini writes the
  * transcript) and its id is written back to the config.
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { walk, type Scene } from '../lib/story/parse';
@@ -98,6 +98,22 @@ const atempo = (r: number) => (Math.abs(r - 1) < 0.001 ? [] : [`atempo=${r.toFix
 function finish(input: string, inputArgs: string[], s: Spec, out: string) {
   mkdirSync(join(out, '..'), { recursive: true });
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputArgs, '-i', input, '-af', storyVoiceFilter(s, TEMPO), '-ac', '1', '-b:a', '64k', out]);
+  level(out);
+}
+/**
+ * Every line at the same loudness (−18 LUFS). The one-pass loudnorm in the filter left some voices ~17 dB
+ * quieter (フリージー, ヒポキン — client 2026-10-26: 「フリージーの声が小さい」): measure, then a fixed gain
+ * and a limiter. Returns true when the file was changed.
+ */
+function level(file: string): boolean {
+  const r = spawnSync('ffmpeg', ['-hide_banner', '-i', file, '-af', 'loudnorm=I=-18:TP=-1.5:print_format=json', '-f', 'null', '-'], { encoding: 'utf8' });
+  const m = /"input_i"\s*:\s*"(-?[\d.]+)"/.exec(`${r.stdout}${r.stderr}`);
+  const gain = m ? -18 - Number(m[1]) : NaN;
+  if (!isFinite(gain) || Math.abs(gain) < 2) return false;
+  const tmp = `${file}.l.mp3`;
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', file, '-af', `volume=${gain.toFixed(1)}dB,alimiter=limit=0.84:level=false`, '-ac', '1', '-b:a', '64k', tmp]);
+  renameSync(tmp, file);
+  return true;
 }
 const seconds = (file: string) => Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file]).toString().trim());
 

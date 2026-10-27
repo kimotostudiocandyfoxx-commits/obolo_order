@@ -61,7 +61,9 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '秘密結社？　……なんとも、怪しい。' },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
   { t: 'say', who: 'KIMORIN', text: 'おやおや、帰れは失礼なのでは？　なぜなら、私は！招待客なんですよー？' },
-  { t: 'se', sound: 'pop' }, // KIMORINがローブの袖から招待状を出して、MONBANに渡す
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/d2-invite-hand' }, // KIMORINが白衣のポケットから招待状を出して、MONBANに渡す（client 2026-10-26: この場面が消えていた）
+  { t: 'se', sound: 'pop' },
   { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。門をくぐり、地球の神殿に行け…。' },
   { t: 'bgm', track: 'comedy' }, // KIMORINの「気をつけなさい」
   { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
@@ -281,19 +283,27 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: null },
   { t: 'video', motion: 'd2-altar' }, // 光の柱が神殿の奥へ。小さな祭壇に、たまごが二つ（太陽と月／地球と月）
   { t: 'still', image: 's/d2-altar' },
-  { t: 'say', who: 'OBOLON', text: 'たまごの前に、、、マナジェムを、置け。' },
-  { t: 'action', label: 'マナジェムを置く' },
-  { t: 'se', sound: 'chime' }, // たまごの前にマナジェムを置く。隣で、KIMORIN⭐︎も自分のマナジェムを置く
+  // the egg is chosen first, then the mana gem is set before it (client 2026-10-26: the natural order)
   { t: 'say', who: 'OBOLON', text: '太陽と月と地球。陰と陽の力で、、、このたまごは、生まれた。' },
   { t: 'say', who: 'OBOLON', text: 'どちらか好きな方を選べ' },
   { t: 'choice', key: 'egg', options: [{ label: '太陽と月のたまご', goto: 'egg-sun' }, { label: '地球と月のたまご', goto: 'egg-earth' }] },
   { t: 'label', id: 'egg-sun' },
   { t: 'still', image: 's/d2-egg-sun' },
-  { t: 'goto', id: 'egg-gem' },
+  { t: 'goto', id: 'egg-chosen' },
   { t: 'label', id: 'egg-earth' },
   { t: 'still', image: 's/d2-egg-earth' },
-  { t: 'label', id: 'egg-gem' },
+  { t: 'label', id: 'egg-chosen' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、私はこちらでいいです。' }, // 選ばれなかった方のたまごを選ぶ
+  { t: 'say', who: 'OBOLON', text: 'たまごの前に、、、マナジェムを、置け。' },
+  { t: 'action', label: 'マナジェムを置く' },
+  { t: 'se', sound: 'chime' }, // たまごの前にマナジェムを置く。隣で、KIMORIN⭐︎も自分のマナジェムを置く
+  { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'gem-sun' }, otherwise: 'gem-earth' },
+  { t: 'label', id: 'gem-sun' },
+  { t: 'still', image: 's/d2-egg-sun-gem' },
+  { t: 'goto', id: 'egg-gem' },
+  { t: 'label', id: 'gem-earth' },
+  { t: 'still', image: 's/d2-egg-earth-gem' },
+  { t: 'label', id: 'egg-gem' },
   { t: 'say', who: 'OBOLON', text: 'この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
   { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 動揺して照れる
   { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },
