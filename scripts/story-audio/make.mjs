@@ -63,7 +63,8 @@ async function make(x) {
       taskUUID,
       model,
       positivePrompt: x.prompt,
-      ...(x.duration ? { duration: x.duration } : {}),
+      // Seed Audio takes no length (it decides it from the description)
+      ...(x.duration && !String(model).startsWith('bytedance:seed-audio') ? { duration: x.duration } : {}),
       outputType: 'URL',
       outputFormat: 'MP3',
       deliveryMethod: 'async',
