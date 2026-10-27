@@ -674,7 +674,8 @@
         "design/story/refs/client/egg-sun-moon.jpg",
         "design/story/refs/client/moon-temple-inside.jpg"
       ],
-      "prompt": "Close-up on the white marble altar in the moon temple: the egg where a burning sun and a white moon mix in a yin-yang shape, a glowing oval gemstone placed in front of it; soft golden light."
+      "prompt": "Close-up on the white marble altar in the moon temple: only the egg of the first picture (a burning sun and a white moon mixed in a yin-yang shape), glowing softly as if chosen, in a pillar of light; soft golden light, painterly anime film quality. Nothing in front of the egg. No text.",
+      "always": false
     },
     {
       "id": "d2-egg-earth",
@@ -688,7 +689,8 @@
         "design/story/refs/client/egg-earth-moon.jpg",
         "design/story/refs/client/moon-temple-inside.jpg"
       ],
-      "prompt": "Close-up on the white marble altar in the moon temple: the egg where the blue Earth and a white moon mix in a yin-yang shape with a purple-cyan rim, a glowing oval gemstone placed in front of it; soft blue light."
+      "prompt": "Close-up on the white marble altar in the moon temple: only the egg of the first picture (the blue Earth and a white moon mixed in a yin-yang shape with a purple-cyan rim), glowing softly as if chosen, in a pillar of light; painterly anime film quality. Nothing in front of the egg. No text.",
+      "always": false
     },
     {
       "id": "d2-moon-bed",
@@ -3185,9 +3187,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw held out palm up, explaining politely, a calm closed-mouth smile. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-talk-o",
@@ -3241,9 +3244,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-lecture.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw raised with the index finger pointing up, the other paw open to the side, lecturing proudly. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-lecture-o",
@@ -3297,9 +3301,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-joy.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: both arms flung wide open, delighted, the mouth open in a big happy smile. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-joy-o",
@@ -3353,9 +3358,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-point.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one arm stretched out pointing at the viewer, the other paw loosely at the side, sure of himself. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-point-o",
@@ -3409,9 +3415,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-shock.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: leaning back in shock, both paws raised beside the head, tail feathers bristling, the mouth a small round 'o'. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-shock-o",
@@ -3465,9 +3472,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-smug.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw on the hip and the other paw at the chin, head tilted, a smug little smile. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-smug-o",
@@ -3521,9 +3529,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-tears.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: both paws clasped at the chest, deeply moved, small drops of blue light falling from his eyes like tears. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-tears-o",
@@ -3577,9 +3586,10 @@
       ],
       "always": false,
       "refs": [
-        "apps/web/public/onboarding/s/kimorin-inv-up.jpg"
+        "apps/web/public/onboarding/s/kimorin-iu-think.jpg",
+        "design/story/refs/cast/kimorin-face-eyes.jpg"
       ],
-      "prompt": "A single full-body character, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080), no floor, no shadow, no other objects. Clean high-quality 3D anime character render, soft even studio light, exactly the design, proportions, size and colours of the first picture: KIMORIN, the small fox with a white fox-mask-like face (his real face), white-and-blue ears, the fan of white, black and red-tipped tail feathers growing from his body, the patched white lab coat with rolled-up sleeves, the tool belt, the small silver box on his head with a dark blank screen, the coiled cable to the silver handheld button (held in a paw or hanging at his side). The brass goggles stay pushed up on his forehead; his eyes are thin glowing blue slits. Pose: one paw at the chin, head tilted to one side, pondering, closed mouth. No text, no letters, no logos, no watermark."
+      "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
     },
     {
       "id": "kimorin-iu-think-o",
@@ -4565,10 +4575,9 @@
     {
       "id": "ref-kaiser-1",
       "refs": [
-        "design/story/refs/cast/kaiser-journey1.webp",
-        "design/story/refs/takoyaki-brother-grey.jpg"
+        "apps/web/public/onboarding/s/ref-kaiser-1.jpg"
       ],
-      "prompt": "A character reference picture for a mobile story game: a single full-body character standing, centered, front three-quarter view, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Art style exactly like the LAST picture: realistic dark-fantasy 3DCG, rich materials, fine detail, soft even studio light. No text, no letters, no symbols you can read, no logos, no watermark. The character is DAIKON KAISER as he looks on the first journey, exactly the design of the first picture (keep it, but on the grey background): a giant upright white daikon radish standing on a spread of thick tangled roots like feet, a stern grumpy old face carved into the radish with heavy brows and glowing amber eyes, a cigar in the corner of his mouth, a crown of big fresh green radish leaves on top. No arms. Dignified, proud king.",
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, his stern face, pose, roots, leaves, colours, framing, size, light and the flat grey background — but remove the cigar and all the smoke completely: his mouth holds nothing, the lips closed and stern where the cigar was. No text, no letters.",
       "w": 1152,
       "h": 1536,
       "size": [
@@ -4580,10 +4589,9 @@
     {
       "id": "ref-kaiser-2",
       "refs": [
-        "design/story/refs/cast/kaiser-journey2.webp",
-        "design/story/refs/takoyaki-brother-grey.jpg"
+        "apps/web/public/onboarding/s/ref-kaiser-2.jpg"
       ],
-      "prompt": "A character reference picture for a mobile story game: a single full-body character standing, centered, front three-quarter view, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Art style exactly like the LAST picture: realistic dark-fantasy 3DCG, rich materials, fine detail, soft even studio light. No text, no letters, no symbols you can read, no logos, no watermark. The character is DAIKON KAISER as he looks on the second journey, exactly the design of the first picture: a huge white daikon radish with a fierce face, sharp fanged grin and a cigar, a tall crown of bright radish leaves, his lower body a great mass of thick roots and hanging vines that reach the ground like a cloak. No arms. Mighty and proud.",
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, his stern face, pose, roots, leaves, colours, framing, size, light and the flat grey background — but remove the cigar and all the smoke completely: his mouth holds nothing, the lips closed and stern where the cigar was. No text, no letters.",
       "w": 1152,
       "h": 1536,
       "size": [
@@ -4617,9 +4625,9 @@
       ],
       "always": false,
       "refs": [
-        "design/story/refs/cast/kaiser-journey1-ref.jpg"
+        "apps/web/public/onboarding/s/kaiser1-x-talk.jpg"
       ],
-      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the first-journey Daikon Kaiser (white daikon on its roots, no arms, cigar, crown of leaves). Expression: speaking grandly, chin up, mouth a little open around the cigar."
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, his stern face, pose, roots, leaves, colours, framing, size, light and the flat grey background — but remove the cigar and all the smoke completely: his mouth holds nothing, his mouth keeping this expression where the cigar was. No text, no letters."
     },
     {
       "id": "kaiser1-x-joy",
@@ -4631,9 +4639,9 @@
       ],
       "always": false,
       "refs": [
-        "design/story/refs/cast/kaiser-journey1-ref.jpg"
+        "apps/web/public/onboarding/s/kaiser1-x-joy.jpg"
       ],
-      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the first-journey Daikon Kaiser (white daikon on its roots, no arms, cigar, crown of leaves). Expression: proud and pleased, a small satisfied smile, the leaves on top fluffed up."
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, his stern face, pose, roots, leaves, colours, framing, size, light and the flat grey background — but remove the cigar and all the smoke completely: his mouth holds nothing, his mouth keeping this expression where the cigar was. No text, no letters."
     },
     {
       "id": "kaiser1-x-shock",
@@ -4645,9 +4653,9 @@
       ],
       "always": false,
       "refs": [
-        "design/story/refs/cast/kaiser-journey1-ref.jpg"
+        "apps/web/public/onboarding/s/kaiser1-x-shock.jpg"
       ],
-      "prompt": "A single full-body character standing, centered, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow, no gradient, no other objects. Clean high-quality render, soft even studio light, exactly the same art style, colours, materials and design as the first picture. No text, no letters, no logos, no watermark. The character is exactly the one in the first picture: the first-journey Daikon Kaiser (white daikon on its roots, no arms, cigar, crown of leaves). Expression: surprised, eyes and brows raised high, mouth open, the cigar tipping down."
+      "prompt": "Edit the first picture: keep everything exactly the same — the character, his stern face, pose, roots, leaves, colours, framing, size, light and the flat grey background — but remove the cigar and all the smoke completely: his mouth holds nothing, his mouth keeping this expression where the cigar was. No text, no letters."
     },
     {
       "id": "kaiser1-x-talk-o",
@@ -4690,7 +4698,85 @@
         "apps/web/public/onboarding/s/kaiser1-x-shock.jpg"
       ],
       "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, colours, framing, size, light and grey background — and change only the mouth: it is open a little more, as if in the middle of saying a word. Nothing else changes. Keep the flat plain mid-grey background (#808080). No text, no letters."
+    },
+    {
+      "id": "d2-invite-hand",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/d2-gate-inside.jpg",
+        "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+        "design/story/refs/monban-grey.jpg",
+        "design/story/refs/client/envelope.webp"
+      ],
+      "prompt": "Same place, light and painterly anime film style as the first picture (inside the great gate of the headquarters). In the middle, the small fox inventor of the second picture (white fox-mask-like face, goggles over his eyes, patched white lab coat, silver box on his head, fan of white-black-red tail feathers) holds up the golden envelope of the fourth picture with both hands, smugly, toward the tall hooded figure of the third picture (black robe with gold lines, one golden eye on the forehead, a halo of a golden magic circle behind the head), who reaches out one black-gloved hand to take it. Seen from the side, both full-body. No text."
+    },
+    {
+      "id": "d2-egg-sun-gem",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/d2-egg-sun.jpg",
+        "design/story/refs/client/managem.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the altar, the egg, the light and the framing exactly the same, and place in front of the egg, on the altar, the gemstone of the second picture exactly as it is (its shape, colours and the light swirling inside), glowing. No text."
+    },
+    {
+      "id": "d2-egg-earth-gem",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "apps/web/public/onboarding/s/d2-egg-earth.jpg",
+        "design/story/refs/client/managem.jpg"
+      ],
+      "prompt": "Edit the first picture: keep the altar, the egg, the light and the framing exactly the same, and place in front of the egg, on the altar, the gemstone of the second picture exactly as it is (its shape, colours and the light swirling inside), glowing. No text."
+    },
+    {
+      "id": "rocket-over-sea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "design/story/refs/client/rocket.jpg",
+        "apps/web/public/onboarding/s/arr-mercury-sea.jpg"
+      ],
+      "prompt": "The golden rocket of the first picture flies low over the endless glittering blue ocean of the second picture (Mercury, a planet of sea): seen from outside and a little above, the rocket small in the middle of the frame skimming the waves, a trail of spray behind it, bands of sunlight on the water, no land anywhere to the horizon. Wide, open and a little lonely. Painterly anime film quality. No text."
     }
   ],
-  "redo": []
+  "redo": [
+    "d2-egg-earth",
+    "d2-egg-sun",
+    "kaiser1-x-joy",
+    "kaiser1-x-shock",
+    "kaiser1-x-talk",
+    "kimorin-iu-joy",
+    "kimorin-iu-lecture",
+    "kimorin-iu-point",
+    "kimorin-iu-shock",
+    "kimorin-iu-smug",
+    "kimorin-iu-talk",
+    "kimorin-iu-tears",
+    "kimorin-iu-think",
+    "ref-kaiser-1",
+    "ref-kaiser-2"
+  ]
 }
