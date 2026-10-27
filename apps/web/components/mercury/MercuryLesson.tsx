@@ -12,8 +12,8 @@ import { ISLAND_BEACHES, ISLAND_LIGHTS, ISLAND_SHAPES, MyIsland, islandOmakase, 
 
 /**
  * Day 5 on Mercury (first journey; story D06-S005〜S007, M-R89/M-R91/M-R114): yesterday's jacket gets its
- * song. フリージー teaches, KIMORIN⭐︎ goes first — his 『プリプリ・ボカン』 as a tearful epic ballad with
- * a choir shouting 「ボカーン！」 — then the visitor: the jacket's song (or new words), add a feeling or
+ * song. フリージー teaches, KIMORIN⭐︎ goes first (M-R133: the client's two songs — 「泣ける曲を」 gives a sad
+ * one, he asks once more for an epic one with 『すね毛楽しい』 in it: the model of the one redo) — then the visitor: the jacket's song (or new words), add a feeling or
  * pass → the feel → {bati}'s lyric draft (tap a line to touch it up) → mana asked → {bati} sings it → the
  * record spins → 〔🔒 土の中にしまう〕 (always: Mars needs it). Draft 21 (M-R124/125): everyone makes one;
  * the song may sail to the dachi's sea (〔🚢 出航させる〕→〔ダチへ〕→〔🚢 出航〕), KIMORIN⭐︎'s ship comes into
@@ -29,9 +29,9 @@ const FEELS: { id: string; label: string }[] = [
   { id: 'auto', label: 'おまかせ' },
 ];
 
-type Who = 'freezy' | 'kimorin' | 'bati' | 'guide' | 'song' | 'choir';
+type Who = 'freezy' | 'kimorin' | 'bati' | 'guide' | 'song' | 'pinpon';
 type Line = { who: Who; text: string };
-type Scene = 'bar' | 'bar-glow' | 'demo' | 'demo-play';
+type Scene = 'bar' | 'bar-glow' | 'demo' | 'song1' | 'song2';
 const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }[] })[] = [
   {
     who: 'freezy',
@@ -52,15 +52,26 @@ const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }
   { who: 'freezy', text: '習うより、慣れろ、だ。さあ、作ってみよう。', scene: 'bar' },
   { who: 'freezy', text: '真ん中の〔♫+ 作曲〕だ。', scene: 'bar-glow' },
   { who: 'kimorin', text: 'お待ちを。きのうのジャケットで。……天才の手本です。', scene: 'demo' },
-  { who: 'song', text: 'ぷりぷりぷりり……　うひょひょひょ、げへへ……　ぷりぷり、滑り台で——', scene: 'demo-play' },
-  { who: 'choir', text: 'ボカーン！　ボカーン！', scene: 'demo-play' },
-  { who: 'freezy', text: '……いい曲だ。', scene: 'demo' },
-  { who: 'kimorin', text: '……自分の曲で、泣くとは。', scene: 'demo' },
+  { who: 'kimorin', text: '泣ける曲を、お願いします。', scene: 'demo' }, // 〔🎙〕に顔を近づける
+  { who: 'guide', text: '♪ 作曲中…', scene: 'demo' }, // うんちピンポンくんが、ぽこん、と弾む
+  { who: 'song', text: '（しっとりと悲しい、泣ける曲）', scene: 'song1' },
+  { who: 'kimorin', text: '……なんか、違います。', scene: 'demo' }, // 腕を組んで、首をかしげている
+  { who: 'kimorin', text: 'こういう、悲しくて泣ける曲、というわけではなく。もっと、壮大で、神々しく、感動的に、泣ける曲です。', scene: 'demo' },
+  { who: 'pinpon', text: 'OK！　ほかに、加えたい要素、ある？', scene: 'demo' },
+  { who: 'kimorin', text: 'では、『すね毛楽しい』という歌詞を、追加してください。', scene: 'demo' },
+  { who: 'pinpon', text: 'OK！', scene: 'demo' },
+  { who: 'guide', text: '♪ 作り直し中…', scene: 'demo' },
+  { who: 'song', text: '（壮大で、神々しい、感動の曲）', scene: 'song2' },
+  { who: 'freezy', text: '……いい曲だ。', scene: 'song2' },
+  { who: 'kimorin', text: '……自分の曲で、泣くとは。', scene: 'song2' }, // サングラスの下から、涙が、ぽろぽろ
   { who: 'freezy', text: '次は、お前だ。' },
 ];
-const SPEAKER: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN', bati: 'バティ', guide: '', song: '', choir: '' };
-const NAMES: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN⭐︎', bati: 'バティ', guide: '', song: 'KIMORIN⭐︎の曲', choir: '合唱' };
-const SPRITES: Partial<Record<Who, string>> = { freezy: 'freezy-x-talk', kimorin: 'kimorin-sun' };
+const SPEAKER: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN', bati: 'バティ', guide: '', song: '', pinpon: 'うんちピンポンくん' };
+const NAMES: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN⭐︎', bati: 'バティ', guide: '', song: 'KIMORIN⭐︎の曲', pinpon: 'うんちピンポンくん' };
+/** the client's two songs for KIMORIN⭐︎ (M-R133); the first is heard from its chorus */
+const KIMORIN_SONG_1 = { src: '/onboarding/kimorin-mercury-1.m4a', from: 22 };
+const KIMORIN_SONG_2 = { src: '/onboarding/kimorin-mercury-2.m4a', from: 0 };
+const SPRITES: Partial<Record<Who, string>> = { freezy: 'freezy-x-talk', kimorin: 'kimorin-sun', pinpon: 'unchi-pinpon' };
 // after the song is put in the soil (D06-S007 最初の一隻 → D06-S007b myアイランド)
 type After =
   | { k: 'line'; l: Line }
@@ -106,6 +117,7 @@ function Bar({ glow, lit = 1, onTap }: { glow?: boolean; lit?: number; onTap?: (
 function IslandEditor({ neo, onMake, onHold }: { neo: string; onMake: (l: IslandLook) => void; onHold: () => void }) {
   const [pick, setPick] = useState<Partial<IslandLook>>({});
   const [name, setName] = useState('');
+  const [custom, setCustom] = useState(false);
   const auto = islandOmakase(neo);
   const look: IslandLook = { shape: pick.shape ?? auto.shape, beach: pick.beach ?? auto.beach, light: pick.light ?? auto.light, name };
   const rows = [
@@ -119,7 +131,15 @@ function IslandEditor({ neo, onMake, onHold }: { neo: string; onMake: (l: Island
       <div className="flex justify-center rounded-2xl bg-gradient-to-b from-sky-200 to-sky-400 py-2">
         <MyIsland look={look} width={200} />
       </div>
-      {rows.map((row) => (
+      {!custom && (
+        <>
+          <Big tone="sky" onClick={() => onMake({ ...auto, name })}>
+            この形で作る
+          </Big>
+          <Soft onClick={() => setCustom(true)}>形・浜・灯りを選ぶ</Soft>
+        </>
+      )}
+      {custom && rows.map((row) => (
         <div key={row.key} className="flex items-center gap-2">
           <span className="w-10 shrink-0 text-[12px] font-bold text-slate-400">{row.name}</span>
           <div className="flex flex-wrap gap-1.5">
@@ -131,11 +151,13 @@ function IslandEditor({ neo, onMake, onHold }: { neo: string; onMake: (l: Island
           </div>
         </div>
       ))}
-      <input value={name} onChange={(e) => setName(e.target.value.slice(0, 12))} placeholder="島の名前（なくてもいい）" className="w-full rounded-xl bg-slate-50 px-3 py-2 text-[16px] outline-none ring-1 ring-slate-200" />
-      <p className="text-center text-[11px] leading-relaxed text-slate-400">選ばなければ、おまかせ。土の中の曲も、帰ってきた船も、ここに集まります（船の帰る小さな桟橋は、どの島にもつきます）。あとで変えられます</p>
-      <Big tone="sky" onClick={() => onMake(look)}>
-        この島にする
-      </Big>
+      <VoiceField light value={name} onChange={(t) => setName(t.slice(0, 12))} placeholder="島の名前（なくてもいい）" maxLength={12} />
+      <p className="text-center text-[11px] leading-relaxed text-slate-400">土の中の曲も、帰ってきた船も、ここに集まります（船の帰る小さな桟橋は、どの島にもつきます）。あとで変えられます</p>
+      {custom && (
+        <Big tone="sky" onClick={() => onMake(look)}>
+          この島にする
+        </Big>
+      )}
       <Soft onClick={onHold}>今はここで止める</Soft>
     </div>
   );
@@ -171,6 +193,9 @@ export function MercuryLesson({
   const [feel, setFeel] = useState<string>('auto');
   const [feelSaid, setFeelSaid] = useState(false);
   const [song, setSong] = useState<{ id: string; title: string; url: string } | null>(null);
+  // M-R132: the song can be made again once; then the two lie side by side and one is put in the soil
+  const [other, setOther] = useState<{ id: string; title: string; url: string } | null>(null);
+  const [redone, setRedone] = useState(false);
   const [stage, setStage] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [heard, setHeard] = useState(false);
@@ -184,7 +209,26 @@ export function MercuryLesson({
   const [rise, setRise] = useState<0 | 1 | 2>(0);
   const [cue, setCue] = useState<Line | null>(null);
   const audio = useRef<HTMLAudioElement>(null);
-  const ballad = useRef<HTMLAudioElement>(null);
+  const song1 = useRef<HTMLAudioElement>(null);
+  const song2 = useRef<HTMLAudioElement>(null);
+  /** fade a demo song out (a tap moved on) */
+  const fade = (a: HTMLAudioElement | null) => {
+    if (!a || a.paused) return;
+    const t = setInterval(() => {
+      a.volume = Math.max(0, a.volume - 0.1);
+      if (a.volume <= 0.01) {
+        clearInterval(t);
+        a.pause();
+        a.volume = 1;
+      }
+    }, 60);
+  };
+  const start = (a: HTMLAudioElement | null, from: number) => {
+    if (!a || !a.paused) return;
+    a.currentTime = from;
+    a.volume = 1;
+    void a.play().catch(() => undefined);
+  };
   const voice = useRef<LineVoice | null>(null);
   const fill = (t: string) => t.replaceAll('{neo}', neo).replaceAll('{bati}', bati).replaceAll('{inviter}', inviter);
   const lineOf = (l: Line): CoachLine => ({ sprite: l.who === 'bati' ? batiImage : SPRITES[l.who], name: l.who === 'bati' ? bati : NAMES[l.who] || undefined, text: fill(l.text) });
@@ -205,9 +249,13 @@ export function MercuryLesson({
   const introLine = phase === 'intro' ? (reply ? reply[replyAt] : INTRO[k]) : null;
   useEffect(() => {
     if (introLine) speak(introLine);
-    const play = phase === 'intro' && INTRO[k]?.scene === 'demo-play';
-    if (play && ballad.current?.paused) void ballad.current.play().catch(() => undefined);
-    if (!play && phase === 'intro' && INTRO[k]?.scene !== 'demo') ballad.current?.pause();
+    if (phase === 'intro') {
+      const sc = INTRO[k]?.scene;
+      if (sc === 'song1') start(song1.current, KIMORIN_SONG_1.from);
+      else fade(song1.current);
+      if (sc === 'song2') start(song2.current, KIMORIN_SONG_2.from);
+      else fade(song2.current);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [introLine?.text, phase]);
 
@@ -254,7 +302,6 @@ export function MercuryLesson({
       gd('曲を、{neo}だけの〔⛏ 土の中の曲〕にしまいました。誰にも送られていません。しまった曲は、このあと作る〔🏝️ myアイランド〕の土の中から、いつでも聴けます'),
       fr('次は、出航だ。お前の曲を、ダチの海に出す。'),
       gd('〔🚢 出航させる〕を押すと、曲が船になって、ダチの海を88時間めぐり、このあと作るmyアイランドの桟橋に戻ります（届くのはダチだけ。いまのダチは、{inviter}とKIMORIN⭐︎です）'),
-      gd('〔🗺️ 海図〕を開くと、上の〔推し〕に、ダチの船が入ってきます。タップすると聴けます（押した時だけ鳴ります）'),
       { k: 'sail' },
     ]);
     setAk(0);
@@ -264,8 +311,8 @@ export function MercuryLesson({
     heard ? fr('{neo}の言葉は、ちゃんと歌になった。また聴かせてくれ。') : fr('聴くのは、あとでいい。また聴かせてくれ。'),
     ki('では、私も。'),
     { k: 'ship', who: 'kimorin' },
+    gd('〔🗺️ 海図〕を押すと、上の〔推し〕に、ダチの船が入ってきます。タップすると聴けます（押した時だけ鳴ります）'),
     { k: 'oshi' },
-    { k: 'line', l: { who: 'choir', text: 'ボカーン！　ボカーン！' } },
     ki('……二回目でも、泣けますね。'),
     fr('次は、音楽が帰る場所だ。どんな島にするかは、お前が決めろ。'),
     { k: 'bar' },
@@ -280,6 +327,7 @@ export function MercuryLesson({
   useEffect(() => {
     if (!ab) return;
     if (ab.k === 'line') speak(ab.l);
+    if (ab.k === 'bar') fade(song2.current);
     if (ab.k === 'ship') {
       const t = setTimeout(anext, 3200);
       return () => clearTimeout(t);
@@ -297,7 +345,7 @@ export function MercuryLesson({
       return () => [a, b, c].forEach(clearTimeout);
     }
     if (ab.k === 'end') {
-      ballad.current?.pause();
+      fade(song2.current);
       onDone(song ? { id: song.id, title: song.title, url: song.url, jacket: record.url, words: record.text } : null, look ?? islandOmakase(neo), sailed);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -324,7 +372,7 @@ export function MercuryLesson({
             setReplyAt(0);
             if (k < INTRO.length - 1) setK(k + 1);
             else {
-              ballad.current?.pause();
+              fade(song2.current);
               setPhase('choose');
               setCue(null);
             }
@@ -346,7 +394,9 @@ export function MercuryLesson({
   return (
     <LessonShell bg="/onboarding/s/mercury-ice.jpg" coach={coach} actions={actions}>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio ref={ballad} src="/onboarding/bgm-kimorin-ballad.m4a" preload="auto" />
+      <audio ref={song1} src={KIMORIN_SONG_1.src} preload="auto" />
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+      <audio ref={song2} src={KIMORIN_SONG_2.src} preload="auto" />
       {batiImage && phase !== 'after' && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={batiImage} alt="" className="pointer-events-none absolute bottom-[calc(16px+env(safe-area-inset-bottom))] left-3 z-[170] h-16 w-16 rounded-2xl border-2 border-white/70 object-cover shadow-lg" aria-hidden />
@@ -357,9 +407,9 @@ export function MercuryLesson({
       )}
 
       {(scene === 'bar' || scene === 'bar-glow') && <Bar glow={scene === 'bar-glow'} />}
-      {(scene === 'demo' || scene === 'demo-play') && (
+      {(scene === 'demo' || scene === 'song1' || scene === 'song2') && (
         <div className="absolute inset-x-0 top-[36svh] z-[160] flex justify-center">
-          <Record s={KIMORIN_JACKET} playing={scene === 'demo-play'} size={220} />
+          <Record s={KIMORIN_JACKET} playing={scene === 'song1' || scene === 'song2'} size={220} />
         </div>
       )}
 
@@ -425,7 +475,7 @@ export function MercuryLesson({
               <p className="mt-1 text-center text-[12px] font-bold text-slate-500">
                 {fill(
                   from === 'prev'
-                    ? 'そのとき何があったか、どんな気持ちだったか、足したければ言え。言葉が、そのまま歌詞になる。足さなくてもいい。'
+                    ? 'そのとき何があったか、どんな気持ちだったか、足したければ、声で言ってみろ。言葉が、そのまま歌詞になる。足さなくてもいい。'
                     : '今日あったことを、話してみろ。言葉が、そのまま歌詞になる。',
                 )}
               </p>
@@ -563,6 +613,28 @@ export function MercuryLesson({
 
       {phase === 'song' && song && (
         <Panel>
+          {redone && other && (
+            <div className="mb-2 flex justify-center gap-2">
+              {[
+                { label: '作り直した曲', s: song, on: true },
+                { label: '前の曲', s: other, on: false },
+              ].map((c) => (
+                <button
+                  key={c.label}
+                  onClick={() => {
+                    if (c.on) return;
+                    audio.current?.pause();
+                    setOther(song);
+                    setSong(c.s);
+                  }}
+                  className={`rounded-full px-3 py-1.5 text-[12px] font-bold ${c.on ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-600'}`}
+                >
+                  {c.on ? '✓ ' : ''}
+                  {c.s.title}
+                </button>
+              ))}
+            </div>
+          )}
           <p className="text-center text-sm font-black text-sky-700">{song.title}</p>
           <div className="mt-3 flex justify-center">
             <button onClick={() => (playing ? audio.current?.pause() : void audio.current?.play())} aria-label="play">
@@ -581,7 +653,22 @@ export function MercuryLesson({
             >
               🔒 土の中にしまう
             </Big>
-            <Soft onClick={() => setPhase('lyrics')}>歌詞を直して、作り直す</Soft>
+            {!redone ? (
+              <Soft
+                onClick={() => {
+                  audio.current?.pause();
+                  setOther(song);
+                  setRedone(true);
+                  setPhase('lyrics');
+                }}
+              >
+                作り直す（1回だけ）
+              </Soft>
+            ) : (
+              other && (
+                <p className="text-center text-[11px] text-slate-400">二枚のどちらかを選んで〔🔒 土の中にしまう〕（作り直しは、ここまで）</p>
+              )
+            )}
           </div>
         </Panel>
       )}
@@ -593,12 +680,12 @@ export function MercuryLesson({
               tone="sky"
               onClick={() => {
                 setSailed(true);
-                setPost('post');
+                setPost('to');
                 ainsert([{ k: 'post' }, { k: 'ship', who: 'mine' }, gd('{neo}の最初の一隻が、ダチの海へ出た'), ki('出た……！　船、出たケン！'), ki('……失礼。見事な船出ですね。'), ...closing()]);
                 anext();
               }}
             >
-              ダチの海に出航させる
+              🚢 出航させる
             </Big>
             <Soft
               onClick={() => {
@@ -621,7 +708,7 @@ export function MercuryLesson({
             <div className="space-y-3">
               <p className="text-center text-[13px] text-slate-500">行き先</p>
               <div className="rounded-2xl bg-sky-50 p-3 text-center text-[14px] font-bold text-sky-700 ring-2 ring-sky-300">
-                ダチへ（{inviter}・KIMORIN⭐︎）
+                ✓ ダチへ（{inviter}・KIMORIN⭐︎）
               </div>
               <Big tone="sky" onClick={anext}>
                 🚢 出航
@@ -645,9 +732,10 @@ export function MercuryLesson({
             onClick={() => {
               if (oshi !== 'here') return;
               setOshi('open');
-              if (ballad.current) {
-                ballad.current.currentTime = 0;
-                void ballad.current.play().catch(() => undefined);
+              if (song2.current) {
+                song2.current.currentTime = 0;
+                song2.current.volume = 1;
+                void song2.current.play().catch(() => undefined);
               }
               setTimeout(anext, 900);
             }}

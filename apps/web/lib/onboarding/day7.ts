@@ -67,7 +67,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '太陽……。いよいよ、ですね。' },
   { t: 'say', who: 'ボスG', text: '金星には、いつでも、回しに来い。ここも、お前の帰る場所だ。' },
   { t: 'sprite', image: 'kimorin-sun' }, // ステージの明かりが、一つずつ消える。レコードの星だけが、ゆっくり回り続ける
-  { t: 'say', who: 'KIMORIN', text: '……{neo}さんの曲が、まだ耳に残っています。……ボカーンの、次くらいに。' },
+  { t: 'say', who: 'KIMORIN', text: '……{neo}の曲が、まだ耳に残っています。……ボカーンの、次くらいに。' },
   { t: 'bgm', track: 'farewell' },
   { t: 'sprite', image: null },
   { t: 'caption', text: 'また明日' },

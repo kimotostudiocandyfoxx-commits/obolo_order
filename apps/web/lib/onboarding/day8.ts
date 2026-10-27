@@ -137,10 +137,10 @@ export const DAY8: Step[] = [
   { t: 'seal', n: 2, open: true }, // 札2のひびが割れ、「Obolo Orderは全員……」の続きに「DJ」の字。札1に星図の線と灯り（閉じたまま）
   { t: 'caption', text: '謎2が開いた' },
   { t: 'say', who: 'OBOLON', text: '謎は、8つ。' },
-  { t: 'say', who: 'OBOLON', text: '残りは、、、Obolo Orderとして、確かめに行け。' },
+  { t: 'say', who: 'OBOLON', text: '残りの謎は、、、旅の先に、ある。' },
   // 札7「コスモスは」の字が、かすかに光る
   { t: 'say', who: 'KIMORIN', text: '……コスモス。宝のありかの、あれですね。' },
-  { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderに、なってから、考えろ。' },
+  { t: 'say', who: 'OBOLON', text: '、、、急がなくて、いい。' },
   { t: 'sprite', image: null },
   { t: 'whiteout' },
 
@@ -167,7 +167,7 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
   { t: 'screen', open: true },
   { t: 'say', who: 'MONBAN', text: '……エクリプスを受けなくても、お前は、住人のままだ…。それも、道だ…。' },
-  { t: 'say', who: 'MONBAN', text: '……受けるなら、今、ここで、始められる…。' },
+  { t: 'say', who: 'MONBAN', text: '……受けるなら、今、ここで、始められる…。' }, // KIMORINは、腕を組んで黙っている
   { t: 'label', id: 'decide-choice' },
   { t: 'choice', key: 'f_d08_decide', options: [{ label: 'エクリプスを受ける', goto: 'pay' }, { label: '今は、住人のままでいる' }] },
 
@@ -182,6 +182,7 @@ export const DAY8: Step[] = [
   { t: 'bgm', track: 'farewell' },
   { t: 'notice', text: '住人のまま、いつでも星に戻れます。作ったもの・届けたもの・金星のDJ・声のコロリンは、ずっと使えます' },
   { t: 'notice', text: 'マナを使って新しく作る時、天王星・海王星の扉、二周目の物語は、エクリプスを受けてから。太陽の神殿で、いつでも受けられます' },
+  { t: 'caption', text: '一周目の旅、おわり' },
   { t: 'action', label: '宇宙の地図へ' },
   { t: 'end' },
   // 再開した人（太陽の神殿に戻ってきた住人）：光の中に、OBOLON → 星図のあとの二択へ
@@ -199,9 +200,9 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'MONBAN', text: '……よし、分かった…。' },
   { t: 'screen', open: false },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
-  { t: 'say', who: 'KIMORIN', text: '……お待ちなさい。' },
-  { t: 'say', who: 'KIMORIN', text: '私も、Obolo Orderになることにしました。' },
-  { t: 'say', who: 'KIMORIN', text: '……母に、言ってやりました。そうしたら、『88円なら、なっておきなさい』と。' },
+  { t: 'say', who: 'KIMORIN', text: '……私も、決めました。' },
+  { t: 'say', who: 'KIMORIN', text: 'Obolo Orderに、なります。' },
+  { t: 'say', who: 'KIMORIN', text: '……ロケットに飛び乗る前に、母に言ってやりました。そうしたら、『88円なら、なっておきなさい』と。' },
   { t: 'say', who: 'KIMORIN', text: '私は、発明家です。新しい発明は、新しい体験に、こそ、あります。' },
   { t: 'say', who: 'KIMORIN', text: 'そして、私は、全ての謎を解き明かし、コスモスを見つけ、宝を、手に入れてみせます。' },
   { t: 'say', who: 'KIMORIN', text: 'それを、母に、プレゼントするのです！' },

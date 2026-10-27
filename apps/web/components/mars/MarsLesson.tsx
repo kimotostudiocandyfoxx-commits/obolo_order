@@ -72,23 +72,20 @@ const AFTER: After[] = [
   hp('しまったら、次は、置き場所だ。'),
   { k: 'bar' },
   hp('撮影所の土地だ。建てるのは、自分でやれ。'),
-  { k: 'pick' },
   hp('鳴らせ。'),
-  { k: 'clap' },
+  { k: 'pick' }, // the clapper 〔この形で作る〕 (red canyon), or 〔街中の宇宙船〕 first
   { k: 'build' },
   gu('myスタジオができた'),
+  gu('スタジオに置いた映像は、ダチがスタジオに来た時に見られます。〔🔒 裏スタジオ〕の中は、{neo}だけ'), // 裏スタジオの一本が、大きい1枠に、すっと入る
   km('……もう一度。'),
-  hp('作ったものを残して、次の作品を始める場所だ。並べろ。'),
-  { k: 'place' },
-  gu('スタジオに置いた映像は、ダチがスタジオに来た時に見られます。〔🔒 裏スタジオ〕の中は、{neo}だけ'),
+  hp('作ったものを残して、次の作品を始める場所だ。'),
   hp('次は、届ける。'),
-  gu('〔🛸 公開する〕を押すと、UFOになって、ダチの星図を88時間とびます。とび終えたら、このスタジオに戻ります（届くのはダチだけ）'),
+  gu('〔🛸 公開する〕を押すと、UFOになって、ダチの星図を88時間とび、このスタジオに戻ります（届くのはダチだけ）'),
   { k: 'send' },
 ];
 const SENT: After[] = [
   { k: 'post' },
   { k: 'ufo' },
-  gu('88時間、ダチの星図をとんで、あなたのスタジオに戻ります'),
   km('……来ました。押すまで、待っていてくれるのですね。では、遠慮なく。'),
   km('……{neo}の一本、確かに受け取りました。'),
   hp('届いたな。'),
@@ -133,6 +130,9 @@ export function MarsLesson({
   const [first, setFirst] = useState<(typeof FIRSTS)[number] | null>(null);
   const [frame, setFrame] = useState<MarsResult['frame']>();
   const [mv, setMv] = useState<MvMade | null>(null);
+  // M-R132: one more take, then the two cards side by side
+  const [otherMv, setOtherMv] = useState<MvMade | null>(null);
+  const [retook, setRetook] = useState(false);
   const [wk, setWk] = useState(-1);
   const [watched, setWatched] = useState(false);
   const [after, setAfter] = useState<After[]>([]);
@@ -190,6 +190,7 @@ export function MarsLesson({
   useEffect(() => {
     if (!ab) return;
     if (ab.k === 'line' && SPEAKER[ab.l.who]) void voice.current?.say(SPEAKER[ab.l.who], ab.l.text);
+    if (ab.k === 'build') setPlaced(true);
     if (ab.k === 'build' || ab.k === 'ufo') {
       const t = setTimeout(anext, ab.k === 'build' ? 2600 : 3000);
       return () => clearTimeout(t);
@@ -290,7 +291,7 @@ export function MarsLesson({
                 tone="rose"
                 onClick={() => {
                   setPhase('words');
-                  said({ who: 'bati', text: 'どんな場面を見たい？　しゃべっても、打っても、選んでもいいよ。' });
+                  said({ who: 'bati', text: 'どんな場面を見たい？　話してみて。' });
                 }}
               >
                 撮ってみる
@@ -516,6 +517,27 @@ export function MarsLesson({
 
       {phase === 'made' && mv && (
         <Panel>
+          {retook && otherMv && (
+            <div className="mb-2 flex justify-center gap-2">
+              {[
+                { label: '新しい一本', m: mv, on: true },
+                { label: '前の一本', m: otherMv, on: false },
+              ].map((c) => (
+                <button
+                  key={c.label}
+                  onClick={() => {
+                    if (c.on) return;
+                    setOtherMv(mv);
+                    setMv(c.m);
+                  }}
+                  className={`rounded-full px-3 py-1.5 text-[12px] font-bold ${c.on ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-600'}`}
+                >
+                  {c.on ? '✓ ' : ''}
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          )}
           <p className="text-center text-sm font-black text-rose-600">{mv.title}</p>
           <p className="text-center text-[11px] text-slate-400">MV・未公開</p>
           <video src={mv.url} poster={mv.poster ?? undefined} controls playsInline onPlay={() => setWatched(true)} className="mt-2 aspect-video w-full rounded-2xl bg-black object-contain" />
@@ -532,7 +554,19 @@ export function MarsLesson({
               🔒 裏スタジオにしまう
             </Big>
             {!watched && <p className="text-center text-[11px] text-slate-400">しまう前に、▶ で見てみよう</p>}
-            <Soft onClick={() => setPhase('first')}>もう一回つくる</Soft>
+            {!retook ? (
+              <Soft
+                onClick={() => {
+                  setOtherMv(mv);
+                  setRetook(true);
+                  setPhase('first');
+                }}
+              >
+                もう一回つくる（1回だけ）
+              </Soft>
+            ) : (
+              otherMv && <p className="text-center text-[11px] text-slate-400">二枚のどちらかを選んで〔🔒 裏スタジオにしまう〕（もう一回つくるのは、ここまで）</p>
+            )}
           </div>
         </Panel>
       )}
@@ -553,7 +587,7 @@ export function MarsLesson({
       {phase === 'kept' && ak >= 4 && ab?.k !== 'pick' && (
         <div className="pointer-events-none absolute inset-x-0 top-[24svh] z-[160] flex flex-col items-center px-6">
           <div className="relative aspect-[4/3] w-full max-w-sm overflow-hidden rounded-2xl border-2 border-white/40 bg-gradient-to-b from-orange-300 to-rose-500 shadow-2xl">
-            {studio && ak > after.findIndex((x) => x.k === 'clap') ? (
+            {studio && ak > after.findIndex((x) => x.k === 'pick') ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={STUDIOS.find((x) => x.id === studio)!.img} alt="" className={`h-full w-full object-cover ${ab?.k === 'build' ? 'animate-[fadeUp_2.2s_ease-out]' : ''}`} />
             ) : (
@@ -574,48 +608,21 @@ export function MarsLesson({
       {ab?.k === 'pick' && (
         <Panel>
           <p className="text-center text-sm font-black text-rose-600">🎬 myスタジオ</p>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {STUDIOS.map((x) => (
-              <button key={x.id} onClick={() => setStudio(x.id)} className={`overflow-hidden rounded-2xl text-left ring-2 ${studio === x.id ? 'ring-rose-500' : 'ring-transparent'}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={x.img} alt="" className="aspect-[4/3] w-full bg-rose-100 object-cover" />
-                <span className="block bg-white py-1.5 text-center text-[12px] font-black text-slate-700">{x.label}</span>
-              </button>
-            ))}
-          </div>
-          <p className="mt-2 text-center text-[11px] text-slate-400">星図の景色も、同じ見た目になります。あとで変えられます</p>
-          <div className="mt-3">
-            <Big tone="rose" disabled={!studio} onClick={anext}>
-              このスタジオにする
-            </Big>
-          </div>
-        </Panel>
-      )}
-      {ab?.k === 'clap' && (
-        <div className="absolute inset-x-0 bottom-[calc(40px+env(safe-area-inset-bottom))] z-[185] flex justify-center">
-          <button onClick={anext} className="animate-[hintGlow_2.2s_ease-in-out_infinite] rounded-2xl bg-stone-900 px-6 py-4 text-3xl shadow-2xl active:scale-90" aria-label="カチンコを鳴らす">
-            🎬
+          <button
+            onClick={() => {
+              setStudio((x) => x ?? 'canyon');
+              anext();
+            }}
+            className="mx-auto mt-3 flex animate-[hintGlow_2.2s_ease-in-out_infinite] flex-col items-center rounded-2xl bg-stone-900 px-8 py-4 text-white shadow-2xl active:scale-95"
+          >
+            <span className="text-4xl">🎬</span>
+            <span className="mt-1 text-[14px] font-black">この形で作る</span>
+            <span className="text-[11px] text-white/60">{studio === 'ship' ? '街中の宇宙船' : '郊外の赤い峡谷'}</span>
           </button>
-        </div>
-      )}
-      {ab?.k === 'place' && mv && (
-        <Panel>
-          <p className="text-center text-sm font-black text-rose-600">〈{neo}〉 STUDIO</p>
-          <div className="mt-3 flex items-center gap-3 rounded-2xl bg-stone-800 p-3 text-amber-100">
-            <video src={mv.url} poster={mv.poster ?? undefined} muted playsInline className="h-16 w-28 rounded-lg bg-black object-cover" />
-            <span className="text-sm font-bold">{mv.title}</span>
-          </div>
-          <div className="mt-3">
-            <Big
-              tone="rose"
-              onClick={() => {
-                setPlaced(true);
-                anext();
-              }}
-            >
-              ここに置く
-            </Big>
-          </div>
+          <button onClick={() => setStudio((x) => (x === 'ship' ? 'canyon' : 'ship'))} className="mt-3 w-full text-center text-[12px] text-rose-500 underline">
+            見た目を選ぶ：{studio === 'ship' ? '郊外の赤い峡谷' : '街中の宇宙船'}
+          </button>
+          <p className="mt-1 text-center text-[11px] text-slate-400">あとで変えられます。星図の景色も、同じ見た目になります</p>
         </Panel>
       )}
       {ab?.k === 'send' && (
@@ -625,12 +632,12 @@ export function MarsLesson({
               tone="rose"
               onClick={() => {
                 setSent(true);
-                setPost('post');
+                setPost('to');
                 ainsert(SENT);
                 anext();
               }}
             >
-              ダチの星図に飛ばす
+              🛸 公開する
             </Big>
             <Soft
               onClick={() => {
@@ -653,8 +660,9 @@ export function MarsLesson({
             <div className="space-y-3">
               <p className="text-center text-[13px] text-slate-500">行き先</p>
               <div className="rounded-2xl bg-rose-50 p-3 text-center text-[14px] font-bold text-rose-700 ring-2 ring-rose-300">
-                ダチへ（{inviter}・KIMORIN⭐︎）
+                ✓ ダチへ（{inviter}・KIMORIN⭐︎）
               </div>
+              <p className="text-center text-[11px] text-slate-400">88時間、ダチの星図をとんで、あなたのスタジオに戻ります</p>
               <Big tone="rose" onClick={anext}>
                 とばす
               </Big>

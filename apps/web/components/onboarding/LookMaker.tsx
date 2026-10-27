@@ -51,8 +51,10 @@ interface Draft {
   ans: { animal: string; color: string[]; mood: string; hobby: string };
   words: string;
   cands: NeoLookCandidate[];
-  /** the four are the refined ones: decide from them */
+  /** the four are the redone ones (one redo on the first journey, M-R132): decide from these or the four before */
   refined?: boolean;
+  /** the four before the redo */
+  prev?: NeoLookCandidate[];
 }
 const emptyDraft: Draft = { ans: { animal: '', color: [], mood: '', hobby: '' }, words: '', cands: [] };
 function loadDraft(): Draft {
@@ -102,7 +104,8 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       // let the basin scene play out (KIMORIN's whisper, the splash, OBOLON's line)
       await new Promise((ok) => setTimeout(ok, Math.max(0, 5200 - (Date.now() - started))));
       if (!r.candidates.length) return setPhase('failed');
-      save({ ...draft, cands: r.candidates, refined: false });
+      // a second drawing is the one redo (M-R132)
+      save(draft.cands.length ? { ...draft, cands: r.candidates, refined: true, prev: draft.cands } : { ...draft, cands: r.candidates, refined: false });
       setSel(null);
       setPhase('pick');
     } catch (e) {
@@ -122,7 +125,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     try {
       const r = await api.refine(sel.id, instruction.trim());
       if (r.candidates.length) {
-        save({ ...draft, cands: r.candidates, refined: true });
+        save({ ...draft, cands: r.candidates, refined: true, prev: draft.cands });
         setSel(null);
         setInstruction('');
         return setPhase('pick');
@@ -323,9 +326,14 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       </div>
       <div className="mt-3 flex flex-col gap-2">
         {draft.refined ? (
-          <p className="text-center text-xs text-white/50">この4つから決めてください。姿は、あとでまた変えられます</p>
+          <>
+            {draft.prev && draft.prev.length > 0 && (
+              <Plain onClick={() => save({ ...draft, cands: draft.prev!, prev: draft.cands })}>前の4つ</Plain>
+            )}
+            <p className="text-center text-xs text-white/50">この4つか、前の4つから決めてください（作り直しは、ここまで）。姿は、あとでまた変えられます</p>
+          </>
         ) : !tired ? (
-          <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>最初から描き直す</Plain>
+          <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>最初から描き直す（1回だけ）</Plain>
         ) : (
           <p className="text-center text-xs text-white/50">水盤が今日は疲れてしまった……この4枚から選んでください</p>
         )}

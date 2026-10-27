@@ -70,7 +70,7 @@ export const DAY4: Step[] = [
   // D05-S009 畑から門番／札3
   { t: 'still', image: 's/jupiter-daikon' },
   { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
-  { t: 'say', who: '大根カイザー', text: 'よい機会ダ。王として、結社の大事な話をしてやろう。' },
+  { t: 'say', who: '大根カイザー', text: 'よい機会ダ。王として、大事な話をしてやるダ。' },
   { t: 'say', who: '大根カイザー', text: 'Obolo Orderが、なぜ集まり、何をめざしておるのか、ダ。' },
   { t: 'say', who: '大根カイザー', text: '結社の目的とは……' },
   { t: 'se', sound: 'blip' }, // ピピッ。Bluenaが勝手に光り、大根畑の土の上に正方形のスクリーン

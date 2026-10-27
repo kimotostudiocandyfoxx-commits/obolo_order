@@ -2,6 +2,7 @@
 
 import { KORORIN_VOICE_STYLE, neoVoiceUrl, type SaturnPostView } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
+import { VoiceField } from '@/components/onboarding/StoryExtras';
 import { Choice, DecisionButton } from '@/components/story/parts';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -79,6 +80,7 @@ const BEATS: Beat[] = [
   { k: 'note', text: '〔🎙〕を押して、{bati}に向かって、独り言みたいにつぶやく（声を出せない時は、すみの⌨で文字でも）→ {bati}がコロリンにする → タップすると喋る → 〔自分の部屋に飛ばす〕' },
   { k: 'choice' },
   // D04-S005b コロリンのデザイン (draft 21, M-R124): KIMORIN⭐︎ first, then yours (answers or おまかせ → four → one redo)
+  { k: 'say', who: 'sister', text: 'つぶやくのは、ここまでね。次は、見た目だワ。' },
   { k: 'say', who: 'sister', text: 'コロリンの見た目は、自分でデザインできるワ。' },
   { k: 'say', who: 'brother', text: '今は{neo}の見た目だZE。好きな見た目に、変えられるZE!!' },
   { k: 'say', who: 'kimorin', text: 'では、私から。' },
@@ -96,7 +98,7 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'brother', text: '招待者の、{inviter}だZE。' },
   { k: 'say', who: 'sister', text: '{neo}を、ここに招いてくれた人だワ。' },
   { k: 'note', text: '{inviter}がダチになった' },
-  { k: 'say', who: 'sister', text: '今日から、上に〔推し〕ができるワ。ダチの作品だけが、そこに入るの。' },
+  { k: 'say', who: 'sister', text: '今日から、上に〔推し〕ができるワ。ダチの作品だけが、そこに入るワ。' },
   { k: 'say', who: 'kimorin', text: '推し、ですか。……私は、ずっと、自分推しです。' },
   { k: 'note', text: '知らない人からダチの申しこみが来ても、承認しなくてかまいません。断っても、相手には知らせません' },
   { k: 'say', who: 'brother', text: '{neo}のコロリン、{inviter}に届けてみるといいZE!!' },
@@ -111,13 +113,13 @@ const BEATS: Beat[] = [
 const TRY: Beat[] = [{ k: 'recNormal', prompt: 'topics' }, { k: 'listen', id: 'mine' }, { k: 'note', text: 'コロリンは、あなたの部屋に、日付と時刻つきで残ります。誰にも送られません' }];
 const SKIP: Beat[] = [{ k: 'say', who: 'sister', text: 'いいワ。つぶやきたくなったら、いつでもどうぞ。' }, { k: 'note', text: 'コロリンは、いつでも作れます（今日でなくても）' }];
 const DESIGNED: Beat[] = [{ k: 'note', text: 'これから生まれるコロリンは、この見た目になります' }];
-const UNDESIGNED: Beat[] = [{ k: 'say', who: 'sister', text: '今の見た目のままでも、いいワ。デザインは、あとでもできるの。' }];
+const UNDESIGNED: Beat[] = [{ k: 'say', who: 'sister', text: '今の見た目のままでも、いいワ。デザインは、あとでもできるワ。' }];
 const SENT: Beat[] = [
-  { k: 'note', text: '{inviter}に、コロリンを届けた' },
+  { k: 'note', text: 'ダチに、コロリンを届けた' },
   { k: 'say', who: 'brother', text: '届けたコロリンは、88時間、{inviter}のところを転がって、{neo}の部屋に戻ってくるZE。' },
-  { k: 'note', text: '届けたコロリンは、{inviter}の〔推し〕に入ります。届けるのに、マナは使いません' },
+  { k: 'note', text: '届けたコロリンは、{inviter}とKIMORIN⭐︎の〔推し〕に入ります。届けるのに、マナは使いません' },
 ];
-const NOT_SENT: Beat[] = [{ k: 'say', who: 'sister', text: '届けたくなったら、いつでもどうぞ。' }];
+const NOT_SENT: Beat[] = [{ k: 'say', who: 'sister', text: '届けたくなったら、いつでも届けられるワ。' }];
 /** KIMORIN⭐︎'s designed kororin (80 muscular arms, a heap of aonori) — design/story-art-queue.json */
 const KIMORIN_DESIGNED = '/onboarding/s/kororin-kimorin80.jpg';
 const TOPICS = [
@@ -211,6 +213,7 @@ export function SaturnLesson({
   neo,
   inviter,
   batiImage,
+  food,
   api,
   onDone,
 }: {
@@ -218,6 +221,8 @@ export function SaturnLesson({
   neo: string;
   inviter: string;
   batiImage?: string;
+  /** the favourite food said on the Moon (the design takes it in) */
+  food?: string;
   api?: LessonApi;
   onDone: (made: string[]) => void;
 }) {
@@ -512,7 +517,7 @@ export function SaturnLesson({
               </div>
             )}
 
-            {beat?.k === 'design' && <KororinDesign api={api} bati={bati} neo={neo} onDone={designed} />}
+            {beat?.k === 'design' && <KororinDesign api={api} bati={bati} neo={neo} food={food} onDone={designed} />}
             {beat?.k === 'send' && <SendKororin made={made} inviter={inviter} onDone={sent} />}
 
             {beat?.k === 'choice' && (
@@ -540,55 +545,30 @@ function BatiSkip({ onSkip }: { onSkip: () => void }) {
   return null;
 }
 
-const COLORS = [
-  { n: '赤', c: '#e5484d' },
-  { n: 'オレンジ', c: '#f5a524' },
-  { n: '黄色', c: '#f7d84a' },
-  { n: '緑', c: '#46a758' },
-  { n: '水色', c: '#5ec8e5' },
-  { n: '青', c: '#3e63dd' },
-  { n: 'むらさき', c: '#8e4ec6' },
-  { n: 'ピンク', c: '#ef7fb4' },
-  { n: '白', c: '#f4f4f5' },
-  { n: '黒', c: '#27272a' },
-];
-const FOODS = ['甘いもの', 'しょっぱいもの', '辛いもの'];
-const MOODS = ['わくわく', 'のんびり', 'ねむい'];
-
-const sheet = 'pb-safe absolute inset-x-0 bottom-0 z-[205] max-h-[72%] overflow-y-auto rounded-t-3xl bg-[rgba(14,10,24,0.94)] px-5 pb-8 pt-5 text-amber-50';
-const chip = (on: boolean) => `rounded-full border px-3.5 py-1.5 text-[14px] ${on ? 'border-amber-200 bg-amber-200/25' : 'border-white/25 bg-white/5'}`;
-
 /**
- * D04-S005b コロリンのデザイン: answer a few (two colours, a food, the mood — each can be passed or free) or
- * 〔おまかせ〕 (from the NEO look) → the mana question → four designs → pick one, or say what to change once.
+ * D04-S005b コロリンのデザイン (M-R130/M-R132): 〔おまかせ〕 (the NEO look + the favourite food) or 〔🎙 話して
+ * 決める〕 (two colours and the mood, said aloud; ⌨ only when you cannot speak) → the mana question → four designs
+ * → pick one, or say what to change once (then the new four, or 〔前の4つ〕 again).
  */
-function KororinDesign({ api, bati, neo, onDone }: { api?: LessonApi; bati: string; neo: string; onDone: (url: string | null) => void }) {
+function KororinDesign({ api, bati, neo, food, onDone }: { api?: LessonApi; bati: string; neo: string; food?: string; onDone: (url: string | null) => void }) {
   const [phase, setPhase] = useState<'how' | 'ask' | 'mana' | 'drawing' | 'pick' | 'refine'>('how');
-  const [colors, setColors] = useState<string[]>([]);
-  const [food, setFood] = useState('');
-  const [mood, setMood] = useState('');
-  const [free, setFree] = useState<'food' | 'mood' | null>(null);
+  const [said, setSaid] = useState('');
   const [wish, setWish] = useState('');
   const [refined, setRefined] = useState(false);
   const [designs, setDesigns] = useState<{ id: string; url: string }[]>([]);
+  const [before, setBefore] = useState<{ id: string; url: string }[] | null>(null);
+  const [showBefore, setShowBefore] = useState(false);
   const [err, setErr] = useState(false);
 
   const describe = (extra?: string) =>
-    [
-      'a round takoyaki-ball kororin',
-      colors.length ? `colours: ${colors.join(', ')}` : '',
-      food ? `favourite food: ${food}` : '',
-      mood ? `mood: ${mood}` : '',
-      extra ? `request: ${extra}` : '',
-    ]
-      .filter(Boolean)
-      .join('. ');
+    ['a round takoyaki-ball kororin', said ? `colours and mood: ${said}` : '', food ? `favourite food: ${food}` : '', extra ? `request: ${extra}` : ''].filter(Boolean).join('. ');
   const draw = async (extra?: string) => {
     setPhase('drawing');
     setErr(false);
     try {
       const d = api ? await api.kororinDesigns(describe(extra)) : [];
       if (!d.length) throw new Error('none');
+      if (extra) setBefore(designs);
       setDesigns(d);
       setPhase('pick');
     } catch {
@@ -604,53 +584,34 @@ function KororinDesign({ api, bati, neo, onDone }: { api?: LessonApi; bati: stri
   if (phase === 'how')
     return (
       <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-end gap-2 px-4 pb-8">
-        <Choice k={0} onClick={() => setPhase('ask')}>
-          いくつか答えて決める
-        </Choice>
-        <Choice k={1} onClick={() => setPhase('mana')}>
+        <Choice k={0} onClick={() => setPhase('mana')}>
           おまかせ
+        </Choice>
+        <Choice k={1} onClick={() => setPhase('ask')}>
+          🎙 話して決める
         </Choice>
       </div>
     );
   if (phase === 'ask')
     return (
       <div className={sheet}>
-        <p className="text-[13px] text-amber-200/90">{bati}「好きな色と、好きな食べ物と、今の気分。教えて。」</p>
-        <p className="mt-4 text-[13px] text-white/70">好きな色（2つまで）</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {COLORS.map((c) => (
-            <button key={c.n} onClick={() => setColors((x) => (x.includes(c.n) ? x.filter((y) => y !== c.n) : x.length < 2 ? [...x, c.n] : x))} className={chip(colors.includes(c.n))}>
-              <span className="mr-1.5 inline-block h-3 w-3 rounded-full align-[-1px]" style={{ background: c.c }} />
-              {c.n}
-            </button>
-          ))}
+        <p className="text-[13px] text-amber-200/90">{bati}「好きな色と、今の気分。話してみて。」</p>
+        <div className="mt-4">
+          <VoiceField value={said} onChange={setSaid} placeholder="青と金。わくわく" maxLength={40} />
         </div>
-        {(['food', 'mood'] as const).map((k) => (
-          <div key={k}>
-            <p className="mt-4 text-[13px] text-white/70">{k === 'food' ? '好きな食べ物' : '今の気分'}</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {(k === 'food' ? FOODS : MOODS).map((o) => (
-                <button key={o} onClick={() => (k === 'food' ? setFood(o) : setMood(o))} className={chip((k === 'food' ? food : mood) === o)}>
-                  {o}
-                </button>
-              ))}
-              <button onClick={() => setFree(k)} className={chip(free === k)}>
-                自由に言う
-              </button>
-            </div>
-            {free === k && (
-              <input
-                value={k === 'food' ? food : mood}
-                onChange={(e) => (k === 'food' ? setFood(e.target.value) : setMood(e.target.value))}
-                maxLength={20}
-                className="mt-2 w-full rounded-xl bg-white/10 px-3 py-2 text-[16px] outline-none"
-                placeholder={k === 'food' ? 'たこ焼き' : 'うきうき'}
-              />
-            )}
-          </div>
-        ))}
-        <div className="mt-5">
-          <DecisionButton onClick={() => setPhase('mana')}>これで描く</DecisionButton>
+        <div className="mt-4 space-y-2">
+          <DecisionButton disabled={!said.trim()} onClick={() => setPhase('mana')}>
+            これで描く
+          </DecisionButton>
+          <button
+            onClick={() => {
+              setSaid('');
+              setPhase('mana');
+            }}
+            className="w-full text-center text-[13px] text-white/55"
+          >
+            パス
+          </button>
         </div>
       </div>
     );
@@ -675,10 +636,11 @@ function KororinDesign({ api, bati, neo, onDone }: { api?: LessonApi; bati: stri
         <p className="rounded-full bg-[rgba(20,12,36,0.8)] px-4 py-1 text-[13px] text-amber-200">−3マナ</p>
       </div>
     );
+  const shown = showBefore && before ? before : designs;
   return (
     <div className={sheet}>
       <div className="grid grid-cols-2 gap-3">
-        {designs.map((d, k) => (
+        {shown.map((d, k) => (
           <button key={d.id} onClick={() => pick(d)} className="aspect-square overflow-hidden rounded-2xl border border-white/20 bg-white/90 p-1 active:scale-95">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={d.url} alt={`${k + 1}つ目`} className="h-full w-full object-contain" />
@@ -686,10 +648,15 @@ function KororinDesign({ api, bati, neo, onDone }: { api?: LessonApi; bati: stri
         ))}
       </div>
       {err && <p className="mt-3 text-center text-[13px] text-rose-200">描き直せなかった…このなかから選んでね</p>}
+      {before && (
+        <button onClick={() => setShowBefore((x) => !x)} className="mt-3 w-full text-center text-[13px] text-amber-200/90 underline">
+          {showBefore ? '新しい4つ' : '前の4つ'}
+        </button>
+      )}
       {!refined &&
         (phase === 'refine' ? (
           <div className="mt-4">
-            <input autoFocus value={wish} onChange={(e) => setWish(e.target.value)} maxLength={40} placeholder="もっとまるく" className="w-full rounded-xl bg-white/10 px-3 py-2 text-[16px] outline-none" />
+            <VoiceField value={wish} onChange={setWish} placeholder="もっとまるく" maxLength={40} />
             <div className="mt-3">
               <DecisionButton
                 disabled={!wish.trim()}
@@ -704,74 +671,41 @@ function KororinDesign({ api, bati, neo, onDone }: { api?: LessonApi; bati: stri
           </div>
         ) : (
           <button onClick={() => setPhase('refine')} className="mt-4 w-full text-center text-[14px] text-amber-200/90 underline">
-            要望を書いて描き直す（1回だけ）
+            🎙 要望を言って描き直す（1回だけ）
           </button>
         ))}
     </div>
   );
 }
 
-/** D04-S005c: 〔届ける〕 one of your kororins → 〔ダチへ〕 → {inviter}'s name tag → 〔届ける〕 (no mana). */
+const sheet = 'pb-safe absolute inset-x-0 bottom-0 z-[205] max-h-[72%] overflow-y-auto rounded-t-3xl bg-[rgba(14,10,24,0.94)] px-5 pb-8 pt-5 text-amber-50';
+
+/** D04-S005c: 〔届ける〕 → the kororin just made, 〔ダチへ〕 ({inviter}・KIMORIN⭐︎) already chosen → 〔届ける〕 (no mana). */
 function SendKororin({ made, inviter, onDone }: { made: string[]; inviter: string; onDone: (sent: boolean) => void }) {
-  const [phase, setPhase] = useState<'ask' | 'pick' | 'to' | 'who'>('ask');
-  const [which, setWhich] = useState<number | null>(null);
-  const [to, setTo] = useState(false);
-  if (phase === 'ask')
+  const [open, setOpen] = useState(false);
+  if (!open)
     return (
       <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-end gap-2 px-4 pb-8">
-        <Choice k={0} onClick={() => setPhase(made.length ? 'pick' : 'to')}>
-          {inviter}に届ける
+        <Choice k={0} onClick={() => setOpen(true)}>
+          届ける
         </Choice>
         <Choice k={1} onClick={() => onDone(false)}>
           今はいい
         </Choice>
       </div>
     );
+  const last = made[made.length - 1];
   return (
     <div className={sheet}>
-      {phase === 'pick' && (
-        <>
-          <p className="text-[13px] text-white/70">自分の部屋のコロリンから、一つ選ぶ</p>
-          <div className="mt-3 flex flex-col gap-2">
-            {made.map((m, k) => (
-              <button key={k} onClick={() => setWhich(k)} className={`rounded-2xl border px-4 py-2.5 text-left text-[14px] ${which === k ? 'border-amber-200 bg-amber-200/20' : 'border-white/20 bg-white/5'}`}>
-                {m.length > 40 ? `${m.slice(0, 40)}…` : m}
-              </button>
-            ))}
-          </div>
-          <div className="mt-4">
-            <DecisionButton disabled={which === null} onClick={() => setPhase('to')}>
-              届ける
-            </DecisionButton>
-          </div>
-        </>
-      )}
-      {phase === 'to' && (
-        <>
-          <p className="text-[13px] text-white/70">行き先</p>
-          <div className="mt-3">
-            <DecisionButton onClick={() => setPhase('who')}>ダチへ</DecisionButton>
-          </div>
-        </>
-      )}
-      {phase === 'who' && (
-        <>
-          <p className="text-[13px] text-white/70">ダチの名札から選ぶ</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button onClick={() => setTo(true)} className={chip(to)}>
-              {inviter}
-            </button>
-            <button disabled className={`${chip(false)} opacity-50`}>
-              KIMORIN⭐︎
-            </button>
-          </div>
-          <div className="mt-4">
-            <DecisionButton disabled={!to} onClick={() => onDone(true)}>
-              届ける
-            </DecisionButton>
-          </div>
-        </>
-      )}
+      {last && <p className="rounded-2xl border border-white/20 bg-white/5 px-4 py-2.5 text-[14px]">🪐 {last.length > 40 ? `${last.slice(0, 40)}…` : last}</p>}
+      <p className="mt-3 text-[13px] text-white/70">行き先</p>
+      <p className="mt-1 rounded-2xl border border-amber-200 bg-amber-200/15 px-4 py-2.5 text-center text-[14px] font-bold">✓ ダチへ（{inviter}・KIMORIN⭐︎）</p>
+      <div className="mt-4">
+        <DecisionButton onClick={() => onDone(true)}>届ける</DecisionButton>
+      </div>
+      <button onClick={() => onDone(false)} className="mt-3 w-full text-center text-[13px] text-white/55">
+        やめる
+      </button>
     </div>
   );
 }

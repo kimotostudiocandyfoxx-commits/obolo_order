@@ -94,6 +94,22 @@ export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
  */
 export const MicAllowed = createContext(true);
 
+/** M-R130: the first time ⌨ is pressed, one line (then the keyboard opens); remembered on this device */
+const KB_NOTICE = 'obolo.kbNotice';
+function kbNoticeSeen() {
+  try {
+    return localStorage.getItem(KB_NOTICE) === '1';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The input of every making screen (story M-R130 「声が主役、文字は非常口」): a big 〔🎙 話してみよう〕 in the
+ * middle, the words heard shown above it; a small ⌨ in the corner only for when you cannot speak (the first
+ * press shows 「声が出せる場所で、また来てね。ここは、声で作る宇宙です」 once, then the keyboard opens anyway).
+ * `textFirst`: names (and the days before the voice comes out, MicAllowed=false) stay a plain text field.
+ */
 export function VoiceField({
   value,
   onChange,
@@ -101,6 +117,7 @@ export function VoiceField({
   maxLength = 20,
   multiline = false,
   light = false,
+  textFirst = false,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -109,45 +126,102 @@ export function VoiceField({
   multiline?: boolean;
   /** on a white panel (the planet lessons): dark text */
   light?: boolean;
+  /** a name: typed, not spoken */
+  textFirst?: boolean;
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const mic = useDictation({ field: ref, value, onChange, maxLength });
   const withMic = useContext(MicAllowed);
+  const [typing, setTyping] = useState(false);
+  const [notice, setNotice] = useState(false);
+  const voiceFirst = withMic && !textFirst && mic.supported;
   const cls = light
     ? `min-w-0 flex-1 rounded-xl border bg-white px-3 py-2 text-slate-800 outline-none placeholder:text-slate-400 ${mic.listening ? 'border-rose-400' : 'border-slate-300 focus:border-amber-400'}`
     : `min-w-0 flex-1 border-b bg-transparent px-2 py-2 text-amber-50 outline-none placeholder:text-white/35 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] ${mic.listening ? 'border-rose-300' : 'border-amber-100/45 focus:border-amber-200/90'}`;
+  const field = multiline ? (
+    <textarea ref={ref} className={`${cls} h-24 resize-none`} style={{ fontSize: 17 }} maxLength={maxLength} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+  ) : (
+    <input ref={ref} className={`${cls} text-center tracking-widest`} style={{ fontSize: 18 }} maxLength={maxLength} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+  );
+  const example = isDemoMode() && !value && (
+    <button type="button" onClick={() => onChange(placeholder.split('／')[0].slice(0, maxLength))} className={`mt-1.5 text-[11px] tracking-wider underline ${light ? 'text-amber-600' : 'text-amber-200/70'}`}>
+      例で進む
+    </button>
+  );
+
+  if (!voiceFirst)
+    return (
+      <div>
+        <div className="flex items-center gap-2">
+          {field}
+          {withMic && !textFirst && (
+            <button type="button" onClick={mic.toggle} disabled={!mic.supported} aria-label="話して入力" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-amber-200/70 bg-black/60 disabled:opacity-30">
+              🎙
+            </button>
+          )}
+        </div>
+        {example}
+      </div>
+    );
+
+  const sub = light ? 'text-slate-400' : 'text-white/55';
   return (
-    <div>
-      <div className="flex items-center gap-2">
-        {multiline ? (
-          <textarea ref={ref} className={`${cls} h-24 resize-none`} style={{ fontSize: 17 }} maxLength={maxLength} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+    <div className="relative flex flex-col items-center">
+      {/* what was heard (tap ⌨ to touch it up by hand) */}
+      {(value || typing) && <div className="mb-3 flex w-full items-center gap-2">{typing ? field : <p className={`w-full rounded-xl px-3 py-2 text-center text-[16px] font-bold ${light ? 'bg-amber-50 text-slate-700' : 'bg-white/10 text-amber-50'}`}>{value}</p>}</div>}
+      <button
+        type="button"
+        onClick={mic.toggle}
+        aria-label={mic.listening ? '録音をとめる' : '話してみよう'}
+        className={`relative flex h-24 w-24 items-center justify-center rounded-full border-4 shadow-[0_8px_30px_rgba(60,20,90,0.35)] transition active:scale-95 ${mic.listening ? 'border-rose-200 bg-gradient-to-b from-rose-400 to-rose-600' : 'animate-[hintGlow_2.2s_ease-in-out_infinite] border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500'}`}
+      >
+        {mic.listening && <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/50" />}
+        {mic.listening ? (
+          <span className="relative h-8 w-8 rounded-md bg-white" />
         ) : (
-          <input ref={ref} className={`${cls} text-center tracking-widest`} style={{ fontSize: 18 }} maxLength={maxLength} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
+          <svg viewBox="0 0 24 24" className="relative h-12 w-12 fill-white drop-shadow" aria-hidden>
+            <path d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V5a3.5 3.5 0 0 0-7 0v6a3.5 3.5 0 0 0 3.5 3.5Z" />
+            <path d="M18.5 11a.9.9 0 0 0-1.8 0 4.7 4.7 0 0 1-9.4 0 .9.9 0 0 0-1.8 0 6.5 6.5 0 0 0 5.6 6.4V20H8.8a.9.9 0 0 0 0 1.8h6.4a.9.9 0 0 0 0-1.8H12.9v-2.6a6.5 6.5 0 0 0 5.6-6.4Z" />
+          </svg>
         )}
-        {withMic && (
+      </button>
+      <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
+      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : mic.error === 'denied' ? 'マイクを許可してください' : `例「${placeholder.replace(/^例：/, '').split('／')[0]}」`}</p>
+      {example}
+      {/* the emergency exit: only when you cannot speak */}
+      {!typing && (
         <button
           type="button"
-          onClick={mic.toggle}
-          disabled={!mic.supported}
-          aria-label={mic.listening ? '録音をとめる' : '話して入力'}
-          className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition disabled:opacity-30 ${mic.listening ? 'border-rose-200 bg-rose-500/80' : 'border-amber-200/70 bg-black/60'}`}
+          onClick={() => {
+            if (kbNoticeSeen()) return setTyping(true);
+            setNotice(true);
+          }}
+          className={`absolute bottom-0 right-0 p-1.5 text-lg ${light ? 'text-slate-300' : 'text-white/40'}`}
+          aria-label="声が出せない時だけ、文字で"
         >
-          {mic.listening && <span className="absolute inset-0 animate-ping rounded-full bg-rose-400/40" />}
-          <svg className="relative" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fde68a" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
-            <rect x="8.5" y="3" width="7" height="12" rx="3.5" fill={mic.listening ? '#fff' : 'none'} />
-            <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-          </svg>
-        </button>
-        )}
-      </div>
-      {isDemoMode() && !value && (
-        <button type="button" onClick={() => onChange(placeholder.split('／')[0].slice(0, maxLength))} className={`mt-1.5 text-[11px] tracking-wider underline ${light ? 'text-amber-600' : 'text-amber-200/70'}`}>
-          例で進む
+          ⌨
         </button>
       )}
-      <p className="mt-1 min-h-4 text-center text-[11px] text-amber-100/60">
-        {!withMic ? '' : mic.listening ? mic.interim || 'きいています… 話しおわったら、もう一度タップ' : mic.error === 'denied' ? 'マイクを許可してください' : mic.supported ? '🎙 を押して話すか、文字で入力' : ''}
-      </p>
+      {notice && (
+        <div className={`mt-3 w-full rounded-2xl p-3 text-center text-[13px] leading-relaxed ${light ? 'bg-slate-100 text-slate-600' : 'bg-black/60 text-amber-50'}`}>
+          声が出せる場所で、また来てね。ここは、声で作る宇宙です
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                localStorage.setItem(KB_NOTICE, '1');
+              } catch {
+                /* private mode */
+              }
+              setNotice(false);
+              setTyping(true);
+            }}
+            className="mt-2 block w-full text-[12px] underline"
+          >
+            いまは文字で進む
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -165,7 +239,7 @@ export function AgeInput({ onAnswer, onSkip }: { onAnswer: (age: string) => void
   return (
     <div className={panel}>
       <div className="mx-auto mb-8 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-        <VoiceField value={v} onChange={setV} placeholder="太陽をまわった回数" maxLength={8} />
+        <VoiceField textFirst value={v} onChange={setV} placeholder="太陽をまわった回数" maxLength={8} />
         <button className={gold} disabled={!n || Number(n) > 150} onClick={() => onAnswer(String(Number(n)))}>
           答える
         </button>
@@ -203,7 +277,7 @@ export function NeoNameInput({ placeholder, submit, onSubmit }: { placeholder: s
   return (
     <div className={panel}>
       <div className="mx-auto mb-8 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-        <VoiceField value={v} onChange={setV} placeholder={placeholder} />
+        <VoiceField textFirst value={v} onChange={setV} placeholder={placeholder} />
         <button className={gold} disabled={!v.trim() || !nameCharsOk(v) || busy} onClick={go}>
           {busy ? '……' : submit}
         </button>

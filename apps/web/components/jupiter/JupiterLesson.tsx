@@ -94,8 +94,7 @@ const OPEN: Beat[] = [
 // D05-S008 (after the visitor's jacket is kept, or the king's flies)
 const FLY: Line[] = [
   { who: 'kaiser', text: '木星ではな、ジャケットは蝶のように飛ぶダ。言葉が、書いてあるダ。' },
-  { who: 'kaiser', text: '人に届けたジャケットは、88時間、空を飛んで、自分の木に帰るダ。帰ってくると、枝に葉が一枚出るダ。' },
-  { who: 'kaiser', text: '帰ってくる木は、これから{neo}が植えるダ。' },
+  { who: 'kaiser', text: '飛ばすのは、木を植えてからダ。' },
   { who: 'guide', text: '飛んでいるジャケットをタップすると〔ジャケット帳〕がひらきます。ジャケットは石のまわりを飛ぶだけで、誰にも送られていません' },
   { who: 'kimorin', text: '……飛んだ。オレのが、飛んだケン……！　言葉の翼ケン！' },
   { who: 'kimorin', text: '……失礼。おしゃれですね。' },
@@ -125,7 +124,6 @@ const TREE: TreeBeat[] = [
   kai('君の木ダ。作ったジャケットは、この枝に並ぶダ。'),
   kai('そのジャケットは、ダチの空に飛ばせるダ。'),
   kai('{neo}のダチは、{inviter}と、KIMORINダ。届くのは、ダチだけダ。'),
-  note('〔🦋 投稿する〕を押して、行き先〔ダチへ〕を確かめ、〔🦋 飛ばす〕。88時間、空を飛んで、あなたの木に帰ります'),
   { k: 'send' },
 ];
 const SENT: TreeBeat[] = [
@@ -139,8 +137,8 @@ const OSHI: TreeBeat[] = [
   { k: 'oshi' },
   kai('上の〔推し〕は、ダチの作品が飛んでくる空ダ。KIMORINは、もう{neo}のダチダ。だから、来るダ。'),
   note('ダチのジャケットは、上の〔推し〕の空に飛んできます。タップすると見られます'),
-  kim('なんやこれ……{neo}の空で、オレのが開いとる……！'),
-  kim('……失礼。ダチの空とは、いいものですね。'),
+  kim('……{neo}の空で、私のジャケットが、開いています……！'),
+  kim('……ダチの空とは、いいものですね。'),
   kai('木も空も、いつ来て遊んでもよいダ。'),
   { k: 'end' },
 ];
@@ -210,10 +208,14 @@ export function JupiterLesson({
   const [art, setArt] = useState<'photo' | 'mana' | 'skip' | null>(null);
   const [mine, setMine] = useState<StickerMade | null>(null);
   const [fly, setFly] = useState(-1);
+  const [firstArt, setFirstArt] = useState<string | null>(null);
+  const [redrawn, setRedrawn] = useState(false);
+  const [picking, setPicking] = useState(false);
   const [tree, setTree] = useState<TreeBeat[] | null>(null);
   const [ti, setTi] = useState(0);
   const [look, setLook] = useState<TreeLook>(TREE_DEFAULT);
   const [hold, setHold] = useState(false);
+  const [custom, setCustom] = useState(false);
   const [grow, setGrow] = useState<0 | 1 | 2>(0);
   const [sent, setSent] = useState(false);
   const [post, setPost] = useState<'post' | 'to' | 'fly' | 'gone'>('post');
@@ -274,13 +276,16 @@ export function JupiterLesson({
     void voice.current?.say('バティ', '〈{neo}の言葉〉——ここに、かたちを。');
     setTimeout(() => setMake('choose'), 2600);
   };
-  const draw = async () => {
+  // M-R132: {bati}'s picture can be drawn again once; then one of the two is chosen
+  const draw = async (again = false) => {
     if (!draft) return;
+    if (again && draft.url) setFirstArt(draft.url);
     setMake('drawing');
     try {
       const r = await api.stickerArt(draft.text);
       setDraft({ ...draft, url: r.url });
       setArt('mana');
+      setRedrawn(again);
       setMake('ready');
     } catch {
       setMake('burnt');
@@ -429,7 +434,13 @@ export function JupiterLesson({
             </div>
           ) : (
             <div className="mt-3 space-y-2">
-              <Big tone="sky" onClick={() => setMode('new')}>
+              <Big
+                tone="sky"
+                onClick={() => {
+                  setMode('new');
+                  void voice.current?.say('大根カイザー', 'なら、話してみるダ。');
+                }}
+              >
                 新しく作る
               </Big>
               <Soft onClick={() => setMode('hold')}>今はここで止める</Soft>
@@ -506,7 +517,25 @@ export function JupiterLesson({
               </Soft>
             </div>
           )}
-          {make === 'ready' && (
+          {make === 'ready' && art === 'mana' && !picking && (
+            <div className="mt-4 space-y-2">
+              {redrawn && firstArt && draft && (
+                <div className="flex justify-center gap-3">
+                  {[firstArt, draft.url].map((u) => (
+                    <button key={u} onClick={() => setDraft({ ...draft, url: u })} className={`rounded-md ring-4 ${draft.url === u ? 'ring-amber-400' : 'ring-transparent'}`}>
+                      <Sticker s={{ ...draft, url: u }} size={96} />
+                    </button>
+                  ))}
+                </div>
+              )}
+              <Big tone="amber" onClick={() => setPicking(true)}>
+                この絵にする
+              </Big>
+              {!redrawn && <Soft onClick={() => void draw(true)}>描き直す（1回だけ）</Soft>}
+              {redrawn && <p className="text-center text-[11px] text-slate-400">二枚のどちらかを選んで〔この絵にする〕（描き直しは、ここまで）</p>}
+            </div>
+          )}
+          {make === 'ready' && (art !== 'mana' || picking) && (
             <div className="mt-4 space-y-2">
               <Big tone="amber" onClick={keep}>
                 🔒 根っこにしまう
@@ -515,6 +544,9 @@ export function JupiterLesson({
                 onClick={() => {
                   setDraft({ ...draft, url: null });
                   setArt(null);
+                  setPicking(false);
+                  setRedrawn(false);
+                  setFirstArt(null);
                   setMake('choose');
                 }}
               >
@@ -573,7 +605,23 @@ export function JupiterLesson({
               <div className="flex justify-center">
                 <MyTree look={look} width={120} />
               </div>
-              {[
+              {!custom && (
+                <>
+                  <Big
+                    tone="amber"
+                    onClick={() => {
+                      setLook({ ...TREE_DEFAULT, tag: look.tag });
+                      tnext();
+                    }}
+                  >
+                    この形で作る
+                  </Big>
+                  <Soft onClick={() => setCustom(true)}>形・色・飾りを選ぶ</Soft>
+                  <Soft onClick={() => setHold(true)}>今はここで止める</Soft>
+                  <p className="text-center text-[11px] text-slate-400">最初の形のまま、すぐ植わります（あとで変えられます）</p>
+                </>
+              )}
+              {custom && [
                 { name: '形', opts: TREE_SHAPES.map((o) => ({ v: o.v, label: o.label })), key: 'shape' as const },
                 { name: '色', opts: TREE_COLORS.map((o) => ({ v: o.v, label: o.label })), key: 'color' as const },
                 { name: '飾り', opts: TREE_DECOS.map((o) => ({ v: o.v, label: `${o.icon} ${o.label}` })), key: 'deco' as const },
@@ -589,20 +637,15 @@ export function JupiterLesson({
                   </div>
                 </div>
               ))}
-              <input value={look.tag} onChange={(e) => setLook((x) => ({ ...x, tag: [...e.target.value].slice(0, 8).join('') }))} placeholder="枝の先の札（8文字まで。なくてもいい）" className="w-full rounded-xl bg-slate-50 px-3 py-2 text-[16px] outline-none ring-1 ring-slate-200" />
-              <Big tone="amber" onClick={tnext}>
-                この木にする
-              </Big>
-              <Soft
-                onClick={() => {
-                  setLook({ ...TREE_DEFAULT, tag: look.tag });
-                  tnext();
-                }}
-              >
-                最初の形のまま〔この木にする〕
-              </Soft>
-              <Soft onClick={() => setHold(true)}>今はここで止める</Soft>
-              <p className="text-center text-[11px] text-slate-400">〔この木にする〕で、あなたの場所として保存されます（あとで変えられます）</p>
+              {custom && (
+                <>
+                  <VoiceField light value={look.tag} onChange={(t) => setLook((x) => ({ ...x, tag: [...t].slice(0, 8).join('') }))} placeholder="枝の先の札（8文字まで。なくてもいい）" maxLength={8} />
+                  <Big tone="amber" onClick={tnext}>
+                    この木にする
+                  </Big>
+                  <p className="text-center text-[11px] text-slate-400">〔この木にする〕で、あなたの場所として保存されます（あとで変えられます）</p>
+                </>
+              )}
             </div>
           )}
         </Panel>
@@ -614,12 +657,12 @@ export function JupiterLesson({
               tone="sky"
               onClick={() => {
                 setSent(true);
-                setPost('post');
+                setPost('to');
                 tinsert([...SENT, ...OSHI]);
                 tnext();
               }}
             >
-              ダチの空に飛ばす
+              🦋 投稿する
             </Big>
             <Soft
               onClick={() => {
@@ -643,8 +686,9 @@ export function JupiterLesson({
             <div className="space-y-3">
               <p className="text-center text-[13px] text-slate-500">行き先</p>
               <div className="rounded-2xl bg-sky-50 p-3 text-center text-[14px] font-bold text-sky-700 ring-2 ring-sky-300">
-                ダチへ（{inviter}・KIMORIN⭐︎）
+                ✓ ダチへ（{inviter}・KIMORIN⭐︎）
               </div>
+              <p className="text-center text-[11px] text-slate-400">88時間、空を飛んで、あなたの木に帰ります</p>
               <Big
                 tone="sky"
                 onClick={() => {

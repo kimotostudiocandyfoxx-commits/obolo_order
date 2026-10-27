@@ -1,5 +1,5 @@
 {
- "made": "2026-10-27T02:27:37.926Z",
+ "made": "2026-10-27T04:46:00.864Z",
  "sheets": {
   "cast": 0,
   "places": 0
@@ -8,7 +8,7 @@
   {
    "name": "MONBAN",
    "id": "monban",
-   "uses": 152,
+   "uses": 153,
    "aliases": [],
    "status": "needs-sheet",
    "sprite": null,
@@ -54,6 +54,18 @@
    "sheet": null
   },
   {
+   "name": "二人の曲",
+   "id": "c-gdstxb",
+   "uses": 3,
+   "aliases": [],
+   "status": "needs-sheet",
+   "sprite": null,
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "スクリーンのうんちピンポンくん",
    "id": "c-v6fvt7",
    "uses": 3,
@@ -66,8 +78,8 @@
    "sheet": null
   },
   {
-   "name": "合唱",
-   "id": "c-yyz7jm",
+   "name": "KIMORINの声",
+   "id": "c-1gmk1p8",
    "uses": 2,
    "aliases": [],
    "status": "needs-sheet",
@@ -104,18 +116,6 @@
   {
    "name": "コロリン",
    "id": "c-1qju2sy",
-   "uses": 1,
-   "aliases": [],
-   "status": "needs-sheet",
-   "sprite": null,
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
-   "name": "KIMORINの曲",
-   "id": "c-1h7n1z6",
    "uses": 1,
    "aliases": [],
    "status": "needs-sheet",
@@ -164,7 +164,7 @@
   {
    "name": "KIMORIN",
    "id": "kimorin",
-   "uses": 483,
+   "uses": 505,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/kimorin-1.webp",
@@ -190,7 +190,7 @@
   {
    "name": "ヒポキン",
    "id": "c-13wd9v8",
-   "uses": 172,
+   "uses": 175,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/hipokin.webp",
@@ -202,7 +202,7 @@
   {
    "name": "フリージー",
    "id": "c-1l8fmea",
-   "uses": 136,
+   "uses": 138,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/freezy.webp",
@@ -214,7 +214,7 @@
   {
    "name": "大根カイザー",
    "id": "c-16ueow0",
-   "uses": 83,
+   "uses": 85,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-16ueow0.webp",
@@ -247,6 +247,18 @@
    "sheet": null
   },
   {
+   "name": "たこ焼きシスター",
+   "id": "c-105b577",
+   "uses": 44,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/onboarding/takoyaki-sister.webp",
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
    "name": "バティ",
    "id": "c-1xpkc0o",
    "uses": 43,
@@ -259,21 +271,9 @@
    "sheet": null
   },
   {
-   "name": "たこ焼きシスター",
-   "id": "c-105b577",
-   "uses": 43,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/onboarding/takoyaki-sister.webp",
-   "client": [],
-   "candidates": [],
-   "pick": null,
-   "sheet": null
-  },
-  {
    "name": "ボスG",
    "id": "c-1hwam1f",
-   "uses": 18,
+   "uses": 35,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/bossg.webp",
@@ -285,7 +285,7 @@
   {
    "name": "うんちピンポンくん",
    "id": "c-131ge3q",
-   "uses": 17,
+   "uses": 19,
    "aliases": [],
    "status": "ready",
    "sprite": "/story/cast/c-131ge3q.webp",
@@ -295,6 +295,18 @@
    ],
    "candidates": [],
    "pick": "client",
+   "sheet": null
+  },
+  {
+   "name": "ハットG",
+   "id": "c-1pvfg32",
+   "uses": 10,
+   "aliases": [],
+   "status": "ready",
+   "sprite": "/onboarding/hatg.webp",
+   "client": [],
+   "candidates": [],
+   "pick": null,
    "sheet": null
   },
   {
@@ -329,18 +341,6 @@
    ],
    "candidates": [],
    "pick": "client",
-   "sheet": null
-  },
-  {
-   "name": "ハットG",
-   "id": "c-1pvfg32",
-   "uses": 6,
-   "aliases": [],
-   "status": "ready",
-   "sprite": "/onboarding/hatg.webp",
-   "client": [],
-   "candidates": [],
-   "pick": null,
    "sheet": null
   },
   {
@@ -421,7 +421,7 @@
   {
    "name": "ロングG",
    "id": "c-1pm5jmk",
-   "uses": 1,
+   "uses": 3,
    "aliases": [],
    "status": "ready",
    "sprite": "/onboarding/longg.webp",
@@ -476,10 +476,24 @@
    "name": "mars-city",
    "id": "mars-city",
    "scenes": [
-    "D07-S001"
+    "D07-S001",
+    "D07V-S001"
    ],
    "status": "ready",
    "image": "/onboarding/mars-city.jpg",
+   "client": [],
+   "candidates": [],
+   "pick": null,
+   "sheet": null
+  },
+  {
+   "name": "venus-stage",
+   "id": "venus-stage",
+   "scenes": [
+    "D07V-S001"
+   ],
+   "status": "needs-sheet",
+   "image": null,
    "client": [],
    "candidates": [],
    "pick": null,

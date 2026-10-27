@@ -23,7 +23,7 @@ mkdirSync(REPORT, { recursive: true });
 const parts = readdirSync(src).filter((d) => /^P\d+$/.test(d)).sort();
 const all: Scene[] = [];
 for (const p of parts) {
-  const files = readdirSync(join(src, p)).filter((f) => /^c\d+\.md$/.test(f)).sort();
+  const files = readdirSync(join(src, p)).filter((f) => /^c\d+[a-z]?\.md$/.test(f)).sort();
   const scenes = files.flatMap((f) => parseFile(readFileSync(join(src, p, f), 'utf8'), p, `${p}/${f}`));
   all.push(...scenes);
   writeFileSync(join(OUT, `${p}.json`), JSON.stringify(scenes));

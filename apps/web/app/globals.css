@@ -674,3 +674,16 @@ body {
   from { transform: scale(1.02) translate(0, 0); }
   to { transform: scale(1.15) translate(-3%, -2%); }
 }
+
+/* the golden seal before the invitation is opened (E-0, M-R131) */
+@keyframes sealPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 18px rgba(255, 200, 110, 0.45));
+  }
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 38px rgba(255, 210, 130, 0.85));
+  }
+}

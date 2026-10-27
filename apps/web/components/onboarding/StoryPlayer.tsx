@@ -24,6 +24,7 @@ import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/li
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
+import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
@@ -487,6 +488,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   );
   runRef.current = run;
 
+  // E-0 (M-R131): the seal before the invitation, only the very first time (read after mount: no hydration gap)
+  const [gateSeen, setGateSeen] = useState(true);
+  useEffect(() => setGateSeen(sealGateSeen()), []);
   const filmPart = useRef(0);
   const endFilm = () => {
     const s = steps[iRef.current];
@@ -903,6 +907,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           neo={v.neo || v.name}
           inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
+          food={v.batiFood}
           api={lessonApi ?? undefined}
           onDone={(made) => {
             // the day's kororins (their words) — Jupiter turns two of them into stickers tomorrow
@@ -1116,7 +1121,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
 
-      {!started && (
+      {!started && i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen && <SealGate onOpen={start} />}
+      {!started && !(i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen) && (
         <button className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black" onClick={start}>
           <span className="relative flex h-24 w-24 items-center justify-center">
             <span className="absolute inset-0 animate-ping rounded-full bg-amber-200/20" />

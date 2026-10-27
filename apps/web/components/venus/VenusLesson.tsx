@@ -47,7 +47,7 @@ const L = (who: Who, text: string): Step => ({ k: 'line', l: { who, text } });
 
 const OPEN: Step[] = [
   L('guide', '音が出ます。音を出せる場所か、イヤホンで遊んでください。回すのに、マナは使いません'),
-  L('bossg', '回すのは、自分の曲だけだ。映すのも、自分の映像だけだ。'),
+  L('bossg', '回すのは、お前が作ったものだ。最初の一枚だけ、こっちで用意した。'),
   L('kimorin', 'では、お手本を。'),
   { k: 'demo' },
   L('kimorin', 'ボカーンが、三倍ケン!!　……失礼。三倍です。'),
@@ -57,7 +57,7 @@ const OPEN: Step[] = [
 ];
 const SELF: Step[] = [
   L('bossg', '台は、二つ。左で鳴らしながら、右で次を待たせる。'),
-  L('bossg', '最初の一枚は、こっちで用意した。練習用のリズムだ。……次の一枚が、お前の曲だ。'),
+  L('bossg', '左の一枚が、練習用のリズムだ。……右の一枚が、お前の曲だ。'),
   { k: 'load' },
   L('hatg', '次の曲は、出だしに、印をつけておく。'),
   { k: 'cue' },
@@ -66,11 +66,11 @@ const SELF: Step[] = [
   L('bossg', 'つまみを、ゆっくり右へ。左が消えて、右が残る。それが、つなぐ、だ。'),
   { k: 'fade' },
 ];
-const AUTO: Step[] = [L('bossg', '材料を、三つ選べ。並べるのは、卓がやる。'), { k: 'pick' }, { k: 'join' }];
+const AUTO: Step[] = [L('bossg', '並べるのは、卓がやる。'), { k: 'pick' }, { k: 'join' }];
 const AFTER: Step[] = [
   { k: 'turning' },
   L('guide', '{neo}が、回している'),
-  L('kimorin', '……いま、この星を回しているのは、{neo}さんです。'),
+  L('kimorin', '……いま、この星を回しているのは、{neo}です。'),
   L('bossg', '……つながったな。それが、お前の曲だ。'),
   L('bossg', 'つなぎ目に、お前のコロリンを落としてもいい。'),
   { k: 'kororin' },
@@ -83,9 +83,6 @@ const AFTER: Step[] = [
 const SHOWN: Step[] = [{ k: 'post' }, L('guide', '届けました'), L('kimorin', '……私の夜空にも、届くのですね。では、今夜は、起きて待ちます。'), { k: 'end' }];
 const NOT_SHOWN: Step[] = [L('bossg', '見せるのは、いつでもいい。'), { k: 'end' }];
 
-const MATERIALS = ['song', 'mv', 'kororin', 'jacket'] as const;
-type Material = (typeof MATERIALS)[number];
-const MATERIAL_LABEL: Record<Material, string> = { song: '🎵 曲', mv: '🎬 映像', kororin: '🪐 コロリン', jacket: '🦋 ジャケット' };
 
 export function VenusLesson({
   song,
@@ -111,7 +108,6 @@ export function VenusLesson({
   const [cued, setCued] = useState(false);
   const [synced, setSynced] = useState(false);
   const [fader, setFader] = useState(0);
-  const [picked, setPicked] = useState<Material[]>([]);
   const [shown, setShown] = useState(false);
   const [post, setPost] = useState<'post' | 'to'>('post');
   const [drop, setDrop] = useState<string | null>(null);
@@ -165,6 +161,7 @@ export function VenusLesson({
         clearTimeout(done);
       };
     }
+    if (step.k === 'pick') void buildSet();
     if (step.k === 'turning') {
       const t = setTimeout(next, 3800);
       return () => clearTimeout(t);
@@ -436,24 +433,9 @@ export function VenusLesson({
       )}
       {step?.k === 'pick' && (
         <Panel>
-          <p className="text-center text-sm font-black text-violet-700">〔おまかせ〕｜材料を三つ選ぶ</p>
-          <p className="mt-1 text-center text-[11px] text-slate-400">セットは卓が組みます。あなたが押すのは、つなぐ時と、コロリンを落とす時だけ</p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {MATERIALS.map((m) => {
-              const n = picked.indexOf(m);
-              return (
-                <button key={m} onClick={() => setPicked((p) => (n >= 0 ? p.filter((x) => x !== m) : p.length < 3 ? [...p, m] : p))} className={`relative rounded-2xl py-4 text-sm font-black ${n >= 0 ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                  {MATERIAL_LABEL[m]}
-                  {n >= 0 && <span className="absolute right-2 top-1.5 text-[11px]">{n + 1}</span>}
-                </button>
-              );
-            })}
-          </div>
-          <div className="mt-3">
-            <Big tone="violet" disabled={picked.length < 3 || busy} onClick={() => void buildSet()}>
-              {busy ? '卓が、セットを組んでいます…' : 'これで組む'}
-            </Big>
-          </div>
+          <p className="text-center text-sm font-black text-violet-700">〔おまかせ〕</p>
+          <p className="mt-1 text-center text-[11px] leading-relaxed text-slate-400">旅で作ったもの（曲・映像・コロリン・ジャケット）から、卓がセットを組みます。あなたが押すのは、つなぐ時と、コロリンを落とす時だけ</p>
+          <p className="mt-3 animate-pulse text-center text-sm font-bold text-violet-500">卓が、棚の全部から、セットを組んでいます…</p>
         </Panel>
       )}
       {step?.k === 'show' && (

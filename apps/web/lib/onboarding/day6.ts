@@ -82,7 +82,7 @@ export const DAY6: Step[] = [
   { t: 'made', what: 'mv' }, // 大スクリーンに{neo}のMV（pick：選んだ一枚）が映る。ヒポキンが、メガホンを下ろして、しばらく黙って見ている
   { t: 'notice', text: '大スクリーンの上映は、お話の中だけです。この上映で、ほかの人に送られることはありません' },
   { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },
-  { t: 'say', who: 'KIMORIN', text: 'ご覧なさい。土星、木星、水星、火星。四つの星を、渡りきりました。……渡りきったケン!!　オレの発明のおかげ——' },
+  { t: 'say', who: 'KIMORIN', text: 'ご覧なさい。土星、木星、水星、火星。四つの星で、作りきりました。……作りきったケン!!　私の発明の——' },
   { t: 'say', who: 'KIMORIN', text: '……失礼。少々、熱くなりました。' },
   { t: 'se', sound: 'knock' }, // ヒポキンが、もう一度、指を鳴らす。パチン
   { t: 'branch', key: 'f_d07_screen', cases: { pick: 'pick-end' }, otherwise: 'big-end' },
@@ -104,12 +104,12 @@ export const DAY6: Step[] = [
   { t: 'se', sound: 'blip' }, // ピピッ。街じゅうの画面が、一斉に正方形のスクリーンに
   { t: 'screen', open: true },
   { t: 'say', who: 'MONBAN', text: '……そこまでだ…。' },
-  { t: 'say', who: 'MONBAN', text: 'おい…。そいつは、まだネオだ…。\n……あさってまでは、な…。' },
+  { t: 'say', who: 'MONBAN', text: 'おい…。そいつは、まだネオだ…。\n……あさってになれば、聞かせてやる…。' },
   { t: 'se', sound: 'egg-crack' }, // 謎の書の札2に、細いひびが一本、ぴしっと走る
   { t: 'say', who: 'KIMORIN', text: '『そいつ』？　……私も、ネオですが？' },
   { t: 'say', who: 'MONBAN', text: '……そいつも、だ…。' },
   { t: 'screen', open: false },
-  { t: 'say', who: 'KIMORIN', text: '……いつも、いい所で出てきますね。あさってまで、とは？' },
+  { t: 'say', who: 'KIMORIN', text: '……いつも、いい所で出てきますね。あさって、とは？' },
   { t: 'sprite', image: null },
   { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'mars', flip: true }, // 4つの欄が全部うまり、切符が金色に光って、ひとりでに裏返る
