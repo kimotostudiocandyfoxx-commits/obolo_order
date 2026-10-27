@@ -47,8 +47,9 @@ export const L2_MARS: Step[] = [
   { t: 'sprite', image: ['unchi-pinpon', 'kimorin-sun'] },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪' },
   // the stage shows the one who speaks: MIKIE⭐︎ (who never speaks) gets her own moment
+  { t: 'enter', who: 'mikie' }, // KIMORINの隣に、すっと出て、ぺこり
   { t: 'sprite', image: 'mikie' },
-  { t: 'caption', text: 'KIMORINの隣に、MIKIE⭐︎。ぺこり、と頭を下げた' },
+  { t: 'caption', text: 'MIKIE⭐︎が現れた' },
   { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: '……実は、もう一本、あります。' },
   { t: 'say', who: 'KIMORIN', text: 'ゆうべ、MIKIE⭐︎の台所で、二人で作りました。MIKIE⭐︎が話して、私が話して。それだけで、一曲です。' },
@@ -57,8 +58,8 @@ export const L2_MARS: Step[] = [
   // MIKIE⭐︎が、フックの先で、手もとの小さな機械を、そっと押す。同じ塔の画面に、MV
   { t: 'song', id: 'mikie-drill' },
   { t: 'bgm', track: 'mars' },
-  { t: 'sprite', image: 'mikie' },
-  { t: 'caption', text: 'MIKIE⭐︎は、ぺこりと頭を下げたまま' },
+  { t: 'sprite', image: 'mikie' }, // ぺこりと頭を下げたまま（会釈の姿勢で止まる）
+  { t: 'wait', s: 1.2 },
   { t: 'sprite', image: ['kimorin-sun', 'mikie'] }, // KIMORINのサングラスが鼻先までずり落ちる
   { t: 'say', who: 'KIMORIN', text: '……何回見ても、すごいケン……！' },
   { t: 'say', who: 'KIMORIN', text: '……失礼。話しただけで、ここまで、できるのです。' }, // 咳ばらい。サングラスをかけ直す
@@ -67,8 +68,8 @@ export const L2_MARS: Step[] = [
   { t: 'say', who: 'ヒポキン', text: '……いい画だ。' },
   { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: 'ちなみに、あの猫は、MIKIE⭐︎のバティ、みーちゃんです。' },
-  { t: 'sprite', image: 'mii' },
-  { t: 'caption', text: 'みーちゃんが、小さく、にゃあ' },
+  { t: 'sprite', image: 'mii' }, // みーちゃんが、小さく、にゃあ
+  { t: 'wait', s: 1.2 },
   { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: '{neo}。ぜひ、MIKIE⭐︎と、ダチになってあげてください。' },
   { t: 'choice', key: 'mikie', options: [{ label: 'MIKIE⭐︎とダチになる', goto: 'mfriend' }, { label: 'あとで', goto: 'mlater' }] },
@@ -90,7 +91,6 @@ export const L2_MARS: Step[] = [
   // スタジオ通りの角で、KIMORINが、手書きのチラシ『本日上映』を配っている。誰も受け取らない
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……お客様、第一号です。' },
-  { t: 'caption', text: 'チラシの看板に『天才の十秒　三本立て』' },
   { t: 'say', who: 'KIMORIN', text: '私の上映館は、すでにできております。' },
   { t: 'say', who: 'KIMORIN', text: '……一本目と二本目と三本目は、同じ作品です。並べる順に、こだわりました。' },
   { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },

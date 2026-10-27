@@ -55,7 +55,6 @@ export const L2_URANUS: Step[] = [
   { t: 'label', id: 'ushelf' },
   // いちばん奥の『空き棚』。KIMORINが看板のすみに、白い小旗を一本。サングラスを額に押し上げる。目の切れ目が青く光る
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'caption', text: '何も並んでいない棚。札『空き棚』' },
   { t: 'say', who: 'KIMORIN', text: 'オレもいつか、obolo商店に並べるケン。……黒くて、しましまのやつがいいケン。' },
   { t: 'sprite', image: ['unchi-pinpon', 'kimorin-sun'] },
   { t: 'say', who: 'うんちピンポンくん', text: '……ピンポン♪' },
@@ -79,7 +78,7 @@ export const L2_NEPTUNE: Step[] = [
   // 映像（豪華・約12秒）：白い嵐の渦→すごろくの盤・生け垣の迷路・町の模型の浮き島→光の橋 — a still for now
   { t: 'bgm', track: 'tender' },
   { t: 'still', image: 's/neptune-islands' },
-  { t: 'caption', text: '『ようこそ、Obolo Order。ここは、扉の奥の星。今日から、結社が用意したゲームで、遊べる。』' },
+  { t: 'notice', text: '札『ようこそ、Obolo Order。ここは、扉の奥の星。今日から、結社が用意したゲームで、遊べる。』' },
 
   // L2-NEPTUNE-S002 結社のゲームで遊ぶ
   { t: 'still', image: 's/neptune-town' }, // 模型の町の島。札：『題　キモリンの帰り道　用意した人　結社』。門の前に、二頭身の人形
