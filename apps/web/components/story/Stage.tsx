@@ -77,6 +77,8 @@ const CHAR: Record<string, CharSpec> = {
   longg: { bottom: 6, height: 70, face: 0.18, tint: '#a07ac8' },
   // KIMORIN's mother (second journey): right arm a silver hook, left arm a golden gatling (M-R135)
   mikie: { bottom: 8, height: 52, face: 0.22, tint: '#d0408a' },
+  // her cat, Mii-chan (MIKIE⭐︎'s Bati)
+  mii: { bottom: 10, height: 26, face: 0.4, tint: '#c8a070', bustMax: 1.4 },
 };
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
 export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);

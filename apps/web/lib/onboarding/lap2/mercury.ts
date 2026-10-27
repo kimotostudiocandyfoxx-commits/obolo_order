@@ -17,8 +17,9 @@ export const L2_MERCURY: Step[] = [
   { t: 'say', who: 'フリージー', text: '今日は、お前の島に、曲を置く。' },
   { t: 'say', who: 'フリージー', text: 'それと、集めたい音の島を、作る。' },
   // KIMORINの隣に、小柄な人が一人。濃いピンクのブラウス、丸いサングラス。左手は金色のガトリング、右手は銀色のフック。足もとに猫
-  { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
+  { t: 'sprite', image: 'mikie' },
   { t: 'caption', text: 'MIKIE⭐︎が、ぺこり、と頭を下げた' },
+  { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: '紹介します。私の母、MIKIE⭐︎です。' },
   { t: 'say', who: 'KIMORIN', text: '……招待しました。' },
   { t: 'sprite', image: ['@bati', 'kimorin-sun'] }, // {bati}が、無言で、KIMORINを見つめている

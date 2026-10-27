@@ -46,7 +46,10 @@ export const L2_MARS: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……天才の、十秒です。今回は、魔法を使わずに、自分で撮りました。' },
   { t: 'sprite', image: ['unchi-pinpon', 'kimorin-sun'] },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪' },
-  { t: 'sprite', image: ['kimorin-sun', 'mikie'] }, // KIMORINの隣に、MIKIE⭐︎。足もとに、猫のみーちゃん。ぺこり
+  // the stage shows the one who speaks: MIKIE⭐︎ (who never speaks) gets her own moment
+  { t: 'sprite', image: 'mikie' },
+  { t: 'caption', text: 'KIMORINの隣に、MIKIE⭐︎。ぺこり、と頭を下げた' },
+  { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: '……実は、もう一本、あります。' },
   { t: 'say', who: 'KIMORIN', text: 'ゆうべ、MIKIE⭐︎の台所で、二人で作りました。MIKIE⭐︎が話して、私が話して。それだけで、一曲です。' },
   { t: 'sprite', image: null },
@@ -54,7 +57,9 @@ export const L2_MARS: Step[] = [
   // MIKIE⭐︎が、フックの先で、手もとの小さな機械を、そっと押す。同じ塔の画面に、MV
   { t: 'song', id: 'mikie-drill' },
   { t: 'bgm', track: 'mars' },
-  { t: 'sprite', image: ['kimorin-sun', 'mikie'] }, // MIKIE⭐︎本人は、ぺこりと頭を下げたまま。KIMORINのサングラスが鼻先までずり落ちる
+  { t: 'sprite', image: 'mikie' },
+  { t: 'caption', text: 'MIKIE⭐︎は、ぺこりと頭を下げたまま' },
+  { t: 'sprite', image: ['kimorin-sun', 'mikie'] }, // KIMORINのサングラスが鼻先までずり落ちる
   { t: 'say', who: 'KIMORIN', text: '……何回見ても、すごいケン……！' },
   { t: 'say', who: 'KIMORIN', text: '……失礼。話しただけで、ここまで、できるのです。' }, // 咳ばらい。サングラスをかけ直す
   { t: 'say', who: 'KIMORIN', text: '{neo}にも、できますよ。私の次くらいには。' },
@@ -62,7 +67,9 @@ export const L2_MARS: Step[] = [
   { t: 'say', who: 'ヒポキン', text: '……いい画だ。' },
   { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: 'ちなみに、あの猫は、MIKIE⭐︎のバティ、みーちゃんです。' },
+  { t: 'sprite', image: 'mii' },
   { t: 'caption', text: 'みーちゃんが、小さく、にゃあ' },
+  { t: 'sprite', image: ['kimorin-sun', 'mikie'] },
   { t: 'say', who: 'KIMORIN', text: '{neo}。ぜひ、MIKIE⭐︎と、ダチになってあげてください。' },
   { t: 'choice', key: 'mikie', options: [{ label: 'MIKIE⭐︎とダチになる', goto: 'mfriend' }, { label: 'あとで', goto: 'mlater' }] },
   { t: 'label', id: 'mfriend' },
