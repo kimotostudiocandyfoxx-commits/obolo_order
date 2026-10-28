@@ -14,7 +14,7 @@
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 const KEY = process.env.SEEDREAM_API_KEY;
 if (!KEY) throw new Error('SEEDREAM_API_KEY is not set');
@@ -56,7 +56,9 @@ async function paint(x) {
   const got = !j.errors?.length && j.data?.[0]?.imageURL;
   if ((!res.ok && !got) || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
   const d = j.data?.[0];
-  const raw = join(OUT, `_${x.id}.jpg`);
+  // an id may hold a folder (art/review: V01/K01-a)
+  mkdirSync(dirname(join(OUT, x.id)), { recursive: true });
+  const raw = join(OUT, `${x.id}.raw.jpg`);
   writeFileSync(raw, Buffer.from(await (await fetch(d.imageURL, { signal: AbortSignal.timeout(60_000) })).arrayBuffer()));
   const [w, h] = x.size;
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-vf', `scale=${w}:${h}:flags=lanczos`, '-q:v', '2', join(OUT, `${x.id}.jpg`)]);

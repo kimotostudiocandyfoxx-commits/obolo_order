@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['claude/**', main]
-    paths: ['design/ui-art-queue.json', 'design/story-art-queue.json', 'design/atelier-art-queue.json', 'design/ui-parts-queue.json']
+    paths: ['design/ui-art-queue.json', 'design/story-art-queue.json', 'design/review-art-queue.json', 'design/atelier-art-queue.json', 'design/ui-parts-queue.json']
 
 concurrency:
   group: ui-art-${{ github.ref }}
@@ -44,12 +44,13 @@ jobs:
           node scripts/ui-art/paint.mjs design/story-art-queue.json
           node scripts/ui-art/paint.mjs design/atelier-art-queue.json
           node scripts/ui-art/paint.mjs design/ui-parts-queue.json
+          node scripts/ui-art/paint.mjs design/review-art-queue.json
       - name: Save the pictures to the branch
         if: always()
         run: |
           git config user.name "ui-art"
           git config user.email "ui-art@users.noreply.github.com"
-          git add -f apps/web/public/dj/art apps/web/public/onboarding/s apps/web/public/atelier/raw apps/web/public/ui/parts/raw design/ui-parts-queue.json design/ui-art-queue.json design/story-art-queue.json design/atelier-art-queue.json
+          git add -f apps/web/public/dj/art apps/web/public/onboarding/s apps/web/public/atelier/raw apps/web/public/ui/parts/raw design/ui-parts-queue.json design/ui-art-queue.json design/story-art-queue.json design/atelier-art-queue.json art/review design/review-art-queue.json
           git diff --cached --quiet && exit 0
           git commit -m "UI art: new pictures [skip ci]"
           for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
