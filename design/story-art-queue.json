@@ -4989,6 +4989,20 @@
     "apps/web/public/onboarding/s/arr-mars-city.jpg"
    ],
    "prompt": "The comms room of an old secret-society temple on Earth: a whole wall of an antique telephone switchboard with hundreds of plug holes and brass fittings, only a few with name plates, cords hanging; an old wooden desk in the corner with a white envelope and a magnifying glass; warm lamplight, an iron door standing open. Painterly anime film quality in the palette of the reference. No people, no text, no letters."
+  },
+  {
+   "id": "mikie-gold",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    864,
+    1152
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/mikie-cand-2.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same — the woman, her face, round sunglasses, hair, magenta blouse, patterned skirt, pose, the silver hook on her right arm (viewer's left), framing, light and the flat plain mid-grey background (#808080) — and change only the gatling gun that is her LEFT forearm (on the viewer's right): it becomes shiny polished GOLD metal (gold barrels, gold body), with the little seasoning bottles still loaded. The hook stays silver. No text, no letters."
   }
  ],
  "redo": []
