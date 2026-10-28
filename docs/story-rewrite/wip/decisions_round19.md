@@ -974,3 +974,10 @@
 - 1日目 D01-S000 の〔画面〕の理由の文を「年齢に合わせて、守りの設定と、あとで作る姿の絵を合わせるためです。ほかの人には見えません」に変えた（年齢を何に使うかを正しく書く）。
 - 描く仕組みへの渡し方（UI）：生まれた年や年齢そのものは描く仕組みに渡さず、年齢の帯（under15／15-24／25plus）だけを渡す。25plus の指示文の例：「youthful-looking adult, appears in the mid-to-late twenties, smooth healthy skin; no wrinkles, no smile lines, no under-eye bags, no age spots, no grey or thinning hair; keep the face shape, hairstyle and vibe of the photo; not childlike」。under15：「a young teenager, wholesome, no makeup, age-appropriate clothes」。
 
+## M-R173 姿の絵は日本のアニメ寄り・キャラっぽい絵も選べる（利用者決定／第21稿。確定稿の変更を含む）
+- D03-S004（と星休めの描き直し）の姿の絵は、**日本のアニメ寄りのセミリアル**にする。アメリカっぽい顔・塗り（カートゥーン、アメコミ、3DCGのような顔）にしない。
+- 4枚のうち **2枚は日本のアニメ寄りのセミリアル、2枚はもっとキャラっぽいアニメの絵**（線がはっきり、塗りはアニメの影、顔のつくりはもっと簡単に）。どちらも、選んだ動物の耳・秘密結社のフード・選んだ色・細い金ぶちの丸いサングラス（目は見せない）は同じ。写真を使わない時は、男の子っぽい姿と女の子っぽい姿を、それぞれのタッチで1枚ずつ。
+- 描き直しで本人が「もっとキャラっぽく」「もっとリアルに」と言ってもよい（本人の言葉を優先）。M-R172（年齢に合わせる・25歳以上は老けを感じさせない）は、どちらのタッチにもかける。
+- 本文の〔ト書き〕（photo・nophoto の4枚の説明）を、このとおりに直した。bible・front・画面設計の「セミリアルの絵」も「日本のアニメ寄りのセミリアルの絵（もっとキャラっぽい絵も選べる）」にそろえた。
+- 指示文の例（UI）：セミリアル「Japanese anime-style semi-realistic illustration, modern Japanese anime key-visual look, clean fine line art, soft cel shading with gentle painterly light, Japanese character design」。キャラっぽい「Japanese anime character illustration, bold clean outlines, flat cel shading, simplified anime facial features, vivid colours」。否定の欄：「western cartoon, american comic style, 3D render, pixar style, photorealistic」。作家・スタジオ・作品の名前は入れない（M-R167 と同じ）。
+
