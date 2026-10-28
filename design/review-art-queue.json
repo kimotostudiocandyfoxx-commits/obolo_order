@@ -4,6 +4,50 @@
  "always": "",
  "items": [
   {
+   "id": "gen-tests/photos/p1",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    768,
+    1024
+   ],
+   "refs": [],
+   "prompt": "Vertical photorealistic smartphone selfie-style portrait photo, natural light, a fictional person who does not exist, upper body, plain everyday background, sharp face. No text, no logos. a Japanese woman in her twenties with long black hair, smiling, light cardigan, cafe window light."
+  },
+  {
+   "id": "gen-tests/photos/p2",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    768,
+    1024
+   ],
+   "refs": [],
+   "prompt": "Vertical photorealistic smartphone selfie-style portrait photo, natural light, a fictional person who does not exist, upper body, plain everyday background, sharp face. No text, no logos. a man in his forties with a short beard and round glasses, grey t-shirt, outdoors in a park."
+  },
+  {
+   "id": "gen-tests/photos/p3",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    768,
+    1024
+   ],
+   "refs": [],
+   "prompt": "Vertical photorealistic smartphone selfie-style portrait photo, natural light, a fictional person who does not exist, upper body, plain everyday background, sharp face. No text, no logos. a teenage boy around sixteen with short curly brown hair and a hoodie, slight grin, school hallway."
+  },
+  {
+   "id": "gen-tests/photos/p4",
+   "w": 1152,
+   "h": 1536,
+   "size": [
+    768,
+    1024
+   ],
+   "refs": [],
+   "prompt": "Vertical photorealistic smartphone selfie-style portrait photo, natural light, a fictional person who does not exist, upper body, plain everyday background, sharp face. No text, no logos. a woman in her sixties with a silver bob haircut and red lipstick, patterned scarf, warm living room."
+  },
+  {
    "id": "sheets/kimorin-lab-a",
    "w": 2048,
    "h": 1152,

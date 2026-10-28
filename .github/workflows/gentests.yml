@@ -1,0 +1,111 @@
+name: Generation tests
+
+# The real generation of days 2–3 tried many ways (scripts/smoke/gentests.mjs), as a one-off Cloud Run job with the
+# API's own service account (the admin token stays in Google Cloud). The sample photos are pictures of fictional
+# people painted for the test (art/review/saturn/gen-tests/photos). Results go to art/review/saturn/gen-tests/.
+on:
+  workflow_dispatch:
+
+env:
+  REGION: asia-northeast1
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+concurrency:
+  group: gentests-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  gentests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Run the generation tests in Cloud Run
+        run: |
+          pip install -q pillow
+          # the sample photos, small enough to ride in environment variables (as the app downscales them too)
+          python3 - <<'PY'
+          import glob, base64, io
+          from PIL import Image
+          out = []
+          for k, f in enumerate(sorted(glob.glob('art/review/saturn/gen-tests/photos/p*.jpg'))[:4], 1):
+              im = Image.open(f).convert('RGB'); im.thumbnail((448, 448))
+              q = 70
+              while True:
+                  b = io.BytesIO(); im.save(b, 'JPEG', quality=q); d = base64.b64encode(b.getvalue()).decode()
+                  if len(d) < 30000 or q <= 35: break
+                  q -= 5
+              out.append(f'PHOTO{k}={d}')
+          open('photos.env', 'w').write('##'.join(out))
+          print('photos', len(out))
+          PY
+          API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.${REGION}.run.app"
+          IMAGE=$(gcloud run services describe obolo-api --region "$REGION" --format='value(spec.template.spec.containers[0].image)')
+          PHOTOS=$(cat photos.env)
+          gcloud run jobs deploy obolo-gentests --region "$REGION" --image "$IMAGE" --service-account "$RUNTIME_SA" \
+            --set-secrets ADMIN_TOKEN=obolo-admin-token:latest \
+            --set-env-vars "^##^API=$API##SCRIPT_B64=$(base64 -w0 scripts/smoke/gentests.mjs)${PHOTOS:+##$PHOTOS}" \
+            --command node --args "^##^--input-type=module##-e##await import('data:text/javascript;base64,' + process.env.SCRIPT_B64)" \
+            --memory 1Gi --task-timeout 2400 --max-retries 0 --quiet
+          EXEC=$(gcloud run jobs execute obolo-gentests --region "$REGION" --wait --format='value(metadata.name)' || true)
+          echo "execution $EXEC"
+          sleep 30
+          gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=obolo-gentests AND labels.\"run.googleapis.com/execution_name\"=\"$EXEC\"" \
+            --order=asc --limit=2000 --format='value(textPayload)' > log.txt || true
+          cat log.txt
+          D=art/review/saturn/gen-tests
+          mkdir -p $D
+          grep '^IMG ' log.txt | while read -r _ name url; do
+            ext=$(echo "$url" | grep -oE '\.(png|jpe?g|webp)' | tail -1); ext=${ext:-.img}
+            curl -sfL "$url" -o "$D/$name$ext" || echo "fetch failed $name"
+          done
+          python3 - <<'PY'
+          import glob, os, re
+          from PIL import Image, ImageDraw
+          D = 'art/review/saturn/gen-tests'
+          log = open('log.txt').read().splitlines()
+          rows = [l[6:].split(' | ') for l in log if l.startswith('TABLE ')]
+          md = ['# 生成テスト（本番）', '', '写真は、テスト用に描いた架空の人物です。', '']
+          def table(kind, head):
+              rs = [r[1:] for r in rows if r[0] == kind]
+              if not rs: return
+              md.extend(['| ' + ' | '.join(head) + ' |', '|' + '---|' * len(head)] + ['| ' + ' | '.join(r) + ' |' for r in rs] + [''])
+          md.append('## a) 姿（D03-S004）'); table('look', ['ケース', '候補', '時間'])
+          md.append('## b) バティの誕生（D03-S005）'); table('bati', ['たまご・食べ物', '結果', '時間'])
+          md.append('## c) バティとの会話（D03-S008）'); table('talk', ['#', '質問', '答え', '答えの時間', '〔🖼 絵で見る〕の絵と出どころ', '絵の時間'])
+          md.append('## 失敗・エラー'); md.extend(['- ' + l for l in log if l.startswith('ERR') or l.startswith('!!')] or ['- なし'])
+          open(f'{D}/results.md', 'w').write('\n'.join(md) + '\n')
+          # one contact sheet per group
+          for g in ['look', 'bati', 'talk']:
+              fs = sorted(f for f in glob.glob(f'{D}/{g}-*') if not f.endswith('.md'))
+              if not fs: continue
+              W, cols = 240, 6
+              S = Image.new('RGB', (W * cols, (W + 20) * ((len(fs) + cols - 1) // cols)), '#333')
+              d = ImageDraw.Draw(S)
+              for i, f in enumerate(fs):
+                  try:
+                      im = Image.open(f).convert('RGBA'); bg = Image.new('RGBA', im.size, (70, 70, 80, 255)); bg.alpha_composite(im)
+                      im = bg.convert('RGB'); im.thumbnail((W, W))
+                      x, y = (i % cols) * W, (i // cols) * (W + 20)
+                      S.paste(im, (x, y + 20)); d.text((x + 4, y + 4), os.path.basename(f).rsplit('.', 1)[0], fill='white')
+                  except Exception as e:
+                      print('skip', f, e)
+              S.save(f'{D}/sheet-{g}.jpg', quality=82)
+          PY
+          grep -v '^IMG ' log.txt > $D/log.txt || true
+          git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $D
+          git diff --cached --quiet || git commit -m "Generation tests: pictures, table and log [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
