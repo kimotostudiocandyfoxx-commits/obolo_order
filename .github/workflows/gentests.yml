@@ -5,6 +5,10 @@ name: Generation tests
 # people painted for the test (art/review/saturn/gen-tests/photos). Results go to art/review/saturn/gen-tests/.
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/gentests.yml
+      - scripts/smoke/gentests.mjs
 
 env:
   REGION: asia-northeast1
