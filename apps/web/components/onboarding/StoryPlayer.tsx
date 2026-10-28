@@ -25,7 +25,6 @@ import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/components/story/Stage';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
-import { markHeard } from '@/lib/story/heard';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
@@ -892,8 +891,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 
 
   const next = () => {
-    const st = steps[iRef.current];
-    if (st?.t === 'say') markHeard(st.who, st.text);
     voice.current?.stop();
     fadeLongSfx();
     run(iRef.current + 1);
