@@ -25,7 +25,7 @@ import { madeFrom } from '@/lib/onboarding/made';
 import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/components/story/Stage';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
-import { markHeard, noWaitVoice, setNoWaitVoice, wasHeard } from '@/lib/story/heard';
+import { markHeard } from '@/lib/story/heard';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
@@ -340,8 +340,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const mixRef = useRef(mix);
   mixRef.current = mix;
   const [mixerOpen, setMixerOpen] = useState(false);
-  const [noWait, setNoWait] = useState(false);
-  useEffect(() => setNoWait(noWaitVoice()), []);
+  /** the line's voice is on its way: a tap waits for it as for the voice itself */
+  const [voiceLoading, setVoiceLoading] = useState(false);
   const voice = useRef<LineVoice | null>(null);
   if (typeof window !== 'undefined') voice.current ??= new LineVoice();
 
@@ -709,6 +709,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const vc = voice.current;
     if (!vc) return;
     vc.onSpeaking = setTalking;
+    vc.onLoading = setVoiceLoading;
     return () => vc.dispose();
   }, []);
   // the lines with the member's names in them: their own voices, made in the background
@@ -897,21 +898,31 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     fadeLongSfx();
     run(iRef.current + 1);
   };
-  // M-R102: a first-time line moves on only after its voice (a tap meanwhile shows the rest of the words);
-  // a line heard before goes any time; "声を待たずに進む" or the voices turned off lift the wait; core lines hold
+  // a spoken line is always heard to the end (client 2026-10-28, replacing M-R102's skip for lines heard before):
+  // a tap meanwhile only shows the rest of the words; the voices turned down or the sound off lift the wait
   const sayStep = step?.t === 'say' ? step : null;
-  // never stuck behind a voice that did not end: past the line's own length, the tap goes through
+  // never stuck behind a voice that did not come or did not end: a voice that never starts lets the tap through after
+  // 4 s + 0.26 s a character, one that started after its own length + 1 s
   const [waitOver, setWaitOver] = useState(false);
+  const waitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     setWaitOver(false);
+    clearTimeout(waitTimer.current);
     if (steps[i]?.t !== 'say') return;
-    const t = setTimeout(() => setWaitOver(true), 4000 + (steps[i] as { text: string }).text.length * 260);
-    return () => clearTimeout(t);
+    waitTimer.current = setTimeout(() => setWaitOver(true), 4000 + (steps[i] as { text: string }).text.length * 260);
+    return () => clearTimeout(waitTimer.current);
   }, [i, steps]);
-  const mustWait = !!sayStep && talking && !waitOver && (!!sayStep.hold || (!noWait && mix.voice > 0 && !wasHeard(sayStep.who, sayStep.text)));
+  useEffect(() => {
+    const d = voice.current?.duration() ?? 0;
+    if (!talking || !d || steps[iRef.current]?.t !== 'say') return;
+    clearTimeout(waitTimer.current);
+    waitTimer.current = setTimeout(() => setWaitOver(true), (d + 1) * 1000);
+  }, [talking, steps]);
+  const mustWait = !!sayStep && (talking || voiceLoading) && !waitOver && !muted && (!!sayStep.hold || mix.voice > 0);
   const tapLine = () => {
-    if (sayStep && !sayStep.hold && wasHeard(sayStep.who, sayStep.text)) return next();
-    if (!reveal.current.done) return reveal.current.finish();
+    // only a line types in: a caption in the thread goes on at once (the typing state of the line before stayed
+    // behind and swallowed every tap after 「OBOLONが現れた」, client 2026-10-28)
+    if (sayStep && !reveal.current.done) return reveal.current.finish();
     if (mustWait) return;
     next();
   };
@@ -1422,11 +1433,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
               mix={mix}
               onChange={setMix}
               onClose={() => setMixerOpen(false)}
-              noWait={noWait}
-              onNoWait={(on) => {
-                setNoWait(on);
-                setNoWaitVoice(on);
-              }}
             />
           </div>
         </div>

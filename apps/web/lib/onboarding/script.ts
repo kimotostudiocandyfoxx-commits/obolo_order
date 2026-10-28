@@ -273,6 +273,8 @@ export function bgmAt(steps: Step[], i: number): string | null {
   for (let k = Math.min(i, steps.length - 1); k >= 0; k--) {
     const s = steps[k];
     if (s.t === 'bgm') return s.track;
+    // a motion before this step that brought its music in partway (`bgmAt`); the motion at `i` itself cues it when it plays
+    if (s.t === 'video' && s.bgmAt && k < i) return s.bgmAt.track;
   }
   return null;
 }

@@ -70,6 +70,13 @@ export class LineVoice {
   private personal: Record<string, string> = {};
   /** speaking (true) / quiet (false): the stage moves mouths and dips the music */
   onSpeaking: (on: boolean) => void = () => undefined;
+  /** a line's voice is on its way (fetched / decoded, not started yet): the story waits for it as for the voice itself */
+  onLoading: (on: boolean) => void = () => undefined;
+  /** how long the line playing now is (s; 0 while unknown) */
+  duration(): number {
+    if (this.src?.buffer) return this.src.buffer.duration;
+    return this.el && Number.isFinite(this.el.duration) ? this.el.duration : 0;
+  }
 
   constructor() {
     void loadManifest();
@@ -93,7 +100,10 @@ export class LineVoice {
       el.preload = 'auto';
       el.setAttribute('playsinline', '');
       el.addEventListener('ended', () => this.onSpeaking(false));
-      el.addEventListener('playing', () => this.onSpeaking(true));
+      el.addEventListener('playing', () => {
+        this.onLoading(false);
+        this.onSpeaking(true);
+      });
       this.el = el;
     }
   }
@@ -170,9 +180,11 @@ export class LineVoice {
     const t = ++this.token;
     const url = await this.urlOf(who, text, act);
     if (!url || t !== this.token) return;
+    this.onLoading(true);
     if (this.ctx && this.gain) {
       const buf = await this.buffer(url);
-      if (!buf || t !== this.token) return;
+      if (t !== this.token) return;
+      if (!buf) return this.onLoading(false);
       if (this.ctx.state !== 'running') void this.ctx.resume();
       const src = this.ctx.createBufferSource();
       src.buffer = buf;
@@ -185,17 +197,22 @@ export class LineVoice {
       };
       src.start();
       this.src = src;
+      this.onLoading(false);
       this.onSpeaking(true);
       return;
     }
-    if (!this.el) return;
+    if (!this.el) return this.onLoading(false);
     this.el.src = url;
     this.applyLevel();
-    void this.el.play().catch(() => this.onSpeaking(false));
+    void this.el.play().catch(() => {
+      this.onLoading(false);
+      this.onSpeaking(false);
+    });
   }
 
   stop() {
     this.token++;
+    this.onLoading(false);
     if (this.src) {
       const s = this.src;
       this.src = null;

@@ -299,8 +299,15 @@ export function SaturnLesson({
   useEffect(() => {
     shownAt.current = Date.now();
   }, [i]);
+  // a spoken line is heard to the end, as in the story (client 2026-10-28); never stuck behind a voice that did not
+  // come or did not end: 4 s + 0.26 s a character, or once it started, its own length + 1 s
+  const voiceBusy = useRef(false);
+  const voiceUntil = useRef(0);
   const tapNext = () => {
-    if (Date.now() - shownAt.current < 600) return;
+    const now = Date.now();
+    if (now - shownAt.current < 600) return;
+    const len = beat?.k === 'say' ? fill(beat.text).length : 0;
+    if (voiceBusy.current && now < (voiceUntil.current || shownAt.current + 4000 + len * 260)) return;
     next();
   };
 
@@ -347,7 +354,13 @@ export function SaturnLesson({
     const v = voice.current;
     if (!v) return;
     let spokeAt = -1;
+    v.onLoading = (on) => {
+      voiceBusy.current = on;
+      voiceUntil.current = 0;
+    };
     v.onSpeaking = (on) => {
+      voiceBusy.current = on;
+      voiceUntil.current = on && v.duration() ? Date.now() + (v.duration() + 1) * 1000 : 0;
       if (on) {
         heard.current = iRef.current;
         clearTimeout(readTimer.current);

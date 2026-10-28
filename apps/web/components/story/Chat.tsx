@@ -56,6 +56,8 @@ export function ChatLog({
   // three bubbles at most; the older ones fade and shrink fast so they don't sit over the standing pictures (story chat, 2026-10-26)
   const shown = entries.slice(-3);
   const last = shown[shown.length - 1];
+  // the typing state belongs to the newest line only: a caption or a reply on top leaves nothing to finish
+  if (last?.kind !== 'them') reveal.current = { done: true, finish: () => undefined };
   return (
     // fades in with the shade under it (QA 11 R35: the gradient popped in)
     <div
