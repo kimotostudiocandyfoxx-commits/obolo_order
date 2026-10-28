@@ -70,7 +70,8 @@ async function bati(egg, food, faces) {
   const h = await safe(`hatch ${id}`, () => call(t, 'POST', '/me/bati/hatch'));
   if (h?.j.bati?.imageUrl) img(`bati-${id}`, h.j.bati.imageUrl);
   // a 200 with no picture is a failure (test 1: the table said ok for births that came back without one)
-  out(`TABLE bati | ${id} | ${h?.j.bati?.imageUrl ? 'ok' : 'failed'} | ${h?.s ?? '-'}s`);
+  // the egg's plain body standing in is not ok either (story chat, test 2)
+  out(`TABLE bati | ${id} | ${!h?.j.bati?.imageUrl ? 'failed' : h.j.bati.stand ? 'stand-in (repainting)' : 'ok'} | ${h?.s ?? '-'}s`);
   if (!faces || !h) return;
   await safe('name', () => call(t, 'POST', '/me/bati/name', { name: 'テスト' }));
   const f = await safe(`faces ${id}`, () => call(t, 'POST', '/me/bati/faces'));
