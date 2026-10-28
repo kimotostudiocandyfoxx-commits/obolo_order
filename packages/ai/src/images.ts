@@ -73,7 +73,16 @@ export class SeedreamImageProvider implements ImageProvider {
     if (this.running >= this.maxAtOnce) await new Promise<void>((go) => this.waiting.push(go));
     this.running++;
     try {
-      return await this.paint(prompt, seed, refs);
+      // Runware refuses while the account's reserved credit is used up (concurrentRequestLimitExceeded, generation
+      // test run 3): wait for the others to finish and try again, a few times
+      for (let k = 0; ; k++) {
+        try {
+          return await this.paint(prompt, seed, refs);
+        } catch (e) {
+          if (k >= 3 || !/concurrentRequestLimitExceeded/.test(String(e))) throw e;
+          await new Promise((r) => setTimeout(r, 8000 * (k + 1)));
+        }
+      }
     } finally {
       this.running--;
       this.waiting.shift()?.();
