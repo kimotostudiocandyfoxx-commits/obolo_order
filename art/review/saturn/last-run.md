@@ -1,10 +1,10 @@
-# UI art — 2026-10-28T11:37:34.735Z
+# UI art — 2026-10-28T12:02:38.270Z
 
-Seedream 5.0 Pro / 152枚 / 約72円
+Seedream 5.0 Pro / 142枚 / 約70円
 
 - ⏸ V02/K10-a: 時間切れ、次回
-- ⏸ V02/K10-r1a: 元の絵ができなかったので次回
-- ⏸ V02/K10-r1b: 元の絵ができなかったので次回
+- ⏸ V02/K10-r1a: 時間切れ、次回
+- ⏸ V02/K10-r1b: 時間切れ、次回
 - ⏸ V02/K11-b: 時間切れ、次回
 - ⏸ V02/K12-a: 時間切れ、次回
 - ⏸ V02/K12-c: 時間切れ、次回
@@ -13,15 +13,9 @@ Seedream 5.0 Pro / 152枚 / 約72円
 - ⏸ V02/K13-c: 時間切れ、次回
 - ⏸ V02/K13b-a: 時間切れ、次回
 - ⏸ V02/K13b-b: 時間切れ、次回
-- ⏸ V02/K13b-r1a: 時間切れ、次回
-- ⏸ V02/K13b-r1b: 時間切れ、次回
 - ⏸ V02/K14-a: 時間切れ、次回
 - ⏸ V02/K14-b: 時間切れ、次回
 - ⏸ V02/K14-c: 元の絵ができなかったので次回
-- ⏸ V02/K14-r1a: 時間切れ、次回
-- ⏸ V02/K14-r1b: 時間切れ、次回
-- ⏸ V02/K3-c: 時間切れ、次回
-- ⏸ V02/K4-a: 時間切れ、次回
 - ⏸ V02/K4-c: 元の絵ができなかったので次回
 - ⏸ V02/K8-a: 時間切れ、次回
 - ⏸ V05/K2-a: 時間切れ、次回
@@ -120,28 +114,19 @@ Seedream 5.0 Pro / 152枚 / 約72円
 - ⏸ stills/saturn-sleep-a: 時間切れ、次回
 - ⏸ stills/saturn-sleep-b: 時間切れ、次回
 - ⏸ stills/saturn-sleep-c: 時間切れ、次回
-- ✅ V01/K13-a
-- ✅ V01/K18-a
-- ✅ V01/K8-b
-- ✅ V02/K11-r1b
-- ✅ V02/K13-r1a
-- ✅ V02/K4-r1a
-- ✅ V02/K4-r1b
-- ✅ V02/K5-r1a
-- ✅ V02/K6-r1a
-- ✅ V02/K6-r1b
-- ✅ V02/K6-r1c
-- ✅ V02/K7-r1a
-- ✅ V02/K7-r1b
-- ✅ V02/K8-r1a
-- ✅ V02/K8-r1b
-- ✅ V02/K9-r1b
-- ✅ sheets/kimorin-lab-r1a
-- ✅ sheets/kimorin-lab-r1b
-- ✅ sheets/rocket-r1a
-- ✅ sheets/rocket-r1b
-- ✅ sheets/rocket-r1c
-- ❌ V01/K12-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ✅ V01/K12-c
+- ✅ V02/K13b-r1a
+- ✅ V02/K13b-r1b
+- ✅ V02/K4-a
+- ✅ V02/K9-r1a
+- ✅ sprites/kimorin-xs-slip-a
+- ✅ sprites/kimorin-xs-slip-b
+- ✅ stills/d2-bed-earth-a
+- ✅ stills/d2-bed-earth-b
+- ✅ stills/d2-bed-earth-c
+- ✅ stills/d2-obolon-squint-a
+- ✅ stills/d2-obolon-squint-c
+- ✅ stills/d3-obolon-listen-c
 - ❌ V01/K4-r1a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
 - ❌ V01/K9-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
 - ❌ V02/K1-r1a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
@@ -151,6 +136,11 @@ Seedream 5.0 Pro / 152枚 / 約72円
 - ❌ V02/K11-r1c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
 - ❌ V02/K13-r1b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
 - ❌ V02/K13-r1c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K14-r1a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K14-r1b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K3-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
 - ❌ V02/K3-r1c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
 - ❌ V02/K5-r1c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V02/K9-r1a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ stills/d2-obolon-squint-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ stills/d3-obolon-listen-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ stills/d3-obolon-listen-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
