@@ -9,13 +9,15 @@ import { useAuth } from '@/lib/auth';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
+import { singKororin, singUrl } from '@/lib/saturn/sing';
 import { KororinWorld } from './KororinWorld';
 
 /**
  * Day 3 on Saturn (D04-S005〜S006; story 9ec42f9, M-R85 — client 2026-10-25). The voice comes out for the
  * first time here, on the real Saturn world (ころりんぱ):
  *  1. outside the temple, round Saturn stones: you blow words into a stone, your {bati} touches it and it
- *     becomes a kororin that speaks your words in your own voice two semitones up (KIMORIN⭐︎ first, with
+ *     becomes a kororin that sings your words in your own voice, a cappella on a short club melody (M-R152,
+ *     lib/saturn/sing; KIMORIN⭐︎ first, with
  *     うんちピンポンくん; a slip of paper with words to read for anyone who cannot think of any)
  *  2. after a spoken murmur: make {bati}'s voice your voice a little higher too? ［する／今のままでいい］
  *  3. the brother's how-to, then ［もうひとつ、つぶやいてみる／今日は、ここまで］ (topics to start from)
@@ -39,7 +41,6 @@ const SPEAKER: Record<Who, string> = { brother: 'たこ焼きブラザー', sist
 const NAMES: Record<Who, string> = { brother: 'たこ焼きブラザー', sister: 'たこ焼きシスター', kimorin: 'KIMORIN⭐︎', pinpon: 'うんちピンポンくん', bati: 'バティ', guide: '' };
 const SPRITES: Partial<Record<Who, string>> = { brother: 'takoyaki-brother', sister: 'takoyaki-sister', kimorin: 'kimorin-sun', pinpon: 'unchi-pinpon' };
 
-/** KIMORIN⭐︎'s words for the stone (his kororin says them in his voice two semitones up) */
 /** the residents' kororin that rolls to your feet on Saturn (story M-R107) */
 const SISTER_SUNSET = '……今日の夕焼け、きれいだったワ。';
 const KIMORIN_STONE = 'ぷりぷりぷりり！ぷりぷりぷりり！うひょひょひょげへへ！ぷりぷりぷりりり！うん！うん！うんちピンポーン大正かーい！ぷり！げへへへ！ぷりぷり滑り台でボカーン！';
@@ -63,7 +64,7 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'kimorin', text: 'タッチ..' },
   { k: 'listen', id: 'kimorin' },
   { k: 'say', who: 'kimorin', text: '楽しいですね。' }, // シーン……
-  { k: 'say', who: 'sister', text: 'そう、コロリンは喋るの。' },
+  { k: 'say', who: 'sister', text: 'そう、コロリンは歌うの。' },
   { k: 'say', who: 'sister', text: '{neo}もやってみたらいいワ。' },
   { k: 'say', who: 'brother', text: 'なんでもいいから石に声を吹き込むんだZE！' },
   { k: 'say', who: 'kimorin', text: '思いつかない時は、これを読んでください。' },
@@ -77,7 +78,7 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'brother', text: 'つぶやいたコロリンは、全部、土星の空を、リングとなって舞うZE。' },
   { k: 'say', who: 'brother', text: 'つぶやいたコロリンは、自分の部屋に落としとけばいいんだZE。' },
   { k: 'say', who: 'brother', text: 'だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
-  { k: 'note', text: '〔🎙〕を押して、{bati}に向かって、独り言みたいにつぶやく（声を出せない時は、すみの⌨で文字でも）→ {bati}がコロリンにする → タップすると喋る → 〔自分の部屋に飛ばす〕' },
+  { k: 'note', text: '〔🎙〕を押して、{bati}に向かって、独り言みたいにつぶやく（声を出せない時は、すみの⌨で文字でも）→ {bati}がコロリンにする → タップすると歌う → 〔自分の部屋に飛ばす〕' },
   { k: 'choice' },
   // D04-S005b コロリンのデザイン (draft 21, M-R124): KIMORIN⭐︎ first, then yours (answers or おまかせ → four → one redo)
   { k: 'say', who: 'sister', text: 'つぶやくのは、ここまでね。次は、見た目だワ。' },
@@ -141,6 +142,15 @@ const storyPost = (id: string, name: string, pic: string, text: string, url: str
   createdAt: new Date().toISOString(),
 });
 
+/**
+ * A story kororin's voice: the speaker's own recorded line (the story voice, else the kororin voice), sung on the
+ * melody; the plain voice when it cannot be sung.
+ */
+async function storyVoice(who: string, text: string): Promise<string> {
+  const plain = (await lineVoiceUrl(who, text)) ?? (await lineVoiceUrl('コロリン', text)) ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, text);
+  return (await singUrl(plain, text)) ?? plain;
+}
+
 const toBase64 = (b: Blob) =>
   new Promise<string>((ok, no) => {
     const r = new FileReader();
@@ -149,7 +159,7 @@ const toBase64 = (b: Blob) =>
     r.readAsDataURL(b);
   });
 
-/** A recording two semitones up (pitch and pace together, like a sped-up tape) → WAV: the kororin's voice. */
+/** A recording two semitones up (pitch and pace together, like a sped-up tape) → WAV: used only if singing fails. */
 async function upTwo(blob: Blob): Promise<Blob> {
   try {
     const rate = Math.pow(2, 2 / 12);
@@ -260,21 +270,18 @@ export function SaturnLesson({
       if (beat.star) setStar(true);
       if (beat.redraw === 'kimorin') setExtra((x) => x.map((p) => (p.id === 'story-kimorin' ? { ...p, author: { ...p.author, pic: KIMORIN_DESIGNED } } : p)));
       if (beat.drop === 'kimorin')
-        void lineVoiceUrl('コロリン', KIMORIN_STONE).then((u) =>
-          setExtra((x) => [storyPost('story-kimorin', 'KIMORIN⭐︎', spriteUrl('kimorin-face'), KIMORIN_STONE, u ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, KIMORIN_STONE)), ...x]),
-        );
+        // KIMORIN⭐︎'s kororin takes a breath and sings his words in his own voice (M-R152)
+        void storyVoice('KIMORIN', KIMORIN_STONE).then((u) => setExtra((x) => [storyPost('story-kimorin', 'KIMORIN⭐︎', spriteUrl('kimorin-face'), KIMORIN_STONE, u), ...x]));
     }
     if (beat.k === 'listen' && beat.id === 'sunset')
-      void lineVoiceUrl('コロリン', SISTER_SUNSET).then((u) =>
-        setExtra((x) => [...x, storyPost('story-sunset', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, u ?? neoVoiceUrl(KORORIN_VOICE_STYLE, null, SISTER_SUNSET))]),
-      );
+      void storyVoice('たこ焼きシスター', SISTER_SUNSET).then((u) => setExtra((x) => [...x, storyPost('story-sunset', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, u)]));
     // D04-S005c: the inviter really becomes a dachi here
     if (beat.k === 'note' && beat.text === '{inviter}がダチになった') void api?.befriendInviter().catch(() => undefined);
     if (beat.k === 'done') onDone(made);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, beats]);
 
-  // 1. words blown into a stone (spoken or typed) → {bati} touches it: a kororin in your own voice, two semitones up
+  // 1. words blown into a stone (spoken or typed) → {bati} touches it: a kororin that sings in your own voice
   const murmur = async (blob: Blob | null, text: string) => {
     setBusy(true);
     let words = text.trim();
@@ -287,7 +294,7 @@ export function SaturnLesson({
       /* keep going with what we have */
     }
     if (!words) words = beat?.k === 'recNormal' && beat.prompt === 'first' ? PAPER : '……';
-    const up = blob ? await upTwo(blob) : null;
+    const up = blob ? await singKororin(blob, words).catch(() => upTwo(blob)) : null;
     let post: SaturnPostView | null = null;
     try {
       if (me) {

@@ -73,3 +73,9 @@
 - このセッションからは vercel.app / b-cdn.net / GitHub の成果物置き場に直接つながらない（プロキシで拒否）。絵はブランチに入れて見る。
 - 2回目以降：姿は4枚そろう（失敗した1枚だけ描き直す）。表情6種類 約60秒・6/6、バティの答え 1.2秒、ブラックホールの絵（NASA）3.3秒・はじめては無料。パンダはコモンズで見つからず→言葉を減らして探し直すように。バティの答えが長かった（前置き＋3行）→「前置きなし・2文・80字くらい・絵文字1つまで」。
 - M-R147：〔🖼 絵で見る〕はマナなし（だれでも、何枚目でも）。1マナ案と「はじめては無料」の画面は外した。
+
+## 2026-10-28 コロリンが歌う (M-R152)
+- lib/saturn/sing.ts: pitch (autocorrelation on an 11 kHz copy) + loudness every 10 ms → syllables at loudness dips → minor pentatonic around the speaker's own pitch, 126 BPM (16ths when over 24 syllables) → pitch-synchronous overlap-add (grains cut around sample peaks, placed at the note's period; formants stay) → room + dotted echo, offline → WAV.
+- Headless check: a 21 s take sings in ~0.9 s, KIMORIN's 12.6 s line in ~0.4 s. The output pitch sits on the notes (A minor pentatonic 55/57/62/64/67/69).
+- Samples: docs/smoke/kororin-before.m4a / kororin-sing.m4a. Not yet heard by a person: listen on the phone before calling it done.
+- If singing throws, the kororin falls back to the old two-semitones-up take.
