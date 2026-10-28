@@ -62,6 +62,7 @@ export const DAY3: Step[] = [
   { t: 'notice', text: 'Bluenaが使えるのは、一日88分。過ぎると地球に帰り、次の日に、その続きから' },
   { t: 'sprite', image: null },
   { t: 'still', image: 's/moon-temple' }, // 光の柱の中で、OBOLONの白い三日月の目が、細くなる。黒い球が、ゆっくり、こちらを見送る（M-R169）
+  { t: 'sprite', image: ['', 'obolon'] }, // 見送るOBOLON（QA 6 R5）
   { t: 'wait', s: 1.6 },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },

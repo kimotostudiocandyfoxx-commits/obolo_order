@@ -135,7 +135,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-launch-pit' },
   { t: 'caption', text: 'ロケット発射場に着いた' },
   { t: 'still', image: 's/d2-monban-pit' }, // ロケットの前のMONBAN（話し手はチャットのアイコンで）
-  { t: 'sprite', image: ['', 'obolon'] }, // 光の柱の中のOBOLONも、発射場にいる（QA 5 N9）
+  { t: 'sprite', image: ['', '', 'obolon'] }, // 光の柱の中のOBOLONも、発射場にいる（QA 5 N9）
   { t: 'say', who: 'OBOLON', text: 'これがロケットだ。月に行く。乗れ。' },
   { t: 'say', who: 'MONBAN', text: 'では、いってこい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？あなた達は乗らないのですか？' },
@@ -167,7 +167,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: '謎の書を手に入れた' },
   { t: 'still', image: 's/d2-monban-pit' },
-  { t: 'sprite', image: ['', 'obolon'] },
+  { t: 'sprite', image: ['', '', 'obolon'] },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
   { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
   { t: 'sprite', image: null },
@@ -203,8 +203,6 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-moon-kimorin' }, // 長い説明は、話す人の胸から上の絵で（QA 5 N10）
   { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
-  { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。' },
-  { t: 'say', who: 'KIMORIN', text: '間違えていたらどうしよう。と、頭を抱える人も少なくない。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……

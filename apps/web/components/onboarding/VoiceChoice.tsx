@@ -6,7 +6,7 @@ import { ReplyChips } from '@/components/story/Chat';
 /**
  * A choice answered by voice (D01-S006, story M-R169): a big 〔🎙 話してみよう〕 with the answers as a small example;
  * the corner ⌨ (for when one cannot speak) shows them as buttons. The first tap ever asks once —
- * 「話した声は、答えを聞き取るためだけに使い、残しません　［いいよ］［やめる］」 — then the phone's mic permission;
+ * 「声は残しません。話した言葉は、あなたの記録にだけ残ります　［いいよ］［やめる］」 (M-R169: the words are kept for D08-S007) — then the phone's mic permission;
  * ［やめる］ goes to the buttons. What is heard is matched to the nearest answer (the browser's own speech
  * recognition; nothing is sent or kept).
  */
@@ -43,9 +43,11 @@ export function matchAnswer(heard: string, options: string[]): number {
   return Math.max(0, find(/わかん|まだ/));
 }
 
-export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k: number) => void }) {
+export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k: number, words?: string) => void }) {
   const [mode, setMode] = useState<'mic' | 'ask' | 'listen' | 'keys'>('mic');
   const [heard, setHeard] = useState('');
+  const [missed, setMissed] = useState(0);
+  const [note, setNote] = useState('');
   const rec = useRef<Rec | null>(null);
   useEffect(() => {
     if (!recognizer()) setMode('keys');
@@ -69,11 +71,23 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     r.onerror = (e) => {
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') setMode('keys');
     };
+    // no answer from the recogniser in 8 seconds: stop and say so; the second time, the buttons (QA 6 R8)
+    const timer = setTimeout(() => r.abort(), 8000);
     r.onend = () => {
+      clearTimeout(timer);
       if (said.trim()) {
         const k = matchAnswer(said, options);
-        setTimeout(() => onPick(k), 500);
-      } else setMode((m) => (m === 'listen' ? 'mic' : m));
+        setTimeout(() => onPick(k, said.trim().slice(0, 120)), 500);
+        return;
+      }
+      setMissed((n) => {
+        if (n + 1 >= 2) setMode('keys');
+        else {
+          setNote('うまく聞き取れなかった。もう一度、または ⌨ で');
+          setMode((m) => (m === 'listen' ? 'mic' : m));
+        }
+        return n + 1;
+      });
     };
     rec.current = r;
     setHeard('');
@@ -100,7 +114,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
       {mode === 'ask' ? (
         <div className="w-full max-w-sm rounded-3xl border border-amber-200/40 bg-black/80 p-4 text-center text-amber-50 backdrop-blur">
-          <p className="text-[14px] leading-relaxed">話した声は、答えを聞き取るためだけに使い、残しません</p>
+          <p className="text-[14px] leading-relaxed">声は残しません。話した言葉は、あなたの記録にだけ残ります</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
               onClick={() => {
@@ -122,7 +136,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
         </div>
       ) : (
         <>
-          <p className="mb-3 rounded-2xl bg-black/60 px-4 py-2 text-center text-[12px] text-amber-50/80 backdrop-blur">{mode === 'listen' ? heard || '聞いています……' : `例：${options.join('・')}`}</p>
+          <p className="mb-3 rounded-2xl bg-black/60 px-4 py-2 text-center text-[12px] text-amber-50/80 backdrop-blur">{mode === 'listen' ? heard || '聞いています……' : note || `例：${options.join('・')}`}</p>
           <button
             onClick={mode === 'listen' ? () => rec.current?.abort() : tap}
             className={`relative flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 text-white shadow-[0_8px_30px_rgba(60,20,90,0.45)] active:scale-95 ${mode === 'listen' ? 'border-rose-200 bg-gradient-to-b from-rose-400 to-rose-600' : 'animate-[hintGlow_2.2s_ease-in-out_infinite] border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500'}`}

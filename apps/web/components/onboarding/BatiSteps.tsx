@@ -45,8 +45,8 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
 
 /** The egg wobbles and cracks while the Bati is generated, then the newborn appears. */
 /**
- * The egg hatches on the picture of the egg chosen (the same film-like egg on its stand, QA 5 N28): it trembles and
- * glows, a white flash, and {bati} comes out.
+ * The egg hatches on the last picture of its cracking film (the same film-like egg, QA 5 N28 / QA 6 R9): no second
+ * wobble, only the light breathing until {bati} is made, a white flash, and {bati} comes out.
  */
 export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 'sun' | 'earth'; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
   const [url, setUrl] = useState<string | null>(null);
@@ -78,9 +78,9 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
       {egg && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`/onboarding/s/d2-egg-${egg}-gem.jpg`}
+          src={`/onboarding/s/d2-egg-${egg}-cracked.jpg`}
           alt=""
-          className={`absolute inset-0 h-full w-full object-cover ${stage === 'wobble' ? 'animate-[shake_0.5s_ease-in-out_infinite]' : 'opacity-50 blur-sm'}`}
+          className={`absolute inset-0 h-full w-full object-cover ${stage === 'wobble' ? 'animate-pulse' : 'opacity-50 blur-sm'}`}
           style={{ filter: stage === 'wobble' ? 'drop-shadow(0 0 40px rgba(255,230,180,0.6)) brightness(1.08)' : undefined }}
         />
       )}
@@ -96,7 +96,7 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
         <img src={url!} alt="" className="relative h-[42svh] w-auto animate-[spriteIn_0.6s_ease-out] rounded-[2.5rem] shadow-[0_0_60px_rgba(255,220,150,0.6)]" />
       )}
       {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[flash_0.7s_ease-out] bg-white" />}
-      <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' ? '生まれた！' : 'たまごが動いている……'}</p>
+      <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' ? '生まれた！' : egg ? '光の中で、なにかが動いている……' : 'たまごが動いている……'}</p>
       {stage === 'born' && <p className="animate-pulse text-xs text-white/60">TAP</p>}
     </button>
   );

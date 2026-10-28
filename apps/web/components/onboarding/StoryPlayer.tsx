@@ -151,6 +151,8 @@ function chatLine(s: Step, id: string): ChatRaw | null {
 function chatBottom(s: Step | undefined): number {
   if (!s) return 28;
   if (s.t === 'action') return 78;
+  // the voice answer (a big 〔🎙〕) needs the room under the question (QA 6 R2)
+  if (s.t === 'choice' && s.voice) return 230;
   if (s.t === 'choice') return s.options.length > 2 ? 128 : 78;
   if (s.t === 'name' || s.t === 'batiname' || s.t === 'neoname') return 112;
   return 30;
@@ -161,6 +163,16 @@ function neoSays() {
   window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: true }));
   setTimeout(() => window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: false })), 1800);
 }
+
+/** day 2's stills with KIMORIN drawn in, and the look he has in them */
+const STILL_LOOK: Record<string, string> = {
+  's/d2-gate-two-inside': 'kimorin-i',
+  's/d2-hall-kimorin': 'kimorin-i',
+  's/d2-hall-dark-kimorin': 'kimorin-i',
+  's/d2-hall-kimorin-up': 'kimorin-iu',
+  's/d2-hall-sky-monban': 'kimorin-iu',
+  's/d2-moon-kimorin': 'kimorin-iu',
+};
 
 export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
@@ -612,15 +624,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // 2026-10-25). KIMORIN in the look he last had on stage that day (kimorin-i / -iu: the inventor, goggles on / up; kimorin-g at the gate with the
   // sunglasses on, kimorin-n before the dragon, kimorin-sun after); none yet → he stays off.
   // KIMORIN's look on stage now (the last kimorin-* standee of the day): his chat icon follows it
-  const kimorinLook = (() => {
-    for (let k = i; k >= 0; k--) {
+  // KIMORIN's look now: the last sprite that shows him, or a still with him drawn in (day 2's stills hold the cast:
+  // QA 6 R4 — the portrait went missing when the sprites gave way to those stills)
+  const lookBefore = (from: number) => {
+    for (let k = from; k >= 0; k--) {
       const x = steps[k];
+      if (x?.t === 'still' && STILL_LOOK[x.image]) return STILL_LOOK[x.image];
       if (x?.t !== 'sprite') continue;
       const look = (Array.isArray(x.image) ? x.image : [x.image]).find((n) => n === 'kimorin-sun' || n === 'kimorin-n' || n === 'kimorin-g' || n === 'kimorin-i' || n === 'kimorin-iu');
       if (look) return look;
     }
     return null;
-  })();
+  };
+  const kimorinLook = lookBefore(i);
   // the inventor (day 2 until the Moon), then the round sunglasses over his eyes (story M-R112)
   const kimorinAvatar: Avatar | undefined =
     kimorinLook === 'kimorin-i' || kimorinLook === 'kimorin-iu' ? { src: `/story/avatars/${kimorinLook}.webp` } : kimorinLook === 'kimorin-sun' ? { src: '/story/avatars/kimorin-glasses.webp' } : undefined;
@@ -628,14 +644,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const st = steps[i];
     if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;
     if (st.who === 'MONBAN') return stillShows(still, 'MONBAN') ? null : 'monban';
-    if (st.who === 'KIMORIN' && !stillShows(still, 'KIMORIN')) {
-      for (let k = i - 1; k >= 0; k--) {
-        const x = steps[k];
-        if (x.t !== 'sprite') continue;
-        const look = (Array.isArray(x.image) ? x.image : [x.image]).find((n) => n === 'kimorin-sun' || n === 'kimorin-n' || n === 'kimorin-g' || n === 'kimorin-i' || n === 'kimorin-iu');
-        if (look) return look;
-      }
-    }
+    if (st.who === 'KIMORIN' && !stillShows(still, 'KIMORIN')) return lookBefore(i - 1);
     return null;
   })();
   // the speaker's face and gesture for this line (picked from the words; a 'face' step still wins until the next line)
@@ -940,7 +949,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <VoiceChoice
           key={i}
           options={step.options.map((o) => o.label)}
-          onPick={(k) => {
+          onPick={(k, words) => {
+            // the words themselves stay in their own record (M-R169: D08-S007 quotes them)
+            if (words) remember(`${step.key}Words`, words);
             addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
             neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
