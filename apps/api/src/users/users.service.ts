@@ -21,6 +21,15 @@ import { Database } from '../db/db';
 import { users } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 
+/** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
+function batiFaces(j: Record<string, string> | null): Partial<Record<string, string>> | undefined {
+  try {
+    return j?.['bati.faces'] ? (JSON.parse(j['bati.faces']) as Record<string, string>) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function toMe(u: typeof users.$inferSelect): Me {
   return {
     id: u.id,
@@ -37,7 +46,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     invitedByMessage: u.invitedByMessage ?? null,
     neoForm: u.neoForm,
     avatarUrl: u.avatarUrl,
-    bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl } : null,
+    bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, faces: batiFaces(u.onboardingJson) } : null,
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },
     look: u.lookJson ?? null,

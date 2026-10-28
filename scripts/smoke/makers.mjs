@@ -72,6 +72,18 @@ const hatched = await step('hatch', () => req('POST', '/me/bati/hatch'));
 if (hatched?.bati?.imageUrl) await save('bati', hatched.bati.imageUrl);
 await step('bati name', () => req('POST', '/me/bati/name', { name: 'タコ丸' }));
 
+const faced = await step('bati faces', () => req('POST', '/me/bati/faces'));
+if (faced?.bati?.faces) for (const [k, u] of Object.entries(faced.bati.faces)) await save(`face-${k}`, u);
+if (faced) say(`faces: ${Object.keys(faced.bati?.faces ?? {}).length} of 6`);
+
+// D03-S008 はじめての、おしゃべり: ask, then 〔🖼 絵で見る〕 twice (the first is free, the second takes a little mana)
+const chat = await step('buddy chat', () => req('POST', '/buddy/chat', { text: 'ブラックホールの正体って、なに？', locale: 'ja' }));
+if (chat) say(`bati says: ${chat.reply.text}`);
+const pic1 = await step('picture 1', () => req('POST', '/buddy/picture', { question: 'ブラックホールの正体って、なに？', answer: chat?.reply.text }));
+if (pic1?.picture) { say(`picture 1: ${pic1.picture.title} — ${pic1.picture.source} (free ${pic1.picture.free})`); await save('pic-blackhole', pic1.picture.url); } else say('picture 1: none');
+const pic2 = await step('picture 2', () => req('POST', '/buddy/picture', { question: 'パンダは何を食べるの？' }));
+if (pic2?.picture) { say(`picture 2: ${pic2.picture.title} — ${pic2.picture.source} (free ${pic2.picture.free})`); await save('pic-panda', pic2.picture.url); } else say('picture 2: none');
+
 const designs = await step('kororin designs', () => req('POST', '/me/puni/pic/candidates', { description: 'たこ焼きと音楽が好きな、やさしい青いきつね', useNeoLook: true }));
 if (designs) say(`kororin designs: ${designs.candidates.length}`);
 if (designs) for (const [k, c] of designs.candidates.entries()) await save(`kororin-${k + 1}`, c.url);

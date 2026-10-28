@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches: ['claude/**']
-    paths: ['scripts/smoke/**', '.github/workflows/smoke.yml']
+    paths: ['.github/workflows/smoke.yml']
 
 env:
   REGION: asia-northeast1

@@ -96,6 +96,14 @@ export class LookController {
     return this.look.hatch(userId, origin(req));
   }
 
+  /** Bati's expressions, drawn once after the hatching (M-R139) */
+  @Post('bati/faces')
+  @HttpCode(200)
+  async faces(@UserId() userId: string, @Req() req: Request) {
+    await rateLimit(this.kv, `bati-faces:${userId}`, 3, 600);
+    return this.look.batiFaces(userId, origin(req));
+  }
+
   @Post('bati/name')
   @HttpCode(200)
   name(@UserId() userId: string, @Body() body: unknown) {

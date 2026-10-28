@@ -2,8 +2,9 @@ import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
-import { JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { BATI_FACES, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -37,6 +38,16 @@ let butterflySheet: Promise<GeneratedImage> | null = null;
 /** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg). */
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
 const BATI_GREY: [number, number, number] = [128, 128, 128];
+const FACE_WORDS: Record<BatiFace, string> = {
+  smile: 'a big happy smile, eyes curved with joy',
+  sparkle: 'wide open eyes full of sparkles and stars, excited and curious, leaning forward a little',
+  surprise: 'a surprised face, eyes wide and round, mouth a small open "o"',
+  think: 'eyes gently closed, thinking hard, a tiny paw or hand near its chin',
+  sad: 'a slightly sad, droopy face, eyebrows tilted, mouth a small frown',
+  yawn: 'a big sleepy yawn, eyes half closed and drowsy',
+};
+const BATI_FACE_PROMPT = (f: BatiFace) =>
+  `Edit the first picture: keep the same creature exactly — the same body, colours, materials, size, framing, light and the flat plain mid-grey background (#808080) — and change only its expression to ${FACE_WORDS[f]}. A small natural change of pose that fits the expression is fine. Cute, kids-friendly. No text, no letters.`;
 const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '../../assets/butterfly-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 
 /**
@@ -301,6 +312,46 @@ export class LookService {
     if (!files.length) return null;
     const f = files[Math.floor(Math.random() * files.length)];
     return { data: await readFile(resolve(BATI_DIR, f)), mime: 'image/jpeg' };
+  }
+
+  /**
+   * Bati's expressions (M-R139): the hatched picture, put back on its grey, edited into each face — the same
+   * creature, only the face and a little of the pose change; cut out like the hatched one. Once per Bati, no mana
+   * (part of the hatching). Faces that fail are left out (the plain picture stands in).
+   */
+  async batiFaces(userId: string, origin: string): Promise<Me> {
+    const u = await this.user(userId);
+    if (!u.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
+    const have = (() => {
+      try {
+        return JSON.parse((u.onboardingJson as Record<string, string>)?.['bati.faces'] ?? '{}') as Record<string, string>;
+      } catch {
+        return {} as Record<string, string>;
+      }
+    })();
+    const todo = BATI_FACES.filter((f) => !have[f]);
+    if (!todo.length) return toMe(u);
+    const png = await this.media.bytesByUrl(userId, u.batiImageUrl);
+    if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
+    const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
+    const made = await settleWithRetry(todo.length, (i) => this.looks.generate(BATI_FACE_PROMPT(todo[i]), i, [ref]));
+    const faces = { ...have };
+    for (const [i, r] of made.entries()) {
+      if (r.status !== 'fulfilled') {
+        this.log.warn(`bati face ${todo[i]} failed: ${String(r.reason)}`);
+        continue;
+      }
+      const cut = await cutoutWhite(r.value.data, 768, BATI_GREY).catch(() => null);
+      const m = cut ? await this.media.storeImage(userId, 'bati', 'image/png', cut, origin) : await this.media.storeImage(userId, 'bati', r.value.mime, r.value.data, origin);
+      faces[todo[i]] = m.url;
+    }
+    const cur = (await this.user(userId)).onboardingJson as Record<string, string>;
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...cur, 'bati.faces': JSON.stringify(faces) }, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(nu);
   }
 
   async name(userId: string, name: string): Promise<Me> {

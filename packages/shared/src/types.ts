@@ -58,7 +58,14 @@ export interface BatiView {
   /** set once it has hatched and been named */
   name: string | null;
   imageUrl: string | null;
+  /**
+   * the expressions drawn from the hatched picture (M-R139): smile / sparkle / surprise / think / sad / yawn →
+   * URL; made once after the hatching (POST /me/bati/faces), missing ones fall back to `imageUrl`
+   */
+  faces?: Partial<Record<BatiFace, string>>;
 }
+export const BATI_FACES = ['smile', 'sparkle', 'surprise', 'think', 'sad', 'yawn'] as const;
+export type BatiFace = (typeof BATI_FACES)[number];
 
 export interface NeoLookCandidate {
   id: string;
@@ -125,6 +132,17 @@ export interface BuddyMessageView {
 export interface BuddyQuotaView {
   usedToday: number;
   freeDaily: number;
+}
+
+/** 〔🖼 絵で見る〕: a picture from a library whose pictures may be used, with where it came from (M-R140) */
+export interface BuddyPicture {
+  url: string;
+  title: string;
+  /** shown small under the picture: the library, author and licence */
+  source: string;
+  pageUrl: string;
+  /** the first picture was free (no mana) */
+  free: boolean;
 }
 
 export interface BuddyChatResponse {

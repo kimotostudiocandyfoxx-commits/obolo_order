@@ -54,6 +54,9 @@ export const BuddyChatBody = z.object({
   locale: z.enum(LOCALES).optional(),
 });
 export type BuddyChatBody = z.infer<typeof BuddyChatBody>;
+/** 〔🖼 絵で見る〕 under one of Bati's answers */
+export const BuddyPictureBody = z.object({ question: z.string().trim().min(1).max(300), answer: z.string().trim().max(600).optional() });
+export type BuddyPictureBody = z.infer<typeof BuddyPictureBody>;
 
 export const CreateSaturnPostBody = z
   .object({
