@@ -4,6 +4,515 @@
  "always": "",
  "items": [
   {
+   "id": "V01/K5-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K5-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the one tiny person standing on the terrace ridge at the far left edge (about two-thirds down); keep everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V01/K5-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K5-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the one tiny person standing on the terrace ridge at the far left edge (about two-thirds down); keep everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V01/K12-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K12-r1c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the whole background with plain deep darkness and faint golden dust (remove the ruins, cliffs, trees and the moon); keep the eight blank golden cards, their arc and their glow exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V01/K12-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K12-r1c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the whole background with plain deep darkness and faint golden dust (remove the ruins, cliffs, trees and the moon); keep the eight blank golden cards, their arc and their glow exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V01/K13-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. No style reference images. SHOT: low side close-up at the height of the record. An ornate antique gold turntable in near-black darkness, black record spinning; the tone arm is lifted so the needle hovers clearly above the record with a finger-wide gap of empty space and a tiny shadow of the needle on the record below it; warm gold rim light only on the turntable; no labels, no text."
+  },
+  {
+   "id": "V01/K13-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. No style reference images. SHOT: low side close-up at the height of the record. An ornate antique gold turntable in near-black darkness, black record spinning; the tone arm is lifted so the needle hovers clearly above the record with a finger-wide gap of empty space and a tiny shadow of the needle on the record below it; warm gold rim light only on the turntable; no labels, no text."
+  },
+  {
+   "id": "V01/K13-r2c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. No style reference images. SHOT: low side close-up at the height of the record. An ornate antique gold turntable in near-black darkness, black record spinning; the tone arm is lifted so the needle hovers clearly above the record with a finger-wide gap of empty space and a tiny shadow of the needle on the record below it; warm gold rim light only on the turntable; no labels, no text."
+  },
+  {
+   "id": "V01/K17-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K16-r1a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same desk, lamp and room; camera pulls back slightly; the hand is gone, out of frame; the sealed envelope with its glowing gold seal floats by itself in mid-air above the desk, its edges dissolving into streams of golden particles flowing toward the viewer; no papers with writing. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V01/K17-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K16-r1a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same desk, lamp and room; camera pulls back slightly; the hand is gone, out of frame; the sealed envelope with its glowing gold seal floats by itself in mid-air above the desk, its edges dissolving into streams of golden particles flowing toward the viewer; no papers with writing. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K1-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset. Camera stands a few steps inside the gate on the black stone avenue (no arch overhead, only side pillars); the low sunset sun is behind the camera, lighting the domed temple from the front, long shadows stretching away from the camera toward the temple, gold dust."
+  },
+  {
+   "id": "V02/K1-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset. Camera stands a few steps inside the gate on the black stone avenue (no arch overhead, only side pillars); the low sunset sun is behind the camera, lighting the domed temple from the front, long shadows stretching away from the camera toward the temple, gold dust."
+  },
+  {
+   "id": "V02/K1-r2c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset. Camera stands a few steps inside the gate on the black stone avenue (no arch overhead, only side pillars); the low sunset sun is behind the camera, lighting the domed temple from the front, long shadows stretching away from the camera toward the temple, gold dust."
+  },
+  {
+   "id": "V02/K2-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K2-c.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the tiny figure a pure dark backlit silhouette FACING THE CAMERA; give it fox ears, a lab-coat hem flaring in the wind, and a folded bundle of many feathers behind its back (thicker than a fox tail, jagged feather tips, NOT spread open); keep gate, light, size and framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K2-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K2-c.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the tiny figure a pure dark backlit silhouette FACING THE CAMERA; give it fox ears, a lab-coat hem flaring in the wind, and a folded bundle of many feathers behind its back (thicker than a fox tail, jagged feather tips, NOT spread open); keep gate, light, size and framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K4-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K3-r1b.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: One shoe steps forward toward the camera, the lab coat hem flares out, the dangling wires swing; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K4-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K3-r1b.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: One shoe steps forward toward the camera, the lab coat hem flares out, the dangling wires swing; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/MASTER-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg",
+    "apps/web/public/onboarding/kimorin-i-joy.webp",
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SHOT: upper-body portrait from the ear tips to the waist, character fills the frame. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). No hood, no robe. His feather tail (clean white, black and vermilion-tipped feathers, no stains, no spots) is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. FACING THE CAMERA, standing just inside the black-and-gold gate at sunset with the gate and the low sun BEHIND him, warm rim light on the ears and coat, face readable; sleeves clearly rolled up, patches and stains, tool belt with dangling wires, the cable from the head box down to the handset in his right hand; sunset reflected in the goggle lenses."
+  },
+  {
+   "id": "V02/MASTER-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg",
+    "apps/web/public/onboarding/kimorin-i-joy.webp",
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SHOT: upper-body portrait from the ear tips to the waist, character fills the frame. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). No hood, no robe. His feather tail (clean white, black and vermilion-tipped feathers, no stains, no spots) is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. FACING THE CAMERA, standing just inside the black-and-gold gate at sunset with the gate and the low sun BEHIND him, warm rim light on the ears and coat, face readable; sleeves clearly rolled up, patches and stains, tool belt with dangling wires, the cable from the head box down to the handset in his right hand; sunset reflected in the goggle lenses."
+  },
+  {
+   "id": "V02/MASTER-r2c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg",
+    "apps/web/public/onboarding/kimorin-i-joy.webp",
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SHOT: upper-body portrait from the ear tips to the waist, character fills the frame. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). No hood, no robe. His feather tail (clean white, black and vermilion-tipped feathers, no stains, no spots) is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. FACING THE CAMERA, standing just inside the black-and-gold gate at sunset with the gate and the low sun BEHIND him, warm rim light on the ears and coat, face readable; sleeves clearly rolled up, patches and stains, tool belt with dangling wires, the cable from the head box down to the handset in his right hand; sunset reflected in the goggle lenses."
+  },
+  {
+   "id": "V02/K9-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r1b.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the wooden door and countryside with the inside of the giant black-and-gold gate at sunset, warm backlight; lift the thumb so it hovers just above the round button with a clear gap; show the thin cable rising from the top of the handset out of frame; keep the hand, glove, cuff and handset exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K9-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r1b.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the wooden door and countryside with the inside of the giant black-and-gold gate at sunset, warm backlight; lift the thumb so it hovers just above the round button with a clear gap; show the thin cable rising from the top of the handset out of frame; keep the hand, glove, cuff and handset exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K10-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The thumb presses the button down, the gold rim flares bright; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K10-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The thumb presses the button down, the gold rim flares bright; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K12-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/V02/MASTER-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The little screen on the head box lights up with a glowing double-circle shape (two concentric rings, not a letter), a soft burst of light around the box. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K12-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/V02/MASTER-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The little screen on the head box lights up with a glowing double-circle shape (two concentric rings, not a letter), a soft burst of light around the box. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K13b-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K13-r1a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: He tilts his head back and looks up past the gate at the towering black-and-gold headquarters buildings, the buildings reflected small in his goggles; stays on the right third; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K13b-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K13-r1a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: He tilts his head back and looks up past the gate at the towering black-and-gold headquarters buildings, the buildings reflected small in his goggles; stays on the right third; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K14-r2a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K13-r1a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: On the left side MONBAN has appeared from black smoke (one golden eye on the forehead, gold magic-circle halo behind the head); KIMORIN stays on the right looking up at him; monban.jpg with the watermark cropped off. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K14-r2b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K13-r1a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: On the left side MONBAN has appeared from black smoke (one golden eye on the forehead, gold magic-circle halo behind the head); KIMORIN stays on the right looking up at him; monban.jpg with the watermark cropped off. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sheets/kimorin-lab-closed-r2a",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same character and views, but the feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sheets/kimorin-lab-closed-r2b",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same character and views, but the feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sheets/rocket-r2-front",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r1b.jpg",
+    "design/story/refs/story/places/rocket.jpg"
+   ],
+   "prompt": "Design reference picture on a flat plain mid-grey background (#808080), even studio light, the whole rocket in frame. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Front view of the rocket in the reference pictures: black body, dense gold arabesque engraving, crests of many planets, pink and cyan neon lines, orange crest emblems, three engine nozzles."
+  },
+  {
+   "id": "sheets/rocket-r2-side",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r1b.jpg",
+    "design/story/refs/story/places/rocket.jpg"
+   ],
+   "prompt": "Design reference picture on a flat plain mid-grey background (#808080), even studio light, the whole rocket in frame. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Exact side profile showing the swept-back fins of the rocket in the reference pictures: black body, dense gold arabesque engraving, crests of many planets, pink and cyan neon lines, orange crest emblems, three engine nozzles."
+  },
+  {
+   "id": "sheets/rocket-r2-back",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r1b.jpg",
+    "design/story/refs/story/places/rocket.jpg"
+   ],
+   "prompt": "Design reference picture on a flat plain mid-grey background (#808080), even studio light, the whole rocket in frame. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. View from directly behind and slightly below, looking into the three engine nozzles of the rocket in the reference pictures: black body, dense gold arabesque engraving, crests of many planets, pink and cyan neon lines, orange crest emblems, three engine nozzles."
+  },
+  {
+   "id": "sheets/dragon-robe-r2a",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "design/story/refs/story/cast/kimorin-dragon.webp",
+    "apps/web/public/onboarding/s/kimorin-dragon.jpg"
+   ],
+   "prompt": "Design reference sheet on a flat plain mid-grey background (#808080), even studio light: the same character three times, front view, side view and back view, side by side. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. a giant white-scaled long-necked dragon in KIMORIN's deep crimson hooded robe with silver embroidered borders, with KIMORIN's white fox face, blue marks and fox ears; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand holding a colorful glowing light stick or a party popper; white, black and vermilion feather tail. Exactly as the reference picture."
+  },
+  {
+   "id": "sheets/dragon-robe-r2b",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "design/story/refs/story/cast/kimorin-dragon.webp",
+    "apps/web/public/onboarding/s/kimorin-dragon.jpg"
+   ],
+   "prompt": "Design reference sheet on a flat plain mid-grey background (#808080), even studio light: the same character three times, front view, side view and back view, side by side. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. a giant white-scaled long-necked dragon in KIMORIN's deep crimson hooded robe with silver embroidered borders, with KIMORIN's white fox face, blue marks and fox ears; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand holding a colorful glowing light stick or a party popper; white, black and vermilion feather tail. Exactly as the reference picture."
+  },
+  {
+   "id": "sheets/dragon-robe-r2c",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "design/story/refs/story/cast/kimorin-dragon.webp",
+    "apps/web/public/onboarding/s/kimorin-dragon.jpg"
+   ],
+   "prompt": "Design reference sheet on a flat plain mid-grey background (#808080), even studio light: the same character three times, front view, side view and back view, side by side. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. a giant white-scaled long-necked dragon in KIMORIN's deep crimson hooded robe with silver embroidered borders, with KIMORIN's white fox face, blue marks and fox ears; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand holding a colorful glowing light stick or a party popper; white, black and vermilion feather tail. Exactly as the reference picture."
+  },
+  {
    "id": "gen-tests/photos/p1",
    "w": 1152,
    "h": 1536,
@@ -72,19 +581,6 @@
     "art/review/saturn/V01/K2-c.jpg"
    ],
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove every person from the scene; keep the houses, lamps, Milky Way and framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V01/K4-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V01/K4-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove all people on the rooftops in the foreground; keep the city lights, haze and framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
   },
   {
    "id": "V01/K4-r1b",
@@ -395,54 +891,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe, highly detailed painterly dark fantasy, deep blacks with glowing gold light, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Empty scene: absolutely no people, no characters, no creatures, no figures. No reference images. The whole frame filled edge to edge with dense glowing golden light particles, almost white at the center; absolutely no objects, no figures, no characters."
   },
   {
-   "id": "V02/K1-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. Camera stands a few steps inside the gate on the black stone avenue (no arch overhead, only side pillars); the low sunset sun is behind the camera, lighting the domed temple from the front, long shadows stretching toward the temple, gold dust."
-  },
-  {
-   "id": "V02/K1-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. Camera stands a few steps inside the gate on the black stone avenue (no arch overhead, only side pillars); the low sunset sun is behind the camera, lighting the domed temple from the front, long shadows stretching toward the temple, gold dust."
-  },
-  {
-   "id": "V02/K1-r1c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. Camera stands a few steps inside the gate on the black stone avenue (no arch overhead, only side pillars); the low sunset sun is behind the camera, lighting the domed temple from the front, long shadows stretching toward the temple, gold dust."
-  },
-  {
    "id": "V02/K2-r1a",
    "w": 1152,
    "h": 2048,
@@ -503,22 +951,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. SHOT: ground-level extreme close-up, only the lab-coat hem, two white shoes with blue paw pads and dangling tool-belt wires fill the frame; nothing above the knees. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. LOCATION: inside the gate at sunset, strong backlight from the gate, gold dust. Tail out of frame."
   },
   {
-   "id": "V02/K3-r1c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. SHOT: ground-level extreme close-up, only the lab-coat hem, two white shoes with blue paw pads and dangling tool-belt wires fill the frame; nothing above the knees. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. LOCATION: inside the gate at sunset, strong backlight from the gate, gold dust. Tail out of frame."
-  },
-  {
    "id": "V02/K4-r1a",
    "w": 1152,
    "h": 2048,
@@ -564,22 +996,6 @@
   },
   {
    "id": "V02/K5-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. Make one high-resolution upper-body master (chest to ear tips) of KIMORIN-LAB inside the gate at sunset, side-lit by the low sun, tail folded closed; crop K5 = chest, tool belt, patches and stains, cable running up; reference sheet kimorin-lab-c first; clean feathers, no stains on feathers."
-  },
-  {
-   "id": "V02/K5-r1c",
    "w": 1152,
    "h": 2048,
    "size": [
@@ -699,20 +1115,6 @@
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Use V02/K7-c as it is (tail fully open) and add gold dust swirling up from the floor; must stay identical in framing, light and character to the new K7. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
   },
   {
-   "id": "V02/K9-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K9-c.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the puck with the rounded-rectangle silver handset with one round button and gold-glowing rim (as on the reference sheet); thumb hovering with a clear gap; show the rolled-up patched lab-coat cuff and glove cuff at the wrist; background = the gate at sunset, warm backlight; move the button up to 40-60% of frame height. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
    "id": "V02/K9-r1b",
    "w": 1152,
    "h": 2048,
@@ -725,50 +1127,6 @@
     "art/review/saturn/sheets/kimorin-lab-c.jpg"
    ],
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the puck with the rounded-rectangle silver handset with one round button and gold-glowing rim (as on the reference sheet); thumb hovering with a clear gap; show the rolled-up patched lab-coat cuff and glove cuff at the wrist; background = the gate at sunset, warm backlight; move the button up to 40-60% of frame height. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K10-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K9-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The thumb presses the button down, the gold rim flares bright; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K10-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K9-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The thumb presses the button down, the gold rim flares bright; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K11-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. SHOT: close-up of only the top of KIMORIN's head: the rounded silver box with a small dark screen sitting between the two fox ears (blue insides), cable trailing down; sunset backlight from the gate; reference sheet kimorin-lab-c. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. "
   },
   {
    "id": "V02/K11-r1b",
@@ -787,50 +1145,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. SHOT: close-up of only the top of KIMORIN's head: the rounded silver box with a small dark screen sitting between the two fox ears (blue insides), cable trailing down; sunset backlight from the gate; reference sheet kimorin-lab-c. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. "
   },
   {
-   "id": "V02/K11-r1c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. SHOT: close-up of only the top of KIMORIN's head: the rounded silver box with a small dark screen sitting between the two fox ears (blue insides), cable trailing down; sunset backlight from the gate; reference sheet kimorin-lab-c. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out. "
-  },
-  {
-   "id": "V02/K12-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K11-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The little screen lights up with a glowing double-circle shape (two concentric rings, not a letter), a soft burst of light around the box. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K12-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K11-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The little screen lights up with a glowing double-circle shape (two concentric rings, not a letter), a soft burst of light around the box. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
    "id": "V02/K13-r1a",
    "w": 1152,
    "h": 2048,
@@ -845,96 +1159,6 @@
     "apps/web/public/onboarding/s/d2-gate-inside.jpg"
    ],
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is burst open into a huge fan behind him. Full-body KIMORIN-LAB on the right third of the frame inside the gate, three-quarter view facing left, tail fan open (same as K8), handset in hand, sunset glint on the goggles; left half empty avenue; same size and direction as the standing sprite kimorin-i-*."
-  },
-  {
-   "id": "V02/K13-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is burst open into a huge fan behind him. Full-body KIMORIN-LAB on the right third of the frame inside the gate, three-quarter view facing left, tail fan open (same as K8), handset in hand, sunset glint on the goggles; left half empty avenue; same size and direction as the standing sprite kimorin-i-*."
-  },
-  {
-   "id": "V02/K13-r1c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content. LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind KIMORIN, so he is backlit with a warm rim light; floating gold dust. SUBJECT: KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe. His feather tail is burst open into a huge fan behind him. Full-body KIMORIN-LAB on the right third of the frame inside the gate, three-quarter view facing left, tail fan open (same as K8), handset in hand, sunset glint on the goggles; left half empty avenue; same size and direction as the standing sprite kimorin-i-*."
-  },
-  {
-   "id": "V02/K13b-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: He tilts his head back and looks up suspiciously at the towering headquarters buildings and domed temple; the buildings reflected small in his goggles; stays on the right third. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K13b-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: He tilts his head back and looks up suspiciously at the towering headquarters buildings and domed temple; the buildings reflected small in his goggles; stays on the right third. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K14-r1a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "design/story/refs/story/cast/monban.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: On the left side MONBAN has appeared from black smoke (one golden eye on the forehead, gold magic-circle halo behind the head); KIMORIN stays on the right looking up at him; monban.jpg with the watermark cropped off. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
-  },
-  {
-   "id": "V02/K14-r1b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-r1a.jpg",
-    "art/review/saturn/sheets/kimorin-lab-c.jpg",
-    "design/story/refs/story/cast/monban.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: On the left side MONBAN has appeared from black smoke (one golden eye on the forehead, gold magic-circle halo behind the head); KIMORIN stays on the right looking up at him; monban.jpg with the watermark cropped off. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
   },
   {
    "id": "sheets/kimorin-lab-r1a",
@@ -1539,20 +1763,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Deep space, dense star field with faint violet nebula, empty dark center."
   },
   {
-   "id": "V01/K9-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Deep space, dense star field with faint violet nebula, empty dark center."
-  },
-  {
    "id": "V01/K9-c",
    "w": 1152,
    "h": 2048,
@@ -1669,20 +1879,6 @@
   },
   {
    "id": "V01/K12-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Eight blank golden cards floating in an arc in darkness, softly glowing edges, completely blank faces, golden dust."
-  },
-  {
-   "id": "V01/K12-c",
    "w": 1152,
    "h": 2048,
    "size": [
@@ -2086,37 +2282,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Low close shot at ground level on the black-and-gold stone floor: the hem of KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe.'s oversized patched white lab coat and his white shoes with blue paw pads, wires dangling from the tool belt, strong backlight, gold dust."
   },
   {
-   "id": "V02/K3-c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Low close shot at ground level on the black-and-gold stone floor: the hem of KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe.'s oversized patched white lab coat and his white shoes with blue paw pads, wires dangling from the tool belt, strong backlight, gold dust."
-  },
-  {
-   "id": "V02/K4-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K3-a.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same framing as before: one shoe steps forward toward the camera, the lab coat hem flares out dramatically, the dangling wires swing. No text, no letters, no logos."
-  },
-  {
    "id": "V02/K4-b",
    "w": 1152,
    "h": 2048,
@@ -2126,19 +2291,6 @@
    ],
    "refs": [
     "art/review/saturn/V02/K3-b.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same framing as before: one shoe steps forward toward the camera, the lab coat hem flares out dramatically, the dangling wires swing. No text, no letters, no logos."
-  },
-  {
-   "id": "V02/K4-c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K3-c.jpg"
    ],
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same framing as before: one shoe steps forward toward the camera, the lab coat hem flares out dramatically, the dangling wires swing. No text, no letters, no logos."
   },
@@ -2305,19 +2457,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Low-angle full-body shot of KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. standing in the gate's light, his feather tail folded closed behind his back, push-button in his right hand, backlit by the sunset."
   },
   {
-   "id": "V02/K8-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K7-a.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: the white, black and vermilion feather tail has burst open into a huge fan behind him, glowing at the edges in the backlight, gold dust swirling up from the floor; heroic pose. No text, no letters, no logos."
-  },
-  {
    "id": "V02/K8-b",
    "w": 1152,
    "h": 2048,
@@ -2392,19 +2531,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Close-up of KIMORIN's white-gloved hand with blue paw pads holding a silver push-button with a gold-glowing rim, thumb hovering above it, the thin cable rising out of frame. No engraving."
   },
   {
-   "id": "V02/K10-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K9-a.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: the thumb presses the button down, the gold rim flares bright. No text, no letters, no logos."
-  },
-  {
    "id": "V02/K10-b",
    "w": 1152,
    "h": 2048,
@@ -2447,22 +2573,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Close-up of the small rounded silver box sitting on top of KIMORIN's head between his fox ears, its little screen dark, cable trailing down."
   },
   {
-   "id": "V02/K11-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Close-up of the small rounded silver box sitting on top of KIMORIN's head between his fox ears, its little screen dark, cable trailing down."
-  },
-  {
    "id": "V02/K11-c",
    "w": 1152,
    "h": 2048,
@@ -2479,19 +2589,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Close-up of the small rounded silver box sitting on top of KIMORIN's head between his fox ears, its little screen dark, cable trailing down."
   },
   {
-   "id": "V02/K12-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K11-a.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: the little screen lights up with a bright glowing double-circle shape (two concentric rings, not a letter), a soft chime-like burst of light around the box. No text, no letters, no logos."
-  },
-  {
    "id": "V02/K12-b",
    "w": 1152,
    "h": 2048,
@@ -2501,19 +2598,6 @@
    ],
    "refs": [
     "art/review/saturn/V02/K11-b.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: the little screen lights up with a bright glowing double-circle shape (two concentric rings, not a letter), a soft chime-like burst of light around the box. No text, no letters, no logos."
-  },
-  {
-   "id": "V02/K12-c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K11-c.jpg"
    ],
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: the little screen lights up with a bright glowing double-circle shape (two concentric rings, not a letter), a soft chime-like burst of light around the box. No text, no letters, no logos."
   },
@@ -2554,60 +2638,6 @@
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Full-body shot of KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. standing on the right third of the frame inside the gate, three-quarter view facing left, tail fan wide open, button in hand, a sharp glint of sunset on the goggles; the left half of the frame is empty avenue."
   },
   {
-   "id": "V02/K13-c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. Full-body shot of KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. standing on the right third of the frame inside the gate, three-quarter view facing left, tail fan wide open, button in hand, a sharp glint of sunset on the goggles; the left half of the frame is empty avenue."
-  },
-  {
-   "id": "V02/K13b-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right third of the frame tilts his head back, looking up suspiciously past the gate at the towering black-and-gold headquarters buildings and domed temple, the buildings reflected small in his brass goggles; sunset backlight."
-  },
-  {
-   "id": "V02/K13b-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg",
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "apps/web/public/onboarding/s/d2-gate-inside.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right third of the frame tilts his head back, looking up suspiciously past the gate at the towering black-and-gold headquarters buildings and domed temple, the buildings reflected small in his brass goggles; sunset backlight."
-  },
-  {
    "id": "V02/K13b-c",
    "w": 1152,
    "h": 2048,
@@ -2624,54 +2654,6 @@
     "design/story/refs/cast/kimorin-face-eyes.jpg"
    ],
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right third of the frame tilts his head back, looking up suspiciously past the gate at the towering black-and-gold headquarters buildings and domed temple, the buildings reflected small in his brass goggles; sunset backlight."
-  },
-  {
-   "id": "V02/K14-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-a.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg",
-    "design/story/refs/story/cast/monban.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: on the left side, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. has appeared from black smoke, standing tall, halo glowing, smoke curling at his feet; KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right looks up at him. No text, no letters, no logos."
-  },
-  {
-   "id": "V02/K14-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-b.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg",
-    "design/story/refs/story/cast/monban.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: on the left side, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. has appeared from black smoke, standing tall, halo glowing, smoke curling at his feet; KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right looks up at him. No text, no letters, no logos."
-  },
-  {
-   "id": "V02/K14-c",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V02/K13-c.jpg",
-    "apps/web/public/onboarding/kimorin-i-joy.webp",
-    "design/story/refs/cast/kimorin-face-eyes.jpg",
-    "design/story/refs/story/cast/monban.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: on the left side, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. has appeared from black smoke, standing tall, halo glowing, smoke curling at his feet; KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right looks up at him. No text, no letters, no logos."
   },
   {
    "id": "V19/K1-a",

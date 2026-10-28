@@ -37,13 +37,20 @@ LAB = ('KIMORIN, a small chibi white fox about three heads tall whose face looks
        'worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with the sleeves clearly rolled up, '
        'a tool belt with dangling wires, white gloves with blue paw pads on the fingertips and palms, white shoes with blue paw pads. On his head '
        'between the ears sits a rounded silver box with a small dark screen on its front; one continuous thin cable runs from it down to a '
-       'rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). A huge fan of clean '
-       'white, black and vermilion-tipped feathers (no stains, no spots on the feathers) grows from his back. No hood, no robe.')
-TAIL_CLOSED = 'His feather tail is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out.'
-TAIL_OPEN = 'His feather tail is burst open into a huge fan behind him.'
+       'rounded-rectangle silver handset with one round button and a gold-glowing rim, held in one hand (no engraving). No hood, no robe.')
+# the tail is said once, closed or open (review 2: a fixed "huge fan grows from his back" fought "folded closed")
+FEATHERS = 'clean white, black and vermilion-tipped feathers, no stains, no spots'
+TAIL_CLOSED = f'His feather tail ({FEATHERS}) is folded closed into a narrow bundle behind his back, only the vermilion tips peeking out.'
+TAIL_OPEN = f'His feather tail ({FEATHERS}) is burst open into a huge fan behind him.'
+# review 2: he faces the player with the gate at his back (r1 drew him walking away)
+FACING = 'He faces the camera (toward the viewer); the gate and the sun are behind him.'
 LOCATION = ('LOCATION: inside the giant black-and-gold gate of the headquarters city at sunset; the low sun is outside the gate, behind '
             'KIMORIN, so he is backlit with a warm rim light; floating gold dust.')
-LAB_REFS = [f'{ROOT}/sheets/kimorin-lab-c.jpg', UI + 'kimorin-i-joy.webp']
+# the lab-coat sheet the story chat passed in review 2 (r1b) is the first reference from now on
+LAB_REFS = [f'{ROOT}/sheets/kimorin-lab-r1b.jpg', UI + 'kimorin-i-joy.webp']
+DRAGON = ("a giant white-scaled long-necked dragon in KIMORIN's deep crimson hooded robe with silver embroidered borders, with KIMORIN's "
+          "white fox face, blue marks and fox ears; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand "
+          "holding a colorful glowing light stick or a party popper; white, black and vermilion feather tail.")
 GATE_REFS = [R + 'story/places/headquarters-gate.webp', UI + 's/d2-gate-inside.jpg']
 
 
@@ -56,17 +63,43 @@ def item(cid, prompt, refs):
 
 
 new = []
+later = []
 for l in lines:
     key, base, mode, do = l['key'], l['base'], l['mode'], l['do']
     v = key.split('/')[0]
     if mode == 'decide':
         picks[key] = f'{key}-{base}'
         continue
+    # crops wait for the chosen master; post-processing (a blur) is done by hand, not painted
+    if mode in ('crop', 'post'):
+        later.append(f'{key}: {mode} {base} — {do}')
+        continue
+    if mode == 'edit+crop':
+        later.append(f'{key}: crop the chosen edit like K11 — {do}')
+    if mode == 'regen-3':
+        # three separate pictures (a sheet in one picture came out as three fronts twice), placed side by side after
+        for view, text in (('front', 'front view'), ('side', 'exact side profile showing the swept-back fins'),
+                           ('back', 'view from directly behind and slightly below, looking into the three engine nozzles')):
+            new.append({**item(f'{key}-r{N}-{view}', f'Design reference picture on a flat plain mid-grey background (#808080), even studio light, the whole rocket in frame. {NOTEXT} {text.capitalize()} of the rocket in the reference pictures: black body, dense gold arabesque engraving, crests of many planets, pink and cyan neon lines, orange crest emblems, three engine nozzles.', [f'{ROOT}/sheets/rocket-r1b.jpg', R + 'story/places/rocket.jpg']), 'w': 1152, 'h': 2048, 'size': [720, 1280]})
+        continue
+    if key == 'sheets/dragon-robe':
+        it = item(f'{key}-r{N}a', f'Design reference sheet on a flat plain mid-grey background (#808080), even studio light: the same character three times, front view, side view and back view, side by side. {NOTEXT} {DRAGON} Exactly as the reference picture.', [R + 'story/cast/kimorin-dragon.webp', UI + 's/kimorin-dragon.jpg'])
+        for c in 'abc':
+            new.append({**it, 'id': f'{key}-r{N}{c}', 'w': 2048, 'h': 1152, 'size': [1280, 720]})
+        continue
+    if key.endswith('/MASTER'):
+        # the upper-body picture the close-ups are cut from: kept at full size so a crop stays sharp
+        body = re.sub(r'\s*(Reference:|Render at)[^.]*\.(\s*\d+x\d+[^.]*\.)?', '', do)
+        prompt = f"{STYLE} {LOCATION} {body.replace('[KIMORIN-LAB] (tail sentence: folded closed only)', LAB + ' ' + TAIL_CLOSED)}"
+        for c in 'abc':
+            new.append({**item(f'{key}-r{N}{c}', prompt, LAB_REFS + GATE_REFS), 'size': [1152, 2048]})
+        continue
     sheet = key.startswith('sheets/')
     size = ([2048, 1152, [1280, 720]] if sheet else [1152, 2048, [720, 1280]])
-    if mode == 'edit':
+    if mode in ('edit', 'edit+crop'):
         if base.startswith('edit:'):
             src = base[5:].replace('<決定>', f'r{N}a')
+            # an edit is made only from a passed picture (review 2); the master's edit takes the full-size first candidate
         else:
             src = f'{key}-{base}'
         # the edit of a key still to be painted in this round waits for it (paint.mjs's passes)
@@ -74,9 +107,12 @@ for l in lines:
         if v == 'V02':
             refs += LAB_REFS[:1]
         if 'MONBAN' in do:
-            refs.append(R + 'story/cast/monban.jpg')
+            # the watermark cut off (review 2)
+            refs.append(R + 'story/cast/monban-clean.jpg')
         text = ('Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told '
                 f'otherwise, and change only this: {do} {NOTEXT}')
+        if mode == 'edit+crop':
+            size = [1152, 2048, [1152, 2048]]
         for c in 'ab':
             it = item(f'{key}-r{N}{c}', text, refs)
             it['w'], it['h'], it['size'] = size
@@ -94,11 +130,15 @@ for l in lines:
     elif re.search(r'No (style )?reference images|Empty scene', do):
         prompt = f'{STYLE_EMPTY} {do}'
         refs = []
+    elif v == 'V02' and not re.search(r'\bKIMORIN\b|\bfigure\b|\bhe\b|\bhis\b', do):
+        # V02 frames with nobody in them (K1: the avenue to the temple)
+        prompt = f'{STYLE_EMPTY} {LOCATION.split(";")[0]}. {do}'
+        refs = GATE_REFS
     elif v == 'V02':
         tail = TAIL_OPEN if key.split('/')[1] in ('K8', 'K13', 'K13b', 'K14') else TAIL_CLOSED
         shot = re.match(r'(SHOT:[^.]*\.)', do)
         rest = do[shot.end():].strip() if shot else do
-        prompt = f'{STYLE} {(shot.group(1) + " ") if shot else ""}{LOCATION} SUBJECT: {LAB} {tail} {rest}'
+        prompt = f'{STYLE} {(shot.group(1) + " ") if shot else ""}{LOCATION} SUBJECT: {LAB} {tail} {FACING} {rest}'
         refs = LAB_REFS + GATE_REFS
     else:
         # the frames of V01 left to redraw are all empty scenes: the style pictures (with figures) stay out
@@ -109,9 +149,13 @@ for l in lines:
         it['w'], it['h'], it['size'] = size
         new.append(it)
 
+# candidates still waiting on the first prompts are dropped (review 2: their refs and tail lines are old)
+q['items'] = [i for i in q['items'] if not (re.match(r'V0[12]/K[0-9b]+-[abc]$', i['id']) and not os.path.exists(path(i['id'])))]
 # the new round first, so the reviewers get it before the rest of the queue
 ids = {i['id'] for i in new}
 q['items'] = new + [i for i in q['items'] if i['id'] not in ids]
 json.dump(q, open('design/review-art-queue.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 json.dump(picks, open(picks_path, 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 print(f'round {N}: {len(new)} new pictures, {len(picks)} picks')
+for x in later:
+    print('later:', x)
