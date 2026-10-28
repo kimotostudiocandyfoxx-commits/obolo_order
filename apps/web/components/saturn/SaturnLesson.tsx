@@ -273,6 +273,8 @@ export function SaturnLesson({
   const [star, setStar] = useState(false);
   // your own kororin (QA 6 R6: only it counts at 〔👆 コロリンをタップ〕), a hint when another is tapped
   const [mineId, setMineId] = useState<string | null>(null);
+  // the design you picked (D04-S005b), shown next to KIMORIN⭐︎'s at 「並べると…」 (QA 6 P7)
+  const [myLook, setMyLook] = useState<string | null>(null);
   const [hint, setHint] = useState('');
   // a tapped kororin sings to the end before the story goes on (QA 6 R11)
   const [waitSong, setWaitSong] = useState(false);
@@ -422,6 +424,7 @@ export function SaturnLesson({
 
   // D04-S005b: the picked design becomes the look of your kororins (null = kept as it is)
   const designed = (url: string | null) => {
+    setMyLook(url);
     if (url) setExtra((x) => x.map((p) => (p.id.startsWith('story-') ? p : { ...p, author: { ...p.author, pic: url } })));
     insert(url ? DESIGNED : UNDESIGNED);
     next();
@@ -532,6 +535,18 @@ export function SaturnLesson({
               <button className="absolute inset-0 z-[195]" aria-label="つぎへ" onClick={next}>
                 <span className="absolute right-4 top-[calc(178px+env(safe-area-inset-top))] animate-pulse text-xs text-white/80">▶</span>
               </button>
+            )}
+            {(beat?.k === 'say' || beat?.k === 'note') && /並べると|これから生まれる/.test(beat.text) && myLook && (
+              <div className="pointer-events-none absolute inset-x-0 top-[34%] z-[198] flex justify-center gap-4 px-6">
+                {[...(beat.text.includes('並べると') ? [{ url: KIMORIN_DESIGNED, name: 'KIMORIN⭐︎' }] : []), { url: myLook, name: neo }].map((d, k, all) => (
+                  <figure key={k} className="w-[42%] max-w-[170px] animate-[fadeUp_0.5s_ease-out] text-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={d.url} alt="" className="aspect-square w-full rounded-full bg-white/90 object-contain p-1 shadow-[0_0_24px_rgba(255,220,150,0.6)]" style={k === all.length - 1 && !beat.text.includes('並べると') ? { animation: 'lookSpin 0.9s ease-out' } : undefined} />
+                    <figcaption className="mt-2 text-[13px] font-bold text-white drop-shadow">{d.name}</figcaption>
+                  </figure>
+                ))}
+                <style>{'@keyframes lookSpin{0%{transform:rotateY(0) scale(.6)}100%{transform:rotateY(720deg) scale(1)}}'}</style>
+              </div>
             )}
             {beat?.k === 'note' && beat.text.endsWith('がダチになった') && (
               <DachiCard who={beat.text.startsWith('KIMORIN') ? 'kimorin' : 'inviter'} name={beat.text.startsWith('KIMORIN') ? 'KIMORIN⭐︎' : inviter} message={beat.text.startsWith('KIMORIN') ? undefined : inviterMessage} />
