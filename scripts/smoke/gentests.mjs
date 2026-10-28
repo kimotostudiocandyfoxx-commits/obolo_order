@@ -25,7 +25,8 @@ async function call(token, method, path, body, headers = {}) {
   return { j, s };
 }
 async function account(name) {
-  const email = `gentest+${name}-${Date.now()}@example.com`;
+  // a random part too: two accounts made in the same millisecond had the same email (ALREADY_MEMBER stopped run 2)
+  const email = `gentest+${name}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
   const inv = (await call('', 'POST', '/admin/invites', { email, inviterName: '木元' }, { 'x-admin-token': ADMIN })).j;
   return (await call('', 'POST', `/invites/${inv.code}/accept`, { displayName: 'テスト' })).j.token;
 }
@@ -64,7 +65,7 @@ async function look(id, body) {
 // b) bati
 async function bati(egg, food, faces) {
   const id = `${egg}-${food}`;
-  const t = await account(`bati-${egg}`);
+  const t = await account(`bati-${egg}-${food}`);
   await safe('egg', () => call(t, 'POST', '/me/bati/egg', { food, egg }));
   const h = await safe(`hatch ${id}`, () => call(t, 'POST', '/me/bati/hatch'));
   if (h?.j.bati?.imageUrl) img(`bati-${id}`, h.j.bati.imageUrl);
