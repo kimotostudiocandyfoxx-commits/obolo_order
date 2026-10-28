@@ -22,6 +22,7 @@ export function BatiChat({
   image,
   faces,
   first,
+  me,
   onDone,
 }: {
   bati: string;
@@ -30,6 +31,8 @@ export function BatiChat({
   faces?: Partial<Record<string, string>>;
   /** the first chat (day 2): the three-line how-to */
   first: boolean;
+  /** the visitor's round icon, beside their own bubbles (M-R149) */
+  me?: string;
   onDone: () => void;
 }) {
   const [msgs, setMsgs] = useState<Msg[]>([{ id: 0, who: 'bati', text: first ? `ねえ、${neo}。宇宙のことで、知りたいこと、ある？　ボク、調べてみる！` : 'なにを調べる？　宇宙のことじゃなくても、何でも聞いてね！' }]);
@@ -120,8 +123,12 @@ export function BatiChat({
         )}
         {msgs.map((m) =>
           m.who === 'me' ? (
-            <div key={m.id} className="flex justify-end">
-              <p className="max-w-[78%] rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[14px] text-amber-950">{m.text}</p>
+            <div key={m.id} className="flex items-end justify-end gap-2">
+              <p className="max-w-[72%] rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[14px] text-amber-950">{m.text}</p>
+              {me && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={me} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-amber-200/60" />
+              )}
             </div>
           ) : (
             <div key={m.id} className="max-w-[86%] space-y-1.5">

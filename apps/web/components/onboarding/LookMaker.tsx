@@ -144,11 +144,16 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     setPhase('chosen');
   };
 
+  const [reveal, setReveal] = useState<string | null>(null);
   const decide = async () => {
     if (!sel) return;
     setBusy(true);
     try {
-      onDone(await api.choose(sel.id));
+      const url = await api.choose(sel.id);
+      // M-R149: the chosen look fills the screen for a moment (ドーン)
+      setReveal(url || sel.url);
+      await new Promise((ok) => setTimeout(ok, 2600));
+      onDone(url);
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
       setBusy(false);
@@ -163,6 +168,16 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
           onDone(null);
         }}
       />
+    );
+
+  if (reveal)
+    return (
+      <div className="absolute inset-0 z-[30] flex items-center justify-center bg-black/80">
+        <div className="absolute inset-0 animate-[fadeUp_0.4s_ease-out] bg-[radial-gradient(circle,rgba(255,220,140,0.35),transparent_60%)]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={reveal} alt="" className="relative w-[82vw] max-w-sm animate-[lookBoom_0.9s_cubic-bezier(.2,1.4,.4,1)] rounded-full object-cover shadow-[0_0_80px_rgba(255,214,140,0.7)] ring-4 ring-amber-200/80" />
+        <style>{'@keyframes lookBoom{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}'}</style>
+      </div>
     );
 
   if (phase === 'making') return <Basin />;

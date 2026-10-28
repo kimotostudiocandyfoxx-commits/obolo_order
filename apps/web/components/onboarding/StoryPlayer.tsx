@@ -1018,6 +1018,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           image={v.batiImage}
           faces={v.batiFaces}
           first={!!step.first}
+          me={v.look}
           onDone={() => {
             remember('f_d03_bati_talk', 'true');
             run(iRef.current + 1);

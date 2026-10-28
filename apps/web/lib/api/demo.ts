@@ -1138,6 +1138,10 @@ export class DemoApi implements Api {
   }
 
   // demo: the drawn Bati stands in for every face; one picture from the story's own stills
+  // demo: the portrait stands in for the standing figure
+  async lookStandee() {
+    return this.patchMe((u) => ({ lookStandee: u.avatarUrl ?? null }));
+  }
   async batiFaces() {
     await sleep(1200);
     return this.patchMe((u) => (u.bati?.imageUrl ? { bati: { ...u.bati, faces: Object.fromEntries(BATI_FACES.map((f) => [f, u.bati!.imageUrl!])) } } : {}));

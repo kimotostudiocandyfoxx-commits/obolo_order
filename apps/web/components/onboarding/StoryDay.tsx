@@ -192,6 +192,8 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         choose: async (id) => {
           const u = await getApi().chooseLook(id);
           setMe(u);
+          // the standing figure without a background (M-R149) is drawn meanwhile
+          void getApi().lookStandee().then(setMe).catch(() => undefined);
           return u.avatarUrl ?? '';
         },
         chooseForm: async (id) => {

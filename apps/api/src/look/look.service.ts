@@ -38,6 +38,11 @@ let butterflySheet: Promise<GeneratedImage> | null = null;
 /** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg). */
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
 const BATI_GREY: [number, number, number] = [128, 128, 128];
+const STANDEE_PROMPT =
+  'Draw the character of the attached portrait as a full-body standing figure: the same person, face, hair, animal ears, oversized hood and ' +
+  'cloak, colours, the round gold-rimmed sunglasses hiding the eyes, and the same semi-real painted style. Standing, facing the viewer, a relaxed ' +
+  'friendly pose, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, ' +
+  'no shadow and no other objects. Safe for children. No text, no letters.';
 const FACE_WORDS: Record<BatiFace, string> = {
   smile: 'a big happy smile, eyes curved with joy',
   sparkle: 'wide open eyes full of sparkles and stars, excited and curious, leaning forward a little',
@@ -167,6 +172,30 @@ export class LookService {
     }
     const tries = Number((await this.kv.get(`look:tries:${userId}`)) ?? 0);
     return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
+  }
+
+  /**
+   * The NEO look standing, without a background (M-R149): the chosen portrait painted again as a full figure on
+   * grey, then cut out — shown big when the look is chosen and while they speak. Once per look (a new look draws a
+   * new one); part of the look, no mana.
+   */
+  async standee(userId: string, origin: string): Promise<Me> {
+    const u = await this.user(userId);
+    if (!u.avatarUrl) throw apiError(HttpStatus.CONFLICT, 'NO_LOOK', 'No look yet');
+    const j = (u.onboardingJson ?? {}) as Record<string, string>;
+    if (j['look.standee'] && j['look.standee.of'] === u.avatarUrl) return toMe(u);
+    const src = await this.current(userId, u.avatarUrl);
+    if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Look not found');
+    const img = await this.looks.generate(STANDEE_PROMPT, 0, [src]);
+    const cut = await cutoutWhite(img.data, 1024, BATI_GREY).catch(() => null);
+    const m = cut ? await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin) : await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
+    const cur = ((await this.user(userId)).onboardingJson ?? {}) as Record<string, string>;
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...cur, 'look.standee': m.url, 'look.standee.of': u.avatarUrl }, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(nu);
   }
 
   /** the look worn now, as a picture to change */

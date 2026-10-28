@@ -46,6 +46,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     invitedByMessage: u.invitedByMessage ?? null,
     neoForm: u.neoForm,
     avatarUrl: u.avatarUrl,
+    lookStandee: (u.onboardingJson as Record<string, string> | null)?.['look.standee'] ?? null,
     bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, faces: batiFaces(u.onboardingJson) } : null,
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },

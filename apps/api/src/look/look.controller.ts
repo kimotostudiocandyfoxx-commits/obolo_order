@@ -96,6 +96,14 @@ export class LookController {
     return this.look.hatch(userId, origin(req));
   }
 
+  /** the NEO look standing without a background (M-R149), drawn once per look */
+  @Post('look/standee')
+  @HttpCode(200)
+  async standee(@UserId() userId: string, @Req() req: Request) {
+    await rateLimit(this.kv, `standee:${userId}`, 4, 600);
+    return this.look.standee(userId, origin(req));
+  }
+
   /** Bati's expressions, drawn once after the hatching (M-R139) */
   @Post('bati/faces')
   @HttpCode(200)

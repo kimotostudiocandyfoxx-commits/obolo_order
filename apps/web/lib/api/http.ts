@@ -392,6 +392,9 @@ export class HttpApi implements Api {
   batiHatch() {
     return this.req<Awaited<ReturnType<Api['batiHatch']>>>('POST', '/me/bati/hatch');
   }
+  lookStandee() {
+    return this.req<Awaited<ReturnType<Api['lookStandee']>>>('POST', '/me/look/standee');
+  }
   batiFaces() {
     return this.req<Awaited<ReturnType<Api['batiFaces']>>>('POST', '/me/bati/faces');
   }

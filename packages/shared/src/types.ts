@@ -33,6 +33,8 @@ export interface Me {
   voices: { self: boolean; bati: boolean; selfSings?: boolean; kororin?: boolean };
   /** the round ぷにぷに character (null until dressed on the profile) */
   look: PuniLook | null;
+  /** the NEO look standing, without a background (M-R149): made once after the look is chosen (POST /me/look/standee) */
+  lookStandee?: string | null;
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
   puniPic: string | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */

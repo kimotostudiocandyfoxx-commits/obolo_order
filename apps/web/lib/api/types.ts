@@ -252,6 +252,8 @@ export interface Api {
   batiName(name: string): Promise<Me>;
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;
+  /** the NEO look standing without a background (M-R149), drawn once per look */
+  lookStandee(): Promise<Me>;
   /** 〔🖼 絵で見る〕 under one of Bati's answers (null = none found) */
   buddyPicture(question: string, answer?: string): Promise<{ picture: BuddyPicture | null }>;
   myInvites(): Promise<MyInviteView[]>;

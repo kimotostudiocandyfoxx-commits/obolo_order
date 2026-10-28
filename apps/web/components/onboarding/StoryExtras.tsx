@@ -131,6 +131,13 @@ export function VoiceField({
 }) {
   const ref = useRef<HTMLInputElement & HTMLTextAreaElement>(null);
   const mic = useDictation({ field: ref, value, onChange, maxLength });
+  // while they speak, their own figure comes up big (M-R149, components/NeoSpeaking.tsx)
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: mic.listening }));
+    return () => {
+      if (mic.listening) window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: false }));
+    };
+  }, [mic.listening]);
   const withMic = useContext(MicAllowed);
   const [typing, setTyping] = useState(false);
   const [notice, setNotice] = useState(false);
