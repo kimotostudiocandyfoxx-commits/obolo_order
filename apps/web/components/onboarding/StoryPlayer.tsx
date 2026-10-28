@@ -552,7 +552,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           return;
         } else if (s.t === 'film') {
           // a film watched before (or skipped) does not play again, also after a restart
-          if (filmWatched(s.id)) {
+          if (filmWatched(s.id) && !filmAnyway.current) {
             n++;
             continue;
           }
@@ -822,14 +822,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   }, [i, started]);
 
   /** First tap: unlocks audio/video on iOS and starts (or resumes) the story inside the gesture. */
-  const start = () => {
+  // 〔開封準備完了〕 always opens on the film, also on a phone that saw it before the gate existed (client 2026-10-29)
+  const filmAnyway = useRef(false);
+  const start = (withFilm = false) => {
+    filmAnyway.current = withFilm;
     setStarted(true);
     unlockSfx();
     voice.current?.unlock();
     // Start the music inside the gesture (fresh start: the first track; resume: the track at that point).
     const firstBgm = steps.find((s) => s.t === 'bgm');
     bgm.current?.unlock(i === 0 ? (firstBgm?.t === 'bgm' ? firstBgm.track : null) : bgmAt(steps, i));
-    const firstMedia = mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
+    const first = steps[i];
+    const firstMedia = first?.t === 'film' && (withFilm || !filmWatched(first.id)) ? { motion: `film-${first.id}-1` as MotionId } : mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
     if (i === 0) {
@@ -1379,9 +1383,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
 
-      {!started && i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen && <SealGate onOpen={start} />}
+      {!started && i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen && <SealGate onOpen={() => start(true)} />}
       {!started && !(i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen) && (
-        <button className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black" onClick={start}>
+        <button className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black" onClick={() => start()}>
           <span className="relative flex h-24 w-24 items-center justify-center">
             <span className="absolute inset-0 animate-ping rounded-full bg-amber-200/20" />
             <span className="h-3 w-3 rounded-full bg-amber-100 shadow-[0_0_40px_12px_rgba(255,214,140,0.7)]" />
