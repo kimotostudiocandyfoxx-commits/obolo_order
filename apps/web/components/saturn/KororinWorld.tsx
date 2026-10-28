@@ -267,10 +267,41 @@ export function KororinWorld({
   const party = useRef<KororinPartyHandle>(null);
   const singingRef = useRef<string | null>(null);
   singingRef.current = speakingId;
+  // a kororin a dachi delivered: the first time it shows here it drops its glasses and dances once, silently
+  // (sound only when tapped, M-R153)
+  const [arrival, setArrival] = useState<string | null>(null);
+  const arrivalRef = useRef<string | null>(null);
+  arrivalRef.current = arrival;
+  const arrivalPending = useRef(false);
+  useEffect(() => {
+    if (tab !== 'friends' || arrivalPending.current) return;
+    let seen: string[] = [];
+    try {
+      seen = JSON.parse(localStorage.getItem('obolo.kororinArrived') ?? '[]') as string[];
+    } catch {
+      /* private mode */
+    }
+    const p = shown.find((x) => x.author.id !== me?.id && !seen.includes(x.id));
+    if (!p) return;
+    try {
+      localStorage.setItem('obolo.kororinArrived', JSON.stringify([...seen, p.id].slice(-300)));
+    } catch {
+      /* private mode */
+    }
+    // one at a time; the timers outlive re-renders (the list changes often)
+    arrivalPending.current = true;
+    setTimeout(() => setArrival(p.id), 900);
+    setTimeout(() => {
+      setArrival(null);
+      arrivalPending.current = false;
+    }, 4200);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, shown]);
 
   // the speech bubble follows the tapped character, always above it (never over the buttons)
   const onFrame = useCallback((get: (id: string) => { x: number; y: number; R: number } | undefined, W: number) => {
-    party.current?.place(singingRef.current ? get(singingRef.current) : undefined);
+    const star = singingRef.current ?? arrivalRef.current;
+    party.current?.place(star ? get(star) : undefined);
     const id = openRef.current;
     const el = card.current;
     if (!id || !el) return;
@@ -499,7 +530,7 @@ export function KororinWorld({
         }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
       </div>
 
-      <KororinParty ref={party} on={!!speakingId} />
+      <KororinParty ref={party} on={!!speakingId || !!arrival} />
 
       {/* soap-bubble pops of the voices you heard */}
       {bursts.map((bu) => (
