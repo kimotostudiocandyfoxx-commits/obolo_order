@@ -18,6 +18,9 @@ def block(start, end):
 
 STYLE = block('### 0-2. 絵柄の固定文（すべての止め絵の頭につける）', '')
 # the style pictures carry figures of their own: Seedream copied them into every frame (first run, V01/K7〜)
+# a frame with nobody in it: the style text's own line about the characters made the model add a small chibi to every frame
+STYLE_EMPTY = re.sub(r';\s*characters in a semi-realistic[^.]*\.', '.', STYLE) + ' No people, no characters, no creatures, no figures anywhere.'
+CAST_WORDS = re.compile(r'\[(KIMORIN|MONBAN|OBOLON|BROTHER|SISTER|UNPON|KORORIN)|KIMORIN|MONBAN|OBOLON|silhouette|hand|figure|person|crane', re.I)
 GUARD = 'Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here.'
 PHOTO = re.search(r'```\n(PHOTO:.*?)\n```', md, re.S).group(1).strip()
 # the cast lines: | [NAME] ... | text | refs |
@@ -79,7 +82,7 @@ for v in videos:
             refs.append(R + 'story/props/envelope.webp')
         if 'hooded silhouette' in body:
             refs.append(R + 'story/cast/monban.jpg')
-        head = PHOTO if photo else STYLE
+        head = PHOTO if photo else (STYLE if CAST_WORDS.search(prompt) else STYLE_EMPTY)
         for c in 'abcdefgh'[:n]:
             if same:
                 edit = f'art/review/saturn/{v}/{base}-{c}.jpg'
