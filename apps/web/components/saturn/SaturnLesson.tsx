@@ -241,6 +241,7 @@ export function SaturnLesson({
   bati,
   neo,
   inviter,
+  inviterMessage,
   batiImage,
   food,
   api,
@@ -249,6 +250,8 @@ export function SaturnLesson({
   bati: string;
   neo: string;
   inviter: string;
+  /** the inviter's own words on Day 1's invitation, shown again on their dachi card (M-R169) */
+  inviterMessage?: string;
   batiImage?: string;
   /** the favourite food said on the Moon (the design takes it in) */
   food?: string;
@@ -487,6 +490,7 @@ export function SaturnLesson({
         extra={extra}
         highlightId={beat?.k === 'listen' && !waitSong ? target : null}
         closeSignal={closeSignal}
+        singingId={waitSong ? target : null}
         events={{
           onListen: (p) => {
             if (beat?.k !== 'listen' || waitSong) return;
@@ -528,6 +532,9 @@ export function SaturnLesson({
               <button className="absolute inset-0 z-[195]" aria-label="つぎへ" onClick={next}>
                 <span className="absolute right-4 top-[calc(178px+env(safe-area-inset-top))] animate-pulse text-xs text-white/80">▶</span>
               </button>
+            )}
+            {beat?.k === 'note' && beat.text.endsWith('がダチになった') && (
+              <DachiCard who={beat.text.startsWith('KIMORIN') ? 'kimorin' : 'inviter'} name={beat.text.startsWith('KIMORIN') ? 'KIMORIN⭐︎' : inviter} message={beat.text.startsWith('KIMORIN') ? undefined : inviterMessage} />
             )}
             {hint && <p className="pointer-events-none absolute inset-x-0 bottom-[calc(120px+env(safe-area-inset-bottom))] z-[205] text-center"><span className="rounded-full bg-[rgba(20,12,36,0.75)] px-4 py-2 text-[13px] text-amber-100">{hint}</span></p>}
             {flying && (
@@ -819,20 +826,63 @@ function KororinDesign({ api, bati, neo, food, onDone }: { api?: LessonApi; bati
   );
 }
 
+/**
+ * A new dachi (QA 6 P9, M-R169): a small card sealed like Day 1's invitation (the compass seal), the face and
+ * the name, and for {inviter} their words from the invitation once more. KIMORIN⭐︎'s face sways as he arrives.
+ */
+function DachiCard({ who, name, message }: { who: 'kimorin' | 'inviter'; name: string; message?: string }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[198] flex items-center justify-center px-8">
+      <div className="relative w-full max-w-[280px] animate-[fadeUp_0.5s_ease-out] rounded-2xl border-2 border-amber-300/80 bg-gradient-to-b from-[#2a1a3e] to-[#120a1e] px-5 pb-5 pt-9 text-center text-amber-50 shadow-[0_0_40px_rgba(255,200,120,0.35)]">
+        {/* the compass seal, as on the invitation */}
+        <span className="absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full border-4 border-double border-amber-200 bg-gradient-to-b from-[#b4282e] to-[#6e1418] text-2xl shadow-lg">🧭</span>
+        <p className="text-[11px] tracking-[0.3em] text-amber-200/90">👥 ダチ</p>
+        <span className={`mx-auto mt-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-white/10 ring-2 ring-amber-200/70 ${who === 'kimorin' ? 'animate-[tailFlap_0.5s_ease-in-out_4]' : ''}`}>
+          {who === 'kimorin' ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={spriteUrl('kimorin-face')} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-3xl font-bold">{[...name][0]}</span>
+          )}
+        </span>
+        <p className="mt-3 text-[18px] font-bold" style={{ fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", serif' }}>
+          {name}
+        </p>
+        {message && (
+          <p className="mt-3 whitespace-pre-wrap border-t border-amber-200/30 pt-3 text-[13px] leading-relaxed text-amber-50/90" style={{ fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", serif' }}>
+            「{message}」
+          </p>
+        )}
+      </div>
+      <style>{'@keyframes tailFlap{0%,100%{transform:rotate(0)}30%{transform:rotate(-8deg)}70%{transform:rotate(8deg)}}'}</style>
+    </div>
+  );
+}
+
 const sheet = 'pb-safe absolute inset-x-0 bottom-0 z-[205] max-h-[72%] overflow-y-auto rounded-t-3xl bg-[rgba(14,10,24,0.94)] px-5 pb-8 pt-5 text-amber-50';
 
 /** D04-S005c: 〔届ける〕 → the kororin just made, 〔ダチへ〕 ({inviter}・KIMORIN⭐︎) already chosen → 〔届ける〕 (no mana). */
 function SendKororin({ made, inviter, onDone }: { made: string[]; inviter: string; onDone: (sent: boolean) => void }) {
   const [open, setOpen] = useState(false);
+  // after 〔届ける〕: the kororin rolls along the ring into the stars and splits into two lights, one for each dachi (QA 6 P8)
+  const [flying, setFlying] = useState(false);
+  if (flying)
+    return (
+      <div className="pointer-events-none absolute inset-0 z-[205]" aria-hidden>
+        <span className="absolute bottom-[30%] left-1/2 h-14 w-14 rounded-full bg-gradient-to-b from-amber-300 to-orange-500 shadow-[0_0_24px_rgba(255,200,120,0.9)]" style={{ animation: 'sendRoll 1.1s ease-in forwards' }} />
+        {[-1, 1].map((d) => (
+          <span key={d} className="absolute left-1/2 top-[38%] h-4 w-4 rounded-full bg-amber-100 opacity-0 shadow-[0_0_18px_6px_rgba(255,230,160,0.9)]" style={{ animation: `sendLight${d < 0 ? 'L' : 'R'} 1.3s 1s ease-out forwards` }} />
+        ))}
+        <style>{'@keyframes sendRoll{0%{transform:translate(-50%,0)}100%{transform:translate(-50%,-26svh) rotate(720deg) scale(.4);opacity:.9}}@keyframes sendLightL{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-38vw,-30svh) scale(.5)}}@keyframes sendLightR{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(34vw,-34svh) scale(.5)}}'}</style>
+      </div>
+    );
   if (!open)
     return (
-      <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-end gap-2 px-4 pb-8">
-        <Choice k={0} onClick={() => setOpen(true)}>
-          届ける
-        </Choice>
-        <Choice k={1} onClick={() => onDone(false)}>
+      <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] px-5 pb-8">
+        <DecisionButton onClick={() => setOpen(true)}>届ける</DecisionButton>
+        <button onClick={() => onDone(false)} className="mt-3 w-full text-center text-[13px] text-white/70">
           今はいい
-        </Choice>
+        </button>
       </div>
     );
   const last = made[made.length - 1];
@@ -842,7 +892,14 @@ function SendKororin({ made, inviter, onDone }: { made: string[]; inviter: strin
       <p className="mt-3 text-[13px] text-white/70">行き先</p>
       <p className="mt-1 rounded-2xl border border-amber-200 bg-amber-200/15 px-4 py-2.5 text-center text-[14px] font-bold">✓ ダチへ（{inviter}・KIMORIN⭐︎）</p>
       <div className="mt-4">
-        <DecisionButton onClick={() => onDone(true)}>届ける</DecisionButton>
+        <DecisionButton
+          onClick={() => {
+            setFlying(true);
+            setTimeout(() => onDone(true), 2400);
+          }}
+        >
+          届ける
+        </DecisionButton>
       </div>
       <button onClick={() => onDone(false)} className="mt-3 w-full text-center text-[13px] text-white/55">
         やめる

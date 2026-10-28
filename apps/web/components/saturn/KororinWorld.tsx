@@ -11,6 +11,7 @@ import { MicButton } from '@/components/MicButton';
 import { PuniAvatar } from '@/components/puni/PuniAvatar';
 import { playPop, unlockPop } from '@/lib/popSound';
 import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
+import type { Blob as PuniBlob } from '@/lib/puni/physics';
 import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
 import { PlazaMap } from './PlazaMap';
@@ -44,6 +45,7 @@ export function KororinWorld({
   highlightDrop = false,
   highlightId = null,
   closeSignal = 0,
+  singingId = null,
   extra,
   roomOnly = false,
   noBar = false,
@@ -66,11 +68,15 @@ export function KororinWorld({
   highlightId?: string | null;
   /** a number that changes when the story moves on: the open bubble closes (QA 6 R7) */
   closeSignal?: number;
+  /** the story says this one is singing now: the party plays for it even while its voice is still loading (QA 6 P4) */
+  singingId?: string | null;
   /** Extra layer on top (tutorial coach). */
   overlay?: ReactNode;
   className?: string;
 }) {
   const { me } = useAuth();
+  // the story's lesson (it brings its own mic)
+  const lesson = noBar;
   const [posts, setPosts] = useState<SaturnPostView[]>([]);
   const [tab, setTab] = useState<Tab>('all');
   // みんな: the ひろば map, or inside one ひろば (the Day 4 tutorial skips the map)
@@ -168,9 +174,10 @@ export function KororinWorld({
   // Real posts first, topped up with sample residents so the world never feels empty.
   const all = useMemo(() => {
     const real = [...(extra ?? []), ...posts];
-    const fill = SATURN_RESIDENTS.slice(0, Math.max(0, 16 - real.length));
+    // a story lesson keeps the crowd smaller, so the one to tap is easy to find (QA 6 P3)
+    const fill = SATURN_RESIDENTS.slice(0, Math.max(0, (lesson ? 8 : 16) - real.length));
     return [...real, ...fill];
-  }, [posts, extra]);
+  }, [posts, extra, lesson]);
 
   // フォロー / ダチ (every planet has みんな・フォロー・ダチ): real posts only, fetched when the tab opens
   // only so many on the planet at once; when one pops, the next voice drops in from the sky
@@ -215,7 +222,12 @@ export function KororinWorld({
   }, [fromList, onMap, all, tabPosts, tab, plazaId]);
   const unheard = useMemo(() => source.filter((p) => !heard.has(p.id)), [source, heard]);
   const cap = tab === 'all' ? (plazaId ? TAB_CAP.plaza : Infinity) : TAB_CAP[tab];
-  const shown = useMemo(() => unheard.slice(0, cap), [unheard, cap]);
+  const shown = useMemo(() => {
+    const l = unheard.slice(0, cap);
+    // the one to tap is drawn last (in front of the pile)
+    const k = highlightId ? l.findIndex((p) => p.id === highlightId) : -1;
+    return k < 0 ? l : [...l.slice(0, k), ...l.slice(k + 1), l[k]];
+  }, [unheard, cap, highlightId]);
   scopeRef.current = `${tab}:${plazaId}`;
 
   // running low on voices waiting in line → fetch the next page
@@ -258,24 +270,25 @@ export function KororinWorld({
           look: p.author.look ?? defaultLook(COLORS[h % COLORS.length]),
           pic: p.author.pic ?? null,
           photo: p.photoUrl ?? null,
-          R: dense
+          R: (p.id === highlightId ? 1.3 : 1) * (dense
             ? Math.max(14, Math.min(30, stageW * 0.028 * (1 + (hueOf(p.id) % 3) * 0.12)))
             : Math.min(
             stageW * (tab === 'friends' ? 0.16 : 0.12),
             Math.max(30, Math.min(84, stageW * (0.05 + (hueOf(p.id) % 4) * 0.008))) * (tab === 'friends' ? FRIENDS_SCALE : 1),
-          ),
+          )),
         };
       }),
-    [shown, stageW, tab, dense],
+    [shown, stageW, tab, dense, highlightId],
   );
   const speakingId = shown.find((p) => p.voiceUrl === playingUrl)?.id ?? null;
+  const partyId = speakingId ?? singingId;
   // M-R153: while a kororin sings, the party (KororinParty) follows it
   const party = useRef<KororinPartyHandle>(null);
   const singingRef = useRef<string | null>(null);
   const highlightRef = useRef<string | null>(null);
   highlightRef.current = highlightId;
   const marker = useRef<HTMLDivElement>(null);
-  singingRef.current = speakingId;
+  singingRef.current = partyId;
   // a kororin a dachi delivered: the first time it shows here it drops its glasses and dances once, silently
   // (sound only when tapped, M-R153)
   const [arrival, setArrival] = useState<string | null>(null);
@@ -308,10 +321,16 @@ export function KororinWorld({
   }, [tab, shown]);
 
   // the speech bubble follows the tapped character, always above it (never over the buttons)
-  const onFrame = useCallback((get: (id: string) => { x: number; y: number; R: number } | undefined, W: number) => {
+  const onFrame = useCallback((get: (id: string) => PuniBlob | undefined, W: number) => {
     const star = singingRef.current ?? arrivalRef.current;
     party.current?.place(star ? get(star) : undefined);
     const hi = highlightRef.current && get(highlightRef.current);
+    // …rolled towards the middle of the planet, in front of the others
+    if (hi && !hi.drag && Math.abs(W / 2 - hi.x) > 4) {
+      // strong enough to climb the planet's curve and push through the pile
+      hi.x += Math.sign(W / 2 - hi.x) * Math.min(Math.abs(W / 2 - hi.x), Math.max(3, Math.abs(W / 2 - hi.x) * 0.1));
+      hi.vx = 0;
+    }
     if (marker.current) {
       marker.current.style.opacity = hi ? '1' : '0';
       if (hi) marker.current.style.transform = `translate(${hi.x - hi.R * 1.25}px, ${hi.y - hi.R * 1.25}px)`;
@@ -539,19 +558,21 @@ export function KororinWorld({
       {/* みんな: the ひろば map */}
       {onMap && <PlazaMap onEnter={enterPlaza} shakeKey={mapShake} refreshKey={mapRefresh} />}
 
-      <KororinPartySky on={!!speakingId} />
+      <KororinPartySky on={!!partyId} />
 
       {/* characters: soft bodies on the planet */}
       <div ref={stage} className="absolute inset-0">
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
           const p = shown.find((x) => x.id === id);
           if (p) listen(p);
-        }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
+        }} onTapEmpty={close} onFrame={onFrame} speakingId={partyId} />
       </div>
 
-      <KororinParty ref={party} on={!!speakingId || !!arrival} />
-      <div ref={marker} className="pointer-events-none absolute left-0 top-0 z-[60] rounded-full border-4 border-amber-200 opacity-0 shadow-[0_0_24px_rgba(255,220,140,0.9)] transition-opacity" aria-hidden>
-        <span className="absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce text-3xl">👇</span>
+      <KororinParty ref={party} on={!!partyId || !!arrival} />
+      <div ref={marker} className="pointer-events-none absolute left-0 top-0 z-[60] rounded-full border-[6px] border-amber-200 opacity-0 shadow-[0_0_28px_rgba(255,220,140,0.95)] transition-opacity" aria-hidden>
+        {/* a thick ring that beats, and a big finger (QA 6 P3) */}
+        <span className="absolute -inset-2 animate-ping rounded-full border-4 border-amber-100/70" />
+        <span className="absolute -top-14 left-1/2 -translate-x-1/2 animate-bounce text-5xl drop-shadow">👇</span>
       </div>
 
       {/* soap-bubble pops of the voices you heard */}

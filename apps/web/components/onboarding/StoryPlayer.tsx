@@ -963,6 +963,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bati={v.bati || 'バティ'}
           neo={v.neo || v.name}
           inviter={v.inviter || 'ともだち'}
+          inviterMessage={v.inviterMessage}
           batiImage={v.batiImage}
           food={v.batiFood}
           api={lessonApi ?? undefined}
