@@ -16,7 +16,7 @@ async function call(token, method, path, body, headers = {}) {
     method,
     headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}), ...headers },
     body: body === undefined ? undefined : JSON.stringify(body),
-    signal: AbortSignal.timeout(300_000),
+    signal: AbortSignal.timeout(480_000),
   });
   const j = await r.json().catch(() => null);
   const s = ((Date.now() - t0) / 1000).toFixed(1);
