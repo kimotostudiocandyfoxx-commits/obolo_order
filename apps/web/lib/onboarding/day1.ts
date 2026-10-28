@@ -43,9 +43,9 @@ export const DAY1: Step[] = [
   { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
   { t: 'se', sound: 'gate-close' },
-  { t: 'video', motion: 'd1-monban' }, // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる
+  // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる; the telop shows over his arrival and goes (QA 6 N18: it stayed in the chat)
+  { t: 'video', motion: 'd1-monban', captions: [{ text: 'MONBANが現れた', from: 7, to: 9.8 }] },
   { t: 'loop', motion: '9-l' }, // no camera shake here: it looked cheap (client 2026-10-22)
-  { t: 'caption', text: 'MONBANが現れた' },
   { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
   { t: 'say', who: 'MONBAN', text: '誰だお前…。\nここは秘密結社だ…。' },
   { t: 'say', who: 'MONBAN', text: 'この先はObolo Orderしか入れない…帰れ…。' },
