@@ -64,10 +64,29 @@ def item(cid, prompt, refs):
 
 new = []
 later = []
+
+
+def ref(r):
+    """a review's reference: a picture of the review (V02/K9-r2b), a file of the repository, or a UI sprite"""
+    for c in (f'{ROOT}/{r}.jpg', r, UI + r, UI + r.replace('onboarding/', '')):
+        if os.path.exists(c):
+            return c
+    return None
+
+
+# the first references show what to draw (a cast member, a place): the "style only" guard is for the style pictures
+# alone (review 3: every OBOLON came out as an ordinary hooded man)
+CONTENT = 'The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are.'
 for l in lines:
     key, base, mode, do = l['key'], l['base'], l['mode'], l['do']
     v = key.split('/')[0]
+    if mode == 'retry':
+        continue
     if mode == 'decide':
+        # the reference sheets wait for the client's OK before they become decisions (review 3)
+        if key.startswith('sheets/') and 'client' in do:
+            later.append(f'{key}: {base} waits for the client OK')
+            continue
         picks[key] = f'{key}-{base}'
         continue
     # crops wait for the chosen master; post-processing (a blur) is done by hand, not painted
@@ -103,8 +122,11 @@ for l in lines:
         else:
             src = f'{key}-{base}'
         # the edit of a key still to be painted in this round waits for it (paint.mjs's passes)
-        refs = [path(src)]
-        if v == 'V02':
+        # the source may also be a file of the repository (the client's Saturn temple, a UI sprite: review 3)
+        refs = [path(src) if os.path.exists(path(src)) or '/' in src and src.split('/')[0] in ('V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V19', 'sheets', 'stills', 'sprites') else (ref(src) or path(src))]
+        # the review's own second / third pictures ("exactly as in the second picture")
+        refs += [x for x in (ref(r) for r in l.get('refs', [])[1:]) if x and x not in refs]
+        if v == 'V02' and not l.get('refs'):
             refs += LAB_REFS[:1]
         if 'MONBAN' in do:
             # the watermark cut off (review 2)
@@ -113,6 +135,8 @@ for l in lines:
                 f'otherwise, and change only this: {do} {NOTEXT}')
         if mode == 'edit+crop':
             size = [1152, 2048, [1152, 2048]]
+        if v == 'sprites':
+            size = [1536, 2048, [960, 1280]]
         for c in 'ab':
             it = item(f'{key}-r{N}{c}', text, refs)
             it['w'], it['h'], it['size'] = size
@@ -120,7 +144,12 @@ for l in lines:
         continue
     # regen
     orig = old.get(f'{key}-a', {}).get('prompt', '')
-    if sheet:
+    if l.get('refs'):
+        # drawn from the given pictures (a cast member, a place): they are content, not style (review 3)
+        refs = [x for x in (ref(r) for r in l['refs']) if x]
+        body = STYLE_EMPTY if v == 'V19' and 'No people' in do else STYLE.replace(' Use the reference pictures for their art style only, never their content.', '')
+        prompt = f'{body} {CONTENT} {do}' if not sheet else f'Design reference picture on a flat plain mid-grey background (#808080), even studio light. {NOTEXT} {CONTENT} {do}'
+    elif sheet:
         prompt = ('Design reference sheet on a flat plain mid-grey background (#808080), even studio light. No text, no letters. ' + do + ' ' +
                   (LAB if 'kimorin' in key else re.sub(r'^.*?(?:three times[^.]*\.)', '', orig)))
         refs = LAB_REFS if 'kimorin' in key else [R + 'story/places/rocket.jpg', f'{ROOT}/sheets/rocket-c.jpg']

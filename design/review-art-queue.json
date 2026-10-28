@@ -4,6 +4,637 @@
  "always": "",
  "items": [
   {
+   "id": "V01/K17-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K17-r2b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the floating envelope, its glowing gold seal, the tassel, the desk, the lamp and the framing exactly the same; only make the envelope's corners and flap edge crumble away into thick streams of glowing golden light particles that flow toward the camera. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V01/K17-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V01/K17-r2b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the floating envelope, its glowing gold seal, the tassel, the desk, the lamp and the framing exactly the same; only make the envelope's corners and flap edge crumble away into thick streams of glowing golden light particles that flow toward the camera. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K1-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K1-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the bright sunburst behind the domed temple; the sky behind the temple becomes a deep blue-violet dusk with the first stars; the dome and facade are lit warm orange from the front, from behind the camera (the low sun is behind the viewer, at the gate); long shadows of the pillars and lamp posts stretch away from the camera toward the temple; keep the avenue, pillars, floor pattern and framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K1-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K1-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the bright sunburst behind the domed temple; the sky behind the temple becomes a deep blue-violet dusk with the first stars; the dome and facade are lit warm orange from the front, from behind the camera (the low sun is behind the viewer, at the gate); long shadows of the pillars and lamp posts stretch away from the camera toward the temple; keep the avenue, pillars, floor pattern and framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K9-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r2b.jpg",
+    "art/review/saturn/V02/MASTER-r2a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the wrought-iron garden gate with the giant gate of the headquarters city exactly as in the second picture: massive black stone pillars with gold ornament, towering, the low sunset sun glowing beyond, softly out of focus; keep the hand, glove, cuff, handset, the thumb resting on the button and the rising cable exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K9-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r2b.jpg",
+    "art/review/saturn/V02/MASTER-r2a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Replace the wrought-iron garden gate with the giant gate of the headquarters city exactly as in the second picture: massive black stone pillars with gold ornament, towering, the low sunset sun glowing beyond, softly out of focus; keep the hand, glove, cuff, handset, the thumb resting on the button and the rising cable exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K10-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r3a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The thumb presses the button down, the gold rim flares bright; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K10-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K9-r3a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The thumb presses the button down, the gold rim flares bright; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K12-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/V02/MASTER-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The little screen on the head box lights up with a glowing double-circle shape (two concentric rings, not a letter), a soft burst of light around the box; everything else exactly the same; then crop the same box as K11 (x360 y560 x792 y1328) and upscale. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K12-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/saturn/V02/MASTER-r2a.jpg",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The little screen on the head box lights up with a glowing double-circle shape (two concentric rings, not a letter), a soft burst of light around the box; everything else exactly the same; then crop the same box as K11 (x360 y560 x792 y1328) and upscale. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K14-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K14-r2a.jpg",
+    "art/review/saturn/V02/K13-r1a.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep MONBAN, the smoke, the gate and the light exactly the same; make KIMORIN exactly the same size, position, pose and tail as in the second picture, holding the silver push-button handset raised in his right hand with the cable up to the head box; only his head is turned up toward MONBAN. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V02/K14-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V02/K14-r2a.jpg",
+    "art/review/saturn/V02/K13-r1a.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep MONBAN, the smoke, the gate and the light exactly the same; make KIMORIN exactly the same size, position, pose and tail as in the second picture, holding the silver push-button handset raised in his right hand with the cable up to the head box; only his head is turned up toward MONBAN. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V06/K11-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K11-b.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Fill the hall with warm golden interior light like the second picture: glowing gold walls and pillars, a polished floor reflecting the light, the giant golden ring at the top of the stairs; keep MONBAN, OBOLON, their positions and the framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V06/K11-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K11-b.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Fill the hall with warm golden interior light like the second picture: glowing gold walls and pillars, a polished floor reflecting the light, the giant golden ring at the top of the stairs; keep MONBAN, OBOLON, their positions and the framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V19/K2-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the basin water rises in a spiral column reaching toward the viewer, droplets and light sparkling; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V19/K2-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the basin water rises in a spiral column reaching toward the viewer, droplets and light sparkling; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V19/K4-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Exact top-down view of the same round basin as the reference, the water perfectly calm like a mirror, a soft evenly bright empty oval of light in the center (nothing reflected in it), the blue-silver magic-circle rim around it, the reflection of a pillar of light at the edge; no people, no faces."
+  },
+  {
+   "id": "V19/K4-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Exact top-down view of the same round basin as the reference, the water perfectly calm like a mirror, a soft evenly bright empty oval of light in the center (nothing reflected in it), the blue-silver magic-circle rim around it, the reflection of a pillar of light at the edge; no people, no faces."
+  },
+  {
+   "id": "V19/K4-r3c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Exact top-down view of the same round basin as the reference, the water perfectly calm like a mirror, a soft evenly bright empty oval of light in the center (nothing reflected in it), the blue-silver magic-circle rim around it, the reflection of a pillar of light at the edge; no people, no faces."
+  },
+  {
+   "id": "sheets/rocket-side-r3a",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r2-front.jpg",
+    "design/story/refs/story/places/rocket.jpg"
+   ],
+   "prompt": "Design reference picture on a flat plain mid-grey background (#808080), even studio light. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Exact 90-degree side profile of the same rocket LYING HORIZONTALLY, nose pointing to the right, on a flat mid-grey background: one long slender body seen from the side, the swept-back fins seen edge-on above and below, the three engine nozzles at the left end seen from the side; same black body, gold arabesque, pink and cyan neon lines, orange crests. (Rotate upright afterwards.)"
+  },
+  {
+   "id": "sheets/rocket-side-r3b",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r2-front.jpg",
+    "design/story/refs/story/places/rocket.jpg"
+   ],
+   "prompt": "Design reference picture on a flat plain mid-grey background (#808080), even studio light. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Exact 90-degree side profile of the same rocket LYING HORIZONTALLY, nose pointing to the right, on a flat mid-grey background: one long slender body seen from the side, the swept-back fins seen edge-on above and below, the three engine nozzles at the left end seen from the side; same black body, gold arabesque, pink and cyan neon lines, orange crests. (Rotate upright afterwards.)"
+  },
+  {
+   "id": "sheets/rocket-side-r3c",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r2-front.jpg",
+    "design/story/refs/story/places/rocket.jpg"
+   ],
+   "prompt": "Design reference picture on a flat plain mid-grey background (#808080), even studio light. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Exact 90-degree side profile of the same rocket LYING HORIZONTALLY, nose pointing to the right, on a flat mid-grey background: one long slender body seen from the side, the swept-back fins seen edge-on above and below, the three engine nozzles at the left end seen from the side; same black body, gold arabesque, pink and cyan neon lines, orange crests. (Rotate upright afterwards.)"
+  },
+  {
+   "id": "sheets/rocket-back-r3a",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r2-back.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Exactly three engine nozzles (remove the fourth, lower one); everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sheets/rocket-back-r3b",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-r2-back.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Exactly three engine nozzles (remove the fourth, lower one); everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/d2-obolon-squint-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. SHOT: medium shot. LOCATION: the vast golden armillary-sphere hall of the Earth temple, warm gold light. SUBJECT: [OBOLON] exactly as in the first picture, floating inside a vertical pillar of soft light: his two white crescent eyes look straight at the viewer and narrow into thin slivers, a calm knowing look. He is only a black sphere: no body, no arms, no mouth, no other face. No people."
+  },
+  {
+   "id": "stills/d2-obolon-squint-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. SHOT: medium shot. LOCATION: the vast golden armillary-sphere hall of the Earth temple, warm gold light. SUBJECT: [OBOLON] exactly as in the first picture, floating inside a vertical pillar of soft light: his two white crescent eyes look straight at the viewer and narrow into thin slivers, a calm knowing look. He is only a black sphere: no body, no arms, no mouth, no other face. No people."
+  },
+  {
+   "id": "stills/d2-obolon-squint-r3c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. SHOT: medium shot. LOCATION: the vast golden armillary-sphere hall of the Earth temple, warm gold light. SUBJECT: [OBOLON] exactly as in the first picture, floating inside a vertical pillar of soft light: his two white crescent eyes look straight at the viewer and narrow into thin slivers, a calm knowing look. He is only a black sphere: no body, no arms, no mouth, no other face. No people."
+  },
+  {
+   "id": "stills/d3-obolon-listen-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. SHOT: medium shot. LOCATION: the white marble moon temple with blue-and-silver ornament, black sky and the blue Earth beyond. SUBJECT: [OBOLON] exactly as in the first picture inside his pillar of light, his white crescent eyes half closed into flat, thin arcs of silent patient exasperation. Only a black sphere: no body, no arms, no mouth. No people."
+  },
+  {
+   "id": "stills/d3-obolon-listen-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. SHOT: medium shot. LOCATION: the white marble moon temple with blue-and-silver ornament, black sky and the blue Earth beyond. SUBJECT: [OBOLON] exactly as in the first picture inside his pillar of light, his white crescent eyes half closed into flat, thin arcs of silent patient exasperation. Only a black sphere: no body, no arms, no mouth. No people."
+  },
+  {
+   "id": "stills/d3-obolon-listen-r3c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. SHOT: medium shot. LOCATION: the white marble moon temple with blue-and-silver ornament, black sky and the blue Earth beyond. SUBJECT: [OBOLON] exactly as in the first picture inside his pillar of light, his white crescent eyes half closed into flat, thin arcs of silent patient exasperation. Only a black sphere: no body, no arms, no mouth. No people."
+  },
+  {
+   "id": "stills/d2-bed-earth-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-b.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change the black-and-gold carved wood walls and bed frame into white marble with blue-and-silver carved ornament like the second picture; keep the pillow with its dent, the blanket, the round window with the blue Earth, the small lamp and the framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/d2-bed-earth-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-b.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change the black-and-gold carved wood walls and bed frame into white marble with blue-and-silver carved ornament like the second picture; keep the pillow with its dent, the blanket, the round window with the blue Earth, the small lamp and the framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/d2-egg-sun-pair-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-egg-sun-pair-a.jpg",
+    "design/story/refs/story/props/managem.webp"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: On the round stone stand, set one small glowing mana gem exactly like the second picture in front of each egg; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/d2-egg-sun-pair-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-egg-sun-pair-a.jpg",
+    "design/story/refs/story/props/managem.webp"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: On the round stone stand, set one small glowing mana gem exactly like the second picture in front of each egg; everything else unchanged. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/d2-egg-earth-pair-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-egg-sun-pair-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Swap the two eggs: the earth-and-moon egg is now large in front and the sun-and-moon egg smaller behind; the gems, the stand, the light and the temple stay exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/d2-egg-earth-pair-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-egg-sun-pair-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Swap the two eggs: the earth-and-moon egg is now large in front and the sun-and-moon egg smaller behind; the gems, the stand, the light and the temple stay exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-outside-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/saturn-temple-front.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: We stand on the surface of Saturn: add Saturn's gigantic rings arching across the whole sunset sky from horizon to horizon as one wide luminous band; the planet itself is NOT visible; keep the round stepped reddish-brown stone temple, the stairway and the two stone octopus statues exactly the same (stone, not painted); 9:16. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-outside-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/saturn-temple-front.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: We stand on the surface of Saturn: add Saturn's gigantic rings arching across the whole sunset sky from horizon to horizon as one wide luminous band; the planet itself is NOT visible; keep the round stepped reddish-brown stone temple, the stairway and the two stone octopus statues exactly the same (stone, not painted); 9:16. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-night-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-outside-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The same view at night: deep navy-to-black sky with stars, the rings still arching across the whole sky as a faintly glowing band; the temple and octopus statues in soft shadow; no planet visible. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-night-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-outside-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The same view at night: deep navy-to-black sky with stars, the rings still arching across the whole sky as a faintly glowing band; the temple and octopus statues in soft shadow; no planet visible. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-octopus-point-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-night-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Move close to the head of one of the octopus statues beside the stairs: its round stone head is flat and empty on top (a small creature will be placed there); behind it the glowing rings arch across the sky, and at the far edge of the rings one tiny point of light smaller than a grain of rice; no planet visible. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-octopus-point-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-night-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Move close to the head of one of the octopus statues beside the stairs: its round stone head is flat and empty on top (a small creature will be placed there); behind it the glowing rings arch across the sky, and at the far edge of the rings one tiny point of light smaller than a grain of rice; no planet visible. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-sleep-r3a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-sleep-a.jpg",
+    "design/story/refs/story/cast/unchi-pinpon-kun.webp"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep KIMORIN and the little swirl creature exactly the same; replace the background with the reddish-brown stone steps of the temple from the second picture, the rings arching across the night sky, no planet visible; give the swirl creature the pointed top and bottom of the third picture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-sleep-r3b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-sleep-a.jpg",
+    "design/story/refs/story/cast/unchi-pinpon-kun.webp"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep KIMORIN and the little swirl creature exactly the same; replace the background with the reddish-brown stone steps of the temple from the second picture, the rings arching across the night sky, no planet visible; give the swirl creature the pointed top and bottom of the third picture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sprites/kimorin-xs-slip-r3a",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kimorin-xs-shock.webp",
+    "design/story/refs/cast/kimorin-face-eyes.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: a: the round black sunglasses have slid down to the very tip of the snout, just above the mouth, no longer covering the eyes; above them the eyes show as two thin glowing blue arcs exactly like the second picture; no round eyes, no eyeballs, no eyebrows, no nose. b: the same, plus a few small drops of blue light spilling from the eye arcs like tears. Keep everything else exactly the same; flat mid-grey background. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sprites/kimorin-xs-slip-r3b",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/kimorin-xs-shock.webp",
+    "design/story/refs/cast/kimorin-face-eyes.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: a: the round black sunglasses have slid down to the very tip of the snout, just above the mouth, no longer covering the eyes; above them the eyes show as two thin glowing blue arcs exactly like the second picture; no round eyes, no eyeballs, no eyebrows, no nose. b: the same, plus a few small drops of blue light spilling from the eye arcs like tears. Keep everything else exactly the same; flat mid-grey background. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
    "id": "stills/d3-obolon-listen-a",
    "w": 1152,
    "h": 2048,
