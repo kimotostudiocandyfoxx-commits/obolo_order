@@ -6,4 +6,4 @@
 ## b) バティの誕生（D03-S005）
 ## c) バティとの会話（D03-S008）
 ## 失敗・エラー
-- ERR POST /invites/__4nwRoji65cQnpg/accept 409 0.1s {"error":{"code":"ALREADY_MEMBER","message":"Already a member — log in on Earth"}}
+- ERR POST /admin/invites 400 0.1s {"error":{"code":"VALIDATION","message":"email: Invalid email address"}}
