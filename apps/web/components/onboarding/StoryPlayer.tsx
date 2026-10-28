@@ -15,6 +15,7 @@ import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { NeoChooser } from './NeoChooser';
 import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
+import { saveAtelier } from '@/components/lap2/AtelierVisit';
 import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
@@ -943,6 +944,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           onDone={(stickers, atelier, sent) => {
             remember('stickers', JSON.stringify(stickers));
             remember('my_atelier', JSON.stringify(atelier));
+            saveAtelier(atelier);
             remember('f_d05_tree_parts', atelier.parts.join('|').slice(0, 200));
             remember('f_d05_send', sent ? 'send' : 'keep');
             run(iRef.current + 1);

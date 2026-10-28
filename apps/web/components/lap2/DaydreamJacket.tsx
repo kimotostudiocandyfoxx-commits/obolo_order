@@ -57,7 +57,7 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
   return (
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/55 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md animate-[fadeUp_0.5s_ease-out] rounded-3xl border border-amber-100/25 bg-[#0d0b18]/95 p-5 text-amber-50">
-        <p className="text-center text-[15px] font-bold tracking-wider">🥚 ジャケットをつくる</p>
+        <p className="text-center text-[15px] font-bold tracking-wider">🥚 アートをつくる</p>
         {phase === 'words' && (
           <div className="mt-3 space-y-3">
             <p className="text-center text-[13px] text-amber-50/75">思い描いた景色を、声で</p>

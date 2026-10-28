@@ -58,8 +58,8 @@ const PANELS: Record<L2What, Panel> = {
     ],
   },
   jacket: {
-    title: '🥚 ジャケットをつくる',
-    body: ['思い描いたまま、まん中の〔🎙 話してみよう〕。〔おまかせ〕（行ってみたい場所／まだない曲のジャケット／夢で見たもの）〔パス〕。', 'ジャケットの絵は〔写真を添える〕〔{bati}に描いてもらう〕〔字だけ〕から。{bati}に描いてもらう時だけ、描く前にマナを使うか確認が出ます。'],
+    title: '🥚 アートをつくる',
+    body: ['思い描いたまま、まん中の〔🎙 話してみよう〕。〔おまかせ〕（行ってみたい場所／まだない曲のジャケット／夢で見たもの）〔パス〕。', 'アートは〔写真を添える〕〔{bati}に描いてもらう〕〔字だけ〕から。{bati}に描いてもらう時だけ、描く前にマナを使うか確認が出ます。'],
     options: [OK('🔒 根っこにしまう', { jacket: 'keep' }), OK('🦋 投稿する（ダチへ）', { jacket: 'send' })],
   },
   'kimorin-jacket': {
@@ -68,9 +68,9 @@ const PANELS: Record<L2What, Panel> = {
     body: ['黒い虎じまのドラゴンの背中で、丸いサングラスの白い狐が、ティーカップを片手に月のまわりを飛んでいる。'],
     options: [OK()],
   },
-  'kimorin-tree': { image: '/onboarding/s/jupiter-forest.jpg', caption: 'KIMORINの木。枝の札『宇宙一の天才発明』', options: [OK()] },
-  'my-tree': { image: '/onboarding/s/jupiter-forest.jpg', caption: '丘のてっぺん、{neo}の木', options: [OK()] },
-  'tree-deco': { title: '🌳 木を飾る', body: ['形・色・飾り・札から、変えたいものを選んで〔飾る〕（札の言葉は〔🎙〕で言うと、字になります）。'], options: [OK('飾る', { tree: 'deco' })] },
+  'kimorin-tree': { image: '/onboarding/s/jupiter-forest.jpg', caption: 'KIMORINのアトリエ。看板『宇宙一の天才発明』', options: [OK()] },
+  'my-tree': { image: '/onboarding/s/jupiter-forest.jpg', caption: '丘のてっぺん、{neo}のアトリエ', options: [OK()] },
+  'tree-deco': { title: '🎨 アトリエを飾る', body: ['部品の札を話して変え、入口の看板を〔🎙〕で言って〔飾る〕。'], options: [OK('飾る', { tree: 'deco' })] },
   'my-island': { image: '/onboarding/s/mercury-ice.jpg', caption: '{neo}の島。浜に、一周目にしまった曲のレコード', options: [OK()] },
   'kimorin-song2': { image: '/onboarding/s/mercury-port.jpg', caption: '帆に『KIMORIN⭐︎』の船。真っ白なジャケットのレコード、ラベルに『2』', options: [OK('▶ 聴く')] },
   'place-song': {

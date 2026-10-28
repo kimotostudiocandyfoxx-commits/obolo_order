@@ -15,6 +15,7 @@ import { Relook } from './Relook';
 import { RoundCards } from './RoundCards';
 import { Theater } from './Theater';
 import { KororinRelay } from './KororinRelay';
+import { AtelierVisit } from './AtelierVisit';
 
 /**
  * One second-journey screen ({ t: 'l2', what }): the makers built so far, else the script's panel (L2Screen).
@@ -46,6 +47,13 @@ export function L2Step({
       return <KororinRelay onDone={onDone} />;
     case 'jacket':
       return <DaydreamJacket api={lessonApi} bati={v.bati ?? ''} fill={fill} onDone={onDone} />;
+    // L2-JUPITER-S005: the ateliers (M-R156); the old ids stay so saved progress keeps its place
+    case 'kimorin-tree':
+      return <AtelierVisit who="kimorin" neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
+    case 'my-tree':
+      return <AtelierVisit who="mine" arts={v.made?.stickers ?? []} neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
+    case 'tree-deco':
+      return <AtelierVisit who="deco" arts={v.made?.stickers ?? []} neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
     case 'round-cards':
       return <RoundCards answers={answers} look={v.look} onDone={() => onDone({})} />;
     case 'place-song':
