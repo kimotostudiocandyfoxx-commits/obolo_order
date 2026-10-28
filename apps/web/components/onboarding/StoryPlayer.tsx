@@ -939,6 +939,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
           look={v.look}
+          chibi={v.lookChibi}
           onDone={(stickers, atelier, sent) => {
             remember('stickers', JSON.stringify(stickers));
             remember('my_atelier', JSON.stringify(atelier));

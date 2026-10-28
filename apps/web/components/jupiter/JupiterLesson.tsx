@@ -261,6 +261,7 @@ export function JupiterLesson({
   inviter,
   batiImage,
   look: neoFace,
+  chibi,
   onDone,
 }: {
   api: JupiterLessonApi;
@@ -271,6 +272,8 @@ export function JupiterLesson({
   batiImage?: string;
   /** the round picture of the visitor's look: the face of their butterfly */
   look?: string;
+  /** the small chibi NEO: the butterfly's body when it exists */
+  chibi?: string;
   onDone: (arts: StickerMade[], atelier: AtelierLook & { parts: string[] }, sent: boolean) => void;
 }) {
   const [i, setI] = useState(0);
@@ -755,7 +758,7 @@ export function JupiterLesson({
             </div>
           ) : (
             <button onClick={() => setBook(true)} className="absolute left-[18%] top-[34%] animate-[fadeUp_0.8s_ease-out]" style={{ animation: 'butterflyDrift 7s ease-in-out infinite' }}>
-              <NeoButterfly face={neoFace} art={mine} size={120} />
+              <NeoButterfly face={neoFace} body={chibi} art={mine} size={120} />
             </button>
           )}
           {kimFly && (
@@ -781,7 +784,7 @@ export function JupiterLesson({
           <span className="-mt-2 rounded bg-[#f6ead2] px-2 py-0.5 text-[12px] font-bold text-stone-700 shadow">{neo}</span>
           {ab?.k === 'hang' && mine && (
             <div className="pointer-events-none absolute left-[56%] top-[10%] animate-[hangIn_2s_ease-in-out_forwards]">
-              <NeoButterfly face={neoFace} art={mine} size={80} />
+              <NeoButterfly face={neoFace} body={chibi} art={mine} size={80} />
             </div>
           )}
           <style>{'@keyframes hangIn{0%{transform:translate(60px,-80px)}70%{transform:translate(-40px,60px)}100%{transform:translate(-40px,60px);opacity:0}}'}</style>
@@ -905,7 +908,7 @@ export function JupiterLesson({
           {post === 'fly' && mine && (
             <div className="flex justify-center py-4">
               <div className="animate-[flyAway_2s_ease-in_forwards]">
-                <NeoButterfly face={neoFace} art={mine} size={100} />
+                <NeoButterfly face={neoFace} body={chibi} art={mine} size={100} />
               </div>
               <style>{'@keyframes flyAway{to{transform:translate(120px,-240px) scale(.4);opacity:0}}'}</style>
             </div>

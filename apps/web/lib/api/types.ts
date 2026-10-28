@@ -254,6 +254,8 @@ export interface Api {
   batiFaces(): Promise<Me>;
   /** the NEO look standing without a background (M-R149), drawn once per look */
   lookStandee(): Promise<Me>;
+  /** the small chibi NEO (M-R155/M-R161), drawn once per look */
+  lookChibi(): Promise<Me>;
   /** 〔🖼 絵で見る〕 under one of Bati's answers (null = none found) */
   buddyPicture(question: string, answer?: string): Promise<{ picture: BuddyPicture | null }>;
   myInvites(): Promise<MyInviteView[]>;

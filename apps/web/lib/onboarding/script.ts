@@ -222,6 +222,8 @@ export interface StoryVars {
   batiFaces?: Partial<Record<string, string>>;
   batiFood?: string;
   look?: string;
+  /** the small chibi NEO (M-R155/M-R161): the butterfly, the owl, the captain… */
+  lookChibi?: string;
 }
 
 export function fill(text: string, v: StoryVars): string {

@@ -1147,6 +1147,9 @@ export class DemoApi implements Api {
   async lookStandee() {
     return this.patchMe((u) => ({ lookStandee: u.avatarUrl ?? null }));
   }
+  async lookChibi() {
+    return this.patchMe((u) => ({ lookChibi: u.avatarUrl ?? null }));
+  }
   async batiFaces() {
     await sleep(1200);
     return this.patchMe((u) => (u.bati?.imageUrl ? { bati: { ...u.bati, faces: Object.fromEntries(BATI_FACES.map((f) => [f, u.bati!.imageUrl!])) } } : {}));

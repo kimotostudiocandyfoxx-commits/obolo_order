@@ -43,6 +43,12 @@ const STANDEE_PROMPT =
   'cloak, colours, the round gold-rimmed sunglasses hiding the eyes, and the same semi-real painted style. Standing, facing the viewer, a relaxed ' +
   'friendly pose, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, ' +
   'no shadow and no other objects. Safe for children. No text, no letters.';
+// the small chibi NEO (M-R155/M-R161): the Jupiter butterfly, the Uranus owl, the Mercury captain, the Mars pilot, the game hero
+const CHIBI_PROMPT =
+  'Draw the character of the attached portrait as a small cute chibi figure: a big head and a small round body (about 2.5 heads tall), the same ' +
+  'face, hair, animal ears, oversized hood and cloak, colours and the round gold-rimmed sunglasses, simplified and cute, soft painted style. ' +
+  'Full body, standing, facing the viewer, both hands a little forward as if holding something, the whole figure inside the frame with margin ' +
+  'around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow and no other objects. Safe for children. No text, no letters.';
 const FACE_WORDS: Record<BatiFace, string> = {
   smile: 'a big happy smile, eyes curved with joy',
   sparkle: 'wide open eyes full of sparkles and stars, excited and curious, leaning forward a little',
@@ -179,20 +185,20 @@ export class LookService {
    * grey, then cut out — shown big when the look is chosen and while they speak. Once per look (a new look draws a
    * new one); part of the look, no mana.
    */
-  async standee(userId: string, origin: string): Promise<Me> {
+  async standee(userId: string, origin: string, kind: 'standee' | 'chibi' = 'standee'): Promise<Me> {
     const u = await this.user(userId);
     if (!u.avatarUrl) throw apiError(HttpStatus.CONFLICT, 'NO_LOOK', 'No look yet');
     const j = (u.onboardingJson ?? {}) as Record<string, string>;
-    if (j['look.standee'] && j['look.standee.of'] === u.avatarUrl) return toMe(u);
+    if (j[`look.${kind}`] && j[`look.${kind}.of`] === u.avatarUrl) return toMe(u);
     const src = await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Look not found');
-    const img = await this.looks.generate(STANDEE_PROMPT, 0, [src]);
+    const img = await this.looks.generate(kind === 'chibi' ? CHIBI_PROMPT : STANDEE_PROMPT, 0, [src]);
     const cut = await cutoutWhite(img.data, 1024, BATI_GREY).catch(() => null);
     const m = cut ? await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin) : await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
     const cur = ((await this.user(userId)).onboardingJson ?? {}) as Record<string, string>;
     const [nu] = await this.db.write
       .update(users)
-      .set({ onboardingJson: { ...cur, 'look.standee': m.url, 'look.standee.of': u.avatarUrl }, updatedAt: new Date() })
+      .set({ onboardingJson: { ...cur, [`look.${kind}`]: m.url, [`look.${kind}.of`]: u.avatarUrl }, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     return toMe(nu);

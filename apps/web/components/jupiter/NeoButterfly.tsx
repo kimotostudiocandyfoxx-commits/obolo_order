@@ -9,7 +9,23 @@ import { Sticker } from './JupiterLesson';
  * KIMORIN⭐︎'s butterfly wears his round sunglasses too. `face` is the round picture of the look (the chibi
  * picture made with the look replaces it when it exists).
  */
-export function NeoButterfly({ face, art, size = 110, shades = false, hue = 48, flap = true }: { face?: string; art?: StickerMade | null; size?: number; shades?: boolean; hue?: number; flap?: boolean }) {
+export function NeoButterfly({
+  face,
+  body,
+  art,
+  size = 110,
+  shades = false,
+  hue = 48,
+  flap = true,
+}: {
+  face?: string;
+  body?: string;
+  art?: StickerMade | null;
+  size?: number;
+  shades?: boolean;
+  hue?: number;
+  flap?: boolean;
+}) {
   const head = size * 0.42;
   return (
     <div className="relative" style={{ width: size, height: size * 1.15 }}>
@@ -34,24 +50,29 @@ export function NeoButterfly({ face, art, size = 110, shades = false, hue = 48, 
           </svg>
         </div>
       ))}
-      {/* the chibi {neo}: the round face */}
-      <div className="absolute left-1/2 top-[6%] -translate-x-1/2 overflow-hidden rounded-full border-2 border-white bg-amber-100 shadow-md" style={{ width: head, height: head }}>
-        {face ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={face} alt="" className="h-full w-full object-cover object-top" />
-        ) : (
-          <span className="flex h-full w-full items-center justify-center" style={{ fontSize: head * 0.5 }}>
-            ✦
-          </span>
-        )}
-        {shades && (
-          <svg viewBox="0 0 100 40" className="absolute left-[12%] top-[34%] w-[76%]">
-            <circle cx="27" cy="20" r="16" fill="#151020" stroke="#ffd36f" strokeWidth="4" />
-            <circle cx="73" cy="20" r="16" fill="#151020" stroke="#ffd36f" strokeWidth="4" />
-            <path d="M43 18 Q50 13 57 18" fill="none" stroke="#ffd36f" strokeWidth="4" />
-          </svg>
-        )}
-      </div>
+      {/* the chibi {neo}: its own picture when made (POST /me/look/chibi), else the round face */}
+      {body ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={body} alt="" className="absolute left-1/2 top-0 -translate-x-1/2 object-contain drop-shadow" style={{ width: size * 0.62, height: size * 0.78 }} />
+      ) : (
+        <div className="absolute left-1/2 top-[6%] -translate-x-1/2 overflow-hidden rounded-full border-2 border-white bg-amber-100 shadow-md" style={{ width: head, height: head }}>
+          {face ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={face} alt="" className="h-full w-full object-cover object-top" />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center" style={{ fontSize: head * 0.5 }}>
+              ✦
+            </span>
+          )}
+          {shades && (
+            <svg viewBox="0 0 100 40" className="absolute left-[12%] top-[34%] w-[76%]">
+              <circle cx="27" cy="20" r="16" fill="#151020" stroke="#ffd36f" strokeWidth="4" />
+              <circle cx="73" cy="20" r="16" fill="#151020" stroke="#ffd36f" strokeWidth="4" />
+              <path d="M43 18 Q50 13 57 18" fill="none" stroke="#ffd36f" strokeWidth="4" />
+            </svg>
+          )}
+        </div>
+      )}
       {/* the art, held in both hands */}
       {art && (
         <div className="absolute left-1/2 -translate-x-1/2" style={{ top: size * 0.5 }}>

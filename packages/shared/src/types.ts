@@ -38,6 +38,8 @@ export interface Me {
   child?: boolean;
   /** the NEO look standing, without a background (M-R149): made once after the look is chosen (POST /me/look/standee) */
   lookStandee?: string | null;
+  /** the small chibi NEO without a background (M-R155/M-R161): the butterfly, the owl, the captain… (POST /me/look/chibi) */
+  lookChibi?: string | null;
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
   puniPic: string | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */

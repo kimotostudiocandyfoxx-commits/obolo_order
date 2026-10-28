@@ -104,6 +104,14 @@ export class LookController {
     return this.look.standee(userId, origin(req));
   }
 
+  /** the small chibi NEO (the butterfly, the owl, the captain…; M-R155/M-R161), drawn once per look */
+  @Post('look/chibi')
+  @HttpCode(200)
+  async chibi(@UserId() userId: string, @Req() req: Request) {
+    await rateLimit(this.kv, `chibi:${userId}`, 4, 600);
+    return this.look.standee(userId, origin(req), 'chibi');
+  }
+
   /** Bati's expressions, drawn once after the hatching (M-R139) */
   @Post('bati/faces')
   @HttpCode(200)

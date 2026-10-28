@@ -120,6 +120,13 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
     facesAsked.current = true;
     void getApi().batiFaces().then(setMe).catch(() => undefined);
   }, [me, setMe]);
+  // a look chosen before the chibi NEO existed gets it now (once; the butterfly on day 4 wears it)
+  const chibiAsked = useRef(false);
+  useEffect(() => {
+    if (!me?.avatarUrl || me.lookChibi || chibiAsked.current) return;
+    chibiAsked.current = true;
+    void getApi().lookChibi().then(setMe).catch(() => undefined);
+  }, [me, setMe]);
 
   const onProgress = useCallback((p: StoryProgress) => me && saveDay(day, me.id, p), [day, me]);
   const onEnd = useCallback(
@@ -164,6 +171,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         batiFaces: me.bati?.faces,
         batiFood: me.bati?.food,
         look: me.avatarUrl ?? undefined,
+        lookChibi: me.lookChibi ?? undefined,
         story: me.story,
         made: madeFrom(me.story),
       }}
@@ -193,7 +201,14 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
           const u = await getApi().chooseLook(id);
           setMe(u);
           // the standing figure without a background (M-R149) is drawn meanwhile
-          void getApi().lookStandee().then(setMe).catch(() => undefined);
+          // then the small chibi NEO (the butterfly, the owl, the captain…; M-R155/M-R161)
+          void getApi()
+            .lookStandee()
+            .then(setMe)
+            .catch(() => undefined)
+            .then(() => getApi().lookChibi())
+            .then((m) => m && setMe(m))
+            .catch(() => undefined);
           return u.avatarUrl ?? '';
         },
         chooseForm: async (id) => {
