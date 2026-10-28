@@ -6,7 +6,7 @@ import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
 import { BatiAsk } from './BatiAsk';
 import { DaydreamJacket } from './DaydreamJacket';
-import { HomewardGame } from './HomewardGame';
+import { NagareTrial } from '@/components/neptune/NagareTrial';
 import { L2Screen } from './L2Screen';
 import { PlaceSong } from './PlaceSong';
 import { PlazaMaker } from './PlazaMaker';
@@ -84,7 +84,7 @@ export function L2Step({
     case 'kimorin-owl':
       return <KimorinOwl face={spriteUrl('kimorin-face')} onDone={onDone} />;
     case 'game':
-      return <HomewardGame watch={answers.game === 'KIMORINが遊ぶのを、となりで見る'} onDone={onDone} />;
+      return <NagareTrial neo={v.neo || v.name} face={v.lookChibi || v.look} art={v.made?.stickers?.find((x) => x.url)?.url ?? null} onDone={onDone} />;
     case 'booth':
       return (
         <VenusLesson

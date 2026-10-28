@@ -103,43 +103,45 @@ export const L2_URANUS: Step[] = [
 ];
 
 /**
- * L2 chapter 7 【海王星】 — review/L2_海王星.md (L2-NEPTUNE-S001〜S003).
- * Islands of games over a deep-blue storm. The order's own game 『キモリンの帰り道』 — KIMORIN finds himself in it
- * (「…………オレや。」). No time limit, score or winning; the road chosen changes the story told to grandpa.
+ * L2 chapter 7 【海王星】 — wip/P09/c02 (L2-NEPTUNE-S001〜S003, M-R160〜M-R164): the city at the bottom of the sea, the
+ * order's game centre. Only the conch-shell hall is lit: the trial of 『ナガレを越えて』 (Saturn and Jupiter stages,
+ * little {neo} as the hero). No score, no ranking, no counts; only クリア. KIMORIN sees his small self waving a flag
+ * (「…………オレや。」).
  */
 export const L2_NEPTUNE: Step[] = [
   ...flight('海王星に着いた'),
-  // 映像（豪華・約12秒）：白い嵐の渦→すごろくの盤・生け垣の迷路・町の模型の浮き島→光の橋 — a still for now
+  // 映像（豪華・約12秒）：白い嵐の渦→潜水艇が海に沈む→ネオンの貝・巻き貝・さんごの都 — a still for now
   { t: 'bgm', track: 'tender' },
   { t: 'still', image: 's/neptune-islands' },
-  { t: 'notice', text: '札『ようこそ、Obolo Order。ここは、扉の奥の星。今日から、結社が用意したゲームで、遊べる。』' },
+  { t: 'notice', text: '潜水艇の中の札『ようこそ、Obolo Order。ここは、扉の奥の星。深海の都。建物の一つ一つが、遊びの館。何度でも、潜りに来ていい。』' },
+  { t: 'notice', text: '海王星｜深海の都。灯りの入った建物に、潜水艇を寄せると入れます。遊ぶのに、マナは使いません。点数の順位や、人と比べる数は出ません。灯りの入る建物は、これから少しずつ増えます' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……海の底に、遊ぶためだけの都、ですか。' },
+  { t: 'say', who: 'KIMORIN', text: '……結社にも、こういう所が、あるのですね。' }, // サングラスを、指で押し上げる
 
-  // L2-NEPTUNE-S002 結社のゲームで遊ぶ
-  { t: 'still', image: 's/neptune-town' }, // 模型の町の島。札：『題　キモリンの帰り道　用意した人　結社』。門の前に、二頭身の人形
-  { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '…………オレや。' }, // サングラスが、鼻先までずり落ちる。目の切れ目が、青く光る
-  { t: 'notice', text: '島ごとに、結社が用意したゲームが一つずつ。〔あそぶ〕を押すと始まります。時間の制限・点数・勝ち負けはなく、評価や遊んだ数も出ません' },
+  // L2-NEPTUNE-S002 『ナガレを越えて』体験版 — 巻き貝の館。いちばん奥の丸い部屋の壁いっぱいに、すごろくの地図
   { t: 'sprite', image: null },
-  { t: 'choice', key: 'game', options: [{ label: '〔あそぶ〕を押す', goto: 'nplay' }, { label: 'KIMORINが遊ぶのを、となりで見る', goto: 'nwatch' }, { label: '今はいい', goto: 'nskip' }] },
-  { t: 'label', id: 'nwatch' },
+  { t: 'choice', key: 'neptune_play', options: [{ label: '遊んでみる', goto: 'ntrial' }, { label: '今は、館の中を見るだけ', goto: 'nnone' }] },
+  { t: 'label', id: 'nnone' },
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: 'では、私が、私を動かします。分かれ道は、{neo}が選んでください。' },
-  { t: 'sprite', image: null },
-  { t: 'label', id: 'nplay' },
-  { t: 'l2', what: 'game' }, // 『キモリンの帰り道』：分かれ道（坂・川・たこ焼き屋）→じいちゃんの家
-  { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '選んだ道で、お話の続きが変わりましたね。' },
-  { t: 'say', who: 'KIMORIN', text: 'オレの帰り道に、付き合ってくれて、ありがとうケン！' },
+  { t: 'say', who: 'KIMORIN', text: '……では、また今度。館は、逃げませんね。' },
   { t: 'goto', id: 'nend' },
-  { t: 'label', id: 'nskip' },
+  { t: 'label', id: 'ntrial' },
+  { t: 'l2', what: 'game' },
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……そうですか。' },
+  { t: 'say', who: 'KIMORIN', text: '…………オレや。' },
+  { t: 'say', who: 'KIMORIN', text: '……失礼。私の小さい方も、旗を、振っていましたね。' }, // 咳ばらい
+  { t: 'sprite', image: null },
+  { t: 'choice', key: 'neptune_again', options: [{ label: 'もう一回', goto: 'ntrial' }, { label: '館を出る', goto: 'nout' }] },
+  { t: 'label', id: 'nout' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: 'ほかの館にも、これから灯りが入るそうですよ。……楽しみですね。' },
 
   // L2-NEPTUNE-S003 地球に帰る
   { t: 'label', id: 'nend' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '次は、地球ですね。' },
-  { t: 'notice', text: '海王星で、結社が用意したゲーム（『キモリンの帰り道』『星すごろく』『生け垣ラビリンス』）を遊ぶことは、このあとも自由にできます' },
+  { t: 'notice', text: '深海の都の『ナガレを越えて』の館の体験版は、このあとも自由に遊べます。灯りの入る館は、これから増えます' },
   { t: 'sprite', image: null },
   ...chapterEnd(7),
 ];
