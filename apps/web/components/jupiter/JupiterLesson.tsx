@@ -78,7 +78,7 @@ const OPEN: Beat[] = [
     scene: 'demo-title',
     choices: [
       {
-        label: '「そのジャケ、好きだよ」と言う',
+        label: '「そのアート、好きだよ」と言う',
         reply: [
           { who: 'kimorin', text: '好き？　オレのが？　……ほんとケン？' },
           { who: 'kimorin', text: '……失礼。点より、効きますね。' },
@@ -115,7 +115,7 @@ const FLY: Line[] = [
   { who: 'guide', text: '飛んでいる蝶をタップすると〔アート帳〕がひらきます。蝶は石のまわりを飛ぶだけで、誰にも送られていません' },
   { who: 'kimorin', text: '……飛んだ。オレのが、飛んだケン……！　言葉の翼ケン！' },
   { who: 'kimorin', text: '……失礼。おしゃれですね。' },
-  { who: 'kaiser', text: '中身は、水星で作るダ。{neo}。今日という日も、ひとつの命ダ。' },
+  { who: 'kaiser', text: '{neo}。今日という日も、ひとつの命ダ。' },
 ];
 
 // D05-S008b myアトリエと、ダチの空へ
