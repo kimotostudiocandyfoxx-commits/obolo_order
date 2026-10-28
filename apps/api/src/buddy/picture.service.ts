@@ -81,7 +81,17 @@ export class PictureService {
     return { url: href.replace(/~thumb\./, '~medium.'), title: d?.title ?? term, source: `NASA${d?.center ? `（${d.center}）` : ''}`, pageUrl: d?.nasa_id ? `https://images.nasa.gov/details/${d.nasa_id}` : 'https://images.nasa.gov' };
   }
 
+  /** the whole words first, then fewer of them (a long phrase rarely matches a curated picture) */
   private async commons(term: string): Promise<Omit<BuddyPicture, 'free'> | null> {
+    const words = term.split(/\s+/).filter(Boolean);
+    for (const t of [...new Set([words.join(' '), words.slice(0, 2).join(' '), words[0]])].filter(Boolean)) {
+      const hit = await this.commonsOnce(t);
+      if (hit) return hit;
+    }
+    return null;
+  }
+
+  private async commonsOnce(term: string): Promise<Omit<BuddyPicture, 'free'> | null> {
     const u = new URL('https://commons.wikimedia.org/w/api.php');
     Object.entries({
       action: 'query',
