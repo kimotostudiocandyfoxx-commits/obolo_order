@@ -210,6 +210,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   /** Timed captions of the motion that is starting (shown once its first frame is on screen). */
   const pendingCaptions = useRef<TimedCaption[]>([]);
   const captionTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const pendingBgm = useRef<{ track: string; at: number } | null>(null);
+  const cueDue = useRef<string | null>(null);
   const [overlayCaption, setOverlayCaption] = useState<string | null>(null);
   // the scene's thread (cleared when the scene changes: a motion, an arrival, black)
   const [log, setLog] = useState<ChatRaw[]>([]);
@@ -246,6 +248,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const clearCaptions = useCallback(() => {
     captionTimers.current.forEach(clearTimeout);
     captionTimers.current = [];
+    // a motion left before its music cue: the music still changes
+    if (cueDue.current) bgm.current?.set(cueDue.current);
+    cueDue.current = null;
     setOverlayCaption(null);
   }, []);
   const bgm = useRef<Bgm | null>(null);
@@ -498,6 +503,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           leaveInvite();
           clearCaptions();
           pendingCaptions.current = s.captions ?? [];
+          pendingBgm.current = s.bgmAt ?? null;
           playMedia(s.motion, false);
           setI(n);
           return;
@@ -567,6 +573,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         // schedule the starting motion's timed captions from its first visible frame
         const caps = pendingCaptions.current;
         pendingCaptions.current = [];
+        const cue = pendingBgm.current;
+        pendingBgm.current = null;
+        if (cue) {
+          cueDue.current = cue.track;
+          captionTimers.current.push(
+            setTimeout(() => {
+              cueDue.current = null;
+              bgm.current?.set(cue.track);
+            }, cue.at * 1000),
+          );
+        }
         for (const c of caps) {
           captionTimers.current.push(setTimeout(() => setOverlayCaption(c.text), c.from * 1000));
           if (c.to !== undefined) captionTimers.current.push(setTimeout(() => setOverlayCaption(null), c.to * 1000));
@@ -686,6 +703,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     for (let k = i; k < Math.min(steps.length, i + 10); k++) {
       const s = steps[k];
       if (s.t === 'se') prefetchSfx(s.sound);
+    }
+  }, [i, steps]);
+  // a motion whose music cue was never scheduled (it did not show): the music changes once the story moves past it
+  useEffect(() => {
+    if (pendingBgm.current && steps[i]?.t !== 'video') {
+      bgm.current?.set(pendingBgm.current.track);
+      pendingBgm.current = null;
     }
   }, [i, steps]);
   // the next theme is decoded ahead

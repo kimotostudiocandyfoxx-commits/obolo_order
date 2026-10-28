@@ -33,9 +33,9 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）。鶴が着いてから、曲を重ねて切り替える（QA 5 U1）
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
-  { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'gate-close' },
-  { t: 'video', motion: 'd1-monban' }, // 門へ進みながら、門が閉まる → 黒い煙からMONBANが現れる
+  // city plays on through the gate; MONBAN's music comes with MONBAN (QA 7 U1: city turned into monban after 3.5 s)
+  { t: 'video', motion: 'd1-monban', bgmAt: { track: 'monban', at: 6.5 } }, // 門へ進みながら、門が閉まる → 黒い煙からMONBANが現れる
   { t: 'loop', motion: '9-l' },
   { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
   { t: 'action', label: '切符を見せる' },
@@ -135,7 +135,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-launch-pit' },
   { t: 'caption', text: 'ロケット発射場に着いた' },
   { t: 'still', image: 's/d2-monban-pit' }, // ロケットの前のMONBAN（話し手はチャットのアイコンで）
-  { t: 'sprite', image: ['', '', 'obolon'] }, // 光の柱の中のOBOLONも、発射場にいる（QA 5 N9）
+  { t: 'sprite', image: ['', '', 'obolon-pit'] }, // 光の柱の中のOBOLONも、発射場にいる（QA 5 N9）、MONBANの光の輪から離して（QA 7 R3）
   { t: 'say', who: 'OBOLON', text: 'これがロケットだ。月に行く。乗れ。' },
   { t: 'say', who: 'MONBAN', text: 'では、いってこい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？あなた達は乗らないのですか？' },
@@ -167,7 +167,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: '謎の書を手に入れた' },
   { t: 'still', image: 's/d2-monban-pit' },
-  { t: 'sprite', image: ['', '', 'obolon'] },
+  { t: 'sprite', image: ['', '', 'obolon-pit'] },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
   { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
   { t: 'sprite', image: null },

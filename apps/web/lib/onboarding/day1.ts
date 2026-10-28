@@ -40,11 +40,11 @@ export const DAY1: Step[] = [
   { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
-  { t: 'bgm', track: 'monban' },
   { t: 'motes', count: 0 },
   { t: 'se', sound: 'gate-close' },
   // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる; the telop shows over his arrival and goes (QA 6 N18: it stayed in the chat)
-  { t: 'video', motion: 'd1-monban', captions: [{ text: 'MONBANが現れた', from: 7, to: 9.8 }] },
+  // MONBAN's music comes with MONBAN (QA 7 U1: it started 6 s early, on 〔中に入る〕)
+  { t: 'video', motion: 'd1-monban', captions: [{ text: 'MONBANが現れた', from: 7, to: 9.8 }], bgmAt: { track: 'monban', at: 6.5 } },
   { t: 'loop', motion: '9-l' }, // no camera shake here: it looked cheap (client 2026-10-22)
   { t: 'cam', move: 'in', focus: '50% 30%' }, // 喋るMONBANに寄る
   { t: 'say', who: 'MONBAN', text: '誰だお前…。\nここは秘密結社だ…。' },

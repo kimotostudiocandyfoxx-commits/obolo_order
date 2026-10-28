@@ -51,7 +51,8 @@ export type Step =
    * Play a motion once. Cannot be skipped; the last frame stays on screen afterwards.
    * `captions` appear on top while it plays (seconds from the start of the motion; no tap needed).
    */
-  | { t: 'video'; motion: MotionId; captions?: TimedCaption[] }
+  /** bgmAt: the music changes at a moment of the motion (MONBAN steps out of the smoke ~7 s in: QA 7 U1) */
+  | { t: 'video'; motion: MotionId; captions?: TimedCaption[]; bgmAt?: { track: string; at: number } }
   /** Switch background music (crossfade). null = fade out. Continues immediately. */
   | { t: 'bgm'; track: string | null; /** null + fade: a slow fade-out over this many seconds */ fade?: number }
   /**

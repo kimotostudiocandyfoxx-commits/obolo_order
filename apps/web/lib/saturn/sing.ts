@@ -245,6 +245,8 @@ export async function singKororin(audio: Blob | ArrayBuffer, words = '', oh = fa
 
 /** The same, from an audio URL (the story's own kororins); null when it cannot be sung. */
 export async function singUrl(url: string, words = '', oh = false): Promise<string | null> {
+  // the browser's own reading (tts:…) is not a file to fetch (QA 7, R13)
+  if (url.startsWith('tts:')) return null;
   try {
     const r = await fetch(url);
     if (!r.ok) return null;

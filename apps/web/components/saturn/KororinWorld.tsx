@@ -46,6 +46,7 @@ export function KororinWorld({
   highlightId = null,
   closeSignal = 0,
   singingId = null,
+  flyId = null,
   extra,
   roomOnly = false,
   noBar = false,
@@ -70,6 +71,8 @@ export function KororinWorld({
   closeSignal?: number;
   /** the story says this one is singing now: the party plays for it even while its voice is still loading (QA 6 P4) */
   singingId?: string | null;
+  /** this kororin jumps and rolls off towards your room, then leaves the planet (QA 7, P5: a plain ball flew instead) */
+  flyId?: string | null;
   /** Extra layer on top (tutorial coach). */
   overlay?: ReactNode;
   className?: string;
@@ -220,7 +223,19 @@ export function KororinWorld({
     });
     return [...real, ...fill];
   }, [fromList, onMap, all, tabPosts, tab, plazaId]);
-  const unheard = useMemo(() => source.filter((p) => !heard.has(p.id)), [source, heard]);
+  const [flown, setFlown] = useState<Set<string>>(new Set());
+  const unheard = useMemo(() => source.filter((p) => !heard.has(p.id) && !flown.has(p.id)), [source, heard, flown]);
+  useEffect(() => {
+    if (!flyId) return;
+    const b = layer.current?.blob(flyId);
+    if (b) {
+      b.vy = -1150;
+      b.vx = 760;
+      b.av = 9;
+    }
+    const t = setTimeout(() => setFlown((cur) => new Set(cur).add(flyId)), 1100);
+    return () => clearTimeout(t);
+  }, [flyId]);
   const cap = tab === 'all' ? (plazaId ? TAB_CAP.plaza : Infinity) : TAB_CAP[tab];
   const shown = useMemo(() => {
     const l = unheard.slice(0, cap);
@@ -563,6 +578,8 @@ export function KororinWorld({
       {/* characters: soft bodies on the planet */}
       <div ref={stage} className="absolute inset-0">
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
+          // while the story waits for one kororin's song, the others do not cut into it (QA 7, R15)
+          if (singingId && id !== singingId) return;
           const p = shown.find((x) => x.id === id);
           if (p) listen(p);
         }} onTapEmpty={close} onFrame={onFrame} speakingId={partyId} />

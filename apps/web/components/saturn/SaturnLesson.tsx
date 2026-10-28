@@ -86,7 +86,8 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'brother', text: 'つぶやいたコロリンは、自分の部屋に落としとけばいいんだZE。' },
   { k: 'say', who: 'brother', text: 'だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
   { k: 'batiVoice' },
-  { k: 'note', text: '〔🎙〕を押して、{bati}に向かって、独り言みたいにつぶやく（声を出せない時は、すみの⌨で文字でも）→ {bati}がコロリンにする → タップすると歌う → 〔自分の部屋に飛ばす〕' },
+  // the steps were just done: only the question (QA 7, R16)
+  { k: 'note', text: 'もうひとつ、つぶやいてみる？' },
   { k: 'choice' },
   // D04-S005b コロリンのデザイン (draft 21, M-R124): KIMORIN⭐︎ first, then yours (answers or おまかせ → four → one redo)
   { k: 'say', who: 'sister', text: 'つぶやくのは、ここまでね。次は、見た目だワ。' },
@@ -116,7 +117,8 @@ const BEATS: Beat[] = [
   { k: 'send' },
   // KIMORIN⭐︎ rolls his own kororin back on the ring; it dances once in your 〔推し〕
   { k: 'say', who: 'kimorin', text: 'お返しです。ダチなので。' },
-  { k: 'note', text: '〔推し〕に、KIMORIN⭐︎から届いた（腕80本のコロリン）。タップすると、歌が聞けます' },
+  // no 〔推し〕 on this screen (QA 7, R10・R16)
+  { k: 'note', text: 'KIMORIN⭐︎から、お返しのコロリンが届いた。タップすると歌うよ' },
   { k: 'listen', id: 'back' },
   // D04-S006 土星の空のリング (story M-R107): the night relay (luxury video V21, to come), then a kororin rolls to your feet
   { k: 'say', who: 'kimorin', text: '……な、なんやこれ。……失礼。土星の夜は、毎日、こうなのですか？' }, // サングラスが鼻先までずり落ちている
@@ -287,6 +289,15 @@ export function SaturnLesson({
   const fill = (t: string) => t.replaceAll('{bati}', bati).replaceAll('{neo}', neo).replaceAll('{inviter}', inviter);
   const insert = (more: Beat[]) => setBeats((b) => [...b.slice(0, i + 1), ...more, ...b.slice(i + 1)]);
   const next = () => setI((n) => n + 1);
+  // a tap right after the line changed (by itself or by a tap) is taken as reading it, not as the next one (QA 7, R17)
+  const shownAt = useRef(0);
+  useEffect(() => {
+    shownAt.current = Date.now();
+  }, [i]);
+  const tapNext = () => {
+    if (Date.now() - shownAt.current < 600) return;
+    next();
+  };
 
   useEffect(() => {
     const v = new LineVoice();
@@ -455,13 +466,19 @@ export function SaturnLesson({
         setI((n) => (n === at ? n + 1 : n));
       }, beatRef.current?.k === 'listen' && beatRef.current.id === 'sunset' ? 1500 : 800);
     };
+    // a song that never starts (its voice did not load) does not hold the story (QA 7, R14); once it plays, its end
+    // (or its stop) moves on, with a cap for a lost end event
+    let cap = setTimeout(go, 3000);
     const off = subscribeAudio((st) => {
       if (st.playing) {
+        if (!started) {
+          clearTimeout(cap);
+          cap = setTimeout(go, 20000);
+        }
         started = true;
         duck(0.15);
-      } else if (started && st.progress >= 0.95) go();
+      } else if (started) go();
     });
-    const cap = setTimeout(go, 12000);
     return () => {
       off();
       clearTimeout(cap);
@@ -494,6 +511,7 @@ export function SaturnLesson({
         highlightId={beat?.k === 'listen' && !waitSong ? target : null}
         closeSignal={closeSignal}
         singingId={waitSong ? target : null}
+        flyId={flying ? mineId : null}
         events={{
           onListen: (p) => {
             if (beat?.k !== 'listen' || waitSong) return;
@@ -514,8 +532,8 @@ export function SaturnLesson({
               <div className="pointer-events-none absolute inset-x-0 top-[calc(70px+env(safe-area-inset-top))] z-[200] flex justify-center px-3">
                 <div key={`${i}-${coachText}`} className="flex w-full max-w-md animate-[fadeUp_0.35s_ease-out] items-end gap-2">
                   {SPRITES[coachWho] && (
-                    // the speaker from the chest up, as big as in the temple (QA 6 P1)
-                    <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-white/10 shadow-lg ring-2 ring-white/40">
+                    // the speaker from the chest up, as big as in the temple (QA 6 P1, a little bigger again: QA 7)
+                    <span className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-white/10 shadow-lg ring-2 ring-white/40">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={spriteUrl(SPRITES[coachWho]!)} alt="" className="absolute left-1/2 top-0 h-[230%] w-auto max-w-none -translate-x-1/2 object-contain" />
                     </span>
@@ -532,7 +550,7 @@ export function SaturnLesson({
               </div>
             )}
             {(beat?.k === 'say' || beat?.k === 'note') && (
-              <button className="absolute inset-0 z-[195]" aria-label="つぎへ" onClick={next}>
+              <button className="absolute inset-0 z-[195]" aria-label="つぎへ" onClick={tapNext}>
                 <span className="absolute right-4 top-[calc(178px+env(safe-area-inset-top))] animate-pulse text-xs text-white/80">▶</span>
               </button>
             )}
@@ -552,12 +570,7 @@ export function SaturnLesson({
               <DachiCard who={beat.text.startsWith('KIMORIN') ? 'kimorin' : 'inviter'} name={beat.text.startsWith('KIMORIN') ? 'KIMORIN⭐︎' : inviter} message={beat.text.startsWith('KIMORIN') ? undefined : inviterMessage} />
             )}
             {hint && <p className="pointer-events-none absolute inset-x-0 bottom-[calc(120px+env(safe-area-inset-bottom))] z-[205] text-center"><span className="rounded-full bg-[rgba(20,12,36,0.75)] px-4 py-2 text-[13px] text-amber-100">{hint}</span></p>}
-            {flying && (
-              // your kororin hops and rolls down to the room (QA 6 P5)
-              <span className="pointer-events-none absolute bottom-[40%] left-1/2 z-[206] h-14 w-14 rounded-full bg-gradient-to-b from-amber-400 to-amber-700 shadow-lg" style={{ animation: 'roomRoll 1.4s ease-in forwards' }} />
-            )}
             {flying && <span className="pointer-events-none absolute bottom-[calc(28px+env(safe-area-inset-bottom))] right-5 z-[206] animate-[fadeUp_0.5s_ease-out] rounded-full bg-white/90 px-3 py-1 text-[12px] font-bold text-[#5a3f8a]">🏠 部屋に、ころん</span>}
-            <style>{'@keyframes roomRoll{0%{transform:translate(-50%,0)}25%{transform:translate(-50%,-60px)}100%{transform:translate(38vw,38svh) rotate(540deg) scale(.5);opacity:.3}}'}</style>
 
             {/* {bati} is the mic: a round button at the bottom */}
             {recording && (
