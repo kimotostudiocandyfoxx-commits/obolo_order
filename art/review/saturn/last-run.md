@@ -1,0 +1,208 @@
+# UI art — 2026-10-28T09:04:24.718Z
+
+Seedream 5.0 Pro / 204枚 / 約98円
+
+- ⏸ V01/K14-c: 時間切れ、次回
+- ⏸ V01/K15-a: 時間切れ、次回
+- ⏸ V01/K15-b: 時間切れ、次回
+- ⏸ V01/K15-c: 時間切れ、次回
+- ⏸ V01/K16-a: 元の絵ができなかったので次回
+- ⏸ V01/K16-b: 元の絵ができなかったので次回
+- ⏸ V01/K16-c: 元の絵ができなかったので次回
+- ⏸ V01/K17-a: 時間切れ、次回
+- ⏸ V01/K17-b: 時間切れ、次回
+- ⏸ V01/K17-c: 時間切れ、次回
+- ⏸ V01/K18-a: 時間切れ、次回
+- ⏸ V01/K18-b: 時間切れ、次回
+- ⏸ V01/K18-c: 時間切れ、次回
+- ⏸ V02/K1-a: 時間切れ、次回
+- ⏸ V02/K1-b: 時間切れ、次回
+- ⏸ V02/K1-c: 時間切れ、次回
+- ⏸ V02/K10-a: 元の絵ができなかったので次回
+- ⏸ V02/K10-b: 元の絵ができなかったので次回
+- ⏸ V02/K10-c: 元の絵ができなかったので次回
+- ⏸ V02/K11-a: 時間切れ、次回
+- ⏸ V02/K11-b: 時間切れ、次回
+- ⏸ V02/K11-c: 時間切れ、次回
+- ⏸ V02/K12-a: 元の絵ができなかったので次回
+- ⏸ V02/K12-b: 元の絵ができなかったので次回
+- ⏸ V02/K12-c: 元の絵ができなかったので次回
+- ⏸ V02/K13-a: 時間切れ、次回
+- ⏸ V02/K13-b: 時間切れ、次回
+- ⏸ V02/K13-c: 時間切れ、次回
+- ⏸ V02/K13b-a: 時間切れ、次回
+- ⏸ V02/K13b-b: 時間切れ、次回
+- ⏸ V02/K13b-c: 時間切れ、次回
+- ⏸ V02/K14-a: 元の絵ができなかったので次回
+- ⏸ V02/K14-b: 元の絵ができなかったので次回
+- ⏸ V02/K14-c: 元の絵ができなかったので次回
+- ⏸ V02/K2-a: 時間切れ、次回
+- ⏸ V02/K2-b: 時間切れ、次回
+- ⏸ V02/K2-c: 時間切れ、次回
+- ⏸ V02/K3-a: 時間切れ、次回
+- ⏸ V02/K3-b: 時間切れ、次回
+- ⏸ V02/K3-c: 時間切れ、次回
+- ⏸ V02/K4-a: 元の絵ができなかったので次回
+- ⏸ V02/K4-b: 元の絵ができなかったので次回
+- ⏸ V02/K4-c: 元の絵ができなかったので次回
+- ⏸ V02/K5-a: 時間切れ、次回
+- ⏸ V02/K5-b: 時間切れ、次回
+- ⏸ V02/K5-c: 時間切れ、次回
+- ⏸ V02/K6-a: 時間切れ、次回
+- ⏸ V02/K6-b: 時間切れ、次回
+- ⏸ V02/K6-c: 時間切れ、次回
+- ⏸ V02/K7-a: 時間切れ、次回
+- ⏸ V02/K7-b: 時間切れ、次回
+- ⏸ V02/K7-c: 時間切れ、次回
+- ⏸ V02/K8-a: 元の絵ができなかったので次回
+- ⏸ V02/K8-b: 元の絵ができなかったので次回
+- ⏸ V02/K8-c: 元の絵ができなかったので次回
+- ⏸ V02/K9-a: 時間切れ、次回
+- ⏸ V02/K9-b: 時間切れ、次回
+- ⏸ V02/K9-c: 時間切れ、次回
+- ⏸ V05/K2-a: 時間切れ、次回
+- ⏸ V05/K2-b: 時間切れ、次回
+- ⏸ V05/K2-c: 時間切れ、次回
+- ⏸ V05/K3-a: 元の絵ができなかったので次回
+- ⏸ V05/K3-b: 元の絵ができなかったので次回
+- ⏸ V05/K3-c: 元の絵ができなかったので次回
+- ⏸ V05/K4-a: 時間切れ、次回
+- ⏸ V05/K4-b: 時間切れ、次回
+- ⏸ V05/K4-c: 時間切れ、次回
+- ⏸ V05/K5-a: 元の絵ができなかったので次回
+- ⏸ V05/K5-b: 元の絵ができなかったので次回
+- ⏸ V05/K5-c: 元の絵ができなかったので次回
+- ⏸ V05/K6-a: 時間切れ、次回
+- ⏸ V05/K6-b: 時間切れ、次回
+- ⏸ V05/K6-c: 時間切れ、次回
+- ⏸ V05/K7-a: 元の絵ができなかったので次回
+- ⏸ V05/K7-b: 元の絵ができなかったので次回
+- ⏸ V05/K7-c: 元の絵ができなかったので次回
+- ⏸ V06/K1-a: 時間切れ、次回
+- ⏸ V06/K1-b: 時間切れ、次回
+- ⏸ V06/K1-c: 時間切れ、次回
+- ⏸ V06/K10-a: 時間切れ、次回
+- ⏸ V06/K10-b: 時間切れ、次回
+- ⏸ V06/K10-c: 時間切れ、次回
+- ⏸ V06/K11-a: 時間切れ、次回
+- ⏸ V06/K11-b: 時間切れ、次回
+- ⏸ V06/K11-c: 時間切れ、次回
+- ⏸ V06/K2-a: 元の絵ができなかったので次回
+- ⏸ V06/K2-b: 元の絵ができなかったので次回
+- ⏸ V06/K2-c: 元の絵ができなかったので次回
+- ⏸ V06/K3-a: 元の絵ができなかったので次回
+- ⏸ V06/K3-b: 元の絵ができなかったので次回
+- ⏸ V06/K3-c: 元の絵ができなかったので次回
+- ⏸ V06/K4-a: 元の絵ができなかったので次回
+- ⏸ V06/K4-b: 元の絵ができなかったので次回
+- ⏸ V06/K4-c: 元の絵ができなかったので次回
+- ⏸ V06/K5-a: 元の絵ができなかったので次回
+- ⏸ V06/K5-b: 元の絵ができなかったので次回
+- ⏸ V06/K5-c: 元の絵ができなかったので次回
+- ⏸ V06/K6-a: 時間切れ、次回
+- ⏸ V06/K6-b: 時間切れ、次回
+- ⏸ V06/K6-c: 時間切れ、次回
+- ⏸ V06/K7-a: 時間切れ、次回
+- ⏸ V06/K7-b: 時間切れ、次回
+- ⏸ V06/K7-c: 時間切れ、次回
+- ⏸ V06/K8-a: 時間切れ、次回
+- ⏸ V06/K8-b: 時間切れ、次回
+- ⏸ V06/K8-c: 時間切れ、次回
+- ⏸ V06/K9-a: 時間切れ、次回
+- ⏸ V06/K9-b: 時間切れ、次回
+- ⏸ V06/K9-c: 時間切れ、次回
+- ⏸ V11/K1b-a: 時間切れ、次回
+- ⏸ V11/K1b-b: 時間切れ、次回
+- ⏸ V11/K1b-c: 時間切れ、次回
+- ⏸ V11/K2-a: 時間切れ、次回
+- ⏸ V11/K2-b: 時間切れ、次回
+- ⏸ V11/K2-c: 時間切れ、次回
+- ⏸ V11/K3-a: 時間切れ、次回
+- ⏸ V11/K3-b: 時間切れ、次回
+- ⏸ V11/K3-c: 時間切れ、次回
+- ⏸ V11/K4-a: 時間切れ、次回
+- ⏸ V11/K4-b: 時間切れ、次回
+- ⏸ V11/K4-c: 時間切れ、次回
+- ⏸ V11/K5-a: 時間切れ、次回
+- ⏸ V11/K5-b: 時間切れ、次回
+- ⏸ V11/K5-c: 時間切れ、次回
+- ⏸ V19/K1-a: 時間切れ、次回
+- ⏸ V19/K1-b: 時間切れ、次回
+- ⏸ V19/K1-c: 時間切れ、次回
+- ⏸ V19/K2-a: 元の絵ができなかったので次回
+- ⏸ V19/K2-b: 元の絵ができなかったので次回
+- ⏸ V19/K2-c: 元の絵ができなかったので次回
+- ⏸ V19/K3-a: 時間切れ、次回
+- ⏸ V19/K3-b: 時間切れ、次回
+- ⏸ V19/K3-c: 時間切れ、次回
+- ⏸ V19/K4-a: 時間切れ、次回
+- ⏸ V19/K4-b: 時間切れ、次回
+- ⏸ V19/K4-c: 時間切れ、次回
+- ⏸ stills/d2-egg-earth-pair-a: 時間切れ、次回
+- ⏸ stills/d2-egg-earth-pair-b: 時間切れ、次回
+- ⏸ stills/d2-egg-earth-pair-c: 時間切れ、次回
+- ⏸ stills/d2-egg-sun-pair-a: 時間切れ、次回
+- ⏸ stills/d2-egg-sun-pair-b: 時間切れ、次回
+- ⏸ stills/d2-egg-sun-pair-c: 時間切れ、次回
+- ⏸ stills/saturn-night-a: 時間切れ、次回
+- ⏸ stills/saturn-night-b: 時間切れ、次回
+- ⏸ stills/saturn-night-c: 時間切れ、次回
+- ⏸ stills/saturn-octopus-point-a: 時間切れ、次回
+- ⏸ stills/saturn-octopus-point-b: 時間切れ、次回
+- ⏸ stills/saturn-octopus-point-c: 時間切れ、次回
+- ⏸ stills/saturn-outside-a: 時間切れ、次回
+- ⏸ stills/saturn-outside-b: 時間切れ、次回
+- ⏸ stills/saturn-outside-c: 時間切れ、次回
+- ⏸ stills/saturn-sleep-a: 時間切れ、次回
+- ⏸ stills/saturn-sleep-b: 時間切れ、次回
+- ⏸ stills/saturn-sleep-c: 時間切れ、次回
+- ✅ V01/K1-a
+- ✅ V01/K1-b
+- ✅ V01/K1-c
+- ✅ V01/K10-a
+- ✅ V01/K10-c
+- ✅ V01/K11-a
+- ✅ V01/K11-b
+- ✅ V01/K11-c
+- ✅ V01/K12-a
+- ✅ V01/K12-b
+- ✅ V01/K12-c
+- ✅ V01/K13-a
+- ✅ V01/K13-b
+- ✅ V01/K13-c
+- ✅ V01/K14-a
+- ✅ V01/K14-b
+- ✅ V01/K2-a
+- ✅ V01/K2-b
+- ✅ V01/K2-c
+- ✅ V01/K3-a
+- ✅ V01/K3-b
+- ✅ V01/K3-c
+- ✅ V01/K4-a
+- ✅ V01/K4-b
+- ✅ V01/K4-c
+- ✅ V01/K5-a
+- ✅ V01/K5-b
+- ✅ V01/K5-c
+- ✅ V01/K6-a
+- ✅ V01/K6-b
+- ✅ V01/K6-c
+- ✅ V01/K7-b
+- ✅ V01/K8-b
+- ✅ V01/K8-c
+- ✅ V01/K9-a
+- ✅ V01/K9-b
+- ✅ V01/K9-c
+- ✅ sheets/kimorin-dragon-labcoat-a
+- ✅ sheets/kimorin-dragon-labcoat-b
+- ✅ sheets/kimorin-dragon-labcoat-c
+- ✅ sheets/kimorin-lab-a
+- ✅ sheets/kimorin-lab-b
+- ✅ sheets/kimorin-lab-c
+- ✅ sheets/rocket-a
+- ✅ sheets/rocket-b
+- ✅ sheets/rocket-c
+- ❌ V01/K10-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V01/K7-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V01/K7-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V01/K8-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
