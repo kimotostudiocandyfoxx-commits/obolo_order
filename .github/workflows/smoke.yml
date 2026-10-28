@@ -1,0 +1,42 @@
+name: Smoke makers
+
+# Runs scripts/smoke/makers.mjs against the deployed API (a fresh invited test account makes a NEO look, a Bati
+# and kororin designs) and uploads the pictures. Run by hand, or by changing scripts/smoke/.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**']
+    paths: ['scripts/smoke/**']
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Makers
+        run: |
+          export API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.asia-northeast1.run.app"
+          export ADMIN_TOKEN="$(gcloud secrets versions access latest --secret=obolo-admin-token)"
+          echo "::add-mask::$ADMIN_TOKEN"
+          node scripts/smoke/makers.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-out
+          path: smoke-out
