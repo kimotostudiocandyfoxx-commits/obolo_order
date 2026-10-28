@@ -581,17 +581,19 @@ export function SaturnLesson({
                     {busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : micFail ? 'マイクが使えないみたい' : 'タップして、話してね'}
                   </p>
                 )}
-                {/* the way out for anyone who cannot speak */}
+                {/* the way out for anyone who cannot speak (hidden while the typing sheet is open) */}
+                {!typing && (
                 <button onClick={() => setTyping(true)} className="absolute bottom-[calc(14px+env(safe-area-inset-bottom))] right-4 rounded-full bg-[rgba(20,12,36,0.6)] px-3 py-1.5 text-[13px] text-white" aria-label="文字で入力">
                   ⌨ 文字で
                 </button>
+                )}
               </div>
             )}
 
             {typing && beat?.k === 'recNormal' && (
               <div className="absolute inset-0 z-[230] flex items-end justify-center bg-black/50" onClick={() => setTyping(false)}>
                 <div className="pb-safe w-full max-w-md rounded-t-3xl bg-white p-5 text-slate-800" onClick={(e) => e.stopPropagation()}>
-                  <input autoFocus value={typed} onChange={(e) => setTyped(e.target.value)} maxLength={140} placeholder={beat.prompt === 'first' ? 'こんにちは' : 'いま思ったこと'} className="w-full border-b border-violet-300 py-2 text-[16px] outline-none" />
+                  <input autoFocus value={typed} onChange={(e) => setTyped(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && typed.trim() && !busy) void murmur(null, typed); }} maxLength={140} placeholder={beat.prompt === 'first' ? 'こんにちは' : 'いま思ったこと'} className="w-full border-b border-violet-300 py-2 text-[16px] outline-none" />
                   <button disabled={!typed.trim() || busy} onClick={() => void murmur(null, typed)} className="mt-4 w-full rounded-full bg-violet-500 py-3 font-black text-white disabled:opacity-40">
                     {bati}にコロリンにしてもらう
                   </button>
@@ -777,6 +779,7 @@ function KororinDesign({ api, bati, neo, food, onDone }: { api?: LessonApi; bati
   const shown = showBefore && before ? before : designs;
   return (
     <div className={sheet}>
+      <p className="mb-3 text-center text-[15px] font-bold text-amber-50">気に入ったのを、タップしてね</p>
       <div className="grid grid-cols-2 gap-3">
         {shown.map((d, k) => (
           <button key={d.id} onClick={() => pick(d)} className="aspect-square overflow-hidden rounded-2xl border border-white/20 bg-white/90 p-1 active:scale-95">
