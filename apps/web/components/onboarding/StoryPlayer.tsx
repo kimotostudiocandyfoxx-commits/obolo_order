@@ -566,14 +566,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     return () => d.dispose();
   }, []);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // strict mode mounts twice in development: the first cleanup disposed the music for good (QA 5 N23)
+    bgm.current?.revive();
+    return () => {
       if (placeholderTimer.current) clearTimeout(placeholderTimer.current);
       captionTimers.current.forEach(clearTimeout);
       bgm.current?.dispose();
-    },
-    [],
-  );
+    };
+  }, []);
 
   useEffect(() => {
     mutedRef.current = muted;
@@ -583,11 +584,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   }, [muted]);
 
   // the mixer: music (dipping while someone speaks), sounds, voices
+  // a lesson can quiet the music under itself (Saturn: low while kororins sing, silent while the mic records — QA 5 N14)
+  const [duck, setDuck] = useState(1);
+  useEffect(() => {
+    const f = (e: Event) => setDuck(Math.max(0, Math.min(1, Number((e as CustomEvent<number>).detail))));
+    window.addEventListener('obolo:bgm-duck', f);
+    return () => window.removeEventListener('obolo:bgm-duck', f);
+  }, []);
   useEffect(() => {
     saveMix(mix);
     voice.current?.setVolume(mix.voice);
-    bgm.current?.setScale(mix.bgm * (talking ? VOICE_DIP : 1), talking ? 0.25 : 0.6);
-  }, [mix, talking]);
+    bgm.current?.setScale(mix.bgm * (talking ? VOICE_DIP : 1) * duck, talking ? 0.25 : 0.6);
+  }, [mix, talking, duck]);
   useEffect(() => {
     const vc = voice.current;
     if (!vc) return;
@@ -800,6 +808,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   return (
     <MicAllowed.Provider value={!textOnly}>
     <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
+      {/* motions and stills fill a phone the same way (cover); on wider screens (iPad) both sit whole over the blurred
+          backdrop — the picture no longer changes size between a motion and a still (QA 5 N6) */}
+      <style>{'.story-fit{object-fit:cover}@media (min-aspect-ratio: 9/16){.story-fit{object-fit:contain}}'}</style>
       {/* blurred backdrop so 9:16 motions fill wider screens (iPad) without cropping */}
       {backdrop && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -813,7 +824,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <video
             key={k}
             ref={ref}
-            className="absolute inset-0 h-full w-full object-contain"
+            className="story-fit absolute inset-0 h-full w-full"
             playsInline
             preload="auto"
             muted={muted}
@@ -828,7 +839,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
       {still && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={still} src={stillUrl(still)} alt="" className="pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out] object-cover" aria-hidden />
+        <img key={still} src={stillUrl(still)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out]" aria-hidden />
       )}
       </Camera>
       {!sprite && autoStandee && (

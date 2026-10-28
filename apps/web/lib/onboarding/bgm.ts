@@ -127,6 +127,13 @@ export class Bgm {
     if (this.gain && this.ctx) this.gain.gain.setTargetAtTime(m ? 0 : this.level(), this.ctx.currentTime, 0.05);
   }
 
+  /** after a dispose (strict mode's second mount) */
+  revive() {
+    if (!this.disposed) return;
+    this.disposed = false;
+    this.gain = null; // disconnected by dispose(): a fresh one is made on the next play
+  }
+
   dispose() {
     this.disposed = true;
     if (this.swapTimer) clearTimeout(this.swapTimer);
@@ -195,9 +202,10 @@ export class Bgm {
       p = fetch(bgmUrl(track))
         .then((r) => r.arrayBuffer())
         .then((b) => ctx.decodeAudioData(b));
-      // keep memory low: the playing track and the one coming up
-      for (const k of [...this.buffers.keys()]) if (k !== this.track) this.buffers.delete(k);
+      // keep memory low, but never drop the playing track or the one being switched to: the three latest
+      // (QA 5 N2: a prefetch evicted the track about to start → seconds of silence)
       this.buffers.set(track, p);
+      for (const k of [...this.buffers.keys()].slice(0, -3)) if (k !== this.track) this.buffers.delete(k);
       p.catch(() => this.buffers.delete(track));
     }
     return p;

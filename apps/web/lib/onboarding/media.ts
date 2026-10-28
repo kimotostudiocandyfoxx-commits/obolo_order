@@ -24,19 +24,19 @@ export const AVAILABLE_MOTIONS: ReadonlySet<MotionId> = new Set<MotionId>([
   // made with Seedance 2.5 (2026-10-20): the joins of day 1
   'd1-open', 'd1-fold', 'd1-arrive', 'd1-gate-loop', 'd1-monban',
   // made with Seedance 2.5 (2026-10-21): day 2 (docs/story-rewrite/day2-video-plan.md)
-  'd2-ticket', 'd2-ticket-give', 'd2-kimorin-turn', 'd2-kimorin-face', 'd2-glasses-up', 'd2-kimorin-startle',
+  'd2-ticket', 'd2-ticket-give', 'd2-kimorin-face', 'd2-glasses-up', 'd2-kimorin-startle',
   'd2-kimorin-leave', 'd2-kimorin-back', 'd2-floor-open', 'd2-descend', 'd2-gem', 'd2-cards', 'd2-book',
   'd2-launch', 'd2-rocket-in', 'd2-landing', 'd2-moon-enter', 'd2-pinpon', 'd2-transform', 'd2-dragon',
   'd2-kimorin-back-normal', 'd2-altar', 'd2-hatch-sun', 'd2-hatch-earth', 'd2-pinpon-earth', 'd2-pinpon-sun',
   'd2-moon-night',
   // the gate of the script of 2026-10-22
-  'd2-step-in', 'd2-monban-smoke',
+  'd2-step-in',
   // motion 12 in two (client 2026-10-22, day 2): through the gate | on into the hall — KIMORIN calls in between
   '12-a', '12-b', 'd2-sky', 'd2-monban-walkin', 'd2-reveal',
   // the paper airplane (Seedance) and the look back through the gate (a whip pan made from its two pictures)
   'd2-plane', 'd2-look-back',
   // KIMORIN's entrance up the avenue, his walk into the temple, OBOLON's light (client 2026-10-22)
-  'd2-kimorin-walkup', 'd2-walk-in', 'd2-obolon-appear',
+  'd2-kimorin-walkup', 'd2-obolon-appear',
   // Day 3
   '3-1', '3-3', '3-4', '3-6', '3-7',
   // Day 4

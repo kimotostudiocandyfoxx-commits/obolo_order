@@ -26,11 +26,11 @@ export const DAY2: Step[] = [
   // the HQ; at the gate the doors close and MONBAN appears, takes the ticket, the gate opens; on the way in
   // KIMORIN calls from behind — the rest is seen looking back out through the gate
   { t: 'se', sound: 'paper' }, // 切符が折り鶴に折れる（M-R169：紙飛行機ではなく折り鶴。1日目の鶴の映像を使う）
-  { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）
   { t: 'video', motion: '5-f' }, // 鶴が空を飛んでいく
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd1-arrive' }, // 本部の門の前に、すっと降りる
   { t: 'loop', motion: 'd1-gate-loop' },
+  { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）。鶴が着いてから、曲を重ねて切り替える（QA 5 U1）
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
   { t: 'bgm', track: 'monban' },
@@ -58,8 +58,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'smoke' },
   // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
   // coat and goggles until he changes on the Moon) — a still until the new cut is made (art/review)
-  { t: 'still', image: 's/d2-gate-inside' }, // 門の内側から入口を見た景色。黒い煙が湧き、MONBANが現れる
-  { t: 'sprite', image: ['monban', 'kimorin-i'] }, // 話す方が前に出る。KIMORINは怪しい発明家の姿・ゴーグルを目に（M-R100）
+  { t: 'still', image: 's/d2-gate-two-inside' }, // 黒い煙が湧き、MONBANが現れる。MONBANが左、白衣のKIMORINが右（話す人は胸から上で）
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
   { t: 'say', who: 'MONBAN', text: 'ここは秘密結社だ…' },
@@ -86,15 +85,13 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'obolon' },
   { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
-  { t: 'still', image: 's/d2-hall' }, // 天球儀の大広間。光の柱の中にOBOLON
-  { t: 'sprite', image: ['', 'kimorin-i'] }, // 話すKIMORINの立ち絵（発明家・ゴーグルを目に。驚いてゴーグルを上げるまで）
+  { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、右手前に白衣のKIMORIN（QA 5 N7）
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'se', sound: 'boing' },
   { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-kimorin-startle' }, // KIMORINがのけぞり、ゴーグルを額に押し上げる（目が光る。M-R100）
   { t: 'say', who: 'KIMORIN', text: 'うわ！なんやこの喋る黒い玉は！　宙に浮いとる！　どういう仕組み！？' },
-  { t: 'still', image: 's/d2-hall' },
-  { t: 'sprite', image: ['', 'kimorin-iu'] },
+  { t: 'still', image: 's/d2-hall-kimorin-up' }, // ゴーグルを額に上げたKIMORIN
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
   { t: 'say', who: 'KIMORIN', text: '宇宙秘密結社?…すごそう...' },
   { t: 'say', who: 'OBOLON', text: 'お前は宇宙に行ってみたいと思うか？' },
@@ -107,8 +104,7 @@ export const DAY2: Step[] = [
   { t: 'bgvideo', motion: 'd2-monban-walkin' }, // 星空の下、MONBANが入り口から歩いてきて、KIMORINの横に立つ
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' }, // MONBANが入り口から歩きながら
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' }, // 長いセリフを分けた（client 2026-10-26）
-  { t: 'still', image: 's/d2-hall-sky-empty' }, // 星空の大広間（人物なし）
-  { t: 'sprite', image: ['monban', 'kimorin-iu'] },
+  { t: 'still', image: 's/d2-hall-sky-monban' }, // 星空の大広間。MONBANが左、OBOLONが真ん中、KIMORINが右（QA 5 N8）
   { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
   { t: 'bgm', track: 'comedy' }, // お金の話から、KIMORINの調子が戻る
   { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、とても手の込んだ手品ですね、、。' },
@@ -194,22 +190,21 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'ちなみに、、、秘密結社は、初めてか？' },
   { t: 'choice', key: 'times', options: [{ label: '1回目' }, { label: '2回目' }, { label: '3回目以上' }] },
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
-  { t: 'still', image: 's/d2-moon-in' }, // 黒い球が、くるりとKIMORINのほうへ向く
-  { t: 'sprite', image: ['', 'kimorin-iu'] }, // 光の柱のOBOLONの前に、KIMORIN（発明家・ゴーグルは額。ドラゴンの前）
+  { t: 'still', image: 's/d2-moon-kimorin' }, // 黒い球が、くるりとKIMORINのほうへ向く。光の柱のOBOLONの前に、白衣のKIMORIN
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
   { t: 'say', who: 'KIMORIN', text: '私は、、、、、、12回目です。' },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
   { t: 'bgm', track: 'comedy' }, // ピンポン2.5の発表
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
+  { t: 'still', image: 's/d2-moon-kimorin' }, // 長い説明は、話す人の胸から上の絵で（QA 5 N10）
   { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
   { t: 'say', who: 'KIMORIN', text: '変な答えを言ってしまったらどうしよう。' },
   { t: 'say', who: 'KIMORIN', text: '間違えていたらどうしよう。と、頭を抱える人も少なくない。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
-  { t: 'still', image: 's/d2-moon-in' }, // シーン……
-  { t: 'sprite', image: ['', 'kimorin-iu'] },
+  { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。' },
@@ -347,6 +342,7 @@ export const DAY2: Step[] = [
   { t: 'label', id: 'pinpon-sun' },
   { t: 'video', motion: 'd2-pinpon-sun' },
   { t: 'label', id: 'pinpon' },
+  { t: 'still', image: 's/d2-moon-in' }, // 生まれる映像の最後の絵を残さない（立ち絵と見た目がちがう：QA 5 N26。映像は作り直す）
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
   { t: 'say', who: 'OBOLON', text: 'これが、、、お前の、相方だ。' },
   { t: 'say', who: 'KIMORIN', text: 'こ、、、これが、、私の、、相方？' }, // 面の目の切れ目から、青い光がぽろぽろ

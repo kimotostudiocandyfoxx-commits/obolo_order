@@ -281,6 +281,14 @@ export function SaturnLesson({
     voice.current = v;
     return () => v.dispose();
   }, []);
+  // the Saturn music plays low under the lesson and stops while the mic records (QA 5 N14)
+  const duck = (v: number) => {
+    window.dispatchEvent(new CustomEvent('obolo:bgm-duck', { detail: v }));
+  };
+  useEffect(() => {
+    duck(rec.on ? 0 : 0.4);
+  }, [rec.on]);
+  useEffect(() => () => duck(1), []);
   // each line plays its voice; the story's kororins drop in with theirs
   useEffect(() => {
     if (!beat) return;
@@ -417,6 +425,7 @@ export function SaturnLesson({
         roomOnly
         noBar
         extra={extra}
+        highlightId={beat?.k === 'listen' ? (beat.id === 'kimorin' ? 'story-kimorin' : beat.id === 'sunset' ? 'story-sunset' : ([...extra].reverse().find((p) => !p.id.startsWith('story-'))?.id ?? null)) : null}
         events={{
           onListen: (p) => {
             if (beat?.k !== 'listen') return;
@@ -494,8 +503,8 @@ export function SaturnLesson({
                   </p>
                 )}
                 {/* the way out for anyone who cannot speak */}
-                <button onClick={() => setTyping(true)} className="absolute bottom-[calc(14px+env(safe-area-inset-bottom))] right-4 p-2 text-lg text-white/45" aria-label="文字で入力">
-                  ⌨
+                <button onClick={() => setTyping(true)} className="absolute bottom-[calc(14px+env(safe-area-inset-bottom))] right-4 rounded-full bg-[rgba(20,12,36,0.6)] px-3 py-1.5 text-[13px] text-white" aria-label="文字で入力">
+                  ⌨ 文字で
                 </button>
               </div>
             )}

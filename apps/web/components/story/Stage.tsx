@@ -41,7 +41,9 @@ const madeFaces = (stem: string, exprs: string[]) => facesOf(stem, exprs.filter(
  * KIMORIN after the dragon (the small wing): from the Moon on his round sunglasses are over his eyes (story
  * M-R112) — the sunglasses-on poses as they are cut, the sunglasses-up ones (eyes glowing) for the rest
  */
-const KIMORIN_FACES = { ...facesOf('kimorin-x', POSES), ...madeFaces('kimorin-xs', POSES) };
+// joy has no sunglasses-on picture yet: it stays on the standing picture rather than lifting the glasses (M-R170,
+// QA 5 N5 — the glasses go up only where the story says so, with a face step)
+const KIMORIN_FACES = { ...facesOf('kimorin-x', POSES.filter((p) => p !== 'joy')), ...madeFaces('kimorin-xs', POSES) };
 const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
 const FRIEND = ['talk', 'joy', 'shock'];
 
@@ -70,7 +72,7 @@ const CHAR: Record<string, CharSpec> = {
   kaiser1: { bottom: 6, height: 72, face: 0.35, tint: '#7aa84a', faces: madeFaces('kaiser1-x', FRIEND) },
   freezy: { bottom: 8, height: 50, face: 0.2, tint: '#5aa8d8', faces: madeFaces('freezy-x', FRIEND) },
   hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a', faces: madeFaces('hipokin-x', FRIEND) },
-  'unchi-pinpon': { bottom: 22, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
+  'unchi-pinpon': { bottom: 10, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
   // Venus's gorilla bosses (client art 2026-10-05; draft 21 brings them into the first journey)
   bossg: { bottom: 6, height: 70, face: 0.18, tint: '#3a3a40' },
   hatg: { bottom: 6, height: 66, face: 0.2, tint: '#c8a030' },

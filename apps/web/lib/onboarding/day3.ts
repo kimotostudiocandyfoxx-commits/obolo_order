@@ -137,7 +137,7 @@ export const DAY3: Step[] = [
   // D04-S005〜S006 コロリン／土星の空のリング: the real Saturn world (ころりんぱ) with the story's lines
   // on top — KIMORIN⭐︎'s kororin, three kororins of your own by mic to your own room, the residents' ring,
   // the sister's sunset kororin (components/saturn/SaturnLesson.tsx).
-  { t: 'bgm', track: null },
+  { t: 'bgm', track: 'saturn' }, // 練習のあいだも曲は流れる（小さく。録音中は止まる：QA 5 N14）
   { t: 'sprite', image: null },
   { t: 'saturn' },
   // D04-S007 いちばん遠い星

@@ -521,7 +521,7 @@ export function BluenaScreen({ open }: { open: boolean }) {
       <div
         className={`relative aspect-square w-[min(64vw,40svh)] overflow-hidden rounded-sm border border-sky-200/70 bg-black shadow-[0_0_50px_rgba(120,190,255,0.55)] transition-all duration-500 ${open ? 'scale-100 opacity-100' : 'scale-y-0 opacity-0'}`}
       >
-        <video src={motionUrl(9)} poster="/onboarding/s/monban-screen.jpg" className="h-full w-full object-cover object-[50%_30%]" autoPlay loop muted playsInline />
+        <video src={motionUrl('9-l')} poster="/onboarding/s/monban-screen.jpg" className="h-full w-full object-cover object-[50%_30%]" autoPlay loop muted playsInline />
         <span className="absolute inset-0 bg-[repeating-linear-gradient(0deg,rgba(150,210,255,0.08)_0px,rgba(150,210,255,0.08)_1px,transparent_1px,transparent_3px)]" />
         <span className="absolute inset-0 bg-sky-300/10 mix-blend-screen" />
       </div>

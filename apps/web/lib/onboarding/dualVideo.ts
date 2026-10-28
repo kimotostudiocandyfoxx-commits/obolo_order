@@ -173,6 +173,8 @@ export class DualVideo {
     // Pre-load the same motion at 0:00 in the hidden element for a seamless loop restart.
     if (this.loop && this.url) {
       this.setSrc(old, this.url);
+      // a loop never sounds: the hidden element may still carry the sound of the motion it played before
+      old.muted = this.muted || this.loop;
       try {
         old.currentTime = 0;
       } catch {
@@ -187,6 +189,7 @@ export class DualVideo {
       const next = this.backEl;
       this.pending = next;
       this.setSrc(next, this.url);
+      next.muted = this.muted || this.loop;
       this.startIn(next, this.token);
       return;
     }

@@ -42,6 +42,7 @@ export function KororinWorld({
   className = '',
   neoOnly = false,
   highlightDrop = false,
+  highlightId = null,
   extra,
   roomOnly = false,
   noBar = false,
@@ -60,6 +61,8 @@ export function KororinWorld({
   neoOnly?: boolean;
   /** Make the 声をおとす button pulse (tutorial cue). */
   highlightDrop?: boolean;
+  /** the kororin to tap now (a story lesson): a glowing ring and 👇 follow it (QA 5 N11) */
+  highlightId?: string | null;
   /** Extra layer on top (tutorial coach). */
   overlay?: ReactNode;
   className?: string;
@@ -266,6 +269,9 @@ export function KororinWorld({
   // M-R153: while a kororin sings, the party (KororinParty) follows it
   const party = useRef<KororinPartyHandle>(null);
   const singingRef = useRef<string | null>(null);
+  const highlightRef = useRef<string | null>(null);
+  highlightRef.current = highlightId;
+  const marker = useRef<HTMLDivElement>(null);
   singingRef.current = speakingId;
   // a kororin a dachi delivered: the first time it shows here it drops its glasses and dances once, silently
   // (sound only when tapped, M-R153)
@@ -302,6 +308,12 @@ export function KororinWorld({
   const onFrame = useCallback((get: (id: string) => { x: number; y: number; R: number } | undefined, W: number) => {
     const star = singingRef.current ?? arrivalRef.current;
     party.current?.place(star ? get(star) : undefined);
+    const hi = highlightRef.current && get(highlightRef.current);
+    if (marker.current) {
+      marker.current.style.opacity = hi ? '1' : '0';
+      if (hi) marker.current.style.transform = `translate(${hi.x - hi.R * 1.25}px, ${hi.y - hi.R * 1.25}px)`;
+      if (hi) marker.current.style.width = marker.current.style.height = `${hi.R * 2.5}px`;
+    }
     const id = openRef.current;
     const el = card.current;
     if (!id || !el) return;
@@ -531,6 +543,9 @@ export function KororinWorld({
       </div>
 
       <KororinParty ref={party} on={!!speakingId || !!arrival} />
+      <div ref={marker} className="pointer-events-none absolute left-0 top-0 z-[60] rounded-full border-4 border-amber-200 opacity-0 shadow-[0_0_24px_rgba(255,220,140,0.9)] transition-opacity" aria-hidden>
+        <span className="absolute -top-10 left-1/2 -translate-x-1/2 animate-bounce text-3xl">👇</span>
+      </div>
 
       {/* soap-bubble pops of the voices you heard */}
       {bursts.map((bu) => (
