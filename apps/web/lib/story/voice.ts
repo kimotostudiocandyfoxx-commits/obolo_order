@@ -37,6 +37,7 @@ export function formOf(act: string | undefined): number | null {
 export function nameRest(text: string): string | null {
   // 「{name}、\nお前は…」→「お前は…」; 「なるほど…。\n{inviter}から…招待されたのか…。」→「なるほど…。\n招待されたのか…。」
   // (an inviter's name in kanji is never voiced: the client asked for the line without it, 2026-10-22)
-  const r = text.replace(/^\{[a-z_]+\}(?:[、,，]\s*\n?|\n)/, '').replace(/\{[a-z_]+\}から…*/, '');
+  // QA 6 §4-16 (M-R169): a name at the head with its pause, also 「{neo}、、、いい名前だ。」 and 「{name}か、いいな。」→「いいな。」
+  const r = text.replace(/^\{[a-z_]+\}(?:か?[、,，]+\s*\n?|\n)/, '').replace(/\{[a-z_]+\}から…*/, '');
   return r !== text && voiceable(r) ? r : null;
 }
