@@ -57,11 +57,18 @@ export class PictureService {
     const r = await fetch(`https://images-api.nasa.gov/search?media_type=image&q=${encodeURIComponent(term)}`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(12_000) });
     if (!r.ok) return null;
     const j = (await r.json()) as { collection?: { items?: { href?: string; data?: { title?: string; description?: string; nasa_id?: string; center?: string }[]; links?: { href?: string; rel?: string }[] }[] } };
-    // NASA's search is loose (a "black hole" query can bring a space shuttle first): only an item whose title or
-    // description names the thing counts
-    const words = term.toLowerCase().split(/\s+/).filter((w) => w.length > 2);
-    const names = (x: { data?: { title?: string; description?: string }[] }) => `${x.data?.[0]?.title ?? ''} ${x.data?.[0]?.description ?? ''}`.toLowerCase();
-    const it = j.collection?.items?.slice(0, 40).find((x) => x.links?.some((l) => l.href && /\.(jpe?g|png)$/i.test(l.href)) && (!words.length || words.every((w) => names(x).includes(w))));
+    // NASA's search is loose (a "black hole" query brought a shuttle mission patch whose description mentions black
+    // holes): the thing's name (the term's first two words) must be in the title, and patches, logos, crews and
+    // launches are skipped unless asked for. Nothing left → Commons is tried instead.
+    const lower = term.toLowerCase();
+    const head = lower.split(/\s+/).filter(Boolean).slice(0, 2).join(' ');
+    const noise = /\b(patch|insignia|emblem|logo|crew|portrait|astronaut|launch|shuttle|sts-\d+|mission control)\b/;
+    const it = j.collection?.items
+      ?.slice(0, 60)
+      .find((x) => {
+        const title = (x.data?.[0]?.title ?? '').toLowerCase();
+        return x.links?.some((l) => l.href && /\.(jpe?g|png)$/i.test(l.href)) && (!head || title.includes(head)) && (!noise.test(title) || noise.test(lower));
+      });
     const href = it?.links?.find((l) => l.href && /\.(jpe?g|png)$/i.test(l.href))?.href;
     if (!it || !href) return null;
     const d = it.data?.[0];
