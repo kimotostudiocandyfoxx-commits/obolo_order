@@ -63,7 +63,7 @@ export const DAY3: Step[] = [
   { t: 'sprite', image: null },
   { t: 'still', image: 's/moon-temple' }, // 光の柱の中で、OBOLONの白い三日月の目が、細くなる。黒い球が、ゆっくり、こちらを見送る（M-R169）
   { t: 'sprite', image: ['', 'obolon'] }, // 見送るOBOLON（QA 6 R5）
-  { t: 'wait', s: 1.6 },
+  { t: 'wait', s: 1.6, keepChat: true }, // the line stays (QA 11 R35)
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
   { t: 'bgm', track: 'space' },

@@ -601,6 +601,11 @@ body {
 }
 
 /* the story as a chat (components/story/Chat.tsx) */
+/* the thread's shade comes in softly (QA 11 R35) */
+@keyframes chatShade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 @keyframes chatIn {
   from { opacity: 0; transform: translateY(12px) scale(0.98); filter: blur(3px); }
   to { opacity: 1; transform: none; filter: none; }

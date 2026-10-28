@@ -202,9 +202,42 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const stillRef = useRef<string | null>(null);
   // how each still came in: a fade-up, or a cross-fade over the one before (kept for as long as it shows: R27)
   const [stillAnim, setStillAnim] = useState('fadeUp 0.6s ease-out');
+  // the still drawn on screen now (stillRef runs ahead while the next one loads)
+  const shownStill = useRef<string | null>(null);
+  const stillTok = useRef(0);
   const setStill = (img: string | null) => {
+    stillTok.current++;
     stillRef.current = img;
+    shownStill.current = img;
     setStillState(img);
+  };
+  /**
+   * A still from a still always cross-fades over the one before (0.5 s unless the step says): cutting showed the motion
+   * frame or black underneath for a moment (QA 11 R32). It starts once the new picture is decoded, the one before staying
+   * until then (R33). From a motion or black (no still before) it fades up as before.
+   */
+  const showStill = (img: string, fade?: number) => {
+    const tok = ++stillTok.current;
+    stillRef.current = img;
+    const go = () => {
+      if (tok !== stillTok.current) return;
+      const prev = shownStill.current;
+      clearTimeout(underTimer.current);
+      if (prev && prev !== img) {
+        const f = fade ?? 0.5;
+        setUnder({ image: prev, fade: f });
+        setStillAnim(`stillIn ${f}s linear both`);
+        underTimer.current = setTimeout(() => setUnder(null), f * 1000 + 100);
+      } else {
+        setUnder(null);
+        if (prev !== img) setStillAnim('fadeUp 0.6s ease-out');
+      }
+      shownStill.current = img;
+      setStillState(img);
+    };
+    const im = new Image();
+    im.src = stillUrl(img);
+    (im.decode ? im.decode() : Promise.resolve()).then(go, go);
   };
   // a cross-fade between two stills: the one before stays underneath (the same <img>) while the new one fades in
   const [under, setUnder] = useState<{ image: string; fade: number } | null>(null);
@@ -380,17 +413,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'still') {
           setWhite(false);
           setTicketArt(null);
-          clearTimeout(underTimer.current);
-          if (s.fade && stillRef.current && stillRef.current !== s.image) {
-            const fade = s.fade;
-            setUnder({ image: stillRef.current, fade });
-            setStillAnim(`stillIn ${fade}s linear both`);
-            underTimer.current = setTimeout(() => setUnder(null), fade * 1000 + 100);
-          } else {
-            setUnder(null);
-            if (stillRef.current !== s.image) setStillAnim('fadeUp 0.6s ease-out');
-          }
-          setStill(s.image);
+          showStill(s.image, s.fade);
           // a still is a full background: lift the start light / black screen
           setReady(true);
           setBlackout(false);
@@ -402,7 +425,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           playSfx(s.sound, mutedRef.current, mixRef.current.se);
           n++;
         } else if (s.t === 'cam') {
-          setCam({ move: s.move, focus: s.focus });
+          // a move without a focus keeps the one before (QA 11 R34: the picture jumped back to 50% 40%)
+          setCam((c) => ({ move: s.move, focus: s.focus ?? c?.focus }));
           if (s.move === 'shake') setTimeout(() => setCam((c) => (c?.move === 'shake' ? null : c)), 1100);
           n++;
         } else if (s.t === 'face') {
@@ -736,6 +760,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       pendingBgm.current = null;
     }
   }, [i, steps]);
+  // the next stills are loaded ahead (QA 11 R33)
+  useEffect(() => {
+    for (let k = i + 1; k < Math.min(steps.length, i + 12); k++) {
+      const s = steps[k];
+      const img = s.t === 'still' || s.t === 'arrive' ? s.image : null;
+      if (img) {
+        const im = new Image();
+        im.src = stillUrl(img);
+        void im.decode?.().catch(() => undefined);
+      }
+    }
+  }, [i, steps]);
   // the next theme is decoded ahead
   useEffect(() => {
     for (let k = i + 1; k < Math.min(steps.length, i + 30); k++) {
@@ -897,7 +933,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         ))}
       </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
-      {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
+      {/* to black at once, back from black softly (QA 11 R36) */}
+      <div className={`pointer-events-none absolute inset-0 z-[4] bg-black transition-opacity ${blackout ? 'opacity-100 duration-0' : 'opacity-0 duration-700'}`} aria-hidden />
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
       {/* the still before (during a cross-fade) and the still now, keyed by picture: the one before is the same <img>
           left in place, and a still's animation is set once, when it comes in (QA 10 R27) */}

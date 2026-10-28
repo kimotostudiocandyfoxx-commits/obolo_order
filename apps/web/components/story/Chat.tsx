@@ -57,8 +57,9 @@ export function ChatLog({
   const shown = entries.slice(-3);
   const last = shown[shown.length - 1];
   return (
+    // fades in with the shade under it (QA 11 R35: the gradient popped in)
     <div
-      className="pointer-events-none absolute inset-x-0 z-[11] flex flex-col justify-end px-3.5"
+      className="pointer-events-none absolute inset-x-0 z-[11] flex flex-col justify-end px-3.5 animate-[chatShade_0.45s_ease-out]"
       style={{
         bottom: `calc(${bottom}px + env(safe-area-inset-bottom))`,
         top: '18%',
