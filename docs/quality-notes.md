@@ -79,3 +79,11 @@
 - Headless check: a 21 s take sings in ~0.9 s, KIMORIN's 12.6 s line in ~0.4 s. The output pitch sits on the notes (A minor pentatonic 55/57/62/64/67/69).
 - Samples: docs/smoke/kororin-before.m4a / kororin-sing.m4a. Not yet heard by a person: listen on the phone before calling it done.
 - If singing throws, the kororin falls back to the old two-semitones-up take.
+
+## 2026-10-28 M-R154 見積もり（my場所を部品で組む：例 火星のスタジオ）
+- 部品：層5種（背景・地面・建物・飾り・光）× 6〜8個 ≒ 35個。よく言われる言葉（夜・夕焼け・海・ネオン・かわいい・和風・宇宙・森）から。
+- 絵：世界観の絵を Seedream で一度生成（1部品あたり候補3〜4枚）→ 約120〜150枚 × 約5円 ≒ 600〜900円。色違いはコードで塗り替えるので追加の生成なし。
+- 切り抜き・層分け：今の切り抜き（灰色背景→透明）を使う。直しが要るものだけ手で修正。
+- 組み立て：最初の一か所だけ、部品を重ねて動かす仕組み（層・色替え・ゆっくり動く光・水・葉、札の保存）に約1〜2日。二か所目からは部品をそろえるだけで、1か所あたり約半日〜1日。
+- 利用者の手間：候補から選ぶのに1か所20〜30分。
+- 動かす時の費用：言葉→札の選択は、決まった札の表を渡した軽い言葉の理解だけ。1回0.1円未満、マナなし、絵の生成なし。

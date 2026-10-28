@@ -3,7 +3,8 @@
  * melody. All on the phone, about a second, no mana and no heavy singing model:
  *  1. read the pitch (autocorrelation on a 11 kHz copy) and the loudness, every 10 ms
  *  2. cut the take into syllables (dips in loudness; Japanese is nearly one kana = one note), drop the silences
- *  3. lay them on a melody (minor pentatonic around the speaker's own pitch, 126 BPM, eighths or sixteenths)
+ *  3. lay them on a melody (A minor pentatonic in the octave nearest the speaker, always 126 BPM, eighths or
+ *     sixteenths — the same key and beat for everyone, so kororins can sing in a relay)
  *  4. pitch-synchronous overlap-add: each output grain is cut from the take around a pitch peak and placed at
  *     the note's period — the pitch moves to the note, the vowel stretches to the note's length, the voice
  *     (its formants) stays the same
@@ -179,7 +180,9 @@ export async function singKororin(audio: Blob | ArrayBuffer, words = ''): Promis
   if (!segs.length) throw new Error('silent');
   const voiced = fr.map((f) => f.f0).filter(Boolean).sort((p, q) => p - q);
   const median = voiced.length ? voiced[Math.floor(voiced.length / 2)] : 220;
-  const root = 440 * Math.pow(2, Math.round(12 * Math.log2(median / 440)) / 12);
+  // every kororin is in A (the octave nearest the speaker) at the same BPM, so kororins laid side by side join
+  // into a relay (M-R153)
+  const root = 440 * Math.pow(2, Math.round(Math.log2(median / 440) - 5 / 12)); // the melody's middle sits on the voice
   const mel = MELODIES[[...words].reduce((h, c) => h + c.charCodeAt(0), segs.length) % MELODIES.length];
   // sixteenths when there are many syllables (keeps a long take under ~12 s), eighths otherwise
   const eighth = (60 / BPM / 2) * SR;

@@ -277,12 +277,15 @@ export function butterflyPrompt(description: string, hasReference: boolean, vari
 
 export function puniPicPrompt(description: string, hasReference: boolean, variant: number): string {
   const moods = ['happy and smiling', 'cheerful with a tiny wink feel', 'sleepy and calm', 'excited'];
+  const shades = ['thin gold frames with dark lenses', 'thick black frames with pink-tinted lenses', 'white frames with mirrored blue lenses', 'tortoiseshell frames with amber lenses'];
   return (
     'Draw ONE cute kawaii mascot character in exactly the art style of the FIRST attached image (the style sheet): ' +
     'a round, glossy, mochi-like ball body that is almost a perfect circle, soft pastel digital painting, a big soft highlight ' +
     'on the upper left, gentle shading, small shiny dark eyes with white sparkles, a tiny "ω" cat mouth, pink blush on the cheeks, ' +
     'tiny stubby arms and feet that stay close to the body. Accessories and patterns are painted ON or tightly around the round body. ' +
     `Character concept: "${description}". Mood: ${moods[variant % moods.length]}. ` +
+    // M-R153: every kororin keeps round sunglasses pushed up on its forehead (they drop onto the eyes when it sings)
+    `It wears small round sunglasses pushed UP on its forehead, above the eyes (the eyes stay visible): ${shades[variant % shades.length]}. ` +
     (hasReference ? 'Use the SECOND attached image only as loose inspiration for colours and motifs, turned into this round mascot. ' : '') +
     'Composition: the round body is centered and fills about 80% of a square frame, front view, nothing cut off. ' +
     'Background: plain flat pure white (#FFFFFF), no ground, no shadow, no other objects. No text, no letters, no logo, no watermark. ' +

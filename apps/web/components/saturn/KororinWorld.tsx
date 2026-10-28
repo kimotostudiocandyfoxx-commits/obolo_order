@@ -15,6 +15,7 @@ import { COLORS, defaultLook } from '@/lib/puni/parts';
 import { hueOf } from './BallAvatar';
 import { PlazaMap } from './PlazaMap';
 import { SaturnProfile } from './SaturnProfile';
+import { KororinParty, KororinPartySky, type KororinPartyHandle } from './KororinParty';
 
 /**
  * 「ころりん」 — Saturn's voice world (client concept, 2026-10-04).
@@ -250,9 +251,14 @@ export function KororinWorld({
     [shown, stageW, tab, dense],
   );
   const speakingId = shown.find((p) => p.voiceUrl === playingUrl)?.id ?? null;
+  // M-R153: while a kororin sings, the party (KororinParty) follows it
+  const party = useRef<KororinPartyHandle>(null);
+  const singingRef = useRef<string | null>(null);
+  singingRef.current = speakingId;
 
   // the speech bubble follows the tapped character, always above it (never over the buttons)
   const onFrame = useCallback((get: (id: string) => { x: number; y: number; R: number } | undefined, W: number) => {
+    party.current?.place(singingRef.current ? get(singingRef.current) : undefined);
     const id = openRef.current;
     const el = card.current;
     if (!id || !el) return;
@@ -464,6 +470,8 @@ export function KororinWorld({
       {/* みんな: the ひろば map */}
       {onMap && <PlazaMap onEnter={enterPlaza} shakeKey={mapShake} refreshKey={mapRefresh} />}
 
+      <KororinPartySky on={!!speakingId} />
+
       {/* characters: soft bodies on the planet */}
       <div ref={stage} className="absolute inset-0">
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
@@ -471,6 +479,8 @@ export function KororinWorld({
           if (p) listen(p);
         }} onTapEmpty={close} onFrame={onFrame} speakingId={speakingId} />
       </div>
+
+      <KororinParty ref={party} on={!!speakingId} />
 
       {/* soap-bubble pops of the voices you heard */}
       {bursts.map((bu) => (
