@@ -49,9 +49,9 @@ describe('providers', () => {
 });
 
 describe('Bati answers (generation test 1, F・G)', () => {
-  it('drops the research opener and keeps one emoji', async () => {
+  it('drops the research opener and every emoji', async () => {
     const { tidyAnswer } = await import('./buddy');
-    expect(tidyAnswer('宇宙じゅうの記録をしらべてみたよ！土星の輪は氷のつぶなんだって🪐✨')).toBe('土星の輪は氷のつぶなんだって🪐');
+    expect(tidyAnswer('宇宙じゅうの記録をしらべてみたよ！土星の輪は氷のつぶなんだって🪐✨')).toBe('土星の輪は氷のつぶなんだって');
     expect(tidyAnswer('調べてみたら、パンダは竹を食べるんだって！')).toBe('パンダは竹を食べるんだって！');
   });
   it('a refusal or a worry has no emoji, and 薬 throws the answer away', async () => {

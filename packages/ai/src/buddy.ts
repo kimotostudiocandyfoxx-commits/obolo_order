@@ -54,11 +54,11 @@ export async function buddyAnswer(llm: LlmProvider, ctx: BuddyContext, history: 
 
 const EMOJI = /\p{Extended_Pictographic}/gu;
 
-/** the habits the prompt alone did not stop: the research opener, more than one emoji, 薬 in a refusal */
+/** the habits the prompt alone did not stop: the research opener, emoji, 薬 in a refusal */
 export function tidyAnswer(text: string, kind: BuddyAnswerKind = 'normal'): string {
   let t = text.trim().replace(/^(宇宙じゅうの記録を)?(しら|調)べ(て(み|き)た|たら)(よ|ら|けど)?[！!、。]?\s*/, '').replace(/^宇宙じゅうの記録[^。！!]*[。！!]\s*/, '');
-  let n = 0;
-  t = t.replace(EMOJI, (m) => (kind === 'normal' && ++n === 1 ? m : '')).replace(/\uFE0F/g, '');
+  // no emoji at all (story chat, after generation test 1)
+  t = t.replace(EMOJI, '').replace(/\uFE0F/g, '');
   if (kind !== 'normal' && /薬/.test(t)) return '';
   return t.replace(/\s{2,}/g, ' ').trim();
 }
