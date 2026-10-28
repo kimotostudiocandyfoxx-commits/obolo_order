@@ -41,7 +41,7 @@ export class PictureService {
     const out = await this.llm
       .chat({
         system:
-          'You turn a child\'s question (Japanese) into a picture search for a public image library. Reply with JSON only: {"term":"2-4 English keywords naming the thing to show","must":"the thing\'s own name in 1-2 English words, as it would appear in a picture\'s title","space":true|false}. space=true for astronomy and space topics. Keep it child-safe and concrete (e.g. {"term":"black hole M87","must":"black hole"}, {"term":"Saturn rings","must":"Saturn"}, {"term":"giant panda eating","must":"panda"}, {"term":"takoyaki street food","must":"takoyaki"}).',
+          'You turn a child\'s question (Japanese) into a picture search for a public image library. Reply with JSON only: {"term":"2-4 English keywords naming the thing to show","must":"the thing\'s own name in 1-2 English words, as it would appear in a picture\'s title","space":true|false}. space=true for astronomy and space topics. For a worry, a feeling, health, the body, school or family trouble, or anything dangerous, reply {"term":""} (no picture). Keep it child-safe and concrete (e.g. {"term":"black hole M87","must":"black hole"}, {"term":"Saturn rings","must":"Saturn"}, {"term":"giant panda eating","must":"panda"}, {"term":"takoyaki street food","must":"takoyaki"}).',
         history: [{ role: 'user', text: `質問: ${question}${answer ? `\n答え: ${answer}` : ''}` }],
         temperature: 0,
         maxOutputTokens: 60,
@@ -68,7 +68,8 @@ export class PictureService {
     // unless asked for. Nothing left → Commons is tried instead.
     const lower = term.toLowerCase();
     const head = must;
-    const noise = /\b(patch|insignia|emblem|logo|crew|portrait|astronaut|launch|shuttle|sts-\d+|mission control)\b/;
+    // also the Saturn rockets (a "Saturn" query brought "Saturn Apollo Program", a rocket, for Saturn's rings)
+    const noise = /\b(patch|insignia|emblem|logo|crew|portrait|astronaut|launch|shuttle|sts-\d+|mission control|apollo|rocket|saturn v|saturn i|saturn ib|engine|test stand|skylab)\b/;
     const it = j.collection?.items
       ?.slice(0, 60)
       .find((x) => {
