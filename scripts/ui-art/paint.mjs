@@ -74,7 +74,7 @@ const START = Date.now();
 const late = () => Date.now() - START > 22 * 60_000;
 const failed = new Set();
 // a few at a time: a burst of tasks is what made Runware time out (504)
-const retry = (x, n) => paint(x).catch((e) => (n > 0 && !late() && /504|Timeout|timeout|abort/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
+const retry = (x, n) => paint(x).catch((e) => (n > 0 && !late() && /504|Timeout|timeout|abort|concurrentRequestLimitExceeded/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
 // in passes: a picture that edits one painted in this run (its ref still missing) waits for the next pass
 const waits = (x) => (x.refs ?? []).some((r) => !existsSync(r) && todo.some((y) => y !== x && join(OUT, `${y.id}.jpg`) === r));
 let left = todo;
