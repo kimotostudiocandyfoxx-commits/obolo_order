@@ -23,6 +23,8 @@ STYLE_EMPTY = re.sub(r';\s*characters in a semi-realistic[^.]*\.', '.', STYLE) +
 CAST_WORDS = re.compile(r'\[(KIMORIN|MONBAN|OBOLON|BROTHER|SISTER|UNPON|KORORIN)|KIMORIN|MONBAN|OBOLON|silhouette|hand|figure|person|crane', re.I)
 GUARD = 'Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here.'
 PHOTO = re.search(r'```\n(PHOTO:.*?)\n```', md, re.S).group(1).strip()
+# 'tiny and seen only from behind' called people in (review 1): none at all
+PHOTO = re.sub(r'any people are tiny[^.]*\.', 'No people at all.', PHOTO)
 # the cast lines: | [NAME] ... | text | refs |
 CAST = {}
 for row in re.finditer(r'^\| (\[[A-Z/額\-]+\])[^|]*\| (.+?) \| (.+?) \|$', md, re.M):
@@ -37,7 +39,8 @@ UI = 'apps/web/public/onboarding/'
 R = 'design/story/refs/'
 STYLE_REFS = [R + 'style-obolon-temple.jpg', R + 'style-gate.jpg']
 CAST_REFS = {
-    'KIMORIN-LAB': [UI + 'kimorin-i-joy.webp', R + 'cast/kimorin-face-eyes.jpg'],
+    # the reference sheet first; not kimorin-face-eyes (red hood, sunglasses, glowing eyes) for the lab-coat keys (review 1)
+    'KIMORIN-LAB': ['art/review/saturn/sheets/kimorin-lab-c.jpg', UI + 'kimorin-i-joy.webp'],
     'KIMORIN-ROBE': [R + 'story/cast/kimorin-entrance.webp', UI + 'kimorin-xs-talk.webp'],
     'KIMORIN-DRAGON': [R + 'story/cast/kimorin-dragon.webp', UI + 's/kimorin-dragon.jpg'],
     'MONBAN': [R + 'story/cast/monban.jpg'],
