@@ -43,8 +43,8 @@ export class LookController {
 
   @Post('look')
   @HttpCode(200)
-  choose(@UserId() userId: string, @Body() body: unknown) {
-    return this.look.choose(userId, parseBody(ChooseLookBody, body).mediaId);
+  choose(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    return this.look.choose(userId, parseBody(ChooseLookBody, body).mediaId, origin(req));
   }
 
   /** Saturn picture character: 2 painted candidates (3 tries a day, P-PUNI-4). */

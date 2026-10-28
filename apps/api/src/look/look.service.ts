@@ -218,11 +218,40 @@ export class LookService {
     return { data, mime };
   }
 
-  async choose(userId: string, mediaId: string): Promise<Me> {
+  async choose(userId: string, mediaId: string, origin?: string): Promise<Me> {
     const m = await this.media.getOwned(userId, mediaId, 'avatar');
     if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     const [u] = await this.db.write.update(users).set({ avatarUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
-    return toMe(u);
+    const icon = origin ? await this.roundIcon(userId, m.url, origin).catch(() => null) : null;
+    if (!icon) return toMe(u);
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...((u.onboardingJson ?? {}) as Record<string, string>), 'look.icon': icon }, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(nu);
+  }
+
+  /**
+   * The round icon (generation test 1, C-3: the "icon" was the square picture itself): the looks are chest-up and
+   * centred with the face in the middle, so a square from the top of the hood down past the chin, cut round at 512.
+   */
+  private async roundIcon(userId: string, url: string, origin: string): Promise<string | null> {
+    const data = await this.media.bytesByUrl(userId, url);
+    if (!data) return null;
+    const { width = 0, height = 0 } = await sharp(data).metadata();
+    if (!width || !height) return null;
+    const side = Math.round(Math.min(width, height) * 0.86);
+    const left = Math.round((width - side) / 2);
+    const top = Math.round(Math.max(0, height * 0.02));
+    const circle = Buffer.from(`<svg width="512" height="512"><circle cx="256" cy="256" r="256" fill="#fff"/></svg>`);
+    const png = await sharp(data)
+      .extract({ left, top: Math.min(top, height - side), width: side, height: side })
+      .resize(512, 512)
+      .composite([{ input: circle, blend: 'dest-in' }])
+      .png()
+      .toBuffer();
+    return (await this.media.storeImage(userId, 'avatar', 'image/png', png, origin)).url;
   }
 
   // --- Saturn picture character -------------------------------------------------------------

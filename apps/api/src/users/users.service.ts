@@ -49,6 +49,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     avatarUrl: u.avatarUrl,
     lookStandee: (u.onboardingJson as Record<string, string> | null)?.['look.standee'] ?? null,
     lookChibi: (u.onboardingJson as Record<string, string> | null)?.['look.chibi'] ?? null,
+    lookIcon: (u.onboardingJson as Record<string, string> | null)?.['look.icon'] ?? null,
     birthYear: Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null,
     child: isChild(Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null),
     bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, faces: batiFaces(u.onboardingJson) } : null,
