@@ -998,6 +998,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {started && step?.t === 'venus' && (
         <VenusLesson
+          standee={v.lookStandee}
           song={v.made?.song ?? null}
           mv={v.made?.mv ?? null}
           kororins={v.made?.kororins ?? []}

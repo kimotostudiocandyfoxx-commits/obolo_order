@@ -224,6 +224,8 @@ export interface StoryVars {
   look?: string;
   /** the small chibi NEO (M-R155/M-R161): the butterfly, the owl, the captain… */
   lookChibi?: string;
+  /** the visitor standing, without a background (M-R149): behind the DJ deck on Venus (R21b) */
+  lookStandee?: string;
 }
 
 export function fill(text: string, v: StoryVars): string {

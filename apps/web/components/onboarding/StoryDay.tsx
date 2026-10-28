@@ -172,6 +172,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         batiFood: me.bati?.food,
         look: me.avatarUrl ?? undefined,
         lookChibi: me.lookChibi ?? undefined,
+        lookStandee: me.lookStandee ?? undefined,
         story: me.story,
         made: madeFrom(me.story),
       }}

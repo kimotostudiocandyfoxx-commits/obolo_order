@@ -119,7 +119,10 @@ export function VenusLesson({
   deliver,
   onDone,
   booth: inBooth,
+  standee,
 }: {
+  /** the visitor standing (no background): big, in front of the deck while they mix (D07V-S002, R21b) */
+  standee?: string;
   song: SongMade | null;
   mv: MvMade | null;
   kororins: string[];
@@ -333,6 +336,10 @@ export function VenusLesson({
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio ref={ballad} src={BALLAD} preload="auto" />
 
+      {showDesk && standee && !demo && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={standee} alt="" className="pointer-events-none absolute bottom-[38%] left-1/2 z-[165] h-[46svh] -translate-x-1/2 object-contain drop-shadow-[0_0_30px_rgba(255,200,120,0.45)]" />
+      )}
       {showDesk && (
         <div className="pb-safe absolute inset-x-0 bottom-0 z-[170] flex flex-col items-center gap-3 rounded-t-3xl bg-gradient-to-b from-[#1a1426]/85 to-[#0b0812]/95 px-4 pb-6 pt-4 text-white shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
           {/* the stage screen: your MV (or KIMORIN⭐︎'s) once the mix is yours */}
