@@ -44,7 +44,11 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
 }
 
 /** The egg wobbles and cracks while the Bati is generated, then the newborn appears. */
-export function HatchStep({ food, onHatch, onDone }: { food: string; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
+/**
+ * The egg hatches on the picture of the egg chosen (the same film-like egg on its stand, QA 5 N28): it trembles and
+ * glows, a white flash, and {bati} comes out.
+ */
+export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 'sun' | 'earth'; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
   const [url, setUrl] = useState<string | null>(null);
   const [stage, setStage] = useState<'wobble' | 'flash' | 'born'>('wobble');
   useEffect(() => {
@@ -67,19 +71,32 @@ export function HatchStep({ food, onHatch, onDone }: { food: string; onHatch: ()
 
   return (
     <button
-      className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 bg-black/40"
+      className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 overflow-hidden bg-black"
       onClick={() => stage === 'born' && url && onDone(url)}
       disabled={stage !== 'born'}
     >
-      {stage !== 'born' ? (
+      {egg && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={eggSvg(food)} alt="" className="h-[42svh] w-auto animate-[shake_0.5s_ease-in-out_infinite] drop-shadow-[0_0_40px_rgba(255,230,180,0.6)]" />
+        <img
+          src={`/onboarding/s/d2-egg-${egg}-gem.jpg`}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover ${stage === 'wobble' ? 'animate-[shake_0.5s_ease-in-out_infinite]' : 'opacity-50 blur-sm'}`}
+          style={{ filter: stage === 'wobble' ? 'drop-shadow(0 0 40px rgba(255,230,180,0.6)) brightness(1.08)' : undefined }}
+        />
+      )}
+      {stage !== 'born' ? (
+        egg ? (
+          <span className="pointer-events-none absolute left-1/2 top-[42%] h-[30svh] w-[30svh] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-amber-100/25 blur-2xl" />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={eggSvg(food)} alt="" className="h-[42svh] w-auto animate-[shake_0.5s_ease-in-out_infinite] drop-shadow-[0_0_40px_rgba(255,230,180,0.6)]" />
+        )
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url!} alt="" className="h-[42svh] w-auto animate-[spriteIn_0.6s_ease-out] rounded-[2.5rem] shadow-[0_0_60px_rgba(255,220,150,0.6)]" />
+        <img src={url!} alt="" className="relative h-[42svh] w-auto animate-[spriteIn_0.6s_ease-out] rounded-[2.5rem] shadow-[0_0_60px_rgba(255,220,150,0.6)]" />
       )}
       {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[flash_0.7s_ease-out] bg-white" />}
-      <p className="tracking-[0.3em] text-amber-100">{stage === 'born' ? '生まれた！' : 'たまごが動いている……'}</p>
+      <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' ? '生まれた！' : 'たまごが動いている……'}</p>
       {stage === 'born' && <p className="animate-pulse text-xs text-white/60">TAP</p>}
     </button>
   );

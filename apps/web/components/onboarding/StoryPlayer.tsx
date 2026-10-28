@@ -1125,6 +1125,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'hatch' && (
         <HatchStep
           food={v.batiFood ?? ''}
+          egg={(stateRef.current.answers.egg ?? v.story?.egg ?? '').includes('太陽') ? 'sun' : 'earth'}
           onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
           onDone={(url) => {
             remember('batiImage', url);

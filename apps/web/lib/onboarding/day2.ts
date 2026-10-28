@@ -135,6 +135,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-launch-pit' },
   { t: 'caption', text: 'ロケット発射場に着いた' },
   { t: 'still', image: 's/d2-monban-pit' }, // ロケットの前のMONBAN（話し手はチャットのアイコンで）
+  { t: 'sprite', image: ['', 'obolon'] }, // 光の柱の中のOBOLONも、発射場にいる（QA 5 N9）
   { t: 'say', who: 'OBOLON', text: 'これがロケットだ。月に行く。乗れ。' },
   { t: 'say', who: 'MONBAN', text: 'では、いってこい。' },
   { t: 'say', who: 'KIMORIN', text: 'え？あなた達は乗らないのですか？' },
@@ -166,8 +167,10 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: '謎の書を手に入れた' },
   { t: 'still', image: 's/d2-monban-pit' },
+  { t: 'sprite', image: ['', 'obolon'] },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
   { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
+  { t: 'sprite', image: null },
   { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。' },
   { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。コスモスへ！' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'MONBAN', text: '月だ' },
