@@ -17,6 +17,8 @@ def block(start, end):
     return m.group(1).strip() if m else ''
 
 STYLE = block('### 0-2. 絵柄の固定文（すべての止め絵の頭につける）', '')
+# the style pictures carry figures of their own: Seedream copied them into every frame (first run, V01/K7〜)
+GUARD = 'Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here.'
 PHOTO = re.search(r'```\n(PHOTO:.*?)\n```', md, re.S).group(1).strip()
 # the cast lines: | [NAME] ... | text | refs |
 CAST = {}
@@ -81,7 +83,7 @@ for v in videos:
                 text = 'Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — ' + body
                 items.append({'id': f'{v}/{kid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(rs))[:6], 'prompt': f'{text} No text, no letters, no logos.'[:2990]})
             else:
-                items.append({'id': f'{v}/{kid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(refs))[:6], 'prompt': f'{head} {body}'[:2990]})
+                items.append({'id': f'{v}/{kid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(refs))[:6], 'prompt': (f'{head} {body}' if photo else f'{head} {GUARD} {body}')[:2990]})
 
 # reference sheets the cut script asks for before the cuts (0-3): grey background, front / side / back, for the client's OK
 GREY = 'Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels.'
