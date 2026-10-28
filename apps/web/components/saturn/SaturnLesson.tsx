@@ -102,7 +102,7 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'sister', text: '今日から、上に〔推し〕ができるワ。ダチの作品だけが、そこに入るワ。' },
   { k: 'say', who: 'kimorin', text: '推し、ですか。……私は、ずっと、自分推しです。' },
   { k: 'note', text: '知らない人からダチの申しこみが来ても、承認しなくてかまいません。断っても、相手には知らせません' },
-  { k: 'say', who: 'brother', text: '{neo}のコロリン、{inviter}に届けてみるといいZE!!' },
+  { k: 'say', who: 'brother', text: '{neo}のコロリン、ダチに届けてみるといいZE!!' },
   { k: 'send' },
   // D04-S006 土星の空のリング (story M-R107): a kororin rolls to your feet — the sister's sunset
   { k: 'note', text: '空を舞う住人たちのコロリンをタップすると、声が聞けます' },
@@ -117,8 +117,8 @@ const DESIGNED: Beat[] = [{ k: 'note', text: 'これから生まれるコロリ�
 const UNDESIGNED: Beat[] = [{ k: 'say', who: 'sister', text: '今の見た目のままでも、いいワ。デザインは、あとでもできるワ。' }];
 const SENT: Beat[] = [
   { k: 'note', text: 'ダチに、コロリンを届けた' },
-  { k: 'say', who: 'brother', text: '届けたコロリンは、88時間、{inviter}のところを転がって、{neo}の部屋に戻ってくるZE。' },
-  { k: 'note', text: '届けたコロリンは、{inviter}とKIMORIN⭐︎の〔推し〕に入ります。届けるのに、マナは使いません' },
+  { k: 'say', who: 'brother', text: '届けたコロリンは、88時間、ダチのところを転がって、{neo}の部屋に戻ってくるZE。' },
+  { k: 'note', text: '届けたコロリンは、{inviter}とKIMORIN⭐︎の〔推し〕に入ります。届いた時、相手の画面で一度だけ、サングラスを落として踊ります（音が出るのは、相手がタップした時だけ）。届けるのに、マナは使いません' },
 ];
 const NOT_SENT: Beat[] = [{ k: 'say', who: 'sister', text: '届けたくなったら、いつでも届けられるワ。' }];
 /** KIMORIN⭐︎'s designed kororin (80 muscular arms, a heap of aonori) — design/story-art-queue.json */

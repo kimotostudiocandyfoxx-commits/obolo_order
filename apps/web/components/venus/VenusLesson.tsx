@@ -12,7 +12,7 @@ import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
  * Day 7 on Venus (first journey, story draft 21: D07V-S002〜S003; screens docs/story-rewrite/画面設計/venus.md
  * V-2 / V-5 / V-6). The easy DJ, held upright: the stage screen on top, two platters, 〔印〕〔SYNC〕, the
  * crossfader, 〔コロリン〕 (and 〔あかり〕 / 〔映像を選ぶ〕 kept quiet on the first day), 〔おまかせ〕 in the corner.
- * KIMORIN⭐︎ shows off first (『プリプリ・ボカン』 on both decks, 「ボカーン」 three times), then the visitor
+ * KIMORIN⭐︎ shows off first (『プリプリ・ボカン』 on both decks, 「すね毛楽しい」 three times), then the visitor
  * mixes from the practice rhythm into their own song — one step at a time (self) or 〔おまかせ〕 (pick three
  * materials, press 〔つなぐ〕) — the planet turns at the song's speed and the MV fills the stage screen; a
  * kororin is dropped at the seam. At night: 〔🎤 見せる〕 → 〔ダチへ〕 → 〔🎤 届ける〕, or not. No mana.
@@ -53,7 +53,7 @@ const OPEN: Step[] = [
   L('bossg', '回すのは、お前が作ったものだ。最初の一枚だけ、こっちで用意した。'),
   L('kimorin', 'では、お手本を。'),
   { k: 'demo' },
-  L('kimorin', 'ボカーンが、三倍ケン!!　……失礼。三倍です。'),
+  L('kimorin', 'すね毛が、三倍ケン!!　……失礼。三倍です。'),
   L('bossg', '……一枚ずつ、つなげ。'),
   L('hatg', '左から右へ。一度だけ、だ。'),
   { k: 'how' },
@@ -175,7 +175,7 @@ export function VenusLesson({
     if (!step) return;
     if (step.k === 'line' && SPEAKER[step.l.who]) void voice.current?.say(SPEAKER[step.l.who], step.l.text);
     if (step.k === 'demo') {
-      // KIMORIN⭐︎ throws the fader back and forth: 「ボカーン」 three times
+      // KIMORIN⭐︎ throws the fader back and forth: 「すね毛楽しい」 three times
       const a = ballad.current;
       if (a) {
         a.currentTime = 0;

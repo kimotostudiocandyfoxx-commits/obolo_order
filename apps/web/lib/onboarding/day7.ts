@@ -47,7 +47,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '私たちは、ネオです。' },
   { t: 'say', who: 'ボスG', text: 'ネオか。……金星に、遊びに来たのだな。\n金星の遊び方を、教えてやる。' },
   { t: 'say', who: 'ボスG', text: 'ここは、DJの星だ。' },
-  { t: 'say', who: 'ボスG', text: '土星の声、木星のジャケ、水星の曲、火星の映像。\nお前が旅で作ったものを、ここで混ぜて、回す。' },
+  { t: 'say', who: 'ボスG', text: '土星の声、木星のアート、水星の曲、火星の映像。\nお前が旅で作ったものを、ここで混ぜて、回す。' },
   { t: 'say', who: 'KIMORIN', text: '……混ぜて、回す。洗濯機の、星ですか。' },
   { t: 'say', who: 'ボスG', text: '……レコードだ。' }, // ボスGが、ステージの真ん中の卓を、あごで指す
 
@@ -67,7 +67,7 @@ export const DAY7: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '太陽……。いよいよ、ですね。' },
   { t: 'say', who: 'ボスG', text: '金星には、いつでも、回しに来い。ここも、お前の帰る場所だ。' },
   { t: 'sprite', image: 'kimorin-sun' }, // ステージの明かりが、一つずつ消える。レコードの星だけが、ゆっくり回り続ける
-  { t: 'say', who: 'KIMORIN', text: '……{neo}の曲が、まだ耳に残っています。……ボカーンの、次くらいに。' },
+  { t: 'say', who: 'KIMORIN', text: '……{neo}の曲が、まだ耳に残っています。……すね毛の、次くらいに。' },
   { t: 'bgm', track: 'farewell' },
   { t: 'sprite', image: null },
   { t: 'caption', text: 'また明日' },

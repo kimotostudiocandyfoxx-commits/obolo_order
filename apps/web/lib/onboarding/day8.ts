@@ -112,7 +112,7 @@ export const DAY8: Step[] = [
   { t: 'label', id: 'sun-quiet' },
   { t: 'say', who: 'OBOLON', text: '、、、来たな。' },
   { t: 'label', id: 'sun-both' },
-  { t: 'say', who: 'OBOLON', text: '、、、お前は、もう、この宇宙の住人だ。' },
+  { t: 'say', who: 'OBOLON', text: '、、、お前は、もう、五つの星を、渡ってきた。' },
   { t: 'say', who: 'OBOLON', text: 'だから、、、聞かせよう。' },
 
   // D08-S009 「わかりやすく、言う。」（M-R86：答えは「DJ」）
@@ -126,7 +126,7 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'OBOLON', text: '、、、混ぜて、誰かに、届ける。それが、DJだ。', hold: true },
   { t: 'say', who: 'OBOLON', text: '選んで、並べる、だけの日も、、、DJだ。' },
   { t: 'say', who: 'OBOLON', text: '土星の輪、木星の蝶、\n水星の船、火星の光、\n金星の、ターンテーブル。' }, // 光の玉に、五つの景色が順に映る。きのう金星で{neo}が自分の曲を回した瞬間。KIMORINのコロリンが「ぷりぷりぷりり！」
-  { t: 'say', who: 'KIMORIN', text: '……私の声。……録って、高さを変えて、鳴らす。……コロリンも、DJの技、でしたか。' },
+  { t: 'say', who: 'KIMORIN', text: '……私の声。……録って、ふしに乗せて、鳴らす。……コロリンも、DJの技、でしたか。' },
   { t: 'say', who: 'OBOLON', text: 'ぜんぶ、、、DJの、材料だ。' },
   { t: 'say', who: 'OBOLON', text: '浴びる、だけの側から、、、混ぜて、届ける、側へ。', hold: true },
 

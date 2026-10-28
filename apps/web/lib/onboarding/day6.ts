@@ -96,7 +96,7 @@ export const DAY6: Step[] = [
   // D07-S007 街じゅうのMONBAN／4つ目のスタンプ
   { t: 'bgm', track: 'night' },
   { t: 'caption', text: 'その夜' },
-  { t: 'say', who: 'ヒポキン', text: '土星で声、木星でジャケ、' },
+  { t: 'say', who: 'ヒポキン', text: '土星で声、木星でアート、' },
   { t: 'say', who: 'ヒポキン', text: '水星で曲、火星で映像。' },
   { t: 'say', who: 'ヒポキン', text: 'ここまで来たなら、\nもう気づいてるだろう。' },
   { t: 'say', who: 'ヒポキン', text: 'Obolo Orderは全員……' },
