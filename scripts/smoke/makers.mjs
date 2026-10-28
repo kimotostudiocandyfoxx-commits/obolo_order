@@ -68,6 +68,13 @@ const pick = refined?.candidates[0] ?? looks?.candidates[0];
 if (pick) await step('choose look', () => req('POST', '/me/look', { mediaId: pick.id }));
 const stood = await step('look standee', () => req('POST', '/me/look/standee'));
 if (stood?.lookStandee) await save('look-standee', stood.lookStandee);
+const chib = await step('look chibi', () => req('POST', '/me/look/chibi'));
+if (chib?.lookChibi) await save('look-chibi', chib.lookChibi);
+// Jupiter's art (M-R151): a square picture in the touch said to Bati
+const artA = await step('art (words only touch)', () => req('POST', '/me/sticker/art', { text: 'ラーメンの湯気がきれい' }));
+if (artA?.url) await save('art-default', artA.url);
+const artB = await step('art (watercolour touch)', () => req('POST', '/me/sticker/art', { text: '大根の王様、木にまぎれすぎ', style: '水彩、やわらかい色、夢の中みたい' }));
+if (artB?.url) await save('art-watercolour', artB.url);
 
 await step('egg', () => req('POST', '/me/bati/egg', { food: 'たこ焼き', egg: 'sun' }));
 const hatched = await step('hatch', () => req('POST', '/me/bati/hatch'));
