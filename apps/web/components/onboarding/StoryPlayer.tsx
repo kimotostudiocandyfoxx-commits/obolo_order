@@ -716,6 +716,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   useEffect(() => {
     for (let k = i + 1; k < Math.min(steps.length, i + 30); k++) {
       const s = steps[k];
+      // a motion's timed music cue too, so it starts on time (QA 8, R21)
+      if (s.t === 'video' && s.bgmAt) {
+        bgm.current?.prefetch(s.bgmAt.track);
+        break;
+      }
       if (s.t === 'bgm') {
         bgm.current?.prefetch(s.track);
         break;

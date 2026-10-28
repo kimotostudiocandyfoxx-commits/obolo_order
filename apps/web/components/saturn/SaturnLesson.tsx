@@ -10,6 +10,8 @@ import { useAuth } from '@/lib/auth';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
+import type { Speaker, Step } from '@/lib/onboarding/script';
+import { useNameVoices } from '@/lib/story/useNameVoices';
 import { singKororin, singUrl } from '@/lib/saturn/sing';
 import { KororinWorld } from './KororinWorld';
 
@@ -142,6 +144,8 @@ const SENT: Beat[] = [
   { k: 'note', text: '届けたコロリンは、{inviter}とKIMORIN⭐︎の〔推し〕に入ります。届いた時、相手の画面で一度だけ、サングラスを落として踊ります（音が出るのは、相手がタップした時だけ）。届けるのに、マナは使いません' },
 ];
 const NOT_SENT: Beat[] = [{ k: 'say', who: 'sister', text: '届けたくなったら、いつでも届けられるワ。' }];
+/** every spoken line of the practice, as story steps: the ones with names in them are voiced per member (useNameVoices) */
+const NAME_STEPS: Step[] = [...BEATS, ...TRY, ...SKIP, ...DESIGNED, ...UNDESIGNED, ...SENT, ...NOT_SENT].flatMap((b): Step[] => (b.k === 'say' && SPEAKER[b.who] ? [{ t: 'say', who: SPEAKER[b.who] as Speaker, text: b.text }] : []));
 /** KIMORIN⭐︎'s designed kororin (80 muscular arms, a heap of aonori) — design/story-art-queue.json */
 const KIMORIN_DESIGNED = '/onboarding/s/kororin-kimorin80.jpg';
 const TOPICS = [
@@ -299,22 +303,44 @@ export function SaturnLesson({
     next();
   };
 
+  // the voice is also state, so the member's own voices of the lines with names in them reach it (QA 8, R18: ten
+  // lines with {neo} / {inviter} were silent and waited for a tap)
+  const [lineVoice, setLineVoice] = useState<LineVoice | null>(null);
   useEffect(() => {
     const v = new LineVoice();
     v.unlock();
     voice.current = v;
+    setLineVoice(v);
     return () => v.dispose();
   }, []);
+  useNameVoices(lineVoice, NAME_STEPS, { neo, bati, inviter });
   // a spoken line goes on by itself a moment after its voice ends; a tap still skips ahead (QA 6 P2)
   const iRef = useRef(i);
   iRef.current = i;
   const beatRef = useRef(beat);
   beatRef.current = beat;
+  // a line whose voice is not there (yet) goes on after a reading time (0.12 s a character + 1.5 s)
+  const heard = useRef(-1);
+  useEffect(() => {
+    if (beat?.k !== 'say') return;
+    const at = i;
+    const len = fill(beat.text).length;
+    let later: ReturnType<typeof setTimeout> | undefined;
+    const first = setTimeout(() => {
+      if (heard.current !== at) later = setTimeout(() => iRef.current === at && setI((n) => (n === at ? n + 1 : n)), len * 120 + 1500);
+    }, 1500);
+    return () => {
+      clearTimeout(first);
+      clearTimeout(later);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i]);
   useEffect(() => {
     const v = voice.current;
     if (!v) return;
     let spokeAt = -1;
     v.onSpeaking = (on) => {
+      if (on) heard.current = iRef.current;
       if (on) spokeAt = iRef.current;
       else if (spokeAt === iRef.current && beatRef.current?.k === 'say') {
         const at = spokeAt;

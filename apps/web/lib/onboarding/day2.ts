@@ -86,6 +86,12 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
   { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、右手前に白衣のKIMORIN（QA 5 N7）
+  // M-R169 (QA 6 §4-6・QA 8 R20): OBOLON looks at you once, and his eyes narrow
+  { t: 'sprite', image: ['obolon-squint'] },
+  { t: 'cam', move: 'in', focus: '50% 40%' },
+  { t: 'wait', s: 1.3 },
+  { t: 'cam', move: 'out' },
+  { t: 'sprite', image: null },
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'se', sound: 'boing' },
   { t: 'sprite', image: null },
@@ -206,12 +212,23 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
+  // M-R169 (§4-8): while KIMORIN goes on, OBOLON's eyes narrow, silently
+  { t: 'sprite', image: ['obolon-squint'] },
+  { t: 'cam', move: 'in', focus: '50% 40%' },
+  { t: 'wait', s: 1.3 },
+  { t: 'cam', move: 'out' },
+  { t: 'sprite', image: null },
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。' },
   { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
+  { t: 'sprite', image: ['obolon-squint'] },
+  { t: 'cam', move: 'in', focus: '50% 40%' },
+  { t: 'wait', s: 1.3 },
+  { t: 'cam', move: 'out' },
+  { t: 'sprite', image: null },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
   { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },

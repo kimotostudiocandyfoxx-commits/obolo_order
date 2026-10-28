@@ -233,8 +233,21 @@ export function KororinWorld({
       b.vx = 760;
       b.av = 9;
     }
-    const t = setTimeout(() => setFlown((cur) => new Set(cur).add(flyId)), 1100);
-    return () => clearTimeout(t);
+    // …then pulled down to the 🏠 label at the bottom right before it leaves (QA 8, R22)
+    const pull = setTimeout(() => {
+      const el = stage.current;
+      const bb = layer.current?.blob(flyId);
+      if (bb && el) bb.drag = { tx: el.clientWidth - 70, ty: el.clientHeight - 40 };
+    }, 500);
+    const t = setTimeout(() => {
+      const bb = layer.current?.blob(flyId);
+      if (bb) bb.drag = null;
+      setFlown((cur) => new Set(cur).add(flyId));
+    }, 1100);
+    return () => {
+      clearTimeout(pull);
+      clearTimeout(t);
+    };
   }, [flyId]);
   const cap = tab === 'all' ? (plazaId ? TAB_CAP.plaza : Infinity) : TAB_CAP[tab];
   const shown = useMemo(() => {
@@ -577,12 +590,13 @@ export function KororinWorld({
 
       {/* characters: soft bodies on the planet */}
       <div ref={stage} className="absolute inset-0">
+        {/* a tap on the sky does not stop the song the story waits for (QA 8, R19) */}
         <PuniPhysicsLayer ref={layer} items={items} floorAt={(x, W, H) => surfaceY(x, W, H) + Math.min(W, H) * 0.02} onTap={(id) => {
           // while the story waits for one kororin's song, the others do not cut into it (QA 7, R15)
           if (singingId && id !== singingId) return;
           const p = shown.find((x) => x.id === id);
           if (p) listen(p);
-        }} onTapEmpty={close} onFrame={onFrame} speakingId={partyId} />
+        }} onTapEmpty={() => !singingId && close()} onFrame={onFrame} speakingId={partyId} />
       </div>
 
       <KororinParty ref={party} on={!!partyId || !!arrival} />
