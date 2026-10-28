@@ -111,7 +111,7 @@ const BEATS: Beat[] = [
 ];
 // the branch after the choice
 // the voice kororin is free on every journey (M-R124): no mana line
-const TRY: Beat[] = [{ k: 'recNormal', prompt: 'topics' }, { k: 'listen', id: 'mine' }, { k: 'note', text: 'コロリンは、あなたの部屋に、日付と時刻つきで残ります。誰にも送られません' }];
+const TRY: Beat[] = [{ k: 'recNormal', prompt: 'topics' }, { k: 'listen', id: 'mine' }, { k: 'note', text: 'コロリンは、あなたの部屋に、日付と時刻つきで残ります。誰にも送られません。部屋のコロリンを続けてタップすると、順番に歌って、つながります' }];
 const SKIP: Beat[] = [{ k: 'say', who: 'sister', text: 'いいワ。つぶやきたくなったら、いつでもどうぞ。' }, { k: 'note', text: 'コロリンは、いつでも作れます（今日でなくても）' }];
 const DESIGNED: Beat[] = [{ k: 'note', text: 'これから生まれるコロリンは、この見た目になります' }];
 const UNDESIGNED: Beat[] = [{ k: 'say', who: 'sister', text: '今の見た目のままでも、いいワ。デザインは、あとでもできるワ。' }];
