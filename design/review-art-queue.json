@@ -46,48 +46,6 @@
    "prompt": "Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels. KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe."
   },
   {
-   "id": "sheets/kimorin-dragon-labcoat-a",
-   "w": 2048,
-   "h": 1152,
-   "size": [
-    1280,
-    720
-   ],
-   "refs": [
-    "design/story/refs/story/cast/kimorin-dragon.webp",
-    "apps/web/public/onboarding/kimorin-i-joy.webp"
-   ],
-   "prompt": "Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels. a giant white-scaled long-necked dragon wearing KIMORIN's patched white lab coat (NOT a robe), with KIMORIN's white fox face, blue marks, fox ears and brass goggles pushed up on the forehead; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand holding a colorful glowing light stick or a party popper; black baggy trousers; white, black and vermilion feather tail."
-  },
-  {
-   "id": "sheets/kimorin-dragon-labcoat-b",
-   "w": 2048,
-   "h": 1152,
-   "size": [
-    1280,
-    720
-   ],
-   "refs": [
-    "design/story/refs/story/cast/kimorin-dragon.webp",
-    "apps/web/public/onboarding/kimorin-i-joy.webp"
-   ],
-   "prompt": "Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels. a giant white-scaled long-necked dragon wearing KIMORIN's patched white lab coat (NOT a robe), with KIMORIN's white fox face, blue marks, fox ears and brass goggles pushed up on the forehead; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand holding a colorful glowing light stick or a party popper; black baggy trousers; white, black and vermilion feather tail."
-  },
-  {
-   "id": "sheets/kimorin-dragon-labcoat-c",
-   "w": 2048,
-   "h": 1152,
-   "size": [
-    1280,
-    720
-   ],
-   "refs": [
-    "design/story/refs/story/cast/kimorin-dragon.webp",
-    "apps/web/public/onboarding/kimorin-i-joy.webp"
-   ],
-   "prompt": "Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels. a giant white-scaled long-necked dragon wearing KIMORIN's patched white lab coat (NOT a robe), with KIMORIN's white fox face, blue marks, fox ears and brass goggles pushed up on the forehead; eighty muscular arms in white gloves with blue paw pads fan out on both sides, every hand holding a colorful glowing light stick or a party popper; black baggy trousers; white, black and vermilion feather tail."
-  },
-  {
    "id": "sheets/rocket-a",
    "w": 2048,
    "h": 1152,

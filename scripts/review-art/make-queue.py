@@ -25,6 +25,10 @@ CAST = {}
 for row in re.finditer(r'^\| (\[[A-Z/額\-]+\])[^|]*\| (.+?) \| (.+?) \|$', md, re.M):
     CAST[row.group(1)] = row.group(2).strip()
 LAB = CAST.get('[KIMORIN-LAB]', '')
+# the client (2026-10-28): the dragon stays as before — in the red hooded robe, not the lab coat
+CAST['[KIMORIN-DRAGON]'] = ("a giant white-scaled long-necked dragon in KIMORIN's deep crimson hooded robe with silver embroidered borders, "
+    "with KIMORIN's white fox face, blue marks and fox ears; eighty muscular arms in white gloves with blue paw pads fan out on both "
+    "sides, every hand holding a colorful glowing light stick or a party popper; white, black and vermilion feather tail. Exactly as the reference picture.")
 
 UI = 'apps/web/public/onboarding/'
 R = 'design/story/refs/'
@@ -32,7 +36,7 @@ STYLE_REFS = [R + 'style-obolon-temple.jpg', R + 'style-gate.jpg']
 CAST_REFS = {
     'KIMORIN-LAB': [UI + 'kimorin-i-joy.webp', R + 'cast/kimorin-face-eyes.jpg'],
     'KIMORIN-ROBE': [R + 'story/cast/kimorin-entrance.webp', UI + 'kimorin-xs-talk.webp'],
-    'KIMORIN-DRAGON': [R + 'story/cast/kimorin-dragon.webp', UI + 'kimorin-i-joy.webp'],
+    'KIMORIN-DRAGON': [R + 'story/cast/kimorin-dragon.webp', UI + 's/kimorin-dragon.jpg'],
     'MONBAN': [R + 'story/cast/monban.jpg'],
     'OBOLON': [R + 'story/cast/obolon.jpg'],
     'BROTHER': [R + 'story/cast/takoyaki-brother.jpg'],
@@ -89,7 +93,6 @@ for v in videos:
 GREY = 'Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels.'
 SHEETS = [
     ('sheets/kimorin-lab', GREY + ' ' + LAB, CAST_REFS['KIMORIN-LAB']),
-    ('sheets/kimorin-dragon-labcoat', GREY + ' ' + CAST.get('[KIMORIN-DRAGON]', ''), CAST_REFS['KIMORIN-DRAGON']),
     ('sheets/rocket', 'Design reference sheet on a flat plain mid-grey background (#808080): the same rocket shown three times — front view, side view, back view — standing upright, even studio light. No text, no letters. ' + CAST.get('[ROCKET]', ''), CAST_REFS['ROCKET']),
 ]
 if '--sheets' in sys.argv:
