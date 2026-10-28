@@ -59,8 +59,10 @@ token = acc.token;
 say(`user ${acc.user.id} day ${acc.user.journeyDay}`);
 
 const looks = await step('look', () => req('POST', '/me/look/candidates', { animal: 'きつね', color: '青と白', mood: 'やさしい', hobby: '音楽' }));
+if (looks) say(`looks: ${looks.candidates.length} of 4`);
 if (looks) for (const [k, c] of looks.candidates.entries()) await save(`look-${k + 1}`, c.url);
 const refined = looks?.candidates[0] && (await step('refine', () => req('POST', '/me/look/refine', { mediaId: looks.candidates[0].id, instruction: 'もっと笑顔で、星の髪かざり' })));
+if (refined) say(`refined: ${refined.candidates.length} of 4`);
 if (refined) for (const [k, c] of refined.candidates.entries()) await save(`refine-${k + 1}`, c.url);
 const pick = refined?.candidates[0] ?? looks?.candidates[0];
 if (pick) await step('choose look', () => req('POST', '/me/look', { mediaId: pick.id }));
@@ -71,6 +73,7 @@ if (hatched?.bati?.imageUrl) await save('bati', hatched.bati.imageUrl);
 await step('bati name', () => req('POST', '/me/bati/name', { name: 'タコ丸' }));
 
 const designs = await step('kororin designs', () => req('POST', '/me/puni/pic/candidates', { description: 'たこ焼きと音楽が好きな、やさしい青いきつね', useNeoLook: true }));
+if (designs) say(`kororin designs: ${designs.candidates.length}`);
 if (designs) for (const [k, c] of designs.candidates.entries()) await save(`kororin-${k + 1}`, c.url);
 if (designs?.candidates[0]) await step('choose kororin', () => req('POST', '/me/puni/pic', { mediaId: designs.candidates[0].id }));
 
