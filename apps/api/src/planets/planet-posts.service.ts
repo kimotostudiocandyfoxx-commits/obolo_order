@@ -16,6 +16,7 @@ import { Database } from '../db/db';
 import { follows, marsBackstage, mvProjects, planetPosts, planetReplies, songs, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
+import { notChild } from '../common/child';
 
 type PostRow = typeof planetPosts.$inferSelect;
 
@@ -89,7 +90,7 @@ export class PlanetPostsService {
         ? sql`(${planetPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${planetPosts.userId} = ${viewerId})`
         : tab === 'friends'
           ? sql`${planetPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
-          : undefined;
+          : notChild(viewerId);
     const rows = await this.db.read
       .select({ p: planetPosts, u: authorCols })
       .from(planetPosts)

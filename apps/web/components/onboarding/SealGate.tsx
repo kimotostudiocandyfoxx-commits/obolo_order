@@ -7,9 +7,11 @@ import { useState } from 'react';
  * pulses in the dark; two marks to touch — 〔音が出せる場所にいる〕〔声を出せる（話しても大丈夫な）場所にいる〕 —
  * then 〔封を開く準備ができた〕 lights up. 〔あとで開く〕 in the corner leaves it waiting. A secret society's
  * opening rite, not a contract: no small print, no table of checkboxes. Nothing is checked or asked of the
- * browser here (no mic permission); it is the visitor's own word.
+ * browser here (no mic permission); it is the visitor's own word. M-R150: the year they were born is chosen here
+ * too (for the protective settings; nobody else sees it) and kept until the account exists (BIRTH_YEAR_KEY).
  */
 export const SEAL_GATE_KEY = 'obolo.sealGate';
+export const BIRTH_YEAR_KEY = 'obolo.birthYear';
 export function sealGateSeen(): boolean {
   try {
     return localStorage.getItem(SEAL_GATE_KEY) === '1';
@@ -24,7 +26,9 @@ export function SealGate({ onOpen }: { onOpen: () => void }) {
   const [sound, setSound] = useState(false);
   const [voice, setVoice] = useState(false);
   const [later, setLater] = useState(false);
-  const ready = sound && voice;
+  const [year, setYear] = useState('');
+  const ready = sound && voice && !!year;
+  const thisYear = new Date().getFullYear();
   const mark = (on: boolean, set: (v: boolean) => void, label: string) => (
     <button onClick={() => set(!on)} className="flex w-full items-center gap-3 text-left text-[15px] tracking-[0.08em] text-amber-50/90">
       <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition ${on ? 'border-amber-200 bg-amber-200/30 shadow-[0_0_14px_rgba(255,214,140,0.8)]' : 'border-amber-200/50'}`}>{on && <span className="h-2.5 w-2.5 rounded-full bg-amber-100" />}</span>
@@ -44,6 +48,18 @@ export function SealGate({ onOpen }: { onOpen: () => void }) {
           <div className="relative mt-5 flex w-full max-w-xs flex-col gap-4">
             {mark(sound, setSound, '音が出せる場所にいる')}
             {mark(voice, setVoice, '声を出せる（話しても大丈夫な）場所にいる')}
+            <label className="mt-1 block text-[13px] tracking-[0.08em] text-amber-50/85">
+              生まれた年を教えてください
+              <select value={year} onChange={(e) => setYear(e.target.value)} className="mt-2 block w-full rounded-full border border-amber-200/50 bg-black px-4 py-2 text-[15px] text-amber-50">
+                <option value="">年を選ぶ</option>
+                {Array.from({ length: 90 }, (_, k) => thisYear - 3 - k).map((y) => (
+                  <option key={y} value={y}>
+                    {y}年
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-[11px] leading-relaxed text-white/45">年齢に合わせて、守りの設定を変えるためです。ほかの人には見えません</span>
+            </label>
           </div>
           <p className="relative mt-6 max-w-xs text-center text-[12px] leading-relaxed tracking-[0.06em] text-white/55">この先は、あなたの声で進みます。電車やバスの中ではなく、家など、ゆっくりできる場所で開いてください</p>
           <button
@@ -51,6 +67,7 @@ export function SealGate({ onOpen }: { onOpen: () => void }) {
             onClick={() => {
               try {
                 localStorage.setItem(SEAL_GATE_KEY, '1');
+                localStorage.setItem(BIRTH_YEAR_KEY, year);
               } catch {
                 /* private mode: asked again next time */
               }

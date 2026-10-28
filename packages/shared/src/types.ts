@@ -33,6 +33,9 @@ export interface Me {
   voices: { self: boolean; bati: boolean; selfSings?: boolean; kororin?: boolean };
   /** the round ぷにぷに character (null until dressed on the profile) */
   look: PuniLook | null;
+  /** the year they were born (M-R150), null = not asked yet; `child` = under 15 */
+  birthYear?: number | null;
+  child?: boolean;
   /** the NEO look standing, without a background (M-R149): made once after the look is chosen (POST /me/look/standee) */
   lookStandee?: string | null;
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */

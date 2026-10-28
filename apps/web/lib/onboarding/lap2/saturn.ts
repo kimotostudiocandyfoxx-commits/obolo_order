@@ -5,7 +5,7 @@ import { chapterEnd, flight } from './common';
  * L2 chapter 1 【土星】 — review/L2_地球_月_土星.md (L2-SATURN-S001, S004, S010).
  * The siblings welcome the Obolo Order: outside, words fly like stones; here a quiet invitation spreads.
  * KIMORIN smells a pyramid scheme (it is the other way round: the one who invites buys the gem, ¥88).
- * 〔✉ 招待状〕 / 〔🔍 名前で探す〕 (18+), then the sister's ひろば and KIMORIN's accidental 「問いかけの広場」;
+ * 〔✉ 招待状〕 / 〔🔍 名前で探す〕 (15+), then the sister's ひろば and KIMORIN's accidental 「問いかけの広場」;
  * the visitor may make their own (only me at first).
  */
 export const L2_SATURN: Step[] = [
@@ -70,7 +70,7 @@ export const L2_SATURN: Step[] = [
   { t: 'say', who: 'たこ焼きシスター', text: '招待状も、広場も、急がなくていいワ。' },
   { t: 'say', who: 'たこ焼きブラザー', text: '次は、木星だZE!!' },
   { t: 'caption', text: '木星が開いた' },
-  { t: 'notice', text: '〔✉ 招待状〕〔🔍 名前で探す〕（18歳以上）と、自分の広場は、このあとも土星で自由に使えます。増えたダチを、ダチのまま〔推し〕からだけ外すこともできます（相手には知らせません）' },
+  { t: 'notice', text: '〔✉ 招待状〕〔🔍 名前で探す〕（15歳から）と、自分の広場は、このあとも土星で自由に使えます。増えたダチを、ダチのまま〔推し〕からだけ外すこともできます（相手には知らせません）' },
   { t: 'sprite', image: null },
   ...chapterEnd(1),
 ];

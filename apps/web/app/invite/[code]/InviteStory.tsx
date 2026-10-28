@@ -1,5 +1,6 @@
 'use client';
 
+import { BIRTH_YEAR_KEY } from '@/components/onboarding/SealGate';
 import type { InviteView } from '@obolo/shared';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -67,6 +68,13 @@ export function InviteStory({ code }: { code: string }) {
         }
         const r = await api.acceptInvite(code, name);
         signIn(r.token, r.user);
+        // the year chosen at the seal (M-R150), now that the account exists
+        try {
+          const y = Number(localStorage.getItem(BIRTH_YEAR_KEY));
+          if (y && !r.user.birthYear) setMe(await api.updateMe({ birthYear: y }));
+        } catch {
+          /* asked again later */
+        }
       } catch (e) {
         if (e instanceof ApiError && (e.code === 'INVITE_USED' || e.code === 'ALREADY_MEMBER')) throw new Error(m.gate.used);
         throw new Error(m.gate.nameError);

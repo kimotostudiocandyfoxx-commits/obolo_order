@@ -10,6 +10,7 @@ import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 import { PlazaService } from './plaza.service';
+import { notChild } from '../common/child';
 
 type PostRow = typeof saturnPosts.$inferSelect;
 type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
@@ -38,12 +39,12 @@ export class SaturnService {
   async feed(viewerId: string, cursor?: string, limit = 20, fresh = false, tab: 'all' | 'following' | 'friends' = 'all', plazaId?: string): Promise<Paged<SaturnPostView>> {
     // inside a ひろば (みんな map): only the voices dropped there
     const scope = plazaId
-      ? eq(saturnPosts.plazaId, plazaId)
+      ? and(eq(saturnPosts.plazaId, plazaId), notChild(viewerId))
       : tab === 'following'
         ? sql`(${saturnPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${saturnPosts.userId} = ${viewerId})`
         : tab === 'friends'
           ? sql`${saturnPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
-          : undefined;
+          : notChild(viewerId);
     // inside a ひろば only its maker may look when it is theirs alone; everywhere else such voices never show
     if (plazaId) await this.plazas.get(viewerId, plazaId);
     // voices flown to their author's own room never fall on the planet

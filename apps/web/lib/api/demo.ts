@@ -45,6 +45,7 @@ import {
   type SaturnPostView,
   type SaturnProfileView,
   type PuniPicResult,
+  isChild,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
 import { getBlob, putBlob } from './idb';
@@ -232,7 +233,11 @@ export class DemoApi implements Api {
     if (body.handle && Object.values(this.s.users).some((u) => u.handle === body.handle && u.id !== id)) {
       throw new ApiError(409, 'HANDLE_TAKEN', 'taken');
     }
-    const u = { ...this.s.users[id], ...Object.fromEntries(Object.entries(body).filter(([, v]) => v !== undefined)) };
+    const prev = this.s.users[id];
+    const u = { ...prev, ...Object.fromEntries(Object.entries(body).filter(([, v]) => v !== undefined)) };
+    // the birth year is set once, like the server (M-R150)
+    if (prev.birthYear) u.birthYear = prev.birthYear;
+    if (u.birthYear) u.child = isChild(u.birthYear);
     this.s.users[id] = u;
     for (const p of this.s.posts) if (p.author.id === id) p.author = { id, handle: u.handle, displayName: u.displayName };
     this.save();

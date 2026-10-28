@@ -17,6 +17,7 @@ import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { follows, jupiterPosts, jupiterReplies, jupiterRoots, mediaObjects, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
+import { notChild } from '../common/child';
 
 type PostRow = typeof jupiterPosts.$inferSelect;
 
@@ -111,7 +112,7 @@ export class JupiterService {
         ? sql`(${jupiterPosts.userId} IN (SELECT ${follows.followeeId} FROM ${follows} WHERE ${follows.followerId} = ${viewerId}) OR ${jupiterPosts.userId} = ${viewerId})`
         : tab === 'friends'
           ? sql`${jupiterPosts.userId} IN (SELECT f.followee_id FROM follows f JOIN follows g ON g.follower_id = f.followee_id AND g.followee_id = f.follower_id WHERE f.follower_id = ${viewerId})`
-          : undefined;
+          : notChild(viewerId);
     const rows = await this.db.read
       .select({ p: jupiterPosts, u: authorCols })
       .from(jupiterPosts)
@@ -180,7 +181,7 @@ export class JupiterService {
     return this.db.read
       .select(authorCols)
       .from(users)
-      .where(and(isNull(users.deletedAt), term ? or(ilike(users.displayName, like), ilike(users.handle, like)) : posters))
+      .where(and(isNull(users.deletedAt), notChild(), term ? or(ilike(users.displayName, like), ilike(users.handle, like)) : posters))
       .orderBy(desc(posters), desc(users.createdAt))
       .limit(30);
   }

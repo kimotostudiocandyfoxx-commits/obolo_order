@@ -14,6 +14,7 @@ import {
   type Locale,
   type Me,
   type UpdateProfileBody,
+  isChild,
 } from '@obolo/shared';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -47,6 +48,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
     neoForm: u.neoForm,
     avatarUrl: u.avatarUrl,
     lookStandee: (u.onboardingJson as Record<string, string> | null)?.['look.standee'] ?? null,
+    birthYear: Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null,
+    child: isChild(Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null),
     bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, faces: batiFaces(u.onboardingJson) } : null,
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },
@@ -87,10 +90,13 @@ export class UsersService {
         .where(and(eq(users.handle, body.handle), ne(users.id, userId)));
       if (taken) throw apiError(HttpStatus.CONFLICT, 'HANDLE_TAKEN', 'This handle is already taken');
     }
-    const { look, ...rest } = body;
+    const { look, birthYear, ...rest } = body;
+    // the birth year is set once (M-R150): the child settings must not be switched off later by the member
+    const cur = birthYear !== undefined ? ((await this.load(userId)).onboardingJson ?? {}) as Record<string, string> : null;
+    const year = cur && !cur.birthYear && birthYear !== undefined ? { onboardingJson: { ...cur, birthYear: String(birthYear) } } : {};
     const [u] = await this.db.write
       .update(users)
-      .set({ ...rest, ...(look !== undefined ? { lookJson: look } : {}), updatedAt: new Date() })
+      .set({ ...rest, ...year, ...(look !== undefined ? { lookJson: look } : {}), updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
     return toMe(u);

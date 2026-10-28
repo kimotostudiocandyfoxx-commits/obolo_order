@@ -30,7 +30,14 @@ export const UpdateProfileBody = z.object({
   neoForm: z.enum(NEO_FORM_IDS).optional(),
   /** the round ぷにぷに character (null = back to the plain ball) */
   look: PuniLook.nullable().optional(),
+  /** asked once before the invitation is opened (M-R150); under CHILD_AGE the child settings apply. Set once. */
+  birthYear: z.number().int().min(1900).max(2100).optional(),
 });
+/** M-R150: under 15 (before high school) a member connects only with their dachi */
+export const CHILD_AGE = 15;
+export function isChild(birthYear: number | null | undefined, now = new Date()): boolean {
+  return !!birthYear && now.getFullYear() - birthYear < CHILD_AGE;
+}
 export type UpdateProfileBody = z.infer<typeof UpdateProfileBody>;
 
 export const BuddyPersona = z.object({
