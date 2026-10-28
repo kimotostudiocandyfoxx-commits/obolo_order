@@ -1,14 +1,17 @@
 OK  POST /admin/invites 201 0.2s
-OK  POST /invites/J-DyeEgh9brJjEyb/accept 200 0.1s
-user d3dbd95b-7d5e-46e5-bc4e-736de2b0bbd7 day 1
-OK  POST /me/look/candidates 200 98.3s
-OK  POST /me/look/refine 200 52.8s
+OK  POST /invites/93-iGO_IW4lv7-39/accept 200 0.1s
+user fb076540-9c43-48fc-9b82-63b08a145ccd day 1
+OK  POST /me/look/candidates 200 86.0s
+looks: 4 of 4
+OK  POST /me/look/refine 200 51.0s
+refined: 4 of 4
 OK  POST /me/look 200 0.1s
 OK  POST /me/bati/egg 200 0.6s
-OK  POST /me/bati/hatch 200 92.5s
-OK  POST /me/bati/name 200 0.8s
-OK  POST /me/puni/pic/candidates 200 16.7s
-OK  POST /me/puni/pic 200 0.1s
+OK  POST /me/bati/hatch 200 92.7s
+OK  POST /me/bati/name 200 0.9s
+OK  POST /me/puni/pic/candidates 200 17.2s
+kororin designs: 4
+OK  POST /me/puni/pic 200 0.0s
 OK  GET /wallet 200 0.1s
 mana left 31
 OK  GET /me 200 0.0s
