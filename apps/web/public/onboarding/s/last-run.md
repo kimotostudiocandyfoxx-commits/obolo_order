@@ -1,10 +1,4 @@
-# UI art — 2026-10-28T00:59:30.007Z
+# UI art — 2026-10-28T08:02:29.632Z
 
-Seedream 5.0 Pro / 6枚 / 約7円
+Seedream 5.0 Pro / 0枚 / 約0円
 
-- ✅ earth-comms
-- ✅ mikie-gold
-- ✅ neptune-islands
-- ✅ neptune-town
-- ✅ uranus-field
-- ✅ uranus-shop
