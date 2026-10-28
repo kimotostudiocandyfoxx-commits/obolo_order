@@ -128,6 +128,9 @@ export function KororinWorld({
     });
   };
   const popRef = useRef<(id: string) => void>(() => {});
+  // the room's relay: kororins tapped while another sings wait their turn (same key and beat, so they join)
+  const relay = useRef<SaturnPostView[]>([]);
+  const playingRef = useRef<string | null>(null);
   // みんな's ひろば: popped voices turn into rainbows
   const denseRef = useRef(false);
   const pendingPop = useRef<string | null>(null);
@@ -136,6 +139,15 @@ export function KororinWorld({
     () =>
       subscribeAudio((st) => {
         setPlayingUrl(st.playing ? st.url : null);
+        playingRef.current = st.playing ? st.url : null;
+        // your own room: the next kororin you tapped while one sang starts right after it (M-R153)
+        if (!st.playing && st.progress >= 0.97 && relay.current.length) {
+          const nx = relay.current.shift()!;
+          openRef.current = nx.id;
+          setOpen(nx);
+          void toggleAudio(nx.voiceUrl).catch(() => undefined);
+          return;
+        }
         // the opened voice played to the end → it pops (not your own, not while its sheet is open)
         const id = openRef.current;
         const p = id ? openPostRef.current : null;
@@ -296,13 +308,19 @@ export function KororinWorld({
   const listen = useCallback(
     (p: SaturnPostView) => {
       unlockPop();
+      if (roomOnly && playingRef.current && playingRef.current !== p.voiceUrl) {
+        if (!relay.current.some((x) => x.id === p.id)) relay.current.push(p);
+        events?.onListen?.(p);
+        return;
+      }
+      relay.current = [];
       openRef.current = p.id;
       setOpen(p);
       setActiveReply(null);
       void toggleAudio(p.voiceUrl).catch(() => undefined);
       events?.onListen?.(p);
     },
-    [events],
+    [events, roomOnly],
   );
 
   // the answers under the opened voice (sample residents answer each other)
@@ -331,6 +349,7 @@ export function KororinWorld({
     setDetail(false);
     setAllReplies(false);
     setActiveReply(null);
+    relay.current = [];
     stopAudio();
   };
 

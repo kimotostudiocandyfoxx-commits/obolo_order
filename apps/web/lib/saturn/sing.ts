@@ -164,7 +164,7 @@ const wav = (pcm: Float32Array): Blob => {
 };
 
 /** A recording (any format the browser decodes) → the kororin's song as WAV. */
-export async function singKororin(audio: Blob | ArrayBuffer, words = ''): Promise<Blob> {
+export async function singKororin(audio: Blob | ArrayBuffer, words = '', oh = false): Promise<Blob> {
   const ctx = new OfflineAudioContext(1, 1, SR);
   const src = await ctx.decodeAudioData(audio instanceof Blob ? await audio.arrayBuffer() : audio.slice(0));
   // to mono at 44.1 kHz
@@ -188,7 +188,10 @@ export async function singKororin(audio: Blob | ArrayBuffer, words = ''): Promis
   const eighth = (60 / BPM / 2) * SR;
   const step = segs.length > 24 ? eighth / 2 : eighth;
   const lead = Math.round(0.15 * SR);
-  const notes = segs.map((s, k) => {
+  // 「♪オー！」 (the relay's last note, M-R153): the take's longest voiced sound, held on the melody's middle note
+  // (the same pitch for every voice, so they stack)
+  const longest = segs.reduce((a, b) => (b[1] - b[0] > a[1] - a[0] ? b : a));
+  const notes: { s: [number, number]; rest: number; steps: number; hz?: number }[] = oh ? [{ s: longest, rest: 0, steps: 6, hz: root * Math.pow(2, stepSemis(2) / 12) }] : segs.map((s, k) => {
     // a syllable that ran long, or the last one, holds for two steps; a pause in the take is a rest
     const gap = k > 0 ? s[0] - segs[k - 1][1] : 0;
     return { s, rest: gap > 25 ? 1 : 0, steps: k === segs.length - 1 ? 3 : s[1] - s[0] > 30 ? 2 : 1 };
@@ -199,7 +202,7 @@ export async function singKororin(audio: Blob | ArrayBuffer, words = ''): Promis
   notes.forEach((nt, k) => {
     t += nt.rest * step;
     const len = Math.round(nt.steps * step * 0.92);
-    const hz = root * Math.pow(2, stepSemis(mel[k % mel.length]) / 12);
+    const hz = nt.hz ?? root * Math.pow(2, stepSemis(mel[k % mel.length]) / 12);
     place(x, fr, nt.s, dry, Math.round(t), len, hz);
     t += nt.steps * step;
   });
@@ -240,11 +243,11 @@ export async function singKororin(audio: Blob | ArrayBuffer, words = ''): Promis
 }
 
 /** The same, from an audio URL (the story's own kororins); null when it cannot be sung. */
-export async function singUrl(url: string, words = ''): Promise<string | null> {
+export async function singUrl(url: string, words = '', oh = false): Promise<string | null> {
   try {
     const r = await fetch(url);
     if (!r.ok) return null;
-    return URL.createObjectURL(await singKororin(await r.arrayBuffer(), words));
+    return URL.createObjectURL(await singKororin(await r.arrayBuffer(), words, oh));
   } catch {
     return null;
   }

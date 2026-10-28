@@ -56,6 +56,14 @@ export const L2_SATURN: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……問いかけの広場です。哲学ですので、わざとです。' },
   { t: 'say', who: 'たこ焼きシスター', text: '名前は、あとから変えられるワ。' },
   { t: 'say', who: 'KIMORIN', text: '変えません。' },
+  // M-R153 広場のリレー：KIMORINが自分のコロリンを三つ、ござの上に並べて〔▶ リレー〕。空が暗くなり、リングに色の光。
+  // サングラスが順番に落ちて、同じビートでKIMORINの声の歌がつながり、最後の「♪オー！」で三つの声が重なる
+  { t: 'sprite', image: null },
+  { t: 'l2', what: 'relay' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……全員、私です。' },
+  { t: 'sprite', image: ['kimorin-sun', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: 'ダチのコロリンを並べると、リレーになるワ。' },
   { t: 'say', who: 'たこ焼きシスター', text: 'どんな話をする場所にしたい？　声で、言ってみて。' },
   { t: 'sprite', image: null },
   { t: 'l2', what: 'plaza' },

@@ -89,6 +89,7 @@ const PANELS: Record<L2What, Panel> = {
   },
   'island-deco': { title: '🏝️ 島を飾る', body: ['形・浜・灯り・名前から、変えたいものを選んで〔飾る〕。'], options: [OK('飾る', { island: 'deco' })] },
   'kimorin-island': { image: '/onboarding/s/arr-mercury-sea.jpg', caption: '沖に、ブラタゴン島。黒い岩に金色の虎のしま、背中に火山', options: [OK()] },
+  relay: { caption: 'KIMORINのコロリン三つが、順番に歌ってつながる', options: [OK()] },
   'kimorin-ten': { image: '/onboarding/s/mars-screens.jpg', caption: 'KIMORINの十秒。扇の尾をばさっ。画面が少し傾いている', options: [OK()] },
   theater: {
     title: '上映館のテーマ',

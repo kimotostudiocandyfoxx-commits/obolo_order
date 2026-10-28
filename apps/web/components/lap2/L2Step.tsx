@@ -14,6 +14,7 @@ import { PlazaMaker } from './PlazaMaker';
 import { Relook } from './Relook';
 import { RoundCards } from './RoundCards';
 import { Theater } from './Theater';
+import { KororinRelay } from './KororinRelay';
 
 /**
  * One second-journey screen ({ t: 'l2', what }): the makers built so far, else the script's panel (L2Screen).
@@ -41,6 +42,8 @@ export function L2Step({
       return <Relook onDone={onDone} />;
     case 'plaza':
       return <PlazaMaker onDone={onDone} />;
+    case 'relay':
+      return <KororinRelay onDone={onDone} />;
     case 'jacket':
       return <DaydreamJacket api={lessonApi} bati={v.bati ?? ''} fill={fill} onDone={onDone} />;
     case 'round-cards':
