@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Sticker, saveSpell } from '@/components/jupiter/JupiterLesson';
 import { Record } from '@/components/mercury/MercuryLesson';
 import { Big, LessonShell, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
-import type { MvMade, SongMade } from '@/lib/onboarding/made';
+import type { MvMade, SongMade, StickerMade } from '@/lib/onboarding/made';
+import { MyStudio, STUDIO_DEFAULT, studioCards, studioFromWords, studioOmakase, type StudioLook } from './MyStudio';
 import { LineVoice } from '@/lib/story/lineVoice';
 
 /**
@@ -22,8 +24,8 @@ import { LineVoice } from '@/lib/story/lineVoice';
  * Without a song there is no MV to make yet (the server shoots from a song), so only the film frames
  * are offered. The lines are the story's, word for word, so their voices play.
  */
-export type MarsResult = { mv: MvMade | null; frame?: 'sunset' | 'sea' | 'stars'; studio?: 'canyon' | 'ship'; sent?: boolean };
-type Phase = 'intro' | 'studio' | 'tabs' | 'choose' | 'nomake' | 'hold' | 'frames' | 'kimorin-mv' | 'words' | 'kind' | 'scenes' | 'first' | 'mana' | 'making' | 'failed' | 'made' | 'kept';
+export type MarsResult = { mv: MvMade | null; frame?: 'sunset' | 'sea' | 'stars'; studio?: StudioLook & { parts: string[] }; sent?: boolean };
+type Phase = 'intro' | 'studio' | 'tabs' | 'choose' | 'nomake' | 'hold' | 'frames' | 'kimorin-mv' | 'words' | 'kind' | 'scenes' | 'first' | 'spell' | 'mana' | 'making' | 'failed' | 'made' | 'kept';
 type Who = 'hipokin' | 'kimorin' | 'bati' | 'guide';
 type Line = { who: Who; text: string };
 const SPEAKER: Record<Who, string> = { hipokin: 'ヒポキン', kimorin: 'KIMORIN', bati: 'バティ', guide: '' };
@@ -36,6 +38,7 @@ const FRAMES = [
 ] as const;
 const FIRSTS = [
   { id: 'view', label: '曲の景色から', wish: '曲の景色から始まる', reply: '定番だ。見る人が迷わない。' },
+  { id: 'art', label: '木星のアートから', wish: '木星のアートの絵から始まる', reply: '自分の絵から入るか。いい入り方だ。' },
   { id: 'walk', label: '{neo}が歩いてくる', wish: '主人公が歩いてくるところから始まる', reply: '主役が先か。いい。' },
   { id: 'dark', label: '真っ暗から', wish: '真っ暗な画面から始まる', reply: '黒から入るか。渋いな。' },
 ];
@@ -47,16 +50,13 @@ const WAITING: Line[] = [
   { who: 'hipokin', text: '……いい画だ。' },
 ];
 const KIMORIN_MV = '/onboarding/s/mv-kimorin-slide.jpg';
-const STUDIOS = [
-  { id: 'canyon', label: '郊外の赤い峡谷', img: '/onboarding/s/mars-studio-canyon.jpg' },
-  { id: 'ship', label: '街中の宇宙船', img: '/onboarding/s/mars-studio-ship.jpg' },
-] as const;
 // after the MV is put away (D07-S005 → D07-S005b myスタジオと、ダチの星図へ)
 type After =
   | { k: 'line'; l: Line }
   | { k: 'bar' } // 🎬 myスタジオ glows
-  | { k: 'pick' } // canyon / ship → 〔このスタジオにする〕
-  | { k: 'clap' } // 「鳴らせ。」 — tap the clapper
+  | { k: 'chat' } // {bati}: what kind of studio? → the part cards (talk again to change them)
+  | { k: 'pick' } // 「鳴らせ。」 — tap the clapper
+  | { k: 'clap' }
   | { k: 'build' }
   | { k: 'place' } // 〔ここに置く〕
   | { k: 'send' } // 〔ダチの星図に飛ばす〕〔今は、スタジオに置いておく〕
@@ -71,9 +71,10 @@ const AFTER: After[] = [
   km('……まずは、一本。始まりとしては、上出来です。'),
   hp('しまったら、次は、置き場所だ。'),
   { k: 'bar' },
-  hp('撮影所の土地だ。建てるのは、自分でやれ。'),
+  hp('撮影所の土地だ。建てるのは、自分でやれ。'), // ヒポキンが、カチンコを{neo}に渡す
+  { k: 'chat' },
   hp('鳴らせ。'),
-  { k: 'pick' }, // the clapper 〔この形で作る〕 (red canyon), or 〔街中の宇宙船〕 first
+  { k: 'pick' }, // the clapper
   { k: 'build' },
   gu('myスタジオができた'),
   gu('スタジオに置いた映像は、ダチがスタジオに来た時に見られます。〔🔒 裏スタジオ〕の中は、{neo}だけ'), // 裏スタジオの一本が、大きい1枠に、すっと入る
@@ -112,10 +113,18 @@ export function MarsLesson({
   bati,
   inviter,
   batiImage,
+  stickers = [],
+  look: neoFace,
+  chibi,
   onDone,
 }: {
   api: LessonApi;
   song: SongMade | null;
+  /** the arts from Jupiter: scene 1 may start from one (R21b) */
+  stickers?: StickerMade[];
+  /** the round look and the chibi: the pilot in the UFO's window */
+  look?: string;
+  chibi?: string;
   neo: string;
   bati: string;
   inviter: string;
@@ -137,7 +146,12 @@ export function MarsLesson({
   const [watched, setWatched] = useState(false);
   const [after, setAfter] = useState<After[]>([]);
   const [ak, setAk] = useState(0);
-  const [studio, setStudio] = useState<'canyon' | 'ship' | null>(null);
+  const [studio, setStudio] = useState<StudioLook>(STUDIO_DEFAULT);
+  const [chat, setChat] = useState<'ask' | 'cards' | 'redo'>('ask');
+  const [talk, setTalk] = useState('');
+  const [built, setBuilt] = useState(0);
+  const [startArt, setStartArt] = useState<StickerMade | null>(null);
+  const [kept, setKept] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [sent, setSent] = useState(false);
   const [post, setPost] = useState<'post' | 'to'>('post');
@@ -165,7 +179,8 @@ export function MarsLesson({
     setPhase('making');
     said({ who: 'bati', text: '〈{neo}の場面〉——ここに、ひかりを。' });
     setWk(-1);
-    const wish = [passed ? '' : words.trim(), first?.wish ?? ''].filter(Boolean).join('。');
+    const opening = first?.id === 'art' && startArt ? `木星のアート「${startArt.text}」の絵から始まる` : (first?.wish ?? '');
+    const wish = [passed ? '' : words.trim(), opening].filter(Boolean).join('。');
     try {
       setMv(await api.mv(song, wish, false));
       setPhase('made');
@@ -190,12 +205,27 @@ export function MarsLesson({
   useEffect(() => {
     if (!ab) return;
     if (ab.k === 'line' && SPEAKER[ab.l.who]) void voice.current?.say(SPEAKER[ab.l.who], ab.l.text);
-    if (ab.k === 'build') setPlaced(true);
-    if (ab.k === 'build' || ab.k === 'ufo') {
-      const t = setTimeout(anext, ab.k === 'build' ? 2600 : 3000);
+    if (ab.k === 'chat' && chat === 'ask') void voice.current?.say('バティ', 'どんなスタジオにしたい？　ざっくりでいいよ！');
+    if (ab.k === 'build') {
+      // カチン: the red sand swirls and the studio rises as the cards say
+      setBuilt(0);
+      const t0 = Date.now();
+      const iv = setInterval(() => {
+        const p = Math.min(1, (Date.now() - t0) / 2200);
+        setBuilt(p);
+        if (p >= 1) {
+          clearInterval(iv);
+          setPlaced(true);
+          setTimeout(anext, 600);
+        }
+      }, 60);
+      return () => clearInterval(iv);
+    }
+    if (ab.k === 'ufo') {
+      const t = setTimeout(anext, 3000);
       return () => clearTimeout(t);
     }
-    if (ab.k === 'end') onDone({ mv, studio: studio ?? 'canyon', sent });
+    if (ab.k === 'end') onDone({ mv, studio: { ...studio, parts: studioCards(studio) }, sent });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ab]);
 
@@ -238,7 +268,16 @@ export function MarsLesson({
   else if (phase === 'mana') coach = { text: '撮影に、マナを使います。いいですか？' };
   else if (phase === 'made' && cue?.text === '−8マナ') actions = <NextButton onClick={() => said({ who: 'hipokin', text: 'しまう前に、▶で見ろ。最初に見るのは、作った者だ。' })} />;
   else if (phase === 'kept') {
-    coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: '右の〔🎬 myスタジオ〕を押す' } : ab?.k === 'clap' ? { text: 'カチンコを鳴らす' } : null;
+    coach =
+      ab?.k === 'line'
+        ? lineOf(ab.l)
+        : ab?.k === 'bar'
+          ? { text: '右の〔🎬 myスタジオ〕を押す' }
+          : ab?.k === 'chat'
+            ? lineOf({ who: 'bati', text: chat === 'cards' ? 'じゃあ、こんな感じかな！' : 'どんなスタジオにしたい？　ざっくりでいいよ！' })
+            : ab?.k === 'pick'
+              ? { text: 'カチンコを鳴らす' }
+              : null;
     if (ab?.k === 'line') actions = <NextButton onClick={anext} />;
   }
 
@@ -463,8 +502,29 @@ export function MarsLesson({
             >
               つぎへ
             </Big>
+          ) : first?.id === 'art' && !startArt ? (
+            // the art book opens; the song's jacket art glows at the front
+            <div>
+              <p className="text-center text-sm font-black text-rose-600">アート帳</p>
+              <div className="mt-2 flex flex-wrap justify-center gap-3">
+                {[...stickers].sort((a, b) => Number(b.url === song?.jacket) - Number(a.url === song?.jacket)).map((a, i) => (
+                  <button key={i} onClick={() => setStartArt(a)} className={`rounded-md ${a.url && a.url === song?.jacket ? 'ring-4 ring-amber-300' : ''}`}>
+                    <Sticker s={a} size={90} />
+                  </button>
+                ))}
+              </div>
+              {!stickers.length && (
+                <Soft onClick={() => setFirst(FIRSTS[0])}>アートがないので、曲の景色から</Soft>
+              )}
+            </div>
           ) : first ? (
-            <Big tone="violet" onClick={() => setPhase('mana')}>
+            <Big
+              tone="violet"
+              onClick={() => {
+                setPhase('spell');
+                said({ who: 'bati', text: 'じゃあ、スペルは、こうなるね！' });
+              }}
+            >
               この3つのシーンで撮る
             </Big>
           ) : (
@@ -482,6 +542,42 @@ export function MarsLesson({
               ))}
             </div>
           )}
+        </Panel>
+      )}
+
+      {phase === 'spell' && (
+        <Panel>
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {[song?.title ?? 'MV', 'シーン1', 'シーン2', 'シーン3', ...(passed ? [] : words.split(/[、。,.\s　]+/).filter(Boolean).slice(0, 3)), first?.id === 'art' && startArt ? `アート：${startArt.text}` : first?.label.replace('{neo}', neo) ?? '', 'ゆっくりのカメラ']
+              .filter(Boolean)
+              .map((c, i) => (
+                <span key={`${c}-${i}`} className="animate-[fadeUp_0.4s_ease-out] rounded-md border border-rose-300 bg-gradient-to-b from-rose-50 to-amber-50 px-2 py-1 font-serif text-[13px] font-bold text-rose-800 shadow-sm" style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}>
+                  〈{c}〉
+                </span>
+              ))}
+          </div>
+          <button
+            onClick={() => {
+              saveSpell([song?.title ?? 'MV', ...(passed ? [] : words.split(/[、。,.\s　]+/).filter(Boolean).slice(0, 3)), 'ゆっくりのカメラ']);
+              setKept(true);
+            }}
+            disabled={kept}
+            className="mx-auto mt-2 block text-[12px] font-bold text-violet-600 disabled:text-slate-400"
+          >
+            {kept ? 'スペルブックに、記しました' : '📖 記す'}
+          </button>
+          <div className="mt-3">
+            <Big
+              tone="rose"
+              onClick={() => {
+                if (cue?.text === 'じゃあ、スペルは、こうなるね！') return said({ who: 'hipokin', text: 'カメラの動きも、スペルのうちだ。' });
+                setPhase('mana');
+                setCue(null);
+              }}
+            >
+              つぎへ
+            </Big>
+          </div>
         </Panel>
       )}
 
@@ -584,45 +680,96 @@ export function MarsLesson({
       )}
       {ab?.k === 'bar' && <Bar glow={2} onTap={anext} />}
       {/* the lot with your name tag → the studio you built, its big frame, the UFO */}
-      {phase === 'kept' && ak >= 4 && ab?.k !== 'pick' && (
+      {phase === 'kept' && ak >= 4 && (
         <div className="pointer-events-none absolute inset-x-0 top-[24svh] z-[160] flex flex-col items-center px-6">
           <div className="relative aspect-[4/3] w-full max-w-sm overflow-hidden rounded-2xl border-2 border-white/40 bg-gradient-to-b from-orange-300 to-rose-500 shadow-2xl">
-            {studio && ak > after.findIndex((x) => x.k === 'pick') ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={STUDIOS.find((x) => x.id === studio)!.img} alt="" className={`h-full w-full object-cover ${ab?.k === 'build' ? 'animate-[fadeUp_2.2s_ease-out]' : ''}`} />
+            {ak > after.findIndex((x) => x.k === 'pick') ? (
+              <MyStudio look={studio} built={ab?.k === 'build' ? built : 1} width={384} />
             ) : (
               <div className="absolute inset-x-10 bottom-8 top-10 border-2 border-dashed border-white/90" />
             )}
             {ab?.k === 'build' && <div className="absolute inset-0 animate-pulse bg-[radial-gradient(circle,rgba(255,170,90,0.6),transparent_70%)]" />}
             {placed && mv && (
-              <div className="absolute bottom-3 left-1/2 w-[58%] -translate-x-1/2 overflow-hidden rounded-md border-2 border-amber-200 bg-black shadow-lg">
+              <div className="absolute bottom-[34%] left-1/2 w-[34%] -translate-x-1/2 overflow-hidden rounded-sm border-2 border-amber-200 bg-black shadow-lg">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 {mv.poster ? <img src={mv.poster} alt="" className="aspect-video w-full object-cover" /> : <video src={mv.url} muted autoPlay loop playsInline className="aspect-video w-full object-cover" />}
               </div>
             )}
-            {ab?.k === 'ufo' && <span className="absolute left-1/2 top-1/2 -translate-x-1/2 animate-[shipOut_3s_ease-in_forwards] text-6xl drop-shadow-xl">🛸</span>}
+            {ab?.k === 'ufo' && (
+              // the UFO carries the MV up into the red sky; in its round window the small {neo} holds the stick
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 animate-[shipOut_3s_ease-in_forwards]">
+                <span className="relative block text-7xl drop-shadow-xl">
+                  🛸
+                  <span className="absolute left-1/2 top-[14%] h-7 w-7 -translate-x-1/2 overflow-hidden rounded-full border-2 border-sky-200 bg-sky-100/80">
+                    {(chibi || neoFace) && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={chibi || neoFace} alt="" className="h-full w-full object-cover object-top" />
+                    )}
+                  </span>
+                </span>
+              </span>
+            )}
           </div>
           <span className="-mt-3 rounded bg-[#f6ead2] px-2 py-0.5 text-[12px] font-bold text-stone-700 shadow">〈{neo}〉 STUDIO</span>
         </div>
       )}
+      {ab?.k === 'chat' && (
+        <Panel>
+          {chat !== 'cards' ? (
+            <div className="space-y-2">
+              <p className="text-center text-sm font-black text-rose-600">🎬 myスタジオ</p>
+              <VoiceField light value={talk} onChange={setTalk} placeholder={chat === 'ask' ? '夜の砂漠で、ネオンがギラギラしてる感じ' : 'もっと、派手に'} maxLength={40} />
+              <Big
+                tone="rose"
+                disabled={!talk.trim()}
+                onClick={() => {
+                  setStudio((l) => studioFromWords(talk, chat === 'ask' ? STUDIO_DEFAULT : l));
+                  setTalk('');
+                  setChat('cards');
+                  void voice.current?.say('バティ', 'じゃあ、こんな感じかな！');
+                }}
+              >
+                これで組む
+              </Big>
+              {chat === 'ask' && (
+                <Soft
+                  onClick={() => {
+                    setStudio(studioOmakase());
+                    setChat('cards');
+                    void voice.current?.say('バティ', 'じゃあ、こんな感じかな！');
+                  }}
+                >
+                  おまかせ
+                </Soft>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex justify-center">
+                <MyStudio look={studio} width={220} />
+              </div>
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {studioCards(studio).map((c) => (
+                  <span key={c} className="rounded-md bg-rose-50 px-2 py-1 text-[12px] font-bold text-rose-800 ring-1 ring-rose-300">
+                    〈{c}〉
+                  </span>
+                ))}
+              </div>
+              <Big tone="rose" onClick={anext}>
+                これでいい
+              </Big>
+              <Soft onClick={() => setChat('redo')}>🎙 話して直す</Soft>
+              <p className="text-center text-[11px] text-slate-400">話すと、札が変わります。マナは使いません。あとで変えられます。星図の景色も、同じ見た目になります</p>
+            </div>
+          )}
+        </Panel>
+      )}
       {ab?.k === 'pick' && (
         <Panel>
-          <p className="text-center text-sm font-black text-rose-600">🎬 myスタジオ</p>
-          <button
-            onClick={() => {
-              setStudio((x) => x ?? 'canyon');
-              anext();
-            }}
-            className="mx-auto mt-3 flex animate-[hintGlow_2.2s_ease-in-out_infinite] flex-col items-center rounded-2xl bg-stone-900 px-8 py-4 text-white shadow-2xl active:scale-95"
-          >
+          <button onClick={anext} className="mx-auto flex animate-[hintGlow_2.2s_ease-in-out_infinite] flex-col items-center rounded-2xl bg-stone-900 px-8 py-4 text-white shadow-2xl active:scale-95">
             <span className="text-4xl">🎬</span>
-            <span className="mt-1 text-[14px] font-black">この形で作る</span>
-            <span className="text-[11px] text-white/60">{studio === 'ship' ? '街中の宇宙船' : '郊外の赤い峡谷'}</span>
+            <span className="mt-1 text-[14px] font-black">カチンコを鳴らす</span>
           </button>
-          <button onClick={() => setStudio((x) => (x === 'ship' ? 'canyon' : 'ship'))} className="mt-3 w-full text-center text-[12px] text-rose-500 underline">
-            見た目を選ぶ：{studio === 'ship' ? '郊外の赤い峡谷' : '街中の宇宙船'}
-          </button>
-          <p className="mt-1 text-center text-[11px] text-slate-400">あとで変えられます。星図の景色も、同じ見た目になります</p>
         </Panel>
       )}
       {ab?.k === 'send' && (

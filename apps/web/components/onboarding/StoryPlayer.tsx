@@ -976,13 +976,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <MarsLesson
           api={lessonApi}
           song={v.made?.song ?? null}
+          stickers={v.made?.stickers ?? []}
+          look={v.look}
+          chibi={v.lookChibi}
           neo={v.neo || v.name}
           bati={v.bati || 'バティ'}
           inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
           onDone={(r) => {
             if (r.mv) remember('mv', JSON.stringify(r.mv));
-            if (r.studio) remember('my_studio', r.studio);
+            if (r.studio) {
+              remember('my_studio', JSON.stringify(r.studio));
+              remember('f_d07_studio_parts', r.studio.parts.join('|'));
+            }
             remember('f_d07_send', r.sent ? 'send' : 'keep');
             remember('f_d07_screen', r.mv ? 'big' : 'pick');
             if (r.frame) remember('mars_frame', r.frame);
