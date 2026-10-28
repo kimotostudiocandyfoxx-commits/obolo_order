@@ -141,7 +141,7 @@ export interface BuddyPicture {
   /** shown small under the picture: the library, author and licence */
   source: string;
   pageUrl: string;
-  /** the first picture was free (no mana) */
+  /** always true: pictures take no mana (M-R147) */
   free: boolean;
 }
 

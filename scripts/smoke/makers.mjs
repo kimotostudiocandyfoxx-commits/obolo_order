@@ -76,7 +76,7 @@ const faced = await step('bati faces', () => req('POST', '/me/bati/faces'));
 if (faced?.bati?.faces) for (const [k, u] of Object.entries(faced.bati.faces)) await save(`face-${k}`, u);
 if (faced) say(`faces: ${Object.keys(faced.bati?.faces ?? {}).length} of 6`);
 
-// D03-S008 はじめての、おしゃべり: ask, then 〔🖼 絵で見る〕 twice (the first is free, the second takes a little mana)
+// D03-S008 はじめての、おしゃべり: ask, then 〔🖼 絵で見る〕 twice (no mana, M-R147)
 const chat = await step('buddy chat', () => req('POST', '/buddy/chat', { text: 'ブラックホールの正体って、なに？', locale: 'ja' }));
 if (chat) say(`bati says: ${chat.reply.text}`);
 const pic1 = await step('picture 1', () => req('POST', '/buddy/picture', { question: 'ブラックホールの正体って、なに？', answer: chat?.reply.text }));

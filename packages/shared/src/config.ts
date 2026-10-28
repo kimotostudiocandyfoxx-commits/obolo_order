@@ -34,10 +34,8 @@ export const MONTHLY_GRANT_MANA = 88;
 export const STARTER_GEM_MANA = 40;
 /**
  * What making costs (the story's table, D08-S002). Voice kororins, photo / words-only jackets, delivering and DJ are free.
- * picture: 〔🖼 絵で見る〕 on the Moon (M-R140) — the first one is free; "少し" = 1 mana (the sources are free; proposed to
- * the story chat 2026-10-28, its answer pending).
  */
-export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, picture: 1 } as const;
+export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8 } as const;
 export type MakeKind = keyof typeof MAKE_COST;
 /** Spec §1.1 — subscription price in JPY. */
 export const SUBSCRIPTION_PRICE_JPY = 88;

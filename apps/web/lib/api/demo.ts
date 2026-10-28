@@ -1144,10 +1144,7 @@ export class DemoApi implements Api {
   }
   async buddyPicture(question: string) {
     await sleep(900);
-    const first = !localStorage.getItem('obolo.demo.pic');
-    if (!first) this.charge('picture');
-    localStorage.setItem('obolo.demo.pic', '1');
-    return { picture: { url: '/onboarding/s/rocket-space.jpg', title: question.slice(0, 30), source: 'デモの絵（本番は NASA・Wikimedia Commons）', pageUrl: 'https://images.nasa.gov', free: first } };
+    return { picture: { url: '/onboarding/s/rocket-space.jpg', title: question.slice(0, 30), source: 'デモの絵（本番は NASA・Wikimedia Commons）', pageUrl: 'https://images.nasa.gov', free: true } };
   }
 
   async batiName(name: string) {

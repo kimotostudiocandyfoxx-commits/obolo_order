@@ -2,10 +2,7 @@ import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import type { BuddyPicture } from '@obolo/shared';
 import { apiError } from '../common/errors';
-import { Database } from '../db/db';
-import type { KvStore } from '../infra/kv';
-import { KV, LLM } from '../infra/tokens';
-import { LedgerService } from '../wallet/ledger.service';
+import { LLM } from '../infra/tokens';
 
 const UA = 'OboloOrder/1.0 (kids space app; contact via app)';
 
@@ -13,37 +10,23 @@ const UA = 'OboloOrder/1.0 (kids space app; contact via app)';
  * 〔🖼 絵で見る〕 (M-R138〜140): a picture for Bati's answer, only from libraries whose pictures may be used —
  * NASA's Image and Video Library (space, mostly public domain) and Wikimedia Commons' curated "Quality images"
  * (free licences, author and licence shown). Both are free to call. The question is checked first, the search
- * words are made by the LLM (English keywords), and the picture's own title is checked again. The first picture is
- * free; after that each one takes a little mana (MAKE_COST.picture), given back when nothing is found.
+ * words are made by the LLM (English keywords), and the picture's own title is checked again. No mana, for anyone
+ * (M-R147: the sources are free). A wider web search would come later as 〔もっと広く探す〕 with a little mana.
  */
 @Injectable()
 export class PictureService {
   private readonly log = new Logger('Picture');
-  constructor(
-    private readonly db: Database,
-    private readonly ledger: LedgerService,
-    @Inject(LLM) private readonly llm: LlmProvider,
-    @Inject(KV) private readonly kv: KvStore,
-  ) {}
+  constructor(@Inject(LLM) private readonly llm: LlmProvider) {}
 
   async find(userId: string, question: string, answer?: string): Promise<BuddyPicture | null> {
     if ((await moderateText(question, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', 'この質問の絵は、出せないよ');
-    const firstKey = `buddy:pic:used:${userId}`;
-    const first = !(await this.kv.get(firstKey));
-    const fee = first ? { refund: async () => undefined } : await this.ledger.charge(this.db, userId, 'picture');
     try {
       const q = await this.terms(question, answer);
       let pic = q.space ? await this.nasa(q.term) : await this.commons(q.term);
       pic ??= q.space ? await this.commons(q.term) : await this.nasa(q.term);
       if (pic && (await moderateText(`${pic.title}`, this.llm)).flagged) pic = null;
-      if (!pic) {
-        await fee.refund();
-        return null;
-      }
-      if (first) await this.kv.set(firstKey, '1', 60 * 60 * 24 * 3650);
-      return { ...pic, free: first };
+      return pic ? { ...pic, free: true } : null;
     } catch (e) {
-      await fee.refund();
       this.log.warn(`picture failed: ${String(e)}`);
       return null;
     }
