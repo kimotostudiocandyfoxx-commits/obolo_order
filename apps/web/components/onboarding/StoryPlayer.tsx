@@ -197,6 +197,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   /** Character image standing in front of the motion ('sprite' steps). */
   const [sprite, setSprite] = useState<string | string[] | null>(null);
   /** Still background image ('still' steps), removed once the next motion is on screen. */
+  const [blackFade, setBlackFade] = useState(0);
   const [still, setStillState] = useState<string | null>(null);
   // the still on screen, known at once (several steps run before the next render: QA 10 R28)
   const stillRef = useRef<string | null>(null);
@@ -204,9 +205,25 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [stillAnim, setStillAnim] = useState('fadeUp 0.6s ease-out');
   // the still drawn on screen now (stillRef runs ahead while the next one loads)
   const shownStill = useRef<string | null>(null);
-  const stillTok = useRef(0);
+  // stills come in their order, each once it is decoded (QA 12: a slow one was skipped); a direct set starts a new line
+  const stillGen = useRef(0);
+  const stillLine = useRef<Promise<void>>(Promise.resolve());
+  // the decoded pictures, kept (the loaded Image objects stay alive so the browser keeps them ready)
+  const stillCache = useRef(new Map<string, { img: HTMLImageElement; ready: Promise<void> }>());
+  const loadStill = (img: string) => {
+    let c = stillCache.current.get(img);
+    if (!c) {
+      const el = new Image();
+      el.src = stillUrl(img);
+      c = { img: el, ready: (el.decode ? el.decode() : Promise.resolve()).catch(() => undefined) };
+      stillCache.current.set(img, c);
+      if (stillCache.current.size > 24) stillCache.current.delete(stillCache.current.keys().next().value!);
+    }
+    return c.ready;
+  };
   const setStill = (img: string | null) => {
-    stillTok.current++;
+    stillGen.current++;
+    stillLine.current = Promise.resolve();
     stillRef.current = img;
     shownStill.current = img;
     setStillState(img);
@@ -217,10 +234,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
    * until then (R33). From a motion or black (no still before) it fades up as before.
    */
   const showStill = (img: string, fade?: number) => {
-    const tok = ++stillTok.current;
+    const gen = stillGen.current;
     stillRef.current = img;
+    const ready = loadStill(img);
     const go = () => {
-      if (tok !== stillTok.current) return;
+      if (gen !== stillGen.current) return;
       const prev = shownStill.current;
       clearTimeout(underTimer.current);
       if (prev && prev !== img) {
@@ -235,9 +253,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       shownStill.current = img;
       setStillState(img);
     };
-    const im = new Image();
-    im.src = stillUrl(img);
-    (im.decode ? im.decode() : Promise.resolve()).then(go, go);
+    stillLine.current = stillLine.current.then(() => ready).then(go);
   };
   // a cross-fade between two stills: the one before stays underneath (the same <img>) while the new one fades in
   const [under, setUnder] = useState<{ image: string; fade: number } | null>(null);
@@ -266,6 +282,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (e) setLog((l) => (l[l.length - 1]?.id === e.id ? l : [...l, e]));
   }, []);
   const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
+  // the thread as it was shown last, and whether it is fading out (QA 12 R35)
+  const lastChat = useRef<{ entries: ChatEntry[]; bottom: number }>({ entries: [], bottom: 0 });
+  const [chatLeaving, setChatLeaving] = useState(false);
+  const chatWas = useRef(false);
   /** Day 1's invitation card is on screen (leaving: its words lift away as the next motion starts under it) */
   /** the space ticket picture as the scene (a `ticket` step with no stamp or flip): stays until the next scene */
   const [ticketArt, setTicketArt] = useState<{ dest?: string; leaving?: boolean } | null>(null);
@@ -488,7 +508,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'black') {
           bgQueue.current = [];
           setTicketArt(null);
+          setBlackFade(s.fade ?? 0);
           setBlackout(true);
+          if (s.fade) {
+            // darkening: the picture stays under it until it is black, then the story goes on
+            const after = n + 1;
+            setI(n);
+            setTimeout(() => {
+              setLog([]);
+              dual.current?.pauseAll();
+              runRef.current(after);
+            }, s.fade * 1000);
+            return;
+          }
           setLog([]);
           dual.current?.pauseAll();
           n++;
@@ -765,11 +797,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     for (let k = i + 1; k < Math.min(steps.length, i + 12); k++) {
       const s = steps[k];
       const img = s.t === 'still' || s.t === 'arrive' ? s.image : null;
-      if (img) {
-        const im = new Image();
-        im.src = stillUrl(img);
-        void im.decode?.().catch(() => undefined);
-      }
+      if (img) void loadStill(img);
     }
   }, [i, steps]);
   // the next theme is decoded ahead
@@ -820,8 +848,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const lastBack = before.find((s) => s.t === 'still' || s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo' || s.t === 'black');
     const onStill = lastBack?.t === 'still';
     if (lastBack?.t === 'still') {
-      setStill(lastBack.image);
-      setReady(true);
+      // from black, once the picture is decoded (QA 12 R40: it came up in two or three frames); the motion behind is hidden
+      const img = lastBack.image;
+      dual.current?.pauseAll();
+      void loadStill(img).then(() => {
+        setStill(img);
+        setReady(true);
+      });
     }
     const lastSprite = before.find((s) => s.t === 'sprite' || s.t === 'video');
     if (lastSprite?.t === 'sprite') setSprite(lastSprite.image);
@@ -893,6 +926,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' || step.t === 'arrive');
   // SYS-S001: only at a calm moment (a line, a button) — never while drawing, saving or paying
   const calm = step && ['caption', 'say', 'letter', 'notice', 'action', 'choice'].includes(step.t);
+  const chatOn = !!(started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)));
+  const chatEntries = log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }));
+  if (chatOn && step) lastChat.current = { entries: chatEntries, bottom: chatBottom(step) };
+  useEffect(() => {
+    if (chatWas.current && !chatOn) {
+      setChatLeaving(true);
+      const t = setTimeout(() => setChatLeaving(false), 320);
+      chatWas.current = chatOn;
+      return () => clearTimeout(t);
+    }
+    chatWas.current = chatOn;
+    if (chatOn) setChatLeaving(false);
+  }, [chatOn]);
   useEffect(() => {
     if (timeUp && calm && started && !paused) setTimeUpShown(true);
   }, [timeUp, calm, started, paused]);
@@ -934,7 +980,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       </div>
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
       {/* to black at once, back from black softly (QA 11 R36) */}
-      <div className={`pointer-events-none absolute inset-0 z-[4] bg-black transition-opacity ${blackout ? 'opacity-100 duration-0' : 'opacity-0 duration-700'}`} aria-hidden />
+      <div className={`pointer-events-none absolute inset-0 z-[4] bg-black transition-opacity ${blackout ? 'opacity-100' : 'opacity-0'}`} style={{ transitionDuration: blackout ? `${blackFade}s` : '0.7s' }} aria-hidden />
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
       {/* the still before (during a cross-fade) and the still now, keyed by picture: the one before is the same <img>
           left in place, and a still's animation is set once, when it comes in (QA 10 R27) */}
@@ -997,18 +1043,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
-      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)) && (
-        // a soft shade under the thread so it reads on any picture
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[10] h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
-      )}
-      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)) && (
-        <ChatLog
-          entries={log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }))}
-          talking={talking}
-          reveal={reveal}
-          live={step.t === 'say' && !mustWait}
-          bottom={chatBottom(step)}
-        />
+      {(chatOn || chatLeaving) && (
+        // the thread and its shade fade out over 0.3 s when they go (QA 12 R35), with what they showed last
+        <div className="pointer-events-none absolute inset-0 z-[10] transition-opacity duration-300" style={{ opacity: chatOn ? 1 : 0 }}>
+          {/* a soft shade under the thread so it reads on any picture */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
+          <ChatLog
+            entries={chatOn ? chatEntries : lastChat.current.entries}
+            talking={chatOn && talking}
+            reveal={reveal}
+            live={chatOn && step?.t === 'say' && !mustWait}
+            bottom={chatOn && step ? chatBottom(step) : lastChat.current.bottom}
+          />
+        </div>
       )}
 
       {started && step?.t === 'action' && (
@@ -1064,6 +1111,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             // the day's kororins (their words) — Jupiter turns two of them into stickers tomorrow
             remember('f_d04_kororin', made.length ? 'try' : 'skip');
             remember('kororins', JSON.stringify(made));
+            // the practice left through black: the story comes back up from it (QA 12 R38)
+            setBlackout(true);
             run(iRef.current + 1);
           }}
         />

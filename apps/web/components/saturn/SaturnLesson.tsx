@@ -286,6 +286,7 @@ export function SaturnLesson({
   const [waitSong, setWaitSong] = useState(false);
   // 〔🏠 自分の部屋に飛ばす〕: the kororin rolls away to the room (QA 6 P5)
   const [flying, setFlying] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [closeSignal, setCloseSignal] = useState(0);
   const voice = useRef<LineVoice | null>(null);
   const rec = useRecorder();
@@ -385,7 +386,11 @@ export function SaturnLesson({
       void storyVoice('たこ焼きシスター', SISTER_SUNSET).then((u) => setExtra((x) => [...x, storyPost('story-sunset', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, u)]));
     // D04-S005c: the inviter really becomes a dachi here
     if (beat.k === 'note' && beat.text === '{inviter}がダチになった') void api?.befriendInviter().catch(() => undefined);
-    if (beat.k === 'done') onDone(made);
+    if (beat.k === 'done') {
+      // out through black: 0.5 s darker, then back to the story (QA 12 R38: it left in one frame)
+      setLeaving(true);
+      setTimeout(() => onDone(made), 520);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, beats]);
 
@@ -538,7 +543,11 @@ export function SaturnLesson({
               : '';
 
   return (
-    <div className="fixed inset-0 z-[150]">
+    <>
+    {/* in through black: the temple darkens (0.5 s), the world comes up from black (0.8 s); out the same way (QA 12 R38) */}
+    <div className="pointer-events-none fixed inset-0 z-[260] bg-black" style={{ animation: leaving ? 'lessonOut 0.5s ease-in both' : 'lessonCurtain 1.3s ease-in-out both' }} aria-hidden />
+    <style>{'@keyframes lessonCurtain{0%{opacity:0}38%{opacity:1}100%{opacity:0}}@keyframes lessonWorld{0%,37%{opacity:0}38%,100%{opacity:1}}@keyframes lessonOut{from{opacity:0}to{opacity:1}}'}</style>
+    <div className="fixed inset-0 z-[150]" style={{ animation: 'lessonWorld 1.3s linear both' }}>
       <KororinWorld
         neoOnly
         roomOnly
@@ -745,6 +754,7 @@ export function SaturnLesson({
         }
       />
     </div>
+    </>
   );
 }
 

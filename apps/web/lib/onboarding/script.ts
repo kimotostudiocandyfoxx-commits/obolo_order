@@ -111,7 +111,8 @@ export type Step =
   /** keepChat: the line before stays on screen meanwhile (a silent reaction to it, QA 10 R29) */
   | { t: 'wait'; s: number; keepChat?: boolean }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
-  | { t: 'black' }
+  /** fade: seconds to darken (〔暗くフェード〕), the story waits until it is black (QA 12 R39); none = a cut (〔暗転〕) */
+  | { t: 'black'; fade?: number }
   /** Start a looping background motion and continue immediately. */
   | { t: 'loop'; motion: MotionId }
   /** テロップ: a short line in the middle of the screen (e.g. "MONBANが現れた"). Never spoken. Tap to continue. */

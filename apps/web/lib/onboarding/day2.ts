@@ -82,6 +82,7 @@ export const DAY2: Step[] = [
   // d2-walk-in walked toward the gate and then swapped to the temple (client 2026-10-28) — a still of KIMORIN in the
   // dark hall until the new cut (walking into the temple) is made
   { t: 'still', image: 's/d2-hall-dark-kimorin' }, // KIMORINが前を歩き、地球の神殿の中へ → 暗い天球儀の大広間
+  { t: 'wait', s: 1.2 }, // the dark hall is seen before the light comes down (QA 12 R41)
   { t: 'bgm', track: 'obolon' },
   { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
@@ -412,10 +413,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポーン！' },
   { t: 'sprite', image: null },
   { t: 'bgm', track: null, fade: 4 },
-  { t: 'black' }, // 暗くフェード
+  { t: 'black', fade: 0.8 }, // 暗くフェード（0.8秒で暗く：QA 12 R39）
   { t: 'still', image: 's/d2-moon-bed' }, // 月の神殿のベッドに横たわるKIMORINとうんちピンポンくん
   { t: 'say', who: 'KIMORIN', text: 'では、寝るとしますか。うんちピンポンくん、いや、うんぽん' },
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
-  { t: 'black' }, // 暗くフェード
+  { t: 'black', fade: 0.8 }, // 暗くフェード（0.8秒で暗く：QA 12 R39）
   { t: 'end' },
 ];
