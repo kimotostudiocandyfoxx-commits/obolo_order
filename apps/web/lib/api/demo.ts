@@ -7,6 +7,7 @@ import {
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
   MAKE_COST,
+  BATI_FACES,
   LAP2,
   lap2Done,
   type MakeKind,
@@ -1134,6 +1135,19 @@ export class DemoApi implements Api {
   async batiHatch() {
     await new Promise((r) => setTimeout(r, 2500));
     return this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: u.bati.imageUrl ?? demoBati(u.bati.food) } } : {}));
+  }
+
+  // demo: the drawn Bati stands in for every face; one picture from the story's own stills
+  async batiFaces() {
+    await sleep(1200);
+    return this.patchMe((u) => (u.bati?.imageUrl ? { bati: { ...u.bati, faces: Object.fromEntries(BATI_FACES.map((f) => [f, u.bati!.imageUrl!])) } } : {}));
+  }
+  async buddyPicture(question: string) {
+    await sleep(900);
+    const first = !localStorage.getItem('obolo.demo.pic');
+    if (!first) this.charge('picture');
+    localStorage.setItem('obolo.demo.pic', '1');
+    return { picture: { url: '/onboarding/s/rocket-space.jpg', title: question.slice(0, 30), source: 'デモの絵（本番は NASA・Wikimedia Commons）', pageUrl: 'https://images.nasa.gov', free: first } };
   }
 
   async batiName(name: string) {

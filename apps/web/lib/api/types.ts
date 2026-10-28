@@ -1,4 +1,4 @@
-import type { DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { BuddyPicture, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -250,6 +250,10 @@ export interface Api {
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;
   batiName(name: string): Promise<Me>;
+  /** Bati's six expressions from the hatched picture (once; M-R139) */
+  batiFaces(): Promise<Me>;
+  /** 〔🖼 絵で見る〕 under one of Bati's answers (null = none found) */
+  buddyPicture(question: string, answer?: string): Promise<{ picture: BuddyPicture | null }>;
   myInvites(): Promise<MyInviteView[]>;
   /** `message`: a few words of your own printed on the invitation (optional) */
   createInvite(email: string, message?: string): Promise<MyInviteView>;

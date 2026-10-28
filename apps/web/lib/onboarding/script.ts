@@ -86,6 +86,8 @@ export type Step =
   | { t: 'l2'; what: import('./lap2').L2What }
   /** a song played whole over a poster with its lines (L2-MARS-S001 『MIKIE⭐︎ドリル』, M-R134); 〔スキップ〕 at the corner */
   | { t: 'song'; id: 'mikie-drill' }
+  /** 〔💬 バティに聞く〕: the chat with Bati (D03-S008 first, later on the Moon); `first` shows the how-to and the free first picture */
+  | { t: 'batitalk'; first?: boolean }
   // --- the stage's directions (production UI 3, 2026-10-15) ---
   /** 〔カメラ：寄る／引く／揺れ〕 on the background; `focus` = where it moves in ("50% 30%") */
   | { t: 'cam'; move: 'in' | 'out' | 'shake'; focus?: string }
@@ -216,6 +218,8 @@ export interface StoryVars {
   /** The Bati's name ({bati}) and pictures used by the '@bati' / '@egg' / '@me' sprites. */
   bati?: string;
   batiImage?: string;
+  /** Bati's expressions (M-R139): { t: 'face', who: '@bati', expr: 'smile' } shows one; missing → batiImage */
+  batiFaces?: Partial<Record<string, string>>;
   batiFood?: string;
   look?: string;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { L2Step } from '@/components/lap2/L2Step';
+import { BatiChat } from './BatiChat';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -275,7 +276,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const stampList = [...new Set([...(stamps ?? []), ...Object.keys(answers).flatMap((k) => (k.startsWith('stamp.') ? [k.slice(6) as StampId] : []))])];
   /** '@bati' / '@egg' / '@me' sprites are the visitor's own pictures ('@bati-weak': out of mana). */
   const spriteSrc = (n: string) =>
-    !n ? null : n === '@bati' || n === '@bati-weak' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
+    !n ? null : n === '@bati' ? (expressions['@bati'] && v.batiFaces?.[expressions['@bati']]) || v.batiImage : n === '@bati-weak' ? v.batiImage : n === '@egg' ? eggSvg(v.batiFood ?? '') : n === '@me' ? v.look : spriteUrl(n);
   /** Remember an answer (saved with the progress) without moving on. */
   const remember = (key: string, value: string) => {
     const a = { ...stateRef.current.answers, [key]: value };
@@ -1005,6 +1006,20 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           fill={(t) => fill(t, v)}
           onDone={(a) => {
             for (const [k, val] of Object.entries(a)) remember(k, val);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
+      {started && step?.t === 'batitalk' && (
+        <BatiChat
+          key={i}
+          bati={v.bati ?? 'バティ'}
+          neo={v.neo || v.name}
+          image={v.batiImage}
+          faces={v.batiFaces}
+          first={!!step.first}
+          onDone={() => {
+            remember('f_d03_bati_talk', 'true');
             run(iRef.current + 1);
           }}
         />

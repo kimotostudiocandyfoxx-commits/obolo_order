@@ -113,6 +113,14 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day, me, story.auth]);
 
+  // a Bati hatched before the expressions existed gets them now (once)
+  const facesAsked = useRef(false);
+  useEffect(() => {
+    if (!me?.bati?.imageUrl || me.bati.faces || facesAsked.current) return;
+    facesAsked.current = true;
+    void getApi().batiFaces().then(setMe).catch(() => undefined);
+  }, [me, setMe]);
+
   const onProgress = useCallback((p: StoryProgress) => me && saveDay(day, me.id, p), [day, me]);
   const onEnd = useCallback(
     (answers: Record<string, string>) => {
@@ -153,6 +161,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         kimorinStar: day >= 3,
         bati: me.bati?.name ?? undefined,
         batiImage: me.bati?.imageUrl ?? undefined,
+        batiFaces: me.bati?.faces,
         batiFood: me.bati?.food,
         look: me.avatarUrl ?? undefined,
         story: me.story,
@@ -196,6 +205,8 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         try {
           const u = await getApi().batiHatch();
           setMe(u);
+          // Bati's expressions are drawn meanwhile (a minute or so; the plain picture stands in until then)
+          if (u.bati?.imageUrl && !u.bati.faces) void getApi().batiFaces().then(setMe).catch(() => undefined);
           // if generation failed, a drawn Bati keeps the story going
           return u.bati?.imageUrl ?? demoBati(u.bati?.food ?? '');
         } catch {
