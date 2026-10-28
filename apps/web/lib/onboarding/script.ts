@@ -67,7 +67,8 @@ export type Step =
    */
   | { t: 'sprite'; image: string | string[] | null }
   /** Still background image (public/onboarding/<image>.jpg) for scenes without a motion yet. */
-  | { t: 'still'; image: string }
+  /** fade: seconds to cross-fade from the still before (it stays underneath meanwhile), e.g. OBOLON's eyes narrowing (QA 9 R23) */
+  | { t: 'still'; image: string; fade?: number }
   /**
    * Saturn: the story's kororin lesson on top of the real world (ころりんぱ) — listen, drop your own voice
    * to your own room (or skip), the sister's sunset kororin. Saves answers.f_d04_kororin (try/skip).

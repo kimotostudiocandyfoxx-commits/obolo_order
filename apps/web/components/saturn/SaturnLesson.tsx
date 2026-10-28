@@ -321,17 +321,18 @@ export function SaturnLesson({
   beatRef.current = beat;
   // a line whose voice is not there (yet) goes on after a reading time (0.12 s a character + 1.5 s)
   const heard = useRef(-1);
+  const readTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     if (beat?.k !== 'say') return;
     const at = i;
     const len = fill(beat.text).length;
-    let later: ReturnType<typeof setTimeout> | undefined;
     const first = setTimeout(() => {
-      if (heard.current !== at) later = setTimeout(() => iRef.current === at && setI((n) => (n === at ? n + 1 : n)), len * 120 + 1500);
+      // a voice that starts later (it came slowly) takes over: it moves the line on when it ends (QA 9 R26)
+      if (heard.current !== at) readTimer.current = setTimeout(() => heard.current !== at && iRef.current === at && setI((n) => (n === at ? n + 1 : n)), len * 120 + 1500);
     }, 1500);
     return () => {
       clearTimeout(first);
-      clearTimeout(later);
+      clearTimeout(readTimer.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i]);
@@ -340,7 +341,10 @@ export function SaturnLesson({
     if (!v) return;
     let spokeAt = -1;
     v.onSpeaking = (on) => {
-      if (on) heard.current = iRef.current;
+      if (on) {
+        heard.current = iRef.current;
+        clearTimeout(readTimer.current);
+      }
       if (on) spokeAt = iRef.current;
       else if (spokeAt === iRef.current && beatRef.current?.k === 'say') {
         const at = spokeAt;

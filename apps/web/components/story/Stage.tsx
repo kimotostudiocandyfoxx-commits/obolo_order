@@ -65,8 +65,6 @@ const CHAR: Record<string, CharSpec> = {
   'kimorin-8': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
   obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
-  // his crescent eyes narrowed (M-R169, QA 8 R20: a close-up instead of a new still)
-  'obolon-squint': { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
   // at the launch pit, lower and smaller: clear of MONBAN's halo in the still behind (QA 7, R3)
   'obolon-pit': { bottom: 22, height: 21, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
   'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a', faces: madeFaces('takoyaki-brother-x', FRIEND) },
@@ -94,7 +92,7 @@ const SPEAKER: Record<string, string[]> = {
   MONBAN: ['monban'],
   KIMORIN: ['kimorin-sun', 'kimorin-n', 'kimorin-g', 'kimorin-i', 'kimorin-iu', 'kimorin', 'kimorin-1', 'kimorin-2', 'kimorin-3', 'kimorin-8', 'kimorin-dragon'],
   'KIMORIN⭐︎': ['kimorin-sun', 'kimorin', 'kimorin-1'],
-  OBOLON: ['obolon', 'obolon-pit', 'obolon-squint'],
+  OBOLON: ['obolon', 'obolon-pit'],
   バティ: ['@bati', '@bati-weak'],
   たこ焼きブラザー: ['takoyaki-brother'],
   たこ焼きシスター: ['takoyaki-sister'],

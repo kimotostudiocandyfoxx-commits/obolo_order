@@ -50,6 +50,8 @@ export interface Blob {
   sx: number;
   sy: number;
   cy: number;
+  /** out of the physics (no floor, walls or bumps): moved by its owner, e.g. a kororin flying home */
+  ghost?: boolean;
 }
 
 export interface World {
@@ -75,6 +77,7 @@ function downReach(b: Blob) {
 export function step(blobs: Blob[], dt: number, w: World) {
   const fl = (x: number) => (w.floorAt ? w.floorAt(x) : w.floor);
   for (const b of blobs) {
+    if (b.ghost) continue;
     let ax = 0;
     let ay = G;
     if (b.drag) {
@@ -126,6 +129,7 @@ export function step(blobs: Blob[], dt: number, w: World) {
     for (let j = i + 1; j < blobs.length; j++) {
       const a = blobs[i];
       const c = blobs[j];
+      if (a.ghost || c.ghost) continue;
       const dx = c.x - a.x;
       const dy = c.y - a.y;
       const d = Math.hypot(dx, dy) || 0.01;

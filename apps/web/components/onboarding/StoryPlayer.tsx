@@ -168,10 +168,12 @@ function neoSays() {
 const STILL_LOOK: Record<string, string> = {
   's/d2-gate-two-inside': 'kimorin-i',
   's/d2-hall-kimorin': 'kimorin-i',
+  's/d2-hall-kimorin-squint': 'kimorin-i',
   's/d2-hall-dark-kimorin': 'kimorin-i',
   's/d2-hall-kimorin-up': 'kimorin-iu',
   's/d2-hall-sky-monban': 'kimorin-iu',
   's/d2-moon-kimorin': 'kimorin-iu',
+  's/d2-moon-kimorin-squint': 'kimorin-iu',
 };
 
 export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false }: Props) {
@@ -195,6 +197,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [sprite, setSprite] = useState<string | string[] | null>(null);
   /** Still background image ('still' steps), removed once the next motion is on screen. */
   const [still, setStill] = useState<string | null>(null);
+  const stillRef = useRef<string | null>(null);
+  stillRef.current = still;
+  // a cross-fade between two stills: the one before stays underneath while the new one fades in
+  const [under, setUnder] = useState<{ image: string; fade: number } | null>(null);
+  const underTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const clearStillOnShow = useRef(false);
   const [placeholder, setPlaceholder] = useState<MotionId | null>(null);
   /** 'whiteout' step: the screen fades to white; the next scene fades in from it. */
@@ -366,6 +373,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'still') {
           setWhite(false);
           setTicketArt(null);
+          clearTimeout(underTimer.current);
+          if (s.fade && stillRef.current) {
+            const fade = s.fade;
+            setUnder({ image: stillRef.current, fade });
+            underTimer.current = setTimeout(() => setUnder(null), fade * 1000 + 100);
+          } else setUnder(null);
           setStill(s.image);
           // a still is a full background: lift the start light / black screen
           setReady(true);
@@ -875,10 +888,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
       {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
+      {under && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img key={`under-${under.image}`} src={stillUrl(under.image)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" aria-hidden />
+      )}
       {still && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={still} src={stillUrl(still)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full animate-[fadeUp_0.6s_ease-out]" aria-hidden />
+        <img
+          key={still}
+          src={stillUrl(still)}
+          alt=""
+          className={`story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full ${under ? '' : 'animate-[fadeUp_0.6s_ease-out]'}`}
+          style={under ? { animation: `stillIn ${under.fade}s linear both` } : undefined}
+          aria-hidden
+        />
       )}
+      {under && <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>}
       </Camera>
       {!sprite && autoStandee && (
         <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />

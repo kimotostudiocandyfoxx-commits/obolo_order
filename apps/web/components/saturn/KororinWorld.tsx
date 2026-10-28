@@ -233,15 +233,17 @@ export function KororinWorld({
       b.vx = 760;
       b.av = 9;
     }
-    // …then pulled down to the 🏠 label at the bottom right before it leaves (QA 8, R22)
+    // …then, out of the physics (it bumped the others: QA 9 R25), along a line to the 🏠 label, smaller and smaller
     const pull = setTimeout(() => {
       const el = stage.current;
       const bb = layer.current?.blob(flyId);
-      if (bb && el) bb.drag = { tx: el.clientWidth - 70, ty: el.clientHeight - 40 };
-    }, 500);
+      if (bb && el) {
+        bb.ghost = true;
+        flying.current = { id: flyId, tx: el.clientWidth - 70, ty: el.clientHeight - 40, R: bb.R };
+      }
+    }, 450);
     const t = setTimeout(() => {
-      const bb = layer.current?.blob(flyId);
-      if (bb) bb.drag = null;
+      flying.current = null;
       setFlown((cur) => new Set(cur).add(flyId));
     }, 1100);
     return () => {
@@ -316,6 +318,7 @@ export function KororinWorld({
   const highlightRef = useRef<string | null>(null);
   highlightRef.current = highlightId;
   const marker = useRef<HTMLDivElement>(null);
+  const flying = useRef<{ id: string; tx: number; ty: number; R: number } | null>(null);
   singingRef.current = partyId;
   // a kororin a dachi delivered: the first time it shows here it drops its glasses and dances once, silently
   // (sound only when tapped, M-R153)
@@ -352,6 +355,12 @@ export function KororinWorld({
   const onFrame = useCallback((get: (id: string) => PuniBlob | undefined, W: number) => {
     const star = singingRef.current ?? arrivalRef.current;
     party.current?.place(star ? get(star) : undefined);
+    const fl = flying.current && get(flying.current.id);
+    if (fl && flying.current) {
+      fl.x += (flying.current.tx - fl.x) * 0.16;
+      fl.y += (flying.current.ty - fl.y) * 0.16;
+      fl.R = Math.max(6, fl.R * 0.95);
+    }
     const hi = highlightRef.current && get(highlightRef.current);
     // …rolled towards the middle of the planet, in front of the others
     if (hi && !hi.drag && Math.abs(W / 2 - hi.x) > 4) {
