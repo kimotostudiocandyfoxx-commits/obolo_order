@@ -85,9 +85,9 @@ export const L2_MARS: Step[] = [
   { t: 'sprite', image: null },
   { t: 'still', image: 's/mars-studio-canyon' }, // {neo}の撮影所。となりの区画に、白い線の四角がもう一つ
   { t: 'sprite', image: 'hipokin' },
-  { t: 'say', who: 'ヒポキン', text: 'スタジオは、作ったものを残す場所だ。' },
-  { t: 'say', who: 'ヒポキン', text: 'となりに建てるのは、見せる場所だ。上映館だ。' },
-  { t: 'say', who: 'ヒポキン', text: '自分の映像でも、ダチが届けてくれた映像でもいい。選んで、並べて、見せる。それも、DJの腕だ。' },
+  { t: 'say', who: 'ヒポキン', text: 'となりに、上映館を建てる。' },
+  { t: 'say', who: 'ヒポキン', text: '選んで、並べて、見せる。それも、DJの腕だ。' },
+  { t: 'still', image: 's/mars-studio-canyon' }, // スタジオ通りの角に、小さな店。看板『obolo商店』。窓に、KIMORIN⭐︎とコロリンの人形
   // スタジオ通りの角で、KIMORINが、手書きのチラシ『本日上映』を配っている。誰も受け取らない
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……お客様、第一号です。' },
@@ -105,8 +105,7 @@ export const L2_MARS: Step[] = [
   { t: 'goto', id: 'tend' },
   { t: 'label', id: 'tmake' },
   { t: 'sprite', image: 'hipokin' },
-  { t: 'say', who: 'ヒポキン', text: '何を集めたい？　笑える映像でも、静かな短編でも、お前の好きなものだ。' },
-  { t: 'say', who: 'ヒポキン', text: '……話してみろ。' },
+  { t: 'say', who: 'ヒポキン', text: '何を集める。……話してみろ。' },
   { t: 'sprite', image: null },
   { t: 'l2', what: 'theater' }, // テーマ→赤い幕→〔幕を、上げろ〕→一本目→順→ダチに見せる
   { t: 'caption', text: '上映館ができた' },

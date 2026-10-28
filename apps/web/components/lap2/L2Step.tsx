@@ -68,7 +68,7 @@ export function L2Step({
     case 'place-song':
       return <PlaceSong onDone={onDone} />;
     case 'theater':
-      return <Theater mv={v.made?.mv ?? null} onDone={onDone} />;
+      return <Theater mv={v.made?.mv ?? null} neo={v.neo || v.name} onDone={onDone} />;
     case 'goods':
       return (
         <GoodsPress

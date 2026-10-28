@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
 import { getApi } from '@/lib/api';
 import type { MvMade } from '@/lib/onboarding/made';
+import { LineVoice } from '@/lib/story/lineVoice';
 
 /**
  * The theatre next to your studio (L2-MARS-S003): the theme said aloud (or a tag), the red curtain lifted,
@@ -16,7 +17,7 @@ const TAGS = ['笑える映像だけ', '眠る前に見たい映像', '自分の
 const KIMORIN_TEN: Film = { key: 'kimorin-ten', title: 'KIMORIN⭐︎の十秒', poster: '/onboarding/s/mars-screens.jpg', from: 'dachi' };
 type Phase = 'theme' | 'curtain' | 'films' | 'shoot' | 'show';
 
-export function Theater({ mv, onDone }: { mv: MvMade | null; onDone: (a: Record<string, string>) => void }) {
+export function Theater({ mv, neo = '', onDone }: { mv: MvMade | null; neo?: string; onDone: (a: Record<string, string>) => void }) {
   const [phase, setPhase] = useState<Phase>('theme');
   const [theme, setTheme] = useState('');
   const [films, setFilms] = useState<Film[]>([]);
@@ -33,7 +34,23 @@ export function Theater({ mv, onDone }: { mv: MvMade | null; onDone: (a: Record<
       ]);
     });
   }, [mv]);
-  const toggle = (k: string) => setOrder((o) => (o.includes(k) ? o.filter((x) => x !== k) : [...o, k]));
+  // ヒポキン's word at each step (L2-MARS-S003, R21b), with its voice
+  const cue = phase === 'curtain' ? '幕を、上げろ。' : phase === 'films' ? (order.length ? '二本目からは、順だ。' : 'まず、一本。') : phase === 'show' ? '最後に、誰に見せるか。' : '何を集める。……話してみろ。';
+  const [voice] = useState(() => (typeof window === 'undefined' ? null : new LineVoice()));
+  useEffect(() => () => voice?.dispose(), [voice]);
+  useEffect(() => {
+    void voice?.say('ヒポキン', cue);
+  }, [cue, voice]);
+  const [thanks, setThanks] = useState(false);
+  const toggle = (k: string) =>
+    setOrder((o) => {
+      // KIMORIN⭐︎'s ten seconds as the very first film
+      if (!o.length && k === KIMORIN_TEN.key) {
+        setThanks(true);
+        void voice?.say('KIMORIN', '……{neo}の上映館の、最初の一本とは。光栄です。');
+      }
+      return o.includes(k) ? o.filter((x) => x !== k) : [...o, k];
+    });
   const title = (k: string) => films.find((f) => f.key === k)?.title ?? '';
   const done = (shown: boolean) => onDone({ theater: shown ? 'show' : 'private', theater_theme: theme.slice(0, 40) || 'まだ決めない', theater_films: order.map(title).join('／').slice(0, 200) });
   const btn = 'w-full rounded-full border border-rose-200/50 bg-rose-200/10 py-3 text-[14px] tracking-wider active:scale-[0.98] disabled:opacity-40';
@@ -42,6 +59,7 @@ export function Theater({ mv, onDone }: { mv: MvMade | null; onDone: (a: Record<
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/55 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md animate-[fadeUp_0.5s_ease-out] rounded-3xl border border-rose-100/25 bg-[#1a0a0c]/95 p-5 text-rose-50">
         <p className="text-center text-[15px] font-bold tracking-wider">🎬 上映館</p>
+        <p className="mt-1 text-center text-[12px] text-rose-100/80">{thanks && order[0] === KIMORIN_TEN.key && order.length === 1 ? `KIMORIN「……${neo}の上映館の、最初の一本とは。光栄です。」` : `ヒポキン「${cue}」`}</p>
         {phase === 'theme' && (
           <div className="mt-3 space-y-3">
             <p className="text-center text-[13px] text-rose-50/75">上映館のテーマ</p>
