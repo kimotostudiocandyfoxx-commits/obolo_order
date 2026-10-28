@@ -35,6 +35,8 @@ type Beat =
   | { k: 'choice' }
   | { k: 'design' }
   | { k: 'send' }
+  /** 〔自分の部屋に飛ばす〕 under the kororin just sung (D04-S005, M-R169) */
+  | { k: 'fly' }
   | { k: 'done' };
 
 const SPEAKER: Record<Who, string> = { brother: 'たこ焼きブラザー', sister: 'たこ焼きシスター', kimorin: 'KIMORIN', pinpon: 'うんちピンポンくん', bati: 'バティ', guide: '' };
@@ -66,18 +68,23 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'kimorin', text: '楽しいですね。' }, // シーン……
   { k: 'say', who: 'sister', text: 'そう、コロリンは歌うの。' },
   { k: 'say', who: 'sister', text: '{neo}もやってみたらいいワ。' },
+  { k: 'say', who: 'brother', text: '文字だけだと、冷たく見られたり、怒ってるように思われたりするZE。' },
+  { k: 'say', who: 'brother', text: 'かわいいコロリンが声に出せば、そんな勘違いは起きないZE。' },
   { k: 'say', who: 'brother', text: 'なんでもいいから石に声を吹き込むんだZE！' },
   { k: 'say', who: 'kimorin', text: '思いつかない時は、これを読んでください。' },
   { k: 'note', text: `紙に書いてある言葉：\n${PAPER}` },
   { k: 'recNormal', prompt: 'first' },
   { k: 'listen', id: 'mine' },
-  { k: 'batiVoice' },
-  { k: 'say', who: 'brother', text: '文字だけだと、冷たく見られたり、怒ってるように思われたりするZE。' },
-  { k: 'say', who: 'brother', text: 'かわいいコロリンが声に出せば、そんな勘違いは起きないZE。' },
+  // the first song (M-R169): KIMORIN's tail still beats; then the kororin is sent to your room
+  { k: 'say', who: 'kimorin', text: '……尾が、勝手に。これは、私の意思ではありません。' },
+  { k: 'say', who: 'sister', text: '……いい声だワ。' },
+  { k: 'say', who: 'brother', text: '{neo}の言葉が、{neo}の声で、歌になったZE。' },
+  { k: 'fly' },
   { k: 'say', who: 'brother', text: '自分で思ったことや、感じたこと、思いついたことは、全部コロリンにしちゃえ。それは全部、大切な思い出だZE。' },
-  { k: 'say', who: 'brother', text: 'つぶやいたコロリンは、全部、土星の空を、リングとなって舞うZE。' },
+  { k: 'say', who: 'brother', text: '住人たちのつぶやいたコロリンは、土星の空を、リングとなって舞うZE。' },
   { k: 'say', who: 'brother', text: 'つぶやいたコロリンは、自分の部屋に落としとけばいいんだZE。' },
   { k: 'say', who: 'brother', text: 'だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
+  { k: 'batiVoice' },
   { k: 'note', text: '〔🎙〕を押して、{bati}に向かって、独り言みたいにつぶやく（声を出せない時は、すみの⌨で文字でも）→ {bati}がコロリンにする → タップすると歌う → 〔自分の部屋に飛ばす〕' },
   { k: 'choice' },
   // D04-S005b コロリンのデザイン (draft 21, M-R124): KIMORIN⭐︎ first, then yours (answers or おまかせ → four → one redo)
@@ -94,8 +101,10 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'bati', text: '{neo}のコロリン、どんなのにする？' },
   { k: 'design' },
   // D04-S005c ダチになる／ダチに届ける: KIMORIN⭐︎ and {inviter} are your dachi from today; 〔推し〕 opens
+  { k: 'say', who: 'brother', text: '土星では、作ったものを届け合う仲間を、ダチって呼ぶZE。' },
   { k: 'say', who: 'kimorin', text: 'では、ダチに、なりましょう。……というか、もう、ダチですよね？' },
   { k: 'note', text: 'KIMORIN⭐︎がダチになった' },
+  { k: 'say', who: 'kimorin', text: '……念のため言っておきますが、詐欺グループの調査の、相棒として、です。' }, // 扇の尾が、ぱたぱた
   { k: 'say', who: 'brother', text: '招待者の、{inviter}だZE。' },
   { k: 'say', who: 'sister', text: '{neo}を、ここに招いてくれた人だワ。' },
   { k: 'note', text: '{inviter}がダチになった' },
@@ -104,8 +113,15 @@ const BEATS: Beat[] = [
   { k: 'note', text: '知らない人からダチの申しこみが来ても、承認しなくてかまいません。断っても、相手には知らせません' },
   { k: 'say', who: 'brother', text: '{neo}のコロリン、ダチに届けてみるといいZE!!' },
   { k: 'send' },
-  // D04-S006 土星の空のリング (story M-R107): a kororin rolls to your feet — the sister's sunset
-  { k: 'note', text: '空を舞う住人たちのコロリンをタップすると、声が聞けます' },
+  // KIMORIN⭐︎ rolls his own kororin back on the ring; it dances once in your 〔推し〕
+  { k: 'say', who: 'kimorin', text: 'お返しです。ダチなので。' },
+  { k: 'note', text: '上の〔推し〕に、小さな点が一つ灯る' },
+  { k: 'note', text: 'タップすると、歌が聞けます' },
+  { k: 'listen', id: 'kimorin' },
+  // D04-S006 土星の空のリング (story M-R107): the night relay (luxury video V21, to come), then a kororin rolls to your feet
+  { k: 'say', who: 'kimorin', text: '……な、なんやこれ。……失礼。土星の夜は、毎日、こうなのですか？' }, // サングラスが鼻先までずり落ちている
+  { k: 'say', who: 'brother', text: 'つぶやいた奴がいる夜は、毎日だZE。' },
+  { k: 'note', text: '空を舞う住人たちのコロリンをタップすると、歌が聞けます' },
   { k: 'listen', id: 'sunset' },
   { k: 'done' },
 ];
@@ -113,7 +129,10 @@ const BEATS: Beat[] = [
 // the voice kororin is free on every journey (M-R124): no mana line
 const TRY: Beat[] = [{ k: 'recNormal', prompt: 'topics' }, { k: 'listen', id: 'mine' }, { k: 'note', text: 'コロリンは、あなたの部屋に、日付と時刻つきで残ります。誰にも送られません。部屋のコロリンを続けてタップすると、順番に歌って、つながります' }];
 const SKIP: Beat[] = [{ k: 'say', who: 'sister', text: 'いいワ。つぶやきたくなったら、いつでもどうぞ。' }, { k: 'note', text: 'コロリンは、いつでも作れます（今日でなくても）' }];
-const DESIGNED: Beat[] = [{ k: 'note', text: 'これから生まれるコロリンは、この見た目になります' }];
+const DESIGNED: Beat[] = [
+  { k: 'note', text: 'これから生まれるコロリンは、この見た目になります' },
+  { k: 'say', who: 'kimorin', text: '……並べると、私のほうが、腕が多いですね。' }, // 80本腕のコロリンを、となりに並べる
+];
 const UNDESIGNED: Beat[] = [{ k: 'say', who: 'sister', text: '今の見た目のままでも、いいワ。デザインは、あとでもできるワ。' }];
 const SENT: Beat[] = [
   { k: 'note', text: 'ダチに、コロリンを届けた' },
@@ -533,6 +552,13 @@ export function SaturnLesson({
 
             {beat?.k === 'design' && <KororinDesign api={api} bati={bati} neo={neo} food={food} onDone={designed} />}
             {beat?.k === 'send' && <SendKororin made={made} inviter={inviter} onDone={sent} />}
+            {beat?.k === 'fly' && (
+              <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-center px-5 pb-10">
+                <button onClick={next} className="rounded-full border-2 border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500 px-7 py-3 text-[15px] font-bold text-white shadow-lg active:scale-95 animate-[hintGlow_2.2s_ease-in-out_infinite]">
+                  🏠 自分の部屋に飛ばす
+                </button>
+              </div>
+            )}
 
             {beat?.k === 'choice' && (
               <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-end gap-2 px-4 pb-8">
@@ -540,7 +566,7 @@ export function SaturnLesson({
                   もうひとつ、つぶやいてみる
                 </Choice>
                 <Choice k={1} onClick={() => choose(false)}>
-                  今日は、ここまで
+                  次へ
                 </Choice>
               </div>
             )}

@@ -59,14 +59,17 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'MONBAN', text: 'ただし…Bluenaが使えるのは…一日、88分だ…。' },
   { t: 'say', who: 'MONBAN', text: 'それを過ぎたら…Bluenaの中の門が閉まる…。地球に、帰ってこい…。' },
   { t: 'screen', open: false },
-  { t: 'notice', text: '宇宙の画面（正方形）は、Bluenaが映しているものです。\n一日88分を過ぎると、Bluenaが止まり、地球に帰ります。次の日に、また続きから' },
+  { t: 'notice', text: 'Bluenaが使えるのは、一日88分。過ぎると地球に帰り、次の日に、その続きから' },
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/moon-temple' }, // 光の柱の中で、OBOLONの白い三日月の目が、細くなる。黒い球が、ゆっくり、こちらを見送る（M-R169）
+  { t: 'wait', s: 1.6 },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
   { t: 'bgm', track: 'space' },
   { t: 'se', sound: 'rocket' }, // ロケットが、月から飛び立つ
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true }, // the day's 88 minutes start here (not shown)
-  { t: 'action', label: 'Bluenaで投影する' },
+  // ピピッ。Bluenaが光り、ロケットの壁に、正方形のスクリーン — MONBAN calls (M-R169), nothing to press
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },

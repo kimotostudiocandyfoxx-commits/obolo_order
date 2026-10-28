@@ -79,7 +79,7 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
   });
   it('the gate: the plane, MONBAN takes the ticket, through the gate, then KIMORIN behind you (client 2026-10-22)', () => {
     const at = (f: (s: Step) => boolean) => steps.findIndex(f);
-    const plane = at((s) => s.t === 'video' && s.motion === 'd2-plane');
+    const plane = at((s) => s.t === 'video' && s.motion === 'd1-arrive');
     const close = at((s) => s.t === 'video' && s.motion === 'd1-monban');
     const give = at((s) => s.t === 'video' && s.motion === 'd2-ticket-give');
     const through = at((s) => s.t === 'video' && s.motion === '12-a');

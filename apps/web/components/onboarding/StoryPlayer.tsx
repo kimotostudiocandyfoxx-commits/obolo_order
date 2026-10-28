@@ -35,6 +35,7 @@ import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
+import { VoiceChoice } from './VoiceChoice';
 import { Invitation } from '@/components/story/Invitation';
 import { TicketArt } from '@/components/story/Ticket';
 import {
@@ -153,6 +154,12 @@ function chatBottom(s: Step | undefined): number {
   if (s.t === 'choice') return s.options.length > 2 ? 128 : 78;
   if (s.t === 'name' || s.t === 'batiname' || s.t === 'neoname') return 112;
   return 30;
+}
+
+/** an answer picked is {neo} speaking too (M-R170): their own figure comes up big for a moment, like with 〔🎙〕 */
+function neoSays() {
+  window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: true }));
+  setTimeout(() => window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: false })), 1800);
 }
 
 export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false }: Props) {
@@ -907,12 +914,24 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <DialogueWindow>{fill(step.prompt, v)}</DialogueWindow>
         </div>
       )}
-      {started && step?.t === 'choice' && (
+      {started && step?.t === 'choice' && !step.voice && (
         <ReplyChips
           key={i}
           options={step.options.map((o) => o.label)}
           onPick={(k) => {
             addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
+            neoSays();
+            choose(step.key, step.options[k].label, step.options[k].goto);
+          }}
+        />
+      )}
+      {started && step?.t === 'choice' && step.voice && (
+        <VoiceChoice
+          key={i}
+          options={step.options.map((o) => o.label)}
+          onPick={(k) => {
+            addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
+            neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />

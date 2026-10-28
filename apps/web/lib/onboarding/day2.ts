@@ -25,9 +25,11 @@ export const DAY2: Step[] = [
   // D02-S002 お待ちなさい（client 2026-10-22, second pass）: the ticket folds into a paper airplane and flies to
   // the HQ; at the gate the doors close and MONBAN appears, takes the ticket, the gate opens; on the way in
   // KIMORIN calls from behind — the rest is seen looking back out through the gate
-  { t: 'se', sound: 'paper' }, // 切符が折りたたまれる
+  { t: 'se', sound: 'paper' }, // 切符が折り鶴に折れる（M-R169：紙飛行機ではなく折り鶴。1日目の鶴の映像を使う）
   { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）
-  { t: 'video', motion: 'd2-plane' }, // 切符が紙飛行機になって飛び、本部の門の前に着く
+  { t: 'video', motion: '5-f' }, // 鶴が空を飛んでいく
+  { t: 'se', sound: 'whoosh' },
+  { t: 'video', motion: 'd1-arrive' }, // 本部の門の前に、すっと降りる
   { t: 'loop', motion: 'd1-gate-loop' },
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
@@ -38,9 +40,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '来たか…切符は持ってきたか？' },
   { t: 'action', label: '切符を見せる' },
   { t: 'se', sound: 'chime' },
-  { t: 'video', motion: 'd2-ticket-give' }, // 切符が光りながら、MONBANの両手の上に浮かぶ
+  { t: 'video', motion: 'd2-ticket-give' }, // MONBANが切符を受け取り、金色のロケットの絵を確かめて、こちらに返す
   { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
-  { t: 'bgvideo', motion: 11 }, // 門が開く
+  { t: 'se', sound: 'smoke' },
+  { t: 'bgvideo', motion: 11 }, // 門が開く。MONBANが、黒い煙になって消える
   { t: 'action', label: '地球の神殿に向かう' },
   { t: 'bgm', track: null, fade: 2 },
   { t: 'video', motion: '12-a' }, // 門をくぐる
@@ -50,6 +53,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'footsteps' },
   { t: 'video', motion: 'd2-kimorin-walkup' }, // 奥の通路から、KIMORINがゆっくり門まで歩いてくる → 顔のドアップ（劇場版アニメのように）
   { t: 'video', motion: 'd2-reveal' }, // 豪華映像 #2 KIMORINの登場（M-R90）：白衣がひるがえり、扇の尾が一気に開き、ゴーグルが夕日を反射（目は光らない）
+  { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // 門ごしに、本部の建物を、下から上まで、じろじろと見上げる（M-R170）
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'smoke' },
   // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
@@ -245,7 +249,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
   { t: 'se', sound: 'magic' },
   { t: 'video', motion: 'd2-transform' }, // マナジェムから光が水盤へ。水が立ち上がってKIMORINを包む
-  { t: 'caption', text: 'KIMORIN⭐︎のマナジェム　−3マナ' },
+  { t: 'caption', text: 'KIMORINのマナジェム　−3マナ' }, // ⭐︎は、まだ付かない（M-R169）
   { t: 'bgm', track: 'party' },
   { t: 'se', sound: 'crackers' },
   { t: 'video', motion: 'd2-dragon' }, // 腕80本のドラゴン。いっせいにクラッカー、紙吹雪

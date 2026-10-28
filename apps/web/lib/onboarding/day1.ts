@@ -72,7 +72,8 @@ export const DAY1: Step[] = [
   { t: 'say', who: 'OBOLON', text: '{name}か、いいな。' },
   { t: 'say', who: 'OBOLON', text: 'ここは、宇宙秘密結社だ。' },
   { t: 'say', who: 'OBOLON', text: '{name}、\nお前は、宇宙に、行ってみたいと思うか？' },
-  { t: 'choice', key: 'choice1', options: [{ label: '行きたい' }, { label: '行きたくない' }, { label: 'まだわかんない' }] },
+  // answered by voice (M-R169): the voice note and the mic permission come once, here at the first 〔🎙〕
+  { t: 'choice', key: 'choice1', voice: true, options: [{ label: '行きたい' }, { label: '行きたくない' }, { label: 'まだわかんない' }] },
   { t: 'say', who: 'OBOLON', text: 'そうか。' },
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、' },
   { t: 'say', who: 'OBOLON', text: '、、、もう宇宙にいる。' },
