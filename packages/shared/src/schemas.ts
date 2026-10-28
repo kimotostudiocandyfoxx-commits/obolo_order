@@ -38,6 +38,13 @@ export const CHILD_AGE = 15;
 export function isChild(birthYear: number | null | undefined, now = new Date()): boolean {
   return !!birthYear && now.getFullYear() - birthYear < CHILD_AGE;
 }
+/** M-R172: the look is drawn for an age band, never the age itself (the painter only gets the band) */
+export type AgeBand = 'under15' | '15-24' | '25plus';
+export function ageBand(birthYear: number | null | undefined, now = new Date()): AgeBand | null {
+  if (!birthYear) return null;
+  const age = now.getFullYear() - birthYear;
+  return age < CHILD_AGE ? 'under15' : age < 25 ? '15-24' : '25plus';
+}
 export type UpdateProfileBody = z.infer<typeof UpdateProfileBody>;
 
 export const BuddyPersona = z.object({

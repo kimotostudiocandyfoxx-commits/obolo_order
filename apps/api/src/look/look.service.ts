@@ -1,10 +1,10 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { withAgeBand, batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
-import { BATI_FACES, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { ageBand, BATI_FACES, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -148,7 +148,9 @@ export class LookService {
     const fee = await this.fee(userId, 'look', unlimited);
     const tries = await this.kv.incr(key, TRY_TTL);
 
-    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(prompt(i), i, refs));
+    // the look for their age band (M-R172; the birth year itself never reaches the painter)
+    const band = ageBand(Number((u.onboardingJson as Record<string, string> | null)?.birthYear) || null);
+    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(withAgeBand(prompt(i), band), i, refs));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {

@@ -58,7 +58,7 @@ export function SealGate({ onOpen }: { onOpen: () => void }) {
                   </option>
                 ))}
               </select>
-              <span className="mt-1 block text-[11px] leading-relaxed text-white/45">年齢に合わせて、守りの設定を変えるためです。ほかの人には見えません</span>
+              <span className="mt-1 block text-[11px] leading-relaxed text-white/45">年齢に合わせて、守りの設定と、あとで作る姿の絵を合わせるためです。ほかの人には見えません</span>
             </label>
           </div>
           <p className="relative mt-6 max-w-xs text-center text-[12px] leading-relaxed tracking-[0.06em] text-white/55">この先は、あなたの声で進みます。電車やバスの中ではなく、家など、ゆっくりできる場所で開いてください</p>

@@ -138,17 +138,40 @@ const STYLE =
  * can feel it is them; the second rule: here you change your look). Four pictures: two boyish, two girlish
  * (gender is never asked), each with the colours placed differently; skin tones vary for people everywhere.
  */
+const WHO_DEFAULT = 'a young person in their late teens';
 const LOOK_STYLE =
   'Digital painting, semi-realistic fantasy character illustration with visible soft brush strokes, painted skin and hair, stylised painterly ' +
   "cinematic lighting, like a high-end fantasy game's character splash art — NOT a photograph, no photographic skin texture, no camera depth of field. " +
-  'Realistic proportions. Chest-up, centered, facing the viewer, a young person in their ' +
-  'late teens with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood ' +
+  'Realistic proportions. Chest-up, centered, facing the viewer, ' + WHO_DEFAULT + ' with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood ' +
   "pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow, fine gold embroidery along the hood's edge. " +
   'Round sunglasses with thin gold frames and pitch-black lenses with a faint golden reflection are always worn: the eyes are never visible. ' +
   'The mouth and the lower face are visible (no face mask, no scarf over the mouth). Modest clothes under the cloak with a high closed neckline, nothing revealing. ' +
   'Background: a dark night with soft golden glints and faint stars, softly blurred. Square image that works as a round profile icon (the face in ' +
   'the middle). Safe for children. No text, no letters, no logo, no watermark.';
 const LEAN = ['The character reads as a boy.', 'The character reads as a girl.'];
+
+/**
+ * M-R172 (client decision): the look is drawn for the visitor's age band, from the birth year asked on Day 1 — the
+ * painter only ever gets the band. Under 15 as young as they are (no makeup, nothing grown-up); 15-24 as they are;
+ * 25 and over youthful (no signs of ageing, about the late twenties at most), never childlike, the photo's likeness kept.
+ */
+const AGE: Record<'under15' | '15-24' | '25plus', { who: string; line: string }> = {
+  under15: {
+    who: 'a young teenager',
+    line: 'Age: a young teenager, wholesome and as young as they are: no makeup, age-appropriate clothes, no grown-up body or styling.',
+  },
+  '15-24': { who: 'a young person in their late teens or early twenties', line: 'Age: as they are, in their late teens or early twenties.' },
+  '25plus': {
+    who: 'a youthful-looking adult who appears in their mid-to-late twenties',
+    line:
+      'Age: a youthful-looking adult, appears in the mid-to-late twenties, smooth healthy skin; no wrinkles, no smile lines, no under-eye bags, no age spots, ' +
+      'no grey or thinning hair; keep the face shape, hairstyle and vibe of the photo; not childlike. Avoid: wrinkles, aged skin, grey hair.',
+  },
+};
+export function withAgeBand(prompt: string, band: 'under15' | '15-24' | '25plus' | null | undefined): string {
+  if (!band) return prompt;
+  return `${prompt.replace(WHO_DEFAULT, AGE[band].who)} ${AGE[band].line}`;
+}
 const SKIN = ['fair skin', 'light olive skin', 'warm brown skin', 'deep brown skin', 'light tan skin', 'golden-beige skin'];
 const EARS: Record<string, string> = {
   犬: 'soft dog ears',
