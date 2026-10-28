@@ -43,6 +43,7 @@ export function KororinWorld({
   neoOnly = false,
   highlightDrop = false,
   highlightId = null,
+  closeSignal = 0,
   extra,
   roomOnly = false,
   noBar = false,
@@ -63,6 +64,8 @@ export function KororinWorld({
   highlightDrop?: boolean;
   /** the kororin to tap now (a story lesson): a glowing ring and 👇 follow it (QA 5 N11) */
   highlightId?: string | null;
+  /** a number that changes when the story moves on: the open bubble closes (QA 6 R7) */
+  closeSignal?: number;
   /** Extra layer on top (tutorial coach). */
   overlay?: ReactNode;
   className?: string;
@@ -394,7 +397,11 @@ export function KororinWorld({
     setActiveReply(null);
     relay.current = [];
     stopAudio();
-  };
+  };  useEffect(() => {
+    if (closeSignal) close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closeSignal]);
+
 
   const star = async (p: SaturnPostView) => {
     const on = !p.starredByMe;

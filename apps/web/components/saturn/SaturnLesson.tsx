@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
 import { Choice, DecisionButton } from '@/components/story/parts';
 import { getApi } from '@/lib/api';
+import { subscribeAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
@@ -30,7 +31,7 @@ type Beat =
   | { k: 'say'; who: Who; text: string; drop?: 'kimorin'; star?: boolean; redraw?: 'kimorin' }
   | { k: 'note'; text: string }
   | { k: 'recNormal'; prompt: 'first' | 'topics' }
-  | { k: 'listen'; id: 'kimorin' | 'mine' | 'sunset'; text?: string }
+  | { k: 'listen'; id: 'kimorin' | 'mine' | 'sunset' | 'back'; text?: string }
   | { k: 'batiVoice' }
   | { k: 'choice' }
   | { k: 'design' }
@@ -115,9 +116,8 @@ const BEATS: Beat[] = [
   { k: 'send' },
   // KIMORIN⭐︎ rolls his own kororin back on the ring; it dances once in your 〔推し〕
   { k: 'say', who: 'kimorin', text: 'お返しです。ダチなので。' },
-  { k: 'note', text: '上の〔推し〕に、小さな点が一つ灯る' },
-  { k: 'note', text: 'タップすると、歌が聞けます' },
-  { k: 'listen', id: 'kimorin' },
+  { k: 'note', text: '〔推し〕に、KIMORIN⭐︎から届いた（腕80本のコロリン）。タップすると、歌が聞けます' },
+  { k: 'listen', id: 'back' },
   // D04-S006 土星の空のリング (story M-R107): the night relay (luxury video V21, to come), then a kororin rolls to your feet
   { k: 'say', who: 'kimorin', text: '……な、なんやこれ。……失礼。土星の夜は、毎日、こうなのですか？' }, // サングラスが鼻先までずり落ちている
   { k: 'say', who: 'brother', text: 'つぶやいた奴がいる夜は、毎日だZE。' },
@@ -268,6 +268,14 @@ export function SaturnLesson({
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
   const [star, setStar] = useState(false);
+  // your own kororin (QA 6 R6: only it counts at 〔👆 コロリンをタップ〕), a hint when another is tapped
+  const [mineId, setMineId] = useState<string | null>(null);
+  const [hint, setHint] = useState('');
+  // a tapped kororin sings to the end before the story goes on (QA 6 R11)
+  const [waitSong, setWaitSong] = useState(false);
+  // 〔🏠 自分の部屋に飛ばす〕: the kororin rolls away to the room (QA 6 P5)
+  const [flying, setFlying] = useState(false);
+  const [closeSignal, setCloseSignal] = useState(0);
   const voice = useRef<LineVoice | null>(null);
   const rec = useRecorder();
   const beat = beats[i];
@@ -281,6 +289,23 @@ export function SaturnLesson({
     voice.current = v;
     return () => v.dispose();
   }, []);
+  // a spoken line goes on by itself a moment after its voice ends; a tap still skips ahead (QA 6 P2)
+  const iRef = useRef(i);
+  iRef.current = i;
+  const beatRef = useRef(beat);
+  beatRef.current = beat;
+  useEffect(() => {
+    const v = voice.current;
+    if (!v) return;
+    let spokeAt = -1;
+    v.onSpeaking = (on) => {
+      if (on) spokeAt = iRef.current;
+      else if (spokeAt === iRef.current && beatRef.current?.k === 'say') {
+        const at = spokeAt;
+        setTimeout(() => iRef.current === at && setI((n) => (n === at ? n + 1 : n)), 900);
+      }
+    };
+  }, []);
   // the Saturn music plays low under the lesson and stops while the mic records (QA 5 N14)
   const duck = (v: number) => {
     window.dispatchEvent(new CustomEvent('obolo:bgm-duck', { detail: v }));
@@ -292,6 +317,8 @@ export function SaturnLesson({
   // each line plays its voice; the story's kororins drop in with theirs
   useEffect(() => {
     if (!beat) return;
+    if (beat.k !== 'listen') setCloseSignal((n) => n + 1);
+    setHint('');
     if (beat.k === 'say') {
       void voice.current?.say(SPEAKER[beat.who], beat.text);
       if (beat.star) setStar(true);
@@ -300,6 +327,8 @@ export function SaturnLesson({
         // KIMORIN⭐︎'s kororin takes a breath and sings his words in his own voice (M-R152)
         void storyVoice('KIMORIN', KIMORIN_STONE).then((u) => setExtra((x) => [storyPost('story-kimorin', 'KIMORIN⭐︎', spriteUrl('kimorin-face'), KIMORIN_STONE, u), ...x]));
     }
+    if (beat.k === 'say' && beat.text === 'お返しです。ダチなので。')
+      void storyVoice('KIMORIN', 'ダチなので。').then((u) => setExtra((x) => [...x, storyPost('story-kimorin-back', 'KIMORIN⭐︎', KIMORIN_DESIGNED, 'ダチなので。', u)]));
     if (beat.k === 'listen' && beat.id === 'sunset')
       void storyVoice('たこ焼きシスター', SISTER_SUNSET).then((u) => setExtra((x) => [...x, storyPost('story-sunset', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, u)]));
     // D04-S005c: the inviter really becomes a dachi here
@@ -334,6 +363,7 @@ export function SaturnLesson({
     // the story previews (nobody logged in): a kororin that lives on this screen, in the voice just recorded
     post ??= storyPost(`mine-${Date.now()}`, neo || 'あなた', '', words, up ? URL.createObjectURL(up) : neoVoiceUrl(KORORIN_VOICE_STYLE, null, words));
     setExtra((x) => [...x, { ...post!, id: post!.id }]);
+    setMineId(post.id);
     setMade((m) => [...m, words]);
     if (blob) setNormal({ blob, text: words });
     setTyped('');
@@ -403,6 +433,36 @@ export function SaturnLesson({
     next();
   };
 
+  const target = beat?.k === 'listen' ? ({ kimorin: 'story-kimorin', sunset: 'story-sunset', back: 'story-kimorin-back', mine: mineId } as Record<string, string | null>)[beat.id] ?? null : null;
+  // the song plays to its end (the music dips under it), a breath, then the story goes on (QA 6 R11, P12)
+  useEffect(() => {
+    if (!waitSong) return;
+    const at = i;
+    let started = false;
+    let done = false;
+    const go = () => {
+      if (done) return;
+      done = true;
+      duck(0.4);
+      setTimeout(() => {
+        setWaitSong(false);
+        setI((n) => (n === at ? n + 1 : n));
+      }, beatRef.current?.k === 'listen' && beatRef.current.id === 'sunset' ? 1500 : 800);
+    };
+    const off = subscribeAudio((st) => {
+      if (st.playing) {
+        started = true;
+        duck(0.15);
+      } else if (started && st.progress >= 0.95) go();
+    });
+    const cap = setTimeout(go, 12000);
+    return () => {
+      off();
+      clearTimeout(cap);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waitSong]);
+
   const recording = beat?.k === 'recNormal';
   const coachWho: Who = beat?.k === 'say' ? beat.who : 'guide';
   const coachText =
@@ -411,7 +471,7 @@ export function SaturnLesson({
       : beat?.k === 'note'
         ? fill(beat.text)
         : beat?.k === 'listen'
-          ? '👆 コロリンをタップ'
+          ? waitSong ? '♪……' : '👆 光っているコロリンをタップ'
           : beat?.k === 'batiVoice'
             ? fill('いまの普通の声を、少し高くして、{bati}の声にもする？')
             : beat?.k === 'choice'
@@ -425,12 +485,17 @@ export function SaturnLesson({
         roomOnly
         noBar
         extra={extra}
-        highlightId={beat?.k === 'listen' ? (beat.id === 'kimorin' ? 'story-kimorin' : beat.id === 'sunset' ? 'story-sunset' : ([...extra].reverse().find((p) => !p.id.startsWith('story-'))?.id ?? null)) : null}
+        highlightId={beat?.k === 'listen' && !waitSong ? target : null}
+        closeSignal={closeSignal}
         events={{
           onListen: (p) => {
-            if (beat?.k !== 'listen') return;
-            const ok = beat.id === 'kimorin' ? p.id === 'story-kimorin' : beat.id === 'sunset' ? p.id === 'story-sunset' : !p.id.startsWith('story-');
-            if (ok) next();
+            if (beat?.k !== 'listen' || waitSong) return;
+            if (p.id !== target) {
+              setHint(beat.id === 'mine' ? fill('光っている、{neo}のコロリンを押してね') : '光っているコロリンを押してね');
+              return;
+            }
+            setHint('');
+            setWaitSong(true);
           },
         }}
         overlay={
@@ -442,8 +507,11 @@ export function SaturnLesson({
               <div className="pointer-events-none absolute inset-x-0 top-[calc(70px+env(safe-area-inset-top))] z-[200] flex justify-center px-3">
                 <div key={`${i}-${coachText}`} className="flex w-full max-w-md animate-[fadeUp_0.35s_ease-out] items-end gap-2">
                   {SPRITES[coachWho] && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={spriteUrl(SPRITES[coachWho]!)} alt="" className="h-14 w-14 shrink-0 object-contain object-top drop-shadow" />
+                    // the speaker from the chest up, as big as in the temple (QA 6 P1)
+                    <span className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-white/10 shadow-lg ring-2 ring-white/40">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={spriteUrl(SPRITES[coachWho]!)} alt="" className="absolute left-1/2 top-0 h-[230%] w-auto max-w-none -translate-x-1/2 object-contain" />
+                    </span>
                   )}
                   {coachWho === 'bati' && batiImage && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -456,7 +524,18 @@ export function SaturnLesson({
                 </div>
               </div>
             )}
-            {(beat?.k === 'say' || beat?.k === 'note') && <button className="absolute inset-0 z-[195]" aria-label="つぎへ" onClick={next} />}
+            {(beat?.k === 'say' || beat?.k === 'note') && (
+              <button className="absolute inset-0 z-[195]" aria-label="つぎへ" onClick={next}>
+                <span className="absolute right-4 top-[calc(178px+env(safe-area-inset-top))] animate-pulse text-xs text-white/80">▶</span>
+              </button>
+            )}
+            {hint && <p className="pointer-events-none absolute inset-x-0 bottom-[calc(120px+env(safe-area-inset-bottom))] z-[205] text-center"><span className="rounded-full bg-[rgba(20,12,36,0.75)] px-4 py-2 text-[13px] text-amber-100">{hint}</span></p>}
+            {flying && (
+              // your kororin hops and rolls down to the room (QA 6 P5)
+              <span className="pointer-events-none absolute bottom-[40%] left-1/2 z-[206] h-14 w-14 rounded-full bg-gradient-to-b from-amber-400 to-amber-700 shadow-lg" style={{ animation: 'roomRoll 1.4s ease-in forwards' }} />
+            )}
+            {flying && <span className="pointer-events-none absolute bottom-[calc(28px+env(safe-area-inset-bottom))] right-5 z-[206] animate-[fadeUp_0.5s_ease-out] rounded-full bg-white/90 px-3 py-1 text-[12px] font-bold text-[#5a3f8a]">🏠 部屋に、ころん</span>}
+            <style>{'@keyframes roomRoll{0%{transform:translate(-50%,0)}25%{transform:translate(-50%,-60px)}100%{transform:translate(38vw,38svh) rotate(540deg) scale(.5);opacity:.3}}'}</style>
 
             {/* {bati} is the mic: a round button at the bottom */}
             {recording && (
@@ -563,7 +642,17 @@ export function SaturnLesson({
             {beat?.k === 'send' && <SendKororin made={made} inviter={inviter} onDone={sent} />}
             {beat?.k === 'fly' && (
               <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-center px-5 pb-10">
-                <button onClick={next} className="rounded-full border-2 border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500 px-7 py-3 text-[15px] font-bold text-white shadow-lg active:scale-95 animate-[hintGlow_2.2s_ease-in-out_infinite]">
+                <button
+                  onClick={() => {
+                    setFlying(true);
+                    setTimeout(() => {
+                      setFlying(false);
+                      next();
+                    }, 1500);
+                  }}
+                  disabled={flying}
+                  className="rounded-full border-2 border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500 px-7 py-3 text-[15px] font-bold text-white shadow-lg active:scale-95 animate-[hintGlow_2.2s_ease-in-out_infinite]"
+                >
                   🏠 自分の部屋に飛ばす
                 </button>
               </div>
