@@ -25,7 +25,9 @@ const dataUri = (p) => `data:${mime(p)};base64,${readFileSync(p).toString('base6
 const OUT = join('apps/web/public', queue.dir ?? 'ui-art');
 mkdirSync(OUT, { recursive: true });
 const redo = new Set(queue.redo ?? []);
-const todo = queue.items.filter((x) => redo.has(x.id) || !existsSync(join(OUT, `${x.id}.jpg`)));
+// at most MAX_PICTURES a run (default 20): a big batch while Runware's balance is low gets refused for the reserved
+// credit (concurrentRequestLimitExceeded, 2026-10-28); the rest stays for the next run
+const todo = queue.items.filter((x) => redo.has(x.id) || !existsSync(join(OUT, `${x.id}.jpg`))).slice(0, Number(process.env.MAX_PICTURES ?? 20));
 
 const refsOf = (x) => (x.refs ?? queue.refs ?? []).filter(existsSync);
 
