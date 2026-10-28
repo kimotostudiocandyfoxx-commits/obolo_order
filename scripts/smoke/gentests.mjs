@@ -65,7 +65,7 @@ async function look(id, body) {
 // b) bati
 async function bati(egg, food, faces) {
   const id = `${egg}-${food}`;
-  const t = await account(`bati-${egg}-${food}`);
+  const t = await account(`bati-${egg}`);
   await safe('egg', () => call(t, 'POST', '/me/bati/egg', { food, egg }));
   const h = await safe(`hatch ${id}`, () => call(t, 'POST', '/me/bati/hatch'));
   if (h?.j.bati?.imageUrl) img(`bati-${id}`, h.j.bati.imageUrl);
