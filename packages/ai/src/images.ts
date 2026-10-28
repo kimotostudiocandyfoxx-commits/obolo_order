@@ -207,11 +207,13 @@ export function refineLookPrompt(instruction: string, variant = 0): string {
 const capital = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
 /** Jupiter (first journey): Bati draws a sticker's picture from its words (a round sticker, no letters). */
-export function stickerArtPrompt(words: string): string {
+export function stickerArtPrompt(words: string, style?: string): string {
+  // Jupiter's art (M-R151): one square picture that fills the frame; the touch is the one said to {bati}
   return (
-    'A round illustrated sticker on a plain white background: warm, soft hand-painted storybook style, gentle colours, ' +
-    `one simple cute scene that shows this feeling or moment: "${words}". ` +
-    'Fill the circle, a thin white sticker border around it. No text, no letters, no numbers, no logo, no watermark. Do not draw real people or their faces.'
+    'One square artwork that fills the whole square frame edge to edge (no border, no frame, no sticker outline). ' +
+    (style ? `Style and touch: ${style}. ` : 'Style: warm, soft hand-painted storybook illustration, gentle colours. ') +
+    `It shows this feeling or moment: "${words}". ` +
+    'No text, no letters, no numbers, no logo, no watermark. Do not draw real people or their faces.'
   );
 }
 

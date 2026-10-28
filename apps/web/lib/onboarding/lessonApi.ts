@@ -9,7 +9,7 @@ import type { MvMade, SongMade } from './made';
  * (Mercury), the MV (Mars).
  */
 export interface LessonApi {
-  stickerArt(text: string): Promise<{ url: string }>;
+  stickerArt(text: string, style?: string): Promise<{ url: string }>;
   uploadPhoto(blob: Blob): Promise<{ url: string }>;
   /** Bati's lyric draft from the sticker's words */
   lyrics(words: string, partner: string): Promise<SongDesign>;
@@ -39,7 +39,7 @@ export const STYLE_SOUND: Record<string, { prompt: string; bpm: number }> = {
 };
 
 export const realLessonApi: LessonApi = {
-  stickerArt: (text) => getApi().stickerArt(text),
+  stickerArt: (text, style) => getApi().stickerArt(text, style),
   uploadPhoto: (blob) => getApi().uploadPhoto(blob),
   lyrics: (words, partner) => getApi().composeDesign({ partner, isBati: true, genre: 'auto', history: [{ role: 'user', text: words }] }),
   async sing(d, onStage) {

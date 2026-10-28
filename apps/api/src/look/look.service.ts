@@ -267,7 +267,7 @@ export class LookService {
    * day per member (~¥6 each); the mana gem's glow is not wired to it yet.
    */
   async stickerArt(userId: string, body: StickerArtBody, origin: string, unlimited = false): Promise<{ id: string; url: string }> {
-    await this.clean(body.text);
+    await this.clean(`${body.text} ${body.style ?? ''}`);
     const key = `${this.puniKey(userId)}:sticker`;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (!unlimited && used >= STICKER_ART_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'STICKER_TRIES', '今日はもう描けません');
@@ -275,7 +275,7 @@ export class LookService {
     // {bati}'s jacket picture costs mana (3); photos and words-only jackets never come here
     const fee = await this.fee(userId, 'jacketArt', unlimited);
     try {
-      const img = await this.images.generate(stickerArtPrompt(body.text), 0, []);
+      const img = await this.images.generate(stickerArtPrompt(body.text, body.style), 0, []);
       const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
       return { id: m.id, url: m.url };
     } catch (e) {

@@ -179,7 +179,7 @@ export interface Api {
   butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   chooseButterfly(mediaId: string | null): Promise<Me>;
   /** Jupiter (first journey): Bati draws a sticker's picture from its words (kept only for you). */
-  stickerArt(text: string): Promise<{ id: string; url: string }>;
+  stickerArt(text: string, style?: string): Promise<{ id: string; url: string }>;
 
   // Jupiter — パタパタ
   jupiterSky(tab: 'all' | 'following' | 'friends'): Promise<JupiterFlyer[]>;

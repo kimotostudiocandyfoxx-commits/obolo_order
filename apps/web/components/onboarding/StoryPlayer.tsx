@@ -938,9 +938,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bati={v.bati || 'バティ'}
           inviter={v.inviter || 'ともだち'}
           batiImage={v.batiImage}
-          onDone={(stickers, tree, sent) => {
+          look={v.look}
+          onDone={(stickers, atelier, sent) => {
             remember('stickers', JSON.stringify(stickers));
-            remember('my_tree', JSON.stringify(tree));
+            remember('my_atelier', JSON.stringify(atelier));
+            remember('f_d05_tree_parts', atelier.parts.join('|').slice(0, 200));
             remember('f_d05_send', sent ? 'send' : 'keep');
             run(iRef.current + 1);
           }}

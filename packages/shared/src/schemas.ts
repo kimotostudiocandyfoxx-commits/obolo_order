@@ -419,7 +419,8 @@ export type CreateJupiterPostBody = z.infer<typeof CreateJupiterPostBody>;
  * Jupiter (first journey, story 2026-10-14): Bati draws the picture of a sticker from its words
  * (a kororin's words). The picture is kept only for the member; it is posted nowhere.
  */
-export const StickerArtBody = z.object({ text: z.string().trim().min(1).max(60) });
+/** Jupiter's art (M-R151): the words, and the touch said to {bati} (the spell's style cards, M-R142) */
+export const StickerArtBody = z.object({ text: z.string().trim().min(1).max(60), style: z.string().trim().max(80).optional() });
 export type StickerArtBody = z.infer<typeof StickerArtBody>;
 
 /** A reply to a Jupiter post. */
