@@ -422,7 +422,7 @@ export const deliveries = pgTable(
     toUserId: uuid('to_user_id')
       .notNull()
       .references(() => users.id),
-    kind: text('kind').notNull(), // kororin | jacket | song | mv | stage
+    kind: text('kind').notNull(), // kororin | jacket | song | mv | stage | book
     title: text('title').notNull().default(''),
     text: text('text').notNull().default(''),
     url: text('url'),

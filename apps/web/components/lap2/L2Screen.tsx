@@ -113,17 +113,13 @@ const PANELS: Record<L2What, Panel> = {
     options: [OK('つないだ', { l2_synced: 'yes' })],
   },
   'kimorin-mix': { image: '/onboarding/s/venus-night.jpg', caption: '『漆黒の黙示録ミックス』　どぉん……。……どぉん……。', options: [OK()] },
-  goods: {
-    title: '🎨 天空のアトリエ',
-    body: ['①形を選ぶ〔Tシャツ〕〔マグカップ〕〔アクリルスタンド〕〔ステッカー〕〔缶バッジ〕〔トート〕〔おまかせ！〕', '②のせる絵を選ぶ（自分のジャケットや作品。新しく描く時は〔🎙 話してみよう〕。描く時は、マナを使う前にたずねます）', '③ハンドルを回すと、見本が浮かぶ　④〔自分のアトリエに飾る〕。見本だけでは、注文も支払いもしません'],
-    options: [OK('一つ作って、自分のアトリエに飾る', { goods: 'display' }), OK('作って、見本を見るだけ', { goods: 'enough' }), OK('今は作らない', { goods: 'none' })],
-  },
-  'kimorin-mug': { caption: '『封印されし黒虎竜の聖杯　——素手で触れるな』', body: ['黒地に虎じまのブラタゴン島がぐるりと一周。どちらから飲んでも、目が合う。'], options: [OK()] },
-  shop: {
-    title: '🏪 obolo商店',
-    body: ['たこ焼き柄のトートバッグ。作った人・素材・大きさ・『受注生産：注文が入ってから作って届けます。届くまで日数がかかります』', '〔購入〕を押した時だけ、買う画面が開きます（月額88円とは別の料金。マナは使いません）。'],
-    options: [OK('札を閉じる')],
-  },
+  // 天王星 (L2-URANUS-S002〜S004): the makers live in components/uranus; these are their stand-ins
+  novel: { title: '✒️ 書く', body: ['{bati}と話して、お話を書きます'], options: [OK('しまう', { novel: 'auto' }), OK('今日は書かない', { novel: 'none' })] },
+  'kimorin-life': { caption: '『天才の一生』', body: ['KIMORIN⭐︎は、生まれた。', '天才だった。', '今も、天才である。'], options: [OK()] },
+  picturebook: { title: '絵本にする', options: [OK('絵本にする', { picturebook: 'make' })] },
+  library: { title: '📚 my図書館', options: [OK('この図書館にする', { library: 'true', has_book: 'no' }), OK('今はここで止める', { library: 'hold' })] },
+  'owl-send': { title: '🦉 届ける', options: [OK('🦉 飛ばす', { sent_book: 'send' }), OK('今は、棚に置いておく', { sent_book: 'keep' })] },
+  'kimorin-owl': { caption: '『天才の一生』', body: ['KIMORIN⭐︎は、生まれた。', '天才だった。', '今も、天才である。'], options: [OK('本を閉じる')] },
   game: {
     title: '『キモリンの帰り道』',
     body: ['じいちゃんに、土産話を届けよう', '分かれ道。立て札：『←坂の道』『川の道→』『まっすぐ：たこ焼き屋の前』'],

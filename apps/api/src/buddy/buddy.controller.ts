@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { BuddyChatBody, BuddyPictureBody, CompassBody, UpdateBuddyProfileBody } from '@obolo/shared';
+import { BuddyChatBody, BuddyPictureBody, CompassBody, StoryBody, UpdateBuddyProfileBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -7,6 +7,7 @@ import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { BuddyService } from './buddy.service';
 import { CompassService } from './compass.service';
+import { StoryService } from './story.service';
 import { PictureService } from './picture.service';
 
 @Controller('buddy')
@@ -16,6 +17,7 @@ export class BuddyController {
     private readonly buddy: BuddyService,
     private readonly pictures: PictureService,
     private readonly compass: CompassService,
+    private readonly story: StoryService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -63,6 +65,15 @@ export class BuddyController {
     const b = parseBody(CompassBody, body);
     await rateLimit(this.kv, `compass:${userId}`, 30, 3600);
     return { cards: await this.compass.read(b) };
+  }
+
+  /** 天王星 〔✒️ 書く〕: what was said → spell cards (free); the cards → a short story (mana, asked before) */
+  @Post('story')
+  @HttpCode(200)
+  async writeStory(@UserId() userId: string, @Body() body: unknown) {
+    const b = parseBody(StoryBody, body);
+    await rateLimit(this.kv, `story:${userId}`, 30, 3600);
+    return b.step === 'cards' ? this.story.cards(b.said) : this.story.write(userId, b.cards);
   }
 
   @Delete('memory')

@@ -18,6 +18,7 @@ import { VoiceService } from './voice/voice.service';
 import { BuddyController } from './buddy/buddy.controller';
 import { BuddyService } from './buddy/buddy.service';
 import { CompassService } from './buddy/compass.service';
+import { StoryService } from './buddy/story.service';
 import { PictureService } from './buddy/picture.service';
 import { HealthController } from './health.controller';
 import { DachiController } from './dachi/dachi.controller';
@@ -84,6 +85,7 @@ import { WalletController } from './wallet/wallet.controller';
     BuddyService,
     PictureService,
     CompassService,
+    StoryService,
     MediaService,
     SaturnService,
     PlazaService,

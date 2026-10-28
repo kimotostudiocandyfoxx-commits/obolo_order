@@ -1,4 +1,4 @@
-import type { LineVoicesBody, LineVoicesView, MvProjectView, TimelinePlanet } from '@obolo/shared';
+import type { LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
 import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
@@ -397,6 +397,12 @@ export class HttpApi implements Api {
   }
   compass(body: Parameters<Api['compass']>[0]) {
     return this.req<Awaited<ReturnType<Api['compass']>>>('POST', '/buddy/compass', body);
+  }
+  storyCards(said: string) {
+    return this.req<{ cards: string[] }>('POST', '/buddy/story', { step: 'cards', said });
+  }
+  writeStory(cards: string[]) {
+    return this.req<StoryResult>('POST', '/buddy/story', { step: 'write', cards });
   }
   lookChibi() {
     return this.req<Awaited<ReturnType<Api['lookChibi']>>>('POST', '/me/look/chibi');

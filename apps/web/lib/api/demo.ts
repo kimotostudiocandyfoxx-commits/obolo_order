@@ -1155,6 +1155,24 @@ export class DemoApi implements Api {
     const all = (body.kind === 'art' ? art : song).map(([group, text]) => ({ group, text }));
     return { cards: body.focus ? all.filter((c) => c.group === body.focus) : all };
   }
+  async storyCards(said: string) {
+    await sleep(700);
+    const parts = said.split(/[、。！？!?\s　]+/).filter(Boolean).slice(0, 4).map((p) => p.slice(0, 12));
+    return { cards: [`主人公：${parts[0] ?? 'たこ焼き'}`, ...parts.slice(1), '短いお話'] };
+  }
+  async writeStory(cards: string[]) {
+    this.charge('story');
+    await sleep(1600);
+    const hero = (cards.find((c) => c.startsWith('主人公：')) ?? '主人公：たこ焼き').slice(4);
+    return {
+      title: `${hero}の旅`,
+      pages: [
+        { text: `ある日、${hero}は、いつもの場所から、ころりと転がりだしました。「どこへ行くんだろう」。風が、そっと背中をおしました。`, scene: `${hero}が転がりだす` },
+        { text: `星と星のあいだを、${hero}は進みます。こわい夜もあったけれど、小さな光が、道をてらしてくれました。`, scene: '星のあいだの道' },
+        { text: `いちばん遠くで、${hero}は、ふりかえりました。来た道が、きらきら光っています。「また、帰ろう」。${hero}は、にっこり笑いました。`, scene: '光る帰り道' },
+      ],
+    };
+  }
   async lookChibi() {
     return this.patchMe((u) => ({ lookChibi: u.avatarUrl ?? null }));
   }

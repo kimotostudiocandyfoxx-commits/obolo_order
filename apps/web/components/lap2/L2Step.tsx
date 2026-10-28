@@ -6,7 +6,6 @@ import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
 import { BatiAsk } from './BatiAsk';
 import { DaydreamJacket } from './DaydreamJacket';
-import { GoodsPress } from './GoodsPress';
 import { HomewardGame } from './HomewardGame';
 import { L2Screen } from './L2Screen';
 import { PlaceSong } from './PlaceSong';
@@ -18,6 +17,10 @@ import { KororinRelay } from './KororinRelay';
 import { AtelierVisit } from './AtelierVisit';
 import { IslandWorks } from './IslandWorks';
 import { SpellCompass } from './SpellCompass';
+import { LibraryBuild, KimorinOwl, OwlSend } from '@/components/uranus/LibraryBuild';
+import { PictureBook } from '@/components/uranus/PictureBook';
+import { StoryDesk } from '@/components/uranus/StoryDesk';
+import { spriteUrl } from '@/lib/onboarding/media';
 
 /**
  * One second-journey screen ({ t: 'l2', what }): the makers built so far, else the script's panel (L2Screen).
@@ -69,13 +72,17 @@ export function L2Step({
       return <PlaceSong onDone={onDone} />;
     case 'theater':
       return <Theater mv={v.made?.mv ?? null} neo={v.neo || v.name} onDone={onDone} />;
-    case 'goods':
-      return (
-        <GoodsPress
-          pictures={[...(v.made?.stickers ?? []), ...(v.made?.song?.jacket ? [{ text: v.made.song.title, url: v.made.song.jacket }] : []), ...(v.look ? [{ text: v.neo || v.name, url: v.look }] : []), { text: v.neo || v.name || 'Obolo', url: null }]}
-          onDone={onDone}
-        />
-      );
+    // 天王星 (L2-URANUS-S002〜S004, M-R158)
+    case 'novel':
+      return <StoryDesk neo={v.neo || v.name} bati={v.bati ?? 'バティ'} arts={v.made?.stickers ?? []} words={v.made?.kororins ?? []} onDone={onDone} />;
+    case 'picturebook':
+      return <PictureBook neo={v.neo || v.name} bati={v.bati ?? 'バティ'} arts={v.made?.stickers ?? []} onDone={onDone} />;
+    case 'library':
+      return <LibraryBuild neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
+    case 'owl-send':
+      return <OwlSend neo={v.neo || v.name} face={v.lookChibi || v.look} onDone={onDone} />;
+    case 'kimorin-owl':
+      return <KimorinOwl face={spriteUrl('kimorin-face')} onDone={onDone} />;
     case 'game':
       return <HomewardGame watch={answers.game === 'KIMORINが遊ぶのを、となりで見る'} onDone={onDone} />;
     case 'booth':

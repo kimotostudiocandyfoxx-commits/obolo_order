@@ -148,6 +148,12 @@ export interface CompassCard {
   text: string;
 }
 
+/** 天王星: a story {bati} wrote from the spell cards; each page carries a scene line for its picture */
+export interface StoryResult {
+  title: string;
+  pages: { text: string; scene: string }[];
+}
+
 export interface BuddyPicture {
   url: string;
   title: string;

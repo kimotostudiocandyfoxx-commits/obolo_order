@@ -2,74 +2,102 @@ import type { Step } from '../script';
 import { chapterEnd, flight } from './common';
 
 /**
- * L2 chapter 6 【天王星】 — review/L2_天王星.md (L2-URANUS-S001, S003, S004, S005).
- * Above the clouds, white planet ateliers and the obolo shop; the brother rides his three-wheeled バイカ.
- * Goods from your own pictures (a sample only — nothing is ordered), KIMORIN's 「封印されし黒虎竜の聖杯」,
- * the shop (made to order, paid in money apart from the ¥88, never with mana) and KIMORIN's empty shelf.
+ * L2 chapter 6 【天王星】 — wip/P09/c01 (L2-URANUS-S001〜S005, story M-R158): the planet of stories, turning like the
+ * pages of a book. 〔✒️ 書く〕 a short story with {bati} (spell cards, mana asked first) → 絵本にする → my図書館 from
+ * the part cards → the {neo} owl carries the book to the dachi. KIMORIN's autobiography 『天才の一生』 is three lines.
  */
 export const L2_URANUS: Step[] = [
   ...flight('天王星に着いた'),
-  // 映像（豪華・約12秒）：横倒しの輪→雲の上の野原、白いプラネットのアトリエ→バイカ→看板『obolo商店』 — a still for now
+  // 映像（豪華・約12秒）：横倒しの星が、雲を本のページのようにめくりながら回る→雲の上の野原、紙の道、小さな図書館 — a still for now
   { t: 'bgm', track: 'city' },
   { t: 'still', image: 's/uranus-field' },
-  { t: 'sprite', image: 'takoyaki-brother' }, // バイカに乗って、プラネットの前に止まりながら
+  { t: 'sprite', image: 'takoyaki-brother' }, // バイカに乗って、{neo}の前に止まりながら
   { t: 'say', who: 'たこ焼きブラザー', text: 'よく来たZE、{neo}。' },
   { t: 'say', who: 'たこ焼きブラザー', text: '地図で、扉だけ見えてた星だZE。Obolo Orderになった者だけが、入れるZE。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '天王星のアトリエは、俺が受け持ってるZE。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '今日から、自分の絵でグッズを作って、自分のアトリエに飾れるZE。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'それと、まん中のobolo商店を、見て回れるZE。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'この野原は、いつか、プラネットの並ぶ町になるらしいZE。' },
-  { t: 'notice', text: '天王星では、行きたいアトリエやobolo商店をタップすると、バイカでそこまで走ります。どこへでも、自由に行けます' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '天王星は、物語の星だZE。星ごと、本のページをめくるみたいに回ってるZE。ここは、俺が受け持ってるZE。' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '今日から、お話を書いて、絵本にして、自分の図書館の本棚に並べられるZE。' },
+  { t: 'notice', text: '天王星｜下に〔🦉 本の空〕〔✒️ 書く〕〔📚 my図書館〕。行きたい場所をタップすると、バイカでそこまで走ります。どこへでも、自由に行けます' },
 
-  // L2-URANUS-S003 天空のアトリエ
-  { t: 'still', image: 's/uranus-press' }, // 輪の根元の浮島。黒い鉄の大きな刷り台に、ハンドルが一本
-  { t: 'say', who: 'たこ焼きブラザー', text: '形を選んで、絵をのせて、ハンドルを回す。それだけだZE。' },
+  // L2-URANUS-S002 お話を書く — 野原のまん中に、大きな本の形の台。開いたページの上に、羽ペンが一本
+  { t: 'say', who: 'たこ焼きブラザー', text: 'お話は、{bati}と話して書くZE。' },
   { t: 'sprite', image: null },
-  { t: 'l2', what: 'goods' },
-  { t: 'branch', key: 'goods', cases: { none: 'unone', display: 'ushown', enough: 'uenough' }, otherwise: 'uvisit' },
-  { t: 'label', id: 'ushown' },
-  { t: 'notice', text: '{neo}のアトリエに飾りました。注文はしていません' },
-  { t: 'goto', id: 'uvisit' },
-  { t: 'label', id: 'uenough' },
-  { t: 'notice', text: '保存はしていません。〔つくる〕は、いつでも使えます' },
-  { t: 'goto', id: 'uvisit' },
+  { t: 'l2', what: 'novel' },
+  { t: 'branch', key: 'novel', cases: { none: 'unone' }, otherwise: 'uwrote' },
   { t: 'label', id: 'unone' },
   { t: 'sprite', image: 'takoyaki-brother' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '作るのは、いつでもいいZE。' },
-  { t: 'label', id: 'uvisit' },
-  { t: 'notice', text: '〔ダチのアトリエ〕の札を押すと、ダチのアトリエを訪ねられます（あなたのアトリエを見に来られるのも、ダチだけです）' },
-  { t: 'l2', what: 'kimorin-mug' }, // 黒地に虎じまのブラタゴン島のマグ。札：『封印されし黒虎竜の聖杯　——素手で触れるな』
+  { t: 'say', who: 'たこ焼きブラザー', text: '書かない日も、あっていいZE。ページは、逃げないZE。' },
+  { t: 'goto', id: 'ulib' },
+  { t: 'label', id: 'uwrote' },
+  { t: 'notice', text: 'お話を、{neo}だけの〔🔒 机の引き出し〕にしまいました。誰にも送られていません' },
+  // となりの台で、KIMORINが、Bluenaに長いこと吹きこんでいる。身ぶり手ぶりも、ついている
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……そういう設計です。' },
+  { t: 'say', who: 'KIMORIN', text: '……では、私も、一冊。自伝です。題は『天才の一生』。' },
+  { t: 'l2', what: 'kimorin-life' }, // ページに字が浮かぶ。三行で、止まる
+  { t: 'say', who: 'KIMORIN', text: '……三行やん。なんやこれ。' }, // サングラスが、鼻先までずり落ちる
+  { t: 'say', who: 'KIMORIN', text: '……失礼。要点だけに、なりましたね。' }, // こほん。サングラスを、指でかけ直す
+  { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun'] },
+  { t: 'say', who: 'たこ焼きブラザー', text: '三行でも、一冊は、一冊だZE。' },
 
-  // L2-URANUS-S004 obolo商店
+  // L2-URANUS-S003 絵本にする — お話のページが、ひとりでにめくれる
+  { t: 'sprite', image: 'takoyaki-brother' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '次は、絵本だZE。お話をページに分けて、ページごとに絵をつけるZE。' },
   { t: 'sprite', image: null },
-  { t: 'still', image: 's/uranus-shop' }, // 店番はいない。棚に、住人たちのグッズの見本。『受注生産』の札
+  { t: 'choice', key: 'picturebook', options: [{ label: '絵本にする', goto: 'upb' }, { label: '今は、お話のままにする', goto: 'utext' }] },
+  { t: 'label', id: 'utext' },
   { t: 'sprite', image: 'takoyaki-brother' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '品物に触ると、札が出るZE。見て回るだけでもいいZE。' },
-  { t: 'notice', text: '支払いはお金で、月額88円（毎月のマナの代金）とは別の料金です。売り買いに、マナは使いません。自分のグッズを並べる申請は、三周目の旅から開きます' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '絵は、いつでもつけられるZE。' },
+  { t: 'goto', id: 'usong' },
+  { t: 'label', id: 'upb' },
+  { t: 'l2', what: 'picturebook' },
+  { t: 'branch', key: 'picturebook', cases: { make: 'upbdone' }, otherwise: 'usong' },
+  { t: 'label', id: 'upbdone' },
+  { t: 'caption', text: '絵本ができた' },
+  { t: 'notice', text: '絵本を、{neo}だけの〔🔒 机の引き出し〕にしまいました。誰にも送られていません' },
+  { t: 'label', id: 'usong' },
+  { t: 'sprite', image: 'takoyaki-brother' },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'お話に主題歌がほしくなったら、水星で作れるZE。' },
+
+  // L2-URANUS-S004 my図書館と、ダチの空へ — 野原のはしに、何もない一区画。{neo}の名前の札
+  { t: 'label', id: 'ulib' },
+  { t: 'sprite', image: 'takoyaki-brother' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '書いた本を並べる場所だZE。図書館は、自分で建てるZE。' },
   { t: 'sprite', image: null },
-  { t: 'choice', key: 'shop', options: [{ label: '棚の品物に触ってみる', goto: 'ulook' }, { label: '今はいい', goto: 'uskip' }] },
-  { t: 'label', id: 'ulook' },
-  { t: 'l2', what: 'shop' }, // たこ焼き柄のトートバッグの札。いちばん下に〔購入〕
+  { t: 'l2', what: 'library' },
+  { t: 'branch', key: 'library', cases: { hold: 'uhold' }, otherwise: 'ubuilt' },
+  { t: 'label', id: 'uhold' },
   { t: 'sprite', image: 'takoyaki-brother' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '注文すれば、家に届くZE。値段と送料と届け先を見て、欲しかったら注文するZE。' },
-  { t: 'goto', id: 'ushelf' },
-  { t: 'label', id: 'uskip' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '土地は、待ってるZE。' },
+  { t: 'goto', id: 'uend' },
+  { t: 'label', id: 'ubuilt' },
+  { t: 'caption', text: 'my図書館ができた' },
+  { t: 'branch', key: 'has_book', cases: { yes: 'usend' }, otherwise: 'uempty' },
+  { t: 'label', id: 'uempty' },
   { t: 'sprite', image: 'takoyaki-brother' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '見るのは、いつでもいいZE。' },
-  { t: 'label', id: 'ushelf' },
-  // いちばん奥の『空き棚』。KIMORINが看板のすみに、白い小旗を一本。サングラスを額に押し上げる。目の切れ目が青く光る
+  { t: 'say', who: 'たこ焼きブラザー', text: '棚は、書いた分だけ、埋まるZE。' },
+  { t: 'goto', id: 'ukowl' },
+  { t: 'label', id: 'usend' },
+  { t: 'sprite', image: 'takoyaki-brother' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '次は、届けるZE。' },
+  { t: 'sprite', image: null },
+  { t: 'l2', what: 'owl-send' },
+  { t: 'branch', key: 'sent_book', cases: { keep: 'ukeep' }, otherwise: 'ukowl' },
+  { t: 'label', id: 'ukeep' },
+  { t: 'sprite', image: 'takoyaki-brother' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '届けるのは、いつでもいいZE。' },
+  { t: 'notice', text: '〔🦉 届ける〕は、棚の本から、いつでも押せます' },
+  { t: 'label', id: 'ukowl' },
+  { t: 'sprite', image: null },
+  { t: 'notice', text: '上の〔推し〕に、ダチのフクロウが本を抱えて飛んできます。タップすると本が開きます' },
+  { t: 'l2', what: 'kimorin-owl' }, // 丸いサングラスをかけた、小さなKIMORINの顔のフクロウ。『天才の一生』。三行
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: 'オレもいつか、obolo商店に並べるケン。……黒くて、しましまのやつがいいケン。' },
-  { t: 'sprite', image: ['unchi-pinpon', 'kimorin-sun'] },
-  { t: 'say', who: 'うんちピンポンくん', text: '……ピンポン♪' },
+  { t: 'say', who: 'KIMORIN', text: '……軽いので、すぐに着きました。' },
 
   // L2-URANUS-S005 海王星が開いた
+  { t: 'label', id: 'uend' },
   { t: 'sprite', image: 'takoyaki-brother' },
   { t: 'say', who: 'たこ焼きブラザー', text: '次は、海王星だZE。' },
   { t: 'caption', text: '海王星が開いた' },
-  { t: 'notice', text: '天王星でグッズを作る・飾る、アトリエやobolo商店を見て回ることは、このあとも自由にできます' },
+  { t: 'notice', text: '天王星でお話を書く・絵本にする、my図書館を飾る・本を届けることは、このあとも自由にできます' },
   { t: 'sprite', image: null },
   ...chapterEnd(6),
 ];

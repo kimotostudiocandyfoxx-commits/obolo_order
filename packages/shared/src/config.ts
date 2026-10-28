@@ -35,7 +35,7 @@ export const STARTER_GEM_MANA = 40;
 /**
  * What making costs (the story's table, D08-S002). Voice kororins, photo / words-only jackets, delivering and DJ are free.
  */
-export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8 } as const;
+export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1 } as const;
 export type MakeKind = keyof typeof MAKE_COST;
 /** Spec §1.1 — subscription price in JPY. */
 export const SUBSCRIPTION_PRICE_JPY = 88;

@@ -77,6 +77,13 @@ export const CompassBody = z
   .refine((b) => !!b.media !== !!b.url, { message: 'one of media or url' });
 export type CompassBody = z.infer<typeof CompassBody>;
 
+/** 天王星 〔✒️ 書く〕 (L2-URANUS-S002): what was said → spell cards (free), or the cards → a short story (mana) */
+export const StoryBody = z.union([
+  z.object({ step: z.literal('cards'), said: z.string().trim().min(1).max(300) }),
+  z.object({ step: z.literal('write'), cards: z.array(z.string().trim().min(1).max(24)).min(1).max(12) }),
+]);
+export type StoryBody = z.infer<typeof StoryBody>;
+
 export const CreateSaturnPostBody = z
   .object({
     text: z.string().trim().min(1).max(SATURN_MAX_CHARS),
@@ -465,7 +472,7 @@ export const CreatePlanetPostBody = z.object({
 export type CreatePlanetPostBody = z.infer<typeof CreatePlanetPostBody>;
 
 // --- ダチに届ける (story draft 21, M-R124: the first journey delivers to the dachi: {inviter} and KIMORIN⭐︎) ---
-export const DELIVERY_KINDS = ['kororin', 'jacket', 'song', 'mv', 'stage'] as const;
+export const DELIVERY_KINDS = ['kororin', 'jacket', 'song', 'mv', 'stage', 'book'] as const;
 export type DeliveryKind = (typeof DELIVERY_KINDS)[number];
 /** a delivery stays in the dachi's 〔推し〕 for 88 hours, then goes home to the maker's place */
 export const DELIVERY_HOURS = 88;

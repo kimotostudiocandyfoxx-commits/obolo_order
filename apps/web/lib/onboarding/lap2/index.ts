@@ -28,6 +28,6 @@ export type L2What =
   | 'my-island' | 'kimorin-song2' | 'place-song' | 'theme-island' | 'island-deco' | 'kimorin-island'
   | 'kimorin-ten' | 'theater'
   | 'booth' | 'kimorin-mix'
-  | 'goods' | 'kimorin-mug' | 'shop'
+  | 'novel' | 'kimorin-life' | 'picturebook' | 'library' | 'owl-send' | 'kimorin-owl'
   | 'game'
   | 'round-cards' | 'route' | 'switchboard' | 'comms';

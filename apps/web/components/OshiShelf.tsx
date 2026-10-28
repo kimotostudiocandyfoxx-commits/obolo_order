@@ -10,7 +10,7 @@ import { useAuth } from '@/lib/auth';
  * for 88 hours each. A dachi's work carries a small name tag. It plays only when tapped; eight at a time;
  * nothing is counted (no numbers anywhere, no "seen" marks back to the sender).
  */
-const ICON: Record<DeliveryView['kind'], string> = { kororin: '🪐', jacket: '🦋', song: '🚢', mv: '🛸', stage: '🎤' };
+const ICON: Record<DeliveryView['kind'], string> = { kororin: '🪐', jacket: '🦋', song: '🚢', mv: '🛸', stage: '🎤', book: '🦉' };
 
 export function OshiShelf() {
   const { me } = useAuth();
