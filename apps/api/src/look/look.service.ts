@@ -94,6 +94,7 @@ export class LookService {
     @Inject(QUEUE) private readonly queue: JobQueue,
   ) {
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
+    this.queue.register('bati.repaint', ({ userId, origin }) => this.repaintBati(userId, origin));
   }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
@@ -406,17 +407,48 @@ export class LookService {
         this.log.warn(`bati generation failed (${k + 1}): ${String(e)}`);
       }
     }
+    let stand = false;
     if (!url && body) {
       const png = await cutoutWhite(body.data, 768, BATI_GREY).catch(() => null);
       if (png) url = (await this.media.storeImage(userId, 'bati', 'image/png', png, origin)).url;
+      stand = !!url;
     }
     await this.kv.del(`bati:painting:${userId}`);
     if (!url) return u;
     // the food changed meanwhile (a new egg): this picture is not theirs any more
     const cur = await this.user(userId);
     if (cur.batiFood !== u.batiFood || cur.batiImageUrl) return cur;
-    const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
+    if (stand) j['bati.stand'] = '1';
+    else delete j['bati.stand'];
+    const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    // the plain body is only a stand-in: painted again in the background
+    if (stand) await this.queue.enqueue('bati.repaint', { userId, origin }, { dedupeKey: `bati-repaint-${userId}` }).catch(() => undefined);
     return nu;
+  }
+
+  /** the stand-in body replaced by the real picture (a few tries, a minute apart); the faces are made again from it */
+  private async repaintBati(userId: string, origin: string) {
+    for (let k = 0; k < 3; k++) {
+      await new Promise((r) => setTimeout(r, 60_000));
+      const u = await this.user(userId);
+      if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
+      const body = await this.batiBody((await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
+      try {
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body), 7 + k, body ? [body] : []);
+        const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
+        const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+        const cur = await this.user(userId);
+        if (cur.batiFood !== u.batiFood) return;
+        const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
+        delete j['bati.stand'];
+        delete j['bati.faces'];
+        await this.db.write.update(users).set({ batiImageUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId));
+        return;
+      } catch (e) {
+        this.log.warn(`bati repaint failed (${k + 1}): ${String(e)}`);
+      }
+    }
   }
 
   /** One of the egg's eight body types, at random (none on disk → null, the free drawing). */

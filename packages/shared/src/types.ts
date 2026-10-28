@@ -67,6 +67,8 @@ export interface BatiView {
   /** set once it has hatched and been named */
   name: string | null;
   imageUrl: string | null;
+  /** the picture is the egg's plain body for now (the painter failed); it is painted again in the background */
+  stand?: boolean;
   /**
    * the expressions drawn from the hatched picture (M-R139): smile / sparkle / surprise / think / sad / yawn →
    * URL; made once after the hatching (POST /me/bati/faces), missing ones fall back to `imageUrl`

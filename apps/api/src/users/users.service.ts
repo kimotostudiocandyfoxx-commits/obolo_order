@@ -52,7 +52,9 @@ export function toMe(u: typeof users.$inferSelect): Me {
     lookIcon: (u.onboardingJson as Record<string, string> | null)?.['look.icon'] ?? null,
     birthYear: Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null,
     child: isChild(Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null),
-    bati: u.batiFood ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, faces: batiFaces(u.onboardingJson) } : null,
+    bati: u.batiFood
+      ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, stand: !!(u.onboardingJson as Record<string, string> | null)?.['bati.stand'], faces: batiFaces(u.onboardingJson) }
+      : null,
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },
     look: u.lookJson ?? null,
