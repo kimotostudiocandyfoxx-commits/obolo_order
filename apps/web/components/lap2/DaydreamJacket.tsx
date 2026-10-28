@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Sticker } from '@/components/jupiter/JupiterLesson';
+import { Sticker, spellCards } from '@/components/jupiter/JupiterLesson';
+import { SpellCompass } from './SpellCompass';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StickerMade } from '@/lib/onboarding/made';
@@ -10,25 +11,45 @@ import type { StickerMade } from '@/lib/onboarding/made';
  * A jacket from a daydream (L2-JUPITER-S002): the words by voice (〔おまかせ〕 / 〔パス〕 → 『雲の上の世界樹』),
  * then the picture — 〔写真を添える〕〔{bati}に描いてもらう〕〔字だけ〕, the same size, none lit first. Only Bati's
  * drawing uses mana, asked first and without numbers. Then 〔🔒 根っこにしまう〕 or 〔🦋 投稿する〕 → 〔ダチへ〕 → 〔🦋 飛ばす〕.
+ * Obolo Order (R21b, M-R145/M-R167): everyone sees the spell cards and may rearrange them by hand
+ * (〔✏️ スペルを組み替える〕: remove, add by voice, take from the spellbook); 〔🧭 スペルコンパス〕 reads a picture
+ * you like into cards first.
  */
+function loadBook(): string[][] {
+  try {
+    return JSON.parse(localStorage.getItem('obolo.spellbook') ?? '[]') as string[][];
+  } catch {
+    return [];
+  }
+}
 const OMAKASE = ['行ってみたい場所', 'まだない曲のジャケット', '夢で見たもの'];
-type Phase = 'words' | 'art' | 'ask' | 'drawing' | 'ready' | 'dest' | 'flying';
+type Phase = 'words' | 'cards' | 'art' | 'ask' | 'drawing' | 'ready' | 'dest' | 'flying';
 
 export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; bati: string; fill: (s: string) => string; onDone: (a: Record<string, string>) => void }) {
   const [phase, setPhase] = useState<Phase>('words');
   const [words, setWords] = useState('');
   const [j, setJ] = useState<StickerMade | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [cards, setCards] = useState<string[]>([]);
+  const [extra, setExtra] = useState<string[]>([]);
+  const [compass, setCompass] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [add, setAdd] = useState('');
+  const [book, setBook] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   const begin = (text: string) => {
-    setJ({ text: text.trim() || '雲の上の世界樹', url: null });
-    setPhase('art');
+    const t = text.trim() || '雲の上の世界樹';
+    setJ({ text: t, url: null });
+    setCards(spellCards(t, extra));
+    setPhase('cards');
   };
   const draw = async () => {
     if (!j || !api) return;
     setPhase('drawing');
     try {
-      const r = await api.stickerArt(j.text);
+      const own = spellCards(j.text);
+      const style = cards.filter((c) => !own.includes(c)).join('、');
+      const r = await api.stickerArt(j.text, style || undefined);
       setJ({ ...j, url: r.url });
       setPhase('ready');
     } catch {
@@ -71,6 +92,64 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
             </div>
             <button onClick={() => begin(words)} className={btn}>
               {words.trim() ? 'この空想で' : 'パス'}
+            </button>
+            <button onClick={() => setCompass(true)} className="w-full py-1.5 text-[12px] text-amber-200/90">
+              🧭 こんな絵にしたい絵を、スペルコンパスで読む{extra.length ? `（${extra.length}枚の札）` : ''}
+            </button>
+          </div>
+        )}
+        {phase === 'cards' && (
+          <div className="mt-3 space-y-2">
+            <p className="text-center text-[12px] text-amber-50/70">{fill(`${bati || 'バティ'}「じゃあ、スペルは、こうなるね！」`)}</p>
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {cards.map((c, i) => (
+                <span key={`${c}-${i}`} className="flex items-center gap-1 rounded-md bg-gradient-to-b from-violet-50 to-amber-50 px-2 py-1 font-serif text-[13px] font-bold text-violet-800">
+                  〈{c}〉
+                  {edit && (
+                    <button onClick={() => setCards((x) => x.filter((_, k) => k !== i))} className="text-[11px] text-violet-400" aria-label="外す">
+                      ✕
+                    </button>
+                  )}
+                </span>
+              ))}
+            </div>
+            {edit ? (
+              <div className="space-y-2">
+                <VoiceField value={add} onChange={setAdd} placeholder="足したい札（例：朝の光）" maxLength={14} />
+                <button
+                  onClick={() => {
+                    if (add.trim()) setCards((x) => [...x, add.trim()]);
+                    setAdd('');
+                  }}
+                  disabled={!add.trim()}
+                  className={btn}
+                >
+                  札を足す
+                </button>
+                <button onClick={() => setBook((b) => !b)} className="w-full py-1 text-[12px] text-violet-200">
+                  📖 スペルブックから出す
+                </button>
+                {book && (
+                  <div className="max-h-32 space-y-1 overflow-y-auto">
+                    {loadBook().length ? (
+                      loadBook().map((sp, k) => (
+                        <button key={k} onClick={() => setCards((x) => [...x, ...sp.filter((c) => !x.includes(c))])} className="block w-full truncate rounded-lg bg-white/5 px-2 py-1 text-left text-[12px]">
+                          {sp.map((c) => `〈${c}〉`).join('')}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-center text-[11px] text-amber-50/50">まだ、記したスペルはありません</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button onClick={() => setEdit(true)} className="w-full py-1 text-[12px] text-amber-200/90">
+                ✏️ スペルを組み替える
+              </button>
+            )}
+            <button onClick={() => setPhase('art')} className={btn}>
+              このスペルで
             </button>
           </div>
         )}
@@ -130,6 +209,16 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
           </div>
         )}
       </div>
+      {compass && (
+        <SpellCompass
+          kind="art"
+          onClose={() => setCompass(false)}
+          onAdd={(c) => {
+            setExtra((x) => [...x, ...c.filter((v) => !x.includes(v))]);
+            setCompass(false);
+          }}
+        />
+      )}
       <style>{'@keyframes flyAway{0%{transform:none;opacity:1}30%{transform:translateY(-10px) scaleX(0.6)}60%{transform:translateY(-120px) scaleX(1)}100%{transform:translate(80px,-420px) scale(0.4);opacity:0}}'}</style>
     </div>
   );

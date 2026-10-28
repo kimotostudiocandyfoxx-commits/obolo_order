@@ -1,4 +1,4 @@
-import type { BuddyPicture, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { CompassCard, BuddyPicture, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -258,6 +258,8 @@ export interface Api {
   lookChibi(): Promise<Me>;
   /** 〔🖼 絵で見る〕 under one of Bati's answers (null = none found) */
   buddyPicture(question: string, answer?: string): Promise<{ picture: BuddyPicture | null }>;
+  /** 〔🧭 スペルコンパス〕: a picture / a song clip / a YouTube link → spell cards */
+  compass(body: { kind: 'art' | 'song'; focus?: string; media?: { mime: string; data: string }; url?: string }): Promise<{ cards: CompassCard[] }>;
   myInvites(): Promise<MyInviteView[]>;
   /** `message`: a few words of your own printed on the invitation (optional) */
   createInvite(email: string, message?: string): Promise<MyInviteView>;

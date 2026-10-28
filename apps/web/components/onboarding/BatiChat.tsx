@@ -3,6 +3,7 @@
 import type { BuddyPicture } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
+import { saveSpell } from '@/components/jupiter/JupiterLesson';
 import { VoiceField } from './StoryExtras';
 
 /**
@@ -33,8 +34,11 @@ export function BatiChat({
   faces,
   first,
   me,
+  spell = false,
   onDone,
 }: {
+  /** Obolo Order (L2 Moon, M-R166): an answer can be kept in the spellbook as cards */
+  spell?: boolean;
   bati: string;
   neo: string;
   image?: string;
@@ -52,6 +56,7 @@ export function BatiChat({
   const [asked, setAsked] = useState(false);
   const [history, setHistory] = useState<{ who: string; text: string }[] | null>(null);
   const [kept, setKept] = useState(false);
+  const [noted, setNoted] = useState<Set<number>>(new Set());
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, casting]);
   const pic = faces?.[face] || image;
@@ -165,6 +170,18 @@ export function BatiChat({
                   ) : (
                     <button onClick={() => void showPicture(m.id)} className="rounded-full border border-amber-200/40 px-3 py-1 text-[12px]">
                       🖼 絵で見る
+                    </button>
+                  )}
+                  {spell && (
+                    <button
+                      onClick={() => {
+                        saveSpell(m.text.split(/[、。！？!?\s　]+/).filter((w) => w.length > 1).slice(0, 6));
+                        setNoted((n) => new Set(n).add(m.id));
+                      }}
+                      disabled={noted.has(m.id)}
+                      className="text-[11px] text-violet-200 disabled:text-amber-50/40"
+                    >
+                      {noted.has(m.id) ? 'スペルブックに記しました' : '📖 記す'}
                     </button>
                   )}
                   <p className="text-[10px] leading-snug text-amber-50/45">{bati}の答えが、まちがっていることもあります。大事なことは、自分でも確かめてね</p>

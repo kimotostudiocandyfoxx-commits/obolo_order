@@ -16,6 +16,8 @@ import { RoundCards } from './RoundCards';
 import { Theater } from './Theater';
 import { KororinRelay } from './KororinRelay';
 import { AtelierVisit } from './AtelierVisit';
+import { IslandWorks } from './IslandWorks';
+import { SpellCompass } from './SpellCompass';
 
 /**
  * One second-journey screen ({ t: 'l2', what }): the makers built so far, else the script's panel (L2Screen).
@@ -48,6 +50,13 @@ export function L2Step({
     case 'jacket':
       return <DaydreamJacket api={lessonApi} bati={v.bati ?? ''} fill={fill} onDone={onDone} />;
     // L2-JUPITER-S005: the ateliers (M-R156); the old ids stay so saved progress keeps its place
+    case 'theme-island':
+      return <IslandWorks mode="theme" neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
+    case 'island-deco':
+      return <IslandWorks mode="deco" neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
+    // 〔🧭 スペルコンパス〕 for a song (L2-MERCURY-S002): the cards go to the spellbook for the song made next
+    case 'compass-song':
+      return <SpellCompass kind="song" onClose={() => onDone({ compass_song: 'skip' })} onAdd={(c) => onDone({ compass_song: c.join('、').slice(0, 120) })} />;
     case 'kimorin-tree':
       return <AtelierVisit who="kimorin" neo={v.neo || v.name} bati={v.bati ?? 'バティ'} onDone={onDone} />;
     case 'my-tree':

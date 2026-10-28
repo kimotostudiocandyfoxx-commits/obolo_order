@@ -30,6 +30,8 @@ async function bootstrap() {
   app.use('/me/butterfly/candidates', express.json({ limit: '8mb' }));
   // voice registration sends one recording (base64)
   app.use('/voice/register', express.json({ limit: '8mb' }));
+  // 〔🧭 スペルコンパス〕: a picture or a 10-second song clip
+  app.use('/buddy/compass', express.json({ limit: '8mb' }));
   // Stripe signs the exact bytes it sends
   app.use('/billing/webhook', express.raw({ type: '*/*', limit: '1mb' }));
   app.useBodyParser('json', { limit: '64kb' });

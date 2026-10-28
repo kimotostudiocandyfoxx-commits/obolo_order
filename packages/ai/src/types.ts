@@ -20,6 +20,8 @@ export interface LlmProvider {
   chat(req: ChatRequest): Promise<string>;
   /** speech → text (the member's own recording becomes the words of their post) */
   transcribe?(audio: Buffer, mime: string): Promise<string>;
+  /** look at a picture / listen to a sound (inline), or a public YouTube link, and answer the prompt as JSON */
+  perceive?(input: { mime: string; data: Buffer } | { url: string }, prompt: string): Promise<string>;
 }
 
 export interface ModerationResult {

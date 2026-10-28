@@ -65,6 +65,18 @@ export type BuddyChatBody = z.infer<typeof BuddyChatBody>;
 export const BuddyPictureBody = z.object({ question: z.string().trim().min(1).max(300), answer: z.string().trim().max(600).optional() });
 export type BuddyPictureBody = z.infer<typeof BuddyPictureBody>;
 
+/** 〔🧭 スペルコンパス〕 (M-R167/M-R168): a picture, a sound clip or a public YouTube link → spell cards (nothing kept) */
+export const CompassBody = z
+  .object({
+    kind: z.enum(['art', 'song']),
+    /** one group to read finely; omitted = a rough read of all */
+    focus: z.string().trim().max(12).optional(),
+    media: z.object({ mime: z.string().regex(/^(image|audio)\/[\w.+-]+$/), data: z.string().max(7_000_000) }).optional(),
+    url: z.string().url().max(300).regex(/^https:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{6,}/).optional(),
+  })
+  .refine((b) => !!b.media !== !!b.url, { message: 'one of media or url' });
+export type CompassBody = z.infer<typeof CompassBody>;
+
 export const CreateSaturnPostBody = z
   .object({
     text: z.string().trim().min(1).max(SATURN_MAX_CHARS),

@@ -142,6 +142,12 @@ export interface BuddyQuotaView {
 }
 
 /** 〔🖼 絵で見る〕: a picture from a library whose pictures may be used, with where it came from (M-R140) */
+/** one spell card read by 〔🧭 スペルコンパス〕 */
+export interface CompassCard {
+  group: string;
+  text: string;
+}
+
 export interface BuddyPicture {
   url: string;
   title: string;

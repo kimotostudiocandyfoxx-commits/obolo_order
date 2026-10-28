@@ -4,6 +4,7 @@ export * from './buddy';
 export * from './moderation';
 export * from './prompts/bati';
 export * from './prompts/memory';
+export * from './prompts/compass';
 export * from './images';
 export * from './song';
 export * from './sing';

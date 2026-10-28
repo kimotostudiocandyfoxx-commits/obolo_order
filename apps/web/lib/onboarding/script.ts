@@ -87,7 +87,7 @@ export type Step =
   /** a song played whole over a poster with its lines (L2-MARS-S001 『MIKIE⭐︎ドリル』, M-R134); 〔スキップ〕 at the corner */
   | { t: 'song'; id: 'mikie-drill' }
   /** 〔💬 バティに聞く〕: the chat with Bati (D03-S008 first, later on the Moon); `first` shows the how-to and the free first picture */
-  | { t: 'batitalk'; first?: boolean }
+  | { t: 'batitalk'; first?: boolean; /** Obolo Order (L2 Moon, M-R166): 〔📖 記す〕 under answers */ spell?: boolean }
   // --- the stage's directions (production UI 3, 2026-10-15) ---
   /** 〔カメラ：寄る／引く／揺れ〕 on the background; `focus` = where it moves in ("50% 30%") */
   | { t: 'cam'; move: 'in' | 'out' | 'shake'; focus?: string }

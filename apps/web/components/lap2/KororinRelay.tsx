@@ -13,7 +13,7 @@ import { lineVoiceUrl } from '@/lib/story/lineVoice';
  * his voice; on the last 「♪オー！」 the three voices stack (the same note). The kororins are his own story lines,
  * sung on the phone (lib/saturn/sing). 〔スキップ〕 at the corner; it ends by itself.
  */
-const LINES = ['三つなら、私にも、できます。', '……問いかけの広場です。哲学ですので、わざとです。', '変えません。'];
+const LINES = ['それなら、私にも、できます。', '……問いかけの広場です。哲学ですので、わざとです。', '変えません。'];
 /** his day-3 lines on Saturn, already voiced: used while a line above has no voice yet */
 const FALLBACK = ['本当になんでもいいんですか？', 'なんですかこのかわいいたこ焼きは！', '楽しいですね。'];
 

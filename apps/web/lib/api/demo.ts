@@ -1147,6 +1147,14 @@ export class DemoApi implements Api {
   async lookStandee() {
     return this.patchMe((u) => ({ lookStandee: u.avatarUrl ?? null }));
   }
+  // demo: a fixed read
+  async compass(body: Parameters<Api['compass']>[0]) {
+    await sleep(1400);
+    const art = [['絵のタッチ', '水彩'], ['絵のタッチ', 'にじみ'], ['キャラ', '二頭身'], ['キャラ', '笑顔'], ['背景', '夕暮れの海辺'], ['色と光', 'オレンジと紫'], ['構図', '下から見上げる'], ['雰囲気', 'なつかしい']];
+    const song = [['ジャンル', 'シティポップ'], ['速さとリズム', 'ゆったり'], ['楽器', 'ピアノ'], ['楽器', 'ベース'], ['声', 'やわらかい声'], ['曲の形', 'サビから始まる'], ['雰囲気', '夜のドライブ']];
+    const all = (body.kind === 'art' ? art : song).map(([group, text]) => ({ group, text }));
+    return { cards: body.focus ? all.filter((c) => c.group === body.focus) : all };
+  }
   async lookChibi() {
     return this.patchMe((u) => ({ lookChibi: u.avatarUrl ?? null }));
   }

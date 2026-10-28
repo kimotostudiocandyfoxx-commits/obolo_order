@@ -17,6 +17,7 @@ import { NeoChooser } from './NeoChooser';
 import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
 import { saveAtelier } from '@/components/lap2/AtelierVisit';
 import { islandCards } from '@/components/mercury/MyIsland';
+import { saveIsland } from '@/components/lap2/IslandWorks';
 import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
@@ -967,6 +968,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             if (song) remember('song', JSON.stringify(song));
             remember('my_island', JSON.stringify(island));
             remember('f_d06_island_parts', islandCards(island).join('|'));
+            saveIsland(island);
             remember('f_d06_sail', sailed ? 'sail' : 'keep');
             run(iRef.current + 1);
           }}
@@ -1034,6 +1036,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           image={v.batiImage}
           faces={v.batiFaces}
           first={!!step.first}
+          spell={!!step.spell}
           me={v.look}
           onDone={() => {
             remember('f_d03_bati_talk', 'true');

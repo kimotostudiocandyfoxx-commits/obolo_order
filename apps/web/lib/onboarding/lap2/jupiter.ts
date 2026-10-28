@@ -27,11 +27,23 @@ export const L2_JUPITER: Step[] = [
   { t: 'say', who: '大根カイザー', text: '根っこの言葉からも、写真からも、アートは作れたダ。' },
   { t: 'say', who: '大根カイザー', text: '今日は、まだ見たことのないものを描くダ。撮っていなくても、思い描いたものは、描けるダ。' },
   { t: 'say', who: '大根カイザー', text: '君の言葉も、空想も、アートになるダ。' },
+  // M-R167 スペルコンパス：手のひらほどの金色のコンパス。針のかわりに、光る羽ペン
+  { t: 'say', who: '大根カイザー', text: '{neo}。もう一つ、持っていくダ。' },
+  { t: 'se', sound: 'sparkle' },
+  { t: 'caption', text: 'スペルコンパスを、もらった' },
+  { t: 'say', who: '大根カイザー', text: 'スペルコンパスダ。気になる絵に向ければ、その絵のスペルの方角を指すダ。' },
+  { t: 'notice', text: '〔🧭 スペルコンパス〕｜好きな絵を送ると、その絵のスペルを、札にして読み取ります（読み取る前に、何のスペルがほしいか選べます）。人や作品の名前は札にしません。送った画像は残しません。マナは使いません' },
+  { t: 'sprite', image: ['daikon-kaiser', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: 'では、試しに。' }, // 自分の顔の写真に、コンパスを向ける
+  { t: 'l2', what: 'compass-kimorin' }, // 羽ペンがくるくる回って、ぴたりと止まる。〈白い狐〉〈丸いサングラス〉〈自信〉〈自信〉〈自信〉
+  { t: 'say', who: 'KIMORIN', text: '……自信が、三枚。正確な道具ですね。' },
+  { t: 'say', who: '大根カイザー', text: '……正直な、コンパスダ。' },
   { t: 'choice', key: 'jmake', options: [{ label: '空想をアートにする', goto: 'jmake' }, { label: '今日は作らない', goto: 'jnone' }] },
   { t: 'label', id: 'jmake' },
   { t: 'sprite', image: ['daikon-kaiser', '@bati'] },
   { t: 'say', who: 'バティ', text: '{neo}は、どんな景色を思い描く？' },
-  { t: 'say', who: '大根カイザー', text: '思い描いたまま、声で言ってみるダ。' },
+  { t: 'notice', text: 'こんな絵にしたい、という絵があれば、〔🧭 スペルコンパス〕で読み取ってから話してもいい' },
+  { t: 'say', who: '大根カイザー', text: 'Obolo Orderは、スペルを、自分の手で、組み替えられるダ。札を一枚変えれば、絵も変わるダ。' },
   { t: 'sprite', image: null },
   { t: 'l2', what: 'jacket' },
   { t: 'branch', key: 'jacket', cases: { keep: 'jkept' }, otherwise: 'jjoin' },
@@ -67,7 +79,7 @@ export const L2_JUPITER: Step[] = [
   { t: 'say', who: '大根カイザー', text: 'ダチのアトリエは、いつ行ってもよいダ。' },
   { t: 'label', id: 'jvisited' },
   { t: 'sprite', image: ['kimorin-sun', 'daikon-kaiser'] }, // Bluenaを取り出しては、しまう。また取り出しては、しまう
-  { t: 'say', who: 'KIMORIN', text: '……もし、、、ダチが、増えたら、、、訪ねる木も、増えるのですかね、、、' },
+  { t: 'say', who: 'KIMORIN', text: '……もし……ダチが、増えたら……訪ねるアトリエも、増えるのですかね……' },
   { t: 'say', who: '大根カイザー', text: '増えるダ。' },
   { t: 'say', who: 'KIMORIN', text: '……そうですか。' }, // Bluenaを、そっとしまう
   { t: 'sprite', image: null },
@@ -85,7 +97,7 @@ export const L2_JUPITER: Step[] = [
   { t: 'label', id: 'jback' },
   { t: 'say', who: '大根カイザー', text: '今日の空想も、88時間たったら、この壁に帰ってくるダ。' },
   { t: 'label', id: 'jgrow' },
-  { t: 'say', who: '大根カイザー', text: '木は、君が育てるダ。形も、色も、飾りも、札の言葉も、変えてよいダ。' },
+  { t: 'say', who: '大根カイザー', text: 'アトリエは、君が育てるダ。札も、看板の言葉も、変えてよいダ。' },
   { t: 'notice', text: '〔🎨 アトリエを飾る〕で、部品の札・入口の看板を、いつでも変えられます（2回目からのボタンは〔飾る〕。〔やめる〕で選んだものは残ります）' },
   { t: 'sprite', image: null },
   { t: 'choice', key: 'jdeco', options: [{ label: '〔🎨 アトリエを飾る〕で変える', goto: 'jdeco' }, { label: 'このままにする', goto: 'jkeep' }] },
@@ -94,7 +106,7 @@ export const L2_JUPITER: Step[] = [
   { t: 'goto', id: 'jend' },
   { t: 'label', id: 'jkeep' },
   { t: 'sprite', image: 'daikon-kaiser' },
-  { t: 'say', who: '大根カイザー', text: 'そのままも、よい木ダ。' },
+  { t: 'say', who: '大根カイザー', text: 'そのままも、よいアトリエダ。' },
 
   // L2-JUPITER-S006 水星が開いた
   { t: 'label', id: 'jend' },

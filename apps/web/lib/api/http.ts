@@ -395,6 +395,9 @@ export class HttpApi implements Api {
   lookStandee() {
     return this.req<Awaited<ReturnType<Api['lookStandee']>>>('POST', '/me/look/standee');
   }
+  compass(body: Parameters<Api['compass']>[0]) {
+    return this.req<Awaited<ReturnType<Api['compass']>>>('POST', '/buddy/compass', body);
+  }
   lookChibi() {
     return this.req<Awaited<ReturnType<Api['lookChibi']>>>('POST', '/me/look/chibi');
   }

@@ -23,7 +23,7 @@ export function lap2Steps(chapter: number, resumed: boolean): Step[] {
 /** the l2 screens the chapters ask for ({ t: 'l2', what }) */
 export type L2What =
   | 'ask' | 'relook'
-  | 'dachi-rules' | 'invite' | 'plaza' | 'relay'
+  | 'dachi-rules' | 'invite' | 'plaza' | 'relay' | 'compass-kimorin' | 'compass-song'
   | 'jacket' | 'kimorin-jacket' | 'kimorin-tree' | 'my-tree' | 'tree-deco'
   | 'my-island' | 'kimorin-song2' | 'place-song' | 'theme-island' | 'island-deco' | 'kimorin-island'
   | 'kimorin-ten' | 'theater'
