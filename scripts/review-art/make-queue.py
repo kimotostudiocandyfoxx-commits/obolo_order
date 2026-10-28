@@ -95,6 +95,6 @@ if '--sheets' in sys.argv:
         for c in 'abc':
             items.append({'id': f'{sid}-{c}', 'w': 2048, 'h': 1152, 'size': [1280, 720], 'refs': refs, 'prompt': prompt[:2990]})
 
-json.dump({'note': '土星まで_豪華カット台本 のキーフレーム候補（止め絵）。art/review/saturn/<映像>/<キー>-a.jpg…。台本チャットと利用者が選ぶ。描き直しは redo に id を足す', 'dir': '../../art/review/saturn', 'always': '', 'items': items, 'redo': []},
+json.dump({'note': '土星まで_豪華カット台本 のキーフレーム候補（止め絵）。art/review/saturn/<映像>/<キー>-a.jpg…。台本チャットと利用者が選ぶ。描き直しは redo に id を足す', 'dir': '../../../art/review/saturn', 'always': '', 'items': items, 'redo': []},
           open('design/review-art-queue.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 print(len(items), 'pictures')
