@@ -1,22 +1,13 @@
-# UI art — 2026-10-28T09:31:26.473Z
+# UI art — 2026-10-28T09:58:37.786Z
 
-Seedream 5.0 Pro / 177枚 / 約71円
+Seedream 5.0 Pro / 154枚 / 約88円
 
-- ⏸ V01/K16-a: 時間切れ、次回
-- ⏸ V01/K16-b: 元の絵ができなかったので次回
-- ⏸ V01/K16-c: 時間切れ、次回
-- ⏸ V01/K18-c: 時間切れ、次回
-- ⏸ V02/K1-a: 時間切れ、次回
-- ⏸ V02/K1-b: 時間切れ、次回
-- ⏸ V02/K1-c: 時間切れ、次回
-- ⏸ V02/K10-a: 元の絵ができなかったので次回
-- ⏸ V02/K10-b: 元の絵ができなかったので次回
-- ⏸ V02/K10-c: 元の絵ができなかったので次回
-- ⏸ V02/K11-a: 時間切れ、次回
-- ⏸ V02/K11-b: 時間切れ、次回
-- ⏸ V02/K11-c: 時間切れ、次回
+- ⏸ V01/K16-b: 時間切れ、次回
+- ⏸ V02/K10-a: 時間切れ、次回
+- ⏸ V02/K10-b: 時間切れ、次回
+- ⏸ V02/K10-c: 時間切れ、次回
 - ⏸ V02/K12-a: 元の絵ができなかったので次回
-- ⏸ V02/K12-b: 元の絵ができなかったので次回
+- ⏸ V02/K12-b: 時間切れ、次回
 - ⏸ V02/K12-c: 元の絵ができなかったので次回
 - ⏸ V02/K13-a: 時間切れ、次回
 - ⏸ V02/K13-b: 時間切れ、次回
@@ -27,30 +18,12 @@ Seedream 5.0 Pro / 177枚 / 約71円
 - ⏸ V02/K14-a: 元の絵ができなかったので次回
 - ⏸ V02/K14-b: 元の絵ができなかったので次回
 - ⏸ V02/K14-c: 元の絵ができなかったので次回
-- ⏸ V02/K2-a: 時間切れ、次回
-- ⏸ V02/K2-b: 時間切れ、次回
-- ⏸ V02/K2-c: 時間切れ、次回
-- ⏸ V02/K3-a: 時間切れ、次回
-- ⏸ V02/K3-b: 時間切れ、次回
-- ⏸ V02/K3-c: 時間切れ、次回
 - ⏸ V02/K4-a: 元の絵ができなかったので次回
-- ⏸ V02/K4-b: 元の絵ができなかったので次回
+- ⏸ V02/K4-b: 時間切れ、次回
 - ⏸ V02/K4-c: 元の絵ができなかったので次回
-- ⏸ V02/K5-a: 時間切れ、次回
-- ⏸ V02/K5-b: 時間切れ、次回
-- ⏸ V02/K5-c: 時間切れ、次回
-- ⏸ V02/K6-a: 時間切れ、次回
-- ⏸ V02/K6-b: 時間切れ、次回
-- ⏸ V02/K6-c: 時間切れ、次回
-- ⏸ V02/K7-a: 時間切れ、次回
-- ⏸ V02/K7-b: 時間切れ、次回
-- ⏸ V02/K7-c: 時間切れ、次回
 - ⏸ V02/K8-a: 元の絵ができなかったので次回
-- ⏸ V02/K8-b: 元の絵ができなかったので次回
-- ⏸ V02/K8-c: 元の絵ができなかったので次回
-- ⏸ V02/K9-a: 時間切れ、次回
-- ⏸ V02/K9-b: 時間切れ、次回
-- ⏸ V02/K9-c: 時間切れ、次回
+- ⏸ V02/K8-b: 時間切れ、次回
+- ⏸ V02/K8-c: 時間切れ、次回
 - ⏸ V05/K2-a: 時間切れ、次回
 - ⏸ V05/K2-b: 時間切れ、次回
 - ⏸ V05/K2-c: 時間切れ、次回
@@ -147,35 +120,39 @@ Seedream 5.0 Pro / 177枚 / 約71円
 - ⏸ stills/saturn-sleep-a: 時間切れ、次回
 - ⏸ stills/saturn-sleep-b: 時間切れ、次回
 - ⏸ stills/saturn-sleep-c: 時間切れ、次回
-- ✅ V01/K10-a
-- ✅ V01/K10-b
-- ✅ V01/K10-c
-- ✅ V01/K11-a
-- ✅ V01/K11-b
-- ✅ V01/K12-a
-- ✅ V01/K12-c
-- ✅ V01/K13-c
-- ✅ V01/K14-a
-- ✅ V01/K14-b
-- ✅ V01/K14-c
-- ✅ V01/K15-a
-- ✅ V01/K15-c
-- ✅ V01/K17-a
-- ✅ V01/K17-b
-- ✅ V01/K17-c
-- ✅ V01/K7-a
-- ✅ V01/K7-b
-- ✅ V01/K7-c
-- ✅ V01/K8-a
-- ✅ V01/K8-c
-- ✅ V01/K9-a
-- ✅ V01/K9-c
-- ❌ V01/K11-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ✅ V01/K11-c
+- ✅ V01/K13-a
+- ✅ V01/K13-b
+- ✅ V01/K15-b
+- ✅ V01/K16-a
+- ✅ V01/K16-c
+- ✅ V01/K18-a
+- ✅ V01/K18-b
+- ✅ V01/K18-c
+- ✅ V01/K8-b
+- ✅ V01/K9-b
+- ✅ V02/K1-a
+- ✅ V02/K1-c
+- ✅ V02/K11-b
+- ✅ V02/K2-a
+- ✅ V02/K2-b
+- ✅ V02/K2-c
+- ✅ V02/K3-b
+- ✅ V02/K5-a
+- ✅ V02/K5-b
+- ✅ V02/K5-c
+- ✅ V02/K6-a
+- ✅ V02/K6-c
+- ✅ V02/K7-b
+- ✅ V02/K7-c
+- ✅ V02/K9-a
+- ✅ V02/K9-b
+- ✅ V02/K9-c
 - ❌ V01/K12-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K13-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K13-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K15-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K18-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K18-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K8-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V01/K9-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K1-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K11-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K11-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K3-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K3-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K6-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
+- ❌ V02/K7-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
