@@ -11,8 +11,18 @@ import { VoiceField } from './StoryExtras';
  * the bottom (⌨ in the corner). Bati looks things up by magic: it closes its eyes, says the spell 「〈問い〉——ここに、
  * こたえを。」, the mana gem glows and letters of light unwind; the answer comes in words first, and 〔🖼 絵で見る〕
  * under it brings a picture from a library whose pictures may be used, with its source — no mana (M-R147). Every
- * answer carries the 'can be wrong' line. No counts, no numbers, no "AI".
+ * answer carries the 'can be wrong' line. No counts, no numbers, no "AI". A talk is gone when closed unless
+ * 〔この話を残す〕 keeps it (R21b, M-R119): only kept talks are listed under 〔📜 前の話〕 (on this device, TALKS_KEY).
  */
+export const TALKS_KEY = 'obolo.batiTalks';
+type Talk = { at: string; lines: { who: 'me' | 'bati'; text: string }[] };
+function loadTalks(): Talk[] {
+  try {
+    return JSON.parse(localStorage.getItem(TALKS_KEY) ?? '[]') as Talk[];
+  } catch {
+    return [];
+  }
+}
 type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean };
 const EXAMPLES = ['ビッグバンって、いつ起きたの？', 'ブラックホールの正体って、なに？', '宇宙の果てって、あるの？'];
 
@@ -41,6 +51,7 @@ export function BatiChat({
   const [casting, setCasting] = useState<string | null>(null);
   const [asked, setAsked] = useState(false);
   const [history, setHistory] = useState<{ who: string; text: string }[] | null>(null);
+  const [kept, setKept] = useState(false);
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, casting]);
   const pic = faces?.[face] || image;
@@ -79,19 +90,22 @@ export function BatiChat({
     }
     setMsgs((all) => all.map((x) => (x.id === id ? { ...x, picLoading: false, picture } : x)));
   };
-  const openHistory = async () => {
+  // only the talks kept with 〔この話を残す〕
+  const openHistory = () => setHistory(loadTalks().flatMap((t) => t.lines.map((l) => ({ who: l.who === 'me' ? neo : bati, text: l.text }))));
+  const keepTalk = () => {
     try {
-      const r = await getApi().buddyMessages();
-      setHistory(r.items.map((x) => ({ who: x.role === 'user' ? neo : bati, text: x.text })).reverse());
+      const talk: Talk = { at: new Date().toISOString(), lines: msgs.slice(1).map((m) => ({ who: m.who, text: m.text })) };
+      localStorage.setItem(TALKS_KEY, JSON.stringify([...loadTalks(), talk].slice(-50)));
     } catch {
-      setHistory([]);
+      /* private mode */
     }
+    setKept(true);
   };
 
   return (
     <div className="absolute inset-0 z-[12] flex flex-col bg-gradient-to-b from-[#0a0f24] via-[#0b0a1a] to-black text-amber-50">
       <div className="pt-safe flex items-center justify-between px-4 pt-12">
-        <button onClick={() => void openHistory()} className="rounded-full bg-white/10 px-3 py-1.5 text-[12px]">
+        <button onClick={openHistory} className="rounded-full bg-white/10 px-3 py-1.5 text-[12px]">
           📜 前の話
         </button>
         <p className="text-[13px] tracking-widest text-amber-100/80">💬 {bati}に聞く</p>
@@ -118,7 +132,7 @@ export function BatiChat({
           <div className="rounded-2xl bg-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-amber-50/75">
             <p>①〔🎙〕を押して、知りたいことを話す（宇宙のことでも、それ以外のことでも、何でも）</p>
             <p>②{bati}が魔法で調べて、言葉で答える。〔🖼 絵で見る〕を押すと、調べてきた写真や図も見られる</p>
-            <p>③続けて聞いてもいい。左上の〔📜 前の話〕から、前の話の続きも聞ける</p>
+            <p>③続けて聞いてもいい。気に入った話は〔この話を残す〕を押すと、左上の〔📜 前の話〕から、いつでも続きを聞ける</p>
           </div>
         )}
         {msgs.map((m) =>
@@ -183,12 +197,17 @@ export function BatiChat({
             </button>
           )}
         </div>
+        {asked && (
+          <button onClick={keepTalk} disabled={kept || !!casting} className="mx-auto block text-[12px] text-amber-100/80 disabled:text-amber-50/40">
+            {kept ? '📜 この話を残しました' : '📜 この話を残す'}
+          </button>
+        )}
       </div>
       {history && (
         <div className="absolute inset-0 z-10 flex flex-col bg-black/85 px-4 pb-6 pt-[calc(16px+env(safe-area-inset-top))]" onClick={() => setHistory(null)}>
           <p className="text-center text-[13px] tracking-widest">📜 前の話</p>
           <div className="mt-3 flex-1 space-y-2 overflow-y-auto text-[13px]">
-            {history.length ? history.map((h, k) => <p key={k}><span className="mr-1 text-[10px] text-amber-200/70">{h.who}</span>{h.text}</p>) : <p className="text-center text-amber-50/50">まだ、前の話はありません</p>}
+            {history.length ? history.map((h, k) => <p key={k}><span className="mr-1 text-[10px] text-amber-200/70">{h.who}</span>{h.text}</p>) : <p className="text-center text-amber-50/50">まだ、残した話はありません</p>}
           </div>
           <button className="mt-3 rounded-full bg-white/10 py-3 text-[14px]">とじる</button>
         </div>

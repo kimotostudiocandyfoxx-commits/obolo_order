@@ -16,6 +16,7 @@ import { LookMaker, type LookApi } from './LookMaker';
 import { NeoChooser } from './NeoChooser';
 import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
 import { saveAtelier } from '@/components/lap2/AtelierVisit';
+import { islandCards } from '@/components/mercury/MyIsland';
 import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
@@ -965,6 +966,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             remember('f_song_from', song ? 'made' : 'none');
             if (song) remember('song', JSON.stringify(song));
             remember('my_island', JSON.stringify(island));
+            remember('f_d06_island_parts', islandCards(island).join('|'));
             remember('f_d06_sail', sailed ? 'sail' : 'keep');
             run(iRef.current + 1);
           }}
