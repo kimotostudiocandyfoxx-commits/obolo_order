@@ -5,7 +5,7 @@
  * (none picked = おまかせ), an optional name, a small pier on every island for the ships coming home, and
  * the records of your songs standing on the beach. Drawn in code, so it can rise out of the sea.
  */
-export type IslandLook = { shape: 'hill' | 'moon' | 'twin'; beach: 'sand' | 'shell' | 'black' | 'coral'; light: 'lighthouse' | 'lantern' | 'rock' | 'none'; name: string };
+export type IslandLook = { shape: 'hill' | 'moon' | 'twin'; beach: 'sand' | 'shell' | 'black' | 'coral'; light: 'lighthouse' | 'lantern' | 'rock' | 'none'; name: string; palm?: boolean; time?: 'day' | 'dusk' | 'night' };
 export const ISLAND_SHAPES: { v: IslandLook['shape']; label: string }[] = [
   { v: 'hill', label: '丸い丘' },
   { v: 'moon', label: '三日月' },
@@ -23,6 +23,38 @@ export const ISLAND_LIGHTS: { v: IslandLook['light']; label: string }[] = [
   { v: 'rock', label: '光る岩' },
   { v: 'none', label: '灯りなし' },
 ];
+/** The part cards {bati} shows for the island (D06-S007b, M-R154). */
+export function islandCards(l: IslandLook): string[] {
+  return [
+    { hill: '丸い丘', moon: '三日月の丘', twin: 'ふたこぶの丘' }[l.shape],
+    ISLAND_BEACHES.find((b) => b.v === l.beach)!.label,
+    ...(l.palm ? ['ヤシの木'] : []),
+    ...(l.time && l.time !== 'day' ? [l.time === 'night' ? '夜' : '夕焼け'] : []),
+    ISLAND_LIGHTS.find((x) => x.v === l.light)!.label,
+  ];
+}
+/** What was said → the parts (a fixed table of words; unmatched words leave the island as it is). */
+export function islandFromWords(said: string, base: IslandLook): IslandLook {
+  const has = (...w: string[]) => w.some((x) => said.includes(x));
+  const l = { ...base };
+  if (has('ふたこぶ', '二つ', 'ふたつ')) l.shape = 'twin';
+  else if (has('三日月', 'みかづき')) l.shape = 'moon';
+  else if (has('丸', 'まる', '丘')) l.shape = 'hill';
+  if (has('貝')) l.beach = 'shell';
+  else if (has('黒', 'くろ', '岩')) l.beach = 'black';
+  else if (has('さんご', 'サンゴ', 'ピンク')) l.beach = 'coral';
+  else if (has('白', 'しろ', '砂')) l.beach = 'sand';
+  if (has('ヤシ', 'やし', '南国', 'ハワイ', 'トロピカル')) l.palm = true;
+  if (has('夜', 'よる', '星', 'ほし')) l.time = 'night';
+  else if (has('夕', 'ゆう', 'オレンジ')) l.time = 'dusk';
+  else if (has('朝', 'あさ', '昼', 'ひる', '青空')) l.time = 'day';
+  if (has('灯台', 'とうだい')) l.light = 'lighthouse';
+  else if (has('ランタン', 'ちょうちん', '提灯')) l.light = 'lantern';
+  else if (has('光る岩', '光る石', 'クリスタル', '水晶')) l.light = 'rock';
+  else if (has('灯りなし', '暗い', 'くらい')) l.light = 'none';
+  return l;
+}
+
 /** おまかせ: one of each, from the name (or a coin) */
 export function islandOmakase(seed: string): IslandLook {
   const h = [...(seed || 'island')].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 11);
@@ -73,6 +105,16 @@ export function MyIsland({ look, rise = 2, records = 0, width = 300 }: { look: I
               ))}
             </g>
           )}
+          {/* palms */}
+          {look.palm &&
+            [20, 80].map((x) => (
+              <g key={x}>
+                <path d={`M${x} 44 Q${x + 1.5} 36 ${x - 1} 28`} stroke="#8a5a36" strokeWidth="1.2" fill="none" />
+                {[-60, -20, 20, 60, 160].map((a) => (
+                  <ellipse key={a} cx={x - 1} cy={28} rx="5" ry="1.2" fill="#3f9a4a" transform={`rotate(${a} ${x - 1} 28) translate(4 0)`} />
+                ))}
+              </g>
+            ))}
           {look.light === 'rock' && <ellipse cx="50" cy="22" rx="6" ry="4.5" fill={lit ? '#9ff0ff' : '#6b7a80'} className={lit ? 'animate-pulse' : ''} />}
           {/* the records of your songs, standing on the beach */}
           {Array.from({ length: Math.min(records, 3) }, (_, k) => (

@@ -954,6 +954,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'mercury' && lessonApi && (
         <MercuryLesson
           api={lessonApi}
+          look={v.look}
+          chibi={v.lookChibi}
           stickers={v.made?.stickers ?? []}
           neo={v.neo || v.name}
           bati={v.bati || 'バティ'}

@@ -193,7 +193,8 @@ function restyle(cards: string[], said: string): string[] {
 }
 const OMAKASE_STYLE = ['やさしい水彩', 'あたたかい色'];
 
-function saveSpell(cards: string[]) {
+/** 〔📖 記す〕: the spell's cards into the spellbook (on this device until the server keeps it) */
+export function saveSpell(cards: string[]) {
   try {
     const book = JSON.parse(localStorage.getItem('obolo.spellbook') ?? '[]') as string[][];
     localStorage.setItem('obolo.spellbook', JSON.stringify([...book, cards].slice(-60)));
@@ -916,7 +917,7 @@ export function JupiterLesson({
         </Panel>
       )}
       {ab?.k === 'oshi' && (
-        <div className="absolute inset-x-0 top-[calc(17svh+env(safe-area-inset-top))] z-[185] flex flex-col items-center">
+        <div className="absolute inset-x-0 top-[calc(17svh+env(safe-area-inset-top))] z-[185] flex flex-col items-center overflow-hidden pb-4">
           <span className="rounded-full bg-black/40 px-4 py-1 text-[13px] font-bold text-amber-100">推し</span>
           <button onClick={() => oshi === 'here' && setOshi('open')} className={`mt-2 flex flex-col items-center transition-all duration-[1600ms] ${oshi === 'coming' ? 'translate-x-[60vw] opacity-0' : 'translate-x-0 opacity-100'}`}>
             {oshi === 'open' ? <Sticker s={KIMORIN_JACKET} size={200} /> : <NeoButterfly face={spriteUrl('kimorin-face')} art={KIMORIN_JACKET} size={96} shades hue={200} />}

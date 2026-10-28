@@ -2,13 +2,14 @@
 
 import type { SongDesign } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
-import { KIMORIN_JACKET, Sticker } from '@/components/jupiter/JupiterLesson';
+import { KIMORIN_JACKET, Sticker, saveSpell } from '@/components/jupiter/JupiterLesson';
 import { Big, LessonShell, NextButton, Panel, Soft, type CoachLine } from '@/components/onboarding/LessonShell';
 import { VoiceField } from '@/components/onboarding/StoryExtras';
 import { STYLE_SOUND, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { SongMade, StickerMade } from '@/lib/onboarding/made';
 import { LineVoice } from '@/lib/story/lineVoice';
-import { ISLAND_BEACHES, ISLAND_LIGHTS, ISLAND_SHAPES, MyIsland, islandOmakase, type IslandLook } from './MyIsland';
+import { spriteUrl } from '@/lib/onboarding/media';
+import { MyIsland, islandCards, islandFromWords, islandOmakase, type IslandLook } from './MyIsland';
 
 /**
  * Day 5 on Mercury (first journey; story D06-S005〜S007, M-R89/M-R91/M-R114): yesterday's jacket gets its
@@ -32,7 +33,9 @@ const FEELS: { id: string; label: string }[] = [
 type Who = 'freezy' | 'kimorin' | 'bati' | 'guide' | 'song' | 'pinpon';
 type Line = { who: Who; text: string };
 type Scene = 'bar' | 'bar-glow' | 'demo' | 'song1' | 'song2';
-const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }[] })[] = [
+const SPELL_1 = ['泣ける', '悲しい', 'しっとり', 'ゆっくり', 'ピアノ'];
+const SPELL_2 = ['泣ける', '壮大', '神々しい', '感動的', 'オーケストラ', '大合唱', '歌詞：すね毛楽しい'];
+const INTRO: (Line & { scene?: Scene; cards?: string[]; choices?: { label: string; reply: Line[] }[] })[] = [
   {
     who: 'freezy',
     text: '自分の思いだったり、起こった出来事を、音に乗っけたことはあるか？',
@@ -47,19 +50,22 @@ const INTRO: (Line & { scene?: Scene; choices?: { label: string; reply: Line[] }
   { who: 'freezy', text: '聴けば、わかる。' },
   { who: 'kimorin', text: '……では、聴いてから、計算します。' },
   { who: 'freezy', text: '今日食べたラーメンが美味しかった。学校に遅刻しそうだ。そんな自分の日常のことを、歌にしてみよう。' },
-  { who: 'freezy', text: '土星の言葉も、木星のジャケットも、音がつけば、もっと伝わる。' },
+  { who: 'freezy', text: '土星の言葉も、木星のアートも、音がつけば、もっと伝わる。' },
   { who: 'freezy', text: 'できた曲は、船になって、ダチの海に出る。' },
   { who: 'freezy', text: '習うより、慣れろ、だ。さあ、作ってみよう。', scene: 'bar' },
   { who: 'freezy', text: '真ん中の〔♫+ 作曲〕だ。', scene: 'bar-glow' },
-  { who: 'kimorin', text: 'お待ちを。きのうのジャケットで。……天才の手本です。', scene: 'demo' },
+  { who: 'kimorin', text: 'お待ちを。きのうのアートで。……天才の手本です。', scene: 'demo' },
   { who: 'kimorin', text: '泣ける曲を、お願いします。', scene: 'demo' }, // 〔🎙〕に顔を近づける
   { who: 'guide', text: '♪ 作曲中…', scene: 'demo' }, // うんちピンポンくんが、ぽこん、と弾む
   { who: 'song', text: '（しっとりと悲しい、泣ける曲）', scene: 'song1' },
   { who: 'kimorin', text: '……なんか、違います。', scene: 'demo' }, // 腕を組んで、首をかしげている
-  { who: 'kimorin', text: 'こういう、悲しくて泣ける曲、というわけではなく。もっと、壮大で、神々しく、感動的に、泣ける曲です。', scene: 'demo' },
-  { who: 'pinpon', text: 'OK！　ほかに、加えたい要素、ある？', scene: 'demo' },
-  { who: 'kimorin', text: 'では、『すね毛楽しい』という歌詞を、追加してください。', scene: 'demo' },
-  { who: 'pinpon', text: 'OK！', scene: 'demo' },
+  { who: 'freezy', text: 'なら、スペルを変えろ。', scene: 'demo' },
+  { who: 'kimorin', text: '……曲にも、スペルが、あるのですね。', scene: 'demo' },
+  { who: 'pinpon', text: 'さっきの曲のスペルは、こんな感じだよ！', scene: 'demo', cards: SPELL_1 },
+  { who: 'kimorin', text: '……なるほど。……あまり、わかりませんが。', scene: 'demo', cards: SPELL_1 },
+  { who: 'kimorin', text: 'とりあえず、もっと、壮大で、神々しく、感動的に、泣ける曲で、お願いします。……あと、『すね毛楽しい』という歌詞も足してください。', scene: 'demo', cards: SPELL_1 },
+  { who: 'pinpon', text: 'なるほど、わかった！　じゃあ、こんなスペルの方が、合うかも！', scene: 'demo', cards: SPELL_2 },
+  { who: 'pinpon', text: 'じゃあ、作るね！', scene: 'demo', cards: SPELL_2 },
   { who: 'guide', text: '♪ 作り直し中…', scene: 'demo' },
   { who: 'song', text: '（壮大で、神々しい、感動の曲）', scene: 'song2' },
   { who: 'freezy', text: '……いい曲だ。', scene: 'song2' },
@@ -113,52 +119,87 @@ function Bar({ glow, lit = 1, onTap }: { glow?: boolean; lit?: number; onTap?: (
   );
 }
 
-/** 🏝️ myアイランド: shape, beach, light (unpicked = おまかせ), a name if you like → 〔この島にする〕 */
-function IslandEditor({ neo, onMake, onHold }: { neo: string; onMake: (l: IslandLook) => void; onHold: () => void }) {
-  const [pick, setPick] = useState<Partial<IslandLook>>({});
-  const [name, setName] = useState('');
-  const [custom, setCustom] = useState(false);
-  const auto = islandOmakase(neo);
-  const look: IslandLook = { shape: pick.shape ?? auto.shape, beach: pick.beach ?? auto.beach, light: pick.light ?? auto.light, name };
-  const rows = [
-    { key: 'shape' as const, name: '形', opts: ISLAND_SHAPES },
-    { key: 'beach' as const, name: '浜', opts: ISLAND_BEACHES },
-    { key: 'light' as const, name: '灯り', opts: ISLAND_LIGHTS },
-  ];
+/**
+ * The captain at the bow (D06-S007, M-R155/M-R161): the small chibi {neo} in a captain's cap, looking out to sea.
+ * KIMORIN⭐︎'s wears his round sunglasses too.
+ */
+function Captain({ chibi, face, shades = false, size = 44 }: { chibi?: string; face?: string; shades?: boolean; size?: number }) {
+  return (
+    <div className="relative" style={{ width: size, height: size * 1.2 }}>
+      {chibi ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={chibi} alt="" className="absolute inset-x-0 bottom-0 h-[88%] w-full object-contain drop-shadow" />
+      ) : (
+        <div className="absolute inset-x-[10%] bottom-0 aspect-square overflow-hidden rounded-full border-2 border-white bg-amber-100">
+          {face && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={face} alt="" className="h-full w-full object-cover object-top" />
+          )}
+          {shades && (
+            <svg viewBox="0 0 100 40" className="absolute left-[12%] top-[38%] w-[76%]">
+              <circle cx="27" cy="20" r="16" fill="#151020" stroke="#ffd36f" strokeWidth="4" />
+              <circle cx="73" cy="20" r="16" fill="#151020" stroke="#ffd36f" strokeWidth="4" />
+            </svg>
+          )}
+        </div>
+      )}
+      {/* the captain's cap */}
+      <svg viewBox="0 0 60 30" className="absolute left-1/2 top-0 w-[78%] -translate-x-1/2">
+        <path d="M6 20 Q30 0 54 20 Z" fill="#fafafa" stroke="#1f2a44" strokeWidth="2" />
+        <rect x="4" y="19" width="52" height="6" rx="3" fill="#1f2a44" />
+        <circle cx="30" cy="13" r="3.2" fill="#e9c46a" />
+      </svg>
+    </div>
+  );
+}
+
+/** 🏝️ myアイランド by talking with {bati} (D06-S007b, M-R154): what you'd like → part cards → 〔この島にする〕 */
+function IslandChat({ neo, bati, say, onMake, onHold }: { neo: string; bati: string; say: (l: Line) => void; onMake: (l: IslandLook) => void; onHold: () => void }) {
+  const [step, setStep] = useState<'ask' | 'cards' | 'redo'>('ask');
+  const [look, setLook] = useState<IslandLook>(() => islandOmakase(neo));
+  const [talk, setTalk] = useState('');
+  useEffect(() => say({ who: 'bati', text: 'どんな島にしたい？　ざっくりでいいよ！' }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const toCards = (l: IslandLook) => {
+    setLook(l);
+    setTalk('');
+    setStep('cards');
+    say({ who: 'bati', text: 'じゃあ、こんな感じかな！' });
+  };
+  if (step !== 'cards')
+    return (
+      <div className="space-y-3">
+        <p className="text-center text-sm font-black text-sky-700">🏝️ myアイランド</p>
+        <VoiceField light value={talk} onChange={setTalk} placeholder={step === 'ask' ? '夕焼けの、ヤシの木がある島' : '夜の島がいい'} maxLength={40} />
+        <Big tone="sky" disabled={!talk.trim()} onClick={() => toCards(islandFromWords(talk, step === 'ask' ? { ...islandOmakase(neo), palm: false, time: 'day' } : look))}>
+          これで組む
+        </Big>
+        {step === 'ask' && (
+          <>
+            <Soft onClick={() => toCards(islandOmakase(neo))}>おまかせ</Soft>
+            <p className="text-center text-[11px] text-slate-400">おまかせなら、{neo}の曲に合う島を、{bati}が組みます</p>
+          </>
+        )}
+      </div>
+    );
   return (
     <div className="space-y-3">
-      <p className="text-center text-sm font-black text-sky-700">🏝️ myアイランド</p>
-      <div className="flex justify-center rounded-2xl bg-gradient-to-b from-sky-200 to-sky-400 py-2">
+      <div className={`flex justify-center rounded-2xl py-2 ${look.time === 'night' ? 'bg-gradient-to-b from-indigo-900 to-sky-800' : look.time === 'dusk' ? 'bg-gradient-to-b from-orange-300 to-sky-500' : 'bg-gradient-to-b from-sky-200 to-sky-400'}`}>
         <MyIsland look={look} width={200} />
       </div>
-      {!custom && (
-        <>
-          <Big tone="sky" onClick={() => onMake({ ...auto, name })}>
-            この形で作る
-          </Big>
-          <Soft onClick={() => setCustom(true)}>形・浜・灯りを選ぶ</Soft>
-        </>
-      )}
-      {custom && rows.map((row) => (
-        <div key={row.key} className="flex items-center gap-2">
-          <span className="w-10 shrink-0 text-[12px] font-bold text-slate-400">{row.name}</span>
-          <div className="flex flex-wrap gap-1.5">
-            {row.opts.map((o) => (
-              <button key={o.v} onClick={() => setPick((x) => ({ ...x, [row.key]: o.v }))} className={`rounded-full px-3 py-1.5 text-[13px] font-bold ${pick[row.key] === o.v ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                {o.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-      <VoiceField light value={name} onChange={(t) => setName(t.slice(0, 12))} placeholder="島の名前（なくてもいい）" maxLength={12} />
-      <p className="text-center text-[11px] leading-relaxed text-slate-400">土の中の曲も、帰ってきた船も、ここに集まります（船の帰る小さな桟橋は、どの島にもつきます）。あとで変えられます</p>
-      {custom && (
-        <Big tone="sky" onClick={() => onMake(look)}>
-          この島にする
-        </Big>
-      )}
+      <div className="flex flex-wrap justify-center gap-1.5">
+        {islandCards(look).map((c) => (
+          <span key={c} className="rounded-md bg-sky-50 px-2 py-1 text-[12px] font-bold text-sky-800 ring-1 ring-sky-300">
+            〈{c}〉
+          </span>
+        ))}
+      </div>
+      <VoiceField light value={look.name} onChange={(t) => setLook((x) => ({ ...x, name: t.slice(0, 12) }))} placeholder="島の名前（なくてもいい）" maxLength={12} />
+      <Big tone="sky" onClick={() => onMake(look)}>
+        この島にする
+      </Big>
+      <Soft onClick={() => setStep('redo')}>🎙 話して直す</Soft>
       <Soft onClick={onHold}>今はここで止める</Soft>
+      <p className="text-center text-[11px] text-slate-400">話すと、札が変わります。マナは使いません。あとで変えられます</p>
     </div>
   );
 }
@@ -170,9 +211,14 @@ export function MercuryLesson({
   bati,
   inviter,
   batiImage,
+  look: neoFace,
+  chibi,
   onDone,
 }: {
   api: LessonApi;
+  /** the visitor's round look and their chibi: the captain at the bow */
+  look?: string;
+  chibi?: string;
   stickers: StickerMade[];
   neo: string;
   bati: string;
@@ -192,6 +238,10 @@ export function MercuryLesson({
   const [edit, setEdit] = useState<number | null>(null);
   const [feel, setFeel] = useState<string>('auto');
   const [feelSaid, setFeelSaid] = useState(false);
+  // the style said to {bati} and the spell cards made from it (D06-S006, M-R142〜145)
+  const [styleSaid, setStyleSaid] = useState('');
+  const [cards, setCards] = useState<string[] | null>(null);
+  const [kept, setKept] = useState(false);
   const [song, setSong] = useState<{ id: string; title: string; url: string } | null>(null);
   // M-R132: the song can be made again once; then the two lie side by side and one is put in the soil
   const [other, setOther] = useState<{ id: string; title: string; url: string } | null>(null);
@@ -259,6 +309,23 @@ export function MercuryLesson({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [introLine?.text, phase]);
 
+  // the style words → genre (the first example named) and spell cards (the said words, then the words' own)
+  const spell = (talk: string) => {
+    const named = FEELS.find((f) => f.id !== 'auto' && talk.toLowerCase().includes(f.label.toLowerCase()));
+    setFeel(named?.id ?? 'auto');
+    setFeelSaid(true);
+    const style = talk
+      .split(/[、。,.\s　]+/)
+      .map((w) => w.replace(/(で|な感じ|感じ|みたいな)$/, '').trim())
+      .filter(Boolean)
+      .slice(0, 5);
+    const mine = (from === 'prev' && jacket ? jacket.text : passed ? '' : words).split(/[、。！？!?\s　]+/).filter(Boolean).slice(0, 2);
+    setCards([...(style.length ? style : ['おまかせのスタイル']), ...mine.map((w) => (w.length > 10 ? `${w.slice(0, 10)}…` : w))]);
+    setStyleSaid(talk);
+    if (!talk) setCue({ who: 'guide', text: '言葉に合う曲のスタイルを、{bati}が選びます' });
+    setTimeout(() => said({ who: 'bati', text: 'じゃあ、スペルは、こうなるね！' }), talk ? 0 : 1600);
+    setTimeout(() => said({ who: 'freezy', text: 'くわしく言えば、言っただけ、スペルは細かくなる。' }), talk ? 2400 : 4000);
+  };
   const material = () => {
     const base = from === 'prev' && jacket ? jacket.text : '';
     const add = passed ? '' : words.trim();
@@ -279,7 +346,9 @@ export function MercuryLesson({
     setPhase('singing');
     said({ who: 'bati', text: '〈{neo}の言葉〉——ここに、ふしを。' });
     const sound = STYLE_SOUND[feel];
-    const d: SongDesign = sound ? { ...design, genre: feel, instrumentalPrompt: sound.prompt, bpm: sound.bpm } : design;
+    // the style said to {bati} rides along with the genre's sound
+    const talk = styleSaid.trim();
+    const d: SongDesign = sound ? { ...design, genre: feel, instrumentalPrompt: talk ? `${sound.prompt}, ${talk}` : sound.prompt, bpm: sound.bpm } : talk ? { ...design, instrumentalPrompt: design.instrumentalPrompt ? `${design.instrumentalPrompt}, ${talk}` : talk } : design;
     try {
       setSong(await api.sing(d, setStage));
       setPhase('song');
@@ -381,7 +450,6 @@ export function MercuryLesson({
       );
   } else if (phase === 'choose') coach = lineOf({ who: 'freezy', text: '次は、お前だ。' });
   else if (phase === 'hold') actions = <NextButton label="続ける" onClick={() => setPhase('choose')} />;
-  else if (phase === 'style' && !feelSaid) coach = { text: 'どんな感じの曲にする？' };
   else if (phase === 'mana') coach = { text: '作曲に、マナを使います。いいですか？' };
   else if (phase === 'writing') coach = { text: '✍️ 歌詞を考えています…' };
   else if (phase === 'singing' && stage === 'warming') coach = { text: '♪ 作曲中…　音のスタジオが、目をさましています' };
@@ -409,7 +477,18 @@ export function MercuryLesson({
       {(scene === 'bar' || scene === 'bar-glow') && <Bar glow={scene === 'bar-glow'} />}
       {(scene === 'demo' || scene === 'song1' || scene === 'song2') && (
         <div className="absolute inset-x-0 top-[36svh] z-[160] flex justify-center">
-          <Record s={KIMORIN_JACKET} playing={scene === 'song1' || scene === 'song2'} size={220} />
+          <div className="flex flex-col items-center gap-3">
+            <Record s={KIMORIN_JACKET} playing={scene === 'song1' || scene === 'song2'} size={220} />
+            {INTRO[k].cards && (
+              <div key={INTRO[k].cards!.join()} className="flex max-w-xs flex-wrap justify-center gap-1.5">
+                {INTRO[k].cards!.map((c, i) => (
+                  <span key={c} className="animate-[fadeUp_0.4s_ease-out] rounded-md border border-sky-300 bg-white/90 px-2 py-0.5 font-serif text-[12px] font-bold text-sky-800" style={{ animationDelay: `${i * 70}ms`, animationFillMode: 'backwards' }}>
+                    〈{c}〉
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -423,10 +502,10 @@ export function MercuryLesson({
                   setFrom('prev');
                   if (stickers.length === 1) setJacket(stickers[0]);
                   setPhase('words');
-                  said({ who: 'freezy', text: '顔は、もうある。あとは中身だ。このジャケットの曲を作るぞ。' });
+                  said({ who: 'freezy', text: 'このアートが、曲の顔になる。あとは中身だ。' });
                 }}
               >
-                きのうのジャケットの曲を作る
+                きのうのアートに、曲をつける
               </Big>
             )}
             <Big
@@ -455,7 +534,7 @@ export function MercuryLesson({
         <Panel>
           {from === 'prev' && !jacket ? (
             <>
-              <p className="text-center text-sm font-black text-sky-700">ジャケットを選ぶ</p>
+              <p className="text-center text-sm font-black text-sky-700">アートを選ぶ</p>
               <div className="mt-3 flex flex-wrap justify-center gap-4">
                 {stickers.map((s, i) => (
                   <button key={i} onClick={() => setJacket(s)} className="active:scale-95">
@@ -489,7 +568,7 @@ export function MercuryLesson({
                   onClick={() => {
                     setPassed(false);
                     setPhase('style');
-                    setCue(null);
+                    said({ who: 'bati', text: 'どんな曲にしたい？　速さとか、雰囲気とか、できるだけ、くわしく教えて！' });
                   }}
                 >
                   送る
@@ -500,6 +579,7 @@ export function MercuryLesson({
                     setPhase('style');
                     if (from === 'prev') setCue({ who: 'guide', text: 'いまある言葉だけで、歌詞にします' });
                     else said({ who: 'kimorin', text: '冷蔵庫が、歌詞に。……家電の、デビューですね。' });
+                    setTimeout(() => said({ who: 'bati', text: 'どんな曲にしたい？　速さとか、雰囲気とか、できるだけ、くわしく教えて！' }), 2600);
                   }}
                 >
                   パス
@@ -513,26 +593,44 @@ export function MercuryLesson({
 
       {phase === 'style' && (
         <Panel>
-          <div className="grid grid-cols-3 gap-2">
-            {FEELS.map((f) => (
-              <button
-                key={f.id}
-                onClick={() => {
-                  setFeel(f.id);
-                  setFeelSaid(true);
-                  said({ who: 'freezy', text: f.id === 'auto' ? '任せろ。' : 'いいな。それでいこう。' });
-                }}
-                className={`rounded-2xl py-3 text-sm font-black ${feel === f.id && feelSaid ? 'bg-sky-500 text-white' : 'bg-sky-50 text-sky-700'}`}
-              >
-                {f.label}
+          {!cards ? (
+            <>
+              <VoiceField light value={styleSaid} onChange={setStyleSaid} placeholder="EDMで、アゲアゲで、テンポが速い感じ" maxLength={60} />
+              <p className="mt-2 text-center text-[11px] text-slate-400">迷ったら、例から</p>
+              <div className="mt-1 flex flex-wrap justify-center gap-1.5">
+                {FEELS.filter((f) => f.id !== 'auto').map((f) => (
+                  <button key={f.id} onClick={() => setStyleSaid((x) => (x.includes(f.label) ? x : x ? `${x}、${f.label}` : f.label))} className="rounded-full bg-sky-50 px-3 py-1.5 text-[13px] font-bold text-sky-700">
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 space-y-2">
+                <Big tone="sky" disabled={!styleSaid.trim()} onClick={() => spell(styleSaid)}>
+                  これで
+                </Big>
+                <Soft onClick={() => spell('')}>おまかせ</Soft>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {cards.map((c, i) => (
+                  <span key={`${c}-${i}`} className="animate-[fadeUp_0.4s_ease-out] rounded-md border border-sky-300 bg-gradient-to-b from-sky-50 to-amber-50 px-2 py-1 font-serif text-[13px] font-bold text-sky-800 shadow-sm" style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}>
+                    〈{c}〉
+                  </span>
+                ))}
+              </div>
+              <button onClick={() => (saveSpell(cards), setKept(true))} disabled={kept} className="mx-auto mt-2 block text-[12px] font-bold text-violet-600 disabled:text-slate-400">
+                {kept ? 'スペルブックに、記しました' : '📖 記す'}
               </button>
-            ))}
-          </div>
-          <div className="mt-3">
-            <Big tone="sky" disabled={!feelSaid} onClick={() => void write()}>
-              歌詞の下書きを見る
-            </Big>
-          </div>
+              <div className="mt-3 space-y-2">
+                <Big tone="sky" onClick={() => (design && redone ? (setPhase('lyrics'), setCue(null)) : void write())}>
+                  {design && redone ? 'このスペルで作り直す' : '歌詞の下書きを見る'}
+                </Big>
+                <Soft onClick={() => setCards(null)}>🎙 話して変える</Soft>
+              </div>
+            </>
+          )}
         </Panel>
       )}
 
@@ -659,7 +757,8 @@ export function MercuryLesson({
                   audio.current?.pause();
                   setOther(song);
                   setRedone(true);
-                  setPhase('lyrics');
+                  setPhase('style');
+                  said({ who: 'bati', text: 'スペルの、どこを変える？' });
                 }}
               >
                 作り直す（1回だけ）
@@ -728,11 +827,12 @@ export function MercuryLesson({
           <div className="relative flex flex-col items-center">
             <Sticker s={ab.who === 'mine' ? record : KIMORIN_JACKET} size={100} />
             <span className="-mt-2 text-7xl drop-shadow-xl">⛵</span>
+            <div className="absolute bottom-6 right-[-18px]">{ab.who === 'mine' ? <Captain chibi={chibi} face={neoFace} /> : <Captain face={spriteUrl('kimorin-face')} shades />}</div>
           </div>
         </div>
       )}
       {ab?.k === 'oshi' && (
-        <div className="absolute inset-x-0 top-[calc(17svh+env(safe-area-inset-top))] z-[185] flex flex-col items-center">
+        <div className="absolute inset-x-0 top-[calc(17svh+env(safe-area-inset-top))] z-[185] flex flex-col items-center overflow-hidden pb-4">
           <span className="rounded-full bg-black/40 px-4 py-1 text-[13px] font-bold text-sky-100">推し</span>
           <button
             onClick={() => {
@@ -750,6 +850,9 @@ export function MercuryLesson({
             <span className="relative flex flex-col items-center">
               <span className="rounded-sm bg-white/90 px-1.5 text-[10px] font-bold text-stone-700">KIMORIN⭐︎</span>
               <span className="text-5xl drop-shadow-xl">⛵</span>
+              <span className="absolute -right-5 bottom-3">
+                <Captain face={spriteUrl('kimorin-face')} shades size={30} />
+              </span>
             </span>
           </button>
         </div>
@@ -758,7 +861,7 @@ export function MercuryLesson({
       {phase === 'after' && ak >= after.findIndex((x) => x.k === 'rise') && after.some((x) => x.k === 'rise') && ab?.k !== 'edit' && (
         <div className="pointer-events-none absolute inset-x-0 top-[26svh] z-[160] flex justify-center px-5">
           {/* the sea off the harbour, where the island rises */}
-          <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/40 bg-gradient-to-b from-sky-300 via-sky-400 to-sky-700 px-3 pb-2 pt-6 shadow-2xl">
+          <div className={`relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/40 bg-gradient-to-b px-3 pb-2 pt-6 shadow-2xl ${look?.time === 'night' ? 'from-indigo-950 via-indigo-800 to-sky-900' : look?.time === 'dusk' ? 'from-orange-300 via-rose-300 to-sky-700' : 'from-sky-300 via-sky-400 to-sky-700'}`}>
             <MyIsland look={look ?? islandOmakase(neo)} rise={ab?.k === 'rise' ? rise : 2} records={1} width={320} />
           </div>
         </div>
@@ -773,8 +876,10 @@ export function MercuryLesson({
               </Big>
             </div>
           ) : (
-            <IslandEditor
+            <IslandChat
               neo={neo}
+              bati={bati}
+              say={said}
               onMake={(l) => {
                 setLook(l);
                 anext();
