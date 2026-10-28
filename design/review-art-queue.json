@@ -1556,6 +1556,1137 @@
     "design/story/refs/story/cast/monban.jpg"
    ],
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: on the left side, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. has appeared from black smoke, standing tall, halo glowing, smoke curling at his feet; KIMORIN, a small chibi white fox about three heads tall whose face looks like a white fox mask: smooth white round face, blue leaf mark on the forehead, blue spiral marks on the cheeks, tiny cat-like ω mouth, tall fox ears with blue insides. Brass steampunk goggles worn over the eyes (eyes completely hidden, no glow). An oversized, patched, stained white lab coat with rolled-up sleeves, a tool belt with dangling wires, white gloves and white shoes with blue paw pads. A small rounded silver box sits on the head between the ears; a thin cable runs from it down to a silver push-button with a gold-glowing rim held in one hand (no engraving on either). A huge fan of white, black and vermilion-tipped feathers grows from the body behind him. No hood, no robe. on the right looks up at him. No text, no letters, no logos."
+  },
+  {
+   "id": "V19/K1-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. First-person view looking down at a shallow round water basin set in a blue-and-silver magic-circle floor of a white marble moon temple; calm water reflecting the starry sky; no people."
+  },
+  {
+   "id": "V19/K1-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. First-person view looking down at a shallow round water basin set in a blue-and-silver magic-circle floor of a white marble moon temple; calm water reflecting the starry sky; no people."
+  },
+  {
+   "id": "V19/K1-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. First-person view looking down at a shallow round water basin set in a blue-and-silver magic-circle floor of a white marble moon temple; calm water reflecting the starry sky; no people."
+  },
+  {
+   "id": "V19/K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the basin water rises in a spiral column reaching toward the viewer, droplets and light sparkling. No text, no letters, no logos."
+  },
+  {
+   "id": "V19/K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the basin water rises in a spiral column reaching toward the viewer, droplets and light sparkling. No text, no letters, no logos."
+  },
+  {
+   "id": "V19/K2-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K1-c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the basin water rises in a spiral column reaching toward the viewer, droplets and light sparkling. No text, no letters, no logos."
+  },
+  {
+   "id": "V19/K3-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Inside a swirling tunnel of water and white-gold light that wraps around the viewer, a bright white center."
+  },
+  {
+   "id": "V19/K3-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Inside a swirling tunnel of water and white-gold light that wraps around the viewer, a bright white center."
+  },
+  {
+   "id": "V19/K3-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Inside a swirling tunnel of water and white-gold light that wraps around the viewer, a bright white center."
+  },
+  {
+   "id": "V19/K4-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Exact top-down view of the round basin's water surface, perfectly calm like a mirror, a soft bright empty oval of light in the center (nothing reflected in it yet), the magic-circle rim around, the reflection of a pillar of light at the edge."
+  },
+  {
+   "id": "V19/K4-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Exact top-down view of the round basin's water surface, perfectly calm like a mirror, a soft bright empty oval of light in the center (nothing reflected in it yet), the magic-circle rim around, the reflection of a pillar of light at the edge."
+  },
+  {
+   "id": "V19/K4-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Exact top-down view of the round basin's water surface, perfectly calm like a mirror, a soft bright empty oval of light in the center (nothing reflected in it yet), the magic-circle rim around, the reflection of a pillar of light at the edge."
+  },
+  {
+   "id": "V06/K1-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A vast golden temple hall with a high ceiling, polished floor reflecting light, lanterns on both sides, stairs leading up to a giant glowing golden magic-circle ring; no one there."
+  },
+  {
+   "id": "V06/K1-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A vast golden temple hall with a high ceiling, polished floor reflecting light, lanterns on both sides, stairs leading up to a giant glowing golden magic-circle ring; no one there."
+  },
+  {
+   "id": "V06/K1-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A vast golden temple hall with a high ceiling, polished floor reflecting light, lanterns on both sides, stairs leading up to a giant glowing golden magic-circle ring; no one there."
+  },
+  {
+   "id": "V06/K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall: a single vertical pillar of soft white light has fallen in front of the golden ring at the top of the stairs. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K1-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall: a single vertical pillar of soft white light has fallen in front of the golden ring at the top of the stairs. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K2-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K1-c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall: a single vertical pillar of soft white light has fallen in front of the golden ring at the top of the stairs. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K3-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K2-a.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K3-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K2-b.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K3-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K2-c.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K4-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K3-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K4-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K3-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K4-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K3-c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K5-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K4-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K5-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K4-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K5-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K4-c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. No text, no letters, no logos."
+  },
+  {
+   "id": "V06/K6-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A great spiral galaxy in deep space, a tiny golden point of light at its center."
+  },
+  {
+   "id": "V06/K6-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A great spiral galaxy in deep space, a tiny golden point of light at its center."
+  },
+  {
+   "id": "V06/K6-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A great spiral galaxy in deep space, a tiny golden point of light at its center."
+  },
+  {
+   "id": "V06/K7-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. An endless room of towering bookshelves glowing warm gold; blank sheets of paper fluttering in the air, birds made of light flying through, glowing musical-note shapes drifting like fireflies. No writing anywhere."
+  },
+  {
+   "id": "V06/K7-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. An endless room of towering bookshelves glowing warm gold; blank sheets of paper fluttering in the air, birds made of light flying through, glowing musical-note shapes drifting like fireflies. No writing anywhere."
+  },
+  {
+   "id": "V06/K7-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. An endless room of towering bookshelves glowing warm gold; blank sheets of paper fluttering in the air, birds made of light flying through, glowing musical-note shapes drifting like fireflies. No writing anywhere."
+  },
+  {
+   "id": "V06/K8-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
+  },
+  {
+   "id": "V06/K8-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
+  },
+  {
+   "id": "V06/K8-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
+  },
+  {
+   "id": "V06/K9-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Almost total darkness, only the last thin edge of a huge golden ring fading at the frame's border."
+  },
+  {
+   "id": "V06/K9-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Almost total darkness, only the last thin edge of a huge golden ring fading at the frame's border."
+  },
+  {
+   "id": "V06/K9-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Almost total darkness, only the last thin edge of a huge golden ring fading at the frame's border."
+  },
+  {
+   "id": "V06/K10-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
+  },
+  {
+   "id": "V06/K10-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
+  },
+  {
+   "id": "V06/K10-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
+  },
+  {
+   "id": "V06/K11-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/monban.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The golden hall lit again: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. stands in the left foreground with his gold halo blazing, OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. in his pillar of light at the back right."
+  },
+  {
+   "id": "V06/K11-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/monban.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The golden hall lit again: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. stands in the left foreground with his gold halo blazing, OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. in his pillar of light at the back right."
+  },
+  {
+   "id": "V06/K11-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/earth-temple-hall.jpg",
+    "design/story/refs/story/cast/monban.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The golden hall lit again: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. stands in the left foreground with his gold halo blazing, OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. in his pillar of light at the back right."
+  },
+  {
+   "id": "V05/K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The headquarters gate at sunset (same view as before): a thick column of swirling black smoke rising from the stone floor, left of center."
+  },
+  {
+   "id": "V05/K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The headquarters gate at sunset (same view as before): a thick column of swirling black smoke rising from the stone floor, left of center."
+  },
+  {
+   "id": "V05/K2-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The headquarters gate at sunset (same view as before): a thick column of swirling black smoke rising from the stone floor, left of center."
+  },
+  {
+   "id": "V05/K3-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K2-a.jpg",
+    "design/story/refs/story/cast/monban.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing left of center where the smoke was, full body, halo blazing gold, wisps of black smoke curling at his feet. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K3-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K2-b.jpg",
+    "design/story/refs/story/cast/monban.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing left of center where the smoke was, full body, halo blazing gold, wisps of black smoke curling at his feet. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K3-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K2-c.jpg",
+    "design/story/refs/story/cast/monban.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing left of center where the smoke was, full body, halo blazing gold, wisps of black smoke curling at his feet. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K4-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Close-up of MONBAN's hood: black mask in deep shadow, gold patterns on the hood rim, the gold halo behind, the eye on the forehead still dark."
+  },
+  {
+   "id": "V05/K4-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Close-up of MONBAN's hood: black mask in deep shadow, gold patterns on the hood rim, the gold halo behind, the eye on the forehead still dark."
+  },
+  {
+   "id": "V05/K4-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. Close-up of MONBAN's hood: black mask in deep shadow, gold patterns on the hood rim, the gold halo behind, the eye on the forehead still dark."
+  },
+  {
+   "id": "V05/K5-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: a single golden eye on the forehead glows brightly in the shadow of the hood. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K5-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: a single golden eye on the forehead glows brightly in the shadow of the hood. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K5-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: a single golden eye on the forehead glows brightly in the shadow of the hood. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K6-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "design/story/refs/story/cast/monban.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The giant closed gate at sunset, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing on the left side in front of it."
+  },
+  {
+   "id": "V05/K6-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "design/story/refs/story/cast/monban.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The giant closed gate at sunset, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing on the left side in front of it."
+  },
+  {
+   "id": "V05/K6-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "design/story/refs/story/cast/monban.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The giant closed gate at sunset, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing on the left side in front of it."
+  },
+  {
+   "id": "V05/K7-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K6-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: the great doors have swung inward, golden light floods out, the domed temple visible far beyond, MONBAN still on the left. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K7-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K6-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: the great doors have swung inward, golden light floods out, the domed temple visible far beyond, MONBAN still on the left. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K7-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K6-c.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: the great doors have swung inward, golden light floods out, the domed temple visible far beyond, MONBAN still on the left. No text, no letters, no logos."
+  },
+  {
+   "id": "V11/K1b-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A long narrow golden ticket floating upright in black space among gold sparkles: engraved ornament border, an engraved slender rocket in the middle, four small empty star-shaped stamp boxes; no text, no numbers, no barcode."
+  },
+  {
+   "id": "V11/K1b-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A long narrow golden ticket floating upright in black space among gold sparkles: engraved ornament border, an engraved slender rocket in the middle, four small empty star-shaped stamp boxes; no text, no numbers, no barcode."
+  },
+  {
+   "id": "V11/K1b-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A long narrow golden ticket floating upright in black space among gold sparkles: engraved ornament border, an engraved slender rocket in the middle, four small empty star-shaped stamp boxes; no text, no numbers, no barcode."
+  },
+  {
+   "id": "V11/K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A white-and-gold origami crane with wings spread, glowing softly at its folds, floating in black space among drifting gold sparkles."
+  },
+  {
+   "id": "V11/K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A white-and-gold origami crane with wings spread, glowing softly at its folds, floating in black space among drifting gold sparkles."
+  },
+  {
+   "id": "V11/K2-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. A white-and-gold origami crane with wings spread, glowing softly at its folds, floating in black space among drifting gold sparkles."
+  },
+  {
+   "id": "V11/K3-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. High above the black-and-gold city of spires at sunset under glowing golden clouds, a tiny white origami crane gliding down toward the great gate."
+  },
+  {
+   "id": "V11/K3-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. High above the black-and-gold city of spires at sunset under glowing golden clouds, a tiny white origami crane gliding down toward the great gate."
+  },
+  {
+   "id": "V11/K3-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. High above the black-and-gold city of spires at sunset under glowing golden clouds, a tiny white origami crane gliding down toward the great gate."
+  },
+  {
+   "id": "V11/K4-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The Obolo Order headquarters seen head-on at sunset: a city of black-and-gold spires, a giant gate with a celestial globe wrapped in rings set in a circle above it, a domed temple beyond, a black stone floor with gold lines and a compass emblem, compass banners on both sides."
+  },
+  {
+   "id": "V11/K4-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The Obolo Order headquarters seen head-on at sunset: a city of black-and-gold spires, a giant gate with a celestial globe wrapped in rings set in a circle above it, a domed temple beyond, a black stone floor with gold lines and a compass emblem, compass banners on both sides."
+  },
+  {
+   "id": "V11/K4-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The Obolo Order headquarters seen head-on at sunset: a city of black-and-gold spires, a giant gate with a celestial globe wrapped in rings set in a circle above it, a domed temple beyond, a black stone floor with gold lines and a compass emblem, compass banners on both sides."
+  },
+  {
+   "id": "V11/K5-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The headquarters gate at sunset as before, the golden ticket from before floating upright at eye level in front of the closed doors, softly glowing."
+  },
+  {
+   "id": "V11/K5-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The headquarters gate at sunset as before, the golden ticket from before floating upright at eye level in front of the closed doors, softly glowing."
+  },
+  {
+   "id": "V11/K5-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg",
+    "design/story/refs/story/places/headquarters-gate.webp"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The headquarters gate at sunset as before, the golden ticket from before floating upright at eye level in front of the closed doors, softly glowing."
   }
  ],
  "redo": []
