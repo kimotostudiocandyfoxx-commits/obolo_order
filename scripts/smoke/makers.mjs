@@ -4,6 +4,8 @@
 // Env: API (https://…run.app), ADMIN_TOKEN.
 import { mkdirSync, writeFileSync } from 'node:fs';
 
+if (process.env.NO_SAVE) process.chdir('/tmp');
+
 const API = process.env.API;
 const ADMIN = process.env.ADMIN_TOKEN;
 mkdirSync('smoke-out', { recursive: true });
@@ -28,6 +30,9 @@ async function req(method, path, body, headers = {}) {
   return j;
 }
 async function save(name, url) {
+  const abs0 = url.startsWith('http') ? url : API + url;
+  say(`IMG ${name} ${abs0}`);
+  if (process.env.NO_SAVE) return;
   try {
     const abs = url.startsWith('http') ? url : API + url;
     const b = Buffer.from(await (await fetch(abs)).arrayBuffer());
