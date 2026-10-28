@@ -138,14 +138,17 @@ function Home() {
     <div className="space-y-4">
       <ProfileCard me={me} />
       <WalletCard wallet={wallet} failed={walletErr} />
-      <section className="card p-5">
-        <h3 className="text-sm font-bold text-white/70">🏦 {m.earth.bank}</h3>
-        <div className="mt-2 flex items-baseline justify-between">
-          <span className="text-sm text-white/60">{m.earth.earnings}</span>
-          <span className="text-2xl font-black">¥{(wallet?.earningsBalanceJpy ?? 0).toLocaleString()}</span>
-        </div>
-        <p className="mt-2 text-[11px] text-white/45">{m.earth.bankHint}</p>
-      </section>
+      {/* 〔お財布〕 opens with the first distribution income (client 2026-10-28); until then it is not shown */}
+      {wallet && (wallet.earningsBalanceJpy > 0 || wallet.recent.some((e) => e.ledger === 'earnings')) && (
+        <section className="card p-5">
+          <h3 className="text-sm font-bold text-white/70">🏦 {m.earth.bank}</h3>
+          <div className="mt-2 flex items-baseline justify-between">
+            <span className="text-sm text-white/60">{m.earth.earnings}</span>
+            <span className="text-2xl font-black">¥{wallet.earningsBalanceJpy.toLocaleString()}</span>
+          </div>
+          <p className="mt-2 text-[11px] text-white/45">{m.earth.bankHint}</p>
+        </section>
+      )}
       <InviteCard />
       <CommsTiles />
       <div className="grid grid-cols-2 gap-3">
