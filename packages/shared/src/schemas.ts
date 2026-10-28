@@ -128,6 +128,10 @@ export const NeoLookBody = z.union([
     color: z.string().trim().min(1).max(30),
     mood: z.string().trim().min(1).max(40),
     hobby: z.string().trim().max(40).optional(),
+    /** a favourite photo of themselves (M-R148), downscaled by the client; only handed to the painter, never stored */
+    photo: z
+      .object({ mime: z.enum(['image/jpeg', 'image/png', 'image/webp']), data: z.string().min(100).max(2_000_000) })
+      .optional(),
   }),
   /** From a reference image (client decision 2026-10-05). The image is only read, never stored. */
   z.object({

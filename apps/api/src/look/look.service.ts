@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
@@ -103,6 +103,8 @@ export class LookService {
     // the reference image is only handed to the model, never stored (copyright, client decision 2026-10-05)
     const refs: GeneratedImage[] = [];
     if ('reference' in body) refs.push({ data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime });
+    // the favourite photo of themselves (M-R148): handed to the painter only, never stored
+    if ('animal' in body && body.photo) refs.push({ data: Buffer.from(body.photo.data, 'base64'), mime: body.photo.mime });
     if ('like' in body) {
       const src = await this.media.imageData(userId, body.like, 'avatar');
       if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
@@ -119,7 +121,9 @@ export class LookService {
             ? neoMorePrompt(i)
             : 'omakase' in body
               ? neoOmakasePrompt(i, round)
-              : neoLookPrompt(body, i, round);
+              : body.photo
+                ? neoFromPhotoPrompt(body, i)
+                : neoLookPrompt(body, i, round);
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');

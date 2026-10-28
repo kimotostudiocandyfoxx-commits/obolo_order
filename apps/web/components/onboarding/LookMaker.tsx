@@ -3,6 +3,7 @@
 import type { NeoLookBody, NeoLookCandidate, NeoLookResult } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { spriteUrl } from '@/lib/onboarding/media';
+import { fileToReference } from '@/lib/look';
 import { NeoChooser } from './NeoChooser';
 import { VoiceField } from './StoryExtras';
 
@@ -25,7 +26,7 @@ export interface LookApi {
   chooseForm(formId: string): Promise<void>;
 }
 
-type Phase = 'animal' | 'color' | 'mood' | 'hobby' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
+type Phase = 'photo' | 'animal' | 'color' | 'mood' | 'hobby' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
 
 const ANIMALS = ['犬', '猫', '狐', 'うさぎ', 'くま', '鳥', '竜', 'おまかせ'];
 const COLORS: { name: string; css: string }[] = [
@@ -68,7 +69,10 @@ function loadDraft(): Draft {
 
 export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string | null) => void }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [phase, setPhase] = useState<Phase>('animal');
+  const [phase, setPhase] = useState<Phase>('photo');
+  // a favourite photo of themselves (M-R148): kept only in this screen, handed to the basin, never stored
+  const [photo, setPhoto] = useState<{ mime: 'image/jpeg'; data: string; url: string } | null>(null);
+  const photoInput = useRef<HTMLInputElement>(null);
   const [free, setFree] = useState('');
   const [sel, setSel] = useState<NeoLookCandidate | null>(null);
   const [instruction, setInstruction] = useState('');
@@ -93,6 +97,8 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   };
   const ans = draft.ans;
   const setAns = (a: Partial<Draft['ans']>) => save({ ...draft, ans: { ...ans, ...a } });
+
+  const withPhoto = () => (photo ? { photo: { mime: photo.mime, data: photo.data } } : {});
 
   const draw = async (body: NeoLookBody) => {
     setErr(null);
@@ -161,6 +167,49 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
 
   if (phase === 'making') return <Basin />;
 
+  if (phase === 'photo')
+    return (
+      <Panel>
+        <Obolon>{'、、、お前の、気に入っている、自分の写真は、あるか？\nあるなら、、、水盤に、映せ。'}</Obolon>
+        <input
+          ref={photoInput}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            try {
+              setPhoto(await fileToReference(f));
+            } catch {
+              setErr('その写真は、読みこめなかった……');
+            }
+          }}
+        />
+        {photo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photo.url} alt="" className="mx-auto mt-3 h-36 w-36 rounded-2xl object-cover ring-2 ring-amber-200/60" />
+        )}
+        <p className="mt-3 text-[11px] leading-relaxed text-white/55">自分だけが写っている写真を選んでね。ほかの人の顔は使えません。写真は、姿を作るためだけに使い、作ったあとは残しません</p>
+        {err && <p className="mt-2 text-xs text-amber-200/80">{err}</p>}
+        <div className="mt-3 flex flex-col gap-2">
+          {photo ? (
+            <>
+              <Gold onClick={() => (setErr(null), setPhase('animal'))}>この写真で作る</Gold>
+              <button onClick={() => photoInput.current?.click()} className="py-2 text-sm text-white/60">
+                ちがう写真にする
+              </button>
+            </>
+          ) : (
+            <Gold onClick={() => photoInput.current?.click()}>📷 お気に入りの自分の写真を選ぶ</Gold>
+          )}
+          <button onClick={() => (setPhoto(null), setErr(null), setPhase('animal'))} className="py-2 text-sm text-white/60">
+            写真を使わずに作る
+          </button>
+        </div>
+      </Panel>
+    );
+
   if (phase === 'animal')
     return (
       <Panel>
@@ -228,7 +277,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
           onPick={(hobby) => {
             const d = { ...draft, ans: { ...ans, hobby } };
             save(d);
-            void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby });
+            void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
           }}
         />
         <p className="mt-3 text-xs text-white/50">自由に言う</p>
@@ -240,7 +289,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
               const hobby = free.trim();
               const d = { ...draft, ans: { ...ans, hobby } };
               save(d);
-              void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby });
+              void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
             }}
           >
             水盤に描いてもらう
@@ -248,7 +297,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
           <Plain
             onClick={() => {
               save({ ...draft, ans: { ...ans, hobby: '' } });
-              void draw({ animal: ans.animal || 'おまかせ', color: ans.color.join('と') || 'おまかせ', mood: ans.mood || 'おまかせ' });
+              void draw({ animal: ans.animal || 'おまかせ', color: ans.color.join('と') || 'おまかせ', mood: ans.mood || 'おまかせ', ...withPhoto() });
             }}
           >
             パス

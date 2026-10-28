@@ -166,6 +166,20 @@ export function neoLookPrompt(a: { animal: string; color: string; mood: string; 
   return `${LOOK_STYLE} ${capital(ears(a.animal, variant))} come out through openings in the hood. Mood and expression: ${mood}. Colours: ${colours(a.color, variant)}.${hobby} ${who(variant, round)} ${ORIGINAL}`;
 }
 
+/**
+ * Day 2 from a favourite photo of themselves (M-R148): the person in the photo drawn semi-real — their face
+ * shape, hairstyle and hair colour kept as a likeness — with the chosen animal's ears, the society's hood in the
+ * chosen colours and the round gold-rimmed sunglasses (the eyes never shown). The four differ in the ears, how the
+ * hood is worn and the expression. The photo is only handed to the painter (never stored).
+ */
+export function neoFromPhotoPrompt(a: { animal: string; color: string; mood: string; hobby?: string }, variant: number): string {
+  const hobby = a.hobby && !/パス/.test(a.hobby) ? ` They love ${a.hobby}: show it as one small charm or accent they wear.` : '';
+  const mood = MOOD[a.mood] ?? any(a.mood, 'mysterious and kind');
+  const hood = ['the hood pulled up deep', 'the hood up but pushed back a little', 'the hood up, slightly tilted', 'the hood up with the edge framing the face'];
+  const face = ['a gentle smile', 'a confident little grin', 'a calm, cool expression', 'a cheerful open smile'];
+  return `${LOOK_STYLE} Base the character on the person in the attached photo: draw THEM as a semi-real painted portrait, keeping a clear likeness of their face shape, hairstyle and hair colour (but painted, not photographic, and flattering). They wear round sunglasses with thin gold frames and pitch-black lenses, so their eyes are not visible. ${capital(ears(a.animal, variant))} come out through openings in the hood, ${pick(hood, variant)}. Colours of the hood: ${colours(a.color, variant)}. Mood: ${mood}; ${pick(face, variant)}.${hobby} Only this one person, never anyone else from the photo.`;
+}
+
 /** Day 2: in the visitor's own words (the hood and the sunglasses stay). */
 export function neoWordsPrompt(words: string, variant: number, round = 0): string {
   return `${LOOK_STYLE} The visitor describes the look they want in their own words: "${words}". Follow it closely, within the hood and sunglasses style. ${who(variant, round)} ${ORIGINAL}`;
