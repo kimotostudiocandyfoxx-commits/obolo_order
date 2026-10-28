@@ -87,10 +87,11 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる
   { t: 'still', image: 's/d2-hall-kimorin' }, // 天球儀の大広間。光の柱の中にOBOLON、右手前に白衣のKIMORIN（QA 5 N7）
   // M-R169 (QA 6 §4-6・QA 8 R20): OBOLON looks at you once, and his eyes narrow
+  // (QA 10 R28: the still first, then in to him and the eyes narrow; they stay narrowed into his first line)
+  { t: 'wait', s: 0.8 },
   { t: 'cam', move: 'in', focus: '50% 57%' },
-  { t: 'still', image: 's/d2-hall-kimorin-squint', fade: 0.4 },
-  { t: 'wait', s: 1.4 },
-  { t: 'still', image: 's/d2-hall-kimorin', fade: 0.4 },
+  { t: 'still', image: 's/d2-hall-kimorin-squint', fade: 0.5 },
+  { t: 'wait', s: 1.2 },
   { t: 'cam', move: 'out' },
   { t: 'say', who: 'OBOLON', text: '俺の名前はOBOLON、双子座だ。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'se', sound: 'boing' },
@@ -215,9 +216,12 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   // M-R169 (§4-8, QA 9 R24): once, while KIMORIN goes on, OBOLON's eyes narrow little by little; the still stays narrowed
+  // in two steps, half then narrow (QA 10 R30: one 2 s cross-fade showed two pairs of eyes), the line staying (R29)
   { t: 'cam', move: 'in', focus: '50% 41%' },
-  { t: 'still', image: 's/d2-moon-kimorin-squint', fade: 2 },
-  { t: 'wait', s: 2 },
+  { t: 'still', image: 's/d2-moon-kimorin-half', fade: 0.9 },
+  { t: 'wait', s: 0.9, keepChat: true },
+  { t: 'still', image: 's/d2-moon-kimorin-squint', fade: 0.9 },
+  { t: 'wait', s: 0.9, keepChat: true },
   { t: 'cam', move: 'out' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。' },
   { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' }, // 長いセリフを分けた（client 2026-10-26）

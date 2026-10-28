@@ -108,7 +108,8 @@ export type Step =
   /** Fade the whole screen to white (~3 s), then continue; the next still/motion fades in from white. */
   | { t: 'whiteout' }
   /** Let a moment play before the next step (e.g. the Earth comes up before KIMORIN gasps). */
-  | { t: 'wait'; s: number }
+  /** keepChat: the line before stays on screen meanwhile (a silent reaction to it, QA 10 R29) */
+  | { t: 'wait'; s: number; keepChat?: boolean }
   /** Cut to a black screen (until the next motion appears) and continue immediately. */
   | { t: 'black' }
   /** Start a looping background motion and continue immediately. */

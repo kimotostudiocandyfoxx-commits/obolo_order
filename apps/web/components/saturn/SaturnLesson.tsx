@@ -328,7 +328,13 @@ export function SaturnLesson({
     const len = fill(beat.text).length;
     const first = setTimeout(() => {
       // a voice that starts later (it came slowly) takes over: it moves the line on when it ends (QA 9 R26)
-      if (heard.current !== at) readTimer.current = setTimeout(() => heard.current !== at && iRef.current === at && setI((n) => (n === at ? n + 1 : n)), len * 120 + 1500);
+      if (heard.current !== at)
+        readTimer.current = setTimeout(() => {
+          if (heard.current === at || iRef.current !== at) return;
+          // a voice arriving just now is not played for a moment (QA 10 R31)
+          voice.current?.stop();
+          setI((n) => (n === at ? n + 1 : n));
+        }, len * 120 + 1500);
     }, 1500);
     return () => {
       clearTimeout(first);

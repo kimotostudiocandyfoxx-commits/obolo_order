@@ -174,6 +174,7 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-hall-sky-monban': 'kimorin-iu',
   's/d2-moon-kimorin': 'kimorin-iu',
   's/d2-moon-kimorin-squint': 'kimorin-iu',
+  's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
 export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false }: Props) {
@@ -196,10 +197,16 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   /** Character image standing in front of the motion ('sprite' steps). */
   const [sprite, setSprite] = useState<string | string[] | null>(null);
   /** Still background image ('still' steps), removed once the next motion is on screen. */
-  const [still, setStill] = useState<string | null>(null);
+  const [still, setStillState] = useState<string | null>(null);
+  // the still on screen, known at once (several steps run before the next render: QA 10 R28)
   const stillRef = useRef<string | null>(null);
-  stillRef.current = still;
-  // a cross-fade between two stills: the one before stays underneath while the new one fades in
+  // how each still came in: a fade-up, or a cross-fade over the one before (kept for as long as it shows: R27)
+  const [stillAnim, setStillAnim] = useState('fadeUp 0.6s ease-out');
+  const setStill = (img: string | null) => {
+    stillRef.current = img;
+    setStillState(img);
+  };
+  // a cross-fade between two stills: the one before stays underneath (the same <img>) while the new one fades in
   const [under, setUnder] = useState<{ image: string; fade: number } | null>(null);
   const underTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const clearStillOnShow = useRef(false);
@@ -374,11 +381,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setWhite(false);
           setTicketArt(null);
           clearTimeout(underTimer.current);
-          if (s.fade && stillRef.current) {
+          if (s.fade && stillRef.current && stillRef.current !== s.image) {
             const fade = s.fade;
             setUnder({ image: stillRef.current, fade });
+            setStillAnim(`stillIn ${fade}s linear both`);
             underTimer.current = setTimeout(() => setUnder(null), fade * 1000 + 100);
-          } else setUnder(null);
+          } else {
+            setUnder(null);
+            if (stillRef.current !== s.image) setStillAnim('fadeUp 0.6s ease-out');
+          }
           setStill(s.image);
           // a still is a full background: lift the start light / black screen
           setReady(true);
@@ -888,22 +899,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {placeholder !== null && <MotionPlaceholder motion={placeholder} />}
       {blackout && <div className="pointer-events-none absolute inset-0 z-[4] bg-black" aria-hidden />}
       <div className={`pointer-events-none absolute inset-0 z-[7] bg-white transition-opacity duration-[2600ms] ease-in-out ${white ? 'opacity-100' : 'opacity-0'}`} aria-hidden />
-      {under && (
+      {/* the still before (during a cross-fade) and the still now, keyed by picture: the one before is the same <img>
+          left in place, and a still's animation is set once, when it comes in (QA 10 R27) */}
+      {[...(under && under.image !== still ? [under.image] : []), ...(still ? [still] : [])].map((img) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={`under-${under.image}`} src={stillUrl(under.image)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" aria-hidden />
-      )}
-      {still && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={still}
-          src={stillUrl(still)}
-          alt=""
-          className={`story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full ${under ? '' : 'animate-[fadeUp_0.6s_ease-out]'}`}
-          style={under ? { animation: `stillIn ${under.fade}s linear both` } : undefined}
-          aria-hidden
-        />
-      )}
-      {under && <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>}
+        <img key={img} src={stillUrl(img)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" style={img === still ? { animation: stillAnim } : undefined} aria-hidden />
+      ))}
+      <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>
       {!sprite && autoStandee && (
         <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
@@ -958,11 +960,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
-      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
+      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)) && (
         // a soft shade under the thread so it reads on any picture
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[10] h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
       )}
-      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t)) && (
+      {started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)) && (
         <ChatLog
           entries={log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }))}
           talking={talking}
