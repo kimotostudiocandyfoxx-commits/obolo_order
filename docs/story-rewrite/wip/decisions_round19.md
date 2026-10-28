@@ -981,3 +981,8 @@
 - 本文の〔ト書き〕（photo・nophoto の4枚の説明）を、このとおりに直した。bible・front・画面設計の「セミリアルの絵」も「日本のアニメ寄りのセミリアルの絵（もっとキャラっぽい絵も選べる）」にそろえた。
 - 指示文の例（UI）：セミリアル「Japanese anime-style semi-realistic illustration, modern Japanese anime key-visual look, clean fine line art, soft cel shading with gentle painterly light, Japanese character design」。キャラっぽい「Japanese anime character illustration, bold clean outlines, flat cel shading, simplified anime facial features, vivid colours」。否定の欄：「western cartoon, american comic style, 3D render, pixar style, photorealistic」。作家・スタジオ・作品の名前は入れない（M-R167 と同じ）。
 
+
+## M-R174 台詞の声は最後まで聞いてから進む・「地球の神殿に着いた」を1秒早く（利用者決定／第21稿）
+- キャラの台詞に声がある行は、声が鳴り終わるまでタップしても次へ進まない（一度聞いた行も同じ）。待っている間のタップは、文字を最後まで出すだけ。声が鳴らない・止まった時は、決まった時間で必ず進めるようにして、先へ進めなくならないようにする。土星の練習の台詞も同じ。
+- 1日目 D01-S006 の神殿に入る映像の〔テロップ：地球の神殿に着いた〕を、今より1秒早く出す。
+- 1日目、〔テロップ：OBOLONが現れた〕のあとで先へ進めなくなる不具合を、UIチャットに最優先で直してもらう。
