@@ -1,27 +1,27 @@
-OK  POST /admin/invites 201 0.2s
-OK  POST /invites/7x8zETXUtzKUVrSa/accept 200 0.1s
-user 4d41f4fb-e170-43d5-b3f0-fab8fe4695e4 day 1
-OK  POST /me/look/candidates 200 92.6s
+OK  POST /admin/invites 201 0.3s
+OK  POST /invites/dEmBjxBVEd15Pi8C/accept 200 0.1s
+user e5892b47-cb53-4906-bf8f-8f71f85c1a1f day 1
+OK  POST /me/look/candidates 200 82.8s
 looks: 4 of 4
-OK  POST /me/look/refine 200 49.4s
+OK  POST /me/look/refine 200 50.1s
 refined: 4 of 4
 OK  POST /me/look 200 0.1s
-OK  POST /me/bati/egg 200 0.6s
-OK  POST /me/bati/hatch 200 112.8s
+OK  POST /me/look/standee 200 44.9s
+OK  POST /me/bati/egg 200 0.7s
+OK  POST /me/bati/hatch 200 104.9s
 OK  POST /me/bati/name 200 0.8s
-OK  POST /me/bati/faces 200 59.9s
+OK  POST /me/bati/faces 200 54.5s
 faces: 6 of 6
 OK  POST /buddy/chat 200 1.2s
-bati says: スモーク、待ってましたっ！ブラックホールについてだね！🌙✨
-マナの魔法で宇宙じゅうの記録を調べてみたよ！そしたらね、ブラックホールっていうのは、とっても重くて小さな星が、自分の重さでぎゅーーーーんって縮みすぎて、なんでも吸い込んじゃうスーパーお宝（？）じゃなくて、スーパーこわい穴なんだって！🪐
-光さえも逃げられないから、真っ黒で見えないらしいよ！ボクも吸い込まれないように、ロケットのエンジン全開にして逃げなきゃ！🚀💨
-OK  POST /buddy/picture 200 3.3s
-picture 1: Behemoth Black Hole Found in an Unlikely Place — NASA（GSFC） (free true)
-OK  POST /buddy/picture 200 2.6s
-picture 2: none
-OK  POST /me/puni/pic/candidates 200 16.5s
+bati says: マナの魔法で調べてみたら、すっごく重たくて何でも吸い込んじゃう宇宙のモンスターなんだって！光ですら逃げられないから真っ黒に見えるらしいよ🌙✨
+OK  POST /buddy/picture 200 2.5s
+picture 1: Space Shuttle Projects — NASA（MSFC） (free true)
+OK  POST /buddy/picture 200 3.4s
+picture 2: Ailuropoda melanoleuca (Panda géant) - 445 — Wikimedia Commons / Another one of my pictures:
+This phot / CC BY-SA 4.0 (free true)
+OK  POST /me/puni/pic/candidates 200 15.7s
 kororin designs: 4
-OK  POST /me/puni/pic 200 0.0s
+OK  POST /me/puni/pic 200 0.1s
 OK  GET /wallet 200 0.1s
 mana left 31
 OK  GET /me 200 0.0s
