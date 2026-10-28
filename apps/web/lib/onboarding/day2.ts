@@ -52,8 +52,9 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-reveal' }, // 豪華映像 #2 KIMORINの登場（M-R90）：白衣がひるがえり、扇の尾が一気に開き、ゴーグルが夕日を反射（目は光らない）
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'smoke' },
-  { t: 'video', motion: 'd2-monban-smoke' }, // 黒い煙が湧き、MONBANが現れる
-  { t: 'still', image: 's/d2-gate-inside' }, // 門の内側から入口を見た景色
+  // the clip d2-monban-smoke showed KIMORIN already in the order's robe (client 2026-10-28: on day 2 he wears the white
+  // coat and goggles until he changes on the Moon) — a still until the new cut is made (art/review)
+  { t: 'still', image: 's/d2-gate-inside' }, // 門の内側から入口を見た景色。黒い煙が湧き、MONBANが現れる
   { t: 'sprite', image: ['monban', 'kimorin-i'] }, // 話す方が前に出る。KIMORINは怪しい発明家の姿・ゴーグルを目に（M-R100）
   { t: 'say', who: 'MONBAN', text: '誰だお前…。' },
   { t: 'say', who: 'KIMORIN', text: '私ですか？私は、なんでもすぐに発明してしまう、天才発明家、KIMORINです。' },
@@ -75,7 +76,9 @@ export const DAY2: Step[] = [
 
   // D02-S004 お金は、かからない
   { t: 'bgm', track: null, fade: 5 },
-  { t: 'video', motion: 'd2-walk-in' }, // KIMORINが前を歩き、地球の神殿の中へ → 暗い天球儀の大広間
+  // d2-walk-in walked toward the gate and then swapped to the temple (client 2026-10-28) — a still of KIMORIN in the
+  // dark hall until the new cut (walking into the temple) is made
+  { t: 'still', image: 's/d2-hall-dark-kimorin' }, // KIMORINが前を歩き、地球の神殿の中へ → 暗い天球儀の大広間
   { t: 'bgm', track: 'obolon' },
   { t: 'se', sound: 'portal' },
   { t: 'video', motion: 'd2-obolon-appear' }, // 光の柱が降り、黒い球のOBOLONが現れる

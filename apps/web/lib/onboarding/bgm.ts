@@ -18,6 +18,8 @@ import { bgmLevel, bgmUrl } from './media';
  * unlock() must be called from the visitor's first tap.
  */
 type Mode = 'element' | 'buffer';
+/** seconds two themes overlap when one follows another */
+const CROSS = 1.6;
 
 export class Bgm {
   private mode: Mode = 'buffer';
@@ -85,6 +87,13 @@ export class Bgm {
     if (this.swapTimer) clearTimeout(this.swapTimer);
     if (!this.track) {
       if (track) this.play(track, 1.2);
+      return;
+    }
+    // Web Audio: a real crossfade — the old theme fades out under the new one, which starts on its cue
+    // (client 2026-10-28: the music broke off and another took its place as the crane reached HQ)
+    if (this.mode === 'buffer' && track) {
+      this.track = track;
+      void this.playBuffer(track, 0, CROSS, true);
       return;
     }
     // Short fade so the new theme lands on the cue (e.g. the moment MONBAN appears).
@@ -194,7 +203,7 @@ export class Bgm {
     return p;
   }
 
-  private async playBuffer(track: string, offset: number, fadeIn: number) {
+  private async playBuffer(track: string, offset: number, fadeIn: number, cross = false) {
     const ctx = this.ctx ?? unlockAudio();
     if (!ctx) return;
     this.ctx = ctx;
@@ -209,10 +218,28 @@ export class Bgm {
       return;
     }
     if (this.track !== track || this.disposed) return;
-    try {
-      this.source?.stop();
-    } catch {
-      /* ignore */
+    if (cross && this.source && this.gain) {
+      // hand the playing theme to its own fade-out, and give the new one a fresh gain
+      const old = this.source;
+      const g = this.gain;
+      const t0 = ctx.currentTime;
+      g.gain.cancelScheduledValues(t0);
+      g.gain.setValueAtTime(g.gain.value, t0);
+      g.gain.linearRampToValueAtTime(0, t0 + fadeIn);
+      try {
+        old.stop(t0 + fadeIn + 0.05);
+      } catch {
+        /* already stopped */
+      }
+      old.onended = () => g.disconnect();
+      this.gain = ctx.createGain();
+      this.gain.connect(masterBus(ctx));
+    } else {
+      try {
+        this.source?.stop();
+      } catch {
+        /* ignore */
+      }
     }
     const src = ctx.createBufferSource();
     src.buffer = buf;
