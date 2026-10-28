@@ -212,28 +212,29 @@ export async function singKororin(audio: Blob | ArrayBuffer, words = '', oh = fa
   if (pk > 0) for (let k = 0; k < dry.length; k++) dry[k] *= 0.8 / pk;
 
   // the room and the echo
-  const tail = 1.6;
+  const tail = 1.0;
   const off = new OfflineAudioContext(1, dry.length + Math.ceil(tail * SR), SR);
   const buf = off.createBuffer(1, dry.length, SR);
   buf.copyToChannel(dry, 0);
   const play = off.createBufferSource();
   play.buffer = buf;
-  const ir = off.createBuffer(1, Math.ceil(SR * 1.2), SR);
+  const ir = off.createBuffer(1, Math.ceil(SR * 0.8), SR);
   const irD = ir.getChannelData(0);
   for (let k = 0; k < irD.length; k++) irD[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / irD.length, 3);
   const verb = off.createConvolver();
   verb.buffer = ir;
   const verbGain = off.createGain();
-  verbGain.gain.value = 0.18;
+  verbGain.gain.value = 0.1;
   const echo = off.createDelay(2);
   echo.delayTime.value = (eighth * 1.5) / SR;
   const fb = off.createGain();
-  fb.gain.value = 0.28;
+  fb.gain.value = 0.15;
   const echoTone = off.createBiquadFilter();
   echoTone.type = 'lowpass';
   echoTone.frequency.value = 3200;
   const echoGain = off.createGain();
-  echoGain.gain.value = 0.22;
+  // kept low so the words stay clear (client 2026-10-28: the echo was too strong)
+  echoGain.gain.value = 0.1;
   play.connect(off.destination);
   play.connect(verb).connect(verbGain).connect(off.destination);
   play.connect(echo).connect(echoTone).connect(fb).connect(echo);

@@ -77,7 +77,7 @@
 ## 2026-10-28 コロリンが歌う (M-R152)
 - lib/saturn/sing.ts: pitch (autocorrelation on an 11 kHz copy) + loudness every 10 ms → syllables at loudness dips → minor pentatonic around the speaker's own pitch, 126 BPM (16ths when over 24 syllables) → pitch-synchronous overlap-add (grains cut around sample peaks, placed at the note's period; formants stay) → room + dotted echo, offline → WAV.
 - Headless check: a 21 s take sings in ~0.9 s, KIMORIN's 12.6 s line in ~0.4 s. The output pitch sits on the notes (A minor pentatonic 55/57/62/64/67/69).
-- Samples: docs/smoke/kororin-before.m4a / kororin-sing.m4a. Not yet heard by a person: listen on the phone before calling it done.
+- Samples: docs/smoke/kororin-before.m4a / kororin-sing.m4a / kororin-relay.m4a. Client heard the relay (2026-10-28): good overall, echo too strong → echo 0.22→0.1, feedback 0.28→0.15, room 0.18→0.1, tail 1.6→1.0 s.
 - If singing throws, the kororin falls back to the old two-semitones-up take.
 
 ## 2026-10-28 M-R154 見積もり（my場所を部品で組む：例 火星のスタジオ）

@@ -83,7 +83,7 @@ export function KororinRelay({ muted = false, onDone }: { muted?: boolean; onDon
       n.start(at);
       nodes.current.push(n);
       starts.push(at);
-      at += b.duration - 1.4;
+      at += b.duration - 0.9;
     }
     for (const b of ohBufs) {
       const n = c.createBufferSource();
