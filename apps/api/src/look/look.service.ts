@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { withAgeBand, batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { withAgeBand, withTouch, batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
@@ -148,9 +148,10 @@ export class LookService {
     const fee = await this.fee(userId, 'look', unlimited);
     const tries = await this.kv.incr(key, TRY_TTL);
 
-    // the look for their age band (M-R172; the birth year itself never reaches the painter)
+    // the look for their age band (M-R172; the birth year itself never reaches the painter), in the touch of each of the
+    // four (M-R173: two Japanese anime semi-real, two character anime)
     const band = ageBand(Number((u.onboardingJson as Record<string, string> | null)?.birthYear) || null);
-    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(withAgeBand(prompt(i), band), i, refs));
+    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(withAgeBand(withTouch(prompt(i), i), band), i, refs));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {

@@ -139,10 +139,20 @@ const STYLE =
  * (gender is never asked), each with the colours placed differently; skin tones vary for people everywhere.
  */
 const WHO_DEFAULT = 'a young person in their late teens';
+/**
+ * M-R173 (client decision): the touch is Japanese anime, never American-looking (no western cartoon, comic or 3D faces).
+ * Two of the four in a Japanese anime-style semi-real, two as a more character-like anime picture; a boyish and a
+ * girlish one in each (LEAN alternates). No artist, studio or title names.
+ */
+const TOUCH_SEMI =
+  'Japanese anime-style semi-realistic illustration, modern Japanese anime key-visual look, clean fine line art, soft cel shading with gentle painterly ' +
+  'light, Japanese character design, painted skin and hair — NOT a photograph, no photographic skin texture, no camera depth of field.'
+const TOUCH_ANIME =
+  'Japanese anime character illustration, bold clean outlines, flat cel shading, simplified anime facial features, vivid colours — NOT a photograph.'
+const NOT_WESTERN = 'Avoid: western cartoon, american comic style, 3D render, pixar style, photorealistic.'
 const LOOK_STYLE =
-  'Digital painting, semi-realistic fantasy character illustration with visible soft brush strokes, painted skin and hair, stylised painterly ' +
-  "cinematic lighting, like a high-end fantasy game's character splash art — NOT a photograph, no photographic skin texture, no camera depth of field. " +
-  'Realistic proportions. Chest-up, centered, facing the viewer, ' + WHO_DEFAULT + ' with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood ' +
+  TOUCH_SEMI +
+  ' Chest-up, centered, facing the viewer, ' + WHO_DEFAULT + ' with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood ' +
   "pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow, fine gold embroidery along the hood's edge. " +
   'Round sunglasses with thin gold frames and pitch-black lenses with a faint golden reflection are always worn: the eyes are never visible. ' +
   'The mouth and the lower face are visible (no face mask, no scarf over the mouth). Modest clothes under the cloak with a high closed neckline, nothing revealing. ' +
@@ -168,6 +178,12 @@ const AGE: Record<'under15' | '15-24' | '25plus', { who: string; line: string }>
       'no grey or thinning hair; keep the face shape, hairstyle and vibe of the photo; not childlike. Avoid: wrinkles, aged skin, grey hair.',
   },
 };
+/** the touch of the n-th of the four (M-R173): 0–1 semi-real, 2–3 character anime; with the look's other lines untouched */
+export function withTouch(prompt: string, variant: number): string {
+  const touch = variant % 4 < 2 ? TOUCH_SEMI : TOUCH_ANIME;
+  return `${prompt.replace(TOUCH_SEMI, touch)} ${NOT_WESTERN}`;
+}
+
 export function withAgeBand(prompt: string, band: 'under15' | '15-24' | '25plus' | null | undefined): string {
   if (!band) return prompt;
   return `${prompt.replace(WHO_DEFAULT, AGE[band].who)} ${AGE[band].line}`;
