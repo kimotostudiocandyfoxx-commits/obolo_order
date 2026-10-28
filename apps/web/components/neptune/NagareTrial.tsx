@@ -70,59 +70,52 @@ function Kororin({ singing, size = 56 }: { singing: boolean; size?: number }) {
 type Stone = { id: number; text: string; x: number; y: number; vx: number; vy: number; gone?: number };
 
 function SaturnStage({ face, onClear }: { face?: string; onClear: () => void }) {
-  const [stones, setStones] = useState<Stone[]>([]);
-  const [freed, setFreed] = useState(0);
+  // the simulation lives in refs (an updater with side effects runs twice in development); each frame is drawn from it
+  const sim = useRef({ stones: [] as Stone[], freed: 0, spawn: 0, seq: 0, done: false });
+  const [, draw] = useState(0);
   const [singing, setSinging] = useState(false);
   const [hint, setHint] = useState(true);
-  const seq = useRef(0);
-  const done = useRef(false);
   const NEED = 8;
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
-    let spawn = 0;
     const tick = (t: number) => {
       const dt = Math.min(0.05, (t - last) / 1000);
       last = t;
-      spawn -= dt;
-      setStones((ss) => {
-        let next = ss
-          .map((s) => (s.gone !== undefined ? { ...s, gone: s.gone + dt } : { ...s, x: s.x + s.vx * dt, y: s.y + s.vy * dt }))
-          // a stone that reaches little {neo} just bumps and drops away (no losing)
-          .filter((s) => (s.gone ?? 0) < 0.8 && Math.hypot(s.x - 50, s.y - 58) > 6);
-        if (spawn <= 0 && next.length < 6) {
-          spawn = 1.1;
-          const a = Math.random() * Math.PI * 2;
-          const x = 50 + Math.cos(a) * 60;
-          const y = 58 + Math.sin(a) * 60;
-          next = [...next, { id: seq.current++, text: WORDS[seq.current % WORDS.length], x, y, vx: (50 - x) / 7, vy: (58 - y) / 7 }];
-        }
-        return next;
-      });
+      const m = sim.current;
+      m.spawn -= dt;
+      m.stones = m.stones
+        .map((s) => (s.gone !== undefined ? { ...s, gone: s.gone + dt } : { ...s, x: s.x + s.vx * dt, y: s.y + s.vy * dt }))
+        // a stone that reaches little {neo} just bumps and drops away (no losing)
+        .filter((s) => (s.gone ?? 0) < 0.8 && Math.hypot(s.x - 50, s.y - 58) > 6);
+      if (m.spawn <= 0 && m.stones.length < 6) {
+        m.spawn = 1.1;
+        const a = Math.random() * Math.PI * 2;
+        const x = 50 + Math.cos(a) * 60;
+        const y = 58 + Math.sin(a) * 60;
+        m.seq++;
+        m.stones.push({ id: m.seq, text: WORDS[m.seq % WORDS.length], x, y, vx: (50 - x) / 7, vy: (58 - y) / 7 });
+      }
+      if (m.freed >= NEED && !m.done) {
+        m.done = true;
+        setTimeout(onClear, 900);
+      }
+      draw((n) => n + 1);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
-  useEffect(() => {
-    if (freed >= NEED && !done.current) {
-      done.current = true;
-      setTimeout(onClear, 900);
-    }
-  }, [freed, onClear]);
+  }, [onClear]);
   const tap = () => {
     setHint(false);
     setSinging(true);
     sing();
     setTimeout(() => setSinging(false), 700);
     // the song: every stone in reach comes apart into light, one letter at a time
-    setStones((ss) => {
-      let n = 0;
-      const out = ss.map((s) => (s.gone === undefined && Math.hypot(s.x - 50, s.y - 58) < 38 ? (n++, { ...s, gone: 0 }) : s));
-      setFreed((f) => f + n);
-      return out;
-    });
+    const m = sim.current;
+    m.stones = m.stones.map((s) => (s.gone === undefined && Math.hypot(s.x - 50, s.y - 58) < 38 ? (m.freed++, { ...s, gone: 0 }) : s));
   };
+  const { stones, freed } = sim.current;
   return (
     <div className="absolute inset-0 overflow-hidden bg-gradient-to-b from-[#2a2238] via-[#6b4a3a] to-[#c27a4a]">
       <div className="absolute inset-0 animate-[spin_30s_linear_infinite] opacity-30" style={{ background: 'conic-gradient(from 0deg, transparent, #9aa 20%, transparent 40%, #889 60%, transparent 80%)' }} />
@@ -151,57 +144,58 @@ function SaturnStage({ face, onClear }: { face?: string; onClear: () => void }) 
 
 function JupiterStage({ face, art, onClear }: { face?: string; art?: string | null; onClear: () => void }) {
   // the butterfly flies right on its own; a tap is a flap up; gravity pulls down; the far edge is 100
-  const [st, setSt] = useState({ x: 6, y: 50, vy: 0, spin: 0, stones: [] as Stone[], rock: 6 });
-  const seq = useRef(0);
-  const done = useRef(false);
+  const sim = useRef({ x: 6, y: 50, vy: 0, spin: 0, stones: [] as Stone[], rock: 6, spawn: 1.5, seq: 0, done: false });
+  const [, draw] = useState(0);
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
-    let spawn = 1.5;
     const tick = (t: number) => {
       const dt = Math.min(0.05, (t - last) / 1000);
       last = t;
-      spawn -= dt;
-      setSt((s) => {
-        if (done.current) return s;
-        let { x, y, vy, spin, rock } = s;
-        let stones = s.stones.map((o) => ({ ...o, x: o.x + o.vx * dt })).filter((o) => o.x > -10);
-        if (spin > 0) {
+      const m = sim.current;
+      if (!m.done) {
+        m.spawn -= dt;
+        m.stones = m.stones.map((o) => ({ ...o, x: o.x + o.vx * dt })).filter((o) => o.x > -10);
+        if (m.spin > 0) {
           // hit: spin down onto the rock just behind, then go on from there
-          spin -= dt;
-          y += (62 - y) * dt * 3;
-          if (spin <= 0) {
-            x = rock;
-            y = 50;
-            vy = 0;
+          m.spin -= dt;
+          m.y += (62 - m.y) * dt * 3;
+          if (m.spin <= 0) {
+            m.x = m.rock;
+            m.y = 50;
+            m.vy = 0;
           }
         } else {
-          x += 7 * dt;
-          vy += 46 * dt;
-          y = Math.max(8, Math.min(78, y + vy * dt));
-          if (y >= 78) vy = -10;
-          if (Math.floor(x / 20) * 20 > rock) rock = Math.floor(x / 20) * 20;
-          if (stones.some((o) => Math.abs(o.x - 18) < 6 && Math.abs(o.y - y) < 7)) {
-            spin = 0.9;
-            stones = [];
+          m.x += 7 * dt;
+          m.vy += 46 * dt;
+          m.y = Math.max(8, Math.min(78, m.y + m.vy * dt));
+          if (m.y >= 78) m.vy = -10;
+          if (Math.floor(m.x / 20) * 20 > m.rock) m.rock = Math.floor(m.x / 20) * 20;
+          if (m.stones.some((o) => Math.abs(o.x - 18) < 6 && Math.abs(o.y - m.y) < 7)) {
+            m.spin = 0.9;
+            m.stones = [];
           }
         }
-        if (spawn <= 0) {
-          spawn = 1.8;
-          stones = [...stones, { id: seq.current++, text: WORDS[seq.current % WORDS.length], x: 110, y: 15 + Math.random() * 60, vx: -26, vy: 0 }];
+        if (m.spawn <= 0) {
+          m.spawn = 1.8;
+          m.seq++;
+          m.stones.push({ id: m.seq, text: WORDS[m.seq % WORDS.length], x: 110, y: 15 + Math.random() * 60, vx: -26, vy: 0 });
         }
-        if (x >= 100 && !done.current) {
-          done.current = true;
+        if (m.x >= 100) {
+          m.done = true;
           setTimeout(onClear, 1600);
         }
-        return { x, y, vy, spin, stones, rock };
-      });
+      }
+      draw((n) => n + 1);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [onClear]);
-  const flap = () => setSt((s) => (s.spin > 0 ? s : { ...s, vy: -26 }));
+  const st = sim.current;
+  const flap = () => {
+    if (sim.current.spin <= 0) sim.current.vy = -26;
+  };
   const end = st.x >= 100;
   return (
     <div className="absolute inset-0 overflow-hidden bg-gradient-to-b from-indigo-900 to-amber-700" onPointerDown={flap}>
@@ -249,8 +243,8 @@ export function NagareTrial({ face, art, neo, onDone }: { face?: string; art?: s
   const [cleared, setCleared] = useState<string>('none');
   const btn = 'w-full rounded-full border border-cyan-200/60 bg-cyan-200/15 py-3 text-[14px] font-bold tracking-wider text-cyan-50 active:scale-[0.98]';
   const Map = ({ at, flag }: { at: number; flag?: boolean }) => (
-    <div className="relative mx-auto mt-4 h-[46svh] w-full max-w-sm rounded-3xl border border-cyan-200/30 bg-[#061a2e] p-4">
-      <div className="absolute inset-0 animate-[spin_40s_linear_infinite] rounded-3xl opacity-20" style={{ background: 'conic-gradient(#888, transparent, #888, transparent)' }} />
+    <div className="relative mx-auto mt-4 h-[46svh] w-full max-w-sm overflow-hidden rounded-3xl border border-cyan-200/30 bg-[#061a2e] p-4">
+      <div className="absolute inset-[-40%] animate-[spin_40s_linear_infinite] opacity-20" style={{ background: 'conic-gradient(#888, transparent, #888, transparent)' }} />
       <svg viewBox="0 0 300 300" className="absolute inset-0 h-full w-full">
         <path d="M40 250 C 90 220, 60 160, 120 150 S 220 120, 200 70 S 120 40, 250 30" fill="none" stroke="#7dd3fc" strokeWidth="3" strokeDasharray="6 8" opacity={0.6} />
       </svg>
@@ -332,7 +326,7 @@ export function NagareTrial({ face, art, neo, onDone }: { face?: string; art?: s
           </div>
         </div>
       )}
-      <button onClick={() => onDone({ neptune_trial: cleared })} className="absolute right-3 top-[calc(10px+env(safe-area-inset-top))] z-10 rounded-full bg-black/40 px-3 py-1 text-[11px] text-white/70">
+      <button onClick={() => onDone({ neptune_trial: cleared })} className="absolute right-3 top-[calc(52px+env(safe-area-inset-top))] z-10 rounded-full bg-black/40 px-3 py-1 text-[11px] text-white/70">
         とじる
       </button>
     </div>
