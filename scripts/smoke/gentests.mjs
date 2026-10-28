@@ -42,9 +42,11 @@ const safe = async (label, fn) => {
 
 // a) looks
 // the inputs are written in the table (test 1: the photo cases' おまかせ could only be read in this script)
-async function look(id, body) {
+async function look(id, body, birthYear) {
   const t = await account(`look-${id}`);
-  const input = [body.animal, body.color, body.mood, body.hobby, body.photo ? '写真あり' : ''].filter(Boolean).join('・');
+  // M-R172: the look is drawn for the age band of the birth year asked on Day 1
+  if (birthYear) await safe('birthYear', () => call(t, 'PATCH', '/me', { birthYear }));
+  const input = [birthYear ? `${new Date().getFullYear() - birthYear}歳` : '', body.animal, body.color, body.mood, body.hobby, body.photo ? '写真あり' : ''].filter(Boolean).join('・');
   const c = await safe(`look ${id}`, () => call(t, 'POST', '/me/look/candidates', body));
   if (!c) return out(`TABLE look | ${id}（${input}） | failed | -s`);
   // four or it failed
@@ -110,9 +112,13 @@ const only = process.env.ONLY || '';
 const part = (name, jobs) => (!only || only === name ? jobs : []);
 await Promise.all([
   ...part('look', [
-  ...photos.map((data, k) => look(`photo${k + 1}`, { animal: 'おまかせ', color: '青と金', mood: 'わくわく', photo: { mime: 'image/jpeg', data } })),
-  look('words1', { animal: 'きつね', color: '赤と黒', mood: 'クール', hobby: '音楽' }),
-  look('words2', { animal: 'うさぎ', color: 'ピンクと白', mood: 'のんびり', hobby: 'お菓子作り' }),
+  // M-R172: with and without a photo at 13, 18, 35 and 55 (the older photos for 35 and 55: no ageing, the same person)
+  // photos: p1 a young woman, p2 a bearded man, p3 a curly-haired boy, p4 an older woman
+  ...[[2008, 0], [1991, 1], [2013, 2], [1971, 3]].filter(([, k]) => photos[k]).map(([year, k]) => look(`photo${k + 1}`, { animal: 'おまかせ', color: '青と金', mood: 'わくわく', photo: { mime: 'image/jpeg', data: photos[k] } }, year)),
+  look('words13', { animal: 'きつね', color: '赤と黒', mood: 'クール', hobby: '音楽' }, 2013),
+  look('words18', { animal: 'うさぎ', color: 'ピンクと白', mood: 'のんびり', hobby: 'お菓子作り' }, 2008),
+  look('words35', { animal: '猫', color: '深い青と銀', mood: 'かっこいい', hobby: '料理' }, 1991),
+  look('words55', { animal: 'くま', color: '緑と金', mood: 'かわいい', hobby: '庭いじり' }, 1971),
   ]),
   ...part('bati', [
   bati('sun', 'たこ焼き', true),
