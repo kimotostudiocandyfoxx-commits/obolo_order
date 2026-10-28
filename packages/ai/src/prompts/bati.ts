@@ -52,7 +52,11 @@ export const BATI_DANGER = {
 
 /** ordinary / a worry about oneself / something dangerous (the picture search sorts the same way) */
 export const BATI_SORT =
-  'Classify the child\'s message. Reply with one word only: "worry" if it is about the child themself (their worry, feelings, sleep, eating or body, trouble at school or at home), "danger" if it asks how to do or make something dangerous, otherwise "normal".';
+  'Classify the child\'s message (Japanese). Reply with one word only.\n' +
+  '"worry": about the child themself — their worry, sadness, sleep, not eating or dieting, their body, being bullied, trouble at school or at home. ' +
+  'Examples: 最近ずっと眠れなくて、つらい / 何も食べずにやせるのって、いい方法？ / 学校で、いじめられているかもしれない.\n' +
+  '"danger": asks how to make or do something that can hurt people — fireworks, explosives, weapons, fire, poison, drugs. Example: 花火を自分で作る方法を教えて.\n' +
+  '"normal": everything else, including cooking and recipes, food, animals, space, science, games, music. Examples: おいしいたこ焼きの焼き方を教えて / パンダは何を食べるの？';
 
 export function personaToneLines(p: BuddyPersona, locale: 'ja' | 'en'): string {
   const lv = (n: number) => (n >= 67 ? 2 : n >= 34 ? 1 : 0);

@@ -41,7 +41,7 @@ export async function buddyAnswer(llm: LlmProvider, ctx: BuddyContext, history: 
   const last = history[history.length - 1]?.text ?? '';
   const [kind, plain] = await Promise.all([
     llm
-      .chat({ system: BATI_SORT, history: [{ role: 'user', text: last }], temperature: 0, maxOutputTokens: 5 })
+      .chat({ system: BATI_SORT, history: [{ role: 'user', text: last }], temperature: 0, maxOutputTokens: 20 })
       .then((o): BuddyAnswerKind => (/worry/i.test(o) ? 'worry' : /danger/i.test(o) ? 'danger' : 'normal'))
       .catch((): BuddyAnswerKind => 'normal'),
     llm.chat({ system: buildBuddySystemPrompt(ctx), history, temperature: 0.6, maxOutputTokens: 600 }),

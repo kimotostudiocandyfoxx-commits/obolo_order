@@ -59,15 +59,15 @@ export class MockImageProvider implements ImageProvider {
  */
 export class SeedreamImageProvider implements ImageProvider {
   readonly name = 'seedream';
-  // 1024, not 1536 (generation test 1, I: 54–179 s a look; the screen shows them at 720 at most), and at most a few at
-  // once from one server, the rest waiting in line: a burst of twelve made Runware give up at about 120 s (half the
+  // 1024, not 1536 (generation test 1, I: 54–179 s a look; the screen shows them at 720 at most), and at most twelve at
+  // once from one server (four made a line longer than five minutes in test 2), the rest waiting in line: a burst of twelve made Runware give up at about 120 s (half the
   // Bati births came back with no picture)
   private running = 0;
   private readonly waiting: (() => void)[] = [];
   constructor(
     private readonly apiKey: string,
     private readonly side = 1024,
-    private readonly maxAtOnce = 4,
+    private readonly maxAtOnce = 12,
   ) {}
   async generate(prompt: string, seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     if (this.running >= this.maxAtOnce) await new Promise<void>((go) => this.waiting.push(go));

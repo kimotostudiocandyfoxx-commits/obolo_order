@@ -375,8 +375,10 @@ export class LookService {
     const u = await this.user(userId);
     if (!u.batiFood) throw apiError(HttpStatus.CONFLICT, 'NO_EGG', 'No egg yet');
     if (u.batiImageUrl) return toMe(u);
+    // waits while the job is still marked as painting (it clears the mark when it ends), at most 240 s: a hatching
+    // that gave up at 100 s painted a second Bati while the first was still in line (generation test 2)
     const started = Number((await this.kv.get(`bati:painting:${userId}`)) ?? 0);
-    while (started && Date.now() - started < 100_000) {
+    while (started && Date.now() - started < 240_000) {
       await new Promise((r) => setTimeout(r, 2000));
       const now = await this.user(userId);
       if (now.batiImageUrl) return toMe(now);
