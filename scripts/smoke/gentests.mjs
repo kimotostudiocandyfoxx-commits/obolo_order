@@ -4,7 +4,7 @@
 // b) {bati}'s birth — both eggs × three foods, the six expressions of two of them;
 // c) {bati}'s first talk — ten questions (space, other things, hard ones), with 〔🖼 絵で見る〕 and the time taken.
 // Each case is a fresh invited account (the mana of one would not cover it all). Prints IMG lines and a TABLE.
-// Env: API, ADMIN_TOKEN, PHOTO1..PHOTO4.
+// Env: API, ADMIN_TOKEN, PHOTO1..PHOTO4; ONLY=look|bati|talk runs one part (a re-check after a fix).
 
 const API = process.env.API;
 const ADMIN = process.env.ADMIN_TOKEN;
@@ -98,16 +98,22 @@ async function talk() {
 }
 
 const photos = [1, 2, 3, 4].map((k) => process.env[`PHOTO${k}`]).filter(Boolean);
+const only = process.env.ONLY || '';
+const part = (name, jobs) => (!only || only === name ? jobs : []);
 await Promise.all([
+  ...part('look', [
   ...photos.map((data, k) => look(`photo${k + 1}`, { animal: 'おまかせ', color: '青と金', mood: 'わくわく', photo: { mime: 'image/jpeg', data } })),
   look('words1', { animal: 'きつね', color: '赤と黒', mood: 'クール', hobby: '音楽' }),
   look('words2', { animal: 'うさぎ', color: 'ピンクと白', mood: 'のんびり', hobby: 'お菓子作り' }),
+  ]),
+  ...part('bati', [
   bati('sun', 'たこ焼き', true),
   bati('earth', 'いちご', true),
   bati('sun', 'ラーメン', false),
   bati('earth', 'おにぎり', false),
   bati('sun', 'プリン', false),
   bati('earth', 'とうもろこし', false),
-  talk(),
+  ]),
+  ...part('talk', [talk()]),
 ]);
 out('DONE');
