@@ -66,6 +66,8 @@ if (refined) say(`refined: ${refined.candidates.length} of 4`);
 if (refined) for (const [k, c] of refined.candidates.entries()) await save(`refine-${k + 1}`, c.url);
 const pick = refined?.candidates[0] ?? looks?.candidates[0];
 if (pick) await step('choose look', () => req('POST', '/me/look', { mediaId: pick.id }));
+const stood = await step('look standee', () => req('POST', '/me/look/standee'));
+if (stood?.lookStandee) await save('look-standee', stood.lookStandee);
 
 await step('egg', () => req('POST', '/me/bati/egg', { food: 'たこ焼き', egg: 'sun' }));
 const hatched = await step('hatch', () => req('POST', '/me/bati/hatch'));
