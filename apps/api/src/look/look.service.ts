@@ -45,6 +45,15 @@ const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '..
  * favourite food (image generated) and named, the same day. If image generation fails the client falls back to the preset forms /
  * an emoji Bati, so the journey never stops.
  */
+/**
+ * n pictures painted side by side; the ones that failed are painted once more (the painter drops one now and then:
+ * the smoke test of 2026-10-28 got 2 of 4 looks once), so a visitor nearly always sees the whole set.
+ */
+async function settleWithRetry<T>(n: number, paint: (i: number) => Promise<T>): Promise<PromiseSettledResult<T>[]> {
+  const first = await Promise.allSettled(Array.from({ length: n }, (_, i) => paint(i)));
+  return Promise.all(first.map((r, i) => (r.status === 'fulfilled' ? r : Promise.allSettled([paint(i)]).then(([again]) => again))));
+}
+
 @Injectable()
 export class LookService {
   private readonly log = new Logger('Look');
@@ -106,11 +115,7 @@ export class LookService {
     const fee = await this.fee(userId, 'look', unlimited);
     const tries = await this.kv.incr(key, TRY_TTL);
 
-    const made = await Promise.allSettled(
-      Array.from({ length: CANDIDATES }, (_, i) =>
-        this.looks.generate(prompt(i), i, refs),
-      ),
-    );
+    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(prompt(i), i, refs));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
@@ -136,7 +141,7 @@ export class LookService {
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
     const fee = await this.fee(userId, 'look', unlimited);
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
-    const made = await Promise.allSettled(Array.from({ length: CANDIDATES }, (_, i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src])));
+    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
     const candidates = [];
     for (const r of made) {
@@ -194,7 +199,7 @@ export class LookService {
     // the kororin design costs mana (3, M-R132)
     const fee = kind === 'puni' ? await this.fee(userId, 'kororinDesign', unlimited) : { refund: async () => undefined };
     const prompt = kind === 'butterfly' ? butterflyPrompt : puniPicPrompt;
-    const made = await Promise.allSettled(Array.from({ length: kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES }, (_, i) => this.images.generate(prompt(body.description, !!reference, i), i, refs)));
+    const made = await settleWithRetry(kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES, (i) => this.images.generate(prompt(body.description, !!reference, i), i, refs));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {
