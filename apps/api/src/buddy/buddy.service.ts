@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { buddyReply, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, LlmProvider, summarizeMemory } from '@obolo/ai';
+import { buddyAnswer, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, LlmProvider, summarizeMemory } from '@obolo/ai';
 import { buddyQuotaDecision, idempotencyKey } from '@obolo/ledger';
 import {
   BUDDY_CONTEXT_MESSAGES,
@@ -149,8 +149,9 @@ export class BuddyService implements OnModuleInit {
 
     const locale = localeOverride ?? (user.locale as Locale);
     let replyText: string;
+    let replyKind: 'normal' | 'worry' | 'danger' = 'normal';
     try {
-      replyText = await buddyReply(
+      ({ text: replyText, kind: replyKind } = await buddyAnswer(
         this.llm,
         {
           buddyName: profile.buddyName,
@@ -160,7 +161,7 @@ export class BuddyService implements OnModuleInit {
           locale,
         },
         history,
-      );
+      ));
     } catch (err) {
       this.log.error(`LLM failed: ${String(err)}`);
       throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'BUDDY_UNAVAILABLE', 'Buddy is resting, try again soon');
@@ -199,6 +200,7 @@ export class BuddyService implements OnModuleInit {
       userMessage: toView(result.u),
       reply: toView(result.b),
       quota: { usedToday: used, freeDaily: this.cfg.BUDDY_FREE_DAILY },
+      kind: replyKind,
     };
   }
 

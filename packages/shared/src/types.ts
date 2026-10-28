@@ -168,6 +168,8 @@ export interface BuddyChatResponse {
   userMessage: BuddyMessageView;
   reply: BuddyMessageView;
   quota: BuddyQuotaView;
+  /** a worry about oneself or something dangerous: the app shows no 〔🖼 絵で見る〕 under it */
+  kind?: 'normal' | 'worry' | 'danger';
 }
 
 export interface SaturnPostView {

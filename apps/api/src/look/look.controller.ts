@@ -85,8 +85,8 @@ export class LookController {
 
   @Post('bati/egg')
   @HttpCode(200)
-  egg(@UserId() userId: string, @Body() body: unknown) {
-    return this.look.egg(userId, parseBody(BatiEggBody, body));
+  egg(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    return this.look.egg(userId, parseBody(BatiEggBody, body), origin(req));
   }
 
   @Post('bati/hatch')

@@ -59,11 +59,27 @@ export class MockImageProvider implements ImageProvider {
  */
 export class SeedreamImageProvider implements ImageProvider {
   readonly name = 'seedream';
+  // 1024, not 1536 (generation test 1, I: 54–179 s a look; the screen shows them at 720 at most), and at most a few at
+  // once from one server, the rest waiting in line: a burst of twelve made Runware give up at about 120 s (half the
+  // Bati births came back with no picture)
+  private running = 0;
+  private readonly waiting: (() => void)[] = [];
   constructor(
     private readonly apiKey: string,
-    private readonly side = 1536,
+    private readonly side = 1024,
+    private readonly maxAtOnce = 4,
   ) {}
-  async generate(prompt: string, _seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
+  async generate(prompt: string, seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
+    if (this.running >= this.maxAtOnce) await new Promise<void>((go) => this.waiting.push(go));
+    this.running++;
+    try {
+      return await this.paint(prompt, seed, refs);
+    } finally {
+      this.running--;
+      this.waiting.shift()?.();
+    }
+  }
+  private async paint(prompt: string, _seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     const res = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
@@ -114,11 +130,13 @@ const STYLE =
  * (gender is never asked), each with the colours placed differently; skin tones vary for people everywhere.
  */
 const LOOK_STYLE =
-  'Semi-realistic fantasy character portrait: semi-real digital painting with realistic proportions, realistic skin, hair and fabric textures, ' +
-  "painterly cinematic lighting, like a high-end fantasy game's character splash art. Chest-up, centered, facing the viewer, a young person in their " +
+  'Digital painting, semi-realistic fantasy character illustration with visible soft brush strokes, painted skin and hair, stylised painterly ' +
+  "cinematic lighting, like a high-end fantasy game's character splash art — NOT a photograph, no photographic skin texture, no camera depth of field. " +
+  'Realistic proportions. Chest-up, centered, facing the viewer, a young person in their ' +
   'late teens with a friendly, attractive face. A member of a mysterious secret society: an OVERSIZED, deep, mysterious hooded cloak, the big hood ' +
   "pulled up over the head and falling loosely around the shoulders, its edge casting a soft shadow, fine gold embroidery along the hood's edge. " +
   'Round sunglasses with thin gold frames and pitch-black lenses with a faint golden reflection are always worn: the eyes are never visible. ' +
+  'The mouth and the lower face are visible (no face mask, no scarf over the mouth). Modest clothes under the cloak with a high closed neckline, nothing revealing. ' +
   'Background: a dark night with soft golden glints and faint stars, softly blurred. Square image that works as a round profile icon (the face in ' +
   'the middle). Safe for children. No text, no letters, no logo, no watermark.';
 const LEAN = ['The character reads as a boy.', 'The character reads as a girl.'];
@@ -149,6 +167,17 @@ const PLACE = [
   (a: string, b: string) => `the hood and cloak are ${a}, the inner fur of the ears and the tips of the hair are ${b}`,
   (a: string, b: string) => `the hood is ${b} with ${a} trim, the hair and the ears are ${a}`,
 ];
+/** from a photo the hair keeps its own colour (test 1, A: blond and teal hair lost the likeness): the colours go on the cloth */
+const PHOTO_PLACE = [
+  (a: string, b: string) => `the hood and cloak are ${a}, the lining is ${b}`,
+  (a: string, b: string) => `the hood is dark with ${a} lining, the inner fur of the animal ears is ${b}`,
+  (a: string, b: string) => `the hood and cloak are ${a}, the embroidered trim and the ear fur are ${b}`,
+  (a: string, b: string) => `the hood is ${b} with ${a} trim, the animal ears are ${a}`,
+];
+const photoColours = (c: string | undefined, variant: number) => {
+  const [a, b] = any(c, pick(OMAKASE_COLOURS, variant)).split(/と|and|,|、/).map((x) => x.trim()).filter(Boolean);
+  return PHOTO_PLACE[variant % PHOTO_PLACE.length](a, b ?? a);
+};
 const who = (variant: number, round = 0) => `${LEAN[variant % 2]} The character has ${pick(SKIN, variant * 2 + round * 3)}.`;
 const colours = (c: string | undefined, variant: number) => {
   const [a, b] = any(c, pick(OMAKASE_COLOURS, variant)).split(/と|and|,|、/).map((x) => x.trim()).filter(Boolean);
@@ -177,7 +206,7 @@ export function neoFromPhotoPrompt(a: { animal: string; color: string; mood: str
   const mood = MOOD[a.mood] ?? any(a.mood, 'mysterious and kind');
   const hood = ['the hood pulled up deep', 'the hood up but pushed back a little', 'the hood up, slightly tilted', 'the hood up with the edge framing the face'];
   const face = ['a gentle smile', 'a confident little grin', 'a calm, cool expression', 'a cheerful open smile'];
-  return `${LOOK_STYLE} Base the character on the person in the attached photo: draw THEM as a semi-real painted portrait, keeping a clear likeness of their face shape, hairstyle and hair colour (but painted, not photographic, and flattering). They wear round sunglasses with thin gold frames and pitch-black lenses, so their eyes are not visible. ${capital(ears(a.animal, variant))} come out through openings in the hood, ${pick(hood, variant)}. Colours of the hood: ${colours(a.color, variant)}. Mood: ${mood}; ${pick(face, variant)}.${hobby} Only this one person, never anyone else from the photo.`;
+  return `Paint, do not photograph: turn the person in the attached photo into a painted illustration (brush strokes, painted skin and hair), never a retouched photo. ${LOOK_STYLE} Base the character on the person in the attached photo: draw THEM as a semi-real painted portrait, keeping a clear likeness of their face shape, hairstyle and their own hair colour (painted and flattering). They wear round sunglasses with thin gold frames and pitch-black lenses, so their eyes are not visible. ${capital(ears(a.animal, variant))} come out through openings in the hood, ${pick(hood, variant)}. Colours: ${photoColours(a.color, variant)}; the hair keeps the photo's own colour. Mood: ${mood}; ${pick(face, variant)}.${hobby} Only this one person, never anyone else from the photo.`;
 }
 
 /** Day 2: in the visitor's own words (the hood and the sunglasses stay). */
@@ -222,13 +251,32 @@ export function stickerArtPrompt(words: string, style?: string): string {
  * apps/api/assets/bati/<egg>-<n>.jpg, painted on flat grey); the favourite food is mixed into that body.
  * Without the body picture (no file), the old free drawing.
  */
+const FOOD_PARTS: [RegExp, string][] = [
+  [/おにぎり|おむすび/, 'a triangular rice-ball head shape, a black nori seaweed band worn like a bib or a scarf, one red umeboshi dot'],
+  [/たこ焼/, 'round takoyaki balls, glossy brown sauce, white mayonnaise stripes, green aonori flakes and pink katsuobushi flakes like hair'],
+  [/ラーメン/, 'wavy yellow noodle hair, a pink-and-white naruto swirl mark, half a boiled egg, a nori sheet'],
+  [/いちご|苺/, 'a red body with tiny yellow seeds, a green strawberry calyx worn as a hat'],
+  [/プリン/, 'a wobbly yellow custard body with a dark caramel top and a red cherry'],
+  [/とうもろこし|コーン/, 'yellow corn kernels, silky corn tassel hair, green husk leaves like little wings'],
+  [/カレー/, 'a warm curry-brown colour, a white rice cap, little orange carrot and yellow potato pieces as accessories'],
+  [/すし|寿司/, 'a sushi rice body with a fish slice on top and a nori band'],
+  [/ケーキ/, 'cream frosting, a strawberry on top, sponge-cake layers'],
+  [/ドーナツ/, 'a ring-shaped donut tail, pink icing and colourful sprinkles'],
+  [/うんち/, 'a cute soft-serve swirl shape on its head, golden brown and shiny, sparkles (cute, never dirty)'],
+];
+/** the parts that tell the food at a glance, for the foods asked most; any other food: its own most recognisable parts */
+export function foodParts(food: string): string {
+  return FOOD_PARTS.find(([r]) => r.test(food))?.[1] ?? `the two or three most recognisable parts of "${food}" that a child would know at a glance`;
+}
+
 export function batiPrompt(food: string, fromBody = false): string {
   if (fromBody)
     return (
       "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. " +
       `Restyle its colours, patterns and small accessories so it is clearly inspired by "${food}": the food's colours become its colours, and small parts of the food ` +
       'become a little hat, ear tips, tufts, cheeks or the tip of its tail. Its skin or fur stays soft, smooth and clean (no raw food texture all over the body, ' +
-      'no meat on its skin). It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.'
+      `no meat on its skin). The food's signature parts must be clearly visible: ${foodParts(food)}. ` +
+      'It stays a cute, appetising creature, not a plate of food, never scary. Keep the tiny mark on its forehead. No text, no letters.'
     );
   return `${STYLE} The character is a newborn magical partner creature called Bati: small, round and chubby, with big sparkling eyes, whose body, colors and accessories are inspired by "${food}". It looks friendly and happy, as if it just hatched from an egg (a few eggshell pieces nearby).`;
 }

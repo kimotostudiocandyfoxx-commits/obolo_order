@@ -11,7 +11,8 @@ import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
-import { IMAGES, KV, LLM, LOOK_IMAGES } from '../infra/tokens';
+import type { JobQueue } from '../infra/queue';
+import { IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 
@@ -42,7 +43,8 @@ const STANDEE_PROMPT =
   'Draw the character of the attached portrait as a full-body standing figure: the same person, face, hair, animal ears, oversized hood and ' +
   'cloak, colours, the round gold-rimmed sunglasses hiding the eyes, and the same semi-real painted style. Standing, facing the viewer, a relaxed ' +
   'friendly pose, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, ' +
-  'no shadow and no other objects. Safe for children. No text, no letters.';
+  'no shadow and no other objects. A human body with human legs and shoes or boots: the animal is only in the ears. The hood and cloak reach only to ' +
+  'the knees, the head about one sixth of the height, the feet fully visible with empty space below them. Safe for children. No text, no letters.';
 // the small chibi NEO (M-R155/M-R161): the Jupiter butterfly, the Uranus owl, the Mercury captain, the Mars pilot, the game hero
 const CHIBI_PROMPT =
   'Draw the character of the attached portrait as a small cute chibi figure: a big head and a small round body (about 2.5 heads tall), the same ' +
@@ -51,11 +53,12 @@ const CHIBI_PROMPT =
   'around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow and no other objects. Safe for children. No text, no letters.';
 const FACE_WORDS: Record<BatiFace, string> = {
   smile: 'a big happy smile, eyes curved with joy',
-  sparkle: 'wide open eyes full of sparkles and stars, excited and curious, leaning forward a little',
+  sparkle: 'wide open eyes with big star-shaped highlights, cheeks glowing, excited and curious, leaning forward a little',
   surprise: 'a surprised face, eyes wide and round, mouth a small open "o"',
   think: 'eyes gently closed, thinking hard, a tiny paw or hand near its chin',
   sad: 'a slightly sad, droopy face, eyebrows tilted, mouth a small frown',
-  yawn: 'a big sleepy yawn, eyes half closed and drowsy',
+  // test 1, E: "half closed" read as grumpy, with teeth, like an old cat
+  yawn: 'a cute sleepy yawn: both eyes fully closed as soft curved lines, a small round open mouth with no teeth, a tiny tear at the corner of one eye, one paw near the mouth, cosy and sweet',
 };
 const BATI_FACE_PROMPT = (f: BatiFace) =>
   `Edit the first picture: keep the same creature exactly — the same body, colours, materials, size, framing, light and the flat plain mid-grey background (#808080) — and change only its expression to ${FACE_WORDS[f]}. A small natural change of pose that fits the expression is fine. Cute, kids-friendly. No text, no letters.`;
@@ -88,7 +91,10 @@ export class LookService {
     @Inject(LLM) private readonly llm: LlmProvider,
     @Inject(KV) private readonly kv: KvStore,
     private readonly ledger: LedgerService,
-  ) {}
+    @Inject(QUEUE) private readonly queue: JobQueue,
+  ) {
+    this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
+  }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
   private async fee(userId: string, kind: MakeKind, unlimited: boolean) {
@@ -314,7 +320,7 @@ export class LookService {
     return toMe(u);
   }
 
-  async egg(userId: string, body: BatiEggBody): Promise<Me> {
+  async egg(userId: string, body: BatiEggBody, origin?: string): Promise<Me> {
     await this.clean(body.food);
     const [u] = await this.db.write
       .update(users)
@@ -323,26 +329,63 @@ export class LookService {
       .returning();
     // which egg: its body types (kept beside the account until the hatching)
     await this.kv.set(`bati:egg:${userId}`, body.egg ?? 'sun', TRY_TTL);
+    // painted from now on, while the story goes to the hatching (generation test 1, D': ~120 s at the hatching itself)
+    if (origin) {
+      await this.kv.set(`bati:painting:${userId}`, String(Date.now()), 600);
+      await this.queue.enqueue('bati.paint', { userId, origin }, { dedupeKey: `bati-paint-${userId}-${Date.now()}` }).catch(() => undefined);
+    }
     return toMe(u);
   }
 
-  /** Day 4: the egg hatches — the Bati image is generated now (the client plays the hatching meanwhile). */
+  /**
+   * Day 4: the egg hatches. The picture was started when the food was said (egg); this waits for it (it lands in the
+   * database, so any server sees it). Nothing coming within 100 s (the painting server slept, or it failed): painted
+   * here. The client plays the hatching meanwhile.
+   */
   async hatch(userId: string, origin: string): Promise<Me> {
     const u = await this.user(userId);
     if (!u.batiFood) throw apiError(HttpStatus.CONFLICT, 'NO_EGG', 'No egg yet');
     if (u.batiImageUrl) return toMe(u);
-    try {
-      const body = await this.batiBody((await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
-      const img = await this.looks.generate(batiPrompt(u.batiFood, !!body), 0, body ? [body] : []);
-      // painted on the body's flat grey: cut out, so the Bati stands on the stage like the others
-      const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
-      const m = png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin);
-      const [nu] = await this.db.write.update(users).set({ batiImageUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
-      return toMe(nu);
-    } catch (e) {
-      this.log.warn(`bati generation failed: ${String(e)}`);
-      return toMe(u);
+    const started = Number((await this.kv.get(`bati:painting:${userId}`)) ?? 0);
+    while (started && Date.now() - started < 100_000) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const now = await this.user(userId);
+      if (now.batiImageUrl) return toMe(now);
+      if (!(await this.kv.get(`bati:painting:${userId}`))) break;
     }
+    return toMe(await this.paintBati(userId, origin));
+  }
+
+  /**
+   * The Bati picture: painted once more when the painter fails, and when that fails too the egg's body itself (cut
+   * out), so a visitor never gets an emoji Bati at the high point of the day (generation test 1, D').
+   */
+  private async paintBati(userId: string, origin: string) {
+    const u = await this.user(userId);
+    if (!u.batiFood || u.batiImageUrl) return u;
+    const body = await this.batiBody((await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
+    let url: string | null = null;
+    for (let k = 0; k < 2 && !url; k++) {
+      try {
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body), k, body ? [body] : []);
+        // painted on the body's flat grey: cut out, so the Bati stands on the stage like the others
+        const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
+        url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
+      } catch (e) {
+        this.log.warn(`bati generation failed (${k + 1}): ${String(e)}`);
+      }
+    }
+    if (!url && body) {
+      const png = await cutoutWhite(body.data, 768, BATI_GREY).catch(() => null);
+      if (png) url = (await this.media.storeImage(userId, 'bati', 'image/png', png, origin)).url;
+    }
+    await this.kv.del(`bati:painting:${userId}`);
+    if (!url) return u;
+    // the food changed meanwhile (a new egg): this picture is not theirs any more
+    const cur = await this.user(userId);
+    if (cur.batiFood !== u.batiFood || cur.batiImageUrl) return cur;
+    const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    return nu;
   }
 
   /** One of the egg's eight body types, at random (none on disk → null, the free drawing). */

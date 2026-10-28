@@ -25,11 +25,20 @@ export class PictureService {
       let pic = q.space ? await this.nasa(q.term, q.must) : await this.commons(q.term, q.must);
       pic ??= q.space ? await this.commons(q.term, q.must) : await this.nasa(q.term, q.must);
       if (pic && (await moderateText(`${pic.title}`, this.llm)).flagged) pic = null;
-      return pic ? { ...pic, free: true } : null;
+      return pic ? { ...pic, title: await this.jaTitle(pic.title), free: true } : null;
     } catch (e) {
       this.log.warn(`picture failed: ${String(e)}`);
       return null;
     }
+  }
+
+  /** a child cannot read the file's English title (generation test 1, H-4): a short Japanese description instead */
+  private async jaTitle(title: string): Promise<string> {
+    const out = await this.llm
+      .chat({ system: 'Turn this picture title into a short, plain Japanese description a child can read (at most 20 characters, no quotes). Reply with the description only.', history: [{ role: 'user', text: title }], temperature: 0, maxOutputTokens: 40 })
+      .catch(() => '');
+    const t = out.trim().replace(/^["「]|["」]$/g, '');
+    return t && t.length <= 30 ? t : title;
   }
 
   /**
@@ -124,7 +133,8 @@ export class PictureService {
     return {
       url: info.thumburl,
       title: strip(info.extmetadata?.ObjectName?.value) || (p.title ?? term).replace(/^File:/, '').replace(/\.\w+$/, ''),
-      source: ['Wikimedia Commons', artist, licence].filter(Boolean).join(' / '),
+      // CC BY-SA needs the author: when the page gives none, the page itself is named
+      source: ['Wikimedia Commons', artist || '作者：元のページ', licence].filter(Boolean).join(' / '),
       pageUrl: info.descriptionurl ?? 'https://commons.wikimedia.org',
     };
   }

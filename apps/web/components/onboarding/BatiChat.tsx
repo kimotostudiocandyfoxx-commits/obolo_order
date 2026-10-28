@@ -24,7 +24,8 @@ function loadTalks(): Talk[] {
     return [];
   }
 }
-type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean };
+// noPic: a worry or a danger — no 〔🖼 絵で見る〕 under it (generation test 1, G-4)
+type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean; noPic?: boolean };
 const EXAMPLES = ['ビッグバンって、いつ起きたの？', 'ブラックホールの正体って、なに？', '宇宙の果てって、あるの？'];
 
 export function BatiChat({
@@ -70,8 +71,11 @@ export function BatiChat({
     setCasting(t);
     const started = Date.now();
     let reply = '';
+    let noPic = false;
     try {
-      reply = (await getApi().buddyChat(t, 'ja')).reply.text;
+      const r = await getApi().buddyChat(t, 'ja');
+      reply = r.reply.text;
+      noPic = !!r.kind && r.kind !== 'normal';
     } catch {
       reply = 'うーん、いまは、うまく調べられなかった……。また聞いてね。';
     }
@@ -79,7 +83,7 @@ export function BatiChat({
     await new Promise((r) => setTimeout(r, Math.max(0, 2200 - (Date.now() - started))));
     setCasting(null);
     setFace('surprise');
-    setMsgs((m) => [...m, { id: m.length, who: 'bati', text: reply, q: t }]);
+    setMsgs((m) => [...m, { id: m.length, who: 'bati', text: reply, q: t, noPic }]);
     setAsked(true);
     setTimeout(() => setFace('smile'), 1400);
   };
@@ -152,11 +156,16 @@ export function BatiChat({
               </p>
               {m.q && (
                 <>
-                  {m.picture ? (
+                  {m.noPic ? null : m.picture ? (
                     <figure className="overflow-hidden rounded-xl bg-black/40">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={m.picture.url} alt={m.picture.title} className="max-h-64 w-full object-contain" />
-                      <figcaption className="px-2 py-1 text-[10px] text-amber-50/55">出どころ：{m.picture.source}</figcaption>
+                      <figcaption className="px-2 py-1 text-[11px] text-amber-50/80">
+                        {m.picture.title}
+                        <a href={m.picture.pageUrl} target="_blank" rel="noreferrer" className="block text-[10px] text-amber-50/55 underline">
+                          出どころ：{m.picture.source}
+                        </a>
+                      </figcaption>
                     </figure>
                   ) : m.picture === null ? (
                     <p className="text-[11px] text-amber-50/55">ぴったりの絵は、見つからなかった……</p>
