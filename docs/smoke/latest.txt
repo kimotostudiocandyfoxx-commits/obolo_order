@@ -1,15 +1,25 @@
 OK  POST /admin/invites 201 0.2s
-OK  POST /invites/93-iGO_IW4lv7-39/accept 200 0.1s
-user fb076540-9c43-48fc-9b82-63b08a145ccd day 1
-OK  POST /me/look/candidates 200 86.0s
+OK  POST /invites/7x8zETXUtzKUVrSa/accept 200 0.1s
+user 4d41f4fb-e170-43d5-b3f0-fab8fe4695e4 day 1
+OK  POST /me/look/candidates 200 92.6s
 looks: 4 of 4
-OK  POST /me/look/refine 200 51.0s
+OK  POST /me/look/refine 200 49.4s
 refined: 4 of 4
 OK  POST /me/look 200 0.1s
 OK  POST /me/bati/egg 200 0.6s
-OK  POST /me/bati/hatch 200 92.7s
-OK  POST /me/bati/name 200 0.9s
-OK  POST /me/puni/pic/candidates 200 17.2s
+OK  POST /me/bati/hatch 200 112.8s
+OK  POST /me/bati/name 200 0.8s
+OK  POST /me/bati/faces 200 59.9s
+faces: 6 of 6
+OK  POST /buddy/chat 200 1.2s
+bati says: スモーク、待ってましたっ！ブラックホールについてだね！🌙✨
+マナの魔法で宇宙じゅうの記録を調べてみたよ！そしたらね、ブラックホールっていうのは、とっても重くて小さな星が、自分の重さでぎゅーーーーんって縮みすぎて、なんでも吸い込んじゃうスーパーお宝（？）じゃなくて、スーパーこわい穴なんだって！🪐
+光さえも逃げられないから、真っ黒で見えないらしいよ！ボクも吸い込まれないように、ロケットのエンジン全開にして逃げなきゃ！🚀💨
+OK  POST /buddy/picture 200 3.3s
+picture 1: Behemoth Black Hole Found in an Unlikely Place — NASA（GSFC） (free true)
+OK  POST /buddy/picture 200 2.6s
+picture 2: none
+OK  POST /me/puni/pic/candidates 200 16.5s
 kororin designs: 4
 OK  POST /me/puni/pic 200 0.0s
 OK  GET /wallet 200 0.1s
