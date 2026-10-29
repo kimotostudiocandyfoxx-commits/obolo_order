@@ -702,3 +702,23 @@ body {
   0%, 100% { opacity: 0.5; transform: scale(0.96); }
   50% { opacity: 1; transform: scale(1.06); }
 }
+
+/* 〔ピンとくる〕 cut-in (client 2026-10-29): a white flash, the band snaps open, holds, closes */
+@keyframes sparkFlash {
+  0% { opacity: 0.95; }
+  14% { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes sparkDim {
+  0% { opacity: 0; }
+  10% { opacity: 0.8; }
+  84% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+@keyframes sparkBand {
+  0% { transform: scaleY(0.02) scaleX(1.2); opacity: 0; filter: brightness(3); }
+  12% { transform: scaleY(1) scaleX(1.04); opacity: 1; filter: brightness(1.6); }
+  22% { transform: none; filter: none; }
+  84% { transform: none; opacity: 1; }
+  100% { transform: scaleY(0.02); opacity: 0; }
+}

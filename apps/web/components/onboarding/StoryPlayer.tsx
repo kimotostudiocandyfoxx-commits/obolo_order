@@ -22,7 +22,7 @@ import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
-import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, speakerSprite } from '@/components/story/Stage';
+import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite } from '@/components/story/Stage';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
@@ -332,6 +332,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [cam, setCam] = useState<{ move: 'in' | 'out' | 'shake'; focus?: string } | null>(null);
   const [expressions, setExpressions] = useState<Record<string, string>>({});
   const [cutin, setCutin] = useState<string | null>(null);
+  const [spark, setSpark] = useState<string | null>(null);
   const [smoke, setSmoke] = useState(0);
   const [motes, setMotes] = useState(0);
   const [talking, setTalking] = useState(false);
@@ -451,6 +452,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'face') {
           setExpressions((e) => ({ ...e, [s.who]: s.expr }));
           n++;
+        } else if (s.t === 'spark') {
+          // the line before stays on screen under the flash; the story goes on once it is gone
+          if (s.sound) playSfx(s.sound, mutedRef.current, mixRef.current.se);
+          setSpark(s.image);
+          setI(n);
+          const after = n + 1;
+          setTimeout(() => {
+            setSpark(null);
+            runRef.current(after);
+          }, 1700);
+          return;
         } else if (s.t === 'cutin') {
           setCutin(s.who);
           n++;
@@ -783,6 +795,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     for (let k = i; k < Math.min(steps.length, i + 10); k++) {
       const s = steps[k];
       if (s.t === 'se') prefetchSfx(s.sound);
+      if (s.t === 'spark') {
+        if (s.sound) prefetchSfx(s.sound);
+        void loadStill(s.image);
+      }
     }
   }, [i, steps]);
   // a motion whose music cue was never scheduled (it did not show): the music changes once the story moves past it
@@ -874,7 +890,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     let q = i - 1;
     while (steps[q]?.t === 'label') q--;
     addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'se', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -1021,6 +1037,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {smoke > 0 && <Smoke key={smoke} />}
       {motes > 0 && <Motes count={motes} />}
       {cutin && spriteSrc(cutin) && <CutIn key={cutin} url={spriteSrc(cutin)!} onDone={() => setCutin(null)} />}
+      {spark && <Spark key={spark} url={stillUrl(spark)} />}
       <FxLayer fx={fx} />
       <BluenaScreen open={screen} />
       {overlayCaption && (

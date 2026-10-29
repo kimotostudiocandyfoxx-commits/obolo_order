@@ -341,6 +341,25 @@ export function CutIn({ url, onDone }: { url: string; onDone: () => void }) {
   );
 }
 
+/**
+ * 〔ピンとくる〕 (client 2026-10-29): a white flash, then a wide picture snaps open across the middle of the screen
+ * between two streaks of light, holds, and is gone — the manga moment something clicks.
+ */
+export function Spark({ url }: { url: string }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[40] flex items-center" aria-hidden>
+      <div className="absolute inset-0 animate-[sparkDim_1.7s_ease-out_forwards] bg-black" />
+      <div className="absolute inset-0 animate-[sparkFlash_1.7s_ease-out_forwards] bg-white" />
+      <div className="relative w-full animate-[sparkBand_1.7s_cubic-bezier(.2,.9,.2,1)_forwards]">
+        <div className="absolute inset-x-0 -top-px h-[2px] bg-white shadow-[0_0_14px_4px_rgba(255,255,255,0.85)]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={url} alt="" className="block aspect-video w-full object-cover" />
+        <div className="absolute inset-x-0 -bottom-px h-[2px] bg-white shadow-[0_0_14px_4px_rgba(255,255,255,0.85)]" />
+      </div>
+    </div>
+  );
+}
+
 /** 〔登場：煙〕 black smoke wells up where someone appears. */
 export function Smoke() {
   return (

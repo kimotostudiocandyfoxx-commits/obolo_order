@@ -114,7 +114,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' }, // MONBANが入り口から歩きながら
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'still', image: 's/d2-hall-sky-monban' }, // 星空の大広間。MONBANが左、OBOLONが真ん中、KIMORINが右（QA 5 N8）
-  { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！\n、、、は！、、ゴホンゴホン！' }, // ピンとくる → 咳払い
+  // ピンとくる → 咳払い: the 'it clicked' cut-in before the cough (client 2026-10-29), the one voice cut at its pause
+  { t: 'say', who: 'KIMORIN', text: 'はい！ぜひ！' },
+  { t: 'spark', image: 's/d2-kimorin-pin-a', sound: 'pin' },
+  { t: 'say', who: 'KIMORIN', text: '、、、は！、、ゴホンゴホン！' },
   { t: 'bgm', track: 'comedy' }, // お金の話から、KIMORINの調子が戻る
   { t: 'say', who: 'KIMORIN', text: 'これはこれは、、、とても手の込んだ手品ですね、、。' },
   { t: 'say', who: 'KIMORIN', text: '宇宙に行きたいかですって？ふふ、、' }, // 長いセリフを分けた（client 2026-10-26）
@@ -241,7 +244,9 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: null },
   { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },
   { t: 'say', who: 'OBOLON', text: '招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' }, // 長いセリフを分けた（client 2026-10-26）
-  { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？、、、、は！、、ゴホンゴホン！' }, // (ピンとくる)
+  { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？' },
+  { t: 'spark', image: 's/d2-kimorin-pin-b', sound: 'pin' }, // (ピンとくる) — client 2026-10-29
+  { t: 'say', who: 'KIMORIN', text: '、、、、は！、、ゴホンゴホン！' },
   { t: 'say', who: 'KIMORIN', text: 'なるほどなるほど、、そうですか。確かにそうですよね？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'あなた達詐欺グループソボロオーダーさん達は脱落なんかさせずに1人でも多くの人からお金を回収したほうが儲かりますもんねー？' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'OBOLON', text: '....' },

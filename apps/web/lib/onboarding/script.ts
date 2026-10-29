@@ -33,7 +33,9 @@ export type SoundFx =
   // a planet's arrival fanfare and the riddle-book sting (ACE-Step, 2026-10-27)
   | 'arrive' | 'riddle'
   // the client's own Pinpon 2.5 press (M-R128): it rings on behind the lines and fades on the next tap; muffled from inside the egg
-  | 'pinpon' | 'pinpon-muffled';
+  | 'pinpon' | 'pinpon-muffled'
+  // the 'it clicked' sting under a 〔ピンとくる〕 cut-in (synthesised, 2026-10-29)
+  | 'pin';
 
 /** Picture effects drawn over the background ('fx' steps). */
 export type PictureFx =
@@ -97,6 +99,8 @@ export type Step =
   | { t: 'face'; who: string; expr: string }
   /** 〔カットイン：MONBAN〕 */
   | { t: 'cutin'; who: string }
+  /** 〔ピンとくる〕 (client 2026-10-29): a wide picture flashes across the screen with its sound, then the story goes on by itself */
+  | { t: 'spark'; image: string; sound?: SoundFx }
   /** 〔登場：煙〕 the "appearance" pattern: smoke wells up, the character stands there (added to the cast) */
   | { t: 'enter'; who: string; fx?: 'smoke' | 'light' }
   /** 〔移動：惑星到着〕〔テロップ：到着〕 the "arrival" pattern: the new place fades in under a title (tap) */
