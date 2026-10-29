@@ -57,7 +57,7 @@ export class InvitesController {
     const ok =
       !!expected && !!token && token.length === expected.length && timingSafeEqual(Buffer.from(token), Buffer.from(expected));
     if (!ok) throw new NotFoundException();
-    const { email, inviterName } = parseBody(AdminCreateInviteBody, body);
-    return this.invites.createByAdmin(email, inviterName);
+    const { email, inviterName, message } = parseBody(AdminCreateInviteBody, body);
+    return this.invites.createByAdmin(email, inviterName, message);
   }
 }

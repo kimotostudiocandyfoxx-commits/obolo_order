@@ -65,8 +65,8 @@ export class InvitesService {
   }
 
   /** Operator-issued invitation (bootstraps the first members). */
-  createByAdmin(email: string, inviterName: string) {
-    return this.create(email, inviterName, null, 'ja');
+  createByAdmin(email: string, inviterName: string, message?: string) {
+    return this.create(email, inviterName, null, 'ja', message);
   }
 
   private async create(email: string, inviterName: string, inviterUserId: string | null, locale: Locale, message?: string) {

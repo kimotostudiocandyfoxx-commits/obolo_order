@@ -121,7 +121,8 @@ export function TomorrowScreen({
     >
       {phase === 'open' ? (
         <div className="animate-[fadeUp_1.2s_ease-out]">
-          <p className="text-2xl tracking-[0.25em] text-amber-50">{skipped.current && skippedText ? skippedText : t(m.gate.doorOpened, { name })}</p>
+          {/* the script's telop only after a skip; the 24 hours waited out open quietly (story chat 2026-10-29) */}
+          {skipped.current && <p className="text-2xl tracking-[0.25em] text-amber-50">{skippedText ?? t(m.gate.doorOpened, { name })}</p>}
         </div>
       ) : (
         <>
