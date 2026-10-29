@@ -71,7 +71,7 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
 
   return (
     <button
-      className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 overflow-hidden bg-black"
+      className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 overflow-hidden bg-black animate-[fadeIn_0.3s_ease-out]"
       onClick={() => stage === 'born' && url && onDone(url)}
       disabled={stage !== 'born'}
     >
@@ -95,7 +95,8 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url!} alt="" className="relative h-[42svh] w-auto animate-[spriteIn_0.6s_ease-out] rounded-[2.5rem] shadow-[0_0_60px_rgba(255,220,150,0.6)]" />
       )}
-      {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[flash_0.7s_ease-out] bg-white" />}
+      {/* no sudden light (QA 14 R52): a soft rise to less than half white */}
+      {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[softFlash_0.9s_ease-out_both] bg-white" />}
       <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' ? '生まれた！' : egg ? '光の中で、なにかが動いている……' : 'たまごが動いている……'}</p>
       {stage === 'born' && <p className="animate-pulse text-xs text-white/60">TAP</p>}
     </button>

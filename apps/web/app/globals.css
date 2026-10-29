@@ -705,8 +705,10 @@ body {
 
 /* 〔ピンとくる〕 cut-in (client 2026-10-29): a white flash, the band snaps open, holds, closes */
 @keyframes sparkFlash {
-  0% { opacity: 0.95; }
-  14% { opacity: 0; }
+  /* no sudden white (QA 14 R50): up to 0.45 over 0.09 s, gone by 0.3 s */
+  0% { opacity: 0; }
+  5% { opacity: 0.45; }
+  18% { opacity: 0; }
   100% { opacity: 0; }
 }
 @keyframes sparkDim {
@@ -716,9 +718,17 @@ body {
   100% { opacity: 0; }
 }
 @keyframes sparkBand {
-  0% { transform: scaleY(0.02) scaleX(1.2); opacity: 0; filter: brightness(3); }
-  12% { transform: scaleY(1) scaleX(1.04); opacity: 1; filter: brightness(1.6); }
+  0% { transform: scaleY(0.02) scaleX(1.2); opacity: 0; filter: brightness(1.3); }
+  12% { transform: scaleY(1) scaleX(1.04); opacity: 1; filter: brightness(1.12); }
   22% { transform: none; filter: none; }
   84% { transform: none; opacity: 1; }
   100% { transform: scaleY(0.02); opacity: 0; }
 }
+
+/* a soft flash: never more than half bright, rising over ~0.4-0.55 s (the 'no sudden light' rule, QA 14 R51/R52) */
+@keyframes softFlash {
+  0% { opacity: 0; }
+  40% { opacity: 0.45; }
+  100% { opacity: 0; }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

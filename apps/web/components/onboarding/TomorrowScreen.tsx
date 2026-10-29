@@ -152,7 +152,8 @@ export function TomorrowScreen({
           )}
         </>
       )}
-      {phase === 'flash' && <div className="pointer-events-none absolute inset-0 animate-[flash_0.9s_ease-out] bg-amber-50" />}
+      {/* no sudden light (QA 14 R51): a soft rise to less than half, over half a second */}
+      {phase === 'flash' && <div className="pointer-events-none absolute inset-0 animate-[softFlash_1.4s_ease-out_both] bg-amber-50" />}
     </div>
   );
 }

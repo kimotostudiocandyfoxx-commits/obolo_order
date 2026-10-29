@@ -25,7 +25,7 @@ export interface DayStory {
 export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
-  1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false },
+  1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした' }, // the script's telop (QA 14 R53)
   // the end of day 2 (the Moon): 「もちろん明日まで待てない」 (story M-R67) → 〔テロップ：24時間スキップした〕 (client 2026-10-22)
   2: { steps: DAY2, skipLabel: 'もちろん明日まで待てない', auth: true, skippedText: '24時間スキップした' },
   3: { steps: DAY3, skipLabel: DEFAULT_SKIP_LABEL, auth: true },

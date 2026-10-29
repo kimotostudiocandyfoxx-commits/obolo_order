@@ -830,6 +830,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       const s = steps[k];
       const img = s.t === 'still' || s.t === 'arrive' ? s.image : null;
       if (img) void loadStill(img);
+      // the hatching egg's picture is decoded before the bright motion ends (QA 14 R52: black for a frame, then the egg)
+      if (s.t === 'hatch') for (const e of ['sun', 'earth']) void loadStill(`s/d2-egg-${e}-cracked`);
     }
   }, [i, steps]);
   // the next theme is decoded ahead
