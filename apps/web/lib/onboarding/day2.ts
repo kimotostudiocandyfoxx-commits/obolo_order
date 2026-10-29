@@ -200,7 +200,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-moon-in' },
   { t: 'say', who: 'OBOLON', text: '、、、来たか。' },
   { t: 'say', who: 'OBOLON', text: 'ちなみに、、、秘密結社は、初めてか？' },
-  { t: 'choice', key: 'times', options: [{ label: '1回目' }, { label: '2回目' }, { label: '3回目以上' }] },
+  { t: 'choice', key: 'times', voice: true, options: [{ label: '1回目' }, { label: '2回目' }, { label: '3回目以上' }] }, // answered by voice (client 2026-10-29)
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // 黒い球が、くるりとKIMORINのほうへ向く。光の柱のOBOLONの前に、白衣のKIMORIN
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },

@@ -35,6 +35,12 @@ export function matchAnswer(heard: string, options: string[]): number {
   const h = heard.replace(/\s/g, '');
   const exact = options.findIndex((o) => h.includes(o));
   if (exact >= 0 && !options.some((o, k) => k !== exact && o.includes(options[exact]) && h.includes(o))) return exact;
+  // 「秘密結社は、初めてか？」〔1回目〕〔2回目〕〔3回目以上〕 (client 2026-10-29): counts said any way
+  if (options.length === 3 && options.every((o) => o.includes('回目'))) {
+    if (/[3-9３-９]|三|四|五|六|七|八|九|十|さん|よん|何回|なんかい|何度|たくさん|いっぱい|以上|いじょう/.test(h)) return 2;
+    if (/[2２]|二|にかい|にど|二度|いいえ|ちがう|違う|初めてじゃない|はじめてじゃない/.test(h)) return 1;
+    return 0;
+  }
   const neg = /たくない|いかない|行かない|いや|嫌|むり|無理|やだ/.test(h);
   const unsure = /わかん|わから|分から|まだ|どう|かな|迷/.test(h);
   const yes = /行き|いき|いく|行く|たい|うん|はい|もちろん|ぜひ/.test(h);
