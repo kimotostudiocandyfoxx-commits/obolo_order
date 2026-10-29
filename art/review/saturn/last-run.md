@@ -1,24 +1,44 @@
-# UI art — 2026-10-29T06:07:08.610Z
+# UI art — 2026-10-29T06:36:16.594Z
 
-Seedream 5.0 Pro / 20枚 / 約23円
+Seedream 5.0 Pro / 40枚 / 約80円
 
-- ⏸ V06/K2-b: 元の絵ができなかったので次回
-- ⏸ V06/K2-c: 元の絵ができなかったので次回
-- ✅ V02/K12-r2a
-- ✅ V06/K1-a
-- ✅ V19/K1-c
-- ✅ V19/K2-b
-- ✅ V19/K4-b
-- ❌ V02/K1-r2b: TypeError: Failed to parse URL from undefined
-- ❌ V02/K10-r2b: TypeError: Failed to parse URL from undefined
-- ❌ V02/MASTER-r2b: TypeError: Failed to parse URL from undefined
-- ❌ V06/K1-b: TypeError: Failed to parse URL from undefined
-- ❌ V06/K1-c: TypeError: Failed to parse URL from undefined
-- ❌ V06/K2-a: TypeError: Failed to parse URL from undefined
-- ❌ V19/K2-c: TypeError: Failed to parse URL from undefined
-- ❌ V19/K3-b: TypeError: Failed to parse URL from undefined
-- ❌ V19/K4-c: TypeError: Failed to parse URL from undefined
-- ❌ stills/d2-egg-earth-pair-a: TypeError: Failed to parse URL from undefined
-- ❌ stills/d2-egg-sun-pair-b: TypeError: Failed to parse URL from undefined
-- ❌ stills/saturn-outside-a: TypeError: Failed to parse URL from undefined
-- ❌ stills/saturn-sleep-r3b: TypeError: Failed to parse URL from undefined
+- ⏸ V03b/K3-a: 時間切れ、次回
+- ⏸ V03b/K3-b: 時間切れ、次回
+- ⏸ V03b/K4-a: 元の絵ができなかったので次回
+- ⏸ V03b/K4-b: 元の絵ができなかったので次回
+- ✅ V02/K1-r2b
+- ✅ V02/K10-r2b
+- ✅ V02/MASTER-r2b
+- ✅ V03a/A0-a
+- ✅ V03a/A0-b
+- ✅ V03a/A1-a
+- ✅ V03a/A1-b
+- ✅ V03a/A2-a
+- ✅ V03a/A2-b
+- ✅ V03a/A3-a
+- ✅ V03a/A3-b
+- ✅ V03b/K1-a
+- ✅ V03b/K1-b
+- ✅ V03b/K2-a
+- ✅ V03b/K2-b
+- ✅ V03b/K5-a
+- ✅ V03b/K5-b
+- ✅ V03b/K6-a
+- ✅ V22/K1-a
+- ✅ V22/K1-b
+- ✅ V22/K1-c
+- ✅ V22/K2-a
+- ✅ V22/K2-b
+- ✅ V22/K2-c
+- ✅ V22/K4-a
+- ✅ V22/K4-b
+- ✅ V22/K5-a
+- ✅ V22/K5-b
+- ✅ V23/a-K2-a
+- ✅ V23/a-K2-b
+- ✅ V23/b-K2-a
+- ✅ V23/b-K2-b
+- ✅ stills/d2-egg-earth-pair-a
+- ✅ stills/d2-egg-sun-pair-b
+- ✅ stills/saturn-outside-a
+- ✅ stills/saturn-sleep-r3b
