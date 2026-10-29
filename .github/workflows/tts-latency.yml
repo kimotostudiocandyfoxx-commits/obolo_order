@@ -1,0 +1,36 @@
+name: TTS latency
+
+# Times one sentence of Bati's voice (apps/web/scripts/tts-latency.ts) — run by hand, or when the script changes.
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/**']
+    paths: ['apps/web/scripts/tts-latency.ts']
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  time:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Time
+        run: |
+          export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=obolo-gemini-api-key)"
+          export FISH_API_KEY="$(gcloud secrets versions access latest --secret=obolo-fish-api-key 2>/dev/null || true)"
+          export FISH_DEFAULT_VOICE_ID="$(gcloud secrets versions access latest --secret=obolo-fish-default-voice-id 2>/dev/null || true)"
+          npx --yes tsx@4.19.2 apps/web/scripts/tts-latency.ts
