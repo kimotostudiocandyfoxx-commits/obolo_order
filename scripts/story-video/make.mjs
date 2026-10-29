@@ -16,20 +16,22 @@
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 const KEY = process.env.RUNWARE_API_KEY ?? process.env.SEEDREAM_API_KEY;
 if (!KEY) throw new Error('RUNWARE_API_KEY is not set');
 const QUEUE = process.argv[2] ?? 'design/story-video-queue.json';
 const queue = JSON.parse(readFileSync(QUEUE, 'utf8'));
-const OUT = 'apps/web/public/onboarding';
+// the review queue (design/review-video-queue.json) puts each cut in art/review for the story chat to judge first
+const OUT = queue.out ?? 'apps/web/public/onboarding';
+const file = (id) => (queue.out ? `${id}` : `m${id}`);
 const MODEL = queue.model ?? 'bytedance:seedance@2.5';
 const API = 'https://api.runware.ai/v1';
 const mime = (p) => (/\.png$/i.test(p) ? 'image/png' : /\.webp$/i.test(p) ? 'image/webp' : 'image/jpeg');
 const dataUri = (p) => `data:${mime(p)};base64,${readFileSync(p).toString('base64')}`;
 const redo = new Set(queue.redo ?? []);
 const log = [];
-const todo = (queue.items ?? []).filter((x) => redo.has(x.id) || !existsSync(join(OUT, `m${x.id}.mp4`)));
+const todo = (queue.items ?? []).filter((x) => redo.has(x.id) || !existsSync(join(OUT, `${file(x.id)}.mp4`)));
 
 async function call(tasks) {
   const res = await fetch(API, {
@@ -104,11 +106,12 @@ async function makeOnce(x, audio) {
     const d = (await call([{ taskType: 'getResponse', taskUUID }])).find((r) => r.taskUUID === taskUUID);
     if (d?.status === 'error') throw new Error(JSON.stringify(d).slice(0, 300));
     if (d?.videoURL) {
-      const raw = join(OUT, `_m${x.id}.mp4`);
+      mkdirSync(OUT, { recursive: true });
+      const raw = join(OUT, `_${file(x.id)}.mp4`);
       writeFileSync(raw, Buffer.from(await (await fetch(d.videoURL)).arrayBuffer()));
-      squeeze(raw, join(OUT, `m${x.id}.mp4`), w !== 720);
+      squeeze(raw, join(OUT, `${file(x.id)}.mp4`), w !== 720);
       rmSync(raw);
-      execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', join(OUT, `m${x.id}.mp4`), '-frames:v', '1', '-q:v', '3', join(OUT, `m${x.id}.jpg`)]);
+      execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', join(OUT, `${file(x.id)}.mp4`), '-frames:v', '1', '-q:v', '3', join(OUT, `${file(x.id)}.jpg`)]);
       return d.cost ?? 0;
     }
   }
@@ -124,6 +127,8 @@ function squeeze(src, out, upscale) {
 }
 
 let usd = 0;
+// what each cut cost, kept in the queue's ledger (the story chat keeps track of what is left)
+const spent = [];
 const failed = new Set();
 // one at a time by default (each request reserves credit up front; parallel requests ran the balance
 // out — 2026-10-22); the queue's "parallel" can raise it
@@ -131,10 +136,17 @@ let next = 0;
 await Promise.all(
   Array.from({ length: queue.parallel ?? 1 }, async () => {
     while (next < todo.length) {
+      // a spending cap for this run (the review queue's budgetYen): nothing new starts past it
+      if (queue.budgetYen && usd * 150 >= queue.budgetYen) {
+        log.push(`- ⏸ ${file(todo[next++].id)}: この回の上限（約${queue.budgetYen}円）に届いたので次回`);
+        continue;
+      }
       const x = todo[next++];
       try {
-        usd += await make(x);
-        log.push(`- ✅ m${x.id}（${x.duration ?? 5}秒・${x.resolution ?? '720p'}）`);
+        const cost = await make(x);
+        usd += cost;
+        spent.push(`| ${new Date().toISOString().slice(0, 16)} | ${x.id} | ${x.duration ?? 5}秒 | 約${Math.round(cost * 150)}円（$${cost.toFixed(3)}） |`);
+        log.push(`- ✅ ${file(x.id)}（${x.duration ?? 5}秒・${x.resolution ?? '720p'}・約${Math.round(cost * 150)}円）`);
       } catch (e) {
         failed.add(x.id);
         log.push(`- ❌ m${x.id}: ${String(e).slice(0, 1500)}`);
@@ -144,7 +156,11 @@ await Promise.all(
 );
 // a redo that failed (the service busy, a refusal) stays queued for the next push
 if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: queue.redo.filter((id) => failed.has(id)) }, null, 2) + '\n');
-mkdirSync('docs/story-import', { recursive: true });
+mkdirSync(dirname(queue.report ?? 'docs/story-import/x'), { recursive: true });
 const report = [`# 物語の動画 — ${new Date().toISOString()}`, '', `${MODEL} / ${todo.length}本 / 約${Math.round(usd * 150)}円`, '', ...log, ''].join('\n');
-writeFileSync('docs/story-import/video-last-run.md', report);
+writeFileSync(queue.report ?? 'docs/story-import/video-last-run.md', report);
+if (queue.ledger && spent.length) {
+  const head = existsSync(queue.ledger) ? readFileSync(queue.ledger, 'utf8') : '# 動画の費用（カットごと）\n\n| 日時 (UTC) | カット | 長さ | 費用 |\n|---|---|---|---|\n';
+  writeFileSync(queue.ledger, `${head.trimEnd()}\n${spent.join('\n')}\n`);
+}
 console.log(report);

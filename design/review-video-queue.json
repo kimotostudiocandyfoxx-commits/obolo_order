@@ -1,0 +1,150 @@
+{
+  "note": "豪華カットの動画（台本チャットの確認用・Seedance 2.5）。決まった止め絵→止め絵だけをつなぐ。できた動画は art/review/saturn/video/<id>.mp4、費用は rounds/video-costs.md。作り直しは redo に id（カット台本 土星まで_豪華カット台本.md）。",
+  "model": "bytedance:seedance@2.5",
+  "always": "Vertical 9:16 cinematic shot for a Japanese mobile story game: highly detailed painterly dark fantasy with glowing gold light, the finest anime film quality, smooth slow professional camera. No text, no letters, no logos, no watermark.",
+  "out": "art/review/saturn/video",
+  "report": "art/review/saturn/video/last-run.md",
+  "ledger": "art/review/saturn/rounds/video-costs.md",
+  "parallel": 3,
+  "budgetYen": 3200,
+  "redo": [],
+  "items": [
+    {
+      "id": "V01-C02",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K1-a.jpg",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. Slow push-in on a quiet snowy town at night, warm window lights, soft snow falling. A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "always": false
+    },
+    {
+      "id": "V01-C03",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K2-r1a.jpg",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. Slow sideways camera move over a desert town of mud-brick houses under a sky full of stars and the Milky Way. A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "always": false
+    },
+    {
+      "id": "V01-C04",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K3-a.jpg",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. A tropical seaside village at night, moonlit waves rolling gently onto the shore under the pier, palm leaves moving in the breeze. A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "always": false
+    },
+    {
+      "id": "V01-C05",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K4-r1b.jpg",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. Slow push-in over a vast city at night seen from high above, lights twinkling through soft haze. A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "always": false
+    },
+    {
+      "id": "V01-C06",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K5-r2a.jpg",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. Terraced fields in a mountain valley at night, mist drifting slowly through the valley, village lights glowing. A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "always": false
+    },
+    {
+      "id": "V01-C07",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K6-b.jpg",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. An old canal town at night, lamplight shimmering on the still water, one small person far away seen from behind; A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. At the end the camera tilts slowly up toward the sky. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "always": false
+    },
+    {
+      "id": "V01-C08",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K7-r1b.jpg",
+      "prompt": "The camera rises steadily up through the night clouds, the city lights below shrink to tiny points, until the night side of planet Earth is seen from orbit; dozens of thin golden threads of light rise from many places on the planet toward the stars. The photographic look melts smoothly into the painted anime film style. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "last": "art/review/saturn/V01/K8-r1a.jpg"
+    },
+    {
+      "id": "V01-C09",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K9-r1b.jpg",
+      "prompt": "Deep space with a dense field of stars and a faint violet nebula; a single thin golden streak of light crosses the stars slowly and straight toward the right edge. The stars twinkle softly. Almost still camera. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V01-C10",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K10-b.jpg",
+      "prompt": "A ring of golden light like a solar eclipse corona with pure black inside, almost still: the ring breathes softly, golden dust drifts slowly around it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V01-C11",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K11-c.jpg",
+      "prompt": "Almost still: before the giant black-and-gold gate at sunset, the tall hooded silhouette stands motionless, its face never visible; golden dust drifts slowly in the backlight, the faint halo behind the head breathes softly. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V01-C12",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K12-r2a.jpg",
+      "prompt": "Eight blank golden cards float in an arc in the dark, bobbing very slightly; their glowing edges breathe softly; golden dust drifts. The cards stay completely blank. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V01-C13",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K13-r2c.jpg",
+      "prompt": "An ornate antique turntable in the dark: the black record spins, the tone arm slowly begins to lower toward the groove but has not touched it when the shot ends. Warm gold rim light. No labels. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V01-C14",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K14-r2b.jpg",
+      "prompt": "A dark forest at night, heavily out of focus: the warm bokeh lights of distant dome houses flicker gently like candles, the camera drifts very slightly. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V01-C15",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V01/K15-c.jpg",
+      "prompt": "Top-down close view of the desk under the warm lamp: the plain hand slowly presses the gold compass-rose seal down onto the envelope flap, a soft gold glow blooms from the seal, the tassel swings, and the hand lifts away. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "last": "art/review/saturn/V01/K16-r1a.jpg"
+    },
+    {
+      "id": "V02-C02",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V02/K3-r1b.jpg",
+      "prompt": "Low ground-level shot: KIMORIN's white shoe with blue paw pads steps forward toward the camera, the hem of the patched white lab coat flares in the wind, the dangling wires on the tool belt swing; strong sunset backlight, gold dust drifting. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "last": "art/review/saturn/V02/K4-r2b.jpg"
+    },
+    {
+      "id": "V02-C04",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V02/K7-r1b.jpg",
+      "prompt": "Low-angle full body shot of KIMORIN standing in the gate's sunset light: his white, black and vermilion feather tail snaps open behind him into a huge fan in one sweep, gold dust swirls up from the floor; he holds still in a heroic pose. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "last": "art/review/saturn/V02/K8-r1b.jpg"
+    },
+    {
+      "id": "V02-C07",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V02/K13-r1a.jpg",
+      "prompt": "Hold on KIMORIN standing on the right third of the frame inside the gate: almost still, a single soft glint of sunset light travels slowly across his brass goggles, his tail feathers breathe gently in the wind, gold dust drifts; the left side stays empty avenue. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V02-C07b",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V02/K13-r1a.jpg",
+      "prompt": "KIMORIN slowly tilts his head back and looks up suspiciously past the gate at the towering black-and-gold buildings, the buildings reflected small in his brass goggles; his feathers move gently in the wind, sunset backlight. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "last": "art/review/saturn/V02/K13b-r2a.jpg"
+    }
+  ]
+}
