@@ -383,7 +383,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             <Gold disabled={busy} onClick={decide}>
               {busy ? '……' : 'これにする'}
             </Gold>
-            {!tired && !draft.refined && <Plain onClick={() => setPhase('add')}>ここを変えたい</Plain>}
+            {REDO_ON && !tired && !draft.refined && <Plain onClick={() => setPhase('add')}>ここを変えたい</Plain>}
             <Back onClick={() => setPhase('pick')} label="4枚にもどる" />
             {err && <p className="text-center text-xs text-rose-300">{err}</p>}
           </div>
@@ -434,7 +434,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             )}
             <p className="text-center text-xs text-white/50">この4つか、前の4つから決めてください（作り直しは、ここまで）。姿は、あとでまた変えられます</p>
           </>
-        ) : !tired ? (
+        ) : !REDO_ON ? null : !tired ? (
           <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>最初から描き直す（1回だけ）</Plain>
         ) : (
           <p className="text-center text-xs text-white/50">水盤が今日は疲れてしまった……この4枚から選んでください</p>
@@ -540,3 +540,10 @@ function Back({ onClick, label = 'もどる' }: { onClick: () => void; label?: s
 function within<T>(p: Promise<T>, ms: number): Promise<T> {
   return Promise.race([p, new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), ms))]);
 }
+
+/**
+ * The redraws (〔ここを変えたい〕, 〔最初から描き直す〕) are hidden for now: waiting again was the weaker moment (client
+ * 2026-10-29, for the investors' evening). The script keeps them; set true to bring them back. 〔もう一度〕 after a
+ * failure stays.
+ */
+const REDO_ON = false;
