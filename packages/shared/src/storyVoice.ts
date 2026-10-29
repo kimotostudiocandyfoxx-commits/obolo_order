@@ -28,7 +28,12 @@ export interface NameLines {
   tempo: number;
   /** by voiceKey(who, act, words-as-written) — also under the key without the stage direction */
   lines: Record<string, { who: string; act?: string; text: string; spec: StoryVoiceSpec; brief: string }>;
+  /** each speaker's speed in the pre-made lines (spokenChars a second, finished files) */
+  pace?: Record<string, number>;
 }
+
+/** The characters of a line that are spoken (no spaces, punctuation or long-vowel marks). */
+export const spokenChars = (text: string) => text.replace(/[\s、。，．！？!?…・「」『』（）()〜ー＊*“”"-]/g, '').length;
 
 /** The names a line can hold. */
 export interface StoryNames {

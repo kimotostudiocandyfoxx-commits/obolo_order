@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
-import { fillNames, speakText, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
+import { fillNames, speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
@@ -33,6 +33,23 @@ function finish(input: Buffer, inputArgs: string[], filter: string): Promise<Buf
     p.stdin.on('error', () => {});
     p.stdin.end(input);
   });
+}
+
+/** One loudness for every line (−18 LUFS, as the pre-made ones): measure, then a fixed gain and a limiter. */
+async function level(mp3: Buffer): Promise<Buffer> {
+  const measured = await new Promise<string>((resolve) => {
+    const p = spawn('ffmpeg', ['-hide_banner', '-f', 'mp3', '-i', 'pipe:0', '-af', 'loudnorm=I=-18:TP=-1.5:print_format=json', '-f', 'null', '-']);
+    let err = '';
+    p.stderr.on('data', (d: Buffer) => (err += d.toString()));
+    p.on('error', () => resolve(''));
+    p.on('close', () => resolve(err));
+    p.stdin.on('error', () => {});
+    p.stdin.end(mp3);
+  });
+  const m = /"input_i"\s*:\s*"(-?[\d.]+)"/.exec(measured);
+  const gain = m ? -18 - Number(m[1]) : NaN;
+  if (!isFinite(gain) || Math.abs(gain) < 2) return mp3;
+  return finish(mp3, ['-f', 'mp3'], `volume=${gain.toFixed(1)}dB,alimiter=limit=0.84:level=false`).catch(() => mp3);
 }
 
 /** seconds of one of our MP3s (constant 64 kbit/s; ffprobe cannot time an MP3 that comes through a pipe) */
@@ -85,8 +102,9 @@ export class LineVoiceService implements OnModuleInit {
       const text = l && fillNames(l.text, body.names);
       if (!l || !text) continue;
       // keyed by what is spoken: a reading fixed later (STORY_READINGS) voices the line again
-      const hash = createHash('sha256').update(JSON.stringify([l.who, l.act ?? '', speakText(text), l.spec, l.brief, nl.tempo, nl.model])).digest('hex').slice(0, 32);
-      items.push({ key, hash, job: { userId, hash, origin, who: l.who, act: l.act, text, spec: l.spec, brief: l.brief, model: nl.model, tempo: nl.tempo } });
+      // v2: takes matched to the speaker's speed and loudness (story chat 2026-10-29) — the lines made before are made again
+      const hash = createHash('sha256').update(JSON.stringify([l.who, l.act ?? '', speakText(text), l.spec, l.brief, nl.tempo, nl.model, 'v2'])).digest('hex').slice(0, 32);
+      items.push({ key, hash, job: { userId, hash, origin, who: l.who, act: l.act, text, spec: l.spec, brief: l.brief, model: nl.model, tempo: nl.tempo, pace: nl.pace?.[l.who] } });
     }
     if (!items.length) return { voices: {}, pending: 0 };
     const rows = await this.db.write
@@ -152,18 +170,23 @@ export class LineVoiceService implements OnModuleInit {
     this.log.log(`${p.who} line voiced for ${p.userId}`);
   }
 
-  /** the line in its character's voice; a take far too short for its words was cut off: try again (keep the longest) */
+  /**
+   * The line in its character's voice, at the speed of the pre-made lines around it: up to three takes, the one
+   * nearest the speaker's pace (a take far too quick for its words was cut off), then the same loudness (−18 LUFS).
+   */
   private async voice(p: JobPayloads['voice.line']): Promise<Buffer> {
     const filter = storyVoiceFilter(p.spec, p.tempo);
-    const chars = p.text.replace(/[\s、。，．！？!?…・「」『』（）()〜ー＊*“”"-]/g, '').length;
-    let best: { mp3: Buffer; sec: number } | null = null;
+    const chars = spokenChars(p.text);
+    const pace = p.pace ?? 5;
+    const off = (sec: number) => (chars / sec > 13 ? 9 : Math.abs(Math.log(chars / sec / pace)));
+    let best: { mp3: Buffer; off: number } | null = null;
     for (let take = 0; take < 3; take++) {
       const mp3 = p.spec.model ? await this.fish(p, filter) : await this.gemini(p, filter);
-      const sec = seconds(mp3);
-      if (!best || sec > best.sec) best = { mp3, sec };
-      if (chars < 6 || chars / best.sec <= 13) break;
+      const o = off(seconds(mp3));
+      if (!best || o < best.off) best = { mp3, off: o };
+      if (chars < 6 || best.off < 0.12) break;
     }
-    return best!.mp3;
+    return level(best!.mp3);
   }
 
   private async fish(p: JobPayloads['voice.line'], filter: string): Promise<Buffer> {

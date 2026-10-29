@@ -17,6 +17,8 @@ export function useNameVoices(voice: LineVoice | null, steps: Step[], names: Sto
   const clean: StoryNames = Object.fromEntries(Object.entries(names).flatMap(([k, val]) => (typeof val === 'string' && val.trim() ? [[k, val.trim().slice(0, 24)]] : [])));
   const dep = JSON.stringify([keys, clean]);
   useEffect(() => {
+    // the voices of the names before this (e.g. the account's name before the one just typed) never play
+    voice?.setPersonal({});
     if (!voice || !keys.length || !Object.keys(clean).length) return;
     let stop = false;
     let timer: ReturnType<typeof setTimeout> | undefined;

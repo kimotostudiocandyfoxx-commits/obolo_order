@@ -1,7 +1,7 @@
 'use client';
 
 import { masterBus, unlockAudio } from '@/lib/onboarding/audio';
-import { nameRest, voiceKey, voiceable } from './voice';
+import { voiceKey, voiceable } from './voice';
 
 /** a line with a member's name in it ({name} {neo} {bati} …) */
 export const hasNames = (text: string) => /\{[a-z_]+\}/.test(text);
@@ -139,15 +139,13 @@ export class LineVoice {
     this.personal = voices;
   }
 
-  /** The file a line is spoken from: its own; for a line with names, the member's voice of it, else the part after the name. */
+  /** The file a line is spoken from: its own; for a line with names, the member's voice of it (none yet: text only). */
   private async urlOf(who: string, text: string, act?: string): Promise<string | null> {
     const m = await loadManifest();
     if (hasNames(text)) {
       const own = this.personal[voiceKey(who, act, text)] ?? this.personal[voiceKey(who, undefined, text)];
-      if (own) return own;
-      // not made yet (e.g. right after the name is given): say the words after the name at least
-      const rest = nameRest(text);
-      return rest ? (m[voiceKey(who, act, rest)] ?? m[voiceKey(who, undefined, rest)] ?? null) : null;
+      // not made yet (e.g. right after the name is given): the caption alone (story chat 2026-10-29)
+      return own ?? null;
     }
     if (!voiceable(text)) return null;
     return m[voiceKey(who, act, text)] ?? null;

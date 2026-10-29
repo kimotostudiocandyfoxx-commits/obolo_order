@@ -172,7 +172,7 @@ export function DemoDay({
       timeUp={timeUp}
       onTimeUp={onTimeUp}
       onNeoName={async (n) => onNeoName?.(n)}
-      initial={start > 0 ? { i: start, name: 'テスト', answers: {} } : null}
+      initial={start > 0 ? { i: start, name: typeof vars.name === 'string' ? vars.name : '', answers: {} } : null}
       onProgress={() => {}}
       onName={async (n) => onName?.(n)}
       onNeo={async (id) => onNeoForm?.(id)}

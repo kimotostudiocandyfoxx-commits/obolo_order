@@ -22,7 +22,7 @@ import { walk, type Scene } from '../lib/story/parse';
 import { idOf } from '../lib/story/sheets';
 import { nameRest, voiceKey, voiceable } from '../lib/story/voice';
 // by path: this runs without an install (the workflow), and the file has no imports of its own
-import { speakText, storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
+import { speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type NameLines } from '../../../packages/shared/src/storyVoice';
 
 const ROOT = resolve(__dirname, '../../..');
 const PUB = join(ROOT, 'apps/web/public');
@@ -251,9 +251,33 @@ function writeNameLines(model: string) {
       out.lines[voiceKey(name, l.act, l.text)] = line;
       out.lines[voiceKey(name, undefined, l.text)] ??= line;
     }
+  out.pace = paces(Object.values(out.lines).map((l) => l.who));
   mkdirSync(join(STORY, 'voices'), { recursive: true });
   writeFileSync(join(STORY, 'voices/name-lines.json'), JSON.stringify(out));
   return Object.keys(out.lines).length;
+}
+
+/**
+ * Each speaker's speed in the pre-made lines (spoken characters a second, the median), so a member's line is
+ * picked from takes at the same speed as the lines around it (story chat 2026-10-29: MONBAN's {inviter} line
+ * came out at another speed and key).
+ */
+function paces(who: string[]): Record<string, number> {
+  const manifest = json<Record<string, string>>(join(STORY, 'voices/manifest.json'), {});
+  const out: Record<string, number> = {};
+  for (const name of new Set(who)) {
+    const r: number[] = [];
+    for (const l of said.get(name) ?? []) {
+      const file = !/\{[a-z_]+\}/.test(l.text) && manifest[voiceKey(name, l.act, l.text)];
+      if (!file || !existsSync(join(PUB, file))) continue;
+      const chars = spokenChars(l.text);
+      if (chars < 6) continue;
+      r.push(chars / seconds(join(PUB, file)));
+      if (r.length >= 25) break;
+    }
+    if (r.length >= 3) out[name] = +r.sort((a, b) => a - b)[r.length >> 1].toFixed(2);
+  }
+  return out;
 }
 
 /** Run jobs a few at a time. */

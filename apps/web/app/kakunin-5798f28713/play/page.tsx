@@ -42,8 +42,24 @@ function PreviewPlay() {
   const [timeUp, setTimeUp] = useState(false);
   // logged in to the real API: the look and Bati are painted for real (Gemini) and saved to the account,
   // like a member's first journey; otherwise demo pictures drawn in the browser
-  const { me, status } = useAuth();
+  const { me, status, setMe } = useAuth();
+  // the name typed on Day 1 (story chat 2026-10-29: never another name in captions or voices): logged in it becomes
+  // the account's name, as for the members; otherwise this browser keeps it for the next days
+  const [typed, setTyped] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setTyped(sessionStorage.getItem('kakunin.name'));
+    } catch {}
+  }, []);
+  const onName = async (n: string) => {
+    setTyped(n);
+    try {
+      sessionStorage.setItem('kakunin.name', n);
+    } catch {}
+    if (getApi().mode === 'live' && me) setMe(await getApi().updateMe({ displayName: n }));
+  };
   const live = getApi().mode === 'live' && !!me && q.get('demo') !== '1';
+  const name = (live && me ? me.displayName : typed) || 'あなた';
   const guest = getApi().mode === 'live' && status === 'guest' && q.get('demo') !== '1';
   useEffect(() => {
     if (q.get('timeup') !== '1') return;
@@ -102,7 +118,7 @@ function PreviewPlay() {
   if (ended && nextDay)
     return (
       <TomorrowScreen
-        name="テスト"
+        name={name}
         completedAt={null}
         skipLabel={STORIES[day]?.skipLabel ?? DEFAULT_SKIP_LABEL}
         skippedText={STORIES[day]?.skippedText}
@@ -131,9 +147,10 @@ function PreviewPlay() {
         timeUp={timeUp}
         onTimeUp={() => setEnded(true)}
         onNeoForm={(id) => setNeo(id)}
+        onName={(n) => void onName(n)}
         onEnd={() => setEnded(true)}
         vars={{
-          name: live && me ? me.displayName : 'テスト',
+          name,
           inviter: live && me?.invitedByName ? me.invitedByName : '木元 駿之介',
           inviterMessage: q.get('msg') === '0' ? undefined : '宇宙で待ってる✌️ウヒョヒョ',
           // logged in: the member's own NEO and Bati (made for real on the Moon), like the members' journey

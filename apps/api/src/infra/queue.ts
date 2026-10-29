@@ -19,7 +19,7 @@ export interface JobPayloads {
   'bati.paint': { userId: string; origin: string };
   /** the egg's plain body stood in: painted again a little later (story chat, generation test 2) */
   'bati.repaint': { userId: string; origin: string };
-  'voice.line': { userId: string; hash: string; origin: string; who: string; act?: string; text: string; spec: import('@obolo/shared').StoryVoiceSpec; brief: string; model: string; tempo: number };
+  'voice.line': { userId: string; hash: string; origin: string; who: string; act?: string; text: string; spec: import('@obolo/shared').StoryVoiceSpec; brief: string; model: string; tempo: number; pace?: number };
 }
 
 export type JobHandler<N extends JobName> = (payload: JobPayloads[N]) => Promise<void>;
