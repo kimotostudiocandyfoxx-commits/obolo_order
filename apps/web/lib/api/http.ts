@@ -123,6 +123,9 @@ export class HttpApi implements Api {
   lineVoices(body: LineVoicesBody) {
     return this.req<LineVoicesView>('POST', '/voice/lines', body);
   }
+  batiSays(text: string) {
+    return this.req<{ url: string | null }>('POST', '/voice/bati-says', { text });
+  }
   speak(body: Parameters<Api['speak']>[0]) {
     return this.req<Awaited<ReturnType<Api['speak']>>>('POST', '/voice/speak', body);
   }

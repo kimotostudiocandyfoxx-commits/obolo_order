@@ -1315,6 +1315,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           first={!!step.first}
           spell={!!step.spell}
           me={v.look}
+          muted={muted || mix.voice === 0}
           onDone={() => {
             remember('f_d03_bati_talk', 'true');
             run(iRef.current + 1);

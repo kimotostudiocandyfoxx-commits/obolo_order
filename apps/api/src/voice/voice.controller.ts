@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
-import { LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
+import { BatiSaysBody, LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -49,5 +49,13 @@ export class VoiceController {
   async lineVoices(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-lines:${userId}`, 40, 60);
     return this.lines.get(userId, parseBody(LineVoicesBody, body), `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** {bati}'s answer in the Moon chat, read aloud in {bati}'s story voice (M-R179); null when it cannot be made now */
+  @Post('bati-says')
+  @HttpCode(200)
+  async batiSays(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `voice-bati-says:${userId}`, 30, 60);
+    return (await this.lines.batiSays(userId, parseBody(BatiSaysBody, body).text, `${req.protocol}://${req.get('host')}`)) ?? { url: null };
   }
 }

@@ -110,6 +110,8 @@ export interface Api {
   registerVoice(body: RegisterVoiceBody): Promise<Me>;
   /** Read a text aloud in a registered voice (Fish Audio). */
   speak(body: SpeakBody): Promise<{ url: string }>;
+  /** one sentence of {bati}'s answer in {bati}'s story voice (M-R179); url null when it cannot be made now */
+  batiSays(text: string): Promise<{ url: string | null }>;
   /** The words of one of your recordings (from uploadVoice). */
   transcribe(mediaId: string): Promise<{ text: string }>;
   /** story lines with the member's names in them: voiced ones back, the rest being voiced (poll) */

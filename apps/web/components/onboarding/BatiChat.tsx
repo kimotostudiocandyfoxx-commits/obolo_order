@@ -28,7 +28,160 @@ function loadTalks(): Talk[] {
 type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean; noPic?: boolean };
 const EXAMPLES = ['ビッグバンって、いつ起きたの？', 'ブラックホールの正体って、なに？', '宇宙の果てって、あるの？'];
 
-export function BatiChat({
+export function BatiChat(props: Parameters<typeof BatiChatFull>[0] & { muted?: boolean }) {
+  return props.first ? <BatiFirstTalk {...props} /> : <BatiChatFull {...props} />;
+}
+
+/** how many answers the first talk on the Moon lasts (M-R179: about five rounds, then {bati} grows sleepy) */
+const FIRST_ROUNDS = 5;
+const sentences = (t: string) => (t.match(/[^。！？!?\n]+[。！？!?]*/g) ?? [t]).map((x) => x.trim()).filter(Boolean);
+
+/**
+ * D03-S008 「はじめての、おしゃべり」 as M-R179 has it: no how-to, no examples, no buttons — a chat where {neo} and
+ * {bati} talk freely for about five rounds. {bati}'s answer comes in words at once and in {bati}'s own voice as each
+ * sentence is made (words alone if the voice does not come); a picture, when there is one, comes inside the answer
+ * with its source. One small line at the bottom says the answers can be wrong. Nothing is kept, no numbers.
+ */
+function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: { bati: string; neo: string; image?: string; faces?: Partial<Record<string, string>>; me?: string; muted?: boolean; onDone: () => void }) {
+  const [msgs, setMsgs] = useState<Msg[]>([{ id: 0, who: 'bati', text: `ねえ、${neo}。なんでも、話して！　ボク、調べてみる！` }]);
+  const [q, setQ] = useState('');
+  const [face, setFace] = useState<string>('sparkle');
+  const [casting, setCasting] = useState(false);
+  const [rounds, setRounds] = useState(0);
+  const end = useRef<HTMLDivElement>(null);
+  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, casting]);
+  const pic = faces?.[face] || image;
+  // the voice: one sentence after another, each played as soon as it is made
+  const playing = useRef<HTMLAudioElement | null>(null);
+  const gen = useRef(0);
+  useEffect(() => () => void (gen.current++, playing.current?.pause()), []);
+  const sayAloud = async (text: string) => {
+    const g = ++gen.current;
+    if (muted) return;
+    const parts = sentences(text).slice(0, 4);
+    const urls = parts.map((t) => getApi().batiSays(t).then((r) => r.url).catch(() => null));
+    for (const u of urls) {
+      const url = await u;
+      if (g !== gen.current) return;
+      if (!url) continue;
+      await new Promise<void>((done) => {
+        const a = new Audio(url);
+        playing.current = a;
+        a.onended = () => done();
+        a.onerror = () => done();
+        a.play().catch(() => done());
+      });
+    }
+  };
+
+  const ask = async (text: string) => {
+    const t = text.trim();
+    if (!t || casting || rounds >= FIRST_ROUNDS) return;
+    gen.current++;
+    playing.current?.pause();
+    setQ('');
+    setMsgs((m) => [...m, { id: m.length, who: 'me', text: t }]);
+    setFace('think');
+    setCasting(true);
+    const started = Date.now();
+    let reply = '';
+    let noPic = false;
+    try {
+      const r = await getApi().buddyChat(t, 'ja');
+      reply = r.reply.text;
+      noPic = !!r.kind && r.kind !== 'normal';
+    } catch {
+      reply = 'うーん、いまは、うまく調べられなかった……。ほかのことも、聞いてみて！';
+      noPic = true;
+    }
+    // the magic takes a moment, even when the answer is quick
+    await new Promise((r) => setTimeout(r, Math.max(0, 1200 - (Date.now() - started))));
+    setCasting(false);
+    setFace('surprise');
+    const id = Date.now();
+    setMsgs((m) => [...m, { id, who: 'bati', text: reply, q: t, noPic, picLoading: !noPic }]);
+    setTimeout(() => setFace('smile'), 1400);
+    const n = rounds + 1;
+    setRounds(n);
+    const voice = sayAloud(reply);
+    // a picture, when there is one, comes into the answer by itself (no button: M-R179)
+    if (!noPic)
+      void getApi()
+        .buddyPicture(t, reply)
+        .then((r) => r.picture)
+        .catch(() => null)
+        .then((picture) => setMsgs((all) => all.map((x) => (x.id === id ? { ...x, picLoading: false, picture } : x))));
+    // about five rounds: {bati} grows sleepy once the last answer has been said
+    if (n >= FIRST_ROUNDS) {
+      await Promise.race([voice, new Promise((r) => setTimeout(r, 12_000))]);
+      await new Promise((r) => setTimeout(r, 1500));
+      setFace('yawn');
+      setTimeout(onDone, 1600);
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 z-[12] flex flex-col bg-gradient-to-b from-[#0a0f24] via-[#0b0a1a] to-black text-amber-50">
+      {/* {bati}, its face changing with the talk */}
+      <div className={`pt-safe relative mx-auto mt-12 w-28 ${pic ? 'h-28' : 'h-0'}`}>
+        {pic && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={pic} alt="" className="h-full w-full object-contain drop-shadow-[0_0_18px_rgba(255,220,150,0.35)] transition-opacity duration-300" />
+        )}
+        {casting && <div className="pointer-events-none absolute inset-[-25%] animate-[spin_3s_linear_infinite] rounded-full border border-dashed border-amber-200/50" />}
+      </div>
+      <div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3 pt-3">
+        {msgs.map((m) =>
+          m.who === 'me' ? (
+            <div key={m.id} className="flex items-end justify-end gap-2">
+              <p className="max-w-[72%] rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[14px] text-amber-950">{m.text}</p>
+              {me && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={me} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-amber-200/60" />
+              )}
+            </div>
+          ) : (
+            <div key={m.id} className="max-w-[86%] space-y-1.5 rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2">
+              <p className="text-[14px] leading-relaxed">
+                <span className="mr-1 text-[10px] tracking-widest text-amber-200/70">{bati}</span>
+                {m.text}
+              </p>
+              {m.picture && (
+                <figure className="overflow-hidden rounded-xl bg-black/40">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={m.picture.url} alt={m.picture.title} className="max-h-56 w-full object-contain" />
+                  <figcaption className="px-2 py-1 text-[10px] text-amber-50/55">
+                    {m.picture.title}
+                    <a href={m.picture.pageUrl} target="_blank" rel="noreferrer" className="ml-1 underline">
+                      出どころ：{m.picture.source}
+                    </a>
+                  </figcaption>
+                </figure>
+              )}
+            </div>
+          ),
+        )}
+        {casting && <p className="animate-pulse pl-2 text-[18px] tracking-[0.3em] text-amber-100/80">…</p>}
+        <div ref={end} />
+      </div>
+      <div className="pb-safe space-y-2 px-4 pb-3">
+        {rounds < FIRST_ROUNDS && (
+          <>
+            <VoiceField value={q} onChange={setQ} placeholder="ブラックホールって、なに？" maxLength={120} />
+            {q.trim() && (
+              <button onClick={() => void ask(q)} disabled={casting} className="w-full rounded-full border border-amber-200/50 bg-amber-200/10 py-2.5 text-[14px] disabled:opacity-40">
+                {bati}に話す
+              </button>
+            )}
+          </>
+        )}
+        <p className="text-center text-[10px] text-amber-50/40">{bati}の答えが、まちがっていることもあります</p>
+      </div>
+    </div>
+  );
+}
+
+function BatiChatFull({
   bati,
   neo,
   image,

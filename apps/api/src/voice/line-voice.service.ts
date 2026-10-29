@@ -17,6 +17,8 @@ const GEMINI = 'https://generativelanguage.googleapis.com/v1beta';
 const DAILY = 300;
 /** voices made at once on one server (the voice services refuse bursts) */
 const AT_ONCE = 3;
+/** {bati}'s answers read aloud at once (M-R179): the quicker model of the same voices */
+const BATI_SAYS_MODEL = 'gemini-2.5-flash-preview-tts';
 
 /** raw audio (any format ffmpeg reads, or `inputArgs` for raw PCM) → the story's sound, as MP3 */
 function finish(input: Buffer, inputArgs: string[], filter: string): Promise<Buffer> {
@@ -107,6 +109,22 @@ export class LineVoiceService implements OnModuleInit {
       await this.queue.enqueue('voice.line', job, { dedupeKey: `lv-${userId.slice(0, 8)}-${hash}` }).catch((e) => this.log.warn(`queue: ${String(e)}`));
     }
     return { voices, pending: missing.size };
+  }
+
+  /**
+   * One of {bati}'s answers read aloud now, in the story's {bati} voice (story chat M-R179: the Moon chat answers
+   * in words and in {bati}'s voice). The faster TTS model (one sentence in about two seconds); the caller plays it
+   * when it comes and goes on with the words alone if it does not. The answer was already checked by the buddy.
+   */
+  async batiSays(userId: string, text: string, origin: string): Promise<{ url: string } | null> {
+    const nl = await this.lines();
+    const bati = nl && Object.values(nl.lines).find((l) => l.who === 'バティ');
+    if (!nl || !bati || !this.cfg.GEMINI_API_KEY) return null;
+    if ((await this.kv.incr(`lv-day:${userId}:${Math.floor(Date.now() / 86_400_000)}`, 86_400)) > DAILY) return null;
+    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec: { ...bati.spec, model: undefined }, brief: bati.brief, model: BATI_SAYS_MODEL, tempo: nl.tempo };
+    const mp3 = await this.slot(() => this.gemini(p, storyVoiceFilter(p.spec, p.tempo)));
+    const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
+    return { url: m.url };
   }
 
   private async slot<T>(fn: () => Promise<T>): Promise<T> {

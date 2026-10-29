@@ -291,6 +291,9 @@ export const SpeakBody = z.object({
   style: z.enum(VOICE_STYLE_IDS).optional(),
 });
 export type SpeakBody = z.infer<typeof SpeakBody>;
+/** one sentence of {bati}'s answer in the Moon chat, read aloud in {bati}'s story voice (M-R179) */
+export const BatiSaysBody = z.object({ text: z.string().trim().min(1).max(200) });
+export type BatiSaysBody = z.infer<typeof BatiSaysBody>;
 
 /**
  * The story lines with the member's names in them (name-lines.json keys) for the day being played: the

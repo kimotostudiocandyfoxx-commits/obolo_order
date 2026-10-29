@@ -408,28 +408,27 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'sparkle' },
   { t: 'caption', text: '{bati}が相方になった' },
 
-  // D03-S008 はじめての、おしゃべり (M-R138〜140: Bati looks things up by magic; its face changes with the talk)
+  // D03-S008 はじめての、おしゃべり (M-R179: no how-to — a chat of about five rounds with {bati}, answers in words and
+  // in {bati}'s voice; then {bati} grows sleepy)
   { t: 'sprite', image: ['obolon', '@bati'] },
   { t: 'face', who: '@bati', expr: 'smile' },
   { t: 'say', who: 'OBOLON', text: '、、、{bati}と、話してみろ。' },
-  { t: 'say', who: 'OBOLON', text: '生まれたばかりの{bati}は、まだ、何も知らない。' },
-  { t: 'say', who: 'OBOLON', text: 'だが、、、マナの力で、宇宙じゅうの記録を、調べることが、できる。' },
-  { t: 'say', who: 'OBOLON', text: '知らないことは、、、魔法で、調べて、答える。それが、{bati}の、もう一つの力だ。' },
+  { t: 'say', who: 'OBOLON', text: '生まれたばかりの{bati}は、まだ、何も知らない。だが、、、知らないことは、魔法で、調べて、答える。' },
   { t: 'sprite', image: '@bati' },
   { t: 'face', who: '@bati', expr: 'sparkle' },
-  { t: 'say', who: 'バティ', text: 'ねえ、{neo}。宇宙のことで、知りたいこと、ある？　ボク、調べてみる！' },
+  { t: 'say', who: 'バティ', text: 'ねえ、{neo}。なんでも、話して！　ボク、調べてみる！' },
   { t: 'batitalk', first: true },
+  { t: 'face', who: '@bati', expr: 'yawn' }, // ふわあ、と小さなあくび。目がとろんとする
+  { t: 'say', who: 'バティ', text: '……いっぱい話したら、眠くなってきちゃった。' },
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] }, // となりで、KIMORINが、うんちピンポンくんに顔を近づける
   { t: 'say', who: 'KIMORIN', text: 'では、私も。……宇宙一の発明家は、誰ですか？' },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪' },
   { t: 'say', who: 'KIMORIN', text: '……さすが、よく調べていますね。' },
   { t: 'sprite', image: '@bati' },
-  { t: 'face', who: '@bati', expr: 'yawn' }, // ふわあ、と小さなあくび。目がとろんとする
-  { t: 'say', who: 'バティ', text: '……いっぱい話したら、眠くなってきちゃった。' },
+  { t: 'face', who: '@bati', expr: 'yawn' },
   { t: 'say', who: 'バティ', text: 'また、月に来てね。いつでも、話せるから。' },
   { t: 'sprite', image: 'obolon' },
   { t: 'say', who: 'OBOLON', text: '、、、この先の星でも、、、作る時は、{bati}と、話して、作る。' },
-  { t: 'notice', text: '月に来れば、いつでも〔💬 バティに聞く〕で話せます' },
 
   // D03-S009 月で眠る
   { t: 'bgm', track: 'night' },

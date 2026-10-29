@@ -352,6 +352,9 @@ export class DemoApi implements Api {
     return { voices: {}, pending: 0 };
   }
 
+  async batiSays(): Promise<{ url: string | null }> {
+    return { url: null };
+  }
   async speak(): Promise<{ url: string }> {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
   }
