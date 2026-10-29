@@ -69,7 +69,7 @@ export class SeedreamImageProvider implements ImageProvider {
     private readonly side = 1024,
     private readonly maxAtOnce = 12,
     /** one picture's whole wait (2026-10-29: a look waited minutes and the screen sat on 「水盤が描いている」) */
-    private readonly timeoutMs = 70_000,
+    private readonly timeoutMs = 115_000,
   ) {}
   async generate(prompt: string, seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     if (this.running >= this.maxAtOnce) await new Promise<void>((go) => this.waiting.push(go));
