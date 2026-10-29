@@ -107,6 +107,7 @@ const BEATS: Beat[] = [
   { k: 'design' },
   // D04-S005c ダチになる／ダチに届ける: KIMORIN⭐︎ and {inviter} are your dachi from today; 〔推し〕 opens
   { k: 'say', who: 'brother', text: '土星では、作ったものを届け合う仲間を、ダチって呼ぶZE。' },
+  { k: 'say', who: 'brother', text: 'ダチは、本当に知ってる奴とだけ、なるもんだZE。' }, // M-R175
   { k: 'say', who: 'kimorin', text: 'では、ダチに、なりましょう。……というか、もう、ダチですよね？' },
   { k: 'note', text: 'KIMORIN⭐︎がダチになった' },
   { k: 'say', who: 'kimorin', text: '……念のため言っておきますが、詐欺グループの調査の、相棒として、です。' }, // 扇の尾が、ぱたぱた
@@ -115,7 +116,8 @@ const BEATS: Beat[] = [
   { k: 'note', text: '{inviter}がダチになった' },
   { k: 'say', who: 'sister', text: '今日から、上に〔推し〕ができるワ。ダチの作品だけが、そこに入るワ。' },
   { k: 'say', who: 'kimorin', text: '推し、ですか。……私は、ずっと、自分推しです。' },
-  { k: 'note', text: '知らない人からダチの申しこみが来ても、承認しなくてかまいません。断っても、相手には知らせません' },
+  // M-R175: no requests from strangers at all — dachi only through invitations, people you really know
+  { k: 'note', text: 'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません' },
   { k: 'say', who: 'brother', text: '{neo}のコロリン、ダチに届けてみるといいZE!!' },
   { k: 'send' },
   // KIMORIN⭐︎ rolls his own kororin back on the ring; it dances once in your 〔推し〕

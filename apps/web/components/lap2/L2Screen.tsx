@@ -27,9 +27,9 @@ const PANELS: Record<L2What, Panel> = {
   },
   'dachi-rules': {
     body: [
-      'ダチになれるのは、〔招待状〕でつながった人（招待した人・招待してくれた人。招待状を送る時はマナジェムを添えます）と、〔名前で探す〕で見つけて、おたがいに承認した人。物語の仲間（KIMORIN⭐︎たち）とも、ダチになれます（連絡はできません）。',
-      '〔名前で探す〕は15歳から使えます。',
-      '知らない人からダチの申しこみが来ても、承認しなくてかまいません。断っても、相手には知らせません',
+      // M-R175: no search, no requests from strangers — invitations between people who really know each other
+      'ダチになれるのは、〔✉ 招待状〕でつながった人（招待した人・招待してくれた人。招待状を送る時はマナジェムを添えます）と、〔🤝 ダチの招待状〕を交わした人（もう宇宙にいる、本当に知っている人）。物語の仲間（KIMORIN⭐︎たち）とも、ダチになれます（連絡はできません）。',
+      'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません',
     ],
     options: [OK()],
   },
@@ -40,7 +40,14 @@ const PANELS: Record<L2What, Panel> = {
         label: '招待状を書いてみる',
         then: { title: '招待状の一言', body: ['まん中の〔🎙 話してみよう〕で一言。〔おまかせ〕〔パス〕も。', '下書きは{neo}だけに保存されます。まだ誰にも送りません'], options: [OK('下書きのまま残す', { invite: 'draft' })] },
       },
-      { label: '🔍 名前で探す', answers: { invite: 'search' }, then: { body: ['15歳未満の人は、名前で探しても出てきません。', 'ダチを申しこむ／やめる。相手も承認すると、ダチになります'], options: [OK('やめる', { invite: 'search' })] } },
+      {
+        label: '🤝 ダチの招待状',
+        answers: { invite: 'dachilink' },
+        then: {
+          body: ['一回だけ使えるリンクとQR（48時間で消えます）。〔リンクを送る〕〔QRを見せる〕〔やめる〕', '相手が開いて〔ダチになる〕を押すと、あなたにも「〈名前〉が、ダチの招待状を開きました。ダチになる？」と届きます。あなたも〔ダチになる〕を押したら、ダチです'],
+          options: [OK('やめる', { invite: 'dachilink' })],
+        },
+      },
       { label: '今はいい', answers: { invite: 'skip' }, then: { caption: 'たこ焼きシスター「招きたい人ができたら、その時でいいワ。」', options: [OK()] } },
     ],
   },
@@ -134,7 +141,7 @@ const PANELS: Record<L2What, Panel> = {
   switchboard: { title: '連絡室', body: ['壁一面の古い交換台。まん中に{neo}の名札。隣に『ダチ　KIMORIN⭐︎』『ダチ　{inviter}』。'], options: [OK()] },
   comms: {
     title: '連絡室の机',
-    options: [OK('ダチに連絡する', { comms: 'dachi' }), OK('名前で探して、ダチを申しこむ', { comms: 'search' }), OK('招待状を書く・贈る', { comms: 'invite' }), OK('今は何もしない', { comms: 'none' })],
+    options: [OK('ダチに連絡する', { comms: 'dachi' }), OK('🤝 ダチの招待状を渡す', { comms: 'dachilink' }), OK('招待状を書く・贈る', { comms: 'invite' }), OK('今は何もしない', { comms: 'none' })],
   },
 };
 
