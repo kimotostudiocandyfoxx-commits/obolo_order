@@ -1,44 +1,44 @@
-# UI art — 2026-10-29T08:10:43.221Z
+# UI art — 2026-10-29T09:58:01.093Z
 
-Seedream 5.0 Pro / 40枚 / 約305円
+Seedream 5.0 Pro / 40枚 / 約247円
 
-- ⏸ V03b/K4-r4a: 時間切れ、次回
-- ⏸ V03b/K4-r4b: 時間切れ、次回
-- ✅ V03a/A0-r4a
-- ✅ V03a/A0-r4b
-- ✅ V03a/A0-r4c
-- ✅ V03a/A1-r4a
-- ✅ V03a/A1-r4b
-- ✅ V03a/A3-r4a
-- ✅ V03a/A3-r4b
-- ✅ V03b/K1-r4a
-- ✅ V03b/K1-r4b
-- ✅ V03b/K3-r4a
-- ✅ V03b/K3-r4b
-- ✅ V05/K3-b
-- ✅ V05/K4-a
-- ✅ V05/K4-b
-- ✅ V05/K5-a
-- ✅ V05/K5-b
-- ✅ V06/K10-r4a
-- ✅ V06/K10-r4b
-- ✅ V19/K4-r4a
-- ✅ V19/K4-r4b
-- ✅ V22/K1-r4a
-- ✅ V22/K1-r4b
-- ✅ V22/K1-r4c
-- ✅ V22/K2-r4a
-- ✅ V22/K2-r4b
-- ✅ V22/K2-r4c
-- ✅ V22/K3-r4a
-- ✅ V22/K3-r4b
-- ✅ V22/K4-r4a
-- ✅ V22/K4-r4b
-- ✅ V22/K4-r4c
-- ✅ V22/K5-r4a
-- ✅ V22/K5-r4b
-- ✅ V22/K5-r4c
-- ✅ sprites/kimorin-xs-slip-r4a
-- ✅ sprites/kimorin-xs-slip-r4b
-- ✅ stills/saturn-sleep-r4a
-- ✅ stills/saturn-sleep-r4b
+- ⏸ V06/K3-b: 時間切れ、次回
+- ⏸ V06/K4-a: 時間切れ、次回
+- ⏸ V06/K4-b: 元の絵ができなかったので次回
+- ⏸ V06/K5-a: 元の絵ができなかったので次回
+- ⏸ V06/K5-b: 元の絵ができなかったので次回
+- ⏸ V07/K2bE-a: 時間切れ、次回
+- ⏸ V07/K2bE-b: 時間切れ、次回
+- ⏸ V07/K2bS-a: 時間切れ、次回
+- ⏸ V07/K2bS-b: 時間切れ、次回
+- ✅ V02/K1m-a
+- ✅ V02/K1m-b
+- ✅ V03b/K4-r4a
+- ✅ V03b/K4-r4b
+- ✅ V05/K6-a
+- ✅ V05/K6-b
+- ✅ V05/K7-a
+- ✅ V05/K7-b
+- ✅ V06/K1-b
+- ✅ V06/K10-a
+- ✅ V06/K10-b
+- ✅ V06/K11-a
+- ✅ V06/K2-a
+- ✅ V06/K2-b
+- ✅ V06/K3-a
+- ✅ V06/K6-a
+- ✅ V06/K6-b
+- ✅ V06/K7-a
+- ✅ V06/K7-b
+- ✅ V06/K8-a
+- ✅ V06/K8-b
+- ✅ V06/K9-a
+- ✅ V06/K9-b
+- ✅ V07/K1E-a
+- ✅ V07/K1E-b
+- ✅ V07/K1S-a
+- ✅ V07/K1S-b
+- ✅ V07/K2E-a
+- ✅ V07/K2E-b
+- ✅ V07/K2S-a
+- ✅ V07/K2S-b
