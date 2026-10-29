@@ -6,7 +6,7 @@
   "report": "art/review/saturn/video/last-run.md",
   "ledger": "art/review/saturn/rounds/video-costs.md",
   "parallel": 3,
-  "budgetYen": 3200,
+  "budgetYen": 400,
   "redo": [],
   "items": [
     {
@@ -91,7 +91,7 @@
       "duration": 5,
       "audio": false,
       "first": "art/review/saturn/V01/K12-r2a.jpg",
-      "prompt": "Eight blank golden cards float in an arc in the dark, bobbing very slightly; their glowing edges breathe softly; golden dust drifts. The cards stay completely blank. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+      "prompt": "Eight blank golden cards hang in an arc in the darkness, almost motionless, bobbing very slightly; their glowing edges brighten and dim slowly; fine golden dust drifts. The cards stay completely blank. Silent shot. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
     },
     {
       "id": "V01-C13",
