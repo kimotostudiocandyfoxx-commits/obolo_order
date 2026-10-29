@@ -5,7 +5,7 @@ import { BatiChat } from './BatiChat';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { hasMotion, motionUrl, spriteUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
+import { hasMotion, motionUrl, spriteUrl, STILL_MOUTH, stillMouthUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
 import { nameCharsOk, neoForm } from '@obolo/shared';
@@ -22,7 +22,7 @@ import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
-import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite } from '@/components/story/Stage';
+import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite, StillMouth } from '@/components/story/Stage';
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
@@ -1045,6 +1045,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         // eslint-disable-next-line @next/next/no-img-element
         <img key={img} src={stillUrl(img)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" style={img === still ? { animation: stillAnim } : undefined} aria-hidden />
       ))}
+      {still && STILL_MOUTH[still] && !sprite && (
+        <StillMouth
+          url={stillMouthUrl(still)}
+          talking={talking && sayStep?.who === STILL_MOUTH[still]}
+          level={voiceLevel}
+          className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full"
+        />
+      )}
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>
       {!sprite && autoStandee && (

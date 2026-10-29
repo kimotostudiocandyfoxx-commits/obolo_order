@@ -135,6 +135,30 @@ function useBlink(on: boolean) {
   return shut;
 }
 
+/** An open-mouth patch over a still, following the voice's loudness like a standee's mouth layer. */
+export function StillMouth({ url, talking, level, className }: { url: string; talking: boolean; level?: () => number; className: string }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!talking || !level) return setOpen(false);
+    let raf = 0;
+    let last = 0;
+    let cur = false;
+    const tick = (t: number) => {
+      const want = level() > MOTION.lip.open;
+      if (want !== cur && t - last > MOTION.lip.holdMs) {
+        cur = want;
+        last = t;
+        setOpen(want);
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [talking, level]);
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt="" className={className} style={{ opacity: open ? 1 : 0 }} aria-hidden />;
+}
+
 export function Cast({
   names,
   src,

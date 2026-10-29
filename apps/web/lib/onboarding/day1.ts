@@ -62,7 +62,7 @@ export const DAY1: Step[] = [
   // D01-S006 OBOLON
   // MONBAN's theme fades slowly while we walk in, gone before OBOLON's light falls (client 2026-10-20)
   { t: 'bgm', track: null, fade: 6 },
-  { t: 'video', motion: 12, captions: [{ text: '地球の神殿に着いた', from: 7, to: 11 }] }, // 門をくぐり、神殿の中へ → 光の柱
+  { t: 'video', motion: 12, captions: [{ text: '地球の神殿に着いた', from: 6, to: 10 }] }, // 門をくぐり、神殿の中へ → 光の柱
   { t: 'bgm', track: 'obolon' },
   { t: 'loop', motion: 13 },
   { t: 'caption', text: 'OBOLONが現れた' },

@@ -54,6 +54,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'footsteps' },
   { t: 'video', motion: 'd2-kimorin-walkup' }, // 奥の通路から、KIMORINがゆっくり門まで歩いてくる → 顔のドアップ（劇場版アニメのように）
   { t: 'video', motion: 'd2-reveal' }, // 豪華映像 #2 KIMORINの登場（M-R90）：白衣がひるがえり、扇の尾が一気に開き、ゴーグルが夕日を反射（目は光らない）
+  { t: 'still', image: 's/d2-reveal-end' }, // the film's last frame with a mouth layer (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // 門ごしに、本部の建物を、下から上まで、じろじろと見上げる（M-R170）
   { t: 'bgm', track: 'monban' },
   { t: 'se', sound: 'smoke' },
@@ -72,6 +73,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '……なんだ、招待か。門をくぐり、地球の神殿に行け…。' },
   { t: 'bgm', track: 'comedy' }, // KIMORINの「気をつけなさい」
   { t: 'video', motion: 'd2-kimorin-face' }, // KIMORINが門をくぐろうとして、止まる。こちらに向き直る
+  // the film's last frame with a mouth layer, so he talks with a moving mouth (client 2026-10-29)
+  { t: 'still', image: 's/d2-gate-kimorin-face' },
   { t: 'say', who: 'KIMORIN', text: 'おや、そこのあなた、もしかして、あなたも招待客？' },
   { t: 'say', who: 'KIMORIN', text: '気をつけなさい。私は、この世のすべての仕組みを理解しているので、わかります。' },
   { t: 'say', who: 'KIMORIN', text: 'こいつらは、大してすごくもないことを、めちゃくちゃすごそうに言い、そのあとに、超高額の入会費を請求してくる詐欺グループに違いありません。' },
@@ -214,6 +217,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
   { t: 'bgm', track: 'comedy' }, // ピンポン2.5の発表
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
+  { t: 'still', image: 's/d2-pinpon-end' }, // the film's last frame with a mouth layer (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // 長い説明は、話す人の胸から上の絵で（QA 5 N10）
   // while KIMORIN explains, his own picture comes up big with the face of each line (client 2026-10-29)

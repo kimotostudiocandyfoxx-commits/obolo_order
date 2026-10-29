@@ -86,6 +86,24 @@ export const filmParts = (id: string, n: number): MotionId[] => Array.from({ len
 export const spriteUrl = (name: string) => `${MEDIA_BASE}/${name}.webp`;
 /** Still background images (JPEG). */
 export const stillUrl = (name: string) => `${MEDIA_BASE}/${name}.jpg`;
+/**
+ * Stills with an open-mouth patch (`<still>-mouth.webp`, same size): the one drawn in it speaks with a moving
+ * mouth (client 2026-10-29: KIMORIN's mouth opens and closes whenever he talks).
+ */
+export const STILL_MOUTH: Record<string, string> = Object.fromEntries(
+  [
+    's/d2-reveal-end',
+    's/d2-gate-two-inside',
+    's/d2-gate-kimorin-face',
+    's/d2-hall-kimorin-up',
+    's/d2-hall-run',
+    's/d2-pinpon-end',
+    's/d2-moon-kimorin',
+    's/d2-moon-kimorin-squint',
+    's/d2-kimorin-after',
+  ].map((s) => [s, 'KIMORIN']),
+);
+export const stillMouthUrl = (name: string) => `${MEDIA_BASE}/${name}-mouth.webp`;
 
 /** Background music tracks (by the client, DJ SHACHO). Converted to AAC 128 kbps. */
 export const bgmUrl = (track: string) => `${MEDIA_BASE}/bgm-${track}.m4a`;
