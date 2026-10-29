@@ -23,6 +23,7 @@ import { PictureService } from './buddy/picture.service';
 import { HealthController } from './health.controller';
 import { DachiController } from './dachi/dachi.controller';
 import { DachiService } from './dachi/dachi.service';
+import { DachiLinkService } from './dachi/dachi-link.service';
 import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
@@ -104,6 +105,7 @@ import { WalletController } from './wallet/wallet.controller';
     MvService,
     JobsService,
     DachiService,
+    DachiLinkService,
   ],
 })
 export class AppModule {}

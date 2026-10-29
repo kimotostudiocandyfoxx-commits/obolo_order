@@ -770,6 +770,24 @@ export class DemoApi implements Api {
     const inviter = this.s.users[this.uid()]?.invitedByName;
     return inviter ? { id: 'demo-inviter', displayName: inviter, pic: null } : null;
   }
+  // demo: a link of one's own that nobody else can open (there is nobody on the other side)
+  async createDachiLink() {
+    return { token: `demo${uid().replace(/-/g, '').slice(0, 20)}`, expiresAt: new Date(Date.now() + 48 * 3600_000).toISOString() };
+  }
+  async peekDachiLink(): Promise<Awaited<ReturnType<Api['peekDachiLink']>>> {
+    const me = this.s.users[this.uid()];
+    return { from: { id: me.id, displayName: me.displayName, pic: null }, state: 'open', mine: true };
+  }
+  async openDachiLink() {
+    return this.peekDachiLink();
+  }
+  async dachiLinkAsks() {
+    return [];
+  }
+  async confirmDachiLink(): Promise<Awaited<ReturnType<Api['confirmDachiLink']>>> {
+    throw new Error('demo');
+  }
+  async endDachiLink() {}
   async deliver(body: Parameters<Api['deliver']>[0]) {
     const to = (await this.dachi()).length;
     if (to) {

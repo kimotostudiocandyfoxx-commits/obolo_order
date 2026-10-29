@@ -374,6 +374,24 @@ export class HttpApi implements Api {
   befriendInviter() {
     return this.req<Awaited<ReturnType<Api['befriendInviter']>>>('POST', '/dachi/inviter', {});
   }
+  createDachiLink() {
+    return this.req<Awaited<ReturnType<Api['createDachiLink']>>>('POST', '/dachi/link', {});
+  }
+  peekDachiLink(token: string) {
+    return this.req<Awaited<ReturnType<Api['peekDachiLink']>>>('GET', `/dachi/link/${encodeURIComponent(token)}`);
+  }
+  openDachiLink(token: string) {
+    return this.req<Awaited<ReturnType<Api['openDachiLink']>>>('POST', `/dachi/link/${encodeURIComponent(token)}/open`, {});
+  }
+  dachiLinkAsks() {
+    return this.req<Awaited<ReturnType<Api['dachiLinkAsks']>>>('GET', '/dachi/link/asks');
+  }
+  confirmDachiLink(token: string) {
+    return this.req<Awaited<ReturnType<Api['confirmDachiLink']>>>('POST', `/dachi/link/${encodeURIComponent(token)}/confirm`, {});
+  }
+  async endDachiLink(token: string) {
+    await this.req<unknown>('DELETE', `/dachi/link/${encodeURIComponent(token)}`);
+  }
   deliver(body: Parameters<Api['deliver']>[0]) {
     return this.req<Awaited<ReturnType<Api['deliver']>>>('POST', '/dachi/deliver', body);
   }

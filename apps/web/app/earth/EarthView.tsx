@@ -11,6 +11,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { CommsTiles } from '@/components/earth/Comms';
 import { InviteCard } from './InviteCard';
+import { DachiLinkCard } from '@/components/DachiLinkCard';
 import { useI18n } from '@/lib/i18n/client';
 
 export function EarthView() {
@@ -150,6 +151,8 @@ function Home() {
         </section>
       )}
       <InviteCard />
+      {/* M-R175: dachi only with people one really knows — the desk's second envelope */}
+      <DachiLinkCard />
       <CommsTiles />
       <div className="grid grid-cols-2 gap-3">
         <FeatureTile icon="🎙️" title={m.earth.voice} hint={m.earth.voiceHint} />

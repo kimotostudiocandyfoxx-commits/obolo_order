@@ -499,6 +499,28 @@ export interface DachiView {
   displayName: string;
   pic: string | null;
 }
+/**
+ * 〔🤝 ダチの招待状〕 (M-R175): a link / QR that works once and goes after 48 hours. The one who opens it presses
+ * 〔ダチになる〕, then the one who gave it is asked too; only when both press it are they dachi.
+ */
+export const DACHI_LINK_HOURS = 48;
+export interface DachiLinkView {
+  token: string;
+  expiresAt: string;
+}
+export interface DachiLinkPeek {
+  /** who gave it */
+  from: DachiView;
+  /** open: nobody has answered yet; waiting: you pressed 〔ダチになる〕, the giver has yet to; gone: used, expired or not for you */
+  state: 'open' | 'waiting' | 'gone';
+  /** it is your own link */
+  mine: boolean;
+}
+export interface DachiLinkAsk {
+  token: string;
+  /** who opened your link and pressed 〔ダチになる〕 */
+  who: DachiView;
+}
 export interface DeliveryView {
   id: string;
   kind: DeliveryKind;

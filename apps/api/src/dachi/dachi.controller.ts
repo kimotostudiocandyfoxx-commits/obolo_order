@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpCode, Inject, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { DELIVERY_KINDS, DeliverBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { DachiLinkService } from './dachi-link.service';
 import { DachiService } from './dachi.service';
 
 @Controller('dachi')
@@ -12,6 +13,7 @@ import { DachiService } from './dachi.service';
 export class DachiController {
   constructor(
     private readonly dachi: DachiService,
+    private readonly links: DachiLinkService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -39,5 +41,47 @@ export class DachiController {
   @Get('oshi')
   oshi(@UserId() userId: string, @Query('kind') kind?: string) {
     return this.dachi.oshi(userId, kind && (DELIVERY_KINDS as readonly string[]).includes(kind) ? kind : undefined);
+  }
+
+  /** 〔🤝 ダチの招待状〕 (M-R175): a link of one's own, once, 48 hours */
+  @Post('link')
+  @HttpCode(200)
+  async createLink(@UserId() userId: string) {
+    await rateLimit(this.kv, `dachilink:${userId}`, 10, 3600);
+    return this.links.create(userId);
+  }
+
+  /** the giver's side: who opened a link and is waiting for 〔ダチになる〕 */
+  @Get('link/asks')
+  asks(@UserId() userId: string) {
+    return this.links.asks(userId);
+  }
+
+  @Get('link/:token')
+  peekLink(@UserId() userId: string, @Param('token') token: string) {
+    return this.links.peek(userId, token);
+  }
+
+  /** the one who opened it presses 〔ダチになる〕 */
+  @Post('link/:token/open')
+  @HttpCode(200)
+  async openLink(@UserId() userId: string, @Param('token') token: string) {
+    await rateLimit(this.kv, `dachilink-open:${userId}`, 30, 3600);
+    return this.links.open(userId, token);
+  }
+
+  /** the giver presses 〔ダチになる〕 too */
+  @Post('link/:token/confirm')
+  @HttpCode(200)
+  confirmLink(@UserId() userId: string, @Param('token') token: string) {
+    return this.links.confirm(userId, token);
+  }
+
+  /** 〔やめる〕 */
+  @Delete('link/:token')
+  @HttpCode(200)
+  async endLink(@UserId() userId: string, @Param('token') token: string) {
+    await this.links.end(userId, token);
+    return { ok: true };
   }
 }

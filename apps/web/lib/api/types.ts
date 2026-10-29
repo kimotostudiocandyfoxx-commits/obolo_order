@@ -1,4 +1,4 @@
-import type { CompassCard, StoryResult, BuddyPicture, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -173,6 +173,13 @@ export interface Api {
   /** ダチ (draft 21): your dachi; Saturn D04-S005c makes the inviter one; 〔ダチへ〕 delivers; 〔推し〕 lists what came */
   dachi(): Promise<DachiView[]>;
   befriendInviter(): Promise<DachiView | null>;
+  /** 〔🤝 ダチの招待状〕 (M-R175): a link once for 48 hours; both press 〔ダチになる〕 */
+  createDachiLink(): Promise<DachiLinkView>;
+  peekDachiLink(token: string): Promise<DachiLinkPeek>;
+  openDachiLink(token: string): Promise<DachiLinkPeek>;
+  dachiLinkAsks(): Promise<DachiLinkAsk[]>;
+  confirmDachiLink(token: string): Promise<DachiView>;
+  endDachiLink(token: string): Promise<void>;
   deliver(body: Partial<DeliverBody> & Pick<DeliverBody, 'kind'>): Promise<{ to: number }>;
   oshi(kind?: DeliveryView['kind']): Promise<DeliveryView[]>;
   /** Jupiter: 🦋 蝶を描いてもらう (2 painted candidates, 3 tries a day) */
