@@ -287,8 +287,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '腕80本の、' },
   { t: 'say', who: 'KIMORIN', text: 'パーティーが大好きなドラゴン！' }, // 両腕を広げる
   { t: 'say', who: 'OBOLON', text: '、、、大丈夫か？' }, // シーン……
-  { t: 'bgm', track: 'moon' },
-  { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' },
+  { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' }, // still no music: it comes with the dragon (client 2026-10-29)
   { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
   { t: 'se', sound: 'magic' },
   { t: 'video', motion: 'd2-transform' }, // マナジェムから光が水盤へ。水が立ち上がってKIMORINを包む
