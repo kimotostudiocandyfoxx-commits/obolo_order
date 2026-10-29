@@ -1,6 +1,8 @@
-# 物語の動画 — 2026-10-29T07:11:33.707Z
+# 物語の動画 — 2026-10-29T07:46:03.401Z
 
-bytedance:seedance@2.5 / 2本 / 約0円
+bytedance:seedance@2.5 / 4本 / 約524円
 
-- ❌ mV01-C12: Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the selected model. Allowed values are: ''.","documentation":"https://runware.ai/docs/video-inference/api-reference#request-providersettings","parameter":"providerSettings.bytedance.audio","allowedValues":[],"taskUUID":"1ac0d550-7e8d-4107-a045-133e25224b2e"}]
-- ❌ mV02-C07b: Error: 400 [{"code":"unsupportedParameter","message":"Unsupported use of 'providerSettings.bytedance.audio' parameter. This parameter is not supported for the selected model. Allowed values are: ''.","documentation":"https://runware.ai/docs/video-inference/api-reference#request-providersettings","parameter":"providerSettings.bytedance.audio","allowedValues":[],"taskUUID":"db8fc05f-d73c-4ea5-a073-c34817212f45"}]
+- ✅ V01-C12（5秒・720p・約175円）
+- ✅ V02-C07（5秒・720p・約175円）
+- ❌ mV01-C05: Error: 400 [{"code":"providerError","message":"ByteDance responded with HTTP N/A. Additional information below.","responseStatusCode":"N/A","responseContent":"Failed to download video from provider","documentation":"https://runware.ai/docs/providers/introduction","taskUUID":"de1fe3c2-84c4-4ee6-9181-e95b354af4b6","taskType":"videoInference","status":"error"}]
+- ✅ V02-C07b（5秒・720p・約175円）
