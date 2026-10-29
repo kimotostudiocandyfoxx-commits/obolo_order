@@ -762,7 +762,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (st?.t !== 'say' || (!sprite && !on)) return set;
     const names = on ?? (Array.isArray(sprite) ? sprite : [sprite]).filter((x): x is string => !!x);
     const who = speakerSprite(st.who, names);
-    return who && who !== OFFSTAGE ? { ...set, [who]: exprFor(st.who, st.text) } : set;
+    return who && who !== OFFSTAGE ? { ...set, [who]: st.expr ?? exprFor(st.who, st.text) } : set;
+  };
+  // a pose mirrored for this line (client 2026-10-29: KIMORIN's surprise faced away from the one he talks to)
+  const sayMirror = (on?: string[]) => {
+    const st = steps[i];
+    if (st?.t !== 'say' || !st.flip) return null;
+    const names = on ?? (Array.isArray(sprite) ? sprite : [sprite]).filter((x): x is string => !!x);
+    const who = speakerSprite(st.who, names);
+    return who && who !== OFFSTAGE ? who : null;
   };
   const sayNow = started && steps[i]?.t === 'say' ? (steps[i] as Extract<Step, { t: 'say' }>) : null;
   // the next line's voice is fetched while this one is read, so it starts the moment it shows
@@ -1020,7 +1028,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>
       {!sprite && autoStandee && (
-        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
+        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
       )}
       {sprite && (
         <Cast
@@ -1029,6 +1037,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
           talking={talking}
           expressions={sayExpressions(expressions)}
+          mirror={sayMirror()}
           level={voiceLevel}
           react={sayReact}
           slot={spriteSlot}

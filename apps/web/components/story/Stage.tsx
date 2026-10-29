@@ -144,8 +144,11 @@ export function Cast({
   level,
   react,
   slot,
+  mirror,
   className = '',
 }: {
+  /** this picture is shown mirrored (a pose that would face the wrong way) */
+  mirror?: string | null;
   /** the voice's loudness now (lip sync) */
   level?: () => number;
   /** the speaker's reaction to the line */
@@ -200,6 +203,7 @@ export function Cast({
             talking={talking && speaking === name}
             level={level}
             react={speaking === name ? react : undefined}
+            flip={mirror === name}
             // beside someone in the video ('' slot): a little smaller, kept inside the screen
             style={real.length < names.length ? { left: `${names.length === 2 ? [30, 70][k] : [22, 50, 78][k] ?? 50}%` } : slot(k, names.length)}
             scale={real.length < names.length ? 0.74 : 1}
@@ -217,7 +221,7 @@ const layersOf = (url: string): string[] => {
   return (stem && (LAYERS as Record<string, string[]>)[stem]) || [];
 };
 
-function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1 }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number }) {
+function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1, flip = false }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number; flip?: boolean }) {
   const base = charSpec(name);
   const spec = { ...base, height: base.height * scale };
   const shut = useBlink(!!spec.eye && !posed);
@@ -288,7 +292,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
     <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden>
       <div key={hop} className="relative h-full" style={hop ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
         <div className="relative h-full" style={{ ...life, ...(talking && !mouth ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
-          <div key={url} className={`relative h-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim }}>
+          <div key={url} className={`relative h-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim, ...(flip ? { transform: 'scaleX(-1)' } : {}) }}>
             {layer('tail') && (
               // the tail feathers sway on their own, behind the body
               // eslint-disable-next-line @next/next/no-img-element

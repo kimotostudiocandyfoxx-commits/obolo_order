@@ -19,25 +19,26 @@ export const DAY3: Step[] = [
   // D04-S002 おはようございます／Bluena
   { t: 'still', image: 's/moon-temple' }, // 月の神殿。窓の外に、青い地球
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: 'おはようございます。いつまで寝ているのですか？' },
-  { t: 'say', who: 'KIMORIN', text: '私はもちろんスキップさせていただきました。これ待つ人いるんですかね？' }, // 長いセリフを分けた（client 2026-10-26）
-  { t: 'say', who: 'KIMORIN', text: 'さぁ、早く、冒険の続きをしますよ。謎を、解き明かさねば。' },
-  { t: 'say', who: 'KIMORIN', text: 'そしてコスモスを見つけ、宝を手に入れるのです。' }, // 長いセリフを分けた（client 2026-10-26）
+  // he talks to you here: the standing picture, facing us (client 2026-10-29)
+  { t: 'say', who: 'KIMORIN', text: 'おはようございます。いつまで寝ているのですか？', expr: 'stand' },
+  { t: 'say', who: 'KIMORIN', text: '私はもちろんスキップさせていただきました。これ待つ人いるんですかね？', expr: 'stand' }, // 長いセリフを分けた（client 2026-10-26）
+  { t: 'say', who: 'KIMORIN', text: 'さぁ、早く、冒険の続きをしますよ。謎を、解き明かさねば。', expr: 'stand' },
+  { t: 'say', who: 'KIMORIN', text: 'そしてコスモスを見つけ、宝を手に入れるのです。', expr: 'stand' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'OBOLON', text: '焦らなくていい。せっかくの宇宙旅行だ。ゆっくり存分に楽しんだ方がいい。' },
   { t: 'say', who: 'KIMORIN', text: 'うるさいですよ。せっかくObolo Orderになってあげたこの私に、口答えですか？' },
   { t: 'say', who: 'OBOLON', text: 'まだお前はObolo Orderじゃない。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？そうなの？' },
+  { t: 'say', who: 'KIMORIN', text: 'え？そうなの？', flip: true }, // the surprise faces OBOLON (client 2026-10-29)
   { t: 'say', who: 'OBOLON', text: 'Obolo Orderはみんなマナを自分の体から生成し、魔法を唱える。' },
   { t: 'say', who: 'OBOLON', text: 'お前たちはまだマナを生成できないし、魔法も何も習得してない。' },
   { t: 'say', who: 'OBOLON', text: 'そんなお前たちのことを、、Obolo Neo、と呼ぶ。' },
   { t: 'say', who: 'KIMORIN', text: 'なるほど。Obolo Neoですか、響きは、嫌いじゃありませんね。' },
   { t: 'say', who: 'OBOLON', text: '今日からお前らは、Obolo Neo、だ。' },
-  { t: 'say', who: 'KIMORIN', text: 'わかりました。それではOBOLON、本日行く場所は、どこですか？' },
+  { t: 'say', who: 'KIMORIN', text: 'わかりました。それではOBOLON、本日行く場所は、どこでしたっけ？' }, // client 2026-10-29
   { t: 'say', who: 'OBOLON', text: '今日、行く場所は、、、土星だ。' },
   { t: 'say', who: 'KIMORIN', text: '土星ですか。いいですね。またOBOLONは先に土星に行って待っててくれるのですよね？' },
   { t: 'say', who: 'OBOLON', text: 'いや、俺は、土星には、行けない。' },
-  { t: 'say', who: 'KIMORIN', text: 'え？なぜですか？' },
+  { t: 'say', who: 'KIMORIN', text: 'え？なぜですか？', flip: true }, // the surprise faces OBOLON (client 2026-10-29)
   { t: 'say', who: 'OBOLON', text: '俺は、、、地球と、月と、太陽の間しか、移動できない。' },
   { t: 'say', who: 'KIMORIN', text: 'どういう仕組み？' },
   { t: 'say', who: 'OBOLON', text: 'でも、、、大丈夫だ。渡したいものが、ある。' },
@@ -86,7 +87,7 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……今のは、何ですか？' },
   { t: 'say', who: 'MONBAN', text: '……答えは…旅の終わりに、見せる…。' },
   { t: 'say', who: 'MONBAN', text: '本日…土星に行けば…謎の、ヒントが…転がっている。' },
-  { t: 'say', who: 'KIMORIN', text: 'え、そうなの？' },
+  { t: 'say', who: 'KIMORIN', text: 'え、そうなの？', flip: true }, // facing MONBAN's screen (client 2026-10-29)
   { t: 'say', who: 'MONBAN', text: 'ああ…。そもそもObolo Orderとは…何の集まりなのか…そのヒントだ…。' },
   { t: 'se', sound: 'chime' },
   { t: 'seal', n: 2 }, // 謎の書が宙に浮き、ひとりでに開く。札2に「Obolo Orderは全員……」が滲み出る

@@ -138,6 +138,10 @@ export type Step =
       voice?: Speaker;
       /** a line that is never tapped through before its voice ends, even heard before (OBOLON's core lines, M-R102) */
       hold?: boolean;
+      /** the speaker's picture for this line by hand ('stand' = the standing picture, facing us) instead of one picked from the words */
+      expr?: string;
+      /** the speaker's picture mirrored for this line (a pose that would face away from the one they talk to) */
+      flip?: boolean;
     }
   /** A single button the visitor must press ("封を開く"). */
   | { t: 'action'; label: string }

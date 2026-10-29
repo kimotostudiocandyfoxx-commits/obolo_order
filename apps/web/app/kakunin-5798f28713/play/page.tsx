@@ -94,7 +94,9 @@ function PreviewPlay() {
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   // thru=N: played straight through, each day handing over to the next up to day N (the client's check from the start to Saturn)
   const thru = Number(q.get('thru') ?? 0);
-  const nextDay = thru > day && (STORIES[day + 1] ?? PREVIEW_ONLY[day + 1]) ? `/kakunin-5798f28713/play?day=${day + 1}&thru=${thru}` : null;
+  // every day that has a next one ends on the countdown (client 2026-10-29: also from day 2 to day 3); thru=N stops at day N
+  const upTo = thru || 99;
+  const nextDay = upTo > day && STORIES[day + 1] ? `/kakunin-5798f28713/play?day=${day + 1}${thru ? `&thru=${thru}` : ''}` : null;
   if (ended && nextDay)
     return (
       <TomorrowScreen
