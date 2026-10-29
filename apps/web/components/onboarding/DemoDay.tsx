@@ -164,6 +164,7 @@ export function DemoDay({
       lessonApi={live ? realLessonApi : fakeLessonApi}
       textOnly={day <= 1}
       showGate={showGate}
+      replayFilms
       seals={{
         known: day >= 2 ? knownSealsOn(day) : [],
         solved: solvedSealsOn(day),

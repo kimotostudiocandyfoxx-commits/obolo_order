@@ -1,5 +1,6 @@
 'use client';
 
+import { fastTap } from '@/lib/story/fastTap';
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { useHint } from './parts';
 
@@ -230,11 +231,20 @@ export function ReplyChips({ options, onPick, action }: { options: string[]; onP
             key={o}
             data-reply
             disabled={said !== null}
-            onClick={() => {
-              if (said !== null) return;
-              setSaid(k);
-              setTimeout(() => onPick(k), 260);
-            }}
+            // a deed (〔ボタンを押す〕) happens on the press, its sound at once; a reply is said after a beat
+            {...(action
+              ? fastTap(() => {
+                  if (said !== null) return;
+                  setSaid(k);
+                  onPick(k);
+                })
+              : {
+                  onClick: () => {
+                    if (said !== null) return;
+                    setSaid(k);
+                    setTimeout(() => onPick(k), 260);
+                  },
+                })}
             className={`pointer-events-auto rounded-full border px-4 py-2.5 text-[14.5px] tracking-wide backdrop-blur-md transition duration-200 active:scale-95 ${
               said === k ? 'border-amber-100 bg-amber-200/90 text-[#2b1b06]' : said !== null ? 'border-white/10 bg-black/30 text-white/30' : 'border-amber-200/45 bg-[rgba(16,11,26,0.62)] text-amber-50'
             }`}

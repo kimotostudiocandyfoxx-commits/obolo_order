@@ -26,6 +26,7 @@ import { Camera, Cast, CutIn, Motes, OFFSTAGE, Smoke, Spark, speakerSprite, Stil
 import { exprFor, reactFor } from '@/lib/story/expression';
 import { DialogueWindow, IconButton, MixerPanel, Telop } from '@/components/story/parts';
 import { filmWatched, markFilmWatched } from '@/lib/story/films';
+import { fastTap, swallowClick } from '@/lib/story/fastTap';
 import { LineVoice, loadMix, saveMix, VOICE_DIP, type Mix } from '@/lib/story/lineVoice';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { FilmReel } from './FilmReel';
@@ -116,6 +117,8 @@ interface Props {
   autoStart?: boolean;
   /** the check page's gate=1: the seal (E-0) every time, whatever this browser saw before */
   showGate?: boolean;
+  /** the check page: every film plays each time (story chat 2026-10-29: the launch "disappeared" on a replay) */
+  replayFilms?: boolean;
 }
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -178,7 +181,8 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false, showGate = false }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false, showGate = false, replayFilms = false }: Props) {
+  const seenFilm = (id: string) => !replayFilms && filmWatched(id);
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -594,7 +598,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           return;
         } else if (s.t === 'film') {
           // a film watched before (or skipped) does not play again, also after a restart
-          if (filmWatched(s.id) && !filmAnyway.current) {
+          if (seenFilm(s.id) && !filmAnyway.current) {
             n++;
             continue;
           }
@@ -819,7 +823,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     for (let k = i + 1; k < Math.min(steps.length, i + 12); k++) {
       const s = steps[k];
       if (s.t === 'film') {
-        if (!filmWatched(s.id)) dual.current?.preload(motionUrl(`film-${s.id}-1`));
+        if (!seenFilm(s.id)) dual.current?.preload(motionUrl(`film-${s.id}-1`));
         break;
       }
       if (s.t === 'video' || s.t === 'loop' || s.t === 'bgvideo') {
@@ -828,6 +832,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       }
     }
   }, [i, steps, started]);
+  // every sound of the day is fetched and decoded once the sound is on (story chat 2026-10-29: a tap's sound at once)
+  useEffect(() => {
+    if (!started) return;
+    for (const s of steps) {
+      if (s.t === 'se') prefetchSfx(s.sound);
+      else if (s.t === 'spark' && s.sound) prefetchSfx(s.sound);
+    }
+  }, [started, steps]);
   // the sounds coming up are fetched ahead
   useEffect(() => {
     for (let k = i; k < Math.min(steps.length, i + 10); k++) {
@@ -889,7 +901,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     const firstBgm = steps.find((s) => s.t === 'bgm');
     bgm.current?.unlock(i === 0 ? (firstBgm?.t === 'bgm' ? firstBgm.track : null) : bgmAt(steps, i));
     const first = steps[i];
-    const firstMedia = first?.t === 'film' && (withFilm || !filmWatched(first.id)) ? { motion: `film-${first.id}-1` as MotionId } : mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
+    const firstMedia = first?.t === 'film' && (withFilm || !seenFilm(first.id)) ? { motion: `film-${first.id}-1` as MotionId } : mediaAt(steps, Math.max(i, steps.findIndex((s) => s.t === 'video')));
     if (firstMedia && hasMotion(firstMedia.motion)) dual.current?.unlock(motionUrl(firstMedia.motion));
     const cur = steps[i];
     if (i === 0) {
@@ -1029,7 +1041,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 
   return (
     <MicAllowed.Provider value={!textOnly}>
-    <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
+    <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }} onPointerDownCapture={() => started && unlockSfx()} onClickCapture={swallowClick}>
       {/* motions and stills fill a phone the same way (cover); on wider screens (iPad) both sit whole over the blurred
           backdrop — the picture no longer changes size between a motion and a still (QA 5 N6). Any phone counts as a
           phone: Safari's bars make its screen wider than 9:16, which left a gap on both sides (client 2026-10-29) */}
@@ -1130,7 +1142,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {/* tap layer for dialogue */}
       {/* the thread: a line is tapped through anywhere (the newest finishes typing first) */}
       {started && step && chatLine(step, '') ? (
-        <button className="absolute inset-0 z-10 cursor-default" aria-label="つぎへ" onClick={tapLine} />
+        <button className="absolute inset-0 z-10 cursor-default" aria-label="つぎへ" {...fastTap(tapLine)} />
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
@@ -1565,7 +1577,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
 
   if (step.t === 'letter') {
     return (
-      <button className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 px-8" onClick={tap}>
+      <button className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 px-8" {...fastTap(tap)}>
         <div
           className="w-full max-w-sm -rotate-1 animate-[letterIn_0.8s_ease-out] whitespace-pre-wrap rounded-sm bg-[#f3e8d2] px-7 py-10 text-left text-lg leading-loose [word-break:keep-all] text-[#3b2a17] shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
           style={{ backgroundImage: 'radial-gradient(circle at 20% 10%, rgba(255,255,255,0.6), transparent 50%)' }}
@@ -1579,7 +1591,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
 
   if (step.t === 'notice') {
     return (
-      <button className="absolute inset-0 z-10 flex items-center justify-center bg-black/45 px-8" onClick={tap}>
+      <button className="absolute inset-0 z-10 flex items-center justify-center bg-black/45 px-8" {...fastTap(tap)}>
         <div className="w-full max-w-sm animate-[fadeUp_0.5s_ease-out] text-center [word-break:keep-all]">
           <DialogueWindow>{text}</DialogueWindow>
         </div>
@@ -1592,7 +1604,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   if (step.t === 'caption' && step.when === 'inviterMessage') {
     const [words, from] = text.split('\u3000');
     return (
-      <button className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 px-8 backdrop-blur-[3px]" onClick={() => onNext()}>
+      <button className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 px-8 backdrop-blur-[3px]" {...fastTap(onNext)}>
         <p className="animate-[subIn_2.6s_ease-out_both] text-center text-[19px] leading-relaxed tracking-[0.08em] text-amber-50 [word-break:keep-all]">{words}</p>
         {from && <p className="mt-3 animate-[subIn_2.6s_ease-out_0.4s_both] text-[13px] tracking-[0.3em] text-amber-200/80">— {from}</p>}
         <Cue />
@@ -1604,7 +1616,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
   if (step.t === 'caption' && DAY_TITLE.test(text)) return <DayTitle text={text} onNext={onNext} />;
   if (step.t === 'caption' || step.t === 'arrive') {
     return (
-      <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" onClick={() => onNext()}>
+      <button className="absolute inset-0 z-10 flex items-end justify-center pb-[calc(18vh+env(safe-area-inset-bottom))]" {...fastTap(onNext)}>
         <div className="animate-[fadeUp_0.8s_ease-out]">
           <Telop text={text} />
         </div>
@@ -1615,7 +1627,7 @@ function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: 
 
   const who = step.t === 'say' ? speakerName(step.who, vars) : '';
   return (
-    <button className="absolute inset-0 z-10 flex items-end justify-center" onClick={tap}>
+    <button className="absolute inset-0 z-10 flex items-end justify-center" {...fastTap(tap)}>
       <div className="pb-safe w-full px-0 pt-16">
         <div className="mb-5 animate-[fadeUp_0.25s_ease-out]">
           <DialogueWindow name={who} done={done}>
@@ -1640,7 +1652,7 @@ function DayTitle({ text, onNext }: { text: string; onNext: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <button className="absolute inset-0 z-10 flex items-center justify-center" onClick={onNext}>
+    <button className="absolute inset-0 z-10 flex items-center justify-center" {...fastTap(onNext)}>
       <span className="animate-[subIn_2.6s_ease-out_both] text-3xl tracking-[0.5em] text-amber-100 drop-shadow-[0_0_18px_rgba(255,210,120,0.6)]" style={{ fontFamily: '"Shippori Mincho", serif' }}>
         {text}
       </span>

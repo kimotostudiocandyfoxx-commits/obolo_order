@@ -30,6 +30,8 @@ export function unlockSfx() {
 /** the made sounds a story sound falls back to when its file is not there */
 const NEAREST: Record<string, Preset> = { 'gate-close': 'thud', smoke: 'whoosh', rocket: 'whoosh', crackers: 'pop', 'egg-crack': 'pop', paper: 'whoosh', stamp: 'thud', footsteps: 'knock', portal: 'magic' };
 const seBuffers = new Map<string, Promise<AudioBuffer | null>>();
+/** the sounds already decoded: played in the same moment as the tap, without waiting a turn */
+const seReady = new Map<string, AudioBuffer>();
 function seBuffer(id: string): Promise<AudioBuffer | null> {
   let p = seBuffers.get(id);
   if (!p && ctx) {
@@ -37,6 +39,7 @@ function seBuffer(id: string): Promise<AudioBuffer | null> {
     p = fetch(seUrl(id))
       .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
       .then((b) => c.decodeAudioData(b))
+      .then((buf) => (seReady.set(id, buf), buf))
       .catch(() => null);
     seBuffers.set(id, p);
   }
@@ -71,7 +74,7 @@ export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
     }
   };
   if (!SE_FILES.has(sound)) return synth();
-  void seBuffer(sound).then((buf) => {
+  const play = (buf: AudioBuffer | null) => {
     if (!buf) return synth();
     const src = c.createBufferSource();
     const g = c.createGain();
@@ -83,7 +86,10 @@ export function playSfx(sound: SoundFx, muted: boolean, volume = 1) {
       src.onended = () => ringing.delete(g);
     }
     src.start();
-  });
+  };
+  const ready = seReady.get(sound);
+  if (ready) play(ready);
+  else void seBuffer(sound).then(play);
 }
 
 // --- a text box with the mic first ----------------------------------------------------------------
