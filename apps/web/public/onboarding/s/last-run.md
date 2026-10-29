@@ -1,10 +1,4 @@
-# UI art — 2026-10-29T02:58:34.047Z
+# UI art — 2026-10-29T05:57:01.089Z
 
-Seedream 5.0 Pro / 6枚 / 約14円
+Seedream 5.0 Pro / 0枚 / 約0円
 
-- ✅ kimorin-iu-joy-notail
-- ✅ kimorin-iu-joy-o
-- ✅ kimorin-iu-shock-notail
-- ✅ kimorin-iu-shock-o
-- ✅ kimorin-iu-think-notail
-- ✅ kimorin-iu-think-o
