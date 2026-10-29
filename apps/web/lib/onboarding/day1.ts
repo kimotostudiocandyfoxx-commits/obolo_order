@@ -19,7 +19,7 @@ export const DAY1: Step[] = [
   // BGM (client, 2026-10-04): opening → MONBAN's theme from MONBAN → OBOLON's theme from OBOLON.
   { t: 'bgm', track: 'opening' },
   { t: 'motes', count: 36 }, // 金色の光の粒（演出）
-  { t: 'caption', text: '1日目' },
+  // no 「1日目」 after the film (client 2026-10-29)
   // D01-S001 招待状 (production 2026-10-19/20: the client's motions with their painted words taken out; words set in code)
   { t: 'video', motion: '1-c' }, // 光の粒がらせんを描いて集まり、封筒になる
   { t: 'caption', text: '招待信号を受信しました' },

@@ -13,13 +13,15 @@ import { neoForm } from '@obolo/shared';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { demoBati } from '@/lib/look';
-import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
+import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
+import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 
 /**
  * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1] — plays one day's story from the start (or from its first
  * step of that type, e.g. at=jupiter) with a test name. Nothing is saved to the account.
  * timeup=1: the 88 minutes of space time run out 20 seconds in (SYS-S001).
- * thru=N: at the end of a day, 〔N日目へ進む〕 opens the next one, up to day N (e.g. day=1&thru=3: from the start to Saturn).
+ * thru=N: each day ends on the members' own 「また明日」 screen (the 24-hour countdown, 〔明日まで待てない〕 and the clock that
+ * skips it), which opens the next day, up to day N (e.g. day=1&thru=3: from the start to Saturn).
  * /kakunin-5798f28713/play?world=jupiter | saturn | mercury | mars | venus — that planet's world on its own.
  */
 export default function PreviewPlayPage() {
@@ -92,12 +94,22 @@ function PreviewPlay() {
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   // thru=N: played straight through, each day handing over to the next up to day N (the client's check from the start to Saturn)
   const thru = Number(q.get('thru') ?? 0);
+  const nextDay = thru > day && (STORIES[day + 1] ?? PREVIEW_ONLY[day + 1]) ? `/kakunin-5798f28713/play?day=${day + 1}&thru=${thru}` : null;
+  if (ended && nextDay)
+    return (
+      <TomorrowScreen
+        name="テスト"
+        completedAt={null}
+        skipLabel={STORIES[day]?.skipLabel ?? DEFAULT_SKIP_LABEL}
+        skippedText={STORIES[day]?.skippedText}
+        onUnlocked={() => window.location.assign(nextDay)}
+      />
+    );
   if (ended)
     return (
       <Ended
         text={`${day}日目 おわり`}
         again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}`}
-        next={thru > day && (STORIES[day + 1] ?? PREVIEW_ONLY[day + 1]) ? { href: `/kakunin-5798f28713/play?day=${day + 1}&thru=${thru}`, label: `${day + 1}日目へ進む` } : undefined}
       />
     );
 

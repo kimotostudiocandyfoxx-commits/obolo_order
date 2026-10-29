@@ -41,12 +41,13 @@ export const DAY2: Step[] = [
   { t: 'action', label: '切符を見せる' },
   { t: 'se', sound: 'chime' },
   { t: 'video', motion: 'd2-ticket-give' }, // MONBANが切符を受け取り、金色のロケットの絵を確かめて、こちらに返す
+  // the line comes while the gate opens and MONBAN steps aside (client 2026-10-29), as on day 1
+  { t: 'bgvideo', motion: 11 }, // 門が開き、MONBANが横へ動く
   { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
-  { t: 'se', sound: 'smoke' },
-  { t: 'bgvideo', motion: 11 }, // 門が開く。MONBANが、黒い煙になって消える
   { t: 'action', label: '地球の神殿に向かう' },
   { t: 'bgm', track: null, fade: 2 },
   { t: 'video', motion: '12-a' }, // 門をくぐる
+  { t: 'wait', s: 1 }, // a beat before the voice behind (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 後ろから
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd2-look-back' }, // ふり返る：門の内側から入口のほうを見た景色
@@ -107,7 +108,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
   { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-sky' }, // 2日目用（client 2026-10-25）：大広間の天井が夜空に溶け、金の輪をまとった地球が浮かぶ。KIMORINは手前で見上げる
-  { t: 'wait', s: 3.5 }, // 地球が出てから（client 2026-10-22）
+  { t: 'wait', s: 5.5 }, // 地球が出てから（client 2026-10-22; two more seconds, 2026-10-29）
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
   { t: 'bgvideo', motion: 'd2-monban-walkin' }, // 星空の下、MONBANが入り口から歩いてきて、KIMORINの横に立つ
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' }, // MONBANが入り口から歩きながら

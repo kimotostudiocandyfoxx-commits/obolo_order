@@ -692,3 +692,13 @@ body {
     filter: drop-shadow(0 0 38px rgba(255, 210, 130, 0.85));
   }
 }
+
+/* the voice answer's mic: rings of light while it listens, a slow breath while it waits (client 2026-10-29) */
+@keyframes micRing {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(1.75); opacity: 0; }
+}
+@keyframes micBreath {
+  0%, 100% { opacity: 0.5; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.06); }
+}

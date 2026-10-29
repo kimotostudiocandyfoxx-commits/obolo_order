@@ -9,8 +9,8 @@ describe('day 1 script', () => {
       if (s.t === 'choice') for (const o of s.options) if (o.goto) expect(() => labelIndex(DAY1, o.goto!)).not.toThrow();
     }
   });
-  it('starts with the 1日目 caption and motion 1 (without its painted words), and ends with end', () => {
-    expect(DAY1.find((s) => s.t === 'caption')).toEqual({ t: 'caption', text: '1日目' });
+  it('goes from the film to motion 1 (no 「1日目」: client 2026-10-29), and ends with end', () => {
+    expect(DAY1.some((s) => s.t === 'caption' && s.text === '1日目')).toBe(false);
     expect(DAY1.find((s) => s.t === 'video')).toEqual({ t: 'video', motion: '1-c' });
     expect(DAY1[DAY1.length - 1]).toEqual({ t: 'end' });
   });

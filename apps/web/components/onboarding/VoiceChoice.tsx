@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { ReplyChips } from '@/components/story/Chat';
 
 /**
- * A choice answered by voice (D01-S006, story M-R169): a big 〔🎙 話してみよう〕 with the answers as a small example;
- * the corner ⌨ (for when one cannot speak) shows them as buttons. The first tap ever asks once —
- * 「声は残しません。話した言葉は、あなたの記録にだけ残ります　［いいよ］［やめる］」 (M-R169: the words are kept for D08-S007) — then the phone's mic permission;
- * ［やめる］ goes to the buttons. What is heard is matched to the nearest answer (the browser's own speech
- * recognition; nothing is sent or kept).
+ * A choice answered by voice (D01-S006, story M-R169): a big mic button 〔話してみよう〕 with the answers as a small
+ * example; the corner ⌨ (for when one cannot speak) shows them as buttons. A tap listens at once — the phone asks for
+ * the mic itself (client 2026-10-29: the 「声は残しません…［いいよ］［やめる］」 step is gone). What is heard is matched to
+ * the nearest answer (the browser's own speech recognition; nothing is sent or kept). A miss stays on the mic with a
+ * word of why (it used to drop to the buttons, which looked like the old choice coming back); only a mic that cannot
+ * be used goes to the buttons, saying so.
  */
 type Rec = {
   lang: string;
@@ -21,6 +22,7 @@ type Rec = {
   onend: (() => void) | null;
 };
 export const VOICE_OK_KEY = 'obolo.voiceOk';
+const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 function recognizer(): (new () => Rec) | null {
   if (typeof window === 'undefined') return null;
@@ -44,11 +46,11 @@ export function matchAnswer(heard: string, options: string[]): number {
 }
 
 export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k: number, words?: string) => void }) {
-  const [mode, setMode] = useState<'mic' | 'ask' | 'listen' | 'keys'>('mic');
+  const [mode, setMode] = useState<'mic' | 'listen' | 'keys'>('mic');
   const [heard, setHeard] = useState('');
-  const [missed, setMissed] = useState(0);
   const [note, setNote] = useState('');
   const rec = useRef<Rec | null>(null);
+  const done = useRef(false);
   useEffect(() => {
     if (!recognizer()) setMode('keys');
     return () => rec.current?.abort();
@@ -60,37 +62,44 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     const r = new R();
     r.lang = 'ja-JP';
     r.interimResults = true;
-    r.continuous = false;
+    // iOS ends a one-shot recognition almost at once: listen on and stop ourselves after a short quiet
+    r.continuous = true;
     let said = '';
+    let quiet: ReturnType<typeof setTimeout> | undefined;
+    let blocked = false;
     r.onresult = (e) => {
-      said = Array.from(e.results)
-        .map((x) => x[0].transcript)
-        .join('');
+      const all = Array.from(e.results);
+      said = all.map((x) => x[0].transcript).join('');
       setHeard(said);
+      clearTimeout(quiet);
+      quiet = setTimeout(() => r.abort(), all[all.length - 1]?.isFinal ? 400 : 1400);
     };
     r.onerror = (e) => {
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') setMode('keys');
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') blocked = true;
     };
-    // no answer from the recogniser in 8 seconds: stop and say so; the second time, the buttons (QA 6 R8)
-    const timer = setTimeout(() => r.abort(), 8000);
+    const timer = setTimeout(() => r.abort(), 9000);
     r.onend = () => {
       clearTimeout(timer);
-      if (said.trim()) {
+      clearTimeout(quiet);
+      rec.current = null;
+      if (said.trim() && !done.current) {
+        done.current = true;
         const k = matchAnswer(said, options);
         setTimeout(() => onPick(k, said.trim().slice(0, 120)), 500);
         return;
       }
-      setMissed((n) => {
-        if (n + 1 >= 2) setMode('keys');
-        else {
-          setNote('うまく聞き取れなかった。もう一度、または ⌨ で');
-          setMode((m) => (m === 'listen' ? 'mic' : m));
-        }
-        return n + 1;
-      });
+      if (blocked) {
+        setNote('マイクが使えないので、ボタンで選んでください');
+        setMode('mic');
+        setTimeout(() => setMode('keys'), 1800);
+        return;
+      }
+      setNote('うまく聞き取れませんでした。もう一度どうぞ');
+      setMode('mic');
     };
     rec.current = r;
     setHeard('');
+    setNote('');
     setMode('listen');
     try {
       r.start();
@@ -98,59 +107,35 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       setMode('keys');
     }
   };
-  const tap = () => {
-    let ok = false;
-    try {
-      ok = localStorage.getItem(VOICE_OK_KEY) === '1';
-    } catch {
-      /* private mode */
-    }
-    if (ok) listen();
-    else setMode('ask');
-  };
 
   if (mode === 'keys') return <ReplyChips options={options} onPick={onPick} />;
+  const on = mode === 'listen';
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 flex flex-col items-center px-5 pb-8">
-      {mode === 'ask' ? (
-        <div className="w-full max-w-sm rounded-3xl border border-amber-200/40 bg-black/80 p-4 text-center text-amber-50 backdrop-blur">
-          <p className="text-[14px] leading-relaxed">声は残しません。話した言葉は、あなたの記録にだけ残ります</p>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <button
-              onClick={() => {
-                try {
-                  localStorage.setItem(VOICE_OK_KEY, '1');
-                } catch {
-                  /* private mode */
-                }
-                listen();
-              }}
-              className="rounded-full border border-amber-200/70 bg-amber-200/15 py-2.5 text-[14px] font-bold"
-            >
-              いいよ
-            </button>
-            <button onClick={() => setMode('keys')} className="rounded-full border border-white/20 py-2.5 text-[14px]">
-              やめる
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <p className="mb-3 rounded-2xl bg-black/60 px-4 py-2 text-center text-[12px] text-amber-50/80 backdrop-blur">{mode === 'listen' ? heard || '聞いています……' : note || `例：${options.join('・')}`}</p>
-          <button
-            onClick={mode === 'listen' ? () => rec.current?.abort() : tap}
-            className={`relative flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 text-white shadow-[0_8px_30px_rgba(60,20,90,0.45)] active:scale-95 ${mode === 'listen' ? 'border-rose-200 bg-gradient-to-b from-rose-400 to-rose-600' : 'animate-[hintGlow_2.2s_ease-in-out_infinite] border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500'}`}
-            aria-label="話してみよう"
-          >
-            {mode === 'listen' && <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/50" />}
-            <span className="relative text-4xl">🎙</span>
-          </button>
-          <p className="mt-2 text-[13px] font-bold tracking-wider text-amber-50">話してみよう</p>
-          <button onClick={() => setMode('keys')} className="absolute bottom-[calc(12px+env(safe-area-inset-bottom))] right-4 rounded-lg bg-white/10 px-2 py-1 text-[16px] text-white/60" aria-label="文字で答える">
-            ⌨
-          </button>
-        </>
-      )}
+      <p className="mb-4 min-h-[2rem] rounded-full border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
+        {on ? heard || '聞いています……' : note || `例：${options.join('・')}`}
+      </p>
+      <button onClick={on ? () => rec.current?.abort() : listen} className="relative flex h-24 w-24 items-center justify-center rounded-full active:scale-95" aria-label="話してみよう">
+        {/* rings of light going out while it listens; a slow breath while it waits */}
+        {on ? (
+          [0, 0.6, 1.2].map((d) => <span key={d} className="absolute inset-0 rounded-full border border-amber-200/70" style={{ animation: `micRing 1.8s ${d}s ease-out infinite` }} />)
+        ) : (
+          <span className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,206,120,0.28),transparent_70%)]" style={{ animation: 'micBreath 2.6s ease-in-out infinite' }} />
+        )}
+        <span className={`absolute inset-0 rounded-full border transition-colors duration-300 ${on ? 'border-amber-100 bg-[radial-gradient(circle_at_50%_35%,rgba(255,214,140,0.35),rgba(40,26,8,0.92)_70%)] shadow-[0_0_34px_rgba(255,204,120,0.65)]' : 'border-amber-200/70 bg-[radial-gradient(circle_at_50%_30%,rgba(70,48,18,0.95),rgba(8,6,12,0.95)_72%)] shadow-[0_0_22px_rgba(255,204,120,0.3)]'}`} />
+        <span className="absolute inset-[7px] rounded-full border border-amber-200/25" />
+        <svg viewBox="0 0 24 24" className={`relative h-9 w-9 transition-colors ${on ? 'text-amber-50' : 'text-amber-200'}`} fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <rect x="9" y="3" width="6" height="11" rx="3" fill={on ? 'currentColor' : 'none'} />
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+          <path d="M12 17.5V21M9 21h6" />
+        </svg>
+      </button>
+      <p className="mt-3 text-[12px] tracking-[0.4em] text-amber-100/90" style={{ fontFamily: SERIF }}>
+        {on ? '話してください' : '話してみよう'}
+      </p>
+      <button onClick={() => setMode('keys')} className="absolute bottom-[calc(12px+env(safe-area-inset-bottom))] right-4 rounded-lg bg-white/10 px-2 py-1 text-[16px] text-white/60" aria-label="文字で答える">
+        ⌨
+      </button>
     </div>
   );
 }

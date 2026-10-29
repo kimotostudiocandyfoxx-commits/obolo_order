@@ -965,8 +965,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     <MicAllowed.Provider value={!textOnly}>
     <div className="fixed inset-0 z-[100] select-none overflow-hidden bg-black text-white" style={{ fontFamily: SERIF }}>
       {/* motions and stills fill a phone the same way (cover); on wider screens (iPad) both sit whole over the blurred
-          backdrop — the picture no longer changes size between a motion and a still (QA 5 N6) */}
-      <style>{'.story-fit{object-fit:cover}@media (min-aspect-ratio: 9/16){.story-fit{object-fit:contain}}'}</style>
+          backdrop — the picture no longer changes size between a motion and a still (QA 5 N6). Any phone counts as a
+          phone: Safari's bars make its screen wider than 9:16, which left a gap on both sides (client 2026-10-29) */}
+      <style>{'.story-fit{object-fit:cover}@media (min-aspect-ratio: 3/4){.story-fit{object-fit:contain}}'}</style>
       {/* blurred backdrop so 9:16 motions fill wider screens (iPad) without cropping */}
       {backdrop && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -1037,7 +1038,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </div>
       )}
 
-      {started && step?.t === 'film' && (
+      {/* the opening film (signal) plays whole: no skip (client 2026-10-29) */}
+      {started && step?.t === 'film' && step.id !== 'signal' && (
         <button
           onClick={endFilm}
           className="absolute bottom-[calc(28px+env(safe-area-inset-bottom))] right-4 z-[60] rounded-full border border-white/30 bg-black/40 px-4 py-1.5 text-xs tracking-[0.3em] text-white/80 backdrop-blur"
