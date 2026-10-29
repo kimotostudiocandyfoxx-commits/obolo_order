@@ -5003,6 +5003,36 @@
     "apps/web/public/onboarding/s/mikie-cand-2.jpg"
    ],
    "prompt": "Edit the first picture: keep everything exactly the same — the woman, her face, round sunglasses, hair, magenta blouse, patterned skirt, pose, the silver hook on her right arm (viewer's left), framing, light and the flat plain mid-grey background (#808080) — and change only the gatling gun that is her LEFT forearm (on the viewer's right): it becomes shiny polished GOLD metal (gold barrels, gold body), with the little seasoning bottles still loaded. The hook stays silver. No text, no letters."
+  },
+  {
+   "id": "d2-kimorin-pin-a",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/kimorin-iu-shock.webp",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "A wide 16:9 cut-in panel for a Japanese mobile story game: the dramatic manga 'it just clicked!' moment of realization. The character is KIMORIN from the reference picture (use it for the character only): a small white fox whose face looks like a smooth white fox mask with a blue leaf mark on the forehead, blue spiral marks on the cheeks, tall fox ears with blue insides, a rounded silver box with a small dark screen between his ears, brass steampunk goggles pushed UP onto his forehead, a white lab coat collar. COMPOSITION: on the right half, an extreme close-up of KIMORIN's mask face, cropped by the right and bottom edges, turned three-quarters toward the left; his two narrow eye slits blaze with pure white light, glowing blank white eyes; a soft white aura outlines his head. The left half is pure black, crossed by one thin perfectly horizontal white streak of light at eye height, with a sharp bright white star flare where it meets the edge of his face. High-contrast black and white light with only his blue marks in colour, semi-realistic painterly anime texture, cinematic. No text, no letters, no sound-effect lettering, no watermark."
+  },
+  {
+   "id": "d2-kimorin-pin-b",
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1280,
+    720
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/kimorin-iu-shock.webp",
+    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+   ],
+   "prompt": "A wide 16:9 cut-in panel for a Japanese mobile story game: the dramatic manga 'it just clicked!' moment of realization. The character is KIMORIN from the reference picture (use it for the character only): a small white fox whose face looks like a smooth white fox mask with a blue leaf mark on the forehead, blue spiral marks on the cheeks, tall fox ears with blue insides, a rounded silver box with a small dark screen between his ears, brass steampunk goggles pushed UP onto his forehead, a white lab coat collar. COMPOSITION: black background; across the middle runs a jagged horizontal white lightning crack, bursting into a big spiky white flash of light; in front of the flash, KIMORIN's mask face in close-up from the chest up, centered, shown in strong backlight, his eye slits shining pure white, a white glowing rim around him, a sudden 'ping!' of understanding. High-contrast, deep blacks, painterly semi-realistic anime texture, cinematic. No text, no letters, no sound-effect lettering, no watermark."
   }
  ],
  "redo": []
