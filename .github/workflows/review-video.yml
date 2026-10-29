@@ -41,12 +41,13 @@ jobs:
           export RUNWARE_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
           node scripts/story-video/make.mjs design/review-video-queue.json
+          node scripts/review-art/budget.mjs || true
       - name: Save to the branch
         if: always()
         run: |
           git config user.name "review-video"
           git config user.email "review-video@users.noreply.github.com"
-          git add -f art/review/saturn/video art/review/saturn/rounds/video-costs.md design/review-video-queue.json
+          git add -f art/review/saturn/video art/review/saturn/rounds/video-costs.md art/review/saturn/rounds/budget.md design/review-video-queue.json
           git diff --cached --quiet && exit 0
           git commit -m "Review video: new cuts [skip ci]"
           for i in 1 2 3 4; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

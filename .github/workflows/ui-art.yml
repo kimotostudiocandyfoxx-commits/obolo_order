@@ -45,6 +45,7 @@ jobs:
           node scripts/ui-art/paint.mjs design/atelier-art-queue.json
           node scripts/ui-art/paint.mjs design/ui-parts-queue.json
           node scripts/ui-art/paint.mjs design/review-art-queue.json
+          node scripts/review-art/budget.mjs || true
       - name: Save the pictures to the branch
         if: always()
         run: |

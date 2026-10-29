@@ -96,6 +96,8 @@ let yen = 0;
 const START = Date.now();
 const late = () => Date.now() - START > 22 * 60_000;
 const failed = new Set();
+// what each picture cost, kept in the queue's ledger (the review queue: art/review/saturn/rounds/art-costs.md)
+const spent = [];
 // a few at a time: a burst of tasks is what made Runware time out (504)
 const retry = (x, n) => paint(x).catch((e) => (n > 0 && !late() && /504|Timeout|timeout|abort|concurrentRequestLimitExceeded/i.test(String(e)) ? new Promise((r) => setTimeout(r, 8000)).then(() => retry(x, n - 1)) : Promise.reject(e)));
 // in passes: a picture that edits one painted in this run (its ref still missing) waits for the next pass
@@ -116,7 +118,9 @@ while (left.length) {
           continue;
         }
         try {
-          yen += (await retry(x, 1)) * 150;
+          const y = (await retry(x, 1)) * 150;
+          yen += y;
+          spent.push(`| ${new Date().toISOString().slice(0, 16)} | ${x.id} | 約${y.toFixed(1)}円 |`);
           log.push(`- ✅ ${x.id}`);
         } catch (e) {
           failed.add(x.id);
@@ -135,4 +139,8 @@ for (const x of left) {
 if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: (queue.redo ?? []).filter((id) => failed.has(id)) }, null, 2) + '\n');
 const report = [`# UI art — ${new Date().toISOString()}`, '', `Seedream 5.0 Pro / ${todo.length}枚 / 約${Math.round(yen)}円`, '', ...log.sort(), ''].join('\n');
 writeFileSync(join(OUT, 'last-run.md'), report);
+if (queue.ledger && spent.length) {
+  const head = existsSync(queue.ledger) ? readFileSync(queue.ledger, 'utf8') : '# 止め絵の費用（1枚ごと）\n\n| 日時 (UTC) | 絵 | 費用 |\n|---|---|---|\n';
+  writeFileSync(queue.ledger, `${head.trimEnd()}\n${spent.join('\n')}\n`);
+}
 console.log(report);
