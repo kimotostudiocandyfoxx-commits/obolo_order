@@ -6,7 +6,6 @@ import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPl
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
-import { demoBati } from '@/lib/look';
 import { realLessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
 import { clearDay, loadDay, saveDay } from '@/lib/onboarding/progress';
@@ -231,15 +230,15 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
           const u = await Promise.race([hatching, new Promise<null>((r) => setTimeout(() => r(null), 75_000))]);
           if (!u) {
             void hatching.then(setMe).catch(() => undefined);
-            return demoBati(me.bati?.food ?? '');
+            return '';
           }
           setMe(u);
           // Bati's expressions are drawn meanwhile (a minute or so; the plain picture stands in until then)
           if (u.bati?.imageUrl && !u.bati.faces) void getApi().batiFaces().then(setMe).catch(() => undefined);
           // if generation failed, a drawn Bati keeps the story going
-          return u.bati?.imageUrl ?? demoBati(u.bati?.food ?? '');
+          return u.bati?.imageUrl ?? '';
         } catch {
-          return demoBati(me.bati?.food ?? '');
+          return '';
         }
       }}
       onBatiName={async (n) => {

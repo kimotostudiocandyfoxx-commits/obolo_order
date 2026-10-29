@@ -59,7 +59,8 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
       const wait = Math.max(0, 3200 - (Date.now() - started));
       setTimeout(() => {
         if (!live) return;
-        setUrl(u || demoBati(food));
+        // not drawn in time: the egg's own plain body stands in (the real one lands on the account later)
+        setUrl(u || (egg ? `/onboarding/bati-stand-${egg}.webp` : demoBati(food)));
         setStage('flash');
         setTimeout(() => live && setStage('born'), 700);
       }, wait);
