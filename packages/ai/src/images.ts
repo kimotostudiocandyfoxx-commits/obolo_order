@@ -68,6 +68,8 @@ export class SeedreamImageProvider implements ImageProvider {
     private readonly apiKey: string,
     private readonly side = 1024,
     private readonly maxAtOnce = 12,
+    /** one picture's whole wait (2026-10-29: a look waited minutes and the screen sat on 「水盤が描いている」) */
+    private readonly timeoutMs = 70_000,
   ) {}
   async generate(prompt: string, seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
     if (this.running >= this.maxAtOnce) await new Promise<void>((go) => this.waiting.push(go));
@@ -79,8 +81,8 @@ export class SeedreamImageProvider implements ImageProvider {
         try {
           return await this.paint(prompt, seed, refs);
         } catch (e) {
-          if (k >= 3 || !/concurrentRequestLimitExceeded/.test(String(e))) throw e;
-          await new Promise((r) => setTimeout(r, 8000 * (k + 1)));
+          if (k >= 2 || !/concurrentRequestLimitExceeded/.test(String(e))) throw e;
+          await new Promise((r) => setTimeout(r, 4000 * (k + 1)));
         }
       }
     } finally {
@@ -88,14 +90,34 @@ export class SeedreamImageProvider implements ImageProvider {
       this.waiting.shift()?.();
     }
   }
+  /** a picture still being made comes back without its URL ("processing"): ask for it by its task (2026-10-29: the look stuck) */
+  private async waitFor(taskUUID: string, until: number): Promise<string> {
+    while (Date.now() < until) {
+      await new Promise((r) => setTimeout(r, 3000));
+      const res = await fetch('https://api.runware.ai/v1', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+        body: JSON.stringify([{ taskType: 'getResponse', taskUUID }]),
+        signal: AbortSignal.timeout(20_000),
+      });
+      const j = (await res.json().catch(() => ({}))) as { data?: { taskUUID?: string; imageURL?: string; status?: string }[]; errors?: unknown[] };
+      if (j.errors?.length) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors).slice(0, 200)}`);
+      const d = (j.data ?? []).find((x) => x.taskUUID === taskUUID);
+      if (d?.status === 'error') throw new Error(`Seedream ${JSON.stringify(d).slice(0, 200)}`);
+      if (d?.imageURL) return d.imageURL;
+    }
+    throw new Error('Seedream: the picture did not come back in time');
+  }
   private async paint(prompt: string, _seed?: number, refs: GeneratedImage[] = []): Promise<GeneratedImage> {
+    const taskUUID = crypto.randomUUID();
+    const until = Date.now() + this.timeoutMs;
     const res = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
       body: JSON.stringify([
         {
           taskType: 'imageInference',
-          taskUUID: crypto.randomUUID(),
+          taskUUID,
           model: 'bytedance:seedream@5.0-pro',
           positivePrompt: prompt.slice(0, 3000),
           width: this.side,
@@ -106,11 +128,12 @@ export class SeedreamImageProvider implements ImageProvider {
           ...(refs.length ? { referenceImages: refs.map((r) => `data:${r.mime};base64,${r.data.toString('base64')}`) } : {}),
         },
       ]),
-      signal: AbortSignal.timeout(180_000),
+      signal: AbortSignal.timeout(this.timeoutMs),
     });
-    const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string }[]; errors?: unknown[] };
-    const url = j.data?.[0]?.imageURL;
-    if (!res.ok || j.errors?.length || !url) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);
+    const j = (await res.json().catch(() => ({}))) as { data?: { imageURL?: string; status?: string }[]; errors?: unknown[] };
+    const processing = !j.errors?.length && j.data?.[0] && !j.data[0].imageURL;
+    const url = j.data?.[0]?.imageURL ?? (processing ? await this.waitFor(taskUUID, until) : undefined);
+    if ((!res.ok && !url) || j.errors?.length || !url) throw new Error(`Seedream ${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 200)}`);
     const img = await fetch(url, { signal: AbortSignal.timeout(60_000) });
     if (!img.ok) throw new Error(`Seedream image ${img.status}`);
     return { data: Buffer.from(await img.arrayBuffer()), mime: 'image/jpeg' };

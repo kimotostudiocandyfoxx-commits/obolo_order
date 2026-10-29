@@ -107,7 +107,12 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     setPhase('making');
     const started = Date.now();
     try {
-      const r = await api.candidates(body);
+      // never wait for ever: about two minutes, then the screen says so and offers another try (client 2026-10-29: it sat
+      // on 「水盤が描いている」); a making that failed costs no mana (the server refunds it)
+      const r = await Promise.race([
+        api.candidates(body),
+        new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), 120_000)),
+      ]);
       // let the basin scene play out (KIMORIN's whisper, the splash, OBOLON's line)
       await new Promise((ok) => setTimeout(ok, Math.max(0, 5200 - (Date.now() - started))));
       if (!r.candidates.length) return setPhase('failed');
@@ -120,7 +125,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
         setTired(true);
         return setPhase(draft.cands.length ? 'pick' : 'failed');
       }
-      setErr(e instanceof Error ? e.message : String(e));
+      setErr(null);
       setPhase(draft.cands.length ? 'pick' : 'failed');
     }
   };
@@ -359,10 +364,10 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   if (phase === 'failed')
     return (
       <Panel>
-        <p className="text-center text-amber-100">{tired ? '水盤が、今日は疲れてしまった……' : '水盤が、うまく描けなかった……'}</p>
+        <p className="text-center text-amber-100">{tired ? '水盤が、今日は疲れてしまった……' : '水盤が、うまく描けなかった。もう一度'}</p>
         <p className="mt-1 text-center text-xs text-white/55">{tired ? '用意された姿から選んでください。' : 'もう一度ためすか、用意された姿から選んでください。'}</p>
         <div className="mt-4 flex flex-col gap-2">
-          {!tired && <Gold onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>もう一度描いてもらう</Gold>}
+          {!tired && <Gold onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>もう一度</Gold>}
           <Plain onClick={() => setPhase('forms')}>用意された8つの姿から選ぶ</Plain>
         </div>
       </Panel>

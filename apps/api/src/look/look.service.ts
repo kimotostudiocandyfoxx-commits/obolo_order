@@ -75,7 +75,10 @@ const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '..
  * the smoke test of 2026-10-28 got 2 of 4 looks once), so a visitor nearly always sees the whole set.
  */
 async function settleWithRetry<T>(n: number, paint: (i: number) => Promise<T>): Promise<PromiseSettledResult<T>[]> {
+  const t0 = Date.now();
   const first = await Promise.allSettled(Array.from({ length: n }, (_, i) => paint(i)));
+  // the second try only while it still fits in the visitor's wait (2026-10-29: about a minute in all, then the screen says so)
+  if (Date.now() - t0 > 25_000) return first;
   return Promise.all(first.map((r, i) => (r.status === 'fulfilled' ? r : Promise.allSettled([paint(i)]).then(([again]) => again))));
 }
 
