@@ -54,6 +54,8 @@ const SPRITES: Partial<Record<Who, string>> = { brother: 'takoyaki-brother', sis
 
 const SISTER_SUNSET = '……今日の夕焼け、きれいだったワ。';
 const BROTHER_STONE = '土星は原石の星だZE!!';
+/** MONBAN's kororin, always on the plaza (M-R176 addendum: so the plaza is never lonely) */
+const MONBAN_SONG = '……今日も、異常なし…。';
 const K1 = 'うんち。';
 const K2 = '滑り台。';
 const K3 = 'ぷりぷりぷりり、うひょひょひょ、げへへ！　ピンポン大正解！';
@@ -133,6 +135,7 @@ const BEATS: Beat[] = [
   { k: 'fly' },
   // D04-S006 土星の広場のサイファー
   { k: 'plaza' },
+  { k: 'say', who: 'kimorin', text: '……MONBANさんのまで、いますね。' },
   { k: 'say', who: 'sister', text: '今夜は、ワタシたちのも、入れるワ。' },
   { k: 'throw' },
   { k: 'say', who: 'brother', text: 'サイファー、始めるZE!!' },
@@ -487,6 +490,8 @@ export function SaturnLesson({
     if (beat.k === 'plaza') {
       stopAudio();
       setScene('plaza');
+      // MONBAN's kororin (the black hood) is on the plaza already, and takes its turn in the cypher
+      void story('inviter', 'monban', 'MONBAN', '/story/avatars/monban.webp', MONBAN_SONG, 'MONBAN').then((k) => setPlazaK((x) => [...x, k]));
       setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1400);
     }
     if (beat.k === 'throw')
