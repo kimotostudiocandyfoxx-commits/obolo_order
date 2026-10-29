@@ -114,6 +114,8 @@ interface Props {
   textOnly?: boolean;
   /** straight on from a tap that already woke the sound (the second journey's next chapter): no start screen */
   autoStart?: boolean;
+  /** the check page's gate=1: the seal (E-0) every time, whatever this browser saw before */
+  showGate?: boolean;
 }
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -176,7 +178,7 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false, showGate = false }: Props) {
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
   const dual = useRef<DualVideo | null>(null);
@@ -623,7 +625,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 
   // E-0 (M-R131): the seal before the invitation, only the very first time (read after mount: no hydration gap)
   const [gateSeen, setGateSeen] = useState(true);
-  useEffect(() => setGateSeen(sealGateSeen()), []);
+  useEffect(() => setGateSeen(!showGate && sealGateSeen()), [showGate]);
   const filmPart = useRef(0);
   const endFilm = () => {
     const s = steps[iRef.current];

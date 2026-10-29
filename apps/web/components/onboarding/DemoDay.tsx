@@ -128,6 +128,7 @@ export function DemoDay({
   onBatiFood,
   onBatiName,
   onBati,
+  showGate = false,
 }: {
   day: number;
   steps: Step[];
@@ -143,6 +144,7 @@ export function DemoDay({
   onBatiFood?: (food: string) => void;
   onBatiName?: (name: string) => void;
   onBati?: (url: string) => void;
+  showGate?: boolean;
 }) {
   setDemoMode(!live);
   const [round, setRound] = useState(0);
@@ -161,6 +163,7 @@ export function DemoDay({
       vars={vars}
       lessonApi={fakeLessonApi}
       textOnly={day <= 1}
+      showGate={showGate}
       seals={{
         known: day >= 2 ? knownSealsOn(day) : [],
         solved: solvedSealsOn(day),

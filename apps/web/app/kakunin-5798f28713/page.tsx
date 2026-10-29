@@ -9,6 +9,8 @@ import { PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
 export default function PreviewIndex() {
   const days = Object.keys({ ...STORIES, ...PREVIEW_ONLY }).map(Number).sort((a, b) => a - b);
   const jumps: { href: string; label: string }[] = [
+    { href: '/kakunin-5798f28713/play?day=1&thru=3&gate=1', label: '▶ チェック画面とオープニング映像から通しで（毎回チェック画面から → 土星まで）' },
+    { href: '/kakunin-5798f28713/play?day=1&gate=1', label: '▶ チェック画面とオープニング映像から（1日目だけ）' },
     { href: '/kakunin-5798f28713/play?day=1&thru=3', label: '▶ 最初から土星まで通しで（1日目の招待状 → 2日目の月 → 3日目の土星）' },
     { href: '/kakunin-5798f28713/parts', label: '✨ 物語の部品（会話の枠・名前札・テロップ・選択肢・ボタン・舞台）' },
     { href: '/kakunin-5798f28713/play?day=1', label: '1日目：冒頭（招待状からMONBANまで）の試作' },

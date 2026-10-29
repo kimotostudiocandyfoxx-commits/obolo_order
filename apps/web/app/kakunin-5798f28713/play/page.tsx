@@ -17,7 +17,7 @@ import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stor
 import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 
 /**
- * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1] — plays one day's story from the start (or from its first
+ * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1][&gate=1: the seal E-0 every time] — plays one day's story from the start (or from its first
  * step of that type, e.g. at=jupiter) with a test name. Nothing is saved to the account.
  * timeup=1: the 88 minutes of space time run out 20 seconds in (SYS-S001).
  * thru=N: each day ends on the members' own 「また明日」 screen (the 24-hour countdown, 〔明日まで待てない〕 and the clock that
@@ -111,7 +111,7 @@ function PreviewPlay() {
     return (
       <Ended
         text={`${day}日目 おわり`}
-        again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}`}
+        again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}${q.get('gate') === '1' ? '&gate=1' : ''}`}
       />
     );
 
@@ -125,6 +125,7 @@ function PreviewPlay() {
         steps={story.steps}
         start={start}
         live={live}
+        showGate={q.get('gate') === '1'}
         timeUp={timeUp}
         onTimeUp={() => setEnded(true)}
         onNeoForm={(id) => setNeo(id)}
