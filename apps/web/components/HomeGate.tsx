@@ -45,7 +45,16 @@ export function HomeGate({ children }: { children: ReactNode }) {
         skippedText={STORIES[day]?.skippedText}
         onUnlocked={async (skipped) => {
           const elapsed = Date.now() >= Date.parse(me.journeyCompletedAt!) + JOURNEY_WAIT_MS;
-          setMe(await getApi().advanceJourney(skipped || !elapsed));
+          // tried again on a bad line; never left on the opened door (story chat 2026-10-29)
+          for (let k = 0; k < 4; k++) {
+            try {
+              setMe(await getApi().advanceJourney(skipped || !elapsed));
+              return;
+            } catch {
+              await new Promise((r) => setTimeout(r, 1500 * (k + 1)));
+            }
+          }
+          window.location.reload();
         }}
       />
     );

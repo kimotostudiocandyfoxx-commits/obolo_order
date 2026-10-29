@@ -15,6 +15,8 @@ import { VoiceField } from './StoryExtras';
  * answer carries the 'can be wrong' line. No counts, no numbers, no "AI". A talk is gone when closed unless
  * 〔この話を残す〕 keeps it (R21b, M-R119): only kept talks are listed under 〔📜 前の話〕 (on this device, TALKS_KEY).
  */
+/** a tenth of a second of silence (WAV) */
+const SILENCE = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 export const TALKS_KEY = 'obolo.batiTalks';
 type Talk = { at: string; lines: { who: 'me' | 'bati'; text: string }[] };
 function loadTalks(): Talk[] {
@@ -65,12 +67,25 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
       if (g !== gen.current) return;
       if (!url) continue;
       await new Promise<void>((done) => {
-        const a = new Audio(url);
-        playing.current = a;
-        a.onended = () => done();
-        a.onerror = () => done();
-        a.play().catch(() => done());
+        // the one element opened by the tap that asked (iOS plays a fresh Audio only inside a tap)
+        const a = (playing.current ??= new Audio());
+        const t = setTimeout(done, 15_000);
+        a.onended = () => (clearTimeout(t), done());
+        a.onerror = () => (clearTimeout(t), done());
+        a.src = url;
+        a.play().catch(() => (clearTimeout(t), done()));
       });
+    }
+  };
+  /** inside the tap: open the voice's element with a moment of silence, so its later play() is allowed */
+  const openVoice = () => {
+    if (muted) return;
+    try {
+      const a = (playing.current ??= new Audio());
+      a.src = SILENCE;
+      void a.play().catch(() => undefined);
+    } catch {
+      /* no sound */
     }
   };
 
@@ -79,6 +94,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     if (!t || casting || rounds >= FIRST_ROUNDS) return;
     gen.current++;
     playing.current?.pause();
+    openVoice();
     setQ('');
     setMsgs((m) => [...m, { id: m.length, who: 'me', text: t }]);
     setFace('think');
@@ -87,11 +103,12 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     let reply = '';
     let noPic = false;
     try {
-      const r = await getApi().buddyChat(t, 'ja');
+      // at most 20 s: a set answer counts as a round, so the talk always reaches its end (story chat 2026-10-29)
+      const r = await Promise.race([getApi().buddyChat(t, 'ja'), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 20_000))]);
       reply = r.reply.text;
       noPic = !!r.kind && r.kind !== 'normal';
     } catch {
-      reply = 'うーん、いまは、うまく調べられなかった……。ほかのことも、聞いてみて！';
+      reply = 'むむ…いまは、うまく調べられなかった！　ほかのこと、聞いてみて！';
       noPic = true;
     }
     // the magic takes a moment, even when the answer is quick

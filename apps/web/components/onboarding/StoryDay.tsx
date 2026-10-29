@@ -133,13 +133,18 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
     (answers: Record<string, string>) => {
       if (!me) return;
       setTimeout(async () => {
-        try {
-          const done = await getApi().completeJourneyDay(day, answers);
-          // the Eclipse day ends as an ORDER: no 24-hour wait after it
-          setMe(day === JOURNEY_PAYMENT ? await getApi().advanceJourney(true) : done);
-        } finally {
-          clearDay(day, me.id);
-          clearLookDraft();
+        // tried a few times; the day's progress is forgotten only once the server has it (else a reload goes on from the end)
+        for (let k = 0; k < 4; k++) {
+          try {
+            const done = await getApi().completeJourneyDay(day, answers);
+            clearDay(day, me.id);
+            clearLookDraft();
+            // the Eclipse day ends as an ORDER: no 24-hour wait after it
+            setMe(day === JOURNEY_PAYMENT ? await getApi().advanceJourney(true).catch(() => done) : done);
+            return;
+          } catch {
+            await new Promise((r) => setTimeout(r, 2000 * (k + 1)));
+          }
         }
       }, 1500);
     },
@@ -221,7 +226,13 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       }}
       onHatch={async () => {
         try {
-          const u = await getApi().batiHatch();
+          // at most 75 s inside the light (story chat 2026-10-29: it stopped there); a late Bati still lands on the account
+          const hatching = getApi().batiHatch();
+          const u = await Promise.race([hatching, new Promise<null>((r) => setTimeout(() => r(null), 75_000))]);
+          if (!u) {
+            void hatching.then(setMe).catch(() => undefined);
+            return demoBati(me.bati?.food ?? '');
+          }
           setMe(u);
           // Bati's expressions are drawn meanwhile (a minute or so; the plain picture stands in until then)
           if (u.bati?.imageUrl && !u.bati.faces) void getApi().batiFaces().then(setMe).catch(() => undefined);

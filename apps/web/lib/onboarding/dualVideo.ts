@@ -28,6 +28,9 @@ export class DualVideo {
   private pending: HTMLVideoElement | null = null;
   /** the motion coming up (preload) */
   private next: string | null = null;
+  /** the watch over a play-once motion (story chat 2026-10-29: a load that stalls must never stop the story) */
+  private watch: ReturnType<typeof setTimeout> | undefined;
+  private endedFor = -1;
 
   constructor(
     private readonly els: [HTMLVideoElement, HTMLVideoElement],
@@ -77,6 +80,12 @@ export class DualVideo {
     el.muted = this.muted || loop;
     this.setSrc(el, url);
 
+    clearTimeout(this.watch);
+    // not on screen 8 s after asked: offer 〔タップして続ける〕
+    if (!loop && !freeze)
+      this.watch = setTimeout(() => {
+        if (t === this.token && this.pending === el) this.cb.onBlocked();
+      }, 8000);
     if (freeze) {
       const seek = () => {
         el.currentTime = Math.max(0, (el.duration || 0) - 0.05);
@@ -107,13 +116,15 @@ export class DualVideo {
   /** Retry after onBlocked (call from a tap). Returns false if the file itself is broken. */
   retry(): boolean {
     const el = this.pending ?? this.frontEl;
-    if (el.error) return false;
+    // broken, or still nothing loaded after the wait: the caller goes past it
+    if (el.error || el.readyState < 2) return false;
     this.startIn(el, this.token);
     return true;
   }
 
   pauseAll() {
     this.token++;
+    clearTimeout(this.watch);
     for (const el of this.els) el.pause();
   }
 
@@ -169,6 +180,13 @@ export class DualVideo {
     }
     this.pending = null;
     if (this.url) this.cb.onShown(this.url);
+    // playing, but stalled before its end: the story goes on 6 s after it should have ended
+    if (!this.loop) {
+      const t = this.token;
+      clearTimeout(this.watch);
+      const left = isFinite(el.duration) && el.duration > 0 ? el.duration - el.currentTime : 20;
+      this.watch = setTimeout(() => t === this.token && this.finish(), (left + 6) * 1000);
+    }
     this.loadNext();
     // Pre-load the same motion at 0:00 in the hidden element for a seamless loop restart.
     if (this.loop && this.url) {
@@ -197,6 +215,14 @@ export class DualVideo {
       this.startIn(next, this.token);
       return;
     }
+    this.finish();
+  }
+
+  /** a play-once motion is over (its end, or the watch): told once */
+  private finish() {
+    if (this.endedFor === this.token) return;
+    this.endedFor = this.token;
+    clearTimeout(this.watch);
     this.cb.onEnded();
   }
 

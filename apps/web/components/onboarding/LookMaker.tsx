@@ -135,7 +135,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     setErr(null);
     setPhase('making');
     try {
-      const r = await api.refine(sel.id, instruction.trim());
+      const r = await within(api.refine(sel.id, instruction.trim()), 120_000);
       if (r.candidates.length) {
         save({ ...draft, cands: r.candidates, refined: true, prev: draft.cands });
         setSel(null);
@@ -145,7 +145,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       setErr('うまく描き変わらなかった……もう一度');
     } catch (e) {
       if (/描き直せません|LOOK_REFINES/.test(String(e))) setTired(true);
-      else setErr(e instanceof Error ? e.message : String(e));
+      else setErr('うまく描き変わらなかった……もう一度');
     }
     setPhase('chosen');
   };
@@ -155,13 +155,13 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     if (!sel) return;
     setBusy(true);
     try {
-      const url = await api.choose(sel.id);
+      const url = await within(api.choose(sel.id), 45_000);
       // M-R149: the chosen look fills the screen for a moment (ドーン)
       setReveal(url || sel.url);
       await new Promise((ok) => setTimeout(ok, 2600));
       onDone(url);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : String(e));
+      setErr('うまく決められなかった……もう一度');
       setBusy(false);
     }
   };
@@ -540,4 +540,9 @@ function Back({ onClick, label = 'もどる' }: { onClick: () => void; label?: s
       {label}
     </button>
   );
+}
+
+/** a wait that always ends (story chat 2026-10-29: never 「水盤が、描いている」 for good) */
+function within<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([p, new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), ms))]);
 }

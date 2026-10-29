@@ -189,7 +189,10 @@ export class HttpApi implements Api {
   }
 
   completeJourneyDay(day: number, answers?: Record<string, string>) {
-    return this.req<Awaited<ReturnType<Api['completeJourneyDay']>>>('POST', '/me/journey/complete', { day, answers });
+    // only the words answered: picture addresses (the look, the Bati) are kept elsewhere and are longer than an
+    // answer may be (story chat 2026-10-29: day 2 ended in a 400 and started over)
+    const short = answers && Object.fromEntries(Object.entries(answers).filter(([k, v]) => k.length <= 40 && typeof v === 'string' && v.length <= 100 && !/^(https?:|data:|blob:)/.test(v)));
+    return this.req<Awaited<ReturnType<Api['completeJourneyDay']>>>('POST', '/me/journey/complete', { day, answers: short });
   }
   jumpJourney(day: number) {
     return this.req<Awaited<ReturnType<Api['jumpJourney']>>>('POST', '/me/journey/jump', { day });

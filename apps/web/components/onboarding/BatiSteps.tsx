@@ -54,7 +54,8 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
   useEffect(() => {
     let live = true;
     const started = Date.now();
-    onHatch().then((u) => {
+    // never stuck in the light: a failure or a very slow drawing hatches the drawn stand-in
+    Promise.race([onHatch().catch(() => ''), new Promise<string>((r) => setTimeout(() => r(''), 80_000))]).then((u) => {
       const wait = Math.max(0, 3200 - (Date.now() - started));
       setTimeout(() => {
         if (!live) return;
