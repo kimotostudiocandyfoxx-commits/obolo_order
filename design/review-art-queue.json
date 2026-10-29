@@ -4,6 +4,542 @@
  "always": "",
  "items": [
   {
+   "id": "V03b/K4-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K3-r4b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same wide shot: the floor magic circle blazes gold, fire bursts from the three nozzles, thick white smoke billows across the shaft bottom, banners whip, candle flames lean. No people. (Retry: timed out; the a/b takes were made from the cabin and are not used.) No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K4-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K3-r4b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same wide shot: the floor magic circle blazes gold, fire bursts from the three nozzles, thick white smoke billows across the shaft bottom, banners whip, candle flames lean. No people. (Retry: timed out; the a/b takes were made from the cabin and are not used.) No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K8-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K8-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the aerial city, the clouds, the domed temple with the round shaft opening and the light exactly the same; make the rocket much smaller, about one tenth of the frame width, higher up above the tallest spires near the clouds, trailing three thin flames and white smoke down to the shaft opening. Same rocket design. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K8-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K8-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the aerial city, the clouds, the domed temple with the round shaft opening and the light exactly the same; make the rocket much smaller, about one tenth of the frame width, higher up above the tallest spires near the clouds, trailing three thin flames and white smoke down to the shaft opening. Same rocket design. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K10-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-side-r3a.jpg",
+    "art/review/saturn/V03b/K10-a.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Outer space: the curved blue horizon of Earth along the bottom and a sunburst on its rim exactly like the second picture; the rocket of the first picture flies HORIZONTALLY from left to right across the middle of the frame, seen exactly from the side, nose pointing right, about half the frame width, neon lines glowing, no flames; black starry sky. Same rocket design, exactly three engine nozzles."
+  },
+  {
+   "id": "V03b/K10-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-side-r3a.jpg",
+    "art/review/saturn/V03b/K10-a.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Outer space: the curved blue horizon of Earth along the bottom and a sunburst on its rim exactly like the second picture; the rocket of the first picture flies HORIZONTALLY from left to right across the middle of the frame, seen exactly from the side, nose pointing right, about half the frame width, neon lines glowing, no flames; black starry sky. Same rocket design, exactly three engine nozzles."
+  },
+  {
+   "id": "V03b/K10-r5c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sheets/rocket-side-r3a.jpg",
+    "art/review/saturn/V03b/K10-a.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Outer space: the curved blue horizon of Earth along the bottom and a sunburst on its rim exactly like the second picture; the rocket of the first picture flies HORIZONTALLY from left to right across the middle of the frame, seen exactly from the side, nose pointing right, about half the frame width, neon lines glowing, no flames; black starry sky. Same rocket design, exactly three engine nozzles."
+  },
+  {
+   "id": "V03b/K11-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K11-a.jpg",
+    "art/review/saturn/V03b/K12-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the cabin, the window with the Earth, the sushi conveyor, the bar and the camera exactly the same; KIMORIN now stands with his back to the camera looking out of the window like in the second picture: we see the back of his head, ears, white coat and open feather fan, arms lowered, the handset hanging in one hand. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K11-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K11-a.jpg",
+    "art/review/saturn/V03b/K12-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the cabin, the window with the Earth, the sushi conveyor, the bar and the camera exactly the same; KIMORIN now stands with his back to the camera looking out of the window like in the second picture: we see the back of his head, ears, white coat and open feather fan, arms lowered, the handset hanging in one hand. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K1-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K1-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change only KIMORIN's eyes into two thin glowing blue arcs exactly like the second picture (gentle upward curves, no eyeballs, no eyelids, no eyelashes, no black lines); the goggles stay pushed up on the forehead; the three leaf marks, cheek spirals and ω mouth stay; everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K1-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K1-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change only KIMORIN's eyes into two thin glowing blue arcs exactly like the second picture (gentle upward curves, no eyeballs, no eyelids, no eyelashes, no black lines); the goggles stay pushed up on the forehead; the three leaf marks, cheek spirals and ω mouth stay; everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K2-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K2-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change only KIMORIN's eyes into two thin glowing blue arcs exactly like the second picture (gentle upward curves, no eyeballs, no eyelids, no eyelashes, no black lines); the goggles stay pushed up on the forehead; the three leaf marks, cheek spirals and ω mouth stay; everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K2-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K2-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change only KIMORIN's eyes into two thin glowing blue arcs exactly like the second picture (gentle upward curves, no eyeballs, no eyelids, no eyelashes, no black lines); the goggles stay pushed up on the forehead; the three leaf marks, cheek spirals and ω mouth stay; everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K3-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K3-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change only KIMORIN's eyes into two thin glowing blue arcs exactly like the second picture (gentle upward curves, no eyeballs, no eyelids, no eyelashes, no black lines); the goggles stay pushed up on the forehead; the three leaf marks, cheek spirals and ω mouth stay; everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K3-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K3-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Change only KIMORIN's eyes into two thin glowing blue arcs exactly like the second picture (gentle upward curves, no eyeballs, no eyelids, no eyelashes, no black lines); the goggles stay pushed up on the forehead; the three leaf marks, cheek spirals and ω mouth stay; everything else exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K4-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K4-a.jpg",
+    "art/review/saturn/sheets/dragon-robe-r2a.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the dark hooded figure at the lower left completely; instead, far at the back left, a tiny OBOLON: a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood (a perfectly round pitch-black sphere with a thin white glowing rim and two white crescent eyes, inside a vertical pillar of soft light); give the dragon black baggy trousers like the second picture; the dragon's face, goggles on the forehead, robe, arms and the temple stay exactly the same. No people, no hooded figures. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K4-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K4-a.jpg",
+    "art/review/saturn/sheets/dragon-robe-r2a.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the dark hooded figure at the lower left completely; instead, far at the back left, a tiny OBOLON: a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood (a perfectly round pitch-black sphere with a thin white glowing rim and two white crescent eyes, inside a vertical pillar of soft light); give the dragon black baggy trousers like the second picture; the dragon's face, goggles on the forehead, robe, arms and the temple stay exactly the same. No people, no hooded figures. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K5-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "art/review/saturn/V04/K4-r5a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same shot: all party poppers burst at once, streamers and confetti fill the temple, light sticks swaying; OBOLON tiny sphere at the back left unchanged; no people. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K5-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
+    "art/review/saturn/V04/K4-r5a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same shot: all party poppers burst at once, streamers and confetti fill the temple, light sticks swaying; OBOLON tiny sphere at the back left unchanged; no people. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K6-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K6-a.jpg",
+    "art/review/saturn/V19/K4-r4a.jpg",
+    "art/review/saturn/sheets/dragon-robe-r2a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the exact top-down view, the ripples, the confetti and the ring of reflected arms; change the gold-and-black basin rim into white marble with a blue-and-silver magic-circle rim like the second picture; the reflected dragon is white-scaled with white gloves with blue paw pads and a deep crimson robe like the third picture, not gold; no gold statue look. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K6-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K6-a.jpg",
+    "art/review/saturn/V19/K4-r4a.jpg",
+    "art/review/saturn/sheets/dragon-robe-r2a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the exact top-down view, the ripples, the confetti and the ring of reflected arms; change the gold-and-black basin rim into white marble with a blue-and-silver magic-circle rim like the second picture; the reflected dragon is white-scaled with white gloves with blue paw pads and a deep crimson robe like the third picture, not gold; no gold statue look. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K8-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K9-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the tall column of white-gold light at full brightness; the crimson hood, robe and sunglasses are not formed yet: inside the light only a small dark silhouette with fox ears and a fanned tail; glowing particles spiral around it; the temple, the Earth and the floor exactly the same. No people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K8-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K9-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the tall column of white-gold light at full brightness; the crimson hood, robe and sunglasses are not formed yet: inside the light only a small dark silhouette with fox ears and a fanned tail; glowing particles spiral around it; the temple, the Earth and the floor exactly the same. No people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K10-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K10-b.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the dark hooded figure at the back left; in its place a small OBOLON: a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood (a perfectly round pitch-black sphere with a thin white glowing rim and two white crescent eyes) floating inside a vertical pillar of soft light; KIMORIN and everything else exactly the same. No people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V04/K10-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V04/K10-b.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the dark hooded figure at the back left; in its place a small OBOLON: a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood (a perfectly round pitch-black sphere with a thin white glowing rim and two white crescent eyes) floating inside a vertical pillar of soft light; KIMORIN and everything else exactly the same. No people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V05/K1-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K2-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the column of black smoke completely; the gate, the sky, the temple and the floor exactly the same. (= V11 K4 and the D01-S003 still.) No text, no letters, no names, no words anywhere. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V05/K1-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K2-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Remove the column of black smoke completely; the gate, the sky, the temple and the floor exactly the same. (= V11 K4 and the D01-S003 still.) No text, no letters, no names, no words anywhere. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V05/K4-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-a.jpg",
+    "art/review/saturn/V05/K3-b.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep MONBAN's hood, mask, gold patterns, halo and the still-dark eye exactly the same; replace the background with the softly out-of-focus headquarters gate and the golden sunset clouds of the second picture. No text, no other characters. (Check the references: the b take shows a labelled character sheet with the words KIMORIN and MONBON.) No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V05/K4-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-a.jpg",
+    "art/review/saturn/V05/K3-b.jpg",
+    "design/story/refs/story/cast/monban-clean.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep MONBAN's hood, mask, gold patterns, halo and the still-dark eye exactly the same; replace the background with the softly out-of-focus headquarters gate and the golden sunset clouds of the second picture. No text, no other characters. (Check the references: the b take shows a labelled character sheet with the words KIMORIN and MONBON.) No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V05/K5-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-r5a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same close-up: a single golden eye on the forehead glows brightly in the shadow of the hood; everything else unchanged. No text. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V05/K5-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K4-r5a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same close-up: a single golden eye on the forehead glows brightly in the shadow of the hood; everything else unchanged. No text. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K1-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K1-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: In the round window at the upper left remove the Earth: only stars and a faint blue glow at its lower rim; remove the folding hand fan beside KIMORIN (his feather tail stays); KIMORIN, the little swirl creature, the bed, the lanterns and the camera exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K1-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K1-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: In the round window at the upper left remove the Earth: only stars and a faint blue glow at its lower rim; remove the folding hand fan beside KIMORIN (his feather tail stays); KIMORIN, the little swirl creature, the bed, the lanterns and the camera exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K2-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K2-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: At the bottom of the round window replace the curved Earth horizon with a white lunar horizon (pale white ground), and just above it only a faint blue glow; no Earth visible yet; the pillow, the evenly lit empty hollow, the walls and the camera exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K2-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K2-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: At the bottom of the round window replace the curved Earth horizon with a white lunar horizon (pale white ground), and just above it only a faint blue glow; no Earth visible yet; the pillow, the evenly lit empty hollow, the walls and the camera exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K3-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K2-r5a.jpg",
+    "art/review/saturn/V22/K4-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: a round luminous blue Earth, a whole sphere like in the second picture, has risen halfway above the white lunar horizon into the lower half of the round window; its cool blue light falls softly across the blanket; the hollow beside the pillow still evenly lit and completely empty. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K3-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K2-r5a.jpg",
+    "art/review/saturn/V22/K4-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: a round luminous blue Earth, a whole sphere like in the second picture, has risen halfway above the white lunar horizon into the lower half of the round window; its cool blue light falls softly across the blanket; the hollow beside the pillow still evenly lit and completely empty. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V23/c-K2-r5a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K12-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same picture exactly, edited: only the light changes: the blue Earth in the window glows a little brighter, its light on KIMORIN's white coat slightly stronger, the purple and cyan neon lines a touch brighter, the stars twinkle in a different pattern; KIMORIN, the sushi conveyor, every object and the camera exactly as before. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V23/c-K2-r5b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K12-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same picture exactly, edited: only the light changes: the blue Earth in the window glows a little brighter, its light on KIMORIN's white coat slightly stronger, the purple and cyan neon lines a touch brighter, the stars twinkle in a different pattern; KIMORIN, the sushi conveyor, every object and the camera exactly as before. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
    "id": "V02/K1m-b",
    "w": 1152,
    "h": 2048,
@@ -5470,7 +6006,7 @@
     "art/review/saturn/V06/K2-a.jpg",
     "design/story/refs/story/cast/obolon.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no logos."
   },
   {
    "id": "V06/K3-b",
@@ -5484,7 +6020,7 @@
     "art/review/saturn/V06/K2-b.jpg",
     "design/story/refs/story/cast/obolon.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same hall, closer: OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. floats inside the pillar of light in front of the golden ring. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no logos."
   },
   {
    "id": "V06/K4-a",
@@ -5495,9 +6031,10 @@
     1280
    ],
    "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
     "art/review/saturn/V06/K3-a.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no logos."
   },
   {
    "id": "V06/K4-b",
@@ -5508,9 +6045,10 @@
     1280
    ],
    "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
     "art/review/saturn/V06/K3-b.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot of OBOLON in the hall, but the ceiling has dissolved into a deep starry night sky full of stars. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no logos."
   },
   {
    "id": "V06/K5-a",
@@ -5521,9 +6059,10 @@
     1280
    ],
    "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
     "art/review/saturn/V06/K4-a.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no logos."
   },
   {
    "id": "V06/K5-b",
@@ -5534,9 +6073,10 @@
     1280
    ],
    "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
     "art/review/saturn/V06/K4-b.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: above OBOLON floats a small blue Earth encircled by a thin golden ring, slowly turning, starry sky above. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no logos."
   },
   {
    "id": "V06/K6-a",
@@ -5612,7 +6152,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
   },
   {
    "id": "V06/K8-b",
@@ -5628,7 +6168,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Close shot of OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. against darkness, a golden eclipse-like ring of light beginning to expand behind him."
   },
   {
    "id": "V06/K9-a",
@@ -5669,11 +6209,12 @@
     1280
    ],
    "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
     "design/story/refs/story/places/earth-temple-hall.jpg",
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
   },
   {
    "id": "V06/K10-b",
@@ -5684,11 +6225,12 @@
     1280
    ],
    "refs": [
+    "design/story/refs/story/cast/obolon.jpg",
     "design/story/refs/story/places/earth-temple-hall.jpg",
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The golden hall in deep shadow, only faint gold reflections on the floor, OBOLON's pillar dimmed at the back."
   },
   {
    "id": "V06/K11-a",
@@ -5705,7 +6247,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The golden hall lit again: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. stands in the left foreground with his gold halo blazing, OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. in his pillar of light at the back right."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. OBOLON is a floating perfectly black sphere with a thin glowing white rim and two white crescent eyes; no body, no human, no clothes, no hood. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The golden hall lit again: MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. stands in the left foreground with his gold halo blazing, OBOLON, a perfectly round pitch-black sphere with a thin white glowing rim like an eclipse corona, two white crescent-shaped closed smiling eyes, no mouth, floating inside a vertical pillar of soft light. in his pillar of light at the back right."
   },
   {
    "id": "V07/K1S-a",
@@ -6160,7 +6702,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white lunar plain under a black sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. descending upright on soft blue thrusters, its shadow on the fine white sand, the blue Earth high in the sky."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white lunar plain under a black sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. descending upright on soft blue thrusters, its shadow on the fine white sand, the blue Earth high in the sky. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K1-b",
@@ -6177,7 +6719,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white lunar plain under a black sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. descending upright on soft blue thrusters, its shadow on the fine white sand, the blue Earth high in the sky."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white lunar plain under a black sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. descending upright on soft blue thrusters, its shadow on the fine white sand, the blue Earth high in the sky. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K2-a",
@@ -6191,7 +6733,7 @@
     "art/review/saturn/V10/K1-a.jpg",
     "art/review/saturn/sheets/rocket-r2-front.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the rocket has landed, a slow low cloud of fine white sand drifting around its base. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the rocket has landed, a slow low cloud of fine white sand drifting around its base. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no logos. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K2-b",
@@ -6205,7 +6747,7 @@
     "art/review/saturn/V10/K1-b.jpg",
     "art/review/saturn/sheets/rocket-r2-front.jpg"
    ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the rocket has landed, a slow low cloud of fine white sand drifting around its base. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no logos."
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same view: the rocket has landed, a slow low cloud of fine white sand drifting around its base. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no logos. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K3-a",
@@ -6220,7 +6762,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Looking up into the black lunar sky, a large luminous blue Earth floating among stars, the white horizon at the bottom edge."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Looking up into the black lunar sky, a large luminous blue Earth floating among stars, the white horizon at the bottom edge. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K3-b",
@@ -6235,7 +6777,7 @@
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Looking up into the black lunar sky, a large luminous blue Earth floating among stars, the white horizon at the bottom edge."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Looking up into the black lunar sky, a large luminous blue Earth floating among stars, the white horizon at the bottom edge. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K4-a",
@@ -6246,13 +6788,14 @@
     1280
    ],
    "refs": [
+    "art/review/saturn/V22/K5-r4a.jpg",
     "design/story/refs/story/places/moon-temple-aerial-1.jpg",
     "art/review/saturn/sheets/rocket-r2-front.jpg",
     "design/story/refs/story/places/rocket.jpg",
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white marble temple inside a lunar crater, a blue magic-circle floor running into it, small blue-domed towers on both sides, the blue Earth in the sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. standing beside the temple."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white marble temple inside a lunar crater, a blue magic-circle floor running into it, small blue-domed towers on both sides, the blue Earth in the sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. standing beside the temple. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V10/K4-b",
@@ -6263,13 +6806,14 @@
     1280
    ],
    "refs": [
+    "art/review/saturn/V22/K5-r4a.jpg",
     "design/story/refs/story/places/moon-temple-aerial-1.jpg",
     "art/review/saturn/sheets/rocket-r2-front.jpg",
     "design/story/refs/story/places/rocket.jpg",
     "design/story/refs/style-obolon-temple.jpg",
     "design/story/refs/style-gate.jpg"
    ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white marble temple inside a lunar crater, a blue magic-circle floor running into it, small blue-domed towers on both sides, the blue Earth in the sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. standing beside the temple."
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. Where the rocket is seen it is exactly the one rocket design of the reference (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, three engine nozzles), never another shape or colour. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. A white marble temple inside a lunar crater, a blue magic-circle floor running into it, small blue-domed towers on both sides, the blue Earth in the sky, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. standing beside the temple. On the moon the Earth is a round sphere floating above a white lunar horizon."
   },
   {
    "id": "V11/K1b-a",
