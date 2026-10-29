@@ -109,6 +109,29 @@ async function talk(round) {
 
 const photos = [1, 2, 3, 4].map((k) => process.env[`PHOTO${k}`]).filter(Boolean);
 const only = process.env.ONLY || '';
+// ONLY=seq: one visitor's path at a time, three times over (look → Bati → five talks), as an invited guest would go
+if (only === 'seq') {
+  const runs = [
+    ['seq1', { animal: 'おまかせ', color: '青と金', mood: 'わくわく', photo: photos[1] && { mime: 'image/jpeg', data: photos[1] } }, 1971, 'sun', 'たこ焼き'],
+    ['seq2', { animal: 'きつね', color: '赤と黒', mood: 'クール', hobby: '音楽' }, 2008, 'earth', 'いちご'],
+    ['seq3', { animal: '猫', color: '深い青と銀', mood: 'かっこいい', hobby: '料理' }, 1991, 'sun', 'ラーメン'],
+  ];
+  for (const [id, body, year, egg, food] of runs) {
+    if (!body.photo) delete body.photo;
+    const t0 = Date.now();
+    await look(id, body, year);
+    await bati(egg, food, false);
+    const t = await account(`talk-${id}`);
+    await safe('egg', () => call(t, 'POST', '/me/bati/egg', { food, egg }));
+    for (const q of QUESTIONS.slice(0, 5)) {
+      const a = await safe(`chat ${q}`, () => call(t, 'POST', '/buddy/chat', { text: q, locale: 'ja' }));
+      out(`TABLE talk | ${id} | ${q} | ${String(a?.j.reply.text ?? '（答えなし）').replace(/\s+/g, ' ').replace(/\|/g, '／')} | ${a?.s ?? '-'}s | - | -s`);
+    }
+    out(`ROUND ${id} ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+  }
+  out('DONE');
+  process.exit(0);
+}
 const part = (name, jobs) => (!only || only === name ? jobs : []);
 await Promise.all([
   ...part('look', [

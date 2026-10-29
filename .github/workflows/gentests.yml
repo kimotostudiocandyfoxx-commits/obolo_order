@@ -16,7 +16,7 @@ env:
   DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
   RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
   # one part only (look | bati | talk), for a re-check after a fix; empty = all. Its results go to results-<part>.md
-  ONLY: ''
+  ONLY: 'seq'
 
 concurrency:
   group: gentests-${{ github.ref }}
