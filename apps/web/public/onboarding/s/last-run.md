@@ -1,11 +1,10 @@
-# UI art — 2026-10-29T02:37:34.566Z
+# UI art — 2026-10-29T02:58:34.047Z
 
-Seedream 5.0 Pro / 7枚 / 約15円
+Seedream 5.0 Pro / 6枚 / 約14円
 
-- ✅ d2-hall-kimorin-up
-- ✅ d2-hall-sky-monban
-- ✅ d2-kimorin-pin-a
-- ✅ d2-kimorin-pin-b
-- ✅ kimorin-iu-joy
-- ✅ kimorin-iu-shock
-- ✅ kimorin-iu-think
+- ✅ kimorin-iu-joy-notail
+- ✅ kimorin-iu-joy-o
+- ✅ kimorin-iu-shock-notail
+- ✅ kimorin-iu-shock-o
+- ✅ kimorin-iu-think-notail
+- ✅ kimorin-iu-think-o
