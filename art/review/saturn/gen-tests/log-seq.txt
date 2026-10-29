@@ -1,0 +1,87 @@
+OK  POST /admin/invites 201 0.2s
+OK  POST /invites/4ouMAguDsVdBbQ1V/accept 200 0.1s
+OK  PATCH /me 200 0.0s
+OK  POST /me/look/candidates 200 57.2s
+TABLE look | seq1（55歳・おまかせ・青と金・わくわく・写真あり） | 4 | 57.2s
+OK  POST /me/look 200 1.0s
+OK  POST /me/look/standee 200 52.3s
+OK  POST /me/look/chibi 200 36.0s
+OK  GET /me 200 0.0s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/mYOyaR6SNNlyIo1R/accept 200 0.1s
+OK  POST /me/bati/egg 200 1.0s
+OK  POST /me/bati/hatch 200 142.9s
+TABLE bati | sun-たこ焼き | stand-in (repainting) | 142.9s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/3kgM47WGog-r-j9G/accept 200 0.1s
+OK  POST /me/bati/egg 200 1.1s
+OK  POST /buddy/chat 200 1.3s
+TABLE talk | seq1 | ブラックホールの正体って、なに？ | ぎゅうぎゅうに縮んだ、すっごく重たい星のかけらなんだって！光すら吸い込んじゃうから、お留守番のときは絶対に近づいちゃダメだよ！ | 1.3s | - | -s
+OK  POST /buddy/chat 200 1.1s
+TABLE talk | seq1 | 宇宙の果てって、あるの？ | 今のところ、果ては見つかってなくて、ずっとずっと広がり続けているんだって！もしかすると、宇宙の外側にはお菓子の世界が広がってるのかもね！ | 1.1s | - | -s
+OK  POST /buddy/chat 200 1.1s
+TABLE talk | seq1 | 土星の輪は、何でできてるの？ | 氷のつぶや岩のかけらが、ものすごい数あつまってできているんだって！ボクの部屋の散らかったおもちゃも、あんなふうに輪っかにできたらカッコいいのにね！ | 1.1s | - | -s
+OK  POST /buddy/chat 200 1.0s
+TABLE talk | seq1 | ビッグバンって、いつ起きたの？ | 約138億年前に起きたんだって！そんな大昔のこと、ボクが生まれるずーっと前の話だから、さすがにびっくりしちゃうよね！ | 1.0s | - | -s
+OK  POST /buddy/chat 200 1.4s
+TABLE talk | seq1 | パンダは何を食べるの？ | 主にごはんにそっくりな笹の葉やタケノコを食べてるんだって！あの大きな体でモリモリ食べるなんて、ボクよりよっぽど食いしん坊だね！ | 1.4s | - | -s
+ROUND seq1 298s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/l4FvmTs4y8pqVPu2/accept 200 0.1s
+OK  PATCH /me 200 0.0s
+OK  POST /me/look/candidates 200 141.4s
+TABLE look | seq2（18歳・きつね・赤と黒・クール・音楽） | 2 failed | 141.4s
+OK  POST /me/look 200 1.1s
+OK  POST /me/look/standee 200 43.2s
+OK  POST /me/look/chibi 200 42.3s
+OK  GET /me 200 0.1s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/NqoDOrBOrtXRWcq-/accept 200 0.1s
+OK  POST /me/bati/egg 200 0.9s
+OK  POST /me/bati/hatch 200 142.9s
+TABLE bati | earth-いちご | stand-in (repainting) | 142.9s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/fWN9I-Vef2aeTqxX/accept 200 0.1s
+OK  POST /me/bati/egg 200 1.2s
+OK  POST /buddy/chat 200 1.1s
+TABLE talk | seq2 | ブラックホールの正体って、なに？ | ものすごく重さがつまった、なんでも吸い込んじゃう宇宙の穴なんだって！光すら出られないから真っ暗なんだよ、テストも吸い込まれないように気ををつけてね！ | 1.1s | - | -s
+OK  POST /buddy/chat 200 0.9s
+TABLE talk | seq2 | 宇宙の果てって、あるの？ | 宇宙は今もどんどん広がっているから、決まった果てはないみたいなんだ！どこまで行っても新しい世界が続いているなんて、なんだかワクワクしちゃうね！ | 0.9s | - | -s
+OK  POST /buddy/chat 200 1.2s
+TABLE talk | seq2 | 土星の輪は、何でできてるの？ | 氷のつぶや岩のかすがたくさん集まってできているんだって！キラキラ光るスケートリンクみたいですごくきれいなんだよ、ボクもいつかサーフィンしてみたいな！ | 1.2s | - | -s
+OK  POST /buddy/chat 200 1.1s
+TABLE talk | seq2 | ビッグバンって、いつ起きたの？ | およそ138億年前に起きたんだって！ものすごい大爆発からこの宇宙が始まったなんて、まるで最高のロックンロールみたいでテンション上がるよね！ | 1.1s | - | -s
+OK  POST /buddy/chat 200 1.3s
+TABLE talk | seq2 | パンダは何を食べるの？ | ほとんど毎日ササや竹ばかり食べているんだって！たまにはボクと一緒に甘いケーキでも食べてお腹いっぱいになりたいよね！ | 1.3s | - | -s
+ROUND seq2 379s
+OK  POST /admin/invites 201 0.1s
+OK  POST /invites/0mkNODGneOsYnzn3/accept 200 0.1s
+OK  PATCH /me 200 0.0s
+OK  POST /me/look/candidates 200 71.4s
+TABLE look | seq3（35歳・猫・深い青と銀・かっこいい・料理） | 1 failed | 71.4s
+OK  POST /me/look 200 0.8s
+OK  POST /me/look/standee 200 48.7s
+OK  POST /me/look/chibi 200 58.1s
+OK  GET /me 200 0.1s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/fsnrqyVGbpks2MlA/accept 200 0.1s
+OK  POST /me/bati/egg 200 1.2s
+OK  POST /me/bati/hatch 200 142.8s
+TABLE bati | sun-ラーメン | stand-in (repainting) | 142.8s
+OK  POST /admin/invites 201 0.0s
+OK  POST /invites/Ak6sGq7v2WJXNRlQ/accept 200 0.1s
+OK  POST /me/bati/egg 200 1.0s
+OK  POST /buddy/chat 200 1.3s
+TABLE talk | seq3 | ブラックホールの正体って、なに？ | ものすごーく重たいうず巻きのことなんだよ！光すら吸い込んじゃうから、誰も中を見たことがないんだって！ねえねえ、テストも吸い込まれないように気をつけてねっ！ | 1.3s | - | -s
+OK  POST /buddy/chat 200 1.0s
+TABLE talk | seq3 | 宇宙の果てって、あるの？ | 宇宙の果てはね、今もどんどん広がり続けているから、どこまで行っても終わりがないみたいなんだよ！もしかすると、果ての向こう側にはボクたちの知らない音楽が流れているかもしれないねっ！ | 1.0s | - | -s
+OK  POST /buddy/chat 200 1.0s
+TABLE talk | seq3 | 土星の輪は、何でできてるの？ | 氷のつぶや大きな岩のかたまりがいっぱい集まってできているんだって！キラキラ光るスケートリンクみたいですごくきれいそうだよ、テストも今度みんなで滑りに行こうねっ！ | 1.0s | - | -s
+OK  POST /buddy/chat 200 1.3s
+TABLE talk | seq3 | ビッグバンって、いつ起きたの？ | およそ138億年前に起きたんだって！ものすごい大爆発からこの宇宙が生まれたなんて、まるでボクたちのノリノリなライブの始まりみたいですごいよねっ！ | 1.3s | - | -s
+OK  POST /buddy/chat 200 1.1s
+TABLE talk | seq3 | パンダは何を食べるの？ | 主にごはんとしてササや竹をたくさん食べているんだって！シャキシャキした音がいかにもおいしそうで、ボクもお腹が空いてきちゃったよ、テストも一緒にモリモリ食べようねっ！ | 1.1s | - | -s
+ROUND seq3 330s
+DONE
+Container called exit(0).
+
