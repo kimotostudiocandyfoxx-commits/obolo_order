@@ -4,6 +4,490 @@
  "always": "",
  "items": [
   {
+   "id": "V03a/A0-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K1-a.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Empty scene, absolutely nothing but the polished golden floor of the Earth temple hall exactly as in the first picture, seen close from a high angle at the foot of a vertical pillar of soft white light; gold reflections, fine floor ornament. No people, no creatures, no figures, no rocket, no banners."
+  },
+  {
+   "id": "V03a/A0-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K1-a.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Empty scene, absolutely nothing but the polished golden floor of the Earth temple hall exactly as in the first picture, seen close from a high angle at the foot of a vertical pillar of soft white light; gold reflections, fine floor ornament. No people, no creatures, no figures, no rocket, no banners."
+  },
+  {
+   "id": "V03a/A0-r4c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K1-a.jpg",
+    "design/story/refs/story/cast/obolon.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. Empty scene, absolutely nothing but the polished golden floor of the Earth temple hall exactly as in the first picture, seen close from a high angle at the foot of a vertical pillar of soft white light; gold reflections, fine floor ornament. No people, no creatures, no figures, no rocket, no banners."
+  },
+  {
+   "id": "V03a/A1-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03a/A0-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the floor at the foot of the pillar of light has opened into a round hole revealing a long stone spiral staircase winding down into candlelit darkness; nothing else changes; no people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03a/A1-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03a/A0-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the floor at the foot of the pillar of light has opened into a round hole revealing a long stone spiral staircase winding down into candlelit darkness; nothing else changes; no people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03a/A3-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03a/A3-b.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the rocket exactly the same (shape, colours, three engine nozzles); make the shaft enormously tall: several rings of the candlelit spiral staircase climb the walls around and far above the rocket, the candles, banners and floor magic circle become tiny at its base, the faint round opening of light far, far above; the rocket reads as tall as a tower. No people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03a/A3-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03a/A3-b.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the rocket exactly the same (shape, colours, three engine nozzles); make the shaft enormously tall: several rings of the candlelit spiral staircase climb the walls around and far above the rocket, the candles, banners and floor magic circle become tiny at its base, the faint round opening of light far, far above; the rocket reads as tall as a tower. No people. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K1-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Turn off all the neon lines along the walls and ceiling (dark, unlit), only a dim purple ambient glow remains; the far hatch stays open; KIMORIN, the seats, the sushi conveyor, the dance floor and the framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K1-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Turn off all the neon lines along the walls and ceiling (dark, unlit), only a dim purple ambient glow remains; the far hatch stays open; KIMORIN, the seats, the sushi conveyor, the dance floor and the framing exactly the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K3-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03a/A3-r4a.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the rocket's hatch is closed and its neon lines glow; candles and banners around the floor magic circle; nothing else changes. (Fix the queue: the base was V03b/K2-a, the cabin.) No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K3-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03a/A3-r4a.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the rocket's hatch is closed and its neon lines glow; candles and banners around the floor magic circle; nothing else changes. (Fix the queue: the base was V03b/K2-a, the cabin.) No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K4-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K3-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same wide shot: the floor magic circle blazes gold, fire bursts from the three nozzles, thick white smoke billows across the hall, banners whip, candle flames lean. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V03b/K4-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V03b/K3-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same wide shot: the floor magic circle blazes gold, fire bursts from the three nozzles, thick white smoke billows across the hall, banners whip, candle flames lean. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V06/K10-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K11-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The same hall in deep shadow: MONBAN is gone, only faint gold reflections on the floor, OBOLON's pillar of light dimmed at the back; same camera and framing. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V06/K10-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V06/K11-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: The same hall in deep shadow: MONBAN is gone, only faint gold reflections on the floor, OBOLON's pillar of light dimmed at the back; same camera and framing. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V19/K4-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K4-a.jpg",
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the exact top-down view, the calm mirror water, the soft evenly bright empty oval in the center and the streak of light at the edge exactly the same; change the gold-and-black carved rim into white marble with a blue-and-silver magic-circle rim like the second picture, and the dark water reflects a faint starry sky; no gold, no people, no faces. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V19/K4-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V19/K4-a.jpg",
+    "art/review/saturn/V19/K1-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep the exact top-down view, the calm mirror water, the soft evenly bright empty oval in the center and the streak of light at the edge exactly the same; change the gold-and-black carved rim into white marble with a blue-and-silver magic-circle rim like the second picture, and the dark water reflects a faint starry sky; no gold, no people, no faces. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K1-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-r3a.jpg",
+    "apps/web/public/onboarding/kimorin-xs-talk.webp",
+    "design/story/refs/story/cast/unchi-pinpon-kun.webp",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. LOCATION: a small bedroom inside the white marble moon temple at night. First-person view from a bed at lying eye level, looking right across the room: the same KIMORIN face, ears and feather fan, now in a deep crimson hooded robe with silver embroidered borders, a blue jewel brooch and blue tassels, small round black sunglasses worn over the eyes (no eye glow), one small white dragon wing among the tail feathers. Nothing on his head, nothing in his hands. lies asleep on his back in a white bed on the right under a white blanket, round sunglasses still on (eyes hidden, no glow), feather fan folded closed beside him; a small glossy brown swirl creature shaped like a soft-serve spiral shell, gold bands, gold stars and double-circle marks, big shiny eyes, red cheeks, happy smile. curled up asleep on the blanket at his side; pale blue-silver lanterns glow softly on the white walls; at the upper left edge, part of a large round window full of stars, a faint blue glow at its lower rim. No hands, no feet, no body of the viewer in view; no other people."
+  },
+  {
+   "id": "V22/K1-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-r3a.jpg",
+    "apps/web/public/onboarding/kimorin-xs-talk.webp",
+    "design/story/refs/story/cast/unchi-pinpon-kun.webp",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. LOCATION: a small bedroom inside the white marble moon temple at night. First-person view from a bed at lying eye level, looking right across the room: the same KIMORIN face, ears and feather fan, now in a deep crimson hooded robe with silver embroidered borders, a blue jewel brooch and blue tassels, small round black sunglasses worn over the eyes (no eye glow), one small white dragon wing among the tail feathers. Nothing on his head, nothing in his hands. lies asleep on his back in a white bed on the right under a white blanket, round sunglasses still on (eyes hidden, no glow), feather fan folded closed beside him; a small glossy brown swirl creature shaped like a soft-serve spiral shell, gold bands, gold stars and double-circle marks, big shiny eyes, red cheeks, happy smile. curled up asleep on the blanket at his side; pale blue-silver lanterns glow softly on the white walls; at the upper left edge, part of a large round window full of stars, a faint blue glow at its lower rim. No hands, no feet, no body of the viewer in view; no other people."
+  },
+  {
+   "id": "V22/K1-r4c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-r3a.jpg",
+    "apps/web/public/onboarding/kimorin-xs-talk.webp",
+    "design/story/refs/story/cast/unchi-pinpon-kun.webp",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. LOCATION: a small bedroom inside the white marble moon temple at night. First-person view from a bed at lying eye level, looking right across the room: the same KIMORIN face, ears and feather fan, now in a deep crimson hooded robe with silver embroidered borders, a blue jewel brooch and blue tassels, small round black sunglasses worn over the eyes (no eye glow), one small white dragon wing among the tail feathers. Nothing on his head, nothing in his hands. lies asleep on his back in a white bed on the right under a white blanket, round sunglasses still on (eyes hidden, no glow), feather fan folded closed beside him; a small glossy brown swirl creature shaped like a soft-serve spiral shell, gold bands, gold stars and double-circle marks, big shiny eyes, red cheeks, happy smile. curled up asleep on the blanket at his side; pale blue-silver lanterns glow softly on the white walls; at the upper left edge, part of a large round window full of stars, a faint blue glow at its lower rim. No hands, no feet, no body of the viewer in view; no other people."
+  },
+  {
+   "id": "V22/K2-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-r3a.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the same moon temple bedroom, first-person view at lying eye level turned to the left: the soft blurred edge of a white pillow along the lower-left corner; just beside it on the white blanket a soft, evenly lit empty hollow about the size of a small cat, a little below the middle of the frame, with nothing in it and no shadow shapes; beyond it, a large round window in the white marble wall in the upper part of the frame, full of stars, a faint blue glow at its lower rim where the Earth is about to rise; the lanterns dimmed to a low blue-silver glow. No people, no creatures, no hands."
+  },
+  {
+   "id": "V22/K2-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-r3a.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the same moon temple bedroom, first-person view at lying eye level turned to the left: the soft blurred edge of a white pillow along the lower-left corner; just beside it on the white blanket a soft, evenly lit empty hollow about the size of a small cat, a little below the middle of the frame, with nothing in it and no shadow shapes; beyond it, a large round window in the white marble wall in the upper part of the frame, full of stars, a faint blue glow at its lower rim where the Earth is about to rise; the lanterns dimmed to a low blue-silver glow. No people, no creatures, no hands."
+  },
+  {
+   "id": "V22/K2-r4c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/d2-bed-earth-r3a.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the same moon temple bedroom, first-person view at lying eye level turned to the left: the soft blurred edge of a white pillow along the lower-left corner; just beside it on the white blanket a soft, evenly lit empty hollow about the size of a small cat, a little below the middle of the frame, with nothing in it and no shadow shapes; beyond it, a large round window in the white marble wall in the upper part of the frame, full of stars, a faint blue glow at its lower rim where the Earth is about to rise; the lanterns dimmed to a low blue-silver glow. No people, no creatures, no hands."
+  },
+  {
+   "id": "V22/K3-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K2-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the luminous blue Earth has risen into the lower half of the round window, its cool blue light falling softly across the blanket; the hollow beside the pillow still evenly lit and completely empty. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K3-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V22/K2-r4a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same view: the luminous blue Earth has risen into the lower half of the round window, its cool blue light falling softly across the blanket; the hollow beside the pillow still evenly lit and completely empty. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K4-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the view through the round window from just inside: the white marble rim of the window at the very edges of the frame, filled with a large luminous blue Earth among stars above a white lunar horizon."
+  },
+  {
+   "id": "V22/K4-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the view through the round window from just inside: the white marble rim of the window at the very edges of the frame, filled with a large luminous blue Earth among stars above a white lunar horizon."
+  },
+  {
+   "id": "V22/K4-r4c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the view through the round window from just inside: the white marble rim of the window at the very edges of the frame, filled with a large luminous blue Earth among stars above a white lunar horizon."
+  },
+  {
+   "id": "V22/K5-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-aerial-1.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg",
+    "design/story/refs/story/places/moon-temple-aerial-2.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the lunar surface at night seen from outside and a little above: a small white marble temple inside a crater with small blue-domed towers, one round window glowing a dim blue-silver, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. Exactly three engine nozzles. standing beside the temple, fine white sand, and a large luminous blue Earth in the black starry sky above; calm and still."
+  },
+  {
+   "id": "V22/K5-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-aerial-1.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg",
+    "design/story/refs/story/places/moon-temple-aerial-2.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the lunar surface at night seen from outside and a little above: a small white marble temple inside a crater with small blue-domed towers, one round window glowing a dim blue-silver, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. Exactly three engine nozzles. standing beside the temple, fine white sand, and a large luminous blue Earth in the black starry sky above; calm and still."
+  },
+  {
+   "id": "V22/K5-r4c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-aerial-1.jpg",
+    "art/review/saturn/sheets/rocket-r2-front.jpg",
+    "design/story/refs/story/places/moon-temple-aerial-2.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact character and place to draw: keep their shapes, colours and design as they are. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. Empty scene, absolutely nothing but the lunar surface at night seen from outside and a little above: a small white marble temple inside a crater with small blue-domed towers, one round window glowing a dim blue-silver, a long slender black rocket covered with gold arabesque engraving, thin pink and cyan neon lines, glowing orange crest emblems, sharp swept-back fins, three engine nozzles. Exactly three engine nozzles. standing beside the temple, fine white sand, and a large luminous blue Earth in the black starry sky above; calm and still."
+  },
+  {
+   "id": "stills/saturn-sleep-r4a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-sleep-r3b.jpg",
+    "art/review/saturn/stills/saturn-night-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep KIMORIN and the little swirl creature exactly the same, lying on stone steps; replace the red palace arcades with the reddish-brown stone stairway of the round stepped temple from the second picture, the pale ring arching across the night sky; no planet visible. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "stills/saturn-sleep-r4b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/stills/saturn-sleep-r3b.jpg",
+    "art/review/saturn/stills/saturn-night-r3a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Keep KIMORIN and the little swirl creature exactly the same, lying on stone steps; replace the red palace arcades with the reddish-brown stone stairway of the round stepped temple from the second picture, the pale ring arching across the night sky; no planet visible. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sprites/kimorin-xs-slip-r4a",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sprites/kimorin-xs-slip-r3b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: D04-S006: remove the blue tear drops under the eye arcs; the thin glowing blue arc eyes and the sunglasses at the tip of the snout stay exactly the same; flat mid-grey background. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "sprites/kimorin-xs-slip-r4b",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/sprites/kimorin-xs-slip-r3b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: D04-S006: remove the blue tear drops under the eye arcs; the thin glowing blue arc eyes and the sunglasses at the tip of the snout stay exactly the same; flat mid-grey background. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
    "id": "V01/K17-r3a",
    "w": 1152,
    "h": 2048,
