@@ -205,7 +205,7 @@ export function VoiceField({
         </svg>
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
-      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? `例「${placeholder.replace(/^例：/, '').split('／')[0]}」`)}</p>
+      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${placeholder.replace(/^例：/, '').split('／')[0]}」` : ''))}</p>
       {example}
       {/* the emergency exit: only when you cannot speak */}
       {!typing && (

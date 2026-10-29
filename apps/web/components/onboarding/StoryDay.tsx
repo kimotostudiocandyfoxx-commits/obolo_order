@@ -292,7 +292,7 @@ function DayAuth({ onPassed }: { onPassed: () => void }) {
     setBusy(true);
     try {
       const r = await getApi().requestCode(email.trim());
-      setDevCode(r.devCode ?? null);
+      setDevCode(getApi().mode === 'demo' ? (r.devCode ?? null) : null);
       if (r.devCode && getApi().mode === 'demo') setCode(r.devCode);
       setStep('code');
     } catch {

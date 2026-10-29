@@ -45,7 +45,7 @@ const sentences = (t: string) => (t.match(/[^。！？!?\n]+[。！？!?]*/g) ??
  * with its source. One small line at the bottom says the answers can be wrong. Nothing is kept, no numbers.
  */
 function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: { bati: string; neo: string; image?: string; faces?: Partial<Record<string, string>>; me?: string; muted?: boolean; onDone: () => void }) {
-  const [msgs, setMsgs] = useState<Msg[]>([{ id: 0, who: 'bati', text: `ねえ、${neo}。なんでも、話して！　ボク、調べてみる！` }]);
+  const [msgs, setMsgs] = useState<Msg[]>([]); // its first words were said as a story line just before (no second time)
   const [q, setQ] = useState('');
   const [face, setFace] = useState<string>('sparkle');
   const [casting, setCasting] = useState(false);
@@ -184,7 +184,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
       <div className="pb-safe space-y-2 px-4 pb-3">
         {rounds < FIRST_ROUNDS && (
           <>
-            <VoiceField value={q} onChange={setQ} placeholder="ブラックホールって、なに？" maxLength={120} />
+            <VoiceField value={q} onChange={setQ} placeholder="" maxLength={120} />
             {q.trim() && (
               <button onClick={() => void ask(q)} disabled={casting} className="w-full rounded-full border border-amber-200/50 bg-amber-200/10 py-2.5 text-[14px] disabled:opacity-40">
                 {bati}に話す

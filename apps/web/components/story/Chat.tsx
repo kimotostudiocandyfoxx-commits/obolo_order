@@ -187,7 +187,7 @@ function TheirLine({
               ))}
             </span>
           ) : (
-            <p className="whitespace-pre-line [word-break:keep-all] [overflow-wrap:anywhere]">
+            <p className="whitespace-pre-line [word-break:normal] [line-break:strict]">
               {chars.slice(0, n).join('')}
               {phase === 'typing' && <span className="invisible">{chars.slice(n).join('')}</span>}
               {live && phase === 'done' && <span className="ml-1 inline-block h-1.5 w-1.5 animate-[cueBlink_1.1s_ease-in-out_infinite] rounded-full bg-amber-200 align-middle shadow-[0_0_6px_rgba(255,214,140,0.9)]" />}

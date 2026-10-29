@@ -414,7 +414,6 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   // pick one of the four
   return (
     <Panel>
-      <Obolon>{draft.refined ? '要望を足して、4つの姿を描いた。' : '水盤が、4つの姿を描いた。'}</Obolon>
       <div className="mt-3 grid grid-cols-2 gap-3">
         {draft.cands.map((c) => (
           <button
@@ -457,20 +456,15 @@ export function clearLookDraft() {
 
 /** While the basin draws: KIMORIN whispers into it, the water splashes, OBOLON explains. */
 function Basin() {
-  const [k, setK] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setK((x) => x + 1), 1700);
-    return () => clearInterval(id);
-  }, []);
-  const lines: [string, string][] = [['', '水盤が光って、姿が浮かんでくる……']];
-  const [who, text] = k < lines.length ? lines[k] : ['', '水盤が、描いている……'];
+  // the screen's own note only (no narration the script does not have, story chat 2026-10-29)
+  const [who, text] = ['', '水盤が描いています'];
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/70 px-6 backdrop-blur-[2px]">
       <div className="relative h-44 w-72" aria-hidden>
         <span className="absolute inset-x-0 bottom-0 h-20 rounded-[50%] border border-sky-100/40 bg-[radial-gradient(ellipse_at_center,rgba(190,225,255,0.45)_0%,rgba(80,120,170,0.15)_60%,transparent_75%)]" />
         <span className="absolute inset-x-10 bottom-5 h-10 animate-pulse rounded-[50%] bg-sky-100/25 blur-md" />
       </div>
-      <div key={k} className="min-h-16 animate-[fadeUp_0.5s_ease-out] text-center">
+      <div className="min-h-16 animate-[fadeUp_0.5s_ease-out] text-center">
         {who && <p className="text-xs tracking-[0.25em] text-amber-200/80">{who}</p>}
         <p className="mt-1 text-[17px] text-amber-50">{text}</p>
       </div>

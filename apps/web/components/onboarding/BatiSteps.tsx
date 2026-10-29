@@ -19,14 +19,14 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
     try {
       await onEgg(f);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : String(e));
+      setErr('うまく受け取れなかった……もう一度');
       setBusy(false);
     }
   };
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-20">
       <div className="mx-auto mb-10 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
-        <VoiceField value={food} onChange={setFood} placeholder="好きな食べ物" maxLength={30} />
+        <VoiceField value={food} onChange={setFood} placeholder="例：おにぎり／カレー／いちご／ラーメン" maxLength={30} />
         <div className="flex flex-wrap justify-center gap-1.5">
           {FOODS.map((f) => (
             <button key={f} onClick={() => setFood(f)} className={`rounded-full px-3 py-1 text-xs ${food === f ? 'bg-amber-300 font-bold text-black' : 'bg-white/10 text-white/80'}`}>
@@ -98,8 +98,8 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
       )}
       {/* no sudden light (QA 14 R52): a soft rise to less than half white */}
       {stage === 'flash' && <span className="pointer-events-none absolute inset-0 animate-[softFlash_0.9s_ease-out_both] bg-white" />}
-      <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' ? '生まれた！' : egg ? '光の中で、なにかが動いている……' : 'たまごが動いている……'}</p>
-      {stage === 'born' && <p className="animate-pulse text-xs text-white/60">TAP</p>}
+      <p className={`relative tracking-[0.3em] text-amber-100 [text-shadow:0_0_8px_#000] ${egg && stage !== 'born' ? 'mt-auto mb-[16svh]' : ''}`}>{stage === 'born' || egg ? '' : 'たまごが動いている……'}</p>
+      {stage === 'born' && <p className="animate-pulse text-xs text-white/60">タップ</p>}
     </button>
   );
 }
