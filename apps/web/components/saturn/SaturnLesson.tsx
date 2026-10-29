@@ -7,6 +7,7 @@ import { Choice, DecisionButton } from '@/components/story/parts';
 import { getApi } from '@/lib/api';
 import { subscribeAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
+import { unlockAudio } from '@/lib/onboarding/audio';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
@@ -188,7 +189,8 @@ const toBase64 = (b: Blob) =>
 async function upTwo(blob: Blob): Promise<Blob> {
   try {
     const rate = Math.pow(2, 2 / 12);
-    const src = await new AudioContext().decodeAudioData(await blob.arrayBuffer());
+    // decoded offline: a new AudioContext each time ran out on iOS after a few kororins
+    const src = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(await blob.arrayBuffer());
     const off = new OfflineAudioContext(1, Math.ceil((src.length / rate) * (44100 / src.sampleRate)), 44100);
     const node = off.createBufferSource();
     node.buffer = src;
@@ -210,35 +212,69 @@ async function upTwo(blob: Blob): Promise<Blob> {
   }
 }
 
-/** Record from the mic (tap to start, tap to stop). Gain control on, so a whisper is heard too. */
+/**
+ * Record from the mic (tap to start, tap to stop). Gain control on, so a whisper is heard too.
+ * iPhone (client 2026-10-29: the kororin mic did not work well): the take comes in small pieces (a single piece at the
+ * end came back empty), a tap right after starting does not stop it before anything was heard, the format is the one
+ * the phone records, and the page's sound is woken up again after the mic (iOS suspends it while recording).
+ */
+const MIN_TAKE_MS = 700;
+function recType(): string | undefined {
+  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return undefined;
+  return ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find((t) => MediaRecorder.isTypeSupported(t));
+}
 function useRecorder() {
   const [on, setOn] = useState(false);
   const rec = useRef<MediaRecorder | null>(null);
+  const startedAt = useRef(0);
   const done = useRef<(b: Blob | null) => void>(() => undefined);
   const start = async (): Promise<boolean> => {
+    if (rec.current && rec.current.state !== 'inactive') return true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
-      const chunks: BlobPart[] = [];
-      const r = new MediaRecorder(stream);
-      r.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+      const chunks: Blob[] = [];
+      const type = recType();
+      const r = type ? new MediaRecorder(stream, { mimeType: type }) : new MediaRecorder(stream);
+      r.ondataavailable = (e) => {
+        if (e.data.size) chunks.push(e.data);
+      };
       r.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
-        done.current(chunks.length ? new Blob(chunks, { type: r.mimeType || 'audio/webm' }) : null);
+        rec.current = null;
+        unlockAudio();
+        done.current(chunks.length ? new Blob(chunks, { type: r.mimeType || type || 'audio/webm' }) : null);
       };
       rec.current = r;
-      r.start();
+      r.start(250);
+      startedAt.current = Date.now();
       setOn(true);
       return true;
     } catch {
+      rec.current = null;
       return false;
     }
   };
   const stop = () =>
     new Promise<Blob | null>((ok) => {
-      done.current = ok;
-      setOn(false);
-      if (rec.current && rec.current.state !== 'inactive') rec.current.stop();
-      else ok(null);
+      const r = rec.current;
+      if (!r || r.state === 'inactive') {
+        setOn(false);
+        return ok(null);
+      }
+      const end = () => {
+        done.current = ok;
+        setOn(false);
+        try {
+          r.requestData();
+        } catch {
+          /* not recording any more */
+        }
+        r.stop();
+      };
+      // a tap right after starting: let it hear a moment first
+      const wait = MIN_TAKE_MS - (Date.now() - startedAt.current);
+      if (wait > 0) setTimeout(end, wait);
+      else end();
     });
   return { on, start, stop };
 }
@@ -274,6 +310,7 @@ export function SaturnLesson({
   const [asking, setAsking] = useState(false);
   const [typing, setTyping] = useState(false);
   const [micFail, setMicFail] = useState(false);
+  const [missed, setMissed] = useState(false);
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
   const [star, setStar] = useState(false);
@@ -447,13 +484,16 @@ export function SaturnLesson({
     if (busy || !beat) return;
     if (beat.k === 'recNormal' && !agreed) return setAsking(true);
     if (!rec.on) {
+      setMissed(false);
       if (await rec.start()) return setMicFail(false);
       setMicFail(true);
       if (beat.k === 'recNormal') setTyping(true);
       return;
     }
     const blob = await rec.stop();
-    if (!blob) return;
+    // nothing came back: say so and let them try again (it used to do nothing at all)
+    if (!blob || blob.size < 1000) return setMissed(true);
+    setMissed(false);
     void murmur(blob, '');
   };
 
@@ -672,7 +712,7 @@ export function SaturnLesson({
                 )}
                 {(
                   <p className="mt-3 rounded-full bg-[rgba(20,12,36,0.72)] px-4 py-1.5 text-[14px] font-bold text-white">
-                    {busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : micFail ? 'マイクが使えないみたい' : 'タップして、話してね'}
+                    {busy ? `${bati}が、コロリンにしているよ…` : rec.on ? '話しおわったら、もう一度タップ' : micFail ? 'マイクが使えないみたい' : missed ? 'うまく録れなかった。もう一度タップして、話してね' : 'タップして、話してね'}
                   </p>
                 )}
                 {/* the way out for anyone who cannot speak (hidden while the typing sheet is open) */}
