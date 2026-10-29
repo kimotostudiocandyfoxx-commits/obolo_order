@@ -292,8 +292,9 @@ function DayAuth({ onPassed }: { onPassed: () => void }) {
     setBusy(true);
     try {
       const r = await getApi().requestCode(email.trim());
-      setDevCode(getApi().mode === 'demo' ? (r.devCode ?? null) : null);
-      if (r.devCode && getApi().mode === 'demo') setCode(r.devCode);
+      // no mail is sent yet: the server hands the code over and it is filled in (the investors' path, 2026-10-29)
+      setDevCode(r.devCode ?? null);
+      if (r.devCode) setCode(r.devCode);
       setStep('code');
     } catch {
       setErr(m.common.error);
