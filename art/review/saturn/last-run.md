@@ -1,44 +1,44 @@
-# UI art — 2026-10-29T07:32:43.279Z
+# UI art — 2026-10-29T08:10:43.221Z
 
-Seedream 5.0 Pro / 40枚 / 約330円
+Seedream 5.0 Pro / 40枚 / 約305円
 
-- ✅ V03b/K10-a
-- ✅ V03b/K10-b
-- ✅ V03b/K11-a
-- ✅ V03b/K11-b
-- ✅ V03b/K12-a
-- ✅ V03b/K12-b
-- ✅ V03b/K3-a
-- ✅ V03b/K3-b
-- ✅ V03b/K4-a
-- ✅ V03b/K4-b
-- ✅ V03b/K6-b
-- ✅ V03b/K7-a
-- ✅ V03b/K7-b
-- ✅ V03b/K8-a
-- ✅ V03b/K8-b
-- ✅ V03b/K9-a
-- ✅ V03b/K9-b
-- ✅ V04/K1-a
-- ✅ V04/K1-b
-- ✅ V04/K10-a
-- ✅ V04/K10-b
-- ✅ V04/K2-a
-- ✅ V04/K2-b
-- ✅ V04/K3-a
-- ✅ V04/K3-b
-- ✅ V04/K4-a
-- ✅ V04/K4-b
-- ✅ V04/K5-a
-- ✅ V04/K5-b
-- ✅ V04/K6-a
-- ✅ V04/K6-b
-- ✅ V04/K7-a
-- ✅ V04/K7-b
-- ✅ V04/K8-a
-- ✅ V04/K8-b
-- ✅ V04/K9-a
-- ✅ V04/K9-b
-- ✅ V05/K2-a
-- ✅ V05/K2-b
-- ✅ V05/K3-a
+- ⏸ V03b/K4-r4a: 時間切れ、次回
+- ⏸ V03b/K4-r4b: 時間切れ、次回
+- ✅ V03a/A0-r4a
+- ✅ V03a/A0-r4b
+- ✅ V03a/A0-r4c
+- ✅ V03a/A1-r4a
+- ✅ V03a/A1-r4b
+- ✅ V03a/A3-r4a
+- ✅ V03a/A3-r4b
+- ✅ V03b/K1-r4a
+- ✅ V03b/K1-r4b
+- ✅ V03b/K3-r4a
+- ✅ V03b/K3-r4b
+- ✅ V05/K3-b
+- ✅ V05/K4-a
+- ✅ V05/K4-b
+- ✅ V05/K5-a
+- ✅ V05/K5-b
+- ✅ V06/K10-r4a
+- ✅ V06/K10-r4b
+- ✅ V19/K4-r4a
+- ✅ V19/K4-r4b
+- ✅ V22/K1-r4a
+- ✅ V22/K1-r4b
+- ✅ V22/K1-r4c
+- ✅ V22/K2-r4a
+- ✅ V22/K2-r4b
+- ✅ V22/K2-r4c
+- ✅ V22/K3-r4a
+- ✅ V22/K3-r4b
+- ✅ V22/K4-r4a
+- ✅ V22/K4-r4b
+- ✅ V22/K4-r4c
+- ✅ V22/K5-r4a
+- ✅ V22/K5-r4b
+- ✅ V22/K5-r4c
+- ✅ sprites/kimorin-xs-slip-r4a
+- ✅ sprites/kimorin-xs-slip-r4b
+- ✅ stills/saturn-sleep-r4a
+- ✅ stills/saturn-sleep-r4b
