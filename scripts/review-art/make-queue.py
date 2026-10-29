@@ -69,7 +69,12 @@ PLACE_REFS = {
     'V19': [R + 'story/places/moon-temple-inside.jpg'],
 }
 
+OBOLON_TEXT = CAST.get('[OBOLON]', '')
+
+
 def expand(p):
+    # 「OBOLON」 written without the brackets is the same sphere (review 5: V04 drew him as a hooded man)
+    p = re.sub(r'(?<!\[)\bOBOLON\b(?!\])', '[OBOLON]', p) if OBOLON_TEXT else p
     p = p.replace('[KIMORIN-LAB/額]', CAST.get('[KIMORIN-LAB/額]', '').replace('[KIMORIN-LAB]', LAB))
     for k, v in CAST.items():
         p = p.replace(k, v.replace('[KIMORIN-LAB]', LAB))
@@ -89,7 +94,7 @@ for v in videos:
         refs = [] if photo else list(STYLE_REFS)
         refs += PLACE_REFS.get(v, []) if not photo else []
         for name, rs in CAST_REFS.items():
-            if f'[{name}' in prompt:
+            if f'[{name}' in prompt or (name == 'OBOLON' and 'OBOLON' in prompt):
                 refs += rs
         if APPEND and not photo:
             # content first, the style pictures last

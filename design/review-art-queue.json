@@ -5896,64 +5896,6 @@
    "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same close-up: a single golden eye on the forehead glows brightly in the shadow of the hood. No text, no letters, no logos."
   },
   {
-   "id": "V05/K6-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "design/story/refs/story/cast/monban.jpg",
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The giant closed gate at sunset, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing on the left side in front of it."
-  },
-  {
-   "id": "V05/K6-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "design/story/refs/story/places/headquarters-gate.webp",
-    "design/story/refs/story/cast/monban.jpg",
-    "design/story/refs/style-obolon-temple.jpg",
-    "design/story/refs/style-gate.jpg"
-   ],
-   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. The giant closed gate at sunset, MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim. standing on the left side in front of it."
-  },
-  {
-   "id": "V05/K7-a",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V05/K6-a.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: the great doors have swung inward, golden light floods out, the domed temple visible far beyond, MONBAN still on the left. No text, no letters, no logos."
-  },
-  {
-   "id": "V05/K7-b",
-   "w": 1152,
-   "h": 2048,
-   "size": [
-    720,
-    1280
-   ],
-   "refs": [
-    "art/review/saturn/V05/K6-b.jpg"
-   ],
-   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — Same shot: the great doors have swung inward, golden light floods out, the domed temple visible far beyond, MONBAN still on the left. No text, no letters, no logos."
-  },
-  {
    "id": "V06/K1-b",
    "w": 1152,
    "h": 2048,
@@ -6979,6 +6921,64 @@
     "design/story/refs/style-gate.jpg"
    ],
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them. Inside a swirling tunnel of water and white-gold light that wraps around the viewer, a bright white center."
+  },
+  {
+   "id": "V05/K6-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "design/story/refs/story/cast/monban.jpg",
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact gate and character to draw: keep their shapes and design. The last reference pictures are for the art style only. Wide locked shot of the giant black-and-gold gate of the headquarters city at sunset, exactly the gate of the first reference picture: a huge open arch with NO doors at all; inside the arch a thin veil of soft golden light hangs like a shimmering barrier, and through it the domed temple far beyond shows only faintly. MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim stands on the left side in front of the arch. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K6-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/headquarters-gate.webp",
+    "design/story/refs/story/cast/monban.jpg",
+    "design/story/refs/style-obolon-temple.jpg",
+    "design/story/refs/style-gate.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. The first reference pictures show the exact gate and character to draw: keep their shapes and design. The last reference pictures are for the art style only. Wide locked shot of the giant black-and-gold gate of the headquarters city at sunset, exactly the gate of the first reference picture: a huge open arch with NO doors at all; inside the arch a thin veil of soft golden light hangs like a shimmering barrier, and through it the domed temple far beyond shows only faintly. MONBAN, a tall figure in a long black hooded robe with fine gold lines and magic-circle patterns, a black mask in the hood's shadow with a single glowing golden eye on the forehead, a large gold glowing magic-circle halo disc behind the head, black gloves and boots with gold trim stands on the left side in front of the arch. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K7-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K6-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — the golden veil of light inside the arch has unravelled and vanished; through the open arch (no doors) the domed temple now shows clearly in a gentle golden light, not too bright; MONBAN still on the left, unchanged. No text, no letters, no logos."
+  },
+  {
+   "id": "V05/K7-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "art/review/saturn/V05/K6-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — the golden veil of light inside the arch has unravelled and vanished; through the open arch (no doors) the domed temple now shows clearly in a gentle golden light, not too bright; MONBAN still on the left, unchanged. No text, no letters, no logos."
   }
  ],
  "redo": [],

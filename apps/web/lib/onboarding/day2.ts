@@ -33,7 +33,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'city' }, // 金と黒の都へ（2026-10-25）。鶴が着いてから、曲を重ねて切り替える（QA 5 U1）
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
-  { t: 'se', sound: 'gate-close' },
+  { t: 'se', sound: 'veil' }, // the gate's veil of light (M-R180: no doors), a low soft tone, never loud
   // city plays on through the gate; MONBAN's music comes with MONBAN (QA 7 U1: city turned into monban after 3.5 s)
   { t: 'video', motion: 'd1-monban', bgmAt: { track: 'monban', at: 6.5 } }, // 門へ進みながら、門が閉まる → 黒い煙からMONBANが現れる
   { t: 'loop', motion: '9-l' },
@@ -42,7 +42,7 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'chime' },
   { t: 'video', motion: 'd2-ticket-give' }, // MONBANが切符を受け取り、金色のロケットの絵を確かめて、こちらに返す
   // the line comes while the gate opens and MONBAN steps aside (client 2026-10-29), as on day 1
-  { t: 'bgvideo', motion: 11 }, // 門が開き、MONBANが横へ動く
+  { t: 'bgvideo', motion: 11 }, // 門の光の幕がほどけ、MONBANが横へ動く（M-R180）
   { t: 'say', who: 'MONBAN', text: '地球の神殿に行け…地下にロケット場がある' },
   { t: 'action', label: '地球の神殿に向かう' },
   { t: 'bgm', track: null, fade: 2 },

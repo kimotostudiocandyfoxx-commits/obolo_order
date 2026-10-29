@@ -488,6 +488,12 @@
           "instrumental": true
         }
       }
+    },
+    {
+      "id": "veil",
+      "kind": "se",
+      "duration": 4,
+      "prompt": "A soft, low, shimmering magical tone as a thin veil of golden light slowly unravels and fades: a deep gentle bell hum with a faint glassy shimmer, fading in softly and dying away slowly, calm and quiet, never loud, no sharp attack. High quality, realistic and rich, clean recording, no music, no voices."
     }
   ],
   "listen": []

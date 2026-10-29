@@ -29,7 +29,7 @@ export type Speaker =
 export type SoundFx =
   | 'sparkle' | 'chime' | 'bell' | 'gong' | 'magic' | 'whoosh' | 'pop' | 'boing' | 'knock' | 'ding' | 'heartbeat' | 'blip' | 'thud'
   // recorded-style sounds made for the story (2026-10-25); without their file they fall back to the nearest preset
-  | 'gate-close' | 'smoke' | 'rocket' | 'crackers' | 'egg-crack' | 'paper' | 'stamp' | 'footsteps' | 'portal'
+  | 'gate-close' | 'smoke' | 'rocket' | 'crackers' | 'egg-crack' | 'paper' | 'stamp' | 'footsteps' | 'portal' | 'veil'
   // a planet's arrival fanfare and the riddle-book sting (ACE-Step, 2026-10-27)
   | 'arrive' | 'riddle'
   // the client's own Pinpon 2.5 press (M-R128): it rings on behind the lines and fades on the next tap; muffled from inside the egg

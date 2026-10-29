@@ -41,7 +41,7 @@ export const DAY1: Step[] = [
   { t: 'caption', text: '本部に到着しました' },
   { t: 'action', label: '中に入る' },
   { t: 'motes', count: 0 },
-  { t: 'se', sound: 'gate-close' },
+  { t: 'se', sound: 'veil' }, // the gate's veil of light (M-R180: no doors), a low soft tone, never loud
   // 門へ進みながら、門が閉まる → 門の前に黒い煙が湧いて、MONBANが現れる; the telop shows over his arrival and goes (QA 6 N18: it stayed in the chat)
   // MONBAN's music comes with MONBAN (QA 7 U1: it started 6 s early, on 〔中に入る〕)
   { t: 'video', motion: 'd1-monban', captions: [{ text: 'MONBANが現れた', from: 7, to: 9.8 }], bgmAt: { track: 'monban', at: 6.5 } },
@@ -55,7 +55,7 @@ export const DAY1: Step[] = [
   { t: 'cam', move: 'in', focus: '50% 30%' },
   { t: 'say', who: 'MONBAN', text: 'なるほど…。\n{inviter}から…招待されたのか…。' },
   { t: 'cam', move: 'out' },
-  { t: 'bgvideo', motion: 11 }, // 門が開く — その間に「門をくぐり…」（client 2026-10-20）
+  { t: 'bgvideo', motion: 11 }, // 門の光の幕がほどける（M-R180）— その間に「門をくぐり…」（client 2026-10-20）
   { t: 'say', who: 'MONBAN', text: '門をくぐり、地球の神殿に行け…。' },
   { t: 'action', label: '門をくぐり、地球の神殿に向かう' },
 
@@ -115,7 +115,7 @@ export const DAY1: Step[] = [
   { t: 'label', id: 'take' },
   { t: 'say', who: 'MONBAN', text: 'わかった、それではまた明日会おう。' },
   { t: 'cam', move: 'out' },
-  { t: 'se', sound: 'gate-close' }, // 大広間の光が、すっと落ちる。遠くで、門の閉まる重い音（QA 5 N19）
+  { t: 'se', sound: 'veil' }, // 大広間の光が、すっと落ちる。遠くで、門の光の幕が張られる低い鈴の音（M-R180: no doors, a veil of light）
   { t: 'motes', count: 60 }, // 金と黒の都が、光の粒になってほどけ、真っ暗な宇宙に戻る
   { t: 'black' },
   { t: 'end' },
