@@ -4707,6 +4707,214 @@
     "design/story/refs/story/places/headquarters-gate.webp"
    ],
    "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. No people, no characters, no creatures, no figures anywhere. Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here. The headquarters gate at sunset as before, the golden ticket from before floating upright at eye level in front of the closed doors, softly glowing."
+  },
+  {
+   "id": "V22/K1-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-moon-bed.jpg",
+    "apps/web/public/onboarding/kimorin-xs-talk.webp",
+    "design/story/refs/unchi-pinpon-grey.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + A quiet snowy town at night, warm window lights, snow on steep roofs, a narrow lane with one tiny figure walking away. Deep blue night sky above. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K1-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-moon-bed.jpg",
+    "apps/web/public/onboarding/kimorin-xs-talk.webp",
+    "design/story/refs/unchi-pinpon-grey.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + A quiet snowy town at night, warm window lights, snow on steep roofs, a narrow lane with one tiny figure walking away. Deep blue night sky above. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K1-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-moon-bed.jpg",
+    "apps/web/public/onboarding/kimorin-xs-talk.webp",
+    "design/story/refs/unchi-pinpon-grey.jpg",
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + A quiet snowy town at night, warm window lights, snow on steep roofs, a narrow lane with one tiny figure walking away. Deep blue night sky above. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "apps/web/public/onboarding/s/d2-moon-bed.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + Desert town of mud-brick houses at night under a sky full of stars and the Milky Way, a few warm lamps. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "apps/web/public/onboarding/s/d2-moon-bed.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + Desert town of mud-brick houses at night under a sky full of stars and the Milky Way, a few warm lamps. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K2-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "apps/web/public/onboarding/s/d2-moon-bed.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + Desert town of mud-brick houses at night under a sky full of stars and the Milky Way, a few warm lamps. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K4-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + A vast modern city seen from a high rooftop at night, endless lights, soft haze, no readable signs or logos, no famous buildings. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K4-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-inside.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + A vast modern city seen from a high rooftop at night, endless lights, soft haze, no readable signs or logos, no famous buildings. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K5-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-aerial-1.jpg",
+    "design/story/refs/story/places/moon-temple-aerial-2.jpg",
+    "design/story/refs/story/places/rocket.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + Terraced fields in a mountain valley at night, a small village with scattered warm lights, mist in the valley, stars above. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V22/K5-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "design/story/refs/story/places/moon-temple-aerial-1.jpg",
+    "design/story/refs/story/places/moon-temple-aerial-2.jpg",
+    "design/story/refs/story/places/rocket.jpg",
+    "design/story/refs/style-obolon-temple.jpg"
+   ],
+   "prompt": "STYLE: Vertical 9:16 cinematic keyframe for a Japanese mobile story game, in exactly the art style of the reference pictures: highly detailed painterly dark fantasy, deep blacks with glowing gold light and fine ornament, finest anime-film background quality; characters in a semi-realistic 3D-CG texture, KIMORIN in cute chibi proportions within the same texture. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature. MOON: Colour palette of the moon temple only: white marble, pale blue-silver light and cool blue Earthlight; a soft, calm night. This overrides the gold of the STYLE: no gold light, no black-and-gold ornament. PHOTO + Terraced fields in a mountain valley at night, a small village with scattered warm lights, mist in the valley, stars above. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V23/a-K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same picture exactly, edited: only the light changes: the stars of the open ceiling twinkle in a different pattern, the thin golden ring around the small Earth above OBOLON glows a little brighter, OBOLON's pillar of light slightly brighter, a few golden motes drifted to new places in the air; MONBAN, OBOLON, KIMORIN, the Earth and the camera exactly as before. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V23/b-K2-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-moon-kimorin.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same picture exactly, edited: only the light changes: the Earthlight through the arches a little brighter, the water in the round basin with slightly different gentle ripples and soft rippling light on the floor, OBOLON's pillar of light slightly brighter, a few pale blue-silver motes in new places; OBOLON, KIMORIN and the camera exactly as before. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V23/a-K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same picture exactly, edited: only the light changes: the stars of the open ceiling twinkle in a different pattern, the thin golden ring around the small Earth above OBOLON glows a little brighter, OBOLON's pillar of light slightly brighter, a few golden motes drifted to new places in the air; MONBAN, OBOLON, KIMORIN, the Earth and the camera exactly as before. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "V23/b-K2-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/d2-moon-kimorin.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same unless told otherwise, and change only this: Same picture exactly, edited: only the light changes: the Earthlight through the arches a little brighter, the water in the round basin with slightly different gentle ripples and soft rippling light on the floor, OBOLON's pillar of light slightly brighter, a few pale blue-silver motes in new places; OBOLON, KIMORIN and the camera exactly as before. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
   }
  ],
  "redo": []
