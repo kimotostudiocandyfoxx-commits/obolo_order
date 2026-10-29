@@ -1,6 +1,7 @@
-# UI art — 2026-10-29T00:22:09.113Z
+# UI art — 2026-10-29T01:54:31.196Z
 
-Seedream 5.0 Pro / 2枚 / 約8円
+Seedream 5.0 Pro / 3枚 / 約8円
 
-- ✅ d2-kimorin-pin-a
-- ✅ d2-kimorin-pin-b
+- ✅ kororin-vessel
+- ✅ saturn-hall-kororin
+- ✅ saturn-plaza-kororin
