@@ -6,8 +6,10 @@
   "report": "art/review/saturn/video/last-run.md",
   "ledger": "art/review/saturn/rounds/video-costs.md",
   "parallel": 3,
-  "budgetYen": 1900,
-  "redo": [],
+  "budgetYen": 700,
+  "redo": [
+    "V02-C08"
+  ],
   "items": [
     {
       "id": "V01-C02",
@@ -153,7 +155,7 @@
       "audio": false,
       "first": "art/review/saturn/V01/K16-r1a.jpg",
       "last": "art/review/saturn/V01/K17-r3a.jpg",
-      "prompt": "The sealed envelope lifts off the desk by itself and floats up into the air; its edges slowly unravel into streams of golden light particles drifting toward the viewer. The lamp light stays warm and steady. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+      "prompt": "On the warm lamp-lit desk the hand moves away out of the frame first; then the sealed envelope rises gently into the air on its own and its edges slowly come apart into soft streams of tiny golden motes drifting toward the viewer. Quiet, calm shot. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
     },
     {
       "id": "V01-C17",
@@ -185,7 +187,7 @@
       "audio": false,
       "first": "art/review/saturn/V02/K9-r3a.jpg",
       "last": "art/review/saturn/V02/K10-r3b.jpg",
-      "prompt": "Close-up of KIMORIN's white-gloved hand: the thumb presses the silver push-button down and its gold rim glows a little brighter, softly. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+      "prompt": "Close-up of KIMORIN's white-gloved hand holding a silver push-button: his thumb slowly pushes the button down and its gold rim brightens gently. Calm, quiet shot. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
     },
     {
       "id": "V02-C06",
@@ -199,9 +201,9 @@
       "id": "V02-C08",
       "duration": 5,
       "audio": false,
-      "first": "art/review/saturn/V02/K13-r1a.jpg",
+      "first": "art/review/saturn/V02/K13b-r2a.jpg",
       "last": "art/review/saturn/V02/K14-r4post.jpg",
-      "prompt": "Locked camera, the same framing throughout: black smoke wells up slowly from the floor on the left and forms into the tall hooded MONBAN, the golden halo behind his head lights up softly; KIMORIN on the right stays still and the same size. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+      "prompt": "Locked camera, the same framing throughout: KIMORIN on the right lowers his gaze from the buildings, while black smoke wells up slowly from the floor on the left and forms into the tall hooded MONBAN, the golden halo behind his head lighting up softly; KIMORIN's feather tail stays wide open as a fan the whole time and he keeps the same size. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
     }
   ]
 }
