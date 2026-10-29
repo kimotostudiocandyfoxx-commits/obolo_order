@@ -6,7 +6,7 @@
   "report": "art/review/saturn/video/last-run.md",
   "ledger": "art/review/saturn/rounds/video-costs.md",
   "parallel": 3,
-  "budgetYen": 700,
+  "budgetYen": 2400,
   "redo": [
     "V02-C08"
   ],
@@ -204,6 +204,78 @@
       "first": "art/review/saturn/V02/K13b-r2a.jpg",
       "last": "art/review/saturn/V02/K14-r4post.jpg",
       "prompt": "Locked camera, the same framing throughout: KIMORIN on the right lowers his gaze from the buildings, while black smoke wells up slowly from the floor on the left and forms into the tall hooded MONBAN, the golden halo behind his head lighting up softly; KIMORIN's feather tail stays wide open as a fan the whole time and he keeps the same size. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V03a-a1",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V03a/A0-r4a.jpg",
+      "last": "art/review/saturn/V03a/A1-r4b.jpg",
+      "prompt": "High-angle view of the polished golden floor at the foot of the pillar of soft light: the floor slowly opens into a round hole, stone segments sliding aside, revealing a long stone spiral staircase winding down into candlelit darkness. No people. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V03a-a2",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V03a/A2-a.jpg",
+      "last": "art/review/saturn/V03a/A3-r4a.jpg",
+      "prompt": "First-person view coming down the last turn of the candlelit stone spiral staircase, then the view opens slowly downward into the enormous shaft where the tall rocket stands at the bottom like a tower; slow, smooth movement, no spinning. No people. The rocket stays exactly the one design of the pictures (black body, gold arabesque engraving, pink and cyan neon lines, orange crest emblems, swept-back fins, exactly three engine nozzles); it does not turn, change shape or change colour. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V19-1",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V19/K1-a.jpg",
+      "last": "art/review/saturn/V19/K2-a.jpg",
+      "prompt": "First-person view looking down into the round basin of the moon temple: the water slowly rises toward the viewer in a spiral column, droplets and soft light sparkling. No people, no faces. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V19-2",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V19/K2-a.jpg",
+      "last": "art/review/saturn/V19/K3-a.jpg",
+      "prompt": "The camera is gently surrounded by the spiral of water and white-gold light, turning slowly around the viewer; the centre glows soft and bright, never flashing. No people, no faces. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V19-3",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V19/K3-a.jpg",
+      "last": "art/review/saturn/V19/K4-r4a.jpg",
+      "prompt": "The light calms down and the camera slowly descends to look straight down on the basin: the water settles into a calm mirror with a soft evenly bright empty oval in the centre that reflects nothing; white marble and blue-silver rim. No people, no faces, nothing in the oval. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V23-a1",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg",
+      "last": "art/review/saturn/V23/a-K2-r4post.jpg",
+      "prompt": "Locked-off camera, absolutely no camera movement; every character stays perfectly still (no blinking, no moving mouths, tails or clothes); only the light breathes: soft motes drift slowly, glows swell and fade gently; no directional motion, no flashes. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V23-a2",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V23/a-K2-r4post.jpg",
+      "last": "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg",
+      "prompt": "Locked-off camera, absolutely no camera movement; every character stays perfectly still (no blinking, no moving mouths, tails or clothes); only the light breathes: soft motes drift slowly, glows swell and fade gently; no directional motion, no flashes. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V23-b1",
+      "duration": 5,
+      "audio": false,
+      "first": "apps/web/public/onboarding/s/d2-moon-kimorin.jpg",
+      "last": "art/review/saturn/V23/b-K2-r4post.jpg",
+      "prompt": "Locked-off camera, absolutely no camera movement; every character stays perfectly still (no blinking, no moving mouths, tails or clothes); only the light breathes: soft motes drift slowly, glows swell and fade gently; no directional motion, no flashes. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+    },
+    {
+      "id": "V23-b2",
+      "duration": 5,
+      "audio": false,
+      "first": "art/review/saturn/V23/b-K2-r4post.jpg",
+      "last": "apps/web/public/onboarding/s/d2-moon-kimorin.jpg",
+      "prompt": "Locked-off camera, absolutely no camera movement; every character stays perfectly still (no blinking, no moving mouths, tails or clothes); only the light breathes: soft motes drift slowly, glows swell and fade gently; no directional motion, no flashes. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
     }
   ]
 }
