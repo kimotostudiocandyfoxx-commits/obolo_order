@@ -2115,10 +2115,10 @@
    ],
    "always": false,
    "refs": [
-    "apps/web/public/onboarding/s/d2-hall-sky-monban-v1.jpg",
-    "apps/web/public/onboarding/s/kimorin-inv.jpg"
+    "apps/web/public/onboarding/s/d2-hall-sky-monban.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "Edit the first picture. Change only KIMORIN (the small fox character with the white fox-mask-like face and the fan of white, black and red tail feathers): keep his position, pose, size, facing and lighting, and keep everything else in the picture exactly the same; but he is now dressed as the suspicious inventor of the second picture — a patched, stained, oversized white lab coat with rolled-up sleeves, a tool belt, a small silver box on top of his head between his ears with a dark blank screen, and a coiled cable to a small silver handheld button. No red robe, no sunglasses. His brass goggles are pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters, no logos, no watermark. Vertical, same framing as the first picture."
+   "prompt": "Edit the first picture: keep everything exactly the same — the place, the light, everyone else, the framing, and KIMORIN (the small white fox in the lab coat with the brass goggles pushed up on his forehead) in the same place, pose, size and facing — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin glowing light-blue arcs, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes). (Seen from his angle, the same marks.) No text, no letters."
   },
   {
    "id": "d2-hall-sky-empty",
@@ -3302,9 +3302,9 @@
    "always": false,
    "refs": [
     "apps/web/public/onboarding/s/kimorin-iu-joy.jpg",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
+   "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, lab coat, the brass goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and the flat mid-grey background (#808080) — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin glowing light-blue arcs, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes). Keep his wide-open happy laughing mouth. No text, no letters."
   },
   {
    "id": "kimorin-iu-joy-o",
@@ -3416,9 +3416,9 @@
    "always": false,
    "refs": [
     "apps/web/public/onboarding/s/kimorin-iu-shock.jpg",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
+   "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, lab coat, the brass goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and the flat mid-grey background (#808080) — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin glowing light-blue arcs, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes). Keep his small open surprised mouth. No text, no letters."
   },
   {
    "id": "kimorin-iu-shock-o",
@@ -3587,9 +3587,9 @@
    "always": false,
    "refs": [
     "apps/web/public/onboarding/s/kimorin-iu-think.jpg",
-    "design/story/refs/cast/kimorin-face-eyes.jpg"
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, lab coat, goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and grey background — and change only his two eyes so they are exactly like the eyes in the second picture: two thin, gently curved, glowing light-blue slits like softly closed smiling eyelids, with no pupils, no irises, no round or almond eyes, no eyeballs. Keep his mouth and his blue face markings as they are. No text, no letters."
+   "prompt": "Edit the first picture: keep everything exactly the same — every pixel of the character, pose, hands, lab coat, the brass goggles pushed up on his head, the box and cable, ears, tail, framing, size, light and the flat mid-grey background (#808080) — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin glowing light-blue arcs, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes).  No text, no letters."
   },
   {
    "id": "kimorin-iu-think-o",
@@ -3643,9 +3643,10 @@
    ],
    "always": false,
    "refs": [
-    "apps/web/public/onboarding/s/d2-hall-kimorin.jpg"
+    "apps/web/public/onboarding/s/d2-hall-kimorin-up.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same — the hall, the pillar of light, the black sphere, the camera, the framing, the light and the small fox character in the white lab coat in the same place and pose — keep the small silver box with the dark screen on top of his head between his ears and the coiled cable to his handheld button — but his brass goggles are now pushed up onto his forehead, and his eyes show as thin glowing blue slits on his white face. No text, no letters."
+   "prompt": "Edit the first picture: keep everything exactly the same — the place, the light, everyone else, the framing, and KIMORIN (the small white fox in the lab coat with the brass goggles pushed up on his forehead) in the same place, pose, size and facing — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin glowing light-blue arcs, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes). (Seen from his angle, the same marks.) No text, no letters."
   },
   {
    "id": "kimorin-xs-talk",
@@ -5014,10 +5015,10 @@
    ],
    "always": false,
    "refs": [
-    "apps/web/public/onboarding/kimorin-iu-shock.webp",
-    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+    "apps/web/public/onboarding/s/d2-kimorin-pin-a.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "A wide 16:9 cut-in panel for a Japanese mobile story game: the dramatic manga 'it just clicked!' moment of realization. The character is KIMORIN from the reference picture (use it for the character only): a small white fox whose face looks like a smooth white fox mask with a blue leaf mark on the forehead, blue spiral marks on the cheeks, tall fox ears with blue insides, a rounded silver box with a small dark screen between his ears, brass steampunk goggles pushed UP onto his forehead, a white lab coat collar. COMPOSITION: on the right half, an extreme close-up of KIMORIN's mask face, cropped by the right and bottom edges, turned three-quarters toward the left; his two narrow eye slits blaze with pure white light, glowing blank white eyes; a soft white aura outlines his head. The left half is pure black, crossed by one thin perfectly horizontal white streak of light at eye height, with a sharp bright white star flare where it meets the edge of his face. High-contrast black and white light with only his blue marks in colour, semi-realistic painterly anime texture, cinematic. No text, no letters, no sound-effect lettering, no watermark."
+   "prompt": "Edit the first picture: keep everything exactly the same — the black background, the streak of light and the flash, the white glow around him, his goggles pushed up, the composition — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin arcs blazing with bright white-blue light, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes). No text, no letters, no sound-effect lettering."
   },
   {
    "id": "d2-kimorin-pin-b",
@@ -5029,10 +5030,10 @@
    ],
    "always": false,
    "refs": [
-    "apps/web/public/onboarding/kimorin-iu-shock.webp",
-    "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
+    "apps/web/public/onboarding/s/d2-kimorin-pin-b.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
    ],
-   "prompt": "A wide 16:9 cut-in panel for a Japanese mobile story game: the dramatic manga 'it just clicked!' moment of realization. The character is KIMORIN from the reference picture (use it for the character only): a small white fox whose face looks like a smooth white fox mask with a blue leaf mark on the forehead, blue spiral marks on the cheeks, tall fox ears with blue insides, a rounded silver box with a small dark screen between his ears, brass steampunk goggles pushed UP onto his forehead, a white lab coat collar. COMPOSITION: black background; across the middle runs a jagged horizontal white lightning crack, bursting into a big spiky white flash of light; in front of the flash, KIMORIN's mask face in close-up from the chest up, centered, shown in strong backlight, his eye slits shining pure white, a white glowing rim around him, a sudden 'ping!' of understanding. High-contrast, deep blacks, painterly semi-realistic anime texture, cinematic. No text, no letters, no sound-effect lettering, no watermark."
+   "prompt": "Edit the first picture: keep everything exactly the same — the black background, the streak of light and the flash, the white glow around him, his goggles pushed up, the composition — and change only his face exactly like the face in the second picture: a smooth white round face; on the forehead exactly three blue leaf marks in a fan (the middle one the longest) and no other lines; for eyes, two thin arcs blazing with bright white-blue light, gently curved upward like softly closed smiling eyelids — no pupils, no whites, no black rims, not almond-shaped, not slanted; one blue spiral on each cheek; a tiny ω cat mouth; no nose. The second picture is only for his face (not its hood, sunglasses or clothes). No text, no letters, no sound-effect lettering."
   },
   {
    "id": "saturn-hall-kororin",
@@ -5079,5 +5080,13 @@
    "prompt": "One big round empty bowl (a vessel for small round creatures), seen from the front and slightly above so its inside is a little visible: a chubby, glossy, pastel ceramic bowl, cream white with a soft lavender rim and a thin gold line, a short round foot, gentle highlights. Centered, filling about 80% of the width, on a flat plain mid-grey background (#808080) with nothing else. Art style exactly like the first reference picture: a cute, soft, rounded 'kororin' world for a Japanese kids' mobile game — pastel lavender, pink and peach light, candy-like smooth shapes, gentle glow, simple and clean, everything chubby and round (deformed, toy-like). No text, no letters, no logos, no watermark. No characters, no creatures, no people."
   }
  ],
- "redo": []
+ "redo": [
+  "kimorin-iu-joy",
+  "kimorin-iu-shock",
+  "kimorin-iu-think",
+  "d2-hall-kimorin-up",
+  "d2-hall-sky-monban",
+  "d2-kimorin-pin-a",
+  "d2-kimorin-pin-b"
+ ]
 }
