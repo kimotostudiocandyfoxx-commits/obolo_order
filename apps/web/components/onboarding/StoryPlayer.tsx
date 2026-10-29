@@ -232,6 +232,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
    * frame or black underneath for a moment (QA 11 R32). It starts once the new picture is decoded, the one before staying
    * until then (R33). From a motion or black (no still before) it fades up as before.
    */
+  const fromLesson = useRef(false);
   const showStill = (img: string, fade?: number) => {
     const gen = stillGen.current;
     stillRef.current = img;
@@ -251,6 +252,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       }
       shownStill.current = img;
       setStillState(img);
+      // back from a lesson: the black lifts (0.7 s) only once this picture is in place (QA 13 R38)
+      if (fromLesson.current) {
+        fromLesson.current = false;
+        setTimeout(() => setBlackout(false), 60);
+      }
     };
     stillLine.current = stillLine.current.then(() => ready).then(go);
   };
@@ -281,6 +287,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (e) setLog((l) => (l[l.length - 1]?.id === e.id ? l : [...l, e]));
   }, []);
   const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
+  // the thread fading out has no say in what a tap finishes (QA 13 R35)
+  const leavingReveal = useRef<ChatReveal>({ done: true, finish: () => {} });
   // the thread as it was shown last, and whether it is fading out (QA 12 R35)
   const lastChat = useRef<{ entries: ChatEntry[]; bottom: number }>({ entries: [], bottom: 0 });
   const [chatLeaving, setChatLeaving] = useState(false);
@@ -434,9 +442,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setWhite(false);
           setTicketArt(null);
           showStill(s.image, s.fade);
-          // a still is a full background: lift the start light / black screen
+          // a still is a full background: lift the start light / black screen (back from a lesson: once it is in place)
           setReady(true);
-          setBlackout(false);
+          if (!fromLesson.current) setBlackout(false);
           n++;
         } else if (s.t === 'sprite') {
           setSprite(s.image);
@@ -879,8 +887,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       // from black, once the picture is decoded (QA 12 R40: it came up in two or three frames); the motion behind is hidden
       const img = lastBack.image;
       dual.current?.pauseAll();
+      // a picture that comes late does not cover a scene the story already moved on to (QA 13 R44), and a very slow
+      // one does not hold the story: after 4 s the lines start over black (R49)
+      const gen = stillGen.current;
+      let placed = false;
+      const giveUp = setTimeout(() => {
+        if (!placed) setReady(true);
+      }, 4000);
       void loadStill(img).then(() => {
-        setStill(img);
+        placed = true;
+        clearTimeout(giveUp);
+        if (gen === stillGen.current) setStill(img);
         setReady(true);
       });
     }
@@ -936,7 +953,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     if (steps[i]?.t !== 'say') return;
     waitTimer.current = setTimeout(() => setWaitOver(true), 4000 + (steps[i] as { text: string }).text.length * 260);
     return () => clearTimeout(waitTimer.current);
-  }, [i, steps]);
+    // from 〔続きから〕 too, not from when the page opened (QA 13 R47)
+  }, [i, steps, started]);
   useEffect(() => {
     const d = voice.current?.duration() ?? 0;
     if (!talking || !d || steps[iRef.current]?.t !== 'say') return;
@@ -1083,15 +1101,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
-      {(chatOn || chatLeaving) && (
-        // the thread and its shade fade out over 0.3 s when they go (QA 12 R35), with what they showed last
+      {(chatOn || chatLeaving || chatWas.current) && (
+        // the thread and its shade fade out over 0.3 s when they go (QA 12 R35), with what they showed last. The frame
+        // it went out on keeps it mounted (chatWas is still true until the effect runs): it used to unmount for that
+        // one frame and come back at opacity 0, so nothing faded (QA 13 R35)
         <div className="pointer-events-none absolute inset-0 z-[10] transition-opacity duration-300" style={{ opacity: chatOn ? 1 : 0 }}>
           {/* a soft shade under the thread so it reads on any picture */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
           <ChatLog
             entries={chatOn ? chatEntries : lastChat.current.entries}
             talking={chatOn && talking}
-            reveal={reveal}
+            reveal={chatOn ? reveal : leavingReveal}
             live={chatOn && step?.t === 'say' && !mustWait}
             bottom={chatOn && step ? chatBottom(step) : lastChat.current.bottom}
           />
@@ -1162,8 +1182,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             // the day's kororins (their words) — Jupiter turns two of them into stickers tomorrow
             remember('f_d04_kororin', made.length ? 'try' : 'skip');
             remember('kororins', JSON.stringify(made));
-            // the practice left through black: the story comes back up from it (QA 12 R38)
+            // the practice left through black: the story comes back up from it once the next picture is in place, and
+            // the picture from before the practice goes while it is black (QA 12/13 R38)
+            setBlackFade(0);
             setBlackout(true);
+            fromLesson.current = true;
+            // a new scene: the lines from before the practice do not come back over it (QA 13 R48)
+            setLog([]);
+            lastChat.current = { entries: [], bottom: 0 };
+            clearTimeout(underTimer.current);
+            setUnder(null);
+            shownStill.current = null;
+            setStillState(null);
             run(iRef.current + 1);
           }}
         />

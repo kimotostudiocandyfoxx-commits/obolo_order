@@ -327,27 +327,24 @@ export function SaturnLesson({
   iRef.current = i;
   const beatRef = useRef(beat);
   beatRef.current = beat;
-  // a line whose voice is not there (yet) goes on after a reading time (0.12 s a character + 1.5 s)
+  // a line with no voice goes on after a reading time, as the story's escape: 4 s + 0.26 s a character (QA 13 R45).
+  // While its voice is being fetched the clock stops; a voice that starts moves the line on when it ends; only a
+  // voice that failed to come starts the clock again (a slow voice no longer let the line go by unheard, M-R174)
   const heard = useRef(-1);
   const readTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const countFrom = (at: number) => {
+    clearTimeout(readTimer.current);
+    const b = beatRef.current;
+    if (b?.k !== 'say' || iRef.current !== at) return;
+    readTimer.current = setTimeout(() => {
+      if (heard.current === at || iRef.current !== at || voiceBusy.current) return;
+      setI((n) => (n === at ? n + 1 : n));
+    }, 4000 + fill(b.text).length * 260);
+  };
   useEffect(() => {
     if (beat?.k !== 'say') return;
-    const at = i;
-    const len = fill(beat.text).length;
-    const first = setTimeout(() => {
-      // a voice that starts later (it came slowly) takes over: it moves the line on when it ends (QA 9 R26)
-      if (heard.current !== at)
-        readTimer.current = setTimeout(() => {
-          if (heard.current === at || iRef.current !== at) return;
-          // a voice arriving just now is not played for a moment (QA 10 R31)
-          voice.current?.stop();
-          setI((n) => (n === at ? n + 1 : n));
-        }, len * 120 + 1500);
-    }, 1500);
-    return () => {
-      clearTimeout(first);
-      clearTimeout(readTimer.current);
-    };
+    if (!voiceBusy.current) countFrom(i);
+    return () => clearTimeout(readTimer.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i]);
   useEffect(() => {
@@ -357,6 +354,9 @@ export function SaturnLesson({
     v.onLoading = (on) => {
       voiceBusy.current = on;
       voiceUntil.current = 0;
+      if (on) clearTimeout(readTimer.current);
+      // fetched but never started (it failed): the reading clock starts now
+      else if (heard.current !== iRef.current) countFrom(iRef.current);
     };
     v.onSpeaking = (on) => {
       voiceBusy.current = on;
@@ -371,6 +371,7 @@ export function SaturnLesson({
         setTimeout(() => iRef.current === at && setI((n) => (n === at ? n + 1 : n)), 900);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // the Saturn music plays low under the lesson and stops while the mic records (QA 5 N14)
   const duck = (v: number) => {
