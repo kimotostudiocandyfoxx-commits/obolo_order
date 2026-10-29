@@ -53,6 +53,8 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-look-back' }, // ふり返る：門の内側から入口のほうを見た景色
   { t: 'se', sound: 'footsteps' },
   { t: 'video', motion: 'd2-kimorin-walkup' }, // 奥の通路から、KIMORINがゆっくり門まで歩いてくる → 顔のドアップ（劇場版アニメのように）
+  // the clips' own made-up sound is gone (client 2026-10-29: an odd sound at his entrance); a gust as his coat flares
+  { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd2-reveal' }, // 豪華映像 #2 KIMORINの登場（M-R90）：白衣がひるがえり、扇の尾が一気に開き、ゴーグルが夕日を反射（目は光らない）
   { t: 'still', image: 's/d2-reveal-end' }, // the film's last frame with a mouth layer (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: 'なんですか、この怪しい建物は。' }, // 門ごしに、本部の建物を、下から上まで、じろじろと見上げる（M-R170）
