@@ -77,8 +77,8 @@ const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '..
 async function settleWithRetry<T>(n: number, paint: (i: number) => Promise<T>): Promise<PromiseSettledResult<T>[]> {
   const t0 = Date.now();
   // a picture that failed is painted again at once, without waiting for the others, while a second try still fits in
-  // the visitor's wait (the screen waits 180 s; one try is at most 70 s) — story chat 2026-10-29
-  const one = (i: number): Promise<T> => paint(i).catch((e: unknown) => (Date.now() - t0 < 95_000 ? paint(i) : Promise.reject(e)));
+  // the visitor's wait (the live web still waits 120 s; one try is at most 70 s) — story chat 2026-10-29
+  const one = (i: number): Promise<T> => paint(i).catch((e: unknown) => (Date.now() - t0 < 45_000 ? paint(i) : Promise.reject(e)));
   return Promise.allSettled(Array.from({ length: n }, (_, i) => one(i)));
 }
 
