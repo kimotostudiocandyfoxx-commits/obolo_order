@@ -70,6 +70,7 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
         write();
       }
       setInterim(mid);
+      midRef.current = mid;
     };
     r.onerror = (e) => {
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
@@ -79,7 +80,9 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
     };
     // Safari stops after a pause: keep listening until the member taps again
     r.onend = () => {
+      if (rec.current !== r) return;
       setInterim('');
+      midRef.current = '';
       if (want.current) {
         try {
           r.start();
@@ -89,6 +92,7 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
         }
       }
       setListening(false);
+      rec.current = null;
       const el = field.current;
       const s = session.current;
       if (el) {
@@ -123,10 +127,35 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
     }
   }, [field, lang, listen]);
 
+  // what is being heard and not final yet (kept if the take is cut off)
+  const midRef = useRef('');
+  // stop: let the last words come in, then stop anyway — iOS Safari sometimes never fires onend after a stop, which
+  // left the mic open (client 2026-10-29)
   const stop = useCallback(() => {
     want.current = false;
-    rec.current?.stop();
-  }, []);
+    const r = rec.current;
+    try {
+      r?.stop();
+    } catch {
+      /* not started */
+    }
+    setTimeout(() => {
+      if (!r || rec.current !== r) return;
+      rec.current = null;
+      if (midRef.current) {
+        session.current.heard += midRef.current;
+        midRef.current = '';
+        write();
+      }
+      try {
+        r.abort();
+      } catch {
+        /* already over */
+      }
+      setInterim('');
+      setListening(false);
+    }, 900);
+  }, [write]);
 
   const toggle = useCallback(() => (listening ? stop() : start()), [listening, start, stop]);
 

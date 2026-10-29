@@ -17,6 +17,7 @@ type Rec = {
   continuous: boolean;
   start(): void;
   abort(): void;
+  stop(): void;
   onresult: ((e: { results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
   onerror: ((e: { error: string }) => void) | null;
   onend: (() => void) | null;
@@ -62,6 +63,8 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     return () => rec.current?.abort();
   }, []);
 
+  // ends the take now (the tap, a quiet after words, the 9 s cap); set by listen()
+  const stopNow = useRef<() => void>(() => undefined);
   const listen = () => {
     const R = recognizer();
     if (!R) return setMode('keys');
@@ -71,23 +74,21 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     // iOS ends a one-shot recognition almost at once: listen on and stop ourselves after a short quiet
     r.continuous = true;
     let said = '';
-    let quiet: ReturnType<typeof setTimeout> | undefined;
     let blocked = false;
-    r.onresult = (e) => {
-      const all = Array.from(e.results);
-      said = all.map((x) => x[0].transcript).join('');
-      setHeard(said);
-      clearTimeout(quiet);
-      quiet = setTimeout(() => r.abort(), all[all.length - 1]?.isFinal ? 400 : 1400);
-    };
-    r.onerror = (e) => {
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') blocked = true;
-    };
-    const timer = setTimeout(() => r.abort(), 9000);
-    r.onend = () => {
-      clearTimeout(timer);
-      clearTimeout(quiet);
+    let ended = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    // the end of the take, whether or not the recogniser says so: iOS Safari sometimes never fires onend after a
+    // stop, which left the mic open with no way on (client 2026-10-29)
+    const finish = () => {
+      if (ended) return;
+      ended = true;
+      timers.forEach(clearTimeout);
       rec.current = null;
+      try {
+        r.abort();
+      } catch {
+        /* already over */
+      }
       if (said.trim() && !done.current) {
         done.current = true;
         const k = matchAnswer(said, options);
@@ -103,6 +104,32 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       setNote('うまく聞き取れませんでした。もう一度どうぞ');
       setMode('mic');
     };
+    // stop: let the last words come in (stop, not abort), then finish anyway after a moment
+    const stop = () => {
+      if (ended) return;
+      try {
+        r.stop();
+      } catch {
+        /* not started */
+      }
+      timers.push(setTimeout(finish, 900));
+    };
+    stopNow.current = stop;
+    let quiet: ReturnType<typeof setTimeout> | undefined;
+    r.onresult = (e) => {
+      const all = Array.from(e.results);
+      said = all.map((x) => x[0].transcript).join('');
+      setHeard(said);
+      clearTimeout(quiet);
+      quiet = setTimeout(stop, all[all.length - 1]?.isFinal ? 400 : 1400);
+      timers.push(quiet);
+    };
+    r.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') blocked = true;
+      if (e.error !== 'no-speech') finish();
+    };
+    r.onend = finish;
+    timers.push(setTimeout(stop, 9000));
     rec.current = r;
     setHeard('');
     setNote('');
@@ -121,7 +148,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       <p className="mb-4 min-h-[2rem] rounded-full border border-amber-200/15 bg-black/55 px-4 py-1.5 text-center text-[12px] tracking-[0.08em] text-amber-50/85 backdrop-blur" style={{ fontFamily: SERIF }}>
         {on ? heard || '聞いています……' : note || `例：${options.join('・')}`}
       </p>
-      <button onClick={on ? () => rec.current?.abort() : listen} className="relative flex h-24 w-24 items-center justify-center rounded-full active:scale-95" aria-label="話してみよう">
+      <button onClick={on ? () => stopNow.current() : listen} className="relative flex h-24 w-24 items-center justify-center rounded-full active:scale-95" aria-label="話してみよう">
         {/* rings of light going out while it listens; a slow breath while it waits */}
         {on ? (
           [0, 0.6, 1.2].map((d) => <span key={d} className="absolute inset-0 rounded-full border border-amber-200/70" style={{ animation: `micRing 1.8s ${d}s ease-out infinite` }} />)
