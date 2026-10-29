@@ -204,7 +204,9 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // 黒い球が、くるりとKIMORINのほうへ向く。光の柱のOBOLONの前に、白衣のKIMORIN
   { t: 'say', who: 'OBOLON', text: 'KIMORINは？' },
-  { t: 'say', who: 'KIMORIN', text: '私は、、、、、、12回目です。' },
+  // 「12回目です。」 after a tap, as the next line (client 2026-10-29): the one voice cut at its pause
+  { t: 'say', who: 'KIMORIN', text: '私は、、、、、、' },
+  { t: 'say', who: 'KIMORIN', text: '12回目です。' },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
   { t: 'bgm', track: 'comedy' }, // ピンポン2.5の発表
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
