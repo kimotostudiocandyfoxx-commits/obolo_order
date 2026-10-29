@@ -1,0 +1,59 @@
+name: Issue invite
+
+# One operator invitation (POST /admin/invites), run from the Actions tab: a one-off Cloud Run job with the API's own
+# service account, so the admin token stays in Google Cloud. The invitation link is printed at the end of the log
+# (no mail is sent yet: EMAIL_DRIVER is console).
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: 招待する人のメールアドレス
+        required: true
+      inviter:
+        description: 招待者の名前
+        default: 木元 駿之介
+      message:
+        description: 招待状のひとこと（空でもよい）
+        default: ''
+
+env:
+  REGION: asia-northeast1
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+  RUNTIME_SA: ${{ vars.GCP_RUNTIME_SA || format('obolo-api-runtime@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  issue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Issue the invitation
+        env:
+          IN_EMAIL: ${{ inputs.email }}
+          IN_INVITER: ${{ inputs.inviter }}
+          IN_MESSAGE: ${{ inputs.message }}
+        run: |
+          API="https://obolo-api-${{ vars.GCP_PROJECT_NUMBER }}.${REGION}.run.app"
+          IMAGE=$(gcloud run services describe obolo-api --region "$REGION" --format='value(spec.template.spec.containers[0].image)')
+          BODY=$(python3 -c 'import json,os; b={"email":os.environ["IN_EMAIL"],"inviterName":os.environ["IN_INVITER"]}; m=os.environ.get("IN_MESSAGE","").strip(); b.update({"message":m} if m else {}); print(json.dumps(b, ensure_ascii=False))' | base64 -w0)
+          SCRIPT=$(printf '%s' "const b=Buffer.from(process.env.BODY_B64,'base64').toString();const r=await fetch(process.env.API+'/admin/invites',{method:'POST',headers:{'content-type':'application/json','x-admin-token':process.env.ADMIN_TOKEN},body:b});const j=await r.json().catch(()=>null);console.log('STATUS '+r.status);if(r.ok)console.log('INVITE_CODE '+j.code+' MESSAGE '+JSON.stringify(j.inviterMessage??null));else console.log('ERROR '+JSON.stringify(j).slice(0,300));" | base64 -w0)
+          gcloud run jobs deploy obolo-issue-invite --region "$REGION" --image "$IMAGE" --service-account "$RUNTIME_SA" \
+            --set-secrets ADMIN_TOKEN=obolo-admin-token:latest \
+            --set-env-vars "^##^API=$API##BODY_B64=$BODY##SCRIPT_B64=$SCRIPT" \
+            --command node --args "^##^--input-type=module##-e##await import('data:text/javascript;base64,' + process.env.SCRIPT_B64)" \
+            --memory 512Mi --task-timeout 120 --max-retries 0 --quiet
+          gcloud run jobs execute obolo-issue-invite --region "$REGION" --wait || true
+          EXEC=$(gcloud run jobs executions list --job obolo-issue-invite --region "$REGION" --limit 1 --format='value(metadata.name)')
+          sleep 20
+          gcloud logging read "resource.type=cloud_run_job AND resource.labels.job_name=obolo-issue-invite AND labels.\"run.googleapis.com/execution_name\"=\"$EXEC\"" \
+            --order=asc --limit=50 --format='value(textPayload)' | tee log.txt
+          CODE=$(grep -oE 'INVITE_CODE [A-Za-z0-9_-]+' log.txt | awk '{print $2}')
+          if [ -n "$CODE" ]; then echo "INVITE_URL https://oboloorder-web.vercel.app/invite/$CODE"; else echo "no invitation made"; exit 1; fi
