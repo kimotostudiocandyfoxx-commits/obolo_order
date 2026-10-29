@@ -96,7 +96,13 @@ export function storyVoiceFilter(s: StoryVoiceSpec, tempo: number): string {
  * as 「おぼろん」 — client 2026-10-20). Only what is spoken changes; the line on screen stays as written.
  */
 // the star in KIMORIN⭐︎ is only written, never said (client 2026-10-29: the voice read it 「キモリンスター」)
-export const STORY_READINGS: [RegExp, string][] = [[/(?<![A-Za-z])obolo(?![A-Za-z])/g, 'オボロ'], [/⭐\uFE0E?/g, '']];
+export const STORY_READINGS: [RegExp, string][] = [
+  [/(?<![A-Za-z])obolo(?![A-Za-z])/g, 'オボロ'],
+  [/⭐\uFE0E?/g, ''],
+  // names the voice misread (client 2026-10-29: 「木元 駿之介」 is きもと しゅんのすけ)
+  [/木元/g, 'きもと'],
+  [/駿之介/g, 'しゅんのすけ'],
+];
 export function speakText(text: string): string {
   return STORY_READINGS.reduce((t, [re, kana]) => t.replace(re, kana), text.replace(/\n/g, ' '));
 }

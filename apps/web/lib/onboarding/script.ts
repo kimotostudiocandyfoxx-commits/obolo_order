@@ -56,7 +56,7 @@ export type Step =
   /** bgmAt: the music changes at a moment of the motion (MONBAN steps out of the smoke ~7 s in: QA 7 U1) */
   | { t: 'video'; motion: MotionId; captions?: TimedCaption[]; bgmAt?: { track: string; at: number } }
   /** Switch background music (crossfade). null = fade out. Continues immediately. */
-  | { t: 'bgm'; track: string | null; /** null + fade: a slow fade-out over this many seconds */ fade?: number }
+  | { t: 'bgm'; track: string | null; /** null + fade: a slow fade-out over this many seconds */ fade?: number; /** start it this many seconds later (the story goes on meanwhile; a later music step cancels it) */ after?: number }
   /**
    * Play a motion once IN THE BACKGROUND and continue immediately, so the dialogue can be read while
    * it plays. `then` motions follow automatically when it ends; the last one holds its final frame.
@@ -103,6 +103,8 @@ export type Step =
   | { t: 'spark'; image: string; sound?: SoundFx }
   /** 〔登場：煙〕 the "appearance" pattern: smoke wells up, the character stands there (added to the cast) */
   | { t: 'enter'; who: string; fx?: 'smoke' | 'light' }
+  /** the one on stage fades away into soft light, mysteriously (client 2026-10-29: OBOLON leaving for the Moon); waits for it */
+  | { t: 'vanish'; s?: number }
   /** 〔移動：惑星到着〕〔テロップ：到着〕 the "arrival" pattern: the new place fades in under a title (tap) */
   | { t: 'arrive'; image: string; caption: string }
   /** Day 1: the seal glows, the envelope bursts into light, the invitation card rises (words set in code) */

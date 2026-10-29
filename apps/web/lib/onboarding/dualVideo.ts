@@ -185,6 +185,10 @@ export class DualVideo {
 
   private handleEnded(el: HTMLVideoElement) {
     if (el !== this.frontEl) return;
+    // the motion before, still on screen while the next one loads, came to its end (a loop at its seam): that is
+    // not the end of the new one — keep its last frame (Day 1: MONBAN's arrival was skipped when the gate's loop
+    // ended before his film had loaded, client 2026-10-29)
+    if (this.pending && this.pending !== el && el.dataset.src !== this.url) return;
     if (this.loop && this.url) {
       const next = this.backEl;
       this.pending = next;

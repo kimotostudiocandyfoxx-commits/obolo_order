@@ -73,6 +73,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   // a favourite photo of themselves (M-R148): kept only in this screen, handed to the basin, never stored
   const [photo, setPhoto] = useState<{ mime: 'image/jpeg'; data: string; url: string } | null>(null);
   const photoInput = useRef<HTMLInputElement>(null);
+  const cameraInput = useRef<HTMLInputElement>(null);
   const [free, setFree] = useState('');
   const [sel, setSel] = useState<NeoLookCandidate | null>(null);
   const [instruction, setInstruction] = useState('');
@@ -186,21 +187,27 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     return (
       <Panel>
         <Obolon>{'、、、お前の、気に入っている、自分の写真は、あるか？\nあるなら、、、水盤に、映せ。'}</Obolon>
-        <input
-          ref={photoInput}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={async (e) => {
-            const f = e.target.files?.[0];
-            if (!f) return;
-            try {
-              setPhoto(await fileToReference(f));
-            } catch {
-              setErr('その写真は、読みこめなかった……');
-            }
-          }}
-        />
+        {/* 〔写真を使う〕 picks one already taken, 〔写真を撮る〕 opens the front camera (client 2026-10-29) */}
+        {[photoInput, cameraInput].map((r, k) => (
+          <input
+            key={k}
+            ref={r}
+            type="file"
+            accept="image/*"
+            {...(k === 1 ? { capture: 'user' as const } : {})}
+            className="hidden"
+            onChange={async (e) => {
+              const f = e.target.files?.[0];
+              e.target.value = '';
+              if (!f) return;
+              try {
+                setPhoto(await fileToReference(f));
+              } catch {
+                setErr('その写真は、読みこめなかった……');
+              }
+            }}
+          />
+        ))}
         {photo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo.url} alt="" className="mx-auto mt-3 h-36 w-36 rounded-2xl object-cover ring-2 ring-amber-200/60" />
@@ -211,12 +218,20 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
           {photo ? (
             <>
               <Gold onClick={() => (setErr(null), setPhase('animal'))}>この写真で作る</Gold>
-              <button onClick={() => photoInput.current?.click()} className="py-2 text-sm text-white/60">
-                ちがう写真にする
-              </button>
+              <div className="flex justify-center gap-4">
+                <button onClick={() => photoInput.current?.click()} className="py-2 text-sm text-white/60">
+                  ちがう写真を使う
+                </button>
+                <button onClick={() => cameraInput.current?.click()} className="py-2 text-sm text-white/60">
+                  撮りなおす
+                </button>
+              </div>
             </>
           ) : (
-            <Gold onClick={() => photoInput.current?.click()}>📷 お気に入りの自分の写真を選ぶ</Gold>
+            <>
+              <Gold onClick={() => photoInput.current?.click()}>🖼 写真を使う</Gold>
+              <Gold onClick={() => cameraInput.current?.click()}>📷 写真を撮る</Gold>
+            </>
           )}
           <button onClick={() => (setPhoto(null), setErr(null), setPhase('animal'))} className="py-2 text-sm text-white/60">
             写真を使わずに作る

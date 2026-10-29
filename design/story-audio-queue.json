@@ -478,6 +478,16 @@
       "id": "dj-practice",
       "kind": "bgm",
       "prompt": "A plain DJ practice rhythm at exactly 120 BPM: steady four-on-the-floor kick, offbeat open hi-hat, clap on 2 and 4, a simple one-note bassline, no melody, no build-ups, no breaks, perfectly even from the first bar to the last, clean mix for beatmatching. Purely instrumental — absolutely no voices, no choir, no humming, no scat, no singing, steady to the end."
+    },
+    {
+      "id": "suspect",
+      "kind": "bgm",
+      "prompt": "Suspicious, sneaky, slow background music for a comic detective-like monologue where a fox inventor reveals that a question was a trick: slow walking pizzicato double bass, muted low clarinet, soft vibraphone notes, a quiet ticking, sly and mysterious with a little humour, very slow and quiet. Instrumental only, no vocals, no singing, no lyrics. Seamless, steady, suitable as looping background music under dialogue in a Japanese anime fantasy adventure game.",
+      "settings": {
+        "settings": {
+          "instrumental": true
+        }
+      }
     }
   ],
   "listen": []

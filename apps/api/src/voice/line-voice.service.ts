@@ -84,7 +84,8 @@ export class LineVoiceService implements OnModuleInit {
       const l = nl.lines[key];
       const text = l && fillNames(l.text, body.names);
       if (!l || !text) continue;
-      const hash = createHash('sha256').update(JSON.stringify([l.who, l.act ?? '', text, l.spec, l.brief, nl.tempo, nl.model])).digest('hex').slice(0, 32);
+      // keyed by what is spoken: a reading fixed later (STORY_READINGS) voices the line again
+      const hash = createHash('sha256').update(JSON.stringify([l.who, l.act ?? '', speakText(text), l.spec, l.brief, nl.tempo, nl.model])).digest('hex').slice(0, 32);
       items.push({ key, hash, job: { userId, hash, origin, who: l.who, act: l.act, text, spec: l.spec, brief: l.brief, model: nl.model, tempo: nl.tempo } });
     }
     if (!items.length) return { voices: {}, pending: 0 };

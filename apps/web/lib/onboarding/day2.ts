@@ -111,8 +111,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '実はな、お前は、、、もう宇宙にいる。' },
   { t: 'sprite', image: null },
   { t: 'bgvideo', motion: 'd2-sky' }, // 2日目用（client 2026-10-25）：大広間の天井が夜空に溶け、金の輪をまとった地球が浮かぶ。KIMORINは手前で見上げる
-  { t: 'wait', s: 5.5 }, // 地球が出てから（client 2026-10-22; two more seconds, 2026-10-29）
+  { t: 'wait', s: 6.5 }, // 地球が出てから（client 2026-10-22; two more seconds, 2026-10-29; one more, 2026-10-29）
+  { t: 'bgm', track: null, fade: 0.8 }, // the music goes quiet for his wonder (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: '……めちゃくちゃすごい！' }, // 面の目の切れ目が、青く光る
+  { t: 'bgm', track: 'obolon' },
   { t: 'bgvideo', motion: 'd2-monban-walkin' }, // 星空の下、MONBANが入り口から歩いてきて、KIMORINの横に立つ
   { t: 'say', who: 'MONBAN', text: 'お前はObolo Orderに招待された...だから知る権利がある。' }, // MONBANが入り口から歩きながら
   { t: 'say', who: 'MONBAN', text: 'どうだ、宇宙へ行ってみるか？' }, // 長いセリフを分けた（client 2026-10-26）
@@ -186,13 +188,13 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: ['', '', 'obolon-pit'] },
   { t: 'say', who: 'OBOLON', text: 'それでは、先に月に行ってる' },
   { t: 'se', sound: 'sparkle' }, // OBOLONが光になって消える
-  { t: 'sprite', image: null },
+  { t: 'vanish', s: 2.2 }, // 神秘的に、光の粒になって薄れていく（client 2026-10-29）
   { t: 'say', who: 'KIMORIN', text: 'すごい、、全然どういう仕組みかわからん、、、。' },
   { t: 'say', who: 'KIMORIN', text: 'それでは私たちも行きましょう。。。コスモスへ！' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'MONBAN', text: '月だ' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
-  { t: 'film', id: 'launch', parts: 5 }, // 豪華映像 #3 ロケットの発射（M-R90）：扉が閉まる → 炎と白い煙 → 雲を突き抜け、空が青から黒へ → 窓の外に丸い青い地球
+  { t: 'film', id: 'launch', parts: 4 }, // the second clip lifted off again after the first (client 2026-10-29: the launch played twice) — 豪華映像 #3 ロケットの発射（M-R90）：扉が閉まる → 炎と白い煙 → 雲を突き抜け、空が青から黒へ → 窓の外に丸い青い地球
   { t: 'bgm', track: 'space' },
   { t: 'bgvideo', motion: 'd2-rocket-in' }, // ロケットの中。KIMORINが、窓の外の地球を見ている
   { t: 'say', who: 'KIMORIN', text: 'ロケット広すぎませんか？2人で乗るのもったいないですよ。' },
@@ -215,7 +217,9 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '私は、、、、、、' },
   { t: 'say', who: 'KIMORIN', text: '12回目です。' },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪　クイズ番組の正解音 → シーン……　KIMORINが、無言で、こちらをじっと見つめてくる
-  { t: 'bgm', track: 'comedy' }, // ピンポン2.5の発表
+  { t: 'bgm', track: null, fade: 0.3 },
+  // the music only 5 s after the pinpon has rung out (7 s), a little quieter (client 2026-10-29)
+  { t: 'bgm', track: 'comedy', after: 12 }, // ピンポン2.5の発表
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'still', image: 's/d2-pinpon-end' }, // the film's last frame with a mouth layer (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
@@ -229,6 +233,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: null, fade: 1.5 }, // シーン…… from here KIMORIN goes on in silence, the funnier for it (client 2026-10-29)
   { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
+  { t: 'bgm', track: 'suspect' }, // 怪しい、ゆっくりした曲（client 2026-10-29）: from 「引っかけ問題」 to 「試されていた」
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
   { t: 'sprite', image: null }, // OBOLON's eyes narrowing are on the still
   // M-R169 (§4-8, QA 9 R24): once, while KIMORIN goes on, OBOLON's eyes narrow little by little; the still stays narrowed
@@ -244,6 +249,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
+  { t: 'bgm', track: null, fade: 0.4 },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪
   { t: 'wait', s: 7.1, keepChat: true }, // the line only once the pinpon has rung out (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
@@ -275,11 +281,13 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'なれる。だが、、、最初は、いっぱい望みすぎないほうがいい。変になるから。' },
   { t: 'say', who: 'OBOLON', text: '旅を続けて、自分で魔法を使えるようになったら、、、ちょっとずつ、自分の好きな見た目に変えていく、それがいい。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、、、、じゃあ、、' },
-  // one tap each (client 2026-10-29), the one voice cut at its pauses
+  // one tap each (client 2026-10-29), the one voice cut at its pauses; no music under them (client 2026-10-29)
+  { t: 'bgm', track: null, fade: 0.6 },
   { t: 'say', who: 'KIMORIN', text: '筋肉ムキムキの、' },
   { t: 'say', who: 'KIMORIN', text: '腕80本の、' },
   { t: 'say', who: 'KIMORIN', text: 'パーティーが大好きなドラゴン！' }, // 両腕を広げる
   { t: 'say', who: 'OBOLON', text: '、、、大丈夫か？' }, // シーン……
+  { t: 'bgm', track: 'moon' },
   { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' },
   { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
   { t: 'se', sound: 'magic' },

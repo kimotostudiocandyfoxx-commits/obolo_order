@@ -118,8 +118,16 @@ export class Bgm {
 
   /** Decode a track that comes up soon, so it starts on its cue. */
   prefetch(track: string | null) {
-    if (track && this.mode === 'buffer' && this.ctx) void this.load(track).catch(() => undefined);
+    if (!track) return;
+    if (this.mode === 'buffer' && this.ctx) void this.load(track).catch(() => undefined);
+    // the <audio> way: fetch the file ahead so it starts on its cue, not after a download (client 2026-10-29: the
+    // music on the way to HQ on day 2 came in late)
+    else if (!this.warmed.has(track)) {
+      this.warmed.add(track);
+      void fetch(bgmUrl(track), { cache: 'force-cache' }).then((r) => r.blob()).catch(() => this.warmed.delete(track));
+    }
   }
+  private readonly warmed = new Set<string>();
 
   setMuted(m: boolean) {
     this.muted = m;

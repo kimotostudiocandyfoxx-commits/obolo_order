@@ -253,10 +253,14 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   const parts = layersOf(url);
   const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp$/, `-${k}.webp`) : null);
   const mouth = layer('mouth');
+  // a pose painted with the mouth open (joy, shock): a closed-mouth patch instead, shown while the voice is quiet
+  // (scripts/mouth-fix.py, client 2026-10-29)
+  const shutLayer = layer('shut');
+  const lips = mouth ?? shutLayer;
   // lip sync: the open-mouth patch follows the voice's loudness (held a moment so it does not flicker)
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    if (!talking || !mouth || !level) return setOpen(false);
+    if (!talking || !lips || !level) return setOpen(false);
     let raf = 0;
     let last = 0;
     let cur = false;
@@ -271,7 +275,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [talking, mouth, level]);
+  }, [talking, lips, level]);
   // the speaker takes the floor: a small hop (once each time this one starts speaking among others)
   const [hop, setHop] = useState(0);
   const wasLit = useRef(lit);
@@ -315,7 +319,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   return (
     <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden>
       <div key={hop} className="relative h-full" style={hop ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
-        <div className="relative h-full" style={{ ...life, ...(talking && !mouth ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
+        <div className="relative h-full" style={{ ...life, ...(talking && !lips ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
           <div key={url} className={`relative h-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim, ...(flip ? { transform: 'scaleX(-1)' } : {}) }}>
             {layer('tail') && (
               // the tail feathers sway on their own, behind the body
@@ -327,6 +331,10 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
             {mouth && (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={mouth} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ opacity: open ? 1 : 0 }} />
+            )}
+            {shutLayer && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={shutLayer} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ opacity: talking && !open ? 1 : 0 }} />
             )}
             {layer('eyes') && (
               // KIMORIN's eye slits: a glow that breathes (the sunglasses poses have none)

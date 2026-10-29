@@ -281,6 +281,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const pendingCaptions = useRef<TimedCaption[]>([]);
   const captionTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const pendingBgm = useRef<{ track: string; at: number } | null>(null);
+  const bgmLater = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(bgmLater.current), []);
   const cueDue = useRef<string | null>(null);
   const [overlayCaption, setOverlayCaption] = useState<string | null>(null);
   // the scene's thread (cleared when the scene changes: a motion, an arrival, black)
@@ -346,6 +348,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [smoke, setSmoke] = useState(0);
   const [motes, setMotes] = useState(0);
   const [talking, setTalking] = useState(false);
+  /** seconds of the 'vanish' step running (0 = none) */
+  const [vanish, setVanish] = useState(0);
   const [mix, setMix] = useState<Mix>(() => (typeof window === 'undefined' ? { bgm: 0.8, se: 0.8, voice: 1 } : loadMix()));
   const mixRef = useRef(mix);
   mixRef.current = mix;
@@ -428,8 +432,11 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         if (s.t === 'label') n++;
         else if (s.t === 'caption' && s.when && !varsRef.current[s.when]) n++;
         else if (s.t === 'bgm') {
-          if (s.track === null && s.fade) bgm.current?.fadeOut(s.fade);
-          else bgm.current?.set(s.track);
+          clearTimeout(bgmLater.current);
+          const go = () => (s.track === null && s.fade ? bgm.current?.fadeOut(s.fade) : bgm.current?.set(s.track));
+          // later: the music comes in a while after a sound has rung out (client 2026-10-29: after the pinpon)
+          if (s.after) bgmLater.current = setTimeout(go, s.after * 1000);
+          else go();
           n++;
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
@@ -559,6 +566,19 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setTicketArt(null);
           playMedia(s.motion, false);
           n++;
+        } else if (s.t === 'vanish') {
+          const sec = s.s ?? 2;
+          setVanish(sec);
+          setMotes(14);
+          setI(n);
+          const after = n + 1;
+          setTimeout(() => {
+            setSprite(null);
+            setVanish(0);
+            setMotes(0);
+            runRef.current(after);
+          }, sec * 1000);
+          return;
         } else if (s.t === 'wait') {
           setI(n);
           const after = n + 1;
@@ -919,7 +939,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     let q = i - 1;
     while (steps[q]?.t === 'label') q--;
     addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -1061,6 +1081,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
       )}
       {sprite && (
+        // a wrapper of its own so the 'vanish' step can fade the whole cast into light
+        <div className="pointer-events-none absolute inset-0 z-[4]" style={vanish ? { animation: `castVanish ${vanish}s ease-in forwards` } : undefined}>
         <Cast
           names={Array.isArray(sprite) ? sprite : [sprite]}
           src={(n) => spriteSrc(n) ?? null}
@@ -1072,6 +1094,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           react={sayReact}
           slot={spriteSlot}
         />
+        </div>
       )}
       {smoke > 0 && <Smoke key={smoke} />}
       {motes > 0 && <Motes count={motes} />}
