@@ -36,6 +36,7 @@ const stamp = (t: number) => {
 
 export function KororinVessels({
   scene,
+  own = false,
   kimorin,
   mine,
   neo,
@@ -51,6 +52,8 @@ export function KororinVessels({
   overlay,
 }: {
   scene: 'hall' | 'plaza';
+  /** after the recital the sister hands {neo} their own vessel (client 2026-10-29); before it, one big shared one */
+  own?: boolean;
   kimorin: Kororin[];
   mine: Kororin[];
   neo: string;
@@ -72,6 +75,15 @@ export function KororinVessels({
   const party = useRef<KororinPartyHandle>(null);
   const els = useRef(new Map<string, HTMLElement>());
   const [gone, setGone] = useState<Set<string>>(new Set());
+  const [size, setSize] = useState({ w: 390, h: 844 });
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }));
+    ro.observe(el);
+    setSize({ w: el.clientWidth, h: el.clientHeight });
+    return () => ro.disconnect();
+  }, []);
   // the party kit follows the one singing
   useEffect(() => {
     if (!singingId) return party.current?.place(undefined);
@@ -91,7 +103,7 @@ export function KororinVessels({
 
   // a flick up out of the top: the kororin spins away to the plaza
   const drag = useRef<{ id: string; y: number; t: number } | null>(null);
-  const ball = (k: Kororin, size: number, i: number, where: 'vessel' | 'plaza') => {
+  const ball = (k: Kororin, size: number, i: number, where: 'vessel' | 'plaza', at?: { left: number; top: number }) => {
     const sing = singingId === k.id || (oh && where === 'plaza');
     const lit = highlightId === k.id;
     const flying = gone.has(k.id) || flyingIds.includes(k.id);
@@ -119,8 +131,10 @@ export function KororinVessels({
           }
           if (Math.abs(up) < 12) onTap(k);
         }}
-        className="relative flex flex-col items-center touch-none select-none"
+        className={`${at ? 'absolute' : 'relative'} flex flex-col items-center touch-none select-none`}
         style={{
+          // the pile settles smoothly when a bowl changes (the gift of {neo}'s own vessel)
+          ...(at ? { left: at.left, top: at.top, zIndex: 5 + Math.round(at.top), transition: 'left 0.9s cubic-bezier(.3,1.3,.5,1), top 0.9s cubic-bezier(.3,1.3,.5,1)' } : {}),
           animation: flying ? `kvFly 0.9s cubic-bezier(.3,.1,.7,1) ${flyingIds.includes(k.id) ? flyingIds.indexOf(k.id) * 0.35 : 0}s forwards` : where === 'plaza' ? `kvLand 0.7s cubic-bezier(.2,1.4,.4,1) ${i * 0.05}s both` : 'kvRoll 0.8s cubic-bezier(.2,1.2,.4,1) both',
         }}
         aria-label={`${k.name}のコロリン`}
@@ -134,23 +148,59 @@ export function KororinVessels({
     );
   };
 
-  const vessel = (name: string, list: Kororin[], side: 'left' | 'right') => (
-    <div className={`absolute bottom-[calc(10%+env(safe-area-inset-bottom))] w-[47%] ${side === 'left' ? 'left-[1.5%]' : 'right-[1.5%]'}`}>
-      <div className="relative w-full" style={{ aspectRatio: '620 / 424' }}>
-        {/* the bowl behind, the kororins in it (three to a row, newest on top), the bowl's front wall over their lower half */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={VESSEL} alt="" draggable={false} className="pointer-events-none absolute inset-0 z-[1] h-full w-full" />
-        <div className="absolute inset-x-[10%] bottom-[50%] z-[2] flex flex-wrap-reverse items-end justify-center gap-x-0.5">
-          {list.map((k, i) => ball(k, list.length > 6 ? 38 : 50, i, 'vessel'))}
-        </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={VESSEL} alt="" draggable={false} className="pointer-events-none absolute inset-0 z-[3] h-full w-full [clip-path:inset(40%_0_0_0)]" />
-      </div>
-      <p className="mt-1 text-center">
-        <span className="rounded-full border border-amber-200/70 bg-[rgba(60,30,80,0.75)] px-3 py-0.5 text-[12px] font-bold tracking-wider text-amber-50 shadow">{name}</span>
-      </p>
-    </div>
-  );
+  /**
+   * A big round bowl like a pile of tsum-tsum (client 2026-10-29): its glossy rim curves down across the screen and the
+   * kororins pile up on it, the first ones in the middle at the bottom, each row a little wider.
+   */
+  const bowl = (list: Kororin[], box2: { x: number; y: number; w: number; h: number }, label: string | null, key: string) => {
+    const s0 = Math.min(64, box2.w / 6.2);
+    const curve = (xn: number) => box2.y + box2.h * ((10 + 100 * xn * (1 - xn)) / 60);
+    const placed: { k: Kororin; left: number; top: number }[] = [];
+    let row = 0;
+    let slot = 0;
+    for (const k of list) {
+      const cap = 3 + row;
+      const xc = box2.x + box2.w / 2 + (slot - (cap - 1) / 2) * s0 * 0.98;
+      const bottom = curve(Math.min(0.97, Math.max(0.03, (xc - box2.x) / box2.w))) - row * s0 * 0.8 - 4;
+      placed.push({ k, left: xc - s0 / 2, top: bottom - s0 });
+      slot++;
+      if (slot >= cap) {
+        row++;
+        slot = 0;
+      }
+    }
+    const gid = `bowl-${key}`;
+    return (
+      <>
+        <svg className="pointer-events-none absolute" style={{ left: box2.x, top: box2.y, width: box2.w, height: box2.h }} viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden>
+          <defs>
+            <linearGradient id={`${gid}-body`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#f6d9ff" />
+              <stop offset="0.45" stopColor="#c99af0" />
+              <stop offset="1" stopColor="#7e4fc0" />
+            </linearGradient>
+            <linearGradient id={`${gid}-rim`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="1" stopColor="#ffb3dc" />
+            </linearGradient>
+          </defs>
+          {/* the inside curve on top, a round underside below (a real bowl, also when small) */}
+          <path d="M0,10 Q50,60 100,10 C100,44 82,60 50,60 C18,60 0,44 0,10 Z" fill={`url(#${gid}-body)`} />
+          {/* a soft shine inside the curve, and the glossy rim along it */}
+          <path d="M6,16 Q50,54 94,16" fill="none" stroke="#ffffff" strokeOpacity="0.35" strokeWidth="2.2" strokeLinecap="round" />
+          <path d="M0,10 Q50,60 100,10" fill="none" stroke={`url(#${gid}-rim)`} strokeWidth="3.4" strokeLinecap="round" />
+        </svg>
+        {placed.map((p, n) => ball(p.k, s0, n, 'vessel', { left: p.left, top: p.top }))}
+        {label && (
+          <p className="pointer-events-none absolute z-[60] text-center" style={{ left: box2.x, width: box2.w, top: box2.y + box2.h * 0.66 }}>
+            <span className="rounded-full border border-white/70 bg-[rgba(90,40,140,0.7)] px-3 py-0.5 text-[12px] font-bold tracking-wider text-white shadow">{label}</span>
+          </p>
+        )}
+      </>
+    );
+  };
+  const W = size.w;
+  const H = size.h;
 
   return (
     <div ref={box} className="absolute inset-0 overflow-hidden bg-gradient-to-b from-[#b9a4e8] via-[#f2b9d6] to-[#ffd9b8]">
@@ -158,10 +208,16 @@ export function KororinVessels({
       <img key={scene} src={scene === 'hall' ? HALL : PLAZA} alt="" draggable={false} className="pointer-events-none absolute inset-0 h-full w-full animate-[fadeUp_0.8s_ease-out] object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
       <KororinPartySky on={partyOn} />
       {scene === 'hall' ? (
-        <>
-          {vessel('KIMORIN⭐︎', kimorin, 'left')}
-          {vessel(neo, mine, 'right')}
-        </>
+        own ? (
+          <>
+            {/* {neo}'s own vessel, the sister's present; KIMORIN⭐︎'s three in his, small, up on the left */}
+            {bowl(mine, { x: -W * 0.08, y: H * 0.6, w: W * 1.16, h: H * 0.42 }, `${neo}の器`, 'mine')}
+            {bowl(kimorin, { x: W * 0.02, y: H * 0.42, w: W * 0.44, h: H * 0.14 }, 'KIMORIN⭐︎', 'kimorin')}
+          </>
+        ) : (
+          // one big bowl the two share until the recital is over
+          bowl([...kimorin, ...mine].sort((a, b) => a.at - b.at), { x: -W * 0.08, y: H * 0.6, w: W * 1.16, h: H * 0.42 }, null, 'shared')
+        )
       ) : (
         // the plaza: the kororins that flew here, scattered over the round cobbles
         <div className="absolute inset-x-[4%] bottom-[calc(12%+env(safe-area-inset-bottom))] top-[52%] flex flex-wrap content-end items-end justify-center gap-x-2 gap-y-1">

@@ -41,6 +41,8 @@ type Beat =
   | { k: 'kimFly' }
   /** {neo} flicks any of theirs up (or 〔今はいい〕) */
   | { k: 'fly' }
+  /** after the recital the sister hands {neo} their own vessel (client 2026-10-29) */
+  | { k: 'gift' }
   /** out of the temple to the plaza (the luxury cut to come: the gate, the plaza at dusk) */
   | { k: 'plaza' }
   /** the sister and the brother throw one each onto the plaza */
@@ -96,6 +98,10 @@ const BEATS: Beat[] = [
   { k: 'drop', text: K3, sing: true },
   { k: 'say', who: 'brother', text: '{neo}の番だZE。なんでもいいZE!!' },
   { k: 'rec', n: 3 },
+  // the recital is over: {neo}'s own vessel, from the sister (client 2026-10-29)
+  { k: 'say', who: 'sister', text: '{neo}に、これをあげるワ。{neo}だけの器だワ。' },
+  { k: 'gift' },
+  { k: 'say', who: 'sister', text: '{neo}のコロリンは、これから、ここにたまっていくワ。' },
   { k: 'say', who: 'brother', text: '自分で思ったことや、感じたこと、思いついたことは、全部コロリンにしちゃえ。それは全部、大切な思い出だZE。' },
   { k: 'say', who: 'brother', text: '器のコロリンは、ずっと残るZE。だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
   { k: 'note', text: 'コロリンは、あなたの器に、日付と時刻つきで残ります。器のコロリンを続けてタップすると、順番に歌って、つながります。コロリンは、いつでも作れます' },
@@ -310,6 +316,7 @@ export function SaturnLesson({
   const [scene, setScene] = useState<'hall' | 'plaza'>('hall');
   const [singingId, setSingingId] = useState<string | null>(null);
   const [oh, setOh] = useState(false);
+  const [own, setOwn] = useState(false);
   const [flown, setFlown] = useState(0);
   const [normal, setNormal] = useState<{ blob: Blob; text: string } | null>(null);
   const [agreed, setAgreed] = useState(false);
@@ -477,6 +484,10 @@ export function SaturnLesson({
         if (beat.sing) setTimeout(() => void singThenNext(k, at), 900);
         else setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1100);
       });
+    }
+    if (beat.k === 'gift') {
+      setOwn(true);
+      setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1600);
     }
     if (beat.k === 'kimFly') {
       setFlyingIds(kimorinK.map((k) => k.id));
@@ -663,6 +674,7 @@ export function SaturnLesson({
     <div className="fixed inset-0 z-[150]" style={{ animation: 'lessonWorld 1.3s linear both' }}>
       <KororinVessels
         scene={scene}
+        own={own}
         kimorin={kimorinK}
         mine={mineK}
         neo={neo}
