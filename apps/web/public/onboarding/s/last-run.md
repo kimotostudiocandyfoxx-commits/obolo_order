@@ -1,4 +1,6 @@
-# UI art — 2026-10-28T12:50:49.337Z
+# UI art — 2026-10-29T00:22:09.113Z
 
-Seedream 5.0 Pro / 0枚 / 約0円
+Seedream 5.0 Pro / 2枚 / 約8円
 
+- ✅ d2-kimorin-pin-a
+- ✅ d2-kimorin-pin-b

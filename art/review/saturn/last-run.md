@@ -1,107 +1,24 @@
-# UI art — 2026-10-28T13:05:07.065Z
+# UI art — 2026-10-29T00:30:26.927Z
 
-Seedream 5.0 Pro / 103枚 / 約44円
+Seedream 5.0 Pro / 20枚 / 約46円
 
-- ⏸ V02/K10-r2a: 元の絵ができなかったので次回
-- ⏸ V02/K10-r2b: 元の絵ができなかったので次回
-- ⏸ V05/K3-a: 元の絵ができなかったので次回
-- ⏸ V05/K3-b: 元の絵ができなかったので次回
-- ⏸ V05/K3-c: 元の絵ができなかったので次回
-- ⏸ V05/K5-a: 元の絵ができなかったので次回
-- ⏸ V05/K5-b: 元の絵ができなかったので次回
-- ⏸ V05/K5-c: 元の絵ができなかったので次回
-- ⏸ V05/K7-a: 元の絵ができなかったので次回
-- ⏸ V05/K7-b: 元の絵ができなかったので次回
-- ⏸ V05/K7-c: 元の絵ができなかったので次回
-- ⏸ V06/K2-a: 元の絵ができなかったので次回
-- ⏸ V06/K2-b: 元の絵ができなかったので次回
-- ⏸ V06/K2-c: 元の絵ができなかったので次回
-- ⏸ V06/K3-a: 元の絵ができなかったので次回
-- ⏸ V06/K3-b: 元の絵ができなかったので次回
-- ⏸ V06/K3-c: 元の絵ができなかったので次回
-- ⏸ V06/K4-a: 元の絵ができなかったので次回
-- ⏸ V06/K4-b: 元の絵ができなかったので次回
-- ⏸ V06/K4-c: 元の絵ができなかったので次回
-- ⏸ V06/K5-a: 元の絵ができなかったので次回
-- ⏸ V06/K5-b: 元の絵ができなかったので次回
-- ⏸ V06/K5-c: 元の絵ができなかったので次回
-- ⏸ V19/K2-c: 元の絵ができなかったので次回
-- ✅ V06/K11-b
-- ✅ V19/K3-c
-- ✅ stills/d2-egg-earth-pair-b
-- ✅ stills/d2-egg-sun-pair-a
-- ✅ stills/d3-obolon-listen-a
-- ✅ stills/d3-obolon-listen-b
-- ✅ stills/saturn-night-a
-- ✅ stills/saturn-night-b
-- ✅ stills/saturn-octopus-point-a
-- ✅ stills/saturn-octopus-point-b
-- ✅ stills/saturn-octopus-point-c
-- ✅ stills/saturn-outside-b
-- ✅ stills/saturn-outside-c
-- ✅ stills/saturn-sleep-a
-- ❌ V01/K17-r2a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V02/K1-r2b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V02/K12-r2a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V02/K12-r2b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V02/K9-r2a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V02/MASTER-r2b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V05/K2-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K2-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K2-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K4-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K4-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K4-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K6-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K6-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V05/K6-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V06/K1-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K1-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K1-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K10-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K10-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K10-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K11-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K11-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V06/K6-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K6-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K6-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K7-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K7-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K7-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K8-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K8-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K8-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K9-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K9-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V06/K9-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V11/K1b-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K1b-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K1b-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K2-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K2-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K2-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K3-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K3-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K3-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K4-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K4-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K4-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K5-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K5-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V11/K5-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.194 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ V19/K1-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V19/K2-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V19/K2-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ V19/K3-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ V19/K4-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V19/K4-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ V19/K4-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.4925 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
-- ❌ stills/d2-egg-earth-pair-a: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 2.587 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ stills/d2-egg-earth-pair-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
-- ❌ stills/d2-egg-sun-pair-b: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 2.587 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ stills/d2-egg-sun-pair-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 2.587 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
-- ❌ stills/saturn-night-c: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ stills/saturn-outside-a: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ stills/saturn-sleep-b: Error: 504 [{"code":"failedTaskTimeout","message":"Task processing timeout. Results were not received within the expected time window. Please try again later."}]
-- ❌ stills/saturn-sleep-c: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 1.99 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInferen
+- ✅ V01/K17-r3a
+- ✅ V01/K17-r3b
+- ✅ V02/K1-r3a
+- ✅ V02/K10-r3a
+- ✅ V02/K10-r3b
+- ✅ V02/K12-r3a
+- ✅ V02/K12-r3b
+- ✅ V02/K14-r3a
+- ✅ V02/K14-r3b
+- ✅ V02/K9-r3a
+- ✅ V02/K9-r3b
+- ✅ V06/K11-r3a
+- ✅ V06/K11-r3b
+- ✅ V19/K2-r3a
+- ✅ V19/K2-r3b
+- ✅ V19/K4-r3a
+- ✅ V19/K4-r3b
+- ✅ V19/K4-r3c
+- ✅ sheets/rocket-side-r3a
+- ❌ V02/K1-r3b: TypeError: Failed to parse URL from undefined
