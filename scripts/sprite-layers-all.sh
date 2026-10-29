@@ -11,7 +11,8 @@ args_for() {
     kaiser1-x-*) echo "--no-eyes --face 0.22,0.58" ;;
     unchi-pinpon-x-*) echo "--face 0.4,0.8" ;;
     kimorin-i-* | kimorin-xs-*) echo "--no-eyes" ;;
-    kimorin-*) echo "" ;;
+    # the eye glow from the pose itself (M-R177: the -glow edits had redrawn the face)
+    kimorin-*) echo "--eyes-from-base" ;;
     *) echo "--no-eyes" ;;
   esac
 }

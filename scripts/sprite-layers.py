@@ -5,7 +5,9 @@
   <stem>-tail.webp   the tail feathers alone (they sway)
   <stem>-mouth.webp  only the pixels of the open mouth   (from <stem>-o.jpg; laid over while speaking)
   <stem>-eyes.webp   the eye slits glowing brighter (from <stem>-glow.jpg; laid over, breathing; not for sunglasses on)
-Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--face 0.4,0.75]
+Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--eyes-from-base] [--face 0.4,0.75]
+(--eyes-from-base: the eye glow is cut from the pose itself — its bright cyan eye arcs — not from <stem>-glow.jpg,
+whose edit had redrawn KIMORIN's face: slanted black-rimmed eyes, extra forehead lines, a nose. M-R177)
 (--face: where the face is, as fractions of the figure's height; default the top 42%)
 The paintings are on flat #808080; the open-mouth and tail-less ones were edited from the closed one, so
 they line up; the mouth patch keeps only the changed pixels around the face (no flicker elsewhere)."""
@@ -144,7 +146,19 @@ if op is not None:
         save(f'{stem}-mouth', op.astype(np.float32), mask)
 
 # the eye slits: what a copy with only the slits glowing brighter changed (<stem>-glow.jpg) → a soft glow layer
-gl = None if no_eyes else load(f'{stem}-glow')
+eyes_from_base = '--eyes-from-base' in sys.argv
+if not no_eyes and eyes_from_base:
+    # the pose's own eye arcs (light cyan, the only such pixels in the face), brightened: the face stays as painted
+    face_y0, face_y1 = int(ys.min() + (ys.max() - ys.min()) * FACE[0]), int(ys.min() + (ys.max() - ys.min()) * FACE[1])
+    R, G, B = base[..., 0], base[..., 1], base[..., 2]
+    eye = np.zeros((h, w), bool)
+    eye[face_y0:face_y1] = ((G > 185) & (B > 215) & (R < 215) & ((B - R) > 30))[face_y0:face_y1]
+    if eye.sum() > 20:
+        glow = Image.fromarray((eye * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.GaussianBlur(2.2))
+        ga = np.asarray(glow).astype(np.float32) / 255
+        lit = rgb * 0.55 + np.array([210, 248, 255], np.float32) * 0.45
+        save(f'{stem}-eyes', lit, np.clip(ga * 1.4, 0, 1) * al)
+gl = None if no_eyes or eyes_from_base else load(f'{stem}-glow')
 if gl is not None:
     diff = np.abs(gl - base).max(axis=2)
     face_y0, face_y1 = int(ys.min() + (ys.max() - ys.min()) * FACE[0]), int(ys.min() + (ys.max() - ys.min()) * FACE[1])

@@ -104,6 +104,8 @@ export function KororinVessels({
         }}
         onPointerDown={(e) => {
           drag.current = { id: k.id, y: e.clientY, t: Date.now() };
+          // the release comes back here even far above the ball (a flick ends off it)
+          e.currentTarget.setPointerCapture?.(e.pointerId);
         }}
         onPointerUp={(e) => {
           const d = drag.current;
