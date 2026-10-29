@@ -4,12 +4,16 @@ Luxury cuts to Saturn (story chat's 土星まで_豪華カット台本.md, 2026-
 design/review-art-queue.json — N candidates per keyframe, painted by .github/workflows/ui-art.yml into
 art/review/saturn/<V>/<K>-a.jpg … for the story chat and the client to pick.
 
-  python3 scripts/review-art/make-queue.py <cuts.md> V01,V02 [candidates=3]
+  python3 scripts/review-art/make-queue.py <cuts.md> V01,V02 [candidates=3] [--append]
+
+--append (2026-10-29): adds the videos' keys to the queue as it is, keeping every picture already painted; a key
+not painted yet gets the new text. The first references show what to draw (review 3), the style pictures follow.
 """
 import json, re, sys
 
 src, videos = sys.argv[1], sys.argv[2].split(',')
-n = int(sys.argv[3]) if len(sys.argv) > 3 else 3
+n = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else 3
+APPEND = '--append' in sys.argv
 md = open(src, encoding='utf8').read()
 
 def block(start, end):
@@ -22,6 +26,8 @@ STYLE = block('### 0-2. 絵柄の固定文（すべての止め絵の頭につ�
 STYLE_EMPTY = re.sub(r';\s*characters in a semi-realistic[^.]*\.', '.', STYLE) + ' No people, no characters, no creatures, no figures anywhere.'
 CAST_WORDS = re.compile(r'\[(KIMORIN|MONBAN|OBOLON|BROTHER|SISTER|UNPON|KORORIN)|KIMORIN|MONBAN|OBOLON|silhouette|hand|figure|person|crane', re.I)
 GUARD = 'Use the reference pictures for their art style only, never their content: no people, no characters, no figures, no silhouettes unless they are described here.'
+# review 3: the first references show what to draw; only the style pictures are for the style
+CONTENT = 'The first reference pictures show the exact characters, places and objects to draw: keep their shapes, colours and design. The last reference pictures (the temple and the gate) are for the art style only: copy nothing from them.'
 PHOTO = re.search(r'```\n(PHOTO:.*?)\n```', md, re.S).group(1).strip()
 # 'tiny and seen only from behind' called people in (review 1): none at all
 PHOTO = re.sub(r'any people are tiny[^.]*\.', 'No people at all.', PHOTO)
@@ -40,16 +46,18 @@ R = 'design/story/refs/'
 STYLE_REFS = [R + 'style-obolon-temple.jpg', R + 'style-gate.jpg']
 CAST_REFS = {
     # the reference sheet first; not kimorin-face-eyes (red hood, sunglasses, glowing eyes) for the lab-coat keys (review 1)
-    'KIMORIN-LAB': ['art/review/saturn/sheets/kimorin-lab-c.jpg', UI + 'kimorin-i-joy.webp'],
+    'KIMORIN-LAB': ['art/review/saturn/sheets/kimorin-lab-r1b.jpg', UI + 'kimorin-i-joy.webp'],
     'KIMORIN-ROBE': [R + 'story/cast/kimorin-entrance.webp', UI + 'kimorin-xs-talk.webp'],
-    'KIMORIN-DRAGON': [R + 'story/cast/kimorin-dragon.webp', UI + 's/kimorin-dragon.jpg'],
+    # the approved sheet (review 3: the dragon in the red hooded robe, M-R171)
+    'KIMORIN-DRAGON': ['art/review/saturn/sheets/dragon-robe-r2a.jpg', R + 'story/cast/kimorin-dragon.webp'],
     'MONBAN': [R + 'story/cast/monban.jpg'],
     'OBOLON': [R + 'story/cast/obolon.jpg'],
     'BROTHER': [R + 'story/cast/takoyaki-brother.jpg'],
     'SISTER': [R + 'story/cast/takoyaki-sister.jpg'],
     'UNPON': [R + 'story/cast/unchi-pinpon-kun.webp'],
     'KORORIN-K': [UI + 's/kororin-kimorin80.jpg'],
-    'ROCKET': [R + 'story/places/rocket.jpg'],
+    # the approved front view first (review 3), then the client's art
+    'ROCKET': ['art/review/saturn/sheets/rocket-r2-front.jpg', R + 'story/places/rocket.jpg'],
 }
 PLACE_REFS = {
     'V01': [], 'V02': [R + 'story/places/headquarters-gate.webp', UI + 's/d2-gate-inside.jpg'],
@@ -57,6 +65,8 @@ PLACE_REFS = {
     'V04': [R + 'story/places/moon-temple-inside.jpg'], 'V10': [R + 'story/places/moon-temple-aerial-1.jpg'],
     'V05': [R + 'story/places/headquarters-gate.webp'], 'V06': [R + 'story/places/earth-temple-hall.jpg'],
     'V08': [R + 'story/places/saturn-temple-aerial.jpg'], 'V11': [R + 'story/places/headquarters-gate.webp'],
+    'V07': [R + 'story/props/egg-earth-moon.jpg', R + 'story/props/egg-sun-moon.jpg', R + 'story/places/moon-temple-inside.jpg'],
+    'V19': [R + 'story/places/moon-temple-inside.jpg'],
 }
 
 def expand(p):
@@ -69,7 +79,7 @@ items = []
 for v in videos:
     sec = re.search(r'^### ' + re.escape(v) + r' .*?(?=^### |\Z)', md, re.S | re.M).group(0)
     prev = None
-    for k in re.finditer(r'^- \*\*(K\d+[a-z]?)\*\*(.*?)\n\s+`((?:PHOTO|STYLE)[^`]*)`(.*)$', sec, re.M):
+    for k in re.finditer(r'^- \*\*([AK]\d+[a-z]?)\*\*(.*?)[`\n]\s*`?((?:PHOTO|STYLE)[^`]*)`(.*)$', sec, re.M):
         kid, note, prompt, tail = k.group(1), k.group(2), k.group(3), k.group(4)
         # 「同じ画角」: the end frame is an edit of the start frame of the same candidate (a pair that matches)
         same = re.match(r'^(PHOTO|STYLE)( \([^)]*\))? \+ (The s|S)ame\b', prompt) and prev
@@ -81,19 +91,28 @@ for v in videos:
         for name, rs in CAST_REFS.items():
             if f'[{name}' in prompt:
                 refs += rs
+        if APPEND and not photo:
+            # content first, the style pictures last
+            refs = [r for r in refs if r not in STYLE_REFS] + list(STYLE_REFS)
         if 'envelope' in body:
             refs.append(R + 'story/props/envelope.webp')
         if 'hooded silhouette' in body:
             refs.append(R + 'story/cast/monban.jpg')
         head = PHOTO if photo else (STYLE if CAST_WORDS.search(prompt) else STYLE_EMPTY)
-        for c in 'abcdefgh'[:n]:
-            if same:
-                edit = f'art/review/saturn/{v}/{base}-{c}.jpg'
-                rs = [edit] + [r for r in refs if r not in STYLE_REFS and r not in PLACE_REFS.get(v, [])]
-                text = 'Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — ' + body
-                items.append({'id': f'{v}/{kid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(rs))[:6], 'prompt': f'{text} No text, no letters, no logos.'[:2990]})
-            else:
-                items.append({'id': f'{v}/{kid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(refs))[:6], 'prompt': (f'{head} {body}' if photo else f'{head} {GUARD} {body}')[:2990]})
+        # V07: the two eggs, each key twice (-S sun and moon, -E Earth and moon); K0, the white light, once
+        variants = [('', None)] if v != 'V07' or kid == 'K0' else [('S', 'a blazing sun and a white cratered moon'), ('E', 'the blue Earth and a white moon')]
+        for var, egg in variants:
+          vrefs = refs if not egg else [R + ('story/props/egg-sun-moon.jpg' if var == 'S' else 'story/props/egg-earth-moon.jpg')] + [r for r in refs if 'story/props/egg-' not in r]
+          vbody = body if not egg else re.sub(r'\[[^\]]*/[^\]]*\]', egg, body)
+          vkid, vbase = kid + var, (base + var if base else base)
+          for c in 'abcdefgh'[:n]:
+                if same:
+                    edit = f'art/review/saturn/{v}/{vbase}-{c}.jpg'
+                    rs = [edit] + [r for r in vrefs if r not in STYLE_REFS and r not in PLACE_REFS.get(v, [])]
+                    text = 'Edit the first picture: keep the place, camera, framing, light, style and every character exactly the same, and change only this — ' + vbody
+                    items.append({'id': f'{v}/{vkid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(rs))[:6], 'prompt': f'{text} No text, no letters, no logos.'[:2990]})
+                else:
+                    items.append({'id': f'{v}/{vkid}-{c}', 'w': 1152, 'h': 2048, 'size': [720, 1280], 'refs': list(dict.fromkeys(vrefs))[:6], 'prompt': (f'{head} {vbody}' if photo else f'{head} {CONTENT if APPEND and any(r not in STYLE_REFS for r in vrefs) else GUARD} {vbody}')[:2990]})
 
 # reference sheets the cut script asks for before the cuts (0-3): grey background, front / side / back, for the client's OK
 GREY = 'Character reference sheet on a flat plain mid-grey background (#808080): the same character shown three times side by side — front view, side view, back view — full body, standing straight, even studio light, no shadow on the background. No text, no letters, no labels.'
@@ -106,6 +125,18 @@ if '--sheets' in sys.argv:
         for c in 'abc':
             items.append({'id': f'{sid}-{c}', 'w': 2048, 'h': 1152, 'size': [1280, 720], 'refs': refs, 'prompt': prompt[:2990]})
 
+if APPEND:
+    import os
+    q = json.load(open('design/review-art-queue.json', encoding='utf8'))
+    done = lambda i: os.path.exists(f"art/review/saturn/{i}.jpg")
+    mine = {x['id'] for x in items}
+    # a key of these videos not painted yet is replaced by the new text (or dropped, past the new number of takes)
+    keep = [x for x in q['items'] if done(x['id']) or not any(x['id'].startswith(f'{v}/') for v in videos)]
+    have = {x['id'] for x in keep}
+    q['items'] = keep + [x for x in items if x['id'] not in have]
+    json.dump(q, open('design/review-art-queue.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+    print(len([x for x in items if x['id'] not in have]), 'pictures to paint')
+    sys.exit(0)
 json.dump({'note': '土星まで_豪華カット台本 のキーフレーム候補（止め絵）。art/review/saturn/<映像>/<キー>-a.jpg…。台本チャットと利用者が選ぶ。描き直しは redo に id を足す', 'dir': '../../../art/review/saturn', 'always': '', 'items': items, 'redo': []},
           open('design/review-art-queue.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 print(len(items), 'pictures')

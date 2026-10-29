@@ -27,18 +27,39 @@ mkdirSync(OUT, { recursive: true });
 const redo = new Set(queue.redo ?? []);
 // at most MAX_PICTURES a run (default 20): a big batch while Runware's balance is low gets refused for the reserved
 // credit (concurrentRequestLimitExceeded, 2026-10-28); the rest stays for the next run
-const todo = queue.items.filter((x) => redo.has(x.id) || !existsSync(join(OUT, `${x.id}.jpg`))).slice(0, Number(process.env.MAX_PICTURES ?? 20));
+const todo = queue.items.filter((x) => redo.has(x.id) || !existsSync(join(OUT, `${x.id}.jpg`))).slice(0, Number(process.env.MAX_PICTURES ?? 40));
 
 const refsOf = (x) => (x.refs ?? queue.refs ?? []).filter(existsSync);
 
+// a picture still being made: ask for it by its task until it is there (the answer came with no picture and
+// "processing" — 2026-10-29: about half a run failed as "Failed to parse URL from undefined")
+async function waitFor(taskUUID) {
+  for (let k = 0; k < 36; k++) {
+    await new Promise((r) => setTimeout(r, 5000));
+    const res = await fetch('https://api.runware.ai/v1', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${KEY}` },
+      body: JSON.stringify([{ taskType: 'getResponse', taskUUID }]),
+      signal: AbortSignal.timeout(60_000),
+    });
+    const j = await res.json().catch(() => ({}));
+    if (j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors).slice(0, 300)}`);
+    const d = (j.data ?? []).find((r) => r.taskUUID === taskUUID);
+    if (d?.status === 'error') throw new Error(JSON.stringify(d).slice(0, 300));
+    if (d?.imageURL) return d;
+  }
+  throw new Error('the picture did not come back in time (Timeout)');
+}
+
 async function paint(x) {
+  const taskUUID = randomUUID();
   const res = await fetch('https://api.runware.ai/v1', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${KEY}` },
     body: JSON.stringify([
       {
         taskType: 'imageInference',
-        taskUUID: randomUUID(),
+        taskUUID,
         model: 'bytedance:seedream@5.0-pro',
         // always: false — a picture that edits its first ref (the place kept exactly) skips the queue's style line
         positivePrompt: `${x.prompt} ${x.always === false ? '' : (queue.always ?? '')}`.slice(0, 3000),
@@ -57,7 +78,7 @@ async function paint(x) {
   // the service sometimes answers 500 with the finished picture in it (2026-10-26): take the picture
   const got = !j.errors?.length && j.data?.[0]?.imageURL;
   if ((!res.ok && !got) || j.errors?.length) throw new Error(`${res.status} ${JSON.stringify(j.errors ?? j).slice(0, 300)}`);
-  const d = j.data?.[0];
+  const d = j.data?.[0]?.imageURL ? j.data[0] : await waitFor(taskUUID);
   // an id may hold a folder (art/review: V01/K01-a)
   mkdirSync(dirname(join(OUT, x.id)), { recursive: true });
   const raw = join(OUT, `${x.id}.raw.jpg`);
