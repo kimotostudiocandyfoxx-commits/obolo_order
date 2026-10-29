@@ -111,7 +111,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       // on 「水盤が描いている」); a making that failed costs no mana (the server refunds it)
       const r = await Promise.race([
         api.candidates(body),
-        new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), 120_000)),
+        new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), 180_000)),
       ]);
       // let the basin scene play out (KIMORIN's whisper, the splash, OBOLON's line)
       await new Promise((ok) => setTimeout(ok, Math.max(0, 5200 - (Date.now() - started))));
@@ -135,7 +135,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     setErr(null);
     setPhase('making');
     try {
-      const r = await within(api.refine(sel.id, instruction.trim()), 120_000);
+      const r = await within(api.refine(sel.id, instruction.trim()), 180_000);
       if (r.candidates.length) {
         save({ ...draft, cands: r.candidates, refined: true, prev: draft.cands });
         setSel(null);

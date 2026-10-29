@@ -76,10 +76,10 @@ const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '..
  */
 async function settleWithRetry<T>(n: number, paint: (i: number) => Promise<T>): Promise<PromiseSettledResult<T>[]> {
   const t0 = Date.now();
-  const first = await Promise.allSettled(Array.from({ length: n }, (_, i) => paint(i)));
-  // the second try only while it still fits in the visitor's wait (2026-10-29: about a minute in all, then the screen says so)
-  if (Date.now() - t0 > 25_000) return first;
-  return Promise.all(first.map((r, i) => (r.status === 'fulfilled' ? r : Promise.allSettled([paint(i)]).then(([again]) => again))));
+  // a picture that failed is painted again at once, without waiting for the others, while a second try still fits in
+  // the visitor's wait (the screen waits 180 s; one try is at most 70 s) — story chat 2026-10-29
+  const one = (i: number): Promise<T> => paint(i).catch((e: unknown) => (Date.now() - t0 < 95_000 ? paint(i) : Promise.reject(e)));
+  return Promise.allSettled(Array.from({ length: n }, (_, i) => one(i)));
 }
 
 @Injectable()
