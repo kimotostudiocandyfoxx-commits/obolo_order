@@ -145,7 +145,7 @@ export type Step =
    * Several buttons. The answer is saved under `key`; `goto` jumps to a label. `prompt` is shown above
    * the buttons (a confirmation, e.g. "この姿と名前を…保存します").
    */
-  | { t: 'choice'; key: string; options: { label: string; goto?: string }[]; prompt?: string; /** answered by voice (big 〔🎙〕, ⌨ in the corner: M-R169) */ voice?: boolean }
+  | { t: 'choice'; key: string; options: { label: string; goto?: string }[]; prompt?: string; /** answered by voice (big 〔🎙〕, ⌨ in the corner: M-R169) */ voice?: boolean; /** answered by tapping a picture of each option (the eggs: client 2026-10-29) */ pics?: string[] }
   /** Name input (Day 1: creates the account from the invitation). */
   | { t: 'name'; placeholder: string; submit: string }
   /** Day 1: how many times you went round the Sun (age, optional). 「言わない」 jumps to `skip`. Saved as answers.age. */

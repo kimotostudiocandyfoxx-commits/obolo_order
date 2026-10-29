@@ -110,7 +110,7 @@ interface Props {
   /** 'pause' step: the day stops here (progress already points at the question to come back to). */
   onPause?: () => void;
   onEnd: (answers: Record<string, string>) => void;
-  /** Day 1 until Saturn: answers are typed, no mic (M-R41) */
+  /** answers typed, no mic: day 1 only now (M-R41; client 2026-10-29: from the Moon on, the mic comes first) */
   textOnly?: boolean;
   /** straight on from a tap that already woke the sound (the second journey's next chapter): no start screen */
   autoStart?: boolean;
@@ -1105,7 +1105,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <DialogueWindow>{fill(step.prompt, v)}</DialogueWindow>
         </div>
       )}
-      {started && step?.t === 'choice' && !step.voice && (
+      {started && step?.t === 'choice' && step.pics && (
+        <TapPick
+          key={i}
+          pics={step.pics}
+          labels={step.options.map((o) => o.label)}
+          onPick={(k) => {
+            addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
+            choose(step.key, step.options[k].label, step.options[k].goto);
+          }}
+        />
+      )}
+      {started && step?.t === 'choice' && !step.voice && !step.pics && (
         <ReplyChips
           key={i}
           options={step.options.map((o) => o.label)}
@@ -1585,6 +1596,44 @@ function MotionPlaceholder({ motion }: { motion: MotionId }) {
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,#2a2140_0%,#07060d_70%)]">
       <div className="starfield" aria-hidden />
       <span className="sr-only">{motion}</span>
+    </div>
+  );
+}
+
+/** A choice made by tapping the thing itself (the two eggs on the altar: client 2026-10-29): they float over the
+ *  darkened scene; the tapped one lights up and the other fades, then the story goes on. */
+function TapPick({ pics, labels, onPick }: { pics: string[]; labels: string[]; onPick: (k: number) => void }) {
+  const [picked, setPicked] = useState<number | null>(null);
+  const pick = (k: number) => {
+    if (picked !== null) return;
+    setPicked(k);
+    setTimeout(() => onPick(k), 900);
+  };
+  return (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/45 px-4 animate-[fadeUp_0.5s_ease-out]">
+      <div className="flex w-full max-w-md items-end justify-center gap-4">
+        {pics.map((src, k) => (
+          <button
+            key={src}
+            onClick={() => pick(k)}
+            aria-label={labels[k]}
+            className="flex w-1/2 flex-col items-center transition-all duration-500"
+            style={{ opacity: picked === null || picked === k ? 1 : 0.15, transform: picked === k ? 'scale(1.12)' : undefined }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt=""
+              className={`w-full drop-shadow-[0_0_24px_rgba(255,220,150,0.45)] ${picked === k ? 'brightness-125 drop-shadow-[0_0_40px_rgba(255,230,170,0.95)]' : ''}`}
+              style={{ animation: picked === null ? `islandBob 3.2s ${k * 0.6}s ease-in-out infinite` : undefined }}
+            />
+            <span className="mt-2 text-[13px] tracking-[0.15em] text-amber-50/90 drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">{labels[k]}</span>
+          </button>
+        ))}
+      </div>
+      <p className="mt-6 text-[13px] tracking-[0.3em] text-amber-100/80" style={{ opacity: picked === null ? 1 : 0, transition: 'opacity 300ms' }}>
+        たまごをタップして選ぼう
+      </p>
     </div>
   );
 }

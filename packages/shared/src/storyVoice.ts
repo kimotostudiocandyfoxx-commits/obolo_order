@@ -95,7 +95,8 @@ export function storyVoiceFilter(s: StoryVoiceSpec, tempo: number): string {
  * The words as the voice should read them: roman words it gets wrong are given in kana (「obolo」 was read
  * as 「おぼろん」 — client 2026-10-20). Only what is spoken changes; the line on screen stays as written.
  */
-export const STORY_READINGS: [RegExp, string][] = [[/(?<![A-Za-z])obolo(?![A-Za-z])/g, 'オボロ']];
+// the star in KIMORIN⭐︎ is only written, never said (client 2026-10-29: the voice read it 「キモリンスター」)
+export const STORY_READINGS: [RegExp, string][] = [[/(?<![A-Za-z])obolo(?![A-Za-z])/g, 'オボロ'], [/⭐\uFE0E?/g, '']];
 export function speakText(text: string): string {
   return STORY_READINGS.reduce((t, [re, kana]) => t.replace(re, kana), text.replace(/\n/g, ' '));
 }

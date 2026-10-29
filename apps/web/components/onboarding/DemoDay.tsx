@@ -160,7 +160,7 @@ export function DemoDay({
       steps={steps}
       vars={vars}
       lessonApi={fakeLessonApi}
-      textOnly={day <= 3}
+      textOnly={day <= 1}
       seals={{
         known: day >= 2 ? knownSealsOn(day) : [],
         solved: solvedSealsOn(day),

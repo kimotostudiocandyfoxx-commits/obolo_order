@@ -127,6 +127,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'MONBAN', text: '本当だ' },
   { t: 'say', who: 'KIMORIN', text: '後から請求書を送ってきたりしない？' },
   { t: 'say', who: 'OBOLON', text: 'しない。' },
+  { t: 'bgm', track: null, fade: 0.8 }, // the silence is the joke (client 2026-10-29: the pop music ran too long)
   { t: 'say', who: 'KIMORIN', text: '…………。' },
   { t: 'say', who: 'KIMORIN', text: '、、、そうですか！それではめちゃくちゃ宇宙に行かせていただきます！' },
   { t: 'say', who: 'KIMORIN', text: '宇宙行きの切符、私の家に、送っといてください。' }, // 長いセリフを分けた（client 2026-10-26）
@@ -221,6 +222,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
   { t: 'say', who: 'KIMORIN', text: 'どんな適当なことを言っても、間違ったことを言ったとしても、ボタン一つで、必ず大正解してしまうのです！' },
+  { t: 'bgm', track: null, fade: 1.5 }, // シーン…… from here KIMORIN goes on in silence, the funnier for it (client 2026-10-29)
   { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
@@ -269,7 +271,10 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'なれる。だが、、、最初は、いっぱい望みすぎないほうがいい。変になるから。' },
   { t: 'say', who: 'OBOLON', text: '旅を続けて、自分で魔法を使えるようになったら、、、ちょっとずつ、自分の好きな見た目に変えていく、それがいい。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、、、、じゃあ、、' },
-  { t: 'say', who: 'KIMORIN', text: '筋肉ムキムキの、腕80本の、パーティーが大好きなドラゴン！' }, // 両腕を広げる
+  // one tap each (client 2026-10-29), the one voice cut at its pauses
+  { t: 'say', who: 'KIMORIN', text: '筋肉ムキムキの、' },
+  { t: 'say', who: 'KIMORIN', text: '腕80本の、' },
+  { t: 'say', who: 'KIMORIN', text: 'パーティーが大好きなドラゴン！' }, // 両腕を広げる
   { t: 'say', who: 'OBOLON', text: '、、、大丈夫か？' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' },
   { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
@@ -319,14 +324,17 @@ export const DAY2: Step[] = [
   // the egg is chosen first, then the mana gem is set before it (client 2026-10-26: the natural order)
   { t: 'say', who: 'OBOLON', text: '太陽と月と地球。陰と陽の力で、、、このたまごは、生まれた。' },
   { t: 'say', who: 'OBOLON', text: 'どちらか好きな方を選べ' },
-  { t: 'choice', key: 'egg', options: [{ label: '太陽と月のたまご', goto: 'egg-sun' }, { label: '地球と月のたまご', goto: 'egg-earth' }] },
+  // the egg itself is tapped (client 2026-10-29)
+  { t: 'choice', key: 'egg', pics: ['/onboarding/egg-pick-sun.webp', '/onboarding/egg-pick-earth.webp'], options: [{ label: '太陽と月のたまご', goto: 'egg-sun' }, { label: '地球と月のたまご', goto: 'egg-earth' }] },
+  // KIMORIN names the one left (client 2026-10-29)
   { t: 'label', id: 'egg-sun' },
   { t: 'still', image: 's/d2-egg-sun' },
+  { t: 'say', who: 'KIMORIN', text: 'そうですか。私は地球の卵がいいので、ちょうどいいですね。' },
   { t: 'goto', id: 'egg-chosen' },
   { t: 'label', id: 'egg-earth' },
   { t: 'still', image: 's/d2-egg-earth' },
+  { t: 'say', who: 'KIMORIN', text: 'そうですか。私は太陽の卵がいいので、ちょうどいいですね。' },
   { t: 'label', id: 'egg-chosen' },
-  { t: 'say', who: 'KIMORIN', text: 'そうですか、私はこちらでいいです。' }, // 選ばれなかった方のたまごを選ぶ
   { t: 'say', who: 'OBOLON', text: 'たまごの前に、、、マナジェムを、置け。' },
   { t: 'action', label: 'マナジェムを置く' },
   { t: 'se', sound: 'chime' }, // たまごの前にマナジェムを置く。隣で、KIMORIN⭐︎も自分のマナジェムを置く
@@ -362,7 +370,11 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '次は、、、KIMORIN⭐︎だ。好きな食べ物は？' },
   { t: 'say', who: 'KIMORIN', text: '私の好きな食べ物は、、、、、' },
   { t: 'say', who: 'KIMORIN', text: '……うんち。' },
-  { t: 'se', sound: 'pinpon-muffled' }, // ポチッ。ピンポンピンポン♪ → シーン……
+  // ポチッ。ピンポンピンポン♪ in the clear, the music at 0 while it rings (client 2026-10-29) → シーン……
+  { t: 'bgm', track: null, fade: 0.3 },
+  { t: 'se', sound: 'pinpon' },
+  { t: 'wait', s: 7.1, keepChat: true },
+  { t: 'bgm', track: 'tender' },
   { t: 'se', sound: 'magic' }, // KIMORIN⭐︎のマナジェムが光り、たまごの中へ
   { t: 'sprite', image: null },
   { t: 'se', sound: 'egg-crack' },
@@ -383,7 +395,9 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '名前を、つけろ' },
   { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん、、、' },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪　ピンポン♪' }, // KIMORIN⭐︎のまわりを、ぴょんぴょん跳ねる
-  { t: 'sprite', image: ['obolon', '@bati'] },
+  // the visitor's own Bati alone on screen while OBOLON asks (client 2026-10-29: with the two of them, OBOLON speaking
+  // came up big and the Bati was hidden)
+  { t: 'sprite', image: '@bati' },
   { t: 'say', who: 'OBOLON', text: 'お前も、、、名前を、つけてやれ。' },
   { t: 'batiname', placeholder: 'バティの名前', submit: 'この名前にする' },
   { t: 'sprite', image: '@bati' },

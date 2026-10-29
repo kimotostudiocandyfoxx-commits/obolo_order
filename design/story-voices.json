@@ -217,7 +217,9 @@
     "P03",
     "P04"
   ],
-  "redoLines": [],
+  "redoLines": [
+    "KIMORIN⭐︎"
+  ],
   "tempo": 1.3,
   "special": [
     {
@@ -1243,6 +1245,50 @@
     {
       "who": "たこ焼きシスター",
       "text": "……今日の夕焼け、きれいだったワ。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "私は、、、、、、"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "12回目です。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "はい！ぜひ！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "、、、は！、、ゴホンゴホン！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "え？、、そうなの？"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "、、、、は！、、ゴホンゴホン！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "筋肉ムキムキの、"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "腕80本の、"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "パーティーが大好きなドラゴン！"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "そうですか。私は地球の卵がいいので、ちょうどいいですね。"
+    },
+    {
+      "who": "KIMORIN",
+      "text": "そうですか。私は太陽の卵がいいので、ちょうどいいですね。"
     }
   ]
 }

@@ -180,17 +180,21 @@ export function VoiceField({
         type="button"
         onClick={mic.toggle}
         aria-label={mic.listening ? '録音をとめる' : '話してみよう'}
-        className={`relative flex h-24 w-24 items-center justify-center rounded-full border-4 shadow-[0_8px_30px_rgba(60,20,90,0.35)] transition active:scale-95 ${mic.listening ? 'border-rose-200 bg-gradient-to-b from-rose-400 to-rose-600' : 'animate-[hintGlow_2.2s_ease-in-out_infinite] border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500'}`}
+        className="relative flex h-24 w-24 items-center justify-center rounded-full transition active:scale-95"
       >
-        {mic.listening && <span className="absolute inset-0 animate-ping rounded-full bg-rose-300/50" />}
+        {/* the gold mic of the voice answers (client 2026-10-29): rings of light while it listens, a slow breath while it waits */}
         {mic.listening ? (
-          <span className="relative h-8 w-8 rounded-md bg-white" />
+          [0, 0.6, 1.2].map((d) => <span key={d} className="absolute inset-0 rounded-full border border-amber-200/70" style={{ animation: `micRing 1.8s ${d}s ease-out infinite` }} />)
         ) : (
-          <svg viewBox="0 0 24 24" className="relative h-12 w-12 fill-white drop-shadow" aria-hidden>
-            <path d="M12 14.5a3.5 3.5 0 0 0 3.5-3.5V5a3.5 3.5 0 0 0-7 0v6a3.5 3.5 0 0 0 3.5 3.5Z" />
-            <path d="M18.5 11a.9.9 0 0 0-1.8 0 4.7 4.7 0 0 1-9.4 0 .9.9 0 0 0-1.8 0 6.5 6.5 0 0 0 5.6 6.4V20H8.8a.9.9 0 0 0 0 1.8h6.4a.9.9 0 0 0 0-1.8H12.9v-2.6a6.5 6.5 0 0 0 5.6-6.4Z" />
-          </svg>
+          <span className="absolute -inset-2 rounded-full bg-[radial-gradient(circle,rgba(255,206,120,0.28),transparent_70%)]" style={{ animation: 'micBreath 2.6s ease-in-out infinite' }} />
         )}
+        <span className={`absolute inset-0 rounded-full border transition-colors duration-300 ${mic.listening ? 'border-amber-100 bg-[radial-gradient(circle_at_50%_35%,rgba(255,214,140,0.35),rgba(40,26,8,0.92)_70%)] shadow-[0_0_34px_rgba(255,204,120,0.65)]' : 'border-amber-200/70 bg-[radial-gradient(circle_at_50%_30%,rgba(70,48,18,0.95),rgba(8,6,12,0.95)_72%)] shadow-[0_0_22px_rgba(255,204,120,0.3)]'}`} />
+        <span className="absolute inset-[7px] rounded-full border border-amber-200/25" />
+        <svg viewBox="0 0 24 24" className={`relative h-9 w-9 ${mic.listening ? 'text-amber-50' : 'text-amber-200'}`} fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <rect x="9" y="3" width="6" height="11" rx="3" fill={mic.listening ? 'currentColor' : 'none'} />
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+          <path d="M12 17.5V21M9 21h6" />
+        </svg>
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
       <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : mic.error === 'denied' ? 'マイクを許可してください' : `例「${placeholder.replace(/^例：/, '').split('／')[0]}」`}</p>

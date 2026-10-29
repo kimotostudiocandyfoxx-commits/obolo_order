@@ -229,14 +229,16 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     return (
       <Panel>
         <Obolon>{'どんな見た目に、なりたい？\nそうだ、好きな動物は？'}</Obolon>
-        <Chips items={ANIMALS} value={ans.animal} onPick={(v) => (setAns({ animal: v }), setFree(''), setPhase('color'))} />
-        <p className="mt-3 text-xs text-white/50">自由に言う</p>
+        {/* the mic first (client 2026-10-29); the examples under it */}
+        <div className="mt-3" />
         <VoiceField value={free} onChange={setFree} placeholder="例：しろくま" />
-        <div className="mt-2 flex flex-col gap-2">
-          <Gold disabled={!free.trim()} onClick={() => (setAns({ animal: free.trim() }), setFree(''), setPhase('color'))}>
-            これにする
-          </Gold>
-        </div>
+        {free.trim() && (
+          <div className="mt-2 flex flex-col gap-2">
+            <Gold onClick={() => (setAns({ animal: free.trim() }), setFree(''), setPhase('color'))}>これにする</Gold>
+          </div>
+        )}
+        <p className="mt-4 text-center text-[11px] text-white/45">または、えらぶ</p>
+        <Chips items={ANIMALS} value={ans.animal} onPick={(v) => (setAns({ animal: v }), setFree(''), setPhase('color'))} />
       </Panel>
     );
 
@@ -246,7 +248,14 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
         <Kimorin>腕は80本？</Kimorin>
         <div className="mt-2" />
         <Obolon>好きな色は？</Obolon>
-        <p className="mt-1 text-center text-[11px] text-white/50">2つまで選べます</p>
+        <div className="mt-3" />
+        <VoiceField value={free} onChange={setFree} placeholder="例：青と金" />
+        {free.trim() && (
+          <div className="mt-2 flex flex-col gap-2">
+            <Gold onClick={() => (setAns({ color: [free.trim()] }), setFree(''), setPhase('mood'))}>これにする</Gold>
+          </div>
+        )}
+        <p className="mt-4 text-center text-[11px] text-white/50">または、えらぶ（2つまで）</p>
         <div className="mt-3 grid grid-cols-6 gap-2">
           {COLORS.map((c) => {
             const on = ans.color.includes(c.name);
@@ -277,7 +286,15 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     return (
       <Panel>
         <Obolon>どんな雰囲気が、いい？</Obolon>
-        <Chips items={MOODS} value={ans.mood} onPick={(v) => (setAns({ mood: v }), setPhase('hobby'))} />
+        <div className="mt-3" />
+        <VoiceField value={free} onChange={setFree} placeholder="例：ミステリアス" />
+        {free.trim() && (
+          <div className="mt-2 flex flex-col gap-2">
+            <Gold onClick={() => (setAns({ mood: free.trim() }), setFree(''), setPhase('hobby'))}>これにする</Gold>
+          </div>
+        )}
+        <p className="mt-4 text-center text-[11px] text-white/45">または、えらぶ</p>
+        <Chips items={MOODS} value={ans.mood} onPick={(v) => (setAns({ mood: v }), setFree(''), setPhase('hobby'))} />
         <Back onClick={() => setPhase('color')} />
       </Panel>
     );
@@ -286,29 +303,31 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     return (
       <Panel>
         <Obolon>今、好きなことは？</Obolon>
-        <Chips
-          items={HOBBIES}
-          value={ans.hobby}
-          onPick={(hobby) => {
-            const d = { ...draft, ans: { ...ans, hobby } };
-            save(d);
-            void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
-          }}
-        />
-        <p className="mt-3 text-xs text-white/50">自由に言う</p>
+        <div className="mt-3" />
         <VoiceField value={free} onChange={setFree} placeholder="例：カメラ" />
         <div className="mt-2 flex flex-col gap-2">
-          <Gold
-            disabled={!free.trim()}
-            onClick={() => {
-              const hobby = free.trim();
+          {free.trim() && (
+            <Gold
+              onClick={() => {
+                const hobby = free.trim();
+                const d = { ...draft, ans: { ...ans, hobby } };
+                save(d);
+                void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
+              }}
+            >
+              水盤に描いてもらう
+            </Gold>
+          )}
+          <p className="mt-2 text-center text-[11px] text-white/45">または、えらぶ</p>
+          <Chips
+            items={HOBBIES}
+            value={ans.hobby}
+            onPick={(hobby) => {
               const d = { ...draft, ans: { ...ans, hobby } };
               save(d);
               void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
             }}
-          >
-            水盤に描いてもらう
-          </Gold>
+          />
           <Plain
             onClick={() => {
               save({ ...draft, ans: { ...ans, hobby: '' } });
