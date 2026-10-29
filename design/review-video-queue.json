@@ -6,8 +6,11 @@
   "report": "art/review/saturn/video/last-run.md",
   "ledger": "art/review/saturn/rounds/video-costs.md",
   "parallel": 3,
-  "budgetYen": 401,
-  "redo": [],
+  "budgetYen": 750,
+  "redo": [
+    "V01-C05",
+    "V02-C07"
+  ],
   "items": [
     {
       "id": "V01-C02",
@@ -38,7 +41,7 @@
       "duration": 5,
       "audio": false,
       "first": "art/review/saturn/V01/K4-r1b.jpg",
-      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. Slow push-in over a vast city at night seen from high above, lights twinkling through soft haze. A thin golden streak of light glides slowly across the night sky from left to right; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "prompt": "Photorealistic night footage, 35mm film look, natural light, real-world texture indistinguishable from a real camera; no CG look. No people in focus; no text, no signs, no logos. Slow gentle push-in over a vast city at night seen from high above, lights twinkling through soft haze. High in the upper third of the sky, far above the horizon, a thin faint golden streak of light glides slowly from left to right like a distant shooting star; it is small and does not light up the city or the haze at all; the city's brightness never changes; nobody notices it. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
       "always": false
     },
     {
@@ -91,7 +94,7 @@
       "duration": 5,
       "audio": false,
       "first": "art/review/saturn/V01/K12-r2a.jpg",
-      "prompt": "Eight blank golden cards hang in an arc in the darkness, almost motionless, bobbing very slightly; their glowing edges brighten and dim slowly; fine golden dust drifts. The cards stay completely blank. Silent shot. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+      "prompt": "Eight blank golden cards arranged in a gentle arc in dark space, nearly still, drifting very slightly; their edges shimmer softly; fine golden dust floats around them. The cards stay plain and blank. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
     },
     {
       "id": "V01-C13",
@@ -136,7 +139,8 @@
       "duration": 5,
       "audio": false,
       "first": "art/review/saturn/V02/K13-r1a.jpg",
-      "prompt": "Hold on KIMORIN standing on the right third of the frame inside the gate: almost still, a single soft glint of sunset light travels slowly across his brass goggles, his tail feathers breathe gently in the wind, gold dust drifts; the left side stays empty avenue. Keep KIMORIN exactly as in the pictures: small chibi white fox with a white fox-mask face, blue leaf mark on the forehead, blue spiral cheeks, tiny ω mouth, brass goggles over the eyes (eyes hidden, never glowing), the small silver box on his head, patched white lab coat with tool belt and wires, white gloves, white shoes with blue paw pads; the white, black and vermilion feather tail grows from his body. No robe, no hood. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark."
+      "prompt": "Locked-off camera, absolutely no camera movement and no zoom: KIMORIN stands still on the right third of the frame inside the gate, exactly the same size from the first frame to the last. Only for a brief moment, about a third of a second, a small soft glint of sunset light slides across the rim of his brass goggles and is gone; the lenses stay dark (his eyes stay hidden, never glowing). His tail feathers breathe gently in the wind, gold dust drifts; the left side stays empty avenue. Keep KIMORIN exactly as in the picture: white fox-mask face, blue leaf mark, blue spiral cheeks, ω mouth, brass goggles over the eyes, the small silver box on his head, patched white lab coat, white gloves, white shoes with blue paw pads. No flashes, no sudden bright light: any light changes slowly and gently. No text, no letters, no logos, no watermark.",
+      "last": "art/review/saturn/V02/K13-r1a.jpg"
     },
     {
       "id": "V02-C07b",

@@ -97,9 +97,8 @@ async function makeOnce(x, audio) {
       ...(frameImages.length ? { frameImages } : {}),
       // the shape and size come from the first frame (Seedance 2.5 takes no width / height); character
       // references are not taken this way either — the first / last frames carry the look
-      // no sound unless asked: left out, the model added its own (and the provider refused some of it as copyrighted,
-      // 2026-10-29)
-      providerSettings: { bytedance: { audio: !!audio } },
+      // sound only when asked (Seedance 2.5 refuses audio:false — 2026-10-29; the sound it adds is stripped when cut in)
+      ...(audio ? { providerSettings: { bytedance: { audio: true } } } : {}),
     },
   ]);
   // the motion is made in the background: ask for it until it is there (up to ~12 minutes)
