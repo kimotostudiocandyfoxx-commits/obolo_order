@@ -5033,6 +5033,50 @@
     "art/review/saturn/sheets/kimorin-lab-r1b.jpg"
    ],
    "prompt": "A wide 16:9 cut-in panel for a Japanese mobile story game: the dramatic manga 'it just clicked!' moment of realization. The character is KIMORIN from the reference picture (use it for the character only): a small white fox whose face looks like a smooth white fox mask with a blue leaf mark on the forehead, blue spiral marks on the cheeks, tall fox ears with blue insides, a rounded silver box with a small dark screen between his ears, brass steampunk goggles pushed UP onto his forehead, a white lab coat collar. COMPOSITION: black background; across the middle runs a jagged horizontal white lightning crack, bursting into a big spiky white flash of light; in front of the flash, KIMORIN's mask face in close-up from the chest up, centered, shown in strong backlight, his eye slits shining pure white, a white glowing rim around him, a sudden 'ping!' of understanding. High-contrast, deep blacks, painterly semi-realistic anime texture, cinematic. No text, no letters, no sound-effect lettering, no watermark."
+  },
+  {
+   "id": "saturn-hall-kororin",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kororin-world-style.jpg",
+    "apps/web/public/onboarding/s/saturn-inside.jpg"
+   ],
+   "prompt": "A vertical 9:16 background: the inside of the Saturn temple's great hall, redrawn in that cute deformed style (the second picture is only the place it stands for): chubby round red-brown pillars on both sides, a round skylight window in the domed ceiling through which Saturn's big pastel rings are seen, warm sunset light. In the middle distance a small heap of round smooth glowing pebble-stones. The lower third is an empty, smooth, softly lit round floor with nothing on it (two big bowls will be placed there by the game). Art style exactly like the first reference picture: a cute, soft, rounded 'kororin' world for a Japanese kids' mobile game — pastel lavender, pink and peach light, candy-like smooth shapes, gentle glow, simple and clean, everything chubby and round (deformed, toy-like). No text, no letters, no logos, no watermark. No characters, no creatures, no people."
+  },
+  {
+   "id": "saturn-plaza-kororin",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    720,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kororin-world-style.jpg",
+    "apps/web/public/onboarding/s/saturn-outside.jpg"
+   ],
+   "prompt": "A vertical 9:16 background: the plaza outside the Saturn temple at dusk, redrawn in that cute deformed style (the second picture is only the place it stands for): at the back, the temple itself made chubby and round like a toy (round golden domes, soft shapes) at the top of a few steps; in front of it, a wide round plaza paved with round pastel cobblestones, empty. The sky above goes from purple to deep navy, with Saturn's huge rings across it, faint colored light flowing along them, a few soft stars. The lower half of the picture is the empty round plaza. Art style exactly like the first reference picture: a cute, soft, rounded 'kororin' world for a Japanese kids' mobile game — pastel lavender, pink and peach light, candy-like smooth shapes, gentle glow, simple and clean, everything chubby and round (deformed, toy-like). No text, no letters, no logos, no watermark. No characters, no creatures, no people."
+  },
+  {
+   "id": "kororin-vessel",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    768,
+    768
+   ],
+   "always": false,
+   "refs": [
+    "design/story/refs/kororin-world-style.jpg"
+   ],
+   "prompt": "One big round empty bowl (a vessel for small round creatures), seen from the front and slightly above so its inside is a little visible: a chubby, glossy, pastel ceramic bowl, cream white with a soft lavender rim and a thin gold line, a short round foot, gentle highlights. Centered, filling about 80% of the width, on a flat plain mid-grey background (#808080) with nothing else. Art style exactly like the first reference picture: a cute, soft, rounded 'kororin' world for a Japanese kids' mobile game — pastel lavender, pink and peach light, candy-like smooth shapes, gentle glow, simple and clean, everything chubby and round (deformed, toy-like). No text, no letters, no logos, no watermark. No characters, no creatures, no people."
   }
  ],
  "redo": []
