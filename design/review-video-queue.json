@@ -7,9 +7,7 @@
   "ledger": "art/review/saturn/rounds/video-costs.md",
   "parallel": 3,
   "budgetYen": 1900,
-  "redo": [
-    "V01-C05"
-  ],
+  "redo": [],
   "items": [
     {
       "id": "V01-C02",
