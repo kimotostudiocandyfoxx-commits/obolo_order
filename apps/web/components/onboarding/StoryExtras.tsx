@@ -7,7 +7,7 @@ import type { PictureFx, SoundFx } from '@/lib/onboarding/script';
 import { playPreset, type Preset } from '@/lib/story/sfx';
 import { IconButton } from '@/components/story/parts';
 import { TicketArt } from '@/components/story/Ticket';
-import { useDictation } from '@/lib/useDictation';
+import { micTrouble, useDictation } from '@/lib/useDictation';
 import { nameCharsOk } from '@obolo/shared';
 
 /**
@@ -141,7 +141,8 @@ export function VoiceField({
   const withMic = useContext(MicAllowed);
   const [typing, setTyping] = useState(false);
   const [notice, setNotice] = useState(false);
-  const voiceFirst = withMic && !textFirst && mic.supported;
+  // no recogniser on this phone: still the mic screen, with the reason in one line (never the keyboard by itself)
+  const voiceFirst = withMic && !textFirst;
   const cls = light
     ? `min-w-0 flex-1 rounded-xl border bg-white px-3 py-2 text-slate-800 outline-none placeholder:text-slate-400 ${mic.listening ? 'border-rose-400' : 'border-slate-300 focus:border-amber-400'}`
     : `min-w-0 flex-1 border-b bg-transparent px-2 py-2 text-amber-50 outline-none placeholder:text-white/35 [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] ${mic.listening ? 'border-rose-300' : 'border-amber-100/45 focus:border-amber-200/90'}`;
@@ -179,8 +180,9 @@ export function VoiceField({
       <button
         type="button"
         onClick={mic.toggle}
+        disabled={!mic.supported}
         aria-label={mic.listening ? '録音をとめる' : '話してみよう'}
-        className="relative flex h-24 w-24 items-center justify-center rounded-full transition active:scale-95"
+        className="relative flex h-24 w-24 items-center justify-center rounded-full transition active:scale-95 disabled:opacity-40"
       >
         {/* the gold mic of the voice answers (client 2026-10-29): rings of light while it listens, a slow breath while it waits */}
         {mic.listening ? (
@@ -197,7 +199,7 @@ export function VoiceField({
         </svg>
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
-      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : mic.error === 'denied' ? 'マイクを許可してください' : `例「${placeholder.replace(/^例：/, '').split('／')[0]}」`}</p>
+      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? `例「${placeholder.replace(/^例：/, '').split('／')[0]}」`)}</p>
       {example}
       {/* the emergency exit: only when you cannot speak */}
       {!typing && (

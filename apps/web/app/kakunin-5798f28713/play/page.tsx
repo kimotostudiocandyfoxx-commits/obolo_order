@@ -18,7 +18,8 @@ import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 
 /**
  * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1][&gate=1: the seal E-0 every time] — plays one day's story from the start (or from its first
- * step of that type, e.g. at=jupiter) with a test name. Nothing is saved to the account.
+ * step of that type, e.g. at=jupiter) with a test name. Logged in, it runs as the members get it (the look, Bati and
+ * the talk with Bati for real, saved to that account); otherwise with the browser's stand-ins.
  * timeup=1: the 88 minutes of space time run out 20 seconds in (SYS-S001).
  * thru=N: each day ends on the members' own 「また明日」 screen (the 24-hour countdown, 〔明日まで待てない〕 and the clock that
  * skips it), which opens the next day, up to day N (e.g. day=1&thru=3: from the start to Saturn).
@@ -41,8 +42,9 @@ function PreviewPlay() {
   const [timeUp, setTimeUp] = useState(false);
   // logged in to the real API: the look and Bati are painted for real (Gemini) and saved to the account,
   // like a member's first journey; otherwise demo pictures drawn in the browser
-  const { me } = useAuth();
+  const { me, status } = useAuth();
   const live = getApi().mode === 'live' && !!me && q.get('demo') !== '1';
+  const guest = getApi().mode === 'live' && status === 'guest' && q.get('demo') !== '1';
   useEffect(() => {
     if (q.get('timeup') !== '1') return;
     const t = setTimeout(() => setTimeUp(true), 20_000);
@@ -131,20 +133,47 @@ function PreviewPlay() {
         onNeoForm={(id) => setNeo(id)}
         onEnd={() => setEnded(true)}
         vars={{
-          name: 'テスト',
-          inviter: '木元 駿之介',
+          name: live && me ? me.displayName : 'テスト',
+          inviter: live && me?.invitedByName ? me.invitedByName : '木元 駿之介',
           inviterMessage: q.get('msg') === '0' ? undefined : '宇宙で待ってる✌️ウヒョヒョ',
-          neo: neoForm(neo)?.name ?? (day >= 3 ? 'ミナト⭐︎' : undefined),
-          batiFood: day >= 3 ? 'ラーメン' : undefined,
-          bati: day >= 3 ? 'ぽん' : undefined,
-          batiImage: day >= 3 ? demoBati('ラーメン') : undefined,
+          // logged in: the member's own NEO and Bati (made for real on the Moon), like the members' journey
+          neo: live && me && day >= 3 ? me.displayName : (neoForm(neo)?.name ?? (day >= 3 ? 'ミナト⭐︎' : undefined)),
+          batiFood: live && me?.bati ? me.bati.food : day >= 3 ? 'ラーメン' : undefined,
+          bati: live && me?.bati?.name ? me.bati.name : day >= 3 ? 'ぽん' : undefined,
+          batiImage: live && me?.bati?.imageUrl ? me.bati.imageUrl : day >= 3 ? demoBati('ラーメン') : undefined,
+          batiFaces: live ? me?.bati?.faces : undefined,
+          look: live ? (me?.avatarUrl ?? undefined) : undefined,
+          lookChibi: live ? (me?.lookChibi ?? undefined) : undefined,
+          lookStandee: live ? (me?.lookStandee ?? undefined) : undefined,
           kimorinStar: day >= 3,
           made: previewMade(day),
           story: { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる' },
         }}
       />
       <BackLink live={live} />
+      {guest && <GuestNote />}
     </>
+  );
+}
+
+/**
+ * The real API but nobody logged in on this browser: the mic works, but the look, Bati and the talk with Bati are
+ * the browser's stand-ins (story chat 2026-10-29: check it as the members get it — log in first, then come back).
+ */
+function GuestNote() {
+  const [shut, setShut] = useState(false);
+  if (shut) return null;
+  return (
+    <div className="fixed inset-x-3 top-[calc(40px+env(safe-area-inset-top))] z-[400] rounded-xl bg-black/75 px-3 py-2 text-center text-[11px] leading-relaxed text-amber-50 backdrop-blur">
+      いまは仮の絵で動いています（姿の絵・バティ・バティとのおしゃべり）。本番と同じにするには、
+      <a href="/" className="font-bold underline">
+        先にログイン
+      </a>
+      してから、このページを開きなおしてください（作ったものは、そのアカウントに残ります）
+      <button onClick={() => setShut(true)} className="ml-2 text-white/50" aria-label="とじる">
+        ✕
+      </button>
+    </div>
   );
 }
 

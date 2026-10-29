@@ -22,6 +22,19 @@ type Rec = {
 
 type Field = HTMLTextAreaElement | HTMLInputElement;
 
+/**
+ * Why the voice cannot be heard, in one line (story chat 2026-10-29: never switch to the keyboard by itself; say why
+ * and leave the small ⌨ in the corner). The code is the recogniser's error (or 'unsupported' when there is none).
+ */
+export function micTrouble(code: string | null): string | null {
+  if (!code || code === 'no-speech' || code === 'aborted') return null;
+  if (code === 'not-allowed') return 'マイクの許可がありません（設定 → Safari → マイク を「許可」に）';
+  if (code === 'service-not-allowed' || code === 'unsupported') return 'この端末では声の聞き取りが使えません（設定 → 一般 → キーボード →「音声入力」をオンに）';
+  if (code === 'audio-capture') return 'マイクが使えません。ほかのアプリがマイクを使っていないか、たしかめてください';
+  if (code === 'network') return '通信がうまくいかず、聞き取れませんでした。もう一度どうぞ';
+  return 'うまく聞き取れませんでした。もう一度どうぞ';
+}
+
 function recognizer(): (new () => Rec) | null {
   if (typeof window === 'undefined') return null;
   const w = window as unknown as { SpeechRecognition?: new () => Rec; webkitSpeechRecognition?: new () => Rec };
@@ -33,6 +46,8 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState('');
   const [error, setError] = useState<'denied' | 'failed' | null>(null);
+  // the recogniser's own error code, for the one-line reason (micTrouble)
+  const [code, setCode] = useState<string | null>(null);
   const rec = useRef<Rec | null>(null);
   const want = useRef(false);
   // the text around the insertion point while listening, and what has been heard so far
@@ -73,6 +88,7 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
       midRef.current = mid;
     };
     r.onerror = (e) => {
+      if (e.error !== 'no-speech' && e.error !== 'aborted') setCode(e.error);
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
         want.current = false;
         setError('denied');
@@ -116,6 +132,7 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
     const sep = lang.startsWith('ja') || !before || /\s$/.test(before) ? '' : ' ';
     session.current = { before: before + sep, after: v.slice(b), heard: '' };
     setError(null);
+    setCode(null);
     want.current = true;
     setListening(true);
     try {
@@ -124,6 +141,7 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
       want.current = false;
       setListening(false);
       setError('failed');
+      setCode((c) => c ?? 'start-failed');
     }
   }, [field, lang, listen]);
 
@@ -159,5 +177,5 @@ export function useDictation({ field, value, onChange, maxLength, lang = 'ja-JP'
 
   const toggle = useCallback(() => (listening ? stop() : start()), [listening, start, stop]);
 
-  return { supported, listening, interim, error, toggle, stop };
+  return { supported, listening, interim, error, code, toggle, stop };
 }

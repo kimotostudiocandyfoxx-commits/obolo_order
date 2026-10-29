@@ -7,7 +7,7 @@ import { knownSealsOn, solvedSealsOn, stampsOn } from '@/components/onboarding/S
 import { demoBati, demoStickerArt, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import type { LessonApi } from '@/lib/onboarding/lessonApi';
+import { realLessonApi, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { Made } from '@/lib/onboarding/made';
 import type { Step, StoryVars } from '@/lib/onboarding/script';
 
@@ -161,7 +161,7 @@ export function DemoDay({
     <StoryPlayer
       steps={steps}
       vars={vars}
-      lessonApi={fakeLessonApi}
+      lessonApi={live ? realLessonApi : fakeLessonApi}
       textOnly={day <= 1}
       showGate={showGate}
       seals={{

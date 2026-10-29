@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ReplyChips } from '@/components/story/Chat';
+import { micTrouble } from '@/lib/useDictation';
 
 /**
  * A choice answered by voice (D01-S006, story M-R169): a big mic button 〔話してみよう〕 with the answers as a small
@@ -58,8 +59,10 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   const [note, setNote] = useState('');
   const rec = useRef<Rec | null>(null);
   const done = useRef(false);
+  // no recogniser on this phone: the mic stays, with the reason in one line; ⌨ in the corner is the way on
+  // (story chat 2026-10-29: never switch to the buttons by itself)
   useEffect(() => {
-    if (!recognizer()) setMode('keys');
+    if (!recognizer()) setNote(micTrouble('unsupported') ?? '');
     return () => rec.current?.abort();
   }, []);
 
@@ -67,14 +70,14 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
   const stopNow = useRef<() => void>(() => undefined);
   const listen = () => {
     const R = recognizer();
-    if (!R) return setMode('keys');
+    if (!R) return setNote(micTrouble('unsupported') ?? '');
     const r = new R();
     r.lang = 'ja-JP';
     r.interimResults = true;
     // iOS ends a one-shot recognition almost at once: listen on and stop ourselves after a short quiet
     r.continuous = true;
     let said = '';
-    let blocked = false;
+    let trouble: string | null = null;
     let ended = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
     // the end of the take, whether or not the recogniser says so: iOS Safari sometimes never fires onend after a
@@ -95,13 +98,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
         setTimeout(() => onPick(k, said.trim().slice(0, 120)), 500);
         return;
       }
-      if (blocked) {
-        setNote('マイクが使えないので、ボタンで選んでください');
-        setMode('mic');
-        setTimeout(() => setMode('keys'), 1800);
-        return;
-      }
-      setNote('うまく聞き取れませんでした。もう一度どうぞ');
+      setNote(micTrouble(trouble) ?? 'うまく聞き取れませんでした。もう一度どうぞ');
       setMode('mic');
     };
     // stop: let the last words come in (stop, not abort), then finish anyway after a moment
@@ -125,7 +122,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
       timers.push(quiet);
     };
     r.onerror = (e) => {
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') blocked = true;
+      trouble = e.error;
       if (e.error !== 'no-speech') finish();
     };
     r.onend = finish;
@@ -137,7 +134,11 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
     try {
       r.start();
     } catch {
-      setMode('keys');
+      rec.current = null;
+      timers.forEach(clearTimeout);
+      ended = true;
+      setNote(micTrouble('start-failed') ?? '');
+      setMode('mic');
     }
   };
 
