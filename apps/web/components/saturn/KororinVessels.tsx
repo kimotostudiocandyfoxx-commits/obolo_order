@@ -6,8 +6,9 @@ import { KororinParty, KororinPartySky, type KororinPartyHandle } from './Korori
 
 /**
  * Saturn's kororins as the story has them since M-R176 (client 2026-10-29):
- *  - the hall: the temple's great hall drawn the kororin way; two big vessels, KIMORIN⭐︎'s and {neo}'s, with name
- *    plates. A new kororin rolls in from the heap of stones into its vessel; each keeps its date and time. A tap
+ *  - the hall: the temple's great hall drawn the kororin way; during the practice one big vessel holds everyone's
+ *    kororins (KIMORIN⭐︎'s too); at its end the sister gives {neo} their own, which holds only theirs (client
+ *    2026-10-29, also from lap 2 on). A new kororin rolls in from the heap of stones into its vessel; each keeps its date and time. A tap
  *    sings it (the party: sky dims, the glasses drop); a kororin in your own vessel flicked up and out of the top of
  *    the screen flies to the plaza (your dachi's plaza too).
  *  - the plaza: outside, the temple made round at the back, a round cobbled plaza with the kororins that flew there.
@@ -52,7 +53,7 @@ export function KororinVessels({
   overlay,
 }: {
   scene: 'hall' | 'plaza';
-  /** after the recital the sister hands {neo} their own vessel (client 2026-10-29); before it, one big shared one */
+  /** {neo}'s own vessel (theirs only), from the end of the practice on; before it, one big shared one (client 2026-10-29) */
   own?: boolean;
   kimorin: Kororin[];
   mine: Kororin[];
@@ -209,13 +210,10 @@ export function KororinVessels({
       <KororinPartySky on={partyOn} />
       {scene === 'hall' ? (
         own ? (
-          <>
-            {/* {neo}'s own vessel, the sister's present; KIMORIN⭐︎'s three in his, small, up on the left */}
-            {bowl(mine, { x: -W * 0.08, y: H * 0.6, w: W * 1.16, h: H * 0.42 }, `${neo}の器`, 'mine')}
-            {bowl(kimorin, { x: W * 0.02, y: H * 0.42, w: W * 0.44, h: H * 0.14 }, 'KIMORIN⭐︎', 'kimorin')}
-          </>
+          // {neo}'s own vessel, the sister's present: only their kororins
+          bowl(mine, { x: -W * 0.08, y: H * 0.6, w: W * 1.16, h: H * 0.42 }, `${neo}の器`, 'mine')
         ) : (
-          // one big bowl the two share until the recital is over
+          // one big bowl everyone shares during the practice
           bowl([...kimorin, ...mine].sort((a, b) => a.at - b.at), { x: -W * 0.08, y: H * 0.6, w: W * 1.16, h: H * 0.42 }, null, 'shared')
         )
       ) : (

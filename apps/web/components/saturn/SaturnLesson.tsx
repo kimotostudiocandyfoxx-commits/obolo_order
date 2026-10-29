@@ -41,7 +41,7 @@ type Beat =
   | { k: 'kimFly' }
   /** {neo} flicks any of theirs up (or 〔今はいい〕) */
   | { k: 'fly' }
-  /** after the recital the sister hands {neo} their own vessel (client 2026-10-29) */
+  /** at the end of the practice the sister hands {neo} their own vessel (client 2026-10-29) */
   | { k: 'gift' }
   /** out of the temple to the plaza (the luxury cut to come: the gate, the plaza at dusk) */
   | { k: 'plaza' }
@@ -98,10 +98,6 @@ const BEATS: Beat[] = [
   { k: 'drop', text: K3, sing: true },
   { k: 'say', who: 'brother', text: '{neo}の番だZE。なんでもいいZE!!' },
   { k: 'rec', n: 3 },
-  // the recital is over: {neo}'s own vessel, from the sister (client 2026-10-29)
-  { k: 'say', who: 'sister', text: '{neo}に、これをあげるワ。{neo}だけの器だワ。' },
-  { k: 'gift' },
-  { k: 'say', who: 'sister', text: '{neo}のコロリンは、これから、ここにたまっていくワ。' },
   { k: 'say', who: 'brother', text: '自分で思ったことや、感じたこと、思いついたことは、全部コロリンにしちゃえ。それは全部、大切な思い出だZE。' },
   { k: 'say', who: 'brother', text: '器のコロリンは、ずっと残るZE。だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
   { k: 'note', text: 'コロリンは、あなたの器に、日付と時刻つきで残ります。器のコロリンを続けてタップすると、順番に歌って、つながります。コロリンは、いつでも作れます' },
@@ -139,6 +135,11 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'kimorin', text: 'では、三つとも。……全部、名作ですので。' },
   { k: 'kimFly' },
   { k: 'fly' },
+  // the practice is over: {neo}'s own vessel, from the sister (client 2026-10-29). Until here one bowl holds
+  // everyone's kororins (KIMORIN⭐︎'s too, only for the practice); from now on — and from lap 2 — {neo}'s alone
+  { k: 'say', who: 'sister', text: '{neo}に、これをあげるワ。{neo}だけの器だワ。' },
+  { k: 'gift' },
+  { k: 'say', who: 'sister', text: '{neo}のコロリンは、これから、ここにたまっていくワ。' },
   // D04-S006 土星の広場のサイファー
   { k: 'plaza' },
   { k: 'say', who: 'kimorin', text: '……MONBANさんのまで、いますね。' },
