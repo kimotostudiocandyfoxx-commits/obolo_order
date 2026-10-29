@@ -212,6 +212,8 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-pinpon' }, // 手に持っている小さなボタンを、ゆっくりこちらに見せる
   { t: 'say', who: 'KIMORIN', text: '気になりますか？　これが。' },
   { t: 'still', image: 's/d2-moon-kimorin' }, // 長い説明は、話す人の胸から上の絵で（QA 5 N10）
+  // while KIMORIN explains, his own picture comes up big with the face of each line (client 2026-10-29)
+  { t: 'sprite', image: 'kimorin-iu' },
   { t: 'say', who: 'KIMORIN', text: 'これは私が発明した、持ち運び式完全肯定型デバイス『ピンポン2.5』です。' },
   { t: 'say', who: 'KIMORIN', text: '人生を生きていたら、なんと答えればいいかわからない。そんな場面に、よく遭遇します。' },
   { t: 'say', who: 'KIMORIN', text: 'しかし、この持ち運び式完全肯定型デバイス『ピンポン2.5』さえあれば、もう安心。' },
@@ -219,6 +221,7 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-moon-kimorin' }, // シーン……
   { t: 'say', who: 'KIMORIN', text: 'さらに、気づきましたか？' },
   { t: 'say', who: 'KIMORIN', text: 'この『秘密結社は何回目？』という質問。実は、引っかけ問題なのです。' },
+  { t: 'sprite', image: null }, // OBOLON's eyes narrowing are on the still
   // M-R169 (§4-8, QA 9 R24): once, while KIMORIN goes on, OBOLON's eyes narrow little by little; the still stays narrowed
   // in two steps, half then narrow (QA 10 R30: one 2 s cross-fade showed two pairs of eyes), the line staying (R29)
   { t: 'cam', move: 'in', focus: '50% 41%' },
@@ -227,12 +230,15 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-moon-kimorin-squint', fade: 0.9 },
   { t: 'wait', s: 0.9, keepChat: true },
   { t: 'cam', move: 'out' },
+  { t: 'sprite', image: 'kimorin-iu' },
   { t: 'say', who: 'KIMORIN', text: 'もし本当に秘密結社に入ったことがあるとして、2回目です！と答えてしまった場合。' },
   { t: 'say', who: 'KIMORIN', text: 'それは、過去に秘密結社に入っていたという秘密を、自ら暴露していることになります。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'そんな口の軽いやつは、Obolo Orderになる資格はない。ここで脱落。' },
   { t: 'say', who: 'KIMORIN', text: 'そう、私たちは、試されていたのです！' },
   { t: 'se', sound: 'pinpon' }, // ポチッ。ピンポンピンポン♪
+  { t: 'wait', s: 7.1, keepChat: true }, // the line only once the pinpon has rung out (client 2026-10-29)
   { t: 'say', who: 'KIMORIN', text: 'ふ、、、また大正解してしまった。ですよね？OBOLONさん' },
+  { t: 'sprite', image: null },
   { t: 'say', who: 'OBOLON', text: '、、、Obolo Orderは、完全招待制だ。' },
   { t: 'say', who: 'OBOLON', text: '招待された時点でObolo Orderになる資格を持っている、脱落など、存在しない。' }, // 長いセリフを分けた（client 2026-10-26）
   { t: 'say', who: 'KIMORIN', text: 'え？、、そうなの？、、、、は！、、ゴホンゴホン！' }, // (ピンとくる)
