@@ -1,44 +1,44 @@
-# UI art — 2026-10-29T06:36:16.594Z
+# UI art — 2026-10-29T07:32:43.279Z
 
-Seedream 5.0 Pro / 40枚 / 約80円
+Seedream 5.0 Pro / 40枚 / 約330円
 
-- ⏸ V03b/K3-a: 時間切れ、次回
-- ⏸ V03b/K3-b: 時間切れ、次回
-- ⏸ V03b/K4-a: 元の絵ができなかったので次回
-- ⏸ V03b/K4-b: 元の絵ができなかったので次回
-- ✅ V02/K1-r2b
-- ✅ V02/K10-r2b
-- ✅ V02/MASTER-r2b
-- ✅ V03a/A0-a
-- ✅ V03a/A0-b
-- ✅ V03a/A1-a
-- ✅ V03a/A1-b
-- ✅ V03a/A2-a
-- ✅ V03a/A2-b
-- ✅ V03a/A3-a
-- ✅ V03a/A3-b
-- ✅ V03b/K1-a
-- ✅ V03b/K1-b
-- ✅ V03b/K2-a
-- ✅ V03b/K2-b
-- ✅ V03b/K5-a
-- ✅ V03b/K5-b
-- ✅ V03b/K6-a
-- ✅ V22/K1-a
-- ✅ V22/K1-b
-- ✅ V22/K1-c
-- ✅ V22/K2-a
-- ✅ V22/K2-b
-- ✅ V22/K2-c
-- ✅ V22/K4-a
-- ✅ V22/K4-b
-- ✅ V22/K5-a
-- ✅ V22/K5-b
-- ✅ V23/a-K2-a
-- ✅ V23/a-K2-b
-- ✅ V23/b-K2-a
-- ✅ V23/b-K2-b
-- ✅ stills/d2-egg-earth-pair-a
-- ✅ stills/d2-egg-sun-pair-b
-- ✅ stills/saturn-outside-a
-- ✅ stills/saturn-sleep-r3b
+- ✅ V03b/K10-a
+- ✅ V03b/K10-b
+- ✅ V03b/K11-a
+- ✅ V03b/K11-b
+- ✅ V03b/K12-a
+- ✅ V03b/K12-b
+- ✅ V03b/K3-a
+- ✅ V03b/K3-b
+- ✅ V03b/K4-a
+- ✅ V03b/K4-b
+- ✅ V03b/K6-b
+- ✅ V03b/K7-a
+- ✅ V03b/K7-b
+- ✅ V03b/K8-a
+- ✅ V03b/K8-b
+- ✅ V03b/K9-a
+- ✅ V03b/K9-b
+- ✅ V04/K1-a
+- ✅ V04/K1-b
+- ✅ V04/K10-a
+- ✅ V04/K10-b
+- ✅ V04/K2-a
+- ✅ V04/K2-b
+- ✅ V04/K3-a
+- ✅ V04/K3-b
+- ✅ V04/K4-a
+- ✅ V04/K4-b
+- ✅ V04/K5-a
+- ✅ V04/K5-b
+- ✅ V04/K6-a
+- ✅ V04/K6-b
+- ✅ V04/K7-a
+- ✅ V04/K7-b
+- ✅ V04/K8-a
+- ✅ V04/K8-b
+- ✅ V04/K9-a
+- ✅ V04/K9-b
+- ✅ V05/K2-a
+- ✅ V05/K2-b
+- ✅ V05/K3-a
