@@ -418,7 +418,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
     if (cypherBtn.classList.contains('on')) { stopAll(); return; }
     stopAll();
     const tok = ++playTok; cypherBtn.classList.add('on'); cypherBtn.setAttribute('aria-label', 'サイファーを止める');
-    for (let i = 0; i < msgs.length; i++) {
+    for (let i = msgs.length - 1; i >= 0; i--) {   // newest first: the outer groove toward the centre, like a real record
       if (tok !== playTok) return;
       await play(i);
       await new Promise((r) => setTimeout(r, 220));
