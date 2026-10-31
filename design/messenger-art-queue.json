@@ -1,0 +1,193 @@
+{
+ "note": "二人のレコード（M-R184）の絵。台本チャットがコードと組み合わせる。art/review/messenger/<id>.jpg。透過が要るもの（kororin・label・tonearm）は白地で描き、あとで切り抜く",
+ "dir": "../../../art/review/messenger",
+ "items": [
+  {
+   "id": "record-stage-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/saturn-hall-kororin.jpg"
+   ],
+   "prompt": "Inside the Saturn temple from the reference picture (round reddish-brown pillars, a round skylight in the ceiling showing Saturn's rings, night). In the middle stands a round stone pedestal; on it sits a luxurious black-and-gold record turntable: gold arabesque trim around the edge, gold ornamental legs shaped like octopus tentacles, a tiny Saturn ornament on each corner. Seen from above at about 55 degrees, so the turntable's circle reads as an ellipse squashed to about 0.55 of its width. On the turntable only an EMPTY platter: a plain matte black rubber disc, no record on it, NO tonearm, nothing on the platter. The turntable spans about 90% of the picture's width and sits between 35% and 75% from the top. Slightly dark around the pedestal, a soft golden light from straight above. No people, no characters, no creatures. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "record-stage-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/saturn-hall-kororin.jpg"
+   ],
+   "prompt": "Inside the Saturn temple from the reference picture (round reddish-brown pillars, a round skylight in the ceiling showing Saturn's rings, night). In the middle stands a round stone pedestal; on it sits a luxurious black-and-gold record turntable: gold arabesque trim around the edge, gold ornamental legs shaped like octopus tentacles, a tiny Saturn ornament on each corner. Seen from above at about 55 degrees, so the turntable's circle reads as an ellipse squashed to about 0.55 of its width. On the turntable only an EMPTY platter: a plain matte black rubber disc, no record on it, NO tonearm, nothing on the platter. The turntable spans about 90% of the picture's width and sits between 35% and 75% from the top. Slightly dark around the pedestal, a soft golden light from straight above. No people, no characters, no creatures. The pedestal has a few small candles around it. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "record-stage-c",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "apps/web/public/onboarding/s/saturn-hall-kororin.jpg"
+   ],
+   "prompt": "Inside the Saturn temple from the reference picture (round reddish-brown pillars, a round skylight in the ceiling showing Saturn's rings, night). In the middle stands a round stone pedestal; on it sits a luxurious black-and-gold record turntable: gold arabesque trim around the edge, gold ornamental legs shaped like octopus tentacles, a tiny Saturn ornament on each corner. Seen from above at about 55 degrees, so the turntable's circle reads as an ellipse squashed to about 0.55 of its width. On the turntable only an EMPTY platter: a plain matte black rubber disc, no record on it, NO tonearm, nothing on the platter. The turntable spans about 90% of the picture's width and sits between 35% and 75% from the top. Slightly dark around the pedestal, a soft golden light from straight above. No people, no characters, no creatures. A faint circle of gold floor tiles around the pedestal. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-a-normal-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a soft warm orange band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. The sunglasses are pushed up on its forehead; a calm happy face. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-a-normal-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a soft warm orange band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. The sunglasses are pushed up on its forehead; a calm happy face. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-a-sing-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a soft warm orange band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. It is singing: the sunglasses have dropped down over its eyes, it holds its takoyaki pick like a microphone to its open mouth, body bouncing a little. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-a-sing-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a soft warm orange band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. It is singing: the sunglasses have dropped down over its eyes, it holds its takoyaki pick like a microphone to its open mouth, body bouncing a little. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-b-normal-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a light sky-blue band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. The sunglasses are pushed up on its forehead; a calm happy face. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-b-normal-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a light sky-blue band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. The sunglasses are pushed up on its forehead; a calm happy face. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-b-sing-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a light sky-blue band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. It is singing: the sunglasses have dropped down over its eyes, it holds its takoyaki pick like a microphone to its open mouth, body bouncing a little. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-b-sing-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "apps/web/public/onboarding/takoyaki-sister.webp"
+   ],
+   "prompt": "A single 'kororin' character on a plain pure white background, full body, front view, centered, nothing cut off, no shadow on the ground: a small squishy takoyaki ball (round octopus dumpling) with brown takoyaki sauce, white mayonnaise zigzag, green aonori flakes and dancing katsuobushi flakes on top, small cute dot eyes and a tiny mouth, round gold-rimmed sunglasses, little stubby arms, wearing a light sky-blue band around its lower body so you can tell whose it is. Same takoyaki world as the reference character, but a smaller, simpler, rounder ball creature. It is singing: the sunglasses have dropped down over its eyes, it holds its takoyaki pick like a microphone to its open mouth, body bouncing a little. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "record-label-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "prompt": "A record label seen exactly from straight above (a perfect circle, not tilted), centered on a plain pure white background: a golden paper label with a fine emblem of Saturn's thin rings in the middle area, a black arabesque border around its edge, a small round hole in the very center. Flat, clean, slightly embossed gold. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "record-label-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "prompt": "A record label seen exactly from straight above (a perfect circle, not tilted), centered on a plain pure white background: a golden paper label with a fine emblem of Saturn's thin rings in the middle area, a black arabesque border around its edge, a small round hole in the very center. Flat, clean, slightly embossed gold. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "tonearm-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "prompt": "A record player tonearm seen from straight above, on a plain pure white background: a round black-and-gold pivot base, a long slender gold arm running diagonally at 45 degrees, ending in a small black-and-gold headshell with the stylus. Luxurious, matching a black-and-gold turntable with arabesque trim. Only the tonearm, nothing else. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "tonearm-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [],
+   "prompt": "A record player tonearm seen from straight above, on a plain pure white background: a round black-and-gold pivot base, a long slender gold arm running diagonally at 45 degrees, ending in a small black-and-gold headshell with the stylus. Luxurious, matching a black-and-gold turntable with arabesque trim. Only the tonearm, nothing else. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  }
+ ]
+}
