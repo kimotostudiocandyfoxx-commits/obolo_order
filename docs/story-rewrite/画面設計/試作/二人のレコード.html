@@ -1,0 +1,382 @@
+<title>二人のレコード</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=M+PLUS+Rounded+1c:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width column, Saturn night. A switch at the top flips between the two ways of laying out a conversation. */
+:root {
+  --night: #0f1024;
+  --night-2: #191a38;
+  --ring: #e9c48a;
+  --ring-dim: #7c6a52;
+  --ink: #f4efe6;
+  --ink-dim: #a9a6c4;
+  --me: #e98f4c;
+  --friend: #7fb7e8;
+  --sauce: #5a2e1c;
+  --glass: #20202a;
+  --line: #2c2d55;
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+  --font-body: "M PLUS Rounded 1c", "Hiragino Sans", "Yu Gothic", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: radial-gradient(120% 70% at 50% -10%, #2a2457 0%, var(--night) 55%) fixed, var(--night);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 440px; margin: 0 auto; padding-block: 14px 24px; display: flex; flex-direction: column; gap: 12px; min-height: 100%; box-sizing: border-box; }
+header { display: flex; flex-direction: column; gap: 6px; }
+h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+.sub { color: var(--ink-dim); font-size: .8rem; margin: 0; line-height: 1.6; }
+.switch { display: grid; grid-template-columns: 1fr 1fr; background: var(--night-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 4px; }
+.switch button { font-family: var(--font-display); font-weight: 700; font-size: .95rem; color: var(--ink-dim); background: transparent; border: 0; border-radius: 999px; padding: 9px 6px; cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--ring); color: var(--night); }
+.switch button:focus-visible, .btn:focus-visible, .chip:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.thread-head { display: flex; align-items: center; gap: 10px; }
+.thread-head .grow { flex: 1; min-width: 0; }
+.switch.mini { flex: none; }
+.switch.mini button { font-size: .78rem; padding: 7px 10px; }
+.thread-head .who { font-family: var(--font-display); font-weight: 700; }
+.thread-head .note { color: var(--ink-dim); font-size: .75rem; }
+.stage { background: linear-gradient(180deg, rgba(25,26,56,.85), rgba(15,16,36,.85)); border: 1px solid var(--line); border-radius: 22px; position: relative; overflow: hidden; }
+
+/* ---- lane ---- */
+.lane { height: 470px; overflow-y: auto; padding: 14px 12px 18px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+.flag { align-self: center; font-size: .72rem; color: var(--ring); border: 1px solid var(--ring-dim); padding: 2px 10px 2px 22px; border-radius: 999px; position: relative; }
+.flag::before { content: ""; position: absolute; left: 9px; top: 4px; width: 2px; height: 11px; background: var(--ring); }
+.flag::after { content: ""; position: absolute; left: 11px; top: 4px; border-left: 7px solid var(--ring); border-top: 3px solid transparent; border-bottom: 3px solid transparent; }
+.row { display: flex; align-items: flex-end; gap: 8px; max-width: 86%; }
+.row.me { align-self: flex-end; flex-direction: row-reverse; }
+.row .koro { flex: none; width: 54px; height: 54px; cursor: pointer; border: 0; background: none; padding: 0; }
+.cap { background: var(--night-2); border: 1px solid var(--line); border-radius: 16px; padding: 8px 11px; font-size: .88rem; line-height: 1.55; min-width: 0; overflow-wrap: anywhere; }
+.row.me .cap { border-color: rgba(233,143,76,.45); }
+.row.friend .cap { border-color: rgba(127,183,232,.45); }
+.cap small { display: block; color: var(--ink-dim); font-size: .68rem; margin-top: 2px; }
+.cap .sing { color: var(--ring); font-size: .7rem; margin-right: 4px; }
+.row.new .koro { animation: rollin .9s cubic-bezier(.2,.8,.3,1.1) both; }
+.row.new .cap { animation: capin .5s .55s both; }
+@keyframes rollin { 0% { transform: translate(var(--from, -60px), -240px) rotate(-540deg); } 70% { transform: translate(0, 6px) rotate(10deg); } 100% { transform: none; } }
+@keyframes capin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ---- record ---- */
+.record-box { padding: 12px 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.record { width: min(100%, 400px); aspect-ratio: 1; max-width: 100%; touch-action: none; cursor: grab; user-select: none; }
+.record:active { cursor: grabbing; }
+.record .k { cursor: pointer; }
+.readout { min-height: 74px; width: 100%; box-sizing: border-box; padding: 2px 6px 10px; display: flex; gap: 10px; align-items: center; }
+.readout .koro { width: 48px; height: 48px; flex: none; }
+.readout .empty { color: var(--ink-dim); font-size: .82rem; }
+
+/* ---- kororin ---- */
+button.koro > svg, span.koro > svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.koro .body, .koro .flakes, .koro .shades { transform-box: fill-box; }
+.koro .shades { transition: transform .25s cubic-bezier(.3,1.6,.5,1); }
+.koro.playing .shades { transform: translateY(9px); }
+.koro.playing .body { animation: bob .32s ease-in-out infinite alternate; transform-origin: 50% 90%; }
+.koro.playing .flakes { animation: flake .28s ease-in-out infinite alternate; transform-origin: 50% 30%; }
+@keyframes bob { from { transform: scale(1, 1); } to { transform: scale(1.05, .94); } }
+@keyframes flake { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+
+/* ---- controls ---- */
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font-family: var(--font-display); font-weight: 700; border-radius: 999px; border: 1px solid var(--ring); background: transparent; color: var(--ring); padding: 9px 14px; font-size: .9rem; cursor: pointer; }
+.btn.primary { background: var(--ring); color: var(--night); }
+.btn[disabled] { opacity: .5; cursor: default; }
+.chip { font-size: .8rem; border-radius: 999px; border: 1px solid var(--line); background: var(--night-2); color: var(--ink-dim); padding: 6px 11px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--ring); color: var(--ink); }
+.compose { display: flex; gap: 8px; }
+.compose input { flex: 1; min-width: 0; font-family: var(--font-body); font-size: 1rem; color: var(--ink); background: var(--night-2); border: 1px solid var(--line); border-radius: 999px; padding: 10px 14px; }
+.legend { color: var(--ink-dim); font-size: .75rem; line-height: 1.7; margin: 0; }
+.legend b { color: var(--ink); font-weight: 700; }
+@media (prefers-reduced-motion: reduce) {
+  .row.new .koro, .row.new .cap, .koro.playing .body, .koro.playing .flakes { animation: none; }
+  .lane { scroll-behavior: auto; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>二人のレコード</h1>
+    <p class="sub">土星の、ダチとのやり取りの試作（見本：自分＝ミナト、ダチ＝ハル）。ふだんはレコード。字だけでやり取りしたい時は、右上で「会話」に切りかえ。コロリンをタップすると見本の声で読み上げます（実際は本人の声）。</p>
+  </header>
+
+  <div class="thread-head">
+    <span class="koro" id="head-koro" style="width:34px;height:34px;display:inline-block"></span>
+    <div class="grow"><div class="who">ハル</div><div class="note">二人のレコード ・ 見本</div></div>
+    <div class="switch mini" role="group" aria-label="見え方">
+      <button id="tab-record" aria-pressed="true" title="レコード（声で聞く）">💿 レコード</button>
+      <button id="tab-lane" aria-pressed="false" title="会話（字で読む）">💬 会話</button>
+    </div>
+  </div>
+
+  <section class="stage" id="lane-stage" hidden>
+    <div class="lane" id="lane" aria-live="polite"></div>
+  </section>
+
+  <section class="stage" id="record-stage">
+    <div class="record-box">
+      <svg class="record" id="record" viewBox="-200 -200 400 400" role="img" aria-label="レコードの溝に並んだコロリン。ドラッグで回せます"></svg>
+      <div class="readout" id="readout"><span class="empty">コロリンをタップすると、ここに字が出ます。指で回すと、レコードが回ります。</span></div>
+    </div>
+  </section>
+
+  <div class="tools">
+    <button class="btn primary" id="cypher">🎤 サイファー（続けて再生）</button>
+    <button class="btn" id="stop" disabled>止める</button>
+    <button class="chip" id="sound" aria-pressed="true">🔊 読み上げ オン</button>
+  </div>
+
+  <div class="tools">
+    <span class="legend">送り方：</span>
+    <button class="chip" id="m-talk" aria-pressed="true">しゃべる</button>
+    <button class="chip" id="m-sing" aria-pressed="false">歌う（サングラスを落とす）</button>
+  </div>
+  <form class="compose" id="compose" autocomplete="off">
+    <label for="msg" hidden>送る言葉</label>
+    <input id="msg" placeholder="声のかわりに、字で送ってみる" maxlength="60">
+    <button class="btn primary" type="submit">はじく</button>
+  </form>
+  <p class="legend"><b>💿 レコード</b>（ふだん）：中心が一番古く、外側ほど新しい。指で回して見返す。サイファーは中心から外へ針が進み、続けて流れる。<br><b>💬 会話</b>（字だけでやり取りしたい時）：上が古く、下が新しい。音は出さず、コロリンをタップした時だけ鳴る。新しいコロリンは坂を転がってきて止まる。</p>
+</div>
+
+<script>
+(() => {
+  const ME = 'ミナト', FRIEND = 'ハル';
+  const msgs = [
+    { who: 'friend', text: '明日の放課後ひま？', day: '10月30日', t: '16:02' },
+    { who: 'me', text: 'ひま！どこ行く？', day: '10月30日', t: '16:05' },
+    { who: 'friend', text: '駅前の新しいクレープ屋', day: '10月30日', t: '16:06' },
+    { who: 'me', text: 'いちごのやつ食べたい', day: '10月30日', t: '16:06', sing: true },
+    { who: 'friend', text: '4時に改札でいい？', day: '10月30日', t: '16:09' },
+    { who: 'me', text: 'りょうかい', day: '10月30日', t: '16:10' },
+    { who: 'friend', text: 'クレープでかすぎた', day: '10月31日', t: '17:21' },
+    { who: 'me', text: 'あれは顔より大きかった', day: '10月31日', t: '17:24' },
+    { who: 'friend', text: 'また行こうね〜', day: '10月31日', t: '17:30', sing: true },
+    { who: 'me', text: '次はチョコバナナ', day: '10月31日', t: '17:31' },
+  ];
+  let soundOn = true, sendSing = false, view = 'lane';
+  let playToken = 0;
+
+  const colors = { me: getVar('--me'), friend: getVar('--friend') };
+  function getVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+  function koroSVG(who, sing) {
+    const c = colors[who];
+    return `<svg viewBox="-30 -34 60 64" aria-hidden="true">
+      <g class="body">
+        <ellipse cx="0" cy="24" rx="20" ry="4" fill="rgba(0,0,0,.35)"/>
+        <circle cx="0" cy="2" r="22" fill="${c}"/>
+        <path d="M-15 -8 C -6 -16, 8 -15, 16 -6 C 8 -10, -6 -11, -15 -8 Z" fill="#5a2e1c" opacity=".85"/>
+        <circle cx="-8" cy="-9" r="3" fill="#fff" opacity=".35"/>
+        <g class="flakes"><path d="M-6 -20 l5 -7 l3 6 z M3 -21 l6 -5 l1 7 z" fill="#f1d8a8"/></g>
+        <circle cx="-7" cy="6" r="2" fill="#2a1a12"/><circle cx="7" cy="6" r="2" fill="#2a1a12"/>
+        <path d="M-4 13 q4 4 8 0" stroke="#2a1a12" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <g class="shades" ${sing ? '' : ''}>
+          <circle cx="-8" cy="-3" r="5.5" fill="#20202a" stroke="#e9c48a" stroke-width="1.2"/>
+          <circle cx="8" cy="-3" r="5.5" fill="#20202a" stroke="#e9c48a" stroke-width="1.2"/>
+          <path d="M-2.5 -3 h5" stroke="#e9c48a" stroke-width="1.2"/>
+        </g>
+      </g>
+    </svg>`;
+  }
+
+  // ---------- sound (preview voice only; the app uses each person's own voice) ----------
+  function speak(m) {
+    return new Promise((done) => {
+      if (!soundOn || !('speechSynthesis' in window)) { setTimeout(done, 900 + m.text.length * 90); return; }
+      try {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(m.text);
+        u.lang = 'ja-JP';
+        u.pitch = m.who === 'me' ? 1.5 : 1.2;
+        u.rate = m.sing ? 0.9 : 1.05;
+        let finished = false;
+        const end = () => { if (!finished) { finished = true; done(); } };
+        u.onend = end; u.onerror = end;
+        setTimeout(end, 1500 + m.text.length * 220);
+        speechSynthesis.speak(u);
+      } catch (e) { setTimeout(done, 900 + m.text.length * 90); }
+    });
+  }
+  function koroEls(i) { return document.querySelectorAll(`[data-i="${i}"]`); }
+  async function play(i) {
+    const m = msgs[i];
+    showReadout(i);
+    koroEls(i).forEach((el) => el.classList.add('playing'));
+    await speak(m);
+    koroEls(i).forEach((el) => el.classList.remove('playing'));
+  }
+
+  // ---------- lane ----------
+  const lane = document.getElementById('lane');
+  function renderLane(newIndex) {
+    lane.innerHTML = '';
+    let lastDay = '';
+    msgs.forEach((m, i) => {
+      if (m.day !== lastDay) {
+        const f = document.createElement('div'); f.className = 'flag'; f.textContent = m.day; lane.appendChild(f); lastDay = m.day;
+      }
+      const row = document.createElement('div');
+      row.className = `row ${m.who}` + (i === newIndex ? ' new' : '');
+      if (m.who === 'me') row.style.setProperty('--from', '60px');
+      const b = document.createElement('button');
+      b.className = 'koro'; b.dataset.i = i; b.setAttribute('aria-label', `${m.who === 'me' ? ME : FRIEND}のコロリン：${m.text}`);
+      b.innerHTML = koroSVG(m.who, m.sing);
+      b.addEventListener('click', () => { stopAll(); play(i); });
+      const cap = document.createElement('div'); cap.className = 'cap';
+      cap.innerHTML = `${m.sing ? '<span class="sing">♪歌</span>' : ''}${escapeHtml(m.text)}<small>${m.who === 'me' ? ME : FRIEND}・${m.t}</small>`;
+      row.append(b, cap); lane.appendChild(row);
+    });
+    lane.scrollTop = lane.scrollHeight;
+  }
+
+  // ---------- record ----------
+  const rec = document.getElementById('record');
+  let angle = 0, dragging = false, lastA = 0, moved = 0;
+  function spiralPos(k, n) {
+    // Archimedean spiral, oldest at the centre. Even spacing along the groove.
+    const a = 50, b = 10;           // r = a + b*θ
+    const step = 0.62;               // radians between kororins at the inner groove, shrinking outward
+    let th = 0;
+    for (let j = 0; j < k; j++) th += step * (a + b * 0) / (a + b * th) * 1.55;
+    const r = a + b * th;
+    return { x: r * Math.cos(th - Math.PI / 2), y: r * Math.sin(th - Math.PI / 2), r, th };
+  }
+  function renderRecord(newIndex) {
+    const n = msgs.length;
+    let grooves = '';
+    for (let r = 30; r <= 196; r += 5) grooves += `<circle r="${r}" fill="none" stroke="rgba(255,255,255,${r % 15 === 0 ? 0.07 : 0.035})"/>`;
+    // the path the kororins sit on
+    let d = '';
+    for (let th = 0; th <= 15.5; th += 0.05) { const r = 50 + 10 * th; const x = r * Math.cos(th - Math.PI / 2), y = r * Math.sin(th - Math.PI / 2); d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); }
+    let items = '', flags = '', lastDay = '';
+    msgs.forEach((m, i) => {
+      const p = spiralPos(i, n);
+      if (p.r > 190) return;
+      if (m.day !== lastDay) {
+        lastDay = m.day;
+        flags += `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${-angle})"><text y="-24" text-anchor="middle" font-size="9" fill="${getVar('--ring')}" font-family="sans-serif">${m.day}</text></g>`;
+      }
+      items += `<g class="k${i === newIndex ? ' fresh' : ''}" data-k="${i}" transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})"><g class="spin" transform="rotate(${-angle})"><g class="koro" data-i="${i}" transform="translate(-18 -19) scale(.6)">${koroSVG(m.who, m.sing).replace('<svg viewBox="-30 -34 60 64" aria-hidden="true">', '<svg viewBox="-30 -34 60 64" width="60" height="64" x="0" y="0" aria-hidden="true">')}</g></g></g>`;
+    });
+    rec.innerHTML = `
+      <defs><radialGradient id="vinyl" r="0.55"><stop offset="0" stop-color="#1b1b2e"/><stop offset="1" stop-color="#08080f"/></radialGradient></defs>
+      <g id="disc" transform="rotate(${angle})">
+        <circle r="198" fill="url(#vinyl)"/>
+        ${grooves}
+        <path d="${d}" fill="none" stroke="${getVar('--ring-dim')}" stroke-width="1.2" stroke-dasharray="2 4" opacity=".7"/>
+        <circle r="26" fill="${getVar('--ring')}"/><circle r="4" fill="#08080f"/>
+        <text y="-8" text-anchor="middle" font-size="7.5" font-weight="700" fill="#0f1024" font-family="sans-serif">ミナト</text>
+        <text y="13" text-anchor="middle" font-size="7.5" font-weight="700" fill="#0f1024" font-family="sans-serif">ハル</text>
+        ${flags}${items}
+      </g>
+      <g id="arm" transform="rotate(${armAngle})"><line x1="182" y1="-182" x2="${armTip().x}" y2="${armTip().y}" stroke="#c9c3d9" stroke-width="3" stroke-linecap="round"/><circle cx="182" cy="-182" r="9" fill="#c9c3d9"/></g>`;
+    if (newIndex != null) {
+      const g = rec.querySelector('.k.fresh .koro');
+      if (g && !matchMedia('(prefers-reduced-motion: reduce)').matches) g.animate([{ transform: 'translate(-18px,-64px) scale(.6)', opacity: 0 }, { transform: 'translate(-18px,-19px) scale(.6)', opacity: 1 }], { duration: 600, easing: 'cubic-bezier(.2,.8,.3,1.2)' });
+    }
+  }
+  let armAngle = 0, armTarget = null;
+  function armTip() { return armTarget ? armTarget : { x: 120, y: -40 }; }
+  function setArmTo(i) {
+    if (i == null) { armTarget = null; renderRecord(); return; }
+    const p = spiralPos(i, msgs.length);
+    const a = angle * Math.PI / 180;
+    armTarget = { x: p.x * Math.cos(a) - p.y * Math.sin(a), y: p.x * Math.sin(a) + p.y * Math.cos(a) };
+    renderRecord();
+  }
+  function ptAngle(e) { const r = rec.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; }
+  rec.addEventListener('pointerdown', (e) => { dragging = true; moved = 0; lastA = ptAngle(e); rec.setPointerCapture(e.pointerId); });
+  rec.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    const a = ptAngle(e); let dA = a - lastA; if (dA > 180) dA -= 360; if (dA < -180) dA += 360;
+    moved += Math.abs(dA); angle = (angle + dA) % 360; lastA = a;
+    const disc = rec.querySelector('#disc'); if (disc) disc.setAttribute('transform', `rotate(${angle})`);
+    rec.querySelectorAll('.spin').forEach((s) => s.setAttribute('transform', `rotate(${-angle})`));
+  });
+  rec.addEventListener('pointerup', (e) => {
+    dragging = false;
+    if (moved < 6) { const hit = document.elementFromPoint(e.clientX, e.clientY); const g = hit && hit.closest && hit.closest('.k'); if (g) { stopAll(); play(+g.dataset.k); } }
+  });
+  rec.addEventListener('pointercancel', () => { dragging = false; });
+
+  const readout = document.getElementById('readout');
+  function showReadout(i) {
+    const m = msgs[i];
+    readout.innerHTML = `<span class="koro" style="display:inline-block">${koroSVG(m.who, m.sing)}</span><div class="cap">${m.sing ? '<span class="sing">♪歌</span>' : ''}${escapeHtml(m.text)}<small>${m.who === 'me' ? ME : FRIEND}・${m.day} ${m.t}</small></div>`;
+    if (view === 'record') { readout.querySelector('.koro').dataset.i = i; setArmTo(i); }
+  }
+
+  // ---------- cypher ----------
+  const cypherBtn = document.getElementById('cypher'), stopBtn = document.getElementById('stop');
+  async function cypher() {
+    const tok = ++playToken; cypherBtn.disabled = true; stopBtn.disabled = false;
+    for (let i = 0; i < msgs.length; i++) {
+      if (tok !== playToken) break;
+      if (view === 'lane') { const el = lane.querySelector(`[data-i="${i}"]`); el && el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      await play(i);
+      await new Promise((r) => setTimeout(r, 180));
+    }
+    if (tok === playToken) stopAll();
+  }
+  function stopAll() {
+    playToken++; try { speechSynthesis.cancel(); } catch (e) {}
+    document.querySelectorAll('.koro.playing').forEach((el) => el.classList.remove('playing'));
+    cypherBtn.disabled = false; stopBtn.disabled = true;
+  }
+  cypherBtn.addEventListener('click', cypher);
+  stopBtn.addEventListener('click', stopAll);
+
+  // ---------- switches ----------
+  const tabLane = document.getElementById('tab-lane'), tabRec = document.getElementById('tab-record');
+  function setView(v) {
+    view = v; stopAll();
+    tabLane.setAttribute('aria-pressed', v === 'lane'); tabRec.setAttribute('aria-pressed', v === 'record');
+    document.getElementById('lane-stage').hidden = v !== 'lane';
+    document.getElementById('record-stage').hidden = v !== 'record';
+    if (v === 'lane') renderLane(); else { armTarget = null; renderRecord(); }
+    setSound(v === 'record');
+    try { localStorage.setItem('koro-view2', v); } catch (e) {}
+  }
+  tabLane.addEventListener('click', () => setView('lane'));
+  tabRec.addEventListener('click', () => setView('record'));
+  const soundBtn = document.getElementById('sound');
+  function setSound(on) { soundOn = on; soundBtn.setAttribute('aria-pressed', on); soundBtn.textContent = on ? '🔊 読み上げ オン' : '🔈 読み上げ オフ（字だけ）'; if (!on) try { speechSynthesis.cancel(); } catch (e) {} }
+  soundBtn.addEventListener('click', () => setSound(!soundOn));
+  const mTalk = document.getElementById('m-talk'), mSing = document.getElementById('m-sing');
+  mTalk.addEventListener('click', () => { sendSing = false; mTalk.setAttribute('aria-pressed', true); mSing.setAttribute('aria-pressed', false); });
+  mSing.addEventListener('click', () => { sendSing = true; mSing.setAttribute('aria-pressed', true); mTalk.setAttribute('aria-pressed', false); });
+
+  // ---------- send ----------
+  const replies = ['それな', 'わかる〜', 'ウケる', 'まじで？', '最高じゃん'];
+  let replyIdx = 0;
+  document.getElementById('compose').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('msg');
+    const text = input.value.trim(); if (!text) return;
+    input.value = '';
+    stopAll();
+    const now = new Date(); const t = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+    msgs.push({ who: 'me', text, day: '今日', t, sing: sendSing });
+    const i = msgs.length - 1;
+    if (view === 'lane') renderLane(i); else renderRecord(i);
+    setTimeout(() => play(i), 700);
+    setTimeout(() => {
+      msgs.push({ who: 'friend', text: replies[replyIdx++ % replies.length], day: '今日', t });
+      const j = msgs.length - 1;
+      if (view === 'lane') renderLane(j); else renderRecord(j);
+    }, 3200);
+  });
+
+  function escapeHtml(s) { return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  document.getElementById('head-koro').innerHTML = koroSVG('friend');
+  let start = 'record';
+  try { start = localStorage.getItem('koro-view2') || 'record'; } catch (e) {}
+  setView(start === 'lane' ? 'lane' : 'record');
+})();
+</script>
