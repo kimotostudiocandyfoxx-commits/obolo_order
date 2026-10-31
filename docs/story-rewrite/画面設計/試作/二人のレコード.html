@@ -50,10 +50,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
 
 /* record view */
 .record-view { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px)); gap: 10px; }
-.deck { position: relative; width: min(100%, 50vh, 420px); aspect-ratio: 1; max-width: 100%; flex: none; }
-.deck svg.disc { width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; display: block; overflow: visible; }
-.deck svg.disc:active { cursor: grabbing; }
-.deck .halo { position: absolute; inset: -5%; border-radius: 50%; background: radial-gradient(closest-side, transparent 80%, rgba(240,201,139,.16) 90%, transparent 100%); pointer-events: none; }
+.deck { position: relative; width: min(100%, 440px, 70vh); aspect-ratio: 1 / .78; max-width: 100%; flex: none; }
+.deck canvas.disc { width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; display: block; }
+.deck canvas.disc:active { cursor: grabbing; }
+.deck .halo { position: absolute; left: -4%; right: -4%; top: 14%; bottom: -2%; border-radius: 50%; background: radial-gradient(closest-side, rgba(240,201,139,.14), transparent 75%); pointer-events: none; }
 .cypher { position: absolute; right: -6px; bottom: -4px; width: 76px; height: 76px; border-radius: 50%; border: 0; cursor: pointer; background: radial-gradient(circle at 35% 30%, #fff1d2, var(--ring) 45%, var(--ring-deep)); color: #2a1a08; font-family: var(--font-display); font-weight: 900; font-size: .66rem; line-height: 1.15; box-shadow: 0 6px 18px rgba(0,0,0,.45), 0 0 0 4px rgba(240,201,139,.16); display: grid; place-items: center; padding: 0; }
 .cypher .ic { font-size: 22px; display: block; }
 .cypher.on { background: radial-gradient(circle at 35% 30%, #ffdede, #ff8a8a 45%, #b84a4a); color: #2a0808; }
@@ -157,7 +157,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
     <section class="view record-view" id="record-view" aria-label="レコード">
       <div class="deck">
         <div class="halo"></div>
-        <svg class="disc" id="disc" viewBox="-210 -210 420 420" role="img" aria-label="レコードの溝に並んだコロリン。指で回せます。タップで再生"></svg>
+        <canvas class="disc" id="disc" role="img" aria-label="斜め上から見たレコード。溝にコロリンが立って並ぶ。指で回せます。タップで再生"></canvas>
         <button class="cypher" id="cypher" aria-label="サイファー：順に再生"><span><span class="ic">🎤</span>サイファー</span></button>
       </div>
       <div class="now idle" id="now">
@@ -263,65 +263,115 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
     playing = -1; cypherBtn.classList.remove('on'); cypherBtn.setAttribute('aria-label', 'サイファー：順に再生');
   }
 
-  // ---------- record ----------
-  const disc = document.getElementById('disc');
-  const A = 66, B = 11, GAP = 45;           // spiral r = A + B*θ; kororins GAP units apart along the groove
+  // ---------- record (3D: seen from diagonally above, drawn on a canvas) ----------
+  const cvs = document.getElementById('disc'), ctx = cvs.getContext('2d');
+  const A = 92, B = 10, GAP = 54;             // spiral on the disc plane: r = A + B*θ (disc radius 204)
+  const R = 204, TILT = 0.56;                 // vertical squash of the disc plane (cos of the viewing angle)
   function spiralAt(k) { let th = 0; for (let j = 0; j < k; j++) th += GAP / (A + B * th); return { th, r: A + B * th }; }
   let angle = -30;
   const SPIN = reduce ? 0 : 4.2;              // degrees per second: one turn about every 85 s
-  let dragging = false, lastA = 0, moved = 0, vel = SPIN, lastT = 0;
-  function buildDisc(fresh) {
-    let grooves = '';
-    for (let r = 44; r <= 204; r += 3.2) grooves += `<circle r="${r.toFixed(1)}" fill="none" stroke="#fff" stroke-opacity="${(Math.round(r) % 4 === 0) ? .055 : .028}" stroke-width=".8"/>`;
-    let path = '';
-    const last = spiralAt(msgs.length + 1).th;
-    for (let th = 0; th <= last; th += .04) { const r = A + B * th; path += (path ? 'L' : 'M') + (r * Math.cos(th - Math.PI / 2)).toFixed(1) + ' ' + (r * Math.sin(th - Math.PI / 2)).toFixed(1); }
-    let items = '', lastDay = '';
-    msgs.forEach((m, i) => {
-      const { th, r } = spiralAt(i);
-      if (r > 196) return;
-      const x = r * Math.cos(th - Math.PI / 2), y = r * Math.sin(th - Math.PI / 2);
-      let flag = '';
-      if (m.day !== lastDay) { lastDay = m.day; flag = `<text y="-27" text-anchor="middle" font-size="9.5" font-weight="700" fill="#f0c98b" font-family="sans-serif">${m.day}</text>`; }
-      items += `<g class="slot" data-k="${i}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><g class="upright">${flag}<g transform="translate(-24.5 -28.5) scale(.72)"><svg class="k${i === fresh ? ' fresh' : ''}" data-i="${i}" viewBox="-34 -40 68 76" width="68" height="76" overflow="visible">${koroInner(m.who)}</svg></g></g></g>`;
-    });
-    disc.innerHTML = `
-      <circle r="208" fill="#05050a"/>
-      <g id="spin">
-        <circle r="204" fill="url(#g-vinyl)"/>
-        ${grooves}
-        <path d="${path}" fill="none" stroke="#f0c98b" stroke-width="1" stroke-dasharray="1.5 5" opacity=".38"/>
-        <circle r="40" fill="url(#g-label)"/>
-        <circle r="40" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="1"/>
-        <g class="upright"><text y="-12" text-anchor="middle" font-size="9" font-weight="900" fill="#3b2408" font-family="sans-serif">ミナト × ハル</text>
-        <text y="19" text-anchor="middle" font-size="6.5" font-weight="700" fill="#5a3a12" font-family="sans-serif">SIDE SATURN</text></g>
-        <ellipse rx="15" ry="4" fill="none" stroke="#5a3a12" stroke-width="1.4" transform="rotate(-18)"/><circle r="6" fill="#5a3a12"/><circle r="2.2" fill="#05050a"/>
-        ${items}
-      </g>
-      <circle r="204" fill="url(#g-sheen)" pointer-events="none"/>
-      <g pointer-events="none">
-        <circle cx="178" cy="-178" r="13" fill="#2a2a3a" stroke="#c9c3d9" stroke-width="2"/>
-        <line id="arm-line" x1="178" y1="-178" x2="150" y2="-40" stroke="#d9d3e6" stroke-width="3.2" stroke-linecap="round"/>
-        <rect id="arm-head" x="-6" y="-9" width="12" height="18" rx="3" fill="#c9c3d9" transform="translate(150 -40)"/>
-      </g>`;
-    applyAngle();
-    if (fresh != null && !reduce) {
-      const g = disc.querySelector('.k.fresh');
-      if (g) g.animate([{ opacity: 0, transform: 'translateY(-40px)' }, { opacity: 1, transform: 'none' }], { duration: 700, easing: 'cubic-bezier(.2,.9,.3,1.3)' });
-    }
+  let dragging = false, lastA = 0, moved = 0, vel = SPIN, lastT = 0, fresh = -1, freshAt = 0;
+  let W = 0, H = 0, S = 1, CX = 0, CY = 0, dpr = 1;
+  // kororin pictures for the canvas: normal and singing, per person
+  const pics = {};
+  function koroStandalone(who, singing) {
+    const defs = document.querySelector('svg defs').innerHTML;
+    let inner = koroInner(who);
+    if (singing) inner = inner.replace('<g class="shades">', '<g class="shades" transform="translate(0 19)">').replace('<g class="mic-pick">', '<g class="mic-pick" opacity="1">');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-34 -40 68 76" width="272" height="304"><defs>${defs}</defs>${inner.replace(/class="mic-pick"(?! opacity)/, 'class="mic-pick" opacity="0"')}</svg>`;
   }
+  function loadPics() {
+    ['me', 'friend'].forEach((who) => [false, true].forEach((sing) => {
+      const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(koroStandalone(who, sing));
+      pics[who + (sing ? '-s' : '')] = img;
+    }));
+  }
+  function resize() {
+    const r = cvs.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio || 1);
+    W = r.width; H = r.height; cvs.width = Math.round(W * dpr); cvs.height = Math.round(H * dpr);
+    S = Math.min(W / (2 * R + 16), H / ((2 * R) * TILT + 96));
+    CX = W / 2; CY = H * 0.55;
+  }
+  const P = (x, y) => [CX + x * S, CY + y * S * TILT];          // disc plane → screen
+  function rot(x, y, a) { const c = Math.cos(a), s = Math.sin(a); return [x * c - y * s, x * s + y * c]; }
+  function buildDisc(f) { if (f != null) { fresh = f; freshAt = performance.now(); } }
   let armX = 150, armY = -40;
-  function applyAngle() {
-    const s = disc.querySelector('#spin'); if (!s) return;
-    s.setAttribute('transform', `rotate(${angle.toFixed(2)})`);
-    disc.querySelectorAll('.upright').forEach((u) => u.setAttribute('transform', `rotate(${(-angle).toFixed(2)})`));
-    let tx = 150, ty = -40;                     // tonearm rests at the edge, follows the playing kororin
-    if (playing >= 0) { const { th, r } = spiralAt(playing); const a = th - Math.PI / 2 + angle * Math.PI / 180; tx = r * Math.cos(a); ty = r * Math.sin(a); }
-    armX += (tx - armX) * (reduce ? 1 : .12); armY += (ty - armY) * (reduce ? 1 : .12);
-    const ln = disc.querySelector('#arm-line'), hd = disc.querySelector('#arm-head');
-    if (ln) { ln.setAttribute('x2', armX.toFixed(1)); ln.setAttribute('y2', armY.toFixed(1)); }
-    if (hd) { const rot = Math.atan2(armY + 178, armX - 178) * 180 / Math.PI + 90; hd.setAttribute('transform', `translate(${armX.toFixed(1)} ${armY.toFixed(1)}) rotate(${rot.toFixed(1)})`); }
+  function draw(now) {
+    if (!W) resize();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    const a = angle * Math.PI / 180;
+    // plinth and platter edge (thickness)
+    const thick = 16 * S, base = 30 * S;
+    ctx.save(); ctx.translate(CX, CY + base); ctx.scale(1, TILT);
+    ctx.beginPath(); ctx.arc(0, 0, (R + 26) * S, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(CX, CY); ctx.scale(1, TILT);
+    for (let i = 0; i <= thick; i += 1) { ctx.beginPath(); ctx.arc(0, i / TILT, R * S + 2, 0, Math.PI); ctx.fillStyle = i > thick - 2 ? '#3a3326' : '#15141d'; ctx.fill(); }
+    ctx.beginPath(); ctx.arc(0, thick / TILT, R * S + 2, 0, Math.PI); ctx.strokeStyle = '#f0c98b33'; ctx.lineWidth = 1.5; ctx.stroke();
+    // vinyl
+    ctx.beginPath(); ctx.arc(0, 0, R * S, 0, Math.PI * 2);
+    const g = ctx.createRadialGradient(0, 0, 10, 0, 0, R * S); g.addColorStop(0, '#20202f'); g.addColorStop(.6, '#101019'); g.addColorStop(1, '#06060b');
+    ctx.fillStyle = g; ctx.fill();
+    for (let r = 44; r <= R - 2; r += 3.2) { ctx.beginPath(); ctx.arc(0, 0, r * S, 0, Math.PI * 2); ctx.strokeStyle = `rgba(255,255,255,${Math.round(r) % 4 === 0 ? .06 : .03})`; ctx.lineWidth = .8; ctx.stroke(); }
+    // rotating plane: groove path and label
+    ctx.rotate(a);
+    ctx.beginPath(); const last = spiralAt(msgs.length + 1).th;
+    for (let th = 0; th <= last; th += .04) { const r = A + B * th; const x = r * Math.cos(th - Math.PI / 2) * S, y = r * Math.sin(th - Math.PI / 2) * S; th ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.setLineDash([2, 6]); ctx.strokeStyle = 'rgba(240,201,139,.4)'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.setLineDash([]);
+    const lg = ctx.createRadialGradient(-12 * S, -14 * S, 2, 0, 0, 40 * S); lg.addColorStop(0, '#ffe7b8'); lg.addColorStop(.7, '#f0c98b'); lg.addColorStop(1, '#c9954f');
+    ctx.beginPath(); ctx.arc(0, 0, 40 * S, 0, Math.PI * 2); ctx.fillStyle = lg; ctx.fill();
+    ctx.fillStyle = '#3b2408'; ctx.textAlign = 'center'; ctx.font = `900 ${9 * S}px ${getComputedStyle(document.body).fontFamily}`; ctx.fillText('ミナト × ハル', 0, -12 * S);
+    ctx.fillStyle = '#5a3a12'; ctx.font = `700 ${6.5 * S}px sans-serif`; ctx.fillText('SIDE SATURN', 0, 21 * S);
+    ctx.beginPath(); ctx.ellipse(0, 0, 15 * S, 4 * S, -.3, 0, Math.PI * 2); ctx.strokeStyle = '#5a3a12'; ctx.lineWidth = 1.4 * S; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, 6 * S, 0, Math.PI * 2); ctx.fillStyle = '#5a3a12'; ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, 2.2 * S, 0, Math.PI * 2); ctx.fillStyle = '#05050a'; ctx.fill();
+    ctx.restore();
+    // fixed sheen (the light does not turn with the disc)
+    ctx.save(); ctx.translate(CX, CY); ctx.scale(1, TILT);
+    ctx.beginPath(); ctx.arc(0, 0, R * S, 0, Math.PI * 2); ctx.clip();
+    const sh = ctx.createLinearGradient(-R * S, -R * S, R * S, R * S);
+    sh.addColorStop(0, 'rgba(255,255,255,0)'); sh.addColorStop(.38, 'rgba(255,255,255,.05)'); sh.addColorStop(.48, 'rgba(255,255,255,.13)'); sh.addColorStop(.58, 'rgba(255,255,255,.04)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sh; ctx.fillRect(-R * S, -R * S, 2 * R * S, 2 * R * S); ctx.restore();
+    // kororins: stand upright on the disc, back ones first
+    const list = [];
+    let lastDay = '';
+    msgs.forEach((m, i) => {
+      const { th, r } = spiralAt(i); if (r > R - 8) return;
+      const [x, y] = rot(r * Math.cos(th - Math.PI / 2), r * Math.sin(th - Math.PI / 2), a);
+      const day = m.day !== lastDay ? m.day : ''; lastDay = m.day;
+      list.push({ i, m, x, y, day });
+    });
+    list.sort((p, q) => p.y - q.y);
+    hits = [];
+    for (const it of list) {
+      const [sx, sy] = P(it.x, it.y);
+      const depth = 1 + 0.16 * (it.y / R);                  // nearer = a little bigger
+      let size = 54 * S * depth, lift = 0;
+      const isPlaying = it.i === playing;
+      if (isPlaying && !reduce) { const k = Math.sin(now / 95); size *= 1 + .05 * k; lift = 4 * S * Math.abs(k); }
+      if (it.i === fresh) { const t = Math.min(1, (now - freshAt) / 700); lift += (1 - t) * (1 - t) * 120 * S; if (t >= 1) fresh = -1; }
+      ctx.beginPath(); ctx.ellipse(sx, sy, size * .38, size * .38 * TILT * .55, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
+      if (isPlaying) { ctx.beginPath(); ctx.ellipse(sx, sy, size * .62, size * .62 * TILT * .55, 0, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(240,201,139,.75)'; ctx.lineWidth = 2; ctx.stroke(); }
+      const img = pics[it.m.who + (isPlaying ? '-s' : '')];
+      const w = size, h = size * 76 / 68, top = sy - h * .9 - lift;
+      if (img && img.complete) ctx.drawImage(img, sx - w / 2, top, w, h);
+      if (it.day) { ctx.font = `700 ${9.5 * S}px sans-serif`; ctx.textAlign = 'center'; ctx.fillStyle = '#f0c98b'; ctx.fillText(it.day, sx, top - 3 * S); }
+      hits.push({ i: it.i, x0: sx - w / 2, x1: sx + w / 2, y0: top, y1: sy + 4 });
+    }
+    // tonearm: pivot raised on the plinth, head follows the playing kororin
+    let tx = 150, ty = -40;
+    if (playing >= 0) { const { th, r } = spiralAt(playing); [tx, ty] = rot(r * Math.cos(th - Math.PI / 2), r * Math.sin(th - Math.PI / 2), a); }
+    armX += (tx - armX) * (reduce ? 1 : .1); armY += (ty - armY) * (reduce ? 1 : .1);
+    const [px, py] = P(186, -150), [hx, hy] = P(armX, armY);
+    const pivotUp = 26 * S, headUp = (playing >= 0 ? 6 : 14) * S;
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(px, py - pivotUp + 4); ctx.lineTo(hx, hy - headUp + 4); ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = 5 * S; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, py - pivotUp); ctx.lineTo(hx, hy - headUp); ctx.strokeStyle = '#d9d3e6'; ctx.lineWidth = 3.4 * S; ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(px, py, 16 * S, 16 * S * TILT, 0, 0, Math.PI * 2); ctx.fillStyle = '#26263a'; ctx.fill();
+    ctx.fillStyle = '#3a3a52'; ctx.fillRect(px - 5 * S, py - pivotUp, 10 * S, pivotUp);
+    ctx.beginPath(); ctx.arc(px, py - pivotUp, 7 * S, 0, Math.PI * 2); ctx.fillStyle = '#c9c3d9'; ctx.fill();
+    ctx.save(); ctx.translate(hx, hy - headUp); ctx.rotate(Math.atan2(hy - py, hx - px)); ctx.fillStyle = '#c9c3d9'; ctx.fillRect(-4 * S, -6 * S, 14 * S, 12 * S); ctx.restore();
   }
+  let hits = [];
   function tick(t) {
     const dt = lastT ? Math.min(.05, (t - lastT) / 1000) : 0; lastT = t;
     if (view === 'record') {
@@ -330,26 +380,27 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
         vel += (target - vel) * Math.min(1, dt * 1.4);
         angle = (angle + vel * dt) % 360;
       }
-      applyAngle();
+      draw(t);
     }
     requestAnimationFrame(tick);
   }
-  function ptAngle(e) { const r = disc.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; }
-  disc.addEventListener('pointerdown', (e) => { dragging = true; moved = 0; lastA = ptAngle(e); disc.setPointerCapture(e.pointerId); });
-  disc.addEventListener('pointermove', (e) => {
+  function planeAngle(e) { const r = cvs.getBoundingClientRect(); const x = (e.clientX - r.left - CX) / S, y = (e.clientY - r.top - CY) / (S * TILT); return Math.atan2(y, x) * 180 / Math.PI; }
+  cvs.addEventListener('pointerdown', (e) => { dragging = true; moved = 0; lastA = planeAngle(e); cvs.setPointerCapture(e.pointerId); });
+  cvs.addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    const a = ptAngle(e); let d = a - lastA; if (d > 180) d -= 360; if (d < -180) d += 360;
-    moved += Math.abs(d); angle += d; lastA = a; vel = Math.max(-240, Math.min(240, d * 40));
+    const a2 = planeAngle(e); let d = a2 - lastA; if (d > 180) d -= 360; if (d < -180) d += 360;
+    moved += Math.abs(d); angle += d; lastA = a2; vel = Math.max(-240, Math.min(240, d * 40));
   });
-  disc.addEventListener('pointerup', (e) => {
+  cvs.addEventListener('pointerup', (e) => {
     dragging = false;
     if (moved < 6) {
-      const hit = document.elementFromPoint(e.clientX, e.clientY);
-      const slot = hit && hit.closest && hit.closest('.slot');
-      if (slot) { stopAll(); play(+slot.dataset.k); }
+      const r = cvs.getBoundingClientRect(); const x = e.clientX - r.left, y = e.clientY - r.top;
+      for (let k = hits.length - 1; k >= 0; k--) { const h = hits[k]; if (x >= h.x0 && x <= h.x1 && y >= h.y0 && y <= h.y1) { stopAll(); play(h.i); break; } }
     }
   });
-  disc.addEventListener('pointercancel', () => { dragging = false; });
+  cvs.addEventListener('pointercancel', () => { dragging = false; });
+  addEventListener('resize', resize);
+  loadPics();
 
   // now-playing card
   const now = document.getElementById('now'), nowAv = document.getElementById('now-av'), nowL1 = document.getElementById('now-line1'), nowBody = document.getElementById('now-body');
