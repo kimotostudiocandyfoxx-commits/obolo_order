@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { withAgeBand, withTouch, batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, puniPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { withAgeBand, withTouch, batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
@@ -31,10 +31,10 @@ export const PUNI_PIC_TRIES = 3;
 /** PLACEHOLDER (P-JUP-20): Bati's sticker pictures per member per day. */
 export const STICKER_ART_TRIES = 8;
 const PUNI_PIC_CANDIDATES = 4; // Saturn kororin design (story D04-S005b): four to pick from
-let styleSheet: Promise<GeneratedImage> | null = null;
 /** The client's reference characters, shown to the model as the style to follow. */
-const puniStyle = () => (styleSheet ??= readFile(resolve(__dirname, '../../assets/puni-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
+const kororinStyle = () => (kororinSheet ??= readFile(resolve(__dirname, '../../assets/kororin-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 let butterflySheet: Promise<GeneratedImage> | null = null;
+let kororinSheet: Promise<GeneratedImage> | null = null;
 /** The client's パタパタ butterflies (cut from the Jupiter mock), the style to follow. */
 /** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg). */
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
@@ -287,11 +287,13 @@ export class LookService {
       const res = await fetch(from, { signal: AbortSignal.timeout(20_000) }).catch(() => null);
       if (res?.ok) reference = { data: Buffer.from(await res.arrayBuffer()), mime: res.headers.get('content-type') ?? 'image/png' };
     }
-    const refs = [kind === 'butterfly' ? await butterflyStyle() : await puniStyle(), ...(reference ? [reference] : [])];
+    // Saturn's kororin is a takoyaki (M-R153) painted by Seedream like the looks; Jupiter's butterfly keeps its sheet
+    const refs = [kind === 'butterfly' ? await butterflyStyle() : await kororinStyle(), ...(reference ? [reference] : [])];
     // the kororin design costs mana (3, M-R132)
     const fee = kind === 'puni' ? await this.fee(userId, 'kororinDesign', unlimited) : { refund: async () => undefined };
-    const prompt = kind === 'butterfly' ? butterflyPrompt : puniPicPrompt;
-    const made = await settleWithRetry(kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES, (i) => this.images.generate(prompt(body.description, !!reference, i), i, refs));
+    const prompt = kind === 'butterfly' ? butterflyPrompt : kororinPicPrompt;
+    const painter = kind === 'butterfly' ? this.images : this.looks;
+    const made = await settleWithRetry(kind === 'butterfly' ? 2 : PUNI_PIC_CANDIDATES, (i) => painter.generate(prompt(body.description, !!reference, i), i, refs));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {

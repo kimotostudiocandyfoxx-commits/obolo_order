@@ -1,5 +1,6 @@
+import { KORORIN_BASE } from '@/components/saturn/KororinVessels';
 import type { DeliverBody, SongDesign } from '@obolo/shared';
-import { getApi } from '@/lib/api';
+import { ApiError, getApi } from '@/lib/api';
 import { waitJob } from '@/lib/jobs';
 import type { MvMade, SongMade } from './made';
 
@@ -63,10 +64,19 @@ export const realLessonApi: LessonApi = {
     await getApi().composeSongSave(id);
   },
   async kororinDesigns(description) {
-    return (await getApi().puniPicCandidates({ description: description.slice(0, 200), useNeoLook: true })).candidates;
+    // nothing painted: the base takoyaki kororin keeps the lesson going (client 2026-11-01)
+    const c = await getApi()
+      .puniPicCandidates({ description: description.slice(0, 200), useNeoLook: true })
+      .then((r) => r.candidates)
+      .catch((e: unknown) => {
+        // words that cannot be used, or no tries left today: said on screen as before
+        if (e instanceof ApiError && (e.code === 'MODERATION' || e.code === 'PUNI_PIC_TRIES')) throw e;
+        return [];
+      });
+    return c.length ? c : [{ id: '', url: KORORIN_BASE.mine }];
   },
   async chooseKororin(id) {
-    await getApi().choosePuniPic(id);
+    if (id) await getApi().choosePuniPic(id);
   },
   async befriendInviter() {
     await getApi().befriendInviter();

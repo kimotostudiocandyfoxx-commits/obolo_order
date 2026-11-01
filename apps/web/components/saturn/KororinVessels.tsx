@@ -26,6 +26,9 @@ export interface Kororin {
   at: number;
 }
 
+/** the base kororin (client 2026-11-01): a takoyaki, your own with an orange band, everyone else's sky blue; it sings with the glasses down */
+export const KORORIN_BASE = { mine: '/saturn/kororin-mine.webp', mineSing: '/saturn/kororin-mine-sing.webp', dachi: '/saturn/kororin-dachi.webp', dachiSing: '/saturn/kororin-dachi-sing.webp' };
+const basePic = (owner: Kororin['owner'], sing: boolean) => (owner === 'mine' ? (sing ? KORORIN_BASE.mineSing : KORORIN_BASE.mine) : sing ? KORORIN_BASE.dachiSing : KORORIN_BASE.dachi);
 const HALL = '/onboarding/s/saturn-hall-kororin.jpg';
 const PLAZA = '/onboarding/s/saturn-plaza-kororin.jpg';
 const VESSEL = '/onboarding/kororin-vessel.webp';
@@ -141,7 +144,7 @@ export function KororinVessels({
         aria-label={`${k.name}のコロリン`}
       >
         <span className={`relative rounded-full ${lit ? 'animate-[hintGlow_1.6s_ease-in-out_infinite] ring-4 ring-amber-200' : ''}`} style={{ width: size, height: size }}>
-          <PuniAvatar seed={k.seed} pic={k.pic} size={size} speaking={sing} bounce={sing ? 'sing' : undefined} />
+          <PuniAvatar seed={k.seed} pic={k.pic || basePic(k.owner, sing)} size={size} speaking={sing} bounce={sing ? 'sing' : undefined} />
           {sing && <span className="pointer-events-none absolute -right-2 -top-3 animate-bounce text-[18px] text-amber-200 drop-shadow">♪</span>}
         </span>
         {where === 'vessel' && <span className="pointer-events-none absolute -top-3 left-1/2 z-[4] -translate-x-1/2 whitespace-nowrap rounded-full bg-white/85 px-1.5 text-[8px] font-bold leading-[13px] text-[#6a4a8a] shadow-sm">{stamp(k.at)}</span>}

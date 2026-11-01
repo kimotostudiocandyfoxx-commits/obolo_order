@@ -396,6 +396,27 @@ export function butterflyPrompt(description: string, hasReference: boolean, vari
   );
 }
 
+/**
+ * Saturn's kororin (M-R153, client 2026-11-01: they came out as round mochi mascots): always a squishy takoyaki ball
+ * in the style of the FIRST attached image (the base kororin), its body never changes; the member's words become its
+ * colours, patterns, the band around its lower body and a small charm. Sunglasses up on the forehead, eyes visible.
+ */
+export function kororinPicPrompt(description: string, hasReference: boolean, variant: number): string {
+  const moods = ['happy and smiling', 'cheerful with a tiny wink feel', 'calm and gentle', 'excited'];
+  return (
+    'Draw ONE kororin character in exactly the style of the FIRST attached image (the base kororin): a small squishy takoyaki ball ' +
+    '(round octopus dumpling) with a golden-brown baked body, brown takoyaki sauce on top, a white mayonnaise zigzag, green aonori flakes ' +
+    'and dancing katsuobushi flakes, small black dot eyes, a tiny "ω" mouth, short stubby arms and feet, a soft soft-lit deformed 3D look. ' +
+    'Round gold-rimmed sunglasses are pushed UP on its forehead, resting on the sauce, so the eyes stay visible. The body is ALWAYS this takoyaki ball. ' +
+    `Make it the member's own from their words: "${description}" — show it only as the colour of the band around its lower body, small patterns, ` +
+    `and one small charm or accessory it wears or holds. Mood: ${moods[variant % moods.length]}. ` +
+    (hasReference ? 'Use the SECOND attached image only for a hint of colours and motifs (never its face or body). ' : '') +
+    'Composition: full body, front view, centered, about 75% of a square frame, nothing cut off. ' +
+    'Background: plain flat pure white (#FFFFFF), no ground, no shadow, no other objects. No text, no letters, no logo, no watermark. ' +
+    ORIGINAL
+  );
+}
+
 export function puniPicPrompt(description: string, hasReference: boolean, variant: number): string {
   const moods = ['happy and smiling', 'cheerful with a tiny wink feel', 'sleepy and calm', 'excited'];
   const shades = ['thin gold frames with dark lenses', 'thick black frames with pink-tinted lenses', 'white frames with mirrored blue lenses', 'tortoiseshell frames with amber lenses'];
