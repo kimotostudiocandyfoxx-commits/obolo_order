@@ -109,6 +109,17 @@ async function talk(round) {
 
 const photos = [1, 2, 3, 4].map((k) => process.env[`PHOTO${k}`]).filter(Boolean);
 const only = process.env.ONLY || '';
+// ONLY=kororin: Saturn's kororin designs (two wordings, four candidates each), to see they come out as takoyaki
+if (only === 'kororin') {
+  for (const [id, description] of [['k1', '青と金、星が好き、元気'], ['k2', 'ピンク、お菓子作りが好き、のんびり']]) {
+    const t = await account(`kororin-${id}`);
+    const c = await safe(`kororin ${id}`, () => call(t, 'POST', '/me/puni/pic/candidates', { description }));
+    out(`TABLE look | kororin ${id}（${description}） | ${c?.j.candidates.length ?? 0} | ${c?.s ?? '-'}s`);
+    (c?.j.candidates ?? []).forEach((x, k) => img(`look-kororin-${id}-${k + 1}`, x.url));
+  }
+  out('DONE');
+  process.exit(0);
+}
 // ONLY=seq: one visitor's path at a time, three times over (look → Bati → five talks), as an invited guest would go
 if (only === 'seq') {
   const runs = [
