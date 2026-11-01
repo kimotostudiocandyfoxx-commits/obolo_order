@@ -1,0 +1,11 @@
+OK  POST /admin/invites 201 0.2s
+OK  POST /invites/uBvy3MM7QFdZsol3/accept 200 0.1s
+OK  POST /me/puni/pic/candidates 200 95.4s
+TABLE look | kororin k1（青と金、星が好き、元気） | 4 | 95.4s
+OK  POST /admin/invites 201 0.1s
+OK  POST /invites/8ibeAUrbxAfMmtgM/accept 200 0.1s
+OK  POST /me/puni/pic/candidates 200 118.0s
+TABLE look | kororin k2（ピンク、お菓子作りが好き、のんびり） | 3 | 118.0s
+DONE
+Container called exit(0).
+
