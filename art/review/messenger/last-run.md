@@ -1,19 +1,10 @@
-# UI art — 2026-10-31T05:37:20.399Z
+# UI art — 2026-11-01T01:40:32.288Z
 
-Seedream 5.0 Pro / 15枚 / 約108円
+Seedream 5.0 Pro / 6枚 / 約43円
 
-- ✅ kororin-a-normal-a
-- ✅ kororin-a-normal-b
-- ✅ kororin-a-sing-a
-- ✅ kororin-a-sing-b
-- ✅ kororin-b-normal-a
-- ✅ kororin-b-normal-b
-- ✅ kororin-b-sing-a
-- ✅ kororin-b-sing-b
-- ✅ record-label-a
-- ✅ record-label-b
-- ✅ record-stage-a
-- ✅ record-stage-b
-- ✅ record-stage-c
-- ✅ tonearm-a
-- ✅ tonearm-b
+- ✅ kororin-a-normal-a-up-a
+- ✅ kororin-a-normal-a-up-b
+- ✅ kororin-b-normal-b-up-a
+- ✅ kororin-b-normal-b-up-b
+- ✅ record-stage-a-empty-a
+- ✅ record-stage-a-empty-b
