@@ -188,6 +188,84 @@
    ],
    "refs": [],
    "prompt": "A record player tonearm seen from straight above, on a plain pure white background: a round black-and-gold pivot base, a long slender gold arm running diagonally at 45 degrees, ending in a small black-and-gold headshell with the stylus. Luxurious, matching a black-and-gold turntable with arabesque trim. Only the tonearm, nothing else. Soft-lit deformed 3D style matching the reference picture (the Saturn temple drawn the kororin way): rounded shapes, gentle warm light, no harsh white glare. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "record-stage-a-empty-a",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/messenger/record-stage-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and everything else exactly the same, and change only this: remove the vinyl record and the whole tonearm, including the tonearm's base, pivot and rest. The turntable keeps its black-and-gold body, gold arabesque trim, octopus-tentacle legs and corner Saturn ornaments; on top only an empty, plain matte black rubber platter (a smooth disc, no grooves, no label, no spindle decoration beyond a tiny center pin), the spot where the arm stood is plain black lacquer with gold trim. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "record-stage-a-empty-b",
+   "w": 1152,
+   "h": 2048,
+   "size": [
+    1152,
+    2048
+   ],
+   "refs": [
+    "art/review/messenger/record-stage-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and everything else exactly the same, and change only this: remove the vinyl record and the whole tonearm, including the tonearm's base, pivot and rest. The turntable keeps its black-and-gold body, gold arabesque trim, octopus-tentacle legs and corner Saturn ornaments; on top only an empty, plain matte black rubber platter (a smooth disc, no grooves, no label, no spindle decoration beyond a tiny center pin), the spot where the arm stood is plain black lacquer with gold trim. The platter's black rubber has a faint soft sheen from the light above. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-a-normal-a-up-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "art/review/messenger/kororin-a-normal-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and everything else exactly the same, and change only this: the round gold-rimmed sunglasses are pushed up onto its forehead, resting on top of the sauce, so its small black dot eyes are clearly visible below them with a calm happy look. Everything else (body, sauce, mayonnaise, aonori, katsuobushi, arms, coloured band, white background) stays the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-a-normal-a-up-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "art/review/messenger/kororin-a-normal-a.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and everything else exactly the same, and change only this: the round gold-rimmed sunglasses are pushed up onto its forehead, resting on top of the sauce, so its small black dot eyes are clearly visible below them with a calm happy look. Everything else (body, sauce, mayonnaise, aonori, katsuobushi, arms, coloured band, white background) stays the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-b-normal-b-up-a",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "art/review/messenger/kororin-b-normal-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and everything else exactly the same, and change only this: the round gold-rimmed sunglasses are pushed up onto its forehead, resting on top of the sauce, so its small black dot eyes are clearly visible below them with a calm happy look. Everything else (body, sauce, mayonnaise, aonori, katsuobushi, arms, coloured band, white background) stays the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
+  },
+  {
+   "id": "kororin-b-normal-b-up-b",
+   "w": 1024,
+   "h": 1024,
+   "size": [
+    1024,
+    1024
+   ],
+   "refs": [
+    "art/review/messenger/kororin-b-normal-b.jpg"
+   ],
+   "prompt": "Edit the first picture: keep the place, camera, framing, light, style and everything else exactly the same, and change only this: the round gold-rimmed sunglasses are pushed up onto its forehead, resting on top of the sauce, so its small black dot eyes are clearly visible below them with a calm happy look. Everything else (body, sauce, mayonnaise, aonori, katsuobushi, arms, coloured band, white background) stays the same. No text, no letters, no numbers, no symbols that read as writing, no logos, no watermark, no signature."
   }
  ]
 }
