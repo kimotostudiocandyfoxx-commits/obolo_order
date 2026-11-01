@@ -5,8 +5,11 @@ import sharp from 'sharp';
  * near-white pixels connected to the image border (so white INSIDE the character — rice, shine —
  * stays), soften the edge, then crop to a square around the character with a little margin and
  * return a 512 px transparent PNG. `bg`: another flat background colour (the Bati's mid-grey).
+ * `noShadow`: the soft grey shadow the painter leaves under the feet goes too (the app draws its own; on a dark
+ * stage it read as a white stain, story chat 2026-11-01) — the flood runs on into light, colourless pixels in the
+ * lower part of the picture only, so white inside the character (mayonnaise, shine) stays.
  */
-export async function cutoutWhite(input: Buffer, out = 512, bg: [number, number, number] = [255, 255, 255]): Promise<Buffer> {
+export async function cutoutWhite(input: Buffer, out = 512, bg: [number, number, number] = [255, 255, 255], noShadow = false): Promise<Buffer> {
   const { data, info } = await sharp(input).ensureAlpha().resize(720, 720, { fit: 'inside' }).raw().toBuffer({ resolveWithObject: true });
   const W = info.width;
   const H = info.height;
@@ -32,14 +35,32 @@ export async function cutoutWhite(input: Buffer, out = 512, bg: [number, number,
     seed(y * W);
     seed(y * W + W - 1);
   }
-  while (stack.length) {
-    const i = stack.pop()!;
-    const x = i % W;
-    const y = (i / W) | 0;
-    if (x > 0) seed(i - 1);
-    if (x < W - 1) seed(i + 1);
-    if (y > 0) seed(i - W);
-    if (y < H - 1) seed(i + W);
+  const flood = (take: (i: number) => void) => {
+    while (stack.length) {
+      const i = stack.pop()!;
+      const x = i % W;
+      const y = (i / W) | 0;
+      if (x > 0) take(i - 1);
+      if (x < W - 1) take(i + 1);
+      if (y > 0) take(i - W);
+      if (y < H - 1) take(i + W);
+    }
+  };
+  flood(seed);
+  if (noShadow) {
+    // the shadow under the feet: light, nearly colourless and warm (never bluish: the sky-blue band stays), in the lowest 40%
+    const shade = (i: number) => {
+      if (isBg[i] || ((i / W) | 0) < H * 0.6) return;
+      const r = px[i * 4];
+      const g = px[i * 4 + 1];
+      const b = px[i * 4 + 2];
+      if (Math.max(r, g, b) - Math.min(r, g, b) <= 45 && Math.min(r, g, b) >= 140 && r >= b - 4) {
+        isBg[i] = 1;
+        stack.push(i);
+      }
+    };
+    for (let i = 0; i < W * H; i++) if (isBg[i] && ((i / W) | 0) >= H * 0.6) stack.push(i);
+    flood(shade);
   }
   let minX = W;
   let minY = H;

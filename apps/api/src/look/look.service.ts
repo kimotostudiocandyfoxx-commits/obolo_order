@@ -301,7 +301,7 @@ export class LookService {
         continue;
       }
       try {
-        const png = await cutoutWhite(r.value.data);
+        const png = await cutoutWhite(r.value.data, 512, undefined, kind === 'puni');
         const m = await this.media.storeImage(userId, 'avatar', 'image/png', png, origin);
         candidates.push({ id: m.id, url: m.url });
       } catch (e) {
