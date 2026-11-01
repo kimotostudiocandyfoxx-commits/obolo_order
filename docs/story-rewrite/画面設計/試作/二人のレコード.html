@@ -273,14 +273,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
   const cvs = document.getElementById('disc'), ctx = cvs.getContext('2d');
   const A = 102, B = 9, GAP = 66, R = 204;    // spiral on the disc plane in disc units (disc radius R)
   // where the record sits in assets/stage.webp (1152×1140): centre, horizontal and vertical radius in image pixels
-  const IMG_W = 1152, IMG_H = 1140, DCX = 570, DCY = 565, DRX = 330, DRY = 245;
+  const IMG_W = 1152, IMG_H = 1140, DCX = 571, DCY = 572, DRX = 326, DRY = 254;
+  // the tonearm picture (assets/tonearm.webp, 600×474): pivot and stylus in its own pixels; where the pivot stands in the stage
+  const ARM_B = [110, 385], ARM_H = [545, 38], ARM_PIVOT = [985, 372], ARM_LEN = 430, ARM_REST = [935, 735];
   function spiralAt(k) { let th = 0; for (let j = 0; j < k; j++) th += GAP / (A + B * th); return { th, r: A + B * th }; }
   let angle = -30;
   const SPIN = reduce ? 0 : 4.2;              // degrees per second: one turn about every 85 s
   let dragging = false, lastA = 0, moved = 0, vel = SPIN, lastT = 0, fresh = -1, freshAt = 0;
   let W = 0, H = 0, F = 1, dpr = 1;
   const img = (src) => { const i = new Image(); i.src = src; return i; };
-  const art = { stage: img('assets/stage.webp'), label: img('assets/label.webp'), me: img('assets/koro-me.webp'), 'me-s': img('assets/koro-me-s.webp'), friend: img('assets/koro-friend.webp'), 'friend-s': img('assets/koro-friend-s.webp') };
+  const art = { stage: img('assets/stage.webp'), label: img('assets/label.webp'), me: img('assets/koro-me.webp'), 'me-s': img('assets/koro-me-s.webp'), friend: img('assets/koro-friend.webp'), 'friend-s': img('assets/koro-friend-s.webp'), arm: img('assets/tonearm.webp') };
+  let armAng = null;
   function resize() {
     const r = cvs.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio || 1);
     W = r.width; H = r.height; cvs.width = Math.round(W * dpr); cvs.height = Math.round(H * dpr);
@@ -296,8 +299,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const a = angle * Math.PI / 180;
     if (art.stage.complete && art.stage.naturalWidth) ctx.drawImage(art.stage, 0, 0, IMG_W * F, IMG_H * F);
-    // the turning parts, in the plane of the record
+    // the record itself, drawn on the empty platter of the stage art
     ctx.save(); ctx.translate(DCX * F, DCY * F); ctx.scale(SX(), SY());
+    ctx.beginPath(); ctx.arc(0, 3, R, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();
+    const vg = ctx.createRadialGradient(0, 0, 20, 0, 0, R); vg.addColorStop(0, '#22212c'); vg.addColorStop(.55, '#131219'); vg.addColorStop(1, '#09080d');
+    ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = vg; ctx.fill();
+    for (let r = 78; r <= R - 4; r += 2.6) { ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.strokeStyle = `rgba(255,255,255,${Math.round(r * 10) % 3 === 0 ? .055 : .025})`; ctx.lineWidth = .9; ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(0, 0, R - 1, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(240,201,139,.35)'; ctx.lineWidth = 1.6; ctx.stroke();
+    // the turning parts, in the plane of the record
     ctx.rotate(a);
     // light catching the grooves as they pass (turns with the disc)
     for (let k = 0; k < 3; k++) {
@@ -314,6 +323,14 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
       ctx.fillStyle = '#3b2408'; ctx.textAlign = 'center'; ctx.font = `900 13px ${getComputedStyle(document.body).fontFamily}`;
       ctx.fillText('ミナト × ハル', 0, -30);
     }
+    ctx.restore();
+    // the light on the record stays where it is while the record turns
+    ctx.save(); ctx.translate(DCX * F, DCY * F); ctx.scale(SX(), SY());
+    ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.clip();
+    const sh = ctx.createLinearGradient(-R, -R, R, R);
+    sh.addColorStop(0, 'rgba(255,240,220,0)'); sh.addColorStop(.36, 'rgba(255,240,220,.05)'); sh.addColorStop(.47, 'rgba(255,240,220,.16)'); sh.addColorStop(.58, 'rgba(255,240,220,.04)'); sh.addColorStop(1, 'rgba(255,240,220,0)');
+    ctx.fillStyle = sh; ctx.fillRect(-R, -R, 2 * R, 2 * R);
+    ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fillStyle = '#d9d3e6'; ctx.fill();
     ctx.restore();
     // kororins standing in the groove, back ones first
     const list = []; let lastDay = '';
@@ -341,6 +358,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--ring); outl
         if (it.day) { ctx.font = `700 ${Math.max(10, 24 * F)}px sans-serif`; ctx.textAlign = 'center'; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(12,13,31,.8)'; ctx.strokeText(it.day, sx, top - 4); ctx.fillStyle = '#f0c98b'; ctx.fillText(it.day, sx, top - 4); }
         hits.push({ i: it.i, x0: sx - w / 2, x1: sx + w / 2, y0: top, y1: sy + 6 });
       }
+    }
+    // tonearm: turns on its pivot toward the kororin that is singing, rests at the side otherwise
+    if (art.arm.complete && art.arm.naturalWidth) {
+      let tx = ARM_REST[0], ty = ARM_REST[1];
+      if (playing >= 0) { const { th, r } = spiralAt(playing); const [x, y] = rot(r * Math.cos(th - Math.PI / 2), r * Math.sin(th - Math.PI / 2), a); tx = DCX + x * DRX / R; ty = DCY + y * DRY / R; }
+      const want = Math.atan2(ty - ARM_PIVOT[1], tx - ARM_PIVOT[0]);
+      if (armAng == null || reduce) armAng = want; else { let d = want - armAng; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; armAng += d * .08; }
+      const base = Math.atan2(ARM_H[1] - ARM_B[1], ARM_H[0] - ARM_B[0]);
+      const s = ARM_LEN / Math.hypot(ARM_H[0] - ARM_B[0], ARM_H[1] - ARM_B[1]) * F;
+      ctx.save(); ctx.translate(ARM_PIVOT[0] * F, ARM_PIVOT[1] * F);
+      ctx.save(); ctx.translate(6 * F, 14 * F); ctx.rotate(armAng - base); ctx.scale(s, s); ctx.globalAlpha = .3; ctx.filter = 'brightness(0) blur(3px)'; ctx.drawImage(art.arm, -ARM_B[0], -ARM_B[1]); ctx.restore();
+      ctx.rotate(armAng - base); ctx.scale(s, s); ctx.drawImage(art.arm, -ARM_B[0], -ARM_B[1]);
+      ctx.restore();
     }
   }
   function tick(t) {
