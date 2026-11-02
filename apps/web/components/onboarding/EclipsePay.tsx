@@ -140,7 +140,7 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
     >
       <div className="mx-auto flex min-h-full max-w-md flex-col px-5 py-6">
         {/* the eclipse: a black sun in a slowly turning golden corona */}
-        <div className="relative mx-auto mt-2 h-28 w-28" aria-hidden>
+        <div className="relative mx-auto mt-1 h-16 w-16" aria-hidden>
           <span className="absolute inset-0 animate-[spin_28s_linear_infinite] rounded-full opacity-90" style={{ background: 'conic-gradient(from 0deg, rgba(255,214,140,0) 0deg, rgba(255,214,140,0.85) 40deg, rgba(255,240,200,0) 90deg, rgba(255,214,140,0.7) 160deg, rgba(255,214,140,0) 220deg, rgba(255,230,170,0.9) 290deg, rgba(255,214,140,0) 360deg)', filter: 'blur(6px)' }} />
           <span className="absolute inset-[14%] rounded-full bg-black shadow-[0_0_40px_12px_rgba(255,200,120,0.55),inset_0_0_18px_rgba(255,220,160,0.25)]" />
           <span className="absolute inset-[14%] rounded-full ring-1 ring-amber-100/70" />
@@ -188,6 +188,15 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
           {/* Stripe Embedded Checkout mounts here */}
           <div ref={box} className={phase === 'stripe' ? 'overflow-hidden rounded-2xl bg-white' : 'hidden'} />
           {phase === 'loading' && consent && <p className="py-10 text-center text-sm tracking-widest text-amber-100/70">秘密ロケットの手配中……</p>}
+          {/* before the check: the button is there already, asleep (story chat 2026-11-02: only 〔戻る〕 could be seen) */}
+          {!consent && (
+            <div className="flex flex-col items-center gap-2 py-3">
+              <button disabled className="w-full rounded-full border border-amber-100/30 bg-amber-200/10 py-4 text-lg tracking-[0.4em] text-amber-100/40">
+                支払う
+              </button>
+              <p className="text-center text-[11px] text-white/50">上のチェックを入れると、押せます</p>
+            </div>
+          )}
           {phase === 'confirming' && <p className="py-10 text-center text-sm tracking-widest text-amber-100/80">エクリプスの準備をしています……</p>}
           {phase === 'demo' && (
             <div className="flex flex-col items-center gap-3 py-4">

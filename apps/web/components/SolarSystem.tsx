@@ -99,8 +99,13 @@ function PlanetLink({
             🔒
           </span>
         </span>
-        <span className="mt-[1.2cqw] whitespace-nowrap rounded-full px-[1.6cqw] py-[0.3cqw] font-bold text-white/80" style={{ fontSize: 'clamp(9px, 2.6cqw, 13px)', background: 'rgba(8,11,28,0.55)' }}>
-          {label}・{lock.note}
+        {/* two lines, nudged inward at the screen's edges (story chat 2026-11-02: cut at the left) */}
+        <span
+          className="mt-[1.2cqw] flex flex-col items-center whitespace-nowrap rounded-xl px-[1.6cqw] py-[0.3cqw] text-center font-bold leading-tight text-white/80"
+          style={{ fontSize: 'clamp(9px, 2.6cqw, 13px)', background: 'rgba(8,11,28,0.55)', transform: x < 20 ? `translateX(${(20 - x) * 2}%)` : x > 80 ? `translateX(-${(x - 80) * 2}%)` : undefined }}
+        >
+          <span>{label}</span>
+          <span className="text-[0.85em] font-normal text-white/65">{lock.note}</span>
         </span>
       </div>
     );

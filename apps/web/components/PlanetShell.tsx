@@ -32,7 +32,7 @@ export function PlanetShell({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={`/art/${backdrop}.jpg`} alt="" aria-hidden className="pointer-events-none fixed inset-0 z-0 h-full w-full select-none object-cover opacity-90" />
       )}
-      <header className="pt-safe sticky top-0 z-30 border-b border-white/5 bg-[color:var(--color-space-950)]/80 backdrop-blur-md">
+      <header className={`pt-safe sticky top-0 z-30 ${id === 'venus' ? 'landscape:hidden' : ''} border-b border-white/5 bg-[color:var(--color-space-950)]/80 backdrop-blur-md`}>
         <div className={`mx-auto flex h-14 items-center gap-2 px-3 ${wide ? 'max-w-3xl' : 'max-w-xl'}`}>
           <Link href="/" className="btn btn-ghost h-9 w-9 !p-0 text-lg" aria-label={m.common.home}>
             ←

@@ -8,6 +8,7 @@ import { PlanetSphere } from '@/components/PlanetSphere';
 import { RequireAuth } from '@/components/RequireAuth';
 import { ApiError, getApi } from '@/lib/api';
 import { useI18n } from '@/lib/i18n/client';
+import { useAuth } from '@/lib/auth';
 
 export function MoonView() {
   return (
@@ -36,6 +37,7 @@ function BatiFace({ size = 36 }: { size?: number }) {
 
 function Chat() {
   const { m, t, locale } = useI18n();
+  const { me } = useAuth();
   const api = getApi();
   const [profile, setProfile] = useState<BuddyProfileView | null>(null);
   const [messages, setMessages] = useState<BuddyMessageView[]>([]);
@@ -92,7 +94,8 @@ function Chat() {
     }
   };
 
-  const name = profile?.buddyName ?? (locale === 'ja' ? 'バティ' : 'Bati');
+  // the member's own {bati} (named on the Moon) wins over the buddy profile's default name
+  const name = me?.bati?.name || profile?.buddyName || (locale === 'ja' ? 'バティ' : 'Bati');
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -251,7 +254,7 @@ function SettingsSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
-      <div className="card pb-safe w-full max-w-xl rounded-b-none p-5" onClick={(e) => e.stopPropagation()}>
+      <div className="card max-h-[88svh] w-full max-w-xl overflow-y-auto rounded-b-none p-5 pb-[calc(76px+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
         <h3 className="mb-4 text-lg font-black">{m.moon.settings}</h3>
         <label className="mb-4 block text-xs text-white/70">
           <span className="font-bold">{m.moon.buddyName}</span>

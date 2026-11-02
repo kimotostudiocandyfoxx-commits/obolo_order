@@ -165,6 +165,8 @@ export const DAY8: Step[] = [
   { t: 'ticket', flip: true }, // 金色の切符の裏の星図。土星〜金星を通って太陽まで。その外で錠の天王星と海王星が、うっすら光る
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
   { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
+  // MONBAN speaks from the square screen alone: OBOLON and KIMORIN step back (story chat 2026-11-02: the three overlapped)
+  { t: 'sprite', image: null },
   { t: 'screen', open: true },
   { t: 'say', who: 'MONBAN', text: '……エクリプスを受けなくても、お前は、住人のままだ…。それも、道だ…。' },
   { t: 'say', who: 'MONBAN', text: '……受けるなら、今、ここで、始められる…。' }, // KIMORINは、腕を組んで黙っている
@@ -175,6 +177,7 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'MONBAN', text: '……そうか…。' },
   { t: 'say', who: 'MONBAN', text: '……いつでも、来い…。' },
   { t: 'screen', open: false },
+  { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……では、私も、もう少しだけ、考えます。決して、怖気づいたわけでは、ありません。' },
   { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪' },
   { t: 'sprite', image: null },

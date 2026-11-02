@@ -88,7 +88,7 @@ const ja = {
     saturn: { name: '土星', role: '声でつぶやくSNS' },
     jupiter: { name: '木星', role: '蝶と木（写真）' },
     mercury: { name: '水星', role: '音楽を見つける・つくる' },
-    venus: { name: '金星', role: 'グッズをつくる・星で売り買い' },
+    venus: { name: '金星', role: 'DJ・自分の曲をミックスする' },
     mars: { name: '火星', role: '映像（動画はぜんぶ裏スタジオに）' },
     uranus: { name: '天王星', role: 'アトリエの星' },
     neptune: { name: '海王星', role: 'ゲームストア' },

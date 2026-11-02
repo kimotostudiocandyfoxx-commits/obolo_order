@@ -158,7 +158,14 @@ export function DjConsole({ engine, songs, backHref }: { engine: DjEngine; songs
           </div>
         </div>
       </div>
-      <div className="hidden h-full items-center justify-center text-sm text-white/60 portrait:flex">横向きにしてね ↻</div>
+      {/* the decks need the width: a phone turning on its side shows how (story chat 2026-11-02) */}
+      <div className="hidden h-full flex-col items-center justify-center gap-4 text-center portrait:flex">
+        <span className="text-5xl" style={{ animation: 'djTurn 2.4s ease-in-out infinite' }} aria-hidden>
+          📱
+        </span>
+        <p className="text-sm font-bold text-white/80">スマホを横にすると、DJ がはじまります</p>
+        <style>{'@keyframes djTurn{0%,30%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}'}</style>
+      </div>
       {backHref && (
         <Link href={backHref} className="absolute left-2 top-[calc(6px+env(safe-area-inset-top))] rounded-full bg-black/50 px-2.5 py-1 text-[10px] text-white/70">
           ← もどる
