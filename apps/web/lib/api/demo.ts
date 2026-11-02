@@ -36,6 +36,7 @@ import {
   type Locale,
   type Me,
   type OrderCheckout,
+  type ComposeChatBody,
   type ComposeChatResult,
   type SongDesign,
   type InstrumentalResult,
@@ -328,8 +329,17 @@ export class DemoApi implements Api {
   }
 
   // demo: no AI — the Mercury screen keeps its offline song maker
-  async composeChat(): Promise<ComposeChatResult> {
-    throw new ApiError(501, 'DEMO', 'demo');
+  /** demo: a short varied reply that picks up a word of what was said (no parroting the same line, story chat 2026-11-02) */
+  async composeChat(body: ComposeChatBody): Promise<ComposeChatResult> {
+    await sleep(700);
+    const said = body.history.filter((h) => h.role === 'user');
+    const last = (said[said.length - 1]?.text ?? '').trim();
+    const bit = last.replace(/[。、！？!?\s]/g, '').slice(0, 12);
+    const b = body.isBati;
+    const lines = b
+      ? [`「${bit}」、いいね！ それって、どんな気持ちのとき？`, `わかる〜。${bit}って、ワクワクする感じ？ それとも、しんみり？`, `いい歌になりそう！ もうひとつだけ。だれに聴いてほしい？`, `${bit}、メモしたよ！ そろそろ作れそう。ジャンルを選んで！`]
+      : [`「${bit}」か、いいケン！ それはどんな気分のときだ？`, `${bit}……ノれる感じか？ しっとり系か？`, `いい歌になりそうだケン！ だれに届けたい？`, `${bit}、もらったケン！ ジャンルを選べ！`];
+    return { reply: lines[Math.min(said.length - 1, lines.length - 1)] ?? lines[0], ready: said.length >= 2 };
   }
 
   async composeDesign(): Promise<SongDesign> {

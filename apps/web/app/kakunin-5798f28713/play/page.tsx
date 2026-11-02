@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { PatapataWorld } from '@/components/jupiter/PatapataWorld';
 import { MarsWorld } from '@/components/mars/MarsWorld';
-import { VenusWorld } from '@/components/venus/VenusWorld';
+import { VenusDj } from '@/components/dj/VenusDj';
 import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { KororinWorld } from '@/components/saturn/KororinWorld';
 import { DemoDay, previewMade } from '@/components/onboarding/DemoDay';
@@ -70,7 +70,7 @@ function PreviewPlay() {
   if (q.get('world') === 'venus') {
     return (
       <div className="fixed inset-0">
-        <VenusWorld />
+        <VenusDj backHref="/kakunin-5798f28713" />
         <BackLink />
       </div>
     );
@@ -196,8 +196,13 @@ function GuestNote() {
 
 function BackLink({ live }: { live?: boolean }) {
   return (
-    <Link href="/kakunin-5798f28713" className="fixed left-1/2 top-[calc(10px+env(safe-area-inset-top))] z-[400] -translate-x-1/2 rounded-full bg-black/45 px-3 py-1 text-[10px] text-white/60 backdrop-blur">
-      ← 確認用ページ{live ? '・本番生成' : ''}
+    // a small round button low on the left, clear of the worlds' tabs and titles (story chat 2026-11-02)
+    <Link
+      href="/kakunin-5798f28713"
+      aria-label="確認用ページへ"
+      className="fixed bottom-[calc(96px+env(safe-area-inset-bottom))] left-2 z-[400] flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-[13px] text-white/70 backdrop-blur"
+    >
+      ←{live && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-emerald-400" />}
     </Link>
   );
 }

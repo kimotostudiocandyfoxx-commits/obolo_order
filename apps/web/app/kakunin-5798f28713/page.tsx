@@ -19,8 +19,8 @@ export default function PreviewIndex() {
     { href: '/kakunin-5798f28713/story-assets', label: '🎨 物語の素材（人物・場所・声・効果音／候補の見比べ）' },
     { href: '/kakunin-5798f28713/play?day=2&at=look', label: '2日目：月の神殿・ネオの姿づくりから' },
     { href: '/kakunin-5798f28713/play?day=2&at=egg', label: '2日目：バティ誕生から' },
-    { href: '/kakunin-5798f28713/play?day=2&at=pause', label: '2日目：「やめておく」（その日を終える）' },
-    { href: '/kakunin-5798f28713/play?day=1&at=riddles', label: '1日目：8つの謎の札から' },
+    { href: '/kakunin-5798f28713/play?day=1&at=pause', label: '1日目：「やめておく」（その日を終える）' },
+    { href: '/kakunin-5798f28713/play?day=2&at=riddles', label: '2日目：8つの謎の札から' },
     { href: '/kakunin-5798f28713/play?day=3&at=screen', label: '3日目：Bluenaの投影から' },
     { href: '/kakunin-5798f28713/play?day=3&at=screen&timeup=1', label: '3日目：88分を過ぎたとき（20秒後に割りこみ）' },
     { href: '/kakunin-5798f28713/play?day=3&at=seal', label: '3日目：謎2が解けるところから' },
@@ -29,10 +29,10 @@ export default function PreviewIndex() {
     { href: '/kakunin-5798f28713/play?day=5&at=mercury', label: '5日目：水星（シールから歌→ジャケットが回る）から' },
     { href: '/kakunin-5798f28713/play?day=6&at=mars', label: '6日目：火星（曲にMV→▶で見る→裏スタジオ）から' },
     { href: '/kakunin-5798f28713/play?day=6&at=made', label: '6日目：大スクリーンにMVを映すところから' },
-    { href: '/kakunin-5798f28713/play?day=7&at=ticket', label: '7日目：地球でORDERになるか決めるところから（支払いはデモ）' },
-    { href: '/kakunin-5798f28713/play?day=7&at=branch', label: '7日目：太陽の神殿から' },
-    { href: '/kakunin-5798f28713/play?day=7&at=made', label: '7日目：上映「7日間」から' },
-    { href: '/kakunin-5798f28713/play?day=8', label: '（一周目には出ない）金星：ゴリラ3人組（旧8日目の台本）' },
+    { href: '/kakunin-5798f28713/play?day=7', label: '7日目：金星（DJ）' },
+    { href: '/kakunin-5798f28713/play?day=8&at=ticket', label: '8日目：地球から（太陽の神殿・エクリプスへ。支払いはデモ）' },
+    { href: '/kakunin-5798f28713/play?day=8&at=branch', label: '8日目：太陽の神殿の分かれ道から' },
+    { href: '/kakunin-5798f28713/play?day=8&at=order', label: '8日目：エクリプスの支払いから（デモ）' },
     { href: '/kakunin-5798f28713/puni-image', label: 'ぷにぷにキャラの試作（絵のキャラ版・メッシュ変形）' },
     { href: '/kakunin-5798f28713/bati-chat', label: 'バティとの会話だけ（D03-S008：5往復＋読み上げ。ログイン中は自分のバティで本番どおり）' },
     { href: '/kakunin-5798f28713/robot', label: 'ロボット声のテスト（土星チュートリアル用：録音→ロボット声で再生）' },
@@ -50,7 +50,7 @@ export default function PreviewIndex() {
         {days.map((d) => (
           <Link key={d} href={`/kakunin-5798f28713/play?day=${d}`} className="rounded-2xl border border-amber-200/30 bg-white/5 px-4 py-3">
             <span className="text-amber-100">{d}日目</span>
-            <span className="ml-3 text-sm text-white/70">{JOURNEY.find((j) => j.day === d)?.title ?? (d === 7 ? 'エクリプス（ORDERへ）' : d === 8 ? '金星（一周目には出ない・旧台本）' : '')}</span>
+            <span className="ml-3 text-sm text-white/70">{JOURNEY.find((j) => j.day === d)?.title ?? ''}</span>
           </Link>
         ))}
       </div>

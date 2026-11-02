@@ -79,7 +79,7 @@ export function InviteCard() {
         <ul className="mt-3 divide-y divide-white/5">
           {list.map((i) => (
             <li key={i.code} className="flex items-center gap-2 py-2 text-sm">
-              <span className="min-w-0 flex-1 truncate text-white/80">{i.email}</span>
+              <span className="min-w-0 flex-1 break-all text-[13px] leading-snug text-white/80">{i.email}</span>
               <span className="chip bg-white/10 text-white/60">{m.earth.inviteStatus[i.status] ?? i.status}</span>
               {i.status === 'pending' && (
                 <button className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold" onClick={() => void copy(i.code)}>

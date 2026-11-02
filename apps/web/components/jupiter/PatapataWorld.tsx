@@ -356,7 +356,7 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
                 );
               })}
               {!slots.some(Boolean) && (
-                <p className="absolute inset-x-0 top-1/3 px-8 text-center text-sm text-[#a58c74]">
+                <p className="absolute inset-x-6 top-1/3 rounded-2xl bg-white/80 px-4 py-3 text-center text-sm font-bold text-[#6b4f36] shadow-sm backdrop-blur-sm">
                   {tab === 'friends' ? 'ダチは、おたがいにフォローしている人。木をのぞいてフォローしてみてね' : tab === 'following' ? 'フォローした人の蝶が、ここに飛んでくるよ' : 'いまは誰も飛んでいないみたい'}
                 </p>
               )}
