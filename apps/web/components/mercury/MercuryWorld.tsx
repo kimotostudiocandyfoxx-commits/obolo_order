@@ -149,7 +149,7 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pt-[calc(10px+env(safe-area-inset-top))]">
             <Tabs tab={tab} setTab={setTab} />
-            <p className="mx-auto mt-2 w-fit rounded-full border border-amber-300/50 bg-black/30 px-4 py-1 text-sm text-amber-100">👥 今 {sailingCount}人が航海中</p>
+            {sailingCount > 0 && <p className="mx-auto mt-2 w-fit rounded-full border border-amber-300/50 bg-black/30 px-4 py-1 text-sm text-amber-100">⛵ ダチの船が、海に出ています</p>}
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center p-2">
             <ArtStage name="mercury-sea" reserve={230} focus={62}>

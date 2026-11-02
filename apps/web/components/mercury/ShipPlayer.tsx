@@ -57,7 +57,12 @@ export function ShipPlayer({
   const next = useRef(() => toFlyer(1));
   next.current = () => toFlyer(1);
 
-  // play the song; when it ends the next ship comes in
+  // play the song; at its end it stops there (only what you pressed plays — story chat 2026-11-02, day 6's words)
+  const ended = useRef(() => {});
+  ended.current = () => {
+    if (!song.audioUrl) synth.stop();
+    setPaused(true);
+  };
   useEffect(() => {
     setT(0);
     let synthTimer: ReturnType<typeof setInterval> | null = null;
@@ -66,7 +71,8 @@ export function ShipPlayer({
         () =>
           setT((v) => {
             if (v + 1 >= song.seconds) {
-              setTimeout(() => next.current(), 0);
+              if (synthTimer) clearInterval(synthTimer);
+              setTimeout(() => ended.current(), 0);
               return v;
             }
             return v + 1;
@@ -81,7 +87,7 @@ export function ShipPlayer({
       off = subscribeAudio((s) => {
         if (s.url !== url) return;
         setT(Math.round(s.progress * song.seconds));
-        if (!s.playing && s.progress >= 1) next.current();
+        if (!s.playing && s.progress >= 1) ended.current();
       });
       toggleAudio(url).catch(() => byTimer());
     } else {
@@ -206,9 +212,7 @@ export function ShipPlayer({
           <span className="w-9 text-right tabular-nums">{fmt(song.seconds)}</span>
         </div>
         <div className="relative mx-auto mt-3 flex max-w-md items-center justify-center gap-3">
-          {([1, 2] as const).map((s) => (
-            <Star key={s} n={s} on={mine >= s} onClick={() => onStar(song.id, mine === s ? ((s - 1) as 0 | 1) : s)} />
-          ))}
+          {/* no ratings (a rule of the app, story chat 2026-11-02): only play and reply */}
           <button
             onClick={pause}
             className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-pink-200/80 bg-gradient-to-br from-fuchsia-500/80 to-violet-600/80 text-2xl shadow-[0_0_24px_rgba(255,120,220,0.6)]"
@@ -216,7 +220,6 @@ export function ShipPlayer({
           >
             {paused ? '▶' : '❚❚'}
           </button>
-          <Star n={3} on={mine >= 3} onClick={() => onStar(song.id, mine === 3 ? 2 : 3)} />
           <button
             onClick={() => setReplying(true)}
             className="flex h-12 shrink-0 items-center gap-1.5 rounded-full border border-white/35 bg-black/40 px-3 text-lg backdrop-blur"

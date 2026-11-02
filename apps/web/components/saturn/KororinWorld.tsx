@@ -658,7 +658,7 @@ export function KororinWorld({
         )}
         {tab !== 'all' && tabPosts && !tabPosts.length && (
           <p className="mx-auto mt-2 w-fit max-w-[90%] rounded-2xl bg-white/85 px-3 py-1.5 text-center text-[11px] font-bold text-[#5a3f8a]">
-            {tab === 'friends' ? 'ダチは、おたがいにフォローしている人。名前をタップしてページからフォローしてね' : 'まだ誰もフォローしていないよ。名前をタップして、その人のページからフォローしてね'}
+            {tab === 'friends' ? 'ダチは、本当に知ってる人とだけ。リンク・メール・ユーザー名で招こう' : 'まだ誰も推していないよ'}
           </p>
         )}
         {tab === 'all' && plaza ? (

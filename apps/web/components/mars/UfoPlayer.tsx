@@ -58,7 +58,8 @@ export function UfoPlayer({
   const next = useRef(() => toMember(1));
   next.current = () => toMember(1);
 
-  // a sample movie: its BGM and storyboard for a little while, then the next UFO
+  // a sample movie: its BGM and storyboard for a little while, then it rests there (no next UFO by itself:
+  // only what you pressed plays — story chat 2026-11-02)
   useEffect(() => {
     setT(0);
     if (real) {
@@ -70,7 +71,8 @@ export function UfoPlayer({
       () =>
         setT((v) => {
           if (v + 1 >= SAMPLE_SECONDS) {
-            setTimeout(() => next.current(), 0);
+            clearInterval(id);
+            synth.stop();
             return v;
           }
           return v + 1;
@@ -133,7 +135,7 @@ export function UfoPlayer({
         >
           {/* real Mars movies are square (client decision 2026-10-07) */}
           <div className="relative w-[min(78%,calc(100svh-470px))] overflow-hidden rounded-2xl border-2 border-amber-300/60 shadow-[0_0_40px_rgba(255,150,80,0.45)]">
-            <Frame key={video.id} video={video} playing className="aspect-square w-full" onEnded={() => next.current()} />
+            <Frame key={video.id} video={video} playing className="aspect-square w-full" onEnded={() => undefined} />
             {!real && (
               <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-10">
                 <p key={scene} className="animate-[fadeUp_0.6s_ease-out] text-center text-sm font-bold drop-shadow">{scene}</p>

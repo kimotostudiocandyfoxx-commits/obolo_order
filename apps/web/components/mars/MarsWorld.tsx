@@ -153,7 +153,8 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
               ))}
             </div>
             <span className="shrink-0 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-xs">
-              <span className="text-red-500">●</span> 今 {liveCount}人がライブ中
+              {/* no head counts (a rule of the app): only that someone is live */}
+              <span className="text-red-500">●</span> {liveCount ? 'ライブ中のダチがいる' : 'ライブ'}
             </span>
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center p-2">
@@ -197,7 +198,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
             onPosted={() => {
               setSkyKey(Date.now());
               go({ v: 'sky' });
-              say('🛸 公開！ 88時間、みんなの星図をとびます');
+              say('🛸 公開！ 88時間、ダチの星図をとびます');
               ev.current?.onRelease?.();
             }}
           />
@@ -219,7 +220,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           }}
           onPosted={() => {
             setSkyKey(Date.now());
-            say('🛸 公開！ 88時間、みんなの星図をとびます');
+            say('🛸 公開！ 88時間、ダチの星図をとびます');
             ev.current?.onRelease?.();
           }}
           onShoot={() => go({ v: 'shoot' })}
@@ -242,7 +243,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           onLocker={() => ev.current?.onLocker?.()}
           onRelease={(id) => {
             mine.release(id);
-            say('🛸 公開！ 88時間、みんなの星図をとびます');
+            say('🛸 公開！ 88時間、ダチの星図をとびます');
             ev.current?.onRelease?.();
           }}
           say={say}
@@ -478,7 +479,7 @@ function StudioView({
             }
           />
           <p className="mb-2 text-xs font-bold text-amber-100">🎞 撮影した映像（未公開）</p>
-          <p className="mb-3 text-center text-[11px] text-white/55">公開すると、UFOになって88時間、ダチやフォロワーの星図をとびます。</p>
+          <p className="mb-3 text-center text-[11px] text-white/55">公開すると、UFOになって88時間、ダチや推してくれる人の星図をとびます。</p>
           <div className="space-y-3">
             {locker.map((v) => (
               <div key={v.id} className="flex items-center gap-3 rounded-2xl bg-black/30 p-2">

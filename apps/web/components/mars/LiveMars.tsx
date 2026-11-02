@@ -92,7 +92,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
     setMood('');
     setStep('rendering');
     let k = 0;
-    say(ken('受けつけたよ！ アプリを閉じても、できたら通知するね。', '受けつけたケン！ アプリを閉じても、できたら通知するぞ。'));
+    say(ken('受けつけたよ！ できたら、ここに出すね。', '受けつけたケン！ できたら、ここに出すぞ。'));
     say(ken(WAIT[0][0], WAIT[0][1]));
     const timer = setInterval(() => {
       k = Math.min(k + 1, WAIT.length - 1);
@@ -154,7 +154,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
     setStep('busy');
     try {
       await getApi().createPlanetPost('mars', { sourceId: mv.backstageId, title: title.trim() || mv.songTitle, text: '' });
-      say(ken('公開したよ！ 88時間、みんなの星図をとんでいくよ。', '公開したケン！ 88時間、みんなの星図をとんでいくぞ。'));
+      say(ken('公開したよ！ 88時間、ダチの星図をとんでいくよ。', '公開したケン！ 88時間、ダチの星図をとんでいくぞ。'));
       setTimeout(onPosted, 900);
     } catch (e) {
       setStep('publish');

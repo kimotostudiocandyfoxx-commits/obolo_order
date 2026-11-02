@@ -5,7 +5,7 @@ import { PlanetGate } from '@/components/PlanetLock';
 import { PlanetShell } from '@/components/PlanetShell';
 import { useToast } from '@/components/Toast';
 import { useI18n } from '@/lib/i18n/client';
-import { compact, GAMES, tr } from '@/lib/samples';
+import { GAMES, tr } from '@/lib/samples';
 
 /** Neptune (spec §2.9): HTML5 game store, 92% to developers. VISUAL DEMO (P-DEMO-1). */
 export function NeptuneView() {
@@ -22,7 +22,7 @@ export function NeptuneView() {
           <div className="min-w-0 flex-1">
             <div className="truncate font-black">{tr(hero.title, locale)}</div>
             <div className="text-xs text-white/50">
-              {hero.dev} · ★ {hero.rating} · {compact(hero.plays, locale)}
+              {hero.dev}
             </div>
           </div>
           <button className="btn btn-primary" onClick={() => toast.show(m.common.comingSoon)}>
@@ -39,7 +39,7 @@ export function NeptuneView() {
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-bold">{tr(g.title, locale)}</div>
               <div className="truncate text-[11px] text-white/45">
-                {g.dev} · {tr(g.genre, locale)} · ★ {g.rating}
+                {g.dev} · {tr(g.genre, locale)}
               </div>
               <span className="chip mt-1 bg-emerald-300/15 text-emerald-200">{m.neptune.devShare}</span>
             </div>
