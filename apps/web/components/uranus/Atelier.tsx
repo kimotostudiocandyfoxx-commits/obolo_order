@@ -178,7 +178,7 @@ export function Atelier() {
     : [];
 
   return (
-    <div className={`mx-auto w-full transition-[max-width] ${editing ? 'max-w-[400px]' : 'max-w-[520px]'}`}>
+    <div className={`mx-auto w-full transition-[max-width] ${editing ? 'max-w-[300px] pb-[46svh]' : 'max-w-[520px]'}`}>
       <div
         ref={room}
         className="relative aspect-[3/4] w-full touch-none select-none overflow-hidden rounded-3xl border-4 border-white/70 shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
@@ -241,7 +241,8 @@ export function Atelier() {
       </div>
 
       {editing && (
-        <div className="mt-3 rounded-3xl bg-white/95 p-3 text-stone-700 shadow-xl">
+        // a sheet from the bottom, always on screen (story chat 2026-11-02: the drawer lay below the screen's edge)
+        <div className="fixed inset-x-0 bottom-0 z-[70] mx-auto max-h-[44svh] max-w-[520px] overflow-y-auto rounded-t-3xl bg-white/95 p-3 pb-[calc(12px+env(safe-area-inset-bottom))] text-stone-700 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] animate-[fadeUp_0.25s_ease-out]">
           <div className="mb-3 grid grid-cols-3 gap-1 rounded-full bg-stone-100 p-1 text-sm font-black">
             {(
               [

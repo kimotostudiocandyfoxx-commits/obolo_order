@@ -81,7 +81,7 @@ export function PlazaMap({
     <div className="absolute inset-x-0 bottom-0 top-[calc(150px+env(safe-area-inset-top))] z-[40] flex flex-col">
       {/* search */}
       <div className="relative z-[2] mx-auto mt-1 flex w-[min(92%,460px)] items-center gap-2">
-        <label className="flex h-11 flex-1 items-center gap-2 rounded-full border border-white/40 bg-white/90 px-4 shadow-[0_4px_14px_rgba(60,20,110,.25)]">
+        <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-white/40 bg-white/90 px-4 shadow-[0_4px_14px_rgba(60,20,110,.25)]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a76bd" strokeWidth="2.6" strokeLinecap="round" aria-hidden>
             <circle cx="11" cy="11" r="7" />
             <path d="m20 20-4-4" />
@@ -99,7 +99,9 @@ export function PlazaMap({
             </button>
           )}
         </label>
-        <Mic value={q} onChange={(v) => setQ(v.slice(0, 30))} />
+        <span className="shrink-0">
+          <Mic value={q} onChange={(v) => setQ(v.slice(0, 30))} />
+        </span>
       </div>
 
       <div ref={box} className="relative mt-2 flex-1 overflow-y-auto overflow-x-hidden">

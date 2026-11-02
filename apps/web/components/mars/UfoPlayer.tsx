@@ -163,11 +163,11 @@ export function UfoPlayer({
         )}
         {!real && (
           <div className="mx-auto mt-2 flex max-w-md items-center gap-3 text-xs text-white/70">
-            <span className="w-10 text-left tabular-nums">{live ? 'LIVE' : fmtLen(t)}</span>
+            <span className="min-w-10 shrink-0 whitespace-nowrap text-left tabular-nums">{live ? 'LIVE' : fmtLen(t)}</span>
             <div className="relative h-1 flex-1 rounded-full bg-white/20">
               <div className={`absolute inset-y-0 left-0 rounded-full ${live ? 'bg-red-500' : 'bg-gradient-to-r from-orange-400 to-fuchsia-500'}`} style={{ width: `${(t / SAMPLE_SECONDS) * 100}%` }} />
             </div>
-            <span className="w-10 text-right tabular-nums">{live ? '' : fmtLen(SAMPLE_SECONDS)}</span>
+            <span className="min-w-10 shrink-0 whitespace-nowrap text-right tabular-nums">{live ? '' : fmtLen(SAMPLE_SECONDS)}</span>
           </div>
         )}
         <div className="mx-auto mt-3 flex max-w-md items-center justify-center gap-3">

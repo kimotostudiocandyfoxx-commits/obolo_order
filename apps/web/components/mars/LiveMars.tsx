@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { type MvProjectView, type SongView } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
@@ -195,7 +196,15 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
           <div className="rounded-2xl border border-amber-300/25 bg-black/30 p-3">
             <p className="text-xs font-bold text-amber-100">🎵 水星で作った曲</p>
             {songs === null && <p className="mt-2 text-center text-xs text-white/50">ひらいています…</p>}
-            {songs?.length === 0 && <p className="mt-2 text-center text-xs text-white/50">まだ曲がないよ。水星で曲を作ってから来てね</p>}
+            {songs?.length === 0 && (
+              // no dead end (story chat 2026-11-02): the way to Mercury is right here
+              <div className="mt-2 text-center">
+                <p className="text-xs text-white/50">まだ曲がないよ。水星で曲を作ってから来てね</p>
+                <Link href="/mercury" className="mt-2 inline-block rounded-full border border-sky-300/60 bg-sky-500/15 px-5 py-2 text-sm font-bold text-sky-100">
+                  🌊 水星へ行く
+                </Link>
+              </div>
+            )}
             <div className="mt-2 space-y-1.5">
               {songs?.map((s) => (
                 <button key={s.id} onClick={() => void chooseSong(s)} className="flex w-full items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-left active:bg-white/15">

@@ -487,8 +487,8 @@ function StudioView({
                 </button>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-bold">{v.title}</p>
-                  <p className="text-[11px] text-white/50">
-                    {v.kind} ・ {fmtLen(v.seconds)}
+                  <p className="flex gap-1 text-[11px] text-white/50">
+                    <span className="truncate">{v.kind}</span>・<span className="shrink-0 whitespace-nowrap tabular-nums">{fmtLen(v.seconds)}</span>
                   </p>
                 </div>
                 <button

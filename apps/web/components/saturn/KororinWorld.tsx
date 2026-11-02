@@ -1105,7 +1105,7 @@ function DropComposer({
         onClose();
       }}
     >
-      <div className="pb-safe max-h-[92%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 text-slate-800" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[86%] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(24px+env(safe-area-inset-bottom))] text-slate-800" onClick={(e) => e.stopPropagation()}>
         <p className="text-center text-sm font-black text-violet-600">
           {replyTo ? `${replyTo.author.displayName}に、声で返信` : quote ? '声を引用して、ひとこと' : 'いまの気持ちを、声でおとす'}
         </p>
