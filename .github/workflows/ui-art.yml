@@ -52,6 +52,8 @@ jobs:
           node scripts/ui-art/paint.mjs design/plaza-art-queue.json
           # the planets' UI round 1 (about 330 pictures): up to 64 a run, run again until done
           MAX_PICTURES=64 node scripts/ui-art/paint.mjs design/ui1-art-queue.json
+          # the parts on a flat background also as <name>-cut.png
+          pip install -q opencv-python-headless numpy pillow && python3 scripts/ui-art/cut.py design/ui1-art-queue.json || true
           node scripts/review-art/budget.mjs || true
       - name: Save the pictures to the branch
         if: always()
