@@ -50,9 +50,15 @@ export function KororinWorld({
   extra,
   roomOnly = false,
   noBar = false,
+  hostBar = false,
+  openComposer = false,
 }: {
   /** the story's lesson brings its own mic (the Bati): no bottom bar */
   noBar?: boolean;
+  /** the page around it (SaturnHome) has the bottom bar: this one hides its own */
+  hostBar?: boolean;
+  /** open with the voice composer up (〔🎙 つぶやく〕 on the page around it) */
+  openComposer?: boolean;
   events?: KororinEvents;
   /** The story's own kororins (KIMORIN⭐︎'s, the sister's sunset): placed on the planet first. */
   extra?: SaturnPostView[];
@@ -89,7 +95,7 @@ export function KororinWorld({
   const onMap = tab === 'all' && !plaza && !neoOnly;
   const [open, setOpen] = useState<SaturnPostView | null>(null);
   const [playingUrl, setPlayingUrl] = useState<string | null>(null);
-  const [composer, setComposer] = useState<false | { replyTo?: SaturnPostView; quote?: SaturnPostView }>(false);
+  const [composer, setComposer] = useState<false | { replyTo?: SaturnPostView; quote?: SaturnPostView }>(openComposer ? {} : false);
   const [tabPosts, setTabPosts] = useState<SaturnPostView[] | null>(null);
   const [stageW, setStageW] = useState(390);
   const [allReplies, setAllReplies] = useState(false);
@@ -794,7 +800,7 @@ export function KororinWorld({
       )}
 
       {/* bottom bar */}
-      <div className={`pb-safe absolute inset-x-0 bottom-0 z-[85] flex justify-center px-4 pb-4 ${noBar ? 'hidden' : ''}`}>
+      <div className={`pb-safe absolute inset-x-0 bottom-0 z-[85] flex justify-center px-4 pb-4 ${noBar || hostBar ? 'hidden' : ''}`}>
         <div className="flex items-center gap-1 rounded-[30px] bg-white/95 px-3 py-2 shadow-[0_8px_30px_rgba(80,30,130,.25)]">
           <button onClick={shake} className="flex w-16 flex-col items-center gap-0.5 text-[11px] font-black text-[#6b5a8a]">
             <ShakeIcon />

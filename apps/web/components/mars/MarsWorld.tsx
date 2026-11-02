@@ -458,7 +458,8 @@ function StudioView({
                 className={`overflow-hidden rounded-2xl border-2 ${theme === t.id ? 'border-amber-400' : 'border-white/15'}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={stillUrl(STUDIO[t.id].art)} alt="" className="aspect-square w-full object-cover" />
+                {/* the previews carry no numbers or other people's characters (story chat 2026-11-02) */}
+                <img src={stillUrl(t.id === 'city' ? 's/mars-studio-ship' : STUDIO[t.id].art)} alt="" className="aspect-square w-full object-cover" />
                 <p className="py-1.5 text-sm">{t.label}</p>
               </button>
             ))}
