@@ -167,7 +167,7 @@ const NOT_FLOWN: Beat[] = [{ k: 'say', who: 'sister', text: '飛ばしたくな�
 /** every spoken line of the practice, as story steps: the ones with names in them are voiced per member (useNameVoices) */
 const NAME_STEPS: Step[] = [...BEATS, ...DESIGNED, ...UNDESIGNED, ...FLOWN, ...NOT_FLOWN].flatMap((b): Step[] => (b.k === 'say' && SPEAKER[b.who] ? [{ t: 'say', who: SPEAKER[b.who] as Speaker, text: b.text }] : []));
 /** KIMORIN⭐︎'s designed kororin (80 muscular arms, a heap of aonori) — design/story-art-queue.json */
-const KIMORIN_DESIGNED = '/onboarding/s/kororin-kimorin80.jpg';
+const KIMORIN_DESIGNED = '/saturn/kororin-kimorin.webp';
 const TOPICS = [
   { t: '今したいこと', ex: '滑り台でボカーン！' },
   { t: '最近驚いたこと', ex: 'え！？わき毛ってこんなに美味しいの？' },
@@ -503,13 +503,13 @@ export function SaturnLesson({
       stopAudio();
       setScene('plaza');
       // MONBAN's kororin (the black hood) is on the plaza already, and takes its turn in the cypher
-      void story('inviter', 'monban', 'MONBAN', '/story/avatars/monban.webp', MONBAN_SONG, 'MONBAN').then((k) => setPlazaK((x) => [...x, k]));
+      void story('inviter', 'monban', 'MONBAN', '/saturn/kororin-monban.webp', MONBAN_SONG, 'MONBAN').then((k) => setPlazaK((x) => [...x, k]));
       setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1400);
     }
     if (beat.k === 'throw')
       void Promise.all([
-        story('sister', 'sister', 'たこ焼きシスター', spriteUrl('takoyaki-sister'), SISTER_SUNSET, 'たこ焼きシスター'),
-        story('brother', 'brother', 'たこ焼きブラザー', spriteUrl('takoyaki-brother'), BROTHER_STONE, 'たこ焼きブラザー'),
+        story('sister', 'sister', 'たこ焼きシスター', '/saturn/kororin-sister.webp', SISTER_SUNSET, 'たこ焼きシスター'),
+        story('brother', 'brother', 'たこ焼きブラザー', '/saturn/kororin-brother.webp', BROTHER_STONE, 'たこ焼きブラザー'),
       ]).then((two) => {
         setPlazaK((x) => [...x, ...two]);
         setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1300);

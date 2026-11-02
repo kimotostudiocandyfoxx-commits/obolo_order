@@ -4,6 +4,7 @@ import { DemoBanner } from '@/components/DemoBanner';
 import { MercuryWorld } from '@/components/mercury/MercuryWorld';
 import { PlanetShell } from '@/components/PlanetShell';
 import { RequireAuth } from '@/components/RequireAuth';
+import { getApi } from '@/lib/api';
 
 /**
  * Mercury — the planet of music: a sea chart of genre islands; sail to one and swipe through its
@@ -16,7 +17,8 @@ export function MercuryView() {
       <DemoBanner />
       <RequireAuth>
         <div className="h-[calc(100svh-56px-env(safe-area-inset-top))]">
-          <MercuryWorld live />
+          {/* the demo build keeps its island in this browser (the real one comes from the server) */}
+          <MercuryWorld live={getApi().mode === 'live'} />
         </div>
       </RequireAuth>
     </PlanetShell>
