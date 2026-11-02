@@ -129,11 +129,6 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
     setText('');
     setMsgs((m) => [...m, { who: 'me', text: t }]);
     if (editing) return void editSong(editing, { message: t });
-    if (!live) {
-      setPending(t);
-      setTimeout(() => say(`いいね！「${[...t].slice(0, 14).join('')}${[...t].length > 14 ? '…' : ''}」か。どんな感じの曲にする${partner.end ? 'ケン？' : '？'}`), 500);
-      return;
-    }
     setBusy(true);
     setTyping(true);
     try {

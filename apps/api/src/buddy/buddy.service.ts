@@ -75,7 +75,8 @@ export class BuddyService implements OnModuleInit {
 
   async getProfile(userId: string): Promise<BuddyProfileView> {
     const p = await this.ensureProfile(userId);
-    return { buddyName: p.buddyName, persona: p.personaJson, hasMemory: !!p.memorySummary };
+    const [u] = await this.db.write.select({ batiName: users.batiName }).from(users).where(eq(users.id, userId));
+    return { buddyName: u?.batiName || p.buddyName, persona: p.personaJson, hasMemory: !!p.memorySummary };
   }
 
   async updateProfile(userId: string, body: UpdateBuddyProfileBody): Promise<BuddyProfileView> {
@@ -154,7 +155,8 @@ export class BuddyService implements OnModuleInit {
       ({ text: replyText, kind: replyKind } = await buddyAnswer(
         this.llm,
         {
-          buddyName: profile.buddyName,
+          // the member's own {bati}, named on the Moon, answers under its own name (story chat 2026-11-02)
+          buddyName: user.batiName || profile.buddyName,
           persona: profile.personaJson,
           memorySummary: profile.memorySummary,
           userDisplayName: user.displayName,

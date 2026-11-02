@@ -268,6 +268,9 @@ export class DemoApi implements Api {
       memory: [],
       messages: [],
     };
+    // the member's own {bati}, named on the Moon, speaks under its own name (story chat 2026-11-02)
+    const own = this.s.users[id]?.bati?.name;
+    if (own) this.s.buddy[id].name = own;
     return this.s.buddy[id];
   }
 

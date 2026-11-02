@@ -169,6 +169,19 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
               <dd>やめるまで、毎月の更新日に、月額{ORDER_PRICE_JPY}円のお支払いが自動で行われます</dd>
             </div>
             <div className="py-2.5">
+              <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">いつから</dt>
+              <dd>支払いが済んだその時から、Obolo Orderの一員です</dd>
+            </div>
+            <div className="py-2.5">
+              <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">支払い方法</dt>
+              <dd>クレジットカード・デビットカード（この画面の下で入力します）</dd>
+            </div>
+            <div className="py-2.5">
+              {/* PLACEHOLDER (P-BILL-4): the refund wording is the operator's to confirm */}
+              <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">返金</dt>
+              <dd>始めた月の分は、返金されません。まちがって二重に支払われた時は、お問い合わせから返金します</dd>
+            </div>
+            <div className="py-2.5">
               <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">やめ方</dt>
               <dd>〔設定〕→〔毎月のマナ〕→〔やめる〕から、いつでも。やめると、次の更新日から支払いが止まります。作ったものは消えません</dd>
             </div>
@@ -240,7 +253,7 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
           </div>
         )}
         {phase !== 'confirming' && phase !== 'done' && (
-          <button onClick={onCancel} className="mt-4 self-center py-2 text-xs tracking-widest text-white/50 underline">
+          <button onClick={onCancel} className="mt-4 w-full rounded-full border border-white/35 py-3 text-sm tracking-[0.3em] text-white/80">
             戻る
           </button>
         )}

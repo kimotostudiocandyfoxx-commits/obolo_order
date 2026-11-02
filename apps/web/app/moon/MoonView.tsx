@@ -106,8 +106,9 @@ function Chat() {
           <div className="font-black">{name}</div>
           <div className="text-[11px] text-white/50">{profile?.hasMemory ? `🧠 ${m.moon.memoryOn}` : m.moon.memoryOff}</div>
         </div>
-        {quota && (
-          <span className="chip bg-white/10 text-white/70">{t(m.moon.quota, { used: quota.usedToday, free: quota.freeDaily })}</span>
+        {/* the day's count only when few are left (story chat 2026-11-02: no numbers on screen otherwise) */}
+        {quota && quota.freeDaily - quota.usedToday <= 5 && (
+          <span className="chip bg-white/10 text-white/70">🌙 今日は、あと少し話せるよ</span>
         )}
         <button className="btn btn-ghost h-9 w-9 !p-0" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
           ⚙︎
@@ -132,7 +133,12 @@ function Chat() {
           <div className="flex items-end gap-2">
             <BatiFace size={28} />
             <div className="rounded-2xl rounded-bl-sm bg-white/10 px-4 py-2.5 text-sm text-white/60">
-              <span className="animate-pulse">{t(m.moon.thinking, { name })}</span>
+              {/* a small magic circle turning while {bati} looks it up (no "thinking…" words) */}
+              <span className="relative block h-7 w-7" aria-label={t(m.moon.thinking, { name })}>
+                <span className="absolute inset-0 animate-[spin_3s_linear_infinite] rounded-full border-2 border-dashed border-amber-200/70" />
+                <span className="absolute inset-[5px] animate-[spin_2s_linear_infinite_reverse] rounded-full border border-sky-200/70" />
+                <span className="absolute inset-[11px] animate-pulse rounded-full bg-amber-100/80" />
+              </span>
             </div>
           </div>
         )}
@@ -231,26 +237,32 @@ function SettingsSheet({
     onClose();
   };
 
-  const slider = (key: keyof BuddyPersona, label: string, low: string, high: string) => (
-    <label className="block">
-      <div className="mb-1 flex justify-between text-xs text-white/70">
-        <span className="font-bold">{label}</span>
-        <span className="tabular-nums text-white/40">{persona[key]}</span>
+  // three words instead of a number (story chat 2026-11-02): low / middle / high
+  const slider = (key: keyof BuddyPersona, label: string, low: string, high: string) => {
+    const steps: [number, string][] = [
+      [15, low],
+      [50, 'ふつう'],
+      [85, high],
+    ];
+    const at = persona[key] < 34 ? 0 : persona[key] > 66 ? 2 : 1;
+    return (
+      <div className="block">
+        <p className="mb-1.5 text-xs font-bold text-white/70">{label}</p>
+        <div className="grid grid-cols-3 gap-1.5">
+          {steps.map(([v, word], k) => (
+            <button
+              key={word}
+              type="button"
+              onClick={() => setPersona({ ...persona, [key]: v })}
+              className={`min-h-11 rounded-xl px-2 text-[13px] font-bold ${k === at ? 'bg-sky-300 text-sky-950' : 'bg-white/10 text-white/70'}`}
+            >
+              {word}
+            </button>
+          ))}
+        </div>
       </div>
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={persona[key]}
-        onChange={(e) => setPersona({ ...persona, [key]: Number(e.target.value) })}
-        className="w-full accent-sky-300"
-      />
-      <div className="flex justify-between text-[10px] text-white/40">
-        <span>{low}</span>
-        <span>{high}</span>
-      </div>
-    </label>
-  );
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
