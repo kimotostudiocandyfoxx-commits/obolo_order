@@ -31,9 +31,10 @@ jobs:
     steps:
       - name: Video API pages
         run: |
-          for u in docs/en/video-inference/api-reference.md docs/models/bytedance-seedance-1-5-pro.md docs/models/bytedance-seedance-1-0-pro-fast.md docs/models/bytedance-seedance-2-0-fast.md docs/learn/image-to-video.md; do
+          for u in docs/models/bytedance-seedance-2-0-fast.md docs/models/bytedance-seedance-1-0-pro-fast.md docs/models/bytedance-seedance-1-5-pro.md; do
             echo "=================== $u"
-            curl -sSL "https://runware.ai/$u" | sed 's/<[^>]*>//g' | grep -v '^\s*$' | cut -c1-400 | head -n 260 || true
+            curl -sSL "https://runware.ai/$u" | sed 's/<[^>]*>//g' > /tmp/p.md || true
+            grep -n -i -B2 -A8 'providerSettings\|audio\|duration\|\*\*Value\*\*' /tmp/p.md | cut -c1-300 | head -n 220 || true
           done
   video:
     if: ${{ inputs.docs == '' && !contains(github.event.head_commit.message, '[docs]') }}
