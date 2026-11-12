@@ -378,7 +378,7 @@
     },
     {
       "id": "mv-14-together-sq",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing at the top of white marble temple steps at sunrise, facing the viewer with a warm proud smile, one hand raised as if blessing and watching over; in the lower foreground, seen only from behind, a young winged angel with curly golden-blond hair walks up the steps toward him (no face visible); divine golden light, heartfelt.",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing on white marble temple steps at sunrise beside a young blond curly-haired muscular angel with white wings; the man rests a hand on the angel's shoulder; the man faces the viewer with a big warm smile, his face clearly visible and in focus; the angel is turned toward him, seen in profile; golden divine light, heartfelt.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -386,7 +386,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person-4.jpg"
+        "/tmp/mv-person-2.jpg"
       ]
     },
     {
@@ -464,7 +464,7 @@
     },
     {
       "id": "mv-14-together-sqb",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing at the top of white marble temple steps at sunrise, facing the viewer with a warm proud smile, one hand raised as if blessing and watching over; in the lower foreground, seen only from behind, a young winged angel with curly golden-blond hair walks up the steps toward him (no face visible); divine golden light, heartfelt.",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing on white marble temple steps at sunrise beside a young blond curly-haired muscular angel with white wings; the man rests a hand on the angel's shoulder; the man faces the viewer with a big warm smile, his face clearly visible and in focus; the angel is turned toward him, seen in profile; golden divine light, heartfelt.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -472,9 +472,12 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person-4.jpg"
+        "/tmp/mv-person-2.jpg"
       ]
     }
   ],
-  "redo": []
+  "redo": [
+    "mv-14-together-sq",
+    "mv-14-together-sqb"
+  ]
 }
