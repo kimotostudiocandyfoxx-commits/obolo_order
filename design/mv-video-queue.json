@@ -118,13 +118,6 @@
    "prompt": "The heavenly clouds drift very slowly, golden light glows and breathes, a few feathers float down gently."
   },
   {
-   "id": "vcu-01-katada-smile",
-   "image": "design/mv-art/out/mv-cu-01-katada-smile.jpg",
-   "duration": 5,
-   "cameraFixed": true,
-   "prompt": "He laughs warmly with joy, the halo glows behind him, his wings stir softly at the edges. He keeps exactly the same face, smile and pose."
-  },
-  {
    "id": "vcu-02-katada-serene",
    "image": "design/mv-art/out/mv-cu-02-katada-serene.jpg",
    "duration": 6,
@@ -151,6 +144,20 @@
    "duration": 7,
    "cameraFixed": true,
    "prompt": "Looking up into the golden dome: the column of divine light pours down through the oculus and shimmers, clouds drift slowly inside the hall, petals and feathers float and turn slowly in the light."
+  },
+  {
+   "id": "vcu-01-katada-smile-b",
+   "image": "design/mv-art/out/mv-cu-01-katada-smile-b.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "prompt": "He laughs warmly with joy, the halo glows behind him, his wings stir softly at the edges. He keeps exactly the same face, smile and pose."
+  },
+  {
+   "id": "vcu-03-hand-heart",
+   "image": "design/mv-art/out/mv-cu-03-hand-heart.jpg",
+   "duration": 4,
+   "cameraFixed": true,
+   "prompt": "The hand presses gently over the heart, a soft golden light glows and pulses from beneath the fingers with each slow breath, the chest rises and falls, the wings stir, a feather drifts down."
   }
  ],
  "redo": []
