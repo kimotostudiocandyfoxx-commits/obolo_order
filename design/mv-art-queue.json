@@ -269,7 +269,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg"
+        "/tmp/mv-person-1.jpg"
       ]
     },
     {
@@ -282,7 +282,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg"
+        "/tmp/mv-person-2.jpg"
       ]
     },
     {
@@ -326,7 +326,7 @@
     },
     {
       "id": "mv-10-katada-colossal-sq",
-      "prompt": "Epic vista: a colossal figure of the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha rising above the horizon of an endless sea of clouds like the rising sun, his smiling face, massive bare muscular shoulders and chest visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
+      "prompt": "Epic vista: a colossal figure of the man in the reference photo (keep his face and hairstyle exactly as in the photo), standing with his arms crossed confidently, shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha rising above the horizon of an endless sea of clouds like the rising sun, his smiling face, massive bare muscular shoulders and chest visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -334,7 +334,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg"
+        "/tmp/mv-person-3.jpg"
       ]
     },
     {
@@ -386,7 +386,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg",
+        "/tmp/mv-person-4.jpg",
         "design/mv-art/ref/angel.jpg"
       ]
     },
@@ -434,7 +434,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg"
+        "/tmp/mv-person-1.jpg"
       ]
     },
     {
@@ -447,12 +447,12 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg"
+        "/tmp/mv-person-2.jpg"
       ]
     },
     {
       "id": "mv-10-katada-colossal-sqb",
-      "prompt": "Epic vista: a colossal figure of the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha rising above the horizon of an endless sea of clouds like the rising sun, his smiling face, massive bare muscular shoulders and chest visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
+      "prompt": "Epic vista: a colossal figure of the man in the reference photo (keep his face and hairstyle exactly as in the photo), standing with his arms crossed confidently, shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha rising above the horizon of an endless sea of clouds like the rising sun, his smiling face, massive bare muscular shoulders and chest visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -460,7 +460,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg"
+        "/tmp/mv-person-3.jpg"
       ]
     },
     {
@@ -473,7 +473,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person.jpg",
+        "/tmp/mv-person-4.jpg",
         "design/mv-art/ref/angel.jpg"
       ]
     }

@@ -12,6 +12,22 @@ on:
         description: 'reference photo (base64 jpeg)'
         required: false
         default: ''
+      ref1:
+        description: 'reference photo 1 (base64 jpeg)'
+        required: false
+        default: ''
+      ref2:
+        description: 'reference photo 2 (base64 jpeg)'
+        required: false
+        default: ''
+      ref3:
+        description: 'reference photo 3 (base64 jpeg)'
+        required: false
+        default: ''
+      ref4:
+        description: 'reference photo 4 (base64 jpeg)'
+        required: false
+        default: ''
 
 concurrency:
   group: mv-art-${{ github.ref }}
@@ -44,6 +60,10 @@ jobs:
         run: |
           jq -r '.inputs.ref // empty' "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-person.jpg 2>/dev/null || true
           [ -s /tmp/mv-person.jpg ] && echo "reference ready" || rm -f /tmp/mv-person.jpg
+          for i in 1 2 3 4; do
+            jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-person-$i.jpg 2>/dev/null || true
+            [ -s /tmp/mv-person-$i.jpg ] && echo "reference $i ready" || rm -f /tmp/mv-person-$i.jpg
+          done
       - name: Paint
         run: |
           export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
