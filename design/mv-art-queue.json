@@ -677,7 +677,7 @@
     1440,
     1440
    ],
-   "prompt": "Close-up of a large muscular hand placed tenderly over the heart on a bare, sculpted, sun-bronzed chest, a soft golden light glowing from beneath the fingers, a few white feathers drifting, warm golden backlight, no face visible."
+   "prompt": "Close-up of a large, powerful, very muscular hand placed tenderly over the heart on a huge, sculpted, sun-bronzed bodybuilder chest (massive pectorals and shoulders), framed from the collarbones down to the upper abdomen only, a soft golden light glowing from beneath the fingers, a golden sash across the chest, white feathered wing edges at the sides, a few white feathers drifting, warm golden backlight, no face visible, nothing below the ribs in frame."
   },
   {
    "id": "mv-cu-04-trophy",
@@ -711,7 +711,22 @@
     1440
    ],
    "prompt": "Inside a vast heavenly temple: looking up into an immense golden coffered dome with a bright open oculus pouring a column of divine light straight down, a ring of white marble columns, soft clouds drifting inside the hall, white feathers and rose petals floating in the light, no people."
+  },
+  {
+   "id": "mv-cu-01-katada-smile-b",
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-2.jpg"
+   ],
+   "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), close-up portrait: his face fills the upper half of the frame, laughing with a big warm joyful smile, eyes crinkled, bare muscular shoulders and chest, a glowing golden halo behind his head, the edges of radiant white angel wings at both sides, golden divine backlight, shallow depth of field."
   }
  ],
- "redo": []
+ "redo": [
+  "mv-cu-03-hand-heart"
+ ]
 }
