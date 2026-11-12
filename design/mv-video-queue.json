@@ -1,20 +1,8 @@
 {
  "out": "design/mv-art/video",
- "model": "bytedance:seedance@2.0-fast",
- "always": "The painting comes gently to life as a slow, graceful, majestic shot in exactly the same oil-painting style; the camera is locked off; faces, bodies and composition stay exactly as in the first frame; no new people, no text, no flashes; smooth, slow motion.",
+ "model": "bytedance:2@2",
+ "always": "Slow, graceful, majestic motion in exactly the same oil-painting style. The camera stays fixed. Every face, body, pose and the composition stay exactly as in the first frame; faces do not change at all. No new people, no text, no flashes.",
  "items": [
-  {
-   "id": "v02-letter-altar",
-   "image": "design/mv-art/out/mv-02-letter-altar-sq.jpg",
-   "duration": 6,
-   "prompt": "The candle flame flickers softly, the quill's feather sways a little, golden dust motes drift through the god rays, the clouds behind drift slowly."
-  },
-  {
-   "id": "v06-katada-blessing",
-   "image": "design/mv-art/out/mv-06-katada-blessing-sq.jpg",
-   "duration": 6,
-   "prompt": "The winged man keeps his warm smile and raises his open hand slightly in a gentle blessing, his great white wings breathe and their feathers stir softly, the halo glows, rose petals float down slowly."
-  },
   {
    "id": "v06-katada-blessing-s1",
    "model": "bytedance:2@2",
@@ -30,6 +18,139 @@
    "image": "design/mv-art/out/mv-10-katada-colossal-sq.jpg",
    "duration": 6,
    "prompt": "Only small, gentle movements: the huge white wings breathe slowly, the giant halo blazes and pulses softly like a sunrise, the sea of clouds drifts, light rays shimmer. He keeps exactly the same face, the same serene smile and the same pose; his face does not change at all."
+  },
+  {
+   "id": "v01-heaven-gate",
+   "image": "design/mv-art/out/mv-01-heaven-gate-sq.jpg",
+   "duration": 12,
+   "cameraFixed": true,
+   "prompt": "The clouds around the opening in the sky drift and turn very slowly, the divine light at the centre glows and breathes, golden rays shimmer, the tiny cherubs flutter their wings gently."
+  },
+  {
+   "id": "v02-letter-altar",
+   "image": "design/mv-art/out/mv-02-letter-altar-sq.jpg",
+   "duration": 8,
+   "cameraFixed": true,
+   "prompt": "The candle flame flickers softly, the quill feather sways a little, golden dust drifts through the light rays, the clouds behind drift slowly."
+  },
+  {
+   "id": "v03-one-yen",
+   "image": "design/mv-art/out/mv-03-one-yen-sq.jpg",
+   "duration": 6,
+   "cameraFixed": true,
+   "prompt": "The single small coin falls slowly and gently, turning as it falls, leaving a faint trail of sparkling light; the dark clouds drift and swirl slowly; the light from above shimmers."
+  },
+  {
+   "id": "v04-empty-chest",
+   "image": "design/mv-art/out/mv-04-empty-chest-sq.jpg",
+   "duration": 7,
+   "cameraFixed": true,
+   "prompt": "The two cherubs flutter their small wings and peer into the open golden chest, golden light glimmers on the chest, dust motes drift in the rays, the clouds drift."
+  },
+  {
+   "id": "v05-katada-throne",
+   "image": "design/mv-art/out/mv-05-katada-throne-sq.jpg",
+   "duration": 7,
+   "cameraFixed": true,
+   "prompt": "The seated winged man breathes calmly, his great wings stir softly, the giant golden halo behind him glows and turns slowly, the small cherubs flutter around him, clouds drift. He keeps exactly the same face, smile and pose."
+  },
+  {
+   "id": "v07-angel-tears",
+   "image": "design/mv-art/out/mv-07-angel-tears-sq.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "prompt": "The angel breathes deeply with his hands on his heart, a tear glistens on his cheek, his wings stir softly, warm light pulses gently behind him. He keeps exactly the same face and pose."
+  },
+  {
+   "id": "v08-angel-bow",
+   "image": "design/mv-art/out/mv-08-angel-bow-sq.jpg",
+   "duration": 8,
+   "cameraFixed": true,
+   "prompt": "The kneeling angel bows his head in gratitude, breathing slowly, his large wing lifts and settles gently, the sun behind blazes softly, clouds drift. He keeps exactly the same face and pose."
+  },
+  {
+   "id": "v09-three-generations",
+   "image": "design/mv-art/out/mv-09-three-generations-sq.jpg",
+   "duration": 12,
+   "cameraFixed": true,
+   "prompt": "The angel and the two baby angels sleep peacefully, breathing slowly, their wings rising and falling gently, the soft clouds drift, the distant temple glows in the rising sun. They keep exactly the same faces."
+  },
+  {
+   "id": "v11-angel-march",
+   "image": "design/mv-art/out/mv-11-angel-march-sq.jpg",
+   "duration": 8,
+   "cameraFixed": true,
+   "prompt": "The angel strides forward slowly and powerfully over the clouds, his wings spread and stir, the white cloth flows, light shines behind him. He keeps exactly the same face."
+  },
+  {
+   "id": "v12-angel-trophy",
+   "image": "design/mv-art/out/mv-12-angel-trophy-sq.jpg",
+   "duration": 7,
+   "cameraFixed": true,
+   "prompt": "The angel raises the golden trophy a little higher in triumph, golden light pours from the cup, gold leaves and feathers flutter around, his wings stir. He keeps exactly the same face."
+  },
+  {
+   "id": "v13-angel-oath",
+   "image": "design/mv-art/out/mv-13-angel-oath-sq.jpg",
+   "duration": 10,
+   "cameraFixed": true,
+   "prompt": "The angel keeps his hand on his heart and his other hand raised in an oath, his wings stir, the cherubs above play their trumpets and hold their candles, the flames flicker, light pours down. He keeps exactly the same face."
+  },
+  {
+   "id": "v14-together",
+   "image": "design/mv-art/out/mv-14-together-sq.jpg",
+   "duration": 8,
+   "cameraFixed": true,
+   "prompt": "The winged man keeps his hand on the young angel's shoulder, both wings stir softly, golden morning light glows, feathers drift slowly. He keeps exactly the same face, smile and pose."
+  },
+  {
+   "id": "v15-temple-finale",
+   "image": "design/mv-art/out/mv-15-temple-finale-sq.jpg",
+   "duration": 7,
+   "cameraFixed": true,
+   "prompt": "The two angels raise their hands in joy on the temple steps, petals and feathers swirl slowly upward, the rainbow shimmers, light pours from the dome. They keep exactly the same faces."
+  },
+  {
+   "id": "v16-end-sky",
+   "image": "design/mv-art/out/mv-16-end-sky-sq.jpg",
+   "duration": 12,
+   "cameraFixed": true,
+   "prompt": "The heavenly clouds drift very slowly, golden light glows and breathes, a few feathers float down gently."
+  },
+  {
+   "id": "vcu-01-katada-smile",
+   "image": "design/mv-art/out/mv-cu-01-katada-smile.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "prompt": "He laughs warmly with joy, the halo glows behind him, his wings stir softly at the edges. He keeps exactly the same face, smile and pose."
+  },
+  {
+   "id": "vcu-02-katada-serene",
+   "image": "design/mv-art/out/mv-cu-02-katada-serene.jpg",
+   "duration": 6,
+   "cameraFixed": true,
+   "prompt": "He looks gently toward the viewer and his serene smile softens a little, the great halo behind him blazes and pulses slowly like a sunrise. He keeps exactly the same face, smile and pose."
+  },
+  {
+   "id": "vcu-04-trophy",
+   "image": "design/mv-art/out/mv-cu-04-trophy.jpg",
+   "duration": 6,
+   "cameraFixed": true,
+   "prompt": "The golden trophy is lifted a little higher, golden light overflows from the rim and pours down like liquid gold, gold leaves and feathers flutter around it."
+  },
+  {
+   "id": "vcu-05-angel-tear",
+   "image": "design/mv-art/out/mv-cu-05-angel-tear.jpg",
+   "duration": 5,
+   "cameraFixed": true,
+   "prompt": "The tear runs slowly down his cheek, his eyes stay closed, his gentle smile deepens a little, the halo glows. He keeps exactly the same face."
+  },
+  {
+   "id": "v20-dome-interior",
+   "image": "design/mv-art/out/mv-20-dome-interior.jpg",
+   "duration": 7,
+   "cameraFixed": true,
+   "prompt": "Looking up into the golden dome: the column of divine light pours down through the oculus and shimmers, clouds drift slowly inside the hall, petals and feathers float and turn slowly in the light."
   }
  ],
  "redo": []
