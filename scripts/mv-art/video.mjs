@@ -56,6 +56,7 @@ async function make(x) {
       outputFormat: 'MP4',
       includeCost: true,
       inputs: { frameImages: frames },
+      ...(x.cameraFixed ? { providerSettings: { bytedance: { cameraFixed: true } } } : {}),
       // no generated sound: the MV has its own song, and generated audio got clips refused as "copyright" (2026-11-12)
       ...(/seedance@2/.test(x.model ?? queue.model ?? '') || !(x.model ?? queue.model) ? { settings: { audio: false } } : {}),
     },

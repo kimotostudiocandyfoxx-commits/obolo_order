@@ -14,6 +14,22 @@
    "image": "design/mv-art/out/mv-06-katada-blessing-sq.jpg",
    "duration": 6,
    "prompt": "The winged man keeps his warm smile and raises his open hand slightly in a gentle blessing, his great white wings breathe and their feathers stir softly, the halo glows, rose petals float down slowly."
+  },
+  {
+   "id": "v06-katada-blessing-s1",
+   "model": "bytedance:2@2",
+   "cameraFixed": true,
+   "image": "design/mv-art/out/mv-06-katada-blessing-sq.jpg",
+   "duration": 6,
+   "prompt": "Only small, gentle movements: his great white wings breathe and their feathers stir softly, the halo glows, rose petals float down slowly. He keeps exactly the same face, the same smile and the same pose; his face does not change at all."
+  },
+  {
+   "id": "v10-katada-colossal-s1",
+   "model": "bytedance:2@2",
+   "cameraFixed": true,
+   "image": "design/mv-art/out/mv-10-katada-colossal-sq.jpg",
+   "duration": 6,
+   "prompt": "Only small, gentle movements: the huge white wings breathe slowly, the giant halo blazes and pulses softly like a sunrise, the sea of clouds drifts, light rays shimmer. He keeps exactly the same face, the same serene smile and the same pose; his face does not change at all."
   }
  ],
  "redo": []
