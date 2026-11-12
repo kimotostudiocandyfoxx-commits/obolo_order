@@ -378,7 +378,7 @@
     },
     {
       "id": "mv-14-together-sq",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha and the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips) two muscular shirtless winged heroes standing side by side, both with spread white wings, on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha and a second figure: a young muscular angel with curly golden-blond hair, a thin golden halo, large white feathered wings and a white cloth wrapped at the hips two muscular shirtless winged heroes standing side by side, both with spread white wings, on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -386,8 +386,7 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person-4.jpg",
-        "design/mv-art/ref/angel.jpg"
+        "/tmp/mv-person-4.jpg"
       ]
     },
     {
@@ -465,7 +464,7 @@
     },
     {
       "id": "mv-14-together-sqb",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha and the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips) two muscular shirtless winged heroes standing side by side, both with spread white wings, on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha and a second figure: a young muscular angel with curly golden-blond hair, a thin golden halo, large white feathered wings and a white cloth wrapped at the hips two muscular shirtless winged heroes standing side by side, both with spread white wings, on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -473,10 +472,12 @@
         1440
       ],
       "refs": [
-        "/tmp/mv-person-4.jpg",
-        "design/mv-art/ref/angel.jpg"
+        "/tmp/mv-person-4.jpg"
       ]
     }
   ],
-  "redo": []
+  "redo": [
+    "mv-14-together-sq",
+    "mv-14-together-sqb"
+  ]
 }
