@@ -1,0 +1,67 @@
+name: MV video
+
+# MV moving paintings (2026-11-12, the Mars studio MV prototype): each still listed in design/mv-video-queue.json
+# becomes a short moving shot (image-to-video on Runware, scripts/mv-art/video.mjs), saved to queue.out.
+# Only the names-free paintings already in design/mv-art/out go in; nothing about a real person is stored here.
+# Run by hand (workflow_dispatch). docs=1 only prints the video API pages to the log.
+on:
+  workflow_dispatch:
+    inputs:
+      docs:
+        description: 'print the Runware video docs to the log instead of making videos (1)'
+        required: false
+        default: ''
+
+concurrency:
+  group: mv-video-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  docs:
+    if: ${{ inputs.docs != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Video API pages
+        run: |
+          for u in docs/en/video-inference/api-reference.md docs/models/bytedance-seedance-1-5-pro.md docs/models/bytedance-seedance-1-0-pro-fast.md docs/models/bytedance-seedance-2-0-fast.md docs/learn/image-to-video.md; do
+            echo "=================== $u"
+            curl -sSL "https://runware.ai/$u" | sed 's/<[^>]*>//g' | grep -v '^\s*$' | cut -c1-400 | head -n 260 || true
+          done
+  video:
+    if: ${{ inputs.docs == '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Animate
+        run: |
+          export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
+          command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          node scripts/mv-art/video.mjs design/mv-video-queue.json
+      - name: Save the videos to the branch
+        if: always()
+        run: |
+          git config user.name "mv-art"
+          git config user.email "mv-art@users.noreply.github.com"
+          git add -f design/mv-art design/mv-video-queue.json
+          git diff --cached --quiet && exit 0
+          git commit -m "MV video: new shots [skip ci]"
+          for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done
