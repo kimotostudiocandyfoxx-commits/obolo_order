@@ -1,6 +1,6 @@
 {
   "out": "design/mv-art/out",
-  "always": "Baroque Renaissance religious oil painting in the style of a grand ceiling fresco, warm golden divine light, god rays, soft billowing cream clouds, pale blue sky, rich glazing, fine visible brushwork, cinematic vertical composition, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+  "always": "Baroque Renaissance religious oil painting in the style of a grand ceiling fresco, warm golden divine light, god rays, soft billowing cream clouds, pale blue sky, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
   "items": [
     {
       "id": "mv-01-heaven-gate",
@@ -211,6 +211,201 @@
     {
       "id": "mv-19-cherub-trumpet",
       "prompt": "A chubby baby cherub with small white wings flying and blowing a long golden trumpet, joyful, Renaissance oil painting style, isolated single object, centered, on a plain flat solid light gray (#d9d9d9) background, no scenery, no floor, no shadow, nothing else in frame, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        1024,
+        1024
+      ],
+      "always": false
+    },
+    {
+      "id": "mv-01-heaven-gate-sq",
+      "prompt": "Looking up into heaven: towering cream clouds parting in a vast circle, a blazing golden light at the center, god rays streaming down in every direction, a few tiny distant cherubs circling, the upper third left calm and open for a title.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-02-letter-altar-sq",
+      "prompt": "A white marble altar standing on clouds in heavenly light; on it an unrolled cream parchment letter that is completely blank, a white feather quill in a golden inkwell, a red wax seal, one lit candle and scattered rose petals; intimate still life, shallow depth of field, warm glow.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-03-one-yen-sq",
+      "prompt": "A single small shiny silver aluminium coin falling all alone through a vast heavenly sky of clouds, caught in one beam of golden light, tiny and lonely against the enormous sky, a faint sparkle trail behind it; solemn and absurdly grand.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-04-empty-chest-sq",
+      "prompt": "An ornate golden treasure chest standing wide open on a cloud, completely empty except for one tiny silver coin at the bottom, a small cobweb in one corner, a dramatic heavenly spotlight on it, two chubby cherubs peeking in from the sides with puzzled faces.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-05-katada-throne-sq",
+      "prompt": "a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha, seated on a majestic throne of clouds, an enormous golden halo and radiant aureole blazing behind him, a large pink lotus blossom beneath the throne, cherubs and white doves around him, hands resting calmly on his knees, smiling down benevolently; full figure, centered, heavenly majesty.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-06-katada-blessing-sq",
+      "prompt": "Waist-up portrait of a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha, raising one hand in a gentle blessing gesture, a golden halo behind his head, rose petals drifting down, warm light falling on his smiling face.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-07-angel-tears-sq",
+      "prompt": "Close-up portrait of the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), both hands pressed to his heart, eyes closed, streams of glowing golden tears running down his cheeks, a deeply moved, trembling smile, holy light from above.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-08-angel-bow-sq",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), kneeling and bowing deeply with his forehead touching the clouds, wings folded forward humbly, before a distant blaze of golden light; side view, reverent and solemn.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-09-three-generations-sq",
+      "prompt": "A gently comic scene: three angels sleeping peacefully in a neat row on one long cloud bed under a starry golden night sky — the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), his young son (a small muscular blond child angel) and his grandson (a chubby baby cherub) — all three lying with their heads toward a small glowing golden temple far away on the horizon and their feet pointing away from it; serene sleeping faces, soft moonlight and gold.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-10-katada-colossal-sq",
+      "prompt": "Epic vista: a colossal figure of a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha rising above the horizon of an endless sea of clouds like the rising sun, only his smiling face and shoulders visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-11-angel-march-sq",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), striding forward boldly along a road of golden clouds that leads to a brilliant horizon, wings fully spread, fists clenched with determination, a confident smile; dynamic low angle, streaks of light.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-12-angel-trophy-sq",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), raising a large golden trophy cup wreathed in laurel high above his head toward a radiant sky, light bursting from the trophy, golden feathers swirling like confetti, triumphant joyful face.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-13-angel-oath-sq",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), one hand on his heart and the other raised in a solemn oath, behind him a choir of cherubs singing with candles and golden trumpets, warm cathedral-like light among the clouds.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-14-together-sq",
+      "prompt": "a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha and the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips) standing side by side on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-15-temple-finale-sq",
+      "prompt": "A grand white domed classical temple floating among clouds, an explosion of golden light bursting from behind the dome, a soft rainbow halo, hundreds of white feathers and rose petals swirling, two tiny figures at the top of the steps — a winged angel and a man in a dark suit — waving.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "mv-16-end-sky-sq",
+      "prompt": "A calm, serene golden evening sky over a sea of soft clouds, a faint ring of light in the center, empty and peaceful.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "mv-19-cherub-trumpet-sq",
+      "prompt": "A chubby little cherub with small white wings, wearing a flowing white cloth wrapped around the body, flying and blowing a long golden trumpet, joyful, Renaissance oil painting style, isolated single figure, centered, on a plain flat solid light gray (#d9d9d9) background, no scenery, no floor, no shadow, nothing else in frame, no text.",
       "w": 1024,
       "h": 1024,
       "size": [
