@@ -3,8 +3,11 @@ name: MV video
 # MV moving paintings (2026-11-12, the Mars studio MV prototype): each still listed in design/mv-video-queue.json
 # becomes a short moving shot (image-to-video on Runware, scripts/mv-art/video.mjs), saved to queue.out.
 # Only the names-free paintings already in design/mv-art/out go in; nothing about a real person is stored here.
-# Run by hand (workflow_dispatch). docs=1 only prints the video API pages to the log.
+# Runs when the queue changes, or by hand. docs=1 (or a queue with "docs": true) prints the video API pages to the log.
 on:
+  push:
+    paths:
+      - design/mv-video-queue.json
   workflow_dispatch:
     inputs:
       docs:
@@ -22,7 +25,7 @@ env:
 
 jobs:
   docs:
-    if: ${{ inputs.docs != '' }}
+    if: ${{ inputs.docs != '' || contains(github.event.head_commit.message, '[docs]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -33,7 +36,7 @@ jobs:
             curl -sSL "https://runware.ai/$u" | sed 's/<[^>]*>//g' | grep -v '^\s*$' | cut -c1-400 | head -n 260 || true
           done
   video:
-    if: ${{ inputs.docs == '' }}
+    if: ${{ inputs.docs == '' && !contains(github.event.head_commit.message, '[docs]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
