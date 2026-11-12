@@ -261,22 +261,28 @@
     },
     {
       "id": "mv-05-katada-throne-sq",
-      "prompt": "a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha, seated on a majestic throne of clouds, an enormous golden halo and radiant aureole blazing behind him, a large pink lotus blossom beneath the throne, cherubs and white doves around him, hands resting calmly on his knees, smiling down benevolently; full figure, centered, heavenly majesty.",
+      "prompt": "the man in the first reference photo (keep his face, hairline, eyes, beard and smile exactly like the photo: a kind Japanese man in his early fifties with a very short buzz cut, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha), seated on a majestic throne of clouds, an enormous golden halo and radiant aureole blazing behind him, a large pink lotus blossom beneath the throne, cherubs and white doves around him, hands resting calmly on his knees, smiling down benevolently; full figure, centered, heavenly majesty.",
       "w": 2048,
       "h": 2048,
       "size": [
         1440,
         1440
+      ],
+      "refs": [
+        "/tmp/mv-person.jpg"
       ]
     },
     {
       "id": "mv-06-katada-blessing-sq",
-      "prompt": "Waist-up portrait of a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha, raising one hand in a gentle blessing gesture, a golden halo behind his head, rose petals drifting down, warm light falling on his smiling face.",
+      "prompt": "Waist-up portrait of the man in the first reference photo (keep his face, hairline, eyes, beard and smile exactly like the photo: a kind Japanese man in his early fifties with a very short buzz cut, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha), raising one hand in a gentle blessing gesture, a golden halo behind his head, rose petals drifting down, warm light falling on his smiling face.",
       "w": 2048,
       "h": 2048,
       "size": [
         1440,
         1440
+      ],
+      "refs": [
+        "/tmp/mv-person.jpg"
       ]
     },
     {
@@ -320,12 +326,15 @@
     },
     {
       "id": "mv-10-katada-colossal-sq",
-      "prompt": "Epic vista: a colossal figure of a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha rising above the horizon of an endless sea of clouds like the rising sun, only his smiling face and shoulders visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
+      "prompt": "Epic vista: a colossal figure of the man in the first reference photo (keep his face, hairline, eyes, beard and smile exactly like the photo: a kind Japanese man in his early fifties with a very short buzz cut, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha) rising above the horizon of an endless sea of clouds like the rising sun, only his smiling face and shoulders visible, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; in the lower foreground a tiny silhouette of a winged angel looking up in awe.",
       "w": 2048,
       "h": 2048,
       "size": [
         1440,
         1440
+      ],
+      "refs": [
+        "/tmp/mv-person.jpg"
       ]
     },
     {
@@ -369,7 +378,7 @@
     },
     {
       "id": "mv-14-together-sq",
-      "prompt": "a kind Japanese man in his early fifties with a very short buzz cut and a slightly receding hairline, a round friendly face, narrow gentle eyes, a neat short goatee and a thin mustache, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha and the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips) standing side by side on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
+      "prompt": "the man in the first reference photo (keep his face, hairline, eyes, beard and smile exactly like the photo: a kind Japanese man in his early fifties with a very short buzz cut, wearing a dark charcoal business suit, white shirt and navy blue tie, with a serene, warm, closed-mouth smile like a Buddha) and the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips) standing side by side on white marble temple steps at sunrise, the man resting a hand on the angel's shoulder, both smiling toward the golden horizon; seen three-quarter from behind, warm and heartfelt.",
       "w": 2048,
       "h": 2048,
       "size": [
@@ -377,6 +386,7 @@
         1440
       ],
       "refs": [
+        "/tmp/mv-person.jpg",
         "design/mv-art/ref/angel.jpg"
       ]
     },
@@ -414,5 +424,11 @@
       ],
       "always": false
     }
+  ],
+  "redo": [
+    "mv-05-katada-throne-sq",
+    "mv-06-katada-blessing-sq",
+    "mv-10-katada-colossal-sq",
+    "mv-14-together-sq"
   ]
 }

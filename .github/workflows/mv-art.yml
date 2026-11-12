@@ -3,11 +3,15 @@ name: MV art
 # MV art (2026-11-12, the Mars studio MV prototype): the pictures listed in design/mv-art-queue.json are
 # painted with Seedream 5.0 Pro (scripts/mv-art/paint.mjs) and saved to the folder the queue names (queue.out).
 # Only names-free pictures go here: the song, the lyrics and any real person's photo stay out of this public repo.
+# A person's reference photo is never stored here: it comes in as the `ref` input (base64 JPEG), is read from the
+# event file (never echoed) and written to /tmp only. Run by hand (workflow_dispatch).
 on:
   workflow_dispatch:
-  push:
-    branches: ['claude/hopeful-pascal-udqkh2']
-    paths: ['design/mv-art-queue.json']
+    inputs:
+      ref:
+        description: 'reference photo (base64 jpeg)'
+        required: false
+        default: ''
 
 concurrency:
   group: mv-art-${{ github.ref }}
@@ -36,6 +40,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Reference photo (to /tmp only)
+        run: |
+          jq -r '.inputs.ref // empty' "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-person.jpg 2>/dev/null || true
+          [ -s /tmp/mv-person.jpg ] && echo "reference ready" || rm -f /tmp/mv-person.jpg
       - name: Paint
         run: |
           export SEEDREAM_API_KEY="$(gcloud secrets versions access latest --secret=obolo-seedream-api-key)"
