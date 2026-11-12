@@ -1,1 +1,19 @@
-{ "out": "design/mv-art/video", "items": [] }
+{
+ "out": "design/mv-art/video",
+ "model": "bytedance:seedance@2.0-fast",
+ "always": "The painting comes gently to life as a slow, graceful, majestic shot in exactly the same oil-painting style; the camera is locked off; faces, bodies and composition stay exactly as in the first frame; no new people, no text, no flashes; smooth, slow motion.",
+ "items": [
+  {
+   "id": "v02-letter-altar",
+   "image": "design/mv-art/out/mv-02-letter-altar-sq.jpg",
+   "duration": 6,
+   "prompt": "The candle flame flickers softly, the quill's feather sways a little, golden dust motes drift through the god rays, the clouds behind drift slowly."
+  },
+  {
+   "id": "v06-katada-blessing",
+   "image": "design/mv-art/out/mv-06-katada-blessing-sq.jpg",
+   "duration": 6,
+   "prompt": "The winged man keeps his warm smile and raises his open hand slightly in a gentle blessing, his great white wings breathe and their feathers stir softly, the halo glows, rose petals float down slowly."
+  }
+ ]
+}
