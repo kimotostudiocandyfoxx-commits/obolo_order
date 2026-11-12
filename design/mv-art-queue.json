@@ -478,14 +478,5 @@
       ]
     }
   ],
-  "redo": [
-    "mv-05-katada-throne-sq",
-    "mv-06-katada-blessing-sq",
-    "mv-10-katada-colossal-sq",
-    "mv-14-together-sq",
-    "mv-05-katada-throne-sqb",
-    "mv-06-katada-blessing-sqb",
-    "mv-10-katada-colossal-sqb",
-    "mv-14-together-sqb"
-  ]
+  "redo": []
 }
