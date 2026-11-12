@@ -1,6 +1,6 @@
-# MV video — 2026-11-12T14:39:43.428Z
+# MV video — 2026-11-12T14:43:18.493Z
 
-2 clips / about $0.78
+2 clips / about $0.08
 
-- ✅ v02-letter-altar
-- ✅ v06-katada-blessing
+- ✅ v06-katada-blessing-s1
+- ✅ v10-katada-colossal-s1
