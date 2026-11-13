@@ -1,6 +1,5 @@
-# UI art — 2026-11-12T14:46:42.670Z
+# UI art — 2026-11-13T00:06:56.758Z
 
-Seedream 5.0 Pro / 2枚 / 約29円
+Seedream 5.0 Pro / 1枚 / 約14円
 
-- ✅ mv-cu-01-katada-smile-b
-- ✅ mv-cu-03-hand-heart
+- ✅ mv-cu-03-hand-heart-b
