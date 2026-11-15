@@ -1,44 +1,19 @@
-# UI art — 2026-11-15T08:12:48.647Z
+# UI art — 2026-11-15T08:22:51.486Z
 
-Seedream 5.0 Pro / 40枚 / 約595円
+Seedream 5.0 Pro / 15枚 / 約221円
 
-- ✅ mv2-m01-plane-young
-- ✅ mv2-m02-mexico-jungle
-- ✅ mv2-m03-party-meet
-- ✅ mv2-m04-tequila
-- ✅ mv2-m05-heart-eyes
-- ✅ mv2-m06-bye
-- ✅ mv2-m07-busking
-- ✅ mv2-m08-remember
-- ✅ mv2-m09-to-thailand
-- ✅ mv2-m10-reunion-hug
-- ✅ mv2-m11-420-hands
-- ✅ mv2-m12-shave
-- ✅ mv2-m13-okinawa
-- ✅ mv2-m14-finland-reindeer
-- ✅ mv2-m15-aurora
-- ✅ mv2-m16-proposal
-- ✅ mv2-m17-mexico-birth
-- ✅ mv2-m18-vietnam
-- ✅ mv2-m19-bali
-- ✅ mv2-m20-spain
-- ✅ mv2-m21-slovakia
-- ✅ mv2-m22-berlin
-- ✅ mv2-m23-colmar
-- ✅ mv2-m24-hungary
-- ✅ mv2-m25-austria
-- ✅ mv2-m26-hawaii
-- ✅ mv2-m27-phangan-birth
-- ✅ mv2-m28-tattoo
-- ✅ mv2-m29-phangan-life
-- ✅ mv2-s01-house-night
-- ✅ mv2-s02-wife-crying
-- ✅ mv2-s03-fox-apology
-- ✅ mv2-s04-slap
-- ✅ mv2-s05-leaving
-- ✅ mv2-s06-slope-alone
-- ✅ mv2-s07-plane-sad
-- ✅ mv2-s08-tokyo
-- ✅ mv2-s09-shisha
-- ✅ mv2-s10-remote
-- ✅ mv2-s11-screen-title
+- ✅ mv2-m30-moving
+- ✅ mv2-m31-snow-life
+- ✅ mv2-m32-hair-grows
+- ✅ mv2-m33-passing-ladies
+- ✅ mv2-m34-heart-eyes-late
+- ✅ mv2-m35-crying-again
+- ✅ mv2-r01-sofa-watching
+- ✅ mv2-r02-tear
+- ✅ mv2-r03-plane-back
+- ✅ mv2-r04-front-of-house
+- ✅ mv2-r05-inside-family
+- ✅ mv2-r06-hand-door
+- ✅ mv2-r07-u-turn
+- ✅ mv2-r08-guitar-snow
+- ✅ mv2-r09-last-wide
