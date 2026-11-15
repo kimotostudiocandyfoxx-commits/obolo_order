@@ -194,6 +194,9 @@ function buildLayers() {
   { const S = 256, c = mk(S, S), g = c.getContext('2d'), gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
     gr.addColorStop(0, 'rgba(255,228,170,.9)'); gr.addColorStop(.35, 'rgba(255,214,150,.4)'); gr.addColorStop(.7, 'rgba(255,205,140,.1)'); gr.addColorStop(1, 'rgba(255,200,130,0)');
     g.fillStyle = gr; g.fillRect(0, 0, S, S); L.puff = c; }
+  { const S = 64, c = mk(S, S), g = c.getContext('2d'), gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);   // snowflake: soft white dot
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.35, 'rgba(250,252,255,.85)'); gr.addColorStop(.7, 'rgba(235,242,255,.25)'); gr.addColorStop(1, 'rgba(230,240,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, S, S); L.flake = c; }
   { const S = 256, c = mk(S, S), g = c.getContext('2d'), gr = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
     gr.addColorStop(0, 'rgba(14,6,1,.5)'); gr.addColorStop(.45, 'rgba(14,6,1,.32)'); gr.addColorStop(.8, 'rgba(14,6,1,.08)'); gr.addColorStop(1, 'rgba(14,6,1,0)');
     g.fillStyle = gr; g.fillRect(0, 0, S, S); L.shade = c; }
@@ -409,6 +412,30 @@ const DUST = (() => { const R = mulberry32(7), far = [], near = [];
   return { far, near }; })();
 // particles fade out over faces (the big close-ups especially): 0 on the face, 1 clear of it
 function faceClear(x, y, faces) { let k = 1; for (const [fx, fy, r] of faces) { const d = Math.hypot(x - fx, (y - fy) * .85) / (r * 1.25); k = Math.min(k, sstep((d - .55) / .6)); } return k; }
+// snow (P.snow: [[from, to], ...]): two depths of soft flakes drifting down, every flake a pure function of t
+const SNOWF = (() => { const R = mulberry32(4242), out = []; for (let k = 0; k < 260; k++) { const near = k < 50;
+  out.push({ x: R(), y: R(), v: near ? .07 + R() * .05 : .03 + R() * .035, s: near ? 9 + R() * 9 : 3 + R() * 5, sw: .008 + R() * .02, w: .3 + R() * .7, ph: R() * 6.283, a: near ? .75 : .55 + R() * .35 }); }
+  return out; })();
+function snowAmount(t) { let k = 0; for (const [a, b, i = 1] of P.snow || []) k = Math.max(k, i * ramp(t, a - .6, a + 1) * (1 - ramp(t, b - .6, b + .4))); return k; }
+function drawSnow(t) {
+  const k = snowAmount(t); if (k <= 0) return;
+  cx.globalCompositeOperation = 'source-over';
+  for (const f of SNOWF) {
+    const y = fract(f.y + f.v * t) * 1.1 - .05, x = fract(f.x + f.sw * Math.sin(t * f.w + f.ph) + t * .004);
+    cx.globalAlpha = clamp(f.a * k); cx.drawImage(L.flake, x * W - f.s / 2, y * H - f.s / 2, f.s, f.s);
+  }
+  cx.globalAlpha = 1;
+}
+// memory tone (P.memory: [from, to]): the film-within-the-MV looks like an old, warm, slightly faded film
+function memoryAmount(t) { const M = P.memory; return M ? ramp(t, M[0] - .5, M[0] + .7) * (1 - ramp(t, M[1] - .7, M[1] + .3)) : 0; }
+function drawMemory(t) {
+  const k = memoryAmount(t); if (k <= 0) return;
+  const flick = .92 + .08 * Math.sin(t * 23.0) * Math.sin(t * 7.3);
+  cx.globalCompositeOperation = 'soft-light'; cx.globalAlpha = .55 * k; cx.fillStyle = '#c8955a'; cx.fillRect(0, 0, W, H);   // warm sepia
+  cx.globalCompositeOperation = 'screen'; cx.globalAlpha = .07 * k * flick; cx.fillStyle = '#fff4e0'; cx.fillRect(0, 0, W, H);   // faded blacks, soft flicker
+  cx.globalCompositeOperation = 'source-over'; cx.globalAlpha = .55 * k; cx.drawImage(L.vig, 0, 0);                           // deeper vignette
+  cx.globalAlpha = 1;
+}
 function drawDust(layer, t, en, gain) {
   const faces = faceSpots(t);
   const list = DUST[layer], spr = layer === 'far' ? L.dust : L.bokeh, drift = layer === 'far' ? .006 : .02;
@@ -600,10 +627,11 @@ function renderAt(t) {
   drawRays(i, t, pe, en);
   drawVoxGlow(t);
   // --- depth layers
-  drawDust('far', t, en, .9);
+  drawDust('far', t, en, .9 * (P.dust ?? 1));
   drawFeathers(t);
   drawDivine(t);
-  drawDust('near', t, en, .8);
+  drawDust('near', t, en, .8 * (P.dust ?? 1));
+  drawSnow(t);
   // --- breathing warm glow + gentle bloom in the crossfades (small lift only)
   const breathe = .5 + .5 * Math.sin(t * Math.PI * 2 / 6.4);
   const xfb = p < 1 ? Math.sin(Math.PI * p) : 0;
@@ -631,8 +659,9 @@ function renderAt(t) {
   if (mA > 0 || cA > 0) { cx.globalAlpha = Math.max(mA * .8, cA); cx.drawImage(L.cveil, 0, 0); cx.globalAlpha = 1; }
   if (mA > 0) { const sc = 1 + .05 * clamp((t - EN.from) / (EN.to - EN.from)); cx.save(); cx.globalAlpha = mA; cx.translate(W / 2, H * .47); cx.scale(sc, sc); cx.drawImage(L.merci, -W / 2, -225 + (1 - mA) * 12); cx.restore(); }
   if (cA > 0) { const sc = 1 + .03 * clamp((t - CR.from) / (CR.to - CR.from)); cx.save(); cx.globalAlpha = cA; cx.translate(W / 2, H * .5); cx.scale(sc, sc); cx.drawImage(L.credit, -W / 2, -180 + (1 - cA) * 10); cx.restore(); }
+  drawMemory(t);
   // --- film grain (very subtle)
-  cx.globalCompositeOperation = 'overlay'; cx.globalAlpha = .05;
+  cx.globalCompositeOperation = 'overlay'; cx.globalAlpha = .05 + .07 * memoryAmount(t);
   cx.drawImage(L.grain[Math.floor(t * FPS + 1e-6) % L.grain.length], 0, 0, W, H);
   cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over';
   // --- from black / to black
