@@ -891,6 +891,76 @@
     "design/mv-art/out/mv2-chr-fox-a.jpg"
    ],
    "prompt": "A character turnaround sheet of exactly this fox character (the same wobbly hand-drawn ink line, the same face with closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip): four full-body views of him standing in a row on a plain white background — front view, three-quarter view, side view in profile, and back view — all the same size and height, evenly spaced. No text, no labels, no lines between them."
+  },
+  {
+   "id": "mv2-chr-fox-young-a",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on the top of his head between his ears, drawn in exactly the same loose ink line and watercolor. Young days: fluffy, slightly messy sky-blue hair with soft bangs falling over his forehead."
+  },
+  {
+   "id": "mv2-chr-fox-young-b",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on the top of his head between his ears, drawn in exactly the same loose ink line and watercolor. Young days: a big soft quiff of medium-blue hair swept up and back, like a cool young man."
+  },
+  {
+   "id": "mv2-chr-fox-late-a",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on the top of his head between his ears, drawn in exactly the same loose ink line and watercolor. Later years: just a little very short black hair, a short crew cut covering only the top of his head."
+  },
+  {
+   "id": "mv2-chr-fox-late-b",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on the top of his head between his ears, drawn in exactly the same loose ink line and watercolor. Later years: a small patch of very short, slightly spiky black hair on the crown of his head, thin and sparse."
+  },
+  {
+   "id": "mv2-chr-cat-turn",
+   "always": false,
+   "w": 2560,
+   "h": 1440,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A character turnaround sheet of exactly this cat character (the same wobbly hand-drawn ink line, the same face with closed eyes and pink cheeks, the same pale blue watercolor stripes, the same pale lavender witch's hat with the little yellow flower on its band): four full-body views of her standing in a row on a plain white background — front view, three-quarter view, side view in profile, and back view — all the same size and height, evenly spaced. No text, no labels, no lines between them."
   }
  ],
  "redo": []
