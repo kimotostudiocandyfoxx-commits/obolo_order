@@ -1049,6 +1049,62 @@
     "design/mv-art/out/mv2-chr-cat-a.jpg"
    ],
    "prompt": "Drawn in exactly the same style as the reference pictures: a simple, charming children's picture-book character with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny mouth, a few thin whiskers), full body, centered, on a plain pure white background with plenty of empty space. No text, no letters, no signature, no frame. A tiny baby boy fox (their second child): a fox's shape like the fox in the reference — pointed ears, a small pointed muzzle, a fluffy little fox tail — but his colors come from his mother cat: white with soft pale SKY-BLUE watercolor stripes (not orange). Baby proportions: a big head, a tiny chubby body, little paws, eyes closed in a happy smile, standing up wobbly for the first time with his little arms raised, a tiny pale-blue bib."
+  },
+  {
+   "id": "mv2-chr-baby-girl-a2",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-baby-girl-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the same character with the same colors, stripes, accessories and the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, but make it look much more like a real little baby: a much bigger round head compared to the body, very short chubby arms and legs, a round little tummy, tiny paws, softer rounder features, eyes closed peacefully, and a baby pacifier (dummy) in its mouth — a small round pacifier with a pastel pink ring and shield. Keep the tiny yellow flower on her head. She is a baby girl cat with orange stripes."
+  },
+  {
+   "id": "mv2-chr-baby-girl-b2",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-baby-girl-b.jpg"
+   ],
+   "prompt": "Edit this picture: keep the same character with the same colors, stripes, accessories and the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, but make it look much more like a real little baby: a much bigger round head compared to the body, very short chubby arms and legs, a round little tummy, tiny paws, softer rounder features, eyes closed peacefully, and a baby pacifier (dummy) in its mouth — a small round pacifier with a pastel pink ring and shield. Keep the tiny pink ribbon. She is a baby girl cat with orange stripes, crawling."
+  },
+  {
+   "id": "mv2-chr-baby-boy-a2",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-baby-boy-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the same character with the same colors, stripes, accessories and the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, but make it look much more like a real little baby: a much bigger round head compared to the body, very short chubby arms and legs, a round little tummy, tiny paws, softer rounder features, eyes closed peacefully, and a baby pacifier (dummy) in its mouth — a small round pacifier with a pastel sky-blue ring and shield. Keep his small pointed fox muzzle, pointed fox ears and fluffy little fox tail. He is a baby boy fox with pale blue stripes."
+  },
+  {
+   "id": "mv2-chr-baby-boy-b2",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-baby-boy-b.jpg"
+   ],
+   "prompt": "Edit this picture: keep the same character with the same colors, stripes, accessories and the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, but make it look much more like a real little baby: a much bigger round head compared to the body, very short chubby arms and legs, a round little tummy, tiny paws, softer rounder features, eyes closed peacefully, and a baby pacifier (dummy) in its mouth — a small round pacifier with a pastel sky-blue ring and shield. Make his face clearly a fox: a small but clearly pointed fox muzzle with a black nose tip, tall pointed fox ears, a fluffy fox tail. Keep the pale-blue bib; he stands wobbly with his arms raised. He is a baby boy fox with pale blue stripes."
   }
  ],
  "redo": []
