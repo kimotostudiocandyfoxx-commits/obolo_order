@@ -737,6 +737,104 @@
     "design/mv-art/ref/angel.jpg"
    ],
    "prompt": "Close-up of the young blond curly-haired muscular angel in the reference image, framed from the top of his head down to his chest: his whole head, face and neck are fully inside the frame with space above his hair, eyes gently closed, a peaceful grateful smile, one large muscular hand placed tenderly over his heart on his bare sculpted chest, a soft golden light glowing from beneath his fingers, a glowing golden halo above his head, white wings softly out of focus at the sides, warm golden backlight."
+  },
+  {
+   "id": "mv2-chr-cat-a",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: a gentle wife cat: white with soft pale sky-blue stripes like the reference, a slightly smaller, rounder and softer body than the reference, a little pink blush on her cheeks, eyes closed in a soft happy smile, a tiny pale-yellow flower tucked behind one ear."
+  },
+  {
+   "id": "mv2-chr-cat-b",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: a gentle wife cat: white with soft pale sky-blue stripes like the reference, a slightly smaller, rounder and softer body than the reference, a little pink blush on her cheeks, eyes closed in a soft happy smile, wearing a simple short pale-yellow apron with a small pocket and a tiny blue ribbon at the base of one ear."
+  },
+  {
+   "id": "mv2-chr-cat-c",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: a gentle wife cat: white with soft pale sky-blue stripes like the reference, a slightly smaller, rounder and softer body than the reference, a little pink blush on her cheeks, eyes closed in a soft happy smile, a soft pale-pink scarf tied around her neck, her paws held together in front of her shyly."
+  },
+  {
+   "id": "mv2-chr-fox-a",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: a kind husband fox: tall and slender, tall pointed ears and a long gentle muzzle, a white body with soft warm orange watercolor stripes (drawn the same way as the blue stripes of the reference), a big fluffy tail with orange stripes and a white tip, eyes closed in a calm kind smile, thin whiskers."
+  },
+  {
+   "id": "mv2-chr-fox-b",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: a kind husband fox: tall and slender, tall pointed ears and a long gentle muzzle, a white body with soft warm orange watercolor stripes (drawn the same way as the blue stripes of the reference), a big fluffy tail with orange stripes and a white tip, eyes closed in a calm kind smile, thin whiskers, wearing a small pale-blue necktie, standing a little proudly."
+  },
+  {
+   "id": "mv2-chr-fox-c",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: a kind husband fox: tall and slender, tall pointed ears and a long gentle muzzle, a white body with soft warm orange watercolor stripes (drawn the same way as the blue stripes of the reference), a big fluffy tail with orange stripes and a white tip, eyes closed in a calm kind smile, thin whiskers, wearing small round glasses, his hands behind his back, slightly taller."
+  },
+  {
+   "id": "mv2-chr-pair-a",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: Two characters side by side holding hands: a gentle wife cat: white with soft pale sky-blue stripes like the reference, a slightly smaller, rounder and softer body than the reference, a little pink blush on her cheeks, eyes closed in a soft happy smile; and a kind husband fox: tall and slender, tall pointed ears and a long gentle muzzle, a white body with soft warm orange watercolor stripes (drawn the same way as the blue stripes of the reference), a big fluffy tail with orange stripes and a white tip, eyes closed in a calm kind smile, thin whiskers. Both look happy and in love, a warm, nostalgic, heart-warming feeling."
   }
  ],
  "redo": []
