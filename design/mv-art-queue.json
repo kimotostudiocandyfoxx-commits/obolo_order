@@ -1090,7 +1090,7 @@
    "refs": [
     "design/mv-art/out/mv2-chr-baby-boy-a.jpg"
    ],
-   "prompt": "Edit this picture: keep the same character with the same colors, stripes, accessories and the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, but make it look much more like a real little baby: a much bigger round head compared to the body, very short chubby arms and legs, a round little tummy, tiny paws, softer rounder features, eyes closed peacefully, and a baby pacifier (dummy) in its mouth — a small round pacifier with a pastel sky-blue ring and shield. Keep his small pointed fox muzzle, pointed fox ears and fluffy little fox tail. He is a baby boy fox with pale blue stripes."
+   "prompt": "Edit this picture: keep the same baby fox character with the same pale blue stripes, the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, and make him look more like a little baby: a bigger round head, very short chubby arms and legs, a round little tummy, tiny paws. His face must stay clearly a FOX: a small pointed fox muzzle sticking out to one side with a black nose at its tip, tall pointed fox ears, a fluffy fox tail. A baby pacifier (dummy) with a sky-blue ring and shield is in his mouth at the END of his pointed muzzle, just under the black nose (not on his cheek). Eyes closed peacefully. He sits on the floor with his legs out in front, his fluffy blue-striped tail beside him."
   },
   {
    "id": "mv2-chr-baby-boy-b2",
@@ -1102,10 +1102,13 @@
     1440
    ],
    "refs": [
-    "design/mv-art/out/mv2-chr-baby-boy-b.jpg"
+    "design/mv-art/out/mv2-chr-baby-boy-a.jpg"
    ],
-   "prompt": "Edit this picture: keep the same character with the same colors, stripes, accessories and the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, but make it look much more like a real little baby: a much bigger round head compared to the body, very short chubby arms and legs, a round little tummy, tiny paws, softer rounder features, eyes closed peacefully, and a baby pacifier (dummy) in its mouth — a small round pacifier with a pastel sky-blue ring and shield. Make his face clearly a fox: a small but clearly pointed fox muzzle with a black nose tip, tall pointed fox ears, a fluffy fox tail. Keep the pale-blue bib; he stands wobbly with his arms raised. He is a baby boy fox with pale blue stripes."
+   "prompt": "Edit this picture: keep the same baby fox character with the same pale blue stripes, the same wobbly hand-drawn ink line and pale watercolor, on the same plain white background, and make him look more like a little baby: a bigger round head, very short chubby arms and legs, a round little tummy, tiny paws. His face must stay clearly a FOX: a small pointed fox muzzle sticking out to one side with a black nose at its tip, tall pointed fox ears, a fluffy fox tail. A baby pacifier (dummy) with a sky-blue ring and shield is in his mouth at the END of his pointed muzzle, just under the black nose (not on his cheek). Eyes closed peacefully. He stands up wobbly for the first time with his little arms raised, wearing a tiny pale-blue bib."
   }
  ],
- "redo": []
+ "redo": [
+  "mv2-chr-baby-boy-a2",
+  "mv2-chr-baby-boy-b2"
+ ]
 }
