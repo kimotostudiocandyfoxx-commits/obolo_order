@@ -835,6 +835,62 @@
     "/tmp/mv-person-1.jpg"
    ],
    "prompt": "Draw in exactly the same drawing style as the reference picture: a simple, charming children's picture-book character drawn with a loose, slightly wobbly hand-drawn black ink line of varying thickness, a flat pure white body with no shading, soft pale watercolor color only in the stripes and small accents, a very simple face (gently closed curved eyes, a tiny oval mouth, a few thin whisker lines), standing upright on two legs with arms hanging relaxed, full body, centered, on a plain pure white background with plenty of empty space around. A new original character, not a copy of the reference. No text, no letters, no signature, no frame, no ground shadow. The character: Two characters side by side holding hands: a gentle wife cat: white with soft pale sky-blue stripes like the reference, a slightly smaller, rounder and softer body than the reference, a little pink blush on her cheeks, eyes closed in a soft happy smile; and a kind husband fox: tall and slender, tall pointed ears and a long gentle muzzle, a white body with soft warm orange watercolor stripes (drawn the same way as the blue stripes of the reference), a big fluffy tail with orange stripes and a white tip, eyes closed in a calm kind smile, thin whiskers. Both look happy and in love, a warm, nostalgic, heart-warming feeling."
+  },
+  {
+   "id": "mv2-chr-cat-hat-a",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the cat character exactly as she is — the same wobbly hand-drawn ink line, the same face with closed eyes and pink cheeks, the same pale blue watercolor stripes, the same body and pose, the same plain white background — and only add a soft, simple witch's (wizard's) hat on her head, drawn in exactly the same loose ink line and pale watercolor: a pointed cone hat with a wide round brim, the tip gently bent over, sitting between her ears. The hat is soft deep blue with one small yellow star near the tip; keep the little yellow flower behind her ear."
+  },
+  {
+   "id": "mv2-chr-cat-hat-b",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the cat character exactly as she is — the same wobbly hand-drawn ink line, the same face with closed eyes and pink cheeks, the same pale blue watercolor stripes, the same body and pose, the same plain white background — and only add a soft, simple witch's (wizard's) hat on her head, drawn in exactly the same loose ink line and pale watercolor: a pointed cone hat with a wide round brim, the tip gently bent over, sitting between her ears. The hat is pale lavender, and the little yellow flower now sits on the hat's band instead of behind her ear."
+  },
+  {
+   "id": "mv2-chr-cat-hat-c",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-a.jpg"
+   ],
+   "prompt": "Edit this picture: keep the cat character exactly as she is — the same wobbly hand-drawn ink line, the same face with closed eyes and pink cheeks, the same pale blue watercolor stripes, the same body and pose, the same plain white background — and only add a soft, simple witch's (wizard's) hat on her head, drawn in exactly the same loose ink line and pale watercolor: a pointed cone hat with a wide round brim, the tip gently bent over, sitting between her ears. The hat is soft charcoal black with a pale sky-blue ribbon band, tilted a little to one side; keep the little yellow flower behind her ear."
+  },
+  {
+   "id": "mv2-chr-fox-turn",
+   "always": false,
+   "w": 2560,
+   "h": 1440,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg"
+   ],
+   "prompt": "A character turnaround sheet of exactly this fox character (the same wobbly hand-drawn ink line, the same face with closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip): four full-body views of him standing in a row on a plain white background — front view, three-quarter view, side view in profile, and back view — all the same size and height, evenly spaced. No text, no labels, no lines between them."
   }
  ],
  "redo": []
