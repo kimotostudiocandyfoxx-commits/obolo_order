@@ -932,7 +932,7 @@
    "refs": [
     "design/mv-art/out/mv2-chr-fox-a.jpg"
    ],
-   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on the top of his head between his ears, drawn in exactly the same loose ink line and watercolor. Later years: just a little very short black hair, a short crew cut covering only the top of his head."
+   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on his head, drawn in exactly the same loose ink line and watercolor. Later years: short black hair that clearly covers the whole top of his head, from just above his forehead back to behind his ears, a short cropped haircut drawn as a soft black watercolor cap with many tiny short ink strokes; it is obviously hair, not eyebrows."
   },
   {
    "id": "mv2-chr-fox-late-b",
@@ -946,7 +946,7 @@
    "refs": [
     "design/mv-art/out/mv2-chr-fox-a.jpg"
    ],
-   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on the top of his head between his ears, drawn in exactly the same loose ink line and watercolor. Later years: a small patch of very short, slightly spiky black hair on the crown of his head, thin and sparse."
+   "prompt": "Edit this picture: keep the fox character exactly as he is — the same wobbly hand-drawn ink line, the same long gentle muzzle and closed eyes, the same soft orange watercolor stripes, the same big fluffy striped tail with a white tip, the same pose, the same plain white background — and only add hair on his head, drawn in exactly the same loose ink line and watercolor. Later years: a neat short black haircut on the top of his head, a little longer and softer, with a small fringe at the front; clearly a hairstyle sitting between and in front of his ears, not eyebrows."
   },
   {
    "id": "mv2-chr-cat-turn",
@@ -963,5 +963,8 @@
    "prompt": "A character turnaround sheet of exactly this cat character (the same wobbly hand-drawn ink line, the same face with closed eyes and pink cheeks, the same pale blue watercolor stripes, the same pale lavender witch's hat with the little yellow flower on its band): four full-body views of her standing in a row on a plain white background — front view, three-quarter view, side view in profile, and back view — all the same size and height, evenly spaced. No text, no labels, no lines between them."
   }
  ],
- "redo": []
+ "redo": [
+  "mv2-chr-fox-late-a",
+  "mv2-chr-fox-late-b"
+ ]
 }
