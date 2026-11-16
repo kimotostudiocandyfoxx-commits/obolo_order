@@ -75,7 +75,8 @@ jobs:
           SET="$(jq -r '.inputs.set // "person"' "$GITHUB_EVENT_PATH" | tr -cd 'a-z0-9')"; SET="${SET:-person}"
           for i in 1 2 3 4 5 6; do
             jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-$SET-$i.jpg 2>/dev/null || true
-            [ -s /tmp/mv-$SET-$i.jpg ] && echo "reference $SET-$i ready" || rm -f /tmp/mv-$SET-$i.jpg
+            # only a real JPEG counts (a broken or placeholder input is dropped, so its picture waits instead)
+            [ "$(head -c 3 /tmp/mv-$SET-$i.jpg 2>/dev/null | od -An -tx1 | tr -d ' ')" = "ffd8ff" ] && echo "reference $SET-$i ready" || rm -f /tmp/mv-$SET-$i.jpg
           done
       - name: Paint
         run: |
