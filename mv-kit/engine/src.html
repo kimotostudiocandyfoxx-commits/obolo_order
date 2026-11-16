@@ -121,7 +121,7 @@ const LINES = P.lines.map(l => [l.s, l.e, l.text]).map(([s, e, text], i, all) =>
   const place = PLACE[i], bottom = place.some(r => !r.v && r.y > .78);
   const flat = [...text.replace(/[／ ]/g, '')], at = w => { if (!w) return []; const k = flat.join('').indexOf(w); return k < 0 ? [] : [...w].map((_, j) => [...flat.join('').slice(0, k)].length + j); };
   const fx = { tear: at(WORDFX.tear), halo: at(WORDFX.halo), swell: at(WORDFX.swell), pour: at(WORDFX.pour && WORDFX.pour.word) };
-  return { s, e, text, rows: text.split('／'), peak, foStart, foEnd, fade, revEnd, place, bottom, fx };
+  return { s, e, text, rows: text.split('／'), peak, foStart, foEnd, fade, revEnd, place, bottom, fx, at: P.lines[i].at };
 });
 // scenes: image, start, camera (zoom from->to, view centre in image coords from->to), god-ray origin (image coords),
 // face spots to keep clean of rays and particles (image coords + radius), ray strength
@@ -276,13 +276,23 @@ function buildCredit() { const c = mk(W, 340), g = c.getContext('2d');
   if (C.big) goldText(g, C.big, W / 2, 250, MIN(800, 92), 92, { ls: 8, haloBlur: 34 }); return c; }
 
 // ----- lyric characters: one sprite pair (core + halo) per glyph & size -----
-const glyphs = new Map();
+const glyphs = new Map(), HAND = P.lyricStyle === 'hand';
 function glyph(ch, px) {
   const key = ch + '|' + px; if (glyphs.has(key)) return glyphs.get(key);
   const pad = Math.ceil(px * .9), S = Math.ceil(px * 1.2) + pad * 2;
-  const font = MIN(800, px);
+  const font = HAND ? `600 ${px}px 'MVHand', 'MVMincho', serif` : MIN(800, px);
   const core = mk(S, S), g = core.getContext('2d'); g.font = font; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
   const bx = S / 2, by = pad + px * .98;
+  if (HAND) {   // hand-written: warm cream ink, a soft brown lift for reading on bright paper, a faint warm glow
+    g.shadowColor = 'rgba(40,22,8,.75)'; g.shadowBlur = px * .22; g.shadowOffsetY = px * .02; g.fillStyle = 'rgba(50,28,10,.45)'; g.fillText(ch, bx, by);
+    g.shadowColor = 'transparent'; g.shadowOffsetY = 0; g.fillStyle = '#fff7e8'; g.fillText(ch, bx, by);
+    g.lineJoin = 'round'; g.lineWidth = Math.max(.5, px * .01); g.strokeStyle = 'rgba(120,80,40,.35)'; g.strokeText(ch, bx, by);
+    const halo = mk(S, S), h = halo.getContext('2d'); h.font = font; h.textAlign = 'center'; h.textBaseline = 'alphabetic';
+    h.shadowColor = 'rgba(255,240,215,.8)'; h.shadowBlur = px * .35; h.fillStyle = 'rgba(255,246,228,.25)'; h.fillText(ch, bx, by);
+    const soft = mk(S, S), sg = soft.getContext('2d'); sg.filter = `blur(${Math.max(2, px * .12)}px)`; sg.font = font; sg.textAlign = 'center'; sg.textBaseline = 'alphabetic'; sg.fillStyle = 'rgba(255,244,222,.6)'; sg.fillText(ch, bx, by);
+    const m = mk(4, 4).getContext('2d'); m.font = font; const adv = m.measureText(ch).width;
+    const gl = { core, halo, soft, S, bx, by, adv }; glyphs.set(key, gl); return gl;
+  }
   // soft dark lift (no hard drop shadow)
   g.shadowColor = 'rgba(25,10,0,.55)'; g.shadowBlur = px * .3; g.shadowOffsetY = px * .015; g.fillStyle = 'rgba(40,18,0,.35)'; g.fillText(ch, bx, by);
   g.shadowColor = 'transparent'; g.shadowOffsetY = 0;
@@ -565,7 +575,7 @@ function drawLyric(L0, t) {
   const la = lineAlpha(L0, t); if (la <= 0) return 0;
   const { px, chars } = layoutLine(L0), N = chars.length;
   if (!L0.peak) {   // soft dark under each character as it arrives (overlapping blobs = one smooth band that grows with the line)
-    chars.forEach((c, j) => { const r = N > 1 ? lerp(L0.s, L0.revEnd, j / (N - 1)) : L0.s, a = la * ramp(t, r - .2, r + L0.fade); if (a <= 0) return;
+    chars.forEach((c, j) => { const r = revAt(L0, j, N), a = la * ramp(t, r - .2, r + L0.fade); if (a <= 0) return;
       const w = c.px * 2.5, h = c.px * 2.3; cx.globalAlpha = a * .42; cx.drawImage(L.shade, c.x - w / 2, c.y - c.px * .38 - h / 2, w, h); });
     cx.globalAlpha = 1; }
   const bloom = L0.peak ? ramp(t, L0.s, L0.s + 4.5) : 0;
@@ -575,7 +585,7 @@ function drawLyric(L0, t) {
     cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over';
   }
   chars.forEach((c, j) => {
-    const r = N > 1 ? lerp(L0.s, L0.revEnd, j / (N - 1)) : L0.s;
+    const r = revAt(L0, j, N);
     const a0 = ramp(t, r, r + L0.fade); if (a0 <= 0) return;
     const sw = L0.fx.swell.includes(j) ? Math.pow(Math.sin(Math.PI * clamp((t - r - L0.fade * .5) / 2.2)), 2) * .24 : 0;
     const a = sstep(a0), gl = c.gl, dy = (1 - a) * c.px * .14, sc = (1 + (1 - a) * .06) * (1 + sw);
@@ -592,7 +602,7 @@ function drawLyric(L0, t) {
   cx.globalAlpha = 1; drawWordFx(L0, t, la, chars, N); return la;
 }
 // ----- effects tied to single words (slow, soft, no flash) -----
-const revAt = (L0, j, N) => N > 1 ? lerp(L0.s, L0.revEnd, j / (N - 1)) : L0.s;
+const revAt = (L0, j, N) => L0.at ? L0.at[Math.min(j, L0.at.length - 1)] : N > 1 ? lerp(L0.s, L0.revEnd, j / (N - 1)) : L0.s;
 function spark(x, y, s, a, rot = 0) { if (a <= 0) return; cx.globalAlpha = clamp(a); cx.save(); cx.translate(x, y); cx.rotate(rot); cx.drawImage(L.star, -s, -s, 2 * s, 2 * s); cx.restore(); }
 function glow(x, y, R, a) { if (a <= 0) return; cx.globalAlpha = clamp(a); cx.drawImage(L.puff, x - R, y - R, 2 * R, 2 * R); }
 function drawWordFx(L0, t, la, chars, N) {
@@ -700,9 +710,11 @@ function renderAt(t) {
   if (cA > 0) { const sc = 1 + .03 * clamp((t - CR.from) / (CR.to - CR.from)); cx.save(); cx.globalAlpha = cA; cx.translate(W / 2, H * .5); cx.scale(sc, sc); cx.drawImage(L.credit, -W / 2, -180 + (1 - cA) * 10); cx.restore(); }
   drawMemory(t);
   // --- film grain (very subtle)
-  cx.globalCompositeOperation = 'overlay'; cx.globalAlpha = .05 + .07 * memoryAmount(t);
+  cx.globalCompositeOperation = 'overlay'; cx.globalAlpha = .05 + (P.filmGrain ?? .07) * memoryAmount(t);
   cx.drawImage(L.grain[Math.floor(t * FPS + 1e-6) % L.grain.length], 0, 0, W, H);
   cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over';
+  { const bar = (P.filmBars || 0) * H * sstep(memoryAmount(t));   // the film is projected: thin black bars at top and bottom
+    if (bar > .5) { cx.fillStyle = '#000'; cx.fillRect(0, 0, W, bar); cx.fillRect(0, H - bar, W, bar); } }
   // --- from black / to black
   const blk = Math.max(1 - ramp(t, .15, 3.4), ramp(t, END - 5, END - .3));
   if (blk > 0) { cx.globalAlpha = blk; cx.fillStyle = '#000'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
@@ -713,7 +725,7 @@ window.renderAt = renderAt;
 window.mvReady = (async () => {
   SCENES.forEach(s => { if (s.layers && A(s.layers.bg) && A(s.layers.fg)) { img(s.layers.bg); img(s.layers.fg); } else img(s.img); if (s.fg && s.fg.still) img('fg-' + s.fg.still); }); img('feather');
   await Promise.all(Object.values(imgs).map(i => i.src ? i.decode().catch(() => {}) : 0));
-  await Promise.all(['800 50px MVMincho', '600 50px MVMincho', '800 50px MVCinzel', '600 50px MVCinzel', '400 50px MVScript', '500 50px MVSerif', 'italic 500 50px MVSerif'].map(f => document.fonts.load(f, 'あ亜ÀMm')));
+  await Promise.all(['800 50px MVMincho', '600 50px MVMincho', '800 50px MVCinzel', '600 50px MVCinzel', '400 50px MVScript', '500 50px MVSerif', 'italic 500 50px MVSerif', '600 50px MVHand'].map(f => document.fonts.load(f, 'あ亜ÀMm')));
   await document.fonts.ready;
   buildLayers();
   LINES.forEach(layoutLine);
