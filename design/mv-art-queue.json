@@ -2328,6 +2328,86 @@
     "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
    ],
    "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. A night selfie at Santa Claus Village: the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) with a white fluffy scarf and red mittens, cheeks puffed cutely; the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) close behind her in a black hoodie and a white-and-red knit Santa hat with a fluffy white pom, wide surprised eyes, making a peace sign; behind them a wooden reindeer fence, snowy pines lit green and purple, warm string lights, snow on the ground."
+  },
+  {
+   "id": "mv2-ok1-bridge",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-person-4.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Okinawa, a bright sunny day: a light-blue open-top convertible drives across a very long straight bridge over a shining turquoise sea, white railings, a blue sky, a black off-road jeep following behind. A wide-angle selfie from the front: the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) sits in the back seat in big round dark sunglasses, a black T-shirt and a thin silver chain, his mouth open in a funny shocked face, making a peace sign; the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) leans over from behind him, hugging his shiny bald head with both paws and smiling widely in round sunglasses."
+  },
+  {
+   "id": "mv2-ok2-rock",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-person-2.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. An Okinawa beach at noon: a huge mushroom-shaped coral rock with green plants on top and a small natural arch stands in clear emerald-green shallow water, a deep blue sky. A low-angle selfie: the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower), wet from swimming, in round sunglasses and a simple swimsuit, rests her chin on her paws on top of the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all)'s shiny wet bald head and laughs; he is wet too, frowning with a funny grumpy face, water drops on his fur."
+  },
+  {
+   "id": "mv2-ok3-drone",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-person-5.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Looking straight down from high in the sky (a bird's-eye view): a tiny secret white-sand cove hidden between thick bright-green pandanus bushes and grey coral rocks, clear turquoise water with coral below. the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) and the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) lie side by side on the white sand, small in the picture, holding paws, tails curled together."
+  },
+  {
+   "id": "mv2-ok4-sunset",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-person-1.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. An Okinawa evening: a huge dramatic pink, orange and gold sunset sky full of little fluffy clouds over green grass and wild bushes, a small old grey concrete house on the right. A selfie: the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) in a white T-shirt, mouth wide open in surprise; the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) looks back over her shoulder at the camera and laughs, the warm wind in her fur."
+  },
+  {
+   "id": "mv2-ok5-villa",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-person-3.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A villa terrace in Okinawa at dusk: a palm tree, a calm canal reflecting the pale blue evening sky, a white house with warm golden light from its glass doors, blue tiles and a little pool. the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) hugs the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) from behind with her arm around his neck, both in loose white T-shirts; he shouts with joy, she smiles with her cheek against his shoulder."
   }
  ],
  "redo": []
