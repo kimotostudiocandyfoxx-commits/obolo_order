@@ -80,6 +80,21 @@ for img in sorted({s['img'] for s in P['scenes']}):
         assets[img] = uri(webp(Image.open(f).convert('RGB'), 90, 1440), 'image/webp')
 if missing: print('WARNING: no picture for', missing, '(those scenes render black)')
 
+def key_green(im):
+    """green-screen picture -> RGBA: pure-ish green becomes transparent (soft edge), green spill on the edges pulled back"""
+    a = np.asarray(im.convert('RGB')).astype(np.float32); r, g, bl = a[..., 0], a[..., 1], a[..., 2]
+    gness = g - np.maximum(r, bl)                       # how much greener than the other channels
+    alpha = np.clip(1 - (gness - 40) / 60, 0, 1)        # >100 -> transparent, <40 -> opaque
+    a[..., 1] = np.minimum(g, np.maximum(r, bl) + 12)   # despill
+    return Image.fromarray(np.dstack([a.clip(0, 255), alpha * 255]).astype(np.uint8), 'RGBA')
+
+# foreground stills over scenes (scene.fg.still: a picture on a green background, keyed here)
+for st in sorted({s['fg']['still'] for s in P['scenes'] if s.get('fg') and s['fg'].get('still')}):
+    f = os.path.join(PRJ, 'art', st + '.jpg')
+    if os.path.exists(f):
+        kim = key_green(Image.open(f)); kim = kim.crop(kim.getbbox() or (0, 0, kim.width, kim.height))
+        bio = io.BytesIO(); kim.save(bio, 'WEBP', quality=90, method=6); assets['fg-' + st] = uri(bio.getvalue(), 'image/webp')
+
 # ---- optional moving paintings: vid/<clip>.mp4 -> vid/<clip>.f/f0001.jpg ... (every source frame, no rate conversion) ----
 VID, vids = os.path.join(PRJ, 'vid'), {}
 if P.get('video') and os.path.isdir(VID):
@@ -88,10 +103,18 @@ if P.get('video') and os.path.isdir(VID):
         vid, d = f[:-4], os.path.join(VID, f[:-4] + '.f')
         fr = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', '-of', 'csv=p=0', os.path.join(VID, f)], capture_output=True, text=True, check=True).stdout.strip()
         num, den = (fr.split('/') + ['1'])[:2]
+        keyed = vid in (P['video'].get('keyed') or [])     # a green-screen clip used as a foreground layer: PNG frames with alpha
         if not os.path.isdir(d) or not os.listdir(d):
             os.makedirs(d, exist_ok=True)
-            subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', os.path.join(VID, f), '-vf', 'scale=1080:1080:flags=lanczos', '-fps_mode', 'passthrough', '-q:v', '3', os.path.join(d, 'f%04d.jpg')], check=True)
-        vids[vid] = {'n': len([x for x in os.listdir(d) if x.endswith('.jpg')]), 'fps': round(float(num) / float(den), 3)}
+            if keyed:
+                tmp = os.path.join(d, 'tmp'); os.makedirs(tmp, exist_ok=True)
+                subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', os.path.join(VID, f), '-vf', 'scale=720:720:flags=lanczos', '-fps_mode', 'passthrough', os.path.join(tmp, 'f%04d.png')], check=True)
+                for fn in sorted(os.listdir(tmp)):
+                    key_green(Image.open(os.path.join(tmp, fn))).save(os.path.join(d, fn)); os.remove(os.path.join(tmp, fn))
+                os.rmdir(tmp)
+            else:
+                subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', os.path.join(VID, f), '-vf', 'scale=1080:1080:flags=lanczos', '-fps_mode', 'passthrough', '-q:v', '3', os.path.join(d, 'f%04d.jpg')], check=True)
+        vids[vid] = {'n': len([x for x in os.listdir(d) if x.endswith(('.jpg', '.png'))]), 'fps': round(float(num) / float(den), 3)}
     print('videos', vids)
 
 # ---- song analysis ----

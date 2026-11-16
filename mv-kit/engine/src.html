@@ -363,11 +363,35 @@ const vneed = (i, t) => { const u = vidFrame(i, t); if (u < 0) return null; cons
 window.prepAt = async t => {
   const i = sceneIndex(t + XF / 2), need = [];
   for (const j of [i - 1, i]) { if (j < 0) continue; const v = vneed(j, t); if (v) need.push([j, v.f0], [j, v.f1]); }
-  await Promise.all(need.map(async ([j, f]) => { const k = vkey(j, f); if (vcache.has(k)) return;
-    const im = new Image(); im.src = `vid/${SCENES[j].vid}.f/f${String(f + 1).padStart(4, '0')}.jpg`; await im.decode().catch(() => {}); vcache.set(k, im);
-    if (vcache.size > 120) vcache.delete(vcache.keys().next().value); }));
+  const fneed = [];
+  for (const j of [i - 1, i]) { if (j < 0) continue; const v = fgNeed(j, t); if (v) fneed.push([j, v.f0], [j, v.f1]); }
+  const load = async (k, src) => { if (vcache.has(k)) return; const im = new Image(); im.src = src; await im.decode().catch(() => {}); vcache.set(k, im);
+    if (vcache.size > 160) vcache.delete(vcache.keys().next().value); };
+  await Promise.all([...need.map(([j, f]) => load(vkey(j, f), `vid/${SCENES[j].vid}.f/f${String(f + 1).padStart(4, '0')}.jpg`)),
+                     ...fneed.map(([j, f]) => load(fkey(j, f), `vid/${SCENES[j].fg.clip}.f/f${String(f + 1).padStart(4, '0')}.png`))]);
 };
-function drawScene(i, t, alpha) {
+// ----- foreground layer over a scene (scene.fg): characters cut from a green-screen clip (or a keyed still) walking over the background -----
+// fg = { clip: keyed clip id, still: picture name (green background, keyed by build.py), x: centre (0..1), y: feet line (0..1), h: height (0..1 of frame),
+//        rate: clip speed (default 1), mirror: true to face the other way, drift: [x from, x to] (slow walk across) }
+const fkey = (i, f) => 'fg:' + SCENES[i].fg.clip + '/' + f;
+function fgNeed(i, t) {
+  const F = SCENES[i].fg, V = F && F.clip && VIDS[F.clip]; if (!V) return null;
+  const u = Math.max(0, t - (SCENES[i].t - XF / 2)) * (F.rate || 1) * V.fps, m = u % (V.n - 1);   // loops (a walk cycle keeps going)
+  const f0 = Math.floor(m); return { f0, f1: Math.min(f0 + 1, V.n - 1), k: m - f0 };
+}
+function drawFg(i, t, alpha) {
+  const s = SCENES[i], F = s.fg; if (!F) return;
+  const a = s.t - XF / 2, b = (SCENES[i + 1] ? SCENES[i + 1].t : END) + XF / 2, e = clamp((t - a) / (b - a));
+  const h = (F.h || .6) * H, cxp = (F.drift ? lerp(F.drift[0], F.drift[1], e) : (F.x ?? .5)) * W, y1 = (F.y ?? .95) * H;
+  const v = fgNeed(i, t), f0 = v && vcache.get(fkey(i, v.f0)), f1 = v && vcache.get(fkey(i, v.f1));
+  const draw = (im, al) => { if (!ok(im)) return; const w = h * im.naturalWidth / im.naturalHeight; cx.save(); cx.globalAlpha = al;
+    if (F.mirror) { cx.translate(cxp, 0); cx.scale(-1, 1); cx.translate(-cxp, 0); } cx.drawImage(im, cxp - w / 2, y1 - h, w, h); cx.restore(); };
+  if (f0 && ok(f0)) { draw(f0, alpha); if (f1 && ok(f1) && v.k > .01) draw(f1, alpha * v.k); }
+  else if (F.still) draw(img('fg-' + F.still), alpha);
+  cx.globalAlpha = 1;
+}
+function drawScene(i, t, alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, alpha); }
+function drawSceneBase(i, t, alpha) {
   const s = SCENES[i], Ly = s.layers, FILT = 'contrast(1.06) saturate(1.06)';
   const vn = vneed(i, t), v0 = vn && vcache.get(vkey(i, vn.f0)), v1 = vn && vcache.get(vkey(i, vn.f1));
   if (v0 && ok(v0)) {   // the moving painting replaces the still (and its depth layers); the slow camera stays
@@ -672,7 +696,7 @@ window.renderAt = renderAt;
 
 // ======================= ready =======================
 window.mvReady = (async () => {
-  SCENES.forEach(s => { if (s.layers && A(s.layers.bg) && A(s.layers.fg)) { img(s.layers.bg); img(s.layers.fg); } else img(s.img); }); img('feather');
+  SCENES.forEach(s => { if (s.layers && A(s.layers.bg) && A(s.layers.fg)) { img(s.layers.bg); img(s.layers.fg); } else img(s.img); if (s.fg && s.fg.still) img('fg-' + s.fg.still); }); img('feather');
   await Promise.all(Object.values(imgs).map(i => i.src ? i.decode().catch(() => {}) : 0));
   await Promise.all(['800 50px MVMincho', '600 50px MVMincho', '800 50px MVCinzel', '600 50px MVCinzel', '400 50px MVScript', '500 50px MVSerif', 'italic 500 50px MVSerif'].map(f => document.fonts.load(f, 'あ亜ÀMm')));
   await document.fonts.ready;
