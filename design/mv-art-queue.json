@@ -2486,6 +2486,54 @@
     "/tmp/mv-mx-5.jpg"
    ],
    "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Lunch at a jungle hideaway in Mexico: a big round wooden table under a thatched roof, white flowers in the middle, a turquoise pool and a white curvy sculpted building among tropical trees. Around the table a happy group of animal friends (a bear in a colorful patchwork shirt, a raccoon in a white T-shirt and red trousers, a rabbit in a sun hat, a tanuki in a black cap); the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) rests his cheek on the table and gazes dreamily across at the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower), who smiles back."
+  },
+  {
+   "id": "mv2-th1-bbq",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-th-1.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A Korean barbecue restaurant in Bangkok: a round grill with sliced meat in the middle of the table, many little metal bowls of side dishes, a basket of fresh lettuce, a silver smoke hood, wooden lattice windows with green trees outside and little Christmas ornaments. A selfie: the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) in a black T-shirt pulls a funny face and makes a peace sign; the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) leans on the table across from him with a big happy smile."
+  },
+  {
+   "id": "mv2-th2-street",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-th-2.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A hot sunny Bangkok street: a big green tree, a messy tangle of black power lines, a tall office building and a dark stone wall with carved white panels. A selfie: the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) in a navy knit beanie, a navy T-shirt and a silver chain makes a goofy face and a peace sign; the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) stands close behind him, shading her eyes from the bright sun with one paw, eyes closed against the light."
+  },
+  {
+   "id": "mv2-th3-shop",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-th-3.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A little green shop in Bangkok in the evening: dark green walls and pillars, a long gold sign with blank gold letters, glass double doors with two bright psychedelic posters that say only \"4.20\", rainbow stripes across the glass, a colorful neon open-sign glow, warm light inside. the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) and the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) stand at the doors, seen from behind, holding paws, about to go in, their tails curled into a heart. \"4.20\" on the posters is the only text in the picture."
   }
  ],
  "redo": []
