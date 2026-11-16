@@ -391,7 +391,10 @@ function drawFg(i, t, alpha) {
   cx.globalAlpha = 1;
 }
 function drawScene(i, t, alpha, fgAlpha = alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, fgAlpha); }
-function drawSceneBase(i, t, alpha) {
+function drawSceneBase(i, t, alpha) {   // the picture, then (scene.dim: 0..1) darkened — e.g. an old film title card that the gold text sits on
+  drawSceneImg(i, t, alpha); const d = SCENES[i].dim; if (d) { cx.globalAlpha = d * alpha; cx.fillStyle = '#120a04'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
+}
+function drawSceneImg(i, t, alpha) {
   const s = SCENES[i], Ly = s.layers, FILT = 'contrast(1.06) saturate(1.06)';
   const vn = vneed(i, t), v0 = vn && vcache.get(vkey(i, vn.f0)), v1 = vn && vcache.get(vkey(i, vn.f1));
   if (v0 && ok(v0)) {   // the moving painting replaces the still (and its depth layers); the slow camera stays
