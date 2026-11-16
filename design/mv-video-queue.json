@@ -158,6 +158,22 @@
    "duration": 4,
    "cameraFixed": true,
    "prompt": "The hand presses gently over the heart, a soft golden light glows and pulses from beneath the fingers with each slow breath, the chest rises and falls, the wings stir, a feather drifts down."
+  },
+  {
+   "id": "kfam-vietnam",
+   "image": "design/mv-art/out/mv2-fam-vietnam.jpg",
+   "duration": 6,
+   "cameraFixed": true,
+   "model": "bytedance:2@2",
+   "prompt": "The family walks steadily to the right with a happy, bouncy walking rhythm, walking in place (their feet step but they stay in the middle of the picture), the baby on the shoulders bobs gently, the tails sway. Slow, gentle motion in exactly the same hand-drawn picture-book watercolor style. The camera stays fixed. The characters keep exactly their designs. The background stays a perfectly flat, plain, solid bright green everywhere, with no ground, no shadow and no scenery."
+  },
+  {
+   "id": "kfam-spain",
+   "image": "design/mv-art/out/mv2-fam-spain.jpg",
+   "duration": 6,
+   "cameraFixed": true,
+   "model": "bytedance:2@2",
+   "prompt": "The family walks steadily to the right with a happy, bouncy walking rhythm, walking in place (their feet step but they stay in the middle of the picture), the baby on the shoulders bobs gently, the tails sway. Slow, gentle motion in exactly the same hand-drawn picture-book watercolor style. The camera stays fixed. The characters keep exactly their designs. The background stays a perfectly flat, plain, solid bright green everywhere, with no ground, no shadow and no scenery."
   }
  ],
  "redo": []
