@@ -28,8 +28,8 @@ mkdirSync(OUT, { recursive: true });
 const redo = new Set(queue.redo ?? []);
 // at most MAX_PICTURES a run (default 20): a big batch while Runware's balance is low gets refused for the reserved
 // credit (concurrentRequestLimitExceeded, 2026-10-28); the rest stays for the next run
-// a picture made from a person's photo waits for a run that brings that photo (never painted without it)
-const photoMissing = (x) => (x.refs ?? []).some((r) => r.startsWith('/tmp/mv-person') && !existsSync(r));
+// a picture made from a person's photo (/tmp/mv-<set>-<n>.jpg) waits for the run that brings that photo (never painted without it)
+const photoMissing = (x) => (x.refs ?? []).some((r) => r.startsWith('/tmp/mv-') && !existsSync(r));
 const todo = queue.items.filter((x) => (redo.has(x.id) || !existsSync(join(OUT, `${x.id}.jpg`))) && !photoMissing(x)).slice(0, Number(process.env.MAX_PICTURES ?? 40));
 
 const refsOf = (x) => (x.refs ?? queue.refs ?? []).filter(existsSync);

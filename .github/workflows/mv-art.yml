@@ -8,6 +8,10 @@ name: MV art
 on:
   workflow_dispatch:
     inputs:
+      set:
+        description: 'name of this batch of photos: ref<n> is saved as /tmp/mv-<set>-<n>.jpg (default person)'
+        required: false
+        default: 'person'
       ref:
         description: 'reference photo (base64 jpeg)'
         required: false
@@ -68,9 +72,10 @@ jobs:
         run: |
           jq -r '.inputs.ref // empty' "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-person.jpg 2>/dev/null || true
           [ -s /tmp/mv-person.jpg ] && echo "reference ready" || rm -f /tmp/mv-person.jpg
+          SET="$(jq -r '.inputs.set // "person"' "$GITHUB_EVENT_PATH" | tr -cd 'a-z0-9')"; SET="${SET:-person}"
           for i in 1 2 3 4 5 6; do
-            jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-person-$i.jpg 2>/dev/null || true
-            [ -s /tmp/mv-person-$i.jpg ] && echo "reference $i ready" || rm -f /tmp/mv-person-$i.jpg
+            jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-$SET-$i.jpg 2>/dev/null || true
+            [ -s /tmp/mv-$SET-$i.jpg ] && echo "reference $SET-$i ready" || rm -f /tmp/mv-$SET-$i.jpg
           done
       - name: Paint
         run: |

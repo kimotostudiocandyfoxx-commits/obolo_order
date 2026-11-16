@@ -2408,6 +2408,84 @@
     "/tmp/mv-person-3.jpg"
    ],
    "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A villa terrace in Okinawa at dusk: a palm tree, a calm canal reflecting the pale blue evening sky, a white house with warm golden light from its glass doors, blue tiles and a little pool. the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) hugs the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) from behind with her arm around his neck, both in loose white T-shirts; he shouts with joy, she smiles with her cheek against his shoulder."
+  },
+  {
+   "id": "mv2-mx1-stage",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "/tmp/mv-mx-4.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A jungle music festival in Mexico on a sunny afternoon: a giant stage built like an ancient stepped stone pyramid with a huge screen glowing with orange-pink sunset clouds, thin red light poles, tall palm trees framing a deep blue sky, a big happy crowd of little animals dancing below. the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) stands in the crowd seen from behind, looking up at the stage in wonder."
+  },
+  {
+   "id": "mv2-mx2-meet",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-mx-1.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. The moment they met, at the Mexican jungle festival in the daytime: huge grey clay sculptures like giant crumpled flowers hang overhead among palm trees, colorful lights and a crowd behind. A close selfie: the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) with wide round eyes makes a funny kissy fish-face; the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) leans her cheek next to his, smiling sweetly with sparkly face glitter, one paw raised near her cheek."
+  },
+  {
+   "id": "mv2-mx3-tequila",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "/tmp/mv-mx-2.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Night at a colorful Mexican street bar: bright neon and warm lights, flowers and lanterns, a pink seat. A friendly big brown bear waiter in an orange shirt grins and jokingly balances a big square crystal tequila bottle on top of the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs)'s head, while the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) hugs another big square crystal bottle against his cheek with his tongue out and crazy happy eyes. The bottles have no labels and no text."
+  },
+  {
+   "id": "mv2-mx4-rave",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-mx-3.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A night rave deep in the Mexican jungle: thick green laser fog, blue and purple stage lights between huge old trees, a DJ booth and a dancing crowd far behind, a glowing LED dome on the left. the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) hugs the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) tightly from the side, cheek to cheek, smiling; he makes a funny flustered face with many colorful festival wristbands on his wrist."
+  },
+  {
+   "id": "mv2-mx5-friends",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-young-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-mx-5.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Lunch at a jungle hideaway in Mexico: a big round wooden table under a thatched roof, white flowers in the middle, a turquoise pool and a white curvy sculpted building among tropical trees. Around the table a happy group of animal friends (a bear in a colorful patchwork shirt, a raccoon in a white T-shirt and red trousers, a rabbit in a sun hat, a tanuki in a black cap); the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) rests his cheek on the table and gazes dreamily across at the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower), who smiles back."
   }
  ],
  "redo": []
