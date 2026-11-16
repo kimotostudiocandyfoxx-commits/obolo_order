@@ -1,6 +1,5 @@
-# UI art — 2026-11-16T09:28:31.730Z
+# UI art — 2026-11-16T09:33:34.337Z
 
-Seedream 5.0 Pro / 2枚 / 約31円
+Seedream 5.0 Pro / 1枚 / 約15円
 
-- ✅ mv2-hu1-festival
-- ✅ mv2-r03-plane-back
+- ✅ mv2-m12-shave
