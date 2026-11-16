@@ -1,5 +1,5 @@
-# UI art — 2026-11-16T09:33:34.337Z
+# UI art — 2026-11-16T10:01:50.138Z
 
 Seedream 5.0 Pro / 1枚 / 約15円
 
-- ✅ mv2-m12-shave
+- ✅ mv2-m12b-bald
