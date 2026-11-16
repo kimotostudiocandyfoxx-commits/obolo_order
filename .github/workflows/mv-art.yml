@@ -8,6 +8,10 @@ name: MV art
 on:
   workflow_dispatch:
     inputs:
+      sums:
+        description: 'md5 of each decoded photo, comma separated in ref order (a photo that does not match is dropped)'
+        required: false
+        default: ''
       set:
         description: 'name of this batch of photos: ref<n> is saved as /tmp/mv-<set>-<n>.jpg (default person)'
         required: false
@@ -76,7 +80,11 @@ jobs:
           for i in 1 2 3 4 5 6; do
             jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-$SET-$i.jpg 2>/dev/null || true
             # only a real JPEG counts (a broken or placeholder input is dropped, so its picture waits instead)
-            [ "$(head -c 3 /tmp/mv-$SET-$i.jpg 2>/dev/null | od -An -tx1 | tr -d ' ')" = "ffd8ff" ] && echo "reference $SET-$i ready" || rm -f /tmp/mv-$SET-$i.jpg
+            [ "$(head -c 3 /tmp/mv-$SET-$i.jpg 2>/dev/null | od -An -tx1 | tr -d ' ')" = "ffd8ff" ] || rm -f /tmp/mv-$SET-$i.jpg
+            # with sums given, a photo whose md5 differs from the one sent (a copy error) is dropped too
+            WANT="$(jq -r '.inputs.sums // ""' "$GITHUB_EVENT_PATH" | cut -d, -f$i | tr -cd '0-9a-f')"
+            if [ -s /tmp/mv-$SET-$i.jpg ] && [ -n "$WANT" ] && [ "$(md5sum < /tmp/mv-$SET-$i.jpg | cut -c1-32)" != "$WANT" ]; then echo "reference $SET-$i does not match its sum: dropped"; rm -f /tmp/mv-$SET-$i.jpg; fi
+            [ -s /tmp/mv-$SET-$i.jpg ] && echo "reference $SET-$i ready" || true
           done
       - name: Paint
         run: |
