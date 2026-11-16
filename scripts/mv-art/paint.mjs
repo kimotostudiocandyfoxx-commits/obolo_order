@@ -21,7 +21,14 @@ if (!KEY) throw new Error('SEEDREAM_API_KEY is not set');
 const QUEUE = process.argv[2] ?? 'design/mv-art-queue.json';
 const queue = JSON.parse(readFileSync(QUEUE, 'utf8'));
 const mime = (p) => (/\.png$/i.test(p) ? 'image/png' : /\.webp$/i.test(p) ? 'image/webp' : 'image/jpeg');
-const dataUri = (p) => `data:${mime(p)};base64,${readFileSync(p).toString('base64')}`;
+// a small photo reference (sent shrunk through the workflow inputs) is enlarged first: the painter wants 128..2048 px on each side
+const bigEnough = (p) => {
+  if (!p.startsWith('/tmp/mv-')) return p;
+  const big = p.replace(/\.jpg$/, '-512.jpg');
+  if (!existsSync(big)) execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', p, '-vf', "scale='if(gt(iw,ih),-2,512)':'if(gt(iw,ih),512,-2)':flags=lanczos", '-q:v', '2', big]);
+  return big;
+};
+const dataUri = (p) => { const q = bigEnough(p); return `data:${mime(q)};base64,${readFileSync(q).toString('base64')}`; };
 // mv-art: the queue names its own output folder (queue.out)
 const OUT = queue.out ?? join('apps/web/public', queue.dir ?? 'ui-art');
 mkdirSync(OUT, { recursive: true });
