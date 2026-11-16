@@ -139,7 +139,7 @@ for (const x of left) {
   log.push(`- ⏸ ${x.id}: 元の絵ができなかったので次回`);
 }
 // redo is done once: keep only what was not painted (failed, waiting, out of time)
-if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: (queue.redo ?? []).filter((id) => failed.has(id)) }, null, 2) + '\n');
+if ((queue.redo ?? []).length) writeFileSync(QUEUE, JSON.stringify({ ...queue, redo: (queue.redo ?? []).filter((id) => failed.has(id) || queue.items.some((x) => x.id === id && photoMissing(x))) }, null, 2) + '\n');
 const report = [`# UI art — ${new Date().toISOString()}`, '', `Seedream 5.0 Pro / ${todo.length}枚 / 約${Math.round(yen)}円`, '', ...log.sort(), ''].join('\n');
 writeFileSync(join(OUT, 'last-run.md'), report);
 if (queue.ledger && spent.length) {
