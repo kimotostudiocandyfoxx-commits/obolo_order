@@ -8,6 +8,10 @@ name: MV art
 on:
   workflow_dispatch:
     inputs:
+      key:
+        description: 'key for design/mv-art/photos.enc (encrypted photos; never stored in the repo)'
+        required: false
+        default: ''
       sums:
         description: 'md5 of each decoded photo, comma separated in ref order (a photo that does not match is dropped)'
         required: false
@@ -76,9 +80,17 @@ jobs:
         run: |
           jq -r '.inputs.ref // empty' "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-person.jpg 2>/dev/null || true
           [ -s /tmp/mv-person.jpg ] && echo "reference ready" || rm -f /tmp/mv-person.jpg
+          # encrypted photos (AES-256, the key only comes in as an input) -> /tmp/mv-<set>-<n>.jpg
+          K="$(jq -r '.inputs.key // ""' "$GITHUB_EVENT_PATH")"
+          if [ -n "$K" ] && [ -f design/mv-art/photos.enc ]; then
+            echo "::add-mask::$K"
+            K="$K" openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -pass env:K -in design/mv-art/photos.enc | tar -x -C /tmp && ls /tmp | grep -c '^mv-.*\.jpg$' || echo "photos.enc could not be opened"
+          fi
           SET="$(jq -r '.inputs.set // "person"' "$GITHUB_EVENT_PATH" | tr -cd 'a-z0-9')"; SET="${SET:-person}"
           for i in 1 2 3 4 5 6; do
-            jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH" | base64 -d > /tmp/mv-$SET-$i.jpg 2>/dev/null || true
+            R="$(jq -r ".inputs.ref$i // empty" "$GITHUB_EVENT_PATH")"
+            [ -z "$R" ] && continue
+            printf '%s' "$R" | base64 -d > /tmp/mv-$SET-$i.jpg 2>/dev/null || true
             # only a real JPEG counts (a broken or placeholder input is dropped, so its picture waits instead)
             [ "$(head -c 3 /tmp/mv-$SET-$i.jpg 2>/dev/null | od -An -tx1 | tr -d ' ')" = "ffd8ff" ] || rm -f /tmp/mv-$SET-$i.jpg
             # with sums given, a photo whose md5 differs from the one sent (a copy error) is dropped too
@@ -96,6 +108,8 @@ jobs:
         run: |
           git config user.name "mv-art"
           git config user.email "mv-art@users.noreply.github.com"
+          # the encrypted photos are used once, then removed from the branch
+          [ -n "$(jq -r '.inputs.key // ""' "$GITHUB_EVENT_PATH")" ] && git rm -q --ignore-unmatch design/mv-art/photos.enc || true
           git add -f design/mv-art design/mv-art-queue.json
           git diff --cached --quiet && exit 0
           git commit -m "MV art: new pictures [skip ci]"
