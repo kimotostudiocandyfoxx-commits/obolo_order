@@ -390,7 +390,7 @@ function drawFg(i, t, alpha) {
   else if (F.still) draw(img('fg-' + F.still), alpha);
   cx.globalAlpha = 1;
 }
-function drawScene(i, t, alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, alpha); }
+function drawScene(i, t, alpha, fgAlpha = alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, fgAlpha); }
 function drawSceneBase(i, t, alpha) {
   const s = SCENES[i], Ly = s.layers, FILT = 'contrast(1.06) saturate(1.06)';
   const vn = vneed(i, t), v0 = vn && vcache.get(vkey(i, vn.f0)), v1 = vn && vcache.get(vkey(i, vn.f1));
@@ -645,7 +645,17 @@ function renderAt(t) {
   // --- scenes + crossfade
   const i = sceneIndex(t + XF / 2), s = SCENES[i];
   const p = i > 0 ? clamp((t - (s.t - XF / 2)) / XF) : 1, pe = sstep(p);
-  if (p < 1) { drawScene(i - 1, t, 1); drawScene(i, t, pe); } else drawScene(i, t, 1);
+  // two scenes that both carry a foreground (the same characters in a new place): the place crossfades, the characters swap in an instant
+  // at the middle with a puff of sparkles (a magic outfit change) instead of showing two ghost copies
+  const swap = p < 1 && SCENES[i].fg && SCENES[i - 1].fg;
+  if (swap) { drawSceneBase(i - 1, t, 1); drawSceneBase(i, t, pe); drawFg(pe < .5 ? i - 1 : i, t, 1); }
+  else if (p < 1) { drawScene(i - 1, t, 1); drawScene(i, t, pe); } else drawScene(i, t, 1);
+  if (swap) { const F = SCENES[i].fg, k = Math.max(0, 1 - Math.abs(pe - .5) / .3); if (k > 0) {
+    const fx = (F.drift ? F.drift[0] : (F.x ?? .5)) * W, fy = ((F.y ?? .95) - (F.h || .6) * .5) * H, R = (F.h || .6) * H * .7;
+    cx.globalCompositeOperation = 'screen'; cx.globalAlpha = .55 * k; cx.drawImage(L.puff, fx - R, fy - R, 2 * R, 2 * R);
+    const Rr = mulberry32(31 + i); for (let q = 0; q < 22; q++) { const an = Rr() * 6.283, d = R * (.3 + .8 * Rr()) * (1.2 - k * .4), sz = 8 + Rr() * 14;
+      cx.globalAlpha = k * (.6 + .4 * Rr()); cx.save(); cx.translate(fx + Math.cos(an) * d, fy + Math.sin(an) * d * .8); cx.rotate(an + t); cx.drawImage(L.star, -sz, -sz, 2 * sz, 2 * sz); cx.restore(); }
+    cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over'; } }
   // --- god rays (blended across the crossfade)
   if (p < 1) drawRays(i - 1, t, 1 - pe, en);
   drawRays(i, t, pe, en);
