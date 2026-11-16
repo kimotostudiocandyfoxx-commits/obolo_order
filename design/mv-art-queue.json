@@ -2534,6 +2534,85 @@
     "/tmp/mv-th-3.jpg"
    ],
    "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. A little green shop in Bangkok in the evening: dark green walls and pillars, a long gold sign with blank gold letters, glass double doors with two bright psychedelic posters that say only \"4.20\", rainbow stripes across the glass, a colorful neon open-sign glow, warm light inside. the young fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, fluffy sky-blue hair with bangs) and the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) stand at the doors, seen from behind, holding paws, about to go in, their tails curled into a heart. \"4.20\" on the posters is the only text in the picture."
+  },
+  {
+   "id": "mv2-fr4-eiffel",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "/tmp/mv-fr-4.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Paris on a bright autumn day: a narrow street of cream stone Haussmann buildings with black iron balconies and ivy, golden autumn trees, white clouds in a blue sky, and the Eiffel Tower rising at the end of the street. the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) in big dark sunglasses, a blue patterned jacket and black track pants stands in the middle of the cobbled street with both arms thrown up high in joy."
+  },
+  {
+   "id": "mv2-fr1-rain",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-fr-1.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. The castle, hotel and park are an original fairytale design of our own (not any real or famous castle or theme park), with no cartoon characters, no mascots and no logos. A grey rainy day at a fairytale park near Paris: a grand pink Victorian hotel with pointed turrets and a glowing clock tower, a round flowerbed shaped like a big heart, old street lamps, a wet shining brick plaza. A selfie: the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) and the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) in clear plastic rain ponchos with the hoods up, rain drops everywhere, he grins with his mouth open, she smiles and makes a peace sign."
+  },
+  {
+   "id": "mv2-fr3-tree",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-fr-3.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. The castle, hotel and park are an original fairytale design of our own (not any real or famous castle or theme park), with no cartoon characters, no mascots and no logos. Night at the fairytale park: a giant Christmas tree covered in glowing blue and white lights with a star on top, a wet shining plaza reflecting the lights, a row of warm golden Victorian shop fronts behind. A selfie: the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) in a white knit scarf playfully squeezes the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all)'s cheek and laughs; he makes a funny surprised face, in a blue-and-navy jacket."
+  },
+  {
+   "id": "mv2-fr2-proposal",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-fr-2.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. The castle, hotel and park are an original fairytale design of our own (not any real or famous castle or theme park), with no cartoon characters, no mascots and no logos. The moment of the proposal, at night: an original fairytale castle with slender pale towers lit in soft blue and pink glows in the dark sky behind them, a wet shining square, tiny sparkles in the air. the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) and the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) press their cheeks together, she makes a small peace sign and shows a sparkling diamond ring on her paw, both smiling with happy, teary eyes, deeply in love."
+  },
+  {
+   "id": "mv2-fr5-eiffel-night",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-fox-a.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-fr-5.jpg"
+   ],
+   "prompt": "A scene from a gentle, nostalgic children's picture book, square 1:1 composition, drawn in exactly the same style as the reference characters: loose, slightly wobbly hand-drawn black ink lines, soft transparent watercolor washes, white paper texture, simple and warm. Every character keeps exactly its design from the references (the same face with gently closed curved eyes, the same stripes and colors, the same accessories). No text, no letters, no words, no signature, no frame, unless stated. Recreate the place, the light and the composition of the photo reference (the last reference picture) as this picture-book scene, with the characters instead of the people. Do not draw any real humans. Paris at night seen through a car windscreen: the Eiffel Tower glows bright gold against dark clouds at the end of a wet cobbled avenue, red tail lights, a green traffic light, street lamps; small in the front seats, the fox husband from the reference (a WHITE body with only thin orange stripes, a long thin pointed muzzle with a black nose, a big fluffy orange tail with a white tip, no hair at all) and the cat wife from the reference (white with pale blue stripes, pink cheeks, pale lavender witch's hat with a little yellow flower) look up at it from the car, seen from behind."
   }
  ],
  "redo": []
