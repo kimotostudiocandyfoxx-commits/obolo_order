@@ -1,8 +1,8 @@
-# UI art — 2026-11-17T03:04:19.770Z
+# UI art — 2026-11-17T04:05:40.473Z
 
-Seedream 5.0 Pro / 4枚 / 約29円
+Seedream 5.0 Pro / 4枚 / 約30円
 
-- ✅ chr3-baby-a
-- ✅ chr3-baby-b
-- ✅ chr3-baby-c
-- ✅ chr3-cat
+- ✅ chr4-angel-a
+- ✅ chr4-angel-b
+- ✅ chr4-cat
+- ✅ sc4-test
