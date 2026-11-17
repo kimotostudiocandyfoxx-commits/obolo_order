@@ -21,7 +21,8 @@ const FRAMES = Math.round(DURATION / SPEED * FPS);
 const WORKERS = +(process.env.WORKERS || 3), BATCH = +(process.env.BATCH || 8), QUALITY = 0.95;
 
 async function openPage(browser) {
-  const page = await browser.newPage({ viewport: { width: 1080, height: 1080 }, deviceScaleFactor: 1 });
+  const [VW, VH] = P.size || [1080, 1080];
+  const page = await browser.newPage({ viewport: { width: VW, height: VH }, deviceScaleFactor: 1 });
   page.on('pageerror', e => console.error('pageerror', String(e)));
   page.on('console', m => { if (m.type() === 'error') console.error('console', m.text()); });
   await page.goto(URL, { waitUntil: 'load', timeout: 120000 });

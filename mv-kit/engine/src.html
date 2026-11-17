@@ -100,7 +100,7 @@ const A = n => ASSETS[n];
 const VIDS = /*VIDS*/;   // moving paintings: id -> { n: frames in vid/<id>.f/, fps: the clip's own frame rate }
 const RENDER = /[?&]render=1/.test(location.search);
 const END = P.end, FPS = 30;   // P.end: the song length, measured by build.py
-const W = 1080, H = 1080;
+const [W, H] = P.size || [1080, 1080], IA = H / W;   // IA: picture height / width (pictures share the frame's aspect)
 
 // ======================= timeline (from project.json) =======================
 // lyric lines: start, sung end (from the vocal transcription), text (／ = line break), place = where each row sits:
@@ -116,12 +116,14 @@ const LINES = P.lines.map(l => [l.s, l.e, l.text]).map(([s, e, text], i, all) =>
   // an overlay ("over": a caption beside the lyrics, e.g. a word on a screen) neither ends the lyric before it nor is ended by the next one
   else { const nx = P.lines[i].over ? null : all.find((_, k) => k > i && !P.lines[k].over);
     foEnd = Math.min(nx ? nx[0] + 0.05 : e + 1.1, e + 1.1); foStart = Math.max(foEnd - 0.8, Math.min(e, foEnd - 0.35)); }
-  const fade = peak ? 2.2 : 1.35;                      // per-character fade-in (soft, slow)
-  const revEnd = Math.max(s, Math.min(e, foStart) - fade * .55);   // last character starts here
+  const OPT = P.lines[i], inst = !!OPT.instant || OPT.style === 'sub' || OPT.style === 'pop';
+  const fade = OPT.fade ?? (peak ? 2.2 : inst ? (OPT.style === 'pop' ? .2 : .08) : 1.35);   // per-character fade-in (soft, slow; subtitles/telops at once)
+  const revEnd = inst ? s : Math.max(s, Math.min(e, foStart) - fade * .55);   // last character starts here
   const place = PLACE[i], bottom = place.some(r => !r.v && r.y > .78);
   const flat = [...text.replace(/[／ ]/g, '')], at = w => { if (!w) return []; const k = flat.join('').indexOf(w); return k < 0 ? [] : [...w].map((_, j) => [...flat.join('').slice(0, k)].length + j); };
   const fx = { tear: at(WORDFX.tear), halo: at(WORDFX.halo), swell: at(WORDFX.swell), pour: at(WORDFX.pour && WORDFX.pour.word) };
-  return { s, e, text, rows: text.split('／'), peak, foStart, foEnd, fade, revEnd, place, bottom, fx, at: P.lines[i].at };
+  return { s, e, text, rows: text.split('／'), peak, foStart, foEnd, fade, revEnd, place, bottom, fx, at: OPT.at, style: OPT.style, color: OPT.color, rot: OPT.rot || 0,
+           at2: OPT.style === 'pop' && !OPT.at ? .045 : 0 };
 });
 // scenes: image, start, camera (zoom from->to, view centre in image coords from->to), god-ray origin (image coords),
 // face spots to keep clean of rays and particles (image coords + radius), ray strength
@@ -139,7 +141,7 @@ const PV = P.video || {}, VIDOF = PV.clips || {}, STILL_LAST = PV.still || [];
 SCENES.forEach(s => { s.vid = s.t >= (PV.from || 0) && !STILL_LAST.includes(s.img) ? VIDOF[s.img] : undefined; });
 const VMAX = PV.vmax || {};     // use only the start of a clip whose ending goes wrong
 const VRATE = PV.vrate || {};   // slow motion for one clip (e.g. .55)
-const XF = 1.8; // crossfade length, centred on each scene start
+const XF = P.xf ?? 1.8; // crossfade length, centred on each scene start (P.xf: short for hard, anime-style cuts)
 const CHERUBS = [];
 
 // ======================= pure helpers =======================
@@ -163,7 +165,7 @@ function img(n) { if (imgs[n]) return imgs[n]; const s = A(n + '-sq') || A(n); c
 const ok = im => im && im.complete && im.naturalWidth > 0;
 
 // ======================= canvas + prebuilt layers =======================
-const cv = document.getElementById('cv'), cx = cv.getContext('2d');
+const cv = document.getElementById('cv'), cx = cv.getContext('2d'); cv.width = W; cv.height = H;
 cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
 function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 const L = {};  // prebuilt layers
@@ -277,9 +279,29 @@ function buildCredit() { const c = mk(W, 340), g = c.getContext('2d');
 
 // ----- lyric characters: one sprite pair (core + halo) per glyph & size -----
 const glyphs = new Map(), HAND = P.lyricStyle === 'hand';
-function glyph(ch, px) {
-  const key = ch + '|' + px; if (glyphs.has(key)) return glyphs.get(key);
+function glyph(ch, px, st, col) {
+  const key = ch + '|' + px + '|' + (st || '') + '|' + (col || ''); if (glyphs.has(key)) return glyphs.get(key);
   const pad = Math.ceil(px * .9), S = Math.ceil(px * 1.2) + pad * 2;
+  if (st === 'sub' || st === 'pop') {   // film subtitle (white, dark outline) / variety-show telop (gradient, double outline, 3D drop)
+    const font = st === 'sub' ? `800 ${px}px 'MVSub', 'MVMincho', sans-serif` : `400 ${px}px 'MVPop', 'MVSub', sans-serif`;
+    const core = mk(S, S), g = core.getContext('2d'); g.font = font; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
+    const bx = S / 2, by = pad + px * .98;
+    if (st === 'sub') {
+      g.shadowColor = 'rgba(0,0,0,.65)'; g.shadowBlur = px * .18; g.shadowOffsetY = px * .05;
+      g.lineWidth = px * .2; g.strokeStyle = '#121218'; g.strokeText(ch, bx, by);
+      g.shadowColor = 'transparent'; g.fillStyle = '#ffffff'; g.fillText(ch, bx, by);
+    } else {
+      const C = { pink: ['#ffffff', '#ff9fe6', '#d23ccd', '#3d0a33'], gold: ['#fffbe2', '#ffd85c', '#e48a00', '#3d2400'], cyan: ['#ffffff', '#8ff3ff', '#159fd6', '#08263d'], red: ['#fff2f0', '#ff7a6b', '#d11f1f', '#3d0808'] }[col || 'pink'];
+      g.shadowColor = 'rgba(30,0,25,.6)'; g.shadowOffsetX = px * .05; g.shadowOffsetY = px * .07; g.shadowBlur = 0;
+      g.lineWidth = px * .36; g.strokeStyle = '#ffffff'; g.strokeText(ch, bx, by);
+      g.shadowColor = 'transparent'; g.shadowOffsetX = g.shadowOffsetY = 0;
+      g.lineWidth = px * .17; g.strokeStyle = C[3]; g.strokeText(ch, bx, by);
+      const gr = g.createLinearGradient(0, by - px * .9, 0, by + px * .12); gr.addColorStop(0, C[0]); gr.addColorStop(.42, C[1]); gr.addColorStop(1, C[2]);
+      g.fillStyle = gr; g.fillText(ch, bx, by);
+    }
+    const halo = mk(4, 4), soft = mk(4, 4), m = mk(4, 4).getContext('2d'); m.font = font; const adv = m.measureText(ch).width;
+    const gl = { core, halo, soft, S, bx, by, adv, flat: true }; glyphs.set(key, gl); return gl;
+  }
   const font = HAND ? `600 ${px}px 'MVHand', 'MVMincho', serif` : MIN(800, px);
   const core = mk(S, S), g = core.getContext('2d'); g.font = font; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
   const bx = S / 2, by = pad + px * .98;
@@ -318,7 +340,7 @@ function layoutLine(L0) {   // cached char positions (each char carries its own 
   const base = 54, chars = [], boxes = [];
   L0.rows.forEach((row, ri) => {
     const P = L0.place[ri] || L0.place[L0.place.length - 1], px = Math.round(base * P.k), ls = px * (.06 + (P.sp || 0));
-    const cs = [...row].map(ch => { const sz = KANJI.test(ch) ? Math.round(px * 1.12) : px; return { ch, sz, gl: ch === '\u2002' ? null : glyph(ch, sz) }; });
+    const cs = [...row].map(ch => { const sz = KANJI.test(ch) ? Math.round(px * 1.12) : px; return { ch, sz, gl: ch === '\u2002' ? null : glyph(ch, sz, L0.style, L0.color) }; });
     const row0 = chars.length;
     if (P.v) {   // vertical column, top to bottom; the glyph's em centre sits on the column centre
       let y = P.y * H; const x = P.x * W;
@@ -344,9 +366,12 @@ function camera(i, t) {
   const k = clamp((t - a) / (b - a)), e = .55 * k + .45 * sstep(k);   // never fully stops: no stall in the crossfades
   const z = lerp(s.z[0], s.z[1], e), h = .5 / z;
   const ux = clamp(lerp(s.c[0][0], s.c[1][0], e), h, 1 - h), uy = clamp(lerp(s.c[0][1], s.c[1][1], e), h, 1 - h);
-  const sz = W * z; return { sz, x: W / 2 - ux * sz, y: H / 2 - uy * sz };
+  const sz = W * z; let sx = 0, sy = 0;
+  if (s.shake) { const [amp, dec] = s.shake, d = Math.max(0, t - s.t), k2 = amp * (dec ? Math.exp(-d / dec) : 1);
+    sx = k2 * Math.sin(t * 91.7 + i) * Math.sin(t * 13.1); sy = k2 * Math.sin(t * 77.3 + 2 * i) * Math.cos(t * 17.9); }
+  return { sz, x: W / 2 - ux * sz + sx, y: H / 2 - uy * sz * IA + sy };
 }
-const toScr = (cam, u, v) => [cam.x + u * cam.sz, cam.y + v * cam.sz];
+const toScr = (cam, u, v) => [cam.x + u * cam.sz, cam.y + v * cam.sz * IA];
 // two-layer depth (scenes with `layers`): an inpainted background plate and the cut-out figure(s), each with its
 // own slow zoom/pan on top of the scene camera. The figure is drawn slightly enlarged (s) around a grounding anchor
 // (a, image coords) so it always covers its original silhouette. bz/fz: extra zoom from->to, bp/fp: pan from->to (screen
@@ -358,7 +383,7 @@ function layerCams(i, t) {
   const sub = (zz, pp, anc, k) => {
     const z = lerp(zz[0], zz[1], e) * k, [ax, ay] = anc ? toScr(base, anc[0], anc[1]) : [W / 2, H / 2], sz = base.sz * z;
     const x = ax - (ax - base.x) * z + lerp(pp[0][0], pp[1][0], e) * W, y = ay - (ay - base.y) * z + lerp(pp[0][1], pp[1][1], e) * H;
-    return { sz, x: clamp(x, W - sz, 0), y: clamp(y, H - sz, 0) };
+    return { sz, x: clamp(x, W - sz, 0), y: clamp(y, H - sz * IA, 0) };
   };
   return { base, bg: sub(Ly.bz, Ly.bp || [[0, 0], [0, 0]], Ly.ba, 1), fg: sub(Ly.fz, Ly.fp || [[0, 0], [0, 0]], Ly.a, Ly.s || 1.06) };
 }
@@ -402,7 +427,8 @@ function drawFg(i, t, alpha) {
   else if (F.still) draw(img('fg-' + F.still), alpha);
   cx.globalAlpha = 1;
 }
-function drawScene(i, t, alpha, fgAlpha = alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, fgAlpha); }
+function drawScene(i, t, alpha, fgAlpha = alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, fgAlpha);
+  const fl = SCENES[i].flash; if (fl && t >= SCENES[i].t) { const k = fl * Math.exp(-(t - SCENES[i].t) / .14) * alpha; if (k > .01) { cx.globalAlpha = Math.min(1, k); cx.fillStyle = '#fff'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; } } }
 function drawSceneBase(i, t, alpha) {   // the picture, then (scene.dim: 0..1) darkened — e.g. an old film title card that the gold text sits on
   drawSceneImg(i, t, alpha); const d = SCENES[i].dim; if (d) { cx.globalAlpha = d * alpha; cx.fillStyle = '#120a04'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
 }
@@ -410,8 +436,8 @@ function drawSceneImg(i, t, alpha) {
   const s = SCENES[i], Ly = s.layers, FILT = 'contrast(1.06) saturate(1.06)';
   const vn = vneed(i, t), v0 = vn && vcache.get(vkey(i, vn.f0)), v1 = vn && vcache.get(vkey(i, vn.f1));
   if (v0 && ok(v0)) {   // the moving painting replaces the still (and its depth layers); the slow camera stays
-    const cam = camera(i, t), g = L.scn.getContext('2d'); g.globalAlpha = 1; g.drawImage(v0, cam.x, cam.y, cam.sz, cam.sz);
-    if (v1 && ok(v1) && vn.k > .01) { g.globalAlpha = vn.k; g.drawImage(v1, cam.x, cam.y, cam.sz, cam.sz); g.globalAlpha = 1; }   // smooth in-between frame
+    const cam = camera(i, t), g = L.scn.getContext('2d'); g.globalAlpha = 1; g.drawImage(v0, cam.x, cam.y, cam.sz, cam.sz * IA);
+    if (v1 && ok(v1) && vn.k > .01) { g.globalAlpha = vn.k; g.drawImage(v1, cam.x, cam.y, cam.sz, cam.sz * IA); g.globalAlpha = 1; }   // smooth in-between frame
     cx.globalAlpha = alpha; cx.filter = FILT; cx.drawImage(L.scn, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1;
     if (s.tint) { cx.globalAlpha = .1 * alpha; cx.fillStyle = '#1a2450'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
     return; }
@@ -419,12 +445,12 @@ function drawSceneImg(i, t, alpha) {
     if (ok(bg) && ok(fg)) {
       const c = layerCams(i, t), g = L.scn.getContext('2d');
       g.globalAlpha = 1; g.clearRect(0, 0, W, H);
-      g.drawImage(bg, c.bg.x, c.bg.y, c.bg.sz, c.bg.sz); g.drawImage(fg, c.fg.x, c.fg.y, c.fg.sz, c.fg.sz);
+      g.drawImage(bg, c.bg.x, c.bg.y, c.bg.sz, c.bg.sz * IA); g.drawImage(fg, c.fg.x, c.fg.y, c.fg.sz, c.fg.sz * IA);
       cx.globalAlpha = alpha; cx.filter = FILT; cx.drawImage(L.scn, 0, 0); cx.filter = 'none'; cx.globalAlpha = 1;
       if (s.tint) { cx.globalAlpha = .1 * alpha; cx.fillStyle = '#1a2450'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
       return; } }
   const im = img(s.img); if (!ok(im)) return;
-  const cam = camera(i, t); cx.globalAlpha = alpha; cx.filter = FILT; cx.drawImage(im, cam.x, cam.y, cam.sz, cam.sz); cx.filter = 'none'; cx.globalAlpha = 1;
+  const cam = camera(i, t); cx.globalAlpha = alpha; cx.filter = FILT; cx.drawImage(im, cam.x, cam.y, cam.sz, cam.sz * IA); cx.filter = 'none'; cx.globalAlpha = 1;
   if (s.tint) { cx.globalAlpha = .1 * alpha; cx.fillStyle = '#1a2450'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
 }
 function drawRays(i, t, weight, en) {
@@ -574,7 +600,10 @@ function lineAlpha(L0, t) { return t < L0.s - .01 || t > L0.foEnd ? 0 : 1 - ramp
 function drawLyric(L0, t) {
   const la = lineAlpha(L0, t); if (la <= 0) return 0;
   const { px, chars } = layoutLine(L0), N = chars.length;
-  if (!L0.peak) {   // soft dark under each character as it arrives (overlapping blobs = one smooth band that grows with the line)
+  if (L0.rot) {   // a tilted telop: rotate the whole line around its centre
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (const c of chars) { x0 = Math.min(x0, c.x); x1 = Math.max(x1, c.x); y0 = Math.min(y0, c.y); y1 = Math.max(y1, c.y); }
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 - px * .35; cx.save(); cx.translate(mx, my); cx.rotate(L0.rot * Math.PI / 180); cx.translate(-mx, -my); }
+  if (!L0.peak && !L0.style) {   // soft dark under each character as it arrives (overlapping blobs = one smooth band that grows with the line)
     chars.forEach((c, j) => { const r = revAt(L0, j, N), a = la * ramp(t, r - .2, r + L0.fade); if (a <= 0) return;
       const w = c.px * 2.5, h = c.px * 2.3; cx.globalAlpha = a * .42; cx.drawImage(L.shade, c.x - w / 2, c.y - c.px * .38 - h / 2, w, h); });
     cx.globalAlpha = 1; }
@@ -588,7 +617,7 @@ function drawLyric(L0, t) {
     const r = revAt(L0, j, N);
     const a0 = ramp(t, r, r + L0.fade); if (a0 <= 0) return;
     const sw = L0.fx.swell.includes(j) ? Math.pow(Math.sin(Math.PI * clamp((t - r - L0.fade * .5) / 2.2)), 2) * .24 : 0;
-    const a = sstep(a0), gl = c.gl, dy = (1 - a) * c.px * .14, sc = (1 + (1 - a) * .06) * (1 + sw);
+    const a = sstep(a0), gl = c.gl, dy = gl.flat ? 0 : (1 - a) * c.px * .14, sc = (L0.style === 'pop' ? 1 + .9 * (1 - a) : gl.flat ? 1 : 1 + (1 - a) * .06) * (1 + sw);
     const S = gl.S * sc, x = c.x - gl.bx * sc, y = c.y + dy - gl.by * sc;
     // 1: a warm haze blooms first, 2: it gathers into the sharp gold glyph
     const hazeA = clamp(Math.sin(Math.PI * Math.min(1, a0 * 1.15)) * .6) * la;
@@ -599,10 +628,10 @@ function drawLyric(L0, t) {
     else cx.drawImage(gl.halo, x, y, S, S);
     cx.globalCompositeOperation = 'source-over'; cx.globalAlpha = clamp(Math.pow(a, 1.6) * la); cx.drawImage(gl.core, x, y, S, S);
   });
-  cx.globalAlpha = 1; drawWordFx(L0, t, la, chars, N); return la;
+  cx.globalAlpha = 1; drawWordFx(L0, t, la, chars, N); if (L0.rot) cx.restore(); return la;
 }
 // ----- effects tied to single words (slow, soft, no flash) -----
-const revAt = (L0, j, N) => L0.at ? L0.at[Math.min(j, L0.at.length - 1)] : N > 1 ? lerp(L0.s, L0.revEnd, j / (N - 1)) : L0.s;
+const revAt = (L0, j, N) => L0.at ? L0.at[Math.min(j, L0.at.length - 1)] : L0.at2 ? L0.s + j * L0.at2 : N > 1 ? lerp(L0.s, L0.revEnd, j / (N - 1)) : L0.s;
 function spark(x, y, s, a, rot = 0) { if (a <= 0) return; cx.globalAlpha = clamp(a); cx.save(); cx.translate(x, y); cx.rotate(rot); cx.drawImage(L.star, -s, -s, 2 * s, 2 * s); cx.restore(); }
 function glow(x, y, R, a) { if (a <= 0) return; cx.globalAlpha = clamp(a); cx.drawImage(L.puff, x - R, y - R, 2 * R, 2 * R); }
 function drawWordFx(L0, t, la, chars, N) {
@@ -700,6 +729,7 @@ function renderAt(t) {
     L.title.forEach((pt, k) => { const a = win(t, TT.from + k * 1.1, TT.from + 2.4 + k * 1.1, TT.to - 2, TT.to); if (a <= 0) return;
       cx.save(); cx.globalAlpha = a; cx.translate(W / 2, 330); cx.scale(sc, sc); cx.drawImage(pt.c, -W / 2, pt.y - 330 + (1 - a) * 14); cx.restore(); });
   }
+  if (P.letterbox) { const bh = Math.round(P.letterbox * H); cx.fillStyle = '#000'; cx.fillRect(0, 0, W, bh); cx.fillRect(0, H - bh, W, bh); }
   for (const L0 of LINES) drawLyric(L0, t);
   { const PK = LINES[LINES.length - 1]; if (t > PK.s - 3 && t < PK.foEnd + 7) { const { chars } = layoutLine(PK); drawPeakFx(PK, t, 1, chars, chars.length); } }
   // ending words and credits (P.ending, P.credit)
@@ -725,7 +755,7 @@ window.renderAt = renderAt;
 window.mvReady = (async () => {
   SCENES.forEach(s => { if (s.layers && A(s.layers.bg) && A(s.layers.fg)) { img(s.layers.bg); img(s.layers.fg); } else img(s.img); if (s.fg && s.fg.still) img('fg-' + s.fg.still); }); img('feather');
   await Promise.all(Object.values(imgs).map(i => i.src ? i.decode().catch(() => {}) : 0));
-  await Promise.all(['800 50px MVMincho', '600 50px MVMincho', '800 50px MVCinzel', '600 50px MVCinzel', '400 50px MVScript', '500 50px MVSerif', 'italic 500 50px MVSerif', '600 50px MVHand'].map(f => document.fonts.load(f, 'あ亜ÀMm')));
+  await Promise.all(['800 50px MVMincho', '600 50px MVMincho', '800 50px MVCinzel', '600 50px MVCinzel', '400 50px MVScript', '500 50px MVSerif', 'italic 500 50px MVSerif', '600 50px MVHand', '800 50px MVSub', '400 50px MVPop'].map(f => document.fonts.load(f, 'あ亜ÀMm')));
   await document.fonts.ready;
   buildLayers();
   LINES.forEach(layoutLine);
@@ -736,7 +766,7 @@ window.mvReady = (async () => {
 // ======================= interactive page =======================
 const $ = id => document.getElementById(id);
 const au = $('au');
-if (RENDER) document.body.classList.add('render');
+if (RENDER) { document.body.classList.add('render'); for (const id of ['theater', 'stage']) { const e = document.getElementById(id); if (e) { e.style.width = W + 'px'; e.style.height = H + 'px'; } } }
 else {
   const lk = document.createElement('link'); lk.rel = 'stylesheet';
   lk.href = 'https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Dela+Gothic+One&display=swap'; document.head.appendChild(lk);

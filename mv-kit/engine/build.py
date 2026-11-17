@@ -58,7 +58,7 @@ fdir = os.path.join(PRJ, '.cache', 'fonts-' + hashlib.sha1(TEXT.encode()).hexdig
 subprocess.run([sys.executable, os.path.join(KIT, 'fetch_fonts.py'), fdir, TEXT], check=True)
 font_css = ''
 for fam, f, wt, st in (('MVCinzel', 'cinzel.woff2', '400 900', 'normal'), ('MVMincho', 'mincho600.woff2', '600', 'normal'), ('MVMincho', 'mincho800.woff2', '800', 'normal'),
-                       ('MVScript', 'pinyon.woff2', '400', 'normal'), ('MVSerif', 'cormorant500.woff2', '500', 'normal'), ('MVSerif', 'cormorant500i.woff2', '500', 'italic'), ('MVHand', 'klee600.woff2', '600', 'normal')):
+                       ('MVScript', 'pinyon.woff2', '400', 'normal'), ('MVSerif', 'cormorant500.woff2', '500', 'normal'), ('MVSerif', 'cormorant500i.woff2', '500', 'italic'), ('MVHand', 'klee600.woff2', '600', 'normal'), ('MVSub', 'mplusr800.woff2', '800', 'normal'), ('MVPop', 'dela.woff2', '400', 'normal')):
     font_css += "@font-face{font-family:'%s';font-weight:%s;font-style:%s;font-display:block;src:url(%s) format('woff2')}\n" % (
         fam, wt, st, uri(open(os.path.join(fdir, f), 'rb').read(), 'font/woff2'))
 

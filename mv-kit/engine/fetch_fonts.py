@@ -22,6 +22,9 @@ for w in (600, 800):
     fetch(f'https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@{w}&text=' + urllib.parse.quote(TEXT), os.path.join(OUT, f'mincho{w}.woff2'))
 # hand-written lyrics (P.lyricStyle 'hand'): Klee One, a pencil-like hand, subset to the text
 fetch('https://fonts.googleapis.com/css2?family=Klee+One:wght@600&text=' + urllib.parse.quote(TEXT), os.path.join(OUT, 'klee600.woff2'))
+# film subtitles (rounded gothic) and variety-show telops (heavy display), subset to the text
+fetch('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&text=' + urllib.parse.quote(TEXT), os.path.join(OUT, 'mplusr800.woff2'))
+fetch('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&text=' + urllib.parse.quote(TEXT), os.path.join(OUT, 'dela.woff2'))
 LAT = urllib.parse.quote("ÀÁÂÉÈÊËÎÏÔÖÙÛÜÇàáâéèêëîïôöùûüçœŒMmOoNnCcHhEeRrTtKkAaDdIiUuBbPpSsYyFfXxGgLlVvWwZzQqJj -—'.,&!?0123456789")
 fetch('https://fonts.googleapis.com/css2?family=Pinyon+Script&text=' + LAT, os.path.join(OUT, 'pinyon.woff2'))
 fetch('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&text=' + LAT, os.path.join(OUT, 'cormorant500.woff2'))
