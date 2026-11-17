@@ -3144,6 +3144,58 @@
     "design/mv-art/out/chr3-cat.jpg"
    ],
    "prompt": "Top-quality Japanese TV anime key art in the style of a high-budget shonen battle anime with god-tier animation (sakuga): razor-sharp clean line art with varied line weight, bold cel shading with crisp hard shadows and bright rim light, intense dramatic lighting, a glowing golden aura and light particles, dynamic foreshortened poses, speed lines, vivid saturated colors, epic and dead serious, which makes the comedy even funnier. Clearly Japanese anime: NOT western, NOT an oil painting, NOT 3D, NOT chibi. Setting: heaven with golden god rays, glowing clouds and drifting rose petals. Wide cinematic 16:9 anime frame, low dramatic camera angle: the cat wife Eri from the cat reference pictures: a white cat with pale blue stripes, pink cheeks and a pale lavender witch's hat with a little yellow flower, standing on her hind legs like a person, drawn in this anime style with sharp cool eyes, elegant, proud and intimidating like a final boss. She sits on a towering golden throne on a cloud, legs crossed, chin raised, glaring down with an icy smug look, a menacing purple-gold aura behind her. The husband is the angel from the reference picture, redrawn in this anime style (keep the design, NOT the oil-painting style): a sweet round BABY FACE with big eyes, rosy cheeks and soft curly golden-blond hair on a hugely muscular, shredded fighter's body (huge chest, broad shoulders, sharp abs, veins), large white feathered wings, a white cloth wrapped around his waist, a glowing golden halo. He kneels in a deep dogeza bow on the clouds before her, muscles trembling, tears streaming from his baby face, holding up a big bouquet of roses with both hands; shockwave lines and flying petals around them. No text, no letters."
+  },
+  {
+   "id": "chr6-angel-a",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [],
+   "prompt": "A frame from a top-tier Japanese shonen battle anime with god-tier animation (sakuga), like a climactic fight episode: sharp angular line art with thick-and-thin ink lines, hard two-tone cel shading with deep dramatic shadows, strong white rim light, intense contrast, a blazing golden battle aura with sparks, impact lines and speed lines, extreme dynamic camera angle and foreshortening, highly detailed anime eyes with sharp highlights, glossy hair rendered in clean anime strands. Pure Japanese anime cel animation look: NOT western comics, NOT painterly, NOT realistic, NOT 3D, NOT cute chibi. Setting: heaven, golden god rays, glowing clouds, rose petals flying in the shockwave. A character design reference sheet on a plain white background: the same single character full body from the front, from the side and from the back, plus four head close-ups in a row below: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, burning with fighting spirit. Consistent design. No text, no letters, no labels, no logos. The husband: a muscular angel with a sweet round BABY FACE (big round anime eyes, chubby rosy cheeks, small mouth, soft curly golden-blond hair) on a hugely muscular, shredded fighter's body (huge chest, broad shoulders, sharp abs, visible veins), large white feathered wings, a white cloth wrapped around his waist, a glowing golden halo. "
+  },
+  {
+   "id": "chr6-angel-b",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [],
+   "prompt": "A frame from a top-tier Japanese shonen battle anime with god-tier animation (sakuga), like a climactic fight episode: sharp angular line art with thick-and-thin ink lines, hard two-tone cel shading with deep dramatic shadows, strong white rim light, intense contrast, a blazing golden battle aura with sparks, impact lines and speed lines, extreme dynamic camera angle and foreshortening, highly detailed anime eyes with sharp highlights, glossy hair rendered in clean anime strands. Pure Japanese anime cel animation look: NOT western comics, NOT painterly, NOT realistic, NOT 3D, NOT cute chibi. Setting: heaven, golden god rays, glowing clouds, rose petals flying in the shockwave. A character design reference sheet on a plain white background: the same single character full body from the front, from the side and from the back, plus four head close-ups in a row below: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, burning with fighting spirit. Consistent design. No text, no letters, no labels, no logos. The husband: a muscular angel with a sweet round BABY FACE (big round anime eyes, chubby rosy cheeks, small mouth, soft curly golden-blond hair) on a hugely muscular, shredded fighter's body (huge chest, broad shoulders, sharp abs, visible veins), large white feathered wings, a white cloth wrapped around his waist, a glowing golden halo. He also wears small round rose-gold tinted sunglasses and a thin gold chain necklace."
+  },
+  {
+   "id": "chr6-cat",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A frame from a top-tier Japanese shonen battle anime with god-tier animation (sakuga), like a climactic fight episode: sharp angular line art with thick-and-thin ink lines, hard two-tone cel shading with deep dramatic shadows, strong white rim light, intense contrast, a blazing golden battle aura with sparks, impact lines and speed lines, extreme dynamic camera angle and foreshortening, highly detailed anime eyes with sharp highlights, glossy hair rendered in clean anime strands. Pure Japanese anime cel animation look: NOT western comics, NOT painterly, NOT realistic, NOT 3D, NOT cute chibi. Setting: heaven, golden god rays, glowing clouds, rose petals flying in the shockwave. A character design reference sheet on a plain white background: the same single character full body from the front, from the side and from the back, plus four head close-ups in a row below: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, burning with fighting spirit. Consistent design. No text, no letters, no labels, no logos. The character is the cat wife Eri: a white cat with pale blue stripes and a pale lavender witch's hat with a little yellow flower (the cat in the reference picture, only for who she is), standing on her hind legs like a person, drawn like a fierce shonen anime rival or final boss: sharp narrow eyes with detailed glowing irises, sleek glossy cel-shaded fur with hard shadows, a cold smug smile, intimidating presence. "
+  },
+  {
+   "id": "sc6-test",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A frame from a top-tier Japanese shonen battle anime with god-tier animation (sakuga), like a climactic fight episode: sharp angular line art with thick-and-thin ink lines, hard two-tone cel shading with deep dramatic shadows, strong white rim light, intense contrast, a blazing golden battle aura with sparks, impact lines and speed lines, extreme dynamic camera angle and foreshortening, highly detailed anime eyes with sharp highlights, glossy hair rendered in clean anime strands. Pure Japanese anime cel animation look: NOT western comics, NOT painterly, NOT realistic, NOT 3D, NOT cute chibi. Setting: heaven, golden god rays, glowing clouds, rose petals flying in the shockwave. Wide cinematic 16:9 frame with EXACTLY TWO characters (one cat and one angel, no duplicates, no extra people), seen from a low dramatic angle: the cat wife Eri: a white cat with pale blue stripes and a pale lavender witch's hat with a little yellow flower (the cat in the reference picture, only for who she is), standing on her hind legs like a person, drawn like a fierce shonen anime rival or final boss: sharp narrow eyes with detailed glowing irises, sleek glossy cel-shaded fur with hard shadows, a cold smug smile, intimidating presence. She sits alone on a towering golden throne on a cloud, legs crossed, glaring down with an icy smug look and a menacing purple-gold aura. The husband: a muscular angel with a sweet round BABY FACE (big round anime eyes, chubby rosy cheeks, small mouth, soft curly golden-blond hair) on a hugely muscular, shredded fighter's body (huge chest, broad shoulders, sharp abs, visible veins), large white feathered wings, a white cloth wrapped around his waist, a glowing golden halo. He alone kneels in a deep dogeza bow on the clouds in front of the throne, muscles trembling, tears streaming from his baby face, holding up one big bouquet of roses with both hands; shockwave lines around him. No text, no letters."
   }
  ],
  "redo": []
