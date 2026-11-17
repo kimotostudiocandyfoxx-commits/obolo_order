@@ -1,8 +1,6 @@
-# UI art — 2026-11-17T04:21:00.470Z
+# UI art — 2026-11-17T04:27:13.615Z
 
-Seedream 5.0 Pro / 4枚 / 約29円
+Seedream 5.0 Pro / 2枚 / 約14円
 
-- ✅ chr6-angel-a
-- ✅ chr6-angel-b
-- ✅ chr6-cat
-- ✅ sc6-test
+- ✅ chr7-angel
+- ✅ sc7-key
