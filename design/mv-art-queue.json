@@ -3028,6 +3028,64 @@
     "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
    ],
    "prompt": "Modern Japanese anime illustration in a cinematic, semi-realistic music-video style: crisp clean line art with cel shading plus painterly glowing light, warm golden rim light, rich saturated colors (hot pink, gold, teal), subtle film grain, stylish, bold and a little comedic. A character design reference sheet on a plain light warm-grey background: the same character shown full body from the front, from the side and from the back, plus four head close-ups with different expressions in a row below: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, sparkly-eyed pleading. Consistent design in every view. No text, no letters, no labels, no logos. The character is the cat wife Eri from the reference picture, redrawn completely in this anime style (keep only who she is: a white cat with pale blue stripes, pink cheeks, a pale lavender witch's hat with a little yellow flower; NOT the reference's drawing style): an elegant, proud, slightly bossy cat standing on her hind legs like a person, with expressive eyes."
+  },
+  {
+   "id": "chr4-angel-a",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A classical heavenly oil painting in the style of the reference picture (Renaissance / Rococo religious art): soft luminous golden light rays from above, billowing cream and peach clouds, pale sky blue, blush-pink and ivory roses, delicate gold ornaments, warm glowing skin tones, fine brushwork and a soft canvas texture, divine, elegant and quietly hilarious. A character design reference sheet on a plain soft cream parchment and cloud background: the same character full body from the front, from the side and from the back, plus four head close-ups in a row below with different expressions: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, sparkly-eyed pleading. Consistent design in every view. No text, no letters, no labels, no logos. The husband is the angel from the reference picture: a sweet round BABY FACE with rosy cheeks and soft curly golden-blond hair on a hugely muscular bodybuilder body (big chest, broad shoulders, defined abs), large white feathered wings, a draped white silk loincloth, a faint glowing halo. "
+  },
+  {
+   "id": "chr4-angel-b",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A classical heavenly oil painting in the style of the reference picture (Renaissance / Rococo religious art): soft luminous golden light rays from above, billowing cream and peach clouds, pale sky blue, blush-pink and ivory roses, delicate gold ornaments, warm glowing skin tones, fine brushwork and a soft canvas texture, divine, elegant and quietly hilarious. A character design reference sheet on a plain soft cream parchment and cloud background: the same character full body from the front, from the side and from the back, plus four head close-ups in a row below with different expressions: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, sparkly-eyed pleading. Consistent design in every view. No text, no letters, no labels, no logos. The husband is the angel from the reference picture: a sweet round BABY FACE with rosy cheeks and soft curly golden-blond hair on a hugely muscular bodybuilder body (big chest, broad shoulders, defined abs), large white feathered wings, a draped white silk loincloth, a faint glowing halo. Add small round rose-gold tinted sunglasses and a thin gold chain necklace, like a tiny hip-hop star, the rest classical."
+  },
+  {
+   "id": "chr4-cat",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A classical heavenly oil painting in the style of the reference picture (Renaissance / Rococo religious art): soft luminous golden light rays from above, billowing cream and peach clouds, pale sky blue, blush-pink and ivory roses, delicate gold ornaments, warm glowing skin tones, fine brushwork and a soft canvas texture, divine, elegant and quietly hilarious. A character design reference sheet on a plain soft cream parchment and cloud background: the same character full body from the front, from the side and from the back, plus four head close-ups in a row below with different expressions: crying and begging for forgiveness, smug cheeky grin, shocked with a big sweat drop, sparkly-eyed pleading. Consistent design in every view. No text, no letters, no labels, no logos. The character is the cat wife Eri from the first reference picture: a white cat with pale blue stripes, pink cheeks and a pale lavender witch's hat with a little yellow flower, redrawn completely as a classical oil painting (keep only who she is, NOT the reference's drawing style), standing on her hind legs like a person, elegant, proud and a little bossy. "
+  },
+  {
+   "id": "sc4-test",
+   "always": false,
+   "w": 2048,
+   "h": 1152,
+   "size": [
+    1920,
+    1080
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A classical heavenly oil painting in the style of the reference picture (Renaissance / Rococo religious art): soft luminous golden light rays from above, billowing cream and peach clouds, pale sky blue, blush-pink and ivory roses, delicate gold ornaments, warm glowing skin tones, fine brushwork and a soft canvas texture, divine, elegant and quietly hilarious. Wide cinematic 16:9 scene in heaven: the cat wife Eri from the first reference picture: a white cat with pale blue stripes, pink cheeks and a pale lavender witch's hat with a little yellow flower, redrawn completely as a classical oil painting (keep only who she is, NOT the reference's drawing style), standing on her hind legs like a person, elegant, proud and a little bossy. She sits on a golden rococo throne on a cloud, chin raised, arms crossed, looking down with a smug expression. The husband is the angel from the reference picture: a sweet round BABY FACE with rosy cheeks and soft curly golden-blond hair on a hugely muscular bodybuilder body (big chest, broad shoulders, defined abs), large white feathered wings, a draped white silk loincloth, a faint glowing halo. He kneels on the clouds before her, bowing low with teary puppy eyes, holding up two big bouquets of roses as an offering. Rose petals drift in the golden light. No text, no letters."
   }
  ],
  "redo": []
