@@ -115,7 +115,8 @@ const LINES = P.lines.map(l => [l.s, l.e, l.text]).map(([s, e, text], i, all) =>
   // each line leaves soon after it is sung (at the latest as the next one starts): no lyric lingers into the next scene
   // an overlay ("over": a caption beside the lyrics, e.g. a word on a screen) neither ends the lyric before it nor is ended by the next one
   else { const nx = P.lines[i].over ? null : all.find((_, k) => k > i && !P.lines[k].over);
-    foEnd = Math.min(nx ? nx[0] + 0.05 : e + 1.1, e + 1.1); foStart = Math.max(foEnd - 0.8, Math.min(e, foEnd - 0.35)); }
+    foEnd = Math.min(nx ? nx[0] + 0.05 : e + 1.1, e + 1.1); foStart = Math.max(foEnd - 0.8, Math.min(e, foEnd - 0.35));
+    if (P.lines[i].out != null) { foEnd = Math.min(foEnd, e + P.lines[i].out); foStart = Math.min(foStart, foEnd - 0.08); } }   // out: quick exit (subtitles, telops)
   const OPT = P.lines[i], inst = !!OPT.instant || OPT.style === 'sub' || OPT.style === 'pop';
   const fade = OPT.fade ?? (peak ? 2.2 : inst ? (OPT.style === 'pop' ? .2 : .08) : 1.35);   // per-character fade-in (soft, slow; subtitles/telops at once)
   const revEnd = inst ? s : Math.max(s, Math.min(e, foStart) - fade * .55);   // last character starts here
