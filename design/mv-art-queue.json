@@ -4078,6 +4078,36 @@
     "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
    ],
    "prompt": "A photorealistic photograph-like painting of white Carrara marble statues inside a vast Baroque cathedral, light beams through high windows and dust in the air. A colossal marble statue of a seated queen cat wearing a witch's hat (the cat from the cat reference, carved in marble) on a high pedestal with a carved halo; at its feet a marble statue of the muscular angel with fox ears and fox tail (from the angel reference, carved in marble, realistic Bernini-like carving) kneels with his head bowed and hands clasped. Awe-inspiring scale. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3c-angel-sheet",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. A character study sheet in oil on a warm neutral background, like an Old Master's study: the same single character a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal HUMAN ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo) with ONE big realistic fluffy golden-orange fox tail with a white tip coming from behind the cloth, painted as naturally as real fur shown full length from the front, from the side and from the back (top row), and four head studies below: weeping in shame, quiet resolve, gazing up to heaven in awe, a proud determined look. Consistent face and body in every study. No text, no letters, no signature."
+  },
+  {
+   "id": "mv3c-angel",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. A full-length portrait of a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal HUMAN ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo) with ONE big realistic fluffy golden-orange fox tail with a white tip coming from behind the cloth, painted as naturally as real fur, standing on clouds in divine golden light, front view, wings spread, solemn and heroic, like an altarpiece. No text, no letters, no signature. Square 1:1, painted edge to edge."
   }
  ],
  "redo": []
