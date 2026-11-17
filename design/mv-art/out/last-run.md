@@ -1,5 +1,10 @@
-# UI art — 2026-11-16T10:53:55.767Z
+# UI art — 2026-11-17T02:43:47.984Z
 
-Seedream 5.0 Pro / 1枚 / 約15円
+Seedream 5.0 Pro / 6枚 / 約90円
 
-- ✅ mv2-s04-slap
+- ✅ st2-chojugiga
+- ✅ st2-clay
+- ✅ st2-renaissance
+- ✅ st2-rubberhose
+- ✅ st2-showa-manga
+- ✅ st2-street
