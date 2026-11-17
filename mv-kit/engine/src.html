@@ -429,7 +429,7 @@ function drawFg(i, t, alpha) {
   cx.globalAlpha = 1;
 }
 function drawScene(i, t, alpha, fgAlpha = alpha) { drawSceneBase(i, t, alpha); drawFg(i, t, fgAlpha);
-  const fl = SCENES[i].flash; if (fl && t >= SCENES[i].t) { const k = fl * Math.exp(-(t - SCENES[i].t) / .14) * alpha; if (k > .01) { cx.globalAlpha = Math.min(1, k); cx.fillStyle = '#fff'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; } } }
+  const fl = SCENES[i].flash; if (fl && t >= SCENES[i].t) { const k = fl * Math.exp(-(t - SCENES[i].t) / (P.flashDecay ?? .14)) * alpha; if (k > .01) { cx.globalAlpha = Math.min(1, k); cx.fillStyle = '#fff'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; } } }
 function drawSceneBase(i, t, alpha) {   // the picture, then (scene.dim: 0..1) darkened — e.g. an old film title card that the gold text sits on
   drawSceneImg(i, t, alpha); const d = SCENES[i].dim; if (d) { cx.globalAlpha = d * alpha; cx.fillStyle = '#120a04'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
 }
@@ -717,11 +717,11 @@ function renderAt(t) {
   cx.globalCompositeOperation = 'screen'; cx.globalAlpha = clamp(.025 + .05 * en * (.6 + .4 * breathe) + .06 * xfb, 0, .13);
   cx.drawImage(L.glow, 0, 0); cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over';
   // --- vignette
-  cx.drawImage(L.vig, 0, 0);
+  cx.globalAlpha = P.vignette ?? 1; cx.drawImage(L.vig, 0, 0); cx.globalAlpha = 1;   // P.vignette: 0..1 (bright anime frames want less)
   // --- lyrics band + lyrics
   let vis = 0; for (const L0 of LINES) if (L0.bottom) vis = Math.max(vis, ramp(t, L0.s - .5, L0.s + .1) * (1 - ramp(t, L0.foStart, L0.foEnd + .4)));  // continuous (no step at a line start)
   const L1 = LINES[0], EN = P.ending || { from: END - 20, to: END - 12.6 }, bandIn = Math.max(vis, ramp(t, L1.s - 1, L1.s) * (1 - ramp(t, EN.from, EN.from + 2)) * .3);
-  cx.globalAlpha = .3 + .7 * bandIn; cx.drawImage(L.band, 0, H - 440); cx.globalAlpha = 1;
+  cx.globalAlpha = (.3 + .7 * bandIn) * (P.band ?? 1); cx.drawImage(L.band, 0, H - 440); cx.globalAlpha = 1;
   // title card (P.title.from .. P.title.to)
   const TT = P.title || { from: 3.2, to: 21.6 }, tA = win(t, TT.from, TT.from + 2.4, TT.to - 2, TT.to);
   if (tA > 0) {
@@ -732,7 +732,7 @@ function renderAt(t) {
   }
   if (P.letterbox) { const bh = Math.round(P.letterbox * H); cx.fillStyle = '#000'; cx.fillRect(0, 0, W, bh); cx.fillRect(0, H - bh, W, bh); }
   for (const L0 of LINES) drawLyric(L0, t);
-  { const PK = LINES[LINES.length - 1]; if (t > PK.s - 3 && t < PK.foEnd + 7) { const { chars } = layoutLine(PK); drawPeakFx(PK, t, 1, chars, chars.length); } }
+  { const PK = LINES[LINES.length - 1]; if (PK.peak && t > PK.s - 3 && t < PK.foEnd + 7) { const { chars } = layoutLine(PK); drawPeakFx(PK, t, 1, chars, chars.length); } }
   // ending words and credits (P.ending, P.credit)
   const CR = P.credit || { from: END - 11.6, to: END - 2.3 };
   const mA = P.ending ? win(t, EN.from, EN.from + 2.4, EN.to - 2.1, EN.to) : 0, cA = P.credit ? win(t, CR.from, CR.from + 2.2, CR.to - 2.1, CR.to) : 0;
@@ -747,7 +747,7 @@ function renderAt(t) {
   { const bar = (P.filmBars || 0) * H * sstep(memoryAmount(t));   // the film is projected: thin black bars at top and bottom
     if (bar > .5) { cx.fillStyle = '#000'; cx.fillRect(0, 0, W, bar); cx.fillRect(0, H - bar, W, bar); } }
   // --- from black / to black
-  const blk = Math.max(1 - ramp(t, .15, 3.4), ramp(t, END - 5, END - .3));
+  const blk = Math.max(1 - ramp(t, .15, P.fadeIn ?? 3.4), ramp(t, END - (P.fadeOut ?? 5), END - .3));
   if (blk > 0) { cx.globalAlpha = blk; cx.fillStyle = '#000'; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1; }
 }
 window.renderAt = renderAt;
