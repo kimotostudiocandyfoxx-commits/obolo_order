@@ -572,22 +572,22 @@ function partPos(p, tau) {
 // gold confetti (P.confetti: [[t, seconds, power], ...]): two cannons fire up from the bottom corners while
 // more paper rains from the top; every piece flips in 3D (its metal face glints when it turns to the light)
 const CONF = (P.confetti || []).map(([t0, dur, pw = 1], b) => { const R = mulberry32(4242 + b * 97), ps = [];
-  const n = Math.round(260 * pw);
+  const n = Math.round(420 * pw);
   for (let k = 0; k < n; k++) { const cannon = R() < .55, side = R() < .5 ? -1 : 1;
     ps.push({ cannon, side, d: cannon ? R() * .35 : R() * dur * .7, x0: cannon ? (side < 0 ? .02 : .98) : R(), y0: cannon ? 1.03 : -.05 - R() * .25,
-      vx: cannon ? -side * (.35 + R() * .85) : 0, vy: cannon ? -(1.5 + R() * 1.1) : 0, vt: .16 + R() * .16, k: 1.9 + R() * 1.2,
+      vx: cannon ? -side * (.3 + R() * 1.0) : 0, vy: cannon ? -(1.7 + R() * 1.3) : 0, vt: .12 + R() * .14, k: 1.7 + R() * 1.1,
       sw: .012 + R() * .03, swf: 1.2 + R() * 2.4, ph: R() * 6.283, fl: 5 + R() * 9, rot: R() * 6.283, vr: (R() - .5) * 8,
-      w: 9 + R() * 12, h: 5 + R() * 7, c: Math.floor(R() * 5), rib: R() < .12 }); }
+      w: 20 + R() * 22, h: 12 + R() * 12, c: Math.floor(R() * 5), rib: R() < .12 }); }
   return { t0, dur, ps }; });
 const CONF_COL = ['#fff3c2', '#ffd54a', '#f2b51c', '#e0951a', '#fffaf0'];
 function drawConfetti(t) {
   const sc = W / 1080;
-  for (const C of CONF) { const T = t - C.t0; if (T < 0 || T > C.dur + 2.5) continue;
+  for (const C of CONF) { const T = t - C.t0; if (T < 0 || T > C.dur + 1.2) continue;
     for (const p of C.ps) { const tau = T - p.d; if (tau < 0) continue;
       let x, y; const e = (1 - Math.exp(-p.k * tau)) / p.k;
       if (p.cannon) { x = p.x0 + p.vx * e; y = p.y0 + p.vt * tau + (p.vy - p.vt) * e; } else { x = p.x0; y = p.y0 + p.vt * 1.4 * tau; }
       x += p.sw * Math.sin(tau * p.swf + p.ph); if (y > 1.08 || x < -.06 || x > 1.06) continue;
-      const a = Math.min(1, tau / .08) * (1 - ramp(T, C.dur + .8, C.dur + 2.5)); if (a <= .01) continue;
+      const a = Math.min(1, tau / .08) * (1 - ramp(T, C.dur + .2, C.dur + 1.1)); if (a <= .01) continue;
       const fl = Math.cos(tau * p.fl + p.ph), glint = Math.pow(Math.abs(fl), 8);
       cx.save(); cx.translate(x * W, y * H); cx.rotate(p.rot + p.vr * tau); cx.scale(1, Math.max(.08, Math.abs(fl)));
       cx.globalAlpha = a; cx.fillStyle = glint > .6 ? '#fffbe8' : CONF_COL[p.c];
