@@ -1,6 +1,42 @@
-# UI art — 2026-11-17T04:27:13.615Z
+# UI art — 2026-11-17T04:58:10.766Z
 
-Seedream 5.0 Pro / 2枚 / 約14円
+Seedream 5.0 Pro / 38枚 / 約292円
 
-- ✅ chr7-angel
-- ✅ sc7-key
+- ✅ k00-boss
+- ✅ k00-heaven
+- ✅ k01-liar
+- ✅ k02-mochi
+- ✅ k03-sns
+- ✅ k04-buchigire
+- ✅ k05-dogeza
+- ✅ k06-please
+- ✅ k07-ok
+- ✅ k08-kosokoso
+- ✅ k09-aitsu
+- ✅ k10-ahaha
+- ✅ k11-tanoshii
+- ✅ k12-busted
+- ✅ k13-kikonsha
+- ✅ k14-ichizu
+- ✅ k15-dangomushi
+- ✅ k16-muri
+- ✅ k17-muri2
+- ✅ k18-beam
+- ✅ k19-blasted
+- ✅ k21-celebration
+- ✅ k22-kakka
+- ✅ k23-ameare
+- ✅ k24-congrats
+- ✅ k25-carnival
+- ✅ k26-oath
+- ✅ k27-honeymoon
+- ✅ k28-europe
+- ✅ k29-statue
+- ✅ k30-cathedral
+- ✅ k31-shave
+- ✅ k32-bald
+- ✅ k33-peropero
+- ✅ k34-tickets
+- ✅ k35-tsundere
+- ✅ k36-flyaway
+- ✅ k37-end
