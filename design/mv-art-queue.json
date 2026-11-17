@@ -3956,6 +3956,128 @@
     "design/mv-art/out/chr6-cat.jpg"
    ],
    "prompt": "Epic fantasy game cinematic key art (like a high-end RPG opening movie): ultra detailed, majestic scale, crystal cathedrals, dramatic god rays, glowing particles, deep blues and gold. VERSE: a frozen wasteland in a blizzard at dusk; the husband: the muscular angel from the angel reference picture (a sweet round baby face with chubby cheeks, curly golden-blond hair, golden-orange FOX EARS and no human ears, ONE fluffy fox tail with a white tip, a hugely muscular body, large white feathered wings, a glowing golden halo) in battered armor and a torn cloak pushes forward alone against the storm, pulling a sled loaded with heavy work tools, a single torch, his halo dim, the warm lights of a far castle on the horizon. No text, no letters, no logos. Square 1:1 picture filled edge to edge. "
+  },
+  {
+   "id": "mv3r-angel",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. The husband: a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks and a warm smile, curly golden-blond hair, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo), and in addition a pair of realistic golden-orange FOX EARS rising from his curls and one big realistic fluffy fox tail with a white tip, painted as naturally as real fur. A full-length portrait of him standing on clouds in divine light, front view, wings spread, solemn and heroic, like an altarpiece. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-angel-face",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. The husband: a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks and a warm smile, curly golden-blond hair, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo), and in addition a pair of realistic golden-orange FOX EARS rising from his curls and one big realistic fluffy fox tail with a white tip, painted as naturally as real fur. A close portrait of his face and shoulders: tears running down his cheeks, eyes looking up toward heaven with devotion and resolve, golden light on his face, dark background, Caravaggio-like. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-eri",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. The wife Eri: a real, photorealistic white cat with soft pale blue-grey tabby stripes (painted like a living animal, real fur and eyes), wearing a pale lavender witch's hat with a small yellow flower; dignified like a queen. A Renaissance royal portrait: she sits upright on a red velvet and gold throne in a dark palace hall, wearing a small ermine-trimmed royal mantle and pearls, regal, calm, with a soft golden light, like a portrait by Titian. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-chorus-oil",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. The husband: a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks and a warm smile, curly golden-blond hair, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo), and in addition a pair of realistic golden-orange FOX EARS rising from his curls and one big realistic fluffy fox tail with a white tip, painted as naturally as real fur. The wife Eri: a real, photorealistic white cat with soft pale blue-grey tabby stripes (painted like a living animal, real fur and eyes), wearing a pale lavender witch's hat with a small yellow flower; dignified like a queen. CHORUS, a grand Baroque ceiling fresco of heaven: she sits enthroned at the center of an immense golden sunburst amid swirling clouds and choirs of cherubs, a golden halo behind her; below, he kneels on a cloud with one fist on his chest, swearing a solemn oath with tears in his eyes, golden rays falling on him. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-verse-oil",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Bouguereau, Caravaggio, Rubens): photorealistic anatomy and skin, soft glazed layers, chiaroscuro, warm golden light, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. The husband: a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks and a warm smile, curly golden-blond hair, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo), and in addition a pair of realistic golden-orange FOX EARS rising from his curls and one big realistic fluffy fox tail with a white tip, painted as naturally as real fur. VERSE, a cold nocturne: he sits alone on the stone steps of a snowy European square at night under a gas street lamp, wearing a worn wool worker's coat over his wings, looking at a few coins in his palm, snow settling on his hair and wings, breath visible, melancholy. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-chorus-wc",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic European watercolor painting (academic watercolor like John Singer Sargent and the Pre-Raphaelites): photorealistic detail, luminous transparent washes, soft blooms and granulation on cold-pressed paper, delicate light. NOT anime, NOT cartoon, NOT 3D. The husband: a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks and a warm smile, curly golden-blond hair, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo), and in addition a pair of realistic golden-orange FOX EARS rising from his curls and one big realistic fluffy fox tail with a white tip, painted as naturally as real fur. The wife Eri: a real, photorealistic white cat with soft pale blue-grey tabby stripes (painted like a living animal, real fur and eyes), wearing a pale lavender witch's hat with a small yellow flower; dignified like a queen. CHORUS: dawn breaks over an endless sea of clouds; she appears high in the sky as a radiant figure surrounded by a halo of golden light; he stands on a mountain peak with wings spread wide, looking up at her, light pouring over him, majestic and tender. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-verse-wc",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic European watercolor painting (academic watercolor like John Singer Sargent and the Pre-Raphaelites): photorealistic detail, luminous transparent washes, soft blooms and granulation on cold-pressed paper, delicate light. NOT anime, NOT cartoon, NOT 3D. The husband: a realistic young man angel exactly like the angel in the reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks and a warm smile, curly golden-blond hair, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth draped around his waist, a faint golden halo), and in addition a pair of realistic golden-orange FOX EARS rising from his curls and one big realistic fluffy fox tail with a white tip, painted as naturally as real fur. VERSE: a snowy evening in an old European city street with warm shop windows; he walks alone with his head lowered, carrying a heavy sack of work tools on his shoulder, snow falling, his wings folded and dusted with snow. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
+  },
+  {
+   "id": "mv3r-statue",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "/tmp/mv-ang2-1.jpg",
+    "/tmp/mv-ang-1.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg"
+   ],
+   "prompt": "A photorealistic photograph-like painting of white Carrara marble statues inside a vast Baroque cathedral, light beams through high windows and dust in the air. A colossal marble statue of a seated queen cat wearing a witch's hat (the cat from the cat reference, carved in marble) on a high pedestal with a carved halo; at its feet a marble statue of the muscular angel with fox ears and fox tail (from the angel reference, carved in marble, realistic Bernini-like carving) kneels with his head bowed and hands clasped. Awe-inspiring scale. No text, no letters, no signature, no frame. Square 1:1, painted edge to edge. "
   }
  ],
  "redo": []
