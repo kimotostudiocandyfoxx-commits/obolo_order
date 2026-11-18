@@ -356,6 +356,13 @@
    "duration": 5,
    "model": "bytedance:2@2",
    "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the angel sings a solemn, heartfelt hymn to the cat, his mouth moving gently with the song, his hand pressed on his heart; the cat gazes up at him and big tears slowly roll down her furry cheeks, she blinks slowly; golden light and petals drift between them; the camera slowly pushes in toward their faces."
+  },
+  {
+   "id": "m3v-g2c-sing-bust",
+   "image": "design/mv-art/out/mv3-g2c-sing-bust.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair and wings; no tail appears. In slow motion he sings a solemn, heartfelt hymn with a serious, noble expression, his chest rising with a deep breath, his mouth moving gently with the song, tears glistening, his hand pressed on his heart; his great wings slowly spread wider and the heavenly light behind his head slowly intensifies; petals drift; the camera slowly pushes in toward his face from a gentle low angle."
   }
  ],
  "redo": []
