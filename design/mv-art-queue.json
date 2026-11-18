@@ -5652,6 +5652,52 @@
     "design/mv-art/out/mv3-b-town-sunrise.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people, no figures at all. ULTRA-WIDE AERIAL VIEW from very high in the sky over the whole snow-covered old European city from the first reference picture, at the exact moment of sunrise: the sun just rising over the far snowy hills on the horizon, and its first golden rays sweep across the entire city at once, a wave of warm gold light flowing over thousands of snow-covered rooftops, chimneys with thin smoke, a frozen winding river and stone bridges, long blue shadows still in the narrow streets; the white domed cathedral small in the middle of the city catching the brightest light; broad god-rays through thin morning clouds and drifting mist. Breathtaking, hopeful, epic scale."
+  },
+  {
+   "id": "mv3-a3c-hand-window",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-attic.jpg",
+    "design/mv-art/out/mv3-a3-window.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel's hand. EXTREME CLOSE-UP (macro, very shallow depth of field): seen from inside the shabby attic room at midnight: the angel's strong bare hand pressed flat against the cold small-paned window glass, fingers spread, the frost patterns on the glass slowly melting around his warm fingertips, a patch of breath fog beside it, a soft warm reflection of the candle in the glass; through the glass the snowy rooftops of the city at night, blurred, snow falling outside. Lonely and longing. No face visible."
+  },
+  {
+   "id": "mv3-t0b-aerial",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-town-night.jpg",
+    "design/mv-art/out/mv3-t2c-aerial-high.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. AERIAL VIEW from about rooftop height plus a few storeys, like a drone shot looking steeply down along the narrow snowy old-town backstreet at night from the street reference pictures: dark crooked half-timbered houses with snow-laden roofs on both sides, warm small windows, a single gas lamp; in the middle of the white street a lonely winged young man kneels in the snow, SMALL in the frame and in correct natural scale with the houses (he is about as tall as a door, roughly one tenth of the picture height), head bowed, white wings limp on the snow, his footprints behind him; heavy snow falling between us and him. Overwhelming loneliness."
+  },
+  {
+   "id": "mv3-t3b-snow-grip",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-town-night.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel's hand. EXTREME CLOSE-UP (macro, very shallow depth of field): night in the snowy old-town street, low near the ground: the angel's strong bare hand, kneeling, slowly clenching a fistful of fresh snow on the cobblestones, knuckles tense, snow squeezing out between his fingers, a few white feathers of his wing tip lying in the snow beside it, warm gas-lamp light from one side and cold blue night, snowflakes falling. Frustration turning into resolve. No face visible."
   }
  ],
  "redo": []
