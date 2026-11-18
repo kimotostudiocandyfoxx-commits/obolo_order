@@ -1,27 +1,14 @@
-# UI art — 2026-11-18T00:41:53.222Z
+# UI art — 2026-11-18T00:56:30.739Z
 
-Seedream 5.0 Pro / 23枚 / 約350円
+Seedream 5.0 Pro / 10枚 / 約147円
 
-- ✅ mv3-s02-city-snow
-- ✅ mv3-s03-quill
-- ✅ mv3-s04-desk
-- ✅ mv3-s05-tally
-- ✅ mv3-s06-window
-- ✅ mv3-s07-eri-home
-- ✅ mv3-s08-kneel-snow
-- ✅ mv3-s09-snow-piles
-- ✅ mv3-s10-sun-shame
-- ✅ mv3-s11-statue-shame
-- ✅ mv3-s12-rise
-- ✅ mv3-s14-quarry
-- ✅ mv3-s15-turn-away
-- ✅ mv3-s16-stairs
-- ✅ mv3-s19-statue-glow
-- ✅ mv3-s20-peak
-- ✅ mv3-s21-advance
-- ✅ mv3-s22-blessing
-- ✅ mv3-s23-offering
-- ✅ mv3-s24-oath
-- ✅ mv3-s25-face
-- ✅ mv3-s30-statues-dusk
-- ✅ mv3-s31-letter
+- ✅ mv3-b-home
+- ✅ mv3-b-sq-night
+- ✅ mv3-c1-statue-sun
+- ✅ mv3-c2-statue-clouds
+- ✅ mv3-f1-resolve
+- ✅ mv3-f2-smile
+- ✅ mv3-h4-purse
+- ✅ mv3-q10-fist
+- ✅ mv3-q3-face
+- ✅ mv3-q4-lookup
