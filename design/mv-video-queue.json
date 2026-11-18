@@ -1,7 +1,7 @@
 {
  "out": "design/mv-art/video",
  "model": "bytedance:2@2",
- "always": "Slow, graceful, majestic motion in exactly the same oil-painting style. The camera stays fixed. Every face, body, pose and the composition stay exactly as in the first frame; faces do not change at all. No new people, no text, no flashes.",
+ "always": "Slow motion, graceful and majestic, in exactly the same classical oil-painting style. Every face, body and design stay exactly as in the first frame; faces never change. No new people, no text, no flashes, no cuts.",
  "items": [
   {
    "id": "v06-katada-blessing-s1",
@@ -174,6 +174,153 @@
    "cameraFixed": true,
    "model": "bytedance:2@2",
    "prompt": "The family walks steadily to the right with a happy, bouncy walking rhythm, walking in place (their feet step but they stay in the middle of the picture), the baby on the shoulders bobs gently, the tails sway. Slow, gentle motion in exactly the same hand-drawn picture-book watercolor style. The camera stays fixed. The characters keep exactly their designs. The background stays a perfectly flat, plain, solid bright green everywhere, with no ground, no shadow and no scenery."
+  },
+  {
+   "id": "m3v-t5e-city-sunrise",
+   "image": "design/mv-art/out/mv3-t5e-city-sunrise.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "Cinematic slow aerial drone shot gliding forward high above the snowy city toward the domed cathedral; the rising sun's golden light slowly spreads across the snow-covered rooftops, sun rays shimmer, thin chimney smoke and morning mist drift slowly."
+  },
+  {
+   "id": "m3v-t5d-church-ecu",
+   "image": "design/mv-art/out/mv3-t5d-church-ecu.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The camera slowly cranes upward along the white cathedral dome while the sun flare behind the edge of the dome slowly blooms brighter; glittering snow dust floats in the golden beams, icicles glint."
+  },
+  {
+   "id": "m3v-t6b-low",
+   "image": "design/mv-art/out/mv3-t6b-low.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion the angel strides toward the camera over the snowy cobblestones, each step throwing up soft sprays of glittering snow, his great wings slowly opening wider, curls and fox tail swaying; the camera slowly tracks backward at ground level, keeping him in frame."
+  },
+  {
+   "id": "m3v-c1b-low-face",
+   "image": "design/mv-art/out/mv3-c1b-low-face.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "Warm sunrise light slowly sweeps across the face of the white marble cat statue, glittering dust motes drift through the beam; the camera slowly pushes in and tilts up slightly. The marble statue itself stays perfectly still."
+  },
+  {
+   "id": "m3v-c2-statue-clouds",
+   "image": "design/mv-art/out/mv3-c2-statue-clouds.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "Golden heavenly clouds slowly billow and rise around the pedestal, light pours down from the dome above, tiny cherubs drift; the camera slowly cranes up from the pedestal toward the statue. The marble cat statue stays perfectly still."
+  },
+  {
+   "id": "m3v-c3-two",
+   "image": "design/mv-art/out/mv3-c3-two.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion the angel walks slowly forward on the clouds toward the camera, wings gently spread and breathing, tail swaying; the camera slowly dollies back; clouds drift and light rays shimmer. The giant marble cat statue behind him stays perfectly still."
+  },
+  {
+   "id": "m3v-c4-reverse",
+   "image": "design/mv-art/out/mv3-c4-reverse.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. Seen from behind, in slow motion the angel walks slowly away from the camera toward the giant marble cat statue, wings swaying gently, tail swaying; the camera follows slowly behind him and rises a little; golden clouds drift. The statue stays perfectly still."
+  },
+  {
+   "id": "m3v-c4b-feet",
+   "image": "design/mv-art/out/mv3-c4b-feet.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "Extreme slow motion: the bare feet step forward onto the glowing golden clouds, golden cloud mist swirls softly around the ankles, the fox tail sways; the camera tracks slowly alongside at ground level."
+  },
+  {
+   "id": "m3v-s22-blessing",
+   "image": "design/mv-art/out/mv3-s22-blessing.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the queen cat on the golden throne slowly raises her paw higher in blessing, a stream of golden light flows from her paw down through the clouds, sparkles drift, her ermine mantle stirs softly; the camera slowly pushes in."
+  },
+  {
+   "id": "m3v-s22b-paw",
+   "image": "design/mv-art/out/mv3-s22b-paw.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "Extreme slow motion: golden light particles stream and swirl from the raised white paw, the soft fur ruffles gently; the camera slowly circles around the paw."
+  },
+  {
+   "id": "m3v-g1-hatto",
+   "image": "design/mv-art/out/mv3-g1-hatto.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion the angel's steps slow to a stop; his eyes widen and he catches his breath in sudden realisation, his head lifting as he senses her behind him, and at the end he begins to turn his head to look back over his shoulder; curls and feathers stir; the camera slowly pushes in to his face."
+  },
+  {
+   "id": "m3v-g2-sing-overcat",
+   "image": "design/mv-art/out/mv3-g2-sing-overcat.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion the angel sings with all his heart, his mouth moving with the song, one hand pressed on his chest, the other arm reaching out toward the cat, tears shining; the cat's hat in the blurred foreground stays still; the camera slowly pushes in over her shoulder."
+  },
+  {
+   "id": "m3v-g3-cat-listen",
+   "image": "design/mv-art/out/mv3-g3-cat-listen.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the cat on the throne listens to his song, her eyes slowly welling with tears, her ears turning toward him, her paw on her chest; the angel's back in the blurred foreground rises with his breath; the camera slowly pushes in past his shoulder toward her."
+  },
+  {
+   "id": "m3v-g5-cat-cry",
+   "image": "design/mv-art/out/mv3-g5-cat-cry.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion tears roll down the cat's furry cheeks, she blinks slowly, her whiskers tremble, the golden light glows softly; the camera slowly pushes in."
+  },
+  {
+   "id": "m3v-g6-tear-ecu",
+   "image": "design/mv-art/out/mv3-g6-tear-ecu.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The cat keeps exactly the same face, stripes and lavender witch's hat. Extreme slow-motion macro: one shining tear slowly rolls down through the white fur of the cat's cheek, her golden eye glistens and slowly blinks; a very slow push-in."
+  },
+  {
+   "id": "m3v-f1-resolve",
+   "image": "design/mv-art/out/mv3-f1-resolve.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion his face firms with quiet resolve, he takes one slow deep breath, his eyes steady, his curls stir softly; the camera slowly pushes in."
+  },
+  {
+   "id": "m3v-f2-smile",
+   "image": "design/mv-art/out/mv3-f2-smile.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion his face slowly breaks into a warm, radiant smile with tears in his eyes, the halo behind him glows brighter; the camera slowly pulls back a little."
+  },
+  {
+   "id": "m3v-s26-ascend",
+   "image": "design/mv-art/out/mv3-s26-ascend.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion the angel rises upward through the golden clouds, his wings beating slowly and powerfully, petals and feathers swirling around him, cherubs circling; the camera slowly tilts up following him."
+  },
+  {
+   "id": "m3v-s26b-topdown",
+   "image": "design/mv-art/out/mv3-s26b-topdown.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. Slow motion, seen from above: the angel soars upward toward the camera through a swirling vortex of golden clouds, wings beating slowly, cherubs drifting around; the camera slowly rises ahead of him."
+  },
+  {
+   "id": "m3v-h1-walk-to-eri",
+   "image": "design/mv-art/out/mv3-h1-walk-to-eri.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the angel walks slowly toward the cat sitting on the cloud, reaching out his hand with a tender smile, and at the end he begins to kneel down; she looks up at him lovingly; golden petals drift; the camera tracks slowly sideways with him."
+  },
+  {
+   "id": "m3v-s28-together-flip",
+   "image": "design/mv-art/out/mv3-s28-together-flip.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the angel tenderly draws the cat closer, pressing his forehead to hers, both close their eyes, his wings slowly curve forward around them, golden petals fall softly; the camera slowly orbits a little around them."
   }
  ],
  "redo": []
