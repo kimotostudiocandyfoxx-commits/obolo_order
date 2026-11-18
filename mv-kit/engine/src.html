@@ -546,13 +546,14 @@ function drawFeathers(t) {
 }
 // divine light: varied, slow events at the musical peaks (all pure functions of t)
 // kinds: bloom (slow radial drift), ring (expanding halo of motes), shower (gentle gold rain),
-//        spiral (helix rising around a point), fountain (slow upward plume), twinkle (stars waking in place)
+//        spiral (helix rising around a point), fountain (slow upward plume), twinkle (stars waking in place),
+//        motes (warm specks floating and swaying slowly in place, e.g. candle-lit air); opts.until fades any event out by that time
 const EVENTS = (P.lights || []).map(e => e.length > 5 ? e : [...e, {}]);   // [kind, t, u, v, power, {w, h}]
 const PARTS = (() => { const out = [];
   EVENTS.forEach(([kind, t0, u, v, pw, o], ei) => { const R = mulberry32(900 + ei * 31);
-    const n = Math.round({ bloom: 90, ring: 70, shower: 70, spiral: 60, fountain: 80, twinkle: 55 }[kind] * pw);
+    const n = Math.round({ bloom: 90, ring: 70, shower: 70, spiral: 60, fountain: 80, twinkle: 55, motes: 60 }[kind] * pw);
     for (let k = 0; k < n; k++) { const r = R(), kindSpr = r < .2 ? 2 : r < .36 ? 1 : 0;   // 0 dot, 1 bokeh, 2 star
-      out.push({ kind, t0: t0 + R() * ({ shower: 3, twinkle: 2.5, fountain: 2, spiral: 1.5 }[kind] || .6), u, v, pw, o,
+      out.push({ kind, t0: t0 + R() * ({ shower: 3, twinkle: 2.5, fountain: 2, spiral: 1.5, motes: 3 }[kind] || .6), u, v, pw, o,
         a: R() * 6.283, sp: .35 + R() * .65, life: 5.5 + R() * 3.5, s: (8 + R() * 16) * Math.min(1.25, pw), spr: kindSpr,
         ph: R() * 6.283, tw: 1.2 + R() * 2.2, rot: R() * 6.283, rx: R(), ry: R() }); } });
   return out; })();
@@ -566,6 +567,7 @@ function partPos(p, tau) {
     case 'shower': return [p.u + (p.rx - .5) * p.o.w + .02 * Math.sin(tau * .8 + p.ph) + .015 * tau, p.v + tau * (.07 + .05 * p.sp)];
     case 'spiral': { const ang = p.a + tau * 1.1, rad = .06 + .12 * Math.min(1, tau / 4) * p.sp; return [p.u + Math.cos(ang) * rad, p.v + .05 - tau * .045 * (.7 + .5 * p.sp) + Math.sin(ang) * rad * .25]; }
     case 'fountain': { const ang = -Math.PI / 2 + (p.rx - .5) * 1.1; return [p.u + Math.cos(ang) * p.sp * .3 * e + .01 * Math.sin(tau + p.ph), p.v + Math.sin(ang) * p.sp * .22 * e + .012 * tau * tau * .1]; }
+    case 'motes': return [p.u + (p.rx - .5) * p.o.w + .022 * Math.sin(tau * .45 + p.ph), p.v + (p.ry - .5) * p.o.h - .009 * tau + .01 * Math.sin(tau * .3 + p.ph * 2)];
     default: return [p.u + (p.rx - .5) * p.o.w, p.v + (p.ry - .5) * p.o.h - .004 * tau];  // twinkle
   }
 }
@@ -605,8 +607,9 @@ function drawDivine(t) {
     cx.globalAlpha = clamp(.16 * pw * Math.sin(Math.PI * tau / 5)); const S = W * (kind === 'bloom' ? .95 : .7); cx.drawImage(L.puff, u * W - S / 2, v * H - S / 2, S, S); }
   for (const p of PARTS) { const tau = t - p.t0; if (tau < 0 || tau > p.life) continue;
     const [x, y] = partPos(p, tau); if (y < -.08 || y > 1.08) continue;
-    const tw = p.kind === 'twinkle' ? Math.pow(Math.max(0, Math.sin(Math.PI * tau / p.life)), 1.5) * (.6 + .4 * Math.sin(tau * p.tw + p.ph)) : (.8 + .2 * Math.sin(tau * p.tw + p.ph));
-    const a = ramp(tau, 0, 1.2) * (1 - sstep((tau - p.life * .45) / (p.life * .55))) * tw;
+    const tw = p.kind === 'twinkle' ? Math.pow(Math.max(0, Math.sin(Math.PI * tau / p.life)), 1.5) * (.6 + .4 * Math.sin(tau * p.tw + p.ph))
+             : p.kind === 'motes' ? Math.sin(Math.PI * tau / p.life) * (.75 + .25 * Math.sin(tau * p.tw * .5 + p.ph)) : (.8 + .2 * Math.sin(tau * p.tw + p.ph));
+    const a = ramp(tau, 0, 1.2) * (1 - sstep((tau - p.life * .45) / (p.life * .55))) * tw * (p.o.until ? 1 - ramp(t, p.o.until - .8, p.o.until) : 1);
     const s = p.s * (p.spr === 1 ? 2.6 : p.spr === 2 ? 2.2 : 1); cx.globalAlpha = clamp(a * (p.spr === 1 ? .55 : .95) * faceClear(x * W, y * H, faces)); if (cx.globalAlpha <= .01) continue;
     if (p.spr === 2) { cx.save(); cx.translate(x * W, y * H); cx.rotate(p.rot + tau * .15); cx.drawImage(L.star, -s / 2, -s / 2, s, s); cx.restore(); }
     else cx.drawImage(p.spr === 1 ? L.bokeh : L.dust, x * W - s / 2, y * H - s / 2, s, s); }
