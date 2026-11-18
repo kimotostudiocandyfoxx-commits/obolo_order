@@ -4617,6 +4617,82 @@
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Night, deep cold blue darkness and heavy snow falling: a wide view of the snowy square in front of a grand Baroque cathedral facade with a great dome and two bell towers (the architecture from the reference picture, but WITHOUT any statue), a few gas lamps glowing, snow-covered cobblestones, dark old houses around the square, the great doors closed. No figures, lonely and desolate."
   },
   {
+   "id": "mv3-b-sq-dawn",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-sq-night.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. The very same place and the very same view as in the reference picture, only the time has changed: early dawn, the snow has become light, the sky behind the cathedral turns pale blue, grey and soft pink, the gas lamps still glowing faintly, the snow on the square catching the first cool light. Same buildings, same composition. No figures."
+  },
+  {
+   "id": "mv3-b-sq-sunrise",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-sq-night.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. The very same place and the very same view as in the reference picture, only the time has changed: sunrise, the great golden sun rising right behind the cathedral dome, warm golden light flooding the square, long shadows on the snow, the snowfall ended, a clear sky. Same buildings, same composition. No figures."
+  },
+  {
+   "id": "mv3-h1-write",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-home.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Midnight, exactly the same room as in the room reference picture (a corner of the Baroque cathedral that is their home: a rough wooden desk with a candle on the left, a massive stone pillar with twenty-one tally marks scratched in groups in the middle, a tall arched window looking out on the snowy night city on the right, the colossal marble statue of the seated queen cat with a witch's hat in the background); same architecture, same furniture, same lighting, the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) sits at the desk on the left writing a letter with a quill by the candle, a tear on his cheek, his wings folded."
+  },
+  {
+   "id": "mv3-h2-tally",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-home.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Midnight, exactly the same room as in the room reference picture (a corner of the Baroque cathedral that is their home: a rough wooden desk with a candle on the left, a massive stone pillar with twenty-one tally marks scratched in groups in the middle, a tall arched window looking out on the snowy night city on the right, the colossal marble statue of the seated queen cat with a witch's hat in the background); same architecture, same furniture, same lighting, the camera a little closer: the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) has turned on his chair at the desk and looks at the stone pillar with the twenty-one tally marks, the quill still in his hand, his shoulders slumping."
+  },
+  {
+   "id": "mv3-h3-window",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-home.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Midnight, exactly the same room as in the room reference picture (a corner of the Baroque cathedral that is their home: a rough wooden desk with a candle on the left, a massive stone pillar with twenty-one tally marks scratched in groups in the middle, a tall arched window looking out on the snowy night city on the right, the colossal marble statue of the seated queen cat with a witch's hat in the background); same architecture, same furniture, same lighting, the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) now stands at the tall arched window on the right, one palm against the cold glass, gazing out at the snowy night city, his breath fogging the glass; the desk with the candle behind him."
+  },
+  {
    "id": "mv3-h4-purse",
    "always": false,
    "w": 2048,
@@ -4658,7 +4734,7 @@
     "design/mv-art/out/mv3c-angel-sheet.jpg",
     "design/mv-art/out/mv3c-angel.jpg"
    ],
-   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Close-up of the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) slowly lifting his head and looking up, tears still on his cheeks, his expression turning from sorrow to firm resolve, the first pale dawn light touching his face, light snow."
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. EXTREME CLOSE-UP PORTRAIT: only his head and the top of his shoulders fill the whole square frame (no body, no wings visible below the shoulders), the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) slowly lifting his head and looking up, tears still on his cheeks, his expression turning from sorrow to firm resolve, the first pale dawn light touching his face, light snow."
   },
   {
    "id": "mv3-q10-fist",
@@ -4716,7 +4792,7 @@
     "design/mv-art/out/mv3c-angel-sheet.jpg",
     "design/mv-art/out/mv3c-angel.jpg"
    ],
-   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Extreme close-up of the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip): a fierce, powerful look of resolve, jaw clenched, eyes blazing, brilliant golden light on his face, glowing clouds behind."
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. EXTREME CLOSE-UP PORTRAIT: only his head and the top of his shoulders fill the whole square frame (no body, no wings visible below the shoulders), the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip): a strong, steady, noble look of resolve (calm and determined, not angry, no snarl), lips firmly closed, eyes clear and burning with will, brilliant golden light on his face, glowing clouds behind."
   },
   {
    "id": "mv3-f2-smile",
@@ -4731,8 +4807,12 @@
     "design/mv-art/out/mv3c-angel-sheet.jpg",
     "design/mv-art/out/mv3c-angel.jpg"
    ],
-   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. The same extreme close-up of the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip), now breaking into a radiant, warm, proud smile with tears of joy shining, brilliant golden light, glowing clouds behind."
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. EXTREME CLOSE-UP PORTRAIT: only his head and the top of his shoulders fill the whole square frame (no body, no wings visible below the shoulders), the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip), now breaking into a radiant, warm, proud smile with tears of joy shining, brilliant golden light, glowing clouds behind."
   }
  ],
- "redo": []
+ "redo": [
+  "mv3-q4-lookup",
+  "mv3-f1-resolve",
+  "mv3-f2-smile"
+ ]
 }
