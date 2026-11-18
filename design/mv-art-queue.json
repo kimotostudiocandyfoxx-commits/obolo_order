@@ -5901,6 +5901,57 @@
     "design/mv-art/out/mv3-f1-resolve.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. POINT OF VIEW of the queen cat sitting on her throne (the cat herself is NOT visible at all): the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) stands a few steps away on the golden clouds, facing the camera directly, seen from slightly below (a gentle low angle, majestic), and sings a solemn, heartfelt hymn to her: a serious, noble, earnest expression, brows calm, eyes steady and glistening with restrained tears, mouth only moderately open in song (not shouting), one hand pressed over his heart, the other reaching gently forward toward the camera; his great white wings spread wide behind him; heavenly god-rays burst from behind him, warm golden light, a few petals drifting. Grand and sacred like a Baroque altarpiece."
+  },
+  {
+   "id": "mv3-k1-walk-away",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg",
+    "design/mv-art/out/mv3r-eri.jpg",
+    "design/mv-art/out/mv3-s22-blessing.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel, Eri. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. WIDE ESTABLISHING SIDE VIEW across the golden clouds: on the LEFT in the middle distance, the wife Eri, the cat from the cat reference pictures: a real, photorealistic white cat with soft pale blue-grey tabby stripes and a pale lavender witch's hat with a small yellow flower, regal and dignified like a queen sits on her golden throne with red velvet and her ermine mantle and raises one paw in blessing; a gentle stream of golden light flows from her paw across the clouds toward the RIGHT, where the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) walks AWAY from her toward the right edge of the picture with his BACK turned to her, seen from behind and the side, smaller in the frame, head slightly bowed, not yet noticing her. A quiet, poignant, majestic moment."
+  },
+  {
+   "id": "mv3-k2-turn-back",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg",
+    "design/mv-art/out/mv3-g1-hatto.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. MEDIUM SHOT FROM BEHIND (the camera stands where the queen cat sits on her throne; she is not visible): the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) has been walking away into the golden clouds with his back to us; now he stops and turns his head and shoulders back over his shoulder toward the camera, his face in three-quarter view, a look of sudden realisation, eyes wide and welling with tears, lips parted; we see his broad bare back, his great white wings half folded, his golden curls and the fox tail; warm light from the front. Serious and moving, not comic."
+  },
+  {
+   "id": "mv3-k3-two-sing",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg",
+    "design/mv-art/out/mv3r-eri.jpg",
+    "design/mv-art/out/mv3-g2b-sing-pov.jpg",
+    "design/mv-art/out/mv3-s23b-eri.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel, Eri. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. WIDE SIDE-VIEW TWO-SHOT, both in profile: on the LEFT the wife Eri, the cat from the cat reference pictures: a real, photorealistic white cat with soft pale blue-grey tabby stripes and a pale lavender witch's hat with a small yellow flower, regal and dignified like a queen sits on her golden throne with red velvet and ermine mantle, facing RIGHT toward him, listening, deeply moved, tears beginning to run down her furry cheeks, one paw on her chest; on the RIGHT the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) stands on the clouds a few steps away facing LEFT toward her and sings a solemn, heartfelt hymn with a serious, noble expression, one hand on his heart, the other reaching toward her, wings spread; golden god-rays and petals drifting between them. Grand and sacred like a Baroque altarpiece."
   }
  ],
  "redo": []
