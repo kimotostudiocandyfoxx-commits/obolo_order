@@ -1,12 +1,7 @@
-# UI art — 2026-11-18T01:30:19.550Z
+# UI art — 2026-11-18T01:46:12.830Z
 
-Seedream 5.0 Pro / 8枚 / 約121円
+Seedream 5.0 Pro / 3枚 / 約46円
 
-- ✅ mv3-a1-write
-- ✅ mv3-a2-tally
-- ✅ mv3-a3-window
-- ✅ mv3-b-town-dawn
-- ✅ mv3-b-town-sunrise
-- ✅ mv3-t1-back
-- ✅ mv3-t2-wide
-- ✅ mv3-t3-snowed
+- ✅ mv3-t4-rise
+- ✅ mv3-t5-gaze
+- ✅ mv3-t6-heaven-street
