@@ -4148,11 +4148,11 @@
     1440
    ],
    "refs": [
+    "design/mv-art/out/mv3-b-attic.jpg",
     "design/mv-art/out/mv3c-angel-sheet.jpg",
-    "design/mv-art/out/mv3c-angel.jpg",
-    "design/mv-art/out/mv3-s01-cathedral.jpg"
+    "design/mv-art/out/mv3c-angel.jpg"
    ],
-   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel's hand. Midnight close-up by candlelight on a rough wooden desk inside the stone cathedral: the strong hand of the angel writes a letter with a goose quill on cream paper (only soft unreadable strokes, no real letters), an ink pot, a red wax seal pressed with a small cat paw print, a guttering candle, stone column and a dark stained-glass window behind."
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel's hand. Midnight close-up by candlelight on the small rough wooden desk in the shabby attic room from the room reference picture (rough plaster wall, slanted wooden beam, small frosted window with snow): the strong hand of the angel begins to write a letter with a goose quill on cream paper (only soft unreadable strokes, no real letters), an ink pot, a red wax stick, a guttering candle."
   },
   {
    "id": "mv3-s04-desk",
@@ -5604,10 +5604,13 @@
    ],
    "refs": [
     "design/mv-art/out/mv3-b-town-night.jpg",
-    "design/mv-art/out/mv3-a3b-outside.jpg"
+    "design/mv-art/out/mv3-b-attic.jpg"
    ],
-   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Hovering in the falling snow right outside the small-paned attic window of the old snow-covered house at night, slowly drifting closer: thick snow on the sill and the roof edge, frost patterns on the glass, warm candle light glowing from inside, and through the frosted glass the faint blurred silhouette of a winged figure bent over a small desk. Lonely and tender."
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. The camera floats in the falling snow just outside a small-paned attic window of the old snow-covered house at night, slowly drifting closer: thick snow on the sill, frost patterns on the glass, warm candle light glowing from INSIDE the room; NOBODY is outside the window; through the frosted glass, inside the attic, a winged figure sits bent over a small desk by a candle, soft and blurred by the frost. Lonely and tender."
   }
  ],
- "redo": []
+ "redo": [
+  "mv3-i4-window-approach",
+  "mv3-s03-quill"
+ ]
 }
