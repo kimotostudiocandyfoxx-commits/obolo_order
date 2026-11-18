@@ -1,6 +1,4 @@
-# UI art — 2026-11-18T02:58:12.753Z
+# UI art — 2026-11-18T03:00:30.652Z
 
-Seedream 5.0 Pro / 2枚 / 約30円
+Seedream 5.0 Pro / 0枚 / 約0円
 
-- ✅ mv3-i3-house-approach
-- ✅ mv3-i4-window-approach
