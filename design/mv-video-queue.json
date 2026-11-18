@@ -328,6 +328,27 @@
    "duration": 5,
    "model": "bytedance:2@2",
    "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. In slow motion he sings a solemn, heartfelt hymn with a serious, noble expression, his chest rising with a deep breath, his mouth moving gently with the song, his reaching hand slowly opening toward the camera, his great wings slowly spreading wider; the heavenly light rays behind him slowly intensify, petals drift; the camera slowly pushes in from a gentle low angle."
+  },
+  {
+   "id": "m3v-k1-walk-away",
+   "image": "design/mv-art/out/mv3-k1-walk-away.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the cat on the throne holds her paw raised in blessing while a gentle stream of golden light flows from it across the clouds toward the angel, who keeps walking slowly away to the right with his back to her; golden clouds drift; the camera slowly pans to the right, following the light."
+  },
+  {
+   "id": "m3v-k2-turn-back",
+   "image": "design/mv-art/out/mv3-k2-turn-back.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. Seen from behind, in slow motion the angel stops and slowly turns his head and shoulders further back over his shoulder toward the camera, his eyes widening with realisation and welling with tears, his wings stirring softly; the camera slowly pushes in."
+  },
+  {
+   "id": "m3v-k3-two-sing",
+   "image": "design/mv-art/out/mv3-k3-two-sing.jpg",
+   "duration": 5,
+   "model": "bytedance:2@2",
+   "prompt": "The angel keeps exactly the same face, curly golden hair, wings and fox tail. The cat keeps exactly the same face, stripes and lavender witch's hat. In slow motion the angel sings a solemn, heartfelt hymn to the cat, his mouth opening gently in song, his reaching hand slowly opening toward her; the cat listens and tears slowly roll down her furry cheeks; golden light and petals drift between them; the camera slowly dollies in from the side."
   }
  ],
  "redo": []
