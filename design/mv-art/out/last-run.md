@@ -1,5 +1,5 @@
-# UI art — 2026-11-18T06:31:31.982Z
+# UI art — 2026-11-18T07:16:07.292Z
 
-Seedream 5.0 Pro / 1枚 / 約16円
+Seedream 5.0 Pro / 1枚 / 約14円
 
-- ✅ mv3-h1-walk-to-eri
+- ✅ mv3-s31b-letter
