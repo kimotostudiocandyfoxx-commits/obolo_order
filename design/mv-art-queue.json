@@ -5119,6 +5119,54 @@
     "design/mv-art/out/mv3c-angel.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Night, exactly the same place and view as in the street reference picture (a narrow, poor old-town backstreet of a European city: crooked old houses, warm-lit small windows, hanging iron signs, snowy cobblestones, a gas lamp, and far away at the end of the street, small on a hill, the domed cathedral), closer: the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) still kneels motionless in the street while snow keeps piling up on his bowed head, shoulders and wings, his face set and quiet; deep night."
+  },
+  {
+   "id": "mv3-t4-rise",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-town-dawn.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Dawn, exactly the same place and view as in the street reference picture (a narrow, poor old-town backstreet of a European city: crooked old houses, warm-lit small windows, hanging iron signs, snowy cobblestones, a gas lamp, and far away at the end of the street, small on a hill, the domed cathedral), the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) rises to his feet in the snow in the middle of the street, fists clenched, jaw set, a heavy bundle on his shoulder, the sky above the distant cathedral beginning to glow."
+  },
+  {
+   "id": "mv3-t5-gaze",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-town-dawn.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Dawn turning gold, exactly the same place and view as in the street reference picture (a narrow, poor old-town backstreet of a European city: crooked old houses, warm-lit small windows, hanging iron signs, snowy cobblestones, a gas lamp, and far away at the end of the street, small on a hill, the domed cathedral), seen from behind him: the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) stands in the street with the bundle on his shoulder and gazes for a long moment at the cathedral far away at the end of the street, longing and resolute."
+  },
+  {
+   "id": "mv3-t6-heaven-street",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-town-sunrise.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Sunrise: the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) walks toward us down the snowy old-town street with the bundle on his shoulder, the golden sun rising behind the distant cathedral at his back, and around him the street is transforming into heaven: the cobblestones turning into glowing clouds, the old houses dissolving into golden light, rays bursting."
   }
  ],
  "redo": []
