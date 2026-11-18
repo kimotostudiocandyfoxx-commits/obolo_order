@@ -5609,11 +5609,5 @@
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Hovering in the falling snow right outside the small-paned attic window of the old snow-covered house at night, slowly drifting closer: thick snow on the sill and the roof edge, frost patterns on the glass, warm candle light glowing from inside, and through the frosted glass the faint blurred silhouette of a winged figure bent over a small desk. Lonely and tender."
   }
  ],
- "redo": [
-  "mv3-i1-statue-low",
-  "mv3-t5b-low",
-  "mv3-c1b-low-face",
-  "mv3-s28b-cu",
-  "mv3-s30b-faces"
- ]
+ "redo": []
 }
