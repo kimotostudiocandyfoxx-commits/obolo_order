@@ -5873,6 +5873,18 @@
     "design/mv-art/out/mv3-s31-door.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people. PERFECTLY OVERHEAD TOP-DOWN close-up: one large single sheet of cream laid writing paper lies completely flat and perfectly straight (upright portrait orientation, edges parallel to the frame, NOT tilted), filling most of the frame - about 64% of the picture width and 88% of its height, centred - on the snow-dusted, worn grey stone step at the entrance of the cathedral from the reference picture. The paper is COMPLETELY BLANK: no writing, no letters, no lines, no marks of any kind, evenly lit, smooth. Around it: a red wax seal with a cat paw print and a white goose quill lying on the stone just beside the lower right corner of the paper, glittering snow crystals on the stone, soft warm morning sunlight from the upper left, gentle shadows. Calm and tender."
+  },
+  {
+   "id": "mv3-s33-card",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people. A single blank payment card (standard credit-card shape with rounded corners) made of luminous pearl-white and gold metal floats upright in mid-air, facing the viewer PERFECTLY STRAIGHT ON and level (front view, edges parallel to the frame, not tilted, not rotated), centred, about 70% of the picture width. The card face is COMPLETELY BLANK except for a small gold EMV chip on the left side: NO text, NO numbers, NO letters, NO logos, NO brand marks. Divine radiance: a brilliant golden halo glows behind the card, holy god-rays fan out in all directions, glittering golden dust and a few tiny white feathers drift around it, soft heavenly clouds and warm morning light behind; the card edges shine. Sacred, majestic and slightly humorous, like a Baroque altarpiece of a holy relic."
   }
  ],
  "redo": []
