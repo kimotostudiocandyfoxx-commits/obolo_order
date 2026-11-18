@@ -5698,6 +5698,150 @@
     "design/mv-art/out/mv3c-angel.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel's hand. EXTREME CLOSE-UP (macro, very shallow depth of field): night in the snowy old-town street, low near the ground: the angel's strong bare hand, kneeling, slowly clenching a fistful of fresh snow on the cobblestones, knuckles tense, snow squeezing out between his fingers, a few white feathers of his wing tip lying in the snow beside it, warm gas-lamp light from one side and cold blue night, snowflakes falling. Frustration turning into resolve. No face visible."
+  },
+  {
+   "id": "mv3-g1-hatto",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. MEDIUM CLOSE-UP, chest-up bust shot: the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) has been walking toward us through the clouds, away from the queen cat whose golden throne is a small soft blur far behind him; he suddenly stops, struck, as if he just heard her voice or felt her blessing: eyes wide open, lips parted in a gasp, eyebrows raised, a startled, awakened expression, a beam of golden light from behind touching his shoulder and curls. Shallow depth of field."
+  },
+  {
+   "id": "mv3-g2-sing-overcat",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg",
+    "design/mv-art/out/mv3r-eri.jpg",
+    "design/mv-art/out/mv3-s23-sing.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel, Eri. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. OVER-THE-SHOULDER shot from behind Eri on her throne: in the blurred foreground the back of her pale lavender witch's hat, her ears and her ermine royal mantle and the gilded back of the golden throne; facing the camera a few steps away, the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) sings to her with all his heart, one hand on his chest, the other reaching toward her, mouth open in song, eyes shining with tears and love."
+  },
+  {
+   "id": "mv3-g3-cat-listen",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg",
+    "design/mv-art/out/mv3r-eri.jpg",
+    "design/mv-art/out/mv3-s23b-eri.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel, Eri. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. REVERSE OVER-THE-SHOULDER shot from behind the angel: in the blurred foreground his broad bare muscular back, the edge of a white wing and golden curls; facing the camera, the wife Eri, the cat from the cat reference pictures: a real, photorealistic white cat with soft pale blue-grey tabby stripes and a pale lavender witch's hat with a small yellow flower, regal and dignified like a queen sits on her golden throne with red velvet and her ermine mantle, listening to his song, deeply moved, eyes glistening, one paw on her chest."
+  },
+  {
+   "id": "mv3-g4-sing-ecu",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. EXTREME CLOSE-UP of the face of the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) singing with all his heart: mouth wide open in a heartfelt note, eyebrows lifted, tears welling in his shining eyes and one tear on his cheek, golden rim light on his curls, glowing clouds blurred behind."
+  },
+  {
+   "id": "mv3-g5-cat-cry",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3r-eri.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "design/mv-art/out/mv3-s23b-eri.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: Eri. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. MEDIUM SHOT: the wife Eri, the cat from the cat reference pictures: a real, photorealistic white cat with soft pale blue-grey tabby stripes and a pale lavender witch's hat with a small yellow flower, regal and dignified like a queen sits on her golden throne with red velvet, wrapped in her ermine royal mantle with pearls, and quietly cries with happiness: big tears running down her furry cheeks, eyes shining, one paw raised to her chest, her witch's hat slightly tilted, golden light falling on her."
+  },
+  {
+   "id": "mv3-g6-tear-ecu",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3r-eri.jpg",
+    "design/mv-art/out/mv2-chr-cat-hat-b.jpg",
+    "design/mv-art/out/mv3-s23b-eri.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: Eri. EXTREME CLOSE-UP (macro, very shallow depth of field): the face of the white cat Eri with pale blue-grey stripes (under the brim of her lavender witch's hat): one large golden-amber eye brimming over, a single big shining tear rolling down through the soft white fur of her cheek, reflecting the golden light of heaven, whiskers glittering. Tender and moving."
+  },
+  {
+   "id": "mv3-o1-topdown",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3r-statue.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3-s30-pair.jpg"
+   ],
+   "prompt": "A photorealistic image of white Carrara marble sculptures (Bernini-like carving, polished stone, fine chisel detail) inside a vast Baroque cathedral, shafts of light through high windows, dust in the air. Square 1:1, edge to edge. No text, no letters. TOP-DOWN VIEW looking straight down from the very top of the great dome (from the oculus) into the vast cathedral: far below on the polished geometric marble floor, a pair of white Carrara marble statues of the SAME SIZE side by side on one pedestal: the muscular angel with a fox tail (from the angel reference, no animal ears) kneels and tenderly embraces the seated queen cat with a witch's hat (the cat from the cat reference) who is the same height as his kneeling body; his eyes are closed, his cheek pressed lovingly against her head, one hand gently holding her, his wings curving forward around them both like a shelter; she leans into him; carved with deep love and devotion (Canova's Cupid and Psyche-like tenderness); the WHOLE sculpture is uncolored pure white marble, including the hat, the cape and the tail (no purple, no red, no orange, no paint at all); one single shaft of morning sunlight falls straight down onto the statue pair like a spotlight, everything else in soft shadow, tiny dust motes floating in the beam. Sacred, lonely and eternal."
+  },
+  {
+   "id": "mv3-o2-hands",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3r-statue.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3-s30-pair.jpg"
+   ],
+   "prompt": "A photorealistic image of white Carrara marble sculptures (Bernini-like carving, polished stone, fine chisel detail) inside a vast Baroque cathedral, shafts of light through high windows, dust in the air. Square 1:1. No text, no letters. EXTREME CLOSE-UP detail of the white marble statue pair from the reference: the angel's carved marble hand tenderly cradling the marble cat's paw and cheek, his fingers gently curled around her, her paw resting in his palm, fine chisel marks and polished highlights, warm low morning sunlight raking across the stone, a single real white feather lying on the marble beside them. Pure white marble, no color, very shallow depth of field. Full of love."
+  },
+  {
+   "id": "mv3-o3-back",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3r-statue.jpg",
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3-s30-pair.jpg"
+   ],
+   "prompt": "A photorealistic image of white Carrara marble sculptures (Bernini-like carving, polished stone, fine chisel detail) inside a vast Baroque cathedral, shafts of light through high windows, dust in the air. Square 1:1, edge to edge. No text, no letters. View FROM BEHIND the statue pair, low and close: in the foreground the backs of a pair of white Carrara marble statues of the SAME SIZE side by side on one pedestal: the muscular angel with a fox tail (from the angel reference, no animal ears) kneels and tenderly embraces the seated queen cat with a witch's hat (the cat from the cat reference) who is the same height as his kneeling body; his eyes are closed, his cheek pressed lovingly against her head, one hand gently holding her, his wings curving forward around them both like a shelter; she leans into him; carved with deep love and devotion (Canova's Cupid and Psyche-like tenderness); the WHOLE sculpture is uncolored pure white marble, including the hat, the cape and the tail (no purple, no red, no orange, no paint at all) - his folded marble wings, the cat's back and witch's hat - seen as a soft glowing silhouette, and beyond them, down the long nave, the great doors of the cathedral stand open onto a bright snowy morning, golden sunlight flooding in along the floor toward the statues, rim-lighting their outlines. Emotional, hopeful."
   }
  ],
  "redo": []
