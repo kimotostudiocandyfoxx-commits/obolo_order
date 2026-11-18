@@ -5579,8 +5579,5 @@
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. AERIAL VIEW high above, like a drone or bird's-eye shot: slowly rising in bright morning light high above the grand domed cathedral and the whole snowy old town, the snow glittering in the sun, a clear blue sky, peaceful and hopeful. No figures."
   }
  ],
- "redo": [
-  "mv3-s29-dome2",
-  "mv3-s30-pair"
- ]
+ "redo": []
 }
