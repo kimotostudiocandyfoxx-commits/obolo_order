@@ -1,5 +1,7 @@
-# MV video — 2026-11-18T08:59:12.227Z
+# MV video — 2026-11-18T09:13:48.353Z
 
-1 clips / about $0.07
+3 clips / about $0.07
 
-- ✅ m3v-g2b-sing-pov
+- ✅ m3v-k1-walk-away
+- ✅ m3v-k2-turn-back
+- ✅ m3v-k3-two-sing
