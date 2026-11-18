@@ -5622,6 +5622,36 @@
     "design/mv-art/out/mv3-b-town-dawn.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people, no figures at all - a still, reverent establishing shot. The same snowy old town and the same white cathedral with its great dome and twin towers as in the reference pictures, now seen closer with a long lens over the snow-covered crooked rooftops at the moment of sunrise: the rising sun is hidden exactly behind the cathedral dome, and divine golden light bursts out from behind it and streams through its tall windows and colonnade, broad god-rays fanning across the pale sky and pouring down over the rooftops onto the snowy street below, glittering snow dust floating in the beams, the last snowflakes catching the light, a soft halo around the dome. Majestic, sacred, hopeful, like a Baroque altarpiece of divine light."
+  },
+  {
+   "id": "mv3-t5d-church-ecu",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-b-town-sunrise.jpg",
+    "design/mv-art/out/mv3-b-town-dawn.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people, no figures at all. EXTREME CLOSE-UP from a steep low angle, filling the frame with the upper part of the same white Baroque cathedral as in the reference pictures: the great ribbed dome with its lantern and gilded cross and the top of one bell tower, carved white stone, snow lying on the cornices, statues of saints and icicles on the ledges, while the rising sun bursts out from right behind the edge of the dome: a blinding golden star of light, divine god-rays fanning across the pale morning sky, glittering snow dust in the beams, warm gold rim light on every stone edge. Majestic, sacred, like a Baroque altarpiece."
+  },
+  {
+   "id": "mv3-t5e-city-sunrise",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-s02-city-v1.jpg",
+    "design/mv-art/out/mv3-b-town-sunrise.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people, no figures at all. ULTRA-WIDE AERIAL VIEW from very high in the sky over the whole snow-covered old European city from the first reference picture, at the exact moment of sunrise: the sun just rising over the far snowy hills on the horizon, and its first golden rays sweep across the entire city at once, a wave of warm gold light flowing over thousands of snow-covered rooftops, chimneys with thin smoke, a frozen winding river and stone bridges, long blue shadows still in the narrow streets; the white domed cathedral small in the middle of the city catching the brightest light; broad god-rays through thin morning clouds and drifting mist. Breathtaking, hopeful, epic scale."
   }
  ],
  "redo": []
