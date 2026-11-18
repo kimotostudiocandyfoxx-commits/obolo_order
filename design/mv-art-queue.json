@@ -5885,6 +5885,22 @@
    ],
    "refs": [],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people. A single blank payment card (standard credit-card shape with rounded corners) made of luminous pearl-white and gold metal floats upright in mid-air, facing the viewer PERFECTLY STRAIGHT ON and level (front view, edges parallel to the frame, not tilted, not rotated), centred, about 70% of the picture width. The card face is COMPLETELY BLANK except for a small gold EMV chip on the left side: NO text, NO numbers, NO letters, NO logos, NO brand marks. Divine radiance: a brilliant golden halo glows behind the card, holy god-rays fan out in all directions, glittering golden dust and a few tiny white feathers drift around it, soft heavenly clouds and warm morning light behind; the card edges shine. Sacred, majestic and slightly humorous, like a Baroque altarpiece of a holy relic."
+  },
+  {
+   "id": "mv3-g2b-sing-pov",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3c-angel-sheet.jpg",
+    "design/mv-art/out/mv3c-angel.jpg",
+    "design/mv-art/out/mv3-f1-resolve.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. POINT OF VIEW of the queen cat sitting on her throne (the cat herself is NOT visible at all): the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) stands a few steps away on the golden clouds, facing the camera directly, seen from slightly below (a gentle low angle, majestic), and sings a solemn, heartfelt hymn to her: a serious, noble, earnest expression, brows calm, eyes steady and glistening with restrained tears, mouth only moderately open in song (not shouting), one hand pressed over his heart, the other reaching gently forward toward the camera; his great white wings spread wide behind him; heavenly god-rays burst from behind him, warm golden light, a few petals drifting. Grand and sacred like a Baroque altarpiece."
   }
  ],
  "redo": []
