@@ -5859,6 +5859,20 @@
     "design/mv-art/out/mv3r-eri.jpg"
    ],
    "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. Exactly these figures and no others, no duplicates: the angel, Eri. Bright heaven among shining golden clouds, warm sunlight, soft drifting light particles. WIDE SIDE VIEW, the same place and light as in the first reference picture: on the LEFT, the angel husband exactly as in the angel reference pictures (a gentle, youthful, slightly boyish face with soft rosy cheeks, curly golden-blond hair, normal human ears and NO animal ears, a powerfully muscular sculpted body like a classical statue, large white feathered wings, a white linen cloth around his waist, ONE big realistic fluffy golden-orange fox tail with a white tip) walks slowly toward the RIGHT across the soft glowing clouds, his wings half open, one hand starting to reach out, a tender smile with tears in his eyes; on the RIGHT, the wife Eri, the cat from the cat reference pictures: a real, photorealistic white cat with soft pale blue-grey tabby stripes and a pale lavender witch's hat with a small yellow flower, regal and dignified like a queen is sitting normally on the cloud like a real cat (NO throne, NO chair, no mantle), front paws together, looking up at him lovingly as he approaches; golden petals drifting between them, warm sunbeams. The moment just before he kneels to embrace her."
+  },
+  {
+   "id": "mv3-s31b-letter",
+   "always": false,
+   "w": 2048,
+   "h": 2048,
+   "size": [
+    1440,
+    1440
+   ],
+   "refs": [
+    "design/mv-art/out/mv3-s31-door.jpg"
+   ],
+   "prompt": "A museum-quality, extremely realistic classical European oil painting in the manner of the Old Masters (Caravaggio, Rubens, Bouguereau, Rembrandt): photorealistic anatomy, skin and fur, soft glazed layers, dramatic chiaroscuro, rich deep colors, visible fine brushwork and canvas texture, varnished. NOT anime, NOT cartoon, NOT illustration, NOT 3D. Square 1:1 composition painted edge to edge (no borders, no black bars); keep the important faces away from the very top and bottom edges. No text, no letters, no writing, no signature. No people. PERFECTLY OVERHEAD TOP-DOWN close-up: one large single sheet of cream laid writing paper lies completely flat and perfectly straight (upright portrait orientation, edges parallel to the frame, NOT tilted), filling most of the frame - about 64% of the picture width and 88% of its height, centred - on the snow-dusted, worn grey stone step at the entrance of the cathedral from the reference picture. The paper is COMPLETELY BLANK: no writing, no letters, no lines, no marks of any kind, evenly lit, smooth. Around it: a red wax seal with a cat paw print and a white goose quill lying on the stone just beside the lower right corner of the paper, glittering snow crystals on the stone, soft warm morning sunlight from the upper left, gentle shadows. Calm and tender."
   }
  ],
  "redo": []
