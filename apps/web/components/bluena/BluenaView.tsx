@@ -61,14 +61,14 @@ const FOLDERS: {
     glyph: 'goods',
     planet: '天王星',
     look: 'from-cyan-950 via-teal-950/70 to-stone-950',
-    empty: '月の工房で作ったグッズが、ここにならぶ。',
+    empty: '月で作ったグッズが、ここにならぶ。',
   },
   {
     id: 'neptune',
     glyph: 'game',
     planet: '海王星',
     look: 'from-blue-950 via-indigo-950 to-black',
-    empty: '月の工房で作ったゲームが、ここにしまわれる。',
+    empty: '月で作ったゲームが、ここにしまわれる。',
   },
   {
     id: 'pluto',
@@ -79,7 +79,7 @@ const FOLDERS: {
   },
 ];
 
-/** the atelier's kind for each folder (〔工房で新しく作る〕 opens with it chosen) */
+/** the atelier's kind for each folder (〔月で作る〕 opens with it chosen) */
 const MAKE: Record<FolderId, string> = {
   saturn: 'voice',
   jupiter: 'art',
@@ -197,7 +197,7 @@ function Works({ folder, onFolder }: { folder: FolderId; onFolder: (f: FolderId)
           <span className="flex items-center gap-2">
             <Link
               href={`/moon/atelier?kind=${MAKE[folder]}`}
-              aria-label="工房で新しく作る"
+              aria-label="月で作る"
               className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/30 bg-amber-100/10 text-amber-100"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>

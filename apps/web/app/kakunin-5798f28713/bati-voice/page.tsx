@@ -6,8 +6,8 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { pitchBuffer } from '@/lib/voice/pitch';
 
-const SCRIPT = 'ボクはバティ！ ネオ、今日はどんな曲を作る？ 月の工房で、待ってるね。';
-const LINES = ['ボクはバティ！ 今日はどんな曲を作る？', 'ネオ、それ最高じゃん！', '月の工房で、待ってるね。'];
+const SCRIPT = 'ボクはバティ！ ネオ、今日はどんな曲を作る？ 月で、待ってるね。';
+const LINES = ['ボクはバティ！ 今日はどんな曲を作る？', 'ネオ、それ最高じゃん！', '月で、待ってるね。'];
 const KEYS = [
   { key: 0, label: 'そのまま' },
   { key: 1, label: '+1' },

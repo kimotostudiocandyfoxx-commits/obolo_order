@@ -265,7 +265,7 @@ export function MercuryWorld({
               <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
             </svg>
             </span>
-            工房で新しく作る
+            月で作る
           </Link>
         ) : (
           <button onClick={() => go({ v: 'compose' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'compose' ? 'text-amber-200' : ''}`}>

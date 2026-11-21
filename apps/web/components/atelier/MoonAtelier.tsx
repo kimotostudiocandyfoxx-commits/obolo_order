@@ -38,7 +38,7 @@ const isKind = (k: string | null): k is MakeKind => !!k && KINDS.some((x) => x.i
  * 月の工房 (client decision 2026-11-21, docs/工房とブルーナ_設計.md §1.2・§3.2): Bati's workshop in the Moon temple.
  * 〔つくる〕 opens Bluena's gate, a square screen widens and you are inside. Bati asks「何を作る？」 with the marks;
  * what you make goes into Bluena by itself (the folder of its kind), and 〔公開する〕 projects it to its planet.
- * Coming from a planet's 〔工房で新しく作る〕 (?kind=song …) the kind is already chosen.
+ * Coming from a planet's 〔月で作る〕 (?kind=song …) the kind is already chosen.
  * Only you see what is in here, and making things does not use the day's 88 minutes (§13).
  */
 export function MoonAtelier() {
@@ -73,7 +73,7 @@ export function MoonAtelier() {
         </button>
         <Face face={partner.face} size={34} />
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="text-sm font-black tracking-wide text-amber-50">月の工房</p>
+          <p className="text-sm font-black tracking-wide text-amber-50">月で作る</p>
           {k && (
             <p className="flex items-center gap-1 text-[11px] text-sky-100/70">
               <Glyph id={k.glyph} label={false} className="h-3.5 w-3.5" />
@@ -97,7 +97,7 @@ export function MoonAtelier() {
 /** Bluena's gate opens and a square screen widens into the atelier (no new pictures: shapes and light only) */
 function Gate({ onSkip }: { onSkip: () => void }) {
   return (
-    <button onClick={onSkip} aria-label="工房に入る" className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03040b]">
+    <button onClick={onSkip} aria-label="月へ入る" className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03040b]">
       <span className="absolute h-[70vmin] w-[70vmin] animate-[atelier-glow_1.5s_ease-out_forwards] rounded-full bg-[radial-gradient(circle,rgba(140,210,255,0.55),rgba(80,140,255,0.15)_45%,transparent_70%)]" />
       {/* the square screen */}
       <span className="absolute aspect-square w-[62vmin] animate-[atelier-screen_1.5s_cubic-bezier(.6,0,.3,1)_forwards] rounded-3xl border border-sky-100/50 bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_70%)] shadow-[0_0_60px_rgba(120,200,255,0.5)]" />

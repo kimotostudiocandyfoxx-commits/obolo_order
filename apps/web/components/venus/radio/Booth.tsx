@@ -321,7 +321,7 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
               ブルーナの曲
             </div>
             {songs === null && <p className="py-4 text-center text-xs text-white/50">読みこみ中…</p>}
-            {songs?.length === 0 && <p className="py-4 text-center text-xs text-white/50">ブルーナに、まだ曲がない。月の工房で作るか、水星で〔ブルーナにしまう〕。</p>}
+            {songs?.length === 0 && <p className="py-4 text-center text-xs text-white/50">ブルーナに、まだ曲がない。月で作るか、水星で〔ブルーナにしまう〕。</p>}
             <div className="mt-2 max-h-52 space-y-1 overflow-y-auto">
               {songs?.map((s) => {
                 const blocked = s.from === 'mine' && s.allowRadio === false;
