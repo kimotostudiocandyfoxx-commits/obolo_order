@@ -49,6 +49,8 @@ import { LookService } from './look/look.service';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { LedgerService } from './wallet/ledger.service';
+import { ManaAdminController } from './wallet/mana-admin.controller';
+import { ManaCheckService } from './wallet/mana-check.service';
 import { WalletController } from './wallet/wallet.controller';
 
 /** One module for the demo; split per planet (spec §4.3) as the surface grows. */
@@ -59,6 +61,7 @@ import { WalletController } from './wallet/wallet.controller';
     AuthController,
     UsersController,
     WalletController,
+    ManaAdminController,
     BuddyController,
     MediaController,
     SaturnController,
@@ -88,6 +91,7 @@ import { WalletController } from './wallet/wallet.controller';
     AuthService,
     UsersService,
     LedgerService,
+    ManaCheckService,
     BuddyService,
     PictureService,
     CompassService,

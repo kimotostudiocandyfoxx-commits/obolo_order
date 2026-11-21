@@ -134,10 +134,19 @@ export const manaLedger = pgTable(
     refId: text('ref_id'),
     idempotencyKey: text('idempotency_key').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    /**
+     * Tamper evidence (client decision 2026-11-21, docs/工房とブルーナ_設計.md §15): each user's rows form a chain —
+     * seq 1, 2, 3 … and hash = SHA-256(this row's content + the previous row's hash). Rows written before the chain
+     * existed get their seq from the migration and their hash when first sealed (src/wallet/mana-chain.ts).
+     */
+    seq: integer('seq'),
+    prevHash: text('prev_hash'),
+    hash: text('hash'),
   },
   (t) => [
     uniqueIndex('mana_ledger_idem_uq').on(t.idempotencyKey),
     index('mana_ledger_user_idx').on(t.userId, t.createdAt),
+    uniqueIndex('mana_ledger_user_seq_uq').on(t.userId, t.seq),
   ],
 );
 
