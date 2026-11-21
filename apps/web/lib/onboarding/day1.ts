@@ -12,6 +12,7 @@ import type { Step } from './script';
  * Saved: name, choice1 (day 7 quotes it), f_d01_ticket.
  */
 export const DAY1: Step[] = [
+  { t: 'scene', id: 'D01-S000' },
   // D01-S000 招待信号 (M-R90/M-R93, client 2026-10-26): the luxury film — night scenes around the world, a golden
   // streak, the Earth's golden threads, the fragments, the seal; the envelope streams to the viewer as light.
   // Skippable; once seen it does not play again.
@@ -20,6 +21,7 @@ export const DAY1: Step[] = [
   { t: 'bgm', track: 'opening' },
   { t: 'motes', count: 36 }, // 金色の光の粒（演出）
   // no 「1日目」 after the film (client 2026-10-29)
+  { t: 'scene', id: 'D01-S001' },
   // D01-S001 招待状 (production 2026-10-19/20: the client's motions with their painted words taken out; words set in code)
   { t: 'video', motion: '1-c' }, // 光の粒がらせんを描いて集まり、封筒になる
   { t: 'caption', text: '招待信号を受信しました' },
@@ -30,6 +32,8 @@ export const DAY1: Step[] = [
   { t: 'se', sound: 'chime' }, // 文字がにじみ出る
   { t: 'invitation', fromMotion: true }, // 招待状の文字（招待者と「{inviter_message}」もカードの中）
   { t: 'action', label: '本部へ向かう' },
+
+  { t: 'scene', id: 'D01-S003' },
 
   // D01-S003 本部とMONBAN
   { t: 'se', sound: 'magic' }, // 文字が光って浮かび、消える
@@ -58,6 +62,8 @@ export const DAY1: Step[] = [
   { t: 'bgvideo', motion: 11 }, // 門の光の幕がほどける（M-R180）— その間に「門をくぐり…」（client 2026-10-20）
   { t: 'say', who: 'MONBAN', text: '門をくぐり、地球の神殿に行け…。' },
   { t: 'action', label: '門をくぐり、地球の神殿に向かう' },
+
+  { t: 'scene', id: 'D01-S006' },
 
   // D01-S006 OBOLON
   // MONBAN's theme fades slowly while we walk in, gone before OBOLON's light falls (client 2026-10-20)
@@ -98,6 +104,8 @@ export const DAY1: Step[] = [
   { t: 'video', motion: '27-c' }, // 光が戻る。金の光の輪を背負ったMONBANが、OBOLONの前に立っている
   { t: 'loop', motion: '28-l' },
   { t: 'say', who: 'MONBAN', text: 'OBOLON、それは喋りすぎだ。' },
+
+  { t: 'scene', id: 'D01-S012' },
 
   // D01-S012 宇宙へ行ってみるか？
   { t: 'cam', move: 'in', focus: '50% 30%' },

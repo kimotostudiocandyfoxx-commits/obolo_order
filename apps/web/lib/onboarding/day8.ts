@@ -256,7 +256,11 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……明日から、新しい星へ、、、ですね。' },
   { t: 'sprite', image: null },
   { t: 'bgm', track: null, fade: 4 }, // 音楽が、ゆっくり消えていく。白い光の中に、金色の輪だけが残る
+  // 〔テロップ：最初の旅、おわり〕 only once (M-R205): someone who stayed a resident saw it then
+  { t: 'branch', key: 'd8.f_d08_decide', cases: { '今は、住人のままでいる': 'fin-seen' }, otherwise: 'fin' },
+  { t: 'label', id: 'fin' },
   { t: 'caption', text: '最初の旅、おわり' },
+  { t: 'label', id: 'fin-seen' },
   // 〔完了画面：次のお話（天王星）まで24時間のカウントダウン〕 is the player's / TomorrowScreen's
   { t: 'end' },
 ];
