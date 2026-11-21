@@ -54,6 +54,7 @@ jobs:
           npm init -y >/dev/null && npm install --no-save --silent @anthropic-ai/sdk
           [ -z "$HAIKU_EFFORT" ] && HAIKU_EFFORT="$(grep -o 'effort=[a-z]*' "$RUN_FILE" 2>/dev/null | cut -d= -f2)"
           export HAIKU_EFFORT="${HAIKU_EFFORT:-low}"
+          export GEMINI_IN=0.30 GEMINI_OUT=2.50   # gemini-3.5-flash-lite (what gemini-flash-lite-latest served on 2026-11-21)
           GEMINI_API_KEY="$G" ANTHROPIC_API_KEY="$A" node scripts/bati-test/compare.mjs
       - name: Save the results
         if: always()
@@ -63,4 +64,5 @@ jobs:
           git add scripts/bati-test/results.json scripts/bati-test/report.md 2>/dev/null || true
           git diff --cached --quiet && exit 0
           git commit -m "Bati model test: results [skip ci]"
+          git reset -q --hard HEAD && git clean -qfd
           for i in 1 2 3 4; do git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep $((i * 5)); done

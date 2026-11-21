@@ -1,2 +1,2 @@
-run 1 (gemini only until obolo-anthropic-api-key exists)
+run 2 (gemini only until obolo-anthropic-api-key exists)
 effort=low
