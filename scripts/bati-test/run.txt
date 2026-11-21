@@ -1,2 +1,2 @@
-run 2 (gemini only until obolo-anthropic-api-key exists)
+run 3 (haiku + gemini)
 effort=low
