@@ -322,13 +322,13 @@ export const SEALS: Record<number, { q: string; answer?: string }> = {
 /** Cards whose words appear on Day 1. */
 export const DAY1_SEALS = [1, 7, 8];
 /** The words on the riddle cards by the journey day you are on (2 on Saturn, 3 on Jupiter, 6 on Mercury). */
-export function knownSealsOn(day: number): number[] {
-  // the book is handed over at the launch pit on day 2 (story M-R61): from day 3 the first three are known
-  return [...(day >= 3 ? DAY1_SEALS : []), ...(day >= 4 ? [2] : []), ...(day >= 5 ? [3] : []), ...(day >= 6 ? [6] : []), ...(day >= 7 ? [4] : [])];
+export function knownSealsOn(_day: number): number[] {
+  // the simple version has no riddles (M-R198: one mystery only, 「oboloとは何か」): the riddle book never shows
+  return [];
 }
-/** Answers that are open: 2 and 4 at the Sun for everyone (day 8), 1 with the Eclipse (draft 21) — so from day 9 on. */
-export function solvedSealsOn(day: number, ordered = true): number[] {
-  return day >= 9 ? (ordered ? [1, 2, 4] : [2, 4]) : [];
+/** No riddle answers either (M-R198). */
+export function solvedSealsOn(_day: number, _ordered = true): number[] {
+  return [];
 }
 
 function Card({ n, lit, size = 64, style }: { n: number; lit: boolean; size?: number; style?: React.CSSProperties }) {
