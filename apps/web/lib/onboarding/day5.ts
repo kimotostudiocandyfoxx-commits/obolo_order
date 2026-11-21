@@ -1,4 +1,5 @@
 import type { Step } from './script';
+import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 5 【木星 → 水星】 — script scenes D06-S001〜S008 (simple version, P03/c03.md・c04.md).
@@ -15,6 +16,7 @@ export const DAY5: Step[] = [
   { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: 'おはようダ。よく眠れたかダ？' },
   { t: 'say', who: '大根カイザー', text: '今日は水星ダ。ロケットに乗るダ！' },
+  ...kimorinBack(5), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。……もう、ロケットが待っていますね。' },
   { t: 'action', label: 'ロケットに乗る' },
 

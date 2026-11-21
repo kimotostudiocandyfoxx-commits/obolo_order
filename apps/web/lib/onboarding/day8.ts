@@ -1,4 +1,5 @@
 import type { Step } from './script';
+import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 8 【金星 → 地球 → 太陽】 — the simple version (M-R198〜M-R204; script P04/c02.md・c03.md, D08-S001〜S011).
@@ -35,6 +36,7 @@ export const DAY8: Step[] = [
   { t: 'label', id: 'morning-both' },
   { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
   { t: 'say', who: 'ボスG', text: '地球の結社に、帰れ。' },
+  ...kimorinBack(8), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: '……では、問いただしに参りましょう。この結社の、本当の狙いを。' },
   { t: 'action', label: 'ロケットで地球に帰る' },
   { t: 'sprite', image: null },

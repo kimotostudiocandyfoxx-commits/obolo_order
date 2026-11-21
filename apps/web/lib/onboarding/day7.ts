@@ -1,4 +1,5 @@
 import type { Step } from './script';
+import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 7 【火星 → 金星】 — the simple version (P04/c01v.md, D07V-S001〜S003; M-R190: Venus is the radio planet).
@@ -18,6 +19,7 @@ export const DAY7: Step[] = [
   { t: 'caption', text: '7日目' },
   { t: 'sprite', image: ['hipokin', 'kimorin-sun'] },
   { t: 'say', who: 'ヒポキン', text: 'おはよう。……次は、金星だ。' },
+  ...kimorinBack(7), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。' },
   { t: 'say', who: 'ヒポキン', text: 'ロケットに乗れ。' },
   { t: 'action', label: 'ロケットに乗る' },

@@ -1,4 +1,5 @@
 import type { Step } from './script';
+import { kimorinBack } from './kimorinBack';
 
 /**
  * DAY 6 【水星 → 火星】 — the simple version (M-R198〜M-R204; script P04/c01.md, D07-S001〜S007; S003 and S006 are cut).
@@ -20,6 +21,7 @@ export const DAY6: Step[] = [
   { t: 'still', image: 's/mercury-port' }, // 〔背景 mercury-island〕
   { t: 'sprite', image: ['freezy', 'kimorin-sun'] },
   { t: 'say', who: 'フリージー', text: 'おはよう。よく眠れたか？' },
+  ...kimorinBack(6), // SYS-S002: once, if he walked out
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。' },
   { t: 'say', who: 'フリージー', text: 'さあ、ロケットに乗れ。' },
   { t: 'action', label: 'ロケットに乗る' },

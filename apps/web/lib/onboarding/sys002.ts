@@ -37,6 +37,7 @@ export const SYS002: Step[] = [
   { t: 'goto', id: 'sys-price' },
 
   { t: 'label', id: 'sys-first' },
+  { t: 'set', key: 'f_ej_first_now', value: 'true' }, // KIMORIN walks out: next time he appears, he says so once
   { t: 'cam', move: 'in', focus: '50% 30%' },
   { t: 'say', who: 'MONBAN', text: '……{neo}。旅の途中で、Obolo Orderになりたいと、聞いた…。' },
   { t: 'say', who: 'MONBAN', text: '……Obolo Orderになると…お前の体から、マナが湧くようになる…。{bati}のマナも、切れなくなる…。' },

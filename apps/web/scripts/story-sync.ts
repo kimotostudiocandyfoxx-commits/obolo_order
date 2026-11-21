@@ -53,6 +53,8 @@ function lessonLines(day: number): L[] {
 
 const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts と各星の練習（SaturnLesson など）の台詞`, ''];
 let total = 0;
+// SYS-S002's last line (KIMORIN back from his mother) plays on whichever day he appears next (lib/onboarding/kimorinBack.ts)
+const ANY_DAY = new Set(['KIMORIN|' + norm('……母に言いましたが、聞く耳を持ちません。調査は、続けます。')]);
 for (let day = 1; day <= 8; day++) {
   const script: L[] = [];
   for (const s of scenes) {
@@ -77,8 +79,8 @@ for (let day = 1; day <= 8; day++) {
   for (const l of app) appKeys.set(key(l), (appKeys.get(key(l)) ?? 0) + 1);
   const scriptKeys = new Map<string, number>();
   for (const l of script) scriptKeys.set(key(l), (scriptKeys.get(key(l)) ?? 0) + 1);
-  const missing = script.filter((l) => !appKeys.has(key(l)));
-  const extra = app.filter((l) => !scriptKeys.has(key(l)));
+  const missing = script.filter((l) => !appKeys.has(key(l)) && !ANY_DAY.has(key(l)));
+  const extra = app.filter((l) => !scriptKeys.has(key(l)) && !ANY_DAY.has(key(l)));
   total += missing.length + extra.length;
   out.push(`## ${day}日目：台本 ${script.length}行／画面 ${app.length}行 — 画面にない ${missing.length}・台本にない ${extra.length}`, '');
   if (missing.length) out.push('台本にあって画面にない：', ...missing.map((l) => `- ${l.scene} ${l.who}「${l.text.replace(/\n/g, '／')}」`), '');

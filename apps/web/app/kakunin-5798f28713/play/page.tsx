@@ -17,6 +17,7 @@ import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stor
 import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 import { ReviewBar } from '@/components/review/ReviewBar';
 import { SYS002 } from '@/lib/onboarding/sys002';
+import { joinFlags } from '@/lib/onboarding/joinFlags';
 
 /**
  * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1][&gate=1: the seal E-0 every time] — plays one day's story from the start (or from its first
@@ -45,6 +46,18 @@ function PreviewPlay() {
   const [neo, setNeo] = useState<string | undefined>(undefined);
   const [timeUp, setTimeUp] = useState(false);
   const [scene, setScene] = useState<string | null>(null);
+  const [reviewStory, setReviewStory] = useState<Record<string, string>>({});
+  useEffect(() => {
+    // a run from day 1 starts fresh
+    if (day === 1)
+      try {
+        localStorage.removeItem(REVIEW_STORY);
+      } catch {
+        /* private window */
+      }
+    setReviewStory(loadReviewStory());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // logged in to the real API: the look and Bati are painted for real (Gemini) and saved to the account,
   // like a member's first journey; otherwise demo pictures drawn in the browser
   const { me, status, setMe } = useAuth();
@@ -160,7 +173,11 @@ function PreviewPlay() {
         onTimeUp={() => setEnded(true)}
         onNeoForm={(id) => setNeo(id)}
         onName={(n) => void onName(n)}
-        onEnd={() => setEnded(true)}
+        onEnd={(a) => {
+          // the review run remembers each day's answers for the next days (egg, joining early …), like the server does
+          saveReviewStory(Object.fromEntries(Object.entries(a ?? {}).map(([k, v]) => [`${sys ? 'sys' : `d${day}`}.${k}`, v])));
+          setEnded(true);
+        }}
         onScene={setScene}
         vars={{
           name,
@@ -177,7 +194,10 @@ function PreviewPlay() {
           lookStandee: live ? (me?.lookStandee ?? undefined) : undefined,
           kimorinStar: day >= 3,
           made: previewMade(day),
-          story: { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる' },
+          story: (() => {
+            const st = { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる', ...reviewStory };
+            return { ...st, ...joinFlags(st) };
+          })(),
         }}
       />
       <BackLink live={live} />
@@ -240,4 +260,21 @@ function Ended({ text, again, next }: { text: string; again?: string; next?: { h
       </Link>
     </main>
   );
+}
+
+/** the review run's answers (d<day>.<key>, sys.<key>), kept in this browser across the days */
+const REVIEW_STORY = 'obolo.review.story';
+function loadReviewStory(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(REVIEW_STORY) ?? '{}') as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+function saveReviewStory(a: Record<string, string>) {
+  try {
+    localStorage.setItem(REVIEW_STORY, JSON.stringify({ ...loadReviewStory(), ...a }));
+  } catch {
+    /* private window */
+  }
 }

@@ -229,7 +229,8 @@ export function Cast({
             react={speaking === name ? react : undefined}
             flip={mirror === name}
             // beside someone in the video ('' slot): a little smaller, kept inside the screen
-            style={real.length < names.length ? { left: `${names.length === 2 ? [30, 70][k] : [22, 50, 78][k] ?? 50}%` } : slot(k, names.length)}
+            // '@bati-weak' (out of mana, D08-S001): the body a little see-through
+            style={{ ...(real.length < names.length ? { left: `${names.length === 2 ? [30, 70][k] : [22, 50, 78][k] ?? 50}%` } : slot(k, names.length)), ...(name === '@bati-weak' ? { opacity: 0.5 } : {}) }}
             scale={real.length < names.length ? 0.74 : 1}
             className={className}
           />
@@ -292,7 +293,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
     height: `${spec.height}%`,
     transformOrigin: `50% ${spec.face * 100}%`,
     transform: `translateX(-50%) translateY(${bust ? `${-12 - (spec.face - 0.2) * 40}%` : '0'}) scale(${zoom})`,
-    opacity: hidden ? 0 : 1,
+    opacity: hidden ? 0 : ((style.opacity as number | undefined) ?? 1),
     transition: 'transform 320ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out, left 320ms ease-out',
   };
   const dim = lit ? 'none' : `brightness(${MOTION.dim.brightness}) saturate(${MOTION.dim.saturate})`;

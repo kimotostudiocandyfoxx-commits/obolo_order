@@ -1474,6 +1474,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           stamps={stampList}
           fresh={step.stamp}
           flip={step.flip}
+          member={v.story?.f_join_early === 'true'}
           onDone={() => {
             if (step.stamp) remember(`stamp.${step.stamp}`, '1');
             run(iRef.current + 1);

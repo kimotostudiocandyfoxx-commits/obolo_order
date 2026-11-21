@@ -450,9 +450,10 @@ export function stampsOn(day: number): StampId[] {
 /**
  * The tour ticket (M-R18): the ticket picture with four star-shaped stamp slots — Saturn, Jupiter,
  * Mercury, Mars (+ Venus, draft 21). `fresh` stamps one now; `flip` turns to the back: the star map, the
- * four planets joined by a gold line running on to Venus, and Uranus, Neptune locked 『Obolo Orderのみ』.
+ * four planets joined by a gold line running on to Venus, and Uranus, Neptune, Pluto locked 『Obolo Orderのみ』, with
+ * the Mars Theater's curtain by Mars (M-R188, M-R203).
  */
-export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; onDone: () => void }) {
+export function TicketCard({ stamps, fresh, flip, member = false, onDone }: { stamps: StampId[]; fresh?: StampId; flip?: boolean; /** Obolo Order already (joined early): the Mars Theater's curtain is open */ member?: boolean; onDone: () => void }) {
   const [pressed, setPressed] = useState(!fresh);
   const [back, setBack] = useState(false);
   useEffect(() => {
@@ -490,9 +491,21 @@ export function TicketCard({ stamps, fresh, flip, onDone }: { stamps: StampId[];
                   金星
                 </text>
               </g>
+              {/* the Mars Theater (M-R203): a small gold curtain by Mars, locked until Obolo Order */}
+              <g opacity={member ? 1 : 0.8}>
+                <path d="M232 168 h22 v18 h-22z" fill="#7f1d1d" stroke="#fcd34d" strokeWidth="1" />
+                <path d="M232 168 q5 9 0 18 M254 168 q-5 9 0 18" fill="none" stroke="#fcd34d" strokeWidth="1" />
+                <text x="243" y="181" textAnchor="middle" fontSize="9">
+                  {member ? '🔓' : '🔒'}
+                </text>
+                <text x="243" y="200" textAnchor="middle" fontSize="9" fill="#fde68a">
+                  火星シアター
+                </text>
+              </g>
               {[
                 [170, 70, '天王星'],
                 [95, 95, '海王星'],
+                [245, 50, '冥王星'],
               ].map(([x, y, t]) => (
                 <g key={String(t)} opacity=".75">
                   <circle cx={Number(x)} cy={Number(y)} r="9" fill="none" stroke="#a5b4fc" strokeDasharray="3 3" />
