@@ -3,6 +3,7 @@ import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   CHILD_AGE,
   RADIO_LIVE_STALE_SECONDS,
+  type BluenaKeptView,
   type CommsPerson,
   type CreateRadioShowBody,
   type RadioCue,
@@ -474,6 +475,36 @@ export class RadioService {
   }
 
   // --- Bluena: keep someone else's song ---------------------------------------------------------
+
+  /** your kept works (links): a removed / blocked one stays listed as not available */
+  async kept(userId: string): Promise<BluenaKeptView[]> {
+    const rows = await this.db.read
+      .select({ keptAt: bluenaSaves.createdAt, p: planetPosts, suspended: users.suspendedAt })
+      .from(bluenaSaves)
+      .innerJoin(planetPosts, eq(planetPosts.id, bluenaSaves.postId))
+      .innerJoin(users, eq(users.id, planetPosts.userId))
+      .where(eq(bluenaSaves.userId, userId))
+      .orderBy(desc(bluenaSaves.createdAt))
+      .limit(300);
+    const blocked = await this.blockedWith(userId);
+    const who = await this.people(rows.map((r) => r.p.userId));
+    return rows.map(({ keptAt, p, suspended }) => {
+      const available = !p.deletedAt && !suspended && !blocked.has(p.userId);
+      const o = who.get(p.userId);
+      return {
+        postId: p.id,
+        planet: p.planet as BluenaKeptView['planet'],
+        kind: p.kind as BluenaKeptView['kind'],
+        title: p.title,
+        url: available ? p.url : null,
+        posterUrl: available ? p.posterUrl : null,
+        by: o ? nameOf(o) : '',
+        byId: p.userId,
+        available,
+        keptAt: keptAt.toISOString(),
+      };
+    });
+  }
 
   async keep(userId: string, postId: string, on: boolean) {
     if (on) {

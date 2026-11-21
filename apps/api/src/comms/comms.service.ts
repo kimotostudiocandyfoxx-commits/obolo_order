@@ -232,7 +232,7 @@ export class CommsService {
       .deliver(pairKey(userId, peerId), { id: m.id, senderId: userId, recipientId: peerId, kind: m.kind, text: m.text, audioUrl: m.audioUrl, createdAt: m.createdAt.toISOString() })
       .catch((e) => this.log.warn(`firebase deliver failed: ${String(e)}`));
     // a notification on their devices (the text stays private: only who wrote)
-    void this.nameOf(userId).then((name) => this.push.notify(peerId, { title: `✉️ ${name}からメールが届いたよ`, body: 'ひらいて読んでみよう', url: '/earth?open=mail', tag: `dm-${userId}` }));
+    void this.nameOf(userId).then((name) => this.push.notify(peerId, { title: `✉️ ${name}からメールが届いたよ`, body: 'ひらいて読んでみよう', url: '/bluena?tab=comms', tag: `dm-${userId}` }));
     return { id: m.id, fromMe: true, kind: m.kind as 'text' | 'voice', text: m.text, audioUrl: m.audioUrl, createdAt: m.createdAt.toISOString() };
   }
 

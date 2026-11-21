@@ -1,5 +1,6 @@
 import {
   RADIO_LIVE_STALE_SECONDS,
+  type BluenaKeptView,
   type CreateRadioShowBody,
   type RadioDeckSong,
   type RadioHome,
@@ -1493,6 +1494,17 @@ export class DemoApi implements Api {
 
   async reportRadio(_body: RadioReportBody) {
     await sleep(300);
+  }
+
+  async bluenaKept(): Promise<BluenaKeptView[]> {
+    const viewer = this.uid();
+    const keep = this.s.bluenaKeeps?.[viewer] ?? [];
+    return keep.map((id) => {
+      const p = (this.s.pposts ?? []).find((x) => x.id === id);
+      return p
+        ? { postId: id, planet: p.planet as BluenaKeptView['planet'], kind: p.kind, title: p.title, url: p.url, posterUrl: p.posterUrl, by: this.pAuthor(p.owner).displayName, byId: p.owner, available: true, keptAt: now() }
+        : { postId: id, planet: 'mercury', kind: 'song', title: '', url: null, posterUrl: null, by: '', byId: '', available: false, keptAt: now() };
+    });
   }
 
   async keepInBluena(postId: string, on: boolean) {

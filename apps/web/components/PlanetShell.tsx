@@ -4,6 +4,7 @@ import { PLANETS, type PlanetId } from '@obolo/shared';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useI18n } from '@/lib/i18n/client';
+import { BluenaEntry } from './bluena/BluenaEntry';
 import { LangToggle } from './LangToggle';
 import { ManaChip } from './ManaChip';
 import { PlanetSphere } from './PlanetSphere';
@@ -44,6 +45,7 @@ export function PlanetShell({
             <div className="truncate text-[15px] font-bold">{m.planets[id].name}</div>
             <div className="truncate text-[11px] text-white/55">{m.planets[id].role}</div>
           </div>
+          <BluenaEntry />
           <ManaChip />
           <LangToggle />
         </div>

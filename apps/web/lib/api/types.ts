@@ -1,4 +1,4 @@
-import type { CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -301,4 +301,6 @@ export interface Api {
   reportRadio(body: RadioReportBody): Promise<void>;
   /** 〔ブルーナにしまう〕 someone else's song (a Mercury post) */
   keepInBluena(postId: string, on: boolean): Promise<{ kept: boolean }>;
+  /** Bluena 〔しまった作品〕: your kept works (links) */
+  bluenaKept(): Promise<BluenaKeptView[]>;
 }

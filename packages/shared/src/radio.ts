@@ -142,3 +142,21 @@ export type RadioHome = {
   live: RadioLiveView[];
   shows: RadioShowView[];
 };
+
+/**
+ * Bluena 〔しまった作品〕 (docs/工房とブルーナ_設計.md §8): someone else's work kept as a link. When the maker removed
+ * it, made it private or it was stopped after a report, `available` is false and the app shows 「今は聴けません」.
+ */
+export type BluenaKeptView = {
+  postId: string;
+  planet: 'mercury' | 'mars';
+  kind: 'song' | 'video';
+  title: string;
+  /** null while it cannot be played */
+  url: string | null;
+  posterUrl: string | null;
+  by: string;
+  byId: string;
+  available: boolean;
+  keptAt: string;
+};

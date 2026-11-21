@@ -153,7 +153,7 @@ function Home() {
       <InviteCard />
       {/* M-R175: dachi only with people one really knows — the desk's second envelope */}
       <DachiLinkCard />
-      <CommsTiles />
+      <CommsTiles phoneOnly />
       <div className="grid grid-cols-2 gap-3">
         <FeatureTile icon="🎙️" title={m.earth.voice} hint={m.earth.voiceHint} />
       </div>

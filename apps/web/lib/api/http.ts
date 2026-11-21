@@ -536,6 +536,9 @@ export class HttpApi implements Api {
   reportRadio(body: Parameters<Api['reportRadio']>[0]) {
     return this.req<void>('POST', '/venus/report', body);
   }
+  bluenaKept() {
+    return this.req<Awaited<ReturnType<Api['bluenaKept']>>>('GET', '/bluena/kept');
+  }
   keepInBluena(postId: string, on: boolean) {
     return this.req<{ kept: boolean }>('POST', `/bluena/keep/${postId}`, { on });
   }

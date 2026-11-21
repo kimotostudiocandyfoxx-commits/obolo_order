@@ -16,7 +16,7 @@ import { disablePush, enablePush, pushState, type PushState } from '@/lib/push';
  * Firebase (or by checking every few seconds until it is set up); calls carry their audio through
  * Agora (or ring and connect in demo mode). No counts anywhere: unread is a dot.
  */
-export function CommsTiles() {
+export function CommsTiles({ phoneOnly = false }: { phoneOnly?: boolean } = {}) {
   const [status, setStatus] = useState<CommsStatus | null>(null);
   const [open, setOpen] = useState<'mail' | 'phone' | null>(null);
   const [call, setCall] = useState<{ view: CallView; join?: CallJoin } | null>(null);
@@ -44,7 +44,8 @@ export function CommsTiles() {
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
-        <Tile icon="✉️" title="メール" hint="ダチとメッセージ（声でも送れる）" locked={locked} dot={anyUnread} onClick={() => setOpen('mail')} />
+        {/* 2026-11-21: mail lives in Bluena's 〔通信〕 now (M-R194); Earth keeps the phone */}
+        {!phoneOnly && <Tile icon="✉️" title="メール" hint="ダチとメッセージ（声でも送れる）" locked={locked} dot={anyUnread} onClick={() => setOpen('mail')} />}
         <Tile icon="📞" title="電話" hint="ダチと声で話す" locked={locked} onClick={() => setOpen('phone')} />
       </div>
       {!locked && <PushToggle />}
@@ -424,6 +425,56 @@ function FindFriend({ onChange }: { onChange: () => void }) {
 }
 
 const NO_FRIENDS = 'まだダチがいません。上の「＋ ダチをさがす」で相手のユーザーIDをさがしてフォローし、相手もフォローしかえすとダチになります。メールと電話はダチとだけできます。';
+
+/**
+ * Bluena 〔通信〕 (client decision 2026-11-21, M-R194): the talks with your ダチ, reachable from any planet. The
+ * contacts are listed in place; a talk opens over the screen. Opening it never uses the day's 88 minutes.
+ */
+export function BluenaComms() {
+  const [status, setStatus] = useState<CommsStatus | null | undefined>(undefined);
+  const [contacts, reload] = useContacts();
+  const [peer, setPeer] = useState<CommsContact | null>(null);
+  useEffect(() => {
+    getApi()
+      .commsStatus()
+      .then(setStatus)
+      .catch(() => setStatus(null));
+  }, []);
+  if (status === undefined) return <p className="py-10 text-center text-sm text-white/50">ひらいています…</p>;
+  if (!status?.open) return <p className="px-4 py-10 text-center text-sm leading-relaxed text-white/60">ダチとのやり取りは、Obolo Order になるとひらくよ</p>;
+  return (
+    <div>
+      <FindFriend onChange={reload} />
+      {contacts === null && <p className="py-10 text-center text-sm text-white/50">ひらいています…</p>}
+      {contacts?.length === 0 && <p className="px-4 py-10 text-center text-sm leading-relaxed text-white/60">{NO_FRIENDS}</p>}
+      {contacts?.map((c) => (
+        <button key={c.id} onClick={() => setPeer(c)} className="flex w-full items-center gap-3 rounded-2xl px-2 py-2.5 text-left hover:bg-white/5">
+          <Face p={c} size={46} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-bold">{nameOf(c)}</p>
+            <p className="truncate text-xs text-white/55">{c.lastText ?? 'メッセージを送ってみよう'}</p>
+          </div>
+          {c.unread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-sky-300 shadow-[0_0_8px_rgba(140,220,255,0.9)]" aria-label="新しいやり取り" />}
+        </button>
+      ))}
+      <BlockedList onChange={reload} />
+      {peer && (
+        <Conversation
+          status={status}
+          peer={peer}
+          onBack={() => {
+            setPeer(null);
+            reload();
+          }}
+          onBlocked={() => {
+            setPeer(null);
+            reload();
+          }}
+        />
+      )}
+    </div>
+  );
+}
 
 function MailScreen({ status, onClose }: { status: CommsStatus; onClose: () => void }) {
   const [contacts, reload] = useContacts();

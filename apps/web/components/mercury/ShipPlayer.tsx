@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArtBackdrop, pickShip, Vessel } from '@/components/art/Stage';
+import { Glyph } from '@/components/bluena/glyphs';
+import { getApi } from '@/lib/api';
 import { ReplierFaces, RepliesSheet } from '@/components/planets/RepliesSheet';
 import type { PlanetAuthor } from '@obolo/shared';
 import { pauseAudio, resumeAudio, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
@@ -45,6 +47,13 @@ export function ShipPlayer({
   const song = flyer.songs[wrap(k, flyer.songs.length)];
   const drag = useRef<{ x: number; dx: number } | null>(null);
   const [dx, setDx] = useState(0);
+  const [kept, setKept] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    getApi()
+      .bluenaKept()
+      .then((list) => setKept(new Set(list.map((k) => k.postId))))
+      .catch(() => undefined);
+  }, []);
 
   const toFlyer = (d: number) => {
     setDir(d);
@@ -228,6 +237,30 @@ export function ShipPlayer({
             💬
             <ReplierFaces who={repliers} />
           </button>
+          {/* 〔ブルーナにしまう〕 someone else's song (2026-11-21, §8): a link in your Bluena, nobody sees who kept what */}
+          {song.postId && !flyer.isMe && (
+            <button
+              onClick={() => {
+                const on = !kept.has(song.postId!);
+                void getApi()
+                  .keepInBluena(song.postId!, on)
+                  .then(() =>
+                    setKept((cur) => {
+                      const next = new Set(cur);
+                      if (on) next.add(song.postId!);
+                      else next.delete(song.postId!);
+                      return next;
+                    }),
+                  )
+                  .catch(() => undefined);
+              }}
+              aria-label={kept.has(song.postId) ? 'ブルーナから出す' : 'ブルーナにしまう'}
+              aria-pressed={kept.has(song.postId)}
+              className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border backdrop-blur ${kept.has(song.postId) ? 'border-amber-300 bg-amber-300/20 text-amber-200' : 'border-white/35 bg-black/40 text-white/80'}`}
+            >
+              <Glyph id="kept" label={false} className="h-5 w-5" />
+            </button>
+          )}
           {onOwner && (
             <button
               onClick={() => onOwner(flyer)}

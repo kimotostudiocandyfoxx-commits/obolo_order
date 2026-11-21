@@ -113,6 +113,11 @@ export class RadioController {
 export class BluenaController {
   constructor(private readonly radio: RadioService) {}
 
+  @Get('kept')
+  kept(@UserId() userId: string) {
+    return this.radio.kept(userId);
+  }
+
   @Post('keep/:postId')
   keep(@UserId() userId: string, @Param('postId', new ParseUUIDPipe()) postId: string, @Body() body: unknown) {
     return this.radio.keep(userId, postId, parseBody(OnBody, body).on);

@@ -1,5 +1,6 @@
 'use client';
 
+import { BluenaEntry } from '@/components/bluena/BluenaEntry';
 import { DemoBanner } from '@/components/DemoBanner';
 import { HomeGate } from '@/components/HomeGate';
 import { LangToggle } from '@/components/LangToggle';
@@ -27,6 +28,7 @@ function SolarHome({ hint, legend, tagline }: { hint: string; legend: string; ta
         </h1>
         <div className="flex items-center gap-2">
           <Lap2Chip />
+          <BluenaEntry />
           <OshiShelf />
           <ManaChip />
           <LangToggle />
