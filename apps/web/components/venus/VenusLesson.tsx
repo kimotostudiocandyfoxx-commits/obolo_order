@@ -18,8 +18,8 @@ import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
  * rhythm into their own song — one step at a time (self) or 〔おまかせ〕 (the desk builds the set, they press
  * 〔つなぐ〕) — the planet turns at the song's speed, their art fills the booth glass with the MV looping round
  * it; a kororin is dropped at the seam. At night the first show: 〔⏺ 収録〕, a word into the mic (the music
- * ducks while they talk: lib/venus/booth.ts), their song, 〔■ 止める〕; then 〔🎤 見せる〕 → 〔ダチへ〕 →
- * 〔🎤 届ける〕 (ON AIR lights up), or keep it in Bluena. No mana. Only the step that comes next glows.
+ * ducks while they talk: lib/venus/booth.ts), their song, 〔■ 止める〕; then 〔公開する〕 → 〔ダチへ〕 →
+ * 〔公開する〕 (ON AIR lights up), or keep it in Bluena. No mana. Only the step that comes next glows.
  * Character lines are written `who: '<alias>', text: '…'` so scripts/story-sync.ts checks them against the script.
  */
 type Who = 'bossg' | 'hatg' | 'longg' | 'kimorin' | 'guide';
@@ -51,8 +51,8 @@ type Step =
   | { k: 'stop' } // the song ends; the planet slowly stops
   | { k: 'night' }
   | { k: 'rec'; l: Line } // 〔⏺ 収録〕 → talk → the song → 〔■ 止める〕 (the line comes up once recording starts)
-  | { k: 'show' } // 〔🎤 見せる〕〔今は、Bluenaにしまっておく〕
-  | { k: 'post' } // 行き先〔ダチへ〕 → 〔🎤 届ける〕
+  | { k: 'show' } // 〔公開する〕〔今は、Bluenaにしまっておく〕
+  | { k: 'post' } // 行き先〔ダチへ〕 → 〔公開する〕 (M-R206)
   | { k: 'end' };
 const L = (l: Line): Step => ({ k: 'line', l });
 /** a 〔画面〕 note: words on the screen, no speaker */
@@ -96,7 +96,7 @@ const AFTER: Step[] = [
   G('番組の絵は、木星のアート。ループ画像は、MVのひとこま（あとで変えられます）'),
   G('Bluenaの金星のフォルダにしまいました。{neo}だけが聴けます'),
   L({ who: 'bossg', text: 'いま作った番組を、誰に聴かせるかは、自分で決めろ。' }),
-  G('〔🎤 見せる〕を押すと、いまの番組（声と曲）が、Bluenaから金星の空へ映り、ダチ（{inviter}とKIMORIN⭐︎）の夜空に、ラジオとして88時間流れます。88時間たつと、あなたの放送ブースの記録に戻ります。押さなければ、Bluenaの中だけにあって、どこにも送られません'),
+  G('〔公開する〕を押すと、いまの番組（声と曲）が、Bluenaから金星の空へ映り、ダチ（{inviter}とKIMORIN⭐︎）の夜空に、ラジオとして88時間流れます。88時間たつと、あなたの放送ブースの記録に戻ります。押さなければ、Bluenaの中だけにあって、どこにも送られません'),
   { k: 'show' },
 ];
 /**
@@ -146,7 +146,7 @@ export function VenusLesson({
   kororins: string[];
   neo: string;
   inviter: string;
-  /** 〔🎤 届ける〕: the show (your word and your song; its picture = your art) goes to the dachi's night sky */
+  /** 〔公開する〕: the show (your word and your song; its picture = your art) goes to the dachi's night sky */
   deliver?: (body: { kind: 'stage'; title?: string; text?: string; url?: string; posterUrl?: string }) => Promise<void>;
   onDone: (r: { shown: boolean; mode: 'self' | 'auto' }) => void;
   /** the back booth of the second journey (your song into your song); `self` = mixed by hand on the first journey */
@@ -696,7 +696,7 @@ export function VenusLesson({
                 next();
               }}
             >
-              🎤 見せる
+              公開する
             </Big>
             <Soft
               onClick={() => {
@@ -729,7 +729,7 @@ export function VenusLesson({
                 setTimeout(next, 1400);
               }}
             >
-              🎤 届ける
+              公開する
             </Big>
           </div>
         </Panel>
