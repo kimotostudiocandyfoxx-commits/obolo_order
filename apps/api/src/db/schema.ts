@@ -11,6 +11,7 @@ import { sql } from 'drizzle-orm';
 import type { AtelierLayout, PuniLook } from '@obolo/shared';
 import {
   bigint,
+  boolean,
   check,
   customType,
   date,
@@ -501,9 +502,107 @@ export const songs = pgTable(
     mixUrl: text('mix_url').notNull(),
     seconds: real('seconds').notNull(),
     savedAt: timestamp('saved_at', { withTimezone: true }),
+    /** the maker lets radio / DJ shows in this app play it (on by default, 2026-11-21) */
+    allowRadio: boolean('allow_radio').notNull().default(true),
     ...timestamps,
   },
   (t) => [index('songs_user_idx').on(t.userId, t.createdAt)],
+);
+
+/**
+ * Bluena 〔ブルーナにしまう〕 (client decision 2026-11-21): someone else's published work kept in your
+ * Bluena — a link, not a copy (when the maker removes it, it shows "今は聴けません"). Nobody sees who
+ * kept what (no counts).
+ */
+export const bluenaSaves = pgTable(
+  'bluena_saves',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    /** a planet post (mercury: song) */
+    postId: uuid('post_id')
+      .notNull()
+      .references(() => planetPosts.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.postId] }), index('bluena_saves_user_idx').on(t.userId, t.createdAt)],
+);
+
+/** Venus radio: a recorded show (or the recording a live show left). private = Bluena's Venus folder. */
+export const radioShows = pgTable(
+  'radio_shows',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    mediaId: uuid('media_id').references(() => mediaObjects.id),
+    title: text('title').notNull(),
+    audioUrl: text('audio_url').notNull(),
+    thumbUrl: text('thumb_url'),
+    loop: text('loop').notNull().default('drift'),
+    seconds: real('seconds').notNull(),
+    /** the songs that went on air: [{ at, songId, title, by, byId }] */
+    cuesJson: jsonb('cues_json').$type<Record<string, unknown>[]>().notNull(),
+    /** recorded | live */
+    source: text('source').notNull().default('recorded'),
+    liveId: uuid('live_id'),
+    /** private | public */
+    status: text('status').notNull().default('private'),
+    publishedAt: timestamp('published_at', { withTimezone: true }),
+    /** taken down by the team after a report */
+    removedAt: timestamp('removed_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [index('radio_shows_user_idx').on(t.userId, t.createdAt), index('radio_shows_public_idx').on(t.status, t.publishedAt)],
+);
+
+/** Venus radio: a live (voice-only) show. ORDER members only at first. */
+export const radioLives = pgTable(
+  'radio_lives',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    title: text('title').notNull(),
+    thumbUrl: text('thumb_url'),
+    loop: text('loop').notNull().default('drift'),
+    /** live | ended | stopped (by the team) */
+    status: text('status').notNull().default('live'),
+    nowJson: jsonb('now_json').$type<Record<string, unknown> | null>(),
+    /** test | realtime */
+    transport: text('transport').notNull().default('test'),
+    /** the host's last word (a live show nobody hosts any more ends by itself) */
+    beatAt: timestamp('beat_at', { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+    endedAt: timestamp('ended_at', { withTimezone: true }),
+    stoppedReason: text('stopped_reason'),
+  },
+  (t) => [index('radio_lives_status_idx').on(t.status, t.startedAt), index('radio_lives_user_idx').on(t.userId, t.startedAt)],
+);
+
+/** Venus radio: listeners' short comments and song requests during a live show. */
+export const radioMessages = pgTable(
+  'radio_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    liveId: uuid('live_id')
+      .notNull()
+      .references(() => radioLives.id),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    /** comment | request */
+    kind: text('kind').notNull(),
+    text: text('text').notNull().default(''),
+    postId: uuid('post_id').references(() => planetPosts.id),
+    /** the host (or the team) hid it */
+    hiddenAt: timestamp('hidden_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index('radio_messages_live_idx').on(t.liveId, t.createdAt)],
 );
 
 /**
@@ -578,9 +677,11 @@ export const userReports = pgTable(
     targetUserId: uuid('target_user_id')
       .notNull()
       .references(() => users.id),
-    /** mail | call | person */
+    /** mail | call | person | radio-show | radio-live | radio-message */
     kind: text('kind').notNull(),
-    /** mean | scary | other */
+    /** the reported show / live / message (radio) */
+    targetId: uuid('target_id'),
+    /** mean | scary | other (radio: also song = a song that should not be on air) */
     reason: text('reason').notNull(),
     note: text('note').notNull().default(''),
     /** open | reviewed */

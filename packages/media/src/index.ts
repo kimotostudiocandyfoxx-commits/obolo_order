@@ -15,7 +15,7 @@ export interface BunnyStorageConfig {
   cdnHost: string;
 }
 
-export type MediaKind = 'voice' | 'image' | 'audio' | 'video-thumb' | 'avatar' | 'bati' | 'photo' | 'video' | 'poster';
+export type MediaKind = 'voice' | 'image' | 'audio' | 'video-thumb' | 'avatar' | 'bati' | 'photo' | 'video' | 'poster' | 'show';
 
 const EXT_BY_MIME: Record<string, string> = {
   'audio/webm': 'webm',

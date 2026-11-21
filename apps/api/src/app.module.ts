@@ -36,6 +36,8 @@ import { JupiterService } from './jupiter/jupiter.service';
 import { MarsController } from './mars/mars.controller';
 import { PlanetPostsController } from './planets/planet-posts.controller';
 import { PlanetPostsService } from './planets/planet-posts.service';
+import { AdminRadioController, BluenaController, RadioController } from './radio/radio.controller';
+import { RadioService } from './radio/radio.service';
 import { MarsService } from './mars/mars.service';
 import { InternalJobsController, JobsController } from './jobs/jobs.controller';
 import { JobsService } from './jobs/jobs.service';
@@ -65,6 +67,9 @@ import { WalletController } from './wallet/wallet.controller';
     JupiterController,
     MarsController,
     PlanetPostsController,
+    RadioController,
+    BluenaController,
+    AdminRadioController,
     InvitesController,
     LookController,
     BillingController,
@@ -93,6 +98,7 @@ import { WalletController } from './wallet/wallet.controller';
     JupiterService,
     MarsService,
     PlanetPostsService,
+    RadioService,
     InvitesService,
     LookService,
     BillingService,

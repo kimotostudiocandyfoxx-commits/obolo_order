@@ -39,6 +39,15 @@ export class MediaService {
     return this.store(userId, 'voice', mime, body, requestOrigin);
   }
 
+  /** A Venus radio show's recording, kept as it was recorded (opus / aac from the booth). */
+  async uploadShow(userId: string, mimeHeader: string | undefined, file: string, requestOrigin: string) {
+    const mime = (mimeHeader ?? '').split(';')[0].trim().toLowerCase();
+    if (!(VOICE_MIME_TYPES as readonly string[]).includes(mime)) {
+      throw apiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, 'UNSUPPORTED_AUDIO', `Unsupported audio type: ${mime || 'none'}`);
+    }
+    return this.store(userId, 'show', mime, await readFile(file), requestOrigin);
+  }
+
   /** A photo (Jupiter roots etc.): re-encoded to WebP ≤ 1600 px before it is stored. */
   async uploadPhoto(userId: string, mimeHeader: string | undefined, file: string, requestOrigin: string) {
     const mime = (mimeHeader ?? '').split(';')[0].trim().toLowerCase();

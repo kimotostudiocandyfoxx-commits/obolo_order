@@ -1,4 +1,4 @@
-import type { CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -275,4 +275,28 @@ export interface Api {
   myInvites(): Promise<MyInviteView[]>;
   /** `message`: a few words of your own printed on the invitation (optional) */
   createInvite(email: string, message?: string): Promise<MyInviteView>;
+
+  // Venus — the radio planet (docs/工房とブルーナ_設計.md §9–10)
+  radioHome(): Promise<RadioHome>;
+  /** the booth: Bluena's songs that may go on air (Bluena = the DJ's USB stick) */
+  radioDeck(): Promise<RadioDeckSong[]>;
+  /** "radio / DJ OK" on one of your songs */
+  setSongRadio(songId: string, allow: boolean): Promise<{ allowRadio: boolean }>;
+  /** the recording of a show (POST /media/show) */
+  uploadShow(blob: Blob): Promise<{ id: string; url: string }>;
+  createRadioShow(body: CreateRadioShowBody): Promise<RadioShowView>;
+  /** your shows = Bluena's Venus folder */
+  myRadioShows(): Promise<RadioShowView[]>;
+  publishRadioShow(id: string, on: boolean): Promise<RadioShowView>;
+  removeRadioShow(id: string): Promise<void>;
+  radioShow(id: string): Promise<RadioShowView>;
+  startRadioLive(body: StartRadioLiveBody): Promise<RadioLiveView>;
+  radioLive(id: string): Promise<RadioLiveState>;
+  setRadioNow(id: string, now: RadioNowBody['now']): Promise<RadioLiveView>;
+  endRadioLive(id: string): Promise<RadioLiveView>;
+  radioMessage(id: string, body: RadioMessageBody): Promise<RadioMessageView>;
+  hideRadioMessage(liveId: string, messageId: string): Promise<void>;
+  reportRadio(body: RadioReportBody): Promise<void>;
+  /** 〔ブルーナにしまう〕 someone else's song (a Mercury post) */
+  keepInBluena(postId: string, on: boolean): Promise<{ kept: boolean }>;
 }

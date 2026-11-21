@@ -1,5 +1,5 @@
 import { Controller, Get, Headers, HttpStatus, Inject, NotFoundException, Param, ParseUUIDPipe, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
-import { MEDIA_POLICY } from '@obolo/shared';
+import { MEDIA_POLICY, RADIO_SHOW_MAX_BYTES } from '@obolo/shared';
 import type { Request, Response } from 'express';
 import { createWriteStream } from 'node:fs';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -67,6 +67,20 @@ export class MediaController {
     try {
       await receive(req, join(dir, 'in'), MEDIA_POLICY.video.maxUploadBytes);
       return await this.media.uploadVideo(userId, type, join(dir, 'in'), Number(max ?? MEDIA_POLICY.video.maxSeconds), `${req.protocol}://${req.get('host')}`);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  }
+
+  /** A Venus radio show's recording (Content-Type: audio/*, up to an hour). Streamed to a temp file. */
+  @Post('show')
+  @UseGuards(AuthGuard)
+  async show(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
+    await rateLimit(this.kv, `upload-show:${userId}`, 10, 3600);
+    const dir = await mkdtemp(join(tmpdir(), 'obolo-up-'));
+    try {
+      await receive(req, join(dir, 'in'), RADIO_SHOW_MAX_BYTES);
+      return await this.media.uploadShow(userId, type, join(dir, 'in'), `${req.protocol}://${req.get('host')}`);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

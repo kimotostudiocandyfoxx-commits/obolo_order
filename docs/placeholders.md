@@ -169,6 +169,17 @@
 | P-PWA-1 | ⚪ | Service Worker・Web Push | マニフェストのみ（ホーム画面追加は可能） |
 | P-BRAND-1 | 🟡 | ロゴ・アプリアイコン | 仮の SVG アイコン |
 
+## 5.5 金星ラジオ（2026-11-21）
+
+| ID | 状態 | 内容 | いまの仮 | 場所 |
+|---|---|---|---|---|
+| P-RADIO-1 | 🟡 | 収録の番組の長さの上限 | 1時間・80MBまで（運営が決める） | `packages/shared/src/radio.ts` |
+| P-RADIO-2 | 🔴 | 生配信の声を聴く人に届けるしくみ（例：Cloudflare Realtime） | `transport: 'test'`：ON AIR・いまの曲・コメント・リクエスト・通報・止めるは本物と同じに動くが、声はまだ届かない。配信サービスのアカウントと鍵（Secret Manager）がそろったら `realtime` につなぐ | `apps/api/src/radio/`、`apps/web/components/venus/radio/` |
+| P-RADIO-3 | 🟡 | 生配信を始めるには星への門（一日88分）が要る | 門の時間のしくみがアプリにまだないので、いまは時間で止めない（放送中に切らない決まりは満たしている） | `Booth.tsx` |
+| P-RADIO-4 | 🟡 | いまの曲の〔水星へ〕から、作った人の島へまっすぐ | 水星のトップへ行くだけ（島をリンクで開くしくみが水星にまだない） | `RadioWorld.tsx` |
+| P-RADIO-5 | 🟡 | 水星で公開する時の「ラジオ・DJで使われてOK」の切りかえ | 曲は最初からOK。放送ブースの曲の一覧で、オフの自分の曲だけ〔ラジオOKにする〕が出る。オフにする画面はブルーナの曲の画面で作る | `PUT /venus/songs/:id/radio` |
+| P-RADIO-6 | 🟡 | 運営の画面（生配信を止める・番組を下げる） | API だけ（`/admin/venus/...`、管理トークン）。通報は `user_reports` に kind `radio-*` で入る | `apps/api/src/radio/radio.controller.ts` |
+
 ## 6. 見た目だけの惑星（10/10 デモ）
 
 | ID | 状態 | 内容 |

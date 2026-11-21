@@ -446,4 +446,57 @@ export class HttpApi implements Api {
   createInvite(email: string, message?: string) {
     return this.req<Awaited<ReturnType<Api['createInvite']>>>('POST', '/invites', { email, ...(message?.trim() ? { message: message.trim() } : {}) });
   }
+
+  // Venus — radio
+  radioHome() {
+    return this.req<Awaited<ReturnType<Api['radioHome']>>>('GET', '/venus');
+  }
+  radioDeck() {
+    return this.req<Awaited<ReturnType<Api['radioDeck']>>>('GET', '/venus/deck');
+  }
+  setSongRadio(songId: string, allow: boolean) {
+    return this.req<{ allowRadio: boolean }>('PUT', `/venus/songs/${songId}/radio`, { allow });
+  }
+  uploadShow(blob: Blob) {
+    return this.req<{ id: string; url: string }>('POST', '/media/show', undefined, blob);
+  }
+  createRadioShow(body: Parameters<Api['createRadioShow']>[0]) {
+    return this.req<Awaited<ReturnType<Api['createRadioShow']>>>('POST', '/venus/shows', body);
+  }
+  myRadioShows() {
+    return this.req<Awaited<ReturnType<Api['myRadioShows']>>>('GET', '/venus/shows/mine');
+  }
+  publishRadioShow(id: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['publishRadioShow']>>>('POST', `/venus/shows/${id}/publish`, { on });
+  }
+  removeRadioShow(id: string) {
+    return this.req<void>('DELETE', `/venus/shows/${id}`);
+  }
+  radioShow(id: string) {
+    return this.req<Awaited<ReturnType<Api['radioShow']>>>('GET', `/venus/shows/${id}`);
+  }
+  startRadioLive(body: Parameters<Api['startRadioLive']>[0]) {
+    return this.req<Awaited<ReturnType<Api['startRadioLive']>>>('POST', '/venus/lives', body);
+  }
+  radioLive(id: string) {
+    return this.req<Awaited<ReturnType<Api['radioLive']>>>('GET', `/venus/lives/${id}`);
+  }
+  setRadioNow(id: string, now: Parameters<Api['setRadioNow']>[1]) {
+    return this.req<Awaited<ReturnType<Api['setRadioNow']>>>('POST', `/venus/lives/${id}/now`, { now });
+  }
+  endRadioLive(id: string) {
+    return this.req<Awaited<ReturnType<Api['endRadioLive']>>>('POST', `/venus/lives/${id}/end`);
+  }
+  radioMessage(id: string, body: Parameters<Api['radioMessage']>[1]) {
+    return this.req<Awaited<ReturnType<Api['radioMessage']>>>('POST', `/venus/lives/${id}/messages`, body);
+  }
+  hideRadioMessage(liveId: string, messageId: string) {
+    return this.req<void>('POST', `/venus/lives/${liveId}/messages/${messageId}/hide`);
+  }
+  reportRadio(body: Parameters<Api['reportRadio']>[0]) {
+    return this.req<void>('POST', '/venus/report', body);
+  }
+  keepInBluena(postId: string, on: boolean) {
+    return this.req<{ kept: boolean }>('POST', `/bluena/keep/${postId}`, { on });
+  }
 }

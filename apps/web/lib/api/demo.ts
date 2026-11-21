@@ -1,4 +1,16 @@
 import {
+  RADIO_LIVE_STALE_SECONDS,
+  type CreateRadioShowBody,
+  type RadioDeckSong,
+  type RadioHome,
+  type RadioLiveState,
+  type RadioLiveView,
+  type RadioMessageBody,
+  type RadioMessageView,
+  type RadioNowBody,
+  type RadioReportBody,
+  type RadioShowView,
+  type StartRadioLiveBody,
   type DeliveryView,
   EMPTY_ATELIER,
   type AtelierLayout,
@@ -104,7 +116,41 @@ interface DemoState {
   ateliers?: Record<string, AtelierLayout>;
   /** ひろば (みんな map) and who joined them */
   plazas?: { id: string; name: string; icon: string; members: string[]; base: number; owner?: string }[];
+  /** Venus radio (this browser only) */
+  radioShows?: (Omit<RadioShowView, 'host' | 'mine'> & { owner: string })[];
+  radioLives?: (Omit<RadioLiveView, 'host' | 'mine'> & { owner: string; beat: number })[];
+  radioMessages?: (Omit<RadioMessageView, 'from' | 'mine'> & { liveId: string; owner: string; hidden?: boolean })[];
+  radioPerm?: Record<string, boolean>;
+  bluenaKeeps?: Record<string, string[]>;
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
+}
+
+/** Venus radio samples: the gorilla trio's shows on the demo Venus (their own pictures, no new art). */
+const RADIO_RESIDENTS: Record<string, { handle: string; name: string; pic: string }> = {
+  'seed-bossg': { handle: 'bossg', name: 'ボスG', pic: '/onboarding/bossg-face.webp' },
+  'seed-hatg': { handle: 'hatg', name: 'ハットG', pic: '/onboarding/hatg-face.webp' },
+  'seed-longg': { handle: 'longg', name: 'ロングG', pic: '/onboarding/longg-face.webp' },
+};
+const RADIO_SAMPLE_SONGS: RadioDeckSong[] = [
+  { id: 'sample-kimorin-1', title: 'KIMORIN⭐︎の水星の歌', url: '/onboarding/kimorin-mercury-1.m4a', bpm: null, seconds: 0, by: 'KIMORIN⭐︎', byId: null, from: 'sample' },
+  { id: 'sample-kimorin-2', title: 'KIMORIN⭐︎の推しの歌', url: '/onboarding/kimorin-mercury-2.m4a', bpm: null, seconds: 0, by: 'KIMORIN⭐︎', byId: null, from: 'sample' },
+  { id: 'sample-venus', title: '金星のテーマ', url: '/onboarding/bgm-venus.m4a', bpm: null, seconds: 0, by: 'ゴリラ3人組', byId: null, from: 'sample' },
+  { id: 'sample-practice', title: '練習用のリズム', url: '/onboarding/bgm-dj-practice.m4a', bpm: null, seconds: 0, by: 'OBOLO', byId: null, from: 'sample' },
+];
+const RADIO_DEMO_VISITS: { who: string; kind: 'comment' | 'request'; text: string; song?: { postId: string; title: string; by: string } }[] = [
+  { who: 'seed-hatg', kind: 'comment', text: 'きこえてるぜ〜！' },
+  { who: 'seed-longg', kind: 'request', text: 'つぎ、これかけて', song: { postId: 'sample-kimorin-2', title: 'KIMORIN⭐︎の推しの歌', by: 'KIMORIN⭐︎' } },
+  { who: 'seed-bossg', kind: 'comment', text: 'いい声だ。バナナがすすむ' },
+];
+function seedRadioShows(): NonNullable<DemoState['radioShows']> {
+  const at = (h: number) => new Date(Date.now() - h * 3600_000).toISOString();
+  return [
+    { id: crypto.randomUUID(), title: 'ボスGの真夜中バナナ放送', thumbUrl: '/onboarding/bossg.webp', loop: 'drift', audioUrl: '/onboarding/bgm-venus.m4a', seconds: 95, cues: [{ at: 4, songId: 'sample-venus', title: '金星のテーマ', by: 'ゴリラ3人組', byId: null }], status: 'public', source: 'recorded', createdAt: at(5), publishedAt: at(5), owner: 'seed-bossg' },
+    { id: crypto.randomUUID(), title: 'ロングGの歯みがきラジオ', thumbUrl: '/onboarding/longg.webp', loop: 'ripple', audioUrl: '/onboarding/bgm-dj-practice.m4a', seconds: 60, cues: [{ at: 0, songId: 'sample-practice', title: '練習用のリズム', by: 'OBOLO', byId: null }], status: 'public', source: 'live', createdAt: at(30), publishedAt: at(30), owner: 'seed-longg' },
+  ];
+}
+function seedRadioLives(): NonNullable<DemoState['radioLives']> {
+  return [{ id: crypto.randomUUID(), title: 'ハットGのスプレー相談室', thumbUrl: '/onboarding/hatg.webp', loop: 'stars', status: 'live', now: { songId: 'sample-kimorin-1', title: 'KIMORIN⭐︎の水星の歌', by: 'KIMORIN⭐︎', byId: null }, startedAt: new Date(Date.now() - 18 * 60_000).toISOString(), transport: 'test', owner: 'seed-hatg', beat: Date.now() }];
 }
 
 /** Demo invitation that always works: /invite/demo (inviter = 木元 駿之介, the very first inviter). */
@@ -1261,5 +1307,201 @@ export class DemoApi implements Api {
     this.invites()[code] = inv;
     this.save();
     return { ...inv, expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
+  }
+
+  // --- Venus radio (demo: this browser only; the residents' shows are samples) -------------------
+
+  private rPerson(id: string): RadioShowView['host'] {
+    const r = RADIO_RESIDENTS[id];
+    if (r) return { id, handle: r.handle, displayName: r.name, neoForm: null, pic: r.pic };
+    const u = this.s.users[id];
+    return { id, handle: u?.handle ?? 'neo', displayName: u?.displayName ?? 'NEO', neoForm: u?.neoForm ?? null, pic: u?.puniPic ?? null };
+  }
+
+  private rShows() {
+    if (!this.s.radioShows) this.s.radioShows = seedRadioShows();
+    return this.s.radioShows;
+  }
+
+  private rLives() {
+    if (!this.s.radioLives) this.s.radioLives = seedRadioLives();
+    // the residents' sample show is always on air; yours ends when you stop sending a beat
+    for (const l of this.s.radioLives) if (l.status === 'live' && !RADIO_RESIDENTS[l.owner] && Date.now() - l.beat > RADIO_LIVE_STALE_SECONDS * 1000) l.status = 'ended';
+    return this.s.radioLives;
+  }
+
+  private rShowView(r: NonNullable<DemoState['radioShows']>[number], viewer: string): RadioShowView {
+    const { owner, ...rest } = r;
+    return { ...rest, host: this.rPerson(owner), mine: owner === viewer };
+  }
+
+  private rLiveView(l: NonNullable<DemoState['radioLives']>[number], viewer: string): RadioLiveView {
+    const { owner, beat: _b, ...rest } = l;
+    return { ...rest, host: this.rPerson(owner), mine: owner === viewer };
+  }
+
+  async radioHome(): Promise<RadioHome> {
+    const viewer = this.uid();
+    await sleep(150);
+    return {
+      live: this.rLives().filter((l) => l.status === 'live').map((l) => this.rLiveView(l, viewer)),
+      shows: this.rShows()
+        .filter((r) => r.status === 'public')
+        .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
+        .map((r) => this.rShowView(r, viewer)),
+    };
+  }
+
+  async radioDeck(): Promise<RadioDeckSong[]> {
+    const me = this.s.users[this.uid()];
+    const perm = this.s.radioPerm ?? {};
+    const saved: Awaited<ReturnType<Api['savedSongs']>> = await this.savedSongs();
+    const mine = saved.map<RadioDeckSong>((x) => ({ id: x.id, title: x.title, url: x.url, bpm: x.bpm, seconds: x.seconds, by: me?.displayName ?? 'NEO', byId: me?.id ?? null, from: 'mine', allowRadio: perm[x.id] ?? true }));
+    return [...mine, ...RADIO_SAMPLE_SONGS];
+  }
+
+  async setSongRadio(songId: string, allow: boolean) {
+    this.s.radioPerm = { ...(this.s.radioPerm ?? {}), [songId]: allow };
+    this.save();
+    return { allowRadio: allow };
+  }
+
+  async uploadShow(blob: Blob) {
+    return this.uploadVoice(blob);
+  }
+
+  async createRadioShow(body: CreateRadioShowBody) {
+    const viewer = this.uid();
+    const r = {
+      id: uid(),
+      title: body.title,
+      thumbUrl: body.thumbUrl ?? null,
+      loop: body.loop,
+      audioUrl: `idb:${body.mediaId}`,
+      seconds: body.seconds,
+      cues: body.cues,
+      status: 'private' as const,
+      source: body.liveId ? ('live' as const) : ('recorded' as const),
+      createdAt: now(),
+      publishedAt: null,
+      owner: viewer,
+    };
+    this.s.radioShows = [r, ...this.rShows()];
+    this.save();
+    return this.rShowView(r, viewer);
+  }
+
+  async myRadioShows() {
+    const viewer = this.uid();
+    return this.rShows()
+      .filter((r) => r.owner === viewer)
+      .map((r) => this.rShowView(r, viewer));
+  }
+
+  async publishRadioShow(id: string, on: boolean) {
+    const viewer = this.uid();
+    const r = this.rShows().find((x) => x.id === id && x.owner === viewer);
+    if (!r) throw new ApiError(404, 'NOT_FOUND', 'Not found');
+    r.status = on ? 'public' : 'private';
+    if (on) r.publishedAt = now();
+    this.save();
+    return this.rShowView(r, viewer);
+  }
+
+  async removeRadioShow(id: string) {
+    const viewer = this.uid();
+    this.s.radioShows = this.rShows().filter((r) => !(r.id === id && r.owner === viewer));
+    this.save();
+  }
+
+  async radioShow(id: string) {
+    const viewer = this.uid();
+    const r = this.rShows().find((x) => x.id === id && (x.status === 'public' || x.owner === viewer));
+    if (!r) throw new ApiError(404, 'NOT_FOUND', 'Not found');
+    return this.rShowView(r, viewer);
+  }
+
+  async startRadioLive(body: StartRadioLiveBody) {
+    const viewer = this.uid();
+    const me = this.s.users[viewer];
+    if (!me?.orderedAt) throw new ApiError(403, 'ORDER_REQUIRED', 'Live shows open for ORDER members');
+    for (const l of this.rLives()) if (l.owner === viewer && l.status === 'live') l.status = 'ended';
+    const l = { id: uid(), title: body.title, thumbUrl: body.thumbUrl ?? null, loop: body.loop, status: 'live' as const, now: null, startedAt: now(), transport: 'test' as const, owner: viewer, beat: Date.now() };
+    this.s.radioLives = [l, ...this.rLives()];
+    this.save();
+    return this.rLiveView(l, viewer);
+  }
+
+  async radioLive(id: string): Promise<RadioLiveState> {
+    const viewer = this.uid();
+    const l = this.rLives().find((x) => x.id === id);
+    if (!l) throw new ApiError(404, 'NOT_FOUND', 'Not found');
+    const all = (this.s.radioMessages ?? []).filter((m) => m.liveId === id && !m.hidden);
+    // demo: on your own show, the residents drop by with a comment or a request now and then
+    if (l.owner === viewer && l.status === 'live') {
+      const fake = all.filter((m) => RADIO_RESIDENTS[m.owner]).length;
+      const last = all[all.length - 1];
+      if (fake < RADIO_DEMO_VISITS.length && (!last || Date.now() - new Date(last.createdAt).getTime() > 9000)) {
+        const v = RADIO_DEMO_VISITS[fake];
+        this.s.radioMessages = [...(this.s.radioMessages ?? []), { id: uid(), liveId: id, owner: v.who, kind: v.kind, text: v.text, song: v.song ?? null, createdAt: now() }];
+        this.save();
+      }
+    }
+    const msgs = (this.s.radioMessages ?? [])
+      .filter((m) => m.liveId === id && !m.hidden)
+      .slice(-60)
+      .map(({ liveId: _l, owner, hidden: _h, ...m }) => ({ ...m, from: this.rPerson(owner), mine: owner === viewer }));
+    const host = l.owner === viewer;
+    return { ...this.rLiveView(l, viewer), messages: host ? msgs : msgs.filter((m) => m.kind === 'comment' || m.mine) };
+  }
+
+  async setRadioNow(id: string, n: RadioNowBody['now']) {
+    const viewer = this.uid();
+    const l = this.rLives().find((x) => x.id === id && x.owner === viewer);
+    if (!l || l.status !== 'live') throw new ApiError(410, 'LIVE_ENDED', 'This show has ended');
+    l.now = n ? { songId: n.songId, title: n.title, by: n.by, byId: n.byId ?? null } : null;
+    l.beat = Date.now();
+    this.save();
+    return this.rLiveView(l, viewer);
+  }
+
+  async endRadioLive(id: string) {
+    const viewer = this.uid();
+    const l = this.rLives().find((x) => x.id === id && x.owner === viewer);
+    if (!l) throw new ApiError(404, 'NOT_FOUND', 'Not found');
+    if (l.status === 'live') l.status = 'ended';
+    l.now = null;
+    this.save();
+    return this.rLiveView(l, viewer);
+  }
+
+  async radioMessage(id: string, body: RadioMessageBody) {
+    const viewer = this.uid();
+    const l = this.rLives().find((x) => x.id === id);
+    if (!l || l.status !== 'live') throw new ApiError(410, 'LIVE_ENDED', 'This show has ended');
+    const m = { id: uid(), liveId: id, owner: viewer, kind: body.kind, text: body.text ?? '', song: null, createdAt: now() };
+    this.s.radioMessages = [...(this.s.radioMessages ?? []), m];
+    this.save();
+    return { id: m.id, kind: m.kind, text: m.text, song: null, from: this.rPerson(viewer), createdAt: m.createdAt, mine: true };
+  }
+
+  async hideRadioMessage(liveId: string, messageId: string) {
+    const m = (this.s.radioMessages ?? []).find((x) => x.id === messageId && x.liveId === liveId);
+    if (m) m.hidden = true;
+    this.save();
+  }
+
+  async reportRadio(_body: RadioReportBody) {
+    await sleep(300);
+  }
+
+  async keepInBluena(postId: string, on: boolean) {
+    const viewer = this.uid();
+    const k = new Set(this.s.bluenaKeeps?.[viewer] ?? []);
+    if (on) k.add(postId);
+    else k.delete(postId);
+    this.s.bluenaKeeps = { ...(this.s.bluenaKeeps ?? {}), [viewer]: [...k] };
+    this.save();
+    return { kept: on };
   }
 }
