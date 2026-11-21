@@ -110,6 +110,8 @@ export interface Api {
   composeMusicStatus(): Promise<Record<string, unknown>>;
   /** Register one of the two voices (own / Bati) from a recording of the fixed script. */
   registerVoice(body: RegisterVoiceBody): Promise<Me>;
+  /** whether the voice service (Fish Audio) is connected */
+  voiceStatus(): Promise<{ fish: boolean }>;
   /** Read a text aloud in a registered voice (Fish Audio). */
   speak(body: SpeakBody): Promise<{ url: string }>;
   /** one sentence of {bati}'s answer in {bati}'s story voice (M-R179); url null when it cannot be made now */

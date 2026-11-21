@@ -52,6 +52,10 @@ export class VoiceService {
     return this.cfg.FISH_API_KEY;
   }
 
+  get connected(): boolean {
+    return !!this.cfg.FISH_API_KEY;
+  }
+
   /** The member's Fish voice model for this slot (throws when not registered). */
   async voiceId(userId: string, slot: VoiceSlot): Promise<string> {
     this.key();

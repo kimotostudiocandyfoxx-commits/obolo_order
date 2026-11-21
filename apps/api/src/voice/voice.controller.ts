@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { BatiSaysBody, LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
@@ -18,6 +18,12 @@ export class VoiceController {
     private readonly lines: LineVoiceService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
+
+  /** whether the voice service (Fish Audio) is connected here — the 〔バティの声ためし〕 page asks first */
+  @Get('status')
+  status() {
+    return { fish: this.voice.connected };
+  }
 
   @Post('register')
   @HttpCode(200)

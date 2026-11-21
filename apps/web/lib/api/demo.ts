@@ -371,6 +371,10 @@ export class DemoApi implements Api {
     this.save();
   }
 
+  async voiceStatus() {
+    return { fish: false };
+  }
+
   async uploadVoice(blob: Blob) {
     this.uid();
     const id = uid();

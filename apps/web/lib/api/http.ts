@@ -166,6 +166,9 @@ export class HttpApi implements Api {
   batiSays(text: string) {
     return this.req<{ url: string | null }>('POST', '/voice/bati-says', { text });
   }
+  voiceStatus() {
+    return this.req<{ fish: boolean }>('GET', '/voice/status');
+  }
   speak(body: Parameters<Api['speak']>[0]) {
     return this.req<Awaited<ReturnType<Api['speak']>>>('POST', '/voice/speak', body);
   }
