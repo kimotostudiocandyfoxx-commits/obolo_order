@@ -18,12 +18,46 @@ const scenes: Scene[] = idx.parts.flatMap((p) => JSON.parse(readFileSync(join(PU
 type L = { who: string; text: string; scene?: string };
 const norm = (t: string) => t.replace(/\s+/g, '').replace(/[／/]/g, '');
 
-const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts`, ''];
+/** the planet practices keep their lines in their own beat lists (who: 'kaiser' …): read those too, for their day */
+const LESSONS: Record<number, string> = {
+  3: 'components/saturn/SaturnLesson.tsx',
+  4: 'components/jupiter/JupiterLesson.tsx',
+  5: 'components/mercury/MercuryLesson.tsx',
+  6: 'components/mars/MarsLesson.tsx',
+  7: 'components/venus/VenusLesson.tsx',
+};
+const WHO: Record<string, string> = {
+  kaiser: '大根カイザー',
+  kimorin: 'KIMORIN',
+  pinpon: 'うんちピンポンくん',
+  bati: 'バティ',
+  freezy: 'フリージー',
+  hipokin: 'ヒポキン',
+  bossg: 'ボスG',
+  hatg: 'ハットG',
+  longg: 'ロングG',
+  brother: 'たこ焼きブラザー',
+  sister: 'たこ焼きシスター',
+};
+function lessonLines(day: number): L[] {
+  const f = LESSONS[day];
+  if (!f) return [];
+  const src = readFileSync(join(ROOT, 'apps/web', f), 'utf8');
+  const out: L[] = [];
+  for (const m of src.matchAll(/who:\s*'(\w+)',\s*text:\s*'((?:[^'\\]|\\.)*)'/g)) {
+    const who = WHO[m[1]];
+    if (who) out.push({ who, text: m[2].replace(/\\n/g, '\n').replace(/\\'/g, "'") });
+  }
+  return out;
+}
+
+const out: string[] = ['# 台本と画面の台詞の照合', '', `台本：public/story（${idx.parts.join('・')}）／画面：lib/onboarding/dayN.ts と各星の練習（SaturnLesson など）の台詞`, ''];
 let total = 0;
 for (let day = 1; day <= 8; day++) {
   const script: L[] = [];
   for (const s of scenes) {
-    if (SCENE_DAY(s.id) !== day) continue;
+    // SYS-S002 (joining early) plays at the end of day 3 (and from the settings)
+    if ((s.id === 'SYS-S002' ? 3 : SCENE_DAY(s.id)) !== day) continue;
     walk(s.lines, (l) => {
       if (l.k === 'say') script.push({ who: l.who, text: l.text, scene: s.id });
     });
@@ -37,6 +71,7 @@ for (let day = 1; day <= 8; day++) {
     Object.values(o).forEach(visit);
   };
   visit(STORIES[day]?.steps ?? []);
+  app.push(...lessonLines(day));
   const key = (l: L) => `${l.who}|${norm(l.text)}`;
   const appKeys = new Map<string, number>();
   for (const l of app) appKeys.set(key(l), (appKeys.get(key(l)) ?? 0) + 1);

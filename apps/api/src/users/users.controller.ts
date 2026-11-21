@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
 import { AdvanceJourneyBody, AtelierLayout, CompleteJourneyDayBody, CompleteLap2Body, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
@@ -5,6 +6,9 @@ import { AppConfig, CONFIG } from '../config';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
 import { UsersService } from './users.service';
+
+/** SYS-S002's flags (short keys, short values) */
+const SysStoryBody = z.object({ answers: z.record(z.string().regex(/^[a-z_]{1,40}$/), z.string().max(40)).refine((a) => Object.keys(a).length <= 10) });
 
 @Controller('me')
 @UseGuards(AuthGuard)
@@ -39,6 +43,13 @@ export class UsersController {
   @HttpCode(200)
   completeDay(@UserId() userId: string, @Body() body: unknown) {
     return this.users.completeJourneyDay(userId, parseBody(CompleteJourneyDayBody, body));
+  }
+
+  /** SYS-S002 from the settings (becoming Obolo Order early): its flags, kept as sys.<key> */
+  @Post('story/sys')
+  @HttpCode(200)
+  saveSysStory(@UserId() userId: string, @Body() body: unknown) {
+    return this.users.saveSysStory(userId, parseBody(SysStoryBody, body).answers);
   }
 
   /** the second journey: a chapter finished (shared/lap2.ts) */

@@ -191,7 +191,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   if (phase === 'photo')
     return (
       <Panel>
-        <Obolon>{'、、、お前の、気に入っている、自分の写真は、あるか？\nあるなら、、、水盤に、映せ。'}</Obolon>
+        <Obolon>{'どんな見た目に、なりたい？\n、、、お前の、気に入っている、自分の写真は、あるか？\nあるなら、、、水盤に、映せ。'}</Obolon>
         {/* 〔写真を使う〕 picks one already taken, 〔写真を撮る〕 opens the front camera (client 2026-10-29) */}
         {[photoInput, cameraInput].map((r, k) => (
           <input
@@ -234,8 +234,8 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             </>
           ) : (
             <>
-              <Gold onClick={() => photoInput.current?.click()}>🖼 写真を使う</Gold>
-              <Gold onClick={() => cameraInput.current?.click()}>📷 写真を撮る</Gold>
+              <Gold onClick={() => photoInput.current?.click()}>📷 お気に入りの自分の写真を選ぶ</Gold>
+              <Gold onClick={() => cameraInput.current?.click()}>📸 いま撮る</Gold>
             </>
           )}
           <button onClick={() => (setPhoto(null), setErr(null), setPhase('animal'))} className="py-2 text-sm text-white/60">
@@ -248,7 +248,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   if (phase === 'animal')
     return (
       <Panel>
-        <Obolon>{'どんな見た目に、なりたい？\nそうだ、好きな動物は？'}</Obolon>
+        <Obolon>そうだ、好きな動物は？</Obolon>
         {/* the mic first (client 2026-10-29); the examples under it */}
         <div className="mt-3" />
         <VoiceField value={free} onChange={setFree} placeholder="例：しろくま" />
@@ -302,6 +302,14 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       </Panel>
     );
 
+  // the script asks three things (animal, colour, mood: D03-S004, simple version) — the mood draws the four looks
+  const drawWith = (mood: string) => {
+    setFree('');
+    const d = { ...draft, ans: { ...ans, mood, hobby: '' } };
+    save(d);
+    void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: mood || 'おまかせ', ...withPhoto() });
+  };
+
   if (phase === 'mood')
     return (
       <Panel>
@@ -310,11 +318,11 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
         <VoiceField value={free} onChange={setFree} placeholder="例：ミステリアス" />
         {free.trim() && (
           <div className="mt-2 flex flex-col gap-2">
-            <Gold onClick={() => (setAns({ mood: free.trim() }), setFree(''), setPhase('hobby'))}>これにする</Gold>
+            <Gold onClick={() => drawWith(free.trim())}>これにする</Gold>
           </div>
         )}
         <p className="mt-4 text-center text-[11px] text-white/45">または、えらぶ</p>
-        <Chips items={MOODS} value={ans.mood} onPick={(v) => (setAns({ mood: v }), setFree(''), setPhase('hobby'))} />
+        <Chips items={MOODS} value={ans.mood} onPick={(v) => drawWith(v)} />
         <Back onClick={() => setPhase('color')} />
       </Panel>
     );

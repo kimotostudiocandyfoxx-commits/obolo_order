@@ -92,16 +92,17 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
     expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['太陽と月のたまご', '地球と月のたまご']);
     const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'egg');
-    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'hatch-sun', 'pinpon-earth']);
+    // the Bati hatches on day 3 now (simple version): day 2 keeps the gem and KIMORIN⭐︎'s egg
+    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'pinpon-earth']);
   });
-  it('the gem and the riddle book at the launch pit, then the look, the NEO name, the Bati is born and named — all on day 2', () => {
+  it('the gem at the launch pit, then the look, the NEO name and the egg; no riddles, no hatching on day 2 (simple version)', () => {
     const t = kinds(steps);
-    expect(t.indexOf('riddles')).toBeLessThan(t.indexOf('look'));
-    expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('riddles'));
+    expect(t).not.toContain('riddles');
+    expect(t).not.toContain('hatch');
+    expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('look'));
     expect(t.indexOf('look')).toBeLessThan(t.indexOf('neoname'));
     expect(t.indexOf('neoname')).toBeLessThan(t.indexOf('egg'));
-    expect(t.indexOf('egg')).toBeLessThan(t.indexOf('hatch'));
-    expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
+    expect(steps.some((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBe(true);
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
@@ -116,18 +117,21 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
   const steps = STORIES[3].steps;
   it('MONBAN only speaks through Bluena’s square screen', () => {
     let open = false;
-    for (const s of steps) {
+    // until SYS-S002 (becoming Obolo Order early), where MONBAN meets you at the Earth temple
+    for (const s of steps.slice(0, steps.findIndex((x) => x.t === 'scene' && x.id === 'SYS-S002'))) {
       if (s.t === 'screen') open = s.open;
       if (s.t === 'say' && s.who === 'MONBAN') expect(open).toBe(true);
     }
-    expect(steps.some((s) => s.t === 'say' && s.who === 'OBOLON' && s.text.includes('地球と、月と、太陽'))).toBe(true);
   });
-  it('riddle 2 on MONBAN\'s call from the rocket, then the kororin lesson on the real Saturn world (story 49a3048)', () => {
+  it('the Bati hatches in the morning, then the kororin practice on Saturn, the stamp; MONBAN offers Obolo Order early (SYS-S002)', () => {
     const t = kinds(steps);
-    expect(steps.find((s) => s.t === 'seal')).toEqual({ t: 'seal', n: 2 });
-    expect(t.indexOf('seal')).toBeGreaterThan(t.indexOf('clock'));
-    expect(t.indexOf('saturn')).toBeGreaterThan(t.indexOf('seal'));
+    expect(t).not.toContain('seal');
+    expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
+    expect(t.indexOf('clock')).toBeLessThan(t.indexOf('saturn'));
     expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('saturn'));
+    const c = steps.find((s) => s.t === 'choice' && s.key === 'f_join_early');
+    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['先にObolo Orderになる', '8日目に決める']);
+    expect(steps.some((s) => s.t === 'scene' && s.id === 'SYS-S002')).toBe(true);
   });
 });
 
@@ -142,22 +146,17 @@ describe('Venus (day 7, draft 21)', () => {
 
 describe('the Sun day (8, draft 21)', () => {
   const steps = STORIES[8].steps;
-  it('record I for everyone, then 〔エクリプスを受ける〕 leads to the payment; 〔今は、住人のままでいる〕 ends the journey as a resident', () => {
+  it('〔エクリプスを受ける〕 leads to the payment; 〔今は、住人のままでいる〕 ends the journey as a resident', () => {
     const c = steps.findIndex((s) => s.t === 'choice' && s.key === 'f_d08_decide');
-    const record1 = steps.findIndex((s) => s.t === 'film' && s.id === 'record1');
-    expect(record1).toBeGreaterThan(0);
-    expect(record1).toBeLessThan(c);
     const opts = steps[c].t === 'choice' ? steps[c].options : [];
     expect(opts.map((o) => o.label)).toEqual(['エクリプスを受ける', '今は、住人のままでいる']);
     const pay = labelIndex(steps, opts[0].goto!);
-    expect(steps.slice(pay, pay + 4).find((s) => s.t === 'order')).toEqual({ t: 'order', cancel: 'back' });
+    expect(steps.slice(pay, pay + 8).find((s) => s.t === 'order')).toEqual({ t: 'order', cancel: 'back' });
     expect(steps.slice(c + 1).find((s) => s.t === 'end' || s.t === 'order')?.t).toBe('end');
   });
-  it('riddles 2 and 4 open for everyone, riddle 1 and records II・III only after the Eclipse', () => {
-    const opened = steps.filter((s) => s.t === 'seal' && s.open).map((s) => (s.t === 'seal' ? s.n : 0));
-    expect(opened).toEqual([2, 4, 1]);
-    const pay = labelIndex(steps, 'pay');
-    expect(steps.findIndex((s) => s.t === 'film' && s.id === 'record23')).toBeGreaterThan(pay);
-    expect(steps.some((s) => s.t === 'made' && s.what === 'film')).toBe(false);
+  it('no riddles or records any more; members who joined early take the short way (f_join_early)', () => {
+    expect(steps.some((s) => s.t === 'seal' || s.t === 'film')).toBe(false);
+    expect(steps.some((s) => s.t === 'branch' && s.key === 'f_join_early')).toBe(true);
+    expect(steps.some((s) => s.t === 'caption' && s.text === '通信：火星シアターの扉が、開いた')).toBe(true);
   });
 });

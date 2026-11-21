@@ -1,0 +1,66 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { RequireAuth } from '@/components/RequireAuth';
+import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
+import { getApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { joinFlags } from '@/lib/onboarding/joinFlags';
+import { SYS002 } from '@/lib/onboarding/sys002';
+
+/**
+ * 〔設定〕→〔毎月のマナ〕→〔先にObolo Orderになる〕: SYS-S002 always plays first (M-R202 — no way to pay that skips the
+ * explanation), then the payment screen inside it. Its flags are saved as sys.* for day 8.
+ */
+export default function OrderEarlyPage() {
+  return (
+    <RequireAuth>
+      <OrderEarly />
+    </RequireAuth>
+  );
+}
+
+function OrderEarly() {
+  const { me, setMe } = useAuth();
+  const router = useRouter();
+  if (!me) return null;
+  return (
+    <StoryPlayer
+      steps={SYS002}
+      vars={{
+        name: me.displayName,
+        inviter: me.invitedByName ?? '木元 駿之介',
+        neo: me.displayName,
+        kimorinStar: true,
+        bati: me.bati?.name ?? undefined,
+        batiImage: me.bati?.imageUrl ?? undefined,
+        batiFaces: me.bati?.faces,
+        batiFood: me.bati?.food,
+        look: me.avatarUrl ?? undefined,
+        story: { ...me.story, ...joinFlags(me.story) },
+      }}
+      initial={null}
+      onProgress={() => {}}
+      onName={async () => {}}
+      ordered={!!me.orderedAt}
+      orderApi={{
+        checkout: () => getApi().orderCheckout(),
+        confirm: async (sessionId) => {
+          setMe(await getApi().confirmOrder(sessionId));
+        },
+        demo: async () => {
+          setMe(await getApi().becomeOrder());
+        },
+      }}
+      onEnd={async (a) => {
+        const keep = Object.fromEntries(Object.entries(a).filter(([k]) => k === 'f_ej_heard_now' || k === 'f_join_early_now'));
+        try {
+          setMe(await getApi().saveSysStory(keep));
+        } catch {
+          /* the payment itself is already on the account; the flags only shorten day 8 */
+        }
+        router.push('/settings');
+      }}
+    />
+  );
+}

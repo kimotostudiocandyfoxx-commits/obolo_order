@@ -203,6 +203,10 @@ export type Step =
    */
   | { t: 'branch'; key: string; cases: Record<string, string>; otherwise: string }
   | { t: 'label'; id: string }
+  /** remember a flag in the day's answers (saved with the day like a choice): f_ej_heard, f_join … */
+  | { t: 'set'; key: string; value: string }
+  /** the script scene that starts here (D04-S002 …): shown on the review screen so notes can name it; no effect in play */
+  | { t: 'scene'; id: string }
   | { t: 'goto'; id: string }
   | { t: 'end' };
 

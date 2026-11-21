@@ -7,6 +7,7 @@ import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n/client';
 import { realLessonApi } from '@/lib/onboarding/lessonApi';
+import { joinFlags } from '@/lib/onboarding/joinFlags';
 import { madeFrom } from '@/lib/onboarding/made';
 import { clearDay, loadDay, saveDay } from '@/lib/onboarding/progress';
 import type { DayStory } from '@/lib/onboarding/stories';
@@ -177,7 +178,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         look: me.avatarUrl ?? undefined,
         lookChibi: me.lookChibi ?? undefined,
         lookStandee: me.lookStandee ?? undefined,
-        story: me.story,
+        story: { ...me.story, ...joinFlags(me.story) },
         made: madeFrom(me.story),
       }}
       lessonApi={realLessonApi}

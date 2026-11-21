@@ -9,18 +9,22 @@ import { STYLE_SOUND, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { SongMade, StickerMade } from '@/lib/onboarding/made';
 import { LineVoice } from '@/lib/story/lineVoice';
 import { spriteUrl } from '@/lib/onboarding/media';
+import { AtelierScreen } from '@/components/atelier/AtelierScreen';
 import { MyIsland, islandCards, islandFromWords, islandOmakase, type IslandLook } from './MyIsland';
 
 /**
- * Day 5 on Mercury (first journey; story D06-S005〜S007, M-R89/M-R91/M-R114): yesterday's jacket gets its
- * song. フリージー teaches, KIMORIN⭐︎ goes first (M-R133: the client's two songs — 「泣ける曲を」 gives a sad
- * one, he asks once more for an epic one with 『すね毛楽しい』 in it: the model of the one redo) — then the visitor: the jacket's song (or new words), add a feeling or
- * pass → the feel → {bati}'s lyric draft (tap a line to touch it up) → mana asked → {bati} sings it → the
- * record spins → 〔🔒 土の中にしまう〕 (always: Mars needs it). Draft 21 (M-R124/125): everyone makes one;
- * the song may sail to the dachi's sea (〔🚢 出航させる〕→〔ダチへ〕→〔🚢 出航〕), KIMORIN⭐︎'s ship comes into
- * the 〔推し〕 sea, then 🏝️ myアイランド rises (D06-S007b). The lines are the story's, word for word.
+ * Day 5 on Mercury (first journey; script D06-S005〜S007b, simple version M-R185/M-R200): 作るのは月、しまうのはBluena、
+ * 見せるのは星. フリージー's 100倍, then KIMORIN⭐︎ goes first: 〔🌙 つくる〕 opens the Moon atelier through his Bluena,
+ * うんちピンポンくん makes 「泣ける曲を」 (the client's two songs, M-R133: one remake with 『すね毛楽しい』) — then
+ * {bati}「工房に行こう！」: the visitor's own atelier (AtelierScreen) — yesterday's art as the jacket or new words,
+ * add a feeling or pass → どんな曲 (talk / genre cards / おまかせ) → spell cards → {bati}'s lyric draft (✏️) → mana
+ * asked → ♪ 作曲中… → the song card (one remake: then two cards) → 〔この曲にする〕 → 「Bluenaに、しまったよ！」, the
+ * screen closes → 〔公開する〕 → 〔ダチへ〕〔🚢 出航〕: the first ship; KIMORIN⭐︎'s ship comes into the 〔推し〕 sea →
+ * 🏝️ myアイランド by talking with {bati} (D06-S007b). The lines are the script's, word for word.
  */
 type Phase = 'intro' | 'choose' | 'hold' | 'words' | 'style' | 'writing' | 'lyrics' | 'mana' | 'singing' | 'failed' | 'song' | 'after';
+/** the phases inside {neo}'s Moon atelier (D06-S006〜S007 until the song is put in Bluena) */
+const MAKING: Phase[] = ['choose', 'hold', 'words', 'style', 'writing', 'lyrics', 'mana', 'singing', 'failed', 'song'];
 const FEELS: { id: string; label: string }[] = [
   { id: 'pop', label: 'ポップ' },
   { id: 'rock', label: 'ロック' },
@@ -32,10 +36,10 @@ const FEELS: { id: string; label: string }[] = [
 
 type Who = 'freezy' | 'kimorin' | 'bati' | 'guide' | 'song' | 'pinpon';
 type Line = { who: Who; text: string };
-type Scene = 'bar' | 'bar-glow' | 'demo' | 'song1' | 'song2';
+type Scene = 'bar' | 'bar-glow' | 'demo' | 'song1' | 'song2' | 'close';
 const SPELL_1 = ['泣ける', '悲しい', 'しっとり', 'ゆっくり', 'ピアノ'];
 const SPELL_2 = ['泣ける', '壮大', '神々しい', '感動的', 'オーケストラ', '大合唱', '歌詞：すね毛楽しい'];
-const INTRO: (Line & { scene?: Scene; cards?: string[]; choices?: { label: string; reply: Line[] }[] })[] = [
+const INTRO: (Line & { scene?: Scene; cards?: string[]; choices?: { label: string; reply: Line[] }[]; /** waits for 〔🌙 つくる〕 instead of つぎへ */ tap?: boolean })[] = [
   {
     who: 'freezy',
     text: '自分の思いだったり、起こった出来事を、音に乗っけたことはあるか？',
@@ -50,19 +54,17 @@ const INTRO: (Line & { scene?: Scene; cards?: string[]; choices?: { label: strin
   { who: 'freezy', text: '聴けば、わかる。' },
   { who: 'kimorin', text: '……では、聴いてから、計算します。' },
   { who: 'freezy', text: '今日食べたラーメンが美味しかった。学校に遅刻しそうだ。そんな自分の日常のことを、歌にしてみよう。' },
-  { who: 'freezy', text: '土星の言葉も、木星のアートも、音がつけば、もっと伝わる。' },
-  { who: 'freezy', text: 'できた曲は、船になって、ダチの海に出る。' },
+  { who: 'freezy', text: 'お前の曲は、この海で生きる。船になって、ダチの海に出るんだ。' },
   { who: 'freezy', text: '習うより、慣れろ、だ。さあ、作ってみよう。', scene: 'bar' },
-  { who: 'freezy', text: '真ん中の〔♫+ 作曲〕だ。', scene: 'bar-glow' },
-  { who: 'kimorin', text: 'お待ちを。きのうのアートで。……天才の手本です。', scene: 'demo' },
-  { who: 'kimorin', text: '泣ける曲を、お願いします。', scene: 'demo' }, // 〔🎙〕に顔を近づける
+  { who: 'freezy', text: '〔🌙 つくる〕だ。曲も、月の工房で作る。', scene: 'bar-glow' },
+  { who: 'kimorin', text: 'お待ちを。きのうのアートで。……天才の手本です。', scene: 'bar-glow' },
+  // KIMORINが〔🌙 つくる〕を押す：彼のBluenaから光がのび、氷の上に正方形のスクリーン。向こうに月の工房、作業台の上でうんちピンポンくんが跳ねる。きのうのアートを選び、〔🎙〕に顔を近づける
+  { who: 'kimorin', text: '泣ける曲を、お願いします。', scene: 'demo' },
   { who: 'guide', text: '♪ 作曲中…', scene: 'demo' }, // うんちピンポンくんが、ぽこん、と弾む
   { who: 'song', text: '（しっとりと悲しい、泣ける曲）', scene: 'song1' },
-  { who: 'kimorin', text: '……なんか、違います。', scene: 'demo' }, // 腕を組んで、首をかしげている
+  { who: 'kimorin', text: '……なんか、違います。', scene: 'demo' },
   { who: 'freezy', text: 'なら、スペルを変えろ。', scene: 'demo' },
-  { who: 'kimorin', text: '……曲にも、スペルが、あるのですね。', scene: 'demo' },
   { who: 'pinpon', text: 'さっきの曲のスペルは、こんな感じだよ！', scene: 'demo', cards: SPELL_1 },
-  { who: 'kimorin', text: '……なるほど。……あまり、わかりませんが。', scene: 'demo', cards: SPELL_1 },
   { who: 'kimorin', text: 'とりあえず、もっと、壮大で、神々しく、感動的に、泣ける曲で、お願いします。……あと、『すね毛楽しい』という歌詞も足してください。', scene: 'demo', cards: SPELL_1 },
   { who: 'pinpon', text: 'なるほど、わかった！　じゃあ、こんなスペルの方が、合うかも！', scene: 'demo', cards: SPELL_2 },
   { who: 'pinpon', text: 'じゃあ、作るね！', scene: 'demo', cards: SPELL_2 },
@@ -70,7 +72,9 @@ const INTRO: (Line & { scene?: Scene; cards?: string[]; choices?: { label: strin
   { who: 'song', text: '（壮大で、神々しい、感動の曲）', scene: 'song2' },
   { who: 'freezy', text: '……いい曲だ。', scene: 'song2' },
   { who: 'kimorin', text: '……自分の曲で、泣くとは。', scene: 'song2' }, // サングラスの下から、涙が、ぽろぽろ
-  { who: 'freezy', text: '次は、お前だ。' },
+  // KIMORINの曲のカードが、彼のBluenaに吸いこまれる。スクリーンが閉じる
+  { who: 'freezy', text: '次は、お前だ。', scene: 'close' },
+  { who: 'bati', text: '工房に行こう！', scene: 'bar-glow', tap: true },
 ];
 const SPEAKER: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN', bati: 'バティ', guide: '', song: '', pinpon: 'うんちピンポンくん' };
 const NAMES: Record<Who, string> = { freezy: 'フリージー', kimorin: 'KIMORIN⭐︎', bati: 'バティ', guide: '', song: 'KIMORIN⭐︎の曲', pinpon: 'うんちピンポンくん' };
@@ -81,16 +85,14 @@ const SPRITES: Partial<Record<Who, string>> = { freezy: 'freezy-x-talk', kimorin
 // after the song is put in the soil (D06-S007 最初の一隻 → D06-S007b myアイランド)
 type After =
   | { k: 'line'; l: Line }
-  | { k: 'sail' } // 〔ダチの海に出航させる〕〔今は、土の中にしまっておく〕
-  | { k: 'post' } // 〔🚢 出航させる〕 → 〔ダチへ〕 → 〔🚢 出航〕
+  | { k: 'sail' } // 〔公開する〕〔今は、Bluenaの土の中にしまっておく〕
+  | { k: 'post' } // 行き先〔ダチへ〕が選ばれた画面 → 〔🚢 出航〕（〔やめる〕＝keep）
   | { k: 'ship'; who: 'mine' | 'kimorin' }
   | { k: 'oshi' } // KIMORIN⭐︎'s ship comes into the 〔推し〕 sea: tap it, the ballad plays
-  | { k: 'bar' } // 🏝️ myアイランド glows
+  | { k: 'bar'; lit: number } // 〔🗺️ 海図〕 / 〔🏝️ myアイランド〕 glows
   | { k: 'edit' }
   | { k: 'rise' }
   | { k: 'end' };
-const fr = (text: string): After => ({ k: 'line', l: { who: 'freezy', text } });
-const ki = (text: string): After => ({ k: 'line', l: { who: 'kimorin', text } });
 const gd = (text: string): After => ({ k: 'line', l: { who: 'guide', text } });
 
 /** The record: the jacket on it, spinning while it plays. */
@@ -110,7 +112,7 @@ export function Record({ s, playing, size = 200 }: { s: StickerMade; playing: bo
 function Bar({ glow, lit = 1, onTap }: { glow?: boolean; lit?: number; onTap?: () => void }) {
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-[175] flex justify-center gap-3 bg-gradient-to-t from-black/60 to-transparent px-4 pb-5 pt-8">
-      {['🗺️ 海図', '♫+ 作曲', '🏝️ myアイランド'].map((l, k) => (
+      {['🗺️ 海図', '🌙 つくる', '🏝️ myアイランド'].map((l, k) => (
         <button key={l} disabled={k !== lit || !onTap} onClick={onTap} className={`rounded-2xl px-4 py-2.5 text-sm font-black ${k === lit ? `bg-sky-300 text-sky-900 ${glow ? 'animate-pulse ring-4 ring-sky-200' : ''}` : 'bg-white/20 text-white/80'}`}>
           {l}
         </button>
@@ -248,11 +250,9 @@ export function MercuryLesson({
   const [redone, setRedone] = useState(false);
   const [stage, setStage] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [heard, setHeard] = useState(false);
   const [after, setAfter] = useState<After[]>([]);
   const [ak, setAk] = useState(0);
   const [sailed, setSailed] = useState(false);
-  const [post, setPost] = useState<'post' | 'to'>('post');
   const [oshi, setOshi] = useState<'coming' | 'here' | 'open'>('coming');
   const [look, setLook] = useState<IslandLook | null>(null);
   const [islandHold, setIslandHold] = useState(false);
@@ -308,6 +308,17 @@ export function MercuryLesson({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [introLine?.text, phase]);
+
+  // the prev／new merge (D06-S006): once the art is chosen (or for new words), フリージー asks for the words
+  useEffect(() => {
+    if (phase !== 'words' || (from === 'prev' && !jacket)) return;
+    const t = setTimeout(
+      () => (from === 'prev' ? said({ who: 'freezy', text: 'どんな気持ちだったか、足したければ、声で言ってみろ。言葉が、そのまま歌詞になる。' }) : said({ who: 'freezy', text: '今日あったことを、話してみろ。言葉が、そのまま歌詞になる。' })),
+      2400,
+    );
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, from, jacket]);
 
   // the style words → genre (the first example named) and spell cards (the said words, then the words' own)
   const spell = (talk: string) => {
@@ -368,30 +379,38 @@ export function MercuryLesson({
   const ainsert = (more: After[]) => setAfter((a) => [...a.slice(0, ak + 1), ...more, ...a.slice(ak + 1)]);
   const putAway = () => {
     setAfter([
-      gd('曲を、{neo}だけの〔⛏ 土の中の曲〕にしまいました。誰にも送られていません。しまった曲は、このあと作る〔🏝️ myアイランド〕の土の中から、いつでも聴けます'),
-      fr('次は、出航だ。お前の曲を、ダチの海に出す。'),
-      gd('〔🚢 出航させる〕を押すと、曲が船になって、ダチの海を88時間めぐり、このあと作るmyアイランドの桟橋に戻ります（届くのはダチだけ。いまのダチは、{inviter}とKIMORIN⭐︎です）'),
+      // the song card flows through the screen into Bluena; {bati} comes back beside {neo}; the screen closes
+      { k: 'line', l: { who: 'bati', text: 'Bluenaに、しまったよ！' } },
+      gd('曲を、Bluenaの中の水星のフォルダ（〔⛏ 土の中の曲〕）にしまいました。{neo}だけの作品集です。誰にも送られていません。Bluenaから、いつでも聴けます'),
+      { k: 'line', l: { who: 'freezy', text: '次は、出航だ。お前の曲を、ダチの海に出す。' } },
+      gd('〔公開する〕を押すと、Bluenaから曲がこの海に映され、船になって、ダチの海を88時間めぐり、このあと作るmyアイランドの桟橋に戻ります（届くのはダチだけ。いまのダチは、{inviter}とKIMORIN⭐︎です）'),
       { k: 'sail' },
     ]);
     setAk(0);
     setPhase('after');
   };
-  const closing = (): After[] => [
-    heard ? fr('{neo}の言葉は、ちゃんと歌になった。また聴かせてくれ。') : fr('聴くのは、あとでいい。また聴かせてくれ。'),
-    ki('では、私も。'),
+  const closing = (sail: boolean): After[] => [
+    { k: 'line', l: { who: 'freezy', text: '{neo}の日常も、立派な歌になる。また聴かせてくれ。' } },
+    { k: 'line', l: { who: 'kimorin', text: 'では、私も。' } }, // KIMORINが、Bluenaの自分の曲の〔公開する〕を押す
     { k: 'ship', who: 'kimorin' },
-    gd('〔🗺️ 海図〕を押すと、上の〔推し〕に、ダチの船が入ってきます。タップすると聴けます（押した時だけ鳴ります）'),
+    { k: 'bar', lit: 0 }, // {neo}が〔🗺️ 海図〕を押す
+    gd('上の〔推し〕に、ダチの船が入ってきます。タップすると聴けます（押した時だけ鳴ります）'),
     { k: 'oshi' },
-    ki('……二回目でも、泣けますね。'),
-    fr('次は、音楽が帰る場所だ。どんな島にするかは、お前が決めろ。'),
-    { k: 'bar' },
+    { k: 'line', l: { who: 'kimorin', text: '……二回目でも、泣けますね。' } }, // サングラスの下から、また涙が一筋
+    // D06-S007b myアイランド：港のすぐ前の、何もない海
+    { k: 'line', l: { who: 'freezy', text: '次は、音楽が帰る場所だ。公開した曲は、ここに並ぶ。どんな島にするかは、お前が決めろ。' } },
+    { k: 'bar', lit: 2 },
     { k: 'edit' },
     { k: 'rise' },
-    ki('……島とは、生えるものだったのですね。'),
-    ...(sailed ? [gd('出航した船は、88時間ダチの海をめぐって、この島の桟橋に戻ります。戻った曲は、浜にレコードとして並びます')] : []),
+    { k: 'line', l: { who: 'kimorin', text: '……島とは、生えるものだったのですね。' } },
+    ...(sail ? [gd('出航した船は、88時間ダチの海をめぐって、この島の桟橋に戻ります。戻った曲は、浜にレコードとして並びます')] : []),
     gd('myアイランドができた'),
     { k: 'end' },
   ];
+  const keep = () => {
+    ainsert([{ k: 'line', l: { who: 'freezy', text: '出航は、いつでもできる。' } }, gd('Bluenaの〔⛏ 土の中の曲〕から、いつでも〔公開する〕を押せます'), ...closing(false)]);
+    anext();
+  };
   // each line plays its voice; the ships sail on their own; KIMORIN⭐︎'s ship waits for a tap; the island rises
   useEffect(() => {
     if (!ab) return;
@@ -423,39 +442,37 @@ export function MercuryLesson({
   let coach: CoachLine | null = cue ? lineOf(cue) : null;
   let actions: React.ReactNode = null;
   const scene = phase === 'intro' ? INTRO[k].scene : undefined;
+  const introNext = () => {
+    if (reply && replyAt < reply.length - 1) return setReplyAt(replyAt + 1);
+    setReply(null);
+    setReplyAt(0);
+    if (k < INTRO.length - 1) setK(k + 1);
+    else {
+      // {neo} pressed 〔🌙 つくる〕: a beam from Bluena's lens, the square screen, the Moon atelier; {bati} hops onto the bench
+      fade(song2.current);
+      setPhase('choose');
+      setCue(null);
+    }
+  };
   if (phase === 'intro') {
     const b = INTRO[k];
     coach = lineOf(reply ? reply[replyAt] : b);
-    actions =
-      b.choices && !reply ? (
+    actions = b.tap ? null : b.choices && !reply ? (
         b.choices.map((c) => (
           <button key={c.label} onClick={() => setReply(c.reply)} className="rounded-full bg-sky-100 px-3 py-1.5 text-xs font-bold text-sky-700">
             {c.label}
           </button>
         ))
       ) : (
-        <NextButton
-          onClick={() => {
-            if (reply && replyAt < reply.length - 1) return setReplyAt(replyAt + 1);
-            setReply(null);
-            setReplyAt(0);
-            if (k < INTRO.length - 1) setK(k + 1);
-            else {
-              fade(song2.current);
-              setPhase('choose');
-              setCue(null);
-            }
-          }}
-        />
+        <NextButton onClick={introNext} />
       );
-  } else if (phase === 'choose') coach = lineOf({ who: 'freezy', text: '次は、お前だ。' });
-  else if (phase === 'hold') actions = <NextButton label="続ける" onClick={() => setPhase('choose')} />;
+  } else if (phase === 'hold') actions = <NextButton label="続ける" onClick={() => setPhase('choose')} />;
   else if (phase === 'mana') coach = { text: '作曲に、マナを使います。いいですか？' };
   else if (phase === 'writing') coach = { text: '✍️ 歌詞を考えています…' };
   else if (phase === 'singing' && stage === 'warming') coach = { text: '♪ 作曲中…　音のスタジオが、目をさましています' };
-  else if (phase === 'song' && cue?.text === '−2マナ') actions = <NextButton onClick={() => setCue({ who: 'guide', text: '聴いたら〔🔒 土の中にしまう〕を押します（自動ではしまいません）' })} />;
+  else if (phase === 'song' && cue?.text === '−2マナ') actions = <NextButton onClick={() => setCue({ who: 'guide', text: '聴いたら〔この曲にする〕を押します（押すまでは、しまいません）' })} />;
   else if (phase === 'after') {
-    coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: '下の右の〔🏝️ myアイランド〕を押す' } : ab?.k === 'oshi' && oshi === 'here' ? { text: '上の〔推し〕の海に、小さな船が一隻。タップしてみよう' } : null;
+    coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: ab.lit === 0 ? '〔🗺️ 海図〕を押す' : '下の右の〔🏝️ myアイランド〕を押す' } : ab?.k === 'oshi' && oshi === 'here' ? { text: 'タップすると聴けます（押した時だけ鳴ります）' } : null;
     if (ab?.k === 'line') actions = <NextButton onClick={anext} />;
   }
 
@@ -465,20 +482,22 @@ export function MercuryLesson({
       <audio ref={song1} src={KIMORIN_SONG_1.src} preload="auto" />
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <audio ref={song2} src={KIMORIN_SONG_2.src} preload="auto" />
-      {batiImage && phase !== 'after' && (
+      {batiImage && phase !== 'after' && !MAKING.includes(phase) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={batiImage} alt="" className="pointer-events-none absolute bottom-[calc(16px+env(safe-area-inset-bottom))] left-3 z-[170] h-16 w-16 rounded-2xl border-2 border-white/70 object-cover shadow-lg" aria-hidden />
       )}
       {song && (
         // eslint-disable-next-line jsx-a11y/media-has-caption
-        <audio ref={audio} src={song.url} onPlay={() => (setPlaying(true), setHeard(true))} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
+        <audio ref={audio} src={song.url} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} />
       )}
 
-      {(scene === 'bar' || scene === 'bar-glow') && <Bar glow={scene === 'bar-glow'} />}
-      {(scene === 'demo' || scene === 'song1' || scene === 'song2') && (
-        <div className="absolute inset-x-0 top-[36svh] z-[160] flex justify-center">
+      {(scene === 'bar' || scene === 'bar-glow') && <Bar glow={scene === 'bar-glow'} onTap={INTRO[k].tap ? introNext : undefined} />}
+      {/* KIMORIN⭐︎'s atelier: through his Bluena, うんちピンポンくん on the bench (closes when his song card goes into his Bluena) */}
+      {(scene === 'demo' || scene === 'song1' || scene === 'song2' || scene === 'close') && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[160] h-[78svh]">
+          <AtelierScreen key="kimorin" bati={{ name: 'うんちピンポンくん', image: spriteUrl('unchi-pinpon') }} closing={scene === 'close'}>
           <div className="flex flex-col items-center gap-3">
-            <Record s={KIMORIN_JACKET} playing={scene === 'song1' || scene === 'song2'} size={220} />
+            <Record s={KIMORIN_JACKET} playing={scene === 'song1' || scene === 'song2'} size={150} />
             {INTRO[k].cards && (
               <div key={INTRO[k].cards!.join()} className="flex max-w-xs flex-wrap justify-center gap-1.5">
                 {INTRO[k].cards!.map((c, i) => (
@@ -489,6 +508,19 @@ export function MercuryLesson({
               </div>
             )}
           </div>
+          </AtelierScreen>
+        </div>
+      )}
+      {/* {neo}'s own atelier: opened by 〔🌙 つくる〕, {bati} on the bench; closes when the song goes into Bluena */}
+      {(MAKING.includes(phase) || (phase === 'after' && ak === 0)) && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-[160] h-[62svh]">
+          <AtelierScreen key="mine" bati={{ name: bati, image: batiImage }} closing={phase === 'after'}>
+            {phase === 'singing' || phase === 'song' || phase === 'failed' || phase === 'after' ? (
+              <Record s={record} playing={phase === 'singing' || playing} size={130} />
+            ) : from === 'prev' && jacket ? (
+              <Sticker s={jacket} size={120} />
+            ) : null}
+          </AtelierScreen>
         </div>
       )}
 
@@ -551,13 +583,6 @@ export function MercuryLesson({
                 </div>
               )}
               <p className="text-center text-sm font-black text-sky-700">{from === 'prev' ? 'そのときの気持ちを、足してもいい' : '今日あったことを話してみよう'}</p>
-              <p className="mt-1 text-center text-[12px] font-bold text-slate-500">
-                {fill(
-                  from === 'prev'
-                    ? 'そのとき何があったか、どんな気持ちだったか、足したければ、声で言ってみろ。言葉が、そのまま歌詞になる。足さなくてもいい。'
-                    : '今日あったことを、話してみろ。言葉が、そのまま歌詞になる。',
-                )}
-              </p>
               <div className="mt-3">
                 <VoiceField light value={words} onChange={setWords} placeholder={from === 'prev' ? 'うれしかった／ちょっとさみしかった／まだ言葉にならない' : '海のこと／冷蔵庫のこと／いま思ったこと'} maxLength={60} />
               </div>
@@ -578,13 +603,15 @@ export function MercuryLesson({
                     setPassed(true);
                     setPhase('style');
                     if (from === 'prev') setCue({ who: 'guide', text: 'いまある言葉だけで、歌詞にします' });
-                    else said({ who: 'kimorin', text: '冷蔵庫が、歌詞に。……家電の、デビューですね。' });
-                    setTimeout(() => said({ who: 'bati', text: 'どんな曲にしたい？　速さとか、雰囲気とか、できるだけ、くわしく教えて！' }), 2600);
+                    else {
+                      setCue({ who: 'guide', text: '言葉がなくても大丈夫。いまいる場所（氷の島と冷蔵庫）から、歌詞を考えます' });
+                      setTimeout(() => said({ who: 'kimorin', text: '冷蔵庫が、歌詞に。……家電の、デビューですね。' }), 2200);
+                    }
+                    setTimeout(() => said({ who: 'bati', text: 'どんな曲にしたい？　速さとか、雰囲気とか、できるだけ、くわしく教えて！' }), from === 'prev' ? 2600 : 4800);
                   }}
                 >
                   パス
                 </Soft>
-                {passed === false && from === 'new' && <p className="text-center text-[11px] text-slate-400">パスすると、いまいる場所（氷の島と冷蔵庫）から、歌詞を考えます</p>}
               </div>
             </>
           )}
@@ -596,6 +623,7 @@ export function MercuryLesson({
           {!cards ? (
             <>
               <VoiceField light value={styleSaid} onChange={setStyleSaid} placeholder="EDMで、アゲアゲで、テンポが速い感じ" maxLength={60} />
+              <p className="text-center text-sm font-black text-sky-700">どんな曲にしたい？</p>
               <p className="mt-2 text-center text-[11px] text-slate-400">迷ったら、例から</p>
               <div className="mt-1 flex flex-wrap justify-center gap-1.5">
                 {FEELS.filter((f) => f.id !== 'auto').map((f) => (
@@ -749,7 +777,7 @@ export function MercuryLesson({
                 putAway();
               }}
             >
-              🔒 土の中にしまう
+              この曲にする
             </Big>
             {!redone ? (
               <Soft
@@ -757,15 +785,16 @@ export function MercuryLesson({
                   audio.current?.pause();
                   setOther(song);
                   setRedone(true);
+                  // the spell cards can be changed by talking before the remake (or left as they are)
                   setPhase('style');
-                  said({ who: 'bati', text: 'スペルの、どこを変える？' });
+                  setCue(null);
                 }}
               >
                 作り直す（1回だけ）
               </Soft>
             ) : (
               other && (
-                <p className="text-center text-[11px] text-slate-400">二枚のどちらかを選んで〔🔒 土の中にしまう〕（作り直しは、ここまで）</p>
+                <p className="text-center text-[11px] text-slate-400">二枚のどちらかを選んで〔この曲にする〕（作り直しは、ここまで）</p>
               )
             )}
           </div>
@@ -779,47 +808,43 @@ export function MercuryLesson({
               tone="sky"
               onClick={() => {
                 setSailed(true);
-                setPost('to');
-                ainsert([{ k: 'post' }, { k: 'ship', who: 'mine' }, gd('{neo}の最初の一隻が、ダチの海へ出た'), ki('出た……！　船、出たケン！'), ki('……失礼。見事な船出ですね。'), ...closing()]);
+                // the 〔ダチへ〕 screen; then the song is projected from Bluena onto the sea and becomes a ship (the jacket on its sail)
+                ainsert([{ k: 'post' }, { k: 'ship', who: 'mine' }, gd('{neo}の最初の一隻が、ダチの海へ出た'), ...closing(true)]);
                 anext();
               }}
             >
-              🚢 出航させる
+              公開する
             </Big>
-            <Soft
-              onClick={() => {
-                ainsert([fr('出航は、いつでもできる。'), gd('〔⛏ 土の中の曲〕から、いつでも〔🚢 出航させる〕を押せます'), ...closing()]);
-                anext();
-              }}
-            >
-              今は、土の中にしまっておく
-            </Soft>
+            <Soft onClick={keep}>今は、Bluenaの土の中にしまっておく</Soft>
           </div>
         </Panel>
       )}
       {ab?.k === 'post' && (
         <Panel>
-          {post === 'post' ? (
-            <Big tone="sky" onClick={() => setPost('to')}>
-              🚢 出航させる
-            </Big>
-          ) : (
-            <div className="space-y-3">
-              <p className="text-center text-[13px] text-slate-500">行き先</p>
-              <div className="rounded-2xl bg-sky-50 p-3 text-center text-[14px] font-bold text-sky-700 ring-2 ring-sky-300">
-                ✓ ダチへ（{inviter}・KIMORIN⭐︎）
-              </div>
-              <Big
-                tone="sky"
-                onClick={() => {
-                  if (song) void api.deliver({ kind: 'song', title: song.title.slice(0, 60), url: song.url, posterUrl: record.url && /^https?:/.test(record.url) ? record.url : undefined, refId: /^[0-9a-f-]{36}$/.test(song.id) ? song.id : undefined }).catch(() => undefined);
-                  anext();
-                }}
-              >
-                🚢 出航
-              </Big>
+          <div className="space-y-3">
+            <p className="text-center text-[13px] text-slate-500">行き先</p>
+            <div className="rounded-2xl bg-sky-50 p-3 text-center text-[14px] font-bold text-sky-700 ring-2 ring-sky-300">
+              ✓ ダチへ（{inviter}・KIMORIN⭐︎）
             </div>
-          )}
+            <Big
+              tone="sky"
+              onClick={() => {
+                if (song) void api.deliver({ kind: 'song', title: song.title.slice(0, 60), url: song.url, posterUrl: record.url && /^https?:/.test(record.url) ? record.url : undefined, refId: /^[0-9a-f-]{36}$/.test(song.id) ? song.id : undefined }).catch(() => undefined);
+                anext();
+              }}
+            >
+              🚢 出航
+            </Big>
+            <Soft
+              onClick={() => {
+                // 〔やめる〕 is the same as keep: drop the ship and its telop, then the keep lines
+                setSailed(false);
+                setAfter((a) => [...a.slice(0, ak), { k: 'line', l: { who: 'freezy', text: '出航は、いつでもできる。' } }, gd('Bluenaの〔⛏ 土の中の曲〕から、いつでも〔公開する〕を押せます'), ...closing(false)]);
+              }}
+            >
+              やめる
+            </Soft>
+          </div>
         </Panel>
       )}
       {ab?.k === 'ship' && (
@@ -857,12 +882,12 @@ export function MercuryLesson({
           </button>
         </div>
       )}
-      {ab?.k === 'bar' && <Bar glow lit={2} onTap={anext} />}
+      {ab?.k === 'bar' && <Bar glow lit={ab.lit} onTap={anext} />}
       {phase === 'after' && ak >= after.findIndex((x) => x.k === 'rise') && after.some((x) => x.k === 'rise') && ab?.k !== 'edit' && (
         <div className="pointer-events-none absolute inset-x-0 top-[26svh] z-[160] flex justify-center px-5">
           {/* the sea off the harbour, where the island rises */}
           <div className={`relative w-full max-w-sm overflow-hidden rounded-3xl border border-white/40 bg-gradient-to-b px-3 pb-2 pt-6 shadow-2xl ${look?.time === 'night' ? 'from-indigo-950 via-indigo-800 to-sky-900' : look?.time === 'dusk' ? 'from-orange-300 via-rose-300 to-sky-700' : 'from-sky-300 via-sky-400 to-sky-700'}`}>
-            <MyIsland look={look ?? islandOmakase(neo)} rise={ab?.k === 'rise' ? rise : 2} records={1} width={320} />
+            <MyIsland look={look ?? islandOmakase(neo)} rise={ab?.k === 'rise' ? rise : 2} records={sailed ? 1 : 0} width={320} />
           </div>
         </div>
       )}

@@ -60,7 +60,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
     butterfly: u.butterflyUrl ?? null,
-    story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2)\./.test(k))),
+    story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2|sys)\./.test(k))),
     createdAt: u.createdAt.toISOString(),
   };
 }
@@ -127,6 +127,20 @@ export class UsersService {
   }
 
   /**
+   * Answers of a story scene that is not on a day (SYS-S002 from the settings: f_ej_heard_now, f_join_early_now),
+   * kept as sys.<key> next to the days' answers. Day 8 reads them (web lib/onboarding/joinFlags.ts).
+   */
+  async saveSysStory(userId: string, answers: Record<string, string>): Promise<Me> {
+    const cur = await this.load(userId);
+    const [u] = await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...cur.onboardingJson, ...Object.fromEntries(Object.entries(answers).map(([k, v]) => [`sys.${k}`, v])) }, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(u);
+  }
+
+  /**
    * The story of `day` was finished. Idempotent; never moves the journey backwards.
    * Day 8 (the Sun) ends paid (ORDER) or not (a resident, draft 21); either way the journey is then done.
    */
@@ -166,13 +180,13 @@ export class UsersService {
   }
 
   /**
-   * Start the next day: allowed 24 h after the current day was finished, or immediately with
-   * skip ("明日まで待てない"). PLACEHOLDER (P-OB-3): skipping is free and unlimited for now.
+   * Start the next day: allowed 24 h after the current day was finished. No skipping (M-R199, simple version): the
+   * old `skip` flag is ignored; a couple of minutes' grace covers a phone clock that runs a little fast.
    */
-  async advanceJourney(userId: string, skip: boolean): Promise<Me> {
+  async advanceJourney(userId: string, _skip: boolean): Promise<Me> {
     const cur = await this.load(userId);
     if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_DONE) return toMe(cur);
-    if (!skip && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS) {
+    if (Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
       throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     }
     const [u] = await this.db.write

@@ -122,6 +122,7 @@ export function DemoDay({
   timeUp = false,
   onTimeUp = () => undefined,
   onEnd,
+  onScene,
   onName,
   onNeoForm,
   onNeoName,
@@ -138,6 +139,8 @@ export function DemoDay({
   timeUp?: boolean;
   onTimeUp?: () => void;
   onEnd: (answers: Record<string, string>) => void;
+  /** the review screen: the script scene now playing */
+  onScene?: (id: string) => void;
   onName?: (name: string) => void;
   onNeoForm?: (id: string) => void;
   onNeoName?: (name: string) => void;
@@ -272,6 +275,7 @@ export function DemoDay({
           setOrdered(true);
         },
       }}
+      onScene={onScene}
       onEnd={(a) => setTimeout(() => onEnd(a), 1200)}
     />
   );

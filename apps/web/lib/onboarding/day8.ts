@@ -1,43 +1,61 @@
 import type { Step } from './script';
 
 /**
- * DAY 8 【金星 → 地球 → 太陽】 — story draft 21 (M-R124〜M-R126; review/DAY8.md, D08-S001〜S011b). Back on
- * Earth OBOLON and MONBAN explain: you are a resident of this universe already; the Eclipse at the Sun is a
- * choice — no joining fee, ¥88 a month is the mana that wells up in you, never raised, stop any time. KIMORIN
- * storms out, then jumps into the rocket after all. In the Sun (OBOLON only, background sun-inside): riddle 2
- * 「DJ」 → record I ナガレ for everyone → riddle 4 → the choice 〔エクリプスを受ける〕〔今は、住人のままでいる〕.
- * Staying: back to the map as a resident (free; the Eclipse can be taken later at the Sun temple). Taking it:
- * the payment by the visitor's own hand (EclipsePay) → KIMORIN⭐︎ joins too → the Eclipse, riddle 1, records
- * II・III (Obolo Order only) → 一周目の旅、おわり. The day ends with no 24-hour wait (StoryDay advances at once).
- * The 88 minutes run in the rocket from Venus; the temples of Earth don't count ('clock' off, M-R22).
+ * DAY 8 【金星 → 地球 → 太陽】 — the simple version (M-R198〜M-R204; script P04/c02.md・c03.md, D08-S001〜S011).
+ * Venus morning: {bati} is fading, the mana gem is empty → back to Earth. OBOLON 「、、、おかえり。」, MONBAN explains
+ * the Eclipse (¥88 a month is the mana that wells up in you), KIMORIN's questions about money, then he storms off.
+ * The choice is made here at the Earth temple (D08-S003): 〔今は、住人のままでいる〕 ends the first journey as a
+ * resident (D08-S005 → 〔宇宙の地図へ〕); 〔エクリプスを受ける〕 → the payment by the visitor's own hand (D08-S006,
+ * EclipsePay) → 〔通信：火星シアターの扉が、開いた〕 → the rocket (KIMORIN jumps in: 「……母は、とっくに、Obolo Orderでした。」)
+ * → into the Sun (D08-S007) → 「わかりやすく、言う。」 (D08-S009) → the Eclipse (D08-S011) → 最初の旅、おわり.
+ * People who already became Obolo Order (f_join_early = 'true', M-R199/M-R202/M-R204): {bati} is bright in the
+ * morning, a short おかえり, no decision and no payment screen, straight to the rocket of D08-S006.
+ * People who heard the explanation at the HQ before but did not join (f_ej_heard = 'true'): a short おかえり → D08-S003.
+ * No riddle book, no records I〜III, no FilmReel recap in the simple version (M-R198).
  */
 export const DAY8: Step[] = [
+  // D08-S001 地球へ帰る
+  { t: 'scene', id: 'D08-S001' },
   { t: 'bgm', track: 'morning' },
   { t: 'caption', text: '8日目' },
-  // D08-S001 地球へ帰る
-  { t: 'still', image: 's/venus-stage' }, // 金星の朝。巨大なレコードの星が、ゆっくり回っている。切符は五つのスタンプで金色
+  { t: 'still', image: 's/venus-stage' }, // 金星の朝。巨大なレコードの星が、ゆっくり回っている。ロケットが待っている。切符は五つのスタンプで金色
   { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
-  { t: 'say', who: 'ボスG', text: 'おはよう。……星めぐりは、ひと巡りだ。地球へ帰れ。' },
-  { t: 'say', who: 'KIMORIN', text: 'おはようございます。……では、問いただしに参りましょう。この結社の、本当の狙いを。' },
+  { t: 'say', who: 'ボスG', text: 'おはよう。……星めぐりは、ひと巡りだ。' },
+  { t: 'branch', key: 'f_join_early', cases: { true: 'morning-early' }, otherwise: 'morning-weak' },
+  { t: 'label', id: 'morning-weak' },
+  { t: 'sprite', image: ['bossg', '@bati-weak'] }, // Bluenaの光から、{bati}が出てくる。光が、うすい。体が、きのうより、透けている
+  { t: 'say', who: 'バティ', text: '……{neo}、おはよ……。なんだか、力が、出ないや……。' },
+  // {neo}の手もとで、マナジェムが、光らなくなっている
+  { t: 'say', who: 'ボスG', text: '……マナジェムの中身が、空だな。旅で、使いきったんだ。' },
+  { t: 'goto', id: 'morning-both' },
+  { t: 'label', id: 'morning-early' },
+  { t: 'sprite', image: ['bossg', '@bati'] }, // {bati}の光は、明るい
+  { t: 'say', who: 'バティ', text: 'おはよ、{neo}！　きょうも、元気！' },
+  { t: 'say', who: 'ボスG', text: '……マナが、湧いているな。もう、結社の一員か。' },
+  { t: 'label', id: 'morning-both' },
+  { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
+  { t: 'say', who: 'ボスG', text: '地球の結社に、帰れ。' },
+  { t: 'say', who: 'KIMORIN', text: '……では、問いただしに参りましょう。この結社の、本当の狙いを。' },
   { t: 'action', label: 'ロケットで地球に帰る' },
   { t: 'sprite', image: null },
-  { t: 'se', sound: 'whoosh' },
+  { t: 'se', sound: 'whoosh' }, // ロケットが、金星から飛び立つ
   { t: 'still', image: 's/rocket-space' },
   { t: 'clock', on: true },
   { t: 'bgm', track: 'space' },
-  { t: 'still', image: 's/rocket-earth' },
+  { t: 'still', image: 's/rocket-earth' }, // 窓の外で、青い地球が、だんだん大きくなる
 
   // D08-S002 OBOLONの「おかえり」と、KIMORINの質問
+  { t: 'scene', id: 'D08-S002' },
   { t: 'clock', on: false },
   { t: 'video', motion: 12 },
   { t: 'bgm', track: 'obolon' },
-  { t: 'loop', motion: 13 },
+  { t: 'loop', motion: 13 }, // 天球儀の大広間。光の柱の中に、黒い球のOBOLON
   { t: 'caption', text: '地球の神殿に戻った' },
   { t: 'say', who: 'OBOLON', text: '、、、おかえり。' },
   { t: 'say', who: 'OBOLON', text: '5つの星は、、、どうだった？' },
   { t: 'choice', key: 'f_d08_how', options: [{ label: '楽しかった', goto: 'how-fun' }, { label: '疲れた', goto: 'how-tired' }, { label: 'まだ、わからない', goto: 'how-unsure' }] },
   { t: 'label', id: 'how-fun' },
-  { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
+  { t: 'say', who: 'OBOLON', text: '、、、そうか。' }, // 黒い球が、少しだけ、にっこりする
   { t: 'goto', id: 'monban' },
   { t: 'label', id: 'how-tired' },
   { t: 'say', who: 'OBOLON', text: '、、、そうか。よく、歩いたな。' },
@@ -48,13 +66,34 @@ export const DAY8: Step[] = [
   { t: 'bgm', track: 'monban' },
   { t: 'video', motion: '27-c' }, // 黒い煙が湧き、MONBANが現れる（字幕を消した版）
   { t: 'loop', motion: '28-l' },
+  { t: 'branch', key: 'f_join_early', cases: { true: 'home-member' }, otherwise: 'home-heard?' },
+  { t: 'label', id: 'home-heard?' },
+  { t: 'branch', key: 'f_ej_heard', cases: { true: 'home-heard' }, otherwise: 'home-first' },
+  // 先に結社で説明を聞いた人（f_ej_heard）：Obolo Orderになった人
+  { t: 'label', id: 'home-member' },
+  { t: 'say', who: 'MONBAN', text: '……{neo}。お前は、もう、Obolo Orderだったな…。……おかえり…。' },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: '……私は、もう一度、母と話してきます。今度こそ、目を覚まさせます。' },
+  { t: 'sprite', image: null }, // KIMORINが、門の外へ出ていく。扇の尾が、ぴん、と立っている
+  { t: 'say', who: 'MONBAN', text: '……あとは、儀式だけだ…。太陽へ、送る…。' },
+  { t: 'goto', id: 'rocket' }, // → D08-S006 の「……よし、分かった…。」から（支払いの画面は出さない）
+  // 先に結社で説明を聞いた人（f_ej_heard）：ならなかった人
+  { t: 'label', id: 'home-heard' },
+  { t: 'say', who: 'MONBAN', text: '……マナジェムが、空になったか…。話は、前に、したな…。' },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: '……私は、もう一度、母と話してきます。今度こそ、目を覚まさせます。' },
+  { t: 'sprite', image: null }, // KIMORINが、門の外へ出ていく。扇の尾が、ぴん、と立っている
+  { t: 'goto', id: 'decide' },
+  // 初めて説明を聞く人（金色の目が、{bati}のうすい光を見る）
+  { t: 'label', id: 'home-first' },
+  { t: 'say', who: 'MONBAN', text: '……マナジェムが、空になったか…。' },
   { t: 'say', who: 'MONBAN', text: '……お前は、もう、この宇宙の住人だ…。いつでも、帰ってきていい…。' },
   { t: 'say', who: 'MONBAN', text: '……太陽の神殿で、『エクリプス』を受けることもできる…。太陽と、お前の魂をつなぐ儀式だ…。\n成功すれば、お前は、Obolo Orderになる…。' },
-  { t: 'say', who: 'MONBAN', text: '……Obolo Orderになれば、まだ行っていない星にも行ける…。切符の裏の、錠の星だ…。' },
-  { t: 'say', who: 'MONBAN', text: '……それに、エクリプスを受ければ…お前の体から、マナが湧くようになる…。招待の時にもらったジェムが空になっても、魔法が唱えられる…。' }, // {neo}の胸のあたりに、小さな泉の絵。数字は出ない
+  { t: 'say', who: 'MONBAN', text: '……エクリプスを受ければ…お前の体から、マナが湧くようになる…。{bati}も、また、魔法が唱えられる…。' }, // {neo}の胸のあたりに、小さな泉の絵。数字は出ない
+  { t: 'say', who: 'MONBAN', text: '……それに、まだ行っていない星にも行ける…。切符の裏の、錠の星だ…。' },
   { t: 'say', who: 'MONBAN', text: '……ここには、勝手に流れてくる広告もない…。知らない誰かの『おすすめ』も、流れてこない…。あるのは、誰かが自分の言葉で作ったものだけだ…。灯りは、みんなの88円で、ともしている…。' },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
-  { t: 'say', who: 'KIMORIN', text: '……ほら、来ました。入会費です。' },
+  { t: 'say', who: 'KIMORIN', text: '……はい、出ました。入会費です。' },
   { t: 'say', who: 'KIMORIN', text: 'ついに、化けの皮が、剥がれましたね。' },
   { t: 'say', who: 'OBOLON', text: '、、、入会費は、ない。' },
   { t: 'say', who: 'KIMORIN', text: '……は？' },
@@ -64,13 +103,10 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '……つまり、入会費は、タダ、ということですね？' },
   { t: 'say', who: 'OBOLON', text: '、、、そうだ。' },
   { t: 'say', who: 'KIMORIN', text: '……うまい言い方を、しますね。' },
-  { t: 'say', who: 'KIMORIN', text: 'では、いくつか、お伺いしましょうか。' }, // 顔を少し上に向けて、腕を組む
   { t: 'say', who: 'KIMORIN', text: '月に88円、と言って、あとから、値上がりしていくのでしょう？' },
   { t: 'say', who: 'OBOLON', text: '、、、値上げは、しない。' },
   { t: 'say', who: 'KIMORIN', text: 'やめたくなったら？　どうせ、やめさせてくれない仕組みでしょう？' },
   { t: 'say', who: 'OBOLON', text: '、、、いつでも、やめられる。やめ方は、支払いの画面に、書いてある。' },
-  { t: 'say', who: 'KIMORIN', text: 'マナは？　足りなくなったら、どうせ、買わせるのでしょう？' },
-  { t: 'say', who: 'OBOLON', text: '、、、買い足すことも、できる。でも、毎月湧く分で、十分、遊べる。' },
   { t: 'say', who: 'KIMORIN', text: '……Obolo Orderにならなかったら？　{bati}も、ピンポンくんも、消えるのでしょう？' },
   { t: 'say', who: 'OBOLON', text: '、、、消えない。お前たちは、もう、住人だ。作ったものも、届けたものも、そのままだ。' },
   { t: 'say', who: 'うんちピンポンくん', text: '……ピンポン♪' },
@@ -79,167 +115,146 @@ export const DAY8: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'そして、お母さんに、言ってやります。' },
   { t: 'say', who: 'KIMORIN', text: 'さようなら。' },
   { t: 'sprite', image: null }, // ローブの裾をひるがえして、門の外へ。扇の尾が、ぴん、と立っている
-  { t: 'say', who: 'MONBAN', text: '……行ったな…。' },
   { t: 'notice', text: '月額88円（毎月88マナの代金）。値上げはしません。いつでもやめられます。やめ方は、支払いの画面に書いてあります' },
-  { t: 'notice', text: '旅で使ったマナのめやす｜姿を変える 3マナ／コロリンのデザイン 3マナ／アートの絵（{bati}が描く時） 3マナ／曲 2マナ／MV 8マナ。声のコロリン、月で{bati}に聞くこと（ふだんの分）、写真や字だけのアート、届けること、DJで回すことは、マナを使いません' },
+  { t: 'notice', text: '旅で使ったマナのめやす｜姿を変える 3マナ／アートの絵（{bati}が描く時） 3マナ／曲 2マナ／MV 8マナ。声のコロリン、月で{bati}に聞くこと（ふだんの分）、写真や字だけのアート、届けること、DJで回すことは、マナを使いません' },
   { t: 'notice', text: 'エクリプスを受けなくても、住人のまま、星に戻って、作ったものを見て、届けて、回せます。マナジェムのマナを使い切ったあと、新しく作る時は、エクリプスが必要です' },
-  { t: 'say', who: 'MONBAN', text: '……まずは、太陽へ行け…。決めるのは、そこでいい…。' },
+
+  // D08-S003 エクリプスを受けるか（地球の神殿）
+  { t: 'scene', id: 'D08-S003' },
+  { t: 'label', id: 'decide' },
+  { t: 'bgm', track: 'earth-decide' },
+  { t: 'ticket', flip: true }, // 金色の切符の裏の星図。土星〜金星を通って太陽の印まで。その外で錠の天王星と海王星、いちばん外の暗い冥王星
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
+  { t: 'say', who: 'MONBAN', text: '……エクリプスを受けなくても、お前は、住人のままだ…。それも、道だ…。' },
+  { t: 'say', who: 'MONBAN', text: '……払えるなら、今から、エクリプスを始める…。太陽へは、俺が送る…。' },
+  { t: 'label', id: 'decide-choice' },
+  { t: 'choice', key: 'f_d08_decide', options: [{ label: 'エクリプスを受ける', goto: 'pay' }, { label: '今は、住人のままでいる' }] },
+  { t: 'say', who: 'MONBAN', text: '……そうか…。' },
+
+  // D08-S005 住人のままでいる
+  { t: 'scene', id: 'D08-S005' },
+  { t: 'say', who: 'MONBAN', text: '……いつでも、来い…。気が変わったら、俺に言え…。' },
+  { t: 'sprite', image: ['', 'kimorin-sun'] }, // 門のすき間から、白い顔が、ちらりとのぞく
+  { t: 'say', who: 'KIMORIN', text: '……では、私も、もう少しだけ、考えます。決して、怖気づいたわけでは、ありません。' },
+  { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪' },
+  { t: 'sprite', image: null },
+  { t: 'bgm', track: 'farewell' },
+  { t: 'notice', text: '住人のまま、いつでも星に戻れます。作ったもの・届けたもの・my場所・金星の番組・声のコロリンは、ずっとそのままです' },
+  { t: 'notice', text: 'Obolo Order（会員）には、いつでもなれます。地球の神殿でMONBANに話しかけると、エクリプスを受けられます。なると、{bati}にまたマナが湧き、天王星・冥王星・海王星が、一つずつ開きます' },
+  { t: 'caption', text: '最初の旅、おわり' },
+  { t: 'action', label: '宇宙の地図へ' },
+  { t: 'end' },
+  // D08-S003 再開した人（地球の神殿に戻ってきた住人）：「、、、来たか。」→ 星図 → 同じ二択
+  { t: 'label', id: 'resume' },
+  { t: 'scene', id: 'D08-S003' },
+  { t: 'bgm', track: 'earth-decide' },
+  { t: 'loop', motion: '28-l' }, // 地球の神殿。光の柱の中に、OBOLON。そばに、MONBAN
+  { t: 'say', who: 'OBOLON', text: '、、、来たか。' },
+  { t: 'ticket', flip: true },
+  { t: 'goto', id: 'decide-choice' },
+
+  // D08-S003 (pay) → D08-S006 エクリプスを始める（支払いは本人の手で）
+  { t: 'label', id: 'pay' },
+  { t: 'say', who: 'MONBAN', text: '……分かった…。' },
+  { t: 'scene', id: 'D08-S006' },
+  { t: 'say', who: 'MONBAN', text: '……この先は、お前の手で、押せ…。' },
+  // 〔画面：エクリプスの支払い（最終確認）〕［支払う／戻る］。完了しなかった時の〔画面：支払いは完了していません〕〔もう一度ためす／戻る〕と
+  // MONBAN「……まだ、終わっていない…。決めたら、また来い…。」は EclipsePay の中
+  { t: 'order', cancel: 'back' },
+  { t: 'caption', text: '通信：火星シアターの扉が、開いた' },
+  { t: 'label', id: 'rocket' },
+  { t: 'say', who: 'MONBAN', text: '……よし、分かった…。' },
+  { t: 'say', who: 'MONBAN', text: '……それでは、エクリプス用のロケットに、案内する…。' },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'still', image: 's/launch-pit' }, // ロケットの扉が、ゆっくり閉まっていく
   { t: 'say', who: 'KIMORIN', text: '待ちなさい。' }, // 外から
   { t: 'sprite', image: 'kimorin-sun' }, // 閉まりかけた扉のすき間に、白い顔がぬっと差しこまれる
   { t: 'say', who: 'KIMORIN', text: 'そのロケットに、私も、乗ります。' },
-  { t: 'say', who: 'KIMORIN', text: '……決めるのは、この目で、太陽を見てからです。' }, // 扉がもう一度開く。裾を整えて乗りこんでくる
+  // 扉がもう一度開く。KIMORINが、裾を整えて乗りこんでくる
+  { t: 'say', who: 'KIMORIN', text: '……私も、決めました。Obolo Orderに、なります。' },
+  { t: 'say', who: 'KIMORIN', text: '……母に言ってやりました。『あの結社は、詐欺です』と。' },
+  { t: 'say', who: 'KIMORIN', text: 'そうしたら、『88円なら、なっておきなさい』と。' },
+  { t: 'say', who: 'KIMORIN', text: '……母は、とっくに、Obolo Orderでした。' },
+  { t: 'say', who: 'KIMORIN', text: 'そして、oboloとは何か。この手で、解き明かしてみせます。' },
+  { t: 'say', who: 'KIMORIN', text: 'はははははは！' },
   { t: 'sprite', image: null },
   { t: 'se', sound: 'rocket' }, // 扉が閉まる。ロケットが、太陽へ飛び立つ
+  { t: 'goto', id: 'sun' },
+  // the payment screen's 「戻る」 → D08-S003
+  { t: 'label', id: 'back' },
+  { t: 'say', who: 'MONBAN', text: '戻るか…。' },
+  { t: 'goto', id: 'decide-choice' },
 
-  // D08-S007 太陽の中へ
-  { t: 'still', image: 's/rocket-sun' }, // 窓の外の太陽が、どんどん大きくなる
-  { t: 'whiteout' }, // まぶしくて、何も見えなくなる。ロケットごと、太陽の中へ、すぽん、と入る
+  // D08-S007 太陽の中へ（映画の場面）
+  { t: 'label', id: 'sun' },
+  { t: 'scene', id: 'D08-S007' },
+  { t: 'still', image: 's/rocket-sun' }, // 映像：ロケットの丸い窓いっぱいに、白く燃える太陽 → 炎がゆっくりうねる → 光の中へ吸いこまれていく
+  { t: 'whiteout' }, // ロケットごと、太陽の中へ、すぽん、と入る
   { t: 'bgm', track: null }, // 音が消える
-  { t: 'still', image: 's/sun-inside' },
+  { t: 'still', image: 's/sun-inside' }, // 上も下もない、あたたかい白い光の世界。白い柱が輪になって、かすんで立っている
   { t: 'caption', text: '太陽の中に入った' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: 'ここは……ええ、知っていますとも。太陽の、中です。……たぶん。' },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] }, // 光の玉の手前に、光の柱が立ちのぼり、黒い球が浮かぶ
   { t: 'caption', text: 'OBOLONが現れた' },
-  { t: 'branch', key: 'd1.choice1', cases: { 行きたい: 'sun-talk', 行きたくない: 'sun-talk', まだわかんない: 'sun-talk' }, otherwise: 'sun-quiet' },
-  { t: 'label', id: 'sun-talk' },
   { t: 'say', who: 'OBOLON', text: '{neo}。1日目、宇宙に行きたいか、\n聞いたな。' },
   { t: 'say', who: 'OBOLON', text: 'お前は、『{choice1}』と、\n言った。' },
   { t: 'say', who: 'OBOLON', text: '、、、今は、もう、\n答えは、いらないな。' },
-  { t: 'goto', id: 'sun-both' },
-  { t: 'label', id: 'sun-quiet' },
-  { t: 'say', who: 'OBOLON', text: '、、、来たな。' },
-  { t: 'label', id: 'sun-both' },
   { t: 'say', who: 'OBOLON', text: '、、、お前は、もう、五つの星を、渡ってきた。' },
-  { t: 'say', who: 'OBOLON', text: 'だから、、、聞かせよう。' },
 
-  // D08-S009 「わかりやすく、言う。」（M-R86：答えは「DJ」）
-  { t: 'say', who: 'OBOLON', text: '{neo}。旅で、何度も、\n聞きかけた言葉が、あるな。' },
-  { t: 'say', who: 'OBOLON', text: 'わかりやすく、言う。' },
-  { t: 'say', who: 'OBOLON', text: '旅で、もう、うすうす、気づいているかもしれないが、、、' },
+  // D08-S009 「わかりやすく、言う。」（映画の場面）
+  { t: 'scene', id: 'D08-S009' },
+  { t: 'bgm', track: 'sun' },
+  { t: 'say', who: 'KIMORIN', text: 'OBOLON。そろそろ、教えていただけますか。……Obolo Orderは全員、、、何なのです？' },
+  { t: 'say', who: 'OBOLON', text: 'わかりやすく、言う。', hold: true },
   { t: 'say', who: 'OBOLON', text: 'Obolo Orderは、全員、、、DJ、なんだ。', hold: true },
   { t: 'say', who: 'KIMORIN', text: '……DJ？　レコードを、きゅっきゅっと回す、あのDJですか？' },
   { t: 'say', who: 'OBOLON', text: '皿を回すだけが、、、DJじゃない。' },
-  { t: 'say', who: 'OBOLON', text: '声、言葉、曲、絵、映像、物語。' },
-  { t: 'say', who: 'OBOLON', text: '、、、混ぜて、誰かに、届ける。それが、DJだ。', hold: true },
-  { t: 'say', who: 'OBOLON', text: '選んで、並べる、だけの日も、、、DJだ。' },
-  { t: 'say', who: 'OBOLON', text: '土星の輪、木星の蝶、\n水星の船、火星の光、\n金星の、ターンテーブル。' }, // 光の玉に、五つの景色が順に映る。きのう金星で{neo}が自分の曲を回した瞬間。KIMORINのコロリンが「ぷりぷりぷりり！」
-  { t: 'say', who: 'KIMORIN', text: '……私の声。……録って、ふしに乗せて、鳴らす。……コロリンも、DJの技、でしたか。' },
-  { t: 'say', who: 'OBOLON', text: 'ぜんぶ、、、DJの、材料だ。' },
+  { t: 'say', who: 'OBOLON', text: '声、言葉、曲、絵、映像。、、、混ぜて、誰かに、届ける。それが、DJだ。', hold: true },
+  // 光の玉に、五つの景色が順に映る：コロリンの声が舞う空の輪／アートを抱えて飛ぶ蝶／曲を積んで港を出る船／スタジオの1枠に映るMV／きのう金星の放送ブースの卓で{neo}が自分の曲を回した瞬間
   { t: 'say', who: 'OBOLON', text: '浴びる、だけの側から、、、混ぜて、届ける、側へ。', hold: true },
-
-  // D08-S010 全員、DJ／札2が開く
-  { t: 'say', who: 'KIMORIN', text: '……星をめぐりながら、レコード箱に、材料を詰めていたのですね。きのう回したのも、その材料でした。' },
   { t: 'say', who: 'KIMORIN', text: '……台所にあるもの、では、なかったのですね。' },
-  { t: 'se', sound: 'riddle' },
-  { t: 'seal', n: 2, open: true }, // 札2のひびが割れ、「Obolo Orderは全員……」の続きに「DJ」の字。札1に星図の線と灯り（閉じたまま）
-  { t: 'caption', text: '謎2が開いた' },
-  { t: 'say', who: 'OBOLON', text: '謎は、8つ。' },
-  { t: 'say', who: 'OBOLON', text: '残りの謎は、、、旅の先に、ある。' },
-  // 札7「コスモスは」の字が、かすかに光る
-  { t: 'say', who: 'KIMORIN', text: '……コスモス。宝のありかの、あれですね。' },
-  { t: 'say', who: 'OBOLON', text: '、、、急がなくて、いい。' },
+  { t: 'say', who: 'KIMORIN', text: 'では、もう一つ。……そもそも、oboloとは、何なのです？' },
+  // 光の玉の奥に、星図のかけらのような細い線が走る。その端で、小さな灯りがいくつか寄り集まって、瞬く。すぐに、ほどけて消える
+  { t: 'say', who: 'OBOLON', text: '、、、それは、、、まだ、言わない。' },
+  { t: 'say', who: 'OBOLON', text: '星を、めぐっていれば、、、いつか、わかる。' },
+  { t: 'say', who: 'KIMORIN', text: '……また、それですか。' },
+
+  // D08-S011 エクリプス（映画の場面・いちばんの山場）
+  { t: 'scene', id: 'D08-S011' },
   { t: 'sprite', image: null },
-  { t: 'whiteout' },
-
-  // D08-S010b 記録 I　ナガレ（全員が見る。3日目のロケットで見せた断片が、ここで全部つながる）
-  { t: 'screen', open: true }, // Bluenaのスクリーンに、門の前のMONBAN
-  { t: 'say', who: 'MONBAN', text: '……よく見ておけ…。これが…ナガレだ…。' },
-  { t: 'screen', open: false },
-  { t: 'film', id: 'record1', parts: 9 },
-  { t: 'still', image: 's/sun-inside' }, // 白い光の中。{neo}と{bati}、KIMORINとピンポンくん。遠くで光の玉が回っている
-  { t: 'se', sound: 'riddle' },
-  { t: 'seal', n: 4, open: true }, // 札4の続きに「ナガレ」の字
-  { t: 'caption', text: '謎4が開いた' },
-  { t: 'sprite', image: ['kimorin-sun', 'obolon'] },
-  { t: 'say', who: 'OBOLON', text: '、、、敵は、人では、ない。', hold: true },
-  { t: 'say', who: 'KIMORIN', text: '……なるほど……全然わからん。' },
-  { t: 'say', who: 'OBOLON', text: '、、、そうか。' },
-  { t: 'say', who: 'OBOLON', text: 'お前たちは、、、もう、あの流れの、外に、いる。' },
-
-  // D08-S003 エクリプスを受けるか
-  { t: 'label', id: 'decide' },
-  { t: 'bgm', track: 'earth-decide' },
-  { t: 'ticket', flip: true }, // 金色の切符の裏の星図。土星〜金星を通って太陽まで。その外で錠の天王星と海王星が、うっすら光る
-  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
-  { t: 'say', who: 'OBOLON', text: '、、、{neo}。決めるのは、お前だ。' },
-  // MONBAN speaks from the square screen alone: OBOLON and KIMORIN step back (story chat 2026-11-02: the three overlapped)
-  { t: 'sprite', image: null },
-  { t: 'screen', open: true },
-  { t: 'say', who: 'MONBAN', text: '……エクリプスを受けなくても、お前は、住人のままだ…。それも、道だ…。' },
-  { t: 'say', who: 'MONBAN', text: '……受けるなら、今、ここで、始められる…。' }, // KIMORINは、腕を組んで黙っている
-  { t: 'label', id: 'decide-choice' },
-  { t: 'choice', key: 'f_d08_decide', options: [{ label: 'エクリプスを受ける', goto: 'pay' }, { label: '今は、住人のままでいる' }] },
-
-  // D08-S005 住人のままでいる
-  { t: 'say', who: 'MONBAN', text: '……そうか…。' },
-  { t: 'say', who: 'MONBAN', text: '……いつでも、来い…。' },
-  { t: 'screen', open: false },
-  { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……では、私も、もう少しだけ、考えます。決して、怖気づいたわけでは、ありません。' },
-  { t: 'say', who: 'うんちピンポンくん', text: 'ピンポン♪' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/rocket-earth' }, // ロケットが、太陽から地球へ戻る。窓の外に、金色の線でつながった五つの星
-  { t: 'bgm', track: 'farewell' },
-  { t: 'notice', text: '住人のまま、いつでも星に戻れます。作ったもの・届けたもの・金星のDJ・声のコロリンは、ずっと使えます' },
-  { t: 'notice', text: 'マナジェムのマナを使い切ったあとの新しい制作、天王星・海王星の扉、二周目の物語は、エクリプスを受けてから。太陽の神殿で、いつでも受けられます' },
-  { t: 'caption', text: '一周目の旅、おわり' },
-  { t: 'action', label: '宇宙の地図へ' },
-  { t: 'end' },
-  // 再開した人（太陽の神殿に戻ってきた住人）：光の中に、OBOLON → 星図のあとの二択へ
-  { t: 'label', id: 'resume' },
-  { t: 'still', image: 's/sun-inside' },
-  { t: 'sprite', image: 'obolon' },
-  { t: 'say', who: 'OBOLON', text: '、、、来たか。' },
-  { t: 'goto', id: 'decide' },
-
-  // D08-S006 エクリプスを始める（支払いは本人の手で）
-  { t: 'label', id: 'pay' },
-  { t: 'say', who: 'MONBAN', text: '……分かった…。' },
-  { t: 'say', who: 'MONBAN', text: '……この先は、お前の手で、押せ…。' },
-  { t: 'order', cancel: 'back' },
-  { t: 'say', who: 'MONBAN', text: '……よし、分かった…。' },
-  { t: 'screen', open: false },
-  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
-  { t: 'say', who: 'KIMORIN', text: '……私も、決めました。' },
-  { t: 'say', who: 'KIMORIN', text: 'Obolo Orderに、なります。' },
-  { t: 'say', who: 'KIMORIN', text: '……ロケットに飛び乗る前に、母に言ってやりました。そうしたら、『88円なら、なっておきなさい』と。' },
-  { t: 'say', who: 'KIMORIN', text: '私は、発明家です。新しい発明は、新しい体験に、こそ、あります。' },
-  { t: 'say', who: 'KIMORIN', text: 'そして、私は、全ての謎を解き明かし、コスモスを見つけ、宝を、手に入れてみせます。' },
-  { t: 'say', who: 'KIMORIN', text: 'それを、母に、プレゼントするのです！' },
-  { t: 'say', who: 'KIMORIN', text: 'はははははは！' },
-  { t: 'goto', id: 'eclipse' },
-  // the payment screen's 「戻る」
-  { t: 'label', id: 'back' },
-  { t: 'say', who: 'MONBAN', text: '戻るか…。' },
-  { t: 'goto', id: 'decide-choice' },
-
-  // D08-S011 エクリプス
-  { t: 'label', id: 'eclipse' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/sun-inside' }, // 黒い球が、遠くの大きな光の玉に重なる。光が隠れて、金色の輪だけが残る
+  { t: 'bgm', track: null },
+  { t: 'still', image: 's/sun-inside' }, // OBOLONの黒い球が、遠くの光の玉に重なる。光が隠れて、まわりに金色の輪だけが残る
   { t: 'bgm', track: 'eclipse' }, // 音楽が、静かに始まる
-  { t: 'se', sound: 'magic' }, // 金色の輪から、光の粒が、雪のように降ってくる。{neo}の胸に、小さな光の泉
-  { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……あたたかい光ですね。これで、{neo}も私も、Obolo Order……ということで、よろしいのですか？' },
+  { t: 'se', sound: 'magic' }, // 金色の輪から、光の粒が、雪のように降ってくる。{neo}と{bati}に。となりで、KIMORINとピンポンくんにも
+  { t: 'motes', count: 120 },
+  { t: 'sprite', image: '@bati' }, // {bati}の透けていた体に、光が流れこむ。輪郭が、くっきりと戻る（先にObolo Orderになった人：いつもの光が、もう一段、明るくなる）
+  { t: 'say', who: 'バティ', text: '……からだが、あったかい！' },
+  { t: 'sprite', image: null }, // {neo}の胸のあたりに、小さな光の泉が、ぽっと灯る。音楽が、大きくなっていく
+  { t: 'still', image: 's/rec3-warm-city', fade: 2 }, // 金色の輪の向こうに、青い地球の夜の側。窓に、一つ、また一つ、暖かい灯りがともる
+  { t: 'still', image: 's/rec3-space', fade: 2 }, // 灯りが、ふわりと空へのぼって、星になる
+  { t: 'still', image: 's/sun-inside', fade: 2 }, // 金色の輪が、いちばん強く光る
+  { t: 'motes', count: 0 },
+  { t: 'branch', key: 'f_join_early', cases: { true: 'eclipse-early' }, otherwise: 'eclipse-new' },
+  { t: 'label', id: 'eclipse-new' },
   { t: 'caption', text: 'Obolo Orderになった' },
-  { t: 'seal', n: 1, open: true }, // 札1「oboloとは」の細い線と灯りが光り、札がほどける
-  { t: 'sprite', image: 'obolon' },
-  { t: 'say', who: 'OBOLON', text: 'oboloは、、、町の名前だ。', hold: true },
-  { t: 'say', who: 'OBOLON', text: 'DJの、、、町だ。宇宙にも、、、地球にも、ある。' },
-  { t: 'say', who: 'OBOLON', text: 'Obolo Orderが、増えれば、、、oboloも、増える。' },
-  { t: 'caption', text: '謎1が開いた' },
-  { t: 'say', who: 'OBOLON', text: 'Obolo Orderにだけ、、、見せる、記録がある。' },
-  { t: 'sprite', image: null },
-  // D08-S011b 記録映像　Obolo Order以外の閲覧を禁ず（記録 II・III）
-  { t: 'film', id: 'record23', parts: 16 }, // 記録 II　Obolo Order ／ 記録 III　掟（MONBANの読み上げ）→ 世界の窓に灯り → 宇宙の星
-  { t: 'still', image: 's/sun-inside' }, // 白い光の中。金色の輪だけが残っている
+  { t: 'goto', id: 'eclipse-both' },
+  { t: 'label', id: 'eclipse-early' },
+  { t: 'caption', text: 'エクリプスを受けた' },
+  { t: 'label', id: 'eclipse-both' },
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……今度は、少しだけ、わかりました。……少しだけ、ですが。' },
+  { t: 'say', who: 'KIMORIN', text: '……エクリプス成功だケン！' },
+  // こほん
+  { t: 'say', who: 'KIMORIN', text: '……失礼。成功です。' },
+  { t: 'say', who: 'KIMORIN', text: 'これで、{neo}も私も、Obolo Order……ということで、よろしいのですね？' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、そうだ。' },
+  { t: 'ticket', flip: true }, // {neo}の金色の切符が、ひとりでに裏返る。錠の印の三つの星。いちばん近い天王星の錠が、かちり、と小さく光る
+  { t: 'say', who: 'OBOLON', text: '錠の星は、、、一つずつ、開く。' },
+  { t: 'say', who: 'KIMORIN', text: '……明日から、新しい星へ、、、ですね。' },
   { t: 'sprite', image: null },
-  { t: 'bgm', track: null }, // 音楽が、ゆっくり消えていく。白い光の中に、金色の輪だけが残る
-  { t: 'caption', text: '一周目の旅、おわり' },
+  { t: 'bgm', track: null, fade: 4 }, // 音楽が、ゆっくり消えていく。白い光の中に、金色の輪だけが残る
+  { t: 'caption', text: '最初の旅、おわり' },
+  // 〔完了画面：次のお話（天王星）まで24時間のカウントダウン〕 is the player's / TomorrowScreen's
   { t: 'end' },
 ];

@@ -35,12 +35,10 @@ describe('day 1 script', () => {
     expect(bgmAt(DAY1, DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。'))).toBe('monban');
     expect(bgmAt(DAY1, DAY1.length - 1)).toBe('monban');
   });
-  it('lets the visitor read during motion 17, with 19 chained after it', () => {
+  it('lets the visitor read during motion 17, with 19 chained after it (M-R200 cut 「何かの偶然…」)', () => {
     const i = DAY1.findIndex((s) => s.t === 'bgvideo' && s.motion === 17);
     expect(DAY1[i]).toEqual({ t: 'bgvideo', motion: 17, then: [19] });
-    expect(DAY1[i + 1]).toMatchObject({ t: 'say', text: expect.stringContaining('何かの偶然') });
-    // resuming during those lines shows 19's last frame
-    expect(mediaAt(DAY1, i + 3)).toEqual({ motion: 19, loop: false });
+    expect(DAY1.slice(i + 1).find((s) => s.t === 'say')).toMatchObject({ t: 'say', text: expect.stringContaining('Obolo Order') });
   });
   it('MONBAN steps in on a black screen, then speaks to OBOLON (no turn: client 2026-10-22)', () => {
     const i = DAY1.findIndex((s) => s.t === 'say' && s.text === 'おい待て、そこまでだ。');

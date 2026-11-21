@@ -15,6 +15,8 @@ import { useAuth } from '@/lib/auth';
 import { demoBati } from '@/lib/look';
 import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
 import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
+import { ReviewBar } from '@/components/review/ReviewBar';
+import { SYS002 } from '@/lib/onboarding/sys002';
 
 /**
  * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1][&gate=1: the seal E-0 every time] — plays one day's story from the start (or from its first
@@ -35,11 +37,14 @@ export default function PreviewPlayPage() {
 
 function PreviewPlay() {
   const q = useSearchParams();
-  const day = Number(q.get('day'));
+  // day=sys002: SYS-S002 on its own (becoming Obolo Order early, from the settings) — with day 4's names and Bati
+  const sys = q.get('day') === 'sys002';
+  const day = sys ? 4 : Number(q.get('day'));
   const at = q.get('at');
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);
   const [timeUp, setTimeUp] = useState(false);
+  const [scene, setScene] = useState<string | null>(null);
   // logged in to the real API: the look and Bati are painted for real (Gemini) and saved to the account,
   // like a member's first journey; otherwise demo pictures drawn in the browser
   const { me, status, setMe } = useAuth();
@@ -58,9 +63,11 @@ function PreviewPlay() {
     } catch {}
     if (getApi().mode === 'live' && me) setMe(await getApi().updateMe({ displayName: n }));
   };
-  const live = getApi().mode === 'live' && !!me && q.get('demo') !== '1';
+  // review mode (client 2026-11-21): making, publishing and paying are tests here — no real AI, money or publishing —
+  // unless real=1 asks for the members' real calls on the logged-in account
+  const live = getApi().mode === 'live' && !!me && q.get('real') === '1';
   const name = (live && me ? me.displayName : typed) || 'あなた';
-  const guest = getApi().mode === 'live' && status === 'guest' && q.get('demo') !== '1';
+  const guest = getApi().mode === 'live' && status === 'guest' && q.get('real') === '1';
   useEffect(() => {
     if (q.get('timeup') !== '1') return;
     const t = setTimeout(() => setTimeUp(true), 20_000);
@@ -108,33 +115,38 @@ function PreviewPlay() {
     );
   }
 
-  const story = STORIES[day] ?? PREVIEW_ONLY[day];
+  const story = sys ? { steps: SYS002, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : (STORIES[day] ?? PREVIEW_ONLY[day]);
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   // thru=N: played straight through, each day handing over to the next up to day N (the client's check from the start to Saturn)
   const thru = Number(q.get('thru') ?? 0);
   // every day that has a next one ends on the countdown (client 2026-10-29: also from day 2 to day 3); thru=N stops at day N
   const upTo = thru || 99;
-  const nextDay = upTo > day && STORIES[day + 1] ? `/kakunin-5798f28713/play?day=${day + 1}${thru ? `&thru=${thru}` : ''}` : null;
+  const nextDay = !sys && upTo > day && STORIES[day + 1] ? `/kakunin-5798f28713/play?day=${day + 1}${thru ? `&thru=${thru}` : ''}` : null;
   if (ended && nextDay)
     return (
-      <TomorrowScreen
-        name={name}
-        completedAt={null}
-        skipLabel={STORIES[day]?.skipLabel ?? DEFAULT_SKIP_LABEL}
-        skippedText={STORIES[day]?.skippedText}
+      <>
+        <ReviewBar day={day} scene={null} />
+        <TomorrowScreen
+          name={name}
+          completedAt={null}
+          skipLabel={STORIES[day]?.skipLabel ?? DEFAULT_SKIP_LABEL}
+          skippedText={STORIES[day]?.skippedText}
+          canSkip
         onUnlocked={() => window.location.assign(nextDay)}
-      />
+        />
+      </>
     );
-  if (ended)
-    return (
-      <Ended
-        text={`${day}日目 おわり`}
-        again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}${q.get('gate') === '1' ? '&gate=1' : ''}`}
-      />
-    );
+  if (ended) return <Ended text={`${day}日目 おわり`} again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}${q.get('gate') === '1' ? '&gate=1' : ''}`} />;
 
   // at=<step type> (its first step) or i=<step index>
-  const start = q.get('i') ? Number(q.get('i')) : at ? Math.max(0, story.steps.findIndex((s) => s.t === at)) : 0;
+  const start = q.get('i')
+    ? Number(q.get('i'))
+    : at
+      ? Math.max(
+          0,
+          story.steps.findIndex((s) => s.t === at),
+        )
+      : 0;
   return (
     <>
       <DemoDay
@@ -149,6 +161,7 @@ function PreviewPlay() {
         onNeoForm={(id) => setNeo(id)}
         onName={(n) => void onName(n)}
         onEnd={() => setEnded(true)}
+        onScene={setScene}
         vars={{
           name,
           inviter: live && me?.invitedByName ? me.invitedByName : '木元 駿之介',
@@ -168,6 +181,7 @@ function PreviewPlay() {
         }}
       />
       <BackLink live={live} />
+      <ReviewBar day={sys ? null : day} scene={scene} />
       {guest && <GuestNote />}
     </>
   );

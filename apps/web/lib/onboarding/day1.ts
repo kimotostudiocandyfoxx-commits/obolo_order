@@ -84,7 +84,7 @@ export const DAY1: Step[] = [
   { t: 'bgvideo', motion: 16 }, // 宇宙へ引いていく
   { t: 'say', who: 'OBOLON', text: '地球も、俺も、お前も。\n想像しうる全てが\n宇宙、そこで生まれる。' },
   { t: 'bgvideo', motion: 17, then: [19] },
-  { t: 'say', who: 'OBOLON', text: '何かの偶然、何かの欲望、何かの閃き、\nいつだって、何かによって、何かが生まれる。' },
+  // M-R200: 「何かの偶然、何かの欲望…」 cut from the script
   { t: 'say', who: 'OBOLON', text: '“Obolo Order”\nそれは、新しい何かを、生み出す者達' },
   { t: 'say', who: 'OBOLON', text: '楽しむ心が、万物を創る。' },
   { t: 'say', who: 'OBOLON', text: '創るだけじゃない。' },

@@ -721,6 +721,10 @@ export class DemoApi implements Api {
     return this.s.users[id];
   }
 
+  async saveSysStory(answers: Record<string, string>) {
+    return this.patchMe((u) => ({ story: { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers).map(([k, v]) => [`sys.${k}`, v])) } }));
+  }
+
   async completeJourneyDay(day: number, answers?: Record<string, string>) {
     return this.patchMe((u) => {
       if (u.journeyDay !== day || u.journeyCompletedAt) return {};

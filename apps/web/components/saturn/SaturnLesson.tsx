@@ -2,8 +2,7 @@
 
 import { KORORIN_VOICE_STYLE, neoVoiceUrl, type SaturnPostView } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
-import { VoiceField } from '@/components/onboarding/StoryExtras';
-import { Choice, DecisionButton } from '@/components/story/parts';
+import { DecisionButton } from '@/components/story/parts';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
@@ -17,51 +16,43 @@ import { singKororin, singUrl } from '@/lib/saturn/sing';
 import { KororinVessels, type Kororin } from './KororinVessels';
 
 /**
- * Day 3 on Saturn (D04-S005〜S006), rebuilt for M-R176 (client 2026-10-29). Inside the temple's great hall, drawn the
- * kororin way: a heap of round stones and two big vessels, KIMORIN⭐︎'s and {neo}'s. Each blows three words into a
- * stone (KIMORIN⭐︎ first, the takoyaki brother and sister helping); {bati} (うんちピンポンくん for KIMORIN⭐︎) touches it
- * and the kororin rolls into its vessel, where it stays with its date and time, singing the words in that voice (M-R152,
- * lib/saturn/sing). The first is tapped to sing; the second and third sing as they land. Then the design (D04-S005b),
- * the dachi (D04-S005c): a kororin flicked up out of the screen flies to the plaza outside — your dachi's plaza too —
- * and the plaza at dusk (D04-S006): 〔🎤 サイファー〕, the mic relay. The mic is the round button at the bottom; a
- * small ⌨ in the corner is the way out for anyone who cannot speak. The lines are the story's (wip/P02/c03.md).
+ * Day 3 on Saturn (D04-S005 → D04-S005c; the simple version, M-R198). Inside the temple's great hall, drawn the
+ * kororin way: a heap of round stones and the vessels. KIMORIN⭐︎ and {neo} each blow two words into a stone (the food
+ * you ate lately, then anything); {bati} (うんちピンポンくん for KIMORIN⭐︎) touches it and the kororin rolls into the
+ * vessel, where it stays with its date and time, singing the words in that voice (M-R152, lib/saturn/sing). The first
+ * is tapped to sing; the second sings as it lands. Then the dachi (D04-S005c): a kororin flicked up out of the screen
+ * flies to the plaza outside — your dachi's plaza too — where MONBAN's kororin sings. The mic is the round button at
+ * the bottom; a small ⌨ in the corner is the way out for anyone who cannot speak. The lines are the story's
+ * (wip/P02/c03.md), word for word.
  */
 type Who = 'brother' | 'sister' | 'kimorin' | 'pinpon' | 'bati' | 'guide';
 type Beat =
-  | { k: 'say'; who: Who; text: string; redraw?: 'kimorin' }
+  | { k: 'say'; who: Who; text: string }
   | { k: 'note'; text: string }
   /** KIMORIN⭐︎'s kororin rolls into his vessel (sing: it sings at once as it lands) */
   | { k: 'drop'; text: string; sing?: boolean }
   /** {neo} blows the n-th words into a stone (n > 1: the kororin sings as it lands) */
-  | { k: 'rec'; n: 1 | 2 | 3 }
-  | { k: 'listen'; id: 'kimorin-1' | 'mine-1' | 'sister' }
-  | { k: 'batiVoice' }
-  | { k: 'design' }
-  /** KIMORIN⭐︎ flicks his three up, one by one */
+  | { k: 'rec'; n: 1 | 2 }
+  | { k: 'listen'; id: 'kimorin-1' | 'mine-1' }
+  /** KIMORIN⭐︎ flicks his up, one by one */
   | { k: 'kimFly' }
   /** {neo} flicks any of theirs up (or 〔今はいい〕) */
   | { k: 'fly' }
-  /** at the end of the practice the sister hands {neo} their own vessel (client 2026-10-29) */
-  | { k: 'gift' }
-  /** out of the temple to the plaza (the luxury cut to come: the gate, the plaza at dusk) */
+  /** out of the temple to the plaza: MONBAN's kororin is there and sings */
   | { k: 'plaza' }
-  /** the sister and the brother throw one each onto the plaza */
-  | { k: 'throw' }
-  | { k: 'cypher' }
   | { k: 'done' };
 
 const SPEAKER: Record<Who, string> = { brother: 'たこ焼きブラザー', sister: 'たこ焼きシスター', kimorin: 'KIMORIN', pinpon: 'うんちピンポンくん', bati: 'バティ', guide: '' };
 const NAMES: Record<Who, string> = { brother: 'たこ焼きブラザー', sister: 'たこ焼きシスター', kimorin: 'KIMORIN⭐︎', pinpon: 'うんちピンポンくん', bati: 'バティ', guide: '' };
 const SPRITES: Partial<Record<Who, string>> = { brother: 'takoyaki-brother', sister: 'takoyaki-sister', kimorin: 'kimorin-sun', pinpon: 'unchi-pinpon' };
 
-const SISTER_SUNSET = '……今日の夕焼け、きれいだったワ。';
-const BROTHER_STONE = '土星は原石の星だZE!!';
 /** MONBAN's kororin, always on the plaza (M-R176 addendum: so the plaza is never lonely) */
 const MONBAN_SONG = '……今日も、異常なし…。';
 const K1 = 'うんち。';
-const K2 = '滑り台。';
-const K3 = 'ぷりぷりぷりり、うひょひょひょ、げへへ！　ピンポン大正解！';
+const K2 = 'ぷりぷりぷりり、うひょひょひょ、げへへ！　ピンポン大正解！';
 
+// the simple version (M-R198, wip/P02/c03.md): two murmurs each (the food you ate lately → anything), no design
+// (D04-S005b) and no cypher (D04-S006); the plaza keeps MONBAN's kororin
 const BEATS: Beat[] = [
   // D04-S005 コロリン: the hall, the heap of stones, the two empty vessels
   { k: 'say', who: 'brother', text: '土星は原石の星だZE!!' },
@@ -69,7 +60,6 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'brother', text: 'さあ、つぶやいてみるZE!!' },
   { k: 'say', who: 'kimorin', text: '……何を、つぶやけばいいですか？' },
   { k: 'say', who: 'brother', text: '最近食べて、うまかったものを、言ってみるZE!!' },
-  { k: 'say', who: 'kimorin', text: 'わかりました。……では。' },
   { k: 'say', who: 'kimorin', text: 'うんち。' },
   { k: 'say', who: 'sister', text: '.....吹き込みが終わったら、バティが魔法で石をコロリンにしてくれるワ' }, // シーン……
   { k: 'say', who: 'pinpon', text: 'ピンポーン！' },
@@ -77,7 +67,6 @@ const BEATS: Beat[] = [
   { k: 'say', who: 'kimorin', text: 'なんですかこのかわいいたこ焼きは！' },
   { k: 'say', who: 'brother', text: 'これはコロリンだZE!!' },
   { k: 'say', who: 'sister', text: 'コロリンを、タップしてみるといいワ。' },
-  { k: 'say', who: 'kimorin', text: 'タッチ..' },
   { k: 'listen', id: 'kimorin-1' },
   { k: 'say', who: 'kimorin', text: '楽しいですね。' }, // シーン……
   { k: 'say', who: 'sister', text: 'そう、コロリンは歌うの。' },
@@ -86,41 +75,19 @@ const BEATS: Beat[] = [
   { k: 'listen', id: 'mine-1' },
   { k: 'say', who: 'kimorin', text: '……尾が、勝手に。これは、私の意思ではありません。' },
   { k: 'say', who: 'sister', text: '……いい声だワ。' },
-  { k: 'say', who: 'brother', text: '{neo}の言葉が、{neo}の声で、歌になったZE。' },
-  { k: 'say', who: 'brother', text: '次だZE。最近、楽しかったことは？' },
-  { k: 'say', who: 'kimorin', text: '滑り台。' },
-  { k: 'drop', text: K2, sing: true },
-  { k: 'say', who: 'brother', text: '{neo}の番だZE。' },
-  { k: 'rec', n: 2 },
   { k: 'say', who: 'sister', text: '最後は、自由に、なんでもいいワ。' },
   { k: 'say', who: 'kimorin', text: 'ぷりぷりぷりり、うひょひょひょ、げへへ！　ピンポン大正解！' },
-  { k: 'say', who: 'pinpon', text: 'ピンポーン！' }, // シーン……のあと
-  { k: 'drop', text: K3, sing: true },
+  { k: 'say', who: 'pinpon', text: 'ピンポーン！' },
+  { k: 'drop', text: K2, sing: true },
   { k: 'say', who: 'brother', text: '{neo}の番だZE。なんでもいいZE!!' },
-  { k: 'rec', n: 3 },
+  { k: 'rec', n: 2 },
   { k: 'say', who: 'brother', text: '自分で思ったことや、感じたこと、思いついたことは、全部コロリンにしちゃえ。それは全部、大切な思い出だZE。' },
-  { k: 'say', who: 'brother', text: '器のコロリンは、ずっと残るZE。だから、メモ代わりにでも、日記代わりにでも、使えちゃうZE。' },
-  { k: 'note', text: 'コロリンは、あなたの器に、日付と時刻つきで残ります。器のコロリンを続けてタップすると、順番に歌って、つながります。コロリンは、いつでも作れます' },
-  { k: 'batiVoice' },
-  // D04-S005b コロリンのデザイン: the vessels' three change
-  { k: 'say', who: 'sister', text: 'つぶやくのは、ここまでね。次は、見た目だワ。' },
-  { k: 'say', who: 'sister', text: 'コロリンの見た目は、自分でデザインできるワ。' },
-  { k: 'say', who: 'brother', text: '今は{neo}の見た目だZE。好きな見た目に、変えられるZE!!' },
-  { k: 'say', who: 'kimorin', text: 'では、私から。' },
-  { k: 'say', who: 'kimorin', text: '腕は80本。筋肉ムキムキ。パーティーが好き。……あと、たこ焼きなので、青のりを、多めに。' },
-  { k: 'note', text: 'KIMORIN⭐︎のマナジェム　−3マナ' },
-  { k: 'say', who: 'pinpon', text: 'ピンポン♪', redraw: 'kimorin' }, // KIMORINの器の三つが、腕80本・むきむき・青のり山盛りに
-  { k: 'say', who: 'kimorin', text: '……完璧です。私は、人生で一回も、失敗したことがありませんので。' }, // シーン……
-  { k: 'say', who: 'sister', text: '……言った言葉どおりに、なるワ。' },
-  { k: 'say', who: 'brother', text: '{neo}の番だZE。' },
-  { k: 'say', who: 'bati', text: '{neo}のコロリン、どんなのにする？' },
-  { k: 'design' },
+  { k: 'note', text: 'コロリンは、Bluenaの中のあなたの器（土星のフォルダ）に、日付と時刻つきで残ります。器のコロリンを続けてタップすると、順番に歌って、つながります。コロリンは、いつでも作れます' },
   // D04-S005c ダチになる／広場へ飛ばす
   { k: 'say', who: 'brother', text: '土星では、作ったものを届け合う仲間を、ダチって呼ぶZE。' },
   { k: 'say', who: 'brother', text: 'ダチは、本当に知ってる奴とだけ、なるもんだZE。' }, // M-R175
   { k: 'say', who: 'kimorin', text: 'では、ダチに、なりましょう。……というか、もう、ダチですよね？' },
-  { k: 'note', text: 'KIMORIN⭐︎がダチになった' },
-  { k: 'say', who: 'kimorin', text: '……念のため言っておきますが、詐欺グループの調査の、相棒として、です。' }, // 扇の尾が、ぱたぱた
+  { k: 'note', text: 'KIMORIN⭐︎がダチになった' }, // 握手。扇の尾が、ぱたぱた
   { k: 'say', who: 'brother', text: '招待者の、{inviter}だZE。' },
   { k: 'say', who: 'sister', text: '{neo}を、ここに招いてくれた人だワ。' },
   { k: 'note', text: '{inviter}がダチになった' },
@@ -130,44 +97,24 @@ const BEATS: Beat[] = [
   { k: 'note', text: 'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません' },
   { k: 'say', who: 'brother', text: '器のコロリンを、上に、飛ばしてみるZE!!' },
   { k: 'say', who: 'brother', text: '画面の外まで飛んだコロリンは、神殿の外の広場に届くZE。' },
-  { k: 'say', who: 'sister', text: '広場には、ダチのコロリンが集まるワ。{neo}が飛ばしたコロリンも、ダチの広場に並ぶワ。' },
-  { k: 'say', who: 'brother', text: '飛ばしたいのがあったら、飛ばせばいいZE。何個でもいいZE!!' },
-  { k: 'say', who: 'kimorin', text: 'では、三つとも。……全部、名作ですので。' },
+  { k: 'say', who: 'kimorin', text: 'では、全部。……全部、名作ですので。' },
   { k: 'kimFly' },
   { k: 'fly' },
-  // the practice is over: {neo}'s own vessel, from the sister (client 2026-10-29). Until here one bowl holds
-  // everyone's kororins (KIMORIN⭐︎'s too, only for the practice); from now on — and from lap 2 — {neo}'s alone
-  { k: 'say', who: 'sister', text: '{neo}に、これをあげるワ。{neo}だけの器だワ。' },
-  { k: 'gift' },
-  { k: 'say', who: 'sister', text: '{neo}のコロリンは、これから、ここにたまっていくワ。' },
-  // D04-S006 土星の広場のサイファー
+  // the plaza outside: the kororins roll over the cobbles; MONBAN's (the black hood) sings
   { k: 'plaza' },
   { k: 'say', who: 'kimorin', text: '……MONBANさんのまで、いますね。' },
-  { k: 'say', who: 'sister', text: '今夜は、ワタシたちのも、入れるワ。' },
-  { k: 'throw' },
-  { k: 'say', who: 'brother', text: 'サイファー、始めるZE!!' },
-  { k: 'cypher' },
-  { k: 'say', who: 'kimorin', text: '……な、なんやこれ。……失礼。土星の夜は、毎日、こうなのですか？' }, // サングラスが鼻先までずり落ちている
-  { k: 'say', who: 'brother', text: 'サイファーを押した夜は、毎日だZE。' },
-  { k: 'note', text: '広場のコロリンをタップすると、一つずつ歌が聞けます。〔🎤 サイファー〕を押すと、次々に歌いだして、マイクリレーが始まります' },
-  { k: 'listen', id: 'sister' },
+  // M-R194: the dachi's messages live in Bluena's 〔💬 通信〕, not on Saturn
+  { k: 'note', text: 'ダチとのやり取りは、どの星にいても、Bluenaの〔💬 通信〕でできます。ダチの名札をタップすると、二人のレコードがひらきます。コロリンをそのレコードへはじくと、そのダチに届きます。ふだんはレコード（声で流れる）、右上で〔💬 会話〕にすると字だけで読めます。どのコロリンにも字がつき、音はタップした時だけ鳴ります' },
   { k: 'done' },
 ];
-const DESIGNED: Beat[] = [
-  { k: 'note', text: 'これから生まれるコロリンは、この見た目になります' },
-  { k: 'say', who: 'kimorin', text: '……並べると、私のほうが、腕が多いですね。' }, // KIMORINが、自分の器を、{neo}の器のとなりに、そっと寄せる
-];
-const UNDESIGNED: Beat[] = [{ k: 'say', who: 'sister', text: '今の見た目のままでも、いいワ。デザインは、あとでもできるワ。' }];
 const FLOWN: Beat[] = [
   { k: 'note', text: 'コロリンが、広場へ飛んでいった' },
   { k: 'say', who: 'brother', text: '広場のコロリンは、88時間たつと、自分の器に戻ってくるZE。' },
-  { k: 'note', text: '上へ飛ばしたコロリンは、神殿の外の土星の広場に届き、ダチ（{inviter}・KIMORIN⭐︎）の広場にも並びます。広場には、ダチと自分のコロリンが集まります（三周目からは、推した人のコロリンも）。飛ばすのに、マナは使いません' },
+  { k: 'note', text: '上へ飛ばしたコロリンは、神殿の外の土星の広場に届き、ダチ（{inviter}・KIMORIN⭐︎）の広場にも並びます。広場には、ダチと自分のコロリンが集まります。飛ばすのに、マナは使いません' },
 ];
 const NOT_FLOWN: Beat[] = [{ k: 'say', who: 'sister', text: '飛ばしたくなったら、いつでも飛ばせるワ。' }];
 /** every spoken line of the practice, as story steps: the ones with names in them are voiced per member (useNameVoices) */
-const NAME_STEPS: Step[] = [...BEATS, ...DESIGNED, ...UNDESIGNED, ...FLOWN, ...NOT_FLOWN].flatMap((b): Step[] => (b.k === 'say' && SPEAKER[b.who] ? [{ t: 'say', who: SPEAKER[b.who] as Speaker, text: b.text }] : []));
-/** KIMORIN⭐︎'s designed kororin (80 muscular arms, a heap of aonori) — design/story-art-queue.json */
-const KIMORIN_DESIGNED = '/saturn/kororin-kimorin.webp';
+const NAME_STEPS: Step[] = [...BEATS, ...FLOWN, ...NOT_FLOWN].flatMap((b): Step[] => (b.k === 'say' && SPEAKER[b.who] ? [{ t: 'say', who: SPEAKER[b.who] as Speaker, text: b.text }] : []));
 const TOPICS = [
   { t: '今したいこと', ex: '滑り台でボカーン！' },
   { t: '最近驚いたこと', ex: 'え！？わき毛ってこんなに美味しいの？' },
@@ -183,13 +130,6 @@ async function storyVoice(who: string, text: string): Promise<string> {
   return (await singUrl(plain, text)) ?? plain;
 }
 
-const toBase64 = (b: Blob) =>
-  new Promise<string>((ok, no) => {
-    const r = new FileReader();
-    r.onload = () => ok(String(r.result).split(',')[1] ?? '');
-    r.onerror = () => no(r.error);
-    r.readAsDataURL(b);
-  });
 
 /** A recording two semitones up (pitch and pace together, like a sped-up tape) → WAV: used only if singing fails. */
 async function upTwo(blob: Blob): Promise<Blob> {
@@ -291,7 +231,6 @@ export function SaturnLesson({
   inviter,
   inviterMessage,
   batiImage,
-  food,
   api,
   onDone,
 }: {
@@ -316,10 +255,7 @@ export function SaturnLesson({
   const [plazaK, setPlazaK] = useState<Kororin[]>([]);
   const [scene, setScene] = useState<'hall' | 'plaza'>('hall');
   const [singingId, setSingingId] = useState<string | null>(null);
-  const [oh, setOh] = useState(false);
-  const [own, setOwn] = useState(false);
   const [flown, setFlown] = useState(0);
-  const [normal, setNormal] = useState<{ blob: Blob; text: string } | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [asking, setAsking] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -327,8 +263,8 @@ export function SaturnLesson({
   const [missed, setMissed] = useState(false);
   const [typed, setTyped] = useState('');
   const [busy, setBusy] = useState(false);
-  // the design you picked (D04-S005b), shown next to KIMORIN⭐︎'s at 「並べると…」 (QA 6 P7)
-  const [myLook, setMyLook] = useState<string | null>(null);
+  // your kororins keep the base look (the design, D04-S005b, is gone in the simple version)
+  const myLook: string | null = null;
   const [hint, setHint] = useState('');
   // a kororin singing holds the story until its song ends (QA 6 R11)
   const [waitSong, setWaitSong] = useState(false);
@@ -476,7 +412,6 @@ export function SaturnLesson({
     const at = i;
     if (beat.k === 'say') {
       void voice.current?.say(SPEAKER[beat.who], beat.text);
-      if (beat.redraw === 'kimorin') setKimorinK((x) => x.map((k) => ({ ...k, pic: KIMORIN_DESIGNED })));
     }
     if (beat.k === 'drop') {
       const n = kimorinK.length + 1;
@@ -485,10 +420,6 @@ export function SaturnLesson({
         if (beat.sing) setTimeout(() => void singThenNext(k, at), 900);
         else setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1100);
       });
-    }
-    if (beat.k === 'gift') {
-      setOwn(true);
-      setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1600);
     }
     if (beat.k === 'kimFly') {
       setFlyingIds(kimorinK.map((k) => k.id));
@@ -502,18 +433,12 @@ export function SaturnLesson({
     if (beat.k === 'plaza') {
       stopAudio();
       setScene('plaza');
-      // MONBAN's kororin (the black hood) is on the plaza already, and takes its turn in the cypher
-      void story('inviter', 'monban', 'MONBAN', '/saturn/kororin-monban.webp', MONBAN_SONG, 'MONBAN').then((k) => setPlazaK((x) => [...x, k]));
-      setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1400);
-    }
-    if (beat.k === 'throw')
-      void Promise.all([
-        story('sister', 'sister', 'たこ焼きシスター', '/saturn/kororin-sister.webp', SISTER_SUNSET, 'たこ焼きシスター'),
-        story('brother', 'brother', 'たこ焼きブラザー', '/saturn/kororin-brother.webp', BROTHER_STONE, 'たこ焼きブラザー'),
-      ]).then((two) => {
-        setPlazaK((x) => [...x, ...two]);
-        setTimeout(() => setI((m) => (m === at ? m + 1 : m)), 1300);
+      // MONBAN's kororin (the black hood) is on the plaza already: its glasses drop and it sings
+      void story('inviter', 'monban', 'MONBAN', '/saturn/kororin-monban.webp', MONBAN_SONG, 'MONBAN').then((k) => {
+        setPlazaK((x) => [...x, k]);
+        setTimeout(() => void singThenNext(k, at), 1400);
       });
+    }
     // D04-S005c: the inviter really becomes a dachi here
     if (beat.k === 'note' && beat.text === '{inviter}がダチになった') void api?.befriendInviter().catch(() => undefined);
     if (beat.k === 'done') {
@@ -552,7 +477,6 @@ export function SaturnLesson({
     const k: Kororin = { id: post?.id ?? `mine-${Date.now()}`, owner: 'mine', name: neo || 'あなた', pic: myLook, seed: neo || 'あなた', text: words, url: post?.voiceUrl ?? (up ? URL.createObjectURL(up) : neoVoiceUrl(KORORIN_VOICE_STYLE, null, words)), at: Date.now() };
     setMineK((x) => [...x, k]);
     setMade((m) => [...m, words]);
-    if (blob) setNormal({ blob, text: words });
     setTyped('');
     setTyping(false);
     setBusy(false);
@@ -578,39 +502,6 @@ export function SaturnLesson({
     void murmur(blob, '');
   };
 
-  // 2. {bati}'s voice: your voice two semitones up
-  const batiVoice = async (yes: boolean) => {
-    if (!yes || !normal) return next();
-    setBusy(true);
-    const line = fill('わあ！　ボク、{neo}と、おそろいの声になった！');
-    let url: string | null = null;
-    try {
-      if (me) {
-        await getApi().registerVoice({ slot: 'bati', audio: { mime: normal.blob.type || 'audio/webm', data: await toBase64(normal.blob) }, text: normal.text, pitch: 2 });
-        url = (await getApi().speak({ slot: 'bati', text: line })).url;
-      }
-    } catch {
-      url = null;
-    }
-    // play {bati}'s new voice (the preview: the murmur itself, two semitones up)
-    const a = new Audio(url ?? URL.createObjectURL(normal.blob));
-    if (!url) {
-      a.playbackRate = Math.pow(2, 2 / 12);
-      (a as HTMLAudioElement & { preservesPitch?: boolean }).preservesPitch = false;
-    }
-    void a.play().catch(() => undefined);
-    setBusy(false);
-    setBeats((b) => [...b.slice(0, i + 1), { k: 'say', who: 'bati', text: 'わあ！　ボク、{neo}と、おそろいの声になった！' }, ...b.slice(i + 1)]);
-    next();
-  };
-
-  // D04-S005b: the picked design becomes the look of your kororins (null = kept as it is)
-  const designed = (url: string | null) => {
-    setMyLook(url);
-    if (url) setMineK((x) => x.map((k) => ({ ...k, pic: url })));
-    insert(url ? DESIGNED : UNDESIGNED);
-    next();
-  };
   // D04-S005c: a kororin flicked up out of the screen flies to the plaza — and to the dachi's 〔推し〕 (no mana)
   const flick = (k: Kororin) => {
     setMineK((x) => x.filter((y) => y.id !== k.id));
@@ -623,24 +514,9 @@ export function SaturnLesson({
     insert(flown ? FLOWN : NOT_FLOWN);
     next();
   };
-  // 〔🎤 サイファー〕: one after another on the same beat, the mic passing on; the last 「♪オー！」 all together
-  const [relay, setRelay] = useState(false);
-  const cypher = async () => {
-    if (relay) return;
-    setRelay(true);
-    const at = i;
-    for (const k of plazaK) await sing(k);
-    setOh(true);
-    setTimeout(() => {
-      setOh(false);
-      setRelay(false);
-      setI((n) => (n === at ? n + 1 : n));
-    }, 1600);
-  };
-
-  const target = beat?.k === 'listen' ? (beat.id === 'kimorin-1' ? kimorinK[0]?.id : beat.id === 'mine-1' ? mineK[0]?.id : 'sister') ?? null : null;
+  const target = beat?.k === 'listen' ? (beat.id === 'kimorin-1' ? kimorinK[0]?.id : mineK[0]?.id) ?? null : null;
   const tapKororin = (k: Kororin) => {
-    if (singingId || relay) return;
+    if (singingId) return;
     if (beat?.k === 'listen' && !waitSong) {
       if (k.id !== target) return setHint(beat.id === 'mine-1' ? fill('光っている、{neo}のコロリンを押してね') : '光っているコロリンを押してね');
       setHint('');
@@ -659,13 +535,9 @@ export function SaturnLesson({
         ? fill(beat.text)
         : beat?.k === 'listen'
           ? waitSong ? '♪……' : beat.id === 'mine-1' ? 'コロリンを、タップしてみよう' : '👆 光っているコロリンをタップ'
-          : beat?.k === 'batiVoice'
-            ? fill('いまの普通の声を、少し高くして、{bati}の声にもする？')
-            : beat?.k === 'fly'
-              ? '飛ばしたいコロリンを、上へはじこう（何個でも。飛ばさなくてもいい）'
-              : beat?.k === 'cypher'
-                ? relay ? '♪……' : ''
-                : '';
+          : beat?.k === 'fly'
+            ? '飛ばしたいコロリンを、上へはじこう（何個でも。飛ばさなくてもいい）'
+            : '';
 
   return (
     <>
@@ -675,17 +547,16 @@ export function SaturnLesson({
     <div className="fixed inset-0 z-[150]" style={{ animation: 'lessonWorld 1.3s linear both' }}>
       <KororinVessels
         scene={scene}
-        own={own}
         kimorin={kimorinK}
         mine={mineK}
         neo={neo}
         plaza={plazaK}
         singingId={singingId}
         highlightId={beat?.k === 'listen' && !waitSong ? target : null}
-        partyOn={!!singingId || oh}
+        partyOn={!!singingId}
+        oh={false}
         flickable={beat?.k === 'fly'}
         flyingIds={flyingIds}
-        oh={oh}
         onTap={tapKororin}
         onFlick={flick}
         overlay={
@@ -727,13 +598,11 @@ export function SaturnLesson({
             {recording && !waitSong && (
               <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-center px-5 pb-8">
                 <p className="mb-3 max-w-sm rounded-2xl bg-[rgba(20,12,36,0.72)] px-4 py-2.5 text-center text-[14px] leading-relaxed text-white backdrop-blur-sm">
-                  {beat?.k === 'rec' && beat.n === 3 ? (
+                  {beat?.k === 'rec' && beat.n === 2 ? (
                     <>
-                      なんでもいい。迷ったら、小さな字のお題から
+                      迷ったら
                       <span className="mt-1 block text-[11px] text-white/75">{TOPICS.map((t) => `${t.t}（例「${t.ex}」）`).join('／')}</span>
                     </>
-                  ) : beat?.k === 'rec' && beat.n === 2 ? (
-                    <>最近、楽しかったことを、石に吹き込もう</>
                   ) : (
                     <>最近食べておいしかったものを、石に吹き込もう</>
                   )}
@@ -778,7 +647,7 @@ export function SaturnLesson({
             {typing && beat?.k === 'rec' && (
               <div className="absolute inset-0 z-[230] flex items-end justify-center bg-black/50" onClick={() => setTyping(false)}>
                 <div className="pb-safe w-full max-w-md rounded-t-3xl bg-white p-5 text-slate-800" onClick={(e) => e.stopPropagation()}>
-                  <input autoFocus value={typed} onChange={(e) => setTyped(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && typed.trim() && !busy) void murmur(null, typed); }} maxLength={140} placeholder={beat.n === 1 ? 'たこ焼き' : beat.n === 2 ? '滑り台' : 'いま思ったこと'} className="w-full border-b border-violet-300 py-2 text-[16px] outline-none" />
+                  <input autoFocus value={typed} onChange={(e) => setTyped(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.nativeEvent.isComposing && typed.trim() && !busy) void murmur(null, typed); }} maxLength={140} placeholder={beat.n === 1 ? 'たこ焼き' : 'いま思ったこと'} className="w-full border-b border-violet-300 py-2 text-[16px] outline-none" />
                   <button disabled={!typed.trim() || busy} onClick={() => void murmur(null, typed)} className="mt-4 w-full rounded-full bg-violet-500 py-3 font-black text-white disabled:opacity-40">
                     {bati}にコロリンにしてもらう
                   </button>
@@ -808,35 +677,10 @@ export function SaturnLesson({
               </div>
             )}
 
-            {beat?.k === 'batiVoice' && (
-              <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-end gap-2 px-4 pb-8">
-                {normal ? (
-                  <>
-                    <Choice k={0} disabled={busy} onClick={() => void batiVoice(true)}>
-                      する
-                    </Choice>
-                    <Choice k={1} disabled={busy} onClick={() => void batiVoice(false)}>
-                      今のままでいい
-                    </Choice>
-                  </>
-                ) : (
-                  <BatiSkip onSkip={next} />
-                )}
-              </div>
-            )}
-
-            {beat?.k === 'design' && <KororinDesign api={api} bati={bati} neo={neo} food={food} onDone={designed} />}
             {beat?.k === 'fly' && (
               <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex justify-center px-5 pb-3">
                 <button onClick={flyDone} className="rounded-full bg-[rgba(20,12,36,0.72)] px-5 py-2 text-[13px] text-white">
                   {flown ? 'これでいい' : '今はいい'}
-                </button>
-              </div>
-            )}
-            {beat?.k === 'cypher' && !relay && (
-              <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex justify-center px-5 pb-8">
-                <button onClick={() => void cypher()} className="rounded-full border-2 border-amber-100 bg-gradient-to-b from-amber-300 to-orange-500 px-8 py-3 text-[17px] font-black text-white shadow-lg active:scale-95 animate-[hintGlow_2.2s_ease-in-out_infinite]">
-                  🎤 サイファー
                 </button>
               </div>
             )}
@@ -845,148 +689,6 @@ export function SaturnLesson({
       />
     </div>
     </>
-  );
-}
-
-/** Typed murmurs have no voice to borrow: the question is skipped. */
-function BatiSkip({ onSkip }: { onSkip: () => void }) {
-  useEffect(() => {
-    onSkip();
-  }, [onSkip]);
-  return null;
-}
-
-/**
- * D04-S005b コロリンのデザイン (M-R130/M-R132): 〔おまかせ〕 (the NEO look + the favourite food) or 〔🎙 話して
- * 決める〕 (two colours and the mood, said aloud; ⌨ only when you cannot speak) → the mana question → four designs
- * → pick one, or say what to change once (then the new four, or 〔前の4つ〕 again).
- */
-function KororinDesign({ api, bati, neo, food, onDone }: { api?: LessonApi; bati: string; neo: string; food?: string; onDone: (url: string | null) => void }) {
-  const [phase, setPhase] = useState<'how' | 'ask' | 'mana' | 'drawing' | 'pick' | 'refine'>('how');
-  const [said, setSaid] = useState('');
-  const [wish, setWish] = useState('');
-  const [refined, setRefined] = useState(false);
-  const [designs, setDesigns] = useState<{ id: string; url: string }[]>([]);
-  const [before, setBefore] = useState<{ id: string; url: string }[] | null>(null);
-  const [showBefore, setShowBefore] = useState(false);
-  const [err, setErr] = useState(false);
-
-  const describe = (extra?: string) =>
-    ['a round takoyaki-ball kororin', said ? `colours and mood: ${said}` : '', food ? `favourite food: ${food}` : '', extra ? `request: ${extra}` : ''].filter(Boolean).join('. ');
-  const draw = async (extra?: string) => {
-    setPhase('drawing');
-    setErr(false);
-    try {
-      const d = api ? await api.kororinDesigns(describe(extra)) : [];
-      if (!d.length) throw new Error('none');
-      if (extra) setBefore(designs);
-      setDesigns(d);
-      setPhase('pick');
-    } catch {
-      setErr(true);
-      setPhase(extra ? 'pick' : 'mana');
-    }
-  };
-  const pick = (d: { id: string; url: string }) => {
-    void api?.chooseKororin(d.id).catch(() => undefined);
-    onDone(d.url);
-  };
-
-  if (phase === 'how')
-    return (
-      <div className="pb-safe absolute inset-x-0 bottom-0 z-[205] flex flex-col items-end gap-2 px-4 pb-8">
-        <Choice k={0} onClick={() => setPhase('mana')}>
-          おまかせ
-        </Choice>
-        <Choice k={1} onClick={() => setPhase('ask')}>
-          🎙 話して決める
-        </Choice>
-      </div>
-    );
-  if (phase === 'ask')
-    return (
-      <div className={sheet}>
-        <p className="text-[13px] text-amber-200/90">{bati}「好きな色と、今の気分。話してみて。」</p>
-        <div className="mt-4">
-          <VoiceField value={said} onChange={setSaid} placeholder="青と金。わくわく" maxLength={40} />
-        </div>
-        <div className="mt-4 space-y-2">
-          <DecisionButton disabled={!said.trim()} onClick={() => setPhase('mana')}>
-            これで描く
-          </DecisionButton>
-          <button
-            onClick={() => {
-              setSaid('');
-              setPhase('mana');
-            }}
-            className="w-full text-center text-[13px] text-white/55"
-          >
-            パス
-          </button>
-        </div>
-      </div>
-    );
-  if (phase === 'mana')
-    return (
-      <div className="absolute inset-0 z-[240] flex items-center justify-center bg-black/60 px-6">
-        <div className="w-full max-w-sm rounded-3xl bg-[rgba(14,10,24,0.95)] p-5 text-center text-amber-50">
-          <p className="text-[15px] leading-relaxed">{err ? '描けなかった…もう一度ためしてね' : 'コロリンのデザインの魔法に、マナジェムのマナを使います'}</p>
-          <div className="mt-4">
-            <DecisionButton onClick={() => void draw()}>使う</DecisionButton>
-          </div>
-          <button onClick={() => onDone(null)} className="mt-3 text-sm text-white/55">
-            やめる
-          </button>
-        </div>
-      </div>
-    );
-  if (phase === 'drawing')
-    return (
-      <div className="pointer-events-none absolute inset-x-0 bottom-[18%] z-[205] flex flex-col items-center gap-2">
-        <p className="animate-pulse rounded-full bg-[rgba(20,12,36,0.8)] px-5 py-2 text-[15px] text-white">{bati}が、{neo}のコロリンにタッチしている…</p>
-        <p className="rounded-full bg-[rgba(20,12,36,0.8)] px-4 py-1 text-[13px] text-amber-200">−3マナ</p>
-      </div>
-    );
-  const shown = showBefore && before ? before : designs;
-  return (
-    <div className={sheet}>
-      <p className="mb-3 text-center text-[15px] font-bold text-amber-50">気に入ったのを、タップしてね</p>
-      <div className="grid grid-cols-2 gap-3">
-        {shown.map((d, k) => (
-          <button key={d.id} onClick={() => pick(d)} className="aspect-square overflow-hidden rounded-2xl border border-white/20 bg-white/90 p-1 active:scale-95">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={d.url} alt={`${k + 1}つ目`} className="h-full w-full object-contain" />
-          </button>
-        ))}
-      </div>
-      {err && <p className="mt-3 text-center text-[13px] text-rose-200">描き直せなかった…このなかから選んでね</p>}
-      {before && (
-        <button onClick={() => setShowBefore((x) => !x)} className="mt-3 w-full text-center text-[13px] text-amber-200/90 underline">
-          {showBefore ? '新しい4つ' : '前の4つ'}
-        </button>
-      )}
-      {!refined &&
-        (phase === 'refine' ? (
-          <div className="mt-4">
-            <VoiceField value={wish} onChange={setWish} placeholder="もっとまるく" maxLength={40} />
-            <div className="mt-3">
-              <DecisionButton
-                disabled={!wish.trim()}
-                onClick={() => {
-                  setRefined(true);
-                  void draw(wish.trim());
-                }}
-              >
-                描き直す（1回だけ）
-              </DecisionButton>
-            </div>
-          </div>
-        ) : (
-          <button onClick={() => setPhase('refine')} className="mt-4 w-full text-center text-[14px] text-amber-200/90 underline">
-            🎙 要望を言って描き直す（1回だけ）
-          </button>
-        ))}
-    </div>
   );
 }
 
@@ -1023,4 +725,3 @@ function DachiCard({ who, name, message }: { who: 'kimorin' | 'inviter'; name: s
   );
 }
 
-const sheet = 'pb-safe absolute inset-x-0 bottom-0 z-[205] max-h-[72%] overflow-y-auto rounded-t-3xl bg-[rgba(14,10,24,0.94)] px-5 pb-8 pt-5 text-amber-50';

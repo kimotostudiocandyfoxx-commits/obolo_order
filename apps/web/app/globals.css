@@ -779,3 +779,8 @@ body {
 @keyframes atelier-key { 0% { opacity: 0; transform: scale(0.6); } 25% { opacity: 1; transform: scale(1); } 45% { opacity: 1; } 70%, 100% { opacity: 0; transform: scale(1.6); } }
 @keyframes atelier-glow { 0% { opacity: 0; transform: scale(0.4); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(2.4); } }
 @keyframes atelier-screen { 0%, 40% { opacity: 0; transform: scale(0.3); } 60% { opacity: 1; transform: scale(1); border-radius: 1.5rem; } 100% { opacity: 1; transform: scale(3.2); border-radius: 0; } }
+/* the Moon atelier through Bluena in the journey's practices (components/atelier/AtelierScreen.tsx) */
+@keyframes atelier-beam { 0% { opacity: 0; transform: rotate(-28deg) scaleY(0); } 60% { opacity: 1; } 100% { opacity: 0; transform: rotate(-28deg) scaleY(1); } }
+@keyframes atelier-open { 0%, 35% { opacity: 0; transform: scale(0.15); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes atelier-close { to { opacity: 0; transform: scale(0.2) translate(30%, 40%); } }
+@keyframes atelier-hop { 0% { opacity: 0; transform: translateY(30%); } 60% { opacity: 1; transform: translateY(-12%); } 100% { transform: translateY(0); } }

@@ -19,8 +19,8 @@ const fmt = (ms: number) => {
 
 /**
  * End of every journey day: "〇〇、また明日。" + a 24-hour countdown with ticking sound.
- * "明日まで待てへん" skips the wait with a spinning mystical clock.
- * PLACEHOLDER (P-OB-3): the skip is free and unlimited for now; it may later cost MANA.
+ * No skipping in the members' app (M-R199, simple version): the countdown only. The review pages pass `canSkip`, and
+ * their button skips the wait with the spinning mystical clock.
  */
 export function TomorrowScreen({
   name,
@@ -28,7 +28,10 @@ export function TomorrowScreen({
   onUnlocked,
   skipLabel,
   skippedText,
+  canSkip = false,
 }: {
+  /** the review pages only: the skip button (never in the members' app, M-R199) */
+  canSkip?: boolean;
   /** The caption after a skip (default: the door opened). */
   skippedText?: string;
   /** Per-day wording of the skip button (default: m.gate.cantWait = 明日まで待てへん). */
@@ -139,7 +142,7 @@ export function TomorrowScreen({
           {phase !== 'wait' && <MysticClock seconds={SKIP_SECONDS} />}
 
           <div className="pb-safe absolute inset-x-0 bottom-0 flex justify-center pb-14">
-            {phase === 'wait' && showButton && (
+            {phase === 'wait' && showButton && canSkip && (
               <button
                 onClick={skip}
                 className="animate-[fadeUp_0.8s_ease-out] rounded-full border border-amber-200/70 bg-black px-8 py-3.5 text-[17px] tracking-[0.2em] text-amber-50 shadow-[0_0_28px_rgba(255,210,130,0.3)] active:scale-95"

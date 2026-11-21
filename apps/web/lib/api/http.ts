@@ -231,6 +231,10 @@ export class HttpApi implements Api {
     return this.req<Awaited<ReturnType<Api['completeLap2']>>>('POST', '/me/lap2/complete', { chapter, answers });
   }
 
+  saveSysStory(answers: Record<string, string>) {
+    return this.req<Awaited<ReturnType<Api['saveSysStory']>>>('POST', '/me/story/sys', { answers });
+  }
+
   completeJourneyDay(day: number, answers?: Record<string, string>) {
     // only the words answered: picture addresses (the look, the Bati) are kept elsewhere and are longer than an
     // answer may be (story chat 2026-10-29: day 2 ended in a 400 and started over)

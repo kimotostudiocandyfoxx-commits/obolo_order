@@ -111,6 +111,8 @@ interface Props {
   /** 'pause' step: the day stops here (progress already points at the question to come back to). */
   onPause?: () => void;
   onEnd: (answers: Record<string, string>) => void;
+  /** a `scene` step was passed (the review screen shows the script's scene id) */
+  onScene?: (id: string) => void;
   /** answers typed, no mic: day 1 only now (M-R41; client 2026-10-29: from the Moon on, the mic comes first) */
   textOnly?: boolean;
   /** straight on from a tap that already woke the sound (the second journey's next chapter): no start screen */
@@ -181,7 +183,7 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, textOnly = false, autoStart = false, showGate = false, replayFilms = false }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false }: Props) {
   const seenFilm = (id: string) => !replayFilms && filmWatched(id);
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
@@ -275,6 +277,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [white, setWhite] = useState(false);
   const runRef = useRef<(from: number) => void>(() => {});
   const varsRef = useRef(vars);
+  const onSceneRef = useRef(onScene);
+  onSceneRef.current = onScene;
   varsRef.current = vars;
   const [blocked, setBlocked] = useState(false);
   const [muted, setMuted] = useState(false);
@@ -434,6 +438,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         const s = steps[n];
         if (!s) return;
         if (s.t === 'label') n++;
+        else if (s.t === 'set') {
+          remember(s.key, s.value);
+          n++;
+        } else if (s.t === 'scene') {
+          onSceneRef.current?.(s.id);
+          n++;
+        }
         else if (s.t === 'caption' && s.when && !varsRef.current[s.when]) n++;
         else if (s.t === 'bgm') {
           clearTimeout(bgmLater.current);
@@ -532,7 +543,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bgm.current?.fadeOut();
           setScreen(false);
           let r = labelIndex(steps, s.resume);
-          while (steps[r]?.t === 'label') r++;
+          while (steps[r]?.t === 'label' || steps[r]?.t === 'scene') r++;
           setI(r);
           setPaused(true);
           onPause?.();
@@ -949,9 +960,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
     // the thread starts again from the line on screen (or the question being answered)
     let q = i - 1;
-    while (steps[q]?.t === 'label') q--;
+    while (steps[q]?.t === 'label' || steps[q]?.t === 'scene') q--;
     addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'scene', 'set', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -1034,7 +1045,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   }, [timeUp, calm, started, paused]);
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
   let pk = i - 1;
-  while (steps[pk]?.t === 'label') pk--;
+  while (steps[pk]?.t === 'label' || steps[pk]?.t === 'scene') pk--;
   const prev = steps[pk];
   const prompt =
     step && ['choice', 'name', 'action', 'egg', 'batiname', 'age', 'neoname'].includes(step.t) && !(step.t === 'choice' && step.prompt) && prev?.t === 'say' ? prev : null;
@@ -1408,7 +1419,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'hatch' && (
         <HatchStep
           food={v.batiFood ?? ''}
-          egg={(stateRef.current.answers.egg ?? v.story?.egg ?? '').includes('太陽') ? 'sun' : 'earth'}
+          egg={(stateRef.current.answers.egg ?? v.story?.['d2.egg'] ?? '').includes('太陽') ? 'sun' : 'earth'}
           onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
           onDone={(url) => {
             remember('batiImage', url);
