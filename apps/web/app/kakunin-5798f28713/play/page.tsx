@@ -18,6 +18,7 @@ import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 import { ReviewBar } from '@/components/review/ReviewBar';
 import { SYS002 } from '@/lib/onboarding/sys002';
 import { joinFlags } from '@/lib/onboarding/joinFlags';
+import { AFTER_DAYS } from '@/lib/onboarding/after';
 
 /**
  * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1][&gate=1: the seal E-0 every time] — plays one day's story from the start (or from its first
@@ -26,6 +27,8 @@ import { joinFlags } from '@/lib/onboarding/joinFlags';
  * timeup=1: the 88 minutes of space time run out 20 seconds in (SYS-S001).
  * thru=N: each day ends on the members' own 「また明日」 screen (the 24-hour countdown, 〔明日まで待てない〕 and the clock that
  * skips it), which opens the next day, up to day N (e.g. day=1&thru=3: from the start to Saturn).
+ * day=m1 | m2 | m3: the days after joining (天王星・冥王星・海王星 + the end; lib/onboarding/after.ts), each ending on a
+ * button to the next (the members wait 24 hours; the review does not).
  * /kakunin-5798f28713/play?world=jupiter | saturn | mercury | mars | venus — that planet's world on its own.
  */
 export default function PreviewPlayPage() {
@@ -40,7 +43,9 @@ function PreviewPlay() {
   const q = useSearchParams();
   // day=sys002: SYS-S002 on its own (becoming Obolo Order early, from the settings) — with day 4's names and Bati
   const sys = q.get('day') === 'sys002';
-  const day = sys ? 4 : Number(q.get('day'));
+  // day=m1|m2|m3: after joining (played with day 8's names, Bati and works)
+  const afterN = Number(/^m([1-3])$/.exec(q.get('day') ?? '')?.[1] ?? 0);
+  const day = sys ? 4 : afterN ? 8 : Number(q.get('day'));
   const at = q.get('at');
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);
@@ -128,13 +133,13 @@ function PreviewPlay() {
     );
   }
 
-  const story = sys ? { steps: SYS002, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : (STORIES[day] ?? PREVIEW_ONLY[day]);
+  const story = sys ? { steps: SYS002, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : afterN ? { steps: AFTER_DAYS[afterN - 1], skipLabel: DEFAULT_SKIP_LABEL, auth: false } : (STORIES[day] ?? PREVIEW_ONLY[day]);
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   // thru=N: played straight through, each day handing over to the next up to day N (the client's check from the start to Saturn)
   const thru = Number(q.get('thru') ?? 0);
   // every day that has a next one ends on the countdown (client 2026-10-29: also from day 2 to day 3); thru=N stops at day N
   const upTo = thru || 99;
-  const nextDay = !sys && upTo > day && STORIES[day + 1] ? `/kakunin-5798f28713/play?day=${day + 1}${thru ? `&thru=${thru}` : ''}` : null;
+  const nextDay = !sys && !afterN && upTo > day && STORIES[day + 1] ? `/kakunin-5798f28713/play?day=${day + 1}${thru ? `&thru=${thru}` : ''}` : null;
   if (ended && nextDay)
     return (
       <>
@@ -148,6 +153,14 @@ function PreviewPlay() {
         onUnlocked={() => window.location.assign(nextDay)}
         />
       </>
+    );
+  if (ended && afterN)
+    return (
+      <Ended
+        text={`会員${afterN}日目 おわり`}
+        again={`/kakunin-5798f28713/play?day=m${afterN}`}
+        next={afterN < 3 ? { href: `/kakunin-5798f28713/play?day=m${afterN + 1}`, label: `会員${afterN + 1}日目へ（24時間を飛ばす）` } : undefined}
+      />
     );
   if (ended) return <Ended text={`${day}日目 おわり`} again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}${q.get('gate') === '1' ? '&gate=1' : ''}`} />;
 
@@ -163,7 +176,7 @@ function PreviewPlay() {
   return (
     <>
       <DemoDay
-        key={`${day}-${at}`}
+        key={`${q.get('day')}-${at}`}
         day={day}
         steps={story.steps}
         start={start}
@@ -175,7 +188,7 @@ function PreviewPlay() {
         onName={(n) => void onName(n)}
         onEnd={(a) => {
           // the review run remembers each day's answers for the next days (egg, joining early …), like the server does
-          saveReviewStory(Object.fromEntries(Object.entries(a ?? {}).map(([k, v]) => [`${sys ? 'sys' : `d${day}`}.${k}`, v])));
+          saveReviewStory(Object.fromEntries(Object.entries(a ?? {}).map(([k, v]) => [`${sys ? 'sys' : afterN ? `l2.m${afterN}` : `d${day}`}.${k}`, v])));
           setEnded(true);
         }}
         onScene={setScene}
@@ -201,7 +214,7 @@ function PreviewPlay() {
         }}
       />
       <BackLink live={live} />
-      <ReviewBar day={sys ? null : day} scene={scene} />
+      <ReviewBar day={sys ? null : afterN ? `会員${afterN}日目` : day} scene={scene} />
       {guest && <GuestNote />}
     </>
   );

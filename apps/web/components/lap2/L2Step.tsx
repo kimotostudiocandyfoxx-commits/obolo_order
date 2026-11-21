@@ -1,5 +1,6 @@
 'use client';
 
+import { AfterStep, type AfterWhat } from '@/components/after/AfterScreens';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import type { L2What } from '@/lib/onboarding/lap2';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
@@ -41,6 +42,8 @@ export function L2Step({
   fill: (s: string) => string;
   onDone: (a: Record<string, string>) => void;
 }) {
+  // the days after joining (lib/onboarding/after.ts)
+  if (what.startsWith('m-')) return <AfterStep what={what as AfterWhat} vars={v} answers={answers} lessonApi={lessonApi} onDone={onDone} />;
   switch (what) {
     case 'ask':
       return <BatiAsk bati={v.bati ?? ''} onDone={onDone} />;

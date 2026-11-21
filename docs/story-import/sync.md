@@ -1,6 +1,6 @@
 # 台本と画面の台詞の照合
 
-台本：public/story（P01・P02・P03・P04・P05m）／画面：lib/onboarding/dayN.ts と各星の練習（SaturnLesson など）の台詞
+台本：public/story（P01・P02・P03・P04・P05m）／画面：lib/onboarding/dayN.ts・after.ts と各星の練習（SaturnLesson など）の台詞
 
 ## 1日目：台本 30行／画面 30行 — 画面にない 0・台本にない 0
 
@@ -43,4 +43,6 @@
 
 台本にあって画面にない：
 - D08-S006 MONBAN「……まだ、終わっていない…。決めたら、また来い…。」
+
+## 会員後：台本 64行／画面 64行 — 画面にない 0・台本にない 0
 

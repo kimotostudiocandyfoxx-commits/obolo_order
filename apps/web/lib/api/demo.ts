@@ -23,6 +23,7 @@ import {
   BATI_FACES,
   LAP2,
   lap2Done,
+  lap2OpensAt,
   type MakeKind,
   STARTER_GEM_MANA,
   neoVoiceUrl,
@@ -737,8 +738,11 @@ export class DemoApi implements Api {
   async completeLap2(chapter: number, answers?: Record<string, string>) {
     return this.patchMe((u) => {
       if (!u.orderedAt || chapter !== lap2Done(u.story)) return {};
+      // like the API: each day opens 24 h after the one before (no skipping)
+      const opens = lap2OpensAt(u.story);
+      if (opens !== null && Date.now() < opens) throw new ApiError(409, 'NOT_YET', 'not yet');
       const id = LAP2[chapter].id;
-      return { story: { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`l2.${id}.${k}`, v])), 'l2.done': String(chapter + 1) } };
+      return { story: { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`l2.${id}.${k}`, v])), 'l2.done': String(chapter + 1), 'l2.at': now() } };
     });
   }
 

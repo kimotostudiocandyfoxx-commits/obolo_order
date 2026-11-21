@@ -69,7 +69,7 @@ function Kororin({ singing, size = 56 }: { singing: boolean; size?: number }) {
 
 type Stone = { id: number; text: string; x: number; y: number; vx: number; vy: number; gone?: number };
 
-function SaturnStage({ face, onClear }: { face?: string; onClear: () => void }) {
+export function SaturnStage({ face, onClear }: { face?: string; onClear: () => void }) {
   // the simulation lives in refs (an updater with side effects runs twice in development); each frame is drawn from it
   const sim = useRef({ stones: [] as Stone[], freed: 0, spawn: 0, seq: 0, done: false });
   const [, draw] = useState(0);

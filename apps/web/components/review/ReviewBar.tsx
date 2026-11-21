@@ -25,7 +25,11 @@ const store = (n: Notes) => {
   }
 };
 
-export const REVIEW_DAYS: { label: string; href: string }[] = [...[1, 2, 3, 4, 5, 6, 7, 8].map((d) => ({ label: `${d}日目`, href: `/kakunin-5798f28713/play?day=${d}&thru=8` }))];
+export const REVIEW_DAYS: { label: string; href: string }[] = [
+  ...[1, 2, 3, 4, 5, 6, 7, 8].map((d) => ({ label: `${d}日目`, href: `/kakunin-5798f28713/play?day=${d}&thru=8` })),
+  // after joining (天王星・冥王星・海王星 + the end)
+  ...[1, 2, 3].map((d) => ({ label: `会員${d}日目`, href: `/kakunin-5798f28713/play?day=m${d}` })),
+];
 
 export function exportNotes(notes: Notes) {
   const ids = Object.keys(notes)
@@ -34,12 +38,14 @@ export function exportNotes(notes: Notes) {
   return ['# 直したいメモ', '', ...ids.flatMap((id) => [`## ${id}`, notes[id].trim(), ''])].join('\n');
 }
 
-export function ReviewBar({ day, scene }: { day: number | null; scene: string | null }) {
+/** day: the day's number, or a label of its own (「会員1日目」) */
+export function ReviewBar({ day, scene }: { day: number | string | null; scene: string | null }) {
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<Notes>({});
   const [copied, setCopied] = useState(false);
   useEffect(() => setNotes(load()), [open]);
-  const key = scene ?? (day ? `${day}日目` : '全体');
+  const dayLabel = typeof day === 'string' ? day : day ? `${day}日目` : null;
+  const key = scene ?? dayLabel ?? '全体';
   const count = Object.values(notes).filter((v) => v.trim()).length;
   const set = (v: string) => {
     const n = { ...notes, [key]: v };
@@ -68,7 +74,7 @@ export function ReviewBar({ day, scene }: { day: number | null; scene: string | 
         className="fixed right-2 top-[calc(6px+env(safe-area-inset-top))] z-[450] flex items-center gap-1.5 rounded-full border border-amber-200/40 bg-black/70 px-2.5 py-1 font-mono text-[11px] text-amber-100 backdrop-blur"
         aria-label="確認用のメモ"
       >
-        {scene ?? (day ? `${day}日目` : '確認')}
+        {scene ?? dayLabel ?? '確認'}
         {notes[key]?.trim() ? <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> : <span className="text-white/40">✎</span>}
       </button>
       {open && (
@@ -93,7 +99,7 @@ export function ReviewBar({ day, scene }: { day: number | null; scene: string | 
           <p className="mt-6 text-xs text-white/50">日を選んで飛ぶ</p>
           <div className="mt-2 grid grid-cols-4 gap-2">
             {REVIEW_DAYS.map((d) => (
-              <a key={d.href} href={d.href} className={`rounded-xl py-2 text-center text-sm ${d.label === `${day}日目` ? 'bg-amber-300/25 text-amber-100' : 'bg-white/10'}`}>
+              <a key={d.href} href={d.href} className={`rounded-xl py-2 text-center text-sm ${d.label === dayLabel ? 'bg-amber-300/25 text-amber-100' : 'bg-white/10'}`}>
                 {d.label}
               </a>
             ))}

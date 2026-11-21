@@ -1,27 +1,31 @@
 import { LAP2 } from '@obolo/shared';
+import { AFTER_DAYS } from '../after';
 import type { Step } from '../script';
-import { resumeSteps } from './common';
-import { L2_EARTH } from './earth';
-import { L2_JUPITER } from './jupiter';
-import { L2_MARS } from './mars';
-import { L2_MERCURY } from './mercury';
-import { L2_HOME, L2_NEPTUNE, L2_NIGHT, L2_ROOM, L2_URANUS } from './outer';
-import { L2_SATURN } from './saturn';
-import { L2_VENUS } from './venus';
 
 export { MIKIE_DRILL } from './mars';
 
-/** the second journey's chapters, in the order of shared LAP2 */
-export const LAP2_STEPS: Step[][] = [L2_EARTH, L2_SATURN, L2_JUPITER, L2_MERCURY, L2_MARS, L2_VENUS, L2_URANUS, L2_NEPTUNE, L2_HOME, L2_NIGHT, L2_ROOM];
+/**
+ * What an Obolo Order plays after day 8 (shared LAP2): the three days after joining (lib/onboarding/after.ts —
+ * 天王星, 冥王星, 海王星 + the end), one a day. Replaces the old second journey's chapters.
+ */
+export const LAP2_STEPS: Step[][] = AFTER_DAYS;
 if (LAP2_STEPS.length !== LAP2.length) throw new Error('LAP2_STEPS out of step with LAP2');
 
-/** a chapter as played: after 〔今日はここまで〕 it opens with the same choice (`resumed`); straight on from 〔…へ向かう〕 it does not */
-export function lap2Steps(chapter: number, resumed: boolean): Step[] {
-  return [...(resumed ? resumeSteps(chapter) : []), ...(LAP2_STEPS[chapter] ?? [])];
+/** day `chapter` (0-based) after joining */
+export function lap2Steps(chapter: number): Step[] {
+  return LAP2_STEPS[chapter] ?? [];
 }
 
-/** the l2 screens the chapters ask for ({ t: 'l2', what }) */
+/**
+ * The screens the story asks for ({ t: 'l2', what }; components/lap2/L2Step.tsx). The `m-…` ones are the days after
+ * joining (components/after); the others are the old second journey's, kept while their components stay.
+ */
 export type L2What =
+  // after joining (P05m)
+  | 'm-goods' | 'm-publish-goods' | 'm-shop'
+  | 'm-story-seed' | 'm-story-cards' | 'm-story-write' | 'm-picturebook' | 'm-publish-book'
+  | 'm-nagare' | 'm-game-seed' | 'm-game-cards' | 'm-game-play' | 'm-publish-game'
+  // the old second journey's screens
   | 'ask' | 'relook'
   | 'dachi-rules' | 'invite' | 'plaza' | 'relay' | 'compass-kimorin' | 'compass-song'
   | 'jacket' | 'kimorin-jacket' | 'kimorin-tree' | 'my-tree' | 'tree-deco'

@@ -22,6 +22,8 @@ export type Speaker =
   | 'バティ'
   | 'うんちピンポンくん'
   | 'コロリン'
+  /** Uranus's resident (M-R195, the client's own design; no picture in the app yet) */
+  | 'クロコパトラ'
   /** a voice not seen yet (（声）「おい。」) */
   | '？？？';
 

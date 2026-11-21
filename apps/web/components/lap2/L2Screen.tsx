@@ -14,7 +14,7 @@ type Panel = { title?: string; image?: string; caption?: string; body?: string[]
 
 const OK = (label = 'つぎへ', answers?: Record<string, string>): Option => ({ label, answers });
 
-const PANELS: Record<L2What, Panel> = {
+const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
   ask: {
     title: '💬 バティに聞く',
     body: ['知りたいことを話すと、バティが調べて答えます。', '（例）「土星の輪って、何でできてるの？」', 'バティ「氷と、石のかけらが、いっぱい集まってるんだって！」', 'バティの答えが、まちがっていることもあります。大事なことは、自分でも確かめてね'],
@@ -146,7 +146,7 @@ const PANELS: Record<L2What, Panel> = {
 };
 
 export function L2Screen({ what, fill, onDone }: { what: L2What; fill: (s: string) => string; onDone: (answers: Record<string, string>) => void }) {
-  const [panel, setPanel] = useState<Panel>(PANELS[what]);
+  const [panel, setPanel] = useState<Panel>((PANELS as Partial<Record<L2What, Panel>>)[what] ?? { options: [OK()] });
   const [got, setGot] = useState<Record<string, string>>({});
   const pick = (o: Option) => {
     const a = { ...got, ...o.answers };

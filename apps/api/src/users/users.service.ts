@@ -11,6 +11,7 @@ import {
   type CompleteLap2Body,
   LAP2,
   lap2Done,
+  lap2OpensAt,
   type Locale,
   type Me,
   type UpdateProfileBody,
@@ -160,18 +161,26 @@ export class UsersService {
   }
 
   /**
-   * A chapter of the second journey was finished (Obolo Order only). Chapters go in order and never back;
-   * finishing one again (a replay) keeps what was made then.
+   * A day after joining was finished (Obolo Order only; shared LAP2: 天王星・冥王星・海王星). Days go in order and
+   * never back; finishing one again (a replay) keeps what was made then. Each day opens 24 h after the one before
+   * was finished (`l2.at`, no skipping: M-R199); a couple of minutes' grace covers a phone clock that runs fast.
    */
   async completeLap2(userId: string, body: CompleteLap2Body): Promise<Me> {
     const cur = await this.load(userId);
     const story = (cur.onboardingJson ?? {}) as Record<string, string>;
     if (!cur.orderedAt || body.chapter !== lap2Done(story)) return toMe(cur);
+    const opens = lap2OpensAt(story);
+    if (opens !== null && Date.now() < opens - 120_000) throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     const id = LAP2[body.chapter].id;
     const [u] = await this.db.write
       .update(users)
       .set({
-        onboardingJson: { ...story, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`l2.${id}.${k}`, v])), 'l2.done': String(body.chapter + 1) },
+        onboardingJson: {
+          ...story,
+          ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`l2.${id}.${k}`, v])),
+          'l2.done': String(body.chapter + 1),
+          'l2.at': new Date().toISOString(),
+        },
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
