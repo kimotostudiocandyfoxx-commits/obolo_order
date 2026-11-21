@@ -23,14 +23,17 @@ export function VenusView() {
 }
 
 function Venus() {
-  const practice = useSearchParams().get('dj') === '1';
+  const params = useSearchParams();
+  const practice = params.get('dj') === '1';
+  // ?booth=1: straight into the broadcast booth (from the Moon atelier's 〔ラジオ〕)
+  const booth = params.get('booth') === '1';
   const router = useRouter();
   return (
     <PlanetShell id="venus" bare>
       <DemoBanner />
       <RequireAuth>
         <PlanetGate planet="venus" name="金星">
-          {practice ? <VenusDj backHref="/venus" /> : <RadioWorld practice={() => router.push('/venus?dj=1')} />}
+          {practice ? <VenusDj backHref="/venus" /> : <RadioWorld startInBooth={booth} practice={() => router.push('/venus?dj=1')} />}
         </PlanetGate>
       </RequireAuth>
     </PlanetShell>

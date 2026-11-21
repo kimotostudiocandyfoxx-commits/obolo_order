@@ -51,7 +51,9 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
   const [casting, setCasting] = useState(false);
   const [rounds, setRounds] = useState(0);
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, casting]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, casting]);
   const pic = faces?.[face] || image;
   // the voice: one sentence after another, each played as soon as it is made
   const playing = useRef<HTMLAudioElement | null>(null);
@@ -229,7 +231,9 @@ function BatiChatFull({
   const [kept, setKept] = useState(false);
   const [noted, setNoted] = useState<Set<number>>(new Set());
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, casting]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, casting]);
   const pic = faces?.[face] || image;
 
   const ask = async (text: string) => {

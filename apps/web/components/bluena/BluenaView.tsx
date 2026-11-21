@@ -8,22 +8,88 @@ import { BluenaComms } from '@/components/earth/Comms';
 import { PlanetSphere } from '@/components/PlanetSphere';
 import { useToast } from '@/components/Toast';
 import { ShowArt } from '@/components/venus/radio/ShowArt';
-import { getApi } from '@/lib/api';
+import { ApiError, getApi } from '@/lib/api';
 import { Glyph, GLYPH_NAMES, type GlyphId } from './glyphs';
 
 type FolderId = 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus' | 'uranus' | 'neptune' | 'pluto';
 
 /** the nine planets' folders in Bluena (docs/工房とブルーナ_設計.md §2): the planet, its mark, and how the folder looks */
-const FOLDERS: { id: FolderId; glyph: GlyphId; planet: string; look: string; empty: string }[] = [
-  { id: 'saturn', glyph: 'voice', planet: '土星', look: 'from-amber-900/50 via-stone-900/60 to-stone-950', empty: 'まだ公開していないつぶやきは、ここにしまわれる。' },
-  { id: 'jupiter', glyph: 'art', planet: '木星', look: 'from-emerald-950 via-amber-950/70 to-stone-950', empty: '木の根っこに、アートがしまわれる。' },
-  { id: 'mercury', glyph: 'song', planet: '水星', look: 'from-sky-950 via-amber-950/60 to-stone-950', empty: '島の土の中に、曲がうめてある。' },
-  { id: 'mars', glyph: 'video', planet: '火星', look: 'from-red-950 via-orange-950/60 to-stone-950', empty: '裏スタジオの棚に、映像がしまわれる。' },
-  { id: 'venus', glyph: 'radio', planet: '金星', look: 'from-fuchsia-950 via-indigo-950 to-stone-950', empty: '金星の放送ブースで収録すると、ここにしまわれる。' },
-  { id: 'uranus', glyph: 'goods', planet: '天王星', look: 'from-cyan-950 via-teal-950/70 to-stone-950', empty: '月の工房で作ったグッズが、ここにならぶ。' },
-  { id: 'neptune', glyph: 'game', planet: '海王星', look: 'from-blue-950 via-indigo-950 to-black', empty: '月の工房で作ったゲームが、ここにしまわれる。' },
-  { id: 'pluto', glyph: 'book', planet: '冥王星', look: 'from-slate-800 via-sky-950 to-black', empty: '氷の書庫。物語が、氷の結晶の中で眠る。' },
+const FOLDERS: {
+  id: FolderId;
+  glyph: GlyphId;
+  planet: string;
+  look: string;
+  empty: string;
+}[] = [
+  {
+    id: 'saturn',
+    glyph: 'voice',
+    planet: '土星',
+    look: 'from-amber-900/50 via-stone-900/60 to-stone-950',
+    empty: 'まだ公開していないつぶやきは、ここにしまわれる。',
+  },
+  {
+    id: 'jupiter',
+    glyph: 'art',
+    planet: '木星',
+    look: 'from-emerald-950 via-amber-950/70 to-stone-950',
+    empty: '木の根っこに、アートがしまわれる。',
+  },
+  {
+    id: 'mercury',
+    glyph: 'song',
+    planet: '水星',
+    look: 'from-sky-950 via-amber-950/60 to-stone-950',
+    empty: '島の土の中に、曲がうめてある。',
+  },
+  {
+    id: 'mars',
+    glyph: 'video',
+    planet: '火星',
+    look: 'from-red-950 via-orange-950/60 to-stone-950',
+    empty: '裏スタジオの棚に、映像がしまわれる。',
+  },
+  {
+    id: 'venus',
+    glyph: 'radio',
+    planet: '金星',
+    look: 'from-fuchsia-950 via-indigo-950 to-stone-950',
+    empty: '金星の放送ブースで収録すると、ここにしまわれる。',
+  },
+  {
+    id: 'uranus',
+    glyph: 'goods',
+    planet: '天王星',
+    look: 'from-cyan-950 via-teal-950/70 to-stone-950',
+    empty: '月の工房で作ったグッズが、ここにならぶ。',
+  },
+  {
+    id: 'neptune',
+    glyph: 'game',
+    planet: '海王星',
+    look: 'from-blue-950 via-indigo-950 to-black',
+    empty: '月の工房で作ったゲームが、ここにしまわれる。',
+  },
+  {
+    id: 'pluto',
+    glyph: 'book',
+    planet: '冥王星',
+    look: 'from-slate-800 via-sky-950 to-black',
+    empty: '氷の書庫。物語が、氷の結晶の中で眠る。',
+  },
 ];
+
+/** the atelier's kind for each folder (〔工房で新しく作る〕 opens with it chosen) */
+const MAKE: Record<FolderId, string> = {
+  saturn: 'voice',
+  jupiter: 'art',
+  mercury: 'song',
+  mars: 'video',
+  venus: 'radio',
+  uranus: 'goods',
+  neptune: 'game',
+  pluto: 'book',
+};
 
 const HINT_KEY = 'obolo.bluenaHint';
 
@@ -128,16 +194,27 @@ function Works({ folder, onFolder }: { folder: FolderId; onFolder: (f: FolderId)
           <span className="flex items-center gap-2 text-sky-100/80">
             <Glyph id={f.glyph} className="h-5 w-5" />
           </span>
-          {(folder === 'mercury' || folder === 'mars') && (
-            <button
-              onClick={() => setKept((v) => !v)}
-              aria-label={kept ? '自分の作品を見る' : 'しまった作品を見る'}
-              aria-pressed={kept}
-              className={`flex h-8 w-8 items-center justify-center rounded-full ${kept ? 'bg-amber-300 text-slate-950' : 'bg-white/10 text-white/70'}`}
+          <span className="flex items-center gap-2">
+            <Link
+              href={`/moon/atelier?kind=${MAKE[folder]}`}
+              aria-label="工房で新しく作る"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/30 bg-amber-100/10 text-amber-100"
             >
-              <Glyph id="kept" label={false} className="h-4 w-4" />
-            </button>
-          )}
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
+                <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
+              </svg>
+            </Link>
+            {(folder === 'mercury' || folder === 'mars') && (
+              <button
+                onClick={() => setKept((v) => !v)}
+                aria-label={kept ? '自分の作品を見る' : 'しまった作品を見る'}
+                aria-pressed={kept}
+                className={`flex h-8 w-8 items-center justify-center rounded-full ${kept ? 'bg-amber-300 text-slate-950' : 'bg-white/10 text-white/70'}`}
+              >
+                <Glyph id="kept" label={false} className="h-4 w-4" />
+              </button>
+            )}
+          </span>
         </div>
         <Folder id={folder} kept={kept} empty={f.empty} />
       </div>
@@ -176,7 +253,9 @@ function FolderIcon({ f, on, onPick }: { f: (typeof FOLDERS)[number]; on: boolea
       <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-slate-950 text-sky-200 ring-1 ring-sky-200/40">
         <Glyph id={f.glyph} label={false} className="h-3 w-3" />
       </span>
-      {name && <span className="pointer-events-none absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-white px-1.5 py-0.5 text-[11px] font-bold text-slate-900">{f.planet}</span>}
+      {name && (
+        <span className="pointer-events-none absolute -top-7 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-white px-1.5 py-0.5 text-[11px] font-bold text-slate-900">{f.planet}</span>
+      )}
     </button>
   );
 }
@@ -232,7 +311,11 @@ function SongsFolder({ empty }: { empty: string }) {
   const toast = useToast();
   const publish = async (s: SongView) => {
     try {
-      await getApi().createPlanetPost('mercury', { sourceId: s.id, title: s.title, text: '' });
+      await getApi().createPlanetPost('mercury', {
+        sourceId: s.id,
+        title: s.title,
+        text: '',
+      });
       toast.show('ブルーナから水星へ投影した。船が出航する');
       reload();
     } catch {
@@ -244,7 +327,16 @@ function SongsFolder({ empty }: { empty: string }) {
   return (
     <div className="space-y-2">
       {songs.map((s) => (
-        <Row key={s.id} art={<span className="flex h-full w-full items-center justify-center rounded-full border-4 border-black/60 bg-amber-900/60 text-sky-100"><Glyph id="song" label={false} className="h-5 w-5" /></span>} title={s.title} sub={s.posted ? '水星で流れている' : '島の土の中（自分だけ）'}>
+        <Row
+          key={s.id}
+          art={
+            <span className="flex h-full w-full items-center justify-center rounded-full border-4 border-black/60 bg-amber-900/60 text-sky-100">
+              <Glyph id="song" label={false} className="h-5 w-5" />
+            </span>
+          }
+          title={s.title}
+          sub={s.posted ? '水星で流れている' : '島の土の中（自分だけ）'}
+        >
           <Play url={s.url} />
           {!s.posted && (
             <button onClick={() => void publish(s)} className={`${pill} bg-sky-300 text-slate-950`}>
@@ -261,20 +353,39 @@ function SongsFolder({ empty }: { empty: string }) {
 /** 火星：裏スタジオの棚（自分の映像） */
 function MarsFolder({ empty }: { empty: string }) {
   const [videos, reload] = useLoad<MarsBackstageVideo[]>(() => getApi().marsBackstage());
+  const [sent, setSent] = useState<Set<string>>(new Set());
+  const toast = useToast();
+  // the same projection as Mars's backstage: cut square and flying as a UFO for 88 hours; the original stays here
+  const publish = async (v: MarsBackstageVideo) => {
+    try {
+      await getApi().createPlanetPost('mars', { sourceId: v.id, title: v.title, text: '' });
+      setSent((s) => new Set(s).add(v.id));
+      toast.show('ブルーナから火星へ投影した。UFOがとんでいく');
+    } catch (e) {
+      toast.show(e instanceof ApiError && e.code === 'MODERATION' ? 'そのタイトルは使えないよ' : '公開できなかった…');
+    }
+  };
   if (videos === null) return <Empty text="読みこみ中…" />;
   if (!videos.length) return <Empty text={empty} />;
   return (
     <div className="space-y-2">
       {videos.map((v) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <Row key={v.id} art={v.posterUrl ? <img src={v.posterUrl} alt="" className="h-full w-full object-cover" /> : <Glyph id="video" label={false} className="m-3 h-6 w-6 text-orange-100" />} title={v.title || '名前のない映像'} sub="裏スタジオの棚（自分だけ）">
-          {/* PLACEHOLDER (P-BLUENA-1): publishing a video still goes through Mars (it is cut to a square there) */}
-          <Link href="/mars" className={`${pill} bg-orange-300 text-slate-950`}>
-            公開する
-          </Link>
+        <Row
+          key={v.id}
+          art={v.posterUrl ? <img src={v.posterUrl} alt="" className="h-full w-full object-cover" /> : <Glyph id="video" label={false} className="m-3 h-6 w-6 text-orange-100" />}
+          title={v.title || '名前のない映像'}
+          sub={sent.has(v.id) ? '火星をとんでいる' : '裏スタジオの棚（自分だけ）'}
+        >
+          {!sent.has(v.id) && (
+            <button onClick={() => void publish(v)} className={`${pill} bg-orange-300 text-slate-950`}>
+              公開する
+            </button>
+          )}
           <Remove onRemove={() => getApi().removeMarsVideo(v.id).then(reload)} />
         </Row>
       ))}
+      {toast.node}
     </div>
   );
 }
@@ -320,7 +431,12 @@ function VenusFolder({ empty }: { empty: string }) {
   return (
     <div className="space-y-2">
       {shows.map((s) => (
-        <Row key={s.id} art={<ShowArt url={s.thumbUrl} loop={s.loop} playing={false} className="!rounded-xl" />} title={s.title} sub={s.status === 'public' ? '金星で流れている' : 'ブルーナの中（自分だけ）'}>
+        <Row
+          key={s.id}
+          art={<ShowArt url={s.thumbUrl} loop={s.loop} playing={false} className="!rounded-xl" />}
+          title={s.title}
+          sub={s.status === 'public' ? '金星で流れている' : 'ブルーナの中（自分だけ）'}
+        >
           <Play url={s.audioUrl} />
           <button
             onClick={() =>
@@ -353,7 +469,12 @@ function KeptList({ planet }: { planet: 'mercury' | 'mars' }) {
   return (
     <div className="space-y-2">
       {mine.map((k) => (
-        <Row key={k.postId} art={<Glyph id="kept" label={false} className="m-3 h-6 w-6 text-amber-200" />} title={k.available ? k.title : '今は聴けません'} sub={k.available ? k.by : '作った人が、しまったみたい'}>
+        <Row
+          key={k.postId}
+          art={<Glyph id="kept" label={false} className="m-3 h-6 w-6 text-amber-200" />}
+          title={k.available ? k.title : '今は聴けません'}
+          sub={k.available ? k.by : '作った人が、しまったみたい'}
+        >
           {k.available && k.url && <Play url={k.url} />}
           <Remove onRemove={() => getApi().keepInBluena(k.postId, false).then(reload)} />
         </Row>
@@ -397,7 +518,10 @@ function Play({ url }: { url: string }) {
     playing = a;
     a.onended = () => setOn(false);
     a.onpause = () => setOn(false);
-    await a.play().then(() => setOn(true)).catch(() => setOn(false));
+    await a
+      .play()
+      .then(() => setOn(true))
+      .catch(() => setOn(false));
   };
   return (
     <button onClick={() => void toggle()} aria-label={on ? '止める' : '聴く'} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm">

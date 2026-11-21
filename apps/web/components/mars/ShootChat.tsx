@@ -15,7 +15,7 @@ import { Frame } from './Frame';
  */
 type Msg = { who: 'partner' | 'me'; text: string } | { who: 'video'; video: Video };
 
-export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Video) => void; onOpenStudio: () => void; onPreview: (v: Video) => void }) {
+export function ShootChat({ onKeep, onOpenStudio, onPreview, header = true }: { onKeep: (v: Video) => void; onOpenStudio: () => void; onPreview: (v: Video) => void; header?: boolean }) {
   const { me } = useAuth();
   const partner = usePartner();
   const hasBati = partner.isBati;
@@ -34,7 +34,9 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Vid
   const [busy, setBusy] = useState(false);
   const [kept, setKept] = useState<Set<string>>(new Set());
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, busy, pending]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, busy, pending]);
 
   const say = (t: string) => setMsgs((m) => [...m, { who: 'partner', text: t }]);
   const send = () => {
@@ -54,19 +56,28 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview }: { onKeep: (v: Vid
     setBusy(true);
     setTimeout(() => {
       setBusy(false);
-      setMsgs((m) => [...m, { who: 'partner', text: hasBati ? 'できたよ！ 見てみて。' : 'できたケン！ 見てみろ。' }, { who: 'video', video: makeVideo(words, kind, author) }]);
+      setMsgs((m) => [
+        ...m,
+        {
+          who: 'partner',
+          text: hasBati ? 'できたよ！ 見てみて。' : 'できたケン！ 見てみろ。',
+        },
+        { who: 'video', video: makeVideo(words, kind, author) },
+      ]);
     }, 2400);
   };
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-3 border-b border-white/10 px-4 pb-2 pt-[calc(12px+env(safe-area-inset-top))]">
-        <Face face={partner.face} size={40} />
-        <div>
-          <p className="text-sm font-bold">{partner.name}と撮影</p>
-          <p className="text-[11px] text-white/50">話しかけると、{partner.name}が映像にしてくれる（仮の画面）</p>
+      {header && (
+        <div className="flex items-center gap-3 border-b border-white/10 px-4 pb-2 pt-[calc(12px+env(safe-area-inset-top))]">
+          <Face face={partner.face} size={40} />
+          <div>
+            <p className="text-sm font-bold">{partner.name}と撮影</p>
+            <p className="text-[11px] text-white/50">話しかけると、{partner.name}が映像にしてくれる（仮の画面）</p>
+          </div>
         </div>
-      </div>
+      )}
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {msgs.map((m, i) =>
           m.who === 'video' ? (

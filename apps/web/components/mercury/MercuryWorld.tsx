@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ApiError, getApi } from '@/lib/api';
@@ -59,7 +60,18 @@ const songOf = (p: PlanetPostView): Song => ({
   repliers: p.repliers,
 });
 
-export function MercuryWorld({ events, overlay, live = false }: { events?: MercuryEvents; overlay?: ReactNode; live?: boolean }) {
+export function MercuryWorld({
+  events,
+  overlay,
+  live = false,
+  atelier = live,
+}: {
+  events?: MercuryEvents;
+  overlay?: ReactNode;
+  live?: boolean;
+  /** the planet page (not the Day 6 tutorial): making happens in the Moon atelier, not here */
+  atelier?: boolean;
+}) {
   const { me } = useAuth();
   const mine = useMercury();
   const [view, setView] = useState<View>({ v: 'sea' });
@@ -245,10 +257,22 @@ export function MercuryWorld({ events, overlay, live = false }: { events?: Mercu
         <button onClick={() => go({ v: 'sea' })} className={`flex flex-col items-center text-xs ${view.v === 'sea' ? 'text-amber-200' : 'text-white/60'}`}>
           <span className="text-2xl">🗺️</span>海図
         </button>
-        <button onClick={() => go({ v: 'compose' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'compose' ? 'text-amber-200' : ''}`}>
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 via-fuchsia-500 to-violet-500 text-2xl shadow-[0_0_24px_rgba(220,90,255,0.6)]">♫+</span>
-          作曲
-        </button>
+        {atelier ? (
+          // the real Mercury makes nothing itself (docs/工房とブルーナ_設計.md §3.4): songs are made in the Moon atelier
+          <Link href="/moon/atelier?kind=song" className="-mt-8 flex flex-col items-center text-xs">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full border border-amber-100/40 bg-gradient-to-br from-[#2b3a6b] to-[#0d1430] text-amber-100 shadow-[0_0_24px_rgba(140,200,255,0.45)]">
+              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
+              <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
+            </svg>
+            </span>
+            工房で新しく作る
+          </Link>
+        ) : (
+          <button onClick={() => go({ v: 'compose' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'compose' ? 'text-amber-200' : ''}`}>
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 via-fuchsia-500 to-violet-500 text-2xl shadow-[0_0_24px_rgba(220,90,255,0.6)]">♫+</span>
+            作曲
+          </button>
+        )}
         <button onClick={() => go({ v: 'island', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'island' ? 'text-amber-200' : 'text-white/60'}`}>
           <span className="text-2xl">🏝️</span>myアイランド
         </button>

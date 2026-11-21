@@ -18,7 +18,7 @@ export function MercuryView() {
       <RequireAuth>
         <div className="h-[calc(100svh-56px-env(safe-area-inset-top))]">
           {/* the demo build keeps its island in this browser (the real one comes from the server) */}
-          <MercuryWorld live={getApi().mode === 'live'} />
+          <MercuryWorld live={getApi().mode === 'live'} atelier />
         </div>
       </RequireAuth>
     </PlanetShell>

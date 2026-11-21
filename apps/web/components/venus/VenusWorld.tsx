@@ -246,7 +246,9 @@ function MakeChat({ onList, onOpenShop }: { onList: (i: Item) => void; onOpenSho
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [listed, setListed] = useState<Set<string>>(new Set());
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, busy, pending]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, busy, pending]);
 
   const say = (t: string) => setMsgs((m) => [...m, { who: 'partner', text: t }]);
   const send = (value = text) => {

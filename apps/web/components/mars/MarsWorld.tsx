@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
@@ -271,10 +272,22 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
         <button onClick={() => go({ v: 'sky' })} className={`flex flex-col items-center text-xs ${view.v === 'sky' ? 'text-amber-200' : 'text-white/60'}`}>
           <span className="text-2xl">✨</span>星図
         </button>
-        <button onClick={() => go({ v: 'shoot' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'shoot' ? 'text-amber-200' : ''}`}>
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 via-violet-600 to-indigo-600 text-2xl shadow-[0_0_24px_rgba(200,90,255,0.6)]">🎥</span>
-          撮影
-        </button>
+        {live ? (
+          // the real Mars makes nothing itself (docs/工房とブルーナ_設計.md §3.4): videos and MVs are made in the Moon atelier
+          <Link href="/moon/atelier?kind=video" className="-mt-8 flex flex-col items-center text-xs">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full border border-amber-100/40 bg-gradient-to-br from-[#3a2050] to-[#120a1e] text-amber-100 shadow-[0_0_24px_rgba(200,140,255,0.45)]">
+              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
+              <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
+            </svg>
+            </span>
+            工房で新しく作る
+          </Link>
+        ) : (
+          <button onClick={() => go({ v: 'shoot' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'shoot' ? 'text-amber-200' : ''}`}>
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 via-violet-600 to-indigo-600 text-2xl shadow-[0_0_24px_rgba(200,90,255,0.6)]">🎥</span>
+            撮影
+          </button>
+        )}
         <button onClick={() => go(live ? { v: 'live-studio', who: 'me' } : { v: 'studio', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'studio' || view.v === 'live-studio' ? 'text-amber-200' : 'text-white/60'}`}>
           <span className="text-2xl">🎬</span>myスタジオ
         </button>

@@ -24,8 +24,7 @@ export function BluenaEntry() {
   }, []);
   return (
     <div className="flex items-center gap-1.5">
-      {/* PLACEHOLDER (P-ATELIER-1): the Moon atelier is not built yet — 〔つくる〕 opens the Moon, where Bati lives */}
-      <Link href="/moon" aria-label="つくる" className="flex h-9 w-9 items-center justify-center rounded-full border border-amber-100/30 bg-amber-100/10 text-amber-100">
+      <Link href="/moon/atelier" aria-label="つくる" className="flex h-9 w-9 items-center justify-center rounded-full border border-amber-100/30 bg-amber-100/10 text-amber-100">
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
           <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
         </svg>

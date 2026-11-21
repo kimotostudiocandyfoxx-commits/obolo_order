@@ -21,7 +21,21 @@ import { useDictation } from '@/lib/useDictation';
  */
 type Msg = { who: 'partner'; text: string } | { who: 'me'; text: string } | { who: 'song'; song: MadeSong };
 
-export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) => void; onOpenIsland: () => void }) {
+export function ComposeChat({
+  onBury,
+  onOpenIsland,
+  bluena = false,
+  onPublish,
+  header = true,
+}: {
+  onBury: (s: MadeSong) => void;
+  onOpenIsland: () => void;
+  /** made in the Moon atelier (docs/工房とブルーナ_設計.md §3.2): a saved song goes into Bluena's Mercury folder */
+  bluena?: boolean;
+  /** 〔公開する〕 right after saving (atelier only); resolves once the ship has set sail */
+  onPublish?: (s: MadeSong) => Promise<boolean>;
+  header?: boolean;
+}) {
   const { me } = useAuth();
   // Bati exists only for ORDER members (journeyDay ≥ JOURNEY_DONE) — until then KIMORIN composes.
   const partner = usePartner();
@@ -44,9 +58,14 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   const [buried, setBuried] = useState<Set<string>>(new Set());
   // 手直し mode: chat messages go to the song's edit endpoint (Gemini picks the change)
   const [editing, setEditing] = useState<string | null>(null);
-  const [warming, setWarming] = useState<{ songId: string; command: SongEditCommand } | null>(null);
+  const [warming, setWarming] = useState<{
+    songId: string;
+    command: SongEditCommand;
+  } | null>(null);
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, busy, pending]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, busy, pending]);
   useEffect(() => () => synth.stop(), []);
   // wake the GPU studio while we chat: a cold start takes 1-2 min, about as long as the talk,
   // so the instrumental is usually ready to make by the time the song is written
@@ -62,14 +81,36 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
   const live = getApi().mode === 'live';
   const history = (extra?: string) =>
     [
-      ...msgs.flatMap((m) => (m.who === 'song' ? [] : [{ role: m.who === 'me' ? ('user' as const) : ('partner' as const), text: m.text.slice(0, 400) }])),
+      ...msgs.flatMap((m) =>
+        m.who === 'song'
+          ? []
+          : [
+              {
+                role: m.who === 'me' ? ('user' as const) : ('partner' as const),
+                text: m.text.slice(0, 400),
+              },
+            ],
+      ),
       ...(extra ? [{ role: 'user' as const, text: extra.slice(0, 400) }] : []),
     ].slice(-30);
 
   const songMsg = (id: string) => msgs.find((m): m is Extract<Msg, { who: 'song' }> => m.who === 'song' && m.song.id === id)?.song;
   const updateSong = (id: string, v: SongView) =>
     setMsgs((ms) =>
-      ms.map((x) => (x.who === 'song' && x.song.id === id ? { ...x, song: { ...x.song, songUrl: v.url, songId: v.id, instrumentalUrl: v.instrumentalUrl, seconds: Math.round(v.seconds) } } : x)),
+      ms.map((x) =>
+        x.who === 'song' && x.song.id === id
+          ? {
+              ...x,
+              song: {
+                ...x.song,
+                songUrl: v.url,
+                songId: v.id,
+                instrumentalUrl: v.instrumentalUrl,
+                seconds: Math.round(v.seconds),
+              },
+            }
+          : x,
+      ),
     );
 
   /** One 手直し round: the message (or a command retried after the GPU warmed up) → reply + new mix. */
@@ -132,7 +173,11 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
     setBusy(true);
     setTyping(true);
     try {
-      const r = await getApi().composeChat({ partner: partner.name, isBati: hasBati, history: history(t) });
+      const r = await getApi().composeChat({
+        partner: partner.name,
+        isBati: hasBati,
+        history: history(t),
+      });
       say(r.reply);
       // the partner decides when it knows enough; after two answers the genres show anyway
       if (r.ready || msgs.filter((m) => m.who === 'me').length + 1 >= 2) setPending(t);
@@ -156,10 +201,22 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
       if (!live) {
         await new Promise((r) => setTimeout(r, 2200));
         const song = offline();
-        setMsgs((m) => [...m, { who: 'partner', text: hasBati ? 'できたよ！ 聴いてみて。' : 'できたケン！ 聴いてみろ。' }, { who: 'song', song }]);
+        setMsgs((m) => [
+          ...m,
+          {
+            who: 'partner',
+            text: hasBati ? 'できたよ！ 聴いてみて。' : 'できたケン！ 聴いてみろ。',
+          },
+          { who: 'song', song },
+        ]);
         return;
       }
-      const d = await getApi().composeDesign({ partner: partner.name, isBati: hasBati, genre, history: history(label) });
+      const d = await getApi().composeDesign({
+        partner: partner.name,
+        isBati: hasBati,
+        genre,
+        history: history(label),
+      });
       const song = songFromDesign(d, artist);
       setMsgs((m) => [...m, { who: 'partner', text: d.comment }, { who: 'song', song }]);
     } catch (e) {
@@ -172,15 +229,18 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center gap-3 border-b border-white/10 px-4 pb-2 pt-[calc(12px+env(safe-area-inset-top))]">
-        <Face face={partner.face} size={40} />
-        <div>
-          <p className="text-sm font-bold">{partner.name}と作曲</p>
-          <p className="text-[11px] text-white/50">
-            話しかけると、{partner.name}が曲にしてくれる（{live ? '伴奏と歌も入れられるよ' : '仮の画面'}）
-          </p>
+      {header && (
+        <div className="flex items-center gap-3 border-b border-white/10 px-4 pb-2 pt-[calc(12px+env(safe-area-inset-top))]">
+          <Face face={partner.face} size={40} />
+          <div>
+            <p className="text-sm font-bold">{partner.name}と作曲</p>
+            <p className="text-[11px] text-white/50">
+              話しかけると、{partner.name}が曲にしてくれる（
+              {live ? '伴奏と歌も入れられるよ' : '仮の画面'}）
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {msgs.map((m, i) =>
@@ -211,10 +271,26 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
                     return;
                   }
                 }
-                onBury(m.song.songUrl ? { ...m.song, id: `${m.song.id}-${Date.now()}`, audioUrl: m.song.songUrl } : m.song);
+                onBury(
+                  m.song.songUrl
+                    ? {
+                        ...m.song,
+                        id: `${m.song.id}-${Date.now()}`,
+                        audioUrl: m.song.songUrl,
+                      }
+                    : m.song,
+                );
                 setBuried((b) => new Set(b).add(`${m.song.id}:${m.song.songUrl ?? ''}`));
                 if (editing === m.song.id) setEditing(null);
-                say(hasBati ? '保存して、島の土に埋めておいたよ。出航させたくなったら、島から出航してね。' : '保存して、島の土に埋めといたケン。出航させたくなったら、島から出航だ！');
+                say(
+                  bluena
+                    ? hasBati
+                      ? 'ブルーナにしまったよ。'
+                      : 'ブルーナにしまったケン。'
+                    : hasBati
+                      ? '保存して、島の土に埋めておいたよ。出航させたくなったら、島から出航してね。'
+                      : '保存して、島の土に埋めといたケン。出航させたくなったら、島から出航だ！',
+                );
               }}
               editing={editing === m.song.id}
               onEdit={() => {
@@ -235,6 +311,8 @@ export function ComposeChat({ onBury, onOpenIsland }: { onBury: (s: MadeSong) =>
                 say('じゃあ、もう一回。どんな感じにする？');
               }}
               onIsland={onOpenIsland}
+              bluena={bluena}
+              onPublish={onPublish ? () => onPublish(m.song.songUrl ? { ...m.song, audioUrl: m.song.songUrl } : m.song) : undefined}
               live={live}
               onSung={(v) => {
                 synth.stop();
@@ -293,6 +371,36 @@ function detail(e: unknown) {
   return e instanceof ApiError ? `\n（${e.status} ${e.code}${e.message ? `: ${e.message.slice(0, 120)}` : ''}）` : `\n（${String(e).slice(0, 120)}）`;
 }
 
+/** after saving in the atelier: 〔ブルーナを見る〕 and 〔公開する〕 with the planet it goes to (docs/工房とブルーナ_設計.md §3.2) */
+function SavedInBluena({ onOpen, onPublish }: { onOpen: () => void; onPublish?: () => Promise<boolean> }) {
+  const [state, setState] = useState<'idle' | 'busy' | 'done'>('idle');
+  return (
+    <div className="mt-3 flex gap-2">
+      <button onClick={onOpen} className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-sky-200/40 bg-sky-300/10 py-2 text-xs">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/ui/bluena-icon.webp" alt="" className="h-5 w-5 scale-125 rounded-full object-cover" />
+        ブルーナを見る
+      </button>
+      {onPublish &&
+        (state === 'done' ? (
+          <span className="flex flex-[1.4] items-center justify-center rounded-full bg-white/10 py-2 text-xs text-sky-100">⛵ 水星へ出航した</span>
+        ) : (
+          <button
+            disabled={state === 'busy'}
+            onClick={async () => {
+              setState('busy');
+              setState((await onPublish()) ? 'done' : 'idle');
+            }}
+            className="flex flex-[1.4] items-center justify-center gap-1.5 rounded-full bg-sky-300 py-2 text-sm font-black text-slate-950 disabled:opacity-60"
+          >
+            <span className="h-4 w-4 rounded-full bg-[radial-gradient(circle_at_35%_35%,#e8f2ff,#7f9bc4_60%,#3d4f73)]" aria-hidden />
+            {state === 'busy' ? '投影中…' : '公開する'}
+          </button>
+        ))}
+    </div>
+  );
+}
+
 export function Face({ face, size }: { face: string; size: number }) {
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={face} alt="" style={{ width: size, height: size }} className="shrink-0 rounded-full border border-white/20 object-cover" />;
@@ -306,6 +414,8 @@ function SongCard({
   onBury,
   onAgain,
   onIsland,
+  bluena = false,
+  onPublish,
   live,
   onSung,
   editing,
@@ -324,6 +434,8 @@ function SongCard({
   onBury: () => void | Promise<void>;
   onAgain: () => void;
   onIsland: () => void;
+  bluena?: boolean;
+  onPublish?: () => Promise<boolean>;
 }) {
   return (
     <div className="mx-auto w-full max-w-sm rounded-3xl border border-violet-300/30 bg-gradient-to-b from-[#1b1a4a] to-[#0f1230] p-4 shadow-xl">
@@ -360,7 +472,9 @@ function SongCard({
         </p>
       )}
       {live && song.design && <FullSong song={song} onMade={onSung} />}
-      {buried ? (
+      {buried && bluena ? (
+        <SavedInBluena onOpen={onIsland} onPublish={onPublish} />
+      ) : buried ? (
         <button onClick={onIsland} className="mt-3 w-full rounded-full border border-amber-200/50 bg-[#3a2410]/80 py-2 text-sm">
           ⛏ 保存して島の土に埋めました → 島を見る
         </button>
@@ -392,7 +506,7 @@ function SongCard({
             もう一回つくる
           </button>
           <button onClick={() => void onBury()} className="flex-[2] rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
-            ⛏ 島の土に埋める（デモ）
+            {bluena ? 'ブルーナにしまう' : '⛏ 島の土に埋める（デモ）'}
           </button>
         </div>
       )}
@@ -454,7 +568,13 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
         bpm: d.bpm,
         keyRoot: d.keyRoot,
         scale: d.scale,
-        sections: d.sections.map((s) => ({ name: s.name, lines: s.lines.map((l) => ({ text: l.text.slice(0, 40), beats: l.notes.reduce((a, n) => a + n.beats, 0) })) })),
+        sections: d.sections.map((s) => ({
+          name: s.name,
+          lines: s.lines.map((l) => ({
+            text: l.text.slice(0, 40),
+            beats: l.notes.reduce((a, n) => a + n.beats, 0),
+          })),
+        })),
         instrumentalPrompt: d.instrumentalPrompt,
         progression: d.progression,
         seconds: Math.max(10, Math.min(180, d.seconds)),

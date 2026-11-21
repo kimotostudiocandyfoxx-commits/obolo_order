@@ -534,7 +534,9 @@ function Conversation({ status, peer, onBack, onBlocked }: { status: CommsStatus
     });
     return stop;
   }, [status, me, peer.id]);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs]);
 
   const send = async () => {
     const t = text.trim();

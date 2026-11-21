@@ -14,11 +14,11 @@ import { ShowArt } from './ShowArt';
  * where something is made (radio is made and shown at the same moment).
  * No numbers: no listener counts, no play counts.
  */
-export function RadioWorld({ practice }: { practice?: () => void }) {
+export function RadioWorld({ practice, startInBooth = false }: { practice?: () => void; startInBooth?: boolean }) {
   const [home, setHome] = useState<RadioHome | null>(null);
   const [error, setError] = useState(false);
   const [open, setOpen] = useState<{ kind: 'show'; show: RadioShowView } | { kind: 'live'; live: RadioLiveView } | null>(null);
-  const [booth, setBooth] = useState(false);
+  const [booth, setBooth] = useState(startInBooth);
 
   const load = useCallback(() => {
     getApi()

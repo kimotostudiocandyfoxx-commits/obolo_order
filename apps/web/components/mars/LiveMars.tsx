@@ -48,7 +48,9 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
   // the hero of the MV: the painted ぷにぷに picture, else the NEO look
   const heroPic = account?.puniPic ?? account?.avatarUrl ?? null;
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth' }), [msgs, step, songs]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [msgs, step, songs]);
   const say = (text: string, media?: Media) => setMsgs((m) => [...m, { who: 'partner', text, media }]);
   const me = (m: Omit<Msg, 'who'>) => setMsgs((cur) => [...cur, { who: 'me', ...m }]);
   const oops = () => say(ken('ごめん、うまくいかなかった……もう一回ためしてね。', 'すまん、うまくいかなかったケン……もう一回ためしてみろ。'));

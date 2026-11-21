@@ -772,3 +772,10 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .radio-drift, .radio-pulse, .radio-ripple-ring, .radio-onair, .bluena-in { animation: none; }
 }
+
+/* 月の工房: Bluena's gate opens, the square screen widens into the atelier (docs/工房とブルーナ_設計.md §3.2) */
+@keyframes atelier-door-l { 0%, 30% { transform: translateX(0); } 100% { transform: translateX(-101%); } }
+@keyframes atelier-door-r { 0%, 30% { transform: translateX(0); } 100% { transform: translateX(101%); } }
+@keyframes atelier-key { 0% { opacity: 0; transform: scale(0.6); } 25% { opacity: 1; transform: scale(1); } 45% { opacity: 1; } 70%, 100% { opacity: 0; transform: scale(1.6); } }
+@keyframes atelier-glow { 0% { opacity: 0; transform: scale(0.4); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(2.4); } }
+@keyframes atelier-screen { 0%, 40% { opacity: 0; transform: scale(0.3); } 60% { opacity: 1; transform: scale(1); border-radius: 1.5rem; } 100% { opacity: 1; transform: scale(3.2); border-radius: 0; } }
