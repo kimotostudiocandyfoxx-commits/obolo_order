@@ -1,5 +1,20 @@
 ﻿# Obolo Order — Full Product & Engineering Specification
 ### For Claude Code — Complete Design Document v1.8
+### v1.9 (2026-11-21, client decision — supersedes the planet roles below where they differ):
+###       CREATE on the Moon, KEEP in Bluena, SHOW on the planets. Full design (Japanese):
+###       docs/工房とブルーナ_設計.md. Story side: decisions_round20.md (M-R185–M-R197).
+###       (a) All creation (song, art, MV, goods, book, game) happens in the MOON ATELIER with
+###           Bati. Planets have no create tabs; each "my place" gets one "make in the atelier".
+###       (b) BLUENA holds the user's works in per-planet folders (private) + saved links to
+###           other users' works, and has two screens: WORKS and COMMS (friend messages; Earth
+###           mail moves here, Earth keeps calls only). Publishing = projecting from Bluena.
+###       (c) NINE planets: Saturn=voice, Jupiter=art, Mercury=songs, Mars=MV/video only,
+###           Venus=RADIO (podcast + voice-only live; DJ is a feature inside a show; the
+###           broadcast booth lives on Venus as the one exception to "create on the Moon"),
+###           Uranus=goods (obolo shop), Neptune=games (made in the atelier from a company
+###           parts kit; Haiku/Sonnet/Opus tiers; sandboxed iframe only), Pluto=books/stories.
+###       (d) The daily 88 minutes count only time spent touring planets (not atelier,
+###           Bluena, comms or publishing).
 ### v1.8: Commerce & wallet simplified (client decision 2026-10-13).
 ###       (a) NO bank feature: users do not open bank accounts in-app (no GMO BaaS per-user
 ###       accounts, no "Earth Bank"). Earth has a private WALLET instead: EARNINGS are shown
@@ -158,7 +173,7 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 - **Earn**: streaming royalties return via LabelGrid → obolo records keeps 8%, the artist
   receives 92% into the EARNINGS ledger (same split philosophy as Neptune).
 
-### 2.6 🟡 Venus — Paid Reels
+### 2.6 🟡 Venus — Paid Reels  (→ v1.9: RADIO planet, see docs/工房とブルーナ_設計.md §9–10)
 - Short-form video feed (TikTok/Reels mechanics: swipe feed, Stars, comment, share).
 - **SQUARE (1:1) video, not vertical** — deliberate differentiator.
 - Only paying subscribers can post (already guaranteed by the ¥88 paywall).
@@ -168,7 +183,7 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 - Long video hosting: anime, drama, creator series. SQUARE (1:1) player.
 - Bunny Stream; optional DRM add-on for premium/licensed content (OPEN: phase 2).
 
-### 2.8 ⭕ Uranus — Sky Atelier + Oboro Shop (v1.8, made-to-order)
+### 2.8 ⭕ Uranus — Sky Atelier + Oboro Shop (v1.8, made-to-order)  (→ v1.9: goods planet; goods are made in the Moon atelier)
 - **Sky Atelier**: every user has an atelier (floating in the sky) where they display goods
   made from their own works (T-shirt, mug, acrylic stand, sticker, can badge, tote…), chosen
   from company-provided templates. Displaying is free; MANA is spent only if new artwork is
@@ -191,7 +206,7 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
   Printio (public API) — see docs/天王星_アトリエ_設計メモ.md. Shopify is not used.
 - Cross-link: Neptune game characters can become Uranus goods.
 
-### 2.9 🔵 Neptune — Game Arcade, play-first (v1.8)
+### 2.9 🔵 Neptune — Game Arcade, play-first (v1.8)  (→ v1.9: games made in the Moon atelier, §12 of docs/工房とブルーナ_設計.md)
 - **Launch: play only.** A small set of HTML5/browser games made by the company, free to play
   in our own WebView/PWA (no App Store / Google Play intermediary). No user-to-user game sales
   and no in-game MANA billing at launch.
@@ -212,6 +227,12 @@ Where marked `PLACEHOLDER`, insert a clearly-marked stub the client will replace
 - Cross-link: Neptune game characters can become Uranus goods.
 
 ---
+
+### 2.10 Pluto — Story planet (v1.9, new)
+- Novels, picture books and books are shown on Pluto: an ice library; each published story
+  lights up as a lamp in the dark sky. Locked in the first journey (door only), opens at the
+  start of the second. Books link out to the atelier ("make an anime of this story" → Mars,
+  "make it a picture book" → printed via the Uranus obolo shop).
 
 ## 3. MANA (マナ) ECONOMY — The Internal Currency
 
