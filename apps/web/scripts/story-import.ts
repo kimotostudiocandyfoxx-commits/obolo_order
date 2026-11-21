@@ -20,7 +20,7 @@ const REPORT = join(ROOT, 'docs/story-import');
 mkdirSync(OUT, { recursive: true });
 mkdirSync(REPORT, { recursive: true });
 
-const parts = readdirSync(src).filter((d) => /^P\d+$/.test(d)).sort();
+const parts = readdirSync(src).filter((d) => /^P\d+[a-z]?$/.test(d)).sort();
 const all: Scene[] = [];
 for (const p of parts) {
   const files = readdirSync(join(src, p)).filter((f) => /^c\d+[a-z]?\.md$/.test(f)).sort();
