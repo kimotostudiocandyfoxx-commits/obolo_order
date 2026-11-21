@@ -25,7 +25,7 @@ export function AtelierScreen({ bati, children, closing = false, caption }: { ba
         </div>
         {bati?.image && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={bati.image} alt={bati.name ?? ''} className="absolute bottom-[14%] left-[5%] h-[26%] w-auto animate-[atelier-hop_0.6s_0.7s_ease-out_both] object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.5)]" />
+          <img src={bati.image} alt={bati.name ?? ''} className="absolute bottom-[14%] left-[5%] h-[26%] w-auto animate-[atelier-hop_0.6s_0.7s_ease-out_both] rounded-2xl object-contain shadow-[0_0_18px_rgba(140,200,255,0.35)]" />
         )}
         {caption && <p className="absolute inset-x-0 top-2 text-center text-[11px] tracking-[0.25em] text-sky-100/70">{caption}</p>}
         <div className="absolute inset-0 flex items-center justify-center p-[9%]">{children}</div>
