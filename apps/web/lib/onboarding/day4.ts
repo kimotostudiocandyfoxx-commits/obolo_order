@@ -1,98 +1,91 @@
 import type { Step } from './script';
 
 /**
- * DAY 4 【土星 → 木星】 — the story of 2026-10-14 (docs/story-rewrite/太陽まで_UI引き継ぎ.md §8, D05-S001〜S009).
- * The daily pattern (3〜6日目): in the rocket KIMORIN⭐︎ guesses wrong on Bluena → MONBAN names the next
- * resident → arrive → 「誰だ？」「ネオです」「遊び方を教えてやる」 → the play screen → a riddle card gets its
- * words, the ticket its stamp.
- * Jupiter's play screen (story D05-S005〜S008, M-R89): words become a square record jacket — KIMORIN⭐︎'s
- * 『プリプリ・ボカン』 first, then the visitor's one (a root's words or new ones; a photo / Bati's drawing /
- * words only) — put on the stone, it flaps up like a butterfly (components/jupiter/JupiterLesson.tsx).
- * Saves answers.stickers (the jacket).
+ * DAY 4 【土星 → 木星】 — the simple version (M-R198, M-R200; wip/P03/c01.md D05-S001〜S006, c02.md D05-S007〜S009;
+ * the scene ids say D05 but it is day 4). Starts after the email check 〔扉の合言葉〕 (DayAuth). Morning on Saturn,
+ * KIMORIN⭐︎'s たこ焼き guess on Bluena in the rocket, MONBAN names 大根カイザー, the arrival cut over the great forest,
+ * the daikon among the trees, 「木星は、命が宿る星ダ。」. The play screen (components/jupiter/JupiterLesson.tsx,
+ * D05-S006〜S008b): KIMORIN⭐︎'s『プリプリ・ボカン』 made in the Moon atelier, then the visitor's art from one of
+ * yesterday's Saturn words (or new words) — kept in Bluena's Jupiter folder — then 🎨 myアトリエ and 〔公開する〕 to the
+ * dachi's sky. The day ends with the Jupiter stamp (no MONBAN interruption, no riddle card: M-R198).
+ * Saved: answers.stickers (the art), my_atelier, f_d05_send.
  */
 export const DAY4: Step[] = [
-  { t: 'bgm', track: 'morning' }, // scene music (ACE-Step, 2026-10-27)
-  { t: 'caption', text: '4日目' },
   // D05-S001 朝の土星
-  { t: 'still', image: 's/saturn-inside' },
+  { t: 'scene', id: 'D05-S001' },
+  { t: 'bgm', track: 'morning' }, // scene music (ACE-Step, 2026-10-27)
+  { t: 'still', image: 's/saturn-inside' }, // 〔背景 saturn-temple〕
+  { t: 'caption', text: '4日目' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: 'おはようございます、{neo}。' },
   { t: 'say', who: 'KIMORIN', text: '切符によると、次は、木星です。' },
   { t: 'action', label: '木星へ向かう' },
 
   // D05-S002 たこ焼き推理／大森林の大根
+  { t: 'scene', id: 'D05-S002' },
   { t: 'sprite', image: null },
   { t: 'se', sound: 'whoosh' },
-  { t: 'still', image: 's/rocket-space' },
+  { t: 'still', image: 's/rocket-space' }, // ロケットが、土星から飛び立つ。窓の外が、真っ暗な宇宙になる
   { t: 'clock', on: true },
   { t: 'bgm', track: 'space' },
-  { t: 'se', sound: 'blip' },
+  { t: 'se', sound: 'blip' }, // KIMORINが、Bluenaを光らせる。ロケットの壁に正方形のスクリーン。門の前のMONBAN
   { t: 'screen', open: true },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
-  { t: 'say', who: 'KIMORIN', text: 'MONBANさん、、、私、謎の答えが、分かりました。' },
+  { t: 'say', who: 'KIMORIN', text: 'MONBANさん、、、私、分かりました。' },
   { t: 'say', who: 'KIMORIN', text: 'Obolo Orderは全員、、、たこ焼き。そうですよね？' },
-  { t: 'say', who: 'KIMORIN', text: 'きのう、たこ焼きブラザーと、たこ焼きシスターが、いました。' },
   { t: 'say', who: 'KIMORIN', text: 'OBOLONも、よくよく見たら、焦げたたこ焼きでは、ありませんか。' },
-  { t: 'say', who: 'KIMORIN', text: '木星には、たこ焼きマザーと、たこ焼きファザーが、いるに違いありません。' },
-  { t: 'say', who: 'KIMORIN', text: 'そうなのでしょう？' },
   { t: 'say', who: 'MONBAN', text: '木星には…大根カイザーが、いる…。' },
   { t: 'screen', open: false },
   { t: 'say', who: 'KIMORIN', text: 'なるほど。やはり、大根でしたか。' },
   { t: 'sprite', image: null },
   { t: 'still', image: 's/rocket-jupiter' },
   { t: 'se', sound: 'whoosh' },
-  { t: 'still', image: 's/jupiter-forest' },
-  { t: 'se', sound: 'arrive' },
   { t: 'bgm', track: 'jupiter' },
-  { t: 'caption', text: '木星に着いた' },
+  { t: 'se', sound: 'arrive' },
+  // 到着カット（止め絵＋ゆっくりしたカメラ）：緑の縞もようの雲の下、見わたすかぎりの大森林。梢の上をゆっくり進む
+  { t: 'arrive', image: 's/arr-jupiter-canopy', caption: '木星に着いた' },
+  { t: 'cam', move: 'in' },
+  { t: 'still', image: 's/jupiter-forest' }, // 森の切れ目に降りたロケット
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: 'すごい、、、神秘的な森ですね。' },
-  { t: 'action', label: '森を探索する' },
-  { t: 'say', who: '？？？', text: 'おい。', voice: '大根カイザー' },
+  { t: 'say', who: '？？？', text: 'おい。', voice: '大根カイザー' }, // （声）
   { t: 'say', who: 'KIMORIN', text: 'ん？　どこですか？' },
-  { t: 'say', who: '？？？', text: 'ここダ。', voice: '大根カイザー' },
-  { t: 'say', who: 'KIMORIN', text: 'どこですか？' },
-  { t: 'still', image: 's/jupiter-daikon' }, // 並んだ木のうちの一本だけ、幹が白くて太い。大根だった
+  { t: 'say', who: '？？？', text: 'ここダ。', voice: '大根カイザー' }, // （声）
+  { t: 'still', image: 's/jupiter-daikon' }, // 並んだ木のうちの一本だけ、幹が白くて太い。てっぺんに、青い葉の冠。大根だった
   { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
   { t: 'caption', text: '大根カイザーが現れた' },
   { t: 'say', who: '大根カイザー', text: '木星で、何をしているダ？　お前ら、誰ダ？' },
   { t: 'say', who: 'KIMORIN', text: '私たちは、ネオです。' },
-  { t: 'say', who: '大根カイザー', text: 'なんダ、ネオか。' },
-  { t: 'say', who: '大根カイザー', text: 'ということは、木星に遊びに来たのダな。' },
+  { t: 'say', who: '大根カイザー', text: 'なんダ、ネオか。木星に、遊びに来たのダな。' },
   { t: 'say', who: '大根カイザー', text: '我が、木星の遊び方を、教えてやるダ。' },
 
-  // D05-S005〜S008 木星の遊ぶ画面：言葉をジャケットに（KIMORINの見本『プリプリ・ボカン』→自分の1枚）→ 石に置くとパタパタ飛ぶ
+  // D05-S005 木星は命が宿る星／「いい言葉ですね」 — 画面が、木星の遊ぶ画面に切りかわる
+  { t: 'scene', id: 'D05-S005' },
   { t: 'bgm', track: 'jupiter-play' },
+  { t: 'still', image: 's/jupiter-forest' },
+  { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
+  { t: 'say', who: '大根カイザー', text: '木星は、命が宿る星ダ。' },
+  { t: 'say', who: '大根カイザー', text: '君が見た風景だったり、今日食べたご飯だったり。そんな何気ない日常でも、命を宿し、そして思い出になっていくのダ。' },
+  { t: 'say', who: '大根カイザー', text: '百聞は、一見にしかず、ダ。やってみるダ。' },
+  { t: 'say', who: 'KIMORIN', text: '……百聞は、一見にしかず。いい言葉ですね。今日から、私の言葉にしましょう。' },
+
+  // D05-S006 根っこから一つ選ぶ → D05-S007 {neo}のアート → D05-S008b myアトリエと、ダチの空へ
+  // (all three inside the Jupiter play screen: components/jupiter/JupiterLesson.tsx)
+  { t: 'scene', id: 'D05-S006' },
   { t: 'sprite', image: null },
   { t: 'jupiter' },
   { t: 'bgm', track: 'jupiter' },
 
-  // D05-S009 畑から門番／札3
+  // D05-S009 木星のスタンプ
+  { t: 'scene', id: 'D05-S009' },
   { t: 'still', image: 's/jupiter-daikon' },
-  { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
-  { t: 'say', who: '大根カイザー', text: 'よい機会ダ。王として、大事な話をしてやるダ。' },
-  { t: 'say', who: '大根カイザー', text: 'Obolo Orderが、なぜ集まり、何をめざしておるのか、ダ。' },
-  { t: 'say', who: '大根カイザー', text: '結社の目的とは……' },
-  { t: 'se', sound: 'blip' }, // ピピッ。Bluenaが勝手に光り、大根畑の土の上に正方形のスクリーン
-  { t: 'screen', open: true },
-  { t: 'say', who: 'MONBAN', text: 'おい…。そいつらは、まだネオだ…。\n秘密を喋るのは、ダメだ…。' },
-  { t: 'say', who: '大根カイザー', text: '……MONBAN、聞いておったのダ。' },
-  { t: 'say', who: 'MONBAN', text: '……王でも、掟は掟だ…。' },
-  { t: 'screen', open: false },
-  { t: 'say', who: 'KIMORIN', text: 'さすがの王様も、MONBANにはかなわないようですね。' },
-  { t: 'say', who: 'KIMORIN', text: 'ですが、私には分かります。結社の目的——お金を集める組織、でしょう？' }, // 丸いサングラスを、指でくいっとかけ直す
-  { t: 'say', who: 'うんちピンポンくん', text: 'ピンポンピンポン♪' },
-  { t: 'say', who: '大根カイザー', text: '……続きは、もう少し旅をしてからダ。' },
-  { t: 'se', sound: 'riddle' },
-  { t: 'seal', n: 3 }, // 謎の書の札3に「結社の目的とは」の文字
-  { t: 'caption', text: '謎の書に、文字が浮かんだ' },
   { t: 'sprite', image: ['kaiser1', 'kimorin-sun'] },
   { t: 'say', who: '大根カイザー', text: '明日は、水星へ行くダ。' },
   { t: 'sprite', image: null },
   { t: 'se', sound: 'stamp' },
-  { t: 'ticket', stamp: 'jupiter' },
+  { t: 'ticket', stamp: 'jupiter' }, // {neo}の切符の、木星の欄に、ぽん、とスタンプが押される
   { t: 'caption', text: '切符に、木星のスタンプが押された' },
   { t: 'bgm', track: 'farewell' },
-  { t: 'caption', text: 'また明日' },
+  { t: 'caption', text: 'また明日' }, // 〔おわり：また明日〕 → 〔完了画面：5日目まで24時間のカウントダウン〕 (TomorrowScreen)
   { t: 'end' },
 ];
