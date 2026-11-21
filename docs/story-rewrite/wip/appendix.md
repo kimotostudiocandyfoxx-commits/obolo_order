@@ -731,6 +731,91 @@
 
 ---
 
+## 付録C-0　シンプル版のフラグ（M-R198・本編 P01〜P04・P05m で使うもの）
+
+| フラグ | 使うパート |
+|---|---|
+| `f_d01_talk` | P01 |
+| `f_d01_ticket` | P01 |
+| `f_d03_card` | P02 |
+| `f_d03_neo_mode` | P02 |
+| `f_d03_photo` | P02 |
+| `f_d03_redraw` | P02 |
+| `f_d04_dachi_inviter` | P02 |
+| `f_d04_fly` | P02 |
+| `f_d04_jupiter_letter` | P02 |
+| `f_d04_kororin` | P02・P03 |
+| `f_d04_kororin_count` | P02 |
+| `f_d04_square` | P02 |
+| `f_d05_kimorin_sticker` | P03 |
+| `f_d05_proverb` | P03 |
+| `f_d05_redraw` | P03 |
+| `f_d05_sent_jacket` | P03 |
+| `f_d05_spell` | P03 |
+| `f_d05_spell_kept` | P03 |
+| `f_d05_tree` | P03 |
+| `f_d05_tree_parts` | P03 |
+| `f_d06_genre` | P03 |
+| `f_d06_island` | P03 |
+| `f_d06_island_name` | P03 |
+| `f_d06_island_parts` | P03 |
+| `f_d06_island_shape` | P03 |
+| `f_d06_know` | P03 |
+| `f_d06_lyric_add` | P03 |
+| `f_d06_night` | P03 |
+| `f_d06_pick` | P03 |
+| `f_d06_remade` | P03 |
+| `f_d06_sent_song` | P03 |
+| `f_d06_spell` | P03 |
+| `f_d06_turn` | P03 |
+| `f_d07_done` | P04 |
+| `f_d07_first_frame` | P04 |
+| `f_d07_remade` | P04 |
+| `f_d07_sent_mv` | P04 |
+| `f_d07_studio` | P04 |
+| `f_d07_studio_parts` | P04 |
+| `f_d07v_arrived` | P04 |
+| `f_d07v_dj` | P04 |
+| `f_d07v_done` | P04 |
+| `f_d07v_set_done` | P04 |
+| `f_d07v_show` | P04 |
+| `f_d08_feel` | P04 |
+| `f_dachi_inviter` | P02 |
+| `f_dachi_kimorin` | P02 |
+| `f_food` | P02 |
+| `f_join` | P02・P04 |
+| `f_join_early` | P02・P04 |
+| `f_koro_voice` | P02 |
+| `f_link_d05` | P03 |
+| `f_m_end_seen` | P05m |
+| `f_m_neptune_done` | P05m |
+| `f_m_neptune_game` | P05m |
+| `f_m_neptune_publish` | P05m |
+| `f_m_neptune_trial` | P05m |
+| `f_m_pluto_done` | P05m |
+| `f_m_pluto_picturebook` | P05m |
+| `f_m_pluto_publish` | P05m |
+| `f_m_pluto_story` | P05m |
+| `f_m_uranus_done` | P05m |
+| `f_m_uranus_goods` | P05m |
+| `f_m_uranus_order` | P05m |
+| `f_m_uranus_shop` | P05m |
+| `f_m_uranus_template` | P05m |
+| `f_mv_from` | P04 |
+| `f_mv_saved` | P04 |
+| `f_neo_created` | P02 |
+| `f_neo_name` | P02 |
+| `f_order` | P04 |
+| `f_song_from` | P03 |
+| `f_song_saved` | P03 |
+| `f_spellbook` | P03 |
+| `f_sticker_art` | P03 |
+| `f_sticker_from` | P03 |
+
+- M-R198 で外したフラグ：`f_d03_bati_talk`・`f_bati_voice`・`f_d04_kororin_design`・`f_d04_kororin_card`・`f_d04_kororin_redraw`・`f_d05_butterfly`・`f_d07_screen`・`f_mystery1_open`・`f_mystery4_open`。
+- M-R198 で足したフラグ：`f_join_early`（early/later・3日目の終わり）と、会員になった後の `f_m_*`。
+- 下の付録Cの表は、三周の旅の頃の記録（星の物語の材料のフラグを含む）。
+
 ## 付録C　後のゲーム画面化への引き継ぎ（実装命令ではない）
 
 この付録は、次の工程（ゲーム画面化）が本文を読むときの手がかりです。ここに書いた手順・名前・素材は、実装の決定でも命令でもありません。技術・経済の未決は未決のまま渡します。
