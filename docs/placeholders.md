@@ -165,6 +165,7 @@
 | P-MEDIA-1 | 🔴 | Bunny Storage / CDN の認証情報 | 未設定の間は **音声を Postgres に保存して API から配信**（開発・プレビュー専用）。Bunny の値を入れると自動で Bunny に切り替わる |
 | P-INFRA-1 | 🔴 | GCP プロジェクトID、Workload Identity、Cloud SQL インスタンス名、CORS 許可ドメイン | `docs/deploy.md` の手順で設定 |
 | P-AI-1 | 🟡 | 使う LLM モデル名 | Gemini `gemini-2.5-flash-lite`（クライアント決定 2026-10-06：費用のため、バティとの会話・作曲の設計など文章のAIは全部これ）、予備 OpenAI `gpt-4o-mini`。キー未設定時はオフラインの仮返答 |
+| P-AI-1b | 🔴 | バティの会話を Claude Haiku 5.5 に（2026-11-21） | しくみはできている。鍵 `obolo-anthropic-api-key` が未登録（Google Cloud の本人確認待ち）なので Gemini で動いている。登録したら GitHub の変数 `CLAUDE_BATI=true` | `packages/ai/src/claude.ts`、`deploy-api.yml` |
 | P-MOD-1 | 🔴 | 投稿前モデレーション（仕様 §8：ローンチ必須） | 簡単な禁止語チェック＋Gemini 判定。通報・ストライク・管理画面は未実装 |
 | P-PWA-1 | ⚪ | Service Worker・Web Push | マニフェストのみ（ホーム画面追加は可能） |
 | P-BRAND-1 | 🟡 | ロゴ・アプリアイコン | 仮の SVG アイコン |

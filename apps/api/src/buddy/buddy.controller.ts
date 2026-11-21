@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
+import type { Response } from 'express';
 import { BuddyChatBody, BuddyPictureBody, CompassBody, StoryBody, UpdateBuddyProfileBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -47,6 +48,31 @@ export class BuddyController {
     const { text, locale } = parseBody(BuddyChatBody, body);
     await rateLimit(this.kv, `buddy:${userId}`, 12, 60);
     return this.buddy.chat(userId, text, locale);
+  }
+
+  /**
+   * The same as POST /buddy/chat, written as it comes (Server-Sent Events): `event: text` pieces of an ordinary
+   * answer, then `event: done` with the saved reply (BuddyChatResponse) or `event: error` with { code }.
+   */
+  @Post('chat/stream')
+  async chatStream(@UserId() userId: string, @Body() body: unknown, @Res() res: Response) {
+    const { text, locale } = parseBody(BuddyChatBody, body);
+    await rateLimit(this.kv, `buddy:${userId}`, 12, 60);
+    res.status(200);
+    res.setHeader('content-type', 'text/event-stream; charset=utf-8');
+    res.setHeader('cache-control', 'no-cache, no-transform');
+    res.setHeader('x-accel-buffering', 'no');
+    res.flushHeaders();
+    const send = (event: string, data: unknown) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    try {
+      const out = await this.buddy.chat(userId, text, locale, (piece) => send('text', { text: piece }));
+      send('done', out);
+    } catch (err) {
+      const e = err as { getResponse?: () => { error?: { code?: string } } };
+      send('error', { code: e.getResponse?.()?.error?.code ?? 'BUDDY_UNAVAILABLE' });
+    } finally {
+      res.end();
+    }
   }
 
   /** 〔🖼 絵で見る〕: a picture for an answer (null = none found; nothing is charged then) */

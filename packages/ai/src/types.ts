@@ -22,6 +22,10 @@ export interface LlmProvider {
   transcribe?(audio: Buffer, mime: string): Promise<string>;
   /** look at a picture / listen to a sound (inline), or a public YouTube link, and answer the prompt as JSON */
   perceive?(input: { mime: string; data: Buffer } | { url: string }, prompt: string): Promise<string>;
+  /** the answer as it is written: onText gets each new piece, the promise the whole text */
+  stream?(req: ChatRequest, onText: (piece: string) => void): Promise<string>;
+  /** sorts a question and answers it in one call (Bati's one-call prompt; Claude) */
+  readonly oneCall?: boolean;
 }
 
 export interface ModerationResult {

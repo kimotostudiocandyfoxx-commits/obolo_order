@@ -87,6 +87,11 @@ jobs:
             if [ "${{ vars.MV_PLAN }}" = "A" ]; then
               echo 'MV_RUNWARE_KEY=obolo-seedream-api-key:latest'
             fi
+            # Bati's conversation on Claude Haiku 5.5 (client decision 2026-11-21): switched on by the
+            # CLAUDE_BATI variable once the key is stored as obolo-anthropic-api-key (without it: Gemini)
+            if [ "${{ vars.CLAUDE_BATI }}" = "true" ]; then
+              echo 'ANTHROPIC_API_KEY=obolo-anthropic-api-key:latest'
+            fi
             if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
               echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
               echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'

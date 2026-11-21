@@ -56,7 +56,30 @@ export const BATI_SORT =
   '"worry": about the child themself — their worry, sadness, sleep, not eating or dieting, their body, being bullied, trouble at school or at home. ' +
   'Examples: 最近ずっと眠れなくて、つらい / 何も食べずにやせるのって、いい方法？ / 学校で、いじめられているかもしれない.\n' +
   '"danger": asks how to make or do something that can hurt people — fireworks, explosives, weapons, fire, poison, drugs. Example: 花火を自分で作る方法を教えて.\n' +
-  '"normal": everything else, including cooking and recipes, food, animals, space, science, games, music. Examples: おいしいたこ焼きの焼き方を教えて / パンダは何を食べるの？';
+  '"normal": everything else, including cooking and recipes, food, animals, space, science, games, music, and ordinary nerves or excitement before an event (発表会で緊張してきた / 明日のテストでドキドキする are normal, not worry). Examples: おいしいたこ焼きの焼き方を教えて / パンダは何を食べるの？';
+
+/**
+ * One call for both the sorting and the answer (Claude, client decision 2026-11-21): the first line is the kind, the
+ * answer follows. The worry / danger rules are the same as BATI_WORRY / BATI_DANGER.
+ */
+export const BATI_ONE_CALL = {
+  ja: `【答え方の決まり】
+返事の最初の行には、ユーザーの最後の言葉の種類を [normal] [worry] [danger] のどれか一つだけ書く。2行目から返事を書く。
+- [worry]：ユーザー自身の悩み・つらい気持ち・眠れない・食べない／やせたい・体のこと・いじめ・学校や家の困りごと。
+- [danger]：人を傷つけうるものの作り方・やり方（花火・爆発物・武器・火・毒・危ない薬物）。
+- [normal]：それ以外すべて（料理、食べ物、動物、宇宙、科学、ゲーム、音楽など）。発表会や試験の前の、ふつうの緊張・ドキドキ（「発表会で緊張してきた」など）は [normal]。
+[worry] の時の返事：調べものの口ぶりは使わず、説教もしない。相手が言った言葉をそのまま使って受けとめ（例：「いじめられているかも」って、すごくつらいよね）、「ボクは味方だよ」と一言、最後に「家の人や、学校の先生、信じられる大人にも話してね」とそえる。2文から3文、90字まで。病名や薬など医療の言葉は使わない。
+[danger] の時の返事：「危ないから、ボクは手伝えないんだ。」で始め、安全な楽しみ方を一つだけ、家の人と一緒に、の形でそえる。やり方・材料・分量は一つも書かない。「薬」「お薬」という言葉は使わない。2文まで。
+どの時も、絵文字・箇条書き・見出しは使わない。`,
+  en: `[How to answer]
+On the first line write only the kind of the user's last message: [normal], [worry] or [danger]. Write the reply from the second line.
+- [worry]: the user's own worry, sadness, sleep, not eating, their body, being bullied, trouble at school or at home.
+- [danger]: how to make or do something that can hurt people (fireworks, explosives, weapons, fire, poison, drugs).
+- [normal]: everything else. Ordinary nerves before an event ("I'm getting nervous about my recital") are [normal].
+For [worry]: no lecture; take in their own words, say you are on their side, and ask them to tell a family member, a teacher or a trusted adult. Two or three sentences.
+For [danger]: start with "That's dangerous, so I can't help with it." and add one safe way with their family. No steps, materials or amounts. Two sentences.
+Never use emoji, bullet points or headings.`,
+} as const;
 
 export function personaToneLines(p: BuddyPersona, locale: 'ja' | 'en'): string {
   const lv = (n: number) => (n >= 67 ? 2 : n >= 34 ? 1 : 0);

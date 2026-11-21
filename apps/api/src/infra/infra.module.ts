@@ -1,11 +1,11 @@
 import { Global, Inject, Logger, Module, OnApplicationShutdown } from '@nestjs/common';
-import { createImageProvider, createLookImageProvider, createLlm, LlmProvider } from '@obolo/ai';
+import { createBuddyLlm, createImageProvider, createLookImageProvider, createLlm, LlmProvider } from '@obolo/ai';
 import { AppConfig, CONFIG, loadConfig } from '../config';
 import { Database } from '../db/db';
 import { createEmailSender } from './email';
 import { createKv, KvStore } from './kv';
 import { BullQueue, CloudTasksQueue, InlineQueue, JobQueue } from './queue';
-import { EMAIL, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from './tokens';
+import { BUDDY_LLM, EMAIL, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from './tokens';
 
 @Global()
 @Module({
@@ -57,8 +57,26 @@ import { EMAIL, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from './tokens';
         return llm;
       },
     },
+    {
+      provide: BUDDY_LLM,
+      inject: [CONFIG],
+      useFactory: (c: AppConfig): LlmProvider => {
+        const log = new Logger('LLM');
+        const llm = createBuddyLlm({
+          anthropicApiKey: c.ANTHROPIC_API_KEY,
+          anthropicModel: c.ANTHROPIC_MODEL,
+          geminiApiKey: c.GEMINI_API_KEY,
+          geminiModel: c.GEMINI_MODEL,
+          openaiApiKey: c.OPENAI_API_KEY,
+          openaiModel: c.OPENAI_MODEL,
+          onError: (p, e) => log.warn(`Bati: ${p} failed, falling back: ${String(e)}`),
+        });
+        log.log(`Bati chain: ${llm.name}`);
+        return llm;
+      },
+    },
   ],
-  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, IMAGES, LOOK_IMAGES],
+  exports: [CONFIG, Database, KV, QUEUE, EMAIL, LLM, BUDDY_LLM, IMAGES, LOOK_IMAGES],
 })
 export class InfraModule implements OnApplicationShutdown {
   constructor(

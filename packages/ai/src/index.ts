@@ -1,5 +1,6 @@
 export * from './types';
 export * from './providers';
+export * from './claude';
 export * from './buddy';
 export * from './moderation';
 export * from './prompts/bati';

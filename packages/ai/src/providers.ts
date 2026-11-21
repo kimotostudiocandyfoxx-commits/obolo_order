@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { ClaudeProvider, LlmRefusalError } from './claude';
 import { mockSongDesign } from './song';
 import { mockSongEdit } from './songEdit';
 import type { ChatRequest, LlmProvider } from './types';
@@ -186,11 +187,13 @@ export class MockProvider implements LlmProvider {
 /** Tries providers in order; returns the first successful answer. */
 export class FallbackProvider implements LlmProvider {
   readonly name: string;
+  readonly oneCall?: boolean;
   constructor(
     private readonly providers: LlmProvider[],
     private readonly onError?: (provider: string, err: unknown) => void,
   ) {
     this.name = providers.map((p) => p.name).join('>');
+    this.oneCall = providers[0]?.oneCall;
   }
   async chat(req: ChatRequest): Promise<string> {
     let lastErr: unknown;
@@ -198,6 +201,31 @@ export class FallbackProvider implements LlmProvider {
       try {
         return await p.chat(req);
       } catch (err) {
+        // a refusal is an answer, not an outage: the caller handles it (no other model is asked)
+        if (err instanceof LlmRefusalError) throw err;
+        lastErr = err;
+        this.onError?.(p.name, err);
+      }
+    }
+    throw lastErr ?? new Error('No LLM provider configured');
+  }
+
+  /** the first provider streams; if it fails before writing anything, the next ones answer in one piece */
+  async stream(req: ChatRequest, onText: (piece: string) => void): Promise<string> {
+    let lastErr: unknown;
+    for (const p of this.providers) {
+      let wrote = false;
+      try {
+        if (p.stream)
+          return await p.stream(req, (t) => {
+            wrote = true;
+            onText(t);
+          });
+        const text = await p.chat(req);
+        onText(text);
+        return text;
+      } catch (err) {
+        if (err instanceof LlmRefusalError || wrote) throw err;
         lastErr = err;
         this.onError?.(p.name, err);
       }
@@ -219,6 +247,9 @@ export class FallbackProvider implements LlmProvider {
 }
 
 export interface LlmConfig {
+  /** Bati's conversation (createBuddyLlm): Claude Haiku 5.5 when set (client decision 2026-11-21) */
+  anthropicApiKey?: string;
+  anthropicModel?: string;
   geminiApiKey?: string;
   geminiModel?: string;
   openaiApiKey?: string;
@@ -235,4 +266,15 @@ export function createLlm(cfg: LlmConfig): LlmProvider {
   if (cfg.openaiApiKey) chain.push(new OpenAiProvider(cfg.openaiApiKey, cfg.openaiModel || 'gpt-4o-mini'));
   if (chain.length === 0) return new MockProvider();
   return chain.length === 1 ? chain[0] : new FallbackProvider(chain, cfg.onError);
+}
+
+/**
+ * Bati's conversation (client decision 2026-11-21): Claude Haiku 5.5, with the ordinary chain (Gemini) behind it for an
+ * outage. Without an Anthropic key it is the ordinary chain, so the app keeps working until the key is set.
+ */
+export function createBuddyLlm(cfg: LlmConfig): LlmProvider {
+  const base = createLlm(cfg);
+  if (!cfg.anthropicApiKey) return base;
+  const claude = new ClaudeProvider(cfg.anthropicApiKey, cfg.anthropicModel || undefined);
+  return base.name === 'mock' ? claude : new FallbackProvider([claude, base], cfg.onError);
 }

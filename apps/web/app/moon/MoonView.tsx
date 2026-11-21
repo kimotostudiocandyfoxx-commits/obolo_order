@@ -81,12 +81,24 @@ function Chat() {
     const tempId = `tmp-${Date.now()}`;
     setMessages((cur) => [...cur, { id: tempId, role: 'user', text: body, createdAt: new Date().toISOString() }]);
     setText('');
+    const liveId = `live-${Date.now()}`;
     try {
-      const r = await api.buddyChat(body, locale);
-      setMessages((cur) => [...cur.filter((x) => x.id !== tempId), r.userMessage, r.reply]);
+      // Claude writes the answer as it comes (2026-11-21): the bubble fills while it is written, then the saved reply takes its place
+      const r = api.buddyChatStream
+        ? await api.buddyChatStream(body, locale, (piece) =>
+            setMessages((cur) => {
+              const at = cur.findIndex((x) => x.id === liveId);
+              if (at < 0) return [...cur, { id: liveId, role: 'buddy', text: piece, createdAt: new Date().toISOString() }];
+              const next = [...cur];
+              next[at] = { ...next[at], text: next[at].text + piece };
+              return next;
+            }),
+          )
+        : await api.buddyChat(body, locale);
+      setMessages((cur) => [...cur.filter((x) => x.id !== tempId && x.id !== liveId), r.userMessage, r.reply]);
       setQuota(r.quota);
     } catch (err) {
-      setMessages((cur) => cur.filter((x) => x.id !== tempId));
+      setMessages((cur) => cur.filter((x) => x.id !== tempId && x.id !== liveId));
       setText(body);
       setNotice(err instanceof ApiError && err.code === 'BUDDY_QUOTA' ? m.moon.quotaReached : m.moon.unavailable);
     } finally {

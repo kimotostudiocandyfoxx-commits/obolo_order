@@ -21,7 +21,7 @@ import { Database } from '../db/db';
 import { buddyMessages, buddyProfiles, users, wallets } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
-import { KV, LLM, QUEUE } from '../infra/tokens';
+import { BUDDY_LLM, KV, QUEUE } from '../infra/tokens';
 import { LedgerService } from '../wallet/ledger.service';
 
 const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
@@ -41,7 +41,8 @@ export class BuddyService implements OnModuleInit {
   constructor(
     @Inject(CONFIG) private readonly cfg: AppConfig,
     @Inject(KV) private readonly kv: KvStore,
-    @Inject(LLM) private readonly llm: LlmProvider,
+    // Bati's conversation: Claude Haiku 5.5 when its key is set (client decision 2026-11-21), else the Gemini chain
+    @Inject(BUDDY_LLM) private readonly llm: LlmProvider,
     @Inject(QUEUE) private readonly queue: JobQueue,
     private readonly db: Database,
     private readonly ledger: LedgerService,
@@ -118,7 +119,8 @@ export class BuddyService implements OnModuleInit {
     };
   }
 
-  async chat(userId: string, text: string, localeOverride?: Locale): Promise<BuddyChatResponse> {
+  /** `onText`: the ordinary answer as it is written (POST /buddy/chat/stream); the saved reply comes at the end */
+  async chat(userId: string, text: string, localeOverride?: Locale, onText?: (piece: string) => void): Promise<BuddyChatResponse> {
     const profile = await this.ensureProfile(userId);
     const [user] = await this.db.write.select().from(users).where(eq(users.id, userId));
     const [wallet] = await this.db.write.select().from(wallets).where(eq(wallets.userId, userId));
@@ -163,6 +165,7 @@ export class BuddyService implements OnModuleInit {
           locale,
         },
         history,
+        onText,
       ));
     } catch (err) {
       this.log.error(`LLM failed: ${String(err)}`);

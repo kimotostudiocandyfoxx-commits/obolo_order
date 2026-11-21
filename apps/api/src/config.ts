@@ -67,6 +67,11 @@ const Env = z.object({
   GEMINI_IMAGE_MODEL: z.string().optional(),
   OPENAI_API_KEY: secret(),
   OPENAI_MODEL: z.string().optional(),
+  /** Bati's conversation on Claude Haiku 5.5 (client decision 2026-11-21; secret obolo-anthropic-api-key).
+   *  Without it Bati talks on the Gemini chain as before. */
+  ANTHROPIC_API_KEY: secret(),
+  /** a fixed model id (never an alias); default claude-haiku-5-5 */
+  ANTHROPIC_MODEL: z.string().optional(),
 
   /** Stripe (the Eclipse day 7, ¥88/month). Without the secret key the payment runs in demo mode
    *  (no charge) — once it is set, POST /me/order is refused and only a paid Checkout counts. */

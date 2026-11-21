@@ -96,6 +96,8 @@ export interface Api {
   buddyMessages(cursor?: string): Promise<Paged<BuddyMessageView>>;
   buddyQuota(): Promise<BuddyQuotaView>;
   buddyChat(text: string, locale: Locale): Promise<BuddyChatResponse>;
+  /** the same, with the ordinary answer shown as it is written (live API only) */
+  buddyChatStream?(text: string, locale: Locale, onText: (piece: string) => void): Promise<BuddyChatResponse>;
   buddyForget(): Promise<void>;
   uploadVoice(blob: Blob): Promise<{ id: string; url: string }>;
   /** Mercury 作曲: the partner's reply while talking about the song. */

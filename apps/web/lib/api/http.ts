@@ -77,6 +77,46 @@ export class HttpApi implements Api {
   buddyChat(text: string, locale: 'ja' | 'en') {
     return this.req<Awaited<ReturnType<Api['buddyChat']>>>('POST', '/buddy/chat', { text, locale });
   }
+  /** POST /buddy/chat/stream (Server-Sent Events): `text` pieces, then `done` (the saved reply) or `error` */
+  async buddyChatStream(text: string, locale: 'ja' | 'en', onText: (piece: string) => void) {
+    const headers: Record<string, string> = { 'content-type': 'application/json', accept: 'text/event-stream' };
+    const token = tokenStore.get();
+    if (token) headers.authorization = `Bearer ${token}`;
+    let res: Response;
+    try {
+      res = await fetch(`${this.base}/buddy/chat/stream`, { method: 'POST', headers, body: JSON.stringify({ text, locale }) });
+    } catch {
+      throw new ApiError(0, 'NETWORK', 'Network error');
+    }
+    if (!res.ok || !res.body) {
+      const json = (await res.json().catch(() => null)) as { error?: { code: string; message: string } } | null;
+      if (res.status === 401) tokenStore.clear();
+      throw new ApiError(res.status, json?.error?.code ?? 'ERROR', json?.error?.message ?? res.statusText);
+    }
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buf = '';
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      let cut: number;
+      while ((cut = buf.indexOf('\n\n')) >= 0) {
+        const block = buf.slice(0, cut);
+        buf = buf.slice(cut + 2);
+        const event = /^event: (.+)$/m.exec(block)?.[1];
+        const data = /^data: (.*)$/m.exec(block)?.[1];
+        if (!event || data === undefined) continue;
+        const json = JSON.parse(data) as { text?: string; code?: string };
+        if (event === 'text' && json.text) onText(json.text);
+        else if (event === 'done') return json as unknown as Awaited<ReturnType<Api['buddyChat']>>;
+        else if (event === 'error') {
+          if (json.code === 'NO_MANA') window.dispatchEvent(new Event('obolo:nomana'));
+          throw new ApiError(json.code === 'BUDDY_QUOTA' ? 429 : 503, json.code ?? 'BUDDY_UNAVAILABLE', 'Buddy error');
+        }
+      }
+    }
+    throw new ApiError(503, 'BUDDY_UNAVAILABLE', 'The answer was cut off');
+  }
   buddyForget() {
     return this.req<void>('DELETE', '/buddy/memory');
   }
