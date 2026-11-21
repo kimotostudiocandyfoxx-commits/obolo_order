@@ -57,6 +57,7 @@ jobs:
           npm init -y >/dev/null && npm install --no-save --silent @anthropic-ai/sdk
           [ -z "$HAIKU_EFFORT" ] && HAIKU_EFFORT="$(grep -o 'effort=[a-z]*' "$RUN_FILE" 2>/dev/null | cut -d= -f2)"
           export HAIKU_EFFORT="${HAIKU_EFFORT:-low}"
+          export HAIKU_THINKING="$(grep -o 'thinking=[a-z]*' "$RUN_FILE" 2>/dev/null | cut -d= -f2)"
           export GEMINI_IN=0.30 GEMINI_OUT=2.50   # gemini-3.5-flash-lite (what gemini-flash-lite-latest served on 2026-11-21)
           GEMINI_API_KEY="$G" ANTHROPIC_API_KEY="$A" node scripts/bati-test/compare.mjs
       - name: Save the results

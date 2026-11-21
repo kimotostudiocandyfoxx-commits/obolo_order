@@ -1,2 +1,3 @@
-run 3 (haiku + gemini)
+run 4 (haiku thinking off + gemini)
 effort=low
+thinking=disabled

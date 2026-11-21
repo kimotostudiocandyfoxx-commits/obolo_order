@@ -17,6 +17,7 @@ const NAME = 'バティ', USER = 'ネオ';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
 const HAIKU_MODEL = 'claude-haiku-5-5';
 const HAIKU_EFFORT = process.env.HAIKU_EFFORT || 'low';
+const HAIKU_THINKING = process.env.HAIKU_THINKING || 'adaptive'; // 'disabled' is allowed on Haiku 5.5 at effort high or below
 // prices per 1M tokens (Haiku 5.5: prompts up to 100K; Gemini: set from the official page when known)
 const PRICE = { haiku: [0.10, 0.50], gemini: [Number(process.env.GEMINI_IN || 0.25), Number(process.env.GEMINI_OUT || 1.5)] };
 
@@ -33,6 +34,7 @@ async function haiku({ sys, turns, maxTokens }) {
     max_tokens: maxTokens,
     system: sys,
     output_config: { effort: HAIKU_EFFORT },
+    ...(HAIKU_THINKING === 'disabled' ? { thinking: { type: 'disabled' } } : {}),
     messages: turns.map((t) => ({ role: t.role, content: t.text })),
   });
   const ms = Date.now() - t0;
@@ -108,7 +110,7 @@ for (const [name] of models) {
     version: ok.find((x) => x.version)?.version,
   };
 }
-const out = { at: new Date().toISOString(), haikuModel: HAIKU_MODEL, haikuEffort: HAIKU_EFFORT, geminiModel: GEMINI_MODEL, price: PRICE, summary: sum, results };
+const out = { at: new Date().toISOString(), haikuModel: HAIKU_MODEL, haikuEffort: HAIKU_EFFORT, haikuThinking: HAIKU_THINKING, geminiModel: GEMINI_MODEL, price: PRICE, summary: sum, results };
 writeFileSync(join(here, 'results.json'), JSON.stringify(out, null, 1) + '\n');
 const md = [`# バティのモデル比較 — ${out.at}`, '', '```', JSON.stringify(sum, null, 1), '```', '',
   ...results.flatMap((r) => [`## ${r.id}（${r.note}）`, `**質問**：${r.text}`, ...models.map(([n]) => `- **${n}**${r[n].error ? `：エラー ${r[n].error}` : `（${r[n].ms}ms・${r[n].chars}字・仕分け ${r[n].kind}${r[n].kindOk ? '' : ' ✗'}${r[n].refusal ? '・拒否 ' + r[n].refusal : ''}）：${r[n].text}`}`), ''])];
