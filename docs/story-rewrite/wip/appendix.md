@@ -813,6 +813,7 @@
 | `f_sticker_from` | P03 |
 
 - M-R198 で外したフラグ：`f_d03_bati_talk`・`f_bati_voice`・`f_d04_kororin_design`・`f_d04_kororin_card`・`f_d04_kororin_redraw`・`f_d05_butterfly`・`f_d07_screen`・`f_mystery1_open`・`f_mystery4_open`。
+- M-R202 で足したフラグ：`f_ej_heard`（SYS-S002 を見た）・`f_kimorin_back`（P02）。
 - M-R198 で足したフラグ：`f_join_early`（early/later・3日目の終わり）と、会員になった後の `f_m_*`。
 - 下の付録Cの表は、三周の旅の頃の記録（星の物語の材料のフラグを含む）。
 
