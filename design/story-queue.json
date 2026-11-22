@@ -7,6 +7,31 @@
         "design/story/refs/kimorin.jpg"
       ],
       "prompt": "The same character as the reference picture (KIMORIN: a small chibi fox-spirit with a white mask with blue markings, red hooded robe, many white-and-black tails), standing on a tiny floating island in outer space, waving hello to the viewer. Soft Japanese anime illustration, warm light, stars and a ringed planet behind. No text."
+    },
+    {
+      "id": "bluena-egg-v1-studio",
+      "size": "square",
+      "prompt": "Product design concept render of 'Bluena', a handheld companion device: a large glossy white egg-shaped object about the size of a hand, smooth ceramic-like surface. On the front of the egg, a round touchscreen display (circular, slightly recessed, glowing softly with a tiny cute UI showing a small moon and orbiting planets). At the narrow top tip of the egg, a small round projector lens (glass, dark with a subtle blue reflection) for projecting a square screen. No text, no letters, no logos, no watermark. Clean studio product photo, three-quarter front view, soft white background, gentle shadow, premium minimal industrial design like a modern Japanese gadget, photorealistic."
+    },
+    {
+      "id": "bluena-egg-v2-projecting",
+      "size": "landscape",
+      "prompt": "Product design concept render of 'Bluena', a handheld companion device: a large glossy white egg-shaped object about the size of a hand, smooth ceramic-like surface. On the front of the egg, a round touchscreen display (circular, slightly recessed, glowing softly with a tiny cute UI showing a small moon and orbiting planets). At the narrow top tip of the egg, a small round projector lens (glass, dark with a subtle blue reflection) for projecting a square screen. No text, no letters, no logos, no watermark. The lens at the top tip is projecting a glowing square screen of light onto the air in front of it, showing a starry space scene. Dark room, cinematic lighting, photorealistic product shot."
+    },
+    {
+      "id": "bluena-egg-v3-in-hand",
+      "size": "portrait",
+      "prompt": "Product design concept render of 'Bluena', a handheld companion device: a large glossy white egg-shaped object about the size of a hand, smooth ceramic-like surface. On the front of the egg, a round touchscreen display (circular, slightly recessed, glowing softly with a tiny cute UI showing a small moon and orbiting planets). At the narrow top tip of the egg, a small round projector lens (glass, dark with a subtle blue reflection) for projecting a square screen. No text, no letters, no logos, no watermark. Held gently in a person's open palm (only the hand is visible), the round screen glowing, a soft moonlit night background with bokeh stars. Photorealistic, warm and magical mood."
+    },
+    {
+      "id": "bluena-egg-v4-anime",
+      "size": "square",
+      "prompt": "Product design concept render of 'Bluena', a handheld companion device: a large glossy white egg-shaped object about the size of a hand, smooth ceramic-like surface. On the front of the egg, a round touchscreen display (circular, slightly recessed, glowing softly with a tiny cute UI showing a small moon and orbiting planets). At the narrow top tip of the egg, a small round projector lens (glass, dark with a subtle blue reflection) for projecting a square screen. No text, no letters, no logos, no watermark. Soft Japanese anime illustration style, cute and mystical, the egg floating in outer space with a small moon and the Earth behind it, pale blue glow around the round screen and the lens, clean line art."
+    },
+    {
+      "id": "bluena-egg-v5-turnaround",
+      "size": "landscape",
+      "prompt": "Product design concept render of 'Bluena', a handheld companion device: a large glossy white egg-shaped object about the size of a hand, smooth ceramic-like surface. On the front of the egg, a round touchscreen display (circular, slightly recessed, glowing softly with a tiny cute UI showing a small moon and orbiting planets). At the narrow top tip of the egg, a small round projector lens (glass, dark with a subtle blue reflection) for projecting a square screen. No text, no letters, no logos, no watermark. Industrial design turnaround sheet: the same egg device shown from front, side, back and top views in a neat row on a light gray background, the top view clearly showing the round projector lens at the tip, consistent proportions, product design presentation, photorealistic render."
     }
   ]
 }
