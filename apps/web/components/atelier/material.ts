@@ -1,7 +1,7 @@
 import type { WorkMaterial } from '@obolo/shared';
 import { workMarkRef } from '@/lib/finds/works';
 import type { AtelierKind } from '@/lib/atelier/unlock';
-export { dayWord, madeDay, PROPOSAL, PROPOSAL_ASK, proposalFor, type Proposal } from './proposal';
+export { dayWord, madeDay, PROPOSAL_ASK, proposalFor, type Proposal } from './proposal';
 import type { Work } from './work';
 
 /**

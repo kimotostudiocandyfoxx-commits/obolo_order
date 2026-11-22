@@ -8,7 +8,7 @@ import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, se
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { etaMinutes, homecomingLine, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
@@ -21,6 +21,8 @@ import { asMaterial, fromMaterial, PROPOSAL_ASK, proposalFor, usesOf } from './m
 import { saveTalk, type Talk } from './shelf';
 import { countdown, jobView, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
 import { dayOf } from '@/lib/finds/spiral';
+import { nextLine } from '@/lib/atelier/lineTurn';
+import { planetOpen } from '@/components/bluena/BluenaOrbit';
 import { cues, withWords, type StoryMode } from './story';
 import { contentOf } from './intent';
 import { toggleAudio } from '@/lib/audio';
@@ -35,21 +37,8 @@ const PLANET_OF = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'ma
 const LESSON_OF: Partial<Record<AtelierKind, Lesson>> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
 // PLACEHOLDER (P-ATELIER-5): {bati}'s opening line in the atelier
 const HELLO = 'なにをする？ ことばで頼んでね';
-/**
- * M-R253 §4: {bati}'s words around a slow work (said in its manner, batiLine).
- * PLACEHOLDER (P-ATELIER-10): provisional until the script writes them.
- */
-const KIND_NAME: Partial<Record<AtelierKind, string>> = { song: '曲', video: '映像', art: '絵', radio: '番組', voice: 'コロリン' };
-const AWAY: Partial<Record<AtelierKind, string>> = { song: '土星', video: '水星', art: '土星', radio: '木星' };
-export const backLine = (kind: AtelierKind, ms: number) => {
-  const m = etaMinutes(ms);
-  return `この${KIND_NAME[kind] ?? '作品'}は、だいたい${m}分かかるよ。${m}分後に戻ってきてね。そのあいだ、${AWAY[kind] ?? '土星'}でも見てくる？`;
-};
-export const LATE_LINE = 'ごめん、あと1分だけ';
-export const retryLine = (ms: number) => `ごめん、うまくいかなかったから、もう一回作ってるね。${etaMinutes(ms)}分後に、また来てね`;
-export const SORRY_LINE = 'ごめん、うまく作れなかった。もう一回、頼んでくれる？';
-const USE = '使ってみる';
-const NOT_TODAY = '今日はいい';
+const USE = '使う';
+const NEW_TODAY = '今日は新しく';
 const PROPOSED_KEY = 'obolo.atelier.proposed';
 
 /** M-R253: the cards as they are now, for a card opened big (the talk keeps a copy of what was opened) */
@@ -76,7 +65,7 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  * (Shell.tsx: left = the conversations, right = Bluena from day 3). Opened from a story step it plays the day's script
  * lines at their moments and hands what was made back to the story (`story`, story.ts).
  */
-export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
+export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack, welcome }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** M-R253 §6 ⑤: opened from the toast / the push — {bati}'s word for coming back */ welcome?: boolean; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
   const { me, setMe } = useAuth();
   // M-R245: your bubble colour (picked once)
   const talkTone = useTalkTone();
@@ -108,6 +97,29 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   const batiVoice = own.isBati ? batiLineVoiceOf(me?.bati) : undefined;
   const say = (text: string, chips?: string[], found?: Work[]) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: story ? story.voice('バティ', text) : batiLine(text, batiVoice), chips, found }]);
   const ring = useMarkRing();
+  /** M-R253 §6: an official line in {bati}'s manner, then its placeholders */
+  const sayT = (tpl: string, vars: Record<string, string | number | undefined> = {}, chips?: string[], fix: [string, string][] = []) => {
+    let text = fillLine(story ? story.voice('バティ', tpl) : batiLine(tpl, batiVoice), { neo: me?.displayName ?? '', ...vars });
+    for (const [a, b] of fix) text = text.replace(a, b);
+    setMsgs((m) => [...m, { id: uid(), who: 'bati', text, chips }]);
+  };
+  /** ② where to go meanwhile: a planet open today (not the one it is made for); none yet → Bluena */
+  const awayPlanet = (kind: AtelierKind) => {
+    const own = PLANET_OF[kind];
+    const open = (['saturn', 'jupiter', 'mercury', 'mars', 'venus'] as const).filter((p) => p !== own && planetOpen(p, day));
+    return open.length ? PLANET_NAME[nextLine('planet', open)] : null;
+  };
+  const backLine = (kind: AtelierKind, ms: number) => {
+    const n = etaMinutes(ms);
+    if (kind === 'video') return sayT(MOON_LINES.backBig, { n });
+    if (kind === 'song') {
+      const planet = awayPlanet(kind);
+      const first = planet ? MOON_LINES.backSong : MOON_LINES.backSongBluena;
+      return sayT(nextLine('back-song', [first, ...MOON_LINES.back]), { n, planet: planet ?? '' });
+    }
+    return sayT(nextLine('back', MOON_LINES.back), { n });
+  };
+  const lates = useRef(new Map<string, number>());
 
   /** M-R236: 「★がついた曲、見せて」 — your works with that ★ / mark, as cards in the talk */
   const showFound = async (f: { star: boolean; mark?: ItemMarkId; planet?: BluenaPlanet }) => {
@@ -178,7 +190,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
           const card: Work = { ...shell, ...(prev ? {} : { prompt: res.prompt, title: res.title }), ref: res.ref ?? shell.ref, job: { id: started.job.id, long } };
           watchJob({ jobId: started.job.id, what: started.what, card, talkId, toast: long, words: started.words, extra: started.extra, since: Date.now() }, started.job);
           put(card);
-          if (long) say(backLine(kind, ms));
+          if (long) backLine(kind, ms);
           return;
         }
         if (res.status === 'failed') {
@@ -216,8 +228,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     if (w.status === 'ready' && !story) void tipCheck();
   };
 
-  const sayRef = useRef(say);
-  sayRef.current = say;
+  const sayTRef = useRef(sayT);
+  sayTRef.current = sayT;
   const afterRef = useRef(afterMade);
   afterRef.current = afterMade;
   // M-R253 §4: the app's job host says how this talk's slow cards are doing
@@ -225,19 +237,26 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     () =>
       onJobs((e) => {
         if (!e || !msgsRef.current.some((m) => m.who === 'work' && m.work.id === e.w.card.id)) return;
-        const say = sayRef.current;
-        // a quick one is waited in place: no time, no "late"
+        const sayT = sayTRef.current;
+        const n = etaMinutes(msLeft(e.job));
         if (e.kind === 'late') {
-          if (e.w.toast) say(LATE_LINE);
-        } else if (e.kind === 'retrying') say(retryLine(msLeft(e.job)));
+          // ③ a quick one is waited in place: no time, no "late"; the second delay has its own line
+          if (!e.w.toast) return;
+          const k = (lates.current.get(e.job.id) ?? 0) + 1;
+          lates.current.set(e.job.id, k);
+          sayT(k >= 2 ? MOON_LINES.late2 : nextLine('late', MOON_LINES.late), { n });
+        } else if (e.kind === 'retrying') sayT(e.w.toast ? nextLine('retry', MOON_LINES.retry) : MOON_LINES.retryQuick, { n });
         else if (e.kind === 'done' && e.work) {
           if (e.work.ref?.songId) lastSong.current = e.work.ref.songId;
           putLast(e.work);
-          afterRef.current(e.work, e.w.words);
+          // ⑤ a slow one: {bati}'s word for coming back to it; a quick one: as any card
+          if (e.w.toast && !story) sayT(nextLine('welcome', MOON_LINES.welcome));
+          else afterRef.current(e.work, e.w.words);
         } else if (e.kind === 'failed') {
           const before = e.w.card.versions?.length ? faceTo({ ...e.w.card, status: 'ready', job: undefined }, e.w.card.versions.length - 1) : { ...e.w.card, status: 'failed' as const, job: undefined, note: undefined };
           put(before);
-          say(SORRY_LINE);
+          // ④ two failures in a row: the re-try stops
+          sayT(MOON_LINES.stop);
         }
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -312,9 +331,11 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       proposal.current = null;
       return void run(pr.kind, PROPOSAL_ASK[pr.kind] ?? '', undefined, { materials: pr.materials });
     }
-    if (label === NOT_TODAY) {
+    if (label === NEW_TODAY && proposal.current) {
+      // ① 「了解！　まっさらから、いこう。」 and the day's own way to make
+      const k2 = proposal.current.kind;
       proposal.current = null;
-      return say(HELLO, openKinds(day).map((x) => KIND_WORD[x]));
+      return sayT(MOON_LINES.fresh, {}, [KIND_WORD[k2]]);
     }
     if (k && mats.length && usesOf(mats[0].kind).includes(k)) {
       setPending({ use: k, materials: mats });
@@ -344,7 +365,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         } catch {
           /* said again next time */
         }
-        say(pr.line, [USE, NOT_TODAY]);
+        sayT(pr.line, pr.vars, [USE, NEW_TODAY], pr.fix);
       })
       .catch(() => undefined);
     return () => {
@@ -352,6 +373,15 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me?.id, day]);
+
+  // M-R253 §6 ⑤: back to a finished slow card (from the toast / the push)
+  const welcomed = useRef(false);
+  useEffect(() => {
+    if (!welcome || welcomed.current || story) return;
+    welcomed.current = true;
+    sayT(nextLine('welcome', MOON_LINES.welcome));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [welcome]);
 
   // M-R253 §3: a work dragged in from Bluena is material
   useEffect(() => {
@@ -376,7 +406,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       .homecomings()
       .then((hs) => {
         if (!live || !hs.length) return;
-        for (const h of hs) say(homecomingLine(h));
+        for (const h of hs) for (const l of homecomingSay(h)) sayT(l.text, l.vars);
         void getApi().homecomingsTold(hs.map((h) => h.key)).catch(() => undefined);
       })
       .catch(() => undefined);

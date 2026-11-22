@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { faceTo, stack, swipeTo, versionsOf, type Work } from './work';
+import { MOON_LINES } from '@obolo/shared';
 import { dayWord, madeDay, proposalFor } from './proposal';
 
 const art = (image: string, extra: Partial<Work> = {}): Work => ({ id: 'w1', kind: 'art', prompt: 'うみ', status: 'ready', image, ...extra });
@@ -32,22 +33,30 @@ describe('M-R253 §1: the tries inside one card', () => {
   });
 });
 
-describe('M-R253 §3: the morning proposal', () => {
+describe('M-R253 §3 / §6 ①: the morning proposal', () => {
   const now = new Date('2026-11-22T09:00:00');
   const k = (kind: Work['kind'], at: string, x: Partial<Work> = {}) => ({ work: { id: kind + at, kind, prompt: '', status: 'ready' as const, ...x }, createdAt: at });
-  it('day 5 (songs open): the kororin of day 3 as lyrics', () => {
-    const p = proposalFor(5, [k('voice', '2026-11-20T10:00:00', { text: 'おはよう' })], now);
+  it('day 4 (art opens): the day-3 kororin, as a picture', () => {
+    const p = proposalFor(4, [k('voice', '2026-11-21T10:00:00', { text: 'おはよう' })], now);
+    expect(p?.kind).toBe('art');
+    expect(p?.line).toBe(MOON_LINES.propose.art);
+    expect(p?.fix).toEqual([]);
+  });
+  it('day 5 (songs open): the kororin of day 3 as lyrics ({work} = its words)', () => {
+    const p = proposalFor(5, [k('voice', '2026-11-20T10:00:00', { text: 'おはよう' }), k('art', '2026-11-21T10:00:00')], now);
     expect(p?.kind).toBe('song');
-    expect(p?.line).toBe('3日目のコロリン、歌詞にしてみる？');
+    expect(p?.vars.work).toBe('おはよう');
   });
-  it('day 6: the picture of day 4 and yesterday’s song', () => {
+  it('day 6: the picture of day 4 and yesterday’s song; another day is said as it was', () => {
     const p = proposalFor(6, [k('art', '2026-11-20T10:00:00'), k('song', '2026-11-21T10:00:00')], now);
-    expect(p?.line).toBe('4日目の絵と、昨日の曲で、映像にしよう');
+    expect(p?.line).toBe('4日目の絵と、昨日の曲で、映像にしよう。……絶対、合うと思う。');
     expect(p?.materials).toHaveLength(2);
+    expect(proposalFor(6, [k('art', '2026-11-19T10:00:00'), k('song', '2026-11-21T10:00:00')], now)?.fix).toEqual([['4日目', '3日目']]);
   });
-  it('nothing to use, or no kind opening today: no proposal', () => {
-    expect(proposalFor(6, [k('art', '2026-11-20T10:00:00')], now)).toBeNull();
-    expect(proposalFor(4, [k('voice', '2026-11-21T10:00:00')], now)).toBeNull();
+  it('nothing made the day before, nothing to use, or no kind opening today: no proposal', () => {
+    expect(proposalFor(5, [k('voice', '2026-11-20T10:00:00')], now)).toBeNull();
+    expect(proposalFor(6, [k('art', '2026-11-21T10:00:00')], now)).toBeNull();
+    expect(proposalFor(3, [k('voice', '2026-11-21T10:00:00')], now)).toBeNull();
     expect(madeDay('2026-11-22T01:00:00', 5, now)).toBe(5);
     expect(dayWord(4, 5)).toBe('昨日');
   });

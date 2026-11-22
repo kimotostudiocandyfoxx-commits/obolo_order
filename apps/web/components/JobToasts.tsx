@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { finishJob } from '@/components/atelier/makers';
 import { onJobs, startJobPolling } from '@/lib/atelier/jobs';
 import { useAuth } from '@/lib/auth';
+import { fillLine, MOON_LINES } from '@obolo/shared';
+import { nextLine } from '@/lib/atelier/lineTurn';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 import { usePartner } from '@/lib/partner';
 
@@ -28,9 +30,11 @@ export function JobToasts() {
     () =>
       onJobs((e) => {
         if (!e || !e.w.toast || (e.kind !== 'done' && e.kind !== 'failed')) return;
-        // PLACEHOLDER (P-ATELIER-10): {bati}'s words on the toast
-        const text = batiLine(e.kind === 'done' ? 'できたよ！' : 'ごめん、うまく作れなかった', voice);
-        const t: Toast = { id: `${e.job.id}-${e.kind}`, jobId: e.job.id, text, title: e.work?.title };
+        // M-R253 §6 ⑤: short — 「できたよ！」／「{work}、できた！」 in turn; when the re-tries are over, {bati}'s sorry line
+        const work = (e.work?.title || e.w.card.title || '').slice(0, 16);
+        const tpl = e.kind === 'done' ? (work ? nextLine('toast', MOON_LINES.toast) : MOON_LINES.toast[0]) : MOON_LINES.stop;
+        const text = fillLine(batiLine(tpl, voice), { work });
+        const t: Toast = { id: `${e.job.id}-${e.kind}`, jobId: e.job.id, text, title: e.kind === 'done' && tpl === MOON_LINES.toast[0] ? e.work?.title : undefined };
         setToasts((xs) => [t, ...xs.filter((x) => x.id !== t.id)].slice(0, 3));
         setTimeout(() => setToasts((xs) => xs.filter((x) => x.id !== t.id)), 7000);
       }),

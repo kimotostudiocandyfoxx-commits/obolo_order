@@ -131,6 +131,7 @@ export function storyPeople({
   onStage,
   entries,
   speaking,
+  inScene = () => true,
   v,
   self,
   name,
@@ -139,6 +140,8 @@ export function storyPeople({
 }: {
   onStage: string[];
   entries: StoryEntry[];
+  /** a line said in this scene (the ones from before it keep their bubbles but not their place in the row) */
+  inScene?: (e: StoryEntry) => boolean;
   speaking: Speaker | null;
   v: StoryVars;
   self: TalkLook | null;
@@ -158,7 +161,7 @@ export function storyPeople({
     const who = speakerOfSprite(s);
     if (who) add(talkId(who), s);
   }
-  const spoke = [...entries.flatMap((e) => (e.kind === 'them' ? [e.who] : [])), ...(speaking ? [speaking] : [])];
+  const spoke = [...entries.flatMap((e) => (e.kind === 'them' && inScene(e) ? [e.who] : [])), ...(speaking ? [speaking] : [])];
   for (const who of spoke) {
     const id = talkId(who);
     if (sprites.has(id)) continue;
@@ -167,7 +170,12 @@ export function storyPeople({
   }
   const people: TalkPerson[] = [];
   // at most three stand with you (more crowd the phone): the latest to speak stay
-  const keep = order.length > 3 ? order.filter((id) => spoke.slice(-6).map(talkId).includes(id) || onStage.some((s) => sprites.get(id) === s)).slice(-3) : order;
+  // (the one speaking now always; then whoever spoke last; then the ones the script put on stage)
+  const last = (id: string) => {
+    for (let k = spoke.length - 1; k >= 0; k--) if (talkId(spoke[k]) === id) return k;
+    return onStage.some((s) => sprites.get(id) === s) ? -1 : -2;
+  };
+  const keep = order.length > 3 ? [...order].sort((a, b) => last(b) - last(a)).slice(0, 3) : order;
   for (const id of order) {
     const sprite = sprites.get(id)!;
     const look = spriteLook(sprite, v);
@@ -175,8 +183,8 @@ export function storyPeople({
     const who = (id === 'KIMORIN' ? 'KIMORIN' : id) as Speaker;
     people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look || !keep.includes(id) });
   }
-  // heard only: 「？？？」, a speaker with no picture
-  for (const who of spoke) {
+  // heard only: 「？？？」, a speaker with no picture, and who spoke before this scene
+  for (const who of entries.flatMap((e) => (e.kind === 'them' ? [e.who] : []))) {
     const id = talkId(who);
     if (people.some((p) => p.id === id)) continue;
     const t = toneFor(id);
@@ -208,7 +216,9 @@ export function storyItems({
   for (const e of entries) {
     if (e.kind === 'sys' || (e.kind === 'me' && e.action)) continue;
     if (e.kind === 'me') {
-      out.push({ id: `${gen}:${e.id}`, who: 'me', text: e.text });
+      // an answer written as a deed of saying (〔「そのアート、好きだよ」と言う〕): the bubble holds the words said
+      const said = e.text.match(/^「([^」]+)」と(?:言う|いう|答える|こたえる|話す|聞く|きく|伝える)$/);
+      out.push({ id: `${gen}:${e.id}`, who: 'me', text: said ? said[1] : e.text });
       continue;
     }
     const id = talkId(e.who);

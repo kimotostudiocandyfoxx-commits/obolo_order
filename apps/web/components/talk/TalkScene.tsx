@@ -603,7 +603,8 @@ export function TalkScene({
     r.forEach((p, k) => {
       // the back row sits in the gaps of the front one (between 1–2, 2–3, 3–4, then the ends)
       const gap = [1, 2, 3, 0, 4][k % 5];
-      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? 0.5 : back ? gap / fn : (k + 0.5) / r.length;
+      // a row of three or more keeps its ends inside the screen (the figures are wider than their share)
+      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? 0.5 : back ? gap / fn : 0.07 + (0.86 * (k + 0.5)) / r.length;
       spots.set(p.id, { x: Math.min(0.93, Math.max(0.07, x)), bottom: back ? stageH * 0.52 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : back ? 0.2 : 0.9 / r.length, chest: chest || back });
     });
   });

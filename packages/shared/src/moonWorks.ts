@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { MARKED_KINDS, type BluenaPlanet } from './finds';
 import { seesOnlyDachi } from './schemas';
+import { batiRuleTransform, isBatiRare, normalizeBatiPersonality, resolveBatiSpeech, type BatiEggKind, type BatiPersonality } from './batiPersona';
+import { BATI_VARIANTS, type BatiVariantSet } from './batiVariants';
 
 /**
  * M-R253 「月はいちばん大事な所」 (docs/story-rewrite/月の工房_作る・直す・残す.md): five things on top of the Moon atelier
@@ -181,8 +183,8 @@ export const QUICK_MS = 30_000;
 export const LATE_EXTEND_MS = 60_000;
 /** said as late this long before the time is up (0: when the time is up and it is not done) */
 export const LATE_LEAD_MS = 0;
-/** tries in all (the first and the automatic re-tries) */
-export const JOB_MAX_ATTEMPTS = 3;
+/** tries in all: after two failures in a row the automatic re-try stops ({bati}: 「少ししてから、もう一回、頼んでくれる？」) */
+export const JOB_MAX_ATTEMPTS = 2;
 
 const median = (xs: number[]) => {
   const s = [...xs].sort((a, b) => a - b);
@@ -263,22 +265,85 @@ export function reactionsFor(viewerBirthYear: number | null | undefined, rs: rea
   return { named, strangers: rs.filter((r) => !r.dachi).length };
 }
 
-const PLANET_WORD: Partial<Record<BluenaPlanet, string>> = { saturn: '土星', jupiter: '木星', mercury: '水星', mars: '火星', venus: '金星' };
+/**
+ * M-R253 §6: {bati}'s official lines (as written = 元気な子; the other styles in BATI_VARIANTS, rendered by batiLine /
+ * batiSay before the placeholders are filled). Where a scene has several, they are used in turn, never the same twice in
+ * a row. {n} = minutes, {work} = the work's name, {planet} = a planet, {friend} = a dachi, {k} = how many more, {place} =
+ * the planet's own place, {neo} = the member, {bati} = {bati}'s name.
+ */
+export const MOON_LINES = {
+  /** ① the morning a kind opens: a work made before as material (buttons 〔使う〕〔今日は新しく〕) */
+  propose: {
+    art: '3日目のコロリン、絵にしてみる？　あの言葉、絵にしたら、どうなるか、見てみたい。',
+    song: '3日目のコロリン、歌詞にしてみる？　{work}、けっこう、いいこと言ってたよ。',
+    video: '4日目の絵と、昨日の曲で、映像にしよう。……絶対、合うと思う。',
+    radio: '今まで作った曲を流して、しゃべってみる？　DJ、{neo}。',
+  },
+  fresh: '了解！　まっさらから、いこう。',
+  /** ② slow work: when to come back ({planet}: one reachable today; none yet → the Bluena line) */
+  backSong: 'この曲は、だいたい{n}分かかるよ。{n}分後に戻ってきてね。そのあいだ、{planet}でも見てくる？',
+  backSongBluena: 'この曲は、だいたい{n}分かかるよ。{n}分後に戻ってきてね。Bluenaでも開いてみる？',
+  back: ['よし、作り始めた！　だいたい{n}分。{n}分後に、ここで会おう。', '{n}分くらい、かかりそう。ダチのトークでも、のぞいてきなよ。できたら、呼ぶから。'],
+  backBig: 'これは、ちょっと大物。だいたい{n}分。ゆっくりしてきて。ちゃんと、呼ぶから。',
+  /** ③ late; the second time its own line */
+  late: ['ごめん、あと1分だけ！　いま、いちばん、いい所。', 'ごめん、ちょっと混んでる。あと{n}分、ちょうだい。'],
+  late2: '……ほんとに、ごめん。あと{n}分。その分、いいの作る。',
+  /** ④ it failed and is made again; a quick one (no time); the second failure in a row (the re-try stops) */
+  retry: ['あっ、ごめん！　うまく、できなかった。もう一回、作るね。だいたい{n}分。', 'ごめん、失敗しちゃった。……今度は、ちゃんとやる。{n}分ちょうだい。'],
+  retryQuick: 'ごめん、やり直す！　ちょっと待ってて。',
+  stop: 'ごめん、今日はちょっと調子が悪いみたい。少ししてから、もう一回、頼んでくれる？',
+  /** ⑤ done: the toast in the app, the push outside it, and the word when you come back to the card */
+  toast: ['できたよ！', '{work}、できた！'],
+  push: '{bati}：{work}、できたよ！　見に来て。',
+  welcome: ['おかえり！　見て見て。', '待たせたね。どう？'],
+  /** ⑥ back home after 88 hours (no ★: no numbers) */
+  homeOne: '「{work}」が、{planet}から帰ってきたよ。{friend}が★つけてたよ。',
+  homeMany: '「{work}」が、{planet}から帰ってきたよ。{friend}と、ほか{k}人が★つけてた。',
+  homeNone: '「{work}」が、{planet}から帰ってきたよ。のんびり、浮かんでたって。',
+  homePlace: '{place}に、しまっておいたよ。',
+} as const;
+
+/** every fixed {bati} line above (each has its variants in BATI_VARIANTS) */
+export const MOON_LINE_TEXTS: string[] = Object.values(MOON_LINES).flatMap((v) => (typeof v === 'string' ? [v] : Array.isArray(v) ? [...v] : Object.values(v)));
 
 /**
- * {bati}'s report when a work comes home (before its personality's manner, batiLine). Numbers stay small words
- * (「3回」, then 「たくさん」): no ranking, no comparing.
- * PLACEHOLDER (P-ATELIER-11): provisional until the script writes these lines.
+ * A {bati} line in its manner where there is no app (the server's push): the written variant, a rare style's rewrite or
+ * the rule; then the 一人称 and 呼び方 (the web's batiLine does the same).
  */
-export function homecomingLine(h: Pick<HomecomingView, 'title' | 'planet' | 'named' | 'strangers'>): string {
-  const what = h.title ? `「${h.title.slice(0, 20)}」` : '作品';
-  const head = `${what}が、${PLANET_WORD[h.planet] ?? '星'}から帰ってきたよ`;
-  const parts: string[] = [];
-  if (h.named.length) {
-    const names = h.named.slice(0, 2).map((x) => x.name);
-    parts.push(`${names.join('と')}${h.named.length > 2 ? 'たち' : ''}が★つけてたよ`);
-  }
-  if (h.strangers > 0) parts.push(`知らない人が${h.strangers > 9 ? 'たくさん' : `${h.strangers}回`}★つけてた`);
-  if (!parts.length) return `${head}。おかえり！`;
-  return `${head}。${parts.join('。')}！`;
+export function batiSay(text: string, b?: { personality?: BatiPersonality; egg?: BatiEggKind; self?: string | null; selfCustom?: string | null; callCustom?: string | null; lines?: Record<string, string> } | null): string {
+  if (!b?.personality) return text;
+  const p = normalizeBatiPersonality(b.personality);
+  const said = p === 'genki' ? text : isBatiRare(p) ? (b.lines?.[text] ?? text) : (BATI_VARIANTS[text]?.[p as keyof BatiVariantSet] ?? batiRuleTransform(text, p));
+  return resolveBatiSpeech(said, { personality: p, egg: b.egg, self: b.selfCustom, bornSelf: b.self, call: b.callCustom });
+}
+
+/** a scene's next line: in turn, never the one said last (`last` = its index, -1 = none) */
+export function rotateLine(n: number, last: number): number {
+  if (n <= 1) return 0;
+  return last >= 0 && last < n ? (last + 1) % n : 0;
+}
+
+/** the placeholders filled */
+export function fillLine(text: string, vars: Record<string, string | number | undefined>): string {
+  return text.replace(/\{([a-z]+)\}/g, (m, k: string) => (vars[k] == null ? m : String(vars[k])));
+}
+
+const PLANET_WORD: Partial<Record<BluenaPlanet, string>> = { saturn: '土星', jupiter: '木星', mercury: '水星', mars: '火星', venus: '金星' };
+
+/** each planet's own place a work goes home to (M-R208) */
+export const HOME_PLACE: Partial<Record<BluenaPlanet, string>> = { saturn: 'レコード', jupiter: 'アトリエ', mercury: '島', mars: 'スタジオ', venus: 'ブース' };
+
+/**
+ * M-R253 §6 ⑥: {bati}'s report when a work comes home — the lines to say with their placeholders (render each in the
+ * personality's manner first). One ★: the dachi; more: the first and how many more (under 15 the server sends the dachi
+ * only); none: 「のんびり、浮かんでたって」 (no numbers). Then where it was put away.
+ */
+export function homecomingSay(h: Pick<HomecomingView, 'title' | 'planet' | 'named' | 'strangers'>): { text: string; vars: Record<string, string | number> }[] {
+  const base = { work: (h.title || '作品').slice(0, 20), planet: PLANET_WORD[h.planet] ?? '星' };
+  const all = h.named.length + h.strangers;
+  const friend = h.named[0]?.name ?? 'だれか';
+  const first =
+    all === 0 ? { text: MOON_LINES.homeNone, vars: base } : all === 1 ? { text: MOON_LINES.homeOne, vars: { ...base, friend } } : { text: MOON_LINES.homeMany, vars: { ...base, friend, k: all - 1 } };
+  const place = HOME_PLACE[h.planet];
+  return place ? [first, { text: MOON_LINES.homePlace, vars: { place } }] : [first];
 }

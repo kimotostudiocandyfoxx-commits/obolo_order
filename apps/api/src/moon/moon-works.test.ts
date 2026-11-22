@@ -4,7 +4,8 @@ import {
   estimateEtaMs,
   ETA_BASE_MS,
   hiddenRefs,
-  homecomingLine,
+  homecomingSay,
+  fillLine,
   JOB_MAX_ATTEMPTS,
   lateEta,
   leftWords,
@@ -107,13 +108,14 @@ describe('M-R253 §4: how long it takes', () => {
   const jobsHarness = (row: JobRow, work: (r: JobRow) => Promise<Record<string, unknown>>) => {
     const db = { row: { ...row } as JobRow, pushes: [] as string[], queued: 0 };
     const queue = { register: () => undefined, enqueue: async () => void db.queued++ };
-    const push = { notify: async (_u: string, p: { title: string }) => void db.pushes.push(p.title) };
+    const push = { notify: async (_u: string, p: { title: string; body: string }) => void db.pushes.push(`${p.title}|${p.body}`) };
     const s = new JobsService({} as never, queue as never, {} as never, {} as never, push as never);
     Object.assign(s, {
       load: async () => ({ ...db.row }),
       patch: async (_id: string, set: object) => void Object.assign(db.row, set),
       recentMs: async () => [],
       waiting: async () => 0,
+      batiOf: async () => ({ name: 'タコポン', speech: { personality: 'kansai' } }),
       work: (r: JobRow) => work(r),
     });
     return { s, db };
@@ -131,17 +133,19 @@ describe('M-R253 §4: how long it takes', () => {
     expect(db.pushes).toEqual([]);
     await s.run('j1');
     expect(db.row).toMatchObject({ status: 'done', attempts: 2 });
-    expect(db.pushes).toEqual(['作品ができたよ！']);
+    // M-R253 §6 ⑤: the push in {bati}'s words and manner
+    expect(db.pushes).toEqual(['タコポン|タコポン：作品、できたよ！　見に来てな。']);
   });
 
-  it('after the last try it has failed (gently said), and words it cannot mend are not tried again', async () => {
+  it('after two failures in a row the re-try stops, and {bati} asks to try again a little later', async () => {
     const { s, db } = jobsHarness(base, async () => {
       throw new Error('down');
     });
     for (let i = 0; i < JOB_MAX_ATTEMPTS; i++) await s.run('j1');
     expect(db.row).toMatchObject({ status: 'failed', attempts: JOB_MAX_ATTEMPTS });
     expect(db.queued).toBe(JOB_MAX_ATTEMPTS - 1);
-    expect(db.pushes[0]).toMatch(/^ごめん/);
+    expect(JOB_MAX_ATTEMPTS).toBe(2);
+    expect(db.pushes[0]).toContain('少ししてから、もう一回、頼んでくれる？');
   });
 
   it('the review stand-in takes the seconds asked; a real one is estimated', async () => {
@@ -177,10 +181,14 @@ describe('M-R253 §5: back home after 88 hours', () => {
   it('15 and over: the dachi by name, others as a count', () => {
     expect(reactionsFor(2000, rs, now)).toEqual({ named: [{ name: 'ミキエ', stars: 1 }], strangers: 2 });
   });
-  it("{bati}'s report: names, a small count, no ranking", () => {
-    expect(homecomingLine({ title: '月のうた', planet: 'mercury', named: [{ name: 'ミキエ', stars: 1 }], strangers: 3 })).toBe('「月のうた」が、水星から帰ってきたよ。ミキエが★つけてたよ。知らない人が3回★つけてた！');
-    expect(homecomingLine({ title: '', planet: 'saturn', named: [], strangers: 12 })).toContain('たくさん');
-    expect(homecomingLine({ title: 'x', planet: 'jupiter', named: [], strangers: 0 })).toContain('おかえり');
+  it("{bati}'s report (§6 ⑥): one ★, several, none (no numbers), then where it was put", () => {
+    const say = (h: Parameters<typeof homecomingSay>[0]) => homecomingSay(h).map((x) => fillLine(x.text, x.vars));
+    expect(say({ title: '月のうた', planet: 'mercury', named: [{ name: 'ミキエ', stars: 1 }], strangers: 0 })).toEqual(['「月のうた」が、水星から帰ってきたよ。ミキエが★つけてたよ。', '島に、しまっておいたよ。']);
+    expect(say({ title: '月のうた', planet: 'mercury', named: [{ name: 'ミキエ', stars: 1 }], strangers: 3 })[0]).toBe('「月のうた」が、水星から帰ってきたよ。ミキエと、ほか3人が★つけてた。');
+    const none = say({ title: 'あさ', planet: 'saturn', named: [], strangers: 0 });
+    expect(none[0]).toBe('「あさ」が、土星から帰ってきたよ。のんびり、浮かんでたって。');
+    expect(none[0]).not.toMatch(/\d/);
+    expect(none[1]).toBe('レコードに、しまっておいたよ。');
   });
   it('the service tells each once, with the viewer’s age rule', async () => {
     const item: HomeItem = { key: 'planet_post:p1', targetType: 'planet_post', id: 'p1', planet: 'mercury', title: '月のうた', image: null, flownAt: new Date(now.getTime() - 90 * 3600_000) };

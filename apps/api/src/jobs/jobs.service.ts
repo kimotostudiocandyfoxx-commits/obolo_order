@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { estimateEtaMs, lateEta, shouldRetry, type DemoJobBody, type EtaKind, type FullSongBody, type JobKind, type JobView } from '@obolo/shared';
+import { batiSay, estimateEtaMs, fillLine, lateEta, MOON_LINES, shouldRetry, type DemoJobBody, type EtaKind, type FullSongBody, type JobKind, type JobView } from '@obolo/shared';
 import { and, count, desc, eq, inArray, isNotNull } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { SongService } from '../compose/song.service';
 import { Database } from '../db/db';
-import { jobs } from '../db/schema';
+import { jobs, users } from '../db/schema';
+import { activeBati } from '../look/batis';
 import type { JobQueue } from '../infra/queue';
 import { QUEUE } from '../infra/tokens';
 import { MvService } from '../mv/mv.service';
@@ -156,7 +157,7 @@ export class JobsService implements OnModuleInit {
       const result = await this.work({ ...row, attempts });
       await this.finish(jobId, 'done', result, null);
       this.log.log(`job ${jobId} ${row.kind} done in ${Math.round((Date.now() - t0) / 1000)}s`);
-      await this.notify(row, true);
+      await this.notify(row, true, result);
     } catch (e) {
       const err = errorOf(e);
       this.log.warn(`job ${jobId} ${row.kind} try ${attempts} failed after ${Math.round((Date.now() - t0) / 1000)}s: ${err.code} ${err.message}`);
@@ -223,23 +224,27 @@ export class JobsService implements OnModuleInit {
     await this.patch(id, { status, resultJson: result, errorCode: err?.code ?? null, error: err?.message.slice(0, 500) ?? null, finishedAt: new Date() });
   }
 
+  /** the member's {bati} (its name and manner, for the push) */
+  protected async batiOf(userId: string): Promise<{ name: string; speech: Parameters<typeof batiSay>[1] }> {
+    const [u] = await this.db.read.select().from(users).where(eq(users.id, userId));
+    const b = u ? activeBati(u) : null;
+    return { name: b?.name || u?.batiName || 'バティ', speech: b ? { personality: b.personality, egg: b.egg, self: b.self, selfCustom: b.selfCustom, callCustom: b.callCustom, lines: (b as { lines?: Record<string, string> }).lines } : null };
+  }
+
   /**
-   * A push to the member's devices (outside the app; inside it the top toast says it): the work is ready (or could not
-   * be made, said gently). Made in the Moon atelier → it opens that card there.
+   * A push to the member's devices (outside the app; inside it the top toast says it), in {bati}'s words (M-R253 §6 ⑤):
+   * 「{bati}：{work}、できたよ！　見に来て。」; when the re-tries are over, its sorry line. Made in the Moon atelier →
+   * it opens that card there.
    */
-  private async notify(row: Row, ok: boolean) {
-    const input = row.inputJson as { from?: string; body?: { from?: string } };
+  private async notify(row: Row, ok: boolean, result?: Record<string, unknown> | null) {
+    const input = row.inputJson as { from?: string; body?: { from?: string; title?: string } };
     const atelier = input.from === 'atelier' || input.body?.from === 'atelier' || row.kind === 'demo';
-    const what = row.kind === 'song' ? '曲' : row.kind === 'demo' ? '作品' : 'MV';
     const url = atelier ? `/moon/atelier?job=${row.id}` : row.kind === 'song' ? '/mercury' : '/mars';
-    await this.push
-      .notify(
-        row.userId,
-        ok
-          ? { title: `${what}ができたよ！`, body: 'タップして見てみてね', url, tag: `job-${row.id}` }
-          : { title: `ごめん、${what}をうまく作れなかった`, body: 'タップして、もう一回ためしてみてね', url, tag: `job-${row.id}` },
-      )
-      .catch(() => undefined);
+    const r = (result ?? {}) as { song?: { title?: string }; mv?: { songTitle?: string } };
+    const work = (r.song?.title || (r.mv?.songTitle ? `${r.mv.songTitle}（MV）` : '') || input.body?.title || (row.kind === 'song' ? '曲' : row.kind === 'demo' ? '作品' : 'MV')).slice(0, 30);
+    const bati = await this.batiOf(row.userId).catch(() => ({ name: 'バティ', speech: null }));
+    const body = fillLine(batiSay(ok ? MOON_LINES.push : MOON_LINES.stop, bati.speech), { bati: bati.name, work });
+    await this.push.notify(row.userId, { title: bati.name, body, url, tag: `job-${row.id}` }).catch(() => undefined);
   }
 
   /** A running job whose instance went away is reported as failed (the member may try again). */

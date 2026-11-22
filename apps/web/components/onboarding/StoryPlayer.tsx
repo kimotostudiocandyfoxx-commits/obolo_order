@@ -1110,10 +1110,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const lookMade = !!answers.look || (lookStepAt >= 0 ? i > lookStepAt : !!(v.kimorinStar || v.story?.['d2.look']));
   const selfTalkLook = storySelfLook(lookUrl, lookMade);
   const threadEntries = log;
+  // where this scene starts (the row is the ones in it)
+  let sceneFrom = i;
+  while (sceneFrom > 0 && steps[sceneFrom]?.t !== 'scene') sceneFrom--;
   const talkSays = step?.t === 'say' ? step : null;
   const { people: talkPeople, sprites: talkSprites } = storyPeople({
     onStage: charsOnStage,
     entries: threadEntries,
+    inScene: (e) => Number(e.id.replace(/^s/, '').split('~')[0]) >= sceneFrom,
     speaking: talkSays?.who ?? null,
     v,
     self: selfTalkLook,

@@ -36,6 +36,8 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open }
   // M-R253 §4: opened from the toast / the push: the talk with that card (else a new talk)
   const [talk, setTalk] = useState<Talk>(() => (open?.job && talkWith((w) => w.job?.id === open.job || w.id === open.job)) || newTalk(day));
   const [firstTalk] = useState(talk.id);
+  // M-R253 §6 ⑤: the talk opened from the toast / the push ({bati} says its word for coming back)
+  const [welcomeTalk, setWelcomeTalk] = useState<string | null>(open?.job ? talk.id : null);
   const [drawer, setDrawer] = useState<'left' | 'right' | null>(null);
   const unread = threads.some((t) => t.id !== BATI_THREAD && !!t.unread);
   // M-R237: one day of a thread's past talk, opened from the left drawer (read only)
@@ -48,6 +50,7 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open }
       if (!t) return;
       setPast(null);
       setThread(BATI_THREAD);
+      setWelcomeTalk(t.id);
       setTalk(t);
     };
     window.addEventListener('obolo:openjob', go);
@@ -87,7 +90,7 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open }
       {past && past.thread === BATI_THREAD ? (
         <BatiDay key={`${past.day}-${past.at ?? ''}`} day={past.day} at={past.at} onBack={closePast} />
       ) : thread === BATI_THREAD ? (
-        <AtelierChat key={talk.id} first={talk.id === firstTalk && !open?.job ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} onBack={onBack} />
+        <AtelierChat key={talk.id} first={talk.id === firstTalk && !open?.job ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} onBack={onBack} welcome={welcomeTalk === talk.id} />
       ) : (
         <div key={tctx.day ?? 'now'} className="relative flex min-h-0 flex-1 flex-col">
           {renderThread?.(thread, tctx) ?? null}
