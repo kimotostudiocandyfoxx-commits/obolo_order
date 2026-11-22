@@ -637,6 +637,16 @@ export class DemoApi implements Api {
     return this.view(p, id);
   }
 
+  async publishSaturnPost(postId: string) {
+    const id = this.uid();
+    const p = this.s.posts.find((x) => x.id === postId && x.author.id === id && x.room && !x.replyToId);
+    if (!p) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    p.room = false;
+    p.createdAt = now();
+    this.save();
+    return this.view(p, id);
+  }
+
   async deleteSaturnPost(postId: string) {
     const id = this.uid();
     this.s.posts = this.s.posts.filter((p) => !(p.id === postId && p.author.id === id));

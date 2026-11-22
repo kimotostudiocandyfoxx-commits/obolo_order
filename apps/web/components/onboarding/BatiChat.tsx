@@ -35,7 +35,8 @@ export function BatiChat(props: Parameters<typeof BatiChatFull>[0] & { muted?: b
 }
 
 /** how many answers the first talk on the Moon lasts (M-R179: about five rounds, then {bati} grows sleepy) */
-const FIRST_ROUNDS = 5;
+/** D03-S008 (M-R207): about three rounds, then {bati} hops */
+const FIRST_ROUNDS = 3;
 const sentences = (t: string) => (t.match(/[^。！？!?\n]+[。！？!?]*/g) ?? [t]).map((x) => x.trim()).filter(Boolean);
 
 /**
@@ -130,11 +131,11 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
         .then((r) => r.picture)
         .catch(() => null)
         .then((picture) => setMsgs((all) => all.map((x) => (x.id === id ? { ...x, picLoading: false, picture } : x))));
-    // about five rounds: {bati} grows sleepy once the last answer has been said
+    // about three rounds: {bati} hops once the last answer has been said
     if (n >= FIRST_ROUNDS) {
       await Promise.race([voice, new Promise((r) => setTimeout(r, 12_000))]);
       await new Promise((r) => setTimeout(r, 1500));
-      setFace('yawn');
+      setFace('smile');
       setTimeout(onDone, 1600);
     }
   };

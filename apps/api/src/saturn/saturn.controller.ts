@@ -42,6 +42,14 @@ export class SaturnController {
     return this.saturn.create(userId, input, `${req.protocol}://${req.get('host')}`);
   }
 
+  /** a kororin kept in your room (Bluena's Saturn folder) flies out to Saturn (M-R208) */
+  @Post(':id/publish')
+  @HttpCode(200)
+  async publish(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    await rateLimit(this.kv, `saturn-post:${userId}`, 10, 600);
+    return this.saturn.publish(userId, id);
+  }
+
   @Delete(':id')
   @HttpCode(204)
   async remove(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {

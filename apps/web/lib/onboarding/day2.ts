@@ -452,8 +452,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'バティ', text: 'うん！　ボク、魔法が使えるんだ！' },
   { t: 'say', who: 'バティ', text: '{neo}の姿、もっとかっこよくも、かわいくも、できるよ！' },
   { t: 'say', who: 'バティ', text: 'ボクのことも、好きに着せかえて！　ちょっとだけなら、変身もできるよ！' },
-  // D03-S008 magic room (wired by the lead)
-  { t: 'notice', text: '〔{bati}の魔法で、自分の姿を変える〕〔{bati}を着せかえる〕今は押さなくても、あとでいつでも使えます' },
+  // D03-S008 〔{bati}の魔法で、自分の姿を変える〕〔{bati}を着せかえる〕 — the Moon room's sheets, then on (also later, on the Moon)
+  { t: 'magic' },
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] }, // となりで、KIMORINが、うんちピンポンくんに顔を近づける
   { t: 'say', who: 'KIMORIN', text: 'では、私も。……宇宙一の発明家は、誰ですか？' },
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },

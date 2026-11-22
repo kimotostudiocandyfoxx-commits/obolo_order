@@ -150,6 +150,8 @@ export interface Api {
   followSaturnUser(userId: string, on: boolean): Promise<SaturnProfileView>;
   createSaturnPost(body: CreateSaturnPostBody): Promise<SaturnPostView>;
   deleteSaturnPost(id: string): Promise<void>;
+  /** 〔公開する〕: a kororin kept in your room (Bluena's Saturn folder) flies out to Saturn; its 88 hours start now (M-R208) */
+  publishSaturnPost(id: string): Promise<SaturnPostView>;
   starSaturnPost(id: string, on: boolean): Promise<{ starCount: number; starredByMe: boolean }>;
   // --- Invite-only onboarding
   getInvite(code: string): Promise<InviteView>;

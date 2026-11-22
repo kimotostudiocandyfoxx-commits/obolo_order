@@ -5,7 +5,6 @@ import { demoBati, eggSvg } from '@/lib/look';
 import { VoiceField } from './StoryExtras';
 
 /** Day 2 on the Moon: the favourite food the Bati is born from (examples from the story, 2026-10-14). */
-const FOODS = ['おにぎり', 'カレー', 'いちご', 'ラーメン', 'おすし', 'たこ焼き'];
 
 export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: string) => Promise<void>; submit?: string }) {
   const [food, setFood] = useState('');
@@ -27,13 +26,7 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
     <div className="pb-safe absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-20">
       <div className="mx-auto mb-10 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
         <VoiceField value={food} onChange={setFood} placeholder="例：おにぎり／カレー／いちご／ラーメン" maxLength={30} />
-        <div className="flex flex-wrap justify-center gap-1.5">
-          {FOODS.map((f) => (
-            <button key={f} onClick={() => setFood(f)} className={`rounded-full px-3 py-1 text-xs ${food === f ? 'bg-amber-300 font-bold text-black' : 'bg-white/10 text-white/80'}`}>
-              {f}
-            </button>
-          ))}
-        </div>
+        {/* answered by voice (the mic button), or 〔文字で答える〕; the words are kept as said (M-R207) */}
         <button onClick={go} disabled={!food.trim() || busy} className="rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-lg tracking-widest text-amber-50 disabled:opacity-40">
           {busy ? '……' : submit}
         </button>

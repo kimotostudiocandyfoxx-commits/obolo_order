@@ -225,6 +225,22 @@ export class SaturnService {
     return this.toView(p, author, false, repostOf);
   }
 
+  /**
+   * 〔公開する〕 from Bluena's Saturn folder (M-R208): a kororin kept in your room (room = 1, made in the Moon atelier
+   * or on the first journey) flies out to Saturn. Its 88 hours start now, so the post's time is reset to now.
+   * The words were checked when it was made.
+   */
+  async publish(userId: string, postId: string): Promise<SaturnPostView> {
+    const [p] = await this.db.write
+      .update(saturnPosts)
+      .set({ room: 0, createdAt: new Date(), updatedAt: new Date() })
+      .where(and(eq(saturnPosts.id, postId), eq(saturnPosts.userId, userId), eq(saturnPosts.room, 1), isNull(saturnPosts.replyToId), isNull(saturnPosts.deletedAt)))
+      .returning();
+    if (!p) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Kept kororin not found');
+    const [author] = await this.db.write.select(authorCols).from(users).where(eq(users.id, userId));
+    return this.toView(p, author, false, p.repostOfId ? ((await this.refs(this.db.write, [p.repostOfId])).get(p.repostOfId) ?? null) : null);
+  }
+
   async remove(userId: string, postId: string): Promise<void> {
     const res = await this.db.write
       .update(saturnPosts)

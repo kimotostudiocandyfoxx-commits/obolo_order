@@ -4,6 +4,7 @@ import { L2Step } from '@/components/lap2/L2Step';
 import { BatiChat } from './BatiChat';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
+import { RoomSheet, type RoomMode } from '@/app/moon/BatiRoom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, STILL_MOUTH, stillMouthUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
@@ -971,7 +972,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     let q = i - 1;
     while (steps[q]?.t === 'label' || steps[q]?.t === 'scene') q--;
     addLine(chatLine(cur, `s${i}`) ?? (steps[q] ? chatLine(steps[q], `s${q}`) : null));
-    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'scene', 'set', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
+    if (['video', 'bgvideo', 'black', 'bgm', 'loop', 'label', 'scene', 'set', 'magic', 'goto', 'still', 'sprite', 'whiteout', 'wait', 'vanish', 'se', 'spark', 'fx', 'screen', 'pause', 'clock', 'branch', 'invitation'].includes(cur.t)) {
       run(i);
       return;
     }
@@ -1409,12 +1410,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'look' && lookApi && (
         <LookMaker
           api={lookApi}
-          onDone={(url) => {
+          onDone={(url, meta) => {
             if (url) remember('look', url);
+            // D03-S004's flags: the photo's way in, the animal as said, the card picked, the one redraw
+            if (meta?.photo) remember('f_d03_photo', meta.photo);
+            if (meta?.animal) remember('f_d03_animal', meta.animal);
+            if (meta?.card != null) remember('f_d03_card', String(meta.card));
+            if (meta?.redraw != null) remember('f_d03_redraw', String(meta.redraw));
             run(iRef.current + 1);
           }}
         />
       )}
+      {started && step?.t === 'magic' && <MagicStep bati={v.bati || 'バティ'} onNext={() => run(iRef.current + 1)} />}
       {started && step?.t === 'egg' && (
         <EggStep
           submit={step.submit}
@@ -1743,6 +1750,27 @@ function TapPick({ pics, labels, onPick }: { pics: string[]; labels: string[]; o
       <p className="mt-6 text-[13px] tracking-[0.3em] text-amber-100/80" style={{ opacity: picked === null ? 1 : 0, transition: 'opacity 300ms' }}>
         たまごをタップして選ぼう
       </p>
+    </div>
+  );
+}
+
+/** D03-S008: {bati}'s magic in the story — the two Moon-room sheets, as often as wished, then 〔つぎへ〕 */
+function MagicStep({ bati, onNext }: { bati: string; onNext: () => void }) {
+  const [mode, setMode] = useState<RoomMode | null>(null);
+  return (
+    <div className="pb-safe absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-6 pt-20">
+      <div className="mx-auto mb-10 flex max-w-sm animate-[fadeUp_0.6s_ease-out] flex-col gap-3">
+        <button onClick={() => setMode('me')} className="rounded-full border border-amber-200/70 bg-black/50 py-3.5 text-[15px] tracking-widest text-amber-50">
+          {bati}の魔法で、自分の姿を変える
+        </button>
+        <button onClick={() => setMode('bati')} className="rounded-full border border-amber-200/70 bg-black/50 py-3.5 text-[15px] tracking-widest text-amber-50">
+          {bati}を着せかえる
+        </button>
+        <button onClick={onNext} className="py-2 text-sm tracking-widest text-white/60">
+          つぎへ
+        </button>
+      </div>
+      {mode && <RoomSheet mode={mode} onClose={() => setMode(null)} onDone={() => setMode(null)} />}
     </div>
   );
 }

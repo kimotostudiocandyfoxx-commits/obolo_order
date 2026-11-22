@@ -218,6 +218,9 @@ export class HttpApi implements Api {
   deleteSaturnPost(id: string) {
     return this.req<void>('DELETE', `/saturn/posts/${id}`);
   }
+  publishSaturnPost(id: string) {
+    return this.req<Awaited<ReturnType<Api['publishSaturnPost']>>>('POST', `/saturn/posts/${id}/publish`);
+  }
   starSaturnPost(id: string, on: boolean) {
     return this.req<{ starCount: number; starredByMe: boolean }>(on ? 'POST' : 'DELETE', `/saturn/posts/${id}/star`);
   }
