@@ -277,6 +277,110 @@
       "id": "talk-bg-moon",
       "size": "1152x2048",
       "prompt": "Background art for a mobile chat screen (portrait): standing on the soft silver-gray surface of the moon at night, gentle craters, the lower third is the moon ground, a big beautiful blue Earth rising in the upper sky, deep navy space with many fine stars and a faint milky way, calm, dreamy, slightly painterly anime background art, no characters, no text, plenty of empty space in the middle for characters and speech bubbles."
+    },
+    {
+      "id": "talk-user-smile-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: big happy smile with eyes curved, both arms raised up happily in a cheer. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-surprised-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: surprised face (eyes wide, small round open mouth), leaning back a little with both hands raised in front of the chest. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-shy-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: shy blushing face with a bashful smile, one hand scratching the back of the head. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-smile-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: big happy smile with eyes curved, both arms raised up happily in a cheer. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-surprised-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: surprised face (eyes wide, small round open mouth), leaning back a little with both hands raised in front of the chest. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-thinking-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: thinking face (eyes looking up), one hand on the chin, head tilted to one side. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-sad-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: a little sad face, shoulders dropped, head slightly down, arms hanging. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-shy-pose",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: shy blushing face with a bashful smile, one hand scratching the back of the head. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-smile-pose",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: big happy smile, both little arms raised up in a cheer, bouncing. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-surprised-pose",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: surprised face (eyes wide, round mouth), spines puffed out a little, little arms up. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-thinking-pose",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: thinking face (eyes looking up), one little arm touching its cheek, body tilted to one side. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-sad-pose",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: a little sad face, spines drooping down, little arms hanging down. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-shy-pose",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. Pose and expression: shy blushing face, both little arms covering its cheeks, looking away. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
     }
   ],
   "run": 1
