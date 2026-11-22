@@ -381,6 +381,134 @@
         "design/story/out/talk-bati-base-1.jpg"
       ],
       "prompt": "The same character as the reference picture. Pose and expression: shy blushing face, both little arms covering its cheeks, looking away. Same character, same art style, same clothes and colors as the reference, full body, the whole body inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-sad-pose-talk",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-sad-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-shy-pose-talk",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-shy-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-smile-pose-talk",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-smile-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-smile-pose-blink",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-smile-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Eyes gently closed (a blink), keep the same smile otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-surprised-pose-talk",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-surprised-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-thinking-pose-talk",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-thinking-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-sad-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-sad-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-shy-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-shy-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-smile-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-smile-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-smile-pose-blink",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-smile-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Eyes gently closed (a blink), keep the same smile otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-surprised-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-surprised-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-thinking-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-thinking-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-user-shy-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-shy-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-user-smile-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-smile-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-user-smile-pose-blink",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-smile-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Eyes gently closed (a blink), keep the same smile otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-user-surprised-pose-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-surprised-pose-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
     }
   ],
   "run": 1
