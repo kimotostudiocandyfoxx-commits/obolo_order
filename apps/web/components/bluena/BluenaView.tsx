@@ -1,6 +1,6 @@
 'use client';
 
-import type { BluenaKeptView, JupiterRootView, MarsBackstageVideo, PlanetId, RadioShowView, SongView } from '@obolo/shared';
+import { SATURN_LIFETIME_HOURS, type BluenaKeptView, type JupiterRootView, type MarsBackstageVideo, type PlanetId, type RadioShowView, type SaturnPostView, type SongView } from '@obolo/shared';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
@@ -9,6 +9,7 @@ import { PlanetSphere } from '@/components/PlanetSphere';
 import { useToast } from '@/components/Toast';
 import { ShowArt } from '@/components/venus/radio/ShowArt';
 import { ApiError, getApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { Glyph, GLYPH_NAMES, type GlyphId } from './glyphs';
 
 type FolderId = 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus' | 'uranus' | 'neptune' | 'pluto';
@@ -54,7 +55,7 @@ const FOLDERS: {
     glyph: 'radio',
     planet: '金星',
     look: 'from-fuchsia-950 via-indigo-950 to-stone-950',
-    empty: '金星の放送ブースで収録すると、ここにしまわれる。',
+    empty: '月で番組を収録すると、ここにしまわれる。',
   },
   {
     id: 'uranus',
@@ -79,7 +80,7 @@ const FOLDERS: {
   },
 ];
 
-/** the atelier's kind for each folder (〔月で作る〕 opens with it chosen) */
+/** the atelier's kind for each folder (〔月で作る〕 opens with it chosen; a kind not open yet shows its lock there, M-R208) */
 const MAKE: Record<FolderId, string> = {
   saturn: 'voice',
   jupiter: 'art',
@@ -266,6 +267,7 @@ function Folder({ id, kept, empty }: { id: FolderId; kept: boolean; empty: strin
   if (id === 'mars') return <MarsFolder empty={empty} />;
   if (id === 'jupiter') return <JupiterFolder empty={empty} />;
   if (id === 'venus') return <VenusFolder empty={empty} />;
+  if (id === 'saturn') return <SaturnFolder empty={empty} />;
   return <Empty text={empty} />;
 }
 
@@ -423,8 +425,8 @@ function VenusFolder({ empty }: { empty: string }) {
   if (!shows.length)
     return (
       <Empty text={empty}>
-        <Link href="/venus" className="mt-4 rounded-full bg-fuchsia-300/20 px-4 py-2 text-xs text-fuchsia-100">
-          金星へ
+        <Link href="/moon/atelier?kind=radio" className="mt-4 rounded-full bg-fuchsia-300/20 px-4 py-2 text-xs text-fuchsia-100">
+          月で作る
         </Link>
       </Empty>
     );
@@ -453,6 +455,53 @@ function VenusFolder({ empty }: { empty: string }) {
             {s.status === 'public' ? 'もどす' : '公開する'}
           </button>
           <Remove onRemove={() => getApi().removeRadioShow(s.id).then(reload)} />
+        </Row>
+      ))}
+      {toast.node}
+    </div>
+  );
+}
+
+/**
+ * 土星：コロリン (M-R208). Kororins made in the Moon atelier (and the first journey's) are kept room-only — nobody else
+ * sees them — until 〔公開する〕 flies one to Saturn for its 88 hours; after that it comes back here.
+ */
+function SaturnFolder({ empty }: { empty: string }) {
+  const { me } = useAuth();
+  const [posts, reload] = useLoad<SaturnPostView[]>(() => (me ? getApi().saturnUserPosts(me.id).then((p) => p.items.filter((x) => !x.replyToId)) : Promise.resolve([])));
+  const toast = useToast();
+  const publish = async (p: SaturnPostView) => {
+    try {
+      await getApi().publishSaturnPost(p.id);
+      toast.show('ブルーナから土星へ飛ばした');
+      reload();
+    } catch {
+      toast.show('公開できなかった…');
+    }
+  };
+  if (posts === null) return <Empty text="読みこみ中…" />;
+  if (!posts.length) return <Empty text={empty} />;
+  const out = (p: SaturnPostView) => !p.room && Date.now() - Date.parse(p.createdAt) < SATURN_LIFETIME_HOURS * 3600_000;
+  return (
+    <div className="space-y-2">
+      {posts.map((p) => (
+        <Row
+          key={p.id}
+          art={
+            <span className="flex h-full w-full items-center justify-center rounded-full bg-amber-200/15 text-amber-100">
+              <Glyph id="voice" label={false} className="h-6 w-6" />
+            </span>
+          }
+          title={p.text}
+          sub={p.room ? 'ブルーナの中（自分だけ）' : out(p) ? '土星にいる' : '土星から、もどってきた'}
+        >
+          <Play url={p.voiceUrl} />
+          {p.room && (
+            <button onClick={() => void publish(p)} className={`${pill} bg-amber-300 text-slate-950`}>
+              公開する
+            </button>
+          )}
+          <Remove onRemove={() => getApi().deleteSaturnPost(p.id).then(reload)} />
         </Row>
       ))}
       {toast.node}
@@ -507,6 +556,12 @@ function Play({ url }: { url: string }) {
       return;
     }
     playing?.pause();
+    // a kororin read in the NEO voice is spoken by the device
+    if (url.startsWith('tts:')) {
+      const { toggleAudio } = await import('@/lib/audio');
+      await toggleAudio(url).catch(() => undefined);
+      return;
+    }
     let src = url;
     if (url.startsWith('idb:')) {
       const { getBlob } = await import('@/lib/api/idb');

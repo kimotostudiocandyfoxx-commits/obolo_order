@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
-import type { Response } from 'express';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Patch, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
+import type { Request, Response } from 'express';
 import { BuddyChatBody, BuddyPictureBody, CompassBody, StoryBody, UpdateBuddyProfileBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -10,6 +10,9 @@ import { BuddyService } from './buddy.service';
 import { CompassService } from './compass.service';
 import { StoryService } from './story.service';
 import { PictureService } from './picture.service';
+
+/** where a picture kept in Postgres (dev, no Bunny) is served from */
+const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
 @Controller('buddy')
 @UseGuards(AuthGuard)
@@ -44,18 +47,19 @@ export class BuddyController {
 
   @Post('chat')
   @HttpCode(200)
-  async chat(@UserId() userId: string, @Body() body: unknown) {
+  async chat(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     const { text, locale } = parseBody(BuddyChatBody, body);
     await rateLimit(this.kv, `buddy:${userId}`, 12, 60);
-    return this.buddy.chat(userId, text, locale);
+    return this.buddy.chat(userId, text, locale, undefined, origin(req));
   }
 
   /**
    * The same as POST /buddy/chat, written as it comes (Server-Sent Events): `event: text` pieces of an ordinary
-   * answer, then `event: done` with the saved reply (BuddyChatResponse) or `event: error` with { code }.
+   * answer, then `event: done` with the saved reply (BuddyChatResponse; M-R208: with `sources` / `image` when it was
+   * looked up or drawn) or `event: error` with { code }.
    */
   @Post('chat/stream')
-  async chatStream(@UserId() userId: string, @Body() body: unknown, @Res() res: Response) {
+  async chatStream(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Res() res: Response) {
     const { text, locale } = parseBody(BuddyChatBody, body);
     await rateLimit(this.kv, `buddy:${userId}`, 12, 60);
     res.status(200);
@@ -65,7 +69,7 @@ export class BuddyController {
     res.flushHeaders();
     const send = (event: string, data: unknown) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     try {
-      const out = await this.buddy.chat(userId, text, locale, (piece) => send('text', { text: piece }));
+      const out = await this.buddy.chat(userId, text, locale, (piece) => send('text', { text: piece }), origin(req));
       send('done', out);
     } catch (err) {
       const e = err as { getResponse?: () => { error?: { code?: string } } };

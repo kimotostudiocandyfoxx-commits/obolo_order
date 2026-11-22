@@ -1,0 +1,1 @@
+ALTER TABLE "buddy_messages" ADD COLUMN "extra_json" jsonb;

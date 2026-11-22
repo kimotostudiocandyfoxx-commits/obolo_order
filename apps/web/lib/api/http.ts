@@ -519,6 +519,10 @@ export class HttpApi implements Api {
   createRadioShow(body: Parameters<Api['createRadioShow']>[0]) {
     return this.req<Awaited<ReturnType<Api['createRadioShow']>>>('POST', '/venus/shows', body);
   }
+  radioHostShows(hostId: string) {
+    return this.req<Awaited<ReturnType<Api['radioHostShows']>>>('GET', `/venus/hosts/${hostId}/shows`);
+  }
+
   myRadioShows() {
     return this.req<Awaited<ReturnType<Api['myRadioShows']>>>('GET', '/venus/shows/mine');
   }

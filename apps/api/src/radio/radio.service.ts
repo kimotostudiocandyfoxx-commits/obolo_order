@@ -2,6 +2,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   CHILD_AGE,
+  flyingSince,
   RADIO_LIVE_STALE_SECONDS,
   type BluenaKeptView,
   type CommsPerson,
@@ -232,10 +233,36 @@ export class RadioService {
     return this.showView(rows, userId);
   }
 
+  /**
+   * Someone's booth (M-R208): their public shows back home after 88 hours on the air, newest first.
+   * Your own booth is myShows (private ones too).
+   */
+  async hostShows(viewer: string, hostId: string): Promise<RadioShowView[]> {
+    if ((await this.blockedWith(viewer)).has(hostId)) return [];
+    const rows = await this.db.read
+      .select({ s: radioShows })
+      .from(radioShows)
+      .innerJoin(users, eq(users.id, radioShows.userId))
+      .where(
+        and(
+          eq(radioShows.userId, hostId),
+          eq(radioShows.status, 'public'),
+          isNull(radioShows.deletedAt),
+          isNull(radioShows.removedAt),
+          isNull(users.suspendedAt),
+          notChild(viewer),
+          lt(radioShows.publishedAt, flyingSince()),
+        ),
+      )
+      .orderBy(desc(radioShows.publishedAt))
+      .limit(60);
+    return this.showView(rows.map((x) => x.s), viewer);
+  }
+
   async publishShow(userId: string, id: string, on: boolean): Promise<RadioShowView> {
     const [r] = await this.db.write
       .update(radioShows)
-      .set(on ? { status: 'public', publishedAt: new Date(), updatedAt: new Date() } : { status: 'private', updatedAt: new Date() })
+      .set(on ? { status: 'public', publishedAt: sql`coalesce(${radioShows.publishedAt}, now())`, updatedAt: new Date() } : { status: 'private', updatedAt: new Date() })
       .where(and(eq(radioShows.id, id), eq(radioShows.userId, userId), isNull(radioShows.deletedAt), isNull(radioShows.removedAt)))
       .returning();
     if (!r) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
@@ -261,7 +288,7 @@ export class RadioService {
     return (await this.showView([r], viewer))[0];
   }
 
-  // --- the Venus home: ON AIR + shows -----------------------------------------------------------
+  // --- the Venus home: ON AIR + the shows on the air as waves (88 hours, M-R208) ----------------
 
   async home(viewer: string): Promise<RadioHome> {
     await this.endStale();
@@ -278,7 +305,8 @@ export class RadioService {
       .select({ s: radioShows })
       .from(radioShows)
       .innerJoin(users, eq(users.id, radioShows.userId))
-      .where(and(eq(radioShows.status, 'public'), isNull(radioShows.deletedAt), isNull(radioShows.removedAt), notBlocked(radioShows.userId), isNull(users.suspendedAt), notChild(viewer)))
+      // a published show drifts above the clouds for 88 hours, then goes back to its owner's booth
+      .where(and(eq(radioShows.status, 'public'), gt(radioShows.publishedAt, flyingSince()), isNull(radioShows.deletedAt), isNull(radioShows.removedAt), notBlocked(radioShows.userId), isNull(users.suspendedAt), notChild(viewer)))
       .orderBy(desc(radioShows.publishedAt))
       .limit(60);
     return { live: await this.liveView(lives.map((x) => x.l), viewer), shows: await this.showView(shows.map((x) => x.s), viewer) };

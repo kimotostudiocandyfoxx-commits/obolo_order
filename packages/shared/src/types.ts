@@ -144,6 +144,17 @@ export interface BuddyMessageView {
   role: 'user' | 'buddy';
   text: string;
   createdAt: string;
+  /** M-R208: an answer looked up on the web — the pages it is based on (shown as links under the bubble) */
+  sources?: BuddySource[];
+  /** M-R208: a picture {bati} drew in the chat ("〜の絵を見せて"), shown as its own bubble */
+  image?: { url: string } | null;
+}
+
+/** a page a looked-up answer is based on: its title and the site's name */
+export interface BuddySource {
+  title: string;
+  url: string;
+  domain: string;
 }
 
 export interface BuddyQuotaView {

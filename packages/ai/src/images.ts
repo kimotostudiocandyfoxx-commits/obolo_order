@@ -457,3 +457,16 @@ export function puniPicPrompt(description: string, hasReference: boolean, varian
     ORIGINAL
   );
 }
+
+/**
+ * A picture {bati} draws in the chat (M-R208: "〜の絵を見せて"): one child-safe illustration of what was asked, from
+ * the English description the chat's sorting wrote (moderated before it is painted).
+ */
+export function batiChatPicturePrompt(description: string): string {
+  return (
+    'One square, child-friendly illustration for a children\'s app, warm and gentle, clear and easy to understand at a glance. ' +
+    `It shows: ${description.replace(/["\n]/g, ' ').slice(0, 200)}. ` +
+    'Soft hand-painted storybook style, bright friendly colours. Nothing scary, violent or grown-up. ' +
+    'No text, no letters, no numbers, no logo, no watermark. Do not draw real people or their faces.'
+  );
+}

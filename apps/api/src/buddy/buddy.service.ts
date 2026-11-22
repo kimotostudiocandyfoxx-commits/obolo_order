@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { buddyAnswer, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, LlmProvider, summarizeMemory } from '@obolo/ai';
+import { batiChatPicturePrompt, buddyAnswer, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, type ImageProvider, LlmProvider, moderateText, summarizeMemory } from '@obolo/ai';
 import { buddyQuotaDecision, idempotencyKey } from '@obolo/ledger';
 import {
   BUDDY_CONTEXT_MESSAGES,
@@ -8,6 +8,7 @@ import {
   BuddyChatResponse,
   BuddyMessageView,
   BuddyProfileView,
+  BuddySource,
   Locale,
   Paged,
   QUOTA_TIMEZONE,
@@ -21,7 +22,8 @@ import { Database } from '../db/db';
 import { buddyMessages, buddyProfiles, users, wallets } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
-import { BUDDY_LLM, KV, QUEUE } from '../infra/tokens';
+import { BUDDY_LLM, IMAGES, KV, LLM, QUEUE } from '../infra/tokens';
+import { MediaService } from '../media/media.service';
 import { LedgerService } from '../wallet/ledger.service';
 
 const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
@@ -29,7 +31,43 @@ const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
   role: m.role as 'user' | 'buddy',
   text: m.text,
   createdAt: m.createdAt.toISOString(),
+  ...(m.extraJson?.sources?.length ? { sources: m.extraJson.sources } : {}),
+  ...(m.extraJson?.image ? { image: { url: m.extraJson.image.url } } : {}),
 });
+
+/** a picture in the chat may take this long; after it, the answer comes without one */
+const DRAW_TIMEOUT_MS = 60_000;
+
+/**
+ * M-R208 caps, counted per day in Redis (shared by every instance): looked-up answers per member and for everyone
+ * (each takes up to two web searches), pictures drawn per member. A used cap only turns the ability off for the day —
+ * Bati still answers (the one-call prompt is told so).
+ */
+export class BuddyExtrasCaps {
+  constructor(
+    private readonly kv: KvStore,
+    private readonly cfg: Pick<AppConfig, 'BUDDY_SEARCH_DAILY' | 'BUDDY_SEARCH_GLOBAL_DAILY' | 'BUDDY_DRAW_DAILY'>,
+  ) {}
+  private keys(userId: string, day = quotaDay()) {
+    return { search: `buddy-search:${userId}:${day}`, all: `buddy-search-all:${day}`, draw: `buddy-draw:${userId}:${day}` };
+  }
+  async abilities(userId: string): Promise<{ search: boolean; draw: boolean }> {
+    const k = this.keys(userId);
+    const [s, a, d] = await Promise.all([this.kv.get(k.search), this.kv.get(k.all), this.kv.get(k.draw)]);
+    return {
+      search: Number(s ?? 0) < this.cfg.BUDDY_SEARCH_DAILY && Number(a ?? 0) < this.cfg.BUDDY_SEARCH_GLOBAL_DAILY,
+      draw: Number(d ?? 0) < this.cfg.BUDDY_DRAW_DAILY,
+    };
+  }
+  async searched(userId: string) {
+    const k = this.keys(userId);
+    await Promise.all([this.kv.incr(k.search, 2 * 86400), this.kv.incr(k.all, 2 * 86400)]);
+  }
+  /** takes one of the day's pictures; false when another request took the last one first */
+  async takeDraw(userId: string): Promise<boolean> {
+    return (await this.kv.incr(this.keys(userId).draw, 2 * 86400)) <= this.cfg.BUDDY_DRAW_DAILY;
+  }
+}
 
 export function quotaDay(now = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: QUOTA_TIMEZONE }).format(now);
@@ -38,6 +76,7 @@ export function quotaDay(now = new Date()): string {
 @Injectable()
 export class BuddyService implements OnModuleInit {
   private readonly log = new Logger('Buddy');
+  private readonly caps: BuddyExtrasCaps;
   constructor(
     @Inject(CONFIG) private readonly cfg: AppConfig,
     @Inject(KV) private readonly kv: KvStore,
@@ -46,7 +85,13 @@ export class BuddyService implements OnModuleInit {
     @Inject(QUEUE) private readonly queue: JobQueue,
     private readonly db: Database,
     private readonly ledger: LedgerService,
-  ) {}
+    // M-R208: moderating what to draw (the ordinary chain, as for every other prompt), painting it, keeping it
+    @Inject(LLM) private readonly modLlm: LlmProvider,
+    @Inject(IMAGES) private readonly images: ImageProvider,
+    private readonly media: MediaService,
+  ) {
+    this.caps = new BuddyExtrasCaps(kv, cfg);
+  }
 
   onModuleInit() {
     this.queue.register('buddy.summarize', ({ userId }) => this.summarize(userId));
@@ -120,7 +165,7 @@ export class BuddyService implements OnModuleInit {
   }
 
   /** `onText`: the ordinary answer as it is written (POST /buddy/chat/stream); the saved reply comes at the end */
-  async chat(userId: string, text: string, localeOverride?: Locale, onText?: (piece: string) => void): Promise<BuddyChatResponse> {
+  async chat(userId: string, text: string, localeOverride?: Locale, onText?: (piece: string) => void, origin = ''): Promise<BuddyChatResponse> {
     const profile = await this.ensureProfile(userId);
     const [user] = await this.db.write.select().from(users).where(eq(users.id, userId));
     const [wallet] = await this.db.write.select().from(wallets).where(eq(wallets.userId, userId));
@@ -153,8 +198,12 @@ export class BuddyService implements OnModuleInit {
     const locale = localeOverride ?? (user.locale as Locale);
     let replyText: string;
     let replyKind: 'normal' | 'worry' | 'danger' = 'normal';
+    let sources: BuddySource[] | undefined;
+    let draw: string | undefined;
+    // M-R208: whether Bati may look it up / draw today (a used cap turns it off, the talk goes on)
+    const can = await this.caps.abilities(userId).catch(() => ({ search: false, draw: false }));
     try {
-      ({ text: replyText, kind: replyKind } = await buddyAnswer(
+      ({ text: replyText, kind: replyKind, sources, draw } = await buddyAnswer(
         this.llm,
         {
           // the member's own {bati}, named on the Moon, answers under its own name (story chat 2026-11-02)
@@ -166,18 +215,27 @@ export class BuddyService implements OnModuleInit {
         },
         history,
         onText,
+        can,
       ));
     } catch (err) {
       this.log.error(`LLM failed: ${String(err)}`);
       throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'BUDDY_UNAVAILABLE', 'Buddy is resting, try again soon');
     }
+    if (sources) await this.caps.searched(userId).catch(() => undefined);
+    let image: { url: string; mediaId: string } | undefined;
+    if (draw && replyKind === 'normal') {
+      const drawn = await this.draw(userId, text, draw, locale, origin);
+      if ('image' in drawn) image = drawn.image;
+      else replyText = drawn.text;
+    }
+    const extra = sources?.length || image ? { ...(sources?.length ? { sources } : {}), ...(image ? { image } : {}) } : null;
 
     const now = Date.now();
     const result = await this.db.write.transaction(async (tx) => {
       const [u] = await tx.insert(buddyMessages).values({ userId, role: 'user', text, createdAt: new Date(now) }).returning();
       const [b] = await tx
         .insert(buddyMessages)
-        .values({ userId, role: 'buddy', text: replyText, provider: this.llm.name, createdAt: new Date(now + 1) })
+        .values({ userId, role: 'buddy', text: replyText, provider: this.llm.name, extraJson: extra, createdAt: new Date(now + 1) })
         .returning();
       if (decision.chargeMana > 0) {
         await this.ledger.applyMana(tx, {
@@ -207,6 +265,28 @@ export class BuddyService implements OnModuleInit {
       quota: { usedToday: used, freeDaily: this.cfg.BUDDY_FREE_DAILY },
       kind: replyKind,
     };
+  }
+
+  /**
+   * M-R208 "〜の絵を見せて": what to draw is checked like any other prompt, painted by the image provider and kept with
+   * the media service (kind "image"). A refused or failed picture gives Bati's own line instead.
+   */
+  private async draw(userId: string, asked: string, what: string, locale: Locale, origin: string): Promise<{ image: { url: string; mediaId: string } } | { text: string }> {
+    const ja = locale !== 'en';
+    if ((await moderateText(`${asked}\n${what}`, this.modLlm)).flagged) return { text: ja ? 'その絵は、ボクには描けないんだ。ほかのものなら描けるよ！' : "I can't draw that one. Ask me for something else!" };
+    if (!(await this.caps.takeDraw(userId).catch(() => false))) return { text: ja ? '今日は、もう絵を描けないんだ。また明日ね。' : "I can't draw any more today. Let's draw tomorrow!" };
+    try {
+      let timer: NodeJS.Timeout | undefined;
+      const img = await Promise.race([
+        this.images.generate(batiChatPicturePrompt(what)),
+        new Promise<never>((_, no) => (timer = setTimeout(() => no(new Error('draw timeout')), DRAW_TIMEOUT_MS))),
+      ]).finally(() => clearTimeout(timer));
+      const m = await this.media.storeImage(userId, 'image', img.mime, img.data, origin);
+      return { image: { url: m.url, mediaId: m.id } };
+    } catch (e) {
+      this.log.warn(`chat picture failed: ${String(e)}`);
+      return { text: ja ? 'うーん、うまく描けなかった……。また頼んでね。' : "Hmm, I couldn't draw it this time. Ask me again!" };
+    }
   }
 
   /** Background job: fold recent messages into the long-term memory summary. */

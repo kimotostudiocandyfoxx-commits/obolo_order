@@ -1,18 +1,25 @@
 'use client';
 
-import type { PlanetId } from '@obolo/shared';
+import { KORORIN_VOICE_STYLE, neoVoiceUrl, type PlanetId, type SaturnPostView } from '@obolo/shared';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Glyph, GLYPH_NAMES, type GlyphId } from '@/components/bluena/glyphs';
 import { PlanetMark } from '@/components/bluena/PlanetMark';
+import { LineIcon } from '@/components/LineIcon';
+import { Booth } from '@/components/venus/radio/Booth';
 import { LiveShoot } from '@/components/mars/LiveMars';
 import { ShootChat } from '@/components/mars/ShootChat';
 import { ComposeChat, Face } from '@/components/mercury/ComposeChat';
 import { ApiError, getApi } from '@/lib/api';
+import { isOpen, lockLine, omakaseKind } from '@/lib/atelier/unlock';
+import { playBlob, stopAudio, toggleAudio } from '@/lib/audio';
+import { useAuth } from '@/lib/auth';
 import { useMars } from '@/lib/mars/state';
 import { useMercury } from '@/lib/mercury/state';
 import { usePartner } from '@/lib/partner';
+import { singKororin } from '@/lib/saturn/sing';
+import { useRecorder } from '@/lib/useRecorder';
 
 /** what can be made, in the order of the design (docs/工房とブルーナ_設計.md §3.2), and the planet it is shown on */
 export type MakeKind = 'song' | 'video' | 'art' | 'radio' | 'goods' | 'voice' | 'book' | 'game' | 'any';
@@ -40,6 +47,8 @@ const isKind = (k: string | null): k is MakeKind => !!k && KINDS.some((x) => x.i
  * what you make goes into Bluena by itself (the folder of its kind), and 〔公開する〕 projects it to its planet.
  * Coming from a planet's 〔月で作る〕 (?kind=song …) the kind is already chosen.
  * Only you see what is in here, and making things does not use the day's 88 minutes (§13).
+ * Making happens only here (M-R208): on the first journey each day opens one more kind (lib/atelier/unlock.ts) and the
+ * rest wait with a thin lock; a kind asked for before its day (?kind=… from a Bluena folder) shows the lock's line.
  */
 export function MoonAtelier() {
   const params = useSearchParams();
@@ -48,6 +57,15 @@ export function MoonAtelier() {
   const [kind, setKind] = useState<MakeKind | null>(isKind(first) ? first : null);
   const [gate, setGate] = useState(true);
   const partner = usePartner();
+  const day = useAuth().me?.journeyDay;
+  // a locked kind is never opened: the choice screen shows its line instead
+  const [notice, setNotice] = useState<MakeKind | null>(isKind(first) && !isOpen(first, day) ? first : null);
+  useEffect(() => {
+    if (kind && !isOpen(kind, day)) {
+      setNotice(kind);
+      setKind(null);
+    }
+  }, [kind, day]);
 
   // the gate plays once per visit; reduced motion → straight in
   useEffect(() => {
@@ -57,6 +75,8 @@ export function MoonAtelier() {
   }, []);
 
   const pick = (k: MakeKind | null) => {
+    if (k && !isOpen(k, day)) return setNotice(k);
+    setNotice(null);
     setKind(k);
     const q = new URLSearchParams(params.toString());
     if (k) q.set('kind', k);
@@ -87,7 +107,7 @@ export function MoonAtelier() {
         </Link>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col">{kind ? <Make kind={kind} onKind={pick} /> : <Choose onPick={pick} />}</div>
+      <div className="flex min-h-0 flex-1 flex-col">{kind && isOpen(kind, day) ? <Make kind={kind} day={day} onKind={pick} /> : <Choose day={day} notice={notice} onPick={pick} />}</div>
 
       {gate && <Gate onSkip={() => setGate(false)} />}
     </main>
@@ -121,40 +141,59 @@ function Bubble({ face, children }: { face: string; children: ReactNode }) {
   );
 }
 
-/** 「何を作る？」 — the marks, with the planet each one is shown on */
-function Choose({ onPick }: { onPick: (k: MakeKind) => void }) {
+/** 「何を作る？」 — the marks, with the planet each one is shown on; a kind not open yet waits under a thin lock */
+function Choose({ day, notice, onPick }: { day: number | undefined; notice: MakeKind | null; onPick: (k: MakeKind) => void }) {
   const partner = usePartner();
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-[calc(16px+env(safe-area-inset-bottom))] pt-2">
       <Bubble face={partner.face}>{partner.isBati ? '何を作る？' : '何を作るケン？'}</Bubble>
       <div className="mx-auto mt-5 grid max-w-sm grid-cols-3 gap-3">
-        {KINDS.map((x) => (
-          <button
-            key={x.id}
-            onClick={() => onPick(x.id)}
-            aria-label={GLYPH_NAMES[x.glyph]}
-            className={`relative flex aspect-square flex-col items-center justify-center gap-1.5 rounded-3xl border ${x.id === 'any' ? 'border-amber-200/40 bg-amber-200/10 text-amber-100' : 'border-sky-200/20 bg-white/5 text-sky-100'} active:scale-95`}
-          >
-            <Glyph id={x.glyph} label={false} className="h-9 w-9" />
-            <span className="text-[10px] text-white/55">{GLYPH_NAMES[x.glyph]}</span>
-            {x.planet && (
-              <span className="absolute right-2 top-2 opacity-80">
-                <PlanetMark id={x.planet} size={14} />
-              </span>
-            )}
-          </button>
-        ))}
+        {KINDS.map((x) => {
+          const locked = !isOpen(x.id, day);
+          return (
+            <button
+              key={x.id}
+              onClick={() => onPick(x.id)}
+              aria-label={locked ? `${GLYPH_NAMES[x.glyph]}（${lockLine(x.id)}）` : GLYPH_NAMES[x.glyph]}
+              aria-disabled={locked}
+              className={`relative flex aspect-square flex-col items-center justify-center gap-1.5 rounded-3xl border ${
+                locked
+                  ? `border-white/10 bg-white/[0.02] text-white/30 ${notice === x.id ? 'ring-1 ring-sky-200/40' : ''}`
+                  : x.id === 'any'
+                    ? 'border-amber-200/40 bg-amber-200/10 text-amber-100 active:scale-95'
+                    : 'border-sky-200/20 bg-white/5 text-sky-100 active:scale-95'
+              }`}
+            >
+              <Glyph id={x.glyph} label={false} className="h-9 w-9" />
+              <span className={`text-[10px] ${locked ? 'text-white/30' : 'text-white/55'}`}>{GLYPH_NAMES[x.glyph]}</span>
+              {x.planet && (
+                <span className={`absolute right-2 top-2 ${locked ? 'opacity-30' : 'opacity-80'}`}>
+                  <PlanetMark id={x.planet} size={14} />
+                </span>
+              )}
+              {locked && (
+                <span className="absolute bottom-2 right-2 text-white/45">
+                  <LineIcon id="lock" className="h-3.5 w-3.5" />
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
+      <p aria-live="polite" className="mt-4 min-h-5 text-center text-xs text-sky-100/70">
+        {notice ? lockLine(notice) : ''}
+      </p>
     </div>
   );
 }
 
-function Make({ kind, onKind }: { kind: MakeKind; onKind: (k: MakeKind | null) => void }) {
+function Make({ kind: asked, day, onKind }: { kind: MakeKind; day: number | undefined; onKind: (k: MakeKind | null) => void }) {
   const live = getApi().mode === 'live';
   const router = useRouter();
   const mercury = useMercury();
   const mars = useMars();
-  // おまかせ: talk first — today a talk becomes a song (the one kind Bati can make end to end from words)
+  // おまかせ follows what is open: a talk becomes a song once songs are open, before that the newest kind of the journey
+  const kind: MakeKind = asked === 'any' ? (omakaseKind(day) ?? 'any') : asked;
   if (kind === 'song' || kind === 'any')
     return (
       <ComposeChat
@@ -188,7 +227,16 @@ function Make({ kind, onKind }: { kind: MakeKind; onKind: (k: MakeKind | null) =
       <ShootChat header={false} onKeep={(v) => mars.keep(v)} onOpenStudio={() => router.push('/bluena?folder=mars')} onPreview={() => undefined} />
     );
   if (kind === 'art') return <ArtMake />;
-  return <Elsewhere kind={kind} onKind={onKind} />;
+  if (kind === 'voice') return <VoiceMake />;
+  // 金星のラジオ (M-R208): a recorded show (FM) — your songs and your voice, listened back, then flown to Venus.
+  // Live streaming stays the members' booth on Venus.
+  if (kind === 'radio')
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <Booth use="record" bare />
+      </div>
+    );
+  return <Elsewhere onKind={onKind} />;
 }
 
 /** アート: a picture or photo from the device goes into Bluena's Jupiter folder (the roots) */
@@ -277,35 +325,180 @@ function Saved({ folder, planet, publishHref, again }: { folder: string; planet:
 }
 
 /**
- * The kinds that are not made in this room (yet).
- * ラジオ and 声 are the two exceptions where making and showing happen together (§0): the booth on Venus and the
- * Kororin relay on Saturn. グッズ・本・ゲーム are not built yet.
+ * The kinds that are not made in this room yet: グッズ・本・ゲーム (the members' later planets).
  * PLACEHOLDER (P-ATELIER-2): Bati's lines here are UI stand-ins until the story chat writes them.
  */
-function Elsewhere({ kind, onKind }: { kind: MakeKind; onKind: (k: MakeKind | null) => void }) {
+function Elsewhere({ onKind }: { onKind: (k: MakeKind | null) => void }) {
   const partner = usePartner();
   const ken = (a: string, b: string) => (partner.isBati ? a : b);
-  const line =
-    kind === 'radio'
-      ? ken('ラジオ番組は、金星の放送ブースで録るよ。録った番組は、ブルーナにしまわれるよ。', 'ラジオ番組は、金星の放送ブースで録るケン。録った番組は、ブルーナにしまわれるぞ。')
-      : kind === 'voice'
-        ? ken('声は、土星でその場で落とすよ。', '声は、土星でその場で落とすケン。')
-        : ken('これは、まだ準備中。もうすぐ一緒に作れるようになるよ。', 'これは、まだ準備中だケン。もうすぐ一緒に作れるようになるぞ。');
-  const go = kind === 'radio' ? { href: '/venus?booth=1', planet: 'venus' as const } : kind === 'voice' ? { href: '/saturn', planet: 'saturn' as const } : null;
+  const line = ken('これは、まだ準備中。もうすぐ一緒に作れるようになるよ。', 'これは、まだ準備中だケン。もうすぐ一緒に作れるようになるぞ。');
   return (
     <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pt-2">
       <Bubble face={partner.face}>{line}</Bubble>
       <div className="mx-auto flex max-w-sm gap-2">
-        {go ? (
-          <Link href={go.href} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-sky-300 py-2.5 text-sm font-black text-slate-950">
-            <PlanetMark id={go.planet} size={18} />
-            {kind === 'radio' ? '放送ブースへ' : '土星へ'}
-          </Link>
-        ) : null}
         <button onClick={() => onKind(null)} className="flex-1 rounded-full border border-white/20 py-2.5 text-sm">
           ほかのものを作る
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * コロリン (M-R208, day 3): a memo or a spoken mutter. Speak (mic) or type, hear it back, keep it → Bluena's Saturn folder
+ * (a room-only kororin: nobody else sees it) → 〔公開する〕 flies it to Saturn, where its 88 hours start.
+ * A spoken take sings in your own voice (lib/saturn/sing, on the phone); typed words are read in the kororin voice.
+ */
+function VoiceMake() {
+  const { me } = useAuth();
+  const rec = useRecorder(20);
+  const [words, setWords] = useState('');
+  const [sung, setSung] = useState<Blob | null>(null);
+  const [state, setState] = useState<'idle' | 'busy' | 'saved' | 'flown'>('idle');
+  const [post, setPost] = useState<SaturnPostView | null>(null);
+  const [error, setError] = useState('');
+  useEffect(() => () => stopAudio(), []);
+  // a new take: the sung copy is made again
+  useEffect(() => setSung(null), [rec.blob]);
+
+  const take = rec.blob && rec.blob.size > 1000 ? rec.blob : null;
+  const text = words.trim();
+  const ready = !!take || !!text;
+
+  const singing = async (b: Blob) => {
+    if (sung) return sung;
+    const s = await singKororin(b, text).catch(() => b);
+    setSung(s);
+    return s;
+  };
+  const listen = async () => {
+    setError('');
+    try {
+      if (take) await playBlob(await singing(take), 'atelier-kororin');
+      else if (text) await toggleAudio(neoVoiceUrl(KORORIN_VOICE_STYLE, me?.neoForm, text));
+    } catch {
+      setError('うまく鳴らせなかった…');
+    }
+  };
+  const mic = async () => {
+    setError('');
+    if (rec.recording) return rec.stop();
+    stopAudio();
+    await rec.start();
+  };
+
+  const keep = async () => {
+    if (!ready) return;
+    setState('busy');
+    setError('');
+    try {
+      let said = text;
+      let voiceMediaId: string | undefined;
+      if (take) {
+        voiceMediaId = (await getApi().uploadVoice(await singing(take))).id;
+        // spoken without words: the words come from the take (the kororin needs a line to show)
+        if (!said && getApi().mode === 'live') said = (await getApi().transcribe(voiceMediaId).catch(() => ({ text: '' }))).text.trim();
+      }
+      said = (said || '……').slice(0, 140);
+      const p = await getApi().createSaturnPost(
+        voiceMediaId ? { text: said, voiceMediaId, voiceDurationSec: rec.duration || undefined, room: true } : { text: said, voiceStyle: KORORIN_VOICE_STYLE, readBy: 'bati', room: true },
+      );
+      setPost(p);
+      setState('saved');
+    } catch (e) {
+      setState('idle');
+      setError(e instanceof ApiError && e.code === 'MODERATION' ? 'そのことばは、コロリンにできないよ' : e instanceof ApiError && e.code === 'STORAGE_FULL' ? '保存できる容量がいっぱいです' : 'うまくしまえなかった…もう一度');
+    }
+  };
+  const publish = async () => {
+    if (!post) return;
+    setState('busy');
+    try {
+      setPost(await getApi().publishSaturnPost(post.id));
+      setState('flown');
+    } catch {
+      setState('saved');
+      setError('公開できなかった…');
+    }
+  };
+  const again = () => {
+    rec.reset();
+    setWords('');
+    setSung(null);
+    setPost(null);
+    setState('idle');
+    setError('');
+  };
+
+  return (
+    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 pb-[calc(16px+env(safe-area-inset-bottom))] pt-2">
+      {state === 'idle' || (state === 'busy' && !post) ? (
+        <>
+          <p className="text-center text-sm text-sky-100/80">ひとこと、つぶやく。声でも、文字でも。</p>
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => void mic()}
+              disabled={state === 'busy'}
+              aria-label={rec.recording ? '止める' : '声でつぶやく'}
+              className={`flex h-20 w-20 items-center justify-center rounded-full border ${rec.recording ? 'animate-pulse border-red-300/60 bg-red-500/80 text-white' : 'border-amber-200/40 bg-amber-200/10 text-amber-100'} disabled:opacity-50`}
+            >
+              <LineIcon id="mic" className="h-9 w-9" />
+            </button>
+            <span className="text-[11px] text-white/55">
+              {rec.recording ? `${rec.elapsed}秒…もう一度押すと止まる` : take ? '声が入った' : rec.error ? 'マイクが使えない…文字でもつぶやける' : '押して話す（20秒まで）'}
+            </span>
+          </div>
+          <textarea
+            value={words}
+            onChange={(e) => setWords(e.target.value.slice(0, 140))}
+            rows={2}
+            placeholder={take ? 'ことばも添える（なくてもいい）' : 'または、文字でつぶやく'}
+            className="w-full resize-none rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm outline-none"
+          />
+          <div className="mx-auto flex max-w-sm gap-2">
+            <button onClick={() => void listen()} disabled={!ready || rec.recording || state === 'busy'} className="flex-1 rounded-full border border-white/20 py-2.5 text-sm disabled:opacity-40">
+              聴いてみる
+            </button>
+            <button onClick={() => void keep()} disabled={!ready || rec.recording || state === 'busy'} className="flex-[1.3] rounded-full bg-amber-200 py-2.5 text-sm font-black text-slate-950 disabled:opacity-40">
+              {state === 'busy' ? 'しまっています…' : 'ブルーナにしまう'}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="mx-auto max-w-sm rounded-2xl border border-amber-200/20 bg-amber-200/5 p-3 text-center">
+            <p className="text-sm font-bold">{post?.text}</p>
+            <p className="mt-1 text-[11px] text-white/55">{state === 'flown' ? '土星へ飛んでいった（88時間）' : 'ブルーナの土星フォルダにしまった（自分だけ）'}</p>
+            {post?.voiceUrl && (
+              <button onClick={() => void toggleAudio(post.voiceUrl).catch(() => undefined)} className="mt-2 rounded-full bg-white/10 px-3 py-1 text-xs">
+                聴く
+              </button>
+            )}
+          </div>
+          <div className="mx-auto flex max-w-sm gap-2">
+            <Link href="/bluena?folder=saturn" className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-sky-200/40 bg-sky-300/10 py-2 text-xs">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/ui/bluena-icon.webp" alt="" className="h-5 w-5 scale-125 rounded-full object-cover" />
+              ブルーナを見る
+            </Link>
+            {state === 'flown' ? (
+              <Link href="/saturn" className="flex flex-[1.3] items-center justify-center gap-1.5 rounded-full bg-sky-300 py-2 text-sm font-black text-slate-950">
+                <PlanetMark id="saturn" size={16} />
+                土星へ行く
+              </Link>
+            ) : (
+              <button onClick={() => void publish()} disabled={state === 'busy'} className="flex flex-[1.3] items-center justify-center gap-1.5 rounded-full bg-sky-300 py-2 text-sm font-black text-slate-950 disabled:opacity-60">
+                <PlanetMark id="saturn" size={16} />
+                公開する
+              </button>
+            )}
+            <button onClick={again} className="rounded-full border border-white/20 px-3 py-2 text-xs" aria-label="もう1つ">
+              ＋
+            </button>
+          </div>
+        </>
+      )}
+      {error && <p className="text-center text-sm text-red-300">{error}</p>}
     </div>
   );
 }

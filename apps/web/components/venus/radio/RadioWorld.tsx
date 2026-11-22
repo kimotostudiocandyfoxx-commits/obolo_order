@@ -1,24 +1,31 @@
 'use client';
 
-import type { PlanetPostView, RadioCue, RadioHome, RadioLiveState, RadioLiveView, RadioReportBody, RadioShowView } from '@obolo/shared';
+import { isFlying, type PlanetPostView, RadioCue, RadioHome, RadioLiveState, RadioLiveView, RadioReportBody, RadioShowView } from '@obolo/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Glyph } from '@/components/bluena/glyphs';
 import { useToast } from '@/components/Toast';
 import { getApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { Booth } from './Booth';
 import { ShowArt } from './ShowArt';
+import { WaveSky } from './WaveSky';
 
 /**
  * Venus — the radio planet (client decision 2026-11-21, docs/工房とブルーナ_設計.md §9–10).
- * The home: shows ON AIR now, then the recorded shows. The booth is the one place on a planet
- * where something is made (radio is made and shown at the same moment).
+ * The home: shows ON AIR now, then the published shows drifting above the clouds as radio waves for 88 hours
+ * (M-R208: a tap comes near one and it plays; your own glow), then myブース: your shows back home after 88 hours.
  * No numbers: no listener counts, no play counts.
  */
 export function RadioWorld({ practice, startInBooth = false }: { practice?: () => void; startInBooth?: boolean }) {
   const [home, setHome] = useState<RadioHome | null>(null);
   const [error, setError] = useState(false);
   const [open, setOpen] = useState<{ kind: 'show'; show: RadioShowView } | { kind: 'live'; live: RadioLiveView } | null>(null);
+  // the booth here is the members' live booth (M-R208): recorded shows are made in the Moon atelier
+  const member = !!useAuth().me?.orderedAt;
   const [booth, setBooth] = useState(startInBooth);
+  // myブース (M-R208): your published shows that came home after 88 hours on the air
+  const [myHome, setMyHome] = useState<RadioShowView[]>([]);
+  const [visit, setVisit] = useState<RadioShowView['host'] | null>(null);
 
   const load = useCallback(() => {
     getApi()
@@ -28,6 +35,10 @@ export function RadioWorld({ practice, startInBooth = false }: { practice?: () =
         setError(false);
       })
       .catch(() => setError(true));
+    getApi()
+      .myRadioShows()
+      .then((l) => setMyHome(l.filter((s) => s.status === 'public' && s.publishedAt && !isFlying(s.publishedAt))))
+      .catch(() => setMyHome([]));
   }, []);
   useEffect(() => {
     load();
@@ -35,7 +46,7 @@ export function RadioWorld({ practice, startInBooth = false }: { practice?: () =
     return () => clearInterval(t);
   }, [load]);
 
-  if (booth)
+  if (booth && member)
     return (
       <Booth
         onClose={() => {
@@ -77,21 +88,16 @@ export function RadioWorld({ practice, startInBooth = false }: { practice?: () =
           )}
 
           <section className="mt-5">
-            <h2 className="mb-2 text-xs font-bold text-white/60">番組</h2>
-            {home.shows.length === 0 ? (
-              <p className="rounded-2xl border border-white/10 bg-white/5 p-5 text-center text-sm text-white/60">まだ、番組が流れていない。最初の声になろう。</p>
+            <h2 className="mb-2 text-xs font-bold text-white/60">雲の上の電波</h2>
+            <WaveSky shows={home.shows} onOpen={(show) => setOpen({ kind: 'show', show })} />
+          </section>
+
+          <section className="mt-6">
+            <h2 className="mb-2 text-xs font-bold text-white/60">myブース</h2>
+            {myHome.length === 0 ? (
+              <p className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center text-xs leading-relaxed text-white/55">88時間、雲の上をただよった番組は、ここに帰ってくる。</p>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {home.shows.map((s) => (
-                  <button key={s.id} onClick={() => setOpen({ kind: 'show', show: s })} className="text-left">
-                    <ShowArt url={s.thumbUrl} loop={s.loop} playing={false} />
-                    <p className="mt-1.5 line-clamp-2 text-sm font-bold leading-snug">{s.title}</p>
-                    <p className="text-xs text-white/55">
-                      {s.host.displayName || s.host.handle}・{minutes(s.seconds)}
-                    </p>
-                  </button>
-                ))}
-              </div>
+              <ShowGrid shows={myHome} onOpen={(show) => setOpen({ kind: 'show', show })} />
             )}
           </section>
         </>
@@ -99,16 +105,71 @@ export function RadioWorld({ practice, startInBooth = false }: { practice?: () =
 
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[color:var(--color-space-950)] via-[color:var(--color-space-950)]/90 to-transparent px-4 pb-[calc(16px+env(safe-area-inset-bottom))] pt-8">
         <div className="pointer-events-auto mx-auto flex max-w-xl gap-2">
-          <button onClick={() => setBooth(true)} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 to-fuchsia-400 py-3 text-base font-black text-slate-950 shadow-lg">
-            <Glyph id="radio" label={false} className="h-5 w-5" />
-            放送ブースへ
-          </button>
+          {member && (
+            <button onClick={() => setBooth(true)} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-300 to-fuchsia-400 py-3 text-base font-black text-slate-950 shadow-lg">
+              <Glyph id="radio" label={false} className="h-5 w-5" />
+              生配信ブースへ
+            </button>
+          )}
         </div>
       </div>
 
-      {open?.kind === 'show' && <ShowPlayer show={open.show} onClose={() => setOpen(null)} />}
+      {open?.kind === 'show' && (
+        <ShowPlayer
+          show={open.show}
+          onClose={() => setOpen(null)}
+          onBooth={
+            open.show.mine
+              ? undefined
+              : () => {
+                  setVisit(open.show.host);
+                  setOpen(null);
+                }
+          }
+        />
+      )}
+      {visit && <HostBooth host={visit} onClose={() => setVisit(null)} onOpen={(show) => setOpen({ kind: 'show', show })} />}
       {open?.kind === 'live' && <LivePlayer live={open.live} onClose={() => setOpen(null)} />}
     </div>
+  );
+}
+
+function ShowGrid({ shows, onOpen }: { shows: RadioShowView[]; onOpen: (s: RadioShowView) => void }) {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {shows.map((s) => (
+        <button key={s.id} onClick={() => onOpen(s)} className="text-left">
+          <ShowArt url={s.thumbUrl} loop={s.loop} playing={false} />
+          <p className="mt-1.5 line-clamp-2 text-sm font-bold leading-snug">{s.title}</p>
+          <p className="text-xs text-white/55">
+            {s.host.displayName || s.host.handle}・{minutes(s.seconds)}
+          </p>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** someone's booth (M-R208): their shows back home after 88 hours on the air */
+function HostBooth({ host, onClose, onOpen }: { host: RadioShowView['host']; onClose: () => void; onOpen: (s: RadioShowView) => void }) {
+  const [list, setList] = useState<RadioShowView[] | null>(null);
+  useEffect(() => {
+    getApi()
+      .radioHostShows(host.id)
+      .then(setList)
+      .catch(() => setList([]));
+  }, [host.id]);
+  return (
+    <Sheet onClose={onClose}>
+      <p className="mb-3 text-base font-black">{host.displayName || host.handle}のブース</p>
+      {list === null ? (
+        <p className="py-6 text-center text-sm text-white/50">チューニング中…</p>
+      ) : list.length === 0 ? (
+        <p className="py-6 text-center text-xs text-white/55">まだ、帰ってきた番組はない。</p>
+      ) : (
+        <ShowGrid shows={list} onOpen={onOpen} />
+      )}
+    </Sheet>
   );
 }
 
@@ -205,7 +266,7 @@ export function SafetyMenu({ target, id, hostId, onBlocked }: { target: RadioRep
   );
 }
 
-function ShowPlayer({ show, onClose }: { show: RadioShowView; onClose: () => void }) {
+function ShowPlayer({ show, onClose, onBooth }: { show: RadioShowView; onClose: () => void; onBooth?: () => void }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [t, setT] = useState(0);
@@ -222,6 +283,10 @@ function ShowPlayer({ show, onClose }: { show: RadioShowView; onClose: () => voi
         }),
       );
     } else a.src = show.audioUrl;
+    // M-R208: coming near a wave makes it audible — it starts playing as the sheet opens (when the browser allows)
+    a.autoplay = true;
+    a.addEventListener('playing', () => setPlaying(true));
+    a.addEventListener('pause', () => setPlaying(false));
     const time = () => setT(a.currentTime);
     a.addEventListener('timeupdate', time);
     a.addEventListener('loadedmetadata', () => Number.isFinite(a.duration) && setDur(a.duration));
@@ -284,6 +349,11 @@ function ShowPlayer({ show, onClose }: { show: RadioShowView; onClose: () => voi
       </div>
       {failed && <p className="mt-2 text-center text-xs text-red-300">この番組は、今は聴けません</p>}
       <NowPlaying cue={cue} />
+      {onBooth && (
+        <button onClick={onBooth} className="mt-3 w-full rounded-full border border-white/15 py-2 text-xs text-white/75">
+          {show.host.displayName || show.host.handle}のブースへ
+        </button>
+      )}
     </Sheet>
   );
 }

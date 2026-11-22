@@ -301,6 +301,8 @@ export interface Api {
   createRadioShow(body: CreateRadioShowBody): Promise<RadioShowView>;
   /** your shows = Bluena's Venus folder */
   myRadioShows(): Promise<RadioShowView[]>;
+  /** someone's booth: their public shows back home after 88 hours on the air (M-R208) */
+  radioHostShows(hostId: string): Promise<RadioShowView[]>;
   publishRadioShow(id: string, on: boolean): Promise<RadioShowView>;
   removeRadioShow(id: string): Promise<void>;
   radioShow(id: string): Promise<RadioShowView>;

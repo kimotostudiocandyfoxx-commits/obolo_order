@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { AtelierLayout, PuniLook } from '@obolo/shared';
+import type { AtelierLayout, BuddySource, PuniLook } from '@obolo/shared';
 import {
   bigint,
   boolean,
@@ -193,6 +193,8 @@ export const buddyMessages = pgTable(
     text: text('text').notNull(),
     audioUrl: text('audio_url'),
     provider: text('provider'),
+    /** M-R208: the pages a looked-up answer is based on, or the picture {bati} drew (media URL) */
+    extraJson: jsonb('extra_json').$type<{ sources?: BuddySource[]; image?: { url: string; mediaId: string } }>(),
     ...timestamps,
   },
   (t) => [index('buddy_messages_user_idx').on(t.userId, t.createdAt)],

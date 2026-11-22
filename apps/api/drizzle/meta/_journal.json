@@ -246,6 +246,13 @@
       "when": 1795258811953,
       "tag": "0034_mana_chain",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1795312757548,
+      "tag": "0035_buddy_extras",
+      "breakpoints": true
     }
   ]
 }

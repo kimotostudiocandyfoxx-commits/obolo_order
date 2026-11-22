@@ -769,8 +769,32 @@ body {
 .radio-ripple-ring { animation: radio-ripple 3.6s ease-out infinite; }
 .radio-onair { animation: radio-onair 1.6s ease-in-out infinite; }
 .bluena-in { animation: bluena-slot 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+/* M-R208: Venus shows drift above the clouds as little radios for 88 hours; Saturn's DJ record turns */
+@keyframes radio-wave-drift {
+  0%, 100% { transform: translate(-50%, -50%) translate(-14px, 0); }
+  50% { transform: translate(-50%, -50%) translate(14px, -10px); }
+}
+@keyframes cloud-slide {
+  0%, 100% { transform: translateX(-3%); }
+  50% { transform: translateX(3%); }
+}
+@keyframes record-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes record-counter {
+  to { transform: translate(-50%, -50%) rotate(-360deg); }
+}
+@keyframes mine-glow {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(255, 214, 120, 0.9), 0 0 18px 6px rgba(255, 190, 90, 0.55); }
+  50% { box-shadow: 0 0 0 3px rgba(255, 214, 120, 0.6), 0 0 28px 10px rgba(255, 190, 90, 0.35); }
+}
+.radio-wave-drift { animation: radio-wave-drift 9s ease-in-out infinite; }
+.cloud-slide { animation: cloud-slide 22s ease-in-out infinite; }
+.record-spin { animation: record-spin 40s linear infinite; }
+.record-counter { animation: record-counter 40s linear infinite; }
+.mine-glow { animation: mine-glow 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .radio-drift, .radio-pulse, .radio-ripple-ring, .radio-onair, .bluena-in { animation: none; }
+  .radio-drift, .radio-pulse, .radio-ripple-ring, .radio-onair, .bluena-in, .radio-wave-drift, .cloud-slide, .record-spin, .record-counter, .mine-glow { animation: none; }
 }
 
 /* 月の工房: Bluena's gate opens, the square screen widens into the atelier (docs/工房とブルーナ_設計.md §3.2) */

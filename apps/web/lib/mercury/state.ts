@@ -1,5 +1,6 @@
 'use client';
 
+import { isFlying } from '@obolo/shared';
 import { useCallback } from 'react';
 import { useLocalState } from '@/lib/useLocalState';
 import { P, type Song } from './sea';
@@ -28,7 +29,8 @@ const DEMOS: Song[] = [
 ];
 
 const HOUR = 3600_000;
-export const atSea = (at: number, now = Date.now()) => now - at < 88 * HOUR;
+/** M-R208: one rule for every planet (packages/shared/src/flying.ts) */
+export const atSea = (at: number, now = Date.now()) => isFlying(at, now);
 export const hoursSince = (at: number, now = Date.now()) => Math.max(0, Math.floor((now - at) / HOUR));
 
 export function useMercury() {

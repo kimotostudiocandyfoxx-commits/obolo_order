@@ -1,5 +1,6 @@
 'use client';
 
+import { isFlying as flyingNow } from '@obolo/shared';
 import { useCallback, useEffect, useState } from 'react';
 import { getBlob, putBlob } from '@/lib/api/idb';
 import { useLocalState } from '@/lib/useLocalState';
@@ -90,7 +91,8 @@ export function useJupiter() {
   return { roots: state.roots, posts: state.posts, addFiles, post };
 }
 
-export const isFlying = (createdAt: number, now = Date.now()) => now - createdAt < 88 * HOUR;
+/** M-R208: one rule for every planet (packages/shared/src/flying.ts) */
+export const isFlying = (createdAt: number, now = Date.now()) => flyingNow(createdAt, now);
 export const hoursSince = (createdAt: number, now = Date.now()) => Math.max(0, Math.floor((now - createdAt) / HOUR));
 
 /** Object URL for a stored file (revoked on unmount). */

@@ -133,5 +133,5 @@ export const SAILORS: Sailor[] = [
   },
 ];
 
-export const FLY_HOURS = 88;
+export { PLANET_FLY_HOURS as FLY_HOURS } from '@obolo/shared';
 export const fmt = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;

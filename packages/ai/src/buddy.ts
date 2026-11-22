@@ -1,8 +1,8 @@
 import type { BuddyPersona, Locale } from '@obolo/shared';
 import { LlmRefusalError } from './claude';
-import { BATI_CHARACTER, BATI_DANGER, BATI_ONE_CALL, BATI_SORT, BATI_WORRY, personaToneLines } from './prompts/bati';
+import { BATI_CHARACTER, BATI_DANGER, BATI_SEARCH, BATI_WORRY, batiOneCallRules, batiSort, personaToneLines, type BatiAbilities } from './prompts/bati';
 import { MEMORY_SUMMARY_PROMPT } from './prompts/memory';
-import type { ChatTurn, LlmProvider } from './types';
+import type { ChatTurn, LlmProvider, WebSource } from './types';
 
 export interface BuddyContext {
   buddyName: string;
@@ -33,10 +33,23 @@ export async function buddyReply(llm: LlmProvider, ctx: BuddyContext, history: C
 
 export type BuddyAnswerKind = 'normal' | 'worry' | 'danger';
 
+/** Bati's answer: the text, its kind, and (M-R208) the pages it was looked up on or the picture it will draw */
+export interface BuddyAnswer {
+  text: string;
+  kind: BuddyAnswerKind;
+  /** a searched answer: the pages it is based on (shown as links under the bubble) */
+  sources?: WebSource[];
+  /** web searches it took (cost; counted against the day's cap) */
+  searches?: number;
+  /** "show me / draw …": what to draw, in short English (the caller moderates it and paints it) */
+  draw?: string;
+}
+
 /**
  * Bati's answer and what kind of question it was (a worry or a danger shows no 〔🖼 絵で見る〕). The sorting runs next
  * to the ordinary answer, so an ordinary question is not slower; a worry or a danger is answered again with its own
- * short prompt (story chat's generation test 1, F・G).
+ * short prompt (story chat's generation test 1, F・G). M-R208: the same sorting says when to look it up on the web
+ * (`can.search`) or draw a picture (`can.draw`); a worry or a danger never is.
  */
 export async function buddyAnswer(
   llm: LlmProvider,
@@ -44,28 +57,78 @@ export async function buddyAnswer(
   history: ChatTurn[],
   /** the ordinary answer as it is written (one-call providers that stream); a worry / danger comes whole at the end */
   onText?: (piece: string) => void,
-): Promise<{ text: string; kind: BuddyAnswerKind }> {
-  if (llm.oneCall) return buddyAnswerOneCall(llm, ctx, history, onText);
+  can: BatiAbilities = {},
+): Promise<BuddyAnswer> {
+  const abilities = { search: !!can.search && !!llm.search, draw: !!can.draw };
+  if (llm.oneCall) return buddyAnswerOneCall(llm, ctx, history, onText, abilities);
   const last = history[history.length - 1]?.text ?? '';
-  const [kind, plain] = await Promise.all([
+  const [sorted, plain] = await Promise.all([
     llm
-      .chat({ system: BATI_SORT, history: [{ role: 'user', text: last }], temperature: 0, maxOutputTokens: 20 })
-      .then((o): BuddyAnswerKind => (/worry/i.test(o) ? 'worry' : /danger/i.test(o) ? 'danger' : 'normal'))
-      .catch((): BuddyAnswerKind => 'normal'),
+      .chat({ system: batiSort(abilities), history: [{ role: 'user', text: last }], temperature: 0, maxOutputTokens: 50 })
+      .then(readSort)
+      .catch((): Sorted => ({ kind: 'normal' })),
     llm.chat({ system: buildBuddySystemPrompt(ctx), history, temperature: 0.6, maxOutputTokens: 600 }),
   ]);
-  if (kind === 'normal') return { text: tidyAnswer(plain), kind };
+  const { kind } = sorted;
+  if (kind === 'normal') {
+    if (sorted.want === 'search' && abilities.search) {
+      const found = await searched(llm, ctx, history);
+      if (found) return found;
+    }
+    if (sorted.want === 'draw' && abilities.draw && sorted.draw) return { text: drawLine(ctx.locale), kind, draw: sorted.draw };
+    return { text: tidyAnswer(plain), kind };
+  }
   const own = (kind === 'worry' ? BATI_WORRY : BATI_DANGER)[ctx.locale].replaceAll('{name}', ctx.buddyName);
   const text = await llm.chat({ system: own, history: [{ role: 'user', text: last }], temperature: 0.3, maxOutputTokens: 300 }).catch(() => '');
   return { text: tidyAnswer(text, kind) || fallbackAnswer(kind, ctx.locale), kind };
 }
 
+type Sorted = { kind: BuddyAnswerKind; want?: 'search' | 'draw'; draw?: string };
+
+/** the sorting's one word ("worry" / "danger" / "search" / "draw: …" / "normal") */
+export function readSort(out: string): Sorted {
+  const t = out.trim().replace(/^["'`\[]+/, '');
+  const word = /^(\w+)/.exec(t)?.[1]?.toLowerCase() ?? '';
+  if (word === 'worry' || (!word && /worry/i.test(t))) return { kind: 'worry' };
+  if (word === 'danger') return { kind: 'danger' };
+  if (word === 'search') return { kind: 'normal', want: 'search' };
+  if (word === 'draw') {
+    const draw = cleanDraw(t.replace(/^draw\s*\]?\s*[:：-]?\s*/i, ''));
+    return draw ? { kind: 'normal', want: 'draw', draw } : { kind: 'normal' };
+  }
+  if (word === 'normal') return { kind: 'normal' };
+  return /worry/i.test(t) ? { kind: 'worry' } : /danger/i.test(t) ? { kind: 'danger' } : { kind: 'normal' };
+}
+
+/** what to draw: one line, no quotes, at most 160 characters */
+function cleanDraw(s: string): string {
+  return s.split(/\r?\n/)[0].replace(/["「」`]/g, '').trim().slice(0, 160);
+}
+
+function drawLine(locale: 'ja' | 'en'): string {
+  return locale === 'en' ? 'I drew it for you!' : '絵を描いてみたよ！';
+}
+
+/** the searched answer (M-R208); null when the search failed (the caller answers without it) */
+async function searched(llm: LlmProvider, ctx: BuddyContext, history: ChatTurn[]): Promise<BuddyAnswer | null> {
+  if (!llm.search) return null;
+  try {
+    const r = await llm.search({ system: `${buildBuddySystemPrompt(ctx)}\n\n${BATI_SEARCH[ctx.locale]}`, history, temperature: 0.3, maxOutputTokens: 400 });
+    const text = tidyAnswer(r.text);
+    return text ? { text, kind: 'normal', sources: r.sources, searches: r.searches } : null;
+  } catch (err) {
+    if (err instanceof LlmRefusalError) return { text: fallbackAnswer('danger', ctx.locale), kind: 'danger' };
+    return null;
+  }
+}
+
 /**
  * Claude (client decision 2026-11-21): the kind on the first line, the answer after it — one call instead of three.
- * A refusal (Haiku 5.5 has no server-side fallback) gets Bati's own safe answer.
+ * A refusal (Haiku 5.5 has no server-side fallback) gets Bati's own safe answer. `[search]` is answered by a second
+ * call with the web search tool (only those messages); `[draw] …` carries what to draw on its first line.
  */
-async function buddyAnswerOneCall(llm: LlmProvider, ctx: BuddyContext, history: ChatTurn[], onText?: (piece: string) => void): Promise<{ text: string; kind: BuddyAnswerKind }> {
-  const system = `${buildBuddySystemPrompt(ctx)}\n\n${BATI_ONE_CALL[ctx.locale]}`;
+async function buddyAnswerOneCall(llm: LlmProvider, ctx: BuddyContext, history: ChatTurn[], onText: ((piece: string) => void) | undefined, can: BatiAbilities): Promise<BuddyAnswer> {
+  const system = `${buildBuddySystemPrompt(ctx)}\n\n${batiOneCallRules(ctx.locale, can)}`;
   const req = { system, history, maxOutputTokens: 400 };
   const split = new TaggedSplitter(onText);
   let raw: string;
@@ -78,26 +141,59 @@ async function buddyAnswerOneCall(llm: LlmProvider, ctx: BuddyContext, history: 
     }
     throw err;
   }
-  const { kind, body } = parseTagged(raw);
+  const { kind, body, want, draw } = parseTagged(raw);
+  if (want === 'search') {
+    const found = can.search ? await searched(llm, ctx, history) : null;
+    if (found) {
+      onText?.(found.text);
+      return found;
+    }
+    // no search (the day's searches are used, or it failed): an ordinary answer from what Bati knows
+    const plain = tidyAnswer(body) || tidyAnswer(await llm.chat({ system: buildBuddySystemPrompt(ctx), history, maxOutputTokens: 300 }).catch(() => ''));
+    const text = plain || (ctx.locale === 'en' ? "Hmm, I couldn't find out right now." : 'うーん、いまは、うまく調べられなかった。');
+    onText?.(text);
+    return { text, kind: 'normal' };
+  }
+  if (want === 'draw') {
+    const text = tidyAnswer(body) || drawLine(ctx.locale);
+    return can.draw && draw ? { text, kind, draw } : { text: tidyAnswer(body) || noMoreDrawing(ctx.locale), kind };
+  }
   return { text: tidyAnswer(body, kind) || (kind === 'normal' ? tidyAnswer(raw) : fallbackAnswer(kind, ctx.locale)), kind };
 }
 
-const TAG = /^\s*\[?\s*(normal|worry|danger)\s*\]?[ \t]*(?:\r?\n|$)/i;
+function noMoreDrawing(locale: 'ja' | 'en'): string {
+  return locale === 'en' ? "I can't draw any more today. Let's draw tomorrow!" : '今日は、もう絵を描けないんだ。また明日ね。';
+}
 
-/** "[worry]\n…" → the kind and the answer; no tag = an ordinary answer */
-export function parseTagged(raw: string): { kind: BuddyAnswerKind; body: string } {
+// "[kind] same-line text" with brackets, or the bare word alone on its line (an answer starting "Search engines…" is no tag)
+const TAG = /^\s*(?:\[\s*(normal|worry|danger|search|draw)\s*\][ \t]*([^\r\n]*)|(normal|worry|danger|search)[ \t]*)(?:\r?\n|$)/i;
+
+/**
+ * "[worry]\n…" → the kind and the answer; no tag = an ordinary answer. "[search]" asks for a web search,
+ * "[draw] <what to draw>" for a picture (both ordinary).
+ */
+export function parseTagged(raw: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw'; draw?: string } {
   const m = TAG.exec(raw);
   if (!m) return { kind: 'normal', body: raw.trim() };
-  return { kind: m[1].toLowerCase() as BuddyAnswerKind, body: raw.slice(m[0].length).trim() };
+  const tag = (m[1] ?? m[3]).toLowerCase();
+  const line = m[2] ?? '';
+  const rest = raw.slice(m[0].length);
+  if (tag === 'search') return { kind: 'normal', body: `${line}\n${rest}`.trim(), want: 'search' };
+  if (tag === 'draw') {
+    const draw = cleanDraw(line);
+    return draw ? { kind: 'normal', body: rest.trim(), want: 'draw', draw } : { kind: 'normal', body: rest.trim() };
+  }
+  return { kind: tag as BuddyAnswerKind, body: `${line}\n${rest}`.trim() };
 }
 
 /**
  * Reads the stream: holds the first line until the kind is known, then lets an ordinary answer through (a worry or a
- * danger is not streamed — it may still be swapped for the safe answer). The opening research phrase is held back
- * until it can be cut, and emoji never go out.
+ * danger is not streamed — it may still be swapped for the safe answer; a search is answered later). The opening
+ * research phrase is held back until it can be cut, and emoji never go out.
  */
 export class TaggedSplitter {
   kind: BuddyAnswerKind | null = null;
+  want: 'search' | 'draw' | undefined;
   private head = '';
   private held = '';
   private flowing = false;
@@ -106,16 +202,18 @@ export class TaggedSplitter {
     if (this.kind === null) {
       this.head += piece;
       const nl = this.head.indexOf('\n');
-      // no tag at all after a few words: it is an ordinary answer
-      if (nl < 0 && this.head.length < 24) return;
-      const { kind } = parseTagged(this.head);
-      this.kind = kind;
-      const rest = TAG.test(this.head) ? this.head.replace(TAG, '') : this.head;
+      // no tag at all after a few words: it is an ordinary answer ("[draw] …" waits for its whole first line)
+      if (nl < 0 && (this.head.length < 24 || (/^\s*\[?\s*draw/i.test(this.head) && this.head.length < 400))) return;
+      const p = parseTagged(this.head);
+      this.kind = p.kind;
+      this.want = p.want;
+      const m = TAG.exec(this.head);
+      const rest = m ? `${p.want === 'draw' ? '' : (m[2] ?? '')}${this.head.slice(m[0].length)}` : this.head;
       this.head = '';
-      if (kind === 'normal') this.feed(rest);
+      if (this.kind === 'normal' && this.want !== 'search') this.feed(rest);
       return;
     }
-    if (this.kind === 'normal') this.feed(piece);
+    if (this.kind === 'normal' && this.want !== 'search') this.feed(piece);
   }
   private feed(piece: string) {
     if (!this.onText) return;

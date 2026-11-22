@@ -43,6 +43,12 @@ export class RadioController {
     return this.radio.myShows(userId);
   }
 
+  /** someone's booth: their public shows that came home after 88 hours on the air (M-R208) */
+  @Get('hosts/:id/shows')
+  hostShows(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string) {
+    return this.radio.hostShows(userId, id);
+  }
+
   @Post('shows')
   async createShow(@UserId() userId: string, @Body() body: unknown) {
     await rateLimit(this.kv, `radio-show:${userId}`, 20, 3600);

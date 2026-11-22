@@ -12,6 +12,7 @@ import {
   type RadioReportBody,
   type RadioShowView,
   type StartRadioLiveBody,
+  isFlying,
   type DeliveryView,
   EMPTY_ATELIER,
   type AtelierLayout,
@@ -152,6 +153,8 @@ function seedRadioShows(): NonNullable<DemoState['radioShows']> {
   return [
     { id: crypto.randomUUID(), title: 'ボスGの真夜中バナナ放送', thumbUrl: '/onboarding/bossg.webp', loop: 'drift', audioUrl: '/onboarding/bgm-venus.m4a', seconds: 95, cues: [{ at: 4, songId: 'sample-venus', title: '金星のテーマ', by: 'ゴリラ3人組', byId: null }], status: 'public', source: 'recorded', createdAt: at(5), publishedAt: at(5), owner: 'seed-bossg' },
     { id: crypto.randomUUID(), title: 'ロングGの歯みがきラジオ', thumbUrl: '/onboarding/longg.webp', loop: 'ripple', audioUrl: '/onboarding/bgm-dj-practice.m4a', seconds: 60, cues: [{ at: 0, songId: 'sample-practice', title: '練習用のリズム', by: 'OBOLO', byId: null }], status: 'public', source: 'live', createdAt: at(30), publishedAt: at(30), owner: 'seed-longg' },
+    // back in its owner's booth (more than 88 hours since it was published, M-R208)
+    { id: crypto.randomUUID(), title: 'ボスGの朝のバナナ体操', thumbUrl: '/onboarding/bossg.webp', loop: 'pulse', audioUrl: '/onboarding/bgm-venus.m4a', seconds: 80, cues: [], status: 'public', source: 'recorded', createdAt: at(120), publishedAt: at(120), owner: 'seed-bossg' },
   ];
 }
 function seedRadioLives(): NonNullable<DemoState['radioLives']> {
@@ -1417,8 +1420,9 @@ export class DemoApi implements Api {
     await sleep(150);
     return {
       live: this.rLives().filter((l) => l.status === 'live').map((l) => this.rLiveView(l, viewer)),
+      // M-R208: on the air (waves above the clouds) for 88 hours after publishing, then back in the owner's booth
       shows: this.rShows()
-        .filter((r) => r.status === 'public')
+        .filter((r) => r.status === 'public' && isFlying(r.publishedAt))
         .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
         .map((r) => this.rShowView(r, viewer)),
     };
@@ -1463,6 +1467,14 @@ export class DemoApi implements Api {
     return this.rShowView(r, viewer);
   }
 
+  async radioHostShows(hostId: string) {
+    const viewer = this.uid();
+    return this.rShows()
+      .filter((r) => r.owner === hostId && r.status === 'public' && r.publishedAt && !isFlying(r.publishedAt))
+      .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
+      .map((r) => this.rShowView(r, viewer));
+  }
+
   async myRadioShows() {
     const viewer = this.uid();
     return this.rShows()
@@ -1475,7 +1487,8 @@ export class DemoApi implements Api {
     const r = this.rShows().find((x) => x.id === id && x.owner === viewer);
     if (!r) throw new ApiError(404, 'NOT_FOUND', 'Not found');
     r.status = on ? 'public' : 'private';
-    if (on) r.publishedAt = now();
+    // M-R208: "when it was flown" is the first publishing; hiding and showing it again does not fly it again
+    if (on) r.publishedAt ??= now();
     this.save();
     return this.rShowView(r, viewer);
   }

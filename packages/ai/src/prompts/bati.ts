@@ -96,3 +96,75 @@ export function personaToneLines(p: BuddyPersona, locale: 'ja' | 'en'): string {
   const t = locale === 'ja' ? ja : en;
   return [t.cheer[lv(p.cheer)], t.polite[lv(p.polite)], t.humor[lv(p.humor)]].join('\n');
 }
+
+/** what Bati may do for this message (M-R208): look it up on the web, draw a picture — off when the day's cap is used */
+export interface BatiAbilities {
+  search?: boolean;
+  draw?: boolean;
+}
+
+/**
+ * The one-call rules plus the two extra kinds (M-R208): `[search]` (a fact to look up: the answer comes from a web
+ * search afterwards, so nothing else is written) and `[draw] <English description>` (a picture: the reply line
+ * follows). Both are kinds of an ordinary message: a worry or a danger is never searched or drawn.
+ */
+export function batiOneCallRules(locale: 'ja' | 'en', can: BatiAbilities = {}): string {
+  const base = BATI_ONE_CALL[locale];
+  const extra: string[] = [];
+  if (locale === 'ja') {
+    extra.push('【調べる・絵を描く】');
+    if (can.search)
+      extra.push(
+        '- [search]：確かめないと正しく答えられない事実の質問（今の出来事・ニュース・天気・試合の結果・値段・日付や数字・人や会社・お店や場所のこと、ボクが確かでないこと）。[search] の時は、その1行だけを書き、ほかには何も書かない（このあと調べてから答える）。だれでも知っているふつうのこと（パンダは何を食べるの？など）は [normal]。',
+      );
+    else extra.push('- 今日は、もう調べものはできない。事実の質問も [normal] で、知っていることだけで答え、確かでなければ「よくわからなかった」と言う。');
+    if (can.draw)
+      extra.push(
+        '- [draw]：「〜の絵を見せて」「〜を描いて」「〜ってどんな見た目？」など、絵を見たい時。1行目に [draw] と、描くものを英語で短く（12語まで、子ども向けで安全な内容）同じ行に書く（例：[draw] a giant panda eating bamboo in a forest）。2行目から、絵をわたす一言を1文で（例：パンダの絵を描いてみたよ！）。',
+      );
+    else extra.push('- 今日は、もう絵を描けない。絵を頼まれたら [normal] で「今日は、もう絵を描けないんだ。また明日ね」とやさしく答える。');
+    extra.push('- [worry] や [danger] の言葉は、[search] にも [draw] にもしない。実在の人の顔・こわい絵・大人向けの絵は描かない（[normal] で、やさしく断る）。');
+  } else {
+    extra.push('[Looking up and drawing]');
+    if (can.search)
+      extra.push(
+        '- [search]: a factual question that must be checked to answer correctly (current events, news, weather, results, prices, dates and numbers, people, companies, shops and places, anything you are not sure about). For [search] write only that one line and nothing else (you will answer after a web search). Everyday knowledge ("what do pandas eat?") is [normal].',
+      );
+    else extra.push('- No more looking things up today: factual questions are [normal]; answer from what you know and say so when you are not sure.');
+    if (can.draw)
+      extra.push(
+        '- [draw]: the user wants to see a picture ("show me a picture of…", "draw…", "what does … look like?"). On the first line write [draw] and, on the same line, what to draw in short English (12 words at most, child-safe), e.g. "[draw] a giant panda eating bamboo in a forest". From the second line, one sentence handing over the picture.',
+      );
+    else extra.push('- No more pictures today: if asked to draw, answer [normal] and kindly say you cannot draw any more today.');
+    extra.push('- Never [search] or [draw] a worry or a danger. Do not draw real people, scary or grown-up pictures (answer [normal] and kindly decline).');
+  }
+  return `${base}\n${extra.join('\n')}`;
+}
+
+/**
+ * The ordinary chain's sorting (Gemini; M-R208): the three kinds plus "search" and "draw: <English description>".
+ * The answer is written next to it as before; a search replaces it with the searched answer.
+ */
+export function batiSort(can: BatiAbilities = {}): string {
+  const extra: string[] = [];
+  if (can.search)
+    extra.push('"search": inside "normal", a factual question that must be checked or is current — news, weather, results, prices, dates, numbers, people, companies, shops, places. Not everyday knowledge (パンダは何を食べるの？ is normal).');
+  if (can.draw)
+    extra.push('"draw: <what to draw, short child-safe English>": inside "normal", the child wants to see a picture (〜の絵を見せて / 〜を描いて / 〜ってどんな見た目？), e.g. draw: a giant panda eating bamboo. Never real people, scary or grown-up pictures (those are normal).');
+  if (!extra.length) return BATI_SORT;
+  return `${BATI_SORT}\n${extra.join('\n')}\nworry and danger always come before search and draw.`;
+}
+
+/** the searched answer (M-R208): the same Bati, the found pages as the only ground, the links shown by the app */
+export const BATI_SEARCH = {
+  ja: `【調べて答える】
+いま、ウェブで調べた結果をもとに答える。
+- 調べてわかったことだけを、子どもにもわかる言葉で、2文まで・90字くらいまで。数字や名前は、調べた結果にあるものだけ。
+- 前置き（「調べたよ」など）、URL、サイトの名前、箇条書き、絵文字は書かない（見たページは、画面にリンクで出る）。
+- 子どもに向かない話（こわすぎること・暴力・大人向けのこと）は、やさしくぼかす。はっきりしなければ「よくわからなかった」と正直に言う。`,
+  en: `[Answer from a web search]
+Answer from what the web search found.
+- Only what the search found, in words a child understands, two sentences at most. Numbers and names only from the results.
+- No opener ("I looked it up"), no URLs, no site names, no bullet points, no emoji (the pages are shown as links).
+- Soften anything not for children. If it is unclear, honestly say you could not find out.`,
+} as const;

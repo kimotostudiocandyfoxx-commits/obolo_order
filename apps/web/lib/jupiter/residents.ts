@@ -76,4 +76,4 @@ export const RESIDENTS: Resident[] = [
   { id: 'ookami_night', handle: 'ookami_night', emoji: '🐺', wing: '#9fb1d6', friend: false, fruits: 5, friends: 230, posts: [p('🌌', 240, '星がふってきそう', 86, 'walk'), ...leaves(44)] },
 ];
 
-export const FLY_HOURS = 88;
+export { PLANET_FLY_HOURS as FLY_HOURS } from '@obolo/shared';

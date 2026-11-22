@@ -164,6 +164,11 @@ const Env = z.object({
   MUSIC_URL: secret(),
 
   BUDDY_FREE_DAILY: z.coerce.number().default(30),
+  /** M-R208: web searches {bati} may make for one member a day (each ~1–5 yen), and for everyone together (cost ceiling) */
+  BUDDY_SEARCH_DAILY: z.coerce.number().default(30),
+  BUDDY_SEARCH_GLOBAL_DAILY: z.coerce.number().default(5000),
+  /** M-R208: pictures {bati} draws in the chat for one member a day (~4–6 yen each) */
+  BUDDY_DRAW_DAILY: z.coerce.number().default(10),
   /** Spec §2.2 overage (1 MANA/msg). Demo: billing off → blocked after the quota. */
   BUDDY_OVERAGE_ENABLED: bool(false),
   /** The first mana gem credited on sign-up (story M-R132, about 40; the operator decides — STARTER_GEM_MANA). */
