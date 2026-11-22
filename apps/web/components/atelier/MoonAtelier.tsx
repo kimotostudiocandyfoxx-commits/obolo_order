@@ -32,7 +32,7 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
   return (
     <main className="pt-safe relative mx-auto flex h-svh max-w-xl flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
       {/* one bar: the talk's own (← back, the conversations, {bati}, Bluena) — no page header above it */}
-      <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={() => router.back()} />
+      <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={() => router.back()} open={params.get('thread') ? { thread: params.get('thread')!, day: params.get('day') ?? undefined } : undefined} />
       {gate && <Gate onSkip={() => setGate(false)} />}
     </main>
   );

@@ -60,6 +60,21 @@ const REPLIES = ['えっ、本当！？ すごいね！ ……でも、むりは
 const LONG_TEXT =
   'ビッグバンは、だいたい138億年前に起きたと考えられているよ。はじめは、とても小さくて、とても熱いところから、宇宙がいっきにふくらんだんだって。そのあと、だんだん冷えて、星や銀河ができていったんだ。いまも宇宙はふくらみつづけていて、遠くの銀河ほど、速く遠ざかっているんだよ。夜空の星の光は、何年も、何万年も前に出た光なんだ。だから、星を見るのは、むかしの宇宙を見ていることになるんだね。';
 
+/** M-R237 in the left drawer: the conversations (a ring while few) and each one's past days (stand-ins) */
+const THREADS = [
+  { id: 'bati', name: 'ウニュ', avatar: '/talk/bati/stand.webp' },
+  { id: 'dachi', name: 'アポロ', avatar: '/story/avatars/kimorin.webp', unread: 1 },
+  { id: 'group', name: '土星のサイファー仲間' },
+  { id: 'news', name: '結社のお知らせ', avatar: '/ui/bluena-icon.webp' },
+];
+const FIRSTS = ['おはよ、ネオ！', '土星の輪は氷なんだって', 'コロリン、作ったよ', '今日は月が近いね', 'ビッグバンの話して', '眠れない夜だった', '新しい曲、聴いて', '木星に行ってみたい', 'ありがとう、ウニュ', 'また明日ね'];
+const COLORS = { bati: BATI_COLOR, dachi: DACHI_COLOR, group: '#b98790', news: '#87a3c2' } as Record<string, string>;
+const demoDays = (thread: string) =>
+  FIRSTS.map((t, k) => {
+    const d = new Date(Date.now() - (k + 1) * 86_400_000 * (thread === 'bati' ? 1 : 2));
+    return { id: `${thread}-${k}`, at: d.toISOString(), color: k % 3 === 1 ? SELF_COLOR : (COLORS[thread] ?? BATI_COLOR), title: t, sub: `${d.getMonth() + 1}/${d.getDate()}`, stars: k % 4 === 0 ? 1 : 0 };
+  });
+
 export default function TalkReview() {
   return (
     <Suspense>
@@ -182,7 +197,7 @@ function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
         top={0}
         // M-R239: the ダチ scene opens with two unread lines (the last read one and the unread ones play in a row)
         unreadFrom={scene === 'dachi' ? 2 : scene === 'live' ? HISTORY.length : undefined}
-        bar={{ title: group ? '' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', onBluena: () => undefined }}
+        bar={{ title: group ? '' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', onBluena: () => undefined, threads: { list: THREADS, current: group ? 'group' : scene === 'dachi' ? 'dachi' : 'bati', days: demoDays } }}
         composer={<TalkComposer placeholder="ことばで話す" onSend={send} onState={(s) => setState((o) => (scene === 'kb' ? { ...s, keyboard: true } : s))} initial={scene === 'kb' ? '土星の輪は' : ''} startTyping={scene === 'kb'} />}
       />
       {scene === 'live' && !bare && (

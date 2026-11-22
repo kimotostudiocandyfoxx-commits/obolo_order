@@ -277,6 +277,7 @@ export function ThreadsDrawer({
   onNew,
   onDay,
   onClose,
+  extra,
 }: {
   bati: { name: string; face: string };
   threads: ThreadInfo[];
@@ -288,6 +289,8 @@ export function ThreadsDrawer({
   /** open one day of a thread's past talk */
   onDay: (thread: string, day: string) => void;
   onClose: () => void;
+  /** above the threads (a talk's settings, the looks …) */
+  extra?: React.ReactNode;
 }) {
   const all = [{ id: 'bati', name: bati.name, avatar: bati.face }, ...threads.filter((t) => t.id !== 'bati')];
   const [sel, setSel] = useState(current || 'bati');
@@ -324,6 +327,7 @@ export function ThreadsDrawer({
   const pick = all.find((t) => t.id === sel) ?? all[0];
   return (
     <Drawer side="left" onClose={onClose} label="会話">
+      {extra}
       {ring ? (
         <ThreadRing all={all} sel={sel} onPick={(id) => (id === sel ? onThread(id) : setSel(id))} />
       ) : (
@@ -354,7 +358,7 @@ export function ThreadsDrawer({
 }
 
 /** the threads as a ring of faces (few to choose from: round, M-R236 §1); a drag turns it, a tap on the chosen one opens it */
-function ThreadRing({ all, sel, onPick }: { all: { id: string; name: string; avatar?: string; unread?: number }[]; sel: string; onPick: (id: string) => void }) {
+export function ThreadRing({ all, sel, onPick }: { all: { id: string; name: string; avatar?: string; unread?: number }[]; sel: string; onPick: (id: string) => void }) {
   const [spin, setSpin] = useState(0);
   const drag = useRef<{ x: number; spin: number; moved: number } | null>(null);
   const n = all.length;
@@ -402,7 +406,7 @@ function ThreadRing({ all, sel, onPick }: { all: { id: string; name: string; ava
   );
 }
 
-function Face({ src, name, size, glow }: { src?: string; name?: string; size: number; glow?: boolean }) {
+export function Face({ src, name, size, glow }: { src?: string; name?: string; size: number; glow?: boolean }) {
   return (
     <span className="relative block shrink-0 overflow-hidden rounded-full bg-white/10" style={{ width: size, height: size, boxShadow: glow ? '0 0 0 2px #f2c46b, 0 0 16px rgba(242,196,107,0.6)' : '0 0 0 1px rgba(255,255,255,0.15)' }}>
       {src ? (
@@ -415,7 +419,7 @@ function Face({ src, name, size, glow }: { src?: string; name?: string; size: nu
   );
 }
 
-function Drawer({ side, label, onClose, children }: { side: 'left' | 'right'; label: string; onClose: () => void; children: React.ReactNode }) {
+export function Drawer({ side, label, onClose, children }: { side: 'left' | 'right'; label: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="absolute inset-0 z-40 bg-black/40" onClick={onClose}>
       <aside

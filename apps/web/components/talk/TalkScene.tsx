@@ -4,6 +4,8 @@ import { ruleBeats, talkChunks, talkPlain, talkRuns, talkSentences, type TalkMar
 import { holdProps, StarButton } from '@/components/finds/MarkRing';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Figure, TALK_CSS, type FigureState } from './Figure';
+import { AppThreads, HereThreads, type TalkThread } from './TalkThreads';
+import type { SpiralRow } from '@/components/finds/SpiralList';
 import { SELF_TONES, TONES, toneOf, type TalkTone } from '@/lib/talk/looks';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
@@ -176,6 +178,8 @@ export function TalkScene({
     right?: ReactNode;
     /** at the top of this talk's own drawer (settings, the looks …) */
     drawer?: ReactNode;
+    /** this talk's own drawer: 'app' = the signed-in app's threads (choosing one goes to the atelier); else the threads given */
+    threads?: 'app' | { list: TalkThread[]; current: string; days?: (thread: string) => SpiralRow[] };
   };
   /** 「画面を押すと、次の言葉へ進みます」 while lines are played in a row */
   hint?: boolean;
@@ -483,6 +487,19 @@ export function TalkScene({
   const [opened, setOpened] = useState<TalkItem | null>(null);
   const [big, setBig] = useState<TalkItem | null>(null);
   const [drawer, setDrawer] = useState(false);
+  // this talk's past for the drawer: one row an utterance (today), the dot in the speaker's colour
+  const pastRows: SpiralRow[] = drawer
+    ? visible.map((it, k) => {
+        const t = toneFor(byId.get(it.who));
+        return { id: it.id, at: new Date(Date.now() - (visible.length - k) * 60_000).toISOString(), color: t.line, title: talkPlain(it.text) || (it.voice ? '♪ 声' : (it.card?.label ?? '')), sub: it.name ?? byId.get(it.who)?.name };
+      })
+    : [];
+  // typing: <html data-typing> (a review page's build stamp steps out of the input's way)
+  useEffect(() => {
+    if (!keyboard) return;
+    document.documentElement.dataset.typing = '1';
+    return () => void delete document.documentElement.dataset.typing;
+  }, [keyboard]);
 
   // M-R242 the camera: while a line plays it moves in toward the one speaking (the stage to 1.1 from their side, 3% their
   // way, 0.9 s; the place 1.5% and 1.07, 1.2 s — parallax) and eases back 0.7 s after the line; none in the past
@@ -498,23 +515,37 @@ export function TalkScene({
   const { w, h } = size;
   const barH = bar ? 62 : 0;
   const dockH = keyboard ? 64 : 110;
-  const chest = keyboard || n >= 6;
+  const chest = keyboard;
   // the pair stands low (design/talk/proto.html): at most 46% of the height (420 px), each 40% wide with 6% between;
   // the pictures share one canvas with headroom for raised arms, so the heads are about 16% down into it
   const stageH = chest ? Math.min(h * 0.26, 220) : Math.min(h * 0.46, 420);
   const stageTop = h - dockH - stageH;
-  const rows = n >= 6 ? [row.slice(0, Math.ceil(n / 2)), row.slice(Math.ceil(n / 2))] : [row];
-  const spots = new Map<string, { x: number; bottom: number; h: number; z: number; w: number }>();
+  // a big group (5 or more): at most four full length in the front row, large and low (you at the right end, the one
+  // speaking — or who spoke last — steps into it); the rest behind them, smaller, higher, chest up, each between two
+  // of the front (staggered by half, not squeezed)
+  const lead = talkingId ?? shown[shown.length - 1]?.item.who ?? null;
+  let rows: TalkPerson[][] = [row];
+  if (n >= 5) {
+    const others = self ? row.slice(0, -1) : row;
+    let front = others.slice(0, self ? 3 : 4);
+    if (lead && lead !== self?.id && !front.some((p) => p.id === lead)) front = [...front.slice(0, -1), others.find((p) => p.id === lead)!];
+    front = others.filter((p) => front.includes(p));
+    rows = [others.filter((p) => !front.includes(p)), self ? [...front, self] : front];
+  }
+  const spots = new Map<string, { x: number; bottom: number; h: number; z: number; w: number; chest: boolean }>();
   rows.forEach((r, ri) => {
-    const front = ri === rows.length - 1;
-    const back = rows.length > 1 && !front;
-    const hh = n <= 2 ? stageH : stageH * (back ? 0.62 : rows.length > 1 ? 0.7 : n <= 3 ? 0.86 : 0.72);
+    const back = rows.length > 1 && ri === 0;
+    const fn = rows[rows.length - 1].length;
+    const hh = n <= 2 ? stageH : back ? stageH * 0.27 : stageH * (n <= 3 ? 0.86 : 0.72);
     r.forEach((p, k) => {
-      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? 0.5 : (k + 0.5 + (back ? 0.25 : 0)) / (r.length + (back ? 0.5 : 0));
-      spots.set(p.id, { x, bottom: back ? stageH * 0.42 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : 0.9 / r.length });
+      // the back row sits in the gaps of the front one (between 1–2, 2–3, 3–4, then the ends)
+      const gap = [1, 2, 3, 0, 4][k % 5];
+      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? 0.5 : back ? gap / fn : (k + 0.5) / r.length;
+      spots.set(p.id, { x: Math.min(0.93, Math.max(0.07, x)), bottom: back ? stageH * 0.52 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : back ? 0.2 : 0.9 / r.length, chest: chest || back });
     });
   });
-  const heads = stageTop + stageH * (chest ? 0.1 : 0.16) * (rows.length > 1 ? 0.5 : 1);
+  // with the keyboard up the bubbles sit over the canvas's top edge, clear of the two faces
+  const heads = chest ? stageTop - 6 : stageTop + stageH * 0.16 * (rows.length > 1 ? 0.5 : 1);
   // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
   const room = Math.max(120, heads - (barH + top + 56) - 48);
   const bubbleBottom = h - heads + 8;
@@ -642,7 +673,7 @@ export function TalkScene({
                 motionKey={past ? 0 : (react[p.id]?.key ?? 0)}
                 toward={p.self ? 'left' : 'right'}
                 height={s.h}
-                chest={chest}
+                chest={s.chest}
                 // the two breathe at their own pace (in step would look mechanical): 3.4 s and 4.1 s
                 breath={p.self ? 4.1 : 3.4 + ((k * 0.37) % 0.5)}
                 calm={isGroup && !speaking && talkingId != null}
@@ -702,43 +733,26 @@ export function TalkScene({
 
       {askTone && onTone && <TonePicker onPick={onTone} />}
 
-      {/* the left banner of a talk with no shell around it: what was said here (the prototype's drawer) */}
-      {drawer && (
-        <div className="absolute inset-0 z-[34] flex bg-black/40" onClick={() => setDrawer(false)}>
-          <aside
-            className="flex h-full w-[84%] max-w-[380px] flex-col gap-3.5 rounded-r-[22px] border border-[rgba(210,220,255,.22)] bg-[rgba(10,14,44,.9)] px-[18px] pb-6 backdrop-blur-xl"
-            style={{ paddingTop: top + 18 }}
-            onClick={(e) => e.stopPropagation()}
-            aria-label="会話"
-          >
-            <h2 className="text-[14px] tracking-[0.12em] text-[#b9bde6]">会話</h2>
-            {/* a button in it (settings, a look) closes the drawer as it opens its own sheet */}
-            {bar?.drawer && <div onClick={() => setDrawer(false)}>{bar.drawer}</div>}
-            <div className="flex min-h-0 flex-col gap-2 overflow-y-auto">
-              {[...units].reverse().map((u) => {
-                const p = byId.get(u.item.who);
-                const t = toneFor(p);
-                return (
-                  <button
-                    key={u.key}
-                    onClick={() => {
-                      setDrawer(false);
-                      goBack(units.length - 1 - units.indexOf(u));
-                    }}
-                    className="flex w-full items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/5 px-3 py-2.5 text-left"
-                  >
-                    <span className="mt-1 h-3 w-3 flex-none rounded-full" style={{ background: `linear-gradient(170deg,${t.a},${t.b})`, border: `1.5px solid ${t.line}` }} />
-                    <span className="min-w-0 flex-1">
-                      <b className="block text-[13px]">{u.item.name ?? p?.name}</b>
-                      <small className="line-clamp-2 text-[12px] text-[#b9bde6]">{talkPlain(u.text) || (u.item.voice ? '（声のメッセージ）' : (u.item.card?.label ?? ''))}</small>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </aside>
-        </div>
-      )}
+      {/* the left drawer of a talk with no shell around it (M-R237: the conversations, then the chosen one's past as the
+          spiral and the list — the atelier's parts); this talk's own past is its lines, a row goes back to that line */}
+      {drawer &&
+        (bar?.threads === 'app' ? (
+          <AppThreads extra={bar.drawer && <div onClick={() => setDrawer(false)}>{bar.drawer}</div>} onClose={() => setDrawer(false)} />
+        ) : (
+          <HereThreads
+            threads={bar?.threads?.list ?? [{ id: 'here', name: typeof bar?.title === 'string' && bar.title ? bar.title : (row[0]?.name ?? '') }]}
+            current={bar?.threads?.current ?? 'here'}
+            days={bar?.threads?.days}
+            rows={pastRows}
+            extra={bar?.drawer && <div onClick={() => setDrawer(false)}>{bar.drawer}</div>}
+            onRow={(r) => {
+              setDrawer(false);
+              const k = units.findIndex((u) => u.item.id === r.id);
+              if (k >= 0) goBack(units.length - 1 - k);
+            }}
+            onClose={() => setDrawer(false)}
+          />
+        ))}
 
       {opened && (
         <div className="absolute inset-0 z-[30] flex items-start justify-center bg-black/40 px-6" style={{ paddingTop: barH + top + 60 }} onClick={() => setOpened(null)}>
@@ -875,9 +889,9 @@ function Bubble({
           ? { borderStyle: 'dashed', boxShadow: '0 6px 16px rgba(4,8,30,.25)', opacity: 0.95 }
           : {},
   );
-  const pad = shape === 'burst' ? 'px-[42px] pb-[38px] pt-[32px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
+  const pad = shape === 'burst' ? 'px-[42px] py-[30px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
   return (
-    <div className={`pointer-events-auto relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-34px] max-w-[min(calc(100%+68px),400px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
+    <div className={`pointer-events-auto relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
       {named && (
         <p className="mb-1 px-2 text-[10.5px] font-bold tracking-[0.12em] [text-shadow:0_1px_4px_#000]" style={{ color: tone.a }}>
           {item.name ?? who?.name}

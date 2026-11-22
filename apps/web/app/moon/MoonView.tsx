@@ -190,6 +190,7 @@ function Chat() {
         bar={{
           title: name,
           // the list button (this talk's drawer) is the bar's own; settings and {bati}'s look sit at the top of that drawer
+          threads: 'app',
           drawer: (
             <div className="flex flex-col gap-2">
               <button className="flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/5 px-3 py-2.5 text-left text-[13px]" onClick={() => setSettingsOpen(true)}>

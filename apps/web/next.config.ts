@@ -3,6 +3,8 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // the dev-only route indicator (the 「N」 at the bottom left) never ships in a build; off in dev too so review shots are clean
+  devIndicators: false,
   // the story's pictures are cached by the browser (QA 12 R33: a slow line showed stills late). A day, not a year:
   // a still is sometimes redrawn under the same name
   async headers() {

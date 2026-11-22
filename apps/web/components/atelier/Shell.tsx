@@ -25,19 +25,19 @@ export const hasBluena = (me: Me | null) => !me || me.story?.['d3.f_d04_bluena']
  * threads given in `threads`), Bluena on the right from day 3. {bati}'s thread is AtelierChat; any other thread is drawn
  * by `renderThread` in the same place (see threads.ts).
  */
-export function Shell({ first, threads = [], renderThread, story, onBack }: { first: AtelierKind | null; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode; /** the page's way out, in the talk's own bar */ onBack?: () => void }) {
+export function Shell({ first, threads = [], renderThread, story, onBack, open }: { first: AtelierKind | null; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode; /** the page's way out, in the talk's own bar */ onBack?: () => void; /** a thread (and one day of its past) to open with, from another talk's drawer (?thread=&day=) */ open?: { thread: string; day?: string } }) {
   const { me } = useAuth();
   const partner = usePartner();
   const ctx = useAtelierCtx();
   const day = me?.journeyDay;
   const bluena = !!story?.bluena || hasBluena(me);
-  const [thread, setThread] = useState<string>(BATI_THREAD);
+  const [thread, setThread] = useState<string>(open?.thread || BATI_THREAD);
   const [talk, setTalk] = useState<Talk>(() => newTalk(day));
   const [firstTalk] = useState(talk.id);
   const [drawer, setDrawer] = useState<'left' | 'right' | null>(null);
   const unread = threads.some((t) => t.id !== BATI_THREAD && !!t.unread);
   // M-R237: one day of a thread's past talk, opened from the left drawer (read only)
-  const [past, setPast] = useState<{ thread: string; day: string } | null>(null);
+  const [past, setPast] = useState<{ thread: string; day: string } | null>(open?.day ? { thread: open.thread || BATI_THREAD, day: open.day } : null);
   const closePast = () => {
     setPast(null);
     setDrawer('left');

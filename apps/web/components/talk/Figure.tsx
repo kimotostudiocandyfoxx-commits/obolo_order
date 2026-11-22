@@ -114,7 +114,8 @@ export function Figure({
       }
     }
   }, [look]);
-  height = wide && !chest ? height * 0.58 : height;
+  // a wide one (a round creature) stands lower and, chest up, a little smaller (its whole width shows)
+  height = wide ? height * (chest ? 0.72 : 0.58) : height;
   const open = useFlap(state === 'talk', level);
   const idle = useIdle(state === 'idle' && !reduced && !calm);
   const yawn = idle === 'yawn';
