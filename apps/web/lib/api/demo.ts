@@ -332,8 +332,11 @@ export class DemoApi implements Api {
   }
 
   async me() {
-    const u = this.s.users[this.uid()];
-    // M-R231: the egg's day is worked out each time (it grows every day)
+    let u = this.s.users[this.uid()];
+    // M-R231: past the first journey with no day 9 saved: it starts now — the 2nd egg the next morning
+    if (u?.bati && u.journeyDay >= 9 && !u.story?.['eggs.day9'])
+      u = this.patchMe((x) => ({ story: { ...(x.story ?? {}), 'eggs.day9': new Date(Date.now() + 24 * 3_600_000).toISOString() } }));
+    // the egg's day is worked out each time (it grows every day)
     return u?.bati ? { ...u, batiEgg: demoEggOf(u) } : u;
   }
 

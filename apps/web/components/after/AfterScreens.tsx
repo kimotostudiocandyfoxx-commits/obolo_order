@@ -346,6 +346,9 @@ function Seed({ v, kind, how, onDone }: { v: StoryVars; kind: 'story' | 'game'; 
   );
 }
 
+/** the most spell cards on the desk (more did not fit and ran over the picture) */
+const CARDS_MAX = 12;
+
 /** 〔スペルの札が並ぶ〕 + 〔✏️ スペルを組み替える〕 */
 function Cards({ v, kind, answers, onDone }: { v: StoryVars; kind: 'story' | 'game'; answers: Record<string, string>; onDone: Done }) {
   const seed = answers[`${kind}_seed`] ?? '';
@@ -365,10 +368,12 @@ function Cards({ v, kind, answers, onDone }: { v: StoryVars; kind: 'story' | 'ga
               <VoiceField value={add} onChange={setAdd} placeholder={kind === 'story' ? '主人公：ねこ' : '主人公：コロリン'} maxLength={16} />
               <button
                 onClick={() => {
-                  if (add.trim()) setCards((x) => [...x, add.trim()]);
+                  // a card once (the cards are keyed by their words), and no more than fit on the desk
+                  const t = add.trim();
+                  if (t) setCards((x) => (x.includes(t) || x.length >= CARDS_MAX ? x : [...x, t]));
                   setAdd('');
                 }}
-                disabled={!add.trim()}
+                disabled={!add.trim() || cards.length >= CARDS_MAX}
                 className="w-full rounded-full bg-white/10 py-2 text-[12px] disabled:opacity-40"
               >
                 札を足す

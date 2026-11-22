@@ -670,7 +670,7 @@ export class LookService {
       if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'WISH_REFUSED', BATI_WISH_REFUSE);
     } else {
       await this.clean(body.seed);
-      persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.seed, body.egg, kind, { exclude, role: body.role ?? null });
+      persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.seed, body.egg, kind, { exclude });
       if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', BATI_SEED_QUESTION[kind]);
     }
     const rec = this.record(body.seed, kind, body.egg, persona);

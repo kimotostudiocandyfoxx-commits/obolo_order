@@ -950,6 +950,18 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
     galcool: "それは、ちょっとむずかしい。ほかの言い方で、教えて！",
     galkansai: "それは、ちょっとむずかしいかもやん！　ほかの言い方で、教えて！",
   },
+  "見て見て！　話した言葉が、ぜんぶ、コロリンになった！": {
+    teinei: "見て見て！　話した言葉が、ぜんぶ、コロリンになりマシタ！",
+    kansai: "見て見て！　話した言葉が、ぜんぶ、コロリンになったで！",
+    cool: "見て。話した言葉が、ぜんぶ、コロリンになった！",
+    mellow: "見て見て！　話した言葉が、ぜんぶ、コロリンになったねぇ。",
+    amae: "見て見て！　話した言葉が、ぜんぶ、コロリンになったよ！",
+    gal: "見て見て！　話した言葉が、ぜんぶ、コロリンになったじゃん！",
+    galfuwa: "見て見て〜！　話した言葉が、ぜんぶ、コロリンになった！",
+    galane: "見てみな！　話した言葉が、ぜんぶ、コロリンになった！",
+    galcool: "見て。話した言葉が、ぜんぶ、コロリンになった、エモい。",
+    galkansai: "見て見て！　話した言葉が、ぜんぶ、コロリンになったやん！",
+  },
 };
 
 /** the fixed {bati} lines of the script (the keys above), for the birth's rewrite of a rare style */

@@ -249,8 +249,6 @@ export type BatiSpeechBody = z.infer<typeof BatiSpeechBody>;
 export const BatiNewHatchBody = z.object({
   egg: z.enum(['moon', 'sun']),
   seed: z.string().trim().min(1).max(40),
-  /** M-R227: the role, when it is known before the birth (a 仕事・勉強 {bati} leans to 姉御ギャル / クールギャル) */
-  role: z.enum(BATI_ROLES).optional(),
 });
 export type BatiNewHatchBody = z.infer<typeof BatiNewHatchBody>;
 

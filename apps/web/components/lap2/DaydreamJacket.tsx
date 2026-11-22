@@ -118,10 +118,12 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
                 <VoiceField value={add} onChange={setAdd} placeholder="足したい札（例：朝の光）" maxLength={14} />
                 <button
                   onClick={() => {
-                    if (add.trim()) setCards((x) => [...x, add.trim()]);
+                    // a card once, and no more than fit (12)
+                    const t = add.trim();
+                    if (t) setCards((x) => (x.includes(t) || x.length >= 12 ? x : [...x, t]));
                     setAdd('');
                   }}
-                  disabled={!add.trim()}
+                  disabled={!add.trim() || cards.length >= 12}
                   className={btn}
                 >
                   札を足す

@@ -142,13 +142,12 @@ export async function decideBatiPersona(llm: LlmProvider, seed: string, egg: Bat
   // no model (the demo, the tests): the rules alone
   if (llm.name === 'mock') return batiPersonaByRules(seed, egg, Math.random(), o);
   const others = o.exclude?.length ? `\nこの人のほかの相方の話し方（同じものは選ばない。ギャル系どうしは、ちがう種類ならよい）：${o.exclude.join('、')}` : '';
-  const role = o.role === 'work' ? '\nこの子の役目は〔仕事・勉強〕：ギャル系にするなら galane／galcool を多めに（全肯定のまま、要点は短く）。' : '';
   const first = o.first ? `\nこの子は1体目：明るい組（${BATI_BRIGHT_IDS.join('、')}）の中からだけ選ぶ。ギャル系が約6割。食べ物の決まりは、この中で使う（たこ焼き→galkansai か kansai、プリン→amae か galfuwa）。` : '';
   let raw = '';
   try {
     raw = await llm.chat({
       system: BATI_PERSONA_SYSTEM,
-      history: [{ role: 'user', text: `たまご：${egg === 'moon' ? '月のたまご' : '太陽のたまご'}\n種（${KIND_WORD[kind]}）：${seed}${others}${role}${first}` }],
+      history: [{ role: 'user', text: `たまご：${egg === 'moon' ? '月のたまご' : '太陽のたまご'}\n種（${KIND_WORD[kind]}）：${seed}${others}${first}` }],
       temperature: 1,
       maxOutputTokens: 300,
       json: true,

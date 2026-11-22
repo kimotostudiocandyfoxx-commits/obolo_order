@@ -192,23 +192,21 @@ export interface BatiDrawOptions {
   first?: boolean;
   /** styles of the member's other {bati}: never the same style twice among the three (different gal kinds are fine) */
   exclude?: readonly BatiPersonality[];
-  /** M-R227: a 仕事・勉強 {bati} leans to 姉御ギャル / クールギャル among the gal kinds */
-  role?: 'any' | 'play' | 'work' | 'make' | null;
 }
 
-/** each style's weight for a draw (the group's share split among its kinds; the role's lean; the excluded out) */
+/** each style's weight for a draw (the group's share split among its kinds; the excluded out). The role is asked after
+ * the naming (the script's order), so it never leans the draw (the user's decision after M-R227). */
 export function batiStyleWeights(o: BatiDrawOptions = {}): [BatiPersonality, number][] {
   const out: [BatiPersonality, number][] = [];
   const group = (ids: readonly BatiPersonality[], share: number, w: (id: BatiPersonality) => number = () => 1) => {
     const total = ids.reduce((s, id) => s + w(id), 0);
     for (const id of ids) out.push([id, (share * w(id)) / total]);
   };
-  const galW = (id: BatiPersonality) => (o.role === 'work' && (id === 'galane' || id === 'galcool') ? 3 : 1);
   if (o.first) {
-    group(BATI_GAL_IDS, BATI_BRIGHT_GAL_SHARE, galW);
+    group(BATI_GAL_IDS, BATI_BRIGHT_GAL_SHARE);
     group(['genki', 'amae', 'kansai'], 1 - BATI_BRIGHT_GAL_SHARE);
   } else {
-    group(BATI_GAL_IDS, BATI_GROUP_WEIGHTS.gal, galW);
+    group(BATI_GAL_IDS, BATI_GROUP_WEIGHTS.gal);
     group(BATI_COMMON_IDS, BATI_GROUP_WEIGHTS.common);
     group(BATI_RARE_IDS, BATI_GROUP_WEIGHTS.rare);
   }

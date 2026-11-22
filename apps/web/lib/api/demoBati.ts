@@ -22,7 +22,8 @@ function eggReadyNow() {
  */
 export function demoEggOf(u: Me, born = (u.batis ?? []).length): Me['batiEgg'] {
   const at = Date.parse(u.story?.['eggs.day9'] ?? '');
-  const day9At = Number.isFinite(at) ? at : u.journeyDay >= 9 ? Date.parse(u.createdAt) : null;
+  // past the journey with none saved: the demo's me() saves one (the next morning), like the server
+  const day9At = Number.isFinite(at) ? at : null;
   const e = batiEggState({ born, journeyDay: u.journeyDay, day9At });
   return e && eggReadyNow() ? { ...e, ready: true, growth: 1 } : e;
 }

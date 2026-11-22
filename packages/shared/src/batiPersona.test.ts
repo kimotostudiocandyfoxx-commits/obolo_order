@@ -63,12 +63,13 @@ describe("{bati}'s way of speaking (M-R225 / M-R226)", () => {
     expect(batiStyleWeights({ exclude: ['gal'] }).some(([id]) => id === 'galfuwa')).toBe(true);
   });
 
-  it('a 仕事・勉強 {bati} leans to 姉御ギャル / クールギャル', () => {
-    const w = (role?: 'work') => Object.fromEntries(batiStyleWeights({ role }));
-    expect(w('work').galane).toBeGreaterThan(w().galane * 1.5);
-    expect(w('work').galcool).toBeGreaterThan(w('work').gal * 2);
-    expect(w('work').genki).toBeCloseTo(w().genki);
+  it('the role never leans the draw (it is asked after the naming)', () => {
+    expect(batiStyleWeights({})).toEqual(batiStyleWeights({ exclude: [] }));
+    const w = Object.fromEntries(batiStyleWeights());
+    expect(w.galane).toBeCloseTo(w.gal);
+    expect(w.galcool).toBeCloseTo(w.gal);
   });
+
 
   it('an old style is read as the nearest new one', () => {
     expect(normalizeBatiPersonality('keigo')).toBe('teinei');

@@ -36,12 +36,13 @@ function batiFaces(j: Record<string, string> | null): Partial<Record<string, str
 
 /**
  * When the app's day 9 opens (M-R231): kept in users.bati_egg_at when the first journey's last day is finished (+ the
- * day's wait); before that, day 8 finished → its wait; an account past the journey from before → it began long ago.
+ * day's wait); before that, day 8 finished → its wait. An account already past the journey with none saved gets it on
+ * its first open after this update (getMe: + the day's wait — the 2nd egg the next morning, not at once); until then
+ * null (not yet).
  */
 export function day9At(u: typeof users.$inferSelect): number | null {
   if (u.batiEggAt) return u.batiEggAt.getTime();
   if (u.journeyDay === JOURNEY_PAYMENT && u.journeyCompletedAt) return u.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS;
-  if (u.journeyDay >= JOURNEY_DONE) return (u.orderedAt ?? u.journeyCompletedAt ?? u.createdAt).getTime();
   return null;
 }
 
@@ -116,6 +117,15 @@ export class UsersService {
   async getMe(userId: string): Promise<Me> {
     const [u] = await this.db.write.select().from(users).where(and(eq(users.id, userId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
+    // M-R231: past the first journey with no day 9 saved (an account from before): it starts now — the next morning
+    if (u.journeyDay >= JOURNEY_DONE && !u.batiEggAt && u.batiFood) {
+      const [nu] = await this.db.write
+        .update(users)
+        .set({ batiEggAt: new Date(Date.now() + JOURNEY_WAIT_MS) })
+        .where(eq(users.id, userId))
+        .returning();
+      if (nu) return toMe(nu);
+    }
     return toMe(u);
   }
 

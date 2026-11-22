@@ -227,3 +227,26 @@ describe('「ねがいの子」 (M-R230) and the days the eggs hatch (M-R231)', 
     expect(toMe(user as never).batiEgg?.ready).toBe(false);
   });
 });
+
+import { UsersService } from '../users/users.service';
+
+describe('M-R231: an account already past the journey with no day 9 saved', () => {
+  it('starts counting from its first open after the update: the 2nd egg the next morning, not at once', async () => {
+    const { user } = make({ batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/b1.png', batiId: 'b1', batisJson: [born('b1', 'ポン')], journeyDay: 9, deletedAt: null });
+    expect(toMe(user as never).batiEgg?.ready).toBe(false);
+    const db = {
+      write: {
+        select: () => ({ from: () => ({ where: async () => [user] }) }),
+        update: () => ({ set: (v: Record<string, unknown>) => ({ where: () => ({ returning: async () => [Object.assign(user, v)] }) }) }),
+      },
+    };
+    const me = await new UsersService(db as never, {} as never).getMe('u');
+    expect(me.batiEgg).toMatchObject({ nth: 2, ready: false });
+    const at = (user.batiEggAt as Date).getTime() - Date.now();
+    expect(at).toBeGreaterThan(23 * 3_600_000);
+    expect(at).toBeLessThanOrEqual(24 * 3_600_000);
+    // the next morning it is ready
+    Object.assign(user, { batiEggAt: new Date(Date.now() - 1000) });
+    expect(toMe(user as never).batiEgg?.ready).toBe(true);
+  });
+});

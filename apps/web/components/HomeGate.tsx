@@ -4,6 +4,9 @@ import { JOURNEY_DONE, JOURNEY_WAIT_MS, LAP2_DONE, lap2Done } from '@obolo/share
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Lap2Story } from '@/components/lap2/Lap2Story';
+import { EggMorning } from '@/components/bati/EggMorning';
+import { eggReady } from '@/components/bati/BatiSheet';
+import { useRouter } from 'next/navigation';
 import { EntryScreen } from '@/components/onboarding/EntryScreen';
 import { JourneyDayScreen } from '@/components/onboarding/JourneyDayScreen';
 import { StoryDay } from '@/components/onboarding/StoryDay';
@@ -32,6 +35,8 @@ export function HomeGate({ children }: { children: ReactNode }) {
 
   const day = me.journeyDay;
   if (day >= JOURNEY_DONE) {
+    // M-R231: a member's day 16 — the egg scene (SYS-S003, the 3rd) first thing that morning, then the Moon home
+    if (me.orderedAt && me.batiEgg?.nth === 3 && eggReady(me)) return <EggMorningGate>{children}</EggMorningGate>;
     if (me.orderedAt && lap2Done(me.story) < LAP2_DONE) return <Lap2Gate>{children}</Lap2Gate>;
     return <>{children}</>;
   }
@@ -114,5 +119,20 @@ function ResumeStory() {
         {m.gate.resume}
       </Link>
     </main>
+  );
+}
+
+/** M-R231: the egg's morning for a member (day 16): the scene, then back to the Moon home (no other story that day) */
+function EggMorningGate({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const [done, setDone] = useState(false);
+  if (done) return <>{children}</>;
+  return (
+    <EggMorning
+      onClose={() => {
+        setDone(true);
+        router.replace('/moon');
+      }}
+    />
   );
 }
