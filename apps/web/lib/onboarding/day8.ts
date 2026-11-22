@@ -161,8 +161,12 @@ export const DAY8: Step[] = [
   { t: 'scene', id: 'D08-S006' },
   { t: 'say', who: 'MONBAN', text: '……この先は、お前の手で、押せ…。' },
   // 〔画面：エクリプスの支払い（最終確認）〕［支払う／戻る］。完了しなかった時の〔画面：支払いは完了していません〕〔もう一度ためす／戻る〕と
-  // MONBAN「……まだ、終わっていない…。決めたら、また来い…。」は EclipsePay の中
-  { t: 'order', cancel: 'back' },
+  // MONBANの一言は EclipsePay の中（failLine）
+  {
+    t: 'order',
+    cancel: 'back',
+    failLine: { t: 'say', who: 'MONBAN', text: '……まだ、終わっていない…。決めたら、また来い…。' },
+  },
   { t: 'caption', text: '通信：火星シアターの扉が、開いた' },
   { t: 'label', id: 'rocket' },
   { t: 'say', who: 'MONBAN', text: '……よし、分かった…。' },

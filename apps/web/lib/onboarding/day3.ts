@@ -10,7 +10,7 @@ import { SYS002 } from './sys002';
  *    {neo}'s two kororins are made in {bati}'s chat (the 'atelier' step: cards, in Bluena at once); 〔土星へ飛ばす〕
  *    or 〔今は飛ばさない〕 (f_d04_fly = fly / skip); the rocket leaves the Moon — the day's 88 minutes start here ('clock')
  *  - Saturn only to look: the gaudy temple, the giant DJ record's cypher (D04-S005), the dachi with KIMORIN⭐︎ and
- *    {inviter}, {neo}'s own record, the first voice message (D04-S005c, f_d04_voice_reply = reply / later)
+ *    {inviter}, {neo}'s own record, the first voice message in the inviter's dachi thread (D04-S005c, 'dachivoice': f_d04_voice_reply = reply / later)
  *  - the night: the Saturn stamp, back to the Moon to sleep, MONBAN's one-time offer to become Obolo Order early (SYS-S002)
  * Nothing is made on Saturn (M-R208).
  */
@@ -280,26 +280,21 @@ export const DAY3: Step[] = [
   { t: 'notice', text: '{neo}のレコードは、土星へ飛ばしたコロリンを見せる棚です。Bluenaの中のコロリンと同じ物が並びます' },
   { t: 'say', who: 'KIMORIN', text: '……私のレコードは、名作で、すぐ、いっぱいになりますね。' },
   // ピロン。チャットの画面の左のバナーが光る。{bati}の下に『{inviter}』と『KIMORIN⭐︎』の会話。『{inviter}』に声のメッセージ
-  // PLACEHOLDER (M-R212): the dachi voice screens are another agent's; here only the story's choice and its flag
   { t: 'se', sound: 'blip' },
   { t: 'notice', text: '左のバナーを開いて、『{inviter}』を押す。声のメッセージを再生する' },
   { t: 'sprite', image: '@bati' },
   { t: 'say', who: 'バティ', text: '{neo}、声で、返してみよう！' },
   { t: 'notice', text: 'ダチとの会話も、{bati}とのチャットと同じ画面です。マイクのボタンを押している間だけ録音され、離すと送る前に聞き直せます。Bluenaの作品も、カードで送れます' },
+  // the inviter's thread full screen: their recorded voice message (or MIKIE⭐︎DRILL's welcome), 〔声で返す〕 by the mic, 〔あとで〕
   {
-    t: 'choice',
-    key: 'f_d04_voice_reply',
-    options: [
-      { label: '声で返す', goto: 'reply' },
-      { label: 'あとで返す', goto: 'reply-later' },
-    ],
+    t: 'dachivoice',
+    fallback: { t: 'say', who: 'MIKIE⭐︎DRILL', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。' },
   },
+  { t: 'branch', key: 'f_d04_voice_reply', cases: { reply: 'reply' }, otherwise: 'reply-later' },
   { t: 'label', id: 'reply' },
-  { t: 'set', key: 'f_d04_voice_reply', value: 'reply' },
   { t: 'caption', text: 'はじめての声のメッセージを送った' },
   { t: 'goto', id: 'reply-end' },
   { t: 'label', id: 'reply-later' },
-  { t: 'set', key: 'f_d04_voice_reply', value: 'later' },
   { t: 'say', who: 'バティ', text: 'いつでも、左のバナーから、返せるよ！' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……私にも、送っていいですよ。返事は、気が向いたら、しますので。' },

@@ -25,7 +25,20 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  * PLACEHOLDER (P-BILL-3): the wording must be checked by the operator; the 〔設定〕→〔毎月のマナ〕→〔やめる〕
  * screen does not exist yet (P-BILL-4: the operator stops it in Stripe).
  */
-export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; paid: boolean; onPaid: () => void; onCancel: () => void }) {
+export function EclipsePay({
+  api,
+  paid,
+  onPaid,
+  onCancel,
+  failLine = { who: 'MONBAN', text: '……まだ、終わっていない…。決めたら、また来い…。' },
+}: {
+  api: OrderApi;
+  paid: boolean;
+  onPaid: () => void;
+  onCancel: () => void;
+  /** D08-S006: the line when the payment did not go through (from the day's script) */
+  failLine?: { who: string; text: string };
+}) {
   const [phase, setPhase] = useState<'loading' | 'stripe' | 'demo' | 'confirming' | 'error' | 'done'>('loading');
   useEffect(() => {
     if (phase !== 'error') return;
@@ -228,7 +241,8 @@ export function EclipsePay({ api, paid, onPaid, onCancel }: { api: OrderApi; pai
               {err && <p className="text-xs text-rose-200/70">{err}</p>}
               {/* D08-S006: the payment did not go through */}
               <p className="text-[13px] text-amber-100/90">
-                <span className="mr-1 text-[11px] text-amber-200/60">MONBAN</span>……まだ、終わっていない…。決めたら、また来い…。
+                <span className="mr-1 text-[11px] text-amber-200/60">{failLine.who}</span>
+                {failLine.text}
               </p>
               <button
                 onClick={() => {

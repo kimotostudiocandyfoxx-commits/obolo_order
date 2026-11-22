@@ -29,9 +29,10 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is eight days (draft 21); every countdown says 明日まで待てない (day 2: もちろん…)', () => {
+  it('the first journey is eight days (draft 21); only days 1 and 2 can skip the wait (明日まで待てない; day 2: もちろん…)', () => {
     expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
-    expect(Object.entries(STORIES).every(([d, s]) => s.skipLabel === (d === '2' ? 'もちろん明日まで待てない' : DEFAULT_SKIP_LABEL))).toBe(true);
+    const labels = Object.fromEntries(Object.entries(STORIES).map(([d, s]) => [d, s.skipLabel]));
+    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: 'もちろん明日まで待てない', 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined });
     expect(DEFAULT_SKIP_LABEL).toBe('明日まで待てない');
     expect(STORIES[JOURNEY_PAYMENT].steps.some((s) => s.t === 'order')).toBe(true);
   });
@@ -150,7 +151,10 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
     expect(fly).toBeLessThan(t.indexOf('clock'));
     expect(t.indexOf('clock')).toBeLessThan(steps.findIndex((s) => s.t === 'scene' && s.id === 'D04-S005'));
     expect(steps.filter((s) => s.t === 'set' && s.key === 'f_d04_fly').map((s) => s.t === 'set' && s.value)).toEqual(['fly', 'skip']);
-    expect(steps.filter((s) => s.t === 'set' && s.key === 'f_d04_voice_reply').map((s) => s.t === 'set' && s.value)).toEqual(['reply', 'later']);
+    // D04-S005c: the first voice message in the inviter's dachi thread (M-R212), then the way on by its answer
+    const dv = t.indexOf('dachivoice');
+    expect(steps[dv]).toEqual({ t: 'dachivoice', fallback: { t: 'say', who: 'MIKIE⭐︎DRILL', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。' } });
+    expect(steps[dv + 1]).toMatchObject({ t: 'branch', key: 'f_d04_voice_reply', cases: { reply: 'reply' }, otherwise: 'reply-later' });
     expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('clock'));
     const c = steps.find((s) => s.t === 'choice' && s.key === 'f_join_early');
     expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['先にObolo Orderになる', '8日目に決める']);
@@ -206,7 +210,7 @@ describe('the Sun day (8, draft 21)', () => {
     const opts = steps[c].t === 'choice' ? steps[c].options : [];
     expect(opts.map((o) => o.label)).toEqual(['エクリプスを受ける', '今は、住人のままでいる']);
     const pay = labelIndex(steps, opts[0].goto!);
-    expect(steps.slice(pay, pay + 8).find((s) => s.t === 'order')).toEqual({ t: 'order', cancel: 'back' });
+    expect(steps.slice(pay, pay + 8).find((s) => s.t === 'order')).toMatchObject({ t: 'order', cancel: 'back' });
     expect(steps.slice(c + 1).find((s) => s.t === 'end' || s.t === 'order')?.t).toBe('end');
   });
   it('no riddles or records any more; members who joined early take the short way (f_join_early)', () => {

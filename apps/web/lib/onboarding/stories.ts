@@ -14,8 +14,11 @@ import type { Step } from './script';
  */
 export interface DayStory {
   steps: Step[];
-  /** Label of the skip button on that day's "また明日" countdown. */
-  skipLabel: string;
+  /**
+   * Label of the skip button on that day's "また明日" countdown. Only days 1 and 2 have one (M-R207: the server skips the
+   * wait only while journeyDay ≤ 2); from day 3 the 24 hours are waited, so no label (HomeGate shows no button).
+   */
+  skipLabel?: string;
   /** Day 2+ start with the email check (the 6-digit code). Day 1 starts from the invitation. */
   auth: boolean;
   /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */
@@ -28,13 +31,13 @@ export const STORIES: Record<number, DayStory> = {
   1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした' }, // the script's telop (QA 14 R53)
   // the end of day 2 (the Moon): 「もちろん明日まで待てない」 (story M-R67) → 〔テロップ：24時間スキップした〕 (client 2026-10-22)
   2: { steps: DAY2, skipLabel: 'もちろん明日まで待てない', auth: true, skippedText: '24時間スキップした' },
-  3: { steps: DAY3, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
-  4: { steps: DAY4, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
-  5: { steps: DAY5, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
-  6: { steps: DAY6, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
-  7: { steps: DAY7, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
+  3: { steps: DAY3, auth: true },
+  4: { steps: DAY4, auth: true },
+  5: { steps: DAY5, auth: true },
+  6: { steps: DAY6, auth: true },
+  7: { steps: DAY7, auth: true },
   // the Sun: the Eclipse is a choice inside the story (pay → ORDER, or stay a resident); no countdown after it
-  8: { steps: DAY8, skipLabel: DEFAULT_SKIP_LABEL, auth: true },
+  8: { steps: DAY8, auth: true },
 };
 
 /** Days shown only on the preview pages (none now: Venus is day 7 of the first journey since draft 21). */

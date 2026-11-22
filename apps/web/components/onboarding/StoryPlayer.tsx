@@ -14,6 +14,7 @@ import { eggSvg } from '@/lib/look';
 import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
+import { DachiVoiceStep } from './DachiVoiceStep';
 import { Shell as AtelierShell } from '@/components/atelier/Shell';
 import { NeoChooser } from './NeoChooser';
 import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
@@ -1394,7 +1395,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </button>
       )}
       {started && step?.t === 'order' && orderApi && (
-        <EclipsePay api={orderApi} paid={!!ordered} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
+        <EclipsePay api={orderApi} paid={!!ordered} failLine={step.failLine} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
       )}
       {started && step?.t === 'neo' && (
         <NeoChooser
@@ -1418,6 +1419,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             次へ
           </button>
         </div>
+      )}
+      {/* D04-S005c: the first voice message, in the inviter's dachi thread (M-R212) */}
+      {started && step?.t === 'dachivoice' && (
+        <DachiVoiceStep
+          key={i}
+          fallback={{ name: speakerName(step.fallback.who, v), text: fill(step.fallback.text, v) }}
+          onDone={(answer) => {
+            remember('f_d04_voice_reply', answer);
+            run(iRef.current + 1);
+          }}
+        />
       )}
       {started && step?.t === 'look' && lookApi && (
         <LookMaker

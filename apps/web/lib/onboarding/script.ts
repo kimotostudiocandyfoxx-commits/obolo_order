@@ -24,6 +24,8 @@ export type Speaker =
   | 'コロリン'
   /** Uranus's resident (M-R195, the client's own design; no picture in the app yet) */
   | 'クロコパトラ'
+  /** the inviter's stand-in on Saturn when nobody invited you: her welcome voice message (D04-S005c, M-R212) */
+  | 'MIKIE⭐︎DRILL'
   /** a voice not seen yet (（声）「おい。」) */
   | '？？？';
 
@@ -199,7 +201,7 @@ export type Step =
    * The Eclipse day (7): the payment (¥88/month, Stripe inside the story). Continues once paid;
    * "もう少し考える" jumps to the `cancel` label.
    */
-  | { t: 'order'; cancel: string }
+  | { t: 'order'; cancel: string; /** what MONBAN says when the payment did not go through (D08-S006), shown on the payment screen */ failLine?: ScriptLine }
   /** A handwritten-style letter card. Tap to continue. */
   | { t: 'letter'; text: string }
   /**
@@ -217,6 +219,12 @@ export type Step =
    * the card singing …), word for word, in order, for the atelier to play (it does not take them yet: see the day files).
    */
   | { t: 'atelier'; kind: 'voice' | 'art' | 'song' | 'video' | 'radio'; lines?: ScriptLine[] }
+  /**
+   * D04-S005c (M-R212): the first voice message — the inviter's ダチ thread full screen (components/dachi/DachiThread),
+   * 〔あとで〕 at the top. Sending → f_d04_voice_reply = 'reply', 〔あとで〕 → 'later'. `fallback`: shown when there is
+   * no thread to open (MIKIE⭐︎DRILL 「ようこそ。……」, shared MIKIE_WELCOME).
+   */
+  | { t: 'dachivoice'; fallback: ScriptLine }
   /** remember a flag in the day's answers (saved with the day like a choice): f_ej_heard, f_join … */
   | { t: 'set'; key: string; value: string }
   /** the script scene that starts here (D04-S002 …): shown on the review screen so notes can name it; no effect in play */

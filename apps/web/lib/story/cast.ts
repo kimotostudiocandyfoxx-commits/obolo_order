@@ -25,6 +25,7 @@ export const CAST: CastMember[] = [
   { name: 'ハットG', sprite: 'hatg' },
   { name: 'ボスG', sprite: 'bossg' },
   { name: 'うんちピンポンくん' },
+  { name: 'MIKIE⭐︎DRILL', sprite: 'mikie' },
   { name: '小箱' },
   /** a voice not seen yet (？？？「おい。」): the line is voiced by whoever appears next */
   { name: '？？？' },
