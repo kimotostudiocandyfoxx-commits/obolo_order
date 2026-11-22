@@ -360,10 +360,20 @@ export class DemoApi implements Api {
     this.s.quota[qk] = used;
     const b = this.buddyOf(id);
     await sleep(700 + Math.random() * 600);
-    const reply = cannedReply(text, b.name, b.memory, locale);
+    // M-R208 offline: "〜の絵を見せて" brings a local picture, a question a made-up source link (no network)
+    const drawn = /絵|描いて|見た目|picture|draw/i.test(text);
+    const looked = !drawn && /[?？]|いつ|どこ|なに|何|いくつ|ニュース|天気/.test(text);
+    const reply = drawn ? (locale === 'en' ? 'I drew it for you!' : '絵を描いてみたよ！') : cannedReply(text, b.name, b.memory, locale);
     const t0 = Date.now();
     const userMessage: BuddyMessageView = { id: uid(), role: 'user', text, createdAt: new Date(t0).toISOString() };
-    const buddyMessage: BuddyMessageView = { id: uid(), role: 'buddy', text: reply, createdAt: new Date(t0 + 1).toISOString() };
+    const buddyMessage: BuddyMessageView = {
+      id: uid(),
+      role: 'buddy',
+      text: reply,
+      createdAt: new Date(t0 + 1).toISOString(),
+      ...(drawn ? { image: { url: '/onboarding/s/rocket-space.jpg' } } : {}),
+      ...(looked ? { sources: [{ title: 'デモのページ（本番は調べたページ）', url: 'https://example.com/', domain: 'example.com' }] } : {}),
+    };
     b.messages.push(userMessage, buddyMessage);
     // Demo "memory": remember short statements the user makes about themselves.
     if (/好き|嫌い|名前|趣味|i like|i love|my name|hobby/i.test(text)) b.memory = [...b.memory, text.slice(0, 40)].slice(-15);

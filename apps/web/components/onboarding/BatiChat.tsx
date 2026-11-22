@@ -1,6 +1,7 @@
 'use client';
 
-import type { BuddyPicture } from '@obolo/shared';
+import type { BuddyPicture, BuddySource } from '@obolo/shared';
+import { DrawnPicture, SourceChips } from '@/components/chat/BuddyExtras';
 import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { saveSpell } from '@/components/jupiter/JupiterLesson';
@@ -27,7 +28,8 @@ function loadTalks(): Talk[] {
   }
 }
 // noPic: a worry or a danger — no 〔🖼 絵で見る〕 under it (generation test 1, G-4)
-type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean; noPic?: boolean };
+// drawn / sources (M-R208): a picture {bati} drew when asked, the pages it looked the answer up on
+type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean; noPic?: boolean; drawn?: string; sources?: BuddySource[] };
 const EXAMPLES = ['ビッグバンって、いつ起きたの？', 'ブラックホールの正体って、なに？', '宇宙の果てって、あるの？'];
 
 export function BatiChat(props: Parameters<typeof BatiChatFull>[0] & { muted?: boolean }) {
@@ -105,11 +107,15 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     const started = Date.now();
     let reply = '';
     let noPic = false;
+    let drawn: string | undefined;
+    let sources: BuddySource[] | undefined;
     try {
       // at most 20 s: a set answer counts as a round, so the talk always reaches its end (story chat 2026-10-29)
       const r = await Promise.race([getApi().buddyChat(t, 'ja'), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 20_000))]);
       reply = r.reply.text;
       noPic = !!r.kind && r.kind !== 'normal';
+      drawn = r.reply.image?.url;
+      sources = r.reply.sources;
     } catch {
       reply = 'むむ…いまは、うまく調べられなかった！　ほかのこと、聞いてみて！';
       noPic = true;
@@ -119,13 +125,14 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     setCasting(false);
     setFace('surprise');
     const id = Date.now();
-    setMsgs((m) => [...m, { id, who: 'bati', text: reply, q: t, noPic, picLoading: !noPic }]);
+    // a picture it drew takes the library picture's place
+    setMsgs((m) => [...m, { id, who: 'bati', text: reply, q: t, noPic, picLoading: !noPic && !drawn, drawn, sources }]);
     setTimeout(() => setFace('smile'), 1400);
     const n = rounds + 1;
     setRounds(n);
     const voice = sayAloud(reply);
     // a picture, when there is one, comes into the answer by itself (no button: M-R179)
-    if (!noPic)
+    if (!noPic && !drawn)
       void getApi()
         .buddyPicture(t, reply)
         .then((r) => r.picture)
@@ -166,6 +173,8 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
                 <span className="mr-1 text-[10px] tracking-widest text-amber-200/70">{bati}</span>
                 {m.text}
               </p>
+              {m.drawn && <DrawnPicture url={m.drawn} alt={m.text} />}
+              <SourceChips sources={m.sources} tone="story" />
               {m.picture && (
                 <figure className="overflow-hidden rounded-xl bg-black/40">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -247,10 +256,14 @@ function BatiChatFull({
     const started = Date.now();
     let reply = '';
     let noPic = false;
+    let drawn: string | undefined;
+    let sources: BuddySource[] | undefined;
     try {
       const r = await getApi().buddyChat(t, 'ja');
       reply = r.reply.text;
       noPic = !!r.kind && r.kind !== 'normal';
+      drawn = r.reply.image?.url;
+      sources = r.reply.sources;
     } catch {
       reply = 'うーん、いまは、うまく調べられなかった……。また聞いてね。';
     }
@@ -258,7 +271,7 @@ function BatiChatFull({
     await new Promise((r) => setTimeout(r, Math.max(0, 2200 - (Date.now() - started))));
     setCasting(null);
     setFace('surprise');
-    setMsgs((m) => [...m, { id: m.length, who: 'bati', text: reply, q: t, noPic }]);
+    setMsgs((m) => [...m, { id: m.length, who: 'bati', text: reply, q: t, noPic, drawn, sources }]);
     setAsked(true);
     setTimeout(() => setFace('smile'), 1400);
   };
@@ -329,9 +342,11 @@ function BatiChatFull({
                 <span className="mr-1 text-[10px] tracking-widest text-amber-200/70">{bati}</span>
                 {m.text}
               </p>
+              {m.drawn && <DrawnPicture url={m.drawn} alt={m.text} />}
+              <SourceChips sources={m.sources} tone="story" />
               {m.q && (
                 <>
-                  {m.noPic ? null : m.picture ? (
+                  {m.noPic || m.drawn ? null : m.picture ? (
                     <figure className="overflow-hidden rounded-xl bg-black/40">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={m.picture.url} alt={m.picture.title} className="max-h-64 w-full object-contain" />

@@ -1,6 +1,7 @@
 'use client';
 
-import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView } from '@obolo/shared';
+import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView, BuddySource } from '@obolo/shared';
+import { DrawnPicture, SourceChips } from '@/components/chat/BuddyExtras';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
 import { PlanetShell } from '@/components/PlanetShell';
@@ -170,7 +171,7 @@ function Chat() {
         )}
         {profile && messages.length === 0 && <Bubble role="buddy" text={t(m.moon.greeting, { name })} />}
         {messages.map((msg) => (
-          <Bubble key={msg.id} role={msg.role} text={msg.text} />
+          <Bubble key={msg.id} role={msg.role} text={msg.text} sources={msg.sources} image={msg.image?.url} />
         ))}
         {sending && (
           <div className="flex items-end gap-2">
@@ -239,7 +240,7 @@ function Chat() {
   );
 }
 
-function Bubble({ role, text }: { role: 'user' | 'buddy'; text: string }) {
+function Bubble({ role, text, sources, image }: { role: 'user' | 'buddy'; text: string; sources?: BuddySource[]; image?: string }) {
   if (role === 'user') {
     return (
       <div className="flex justify-end">
@@ -252,8 +253,11 @@ function Bubble({ role, text }: { role: 'user' | 'buddy'; text: string }) {
   return (
     <div className="flex items-end gap-2">
       <BatiFace size={28} />
-      <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-white/10 px-4 py-2.5 text-[15px] leading-relaxed">
-        {text}
+      {/* M-R208: the pages it looked up, as link chips under the bubble; a picture it drew, as its own bubble */}
+      <div className="flex min-w-0 max-w-[80%] flex-col items-start gap-1.5">
+        <div className="whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-white/10 px-4 py-2.5 text-[15px] leading-relaxed">{text}</div>
+        {image && <DrawnPicture url={image} alt={text} />}
+        <SourceChips sources={sources} />
       </div>
     </div>
   );
