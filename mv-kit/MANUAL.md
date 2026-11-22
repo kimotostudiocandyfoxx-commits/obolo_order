@@ -347,6 +347,8 @@ python3 mv-kit/tools/plate_bg.py    ~/mv-projects/my-song      # art/<img>-plate
 "credit": {"small": "Studio Name", "big": "名前", "from": 158.0, "to": 167.3}
 ```
 
+名前が長い（15文字くらいから）と大文字の名前が画面の端まで届くので、`"capsSize": 58, "capsLs": 16` で小さくする（ふつうは 70 と 24）。
+
 - 英語・フランス語は**筆記体（Pinyon Script）＋字間を広く空けた細い大文字（Cormorant Garamond）**で、おしゃれに。
 - タイトルは前奏の中だけ（1行目の歌詞の前に消える）。歌詞と同じ文言を重ねて出さない（依頼者の指摘）。
 - 文字の縁は細く。依頼者が要らないと言った文字（スタジオ名など）は出さない。

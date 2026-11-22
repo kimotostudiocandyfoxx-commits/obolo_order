@@ -266,7 +266,7 @@ function buildTitle() {  // separate sprites so they can enter one after another
   const parts = [], mkp = (h, fn) => { const c = mk(W, h), g = c.getContext('2d'); fn(g); return c; };
   const T = P.title || {};
   if (T.script) parts.push({ y: 40, c: mkp(220, g => goldText(g, T.script, W / 2, 150, SCR(120), 120, { haloBlur: 16, haloA: .4 })) });
-  if (T.caps) parts.push({ y: 232, c: mkp(140, g => goldText(g, T.caps, W / 2, 92, SRF(70), 70, { ls: 24, haloBlur: 14, haloA: .4 })) });
+  if (T.caps) parts.push({ y: 232, c: mkp(140, g => goldText(g, T.caps, W / 2, 92, SRF(T.capsSize || 70), T.capsSize || 70, { ls: T.capsLs ?? 24, haloBlur: 14, haloA: .4 })) });
   if (T.small) parts.push({ y: 372, c: mkp(90, g => { goldText(g, T.small, W / 2, 52, SRF(36, 1), 36, { ls: 5, haloBlur: 8, haloA: .35 });
     hairline(g, 110, 250, 40); hairline(g, W - 250, W - 110, 40); }) });
   return parts;
