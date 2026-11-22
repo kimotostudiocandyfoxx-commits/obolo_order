@@ -18,7 +18,7 @@ export default function ReviewLayout({ children }: { children: ReactNode }) {
       {children}
       <span
         aria-hidden
-        className="pointer-events-none fixed [html[data-typing]_&]:hidden bottom-[calc(2px+env(safe-area-inset-bottom))] left-1/2 z-[460] -translate-x-1/2 select-none font-mono text-[9px] tracking-wider text-white/35"
+        className="pointer-events-none fixed [html[data-typing]_&]:hidden bottom-[env(safe-area-inset-bottom)] left-1/2 z-[460] -translate-x-1/2 select-none font-mono text-[8px] leading-none tracking-wider text-white/20"
         title={BRANCH}
       >
         build {COMMIT}
