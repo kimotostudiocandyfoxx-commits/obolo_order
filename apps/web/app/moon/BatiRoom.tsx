@@ -199,7 +199,8 @@ function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone
 
         {!ended && (
           <>
-            <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto">
+            {/* the ideas wrap onto a second row rather than run off a phone's edge */}
+            <div className="mt-3 flex flex-wrap justify-center gap-1.5">
               {IDEAS[mode].map((idea) => (
                 <button key={idea} type="button" disabled={busy} onClick={() => setWish(idea)} className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[12px] text-white/75">
                   {idea}

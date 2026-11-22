@@ -189,17 +189,20 @@ function Chat() {
         // the prototype's top bar (glass buttons): settings and {bati}'s look at the left, the name, the egg / your look / mute
         bar={{
           title: name,
-          left: (
-            <span className="flex flex-none gap-2">
-              <button className="grid h-[42px] w-[42px] flex-none place-items-center overflow-hidden rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px] active:scale-95" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
+          // the list button (this talk's drawer) is the bar's own; settings and {bati}'s look sit at the top of that drawer
+          drawer: (
+            <div className="flex flex-col gap-2">
+              <button className="flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/5 px-3 py-2.5 text-left text-[13px]" onClick={() => setSettingsOpen(true)}>
                 <LineIcon id="gear" className="h-5 w-5" />
+                {m.moon.settings}
               </button>
               {me?.bati?.imageUrl && (
-                <button type="button" className="grid h-[42px] w-[42px] flex-none place-items-center overflow-hidden rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px] active:scale-95" onClick={() => setRoom('bati')} aria-label={`${me.bati.name || 'バティ'}の見た目を変える`}>
-                  <BatiFace size={34} />
+                <button type="button" className="flex w-full items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/5 px-3 py-2.5 text-left text-[13px]" onClick={() => setRoom('bati')}>
+                  <BatiFace size={28} />
+                  {`${me.bati.name || 'バティ'}の見た目を変える`}
                 </button>
               )}
-            </span>
+            </div>
           ),
           right: (
             <span className="flex flex-none items-center gap-2">

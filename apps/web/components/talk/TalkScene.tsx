@@ -165,7 +165,18 @@ export function TalkScene({
   /** M-R236: a long press on a line (its ★ / mark ring) */
   onRing?: (item: TalkItem, at: { x: number; y: number }) => void;
   /** the top bar (glass buttons): the conversations (or 〔過去の言葉〕), the partner's name, the mute and Bluena */
-  bar?: { title: ReactNode; onList?: () => void; onBluena?: () => void; unread?: boolean; left?: ReactNode; right?: ReactNode };
+  bar?: {
+    title: ReactNode;
+    /** the shell's left drawer (the conversations); none = this talk's own drawer of what was said */
+    onList?: () => void;
+    onBluena?: () => void;
+    onBack?: () => void;
+    unread?: boolean;
+    left?: ReactNode;
+    right?: ReactNode;
+    /** at the top of this talk's own drawer (settings, the looks …) */
+    drawer?: ReactNode;
+  };
   /** 「画面を押すと、次の言葉へ進みます」 while lines are played in a row */
   hint?: boolean;
   /** M-R245: show the one-time picker of your bubble colour */
@@ -471,6 +482,7 @@ export function TalkScene({
   }, [shown.map((x) => x.key).join('|')]);
   const [opened, setOpened] = useState<TalkItem | null>(null);
   const [big, setBig] = useState<TalkItem | null>(null);
+  const [drawer, setDrawer] = useState(false);
 
   // M-R242 the camera: while a line plays it moves in toward the one speaking (the stage to 1.1 from their side, 3% their
   // way, 0.9 s; the place 1.5% and 1.07, 1.2 s — parallax) and eases back 0.7 s after the line; none in the past
@@ -562,17 +574,23 @@ export function TalkScene({
       {/* the top bar (small): the conversations at the left, the partner's name, the mute and Bluena at the right */}
       {bar ? (
         <header className="absolute inset-x-0 z-[20] flex items-center gap-2.5 px-3.5 py-2.5" style={{ top }}>
-          {bar.left ??
-            (bar.onList ? (
-              <button onClick={bar.onList} aria-label="会話の一覧を開く" className={GLASS}>
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
-                  <path d="M4 7h16M4 12h11M4 17h7" />
+          {/* the left: back (where the page has no other way out), then the conversations — the shell's drawer, or this talk's own */}
+          <span className="flex flex-none gap-2">
+            {bar.onBack && (
+              <button onClick={bar.onBack} aria-label="もどる" className={GLASS}>
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M15 5l-7 7 7 7" />
                 </svg>
-                {bar.unread && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-sky-300" />}
               </button>
-            ) : (
-              <span className="w-[42px] flex-none" />
-            ))}
+            )}
+            <button onClick={() => (bar.onList ? bar.onList() : setDrawer(true))} aria-label="会話の一覧を開く" className={GLASS}>
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+                <path d="M4 7h16M4 12h11M4 17h7" />
+              </svg>
+              {bar.unread && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-sky-300" />}
+            </button>
+            {bar.left}
+          </span>
           <div className="flex min-w-0 flex-1 flex-col items-center">
             <b className="truncate text-[15px] font-black tracking-[0.04em] [text-shadow:0_1px_8px_rgba(0,0,0,.5)]">{group ? group.name : bar.title}</b>
             {group && <span className="text-[11px] font-bold text-[#b9bde6]">{group.count}人</span>}
@@ -683,6 +701,44 @@ export function TalkScene({
       {composer && <div className="absolute inset-x-0 bottom-0 z-[20]">{composer}</div>}
 
       {askTone && onTone && <TonePicker onPick={onTone} />}
+
+      {/* the left banner of a talk with no shell around it: what was said here (the prototype's drawer) */}
+      {drawer && (
+        <div className="absolute inset-0 z-[34] flex bg-black/40" onClick={() => setDrawer(false)}>
+          <aside
+            className="flex h-full w-[84%] max-w-[380px] flex-col gap-3.5 rounded-r-[22px] border border-[rgba(210,220,255,.22)] bg-[rgba(10,14,44,.9)] px-[18px] pb-6 backdrop-blur-xl"
+            style={{ paddingTop: top + 18 }}
+            onClick={(e) => e.stopPropagation()}
+            aria-label="会話"
+          >
+            <h2 className="text-[14px] tracking-[0.12em] text-[#b9bde6]">会話</h2>
+            {/* a button in it (settings, a look) closes the drawer as it opens its own sheet */}
+            {bar?.drawer && <div onClick={() => setDrawer(false)}>{bar.drawer}</div>}
+            <div className="flex min-h-0 flex-col gap-2 overflow-y-auto">
+              {[...units].reverse().map((u) => {
+                const p = byId.get(u.item.who);
+                const t = toneFor(p);
+                return (
+                  <button
+                    key={u.key}
+                    onClick={() => {
+                      setDrawer(false);
+                      goBack(units.length - 1 - units.indexOf(u));
+                    }}
+                    className="flex w-full items-start gap-3 rounded-2xl border border-white/[0.06] bg-white/5 px-3 py-2.5 text-left"
+                  >
+                    <span className="mt-1 h-3 w-3 flex-none rounded-full" style={{ background: `linear-gradient(170deg,${t.a},${t.b})`, border: `1.5px solid ${t.line}` }} />
+                    <span className="min-w-0 flex-1">
+                      <b className="block text-[13px]">{u.item.name ?? p?.name}</b>
+                      <small className="line-clamp-2 text-[12px] text-[#b9bde6]">{talkPlain(u.text) || (u.item.voice ? '（声のメッセージ）' : (u.item.card?.label ?? ''))}</small>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        </div>
+      )}
 
       {opened && (
         <div className="absolute inset-0 z-[30] flex items-start justify-center bg-black/40 px-6" style={{ paddingTop: barH + top + 60 }} onClick={() => setOpened(null)}>
@@ -819,9 +875,9 @@ function Bubble({
           ? { borderStyle: 'dashed', boxShadow: '0 6px 16px rgba(4,8,30,.25)', opacity: 0.95 }
           : {},
   );
-  const pad = shape === 'burst' ? 'px-[34px] pb-[28px] pt-[26px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
+  const pad = shape === 'burst' ? 'px-[42px] pb-[38px] pt-[32px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
   return (
-    <div className={`pointer-events-auto relative flex min-h-0 max-w-[min(100%,380px)] flex-col ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
+    <div className={`pointer-events-auto relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-34px] max-w-[min(calc(100%+68px),400px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
       {named && (
         <p className="mb-1 px-2 text-[10.5px] font-bold tracking-[0.12em] [text-shadow:0_1px_4px_#000]" style={{ color: tone.a }}>
           {item.name ?? who?.name}
@@ -834,7 +890,7 @@ function Bubble({
         className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`}
         style={{ color: ink, ...box }}
       >
-        <div className={`${pad} font-bold leading-[1.6] ${grow || maxH ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} style={{ ...(maxH ? { maxHeight: maxH } : {}), ...(shape === 'whisper' ? { fontFamily: "'Klee One', " + TALK_FONT, fontWeight: 600 } : {}) }} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
+        <div className={`${pad} font-bold leading-[1.6] ${grow || (maxH && shape !== 'burst') ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} style={{ ...(maxH && shape !== 'burst' ? { maxHeight: maxH } : {}), ...(shape === 'whisper' ? { fontFamily: "'Klee One', " + TALK_FONT, fontWeight: 600 } : {}) }} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
           {item.voice && (
             <button onClick={onPlay} disabled={!item.voice.url} className="flex items-center gap-2 py-0.5" aria-label={on ? '止める' : muted ? '声を消して見る' : '聞く'}>
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm" style={{ background: `${ink}1f` }}>{on ? '❚❚' : '▶'}</span>

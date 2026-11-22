@@ -2,10 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Face } from '@/components/mercury/ComposeChat';
-import { useAuth } from '@/lib/auth';
 import { KINDS, type AtelierKind } from '@/lib/atelier/unlock';
-import { usePartner } from '@/lib/partner';
 import { Shell } from './Shell';
 import type { RenderThread, ThreadInfo } from './threads';
 
@@ -23,8 +20,6 @@ const kindOf = (k: string | null): AtelierKind | null => (k && (KINDS as string[
 export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[]; renderThread?: RenderThread } = {}) {
   const params = useSearchParams();
   const router = useRouter();
-  const partner = usePartner();
-  const { me } = useAuth();
   const [gate, setGate] = useState(true);
 
   // the gate plays once per visit; reduced motion → straight in
@@ -36,20 +31,8 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
 
   return (
     <main className="pt-safe relative mx-auto flex h-svh max-w-xl flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
-      <header className="flex items-center gap-2 px-3 py-2">
-        <button onClick={() => router.back()} className="btn btn-ghost h-9 w-9 !p-0 text-lg" aria-label="もどる">
-          ←
-        </button>
-        {/* your face: the look made on day 2 becomes the profile, and this follows it (M-R212) */}
-        {me?.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={me.avatarUrl} alt="" className="h-[34px] w-[34px] rounded-full border border-amber-200/40 object-cover" />
-        ) : (
-          <Face face={partner.face} size={34} />
-        )}
-        <p className="min-w-0 flex-1 text-sm font-black tracking-wide">月で作る</p>
-      </header>
-      <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} />
+      {/* one bar: the talk's own (← back, the conversations, {bati}, Bluena) — no page header above it */}
+      <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={() => router.back()} />
       {gate && <Gate onSkip={() => setGate(false)} />}
     </main>
   );

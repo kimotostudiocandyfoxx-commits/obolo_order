@@ -15,9 +15,9 @@ import { castLook, DEMO_GROUP_SEEDS } from '@/lib/talk/demoLooks';
  * (1, 2, 3+, 9+ messages, a long reply, a card, the keyboard, a ダチ voice message, groups of 3 and 7).
  * ?s=<scene> opens one; ?bare=1 hides the panel (screenshots).
  */
-const SCENES = ['live', '1', '2', '3', '9', 'past', 'long', 'card', 'kb', 'dachi', 'g3', 'g7'] as const;
+const SCENES = ['live', 'pop', 'slam', 'slow', 'whisper', '1', '2', '3', '9', 'past', 'long', 'card', 'kb', 'dachi', 'g3', 'g7'] as const;
 type Scene = (typeof SCENES)[number];
-const LABEL: Record<Scene, string> = { live: '話してみる', '1': '1つ', '2': '2つ', '3': '3つ', '9': '9つ以上', long: '長い返事', card: 'カード', kb: 'キーボード', past: '過去に戻る', dachi: 'ダチの声', g3: '3人', g7: '7人' };
+const LABEL: Record<Scene, string> = { live: '話してみる', pop: 'ふつう', slam: 'ドーン', slow: 'もこもこ', whisper: '小声', '1': '1つ', '2': '2つ', '3': '3つ', '9': '9つ以上', long: '長い返事', card: 'カード', kb: 'キーボード', past: '過去に戻る', dachi: 'ダチの声', g3: '3人', g7: '7人' };
 
 /** the prototype's talk (design/talk/proto.html): what was said before (on the ring), then the lines played in a row */
 type Said = [string, [string, TalkFace, TalkMotion | '', { in?: TalkIn; shape?: TalkShape }?][]];
@@ -32,6 +32,13 @@ const SCRIPT: Said[] = [
   ['me', [['明日、一緒に行こうな。', 'smile', '']]],
   ['bati', [['うん！　[[金:約束]]だよ、ネオ！', 'smile', 'hop', { in: 'shake' }]]],
 ];
+/** M-R243: one line each way it can come in (normal pop/round, ドーン slam/burst, もこもこ slow/cloud, 小声 whisper) */
+const BEAT: Partial<Record<Scene, Said>> = {
+  pop: ['bati', [['今日はね、**月の裏側**まで散歩してきたよ！', 'smile', 'hop', { in: 'pop', shape: 'round' }]]],
+  slam: ['bati', [['[[赤:ドーン！！]]　土星の輪が、!!ぜんぶ回りだした!!！', 'surprised', 'lean', { in: 'slam', shape: 'burst' }]]],
+  slow: ['bati', [['……もこもこの雲の上で、ちょっと眠くなっちゃった……', 'sad', '', { in: 'slow', shape: 'cloud' }]]],
+  whisper: ['bati', [['（小声）ねえ、[[かわいい:ひみつ]]、教えてあげよっか', 'shy', '', { in: 'slow', shape: 'whisper' }]]],
+};
 const said = ([who, parts]: Said, k: number): TalkItem => ({ id: `s${k}`, who, text: parts.map((p) => p[0]).join(''), faces: parts.map(([, face, motion, st]) => ({ face, ...(motion ? { motion } : {}), ...(st ?? {}) })) });
 
 const LINES: [string, string, TalkFace?, TalkMotion?][] = [
@@ -100,6 +107,8 @@ function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
     const pick = (n: number) => LINES.slice(0, n).map(([who, text, face, motion], k) => ({ id: `l${k}`, who, text, face, motion }));
     // the prototype's talk: the ring holds what was said before, the script plays in a row (taps go on)
     if (scene === 'live') return [...HISTORY.map(([who, text], k) => ({ id: `h${k}`, who, text })), ...SCRIPT.map(said)];
+    const beat = BEAT[scene];
+    if (beat) return [...HISTORY.slice(0, 2).map(([who, text], k) => ({ id: `h${k}`, who, text })), said(beat, 0)];
     if (scene === '1') return pick(1);
     if (scene === '2') return pick(2);
     if (scene === '3') return pick(3);

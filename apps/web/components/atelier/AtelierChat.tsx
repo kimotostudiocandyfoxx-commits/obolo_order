@@ -47,7 +47,7 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  * (Shell.tsx: left = the conversations, right = Bluena from day 3). Opened from a story step it plays the day's script
  * lines at their moments and hands what was made back to the story (`story`, story.ts).
  */
-export function AtelierChat({ first, talk, story, onList, onBluena, unread }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean }) {
+export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
   const { me, setMe } = useAuth();
   // M-R245: your bubble colour (picked once)
   const talkTone = useTalkTone();
@@ -375,7 +375,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread }: { 
         keyboard={talkState.keyboard}
         place={PLACE_BG.moon}
         top={story ? 40 : 0}
-        bar={{ title: partner.name, onList, onBluena, unread }}
+        bar={{ title: partner.name, onList, onBluena, unread, onBack }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
         composer={

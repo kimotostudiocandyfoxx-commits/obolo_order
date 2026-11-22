@@ -14,11 +14,11 @@ export const TONES: Record<string, TalkTone> = {
   pearl: { id: 'pearl', name: '月光パール', a: '#f7f4fd', b: '#e7e1f6', line: '#9a8fc4', ink: '#2b2550' },
   honey: { id: 'honey', name: 'はちみつクリーム', a: '#fbf0d9', b: '#f0dcb0', line: '#c29a52', ink: '#4a3410' },
   sage: { id: 'sage', name: 'セージ', a: '#eef4ee', b: '#d9e6db', line: '#86a58e', ink: '#253d2c' },
-  rose: { id: 'rose', name: 'くすみローズ', a: '#fbeff1', b: '#f0d9de', line: '#b98a95', ink: '#4a2530' },
-  sky: { id: 'sky', name: '霧の空色', a: '#eef4fa', b: '#d8e5f1', line: '#86a1bf', ink: '#22344d' },
-  apricot: { id: 'apricot', name: '杏', a: '#fdf1e8', b: '#f5dcc7', line: '#c79a74', ink: '#4a2e16' },
-  lilac: { id: 'lilac', name: 'ライラック', a: '#f4effa', b: '#e2d8f0', line: '#a08cc0', ink: '#33264d' },
-  greyblue: { id: 'greyblue', name: '灰青', a: '#eef1f5', b: '#d8dee8', line: '#8794aa', ink: '#262f40' },
+  rose: { id: 'rose', name: 'くすみローズ', a: '#fbeff0', b: '#efd6da', line: '#b98790', ink: '#4a2730' },
+  sky: { id: 'sky', name: '霧の空色', a: '#eef4fa', b: '#d6e4f1', line: '#87a3c2', ink: '#22374e' },
+  apricot: { id: 'apricot', name: '杏', a: '#fdf1e8', b: '#f5dcc6', line: '#c79a73', ink: '#4a3018' },
+  lilac: { id: 'lilac', name: 'ライラック', a: '#f5f0fb', b: '#e3d8f1', line: '#a48cc6', ink: '#35254f' },
+  greyblue: { id: 'greyblue', name: '灰青', a: '#eef1f5', b: '#d8dee7', line: '#8a97a9', ink: '#283344' },
 };
 /** the colours you may pick for yourself (once, at the first talk; changeable in the settings) */
 export const SELF_TONES = ['pearl', 'sky', 'rose', 'sage', 'apricot', 'lilac'];

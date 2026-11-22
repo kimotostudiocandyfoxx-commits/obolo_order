@@ -25,7 +25,7 @@ export const hasBluena = (me: Me | null) => !me || me.story?.['d3.f_d04_bluena']
  * threads given in `threads`), Bluena on the right from day 3. {bati}'s thread is AtelierChat; any other thread is drawn
  * by `renderThread` in the same place (see threads.ts).
  */
-export function Shell({ first, threads = [], renderThread, story }: { first: AtelierKind | null; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode }) {
+export function Shell({ first, threads = [], renderThread, story, onBack }: { first: AtelierKind | null; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode; /** the page's way out, in the talk's own bar */ onBack?: () => void }) {
   const { me } = useAuth();
   const partner = usePartner();
   const ctx = useAtelierCtx();
@@ -63,7 +63,7 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
       {past && past.thread === BATI_THREAD ? (
         <BatiDay key={past.day} day={past.day} onBack={closePast} />
       ) : thread === BATI_THREAD ? (
-        <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} />
+        <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} onBack={onBack} />
       ) : (
         <div key={tctx.day ?? 'now'} className="relative flex min-h-0 flex-1 flex-col">
           {renderThread?.(thread, tctx) ?? null}
