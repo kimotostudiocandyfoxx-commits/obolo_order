@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
@@ -18,6 +18,7 @@ import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord
 import { MediaService } from '../media/media.service';
 import { findPart, storedTalk, TALK_BLINK_PROMPT, TALK_MOUTH_PROMPT, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
 import { day9At, toMe } from '../users/users.service';
+import { canUseMedia } from '../voice/media-consent';
 
 /**
  * Generations per OBOLO NEO. The story (2026-10-14) lets the visitor redraw "何度でも", so the screen
@@ -151,7 +152,9 @@ export class LookService {
     // the reference image is only handed to the model, never stored (copyright, client decision 2026-10-05)
     const refs: GeneratedImage[] = [];
     if ('reference' in body) refs.push({ data: Buffer.from(body.reference.data, 'base64'), mime: body.reference.mime });
-    // the favourite photo of themselves (M-R148): handed to the painter only, never stored
+    // the favourite photo of themselves (M-R148): handed to the painter only, never stored. M-R248: only when the photo may
+    // be used (the agreement; never under 13; 13〜15 with the guardian's consent) — else refused, the look is made from words
+    if ('animal' in body && body.photo && !canUseMedia(u)) throw apiError(HttpStatus.FORBIDDEN, 'PHOTO_NOT_ALLOWED', 'A photo cannot be used for this account');
     if ('animal' in body && body.photo) refs.push({ data: Buffer.from(body.photo.data, 'base64'), mime: body.photo.mime });
     if ('like' in body) {
       const src = await this.media.imageData(userId, body.like, 'avatar');
@@ -171,7 +174,10 @@ export class LookService {
               ? neoOmakasePrompt(i, round)
               : body.photo
                 ? neoFromPhotoPrompt(body, i)
-                : neoLookPrompt(body, i, round);
+                : // M-R250: no photo may be used (under 13 / 13〜15 without the guardian's consent): the animal itself in the hood
+                  !canUseMedia(u)
+                  ? neoAnimalPrompt(body, i)
+                  : neoLookPrompt(body, i, round);
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');
@@ -430,6 +436,28 @@ export class LookService {
     const [nu] = await this.db.write.update(users).set({ avatarUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     // M-R234: the decided look's expressions, blink / mouth parts and コロリン, in the background
     if (origin) await this.enqueueTalk(userId, 'me', url, origin);
+    return toMe(nu);
+  }
+
+  /**
+   * M-R247 〔写真を消す〕 (settings): the photo itself was never kept (only handed to the painter); what was made from it
+   * goes — every look of one's own (the pictures, the standee, the round icon, the talk's expressions). The member
+   * stands as the hooded guest again (the placeholder look) until a new look is made.
+   */
+  async removeLook(userId: string): Promise<Me> {
+    const u = await this.user(userId);
+    const j = { ...((u.onboardingJson ?? {}) as Record<string, string>) };
+    const urls = new Set<string>([u.avatarUrl, ...lookHistory(j).flatMap((h) => [h.url, h.icon]), j['look.standee'], j['look.icon'], j['look.chibi']].filter((x): x is string => !!x));
+    try {
+      const t = j['talk.me'] ? (JSON.parse(j['talk.me']) as { stand?: string; faces?: Record<string, { url?: string; blink?: string; mouth?: string }> }) : null;
+      if (t?.stand) urls.add(t.stand);
+      for (const f of Object.values(t?.faces ?? {})) for (const x of [f?.url, f?.blink, f?.mouth]) if (x) urls.add(x);
+    } catch {
+      /* an unreadable talk look: just dropped */
+    }
+    for (const k of Object.keys(j)) if (k.startsWith('look.') || k === 'talk.me' || /^d\d+\.look$/.test(k)) delete j[k];
+    const [nu] = await this.db.write.update(users).set({ avatarUrl: null, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    for (const url of urls) await this.media.removeByUrl(userId, url).catch(() => undefined);
     return toMe(nu);
   }
 

@@ -72,6 +72,14 @@ export const users = pgTable(
     /** the recordings themselves (2026-10-09): the voice reference Seed-VC sings songs in */
     voiceSelfUrl: text('voice_self_url'),
     voiceBatiUrl: text('voice_bati_url'),
+    /** M-R246: {bati}'s voice from the egg recording — none | making | ready | failed (null = none) */
+    voiceBatiState: text('voice_bati_state'),
+    /** M-R247: the start-of-app agreement (terms, privacy, what photos and voice are used for): its version and when */
+    consentVersion: text('consent_version'),
+    consentAt: timestamp('consent_at', { withTimezone: true }),
+    /** M-R248: 13〜15 — a guardian agreed to the photo and voice being used (confirmed once at the start), with its version */
+    guardianConsentVersion: text('guardian_consent_version'),
+    guardianConsentAt: timestamp('guardian_consent_at', { withTimezone: true }),
     voiceId: text('voice_id'),
     virtualAccountNo: text('virtual_account_no'),
     kycStatus: text('kyc_status').notNull().default('none'),

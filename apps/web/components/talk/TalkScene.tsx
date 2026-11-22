@@ -203,7 +203,21 @@ export function TalkScene({
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
   const self = people.find((p) => p.self);
   const others = people.filter((p) => !p.self);
-  const row = self ? [...others, self] : others;
+  // M-R249: no look of yours yet (day 1 until the look is made on day 2's Moon) — first person: you are not shown, the
+  // partners stand in the middle facing you, your words come from the bottom right with the tail off the screen toward you
+  const firstPerson = !!self && !self.look;
+  const row = self && !firstPerson ? [...others, self] : others;
+  // the moment your look is made: you step in beside the partner for the first time (light gathering into you, ~1.1 s)
+  const wasFirst = useRef(firstPerson);
+  const [arriving, setArriving] = useState(false);
+  useEffect(() => {
+    const was = wasFirst.current;
+    wasFirst.current = firstPerson;
+    if (!was || firstPerson) return;
+    setArriving(true);
+    const t = setTimeout(() => setArriving(false), 1400);
+    return () => clearTimeout(t);
+  }, [firstPerson]);
   const n = row.length;
   const isGroup = n >= 3;
 
@@ -664,7 +678,8 @@ export function TalkScene({
           const s = spots.get(p.id)!;
           const speaking = talkingId === p.id && !past;
           return (
-            <div key={p.id} className="absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left] duration-300" style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, animation: arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined }}>
+              {arriving && p.self && <ArrivalMotes />}
               <Figure
                 look={p.look}
                 face={faceOf(p)}
@@ -690,9 +705,9 @@ export function TalkScene({
       {/* the bubbles: two at most over the heads (the newest lower), 62 px from the sides */}
       <div className="pointer-events-none absolute inset-x-0 z-[8] flex flex-col items-center justify-end gap-2.5" style={{ paddingLeft: 62, paddingRight: 62, bottom: bubbleBottom }}>
         {leaving && !past && <Ghost key={`g-${leaving.id}`} item={leaving} who={byId.get(leaving.who)} />}
-        {shown.map((u, k) => {
+        {(firstPerson ? shown.filter((u) => !byId.get(u.item.who)?.self) : shown).map((u, k, list) => {
           const it = u.item;
-          const newest = k === shown.length - 1;
+          const newest = k === list.length - 1;
           const who = byId.get(it.who);
           const live = speech?.id === it.id && outNow != null;
           // one utterance: its name over the first bubble, its card, choices, ★ on the last
@@ -707,6 +722,7 @@ export function TalkScene({
               clamp={false}
               maxH={view.card ? Math.max(room * 0.8, 200) : room / 2}
               named={(isGroup || !!it.name) && u.first}
+              right={firstPerson && !who?.self && (spots.get(it.who)?.x ?? 0) > 0.55}
               onCard={() => setBig(it)}
               onOpen={() => setOpened(it)}
               playing={speech?.id === it.id && !!it.voice}
@@ -720,6 +736,31 @@ export function TalkScene({
           );
         })}
       </div>
+
+      {/* M-R249 first person: your newest words, from the bottom right, the tail off the screen toward you */}
+      {firstPerson &&
+        shown
+          .filter((u) => byId.get(u.item.who)?.self)
+          .slice(-1)
+          .map((u) => (
+            <div key={`fp-${u.key}`} className="pointer-events-none absolute right-3 z-[9] flex max-w-[72%] flex-col items-end" style={{ bottom: dockH + 14 }}>
+              <Bubble
+                item={{ ...u.item, text: u.text }}
+                who={byId.get(u.item.who)}
+                newest
+                past={past}
+                out
+                maxH={room / 2}
+                onCard={() => setBig(u.item)}
+                onOpen={() => setOpened(u.item)}
+                playing={false}
+                muted={muted}
+                onPlay={() => undefined}
+                onReplay={() => undefined}
+                beat={{ shape: u.beats[u.beats.length - 1]?.shape, key: -1 }}
+              />
+            </div>
+          ))}
 
       {past ? (
         <button onClick={backToNow} className="absolute left-1/2 z-[21] -translate-x-1/2 rounded-full bg-[rgba(223,230,255,.92)] px-4 py-[7px] text-[12px] font-bold text-[#070b24] shadow-[0_4px_14px_rgba(0,0,0,.35)]" style={{ bottom: dockH - 6 }}>
@@ -773,6 +814,25 @@ export function TalkScene({
         </div>
       )}
     </div>
+  );
+}
+
+/** M-R249: light motes gathering into you as you first stand beside the partner (fixed positions: no random in render) */
+const MOTES = Array.from({ length: 22 }, (_, k) => {
+  const r = (n: number) => (((Math.sin(k * 12.9898 + n * 78.233) * 43758.5453) % 1) + 1) % 1;
+  return { x: 15 + r(1) * 70, y: 10 + r(2) * 80, s: 2 + r(3) * 4, dx: (r(4) - 0.5) * 60, dy: 20 + r(5) * 50, d: r(6) * 0.35 };
+});
+function ArrivalMotes() {
+  return (
+    <span className="pointer-events-none absolute inset-0 z-[1]" aria-hidden>
+      {MOTES.map((m, k) => (
+        <span
+          key={k}
+          className="absolute rounded-full"
+          style={{ left: `${m.x}%`, top: `${m.y}%`, width: m.s, height: m.s, background: 'radial-gradient(circle,#fff 0%,#ffe6b0 45%,rgba(255,220,150,0) 70%)', ['--mx' as string]: `${m.dx}px`, ['--my' as string]: `${m.dy}px`, animation: `talk-gather .9s ${m.d}s ease-in both` }}
+        />
+      ))}
+    </span>
   );
 }
 
@@ -837,7 +897,13 @@ function Bubble({
   onRing,
   shown,
   beat,
+  out = false,
+  right = false,
 }: {
+  /** the speaker stands at the right (M-R249 first person, two partners): the bubble leans and points that way */
+  right?: boolean;
+  /** M-R249 first person: your words, the tail off the bottom right of the screen (toward you) */
+  out?: boolean;
   item: TalkItem;
   who?: TalkPerson;
   newest: boolean;
@@ -864,7 +930,8 @@ function Bubble({
   /** M-R243: the shape, and how the sentence being said comes in (key = which sentence) */
   beat?: { shape?: TalkShape; in?: TalkIn; key: number };
 }) {
-  const mine = !!who?.self;
+  // the side it leans to and its tail points to: yours at the right; a partner standing at the right (first person with two) too
+  const mine = !!who?.self || right;
   const tone = toneFor(who);
   const bg = tone.b;
   const ink = tone.ink;
@@ -946,7 +1013,7 @@ function Bubble({
           <span
             aria-hidden
             className="absolute bottom-[-11px] h-4 w-4"
-            style={{ background: bg, borderRight: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderBottom: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderRadius: '0 0 14px 0', [mine ? 'right' : 'left']: '20%', transform: mine ? 'rotate(30deg) skewX(-12deg)' : 'rotate(60deg) skewY(12deg)' }}
+            style={{ background: bg, borderRight: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderBottom: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderRadius: '0 0 14px 0', [mine ? 'right' : 'left']: out ? '6%' : '20%', transform: out ? 'rotate(20deg) skewX(-34deg) translate(4px,2px)' : mine ? 'rotate(30deg) skewX(-12deg)' : 'rotate(60deg) skewY(12deg)' }}
           />
         )}
       </div>

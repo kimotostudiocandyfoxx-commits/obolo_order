@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { AdvanceJourneyBody, AtelierLayout, CompleteJourneyDayBody, CompleteLap2Body, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
+import { AdvanceJourneyBody, AtelierLayout, ConsentBody, CompleteJourneyDayBody, CompleteLap2Body, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
@@ -26,6 +26,14 @@ export class UsersController {
   @Patch()
   update(@UserId() userId: string, @Body() body: unknown) {
     return this.users.updateMe(userId, parseBody(UpdateProfileBody, body));
+  }
+
+  /** M-R247: the start-of-app agreement (terms, privacy, photos and voice) */
+  @Post('consent')
+  @HttpCode(200)
+  consent(@UserId() userId: string, @Body() body: unknown) {
+    const b = parseBody(ConsentBody, body);
+    return this.users.consent(userId, b.version, b.guardian ?? false);
   }
 
   /** Uranus: your atelier (second journey, from ORDER) */

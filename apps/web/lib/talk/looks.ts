@@ -35,13 +35,15 @@ export const BATI_COLOR = TONES.honey.line;
 export const DACHI_COLOR = TONES.sage.line;
 export const colorOf = (id: string, _k = 0) => toneOf(id).line;
 
-/** your own look in the talk: the one made for it (Me.talk), else the standing look you chose */
+/** your own look in the talk: the one made for it (Me.talk), else the standing look you chose; none yet → null (first person) */
 export function selfLook(me: Me | null | undefined): TalkLook | null {
   // no look yet (the review pages play the story without an account): the talk cast's NEO stands in
   if (!me) return castLook('user');
   if (me.talk) return me.talk;
   const stand = me.lookStandee || me.avatarUrl;
-  if (!stand) return castLook('user');
+  // M-R249: no look yet (day 1 until the look is made on day 2's Moon, or after 〔写真を消す〕): you are not shown — the
+  // talk is first person (TalkScene: the partners face you, your words come from the bottom right)
+  if (!stand) return null;
   // a drawn stand-in on its own square background (the browser demo's look) does not stand: the talk cast's NEO does
   if (stand?.startsWith('data:image/svg')) return castLook('user', stand);
   return stand ? { of: me.avatarUrl ?? stand, stand } : null;

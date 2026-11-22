@@ -7,6 +7,7 @@ import './globals.css';
 import { SuspendedNotice } from '@/components/SuspendedNotice';
 import { NoManaNotice } from '@/components/NoManaNotice';
 import { NeoSpeaking } from '@/components/NeoSpeaking';
+import { ConsentGate } from '@/components/ConsentGate';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <SuspendedNotice />
             <NoManaNotice />
             <NeoSpeaking />
+            <ConsentGate />
           </AuthProvider>
         </I18nProvider>
       </body>

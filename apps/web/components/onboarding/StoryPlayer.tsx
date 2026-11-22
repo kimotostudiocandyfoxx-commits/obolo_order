@@ -15,6 +15,8 @@ import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { DachiVoiceStep } from './DachiVoiceStep';
+import { EggVoiceStep } from './EggVoiceStep';
+import { isDemoMode } from '@/lib/onboarding/demoMode';
 import { BatiCardStep } from '@/components/bati/BatiCard';
 import { BatiRoleStep, NewBatiStep } from '@/components/bati/NewBatiSteps';
 import { batiLine, batiLineVaried } from '@/lib/onboarding/batiLine';
@@ -177,6 +179,7 @@ function chatBottom(s: Step | undefined): number {
   if (s.t === 'choice' && s.voice) return 230;
   if (s.t === 'choice') return s.options.length > 2 ? 128 : 78;
   if (s.t === 'name' || s.t === 'batiname' || s.t === 'neoname') return 112;
+  if (s.t === 'eggvoice') return 290;
   return 30;
 }
 
@@ -475,7 +478,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
         else if (s.t === 'goto') n = labelIndex(steps, s.id);
         // an answer given earlier today first (the egg), else one from an earlier day
-        else if (s.t === 'branch') n = labelIndex(steps, s.cases[stateRef.current.answers[s.key] ?? varsRef.current.story?.[s.key] ?? ''] ?? s.otherwise);
+        else if (s.t === 'branch') n = labelIndex(steps, s.cases[s.key === 'f_media' ? (varsRef.current.mediaOk === false ? 'no' : 'yes') : (stateRef.current.answers[s.key] ?? varsRef.current.story?.[s.key] ?? '')] ?? s.otherwise);
         else if (s.t === 'ticket' && !s.stamp && !s.flip) {
           setTicketArt({ dest: s.dest });
           setReady(true);
@@ -1073,7 +1076,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const interactiveTap = step && (step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' || step.t === 'arrive');
   // SYS-S001: only at a calm moment (a line, a button) — never while drawing, saving or paying
   const calm = step && ['caption', 'say', 'letter', 'notice', 'action', 'choice'].includes(step.t);
-  const chatOn = !!(started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)));
+  const chatOn = !!(started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname', 'eggvoice'].includes(step.t) || (step.t === 'wait' && step.keepChat)));
   const chatEntries = log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: sayText(e.who, e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }));
   if (chatOn && step) lastChat.current = { entries: chatEntries, bottom: chatBottom(step) };
   useEffect(() => {
@@ -1094,7 +1097,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   while (steps[pk]?.t === 'label' || steps[pk]?.t === 'scene') pk--;
   const prev = steps[pk];
   const prompt =
-    step && ['choice', 'name', 'action', 'egg', 'batiname', 'age', 'neoname'].includes(step.t) && !(step.t === 'choice' && step.prompt) && prev?.t === 'say' ? prev : null;
+    step && ['choice', 'name', 'action', 'egg', 'batiname', 'age', 'neoname', 'eggvoice'].includes(step.t) && !(step.t === 'choice' && step.prompt) && prev?.t === 'say' ? prev : null;
 
   return (
     <MicAllowed.Provider value={!textOnly}>
@@ -1476,6 +1479,21 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
+      {/* D03-S005 (M-R246 / M-R247): 「たまごに声を聞かせる」 — the held mic and its ring; {bati}'s voice from {name}'s */}
+      {started && step?.t === 'eggvoice' && (
+        <EggVoiceStep
+          key={i}
+          example={step.example}
+          fake={atelierTest || isDemoMode()}
+          listenOnly={v.mediaOk === false}
+          onShort={() => addLine({ id: `ev${i}`, kind: 'them', who: step.short.who, text: step.short.text })}
+          onDone={({ words, skipped }) => {
+            if (words) addLine({ id: `ew${i}`, kind: 'me', text: words });
+            remember('f_d03_voice', skipped ? 'skip' : 'recorded');
+            run(iRef.current + 1);
+          }}
+        />
+      )}
       {/* the day's fly-or-keep choice, on today's cards: a card's 〔星へ飛ばす〕 flies it and takes the first way, 〔今は飛ばさない〕
           the second (the labels after it set the flag). Nothing made here today (a resumed day): the plain choice */}
       {started && step?.t === 'choice' && FLY_CHOICES.has(step.key) && flyable.length > 0 && (
@@ -1508,6 +1526,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           spell={step.spell ? sayText(step.spell.who, step.spell.text, v) : undefined}
           spellName={step.spell ? speakerName(step.spell.who, v) : undefined}
           spellFace={step.spell?.who === 'バティ' ? v.batiImage : undefined}
+          noPhoto={v.mediaOk === false}
           onDone={(url, meta) => {
             if (url) remember('look', url);
             // D03-S004's flags: the photo's way in, the animal as said, the card picked, the one redraw

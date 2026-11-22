@@ -20,13 +20,14 @@ async function fail(res: Response, what: string): Promise<never> {
 }
 
 /** Make a private voice model from one recording and its transcript. */
-export async function createVoiceModel(key: string, o: { title: string; audio: Buffer; filename: string; mime: string; text: string }): Promise<string> {
+export async function createVoiceModel(key: string, o: { title: string; audio: Buffer; filename: string; mime: string; text?: string }): Promise<string> {
   const form = new FormData();
   form.append('title', o.title);
   form.append('visibility', 'private');
   form.append('type', 'tts');
   form.append('train_mode', 'fast');
-  form.append('texts', o.text);
+  // the transcript helps the cloning; without one Fish works from the audio alone
+  if (o.text) form.append('texts', o.text);
   form.append('voices', new Blob([new Uint8Array(o.audio)], { type: o.mime }), o.filename);
   const res = await fetch(`${BASE}/model`, { method: 'POST', headers: { authorization: `Bearer ${key}` }, body: form, signal: AbortSignal.timeout(120_000) });
   if (!res.ok) await fail(res, 'create voice');

@@ -92,6 +92,8 @@ import {
   type ItemMarkView,
   type MarkNames,
   type MarkedKind,
+  BATI_VOICE_MIN_SECONDS,
+  mediaAllowed,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
@@ -543,6 +545,27 @@ export class DemoApi implements Api {
     b.memory = [];
     b.messages = [];
     this.save();
+  }
+
+  /** demo: nothing leaves this browser and no voice model is made — the recording is only noted ({bati} keeps the default voice) */
+  async batiVoice(body: { seconds: number }) {
+    await sleep(300);
+    const u = this.s.users[this.uid()];
+    if (!u.mediaOk) return withTalk(u);
+    if (body.seconds < BATI_VOICE_MIN_SECONDS) throw new ApiError(400, 'VOICE_TOO_SHORT', 'Talk to the egg a little longer');
+    return this.patchMe((x) => ({ voices: { ...(x.voices ?? { self: false, bati: false }), batiState: 'making' } }));
+  }
+
+  async removeBatiVoice() {
+    return this.patchMe((x) => ({ voices: { ...(x.voices ?? { self: false, bati: false }), bati: false, batiState: 'none' } }));
+  }
+
+  async removeLook() {
+    return this.patchMe((x) => ({ avatarUrl: null, lookHistory: [], lookStandee: null, lookIcon: null, talk: null, story: Object.fromEntries(Object.entries(x.story ?? {}).filter(([k]) => !/^d\d+\.look$/.test(k))) }));
+  }
+
+  async consent(version: string, guardian = false) {
+    return this.patchMe((u) => ({ consent: { version, at: now(), guardian }, mediaOk: mediaAllowed({ birthYear: u.birthYear, consent: true, guardian }) }));
   }
 
   async voiceStatus() {

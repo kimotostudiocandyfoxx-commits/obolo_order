@@ -15,6 +15,9 @@ import { SongService } from './compose/song.service';
 import { VoiceController } from './voice/voice.controller';
 import { LineVoiceService } from './voice/line-voice.service';
 import { VoiceService } from './voice/voice.service';
+import { BatiVoiceService } from './voice/bati-voice.service';
+import { fishVoiceModels, VOICE_MODELS } from './voice/voice-models';
+import { AppConfig, CONFIG } from './config';
 import { BuddyController } from './buddy/buddy.controller';
 import { BuddyService } from './buddy/buddy.service';
 import { CompassService } from './buddy/compass.service';
@@ -120,6 +123,8 @@ import { WalletController } from './wallet/wallet.controller';
     SongService,
     VoiceService,
     LineVoiceService,
+    BatiVoiceService,
+    { provide: VOICE_MODELS, inject: [CONFIG], useFactory: (c: AppConfig) => fishVoiceModels(c) },
     CommsService,
     PushService,
     MvService,

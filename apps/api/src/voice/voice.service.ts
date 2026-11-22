@@ -1,36 +1,18 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { type LlmProvider, moderateText } from '@obolo/ai';
 import { LLM } from '../infra/tokens';
-import { VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
+import { batiDefaultVoice, VOICE_SCRIPTS, VOICE_STYLES, type Me, type RegisterVoiceBody, type SpeakBody, type VoiceSlot } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
-import { spawn } from 'node:child_process';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
+import { toMp3 } from './audio';
+import { canUseMedia } from './media-consent';
+import { activeBati } from '../look/batis';
 import { createVoiceModel, deleteVoiceModel, textToSpeech, type TtsOptions } from './fish.client';
-
-/**
- * Any browser recording (webm / mp4 / …) → 44.1 kHz mono MP3 with ffmpeg, trimmed to 30 s; `semitones`
- * shifts the pitch and keeps the speed (Saturn: your voice a little higher for Bati).
- */
-function toMp3(input: Buffer, semitones = 0): Promise<Buffer> {
-  const r = Math.pow(2, semitones / 12);
-  const shift = semitones ? ['-af', `asetrate=${Math.round(44100 * r)},aresample=44100,atempo=${(1 / r).toFixed(5)}`] : [];
-  return new Promise((resolve, reject) => {
-    const p = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', '-t', '30', '-ac', '1', '-ar', '44100', ...shift, '-b:a', '128k', '-f', 'mp3', 'pipe:1']);
-    const out: Buffer[] = [];
-    let err = '';
-    p.stdout.on('data', (d: Buffer) => out.push(d));
-    p.stderr.on('data', (d: Buffer) => (err += d.toString()));
-    p.on('error', reject);
-    p.on('close', (code) => (code === 0 && out.length ? resolve(Buffer.concat(out)) : reject(new Error(err.slice(-300) || `ffmpeg ${code}`))));
-    p.stdin.on('error', () => {});
-    p.stdin.end(input);
-  });
-}
 
 /**
  * Member voices (client decision 2026-10-07): two Fish Audio voice models per member — their own
@@ -87,6 +69,9 @@ export class VoiceService {
     }
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
+    // M-R247: a voice model needs the start-of-app agreement on what the voice is used for
+    // M-R248: and by age (under 13 never; 13〜15 with the guardian's consent)
+    if (!canUseMedia(u)) throw apiError(HttpStatus.FORBIDDEN, 'CONSENT_REQUIRED', 'The voice cannot be used for this account');
     const id = await createVoiceModel(key, { title: `obolo-${userId.slice(0, 8)}-${body.slot}`, audio: mp3, filename: `${body.slot}.mp3`, mime: 'audio/mpeg', text: body.text ?? VOICE_SCRIPTS[body.slot] });
     const old = u[this.col(body.slot)];
     // the recording itself is kept too: songs are sung in it (Seed-VC reference, 2026-10-09)
@@ -148,8 +133,11 @@ export class VoiceService {
    */
   async readByBati(userId: string, body: Omit<SpeakBody, 'slot'>, origin: string): Promise<{ url: string; mediaId: string } | null> {
     if (!this.cfg.FISH_API_KEY) return null;
-    const [u] = await this.db.write.select({ bati: users.voiceBatiId }).from(users).where(eq(users.id, userId));
-    const ref = u?.bati ?? this.cfg.FISH_DEFAULT_VOICE_ID;
+    const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
+    // M-R248 / M-R250: the member's own {bati} voice only when it may be used; else the prepared voice for the egg ×
+    // personality (none chosen yet: FISH_DEFAULT_VOICE_ID)
+    const r = u ? activeBati(u) : null;
+    const ref = (u && canUseMedia(u) ? u.voiceBatiId : null) ?? batiDefaultVoice(r?.egg, r?.personality).fish ?? this.cfg.FISH_DEFAULT_VOICE_ID;
     if (!ref) return null;
     return this.readWith(ref, userId, { ...body, slot: 'bati' }, origin, this.key());
   }

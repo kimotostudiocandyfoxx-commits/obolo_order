@@ -17,9 +17,12 @@ import {
   type UpdateProfileBody,
   isChild,
   batiEggState,
+  type BatiVoiceState,
+  MEDIA_CONSENT_VERSION,
 } from '@obolo/shared';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
+import { canUseMedia } from '../voice/media-consent';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
@@ -94,7 +97,9 @@ export function toMe(u: typeof users.$inferSelect): Me {
     // M-R231: the 2nd hatches on the app's day 9, the 3rd on day 16 (members and residents alike)
     batiEgg: batiEggState({ born: batiSummaries(u).length, journeyDay: u.journeyDay, day9At: day9At(u) }),
     orderedAt: u.orderedAt?.toISOString() ?? null,
-    voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },
+    voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId, batiState: (u.voiceBatiState as BatiVoiceState | null) ?? (u.voiceBatiId ? 'ready' : 'none') },
+    consent: u.consentVersion && u.consentAt ? { version: u.consentVersion, at: u.consentAt.toISOString(), guardian: u.guardianConsentVersion === u.consentVersion && !!u.guardianConsentAt } : null,
+    mediaOk: canUseMedia(u),
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
     butterfly: u.butterflyUrl ?? null,
@@ -116,6 +121,20 @@ export class UsersService {
     await this.db.write.transaction((tx) =>
       this.ledger.applyMana(tx, { userId, delta: MONTHLY_GRANT_MANA, reason: 'monthly_grant', idempotencyKey: `monthly:${userId}:${month}` }),
     );
+  }
+
+  /**
+   * M-R247: the start-of-app agreement (terms, privacy, and that photos and voice make only the member's look and
+   * {bati}). Only the current version can be agreed to; it is kept with the time.
+   */
+  async consent(userId: string, version: string, guardian = false): Promise<Me> {
+    if (version !== MEDIA_CONSENT_VERSION) throw apiError(HttpStatus.CONFLICT, 'CONSENT_OUTDATED', 'Please read the current terms');
+    const now = new Date();
+    // M-R248: the guardian's line (13〜15) is kept with the same version; not ticked = none
+    const g = guardian ? { guardianConsentVersion: version, guardianConsentAt: now } : { guardianConsentVersion: null, guardianConsentAt: null };
+    const [nu] = await this.db.write.update(users).set({ consentVersion: version, consentAt: now, ...g, updatedAt: now }).where(eq(users.id, userId)).returning();
+    if (!nu) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
+    return toMe(nu);
   }
 
   async getMe(userId: string): Promise<Me> {

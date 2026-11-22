@@ -111,6 +111,14 @@ export interface Api {
   composeMusicStatus(): Promise<Record<string, unknown>>;
   /** Register one of the two voices (own / Bati) from a recording of the fixed script. */
   registerVoice(body: RegisterVoiceBody): Promise<Me>;
+  /** M-R246: the egg recording (the held takes, appended) → {bati}'s voice (a queued voice model, +2 semitones) */
+  batiVoice(body: import('@obolo/shared').BatiVoiceBody): Promise<Me>;
+  /** 〔声を消す〕: the recording and the voice model deleted; {bati} speaks in the default voice */
+  removeBatiVoice(): Promise<Me>;
+  /** 〔写真を消す〕: the looks made from the photo deleted (the photo itself was never kept); the placeholder look */
+  removeLook(): Promise<Me>;
+  /** M-R247: the start-of-app agreement (terms, privacy, photos and voice) */
+  consent(version: string, guardian?: boolean): Promise<Me>;
   /** whether the voice service (Fish Audio) is connected */
   voiceStatus(): Promise<{ fish: boolean }>;
   /** Read a text aloud in a registered voice (Fish Audio). */

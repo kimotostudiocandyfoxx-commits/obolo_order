@@ -14,7 +14,7 @@ import type { Step } from './script';
  * Pictures: Seedance motions d2-* (each starting and ending on the stills around it), the Day-1 motions for
  * the HQ (d1-gate-loop, 9, 11, 12), Seedream stills s/d2-*.
  * The egg (M-R215): the visitor picks the moon egg (girl-leaning) or the sun egg (boy-leaning), f_egg; KIMORIN⭐︎ gets the other one.
- * Saved: times (+ timesWords), the look, the NEO name, egg, the favourite food, {bati} and its name, f_d03_bati_look,
+ * Saved: times (+ timesWords), the look, the NEO name, egg, f_d03_voice (the egg recording, M-R246), the favourite food, {bati} and its name, f_d03_bati_look,
  * f_d03_bati_talk.
  */
 export const DAY2: Step[] = [
@@ -320,6 +320,25 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'この卵にマナと、愛が、加われば、、、お前だけの旅の相方、バティが、生まれる。' },
   { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 声が裏返る。狐の耳の先まで赤くなる
   { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },
+  // M-R246: before {bati} hatches, the two talk to their eggs — {bati}'s voice is made from {name}'s (two keys higher)
+  { t: 'say', who: 'OBOLON', text: 'その前に、、、相方は、お前たちの声から、生まれる。' },
+  { t: 'say', who: 'OBOLON', text: 'たまごに、、、声を、聞かせてやれ。' },
+  { t: 'sprite', image: ['obolon', 'kimorin-iu'] }, // 黒い球が、KIMORINのほうへ向く
+  { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORINだ。' },
+  { t: 'say', who: 'KIMORIN', text: '……なんと話しかけても、いいんですか？' },
+  { t: 'say', who: 'OBOLON', text: '、、、大丈夫だ。なんでも、いい。' },
+  // KIMORINが、たまごに顔を近づける。咳払いを一つ
+  { t: 'say', who: 'KIMORIN', text: 'こんな、よくわからない、初めて見るスピスピのたまごに向かって、何か話しかけろと言われましても。' },
+  { t: 'say', who: 'KIMORIN', text: 'なんて話しかければいいか、わかりません。……これが、本音です。' },
+  { t: 'se', sound: 'chime' }, // KIMORINのたまごの模様が、ゆっくり光る。中から、小さく：ピン……
+  { t: 'sprite', image: 'obolon' }, // 黒い球が、くるりと、こちらへ向く
+  { t: 'say', who: 'OBOLON', text: '、、、さあ、{name}。話しかけてみろ。' },
+  {
+    t: 'eggvoice', // held mic, the ring fills (~10 s), ⓘ only (M-R247); the words heard as {name}'s bubble; full → the egg glows
+    example: '私も正直、なんて話しかければいいか全然分かっていません。でも、分かりませんと話しかけていいなら、そう話しかけます。',
+    short: { t: 'say', who: 'OBOLON', text: '、、、もう少し、聞かせてやれ。' },
+  },
+  { t: 'se', sound: 'magic' }, // {name}のたまごの模様が、ゆっくり光る
   { t: 'say', who: 'OBOLON', text: 'お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。' },
   { t: 'sprite', image: ['obolon', 'kimorin-iu'] }, // 黒い球が、KIMORINのほうへ向く
   { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORINだ。好きな食べ物は？' },
@@ -400,7 +419,11 @@ export const DAY2: Step[] = [
   { t: 'still', image: 's/d2-moon-in' },
   { t: 'sprite', image: ['obolon', '@bati'] }, // KIMORINが、両腕を大きく広げて、息を吸いこむ — その前に、黒い球が、こちらへ向く
   { t: 'say', who: 'OBOLON', text: '{name}、、、こっちへ来い。' }, // 器の水のそばへ。{bati}が、ころころ、あとからついてくる。KIMORINは、両腕を広げたまま
+  // M-R250: under 13 (or 13〜15 without the guardian's consent) the photo passage is skipped — the look from the animal only
+  { t: 'branch', key: 'f_media', cases: { no: 'look-animal' }, otherwise: 'look-photo' },
+  { t: 'label', id: 'look-photo' },
   { t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' },
+  { t: 'label', id: 'look-animal' },
   { t: 'sprite', image: null },
   {
     t: 'look', // 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕→ the animal → {bati} casts → −3マナ → 4枚

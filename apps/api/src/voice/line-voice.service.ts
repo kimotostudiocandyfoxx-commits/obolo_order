@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, Optional, type OnModuleInit } from '@nestjs/common';
 import { fillNames, speakText, spokenChars, storyVoiceFilter, storyVoicePrompt, type LineVoicesBody, type LineVoicesView, type NameLines } from '@obolo/shared';
 import { and, eq, inArray } from 'drizzle-orm';
 import { createHash } from 'node:crypto';
@@ -10,6 +10,7 @@ import type { KvStore } from '../infra/kv';
 import type { JobPayloads, JobQueue } from '../infra/queue';
 import { KV, QUEUE } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
+import { BatiVoiceService } from './bati-voice.service';
 import { textToSpeech } from './fish.client';
 
 const GEMINI = 'https://generativelanguage.googleapis.com/v1beta';
@@ -74,6 +75,7 @@ export class LineVoiceService implements OnModuleInit {
     @Inject(QUEUE) private readonly queue: JobQueue,
     private readonly db: Database,
     private readonly media: MediaService,
+    @Optional() private readonly batiVoice?: BatiVoiceService,
   ) {}
 
   onModuleInit() {
@@ -136,11 +138,17 @@ export class LineVoiceService implements OnModuleInit {
    * when it comes and goes on with the words alone if it does not. The answer was already checked by the buddy.
    */
   async batiSays(userId: string, text: string, origin: string): Promise<{ url: string } | null> {
+    // M-R246: the member's own {bati} voice (from the egg recording) when it is made; else the story's {bati} voice
+    const own = await this.batiVoice?.speak(userId, speakText(text)).catch((e) => (this.log.warn(`own bati voice: ${String(e)}`), null));
+    if (own) return { url: (await this.media.storeAudio(userId, 'audio/mpeg', own, origin)).url };
     const nl = await this.lines();
     const bati = nl && Object.values(nl.lines).find((l) => l.who === 'バティ');
     if (!nl || !bati || !this.cfg.GEMINI_API_KEY) return null;
     if ((await this.kv.incr(`lv-day:${userId}:${Math.floor(Date.now() / 86_400_000)}`, 86_400)) > DAILY) return null;
-    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec: { ...bati.spec, model: undefined }, brief: bati.brief, model: BATI_SAYS_MODEL, tempo: nl.tempo };
+    // M-R250: the prepared voice for this {bati}'s egg and personality (no voice of the member's own)
+    const dv = await this.batiVoice?.defaultVoice(userId).catch(() => null);
+    const spec = { ...bati.spec, model: undefined, ...(dv ? { voice: dv.gemini, pitch: dv.pitch } : {}) };
+    const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec, brief: bati.brief, model: BATI_SAYS_MODEL, tempo: nl.tempo };
     const mp3 = await this.slot(() => this.gemini(p, storyVoiceFilter(p.spec, p.tempo)));
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
     return { url: m.url };

@@ -273,6 +273,17 @@ export function neoLookPrompt(a: { animal: string; color: string; mood: string; 
 }
 
 /**
+ * M-R250: under 13 (or 13〜15 without the guardian's consent) — no photo: the chosen animal itself as the character, wearing
+ * the society's hood and the round gold-rimmed sunglasses (eyes never shown). The four differ in their touch (withTouch).
+ */
+export function neoAnimalPrompt(a: { animal: string; color: string; mood: string }, variant: number): string {
+  const animal = any(a.animal, 'fox');
+  const mood = MOOD[a.mood] ?? any(a.mood, 'mysterious and kind');
+  const pose = ['a gentle smile', 'a confident little grin', 'a calm, cool look', 'a cheerful open smile'];
+  return `A cute, friendly ${animal} character (the animal itself, standing like a person, not a human with animal ears), chest-up, centered, facing the viewer. A member of a mysterious secret society: an oversized, deep hooded cloak, the big hood pulled up over its head with its ears coming out through openings, fine gold embroidery along the hood's edge. It wears round sunglasses with thin gold frames and pitch-black lenses, so its eyes are not visible. Colours: ${colours(a.color, variant)}. Mood: ${mood}; ${pick(pose, variant)}. Plain soft background. ${ORIGINAL}`;
+}
+
+/**
  * Day 2 from a favourite photo of themselves (M-R148): the person in the photo drawn semi-real — their face
  * shape, hairstyle and hair colour kept as a likeness — with the chosen animal's ears, the society's hood in the
  * chosen colours and the round gold-rimmed sunglasses (the eyes never shown). The four differ in the ears, how the

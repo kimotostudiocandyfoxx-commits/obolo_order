@@ -1,11 +1,12 @@
-import { Body, Controller, Get, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
-import { BatiSaysBody, LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
+import { Body, Controller, Delete, Get, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { BatiSaysBody, BatiVoiceBody, LineVoicesBody, RegisterVoiceBody, SpeakBody, TranscribeBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
+import { BatiVoiceService } from './bati-voice.service';
 import { LineVoiceService } from './line-voice.service';
 import { VoiceService } from './voice.service';
 
@@ -16,6 +17,7 @@ export class VoiceController {
   constructor(
     private readonly voice: VoiceService,
     private readonly lines: LineVoiceService,
+    private readonly batiVoices: BatiVoiceService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -30,6 +32,23 @@ export class VoiceController {
   async register(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `voice-reg:${userId}`, 10, 86400);
     return this.voice.register(userId, parseBody(RegisterVoiceBody, body), `${req.protocol}://${req.get('host')}`);
+  }
+
+  /**
+   * M-R246 (D03-S005 「たまごに声を聞かせる」): the egg recording → {bati}'s voice (a queued voice model, +2 semitones).
+   * Needs the start-of-app agreement (M-R247); without it nothing is kept and {bati} keeps the default voice.
+   */
+  @Post('bati')
+  @HttpCode(200)
+  async batiVoice(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `voice-bati:${userId}`, 10, 86400);
+    return this.batiVoices.record(userId, parseBody(BatiVoiceBody, body), `${req.protocol}://${req.get('host')}`);
+  }
+
+  /** 〔声を消す〕 (settings): the recording and the voice model are deleted; the default voice again */
+  @Delete('bati')
+  removeBatiVoice(@UserId() userId: string) {
+    return this.batiVoices.remove(userId);
   }
 
   /** Mic first: the words of a recording (PLACEHOLDER P-VOICE-7: 200 a day). */

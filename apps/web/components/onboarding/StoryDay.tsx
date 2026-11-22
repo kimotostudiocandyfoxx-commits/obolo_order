@@ -172,6 +172,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         // from day 3 the display name is the NEO name (set on the Moon)
         neo: day >= 3 ? me.displayName : undefined,
         kimorinStar: day >= 3,
+        mediaOk: !!me.mediaOk,
         bati: me.bati?.name ?? undefined,
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFaces: me.bati?.faces,

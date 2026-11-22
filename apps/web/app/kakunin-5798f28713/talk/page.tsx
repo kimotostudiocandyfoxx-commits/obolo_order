@@ -6,8 +6,9 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
-import { BATI_COLOR, colorOf, DACHI_COLOR, PLACE_BG, SELF_COLOR } from '@/lib/talk/looks';
+import { BATI_COLOR, colorOf, DACHI_COLOR, PLACE_BG, SELF_COLOR, characterLook } from '@/lib/talk/looks';
 import { castLook, DEMO_GROUP_SEEDS } from '@/lib/talk/demoLooks';
+import { spriteUrl } from '@/lib/onboarding/media';
 
 /**
  * /kakunin-5798f28713/talk — 隣に並ぶトーク (M-R232〜M-R235) alive, with stand-in looks (no generation): the client
@@ -15,9 +16,9 @@ import { castLook, DEMO_GROUP_SEEDS } from '@/lib/talk/demoLooks';
  * (1, 2, 3+, 9+ messages, a long reply, a card, the keyboard, a ダチ voice message, groups of 3 and 7).
  * ?s=<scene> opens one; ?bare=1 hides the panel (screenshots).
  */
-const SCENES = ['live', 'pop', 'slam', 'slow', 'whisper', '1', '2', '3', '9', 'past', 'long', 'card', 'kb', 'dachi', 'g3', 'g7'] as const;
+const SCENES = ['live', 'pop', 'slam', 'slow', 'whisper', '1', '2', '3', '9', 'past', 'long', 'card', 'kb', 'dachi', 'g3', 'g7', 'fp1', 'fp2', 'switch'] as const;
 type Scene = (typeof SCENES)[number];
-const LABEL: Record<Scene, string> = { live: '話してみる', pop: 'ふつう', slam: 'ドーン', slow: 'もこもこ', whisper: '小声', '1': '1つ', '2': '2つ', '3': '3つ', '9': '9つ以上', long: '長い返事', card: 'カード', kb: 'キーボード', past: '過去に戻る', dachi: 'ダチの声', g3: '3人', g7: '7人' };
+const LABEL: Record<Scene, string> = { live: '話してみる', pop: 'ふつう', slam: 'ドーン', slow: 'もこもこ', whisper: '小声', '1': '1つ', '2': '2つ', '3': '3つ', '9': '9つ以上', long: '長い返事', card: 'カード', kb: 'キーボード', past: '過去に戻る', dachi: 'ダチの声', g3: '3人', g7: '7人', fp1: '1日目（目線・1人）', fp2: '1日目（目線・2人）', switch: '姿ができた瞬間' };
 
 /** the prototype's talk (design/talk/proto.html): what was said before (on the ring), then the lines played in a row */
 type Said = [string, [string, TalkFace, TalkMotion | '', { in?: TalkIn; shape?: TalkShape }?][]];
@@ -108,13 +109,25 @@ function Review() {
 
 function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
   // the client's talk cast (public/talk, from design/talk): ネオ, ウニュ the {bati}, アポロ the dachi
-  const me: TalkPerson = useMemo(() => ({ id: 'me', name: 'ネオ', look: castLook('user'), color: SELF_COLOR, self: true }), []);
+  // M-R249: 'fp1' / 'fp2' — day 1 in first person (you are not shown; one partner / two); 'switch' — the look is made and
+  // you stand beside {bati} for the first time
+  const day1 = scene === 'fp1' || scene === 'fp2';
+  const [made, setMade] = useState(!day1 && scene !== 'switch');
+  useEffect(() => {
+    if (scene !== 'switch') return;
+    const t = setTimeout(() => setMade(true), 2600);
+    return () => clearTimeout(t);
+  }, [scene]);
+  const me: TalkPerson = useMemo(() => ({ id: 'me', name: 'ネオ', look: made ? castLook('user') : null, color: SELF_COLOR, self: true }), [made]);
   const bati: TalkPerson = useMemo(() => ({ id: 'bati', name: 'ウニュ', look: castLook('bati'), color: BATI_COLOR }), []);
-  const kimorin: TalkPerson = useMemo(() => ({ id: 'kimorin', name: 'アポロ', look: castLook('friend'), color: DACHI_COLOR }), []);
+  const kimorin: TalkPerson = useMemo(() => (day1 ? { id: 'kimorin', name: 'KIMORIN', look: characterLook('kimorin'), color: DACHI_COLOR } : { id: 'kimorin', name: 'アポロ', look: castLook('friend'), color: DACHI_COLOR }), [day1]);
+  const monban: TalkPerson = useMemo(() => ({ id: 'monban', name: 'MONBAN', look: { of: 'monban', stand: spriteUrl('monban') }, color: '#87a3c2' }), []);
   const group = scene === 'g3' || scene === 'g7';
   const people: TalkPerson[] = group
     ? [...DEMO_GROUP_SEEDS.slice(0, scene === 'g3' ? 2 : 6).map((s, k) => ({ id: `p${k}`, name: ['アポロ', 'ウニュ', 'ミナ', 'ポコ', 'ソラ', 'テト'][k], look: castLook((['friend', 'bati', 'user'] as const)[k % 3], `g${k}`), color: colorOf(s, k) })), me]
-    : scene === 'dachi'
+    : scene === 'fp2'
+      ? [monban, kimorin, me]
+      : scene === 'dachi' || scene === 'fp1'
       ? [kimorin, me]
       : [bati, me];
 
@@ -164,6 +177,22 @@ function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
         { id: 'd2', who: 'me', text: 'ほんと！？　うれしい！', voice: { url: '/onboarding/kimorin-mercury-2.m4a', seconds: 3 }, faces: [{ face: 'smile', motion: 'hop' }] },
         { id: 'd3', who: 'kimorin', text: '……[[しんみり:鍛えすぎたか]]。いや、!!むしろ見せたい!!。', voice: { url: '/onboarding/kimorin-mercury-1.m4a', seconds: 5 }, faces: [{ face: 'normal' }, { face: 'thinking', motion: 'tilt' }] },
       ];
+    if (scene === 'fp1')
+      return [
+        { id: 'k0', who: 'kimorin', text: 'おや、そこのあなた、もしかして、あなたも招待客？' },
+        { id: 'k1', who: 'me', text: 'うん、招待状が届いたんだ' },
+      ];
+    if (scene === 'fp2')
+      return [
+        { id: 'm0', who: 'monban', text: '来たか…切符は持ってきたか？' },
+        { id: 'm1', who: 'me', text: '切符を見せる' },
+        { id: 'k2', who: 'kimorin', text: '気をつけなさい。', face: 'thinking' },
+      ];
+    if (scene === 'switch')
+      return [
+        { id: 's0', who: 'bati', text: 'いくよ、ネオ！', face: 'smile', motion: 'hop' },
+        { id: 's1', who: 'me', text: 'これが、わたし……？' },
+      ];
     if (group) return people.slice(0, -1).flatMap((p, k) => [{ id: `g${k}`, who: p.id, text: ['やっほー！', 'こんばんは！', '今日の曲、聞いた？', 'うん、よかった！', '次は木星だね', 'たのしみ！'][k % 6], face: 'smile' as TalkFace }]).concat([{ id: 'gm', who: 'me', text: 'みんな、おつかれさま！', face: 'smile' }]);
     return pick(2);
   };
@@ -196,8 +225,8 @@ function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
         group={group ? { name: '土星のサイファー仲間', count: people.length } : undefined}
         top={0}
         // M-R239: the ダチ scene opens with two unread lines (the last read one and the unread ones play in a row)
-        unreadFrom={scene === 'dachi' ? 2 : scene === 'live' ? HISTORY.length : undefined}
-        bar={{ title: group ? '' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', onBluena: () => undefined, threads: { list: THREADS, current: group ? 'group' : scene === 'dachi' ? 'dachi' : 'bati', days: demoDays } }}
+        unreadFrom={scene === 'dachi' || scene === 'fp2' ? 2 : scene === 'live' ? HISTORY.length : undefined}
+        bar={{ title: group ? '' : scene === 'fp2' ? 'MONBAN・KIMORIN' : day1 ? 'KIMORIN' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', onBluena: () => undefined, threads: { list: THREADS, current: group ? 'group' : scene === 'dachi' ? 'dachi' : 'bati', days: demoDays } }}
         composer={<TalkComposer placeholder="ことばで話す" onSend={send} onState={(s) => setState((o) => (scene === 'kb' ? { ...s, keyboard: true } : s))} initial={scene === 'kb' ? '土星の輪は' : ''} startTyping={scene === 'kb'} />}
       />
       {scene === 'live' && !bare && (

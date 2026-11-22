@@ -281,6 +281,13 @@
       "when": 1795331424696,
       "tag": "0039_item_marks",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1795341486258,
+      "tag": "0040_bati_voice_consent",
+      "breakpoints": true
     }
   ]
 }

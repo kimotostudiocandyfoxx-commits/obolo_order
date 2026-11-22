@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
 import { BatiForgetBody, BatiMemoryBody, BatiRoleBody, BatiEggBody, BatiIdBody, BatiNameBody, BatiNewHatchBody, BatiSpeechBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, LookRestoreBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
 import type { Request } from 'express';
@@ -135,6 +135,12 @@ export class LookController {
   @HttpCode(200)
   restyleBack(@UserId() userId: string, @Req() req: Request) {
     return this.look.restyleBack(userId, origin(req));
+  }
+
+  /** M-R247 〔写真を消す〕: every look made from the photo goes (the photo itself was never kept); the placeholder look again */
+  @Delete('look')
+  removeLook(@UserId() userId: string) {
+    return this.look.removeLook(userId);
   }
 
   /** M-R223: Bluena's first shelf — a {bati} look kept before, worn again */

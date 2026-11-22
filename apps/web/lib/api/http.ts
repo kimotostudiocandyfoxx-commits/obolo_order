@@ -174,6 +174,18 @@ export class HttpApi implements Api {
   batiSays(text: string) {
     return this.req<{ url: string | null }>('POST', '/voice/bati-says', { text });
   }
+  batiVoice(body: Parameters<Api['batiVoice']>[0]) {
+    return this.req<Me>('POST', '/voice/bati', body);
+  }
+  removeBatiVoice() {
+    return this.req<Me>('DELETE', '/voice/bati');
+  }
+  removeLook() {
+    return this.req<Me>('DELETE', '/me/look');
+  }
+  consent(version: string, guardian = false) {
+    return this.req<Me>('POST', '/me/consent', { version, guardian });
+  }
   voiceStatus() {
     return this.req<{ fish: boolean }>('GET', '/voice/status');
   }

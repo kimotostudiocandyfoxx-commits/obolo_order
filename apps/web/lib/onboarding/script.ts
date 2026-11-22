@@ -237,6 +237,15 @@ export type Step =
    * no thread to open (MIKIE⭐︎DRILL 「ようこそ。……」, shared MIKIE_WELCOME).
    */
   | { t: 'dachivoice'; fallback: ScriptLine }
+  /**
+   * D03-S005 (M-R246 / M-R247) 「たまごに声を聞かせる」: a big mic in the middle, held to talk to the egg; a light ring around
+   * it fills with the length spoken (full at about 10 s). Released too soon → `short` (OBOLON 「、、、もう少し、聞かせてやれ。」)
+   * and the takes go on (appended). The words heard come out as {name}'s bubble; full → the egg glows and the story goes
+   * on. `example`: the small example sentence under the mic. No explanation on the screen (M-R247): a small ⓘ by the mic
+   * shows how the voice is used to those who tap it. The recording becomes {bati}'s voice on the server (POST /voice/bati)
+   * only with the start-of-app agreement; the demo and the review page record nothing. Saves f_d03_voice.
+   */
+  | { t: 'eggvoice'; example: string; short: ScriptLine }
   /** remember a flag in the day's answers (saved with the day like a choice): f_ej_heard, f_join … */
   | { t: 'set'; key: string; value: string }
   /** the script scene that starts here (D04-S002 …): shown on the review screen so notes can name it; no effect in play */
@@ -279,6 +288,12 @@ export interface StoryVars {
   age?: string;
   /** KIMORIN is shown as "KIMORIN⭐︎" (his NEO name, from the Moon's naming on). */
   kimorinStar?: boolean;
+  /**
+   * M-R248 / M-R250: the photo and the voice may be used (Me.mediaOk: the agreement; never under 13; 13〜15 with the
+   * guardian's consent). false → the look from the animal only (no photo passage) and the egg scene records nothing.
+   * Read by the 'branch' key `f_media` (yes / no). Missing (the review pages) = yes.
+   */
+  mediaOk?: boolean;
   /** Earlier days' answers ("d1.choice1" …), for 'branch' steps and {choice1}. */
   story?: Record<string, string>;
   /** What earlier days made (kororins → stickers → song → MV): lib/onboarding/made.ts. */

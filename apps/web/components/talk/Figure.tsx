@@ -360,6 +360,8 @@ export const TALK_CSS = `
 @keyframes talk-quake0 { 0%,100% { transform: none } 25% { transform: translate(2px,-2px) } 50% { transform: translate(-2px,2px) } 75% { transform: translate(1px,1px) } }
 @keyframes talk-quake1 { 0%,100% { transform: none } 25% { transform: translate(2px,-2px) } 50% { transform: translate(-2px,2px) } 75% { transform: translate(1px,1px) } }
 @keyframes talk-fadeout { to { opacity: 0 } }
+@keyframes talk-arrive { 0% { opacity: 0; filter: brightness(2.6) blur(6px); transform: translateX(-50%) scale(.96) } 55% { opacity: 1; filter: brightness(1.6) blur(1px) } 100% { opacity: 1; filter: none; transform: translateX(-50%) } }
+@keyframes talk-gather { 0% { opacity: 0; transform: translate(var(--mx), var(--my)) scale(1.4) } 30% { opacity: 1 } 100% { opacity: 0; transform: translate(0,0) scale(.5) } }
 @keyframes talk-fadein { from { opacity: 0 } to { opacity: 1 } }
 @keyframes talk-pulse { 0%,100% { box-shadow: 0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55) } 50% { box-shadow: 0 0 0 14px rgba(223,230,255,.08),0 0 48px rgba(160,180,255,.8) } }
 @keyframes talk-squash { 0% { transform: scale(1,1) } 35% { transform: scale(1.04,.95) } 70% { transform: scale(.98,1.03) } 100% { transform: scale(1,1) } }
