@@ -61,7 +61,7 @@ export const M_URANUS: Step[] = [
   { t: 'sprite', image: '@bati' },
   { t: 'say', who: 'バティ', text: '工房に行こう！' },
   { t: 'sprite', image: null },
-  { t: 'action', label: '🌙 つくる' }, // 〔画面：〔🌙 つくる〕〕
+  { t: 'action', label: 'つくる' }, // 〔画面：〔🌙 つくる〕〕
   // Bluenaのレンズから光がのび、正方形のスクリーンが広がる。{bati}が、スクリーンをくぐって、黒い鉄の大きな刷り台に、ぴょんと跳びのる
   { t: 'se', sound: 'portal' },
   { t: 'still', image: 's/uranus-press', fade: 0.8 }, // the iron press with its handle (the workshop itself opens in the m-goods screen)
@@ -120,7 +120,7 @@ export const M_URANUS: Step[] = [
   { t: 'say', who: CROCO, text: '品物に触れると、札が出ますわ。見て回るだけでも、よろしくてよ。' },
   {
     t: 'notice',
-    text: '🏪 obolo商店｜品物に触ると札が出ます（作った人・素材・大きさ・『受注生産：注文が入ってから作って届けます』）。〔購入〕を押した時だけ、買う画面が開きます。支払いはお金で、月額88円とは別の料金です。売り買いに、マナは使いません',
+    text: 'obolo商店｜品物に触ると札が出ます（作った人・素材・大きさ・『受注生産：注文が入ってから作って届けます』）。〔購入〕を押した時だけ、買う画面が開きます。支払いはお金で、月額88円とは別の料金です。売り買いに、マナは使いません',
   },
   {
     t: 'choice',
@@ -174,7 +174,7 @@ export const M_PLUTO: Step[] = [
   { t: 'say', who: 'たこ焼きブラザー', text: '空の灯りは、ぜんぶ、誰かの物語だZE!!' },
   // 平原のはしに、{neo}の名前の札がかかった、小さな氷の書庫。中の棚は、まだ空いている
   { t: 'say', who: 'たこ焼きブラザー', text: 'ここが、{neo}の図書館だZE。公開した本が、ここに並ぶZE。書くのは、月の工房だZE。' },
-  { t: 'notice', text: '冥王星｜下に〔🦉 本の空〕〔📚 my図書館〕。行きたい場所をタップすると、バイカでそこまで走ります。図書館の形は、あとで{bati}と話して変えられます' },
+  { t: 'notice', text: '冥王星｜下に〔本の空〕〔my図書館〕。行きたい場所をタップすると、バイカでそこまで走ります。図書館の形は、あとで{bati}と話して変えられます' },
 
   // M-PLUTO-S002 お話を書いて、空に灯す
   { t: 'scene', id: 'M-PLUTO-S002' },

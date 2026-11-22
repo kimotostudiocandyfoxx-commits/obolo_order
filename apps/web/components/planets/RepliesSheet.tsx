@@ -52,7 +52,7 @@ export function RepliesSheet({ planet, postId, owner, onClose, onReplied }: { pl
   return createPortal(
     <div className="fixed inset-0 z-[140] flex items-end justify-center bg-black/55" onClick={onClose}>
       <div className={`pb-safe flex max-h-[75svh] w-full max-w-md flex-col rounded-t-3xl ${dark} p-4 text-white`} onClick={(e) => e.stopPropagation()}>
-        <p className="text-center text-sm font-bold tracking-widest">💬 @{owner} へのリプ</p>
+        <p className="text-center text-sm font-bold tracking-widest">@{owner} へのリプ</p>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto">
           {list === null && <p className="text-center text-xs text-white/50">ひらいています…</p>}
           {list?.length === 0 && <p className="py-4 text-center text-xs text-white/55">{postId ? 'まだリプはありません。最初のひとことを送ってみよう' : 'サンプルの作品には、リプできません'}</p>}

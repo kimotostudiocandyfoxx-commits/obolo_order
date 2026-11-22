@@ -289,9 +289,9 @@ function BatiChatFull({
     <div className="absolute inset-0 z-[12] flex flex-col bg-gradient-to-b from-[#0a0f24] via-[#0b0a1a] to-black text-amber-50">
       <div className="pt-safe flex items-center justify-between px-4 pt-12">
         <button onClick={openHistory} className="rounded-full bg-white/10 px-3 py-1.5 text-[12px]">
-          📜 前の話
+          前の話
         </button>
-        <p className="text-[13px] tracking-widest text-amber-100/80">💬 {bati}に聞く</p>
+        <p className="text-[13px] tracking-widest text-amber-100/80">{bati}に聞く</p>
         <span className="w-16" />
       </div>
       {/* Bati, its face changing with the talk */}
@@ -312,7 +312,7 @@ function BatiChatFull({
       </div>
       <div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3 pt-3">
         {/* the how-to comes one step at a time, at the moment it is used (M-R169) */}
-        {first && !asked && <p className="rounded-2xl bg-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-amber-50/75">使い方｜〔🎙〕を押して、知りたいことを話してみよう（宇宙のことでも、それ以外のことでも、何でも）</p>}
+        {first && !asked && <p className="rounded-2xl bg-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-amber-50/75">使い方｜マイクを押して、知りたいことを話してみよう（宇宙のことでも、それ以外のことでも、何でも）</p>}
         {msgs.map((m) =>
           m.who === 'me' ? (
             <div key={m.id} className="flex items-end justify-end gap-2">
@@ -348,9 +348,9 @@ function BatiChatFull({
                   ) : (
                     <>
                       <button onClick={() => void showPicture(m.id)} className="rounded-full border border-amber-200/40 px-3 py-1 text-[12px]">
-                        🖼 絵で見る
+                        絵で見る
                       </button>
-                      {first && !msgs.some((x) => x.picture !== undefined) && <p className="text-[11px] text-amber-50/60">〔🖼 絵で見る〕を押すと、調べてきた写真や図も見られます</p>}
+                      {first && !msgs.some((x) => x.picture !== undefined) && <p className="text-[11px] text-amber-50/60">〔絵で見る〕を押すと、調べてきた写真や図も見られます</p>}
                     </>
                   )}
                   {spell && (
@@ -362,7 +362,7 @@ function BatiChatFull({
                       disabled={noted.has(m.id)}
                       className="text-[11px] text-violet-200 disabled:text-amber-50/40"
                     >
-                      {noted.has(m.id) ? 'スペルブックに記しました' : '📖 記す'}
+                      {noted.has(m.id) ? 'スペルブックに記しました' : '記す'}
                     </button>
                   )}
                   <p className="text-[10px] leading-snug text-amber-50/45">{bati}の答えが、まちがっていることもあります。大事なことは、自分でも確かめてね</p>
@@ -395,16 +395,16 @@ function BatiChatFull({
             </button>
           )}
         </div>
-        {first && asked && msgs.some((x) => x.picture !== undefined) && !kept && <p className="text-center text-[11px] text-amber-50/60">気に入った話は〔この話を残す〕。左上の〔📜 前の話〕から、いつでも続きを聞けます</p>}
+        {first && asked && msgs.some((x) => x.picture !== undefined) && !kept && <p className="text-center text-[11px] text-amber-50/60">気に入った話は〔この話を残す〕。左上の〔前の話〕から、いつでも続きを聞けます</p>}
         {asked && (
           <button onClick={keepTalk} disabled={kept || !!casting} className="mx-auto block text-[12px] text-amber-100/80 disabled:text-amber-50/40">
-            {kept ? '📜 この話を残しました' : '📜 この話を残す'}
+            {kept ? 'この話を残しました' : 'この話を残す'}
           </button>
         )}
       </div>
       {history && (
         <div className="absolute inset-0 z-10 flex flex-col bg-black/85 px-4 pb-6 pt-[calc(16px+env(safe-area-inset-top))]" onClick={() => setHistory(null)}>
-          <p className="text-center text-[13px] tracking-widest">📜 前の話</p>
+          <p className="text-center text-[13px] tracking-widest">前の話</p>
           <div className="mt-3 flex-1 space-y-2 overflow-y-auto text-[13px]">
             {history.length ? history.map((h, k) => <p key={k}><span className="mr-1 text-[10px] text-amber-200/70">{h.who}</span>{h.text}</p>) : <p className="text-center text-amber-50/50">まだ、残した話はありません</p>}
           </div>

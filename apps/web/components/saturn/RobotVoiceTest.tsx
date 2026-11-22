@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { decodeVoice, playRobot, ROBOT_LEVELS, stopRobot, TUTORIAL_ROBOT, unlockRobot, type RobotLevel } from '@/lib/robotVoice';
 import { useRecorder } from '@/lib/useRecorder';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Robot voice test (client idea 2026-10-07): KIMORIN asks you to prove you are human, you say
@@ -59,7 +60,7 @@ export function RobotVoiceTest() {
         }}
         className={`mt-6 flex h-28 w-28 flex-col items-center justify-center rounded-full text-white shadow-[0_6px_0_rgba(120,60,170,.4)] ${rec.recording ? 'animate-pulse bg-gradient-to-br from-rose-400 to-pink-500' : 'bg-gradient-to-br from-[#f39bd0] to-[#b58cff]'}`}
       >
-        <span className="text-4xl">{rec.recording ? '■' : '🎙'}</span>
+        {rec.recording ? <span className="text-4xl">■</span> : <LineIcon id="mic" className="h-10 w-10" />}
         <span className="mt-1 text-xs font-black">{rec.recording ? `${rec.elapsed}秒・とめる` : buf ? 'とりなおす' : '録音する'}</span>
       </button>
       {rec.error && <p className="mt-2 text-xs font-bold text-rose-100">マイクが使えなかった…（設定でマイクを許可してね）</p>}
@@ -70,11 +71,11 @@ export function RobotVoiceTest() {
           <p className="text-center text-xs font-black text-[#8a76bd]">聞きくらべてみてね（{buf.duration.toFixed(1)}秒）</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button onClick={() => void play(null)} className={`rounded-2xl py-3 text-sm font-black ${playing === 'raw' ? 'bg-violet-500 text-white' : 'bg-violet-50 text-[#5a3f8a]'}`}>
-              🙂 そのまま
+              そのまま
             </button>
             {ROBOT_LEVELS.map((l) => (
               <button key={l.id} onClick={() => void play(l.id)} className={`rounded-2xl py-3 text-sm font-black ${playing === l.id ? 'bg-violet-500 text-white' : 'bg-violet-50 text-[#5a3f8a]'}`}>
-                🤖 {l.label}
+                {l.label}
                 {l.id === TUTORIAL_ROBOT && <span className="ml-1 rounded-full bg-pink-100 px-1.5 text-[9px] text-pink-500">チュートリアル用</span>}
               </button>
             ))}

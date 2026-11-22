@@ -11,8 +11,8 @@ import { useAuth } from '@/lib/auth';
  * (painted, warped by the physics). 3 tries a day (≈ ¥6 an image).
  */
 const TEXT = {
-  puni: { title: '🎨 キャラを描いてもらう', empty: 'ここにあなたのキャラが描かれるよ', example: '例：サーモンのお寿司みたいな、ゆるくて元気なキャラ。小さな王冠をかぶってる', pick: 'このキャラにする', reset: '絵のキャラをやめる（シンプルな丸にもどす）' },
-  butterfly: { title: '🦋 蝶を描いてもらう', empty: 'ここにあなたの蝶が描かれるよ', example: '例：月と星もようの羽の、うさぎの蝶。青いフードをかぶってる', pick: 'この蝶にする', reset: '描いた蝶をやめる（いつもの姿にもどす）' },
+  puni: { title: 'キャラを描いてもらう', empty: 'ここにあなたのキャラが描かれるよ', example: '例：サーモンのお寿司みたいな、ゆるくて元気なキャラ。小さな王冠をかぶってる', pick: 'このキャラにする', reset: '絵のキャラをやめる（シンプルな丸にもどす）' },
+  butterfly: { title: '蝶を描いてもらう', empty: 'ここにあなたの蝶が描かれるよ', example: '例：月と星もようの羽の、うさぎの蝶。青いフードをかぶってる', pick: 'この蝶にする', reset: '描いた蝶をやめる（いつもの姿にもどす）' },
 };
 
 /** `kind`: Saturn character (round ぷにぷに) or Jupiter butterfly (client request 2026-10-07). */
@@ -125,7 +125,7 @@ export function PuniPicMaker({ onClose, onSaved, kind = 'puni' }: { onClose: () 
         <p className="mt-3 text-xs font-black text-[#8a76bd]">参考にする絵（なくてもOK）</p>
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <label className="cursor-pointer rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#7a62b0] shadow-sm">
-            🖼 画像をえらぶ
+            画像をえらぶ
             <input type="file" accept="image/*" className="hidden" onChange={(e) => void onFile(e.target.files?.[0])} />
           </label>
           {kind === 'butterfly' && me?.puniPic && (
@@ -137,7 +137,7 @@ export function PuniPicMaker({ onClose, onSaved, kind = 'puni' }: { onClose: () 
               }}
               className={`rounded-full px-3 py-1.5 text-xs font-bold shadow-sm ${useSaturn ? 'bg-violet-500 text-white' : 'bg-white text-[#7a62b0]'}`}
             >
-              🪐 土星のキャラを蝶にする
+              土星のキャラを蝶にする
             </button>
           )}
           {me?.avatarUrl && (
@@ -149,7 +149,7 @@ export function PuniPicMaker({ onClose, onSaved, kind = 'puni' }: { onClose: () 
               }}
               className={`rounded-full px-3 py-1.5 text-xs font-bold shadow-sm ${useNeo ? 'bg-violet-500 text-white' : 'bg-white text-[#7a62b0]'}`}
             >
-              ✨ ネオの姿を参考にする
+              ネオの姿を参考にする
             </button>
           )}
           {ref && (
@@ -169,7 +169,7 @@ export function PuniPicMaker({ onClose, onSaved, kind = 'puni' }: { onClose: () 
         {err && <p className="mb-1 text-center text-xs text-rose-500">{err}</p>}
         <div className="flex gap-2">
           <button onClick={() => void generate()} disabled={!!busy} className="flex-1 rounded-full bg-[#f3ecff] py-3 text-sm font-black text-[#5a3f8a] disabled:opacity-50">
-            {cands.length ? '🎨 もう一度描く' : '🎨 描いてもらう'}
+            {cands.length ? 'もう一度描く' : '描いてもらう'}
             {left !== null && <span className="ml-1 text-[10px] font-bold">（今日あと{left}回）</span>}
           </button>
           {pick && (

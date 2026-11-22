@@ -24,7 +24,7 @@ export function Lap2Chip() {
   const opens = lap2OpensAt(me.story);
   if (opens !== null && now < opens) {
     const h = Math.ceil((opens - now) / 3600_000);
-    return <span className="chip bg-white/10 px-2.5 py-1 text-xs text-white/60">🔒 {planet}は、あと{h}時間でひらきます</span>;
+    return <span className="chip bg-white/10 px-2.5 py-1 text-xs text-white/60">{planet}は、あと{h}時間でひらきます</span>;
   }
   return (
     <button
@@ -38,7 +38,7 @@ export function Lap2Chip() {
       }}
       className="chip bg-amber-200/15 px-2.5 py-1 text-xs text-amber-100"
     >
-      🚀 {planet}へ
+      {planet}へ
     </button>
   );
 }

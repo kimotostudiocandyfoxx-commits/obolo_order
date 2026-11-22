@@ -8,6 +8,7 @@ import { synth } from '@/lib/synth';
 import { Frame } from './Frame';
 import { ReplierFaces, RepliesSheet } from '@/components/planets/RepliesSheet';
 import type { PlanetAuthor } from '@obolo/shared';
+import { LineIcon } from '@/components/LineIcon';
 
 /** One person in the Mars sky: their UFO and the movies it carries. */
 export type CrewMember = { key: string; name: string; img?: string | null; emoji: string; videos: Video[]; isMe?: boolean };
@@ -208,12 +209,12 @@ export function UfoPlayer({
             className="flex h-11 shrink-0 items-center gap-1.5 rounded-full border border-white/35 bg-black/40 px-3 text-lg backdrop-blur"
             aria-label="リプ"
           >
-            💬
+            <LineIcon id="chat" className="h-5 w-5" />
             <ReplierFaces who={repliers} />
           </button>
           {onStudio && (
             <button onClick={() => onStudio(member)} className="flex h-11 shrink-0 items-center gap-1 rounded-full border border-amber-300/60 bg-black/50 px-3 text-xs font-bold text-amber-100 backdrop-blur">
-              🎬 {member.isMe ? 'myスタジオへ' : 'この人のスタジオへ'}
+              {member.isMe ? 'myスタジオへ' : 'この人のスタジオへ'}
             </button>
           )}
         </div>

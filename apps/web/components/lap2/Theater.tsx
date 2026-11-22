@@ -58,7 +58,7 @@ export function Theater({ mv, neo = '', onDone }: { mv: MvMade | null; neo?: str
   return (
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/55 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md animate-[fadeUp_0.5s_ease-out] rounded-3xl border border-rose-100/25 bg-[#1a0a0c]/95 p-5 text-rose-50">
-        <p className="text-center text-[15px] font-bold tracking-wider">🎬 上映館</p>
+        <p className="text-center text-[15px] font-bold tracking-wider">上映館</p>
         <p className="mt-1 text-center text-[12px] text-rose-100/80">{thanks && order[0] === KIMORIN_TEN.key && order.length === 1 ? `KIMORIN「……${neo}の上映館の、最初の一本とは。光栄です。」` : `ヒポキン「${cue}」`}</p>
         {phase === 'theme' && (
           <div className="mt-3 space-y-3">
@@ -125,7 +125,7 @@ export function Theater({ mv, neo = '', onDone }: { mv: MvMade | null; neo?: str
         )}
         {phase === 'shoot' && (
           <div className="mt-3 space-y-3 text-center">
-            <p className="text-[13px] text-rose-50/80">新しく撮る時は、マナを使います。撮影は、myスタジオの〔🎥 撮影〕でできます。撮れたら、上映館にそのまま置けます</p>
+            <p className="text-[13px] text-rose-50/80">新しく撮る時は、マナを使います。撮影は、myスタジオの〔撮影〕でできます。撮れたら、上映館にそのまま置けます</p>
             <p className="text-[11px] text-rose-50/55">本当にいる人の顔や名前、ほかの人の作品のキャラクターは、映像にしません</p>
             <button onClick={() => setPhase('films')} className={btn}>
               やめる（ほかの一本を選ぶ）

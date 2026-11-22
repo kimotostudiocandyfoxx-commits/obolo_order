@@ -30,7 +30,7 @@ export function BatiAsk({ bati, onDone }: { bati: string; onDone: (a: Record<str
   return (
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/55 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md animate-[fadeUp_0.5s_ease-out] rounded-3xl border border-amber-100/25 bg-[#0d0b18]/95 p-5 text-amber-50">
-        <p className="text-center text-[15px] font-bold tracking-wider">💬 {name}に聞く</p>
+        <p className="text-center text-[15px] font-bold tracking-wider">{name}に聞く</p>
         {answer === null ? (
           <div className="mt-3 space-y-3">
             {err && <p className="text-center text-[12px] text-amber-200/80">{err}</p>}

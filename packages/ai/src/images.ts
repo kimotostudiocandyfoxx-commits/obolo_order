@@ -358,6 +358,23 @@ export function batiPrompt(food: string, fromBody = false): string {
   return `${STYLE} The character is a newborn magical partner creature called Bati: small, round and chubby, with big sparkling eyes, whose body, colors and accessories are inspired by "${food}". It looks friendly and happy, as if it just hatched from an egg (a few eggshell pieces nearby).`;
 }
 
+/**
+ * Bati's room (P-BATI-ROOM): the hatched Bati, on its flat grey, dressed up or changed a little by the member's wish —
+ * clothes, accessories, a small transformation — and still clearly the same creature. Three variations per round.
+ */
+export function batiRestylePrompt(wish: string, variant = 0): string {
+  const ways = ['a happy pose', 'a proud little pose, showing off the new look', 'a playful pose, turning a little'];
+  return (
+    'Edit the first picture: it is the same small magical partner creature called Bati, and it must stay clearly the same creature — ' +
+    'the same face, eyes, body shape, size, main colours, the tiny mark on its forehead, the same soft painted style, framing and the flat ' +
+    'plain mid-grey background (#808080) with no floor, no shadow and no other objects. ' +
+    `Dress it up or change it a little following this wish: "${wish}" — new clothes, accessories, a hat, a small costume or a small, ` +
+    'cute transformation (colours of a part, little wings, a tail tip, ears), never a different animal or a different character. ' +
+    `Variation ${variant + 1}: ${pick(ways, variant)}. Cute, kids-friendly, never scary. No text, no letters. ` +
+    'Do not copy any existing character, mascot, costume, logo or brand.'
+  );
+}
+
 const ORIGINAL =
   'IMPORTANT: the result must be a completely NEW, ORIGINAL character. Do NOT reproduce, trace or imitate any existing ' +
   'character, mascot, costume, logo or trademark from anime, games, films or brands; change the face, outfit design, ' +

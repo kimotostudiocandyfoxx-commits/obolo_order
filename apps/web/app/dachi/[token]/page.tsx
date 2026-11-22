@@ -37,7 +37,7 @@ export default function DachiLinkPage({ params }: { params: Promise<{ token: str
 
   const box = (body: React.ReactNode) => (
     <main className="flex min-h-svh flex-col items-center justify-center gap-5 bg-[#07060d] px-8 text-center text-amber-50" style={{ fontFamily: '"Shippori Mincho", "Hiragino Mincho ProN", serif' }}>
-      <p className="text-[12px] tracking-[0.4em] text-amber-200/80">🤝 ダチの招待状</p>
+      <p className="text-[12px] tracking-[0.4em] text-amber-200/80">ダチの招待状</p>
       {body}
       <Link href="/" className="text-[12px] text-white/50 underline">
         宇宙へもどる

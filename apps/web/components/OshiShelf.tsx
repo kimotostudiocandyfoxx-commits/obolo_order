@@ -4,13 +4,14 @@ import type { DeliveryView } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { GLYPH_NAMES, Glyph, type GlyphId } from '@/components/bluena/glyphs';
 
 /**
  * 〔推し〕 (story draft 21, M-R124/M-R109): what the dachi delivered — kororins, jackets, songs, MVs, stages —
  * for 88 hours each. A dachi's work carries a small name tag. It plays only when tapped; eight at a time;
  * nothing is counted (no numbers anywhere, no "seen" marks back to the sender).
  */
-const ICON: Record<DeliveryView['kind'], string> = { kororin: '🪐', jacket: '🦋', song: '🚢', mv: '🛸', stage: '🎤', book: '🦉' };
+const ICON: Record<DeliveryView['kind'], GlyphId> = { kororin: 'voice', jacket: 'art', song: 'song', mv: 'video', stage: 'radio', book: 'book' };
 
 export function OshiShelf() {
   const { me } = useAuth();
@@ -48,11 +49,11 @@ export function OshiShelf() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={d.posterUrl ?? d.url ?? ''} alt="" className="h-full w-full object-cover" />
                       ) : (
-                        ICON[d.kind]
+                        <Glyph id={ICON[d.kind]} label={false} className="h-10 w-10 text-amber-100/80" />
                       )}
                     </div>
                     <div className="p-2">
-                      <p className="truncate text-[13px] font-bold">{d.title || d.text || ICON[d.kind]}</p>
+                      <p className="truncate text-[13px] font-bold">{d.title || d.text || GLYPH_NAMES[ICON[d.kind]]}</p>
                       <p className="mt-0.5 inline-block rounded-full bg-amber-200/20 px-2 text-[10px] text-amber-100">@{d.from.displayName}</p>
                     </div>
                   </button>
@@ -67,7 +68,7 @@ export function OshiShelf() {
             {playing && (
               <div className="mt-4 rounded-2xl bg-black/40 p-3">
                 <p className="text-[12px] text-white/70">
-                  {ICON[playing.kind]} {playing.title || playing.text}
+                  {playing.title || playing.text}
                 </p>
                 {playing.kind === 'mv' && playing.url ? (
                   <video src={playing.url} poster={playing.posterUrl ?? undefined} controls autoPlay playsInline className="mt-2 aspect-video w-full rounded-xl bg-black" />

@@ -11,6 +11,7 @@ import { LineVoice } from '@/lib/story/lineVoice';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { AtelierScreen } from '@/components/atelier/AtelierScreen';
 import { MyIsland, islandCards, islandFromWords, islandOmakase, type IslandLook } from './MyIsland';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Day 5 on Mercury (first journey; script D06-S005〜S007b, simple version M-R185/M-R200): 作るのは月、しまうのはBluena、
@@ -112,7 +113,7 @@ export function Record({ s, playing, size = 200 }: { s: StickerMade; playing: bo
 function Bar({ glow, lit = 1, onTap }: { glow?: boolean; lit?: number; onTap?: () => void }) {
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-[175] flex justify-center gap-3 bg-gradient-to-t from-black/60 to-transparent px-4 pb-5 pt-8">
-      {['🗺️ 海図', '🌙 つくる', '🏝️ myアイランド'].map((l, k) => (
+      {['海図', 'つくる', 'myアイランド'].map((l, k) => (
         <button key={l} disabled={k !== lit || !onTap} onClick={onTap} className={`rounded-2xl px-4 py-2.5 text-sm font-black ${k === lit ? `bg-sky-300 text-sky-900 ${glow ? 'animate-pulse ring-4 ring-sky-200' : ''}` : 'bg-white/20 text-white/80'}`}>
           {l}
         </button>
@@ -170,7 +171,7 @@ function IslandChat({ neo, bati, say, onMake, onHold }: { neo: string; bati: str
   if (step !== 'cards')
     return (
       <div className="space-y-3">
-        <p className="text-center text-sm font-black text-sky-700">🏝️ myアイランド</p>
+        <p className="text-center text-sm font-black text-sky-700">myアイランド</p>
         <VoiceField light value={talk} onChange={setTalk} placeholder={step === 'ask' ? '夕焼けの、ヤシの木がある島' : '夜の島がいい'} maxLength={40} />
         <Big tone="sky" disabled={!talk.trim()} onClick={() => toCards(islandFromWords(talk, step === 'ask' ? { ...islandOmakase(neo), palm: false, time: 'day' } : look))}>
           これで組む
@@ -199,7 +200,7 @@ function IslandChat({ neo, bati, say, onMake, onHold }: { neo: string; bati: str
       <Big tone="sky" onClick={() => onMake(look)}>
         この島にする
       </Big>
-      <Soft onClick={() => setStep('redo')}>🎙 話して直す</Soft>
+      <Soft onClick={() => setStep('redo')}>話して直す</Soft>
       <Soft onClick={onHold}>今はここで止める</Soft>
       <p className="text-center text-[11px] text-slate-400">話すと、札が変わります。マナは使いません。あとで変えられます</p>
     </div>
@@ -381,7 +382,7 @@ export function MercuryLesson({
     setAfter([
       // the song card flows through the screen into Bluena; {bati} comes back beside {neo}; the screen closes
       { k: 'line', l: { who: 'bati', text: 'Bluenaに、しまったよ！' } },
-      gd('曲を、Bluenaの中の水星のフォルダ（〔⛏ 土の中の曲〕）にしまいました。{neo}だけの作品集です。誰にも送られていません。Bluenaから、いつでも聴けます'),
+      gd('曲を、Bluenaの中の水星のフォルダ（〔土の中の曲〕）にしまいました。{neo}だけの作品集です。誰にも送られていません。Bluenaから、いつでも聴けます'),
       { k: 'line', l: { who: 'freezy', text: '次は、出航だ。お前の曲を、ダチの海に出す。' } },
       gd('〔公開する〕を押すと、Bluenaから曲がこの海に映され、船になって、ダチの海を88時間めぐり、このあと作るmyアイランドの桟橋に戻ります（届くのはダチだけ。いまのダチは、{inviter}とKIMORIN⭐︎です）'),
       { k: 'sail' },
@@ -408,7 +409,7 @@ export function MercuryLesson({
     { k: 'end' },
   ];
   const keep = () => {
-    ainsert([{ k: 'line', l: { who: 'freezy', text: '出航は、いつでもできる。' } }, gd('Bluenaの〔⛏ 土の中の曲〕から、いつでも〔公開する〕を押せます'), ...closing(false)]);
+    ainsert([{ k: 'line', l: { who: 'freezy', text: '出航は、いつでもできる。' } }, gd('Bluenaの〔土の中の曲〕から、いつでも〔公開する〕を押せます'), ...closing(false)]);
     anext();
   };
   // each line plays its voice; the ships sail on their own; KIMORIN⭐︎'s ship waits for a tap; the island rises
@@ -468,11 +469,11 @@ export function MercuryLesson({
       );
   } else if (phase === 'hold') actions = <NextButton label="続ける" onClick={() => setPhase('choose')} />;
   else if (phase === 'mana') coach = { text: '作曲に、マナを使います。いいですか？' };
-  else if (phase === 'writing') coach = { text: '✍️ 歌詞を考えています…' };
+  else if (phase === 'writing') coach = { text: '歌詞を考えています…' };
   else if (phase === 'singing' && stage === 'warming') coach = { text: '♪ 作曲中…　音のスタジオが、目をさましています' };
   else if (phase === 'song' && cue?.text === '−2マナ') actions = <NextButton onClick={() => setCue({ who: 'guide', text: '聴いたら〔この曲にする〕を押します（押すまでは、しまいません）' })} />;
   else if (phase === 'after') {
-    coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: ab.lit === 0 ? '〔🗺️ 海図〕を押す' : '下の右の〔🏝️ myアイランド〕を押す' } : ab?.k === 'oshi' && oshi === 'here' ? { text: 'タップすると聴けます（押した時だけ鳴ります）' } : null;
+    coach = ab?.k === 'line' ? lineOf(ab.l) : ab?.k === 'bar' ? { text: ab.lit === 0 ? '〔海図〕を押す' : '下の右の〔myアイランド〕を押す' } : ab?.k === 'oshi' && oshi === 'here' ? { text: 'タップすると聴けます（押した時だけ鳴ります）' } : null;
     if (ab?.k === 'line') actions = <NextButton onClick={anext} />;
   }
 
@@ -649,13 +650,13 @@ export function MercuryLesson({
                 ))}
               </div>
               <button onClick={() => (saveSpell(cards), setKept(true))} disabled={kept} className="mx-auto mt-2 block text-[12px] font-bold text-violet-600 disabled:text-slate-400">
-                {kept ? 'スペルブックに、記しました' : '📖 記す'}
+                {kept ? 'スペルブックに、記しました' : '記す'}
               </button>
               <div className="mt-3 space-y-2">
                 <Big tone="sky" onClick={() => (design && redone ? (setPhase('lyrics'), setCue(null)) : void write())}>
                   {design && redone ? 'このスペルで作り直す' : '歌詞の下書きを見る'}
                 </Big>
-                <Soft onClick={() => setCards(null)}>🎙 話して変える</Soft>
+                <Soft onClick={() => setCards(null)}>話して変える</Soft>
               </div>
             </>
           )}
@@ -664,7 +665,7 @@ export function MercuryLesson({
 
       {phase === 'lyrics' && design && (
         <Panel>
-          <p className="text-center text-sm font-black text-sky-700">📝 歌詞の下書き「{design.title}」</p>
+          <p className="text-center text-sm font-black text-sky-700">歌詞の下書き「{design.title}」</p>
           <div className="mt-3 space-y-1.5">
             {lines.map((l) =>
               edit === l.si * 100 + l.li ? (
@@ -681,7 +682,7 @@ export function MercuryLesson({
               ) : (
                 <button key={`${l.si}-${l.li}`} onClick={() => setEdit(l.si * 100 + l.li)} className="flex w-full items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-left text-[15px]">
                   <span>{l.text}</span>
-                  <span className="text-xs text-sky-400">✏️</span>
+                  <LineIcon id="pencil" className="h-4 w-4 shrink-0 text-sky-400" />
                 </button>
               ),
             )}
@@ -695,7 +696,7 @@ export function MercuryLesson({
               }}
               disabled={lines.some((l) => !l.text.trim())}
             >
-              🎤 歌入りで作曲する
+              歌入りで作曲する
             </Big>
             <Soft onClick={() => void write()}>作り直す</Soft>
           </div>
@@ -833,13 +834,13 @@ export function MercuryLesson({
                 anext();
               }}
             >
-              🚢 出航
+              出航
             </Big>
             <Soft
               onClick={() => {
                 // 〔やめる〕 is the same as keep: drop the ship and its telop, then the keep lines
                 setSailed(false);
-                setAfter((a) => [...a.slice(0, ak), { k: 'line', l: { who: 'freezy', text: '出航は、いつでもできる。' } }, gd('Bluenaの〔⛏ 土の中の曲〕から、いつでも〔公開する〕を押せます'), ...closing(false)]);
+                setAfter((a) => [...a.slice(0, ak), { k: 'line', l: { who: 'freezy', text: '出航は、いつでもできる。' } }, gd('Bluenaの〔土の中の曲〕から、いつでも〔公開する〕を押せます'), ...closing(false)]);
               }}
             >
               やめる

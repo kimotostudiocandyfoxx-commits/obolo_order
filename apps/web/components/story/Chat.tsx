@@ -112,7 +112,7 @@ function MyLine({ text, action }: { text: string; action?: boolean }) {
   return (
     <div className="flex animate-[chatInR_0.38s_cubic-bezier(.2,.8,.2,1)_both] justify-end pl-14">
       {action ? (
-        <p className="rounded-full border border-amber-200/50 bg-black/35 px-3.5 py-1.5 text-[13px] tracking-wider text-amber-100 backdrop-blur-md">✦ {text}</p>
+        <p className="rounded-full border border-amber-200/50 bg-black/35 px-3.5 py-1.5 text-[13px] tracking-wider text-amber-100 backdrop-blur-md">{text}</p>
       ) : (
         <p
           className="max-w-[78%] whitespace-pre-line rounded-[18px] rounded-tr-[5px] px-3.5 py-2 text-[15px] font-medium leading-[1.6] text-[#2b1b06] shadow-[0_6px_22px_rgba(230,170,70,0.35)]"

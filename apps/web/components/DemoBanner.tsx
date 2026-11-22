@@ -14,7 +14,7 @@ export function DemoBanner() {
     // laid over the top, taking no room: the worlds are sized to the screen minus the nav (story chat 2026-11-02:
     // the banner pushed their bottom buttons off the screen)
     <div className="pointer-events-none fixed left-1/2 top-[calc(2px+env(safe-area-inset-top))] z-[60] w-fit max-w-[92vw] -translate-x-1/2 rounded-full bg-black/55 px-3 py-0.5 text-center text-[10px] text-amber-200 backdrop-blur">
-      ⚠︎ {m.common.demoMode} — {m.common.demoModeHint}
+      {m.common.demoMode} — {m.common.demoModeHint}
     </div>
   );
 }

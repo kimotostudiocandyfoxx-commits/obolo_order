@@ -51,7 +51,7 @@ export function InviteCard() {
 
   return (
     <section className="card p-5">
-      <h3 className="text-sm font-bold text-white/70">✉︎ {m.earth.invite}</h3>
+      <h3 className="text-sm font-bold text-white/70">{m.earth.invite}</h3>
       <p className="mt-1 text-[11px] text-white/45">{m.earth.inviteLead}</p>
       <form onSubmit={create} className="mt-3 flex flex-wrap gap-2">
         <input

@@ -9,6 +9,8 @@ import { LineVoice } from '@/lib/story/lineVoice';
 import type { StickerMade } from '@/lib/onboarding/made';
 import { ATELIER_DEFAULT, MyAtelier, atelierCards, atelierFromWords, atelierOmakase, type AtelierLook } from './MyAtelier';
 import { NeoButterfly } from './NeoButterfly';
+import { LineIcon } from '@/components/LineIcon';
+import { Glyph } from '@/components/bluena/glyphs';
 
 /**
  * Day 4 on Jupiter (first journey, the simple version: wip/P03/c01.md D05-S006, c02.md D05-S007〜S008b; D05-S005
@@ -213,14 +215,14 @@ function Bar({ glow, onTap }: { glow?: 'make' | 'atelier' | 'make-shown'; onTap?
   return (
     <div className="pb-safe absolute inset-x-0 bottom-0 z-[175] flex items-end justify-center gap-4 bg-gradient-to-t from-black/60 to-transparent px-4 pb-5 pt-10">
       <button disabled className="flex flex-col items-center text-[11px] font-bold text-white/70">
-        <span className="text-2xl">🦋</span>空
+        空
       </button>
       <button disabled={glow !== 'make' || !onTap} onClick={onTap} className="-mt-6 flex flex-col items-center text-[11px] font-bold text-amber-100">
-        <span className={`flex h-16 w-16 items-center justify-center rounded-full border border-amber-100/40 bg-gradient-to-br from-[#2b3a6b] to-[#0d1430] text-2xl shadow-[0_0_24px_rgba(140,200,255,0.45)] ${lit('make') ? 'animate-pulse ring-4 ring-amber-200' : ''}`}>🌙</span>
+        <span className={`flex h-16 w-16 items-center justify-center rounded-full border border-amber-100/40 bg-gradient-to-br from-[#2b3a6b] to-[#0d1430] text-2xl shadow-[0_0_24px_rgba(140,200,255,0.45)] ${lit('make') ? 'animate-pulse ring-4 ring-amber-200' : ''}`}><LineIcon id="moon" className="h-7 w-7" /></span>
         つくる
       </button>
       <button disabled={glow !== 'atelier' || !onTap} onClick={onTap} className={`flex flex-col items-center text-[11px] font-bold ${lit('atelier') ? 'text-amber-200' : 'text-white/70'}`}>
-        <span className={`rounded-full text-2xl ${lit('atelier') ? 'animate-pulse ring-4 ring-amber-200' : ''}`}>🎨</span>
+        <span className={`rounded-full ${lit('atelier') ? 'animate-pulse ring-4 ring-amber-200' : ''}`}><Glyph id="art" label={false} className="h-7 w-7" /></span>
         myアトリエ
       </button>
       <span className="absolute bottom-[calc(20px+env(safe-area-inset-bottom))] right-4 flex h-11 w-11 items-center justify-center rounded-full border border-sky-100/50 bg-[radial-gradient(circle_at_35%_35%,#bfe3ff,#3a78c9_60%,#173866)] text-[9px] font-black text-white shadow-[0_0_18px_rgba(120,190,255,0.6)]">
@@ -576,7 +578,7 @@ export function JupiterLesson({
           {make === 'choose' && (
             <div className="space-y-2">
               <Big tone="sky" onClick={() => setMake('photo')}>
-                📷 写真を添える
+                写真を添える
               </Big>
               <Big
                 tone="violet"
@@ -585,7 +587,7 @@ export function JupiterLesson({
                   setMake('style');
                 }}
               >
-                🎨 {bati}に描いてもらう
+                {bati}に描いてもらう
               </Big>
               <Soft
                 onClick={() => {
@@ -593,7 +595,7 @@ export function JupiterLesson({
                   setMake('ready');
                 }}
               >
-                🔤 字だけ
+                字だけ
               </Soft>
             </div>
           )}
@@ -642,7 +644,7 @@ export function JupiterLesson({
               <Soft onClick={() => setMake('choose')}>やめる</Soft>
             </div>
           )}
-          {make === 'drawing' && <p className="text-center text-sm font-bold text-violet-500">✨ 魔法陣を描いています…</p>}
+          {make === 'drawing' && <p className="text-center text-sm font-bold text-violet-500">魔法陣を描いています…</p>}
           {make === 'burnt' && (
             <div className="space-y-2">
               <Big tone="violet" onClick={() => void draw(redrawn)}>
@@ -755,7 +757,7 @@ export function JupiterLesson({
         <Panel>
           {chat === 'ask' || chat === 'redo' ? (
             <div className="space-y-3">
-              <p className="text-center text-sm font-black text-amber-700">🎨 myアトリエ</p>
+              <p className="text-center text-sm font-black text-amber-700">myアトリエ</p>
               <VoiceField light value={said} onChange={setSaid} placeholder={chat === 'ask' ? '森の中の、木とガラスの、あったかいアトリエ' : 'もっと、明るく'} maxLength={40} />
               <Big
                 tone="amber"
@@ -803,7 +805,7 @@ export function JupiterLesson({
                   setChat('redo');
                 }}
               >
-                🎙 話して直す
+                話して直す
               </Soft>
               <Soft onClick={() => setChat('hold')}>今はここで止める</Soft>
               <p className="text-center text-[11px] text-slate-400">話すと、札が変わります。マナは使いません。あとで変えられます</p>
@@ -843,7 +845,7 @@ export function JupiterLesson({
                 setTimeout(next, 3400);
               }}
             >
-              🦋 飛ばす
+              飛ばす
             </Big>
           </div>
         </Panel>

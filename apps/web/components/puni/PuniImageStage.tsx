@@ -222,7 +222,7 @@ export function PuniImageStage() {
         <p className="mt-1 text-[10px] text-white/60">※ 絵はいただいた参考画像から切り抜いたテスト用</p>
       </div>
       <button onClick={scatter} className="pb-safe absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-5 py-2.5 text-sm font-black text-violet-600 shadow">
-        🎉 ばらまく
+        ばらまく
       </button>
     </div>
   );

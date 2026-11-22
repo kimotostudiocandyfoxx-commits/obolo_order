@@ -202,7 +202,7 @@ export function Atelier() {
         ))}
         {layout.items.length === 0 && !editing && (
           <div className="absolute inset-x-6 top-[38%] rounded-2xl bg-white/80 p-4 text-center text-sm font-bold text-stone-600">
-            まだ何もない、{me?.displayName ?? ''}のアトリエ。{'\n'}〔🎨 かざる〕で、旅で作ったものを飾ろう
+            まだ何もない、{me?.displayName ?? ''}のアトリエ。{'\n'}〔かざる〕で、旅で作ったものを飾ろう
           </div>
         )}
       </div>
@@ -235,7 +235,7 @@ export function Atelier() {
           </button>
         ) : (
           <button onClick={() => setEditing(true)} className="rounded-full bg-white px-8 py-3 text-base font-black text-violet-600 shadow-lg">
-            🎨 かざる
+            かざる
           </button>
         )}
       </div>

@@ -80,7 +80,7 @@ export function DachiLinkCard() {
 
   return (
     <section className="card p-5">
-      <h3 className="text-sm font-bold text-white/70">🤝 ダチの招待状</h3>
+      <h3 className="text-sm font-bold text-white/70">ダチの招待状</h3>
       <p className="mt-1 text-[12px] leading-relaxed text-white/60">もう宇宙にいる、本当に知っている人とダチになる招待状です。一回だけ使えるリンクとQRが出ます（48時間で消えます）</p>
       <p className="mt-1 text-[11px] text-white/45">知らない人を名前で探すことは、できません。マナは使いません</p>
       {asks.map((a) => (

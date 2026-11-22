@@ -8,6 +8,7 @@ import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { BoothMixer } from '@/lib/venus/booth';
 import { LOOP_CHOICES, ShowArt } from './ShowArt';
+import { LineIcon } from '@/components/LineIcon';
 
 type Mode = 'idle' | 'recording' | 'live' | 'saving';
 
@@ -404,7 +405,7 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
       <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
         <div className="flex items-center gap-3">
           <button onClick={() => void toggleMic()} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-xl ${mx?.micOn ? 'bg-red-500' : 'bg-white/15'}`} aria-label={mx?.micOn ? 'マイクを切る' : 'マイクを入れる'}>
-            🎙
+            <LineIcon id="mic" className="h-6 w-6" />
           </button>
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
             <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-amber-300 transition-[width] duration-75" style={{ width: `${Math.round((mx?.micLevel ?? 0) * 100)}%` }} />

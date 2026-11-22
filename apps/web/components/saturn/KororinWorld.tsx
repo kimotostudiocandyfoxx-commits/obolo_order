@@ -17,6 +17,7 @@ import { hueOf } from './BallAvatar';
 import { PlazaMap } from './PlazaMap';
 import { SaturnProfile } from './SaturnProfile';
 import { KororinParty, KororinPartySky, type KororinPartyHandle } from './KororinParty';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * 「ころりん」 — Saturn's voice world (client concept, 2026-10-04).
@@ -541,7 +542,7 @@ export function KororinWorld({
       setTimeout(() => {
         popRef.current(p.id);
         setPosts((cur) => cur.filter((x) => x.id !== p.id));
-        setToast('🏠 自分の部屋に、ころころ転がっていった');
+        setToast('自分の部屋に、ころころ転がっていった');
         setTimeout(() => setToast(null), 3200);
       }, 6500);
     }
@@ -618,7 +619,7 @@ export function KororinWorld({
       <div ref={marker} className="pointer-events-none absolute left-0 top-0 z-[60] rounded-full border-[6px] border-amber-200 opacity-0 shadow-[0_0_28px_rgba(255,220,140,0.95)] transition-opacity" aria-hidden>
         {/* a thick ring that beats, and a big finger (QA 6 P3) */}
         <span className="absolute -inset-2 animate-ping rounded-full border-4 border-amber-100/70" />
-        <span className="absolute -top-14 left-1/2 -translate-x-1/2 animate-bounce text-5xl drop-shadow">👇</span>
+        <span className="absolute -top-14 left-1/2 -translate-x-1/2 animate-bounce text-amber-100 drop-shadow"><LineIcon id="arrowDown" className="h-12 w-12" strokeWidth={2.5} /></span>
       </div>
 
       {/* soap-bubble pops of the voices you heard */}
@@ -709,7 +710,7 @@ export function KororinWorld({
                 <span className="text-[#b4a3d8]">›</span>
               </button>
               <button onClick={() => setDetail(true)} className="flex h-7 items-center gap-1 rounded-full border border-violet-100 bg-white px-2 text-[11px] font-black text-[#7a62b0] shadow" aria-label="replies">
-                💬
+                <LineIcon id="chat" className="h-4 w-4" />
               </button>
               <button onClick={() => void star(open)} className={`flex h-7 items-center gap-0.5 rounded-full border px-2 text-[11px] font-black shadow ${open.starredByMe ? 'border-amber-200 bg-amber-50 text-amber-500' : 'border-violet-100 bg-white text-[#7a62b0]'}`} aria-label="star">
                 {open.starredByMe ? '★' : '☆'}
@@ -742,7 +743,7 @@ export function KororinWorld({
               <button onClick={() => void toggleAudio(open.repostOf!.voiceUrl).catch(() => undefined)} className="mt-2 flex w-full items-center gap-2 rounded-2xl bg-[#f8f3ff] p-2 text-left">
                 <PuniAvatar seed={open.repostOf.author.id} neo={open.repostOf.author.neoForm} look={open.repostOf.author.look} pic={open.repostOf.author.pic} size={28} speaking={playingUrl === open.repostOf.voiceUrl} />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[10px] font-black text-[#a08fc4]">🔁 {open.repostOf.author.displayName}の声</span>
+                  <span className="block text-[10px] font-black text-[#a08fc4]">{open.repostOf.author.displayName}の声</span>
                   <span className="block truncate text-xs font-bold">{open.repostOf.text}</span>
                 </span>
                 <span className="text-xs text-[#7a62b0]">{playingUrl === open.repostOf.voiceUrl ? '❚❚' : '▶'}</span>
@@ -750,7 +751,7 @@ export function KororinWorld({
             )}
             <div className="mt-3 rounded-[22px] bg-[#f6f0ff] p-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#8a76bd]">💬 リプ</span>
+                <span className="text-xs font-black text-[#8a76bd]">リプ</span>
                 <span className="text-[10px] font-bold text-[#b3a5d6]">{replies.length ? 'アイコンをタップできくよ' : resident ? 'サンプルには返信できないよ' : 'まだリプはないよ'}</span>
               </div>
               {(() => {
@@ -792,7 +793,7 @@ export function KororinWorld({
                 <MicIcon size={16} /> 声でかえす
               </button>
               <button onClick={() => !resident && setComposer({ quote: open })} disabled={resident} className="rounded-full bg-[#f3ecff] py-2.5 text-sm font-black text-[#5a3f8a] disabled:opacity-50">
-                🔁 引用
+                引用
               </button>
             </div>
           </div>
@@ -1151,13 +1152,13 @@ function DropComposer({
         <textarea
           ref={box}
           className={`mt-3 h-24 w-full resize-none rounded-2xl p-3 text-[16px] outline-none ${mic.listening ? 'bg-pink-50 ring-2 ring-pink-200' : 'bg-violet-50'}`}
-          placeholder={replyTo ? '🎙 を押して、どう返すか話してね' : quote ? '🎙 を押して、この声についてひとこと' : '🎙 を押して、いま思ったことを話してね'}
+          placeholder={replyTo ? 'マイクを押して、どう返すか話してね' : quote ? 'マイクを押して、この声についてひとこと' : 'マイクを押して、いま思ったことを話してね'}
           maxLength={SATURN_MAX_CHARS * 2}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
         <div className="mt-1 flex items-start justify-between gap-2 text-[10px] text-slate-400">
-          <span>直したいところをタップ（なぞって選ぶ）→ 消して → もう一度 🎙</span>
+          <span>直したいところをタップ（なぞって選ぶ）→ 消して → もう一度マイク</span>
           <span className={`shrink-0 text-xs ${left < 0 ? 'text-rose-500' : ''}`}>{left}</span>
         </div>
 
@@ -1177,7 +1178,7 @@ function DropComposer({
           onClick={() => void post()}
           className="mt-4 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-3.5 text-base font-black text-white disabled:opacity-40"
         >
-          {busy ? (roomOnly ? '飛ばしています…' : 'おとしています…') : replyTo ? '💬 返信する' : quote ? '🔁 引用しておとす' : roomOnly ? '🏠 自分の部屋に飛ばす' : '🎙 土星におとす'}
+          {busy ? (roomOnly ? '飛ばしています…' : 'おとしています…') : replyTo ? '返信する' : quote ? '引用しておとす' : roomOnly ? '自分の部屋に飛ばす' : '土星におとす'}
         </button>
         {roomOnly && (
           <>

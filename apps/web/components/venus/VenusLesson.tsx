@@ -8,6 +8,8 @@ import { EasyDj } from '@/lib/dj/easy';
 import { BoothMixer } from '@/lib/venus/booth';
 import type { MvMade, SongMade, StickerMade } from '@/lib/onboarding/made';
 import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
+import { Glyph } from '@/components/bluena/glyphs';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Day 7 on Venus, the radio planet (simple version: P04/c01v.md D07V-S002〜S003, M-R190; screens
@@ -413,7 +415,7 @@ export function VenusLesson({
     coach = lineOf(step.l);
     actions = <NextButton onClick={next} />;
   } else if (step?.k === 'plug') coach = lineOf(step.l);
-  else if (step?.k === 'rec') coach = rec === 'idle' ? { text: '〔⏺ 収録〕を押すと、収録が始まります。マイクに話して、曲をかけて、〔■ 止める〕' } : lineOf(step.l); else if (step?.k === 'load') coach = { text: '①左右の台に、レコードをのせる（左の台は、のせるとすぐ鳴ります）' };
+  else if (step?.k === 'rec') coach = rec === 'idle' ? { text: '〔収録〕を押すと、収録が始まります。マイクに話して、曲をかけて、〔■ 止める〕' } : lineOf(step.l); else if (step?.k === 'load') coach = { text: '①左右の台に、レコードをのせる（左の台は、のせるとすぐ鳴ります）' };
   else if (step?.k === 'cue') coach = { text: '②右のレコードの、鳴らしたい所を押して〔印〕（右の台が、印の所から回りはじめます。音は、つまみを動かすと聞こえます）' };
   else if (step?.k === 'sync') coach = { text: '③〔SYNC〕を押す（左右の拍がそろうと、光ります）' };
   else if (step?.k === 'fade') coach = { text: '④真ん中のつまみを、ゆっくり右へ' };
@@ -462,18 +464,18 @@ export function VenusLesson({
             ) : plugged && !inBooth ? (
               // 台の横の小さな画面に、Bluenaの中のものが並ぶ：水星の曲、土星のコロリンの声、木星のアート、火星のMV
               <div className="grid h-full w-full grid-cols-4 items-center gap-1.5 p-2 text-center text-[10px] text-white/80">
-                <span className="truncate">🎵 {song?.title ?? '曲'}</span>
-                <span className="truncate">🪐 {kororins[kororins.length - 1] ?? 'コロリン'}</span>
+                <span className="truncate">{song?.title ?? '曲'}</span>
+                <span className="truncate">{kororins[kororins.length - 1] ?? 'コロリン'}</span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {art ? <img src={art} alt="" className="aspect-square w-full rounded object-cover" /> : <span>🎨</span>}
+                {art ? <img src={art} alt="" className="aspect-square w-full rounded object-cover" /> : <Glyph id="art" label={false} className="h-6 w-6" />}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {loopPic ? <img src={loopPic} alt="" className="aspect-video w-full rounded object-cover" /> : <span>🎬</span>}
+                {loopPic ? <img src={loopPic} alt="" className="aspect-video w-full rounded object-cover" /> : <Glyph id="video" label={false} className="h-6 w-6" />}
               </div>
             ) : (
               <div className="h-full w-full" />
             )}
             {light && <span className="pointer-events-none absolute inset-0 mix-blend-screen transition-colors duration-500" style={{ background: `radial-gradient(circle at 50% 20%, ${light}, transparent 75%)` }} />}
-            {drop && <span className="absolute inset-x-3 bottom-2 animate-[fadeUp_0.4s_ease-out] rounded-full bg-white/90 px-3 py-1 text-center text-[12px] font-bold text-violet-700">🪐 {drop.length > 24 ? `${drop.slice(0, 24)}…` : drop}</span>}
+            {drop && <span className="absolute inset-x-3 bottom-2 animate-[fadeUp_0.4s_ease-out] rounded-full bg-white/90 px-3 py-1 text-center text-[12px] font-bold text-violet-700">{drop.length > 24 ? `${drop.slice(0, 24)}…` : drop}</span>}
           </div>
 
           {/* the two platters, each with its square jacket; Bluena's round hollow between them */}
@@ -639,7 +641,7 @@ export function VenusLesson({
         <Panel>
           {rec === 'idle' ? (
             <Big tone="rose" disabled={busy} onClick={() => void startRec()}>
-              ⏺ 収録
+              収録
             </Big>
           ) : (
             <div className="space-y-3">
@@ -649,7 +651,7 @@ export function VenusLesson({
                     className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-4xl text-white shadow-lg transition-transform"
                     style={{ transform: `scale(${1 + (mixer.current?.micLevel ?? 0) * 0.35})` }}
                   >
-                    🎙
+                    <LineIcon id="mic" className="h-10 w-10" />
                   </div>
                   <p className="text-sm font-black text-violet-700">{micOff ? '' : '話してみよう'}</p>
                 </div>
@@ -671,8 +673,8 @@ export function VenusLesson({
               {rec === 'talk' && (
                 <div className="flex items-center gap-2">
                   <Soft onClick={playSong}>パス</Soft>
-                  <button onClick={() => setKeys((x) => !x)} aria-label="⌨" className="shrink-0 rounded-full bg-slate-100 px-3 py-3 text-[12px] text-slate-500">
-                    ⌨
+                  <button onClick={() => setKeys((x) => !x)} aria-label="文字で入力" className="shrink-0 rounded-full bg-slate-100 px-3 py-3 text-[12px] text-slate-500">
+                    <LineIcon id="keyboard" className="h-5 w-5" />
                   </button>
                 </div>
               )}

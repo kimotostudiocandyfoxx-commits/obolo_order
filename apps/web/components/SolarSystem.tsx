@@ -7,6 +7,7 @@ import { EclipseGuide, useResident } from './onboarding/EclipseGuide';
 import { useI18n } from '@/lib/i18n/client';
 import { usePlanetLock } from './PlanetLock';
 import { PlanetSphere } from './PlanetSphere';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Home map. Earth in the centre; Moon at 12 o'clock; then clockwise
@@ -96,7 +97,7 @@ function PlanetLink({
         <span className="relative block">
           <PlanetSphere id={id} size={`${sizePct}cqw`} />
           <span className="absolute inset-0 flex items-center justify-center" style={{ fontSize: `${sizePct * 0.4}cqw` }}>
-            🔒
+            <LineIcon id="lock" className="h-[1em] w-[1em]" />
           </span>
         </span>
         {/* two lines, nudged inward at the screen's edges (story chat 2026-11-02: cut at the left) */}

@@ -18,7 +18,7 @@ export function ManaChip() {
   if (status !== 'authed' || mana === null) return null;
   return (
     <Link href="/settings" className="chip bg-[color:var(--color-mana)]/20 px-2.5 py-1 text-xs text-[color:var(--color-mana)]">
-      ✦ {mana.toLocaleString()} MANA
+      {mana.toLocaleString()} MANA
     </Link>
   );
 }

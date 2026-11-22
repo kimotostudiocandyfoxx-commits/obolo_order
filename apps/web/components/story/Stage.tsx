@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { MOTION } from '@/lib/story/motion';
 import LAYERS from '@/lib/story/sprite-layers.json';
+import MOUTHS from '@/lib/story/sprite-mouths.json';
 
 /** a small motion that goes with a line (lib/story/expression.ts reactFor) */
 export type Reaction = 'shock' | 'stare' | 'tremble';
@@ -35,6 +36,8 @@ export interface CharSpec {
 /** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
 const facesOf = (stem: string, exprs: string[]) => Object.fromEntries(exprs.map((e) => [e, `${stem}-${e}`]));
 const POSES = ['talk', 'lecture', 'joy', 'point', 'shock', 'smug', 'tears', 'think'];
+/** KIMORIN's repainted looks also blush (「ア、、、アイ//？」, client 2026-11-22; scripts/kimorin/build.py) */
+const KIMORIN_POSES = [...POSES, 'blush'];
 /** pictures that have been cut into layers (scripts/sprite-layers.py) — for the newer casts, only those */
 const madeFaces = (stem: string, exprs: string[]) => facesOf(stem, exprs.filter((e) => `${stem}-${e}` in LAYERS));
 /**
@@ -43,7 +46,7 @@ const madeFaces = (stem: string, exprs: string[]) => facesOf(stem, exprs.filter(
  */
 // joy has no sunglasses-on picture yet: it stays on the standing picture rather than lifting the glasses (M-R170,
 // QA 5 N5 — the glasses go up only where the story says so, with a face step)
-const KIMORIN_FACES = { ...facesOf('kimorin-x', POSES.filter((p) => p !== 'joy')), ...madeFaces('kimorin-xs', POSES) };
+const KIMORIN_FACES = { ...facesOf('kimorin-x', POSES.filter((p) => p !== 'joy')), ...madeFaces('kimorin-xs', KIMORIN_POSES) };
 const MONBAN_FACES = facesOf('monban-x', ['talk', 'point', 'arms', 'stop']);
 const FRIEND = ['talk', 'joy', 'shock'];
 
@@ -56,8 +59,8 @@ const CHAR: Record<string, CharSpec> = {
   'kimorin-g': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e', faces: facesOf('kimorin-g', POSES) },
   // KIMORIN's first look, the suspicious inventor (story M-R100): goggles on at the gate, pushed up from the
   // startle in the Earth temple until the Moon
-  'kimorin-i': { bottom: 10, height: 58, face: 0.22, tint: '#b8b0a0', faces: madeFaces('kimorin-i', POSES) },
-  'kimorin-iu': { bottom: 10, height: 58, face: 0.22, tint: '#b8b0a0', faces: madeFaces('kimorin-iu', POSES) },
+  'kimorin-i': { bottom: 10, height: 58, face: 0.22, tint: '#b8b0a0', faces: madeFaces('kimorin-i', KIMORIN_POSES) },
+  'kimorin-iu': { bottom: 10, height: 58, face: 0.22, tint: '#b8b0a0', faces: madeFaces('kimorin-iu', KIMORIN_POSES) },
   kimorin: { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-1': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
   'kimorin-2': { bottom: 10, height: 58, face: 0.22, tint: '#8a3a2e' },
@@ -241,10 +244,18 @@ export function Cast({
 }
 
 /** the parts a layered pose has (scripts/sprite-layers.py writes the list) */
+const stemOf = (url: string) => url.match(/\/onboarding\/([^/]+)\.webp$/)?.[1];
 const layersOf = (url: string): string[] => {
-  const stem = url.match(/\/onboarding\/([^/]+)\.webp$/)?.[1];
+  const stem = stemOf(url);
   return (stem && (LAYERS as Record<string, string[]>)[stem]) || [];
 };
+/**
+ * Where a small mouth patch sits on its pose (scripts/kimorin/build.py finds the mouth by differencing the open-
+ * and closed-mouth paintings): left, top, width, height as fractions of the picture. Poses without an entry
+ * have a mouth layer the size of the whole picture.
+ */
+type MouthBox = { x: number; y: number; w: number; h: number };
+const mouthBoxOf = (url: string): MouthBox | undefined => (MOUTHS as Record<string, MouthBox>)[stemOf(url) ?? ''];
 
 function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1, flip = false }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number; flip?: boolean }) {
   const base = charSpec(name);
@@ -254,6 +265,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   const parts = layersOf(url);
   const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp$/, `-${k}.webp`) : null);
   const mouth = layer('mouth');
+  const mouthBox = mouthBoxOf(url);
   // a pose painted with the mouth open (joy, shock): a closed-mouth patch instead, shown while the voice is quiet
   // (scripts/mouth-fix.py, client 2026-10-29)
   const shutLayer = layer('shut');
@@ -331,7 +343,13 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
             <img src={layer('body') ?? url} alt="" draggable={false} className={`relative ${img} ${own ? 'rounded-[2rem] border-2 border-amber-200/50' : ''}`} />
             {mouth && (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={mouth} alt="" draggable={false} className={`absolute inset-0 ${img}`} style={{ opacity: open ? 1 : 0 }} />
+              <img
+                src={mouth}
+                alt=""
+                draggable={false}
+                className={mouthBox ? 'absolute max-w-none select-none' : `absolute inset-0 ${img}`}
+                style={{ opacity: open ? 1 : 0, ...(mouthBox ? { left: `${mouthBox.x * 100}%`, top: `${mouthBox.y * 100}%`, width: `${mouthBox.w * 100}%`, height: `${mouthBox.h * 100}%` } : {}) }}
+              />
             )}
             {shutLayer && (
               // eslint-disable-next-line @next/next/no-img-element

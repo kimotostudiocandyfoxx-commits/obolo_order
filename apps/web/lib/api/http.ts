@@ -259,8 +259,8 @@ export class HttpApi implements Api {
   lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
   }
-  refineLook(mediaId: string | null, instruction: string) {
-    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { ...(mediaId ? { mediaId } : {}), instruction });
+  refineLook(mediaId: string | null, instruction: string, magic?: boolean) {
+    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { ...(mediaId ? { mediaId } : {}), instruction, ...(magic ? { magic } : {}) });
   }
   puniPicCandidates(body: Parameters<Api['puniPicCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['puniPicCandidates']>>>('POST', '/me/puni/pic/candidates', body);
@@ -480,6 +480,12 @@ export class HttpApi implements Api {
   }
   batiFaces() {
     return this.req<Awaited<ReturnType<Api['batiFaces']>>>('POST', '/me/bati/faces');
+  }
+  batiRestyle(wish: string) {
+    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { wish });
+  }
+  chooseBatiRestyle(id: string) {
+    return this.req<Awaited<ReturnType<Api['chooseBatiRestyle']>>>('POST', '/me/bati/restyle/choose', { id });
   }
   buddyPicture(question: string, answer?: string) {
     return this.req<Awaited<ReturnType<Api['buddyPicture']>>>('POST', '/buddy/picture', { question, answer });

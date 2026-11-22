@@ -26,8 +26,8 @@ export default function VoicePage() {
         </p>
       ) : (
         <div className="mx-auto mt-6 grid max-w-md gap-5">
-          <VoiceCard slot="self" title="🎤 自分の声" done={!!me.voices?.self} />
-          <VoiceCard slot="bati" title={`🥚 ${me.bati?.name ?? 'バティ'}の声（変声）`} done={!!me.voices?.bati} />
+          <VoiceCard slot="self" title="自分の声" done={!!me.voices?.self} />
+          <VoiceCard slot="bati" title={`${me.bati?.name ?? 'バティ'}の声（変声）`} done={!!me.voices?.bati} />
         </div>
       )}
     </main>
@@ -130,10 +130,10 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
         // what makes the singing voice come out like you (studio lab r10, 2026-10-12): a clean recording
         // matters more than a long one — only the first ~25 s of voice are read
         <ul className="mt-2 space-y-0.5 rounded-2xl bg-amber-300/10 p-3 text-[11px] leading-relaxed text-amber-100/80">
-          <li>🤫 しずかな部屋で（テレビや音楽は止めてね）</li>
-          <li>📱 スマホと口は、手のひら2つ分くらいはなす</li>
-          <li>🗣 いつもの声で、はっきり。とちゅうで長く止まらない</li>
-          <li>⏱ 15〜25秒くらいでじゅうぶん（それより長くても同じだよ）</li>
+          <li>しずかな部屋で（テレビや音楽は止めてね）</li>
+          <li>スマホと口は、手のひら2つ分くらいはなす</li>
+          <li>いつもの声で、はっきり。とちゅうで長く止まらない</li>
+          <li>15〜25秒くらいでじゅうぶん（それより長くても同じだよ）</li>
         </ul>
       )}
       <div className="mt-3 flex items-center gap-2">
@@ -158,7 +158,7 @@ function VoiceCard({ slot, title, done }: { slot: VoiceSlot; title: string; done
           <p className="text-[11px] text-white/50">試しに読み上げ</p>
           <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={300} rows={2} className="mt-1 w-full rounded-2xl border border-white/15 bg-black/30 p-2 text-sm outline-none" />
           <button onClick={() => void speak()} disabled={busy || !text.trim()} className="mt-1 w-full rounded-full bg-violet-500 py-2 text-sm font-bold disabled:opacity-40">
-            {busy ? '読み上げ中…' : '🔊 この声で読み上げる'}
+            {busy ? '読み上げ中…' : 'この声で読み上げる'}
           </button>
           {audioUrl && <audio src={audioUrl} controls autoPlay className="mt-2 w-full" />}
         </div>

@@ -35,7 +35,7 @@ export function PlaceSong({ onDone }: { onDone: (a: Record<string, string>) => v
   return (
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/55 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md animate-[fadeUp_0.5s_ease-out] rounded-3xl border border-cyan-100/25 bg-[#07141a]/95 p-5 text-cyan-50">
-        <p className="text-center text-[15px] font-bold tracking-wider">🏝️ 曲を置く</p>
+        <p className="text-center text-[15px] font-bold tracking-wider">曲を置く</p>
         {mode === 'menu' && (
           <div className="mt-4 space-y-2">
             {songs && songs.length > 0 && (
@@ -61,7 +61,7 @@ export function PlaceSong({ onDone }: { onDone: (a: Record<string, string>) => v
         )}
         {mode === 'mine' && (
           <div className="mt-3 max-h-[50svh] space-y-2 overflow-y-auto">
-            <p className="text-center text-[12px] text-cyan-50/70">⛏ 土の中の曲</p>
+            <p className="text-center text-[12px] text-cyan-50/70">土の中の曲</p>
             {songs?.map((s) => (
               <div key={s.id} className="flex items-center gap-2">
                 <button onClick={() => play(s.url)} className="h-11 w-11 shrink-0 rounded-full bg-white/10 text-lg" aria-label={`${s.title}を聴く`}>

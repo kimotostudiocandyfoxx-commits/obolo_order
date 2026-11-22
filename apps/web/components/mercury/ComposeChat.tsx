@@ -383,7 +383,7 @@ function SavedInBluena({ onOpen, onPublish }: { onOpen: () => void; onPublish?: 
       </button>
       {onPublish &&
         (state === 'done' ? (
-          <span className="flex flex-[1.4] items-center justify-center rounded-full bg-white/10 py-2 text-xs text-sky-100">⛵ 水星へ出航した</span>
+          <span className="flex flex-[1.4] items-center justify-center rounded-full bg-white/10 py-2 text-xs text-sky-100">水星へ出航した</span>
         ) : (
           <button
             disabled={state === 'busy'}
@@ -476,27 +476,27 @@ function SongCard({
         <SavedInBluena onOpen={onIsland} onPublish={onPublish} />
       ) : buried ? (
         <button onClick={onIsland} className="mt-3 w-full rounded-full border border-amber-200/50 bg-[#3a2410]/80 py-2 text-sm">
-          ⛏ 保存して島の土に埋めました → 島を見る
+          保存して島の土に埋めました → 島を見る
         </button>
       ) : song.songUrl ? (
         <>
           {editing ? (
             <button onClick={onEditDone} className="mt-3 w-full rounded-full border border-fuchsia-300/50 bg-fuchsia-500/10 py-2 text-xs">
-              ✏️ 手直し中 — チャットで直したいところを話してね（終わる）
+              手直し中 — チャットで直したいところを話してね（終わる）
             </button>
           ) : (
             <div className="mt-3 flex gap-2">
               <button onClick={onEdit} className="flex-1 rounded-full border border-fuchsia-300/60 bg-fuchsia-500/15 py-2 text-sm font-bold">
-                ✏️ 手直しする
+                手直しする
               </button>
               <button onClick={() => void onBury()} className="flex-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
-                💾 保存する
+                保存する
               </button>
             </div>
           )}
           {editing && (
             <button onClick={() => void onBury()} className="mt-2 w-full rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
-              💾 この曲を保存する
+              この曲を保存する
             </button>
           )}
         </>
@@ -506,7 +506,7 @@ function SongCard({
             もう一回つくる
           </button>
           <button onClick={() => void onBury()} className="flex-[2] rounded-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 text-sm font-bold">
-            {bluena ? 'ブルーナにしまう' : '⛏ 島の土に埋める（デモ）'}
+            {bluena ? 'ブルーナにしまう' : '島の土に埋める（デモ）'}
           </button>
         </div>
       )}
@@ -551,7 +551,7 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
   if (song.songUrl) {
     return (
       <div className="mt-3 rounded-2xl bg-black/25 p-2">
-        <p className="mb-1 text-center text-[11px] text-fuchsia-200/80">🎤 歌入りの曲</p>
+        <p className="mb-1 text-center text-[11px] text-fuchsia-200/80">歌入りの曲</p>
         <audio key={song.songUrl} src={song.songUrl} controls playsInline className="w-full" />
       </div>
     );
@@ -598,7 +598,7 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
         disabled={state === 'working' || state === 'warming'}
         className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 py-2 text-sm font-bold disabled:opacity-60"
       >
-        {state === 'working' ? '🎤 歌入りで作曲中…（2〜3分）' : state === 'warming' ? '🎤 受けつけたよ（スタジオ起動中）' : '🎤 歌入りで作曲する'}
+        {state === 'working' ? '歌入りで作曲中…（2〜3分）' : state === 'warming' ? '受けつけたよ（スタジオ起動中）' : '歌入りで作曲する'}
       </button>
       {(state === 'working' || state === 'warming') && <p className="mt-1 text-[10px] text-white/50">アプリを閉じても大丈夫。できたら通知するね</p>}
       {state === 'warming' && (
@@ -610,7 +610,7 @@ function FullSong({ song, onMade }: { song: MadeSong; onMade: (v: SongView) => v
       {state === 'error' && <p className="mt-1.5 whitespace-pre-wrap text-[11px] text-rose-300">うまく作れなかった。{err}</p>}
       {state === 'idle' && !me?.voices?.selfSings && (
         <a href="/voice" className="mt-2 block text-[11px] text-fuchsia-200/80 underline">
-          {me?.voices?.self ? '🎤 声を登録しなおすと、あなたの声で歌うよ →' : '🎤 声を登録すると、あなたの声で歌うよ →'}
+          {me?.voices?.self ? '声を登録しなおすと、あなたの声で歌うよ →' : '声を登録すると、あなたの声で歌うよ →'}
         </a>
       )}
     </div>

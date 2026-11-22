@@ -14,6 +14,7 @@ import type { Speaker, Step } from '@/lib/onboarding/script';
 import { useNameVoices } from '@/lib/story/useNameVoices';
 import { singKororin, singUrl } from '@/lib/saturn/sing';
 import { KororinVessels, type Kororin } from './KororinVessels';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Day 3 on Saturn (D04-S005 → D04-S005c; the simple version, M-R198). Inside the temple's great hall, drawn the
@@ -104,7 +105,7 @@ const BEATS: Beat[] = [
   { k: 'plaza' },
   { k: 'say', who: 'kimorin', text: '……MONBANさんのまで、いますね。' },
   // M-R194: the dachi's messages live in Bluena's 〔💬 通信〕, not on Saturn
-  { k: 'note', text: 'ダチとのやり取りは、どの星にいても、Bluenaの〔💬 通信〕でできます。ダチの名札をタップすると、二人のレコードがひらきます。コロリンをそのレコードへはじくと、そのダチに届きます。ふだんはレコード（声で流れる）、右上で〔💬 会話〕にすると字だけで読めます。どのコロリンにも字がつき、音はタップした時だけ鳴ります' },
+  { k: 'note', text: 'ダチとのやり取りは、どの星にいても、Bluenaの〔通信〕でできます。ダチの名札をタップすると、二人のレコードがひらきます。コロリンをそのレコードへはじくと、そのダチに届きます。ふだんはレコード（声で流れる）、右上で〔会話〕にすると字だけで読めます。どのコロリンにも字がつき、音はタップした時だけ鳴ります' },
   { k: 'done' },
 ];
 const FLOWN: Beat[] = [
@@ -534,7 +535,7 @@ export function SaturnLesson({
       : beat?.k === 'note'
         ? fill(beat.text)
         : beat?.k === 'listen'
-          ? waitSong ? '♪……' : beat.id === 'mine-1' ? 'コロリンを、タップしてみよう' : '👆 光っているコロリンをタップ'
+          ? waitSong ? '♪……' : beat.id === 'mine-1' ? 'コロリンを、タップしてみよう' : '光っているコロリンをタップ'
           : beat?.k === 'fly'
             ? '飛ばしたいコロリンを、上へはじこう（何個でも。飛ばさなくてもいい）'
             : '';
@@ -638,7 +639,7 @@ export function SaturnLesson({
                 {/* the way out for anyone who cannot speak (hidden while the typing sheet is open) */}
                 {!typing && (
                 <button onClick={() => setTyping(true)} className="absolute bottom-[calc(14px+env(safe-area-inset-bottom))] right-4 rounded-full bg-[rgba(20,12,36,0.6)] px-3 py-1.5 text-[13px] text-white" aria-label="文字で入力">
-                  ⌨ 文字で
+                  文字で
                 </button>
                 )}
               </div>
@@ -701,8 +702,8 @@ function DachiCard({ who, name, message }: { who: 'kimorin' | 'inviter'; name: s
     <div className="pointer-events-none absolute inset-0 z-[198] flex items-center justify-center px-8">
       <div className="relative w-full max-w-[280px] animate-[fadeUp_0.5s_ease-out] rounded-2xl border-2 border-amber-300/80 bg-gradient-to-b from-[#2a1a3e] to-[#120a1e] px-5 pb-5 pt-9 text-center text-amber-50 shadow-[0_0_40px_rgba(255,200,120,0.35)]">
         {/* the compass seal, as on the invitation */}
-        <span className="absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full border-4 border-double border-amber-200 bg-gradient-to-b from-[#b4282e] to-[#6e1418] text-2xl shadow-lg">🧭</span>
-        <p className="text-[11px] tracking-[0.3em] text-amber-200/90">👥 ダチ</p>
+        <span className="absolute -top-7 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full border-4 border-double border-amber-200 bg-gradient-to-b from-[#b4282e] to-[#6e1418] text-amber-100 shadow-lg"><LineIcon id="compass" className="h-7 w-7" /></span>
+        <p className="text-[11px] tracking-[0.3em] text-amber-200/90">ダチ</p>
         <span className={`mx-auto mt-3 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-white/10 ring-2 ring-amber-200/70 ${who === 'kimorin' ? 'animate-[tailFlap_0.5s_ease-in-out_4]' : ''}`}>
           {who === 'kimorin' ? (
             // eslint-disable-next-line @next/next/no-img-element

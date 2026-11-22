@@ -10,10 +10,10 @@ import { VenusWorld } from './VenusWorld';
  */
 type Wait = 'buy' | 'make' | 'list' | 'mine' | 'done';
 const STEPS: { who: 'bossg' | 'hatg' | 'longg'; text: string; wait: Wait; hint?: string }[] = [
-  { who: 'bossg', text: 'ここが金星のマーケットだ。\nみんなが作ったグッズが並んでる。\n気に入ったのを、星で買ってみな。', wait: 'buy', hint: '🛍 グッズをタップ →「★で買う」' },
-  { who: 'hatg', text: '星は、ほかの惑星で集めた星だ。\n本物のお金はいらないぜ。\n次は、作る番だ。「つくる」を押してみな。', wait: 'make', hint: '👇「つくる」' },
-  { who: 'longg', text: '相棒のバティに、作りたいものを話してみな。\n形になったら、値段をつけて\n店に並べるんだ。', wait: 'list', hint: '🏪「店に並べる」' },
-  { who: 'bossg', text: 'いいぞ。売れたら星が入る。\n「自分の店」をのぞいてみな。', wait: 'mine', hint: '👇「自分の店」' },
+  { who: 'bossg', text: 'ここが金星のマーケットだ。\nみんなが作ったグッズが並んでる。\n気に入ったのを、星で買ってみな。', wait: 'buy', hint: 'グッズをタップ →「★で買う」' },
+  { who: 'hatg', text: '星は、ほかの惑星で集めた星だ。\n本物のお金はいらないぜ。\n次は、作る番だ。「つくる」を押してみな。', wait: 'make', hint: '↓「つくる」' },
+  { who: 'longg', text: '相棒のバティに、作りたいものを話してみな。\n形になったら、値段をつけて\n店に並べるんだ。', wait: 'list', hint: '「店に並べる」' },
+  { who: 'bossg', text: 'いいぞ。売れたら星が入る。\n「自分の店」をのぞいてみな。', wait: 'mine', hint: '↓「自分の店」' },
   { who: 'bossg', text: '作って、売って、集める。\nこれが金星の遊び方だ。', wait: 'done' },
 ];
 const NAMES = { bossg: 'ボスG', hatg: 'ハットG', longg: 'ロングG' };

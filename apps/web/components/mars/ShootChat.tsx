@@ -93,13 +93,13 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview, header = true }: { 
               <ol className="mt-2 space-y-1 rounded-2xl bg-black/30 p-3 text-xs text-white/85">
                 {m.video.scenes.map((s, k) => (
                   <li key={k}>
-                    🎬 シーン{k + 1}：{s}
+                    シーン{k + 1}：{s}
                   </li>
                 ))}
               </ol>
               {kept.has(m.video.id) ? (
                 <button onClick={onOpenStudio} className="mt-3 w-full rounded-full border border-orange-200/50 py-2 text-sm">
-                  🔒 裏スタジオにしまいました → スタジオを見る
+                  裏スタジオにしまいました → スタジオを見る
                 </button>
               ) : (
                 <div className="mt-3 flex gap-2">
@@ -120,7 +120,7 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview, header = true }: { 
                     }}
                     className="flex-[2] rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 py-2 text-sm font-bold"
                   >
-                    🔒 裏スタジオにしまう（未公開）
+                    裏スタジオにしまう（未公開）
                   </button>
                 </div>
               )}
@@ -147,7 +147,7 @@ export function ShootChat({ onKeep, onOpenStudio, onPreview, header = true }: { 
         {busy && (
           <div className="flex items-end gap-2">
             <Face face={partner.face} size={32} />
-            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">🎬 撮影中…</p>
+            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">撮影中…</p>
           </div>
         )}
         <div ref={end} />

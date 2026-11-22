@@ -32,8 +32,7 @@ export function RoundCards({ answers, look, onDone }: { answers: Record<string, 
             const w = r.what(answers, look);
             return (
               <div key={r.planet} className={`flex aspect-[3/4] flex-col items-center justify-center rounded-xl p-1 text-center transition-all duration-500 ${k < shown ? 'opacity-100' : 'translate-y-2 opacity-0'} ${w ? 'bg-amber-100/15 ring-1 ring-amber-200/50' : 'bg-white/[0.03]'}`}>
-                <span className={w ? 'text-2xl' : 'text-xl opacity-50'}>{r.icon}</span>
-                <span className="mt-1 text-[10px] text-amber-100/70">{r.planet}</span>
+                <span className={`text-[12px] ${w ? 'font-bold text-amber-100' : 'text-amber-100/50'}`}>{r.planet}</span>
                 {w && <span className="mt-0.5 line-clamp-2 text-[10px] leading-tight">{w}</span>}
               </div>
             );

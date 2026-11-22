@@ -92,7 +92,7 @@ export function PlazaMaker({ onDone }: { onDone: (a: Record<string, string>) => 
             <p className="text-3xl">{icon}</p>
             <p className="text-[14px]">『{name}』</p>
             <p className="text-[12px] text-pink-50/70">入れる人：わたしだけ</p>
-            <p className="text-[12px] leading-relaxed text-pink-50/60">自分の広場では、〔🎙 この広場でつぶやく〕で、コロリンを置けます。入れる人をしぼった広場のコロリンは、〔推し〕には入りません</p>
+            <p className="text-[12px] leading-relaxed text-pink-50/60">自分の広場では、〔この広場でつぶやく〕で、コロリンを置けます。入れる人をしぼった広場のコロリンは、〔推し〕には入りません</p>
             <button onClick={() => onDone({ plaza: 'make' })} className={btn}>
               つぎへ
             </button>

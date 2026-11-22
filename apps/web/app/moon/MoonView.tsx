@@ -9,6 +9,7 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { ApiError, getApi } from '@/lib/api';
 import { useI18n } from '@/lib/i18n/client';
 import { useAuth } from '@/lib/auth';
+import { LineIcon } from '@/components/LineIcon';
 
 export function MoonView() {
   return (
@@ -116,14 +117,14 @@ function Chat() {
         <BatiFace size={44} />
         <div className="flex-1">
           <div className="font-black">{name}</div>
-          <div className="text-[11px] text-white/50">{profile?.hasMemory ? `🧠 ${m.moon.memoryOn}` : m.moon.memoryOff}</div>
+          <div className="text-[11px] text-white/50">{profile?.hasMemory ? `${m.moon.memoryOn}` : m.moon.memoryOff}</div>
         </div>
         {/* the day's count only when few are left (story chat 2026-11-02: no numbers on screen otherwise) */}
         {quota && quota.freeDaily - quota.usedToday <= 5 && (
-          <span className="chip bg-white/10 text-white/70">🌙 今日は、あと少し話せるよ</span>
+          <span className="chip bg-white/10 text-white/70">今日は、あと少し話せるよ</span>
         )}
         <button className="btn btn-ghost h-9 w-9 !p-0" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
-          ⚙︎
+          <LineIcon id="gear" className="h-5 w-5" />
         </button>
       </div>
 

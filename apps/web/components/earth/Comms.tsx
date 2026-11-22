@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth';
 import { connectAudio, type CallAudio } from '@/lib/comms/call';
 import { watchConversation } from '@/lib/comms/mail';
 import { disablePush, enablePush, pushState, type PushState } from '@/lib/push';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Earth mail & phone (client decision 2026-10-08): they open for each member after the ¥88
@@ -45,8 +46,8 @@ export function CommsTiles({ phoneOnly = false }: { phoneOnly?: boolean } = {}) 
     <>
       <div className="grid grid-cols-2 gap-3">
         {/* 2026-11-21: mail lives in Bluena's 〔通信〕 now (M-R194); Earth keeps the phone */}
-        {!phoneOnly && <Tile icon="✉️" title="メール" hint="ダチとメッセージ（声でも送れる）" locked={locked} dot={anyUnread} onClick={() => setOpen('mail')} />}
-        <Tile icon="📞" title="電話" hint="ダチと声で話す" locked={locked} onClick={() => setOpen('phone')} />
+        {!phoneOnly && <Tile icon={<LineIcon id="mail" />} title="メール" hint="ダチとメッセージ（声でも送れる）" locked={locked} dot={anyUnread} onClick={() => setOpen('mail')} />}
+        <Tile icon={<LineIcon id="phone" />} title="電話" hint="ダチと声で話す" locked={locked} onClick={() => setOpen('phone')} />
       </div>
       {!locked && <PushToggle />}
       {status?.open && open === 'mail' && <MailScreen status={status} onClose={() => setOpen(null)} />}
@@ -78,10 +79,10 @@ function PushToggle() {
   if (state === 'needs-home-screen')
     return (
       <p className="card p-3 text-[11px] leading-relaxed text-white/60">
-        🔔 電話やメールのお知らせを受け取るには：Safari の「共有」ボタン →「ホーム画面に追加」で、ホーム画面のアプリから開いてね
+        電話やメールのお知らせを受け取るには：Safari の「共有」ボタン →「ホーム画面に追加」で、ホーム画面のアプリから開いてね
       </p>
     );
-  if (state === 'denied') return <p className="card p-3 text-[11px] text-white/60">🔕 お知らせがブロックされています（設定 → 通知 から許可できます）</p>;
+  if (state === 'denied') return <p className="card p-3 text-[11px] text-white/60">お知らせがブロックされています（設定 → 通知 から許可できます）</p>;
   const on = state === 'on';
   return (
     <button
@@ -95,7 +96,7 @@ function PushToggle() {
       }}
       className={`card flex w-full items-center gap-3 p-3 text-left disabled:opacity-60 ${on ? '' : 'hover:bg-white/10'}`}
     >
-      <span className="text-2xl">{on ? '🔔' : '🔕'}</span>
+      <LineIcon id={on ? 'bell' : 'bellOff'} className="h-6 w-6 shrink-0" />
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-bold">{on ? '電話とメールのお知らせ：オン' : '電話とメールのお知らせをオンにする'}</span>
         <span className="block text-[11px] text-white/55">アプリを閉じていても、ダチからの電話とメールがわかるよ</span>
@@ -107,14 +108,14 @@ function PushToggle() {
   );
 }
 
-function Tile({ icon, title, hint, locked, dot, onClick }: { icon: string; title: string; hint: string; locked: boolean; dot?: boolean; onClick: () => void }) {
+function Tile({ icon, title, hint, locked, dot, onClick }: { icon: ReactNode; title: string; hint: string; locked: boolean; dot?: boolean; onClick: () => void }) {
   return (
     <button onClick={locked ? undefined : onClick} className={`card relative p-4 text-left ${locked ? 'opacity-70' : 'hover:bg-white/10'}`} aria-disabled={locked}>
       {dot && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_rgba(255,120,150,0.9)]" aria-label="未読あり" />}
       <div className="text-2xl">{icon}</div>
       <div className="mt-1 text-sm font-bold">{title}</div>
       <p className="mt-1 text-[11px] leading-snug text-white/55">{hint}</p>
-      {locked && <span className="chip mt-2 bg-white/10 text-white/60">🔒 Obolo Orderに入るとひらきます</span>}
+      {locked && <span className="chip mt-2 bg-white/10 text-white/60">Obolo Orderに入るとひらきます</span>}
     </button>
   );
 }
@@ -209,10 +210,10 @@ function SafetyMenu({ person, kind, onBlocked }: { person: CommsPerson; kind: 'm
                 <div className="space-y-2">
                   <p className="pb-1 text-center text-sm text-white/60">{nameOf(person)}</p>
                   <button onClick={() => setOpen('report')} className="w-full rounded-2xl bg-white/10 py-3 font-bold">
-                    🚩 通報する
+                    通報する
                   </button>
                   <button onClick={() => setOpen('block')} className="w-full rounded-2xl bg-white/10 py-3 font-bold text-rose-300">
-                    🚫 ブロックする
+                    ブロックする
                   </button>
                   <button onClick={() => setOpen(null)} className="w-full py-2 text-sm text-white/60">
                     やめる
@@ -279,7 +280,7 @@ function BlockedList({ onChange }: { onChange: () => void }) {
     );
   return (
     <div className="mt-6 rounded-2xl border border-white/10 p-3">
-      <p className="mb-2 text-xs font-bold text-white/60">🚫 ブロックした人</p>
+      <p className="mb-2 text-xs font-bold text-white/60">ブロックした人</p>
       {list?.length === 0 && <p className="text-center text-xs text-white/45">いません</p>}
       {list?.map((p) => (
         <div key={p.id} className="flex items-center gap-3 py-1.5">
@@ -384,9 +385,9 @@ function FindFriend({ onChange }: { onChange: () => void }) {
             <p className="truncate font-bold">{nameOf(found)}</p>
             <p className="truncate text-[11px] text-white/55">
               {found.blockedByMe
-                ? '🚫 ブロック中'
+                ? 'ブロック中'
                 : found.followedByMe && found.followsMe
-                  ? '🤝 ダチです。メールと電話ができます'
+                  ? 'ダチです。メールと電話ができます'
                   : found.followedByMe
                     ? '相手がフォローしかえすとダチになります'
                     : found.followsMe
@@ -492,7 +493,7 @@ function MailScreen({ status, onClose }: { status: CommsStatus; onClose: () => v
       />
     );
   return (
-    <Overlay title="✉️ メール" onBack={onClose}>
+    <Overlay title="メール" onBack={onClose}>
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
         <FindFriend onChange={reload} />
         {contacts === null && <p className="py-10 text-center text-sm text-white/50">ひらいています…</p>}
@@ -561,12 +562,12 @@ function Conversation({ status, peer, onBack, onBlocked }: { status: CommsStatus
         {msgs.map((m) =>
           m.fromMe ? (
             <p key={m.id} className="ml-auto w-fit max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-gradient-to-r from-sky-600 to-violet-600 px-3 py-2 text-sm">
-              {m.text || '🎤 ボイス'}
+              {m.text || 'ボイス'}
             </p>
           ) : (
             <div key={m.id} className="flex items-end gap-2">
               <Face p={peer} size={30} />
-              <p className="max-w-[78%] whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{m.text || '🎤 ボイス'}</p>
+              <p className="max-w-[78%] whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">{m.text || 'ボイス'}</p>
             </div>
           ),
         )}
@@ -594,7 +595,7 @@ function PhoneScreen({ onClose, onCall }: { onClose: () => void; onCall: (to: Co
   const [contacts, reload] = useContacts();
   const [err, setErr] = useState('');
   return (
-    <Overlay title="📞 電話" onBack={onClose}>
+    <Overlay title="電話" onBack={onClose}>
       <div className="min-h-0 flex-1 overflow-y-auto p-3">
         <FindFriend onChange={reload} />
         {contacts === null && <p className="py-10 text-center text-sm text-white/50">ひらいています…</p>}
@@ -612,7 +613,7 @@ function PhoneScreen({ onClose, onCall }: { onClose: () => void; onCall: (to: Co
               className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500 text-xl shadow-[0_0_14px_rgba(60,220,140,0.5)]"
               aria-label={`${nameOf(c)}に電話する`}
             >
-              📞
+              <LineIcon id="phone" className="h-5 w-5" />
             </button>
             <SafetyMenu person={c} kind="person" onBlocked={reload} />
           </div>
@@ -649,7 +650,7 @@ function IncomingCall({ onAnswer }: { onAnswer: (view: CallView, join: CallJoin)
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate font-bold">{nameOf(ringing.caller)}</p>
-          <p className="text-xs text-emerald-200">📞 電話がかかってきています</p>
+          <p className="text-xs text-emerald-200">電話がかかってきています</p>
         </div>
         <button
           onClick={() => {
@@ -765,7 +766,7 @@ function CallScreen({ initial, join, demo, onClose }: { initial: CallView; join?
               className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl ${muted ? 'bg-white text-black' : 'bg-white/15'}`}
               aria-label={muted ? 'ミュートを解除' : 'ミュート'}
             >
-              {muted ? '🔇' : '🎙️'}
+              <LineIcon id={muted ? 'micOff' : 'mic'} className="h-7 w-7" />
             </button>
           )}
           <button
@@ -773,7 +774,7 @@ function CallScreen({ initial, join, demo, onClose }: { initial: CallView; join?
             className="flex h-16 w-16 items-center justify-center rounded-full bg-rose-500 text-2xl shadow-[0_0_20px_rgba(255,80,110,0.6)]"
             aria-label={done ? 'とじる' : '切る'}
           >
-            {done ? '✕' : '📵'}
+            {done ? '✕' : <LineIcon id="phoneOff" className="h-7 w-7" />}
           </button>
         </div>
         {done && (

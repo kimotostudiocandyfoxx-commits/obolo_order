@@ -16,6 +16,7 @@ import { Frame } from './Frame';
 import { UfoPlayer, type CrewMember } from './UfoPlayer';
 import { LiveShoot } from './LiveMars';
 import { ShootChat } from './ShootChat';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Mars — the planet of video (client design 2026-10-05, docs/mars.md).
@@ -199,7 +200,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
             onPosted={() => {
               setSkyKey(Date.now());
               go({ v: 'sky' });
-              say('🛸 公開！ 88時間、ダチの星図をとびます');
+              say('公開！ 88時間、ダチの星図をとびます');
               ev.current?.onRelease?.();
             }}
           />
@@ -221,7 +222,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           }}
           onPosted={() => {
             setSkyKey(Date.now());
-            say('🛸 公開！ 88時間、ダチの星図をとびます');
+            say('公開！ 88時間、ダチの星図をとびます');
             ev.current?.onRelease?.();
           }}
           onShoot={() => go({ v: 'shoot' })}
@@ -244,7 +245,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           onLocker={() => ev.current?.onLocker?.()}
           onRelease={(id) => {
             mine.release(id);
-            say('🛸 公開！ 88時間、ダチの星図をとびます');
+            say('公開！ 88時間、ダチの星図をとびます');
             ev.current?.onRelease?.();
           }}
           say={say}
@@ -270,7 +271,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
       {/* controls: 星図 / 撮影 / スタジオ */}
       <nav className="relative z-20 mx-auto mb-[calc(10px+env(safe-area-inset-bottom))] flex w-[min(94%,560px)] items-center justify-around rounded-[2rem] border border-white/10 bg-black/60 px-6 py-2.5 backdrop-blur">
         <button onClick={() => go({ v: 'sky' })} className={`flex flex-col items-center text-xs ${view.v === 'sky' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">✨</span>星図
+          星図
         </button>
         {live ? (
           // the real Mars makes nothing itself (docs/工房とブルーナ_設計.md §3.4): videos and MVs are made in the Moon atelier
@@ -284,12 +285,12 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           </Link>
         ) : (
           <button onClick={() => go({ v: 'shoot' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'shoot' ? 'text-amber-200' : ''}`}>
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 via-violet-600 to-indigo-600 text-2xl shadow-[0_0_24px_rgba(200,90,255,0.6)]">🎥</span>
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 via-violet-600 to-indigo-600 shadow-[0_0_24px_rgba(200,90,255,0.6)]"><LineIcon id="camera" className="h-7 w-7" /></span>
             撮影
           </button>
         )}
         <button onClick={() => go(live ? { v: 'live-studio', who: 'me' } : { v: 'studio', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'studio' || view.v === 'live-studio' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🎬</span>myスタジオ
+          myスタジオ
         </button>
       </nav>
 
@@ -387,7 +388,7 @@ function StudioView({
         <div className="absolute flex flex-col items-center justify-center rounded-2xl border border-amber-400/60 bg-[#1c0d08]/95 text-center shadow-[0_0_24px_rgba(255,150,60,0.35)]" style={{ ...pct(st.title), containerType: 'inline-size' }}>
           <p className="truncate px-2 text-[clamp(14px,9cqw,44px)] font-black tracking-wide text-amber-50">{isMe ? 'myスタジオ' : `${title.toUpperCase()} STUDIO`}</p>
           <p className="text-[clamp(9px,3.4cqw,15px)] text-white/75">
-            {flyingCount ? '🛸 いま映像がとんでいます' : 'ようこそ'}
+            {flyingCount ? 'いま映像がとんでいます' : 'ようこそ'}
           </p>
         </div>
         <div className="absolute flex gap-[3%]" style={pct(st.buttons)}>
@@ -400,10 +401,10 @@ function StudioView({
                 }}
                 className="flex-1 rounded-full border border-white/25 bg-[#1c0d08]/95 text-[clamp(8px,1.3vw,13px)] whitespace-nowrap"
               >
-                🔒 裏スタジオ {locker.length}
+                裏スタジオ {locker.length}
               </button>
               <button onClick={() => setDecor(true)} className="flex-1 rounded-full border border-amber-400/70 bg-[#1c0d08]/95 text-[clamp(8px,1.3vw,13px)] whitespace-nowrap text-amber-200">
-                🎨 飾る
+                飾る
               </button>
             </>
           ) : (
@@ -416,7 +417,7 @@ function StudioView({
                 {following ? 'フォロー中' : 'フォロー'}
               </button>
               <button onClick={() => say('スタジオを飾るのは本人だけです')} className="flex-1 rounded-full border border-amber-400/50 bg-[#1c0d08]/95 text-[clamp(8px,1.3vw,13px)] whitespace-nowrap text-amber-200/70">
-                🎨 スタジオ
+                スタジオ
               </button>
             </>
           )}
@@ -458,7 +459,7 @@ function StudioView({
       )}
 
       {decor && (
-        <Sheet onClose={() => setDecor(false)} title="🎨 スタジオを飾る">
+        <Sheet onClose={() => setDecor(false)} title="スタジオを飾る">
           <p className="mb-3 text-center text-[11px] text-white/55">星図とスタジオの見た目を選べます</p>
           <div className="grid grid-cols-2 gap-3">
             {THEMES.map((t) => (
@@ -480,7 +481,7 @@ function StudioView({
         </Sheet>
       )}
       {open && (
-        <Sheet onClose={() => setOpen(false)} title="🔒 裏スタジオ（自分だけ）">
+        <Sheet onClose={() => setOpen(false)} title="裏スタジオ（自分だけ）">
           <div className="max-h-[70svh] overflow-y-auto">
           <Backstage
             onPublish={
@@ -492,7 +493,7 @@ function StudioView({
                 : undefined
             }
           />
-          <p className="mb-2 text-xs font-bold text-amber-100">🎞 撮影した映像（未公開）</p>
+          <p className="mb-2 text-xs font-bold text-amber-100">撮影した映像（未公開）</p>
           <p className="mb-3 text-center text-[11px] text-white/55">公開すると、UFOになって88時間、ダチや推してくれる人の星図をとびます。</p>
           <div className="space-y-3">
             {locker.map((v) => (
@@ -513,7 +514,7 @@ function StudioView({
                   }}
                   className="rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 px-3 py-1.5 text-xs font-bold"
                 >
-                  🛸 公開する
+                  公開する
                 </button>
               </div>
             ))}

@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { BatiEggBody, BatiNameBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
+import { BatiEggBody, BatiNameBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -118,6 +118,20 @@ export class LookController {
   async faces(@UserId() userId: string, @Req() req: Request) {
     await rateLimit(this.kv, `bati-faces:${userId}`, 3, 600);
     return this.look.batiFaces(userId, origin(req));
+  }
+
+  /** Bati's room (P-BATI-ROOM): the Bati dressed up / changed a little by the wish — 3 pictures, 8 rounds a day */
+  @Post('bati/restyle')
+  @HttpCode(200)
+  async restyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
+    await rateLimit(this.kv, `bati-restyle:${userId}`, 4, 60);
+    return this.look.restyle(userId, parseBody(BatiRestyleBody, body).wish, origin(req), this.admin(token));
+  }
+
+  @Post('bati/restyle/choose')
+  @HttpCode(200)
+  chooseRestyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    return this.look.chooseRestyle(userId, parseBody(BatiRestyleChooseBody, body).id, origin(req));
   }
 
   @Post('bati/name')

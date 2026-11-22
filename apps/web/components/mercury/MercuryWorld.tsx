@@ -161,7 +161,7 @@ export function MercuryWorld({
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="px-4 pt-[calc(10px+env(safe-area-inset-top))]">
             <Tabs tab={tab} setTab={setTab} />
-            {sailingCount > 0 && <p className="mx-auto mt-2 w-fit rounded-full border border-amber-300/50 bg-black/30 px-4 py-1 text-sm text-amber-100">⛵ ダチの船が、海に出ています</p>}
+            {sailingCount > 0 && <p className="mx-auto mt-2 w-fit rounded-full border border-amber-300/50 bg-black/30 px-4 py-1 text-sm text-amber-100">ダチの船が、海に出ています</p>}
           </div>
           <div className="flex min-h-0 flex-1 items-center justify-center p-2">
             <ArtStage name="mercury-sea" reserve={230} focus={62}>
@@ -203,7 +203,7 @@ export function MercuryWorld({
           onSoil={() => ev.current?.onSoil?.()}
           onReleased={() => {
             setSkyKey(Date.now());
-            say('🚢 出航！ 88時間、みんなの海を渡ります');
+            say('出航！ 88時間、みんなの海を渡ります');
             ev.current?.onRelease?.();
           }}
           say={say}
@@ -222,7 +222,7 @@ export function MercuryWorld({
           onSoil={() => ev.current?.onSoil?.()}
           onRelease={(id) => {
             mine.release(id);
-            say('🚢 出航！ 88時間、みんなの海を渡ります');
+            say('出航！ 88時間、みんなの海を渡ります');
             ev.current?.onRelease?.();
           }}
           say={say}
@@ -255,7 +255,7 @@ export function MercuryWorld({
       {/* controls: 海図 / 作曲 / 島 */}
       <nav className="relative z-20 mx-auto mb-[calc(10px+env(safe-area-inset-bottom))] flex w-[min(94%,560px)] items-center justify-around rounded-[2rem] border border-white/10 bg-[#0a1430]/80 px-6 py-2.5 backdrop-blur">
         <button onClick={() => go({ v: 'sea' })} className={`flex flex-col items-center text-xs ${view.v === 'sea' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🗺️</span>海図
+          海図
         </button>
         {atelier ? (
           // the real Mercury makes nothing itself (docs/工房とブルーナ_設計.md §3.4): songs are made in the Moon atelier
@@ -274,7 +274,7 @@ export function MercuryWorld({
           </button>
         )}
         <button onClick={() => go({ v: 'island', who: 'me' })} className={`flex flex-col items-center text-xs ${view.v === 'island' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🏝️</span>myアイランド
+          myアイランド
         </button>
       </nav>
 
@@ -440,7 +440,7 @@ function IslandView({
           </div>
           {action ?? (
             <button onClick={() => say('島を飾るのは準備中です')} className="shrink-0 rounded-full border border-amber-300/60 bg-[#0a1430]/85 px-4 py-1.5 text-sm text-amber-100">
-              🏝 島を飾る
+              島を飾る
             </button>
           )}
         </div>
@@ -468,7 +468,7 @@ function IslandView({
       <div className="mx-auto mt-2 flex max-w-2xl flex-wrap justify-center gap-2 px-4">
         {sailing.length > 0 && (
           <button onClick={() => onPlay(sailing, 0)} className="rounded-full border border-cyan-200/40 bg-[#0a1430]/80 px-4 py-2 text-xs text-cyan-100">
-            🚢 いま航海中の曲を聴く
+            いま航海中の曲を聴く
           </button>
         )}
         {isMe && (
@@ -480,7 +480,7 @@ function IslandView({
             }}
             className="rounded-full border border-amber-200/60 bg-[#3a2410]/90 px-4 py-2 text-xs"
           >
-            ⛏ 土の中の曲
+            土の中の曲
           </button>
         )}
       </div>
@@ -488,7 +488,7 @@ function IslandView({
       {dig && (
         <div className="absolute inset-0 z-40 flex items-end justify-center bg-black/60" onClick={() => setDig(false)}>
           <div className="w-full max-w-lg rounded-t-3xl border-t border-amber-200/30 bg-gradient-to-b from-[#3b2614] to-[#1d1209] p-5 pb-[calc(24px+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
-            <p className="text-center text-sm font-bold">⛏ 土の中のデモ曲</p>
+            <p className="text-center text-sm font-bold">土の中のデモ曲</p>
             <p className="mt-1 text-center text-[11px] text-white/55">まだ発表していない曲は、島の土に埋まっています。出航させると、88時間みんなの海を渡ります。</p>
             <div className="mt-4 space-y-3">
               {soil.map((d) => (
@@ -507,7 +507,7 @@ function IslandView({
                     }}
                     className="rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 px-3 py-1.5 text-xs font-bold"
                   >
-                    🚢 出航させる
+                    出航させる
                   </button>
                 </div>
               ))}

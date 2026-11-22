@@ -61,7 +61,7 @@ export function Backstage({ onPublish }: { onPublish?: () => void } = {}) {
   if (list === null) return null;
   return (
     <div className="mb-4 rounded-2xl border border-amber-300/25 bg-black/25 p-3">
-      <p className="text-xs font-bold text-amber-100">🎬 あなたの動画（自分だけ）</p>
+      <p className="text-xs font-bold text-amber-100">あなたの動画（自分だけ）</p>
       <p className="mt-0.5 text-[10px] text-white/50">撮った動画は、ぜんぶここにしまわれます（{MARS_VIDEO_SECONDS}秒まで）。写真は木星の根っこへ。</p>
       <button onClick={() => input.current?.click()} disabled={busy} className="mt-2 w-full rounded-xl border-2 border-dashed border-amber-300/40 py-3 text-sm disabled:opacity-60">
         {busy ? 'しまっています…（少し時間がかかります）' : '＋ 動画を入れる'}
@@ -101,7 +101,7 @@ export function Backstage({ onPublish }: { onPublish?: () => void } = {}) {
               <p className="mt-0.5 truncate text-[10px] text-white/60">{v.title || '動画'}</p>
               {onPublish && (
                 <button onClick={() => void publish(v)} disabled={!!sending} className="mt-1 w-full rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 py-1 text-[10px] font-bold disabled:opacity-50">
-                  {sending === v.id ? '正方形にしています…' : '🛸 公開する'}
+                  {sending === v.id ? '正方形にしています…' : '公開する'}
                 </button>
               )}
             </div>

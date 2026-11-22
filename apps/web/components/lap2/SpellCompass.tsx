@@ -91,7 +91,7 @@ export function SpellCompass({ kind, onAdd, onClose }: { kind: 'art' | 'song'; o
     <div className="absolute inset-0 z-[40] flex items-end justify-center bg-black/60 px-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
       <div className="max-h-[86svh] w-full max-w-md overflow-y-auto rounded-3xl border border-amber-200/30 bg-[#140f08]/95 p-4 text-amber-50">
         <div className="flex items-center justify-between">
-          <p className="text-[15px] font-bold">🧭 スペルコンパス</p>
+          <p className="text-[15px] font-bold">スペルコンパス</p>
           <button onClick={onClose} className="text-[12px] text-amber-50/60">
             とじる
           </button>
@@ -130,7 +130,7 @@ export function SpellCompass({ kind, onAdd, onClose }: { kind: 'art' | 'song'; o
                   URLで読み取る
                 </button>
                 <button onClick={() => void listen()} disabled={listening} className={btn}>
-                  {listening ? '🎙 聞いています…（10秒）' : '🎙 スマホのそばで流して聞かせる'}
+                  {listening ? '聞いています…（10秒）' : 'スマホのそばで流して聞かせる'}
                 </button>
               </>
             )}
@@ -199,7 +199,7 @@ export function SpellCompass({ kind, onAdd, onClose }: { kind: 'art' | 'song'; o
               disabled={noted || !chosen.length}
               className="w-full text-center text-[12px] text-violet-200 disabled:text-amber-50/40"
             >
-              {noted ? 'スペルブックに記しました' : '📖 記す'}
+              {noted ? 'スペルブックに記しました' : '記す'}
             </button>
           </div>
         )}

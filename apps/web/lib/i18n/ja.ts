@@ -17,7 +17,7 @@ const ja = {
     sampleDataHint: 'この惑星は見た目のデモです（10/10時点）',
     comingSoon: '準備中',
     loginRequired: 'この惑星を使うには地球でログインしてね',
-    goToEarth: '🌍 地球へ行く',
+    goToEarth: '地球へ行く',
     error: 'エラーが発生しました',
     mana: 'MANA',
     stars: 'Stars',

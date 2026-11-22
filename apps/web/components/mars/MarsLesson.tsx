@@ -10,6 +10,7 @@ import type { LessonApi } from '@/lib/onboarding/lessonApi';
 import type { MvMade, SongMade, StickerMade } from '@/lib/onboarding/made';
 import { MyStudio, STUDIO_DEFAULT, studioCards, studioFromWords, studioOmakase, type StudioLook } from './MyStudio';
 import { LineVoice } from '@/lib/story/lineVoice';
+import { Glyph } from '@/components/bluena/glyphs';
 
 /**
  * Day 6 on Mars (first journey, simple version M-R185/M-R198/M-R200; script P04/c01.md D07-S004〜S005b).
@@ -65,7 +66,7 @@ const FIRSTS: { id: 'view' | 'art' | 'walk' | 'dark'; label: string; wish: strin
   { id: 'dark', label: '真っ暗から', wish: '真っ暗な画面から始まる', reply: { who: 'hipokin', text: '黒から入るか。渋いな。' } },
 ];
 // 「何を作る？」: the atelier's symbol buttons (only ▶ = a film today)
-const MAKE_KINDS = ['🎙', '🎨', '♪', '▶'];
+const MAKE_KINDS = ['voice', 'art', 'song', 'video'] as const;
 const KIMORIN_MV = '/onboarding/s/mv-kimorin-slide.jpg';
 const OPENING: Line = { who: 'hipokin', text: '火星の撮影に、カメラはいらない。撮りたい場面を、話せばいい。' };
 
@@ -104,7 +105,7 @@ const SENT: After[] = [
 ];
 const KEPT: After[] = [
   L({ who: 'hipokin', text: '飛ばすのは、いつでもいい。' }),
-  L({ who: 'guide', text: '〔🛸 公開する〕は、Bluenaの映像から、いつでも押せます。公開するまで、スタジオの1枠は空いたままです' }),
+  L({ who: 'guide', text: '〔公開する〕は、Bluenaの映像から、いつでも押せます。公開するまで、スタジオの1枠は空いたままです' }),
   { k: 'end' },
 ];
 
@@ -115,15 +116,15 @@ function Bar({ glow, onTap }: { glow: 'make' | 'studio' | null; onTap?: () => vo
     <div className="pb-safe absolute inset-x-0 bottom-0 z-[175] bg-gradient-to-t from-black/60 to-transparent px-4 pb-5 pt-8">
       <div className="flex justify-center gap-3">
         <button disabled className={btn(false)}>
-          ✨ 星図
+          星図
         </button>
         <button disabled={glow !== 'studio' || !onTap} onClick={onTap} className={btn(glow === 'studio')}>
-          🎬 myスタジオ
+          myスタジオ
         </button>
       </div>
       <div className="absolute bottom-5 right-3 flex flex-col items-end gap-2">
         <button disabled={glow !== 'make' || !onTap} onClick={onTap} className={`rounded-full px-3 py-2 text-[12px] font-black ${glow === 'make' ? 'animate-pulse bg-amber-300 text-stone-900 ring-4 ring-amber-100' : 'bg-white/20 text-white/80'}`}>
-          🌙 つくる
+          つくる
         </button>
         <span className="rounded-full bg-sky-300/30 px-3 py-1 text-[11px] font-black text-sky-50">Bluena</span>
       </div>
@@ -346,7 +347,7 @@ export function MarsLesson({
       ab?.k === 'line'
         ? lineOf(ab.l)
         : ab?.k === 'bar'
-          ? { text: '右の〔🎬 myスタジオ〕を押す' }
+          ? { text: '右の〔myスタジオ〕を押す' }
           : ab?.k === 'chat'
             ? lineOf({ who: 'bati', text: chat === 'cards' ? 'じゃあ、こんな感じかな！' : 'どんなスタジオにしたい？　ざっくりでいいよ！' })
             : ab?.k === 'pick'
@@ -359,7 +360,7 @@ export function MarsLesson({
     <div className="mt-2 grid grid-cols-3 gap-2">
       {[1, 2, 3].map((n) => (
         <div key={n} className={`flex aspect-video items-end rounded-lg p-1 text-[10px] font-black ${n === 1 && !first ? 'border-2 border-dashed border-rose-300 bg-white text-rose-400' : 'bg-gradient-to-br from-rose-200 to-amber-200 text-rose-700'}`}>
-          🎬 シーン{n}
+          シーン{n}
         </div>
       ))}
     </div>
@@ -413,14 +414,14 @@ export function MarsLesson({
             {MAKE_KINDS.map((s) => (
               <button
                 key={s}
-                disabled={s !== '▶'}
+                disabled={s !== 'video'}
                 onClick={() => {
                   setPhase('look');
                   said({ who: 'hipokin', text: '撮るのは、向こうでいい。撮った映像が生きるのは、こっちだ。' });
                 }}
-                className={`rounded-2xl py-4 text-xl font-black ${s === '▶' ? 'animate-pulse bg-rose-500 text-white' : 'bg-slate-100 text-slate-300'}`}
+                className={`rounded-2xl py-4 text-xl font-black ${s === 'video' ? 'animate-pulse bg-rose-500 text-white' : 'bg-slate-100 text-slate-300'}`}
               >
-                {s}
+                <Glyph id={s} className="mx-auto h-7 w-7" />
               </button>
             ))}
           </div>
@@ -606,7 +607,7 @@ export function MarsLesson({
       {/* one more take: back to the three scenes' draft (they may change it; the spell cards change as they talk) */}
       {phase === 'redraft' && (
         <Panel>
-          <p className="text-center text-sm font-black text-rose-600">🎬 シーン1／シーン2／シーン3</p>
+          <p className="text-center text-sm font-black text-rose-600">シーン1／シーン2／シーン3</p>
           {sceneCards}
           <div className="mt-3">
             <VoiceField light value={words} onChange={setWords} placeholder="夜の海を、小さな船が、まっすぐ進む" maxLength={60} />
@@ -645,7 +646,7 @@ export function MarsLesson({
             disabled={spelled}
             className="mx-auto mt-2 block text-[12px] font-bold text-violet-600 disabled:text-slate-400"
           >
-            {spelled ? 'スペルブックに、記しました' : '📖 記す'}
+            {spelled ? 'スペルブックに、記しました' : '記す'}
           </button>
           <div className="mt-3">
             <Big
@@ -683,7 +684,7 @@ export function MarsLesson({
       {(phase === 'making' || phase === 'failed') && (
         <Panel>
           {phase === 'making' ? (
-            <p className="py-4 text-center text-sm font-bold text-rose-500">🎬 撮影中…</p>
+            <p className="py-4 text-center text-sm font-bold text-rose-500">撮影中…</p>
           ) : (
             <Big tone="rose" onClick={() => void make()}>
               もう1回唱える
@@ -699,7 +700,7 @@ export function MarsLesson({
           <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500">
             {remade
               ? '映像カードが二枚、Bluenaの火星のフォルダに並びました。公開する一本は、あとで選べます（もう一回つくるのは、ここまで）'
-              : `🔒 Bluenaの火星のフォルダ（裏スタジオの棚）にしまいました。${neo}だけが見られます`}
+              : `Bluenaの火星のフォルダ（裏スタジオの棚）にしまいました。${neo}だけが見られます`}
           </p>
           <div className="mt-3 space-y-2">
             <Big
@@ -768,7 +769,7 @@ export function MarsLesson({
         <Panel>
           {chat === 'ask' ? (
             <div className="space-y-2">
-              <p className="text-center text-sm font-black text-rose-600">🎬 myスタジオ</p>
+              <p className="text-center text-sm font-black text-rose-600">myスタジオ</p>
               <VoiceField light value={talk} onChange={setTalk} placeholder="夜の砂漠で、ネオンがギラギラしてる感じ" maxLength={40} />
               <Big
                 tone="rose"
@@ -824,10 +825,9 @@ export function MarsLesson({
             ) : (
               <>
                 <button onClick={anext} className="mx-auto flex animate-[hintGlow_2.2s_ease-in-out_infinite] flex-col items-center rounded-2xl bg-stone-900 px-8 py-4 text-white shadow-2xl active:scale-95">
-                  <span className="text-4xl">🎬</span>
-                  <span className="mt-1 text-[14px] font-black">カチンコを鳴らす</span>
+                  <span className="text-[14px] font-black">カチンコを鳴らす</span>
                 </button>
-                <Soft onClick={() => setRedo(true)}>🎙 話して直す</Soft>
+                <Soft onClick={() => setRedo(true)}>話して直す</Soft>
               </>
             )}
           </div>
@@ -873,7 +873,7 @@ export function MarsLesson({
             </div>
           )}
           <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500">
-            〔🛸 公開する〕を押すと、Bluenaから火星へ映り、スタジオの大きい1枠に飾られます。同時にUFOになって、ダチの星図を88時間とび、このスタジオに戻ります（届くのはダチだけ）
+            〔公開する〕を押すと、Bluenaから火星へ映り、スタジオの大きい1枠に飾られます。同時にUFOになって、ダチの星図を88時間とび、このスタジオに戻ります（届くのはダチだけ）
           </p>
           <div className="mt-3 space-y-2">
             <Big
@@ -884,7 +884,7 @@ export function MarsLesson({
                 anext();
               }}
             >
-              🛸 公開する
+              公開する
             </Big>
             <Soft
               onClick={() => {

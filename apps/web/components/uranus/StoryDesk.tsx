@@ -121,7 +121,7 @@ export function StoryDesk({ neo, bati, arts, words, onDone }: { neo: string; bat
                 </button>
               ))}
             </div>
-            {trip && <p className="text-center text-[11px] text-amber-200">✨ {trip.url ? 'アートの端から、光の糸が一本、ページへのびる' : '言葉から、光の糸が一本、ページへのびる'}</p>}
+            {trip && <p className="text-center text-[11px] text-amber-200">{trip.url ? 'アートの端から、光の糸が一本、ページへのびる' : '言葉から、光の糸が一本、ページへのびる'}</p>}
             <VoiceField value={talk} onChange={setTalk} placeholder="この絵の場所で、迷子になる話" maxLength={120} multiline />
             <button onClick={() => trip && void toCards(`${trip.text}。${talk.trim()}`, 'trip')} disabled={!trip || busy} className={btn}>
               {busy ? '……' : 'これで話す'}
@@ -152,7 +152,7 @@ export function StoryDesk({ neo, bati, arts, words, onDone }: { neo: string; bat
                 </button>
                 {spellbookCards().length > 0 && (
                   <div className="flex flex-wrap justify-center gap-1">
-                    <span className="text-[10px] text-violet-200">📖 スペルブック</span>
+                    <span className="text-[10px] text-violet-200">スペルブック</span>
                     {spellbookCards().map((c) => (
                       <button key={c} onClick={() => setCards((x) => (x.includes(c) ? x : [...x, c]))} className="rounded bg-violet-300/20 px-1.5 text-[11px]">
                         〈{c}〉
@@ -166,7 +166,7 @@ export function StoryDesk({ neo, bati, arts, words, onDone }: { neo: string; bat
               </div>
             ) : (
               <button onClick={() => setEdit(true)} className="w-full text-center text-[12px] text-amber-200">
-                ✏️ スペルを組み替える
+                スペルを組み替える
               </button>
             )}
             <p className="text-center text-[11px] text-teal-50/60">たこ焼きブラザー「主人公の札を一枚変えれば、別のお話になるZE。」</p>
@@ -226,7 +226,7 @@ export function StoryDesk({ neo, bati, arts, words, onDone }: { neo: string; bat
               disabled={noted}
               className="w-full text-center text-[12px] text-violet-200 disabled:text-teal-50/40"
             >
-              {noted ? 'スペルブックに記しました' : '📖 記す'}
+              {noted ? 'スペルブックに記しました' : '記す'}
             </button>
             <button
               onClick={() => {
@@ -235,7 +235,7 @@ export function StoryDesk({ neo, bati, arts, words, onDone }: { neo: string; bat
               }}
               className={btn}
             >
-              🔒 机の引き出しにしまう
+              机の引き出しにしまう
             </button>
             <button onClick={() => setPhase('redo')} className="w-full py-1 text-[12px] text-teal-50/70">
               話して直す

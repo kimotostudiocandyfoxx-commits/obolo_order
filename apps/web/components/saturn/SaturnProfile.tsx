@@ -135,7 +135,7 @@ export function SaturnProfile({
 
             {profile.isMe && !editing && (
               <button onClick={() => setMaker(true)} className="mt-3 w-full rounded-full bg-gradient-to-r from-pink-400 to-violet-400 py-2.5 text-sm font-black text-white shadow">
-                🎨 キャラを描いてもらう
+                キャラを描いてもらう
               </button>
             )}
             {profile.isMe ? (
@@ -147,7 +147,7 @@ export function SaturnProfile({
                   }}
                   className="mt-3 w-full rounded-full border-2 border-violet-200 py-2.5 text-sm font-bold text-violet-600"
                 >
-                  ✏️ 自己紹介を書く
+                  自己紹介を書く
                 </button>
               )
             ) : (
@@ -162,7 +162,7 @@ export function SaturnProfile({
               </button>
             )}
 
-            <p className="mb-2 mt-5 text-xs font-black text-violet-500">{profile.isMe ? '🏠 自分の部屋のコロリン' : `🎙 ${u.displayName}の声`}</p>
+            <p className="mb-2 mt-5 text-xs font-black text-violet-500">{profile.isMe ? '自分の部屋のコロリン' : `${u.displayName}の声`}</p>
             {!posts.length && <p className="py-6 text-center text-xs text-slate-400">まだ声がないよ</p>}
             <div className="space-y-2">
               {posts.map((p) => (
@@ -179,7 +179,7 @@ export function SaturnProfile({
                     <p className="text-[10px] text-pink-400">{postWhere(p)}</p>
                     {p.repostOf && (
                       <p className="mt-1 truncate rounded-xl bg-white/80 px-2 py-1 text-[11px] text-slate-500">
-                        🔁 {p.repostOf.author.displayName}「{p.repostOf.text}」
+                        {p.repostOf.author.displayName}「{p.repostOf.text}」
                       </p>
                     )}
                     <p className="mt-1 text-[10px] text-slate-400">
@@ -259,7 +259,7 @@ function ProfileArt({ hue }: { hue: number }) {
  * back in your room after its 88 hours.
  */
 function postWhere(p: SaturnPostView): string {
-  if (p.room) return '🔒 自分の部屋だけ（誰にも見えない）';
+  if (p.room) return '自分の部屋だけ（誰にも見えない）';
   const left = Math.floor(SATURN_LIFETIME_HOURS - (Date.now() - new Date(p.createdAt).getTime()) / 3600_000);
-  return left > 0 ? `のこり${left}時間で部屋に帰ってくる` : '🏠 部屋に帰ってきた';
+  return left > 0 ? `のこり${left}時間で部屋に帰ってくる` : '部屋に帰ってきた';
 }

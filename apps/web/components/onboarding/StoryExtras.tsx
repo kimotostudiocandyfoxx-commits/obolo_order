@@ -9,6 +9,7 @@ import { IconButton } from '@/components/story/parts';
 import { TicketArt } from '@/components/story/Ticket';
 import { micTrouble, useDictation } from '@/lib/useDictation';
 import { nameCharsOk } from '@obolo/shared';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Pieces of the first journey's story (docs/story-rewrite/土星まで_UI引き継ぎ.md, 2026-10-14) that the
@@ -170,7 +171,7 @@ export function VoiceField({
           {field}
           {withMic && !textFirst && (
             <button type="button" onClick={mic.toggle} disabled={!mic.supported} aria-label="話して入力" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-amber-200/70 bg-black/60 disabled:opacity-30">
-              🎙
+              <LineIcon id="mic" className="h-6 w-6" />
             </button>
           )}
         </div>
@@ -218,7 +219,7 @@ export function VoiceField({
           className={`absolute bottom-0 right-0 p-1.5 text-lg ${light ? 'text-slate-300' : 'text-white/40'}`}
           aria-label="声が出せない時だけ、文字で"
         >
-          ⌨
+          <LineIcon id="keyboard" className="h-5 w-5" />
         </button>
       )}
       {notice && (
@@ -495,9 +496,7 @@ export function TicketCard({ stamps, fresh, flip, member = false, onDone }: { st
               <g opacity={member ? 1 : 0.8}>
                 <path d="M232 168 h22 v18 h-22z" fill="#7f1d1d" stroke="#fcd34d" strokeWidth="1" />
                 <path d="M232 168 q5 9 0 18 M254 168 q-5 9 0 18" fill="none" stroke="#fcd34d" strokeWidth="1" />
-                <text x="243" y="181" textAnchor="middle" fontSize="9">
-                  {member ? '🔓' : '🔒'}
-                </text>
+                <LineIcon id={member ? 'unlock' : 'lock'} x="238" y="172" width="10" height="10" className="text-amber-200" strokeWidth={2} />
                 <text x="243" y="200" textAnchor="middle" fontSize="9" fill="#fde68a">
                   火星シアター
                 </text>
@@ -509,9 +508,7 @@ export function TicketCard({ stamps, fresh, flip, member = false, onDone }: { st
               ].map(([x, y, t]) => (
                 <g key={String(t)} opacity=".75">
                   <circle cx={Number(x)} cy={Number(y)} r="9" fill="none" stroke="#a5b4fc" strokeDasharray="3 3" />
-                  <text x={Number(x)} y={Number(y) + 4} textAnchor="middle" fontSize="10">
-                    🔒
-                  </text>
+                  <LineIcon id="lock" x={Number(x) - 5} y={Number(y) - 5} width="10" height="10" className="text-indigo-200" strokeWidth={2} />
                   <text x={Number(x)} y={Number(y) + 24} textAnchor="middle" fontSize="11" fill="#c7d2fe">
                     {t}
                   </text>

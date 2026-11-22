@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useResident } from './onboarding/EclipseGuide';
+import { LineIcon } from '@/components/LineIcon';
 
 /** When a later planet opens for the signed-in member (client decision 2026-10-07). */
 export function usePlanetLock(planet: string): { locked: boolean; note: string } {
@@ -26,7 +27,7 @@ export function PlanetGate({ planet, name, children }: { planet: string; name: s
   if (!locked) return <>{children}</>;
   return (
     <div className="flex h-[calc(100svh-56px-env(safe-area-inset-top))] flex-col items-center justify-center px-8 text-center">
-      <p className="text-5xl">🔒</p>
+      <LineIcon id="lock" className="h-12 w-12" />
       <p className="mt-4 text-lg font-black">{name}は、まだひらいていない</p>
       <p className="mt-2 text-sm text-white/70">{note}</p>
       <p className="mt-1 text-xs text-white/50">Obolo Order になると、1週間ごとに新しい星がひらいていくよ</p>

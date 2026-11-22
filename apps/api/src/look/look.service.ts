@@ -1,10 +1,10 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { withAgeBand, withTouch, batiPrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { withAgeBand, withTouch, batiPrompt, batiRestylePrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
-import { ageBand, BATI_FACES, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { ageBand, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -25,6 +25,8 @@ export const NEO_LOOK_TRIES = 8;
 /** One refine (client decision 2026-10-25): four pictures with the request; the hidden ceiling stays generous. */
 export const NEO_LOOK_REFINES = 4;
 const CANDIDATES = 4;
+/** Bati's room: pictures per dress-up round (P-BATI-ROOM) */
+const RESTYLE_CANDIDATES = 3;
 const TRY_TTL = 60 * 60 * 24 * 60;
 /** PLACEHOLDER (P-PUNI-4): picture-character tries per member per day (2 candidates each, ~¥6 per image). */
 export const PUNI_PIC_TRIES = 3;
@@ -98,6 +100,7 @@ export class LookService {
   ) {
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
     this.queue.register('bati.repaint', ({ userId, origin }) => this.repaintBati(userId, origin));
+    this.queue.register('bati.faces', ({ userId, origin }) => this.batiFaces(userId, origin).then(() => undefined));
   }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
@@ -172,6 +175,7 @@ export class LookService {
 
   /** The one refine: the chosen candidate + what to change → four versions to decide from. */
   async refine(userId: string, body: RefineLookBody, origin: string, unlimited = false): Promise<NeoLookResult> {
+    if (body.magic) return this.magic(userId, body, origin, unlimited);
     const u = await this.user(userId);
     await this.clean(body.instruction);
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
@@ -191,6 +195,86 @@ export class LookService {
     }
     const tries = Number((await this.kv.get(`look:tries:${userId}`)) ?? 0);
     return { candidates, triesLeft: limited ? Math.max(0, NEO_LOOK_TRIES - tries) : 99, refinesLeft: await this.refinesLeft(userId, limited) };
+  }
+
+  /** the day in Japan, for the per-day counters */
+  private day() {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date());
+  }
+
+  /**
+   * Bati's magic in Bati's room (P-BATI-ROOM): the look worn now (or a candidate of it) changed by the wish, as often as
+   * BATI_MAGIC_PER_DAY rounds a day, so the visitor can keep going until they like it. Free during the first journey;
+   * after it each round takes the look's mana. `refinesLeft` = the rounds left today.
+   */
+  private async magic(userId: string, body: RefineLookBody, origin: string, unlimited: boolean): Promise<NeoLookResult> {
+    const u = await this.user(userId);
+    await this.clean(body.instruction);
+    const key = `look:magic:${userId}:${this.day()}`;
+    const used = Number((await this.kv.get(key)) ?? 0);
+    if (!unlimited && used >= BATI_MAGIC_PER_DAY) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', '今日はもう描き直せません');
+    const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
+    if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
+    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited);
+    const n = await this.kv.incr(key, 60 * 60 * 26);
+    const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
+    const candidates = [];
+    for (const r of made) {
+      if (r.status === 'fulfilled') {
+        const m = await this.media.storeImage(userId, 'avatar', r.value.mime, r.value.data, origin);
+        candidates.push({ id: m.id, url: m.url });
+      } else this.log.warn(`look magic failed: ${String(r.reason)}`);
+    }
+    if (!candidates.length) await fee.refund();
+    const left = unlimited ? 99 : Math.max(0, BATI_MAGIC_PER_DAY - n);
+    return { candidates, triesLeft: left, refinesLeft: left };
+  }
+
+  /**
+   * Bati's room (P-BATI-ROOM): the Bati dressed up / changed a little by the wish — its picture put back on its grey
+   * (like the faces), edited three ways and cut out like the hatched one. BATI_RESTYLE_PER_DAY rounds a day; free
+   * during the first journey, the look's mana after it.
+   */
+  async restyle(userId: string, wish: string, origin: string, unlimited = false): Promise<BatiRestyleResult> {
+    const u = await this.user(userId);
+    if (!u.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
+    await this.clean(wish);
+    const key = `bati:restyle:${userId}:${this.day()}`;
+    const used = Number((await this.kv.get(key)) ?? 0);
+    if (!unlimited && used >= BATI_RESTYLE_PER_DAY) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'RESTYLE_TRIES', '今日はもう着替えられません');
+    const png = await this.media.bytesByUrl(userId, u.batiImageUrl);
+    if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
+    const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
+    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited);
+    const n = await this.kv.incr(key, 60 * 60 * 26);
+    const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(wish, i), i, [ref]));
+    const candidates = [];
+    for (const r of made) {
+      if (r.status !== 'fulfilled') {
+        this.log.warn(`bati restyle failed: ${String(r.reason)}`);
+        continue;
+      }
+      const cut = await cutoutWhite(r.value.data, 768, BATI_GREY).catch(() => null);
+      const m = cut ? await this.media.storeImage(userId, 'bati', 'image/png', cut, origin) : await this.media.storeImage(userId, 'bati', r.value.mime, r.value.data, origin);
+      candidates.push({ id: m.id, url: m.url });
+    }
+    if (!candidates.length) await fee.refund();
+    return { candidates, left: unlimited ? 99 : Math.max(0, BATI_RESTYLE_PER_DAY - n) };
+  }
+
+  /** a restyle candidate becomes the Bati picture; its expressions are drawn again in the background (the old ones go) */
+  async chooseRestyle(userId: string, id: string, origin: string): Promise<Me> {
+    const m = await this.media.getOwned(userId, id, 'bati');
+    if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
+    const cur = await this.user(userId);
+    if (!cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
+    if (cur.batiImageUrl === m.url) return toMe(cur);
+    const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
+    delete j['bati.faces'];
+    delete j['bati.stand'];
+    const [nu] = await this.db.write.update(users).set({ batiImageUrl: m.url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    await this.queue.enqueue('bati.faces', { userId, origin }, { dedupeKey: `bati-faces-${userId}-${m.id}` }).catch(() => undefined);
+    return toMe(nu);
   }
 
   /**

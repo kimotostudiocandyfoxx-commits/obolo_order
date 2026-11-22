@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ReplyChips } from '@/components/story/Chat';
 import { micTrouble } from '@/lib/useDictation';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * A choice answered by voice (D01-S006, story M-R169): a big mic button 〔話してみよう〕 with the answers as a small
@@ -168,7 +169,7 @@ export function VoiceChoice({ options, onPick }: { options: string[]; onPick: (k
         {on ? '話してください' : '話してみよう'}
       </p>
       <button onClick={() => setMode('keys')} className="absolute bottom-[calc(12px+env(safe-area-inset-bottom))] right-4 rounded-lg bg-white/10 px-2 py-1 text-[16px] text-white/60" aria-label="文字で答える">
-        ⌨
+        <LineIcon id="keyboard" className="h-5 w-5" />
       </button>
     </div>
   );

@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { waitJob } from '@/lib/jobs';
 import { usePartner } from '@/lib/partner';
 import { Mic } from '@/components/mercury/ComposeChat';
+import { Glyph } from '@/components/bluena/glyphs';
 
 /**
  * 撮影 on Mars = the MV studio (client decision 2026-10-08). In the chat with Bati:
@@ -196,21 +197,21 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
 
         {step === 'song' && (
           <div className="rounded-2xl border border-amber-300/25 bg-black/30 p-3">
-            <p className="text-xs font-bold text-amber-100">🎵 水星で作った曲</p>
+            <p className="text-xs font-bold text-amber-100">水星で作った曲</p>
             {songs === null && <p className="mt-2 text-center text-xs text-white/50">ひらいています…</p>}
             {songs?.length === 0 && (
               // no dead end (story chat 2026-11-02): the way to Mercury is right here
               <div className="mt-2 text-center">
                 <p className="text-xs text-white/50">まだ曲がないよ。水星で曲を作ってから来てね</p>
                 <Link href="/mercury" className="mt-2 inline-block rounded-full border border-sky-300/60 bg-sky-500/15 px-5 py-2 text-sm font-bold text-sky-100">
-                  🌊 水星へ行く
+                  水星へ行く
                 </Link>
               </div>
             )}
             <div className="mt-2 space-y-1.5">
               {songs?.map((s) => (
                 <button key={s.id} onClick={() => void chooseSong(s)} className="flex w-full items-center gap-2 rounded-xl bg-white/5 px-3 py-2 text-left active:bg-white/15">
-                  <span className="text-lg">🎵</span>
+                  <Glyph id="song" label={false} className="h-5 w-5 shrink-0" />
                   <span className="min-w-0 flex-1 truncate text-sm">{s.title || '曲'}</span>
                   <span className="text-[10px] text-white/50">{fmt(s.seconds)}</span>
                 </button>
@@ -229,7 +230,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
         {step === 'lyrics?' && (
           <div className="flex gap-2 pl-12">
             <button onClick={() => void lyrics(true)} className="flex-1 rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 py-2 text-sm font-bold">
-              📝 歌詞を入れて
+              歌詞を入れて
             </button>
             <button onClick={() => void lyrics(false)} className="flex-1 rounded-full border border-white/20 py-2 text-sm">
               このままでいい
@@ -253,7 +254,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
               disabled={step === 'busy'}
               className="mt-2 w-full rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 py-2.5 text-sm font-bold disabled:opacity-60"
             >
-              {step === 'busy' ? '公開しています…' : '🛸 公開する（88時間とぶ）'}
+              {step === 'busy' ? '公開しています…' : '公開する（88時間とぶ）'}
             </button>
           </div>
         )}
@@ -280,7 +281,7 @@ export function LiveShoot({ onPosted }: { onPosted: () => void }) {
             </button>
           </div>
           <button onClick={() => void make('')} className="h-10 w-full rounded-full bg-gradient-to-r from-orange-500 to-fuchsia-600 text-sm font-bold">
-            ✨ おまかせで作って
+            おまかせで作って
           </button>
         </div>
       )}

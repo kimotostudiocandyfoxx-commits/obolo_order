@@ -13,6 +13,7 @@ import { PuniPicMaker } from '@/components/puni/PuniPicMaker';
 import { usePartner } from '@/lib/partner';
 import { Butterfly } from './Butterfly';
 import { PostCircle, type CircleMedia } from './PostCircle';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Jupiter — "パタパタ" (client design 2026-10-05, docs/jupiter.md). Replaces spec §2.4.
@@ -321,7 +322,7 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
             <header className="relative px-4 pt-[calc(14px+env(safe-area-inset-top))] text-center">
               <h1 className="text-xl tracking-[0.7em] text-[#8a6a4c]">パタパタ</h1>
               <button onClick={() => say('お知らせはまだありません')} className="absolute right-4 top-[calc(12px+env(safe-area-inset-top))] text-xl" aria-label="お知らせ">
-                🔔
+                <LineIcon id="bell" className="h-6 w-6" />
               </button>
               <div className="mx-auto mt-3 inline-flex rounded-full bg-white/50 p-1 shadow-inner">
                 {TABS.map(([t, label]) => (
@@ -418,7 +419,7 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
           <nav className="pointer-events-none absolute inset-x-0 bottom-[calc(14px+env(safe-area-inset-bottom))] z-20 flex justify-center">
             <div className="pointer-events-auto relative flex w-[min(92%,520px)] items-center justify-between rounded-full bg-white/75 px-8 py-3 shadow-lg backdrop-blur">
               <button onClick={() => go(view.v === 'search' ? { v: 'sky' } : { v: 'search' })} className={`flex items-center gap-2 text-sm ${view.v === 'search' ? 'font-bold' : ''}`}>
-                🔍 探す
+                探す
               </button>
               <button
                 onClick={() => {
@@ -428,11 +429,10 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
                 className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 border-[#f6ead9] bg-[#fffaf2] shadow-lg"
                 aria-label="たまご"
               >
-                <span className="text-3xl">🥚</span>
                 <span className="text-[10px] tracking-widest">たまご</span>
               </button>
               <button onClick={() => go({ v: 'tree', who: { kind: 'me' } })} className={`flex items-center gap-2 text-sm ${view.v === 'tree' ? 'font-bold' : ''}`}>
-                🌳 myツリー
+                myツリー
               </button>
             </div>
           </nav>
@@ -519,7 +519,7 @@ function StoryViewer({ flyer, start, onClose, onTree }: { flyer: Flyer; start: n
           <button onClick={onTree} disabled={!onTree} className="flex min-w-0 items-center gap-2 text-left" aria-label="木をみる">
             <Butterfly art={flyer.art} src={flyer.src} emoji={flyer.emoji} img={flyer.img} wing={flyer.wing} size={40} />
             <span className="truncate font-bold">@{flyer.handle}</span>
-            {onTree && <span className="shrink-0 text-xs text-[#b09276]">🌳›</span>}
+            {onTree && <span className="shrink-0 text-xs text-[#b09276]">›</span>}
           </button>
           <span className="shrink-0 text-xs text-[#b09276]">{post.hours}h</span>
           <button onClick={onClose} className="ml-auto rounded-full bg-amber-50 px-3 py-1 text-sm" aria-label="とじる">
@@ -569,7 +569,7 @@ function StoryViewer({ flyer, start, onClose, onTree }: { flyer: Flyer; start: n
                         ))}
                       </span>
                     ) : (
-                      <span>💬</span>
+                      <LineIcon id="chat" className="h-4 w-4" />
                     )}
                   </button>
                 )}
@@ -683,7 +683,7 @@ function Replies({ post, owner, onClose, onReplied }: { post: ViewPost; owner: F
             </div>
             {err && <p className="mt-1 text-center text-xs text-rose-500">{err}</p>}
             <button disabled={!text.trim() || busy} onClick={() => void send()} className="mt-2 w-full rounded-full bg-amber-500 py-2.5 text-sm font-bold text-white disabled:opacity-40">
-              {busy ? '送っています…' : '💬 リプする'}
+              {busy ? '送っています…' : 'リプする'}
             </button>
           </>
         ) : null}
@@ -833,7 +833,7 @@ function TreeView({
           <span className="truncate font-bold">@{data.handle}</span>
           {isMe && live && (
             <button onClick={() => setPainting(true)} className="ml-auto shrink-0 rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-amber-800 shadow-sm">
-              🦋 蝶を描いてもらう
+              蝶を描いてもらう
             </button>
           )}
         </div>
@@ -901,7 +901,7 @@ function TreeView({
           <div className="mt-4 text-center">
             {!data.leaves.length && <p className="mb-3 text-xs text-[#a58c74]">88時間飛び終えた蝶が、葉っぱになってここに戻ってきます</p>}
             <button onClick={onRoots} className="rounded-full border border-[#d9c0a0] bg-[#fff6ea] px-5 py-2 text-sm">
-              🔒 根っこをひらく（自分だけ）
+              根っこをひらく（自分だけ）
             </button>
           </div>
         )}
@@ -1053,7 +1053,7 @@ function RootsView({
           <button onClick={onBack} className="text-2xl" aria-label="もどる">
             ‹
           </button>
-          <h2 className="tracking-[0.3em]">🔒 根っこ</h2>
+          <h2 className="tracking-[0.3em]">根っこ</h2>
           {onRemove && roots.length > 0 && (
             <button onClick={() => setEditing(!editing)} className="ml-auto rounded-full bg-white/70 px-3 py-1 text-xs">
               {editing ? 'おわる' : '整理する'}
@@ -1066,7 +1066,7 @@ function RootsView({
           {uploading ? 'しまっています…' : '＋ 写真を入れる'}
         </button>
         <a href="/mars" className="mt-2 block text-center text-[11px] text-[#a58c74] underline">
-          🎬 動画は、火星の裏スタジオにしまうよ →
+          動画は、火星の裏スタジオにしまうよ →
         </a>
         <input
           ref={input}
@@ -1157,7 +1157,7 @@ function Compose({ item, live, myId, onBack, onPost }: { item: RootView; live: b
           }}
           className="mt-6 w-full rounded-full bg-gradient-to-r from-amber-400 to-orange-400 py-3 font-bold text-white shadow-lg disabled:opacity-50"
         >
-          {busy ? '飛ばしています…' : '🦋 投稿する（88時間、空を飛ぶ）'}
+          {busy ? '飛ばしています…' : '投稿する（88時間、空を飛ぶ）'}
         </button>
       </div>
     </div>

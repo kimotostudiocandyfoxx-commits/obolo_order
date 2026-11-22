@@ -21,6 +21,8 @@ import {
   JOURNEY_WAIT_MS,
   MAKE_COST,
   BATI_FACES,
+  BATI_MAGIC_PER_DAY,
+  BATI_RESTYLE_PER_DAY,
   LAP2,
   lap2Done,
   lap2OpensAt,
@@ -60,6 +62,7 @@ import {
   type SaturnPostView,
   type SaturnProfileView,
   type PuniPicResult,
+  type BatiRestyleResult,
   isChild,
 } from '@obolo/shared';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
@@ -800,8 +803,9 @@ export class DemoApi implements Api {
     return u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
   }
 
-  async refineLook(mediaId: string | null, instruction: string) {
+  async refineLook(mediaId: string | null, instruction: string, magic?: boolean) {
     const u = this.s.users[this.uid()];
+    if (magic) return this.lookMagic(mediaId, instruction);
     if (this.refinesLeft() <= 0) throw new ApiError(429, 'LOOK_REFINES', 'もう描き直せません');
     // null: the look worn now (the second journey's basin)
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
@@ -816,6 +820,51 @@ export class DemoApi implements Api {
     return { candidates: c, triesLeft: u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.tries.${u.id}`) ?? 0)) : 99, refinesLeft: this.refinesLeft() };
   }
   private lookCache: { id: string; url: string }[] = [];
+
+  /** the day's key for Bati's room (like the API: a per-day counter, free on the first journey) */
+  private roomKey(what: string) {
+    return `obolo.room.${what}.${this.uid()}.${new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date())}`;
+  }
+
+  // Bati's magic in Bati's room (P-BATI-ROOM): like the API, BATI_MAGIC_PER_DAY rounds a day
+  private async lookMagic(mediaId: string | null, instruction: string) {
+    const u = this.s.users[this.uid()];
+    const key = this.roomKey('magic');
+    const used = Number(localStorage.getItem(key) ?? 0);
+    if (used >= BATI_MAGIC_PER_DAY) throw new ApiError(429, 'LOOK_REFINES', '今日はもう描き直せません');
+    const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
+    if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('look');
+    localStorage.setItem(key, String(used + 1));
+    await sleep(1500);
+    const c = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: uid(), url: await demoRefine(src.url, instruction, used * 4 + k) })));
+    this.lookCache.push(...c);
+    const left = Math.max(0, BATI_MAGIC_PER_DAY - used - 1);
+    return { candidates: c, triesLeft: left, refinesLeft: left };
+  }
+
+  // demo: the Bati picture recoloured three ways stands in for the dressed-up Bati (no network)
+  async batiRestyle(wish: string): Promise<BatiRestyleResult> {
+    const u = this.s.users[this.uid()];
+    if (!u.bati?.imageUrl) throw new ApiError(409, 'NO_BATI', 'Not hatched yet');
+    const key = this.roomKey('restyle');
+    const used = Number(localStorage.getItem(key) ?? 0);
+    if (used >= BATI_RESTYLE_PER_DAY) throw new ApiError(429, 'RESTYLE_TRIES', '今日はもう着替えられません');
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('look');
+    localStorage.setItem(key, String(used + 1));
+    await sleep(1500);
+    const src = u.bati.imageUrl;
+    const candidates = await Promise.all([0, 1, 2].map(async (k) => ({ id: uid(), url: await demoRefine(src, wish, used * 3 + k) })));
+    this.lookCache.push(...candidates);
+    return { candidates, left: Math.max(0, BATI_RESTYLE_PER_DAY - used - 1) };
+  }
+
+  async chooseBatiRestyle(id: string) {
+    const c = this.lookCache.find((x) => x.id === id);
+    if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    // the faces are drawn again from the new picture (the demo: the picture itself stands in for each)
+    return this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: c.url, stand: false, faces: Object.fromEntries(BATI_FACES.map((f) => [f, c.url])) } } : {}));
+  }
 
   async chooseLook(mediaId: string) {
     const c = this.lookCache.find((x) => x.id === mediaId);

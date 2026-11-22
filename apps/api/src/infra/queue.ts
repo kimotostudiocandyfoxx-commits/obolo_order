@@ -8,7 +8,7 @@ import { createRedis } from './kv';
  * - "bullmq": pushes to Redis; `apps/api/dist/worker.js` (a separate Cloud Run service or
  *   GPU worker pool later) consumes it. Handlers are identical in both modes.
  */
-export type JobName = 'buddy.summarize' | 'jobs.run' | 'voice.line' | 'bati.paint' | 'bati.repaint';
+export type JobName = 'buddy.summarize' | 'jobs.run' | 'voice.line' | 'bati.paint' | 'bati.repaint' | 'bati.faces';
 
 export interface JobPayloads {
   'buddy.summarize': { userId: string };
@@ -19,6 +19,8 @@ export interface JobPayloads {
   'bati.paint': { userId: string; origin: string };
   /** the egg's plain body stood in: painted again a little later (story chat, generation test 2) */
   'bati.repaint': { userId: string; origin: string };
+  /** the expressions drawn again after the Bati was dressed up in its room (LookService.batiFaces) */
+  'bati.faces': { userId: string; origin: string };
   'voice.line': { userId: string; hash: string; origin: string; who: string; act?: string; text: string; spec: import('@obolo/shared').StoryVoiceSpec; brief: string; model: string; tempo: number; pace?: number };
 }
 

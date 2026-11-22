@@ -51,7 +51,7 @@ export function VoiceButton({ url, durationSec, label }: { url: string; duration
             );
           })}
         </span>
-        <span className="text-[10px] text-white/50">{failed ? '⚠︎' : durationSec ? `${durationSec.toFixed(1)}s` : label}</span>
+        <span className="text-[10px] text-white/50">{failed ? 'エラー' : durationSec ? `${durationSec.toFixed(1)}s` : label}</span>
       </span>
     </button>
   );

@@ -3,6 +3,7 @@
 import { PlanetGate } from '@/components/PlanetLock';
 import { PlanetShell } from '@/components/PlanetShell';
 import { Atelier } from '@/components/uranus/Atelier';
+import { Glyph } from '@/components/bluena/glyphs';
 
 /**
  * Uranus (client decision 2026-10-15): the planet of ateliers. Each member has an atelier of their own to
@@ -14,7 +15,7 @@ export function UranusView() {
     <PlanetShell id="uranus">
       <PlanetGate planet="uranus" name="天王星">
         <div className="mb-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[repeating-linear-gradient(0deg,#8b8fa3_0_4px,#6d7186_4px_8px)] text-xl">🏪</span>
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[repeating-linear-gradient(0deg,#8b8fa3_0_4px,#6d7186_4px_8px)] text-xl"><Glyph id="goods" label={false} className="h-6 w-6" /></span>
           <div className="min-w-0 flex-1 leading-tight">
             <div className="text-sm font-black">OBOLO商店</div>
             <div className="text-[11px] text-white/55">天王星のまんなかのお店。シャッターは、まだ閉まっている</div>

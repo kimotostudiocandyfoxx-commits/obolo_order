@@ -225,6 +225,13 @@ export type BatiEggBody = z.infer<typeof BatiEggBody>;
 export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) });
 export type BatiNameBody = z.infer<typeof BatiNameBody>;
 
+/** Bati's room (the Moon, P-BATI-ROOM): dress up / transform the Bati a little — the same creature, changed by the wish. */
+export const BatiRestyleBody = z.object({ wish: z.string().trim().min(1).max(60) });
+export type BatiRestyleBody = z.infer<typeof BatiRestyleBody>;
+/** one of the restyle candidates becomes the Bati picture */
+export const BatiRestyleChooseBody = z.object({ id: z.string().uuid() });
+export type BatiRestyleChooseBody = z.infer<typeof BatiRestyleChooseBody>;
+
 /** Operator testing (/lab, admin token): move the logged-in account to a journey day. */
 export const JumpJourneyBody = z.object({ day: z.number().int().min(1).max(10) });
 export type JumpJourneyBody = z.infer<typeof JumpJourneyBody>;
@@ -235,7 +242,8 @@ export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;
 
 /** Day 3: refine the chosen look with one instruction (3 times). */
 /** `mediaId` left out: the look worn now (the second journey's basin, L2-MOON-S002, changes the current look) */
-export const RefineLookBody = z.object({ mediaId: z.string().uuid().optional(), instruction: z.string().trim().min(1).max(60) });
+/** `magic`: Bati's magic in Bati's room (the Moon, P-BATI-ROOM) — counted per day, so the visitor can keep changing it until they like it */
+export const RefineLookBody = z.object({ mediaId: z.string().uuid().optional(), instruction: z.string().trim().min(1).max(60), magic: z.boolean().optional() });
 export type RefineLookBody = z.infer<typeof RefineLookBody>;
 
 /** Mercury 作曲: the conversation so far (the partner's and the visitor's lines). */

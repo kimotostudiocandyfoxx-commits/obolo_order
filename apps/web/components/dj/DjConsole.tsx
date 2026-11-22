@@ -12,6 +12,7 @@ import { PadIcon } from './icons';
 import type { DjTrack } from './DjController';
 import './fonts';
 import { ART, FONT_NUM, FONT_UI, HOT_CUE_COLORS, NEON, neon } from './skin';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * The Venus DJ console in the client's shape (reference picture 2026-10-12): three circles side by
@@ -161,7 +162,7 @@ export function DjConsole({ engine, songs, backHref }: { engine: DjEngine; songs
       {/* the decks need the width: a phone turning on its side shows how (story chat 2026-11-02) */}
       <div className="hidden h-full flex-col items-center justify-center gap-4 text-center portrait:flex">
         <span className="text-5xl" style={{ animation: 'djTurn 2.4s ease-in-out infinite' }} aria-hidden>
-          📱
+          <LineIcon id="phoneDevice" className="h-12 w-12" />
         </span>
         <p className="text-sm font-bold text-white/80">スマホを横にすると、DJ がはじまります</p>
         <style>{'@keyframes djTurn{0%,30%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}'}</style>
@@ -412,11 +413,11 @@ function DeckCircle({ engine, i, D, k, songs }: { engine: DjEngine; i: 0 | 1; D:
               }}
               className="block w-full truncate rounded px-2 py-2 text-left hover:bg-white/5"
             >
-              {s.videoUrl ? '🎬' : '♪'} {s.title} <span className="text-[10px] text-white/40">{s.bpm ? `${s.bpm} BPM` : ''}</span>
+              {s.videoUrl ? '▶' : '♪'} {s.title} <span className="text-[10px] text-white/40">{s.bpm ? `${s.bpm} BPM` : ''}</span>
             </button>
           ))}
           <button onClick={() => file.current?.click()} className="mt-1 block w-full rounded px-2 py-2 text-left text-white/70">
-            📁 端末の音声ファイル…
+            端末の音声ファイル…
           </button>
           <input
             ref={file}

@@ -18,7 +18,7 @@ const en: Messages = {
     sampleDataHint: 'This planet is a visual demo (as of 10/10)',
     comingSoon: 'Coming soon',
     loginRequired: 'Log in on Earth to use this planet',
-    goToEarth: '🌍 Go to Earth',
+    goToEarth: 'Go to Earth',
     error: 'Something went wrong',
     mana: 'MANA',
     stars: 'Stars',

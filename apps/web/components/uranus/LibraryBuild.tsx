@@ -113,7 +113,7 @@ export function LibraryBuild({ bati, neo, onDone }: { bati: string; neo: string;
           <>
             <p className="text-center text-[14px] font-bold">〈{neo}〉の図書館</p>
             <p className="text-center text-[12px] text-teal-50/80">{books.length ? (books.some((b) => b.picture) ? '引き出しのお話が本になって、棚にすっと収まる。となりに、絵本が一冊' : '引き出しのお話が一冊の本になって、棚にすっと収まる') : '棚は、まだ空いている'}</p>
-            <p className="text-center text-[11px] text-teal-50/55">棚に並べた本は、ダチが図書館に来た時に見られます。〔🔒 机の引き出し〕の中は、{neo}だけ</p>
+            <p className="text-center text-[11px] text-teal-50/55">棚に並べた本は、ダチが図書館に来た時に見られます。〔机の引き出し〕の中は、{neo}だけ</p>
             <button onClick={() => onDone({ library: 'true', library_sign: look.sign || 'none', has_book: books.length ? 'yes' : 'no' })} className={btn}>
               OK
             </button>
@@ -147,9 +147,9 @@ export function OwlSend({ face, neo, onDone }: { face?: string; neo: string; onD
       <div className="w-full max-w-md space-y-2 rounded-3xl border border-teal-100/25 bg-[#062023]/90 p-4 text-teal-50">
         {step === 'ask' && (
           <>
-            <p className="text-center text-[12px] leading-relaxed text-teal-50/80">本の〔🦉 届ける〕を押すと、{neo}の顔のフクロウが本を抱えて、ダチの空を88時間とび、この図書館の棚に戻ります（届くのはダチだけ）</p>
+            <p className="text-center text-[12px] leading-relaxed text-teal-50/80">本の〔届ける〕を押すと、{neo}の顔のフクロウが本を抱えて、ダチの空を88時間とび、この図書館の棚に戻ります（届くのはダチだけ）</p>
             <button onClick={() => setStep('to')} className={btn}>
-              🦉 届ける
+              届ける
             </button>
             <button onClick={() => onDone({ sent_book: 'keep' })} className="w-full py-1.5 text-[12px] text-teal-50/60">
               今は、棚に置いておく
@@ -163,7 +163,7 @@ export function OwlSend({ face, neo, onDone }: { face?: string; neo: string; onD
               <span className="rounded-full bg-teal-300 px-4 py-1 text-[13px] font-bold text-teal-950">✓ ダチへ</span>
             </div>
             <button onClick={fly} className={btn}>
-              🦉 飛ばす
+              飛ばす
             </button>
             <button onClick={() => onDone({ sent_book: 'keep' })} className="w-full py-1.5 text-[12px] text-teal-50/60">
               やめる

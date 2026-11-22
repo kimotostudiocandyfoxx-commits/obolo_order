@@ -16,32 +16,32 @@ const OK = (label = 'つぎへ', answers?: Record<string, string>): Option => ({
 
 const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
   ask: {
-    title: '💬 バティに聞く',
+    title: 'バティに聞く',
     body: ['知りたいことを話すと、バティが調べて答えます。', '（例）「土星の輪って、何でできてるの？」', 'バティ「氷と、石のかけらが、いっぱい集まってるんだって！」', 'バティの答えが、まちがっていることもあります。大事なことは、自分でも確かめてね'],
     options: [OK('つぎへ', { ask: 'ask' })],
   },
   relook: {
     title: '水盤',
-    body: ['水盤のまん中に〔🎙 話してみよう〕。変えたいところや足したいものを話すと〔描く〕が光ります（色・髪・服・持ち物・翼など。現実にない姿でもいい）。', '描く前に、マナを使うか確認が出ます。4枚から選び、1回だけ要望を言って描き直せます。'],
+    body: ['水盤のまん中に〔話してみよう〕。変えたいところや足したいものを話すと〔描く〕が光ります（色・髪・服・持ち物・翼など。現実にない姿でもいい）。', '描く前に、マナを使うか確認が出ます。4枚から選び、1回だけ要望を言って描き直せます。'],
     options: [OK('この姿にする', { look: 'change' }), OK('やめて今の姿のまま', { look: 'stay' })],
   },
   'dachi-rules': {
     body: [
       // M-R175: no search, no requests from strangers — invitations between people who really know each other
-      'ダチになれるのは、〔✉ 招待状〕でつながった人（招待した人・招待してくれた人。招待状を送る時はマナジェムを添えます）と、〔🤝 ダチの招待状〕を交わした人（もう宇宙にいる、本当に知っている人）。物語の仲間（KIMORIN⭐︎たち）とも、ダチになれます（連絡はできません）。',
+      'ダチになれるのは、〔招待状〕でつながった人（招待した人・招待してくれた人。招待状を送る時はマナジェムを添えます）と、〔ダチの招待状〕を交わした人（もう宇宙にいる、本当に知っている人）。物語の仲間（KIMORIN⭐︎たち）とも、ダチになれます（連絡はできません）。',
       'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません',
     ],
     options: [OK()],
   },
   invite: {
-    title: '✉ 招待状',
+    title: '招待状',
     options: [
       {
         label: '招待状を書いてみる',
-        then: { title: '招待状の一言', body: ['まん中の〔🎙 話してみよう〕で一言。〔おまかせ〕〔パス〕も。', '下書きは{neo}だけに保存されます。まだ誰にも送りません'], options: [OK('下書きのまま残す', { invite: 'draft' })] },
+        then: { title: '招待状の一言', body: ['まん中の〔話してみよう〕で一言。〔おまかせ〕〔パス〕も。', '下書きは{neo}だけに保存されます。まだ誰にも送りません'], options: [OK('下書きのまま残す', { invite: 'draft' })] },
       },
       {
-        label: '🤝 ダチの招待状',
+        label: 'ダチの招待状',
         answers: { invite: 'dachilink' },
         then: {
           body: ['一回だけ使えるリンクとQR（48時間で消えます）。〔リンクを送る〕〔QRを見せる〕〔やめる〕', '相手が開いて〔ダチになる〕を押すと、あなたにも「〈名前〉が、ダチの招待状を開きました。ダチになる？」と届きます。あなたも〔ダチになる〕を押したら、ダチです'],
@@ -57,7 +57,7 @@ const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
       {
         label: '広場を作る',
         then: {
-          body: ['どんな話をする場所？　まん中の〔🎙 話してみよう〕。言ったことが、そのまま看板の名前になります（あとから変えられます）。', 'たこ焼きシスター「最初は自分だけでもいい。誰かを迎えるのは、あとで決めましょう。」', '入れる人：〔わたしだけ〕（はじめはこれ）'],
+          body: ['どんな話をする場所？　まん中の〔話してみよう〕。言ったことが、そのまま看板の名前になります（あとから変えられます）。', 'たこ焼きシスター「最初は自分だけでもいい。誰かを迎えるのは、あとで決めましょう。」', '入れる人：〔わたしだけ〕（はじめはこれ）'],
           options: [OK('このひろばをつくる', { plaza: 'make' }), OK('もどる', { plaza: 'later' })],
         },
       },
@@ -65,9 +65,9 @@ const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
     ],
   },
   jacket: {
-    title: '🥚 アートをつくる',
-    body: ['思い描いたまま、まん中の〔🎙 話してみよう〕。〔おまかせ〕（行ってみたい場所／まだない曲のジャケット／夢で見たもの）〔パス〕。', 'アートは〔写真を添える〕〔{bati}に描いてもらう〕〔字だけ〕から。{bati}に描いてもらう時だけ、描く前にマナを使うか確認が出ます。'],
-    options: [OK('🔒 根っこにしまう', { jacket: 'keep' }), OK('🦋 投稿する（ダチへ）', { jacket: 'send' })],
+    title: 'アートをつくる',
+    body: ['思い描いたまま、まん中の〔話してみよう〕。〔おまかせ〕（行ってみたい場所／まだない曲のジャケット／夢で見たもの）〔パス〕。', 'アートは〔写真を添える〕〔{bati}に描いてもらう〕〔字だけ〕から。{bati}に描いてもらう時だけ、描く前にマナを使うか確認が出ます。'],
+    options: [OK('根っこにしまう', { jacket: 'keep' }), OK('投稿する（ダチへ）', { jacket: 'send' })],
   },
   'kimorin-jacket': {
     image: '/onboarding/s/kimorin-dragon.jpg',
@@ -77,32 +77,32 @@ const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
   },
   'kimorin-tree': { image: '/onboarding/s/jupiter-forest.jpg', caption: 'KIMORINのアトリエ。看板『宇宙一の天才発明』', options: [OK()] },
   'my-tree': { image: '/onboarding/s/jupiter-forest.jpg', caption: '丘のてっぺん、{neo}のアトリエ', options: [OK()] },
-  'tree-deco': { title: '🎨 アトリエを飾る', body: ['部品の札を話して変え、入口の看板を〔🎙〕で言って〔飾る〕。'], options: [OK('飾る', { tree: 'deco' })] },
+  'tree-deco': { title: 'アトリエを飾る', body: ['部品の札を話して変え、入口の看板をマイクで言って〔飾る〕。'], options: [OK('飾る', { tree: 'deco' })] },
   'my-island': { image: '/onboarding/s/mercury-ice.jpg', caption: '{neo}の島。浜に、一周目にしまった曲のレコード', options: [OK()] },
   'kimorin-song2': { image: '/onboarding/s/mercury-port.jpg', caption: '帆に『KIMORIN⭐︎』の船。真っ白なジャケットのレコード、ラベルに『2』', options: [OK('▶ 聴く')] },
   'place-song': {
     title: '曲を置く',
     options: [
       OK('自分の曲を置く', { place: 'mine' }),
-      { label: '新しく一曲作って置く', then: { body: ['フリージー「作るなら、話してみろ。今日の言葉で、一曲だ。」', '〔♫+ 作曲〕まん中に〔🎙 話してみよう〕。作曲の前に、マナを使うか確認が出ます。'], options: [OK('曲を置く', { place: 'new' })] } },
+      { label: '新しく一曲作って置く', then: { body: ['フリージー「作るなら、話してみろ。今日の言葉で、一曲だ。」', '〔♫+ 作曲〕まん中に〔話してみよう〕。作曲の前に、マナを使うか確認が出ます。'], options: [OK('曲を置く', { place: 'new' })] } },
       OK('KIMORINの『2』を置く', { place: 'kimorin' }),
       OK('今は置かない', { place: 'none' }),
     ],
   },
   'theme-island': {
     title: 'どんな曲が流れる島？',
-    body: ['まん中の〔🎙 話してみよう〕。〔おまかせ〕（雨の日の曲だけ／眠る前の曲／友達と聴いた曲の島）〔パス〕。', '形・浜・灯りを選んで〔この島にする〕。'],
+    body: ['まん中の〔話してみよう〕。〔おまかせ〕（雨の日の曲だけ／眠る前の曲／友達と聴いた曲の島）〔パス〕。', '形・浜・灯りを選んで〔この島にする〕。'],
     options: [OK('この島にする', { island: 'theme' })],
   },
-  'island-deco': { title: '🏝️ 島を飾る', body: ['形・浜・灯り・名前から、変えたいものを選んで〔飾る〕。'], options: [OK('飾る', { island: 'deco' })] },
+  'island-deco': { title: '島を飾る', body: ['形・浜・灯り・名前から、変えたいものを選んで〔飾る〕。'], options: [OK('飾る', { island: 'deco' })] },
   'kimorin-island': { image: '/onboarding/s/arr-mercury-sea.jpg', caption: '沖に、ブラタゴン島。黒い岩に金色の虎のしま、背中に火山', options: [OK()] },
   relay: { caption: 'KIMORINのコロリン三つが、順番に歌ってつながる', options: [OK()] },
-  'compass-kimorin': { title: '🧭 スペルコンパス', body: ['羽ペンがくるくる回って、ぴたりと止まる。', '〈白い狐〉〈丸いサングラス〉〈自信〉〈自信〉〈自信〉'], options: [OK()] },
-  'compass-song': { title: '🧭 スペルコンパス', body: ['曲の URL を送るか、スマホのそばで10秒流して〔🎙〕で聞かせると、曲のスタイルを札にして読み取ります。'], options: [OK()] },
+  'compass-kimorin': { title: 'スペルコンパス', body: ['羽ペンがくるくる回って、ぴたりと止まる。', '〈白い狐〉〈丸いサングラス〉〈自信〉〈自信〉〈自信〉'], options: [OK()] },
+  'compass-song': { title: 'スペルコンパス', body: ['曲の URL を送るか、スマホのそばで10秒流してマイクで聞かせると、曲のスタイルを札にして読み取ります。'], options: [OK()] },
   'kimorin-ten': { image: '/onboarding/s/mars-screens.jpg', caption: 'KIMORINの十秒。扇の尾をばさっ。画面が少し傾いている', options: [OK()] },
   theater: {
     title: '上映館のテーマ',
-    body: ['まん中の〔🎙 話してみよう〕。〔笑える映像だけ〕〔眠る前に見たい映像〕〔自分の作った映像だけ〕〔まだ決めない〕。'],
+    body: ['まん中の〔話してみよう〕。〔笑える映像だけ〕〔眠る前に見たい映像〕〔自分の作った映像だけ〕〔まだ決めない〕。'],
     options: [
       {
         label: '幕を上げる',
@@ -121,11 +121,11 @@ const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
   },
   'kimorin-mix': { image: '/onboarding/s/venus-night.jpg', caption: '『漆黒の黙示録ミックス』　どぉん……。……どぉん……。', options: [OK()] },
   // 天王星 (L2-URANUS-S002〜S004): the makers live in components/uranus; these are their stand-ins
-  novel: { title: '✒️ 書く', body: ['{bati}と話して、お話を書きます'], options: [OK('しまう', { novel: 'auto' }), OK('今日は書かない', { novel: 'none' })] },
+  novel: { title: '書く', body: ['{bati}と話して、お話を書きます'], options: [OK('しまう', { novel: 'auto' }), OK('今日は書かない', { novel: 'none' })] },
   'kimorin-life': { caption: '『天才の一生』', body: ['KIMORIN⭐︎は、生まれた。', '天才だった。', '今も、天才である。'], options: [OK()] },
   picturebook: { title: '絵本にする', options: [OK('絵本にする', { picturebook: 'make' })] },
-  library: { title: '📚 my図書館', options: [OK('この図書館にする', { library: 'true', has_book: 'no' }), OK('今はここで止める', { library: 'hold' })] },
-  'owl-send': { title: '🦉 届ける', options: [OK('🦉 飛ばす', { sent_book: 'send' }), OK('今は、棚に置いておく', { sent_book: 'keep' })] },
+  library: { title: 'my図書館', options: [OK('この図書館にする', { library: 'true', has_book: 'no' }), OK('今はここで止める', { library: 'hold' })] },
+  'owl-send': { title: '届ける', options: [OK('飛ばす', { sent_book: 'send' }), OK('今は、棚に置いておく', { sent_book: 'keep' })] },
   'kimorin-owl': { caption: '『天才の一生』', body: ['KIMORIN⭐︎は、生まれた。', '天才だった。', '今も、天才である。'], options: [OK('本を閉じる')] },
   game: {
     title: '『キモリンの帰り道』',
@@ -141,7 +141,7 @@ const PANELS: Record<Exclude<L2What, `m-${string}`>, Panel> = {
   switchboard: { title: '連絡室', body: ['壁一面の古い交換台。まん中に{neo}の名札。隣に『ダチ　KIMORIN⭐︎』『ダチ　{inviter}』。'], options: [OK()] },
   comms: {
     title: '連絡室の机',
-    options: [OK('ダチに連絡する', { comms: 'dachi' }), OK('🤝 ダチの招待状を渡す', { comms: 'dachilink' }), OK('招待状を書く・贈る', { comms: 'invite' }), OK('今は何もしない', { comms: 'none' })],
+    options: [OK('ダチに連絡する', { comms: 'dachi' }), OK('ダチの招待状を渡す', { comms: 'dachilink' }), OK('招待状を書く・贈る', { comms: 'invite' }), OK('今は何もしない', { comms: 'none' })],
   },
 };
 

@@ -13,6 +13,7 @@ import { CommsTiles } from '@/components/earth/Comms';
 import { InviteCard } from './InviteCard';
 import { DachiLinkCard } from '@/components/DachiLinkCard';
 import { useI18n } from '@/lib/i18n/client';
+import { LineIcon } from '@/components/LineIcon';
 
 export function EarthView() {
   const { status } = useAuth();
@@ -87,7 +88,7 @@ function LoginCard() {
           <button className="btn btn-primary w-full" disabled={busy || !email}>
             {m.earth.sendCode}
           </button>
-          <p className="text-center text-[11px] text-white/40">🔑 {m.earth.passkeySoon}</p>
+          <p className="text-center text-[11px] text-white/40">{m.earth.passkeySoon}</p>
         </form>
       ) : (
         <form onSubmit={verify} className="mt-5 space-y-3">
@@ -142,7 +143,7 @@ function Home() {
       {/* 〔お財布〕 opens with the first distribution income (client 2026-10-28); until then it is not shown */}
       {wallet && (wallet.earningsBalanceJpy > 0 || wallet.recent.some((e) => e.ledger === 'earnings')) && (
         <section className="card p-5">
-          <h3 className="text-sm font-bold text-white/70">🏦 {m.earth.bank}</h3>
+          <h3 className="text-sm font-bold text-white/70">{m.earth.bank}</h3>
           <div className="mt-2 flex items-baseline justify-between">
             <span className="text-sm text-white/60">{m.earth.earnings}</span>
             <span className="text-2xl font-black">¥{wallet.earningsBalanceJpy.toLocaleString()}</span>
@@ -155,7 +156,7 @@ function Home() {
       <DachiLinkCard />
       <CommsTiles phoneOnly />
       <div className="grid grid-cols-2 gap-3">
-        <FeatureTile icon="🎙️" title={m.earth.voice} hint={m.earth.voiceHint} />
+        <FeatureTile icon={<LineIcon id="mic" />} title={m.earth.voice} hint={m.earth.voiceHint} />
       </div>
       <button className="btn btn-ghost w-full" onClick={() => void signOut()}>
         {m.earth.logout}
@@ -164,7 +165,7 @@ function Home() {
   );
 }
 
-function FeatureTile({ icon, title, hint }: { icon: string; title: string; hint: string }) {
+function FeatureTile({ icon, title, hint }: { icon: React.ReactNode; title: string; hint: string }) {
   const { m } = useI18n();
   return (
     <div className="card p-4 opacity-80">
@@ -285,7 +286,7 @@ function WalletCard({ wallet, failed }: { wallet: WalletView | null; failed: boo
   return (
     <section className="card overflow-hidden">
       <div className="bg-gradient-to-br from-violet-500/30 via-indigo-500/20 to-sky-400/20 p-5">
-        <div className="text-sm font-bold text-white/70">✦ {m.earth.wallet}</div>
+        <div className="text-sm font-bold text-white/70">{m.earth.wallet}</div>
         <div className="mt-2 flex items-end gap-2">
           <span className="text-5xl font-black tabular-nums text-[color:var(--color-mana)]">
             {wallet ? wallet.manaBalance.toLocaleString() : failed ? '—' : '…'}

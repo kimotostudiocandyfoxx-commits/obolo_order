@@ -78,7 +78,7 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
   return (
     <div className="absolute inset-0 z-[12] flex items-end justify-center bg-black/55 px-4 pb-[calc(20px+env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md animate-[fadeUp_0.5s_ease-out] rounded-3xl border border-amber-100/25 bg-[#0d0b18]/95 p-5 text-amber-50">
-        <p className="text-center text-[15px] font-bold tracking-wider">🥚 アートをつくる</p>
+        <p className="text-center text-[15px] font-bold tracking-wider">アートをつくる</p>
         {phase === 'words' && (
           <div className="mt-3 space-y-3">
             <p className="text-center text-[13px] text-amber-50/75">思い描いた景色を、声で</p>
@@ -94,7 +94,7 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
               {words.trim() ? 'この空想で' : 'パス'}
             </button>
             <button onClick={() => setCompass(true)} className="w-full py-1.5 text-[12px] text-amber-200/90">
-              🧭 こんな絵にしたい絵を、スペルコンパスで読む{extra.length ? `（${extra.length}枚の札）` : ''}
+              こんな絵にしたい絵を、スペルコンパスで読む{extra.length ? `（${extra.length}枚の札）` : ''}
             </button>
           </div>
         )}
@@ -127,7 +127,7 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
                   札を足す
                 </button>
                 <button onClick={() => setBook((b) => !b)} className="w-full py-1 text-[12px] text-violet-200">
-                  📖 スペルブックから出す
+                  スペルブックから出す
                 </button>
                 {book && (
                   <div className="max-h-32 space-y-1 overflow-y-auto">
@@ -145,7 +145,7 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
               </div>
             ) : (
               <button onClick={() => setEdit(true)} className="w-full py-1 text-[12px] text-amber-200/90">
-                ✏️ スペルを組み替える
+                スペルを組み替える
               </button>
             )}
             <button onClick={() => setPhase('art')} className={btn}>
@@ -190,10 +190,10 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
         {phase === 'ready' && (
           <div className="mt-4 space-y-2">
             <button onClick={() => onDone({ jacket: 'keep', jacket_text: j?.text ?? '' })} className={btn}>
-              🔒 根っこにしまう
+              根っこにしまう
             </button>
             <button onClick={() => setPhase('dest')} className={btn}>
-              🦋 投稿する
+              投稿する
             </button>
           </div>
         )}
@@ -201,7 +201,7 @@ export function DaydreamJacket({ api, bati, fill, onDone }: { api?: LessonApi; b
           <div className="mt-4 space-y-2">
             <p className="text-center text-[12px] text-amber-50/70">行き先：ダチへ（88時間、ダチの空を飛んで、あなたの枝に帰ってきます）</p>
             <button onClick={fly} className={btn}>
-              🦋 飛ばす
+              飛ばす
             </button>
             <button onClick={() => setPhase('ready')} className="w-full py-2 text-[13px] text-amber-50/60">
               もどる

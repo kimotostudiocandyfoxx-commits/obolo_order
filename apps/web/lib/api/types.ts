@@ -38,6 +38,7 @@ import type {
   VerifyResult,
   NeoLookBody,
   NeoLookResult,
+  BatiRestyleResult,
   WalletView,
   OrderCheckout,
   ComposeChatBody,
@@ -172,7 +173,8 @@ export interface Api {
   lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;
   /** One instruction → one new version of a candidate (3 per apprentice). */
   /** `mediaId` null: change the look worn now (the second journey's basin) */
-  refineLook(mediaId: string | null, instruction: string): Promise<NeoLookResult>;
+  /** `magic`: Bati's magic in Bati's room (the Moon) — rounds counted per day (BATI_MAGIC_PER_DAY), free on the first journey */
+  refineLook(mediaId: string | null, instruction: string, magic?: boolean): Promise<NeoLookResult>;
   chooseLook(mediaId: string): Promise<Me>;
   /** Saturn picture character: 2 painted candidates from a description (+ optional inspiration picture). */
   puniPicCandidates(body: PuniPicBody): Promise<PuniPicResult>;
@@ -267,6 +269,10 @@ export interface Api {
   batiName(name: string): Promise<Me>;
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;
+  /** Bati's room: pictures of the same Bati dressed up / changed a little by the wish (BATI_RESTYLE_PER_DAY rounds a day) */
+  batiRestyle(wish: string): Promise<BatiRestyleResult>;
+  /** one of them becomes the Bati picture (its expressions are drawn again in the background) */
+  chooseBatiRestyle(id: string): Promise<Me>;
   /** the NEO look standing without a background (M-R149), drawn once per look */
   lookStandee(): Promise<Me>;
   /** the small chibi NEO (M-R155/M-R161), drawn once per look */

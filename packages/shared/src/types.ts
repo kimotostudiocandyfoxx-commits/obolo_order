@@ -91,6 +91,12 @@ export interface NeoLookResult {
   refinesLeft?: number;
 }
 
+/** POST /me/bati/restyle (Bati's room): pictures of the same Bati changed by the wish, and the rounds left today */
+export interface BatiRestyleResult {
+  candidates: NeoLookCandidate[];
+  left: number;
+}
+
 /** Result of POST /auth/request-code: who is this email? */
 export type EntryKind = 'member' | 'invited';
 

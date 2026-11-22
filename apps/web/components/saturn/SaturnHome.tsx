@@ -57,7 +57,7 @@ export function SaturnHome() {
           overlay={
             !mine.length ? (
               <p className="pointer-events-none absolute inset-x-8 top-[38%] rounded-2xl bg-black/45 px-4 py-3 text-center text-sm font-bold text-white/90 backdrop-blur">
-                まだ、器はからっぽ。〔🎙 つぶやく〕で、最初のコロリンを
+                まだ、器はからっぽ。〔つぶやく〕で、最初のコロリンを
               </p>
             ) : null
           }
@@ -67,7 +67,7 @@ export function SaturnHome() {
       <div className="pb-safe absolute inset-x-0 bottom-0 z-[90] flex justify-center px-4 pb-4">
         <div className="flex items-center gap-1 rounded-[30px] bg-white/95 px-2 py-2 shadow-[0_8px_30px_rgba(80,30,130,.25)]">
           <button onClick={() => setWhere('plaza')} className={`flex h-12 w-20 flex-col items-center justify-center rounded-2xl text-[12px] font-black ${where === 'plaza' ? 'bg-violet-100 text-violet-700' : 'text-[#6b5a8a]'}`}>
-            <span className="text-lg leading-none">🪐</span>広場
+            広場
           </button>
           <button
             onClick={() => {
@@ -76,10 +76,10 @@ export function SaturnHome() {
             }}
             className="flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-[#f39bd0] to-[#c3a2ff] px-6 text-base font-black text-white shadow-[0_4px_0_rgba(160,90,200,.35)]"
           >
-            🎙 つぶやく
+            つぶやく
           </button>
           <button onClick={() => setWhere('vessel')} className={`flex h-12 w-20 flex-col items-center justify-center rounded-2xl text-[12px] font-black ${where === 'vessel' ? 'bg-violet-100 text-violet-700' : 'text-[#6b5a8a]'}`}>
-            <span className="text-lg leading-none">🥣</span>器
+            器
           </button>
         </div>
       </div>

@@ -49,7 +49,7 @@ export function AtelierVisit({ who, arts = [], neo, bati, onDone }: { who: 'kimo
         </div>
       ) : (
         <div className="w-full max-w-md space-y-2 rounded-3xl border border-amber-100/25 bg-[#1a120a]/90 p-4 text-amber-50">
-          <p className="text-center text-[14px] font-bold">🎨 アトリエを飾る</p>
+          <p className="text-center text-[14px] font-bold">アトリエを飾る</p>
           <div className="flex flex-wrap justify-center gap-1.5">
             {atelierCards(look).map((c) => (
               <span key={c} className="rounded-md bg-amber-50 px-2 py-0.5 text-[12px] font-bold text-amber-800">

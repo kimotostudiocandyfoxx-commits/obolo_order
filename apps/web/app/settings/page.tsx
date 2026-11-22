@@ -42,7 +42,7 @@ function Settings() {
       </header>
       <section className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-4">
         <h2 className="text-sm font-black text-[color:var(--color-mana)]">毎月のマナ</h2>
-        <p className="mt-2 text-3xl font-black text-[color:var(--color-mana)]">✦ {mana === null ? '…' : mana.toLocaleString()}</p>
+        <p className="mt-2 text-3xl font-black text-[color:var(--color-mana)]">{mana === null ? '…' : mana.toLocaleString()}</p>
         <p className="mt-1 text-xs text-white/55">{ordered ? 'Obolo Order：毎月、体から88マナが湧きます（月額88円）' : '住人：マナジェムのマナで作ります'}</p>
         {early && (
           <Link href="/settings/order-early" className="mt-4 block rounded-full bg-gradient-to-b from-amber-300 to-orange-500 py-3 text-center text-[15px] font-black text-slate-950">

@@ -15,7 +15,7 @@ export function NeptuneView() {
   return (
     <PlanetShell id="neptune">
       <PlanetGate planet="neptune" name="海王星">
-      <p className="mb-4 text-xs text-white/55">🎮 {m.neptune.lead}</p>
+      <p className="mb-4 text-xs text-white/55">{m.neptune.lead}</p>
       <article className="card mb-4 overflow-hidden">
         <Artwork hue={hero.hue} emoji={hero.emoji} animated />
         <div className="flex items-center gap-3 p-4">
@@ -44,7 +44,7 @@ export function NeptuneView() {
               <span className="chip mt-1 bg-emerald-300/15 text-emerald-200">{m.neptune.devShare}</span>
             </div>
             <button className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold" onClick={() => toast.show(m.common.comingSoon)}>
-              {g.priceMana ? `✦ ${g.priceMana}` : m.neptune.free}
+              {g.priceMana ? `${g.priceMana} MANA` : m.neptune.free}
             </button>
           </li>
         ))}

@@ -9,6 +9,7 @@ import { type Book, loadDrawer, putInDrawer } from '@/components/uranus/drawer';
 import { getApi } from '@/lib/api';
 import { realLessonApi, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { StoryVars } from '@/lib/onboarding/script';
+import { Glyph } from '@/components/bluena/glyphs';
 
 /**
  * The making screens of the days after joining (lib/onboarding/after.ts, script P05m): goods on Uranus, a story on
@@ -378,7 +379,7 @@ function Cards({ v, kind, answers, onDone }: { v: StoryVars; kind: 'story' | 'ga
             </div>
           ) : (
             <button onClick={() => setEdit(true)} className="w-full text-center text-[12px] text-amber-200">
-              ✏️ スペルを組み替える
+              スペルを組み替える
             </button>
           )}
           <button onClick={() => onDone({ [`${kind}_cards`]: cards.join('|').slice(0, 190) })} disabled={!cards.length} className={btn}>
@@ -441,7 +442,7 @@ function StoryWrite({ v, answers, lessonApi, onDone }: { v: StoryVars; answers: 
             <button onClick={() => setPage((p) => (p + 1 < book.pages.length ? p + 1 : -1))} className="w-full rounded-full bg-white/10 py-2 text-[13px]">
               {page < 0 ? '▶ 読む' : page + 1 < book.pages.length ? 'つぎのページ →' : '表紙にもどる'}
             </button>
-            <p className="text-center text-[10px] text-sky-50/50">🖼 絵本にする（ページごとに絵をつけます。あとからでもできます）</p>
+            <p className="text-center text-[10px] text-sky-50/50">絵本にする（ページごとに絵をつけます。あとからでもできます）</p>
             <button onClick={() => onDone({ story_title: book.title.slice(0, 40) })} className={btn}>
               つぎへ
             </button>
@@ -512,7 +513,7 @@ function PictureBookMini({ v, onDone }: { v: StoryVars; onDone: Done }) {
       ) : (
         <div className="flex h-[66%] w-[92%] rounded-md bg-[#fbf6ea] p-2 shadow-xl">
           <div className="flex-1 overflow-hidden border-r border-amber-900/15 p-1 text-[10px] leading-relaxed text-amber-950/85">{pages[at]?.text}</div>
-          <div className="flex flex-1 items-center justify-center text-2xl text-amber-900/30">🖼</div>
+          <div className="flex flex-1 items-center justify-center text-2xl text-amber-900/30"><Glyph id="art" label={false} className="h-7 w-7" /></div>
         </div>
       )}
     </Workshop>

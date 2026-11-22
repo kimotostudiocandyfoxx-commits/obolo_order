@@ -9,6 +9,7 @@ import { spriteUrl, stillUrl } from '@/lib/onboarding/media';
 import { guessKind, makeItem } from '@/lib/venus/make';
 import { ITEM_KINDS, ITEMS, MAKERS, type Item, type ItemKind } from '@/lib/venus/shop';
 import { useVenus } from '@/lib/venus/state';
+import { LineIcon } from '@/components/LineIcon';
 
 /**
  * Venus — the planet of making things (client decision 2026-10-05, docs/venus.md).
@@ -52,7 +53,7 @@ export function VenusWorld({ events, overlay }: { events?: VenusEvents; overlay?
       const item = mine[Math.floor(Math.random() * mine.length)];
       const who = MAKERS[Math.floor(Math.random() * MAKERS.length)];
       v.sold(item.id);
-      say(`🛍 @${who.handle} が「${item.name}」を買いました ＋★${item.price}`);
+      say(`@${who.handle} が「${item.name}」を買いました ＋★${item.price}`);
     }, 9000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +104,7 @@ export function VenusWorld({ events, overlay }: { events?: VenusEvents; overlay?
         <MakeChat
           onList={(item) => {
             v.list(item);
-            say(`🏪「${item.name}」を店に並べました（★${item.price}）`);
+            say(`「${item.name}」を店に並べました（★${item.price}）`);
             ev.current?.onList?.();
           }}
           onOpenShop={() => go('mine')}
@@ -114,14 +115,14 @@ export function VenusWorld({ events, overlay }: { events?: VenusEvents; overlay?
 
       <nav className="relative z-20 mx-auto mb-[calc(10px+env(safe-area-inset-bottom))] flex w-[min(94%,560px)] items-center justify-around rounded-[2rem] border border-white/10 bg-black/50 px-6 py-2.5 backdrop-blur">
         <button onClick={() => go('shop')} className={`flex flex-col items-center text-xs ${view === 'shop' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🛍</span>ショップ
+          ショップ
         </button>
         <button onClick={() => go('make')} className={`-mt-8 flex flex-col items-center text-xs ${view === 'make' ? 'text-amber-200' : ''}`}>
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-pink-500 to-fuchsia-600 text-2xl shadow-[0_0_24px_rgba(255,120,200,0.6)]">🛠</span>
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-pink-500 to-fuchsia-600 shadow-[0_0_24px_rgba(255,120,200,0.6)]"><LineIcon id="tool" className="h-7 w-7" /></span>
           つくる
         </button>
         <button onClick={() => go('mine')} className={`flex flex-col items-center text-xs ${view === 'mine' ? 'text-amber-200' : 'text-white/60'}`}>
-          <span className="text-2xl">🏪</span>自分の店
+          自分の店
         </button>
       </nav>
 
@@ -147,7 +148,7 @@ export function VenusWorld({ events, overlay }: { events?: VenusEvents; overlay?
                     return;
                   }
                   v.buy(open);
-                  say(`✨「${open.name}」を買いました −★${open.price}`);
+                  say(`「${open.name}」を買いました −★${open.price}`);
                   setOpen(null);
                   ev.current?.onBuy?.();
                 }}
@@ -198,7 +199,7 @@ function MyShop({ shop, collection, stars, onOpen }: { shop: Item[]; collection:
   return (
     <div className="relative min-h-0 flex-1 overflow-y-auto px-3 pb-4">
       <div className="mx-auto mt-2 max-w-3xl rounded-3xl border border-amber-300/40 bg-black/40 p-4 text-center">
-        <p className="text-lg font-black tracking-wide text-amber-100">🏪 {(me?.displayName || 'neo').toUpperCase()} SHOP</p>
+        <p className="text-lg font-black tracking-wide text-amber-100">{(me?.displayName || 'neo').toUpperCase()} SHOP</p>
         <p className="mt-1 text-xs text-white/65">
           売上 ★{earned} ・ 持っている星 ★{stars}
         </p>
@@ -289,7 +290,7 @@ function MakeChat({ onList, onOpenShop }: { onList: (i: Item) => void; onOpenSho
               <p className="text-center text-[11px] text-white/55">{m.item.kind}</p>
               {listed.has(m.item.id) ? (
                 <button onClick={onOpenShop} className="mt-3 w-full rounded-full border border-amber-200/50 py-2 text-sm">
-                  🏪 店に並べました → 自分の店を見る
+                  店に並べました → 自分の店を見る
                 </button>
               ) : (
                 <>
@@ -310,7 +311,7 @@ function MakeChat({ onList, onOpenShop }: { onList: (i: Item) => void; onOpenSho
                     }}
                     className="mt-3 w-full rounded-full bg-gradient-to-r from-amber-400 to-pink-500 py-2.5 text-sm font-bold"
                   >
-                    🏪 店に並べる
+                    店に並べる
                   </button>
                 </>
               )}
@@ -337,7 +338,7 @@ function MakeChat({ onList, onOpenShop }: { onList: (i: Item) => void; onOpenSho
         {busy && (
           <div className="flex items-end gap-2">
             <Face face={partner.face} size={32} />
-            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">🛠 つくっています…</p>
+            <p className="animate-pulse rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-sm">つくっています…</p>
           </div>
         )}
         <div ref={end} />

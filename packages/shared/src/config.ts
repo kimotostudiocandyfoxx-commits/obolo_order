@@ -37,6 +37,13 @@ export const STARTER_GEM_MANA = 40;
  */
 export const MAKE_COST = { look: 3, kororinDesign: 3, jacketArt: 3, song: 2, mv: 8, story: 1 } as const;
 export type MakeKind = keyof typeof MAKE_COST;
+/**
+ * Bati's room (the Moon, P-BATI-ROOM): rounds a day per member of dressing up the Bati, and of Bati's magic on the
+ * member's own look. Free during the first journey; after it each round takes the look's mana (MAKE_COST.look).
+ * PLACEHOLDER (P-BATI-ROOM): ~3 pictures (restyle) / 4 pictures (look) per round, ~¥6 each.
+ */
+export const BATI_RESTYLE_PER_DAY = 8;
+export const BATI_MAGIC_PER_DAY = 8;
 /** Spec §1.1 — subscription price in JPY. */
 export const SUBSCRIPTION_PRICE_JPY = 88;
 

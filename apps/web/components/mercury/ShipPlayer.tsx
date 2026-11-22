@@ -9,6 +9,7 @@ import type { PlanetAuthor } from '@obolo/shared';
 import { pauseAudio, resumeAudio, stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { fmt, type Song } from '@/lib/mercury/sea';
 import { synth } from '@/lib/synth';
+import { LineIcon } from '@/components/LineIcon';
 
 /** One person on the sea: their ship and the songs it carries. */
 export type Flyer = { key: string; name: string; img?: string | null; emoji: string; songs: Song[]; isMe?: boolean };
@@ -234,7 +235,7 @@ export function ShipPlayer({
             className="flex h-12 shrink-0 items-center gap-1.5 rounded-full border border-white/35 bg-black/40 px-3 text-lg backdrop-blur"
             aria-label="リプ"
           >
-            💬
+            <LineIcon id="chat" className="h-5 w-5" />
             <ReplierFaces who={repliers} />
           </button>
           {/* 〔ブルーナにしまう〕 someone else's song (2026-11-21, §8): a link in your Bluena, nobody sees who kept what */}
@@ -266,7 +267,7 @@ export function ShipPlayer({
               onClick={() => onOwner(flyer)}
               className="flex h-12 shrink-0 items-center gap-1 rounded-full border border-cyan-200/50 bg-black/45 px-3 text-xs font-bold text-cyan-100 backdrop-blur"
             >
-              🏝 {flyer.isMe ? 'myアイランドへ' : 'この人の島へ'}
+              {flyer.isMe ? 'myアイランドへ' : 'この人の島へ'}
             </button>
           )}
         </div>
