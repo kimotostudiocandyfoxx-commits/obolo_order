@@ -77,32 +77,37 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps[first]).toMatchObject({ text: '待ちなさい。' });
     expect(steps.some((s) => s.t === 'say' && s.text.includes('天才発明家'))).toBe(true);
   });
-  it('the gate: the plane, MONBAN takes the ticket, through the gate, then KIMORIN behind you (client 2026-10-22)', () => {
+  it('the gate (M-R207): the line of light to the gate, KIMORIN behind you, MONBAN out of the smoke, the ticket, through the gate', () => {
     const at = (f: (s: Step) => boolean) => steps.findIndex(f);
-    const plane = at((s) => s.t === 'video' && s.motion === 'd1-arrive');
-    const close = at((s) => s.t === 'video' && s.motion === 'd1-monban');
-    const give = at((s) => s.t === 'video' && s.motion === 'd2-ticket-give');
-    const through = at((s) => s.t === 'video' && s.motion === '12-a');
+    const line = at((s) => s.t === 'still' && s.image === 's/d2-gate-near');
     const wait = at((s) => s.t === 'say' && s.text === '待ちなさい。');
     const smoke = at((s) => s.t === 'still' && s.image === 's/d2-gate-two-inside');
+    const give = at((s) => s.t === 'video' && s.motion === 'd2-ticket-give');
+    const through = at((s) => s.t === 'video' && s.motion === '12-a');
     const into = at((s) => s.t === 'still' && s.image === 's/d2-hall-dark-kimorin');
-    expect([plane, close, give, through, wait, smoke, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
+    expect([line, wait, smoke, give, through, into].every((x, k, a) => x > -1 && (k === 0 || x > a[k - 1]))).toBe(true);
+    // no crane any more (M-R207)
+    expect(steps.some((s) => s.t === 'video' && s.motion === '5-f')).toBe(false);
   });
   it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
     expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['太陽と月のたまご', '地球と月のたまご']);
     const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'egg');
-    // the Bati hatches on day 3 now (simple version): day 2 keeps the gem and KIMORIN⭐︎'s egg
-    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'pinpon-earth']);
+    // the gem, KIMORIN⭐︎'s egg (its pinpon and うんちピンポンくん), then the visitor's own egg hatching (M-R207: on day 2 again)
+    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'pinpon-earth', 'unpon-earth', 'hatch-sun']);
   });
-  it('the gem at the launch pit, then the look, the NEO name and the egg; no riddles, no hatching on day 2 (simple version)', () => {
+  it('the gem at the launch pit, then the look, KIMORIN\'s dragon, the NEO name, the egg, {bati} hatches and the first chat (M-R207)', () => {
     const t = kinds(steps);
     expect(t).not.toContain('riddles');
-    expect(t).not.toContain('hatch');
     expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('look'));
+    expect(t.indexOf('look')).toBeLessThan(steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon'));
     expect(t.indexOf('look')).toBeLessThan(t.indexOf('neoname'));
     expect(t.indexOf('neoname')).toBeLessThan(t.indexOf('egg'));
-    expect(steps.some((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBe(true);
+    expect(t.indexOf('egg')).toBeLessThan(t.indexOf('hatch'));
+    expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
+    expect(t.indexOf('batiname')).toBeLessThan(t.indexOf('batitalk'));
+    // Bluena is given on the morning of day 3 (M-R207)
+    expect(steps.some((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBe(false);
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');
@@ -123,10 +128,12 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
       if (s.t === 'say' && s.who === 'MONBAN') expect(open).toBe(true);
     }
   });
-  it('the Bati hatches in the morning, then the kororin practice on Saturn, the stamp; MONBAN offers Obolo Order early (SYS-S002)', () => {
+  it('Bluena in the morning, then the kororin practice on Saturn, the stamp; MONBAN offers Obolo Order early (SYS-S002)', () => {
     const t = kinds(steps);
     expect(t).not.toContain('seal');
-    expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
+    // {bati} was born on day 2 (M-R207): no hatching on day 3
+    expect(t).not.toContain('hatch');
+    expect(steps.findIndex((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBeLessThan(t.indexOf('clock'));
     expect(t.indexOf('clock')).toBeLessThan(t.indexOf('saturn'));
     expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('saturn'));
     const c = steps.find((s) => s.t === 'choice' && s.key === 'f_join_early');

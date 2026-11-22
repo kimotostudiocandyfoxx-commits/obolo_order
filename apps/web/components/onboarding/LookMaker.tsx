@@ -8,14 +8,14 @@ import { NeoChooser } from './NeoChooser';
 import { VoiceField } from './StoryExtras';
 
 /**
- * Day 2 on the Moon (D03-S004, story 2026-10-15, M-R64 / production UI 20): the visitor's NEO look, drawn
- * by the water basin — short, so nobody gets stuck (the second journey's Moon can redo it).
- *  - OBOLON asks four questions with buttons: animal (or in their own words) → up to two colours (KIMORIN:
- *    「腕は80本？」) → mood → what they are into (or their own words, or pass). Gender is never asked.
- *  - the basin draws four looks (two boyish, two girlish; semi-real, a big hood, round sunglasses — client
- *    2026-10-25). Pick the closest → 〔これにする〕 or 〔ここを変えたい〕: one wish → four looks with it, and
- *    the visitor decides from those (one refine; the look can be changed later). Before that, 〔最初から描き
- *    直す〕 draws four new ones from the same answers. No count is shown; the server keeps a hidden ceiling.
+ * Day 2 on the Moon (D03-S004, M-R207): the visitor's NEO look, drawn by the bowl of water. OBOLON's
+ * 「{name}、、、こっちへ来い。」「まず、お前の姿を、器の水に映せ。」 are story lines just before this screen.
+ *  - 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕: always their own photo (no way without one)
+ *  - OBOLON 「何の動物に、アレンジする？」, answered by voice (〔文字で答える〕 in the corner); the words as said are the
+ *    bubble and go into the drawing as they are (no list of animals)
+ *  - −3マナ, then four looks from the photo, each with that animal's ears, the society's hood and round sunglasses, in four
+ *    different touches. Pick one → the chosen look big on the screen (ドーン). One redraw with a wish (hidden for now:
+ *    REDO_ON). Gender is never asked.
  *  - if drawing fails, the eight preset forms are offered so the story always moves on.
  * The answers and the last four looks are kept for this visit.
  */
@@ -26,30 +26,20 @@ export interface LookApi {
   chooseForm(formId: string): Promise<void>;
 }
 
-type Phase = 'photo' | 'animal' | 'color' | 'mood' | 'hobby' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
+type Phase = 'photo' | 'animal' | 'making' | 'pick' | 'chosen' | 'add' | 'failed' | 'forms';
 
-const ANIMALS = ['犬', '猫', '狐', 'うさぎ', 'くま', '鳥', '竜', 'おまかせ'];
-const COLORS: { name: string; css: string }[] = [
-  { name: '赤', css: '#e0453a' },
-  { name: '橙', css: '#f08a2c' },
-  { name: '黄', css: '#f2cf3a' },
-  { name: '緑', css: '#3fae5a' },
-  { name: '水色', css: '#5cc6e8' },
-  { name: '青', css: '#3360d8' },
-  { name: '紫', css: '#8a4fd0' },
-  { name: '桃', css: '#f08ab8' },
-  { name: '白', css: '#f4f1ea' },
-  { name: '黒', css: '#1d1b22' },
-  { name: '金', css: 'linear-gradient(135deg,#f7e08a,#b8862b)' },
-  { name: '銀', css: 'linear-gradient(135deg,#f2f4f7,#9aa3ad)' },
-];
-const MOODS = ['かっこいい', 'かわいい', 'クール', 'パーティーが好き', 'おまかせ'];
-const HOBBIES = ['スポーツ', 'ゲーム', 'パーティー'];
-const ADD = ['もっとかっこよく', 'もっとかわいく', '色を明るく', '髪を長く', '小物を足して'];
+/** what the look screen answered (D03-S004): `f_d03_photo`, `f_d03_animal` (the words as said), `f_d03_card`, `f_d03_redraw` */
+export interface LookFlags {
+  photo?: 'folder' | 'camera';
+  animal?: string;
+  card?: number;
+  redraw?: 0 | 1;
+}
+
 const DRAFT = 'obolo.look.draft';
 
 interface Draft {
-  ans: { animal: string; color: string[]; mood: string; hobby: string };
+  ans: { animal: string; color: string[]; mood: string; hobby: string; photo?: 'folder' | 'camera' };
   words: string;
   cands: NeoLookCandidate[];
   /** the four are the redone ones (one redo on the first journey, M-R132): decide from these or the four before */
@@ -67,7 +57,7 @@ function loadDraft(): Draft {
   }
 }
 
-export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string | null) => void }) {
+export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string | null, flags?: LookFlags) => void }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [phase, setPhase] = useState<Phase>('photo');
   // a favourite photo of themselves (M-R148): kept only in this screen, handed to the basin, never stored
@@ -108,7 +98,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     const started = Date.now();
     try {
       // never wait for ever: about two minutes, then the screen says so and offers another try (client 2026-10-29: it sat
-      // on 「水盤が描いている」); a making that failed costs no mana (the server refunds it)
+      // on 「器の水が描いている」); a making that failed costs no mana (the server refunds it)
       const r = await Promise.race([
         api.candidates(body),
         new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), 180_000)),
@@ -156,10 +146,11 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
     setBusy(true);
     try {
       const url = await within(api.choose(sel.id), 45_000);
+      const card = draft.cands.findIndex((c) => c.id === sel.id) + 1;
       // M-R149: the chosen look fills the screen for a moment (ドーン)
       setReveal(url || sel.url);
       await new Promise((ok) => setTimeout(ok, 2600));
-      onDone(url);
+      onDone(url, { photo: ans.photo, animal: ans.animal || undefined, card: card || undefined, redraw: draft.refined ? 1 : 0 });
     } catch (e) {
       setErr('うまく決められなかった……もう一度');
       setBusy(false);
@@ -186,13 +177,12 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       </div>
     );
 
-  if (phase === 'making') return <Basin />;
+  if (phase === 'making') return <Basin said={instruction || ans.animal} />;
 
   if (phase === 'photo')
     return (
       <Panel>
-        <Obolon>{'どんな見た目に、なりたい？\n、、、お前の、気に入っている、自分の写真は、あるか？\nあるなら、、、水盤に、映せ。'}</Obolon>
-        {/* 〔写真を使う〕 picks one already taken, 〔写真を撮る〕 opens the front camera (client 2026-10-29) */}
+        {/* OBOLON's 「まず、お前の姿を、器の水に映せ。」 is the story line just before; the two buttons of the script */}
         {[photoInput, cameraInput].map((r, k) => (
           <input
             key={k}
@@ -207,37 +197,21 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
               if (!f) return;
               try {
                 setPhoto(await fileToReference(f));
+                setAns({ photo: k === 1 ? 'camera' : 'folder' });
+                // 写真が器の水に沈み、波紋がゆっくり広がる → OBOLON asks the animal
+                setErr(null);
+                setPhase('animal');
               } catch {
                 setErr('その写真は、読みこめなかった……');
               }
             }}
           />
         ))}
-        {photo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo.url} alt="" className="mx-auto mt-3 h-36 w-36 rounded-2xl object-cover ring-2 ring-amber-200/60" />
-        )}
-        <p className="mt-3 text-[11px] leading-relaxed text-white/55">自分だけが写っている写真を選んでね。ほかの人の顔は使えません。写真は、姿を作るためだけに使い、作ったあとは残しません</p>
+        <p className="text-[11px] leading-relaxed text-white/55">自分だけが写っている写真にしてね。ほかの人の顔は使えません。写真は、姿を作るためだけに使い、作ったあとは残しません</p>
         {err && <p className="mt-2 text-xs text-amber-200/80">{err}</p>}
         <div className="mt-3 flex flex-col gap-2">
-          {photo ? (
-            <>
-              <Gold onClick={() => (setErr(null), setPhase('animal'))}>この写真で作る</Gold>
-              <div className="flex justify-center gap-4">
-                <button onClick={() => photoInput.current?.click()} className="py-2 text-sm text-white/60">
-                  ちがう写真を使う
-                </button>
-                <button onClick={() => cameraInput.current?.click()} className="py-2 text-sm text-white/60">
-                  撮りなおす
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <Gold onClick={() => photoInput.current?.click()}>写真フォルダから器の水に映す</Gold>
-              <Gold onClick={() => cameraInput.current?.click()}>カメラで撮って器の水に映す</Gold>
-            </>
-          )}
+          <Gold onClick={() => photoInput.current?.click()}>写真フォルダから器の水に映す</Gold>
+          <Gold onClick={() => cameraInput.current?.click()}>カメラで撮って器の水に映す</Gold>
           {/* the look is always made from their own photo now (client 2026-11-22: 「写真を使わずに作る」 is gone) */}
         </div>
       </Panel>
@@ -247,139 +221,37 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
   // sunglasses, in four different touches (the server's look prompt)
   const drawAnimal = (animal: string) => {
     setFree('');
+    setInstruction('');
     const d = { ...draft, ans: { ...ans, animal, color: [], mood: '', hobby: '' } };
     save(d);
-    void draw({ animal: animal || 'おまかせ', color: 'おまかせ', mood: 'おまかせ', ...withPhoto() });
+    void draw({ animal, color: 'おまかせ', mood: 'おまかせ', ...withPhoto() });
   };
 
   if (phase === 'animal')
     return (
       <Panel>
+        {photo && (
+          // the photo sunk into the bowl of water: {name} seen dimly on the surface
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photo.url} alt="" className="mx-auto mb-3 h-24 w-24 rounded-full object-cover opacity-70 ring-2 ring-sky-100/40 [filter:saturate(0.7)_blur(0.5px)]" />
+        )}
         <Obolon>何の動物に、アレンジする？</Obolon>
-        {/* the mic first (client 2026-10-29); the examples under it */}
+        {/* the mic first, 〔文字で答える〕 in the corner (VoiceField); the words as said, never matched to a list */}
         <div className="mt-3" />
-        <VoiceField value={free} onChange={setFree} placeholder="例：しろくま" />
+        <VoiceField value={free} onChange={setFree} placeholder="例「しろくま」" />
         {free.trim() && (
           <div className="mt-2 flex flex-col gap-2">
             <Gold onClick={() => drawAnimal(free.trim())}>これにする</Gold>
           </div>
         )}
-        <p className="mt-4 text-center text-[11px] text-white/45">または、えらぶ</p>
-        <Chips items={ANIMALS} value={ans.animal} onPick={(v) => drawAnimal(v)} />
-      </Panel>
-    );
-
-  if (phase === 'color')
-    return (
-      <Panel>
-        <Kimorin>腕は80本？</Kimorin>
-        <div className="mt-2" />
-        <Obolon>好きな色は？</Obolon>
-        <div className="mt-3" />
-        <VoiceField value={free} onChange={setFree} placeholder="例：青と金" />
-        {free.trim() && (
-          <div className="mt-2 flex flex-col gap-2">
-            <Gold onClick={() => (setAns({ color: [free.trim()] }), setFree(''), setPhase('mood'))}>これにする</Gold>
-          </div>
-        )}
-        <p className="mt-4 text-center text-[11px] text-white/50">または、えらぶ（2つまで）</p>
-        <div className="mt-3 grid grid-cols-6 gap-2">
-          {COLORS.map((c) => {
-            const on = ans.color.includes(c.name);
-            return (
-              <button
-                key={c.name}
-                onClick={() => setAns({ color: on ? ans.color.filter((x) => x !== c.name) : [...ans.color, c.name].slice(-2) })}
-                className={`flex flex-col items-center gap-1 rounded-xl py-1.5 ${on ? 'bg-amber-200/20 ring-2 ring-amber-200' : ''}`}
-                aria-label={c.name}
-              >
-                <span className="h-8 w-8 rounded-full border border-white/40" style={{ background: c.css }} />
-                <span className="text-[10px] text-white/70">{c.name}</span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="mt-3 flex flex-col gap-2">
-          <Gold disabled={!ans.color.length} onClick={() => setPhase('mood')}>
-            つぎへ
-          </Gold>
-          <Plain onClick={() => (setAns({ color: [] }), setPhase('mood'))}>おまかせ</Plain>
-          <Back onClick={() => setPhase('animal')} />
-        </div>
-      </Panel>
-    );
-
-  // the script asks three things (animal, colour, mood: D03-S004, simple version) — the mood draws the four looks
-  const drawWith = (mood: string) => {
-    setFree('');
-    const d = { ...draft, ans: { ...ans, mood, hobby: '' } };
-    save(d);
-    void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: mood || 'おまかせ', ...withPhoto() });
-  };
-
-  if (phase === 'mood')
-    return (
-      <Panel>
-        <Obolon>どんな雰囲気が、いい？</Obolon>
-        <div className="mt-3" />
-        <VoiceField value={free} onChange={setFree} placeholder="例：ミステリアス" />
-        {free.trim() && (
-          <div className="mt-2 flex flex-col gap-2">
-            <Gold onClick={() => drawWith(free.trim())}>これにする</Gold>
-          </div>
-        )}
-        <p className="mt-4 text-center text-[11px] text-white/45">または、えらぶ</p>
-        <Chips items={MOODS} value={ans.mood} onPick={(v) => drawWith(v)} />
-        <Back onClick={() => setPhase('color')} />
-      </Panel>
-    );
-
-  if (phase === 'hobby')
-    return (
-      <Panel>
-        <Obolon>今、好きなことは？</Obolon>
-        <div className="mt-3" />
-        <VoiceField value={free} onChange={setFree} placeholder="例：カメラ" />
-        <div className="mt-2 flex flex-col gap-2">
-          {free.trim() && (
-            <Gold
-              onClick={() => {
-                const hobby = free.trim();
-                const d = { ...draft, ans: { ...ans, hobby } };
-                save(d);
-                void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
-              }}
-            >
-              水盤に描いてもらう
-            </Gold>
-          )}
-          <p className="mt-2 text-center text-[11px] text-white/45">または、えらぶ</p>
-          <Chips
-            items={HOBBIES}
-            value={ans.hobby}
-            onPick={(hobby) => {
-              const d = { ...draft, ans: { ...ans, hobby } };
-              save(d);
-              void draw({ animal: d.ans.animal || 'おまかせ', color: d.ans.color.join('と') || 'おまかせ', mood: d.ans.mood || 'おまかせ', hobby, ...withPhoto() });
-            }}
-          />
-          <Plain
-            onClick={() => {
-              save({ ...draft, ans: { ...ans, hobby: '' } });
-              void draw({ animal: ans.animal || 'おまかせ', color: ans.color.join('と') || 'おまかせ', mood: ans.mood || 'おまかせ', ...withPhoto() });
-            }}
-          >
-            パス
-          </Plain>
-          <Back onClick={() => setPhase('mood')} />
-        </div>
+        {!photo && <Back onClick={() => setPhase('photo')} />}
       </Panel>
     );
 
   if (phase === 'failed')
     return (
       <Panel>
-        <p className="text-center text-amber-100">{tired ? '水盤が、今日は疲れてしまった……' : '水盤が、うまく描けなかった。もう一度'}</p>
+        <p className="text-center text-amber-100">{tired ? '器の水が、今日は疲れてしまった……' : '器の水が、うまく描けなかった。もう一度'}</p>
         <p className="mt-1 text-center text-xs text-white/55">{tired ? '用意された姿から選んでください。' : 'もう一度ためすか、用意された姿から選んでください。'}</p>
         <div className="mt-4 flex flex-col gap-2">
           {!tired && <Gold onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>もう一度</Gold>}
@@ -398,26 +270,17 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             <Gold disabled={busy} onClick={decide}>
               {busy ? '……' : 'これにする'}
             </Gold>
-            {REDO_ON && !tired && !draft.refined && <Plain onClick={() => setPhase('add')}>ここを変えたい</Plain>}
+            {REDO_ON && !tired && !draft.refined && <Plain onClick={() => setPhase('add')}>要望を言って描き直す（1回だけ）</Plain>}
             <Back onClick={() => setPhase('pick')} label="4枚にもどる" />
             {err && <p className="text-center text-xs text-rose-300">{err}</p>}
           </div>
         ) : (
           <div className="mt-3">
-            <Obolon>どう、変えたい？</Obolon>
-            <div className="mt-2">
-              <VoiceField value={instruction} onChange={setInstruction} placeholder="例：もっとかっこよく" maxLength={60} />
-            </div>
-            <div className="mt-1 flex flex-wrap justify-center gap-1.5">
-              {ADD.map((c) => (
-                <button key={c} onClick={() => setInstruction(c)} className={`rounded-full px-3 py-1 text-xs ${instruction === c ? 'bg-amber-300 font-bold text-black' : 'bg-white/10 text-white/80'}`}>
-                  {c}
-                </button>
-              ))}
-            </div>
+            {/* the wish by voice (〔文字で答える〕 in the corner); the words as said */}
+            <VoiceField value={instruction} onChange={setInstruction} placeholder="例「もっとかっこよく」" maxLength={60} />
             <div className="mt-3 flex flex-col gap-2">
               <Gold disabled={!instruction.trim()} onClick={add}>
-                この要望で、4つ描いてもらう
+                これにする
               </Gold>
               <Back onClick={() => setPhase('chosen')} />
             </div>
@@ -445,14 +308,14 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
         {draft.refined ? (
           <>
             {draft.prev && draft.prev.length > 0 && (
-              <Plain onClick={() => save({ ...draft, cands: draft.prev!, prev: draft.cands })}>前の4つ</Plain>
+              <Plain onClick={() => save({ ...draft, cands: draft.prev!, prev: draft.cands })}>前の4枚</Plain>
             )}
-            <p className="text-center text-xs text-white/50">この4つか、前の4つから決めてください（作り直しは、ここまで）。姿は、あとでまた変えられます</p>
+            <p className="text-center text-xs text-white/50">この4枚か、前の4枚から決めてください</p>
           </>
         ) : !REDO_ON ? null : !tired ? (
-          <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>最初から描き直す（1回だけ）</Plain>
+          <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>要望を言って描き直す（1回だけ）</Plain>
         ) : (
-          <p className="text-center text-xs text-white/50">水盤が今日は疲れてしまった……この4枚から選んでください</p>
+          <p className="text-center text-xs text-white/50">器の水が今日は疲れてしまった……この4枚から選んでください</p>
         )}
         {err && <p className="text-center text-xs text-rose-300">{err}</p>}
       </div>
@@ -469,20 +332,19 @@ export function clearLookDraft() {
   }
 }
 
-/** While the basin draws: KIMORIN whispers into it, the water splashes, OBOLON explains. */
-function Basin() {
-  // the screen's own note only (no narration the script does not have, story chat 2026-10-29)
-  const [who, text] = ['', '水盤が描いています'];
+/**
+ * While the bowl of water draws: what was said, as said, in {name}'s bubble; the light from the mana gem into the water and
+ * 〔テロップ：−3マナ〕 (D03-S004). No narration the script does not have (story chat 2026-10-29).
+ */
+function Basin({ said }: { said?: string }) {
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/70 px-6 backdrop-blur-[2px]">
+      {said && <p className="max-w-[80%] self-end rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[15px] text-amber-950">{said}</p>}
       <div className="relative h-44 w-72" aria-hidden>
         <span className="absolute inset-x-0 bottom-0 h-20 rounded-[50%] border border-sky-100/40 bg-[radial-gradient(ellipse_at_center,rgba(190,225,255,0.45)_0%,rgba(80,120,170,0.15)_60%,transparent_75%)]" />
         <span className="absolute inset-x-10 bottom-5 h-10 animate-pulse rounded-[50%] bg-sky-100/25 blur-md" />
       </div>
-      <div className="min-h-16 animate-[fadeUp_0.5s_ease-out] text-center">
-        {who && <p className="text-xs tracking-[0.25em] text-amber-200/80">{who}</p>}
-        <p className="mt-1 text-[17px] text-amber-50">{text}</p>
-      </div>
+      <p className="animate-[fadeUp_0.5s_ease-out] text-center text-[17px] tracking-[0.2em] text-amber-50">−3マナ</p>
     </div>
   );
 }
@@ -495,34 +357,12 @@ function Panel({ children }: { children: ReactNode }) {
   );
 }
 
-function Kimorin({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex items-start justify-end gap-2">
-      <p className="whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-white/10 px-3 py-2 text-[15px] leading-relaxed text-amber-50">{children}</p>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={spriteUrl('kimorin-sun')} alt="" className="h-10 w-10 shrink-0 object-contain object-top" />
-    </div>
-  );
-}
-
 function Obolon({ children }: { children: ReactNode }) {
   return (
     <div className="flex items-start gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={spriteUrl('obolon')} alt="" className="h-10 w-10 shrink-0 object-contain" />
       <p className="whitespace-pre-wrap rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2 text-[15px] leading-relaxed text-amber-50">{children}</p>
-    </div>
-  );
-}
-
-function Chips({ items, value, onPick }: { items: string[]; value: string; onPick: (v: string) => void }) {
-  return (
-    <div className="mt-3 flex flex-wrap justify-center gap-2">
-      {items.map((c) => (
-        <button key={c} onClick={() => onPick(c)} className={`rounded-full px-4 py-2 text-sm ${value === c ? 'bg-amber-300 font-bold text-black' : 'border border-amber-200/30 bg-white/5 text-white/85'}`}>
-          {c}
-        </button>
-      ))}
     </div>
   );
 }
@@ -551,13 +391,13 @@ function Back({ onClick, label = 'もどる' }: { onClick: () => void; label?: s
   );
 }
 
-/** a wait that always ends (story chat 2026-10-29: never 「水盤が、描いている」 for good) */
+/** a wait that always ends (story chat 2026-10-29: never 「器の水が、描いている」 for good) */
 function within<T>(p: Promise<T>, ms: number): Promise<T> {
   return Promise.race([p, new Promise<never>((_, no) => setTimeout(() => no(new Error('timeout')), ms))]);
 }
 
 /**
- * The redraws (〔ここを変えたい〕, 〔最初から描き直す〕) are hidden for now: waiting again was the weaker moment (client
+ * The redraw (〔要望を言って描き直す（1回だけ）〕) is hidden for now: waiting again was the weaker moment (client
  * 2026-10-29, for the investors' evening). The script keeps them; set true to bring them back. 〔もう一度〕 after a
  * failure stays.
  */

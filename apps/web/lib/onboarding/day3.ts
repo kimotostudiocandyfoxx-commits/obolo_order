@@ -3,76 +3,26 @@ import { SYS002 } from './sys002';
 
 /**
  * DAY 3 【月 → 土星】 — the simple version (M-R198, wip/P02/c02.md D04-S002〜S003, c03.md D04-S005〜S007; the scene ids
- * say D04 but it is day 3). Starts after the email check 〔扉の合言葉〕 (DayAuth). The morning on the Moon: the egg
- * placed on day 2 hatches ({bati}, then うんちピンポンくん), {neo} names {bati}, Obolo Neo, then the rocket leaves the
- * Moon (the day's 88 minutes start: 'clock', M-R22). Bluena was handed over at the end of day 2 (D03-S009). Saturn:
+ * say D04 but it is day 3). Starts after the email check 〔扉の合言葉〕 (DayAuth). The morning on the Moon (M-R207: {bati}
+ * was born on day 2): Obolo Neo, Bluena, the Moon atelier and 「作るのは、月。しまうのは、Bluena。見せるのは、、、星だ。」,
+ * the gate's 88 minutes, then the rocket leaves the Moon (the day's 88 minutes start: 'clock', M-R22). Saturn:
  * the gaudy temple, たこ焼きブラザー & シスター, the kororin practice and the dachi with KIMORIN⭐︎ and {inviter}
  * (components/saturn/SaturnLesson.tsx), Saturn's night and its stamp, and MONBAN's one-time offer to become Obolo Order
- * early (`f_join_early`). The dachi's messages live in Bluena's 〔💬 通信〕 (M-R194).
- * Saved: {bati} and its name, the kororins (d3.kororins), the Saturn stamp.
+ * early (`f_join_early`). The dachi's messages live in Bluena's 〔通信〕 (M-R194).
+ * Saved: Bluena, the kororins (d3.kororins), the Saturn stamp.
  */
 export const DAY3: Step[] = [
-  // D04-S002 おはようございます／バティ誕生
+  // D04-S002 おはようございます／Bluena（M-R207：{bati}は2日目に生まれている。Bluenaと月の工房はここで）
   { t: 'scene', id: 'D04-S002' },
   { t: 'bgm', track: 'moon' }, // 月の神殿の朝
   { t: 'caption', text: '3日目' },
   { t: 'still', image: 's/moon-temple' }, // 月の神殿。窓の外に、青い地球
-  { t: 'sprite', image: 'kimorin-sun' },
-  // KIMORINが、こちらを向いて立っている (the standing picture, facing us: client 2026-10-29)
+  // KIMORINが、こちらを向いて立っている。足もとで、うんちピンポンくんと{bati}が、跳ねている
+  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon', '@bati'] },
   { t: 'say', who: 'KIMORIN', text: 'おはようございます。いつまで寝ているのですか？', expr: 'stand' },
   { t: 'say', who: 'KIMORIN', text: '私は、楽しみすぎて、一睡もしていません。', expr: 'stand' },
-  { t: 'say', who: 'KIMORIN', text: 'さぁ、早く。たまごが、かえりますよ。', expr: 'stand' },
-  { t: 'sprite', image: null },
-  { t: 'still', image: 's/d2-altar' }, // 祭壇の上で、二つのたまごが光っている。光の柱の中に、黒い球のOBOLON
-  { t: 'sprite', image: ['', 'obolon'] },
-  { t: 'wait', s: 1.4 },
-  { t: 'sprite', image: null },
-  { t: 'bgm', track: 'tender' },
-  { t: 'se', sound: 'egg-crack' },
-  // 映画の場面：{neo}のたまご（2日目に選んだ方）の模様が速く回り、ひび、〈{food}〉の香りの光の粒、殻が割れて転がり出る
-  { t: 'branch', key: 'd2.egg', cases: { 太陽と月のたまご: 'hatch-sun' }, otherwise: 'hatch-earth' },
-  { t: 'label', id: 'hatch-sun' },
-  { t: 'video', motion: 'd2-hatch-sun' },
-  { t: 'goto', id: 'hatch' },
-  { t: 'label', id: 'hatch-earth' },
-  { t: 'video', motion: 'd2-hatch-earth' },
-  { t: 'label', id: 'hatch' },
-  { t: 'hatch' }, // 〈{food}〉みたいな、小さくてかわいい生き物が、ころんと転がり出る。目が開く
-  { t: 'sprite', image: '@bati' },
-  { t: 'say', who: 'バティ', text: '……やぁ！' },
-  { t: 'se', sound: 'sparkle' },
-  { t: 'caption', text: '相方が誕生した' },
-  // となりで、KIMORIN⭐︎のたまご（残った方）が割れて、うんちピンポンくんが跳ね出る
-  { t: 'sprite', image: null },
-  { t: 'se', sound: 'egg-crack' },
-  { t: 'branch', key: 'd2.egg', cases: { 太陽と月のたまご: 'pinpon-earth' }, otherwise: 'pinpon-sun' },
-  { t: 'label', id: 'pinpon-earth' },
-  { t: 'video', motion: 'd2-pinpon-earth' },
-  { t: 'goto', id: 'pinpon' },
-  { t: 'label', id: 'pinpon-sun' },
-  { t: 'video', motion: 'd2-pinpon-sun' },
-  { t: 'label', id: 'pinpon' },
-  { t: 'still', image: 's/d2-moon-in' }, // 生まれる映像の最後の絵を残さない（立ち絵と見た目がちがう：QA 5 N26）
-  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
-  { t: 'say', who: 'OBOLON', text: 'これが、、、お前の、相方だ。' },
-  { t: 'say', who: 'KIMORIN', text: 'こ、、、これが、、私の、、相方？' }, // サングラスが鼻先までずり落ち、目の切れ目から青い光がぽろぽろ
-  { t: 'say', who: 'KIMORIN', text: 'どんな時も、私のことを肯定してくれてましたね、、、' },
-  { t: 'say', who: 'KIMORIN', text: 'やっと、会えましたね。' },
-  { t: 'say', who: 'OBOLON', text: '名前を、つけろ' },
-  { t: 'say', who: 'KIMORIN', text: 'うんちピンポンくん、、、いや、うんぽん' },
-  { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' }, // KIMORIN⭐︎のまわりを、ぴょんぴょん跳ねる
-  // 画面に、{neo}の{bati}だけが映る (client 2026-10-29)
-  { t: 'sprite', image: '@bati' },
-  { t: 'say', who: 'OBOLON', text: 'お前も、、、名前を、つけてやれ。' },
-  { t: 'batiname', placeholder: 'バティの名前', submit: 'この名前にする' },
-  { t: 'notice', text: '名前は、あとでいつでも変えられます' },
-  { t: 'sprite', image: '@bati' },
-  { t: 'se', sound: 'sparkle' },
-  { t: 'caption', text: '{bati}が相方になった' },
-  { t: 'face', who: '@bati', expr: 'smile' },
-  { t: 'bgm', track: 'moon' },
-  { t: 'still', image: 's/moon-temple' },
-  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'KIMORIN', text: 'さぁ、早く、冒険の続きをしますよ。', expr: 'stand' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] }, // 光の柱の中に、黒い球のOBOLON
   { t: 'say', who: 'OBOLON', text: '今日、行く場所は、、、土星だ。' },
   { t: 'say', who: 'KIMORIN', text: '土星ですか。いいですね。せっかくObolo Orderになってあげたこの私を、しっかり案内してくださいね。' },
   { t: 'say', who: 'OBOLON', text: 'まだお前はObolo Orderじゃない。' },
@@ -81,7 +31,45 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'OBOLON', text: 'お前たちはまだマナを生成できないし、魔法も何も習得してない。' },
   { t: 'say', who: 'OBOLON', text: 'そんなお前たちのことを、、Obolo Neo、と呼ぶ。' },
   { t: 'say', who: 'KIMORIN', text: 'なるほど。Obolo Neoですか、響きは、嫌いじゃありませんね。' },
+  { t: 'say', who: 'OBOLON', text: '、、、旅立つ前に、、、渡したいものが、ある。' },
   { t: 'sprite', image: null },
+  { t: 'still', image: 's/bluena' }, // 光の柱から、白くて低い円柱のデバイスが二つ、ふわりと降りてくる
+  { t: 'se', sound: 'sparkle' },
+  { t: 'caption', text: 'Bluenaを手に入れた' },
+  { t: 'say', who: 'OBOLON', text: 'Bluena（ブルーナ）だ。' },
+  { t: 'say', who: 'OBOLON', text: '星を越えても、、、これで繋がれる。' },
+  { t: 'say', who: 'OBOLON', text: 'Bluenaの中には、、、月への、門がある。' },
+  { t: 'say', who: 'OBOLON', text: '作る時は、、、門が開いて、この神殿の奥の、月の工房に、つながる。' },
+  // 光の柱が、祭壇のさらに奥へ。白い石の丸い小部屋（月の工房）— no picture of it yet: the temple with the Earth in the window
+  { t: 'still', image: 's/moon-temple', fade: 0.8 },
+  { t: 'cam', move: 'in', focus: '50% 40%' },
+  { t: 'say', who: 'OBOLON', text: 'ここが、、、月の工房だ。お前たちの相方の、家で、、、仕事場だ。' },
+  { t: 'cam', move: 'out' },
+  { t: 'sprite', image: '@bati' }, // {bati}が、作業台の上に、ぴょんと跳びのって、にっこりする
+  { t: 'se', sound: 'boing' },
+  { t: 'face', who: '@bati', expr: 'smile' },
+  { t: 'wait', s: 1.2 },
+  { t: 'sprite', image: 'obolon' },
+  { t: 'say', who: 'OBOLON', text: '作ったものは、、、Bluenaに、しまわれる。見せる時は、、、Bluenaから、星へ、投影する。' },
+  { t: 'say', who: 'OBOLON', text: '作るのは、月。しまうのは、Bluena。見せるのは、、、星だ。', hold: true },
+  { t: 'action', label: 'Bluenaで投影する' },
+  { t: 'se', sound: 'blip' },
+  { t: 'screen', open: true }, // 神殿の白い壁に、正方形のスクリーン。門の前のMONBAN
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'MONBAN', text: '……聞こえるか…。' },
+  { t: 'say', who: 'KIMORIN', text: '……これは....すごい発明品ですね。まぁ私の発明の方がすごいですけど。ね？うんぽん？' },
+  { t: 'sprite', image: ['', 'kimorin-sun', 'unchi-pinpon'] },
+  { t: 'say', who: 'うんちピンポンくん', text: 'うんポンうんポン！' },
+  { t: 'sprite', image: ['', 'kimorin-sun'] },
+  { t: 'say', who: 'MONBAN', text: 'ただし…星への門が開くのは…一日、88分だ…。' },
+  { t: 'say', who: 'MONBAN', text: 'それを過ぎたら…門を閉める…。そしたら、バティ達は月に…お前たちは地球に、帰ってこい…。' },
+  { t: 'say', who: 'KIMORIN', text: 'じゃあ88分過ぎたら、めちゃくちゃ地球に帰ります。' },
+  { t: 'say', who: 'KIMORIN', text: 'うんぽんくんも、めちゃくちゃ月に帰ってください。' },
+  { t: 'sprite', image: ['', 'kimorin-sun', 'unchi-pinpon'] },
+  { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
+  { t: 'screen', open: false },
+  { t: 'sprite', image: null },
+  { t: 'notice', text: '星への門が開くのは、一日88分。過ぎると地球に帰り、次の日に、その続きから。月の工房とBluenaは、いつでも使えます' },
   { t: 'still', image: 's/moon-temple' }, // 光の柱の中で、OBOLONの白い三日月の目が、細くなる。黒い球が、ゆっくり、こちらを見送る
   { t: 'sprite', image: ['', 'obolon'] }, // 見送るOBOLON（QA 6 R5）
   { t: 'wait', s: 1.6, keepChat: true }, // the line stays (QA 11 R35)
