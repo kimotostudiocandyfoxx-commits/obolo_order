@@ -209,6 +209,8 @@ function PreviewPlay() {
           look: live ? (me?.avatarUrl ?? undefined) : undefined,
           lookChibi: live ? (me?.lookChibi ?? undefined) : undefined,
           lookStandee: live ? (me?.lookStandee ?? undefined) : undefined,
+          talkLook: live ? (me?.talk ?? null) : null,
+          batiTalk: live ? (me?.bati?.talk ?? null) : null,
           kimorinStar: day >= 3,
           made: previewMade(day),
           story: (() => {

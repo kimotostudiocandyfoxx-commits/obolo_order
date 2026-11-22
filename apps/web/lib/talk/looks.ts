@@ -55,7 +55,7 @@ export function batiLook(b: BatiView | null | undefined, fallback?: string): Tal
   const stand = b?.imageUrl || fallback;
   if (!stand) return null;
   // a drawn stand-in in a box (the demo's / the review page's {bati}) does not stand: the talk cast's {bati} does
-  if (stand.startsWith('data:image/svg') || /\/story\/avatars\/|-face\.webp$/.test(stand)) return castLook('bati', stand);
+  if (stand.startsWith('data:') || /\/story\/avatars\/|-face\.webp$/.test(stand)) return castLook('bati', stand);
   const faces: Partial<Record<TalkFace, TalkExpression>> = {};
   for (const [k, url] of Object.entries(b?.faces ?? {})) {
     const f = BATI_FACE_TO_TALK[k];

@@ -399,6 +399,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     batiImage: answers.batiImage ?? vars.batiImage,
     // M-R223: a look decided in the story: its expressions are drawn again (the old ones are not this look)
     batiFaces: answers.batiImage && answers.batiImage !== vars.batiImage ? undefined : vars.batiFaces,
+    batiTalk: answers.batiImage && answers.batiImage !== vars.batiImage ? undefined : vars.batiTalk,
     batiFood: answers.food ?? vars.batiFood,
     look: answers.look ?? vars.look,
     age: answers.age ?? vars.age,
@@ -1108,16 +1109,20 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // your look: none on day 1 and on day 2 until it is made on the Moon (M-R249: first person until then)
   const lookUrl = answers.look ?? (lookStepAt >= 0 && i <= lookStepAt ? undefined : (v.lookStandee ?? v.look));
   const lookMade = !!answers.look || (lookStepAt >= 0 ? i > lookStepAt : !!(v.kimorinStar || v.story?.['d2.look']));
-  const selfTalkLook = storySelfLook(lookUrl, lookMade);
+  // the talk look made for you (its faces) unless a new look was made today; else the standee, else the look itself
+  const selfTalkLook = !answers.look && lookMade && v.talkLook ? v.talkLook : storySelfLook(lookUrl, lookMade);
   const threadEntries = log;
   // where this scene starts (the row is the ones in it)
   let sceneFrom = i;
-  while (sceneFrom > 0 && steps[sceneFrom]?.t !== 'scene') sceneFrom--;
+  // (a new scene, the stage emptied, arriving at a new place or flying: the ones left behind are not in the row there)
+  const fresh = (x: Step | undefined) => !!x && (x.t === 'scene' || x.t === 'arrive' || (x.t === 'sprite' && !x.image) || (x.t === 'still' && /^s\/(arr-|rocket-)/.test(x.image)));
+  while (sceneFrom > 0 && !fresh(steps[sceneFrom])) sceneFrom--;
   const talkSays = step?.t === 'say' ? step : null;
   const { people: talkPeople, sprites: talkSprites } = storyPeople({
     onStage: charsOnStage,
     entries: threadEntries,
     inScene: (e) => Number(e.id.replace(/^s/, '').split('~')[0]) >= sceneFrom,
+    sceneSpeakers: steps.slice(sceneFrom, i).flatMap((s) => (s.t === 'say' ? [s.who] : [])),
     speaking: talkSays?.who ?? null,
     v,
     self: selfTalkLook,
@@ -1209,7 +1214,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         // a wrapper of its own so the 'vanish' step can fade the whole cast into light
         <div className="pointer-events-none absolute inset-0 z-[4]" style={vanish ? { animation: `castVanish ${vanish}s ease-in forwards` } : undefined}>
         <Cast
-          names={(Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && speakerOfSprite(n) ? '' : n))}
+          names={(Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && (speakerOfSprite(n) || n === '@me') ? '' : n))}
           src={(n) => spriteSrc(n) ?? null}
           speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
           talking={talking}
@@ -1270,7 +1275,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             people={step?.t === 'eggvoice' ? talkPeople.map((p) => (p.self ? p : { ...p, offstage: true })) : talkPeople}
             items={talkItems}
             dock={talkDock}
-            keyboard={talkDock > 170}
             top={44}
             voice={{ who: talking && talkSays ? talkId(talkSays.who) : null, level: voiceLevel }}
             stageStyle={vanish ? { animation: `castVanish ${vanish}s ease-in forwards` } : undefined}

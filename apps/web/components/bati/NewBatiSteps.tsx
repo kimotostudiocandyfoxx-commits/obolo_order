@@ -43,7 +43,7 @@ export function NewBatiStep({
     } catch (e) {
       const code = e instanceof ApiError ? e.code : '';
       // the review mode without a {bati} of its own: the scene goes on
-      if (getApi().mode === 'demo' && ['NO_BATI', 'EGG_NOT_READY', 'BATI_FULL'].includes(code)) return onBorn('');
+      if (getApi().mode === 'demo' && ['NO_BATI', 'EGG_NOT_READY', 'BATI_FULL', 'UNAUTHENTICATED'].includes(code)) return onBorn('');
       setErr(
         code === 'WISH_REFUSED' || (kind === 'wish' && code === 'MODERATION')
           ? `${firstName}「${firstSays(BATI_WISH_REFUSE)}」`

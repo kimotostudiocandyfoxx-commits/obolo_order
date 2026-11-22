@@ -604,7 +604,8 @@ export function TalkScene({
       // the back row sits in the gaps of the front one (between 1–2, 2–3, 3–4, then the ends)
       const gap = [1, 2, 3, 0, 4][k % 5];
       // a row of three or more keeps its ends inside the screen (the figures are wider than their share)
-      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? 0.5 : back ? gap / fn : 0.07 + (0.86 * (k + 0.5)) / r.length;
+      // you are always at the right, alone too (nobody beside you yet: the place stays where they will stand)
+      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? (p.self ? 0.73 : 0.5) : back ? gap / fn : 0.07 + (0.86 * (k + 0.5)) / r.length;
       spots.set(p.id, { x: Math.min(0.93, Math.max(0.07, x)), bottom: back ? stageH * 0.52 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : back ? 0.2 : 0.9 / r.length, chest: chest || back });
     });
   });

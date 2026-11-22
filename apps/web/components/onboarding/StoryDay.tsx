@@ -183,6 +183,8 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         look: me.avatarUrl ?? undefined,
         lookChibi: me.lookChibi ?? undefined,
         lookStandee: me.lookStandee ?? undefined,
+        talkLook: me.talk ?? null,
+        batiTalk: me.bati?.talk ?? null,
         story: { ...me.story, ...joinFlags(me.story) },
         made: madeFrom(me.story),
       }}

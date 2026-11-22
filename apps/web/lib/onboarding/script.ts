@@ -286,6 +286,9 @@ export interface StoryVars {
   inviterMessage?: string;
   /** Times round the Sun ({age}). */
   age?: string;
+  /** the talk looks made for the side-by-side talk (Me.talk, BatiView.talk): yours and {bati}'s, with their faces */
+  talkLook?: import('@obolo/shared').TalkLook | null;
+  batiTalk?: import('@obolo/shared').TalkLook | null;
   /** the year they were born, when already asked (the start screen): the seal does not ask it again */
   birthYear?: number | null;
   /** KIMORIN is shown as "KIMORIN⭐︎" (his NEO name, from the Moon's naming on). */

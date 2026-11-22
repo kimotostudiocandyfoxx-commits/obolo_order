@@ -88,7 +88,8 @@ type Box = { x: number; y: number; w: number; h: number };
 function paint(stem: string): TalkExpression {
   const parts = (LAYERS as Record<string, string[]>)[stem] ?? [];
   const box = (MOUTHS as Record<string, Box>)[stem];
-  return { kind: 'image', url: spriteUrl(stem), ...(parts.includes('mouth') ? { mouth: spriteUrl(`${stem}-mouth`), ...(box ? { mouthBox: box } : {}) } : {}) };
+  // a mouth layer with no box found is the whole picture's size, transparent but for the mouth (Stage.tsx): laid over it
+  return { kind: 'image', url: spriteUrl(stem), ...(parts.includes('mouth') ? { mouth: spriteUrl(`${stem}-mouth`), mouthBox: box ?? { x: 0, y: 0, w: 1, h: 1 } } : {}) };
 }
 
 /** the story's pose names → the talk's six faces (the bubble's face rules, the past view) */
@@ -98,6 +99,7 @@ const POSE_MOTION: Record<string, TalkMotion> = { joy: 'hop', shock: 'lean', thi
 /** a painted story character's look: the standing picture, and every pose it has by name (talk, point, joy …) */
 export function spriteLook(sprite: string, v: StoryVars): TalkLook | null {
   if (sprite === '@bati' || sprite === '@bati-weak') {
+    if (v.batiTalk) return v.batiTalk;
     const look = batiLook(v.batiImage ? { imageUrl: v.batiImage, faces: v.batiFaces } as never : null);
     if (!look) return null;
     // the story's {bati} faces by name (〔表情：@bati smile〕)
@@ -115,7 +117,8 @@ export function spriteLook(sprite: string, v: StoryVars): TalkLook | null {
 
 /** your own look in the story's talk: none until the look is made on day 2's Moon (M-R249: first person) */
 export function storySelfLook(url: string | undefined, made: boolean): TalkLook | null {
-  if (url) return url.startsWith('data:image/svg') ? castLook('user', url) : { of: url, stand: url };
+  // a picture drawn in this browser (the review pages' stand-in, on its own square) does not stand: the talk cast's NEO does
+  if (url) return url.startsWith('data:') ? castLook('user', url) : { of: url, stand: url };
   // the review pages play later days without an account: the talk cast's NEO stands in once the look exists
   return made ? castLook('user') : null;
 }
@@ -132,6 +135,7 @@ export function storyPeople({
   entries,
   speaking,
   inScene = () => true,
+  sceneSpeakers,
   v,
   self,
   name,
@@ -142,6 +146,8 @@ export function storyPeople({
   entries: StoryEntry[];
   /** a line said in this scene (the ones from before it keep their bubbles but not their place in the row) */
   inScene?: (e: StoryEntry) => boolean;
+  /** everyone who has spoken in this scene so far (from the script: a motion between lines does not take them away) */
+  sceneSpeakers?: Speaker[];
   speaking: Speaker | null;
   v: StoryVars;
   self: TalkLook | null;
@@ -161,7 +167,7 @@ export function storyPeople({
     const who = speakerOfSprite(s);
     if (who) add(talkId(who), s);
   }
-  const spoke = [...entries.flatMap((e) => (e.kind === 'them' && inScene(e) ? [e.who] : [])), ...(speaking ? [speaking] : [])];
+  const spoke = [...(sceneSpeakers ?? entries.flatMap((e) => (e.kind === 'them' && inScene(e) ? [e.who] : []))), ...(speaking ? [speaking] : [])];
   for (const who of spoke) {
     const id = talkId(who);
     if (sprites.has(id)) continue;
@@ -191,6 +197,14 @@ export function storyPeople({
     people.push({ id, name: speakerName(who), look: null, color: t.line, tone: t, offstage: true });
   }
   people.push({ id: 'me', name, look: self, color: TONES.pearl.line, tone: TONES.pearl, self: true });
+  // three or more in the row: the painted ones (wider than the talk looks) a little smaller, so they overlap less
+  const standing = people.filter((p) => !p.offstage && !!p.look).length;
+  if (standing >= 3)
+    for (const p of people)
+      if (!p.self && p.scale) {
+        p.scale *= 0.86;
+        p.headAt = 1 - (1 - (p.headAt ?? 0.16)) * 0.86;
+      }
   return { people, sprites };
 }
 
