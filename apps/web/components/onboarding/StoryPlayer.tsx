@@ -16,6 +16,8 @@ import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { DachiVoiceStep } from './DachiVoiceStep';
 import { Shell as AtelierShell } from '@/components/atelier/Shell';
+import type { StoryMode as AtelierStory } from '@/components/atelier/story';
+import type { Work as AtelierWork } from '@/components/atelier/work';
 import { NeoChooser } from './NeoChooser';
 import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
 import { saveAtelier } from '@/components/lap2/AtelierVisit';
@@ -131,6 +133,9 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
 /** a line of the scene's thread, as written (names are filled in when shown) */
 type ChatRaw = { id: string; kind: 'them'; who: Speaker; text: string } | { id: string; kind: 'me'; text: string; action?: boolean } | { id: string; kind: 'sys'; text: string };
 /** each speaker's face in the thread */
+/** the day's fly-or-keep choices (days 3–7): made on the atelier's cards (〔星へ飛ばす〕 / 〔今は飛ばさない〕) */
+const FLY_CHOICES = new Set(['f_d04_fly', 'f_d05_sent_jacket', 'f_d06_sent_song', 'f_d07_sent_mv', 'f_d07v_show']);
+
 const AVATARS: Partial<Record<Speaker, Avatar>> = {
   MONBAN: { src: '/story/avatars/monban.webp', dark: true },
   OBOLON: { src: '/story/avatars/obolon.webp', dark: true },
@@ -1028,6 +1033,21 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     next();
   };
 
+  // what today's atelier steps made (the fly choice shows these cards)
+  const atelierWorks = useRef<AtelierWork[]>([]);
+  const flyable = atelierWorks.current.filter((w) => w.status === 'ready' && w.saved && !w.flown && ['voice', 'art', 'song', 'video', 'radio'].includes(w.kind));
+  const atelierStory = (mode: AtelierStory['mode'], more: Partial<AtelierStory>): AtelierStory => ({
+    mode,
+    fill: (t) => fill(t, v),
+    speaker: (who) => ({
+      name: speakerName(who as Speaker, v),
+      avatar: who === 'バティ' ? v.batiImage : ((who === 'KIMORIN' && kimorinAvatar) || AVATARS[who as Speaker])?.src,
+    }),
+    // Bluena is handed over on the morning of day 3 (D04-S002); a later day's answers stand for it when the flag was lost
+    bluena: stateRef.current.answers.f_d04_bluena === 'true' || v.story?.['d3.f_d04_bluena'] === 'true' || Object.keys(v.story ?? {}).some((k) => /^d[4-9]\./.test(k)),
+    ...more,
+  });
+
   const choose = (key: string, label: string, goto?: string) => {
     const a = { ...stateRef.current.answers, [key]: label };
     stateRef.current = { ...stateRef.current, answers: a };
@@ -1214,7 +1234,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
-      {started && step?.t === 'choice' && !step.voice && !step.pics && (
+      {started && step?.t === 'choice' && !step.voice && !step.pics && !(FLY_CHOICES.has(step.key) && flyable.length > 0) && (
         <ReplyChips
           key={i}
           options={step.options.map((o) => o.label)}
@@ -1406,30 +1426,53 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
       {/* 月で作る inside the day (days 3–7, M-R208/M-R210): the Moon atelier's {bati} chat with the day's kind asked at
-          once; what is made is a card, in Bluena at once. 〔次へ〕 goes on with the story (the fly-or-keep choice comes next) */}
+          once and the step's script lines said in it; what is made is a card, in Bluena at once. 〔次へ〕 goes on with the
+          works made (a kororin's words are kept for the next days: d3.kororinWords) */}
       {started && step?.t === 'atelier' && (
         <div className="absolute inset-0 z-[40] flex flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
           <div className="pt-safe flex min-h-0 flex-1 flex-col">
-            <AtelierShell key={i} first={step.kind} />
+            {/* room for the story's own corner buttons (the day, the sound) */}
+            <div className="h-12 shrink-0" />
+            <AtelierShell
+              key={i}
+              first={step.kind}
+              story={atelierStory('make', {
+                lines: step.lines,
+                onDone: (works) => {
+                  atelierWorks.current = [...atelierWorks.current, ...works];
+                  const words = works.filter((w) => w.kind === 'voice' && w.text).map((w) => w.text!);
+                  if (words.length) remember('kororinWords', words[words.length - 1].slice(0, 100));
+                  next();
+                },
+              })}
+            />
           </div>
-          <button
-            onClick={next}
-            className="absolute left-1/2 top-[calc(8px+env(safe-area-inset-top))] z-[41] -translate-x-1/2 rounded-full border border-amber-200/50 bg-black/50 px-4 py-1.5 text-xs tracking-[0.2em] text-amber-100 backdrop-blur"
-          >
-            次へ
-          </button>
         </div>
       )}
-      {/* D04-S005c: the first voice message, in the inviter's dachi thread (M-R212) */}
-      {started && step?.t === 'dachivoice' && (
-        <DachiVoiceStep
-          key={i}
-          fallback={{ name: speakerName(step.fallback.who, v), text: fill(step.fallback.text, v) }}
-          onDone={(answer) => {
-            remember('f_d04_voice_reply', answer);
-            run(iRef.current + 1);
-          }}
-        />
+      {/* the day's fly-or-keep choice, on today's cards: a card's 〔星へ飛ばす〕 flies it and takes the first way, 〔今は飛ばさない〕
+          the second (the labels after it set the flag). Nothing made here today (a resumed day): the plain choice */}
+      {started && step?.t === 'choice' && FLY_CHOICES.has(step.key) && flyable.length > 0 && (
+        <div className="absolute inset-0 z-[40] flex flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
+          <div className="pt-safe flex min-h-0 flex-1 flex-col">
+            {/* room for the story's own corner buttons (the day, the sound) */}
+            <div className="h-12 shrink-0" />
+            <AtelierShell
+              key={`fly${i}`}
+              first={null}
+              story={atelierStory('fly', {
+                works: flyable,
+                onFly: () => {
+                  addLine({ id: `c${i}`, kind: 'me', text: step.options[0].label });
+                  choose(step.key, step.options[0].label, step.options[0].goto);
+                },
+                onSkip: () => {
+                  addLine({ id: `c${i}`, kind: 'me', text: step.options[1]?.label ?? '' });
+                  choose(step.key, step.options[1]?.label ?? '', step.options[1]?.goto);
+                },
+              })}
+            />
+          </div>
+        </div>
       )}
       {started && step?.t === 'look' && lookApi && (
         <LookMaker

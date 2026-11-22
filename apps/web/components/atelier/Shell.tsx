@@ -1,5 +1,6 @@
 'use client';
 
+import type { Me } from '@obolo/shared';
 import { useState } from 'react';
 import { LineIcon } from '@/components/LineIcon';
 import { useAuth } from '@/lib/auth';
@@ -9,22 +10,26 @@ import { AtelierChat, newTalk } from './AtelierChat';
 import { useAtelierCtx } from './ctx';
 import { BluenaDrawer, ThreadsDrawer } from './Drawers';
 import type { Talk } from './shelf';
+import type { StoryMode } from './story';
 import { BATI_THREAD, type RenderThread, type ThreadInfo } from './threads';
 
-/** Bluena is handed over on day 3 (D04-S002); on day 2 there is no right drawer at all (M-R212) */
-export const hasBluena = (day: number | null | undefined) => day == null || day >= 3;
+/**
+ * Bluena is handed over on the morning of day 3 (D04-S002 sets d3.f_d04_bluena); before that there is no right drawer at
+ * all (M-R212). Day 4 on is a fallback in case the flag was not kept.
+ */
+export const hasBluena = (me: Me | null) => !me || me.story?.['d3.f_d04_bluena'] === 'true' || me.journeyDay >= 4;
 
 /**
  * 月で作る's frame (M-R211/M-R212): the chat in the centre, the conversations on the left ({bati} first, then the ダチ
  * threads given in `threads`), Bluena on the right from day 3. {bati}'s thread is AtelierChat; any other thread is drawn
  * by `renderThread` in the same place (see threads.ts).
  */
-export function Shell({ first, threads = [], renderThread }: { first: AtelierKind | null; threads?: ThreadInfo[]; renderThread?: RenderThread }) {
+export function Shell({ first, threads = [], renderThread, story }: { first: AtelierKind | null; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode }) {
   const { me } = useAuth();
   const partner = usePartner();
   const ctx = useAtelierCtx();
   const day = me?.journeyDay;
-  const bluena = hasBluena(day);
+  const bluena = !!story?.bluena || hasBluena(me);
   const [thread, setThread] = useState<string>(BATI_THREAD);
   const [talk, setTalk] = useState<Talk>(() => newTalk(day));
   const [firstTalk] = useState(talk.id);
@@ -48,7 +53,7 @@ export function Shell({ first, threads = [], renderThread }: { first: AtelierKin
       </div>
 
       {thread === BATI_THREAD ? (
-        <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} />
+        <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} />
       ) : (
         <div className="relative flex min-h-0 flex-1 flex-col">{renderThread?.(thread, tctx) ?? null}</div>
       )}
