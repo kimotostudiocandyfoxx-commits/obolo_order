@@ -96,17 +96,23 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     // the gem, KIMORIN⭐︎'s egg (its pinpon and うんちピンポンくん), then the visitor's own egg hatching (M-R207: on day 2 again)
     expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'pinpon-earth', 'unpon-earth', 'hatch-sun']);
   });
-  it('the gem at the launch pit, then the look, KIMORIN\'s dragon, the NEO name, the egg, {bati} hatches and the first chat (M-R207)', () => {
+  it('the gem at the launch pit, then {bati} is born, {bati}\'s magic makes the look, KIMORIN\'s dragon, the NEO name and the first chat (M-R209)', () => {
     const t = kinds(steps);
     expect(t).not.toContain('riddles');
-    expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('look'));
-    expect(t.indexOf('look')).toBeLessThan(steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon'));
-    expect(t.indexOf('look')).toBeLessThan(t.indexOf('neoname'));
-    expect(t.indexOf('neoname')).toBeLessThan(t.indexOf('egg'));
+    const scenes = steps.filter((s): s is Extract<Step, { t: 'scene' }> => s.t === 'scene').map((s) => s.id);
+    expect(scenes.slice(scenes.indexOf('D03-S003'))).toEqual(['D03-S003', 'D03-S005', 'D03-S004', 'D03-S004b', 'D03-S004c', 'D03-S008', 'D03-S009']);
+    expect(steps.findIndex((s) => s.t === 'caption' && s.text === 'マナジェムを手に入れた')).toBeLessThan(t.indexOf('egg'));
     expect(t.indexOf('egg')).toBeLessThan(t.indexOf('hatch'));
     expect(t.indexOf('hatch')).toBeLessThan(t.indexOf('batiname'));
-    expect(t.indexOf('batiname')).toBeLessThan(t.indexOf('batitalk'));
-    // Bluena is given on the morning of day 3 (M-R207)
+    expect(t.indexOf('batiname')).toBeLessThan(t.indexOf('look'));
+    expect(t.indexOf('look')).toBeLessThan(steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon'));
+    expect(steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon')).toBeLessThan(t.indexOf('neoname'));
+    expect(t.indexOf('neoname')).toBeLessThan(t.indexOf('batitalk'));
+    // {bati} casts the look's magic (「いくよ、{name}！」); OBOLON asks for the animal
+    const look = steps.find((s): s is Extract<Step, { t: 'look' }> => s.t === 'look');
+    expect(look?.ask).toEqual({ t: 'say', who: 'OBOLON', text: '何の動物に、アレンジする？' });
+    expect(look?.spell).toEqual({ t: 'say', who: 'バティ', text: 'いくよ、{name}！' });
+    // Bluena is given on the morning of day 3 (M-R207/M-R212)
     expect(steps.some((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBe(false);
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
@@ -128,26 +134,68 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
       if (s.t === 'say' && s.who === 'MONBAN') expect(open).toBe(true);
     }
   });
-  it('Bluena in the morning, then the kororin practice on Saturn, the stamp; MONBAN offers Obolo Order early (SYS-S002)', () => {
+  it('Bluena in the morning, the first kororins made on the Moon, fly or keep, then the rocket and Saturn to look; MONBAN offers Obolo Order early (SYS-S002)', () => {
     const t = kinds(steps);
     expect(t).not.toContain('seal');
-    // {bati} was born on day 2 (M-R207): no hatching on day 3
+    // {bati} was born on day 2 (M-R207): no hatching on day 3; nothing is made on Saturn (M-R208)
     expect(t).not.toContain('hatch');
-    expect(steps.findIndex((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBeLessThan(t.indexOf('clock'));
-    expect(t.indexOf('clock')).toBeLessThan(t.indexOf('saturn'));
-    expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('saturn'));
+    expect(t).not.toContain('saturn');
+    const bluena = steps.findIndex((s) => s.t === 'set' && s.key === 'f_d04_bluena');
+    expect(bluena).toBeGreaterThan(-1);
+    expect(steps.findIndex((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBeLessThan(t.indexOf('atelier'));
+    expect(steps.find((s) => s.t === 'atelier')).toMatchObject({ kind: 'voice' });
+    const fly = steps.findIndex((s) => s.t === 'choice' && s.key === 'f_d04_fly');
+    expect(t.lastIndexOf('atelier')).toBeLessThan(fly);
+    // the 88 minutes start when the rocket leaves the Moon after making (SYS-S001)
+    expect(fly).toBeLessThan(t.indexOf('clock'));
+    expect(t.indexOf('clock')).toBeLessThan(steps.findIndex((s) => s.t === 'scene' && s.id === 'D04-S005'));
+    expect(steps.filter((s) => s.t === 'set' && s.key === 'f_d04_fly').map((s) => s.t === 'set' && s.value)).toEqual(['fly', 'skip']);
+    expect(steps.filter((s) => s.t === 'set' && s.key === 'f_d04_voice_reply').map((s) => s.t === 'set' && s.value)).toEqual(['reply', 'later']);
+    expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('clock'));
     const c = steps.find((s) => s.t === 'choice' && s.key === 'f_join_early');
     expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['先にObolo Orderになる', '8日目に決める']);
     expect(steps.some((s) => s.t === 'scene' && s.id === 'SYS-S002')).toBe(true);
   });
 });
 
-describe('Venus (day 7, draft 21)', () => {
+describe('days 3–7: made on the Moon, flown, then seen on the planet (M-R208)', () => {
+  const plan: [number, string, string, [string, string]][] = [
+    [3, 'voice', 'f_d04_fly', ['fly', 'skip']],
+    [4, 'art', 'f_d05_sent_jacket', ['send', 'keep']],
+    [5, 'song', 'f_d06_sent_song', ['sail', 'keep']],
+    [6, 'video', 'f_d07_sent_mv', ['send', 'keep']],
+    [7, 'radio', 'f_d07v_show', ['send', 'keep']],
+  ];
+  for (const [day, kind, flag, values] of plan) {
+    it(`day ${day}: OBOLON teaches in the Moon temple, the ${kind} is made in {bati}'s chat, ${flag} = ${values.join(' / ')}, then the rocket`, () => {
+      const steps = STORIES[day].steps;
+      const t = kinds(steps);
+      const teach = steps.findIndex((s) => s.t === 'say' && s.who === 'OBOLON' && /お前は、ついに、.+を、作れるようになる。/.test(s.text));
+      expect(teach).toBeGreaterThan(-1);
+      const made = steps.findIndex((s) => s.t === 'atelier' && s.kind === kind);
+      expect(made).toBeGreaterThan(teach);
+      const fly = steps.findIndex((s) => s.t === 'choice' && s.key === flag);
+      expect(fly).toBeGreaterThan(made);
+      expect(steps.filter((s) => s.t === 'set' && s.key === flag).map((s) => s.t === 'set' && s.value)).toEqual(values);
+      // the 88 minutes start as the rocket leaves the Moon, after making; no planet practice any more
+      expect(t.indexOf('clock')).toBeGreaterThan(fly);
+      for (const p of ['saturn', 'jupiter', 'mercury', 'mars', 'venus']) expect(t).not.toContain(p);
+    });
+  }
+  it('the removed flags are gone (M-R208/M-R210)', () => {
+    const gone = ['f_d05_tree', 'f_d05_tree_parts', 'f_d06_island', 'f_d06_island_parts', 'f_d06_island_name', 'f_d06_know', 'f_d07_studio', 'f_d07_studio_parts', 'f_d07v_dj', 'f_d07v_set_done', 'f_d05_spell', 'f_d06_spell'];
+    const keys = Object.values(STORIES).flatMap((s) => s.steps.flatMap((x) => (x.t === 'set' || x.t === 'choice' || x.t === 'branch' ? [x.key] : [])));
+    for (const g of gone) expect(keys).not.toContain(g);
+  });
+});
+
+describe('Venus (day 7)', () => {
   const steps = STORIES[7].steps;
-  it('the easy DJ, then the fifth stamp', () => {
-    const v = steps.findIndex((s) => s.t === 'venus');
-    expect(v).toBeGreaterThan(0);
-    expect(steps.slice(v).find((s) => s.t === 'ticket')).toEqual({ t: 'ticket', stamp: 'venus' });
+  it('the show made on the Moon, then the booth and the fifth stamp; the night is slept on Venus', () => {
+    const booth = steps.findIndex((s) => s.t === 'scene' && s.id === 'D07V-S004');
+    expect(booth).toBeGreaterThan(steps.findIndex((s) => s.t === 'atelier'));
+    expect(steps.slice(booth).find((s) => s.t === 'ticket')).toEqual({ t: 'ticket', stamp: 'venus' });
+    expect(steps.slice(booth).some((s) => s.t === 'still' && s.image.startsWith('s/moon'))).toBe(false);
   });
 });
 

@@ -14,10 +14,10 @@ import { eggSvg } from '@/lib/look';
 import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
+import { Shell as AtelierShell } from '@/components/atelier/Shell';
 import { NeoChooser } from './NeoChooser';
 import { JupiterLesson } from '@/components/jupiter/JupiterLesson';
 import { saveAtelier } from '@/components/lap2/AtelierVisit';
-import { islandCards } from '@/components/mercury/MyIsland';
 import { saveIsland } from '@/components/lap2/IslandWorks';
 import { MarsLesson } from '@/components/mars/MarsLesson';
 import { MercuryLesson } from '@/components/mercury/MercuryLesson';
@@ -1281,7 +1281,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             remember('stickers', JSON.stringify(stickers));
             remember('my_atelier', JSON.stringify(atelier));
             saveAtelier(atelier);
-            remember('f_d05_tree_parts', atelier.parts.join('|').slice(0, 200));
             remember('f_d05_send', sent ? 'send' : 'keep');
             run(iRef.current + 1);
           }}
@@ -1301,7 +1300,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             remember('f_song_from', song ? 'made' : 'none');
             if (song) remember('song', JSON.stringify(song));
             remember('my_island', JSON.stringify(island));
-            remember('f_d06_island_parts', islandCards(island).join('|'));
             saveIsland(island);
             remember('f_d06_sail', sailed ? 'sail' : 'keep');
             run(iRef.current + 1);
@@ -1323,7 +1321,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             if (r.mv) remember('mv', JSON.stringify(r.mv));
             if (r.studio) {
               remember('my_studio', JSON.stringify(r.studio));
-              remember('f_d07_studio_parts', r.studio.parts.join('|'));
             }
             remember('f_d07_send', r.sent ? 'send' : 'keep');
             remember('f_d07_screen', r.mv ? 'big' : 'pick');
@@ -1342,7 +1339,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           inviter={v.inviter || 'ともだち'}
           deliver={lessonApi ? (b) => lessonApi.deliver(b) : undefined}
           onDone={(r) => {
-            remember('f_d07v_show', r.shown ? 'dachi' : 'self');
+            remember('f_d07v_show', r.shown ? 'send' : 'keep');
             remember('f_d07v_mode', r.mode);
             run(iRef.current + 1);
           }}
@@ -1407,9 +1404,28 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
+      {/* 月で作る inside the day (days 3–7, M-R208/M-R210): the Moon atelier's {bati} chat with the day's kind asked at
+          once; what is made is a card, in Bluena at once. 〔次へ〕 goes on with the story (the fly-or-keep choice comes next) */}
+      {started && step?.t === 'atelier' && (
+        <div className="absolute inset-0 z-[40] flex flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
+          <div className="pt-safe flex min-h-0 flex-1 flex-col">
+            <AtelierShell key={i} first={step.kind} />
+          </div>
+          <button
+            onClick={next}
+            className="absolute left-1/2 top-[calc(8px+env(safe-area-inset-top))] z-[41] -translate-x-1/2 rounded-full border border-amber-200/50 bg-black/50 px-4 py-1.5 text-xs tracking-[0.2em] text-amber-100 backdrop-blur"
+          >
+            次へ
+          </button>
+        </div>
+      )}
       {started && step?.t === 'look' && lookApi && (
         <LookMaker
           api={lookApi}
+          ask={step.ask ? fill(step.ask.text, v) : undefined}
+          spell={step.spell ? fill(step.spell.text, v) : undefined}
+          spellName={step.spell ? speakerName(step.spell.who, v) : undefined}
+          spellFace={step.spell?.who === 'バティ' ? v.batiImage : undefined}
           onDone={(url, meta) => {
             if (url) remember('look', url);
             // D03-S004's flags: the photo's way in, the animal as said, the card picked, the one redraw

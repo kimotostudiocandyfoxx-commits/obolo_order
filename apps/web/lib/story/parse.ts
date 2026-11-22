@@ -150,7 +150,8 @@ function lineOf(raw: string, scene: string, n: { still: number; choice: number }
   for (let i = 0; i < ps.length; i++) {
     const p = ps[i];
     if (p.t === 'txt') {
-      const name = p.v.match(/^(.*?)([^\s（）〔［「」『』→。、！？＝：・／]{1,16})(?:（([^）]{1,30})）)?$/);
+      // 「？？？」 (a voice not seen yet) is a name too, though 「？」 ends a sentence elsewhere
+      const name = p.v.match(/^(.*?)(？？？|[^\s（）〔［「」『』→。、！？＝：・／]{1,16})(?:（([^）]{1,30})）)?$/);
       const nextQ = ps[i + 1]?.t === 'q';
       const nextBr = ps[i + 1]?.t === 'br';
       if (name && (nextQ || (nextBr && i === 0 && !name[1]))) {

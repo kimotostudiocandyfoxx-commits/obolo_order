@@ -57,7 +57,25 @@ function loadDraft(): Draft {
   }
 }
 
-export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string | null, flags?: LookFlags) => void }) {
+/**
+ * `ask`: OBOLON's question for the animal; `spell`: {bati}'s line as it casts the magic into the water (M-R209: {bati} is born
+ * before the look and makes it). Both come from the day's script (lib/onboarding/day2.ts), already filled.
+ */
+export function LookMaker({
+  api,
+  onDone,
+  ask = '何の動物に、アレンジする？',
+  spell,
+  spellName = 'バティ',
+  spellFace,
+}: {
+  api: LookApi;
+  onDone: (url: string | null, flags?: LookFlags) => void;
+  ask?: string;
+  spell?: string;
+  spellName?: string;
+  spellFace?: string;
+}) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [phase, setPhase] = useState<Phase>('photo');
   // a favourite photo of themselves (M-R148): kept only in this screen, handed to the basin, never stored
@@ -177,7 +195,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
       </div>
     );
 
-  if (phase === 'making') return <Basin said={instruction || ans.animal} />;
+  if (phase === 'making') return <Basin said={instruction || ans.animal} spell={spell} spellName={spellName} spellFace={spellFace} />;
 
   if (phase === 'photo')
     return (
@@ -235,7 +253,7 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo.url} alt="" className="mx-auto mb-3 h-24 w-24 rounded-full object-cover opacity-70 ring-2 ring-sky-100/40 [filter:saturate(0.7)_blur(0.5px)]" />
         )}
-        <Obolon>何の動物に、アレンジする？</Obolon>
+        <Obolon>{ask}</Obolon>
         {/* the mic first, 〔文字で答える〕 in the corner (VoiceField); the words as said, never matched to a list */}
         <div className="mt-3" />
         <VoiceField value={free} onChange={setFree} placeholder="例「しろくま」" />
@@ -336,10 +354,21 @@ export function clearLookDraft() {
  * While the bowl of water draws: what was said, as said, in {name}'s bubble; the light from the mana gem into the water and
  * 〔テロップ：−3マナ〕 (D03-S004). No narration the script does not have (story chat 2026-10-29).
  */
-function Basin({ said }: { said?: string }) {
+function Basin({ said, spell, spellName, spellFace }: { said?: string; spell?: string; spellName?: string; spellFace?: string }) {
   return (
     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black/70 px-6 backdrop-blur-[2px]">
       {said && <p className="max-w-[80%] self-end rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[15px] text-amber-950">{said}</p>}
+      {/* {bati} jumps onto the rim of the bowl: 「いくよ、{name}！」 (D03-S004) */}
+      {spell && (
+        <div className="flex max-w-[85%] items-start gap-2 self-start">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {spellFace && <img src={spellFace} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />}
+          <div>
+            <p className="text-[11px] text-amber-100/70">{spellName}</p>
+            <p className="rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2 text-[15px] text-amber-50">{spell}</p>
+          </div>
+        </div>
+      )}
       <div className="relative h-44 w-72" aria-hidden>
         <span className="absolute inset-x-0 bottom-0 h-20 rounded-[50%] border border-sky-100/40 bg-[radial-gradient(ellipse_at_center,rgba(190,225,255,0.45)_0%,rgba(80,120,170,0.15)_60%,transparent_75%)]" />
         <span className="absolute inset-x-10 bottom-5 h-10 animate-pulse rounded-[50%] bg-sky-100/25 blur-md" />

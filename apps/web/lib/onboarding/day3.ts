@@ -2,14 +2,17 @@ import type { Step } from './script';
 import { SYS002 } from './sys002';
 
 /**
- * DAY 3 【月 → 土星】 — the simple version (M-R198, wip/P02/c02.md D04-S002〜S003, c03.md D04-S005〜S007; the scene ids
- * say D04 but it is day 3). Starts after the email check 〔扉の合言葉〕 (DayAuth). The morning on the Moon (M-R207: {bati}
- * was born on day 2): Obolo Neo, Bluena, the Moon atelier and 「作るのは、月。しまうのは、Bluena。見せるのは、、、星だ。」,
- * the gate's 88 minutes, then the rocket leaves the Moon (the day's 88 minutes start: 'clock', M-R22). Saturn:
- * the gaudy temple, たこ焼きブラザー & シスター, the kororin practice and the dachi with KIMORIN⭐︎ and {inviter}
- * (components/saturn/SaturnLesson.tsx), Saturn's night and its stamp, and MONBAN's one-time offer to become Obolo Order
- * early (`f_join_early`). The dachi's messages live in Bluena's 〔通信〕 (M-R194).
- * Saved: Bluena, the kororins (d3.kororins), the Saturn stamp.
+ * DAY 3 【月 → 土星】 — the simple version (M-R208〜M-R212; wip/P02/c02.md D04-S002〜S002b, c03.md D04-S003〜S007; the scene
+ * ids say D04 but it is day 3). Starts after the email check 〔扉の合言葉〕 (DayAuth).
+ *  - the Moon morning: Obolo Neo, Bluena (f_d04_bluena), the Moon atelier, 「作るのは、月。しまうのは、Bluena。見せるのは、、、星だ。」,
+ *    the gate's 88 minutes (MONBAN on Bluena's screen)
+ *  - D04-S002b: OBOLON teaches the kororin; Bluena gains the sound-wave shelf; KIMORIN⭐︎'s 「うんち。」 kororin sings;
+ *    {neo}'s two kororins are made in {bati}'s chat (the 'atelier' step: cards, in Bluena at once); 〔土星へ飛ばす〕
+ *    or 〔今は飛ばさない〕 (f_d04_fly = fly / skip); the rocket leaves the Moon — the day's 88 minutes start here ('clock')
+ *  - Saturn only to look: the gaudy temple, the giant DJ record's cypher (D04-S005), the dachi with KIMORIN⭐︎ and
+ *    {inviter}, {neo}'s own record, the first voice message (D04-S005c, f_d04_voice_reply = reply / later)
+ *  - the night: the Saturn stamp, back to the Moon to sleep, MONBAN's one-time offer to become Obolo Order early (SYS-S002)
+ * Nothing is made on Saturn (M-R208).
  */
 export const DAY3: Step[] = [
   // D04-S002 おはようございます／Bluena（M-R207：{bati}は2日目に生まれている。Bluenaと月の工房はここで）
@@ -36,6 +39,7 @@ export const DAY3: Step[] = [
   { t: 'still', image: 's/bluena' }, // 光の柱から、白くて低い円柱のデバイスが二つ、ふわりと降りてくる
   { t: 'se', sound: 'sparkle' },
   { t: 'caption', text: 'Bluenaを手に入れた' },
+  { t: 'set', key: 'f_d04_bluena', value: 'true' }, // the atelier's Bluena drawer opens from here
   { t: 'say', who: 'OBOLON', text: 'Bluena（ブルーナ）だ。' },
   { t: 'say', who: 'OBOLON', text: '星を越えても、、、これで繋がれる。' },
   { t: 'say', who: 'OBOLON', text: 'Bluenaの中には、、、月への、門がある。' },
@@ -52,6 +56,7 @@ export const DAY3: Step[] = [
   { t: 'sprite', image: 'obolon' },
   { t: 'say', who: 'OBOLON', text: '作ったものは、、、Bluenaに、しまわれる。見せる時は、、、Bluenaから、星へ、投影する。' },
   { t: 'say', who: 'OBOLON', text: '作るのは、月。しまうのは、Bluena。見せるのは、、、星だ。', hold: true },
+  { t: 'notice', text: 'チャットの画面の右に、Bluenaのバナーができました。最初の棚（顔の記号）に、きのう作った{neo}の姿が、もう入っています' },
   { t: 'action', label: 'Bluenaで投影する' },
   { t: 'se', sound: 'blip' },
   { t: 'screen', open: true }, // 神殿の白い壁に、正方形のスクリーン。門の前のMONBAN
@@ -70,18 +75,108 @@ export const DAY3: Step[] = [
   { t: 'screen', open: false },
   { t: 'sprite', image: null },
   { t: 'notice', text: '星への門が開くのは、一日88分。過ぎると地球に帰り、次の日に、その続きから。月の工房とBluenaは、いつでも使えます' },
-  { t: 'still', image: 's/moon-temple' }, // 光の柱の中で、OBOLONの白い三日月の目が、細くなる。黒い球が、ゆっくり、こちらを見送る
-  { t: 'sprite', image: ['', 'obolon'] }, // 見送るOBOLON（QA 6 R5）
-  { t: 'wait', s: 1.6, keepChat: true }, // the line stays (QA 11 R35)
+  // D04-S002b 月の工房で、はじめてのコロリン（M-R208：作るのは月。OBOLONが教える → 棚が増える → チャットで作る → 飛ばす）
+  { t: 'scene', id: 'D04-S002b' },
+  { t: 'still', image: 's/moon-temple' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。お前は、ついに、コロリンを、作れるようになる。' },
+  { t: 'say', who: 'OBOLON', text: 'その魔法を、今日は、教える。' },
+  { t: 'say', who: 'KIMORIN', text: 'コロリン？' },
+  { t: 'say', who: 'OBOLON', text: '、、、つぶやきだ。思ったことを、声で、{bati}に、話せ。' },
+  { t: 'say', who: 'OBOLON', text: '{bati}が、魔法で、それを、コロリンにする。' },
+  { t: 'sprite', image: null },
+  { t: 'still', image: 's/bluena' }, // Bluenaの上の青い光の球に、小さな棚が一つ。棚の右下に、音の波の記号
+  { t: 'se', sound: 'sparkle' },
+  { t: 'notice', text: 'Bluenaに、新しい棚（音の波）が増えた。作ったコロリンは、できたらすぐ、ここにしまわれます' },
+  // 月の工房。作業台の前で、{bati}がこちらを向く。となりの作業台で、KIMORINも、うんちピンポンくんとのチャットを開く
+  { t: 'still', image: 's/moon-temple', fade: 0.8 },
+  { t: 'cam', move: 'in', focus: '50% 40%' },
+  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
+  { t: 'say', who: 'KIMORIN', text: '……何を、つぶやけばいいですか？' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、最近、食べて、うまかったものを、言ってみろ。' },
+  { t: 'say', who: 'KIMORIN', text: 'うんち。' },
+  { t: 'wait', s: 1.4, keepChat: true }, // シーン……。OBOLONと、うんちピンポンくんと、{bati}が、無言でKIMORINを見つめる
+  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
+  { t: 'say', who: 'うんちピンポンくん', text: 'ピンポーン！' },
+  { t: 'fx', fx: 'kimorin-kororin' }, // KIMORINのチャットに、コロリンのカードが一枚。KIMORINの見た目の、まんまるのたこ焼き
+  { t: 'say', who: 'KIMORIN', text: 'なんですかこのかわいいたこ焼きは！' },
+  { t: 'say', who: 'OBOLON', text: '、、、タップしてみろ。' },
+  // 工房の灯りが暗くなる。サングラスがシャキーンと落ち、ピックがマイクに。KIMORINの声のまま、アカペラで歌う
+  { t: 'bgm', track: null, fade: 0.6 },
+  { t: 'say', who: 'コロリン', text: '♪うんち。♪', voice: 'KIMORIN' },
+  { t: 'fx', fx: null },
+  { t: 'bgm', track: 'moon' },
+  { t: 'say', who: 'KIMORIN', text: '楽しいですね。' },
+  { t: 'say', who: 'OBOLON', text: '、、、コロリンは、歌う。' },
+  { t: 'cam', move: 'out' },
+  { t: 'sprite', image: '@bati' },
+  { t: 'face', who: '@bati', expr: 'sparkle' },
+  { t: 'say', who: 'バティ', text: '{neo}も！　最近食べて、おいしかったもの、言ってみて！' },
+  {
+    t: 'atelier',
+    kind: 'voice', // the first kororin in {bati}'s chat: the voice consent once, the mic, the card (〔もう一回〕), in Bluena at once
+    lines: [
+      { t: 'say', who: 'バティ', text: 'じゃあ、コロリンにするね！' },
+      { t: 'say', who: 'コロリン', text: '♪〈{neo}が吹き込んだ言葉、そのまま〉♪' },
+    ],
+  },
+  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] }, // KIMORINの扇の尾が、まだ、ビートに合わせて、ぱたぱた揺れている
+  { t: 'say', who: 'KIMORIN', text: '……尾が、勝手に。これは、私の意思ではありません。' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、最後は、自由に、なんでもいい。' },
+  { t: 'say', who: 'KIMORIN', text: 'ぷりぷりぷりり、うひょひょひょ、げへへ！　ピンポン大正解！' },
+  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
+  { t: 'say', who: 'うんちピンポンくん', text: 'ピンポーン！' },
+  { t: 'fx', fx: 'kimorin-kororin' }, // KIMORINのチャットに、二つ目のコロリンのカード。すぐに、サングラスがシャキーンと落ちて、歌う
+  { t: 'say', who: 'コロリン', text: '♪ぷりぷりぷりり、うひょひょひょ、げへへ！　ピンポン大正解！♪', voice: 'KIMORIN' },
+  { t: 'fx', fx: null },
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: '{neo}の番だよ！　なんでもいいよ！' },
+  {
+    t: 'atelier',
+    kind: 'voice', // the second kororin (迷った時の例：今したいこと／最近驚いたこと／やりたいこと)
+    lines: [{ t: 'say', who: 'コロリン', text: '♪〈{neo}が吹き込んだ言葉、そのまま〉♪' }],
+  },
+  { t: 'say', who: 'バティ', text: 'ぜんぶ、Bluenaに、しまってあるよ！' },
+  { t: 'notice', text: 'コロリンは、できたらすぐ、Bluenaの音の波の棚に、日付と時刻つきでしまわれます。{neo}だけが見られます。コロリンは、いつでも、このチャットで作れます' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、見せたいコロリンは、土星へ、飛ばせる。' },
+  { t: 'notice', text: 'カードの〔飛ばす〕を押すと、コロリンが土星へ飛びます（何個でも。飛ばさなくてもいい）。飛ばしたコロリンは、88時間、土星の巨大なDJレコードの上で、みんなのコロリンとサイファーします' },
+  { t: 'say', who: 'KIMORIN', text: 'では、全部。……全部、名作ですので。' }, // 〔飛ばす〕を二つとも。コロリンが二つ、天井の窓から宇宙へ
+  { t: 'se', sound: 'whoosh' },
+  {
+    t: 'choice',
+    key: 'f_d04_fly',
+    options: [
+      { label: '土星へ飛ばす', goto: 'fly' },
+      { label: '今は飛ばさない', goto: 'skip' },
+    ],
+  },
+  { t: 'label', id: 'fly' },
+  { t: 'set', key: 'f_d04_fly', value: 'fly' },
+  { t: 'se', sound: 'whoosh' },
+  { t: 'caption', text: 'コロリンが、土星へ飛んでいった' },
+  { t: 'goto', id: 'flown' },
+  { t: 'label', id: 'skip' },
+  { t: 'set', key: 'f_d04_fly', value: 'skip' },
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: '飛ばしたくなったら、このチャットで、いつでも飛ばせるよ！' },
+  { t: 'label', id: 'flown' },
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '、、、飛ばしたものが、どう生きているか。土星へ、見に行け。' },
+  { t: 'say', who: 'KIMORIN', text: '言われなくても、行きます。名作の、晴れ舞台ですので。' },
+  { t: 'sprite', image: ['', 'obolon'] }, // OBOLONの白い三日月の目が、細くなる。黒い球が、ゆっくり、こちらを見送る
+  { t: 'wait', s: 1.6, keepChat: true },
   { t: 'action', label: 'ロケットに乗る' },
   { t: 'sprite', image: null },
   { t: 'bgm', track: 'space' },
   { t: 'se', sound: 'rocket' }, // ロケットが、月から飛び立つ
   { t: 'still', image: 's/rocket-space' },
-  // Bluenaの上の青い光の球が、ふっと明るくなる（星への門が開いた）: the day's 88 minutes start here (not shown)
+  // Bluenaの上の青い光の球が、ふっと明るくなる（星への門が開いた）: the day's 88 minutes start here, after making (SYS-S001)
   { t: 'clock', on: true },
   { t: 'se', sound: 'sparkle' },
-  { t: 'sprite', image: ['@bati', 'unchi-pinpon'] }, // {bati}とうんちピンポンくんが、その光に包まれて、となりの席に、ふわりと浮かぶ
+  { t: 'sprite', image: ['@bati', 'unchi-pinpon'] }, // {bati}とうんちピンポンくんが、その光に包まれて、となりの席に浮かぶ
   { t: 'wait', s: 1.8 },
   { t: 'sprite', image: null },
   { t: 'still', image: 's/rocket-saturn' }, // 窓の外に、大きな輪のある星が近づいてくる
@@ -110,31 +205,124 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'KIMORIN', text: '遊び、、？いえ、、、私達は、この秘密結社の正体を暴きに来たのです。' },
   { t: 'say', who: 'たこ焼きシスター', text: '遊んでる人って楽しそうで魅力的。とっても素敵だワ。私..大好きだワ' },
   { t: 'say', who: 'KIMORIN', text: '、、、ふふふふ。もももちろん、正体を暴くのも、楽しみの一環、つまり遊びなのです。' },
-  { t: 'say', who: 'たこ焼きシスター', text: 'そうなのね！じゃあさっそく土星で遊びましょう！' },
+  { t: 'say', who: 'たこ焼きシスター', text: 'そうなのね！じゃあさっそく、土星のコロリンを見せてあげるワ！' },
   { t: 'say', who: 'たこ焼きブラザー', text: 'ついてこいだZE!!!' },
 
-  // D04-S005 コロリン → D04-S005c ダチになる／広場へ飛ばす: the practice on the real Saturn world, the story's
-  // lines inside it (components/saturn/SaturnLesson.tsx); the kororins are saved as d3.kororins
+  // D04-S005 巨大なDJレコードの、サイファー（見るだけ。飛ばしたコロリンが、ここで88時間サイファーする）
   { t: 'scene', id: 'D04-S005' },
-  { t: 'bgm', track: 'saturn' }, // 練習のあいだも曲は流れる（小さく。録音中は止まる：QA 5 N14）
+  { t: 'still', image: 's/saturn-inside' }, // 神殿の奥の大広間。巨大なDJレコードが、ゆっくり回っている。レコードの上に、いろんな顔のコロリン
+  { t: 'fx', fx: 'ring' },
+  { t: 'caption', text: '土星の巨大なレコード' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きブラザー', text: '土星は原石の星だZE!!' },
+  { t: 'say', who: 'たこ焼きシスター', text: '飛んできたコロリンは、みんな、ここで、サイファーするのよ。' },
+  { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
+  { t: 'say', who: 'KIMORIN', text: 'サイファー？' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '順番に、歌うんだZE!!　聞いてみるZE!!' },
+  // 針が、レコードに落ちる。知らない誰かのコロリンが、知らない誰かの声のまま、つぶやきを歌いつないでいく
   { t: 'sprite', image: null },
-  { t: 'saturn' },
-  { t: 'scene', id: 'D04-S005c' }, // played inside the same lesson, after the kororins
+  { t: 'say', who: 'コロリン', text: '♪……今日も、異常なし…。♪', voice: 'MONBAN' }, // 黒いフードのMONBANのコロリン
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……MONBANさんのまで、いますね。' },
+  { t: 'sprite', image: null },
+  { t: 'say', who: 'コロリン', text: '♪うんち。♪', voice: 'KIMORIN' }, // KIMORINのコロリン（ふちが、ほんのり白く光る）
+  { t: 'wait', s: 1.2, keepChat: true }, // シーン……。知らない誰かのコロリンたちが、一瞬だけ、歌うのをやめる
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……大舞台でも、堂々としていますね。さすが、私です。' },
+  { t: 'branch', key: 'f_d04_fly', cases: { fly: 'rec-fly' }, otherwise: 'rec-skip' },
+  { t: 'label', id: 'rec-fly' },
+  { t: 'sprite', image: null }, // 輪の中に、{neo}のコロリン。ふちが、金色に光っている
+  { t: 'notice', text: '光っているのが、{neo}のコロリンです。タップすると、そのコロリンの番がきます' },
+  { t: 'action', label: '自分のコロリンをタップする' },
+  { t: 'say', who: 'コロリン', text: '♪〈{neo}が吹き込んだ言葉、そのまま〉♪' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: '……いい声だワ。' },
+  { t: 'goto', id: 'rec-end' },
+  { t: 'label', id: 'rec-skip' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] }, // 輪の中に、{neo}のコロリンは、まだいない
+  { t: 'say', who: 'たこ焼きシスター', text: '{neo}のコロリンは、まだBluenaの中ね。飛ばしたくなったら、いつでも来るワ。' },
+  { t: 'label', id: 'rec-end' },
+  { t: 'notice', text: 'ここには、この88時間に土星へ飛ばされたコロリンが集まっています（ダチの分も、ほかの人の分も）。タップしたコロリンの番がきます' },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'サイファーは、88時間、止まらないZE。{neo}が寝てる間も、だZE!!' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '自分で思ったことや、感じたこと、思いついたことは、全部コロリンにしちゃえ。それは全部、大切な思い出だZE。' },
+  { t: 'fx', fx: null },
 
-  // D04-S007 土星の夜
+  // D04-S005c ダチになる／自分のレコード／はじめての声のメッセージ（M-R212）
+  { t: 'scene', id: 'D04-S005c' },
+  { t: 'fx', fx: 'ring-drop' }, // 羅針盤の形の金の封印がついたコロリンが一つ。知らない声で、短く歌う
+  { t: 'say', who: 'たこ焼きブラザー', text: '今の、招待者の、{inviter}のだZE。' },
+  { t: 'say', who: 'たこ焼きシスター', text: '{neo}を、ここに招いてくれた人だワ。' },
+  { t: 'fx', fx: null },
+  { t: 'say', who: 'たこ焼きブラザー', text: '土星では、作ったものを届け合う仲間を、ダチって呼ぶZE。' },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'ダチは、本当に知ってる奴とだけ、なるもんだZE。' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: 'では、ダチに、なりましょう。……というか、もう、ダチですよね？' }, // 手を差し出す。{neo}と、握手
+  { t: 'se', sound: 'chime' },
+  { t: 'caption', text: 'KIMORIN⭐︎がダチになった' },
+  { t: 'set', key: 'f_dachi_kimorin', value: 'true' },
+  // 右上の〔ダチ〕がひらく。名札が二つ。『ダチ　KIMORIN⭐︎』と、羅針盤の封印の{inviter}の名札。招待状のひとことが金色の字で
+  { t: 'caption', text: '「{inviter_message}」', when: 'inviterMessage' },
+  { t: 'se', sound: 'chime' },
+  { t: 'caption', text: '{inviter}がダチになった' },
+  { t: 'set', key: 'f_dachi_inviter', value: 'true' },
+  { t: 'set', key: 'f_d04_dachi_inviter', value: 'true' },
+  { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: '今日から、上に〔推し〕ができるワ。ダチの作品だけが、そこに入るワ。' },
+  { t: 'say', who: 'KIMORIN', text: '推し、ですか。……私は、ずっと、自分推しです。' },
+  { t: 'notice', text: 'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '最後に、{neo}の場所だZE!!' },
+  // 大広間の壁に、丸い棚。名札つきのレコードが一枚ずつ。その一枚に『{neo}』、となりに『KIMORIN⭐︎』。溝は、まだからっぽ
+  { t: 'say', who: 'たこ焼きシスター', text: 'サイファーが終わったコロリンは、自分のレコードに、並ぶの。' },
+  { t: 'branch', key: 'f_d04_fly', cases: { fly: 'own-fly' }, otherwise: 'own-end' },
+  { t: 'label', id: 'own-fly' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '88時間たったら、{neo}のコロリンも、ここに帰ってくるZE!!' },
+  { t: 'label', id: 'own-end' },
+  { t: 'notice', text: '{neo}のレコードは、土星へ飛ばしたコロリンを見せる棚です。Bluenaの中のコロリンと同じ物が並びます' },
+  { t: 'say', who: 'KIMORIN', text: '……私のレコードは、名作で、すぐ、いっぱいになりますね。' },
+  // ピロン。チャットの画面の左のバナーが光る。{bati}の下に『{inviter}』と『KIMORIN⭐︎』の会話。『{inviter}』に声のメッセージ
+  // PLACEHOLDER (M-R212): the dachi voice screens are another agent's; here only the story's choice and its flag
+  { t: 'se', sound: 'blip' },
+  { t: 'notice', text: '左のバナーを開いて、『{inviter}』を押す。声のメッセージを再生する' },
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: '{neo}、声で、返してみよう！' },
+  { t: 'notice', text: 'ダチとの会話も、{bati}とのチャットと同じ画面です。マイクのボタンを押している間だけ録音され、離すと送る前に聞き直せます。Bluenaの作品も、カードで送れます' },
+  {
+    t: 'choice',
+    key: 'f_d04_voice_reply',
+    options: [
+      { label: '声で返す', goto: 'reply' },
+      { label: 'あとで返す', goto: 'reply-later' },
+    ],
+  },
+  { t: 'label', id: 'reply' },
+  { t: 'set', key: 'f_d04_voice_reply', value: 'reply' },
+  { t: 'caption', text: 'はじめての声のメッセージを送った' },
+  { t: 'goto', id: 'reply-end' },
+  { t: 'label', id: 'reply-later' },
+  { t: 'set', key: 'f_d04_voice_reply', value: 'later' },
+  { t: 'say', who: 'バティ', text: 'いつでも、左のバナーから、返せるよ！' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……私にも、送っていいですよ。返事は、気が向いたら、しますので。' },
+  { t: 'notice', text: '声のメッセージは、ダチどうしの間だけで届きます。知らない人からは届きません。困った時は、会話の右上から、ブロックや通報ができます' },
+  { t: 'label', id: 'reply-end' },
+  { t: 'sprite', image: null },
+
+  // D04-S007 土星の夜 → 月へ帰って眠る
   { t: 'scene', id: 'D04-S007' },
   { t: 'bgm', track: 'night' },
   { t: 'caption', text: 'その夜' },
-  // {neo}のコロリンの一つから、細い光の糸が一本、木星の方角へ。神殿の石段。頭上で、輪が、ごう、と回る
-  { t: 'still', image: 's/saturn-night' },
-  { t: 'sprite', image: ['kimorin-sun', '@bati'] },
-  { t: 'say', who: 'KIMORIN', text: '……明日は、あっちですね。' }, // 丸いサングラスを押し上げて、光の糸の先を、じっと見る
-  { t: 'sprite', image: null },
+  { t: 'still', image: 's/saturn-night' }, // 神殿の石段。頭上で、輪が、ごう、と回る。サイファーの歌が、まだ、かすかに
   { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'saturn' },
   { t: 'caption', text: '切符に、土星のスタンプが押された' },
-  // 石段で、KIMORIN⭐︎とうんちピンポンくんが寄りかかって眠る。{bati}は{neo}のひざの上で丸くなる
-  { t: 'still', image: 's/saturn-night' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きブラザー', text: '明日は木星だZE!!　遅れるんじゃねぇZE!!' },
+  { t: 'sprite', image: null },
+  { t: 'se', sound: 'rocket' }, // ロケットが、土星から月へ帰る
+  { t: 'still', image: 's/moon-night', fade: 0.8 }, // 月の神殿のベッド。{bati}は、{neo}の枕もとで丸くなる。光の糸が一本、木星の方角へ
+  { t: 'sprite', image: ['kimorin-sun', '@bati'] },
+  { t: 'say', who: 'KIMORIN', text: '……明日は、あっちですね。' }, // 寝ぼけて、丸いサングラスを押し上げて、光の糸の先を、じっと見る
+  { t: 'sprite', image: null },
   { t: 'wait', s: 1.6 },
   { t: 'caption', text: 'また明日' },
   // 〔通信：MONBANから（読まなくても、旅は続く）〕 — once, at the end of day 3 (M-R198)

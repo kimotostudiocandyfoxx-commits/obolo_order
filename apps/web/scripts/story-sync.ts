@@ -20,12 +20,12 @@ type L = { who: string; text: string; scene?: string };
 const norm = (t: string) => t.replace(/\s+/g, '').replace(/[／/]/g, '');
 
 /** the planet practices keep their lines in their own beat lists (who: 'kaiser' …): read those too, for their day */
-const LESSONS: Record<number, string> = {
-  3: 'components/saturn/SaturnLesson.tsx',
-  4: 'components/jupiter/JupiterLesson.tsx',
-  5: 'components/mercury/MercuryLesson.tsx',
-  6: 'components/mars/MarsLesson.tsx',
-  7: 'components/venus/VenusLesson.tsx',
+const LESSONS: Record<number, { step: string; file: string }> = {
+  3: { step: 'saturn', file: 'components/saturn/SaturnLesson.tsx' },
+  4: { step: 'jupiter', file: 'components/jupiter/JupiterLesson.tsx' },
+  5: { step: 'mercury', file: 'components/mercury/MercuryLesson.tsx' },
+  6: { step: 'mars', file: 'components/mars/MarsLesson.tsx' },
+  7: { step: 'venus', file: 'components/venus/VenusLesson.tsx' },
 };
 const WHO: Record<string, string> = {
   kaiser: '大根カイザー',
@@ -41,9 +41,10 @@ const WHO: Record<string, string> = {
   sister: 'たこ焼きシスター',
 };
 function lessonLines(day: number): L[] {
-  const f = LESSONS[day];
-  if (!f) return [];
-  const src = readFileSync(join(ROOT, 'apps/web', f), 'utf8');
+  const l = LESSONS[day];
+  // only a practice the day still plays (M-R208: nothing is made on the planets any more, the days 3–7 play none)
+  if (!l || !(STORIES[day]?.steps ?? []).some((s) => s.t === l.step)) return [];
+  const src = readFileSync(join(ROOT, 'apps/web', l.file), 'utf8');
   const out: L[] = [];
   for (const m of src.matchAll(/who:\s*'(\w+)',\s*text:\s*'((?:[^'\\]|\\.)*)'/g)) {
     const who = WHO[m[1]];
@@ -57,7 +58,7 @@ let total = 0;
 // SYS-S002's last line (KIMORIN back from his mother) plays on whichever day he appears next (lib/onboarding/kimorinBack.ts)
 const ANY_DAY = new Set(['KIMORIN|' + norm('……母に言いましたが、聞く耳を持ちません。調査は、続けます。')]);
 
-/** the `say` steps anywhere in a step list (branches and labels included) */
+/** the `say` steps anywhere in a step list (branches and labels included, and the lines a step keeps for its screen: the look, the atelier) */
 function sayLines(steps: unknown): L[] {
   const app: L[] = [];
   const visit = (x: unknown) => {

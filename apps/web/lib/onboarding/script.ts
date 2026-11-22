@@ -84,7 +84,7 @@ export type Step =
   | { t: 'mercury' }
   /** Mars (day 6): the song gets an MV from the visitor's wish; kept in the 裏スタジオ. Saves answers.mv. */
   | { t: 'mars' }
-  /** Venus (day 7, draft 21): the easy DJ — practice rhythm → your song, a kororin at the seam, 〔🎤 見せる〕. Saves answers.f_d07v_show. */
+  /** Venus (day 7, draft 21): the easy DJ — practice rhythm → your song, a kororin at the seam, 〔🎤 見せる〕. Saves answers.f_d07v_show (send / keep). Not on the first journey any more (M-R208). */
   | { t: 'venus' }
   /** Show what was made: the MV on Mars's big screen, … (tap to continue). */
   | { t: 'made'; what: 'mv' | 'film' }
@@ -184,8 +184,11 @@ export type Step =
   | { t: 'pause'; resume: string }
   /** Choose one of the eight OBOLO NEO forms (Day 3). Saved on the account. Fallback for 'look'. */
   | { t: 'neo' }
-  /** Day 2: OBOLON's questions / own words or a picture / おまかせ → the water basin's four looks → choose one. */
-  | { t: 'look' }
+  /**
+   * Day 2 (D03-S004): the photo into the bowl of water → `ask` (OBOLON's 「何の動物に、アレンジする？」) answered by voice →
+   * `spell` ({bati}'s 「いくよ、{name}！」 as the magic goes into the water) → the four looks → choose one (LookMaker).
+   */
+  | { t: 'look'; ask?: ScriptLine; spell?: ScriptLine }
   /** The favourite food → the Bati (Day 2: the food is given to the egg on the altar). */
   | { t: 'egg'; submit?: string }
   /** The egg hatches (the Bati image is generated meanwhile). */
@@ -207,12 +210,26 @@ export type Step =
   | { t: 'label'; id: string }
   /** D03-S008: {bati}'s magic — change your look / dress up {bati} (the Moon room's sheets), as often as you like, then on */
   | { t: 'magic' }
+  /**
+   * 月で作る inside the day (M-R208/M-R210/M-R211, days 3–7): the Moon atelier's one {bati} chat
+   * (components/atelier/AtelierChat) opens with `kind` asked at once; what is made comes in as a card and is in Bluena at
+   * once. 〔次へ〕 goes on with the story. `lines`: the script's lines that are said inside that chat ({bati}'s questions,
+   * the card singing …), word for word, in order, for the atelier to play (it does not take them yet: see the day files).
+   */
+  | { t: 'atelier'; kind: 'voice' | 'art' | 'song' | 'video' | 'radio'; lines?: ScriptLine[] }
   /** remember a flag in the day's answers (saved with the day like a choice): f_ej_heard, f_join … */
   | { t: 'set'; key: string; value: string }
   /** the script scene that starts here (D04-S002 …): shown on the review screen so notes can name it; no effect in play */
   | { t: 'scene'; id: string }
   | { t: 'goto'; id: string }
   | { t: 'end' };
+
+/** a line kept in a step for the screen that step opens to say (the look, the atelier): the script's words as written */
+export interface ScriptLine {
+  t: 'say';
+  who: Speaker;
+  text: string;
+}
 
 export interface TimedCaption {
   text: string;
@@ -252,6 +269,8 @@ export interface StoryVars {
 
 export function fill(text: string, v: StoryVars): string {
   return text
+    // the words {neo} put into the day-3 kororin (the atelier's card), as said; until the atelier hands them back: ……
+    .replaceAll('〈{neo}が吹き込んだ言葉、そのまま〉', v.story?.['d3.kororinWords'] || '……')
     .replaceAll('{name}', v.name || '…')
     .replaceAll('{inviter_message}', v.inviterMessage || '')
     .replaceAll('{inviter}', v.inviter || '…')

@@ -269,73 +269,21 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'OBOLON', text: '姿と名前を、変えることだ。' },
   { t: 'say', who: 'OBOLON', text: '秘密結社用の、姿と名前に、なってもらう。その姿と名前で話すのなら、問題は、ない。' }, // 黒い球が、KIMORINのほうへ向く
   { t: 'say', who: 'KIMORIN', text: 'ほう。新しい姿とは、、、仮装でもするのですか？' },
-  { t: 'say', who: 'OBOLON', text: 'どんな姿になりたいか、伝えてくれたら、俺が魔法を唱え、その姿にする。' },
+  { t: 'say', who: 'OBOLON', text: 'どんな姿になりたいか、伝えてくれたら、、、魔法で、その姿にする。' },
   { t: 'say', who: 'KIMORIN', text: 'え？魔法？　……魔法、使えるのですか？' },
   { t: 'say', who: 'OBOLON', text: '使える。お前も、宇宙を旅していたら、、、そのうち、使えるようになる。' },
   { t: 'say', who: 'KIMORIN', text: 'え！？！？マジで！？' }, // ゴーグルを額に押し上げる。目の切れ目が、青く光る
   { t: 'say', who: 'KIMORIN', text: 'では魔法ってことは、じゃあ、どんな見た目にも、なれるんですか？' }, // 興奮気味。はぁはぁしている
   { t: 'say', who: 'OBOLON', text: 'なれる。だが、、、最初は、いっぱい望みすぎないほうがいい。変になるから。' },
   { t: 'say', who: 'OBOLON', text: '旅を続けて、自分で魔法を使えるようになったら、、、ちょっとずつ、自分の好きな見た目に変えていく、それがいい。' },
-  // KIMORINが、両腕を大きく広げて、息を吸いこむ — その前に、黒い球が、くるりと、こちらへ向く
-
-  // M-R207: the visitor's look first — photo into the bowl of water, the animal by voice, −3マナ, four looks in four
-  // touches, then the chosen look big on the screen (inside LookMaker; its words are the script's)
-  { t: 'scene', id: 'D03-S004' }, // {name}のネオ
-  { t: 'still', image: 's/d2-moon-in' },
-  { t: 'say', who: 'OBOLON', text: '{name}、、、こっちへ来い。' }, // 光の柱の前、床の器の水のそばへ。KIMORINは、両腕を広げたまま、取り残されている
-  { t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' },
-  { t: 'look' }, // 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕→「何の動物に、アレンジする？」→ −3マナ → 4枚
-
-  // M-R207: KIMORIN's dragon after the visitor's look (he had been waiting with his arms spread)
-  { t: 'scene', id: 'D03-S004b' }, // パーティー好きのドラゴン
-  { t: 'still', image: 's/d2-moon-kimorin' }, // KIMORINは、両腕を広げたまま、ずっと待っていた
-  { t: 'say', who: 'OBOLON', text: '、、、次は、KIMORINだ。' },
-  { t: 'say', who: 'KIMORIN', text: 'そうですか、、、、じゃあ、、' },
-  // one tap each (client 2026-10-29), the one voice cut at its pauses; no music under them (client 2026-10-29)
-  { t: 'bgm', track: null, fade: 0.6 },
-  { t: 'say', who: 'KIMORIN', text: '筋肉ムキムキの、' }, // 広げたままの両腕を、さらに大きく広げる
-  { t: 'say', who: 'KIMORIN', text: '腕80本の、' },
-  { t: 'say', who: 'KIMORIN', text: 'パーティーが大好きなドラゴン！' },
-  { t: 'say', who: 'OBOLON', text: '、、、大丈夫か？' }, // シーン……
-  { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' }, // still no music: it comes with the dragon
-  { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
-  { t: 'se', sound: 'magic' },
-  { t: 'video', motion: 'd2-transform' }, // マナジェムから光が器の水へ。水が立ち上がってKIMORINを包む
-  { t: 'caption', text: 'KIMORINのマナジェム　−3マナ' }, // ⭐︎は、まだ付かない（M-R169）
-  { t: 'bgm', track: 'party' },
-  { t: 'se', sound: 'crackers' },
-  { t: 'video', motion: 'd2-dragon' }, // 腕80本のドラゴン。いっせいにクラッカー、紙吹雪
-  { t: 'bgm', track: null, fade: 1.5 }, // シーン……
-  { t: 'say', who: 'KIMORIN', text: '……やっぱり、戻してください。' },
-  { t: 'se', sound: 'magic' },
-  { t: 'video', motion: 'd2-kimorin-back-normal' }, // 光が引いて、深い赤のローブとフードに丸いサングラス。尾のあいだに小さなドラゴンの羽
-  { t: 'bgm', track: 'moon' },
-  { t: 'still', image: 's/d2-kimorin-after' },
-  { t: 'say', who: 'KIMORIN', text: '……これは、足し算をしまくった後、いいもの以外を引き算する。そういう仕組みなのです。' },
-  { t: 'say', who: 'KIMORIN', text: 'たった2工程で、最高の姿になれました。成功です。' },
-  { t: 'sprite', image: ['kimorin-sun', '@me'] },
-  { t: 'say', who: 'KIMORIN', text: 'あなたも、よく似合っていますね。私ほどではありませんが。' },
-
-  // M-R207: the names, the eggs, KIMORIN⭐︎'s food first (うんちピンポンくん), then {neo}'s food and {bati} — on day 2 again
-  { t: 'scene', id: 'D03-S005' }, // 名前と、相方の誕生
-  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
-  { t: 'say', who: 'OBOLON', text: '次は、、、名前だ。' },
-  { t: 'say', who: 'OBOLON', text: '秘密結社用の、名前は、、どうする？' }, // 黒い球が、KIMORINのほうへ向く
-  { t: 'say', who: 'KIMORIN', text: '私は、KIMORINという、親からもらったこの名前を、気に入っています。' },
-  { t: 'say', who: 'KIMORIN', text: 'できれば、変えたくありません。' },
-  { t: 'say', who: 'OBOLON', text: '、、、それだと、ダメだ。変えないとこの先にいけない。' },
-  { t: 'say', who: 'KIMORIN', text: 'そうですか。わかりました。' },
-  { t: 'say', who: 'KIMORIN', text: 'では、KIMORIN⭐︎で。' },
-  { t: 'say', who: 'OBOLON', text: 'わかった。では、KIMORIN⭐︎。よろしく。' },
-  { t: 'say', who: 'OBOLON', text: 'では{name}、、、名前はどうする？' },
-  { t: 'neoname', placeholder: '秘密結社用の名前', submit: 'この名前にする' },
-  { t: 'notice', text: '名前は、あとでいつでも変えられます' },
-  { t: 'say', who: 'OBOLON', text: '{neo}、、、いい名前だ。' },
   { t: 'say', who: 'OBOLON', text: 'それでは、宇宙旅行の相方を誕生させよう' },
   { t: 'say', who: 'KIMORIN', text: '相方？' },
   { t: 'say', who: 'OBOLON', text: 'うん。さっき、魔法が使えるようになる、と言ったが。' },
   { t: 'say', who: 'OBOLON', text: '厳密には、一人では、魔法は使えない。相方と、力を合わせて、魔法を唱えるんだ。' },
+  { t: 'say', who: 'OBOLON', text: 'お前たちの新しい姿も、、、相方が、魔法で、作る。' },
   { t: 'say', who: 'OBOLON', text: 'こっちに、来い。' },
+  // M-R209: {bati} is born first — the egg, the mana gem, KIMORIN's food (うんちピンポンくん), then {name}'s food and {bati}
+  { t: 'scene', id: 'D03-S005' }, // 相方の誕生
   { t: 'sprite', image: null },
   { t: 'video', motion: 'd2-altar' }, // 光の柱が神殿の奥へ。小さな祭壇に、たまごが二つ（太陽と月／地球と月）
   { t: 'still', image: 's/d2-altar' },
@@ -366,8 +314,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'KIMORIN', text: 'ア、、、アイ//？' }, // 声が裏返る。狐の耳の先まで赤くなる
   { t: 'say', who: 'OBOLON', text: '愛、と言っても、、、そんなに、構えなくていい。' },
   { t: 'say', who: 'OBOLON', text: 'お前たちの、好きなもの、、、そうだ。好きな食べ物を、教えてほしい。' },
-  { t: 'sprite', image: ['obolon', 'kimorin-sun'] }, // 黒い球が、KIMORIN⭐︎のほうへ向く
-  { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORIN⭐︎だ。好きな食べ物は？' },
+  { t: 'sprite', image: ['obolon', 'kimorin-iu'] }, // 黒い球が、KIMORINのほうへ向く
+  { t: 'say', who: 'OBOLON', text: 'まずは、、、KIMORINだ。好きな食べ物は？' },
   { t: 'say', who: 'KIMORIN', text: '私の好きな食べ物は、、、、、' },
   { t: 'say', who: 'KIMORIN', text: '……うんち。' },
   // KIMORINの手が、押しボタンを探して空をつかむ。何もない → 曲が止まり、KIMORIN⭐︎のたまごの中から、はっきりと：ピンポンピンポン♪
@@ -393,7 +341,7 @@ export const DAY2: Step[] = [
   { t: 'video', motion: 'd2-pinpon-sun' },
   { t: 'label', id: 'unpon' },
   { t: 'still', image: 's/d2-moon-in' }, // 生まれる映像の最後の絵を残さない（立ち絵と見た目がちがう：QA 5 N26）
-  { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] },
+  { t: 'sprite', image: ['kimorin-iu', 'unchi-pinpon'] },
   { t: 'say', who: 'OBOLON', text: 'これが、、、お前の、相方だ。' },
   { t: 'say', who: 'KIMORIN', text: 'こ、、、これが、、私の、、相方？' }, // サングラスが鼻先までずり落ち、目の切れ目から青い光がぽろぽろ
   { t: 'say', who: 'OBOLON', text: 'うん、そうだ。' },
@@ -404,7 +352,7 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' }, // KIMORIN⭐︎のまわりを、ぴょんぴょん跳ねる
   // 黒い球が、くるりと、こちらへ向く
   { t: 'sprite', image: 'obolon' },
-  { t: 'say', who: 'OBOLON', text: '次は、、、{neo}だ。好きな食べ物は？' },
+  { t: 'say', who: 'OBOLON', text: '次は、、、{name}だ。好きな食べ物は？' },
   { t: 'egg', submit: 'これにする' }, // the food by voice (the words as said); saves the food and the egg on the account
   { t: 'say', who: 'OBOLON', text: '{food}、か。愛が伝わってくる。わかった。' },
   // 映画の場面：{neo}のマナジェムが光る。体からも光。二つの光がたまごの中へ。模様が速く回り、ひび、〈{food}〉の香りの光の粒、殻が割れて転がり出る
@@ -433,7 +381,70 @@ export const DAY2: Step[] = [
   { t: 'caption', text: '{bati}が相方になった' },
   { t: 'face', who: '@bati', expr: 'smile' },
 
-  // M-R207: the first chat with {bati} (about three rounds; the words as said, {bati}'s answers in words and voice), then
+  // M-R209: {bati}'s first magic makes {name}'s look — photo into the bowl of water, the animal by voice, {bati} on the
+  // rim (「いくよ、{name}！」), −3マナ, four looks, then the chosen look big on the screen (inside LookMaker)
+  { t: 'scene', id: 'D03-S004' }, // {name}のネオ
+  { t: 'still', image: 's/d2-moon-in' },
+  { t: 'sprite', image: ['obolon', '@bati'] }, // KIMORINが、両腕を大きく広げて、息を吸いこむ — その前に、黒い球が、こちらへ向く
+  { t: 'say', who: 'OBOLON', text: '{name}、、、こっちへ来い。' }, // 器の水のそばへ。{bati}が、ころころ、あとからついてくる。KIMORINは、両腕を広げたまま
+  { t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' },
+  { t: 'sprite', image: null },
+  {
+    t: 'look', // 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕→ the animal → {bati} casts → −3マナ → 4枚
+    ask: { t: 'say', who: 'OBOLON', text: '何の動物に、アレンジする？' },
+    spell: { t: 'say', who: 'バティ', text: 'いくよ、{name}！' },
+  },
+
+  // KIMORIN's dragon after the visitor's look (he had been waiting with his arms spread): うんちピンポンくん's magic
+  { t: 'scene', id: 'D03-S004b' }, // パーティー好きのドラゴン
+  { t: 'still', image: 's/d2-moon-kimorin' }, // KIMORINは、両腕を広げたまま、ずっと待っていた
+  { t: 'say', who: 'OBOLON', text: '、、、次は、KIMORINだ。' },
+  { t: 'say', who: 'KIMORIN', text: 'そうですか、、、、じゃあ、、' },
+  // one tap each (client 2026-10-29), the one voice cut at its pauses; no music under them (client 2026-10-29)
+  { t: 'bgm', track: null, fade: 0.6 },
+  { t: 'say', who: 'KIMORIN', text: '筋肉ムキムキの、' }, // 広げたままの両腕を、さらに大きく広げる
+  { t: 'say', who: 'KIMORIN', text: '腕80本の、' },
+  { t: 'say', who: 'KIMORIN', text: 'パーティーが大好きなドラゴン！' },
+  { t: 'say', who: 'OBOLON', text: '、、、大丈夫か？' }, // シーン……
+  { t: 'say', who: 'KIMORIN', text: '大丈夫です。私は、人生で一回も、失敗したことがありませんので。' }, // still no music: it comes with the dragon
+  { t: 'say', who: 'OBOLON', text: 'わかった。マナジェムを出せ。' },
+  { t: 'sprite', image: ['kimorin-iu', 'unchi-pinpon'] }, // うんちピンポンくんが、器のふちに、ぴょんと跳びのる
+  { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
+  { t: 'sprite', image: null },
+  { t: 'se', sound: 'magic' },
+  { t: 'video', motion: 'd2-transform' }, // マナジェムから光が器の水へ。水が立ち上がってKIMORINを包む
+  { t: 'caption', text: 'KIMORINのマナジェム　−3マナ' }, // ⭐︎は、まだ付かない（M-R169）
+  { t: 'bgm', track: 'party' },
+  { t: 'se', sound: 'crackers' },
+  { t: 'video', motion: 'd2-dragon' }, // 腕80本のドラゴン。いっせいにクラッカー、紙吹雪
+  { t: 'bgm', track: null, fade: 1.5 }, // シーン……
+  { t: 'say', who: 'KIMORIN', text: '……やっぱり、戻してください。' },
+  { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
+  { t: 'se', sound: 'magic' },
+  { t: 'video', motion: 'd2-kimorin-back-normal' }, // 光が引いて、深い赤のローブとフードに丸いサングラス。尾のあいだに小さなドラゴンの羽
+  { t: 'bgm', track: 'moon' },
+  { t: 'still', image: 's/d2-kimorin-after' },
+  { t: 'say', who: 'KIMORIN', text: '……これは、足し算をしまくった後、いいもの以外を引き算する。そういう仕組みなのです。' },
+  { t: 'say', who: 'KIMORIN', text: 'たった2工程で、最高の姿になれました。成功です。' },
+  { t: 'sprite', image: ['kimorin-sun', '@me'] },
+  { t: 'say', who: 'KIMORIN', text: 'あなたも、よく似合っていますね。私ほどではありませんが。' },
+
+  // M-R209: the society names last, inside {bati}'s chat (new scene D03-S004c)
+  { t: 'scene', id: 'D03-S004c' }, // 秘密結社の名前
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
+  { t: 'say', who: 'OBOLON', text: '次は、、、名前だ。' },
+  { t: 'say', who: 'OBOLON', text: '秘密結社用の、名前は、、どうする？' }, // 黒い球が、KIMORINのほうへ向く
+  { t: 'say', who: 'KIMORIN', text: '私は、KIMORINという、親からもらったこの名前を、気に入っています。' },
+  { t: 'say', who: 'KIMORIN', text: 'できれば、変えたくありません。' },
+  { t: 'say', who: 'OBOLON', text: '、、、それだと、ダメだ。変えないとこの先にいけない。' },
+  { t: 'say', who: 'KIMORIN', text: 'そうですか。わかりました。' },
+  { t: 'say', who: 'KIMORIN', text: 'では、KIMORIN⭐︎で。' },
+  { t: 'say', who: 'OBOLON', text: 'わかった。では、KIMORIN⭐︎。よろしく。' },
+  { t: 'say', who: 'OBOLON', text: 'では{name}、、、名前はどうする？' },
+  { t: 'neoname', placeholder: '秘密結社用の名前', submit: 'この名前にする' },
+  { t: 'notice', text: '名前は、あとでいつでも変えられます' },
+  { t: 'say', who: 'OBOLON', text: '{neo}、、、いい名前だ。' },
+  // the first chat with {bati} (about three rounds; the words as said, {bati}'s answers in words and voice), then
   // {bati}'s magic: change your own look, dress {bati} up
   { t: 'scene', id: 'D03-S008' }, // {bati}とおしゃべり／{bati}の魔法
   { t: 'still', image: 's/moon-temple' },
@@ -447,9 +458,9 @@ export const DAY2: Step[] = [
   { t: 'se', sound: 'boing' }, // 3往復くらい話すと、{bati}が、ぴょんと跳ねる
   { t: 'face', who: '@bati', expr: 'smile' },
   { t: 'sprite', image: ['obolon', '@bati'] },
-  { t: 'say', who: 'OBOLON', text: '、、、{bati}が、魔法を唱えれば、、、お前の姿も、変えられる。' },
+  { t: 'say', who: 'OBOLON', text: '、、、これからは、{bati}に頼めば、、、いつでも、お前の姿を、変えられる。' },
   { t: 'sprite', image: '@bati' },
-  { t: 'say', who: 'バティ', text: 'うん！　ボク、魔法が使えるんだ！' },
+  { t: 'say', who: 'バティ', text: 'うん！　さっきみたいに、ボクが魔法を唱えるよ！' },
   { t: 'say', who: 'バティ', text: '{neo}の姿、もっとかっこよくも、かわいくも、できるよ！' },
   { t: 'say', who: 'バティ', text: 'ボクのことも、好きに着せかえて！　ちょっとだけなら、変身もできるよ！' },
   // D03-S008 〔{bati}の魔法で、自分の姿を変える〕〔{bati}を着せかえる〕 — the Moon room's sheets, then on (also later, on the Moon)

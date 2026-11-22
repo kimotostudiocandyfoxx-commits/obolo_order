@@ -42,6 +42,11 @@ describe('story reader', () => {
     expect(scenes[0].next).toEqual(['D01-S002']);
   });
 
+  it('reads 「？？？」 (a voice not seen yet) as a speaker', () => {
+    const [s] = parseFile('### D05-S002｜森\n**本文**\n？？？「おい。」\n', 'P03', 'P03/c02.md');
+    expect(s.lines).toEqual([{ k: 'say', who: '？？？', text: 'おい。' }]);
+  });
+
   it('turns lines into speech, narration, cards, pictures and choices with their branches', () => {
     const l = scenes[0].lines;
     expect(l[0]).toEqual({ k: 'video', id: '1' });
