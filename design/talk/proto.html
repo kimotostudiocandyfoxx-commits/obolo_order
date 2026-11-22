@@ -41,6 +41,8 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 
 /* stage */
 .stage{position:absolute;left:0;right:0;bottom:110px;height:min(46%,420px);z-index:6;display:flex;justify-content:center;align-items:flex-end;gap:6%}
+.stage{transition:transform .9s cubic-bezier(.33,.1,.2,1);will-change:transform}
+.skycam{position:absolute;inset:0;z-index:-2;transition:transform 1.2s cubic-bezier(.33,.1,.2,1)}
 .char{position:relative;height:100%;width:40%;display:flex;justify-content:center;align-items:flex-end;transition:transform .35s}
 .char .body{position:relative;height:100%;width:100%;display:flex;justify-content:center;align-items:flex-end;transform-origin:50% 100%}
 .char img{position:absolute;bottom:0;left:50%;height:100%;transform:translateX(-50%);max-width:none;transition:opacity .2s ease}
@@ -125,7 +127,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 </style>
 
 <div class="app" id="app">
-  <div class="sky"></div>
+  <div class="skycam"><div class="sky"></div></div>
 
   <header class="bar">
     <button class="ib" id="openL" aria-label="会話の一覧を開く"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h11M4 17h7"/></svg></button>
@@ -259,6 +261,19 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 
   function slotOf(who){ return who==='user' ? 'right' : 'left'; }
 
+  // camera (M-R242): while someone speaks, the camera slowly zooms toward them; it eases back when the line ends
+  let camT = 0;
+  function camera(slot){
+    clearTimeout(camT);
+    if (RM){ return; }
+    const st = els.stage, sky = $('.skycam');
+    if (!slot){ st.style.transform = ''; sky.style.transform = ''; return; }
+    st.style.transformOrigin = slot === 'left' ? '30% 85%' : '70% 85%';
+    st.style.transform = `scale(1.1) translateX(${slot === 'left' ? 3 : -3}%)`;
+    sky.style.transform = `translateX(${slot === 'left' ? 1.5 : -1.5}%) scale(1.07)`;
+  }
+  const cameraRest = (ms) => { clearTimeout(camT); camT = setTimeout(() => camera(null), ms); };
+
   // every finished line is kept here, with the face each speaker had, for scrolling back (M-R241)
   let log = [];
 
@@ -315,9 +330,10 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     const [who, sentences] = script.lines[li];
     const a = actor[slotOf(who)];
     const b = newBubble(who);
+    camera(slotOf(who));
     si=0;
     const next = () => {
-      if (si >= sentences.length){ log.push({ who, text:b.text, face:a.face }); li++; cur=null; later(step, 1100); return; }
+      if (si >= sentences.length){ log.push({ who, text:b.text, face:a.face }); li++; cur=null; cameraRest(700); later(step, 1100); return; }
       const s = sentences[si++];
       cur = b; typeSentence(b, s, a, () => { later(next, 650); });
     };
@@ -373,6 +389,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
   function showPast(v){
     view = Math.max(0, Math.min(v, log.length - 1));
     if (view === 0){ backToNow(); return; }
+    camera(null);
     if (!paused){ paused = true; clearTimeout(waitT); if (cur && cur.finish && typing) cur.finish(); clearTimeout(waitT); }
     const end = log.length - view;               // the newer of the two bubbles shown
     const shown = log.slice(Math.max(0, end - 2), end);
