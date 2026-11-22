@@ -152,6 +152,30 @@ export class HttpApi implements Api {
   activeJobs() {
     return this.req<Awaited<ReturnType<Api['activeJobs']>>>('GET', '/jobs');
   }
+  demoJob(body: Parameters<Api['demoJob']>[0]) {
+    return this.req<Awaited<ReturnType<Api['demoJob']>>>('POST', '/jobs/demo', body);
+  }
+  moonWorks(ids?: string[]) {
+    return this.req<Awaited<ReturnType<Api['moonWorks']>>>('GET', `/moon/works${ids?.length ? `?ids=${encodeURIComponent(ids.join(','))}` : ''}`);
+  }
+  createMoonWork(body: Parameters<Api['createMoonWork']>[0]) {
+    return this.req<Awaited<ReturnType<Api['createMoonWork']>>>('POST', '/moon/works', body);
+  }
+  addMoonVersion(id: string, body: Parameters<Api['addMoonVersion']>[1]) {
+    return this.req<Awaited<ReturnType<Api['addMoonVersion']>>>('POST', `/moon/works/${encodeURIComponent(id)}/versions`, body);
+  }
+  setMoonFace(id: string, index: number) {
+    return this.req<Awaited<ReturnType<Api['setMoonFace']>>>('PUT', `/moon/works/${encodeURIComponent(id)}/face`, { index });
+  }
+  dropMoonVersion(id: string, index: number) {
+    return this.req<Awaited<ReturnType<Api['dropMoonVersion']>>>('DELETE', `/moon/works/${encodeURIComponent(id)}/versions/${index}`);
+  }
+  homecomings() {
+    return this.req<Awaited<ReturnType<Api['homecomings']>>>('GET', '/moon/homecomings');
+  }
+  homecomingsTold(keys: string[]) {
+    return this.req<void>('POST', '/moon/homecomings/told', { keys });
+  }
   composeFullSong(body: Parameters<Api['composeFullSong']>[0]) {
     return this.req<Awaited<ReturnType<Api['composeFullSong']>>>('POST', '/compose/song', body);
   }
@@ -438,8 +462,8 @@ export class HttpApi implements Api {
   mvRender(id: string) {
     return this.req<MvProjectView>('POST', `/mars/mv/${id}/render`);
   }
-  mvStory(id: string, mood: string) {
-    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood });
+  mvStory(id: string, mood: string, from?: 'atelier') {
+    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood, from });
   }
   mvLyrics(id: string) {
     return this.req<Awaited<ReturnType<Api['mvLyrics']>>>('POST', `/mars/mv/${id}/lyrics`);

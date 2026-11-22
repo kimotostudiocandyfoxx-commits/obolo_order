@@ -1,11 +1,12 @@
-import { KORORIN_VOICE_STYLE, neoVoiceUrl, type Me } from '@obolo/shared';
+import { KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, type JobView, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
-import { waitJob } from '@/lib/jobs';
+import type { Watched } from '@/lib/atelier/jobs';
+import { workMarkRef } from '@/lib/finds/works';
 import { makeSong, pickGenre, songFromDesign, type MadeSong } from '@/lib/mercury/compose';
-import { dropShelf, LOCAL_KINDS, putShelf } from './shelf';
-import { uid, type Work } from './work';
+import { dropShelf, LOCAL_KINDS, patchTalkWork, putShelf } from './shelf';
+import { stack, uid, type Version, type Work } from './work';
 
 /**
  * The generation calls behind the atelier's cards (M-R210): the same ones the old per-kind screens used — the look's
@@ -27,9 +28,33 @@ export type Ctx = {
 
 const withTimeout = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), ms))]);
 
+/**
+ * M-R253 §4: a slow kind starts a job and the card comes back at once, still making (`started`): the chat says when to
+ * come back, the card counts down, and the app's job host finishes it (finishJob) wherever you are.
+ */
+export type Started = { job: JobView; what: Watched['what']; words: string; extra?: Watched['extra'] };
+export type Made = Work & { started?: Started };
+/** §2 / §3: the part pointed at, and the works used as material */
+export type MakeOpts = { target?: RefineTarget; materials?: Work[] };
+
+/** the review page's stand-in times (M-R253 §4): a 2-minute one (said up front) and a 20-second one (waited in place) */
+export const DEMO_SECONDS: Partial<Record<AtelierKind, number>> = { song: 120, video: 120, art: 20 };
+
+/** §3: what a material gives the next work — its words (a kororin's, a song's title), its picture, its song */
+export function materialWords(ms: Work[] = []): string {
+  return ms
+    .map((m) => (m.kind === 'voice' ? m.text || m.title || '' : ''))
+    .filter(Boolean)
+    .join('。')
+    .slice(0, 200);
+}
+
 /** make one card; `prev` is the card being refined (its words carry over) */
-export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: Work): Promise<Work> {
-  if (ctx.test) return makeTest(kind, prompt, ctx, prev);
+export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: Work, opts: MakeOpts = {}): Promise<Made> {
+  if (ctx.test) return makeTest(kind, withTarget(prompt, opts.target), ctx, prev);
+  const mats = opts.materials ?? [];
+  const lyric = materialWords(mats);
+  const said = withTarget(prompt, opts.target);
   const api = getApi();
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
@@ -62,8 +87,13 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       return done({ ...base, text: post.text, audio: post.voiceUrl, ref: { postId: post.id } });
     }
     case 'art': {
-      const style = prev?.kind === 'art' ? [prev.ref?.style, prompt].filter(Boolean).join('、').slice(0, 80) : undefined;
-      const words = (prev?.kind === 'art' ? prev.prompt : prompt).slice(0, 60);
+      const style = prev?.kind === 'art' ? [prev.ref?.style, said].filter(Boolean).join('、').slice(0, 80) : undefined;
+      const words = (prev?.kind === 'art' ? prev.prompt : [lyric, prompt].filter(Boolean).join('。')).slice(0, 60);
+      // the review page: a 20-second stand-in job (waited in place, no time said)
+      if (!ctx.live) {
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.art!, failTimes: 0 });
+        return { ...base, prompt: words, status: 'making', ref: { style }, started: { job, what: 'art', words: `${words}${style ?? ''}` } };
+      }
       const r = await api.stickerArt(words, style);
       const w: Work = { ...base, prompt: words, image: r.url, ref: { style } };
       // into Bluena's Jupiter folder (the roots): a root is a photo, so the picture goes up once as one
@@ -71,22 +101,22 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         const blob = await fetch(r.url).then((x) => (x.ok ? x.blob() : Promise.reject(new Error(String(x.status)))));
         const ph = await api.uploadPhoto(blob);
         const root = await api.addJupiterRoot({ mediaId: ph.id });
-        return done({ ...w, ref: { ...w.ref, rootId: root.id } });
+        return done({ ...w, ref: { ...w.ref, rootId: root.id, mediaId: ph.id } });
       } catch {
         return { ...w, note: 'ブルーナに、うまくしまえなかった' };
       }
     }
     case 'song': {
-      const words = prev?.kind === 'song' ? `${prev.prompt}。${prompt}` : prompt;
-      const artist = ctx.me?.displayName ?? '';
+      // §3: a kororin's words become the lyrics
+      const asked = lyric ? `${said}。歌詞は「${lyric}」` : said;
+      const words = prev?.kind === 'song' ? `${prev.prompt}。${asked}` : asked;
       if (!ctx.live) {
-        await new Promise((r) => setTimeout(r, 1500));
-        const s = makeSong(words, pickGenre(words), artist);
-        ctx.mercury.bury(s);
-        return done({ ...base, prompt: words, title: s.title, audio: 'synth:', ref: { demoSong: s } });
+        // the review page: a 2-minute stand-in job, then the offline sketch (finishJob)
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0 });
+        return { ...base, prompt: words, status: 'making', started: { job, what: 'song', words } };
       }
       const d = await api.composeDesign({ partner: ctx.partner.name, isBati: ctx.partner.isBati, genre: 'auto', history: [{ role: 'user', text: words.slice(0, 400) }] });
-      const sketch = songFromDesign(d, artist);
+      const sketch = songFromDesign(d, ctx.me?.displayName ?? '');
       const job = await api.composeFullSong({
         title: d.title.slice(0, 40),
         genre: d.genre,
@@ -98,24 +128,132 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         instrumentalPrompt: d.instrumentalPrompt,
         progression: d.progression,
         seconds: Math.max(10, Math.min(180, d.seconds)),
+        from: 'atelier',
       });
-      const song = (await waitJob(job)).result!.song!;
-      await api.composeSongSave(song.id).catch(() => undefined);
-      return done({ ...base, prompt: words, title: song.title || sketch.title, text: d.comment, audio: song.url, ref: { songId: song.id } });
+      return { ...base, prompt: words, status: 'making', title: sketch.title, started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: sketch.title } } };
     }
     case 'video': {
-      if (!ctx.live) return { ...base, status: 'failed', note: '映像は、ここ（おためし）では作れないんだ' };
-      const words = prev?.kind === 'video' ? `${prev.prompt}。${prompt}` : prompt;
-      const songId = ctx.lastSongId ?? (await api.savedSongs())[0]?.id;
+      const words = prev?.kind === 'video' ? `${prev.prompt}。${said}` : said;
+      // §3: a picture made before is the MV's still; a song made before is what it plays on
+      const art = mats.find((m) => m.kind === 'art' && m.image);
+      const songMat = mats.find((m) => m.kind === 'song');
+      if (!ctx.live) {
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.video!, failTimes: 0 });
+        return { ...base, prompt: words, status: 'making', started: { job, what: 'video', words, extra: { still: art?.image ?? null, songTitle: songMat?.title } } };
+      }
+      const songId = songMat?.ref?.songId ?? ctx.lastSongId ?? (await api.savedSongs())[0]?.id;
       if (!songId) return { ...base, status: 'failed', note: '映像は曲にのせて作るよ。先に曲を作ろう' };
       const mv = await api.mvCreate(songId);
-      const p = (await waitJob(await api.mvStory(mv.id, words))).result!.mv!;
-      return done({ ...base, prompt: words, title: `${p.songTitle}（MV）`.slice(0, 40), text: p.note ?? undefined, video: p.videoUrl ?? undefined, poster: p.posterUrl, ref: { backstageId: p.backstageId ?? undefined } });
+      if (art) {
+        const mediaId = art.ref?.mediaId ?? (await fetch(art.image!).then((x) => x.blob()).then((b) => api.uploadPhoto(b)).then((x) => x.id).catch(() => null));
+        if (mediaId) await api.mvAddMaterial(mv.id, { mediaId, kind: 'photo' }).catch(() => undefined);
+      }
+      const job = await api.mvStory(mv.id, words, 'atelier');
+      return { ...base, prompt: words, status: 'making', started: { job, what: 'video', words } };
     }
     case 'radio':
       // a recorded show: the card records it (your songs + your voice), then it is kept
       return { ...base, status: 'record', title: (prompt || `${ctx.me?.displayName ?? ''}のラジオ`).slice(0, 40) };
   }
+}
+
+/** M-R253 §4: a watched job is done — the card it was waiting for, finished (the job host calls this, wherever you are) */
+export async function finishJob(w: Watched, job: JobView, live = getApi().mode === 'live'): Promise<Work> {
+  const c = w.card;
+  const base: Work = { ...c, status: 'ready', job: undefined };
+  let made: Work;
+  if (w.what === 'song') {
+    if (live && job.result?.song) {
+      const song = job.result.song;
+      await getApi().composeSongSave(song.id).catch(() => undefined);
+      made = { ...base, title: song.title || w.extra?.songTitle || c.title, text: w.extra?.comment, audio: song.url, ref: { songId: song.id } };
+    } else {
+      const s = makeSong(w.words, pickGenre(w.words), '');
+      buryDemo(s);
+      made = { ...base, title: s.title, audio: 'synth:', ref: { demoSong: s } };
+    }
+  } else if (w.what === 'video') {
+    const p = job.result?.mv;
+    made = p
+      ? { ...base, title: `${p.songTitle}（MV）`.slice(0, 40), text: p.note ?? undefined, video: p.videoUrl ?? undefined, poster: p.posterUrl, ref: { backstageId: p.backstageId ?? undefined } }
+      : { ...base, title: `${w.extra?.songTitle ?? 'MV'}（MV・おためし）`.slice(0, 40), image: w.extra?.still ?? demoStickerArt(w.words.slice(0, 60)), note: 'おためしでは映像は作らず、場面の絵を置いています' };
+  } else if (w.what === 'art') {
+    // the review's stand-in picture, put into Bluena's Jupiter folder as the real one is
+    const image = demoStickerArt(w.words);
+    made = { ...base, image };
+    try {
+      const api = getApi();
+      const ph = await api.uploadPhoto(await fetch(image).then((x) => x.blob()));
+      const root = await api.addJupiterRoot({ mediaId: ph.id });
+      made = { ...made, ref: { ...made.ref, rootId: root.id, mediaId: ph.id } };
+    } catch {
+      /* the card only */
+    }
+  } else made = base;
+  const out = await keep(c.versions?.length ? c : undefined, { ...made, saved: true }, c.target);
+  patchTalkWork(w.talkId, out);
+  return out;
+}
+
+/** the review demo's Mercury soil (the page's hook keeps it in this key) */
+function buryDemo(s: MadeSong) {
+  try {
+    const k = 'obolo.mercury.v1';
+    const st = JSON.parse(localStorage.getItem(k) ?? 'null') ?? { soil: [], released: [], stars: {} };
+    localStorage.setItem(k, JSON.stringify({ ...st, soil: [s, ...(st.soil ?? [])] }));
+  } catch {
+    /* kept in Bluena's shelf only */
+  }
+}
+
+const short = (x?: string | null) => (x && x.length <= 1900 ? x : null);
+/** a try as the server keeps it (where its thing is kept, its words and pictures) */
+export function serverVersion(v: Version | Work): WorkVersion {
+  const ref = workMarkRef({ ...(v as Work), kind: (v as Work).kind ?? 'art', id: (v as Work).id ?? 'x', status: 'ready' });
+  return { ref: ref.kind === 'local' ? null : ref, prompt: (v.prompt ?? '').slice(0, 600), title: v.title?.slice(0, 120) ?? null, text: v.text?.slice(0, 2000) ?? null, image: short(v.image), audio: short(v.audio), video: short(v.video), poster: short(v.poster), target: (v as Version).target, at: (v as Version).at ?? new Date().toISOString() };
+}
+
+const PLANET_KINDS: AtelierKind[] = ['voice', 'art', 'song', 'video', 'radio'];
+
+/**
+ * M-R253 §1: a finished try goes on top of its work (the face) — a redo stays the same card — and the server keeps how
+ * the tries belong together (Bluena lists the face only). Device kinds are kept on the shelf with their tries.
+ */
+export async function keep(base: Work | undefined, made: Work, target?: RefineTarget): Promise<Work> {
+  let w = stack(base, made, target);
+  if (w.status !== 'ready' || w.ref?.test) return w;
+  if (PLANET_KINDS.includes(w.kind)) {
+    const v = { ...serverVersion({ ...w, ...w.versions![w.active!] } as Work), at: w.versions![w.active!].at };
+    try {
+      const api = getApi();
+      const r = w.atelierId ? await api.addMoonVersion(w.atelierId, { version: v }) : await api.createMoonWork({ kind: w.kind, version: v, origin: w.origin, materials: w.materials ?? [] });
+      w = { ...w, atelierId: r.id };
+    } catch {
+      /* the try is still in its planet's store */
+    }
+  }
+  if (LOCAL_KINDS.includes(w.kind) || w.ref?.demoSong) putShelf(w);
+  return w;
+}
+
+/** §1: the face chosen by looking (kept on the server; the device's shelf for device kinds) */
+export function keepFace(w: Work) {
+  if (w.atelierId && w.active != null) void getApi().setMoonFace(w.atelierId, w.active).catch(() => undefined);
+  if (LOCAL_KINDS.includes(w.kind) || w.ref?.demoSong) putShelf(w);
+}
+
+/** §1: a try thrown away inside the work (its thing goes from its store too) */
+export async function dropTry(w: Work, i: number): Promise<Work> {
+  const vs = w.versions ?? [];
+  if (vs.length <= 1) return w;
+  const gone = vs[i];
+  if (w.atelierId) await getApi().dropMoonVersion(w.atelierId, i).catch(() => undefined);
+  await discardThing({ ...w, ...gone } as Work).catch(() => undefined);
+  const rest = vs.filter((_, k) => k !== i);
+  const active = Math.min(rest.length - 1, i <= (w.active ?? 0) ? Math.max(0, (w.active ?? 0) - 1) : (w.active ?? 0));
+  const out = { ...w, ...rest[active], versions: rest, active } as Work;
+  if (LOCAL_KINDS.includes(w.kind) || w.ref?.demoSong) putShelf(out);
+  return out;
 }
 
 /** the review page's stand-in for a card (story steps not played for real): made here, kept in no account */
@@ -171,15 +309,19 @@ export async function fly(w: Work, ctx: Ctx): Promise<void> {
   if (LOCAL_KINDS.includes(w.kind) || r.demoSong) putShelf({ ...w, flown: true });
 }
 
-/** thrown away from Bluena */
+/** thrown away from Bluena (every try inside it) */
 export async function discard(w: Work): Promise<void> {
+  for (const v of w.versions?.length ? w.versions : [w]) await discardThing({ ...w, ...v } as Work);
+  dropShelf(w.id);
+}
+
+async function discardThing(w: Work): Promise<void> {
   const api = getApi();
   const r = w.ref ?? {};
   if (w.kind === 'voice' && r.postId) await api.deleteSaturnPost(r.postId);
   else if (w.kind === 'art' && r.rootId) await api.removeJupiterRoot(r.rootId);
   else if (w.kind === 'video' && r.backstageId) await api.removeMarsVideo(r.backstageId);
   else if (w.kind === 'radio' && r.showId) await api.removeRadioShow(r.showId);
-  dropShelf(w.id);
 }
 
 /** wear it: your look / {bati}'s dress-up */

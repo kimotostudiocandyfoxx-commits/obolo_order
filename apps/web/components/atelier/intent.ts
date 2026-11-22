@@ -95,7 +95,8 @@ export const KIND_WORD: Record<AtelierKind, string> = {
 export function isBare(content: string): boolean {
   let t = content;
   for (const [, re] of WORDS) t = t.replace(new RegExp(re.source, 'g' + re.flags.replace('g', '')), '');
-  return t.replace(/[をのでとにがはもへ、。！!？?\s　]|作|つく|して|ほしい|たい/g, '').length < 2;
+  // 「新しく曲を作って」 (M-R253 §1: a new card) names only the kind too
+  return t.replace(/新しく|あたらしく|別の|べつの|もう一つ|もうひとつ/g, '').replace(/[をのでとにがはもへ、。！!？?\s　]|作|つく|して|ほしい|たい/g, '').length < 2;
 }
 
 /**

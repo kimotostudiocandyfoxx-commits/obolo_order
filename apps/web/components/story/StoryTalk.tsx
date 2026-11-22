@@ -73,8 +73,15 @@ const TONE_OF: Record<string, keyof typeof TONES> = { KIMORIN: 'apricot', MONBAN
 const toneFor = (id: string) => TONES[TONE_OF[id] ?? ''] ?? toneOf(id);
 
 /** the size in the row (the painted pictures have no headroom: kept under the bubbles; small ones smaller) */
-const SCALE: Record<string, number> = { monban: 0.86, obolon: 0.8, 'obolon-pit': 0.8, 'unchi-pinpon': 0.42, freezy: 0.72, mikie: 0.76 };
+const SCALE: Record<string, number> = { monban: 0.86, obolon: 0.62, 'obolon-pit': 0.62, 'unchi-pinpon': 0.42, freezy: 0.72, mikie: 0.76 };
 const scaleOf = (sprite: string) => SCALE[sprite] ?? (sprite.startsWith('@') ? 1 : 0.84);
+/** the round ones (OBOLON, {bati}) stand at 58% of their height (Figure's wide rule) */
+const headOf = (sprite: string) => {
+  const s = scaleOf(sprite);
+  if (sprite.startsWith('obolon')) return 1 - s * 0.58 + 0.04;
+  if (sprite.startsWith('@')) return 1 - 0.58 + 0.06;
+  return 1 - s + 0.02;
+};
 
 type Box = { x: number; y: number; w: number; h: number };
 /** a painted picture as a talk expression: its open-mouth patch where scripts/kimorin/build.py found it */
@@ -166,7 +173,7 @@ export function storyPeople({
     const look = spriteLook(sprite, v);
     const t = toneFor(id);
     const who = (id === 'KIMORIN' ? 'KIMORIN' : id) as Speaker;
-    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), offstage: !look || !keep.includes(id) });
+    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look || !keep.includes(id) });
   }
   // heard only: 「？？？」, a speaker with no picture
   for (const who of spoke) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { useTalkTone } from '@/components/talk/useTalkTone';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
@@ -8,7 +8,7 @@ import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, se
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { etaMinutes, homecomingLine, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
@@ -16,13 +16,17 @@ import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesso
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
 import { ASK, DONE, detect, isBare, KIND_WORD } from './intent';
-import { fly, failLine, keepShow, make, wear } from './makers';
+import { dropTry, fly, failLine, keep, keepFace, keepShow, make, wear, type MakeOpts } from './makers';
+import { asMaterial, fromMaterial, PROPOSAL_ASK, proposalFor, usesOf } from './material';
 import { saveTalk, type Talk } from './shelf';
+import { countdown, jobView, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
+import { dayOf } from '@/lib/finds/spiral';
 import { cues, withWords, type StoryMode } from './story';
+import { contentOf } from './intent';
 import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
-import { FLIES, uid, type Msg, type Work } from './work';
+import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
@@ -31,19 +35,44 @@ const PLANET_OF = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'ma
 const LESSON_OF: Partial<Record<AtelierKind, Lesson>> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
 // PLACEHOLDER (P-ATELIER-5): {bati}'s opening line in the atelier
 const HELLO = 'なにをする？ ことばで頼んでね';
+/**
+ * M-R253 §4: {bati}'s words around a slow work (said in its manner, batiLine).
+ * PLACEHOLDER (P-ATELIER-10): provisional until the script writes them.
+ */
+const KIND_NAME: Partial<Record<AtelierKind, string>> = { song: '曲', video: '映像', art: '絵', radio: '番組', voice: 'コロリン' };
+const AWAY: Partial<Record<AtelierKind, string>> = { song: '土星', video: '水星', art: '土星', radio: '木星' };
+export const backLine = (kind: AtelierKind, ms: number) => {
+  const m = etaMinutes(ms);
+  return `この${KIND_NAME[kind] ?? '作品'}は、だいたい${m}分かかるよ。${m}分後に戻ってきてね。そのあいだ、${AWAY[kind] ?? '土星'}でも見てくる？`;
+};
+export const LATE_LINE = 'ごめん、あと1分だけ';
+export const retryLine = (ms: number) => `ごめん、うまくいかなかったから、もう一回作ってるね。${etaMinutes(ms)}分後に、また来てね`;
+export const SORRY_LINE = 'ごめん、うまく作れなかった。もう一回、頼んでくれる？';
+const USE = '使ってみる';
+const NOT_TODAY = '今日はいい';
+const PROPOSED_KEY = 'obolo.atelier.proposed';
+
+/** M-R253: the cards as they are now, for a card opened big (the talk keeps a copy of what was opened) */
+const Cards = createContext<{ get: (id: string) => Work | undefined; render: (w: Work) => React.ReactNode }>({ get: () => undefined, render: () => null });
+function LiveCard({ id, fallback }: { id: string; fallback: Work }) {
+  const c = useContext(Cards);
+  return <>{c.render(c.get(id) ?? fallback)}</>;
+}
 
 /** a fresh talk with {bati} (its opening line offers what is open today) */
 export function newTalk(day: number | null | undefined): Talk {
   return { id: uid(), at: new Date().toISOString(), msgs: [{ id: uid(), who: 'bati', text: HELLO, chips: openKinds(day).map((k) => KIND_WORD[k]) }] };
 }
 
-type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | null;
+type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | null;
 
 /**
  * 月で作る (client M-R210/M-R211): one {bati} chat for everything — your look, {bati}'s dress-up / 変身, lookups, pictures,
  * then コロリン → アート → 曲 → 映像 → ラジオ as the journey's days open them. You ask in words; the result comes into the talk
- * as a card (〔再生〕〔やり直し〕〔星へ飛ばす〕) and is in Bluena at once. A change is asked in words too ("もっと明るく") and
- * makes a new card. The chat never changes its look while something is made. This is {bati}'s thread in the shell
+ * as a card (〔再生〕〔やり直し〕〔星へ飛ばす〕) and is in Bluena at once. A change is asked in words too ("もっと明るく", or
+ * pointing at the part on the card first) and is stacked inside the same card (M-R253; 「新しく作って」 makes a new one).
+ * A slow one says when to come back and is finished by the app's job host wherever you are; on the morning a kind opens
+ * {bati} offers earlier works as material; works back home from their planets are reported here. The chat never changes its look while something is made. This is {bati}'s thread in the shell
  * (Shell.tsx: left = the conversations, right = Bluena from day 3). Opened from a story step it plays the day's script
  * lines at their moments and hands what was made back to the story (`story`, story.ts).
  */
@@ -71,7 +100,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   // the talk is kept for the left drawer (the works themselves are in Bluena)
   useEffect(() => {
     if (story?.mode === 'fly') return;
-    saveTalk({ id: talkId, at: new Date().toISOString(), msgs: msgs.filter((m) => m.who !== 'work' || m.work.status !== 'making') });
+    // a card waiting for its job is kept (it is finished later, wherever you are: M-R253 §4)
+    saveTalk({ id: talkId, at: new Date().toISOString(), msgs: msgs.filter((m) => m.who !== 'work' || m.work.status !== 'making' || !!m.work.job) });
   }, [msgs, talkId]);
 
   // {bati}'s own lines in its personality's manner (M-R216); KIMORIN (no {bati} yet) as written
@@ -112,41 +142,106 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     for (const l of lines[cue] ?? []) setMsgs((m) => [...m, { id: uid(), who: 'bati', speaker: l.who, text: story!.fill(withWords(story!.voice(l.who, l.text), words)) }]);
     return !!lines[cue]?.length;
   };
-  const put = (w: Work) => setMsgs((m) => (m.some((x) => x.who === 'work' && x.work.id === w.id) ? m.map((x) => (x.who === 'work' && x.work.id === w.id ? { ...x, work: w } : x)) : [...m, { id: uid(), who: 'work', work: w }]));
+  const put = (w: Work) => setMsgs((m) => (m.some((x) => x.who === 'work' && x.work.id === w.id) ? m.map((x) => (x.who === 'work' && x.work.id === w.id ? { ...x, work: w } : x)) : [...m, { id: `m-${w.id}`, who: 'work', work: w }]));
+  /** a card finished later (a redo, a slow one) comes to the end of the talk, so it is in view again */
+  const putLast = (w: Work) => setMsgs((m) => [...m.filter((x) => !(x.who === 'work' && x.work.id === w.id)), { id: `m-${w.id}`, who: 'work', work: w }]);
+  const cardOf = (id: string) => msgsRef.current.find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.id === id)?.work;
+  const msgsRef = useRef(msgs);
+  msgsRef.current = msgs;
+  // §3: works chosen as material for the next thing made (from {bati}'s proposal, or dragged in from Bluena)
+  const [mats, setMats] = useState<Work[]>([]);
+  const [peek, setPeek] = useState<Work | null>(null);
   const lastWork = () => [...msgs].reverse().find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.status !== 'making')?.work;
 
   const run = useCallback(
-    async (kind: AtelierKind, prompt: string, prev?: Work) => {
+    async (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
       setBusy(true);
       if (story) {
         line(prev ? 'refine' : 'react');
         line('spell', prompt);
       }
-      const shell: Work = { id: uid(), kind, prompt, status: 'making' };
+      const materials = opts.materials ?? (prev ? undefined : mats.length ? mats : undefined);
+      if (materials) setMats([]);
+      const id = prev?.id ?? uid();
+      // M-R253 §1: a redo is made inside the same card (its tries stay; the new one comes on top)
+      const shell: Work = prev
+        ? { ...prev, status: 'making', versions: versionsOf(prev), target: opts.target, job: undefined }
+        : { id, kind, prompt, status: 'making', materials: materials?.map(asMaterial), origin: { thread: 'bati', talkId, msgId: `m-${id}`, day: dayOf(new Date().toISOString()), at: new Date().toISOString() } };
       put(shell);
       try {
-        const w = { ...(await make(kind, prompt, { ...ctx, lastSongId: lastSong.current }, prev)), id: shell.id };
+        const made = await make(kind, prompt, { ...ctx, lastSongId: lastSong.current }, prev, { ...opts, materials });
+        const { started, ...res } = made;
+        if (started) {
+          // §4: slow → {bati} says when to come back; the card counts down; the app's host finishes it
+          const ms = msLeft(started.job);
+          const long = ms > 30_000;
+          const card: Work = { ...shell, ...(prev ? {} : { prompt: res.prompt, title: res.title }), ref: res.ref ?? shell.ref, job: { id: started.job.id, long } };
+          watchJob({ jobId: started.job.id, what: started.what, card, talkId, toast: long, words: started.words, extra: started.extra, since: Date.now() }, started.job);
+          put(card);
+          if (long) say(backLine(kind, ms));
+          return;
+        }
+        if (res.status === 'failed') {
+          // a redo that could not be made: the work stays as it was
+          put(prev ?? { ...res, id: shell.id });
+          if (!(story && line('fail')) && res.note && !res.image) say(res.note);
+          return;
+        }
+        const w = res.status === 'ready' ? await keep(prev ? shell : undefined, { ...res, id: shell.id, materials: shell.materials, origin: shell.origin }, opts.target) : { ...res, id: shell.id, materials: shell.materials, origin: shell.origin };
         if (w.ref?.songId) lastSong.current = w.ref.songId;
-        put(w);
-        if (w.status === 'failed') {
-          if (!(story && line('fail')) && w.note && !w.image) say(w.note);
-        } else if (story) {
-          // the card sings (a kororin), then the script's own words after it
-          if (line('sing', w.text ?? prompt) && w.audio) void toggleAudio(w.audio).catch(() => undefined);
-          if (w.status === 'ready') line('saved');
-          line('after');
-          line('fix');
-        } else if (DONE[kind]) say(DONE[kind]);
-        if (w.status === 'ready' && !story) void tipCheck();
+        if (prev) putLast(w);
+        else put(w);
+        afterMade(w, prompt);
       } catch (e) {
-        put({ ...shell, status: 'failed', note: failLine(e) });
+        put(prev ?? { ...shell, status: 'failed', note: failLine(e) });
+        if (prev) say(failLine(e));
         if (story) line('fail');
       } finally {
         setBusy(false);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ctx],
+    [ctx, mats],
+  );
+
+  /** what is said once a card is made */
+  const afterMade = (w: Work, prompt: string) => {
+    if (story) {
+      // the card sings (a kororin), then the script's own words after it
+      if (line('sing', w.text ?? prompt) && w.audio) void toggleAudio(w.audio).catch(() => undefined);
+      if (w.status === 'ready') line('saved');
+      line('after');
+      line('fix');
+    } else if (DONE[w.kind]) say(DONE[w.kind]);
+    if (w.status === 'ready' && !story) void tipCheck();
+  };
+
+  const sayRef = useRef(say);
+  sayRef.current = say;
+  const afterRef = useRef(afterMade);
+  afterRef.current = afterMade;
+  // M-R253 §4: the app's job host says how this talk's slow cards are doing
+  useEffect(
+    () =>
+      onJobs((e) => {
+        if (!e || !msgsRef.current.some((m) => m.who === 'work' && m.work.id === e.w.card.id)) return;
+        const say = sayRef.current;
+        // a quick one is waited in place: no time, no "late"
+        if (e.kind === 'late') {
+          if (e.w.toast) say(LATE_LINE);
+        } else if (e.kind === 'retrying') say(retryLine(msLeft(e.job)));
+        else if (e.kind === 'done' && e.work) {
+          if (e.work.ref?.songId) lastSong.current = e.work.ref.songId;
+          putLast(e.work);
+          afterRef.current(e.work, e.w.words);
+        } else if (e.kind === 'failed') {
+          const before = e.w.card.versions?.length ? faceTo({ ...e.w.card, status: 'ready', job: undefined }, e.w.card.versions.length - 1) : { ...e.w.card, status: 'failed' as const, job: undefined, note: undefined };
+          put(before);
+          say(SORRY_LINE);
+        }
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
 
   /** a kind asked for (by words or a chip): locked → the day it opens; only its name → what should it be */
@@ -181,11 +276,21 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       return void run(first, text);
     }
     if (p && 'voiceAgain' in p) return void run('voice', text);
+    if (p && 'use' in p) return void run(p.use, text, undefined, { materials: p.materials });
     if (p && 'kind' in p) return void run(p.kind, text);
     const last = lastWork();
     const it = detect(text, !!last, markNames());
     if (it.kind === 'find') return void showFound(it);
     if (it.kind === 'make') return ask(it.what, it.content);
+    // M-R253 §1: 「新しく作って」 — a new card of the same kind (a change is made inside the card)
+    if (last && /新しく|あたらしく|別の|べつの/.test(text)) {
+      const c = contentOf(text).replace(/新しく|あたらしく|別の|べつの|を?作って|のを?/g, '').trim();
+      if (isBare(c)) {
+        setPending({ kind: last.kind });
+        return say(ASK[last.kind]);
+      }
+      return void run(last.kind, c);
+    }
     if (it.kind === 'refine' && last) {
       if (last.kind === 'voice') {
         setPending({ voiceAgain: true });
@@ -201,8 +306,105 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   const chip = (label: string) => {
     const k = (Object.keys(KIND_WORD) as AtelierKind[]).find((x) => KIND_WORD[x] === label);
     setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
+    // M-R253 §3: {bati}'s proposal of the material
+    if (label === USE && proposal.current) {
+      const pr = proposal.current;
+      proposal.current = null;
+      return void run(pr.kind, PROPOSAL_ASK[pr.kind] ?? '', undefined, { materials: pr.materials });
+    }
+    if (label === NOT_TODAY) {
+      proposal.current = null;
+      return say(HELLO, openKinds(day).map((x) => KIND_WORD[x]));
+    }
+    if (k && mats.length && usesOf(mats[0].kind).includes(k)) {
+      setPending({ use: k, materials: mats });
+      return say(ASK[k]);
+    }
     if (k) ask(k, '');
   };
+
+  // M-R253 §3: on the morning a kind opens, {bati} offers what was made before as its material (once a day)
+  const proposal = useRef<{ kind: AtelierKind; materials: Work[] } | null>(null);
+  useEffect(() => {
+    if (story || !me || !day) return;
+    const key = `${PROPOSED_KEY}.${day}`;
+    try {
+      if (localStorage.getItem(key)) return;
+    } catch {
+      return;
+    }
+    let live = true;
+    void findAll({})
+      .then((all) => {
+        const pr = proposalFor(day, all.map((x) => ({ work: x.work, createdAt: x.createdAt })));
+        if (!live || !pr || !isOpen(pr.kind, day)) return;
+        proposal.current = { kind: pr.kind, materials: pr.materials };
+        try {
+          localStorage.setItem(key, '1');
+        } catch {
+          /* said again next time */
+        }
+        say(pr.line, [USE, NOT_TODAY]);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.id, day]);
+
+  // M-R253 §3: a work dragged in from Bluena is material
+  useEffect(() => {
+    const got = (e: Event) => {
+      const w = (e as CustomEvent<Work>).detail;
+      if (!w) return;
+      setMats((xs) => [...xs.filter((x) => x.id !== w.id), w].slice(-3));
+      const uses = usesOf(w.kind).filter((k) => isOpen(k, day) || !!story);
+      // PLACEHOLDER (P-ATELIER-9): {bati}'s words when a work is brought in
+      say(uses.length ? `「${(w.title || w.text || KIND_WORD[w.kind]).slice(0, 16)}」を材料にするね。なにを作る？` : 'それは、まだ材料にできないみたい', uses.map((k) => KIND_WORD[k]));
+    };
+    window.addEventListener('obolo:material', got);
+    return () => window.removeEventListener('obolo:material', got);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [day]);
+
+  // M-R253 §5: works back home from their planets — {bati} tells who reacted (under 15: only the dachi; the server)
+  useEffect(() => {
+    if (story || !me) return;
+    let live = true;
+    void getApi()
+      .homecomings()
+      .then((hs) => {
+        if (!live || !hs.length) return;
+        for (const h of hs) say(homecomingLine(h));
+        void getApi().homecomingsTold(hs.map((h) => h.key)).catch(() => undefined);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me?.id]);
+
+  /** §2: the part pointed at on a card, then the words */
+  const askAt = (w: Work, text: string, target: RefineTarget) => {
+    setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
+    if (w.kind === 'voice' && target.kind === 'span') {
+      // the words chosen are said anew: 「」 words replace them
+      const now = w.text ?? '';
+      const put2 = contentOf(text) || text;
+      return void run('voice', `${now.slice(0, target.start)}${put2}${now.slice(target.end)}`.slice(0, 140));
+    }
+    if (w.kind === 'radio') return say('カードの〔やり直し〕で、録り直せるよ');
+    void run(w.kind, text, w, { target });
+  };
+  const faceIt = (w: Work, i: number) => {
+    const f = faceTo(w, i);
+    put(f);
+    keepFace(f);
+  };
+  const dropIt = async (w: Work, i: number) => put(await dropTry(w, i));
+  const openMaterial = (m: WorkMaterial) => setPeek(msgsRef.current.flatMap((x) => (x.who === 'work' && (x.work.id === m.id || x.work.atelierId === m.id) ? [x.work] : []))[0] ?? fromMaterial(m));
 
   const recorded = async (w: Work, blob: Blob, seconds: number) => {
     setBusy(true);
@@ -230,7 +432,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       if (w.ref?.showId) await getApi().removeRadioShow(w.ref.showId).catch(() => undefined);
       return put({ ...w, status: 'record', audio: undefined, ref: {}, saved: false, flown: false });
     }
-    void run(w.kind, w.prompt);
+    void run(w.kind, w.prompt, w);
   };
 
   const flyIt = async (w: Work) => {
@@ -346,24 +548,36 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
             card: {
               label: m.work.title ?? m.work.prompt,
               thumb: <WorkThumb w={m.work} />,
-              full: (
-                <WorkCard
-                  w={m.work}
-                  busy={busy}
-                  onAgain={() => void again(m.work)}
-                  onFly={() => void flyIt(m.work)}
-                  onWear={() => void wearIt(m.work)}
-                  onPick={(id) => put({ ...m.work, pick: id, image: m.work.candidates?.find((c) => c.id === id)?.url, worn: false })}
-                  onRecorded={(blob, sec) => void recorded(m.work, blob, sec)}
-                  onRing={(at) => ring.open(workMarkRef(m.work).kind, workMarkRef(m.work).id, at)}
-                />
-              ),
+              full: <LiveCard id={m.work.id} fallback={m.work} />,
             },
           },
   );
-  const making = msgs.some((m) => m.who === 'work' && m.work.status === 'making');
+  // a slow card does not keep {bati} 'thinking' (you may go away meanwhile)
+  const making = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !m.work.job?.long);
+  const renderCard = (w: Work) => (
+    <WorkCard
+      w={w}
+      busy={busy}
+      onAgain={() => void again(w)}
+      onFly={() => void flyIt(w)}
+      onWear={() => void wearIt(w)}
+      onPick={(id) => put({ ...w, pick: id, image: w.candidates?.find((c) => c.id === id)?.url, worn: false })}
+      onRecorded={(blob, sec) => void recorded(w, blob, sec)}
+      onRing={(at) => ring.open(workMarkRef(w).kind, workMarkRef(w).id, at)}
+      onFace={(i) => faceIt(w, i)}
+      onDropTry={(i) => void dropIt(w, i)}
+      onAsk={(text, target) => askAt(w, text, target)}
+      onMaterial={openMaterial}
+      songUrl={(() => {
+        const sm = w.materials?.find((x) => x.kind === 'song' && x.audio);
+        return sm ? { url: sm.audio!, title: sm.title } : undefined;
+      })()}
+    />
+  );
+  const cards = { get: cardOf, render: renderCard };
 
   return (
+    <Cards.Provider value={cards}>
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
       <TalkScene
         askTone={talkTone.ask}
@@ -393,6 +607,30 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       />
       {story && <StoryButton story={story} msgs={msgs} busy={busy} />}
       {ring.node}
+      {/* §3: the materials waiting for the next thing made */}
+      {!!mats.length && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-[118px] z-20 flex justify-center">
+          <span className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-sky-200/40 bg-[rgba(16,22,64,.8)] px-2.5 py-1 text-[11px] text-sky-100 backdrop-blur" data-testid="material-tray">
+            材料
+            {mats.map((w) => (
+              <span key={w.id} className="block h-6 w-6 overflow-hidden rounded-md bg-white/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {w.image || w.poster ? <img src={(w.image ?? w.poster)!} alt="" className="h-full w-full object-cover" /> : <KindMark kind={w.kind} className="m-1 h-4 w-4" />}
+              </span>
+            ))}
+            <button onClick={() => setMats([])} aria-label="材料をやめる" className="ml-0.5 text-sky-100/60">
+              ✕
+            </button>
+          </span>
+        </div>
+      )}
+      {peek && (
+        <div className="absolute inset-0 z-[35] flex items-center justify-center bg-black/55 px-4" onClick={() => setPeek(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm">
+            <WorkCard w={peek} busy={busy} onFly={() => void flyIt(peek)} onWear={() => undefined} onPick={() => undefined} onRecorded={() => undefined} />
+          </div>
+        </div>
+      )}
 
       {lesson && (
         <Teach
@@ -406,6 +644,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         />
       )}
     </div>
+    </Cards.Provider>
   );
 }
 
@@ -441,10 +680,25 @@ function WorkThumb({ w }: { w: Work }) {
       )}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-[13px] text-amber-50">{w.title || w.text || w.prompt}</span>
-        <span className="block text-[10.5px] text-amber-200/70">{w.status === 'making' ? '作っているよ…' : w.status === 'failed' ? 'うまくできなかった' : w.status === 'record' ? '押して、録る' : '押して、ひらく'}</span>
+        <span className="block text-[10.5px] text-amber-200/70">{w.status === 'making' ? <ThumbLeft w={w} /> : w.status === 'failed' ? 'うまくできなかった' : w.status === 'record' ? '押して、録る' : '押して、ひらく'}</span>
       </span>
     </span>
   );
+}
+
+/** M-R253 §4: a slow card's count in the bubble too (「作っているよ・あと3分」) */
+function ThumbLeft({ w }: { w: Work }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => tick((n) => n + 1), 1000);
+    const off = onJobs(() => tick((n) => n + 1));
+    return () => {
+      clearInterval(t);
+      off();
+    };
+  }, []);
+  const c = countdown(jobView(w.job?.id), Date.now(), !!w.job?.long);
+  return <>{c.left ? `作っているよ・${c.left}` : '作っているよ…'}</>;
 }
 
 /** the works {bati} found, small in its bubble: a row of their pictures / marks (a tap opens them all) */

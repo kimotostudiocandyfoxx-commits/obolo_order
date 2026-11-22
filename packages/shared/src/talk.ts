@@ -158,7 +158,8 @@ export function ruleBeats(text: string, self = false): TalkBeat[] {
     else b = { face: 'normal' };
     // M-R243: 「！！」「！？」 shout; 「……」 at the start or the end muses; a whisper is small; else it pops
     if (/[！!]{2,}|[！!][？?]|[？?][！!]/.test(t)) Object.assign(b, { in: 'slam', shape: 'burst' });
-    else if (/^(…|‥)|(…|‥)[。]?$/.test(t)) Object.assign(b, { in: 'slow', shape: 'cloud' });
+    // 「……」 (two): a single 「…」 is only a pause in someone's way of talking (MONBAN's 「誰だお前…。」), not a musing
+    else if (/^(…{2}|‥{2})|(…{2}|‥{2})[。]?$/.test(t)) Object.assign(b, { in: 'slow', shape: 'cloud' });
     else if (/（小声）|\(小声\)|ひそひそ|こっそり/.test(t)) Object.assign(b, { in: 'slow', shape: 'whisper' });
     return self ? brightBeat(b) : b;
   });

@@ -13,7 +13,7 @@ import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
 
 const MaterialBody = AddMvMaterialBody.extend({ posterUrl: z.string().url().max(500).nullish(), seconds: z.number().min(0).max(3600).nullish() });
-const StoryBody = z.object({ mood: z.string().trim().max(200).default('') });
+const StoryBody = z.object({ mood: z.string().trim().max(200).default(''), from: z.literal('atelier').optional() });
 const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
 /** Mars MV studio: a Mercury song + videos / photos → Bati's MV (docs/placeholders.md P-MV). */
@@ -72,7 +72,8 @@ export class MvController {
     // an MV costs mana (8): taken before the shoot; given back if the job cannot be queued
     const fee = await this.ledger.charge(this.db, userId, 'mv', id);
     try {
-      return await this.jobs.create(userId, 'mv-story', { mvId: id, mood: parseBody(StoryBody, body).mood, origin: origin(req) });
+      const b = parseBody(StoryBody, body);
+      return await this.jobs.create(userId, 'mv-story', { mvId: id, mood: b.mood, origin: origin(req), from: b.from });
     } catch (e) {
       await fee.refund();
       throw e;

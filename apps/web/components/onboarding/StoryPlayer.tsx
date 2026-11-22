@@ -185,11 +185,6 @@ function chatBottom(s: Step | undefined): number {
   return 30;
 }
 
-/** an answer picked is {neo} speaking too (M-R170): their own figure comes up big for a moment, like with 〔🎙〕 */
-function neoSays() {
-  window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: true }));
-  setTimeout(() => window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: false })), 1800);
-}
 
 /** day 2's stills with KIMORIN drawn in, and the look he has in them */
 const STILL_LOOK: Record<string, string> = {
@@ -781,6 +776,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the mixer: music (dipping while someone speaks), sounds, voices
   // a lesson can quiet the music under itself (Saturn: low while kororins sing, silent while the mic records — QA 5 N14)
   const [duck, setDuck] = useState(1);
+  // you are speaking into 〔🎙〕: the ones in the talk turn to you and nod
+  const [listening, setListening] = useState(false);
+  useEffect(() => {
+    const f = (e: Event) => setListening(!!(e as CustomEvent<boolean>).detail);
+    window.addEventListener('obolo:speaking', f);
+    return () => window.removeEventListener('obolo:speaking', f);
+  }, []);
   useEffect(() => {
     const f = (e: Event) => setDuck(Math.max(0, Math.min(1, Number((e as CustomEvent<number>).detail))));
     window.addEventListener('obolo:bgm-duck', f);
@@ -1133,7 +1135,10 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       return undefined;
     },
   });
-  const talkOn = started && !!step && step.t !== 'video' && step.t !== 'film' && step.t !== 'whiteout' && (chatOn || charsOnStage.length > 0);
+  // on while the thread is (not under a picture choice, which covers the screen), and through the short waits between
+  // lines while someone stands on stage (a vanish, a flash)
+  const talkHidden = chatOn && step?.t === 'choice' && !!step.pics;
+  const talkOn = started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
   const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
   const talkDock = Math.max(84, chatOn && step ? chatBottom(step) : 30);
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
@@ -1247,15 +1252,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           look on; before it, first person), at most two bubbles over their heads; a tap goes on (the words first), a
           drag down goes back through the thread */}
       {talkOn && (
-        <div className="absolute inset-0 z-[10] flex flex-col">
+        <div className="absolute inset-0 z-[10] flex flex-col transition-opacity duration-300" style={talkHidden ? { opacity: 0, pointerEvents: 'none' } : undefined}>
           {/* a still that already shows them goes soft behind them (depth of field) */}
-          <div className="pointer-events-none absolute inset-0 transition-[backdrop-filter,background] duration-500" style={stillShowsAny(still, talkPeople) ? { backdropFilter: 'blur(6px) brightness(0.62)', WebkitBackdropFilter: 'blur(6px) brightness(0.62)' } : undefined} aria-hidden />
+          <div className="pointer-events-none absolute inset-0 transition-[backdrop-filter,background] duration-500" style={talkPeople.some((p) => !p.offstage && !p.self && p.look) || (selfTalkLook && chatOn) ? { backdropFilter: stillShowsAny(still, talkPeople) ? 'blur(6px) brightness(0.6)' : 'blur(3px) brightness(0.7)', WebkitBackdropFilter: stillShowsAny(still, talkPeople) ? 'blur(6px) brightness(0.6)' : 'blur(3px) brightness(0.7)' } : undefined} aria-hidden />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/60 via-black/25 to-transparent" aria-hidden />
           <TalkScene
             transparent
             noMute
+            listening={listening}
+            tapThrough
             hint={false}
-            people={talkPeople}
+            // the egg's held mic fills the low half: only the words stay (the row steps aside meanwhile)
+            people={step?.t === 'eggvoice' ? talkPeople.map((p) => (p.self ? p : { ...p, offstage: true })) : talkPeople}
             items={talkItems}
             dock={talkDock}
             keyboard={talkDock > 170}
@@ -1317,7 +1325,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           options={step.options.map((o) => o.label)}
           onPick={(k) => {
             addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
-            neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />
@@ -1331,7 +1338,6 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             if (words) remember(`${step.key}Words`, words);
             // the bubble shows what was said, as said (client 2026-11-22); the matched answer only picks the way on
             addLine({ id: `c${i}`, kind: 'me', text: words || step.options[k].label });
-            neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />

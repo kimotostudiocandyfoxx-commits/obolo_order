@@ -1,4 +1,5 @@
 import type { AtelierKind } from '@/lib/atelier/unlock';
+import type { RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
 import type { MadeSong } from '@/lib/mercury/compose';
 
 /**
@@ -24,12 +25,63 @@ export type Work = {
   poster?: string | null;
   source?: { title: string; source: string; pageUrl: string };
   note?: string;
-  ref?: { postId?: string; rootId?: string; songId?: string; backstageId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
+  ref?: { postId?: string; rootId?: string; /** the root's photo (an MV's still, M-R253 §3) */ mediaId?: string; songId?: string; backstageId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
   flown?: boolean;
   worn?: boolean;
   /** put into Bluena (the card's edge flashes once) */
   saved?: boolean;
+  /** M-R253 §1: the tries inside this work (the face's fields are the ones above); `active` = the face */
+  versions?: Version[];
+  active?: number;
+  /** the server's record of the work (planet kinds) */
+  atelierId?: string;
+  /** §3: the works used as its material (shown small on the card) */
+  materials?: WorkMaterial[];
+  /** §5: the talk it was made in */
+  origin?: WorkOrigin;
+  /** §4: the slow job it is waiting for (the card counts down) */
+  job?: { id: string; long: boolean };
+  /** §2: the part the try being made changes */
+  target?: RefineTarget;
 };
+
+/** one try of a work */
+export type Version = Pick<Work, 'prompt' | 'title' | 'text' | 'image' | 'candidates' | 'pick' | 'audio' | 'video' | 'poster' | 'source' | 'note' | 'ref'> & { target?: RefineTarget; at: string };
+
+const FACE_KEYS = ['prompt', 'title', 'text', 'image', 'candidates', 'pick', 'audio', 'video', 'poster', 'source', 'note', 'ref'] as const;
+
+/** the face's fields as a try */
+export function versionOf(w: Work, target?: RefineTarget): Version {
+  const v = { at: new Date().toISOString() } as Version;
+  for (const k of FACE_KEYS) if (w[k] !== undefined) (v as Record<string, unknown>)[k] = w[k];
+  if (target) v.target = target;
+  return v;
+}
+
+/** the tries of a work (a work made before M-R253 is its one try) */
+export const versionsOf = (w: Work): Version[] => w.versions ?? (w.status === 'ready' ? [versionOf(w)] : []);
+
+/** the work with try `i` as its face (the one looked at last) */
+export function faceTo(w: Work, i: number): Work {
+  const vs = versionsOf(w);
+  if (!vs.length) return w;
+  const k = Math.max(0, Math.min(vs.length - 1, i));
+  const out: Work = { ...w, versions: vs, active: k };
+  for (const key of FACE_KEYS) delete (out as Record<string, unknown>)[key];
+  return { ...out, ...vs[k], prompt: vs[k].prompt ?? w.prompt } as Work;
+}
+
+/** a finished try put on top of the work (it becomes the face); `base` = the work before the redo */
+export function stack(base: Work | undefined, made: Work, target?: RefineTarget): Work {
+  const before = base ? versionsOf(base) : [];
+  const vs = [...before, versionOf(made, target)].slice(-12);
+  return { ...made, id: base?.id ?? made.id, atelierId: base?.atelierId ?? made.atelierId, materials: base?.materials ?? made.materials, origin: base?.origin ?? made.origin, versions: vs, active: vs.length - 1, job: undefined, target: undefined };
+}
+
+/** a swipe left / right among the tries: the next index (kept in range) */
+export function swipeTo(i: number, dir: -1 | 1, n: number): number {
+  return Math.max(0, Math.min(n - 1, i + dir));
+}
 
 export type Msg = { id: string; who: 'me'; text: string } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[] } | { id: string; who: 'work'; work: Work };
 

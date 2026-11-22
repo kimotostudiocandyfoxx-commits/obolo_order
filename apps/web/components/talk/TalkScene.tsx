@@ -36,6 +36,8 @@ export type TalkPerson = {
   offstage?: boolean;
   /** the figure's size in the row (a small round character stands smaller); 1 = the row's height */
   scale?: number;
+  /** where their head is, down from the top of the row's height (0..1; default 0.16, the talk looks' headroom) */
+  headAt?: number;
 };
 
 export type TalkItem = {
@@ -153,6 +155,7 @@ export function TalkScene({
   dock,
   transparent = false,
   stageStyle,
+  tapThrough = false,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -210,6 +213,8 @@ export function TalkScene({
   transparent?: boolean;
   /** on the row of people (the story's vanish) */
   stageStyle?: React.CSSProperties;
+  /** a tap on a bubble is a tap on the screen (the story: it goes on; no replay, no opening) */
+  tapThrough?: boolean;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -547,6 +552,11 @@ export function TalkScene({
         return { id: it.id, at: new Date(Date.now() - (visible.length - k) * 60_000).toISOString(), color: t.line, title: talkPlain(it.text) || (it.voice ? '♪ 声' : (it.card?.label ?? '')), sub: it.name ?? byId.get(it.who)?.name };
       })
     : [];
+  // <html data-sidetalk>: you stand in the row here (NeoSpeaking's big figure from below stays away)
+  useEffect(() => {
+    document.documentElement.dataset.sidetalk = '1';
+    return () => void delete document.documentElement.dataset.sidetalk;
+  }, []);
   // typing: <html data-typing> (a review page's build stamp steps out of the input's way)
   useEffect(() => {
     if (!keyboard) return;
@@ -598,7 +608,9 @@ export function TalkScene({
     });
   });
   // with the keyboard up the bubbles sit over the canvas's top edge, clear of the two faces
-  const heads = chest ? stageTop - 6 : stageTop + stageH * 0.16 * (rows.length > 1 ? 0.5 : 1);
+  // the tallest in the row sets where the bubbles start (a small one alone lets them come down to its head)
+  const headAt = Math.min(...row.map((p) => p.headAt ?? 0.16), 0.9);
+  const heads = chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 ? 0.5 : 1);
   // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
   const room = Math.max(120, heads - (barH + top + 56) - 48);
   const bubbleBottom = h - heads + 8;
@@ -786,6 +798,7 @@ export function TalkScene({
               onPlay={() => (speech?.id === it.id ? finish() : say(it))}
               onReplay={() => !past && say(it)}
               onRing={onRing && it.mark ? (at) => onRing(it, at) : undefined}
+              passive={tapThrough}
               shown={live && outNow! < u.from + u.len ? Math.max(0, outNow! - u.from) : undefined}
               beat={live && beatNow && beatNow.k >= u.s0 && beatNow.k < u.s1 ? { shape: beatNow.beat?.shape, in: beatNow.beat?.in, key: beatNow.k } : { shape: u.beats[u.beats.length - 1]?.shape, key: -1 }}
             />
@@ -814,6 +827,7 @@ export function TalkScene({
                 onPlay={() => undefined}
                 onReplay={() => undefined}
                 beat={{ shape: u.beats[u.beats.length - 1]?.shape, key: -1 }}
+                passive={tapThrough}
               />
             </div>
           ))}
@@ -955,7 +969,10 @@ function Bubble({
   beat,
   out = false,
   right = false,
+  passive = false,
 }: {
+  /** taps go through it to the screen */
+  passive?: boolean;
   /** the speaker stands at the right (M-R249 first person, two partners): the bubble leans and points that way */
   right?: boolean;
   /** M-R249 first person: your words, the tail off the bottom right of the screen (toward you) */
@@ -1014,7 +1031,7 @@ function Bubble({
   );
   const pad = shape === 'burst' ? 'px-[42px] py-[30px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
   return (
-    <div className={`pointer-events-auto relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
+    <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
       {named && (
         <p className="mb-1 px-2 text-[10.5px] font-bold tracking-[0.12em] [text-shadow:0_1px_4px_#000]" style={{ color: tone.a }}>
           {item.name ?? who?.name}

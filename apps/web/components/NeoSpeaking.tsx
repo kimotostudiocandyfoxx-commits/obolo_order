@@ -12,7 +12,8 @@ export function NeoSpeaking() {
   const { me } = useAuth();
   const [on, setOn] = useState(false);
   useEffect(() => {
-    const f = (e: Event) => setOn(!!(e as CustomEvent<boolean>).detail);
+    // inside the side-by-side talk (会話の画面) you already stand in the row: no big figure from below
+    const f = (e: Event) => setOn(!!(e as CustomEvent<boolean>).detail && !document.documentElement.dataset.sidetalk);
     window.addEventListener('obolo:speaking', f);
     return () => window.removeEventListener('obolo:speaking', f);
   }, []);

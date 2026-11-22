@@ -398,6 +398,8 @@ export type SingBody = z.infer<typeof SingBody>;
  */
 export const FullSongBody = SingBody.omit({ melody: true, instrumentalUrl: true, slot: true }).extend({
   seconds: z.number().min(10).max(180),
+  /** M-R253 §4: asked in the Moon atelier (the push opens its card there) */
+  from: z.literal('atelier').optional(),
 });
 export type FullSongBody = z.infer<typeof FullSongBody>;
 

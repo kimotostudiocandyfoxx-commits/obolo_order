@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contentOf, detect } from './intent';
+import { contentOf, detect, isBare } from './intent';
 
 describe('atelier intent (M-R210)', () => {
   it('finds one kind by its words', () => {
@@ -37,5 +37,14 @@ describe('M-R236: asking {bati} for the works with a ★ / a mark', () => {
   it('without a ★ or a mark it is what it was', () => {
     expect(detect('絵を見せて', false).kind).toBe('make');
     expect(detect('星の歌を作って', false)).toMatchObject({ kind: 'make', what: 'song' });
+  });
+});
+
+describe('M-R253 §1: 「新しく作って」', () => {
+  it('names only the kind: {bati} asks what it should be (a new card)', () => {
+    const it2 = detect('新しく曲を作って', true);
+    expect(it2).toMatchObject({ kind: 'make', what: 'song' });
+    expect(isBare((it2 as { content: string }).content)).toBe(true);
+    expect(isBare('夏の海の歌')).toBe(false);
   });
 });

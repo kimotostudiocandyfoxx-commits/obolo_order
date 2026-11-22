@@ -8,6 +8,7 @@ import { SuspendedNotice } from '@/components/SuspendedNotice';
 import { NoManaNotice } from '@/components/NoManaNotice';
 import { NeoSpeaking } from '@/components/NeoSpeaking';
 import { ConsentGate } from '@/components/ConsentGate';
+import { JobToasts } from '@/components/JobToasts';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <NoManaNotice />
             <NeoSpeaking />
             <ConsentGate />
+            <JobToasts />
           </AuthProvider>
         </I18nProvider>
       </body>

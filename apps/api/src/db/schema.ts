@@ -8,7 +8,7 @@
  * planet tables carry created_at / updated_at / deleted_at (soft delete).
  */
 import { sql } from 'drizzle-orm';
-import type { AtelierLayout, BuddySource, PuniLook, TalkBeat, TalkFace, TalkMotion } from '@obolo/shared';
+import type { AtelierLayout, BuddySource, PuniLook, TalkBeat, TalkFace, TalkMotion, WorkMaterial, WorkOrigin, WorkVersion } from '@obolo/shared';
 import {
   bigint,
   boolean,
@@ -817,9 +817,17 @@ export const jobs = pgTable(
     attempts: integer('attempts').notNull().default(0),
     startedAt: timestamp('started_at', { withTimezone: true }),
     finishedAt: timestamp('finished_at', { withTimezone: true }),
+    /** M-R253 §4: when it should be done (estimated at the start of each try, moved on when it runs late) */
+    etaAt: timestamp('eta_at', { withTimezone: true }),
+    /** the estimate first given (ms) */
+    etaMs: integer('eta_ms'),
+    /** the time was moved on at least once ({bati} said 「ごめん、あと1分だけ」) */
+    late: integer('late').notNull().default(0),
+    /** the last failed try's code, kept while it is tried again */
+    lastErrorCode: text('last_error_code'),
     ...timestamps,
   },
-  (t) => [index('jobs_user_idx').on(t.userId, t.createdAt)],
+  (t) => [index('jobs_user_idx').on(t.userId, t.createdAt), index('jobs_kind_done_idx').on(t.kind, t.finishedAt)],
 );
 
 /**
@@ -892,4 +900,40 @@ export const itemMarks = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.kind, t.targetId] })],
+);
+
+/**
+ * M-R253 §1 / §3 / §5: one work made in the Moon atelier — its tries (versions, each kept where its kind is kept:
+ * the planets' stores), the face (the try looked at last), the works used as its material, and the talk it was made in.
+ * Bluena lists the face only.
+ */
+export const moonWorks = pgTable(
+  'moon_works',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(),
+    versionsJson: jsonb('versions_json').$type<WorkVersion[]>().notNull(),
+    active: integer('active').notNull().default(0),
+    originJson: jsonb('origin_json').$type<WorkOrigin>(),
+    materialsJson: jsonb('materials_json').$type<WorkMaterial[]>().notNull().default([]),
+    ...timestamps,
+  },
+  (t) => [index('moon_works_user_idx').on(t.userId, t.createdAt)],
+);
+
+/** M-R253 §5: a flown work that came home and was told about ({bati}'s report is said once) */
+export const workHomecomings = pgTable(
+  'work_homecomings',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    /** `${kind}:${id}` of the flown post */
+    key: text('key').notNull(),
+    toldAt: timestamp('told_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.key] })],
 );

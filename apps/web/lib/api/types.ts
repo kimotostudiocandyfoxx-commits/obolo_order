@@ -1,4 +1,4 @@
-import type { FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -137,6 +137,17 @@ export interface Api {
   /** background work (a song, an MV): poll until done */
   getJob(id: string): Promise<JobView>;
   activeJobs(): Promise<{ jobs: JobView[] }>;
+  /** M-R253 §4: a review stand-in job (no AI): it only takes its seconds */
+  demoJob(body: DemoJobBody): Promise<JobView>;
+  /** M-R253: the Moon atelier's works — tries inside one work, the face, material, where it was made */
+  moonWorks(ids?: string[]): Promise<MoonWorkView[]>;
+  createMoonWork(body: CreateMoonWorkBody): Promise<MoonWorkView>;
+  addMoonVersion(id: string, body: AddVersionBody): Promise<MoonWorkView & { dropped: WorkVersion[] }>;
+  setMoonFace(id: string, index: number): Promise<MoonWorkView>;
+  dropMoonVersion(id: string, index: number): Promise<MoonWorkView & { dropped: WorkVersion }>;
+  /** M-R253 §5: flown works back home (88 h), not told yet; and told */
+  homecomings(): Promise<HomecomingView[]>;
+  homecomingsTold(keys: string[]): Promise<void>;
   /** 手直し: a chat message about a sung song (or a retried command) → the partner's reply + the new mix. */
   composeSongEdit(id: string, body: SongEditBody): Promise<SongEditResult>;
   /** 保存する: keep this version of the song. */
@@ -278,7 +289,7 @@ export interface Api {
   /** the lyrics on the MV — a background job */
   mvLyrics(id: string): Promise<JobView>;
   /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) — a background job */
-  mvStory(id: string, mood: string): Promise<JobView>;
+  mvStory(id: string, mood: string, from?: 'atelier'): Promise<JobView>;
   /** `egg`: the egg chosen on the altar (M-R215: 'moon' = 女の子寄り, 'sun' = 男の子寄り); the personality is decided from the food (M-R217) — SEED_REASK: OBOLON asks again */
   batiEgg(food: string, egg?: BatiEggKind): Promise<Me>;
   /** M-R218: the grown egg hatched in the Moon temple from its seed (the 2nd: a sound, the 3rd: a word); EGG_NOT_READY / BATI_FULL / SEED_REASK */

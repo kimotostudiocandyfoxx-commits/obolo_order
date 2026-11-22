@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Optional } from '@nestjs/common';
 import {
   ITEM_MARKS,
   isCharacterThread,
@@ -21,6 +21,7 @@ import { and, desc, eq, isNotNull, isNull, sql, type SQL } from 'drizzle-orm';
 import { Database } from '../db/db';
 import { buddyMessages, itemMarks, jupiterRoots, marsBackstage, radioShows, saturnPosts, songs, users } from '../db/schema';
 import { DachiVoiceService } from '../dachi/dachi-voice.service';
+import { MoonWorksService } from '../moon/moon-works.service';
 
 type Mark = { stars: number; mark: ItemMarkId | null };
 const LIMIT = 300;
@@ -37,6 +38,7 @@ export class FindsService {
   constructor(
     private readonly db: Database,
     private readonly dachi: DachiVoiceService,
+    @Optional() private readonly moon?: MoonWorksService,
   ) {}
 
   async marks(userId: string): Promise<ItemMarksView> {
@@ -137,10 +139,16 @@ export class FindsService {
           .then((rows) => rows.map((r) => this.w('radio_show', r.id, 'venus', r.title, r.createdAt, { audio: r.audioUrl, image: r.thumbUrl, flown: r.status === 'public' }))),
       );
     // グッズ・物語・ゲーム: nothing is made there yet
-    const [lists, marks] = await Promise.all([Promise.all(jobs), this.markMap(userId)]);
+    const empty = { hidden: new Set<string>(), faces: new Map() } as Awaited<ReturnType<MoonWorksService['index']>>;
+    const [lists, marks, moon] = await Promise.all([Promise.all(jobs), this.markMap(userId), this.moon?.index(userId).catch(() => empty) ?? empty]);
     return lists
       .flat()
-      .map((w) => ({ ...w, ...(marks.get(`${w.kind}:${w.id}`) ?? {}) }))
+      // M-R253 §1: one work in Bluena — its other tries are inside it, not listed on their own
+      .filter((w) => !moon.hidden.has(`${w.kind}:${w.id}`))
+      .map((w) => {
+        const m = moon.faces.get(`${w.kind}:${w.id}`);
+        return { ...w, ...(marks.get(`${w.kind}:${w.id}`) ?? {}), ...(m ? { atelierId: m.id, versionCount: m.versions.length, origin: m.origin } : {}) };
+      })
       .filter((w) => matchesFind(w, f))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }

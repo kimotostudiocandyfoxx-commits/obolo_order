@@ -1,4 +1,14 @@
 import {
+  addVersion as addMoonVersionTo,
+  dropVersion as dropMoonVersionOf,
+  hiddenRefs,
+  lateEta,
+  reactionsFor,
+  setFace as setMoonFaceOf,
+  type DemoJobBody,
+  type JobView,
+  type HomecomingView,
+  type MoonWorkView,
   KIMORIN_WAIT_LINES,
   ruleBeats,
   MIKIE_WELCOME,
@@ -169,6 +179,12 @@ interface DemoState {
   itemMarks?: Record<string, Record<string, { stars: number; mark: ItemMarkView['mark'] }>>;
   markNames?: Record<string, MarkNames>;
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
+  /** M-R253 §4: the review's stand-in jobs (they only take their time; `lateBy` s more than said, the first `failTimes` fail) */
+  djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean }>;
+  /** M-R253: the Moon atelier's works (tries inside one work) */
+  moonWorks?: (MoonWorkView & { owner: string })[];
+  /** M-R253 §5: homecomings told (`owner|key`) */
+  homeTold?: string[];
 }
 
 /** Venus radio samples: the gorilla trio's shows on the demo Venus (their own pictures, no new art). */
@@ -319,7 +335,17 @@ export class DemoApi implements Api {
     if (want('mars')) for (const v of await this.marsBackstage()) out.push(w({ kind: 'mars_backstage', id: v.id, planet: 'mars', title: v.title, video: v.url, image: v.posterUrl, createdAt: v.createdAt }));
     if (want('venus')) for (const r of await this.myRadioShows()) out.push(w({ kind: 'radio_show', id: r.id, planet: 'venus', title: r.title, audio: r.audioUrl, image: r.thumbUrl, createdAt: r.createdAt, flown: r.status === 'public' }));
     const q = f.q?.trim().toLowerCase();
-    return out.filter((x) => matchesFind(x, f) && (!q || x.title.toLowerCase().includes(q))).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    // M-R253 §1: a work's other tries are inside it, not listed
+    const moon = await this.moonWorks();
+    const hidden = hiddenRefs(moon);
+    const face = new Map(moon.flatMap((w) => (w.versions[w.active]?.ref ? [[`${w.versions[w.active].ref!.kind}:${w.versions[w.active].ref!.id}`, w] as const] : [])));
+    return out
+      .filter((x) => !hidden.has(`${x.kind}:${x.id}`) && matchesFind(x, f) && (!q || x.title.toLowerCase().includes(q)))
+      .map((x) => {
+        const m = face.get(`${x.kind}:${x.id}`);
+        return m ? { ...x, atelierId: m.id, versionCount: m.versions.length, origin: m.origin } : x;
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
   async findTalkDays(f: Parameters<Api['findTalkDays']>[0]) {
     const me = this.uid();
@@ -630,12 +656,102 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
-  async getJob(): Promise<never> {
-    throw new ApiError(501, 'DEMO', 'demo');
+  async getJob(id: string): Promise<JobView> {
+    const j = this.s.djobs?.[id];
+    if (!j || j.owner !== this.uid()) throw new ApiError(404, 'NOT_FOUND', 'Job not found');
+    const now = Date.now();
+    const view = (status: JobView['status']): JobView => ({ id, kind: 'demo', status, stage: j.retrying ? 'retrying' : 'waiting', result: status === 'done' ? { demo: { seconds: j.seconds } } : null, errorCode: null, error: null, createdAt: j.createdAt, etaAt: new Date(j.eta).toISOString(), startedAt: new Date(j.start).toISOString(), attempts: j.attempts, late: j.late, retrying: j.retrying });
+    if (j.done) return view('done');
+    if (now - j.start < (j.seconds + j.lateBy) * 1000) {
+      const l = lateEta(j.eta, now);
+      if (l.late) Object.assign(j, { eta: l.etaAt, late: true });
+      this.save();
+      return view('running');
+    }
+    if (j.attempts <= j.failTimes) {
+      // a try failed: made again with a new time (no error words)
+      Object.assign(j, { attempts: j.attempts + 1, start: now, eta: now + j.seconds * 1000, retrying: true, lateBy: 0 });
+      this.save();
+      return view('running');
+    }
+    j.done = true;
+    this.save();
+    return view('done');
   }
 
   async activeJobs() {
-    return { jobs: [] };
+    const me = this.uid();
+    const all = await Promise.all(Object.entries(this.s.djobs ?? {}).filter(([, j]) => j.owner === me && !j.done).map(([id]) => this.getJob(id)));
+    return { jobs: all.filter((j) => j.status === 'queued' || j.status === 'running') };
+  }
+
+  // M-R253 §4: a stand-in job — it only waits (the review page's 20 s and 2-minute ones)
+  async demoJob(body: DemoJobBody & { lateBy?: number }): Promise<JobView> {
+    const id = uid();
+    const now = Date.now();
+    this.s.djobs = { ...(this.s.djobs ?? {}), [id]: { owner: this.uid(), seconds: body.seconds, lateBy: body.lateBy ?? 0, failTimes: body.failTimes ?? 0, start: now, attempts: 1, eta: now + body.seconds * 1000, late: false, retrying: false, createdAt: new Date(now).toISOString() } };
+    this.save();
+    return this.getJob(id);
+  }
+
+  async moonWorks(ids?: string[]) {
+    const me = this.uid();
+    return (this.s.moonWorks ?? []).filter((w) => w.owner === me && (!ids?.length || ids.includes(w.id))).map(({ owner: _o, ...w }) => w);
+  }
+  async createMoonWork(body: Parameters<Api['createMoonWork']>[0]) {
+    const at = new Date().toISOString();
+    const w: MoonWorkView & { owner: string } = { id: uid(), owner: this.uid(), kind: body.kind, versions: [body.version], active: 0, origin: body.origin ?? null, materials: body.materials ?? [], createdAt: at, updatedAt: at };
+    this.s.moonWorks = [w, ...(this.s.moonWorks ?? [])].slice(0, 300);
+    this.save();
+    const { owner: _o, ...out } = w;
+    return out;
+  }
+  private moonWork(id: string) {
+    const w = (this.s.moonWorks ?? []).find((x) => x.id === id && x.owner === this.uid());
+    if (!w) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return w;
+  }
+  async addMoonVersion(id: string, body: Parameters<Api['addMoonVersion']>[1]) {
+    const w = this.moonWork(id);
+    const r = addMoonVersionTo(w.versions, body.version);
+    Object.assign(w, { versions: r.versions, active: r.active, updatedAt: new Date().toISOString() });
+    this.save();
+    const { owner: _o, ...out } = w;
+    return { ...out, dropped: r.dropped };
+  }
+  async setMoonFace(id: string, index: number) {
+    const w = this.moonWork(id);
+    w.active = setMoonFaceOf(w.versions, index);
+    this.save();
+    const { owner: _o, ...out } = w;
+    return out;
+  }
+  async dropMoonVersion(id: string, index: number) {
+    const w = this.moonWork(id);
+    const r = dropMoonVersionOf(w.versions, w.active, index);
+    if (!r) throw new ApiError(400, 'LAST_VERSION', 'last');
+    Object.assign(w, { versions: r.versions, active: r.active });
+    this.save();
+    const { owner: _o, ...out } = w;
+    return { ...out, dropped: r.dropped };
+  }
+  /** M-R253 §5 in the review: one stand-in homecoming (from day 6) with stand-in reactions, through the same age rule */
+  async homecomings(): Promise<HomecomingView[]> {
+    const me = this.uid();
+    const u = this.s.users[me];
+    if (!u || (u.journeyDay ?? 0) < 6 || (this.s.homeTold ?? []).includes(`${me}|demo-home-1`)) return [];
+    const rs = [
+      { name: 'ミキエ', dachi: true, stars: 1 },
+      { name: '知らない人', dachi: false, stars: 1 },
+      { name: '知らない人', dachi: false, stars: 1 },
+      { name: '知らない人', dachi: false, stars: 1 },
+    ];
+    return [{ key: 'demo-home-1', planet: 'saturn', title: 'はじめてのコロリン', image: null, homeAt: new Date().toISOString(), ...reactionsFor(u.birthYear, rs), workId: null }];
+  }
+  async homecomingsTold(keys: string[]) {
+    const me = this.uid();
+    this.s.homeTold = [...new Set([...(this.s.homeTold ?? []), ...keys.map((k) => `${me}|${k}`)])];
+    this.save();
   }
 
   async composeSing(): Promise<SongView> {

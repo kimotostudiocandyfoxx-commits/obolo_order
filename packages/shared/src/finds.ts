@@ -70,6 +70,11 @@ export interface FoundWork {
   flown?: boolean;
   stars: number;
   mark: ItemMarkId | null;
+  /** M-R253: the Moon atelier's work this is the face of (its other tries are inside it, not listed) */
+  atelierId?: string;
+  versionCount?: number;
+  /** M-R253 §5: the talk it was made in (a tap jumps there) */
+  origin?: { thread: string; talkId?: string; msgId?: string; day?: string; at: string } | null;
 }
 
 /** the filter strip and the search box (★ = any number of stars) */

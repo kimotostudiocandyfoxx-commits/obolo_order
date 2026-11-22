@@ -1,5 +1,7 @@
 import { Body, Controller, ForbiddenException, Get, HttpCode, Inject, NotFoundException, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
+import { DemoJobBody } from '@obolo/shared';
+import { parseBody } from '../common/validate';
 import { OAuth2Client } from 'google-auth-library';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { AppConfig, CONFIG } from '../config';
@@ -16,6 +18,16 @@ export class JobsController {
   @Get()
   async active(@UserId() userId: string) {
     return { jobs: await this.jobs.active(userId) };
+  }
+
+  /**
+   * M-R253 §4: a stand-in job for review (no AI, no mana): it only waits `seconds` (a 20 s and a 2-minute one show the
+   * two ways — wait in place / 「〇分後に戻ってきてね」); `failTimes` first tries fail to show the automatic re-try.
+   */
+  @Post('demo')
+  @HttpCode(202)
+  demo(@UserId() userId: string, @Body() body: unknown) {
+    return this.jobs.create(userId, 'demo', parseBody(DemoJobBody, body));
   }
 
   @Get(':id')

@@ -65,7 +65,7 @@ async function load(kind: AtelierKind, meId: string | undefined, live: boolean, 
  * looks and {bati} (BatiShelf and the device's own folders). Every work can be played, flown to its planet, or thrown
  * away here. The gear at the top right names the marks.
  */
-export function BluenaDrawer({ kinds, day, ctx, onClose }: { kinds: AtelierKind[]; day?: number | null; ctx: Ctx; onClose: () => void }) {
+export function BluenaDrawer({ kinds, day, ctx, onClose, onOrigin, onMaterial }: { kinds: AtelierKind[]; day?: number | null; ctx: Ctx; onClose: () => void; /** M-R253 §5: a work tapped → the talk it was made in (false: not known) */ onOrigin?: (w: Work) => boolean; /** M-R253 §3: a work dragged into the chat */ onMaterial?: (w: Work) => void }) {
   const { me } = useAuth();
   const partner = usePartner();
   const [view, setView] = useState<'orbit' | 'moon' | { planet: BluenaPlanet | null }>('orbit');
@@ -106,15 +106,15 @@ export function BluenaDrawer({ kinds, day, ctx, onClose }: { kinds: AtelierKind[
           <BluenaOrbit day={day} face={me?.avatarUrl ?? me?.lookIcon} bati={partner.isBati ? partner.face : null} onPlanet={(p) => setView({ planet: p })} onAll={() => setView({ planet: null })} onMoon={() => setView('moon')} />
         </div>
       )}
-      {view === 'moon' && <MoonShelf kinds={kinds.filter((k) => !KIND_PLANET[k])} ctx={ctx} />}
-      {typeof view === 'object' && <PlanetWorks planet={view.planet} day={day} ctx={ctx} />}
+      {view === 'moon' && <MoonShelf kinds={kinds.filter((k) => !KIND_PLANET[k])} ctx={ctx} onOrigin={onOrigin} />}
+      {typeof view === 'object' && <PlanetWorks planet={view.planet} day={day} ctx={ctx} onOrigin={onOrigin} onMaterial={onMaterial} />}
       {names && <MarkNamesSheet onClose={() => setNames(false)} />}
     </Drawer>
   );
 }
 
 /** the Moon: your looks, {bati}'s cards and dress-ups, lookups and pictures (kept on this device) */
-function MoonShelf({ kinds, ctx }: { kinds: AtelierKind[]; ctx: Ctx }) {
+function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx: Ctx; onOrigin?: (w: Work) => boolean }) {
   const { me } = useAuth();
   const [kind, setKind] = useState<AtelierKind | null>(kinds[0] ?? null);
   const [items, setItems] = useState<Work[] | null>(null);
@@ -141,7 +141,7 @@ function MoonShelf({ kinds, ctx }: { kinds: AtelierKind[]; ctx: Ctx }) {
         {items === null && <p className="py-8 text-center text-xs text-white/45">…</p>}
         {items?.length === 0 && <p className="py-8 text-center text-xs text-white/45">まだ、なにもない</p>}
         {items?.map((it) => (
-          <Item key={it.id} w={it} onRing={(at) => ring.open('local', it.id, at)} onDiscard={it.id === 'profile' ? undefined : () => confirm('ブルーナから捨てる？') && void discard(it).then(() => setN((x) => x + 1))} />
+          <Item key={it.id} w={it} onOrigin={onOrigin && it.origin ? () => onOrigin(it) : undefined} onRing={(at) => ring.open('local', it.id, at)} onDiscard={it.id === 'profile' ? undefined : () => confirm('ブルーナから捨てる？') && void discard(it).then(() => setN((x) => x + 1))} />
         ))}
       </div>
       {ring.node}
@@ -150,7 +150,7 @@ function MoonShelf({ kinds, ctx }: { kinds: AtelierKind[]; ctx: Ctx }) {
 }
 
 /** one planet's works (or all of them): the spiral and the list (M-R237) */
-function PlanetWorks({ planet, day, ctx }: { planet: BluenaPlanet | null; day?: number | null; ctx: Ctx }) {
+function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet: BluenaPlanet | null; day?: number | null; ctx: Ctx; onOrigin?: (w: Work) => boolean; onMaterial?: (w: Work) => void }) {
   const [filter, setFilter] = useState<FindFilter>({});
   const [found, setFound] = useState<Found[] | null>(null);
   const [open, setOpen] = useState<Found | null>(null);
@@ -189,7 +189,7 @@ function PlanetWorks({ planet, day, ctx }: { planet: BluenaPlanet | null; day?: 
       setLine('うまくいかなかった…');
     }
   };
-  const w = open?.work;
+  const w = open ? { ...open.work, origin: open.work.origin ?? open.origin ?? undefined, atelierId: open.work.atelierId ?? open.atelierId } : undefined;
   return (
     <>
       {line && <p className="pb-1 text-center text-[11px] text-sky-100/70">{line}</p>}
@@ -209,6 +209,9 @@ function PlanetWorks({ planet, day, ctx }: { planet: BluenaPlanet | null; day?: 
             w={w}
             onRing={(at) => ring.open(open.kind, open.id, at)}
             markRef={{ kind: open.kind, id: open.id }}
+            tries={open.versionCount ?? w.versions?.length}
+            onOrigin={onOrigin && w.origin ? () => onOrigin(w) : undefined}
+            onDragOut={onMaterial ? () => onMaterial(w) : undefined}
             onFly={FLIES[w.kind] && !w.flown && (w.kind !== 'song' || ctx.live || !!w.ref?.demoSong) ? () => void act(() => fly(w, ctx), '星へ飛ばした') : undefined}
             onDiscard={w.kind === 'song' && ctx.live ? undefined : () => confirm('ブルーナから捨てる？') && void act(() => discard(w), '捨てた')}
           />
@@ -224,19 +227,52 @@ function PlanetWorks({ planet, day, ctx }: { planet: BluenaPlanet | null; day?: 
   );
 }
 
-function Item({ w, onFly, onDiscard, onRing, markRef }: { w: Work; onFly?: () => void; onDiscard?: () => void; onRing?: (at: { x: number; y: number }) => void; markRef?: { kind: MarkedKind; id: string } }) {
+function Item({ w, onFly, onDiscard, onRing, markRef, tries, onOrigin, onDragOut }: { w: Work; onFly?: () => void; onDiscard?: () => void; onRing?: (at: { x: number; y: number }) => void; markRef?: { kind: MarkedKind; id: string }; /** M-R253 §1: tries inside the work */ tries?: number; /** §5: to the talk it was made in */ onOrigin?: () => void; /** §3: dragged out of Bluena (into the chat) */ onDragOut?: () => void }) {
   const ref = markRef ?? workMarkRef(w);
   const [on, toggle] = usePlay(w);
   const planet = FLIES[w.kind];
+  // §3: drag the picture out of the drawer (to the left, into the chat) → material
+  const [ghost, setGhost] = useState<{ x: number; y: number } | null>(null);
+  const start = useRef<{ x: number; y: number; edge: number } | null>(null);
+  const pic = w.image ?? w.poster ?? null;
   return (
     <div className="flex items-center gap-2 rounded-2xl bg-white/[0.06] p-2">
-      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-black/30 text-amber-100/70">
+      <div
+        className={`h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-black/30 text-amber-100/70 ${onDragOut ? 'cursor-grab touch-none' : ''}`}
+        data-testid={onDragOut ? 'drag-material' : undefined}
+        onPointerDown={(e) => {
+          if (!onDragOut) return;
+          (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+          const aside = (e.currentTarget as HTMLElement).closest('aside');
+          start.current = { x: e.clientX, y: e.clientY, edge: aside?.getBoundingClientRect().left ?? 0 };
+        }}
+        onPointerMove={(e) => {
+          if (!start.current) return;
+          if (Math.hypot(e.clientX - start.current.x, e.clientY - start.current.y) > 8) setGhost({ x: e.clientX, y: e.clientY });
+        }}
+        onPointerUp={(e) => {
+          const s0 = start.current;
+          start.current = null;
+          setGhost(null);
+          if (s0 && onDragOut && e.clientX < s0.edge) onDragOut();
+        }}
+        onPointerCancel={() => ((start.current = null), setGhost(null))}
+      >
         {w.image ? <Img src={w.image} className="h-full w-full object-cover" /> : w.poster ? <Img src={w.poster} className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center"><KindMark kind={w.kind} /></span>}
       </div>
-      <div className="min-w-0 flex-1">
+      {ghost && (
+        <span className="pointer-events-none fixed z-[80] block h-14 w-14 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border-2 border-sky-200 bg-[#121a3a] opacity-90 shadow-[0_0_20px_rgba(140,220,255,.7)]" style={{ left: ghost.x, top: ghost.y }}>
+          {pic ? <Img src={pic} className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-amber-100"><KindMark kind={w.kind} /></span>}
+        </span>
+      )}
+      <button className="min-w-0 flex-1 text-left" onClick={onOrigin} disabled={!onOrigin} aria-label={onOrigin ? '作った時の会話へ' : undefined}>
         <p className="line-clamp-2 text-[12px] leading-snug">{w.title || w.text || w.prompt}</p>
-        {w.flown && planet && <PlanetMark id={planet} size={12} />}
-      </div>
+        <span className="flex items-center gap-1.5">
+          {w.flown && planet && <PlanetMark id={planet} size={12} />}
+          {!!tries && tries > 1 && <span className="text-[10px] text-sky-100/60">試し {tries}</span>}
+          {onOrigin && <span className="text-[10px] text-amber-100/60 underline">作った時の会話</span>}
+        </span>
+      </button>
       <StarButton kind={ref.kind} id={ref.id} onRing={onRing} />
       {(w.audio || w.ref?.demoSong) && (
         <button onClick={() => void toggle()} aria-label={on ? '止める' : '再生'} className="h-8 w-8 shrink-0 rounded-full bg-white/15 text-xs">

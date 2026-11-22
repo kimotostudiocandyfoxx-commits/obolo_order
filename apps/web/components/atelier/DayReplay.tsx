@@ -1,7 +1,7 @@
 'use client';
 
 import { TALK_FIXED_FACE_KEY } from '@obolo/shared';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useAuth } from '@/lib/auth';
@@ -18,11 +18,14 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  * M-R237 §3: one day of your talk with {bati}, opened from the past talks' list — the same side-by-side talk, read only
  * (no message bar). ★ and marks can still be put on its lines.
  */
-export function BatiDay({ day, onBack }: { day: string; onBack: () => void }) {
+export function BatiDay({ day, at, onBack }: { day: string; /** M-R253 §5: opened at this message (a work from Bluena): the talk up to it, then 〔つづき〕 */ at?: string; onBack: () => void }) {
   const { me } = useAuth();
   const partner = usePartner();
   const ring = useMarkRing();
-  const msgs = useMemo(() => batiDayMsgs(talks(), day), [day]);
+  const all = useMemo(() => batiDayMsgs(talks(), day), [day]);
+  const [whole, setWhole] = useState(!at);
+  const cut = at ? all.findIndex((m) => m.id === at || (m.who === 'work' && `m-${m.work.id}` === at)) : -1;
+  const msgs = whole || cut < 0 ? all : all.slice(0, cut + 1);
   const people: TalkPerson[] = [
     { id: 'bati', name: partner.name, look: partner.isBati ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
     { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
@@ -49,6 +52,11 @@ export function BatiDay({ day, onBack }: { day: string; onBack: () => void }) {
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
       />
+      {!whole && cut >= 0 && cut < all.length - 1 && (
+        <button onClick={() => setWhole(true)} className="absolute left-1/2 top-12 z-20 -translate-x-1/2 rounded-full border border-amber-200/40 bg-black/55 px-4 py-1.5 text-xs tracking-[0.2em] text-amber-100 backdrop-blur">
+          つづき
+        </button>
+      )}
       {ring.node}
     </div>
   );
