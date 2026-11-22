@@ -509,6 +509,11 @@
         "design/story/out/talk-user-surprised-pose-1.jpg"
       ],
       "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow. No text, no watermark."
+    },
+    {
+      "id": "talk-guest-base",
+      "size": "portrait",
+      "prompt": "A mysterious guest of a secret society, full body standing figure: a person completely wrapped in a long deep-black hooded cloak, the face hidden in the shadow of the hood, only two small softly glowing pale blue eyes visible inside the darkness of the hood, slender human proportions, standing relaxed, body turned slightly toward the left side of the picture, cloak hem touching the ground, subtle dark navy rim light on the cloak edges, soft Japanese anime illustration style. Background: one flat solid chroma-key green (#00B140) filling the whole image, no shadow, no floor, no other objects. Full body centered with margin. No text, no watermark."
     }
   ],
   "run": 1
