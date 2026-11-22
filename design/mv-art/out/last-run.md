@@ -1,44 +1,22 @@
-# UI art — 2026-11-22T13:23:08.393Z
+# UI art — 2026-11-22T13:36:40.615Z
 
-Seedream 5.0 Pro / 40枚 / 約578円
+Seedream 5.0 Pro / 18枚 / 約260円
 
-- ✅ jun-01-vista
-- ✅ jun-02-letter-altar
-- ✅ jun-03-torn-scroll
-- ✅ jun-04-scroll-pile
-- ✅ jun-05-palm
-- ✅ jun-06-blessing
-- ✅ jun-07-angel-tears
-- ✅ jun-08-angel-bow
-- ✅ jun-09-three-generations
-- ✅ jun-10-colossal
-- ✅ jun-11-angel-march
-- ✅ jun-12-angel-trophy
-- ✅ jun-13-angel-oath
-- ✅ jun-14-together
-- ✅ jun-15-temple-finale
-- ✅ jun-16-end-sky
-- ✅ jun-20-dome-interior
-- ✅ jun-cu-01-smile
-- ✅ jun-cu-02-serene
-- ✅ jun-cu-03-hand-heart
-- ✅ jun-cu-04-trophy
-- ✅ jun-cu-05-angel-tear
-- ✅ kou-03-ledger
-- ✅ kou-04-coins
-- ✅ kou-05-throne
-- ✅ kou-05-throne-plate
-- ✅ kou-06-blessing
-- ✅ kou-06-blessing-plate
-- ✅ kou-10-colossal
-- ✅ kou-14-together
-- ✅ kou-cu-01-smile
-- ✅ kou-cu-02-serene
-- ✅ tak-03-calendar
-- ✅ tak-04-letters
-- ✅ tak-05-throne
-- ✅ tak-06-blessing
-- ✅ tak-10-colossal
-- ✅ tak-14-together
-- ✅ tak-cu-01-smile
-- ✅ tak-cu-02-serene
+- ✅ jun-04-scroll-pile-plate
+- ✅ jun-05-palm-plate
+- ✅ jun-06-blessing-plate
+- ✅ jun-07-angel-tears-plate
+- ✅ jun-08-angel-bow-plate
+- ✅ jun-09-three-generations-plate
+- ✅ jun-10-colossal-plate
+- ✅ jun-11-angel-march-plate
+- ✅ jun-12-angel-trophy-plate
+- ✅ jun-13-angel-oath-plate
+- ✅ jun-14-together-plate
+- ✅ jun-15-temple-finale-plate
+- ✅ kou-10-colossal-plate
+- ✅ kou-14-together-plate
+- ✅ tak-05-throne-plate
+- ✅ tak-06-blessing-plate
+- ✅ tak-10-colossal-plate
+- ✅ tak-14-together-plate
