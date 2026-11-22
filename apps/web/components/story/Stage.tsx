@@ -31,6 +31,8 @@ export interface CharSpec {
   bustMax?: number;
   /** pictures for expressions: name → file (onboarding/<file>.webp) */
   faces?: Record<string, string>;
+  /** the expression shown when none is set (a cast with no plain standing picture: kaiser1 has only its -x- poses) */
+  rest?: string;
 }
 
 /** the expression / pose pictures made so far (onboarding/<char>-x-<expr>.webp, lib/story/expression.ts) */
@@ -74,7 +76,7 @@ const CHAR: Record<string, CharSpec> = {
   'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a', faces: madeFaces('takoyaki-sister-x', FRIEND) },
   'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a', faces: madeFaces('daikon-kaiser-x', FRIEND) },
   // the Kaiser grows each journey (client 2026-10-26): 1 the stern daikon on its roots (design/story/refs/cast/kaiser-journey1*)
-  kaiser1: { bottom: 6, height: 72, face: 0.35, tint: '#7aa84a', faces: madeFaces('kaiser1-x', FRIEND) },
+  kaiser1: { bottom: 6, height: 72, face: 0.35, tint: '#7aa84a', faces: madeFaces('kaiser1-x', FRIEND), rest: 'talk' },
   freezy: { bottom: 8, height: 50, face: 0.2, tint: '#5aa8d8', faces: madeFaces('freezy-x', FRIEND) },
   hipokin: { bottom: 8, height: 70, face: 0.2, tint: '#c8504a', faces: madeFaces('hipokin-x', FRIEND) },
   'unchi-pinpon': { bottom: 10, height: 26, face: 0.4, tint: '#c89a5a', bustMax: 1.4, faces: madeFaces('unchi-pinpon-x', FRIEND) },
@@ -218,12 +220,14 @@ export function Cast({
         if (!name) return null;
         const url = src(name);
         if (!url) return null;
+        const expr = expressions[name] ?? charSpec(name).rest;
+        const face = expr ? charSpec(name).faces?.[expr] : undefined;
         return (
           <Character
             key={name}
             name={name}
-            url={expressions[name] && charSpec(name).faces?.[expressions[name]] ? `/onboarding/${charSpec(name).faces![expressions[name]]}.webp` : url}
-            posed={!!(expressions[name] && charSpec(name).faces?.[expressions[name]])}
+            url={face ? `/onboarding/${face}.webp` : url}
+            posed={!!face}
             lit={!speaking || speaking === name}
             bust={bust && speaking === name}
             hidden={bust && speaking !== name}

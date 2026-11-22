@@ -2,7 +2,7 @@
 
 import type { Me, NeoLookCandidate } from "@obolo/shared";
 import { useEffect, useRef, useState } from "react";
-import { ApiError, getApi } from "@/lib/api";
+import { ApiError, getApi, type Api } from "@/lib/api";
 import { VoiceField } from "@/components/onboarding/StoryExtras";
 
 /**
@@ -22,6 +22,9 @@ const LINES = {
   limit: "今日の魔法は、ここまで。また明日、つづきをしよう",
 } as const;
 
+/** what BatiLook calls */
+export type BatiLookApi = Pick<Api, "me" | "batiRestyle" | "batiLookBack" | "chooseBatiRestyle">;
+
 export function BatiLook({
   bati,
   ask,
@@ -31,6 +34,7 @@ export function BatiLook({
   onClose,
   onMe,
   auto = true,
+  api: given,
 }: {
   bati: string;
   /** {bati}'s question once a card is tapped (the script's 「これで、決まり？」) */
@@ -44,8 +48,10 @@ export function BatiLook({
   onMe?: (me: Me) => void;
   /** the four touches come at once (the story); off: they come with the first wish or 〔いろんなタッチ〕 */
   auto?: boolean;
+  /** the calls behind it (the review page passes stand-ins: no account there); default the app's API */
+  api?: BatiLookApi;
 }) {
-  const api = getApi();
+  const api = given ?? getApi();
   const [now, setNow] = useState<string | null>(null);
   const [cards, setCards] = useState<Card[]>([]);
   // what was tapped, in order (〔前に戻す〕 goes back through it)

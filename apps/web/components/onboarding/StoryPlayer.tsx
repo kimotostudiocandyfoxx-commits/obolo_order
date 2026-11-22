@@ -4,7 +4,7 @@ import { L2Step } from '@/components/lap2/L2Step';
 import { BatiChat } from './BatiChat';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
-import { BatiLook } from '@/components/bati/BatiLook';
+import { BatiLook, type BatiLookApi } from '@/components/bati/BatiLook';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, STILL_MOUTH, stillMouthUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
@@ -132,6 +132,8 @@ interface Props {
   replayFilms?: boolean;
   /** the review page (not real=1): the atelier steps make stand-in works in this browser (makers.ts makeTest) */
   atelierTest?: boolean;
+  /** the review page: stand-ins for {bati}'s look (D03-S008) — no account there */
+  batiLookApi?: BatiLookApi;
 }
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -197,7 +199,7 @@ const STILL_LOOK: Record<string, string> = {
   's/d2-moon-kimorin-half': 'kimorin-iu',
 };
 
-export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false, atelierTest = false }: Props) {
+export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, lookApi, onEgg, onHatch, onBatiName, orderApi, ordered, onNeoName, lessonApi, seals, stamps, onClock, timeUp, onTimeUp, onPause, onEnd, onScene, textOnly = false, autoStart = false, showGate = false, replayFilms = false, atelierTest = false, batiLookApi }: Props) {
   const seenFilm = (id: string) => !replayFilms && filmWatched(id);
   const videoA = useRef<HTMLVideoElement>(null);
   const videoB = useRef<HTMLVideoElement>(null);
@@ -1550,6 +1552,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <div className="mx-auto max-w-md">
             <BatiLook
               key={i}
+              api={batiLookApi}
               bati={v.bati || 'バティ'}
               ask={sayText(step.ask.who, step.ask.text, v)}
               ok={step.ok}

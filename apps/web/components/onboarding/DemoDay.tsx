@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { setDemoMode } from '@/lib/onboarding/demoMode';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { knownSealsOn, solvedSealsOn, stampsOn } from '@/components/onboarding/StoryExtras';
 import { demoBati, demoStickerArt, demoFromReference, demoNeoLooks, demoRefine } from '@/lib/look';
-import { getApi } from '@/lib/api';
+import { ApiError, getApi } from '@/lib/api';
+import { BATI_RESTYLE_TOUCHES, type Me } from '@obolo/shared';
+import type { BatiLookApi } from '@/components/bati/BatiLook';
 import { useAuth } from '@/lib/auth';
 import { realLessonApi, type LessonApi } from '@/lib/onboarding/lessonApi';
 import type { Made } from '@/lib/onboarding/made';
@@ -155,6 +157,13 @@ export function DemoDay({
   const [cands, setCands] = useState<{ id: string; url: string }[]>([]);
   const [ordered, setOrdered] = useState(false);
   const [batiFood, setBatiFood] = useState('ラーメン');
+  // the review page's stand-ins for {bati}'s look, kept for the run (the cards drawn are looked up when one is chosen)
+  const wornNow = vars.batiImage ?? demoBati(batiFood);
+  const wornBati = useRef(wornNow);
+  useEffect(() => {
+    wornBati.current = wornNow;
+  }, [wornNow]);
+  const [batiLookStub] = useState(() => reviewBatiLook(() => wornBati.current));
   const { setMe } = useAuth();
   const done = (url: string) => {
     onBati?.(url);
@@ -170,6 +179,7 @@ export function DemoDay({
       showGate={showGate}
       replayFilms
       atelierTest={!live}
+      batiLookApi={live ? undefined : batiLookStub}
       seals={{
         known: day >= 2 ? knownSealsOn(day) : [],
         solved: solvedSealsOn(day),
@@ -281,4 +291,33 @@ export function DemoDay({
       onEnd={(a) => setTimeout(() => onEnd(a), 1200)}
     />
   );
+}
+
+/**
+ * {bati}'s look on the review page (D03-S008, M-R223) with no account: four cards drawn in this browser from the look
+ * worn now (or the card tapped), four touches without a wish; the one decided is only this run's.
+ */
+function reviewBatiLook(worn: () => string): BatiLookApi {
+  const cache: { id: string; url: string }[] = [];
+  let now = '';
+  let n = 0;
+  const meWith = (url: string) => ({ bati: { imageUrl: url } }) as unknown as Me;
+  return {
+    me: async () => meWith(now || worn()),
+    batiRestyle: async (wish = '', from?: string) => {
+      await new Promise((r) => setTimeout(r, 1200));
+      const src = (from && cache.find((c) => c.id === from)?.url) || now || worn();
+      const candidates = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: `rb${n}-${k}`, url: await demoRefine(src, wish, n * 4 + k, true) })));
+      n++;
+      cache.push(...candidates);
+      return { candidates, left: 99, ...(wish.trim() ? {} : { touches: BATI_RESTYLE_TOUCHES.map((t) => t.label) }) };
+    },
+    batiLookBack: async () => {
+      throw new ApiError(409, 'NO_PREVIOUS', 'もう前の姿はない');
+    },
+    chooseBatiRestyle: async (id: string) => {
+      now = cache.find((c) => c.id === id)?.url ?? now;
+      return meWith(now);
+    },
+  };
 }

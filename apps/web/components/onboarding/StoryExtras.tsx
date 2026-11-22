@@ -112,6 +112,12 @@ function kbNoticeSeen() {
   }
 }
 
+/** the example under a voice field, from its placeholder (「例：A／B」, 「例「A」「B」」 or plain 「A」 → A) */
+function exampleOf(placeholder: string): string {
+  const s = placeholder.replace(/^例[：:]?\s*/, '');
+  return (/^「([^」]*)」/.exec(s)?.[1] ?? s).split('／')[0];
+}
+
 /**
  * The input of every making screen (story M-R130 「声が主役、文字は非常口」): a big 〔🎙 話してみよう〕 in the
  * middle, the words heard shown above it; a small ⌨ in the corner only for when you cannot speak (the first
@@ -160,7 +166,7 @@ export function VoiceField({
     <input ref={ref} className={`${cls} text-center tracking-widest`} style={{ fontSize: 18 }} maxLength={maxLength} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} />
   );
   const example = isDemoMode() && !value && (
-    <button type="button" onClick={() => onChange(placeholder.split('／')[0].slice(0, maxLength))} className={`mt-1.5 text-[11px] tracking-wider underline ${light ? 'text-amber-600' : 'text-amber-200/70'}`}>
+    <button type="button" onClick={() => onChange(exampleOf(placeholder).slice(0, maxLength))} className={`mt-1.5 text-[11px] tracking-wider underline ${light ? 'text-amber-600' : 'text-amber-200/70'}`}>
       例で進む
     </button>
   );
@@ -207,7 +213,7 @@ export function VoiceField({
         </svg>
       </button>
       <p className={`mt-2 text-[15px] font-black ${light ? 'text-amber-700' : 'text-amber-100'}`}>{mic.listening ? '話しおわったら、もう一度タップ' : value ? 'もう一度、話してみる' : '話してみよう'}</p>
-      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${placeholder.replace(/^例：/, '').split('／')[0]}」` : ''))}</p>
+      <p className={`mt-0.5 text-center text-[11px] ${sub}`}>{mic.listening ? mic.interim || 'きいています…' : (micTrouble(mic.supported ? mic.code : 'unsupported') ?? (placeholder ? `例「${exampleOf(placeholder)}」` : ''))}</p>
       {example}
       {/* the emergency exit: only when you cannot speak */}
       {!typing && (

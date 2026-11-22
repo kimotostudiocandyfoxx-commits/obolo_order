@@ -138,7 +138,7 @@ export const DAY4: Step[] = [
   { t: 'sprite', image: null },
   { t: 'still', image: 's/rocket-jupiter' },
   { t: 'se', sound: 'whoosh' },
-  { t: 'bgm', track: 'jupiter' },
+  { t: 'bgm', track: 'jupiter-mm' }, // the forest theme (bgm-jupiter-mm; there is no bgm-jupiter)
   { t: 'se', sound: 'arrive' },
   // 到着カット（止め絵＋ゆっくりしたカメラ）：緑の縞もようの雲が切れると、見わたすかぎりの大森林
   { t: 'arrive', image: 's/arr-jupiter-canopy', caption: '木星に着いた' },
@@ -184,7 +184,7 @@ export const DAY4: Step[] = [
 
   // D05-S008b {neo}のアトリエ（自分の場所。建てる所はない：M-R208）
   { t: 'scene', id: 'D05-S008b' },
-  { t: 'bgm', track: 'jupiter' },
+  { t: 'bgm', track: 'jupiter-mm' }, // the forest theme (bgm-jupiter-mm; there is no bgm-jupiter)
   { t: 'still', image: 's/jupiter-daikon' }, // 森の切れ目の丘。木とガラスの、丸いドームのアトリエ。扉の名札は『{neo}』
   { t: 'say', who: '大根カイザー', text: 'ここが、{neo}のアトリエダ。' },
   { t: 'say', who: '大根カイザー', text: '88時間、羽ばたいた蝶は、ここに帰ってくるダ。アートは、この壁に、飾られるダ。' },

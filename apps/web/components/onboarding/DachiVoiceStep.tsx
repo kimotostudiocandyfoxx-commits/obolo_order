@@ -32,7 +32,11 @@ export function DachiVoiceStep({ fallback, onDone, test = false }: { fallback: {
 
   return (
     <div className="absolute inset-0 z-[40] flex flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
-      <div className="pt-safe flex items-center justify-end px-3 py-2">
+      {/* room for the story's own corner buttons (the day, the sound; the review page's scene memo), as in the atelier step */}
+      <div className="pt-safe shrink-0">
+        <div className="h-12" />
+      </div>
+      <div className="flex items-center justify-end px-3 pb-2">
         <button
           onClick={() => onDone('later')}
           className="rounded-full border border-amber-200/50 bg-black/40 px-4 py-1.5 text-xs tracking-[0.2em] text-amber-100 backdrop-blur"
