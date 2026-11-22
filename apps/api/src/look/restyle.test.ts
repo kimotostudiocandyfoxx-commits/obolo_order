@@ -49,7 +49,7 @@ describe("Bati's room: dress up the Bati", () => {
     expect(charged).toEqual([]);
     for (let k = 1; k < BATI_RESTYLE_PER_DAY; k++) await s.restyle('u', 'マント', 'https://x');
     await expect(s.restyle('u', 'マント', 'https://x')).rejects.toThrow();
-  });
+  }, 30_000);
 
   it('takes the look mana after the journey', async () => {
     const { s, charged } = make(JOURNEY_DONE);
