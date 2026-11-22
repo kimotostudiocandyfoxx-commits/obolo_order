@@ -1,7 +1,8 @@
 """Talk screen assets (M-R232〜M-R235): chroma-key the green-background character pictures and align every
 expression of a character to its base picture, so swapping faces does not make the body jump.
 
-python3 scripts/talk-assets/cutout.py  →  design/talk/<char>/<face>.png (+ kororin.png, bg-moon.jpg)
+python3 scripts/talk-assets/cutout.py  →  design/talk/<char>/<face>.png (+ kororin.png, bg-moon.jpg); then convert to WebP
+(height 720, quality 82) as in design/talk/*.webp
 """
 import os
 import numpy as np

@@ -1,0 +1,405 @@
+<meta charset="utf-8">
+<title>隣に並ぶトーク</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* layout: one night scene on the moon — the pair stands on the ground, the words float up and orbit them as Kororin */
+:root{
+  --night:#070b24; --night2:#121a46; --ink:#f4f1ff; --mute:#b9bde6;
+  --glass:rgba(16,22,64,.46); --glass-line:rgba(210,220,255,.22);
+  --me:#8fb7ff; --me-ink:#0c1a3d;
+  --bati:#ffc25a; --bati-ink:#3a2200;
+  --friend:#f1d3a2; --friend-ink:#3a2510;
+  --moon:#dfe6ff;
+  --font:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic',system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:hidden;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+.app{position:relative;height:100%;max-width:520px;margin:0 auto;overflow:hidden;isolation:isolate;
+  -webkit-tap-highlight-color:transparent;user-select:none}
+.sky{position:absolute;inset:-4% -4% 0;background:url(bg-moon.webp) center 30%/cover no-repeat;z-index:-2;
+  animation:drift 60s ease-in-out infinite alternate}
+.sky::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1.02)}to{transform:translate3d(-2%,1%,0) scale(1.06)}}
+
+/* top bar */
+.bar{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) max(14px,env(safe-area-inset-right,0px)) 10px max(14px,env(safe-area-inset-left,0px))}
+.ib{width:42px;height:42px;border-radius:50%;border:1px solid var(--glass-line);background:var(--glass);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;place-items:center;color:var(--ink);cursor:pointer;flex:none}
+.ib svg{width:20px;height:20px}
+.ib:focus-visible,.seg button:focus-visible,.mic:focus-visible{outline:2px solid var(--moon);outline-offset:3px}
+.who{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px}
+.who b{font-weight:900;font-size:15px;letter-spacing:.04em;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.seg{display:flex;gap:4px;padding:3px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.seg button{font:700 11px var(--font);color:var(--mute);background:none;border:0;border-radius:999px;padding:4px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:rgba(223,230,255,.9);color:var(--night)}
+
+/* ring of Kororin */
+.ring{position:absolute;inset:0;z-index:5;pointer-events:none}
+.koro{position:absolute;width:64px;margin:-30px 0 0 -32px;background:none;border:0;padding:0;font:inherit;color:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;
+  pointer-events:auto;cursor:pointer;transition:left .9s cubic-bezier(.4,.1,.2,1),top .9s cubic-bezier(.4,.1,.2,1),opacity .6s,transform .6s}
+.koro img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.45));animation:bob 3.2s ease-in-out infinite}
+.koro span{max-width:68px;font-size:10px;font-weight:700;line-height:1.2;padding:2px 6px;border-radius:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.koro.me span{background:var(--me);color:var(--me-ink)}
+.koro.bati span{background:var(--bati);color:var(--bati-ink)}
+.koro.friend span{background:var(--friend);color:var(--friend-ink)}
+.koro.new{transform:scale(.4);opacity:0}
+.koro.gone{opacity:0;transform:scale(.6)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+/* stage */
+.stage{position:absolute;left:0;right:0;bottom:116px;height:min(40%,380px);z-index:6;display:flex;justify-content:center;align-items:flex-end;gap:6%}
+.char{position:relative;height:100%;width:36%;display:flex;justify-content:center;align-items:flex-end;transition:transform .35s}
+.char .body{position:relative;height:100%;width:100%;display:flex;justify-content:center;align-items:flex-end;transform-origin:50% 100%}
+.char img{position:absolute;bottom:0;left:50%;height:100%;transform:translateX(-50%);max-width:none;transition:opacity .09s linear}
+.char .shadow{position:absolute;bottom:-8px;left:18%;right:18%;height:18px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0));filter:blur(2px)}
+.char.bati-type{height:62%}
+.char.speaking{transform:translateY(-6px) scale(1.03)}
+.char.speaking .shadow{opacity:.75}
+.breath{animation:breath var(--bd,3.6s) ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.008,1.018)}}
+.hop{animation:hop .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes hop{0%{transform:translateY(0)}40%{transform:translateY(-22px)}100%{transform:translateY(0)}}
+.tilt{transform:rotate(-5deg)!important}
+.lean{animation:lean .5s ease-out}
+@keyframes lean{0%{transform:translateX(0) rotate(0)}40%{transform:translateX(6px) rotate(4deg)}100%{transform:none}}
+.nod{animation:nod .9s ease-in-out}
+@keyframes nod{0%,100%{transform:translateY(0)}30%{transform:translateY(5px)}60%{transform:translateY(0)}80%{transform:translateY(3px)}}
+.sway{animation:sway 5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(1.4deg)}}
+
+/* bubbles */
+.bubbles{position:absolute;left:0;right:0;z-index:8;display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:0 max(62px,env(safe-area-inset-left,0px)) 0 max(62px,env(safe-area-inset-right,0px));pointer-events:none}
+.bub{position:relative;max-width:min(100%,380px);padding:11px 16px 12px;border-radius:20px;font-size:15px;font-weight:700;line-height:1.55;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .6s cubic-bezier(.4,.1,.2,1),opacity .6s;transform-origin:50% 0;pointer-events:auto}
+.bub.me{background:var(--me);color:var(--me-ink);align-self:flex-end}
+.bub.bati{background:var(--bati);color:var(--bati-ink);align-self:flex-start}
+.bub.friend{background:var(--friend);color:var(--friend-ink);align-self:flex-start}
+.bub::after{content:"";position:absolute;bottom:-9px;width:18px;height:18px;background:inherit;border-radius:3px;transform:rotate(45deg)}
+.bub.me::after{right:22%}
+.bub.bati::after,.bub.friend::after{left:22%}
+.bub.old{opacity:.86}
+.bub.old::after{display:none}
+.bub.fly{transform:translateY(-120px) scale(.2);opacity:0}
+.bub.enter{animation:pop .35s cubic-bezier(.3,1.4,.5,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.bub .caret{display:inline-block;width:6px;height:1em;vertical-align:-2px;margin-left:2px;border-radius:2px;background:currentColor;opacity:.5;animation:blinkc .8s steps(2) infinite}
+@keyframes blinkc{50%{opacity:0}}
+
+/* bottom */
+.dock{position:absolute;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;align-items:center;gap:22px;
+  padding:14px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 18px) max(16px,env(safe-area-inset-left,0px))}
+.mic{width:74px;height:74px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;color:var(--night);
+  background:radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff);box-shadow:0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55)}
+.mic svg{width:30px;height:30px}
+.mic.on{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55)}50%{box-shadow:0 0 0 14px rgba(223,230,255,.08),0 0 48px rgba(160,180,255,.8)}}
+.hint{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);text-align:center;font-size:11px;color:var(--mute);z-index:19;pointer-events:none;text-shadow:0 1px 4px #000}
+
+/* drawers */
+.drawer{position:absolute;top:0;bottom:0;width:min(84%,380px);z-index:40;background:rgba(10,14,44,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-line);transition:transform .35s cubic-bezier(.3,.1,.2,1);display:flex;flex-direction:column;gap:14px;
+  padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 18px)}
+.drawer.l{left:0;transform:translateX(-102%);border-radius:0 22px 22px 0}
+.drawer.r{right:0;transform:translateX(102%);border-radius:22px 0 0 22px}
+.drawer.open{transform:none}
+.drawer h2{margin:0;font-size:14px;letter-spacing:.12em;color:var(--mute)}
+.scrim{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.orbit{position:relative;width:100%;aspect-ratio:1;max-width:320px;margin:0 auto}
+.orbit .moon{position:absolute;left:50%;top:50%;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff,#cfd6f0 60%,#8d95b8);box-shadow:0 0 30px rgba(223,230,255,.5)}
+.orbit .track{position:absolute;inset:6%;border:1px dashed rgba(210,220,255,.25);border-radius:50%;animation:spin 60s linear infinite}
+.orbit .pl{position:absolute;width:15%;aspect-ratio:1;border-radius:50%;margin:-7.5% 0 0 -7.5%;box-shadow:0 0 14px rgba(255,255,255,.15)}
+.orbit .pl.off{filter:grayscale(1) brightness(.35)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.list{display:flex;flex-direction:column;gap:8px;overflow:auto}
+.row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06)}
+.row img{width:40px;height:40px;object-fit:contain}
+.row b{display:block;font-size:14px}
+.row small{color:var(--mute);font-size:12px}
+@media (prefers-reduced-motion:reduce){
+  .sky,.koro img,.breath,.sway,.track,.mic.on{animation:none!important}
+  .hop,.lean,.nod{animation:none!important}
+}
+</style>
+
+<div class="app" id="app">
+  <div class="sky"></div>
+
+  <header class="bar">
+    <button class="ib" id="openL" aria-label="会話の一覧を開く"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h11M4 17h7"/></svg></button>
+    <div class="who">
+      <b id="title">バティ</b>
+      <div class="seg" role="group" aria-label="見本の相手">
+        <button type="button" id="tBati" aria-pressed="true">バティと</button>
+        <button type="button" id="tFriend" aria-pressed="false">ダチと</button>
+      </div>
+    </div>
+    <button class="ib" id="mute" aria-label="声を消す" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path id="wave" d="M17 8.5a5 5 0 0 1 0 7M19.5 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+    <button class="ib" id="openR" aria-label="Bluenaを開く"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c4 0 7 6 7 10.5A7 7 0 0 1 5 13.5C5 9 8 3 12 3z"/><circle cx="12" cy="13" r="2.6"/></svg></button>
+  </header>
+
+  <div class="ring" id="ring"></div>
+  <div class="bubbles" id="bubbles"></div>
+
+  <div class="stage" id="stage">
+    <div class="char" id="left"><div class="shadow"></div><div class="body breath" style="--bd:3.4s"><img alt="" data-l="a"><img alt="" data-l="b" style="opacity:0"></div></div>
+    <div class="char" id="right"><div class="shadow"></div><div class="body breath" style="--bd:4.1s"><img alt="" data-l="a"><img alt="" data-l="b" style="opacity:0"></div></div>
+  </div>
+
+  <p class="hint" id="hint">画面を押すと、次の言葉へ進みます</p>
+  <div class="dock">
+    <button class="mic" id="mic" aria-label="話す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <aside class="drawer l" id="drawerL" aria-label="会話の一覧">
+    <h2>会話</h2>
+    <div class="list" id="convList"></div>
+  </aside>
+  <aside class="drawer r" id="drawerR" aria-label="Bluena">
+    <h2>BLUENA</h2>
+    <div class="orbit" id="orbit"><div class="track"></div><div class="moon"></div></div>
+    <div class="list">
+      <div class="row"><img src="bati/kororin.webp" alt=""><div><b>さっきのコロリン</b><small>土星へ飛ばした・あと87時間</small></div></div>
+      <div class="row"><img src="user/kororin.webp" alt=""><div><b>はじめての姿</b><small>月・きのう</small></div></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const CAST = {
+    user:   { dir:'user',   kind:'me',     faces:['base','smile','surprised','shy'], name:'ネオ' },
+    bati:   { dir:'bati',   kind:'bati',   faces:['base','smile','surprised','thinking','sad','shy'], name:'ウニュ' },
+    friend: { dir:'friend', kind:'friend', faces:['base','smile','surprised','thinking','sad','shy'], name:'アポロ' },
+  };
+  // each line: who, then sentences [text, face, motion]
+  const SCRIPTS = {
+    bati: { partner:'bati', title:'ウニュ（バティ）',
+      history:[['bati','おはよ！'],['user','おはよう'],['bati','今日も月は静か'],['user','作ったよ'],['bati','いい声だった！']],
+      lines:[
+        ['user',[['ねえウニュ、明日の土星ってどんなとこ？','base','']]],
+        ['bati',[['土星はね、コロリンたちがレコードの上でサイファーしてる星だよ！','smile','hop'],['ネオのつぶやきも、きっと回ってるはず！','smile','']]],
+        ['user',[['え、マジで！？　見てみたい！','surprised','hop']]],
+        ['bati',[['でしょでしょ！','smile','hop'],['……でも、ボク、ちょっと緊張するかも？','thinking','tilt']]],
+        ['user',[['ウニュも緊張するんだ笑','smile','']]],
+        ['bati',[['えへへ……バレた？','shy','']]],
+        ['user',[['明日、一緒に行こうな。','smile','']]],
+        ['bati',[['うん！　約束だよ、ネオ！','smile','hop']]],
+      ]},
+    friend: { partner:'friend', title:'アポロ（ダチ）',
+      history:[['friend','ういっす'],['user','おつかれ'],['friend','MV見た？'],['user','まだ！'],['friend','見ろ見ろ']],
+      lines:[
+        ['friend',[['よう！　今日の曲、聴いたぞ。','smile',''],['サビで鳥肌が立った……。','surprised','lean']]],
+        ['user',[['ほんと！？　うれしい！','smile','hop']]],
+        ['friend',[['次はMVもつけようぜ。','base',''],['俺、出演してもいいか？','thinking','tilt']]],
+        ['user',[['その筋肉、画面に入りきらないって笑','smile','']]],
+        ['friend',[['……鍛えすぎたか。','sad',''],['いや、むしろ見せたい。','smile','hop']]],
+        ['user',[['じゃあ主役で！','smile','']]],
+      ]},
+  };
+
+  const els = { left:$('#left'), right:$('#right'), bubbles:$('#bubbles'), ring:$('#ring'), stage:$('#stage') };
+  const actor = { left:null, right:null };
+  let mode='bati', script, li=0, si=0, ring=[], bubbles=[], typing=null, timers=[];
+
+  const src = (who, face) => `${CAST[who].dir}/${face}.webp`;
+  // preload
+  Object.keys(CAST).forEach(k => [...CAST[k].faces,'blink','talk'].forEach(f => { const i=new Image(); i.src=src(k,f); }));
+
+  function makeActor(slot, who){
+    const el = els[slot], imgs = el.querySelectorAll('img'), body = el.querySelector('.body');
+    el.classList.toggle('bati-type', who==='bati');
+    const a = { who, el, body, imgs, front:0, face:'base', talking:false, blinkT:0 };
+    setImg(a,'base',true);
+    scheduleBlink(a);
+    return a;
+  }
+  function setImg(a, face, instant){
+    const next = a.imgs[a.front^1], cur = a.imgs[a.front];
+    const s = src(a.who, face);
+    if (cur.getAttribute('src')===s) return;
+    if (instant){ cur.src=s; return; }
+    next.src = s;
+    const show = () => { next.style.opacity=1; cur.style.opacity=0; a.front^=1; };
+    next.complete ? show() : next.onload = show;
+  }
+  function setFace(a, face){
+    if (a.who==='user' && !CAST.user.faces.includes(face)) face='base'; // the user's own picture shows bright faces only
+    a.face = face; setImg(a, face);
+  }
+  function scheduleBlink(a){
+    clearTimeout(a.blinkT);
+    a.blinkT = setTimeout(() => {
+      if (!a.talking && (a.face==='base'||a.face==='smile')){
+        setImg(a,'blink',true);
+        setTimeout(() => { setImg(a,a.face,true);
+          if (Math.random()<.2) setTimeout(()=>{ setImg(a,'blink',true); setTimeout(()=>setImg(a,a.face,true),110); },180);
+        },120);
+      }
+      scheduleBlink(a);
+    }, 2000 + Math.random()*4000);
+  }
+  function motion(a, m){
+    if (RM || !m) return;
+    const b=a.body;
+    if (m==='tilt'){ b.classList.add('tilt'); timers.push(setTimeout(()=>b.classList.remove('tilt'),1400)); return; }
+    b.classList.remove('hop','lean','nod'); void b.offsetWidth; b.classList.add(m);
+    timers.push(setTimeout(()=>b.classList.remove(m),900));
+  }
+
+  function slotOf(who){ return who==='user' ? 'right' : 'left'; }
+
+  // ring positions: 12 o'clock is the newest, then clockwise around the pair (skipping the floor)
+  const ANG = [-90,-60,-32,-10,190,212,240];
+  function layoutRing(){
+    const W = els.ring.clientWidth, H = els.ring.clientHeight;
+    const st = els.stage.getBoundingClientRect(), ap = $('#app').getBoundingClientRect();
+    const top = 96, heads = (st.top-ap.top) + 10;
+    const cx = W/2, cy = heads, rx = Math.min(W/2 - 36, 230), ry = Math.max(120, heads - top);
+    ring.forEach((k,i) => {
+      const t = ANG[i]*Math.PI/180;
+      k.el.style.left = (cx + rx*Math.cos(t))+'px';
+      k.el.style.top  = (cy + ry*Math.sin(t))+'px';
+    });
+  }
+  function pushRing(who, text, animate){
+    const el = document.createElement('button');
+    el.type='button'; el.className = `koro ${CAST[who].kind}` + (animate?' new':'');
+    el.innerHTML = `<img src="${CAST[who].dir}/kororin.webp" alt=""><span>${text.replace(/[。！？、]/g,'').slice(0,5)}</span>`;
+    el.title = text; el.setAttribute('aria-label', `${CAST[who].name}：${text}`);
+    el.onclick = (e) => { e.stopPropagation(); showOld(who, text); };
+    els.ring.appendChild(el);
+    ring.unshift({el,who,text});
+    if (ring.length > ANG.length){ const old = ring.pop(); old.el.classList.add('gone'); setTimeout(()=>old.el.remove(),700); }
+    layoutRing();
+    if (animate) requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove('new')));
+  }
+  function showOld(who, text){
+    const b = document.createElement('div'); b.className=`bub ${CAST[who].kind} enter`; b.textContent=text;
+    els.bubbles.prepend(b); setTimeout(()=>{ b.classList.add('fly'); setTimeout(()=>b.remove(),600); },2200);
+  }
+
+  function placeBubbles(){
+    const st = els.stage.getBoundingClientRect(), ap = $('#app').getBoundingClientRect();
+    els.bubbles.style.bottom = (ap.bottom - st.top + 10) + 'px';
+  }
+
+  function newBubble(who){
+    // older bubbles: keep 2 on screen; the third flies up into the ring as a Kororin
+    bubbles.forEach(b=>b.el.classList.add('old'));
+    if (bubbles.length >= 2){
+      const top = bubbles.shift();
+      top.el.classList.add('fly');
+      setTimeout(()=>top.el.remove(),600);
+      pushRing(top.who, top.text, true);
+    }
+    const el = document.createElement('div'); el.className = `bub ${CAST[who].kind} enter`;
+    els.bubbles.appendChild(el);
+    const b = { el, who, text:'' }; bubbles.push(b); return b;
+  }
+
+  function typeSentence(b, s, a, done){
+    const [text, face, mv] = s;
+    setFace(a, face); motion(a, mv);
+    const other = a===actor.left ? actor.right : actor.left;
+    if (other){ other.body.classList.remove('nod'); void other.body.offsetWidth; if(!RM) other.body.classList.add('nod'); }
+    a.el.classList.add('speaking'); a.talking = true;
+    const canFlap = face==='base'||face==='smile';
+    let i=0, flap=false;
+    const base = b.text;
+    const tick = () => {
+      i++;
+      b.el.innerHTML = '';
+      b.el.textContent = base + text.slice(0,i);
+      const c=document.createElement('i'); c.className='caret'; b.el.appendChild(c);
+      if (canFlap && i%2===0){ flap=!flap; setImg(a, flap?'talk':face, true); }
+      if (i>=text.length){ finish(); return; }
+      typing = setTimeout(tick, /[、。！？…]/.test(text[i-1]) ? 210 : 62);
+    };
+    const finish = () => {
+      clearTimeout(typing); typing=null;
+      b.text = base + text; b.el.textContent = b.text;
+      setImg(a, face, true); a.talking=false; a.el.classList.remove('speaking');
+      done();
+    };
+    b.finish = finish;
+    tick();
+  }
+
+  let cur=null, waitT=null, pending=null;
+  const later = (fn, ms) => { pending = fn; waitT = setTimeout(() => { pending = null; fn(); }, ms); };
+  function step(){
+    if (li >= script.lines.length){ later(restart, 3800); return; }
+    const [who, sentences] = script.lines[li];
+    const a = actor[slotOf(who)];
+    const b = newBubble(who);
+    si=0;
+    const next = () => {
+      if (si >= sentences.length){ li++; cur=null; later(step, 1100); return; }
+      const s = sentences[si++];
+      cur = b; typeSentence(b, s, a, () => { later(next, 650); });
+    };
+    next();
+  }
+  function advance(){
+    if (cur && cur.finish && typing){ cur.finish(); return; }
+    clearTimeout(waitT); const fn = pending || step; pending = null; fn();
+  }
+
+  function clearAll(){
+    timers.forEach(clearTimeout); timers=[]; clearTimeout(waitT); pending=null; clearTimeout(typing); typing=null;
+    els.bubbles.innerHTML=''; els.ring.innerHTML=''; ring=[]; bubbles=[];
+  }
+  function start(m){
+    mode=m; script=SCRIPTS[m]; clearAll(); li=0;
+    $('#title').textContent = script.title;
+    $('#tBati').setAttribute('aria-pressed', m==='bati'); $('#tFriend').setAttribute('aria-pressed', m==='friend');
+    if (actor.left) clearTimeout(actor.left.blinkT);
+    if (actor.right) clearTimeout(actor.right.blinkT);
+    actor.left = makeActor('left', script.partner);
+    actor.right = makeActor('right', 'user');
+    script.history.slice().reverse().forEach(([w,t]) => pushRing(w,t,false));
+    placeBubbles(); layoutRing();
+    waitT = setTimeout(step, 700);
+  }
+  const restart = () => start(mode);
+
+  // input
+  $('#app').addEventListener('click', (e) => {
+    if (e.target.closest('button,.drawer,.koro')) return;
+    $('#hint').style.opacity=0; advance();
+  });
+  $('#tBati').onclick = (e)=>{ e.stopPropagation(); start('bati'); };
+  $('#tFriend').onclick = (e)=>{ e.stopPropagation(); start('friend'); };
+  $('#mute').onclick = (e)=>{ const on = e.currentTarget.getAttribute('aria-pressed')!=='true';
+    e.currentTarget.setAttribute('aria-pressed', on); $('#wave').style.display = on?'none':''; e.currentTarget.setAttribute('aria-label', on?'声を出す':'声を消す'); };
+  $('#mic').onclick = (e)=>{ e.currentTarget.classList.toggle('on'); };
+  const drawer = (side, open) => { $('#drawer'+side).classList.toggle('open', open); $('#scrim').classList.toggle('on', open); };
+  $('#openL').onclick = ()=>drawer('L',true);
+  $('#openR').onclick = ()=>drawer('R',true);
+  $('#scrim').onclick = ()=>{ drawer('L',false); drawer('R',false); };
+
+  // drawers content
+  $('#convList').innerHTML = [['bati','ウニュ（バティ）','約束だよ、ネオ！'],['friend','アポロ（ダチ）','じゃあ主役で！'],['user','結社からの知らせ','火星シアターの扉が開いた']]
+    .map(([d,n,t])=>`<div class="row"><img src="${d}/kororin.webp" alt=""><div><b>${n}</b><small>${t}</small></div></div>`).join('');
+  const PL = [['#d9b36b',1],['#6fae6a',1],['#6aa8e8',1],['#e06a4f',0],['#e7a6d4',0],['#7bd3d6',0],['#9a8fd6',0],['#3f6fd8',0]];
+  PL.forEach(([c,on],i)=>{ const d=document.createElement('div'); d.className='pl'+(on?'':' off'); const t=(i/8)*2*Math.PI-Math.PI/2;
+    d.style.left=(50+40*Math.cos(t))+'%'; d.style.top=(50+40*Math.sin(t))+'%'; d.style.background=`radial-gradient(circle at 35% 30%,#fff8,${c} 55%,#0008)`; $('#orbit').appendChild(d); });
+
+  addEventListener('resize', ()=>{ placeBubbles(); layoutRing(); });
+  start('bati');
+})();
+</script>
