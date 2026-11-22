@@ -6082,26 +6082,6 @@
       ]
     },
     {
-      "id": "kou-03-ledger",
-      "prompt": "A huge unrolled golden-edged parchment ledger floating in a vast heavenly sky of clouds, its lines filled only with abstract wavy ink strokes (no readable writing), one long row boldly struck through with a red ink stroke, a white feather quill hovering above it, a few gold coins tumbling off the edge, caught in one beam of golden light; solemn and absurdly grand.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ]
-    },
-    {
-      "id": "kou-04-coins",
-      "prompt": "On a cloud, an enormous heap of gold coins and gold bars with a big wooden abacus leaning against it, two chubby cherubs wrapped in white cloth counting the coins with puzzled, sweating faces, one scratching his head, scattered coins, a dramatic heavenly spotlight; gently comic.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ]
-    },
-    {
       "id": "tak-05-throne",
       "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo, including his thin round glasses), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm, closed-mouth smile like a Buddha, seated on a majestic throne of clouds, an enormous golden halo and radiant aureole blazing behind him, a large pink lotus blossom beneath the throne, cherubs in white cloth and white doves around him, hands resting calmly on his knees, smiling down benevolently; full figure from head to feet, centered, heavenly majesty.",
       "w": 2048,
@@ -6180,6 +6160,110 @@
       ]
     },
     {
+      "id": "jun-05-palm",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), a colossal figure shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, seated majestically on a snow-capped mountain peak, gently holding a tiny winged blond angel in the open palm of one enormous hand and looking down at him with a kind, merciful, closed-mouth smile; the tiny angel kneels in his palm with hands clasped in relief; full figure from head to knees, centered, sublime majesty. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-1.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-06-blessing",
+      "prompt": "Waist-up portrait, bare muscular chest visible, of the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a warm kind smile, raising one hand in a gentle blessing gesture, a golden halo behind his head, edelweiss and rose petals drifting down, alpine peaks glowing behind him; his whole head inside the frame with space above. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-1.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-10-colossal",
+      "prompt": "Epic vista: a colossal figure of the man in the reference photo (keep his face and hairstyle exactly as in the photo), standing with his arms crossed confidently, shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm smile, rising behind a range of snow-capped mountains like the rising sun, his smiling face, massive bare shoulders and chest visible above the peaks, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; on a ridge in the lower foreground a tiny silhouette of a winged angel looking up in awe. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-2.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-02-serene",
+      "prompt": "Close-up portrait of the man in the reference photo (keep his face and hairstyle exactly as in the photo): his face fills the upper frame, looking gently toward the viewer with kind eyes and a serene, warm, closed-mouth smile, a large golden halo blazing behind his head like a sunrise over the peaks, bare muscular shoulders, white wings softly out of focus. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-1.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-14-together",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing on white marble steps of an ancient temple on a highland plateau at sunrise beside a young blond curly-haired muscular angel with white wings; the man rests a hand on the angel's shoulder; the man faces the viewer with a big warm smile, his face clearly visible and in focus; the angel is turned toward him, seen in profile; snowy peaks behind, golden light, heartfelt. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-1.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-01-smile",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), close-up portrait: his face fills the upper half of the frame, laughing with a big warm joyful smile, eyes crinkled, bare muscular shoulders and chest, a glowing golden halo behind his head, the edges of radiant white angel wings at both sides, golden backlight from the peaks, shallow depth of field. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-1.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "kou-03-ledger",
+      "prompt": "A huge unrolled golden-edged parchment ledger floating in a vast heavenly sky of clouds, its lines filled only with abstract wavy ink strokes (no readable writing), one long row boldly struck through with a red ink stroke, a white feather quill hovering above it, a few gold coins tumbling off the edge, caught in one beam of golden light; solemn and absurdly grand.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "kou-04-coins",
+      "prompt": "On a cloud, an enormous heap of gold coins and gold bars with a big wooden abacus leaning against it, two chubby cherubs wrapped in white cloth counting the coins with puzzled, sweating faces, one scratching his head, scattered coins, a dramatic heavenly spotlight; gently comic.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
       "id": "tak-03-calendar",
       "prompt": "Hundreds of blank cream calendar pages torn off and fluttering through a vast heavenly sky of clouds like a flock of white doves, all flying toward one beam of golden light, endless and absurdly grand, no writing on the pages.",
       "w": 2048,
@@ -6198,6 +6282,206 @@
         1440,
         1440
       ]
+    },
+    {
+      "id": "jun-01-vista",
+      "prompt": "Looking across a vast golden highland at sunrise: a blazing sun rising between two snow-capped peaks, god rays streaming over endless alpine meadows and misty valleys, a few white doves far away, the upper third left calm and open for a title. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-02-letter-altar",
+      "prompt": "A white marble altar standing at the edge of an alpine meadow in golden morning light; on it an unrolled cream parchment letter that is completely blank, a white feather quill in a golden inkwell, a red wax seal, one lit candle and scattered edelweiss and rose petals; snowy peaks softly blurred behind; intimate still life, shallow depth of field. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-03-torn-scroll",
+      "prompt": "A single blank cream parchment scroll torn cleanly in two, both halves fluttering apart on the wind high above a vast alpine valley, caught in one beam of golden light, tiny against the enormous mountains; solemn and absurdly grand. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-04-scroll-pile",
+      "prompt": "On a mossy boulder in an alpine meadow, a big pile of torn blank parchment scrolls with broken red wax seals, two chubby cherubs wrapped in white cloth peeking from behind the boulder with puzzled faces, a dramatic spotlight of golden light from the sky; gently comic. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-07-angel-tears",
+      "prompt": "Close-up portrait of the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), both hands pressed to his heart, eyes closed, streams of glowing golden tears running down his cheeks, a deeply moved, trembling smile, golden light from above, a sunlit alpine meadow and peaks softly behind. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-03-hand-heart",
+      "prompt": "Close-up of the young blond curly-haired muscular angel in the reference image, framed from the top of his head down to his chest: his whole head, face and neck fully inside the frame with space above his hair, eyes gently closed, a peaceful grateful smile, one large muscular hand placed tenderly over his heart on his bare sculpted chest, a soft golden light glowing from beneath his fingers, a glowing golden halo, white wings softly out of focus, alpine light. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-05-angel-tear",
+      "prompt": "Close-up of the face of the young blond curly-haired muscular angel in the reference image, eyes closed, a single shining tear running down his cheek, a gentle grateful smile, a glowing golden halo above, soft white wings out of focus, mountains glowing gold behind, deeply moved. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-08-angel-bow",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), kneeling and bowing deeply with his forehead touching the grass of an alpine meadow full of wildflowers, wings folded forward humbly, before a distant blaze of golden light rising over the snowy peaks; side view, reverent and solemn. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-09-three-generations",
+      "prompt": "A gently comic scene: three angels sleeping peacefully in a neat row on a soft alpine meadow under a starry golden night sky — the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), his young son (a small muscular blond child angel wrapped in white cloth) and his grandson (a chubby baby cherub wrapped in white cloth) — all three lying with their heads toward a small glowing white chapel on a far mountaintop and their feet pointing away from it; serene sleeping faces, moonlight on the snowy peaks. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-11-angel-march",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), striding forward boldly along a winding golden mountain path that leads over alpine meadows to a brilliant horizon between the peaks, wings fully spread, fists clenched with determination, a confident smile; dynamic low angle, streaks of light. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-12-angel-trophy",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), standing on a snowy mountain summit and raising a large golden trophy cup wreathed in laurel high above his head toward a radiant sky, light bursting from the trophy, golden feathers swirling like confetti, triumphant joyful face, a sea of clouds and peaks below. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-04-trophy",
+      "prompt": "Low-angle close-up of a radiant golden trophy cup wreathed with olive branches, raised high by two powerful muscular arms against a blazing sunburst over snowy peaks, golden light pouring over its rim like liquid, gold leaves and white feathers flying, triumphant, no face visible. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-13-angel-oath",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), one hand on his heart and the other raised in a solemn oath, standing on an alpine meadow before a small white stone chapel, behind him a choir of cherubs wrapped in white cloth singing with candles and golden alphorns and trumpets, warm golden light. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-15-temple-finale",
+      "prompt": "A grand white domed classical temple standing on a high mountain plateau above a sea of clouds, an explosion of golden light bursting from behind the dome, snow-capped peaks around, hundreds of white feathers and edelweiss petals swirling, two tiny figures at the top of the steps — a winged blond angel and a shirtless muscular winged man with a white hip cloth and golden sash — waving. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-20-dome-interior",
+      "prompt": "Inside a vast temple high in the mountains: looking up into an immense golden coffered dome with a bright open oculus pouring a column of divine light straight down, a ring of white marble columns, through tall arches the snowy peaks are visible, edelweiss petals and white feathers floating in the light, no people. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-16-end-sky",
+      "prompt": "A calm, serene golden evening sky over misty highland valleys and distant snowy peaks, a faint ring of light in the center, empty and peaceful. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false
     },
     {
       "id": "kou-05-throne-plate",
@@ -6308,290 +6592,6 @@
       ],
       "refs": [
         "design/mv-art/out/tak-14-together.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-01-vista",
-      "prompt": "Looking across a vast golden highland at sunrise: a blazing sun rising between two snow-capped peaks, god rays streaming over endless alpine meadows and misty valleys, a few white doves far away, the upper third left calm and open for a title. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-02-letter-altar",
-      "prompt": "A white marble altar standing at the edge of an alpine meadow in golden morning light; on it an unrolled cream parchment letter that is completely blank, a white feather quill in a golden inkwell, a red wax seal, one lit candle and scattered edelweiss and rose petals; snowy peaks softly blurred behind; intimate still life, shallow depth of field. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-03-torn-scroll",
-      "prompt": "A single blank cream parchment scroll torn cleanly in two, both halves fluttering apart on the wind high above a vast alpine valley, caught in one beam of golden light, tiny against the enormous mountains; solemn and absurdly grand. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-04-scroll-pile",
-      "prompt": "On a mossy boulder in an alpine meadow, a big pile of torn blank parchment scrolls with broken red wax seals, two chubby cherubs wrapped in white cloth peeking from behind the boulder with puzzled faces, a dramatic spotlight of golden light from the sky; gently comic. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-05-palm",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), a colossal figure shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, seated majestically on a snow-capped mountain peak, gently holding a tiny winged blond angel in the open palm of one enormous hand and looking down at him with a kind, merciful, closed-mouth smile; the tiny angel kneels in his palm with hands clasped in relief; full figure from head to knees, centered, sublime majesty. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "/tmp/mv-jun-1.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-06-blessing",
-      "prompt": "Waist-up portrait, bare muscular chest visible, of the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a warm kind smile, raising one hand in a gentle blessing gesture, a golden halo behind his head, edelweiss and rose petals drifting down, alpine peaks glowing behind him; his whole head inside the frame with space above. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "/tmp/mv-jun-1.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-07-angel-tears",
-      "prompt": "Close-up portrait of the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), both hands pressed to his heart, eyes closed, streams of glowing golden tears running down his cheeks, a deeply moved, trembling smile, golden light from above, a sunlit alpine meadow and peaks softly behind. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-cu-03-hand-heart",
-      "prompt": "Close-up of the young blond curly-haired muscular angel in the reference image, framed from the top of his head down to his chest: his whole head, face and neck fully inside the frame with space above his hair, eyes gently closed, a peaceful grateful smile, one large muscular hand placed tenderly over his heart on his bare sculpted chest, a soft golden light glowing from beneath his fingers, a glowing golden halo, white wings softly out of focus, alpine light. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-cu-05-angel-tear",
-      "prompt": "Close-up of the face of the young blond curly-haired muscular angel in the reference image, eyes closed, a single shining tear running down his cheek, a gentle grateful smile, a glowing golden halo above, soft white wings out of focus, mountains glowing gold behind, deeply moved. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-08-angel-bow",
-      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), kneeling and bowing deeply with his forehead touching the grass of an alpine meadow full of wildflowers, wings folded forward humbly, before a distant blaze of golden light rising over the snowy peaks; side view, reverent and solemn. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-09-three-generations",
-      "prompt": "A gently comic scene: three angels sleeping peacefully in a neat row on a soft alpine meadow under a starry golden night sky — the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), his young son (a small muscular blond child angel wrapped in white cloth) and his grandson (a chubby baby cherub wrapped in white cloth) — all three lying with their heads toward a small glowing white chapel on a far mountaintop and their feet pointing away from it; serene sleeping faces, moonlight on the snowy peaks. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-10-colossal",
-      "prompt": "Epic vista: a colossal figure of the man in the reference photo (keep his face and hairstyle exactly as in the photo), standing with his arms crossed confidently, shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a serene, warm smile, rising behind a range of snow-capped mountains like the rising sun, his smiling face, massive bare shoulders and chest visible above the peaks, enormous, a giant golden halo blazing like a sunrise, rays across the entire sky; on a ridge in the lower foreground a tiny silhouette of a winged angel looking up in awe. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "/tmp/mv-jun-2.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-cu-02-serene",
-      "prompt": "Close-up portrait of the man in the reference photo (keep his face and hairstyle exactly as in the photo): his face fills the upper frame, looking gently toward the viewer with kind eyes and a serene, warm, closed-mouth smile, a large golden halo blazing behind his head like a sunrise over the peaks, bare muscular shoulders, white wings softly out of focus. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "/tmp/mv-jun-1.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-11-angel-march",
-      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), striding forward boldly along a winding golden mountain path that leads over alpine meadows to a brilliant horizon between the peaks, wings fully spread, fists clenched with determination, a confident smile; dynamic low angle, streaks of light. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-12-angel-trophy",
-      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), standing on a snowy mountain summit and raising a large golden trophy cup wreathed in laurel high above his head toward a radiant sky, light bursting from the trophy, golden feathers swirling like confetti, triumphant joyful face, a sea of clouds and peaks below. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-cu-04-trophy",
-      "prompt": "Low-angle close-up of a radiant golden trophy cup wreathed with olive branches, raised high by two powerful muscular arms against a blazing sunburst over snowy peaks, golden light pouring over its rim like liquid, gold leaves and white feathers flying, triumphant, no face visible. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-13-angel-oath",
-      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), one hand on his heart and the other raised in a solemn oath, standing on an alpine meadow before a small white stone chapel, behind him a choir of cherubs wrapped in white cloth singing with candles and golden alphorns and trumpets, warm golden light. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "design/mv-art/ref/angel.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-14-together",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing on white marble steps of an ancient temple on a highland plateau at sunrise beside a young blond curly-haired muscular angel with white wings; the man rests a hand on the angel's shoulder; the man faces the viewer with a big warm smile, his face clearly visible and in focus; the angel is turned toward him, seen in profile; snowy peaks behind, golden light, heartfelt. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "/tmp/mv-jun-1.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-cu-01-smile",
-      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), close-up portrait: his face fills the upper half of the frame, laughing with a big warm joyful smile, eyes crinkled, bare muscular shoulders and chest, a glowing golden halo behind his head, the edges of radiant white angel wings at both sides, golden backlight from the peaks, shallow depth of field. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "refs": [
-        "/tmp/mv-jun-1.jpg"
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-15-temple-finale",
-      "prompt": "A grand white domed classical temple standing on a high mountain plateau above a sea of clouds, an explosion of golden light bursting from behind the dome, snow-capped peaks around, hundreds of white feathers and edelweiss petals swirling, two tiny figures at the top of the steps — a winged blond angel and a shirtless muscular winged man with a white hip cloth and golden sash — waving. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-20-dome-interior",
-      "prompt": "Inside a vast temple high in the mountains: looking up into an immense golden coffered dome with a bright open oculus pouring a column of divine light straight down, a ring of white marble columns, through tall arches the snowy peaks are visible, edelweiss petals and white feathers floating in the light, no people. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
-      ],
-      "always": false
-    },
-    {
-      "id": "jun-16-end-sky",
-      "prompt": "A calm, serene golden evening sky over misty highland valleys and distant snowy peaks, a faint ring of light in the center, empty and peaceful. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
-      "w": 2048,
-      "h": 2048,
-      "size": [
-        1440,
-        1440
       ],
       "always": false
     },
