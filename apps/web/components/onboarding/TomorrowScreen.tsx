@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useI18n } from '@/lib/i18n/client';
 import { unlockAudio } from '@/lib/onboarding/audio';
@@ -21,7 +22,10 @@ export function TomorrowScreen({
   skipLabel,
   skippedText,
   canSkip = false,
+  bati,
 }: {
+  /** the hatched Bati: a calm way into Bati's room (the Moon) to talk while the day waits (P-BATI-ROOM) */
+  bati?: { name: string; image?: string };
   /** the review pages only: the skip button (never in the members' app, M-R199) */
   canSkip?: boolean;
   /** The caption after a skip (default: the door opened). */
@@ -171,7 +175,7 @@ export function TomorrowScreen({
               <div className="relative flex items-end gap-2.5" style={{ fontFamily: '"Cormorant Garamond", "Shippori Mincho", serif' }}>
                 {parts.map(([n, unit]) => (
                   <span key={unit} className="flex items-end gap-0.5">
-                    <span className="bg-gradient-to-b from-[#fff6dc] via-[#f0d08c] to-[#b98a3e] bg-clip-text text-[52px] font-light leading-none tabular-nums text-transparent drop-shadow-[0_0_14px_rgba(255,214,140,0.35)]">{n}</span>
+                    <span className="bg-gradient-to-b from-[#fff6dc] via-[#f0d08c] to-[#b98a3e] bg-clip-text text-[52px] font-light leading-none tabular-nums lining-nums text-transparent drop-shadow-[0_0_14px_rgba(255,214,140,0.35)]">{n}</span>
                     <span className="mb-1.5 text-[11px] tracking-[0.15em] text-amber-100/60" style={{ fontFamily: SERIF }}>
                       {unit}
                     </span>
@@ -182,7 +186,21 @@ export function TomorrowScreen({
             <p className="mt-6 text-[11px] tracking-[0.4em] text-amber-100/45">つぎの扉が ひらくまで</p>
           </div>
 
-          <div className="pb-safe absolute inset-x-0 bottom-0 flex justify-center pb-14">
+          <div className="pb-safe absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pb-14">
+            {phase === 'wait' && showButton && bati && (
+              <Link
+                href="/moon"
+                className="flex animate-[fadeUp_0.8s_ease-out] items-center gap-3 rounded-full border border-amber-100/25 bg-white/[0.04] py-2 pl-2 pr-7 text-[14px] tracking-[0.2em] text-amber-50/90 backdrop-blur active:scale-95"
+              >
+                {bati.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={bati.image} alt="" className="h-9 w-9 rounded-full bg-amber-50/10 object-contain" />
+                ) : (
+                  <span className="h-9 w-9 rounded-full border border-amber-100/30" aria-hidden />
+                )}
+                {bati.name}と話す
+              </Link>
+            )}
             {phase === 'wait' && showButton && canSkip && (
               <button
                 onClick={skip}
@@ -202,32 +220,33 @@ export function TomorrowScreen({
   );
 }
 
-/** A quiet field of stars; on a skip they stream outwards from the middle (time rushing past). */
+/** A quiet field of stars; on a skip, streaks rush outwards from the middle (time rushing past). */
 function Stars({ warp }: { warp: boolean }) {
   const stars = useRef(
     Array.from({ length: 70 }, (_, i) => {
       const a = (i * 137.5 * Math.PI) / 180;
       const d = 8 + ((i * 53) % 46);
-      return { x: 50 + d * Math.cos(a), y: 50 + d * Math.sin(a) * 1.4, s: 0.6 + ((i * 7) % 10) / 10, a, delay: (i % 12) * 0.08 };
+      return { x: 50 + d * Math.cos(a), y: 50 + d * Math.sin(a) * 1.4, s: 0.6 + ((i * 7) % 10) / 10, deg: (i * 137.5) % 360, delay: (i % 14) * 0.07 };
     }),
   ).current;
+  if (warp)
+    return (
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        {stars.map((st, i) => (
+          // a spoke from the centre, turned to its angle; the streak runs out along it
+          <span key={i} className="absolute left-1/2 top-[45%] h-0 w-0" style={{ transform: `rotate(${st.deg}deg)` }}>
+            <span className="absolute -left-px block h-10 w-[1.5px] rounded-full bg-gradient-to-b from-transparent via-amber-50 to-transparent" style={{ animation: `warpOut 0.85s ${st.delay}s cubic-bezier(.5,0,1,1) infinite` }} />
+          </span>
+        ))}
+      </div>
+    );
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden>
       {stars.map((st, i) => (
         <span
           key={i}
           className="absolute rounded-full bg-amber-50"
-          style={{
-            left: `${st.x}%`,
-            top: `${st.y}%`,
-            width: warp ? 1.5 : st.s * 1.6,
-            height: warp ? 26 : st.s * 1.6,
-            opacity: warp ? 0.7 : 0.25 + st.s * 0.35,
-            transform: warp ? `rotate(${(st.a * 180) / Math.PI + 90}deg)` : undefined,
-            animation: warp ? `warp 0.9s ${st.delay}s ease-in infinite` : `twinkle ${3 + (i % 5)}s ${i * 0.13}s ease-in-out infinite`,
-            ['--dx' as string]: `${Math.cos(st.a) * 60}vw`,
-            ['--dy' as string]: `${Math.sin(st.a) * 60}vh`,
-          }}
+          style={{ left: `${st.x}%`, top: `${st.y}%`, width: st.s * 1.6, height: st.s * 1.6, opacity: 0.25 + st.s * 0.35, animation: `twinkle ${3 + (i % 5)}s ${i * 0.13}s ease-in-out infinite` }}
         />
       ))}
     </div>

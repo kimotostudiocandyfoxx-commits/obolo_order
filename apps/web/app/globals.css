@@ -790,3 +790,4 @@ body {
 @keyframes shimmer { 0% { transform: translateX(0); } 60%, 100% { transform: translateX(400%); } }
 @keyframes twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.85; } }
 @keyframes warp { from { transform: translate(0, 0) scaleY(0.2); opacity: 0; } 20% { opacity: 0.8; } to { transform: translate(var(--dx), var(--dy)) scaleY(1.4); opacity: 0; } }
+@keyframes warpOut { from { transform: translateY(-20px) scaleY(0.3); opacity: 0; } 25% { opacity: 0.9; } to { transform: translateY(-62vh) scaleY(1.6); opacity: 0; } }
