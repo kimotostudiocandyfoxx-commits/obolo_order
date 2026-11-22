@@ -1,16 +1,76 @@
-# UI art — 2026-11-22T01:46:41.713Z
+# UI art — 2026-11-22T02:03:05.506Z
 
-Seedream 5.0 Pro / 12枚 / 約175円
+Seedream 5.0 Pro / 72枚 / 約864円
 
-- ✅ kimorin-i-shock
-- ✅ kimorin-i-shock-notail
-- ✅ kimorin-i-shock-o
-- ✅ kimorin-i-talk
-- ✅ kimorin-i-talk-notail
-- ✅ kimorin-i-talk-o
-- ✅ kimorin-xs-point
-- ✅ kimorin-xs-point-notail
-- ✅ kimorin-xs-point-o
-- ✅ kimorin-xs-talk
-- ✅ kimorin-xs-talk-notail
-- ✅ kimorin-xs-talk-o
+- ✅ kimorin-i
+- ✅ kimorin-i-blush
+- ✅ kimorin-i-blush-notail
+- ✅ kimorin-i-blush-o
+- ✅ kimorin-i-joy
+- ✅ kimorin-i-joy-notail
+- ✅ kimorin-i-joy-o
+- ✅ kimorin-i-lecture
+- ✅ kimorin-i-lecture-notail
+- ✅ kimorin-i-lecture-o
+- ✅ kimorin-i-notail
+- ✅ kimorin-i-o
+- ✅ kimorin-i-point
+- ✅ kimorin-i-point-notail
+- ✅ kimorin-i-point-o
+- ✅ kimorin-i-smug
+- ✅ kimorin-i-smug-notail
+- ✅ kimorin-i-smug-o
+- ✅ kimorin-i-tears
+- ✅ kimorin-i-tears-notail
+- ✅ kimorin-i-tears-o
+- ✅ kimorin-i-think
+- ✅ kimorin-i-think-notail
+- ✅ kimorin-i-think-o
+- ✅ kimorin-iu
+- ✅ kimorin-iu-blush
+- ✅ kimorin-iu-blush-notail
+- ✅ kimorin-iu-blush-o
+- ✅ kimorin-iu-joy
+- ✅ kimorin-iu-joy-notail
+- ✅ kimorin-iu-joy-o
+- ✅ kimorin-iu-lecture
+- ✅ kimorin-iu-lecture-notail
+- ✅ kimorin-iu-lecture-o
+- ✅ kimorin-iu-notail
+- ✅ kimorin-iu-o
+- ✅ kimorin-iu-point
+- ✅ kimorin-iu-point-notail
+- ✅ kimorin-iu-point-o
+- ✅ kimorin-iu-shock
+- ✅ kimorin-iu-shock-notail
+- ✅ kimorin-iu-shock-o
+- ✅ kimorin-iu-smug
+- ✅ kimorin-iu-smug-notail
+- ✅ kimorin-iu-smug-o
+- ✅ kimorin-iu-tears
+- ✅ kimorin-iu-tears-notail
+- ✅ kimorin-iu-tears-o
+- ✅ kimorin-iu-think
+- ✅ kimorin-iu-think-o
+- ✅ kimorin-sun
+- ✅ kimorin-sun-o
+- ✅ kimorin-xs-joy
+- ✅ kimorin-xs-lecture
+- ✅ kimorin-xs-shock
+- ✅ kimorin-xs-smug
+- ✅ kimorin-xs-tears
+- ✅ kimorin-xs-think
+- ✅ kimorin-xs-think-o
+- ❌ kimorin-iu-think-notail: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.398 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfere
+- ❌ kimorin-sun-notail: Error: 400 [{"code":"concurrentRequestLimitExceeded","message":"Insufficient available balance. 0.6965 credits are currently reserved for requests in progress, and this request needs 0.0995 credits. Please wait for those requests to complete before submitting another request.","taskType":"imageInfer
+- ❌ kimorin-xs-joy-notail: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-joy-o: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-lecture-notail: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-lecture-o: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-shock-notail: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-shock-o: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-smug-notail: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-smug-o: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-tears-notail: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-tears-o: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.398 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.2985,"taskCredits":0.0995,"minimum
+- ❌ kimorin-xs-think-notail: Error: 400 [{"code":"insufficientCredits","message":"Insufficient credits, this request requires a minimum balance of 0.4975 credits. Please add your credit card and top-up your balance at https://my.runware.ai/wallet","taskType":"imageInference","reservedCredits":0.398,"taskCredits":0.0995,"minimum
