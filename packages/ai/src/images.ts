@@ -362,16 +362,31 @@ export function batiPrompt(food: string, fromBody = false): string {
  * Bati's room (P-BATI-ROOM): the hatched Bati, on its flat grey, dressed up or changed a little by the member's wish —
  * clothes, accessories, a small transformation — and still clearly the same creature. Three variations per round.
  */
-export function batiRestylePrompt(wish: string, variant = 0): string {
+/**
+ * The look's rules for every painting of {bati} (M-R215): free per child, but never a real person's lookalike, another
+ * work's character, a sexual or a violent look. The wish is screened before (moderateLookWish); these say it again.
+ */
+export const BATI_LOOK_RULES =
+  'Rules for the look: it must not resemble any real, existing person; it must not resemble or copy any character, mascot, costume, ' +
+  'logo or brand from an existing anime, game, film, book or company; nothing sexual or revealing; nothing violent (no weapons, blood ' +
+  'or injuries). Cute and kids-friendly, never scary.';
+
+/**
+ * `withOriginal`: the {bati} as it was born is attached as the second picture, so the creature does not drift away
+ * over many dress-ups (M-R215: the current look is the reference, the birth's picture keeps who it is).
+ */
+export function batiRestylePrompt(wish: string, variant = 0, withOriginal = false): string {
   const ways = ['a happy pose', 'a proud little pose, showing off the new look', 'a playful pose, turning a little'];
   return (
     'Edit the first picture: it is the same small magical partner creature called Bati, and it must stay clearly the same creature — ' +
     'the same face, eyes, body shape, size, main colours, the tiny mark on its forehead, the same soft painted style, framing and the flat ' +
     'plain mid-grey background (#808080) with no floor, no shadow and no other objects. ' +
-    `Dress it up or change it a little following this wish: "${wish}" — new clothes, accessories, a hat, a small costume or a small, ` +
-    'cute transformation (colours of a part, little wings, a tail tip, ears), never a different animal or a different character. ' +
-    `Variation ${variant + 1}: ${pick(ways, variant)}. Cute, kids-friendly, never scary. No text, no letters. ` +
-    'Do not copy any existing character, mascot, costume, logo or brand.'
+    (withOriginal ? 'The second picture is the same creature as it was born: keep its identity (face, eyes, body shape) from it. ' : '') +
+    `Dress it up or change it a little following this wish: "${wish}" — new clothes, accessories, a hat, a small costume, a different art ` +
+    'touch (watercolour, crayon, pixel art …) or a small, cute transformation (colours of a part, little wings, a tail tip, ears), never a ' +
+    'different animal or a different character. ' +
+    `Variation ${variant + 1}: ${pick(ways, variant)}. No text, no letters. ` +
+    BATI_LOOK_RULES
   );
 }
 

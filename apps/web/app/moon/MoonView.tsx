@@ -1,5 +1,6 @@
 'use client';
 
+import { callRequest } from '@obolo/shared';
 import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView, BuddySource } from '@obolo/shared';
 import { DrawnPicture, SourceChips } from '@/components/chat/BuddyExtras';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
@@ -12,6 +13,7 @@ import { useI18n } from '@/lib/i18n/client';
 import { useAuth } from '@/lib/auth';
 import { RoomIcon, RoomSheet, type RoomMode } from './BatiRoom';
 import { LineIcon } from '@/components/LineIcon';
+import { BatiSettings, MoonEgg, NewEggFlow } from '@/components/bati/BatiSheet';
 
 export function MoonView() {
   return (
@@ -50,8 +52,9 @@ function BatiFace({ size = 36 }: { size?: number }) {
 
 function Chat() {
   const { m, t, locale } = useI18n();
-  const { me } = useAuth();
+  const { me, setMe } = useAuth();
   const api = getApi();
+  const [eggOpen, setEggOpen] = useState(false);
   const [profile, setProfile] = useState<BuddyProfileView | null>(null);
   const [messages, setMessages] = useState<BuddyMessageView[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -110,6 +113,8 @@ function Chat() {
           )
         : await api.buddyChat(body, locale);
       setMessages((cur) => [...cur.filter((x) => x.id !== tempId && x.id !== liveId), r.userMessage, r.reply]);
+      // M-R222: 「覚えといて」 / 「〇〇って呼んで」 changed {bati} on the server: the card follows
+      if (r.reply.remembered || callRequest(body)) void api.me().then(setMe).catch(() => undefined);
       setQuota(r.quota);
     } catch (err) {
       setMessages((cur) => cur.filter((x) => x.id !== tempId && x.id !== liveId));
@@ -136,6 +141,8 @@ function Chat() {
         {quota && quota.freeDaily - quota.usedToday <= 5 && (
           <span className="chip bg-white/10 text-white/70">今日は、あと少し話せるよ</span>
         )}
+        {/* M-R218: the small egg on the temple's altar — bigger and brighter with the days, no number; ready: tap to hatch */}
+        <MoonEgg me={me} onHatch={() => setEggOpen(true)} />
         <button className="btn btn-ghost h-9 w-9 !p-0" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
           <LineIcon id="gear" className="h-5 w-5" />
         </button>
@@ -212,6 +219,7 @@ function Chat() {
         </button>
       </form>
 
+      {eggOpen && me && <NewEggFlow me={me} onMe={setMe} onClose={() => setEggOpen(false)} />}
       {room && (
         <RoomSheet
           mode={room}
@@ -275,6 +283,7 @@ function SettingsSheet({
   onForget: () => void;
 }) {
   const { m } = useI18n();
+  const { me, setMe } = useAuth();
   const [name, setName] = useState(profile.buddyName);
   const [persona, setPersona] = useState<BuddyPersona>(profile.persona);
   const [busy, setBusy] = useState(false);
@@ -331,11 +340,16 @@ function SettingsSheet({
           <span className="font-bold">{m.moon.buddyName}</span>
           <input className="input mt-1" maxLength={20} value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <div className="space-y-4">
-          {slider('cheer', m.moon.cheer, m.moon.cheerLow, m.moon.cheerHigh)}
-          {slider('polite', m.moon.polite, m.moon.politeLow, m.moon.politeHigh)}
-          {slider('humor', m.moon.humor, m.moon.humorLow, m.moon.humorHigh)}
-        </div>
+        {/* M-R215: a {bati} with a personality talks in it (never changes): only its 呼び方 / 一人称, and which one is in the chat */}
+        {me?.bati?.personality ? (
+          <BatiSettings me={me} onMe={setMe} />
+        ) : (
+          <div className="space-y-4">
+            {slider('cheer', m.moon.cheer, m.moon.cheerLow, m.moon.cheerHigh)}
+            {slider('polite', m.moon.polite, m.moon.politeLow, m.moon.politeHigh)}
+            {slider('humor', m.moon.humor, m.moon.humorLow, m.moon.humorHigh)}
+          </div>
+        )}
         <div className="mt-5 flex gap-2">
           <button className="btn btn-ghost flex-1" onClick={onClose}>
             {m.common.cancel}

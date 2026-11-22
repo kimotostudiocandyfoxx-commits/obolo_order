@@ -1,4 +1,4 @@
-import type { DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -270,8 +270,19 @@ export interface Api {
   mvLyrics(id: string): Promise<JobView>;
   /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) — a background job */
   mvStory(id: string, mood: string): Promise<JobView>;
-  /** `egg`: the egg chosen on the altar ('sun' = 太陽と月, 'earth' = 地球と月) */
-  batiEgg(food: string, egg?: 'sun' | 'earth'): Promise<Me>;
+  /** `egg`: the egg chosen on the altar (M-R215: 'moon' = 女の子寄り, 'sun' = 男の子寄り); the personality is decided from the food (M-R217) — SEED_REASK: OBOLON asks again */
+  batiEgg(food: string, egg?: BatiEggKind): Promise<Me>;
+  /** M-R218: the grown egg hatched in the Moon temple from its seed (the 2nd: a sound, the 3rd: a word); EGG_NOT_READY / BATI_FULL / SEED_REASK */
+  batiNew(egg: BatiEggKind, seed: string): Promise<Me>;
+  /** M-R215: another of the member's {bati} comes into the chat */
+  batiSwitch(id: string): Promise<Me>;
+  /** M-R215: how {bati} calls the member and its 一人称 (null = the birth's) */
+  batiSpeech(body: { id?: string; call?: string | null; self?: string | null }): Promise<Me>;
+  /** M-R222: the card's 〔覚えさせる〕 (the chat's 「覚えといて」 is found by the server); MEMORY_REFUSED / MEMORY_FULL / MEMORY_ALREADY */
+  batiMemory(text: string, id?: string): Promise<Me>;
+  /** M-R222: forget one of 「覚えてること」 (or all without `memory`) */
+  batiForget(memory?: string, id?: string): Promise<Me>;
+  batiRole(role: BatiRole, id?: string): Promise<Me>;
   /** The egg hatches: the Bati image is generated (can take a while). */
   batiHatch(): Promise<Me>;
   batiName(name: string): Promise<Me>;

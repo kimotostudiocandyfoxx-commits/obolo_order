@@ -49,6 +49,7 @@ import { MvService } from './mv/mv.service';
 import { SaturnService } from './saturn/saturn.service';
 import { LookController } from './look/look.controller';
 import { LookService } from './look/look.service';
+import { BatiMemoryService } from './look/memory.service';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { LedgerService } from './wallet/ledger.service';
@@ -110,6 +111,7 @@ import { WalletController } from './wallet/wallet.controller';
     RadioService,
     InvitesService,
     LookService,
+    BatiMemoryService,
     BillingService,
     ComposeService,
     SongService,

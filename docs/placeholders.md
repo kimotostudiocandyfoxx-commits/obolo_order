@@ -246,3 +246,20 @@ KIMORIN⭐︎ の待ち時間の声（作る行・そのまま。句読点も変
 - k6（5日目の夜）「島に、また何か、生えていませんか？　私のには、生えていました。」
 - k7（6日目の夜）「明日は、金星。……電子レンジの次は、何でしょうね。私の推理では、、、言いません。」
 - k8（7日目の夜）「……明日で、旅が終わるそうですね。……いえ、べつに、さみしくは、ありません。」
+
+## バティ（M-R215〜M-R222・2026-11-22）
+
+最大3体・月と太陽のたまご・性格（M-R216／M-R217）・カード・88日ごとの新しいたまご・バティが覚えること（M-R222）。手帳（M-R219）・調味料（M-R220／M-R221）・「月で眠らせる」（M-R215 → M-R217 で取りやめ）は作っていない／取り除いた。
+
+| ID | 状態 | 内容 | 現在の仮実装 | 差し替え場所 |
+|---|---|---|---|---|
+| P-BATI-VARIANTS | 🟡 | ふつうの性格7つ（元気な子以外）の、{bati}の決まった台詞の言い方 | **開発チームが書いた。物語セッションの確認待ち**。台本の{bati}の台詞すべて（全日・SYS・会員後、74行）×7。意味・長さ・{ }はそのまま、一人称は `{self}`。台本にない行は規則の変換（`batiRuleTransform`）で代わりに言う | `packages/shared/src/batiVariants.ts`（検査：`apps/web/lib/story/batiVariants.test.ts`） |
+| P-BATI-RARE | 🟡 | めずらしい性格12（博多弁・武士・忍者…）の台詞 | 生まれた時に一度だけ、バティの会話のAI（Haiku 5.5）が全部の台詞を書き直す（1回の呼び出し。{ }が同じで長さ±40%以内の行だけ使い、だめな行は台本のまま）。台本が増えた時の書き直しは、まだしない | `packages/ai/src/batiPersona.ts`（`rewriteBatiLines`）、ジョブ `bati.lines` |
+| P-BATI-VOICE | 🟡 | 言い方を変えた{bati}の台詞の声 | 作り置きの声は台本の言葉（元気な子）なので、言い方の変わった行は**声なし**で出す（字と声が食いちがわないように）。性格ごとの声は作っていない | `components/onboarding/StoryPlayer.tsx`（`batiLineVaried`） |
+| P-BATI-EGGS | 🟡 | 月のたまご（女の子寄り）の絵・映像 | 旧「地球と月のたまご」の絵（ファイル名 earth）を代わりに使う。太陽のたまごは今までの絵。体型の素材は `apps/api/assets/bati/moon-*`／`sun-*` | `lib/onboarding/day2.ts`・`lib/onboarding/egg.ts`（`eggFile`）・`public/onboarding/s/d2-egg-earth*` |
+| P-BATI-SMALLEGG | 🟡 | 殻から生まれる小さなたまご（祭壇・月のチャットの上・Bluenaのカードの横） | 図形とCSSだけ（絵なし）。日がたつほど少し大きく明るく（数字は出さない）。育った朝の場面は台本にまだないので、決定（バティの性格の決め方.md §4・§6）の台詞で月の画面に出す | `components/bati/SmallEgg.tsx`・`components/bati/BatiSheet.tsx`（`NewEggFlow`） |
+| P-BATI-CARD | 🟡 | バティのカード（めずらしい性格は金の縁） | 図形とCSS。画像は端末の中でcanvasに描いてPNG（1080×1920）。共有できる端末は共有、ほかはダウンロード | `components/bati/BatiCard.tsx` |
+| P-BATI-SEED | 🟡 | 2体目（好きな音）・3体目（好きな言葉）の種の決め方 | 食べ物と同じ係（`decideBatiPersona`、種の種類つき）。AIなし（デモ・テスト）は言葉の規則表（`batiPersonaByRules`） | `packages/ai/src/batiPersona.ts`・`packages/shared/src/batiPersona.ts` |
+| P-BATI-VISIT | ⚪ | 「遊びに行かせる」（ダチのチャットに一日だけ） | あとで作る。データの置き場だけ（`BatiRecord.visit`）。記憶とバティは持ち主のまま、ダチの会話の中身は持ち帰らない | `apps/api/src/look/batis.ts` |
+| P-BATI-MEMORY | 🟡 | バティが覚えること（M-R222）の「覚えない物」の判定 | 正規表現（住所・電話・メール・学校/会社・パスワード・お金・ほかの人・体や病気）＋いつものモデレーション。15歳未満・生まれた年がまだの人は、もっと強く（さん/くん付きの名前・駅・4桁以上の数字・体・学校） | `packages/shared/src/batiMemory.ts`（`memoryRefusal`）・`apps/api/src/look/memory.service.ts` |
+| P-BATI-LOOK | 🟡 | 見た目の禁止（実在の人・ほかの作品のキャラ・性的・暴力的） | 着せかえの言葉を、語の表 → いつものモデレーション → （本物のAIの時）見た目専用のチェック。絵の指示にも同じ決まり。生まれた時の絵を2枚目の参考画像として毎回わたす | `packages/shared/src/batiPersona.ts`（`LOOK_WISH_RULES`）・`packages/ai/src/moderation.ts`（`moderateLookWish`）・`packages/ai/src/images.ts`（`BATI_LOOK_RULES`） |

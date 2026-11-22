@@ -1,5 +1,6 @@
 'use client';
 
+import { ShellEggFx } from '@/components/bati/SmallEgg';
 import { isDemoMode } from '@/lib/onboarding/demoMode';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motionUrl, SE_FILES, seUrl, spriteUrl } from '@/lib/onboarding/media';
@@ -593,6 +594,7 @@ export function Takoyaki({ face, size, speaking = false, hue = 28 }: { face?: st
 /** Picture effects over the background: the sky ring of kororins, KIMORIN⭐︎'s kororin. */
 export function FxLayer({ fx }: { fx: PictureFx | null }) {
   if (!fx) return null;
+  if (fx === 'shell-egg') return <ShellEggFx />;
   if (fx === 'kimorin-kororin')
     return (
       <div className="pointer-events-none absolute inset-x-0 top-[30svh] z-[3] flex animate-[fadeUp_0.5s_ease-out] justify-center">

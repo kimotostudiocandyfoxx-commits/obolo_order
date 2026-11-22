@@ -73,7 +73,15 @@ import {
   type PuniPicResult,
   type BatiRestyleResult,
   isChild,
+  lookWishCategory,
+  type BatiEggKind,
+  type BatiRole,
+  callRequest,
+  memoryRefusal,
+  MEMORY_LINES,
+  rememberRequest,
 } from '@obolo/shared';
+import { demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
 import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
@@ -405,7 +413,26 @@ export class DemoApi implements Api {
     // M-R208 offline: "〜の絵を見せて" brings a local picture, a question a made-up source link (no network)
     const drawn = /絵|描いて|見た目|picture|draw/i.test(text);
     const looked = !drawn && /[?？]|いつ|どこ|なに|何|いくつ|ニュース|天気/.test(text);
-    const reply = drawn ? (locale === 'en' ? 'I drew it for you!' : '絵を描いてみたよ！') : cannedReply(text, b.name, b.memory, locale);
+    // M-R222: only the member's own 「覚えといて」 keeps something (the same rules as the server); 「〇〇って呼んで」 the 呼び方
+    const ask = this.s.users[id]?.bati ? rememberRequest(text) : null;
+    const call = ask ? null : this.s.users[id]?.bati ? callRequest(text) : null;
+    let said: string | null = null;
+    let remembered: BuddyMessageView['remembered'];
+    if (ask) {
+      try {
+        this.patchMe((u) => demoBatiMemory(u, ask));
+        said = MEMORY_LINES.kept;
+        remembered = { text: ask, result: 'kept' };
+      } catch (e) {
+        const code = e instanceof ApiError ? e.code : '';
+        remembered = { text: ask, result: code === 'MEMORY_FULL' ? 'full' : code === 'MEMORY_ALREADY' ? 'already' : 'refused' };
+        said = code === 'MEMORY_FULL' ? MEMORY_LINES.full : code === 'MEMORY_ALREADY' ? 'それ、もう、覚えてるよ！' : MEMORY_LINES.refuse.replace('{neo}', this.s.users[id]?.displayName ?? '');
+      }
+    } else if (call && !memoryRefusal(call, { birthYear: this.s.users[id]?.birthYear ?? null })) {
+      this.patchMe((u) => demoBatiSpeech(u, { call }));
+      said = `わかった！　これからは、${call}って呼ぶね！`;
+    }
+    const reply = said ?? (drawn ? (locale === 'en' ? 'I drew it for you!' : '絵を描いてみたよ！') : cannedReply(text, b.name, b.memory, locale));
     const t0 = Date.now();
     const userMessage: BuddyMessageView = { id: uid(), role: 'user', text, createdAt: new Date(t0).toISOString() };
     const buddyMessage: BuddyMessageView = {
@@ -414,6 +441,7 @@ export class DemoApi implements Api {
       text: reply,
       createdAt: new Date(t0 + 1).toISOString(),
       ...(drawn ? { image: { url: '/onboarding/s/rocket-space.jpg' } } : {}),
+      ...(remembered ? { remembered } : {}),
       ...(looked ? { sources: [{ title: 'デモのページ（本番は調べたページ）', url: 'https://example.com/', domain: 'example.com' }] } : {}),
     };
     b.messages.push(userMessage, buddyMessage);
@@ -912,6 +940,8 @@ export class DemoApi implements Api {
   async batiRestyle(wish: string): Promise<BatiRestyleResult> {
     const u = this.s.users[this.uid()];
     if (!u.bati?.imageUrl) throw new ApiError(409, 'NO_BATI', 'Not hatched yet');
+    // M-R215: no real person's or another work's lookalike, nothing sexual or violent
+    if (lookWishCategory(wish)) throw new ApiError(422, 'MODERATION', 'その姿には、できないんだ');
     const key = this.roomKey('restyle');
     const used = Number(localStorage.getItem(key) ?? 0);
     if (used >= BATI_RESTYLE_PER_DAY) throw new ApiError(429, 'RESTYLE_TRIES', '今日はもう着替えられません');
@@ -1414,13 +1444,39 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
-  async batiEgg(food: string, _egg?: 'sun' | 'earth') {
-    return this.patchMe(() => ({ bati: { food, name: null, imageUrl: null } }));
+  // M-R215 / M-R217: the personality by the rules alone (no model), the card, the small egg
+  async batiEgg(food: string, egg?: BatiEggKind) {
+    return this.patchMe((u) => demoBatiEgg(u, food, egg ?? 'sun'));
   }
 
   async batiHatch() {
     await new Promise((r) => setTimeout(r, 2500));
-    return this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: u.bati.imageUrl ?? demoBati(u.bati.food) } } : {}));
+    this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: u.bati.imageUrl ?? demoBati(u.bati.food) } } : {}));
+    return this.patchMe(demoBatiSync);
+  }
+
+  async batiNew(egg: BatiEggKind, seed: string) {
+    await sleep(600);
+    return this.patchMe((u) => demoBatiNew(u, egg, seed));
+  }
+  async batiSwitch(id: string) {
+    const me = this.patchMe((u) => demoBatiSwitch(u, id));
+    this.buddyOf(me.id).name = me.bati?.name ?? this.buddyOf(me.id).name;
+    this.save();
+    return me;
+  }
+  async batiSpeech(body: { id?: string; call?: string | null; self?: string | null }) {
+    return this.patchMe((u) => demoBatiSpeech(u, body));
+  }
+  // M-R222: what {bati} remembers (demo: on the {bati} in the chat)
+  async batiMemory(text: string) {
+    return this.patchMe((u) => demoBatiMemory(u, text));
+  }
+  async batiForget(memory?: string) {
+    return this.patchMe((u) => demoBatiForget(u, memory));
+  }
+  async batiRole(role: BatiRole) {
+    return this.patchMe((u) => demoBatiRole(u, role));
   }
 
   // demo: the drawn Bati stands in for every face; one picture from the story's own stills
@@ -1467,7 +1523,8 @@ export class DemoApi implements Api {
   }
 
   async batiName(name: string) {
-    const me = this.patchMe((u) => (u.bati ? { bati: { ...u.bati, name } } : {}));
+    this.patchMe((u) => (u.bati ? { bati: { ...u.bati, name } } : {}));
+    const me = this.patchMe(demoBatiSync);
     this.buddyOf(me.id).name = name;
     this.save();
     return me;

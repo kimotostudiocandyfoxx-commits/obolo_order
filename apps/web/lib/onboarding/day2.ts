@@ -12,7 +12,7 @@ import type { Step } from './script';
  *    {bati} and {bati}'s magic (D03-S008), and sleep on the Moon (D03-S009). Bluena comes on the morning of day 3.
  * Pictures: Seedance motions d2-* (each starting and ending on the stills around it), the Day-1 motions for
  * the HQ (d1-gate-loop, 9, 11, 12), Seedream stills s/d2-*.
- * The egg: the visitor picks the sun-and-moon or the earth-and-moon egg; KIMORIN⭐︎ gets the other one.
+ * The egg (M-R215): the visitor picks the moon egg (girl-leaning) or the sun egg (boy-leaning), f_egg; KIMORIN⭐︎ gets the other one.
  * Saved: times (+ timesWords), the look, the NEO name, egg, the favourite food, {bati} and its name, f_d03_bati_talk.
  */
 export const DAY2: Step[] = [
@@ -285,25 +285,30 @@ export const DAY2: Step[] = [
   // M-R209: {bati} is born first — the egg, the mana gem, KIMORIN's food (うんちピンポンくん), then {name}'s food and {bati}
   { t: 'scene', id: 'D03-S005' }, // 相方の誕生
   { t: 'sprite', image: null },
-  { t: 'video', motion: 'd2-altar' }, // 光の柱が神殿の奥へ。小さな祭壇に、たまごが二つ（太陽と月／地球と月）
+  // M-R215: the moon egg (girl-leaning {bati}) and the sun egg (boy-leaning). PROVISIONAL (docs/placeholders.md P-BATI-EGGS):
+  // the moon egg's pictures and films are the old earth-and-moon egg's ('earth' in the file names) until the new ones come
+  { t: 'video', motion: 'd2-altar' }, // 光の柱が神殿の奥へ。小さな祭壇に、たまごが二つ（白く静かに光る月のたまご／金色に燃える太陽のたまご）
   { t: 'still', image: 's/d2-altar' },
-  { t: 'say', who: 'OBOLON', text: '太陽と月と地球。陰と陽の力で、、、このたまごは、生まれた。' },
+  { t: 'say', who: 'OBOLON', text: '月と、太陽。、、、陰と陽の力で、このたまごは、生まれた。' },
   { t: 'say', who: 'OBOLON', text: 'どちらか好きな方を選べ' },
-  // the egg itself is tapped (client 2026-10-29)
-  { t: 'choice', key: 'egg', pics: ['/onboarding/egg-pick-sun.webp', '/onboarding/egg-pick-earth.webp'], options: [{ label: '太陽と月のたまご', goto: 'egg-sun' }, { label: '地球と月のたまご', goto: 'egg-earth' }] },
+  { t: 'notice', text: '月のたまごからは、女の子寄りの相方が。太陽のたまごからは、男の子寄りの相方が、生まれます。生まれたあとの見た目は、自由に変えられます' },
+  // the egg itself is tapped (client 2026-10-29); f_egg = moon / sun (the script's ids)
+  { t: 'choice', key: 'egg', pics: ['/onboarding/egg-pick-earth.webp', '/onboarding/egg-pick-sun.webp'], options: [{ label: '月のたまご（女の子寄り）', goto: 'egg-moon' }, { label: '太陽のたまご（男の子寄り）', goto: 'egg-sun' }] },
   // KIMORIN names the one left (client 2026-10-29)
-  { t: 'label', id: 'egg-sun' },
-  { t: 'still', image: 's/d2-egg-sun' },
-  { t: 'say', who: 'KIMORIN', text: 'そうですか。私は地球の卵がいいので、ちょうどいいですね。' },
-  { t: 'goto', id: 'egg-chosen' },
-  { t: 'label', id: 'egg-earth' },
+  { t: 'label', id: 'egg-moon' },
+  { t: 'set', key: 'f_egg', value: 'moon' },
   { t: 'still', image: 's/d2-egg-earth' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか。私は太陽の卵がいいので、ちょうどいいですね。' },
+  { t: 'goto', id: 'egg-chosen' },
+  { t: 'label', id: 'egg-sun' },
+  { t: 'set', key: 'f_egg', value: 'sun' },
+  { t: 'still', image: 's/d2-egg-sun' },
+  { t: 'say', who: 'KIMORIN', text: 'そうですか。私は月の卵がいいので、ちょうどいいですね。' },
   { t: 'label', id: 'egg-chosen' },
   { t: 'say', who: 'OBOLON', text: 'たまごの前に、、、マナジェムを、置け。' },
   { t: 'action', label: 'マナジェムを置く' },
   { t: 'se', sound: 'chime' }, // たまごの前にマナジェムを置く。隣で、KIMORIN⭐︎も自分のマナジェムを置く
-  { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'gem-sun' }, otherwise: 'gem-earth' },
+  { t: 'branch', key: 'f_egg', cases: { sun: 'gem-sun' }, otherwise: 'gem-earth' },
   { t: 'label', id: 'gem-sun' },
   { t: 'still', image: 's/d2-egg-sun-gem' },
   { t: 'goto', id: 'egg-gem' },
@@ -321,9 +326,9 @@ export const DAY2: Step[] = [
   // KIMORINの手が、押しボタンを探して空をつかむ。何もない → 曲が止まり、KIMORIN⭐︎のたまごの中から、はっきりと：ピンポンピンポン♪
   { t: 'bgm', track: null, fade: 0.3 },
   { t: 'sprite', image: null },
-  { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'pinpon-earth' }, otherwise: 'pinpon-sun' },
+  { t: 'branch', key: 'f_egg', cases: { sun: 'pinpon-earth' }, otherwise: 'pinpon-sun' },
   { t: 'label', id: 'pinpon-earth' },
-  { t: 'still', image: 's/d2-egg-earth-gem' }, // KIMORIN⭐︎のたまご（残った地球と月）
+  { t: 'still', image: 's/d2-egg-earth-gem' }, // KIMORIN⭐︎のたまご（残った月のたまご）
   { t: 'goto', id: 'pinpon' },
   { t: 'label', id: 'pinpon-sun' },
   { t: 'still', image: 's/d2-egg-sun-gem' },
@@ -333,7 +338,7 @@ export const DAY2: Step[] = [
   { t: 'bgm', track: 'tender' },
   { t: 'se', sound: 'magic' }, // KIMORIN⭐︎のマナジェムが光る。体からも、あたたかい光がにじみ出て、たまごの中へ
   { t: 'se', sound: 'egg-crack' },
-  { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'unpon-earth' }, otherwise: 'unpon-sun' },
+  { t: 'branch', key: 'f_egg', cases: { sun: 'unpon-earth' }, otherwise: 'unpon-sun' },
   { t: 'label', id: 'unpon-earth' },
   { t: 'video', motion: 'd2-pinpon-earth' }, // たまごが割れて、てっぺんがくるりと渦を巻いた、つやつやの丸い子が跳ね出る
   { t: 'goto', id: 'unpon' },
@@ -359,7 +364,7 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: null },
   { t: 'se', sound: 'magic' },
   { t: 'se', sound: 'egg-crack' },
-  { t: 'branch', key: 'egg', cases: { 太陽と月のたまご: 'hatch-sun' }, otherwise: 'hatch-earth' },
+  { t: 'branch', key: 'f_egg', cases: { sun: 'hatch-sun' }, otherwise: 'hatch-earth' },
   { t: 'label', id: 'hatch-sun' },
   { t: 'video', motion: 'd2-hatch-sun' },
   { t: 'goto', id: 'hatch' },
@@ -373,12 +378,18 @@ export const DAY2: Step[] = [
   { t: 'caption', text: '相方が誕生した' },
   // 画面に、{neo}の{bati}だけが映る (client 2026-10-29)
   { t: 'sprite', image: '@bati' },
+  // M-R218: the broken shell glows, gathers and becomes a small egg on the altar (drawn over the chat; no number is said)
+  { t: 'fx', fx: 'shell-egg' },
+  { t: 'say', who: 'OBOLON', text: '、、、殻は、、、また、たまごになる。' },
+  { t: 'fx', fx: null },
   { t: 'say', who: 'OBOLON', text: 'お前も、、、名前を、つけてやれ。' },
   { t: 'batiname', placeholder: 'バティの名前', submit: 'この名前にする' },
   { t: 'notice', text: '名前は、あとでいつでも変えられます' },
   { t: 'sprite', image: '@bati' },
   { t: 'se', sound: 'sparkle' },
   { t: 'caption', text: '{bati}が相方になった' },
+  // M-R217: the {bati} card, in the chat (it is kept on Bluena's first shelf too)
+  { t: 'baticard' },
   { t: 'face', who: '@bati', expr: 'smile' },
 
   // M-R209: {bati}'s first magic makes {name}'s look — photo into the bowl of water, the animal by voice, {bati} on the
@@ -465,6 +476,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'バティ', text: 'ボクのことも、好きに着せかえて！　ちょっとだけなら、変身もできるよ！' },
   // D03-S008 〔{bati}の魔法で、自分の姿を変える〕〔{bati}を着せかえる〕 — the Moon room's sheets, then on (also later, on the Moon)
   { t: 'magic' },
+  // M-R222: {bati} keeps only what the member asks it to (「覚えといて」), five at most; shown on its card
+  { t: 'say', who: 'バティ', text: 'ねえ、{neo}。覚えておいてほしいことがあったら、『覚えといて』って言ってね！' },
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] }, // となりで、KIMORINが、うんちピンポンくんに顔を近づける
   { t: 'say', who: 'KIMORIN', text: 'では、私も。……宇宙一の発明家は、誰ですか？' },
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },

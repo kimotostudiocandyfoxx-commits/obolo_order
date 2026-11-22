@@ -91,11 +91,17 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(steps.some((s) => s.t === 'video' && s.motion === '5-f')).toBe(false);
   });
   it('the egg: the visitor picks one, KIMORIN⭐︎ gets the other', () => {
+    // M-R215: the moon egg (girl-leaning) or the sun egg (boy-leaning), f_egg = moon / sun
     const c = steps.find((s) => s.t === 'choice' && s.key === 'egg');
-    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['太陽と月のたまご', '地球と月のたまご']);
-    const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'egg');
+    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['月のたまご（女の子寄り）', '太陽のたまご（男の子寄り）']);
+    expect(steps.filter((s) => s.t === 'set' && s.key === 'f_egg').map((s) => s.t === 'set' && s.value)).toEqual(['moon', 'sun']);
+    const b = steps.filter((s): s is Extract<Step, { t: 'branch' }> => s.t === 'branch' && s.key === 'f_egg');
     // the gem, KIMORIN⭐︎'s egg (its pinpon and うんちピンポンくん), then the visitor's own egg hatching (M-R207: on day 2 again)
-    expect(b.map((x) => x.cases['太陽と月のたまご'])).toEqual(['gem-sun', 'pinpon-earth', 'unpon-earth', 'hatch-sun']);
+    expect(b.map((x) => x.cases.sun)).toEqual(['gem-sun', 'pinpon-earth', 'unpon-earth', 'hatch-sun']);
+    // M-R218 / M-R217: the shell becomes a small egg, then the card
+    const t = steps.map((s) => s.t);
+    expect(steps.findIndex((s) => s.t === 'fx' && s.fx === 'shell-egg')).toBeGreaterThan(t.indexOf('hatch'));
+    expect(t.indexOf('baticard')).toBeGreaterThan(t.indexOf('batiname'));
   });
   it('the gem at the launch pit, then {bati} is born, {bati}\'s magic makes the look, KIMORIN\'s dragon, the NEO name and the first chat (M-R209)', () => {
     const t = kinds(steps);

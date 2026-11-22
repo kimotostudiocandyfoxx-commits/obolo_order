@@ -1,6 +1,8 @@
 import type { BuddyPersona, Locale } from './index';
 import type { SongEditCommand } from './schemas';
 import type { PuniLook } from './puni';
+import type { BatiEggKind, BatiPersonality } from './batiPersona';
+import type { BatiMemory, BatiRole } from './batiMemory';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
 
@@ -26,6 +28,10 @@ export interface Me {
   avatarUrl: string | null;
   /** The visitor's Bati: born and named on Day 2 on the Moon (from the favourite food). */
   bati: BatiView | null;
+  /** every {bati} of the member (M-R215: up to BATI_MAX_AWAKE awake; the rest sleep on the Moon), the active one included */
+  batis?: BatiSummary[];
+  /** the small glowing egg from the first shell (M-R215): hatches in the Moon temple from `readyAt` (88 days) */
+  batiEgg?: { readyAt: string; ready: boolean } | null;
   /** Day 7: when the Eclipse was paid for (null = not yet). */
   orderedAt: string | null;
   /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice.
@@ -74,6 +80,67 @@ export interface BatiView {
    * URL; made once after the hatching (POST /me/bati/faces), missing ones fall back to `imageUrl`
    */
   faces?: Partial<Record<BatiFace, string>>;
+  /** M-R215: which of the member's {bati} this is (the one in the chat) */
+  id?: string;
+  egg?: BatiEggKind;
+  /** decided at birth from the seed (M-R217), never changed */
+  personality?: BatiPersonality;
+  /** the 一人称 in use (the member's own, else the birth's) */
+  self?: string;
+  /** the member's own 一人称 / 呼び方 (null = the birth's) */
+  selfCustom?: string | null;
+  callCustom?: string | null;
+  /** the 呼び方 the birth gave, as a template ({neo} = the name) */
+  call?: string;
+  /** the card (M-R217): 口ぐせ, the introduction, the birth date */
+  card?: BatiCard;
+  /**
+   * a rare personality's fixed story lines, rewritten once at birth (script line as written → its line; a line that
+   * failed the check is missing and is said as written). The ordinary ones use BATI_VARIANTS.
+   */
+  lines?: Record<string, string>;
+  /** M-R222: 「覚えてること」 — what the member asked it to remember (five at most); the only memory the chat is given */
+  memories?: BatiMemory[];
+  /** its role (the 1st: なんでも, changeable) */
+  role?: BatiRole;
+}
+
+/** バティのカード (M-R217): shown in the chat at birth, kept on Bluena's first shelf, exported as a picture */
+export interface BatiCard {
+  name: string | null;
+  /** ISO date-time of the birth */
+  bornAt: string;
+  egg: BatiEggKind;
+  /** the seed as answered, word for word (the first {bati}: the favourite food) */
+  seed: string;
+  personality: BatiPersonality;
+  /** the personality's name (元気な子 …) */
+  label: string;
+  catchphrase: string;
+  /** about 40 characters, written for the seed at birth */
+  intro: string;
+  /** a rare personality: the card's edge glows gold */
+  rare: boolean;
+  imageUrl: string | null;
+}
+
+/** one of the member's {bati} (M-R215: three at most; one is in the chat) */
+export interface BatiSummary {
+  id: string;
+  name: string | null;
+  egg: BatiEggKind;
+  personality: BatiPersonality;
+  imageUrl: string | null;
+  faces?: Partial<Record<BatiFace, string>>;
+  /** the one in the chat now */
+  active: boolean;
+  self: string;
+  call: string;
+  selfCustom: string | null;
+  callCustom: string | null;
+  card: BatiCard;
+  role?: BatiRole;
+  createdAt: string;
 }
 export const BATI_FACES = ['smile', 'sparkle', 'surprise', 'think', 'sad', 'yawn'] as const;
 export type BatiFace = (typeof BATI_FACES)[number];
@@ -150,6 +217,8 @@ export interface BuddyMessageView {
   sources?: BuddySource[];
   /** M-R208: a picture {bati} drew in the chat ("〜の絵を見せて"), shown as its own bubble */
   image?: { url: string } | null;
+  /** M-R222: the member's 「覚えといて」 in this message: kept, or refused / full / already (shown with the bubble) */
+  remembered?: { text: string; result: 'kept' | 'refused' | 'full' | 'already' };
 }
 
 /** a page a looked-up answer is based on: its title and the site's name */

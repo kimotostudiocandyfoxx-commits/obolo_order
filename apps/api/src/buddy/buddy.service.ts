@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { batiChatPicturePrompt, buddyAnswer, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, type ImageProvider, LlmProvider, moderateText, summarizeMemory } from '@obolo/ai';
 import { buddyQuotaDecision, idempotencyKey } from '@obolo/ledger';
 import {
@@ -13,6 +13,8 @@ import {
   Paged,
   QUOTA_TIMEZONE,
   UpdateBuddyProfileBody,
+  callRequest,
+  rememberRequest,
 } from '@obolo/shared';
 import { and, desc, eq, lt, or, sql } from 'drizzle-orm';
 import { AppConfig, CONFIG } from '../config';
@@ -23,6 +25,8 @@ import { buddyMessages, buddyProfiles, users, wallets } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
 import { BUDDY_LLM, IMAGES, KV, LLM, QUEUE } from '../infra/tokens';
+import { activeBati } from '../look/batis';
+import { BatiMemoryService, type RememberResult } from '../look/memory.service';
 import { MediaService } from '../media/media.service';
 import { LedgerService } from '../wallet/ledger.service';
 
@@ -32,6 +36,7 @@ const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
   text: m.text,
   createdAt: m.createdAt.toISOString(),
   ...(m.extraJson?.sources?.length ? { sources: m.extraJson.sources } : {}),
+  ...(m.extraJson?.remembered ? { remembered: m.extraJson.remembered } : {}),
   ...(m.extraJson?.image ? { image: { url: m.extraJson.image.url } } : {}),
 });
 
@@ -89,6 +94,8 @@ export class BuddyService implements OnModuleInit {
     @Inject(LLM) private readonly modLlm: LlmProvider,
     @Inject(IMAGES) private readonly images: ImageProvider,
     private readonly media: MediaService,
+    /** M-R222: the member's own 「覚えといて」 / 「〇〇って呼んで」 */
+    @Optional() private readonly memory?: BatiMemoryService,
   ) {
     this.caps = new BuddyExtrasCaps(kv, cfg);
   }
@@ -195,6 +202,28 @@ export class BuddyService implements OnModuleInit {
       .map((m) => ({ role: m.role === 'buddy' ? ('assistant' as const) : ('user' as const), text: m.text }));
     history.push({ role: 'user', text });
 
+    // M-R222: only the member's own 「覚えといて」 keeps something ({bati} never asks); 「〇〇って呼んで」 changes the 呼び方
+    let remembered: { text: string; result: RememberResult } | undefined;
+    let calledAs: string | undefined;
+    let me = user;
+    if (activeBati(user) && this.memory) {
+      const ask = rememberRequest(text, [...recent].reverse().filter((m) => m.role === 'user').pop()?.text);
+      const call = ask ? null : callRequest(text);
+      if (ask) {
+        const r = await this.memory.remember(userId, ask).catch(() => null);
+        if (r) {
+          remembered = { text: r.text, result: r.result };
+          if (r.user) me = r.user;
+        }
+      } else if (call) {
+        const nu = await this.memory.callAs(userId, call).catch(() => false as const);
+        if (nu) {
+          me = nu;
+          calledAs = call;
+        }
+      }
+    }
+
     const locale = localeOverride ?? (user.locale as Locale);
     let replyText: string;
     let replyKind: 'normal' | 'worry' | 'danger' = 'normal';
@@ -209,9 +238,23 @@ export class BuddyService implements OnModuleInit {
           // the member's own {bati}, named on the Moon, answers under its own name (story chat 2026-11-02)
           buddyName: user.batiName || profile.buddyName,
           persona: profile.personaJson,
-          memorySummary: profile.memorySummary,
+          memorySummary: profile.memorySummary as string | null,
           userDisplayName: user.displayName,
           locale,
+          // M-R215: the {bati} in the chat talks in its own manner. M-R222: 「覚えてること」 are its only memory (the
+          // summary is not sent); it calls them by the society name unless asked otherwise
+          ...(() => {
+            const b = activeBati(me);
+            if (!b) return {};
+            return {
+              bati: { personality: b.personality, self: b.selfCustom || b.self, call: b.callCustom || b.call, catchphrase: b.catchphrase },
+              memorySummary: null,
+              memories: (b.memories ?? []).map((p) => p.text),
+              role: b.role ?? 'any',
+              ...(remembered ? { remembered } : {}),
+              ...(calledAs ? { calledAs } : {}),
+            };
+          })(),
         },
         history,
         onText,
@@ -228,7 +271,8 @@ export class BuddyService implements OnModuleInit {
       if ('image' in drawn) image = drawn.image;
       else replyText = drawn.text;
     }
-    const extra = sources?.length || image ? { ...(sources?.length ? { sources } : {}), ...(image ? { image } : {}) } : null;
+    const extra =
+      sources?.length || image || remembered ? { ...(sources?.length ? { sources } : {}), ...(image ? { image } : {}), ...(remembered ? { remembered } : {}) } : null;
 
     const now = Date.now();
     const result = await this.db.write.transaction(async (tx) => {

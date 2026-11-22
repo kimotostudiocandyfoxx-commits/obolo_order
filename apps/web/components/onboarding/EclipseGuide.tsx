@@ -1,5 +1,6 @@
 'use client';
 
+import { batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 import { JOURNEY_DONE, JOURNEY_PAYMENT } from '@obolo/shared';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -74,6 +75,9 @@ export function EclipseReturn() {
         bati: me.bati?.name ?? undefined,
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFood: me.bati?.food,
+        // M-R215–M-R217: {bati}'s lines in its own manner, and its card
+        batiSpeech: batiLineVoiceOf(me.bati),
+        batiCard: me.bati?.card,
         look: me.avatarUrl ?? undefined,
         story: me.story,
         made: madeFrom(me.story),

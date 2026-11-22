@@ -11,3 +11,4 @@ export * from './images';
 export * from './song';
 export * from './sing';
 export * from './songEdit';
+export * from './batiPersona';

@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { BatiEggBody, BatiNameBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
+import { BatiForgetBody, BatiMemoryBody, BatiRoleBody, BatiEggBody, BatiIdBody, BatiNameBody, BatiNewHatchBody, BatiSpeechBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -9,6 +9,7 @@ import { AppConfig, CONFIG } from '../config';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { LookService } from './look.service';
+import { BatiMemoryService } from './memory.service';
 
 const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
@@ -17,6 +18,7 @@ const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 export class LookController {
   constructor(
     private readonly look: LookService,
+    private readonly memory: BatiMemoryService,
     @Inject(KV) private readonly kv: KvStore,
     @Inject(CONFIG) private readonly cfg: AppConfig,
   ) {}
@@ -132,6 +134,51 @@ export class LookController {
   @HttpCode(200)
   chooseRestyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     return this.look.chooseRestyle(userId, parseBody(BatiRestyleChooseBody, body).id, origin(req));
+  }
+
+  /** M-R215: another of the member's {bati} comes into the chat */
+  @Post('bati/switch')
+  @HttpCode(200)
+  switchBati(@UserId() userId: string, @Body() body: unknown) {
+    return this.look.switchBati(userId, parseBody(BatiIdBody, body).id);
+  }
+
+  /** M-R215: how {bati} calls the member (呼び方) and its 一人称 */
+  @Post('bati/speech')
+  @HttpCode(200)
+  speech(@UserId() userId: string, @Body() body: unknown) {
+    return this.look.batiSpeech(userId, parseBody(BatiSpeechBody, body));
+  }
+
+  /** M-R218: the grown egg hatches in the Moon temple (refused before it is ready / once three are born) */
+  @Post('bati/new')
+  @HttpCode(200)
+  async hatchNew(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    await rateLimit(this.kv, `hatch:${userId}`, 4, 60);
+    return this.look.hatchNew(userId, parseBody(BatiNewHatchBody, body), origin(req));
+  }
+
+  /** M-R222: the card's 〔覚えさせる〕 (the chat's 「覚えといて」 is found by the chat itself) */
+  @Post('bati/memory')
+  @HttpCode(200)
+  async remember(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `bati-memory:${userId}`, 20, 60);
+    const b = parseBody(BatiMemoryBody, body);
+    return this.memory.add(userId, b.text, b.id);
+  }
+
+  /** M-R222: forget one of 「覚えてること」, or all */
+  @Post('bati/memory/forget')
+  @HttpCode(200)
+  forget(@UserId() userId: string, @Body() body: unknown) {
+    return this.memory.forget(userId, parseBody(BatiForgetBody, body));
+  }
+
+  /** the role of the 2nd / 3rd {bati} (なんでも / 遊び / 仕事・勉強 / 作ること); the 1st starts as なんでも */
+  @Post('bati/role')
+  @HttpCode(200)
+  role(@UserId() userId: string, @Body() body: unknown) {
+    return this.memory.role(userId, parseBody(BatiRoleBody, body));
   }
 
   @Post('bati/name')

@@ -1,5 +1,6 @@
 'use client';
 
+import { batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 import { useRouter } from 'next/navigation';
 import { RequireAuth } from '@/components/RequireAuth';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
@@ -36,6 +37,9 @@ function OrderEarly() {
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFaces: me.bati?.faces,
         batiFood: me.bati?.food,
+        // M-R215–M-R217: {bati}'s lines in its own manner, and its card
+        batiSpeech: batiLineVoiceOf(me.bati),
+        batiCard: me.bati?.card,
         look: me.avatarUrl ?? undefined,
         story: { ...me.story, ...joinFlags(me.story) },
       }}

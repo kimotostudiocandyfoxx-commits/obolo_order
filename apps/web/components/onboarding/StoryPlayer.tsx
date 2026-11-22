@@ -15,6 +15,10 @@ import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { DachiVoiceStep } from './DachiVoiceStep';
+import { BatiCardStep } from '@/components/bati/BatiCard';
+import { batiLineVaried } from '@/lib/onboarding/batiLine';
+import { eggOf } from '@/lib/onboarding/egg';
+import type { BatiEggKind } from '@obolo/shared';
 import { Shell as AtelierShell } from '@/components/atelier/Shell';
 import type { StoryMode as AtelierStory } from '@/components/atelier/story';
 import type { Work as AtelierWork } from '@/components/atelier/work';
@@ -37,7 +41,7 @@ import { FilmReel } from './FilmReel';
 import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
-import { bgmAt, fill, labelIndex, mediaAt, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
+import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { VoiceChoice } from './VoiceChoice';
 import { Invitation } from '@/components/story/Invitation';
@@ -88,7 +92,7 @@ interface Props {
   /** Day 3 'look' step: generate and choose the OBOLO NEO look. */
   lookApi?: LookApi;
   /** Day 3 'egg' step. */
-  onEgg?: (food: string, egg: 'sun' | 'earth') => Promise<void>;
+  onEgg?: (food: string, egg: BatiEggKind) => Promise<void>;
   /** Day 4 'hatch' step: resolves with the Bati picture. */
   onHatch?: () => Promise<string>;
   /** Day 4 'batiname' step. */
@@ -839,7 +843,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     for (let k = i + 1; k < Math.min(steps.length, i + 8); k++) {
       const s = steps[k];
       if (s.t === 'say') {
-        void voice.current?.prefetch(s.voice ?? s.who, s.text);
+        if (!(s.who === 'バティ' && batiLineVaried(s.text, v.batiSpeech))) void voice.current?.prefetch(s.voice ?? s.who, s.text);
         break;
       }
     }
@@ -911,7 +915,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     }
   }, [i, steps]);
   useEffect(() => {
-    if (sayNow) void voice.current?.say(sayNow.voice ?? sayNow.who, sayNow.text);
+    // M-R216: a {bati} line in another manner than the script's has no voice of its own (the pre-made one says other words)
+    if (sayNow && !(sayNow.who === 'バティ' && batiLineVaried(sayNow.text, v.batiSpeech))) void voice.current?.say(sayNow.voice ?? sayNow.who, sayNow.text);
     else voice.current?.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, started]);
@@ -1059,7 +1064,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // SYS-S001: only at a calm moment (a line, a button) — never while drawing, saving or paying
   const calm = step && ['caption', 'say', 'letter', 'notice', 'action', 'choice'].includes(step.t);
   const chatOn = !!(started && log.length > 0 && step && (chatLine(step, '') || ['action', 'choice', 'name', 'batiname', 'neoname'].includes(step.t) || (step.t === 'wait' && step.keepChat)));
-  const chatEntries = log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: fill(e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }));
+  const chatEntries = log.map((e): ChatEntry => (e.kind === 'them' ? { ...e, name: speakerName(e.who, v), text: sayText(e.who, e.text, v), avatar: e.who === 'バティ' && v.batiImage ? { src: v.batiImage } : (e.who === 'KIMORIN' && kimorinAvatar) || AVATARS[e.who] } : { ...e, text: fill(e.text, v) }));
   if (chatOn && step) lastChat.current = { entries: chatEntries, bottom: chatBottom(step) };
   useEffect(() => {
     if (chatWas.current && !chatOn) {
@@ -1478,7 +1483,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <LookMaker
           api={lookApi}
           ask={step.ask ? fill(step.ask.text, v) : undefined}
-          spell={step.spell ? fill(step.spell.text, v) : undefined}
+          spell={step.spell ? sayText(step.spell.who, step.spell.text, v) : undefined}
           spellName={step.spell ? speakerName(step.spell.who, v) : undefined}
           spellFace={step.spell?.who === 'バティ' ? v.batiImage : undefined}
           onDone={(url, meta) => {
@@ -1492,13 +1497,15 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
+      {/* M-R217: the newborn {bati}'s card in the chat */}
+      {started && step?.t === 'baticard' && <BatiCardStep card={v.batiCard} onNext={() => run(iRef.current + 1)} />}
       {started && step?.t === 'magic' && <MagicStep bati={v.bati || 'バティ'} onNext={() => run(iRef.current + 1)} />}
       {started && step?.t === 'egg' && (
         <EggStep
           submit={step.submit}
           onEgg={async (food) => {
             // the egg chosen on the altar picks the Bati's body types (client decision 2026-10-25)
-            await onEgg?.(food, /地球/.test(answers.egg ?? '') ? 'earth' : 'sun');
+            await onEgg?.(food, eggOf(stateRef.current.answers, v.story));
             remember('food', food);
             run(iRef.current + 1);
           }}
@@ -1507,7 +1514,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {started && step?.t === 'hatch' && (
         <HatchStep
           food={v.batiFood ?? ''}
-          egg={(stateRef.current.answers.egg ?? v.story?.['d2.egg'] ?? '').includes('太陽') ? 'sun' : 'earth'}
+          egg={eggOf(stateRef.current.answers, v.story)}
           onHatch={() => (onHatch ? onHatch() : Promise.resolve(''))}
           onDone={(url) => {
             remember('batiImage', url);
@@ -1661,7 +1668,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
 }
 
 function TapLine({ step, vars, onNext }: { step: Step; vars: StoryVars; onNext: () => void }) {
-  const text = step.t === 'caption' || step.t === 'say' || step.t === 'letter' || step.t === 'notice' ? fill(step.text, vars) : step.t === 'arrive' ? fill(step.caption, vars) : '';
+  const text = step.t === 'say' ? sayText(step.who, step.text, vars) : step.t === 'caption' || step.t === 'letter' || step.t === 'notice' ? fill(step.text, vars) : step.t === 'arrive' ? fill(step.caption, vars) : '';
   const chars = [...text];
   const [shown, setShown] = useState(step.t === 'letter' || step.t === 'notice' ? chars.length : 0);
   const done = shown >= chars.length;

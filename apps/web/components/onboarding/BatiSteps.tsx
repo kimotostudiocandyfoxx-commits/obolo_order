@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { demoBati, eggSvg } from '@/lib/look';
+import type { BatiEggKind } from '@obolo/shared';
+import { eggFile } from '@/lib/onboarding/egg';
 import { VoiceField } from './StoryExtras';
 
 /** Day 2 on the Moon: the favourite food the Bati is born from (examples from the story, 2026-10-14). */
+
+/** OBOLON's line when the answer is not a food fit for a {bati} (docs/story-rewrite/バティの性格の決め方.md §2-1, M-R217) */
+export const SEED_REASK = 'OBOLON「、、、食べられるものを、言ってみろ。」';
 
 export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: string) => Promise<void>; submit?: string }) {
   const [food, setFood] = useState('');
@@ -18,7 +23,9 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
     try {
       await onEgg(f);
     } catch (e) {
-      setErr('うまく受け取れなかった……もう一度');
+      // M-R217: a seed not fit to be born from — OBOLON asks again (no personality is decided)
+      const code = (e as { code?: string } | null)?.code;
+      setErr(code === 'MODERATION' || code === 'SEED_REASK' ? SEED_REASK : 'うまく受け取れなかった……もう一度');
       setBusy(false);
     }
   };
@@ -30,7 +37,7 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
         <button onClick={go} disabled={!food.trim() || busy} className="rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-lg tracking-widest text-amber-50 disabled:opacity-40">
           {busy ? '……' : submit}
         </button>
-        {err && <p className="text-center text-sm text-rose-300">{err}</p>}
+        {err && <p className={`text-center text-sm ${err === SEED_REASK ? 'text-amber-100' : 'text-rose-300'}`}>{err}</p>}
       </div>
     </div>
   );
@@ -41,7 +48,7 @@ export function EggStep({ onEgg, submit = 'これにする' }: { onEgg: (food: s
  * The egg hatches on the last picture of its cracking film (the same film-like egg, QA 5 N28 / QA 6 R9): no second
  * wobble, only the light breathing until {bati} is made, a white flash, and {bati} comes out.
  */
-export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 'sun' | 'earth'; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
+export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: BatiEggKind; onHatch: () => Promise<string>; onDone: (url: string) => void }) {
   const [url, setUrl] = useState<string | null>(null);
   const [stage, setStage] = useState<'wobble' | 'flash' | 'born'>('wobble');
   useEffect(() => {
@@ -53,7 +60,7 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
       setTimeout(() => {
         if (!live) return;
         // not drawn in time: the egg's own plain body stands in (the real one lands on the account later)
-        setUrl(u || (egg ? `/onboarding/bati-stand-${egg}.webp` : demoBati(food)));
+        setUrl(u || (egg ? `/onboarding/bati-stand-${eggFile(egg)}.webp` : demoBati(food)));
         setStage('flash');
         setTimeout(() => live && setStage('born'), 700);
       }, wait);
@@ -73,7 +80,7 @@ export function HatchStep({ food, egg, onHatch, onDone }: { food: string; egg?: 
       {egg && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`/onboarding/s/d2-egg-${egg}-cracked.jpg`}
+          src={`/onboarding/s/d2-egg-${eggFile(egg)}-cracked.jpg`}
           alt=""
           className={`absolute inset-0 h-full w-full object-cover ${stage === 'wobble' ? 'animate-pulse' : 'opacity-50 blur-sm'}`}
           style={{ filter: stage === 'wobble' ? 'drop-shadow(0 0 40px rgba(255,230,180,0.6)) brightness(1.08)' : undefined }}

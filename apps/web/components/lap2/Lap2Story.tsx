@@ -1,5 +1,6 @@
 'use client';
 
+import { batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 import { JOURNEY_DONE, LAP2_DONE, lap2Done, lap2OpensAt } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPlayer';
@@ -63,6 +64,9 @@ export function Lap2Story({ onLeave }: { onLeave: () => void }) {
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFaces: me.bati?.faces,
         batiFood: me.bati?.food,
+        // M-R215–M-R217: {bati}'s lines in its own manner, and its card
+        batiSpeech: batiLineVoiceOf(me.bati),
+        batiCard: me.bati?.card,
         look: me.avatarUrl ?? undefined,
         lookChibi: me.lookChibi ?? undefined,
         lookStandee: me.lookStandee ?? undefined,

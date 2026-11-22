@@ -1,6 +1,6 @@
-import type { BuddyPersona, Locale } from '@obolo/shared';
+import { BATI_REPLY_LENGTH, BATI_ROLE_TALK, MEMORY_LINES, type BatiRole, type BuddyPersona, type Locale } from '@obolo/shared';
 import { LlmRefusalError } from './claude';
-import { BATI_CHARACTER, BATI_DANGER, BATI_SEARCH, BATI_WORRY, batiOneCallRules, batiSort, personaToneLines, type BatiAbilities } from './prompts/bati';
+import { BATI_CHARACTER, BATI_DANGER, BATI_SEARCH, BATI_WORRY, batiOneCallRules, batiPersonaBlock, batiSort, personaToneLines, type BatiAbilities, type BatiSelfView } from './prompts/bati';
 import { MEMORY_SUMMARY_PROMPT } from './prompts/memory';
 import type { ChatTurn, LlmProvider, WebSource } from './types';
 
@@ -10,13 +10,61 @@ export interface BuddyContext {
   memorySummary: string | null;
   userDisplayName: string;
   locale: Locale;
+  /** the {bati} in the chat (M-R215): personality, 一人称, 呼び方 — the memory above is shared by all of the member's {bati} */
+  bati?: BatiSelfView;
+  /**
+   * M-R222: 「覚えてること」 — what the member asked this {bati} to remember (five at most): the ONLY memory it is given
+   * (the summary is not sent then). Undefined: the old memory summary (an account before it).
+   */
+  memories?: string[];
+  /** its role (なんでも / 遊び / 仕事・勉強 / 作ること) */
+  role?: BatiRole;
+  /** the member's 「覚えといて」 in this message, and what came of it (the server kept it or not; {bati} says so) */
+  remembered?: { text: string; result: 'kept' | 'refused' | 'full' | 'already' };
+  /** the member's 「〇〇って呼んで」 in this message: the new 呼び方 (already saved) */
+  calledAs?: string;
 }
+
+/** M-R222: the memories, the reply's length (ours), the one-time imitation, never asking to remember, the role */
+export function memoryLines(ctx: BuddyContext): string {
+  const self = ctx.bati?.self || 'ボク';
+  const fill = (t: string) => t.replaceAll('{neo}', ctx.userDisplayName).replaceAll('ボク', self);
+  const mem = ctx.memories ?? [];
+  const parts = [
+    `【覚えてること】${mem.length ? '（ユーザーに「覚えといて」と頼まれたこと）' : 'まだ、何もない。'}`,
+    ...mem.map((t) => `- ${t}`),
+    '- ここにないことは、覚えていない（最近のチャットは読める）。知ったふりをしない。',
+    '- 自分から「覚えていい？」とは聞かない。毎日、質問もしない。覚えるのは、本人が「覚えといて」と言った時だけ（覚えるのはアプリがする）。',
+    `- ${BATI_REPLY_LENGTH}`,
+    `- 話し方の調子は、ずっと【性格】のまま。「ギャルみたいに話して」など、ちがう話し方を頼まれたら、その場の遊びとして一回だけまねして、すぐに自分の話し方に戻る（例：「ギャルのまね、やってみる！　……${ctx.userDisplayName}っち、マジ神じゃん！　……やっぱり、${self}は${self}がいいや！」）。`,
+  ];
+  const r = ctx.remembered;
+  if (r)
+    parts.push(
+      r.result === 'kept'
+        ? `【いま】ユーザーに頼まれて「${r.text}」を覚えた。「${MEMORY_LINES.kept}」と、性格の言い方で一言。`
+        : r.result === 'refused'
+          ? `【いま】ユーザーが覚えてと頼んだことは、覚えてはいけない内容（住所・電話・メール・学校や会社の名前・パスワード・お金・ほかの人のこと・体や病気のことなど）。「${fill(MEMORY_LINES.refuse)}」と、性格の言い方でやさしく。`
+          : r.result === 'full'
+            ? `【いま】覚えてることが、もういっぱい（5つ）。「${MEMORY_LINES.full}」と、性格の言い方で聞く（消すのは、カードの「覚えてること」）。`
+            : '【いま】それは、もう覚えている。そう伝える。',
+    );
+  if (ctx.calledAs) parts.push(`【いま】これからは「${ctx.calledAs}」と呼ぶように頼まれた（もう変えてある）。わかった、と一言。`);
+  if (ctx.role && ctx.role !== 'any') parts.push(`【役目】${BATI_ROLE_TALK[ctx.role]}`);
+  return parts.join('\n');
+}
+
+const selfOf = (ctx: BuddyContext) => ctx.bati?.self || 'ボク';
 
 /** System prompt = character layer + tone sliders + long-term memory (spec §2.2). */
 export function buildBuddySystemPrompt(ctx: BuddyContext): string {
-  const parts = [BATI_CHARACTER[ctx.locale].replaceAll('{name}', ctx.buddyName), personaToneLines(ctx.persona, ctx.locale)];
+  const parts = [BATI_CHARACTER[ctx.locale].replaceAll('{name}', ctx.buddyName).replaceAll('{self}', selfOf(ctx))];
+  // the personality decides the manner (M-R216); the old tone sliders stay only for a {bati} without one
+  if (ctx.bati) parts.push(batiPersonaBlock(ctx.bati, ctx.userDisplayName, ctx.locale));
+  else parts.push(personaToneLines(ctx.persona, ctx.locale));
   parts.push(ctx.locale === 'ja' ? `ユーザーの呼び名: ${ctx.userDisplayName}` : `Call the user: ${ctx.userDisplayName}`);
-  if (ctx.memorySummary) {
+  if (ctx.memories) parts.push(memoryLines(ctx));
+  else if (ctx.memorySummary) {
     parts.push(
       ctx.locale === 'ja'
         ? `【これまでの会話で覚えていること】\n${ctx.memorySummary}`
@@ -55,6 +103,16 @@ export async function buddyAnswer(
   llm: LlmProvider,
   ctx: BuddyContext,
   history: ChatTurn[],
+  onText?: (piece: string) => void,
+  can: BatiAbilities = {},
+): Promise<BuddyAnswer> {
+  return answerOf(llm, ctx, history, onText, can);
+}
+
+async function answerOf(
+  llm: LlmProvider,
+  ctx: BuddyContext,
+  history: ChatTurn[],
   /** the ordinary answer as it is written (one-call providers that stream); a worry / danger comes whole at the end */
   onText?: (piece: string) => void,
   can: BatiAbilities = {},
@@ -78,7 +136,10 @@ export async function buddyAnswer(
     if (sorted.want === 'draw' && abilities.draw && sorted.draw) return { text: drawLine(ctx.locale), kind, draw: sorted.draw };
     return { text: tidyAnswer(plain), kind };
   }
-  const own = (kind === 'worry' ? BATI_WORRY : BATI_DANGER)[ctx.locale].replaceAll('{name}', ctx.buddyName);
+  const own = [
+    (kind === 'worry' ? BATI_WORRY : BATI_DANGER)[ctx.locale].replaceAll('{name}', ctx.buddyName).replaceAll('{self}', selfOf(ctx)),
+    ...(ctx.bati ? [batiPersonaBlock(ctx.bati, ctx.userDisplayName, ctx.locale)] : []),
+  ].join('\n\n');
   const text = await llm.chat({ system: own, history: [{ role: 'user', text: last }], temperature: 0.3, maxOutputTokens: 300 }).catch(() => '');
   return { text: tidyAnswer(text, kind) || fallbackAnswer(kind, ctx.locale), kind };
 }

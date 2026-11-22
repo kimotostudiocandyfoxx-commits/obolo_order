@@ -96,6 +96,14 @@ export const users = pgTable(
     batiFood: text('bati_food'),
     batiImageUrl: text('bati_image_url'),
     batiName: text('bati_name'),
+    /**
+     * M-R215 / M-R217: every {bati} of the member (three at most; see look/batis.ts BatiRecord). The legacy columns above
+     * stay the one in the chat (the active {bati}), so older code keeps working; `batiId` names it.
+     */
+    batisJson: jsonb('batis_json').$type<import('../look/batis').BatiRecord[]>(),
+    batiId: text('bati_id'),
+    /** M-R218: the small egg the first shell became hatches from this time (88 days); null = no egg (three born) */
+    batiEggAt: timestamp('bati_egg_at', { withTimezone: true }),
     onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
     /** Uranus: your atelier (AtelierLayout); null = not decorated yet */
     atelierJson: jsonb('atelier_json').$type<AtelierLayout>(),
@@ -196,7 +204,7 @@ export const buddyMessages = pgTable(
     audioUrl: text('audio_url'),
     provider: text('provider'),
     /** M-R208: the pages a looked-up answer is based on, or the picture {bati} drew (media URL) */
-    extraJson: jsonb('extra_json').$type<{ sources?: BuddySource[]; image?: { url: string; mediaId: string } }>(),
+    extraJson: jsonb('extra_json').$type<{ sources?: BuddySource[]; image?: { url: string; mediaId: string }; remembered?: { text: string; result: 'kept' | 'refused' | 'full' | 'already' } }>(),
     ...timestamps,
   },
   (t) => [index('buddy_messages_user_idx').on(t.userId, t.createdAt)],

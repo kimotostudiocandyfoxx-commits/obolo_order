@@ -22,6 +22,7 @@ import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
+import { activeBati, batiSummaries, batiViewExtra } from '../look/batis';
 
 /** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
 function batiFaces(j: Record<string, string> | null): Partial<Record<string, string>> | undefined {
@@ -54,8 +55,21 @@ export function toMe(u: typeof users.$inferSelect): Me {
     birthYear: Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null,
     child: isChild(Number((u.onboardingJson as Record<string, string> | null)?.['birthYear']) || null),
     bati: u.batiFood
-      ? { food: u.batiFood, name: u.batiName, imageUrl: u.batiImageUrl, stand: !!(u.onboardingJson as Record<string, string> | null)?.['bati.stand'], faces: batiFaces(u.onboardingJson) }
+      ? {
+          food: u.batiFood,
+          name: u.batiName,
+          imageUrl: u.batiImageUrl,
+          stand: !!(u.onboardingJson as Record<string, string> | null)?.['bati.stand'],
+          faces: batiFaces(u.onboardingJson),
+          // M-R215 / M-R217: which one, its egg, personality, 一人称 / 呼び方, the card
+          ...(() => {
+            const r = activeBati(u);
+            return r ? batiViewExtra(r) : {};
+          })(),
+        }
       : null,
+    batis: batiSummaries(u),
+    batiEgg: u.batiEggAt ? { readyAt: u.batiEggAt.toISOString(), ready: u.batiEggAt.getTime() <= Date.now() } : null,
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },
     look: u.lookJson ?? null,

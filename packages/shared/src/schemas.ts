@@ -3,6 +3,8 @@ import { LOCALES, PLAZA_ICONS, PLAZA_NAME_MAX, SATURN_MAX_CHARS } from './config
 import { NEO_FORM_IDS } from './neo';
 import { VOICE_STYLE_IDS } from './neoVoice';
 import { PuniLook } from './puni';
+import { BATI_PERSONALITY_IDS } from './batiPersona';
+import { BATI_ROLES } from './batiMemory';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -229,8 +231,23 @@ export type ChooseLookBody = z.infer<typeof ChooseLookBody>;
 
 /** Day 3: the favourite food the Bati egg is made from. */
 /** `egg`: the egg chosen on the altar — its eight prepared body types (client decision 2026-10-25) */
-export const BatiEggBody = z.object({ food: z.string().trim().min(1).max(40), egg: z.enum(['sun', 'earth']).optional() });
+// M-R215: the moon (girl-leaning) or the sun (boy-leaning) egg; 'earth' is the old 地球と月 egg (read as moon)
+export const BatiEggBody = z.object({ food: z.string().trim().min(1).max(40), egg: z.enum(['moon', 'sun', 'earth']).optional() });
 export type BatiEggBody = z.infer<typeof BatiEggBody>;
+
+/** M-R215: one of the member's {bati} (swap into the chat / sleep on the Moon / wake) */
+export const BatiIdBody = z.object({ id: z.string().trim().min(1).max(64) });
+export type BatiIdBody = z.infer<typeof BatiIdBody>;
+/** M-R215: how {bati} calls the member and its 一人称 (the only things that change; null / '' = back to the default) */
+export const BatiSpeechBody = z.object({
+  id: z.string().trim().min(1).max(64).optional(),
+  call: z.string().trim().max(12).nullable().optional(),
+  self: z.string().trim().max(6).nullable().optional(),
+});
+export type BatiSpeechBody = z.infer<typeof BatiSpeechBody>;
+/** M-R218: the grown egg hatched in the Moon temple — which egg it becomes, and its seed (the 2nd: a favourite sound, the 3rd: a word) */
+export const BatiNewHatchBody = z.object({ egg: z.enum(['moon', 'sun']), seed: z.string().trim().min(1).max(40) });
+export type BatiNewHatchBody = z.infer<typeof BatiNewHatchBody>;
 
 /** Day 4: the newborn Bati's name. */
 export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) });
@@ -555,3 +572,29 @@ export interface DeliveryView {
   /** when it goes home (88 hours after it was sent) */
   returnsAt: string;
 }
+
+/**
+ * M-R217: what the birth's model answers for a seed — the personality, its 一人称 / 呼び方 / 口ぐせ and the card's
+ * introduction; or `ok: false` when the seed is not fit to be born from (OBOLON asks again).
+ */
+export const BatiPersonaPick = z.union([
+  z.object({ ok: z.literal(false) }),
+  z.object({
+    ok: z.literal(true).optional(),
+    personality: z.enum(BATI_PERSONALITY_IDS),
+    self: z.string().trim().min(1).max(8),
+    call: z.string().trim().min(1).max(16),
+    catchphrase: z.string().trim().min(1).max(24),
+    intro: z.string().trim().min(4).max(70),
+  }),
+]);
+export type BatiPersonaPick = z.infer<typeof BatiPersonaPick>;
+
+/** M-R222: something the member asks {bati} to remember (the card; the chat's 「覚えといて」 is found on the server) */
+export const BatiMemoryBody = z.object({ text: z.string().trim().min(1).max(60), id: z.string().trim().min(1).max(64).optional() });
+export type BatiMemoryBody = z.infer<typeof BatiMemoryBody>;
+/** forget one (`memory`) or all (none) of a {bati}'s memories */
+export const BatiForgetBody = z.object({ memory: z.string().trim().min(1).max(64).optional(), id: z.string().trim().min(1).max(64).optional() });
+export type BatiForgetBody = z.infer<typeof BatiForgetBody>;
+export const BatiRoleBody = z.object({ role: z.enum(BATI_ROLES), id: z.string().trim().min(1).max(64).optional() });
+export type BatiRoleBody = z.infer<typeof BatiRoleBody>;

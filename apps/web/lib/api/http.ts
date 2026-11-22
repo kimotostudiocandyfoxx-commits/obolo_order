@@ -1,4 +1,4 @@
-import type { LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
+import type { BatiEggKind, BatiRole, Me, LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
 import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
@@ -472,8 +472,26 @@ export class HttpApi implements Api {
   chooseLook(mediaId: string) {
     return this.req<Awaited<ReturnType<Api['chooseLook']>>>('POST', '/me/look', { mediaId });
   }
-  batiEgg(food: string, egg?: 'sun' | 'earth') {
+  batiEgg(food: string, egg?: BatiEggKind) {
     return this.req<Awaited<ReturnType<Api['batiEgg']>>>('POST', '/me/bati/egg', { food, egg });
+  }
+  batiNew(egg: BatiEggKind, seed: string) {
+    return this.req<Me>('POST', '/me/bati/new', { egg, seed });
+  }
+  batiSwitch(id: string) {
+    return this.req<Me>('POST', '/me/bati/switch', { id });
+  }
+  batiSpeech(body: { id?: string; call?: string | null; self?: string | null }) {
+    return this.req<Me>('POST', '/me/bati/speech', body);
+  }
+  batiMemory(text: string, id?: string) {
+    return this.req<Me>('POST', '/me/bati/memory', { text, id });
+  }
+  batiForget(memory?: string, id?: string) {
+    return this.req<Me>('POST', '/me/bati/memory/forget', { memory, id });
+  }
+  batiRole(role: BatiRole, id?: string) {
+    return this.req<Me>('POST', '/me/bati/role', { role, id });
   }
   batiHatch() {
     return this.req<Awaited<ReturnType<Api['batiHatch']>>>('POST', '/me/bati/hatch');

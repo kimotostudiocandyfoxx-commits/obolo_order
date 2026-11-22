@@ -1,5 +1,6 @@
 'use client';
 
+import { batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 import { JOURNEY_PAYMENT } from '@obolo/shared';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPlayer';
@@ -175,6 +176,9 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         batiImage: me.bati?.imageUrl ?? undefined,
         batiFaces: me.bati?.faces,
         batiFood: me.bati?.food,
+        // M-R215–M-R217: {bati}'s lines in its own manner, and its card
+        batiSpeech: batiLineVoiceOf(me.bati),
+        batiCard: me.bati?.card,
         look: me.avatarUrl ?? undefined,
         lookChibi: me.lookChibi ?? undefined,
         lookStandee: me.lookStandee ?? undefined,

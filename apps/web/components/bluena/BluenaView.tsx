@@ -1,5 +1,6 @@
 'use client';
 
+import { BatiShelf } from '@/components/bati/BatiShelf';
 import { SATURN_LIFETIME_HOURS, type BluenaKeptView, type JupiterRootView, type MarsBackstageVideo, type PlanetId, type RadioShowView, type SaturnPostView, type SongView } from '@obolo/shared';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -185,6 +186,8 @@ function Works({ folder, onFolder }: { folder: FolderId; onFolder: (f: FolderId)
   const [kept, setKept] = useState(false);
   return (
     <>
+      {/* M-R217: the first shelf — the {bati} cards and the small egg */}
+      <BatiShelf />
       <div className="flex justify-between gap-1 pb-3" role="tablist" aria-label="星のフォルダ">
         {FOLDERS.map((x) => (
           <FolderIcon key={x.id} f={x} on={x.id === folder} onPick={() => onFolder(x.id)} />

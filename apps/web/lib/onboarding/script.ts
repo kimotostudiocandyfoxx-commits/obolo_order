@@ -6,6 +6,7 @@
  * the Sun, {neo} = the NEO name, {food} = the favourite food, {bati} = the Bati's name.
  */
 import type { MotionId } from './media';
+import { batiLine } from './batiLine';
 
 export type Speaker =
   | 'MONBAN'
@@ -50,7 +51,9 @@ export type PictureFx =
   /** …one falls down to your feet */
   | 'ring-drop'
   /** …and gets a ☆ (the count is never shown) */
-  | 'ring-star';
+  | 'ring-star'
+  /** M-R218: the broken shell glows, gathers and becomes a small egg on the altar (over the chat; shapes, no art) */
+  | 'shell-egg';
 
 export type Step =
   /**
@@ -230,6 +233,8 @@ export type Step =
   /** the script scene that starts here (D04-S002 …): shown on the review screen so notes can name it; no effect in play */
   | { t: 'scene'; id: string }
   | { t: 'goto'; id: string }
+  /** M-R217: the newborn {bati}'s card in the chat (name, birth date, egg, the food as said, personality, 口ぐせ, intro) */
+  | { t: 'baticard' }
   | { t: 'end' };
 
 /** a line kept in a step for the screen that step opens to say (the look, the atelier): the script's words as written */
@@ -268,6 +273,10 @@ export interface StoryVars {
   /** Bati's expressions (M-R139): { t: 'face', who: '@bati', expr: 'smile' } shows one; missing → batiImage */
   batiFaces?: Partial<Record<string, string>>;
   batiFood?: string;
+  /** M-R215/M-R216: how this {bati} talks ({bati} lines are said in its manner; the script's words are the 元気な子's) */
+  batiSpeech?: import('./batiLine').BatiLineVoice;
+  /** M-R217: the newborn {bati}'s card */
+  batiCard?: import('@obolo/shared').BatiCard;
   look?: string;
   /** the small chibi NEO (M-R155/M-R161): the butterfly, the owl, the captain… */
   lookChibi?: string;
@@ -288,6 +297,14 @@ export function fill(text: string, v: StoryVars): string {
     .replaceAll('{age}', v.age || '…')
     // what was said, as said (client 2026-11-22), else the answer it matched
     .replaceAll('{choice1}', v.story?.['d1.choice1Words'] || v.story?.['d1.choice1'] || '…');
+}
+
+/**
+ * A line as it is shown: {bati}'s lines in its personality's manner (M-R216, transformed here at render time — the
+ * script and the sync check keep the words as written), then the names filled in.
+ */
+export function sayText(who: Speaker, text: string, v: StoryVars): string {
+  return fill(who === 'バティ' ? batiLine(text, v.batiSpeech) : text, v);
 }
 
 /** The name shown on a line: the Bati's own name, KIMORIN⭐︎ after his naming. */
