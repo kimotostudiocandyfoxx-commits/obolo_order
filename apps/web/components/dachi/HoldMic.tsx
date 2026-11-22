@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useHoldRecorder } from '@/lib/dachi/useHoldRecorder';
+import { playClip, type Clip } from '@/lib/voice/webVoice';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
@@ -139,27 +140,30 @@ export function HoldMic({
 /** listen back to a take before sending it */
 function TakePlayer({ blob, seconds }: { blob: Blob; seconds: number }) {
   const [on, setOn] = useState(false);
-  const el = useRef<HTMLAudioElement | null>(null);
+  const url = useRef<string | null>(null);
+  const clip = useRef<Clip | null>(null);
   useEffect(() => {
-    const url = URL.createObjectURL(blob);
-    const a = new Audio(url);
-    a.onended = () => setOn(false);
-    a.onpause = () => setOn(false);
-    el.current = a;
+    const u = URL.createObjectURL(blob);
+    url.current = u;
     return () => {
-      a.pause();
-      URL.revokeObjectURL(url);
+      clip.current?.stop();
+      URL.revokeObjectURL(u);
     };
   }, [blob]);
   return (
     <button
       type="button"
-      onClick={() => {
-        const a = el.current;
-        if (!a) return;
-        if (on) return a.pause();
-        a.currentTime = 0;
-        void a.play().then(() => setOn(true)).catch(() => setOn(false));
+      onClick={async () => {
+        // M-R239: through Web Audio (quiet with the silent switch on)
+        if (on) {
+          clip.current?.stop();
+          return setOn(false);
+        }
+        const c = url.current ? await playClip(url.current) : null;
+        if (!c) return;
+        clip.current = c;
+        setOn(true);
+        void c.done.then(() => setOn(false));
       }}
       className="flex min-w-0 flex-1 items-center gap-2 rounded-full px-2 py-1.5 text-left text-amber-50"
       aria-label={on ? '止める' : '聞き直す'}

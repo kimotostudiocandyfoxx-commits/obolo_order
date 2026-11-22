@@ -5,7 +5,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
-import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody, SELF_TALK_FACES, TALK_FACES, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -16,6 +16,7 @@ import type { JobQueue } from '../infra/queue';
 import { BUDDY_LLM, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
+import { findPart, storedTalk, TALK_BLINK_PROMPT, TALK_KORORIN_PROMPT, TALK_MOUTH_PROMPT, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
 import { day9At, toMe } from '../users/users.service';
 
 /**
@@ -118,6 +119,7 @@ export class LookService {
     this.queue.register('bati.paint', ({ userId, origin }) => this.paintBati(userId, origin).then(() => undefined));
     this.queue.register('bati.repaint', ({ userId, origin }) => this.repaintBati(userId, origin));
     this.queue.register('bati.faces', ({ userId, origin }) => this.batiFaces(userId, origin).then(() => undefined));
+    this.queue.register('talk.look', ({ userId, origin, who }) => this.talkLook(userId, who, origin));
   }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
@@ -334,6 +336,8 @@ export class LookService {
     const list = r ? batiList(cur).map((x) => (x.id === r.id ? { ...x, imageUrl: url, looks, faces: next?.faces } : x)) : cur.batisJson;
     const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, onboardingJson: j, batisJson: list, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     if (!j['bati.faces']) await this.queue.enqueue('bati.faces', { userId, origin }, { dedupeKey: `bati-faces-${userId}-${url}` }).catch(() => undefined);
+    // M-R234: the talk's look follows (after the faces when they are drawn again: batiFaces enqueues it)
+    else await this.enqueueTalk(userId, 'bati', url, origin);
     return toMe(nu);
   }
 
@@ -424,6 +428,8 @@ export class LookService {
     if (icon) j['look.icon'] = icon;
     else delete j['look.icon'];
     const [nu] = await this.db.write.update(users).set({ avatarUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    // M-R234: the decided look's expressions, blink / mouth parts and コロリン, in the background
+    if (origin) await this.enqueueTalk(userId, 'me', url, origin);
     return toMe(nu);
   }
 
@@ -872,7 +878,94 @@ export class LookService {
       .set({ onboardingJson: { ...cur, 'bati.faces': JSON.stringify(faces) }, updatedAt: new Date() })
       .where(eq(users.id, userId))
       .returning();
+    if (nu.batiImageUrl) await this.enqueueTalk(userId, 'bati', nu.batiImageUrl, origin);
     return toMe(nu);
+  }
+
+  private async enqueueTalk(userId: string, who: TalkWho, url: string, origin: string) {
+    await this.queue.enqueue('talk.look', { userId, origin, who }, { dedupeKey: `talk-${who}-${userId}-${url}` }).catch(() => undefined);
+  }
+
+  /**
+   * 隣に並ぶトーク (M-R234/M-R235): for the look decided now — your own (its standee) or {bati}'s — the expressions (the
+   * decided look is the reference, so the face does not drift; your own: only the gentle four; {bati}: its drawn faces
+   * are reused), an eyes-closed and an open-mouth edit of TALK_PART_FACES cut down to patches by differencing, and the
+   * コロリン mini (M-R233). Kept in onboardingJson `talk.<who>`; dropped if the look changed meanwhile. No mana (part of
+   * the look); what fails is left out (the client bobs instead of flapping, the look cut round stands in for the mini).
+   */
+  async talkLook(userId: string, who: TalkWho, origin: string): Promise<void> {
+    let u = await this.user(userId);
+    const of = who === 'me' ? u.avatarUrl : u.batiImageUrl;
+    if (!of) return;
+    const j0 = (u.onboardingJson ?? {}) as Record<string, string>;
+    if (storedTalk(j0, who, of) && !storedTalk(j0, who, of)?.making) return;
+    // your own stands full length (the standee); {bati}'s picture already does
+    if (who === 'me' && !(j0['look.standee'] && j0['look.standee.of'] === of)) {
+      await this.standee(userId, origin).catch((e: unknown) => this.log.warn(`talk standee failed: ${String(e)}`));
+      u = await this.user(userId);
+    }
+    const j1 = (u.onboardingJson ?? {}) as Record<string, string>;
+    const stand = who === 'me' ? (j1['look.standee.of'] === of ? j1['look.standee'] : null) || of : of;
+    const png = await this.media.bytesByUrl(userId, stand);
+    if (!png) return;
+    const onGrey = async (b: Buffer) => ({ data: await sharp(b).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' });
+    const ref = await onGrey(png);
+    const kind = who === 'me' ? ('avatar' as const) : ('bati' as const);
+    const store = async (img: GeneratedImage) => {
+      const cut = await cutoutWhite(img.data, 1024, BATI_GREY).catch(() => null);
+      const m = cut ? await this.media.storeImage(userId, kind, 'image/png', cut, origin) : await this.media.storeImage(userId, kind, img.mime, img.data, origin);
+      return { url: m.url, png: cut ?? img.data };
+    };
+    // {bati}'s faces drawn before (M-R139) stand for theirs; only the missing ones are painted
+    let old: Record<string, string> = {};
+    try {
+      old = who === 'bati' && j1['bati.faces'] ? (JSON.parse(j1['bati.faces']) as Record<string, string>) : {};
+    } catch {
+      old = {};
+    }
+    const reuse: Partial<Record<TalkFace, string>> = { smile: old.smile, surprised: old.surprise, thinking: old.think, sad: old.sad };
+    const wanted = (who === 'me' ? SELF_TALK_FACES : TALK_FACES).filter((f) => f !== 'normal');
+    const todo = wanted.filter((f) => !reuse[f]);
+    const painted = await settleWithRetry(todo.length, (i) => this.looks.generate(talkFacePrompt(todo[i]), 11 + i, [ref]).then(store));
+    const pics: Partial<Record<TalkFace, { url: string; png: Buffer | null }>> = { normal: { url: stand, png } };
+    for (const f of wanted) if (reuse[f]) pics[f] = { url: reuse[f]!, png: null };
+    painted.forEach((r, i) => {
+      if (r.status === 'fulfilled') pics[todo[i]] = r.value;
+      else this.log.warn(`talk face ${todo[i]} failed: ${String(r.reason)}`);
+    });
+    const faces: Partial<Record<TalkFace, TalkExpression>> = {};
+    for (const [f, p] of Object.entries(pics) as [TalkFace, { url: string; png: Buffer | null }][]) faces[f] = { kind: 'image', url: p.url };
+    // M-R235: the parts — the same face with the eyes closed and with the mouth open, cut down to where they changed
+    const partFaces = TALK_PART_FACES.filter((f) => pics[f]);
+    const parts = await Promise.allSettled(
+      partFaces.map(async (f, i) => {
+        const base = pics[f]!.png ?? (await this.media.bytesByUrl(userId, pics[f]!.url));
+        if (!base) return;
+        const r = await onGrey(base);
+        const [blink, mouth] = await Promise.allSettled([this.looks.generate(TALK_BLINK_PROMPT, 31 + i, [r]), this.looks.generate(TALK_MOUTH_PROMPT, 41 + i, [r])]);
+        const cutOf = async (g: PromiseSettledResult<GeneratedImage>) => (g.status === 'fulfilled' ? ((await cutoutWhite(g.value.data, 1024, BATI_GREY).catch(() => null)) ?? g.value.data) : null);
+        const [eb, mb] = await Promise.all([cutOf(blink), cutOf(mouth)]);
+        const e = faces[f] as Extract<TalkExpression, { kind: 'image' }>;
+        const eyes = eb ? await findPart(base, eb, [0, 0.5]).catch(() => null) : null;
+        if (eyes) Object.assign(e, { blink: (await this.media.storeImage(userId, kind, 'image/png', eyes.png, origin)).url, eyesBox: eyes.box });
+        const lips = mb ? await findPart(base, mb, [0.05, 0.6]).catch(() => null) : null;
+        if (lips) Object.assign(e, { mouth: (await this.media.storeImage(userId, kind, 'image/png', lips.png, origin)).url, mouthBox: lips.box });
+      }),
+    );
+    parts.forEach((r, i) => r.status === 'rejected' && this.log.warn(`talk parts ${partFaces[i]} failed: ${String(r.reason)}`));
+    // M-R233: the コロリン mini
+    const mini = await this.looks
+      .generate(TALK_KORORIN_PROMPT, 51, [ref])
+      .then(store)
+      .then((m) => m.url)
+      .catch((e: unknown) => (this.log.warn(`talk kororin failed: ${String(e)}`), null));
+    const look: TalkLook = { of, stand, faces, kororin: mini };
+    const cur = await this.user(userId);
+    if ((who === 'me' ? cur.avatarUrl : cur.batiImageUrl) !== of) return;
+    await this.db.write
+      .update(users)
+      .set({ onboardingJson: { ...((cur.onboardingJson ?? {}) as Record<string, string>), [`talk.${who}`]: JSON.stringify(look) }, updatedAt: new Date() })
+      .where(eq(users.id, userId));
   }
 
   async name(userId: string, name: string): Promise<Me> {

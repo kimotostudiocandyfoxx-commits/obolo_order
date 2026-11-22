@@ -1,9 +1,9 @@
 'use client';
 
-import { callRequest } from '@obolo/shared';
-import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView, BuddySource } from '@obolo/shared';
+import { callRequest, kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView } from '@obolo/shared';
 import { DrawnPicture, PlaceMap, SourceChips, placeOf } from '@/components/chat/BuddyExtras';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
 import { PlanetShell } from '@/components/PlanetShell';
 import { PlanetSphere } from '@/components/PlanetSphere';
@@ -15,6 +15,9 @@ import { RoomSheet, type RoomMode } from './BatiRoom';
 import { LineIcon } from '@/components/LineIcon';
 import { BatiSettings, MoonEgg, eggReady } from '@/components/bati/BatiSheet';
 import { EggMorning } from '@/components/bati/EggMorning';
+import { TalkComposer } from '@/components/talk/TalkComposer';
+import { TalkScene } from '@/components/talk/TalkScene';
+import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook } from '@/lib/talk/looks';
 
 export function MoonView() {
   return (
@@ -72,12 +75,12 @@ function Chat() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [quota, setQuota] = useState<BuddyQuotaView | null>(null);
   const [text, setText] = useState('');
+  const [talkState, setTalkState] = useState({ listening: false, keyboard: false });
+  const [streamId, setStreamId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [room, setRoom] = useState<RoomMode | null>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const stickToBottom = useRef(true);
 
   useEffect(() => {
     void Promise.all([api.buddyProfile(), api.buddyMessages(), api.buddyQuota()]).then(([p, page, q]) => {
@@ -88,29 +91,23 @@ function Chat() {
     });
   }, [api]);
 
-  useLayoutEffect(() => {
-    if (stickToBottom.current) bottomRef.current?.scrollIntoView({ block: 'end' });
-  }, [messages, sending]);
-
   const loadOlder = async () => {
     if (!cursor) return;
-    stickToBottom.current = false;
     const page = await api.buddyMessages(cursor);
     setMessages((cur) => [...[...page.items].reverse(), ...cur]);
     setCursor(page.nextCursor);
   };
 
-  const send = async (e?: FormEvent) => {
-    e?.preventDefault();
-    const body = text.trim();
+  const send = async (said?: string) => {
+    const body = (said ?? text).trim();
     if (!body || sending) return;
-    stickToBottom.current = true;
     setSending(true);
     setNotice(null);
     const tempId = `tmp-${Date.now()}`;
     setMessages((cur) => [...cur, { id: tempId, role: 'user', text: body, createdAt: new Date().toISOString() }]);
     setText('');
     const liveId = `live-${Date.now()}`;
+    setStreamId(liveId);
     try {
       // Claude writes the answer as it comes (2026-11-21): the bubble fills while it is written, then the saved reply takes its place
       const r = api.buddyChatStream
@@ -124,12 +121,18 @@ function Chat() {
             }),
           )
         : await api.buddyChat(body, locale);
-      setMessages((cur) => [...cur.filter((x) => x.id !== tempId && x.id !== liveId), r.userMessage, r.reply]);
+      // the same ids stay (the talk does not say them again); a streamed reply keeps its place and gets its faces
+      setMessages((cur) => {
+        const streamed = cur.some((x) => x.id === liveId);
+        return [...cur.filter((x) => x.id !== tempId && x.id !== liveId), { ...r.userMessage, id: tempId }, { ...r.reply, id: streamed ? liveId : r.reply.id }];
+      });
+      setStreamId(null);
       // M-R222: 「覚えといて」 / 「〇〇って呼んで」 changed {bati} on the server: the card follows
       if (r.reply.remembered || callRequest(body)) void api.me().then(setMe).catch(() => undefined);
       setQuota(r.quota);
     } catch (err) {
       setMessages((cur) => cur.filter((x) => x.id !== tempId && x.id !== liveId));
+      setStreamId(null);
       setText(body);
       setNotice(err instanceof ApiError && err.code === 'BUDDY_QUOTA' ? m.moon.quotaReached : m.moon.unavailable);
     } finally {
@@ -173,58 +176,59 @@ function Chat() {
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto px-4 pb-4" onScroll={(e) => {
-        const el = e.currentTarget;
-        stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
-      }}>
-        {cursor && (
-          <button className="mx-auto block text-xs text-white/50 underline" onClick={() => void loadOlder()}>
-            {m.moon.olderMessages}
-          </button>
-        )}
-        {profile && messages.length === 0 && <Bubble role="buddy" text={t(m.moon.greeting, { name })} />}
-        {messages.map((msg, k) => (
-          <Bubble key={msg.id} role={msg.role} text={msg.text} sources={msg.sources} image={msg.image?.url} place={msg.role === 'buddy' && messages[k - 1]?.role === 'user' ? placeOf(messages[k - 1].text) : null} />
-        ))}
-        {sending && (
-          <div className="flex items-end gap-2">
-            <BatiFace size={28} />
-            <div className="rounded-2xl rounded-bl-sm bg-white/10 px-4 py-2.5 text-sm text-white/60">
-              {/* a small magic circle turning while {bati} looks it up (no "thinking…" words) */}
-              <span className="relative block h-7 w-7" aria-label={t(m.moon.thinking, { name })}>
-                <span className="absolute inset-0 animate-[spin_3s_linear_infinite] rounded-full border-2 border-dashed border-amber-200/70" />
-                <span className="absolute inset-[5px] animate-[spin_2s_linear_infinite_reverse] rounded-full border border-sky-200/70" />
-                <span className="absolute inset-[11px] animate-pulse rounded-full bg-amber-100/80" />
-              </span>
-            </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      {notice && <p className="mx-4 mb-2 rounded-xl bg-amber-300/15 px-3 py-2 text-center text-xs text-amber-200">{notice}</p>}
-
-      {/* Composer */}
-      <form onSubmit={send} className="pb-safe flex items-end gap-2 border-t border-white/5 bg-[color:var(--color-space-950)]/80 px-3 py-3">
-        <textarea
-          className="input max-h-32 min-h-11 flex-1 resize-none !rounded-2xl"
-          rows={1}
-          maxLength={2000}
-          placeholder={m.moon.placeholder}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-              e.preventDefault();
-              void send();
-            }
-          }}
-        />
-        <button className="btn btn-primary h-11 !px-4" disabled={sending || !text.trim()}>
-          {m.moon.send}
+      {/* M-R232: the side-by-side talk — {bati} at the left, you at the right, the Moon behind */}
+      <TalkScene
+        people={[
+          { id: 'bati', name, look: me?.bati ? batiLook(me.bati) : characterLook('kimorin'), color: BATI_COLOR },
+          { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+        ]}
+        items={[
+          ...(profile && messages.length === 0 ? [{ id: 'hello', who: 'bati', text: t(m.moon.greeting, { name }), face: 'smile' as const }] : []),
+          ...messages.map((msg, k) => ({
+            id: msg.id,
+            who: msg.role === 'user' ? 'me' : 'bati',
+            text: msg.text,
+            face: msg.faces ? undefined : msg.face,
+            motion: msg.motion,
+            faces: msg.faces,
+            live: msg.id === streamId,
+            // M-R208: a picture it drew sits small in the bubble; the pages it looked up and a place's map under the words
+            card: msg.image?.url ? { label: '絵', thumb: <DrawnPicture url={msg.image.url} alt={msg.text} />, full: <DrawnPicture url={msg.image.url} alt={msg.text} /> } : undefined,
+            extra:
+              msg.role === 'buddy' && (msg.sources?.length || placeOf(messages[k - 1]?.text ?? '')) ? (
+                <>
+                  <SourceChips sources={msg.sources} />
+                  {messages[k - 1]?.role === 'user' && placeOf(messages[k - 1].text) && <PlaceMap place={placeOf(messages[k - 1].text)!} />}
+                </>
+              ) : undefined,
+          })),
+        ]}
+        // M-R234: 'thinking' while it looks it up and writes (not three dots)
+        thinking={sending && !messages.some((x) => x.id === streamId) ? 'bati' : null}
+        listening={talkState.listening}
+        keyboard={talkState.keyboard}
+        kororin={kororinRing(me)}
+        loading={!profile}
+        fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+        top={6}
+        composer={
+          <TalkComposer
+            key={`c-${text}`}
+            initial={text}
+            placeholder={m.moon.placeholder}
+            disabled={sending}
+            onState={setTalkState}
+            onSend={(v) => void send(v)}
+          />
+        }
+      />
+      {cursor && (
+        <button className="absolute left-1/2 top-[76px] z-20 -translate-x-1/2 text-[11px] text-white/45 underline" onClick={() => void loadOlder()}>
+          {m.moon.olderMessages}
         </button>
-      </form>
+      )}
+
+      {notice && <p className="absolute inset-x-4 bottom-[120px] z-20 rounded-xl bg-amber-300/15 px-3 py-2 text-center text-xs text-amber-200">{notice}</p>}
 
       {/* SYS-S003 「たまごが、育った」 (M-R224), played by the story player */}
       {eggOpen && me && <EggMorning onClose={() => setEggOpen(false)} />}
@@ -234,7 +238,6 @@ function Chat() {
           onClose={() => setRoom(null)}
           // Bati's word after the change, in the chat for now (not saved)
           onDone={(line) => {
-            stickToBottom.current = true;
             setMessages((cur) => [...cur, { id: `room-${Date.now()}`, role: 'buddy', text: line, createdAt: new Date().toISOString() }]);
           }}
         />
@@ -252,31 +255,6 @@ function Chat() {
           }}
         />
       )}
-    </div>
-  );
-}
-
-function Bubble({ role, text, sources, image, place }: { role: 'user' | 'buddy'; text: string; sources?: BuddySource[]; image?: string; place?: string | null }) {
-  if (role === 'user') {
-    return (
-      <div className="flex justify-end">
-        <div className="max-w-[80%] whitespace-pre-wrap rounded-2xl rounded-br-sm bg-gradient-to-br from-sky-400/80 to-violet-500/80 px-4 py-2.5 text-[15px] text-white">
-          {text}
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="flex items-end gap-2">
-      <BatiFace size={28} />
-      {/* M-R208: the pages it looked up, as link chips under the bubble; a picture it drew, as its own bubble */}
-      <div className="flex min-w-0 max-w-[80%] flex-col items-start gap-1.5">
-        <div className="whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-white/10 px-4 py-2.5 text-[15px] leading-relaxed">{text}</div>
-        {image && <DrawnPicture url={image} alt={text} />}
-        <SourceChips sources={sources} />
-        {/* M-R223: a place asked about, on a small map */}
-        {place && <PlaceMap place={place} />}
-      </div>
     </div>
   );
 }
@@ -360,6 +338,16 @@ function SettingsSheet({
             {slider('humor', m.moon.humor, m.moon.humorLow, m.moon.humorHigh)}
           </div>
         )}
+        {/* M-R234: your own figure keeps its plain face in the talk */}
+        <label className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-white/5 px-3 py-2.5 text-[13px] font-bold text-white/80">
+          表情を変えない
+          <input
+            type="checkbox"
+            className="h-5 w-5 accent-sky-300"
+            checked={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+            onChange={(e) => void getApi().saveSysStory({ [TALK_FIXED_FACE_KEY.replace(/^sys\./, '')]: e.target.checked ? '1' : '0' }).then(setMe).catch(() => undefined)}
+          />
+        </label>
         <div className="mt-5 flex gap-2">
           <button className="btn btn-ghost flex-1" onClick={onClose}>
             {m.common.cancel}

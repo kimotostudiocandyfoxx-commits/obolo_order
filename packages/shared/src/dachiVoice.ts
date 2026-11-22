@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DELIVERY_KINDS } from './schemas';
+import { TALK_FACES, type TalkBeat, type TalkFace, type TalkLook } from './talk';
 
 /**
  * ダチの声のメッセージ (client decision M-R212). After {name} becomes dachi with {inviter} on Saturn (day 3,
@@ -119,6 +120,8 @@ export interface DachiThreadView {
   /** something arrived that you have not heard yet (a dot, never a number) */
   unread: boolean;
   lastAt: string | null;
+  /** M-R232: the dachi's own look in the talk (made when they decided it); characters use their story art */
+  talk?: TalkLook | null;
 }
 
 /** A Bluena work sent as a card: 〔ダチへ〕's delivery shape, with Bluena's folders' kinds too (art, video, radio) */
@@ -148,12 +151,20 @@ export interface DachiMessageView {
   /** the words of a character's line (shown while its voice is not made) */
   text: string | null;
   work: DachiWorkCard | null;
+  /** M-R234: the sender's expression, decided when it was sent */
+  face?: TalkFace | null;
+  /** M-R238: the words' expressions, sentence by sentence (a character's line, a message with words) */
+  faces?: TalkBeat[];
+  /** M-R239: heard already (yours always are): opening the thread plays the last heard one and every unheard one */
+  read?: boolean;
   createdAt: string;
 }
 
+/** M-R234: the sender's expression with the message */
+const SendFace = z.enum(TALK_FACES).optional();
 export const SendDachiMessageBody = z.union([
-  z.object({ mediaId: z.string().uuid(), seconds: z.number().positive().max(DACHI_VOICE_MAX_SECONDS + 1) }),
-  z.object({ work: DachiWorkCard }),
+  z.object({ mediaId: z.string().uuid(), seconds: z.number().positive().max(DACHI_VOICE_MAX_SECONDS + 1), face: SendFace }),
+  z.object({ work: DachiWorkCard, face: SendFace }),
 ]);
 export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 

@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
-import { batiChatPicturePrompt, buddyAnswer, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, type ImageProvider, LlmProvider, moderateText, summarizeMemory } from '@obolo/ai';
+import { batiChatPicturePrompt, buddyAnswer, talkBeats, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, type ImageProvider, LlmProvider, moderateText, summarizeMemory } from '@obolo/ai';
 import { buddyQuotaDecision, idempotencyKey } from '@obolo/ledger';
 import {
   BUDDY_CONTEXT_MESSAGES,
@@ -15,6 +15,10 @@ import {
   UpdateBuddyProfileBody,
   callRequest,
   rememberRequest,
+  ruleBeats,
+  type TalkBeat,
+  type TalkFace,
+  type TalkMotion,
 } from '@obolo/shared';
 import { and, desc, eq, lt, or, sql } from 'drizzle-orm';
 import { AppConfig, CONFIG } from '../config';
@@ -38,6 +42,9 @@ const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
   ...(m.extraJson?.sources?.length ? { sources: m.extraJson.sources } : {}),
   ...(m.extraJson?.remembered ? { remembered: m.extraJson.remembered } : {}),
   ...(m.extraJson?.image ? { image: { url: m.extraJson.image.url } } : {}),
+  ...(m.extraJson?.face ? { face: m.extraJson.face } : {}),
+  ...(m.extraJson?.motion ? { motion: m.extraJson.motion } : {}),
+  ...(m.extraJson?.faces?.length ? { faces: m.extraJson.faces } : {}),
 });
 
 /** a picture in the chat may take this long; after it, the answer comes without one */
@@ -229,10 +236,16 @@ export class BuddyService implements OnModuleInit {
     let replyKind: 'normal' | 'worry' | 'danger' = 'normal';
     let sources: BuddySource[] | undefined;
     let draw: string | undefined;
+    // M-R234/M-R235: {bati}'s face and reaction, from the same call
+    let face: TalkFace | undefined;
+    let motion: TalkMotion | undefined;
+    let faces: TalkBeat[] | undefined;
+    // M-R238: your own words' faces, sentence by sentence — one small call beside the reply (the rules if it fails)
+    const mine = talkBeats(this.llm, text, { self: true, timeoutMs: 3000 }).catch(() => ruleBeats(text, true));
     // M-R208: whether Bati may look it up / draw today (a used cap turns it off, the talk goes on)
     const can = await this.caps.abilities(userId).catch(() => ({ search: false, draw: false }));
     try {
-      ({ text: replyText, kind: replyKind, sources, draw } = await buddyAnswer(
+      ({ text: replyText, kind: replyKind, sources, draw, face, motion, faces } = await buddyAnswer(
         this.llm,
         {
           // the member's own {bati}, named on the Moon, answers under its own name (story chat 2026-11-02)
@@ -272,11 +285,14 @@ export class BuddyService implements OnModuleInit {
       else replyText = drawn.text;
     }
     const extra =
-      sources?.length || image || remembered ? { ...(sources?.length ? { sources } : {}), ...(image ? { image } : {}), ...(remembered ? { remembered } : {}) } : null;
+      sources?.length || image || remembered || face || motion || faces
+        ? { ...(sources?.length ? { sources } : {}), ...(image ? { image } : {}), ...(remembered ? { remembered } : {}), ...(face ? { face } : {}), ...(motion ? { motion } : {}), ...(faces?.length ? { faces } : {}) }
+        : null;
+    const myFaces = await mine;
 
     const now = Date.now();
     const result = await this.db.write.transaction(async (tx) => {
-      const [u] = await tx.insert(buddyMessages).values({ userId, role: 'user', text, createdAt: new Date(now) }).returning();
+      const [u] = await tx.insert(buddyMessages).values({ userId, role: 'user', text, extraJson: myFaces.length ? { faces: myFaces } : null, createdAt: new Date(now) }).returning();
       const [b] = await tx
         .insert(buddyMessages)
         .values({ userId, role: 'buddy', text: replyText, provider: this.llm.name, extraJson: extra, createdAt: new Date(now + 1) })

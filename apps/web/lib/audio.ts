@@ -2,6 +2,8 @@
 
 import { NEO_PITCH, parseTtsUrl } from '@obolo/shared';
 import { getBlob } from './api/idb';
+import { audioCtx } from './onboarding/audio';
+import { playClip, type Clip } from './voice/webVoice';
 
 /**
  * One shared <audio> element for voice playback: starting a clip stops the previous one,
@@ -20,6 +22,39 @@ const listeners = new Set<Listener>();
 let ttsTimer: ReturnType<typeof setInterval> | null = null;
 let ttsWatchdog: ReturnType<typeof setTimeout> | null = null;
 let ttsSeq = 0;
+/** M-R239: the clip playing through Web Audio (it keeps quiet with the silent switch on); the element is the fallback */
+let web: { url: string; clip: Clip; timer: ReturnType<typeof setInterval> } | null = null;
+let webSeq = 0;
+
+function stopWeb() {
+  if (!web) return;
+  clearInterval(web.timer);
+  web.clip.stop();
+  web = null;
+}
+
+/** plays through Web Audio; false when there is no Web Audio at all (then the <audio> element) */
+async function playWeb(url: string, key = url): Promise<boolean> {
+  if (!audioCtx()) return false;
+  const seq = ++webSeq;
+  const clip = await playClip(url);
+  if (seq !== webSeq || currentUrl !== key) {
+    clip?.stop();
+    return true;
+  }
+  if (!clip) throw new Error('could not play');
+  const started = Date.now();
+  const timer = setInterval(() => emit(true, Math.min(0.99, (Date.now() - started) / 1000 / clip.duration)), 150);
+  web = { url: key, clip, timer };
+  emit(true, 0);
+  void clip.done.then(() => {
+    if (web?.clip !== clip) return;
+    clearInterval(timer);
+    web = null;
+    emit(false, Math.min(1, (Date.now() - started) / 1000 / clip.duration));
+  });
+  return true;
+}
 
 function emit(playing: boolean, progress = 0) {
   for (const l of listeners) l({ url: currentUrl, playing, progress });
@@ -44,6 +79,7 @@ export function subscribeAudio(l: Listener): () => void {
 }
 
 export function stopAudio() {
+  stopWeb();
   if (el && !el.paused) el.pause();
   if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel();
   if (ttsTimer) clearInterval(ttsTimer);
@@ -54,6 +90,11 @@ export function stopAudio() {
 }
 
 export async function toggleAudio(url: string): Promise<void> {
+  if (currentUrl === url && web?.url === url) {
+    stopWeb();
+    emit(false);
+    return;
+  }
   if (currentUrl === url && el && !el.paused) {
     el.pause();
     return;
@@ -100,6 +141,7 @@ export async function toggleAudio(url: string): Promise<void> {
     return;
   }
 
+  if (await playWeb(url)) return;
   const a = audio();
   if (objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = null;
@@ -121,9 +163,10 @@ export async function playBlob(blob: Blob, key: string): Promise<void> {
   stopAudio();
   currentUrl = key;
   elUrl = key;
-  const a = audio();
   if (objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = URL.createObjectURL(blob);
+  if (await playWeb(objectUrl, key)) return;
+  const a = audio();
   a.src = objectUrl;
   await a.play();
 }

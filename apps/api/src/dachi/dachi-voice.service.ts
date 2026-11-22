@@ -10,16 +10,27 @@ import {
   type DachiThreadView,
   type DachiWorkCard,
   type SendDachiMessageBody,
+  isTalkFace,
+  ruleBeats,
+  type TalkFace,
 } from '@obolo/shared';
-import { and, desc, eq, isNotNull, isNull, or, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { dachiMessages, follows, invites, userBlocks, users } from '../db/schema';
 import { MediaService } from '../media/media.service';
 import { PushService } from '../push/push.service';
 import { DachiService } from './dachi.service';
+import { talkLookOf } from '../look/talk';
 
 type Row = typeof dachiMessages.$inferSelect;
+/** M-R234: the sender's expression kept beside the card (or alone, for a voice) */
+const faceOf = (j: unknown) => (j && typeof j === 'object' && isTalkFace((j as { face?: unknown }).face) ? (j as { face: TalkFace }).face : null);
+const cardOf = (j: unknown): DachiWorkCard | null => {
+  if (!j || typeof j !== 'object') return null;
+  const { face: _face, ...card } = j as DachiWorkCard & { face?: unknown };
+  return card as DachiWorkCard;
+};
 type NewRow = typeof dachiMessages.$inferInsert;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -169,7 +180,13 @@ export class DachiVoiceService {
       last.set(t, r.createdAt.toISOString());
       if (r.recipientId === userId && !r.readAt) unread.add(t);
     }
-    const view = (id: string, kind: DachiThreadView['kind'], name: string, pic: string | null): DachiThreadView => ({ id, kind, name, pic, unread: unread.has(id), lastAt: last.get(id) ?? null });
+    // M-R232: each dachi stands in the talk in the look they made (with its expressions, once made)
+    const ids = friends.map((f) => f.id);
+    const talk = new Map<string, DachiThreadView['talk']>();
+    if (ids.length)
+      for (const r of await this.db.read.select({ id: users.id, j: users.onboardingJson, avatarUrl: users.avatarUrl }).from(users).where(inArray(users.id, ids)))
+        talk.set(r.id, talkLookOf((r.j ?? {}) as Record<string, string>, 'me', r.avatarUrl));
+    const view = (id: string, kind: DachiThreadView['kind'], name: string, pic: string | null): DachiThreadView => ({ id, kind, name, pic, unread: unread.has(id), lastAt: last.get(id) ?? null, ...(talk.get(id) ? { talk: talk.get(id) } : {}) });
     const out: DachiThreadView[] = [];
     const inviter = friends.find((f) => f.id === inv?.inviterId);
     if (inviter) out.push(view(inviter.id, 'dachi', inviter.displayName, inviter.pic));
@@ -207,9 +224,10 @@ export class DachiVoiceService {
     if ('mediaId' in body) {
       const m = await this.media.getOwned(userId, body.mediaId, 'voice');
       if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
-      row = { ...base, kind: 'voice', audioUrl: m.url, audioMediaId: m.id, seconds: Math.round(body.seconds * 10) / 10 };
+      // M-R234: the sender's expression rides in work_json (a voice row has no card; no new column)
+      row = { ...base, kind: 'voice', audioUrl: m.url, audioMediaId: m.id, seconds: Math.round(body.seconds * 10) / 10, ...(body.face ? { workJson: { face: body.face } } : {}) };
     } else {
-      row = { ...base, kind: 'work', workJson: body.work };
+      row = { ...base, kind: 'work', workJson: body.face ? { ...body.work, face: body.face } : body.work };
     }
     const m = await this.insertMessage(row);
     if (!character) {
@@ -240,7 +258,11 @@ export class DachiVoiceService {
       audioUrl: line ? line.voice : r.audioUrl,
       seconds: r.seconds ?? null,
       text: line?.text ?? null,
-      work: (r.workJson as DachiWorkCard | null) ?? null,
+      work: r.kind === 'work' ? cardOf(r.workJson) : null,
+      face: faceOf(r.workJson),
+      // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
+      ...(line?.text ? { faces: ruleBeats(line.text) } : {}),
+      read: r.recipientId !== userId || !!r.readAt,
       createdAt: r.createdAt.toISOString(),
     };
   }

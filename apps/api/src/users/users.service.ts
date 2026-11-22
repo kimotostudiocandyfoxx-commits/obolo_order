@@ -24,6 +24,7 @@ import { Database } from '../db/db';
 import { users } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
+import { talkLookOf } from '../look/talk';
 
 /** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
 function batiFaces(j: Record<string, string> | null): Partial<Record<string, string>> | undefined {
@@ -65,6 +66,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
     lookStandee: (u.onboardingJson as Record<string, string> | null)?.['look.standee'] ?? null,
     lookChibi: (u.onboardingJson as Record<string, string> | null)?.['look.chibi'] ?? null,
     lookIcon: (u.onboardingJson as Record<string, string> | null)?.['look.icon'] ?? null,
+    // M-R232〜M-R235: the look in the side-by-side talk (made in the background when the look was decided)
+    talk: talkLookOf((u.onboardingJson ?? {}) as Record<string, string>, 'me', u.avatarUrl),
     // M-R223: the looks worn so far (the one worn now last when it was never noted)
     lookHistory: (() => {
       const urls = lookHistory(u.onboardingJson as Record<string, string> | null).map((h) => h.url);
@@ -79,6 +82,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
           imageUrl: u.batiImageUrl,
           stand: !!(u.onboardingJson as Record<string, string> | null)?.['bati.stand'],
           faces: batiFaces(u.onboardingJson),
+          talk: talkLookOf((u.onboardingJson ?? {}) as Record<string, string>, 'bati', u.batiImageUrl),
           // M-R215 / M-R217: which one, its egg, personality, 一人称 / 呼び方, the card
           ...(() => {
             const r = activeBati(u);

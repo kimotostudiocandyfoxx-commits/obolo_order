@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { MessageBar } from '@/components/story/Chat';
+import { TalkComposer } from '@/components/talk/TalkComposer';
+import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
+import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { batiDaysLeftLine } from '@obolo/shared';
+import { batiDaysLeftLine, kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
@@ -15,7 +17,7 @@ import { saveTalk, type Talk } from './shelf';
 import { cues, withWords, type StoryMode } from './story';
 import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
-import { WorkCard } from './WorkCard';
+import { KindMark, WorkCard } from './WorkCard';
 import { uid, type Msg, type Work } from './work';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -53,16 +55,13 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState<Pending>(null);
   const [bar, setBar] = useState(0);
+  const [talkState, setTalkState] = useState({ listening: false, keyboard: false });
   const held = useRef(new Map<string, { blob: Blob; seconds: number }>());
   const lastSong = useRef<string | undefined>(undefined);
-  const end = useRef<HTMLDivElement>(null);
   const realCtx = useAtelierCtx();
   const test = !!story?.test;
   const ctx = useMemo(() => (test ? { ...realCtx, test } : realCtx), [realCtx, test]);
 
-  useEffect(() => {
-    end.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [msgs]);
   // the talk is kept for the left drawer (the works themselves are in Bluena)
   useEffect(() => {
     if (story?.mode === 'fly') return;
@@ -266,65 +265,71 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
       .catch(() => setLesson(null));
   }
 
+  // M-R232: the side-by-side talk — you at the right, {bati} (or the story's speaker) at the left, the Moon behind
+  const people: TalkPerson[] = [
+    { id: 'bati', name: partner.name, look: own.isBati || story ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+  ];
+  const items: TalkItem[] = msgs.map((m) =>
+    m.who === 'me'
+      ? { id: m.id, who: 'me', text: m.text }
+      : m.who === 'bati'
+        ? {
+            id: m.id,
+            who: 'bati',
+            text: m.text,
+            name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
+            chips: m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
+          }
+        : {
+            id: m.id,
+            who: 'bati',
+            text: m.work.status === 'making' ? '' : (m.work.title ?? ''),
+            card: {
+              label: m.work.title ?? m.work.prompt,
+              thumb: <WorkThumb w={m.work} />,
+              full: (
+                <WorkCard
+                  w={m.work}
+                  busy={busy}
+                  onAgain={() => void again(m.work)}
+                  onFly={() => void flyIt(m.work)}
+                  onWear={() => void wearIt(m.work)}
+                  onPick={(id) => put({ ...m.work, pick: id, image: m.work.candidates?.find((c) => c.id === id)?.url, worn: false })}
+                  onRecorded={(blob, sec) => void recorded(m.work, blob, sec)}
+                />
+              ),
+            },
+          },
+  );
+  const making = msgs.some((m) => m.who === 'work' && m.work.status === 'making');
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
-      <div className={`min-h-0 flex-1 space-y-2.5 overflow-y-auto px-3.5 pb-[calc(96px+env(safe-area-inset-bottom))] ${story ? 'pt-10' : 'pt-1'}`}>
-        {msgs.map((m) =>
-          m.who === 'me' ? (
-            <div key={m.id} className="flex justify-end pl-14">
-              <p className="max-w-[78%] whitespace-pre-line rounded-[18px] rounded-tr-[5px] px-3.5 py-2 text-[15px] font-medium leading-[1.6] text-[#2b1b06]" style={{ background: 'linear-gradient(135deg, #fbe9b7 0%, #f0c873 55%, #d79d45 100%)' }}>
-                {m.text}
-              </p>
-            </div>
-          ) : m.who === 'bati' ? (
-            <div key={m.id} className="flex items-end gap-2 pr-8">
-              <span className="block h-9 w-9 shrink-0 overflow-hidden rounded-full p-[1.5px]" style={{ background: 'linear-gradient(140deg, #fff1c4, #c9923a 55%, #6b4a1c)' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={(m.speaker && story?.speaker(m.speaker).avatar) || partner.face} alt="" className="h-full w-full rounded-full bg-[#120c1c] object-cover" />
-              </span>
-              <div className="min-w-0">
-                {m.speaker && story && <p className="mb-1 ml-1 text-[10.5px] tracking-[0.22em] text-amber-200/90">{story.speaker(m.speaker).name}</p>}
-                <div className="w-fit max-w-full rounded-[18px] rounded-tl-[5px] px-3.5 py-2 text-[15px] leading-[1.6] text-white/95" style={{ background: 'linear-gradient(180deg, rgba(38,28,56,0.80), rgba(14,10,24,0.80))', border: '1px solid rgba(240,205,140,0.22)' }}>
-                  {m.text}
-                </div>
-                {m.chips && m.chips.length > 0 && (
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    {m.chips.map((c) => (
-                      <button key={c} onClick={() => chip(c)} disabled={busy} className="rounded-full border border-amber-200/45 bg-[rgba(16,11,26,0.62)] px-3 py-1.5 text-[13px] text-amber-50 disabled:opacity-40">
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <WorkCard
-              key={m.id}
-              w={m.work}
-              busy={busy}
-              onAgain={() => void again(m.work)}
-              onFly={() => void flyIt(m.work)}
-              onWear={() => void wearIt(m.work)}
-              onPick={(id) => put({ ...m.work, pick: id, image: m.work.candidates?.find((c) => c.id === id)?.url, worn: false })}
-              onRecorded={(blob, sec) => void recorded(m.work, blob, sec)}
-            />
-          ),
-        )}
-        <div ref={end} />
-      </div>
-
-      {story && <StoryButton story={story} msgs={msgs} busy={busy} />}
-
-      <MessageBar
-        key={bar}
-        placeholder={`${partner.name}に頼む`}
-        valid={() => !busy}
-        onSend={async (v) => {
-          send(v);
-          setBar((n) => n + 1);
-        }}
+      <TalkScene
+        people={people}
+        items={items}
+        thinking={busy || making ? 'bati' : null}
+        listening={talkState.listening}
+        keyboard={talkState.keyboard}
+        kororin={kororinRing(me)}
+        place={PLACE_BG.moon}
+        top={story ? 40 : 6}
+        fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+        composer={
+          <TalkComposer
+            key={bar}
+            placeholder={`${partner.name}に頼む`}
+            disabled={busy}
+            onState={setTalkState}
+            onSend={(v) => {
+              send(v);
+              setBar((n) => n + 1);
+            }}
+          />
+        }
       />
+      {story && <StoryButton story={story} msgs={msgs} busy={busy} />}
 
       {lesson && (
         <Teach
@@ -355,5 +360,26 @@ function StoryButton({ story, msgs, busy }: { story: StoryMode; msgs: Msg[]; bus
     >
       {fly ? '今は飛ばさない' : '次へ'}
     </button>
+  );
+}
+
+/** a work small in {bati}'s bubble (M-R232 §2): its picture, or its mark and name; a tap opens the whole card */
+function WorkThumb({ w }: { w: Work }) {
+  const pic = w.image ?? w.poster ?? w.candidates?.[0]?.url;
+  return (
+    <span className="flex items-center gap-2 bg-[rgba(16,11,26,0.7)] p-1.5">
+      {pic ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={pic} alt="" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+      ) : (
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-white/5 text-amber-100/80">
+          <KindMark kind={w.kind} className="h-6 w-6" />
+        </span>
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13px] text-amber-50">{w.title || w.text || w.prompt}</span>
+        <span className="block text-[10.5px] text-amber-200/70">{w.status === 'making' ? '作っているよ…' : w.status === 'failed' ? 'うまくできなかった' : w.status === 'record' ? '押して、録る' : '押して、ひらく'}</span>
+      </span>
+    </span>
   );
 }

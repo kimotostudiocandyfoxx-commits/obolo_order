@@ -312,7 +312,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the scene's thread (cleared when the scene changes: a motion, an arrival, black)
   const [log, setLog] = useState<ChatRaw[]>([]);
   const addLine = useCallback((e: ChatRaw | null) => {
-    if (e) setLog((l) => (l[l.length - 1]?.id === e.id ? l : [...l, e]));
+    // the same line said again later (a choice that comes round again: 受け取らない → the ticket once more) gets its own key
+    if (e) setLog((l) => (l[l.length - 1]?.id.split('~')[0] === e.id ? l : [...l, l.some((x) => x.id === e.id) ? { ...e, id: `${e.id}~${l.length}` } : e]));
   }, []);
   const reveal = useRef<ChatReveal>({ done: true, finish: () => {} });
   // the thread fading out has no say in what a tap finishes (QA 13 R35)

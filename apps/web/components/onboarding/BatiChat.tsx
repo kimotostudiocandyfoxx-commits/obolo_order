@@ -6,8 +6,13 @@ import { RoomSheet, type RoomMode } from '@/app/moon/BatiRoom';
 import { useAuth } from '@/lib/auth';
 import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
+import { unlockAudio } from '@/lib/onboarding/audio';
+import { playClip, type Clip } from '@/lib/voice/webVoice';
 import { saveSpell } from '@/components/jupiter/JupiterLesson';
-import { VoiceField } from './StoryExtras';
+import { kororinRing, TALK_FIXED_FACE_KEY, type BatiView, type Me, type TalkBeat, type TalkFace, type TalkMotion } from '@obolo/shared';
+import { TalkComposer } from '@/components/talk/TalkComposer';
+import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
+import { BATI_COLOR, batiLook, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
 
 /**
  * 〔💬 バティに聞く〕 (D03-S008 「はじめての、おしゃべり」, M-R138〜140): a chat like any other — Bati's face on top
@@ -18,8 +23,6 @@ import { VoiceField } from './StoryExtras';
  * answer carries the 'can be wrong' line. No counts, no numbers, no "AI". A talk is gone when closed unless
  * 〔この話を残す〕 keeps it (R21b, M-R119): only kept talks are listed under 〔📜 前の話〕 (on this device, TALKS_KEY).
  */
-/** a tenth of a second of silence (WAV) */
-const SILENCE = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 export const TALKS_KEY = 'obolo.batiTalks';
 type Talk = { at: string; lines: { who: 'me' | 'bati'; text: string }[] };
 function loadTalks(): Talk[] {
@@ -31,7 +34,7 @@ function loadTalks(): Talk[] {
 }
 // noPic: a worry or a danger — no 〔🖼 絵で見る〕 under it (generation test 1, G-4)
 // drawn / sources (M-R208): a picture {bati} drew when asked, the pages it looked the answer up on
-type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean; noPic?: boolean; drawn?: string; sources?: BuddySource[] };
+type Msg = { id: number; who: 'me' | 'bati'; text: string; q?: string; picture?: BuddyPicture | null; picLoading?: boolean; noPic?: boolean; drawn?: string; sources?: BuddySource[]; face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] };
 const EXAMPLES = ['ビッグバンって、いつ起きたの？', 'ブラックホールの正体って、なに？', '宇宙の果てって、あるの？'];
 
 export function BatiChat(props: Parameters<typeof BatiChatFull>[0] & { muted?: boolean }) {
@@ -51,24 +54,21 @@ const sentences = (t: string) => (t.match(/[^。！？!?\n]+[。！？!?]*/g) ??
  */
 function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: { bati: string; neo: string; image?: string; faces?: Partial<Record<string, string>>; me?: string; muted?: boolean; onDone: () => void }) {
   const [msgs, setMsgs] = useState<Msg[]>([]); // its first words were said as a story line just before (no second time)
-  const [q, setQ] = useState('');
   const [face, setFace] = useState<string>('sparkle');
   const [casting, setCasting] = useState(false);
   const [rounds, setRounds] = useState(0);
-  const end = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    end.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [msgs, casting]);
+  const [talk, setTalk] = useState({ listening: false, keyboard: false });
   // M-R223: a tap on {bati}'s face (or your own small one) above the chat changes the look; a look changed here wins
   const { me: auth } = useAuth();
   const [room, setRoom] = useState<RoomMode | null>(null);
   const changed = auth?.bati?.imageUrl && image && auth.bati.imageUrl !== image ? auth.bati : null;
   const pic = changed ? changed.faces?.[face as 'smile'] || changed.imageUrl || undefined : faces?.[face] || image;
   const myIcon = auth?.lookIcon || auth?.avatarUrl || me;
-  // the voice: one sentence after another, each played as soon as it is made
-  const playing = useRef<HTMLAudioElement | null>(null);
+  // the voice: one sentence after another, each played as soon as it is made — through Web Audio (M-R239: quiet with
+  // the silent switch on; the AudioContext is let out by the tap that asked)
+  const playing = useRef<Clip | null>(null);
   const gen = useRef(0);
-  useEffect(() => () => void (gen.current++, playing.current?.pause()), []);
+  useEffect(() => () => void (gen.current++, playing.current?.stop()), []);
   const sayAloud = async (text: string) => {
     const g = ++gen.current;
     if (muted) return;
@@ -78,36 +78,26 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
       const url = await u;
       if (g !== gen.current) return;
       if (!url) continue;
-      await new Promise<void>((done) => {
-        // the one element opened by the tap that asked (iOS plays a fresh Audio only inside a tap)
-        const a = (playing.current ??= new Audio());
-        const t = setTimeout(done, 15_000);
-        a.onended = () => (clearTimeout(t), done());
-        a.onerror = () => (clearTimeout(t), done());
-        a.src = url;
-        a.play().catch(() => (clearTimeout(t), done()));
-      });
+      const clip = await playClip(url);
+      if (!clip || g !== gen.current) {
+        clip?.stop();
+        continue;
+      }
+      playing.current = clip;
+      await Promise.race([clip.done, new Promise((r) => setTimeout(r, 15_000))]);
     }
   };
-  /** inside the tap: open the voice's element with a moment of silence, so its later play() is allowed */
+  /** inside the tap: let the AudioContext out, so the later plays are allowed */
   const openVoice = () => {
-    if (muted) return;
-    try {
-      const a = (playing.current ??= new Audio());
-      a.src = SILENCE;
-      void a.play().catch(() => undefined);
-    } catch {
-      /* no sound */
-    }
+    if (!muted) unlockAudio();
   };
 
   const ask = async (text: string) => {
     const t = text.trim();
     if (!t || casting || rounds >= FIRST_ROUNDS) return;
     gen.current++;
-    playing.current?.pause();
+    playing.current?.stop();
     openVoice();
-    setQ('');
     setMsgs((m) => [...m, { id: m.length, who: 'me', text: t }]);
     setFace('think');
     setCasting(true);
@@ -116,6 +106,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     let noPic = false;
     let drawn: string | undefined;
     let sources: BuddySource[] | undefined;
+    let look: { face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] } = {};
     try {
       // at most 20 s: a set answer counts as a round, so the talk always reaches its end (story chat 2026-10-29)
       const r = await Promise.race([getApi().buddyChat(t, 'ja'), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 20_000))]);
@@ -123,6 +114,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
       noPic = !!r.kind && r.kind !== 'normal';
       drawn = r.reply.image?.url;
       sources = r.reply.sources;
+      look = { face: r.reply.face, motion: r.reply.motion, faces: r.reply.faces };
     } catch {
       reply = 'むむ…いまは、うまく調べられなかった！　ほかのこと、聞いてみて！';
       noPic = true;
@@ -133,7 +125,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     setFace('surprise');
     const id = Date.now();
     // a picture it drew takes the library picture's place
-    setMsgs((m) => [...m, { id, who: 'bati', text: reply, q: t, noPic, picLoading: !noPic && !drawn, drawn, sources }]);
+    setMsgs((m) => [...m, { id, who: 'bati', text: reply, q: t, noPic, picLoading: !noPic && !drawn, drawn, sources, ...look }]);
     setTimeout(() => setFace('smile'), 1400);
     const n = rounds + 1;
     setRounds(n);
@@ -154,75 +146,47 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
     }
   };
 
+  // M-R232: the side-by-side talk ({bati} at the left, you at the right, the Moon behind); its old face names → the six
+  const people = talkPeople(bati, neo, changed?.imageUrl || image, changed ? changed.faces : faces, auth?.bati, me, auth);
+  const items: TalkItem[] = msgs.map((m) => ({
+    id: String(m.id),
+    who: m.who,
+    text: m.text,
+    face: m.faces ? undefined : m.face,
+    motion: m.motion,
+    faces: m.faces,
+    card: m.drawn ? drawnCard(m.drawn, m.text) : m.picture ? pictureCard(m.picture) : undefined,
+    extra:
+      m.who === 'bati' ? (
+        <>
+          <SourceChips sources={m.sources} tone="story" />
+          {m.q && !m.noPic && placeOf(m.q) && <PlaceMap place={placeOf(m.q)!} tone="story" />}
+        </>
+      ) : undefined,
+  }));
   return (
-    <div className="absolute inset-0 z-[12] flex flex-col bg-gradient-to-b from-[#0a0f24] via-[#0b0a1a] to-black text-amber-50">
-      {/* {bati}, its face changing with the talk; a tap on it (or on your own small face) changes the look (M-R223) */}
-      <div className={`pt-safe relative mx-auto mt-12 w-28 ${pic ? 'h-28' : 'h-0'}`}>
-        {pic && (
-          <button type="button" onClick={() => setRoom('bati')} aria-label={`${bati}の見た目を変える`} className="h-full w-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={pic} alt="" className="h-full w-full object-contain drop-shadow-[0_0_18px_rgba(255,220,150,0.35)] transition-opacity duration-300" />
-          </button>
-        )}
-        {myIcon && (
-          <button type="button" onClick={() => setRoom('me')} aria-label={`${neo}の見た目を変える`} className="absolute -right-10 bottom-0 h-8 w-8 overflow-hidden rounded-full ring-1 ring-amber-200/50">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={myIcon} alt="" className="h-full w-full object-cover" />
-          </button>
-        )}
-        {casting && <div className="pointer-events-none absolute inset-[-25%] animate-[spin_3s_linear_infinite] rounded-full border border-dashed border-amber-200/50" />}
+    <div className="absolute inset-0 z-[12] flex flex-col bg-[#05060f] text-amber-50">
+      <div className="pt-safe flex min-h-0 flex-1 flex-col pt-10">
+        <TalkScene
+          people={people}
+          items={items}
+          thinking={casting ? 'bati' : null}
+          listening={talk.listening}
+          keyboard={talk.keyboard}
+          place={PLACE_BG.moon}
+          kororin={kororinRing(auth)}
+          fixedSelfFace={auth?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+          top={8}
+          composer={
+            <div>
+              {rounds < FIRST_ROUNDS && <TalkComposer placeholder="" maxLength={120} disabled={casting} onState={setTalk} onSend={(v) => void ask(v)} />}
+              <p className="pb-safe pb-1 text-center text-[10px] text-amber-50/40">{bati}の答えが、まちがっていることもあります</p>
+            </div>
+          }
+        />
       </div>
+      <LookButtons bati={bati} neo={neo} pic={pic} myIcon={myIcon} onRoom={setRoom} />
       {room && <RoomSheet mode={room} onClose={() => setRoom(null)} onDone={() => setRoom(null)} />}
-      <div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3 pt-3">
-        {msgs.map((m) =>
-          m.who === 'me' ? (
-            <div key={m.id} className="flex items-end justify-end gap-2">
-              <p className="max-w-[72%] rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[14px] text-amber-950">{m.text}</p>
-              {me && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={me} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-amber-200/60" />
-              )}
-            </div>
-          ) : (
-            <div key={m.id} className="max-w-[86%] space-y-1.5 rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2">
-              <p className="text-[14px] leading-relaxed">
-                <span className="mr-1 text-[10px] tracking-widest text-amber-200/70">{bati}</span>
-                {m.text}
-              </p>
-              {m.drawn && <DrawnPicture url={m.drawn} alt={m.text} />}
-              <SourceChips sources={m.sources} tone="story" />
-              {m.q && !m.noPic && placeOf(m.q) && <PlaceMap place={placeOf(m.q)!} tone="story" />}
-              {m.picture && (
-                <figure className="overflow-hidden rounded-xl bg-black/40">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.picture.url} alt={m.picture.title} className="max-h-56 w-full object-contain" />
-                  <figcaption className="px-2 py-1 text-[10px] text-amber-50/55">
-                    {m.picture.title}
-                    <a href={m.picture.pageUrl} target="_blank" rel="noreferrer" className="ml-1 underline">
-                      出どころ：{m.picture.source}
-                    </a>
-                  </figcaption>
-                </figure>
-              )}
-            </div>
-          ),
-        )}
-        {casting && <p className="animate-pulse pl-2 text-[18px] tracking-[0.3em] text-amber-100/80">…</p>}
-        <div ref={end} />
-      </div>
-      <div className="pb-safe space-y-2 px-4 pb-3">
-        {rounds < FIRST_ROUNDS && (
-          <>
-            <VoiceField value={q} onChange={setQ} placeholder="" maxLength={120} />
-            {q.trim() && (
-              <button onClick={() => void ask(q)} disabled={casting} className="w-full rounded-full border border-amber-200/50 bg-amber-200/10 py-2.5 text-[14px] disabled:opacity-40">
-                {bati}に話す
-              </button>
-            )}
-          </>
-        )}
-        <p className="text-center text-[10px] text-amber-50/40">{bati}の答えが、まちがっていることもあります</p>
-      </div>
     </div>
   );
 }
@@ -250,47 +214,39 @@ function BatiChatFull({
   onDone: () => void;
 }) {
   const [msgs, setMsgs] = useState<Msg[]>([{ id: 0, who: 'bati', text: first ? `ねえ、${neo}。宇宙のことで、知りたいこと、ある？　ボク、調べてみる！` : 'なにを調べる？　宇宙のことじゃなくても、何でも聞いてね！' }]);
-  const [q, setQ] = useState('');
-  const [face, setFace] = useState<string>('sparkle');
   const [casting, setCasting] = useState<string | null>(null);
   const [asked, setAsked] = useState(false);
   const [history, setHistory] = useState<{ who: string; text: string }[] | null>(null);
   const [kept, setKept] = useState(false);
   const [noted, setNoted] = useState<Set<number>>(new Set());
-  const end = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    end.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [msgs, casting]);
-  const pic = faces?.[face] || image;
+  const [talk, setTalk] = useState({ listening: false, keyboard: false });
 
   const ask = async (text: string) => {
     const t = text.trim();
     if (!t || casting) return;
-    setQ('');
     setMsgs((m) => [...m, { id: m.length, who: 'me', text: t }]);
-    setFace('think');
     setCasting(t);
     const started = Date.now();
     let reply = '';
     let noPic = false;
     let drawn: string | undefined;
     let sources: BuddySource[] | undefined;
+    let look: { face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] } = {};
     try {
       const r = await getApi().buddyChat(t, 'ja');
       reply = r.reply.text;
       noPic = !!r.kind && r.kind !== 'normal';
       drawn = r.reply.image?.url;
       sources = r.reply.sources;
+      look = { face: r.reply.face, motion: r.reply.motion, faces: r.reply.faces };
     } catch {
       reply = 'うーん、いまは、うまく調べられなかった……。また聞いてね。';
     }
     // the spell takes a moment, even when the answer is quick
     await new Promise((r) => setTimeout(r, Math.max(0, 2200 - (Date.now() - started))));
     setCasting(null);
-    setFace('surprise');
-    setMsgs((m) => [...m, { id: m.length, who: 'bati', text: reply, q: t, noPic, drawn, sources }]);
+    setMsgs((m) => [...m, { id: m.length, who: 'bati', text: reply, q: t, noPic, drawn, sources, ...look }]);
     setAsked(true);
-    setTimeout(() => setFace('smile'), 1400);
   };
   const showPicture = async (id: number) => {
     const m = msgs.find((x) => x.id === id);
@@ -316,126 +272,92 @@ function BatiChatFull({
     setKept(true);
   };
 
-  return (
-    <div className="absolute inset-0 z-[12] flex flex-col bg-gradient-to-b from-[#0a0f24] via-[#0b0a1a] to-black text-amber-50">
-      <div className="pt-safe flex items-center justify-between px-4 pt-12">
-        <button onClick={openHistory} className="rounded-full bg-white/10 px-3 py-1.5 text-[12px]">
-          前の話
-        </button>
-        <p className="text-[13px] tracking-widest text-amber-100/80">{bati}に聞く</p>
-        <span className="w-16" />
-      </div>
-      {/* Bati, its face changing with the talk */}
-      <div className={`relative mx-auto mt-2 w-28 ${pic ? 'h-28' : 'h-0'}`}>
-        {pic && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={pic} alt="" className="h-full w-full object-contain drop-shadow-[0_0_18px_rgba(255,220,150,0.35)] transition-opacity duration-300" />
-        )}
-        {casting && (
-          <div className="pointer-events-none absolute inset-[-30%] animate-[spin_3s_linear_infinite] rounded-full border border-dashed border-amber-200/60 text-[10px] text-amber-200/80">
-            {'✦ﾏﾅ✧ᚱ✦ᛟ✧ᚨ✦'.split('').map((ch, k) => (
-              <span key={k} className="absolute left-1/2 top-1/2" style={{ transform: `rotate(${k * 33}deg) translateY(-70px)` }}>
-                {ch}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3 pt-3">
-        {/* the how-to comes one step at a time, at the moment it is used (M-R169) */}
-        {first && !asked && <p className="rounded-2xl bg-white/[0.06] px-3 py-2 text-[12px] leading-relaxed text-amber-50/75">使い方｜マイクを押して、知りたいことを話してみよう（宇宙のことでも、それ以外のことでも、何でも）</p>}
-        {msgs.map((m) =>
-          m.who === 'me' ? (
-            <div key={m.id} className="flex items-end justify-end gap-2">
-              <p className="max-w-[72%] rounded-2xl rounded-br-sm bg-amber-200/90 px-3 py-2 text-[14px] text-amber-950">{m.text}</p>
-              {me && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={me} alt="" className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-amber-200/60" />
-              )}
-            </div>
+  const { me: auth } = useAuth();
+  const people = talkPeople(bati, neo, image, faces, auth?.bati, me, auth);
+  const items: TalkItem[] = msgs.map((m) => ({
+    id: String(m.id),
+    who: m.who,
+    text: m.text,
+    face: m.faces ? undefined : m.face,
+    motion: m.motion,
+    faces: m.faces,
+    card: m.drawn ? drawnCard(m.drawn, m.text) : m.picture ? pictureCard(m.picture) : undefined,
+    extra:
+      m.who === 'bati' && m.q ? (
+        <>
+          <SourceChips sources={m.sources} tone="story" />
+          {!m.noPic && placeOf(m.q) && <PlaceMap place={placeOf(m.q)!} tone="story" />}
+          {m.noPic || m.drawn || m.picture ? null : m.picture === null ? (
+            <p className="text-[11px] text-amber-50/55">ぴったりの絵は、見つからなかった……</p>
+          ) : m.picLoading ? (
+            <p className="animate-pulse text-[12px] text-amber-100/70">絵を、さがしている……</p>
           ) : (
-            <div key={m.id} className="max-w-[86%] space-y-1.5">
-              <p className="rounded-2xl rounded-bl-sm bg-white/10 px-3 py-2 text-[14px] leading-relaxed">
-                <span className="mr-1 text-[10px] tracking-widest text-amber-200/70">{bati}</span>
-                {m.text}
-              </p>
-              {m.drawn && <DrawnPicture url={m.drawn} alt={m.text} />}
-              <SourceChips sources={m.sources} tone="story" />
-              {m.q && !m.noPic && placeOf(m.q) && <PlaceMap place={placeOf(m.q)!} tone="story" />}
-              {m.q && (
-                <>
-                  {m.noPic || m.drawn ? null : m.picture ? (
-                    <figure className="overflow-hidden rounded-xl bg-black/40">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={m.picture.url} alt={m.picture.title} className="max-h-64 w-full object-contain" />
-                      <figcaption className="px-2 py-1 text-[11px] text-amber-50/80">
-                        {m.picture.title}
-                        <a href={m.picture.pageUrl} target="_blank" rel="noreferrer" className="block text-[10px] text-amber-50/55 underline">
-                          出どころ：{m.picture.source}
-                        </a>
-                      </figcaption>
-                    </figure>
-                  ) : m.picture === null ? (
-                    <p className="text-[11px] text-amber-50/55">ぴったりの絵は、見つからなかった……</p>
-                  ) : m.picLoading ? (
-                    <p className="animate-pulse text-[12px] text-amber-100/70">絵を、さがしている……</p>
-                  ) : (
-                    <>
-                      <button onClick={() => void showPicture(m.id)} className="rounded-full border border-amber-200/40 px-3 py-1 text-[12px]">
-                        絵で見る
-                      </button>
-                      {first && !msgs.some((x) => x.picture !== undefined) && <p className="text-[11px] text-amber-50/60">〔絵で見る〕を押すと、調べてきた写真や図も見られます</p>}
-                    </>
-                  )}
-                  {spell && (
-                    <button
-                      onClick={() => {
-                        saveSpell(m.text.split(/[、。！？!?\s　]+/).filter((w) => w.length > 1).slice(0, 6));
-                        setNoted((n) => new Set(n).add(m.id));
-                      }}
-                      disabled={noted.has(m.id)}
-                      className="text-[11px] text-violet-200 disabled:text-amber-50/40"
-                    >
-                      {noted.has(m.id) ? 'スペルブックに記しました' : '記す'}
-                    </button>
-                  )}
-                  <p className="text-[10px] leading-snug text-amber-50/45">{bati}の答えが、まちがっていることもあります。大事なことは、自分でも確かめてね</p>
-                </>
-              )}
-            </div>
-          ),
-        )}
-        {casting && <p className="animate-pulse text-center text-[13px] text-amber-100/85">〈{casting}〉——ここに、こたえを。</p>}
-        <div ref={end} />
-      </div>
-      <div className="pb-safe space-y-2 px-4 pb-4">
-        {!asked && (
-          <div className="flex flex-wrap justify-center gap-1.5">
-            {EXAMPLES.map((e) => (
-              <button key={e} onClick={() => void ask(e)} className="rounded-full bg-white/10 px-3 py-1.5 text-[11px]">
-                {e}
-              </button>
-            ))}
-          </div>
-        )}
-        <VoiceField value={q} onChange={setQ} placeholder="ブラックホールの正体って、なに？" maxLength={120} />
-        <div className="flex gap-2">
-          <button onClick={() => void ask(q)} disabled={!q.trim() || !!casting} className="flex-1 rounded-full border border-amber-200/50 bg-amber-200/10 py-3 text-[14px] disabled:opacity-40">
-            {asked ? 'もっと聞いてみる' : '聞く'}
-          </button>
-          {asked && (
-            <button onClick={onDone} disabled={!!casting} className="flex-1 rounded-full bg-white/5 py-3 text-[14px] text-amber-50/75">
-              今日は、ここまで
+            <button onClick={() => void showPicture(m.id)} className="rounded-full border border-amber-200/40 px-3 py-1 text-[12px]">
+              絵で見る
             </button>
           )}
-        </div>
-        {first && asked && msgs.some((x) => x.picture !== undefined) && !kept && <p className="text-center text-[11px] text-amber-50/60">気に入った話は〔この話を残す〕。左上の〔前の話〕から、いつでも続きを聞けます</p>}
-        {asked && (
-          <button onClick={keepTalk} disabled={kept || !!casting} className="mx-auto block text-[12px] text-amber-100/80 disabled:text-amber-50/40">
-            {kept ? 'この話を残しました' : 'この話を残す'}
-          </button>
-        )}
+          {spell && (
+            <button
+              onClick={() => {
+                saveSpell(m.text.split(/[、。！？!?\s　]+/).filter((w) => w.length > 1).slice(0, 6));
+                setNoted((n) => new Set(n).add(m.id));
+              }}
+              disabled={noted.has(m.id)}
+              className="ml-2 text-[11px] text-violet-200 disabled:text-amber-50/40"
+            >
+              {noted.has(m.id) ? 'スペルブックに記しました' : '記す'}
+            </button>
+          )}
+          <p className="text-[10px] leading-snug text-amber-50/45">{bati}の答えが、まちがっていることもあります。大事なことは、自分でも確かめてね</p>
+        </>
+      ) : undefined,
+  }));
+  return (
+    <div className="absolute inset-0 z-[12] flex flex-col bg-[#05060f] text-amber-50">
+      <div className="pt-safe flex min-h-0 flex-1 flex-col pt-10">
+        <TalkScene
+          people={people}
+          items={items}
+          thinking={casting ? 'bati' : null}
+          listening={talk.listening}
+          keyboard={talk.keyboard}
+          place={PLACE_BG.moon}
+          kororin={kororinRing(auth)}
+          fixedSelfFace={auth?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+          top={8}
+          logLabel="前の話"
+          composer={
+            <div className="space-y-1.5">
+              {/* the how-to comes one step at a time, at the moment it is used (M-R169) */}
+              {first && !asked && <p className="mx-4 rounded-2xl bg-black/50 px-3 py-2 text-[12px] leading-relaxed text-amber-50/80">使い方｜マイクを押して、知りたいことを話してみよう（宇宙のことでも、それ以外のことでも、何でも）</p>}
+              {!asked && (
+                <div className="flex flex-wrap justify-center gap-1.5 px-3">
+                  {EXAMPLES.map((e) => (
+                    <button key={e} onClick={() => void ask(e)} className="rounded-full bg-black/45 px-3 py-1.5 text-[11px]">
+                      {e}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {asked && (
+                <div className="flex justify-center gap-2 px-3 text-[12px]">
+                  <button onClick={keepTalk} disabled={kept || !!casting} className="rounded-full bg-black/45 px-3 py-1.5 text-amber-100/85 disabled:text-amber-50/40">
+                    {kept ? 'この話を残しました' : 'この話を残す'}
+                  </button>
+                  <button onClick={openHistory} className="rounded-full bg-black/45 px-3 py-1.5">
+                    前の話
+                  </button>
+                  <button onClick={onDone} disabled={!!casting} className="rounded-full bg-black/45 px-3 py-1.5 text-amber-50/80">
+                    今日は、ここまで
+                  </button>
+                </div>
+              )}
+              <TalkComposer placeholder="ブラックホールの正体って、なに？" maxLength={120} disabled={!!casting} onState={setTalk} onSend={(v) => void ask(v)} />
+            </div>
+          }
+        />
       </div>
+      {casting && <p className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+64px)] z-[14] animate-pulse text-center text-[13px] text-amber-100/85">〈{casting}〉——ここに、こたえを。</p>}
       {history && (
         <div className="absolute inset-0 z-10 flex flex-col bg-black/85 px-4 pb-6 pt-[calc(16px+env(safe-area-inset-top))]" onClick={() => setHistory(null)}>
           <p className="text-center text-[13px] tracking-widest">前の話</p>
@@ -444,6 +366,55 @@ function BatiChatFull({
           </div>
           <button className="mt-3 rounded-full bg-white/10 py-3 text-[14px]">とじる</button>
         </div>
+      )}
+    </div>
+  );
+}
+
+/** the two in the talk: {bati} (its look in the talk, else the story's picture and faces) and you */
+function talkPeople(bati: string, neo: string, image: string | undefined, faces: Partial<Record<string, string>> | undefined, own: BatiView | null | undefined, myIcon: string | undefined, me: Me | null): TalkPerson[] {
+  const look = own?.talk && own.imageUrl === image ? own.talk : batiLook({ ...(own ?? ({} as BatiView)), imageUrl: image ?? own?.imageUrl ?? null, faces: (faces ?? own?.faces) as BatiView['faces'], talk: undefined }, image);
+  return [
+    { id: 'bati', name: bati, look, color: BATI_COLOR },
+    { id: 'me', name: neo, look: selfLook(me) ?? (myIcon ? { of: myIcon, stand: myIcon } : null), color: SELF_COLOR, self: true, avatar: me?.lookIcon ?? myIcon },
+  ];
+}
+
+/** a picture {bati} drew, small in its bubble (big on a tap) */
+const drawnCard = (url: string, alt: string) => ({ label: '絵', thumb: <DrawnPicture url={url} alt={alt} />, full: <DrawnPicture url={url} alt={alt} /> });
+
+/** a library picture with its source (M-R140), small in the bubble */
+function pictureCard(p: BuddyPicture) {
+  const fig = (big: boolean) => (
+    <figure className="overflow-hidden rounded-xl bg-black/40">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={p.url} alt={p.title} className={`${big ? 'max-h-[70svh]' : 'max-h-40'} w-full object-contain`} />
+      <figcaption className="px-2 py-1 text-[10px] text-amber-50/60">
+        {p.title}
+        <a href={p.pageUrl} target="_blank" rel="noreferrer" className="ml-1 underline">
+          出どころ：{p.source}
+        </a>
+      </figcaption>
+    </figure>
+  );
+  return { label: p.title, thumb: fig(false), full: fig(true) };
+}
+
+/** M-R223: a tap on {bati}'s small face (or your own) changes the look — two small round buttons at the top right */
+function LookButtons({ bati, neo, pic, myIcon, onRoom }: { bati: string; neo: string; pic?: string; myIcon?: string | null; onRoom: (m: RoomMode) => void }) {
+  return (
+    <div className="pt-safe absolute right-3 top-2 z-[14] flex gap-2">
+      {pic && (
+        <button type="button" onClick={() => onRoom('bati')} aria-label={`${bati}の見た目を変える`} className="h-9 w-9 overflow-hidden rounded-full bg-black/40 ring-1 ring-amber-200/50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={pic} alt="" className="h-full w-full object-contain" />
+        </button>
+      )}
+      {myIcon && (
+        <button type="button" onClick={() => onRoom('me')} aria-label={`${neo}の見た目を変える`} className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-sky-200/50">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={myIcon} alt="" className="h-full w-full object-cover" />
+        </button>
       )}
     </div>
   );

@@ -10,21 +10,25 @@ let ctx: AudioContext | null = null;
 type NavigatorWithAudioSession = Navigator & { audioSession?: { type: string } };
 
 /**
- * iOS Safari mutes Web Audio when the ringer/silent switch is on (while <video> keeps playing),
- * which made the BGM and countdown sounds inaudible. Declaring a "playback" audio session
- * (Safari 16.4+) makes them play like music. Returns false where the API is missing.
+ * M-R239 (client 2026-11-22): sound follows the phone's silent switch — with the switch on, nothing sounds. Web Audio
+ * under an "ambient" audio session (Safari 16.4+) is muted by the switch and mixes with other apps; an <audio>
+ * element would play through it on iPhone, so voices and music go through Web Audio (lib/voice/webVoice.ts,
+ * lib/story/lineVoice.ts, lib/onboarding/bgm.ts). Before this the session was "playback" (it played through the
+ * switch on purpose). Returns false where the API is missing (Android and older iOS: the system decides).
  */
-export function hasPlaybackSession(): boolean {
+export function setAudioSession(type: 'ambient' | 'playback' = 'ambient'): boolean {
   if (typeof navigator === 'undefined') return false;
   const n = navigator as NavigatorWithAudioSession;
   if (!n.audioSession) return false;
   try {
-    if (n.audioSession.type !== 'playback') n.audioSession.type = 'playback';
+    if (n.audioSession.type !== type) n.audioSession.type = type;
     return true;
   } catch {
     return false;
   }
 }
+/** the old name (the BGM calls it): now the silent-switch-respecting session */
+export const hasPlaybackSession = () => setAudioSession('ambient');
 
 export function audioCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null;

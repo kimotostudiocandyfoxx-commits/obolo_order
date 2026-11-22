@@ -1,4 +1,4 @@
-import { BATI_REPLY_LENGTH, BATI_ROLE_TALK, MEMORY_LINES, type BatiRole, type BuddyPersona, type Locale } from '@obolo/shared';
+import { BATI_REPLY_LENGTH, BATI_ROLE_TALK, MEMORY_LINES, isTalkFace, isTalkMotion, readBeats, talkSentences, type BatiRole, type BuddyPersona, type Locale, type TalkBeat, type TalkFace, type TalkMotion } from '@obolo/shared';
 import { LlmRefusalError } from './claude';
 import { BATI_CHARACTER, BATI_DANGER, BATI_SEARCH, BATI_WORRY, batiOneCallRules, batiPersonaBlock, batiSort, personaToneLines, type BatiAbilities, type BatiSelfView } from './prompts/bati';
 import { MEMORY_SUMMARY_PROMPT } from './prompts/memory';
@@ -91,6 +91,11 @@ export interface BuddyAnswer {
   searches?: number;
   /** "show me / draw …": what to draw, in short English (the caller moderates it and paints it) */
   draw?: string;
+  /** M-R234/M-R235: {bati}'s expression and reaction for this answer, written on the same first line ("{smile hop}") */
+  face?: TalkFace;
+  motion?: TalkMotion;
+  /** M-R238: each sentence's face and motion, from the same first line (a JSON array) */
+  faces?: TalkBeat[];
 }
 
 /**
@@ -202,7 +207,23 @@ async function buddyAnswerOneCall(llm: LlmProvider, ctx: BuddyContext, history: 
     }
     throw err;
   }
-  const { kind, body, want, draw } = parseTagged(raw);
+  const { kind, body, want, draw, face, motion, faces } = parseTagged(raw);
+  const answer = await oneCallAnswer(llm, ctx, history, onText, can, { kind, body, raw, want, draw });
+  // the beats are cut to the answer's own sentences (a search answers in other words: its first beat only)
+  const n = talkSentences(answer.text).length;
+  const beats = faces?.length ? faces.slice(0, want === 'search' ? 1 : Math.max(1, n)) : undefined;
+  const look = { ...(face ? { face } : {}), ...(motion ? { motion } : {}), ...(beats?.length ? { faces: beats } : {}) };
+  return { ...answer, ...look };
+}
+
+async function oneCallAnswer(
+  llm: LlmProvider,
+  ctx: BuddyContext,
+  history: ChatTurn[],
+  onText: ((piece: string) => void) | undefined,
+  can: BatiAbilities,
+  { kind, body, raw, want, draw }: { kind: BuddyAnswerKind; body: string; raw: string; want?: 'search' | 'draw'; draw?: string },
+): Promise<BuddyAnswer> {
   if (want === 'search') {
     const found = can.search ? await searched(llm, ctx, history) : null;
     if (found) {
@@ -233,7 +254,44 @@ const TAG = /^\s*(?:\[\s*(normal|worry|danger|search|draw)\s*\][ \t]*([^\r\n]*)|
  * "[worry]\n…" → the kind and the answer; no tag = an ordinary answer. "[search]" asks for a web search,
  * "[draw] <what to draw>" for a picture (both ordinary).
  */
-export function parseTagged(raw: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw'; draw?: string } {
+export function parseTagged(input: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw'; draw?: string; face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] } {
+  const { face, motion, faces, rest: raw } = readFaceTag(input);
+  const look = { ...(face ? { face } : {}), ...(motion ? { motion } : {}), ...(faces ? { faces } : {}) };
+  return { ...parseKind(raw), ...look };
+}
+
+// M-R234/M-R235: "{smile hop}" before the kind on the first line — the expression, then (optionally) the reaction
+const FACE_TAG = /^\s*\{\s*([a-z]+)(?:[\s,/、]+([a-z]+))?\s*\}[ \t]*/i;
+
+/** "{smile hop}[normal]…" → the face, the motion and the rest (an unknown word is dropped; no tag = nothing) */
+export function readFaceTag(raw: string): { face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[]; rest: string } {
+  // M-R238: the sentences' beats as a JSON array: [{"e":"smile","m":"hop"},{"e":"sad"}][normal]…
+  const lead = /^\s*\[\s*\{/.exec(raw);
+  if (lead) {
+    const end = raw.indexOf('}]');
+    if (end > 0) {
+      const json = raw.slice(lead.index, end + 2);
+      let beats: TalkBeat[] | null = null;
+      try {
+        beats = readBeats(JSON.parse(json), 99);
+      } catch {
+        beats = null;
+      }
+      const rest = raw.slice(end + 2).replace(/^[ \t]*/, '');
+      if (!beats) return { rest };
+      return { face: beats[0].face, ...(beats[0].motion ? { motion: beats[0].motion } : {}), faces: beats, rest };
+    }
+  }
+  const m = FACE_TAG.exec(raw);
+  if (!m) return { rest: raw };
+  const a = m[1].toLowerCase();
+  const b = m[2]?.toLowerCase();
+  const face = isTalkFace(a) ? a : isTalkFace(b) ? b : undefined;
+  const motion = isTalkMotion(b) ? b : isTalkMotion(a) ? a : undefined;
+  return { ...(face ? { face } : {}), ...(motion && motion !== 'none' ? { motion } : {}), rest: raw.slice(m[0].length) };
+}
+
+function parseKind(raw: string): { kind: BuddyAnswerKind; body: string; want?: 'search' | 'draw'; draw?: string } {
   const m = TAG.exec(raw);
   if (!m) return { kind: 'normal', body: raw.trim() };
   const tag = (m[1] ?? m[3]).toLowerCase();
@@ -255,6 +313,10 @@ export function parseTagged(raw: string): { kind: BuddyAnswerKind; body: string;
 export class TaggedSplitter {
   kind: BuddyAnswerKind | null = null;
   want: 'search' | 'draw' | undefined;
+  /** M-R234: the expression on the first line ("{smile hop}"), once read */
+  face: TalkFace | undefined;
+  motion: TalkMotion | undefined;
+  faces: TalkBeat[] | undefined;
   private head = '';
   private held = '';
   private flowing = false;
@@ -262,6 +324,22 @@ export class TaggedSplitter {
   push(piece: string) {
     if (this.kind === null) {
       this.head += piece;
+      // the expression tag comes first: wait for its closing brace, then read on without it
+      if (/^\s*\{/.test(this.head)) {
+        if (!this.head.includes('}') && this.head.length < 40) return;
+        const f = readFaceTag(this.head);
+        this.face = f.face;
+        this.motion = f.motion;
+        this.head = f.rest;
+      } else if (/^\s*\[\s*(\{|$)/.test(this.head)) {
+        // the beats' JSON array (M-R238): wait for its end
+        if (!this.head.includes('}]') && this.head.length < 600) return;
+        const f = readFaceTag(this.head);
+        this.face = f.face;
+        this.motion = f.motion;
+        this.faces = f.faces;
+        this.head = f.rest;
+      }
       const nl = this.head.indexOf('\n');
       // no tag at all after a few words: it is an ordinary answer ("[draw] …" waits for its whole first line)
       if (nl < 0 && (this.head.length < 24 || (/^\s*\[?\s*draw/i.test(this.head) && this.head.length < 400))) return;

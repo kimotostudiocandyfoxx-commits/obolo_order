@@ -19,3 +19,4 @@ export * from './dachiVoice';
 export * from './batiPersona';
 export * from './batiVariants';
 export * from './batiMemory';
+export * from './talk';

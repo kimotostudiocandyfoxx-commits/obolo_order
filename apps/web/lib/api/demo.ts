@@ -1,5 +1,6 @@
 import {
   KIMORIN_WAIT_LINES,
+  ruleBeats,
   MIKIE_WELCOME,
   dachiLine,
   type DachiMessageView,
@@ -84,7 +85,8 @@ import {
   rememberRequest,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
-import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
+import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt, foodEmoji } from '@/lib/look';
+import { demoBatiTalkLook, demoNeoTalkLook } from '@/lib/talk/demoLooks';
 import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
@@ -337,7 +339,7 @@ export class DemoApi implements Api {
     if (u?.bati && u.journeyDay >= 9 && !u.story?.['eggs.day9'])
       u = this.patchMe((x) => ({ story: { ...(x.story ?? {}), 'eggs.day9': new Date(Date.now() + 24 * 3_600_000).toISOString() } }));
     // the egg's day is worked out each time (it grows every day)
-    return u?.bati ? { ...u, batiEgg: demoEggOf(u) } : u;
+    return withTalk(u?.bati ? { ...u, batiEgg: demoEggOf(u) } : u);
   }
 
   async updateMe(body: Parameters<Api['updateMe']>[0]) {
@@ -441,7 +443,8 @@ export class DemoApi implements Api {
     }
     const reply = said ?? (drawn ? (locale === 'en' ? 'I drew it for you!' : '絵を描いてみたよ！') : cannedReply(text, b.name, b.memory, locale));
     const t0 = Date.now();
-    const userMessage: BuddyMessageView = { id: uid(), role: 'user', text, createdAt: new Date(t0).toISOString() };
+    // M-R238: your words' faces (the rules stand in for the small call; your look stays bright)
+    const userMessage: BuddyMessageView = { id: uid(), role: 'user', text, faces: ruleBeats(text, true), createdAt: new Date(t0).toISOString() };
     const buddyMessage: BuddyMessageView = {
       id: uid(),
       role: 'buddy',
@@ -449,6 +452,8 @@ export class DemoApi implements Api {
       createdAt: new Date(t0 + 1).toISOString(),
       ...(drawn ? { image: { url: '/onboarding/s/rocket-space.jpg' } } : {}),
       ...(remembered ? { remembered } : {}),
+      // M-R234/M-R235: the face and the reaction, as the one call returns them
+      ...demoFace(text, reply),
       ...(looked ? { sources: [{ title: 'デモのページ（本番は調べたページ）', url: 'https://example.com/', domain: 'example.com' }] } : {}),
     };
     b.messages.push(userMessage, buddyMessage);
@@ -822,7 +827,7 @@ export class DemoApi implements Api {
     const id = this.uid();
     this.s.users[id] = { ...this.s.users[id], ...fn(this.s.users[id]) };
     this.save();
-    return this.s.users[id];
+    return withTalk(this.s.users[id]);
   }
 
   async saveSysStory(answers: Record<string, string>) {
@@ -1103,7 +1108,8 @@ export class DemoApi implements Api {
     const me = this.s.users[this.uid()];
     const view = (id: string, kind: DachiThreadView['kind'], name: string): DachiThreadView => {
       const mine = list.filter((m) => m.thread === id);
-      return { id, kind, name, pic: null, unread: mine.some((m) => !m.fromMe && !m.read), lastAt: mine.at(-1)?.createdAt ?? null };
+      // M-R232: the inviter stands in the talk in a drawn stand-in look (nothing is generated in the demo)
+      return { id, kind, name, pic: null, unread: mine.some((m) => !m.fromMe && !m.read), lastAt: mine.at(-1)?.createdAt ?? null, ...(kind === 'dachi' ? { talk: demoNeoTalkLook(name) } : {}) };
     };
     const out: DachiThreadView[] = [];
     if (this.s.dachiInviter && me?.invitedByName) out.push(view('demo-inviter', 'dachi', me.invitedByName));
@@ -1119,15 +1125,15 @@ export class DemoApi implements Api {
     this.dachiThreadOk(thread);
     return this.dachiArrive()
       .filter((m) => m.thread === thread)
-      .map(({ thread: _t, lineId: _l, read: _r, ...m }) => m);
+      .map(({ thread: _t, lineId: _l, read, ...m }) => ({ ...m, read: m.fromMe || !!read }));
   }
   async sendDachiMessage(thread: string, body: Parameters<Api['sendDachiMessage']>[1]) {
     this.dachiThreadOk(thread);
     await sleep(300);
     const m: DachiMessageView =
       'mediaId' in body
-        ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: null, work: null, createdAt: now() }
-        : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, createdAt: now() };
+        ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: null, work: null, face: body.face ?? null, createdAt: now() }
+        : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, face: body.face ?? null, createdAt: now() };
     (this.s.dachiMsgs ??= []).push({ ...m, thread });
     this.save();
     return m;
@@ -1836,4 +1842,22 @@ export class DemoApi implements Api {
     this.save();
     return { kept: on };
   }
+}
+
+/**
+ * M-R232〜M-R235 in the demo: the looks in the talk are drawn stand-ins (with real blink / mouth parts) — nothing is
+ * generated; your look's and {bati}'s change with the picture they are made from. Not stored (worked out on read).
+ */
+function withTalk<T extends Me | undefined>(u: T): T {
+  if (!u) return u;
+  const talk = u.avatarUrl ? demoNeoTalkLook(u.avatarUrl.slice(-24), u.avatarUrl) : null;
+  const bati = u.bati?.imageUrl ? { ...u.bati, talk: demoBatiTalkLook(u.bati.food, u.bati.imageUrl, foodEmoji(u.bati.food)) } : u.bati;
+  return { ...u, talk, bati } as T;
+}
+
+/** the demo's face for a reply: surprised at a question, a hop at something nice, else a smile */
+function demoFace(text: string, reply: string): Pick<BuddyMessageView, 'face' | 'motion' | 'faces'> {
+  // M-R238: each sentence of the reply gets its face from the words (the rules stand in for the model's array)
+  const faces = ruleBeats(reply).map((b, k) => (k === 0 && /すごい|やった|好き|うれしい|楽しい|ありがとう/.test(text) ? { face: 'smile' as const, motion: 'hop' as const } : k === 0 && /本当|ほんと|えっ/.test(text) ? { face: 'surprised' as const, motion: 'lean' as const } : b));
+  return { face: faces[0]?.face, ...(faces[0]?.motion ? { motion: faces[0].motion } : {}), faces };
 }

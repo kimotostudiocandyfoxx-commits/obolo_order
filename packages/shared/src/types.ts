@@ -3,6 +3,7 @@ import type { SongEditCommand } from './schemas';
 import type { PuniLook } from './puni';
 import type { BatiCustomStyle, BatiEggKind, BatiPersonality } from './batiPersona';
 import type { BatiMemory, BatiRole } from './batiMemory';
+import type { TalkBeat, TalkFace, TalkLook, TalkMotion } from './talk';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
 
@@ -51,6 +52,8 @@ export interface Me {
   lookChibi?: string | null;
   /** the chosen look cut to a round 512px icon around the face (no painting) */
   lookIcon?: string | null;
+  /** M-R232〜M-R235: the look in the side-by-side talk — standing, its expressions with blink / mouth parts, its コロリン mini */
+  talk?: TalkLook | null;
   /** M-R223: the looks worn so far, oldest first (the one worn now included) — Bluena's first shelf, 〔前に戻す〕 */
   lookHistory?: string[];
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
@@ -114,6 +117,8 @@ export interface BatiView {
   looks?: string[];
   /** M-R223: the seed and what it was (food / sound / word): it stays somewhere small in every look */
   seedKind?: 'food' | 'sound' | 'word' | 'wish';
+  /** M-R232〜M-R235: this look in the side-by-side talk (expressions, blink / mouth parts, コロリン mini) */
+  talk?: TalkLook | null;
 }
 
 /** バティのカード (M-R217): shown in the chat at birth, kept on Bluena's first shelf, exported as a picture */
@@ -236,6 +241,11 @@ export interface BuddyMessageView {
   image?: { url: string } | null;
   /** M-R222: the member's 「覚えといて」 in this message: kept, or refused / full / already (shown with the bubble) */
   remembered?: { text: string; result: 'kept' | 'refused' | 'full' | 'already' };
+  /** M-R234/M-R235: {bati}'s expression and reaction for this reply, from the same call (the first sentence's) */
+  face?: TalkFace;
+  motion?: TalkMotion;
+  /** M-R238: the expression and motion of each sentence ({bati}: the same call; yours: one small call on sending) */
+  faces?: TalkBeat[];
 }
 
 /** a page a looked-up answer is based on: its title and the site's name */

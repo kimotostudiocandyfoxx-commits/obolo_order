@@ -7,6 +7,11 @@ import { useAuth } from '@/lib/auth';
 import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
+import { playClip, type Clip } from '@/lib/voice/webVoice';
+import { kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
+import { characterLook, colorOf, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
+
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const CHAR_NAME: Record<string, string> = { kimorin: 'KIMORIN⭐︎', mikie: 'MIKIE⭐︎DRILL' };
@@ -25,6 +30,8 @@ export type DachiThreadProps = {
   onRead?: (id: string) => void;
   /** you blocked them: the thread is gone (reload the list, go back to it) */
   onGone?: (id: string) => void;
+  /** M-R232: where the talk is (the place behind the two) */
+  place?: 'moon' | 'saturn' | null;
 };
 
 /**
@@ -33,14 +40,13 @@ export type DachiThreadProps = {
  * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
-export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone }: DachiThreadProps) {
+export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon' }: DachiThreadProps) {
   const { me } = useAuth();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
   const [msgs, setMsgs] = useState<DachiMessageView[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
   const [works, setWorks] = useState<BluenaWork[] | null>(null);
-  const end = useRef<HTMLDivElement>(null);
   const readCb = useRef(onRead);
   readCb.current = onRead;
   const person = (thread?.kind ?? (id === 'kimorin' || id === 'mikie' ? id : 'dachi')) === 'dachi';
@@ -78,10 +84,6 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone 
     return () => clearInterval(t);
   }, [load]);
 
-  useEffect(() => {
-    end.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [msgs?.length]);
-
   const sent = (m: DachiMessageView) => {
     setMsgs((l) => [...(l ?? []), m]);
     onSent?.(m);
@@ -109,7 +111,27 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone 
   };
 
   const name = thread?.name ?? CHAR_NAME[id] ?? '';
-  const face = thread?.pic ?? CHARACTER_AVATAR[thread?.kind ?? id];
+  const pic = thread?.pic ?? CHARACTER_AVATAR[thread?.kind ?? id];
+  const kind = thread?.kind ?? (id === 'kimorin' || id === 'mikie' ? id : 'dachi');
+  // the people: the dachi (their own look, or a character's story art), a character speaking in their thread, you
+  const people: TalkPerson[] = [
+    { id: 'them', name, look: thread?.talk ?? characterLook(kind) ?? (pic ? { of: pic, stand: pic } : null), color: colorOf(id), avatar: kind === 'dachi' ? pic : undefined },
+    ...[...new Set((msgs ?? []).filter((m) => m.character && m.character !== kind).map((m) => m.character!))].map((c) => ({ id: c, name: CHAR_NAME[c] ?? c, look: characterLook(c), color: colorOf(c, 3) })),
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+  ];
+  // M-R239: the first line not heard yet (opening plays from the one before it)
+  const firstUnread = (msgs ?? []).findIndex((m) => !m.fromMe && m.read === false);
+  const unreadFrom = firstUnread >= 0 ? firstUnread : null;
+  const items: TalkItem[] = (msgs ?? []).map((m) => ({
+    id: m.id,
+    who: m.fromMe ? 'me' : m.character && m.character !== kind ? m.character : 'them',
+    text: m.kind === 'work' ? '' : (m.text ?? ''),
+    // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
+    face: m.faces ? undefined : (m.face ?? undefined),
+    faces: m.faces,
+    voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
+    card: m.kind === 'work' && m.work ? { label: m.work.title || WORK_WORD[m.work.kind], thumb: <WorkCardView card={m.work} />, full: <WorkCardView card={m.work} big /> } : undefined,
+  }));
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
@@ -119,7 +141,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone 
             ‹
           </button>
         )}
-        <Face src={face} name={name} />
+        <Face src={pic} name={name} />
         <p className="min-w-0 flex-1 truncate text-[13px] tracking-[0.18em] text-amber-100/90">{name}</p>
         {person && (
           <button onClick={() => setMenu(true)} aria-label="メニュー" className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-amber-100/70">
@@ -128,24 +150,31 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone 
         )}
       </div>
 
-      <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto px-3.5 pb-4 pt-1">
-        {msgs === null && <p className="py-8 text-center text-xs text-white/40">…</p>}
-        {msgs?.map((m, k) => {
-          const prev = msgs[k - 1];
-          const grouped = !!prev && !prev.fromMe && !m.fromMe && prev.character === m.character;
-          return m.fromMe ? <Mine key={m.id} m={m} /> : <Theirs key={m.id} m={m} grouped={grouped} name={m.character ? CHAR_NAME[m.character] : name} face={m.character ? CHARACTER_AVATAR[m.character] : face} />;
-        })}
-        {err && <p className="text-center text-xs text-rose-300">{err}</p>}
-        <div ref={end} />
-      </div>
-
-      <HoldMic
-        onSend={sendVoice}
-        disabled={!!err && msgs?.length === 0}
-        left={
-          <button onClick={() => void openWorks()} className="rounded-full border border-amber-200/30 px-3 py-2 text-[12.5px] text-amber-50/90">
-            ✦ 作品を送る
-          </button>
+      {/* M-R232: the same side-by-side talk — you at the right, the dachi in the look they made at the left */}
+      <TalkScene
+        key={id}
+        people={people}
+        items={items}
+        place={place ? PLACE_BG[place] : undefined}
+        kororin={kororinRing(me)}
+        fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+        top={4}
+        loading={msgs === null}
+        unreadFrom={unreadFrom}
+        composer={
+          <div>
+            {err && <p className="mb-1 text-center text-xs text-rose-300">{err}</p>}
+            {msgs === null && <p className="mb-1 text-center text-xs text-white/40">…</p>}
+            <HoldMic
+              onSend={sendVoice}
+              disabled={!!err && msgs?.length === 0}
+              left={
+                <button onClick={() => void openWorks()} className="rounded-full border border-amber-200/30 bg-black/40 px-3 py-2 text-[12.5px] text-amber-50/90">
+                  ✦ 作品を送る
+                </button>
+              }
+            />
+          </div>
         }
       />
 
@@ -177,71 +206,22 @@ function Face({ src, name }: { src?: string | null; name: string }) {
   );
 }
 
-const THEIR_BUBBLE = { background: 'linear-gradient(180deg, rgba(38,28,56,0.80), rgba(14,10,24,0.80))', border: '1px solid rgba(240,205,140,0.22)' };
-const MY_BUBBLE = { background: 'linear-gradient(135deg, #fbe9b7 0%, #f0c873 55%, #d79d45 100%)' };
-
-function Mine({ m }: { m: DachiMessageView }) {
-  return (
-    <div className="flex justify-end pl-14">
-      {m.kind === 'work' && m.work ? (
-        <WorkCardView card={m.work} mine />
-      ) : (
-        <div className="w-[min(78%,260px)] rounded-[18px] rounded-tr-[5px] px-2.5 py-1.5 text-[#2b1b06]" style={MY_BUBBLE}>
-          <VoicePlay url={m.audioUrl} seconds={m.seconds} light />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Theirs({ m, grouped, name, face }: { m: DachiMessageView; grouped: boolean; name: string; face?: string | null }) {
-  return (
-    <div className="flex items-end gap-2 pr-8">
-      <div className="w-9 shrink-0">{!grouped && <Face src={face} name={name} />}</div>
-      <div className="min-w-0 flex-1">
-        {!grouped && <p className="mb-1 ml-1 text-[10.5px] tracking-[0.22em] text-amber-200/90">{name}</p>}
-        {m.kind === 'work' && m.work ? (
-          <WorkCardView card={m.work} />
-        ) : (
-          <div className="w-[min(100%,260px)] rounded-[18px] rounded-tl-[5px] px-2.5 py-1.5 text-white/95" style={THEIR_BUBBLE}>
-            {m.audioUrl ? <VoicePlay url={m.audioUrl} seconds={m.seconds} /> : null}
-            {/* a character's line whose voice is not made yet: its words (VOICE PENDING, docs/placeholders.md P-DACHI-1/3) */}
-            {m.text && <p className={`whitespace-pre-line px-1 text-[15px] leading-[1.6] ${m.audioUrl ? 'mt-1 text-[12.5px] text-white/60' : ''}`}>{m.text}</p>}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-let playing: HTMLAudioElement | null = null;
-/** resolves a stored voice: an absolute URL, a path of this app (a character's line), or the demo's idb: blobs */
-async function audioSrc(url: string): Promise<string | null> {
-  if (!url.startsWith('idb:')) return url;
-  const { getBlob } = await import('@/lib/api/idb');
-  const b = await getBlob(url.slice(4));
-  return b ? URL.createObjectURL(b) : null;
-}
-
 function VoicePlay({ url, seconds, light }: { url: string | null; seconds: number | null; light?: boolean }) {
   const [on, setOn] = useState(false);
+  const clip = useRef<Clip | null>(null);
+  useEffect(() => () => clip.current?.stop(), []);
+  // M-R239: through Web Audio (quiet with the silent switch on); idb: recordings are read by the player
   const toggle = async () => {
     if (!url) return;
     if (on) {
-      playing?.pause();
+      clip.current?.stop();
       return setOn(false);
     }
-    playing?.pause();
-    const src = await audioSrc(url);
-    if (!src) return;
-    const a = new Audio(src);
-    playing = a;
-    a.onended = () => setOn(false);
-    a.onpause = () => setOn(false);
-    await a
-      .play()
-      .then(() => setOn(true))
-      .catch(() => setOn(false));
+    const c = await playClip(url);
+    if (!c) return;
+    clip.current = c;
+    setOn(true);
+    void c.done.then(() => setOn(false));
   };
   return (
     <button onClick={() => void toggle()} disabled={!url} className="flex w-full items-center gap-2 py-0.5 text-left" aria-label={on ? '止める' : '聞く'}>
@@ -253,11 +233,11 @@ function VoicePlay({ url, seconds, light }: { url: string | null; seconds: numbe
 }
 
 /** a Bluena work sent as a card */
-function WorkCardView({ card, mine }: { card: DachiWorkCard; mine?: boolean }) {
+function WorkCardView({ card, mine, big }: { card: DachiWorkCard; mine?: boolean; big?: boolean }) {
   const sound = card.kind === 'song' || card.kind === 'kororin' || card.kind === 'radio';
   const film = card.kind === 'mv' || card.kind === 'video';
   return (
-    <div className={`w-[min(78%,240px)] overflow-hidden rounded-2xl border border-amber-200/30 bg-[rgba(16,11,26,0.78)] ${mine ? 'rounded-tr-[5px]' : 'rounded-tl-[5px]'}`}>
+    <div className={`${big ? 'w-full' : 'w-full max-w-[220px]'} overflow-hidden rounded-2xl border border-amber-200/30 bg-[rgba(16,11,26,0.78)] ${mine ? 'rounded-tr-[5px]' : 'rounded-tl-[5px]'}`}>
       {card.posterUrl || (!sound && !film && card.url) ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={card.posterUrl ?? card.url} alt="" className="aspect-square w-full object-cover" />

@@ -549,37 +549,29 @@ function Remove({ onRemove, small = false }: { onRemove: () => Promise<unknown>;
   );
 }
 
-let playing: HTMLAudioElement | null = null;
+let playing: { stop: () => void } | null = null;
 function Play({ url }: { url: string }) {
   const [on, setOn] = useState(false);
   const toggle = async () => {
     if (on) {
-      playing?.pause();
+      playing?.stop();
       setOn(false);
       return;
     }
-    playing?.pause();
+    playing?.stop();
     // a kororin read in the NEO voice is spoken by the device
     if (url.startsWith('tts:')) {
       const { toggleAudio } = await import('@/lib/audio');
       await toggleAudio(url).catch(() => undefined);
       return;
     }
-    let src = url;
-    if (url.startsWith('idb:')) {
-      const { getBlob } = await import('@/lib/api/idb');
-      const b = await getBlob(url.slice(4));
-      if (!b) return;
-      src = URL.createObjectURL(b);
-    }
-    const a = new Audio(src);
-    playing = a;
-    a.onended = () => setOn(false);
-    a.onpause = () => setOn(false);
-    await a
-      .play()
-      .then(() => setOn(true))
-      .catch(() => setOn(false));
+    // M-R239: through Web Audio (quiet with the silent switch on); idb: recordings are read by the player
+    const { playClip } = await import('@/lib/voice/webVoice');
+    const c = await playClip(url);
+    if (!c) return setOn(false);
+    playing = c;
+    setOn(true);
+    void c.done.then(() => setOn(false));
   };
   return (
     <button onClick={() => void toggle()} aria-label={on ? '止める' : '聴く'} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm">

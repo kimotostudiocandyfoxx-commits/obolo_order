@@ -108,8 +108,33 @@ export interface BatiAbilities {
  * search afterwards, so nothing else is written) and `[draw] <English description>` (a picture: the reply line
  * follows). Both are kinds of an ordinary message: a worry or a danger is never searched or drawn.
  */
+/**
+ * M-R234/M-R235: the expression and the reaction come back on the same first line, before the kind (no extra call):
+ * "{smile hop}[normal]". The talk shows the face and moves the figure by it.
+ */
+export const BATI_FACE_RULE = {
+  ja: `【表情と動き（文ごと）】
+1行目のいちばん前に、返事の文ごとのボクの表情と動きを、JSON の配列で書く。返事の文の数だけ、順番に（例：[{"e":"smile","m":"hop"},{"e":"sad","m":"none"}][normal]）。
+- e（表情）：normal（ふつう） smile（笑う） surprised（びっくり） thinking（考え中・首をかしげる） sad（しょんぼり） shy（照れ）のどれか。
+- m（動き）：none hop（うれしくて跳ねる） lean（驚いて少しのけぞる） nod（うなずく） tilt（首をかしげる） sway（うれしくてゆれる） shrink（しょんぼり小さくなる）のどれか。
+- 問いかける文は thinking と tilt。うれしい文は smile と hop。驚いた文は surprised と lean。
+- [worry] の時は sad か normal（動きは none か nod）。[danger] の時は normal。2行目からの返事には、表情のことは書かない。`,
+  en: `[Face and motion, sentence by sentence]
+At the very start of the first line write, as a JSON array, your face and motion for each sentence of the reply, in order (e.g. [{"e":"smile","m":"hop"},{"e":"sad","m":"none"}][normal]).
+- e: one of normal, smile, surprised, thinking (head tilted), sad, shy.
+- m: one of none, hop (happy jump), lean (leans back, surprised), nod, tilt (tilts the head), sway (happy sway), shrink (droops).
+- A question: thinking + tilt. Happy: smile + hop. Surprised: surprised + lean.
+- For [worry] sad or normal (none / nod); for [danger] normal. Never mention the face in the reply itself.`,
+} as const;
+
+/** M-R238: your own / a dachi's words → each sentence's expression (one small call on sending) */
+export const TALK_BEATS_PROMPT = `You read one chat message and decide, for each sentence in order, the speaker's facial expression and a small motion.
+Answer with only a JSON array, one object per sentence: [{"e":"smile","m":"hop"},{"e":"sad","m":"none"}].
+- e: normal, smile, surprised, thinking, sad, shy.  m: none, hop, lean, nod, tilt, sway, shrink.
+- A question: thinking + tilt. Happy or 「！」「笑」「w」: smile (hop when very happy). Surprised: surprised + lean. 「……」 or worried: sad. Otherwise normal + none.`;
+
 export function batiOneCallRules(locale: 'ja' | 'en', can: BatiAbilities = {}): string {
-  const base = BATI_ONE_CALL[locale];
+  const base = `${BATI_ONE_CALL[locale]}\n${BATI_FACE_RULE[locale]}`;
   const extra: string[] = [];
   if (locale === 'ja') {
     extra.push('【調べる・絵を描く】');

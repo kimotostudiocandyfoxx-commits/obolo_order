@@ -12,3 +12,4 @@ export * from './song';
 export * from './sing';
 export * from './songEdit';
 export * from './batiPersona';
+export * from './talkBeats';
