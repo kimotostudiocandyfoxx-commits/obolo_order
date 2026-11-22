@@ -61,12 +61,6 @@ function loadDraft(): Draft {
  * `ask`: OBOLON's question for the animal; `spell`: {bati}'s line as it casts the magic into the water (M-R209: {bati} is born
  * before the look and makes it). Both come from the day's script (lib/onboarding/day2.ts), already filled.
  */
-/**
- * M-R250's OBOLON line before the animal when no photo is used. PROVISIONAL: given by the client through the dev chat; not
- * in the script files yet (so it is shown here in the look screen, not as a story line — story-sync stays 0).
- */
-const NO_PHOTO_ASK = '、、、器の水に、好きな動物を、思い浮かべろ。';
-
 export function LookMaker({
   api,
   onDone,
@@ -77,8 +71,8 @@ export function LookMaker({
   noPhoto = false,
 }: {
   /**
-   * M-R250: no photo may be used (under 13, or 13〜15 without the guardian's consent): the photo passage is skipped — OBOLON
-   * asks for a favourite animal and the four are that animal itself in the hood and the round sunglasses (the server picks
+   * M-R250: no photo may be used (under 13, or 13〜15 without the guardian's consent): the photo passage is skipped — OBOLON's
+   * 「、、、器の水に、好きな動物を、思い浮かべろ。」 is the story line just before (day2.ts, f_media no); asked for a favourite animal and the four are that animal itself in the hood and the round sunglasses (the server picks
    * the prompt by the account). The rest (redraw, the cards later) is the same.
    */
   noPhoto?: boolean;
@@ -268,7 +262,6 @@ export function LookMaker({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo.url} alt="" className="mx-auto mb-3 h-24 w-24 rounded-full object-cover opacity-70 ring-2 ring-sky-100/40 [filter:saturate(0.7)_blur(0.5px)]" />
         )}
-        {noPhoto && <Obolon>{NO_PHOTO_ASK}</Obolon>}
         <Obolon>{ask}</Obolon>
         {/* the mic first, 〔文字で答える〕 in the corner (VoiceField); the words as said, never matched to a list */}
         <div className="mt-3" />

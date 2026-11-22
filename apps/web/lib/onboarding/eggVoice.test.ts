@@ -32,13 +32,15 @@ describe('たまごに声を聞かせる (D03-S005, M-R246 / M-R247)', () => {
     expect(BATI_VOICE_EXPLAIN).toBe('あなたの声は、相方の声のもとになります（少し高くして使います）。相方の声のためだけに使い、ほかには使いません。あとで設定から消せます');
   });
 
-  it('M-R250: under 13 the photo passage is skipped (the branch f_media no → past 「まず、お前の姿を、器の水に映せ。」)', () => {
+  it('M-R250: under 13 the photo passage is skipped — OBOLON asks for an animal instead (the branch f_media no)', () => {
     const b = DAY2.find((s) => s.t === 'branch' && s.key === 'f_media') as Extract<(typeof DAY2)[number], { t: 'branch' }>;
     expect(b.cases.no).toBe('look-animal');
-    const photoLine = DAY2.findIndex((s) => s.t === 'say' && s.text === 'まず、お前の姿を、器の水に映せ。');
-    const animal = DAY2.findIndex((s) => s.t === 'label' && s.id === 'look-animal');
-    expect(animal).toBe(photoLine + 1);
-    expect(DAY2[animal + 2]?.t).toBe('look');
+    const at = (id: string) => DAY2.findIndex((s) => s.t === 'label' && s.id === id);
+    const photo = DAY2[at('look-photo') + 1];
+    expect(photo).toEqual({ t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' });
+    expect(DAY2[at('look-photo') + 2]).toEqual({ t: 'goto', id: 'look-make' });
+    expect(DAY2[at('look-animal') + 1]).toEqual({ t: 'say', who: 'OBOLON', text: '、、、器の水に、好きな動物を、思い浮かべろ。' });
+    expect(DAY2.slice(at('look-make')).find((s) => s.t === 'look')).toBeTruthy();
   });
 
   it('day 1 asks for no photo and no voice registration (dictated answers only)', () => {

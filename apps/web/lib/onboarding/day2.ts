@@ -423,7 +423,11 @@ export const DAY2: Step[] = [
   { t: 'branch', key: 'f_media', cases: { no: 'look-animal' }, otherwise: 'look-photo' },
   { t: 'label', id: 'look-photo' },
   { t: 'say', who: 'OBOLON', text: 'まず、お前の姿を、器の水に映せ。' },
+  { t: 'goto', id: 'look-make' },
+  // （13歳未満の人）no photo: a favourite animal only; the four are that animal itself in the hood and round sunglasses
   { t: 'label', id: 'look-animal' },
+  { t: 'say', who: 'OBOLON', text: '、、、器の水に、好きな動物を、思い浮かべろ。' },
+  { t: 'label', id: 'look-make' },
   { t: 'sprite', image: null },
   {
     t: 'look', // 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕→ the animal → {bati} casts → −3マナ → 4枚
