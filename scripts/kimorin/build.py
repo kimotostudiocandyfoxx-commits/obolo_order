@@ -65,6 +65,9 @@ def key(a):
     rgb = np.where((al > 0) & (al < 0.98), 1, 0)[..., None] * ((a - (1 - k) * bgc) / k) + np.where((al > 0) & (al < 0.98), 0, 1)[..., None] * a
     rgb = np.clip(rgb, 0, 255)
     rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 4)
+    # un-mixing can take out a little too much green at the very edge (a lilac rim): not below the other two there
+    edge = (al > 0) & (al < 0.98)
+    rgb[..., 1] = np.where(edge, np.maximum(rgb[..., 1], np.minimum(rgb[..., 0], rgb[..., 2]) * 0.94), rgb[..., 1])
     return al, rgb
 
 
