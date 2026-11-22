@@ -172,6 +172,12 @@ const TOUCH_SEMI =
   'light, Japanese character design, painted skin and hair — NOT a photograph, no photographic skin texture, no camera depth of field.'
 const TOUCH_ANIME =
   'Japanese anime character illustration, bold clean outlines, flat cel shading, simplified anime facial features, vivid colours — NOT a photograph.'
+/** client 2026-11-22: the four looks are four different touches of the same character */
+const TOUCH_WATERCOLOR =
+  'Soft watercolour illustration in a Japanese picture-book manner, delicate ink line art, transparent washes, gentle paper texture, painted skin and hair — NOT a photograph.';
+const TOUCH_POSTER =
+  'Stylish Japanese graphic illustration, crisp vector-like line art, flat bold shapes with limited rich colours and subtle gradients, like a modern anime poster — NOT a photograph.';
+const TOUCHES = [TOUCH_SEMI, TOUCH_ANIME, TOUCH_WATERCOLOR, TOUCH_POSTER];
 const NOT_WESTERN = 'Avoid: western cartoon, american comic style, 3D render, pixar style, photorealistic.'
 const LOOK_STYLE =
   TOUCH_SEMI +
@@ -201,9 +207,9 @@ const AGE: Record<'under15' | '15-24' | '25plus', { who: string; line: string }>
       'no grey or thinning hair; keep the face shape, hairstyle and vibe of the photo; not childlike. Avoid: wrinkles, aged skin, grey hair.',
   },
 };
-/** the touch of the n-th of the four (M-R173): 0–1 semi-real, 2–3 character anime; with the look's other lines untouched */
+/** the touch of the n-th of the four (client 2026-11-22): semi-real anime, cel anime, watercolour, graphic poster; the look's other lines untouched */
 export function withTouch(prompt: string, variant: number): string {
-  const touch = variant % 4 < 2 ? TOUCH_SEMI : TOUCH_ANIME;
+  const touch = TOUCHES[((variant % 4) + 4) % 4];
   return `${prompt.replace(TOUCH_SEMI, touch)} ${NOT_WESTERN}`;
 }
 

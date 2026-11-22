@@ -234,31 +234,38 @@ export function LookMaker({ api, onDone }: { api: LookApi; onDone: (url: string 
             </>
           ) : (
             <>
-              <Gold onClick={() => photoInput.current?.click()}>📷 お気に入りの自分の写真を選ぶ</Gold>
-              <Gold onClick={() => cameraInput.current?.click()}>📸 いま撮る</Gold>
+              <Gold onClick={() => photoInput.current?.click()}>写真フォルダから器の水に映す</Gold>
+              <Gold onClick={() => cameraInput.current?.click()}>カメラで撮って器の水に映す</Gold>
             </>
           )}
-          <button onClick={() => (setPhoto(null), setErr(null), setPhase('animal'))} className="py-2 text-sm text-white/60">
-            写真を使わずに作る
-          </button>
+          {/* the look is always made from their own photo now (client 2026-11-22: 「写真を使わずに作る」 is gone) */}
         </div>
       </Panel>
     );
 
+  // only the animal is asked (client 2026-11-22): their photo with that animal's ears, the society's hood and the round
+  // sunglasses, in four different touches (the server's look prompt)
+  const drawAnimal = (animal: string) => {
+    setFree('');
+    const d = { ...draft, ans: { ...ans, animal, color: [], mood: '', hobby: '' } };
+    save(d);
+    void draw({ animal: animal || 'おまかせ', color: 'おまかせ', mood: 'おまかせ', ...withPhoto() });
+  };
+
   if (phase === 'animal')
     return (
       <Panel>
-        <Obolon>そうだ、好きな動物は？</Obolon>
+        <Obolon>何の動物に、アレンジする？</Obolon>
         {/* the mic first (client 2026-10-29); the examples under it */}
         <div className="mt-3" />
         <VoiceField value={free} onChange={setFree} placeholder="例：しろくま" />
         {free.trim() && (
           <div className="mt-2 flex flex-col gap-2">
-            <Gold onClick={() => (setAns({ animal: free.trim() }), setFree(''), setPhase('color'))}>これにする</Gold>
+            <Gold onClick={() => drawAnimal(free.trim())}>これにする</Gold>
           </div>
         )}
         <p className="mt-4 text-center text-[11px] text-white/45">または、えらぶ</p>
-        <Chips items={ANIMALS} value={ans.animal} onPick={(v) => (setAns({ animal: v }), setFree(''), setPhase('color'))} />
+        <Chips items={ANIMALS} value={ans.animal} onPick={(v) => drawAnimal(v)} />
       </Panel>
     );
 
