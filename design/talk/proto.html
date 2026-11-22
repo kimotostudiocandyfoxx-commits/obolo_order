@@ -54,13 +54,15 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 
 /* stage */
-.stage{position:absolute;left:0;right:0;bottom:116px;height:min(40%,380px);z-index:6;display:flex;justify-content:center;align-items:flex-end;gap:6%}
-.char{position:relative;height:100%;width:36%;display:flex;justify-content:center;align-items:flex-end;transition:transform .35s}
+.stage{position:absolute;left:0;right:0;bottom:110px;height:min(46%,420px);z-index:6;display:flex;justify-content:center;align-items:flex-end;gap:6%}
+.char{position:relative;height:100%;width:40%;display:flex;justify-content:center;align-items:flex-end;transition:transform .35s}
 .char .body{position:relative;height:100%;width:100%;display:flex;justify-content:center;align-items:flex-end;transform-origin:50% 100%}
-.char img{position:absolute;bottom:0;left:50%;height:100%;transform:translateX(-50%);max-width:none;transition:opacity .09s linear}
+.char img{position:absolute;bottom:0;left:50%;height:100%;transform:translateX(-50%);max-width:none;transition:opacity .2s ease}
+.squash{animation:squash .32s ease-out}
+@keyframes squash{0%{transform:scale(1,1)}35%{transform:scale(1.04,.95)}70%{transform:scale(.98,1.03)}100%{transform:scale(1,1)}}
 .char .shadow{position:absolute;bottom:-8px;left:18%;right:18%;height:18px;border-radius:50%;
   background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0));filter:blur(2px)}
-.char.bati-type{height:62%}
+.char.bati-type{height:58%}
 .char.speaking{transform:translateY(-6px) scale(1.03)}
 .char.speaking .shadow{opacity:.75}
 .breath{animation:breath var(--bd,3.6s) ease-in-out infinite}
@@ -78,7 +80,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 /* bubbles */
 .bubbles{position:absolute;left:0;right:0;z-index:8;display:flex;flex-direction:column;align-items:center;gap:10px;
   padding:0 max(62px,env(safe-area-inset-left,0px)) 0 max(62px,env(safe-area-inset-right,0px));pointer-events:none}
-.bub{position:relative;max-width:min(100%,380px);padding:11px 16px 12px;border-radius:20px;font-size:15px;font-weight:700;line-height:1.55;
+.bub{position:relative;max-width:min(100%,380px);max-height:calc(var(--room,200px) / 2);overflow:auto;padding:11px 16px 12px;border-radius:20px;font-size:15px;font-weight:700;line-height:1.55;
   box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .6s cubic-bezier(.4,.1,.2,1),opacity .6s;transform-origin:50% 0;pointer-events:auto}
 .bub.me{background:var(--me);color:var(--me-ink);align-self:flex-end}
 .bub.bati{background:var(--bati);color:var(--bati-ink);align-self:flex-start}
@@ -128,7 +130,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 .row small{color:var(--mute);font-size:12px}
 @media (prefers-reduced-motion:reduce){
   .sky,.koro img,.breath,.sway,.track,.mic.on{animation:none!important}
-  .hop,.lean,.nod{animation:none!important}
+  .hop,.lean,.nod,.squash{animation:none!important}
 }
 </style>
 
@@ -215,15 +217,18 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
   const actor = { left:null, right:null };
   let mode='bati', script, li=0, si=0, ring=[], bubbles=[], typing=null, timers=[];
 
-  const src = (who, face) => `${CAST[who].dir}/${face}.webp`;
-  // preload
-  Object.keys(CAST).forEach(k => [...CAST[k].faces,'blink','talk'].forEach(f => { const i=new Image(); i.src=src(k,f); }));
+  // pictures on one shared canvas: the plain stand and a pose per expression (M-R240), each with its talk picture
+  const PIC = (face, v) => face==='base' ? (v ? `stand-${v}` : 'stand') : (v ? `${face}-pose-${v}` : `${face}-pose`);
+  const HAS_BLINK = { base:true, smile:true };
+  const src = (who, name) => `${CAST[who].dir}/${name}.webp`;
+  Object.keys(CAST).forEach(k => CAST[k].faces.forEach(f => [PIC(f), PIC(f,'talk'), HAS_BLINK[f] && PIC(f,'blink')].filter(Boolean)
+    .forEach(n => { const i=new Image(); i.src=src(k,n); })));
 
   function makeActor(slot, who){
     const el = els[slot], imgs = el.querySelectorAll('img'), body = el.querySelector('.body');
     el.classList.toggle('bati-type', who==='bati');
     const a = { who, el, body, imgs, front:0, face:'base', talking:false, blinkT:0 };
-    setImg(a,'base',true);
+    setImg(a,PIC('base'),true);
     scheduleBlink(a);
     return a;
   }
@@ -238,15 +243,17 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
   }
   function setFace(a, face){
     if (a.who==='user' && !CAST.user.faces.includes(face)) face='base'; // the user's own picture shows bright faces only
-    a.face = face; setImg(a, face);
+    if (a.face !== face && !RM){ a.body.classList.remove('squash'); void a.body.offsetWidth; a.body.classList.add('squash'); }
+    a.face = face; setImg(a, PIC(face));
   }
   function scheduleBlink(a){
     clearTimeout(a.blinkT);
     a.blinkT = setTimeout(() => {
-      if (!a.talking && (a.face==='base'||a.face==='smile')){
-        setImg(a,'blink',true);
-        setTimeout(() => { setImg(a,a.face,true);
-          if (Math.random()<.2) setTimeout(()=>{ setImg(a,'blink',true); setTimeout(()=>setImg(a,a.face,true),110); },180);
+      if (!a.talking && HAS_BLINK[a.face]){
+        const f=a.face, bl=PIC(f,'blink'), op=PIC(f);
+        setImg(a,bl,true);
+        setTimeout(() => { if(a.face===f) setImg(a,op,true);
+          if (Math.random()<.2) setTimeout(()=>{ if(a.face!==f) return; setImg(a,bl,true); setTimeout(()=>{ if(a.face===f) setImg(a,op,true); },110); },180);
         },120);
       }
       scheduleBlink(a);
@@ -262,18 +269,17 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 
   function slotOf(who){ return who==='user' ? 'right' : 'left'; }
 
-  // ring positions: 12 o'clock is the newest, then clockwise around the pair (skipping the floor)
-  const ANG = [-90,-60,-32,-10,190,212,240];
+  // ring positions: 12 o'clock is the newest, then clockwise around the words (top → right side → left side),
+  // a rounded path that keeps clear of the bubbles in the middle and of the floor
+  const SLOTS = 7;
   function layoutRing(){
-    const W = els.ring.clientWidth, H = els.ring.clientHeight;
+    const W = els.ring.clientWidth;
     const st = els.stage.getBoundingClientRect(), ap = $('#app').getBoundingClientRect();
-    const top = 96, heads = (st.top-ap.top) + 10;
-    const cx = W/2, cy = heads, rx = Math.min(W/2 - 36, 230), ry = Math.max(120, heads - top);
-    ring.forEach((k,i) => {
-      const t = ANG[i]*Math.PI/180;
-      k.el.style.left = (cx + rx*Math.cos(t))+'px';
-      k.el.style.top  = (cy + ry*Math.sin(t))+'px';
-    });
+    const heads = (st.top-ap.top) + st.height*0.16;
+    const top = 118, side = 34, low = Math.max(top+120, heads - 40), mid = (top + low) / 2 + 10;
+    const P = [[W/2, top-6],[W*0.73, top+4],[W-side, mid],[W-side, low],[side, low],[side, mid],[W*0.27, top+4]];
+    ring.forEach((k,i) => { const [x,y] = P[i]; k.el.style.left = x+'px'; k.el.style.top = y+'px'; });
+    els.bubbles.style.setProperty('--room', Math.max(120, heads - top - 48) + 'px');
   }
   function pushRing(who, text, animate){
     const el = document.createElement('button');
@@ -283,7 +289,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     el.onclick = (e) => { e.stopPropagation(); showOld(who, text); };
     els.ring.appendChild(el);
     ring.unshift({el,who,text});
-    if (ring.length > ANG.length){ const old = ring.pop(); old.el.classList.add('gone'); setTimeout(()=>old.el.remove(),700); }
+    if (ring.length > SLOTS){ const old = ring.pop(); old.el.classList.add('gone'); setTimeout(()=>old.el.remove(),700); }
     layoutRing();
     if (animate) requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove('new')));
   }
@@ -294,7 +300,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 
   function placeBubbles(){
     const st = els.stage.getBoundingClientRect(), ap = $('#app').getBoundingClientRect();
-    els.bubbles.style.bottom = (ap.bottom - st.top + 10) + 'px';
+    els.bubbles.style.bottom = (ap.bottom - st.top - st.height*0.16 + 8) + 'px';
   }
 
   function newBubble(who){
@@ -317,7 +323,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     const other = a===actor.left ? actor.right : actor.left;
     if (other){ other.body.classList.remove('nod'); void other.body.offsetWidth; if(!RM) other.body.classList.add('nod'); }
     a.el.classList.add('speaking'); a.talking = true;
-    const canFlap = face==='base'||face==='smile';
+    const canFlap = true;
     let i=0, flap=false;
     const base = b.text;
     const tick = () => {
@@ -325,14 +331,14 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
       b.el.innerHTML = '';
       b.el.textContent = base + text.slice(0,i);
       const c=document.createElement('i'); c.className='caret'; b.el.appendChild(c);
-      if (canFlap && i%2===0){ flap=!flap; setImg(a, flap?'talk':face, true); }
+      if (canFlap && i%2===0){ flap=!flap; setImg(a, flap?PIC(a.face,'talk'):PIC(a.face), true); }
       if (i>=text.length){ finish(); return; }
       typing = setTimeout(tick, /[、。！？…]/.test(text[i-1]) ? 210 : 62);
     };
     const finish = () => {
       clearTimeout(typing); typing=null;
       b.text = base + text; b.el.textContent = b.text;
-      setImg(a, face, true); a.talking=false; a.el.classList.remove('speaking');
+      setImg(a, PIC(a.face), true); a.talking=false; a.el.classList.remove('speaking');
       done();
     };
     b.finish = finish;
