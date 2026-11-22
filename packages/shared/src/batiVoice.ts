@@ -113,18 +113,31 @@ export type BatiVoiceBody = z.infer<typeof BatiVoiceBody>;
 /**
  * The start-of-app agreement (M-R247): the terms of use and the privacy policy, with what photos and voice are used for.
  * Raise the version when the words change; the server keeps the version agreed to.
- * PLACEHOLDER (P-LEGAL-1): the terms and the privacy policy themselves are not written yet; the wording and the flow are
- * checked by a specialist (a lawyer) before launch (M-R248).
+ * M-R252: the words are the draft's (legal.ts: CONSENT_TEXT, TERMS_DRAFT, PRIVACY_DRAFT); '.2' = that draft.
+ * PLACEHOLDER (P-LEGAL-1): the texts are drafts; the wording and the flow are checked by a specialist (a lawyer) before
+ * launch (M-R248).
  */
-export const MEDIA_CONSENT_VERSION = '2026-11-22';
+export const MEDIA_CONSENT_VERSION = '2026-11-22.2';
+/** the M-R247 summary lines (the agreement before M-R252; the screen now shows CONSENT_TEXT) */
 export const CONSENT_POINTS = [
   '利用規約とプライバシーポリシーに同意します。',
   '写真と声は、あなたの姿と相方（バティ）を作るためだけに使い、ほかのことには使いません。',
   '写真そのものは保存しません。声と、写真から作った姿は、設定からいつでも消せます。',
 ] as const;
 /** M-R248: 13〜15歳 — the guardian's consent, confirmed once at the start (the one line to tick) */
+/** the M-R248 guardian line (before M-R252; the screen now asks with CONSENT_TEXT.guardianAgreed) */
 export const GUARDIAN_POINT = '13〜15歳の人：写真と声を使うことに、家の人が同意しています。';
-export const ConsentBody = z.object({ version: z.string().min(1).max(40), guardian: z.boolean().optional() });
+/**
+ * POST /me/consent. M-R252: with the branch chosen on the start screen — `media: false` when the photo and voice are not
+ * to be used (under 13 / no year, or 13〜15 without the guardian), kept so a year given later cannot turn them on; and
+ * the birth year asked there (kept once, as users.onboarding_json.birthYear, like PATCH /me), null = not answered.
+ */
+export const ConsentBody = z.object({
+  version: z.string().min(1).max(40),
+  guardian: z.boolean().optional(),
+  media: z.boolean().optional(),
+  birthYear: z.number().int().min(1900).max(2100).nullable().optional(),
+});
 export type ConsentBody = z.infer<typeof ConsentBody>;
 
 /**
@@ -139,7 +152,9 @@ export function mediaAge(birthYear: number | null | undefined, now = new Date())
   const age = now.getFullYear() - birthYear;
   return age < 13 ? 'under13' : age < 16 ? 'teen' : 'adult';
 }
-export function mediaAllowed(o: { birthYear: number | null | undefined; consent: boolean; guardian: boolean }, now = new Date()): boolean {
+export function mediaAllowed(o: { birthYear: number | null | undefined; consent: boolean; guardian: boolean; media?: boolean }, now = new Date()): boolean {
+  // M-R252: the start screen's branch said no photo and no voice
+  if (o.media === false) return false;
   const a = mediaAge(o.birthYear, now);
   return a === 'adult' ? o.consent : a === 'teen' ? o.consent && o.guardian : false;
 }

@@ -96,7 +96,7 @@ export function ChatLog({
   );
 }
 
-function SysLine({ text }: { text: string }) {
+export function SysLine({ text }: { text: string }) {
   return (
     <div className="flex animate-[chatIn_0.6s_cubic-bezier(.2,.8,.2,1)_both] items-center justify-center gap-3 py-1.5">
       <span className="h-px w-10 bg-gradient-to-r from-transparent to-amber-200/50" />

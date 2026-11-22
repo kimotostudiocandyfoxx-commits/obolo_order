@@ -118,7 +118,8 @@ export interface Api {
   /** 〔写真を消す〕: the looks made from the photo deleted (the photo itself was never kept); the placeholder look */
   removeLook(): Promise<Me>;
   /** M-R247: the start-of-app agreement (terms, privacy, photos and voice) */
-  consent(version: string, guardian?: boolean): Promise<Me>;
+  /** M-R252: with the start screen's branch (`media: false` = no photo and voice) and the birth year asked there */
+  consent(version: string, guardian?: boolean, opts?: { media?: boolean; birthYear?: number | null }): Promise<Me>;
   /** whether the voice service (Fish Audio) is connected */
   voiceStatus(): Promise<{ fish: boolean }>;
   /** Read a text aloud in a registered voice (Fish Audio). */

@@ -1,14 +1,31 @@
 'use client';
 
-import { CONSENT_POINTS, GUARDIAN_POINT, MEDIA_CONSENT_VERSION } from '@obolo/shared';
+import { CONSENT_TEXT, CONSENT_YEAR, MEDIA_CONSENT_VERSION, mediaAge, type Me } from '@obolo/shared';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { LegalSheet, type LegalKind } from '@/components/LegalText';
+import { BIRTH_YEAR_KEY } from '@/components/onboarding/SealGate';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const KEY = 'obolo.consent';
 const GKEY = 'obolo.consent.guardian';
+/** M-R252: the branch without the photo and voice ('0'), and the year as answered on the start screen ('' = no answer) */
+const MKEY = 'obolo.consent.media';
+const YKEY = 'obolo.consent.year';
+/** the select's value for 〔答えない・分からない〕 */
+const NONE = 'none';
+
+/** what the start screen decided */
+export interface ConsentChoice {
+  /** 13〜15: 〔保護者の人が同意しました〕 */
+  guardian: boolean;
+  /** false: the photo and voice are not used (under 13 / no year, or 13〜15 without the guardian) */
+  media: boolean;
+  /** the year chosen (null = 〔答えない・分からない〕) */
+  birthYear: number | null;
+}
 
 /** the agreement given on this device before the account existed (sent once the account is made) */
 export function localConsent(): string | null {
@@ -18,97 +35,173 @@ export function localConsent(): string | null {
     return null;
   }
 }
-/** M-R248: the guardian's line was ticked on this device (13〜15) */
-function localGuardian(): boolean {
+function localChoice(): ConsentChoice {
   try {
-    return localStorage.getItem(GKEY) === MEDIA_CONSENT_VERSION;
+    const y = Number(localStorage.getItem(YKEY));
+    return { guardian: localStorage.getItem(GKEY) === MEDIA_CONSENT_VERSION, media: localStorage.getItem(MKEY) !== '0', birthYear: y || null };
   } catch {
-    return false;
+    return { guardian: false, media: false, birthYear: null };
   }
 }
-function keepLocal(guardian = false) {
+function keepLocal(c: ConsentChoice) {
   try {
     localStorage.setItem(KEY, MEDIA_CONSENT_VERSION);
-    if (guardian) localStorage.setItem(GKEY, MEDIA_CONSENT_VERSION);
+    if (c.guardian) localStorage.setItem(GKEY, MEDIA_CONSENT_VERSION);
     else localStorage.removeItem(GKEY);
+    localStorage.setItem(MKEY, c.media ? '1' : '0');
+    localStorage.setItem(YKEY, c.birthYear ? String(c.birthYear) : '');
+    // the birth year is kept the way day 1 keeps it (the seal, M-R150), sent as users.onboarding_json.birthYear
+    if (c.birthYear) localStorage.setItem(BIRTH_YEAR_KEY, String(c.birthYear));
   } catch {
     /* private mode: asked again next time */
   }
 }
+function storedYear(): string {
+  try {
+    return localStorage.getItem(BIRTH_YEAR_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+/** the agreement on the account is the current one */
+export const agreedNow = (me: Pick<Me, 'consent'> | null | undefined) => me?.consent?.version === MEDIA_CONSENT_VERSION;
 
 /**
- * M-R247: the one agreement at the start of the app — the terms of use and the privacy policy, with what photos and
- * voice are used for (the member's look and {bati} only, never anything else; deletable in the settings). It is the
- * consent the voice model needs (the story's egg scene shows no explanation: only a small ⓘ by the mic).
- * M-R248: one more line to tick for 13〜15 — a guardian agreed to the photo and voice being used (kept with the version).
- * Under 13 (or no birth year) the photo and voice are never used, whatever is ticked; the server decides by the birth year.
- * PLACEHOLDER (P-LEGAL-1): the terms and the privacy policy themselves are not written yet (only their names here); the
- * wording and the flow are checked by a specialist before launch.
+ * M-R247 / M-R252: the one agreement at the start of the app, before day 1 (the story itself explains nothing). The
+ * words are the draft's (docs/legal/同意の画面と規約の下書き.md; shared legal.ts), word for word:
+ *  1-1 「生まれた年を教えてください」〔年を選ぶ〕 — no answer / not known = as under 13 (skipped when the account has one);
+ *  1-2 by age (mediaAge): 16+ the body, 〔利用規約〕〔プライバシーについて〕 (the full text over this screen), 〔同意してはじめる〕;
+ *      13〜15 the body and the guardian line, 〔保護者の人が同意しました〕 (as 16+) or 〔保護者の同意なしではじめる〕 (no
+ *      photo, no voice); under 13 the one line and 〔はじめる〕 (no photo, no voice).
+ * The server keeps the branch (POST /me/consent `media`) and decides by it and the birth year (canUseMedia).
+ * PLACEHOLDER (P-LEGAL-1/2): the texts are drafts; the wording and the flow are checked by a specialist before launch.
  */
-export function ConsentPanel({ onAgree, busy = false }: { onAgree: (guardian: boolean) => void; busy?: boolean }) {
-  const [guardian, setGuardian] = useState(false);
+export function ConsentPanel({ onAgree, busy = false, knownYear = null }: { onAgree: (c: ConsentChoice) => void; busy?: boolean; knownYear?: number | null }) {
+  const [year, setYear] = useState(knownYear ? String(knownYear) : '');
+  // a year chosen on this device before (the seal, or this screen) comes back chosen
+  useEffect(() => {
+    if (!knownYear) setYear((y) => y || storedYear());
+  }, [knownYear]);
+  const [sheet, setSheet] = useState<LegalKind | null>(null);
+  const thisYear = new Date().getFullYear();
+  const birthYear = year && year !== NONE ? Number(year) : null;
+  const age = year ? mediaAge(birthYear) : null;
+  const agree = (c: Omit<ConsentChoice, 'birthYear'>) => onAgree({ ...c, birthYear });
+  const btn = 'w-full rounded-full border py-3.5 text-[16px] tracking-widest disabled:opacity-40';
+  const main = `${btn} border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)]`;
+  const sub = `${btn} border-white/25 text-[14px] text-amber-50/80`;
+  const lines = (ls: readonly string[]) => (
+    <ul className="space-y-3 text-[14px] leading-relaxed">
+      {ls.map((p) => (
+        <li key={p} className="flex gap-2">
+          <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-amber-200/80" aria-hidden />
+          <span>{p}</span>
+        </li>
+      ))}
+    </ul>
+  );
+  const links = (
+    <p className="mt-5 flex justify-center gap-3 text-[13px]">
+      <button type="button" onClick={() => setSheet('terms')} className="text-amber-200/90 underline underline-offset-4">
+        {CONSENT_TEXT.terms}
+      </button>
+      <button type="button" onClick={() => setSheet('privacy')} className="text-amber-200/90 underline underline-offset-4">
+        {CONSENT_TEXT.privacy}
+      </button>
+    </p>
+  );
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] px-6 text-amber-50" style={{ fontFamily: SERIF }}>
-      <div className="w-full max-w-sm">
-        <p className="text-center text-[13px] tracking-[0.4em] text-amber-200/70">はじめる前に</p>
-        <ul className="mt-6 space-y-3 text-[14px] leading-relaxed">
-          {CONSENT_POINTS.map((p) => (
-            <li key={p} className="flex gap-2">
-              <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-amber-200/80" aria-hidden />
-              <span>{p}</span>
-            </li>
-          ))}
-        </ul>
-        <label className="mt-5 flex items-start gap-2 rounded-xl border border-white/10 bg-white/5 p-3 text-[12px] leading-relaxed text-amber-50/85">
-          <input type="checkbox" checked={guardian} onChange={(e) => setGuardian(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-amber-300" />
-          <span>{GUARDIAN_POINT}</span>
-        </label>
-        <p className="mt-1.5 text-[10px] leading-relaxed text-white/40">13歳未満の人の写真と声は使いません。</p>
-        <p className="mt-3 text-[11px] text-white/45">利用規約・プライバシーポリシー（本文は準備中）</p>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => onAgree(guardian)}
-          className="mt-8 w-full rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-[16px] tracking-widest text-amber-50 shadow-[0_0_24px_rgba(255,210,130,0.25)] disabled:opacity-40"
-        >
-          同意してはじめる
-        </button>
+    <div className="fixed inset-0 z-[200] overflow-y-auto bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] px-6 text-amber-50" style={{ fontFamily: SERIF }}>
+      <div className="mx-auto flex min-h-full w-full max-w-sm flex-col justify-center py-10">
+        <p className="text-center text-[13px] tracking-[0.4em] text-amber-200/70">{CONSENT_TEXT.title}</p>
+        {!knownYear && (
+          <label className="mt-6 block text-[14px] tracking-[0.08em] text-amber-50/90">
+            {CONSENT_YEAR.ask}
+            <select
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="mt-2 block w-full rounded-full border border-amber-200/50 bg-black/60 px-4 py-2.5 text-[15px] text-amber-50"
+              aria-label={CONSENT_YEAR.ask}
+            >
+              <option value="">{CONSENT_YEAR.pick}</option>
+              {Array.from({ length: 90 }, (_, k) => thisYear - 3 - k).map((y) => (
+                <option key={y} value={y}>
+                  {y}年
+                </option>
+              ))}
+              <option value={NONE}>{CONSENT_YEAR.none}</option>
+            </select>
+          </label>
+        )}
+        {age === 'adult' && (
+          <div className="mt-6">
+            {lines(CONSENT_TEXT.adult)}
+            {links}
+            <button type="button" disabled={busy} onClick={() => agree({ guardian: false, media: true })} className={`${main} mt-7`}>
+              {CONSENT_TEXT.agree}
+            </button>
+          </div>
+        )}
+        {age === 'teen' && (
+          <div className="mt-6">
+            {lines([...CONSENT_TEXT.adult, CONSENT_TEXT.teen])}
+            {links}
+            <button type="button" disabled={busy} onClick={() => agree({ guardian: true, media: true })} className={`${main} mt-7`}>
+              {CONSENT_TEXT.guardianAgreed}
+            </button>
+            <button type="button" disabled={busy} onClick={() => agree({ guardian: false, media: false })} className={`${sub} mt-3`}>
+              {CONSENT_TEXT.noGuardian}
+            </button>
+          </div>
+        )}
+        {age === 'under13' && (
+          <div className="mt-6">
+            {lines([CONSENT_TEXT.under13])}
+            <button type="button" disabled={busy} onClick={() => agree({ guardian: false, media: false })} className={`${main} mt-7`}>
+              {CONSENT_TEXT.start}
+            </button>
+          </div>
+        )}
       </div>
+      {sheet && <LegalSheet kind={sheet} onClose={() => setSheet(null)} />}
     </div>
   );
 }
 
 /** before the account exists (the invitation's day 1): kept on this device, sent right after the account is made */
-export function agreeLocally(guardian = false) {
-  keepLocal(guardian);
+export function agreeLocally(c: ConsentChoice) {
+  keepLocal(c);
 }
 
 /** send the agreement given on this device (after the account is made); quiet when there is none or it fails */
 export async function sendLocalConsent() {
   const v = localConsent();
   if (!v) return null;
+  const c = localChoice();
   return getApi()
-    .consent(v, localGuardian())
+    .consent(v, c.guardian, { media: c.media, birthYear: c.birthYear })
     .catch(() => null);
 }
 
-/** pages that never ask (the invitation asks itself; the team's review pages play without an account of their own) */
-const QUIET = /^\/(invite|kakunin-|tameshi-|admin)/;
+/** pages that never ask (the invitation asks itself; the team's review pages play without an account of their own; the texts themselves) */
+const QUIET = /^\/(invite|kakunin-|tameshi-|admin|terms|privacy)/;
 
-/** members who have not agreed yet (an account from before M-R247): the agreement over the app, once */
+/** members who have not agreed to the current words yet (an account from before M-R247 / M-R252): the agreement over the app, once */
 export function ConsentGate() {
   const { me, setMe } = useAuth();
   const path = usePathname() ?? '';
   const [busy, setBusy] = useState(false);
-  if (!me || me.consent || QUIET.test(path)) return null;
+  if (!me || agreedNow(me) || QUIET.test(path)) return null;
   return (
     <ConsentPanel
       busy={busy}
-      onAgree={async (guardian) => {
+      knownYear={me.birthYear ?? null}
+      onAgree={async (c) => {
         setBusy(true);
-        keepLocal(guardian);
+        keepLocal(c);
         try {
-          setMe(await getApi().consent(MEDIA_CONSENT_VERSION, guardian));
+          setMe(await getApi().consent(MEDIA_CONSENT_VERSION, c.guardian, { media: c.media, birthYear: c.birthYear }));
         } finally {
           setBusy(false);
         }

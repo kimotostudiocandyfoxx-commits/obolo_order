@@ -75,6 +75,8 @@ export interface TalkLook {
   poses?: Partial<Record<TalkFace, TalkPose>>;
   /** still being made in the background */
   making?: boolean;
+  /** painted gestures by name (a story character's poses: point, lecture, smug …), shown for the lines that ask for them */
+  named?: Record<string, TalkExpression>;
 }
 
 /** the expression to show: the face asked for, or the nearest one there is, or the standing figure */

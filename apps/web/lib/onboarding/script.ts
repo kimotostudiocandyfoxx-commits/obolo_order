@@ -286,6 +286,8 @@ export interface StoryVars {
   inviterMessage?: string;
   /** Times round the Sun ({age}). */
   age?: string;
+  /** the year they were born, when already asked (the start screen): the seal does not ask it again */
+  birthYear?: number | null;
   /** KIMORIN is shown as "KIMORIN⭐︎" (his NEO name, from the Moon's naming on). */
   kimorinStar?: boolean;
   /**

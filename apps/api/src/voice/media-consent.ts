@@ -8,12 +8,14 @@ export const hasMediaConsent = (u: Pick<User, 'consentVersion' | 'consentAt'> | 
 
 /**
  * M-R248: the photo and the voice may be used — the agreement, and by age: never under 13 (or no birth year yet),
- * 13〜15 only with the guardian's consent, 16 and over their own.
+ * 13〜15 only with the guardian's consent, 16 and over their own. M-R252: never after the start screen's branch without
+ * them (onboarding_json['consent.media'] = '0'), whatever year is given later.
  */
 export function canUseMedia(u: Pick<User, 'consentVersion' | 'consentAt' | 'guardianConsentVersion' | 'guardianConsentAt' | 'onboardingJson'> | null | undefined, now = new Date()): boolean {
   if (!u) return false;
-  const birthYear = Number((u.onboardingJson as Record<string, string> | null)?.birthYear) || null;
+  const json = (u.onboardingJson ?? {}) as Record<string, string>;
+  const birthYear = Number(json.birthYear) || null;
   const guardian = !!u.guardianConsentAt && u.guardianConsentVersion === MEDIA_CONSENT_VERSION;
-  return mediaAllowed({ birthYear, consent: hasMediaConsent(u), guardian }, now);
+  return mediaAllowed({ birthYear, consent: hasMediaConsent(u), guardian, media: json['consent.media'] !== '0' }, now);
 }
 

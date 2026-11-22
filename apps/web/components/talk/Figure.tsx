@@ -33,6 +33,7 @@ const REACTION: Record<TalkMotion, string> = {
 export function Figure({
   look,
   face = 'normal',
+  named,
   state = 'idle',
   motion,
   motionKey = 0,
@@ -50,6 +51,8 @@ export function Figure({
 }: {
   look: TalkLook | null;
   face?: TalkFace;
+  /** a named pose that wins over the face (a story line's painted gesture) */
+  named?: TalkExpression | null;
   state?: FigureState;
   /** a reaction, played once each time motionKey changes */
   motion?: TalkMotion;
@@ -75,7 +78,7 @@ export function Figure({
   // M-R240: two tiers — the plain standing face, and the expression's own pose when there is one (and it loads)
   const posed = talkPose(look, face);
   const poseOk = usePresent(posed?.kind === 'image' ? posed.url : undefined);
-  const expr = (poseOk ? posed : null) ?? talkExpression(look, face);
+  const expr = named ?? (poseOk ? posed : null) ?? talkExpression(look, face);
   // a change of expression cross-fades (~0.2 s) with a small squash-and-recover at the switch
   const key = expr?.url ?? '';
   const lastExpr = useRef<TalkExpression | null>(expr);

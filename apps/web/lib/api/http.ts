@@ -183,8 +183,8 @@ export class HttpApi implements Api {
   removeLook() {
     return this.req<Me>('DELETE', '/me/look');
   }
-  consent(version: string, guardian = false) {
-    return this.req<Me>('POST', '/me/consent', { version, guardian });
+  consent(version: string, guardian = false, opts: { media?: boolean; birthYear?: number | null } = {}) {
+    return this.req<Me>('POST', '/me/consent', { version, guardian, ...opts });
   }
   voiceStatus() {
     return this.req<{ fish: boolean }>('GET', '/voice/status');

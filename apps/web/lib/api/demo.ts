@@ -564,8 +564,14 @@ export class DemoApi implements Api {
     return this.patchMe((x) => ({ avatarUrl: null, lookHistory: [], lookStandee: null, lookIcon: null, talk: null, story: Object.fromEntries(Object.entries(x.story ?? {}).filter(([k]) => !/^d\d+\.look$/.test(k))) }));
   }
 
-  async consent(version: string, guardian = false) {
-    return this.patchMe((u) => ({ consent: { version, at: now(), guardian }, mediaOk: mediaAllowed({ birthYear: u.birthYear, consent: true, guardian }) }));
+  async consent(version: string, guardian = false, opts: { media?: boolean; birthYear?: number | null } = {}) {
+    // M-R252: the year asked on the start screen is kept once (like updateMe); the branch without media stays so
+    return this.patchMe((u) => {
+      const birthYear = u.birthYear || opts.birthYear || null;
+      const media = opts.media !== false;
+      const g = guardian && media;
+      return { birthYear, child: birthYear ? isChild(birthYear) : u.child, consent: { version, at: now(), guardian: g, media }, mediaOk: mediaAllowed({ birthYear, consent: true, guardian: g, media }) };
+    });
   }
 
   async voiceStatus() {

@@ -45,7 +45,9 @@ import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
-import { ChatLog, MessageBar, ReplyChips, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
+import { MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
+import { TalkScene } from '@/components/talk/TalkScene';
+import { speakerOfSprite, stillShowsAny, storyItems, storyPeople, storySelfLook, talkId } from '@/components/story/StoryTalk';
 import { VoiceChoice } from './VoiceChoice';
 import { Invitation } from '@/components/story/Invitation';
 import { TicketArt } from '@/components/story/Ticket';
@@ -314,6 +316,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const [overlayCaption, setOverlayCaption] = useState<string | null>(null);
   // the scene's thread (cleared when the scene changes: a motion, an arrival, black)
   const [log, setLog] = useState<ChatRaw[]>([]);
+  // each new thread (a scene change) gets new ids in the talk, so a line said again later is said, not skipped
+  const [logGen, setLogGen] = useState(0);
+  const clearLog = useCallback(() => {
+    setLog([]);
+    setLogGen((g) => g + 1);
+  }, []);
   const addLine = useCallback((e: ChatRaw | null) => {
     // the same line said again later (a choice that comes round again: 受け取らない → the ticket once more) gets its own key
     if (e) setLog((l) => (l[l.length - 1]?.id.split('~')[0] === e.id ? l : [...l, l.some((x) => x.id === e.id) ? { ...e, id: `${e.id}~${l.length}` } : e]));
@@ -539,12 +547,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           setReady(true);
           setBlackout(false);
           setInvite(false);
-          setLog([]);
+          clearLog();
           addLine(chatLine(s, `s${n}`));
           setI(n);
           return;
         } else if (s.t === 'invitation') {
-          setLog([]);
+          clearLog();
           setInvite(true);
           // the card is a full scene of its own: lift the start light / black screen
           setReady(true);
@@ -580,13 +588,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             const after = n + 1;
             setI(n);
             setTimeout(() => {
-              setLog([]);
+              clearLog();
               dual.current?.pauseAll();
               runRef.current(after);
             }, s.fade * 1000);
             return;
           }
-          setLog([]);
+          clearLog();
           dual.current?.pauseAll();
           n++;
         } else if (s.t === 'loop') {
@@ -624,7 +632,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         } else if (s.t === 'whiteout') {
           setSprite(null);
           setWhite(true);
-          setLog([]);
+          clearLog();
           setI(n);
           const after = n + 1;
           setTimeout(() => runRef.current(after), 3400);
@@ -640,7 +648,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bgQueue.current = [];
           setSprite(null);
           setCam(null);
-          setLog([]);
+          clearLog();
           leaveTicket();
           leaveInvite();
           clearCaptions();
@@ -656,7 +664,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           bgQueue.current = [];
           setSprite(null);
           setCam(null);
-          setLog([]);
+          clearLog();
           leaveTicket();
           leaveInvite();
           clearCaptions();
@@ -676,7 +684,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         }
       }
     },
-    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine, setInvite, leaveInvite, leaveTicket],
+    [steps, playMedia, setI, onEnd, clearCaptions, onPause, onClock, addLine, setInvite, leaveInvite, leaveTicket, clearLog],
   );
   runRef.current = run;
 
@@ -1092,6 +1100,42 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   useEffect(() => {
     if (timeUp && calm && started && !paused) setTimeUpShown(true);
   }, [timeUp, calm, started, paused]);
+  // --- the side-by-side talk (会話の画面, client M-R251: every conversation in this form) ---
+  const spriteNames = (Array.isArray(sprite) ? sprite : sprite ? [sprite] : []).filter((x): x is string => !!x);
+  const charsOnStage = spriteNames.filter((n) => speakerOfSprite(n));
+  // your look: none on day 1 and on day 2 until it is made on the Moon (M-R249: first person until then)
+  const lookUrl = answers.look ?? (lookStepAt >= 0 && i <= lookStepAt ? undefined : (v.lookStandee ?? v.look));
+  const lookMade = !!answers.look || (lookStepAt >= 0 ? i > lookStepAt : !!(v.kimorinStar || v.story?.['d2.look']));
+  const selfTalkLook = storySelfLook(lookUrl, lookMade);
+  const threadEntries = log;
+  const talkSays = step?.t === 'say' ? step : null;
+  const { people: talkPeople, sprites: talkSprites } = storyPeople({
+    onStage: charsOnStage,
+    entries: threadEntries,
+    speaking: talkSays?.who ?? null,
+    v,
+    self: selfTalkLook,
+    name: v.neo || v.name || 'あなた',
+    speakerName: (who) => speakerName(who, v),
+    kimorinSprite: kimorinLook ?? (v.kimorinStar ? 'kimorin-sun' : 'kimorin-i'),
+  });
+  const talkItems = storyItems({
+    entries: chatOn ? threadEntries : [],
+    gen: logGen,
+    sprites: talkSprites,
+    text: (e) => sayText(e.who, e.text, v),
+    // the script's own pose for a line (〔表情〕 by hand); a face step on {bati} until the next scene
+    expr: (e) => {
+      const k = Number(e.id.replace(/^s/, '').split('~')[0]);
+      const st = steps[k];
+      if (st?.t === 'say' && st.expr) return st.expr;
+      if (e.who === 'バティ') return expressions['@bati'];
+      return undefined;
+    },
+  });
+  const talkOn = started && !!step && step.t !== 'video' && step.t !== 'film' && step.t !== 'whiteout' && (chatOn || charsOnStage.length > 0);
+  const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
+  const talkDock = Math.max(84, chatOn && step ? chatBottom(step) : 30);
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
   let pk = i - 1;
   while (steps[pk]?.t === 'label' || steps[pk]?.t === 'scene') pk--;
@@ -1149,14 +1193,14 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>
-      {!sprite && autoStandee && (
+      {!sprite && autoStandee && !talkOn && (
         <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
       )}
       {sprite && (
         // a wrapper of its own so the 'vanish' step can fade the whole cast into light
         <div className="pointer-events-none absolute inset-0 z-[4]" style={vanish ? { animation: `castVanish ${vanish}s ease-in forwards` } : undefined}>
         <Cast
-          names={Array.isArray(sprite) ? sprite : [sprite]}
+          names={(Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && speakerOfSprite(n) ? '' : n))}
           src={(n) => spriteSrc(n) ?? null}
           speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
           talking={talking}
@@ -1199,32 +1243,47 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           スキップ
         </button>
       )}
+      {/* the talk over the scene: the ones in it stand side by side low on the screen (you at the right from the Moon's
+          look on; before it, first person), at most two bubbles over their heads; a tap goes on (the words first), a
+          drag down goes back through the thread */}
+      {talkOn && (
+        <div className="absolute inset-0 z-[10] flex flex-col">
+          {/* a still that already shows them goes soft behind them (depth of field) */}
+          <div className="pointer-events-none absolute inset-0 transition-[backdrop-filter,background] duration-500" style={stillShowsAny(still, talkPeople) ? { backdropFilter: 'blur(6px) brightness(0.62)', WebkitBackdropFilter: 'blur(6px) brightness(0.62)' } : undefined} aria-hidden />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/60 via-black/25 to-transparent" aria-hidden />
+          <TalkScene
+            transparent
+            noMute
+            hint={false}
+            people={talkPeople}
+            items={talkItems}
+            dock={talkDock}
+            keyboard={talkDock > 170}
+            top={44}
+            voice={{ who: talking && talkSays ? talkId(talkSays.who) : null, level: voiceLevel }}
+            stageStyle={vanish ? { animation: `castVanish ${vanish}s ease-in forwards` } : undefined}
+            onTap={() => {
+              if (step && chatLine(step, '')) tapLine();
+            }}
+          />
+          {sysNow && (
+            <div key={sysNow.id} className="pointer-events-none absolute inset-x-0 top-[15%] z-[11] px-6">
+              <SysLine text={fill(sysNow.text, v)} />
+            </div>
+          )}
+          {step && chatLine(step, '') && !mustWait && <Cue />}
+        </div>
+      )}
       {/* tap layer for dialogue */}
       {/* the thread: a line is tapped through anywhere (the newest finishes typing first) */}
       {started && step && chatLine(step, '') ? (
+        !talkOn && 
         <button className="absolute inset-0 z-10 cursor-default" aria-label="つぎへ" {...fastTap(tapLine)} />
       ) : (
         started && interactiveTap && <TapLine key={i} step={step} vars={v} onNext={next} />
       )}
       {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
-      {(chatOn || chatLeaving || chatWas.current) && (
-        // the thread and its shade fade out over 0.3 s when they go (QA 12 R35), with what they showed last. The frame
-        // it went out on keeps it mounted (chatWas is still true until the effect runs): it used to unmount for that
-        // one frame and come back at opacity 0, so nothing faded (QA 13 R35)
-        <div className="pointer-events-none absolute inset-0 z-[10] transition-opacity duration-300" style={{ opacity: chatOn ? 1 : 0 }}>
-          {/* a soft shade under the thread so it reads on any picture */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
-          <ChatLog
-            entries={chatOn ? chatEntries : lastChat.current.entries}
-            talking={chatOn && talking}
-            reveal={chatOn ? reveal : leavingReveal}
-            live={chatOn && step?.t === 'say' && !mustWait}
-            bottom={chatOn && step ? chatBottom(step) : lastChat.current.bottom}
-          />
-        </div>
-      )}
-
       {started && step?.t === 'action' && (
         <ReplyChips
           key={i}
@@ -1296,7 +1355,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             setBlackout(true);
             fromLesson.current = true;
             // a new scene: the lines from before the practice do not come back over it (QA 13 R48)
-            setLog([]);
+            clearLog();
             lastChat.current = { entries: [], bottom: 0 };
             clearTimeout(underTimer.current);
             setUnder(null);
@@ -1694,7 +1753,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         />
       )}
 
-      {!started && i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen && <SealGate onOpen={() => start(true)} />}
+      {!started && i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen && <SealGate knownYear={vars.birthYear} onOpen={() => start(true)} />}
       {!started && !(i === 0 && steps[0]?.t === 'film' && steps[0].id === 'signal' && !gateSeen) && (
         <button className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-6 bg-black" onClick={() => start()}>
           <span className="relative flex h-24 w-24 items-center justify-center">

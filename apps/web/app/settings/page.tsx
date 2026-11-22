@@ -9,8 +9,8 @@ import { useAuth } from '@/lib/auth';
 /**
  * 〔設定〕 — for now the 〔毎月のマナ〕 part (M-R199 / M-R202): your mana, whether you are Obolo Order, and on days 3–7 of
  * the first journey 〔先にObolo Orderになる〕, which always plays SYS-S002 (the explanation) before the payment.
- * PLACEHOLDER (P-BILL-3): 〔やめる〕 (cancelling the monthly mana) is not built yet.
- * M-R246 / M-R247: 〔声を消す〕 and 〔写真を消す〕 (the voice and what was made from the photo; see VoiceAndPhoto).
+ * PLACEHOLDER (P-BILL-3): 〔やめる〕 (cancelling the monthly mana) is not built yet (shown, off).
+ * M-R252 (the draft's section 4): 〔写真と声を消す〕, 〔作った物を消す〕〔会話を消す〕, 〔毎月のマナ〕→〔やめる〕, 〔利用規約〕〔プライバシーについて〕.
  */
 export default function SettingsPage() {
   return (
@@ -50,70 +50,142 @@ function Settings() {
             先にObolo Orderになる
           </Link>
         )}
-        {ordered && <p className="mt-4 text-[11px] leading-relaxed text-white/45">やめ方：〔やめる〕の画面は準備中です。いつでもやめられます。</p>}
+        {ordered && (
+          // PLACEHOLDER (P-BILL-3): the cancelling itself is not built yet
+          <div className="mt-4 flex items-center gap-3">
+            <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-white/45">いつでもやめられます。やめても、作った物は残ります（〔やめる〕の画面は準備中です）</p>
+            <button type="button" disabled className="shrink-0 rounded-full border border-white/25 px-3 py-1.5 text-[12px] text-white/70 disabled:opacity-40">
+              やめる
+            </button>
+          </div>
+        )}
       </section>
       <VoiceAndPhoto />
+      <WorksAndTalk />
+      <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">
+        <div className="flex gap-2">
+          <Link href="/terms" className="flex-1 rounded-full border border-white/20 py-2.5 text-center text-[13px] text-white/85">
+            利用規約
+          </Link>
+          <Link href="/privacy" className="flex-1 rounded-full border border-white/20 py-2.5 text-center text-[13px] text-white/85">
+            プライバシーについて
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
 
 /**
- * M-R246 / M-R247: the voice and the photo, deletable at any time. 〔声を消す〕: the egg recording and {bati}'s voice model
- * are deleted (DELETE /voice/bati) — {bati} speaks in the default voice. 〔写真を消す〕: the photo itself was never kept;
- * the looks made from it are deleted (DELETE /me/look) — you stand as the hooded guest until a new look is made.
+ * M-R246 / M-R247 / M-R252: 〔写真と声を消す〕 — both at once (the draft's settings item): the egg recording and {bati}'s
+ * voice model are deleted (DELETE /voice/bati) — {bati} speaks in the prepared voice; the photo itself was never kept,
+ * the looks made from it are deleted (DELETE /me/look) — you stand as the look made without a photo.
  */
 function VoiceAndPhoto() {
   const { me, setMe } = useAuth();
-  const [ask, setAsk] = useState<'voice' | 'photo' | null>(null);
+  const [ask, setAsk] = useState(false);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   if (!me) return null;
   const voice = me.voices?.batiState ?? (me.voices?.bati ? 'ready' : 'none');
   const hasVoice = voice !== 'none' || !!me.voices?.bati;
   const hasLook = !!(me.avatarUrl || me.lookStandee);
-  const run = async (what: 'voice' | 'photo') => {
+  const run = async () => {
     setBusy(true);
     setNote(null);
     try {
-      setMe(what === 'voice' ? await getApi().removeBatiVoice() : await getApi().removeLook());
-      setNote(what === 'voice' ? '声を消しました。相方は、はじめの声で話します' : '写真から作った姿を消しました');
+      if (hasVoice) setMe(await getApi().removeBatiVoice());
+      if (hasLook) setMe(await getApi().removeLook());
+      setNote('写真と声を消しました。写真を使わない姿と、用意した声に戻りました');
     } catch {
       setNote('うまく消せませんでした。もう一度どうぞ');
     } finally {
       setBusy(false);
-      setAsk(null);
+      setAsk(false);
     }
   };
-  const row = (what: 'voice' | 'photo', title: string, now: string, can: boolean, label: string) => (
-    <div className="flex items-center gap-3 py-3">
-      <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-bold">{title}</p>
-        <p className="mt-0.5 text-[11px] leading-relaxed text-white/50">{now}</p>
+  const state = (title: string, now: string) => (
+    <div className="py-2.5">
+      <p className="text-[14px] font-bold">{title}</p>
+      <p className="mt-0.5 text-[11px] leading-relaxed text-white/50">{now}</p>
+    </div>
+  );
+  return (
+    <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">
+      <h2 className="text-sm font-black">写真と声</h2>
+      <p className="mt-1 text-[11px] leading-relaxed text-white/50">写真と声は、あなたの姿と相方（バティ）の声を作るためだけに使います。ほかの目的には使いません。</p>
+      <div className="mt-1 divide-y divide-white/10">
+        {state('相方の声', hasVoice ? (voice === 'making' ? 'あなたの声から、相方の声を作っています' : 'あなたの声を、少し高くして使っています') : '用意した声で話しています')}
+        {state('あなたの姿', hasLook ? '写真から作った姿があります（写真そのものは保存していません）' : '写真から作った姿はありません')}
       </div>
-      {ask === what ? (
+      <ConfirmRow
+        label="写真と声を消す"
+        note="消すと、写真を使わない姿と、用意した声に戻ります"
+        can={hasVoice || hasLook}
+        ask={ask}
+        busy={busy}
+        onAsk={setAsk}
+        onRun={() => void run()}
+      />
+      {note && <p className="mt-2 text-[12px] text-amber-100/80">{note}</p>}
+    </section>
+  );
+}
+
+/** a delete button that asks once more (〔やめる〕〔消す〕) */
+function ConfirmRow({ label, note, can, ask, busy, onAsk, onRun }: { label: string; note: string; can: boolean; ask: boolean; busy: boolean; onAsk: (on: boolean) => void; onRun: () => void }) {
+  return (
+    <div className="flex items-center gap-3 pt-3">
+      <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-white/50">{note}</p>
+      {ask ? (
         <div className="flex shrink-0 gap-1.5">
-          <button disabled={busy} onClick={() => setAsk(null)} className="rounded-full border border-white/20 px-3 py-1.5 text-[12px] text-white/70">
+          <button disabled={busy} onClick={() => onAsk(false)} className="rounded-full border border-white/20 px-3 py-1.5 text-[12px] text-white/70">
             やめる
           </button>
-          <button disabled={busy} onClick={() => void run(what)} className="rounded-full bg-rose-400/90 px-3 py-1.5 text-[12px] font-bold text-slate-950 disabled:opacity-40">
+          <button disabled={busy} onClick={onRun} className="rounded-full bg-rose-400/90 px-3 py-1.5 text-[12px] font-bold text-slate-950 disabled:opacity-40">
             消す
           </button>
         </div>
       ) : (
-        <button disabled={!can || busy} onClick={() => setAsk(what)} className="shrink-0 rounded-full border border-rose-300/60 px-3 py-1.5 text-[12px] text-rose-200 disabled:opacity-30">
+        <button disabled={!can || busy} onClick={() => onAsk(true)} className="shrink-0 rounded-full border border-rose-300/60 px-3 py-1.5 text-[12px] text-rose-200 disabled:opacity-30">
           {label}
         </button>
       )}
     </div>
   );
+}
+
+/**
+ * M-R252: 〔作った物を消す〕〔会話を消す〕. 〔会話を消す〕: the talk with {bati} and what {bati} remembered (DELETE /buddy/memory).
+ * PLACEHOLDER (P-LEGAL-3): 〔作った物を消す〕 (every work on every planet at once) is not built yet — the button is shown, off.
+ */
+function WorksAndTalk() {
+  const [ask, setAsk] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const forget = async () => {
+    setBusy(true);
+    setNote(null);
+    try {
+      await getApi().buddyForget();
+      setNote('会話を消しました');
+    } catch {
+      setNote('うまく消せませんでした。もう一度どうぞ');
+    } finally {
+      setBusy(false);
+      setAsk(false);
+    }
+  };
   return (
     <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">
-      <h2 className="text-sm font-black">声と写真</h2>
-      <p className="mt-1 text-[11px] leading-relaxed text-white/50">写真と声は、あなたの姿と相方（バティ）を作るためだけに使い、ほかのことには使いません。</p>
-      <div className="mt-2 divide-y divide-white/10">
-        {row('voice', '相方の声', hasVoice ? (voice === 'making' ? 'あなたの声から、相方の声を作っています' : 'あなたの声を、少し高くして使っています') : 'はじめの声で話しています', hasVoice, '声を消す')}
-        {row('photo', 'あなたの姿', hasLook ? '写真から作った姿があります（写真そのものは保存していません）' : 'まだ姿がありません', hasLook, '写真を消す')}
+      <h2 className="text-sm font-black">作った物と会話</h2>
+      <div className="flex items-center gap-3 pt-3">
+        <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-white/50">作った物を、まとめて消します（準備中です）</p>
+        <button type="button" disabled className="shrink-0 rounded-full border border-rose-300/60 px-3 py-1.5 text-[12px] text-rose-200 disabled:opacity-30">
+          作った物を消す
+        </button>
       </div>
+      <ConfirmRow label="会話を消す" note="相方との会話と、相方が覚えたことを消します" can ask={ask} busy={busy} onAsk={setAsk} onRun={() => void forget()} />
       {note && <p className="mt-2 text-[12px] text-amber-100/80">{note}</p>}
     </section>
   );

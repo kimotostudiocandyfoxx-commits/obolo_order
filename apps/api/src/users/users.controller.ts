@@ -28,12 +28,12 @@ export class UsersController {
     return this.users.updateMe(userId, parseBody(UpdateProfileBody, body));
   }
 
-  /** M-R247: the start-of-app agreement (terms, privacy, photos and voice) */
+  /** M-R247 / M-R252: the start-of-app agreement (terms, privacy, photos and voice), with the start screen's branch and birth year */
   @Post('consent')
   @HttpCode(200)
   consent(@UserId() userId: string, @Body() body: unknown) {
     const b = parseBody(ConsentBody, body);
-    return this.users.consent(userId, b.version, b.guardian ?? false);
+    return this.users.consent(userId, b.version, b.guardian ?? false, { media: b.media, birthYear: b.birthYear });
   }
 
   /** Uranus: your atelier (second journey, from ORDER) */

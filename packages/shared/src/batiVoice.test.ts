@@ -16,6 +16,10 @@ describe('M-R248: the photo and the voice, by age', () => {
     expect(mediaAllowed({ birthYear: 1990, consent: true, guardian: false }, now)).toBe(true);
     expect(mediaAllowed({ birthYear: 1990, consent: false, guardian: true }, now)).toBe(false);
   });
+  it('M-R252: the branch without the photo and voice stays so, whatever year comes later', () => {
+    expect(mediaAllowed({ birthYear: 1990, consent: true, guardian: true, media: false }, now)).toBe(false);
+    expect(mediaAllowed({ birthYear: 1990, consent: true, guardian: false, media: true }, now)).toBe(true);
+  });
 });
 
 describe('M-R250: the prepared {bati} voices by egg × personality', () => {

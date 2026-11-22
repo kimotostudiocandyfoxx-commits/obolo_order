@@ -32,6 +32,10 @@ export type TalkPerson = {
   avatar?: string | null;
   /** M-R245: the bubble colour (fixed per person); none = from `color` (you: 月光パール, {bati}: はちみつ, a dachi: セージ) */
   tone?: TalkTone;
+  /** heard, not standing in the row (a voice from off the screen, 「？？？」): their bubbles only */
+  offstage?: boolean;
+  /** the figure's size in the row (a small round character stands smaller); 1 = the row's height */
+  scale?: number;
 };
 
 export type TalkItem = {
@@ -57,6 +61,8 @@ export type TalkItem = {
   live?: boolean;
   /** M-R236: where its ★ / mark is kept (a small ★ at the bubble's / コロリン's top right; a long press opens the ring) */
   mark?: { kind: MarkedKind; id: string };
+  /** a named pose of the speaker's look for this line (TalkLook.named: a story character's painted gesture) */
+  pose?: string;
 };
 
 
@@ -141,6 +147,12 @@ export function TalkScene({
   hint = true,
   askTone = false,
   onTone,
+  onTap,
+  voice,
+  noMute = false,
+  dock,
+  transparent = false,
+  stageStyle,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -186,6 +198,18 @@ export function TalkScene({
   /** M-R245: show the one-time picker of your bubble colour */
   askTone?: boolean;
   onTone?: (id: string) => void;
+  /** a tap while nothing is being said (the story goes on to its next step) */
+  onTap?: () => void;
+  /** a voice played outside (the story's line voices): whose mouth moves, and its loudness */
+  voice?: { who: string | null; level?: () => number };
+  /** the page has its own mute button */
+  noMute?: boolean;
+  /** px kept free at the bottom (the answers under the talk); default 110 (64 with the keyboard) */
+  dock?: number;
+  /** no background of its own: the scene behind shows through (the story's stills and motions) */
+  transparent?: boolean;
+  /** on the row of people (the story's vanish) */
+  stageStyle?: React.CSSProperties;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -202,7 +226,7 @@ export function TalkScene({
 
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
   const self = people.find((p) => p.self);
-  const others = people.filter((p) => !p.self);
+  const others = people.filter((p) => !p.self && !p.offstage);
   // M-R249: no look of yours yet (day 1 until the look is made on day 2's Moon) — first person: you are not shown, the
   // partners stand in the middle facing you, your words come from the bottom right with the tail off the screen toward you
   const firstPerson = !!self && !self.look;
@@ -226,6 +250,8 @@ export function TalkScene({
   // thread opened with unread lines); a tap goes on to the next line, a long press to the end.
   const [speech, setSpeech] = useState<Speech | null>(null);
   const [hold, setHold] = useState<Record<string, { face: TalkFace; until: number }>>({});
+  // the named pose each speaker shows (a story line's painted gesture), until their next line
+  const [poseHold, setPoseHold] = useState<Record<string, string | undefined>>({});
   const [react, setReact] = useState<Record<string, { motion: TalkMotion; key: number }>>({});
   const [cursor, setCursor] = useState<number | null>(null);
   const [muted, setMuted] = useState(false);
@@ -250,6 +276,7 @@ export function TalkScene({
   const say = (it: TalkItem, then?: () => void, streamed = false) => {
     stopClip();
     after.current = then ?? null;
+    setPoseHold((h) => (h[it.who] === it.pose ? h : { ...h, [it.who]: it.pose }));
     const base = speechOf(it, beatsOf(it), streamed);
     if (it.voice) {
       const secs = it.voice.seconds ?? 3;
@@ -268,11 +295,23 @@ export function TalkScene({
     }
     setSpeech(base);
   };
+  const voiceRef = useRef(voice);
+  voiceRef.current = voice;
+  /** a named pose stays a little after the line, then the plain picture again (not while their voice still plays) */
+  const dropPose = (who: string, pose: string | undefined) => {
+    if (!pose) return;
+    setTimeout(() => {
+      if (!alive.current) return;
+      if (voiceRef.current?.who === who) return dropPose(who, pose);
+      setPoseHold((h) => (h[who] === pose ? { ...h, [who]: undefined } : h));
+    }, 2200);
+  };
   const finish = () => {
     setSpeech((cur) => {
       if (cur) {
         const last = cur.beats[cur.beats.length - 1];
         if (last) setHold((h) => ({ ...h, [cur.who]: { face: last.face, until: Date.now() + 2200 } }));
+        dropPose(cur.who, itemsRef.current.find((x) => x.id === cur.id)?.pose);
         cur.clip?.stop();
       }
       return null;
@@ -373,7 +412,7 @@ export function TalkScene({
     if (speech && at >= 1) finish();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech, at]);
-  const talkingId = liveWho ?? (speech && at < 1 && speech.mouth ? speech.who : null);
+  const talkingId = liveWho ?? (voice?.who ? voice.who : speech && at < 1 && speech.mouth ? speech.who : null);
   const faces = hold;
   const playing = cursor != null || !!speech;
 
@@ -463,7 +502,7 @@ export function TalkScene({
     press.current = null;
     if (!pr || pr.moved) return;
     if (backRef.current > 0) return backToNow();
-    if (!playing) return;
+    if (!playing) return onTap?.();
     if (Date.now() - pr.at > 550) return skipAll();
     if (cursor != null) {
       const next = cursor + 1;
@@ -528,7 +567,7 @@ export function TalkScene({
   // the layout (phone portrait first; the client's prototype, design/talk/proto.html)
   const { w, h } = size;
   const barH = bar ? 62 : 0;
-  const dockH = keyboard ? 64 : 110;
+  const dockH = dock ?? (keyboard ? 64 : 110);
   const chest = keyboard;
   // the pair stands low (design/talk/proto.html): at most 46% of the height (420 px), each 40% wide with 6% between;
   // the pictures share one canvas with headroom for raised arms, so the heads are about 16% down into it
@@ -576,6 +615,19 @@ export function TalkScene({
     const f = faces[p.id];
     return pick(f && f.until > now ? f.face : 'normal');
   };
+  /** the named pose shown (a story character's painted gesture): the one of their line in view, else their last */
+  const poseOf = (p: TalkPerson) => {
+    const named = p.look?.named;
+    if (!named) return null;
+    let key: string | undefined;
+    if (past) {
+      for (let i = end - 1; i >= 0; i--) if (units[i].item.who === p.id) {
+        key = units[i].item.pose;
+        break;
+      }
+    } else key = poseHold[p.id];
+    return (key && named[key]) || null;
+  };
   const toggleMute = () => {
     const m = !muted;
     setMuted(m);
@@ -596,7 +648,7 @@ export function TalkScene({
   return (
     <div
       ref={wrap}
-      className="relative min-h-0 flex-1 touch-none select-none overflow-hidden bg-[#070b24] text-[#f4f1ff]"
+      className={`relative min-h-0 flex-1 touch-none select-none overflow-hidden text-[#f4f1ff] ${transparent ? '' : 'bg-[#070b24]'}`}
       style={{ fontFamily: TALK_FONT, WebkitTapHighlightColor: 'transparent', animation: quake && !reduced ? `talk-quake${quake % 2} .28s linear` : undefined }}
       onPointerDown={onDown}
       onPointerMove={onMove}
@@ -641,7 +693,7 @@ export function TalkScene({
             {group && <span className="text-[11px] font-bold text-[#b9bde6]">{group.count}人</span>}
           </div>
           {bar.right}
-          {muteButton}
+          {!noMute && muteButton}
           {bar.onBluena && (
             <button onClick={bar.onBluena} aria-label="Bluenaを開く" className={GLASS}>
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
@@ -652,9 +704,11 @@ export function TalkScene({
           )}
         </header>
       ) : (
-        <div className="absolute right-3.5 z-[20] flex gap-2.5" style={{ top: top + 10 }}>
-          {muteButton}
-        </div>
+        !noMute && (
+          <div className="absolute right-3.5 z-[20] flex gap-2.5" style={{ top: top + 10 }}>
+            {muteButton}
+          </div>
+        )
       )}
       {!bar && group && (
         <p className="absolute inset-x-0 z-[6] text-center text-[12px] font-bold tracking-[0.1em] text-[#f4f1ff]/85" style={{ top: top + 18 }}>
@@ -670,8 +724,9 @@ export function TalkScene({
           height: stageH,
           transformOrigin: `${Math.round(camX * 100) === 27 ? 30 : Math.round(camX * 100) === 73 ? 70 : Math.round(camX * 100)}% 85%`,
           transform: cam ? `scale(1.1) translateX(${camShift}%)` : undefined,
-          transition: `transform .9s ${ease}`,
+          transition: `transform .9s ${ease}, bottom .4s ease`,
           willChange: 'transform',
+          ...stageStyle,
         }}
       >
         {row.map((p, k) => {
@@ -683,11 +738,12 @@ export function TalkScene({
               <Figure
                 look={p.look}
                 face={faceOf(p)}
+                named={poseOf(p)}
                 state={stateOf(p)}
                 motion={past ? undefined : react[p.id]?.motion}
                 motionKey={past ? 0 : (react[p.id]?.key ?? 0)}
                 toward={p.self ? 'left' : 'right'}
-                height={s.h}
+                height={s.h * (p.scale ?? 1)}
                 chest={s.chest}
                 // the two breathe at their own pace (in step would look mechanical): 3.4 s and 4.1 s
                 breath={p.self ? 4.1 : 3.4 + ((k * 0.37) % 0.5)}
@@ -695,7 +751,7 @@ export function TalkScene({
                 reduced={reduced}
                 lit={speaking}
                 glow={isGroup && speaking ? p.color : undefined}
-                level={speech?.who === p.id ? speech.level : undefined}
+                level={voice?.who === p.id && voice.level ? voice.level : speech?.who === p.id ? speech.level : undefined}
               />
             </div>
           );

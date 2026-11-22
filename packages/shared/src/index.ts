@@ -22,3 +22,4 @@ export * from './batiMemory';
 export * from './talk';
 export * from './finds';
 export * from './batiVoice';
+export * from './legal';

@@ -57,12 +57,32 @@ function Typed({ lines, onDone }: { lines: string[]; onDone: () => void }) {
   );
 }
 
-export function SealGate({ onOpen }: { onOpen: () => void }) {
+/** the year already known (the start screen asked it: the account's onboarding_json.birthYear, or this device's key) */
+function knownBirthYear(known?: number | null): string {
+  if (known) return String(known);
+  try {
+    const y = Number(localStorage.getItem(BIRTH_YEAR_KEY));
+    return y > 1900 ? String(y) : '';
+  } catch {
+    return '';
+  }
+}
+
+export function SealGate({ onOpen, knownYear }: { onOpen: () => void; /** the account's birth year (asked on the start screen) */ knownYear?: number | null }) {
   const [typed, setTyped] = useState(false);
   const [voice, setVoice] = useState(false);
   const [sound, setSound] = useState(false);
   const [later, setLater] = useState(false);
   const [year, setYear] = useState('');
+  // asked once already (the start screen, M-R252): not asked a second time here
+  const [asked, setAsked] = useState(false);
+  useEffect(() => {
+    const y = knownBirthYear(knownYear);
+    if (y) {
+      setYear(y);
+      setAsked(true);
+    }
+  }, [knownYear]);
   const marked = voice && sound;
   const ready = marked && !!year;
   const thisYear = new Date().getFullYear();
@@ -93,7 +113,7 @@ export function SealGate({ onOpen }: { onOpen: () => void }) {
                   {mark(sound, setSound, '音声をONにした', 0.6)}
                 </>
               )}
-              {marked && (
+              {marked && !asked && (
                 <label className="mt-2 block text-[13px] tracking-[0.1em] text-amber-50/85 opacity-0 animate-[fadeUp_0.9s_ease-out_both]">
                   生まれた年を教えてください
                   <select value={year} onChange={(e) => setYear(e.target.value)} className="mt-2 block w-full rounded-full border border-amber-200/50 bg-black/70 px-4 py-2 text-[15px] text-amber-50">

@@ -98,7 +98,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     batiEgg: batiEggState({ born: batiSummaries(u).length, journeyDay: u.journeyDay, day9At: day9At(u) }),
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId, batiState: (u.voiceBatiState as BatiVoiceState | null) ?? (u.voiceBatiId ? 'ready' : 'none') },
-    consent: u.consentVersion && u.consentAt ? { version: u.consentVersion, at: u.consentAt.toISOString(), guardian: u.guardianConsentVersion === u.consentVersion && !!u.guardianConsentAt } : null,
+    consent: u.consentVersion && u.consentAt ? { version: u.consentVersion, at: u.consentAt.toISOString(), guardian: u.guardianConsentVersion === u.consentVersion && !!u.guardianConsentAt, media: (u.onboardingJson as Record<string, string> | null)?.['consent.media'] !== '0' } : null,
     mediaOk: canUseMedia(u),
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
@@ -126,13 +126,26 @@ export class UsersService {
   /**
    * M-R247: the start-of-app agreement (terms, privacy, and that photos and voice make only the member's look and
    * {bati}). Only the current version can be agreed to; it is kept with the time.
+   * M-R252: with the branch of the start screen — `media: false` (under 13 / no year, 13〜15 without the guardian) is
+   * kept as onboarding_json['consent.media'] = '0', so the photo and voice stay off whatever year is given later; and
+   * the year asked there, kept once as onboarding_json.birthYear (the same field and rule as PATCH /me, M-R150).
    */
-  async consent(userId: string, version: string, guardian = false): Promise<Me> {
+  async consent(userId: string, version: string, guardian = false, opts: { media?: boolean; birthYear?: number | null } = {}): Promise<Me> {
     if (version !== MEDIA_CONSENT_VERSION) throw apiError(HttpStatus.CONFLICT, 'CONSENT_OUTDATED', 'Please read the current terms');
     const now = new Date();
-    // M-R248: the guardian's line (13〜15) is kept with the same version; not ticked = none
-    const g = guardian ? { guardianConsentVersion: version, guardianConsentAt: now } : { guardianConsentVersion: null, guardianConsentAt: null };
-    const [nu] = await this.db.write.update(users).set({ consentVersion: version, consentAt: now, ...g, updatedAt: now }).where(eq(users.id, userId)).returning();
+    const noMedia = opts.media === false;
+    // M-R248: the guardian's line (13〜15) is kept with the same version; not ticked (or the branch without media) = none
+    const g = guardian && !noMedia ? { guardianConsentVersion: version, guardianConsentAt: now } : { guardianConsentVersion: null, guardianConsentAt: null };
+    const cur = ((await this.load(userId)).onboardingJson ?? {}) as Record<string, string>;
+    const json: Record<string, string> = { ...cur };
+    if (noMedia) json['consent.media'] = '0';
+    else delete json['consent.media'];
+    if (!cur.birthYear && opts.birthYear) json.birthYear = String(opts.birthYear);
+    const [nu] = await this.db.write
+      .update(users)
+      .set({ consentVersion: version, consentAt: now, ...g, onboardingJson: json, updatedAt: now })
+      .where(eq(users.id, userId))
+      .returning();
     if (!nu) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
     return toMe(nu);
   }
