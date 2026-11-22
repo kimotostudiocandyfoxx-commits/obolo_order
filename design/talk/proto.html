@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>隣に並ぶトーク</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Dela+Gothic+One&family=Klee+One:wght@600&display=swap">
 <style>
 /* layout: one night scene on the moon — the pair stands on the ground and talks; nothing else on screen */
 :root{
@@ -98,6 +98,28 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
   font:700 12px var(--font);color:var(--night);background:rgba(223,230,255,.92);border:0;border-radius:999px;padding:7px 16px;cursor:pointer;
   box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .bub.past{opacity:.97}
+/* bubble styles chosen per sentence (M-R243) */
+.bub em{font-style:normal}
+.bub em.b{font-weight:900}
+.bub em.big{font-weight:900;font-size:1.3em;line-height:1.2}
+.bub em.shout{font-family:'Dela Gothic One',var(--font);font-size:1.38em;line-height:1.2;letter-spacing:.02em}
+.bub.burst{border-radius:0;padding:26px 34px 28px;font-size:16px;
+  clip-path:polygon(50% 0,57% 9%,68% 2%,71% 12%,84% 8%,82% 19%,96% 20%,89% 31%,100% 40%,90% 48%,99% 60%,88% 64%,93% 78%,80% 77%,79% 91%,67% 84%,60% 98%,52% 87%,42% 99%,37% 86%,24% 94%,23% 81%,9% 84%,13% 70%,0 62%,10% 53%,1% 41%,12% 35%,5% 21%,19% 20%,18% 7%,31% 12%,36% 1%,44% 10%)}
+.bub.burst::after{display:none}
+.bub.cloud{border-radius:46% 54% 50% 50%/62% 58% 42% 38%;padding:15px 22px 16px}
+.bub.cloud::after{width:13px;height:13px;border-radius:50%;bottom:-17px;transform:none}
+.bub.cloud::before{content:"";position:absolute;bottom:-29px;width:8px;height:8px;border-radius:50%;background:inherit}
+.bub.cloud.bati::before,.bub.cloud.friend::before{left:18%}
+.bub.cloud.me::before{right:18%}
+.bub.whisper{font-family:'Klee One',var(--font);font-weight:600;font-size:14px;box-shadow:none;outline:2px dashed rgba(0,0,0,.28);outline-offset:-6px;opacity:.94}
+.in-slam{animation:slam .5s cubic-bezier(.2,1.7,.4,1)!important}
+@keyframes slam{0%{transform:scale(1.9) rotate(-5deg);opacity:0}45%{transform:scale(.9) rotate(2deg);opacity:1}70%{transform:scale(1.05) rotate(-1deg)}100%{transform:none}}
+.in-slow{animation:slowin .9s ease-out!important}
+@keyframes slowin{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.in-shake{animation:shakeb .45s ease-in-out!important}
+@keyframes shakeb{0%,100%{transform:none}20%{transform:translateX(-6px) rotate(-1deg)}40%{transform:translateX(5px) rotate(1deg)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.quake{animation:quake .28s linear}
+@keyframes quake{0%,100%{transform:none}25%{transform:translate(2px,-2px)}50%{transform:translate(-2px,2px)}75%{transform:translate(1px,1px)}}
 /* drawers */
 .drawer{position:absolute;top:0;bottom:0;width:min(84%,380px);z-index:40;background:rgba(10,14,44,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1px solid var(--glass-line);transition:transform .35s cubic-bezier(.3,.1,.2,1);display:flex;flex-direction:column;gap:14px;
@@ -184,24 +206,24 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     bati: { partner:'bati', title:'ウニュ（バティ）',
       history:[['bati','おはよ、ネオ！　よく眠れた？','smile'],['user','おはよう。ちょっと寝坊した','shy'],['bati','今日も月は静かだね〜','base'],['user','さっきのコロリン、作ったよ','smile'],['bati','いい声だった！　ほんとに！','surprised']],
       lines:[
-        ['user',[['ねえウニュ、明日の土星ってどんなとこ？','base','']]],
-        ['bati',[['土星はね、コロリンたちがレコードの上でサイファーしてる星だよ！','smile','hop'],['ネオのつぶやきも、きっと回ってるはず！','smile','']]],
-        ['user',[['え、マジで！？　見てみたい！','surprised','hop']]],
-        ['bati',[['でしょでしょ！','smile','hop'],['……でも、ボク、ちょっと緊張するかも？','thinking','tilt']]],
+        ['user',[['ねえウニュ、明日の土星ってどんなとこ？','base','',{in:'pop'}]]],
+        ['bati',[['土星はね、コロリンたちが**レコードの上でサイファー**してる星だよ！','smile','hop',{in:'pop'}],['ネオのつぶやきも、きっと回ってるはず！','smile','']]],
+        ['user',[['え、!!マジで！？!!　見てみたい！','surprised','hop',{in:'slam',shape:'burst'}]]],
+        ['bati',[['^^でしょでしょ！^^','smile','hop',{in:'shake'}],['……でも、ボク、ちょっと緊張するかも？','thinking','tilt',{in:'slow',shape:'cloud'}]]],
         ['user',[['ウニュも緊張するんだ笑','smile','']]],
-        ['bati',[['えへへ……バレた？','shy','']]],
+        ['bati',[['えへへ……バレた？','shy','',{in:'slow',shape:'whisper'}]]],
         ['user',[['明日、一緒に行こうな。','smile','']]],
-        ['bati',[['うん！　約束だよ、ネオ！','smile','hop']]],
+        ['bati',[['うん！　^^約束^^だよ、ネオ！','smile','hop',{in:'shake'}]]],
       ]},
     friend: { partner:'friend', title:'アポロ（ダチ）',
       history:[['friend','ういっす','smile'],['user','おつかれ！','smile'],['friend','俺のMV、見た？','thinking'],['user','まだ！　ごめん','shy'],['friend','見ろ見ろ。今すぐだ。','smile']],
       lines:[
-        ['friend',[['よう！　今日の曲、聴いたぞ。','smile',''],['サビで鳥肌が立った……。','surprised','lean']]],
-        ['user',[['ほんと！？　うれしい！','smile','hop']]],
+        ['friend',[['よう！　今日の曲、聴いたぞ。','smile','',{in:'pop'}],['サビで^^鳥肌^^が立った……。','surprised','lean',{in:'slow'}]]],
+        ['user',[['ほんと！？　**うれしい！**','smile','hop',{in:'shake'}]]],
         ['friend',[['次はMVもつけようぜ。','base',''],['俺、出演してもいいか？','thinking','tilt']]],
         ['user',[['その筋肉、画面に入りきらないって笑','smile','']]],
-        ['friend',[['……鍛えすぎたか。','sad',''],['いや、むしろ見せたい。','smile','hop']]],
-        ['user',[['じゃあ主役で！','smile','']]],
+        ['friend',[['……鍛えすぎたか。','sad','',{in:'slow',shape:'whisper'}],['いや、!!むしろ見せたい!!。','smile','hop',{in:'slam',shape:'burst'}]]],
+        ['user',[['じゃあ**主役**で！','smile','',{in:'pop'}]]],
       ]},
   };
 
@@ -292,30 +314,56 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     }
     const el = document.createElement('div'); el.className = `bub ${CAST[who].kind} enter`;
     els.bubbles.appendChild(el);
-    const b = { el, who, text:'' }; bubbles.push(b); return b;
+    const b = { el, who, text:'', html:'' }; bubbles.push(b); return b;
+  }
+
+  // text marks: **bold**  ^^bigger^^  !!shout!!  (chosen by the same AI call as the face, M-R243)
+  function parse(t){
+    const out=[]; const re=/(\*\*|\^\^|!!)(.+?)\1/g; let k=0, m;
+    while ((m=re.exec(t))){ if (m.index>k) out.push({t:t.slice(k,m.index),c:''}); out.push({t:m[2],c:{'**':'b','^^':'big','!!':'shout'}[m[1]]}); k=re.lastIndex; }
+    if (k<t.length) out.push({t:t.slice(k),c:''}); return out;
+  }
+  const esc = (x) => x.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  function htmlOf(segs, n){
+    let h='', left=n;
+    for (const g of segs){ if (left<=0) break; const part=g.t.slice(0,left); left-=part.length;
+      h += g.c ? `<em class="${g.c}">${esc(part)}</em>` : esc(part); }
+    return h;
+  }
+  const plainOf = (segs) => segs.map(g=>g.t).join('');
+  const SHAPES=['burst','cloud','whisper'];
+  function applyStyle(el, st, first){
+    SHAPES.forEach(c=>el.classList.remove(c)); if (st.shape && st.shape!=='round') el.classList.add(st.shape);
+    if (RM) return;
+    const inc = st.in==='slam' ? 'in-slam' : st.in==='slow' ? 'in-slow' : st.in==='shake' ? 'in-shake' : (first ? 'enter' : '');
+    if (!inc) return;
+    ['enter','in-slam','in-slow','in-shake'].forEach(c=>el.classList.remove(c)); void el.offsetWidth; el.classList.add(inc);
+    if (st.in==='slam'){ const app=$('#app'); app.classList.remove('quake'); void app.offsetWidth; app.classList.add('quake'); }
   }
 
   function typeSentence(b, s, a, done){
-    const [text, face, mv] = s;
+    const [text, face, mv, st0] = s; const st = st0 || {};
+    const segs = parse(text), total = plainOf(segs).length;
     setFace(a, face); motion(a, mv);
     const other = a===actor.left ? actor.right : actor.left;
     if (other){ other.body.classList.remove('nod'); void other.body.offsetWidth; if(!RM) other.body.classList.add('nod'); }
     a.el.classList.add('speaking'); a.talking = true;
-    const canFlap = true;
+    applyStyle(b.el, st, !b.html);
+    b.shape = st.shape || 'round';
     let i=0, flap=false;
-    const base = b.text;
+    const base = b.html || '';
+    const speed = st.in==='slow' ? 105 : st.in==='slam' ? 34 : 60;
     const tick = () => {
       i++;
-      b.el.innerHTML = '';
-      b.el.textContent = base + text.slice(0,i);
-      const c=document.createElement('i'); c.className='caret'; b.el.appendChild(c);
-      if (canFlap && i%2===0){ flap=!flap; setImg(a, flap?PIC(a.face,'talk'):PIC(a.face), true); }
-      if (i>=text.length){ finish(); return; }
-      typing = setTimeout(tick, /[、。！？…]/.test(text[i-1]) ? 210 : 62);
+      b.el.innerHTML = base + htmlOf(segs, i) + '<i class="caret"></i>';
+      if (i%2===0){ flap=!flap; setImg(a, flap?PIC(a.face,'talk'):PIC(a.face), true); }
+      if (i>=total){ finish(); return; }
+      const ch = plainOf(segs)[i-1];
+      typing = setTimeout(tick, /[、。！？…]/.test(ch) ? (st.in==='slow' ? 380 : 210) : speed);
     };
     const finish = () => {
       clearTimeout(typing); typing=null;
-      b.text = base + text; b.el.textContent = b.text;
+      b.html = base + htmlOf(segs, total); b.text = (b.text||'') + plainOf(segs); b.el.innerHTML = b.html;
       setImg(a, PIC(a.face), true); a.talking=false; a.el.classList.remove('speaking');
       done();
     };
@@ -333,7 +381,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     camera(slotOf(who));
     si=0;
     const next = () => {
-      if (si >= sentences.length){ log.push({ who, text:b.text, face:a.face }); li++; cur=null; cameraRest(700); later(step, 1100); return; }
+      if (si >= sentences.length){ log.push({ who, text:b.text, html:b.html, shape:b.shape, face:a.face }); li++; cur=null; cameraRest(700); later(step, 1100); return; }
       const s = sentences[si++];
       cur = b; typeSentence(b, s, a, () => { later(next, 650); });
     };
@@ -395,7 +443,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     const shown = log.slice(Math.max(0, end - 2), end);
     els.bubbles.innerHTML = ''; bubbles = [];
     shown.forEach((m, i) => { const el = document.createElement('div');
-      el.className = `bub ${CAST[m.who].kind} past` + (i < shown.length - 1 ? ' old' : ''); el.textContent = m.text; els.bubbles.appendChild(el); });
+      el.className = `bub ${CAST[m.who].kind} past ${m.shape&&m.shape!=='round'?m.shape:''}` + (i < shown.length - 1 ? ' old' : ''); el.innerHTML = m.html || esc(m.text); els.bubbles.appendChild(el); });
     // both speakers take the face they had at that moment
     ['left','right'].forEach(slot => { const a = actor[slot];
       const m = log.slice(0, end).reverse().find(x => slotOf(x.who) === slot);
@@ -406,8 +454,8 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     view = 0; paused = false; $('#back').hidden = true;
     els.bubbles.innerHTML = ''; bubbles = [];
     log.slice(-2).forEach((m, i, arr) => { const el = document.createElement('div');
-      el.className = `bub ${CAST[m.who].kind}` + (i < arr.length - 1 ? ' old' : ''); el.textContent = m.text; els.bubbles.appendChild(el);
-      bubbles.push({ el, who:m.who, text:m.text }); });
+      el.className = `bub ${CAST[m.who].kind} ${m.shape&&m.shape!=='round'?m.shape:''}` + (i < arr.length - 1 ? ' old' : ''); el.innerHTML = m.html || esc(m.text); els.bubbles.appendChild(el);
+      bubbles.push({ el, who:m.who, text:m.text, html:m.html||esc(m.text) }); });
     ['left','right'].forEach(slot => { const m = log.slice().reverse().find(x => slotOf(x.who) === slot); if (m) setFace(actor[slot], m.face); });
     later(step, 900);
   }
