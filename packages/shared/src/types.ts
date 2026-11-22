@@ -114,6 +114,8 @@ export interface InviteView {
 
 export interface MyInviteView extends InviteView {
   email: string;
+  /** a voice note was recorded with it (M-R212) */
+  voice?: boolean;
   createdAt: string;
 }
 

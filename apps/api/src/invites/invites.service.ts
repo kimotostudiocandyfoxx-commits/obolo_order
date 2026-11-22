@@ -12,6 +12,7 @@ import type { EmailSender } from '../infra/email';
 import { EMAIL } from '../infra/tokens';
 import { toMe } from '../users/users.service';
 import { LedgerService } from '../wallet/ledger.service';
+import { MediaService } from '../media/media.service';
 
 /** PLACEHOLDER (P-INV-1): how many invitations a member may send per 30 days. */
 export const INVITES_PER_MONTH = 10;
@@ -33,6 +34,7 @@ export class InvitesService {
     private readonly db: Database,
     private readonly ledger: LedgerService,
     private readonly auth: AuthService,
+    private readonly media: MediaService,
   ) {}
 
   async get(code: string): Promise<InviteView> {
@@ -48,11 +50,11 @@ export class InvitesService {
       .where(eq(invites.inviterUserId, userId))
       .orderBy(desc(invites.createdAt))
       .limit(50);
-    return rows.map((r) => ({ ...toView(r), email: r.email, createdAt: r.createdAt.toISOString() }));
+    return rows.map((r) => ({ ...toView(r), email: r.email, createdAt: r.createdAt.toISOString(), voice: !!r.voiceUrl }));
   }
 
   /** A member invites someone. */
-  async createByMember(userId: string, email: string, message?: string) {
+  async createByMember(userId: string, email: string, message?: string, voice?: { mediaId: string; seconds: number | null }) {
     const [me] = await this.db.write.select().from(users).where(eq(users.id, userId));
     if (!me) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
     const since = new Date(Date.now() - 30 * 86400_000);
@@ -61,7 +63,14 @@ export class InvitesService {
       .from(invites)
       .where(and(eq(invites.inviterUserId, userId), gte(invites.createdAt, since)));
     if (n >= INVITES_PER_MONTH) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'INVITE_LIMIT', 'Invitation limit reached');
-    return this.create(email, me.displayName, me.id, me.locale as Locale, message);
+    // the voice note (M-R212): one of your own recordings; it plays in their {inviter} thread on Saturn
+    let note: { mediaId: string; url: string; seconds: number | null } | undefined;
+    if (voice) {
+      const m = await this.media.getOwned(userId, voice.mediaId, 'voice');
+      if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
+      note = { mediaId: m.id, url: m.url, seconds: voice.seconds };
+    }
+    return this.create(email, me.displayName, me.id, me.locale as Locale, message, note);
   }
 
   /** Operator-issued invitation (bootstraps the first members). */
@@ -69,7 +78,7 @@ export class InvitesService {
     return this.create(email, inviterName, null, 'ja', message);
   }
 
-  private async create(email: string, inviterName: string, inviterUserId: string | null, locale: Locale, message?: string) {
+  private async create(email: string, inviterName: string, inviterUserId: string | null, locale: Locale, message?: string, voice?: { mediaId: string; url: string; seconds: number | null }) {
     const [member] = await this.db.write.select({ id: users.id }).from(users).where(eq(users.email, email));
     if (member) throw apiError(HttpStatus.CONFLICT, 'ALREADY_MEMBER', 'This person is already a member');
     const code = randomBytes(12).toString('base64url');
@@ -81,6 +90,9 @@ export class InvitesService {
         inviterName,
         inviterUserId,
         message: message?.trim() || null,
+        voiceMediaId: voice?.mediaId ?? null,
+        voiceUrl: voice?.url ?? null,
+        voiceSeconds: voice?.seconds ?? null,
         expiresAt: new Date(Date.now() + this.cfg.INVITE_TTL_DAYS * 86400_000),
       })
       .returning();
@@ -93,7 +105,7 @@ export class InvitesService {
           : `${inviterName} has invited you to OBOLO ORDER headquarters.\n\n${url}\n\nThis link is valid for ${this.cfg.INVITE_TTL_DAYS} days.`;
       await this.email.send(email, subject, text).catch((e) => this.log.warn(`invite email failed: ${String(e)}`));
     }
-    return { ...toView(row), email: row.email, createdAt: row.createdAt.toISOString() };
+    return { ...toView(row), email: row.email, createdAt: row.createdAt.toISOString(), voice: !!row.voiceUrl };
   }
 
   /** Visitor tells OBOLON their name → the account is created and a session issued. */

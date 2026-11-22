@@ -1,4 +1,9 @@
 import {
+  KIMORIN_WAIT_LINES,
+  MIKIE_WELCOME,
+  dachiLine,
+  type DachiMessageView,
+  type DachiThreadView,
   RADIO_LIVE_STALE_SECONDS,
   type BluenaKeptView,
   type CreateRadioShowBody,
@@ -13,6 +18,9 @@ import {
   type RadioShowView,
   type StartRadioLiveBody,
   isFlying,
+  seesOnlyDachi,
+  type PlanetWorkKind,
+  type PlanetWorkReportBody,
   type DeliveryView,
   EMPTY_ATELIER,
   type AtelierLayout,
@@ -107,6 +115,10 @@ interface DemoState {
   follows?: Record<string, string[]>;
   /** the inviter became a dachi (Saturn D04-S005c) */
   dachiInviter?: boolean;
+  /** when D04-S005c happened (the ダチ threads show from then, M-R212) */
+  dachiAt?: string;
+  /** ダチの声のメッセージ in this browser (`thread` = 'demo-inviter' | 'kimorin' | 'mikie') */
+  dachiMsgs?: (DachiMessageView & { thread: string; lineId?: string; read?: boolean })[];
   /** works delivered to the dachi (〔推し〕) */
   deliveries?: DeliveryView[];
   /** Jupiter (パタパタ): roots, posts, branch names — this browser only */
@@ -127,6 +139,8 @@ interface DemoState {
   radioLives?: (Omit<RadioLiveView, 'host' | 'mine'> & { owner: string; beat: number })[];
   radioMessages?: (Omit<RadioMessageView, 'from' | 'mine'> & { liveId: string; owner: string; hidden?: boolean })[];
   radioPerm?: Record<string, boolean>;
+  /** M-R213: works each member chose 〔見えなくする〕 on (`kind:id`) */
+  workHides?: Record<string, string[]>;
   bluenaKeeps?: Record<string, string[]>;
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
 }
@@ -229,6 +243,34 @@ export class DemoApi implements Api {
       /* quota */
     }
   }
+  /**
+   * M-R213 (the server's planetWorkScope): may the viewer see this work on a planet — own, a dachi's, or a stranger's
+   * when the viewer is 15 or over (a missing birth year counts as under 15); never one they hid.
+   */
+  private seesWork(kind: PlanetWorkKind, id: string, owner: string): boolean {
+    const viewer = this.uid();
+    if (owner === viewer) return true;
+    if ((this.s.workHides?.[viewer] ?? []).includes(`${kind}:${id}`)) return false;
+    const f = this.s.follows ?? {};
+    const dachi = ((f[viewer] ?? []).includes(owner) && (f[owner] ?? []).includes(viewer)) || (owner === 'demo-inviter' && !!this.s.dachiInviter);
+    return dachi || !seesOnlyDachi(this.s.users[viewer]?.birthYear);
+  }
+
+  async hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean) {
+    const viewer = this.uid();
+    const key = `${kind}:${id}`;
+    const l = new Set(this.s.workHides?.[viewer] ?? []);
+    if (on) l.add(key);
+    else l.delete(key);
+    this.s.workHides = { ...(this.s.workHides ?? {}), [viewer]: [...l] };
+    this.save();
+    return { hidden: on };
+  }
+
+  async reportPlanetWork(_kind: PlanetWorkKind, _id: string, _body: PlanetWorkReportBody) {
+    await sleep(300);
+  }
+
   private uid(): string {
     const t = tokenStore.get();
     const id = t ? this.s.sessions[t] : undefined;
@@ -558,7 +600,7 @@ export class DemoApi implements Api {
     const mutual = new Set((f[viewer] ?? []).filter((u) => (f[u] ?? []).includes(viewer)));
     const mine = tab === 'friends' ? mutual : new Set([...(f[viewer] ?? []), viewer]);
     const sorted = [...this.s.posts]
-      .filter((p) => !p.replyToId && !p.room && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (plaza ? p.plazaId === plaza : !tab || tab === 'all' || mine.has(p.author.id)))
+      .filter((p) => !p.replyToId && !p.room && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && (plaza ? p.plazaId === plaza : !tab || tab === 'all' || mine.has(p.author.id)) && this.seesWork('saturn_post', p.id, p.author.id))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const start = cursor ? Number(cursor) : 0;
     return {
@@ -593,7 +635,7 @@ export class DemoApi implements Api {
     // your own page is your room: everything you made stays; others see what is still on the planet
     const own = viewer === userId;
     const items = this.s.posts
-      .filter((p) => p.author.id === userId && !p.replyToId && (own || (!p.room && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000)))
+      .filter((p) => p.author.id === userId && !p.replyToId && (own || (!p.room && Date.now() - new Date(p.createdAt).getTime() < SATURN_LIFETIME_HOURS * 3600_000 && this.seesWork('saturn_post', p.id, p.author.id))))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .map((p) => this.view(p, viewer));
     return { items, nextCursor: null };
@@ -913,6 +955,7 @@ export class DemoApi implements Api {
   }
   async befriendInviter() {
     this.s.dachiInviter = true;
+    this.s.dachiAt ??= now();
     this.save();
     const inviter = this.s.users[this.uid()]?.invitedByName;
     return inviter ? { id: 'demo-inviter', displayName: inviter, pic: null } : null;
@@ -943,6 +986,73 @@ export class DemoApi implements Api {
       this.save();
     }
     return { to };
+  }
+  /**
+   * demo: what arrives in the ダチ threads — MIKIE⭐︎DRILL's welcome (the demo inviter recorded nothing), and KIMORIN⭐︎'s
+   * lines of the wait. For review the wait is short: the day's lines come 1 and 2 minutes after the day is finished
+   * (the server puts them at night, shared kimorinSchedule).
+   */
+  private dachiArrive() {
+    const me = this.s.users[this.uid()];
+    if (!this.s.dachiAt || !me) return [];
+    const list = (this.s.dachiMsgs ??= []);
+    const sent = new Set(list.map((m) => m.lineId).filter(Boolean));
+    const line = (id: string, thread: string, at: string) => {
+      const l = dachiLine(id)!;
+      list.push({ id: uid(), thread, lineId: id, fromMe: false, character: l.who, kind: 'voice', audioUrl: l.voice, seconds: null, text: l.text, work: null, createdAt: at });
+    };
+    if (!sent.has('welcome')) line(MIKIE_WELCOME.id, this.s.dachiInviter && me.invitedByName ? 'demo-inviter' : 'mikie', this.s.dachiAt);
+    const done = me.journeyCompletedAt ? Date.parse(me.journeyCompletedAt) : null;
+    if (done && done >= Date.parse(this.s.dachiAt) - 86400_000) {
+      KIMORIN_WAIT_LINES.filter((l) => l.day === me.journeyDay)
+        .slice(0, 2)
+        .forEach((l, k) => {
+          const at = done + (k + 1) * 60_000;
+          if (!sent.has(l.id) && at <= Date.now()) line(l.id, 'kimorin', new Date(at).toISOString());
+        });
+    }
+    list.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    this.save();
+    return list;
+  }
+  async dachiThreads(): Promise<DachiThreadView[]> {
+    const list = this.dachiArrive();
+    if (!this.s.dachiAt) return [];
+    const me = this.s.users[this.uid()];
+    const view = (id: string, kind: DachiThreadView['kind'], name: string): DachiThreadView => {
+      const mine = list.filter((m) => m.thread === id);
+      return { id, kind, name, pic: null, unread: mine.some((m) => !m.fromMe && !m.read), lastAt: mine.at(-1)?.createdAt ?? null };
+    };
+    const out: DachiThreadView[] = [];
+    if (this.s.dachiInviter && me?.invitedByName) out.push(view('demo-inviter', 'dachi', me.invitedByName));
+    if (list.some((m) => m.thread === 'mikie')) out.push(view('mikie', 'mikie', 'MIKIE⭐︎DRILL'));
+    out.push(view('kimorin', 'kimorin', 'KIMORIN⭐︎'));
+    return out;
+  }
+  private dachiThreadOk(thread: string) {
+    const ok = !!this.s.dachiAt && (thread === 'kimorin' || thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter));
+    if (!ok) throw new ApiError(403, 'NOT_DACHI', 'Voice messages go only between ダチ');
+  }
+  async dachiMessages(thread: string) {
+    this.dachiThreadOk(thread);
+    return this.dachiArrive()
+      .filter((m) => m.thread === thread)
+      .map(({ thread: _t, lineId: _l, read: _r, ...m }) => m);
+  }
+  async sendDachiMessage(thread: string, body: Parameters<Api['sendDachiMessage']>[1]) {
+    this.dachiThreadOk(thread);
+    await sleep(300);
+    const m: DachiMessageView =
+      'mediaId' in body
+        ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: null, work: null, createdAt: now() }
+        : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, createdAt: now() };
+    (this.s.dachiMsgs ??= []).push({ ...m, thread });
+    this.save();
+    return m;
+  }
+  async readDachiThread(thread: string) {
+    for (const m of this.s.dachiMsgs ?? []) if (m.thread === thread) m.read = true;
+    this.save();
   }
   async oshi(kind?: Parameters<Api['oshi']>[0]) {
     const since = Date.now() - 88 * 3600_000;
@@ -994,7 +1104,7 @@ export class DemoApi implements Api {
     const f = this.s.follows ?? {};
     const since = Date.now() - JUPITER_FLY_HOURS * 3600_000;
     const ok = (o: string) => tab === 'all' || o === viewer || (tab === 'following' ? (f[viewer] ?? []).includes(o) : (f[viewer] ?? []).includes(o) && (f[o] ?? []).includes(viewer));
-    const flying = (this.s.jposts ?? []).filter((p) => new Date(p.createdAt).getTime() > since && ok(p.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const flying = (this.s.jposts ?? []).filter((p) => new Date(p.createdAt).getTime() > since && ok(p.owner) && this.seesWork('jupiter_post', p.id, p.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const by = new Map<string, JupiterFlyer>();
     for (const p of flying) {
       const fl = by.get(p.owner) ?? { author: this.jAuthor(p.owner), posts: [] };
@@ -1073,7 +1183,7 @@ export class DemoApi implements Api {
   async jupiterTree(userId: string): Promise<JupiterTreeView> {
     const viewer = this.uid();
     const since = Date.now() - JUPITER_FLY_HOURS * 3600_000;
-    const mine = (this.s.jposts ?? []).filter((p) => p.owner === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const mine = (this.s.jposts ?? []).filter((p) => p.owner === userId && this.seesWork('jupiter_post', p.id, p.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const f = this.s.follows ?? {};
     return {
       author: this.jAuthor(userId),
@@ -1124,7 +1234,7 @@ export class DemoApi implements Api {
     const cut = Date.now() - 88 * 3600_000;
     const ok = (o: string) => tab === 'all' || o === viewer || (tab === 'following' ? (f[viewer] ?? []).includes(o) : (f[viewer] ?? []).includes(o) && (f[o] ?? []).includes(viewer));
     const by = new Map<string, PlanetFlyer>();
-    for (const p of (this.s.pposts ?? []).filter((x) => x.planet === planet && new Date(x.createdAt).getTime() > cut && ok(x.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
+    for (const p of (this.s.pposts ?? []).filter((x) => x.planet === planet && new Date(x.createdAt).getTime() > cut && ok(x.owner) && this.seesWork('planet_post', x.id, x.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
       const fl = by.get(p.owner) ?? { author: this.pAuthor(p.owner), posts: [] };
       fl.posts.push(this.pView(p, viewer));
       by.set(p.owner, fl);
@@ -1135,7 +1245,7 @@ export class DemoApi implements Api {
   async planetProfile(planet: TimelinePlanet, userId: string): Promise<PlanetProfileView> {
     const viewer = this.uid();
     const cut = Date.now() - 88 * 3600_000;
-    const mine = (this.s.pposts ?? []).filter((p) => p.planet === planet && p.owner === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const mine = (this.s.pposts ?? []).filter((p) => p.planet === planet && p.owner === userId && this.seesWork('planet_post', p.id, p.owner)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return {
       author: this.pAuthor(userId),
       flying: mine.filter((p) => new Date(p.createdAt).getTime() > cut).map((p) => this.pView(p, viewer)),
@@ -1203,14 +1313,20 @@ export class DemoApi implements Api {
   async followPerson(): Promise<never> {
     return this.noComms();
   }
-  async blockPerson(): Promise<never> {
-    return this.noComms();
+  /** demo: only the demo inviter can be blocked (from the ダチ thread's menu, M-R212): they stop being a dachi */
+  async blockPerson(id: string, on: boolean): Promise<Awaited<ReturnType<Api['blockPerson']>>> {
+    if (id !== 'demo-inviter') return this.noComms();
+    if (on) this.s.dachiInviter = false;
+    this.save();
+    const name = this.s.users[this.uid()]?.invitedByName ?? '';
+    return { id, handle: 'inviter', displayName: name, neoForm: null, pic: null, followedByMe: false, followsMe: false, blockedByMe: on };
   }
   async blockedPeople(): Promise<never[]> {
     return [];
   }
-  async reportPerson(): Promise<never> {
-    return this.noComms();
+  async reportPerson(body: Parameters<Api['reportPerson']>[0]): Promise<void> {
+    if (body.userId !== 'demo-inviter') return this.noComms();
+    await sleep(300);
   }
   async dmMessages(): Promise<never[]> {
     return [];
@@ -1385,13 +1501,14 @@ export class DemoApi implements Api {
       .reverse();
   }
 
-  async createInvite(email: string, message?: string) {
+  async createInvite(email: string, message?: string, voice?: { mediaId: string; seconds: number }) {
     const id = this.uid();
     const code = Array.from(crypto.getRandomValues(new Uint8Array(9)), (b) => b.toString(16).padStart(2, '0')).join('');
     const inv = { code, inviterName: this.s.users[id].displayName, email, status: 'pending' as const, createdAt: now(), inviterId: id, message: message?.trim().slice(0, 60) || null };
     this.invites()[code] = inv;
     this.save();
-    return { ...inv, expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
+    // demo: the voice note stays in this browser (there is nobody on the other side to hear it)
+    return { ...inv, voice: !!voice, expiresAt: new Date(Date.now() + 14 * 86400_000).toISOString() };
   }
 
   // --- Venus radio (demo: this browser only; the residents' shows are samples) -------------------
@@ -1429,10 +1546,10 @@ export class DemoApi implements Api {
     const viewer = this.uid();
     await sleep(150);
     return {
-      live: this.rLives().filter((l) => l.status === 'live').map((l) => this.rLiveView(l, viewer)),
+      live: this.rLives().filter((l) => l.status === 'live' && this.seesWork('radio_show', l.id, l.owner)).map((l) => this.rLiveView(l, viewer)),
       // M-R208: on the air (waves above the clouds) for 88 hours after publishing, then back in the owner's booth
       shows: this.rShows()
-        .filter((r) => r.status === 'public' && isFlying(r.publishedAt))
+        .filter((r) => r.status === 'public' && isFlying(r.publishedAt) && this.seesWork('radio_show', r.id, r.owner))
         .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
         .map((r) => this.rShowView(r, viewer)),
     };
@@ -1480,7 +1597,7 @@ export class DemoApi implements Api {
   async radioHostShows(hostId: string) {
     const viewer = this.uid();
     return this.rShows()
-      .filter((r) => r.owner === hostId && r.status === 'public' && r.publishedAt && !isFlying(r.publishedAt))
+      .filter((r) => r.owner === hostId && r.status === 'public' && r.publishedAt && !isFlying(r.publishedAt) && this.seesWork('radio_show', r.id, r.owner))
       .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
       .map((r) => this.rShowView(r, viewer));
   }

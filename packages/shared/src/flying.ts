@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * M-R208 (client decision, approved): 「飛ばした作品は、飛ばしてから88時間、その星のみんなが見られる広い場所で生きている。
  * 88時間が終わると、自分の場所に帰る」. One rule for every planet (separate from the 88-minutes-a-day gate):
@@ -43,3 +45,17 @@ export function splitFlying<T>(items: readonly T[], flownAt: (x: T) => When | nu
   for (const x of items) (isFlying(flownAt(x), now) ? flying : home).push(x);
   return { flying, home };
 }
+
+// --- M-R213: strangers' works on a planet's wide place: 〔通報〕 and 〔見えなくする〕 -----------------------------------
+
+/** which kind of planet work: Saturn kororin, Jupiter butterfly, Mercury / Mars post, Venus show */
+export const PLANET_WORK_KINDS = ['saturn_post', 'jupiter_post', 'planet_post', 'radio_show'] as const;
+export type PlanetWorkKind = (typeof PLANET_WORK_KINDS)[number];
+export const PlanetWorkHideBody = z.object({ on: z.boolean() });
+export type PlanetWorkHideBody = z.infer<typeof PlanetWorkHideBody>;
+export const PlanetWorkReportBody = z.object({
+  reason: z.enum(['mean', 'scary', 'other']),
+  note: z.string().trim().max(200).optional(),
+});
+export type PlanetWorkReportBody = z.infer<typeof PlanetWorkReportBody>;
+

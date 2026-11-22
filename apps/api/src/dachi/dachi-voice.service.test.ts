@@ -1,0 +1,210 @@
+import { KIMORIN_PER_WAIT, KIMORIN_WAIT_LINES, kimorinDue, kimorinSchedule, MIKIE_WELCOME, type SendDachiMessageBody } from '@obolo/shared';
+import { describe, expect, it } from 'vitest';
+import { DachiVoiceService, reachable, welcomeRow } from './dachi-voice.service';
+
+/** the API error's code ({ error: { code } }) */
+const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: string } } }).getResponse?.().error?.code ?? null);
+
+type Row = Record<string, unknown> & { id: string; createdAt: Date; senderId: string | null; recipientId: string | null };
+
+/** a service with its database lookups replaced by a little world in memory */
+function world() {
+  const follows = new Set<string>();
+  const blocks = new Set<string>();
+  const people: Record<string, { journeyDay: number; journeyCompletedAt: Date | null; dachiAt: Date | null; displayName: string }> = {};
+  const invitations: Record<string, { inviterId: string | null; voiceUrl: string | null; voiceMediaId: string | null; voiceSeconds: number | null }> = {};
+  const rows: Row[] = [];
+  const pushes: string[] = [];
+  const media = { getOwned: async (userId: string, id: string) => (id.startsWith(userId.slice(0, 1)) ? { id, url: `https://cdn/${id}.webm` } : null) };
+  const push = { notify: async (to: string) => void pushes.push(to) };
+  const s = new DachiVoiceService({} as never, { list: async () => [] } as never, media as never, push as never);
+  const x = s as unknown as Record<string, unknown>;
+  x.journey = async (id: string) => people[id] ?? null;
+  x.areDachi = async (a: string, b: string) =>
+    a !== b && reachable({ follows: Number(follows.has(`${a}>${b}`)) + Number(follows.has(`${b}>${a}`)), blocks: Number(blocks.has(`${a}>${b}`)) + Number(blocks.has(`${b}>${a}`)), peerOk: true });
+  x.invitation = async (id: string) => invitations[id] ?? null;
+  x.sentLines = async (id: string) => rows.filter((r) => r.recipientId === id && r.lineId).map((r) => r.lineId as string);
+  x.insertLines = async (rs: Row[]) => {
+    for (const r of rs) if (!rows.some((o) => o.recipientId === r.recipientId && o.lineId === r.lineId)) rows.push({ ...r, id: `m${rows.length}`, createdAt: r.createdAt ?? new Date() });
+  };
+  x.insertMessage = async (r: Row) => {
+    const m = { ...r, id: `m${rows.length}`, createdAt: new Date() };
+    rows.push(m);
+    return m;
+  };
+  x.rows = async () => rows;
+  const dachi = (a: string, b: string) => {
+    follows.add(`${a}>${b}`);
+    follows.add(`${b}>${a}`);
+  };
+  return { s, follows, blocks, people, invitations, rows, pushes, dachi };
+}
+
+const A = 'a0000000-0000-4000-8000-000000000001';
+const B = 'b0000000-0000-4000-8000-000000000002';
+const C = 'c0000000-0000-4000-8000-000000000003';
+const voice = (who: string): SendDachiMessageBody => ({ mediaId: `${who.slice(0, 1)}1111111-1111-4111-8111-111111111111`, seconds: 4.2 });
+
+describe('ダチの声のメッセージ: who may write (M-R212)', () => {
+  it('dachi can send each other voice and work cards; the other is notified', async () => {
+    const w = world();
+    w.dachi(A, B);
+    const m = await w.s.send(A, B, voice(A));
+    expect(m).toMatchObject({ fromMe: true, kind: 'voice', audioUrl: expect.stringContaining('https://cdn/'), seconds: 4.2 });
+    await w.s.send(B, A, { work: { kind: 'song', title: 'うた', text: '' } });
+    expect(w.rows.at(-1)).toMatchObject({ senderId: B, recipientId: A, kind: 'work' });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(w.pushes).toEqual([B, A]);
+  });
+
+  it('a one-way follow, a stranger or oneself cannot write or read', async () => {
+    const w = world();
+    w.follows.add(`${A}>${B}`);
+    await expect(w.s.send(A, B, voice(A))).rejects.toThrow();
+    await expect(w.s.send(A, C, voice(A))).rejects.toThrow();
+    await expect(w.s.messages(C, A)).rejects.toThrow();
+    await expect(w.s.send(A, A, voice(A))).rejects.toThrow();
+    expect(w.rows).toHaveLength(0);
+  });
+
+  it('a block either way stops it (and looks the same as not being dachi)', async () => {
+    const w = world();
+    w.dachi(A, B);
+    w.blocks.add(`${B}>${A}`);
+    expect(code(await w.s.send(A, B, voice(A)).catch((e: unknown) => e))).toBe('NOT_DACHI');
+    await expect(w.s.send(B, A, voice(B))).rejects.toThrow();
+    await expect(w.s.messages(A, B)).rejects.toThrow();
+  });
+
+  it('only your own recording can be sent', async () => {
+    const w = world();
+    w.dachi(A, B);
+    expect(code(await w.s.send(A, B, voice(B)).catch((e: unknown) => e))).toBe('MEDIA_NOT_FOUND');
+  });
+
+  it('the characters’ threads open only once dachi (D04-S005c)', async () => {
+    const w = world();
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: null, displayName: 'a' };
+    await expect(w.s.send(A, 'kimorin', voice(A))).rejects.toThrow();
+    expect(await w.s.threads(A)).toEqual([]);
+    w.people[A].dachiAt = new Date();
+    const m = await w.s.send(A, 'kimorin', voice(A));
+    expect(m.fromMe).toBe(true);
+    expect(w.rows.at(-1)).toMatchObject({ senderId: A, recipientId: null, character: 'kimorin' });
+  });
+
+  it('the shapes of the rule itself', () => {
+    expect(reachable({ follows: 2, blocks: 0, peerOk: true })).toBe(true);
+    expect(reachable({ follows: 1, blocks: 0, peerOk: true })).toBe(false);
+    expect(reachable({ follows: 2, blocks: 1, peerOk: true })).toBe(false);
+    expect(reachable({ follows: 2, blocks: 0, peerOk: false })).toBe(false);
+  });
+});
+
+describe('the first voice message: {inviter}’s, else MIKIE⭐︎DRILL’s', () => {
+  const at = new Date('2026-11-01T10:00:00Z');
+  it('{inviter} recorded a voice with the invitation: it comes from them', () => {
+    expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })).toMatchObject({ senderId: B, recipientId: A, audioUrl: 'https://cdn/v.webm', lineId: 'welcome' });
+  });
+  it('no voice recorded: MIKIE⭐︎DRILL’s welcome, in {inviter}’s thread', () => {
+    expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: true, voiceUrl: null, voiceMediaId: null, voiceSeconds: null })).toMatchObject({ senderId: null, character: 'mikie', peerId: B, lineId: MIKIE_WELCOME.id });
+  });
+  it('no inviter (an operator invitation), or not dachi with them: in MIKIE⭐︎DRILL’s own thread', () => {
+    expect(welcomeRow(A, at, null)).toMatchObject({ senderId: null, character: 'mikie', peerId: null });
+    expect(welcomeRow(A, at, { inviterId: B, inviterIsDachi: false, voiceUrl: 'https://cdn/v.webm', voiceMediaId: null, voiceSeconds: 5 })).toMatchObject({ character: 'mikie', peerId: null });
+  });
+  it('MIKIE⭐︎DRILL’s line, word for word', () => {
+    expect(MIKIE_WELCOME.text).toBe('ようこそ。……あなたのつぶやき、聞こえたわよ。');
+  });
+
+  it('arrives once, when becoming dachi; shown with its words', async () => {
+    const w = world();
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'a' };
+    w.invitations[A] = { inviterId: null, voiceUrl: null, voiceMediaId: null, voiceSeconds: null };
+    await w.s.arrive(A);
+    await w.s.arrive(A);
+    expect(w.rows.filter((r) => r.lineId === 'welcome')).toHaveLength(1);
+    const v = w.s.toView(A, w.rows[0] as never);
+    expect(v).toMatchObject({ character: 'mikie', text: MIKIE_WELCOME.text, fromMe: false });
+  });
+
+  it('{inviter}’s own recording, when they are dachi', async () => {
+    const w = world();
+    w.dachi(A, B);
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'a' };
+    w.invitations[A] = { inviterId: B, voiceUrl: 'https://cdn/hello.webm', voiceMediaId: null, voiceSeconds: 3 };
+    await w.s.arrive(A);
+    expect(w.rows[0]).toMatchObject({ senderId: B, recipientId: A, audioUrl: 'https://cdn/hello.webm' });
+  });
+});
+
+describe('KIMORIN⭐︎ during the waits (M-R214)', () => {
+  const H = 3600_000;
+  // finished day 3 at 15:00 JST
+  const done3 = new Date('2026-11-03T06:00:00Z');
+
+  it('the lines are the client’s words: two for the waits of days 3–5, one for days 6 and 7', () => {
+    expect(KIMORIN_WAIT_LINES).toHaveLength(8);
+    expect(KIMORIN_WAIT_LINES[6].text).toBe('明日は、金星。……電子レンジの次は、何でしょうね。私の推理では、、、言いません。');
+    expect(KIMORIN_WAIT_LINES[5].text).toContain('？　私の');
+    for (const d of [3, 4, 5]) expect(KIMORIN_WAIT_LINES.filter((l) => l.day === d)).toHaveLength(2);
+    for (const d of [6, 7]) expect(KIMORIN_WAIT_LINES.filter((l) => l.day === d)).toHaveLength(1);
+  });
+
+  it('at night (Japan time), inside the 24 h wait, at most two, the same for the same person', () => {
+    for (const u of [A, B, C]) {
+      for (let h = 0; h < 24; h += 0.5) {
+        const done = new Date(done3.getTime() + h * H);
+        const s = kimorinSchedule(u, 3, done);
+        expect(s.length).toBeLessThanOrEqual(KIMORIN_PER_WAIT);
+        for (const { at } of s) {
+          expect(at.getTime()).toBeGreaterThan(done.getTime());
+          expect(at.getTime()).toBeLessThan(done.getTime() + 24 * H);
+          const jstHour = (at.getUTCHours() + 9) % 24;
+          expect(jstHour >= 20 || jstHour < 2).toBe(true);
+        }
+        expect(kimorinSchedule(u, 3, done)).toEqual(s);
+      }
+    }
+  });
+
+  it('nothing before becoming dachi, nothing outside a wait, nothing of another day', () => {
+    const late = new Date(done3.getTime() + 23 * H);
+    expect(kimorinDue({ userId: A, journeyDay: 3, journeyCompletedAt: done3, dachiAt: null, sent: [], now: late })).toEqual([]);
+    expect(kimorinDue({ userId: A, journeyDay: 3, journeyCompletedAt: null, dachiAt: done3, sent: [], now: late })).toEqual([]);
+    // dachi only on day 4 (after this wait): day 3's lines never come
+    expect(kimorinDue({ userId: A, journeyDay: 3, journeyCompletedAt: done3, dachiAt: new Date(done3.getTime() + 22 * H), sent: [], now: late })).toEqual([]);
+    expect(kimorinDue({ userId: A, journeyDay: 4, journeyCompletedAt: done3, dachiAt: done3, sent: [], now: late }).map((d) => d.line.day)).toEqual([4, 4]);
+    expect(kimorinDue({ userId: A, journeyDay: 2, journeyCompletedAt: done3, dachiAt: done3, sent: [], now: late })).toEqual([]);
+  });
+
+  it('each line is delivered once, over a whole journey, and only after dachi', async () => {
+    const w = world();
+    let now = new Date('2026-11-03T01:00:00Z');
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: null, displayName: 'a' };
+    w.invitations[A] = { inviterId: null, voiceUrl: null, voiceMediaId: null, voiceSeconds: null };
+    // before dachi: nothing, even in a wait
+    w.people[A].journeyCompletedAt = new Date(now.getTime() - 60_000);
+    now = new Date(now.getTime() + 20 * H);
+    await w.s.arrive(A, now);
+    expect(w.rows).toHaveLength(0);
+    // dachi on day 3 (D04-S005c), before finishing it
+    w.people[A].journeyCompletedAt = null;
+    w.people[A].dachiAt = new Date(now.getTime());
+    for (let day = 3; day <= 7; day++) {
+      w.people[A].journeyDay = day;
+      w.people[A].journeyCompletedAt = new Date(now.getTime() + H);
+      // read the threads every hour through the wait
+      for (let h = 1; h <= 26; h++) {
+        now = new Date(now.getTime() + H);
+        await w.s.arrive(A, now);
+      }
+      w.people[A].journeyCompletedAt = null;
+    }
+    const lines = w.rows.filter((r) => r.character === 'kimorin').map((r) => r.lineId);
+    expect(lines).toEqual(['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8']);
+    expect(new Set(lines).size).toBe(lines.length);
+    // each was written at its own time (not when read) and after becoming dachi
+    for (const r of w.rows) expect(r.createdAt.getTime()).toBeGreaterThanOrEqual(w.people[A].dachiAt!.getTime());
+  });
+});

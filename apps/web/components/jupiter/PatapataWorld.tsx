@@ -1,6 +1,6 @@
 'use client';
 
-import { JUPITER_DEFAULT_BRANCHES, neoForm, type JupiterAuthor, type JupiterFlyer, type JupiterPostView, type JupiterRootView } from '@obolo/shared';
+import { JUPITER_DEFAULT_BRANCHES, neoForm, seesOnlyDachi, type JupiterAuthor, type JupiterFlyer, type JupiterPostView, type JupiterRootView } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -9,6 +9,7 @@ import { hueOf } from '@/components/saturn/BallAvatar';
 import { FILTERS, hoursSince, isFlying, useJupiter, type FilterId, type OwnPost, type RootItem } from '@/lib/jupiter/state';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { Mic } from '@/components/mercury/ComposeChat';
+import { WorkSafety } from '@/components/planets/WorkSafety';
 import { PuniPicMaker } from '@/components/puni/PuniPicMaker';
 import { usePartner } from '@/lib/partner';
 import { Butterfly } from './Butterfly';
@@ -200,14 +201,15 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
       : [];
     // sample residents: the みんな sky (live), or the whole demo sky (tutorial)
     const residents: Flyer[] =
-      live && tab !== 'all'
+      // M-R213: under 15 (or no birth year) only dachi — the sample residents are strangers
+      live && (tab !== 'all' || seesOnlyDachi(me?.birthYear))
         ? []
         : RESIDENTS.filter((r) => live || tab === 'all' || r.friend).flatMap((r) => {
             const posts = residentPosts(r, true);
             return posts.length ? [{ key: r.id, handle: r.handle, art: r.art, emoji: r.emoji, wing: r.wing, hours: posts[0].hours, posts, resident: r }] : [];
           });
     return [...real, ...residents];
-  }, [live, sky, me?.id, tab]);
+  }, [live, sky, me?.id, me?.birthYear, tab]);
 
   const meFlyer: Flyer | null = myFlying.length ? { key: 'me', userId: me?.id, handle: myHandle, ...myLook, hours: myFlying[0].hours, posts: myFlying, me: true } : null;
 
@@ -610,6 +612,8 @@ function StoryViewer({ flyer, start, onClose, onTree }: { flyer: Flyer; start: n
         <button onClick={next} className="mt-3 w-[min(86vw,420px)] rounded-full bg-amber-500 py-2.5 text-sm font-bold text-white shadow">
           {i + 1 < posts.length ? 'ページをめくる' : 'シール帳をとじる'}
         </button>
+        {/* M-R213: a stranger's sticker */}
+        {!flyer.me && <WorkSafety kind="jupiter_post" id={post.id} authorId={flyer.userId} tone="light" className="mt-3" onHidden={() => setTimeout(onClose, 900)} />}
       </div>
       {talk && (
         <Replies

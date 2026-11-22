@@ -427,6 +427,18 @@ export class HttpApi implements Api {
   dachi() {
     return this.req<Awaited<ReturnType<Api['dachi']>>>('GET', '/dachi');
   }
+  dachiThreads() {
+    return this.req<Awaited<ReturnType<Api['dachiThreads']>>>('GET', '/dachi/threads');
+  }
+  dachiMessages(thread: string) {
+    return this.req<Awaited<ReturnType<Api['dachiMessages']>>>('GET', `/dachi/threads/${encodeURIComponent(thread)}/messages`);
+  }
+  sendDachiMessage(thread: string, body: Parameters<Api['sendDachiMessage']>[1]) {
+    return this.req<Awaited<ReturnType<Api['sendDachiMessage']>>>('POST', `/dachi/threads/${encodeURIComponent(thread)}/messages`, body);
+  }
+  async readDachiThread(thread: string) {
+    await this.req('POST', `/dachi/threads/${encodeURIComponent(thread)}/read`, {});
+  }
   befriendInviter() {
     return this.req<Awaited<ReturnType<Api['befriendInviter']>>>('POST', '/dachi/inviter', {});
   }
@@ -499,8 +511,12 @@ export class HttpApi implements Api {
   myInvites() {
     return this.req<Awaited<ReturnType<Api['myInvites']>>>('GET', '/invites');
   }
-  createInvite(email: string, message?: string) {
-    return this.req<Awaited<ReturnType<Api['createInvite']>>>('POST', '/invites', { email, ...(message?.trim() ? { message: message.trim() } : {}) });
+  createInvite(email: string, message?: string, voice?: { mediaId: string; seconds: number }) {
+    return this.req<Awaited<ReturnType<Api['createInvite']>>>('POST', '/invites', {
+      email,
+      ...(message?.trim() ? { message: message.trim() } : {}),
+      ...(voice ? { voiceMediaId: voice.mediaId, voiceSeconds: voice.seconds } : {}),
+    });
   }
 
   // Venus — radio
@@ -552,6 +568,12 @@ export class HttpApi implements Api {
   }
   hideRadioMessage(liveId: string, messageId: string) {
     return this.req<void>('POST', `/venus/lives/${liveId}/messages/${messageId}/hide`);
+  }
+  hidePlanetWork(kind: Parameters<Api['hidePlanetWork']>[0], id: string, on: boolean) {
+    return this.req<{ hidden: boolean }>('POST', `/planet-works/${kind}/${id}/hide`, { on });
+  }
+  reportPlanetWork(kind: Parameters<Api['reportPlanetWork']>[0], id: string, body: Parameters<Api['reportPlanetWork']>[2]) {
+    return this.req<void>('POST', `/planet-works/${kind}/${id}/report`, body);
   }
   reportRadio(body: Parameters<Api['reportRadio']>[0]) {
     return this.req<void>('POST', '/venus/report', body);

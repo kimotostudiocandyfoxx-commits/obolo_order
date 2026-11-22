@@ -1,6 +1,6 @@
 'use client';
 
-import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
+import { neoForm, seesOnlyDachi, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -99,7 +99,8 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
   const myWorks = mine.released.filter((r) => !flying(r.at)).map((r) => r.video);
   // live: real UFOs take the first slots; samples fill the rest of the みんな sky only
   const visible = (c: Creator) => {
-    if (live) return CREATORS.indexOf(c) >= realOthers.length && tab === 'all';
+    // M-R213: under 15 (or no birth year) only dachi — the sample creators are strangers
+    if (live) return !seesOnlyDachi(me?.birthYear) && CREATORS.indexOf(c) >= realOthers.length && tab === 'all';
     return tab === 'all' || (tab === 'follow' ? c.follow : c.friend);
   };
   const liveCount = CREATORS.filter((c) => visible(c) && c.live).length;
@@ -200,7 +201,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
             onPosted={() => {
               setSkyKey(Date.now());
               go({ v: 'sky' });
-              say('公開！ 88時間、ダチの星図をとびます');
+              say('公開！ 88時間、みんなの星図をとびます');
               ev.current?.onRelease?.();
             }}
           />
@@ -222,7 +223,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           }}
           onPosted={() => {
             setSkyKey(Date.now());
-            say('公開！ 88時間、ダチの星図をとびます');
+            say('公開！ 88時間、みんなの星図をとびます');
             ev.current?.onRelease?.();
           }}
           onShoot={() => go({ v: 'shoot' })}
@@ -245,7 +246,7 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           onLocker={() => ev.current?.onLocker?.()}
           onRelease={(id) => {
             mine.release(id);
-            say('公開！ 88時間、ダチの星図をとびます');
+            say('公開！ 88時間、みんなの星図をとびます');
             ev.current?.onRelease?.();
           }}
           say={say}

@@ -253,6 +253,20 @@
       "when": 1795312757548,
       "tag": "0035_buddy_extras",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795313477720,
+      "tag": "0036_work_hides",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795313639948,
+      "tag": "0037_dachi_voice",
+      "breakpoints": true
     }
   ]
 }

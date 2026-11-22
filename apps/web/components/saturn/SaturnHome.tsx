@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
+import { WorkSafety } from '@/components/planets/WorkSafety';
 import { KororinRecord } from './KororinRecord';
 
 const HALL = '/onboarding/s/saturn-hall-kororin.jpg';
@@ -23,6 +24,8 @@ export function SaturnHome() {
   const [mine, setMine] = useState<SaturnPostView[]>([]);
   const [singing, setSinging] = useState<string | null>(null);
   const [cipher, setCipher] = useState(false);
+  // the kororin tapped last on everyone's record (a stranger's gets 〔通報〕〔見えなくする〕, M-R213)
+  const [picked, setPicked] = useState<SaturnPostView | null>(null);
   const queue = useRef<SaturnPostView[]>([]);
   const current = useRef<SaturnPostView | null>(null);
 
@@ -95,9 +98,32 @@ export function SaturnHome() {
         </p>
 
         <div className="flex min-h-0 w-full flex-1 items-center justify-center">
-          <KororinRecord posts={onRecord} myId={me?.id} singingId={singing} own={where === 'mine'} onTap={sing} />
+          <KororinRecord
+            posts={onRecord}
+            myId={me?.id}
+            singingId={singing}
+            own={where === 'mine'}
+            onTap={(p) => {
+              setPicked(p);
+              sing(p);
+            }}
+          />
         </div>
 
+        {where === 'record' && picked && (
+          <div className="absolute inset-x-0 bottom-24 flex flex-col items-center gap-1">
+            <WorkSafety
+              key={picked.id}
+              kind="saturn_post"
+              id={picked.id}
+              authorId={picked.author.id}
+              onHidden={(id) => {
+                setEveryone((l) => l?.filter((x) => x.id !== id) ?? l);
+                setTimeout(() => setPicked(null), 1600);
+              }}
+            />
+          </div>
+        )}
         {where === 'record' && everyone !== null && everyone.length === 0 && (
           <p className="absolute inset-x-8 top-[46%] rounded-2xl bg-black/45 px-4 py-3 text-center text-sm font-bold text-white/90 backdrop-blur">いま、レコードで回っているコロリンはいない。</p>
         )}

@@ -35,6 +35,14 @@ export const UpdateProfileBody = z.object({
 });
 /** M-R150: under 15 (before high school) a member connects only with their dachi */
 export const CHILD_AGE = 15;
+/**
+ * M-R213: under CHILD_AGE — or with no birth year yet (asked on day 1) — a member sees only their dachi's works on the
+ * planets (the server enforces it in every feed; this is the same rule for the demo and the app).
+ */
+export function seesOnlyDachi(birthYear: number | null | undefined, now = new Date()): boolean {
+  return !birthYear || now.getFullYear() - birthYear < CHILD_AGE;
+}
+
 export function isChild(birthYear: number | null | undefined, now = new Date()): boolean {
   return !!birthYear && now.getFullYear() - birthYear < CHILD_AGE;
 }
@@ -132,6 +140,9 @@ export const CreateInviteBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
   /** a few words of your own, printed on the invitation (optional) */
   message: z.string().trim().max(60).optional(),
+  /** a short voice note of your own (M-R212): from POST /media/voice; it arrives in their {inviter} thread on Saturn */
+  voiceMediaId: z.string().uuid().optional(),
+  voiceSeconds: z.number().positive().max(61).optional(),
 });
 export type CreateInviteBody = z.infer<typeof CreateInviteBody>;
 

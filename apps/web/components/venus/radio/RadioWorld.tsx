@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/auth';
 import { Booth } from './Booth';
 import { ShowArt } from './ShowArt';
 import { WaveSky } from './WaveSky';
+import { WorkSafety } from '@/components/planets/WorkSafety';
 
 /**
  * Venus — the radio planet (client decision 2026-11-21, docs/工房とブルーナ_設計.md §9–10).
@@ -118,6 +119,10 @@ export function RadioWorld({ practice, startInBooth = false }: { practice?: () =
         <ShowPlayer
           show={open.show}
           onClose={() => setOpen(null)}
+          onHidden={() => {
+            setOpen(null);
+            load();
+          }}
           onBooth={
             open.show.mine
               ? undefined
@@ -266,7 +271,7 @@ export function SafetyMenu({ target, id, hostId, onBlocked }: { target: RadioRep
   );
 }
 
-function ShowPlayer({ show, onClose, onBooth }: { show: RadioShowView; onClose: () => void; onBooth?: () => void }) {
+function ShowPlayer({ show, onClose, onBooth, onHidden }: { show: RadioShowView; onClose: () => void; onBooth?: () => void; onHidden?: () => void }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [t, setT] = useState(0);
@@ -322,6 +327,8 @@ function ShowPlayer({ show, onClose, onBooth }: { show: RadioShowView; onClose: 
         </div>
         {!show.mine && <SafetyMenu target="show" id={show.id} hostId={show.host.id.startsWith('seed-') ? undefined : show.host.id} onBlocked={onClose} />}
       </div>
+      {/* M-R213: a stranger's show can be hidden, for you only (〔通報〕 is in ⋯) */}
+      {!show.mine && <WorkSafety kind="radio_show" id={show.id} authorId={show.host.id} hideOnly className="mt-2" onHidden={() => setTimeout(() => onHidden?.(), 900)} />}
       <div className="mt-4">
         <input
           type="range"

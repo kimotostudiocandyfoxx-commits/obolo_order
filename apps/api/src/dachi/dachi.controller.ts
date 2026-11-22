@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { DELIVERY_KINDS, DeliverBody } from '@obolo/shared';
+import { Body, Controller, Delete, Get, HttpCode, Inject, NotFoundException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -7,6 +7,14 @@ import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { DachiLinkService } from './dachi-link.service';
 import { DachiService } from './dachi.service';
+import { DachiVoiceService } from './dachi-voice.service';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** a thread: a dachi's user id, or a character's ('kimorin' | 'mikie') */
+function checkThread(id: string) {
+  if (!isCharacterThread(id) && !UUID_RE.test(id)) throw new NotFoundException();
+  return id.toLowerCase();
+}
 
 @Controller('dachi')
 @UseGuards(AuthGuard)
@@ -14,6 +22,7 @@ export class DachiController {
   constructor(
     private readonly dachi: DachiService,
     private readonly links: DachiLinkService,
+    private readonly voice: DachiVoiceService,
     @Inject(KV) private readonly kv: KvStore,
   ) {}
 
@@ -25,8 +34,40 @@ export class DachiController {
   /** D04-S005c: become dachi with the one who invited you */
   @Post('inviter')
   @HttpCode(200)
-  befriendInviter(@UserId() userId: string) {
-    return this.dachi.befriendInviter(userId);
+  async befriendInviter(@UserId() userId: string) {
+    const d = await this.dachi.befriendInviter(userId);
+    // the ダチ threads appear from now (M-R212): {inviter}'s voice (or MIKIE⭐︎DRILL's welcome) is waiting
+    await this.voice.markDachi(userId);
+    return d;
+  }
+
+  // ── ダチの声のメッセージ (M-R212) ──
+
+  /** the drawer's conversations (empty until D04-S005c) */
+  @Get('threads')
+  threads(@UserId() userId: string) {
+    return this.voice.threads(userId);
+  }
+
+  @Get('threads/:id/messages')
+  messages(@UserId() userId: string, @Param('id') id: string) {
+    return this.voice.messages(userId, checkThread(id));
+  }
+
+  /** a voice message (from POST /media/voice, ≤ 60 s) or a Bluena work card — only to a dachi */
+  @Post('threads/:id/messages')
+  async send(@UserId() userId: string, @Param('id') id: string, @Body() body: unknown) {
+    const thread = checkThread(id);
+    const b = parseBody(SendDachiMessageBody, body);
+    await rateLimit(this.kv, `dachi-voice:${userId}`, DACHI_SEND_PER_HOUR, 3600);
+    await rateLimit(this.kv, `dachi-voice-day:${userId}`, DACHI_SEND_PER_DAY, 86400);
+    return this.voice.send(userId, thread, b);
+  }
+
+  @Post('threads/:id/read')
+  @HttpCode(200)
+  read(@UserId() userId: string, @Param('id') id: string) {
+    return this.voice.markRead(userId, checkThread(id));
   }
 
   /** 〔ダチへ〕 — a work goes to every dachi's 〔推し〕 for 88 hours */

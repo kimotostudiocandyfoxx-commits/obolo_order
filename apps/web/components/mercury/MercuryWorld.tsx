@@ -1,6 +1,6 @@
 'use client';
 
-import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
+import { neoForm, seesOnlyDachi, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { Artwork } from '@/components/Artwork';
@@ -103,7 +103,8 @@ export function MercuryWorld({
   // live: real ships take the first slots; samples fill the rest of the みんな sea only
   const visible = (s: Sailor) => {
     const i = SAILORS.indexOf(s);
-    if (live) return i >= realOthers.length && tab === 'all';
+    // M-R213: under 15 (or no birth year) only dachi — the sample sailors are strangers
+    if (live) return !seesOnlyDachi(me?.birthYear) && i >= realOthers.length && tab === 'all';
     return tab === 'all' || (tab === 'follow' ? s.follow : s.friend);
   };
   const sailingCount = SAILORS.filter(visible).length + realOthers.length + (mySailing.length ? 1 : 0);

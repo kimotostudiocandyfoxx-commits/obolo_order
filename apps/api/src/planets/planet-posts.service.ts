@@ -18,7 +18,7 @@ import { Database } from '../db/db';
 import { follows, marsBackstage, mvProjects, planetPosts, planetReplies, songs, starEvents, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
-import { notChild } from '../common/child';
+import { notChild, planetWorkScope } from '../common/child';
 
 type PostRow = typeof planetPosts.$inferSelect;
 
@@ -97,7 +97,8 @@ export class PlanetPostsService {
       .select({ p: planetPosts, u: authorCols })
       .from(planetPosts)
       .innerJoin(users, eq(users.id, planetPosts.userId))
-      .where(and(eq(planetPosts.planet, planet), isNull(planetPosts.deletedAt), isNull(users.deletedAt), gt(planetPosts.createdAt, since()), scope))
+      // M-R213: strangers too, except for a viewer under 15 (dachi only); never a work this viewer hid
+      .where(and(eq(planetPosts.planet, planet), isNull(planetPosts.deletedAt), isNull(users.deletedAt), gt(planetPosts.createdAt, since()), scope, planetWorkScope(viewerId, planetPosts.userId, 'planet_post', planetPosts.id)))
       .orderBy(desc(planetPosts.createdAt))
       .limit(300);
     const views = await this.views(viewerId, rows);
@@ -121,7 +122,7 @@ export class PlanetPostsService {
         .select({ p: planetPosts, u: authorCols })
         .from(planetPosts)
         .innerJoin(users, eq(users.id, planetPosts.userId))
-        .where(and(eq(planetPosts.planet, planet), eq(planetPosts.userId, userId), isNull(planetPosts.deletedAt)))
+        .where(and(eq(planetPosts.planet, planet), eq(planetPosts.userId, userId), isNull(planetPosts.deletedAt), planetWorkScope(viewerId, planetPosts.userId, 'planet_post', planetPosts.id)))
         .orderBy(desc(planetPosts.createdAt))
         .limit(120),
       this.db.read

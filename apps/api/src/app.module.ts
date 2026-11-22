@@ -24,6 +24,7 @@ import { HealthController } from './health.controller';
 import { DachiController } from './dachi/dachi.controller';
 import { DachiService } from './dachi/dachi.service';
 import { DachiLinkService } from './dachi/dachi-link.service';
+import { DachiVoiceService } from './dachi/dachi-voice.service';
 import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
@@ -36,6 +37,8 @@ import { JupiterService } from './jupiter/jupiter.service';
 import { MarsController } from './mars/mars.controller';
 import { PlanetPostsController } from './planets/planet-posts.controller';
 import { PlanetPostsService } from './planets/planet-posts.service';
+import { WorkSafetyController } from './planets/work-safety.controller';
+import { WorkSafetyService } from './planets/work-safety.service';
 import { AdminRadioController, BluenaController, RadioController } from './radio/radio.controller';
 import { RadioService } from './radio/radio.service';
 import { MarsService } from './mars/mars.service';
@@ -70,6 +73,7 @@ import { WalletController } from './wallet/wallet.controller';
     JupiterController,
     MarsController,
     PlanetPostsController,
+    WorkSafetyController,
     RadioController,
     BluenaController,
     AdminRadioController,
@@ -102,6 +106,7 @@ import { WalletController } from './wallet/wallet.controller';
     JupiterService,
     MarsService,
     PlanetPostsService,
+    WorkSafetyService,
     RadioService,
     InvitesService,
     LookService,
@@ -116,6 +121,7 @@ import { WalletController } from './wallet/wallet.controller';
     JobsService,
     DachiService,
     DachiLinkService,
+    DachiVoiceService,
   ],
 })
 export class AppModule {}

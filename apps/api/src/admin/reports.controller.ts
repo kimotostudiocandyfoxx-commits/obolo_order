@@ -6,7 +6,7 @@ import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
-import { dmMessages, userReports, users } from '../db/schema';
+import { dachiMessages, dmMessages, userReports, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import { KV } from '../infra/tokens';
 import { assertAdmin } from './admin.guard';
@@ -89,7 +89,24 @@ export class AdminReportsController {
               )
                 .reverse()
                 .map((m) => ({ id: m.id, fromTarget: m.senderId === r.targetUserId, text: m.kind === 'voice' && !m.text ? '🎤 ボイス' : m.text, createdAt: m.createdAt.toISOString() }))
-            : [],
+            : r.kind === 'voice'
+              ? // ダチの声のメッセージ (M-R212): the latest 30 between the two, with the recordings to listen to
+                (
+                  await this.db.read
+                    .select()
+                    .from(dachiMessages)
+                    .where(
+                      or(
+                        and(eq(dachiMessages.senderId, r.reporterId), eq(dachiMessages.recipientId, r.targetUserId)),
+                        and(eq(dachiMessages.senderId, r.targetUserId), eq(dachiMessages.recipientId, r.reporterId)),
+                      ),
+                    )
+                    .orderBy(desc(dachiMessages.createdAt))
+                    .limit(30)
+                )
+                  .reverse()
+                  .map((m) => ({ id: m.id, fromTarget: m.senderId === r.targetUserId, text: m.kind === 'work' ? '🎁 作品カード' : '🎤 ボイス', audioUrl: m.audioUrl, createdAt: m.createdAt.toISOString() }))
+              : [],
       })),
     );
   }

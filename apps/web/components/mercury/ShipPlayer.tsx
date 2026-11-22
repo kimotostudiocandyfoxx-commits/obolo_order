@@ -1,5 +1,6 @@
 'use client';
 
+import { WorkSafety } from '@/components/planets/WorkSafety';
 import { useEffect, useRef, useState } from 'react';
 import { ArtBackdrop, pickShip, Vessel } from '@/components/art/Stage';
 import { Glyph } from '@/components/bluena/glyphs';
@@ -271,6 +272,8 @@ export function ShipPlayer({
             </button>
           )}
         </div>
+        {/* M-R213: a stranger's song */}
+        {!flyer.isMe && <WorkSafety kind="planet_post" id={song.postId} authorId={flyer.key} className="mt-3" />}
       </div>
       {replying && (
         <RepliesSheet

@@ -86,6 +86,8 @@ export const users = pgTable(
     journeyDay: integer('journey_day').notNull().default(9),
     /** When the current day was finished; the next day unlocks 24 h later (or by skipping). */
     journeyCompletedAt: timestamp('journey_completed_at', { withTimezone: true }),
+    /** When {name} became dachi with {inviter} on Saturn (D04-S005c, M-R212): the ダチ threads are shown from then (set even with no inviter). */
+    dachiAt: timestamp('dachi_at', { withTimezone: true }),
     /** OBOLO NEO form chosen on Day 3 (see @obolo/shared neo.ts). */
     neoForm: text('neo_form'),
     /** Generated OBOLO NEO look chosen on Day 3 (client decision 2026-10-05). */
@@ -479,6 +481,10 @@ export const invites = pgTable(
     inviterName: text('inviter_name').notNull(),
     /** The inviter's own words on the invitation (story M-R61, {inviter_message}); null = none. */
     message: text('message'),
+    /** The inviter's short voice note (M-R212, a 'voice' media object): it arrives in the {inviter} thread on Saturn. */
+    voiceMediaId: uuid('voice_media_id'),
+    voiceUrl: text('voice_url'),
+    voiceSeconds: real('voice_seconds'),
     email: text('email').notNull(),
     status: text('status').notNull().default('pending'), // pending | accepted | revoked
     acceptedUserId: uuid('accepted_user_id').references(() => users.id),
@@ -688,7 +694,7 @@ export const userReports = pgTable(
     targetUserId: uuid('target_user_id')
       .notNull()
       .references(() => users.id),
-    /** mail | call | person | radio-show | radio-live | radio-message */
+    /** mail | call | person | radio-show | radio-live | radio-message | saturn-post | jupiter-post | planet-post (M-R213) */
     kind: text('kind').notNull(),
     /** the reported show / live / message (radio) */
     targetId: uuid('target_id'),
@@ -700,6 +706,23 @@ export const userReports = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index('user_reports_status_idx').on(t.status, t.createdAt)],
+);
+
+/**
+ * M-R213: a planet work someone chose 〔見えなくする〕 on (a stranger's work on a planet's wide place). Per viewer and
+ * kept; the work stays for everyone else. kind: saturn_post | jupiter_post | planet_post | radio_show.
+ */
+export const workHides = pgTable(
+  'work_hides',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(),
+    targetId: uuid('target_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex('work_hides_pair_idx').on(t.userId, t.kind, t.targetId)],
 );
 
 /** Web Push: each device a member turned notifications on for (incoming calls, mail). */
@@ -797,4 +820,38 @@ export const lineVoices = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.hash] })],
+);
+
+/**
+ * ダチの声のメッセージ (M-R212): voice messages (≤ 60 s) and Bluena work cards between dachi, plus the story
+ * characters' lines. A row between two people has both ids; a character's line has no sender (`character` says who,
+ * `peerId` puts it in a dachi's thread — MIKIE⭐︎DRILL's welcome in {inviter}'s — else in the character's own thread);
+ * a reply to a character has no recipient. `lineId` = which prepared line (unique per person: each arrives once).
+ */
+export const dachiMessages = pgTable(
+  'dachi_messages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    senderId: uuid('sender_id').references(() => users.id),
+    recipientId: uuid('recipient_id').references(() => users.id),
+    /** kimorin | mikie: the character who spoke it (no sender), or the one replied to (no recipient) */
+    character: text('character'),
+    /** a character's line shown in this dachi's thread (MIKIE⭐︎DRILL in place of {inviter}'s voice) */
+    peerId: uuid('peer_id').references(() => users.id),
+    lineId: text('line_id'),
+    /** voice | work */
+    kind: text('kind').notNull().default('voice'),
+    audioUrl: text('audio_url'),
+    audioMediaId: uuid('audio_media_id'),
+    seconds: real('seconds'),
+    workJson: jsonb('work_json'),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  },
+  (t) => [
+    index('dachi_messages_recipient_idx').on(t.recipientId, t.createdAt),
+    index('dachi_messages_sender_idx').on(t.senderId, t.createdAt),
+    uniqueIndex('dachi_messages_line_uq').on(t.recipientId, t.lineId).where(sql`${t.lineId} IS NOT NULL`),
+  ],
 );

@@ -9,6 +9,7 @@ import { Frame } from './Frame';
 import { ReplierFaces, RepliesSheet } from '@/components/planets/RepliesSheet';
 import type { PlanetAuthor } from '@obolo/shared';
 import { LineIcon } from '@/components/LineIcon';
+import { WorkSafety } from '@/components/planets/WorkSafety';
 
 /** One person in the Mars sky: their UFO and the movies it carries. */
 export type CrewMember = { key: string; name: string; img?: string | null; emoji: string; videos: Video[]; isMe?: boolean };
@@ -218,6 +219,8 @@ export function UfoPlayer({
             </button>
           )}
         </div>
+        {/* M-R213: a stranger's movie */}
+        {!member.isMe && <WorkSafety kind="planet_post" id={video.postId} authorId={member.key} className="mt-3" />}
       </div>
       {replying && (
         <RepliesSheet

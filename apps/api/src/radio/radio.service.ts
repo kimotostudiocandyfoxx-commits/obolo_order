@@ -21,7 +21,7 @@ import {
   type StartRadioLiveBody,
 } from '@obolo/shared';
 import { and, desc, eq, gt, inArray, isNull, lt, ne, or, sql } from 'drizzle-orm';
-import { notChild } from '../common/child';
+import { notChild, planetWorkScope, viewerSeesAuthor } from '../common/child';
 import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
@@ -252,6 +252,7 @@ export class RadioService {
           isNull(users.suspendedAt),
           notChild(viewer),
           lt(radioShows.publishedAt, flyingSince()),
+          planetWorkScope(viewer, radioShows.userId, 'radio_show', radioShows.id),
         ),
       )
       .orderBy(desc(radioShows.publishedAt))
@@ -283,7 +284,7 @@ export class RadioService {
     const [r] = await this.db.read
       .select()
       .from(radioShows)
-      .where(and(eq(radioShows.id, id), isNull(radioShows.deletedAt), isNull(radioShows.removedAt), or(eq(radioShows.status, 'public'), eq(radioShows.userId, viewer))));
+      .where(and(eq(radioShows.id, id), isNull(radioShows.deletedAt), isNull(radioShows.removedAt), or(eq(radioShows.status, 'public'), eq(radioShows.userId, viewer)), viewerSeesAuthor(viewer, radioShows.userId)));
     if (!r || blocked.has(r.userId)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
     return (await this.showView([r], viewer))[0];
   }
@@ -298,7 +299,7 @@ export class RadioService {
       .select({ l: radioLives })
       .from(radioLives)
       .innerJoin(users, eq(users.id, radioLives.userId))
-      .where(and(eq(radioLives.status, 'live'), notBlocked(radioLives.userId), isNull(users.suspendedAt), notChild(viewer)))
+      .where(and(eq(radioLives.status, 'live'), notBlocked(radioLives.userId), isNull(users.suspendedAt), notChild(viewer), viewerSeesAuthor(viewer, radioLives.userId)))
       .orderBy(desc(radioLives.startedAt))
       .limit(30);
     const shows = await this.db.read
@@ -306,7 +307,7 @@ export class RadioService {
       .from(radioShows)
       .innerJoin(users, eq(users.id, radioShows.userId))
       // a published show drifts above the clouds for 88 hours, then goes back to its owner's booth
-      .where(and(eq(radioShows.status, 'public'), gt(radioShows.publishedAt, flyingSince()), isNull(radioShows.deletedAt), isNull(radioShows.removedAt), notBlocked(radioShows.userId), isNull(users.suspendedAt), notChild(viewer)))
+      .where(and(eq(radioShows.status, 'public'), gt(radioShows.publishedAt, flyingSince()), isNull(radioShows.deletedAt), isNull(radioShows.removedAt), notBlocked(radioShows.userId), isNull(users.suspendedAt), notChild(viewer), planetWorkScope(viewer, radioShows.userId, 'radio_show', radioShows.id)))
       .orderBy(desc(radioShows.publishedAt))
       .limit(60);
     return { live: await this.liveView(lives.map((x) => x.l), viewer), shows: await this.showView(shows.map((x) => x.s), viewer) };
@@ -386,7 +387,8 @@ export class RadioService {
 
   async live(viewer: string, id: string): Promise<RadioLiveState> {
     await this.endStale();
-    const [r] = await this.db.read.select().from(radioLives).where(eq(radioLives.id, id));
+    // M-R213: under 15, only a dachi's live can be opened
+    const [r] = await this.db.read.select().from(radioLives).where(and(eq(radioLives.id, id), viewerSeesAuthor(viewer, radioLives.userId)));
     const blocked = await this.blockedWith(viewer);
     if (!r || blocked.has(r.userId)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not found');
     const host = r.userId === viewer;

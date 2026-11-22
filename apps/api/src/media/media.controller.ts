@@ -89,7 +89,9 @@ export class MediaController {
   /** Raw audio body (Content-Type: audio/*). Parsed by express.raw in main.ts. */
   @Post('voice')
   @UseGuards(AuthGuard)
-  upload(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
+  async upload(@UserId() userId: string, @Headers('content-type') type: string | undefined, @Req() req: Request) {
+    // ダチの声のメッセージ / invitation notes come through here too (M-R212): a ceiling on recordings
+    await rateLimit(this.kv, `upload-voice:${userId}`, 120, 3600);
     return this.media.uploadVoice(userId, type, req.body, `${req.protocol}://${req.get('host')}`);
   }
 

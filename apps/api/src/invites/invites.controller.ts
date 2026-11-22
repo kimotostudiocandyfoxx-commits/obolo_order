@@ -46,7 +46,7 @@ export class InvitesController {
   @UseGuards(AuthGuard)
   create(@UserId() userId: string, @Body() body: unknown) {
     const b = parseBody(CreateInviteBody, body);
-    return this.invites.createByMember(userId, b.email, b.message);
+    return this.invites.createByMember(userId, b.email, b.message, b.voiceMediaId ? { mediaId: b.voiceMediaId, seconds: b.voiceSeconds ?? null } : undefined);
   }
 
   /** Operator endpoint to issue the first invitations. Disabled unless ADMIN_TOKEN is set. */

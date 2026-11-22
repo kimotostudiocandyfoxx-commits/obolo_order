@@ -1,4 +1,4 @@
-import type { BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -194,6 +194,12 @@ export interface Api {
   endDachiLink(token: string): Promise<void>;
   deliver(body: Partial<DeliverBody> & Pick<DeliverBody, 'kind'>): Promise<{ to: number }>;
   oshi(kind?: DeliveryView['kind']): Promise<DeliveryView[]>;
+  /** ダチの声のメッセージ (M-R212): the atelier drawer's threads ({inviter} / KIMORIN⭐︎ / MIKIE⭐︎DRILL / other dachi), empty until D04-S005c */
+  dachiThreads(): Promise<DachiThreadView[]>;
+  dachiMessages(thread: string): Promise<DachiMessageView[]>;
+  /** a voice message (mediaId from uploadVoice, ≤ 60 s) or a Bluena work card; only between dachi */
+  sendDachiMessage(thread: string, body: SendDachiMessageBody): Promise<DachiMessageView>;
+  readDachiThread(thread: string): Promise<void>;
   /** Jupiter: 🦋 蝶を描いてもらう (2 painted candidates, 3 tries a day) */
   butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   chooseButterfly(mediaId: string | null): Promise<Me>;
@@ -231,7 +237,7 @@ export interface Api {
   followPerson(id: string, on: boolean): Promise<CommsFound>;
   blockPerson(id: string, on: boolean): Promise<CommsFound>;
   blockedPeople(): Promise<CommsFound[]>;
-  reportPerson(body: { userId: string; kind: 'mail' | 'call' | 'person'; reason: 'mean' | 'scary' | 'other'; note?: string }): Promise<void>;
+  reportPerson(body: { userId: string; kind: 'mail' | 'call' | 'person' | 'voice'; reason: 'mean' | 'scary' | 'other'; note?: string }): Promise<void>;
   dmMessages(peerId: string, after?: string): Promise<DmMessage[]>;
   sendDm(peerId: string, body: { text: string; audioUrl?: string }): Promise<DmMessage>;
   readDm(peerId: string): Promise<void>;
@@ -287,8 +293,8 @@ export interface Api {
   storyCards(said: string): Promise<{ cards: string[] }>;
   writeStory(cards: string[]): Promise<StoryResult>;
   myInvites(): Promise<MyInviteView[]>;
-  /** `message`: a few words of your own printed on the invitation (optional) */
-  createInvite(email: string, message?: string): Promise<MyInviteView>;
+  /** `message`: a few words of your own printed on the invitation (optional); `voice`: a short voice note (M-R212, from uploadVoice) */
+  createInvite(email: string, message?: string, voice?: { mediaId: string; seconds: number }): Promise<MyInviteView>;
 
   // Venus — the radio planet (docs/工房とブルーナ_設計.md §9–10)
   radioHome(): Promise<RadioHome>;
@@ -313,6 +319,10 @@ export interface Api {
   radioMessage(id: string, body: RadioMessageBody): Promise<RadioMessageView>;
   hideRadioMessage(liveId: string, messageId: string): Promise<void>;
   reportRadio(body: RadioReportBody): Promise<void>;
+  /** M-R213: 〔見えなくする〕 a stranger's planet work, for you only (kept on the server) */
+  hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean): Promise<{ hidden: boolean }>;
+  /** M-R213: 〔通報〕 a stranger's planet work */
+  reportPlanetWork(kind: PlanetWorkKind, id: string, body: PlanetWorkReportBody): Promise<void>;
   /** 〔ブルーナにしまう〕 someone else's song (a Mercury post) */
   keepInBluena(postId: string, on: boolean): Promise<{ kept: boolean }>;
   /** Bluena 〔しまった作品〕: your kept works (links) */

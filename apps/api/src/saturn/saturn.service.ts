@@ -10,7 +10,7 @@ import { LLM } from '../infra/tokens';
 import { MediaService } from '../media/media.service';
 import { VoiceService } from '../voice/voice.service';
 import { PlazaService } from './plaza.service';
-import { notChild } from '../common/child';
+import { notChild, planetWorkScope } from '../common/child';
 
 type PostRow = typeof saturnPosts.$inferSelect;
 type Author = { id: string; handle: string; displayName: string; neoForm?: string | null; look?: PuniLook | null; pic?: string | null };
@@ -49,7 +49,8 @@ export class SaturnService {
     // inside a ひろば only its maker may look when it is theirs alone; everywhere else such voices never show
     if (plazaId) await this.plazas.get(viewerId, plazaId);
     // voices flown to their author's own room never fall on the planet
-    return this.page(viewerId, and(isNull(saturnPosts.replyToId), eq(saturnPosts.room, 0), alive(), scope, plazaId ? undefined : notInPrivatePlaza()), cursor, limit, fresh);
+    // M-R213: strangers too, except for a viewer under 15 (dachi only); never a kororin this viewer hid
+    return this.page(viewerId, and(isNull(saturnPosts.replyToId), eq(saturnPosts.room, 0), alive(), scope, plazaId ? undefined : notInPrivatePlaza(), this.seen(viewerId)), cursor, limit, fresh);
   }
 
   /**
@@ -59,7 +60,11 @@ export class SaturnService {
    */
   async userPosts(viewerId: string, userId: string, cursor?: string, limit = 30): Promise<Paged<SaturnPostView>> {
     const own = viewerId === userId;
-    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), own ? undefined : and(eq(saturnPosts.room, 0), alive(), notInPrivatePlaza())), cursor, limit, true);
+    return this.page(viewerId, and(eq(saturnPosts.userId, userId), isNull(saturnPosts.replyToId), own ? undefined : and(eq(saturnPosts.room, 0), alive(), notInPrivatePlaza(), this.seen(viewerId))), cursor, limit, true);
+  }
+
+  private seen(viewerId: string) {
+    return planetWorkScope(viewerId, saturnPosts.userId, 'saturn_post', saturnPosts.id);
   }
 
   /** The voice replies under a post, oldest first (they line up as little balls under it). */
