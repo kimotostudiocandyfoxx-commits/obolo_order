@@ -13,7 +13,9 @@ import json
 import sys
 
 # a trial: only the stems given (python3 scripts/kimorin/make-queue.py kimorin-i-talk …)
-ONLY = set(sys.argv[1:])
+ARGS = sys.argv[1:]
+REDO_STEMS = set(ARGS[ARGS.index('--redo') + 1:]) if '--redo' in ARGS else set()
+ONLY = set(ARGS[:ARGS.index('--redo')] if '--redo' in ARGS else ARGS) | REDO_STEMS
 
 FACE_REF = 'design/story/refs/cast/kimorin-face-ref.png'
 RAW = 'design/kimorin'
@@ -21,11 +23,14 @@ RAW = 'design/kimorin'
 BODY = (
     "KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. "
     "His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; "
-    "on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; "
+    "on the forehead a small blue three-petal leaf mark; {eyes} "
     "a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. "
     "Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. "
     "White paw hands with blue paw pads, white feet with blue paw pads."
 )
+EYES = "two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs;"
+HIDDEN = ("his eyes are hidden: the two dark round lenses of his {what} sit directly ON his face over the eyes and cover them completely, no eye slits visible "
+          "(in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head);")
 LOOKS = {
     # the inventor, goggles down (day 2 until the startle in the Earth temple)
     'kimorin-i': ("apps/web/public/onboarding/s/kimorin-i-talk.jpg",
@@ -77,16 +82,23 @@ for look, (costume, dress) in LOOKS.items():
             stem = f'{look}-{pose}'
         if ONLY and stem not in ONLY:
             continue
+        eyes = EYES if look == 'kimorin-iu' else HIDDEN.format(what='brass goggles' if look == 'kimorin-i' else 'round black sunglasses')
         prompt = (f"Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. "
-                  f"{BODY} {dress} {how} {BG}")
-        if look == 'kimorin-xs' and pose in ('tears', 'blush'):
-            prompt = prompt.replace("from his eyes", "from under his sunglasses")
+                  f"{BODY.format(eyes=eyes)} {dress} {how} {BG}")
+        if look != 'kimorin-iu':
+            prompt = prompt.replace("from his eyes", "from under his " + ('goggles' if look == 'kimorin-i' else 'sunglasses'))
         items.append({'id': stem, 'w': 1536, 'h': 2048, 'size': [960, 1280], 'always': False, 'refs': [costume, FACE_REF], 'prompt': prompt})
         src = f'{RAW}/{stem}.jpg'
         items.append({'id': f'{stem}-o', 'w': 1536, 'h': 2048, 'size': [960, 1280], 'always': False, 'refs': [src], 'prompt': OPEN})
         items.append({'id': f'{stem}-notail', 'w': 1536, 'h': 2048, 'size': [960, 1280], 'always': False, 'refs': [src],
                       'prompt': NOTAIL.format(wing=' and the small dragon wing' if look == 'kimorin-xs' else '')})
 
+# a repainted pose: its old pictures are deleted, so the pose is painted first and its edits wait for it
+# (paint.mjs's redo would edit the old picture in the same pass)
+import os
+for x in items:
+    if x['id'].removesuffix('-o').removesuffix('-notail') in REDO_STEMS and os.path.exists(f"{RAW}/{x['id']}.jpg"):
+        os.remove(f"{RAW}/{x['id']}.jpg")
 queue = {
     'note': 'KIMORIN の立ち絵を描き直す（2026-11-22）: 緑の背景（クロマキー）、顔は design/story/refs/cast/kimorin-face-ref.png に固定。'
             '<stem>-o は口だけ開いた絵、<stem>-notail は尾羽なし。scripts/kimorin/build.py で切り抜いて onboarding/<stem>.webp と口の位置 (lib/story/sprite-mouths.json) にする',
@@ -94,6 +106,7 @@ queue = {
     'png': True,
     'always': '',
     'items': items,
+    # repaint: python3 scripts/kimorin/make-queue.py --redo <stem> … (the stem and its two edits)
     'redo': [],
 }
 json.dump(queue, open('design/kimorin-art-queue.json', 'w'), ensure_ascii=False, indent=1)
