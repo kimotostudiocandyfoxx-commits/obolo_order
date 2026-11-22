@@ -1,15 +1,17 @@
 <meta charset="utf-8">
 <title>隣に並ぶトーク</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Dela+Gothic+One&family=Klee+One:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Dela+Gothic+One&family=Klee+One:wght@600&family=Yusei+Magic&family=Shippori+Mincho:wght@700&display=swap">
 <style>
 /* layout: one night scene on the moon — the pair stands on the ground and talks; nothing else on screen */
 :root{
   --night:#070b24; --night2:#121a46; --ink:#f4f1ff; --mute:#b9bde6;
   --glass:rgba(16,22,64,.46); --glass-line:rgba(210,220,255,.22);
-  --me:#8fb7ff; --me-ink:#0c1a3d;
-  --bati:#ffc25a; --bati-ink:#3a2200;
-  --friend:#f1d3a2; --friend-ink:#3a2510;
+  /* bubble colours, fixed per person (M-R245): muted tones, a faint gradient, a fine outline in the same hue */
+  --me-a:#f7f4fd; --me-b:#e7e1f6; --me-line:#9a8fc4; --me-ink:#2b2550;      /* 月光パール */
+  --bati-a:#fbf0d9; --bati-b:#f0dcb0; --bati-line:#c29a52; --bati-ink:#4a3410; /* はちみつクリーム */
+  --friend-a:#eef4ee; --friend-b:#d9e6db; --friend-line:#86a58e; --friend-ink:#253d2c; /* セージ */
+  --me:#e7e1f6; --bati:#f0dcb0; --friend:#d9e6db;
   --moon:#dfe6ff;
   --font:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic',system-ui,sans-serif;
   color-scheme:dark;
@@ -68,14 +70,19 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 /* bubbles */
 .bubbles{position:absolute;left:0;right:0;z-index:8;display:flex;flex-direction:column;align-items:center;gap:10px;
   padding:0 max(62px,env(safe-area-inset-left,0px)) 0 max(62px,env(safe-area-inset-right,0px));pointer-events:none}
-.bub{position:relative;max-width:min(100%,380px);max-height:calc(var(--room,200px) / 2);overflow:auto;padding:11px 16px 12px;border-radius:20px;font-size:15px;font-weight:700;line-height:1.55;
-  box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .6s cubic-bezier(.4,.1,.2,1),opacity .6s;transform-origin:50% 0;pointer-events:auto}
-.bub.me{background:var(--me);color:var(--me-ink);align-self:flex-end}
-.bub.bati{background:var(--bati);color:var(--bati-ink);align-self:flex-start}
-.bub.friend{background:var(--friend);color:var(--friend-ink);align-self:flex-start}
-.bub::after{content:"";position:absolute;bottom:-9px;width:18px;height:18px;background:inherit;border-radius:3px;transform:rotate(45deg)}
-.bub.me::after{right:22%}
-.bub.bati::after,.bub.friend::after{left:22%}
+.bub{position:relative;max-width:min(100%,380px);max-height:calc(var(--room,200px) / 2);overflow:auto;padding:12px 17px 13px;
+  border-radius:24px 20px 26px 19px / 20px 25px 19px 24px;font-size:15px;font-weight:700;line-height:1.6;
+  background:linear-gradient(170deg,var(--ba),var(--bb));color:var(--bi);border:1.5px solid var(--bl);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 8px 22px rgba(4,8,30,.32);
+  transition:transform .6s cubic-bezier(.4,.1,.2,1),opacity .6s;transform-origin:50% 0;pointer-events:auto}
+.bub.me{--ba:var(--me-a);--bb:var(--me-b);--bl:var(--me-line);--bi:var(--me-ink);align-self:flex-end;rotate:.4deg}
+.bub.bati{--ba:var(--bati-a);--bb:var(--bati-b);--bl:var(--bati-line);--bi:var(--bati-ink);align-self:flex-start;rotate:-.5deg}
+.bub.friend{--ba:var(--friend-a);--bb:var(--friend-b);--bl:var(--friend-line);--bi:var(--friend-ink);align-self:flex-start;rotate:-.4deg}
+/* curved tail: a small rounded wedge with the same outline */
+.bub::after{content:"";position:absolute;bottom:-11px;width:16px;height:16px;background:var(--bb);
+  border-right:1.5px solid var(--bl);border-bottom:1.5px solid var(--bl);border-radius:0 0 14px 0}
+.bub.me::after{right:20%;transform:rotate(30deg) skewX(-12deg)}
+.bub.bati::after,.bub.friend::after{left:20%;transform:rotate(60deg) skewY(12deg)}
 .bub.old{opacity:.86}
 .bub.old::after{display:none}
 .bub.fly{transform:translateY(-120px) scale(.2);opacity:0}
@@ -103,15 +110,22 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
 .bub em.b{font-weight:900}
 .bub em.big{font-weight:900;font-size:1.3em;line-height:1.2}
 .bub em.shout{font-family:'Dela Gothic One',var(--font);font-size:1.38em;line-height:1.2;letter-spacing:.02em}
-.bub.burst{border-radius:0;padding:26px 34px 28px;font-size:16px;
+/* special words (M-R245): at most one per message */
+.bub em.gold{font-family:'Dela Gothic One',var(--font);font-size:1.32em;line-height:1.2;
+  background:linear-gradient(180deg,#fff6c8 0%,#f2c14e 45%,#b9801c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1.1px #5a3b06;paint-order:stroke fill;filter:drop-shadow(0 0 1px #5a3b06) drop-shadow(0 0 6px rgba(255,214,110,.8))}
+.bub em.red{font-family:'Dela Gothic One',var(--font);font-size:1.34em;line-height:1.2;color:#e0322b;-webkit-text-stroke:.8px #3a0c0a;paint-order:stroke fill}
+.bub em.cute{font-family:'Yusei Magic',var(--font);font-size:1.18em;color:#d4567e;letter-spacing:.03em}
+.bub em.eerie{font-family:'Shippori Mincho',serif;font-weight:700;font-size:1.08em;letter-spacing:.12em;color:#3b3f63;text-shadow:0 0 4px rgba(59,63,99,.45)}
+.bub.burst{border-radius:0;padding:26px 34px 28px;font-size:16px;border:0;box-shadow:none;filter:drop-shadow(1.5px 0 0 var(--bl)) drop-shadow(-1.5px 0 0 var(--bl)) drop-shadow(0 1.5px 0 var(--bl)) drop-shadow(0 -1.5px 0 var(--bl)) drop-shadow(0 8px 14px rgba(4,8,30,.3));
   clip-path:polygon(50% 0,57% 9%,68% 2%,71% 12%,84% 8%,82% 19%,96% 20%,89% 31%,100% 40%,90% 48%,99% 60%,88% 64%,93% 78%,80% 77%,79% 91%,67% 84%,60% 98%,52% 87%,42% 99%,37% 86%,24% 94%,23% 81%,9% 84%,13% 70%,0 62%,10% 53%,1% 41%,12% 35%,5% 21%,19% 20%,18% 7%,31% 12%,36% 1%,44% 10%)}
 .bub.burst::after{display:none}
 .bub.cloud{border-radius:46% 54% 50% 50%/62% 58% 42% 38%;padding:15px 22px 16px}
-.bub.cloud::after{width:13px;height:13px;border-radius:50%;bottom:-17px;transform:none}
-.bub.cloud::before{content:"";position:absolute;bottom:-29px;width:8px;height:8px;border-radius:50%;background:inherit}
+.bub.cloud::after{width:13px;height:13px;border-radius:50%;bottom:-18px;transform:none;border:1.5px solid var(--bl)}
+.bub.cloud::before{content:"";position:absolute;bottom:-31px;width:8px;height:8px;border-radius:50%;background:var(--bb);border:1.5px solid var(--bl)}
 .bub.cloud.bati::before,.bub.cloud.friend::before{left:18%}
 .bub.cloud.me::before{right:18%}
-.bub.whisper{font-family:'Klee One',var(--font);font-weight:600;font-size:14px;box-shadow:none;outline:2px dashed rgba(0,0,0,.28);outline-offset:-6px;opacity:.94}
+.bub.whisper{font-family:'Klee One',var(--font);font-weight:600;font-size:14px;border-style:dashed;box-shadow:0 6px 16px rgba(4,8,30,.25);opacity:.95}
 .in-slam{animation:slam .5s cubic-bezier(.2,1.7,.4,1)!important}
 @keyframes slam{0%{transform:scale(1.9) rotate(-5deg);opacity:0}45%{transform:scale(.9) rotate(2deg);opacity:1}70%{transform:scale(1.05) rotate(-1deg)}100%{transform:none}}
 .in-slow{animation:slowin .9s ease-out!important}
@@ -208,12 +222,12 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
       lines:[
         ['user',[['ねえウニュ、明日の土星ってどんなとこ？','base','',{in:'pop'}]]],
         ['bati',[['土星はね、コロリンたちが**レコードの上でサイファー**してる星だよ！','smile','hop',{in:'pop'}],['ネオのつぶやきも、きっと回ってるはず！','smile','']]],
-        ['user',[['え、!!マジで！？!!　見てみたい！','surprised','hop',{in:'slam',shape:'burst'}]]],
+        ['user',[['え、[[赤:マジで！？]]　見てみたい！','surprised','hop',{in:'slam',shape:'burst'}]]],
         ['bati',[['^^でしょでしょ！^^','smile','hop',{in:'shake'}],['……でも、ボク、ちょっと緊張するかも？','thinking','tilt',{in:'slow',shape:'cloud'}]]],
         ['user',[['ウニュも緊張するんだ笑','smile','']]],
-        ['bati',[['えへへ……バレた？','shy','',{in:'slow',shape:'whisper'}]]],
+        ['bati',[['[[かわいい:えへへ]]……バレた？','shy','',{in:'slow',shape:'whisper'}]]],
         ['user',[['明日、一緒に行こうな。','smile','']]],
-        ['bati',[['うん！　^^約束^^だよ、ネオ！','smile','hop',{in:'shake'}]]],
+        ['bati',[['うん！　[[金:約束]]だよ、ネオ！','smile','hop',{in:'shake'}]]],
       ]},
     friend: { partner:'friend', title:'アポロ（ダチ）',
       history:[['friend','ういっす','smile'],['user','おつかれ！','smile'],['friend','俺のMV、見た？','thinking'],['user','まだ！　ごめん','shy'],['friend','見ろ見ろ。今すぐだ。','smile']],
@@ -222,7 +236,7 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
         ['user',[['ほんと！？　**うれしい！**','smile','hop',{in:'shake'}]]],
         ['friend',[['次はMVもつけようぜ。','base',''],['俺、出演してもいいか？','thinking','tilt']]],
         ['user',[['その筋肉、画面に入りきらないって笑','smile','']]],
-        ['friend',[['……鍛えすぎたか。','sad','',{in:'slow',shape:'whisper'}],['いや、!!むしろ見せたい!!。','smile','hop',{in:'slam',shape:'burst'}]]],
+        ['friend',[['……[[しんみり:鍛えすぎたか]]。','sad','',{in:'slow',shape:'whisper'}],['いや、[[金:むしろ見せたい]]。','smile','hop',{in:'slam',shape:'burst'}]]],
         ['user',[['じゃあ**主役**で！','smile','',{in:'pop'}]]],
       ]},
   };
@@ -317,10 +331,12 @@ body{background:var(--night);color:var(--ink);font-family:var(--font);overflow:h
     const b = { el, who, text:'', html:'' }; bubbles.push(b); return b;
   }
 
-  // text marks: **bold**  ^^bigger^^  !!shout!!  (chosen by the same AI call as the face, M-R243)
+  // text marks: **bold**  ^^bigger^^  !!shout!!  [[金:…]] [[赤:…]] [[かわいい:…]] [[しんみり:…]]  (same AI call as the face, M-R243・M-R245)
   function parse(t){
-    const out=[]; const re=/(\*\*|\^\^|!!)(.+?)\1/g; let k=0, m;
-    while ((m=re.exec(t))){ if (m.index>k) out.push({t:t.slice(k,m.index),c:''}); out.push({t:m[2],c:{'**':'b','^^':'big','!!':'shout'}[m[1]]}); k=re.lastIndex; }
+    const out=[]; const re=/\[\[(金|赤|かわいい|しんみり):(.+?)\]\]|(\*\*|\^\^|!!)(.+?)\3/g; let k=0, m;
+    const FX={'金':'gold','赤':'red','かわいい':'cute','しんみり':'eerie'};
+    while ((m=re.exec(t))){ if (m.index>k) out.push({t:t.slice(k,m.index),c:''});
+      if (m[1]) out.push({t:m[2],c:FX[m[1]]}); else out.push({t:m[4],c:{'**':'b','^^':'big','!!':'shout'}[m[3]]}); k=re.lastIndex; }
     if (k<t.length) out.push({t:t.slice(k),c:''}); return out;
   }
   const esc = (x) => x.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
