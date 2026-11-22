@@ -5,7 +5,7 @@
  * This is a provisional "bright, friendly sidekick" persona agreed for the 10/10 demo.
  * Replace this file (and only this file) when the client delivers the final character sheet.
  */
-import { BATI_PERSONALITIES, batiDefaultCall, type BatiPersonality, type BuddyPersona } from '@obolo/shared';
+import { BATI_PERSONALITIES, BATI_SPEECH_RULES, batiDefaultCall, normalizeBatiPersonality, type BatiPersonality, type BuddyPersona } from '@obolo/shared';
 
 export const DEFAULT_BUDDY_NAME = { ja: 'バティ', en: 'Bati' } as const;
 
@@ -184,15 +184,16 @@ export interface BatiSelfView {
  * the worry / danger answers too — are said in this manner; the meaning stays). Never changes after birth.
  */
 export function batiPersonaBlock(b: BatiSelfView | undefined, userName: string, locale: 'ja' | 'en'): string {
-  const p = BATI_PERSONALITIES[b?.personality ?? 'genki'];
+  const p = BATI_PERSONALITIES[normalizeBatiPersonality(b?.personality ?? 'genki')];
   const self = b?.self || p.self.sun;
   const call = (b?.call || batiDefaultCall(p.id)).replaceAll('{neo}', userName).replaceAll('{name}', userName);
-  if (locale === 'en') return `[Personality] ${p.label} (${p.id}). Talk in this manner in Japanese replies; in English keep its spirit. Call the user "${call}".`;
+  if (locale === 'en') return `[Way of speaking] ${p.label} (${p.id}). In Japanese replies keep it mild; in English keep its spirit. Call the user "${call}".`;
   return [
-    `【性格】あなたは「${p.label}」。生まれた時に決まった性格で、ずっと変わらない。`,
-    `- 話し方：${p.manner}`,
-    `- 一人称：「${self}」（決まりの文の「ボク」も「${self}」に）。ユーザーの呼び方：「${call}」。${b?.catchphrase ? `口ぐせ：「${b.catchphrase}」（ときどき）。` : ''}`,
-    `- 例：${p.examples.map(([a, x]) => `「${a.replaceAll('{neo}', userName)}」→「${x.replaceAll('{neo}', userName)}」`).join(' ')}`,
-    '- 変えるのは言い方だけ。答えの中身・正しさ・長さの決まり・安全の決まりはそのまま。悩みや危ないことへの答えも、この話し方で、やさしく。',
+    `【話し方】あなたは「${p.label}」。生まれた時に決まった話し方で、ずっと変わらない。大前提：ユーザーがストレスを感じないこと。`,
+    ...BATI_SPEECH_RULES.map((r) => `- ${r}`),
+    `- この子の話し方：${p.manner}`,
+    `- 一人称：「${self}」（決まりの文の「ボク」も「${self}」に）。ユーザーの呼び方：「${call}」。${b?.catchphrase ? `口ぐせ：「${b.catchphrase}」（3〜5回の返事に1回くらい）。` : ''}`,
+    `- 例：「${userName}、すごいね！」→「${p.example.replaceAll('{neo}', userName)}」`,
+    '- カードの「性格」（おっちょこちょい など）は、話し方には出さない。答えの中身・正しさ・長さ・安全の決まりは、どの子も同じ。悩みや危ないことへの答えも、この話し方で、やさしく。',
   ].join('\n');
 }

@@ -24,7 +24,7 @@ export type Work = {
   poster?: string | null;
   source?: { title: string; source: string; pageUrl: string };
   note?: string;
-  ref?: { postId?: string; rootId?: string; songId?: string; backstageId?: string; showId?: string; demoSong?: MadeSong; style?: string };
+  ref?: { postId?: string; rootId?: string; songId?: string; backstageId?: string; showId?: string; demoSong?: MadeSong; style?: string; /** a stand-in made on the review page (makers.ts makeTest) */ test?: boolean };
   flown?: boolean;
   worn?: boolean;
   /** put into Bluena (the card's edge flashes once) */

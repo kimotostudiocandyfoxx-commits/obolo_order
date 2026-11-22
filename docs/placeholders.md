@@ -249,17 +249,17 @@ KIMORIN⭐︎ の待ち時間の声（作る行・そのまま。句読点も変
 
 ## バティ（M-R215〜M-R222・2026-11-22）
 
-最大3体・月と太陽のたまご・性格（M-R216／M-R217）・カード・88日ごとの新しいたまご・バティが覚えること（M-R222）。手帳（M-R219）・調味料（M-R220／M-R221）・「月で眠らせる」（M-R215 → M-R217 で取りやめ）は作っていない／取り除いた。
+最大3体・月と太陽のたまご・話し方（M-R225〜M-R229：よく出る6・ギャル系5・めずらしい6、計17）・カード（話し方とは別の一言の「性格」つき）・88日ごとの新しいたまご（SYS-S003）・バティが覚えること（M-R222）。手帳（M-R219）・調味料（M-R220／M-R221）・「月で眠らせる」（M-R215 → M-R217 で取りやめ）は作っていない／取り除いた。
 
 | ID | 状態 | 内容 | 現在の仮実装 | 差し替え場所 |
 |---|---|---|---|---|
-| P-BATI-VARIANTS | 🟡 | ふつうの性格7つ（元気な子以外）の、{bati}の決まった台詞の言い方 | **開発チームが書いた。物語セッションの確認待ち**。台本の{bati}の台詞すべて（全日・SYS・会員後、74行）×7。意味・長さ・{ }はそのまま、一人称は `{self}`。台本にない行は規則の変換（`batiRuleTransform`）で代わりに言う | `packages/shared/src/batiVariants.ts`（検査：`apps/web/lib/story/batiVariants.test.ts`） |
-| P-BATI-RARE | 🟡 | めずらしい性格12（博多弁・武士・忍者…）の台詞 | 生まれた時に一度だけ、バティの会話のAI（Haiku 5.5）が全部の台詞を書き直す（1回の呼び出し。{ }が同じで長さ±40%以内の行だけ使い、だめな行は台本のまま）。台本が増えた時の書き直しは、まだしない | `packages/ai/src/batiPersona.ts`（`rewriteBatiLines`）、ジョブ `bati.lines` |
+| P-BATI-VARIANTS | 🟡 | 台本の{bati}の決まった台詞の、ほかの話し方10（ていねい・関西弁・クール・のんびり・甘えんぼ・ギャル系5） | **開発チームが書いた。物語セッションの確認待ち**（M-R225 で書き直し）。台本の{bati}の台詞すべて（75行＋SYS-S003 の性格で言う2行）×10。一人称（{self}）・呼び方・語尾の少しだけ。語尾を変えたのは、話し方ごとに文の半分以下（テストで検査：15〜36％）。ていねいな子は「デス」「マス」だけカタカナ。「あーし」は使わない。台本にない行は規則の変換（`batiRuleTransform`、文の半分まで）| `packages/shared/src/batiVariants.ts`（検査：`apps/web/lib/story/batiVariants.test.ts`） |
+| P-BATI-RARE | 🟡 | めずらしい話し方6（博多弁・東北・沖縄・武士・執事・王様気どり）の台詞 | 生まれた時に一度だけ、Haiku 5.5 が全部の台詞を書き直す（1回の呼び出し）。M-R225 の話し方の決まりを指示に入れ、{ }が同じ・長さ±40%・ふつうの漢字かな（全部ひらがな／カタカナは不可）・「あーし」なし の行だけ使い、語尾を変えた文が全体の半分を超えた分は台本のまま | `packages/ai/src/batiPersona.ts`（`rewriteBatiLines`）、ジョブ `bati.lines` |
 | P-BATI-VOICE | 🟡 | 言い方を変えた{bati}の台詞の声 | 作り置きの声は台本の言葉（元気な子）なので、言い方の変わった行は**声なし**で出す（字と声が食いちがわないように）。性格ごとの声は作っていない | `components/onboarding/StoryPlayer.tsx`（`batiLineVaried`） |
 | P-BATI-EGGS | 🟡 | 月のたまご（女の子寄り）の絵・映像 | 旧「地球と月のたまご」の絵（ファイル名 earth）を代わりに使う。太陽のたまごは今までの絵。体型の素材は `apps/api/assets/bati/moon-*`／`sun-*` | `lib/onboarding/day2.ts`・`lib/onboarding/egg.ts`（`eggFile`）・`public/onboarding/s/d2-egg-earth*` |
-| P-BATI-SMALLEGG | 🟡 | 殻から生まれる小さなたまご（祭壇・月のチャットの上・Bluenaのカードの横） | 図形とCSSだけ（絵なし）。日がたつほど少し大きく明るく（数字は出さない）。育った朝の場面は台本にまだないので、決定（バティの性格の決め方.md §4・§6）の台詞で月の画面に出す | `components/bati/SmallEgg.tsx`・`components/bati/BatiSheet.tsx`（`NewEggFlow`） |
+| P-BATI-SMALLEGG | 🟡 | 殻から生まれる小さなたまご（祭壇・月のチャットの上・Bluenaのカードの横） | 図形とCSSだけ（絵なし）。日がたつほど少し大きく明るく（数字は出さない）。育った朝は台本 SYS-S003 を物語の再生で（月を開いた時、たまごが育っていれば自動で一度・たまごを押しても）。たまご（月／太陽）は SYS-S003 の中で、たまごの絵を押して選ぶ（光が交互に映る→選んだ光が染みこむ：図形とCSS） | `components/bati/SmallEgg.tsx`・`lib/onboarding/sys003.ts`・`components/bati/EggMorning.tsx`・`components/bati/NewBatiSteps.tsx` |
 | P-BATI-CARD | 🟡 | バティのカード（めずらしい性格は金の縁） | 図形とCSS。画像は端末の中でcanvasに描いてPNG（1080×1920）。共有できる端末は共有、ほかはダウンロード | `components/bati/BatiCard.tsx` |
-| P-BATI-SEED | 🟡 | 2体目（好きな音）・3体目（好きな言葉）の種の決め方 | 食べ物と同じ係（`decideBatiPersona`、種の種類つき）。AIなし（デモ・テスト）は言葉の規則表（`batiPersonaByRules`） | `packages/ai/src/batiPersona.ts`・`packages/shared/src/batiPersona.ts` |
+| P-BATI-SEED | 🟡 | 種からの話し方の決め方（M-R227 の割合：ギャル系35％・ほかのよく出る50％・めずらしい15％、3体で同じ話し方なし、仕事・勉強は姉御／クールギャル多め） | 食べ物と同じ係（`decideBatiPersona`、種の種類・ほかの子の話し方つき。重なったら引き直し）。AIなし（デモ・テスト）は規則表＋割合の抽選（`batiPersonaByRules`・`drawBatiStyle`）。役目は生まれたあとに聞くので、役目による寄せは役目が先にわかる時だけ（`POST /me/bati/new` の `role`） | `packages/ai/src/batiPersona.ts`・`packages/shared/src/batiPersona.ts` |
 | P-BATI-VISIT | ⚪ | 「遊びに行かせる」（ダチのチャットに一日だけ） | あとで作る。データの置き場だけ（`BatiRecord.visit`）。記憶とバティは持ち主のまま、ダチの会話の中身は持ち帰らない | `apps/api/src/look/batis.ts` |
 | P-BATI-MEMORY | 🟡 | バティが覚えること（M-R222）の「覚えない物」の判定 | 正規表現（住所・電話・メール・学校/会社・パスワード・お金・ほかの人・体や病気）＋いつものモデレーション。15歳未満・生まれた年がまだの人は、もっと強く（さん/くん付きの名前・駅・4桁以上の数字・体・学校） | `packages/shared/src/batiMemory.ts`（`memoryRefusal`）・`apps/api/src/look/memory.service.ts` |
 | P-BATI-LOOK | 🟡 | 見た目の禁止（実在の人・ほかの作品のキャラ・性的・暴力的） | 着せかえの言葉を、語の表 → いつものモデレーション → （本物のAIの時）見た目専用のチェック。絵の指示にも同じ決まり。生まれた時の絵を2枚目の参考画像として毎回わたす | `packages/shared/src/batiPersona.ts`（`LOOK_WISH_RULES`）・`packages/ai/src/moderation.ts`（`moderateLookWish`）・`packages/ai/src/images.ts`（`BATI_LOOK_RULES`） |

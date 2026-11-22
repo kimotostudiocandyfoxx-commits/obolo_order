@@ -23,14 +23,22 @@ export interface DayStory {
   auth: boolean;
   /** The caption when the skip has rolled the clock to zero (instead of 「扉が開いた」). */
   skippedText?: string;
+  /** a line under the countdown when {bati} is there ({bati} = its name): D03-S009's note on the 24 hours with {bati} */
+  waitNote?: string;
 }
 
 export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
   1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした' }, // the script's telop (QA 14 R53)
-  // the end of day 2 (the Moon): 「もちろん明日まで待てない」 (story M-R67) → 〔テロップ：24時間スキップした〕 (client 2026-10-22)
-  2: { steps: DAY2, skipLabel: 'もちろん明日まで待てない', auth: true, skippedText: '24時間スキップした' },
+  // the end of day 2 (the Moon): D03-S009 〔明日まで待てない〕 → 〔テロップ：24時間スキップした〕; the 24 hours are {bati}'s (M-R223)
+  2: {
+    steps: DAY2,
+    skipLabel: '明日まで待てない',
+    auth: true,
+    skippedText: '24時間スキップした',
+    waitNote: '明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます。見た目は、チャットの上の顔を押すと、いつでも変えられます',
+  },
   3: { steps: DAY3, auth: true },
   4: { steps: DAY4, auth: true },
   5: { steps: DAY5, auth: true },

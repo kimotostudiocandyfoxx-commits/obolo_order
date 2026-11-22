@@ -1,4 +1,5 @@
-import { KORORIN_VOICE_STYLE, type Me } from '@obolo/shared';
+import { KORORIN_VOICE_STYLE, neoVoiceUrl, type Me } from '@obolo/shared';
+import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { waitJob } from '@/lib/jobs';
@@ -20,12 +21,15 @@ export type Ctx = {
   mercury: { bury: (s: MadeSong) => void; release: (id: string) => void };
   /** the newest song made in this talk (an MV is made on it) */
   lastSongId?: string;
+  /** the review page's story steps: stand-in works made in this browser (no AI, no account, nothing saved or flown) */
+  test?: boolean;
 };
 
 const withTimeout = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), ms))]);
 
 /** make one card; `prev` is the card being refined (its words carry over) */
 export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: Work): Promise<Work> {
+  if (ctx.test) return makeTest(kind, prompt, ctx, prev);
   const api = getApi();
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
@@ -114,8 +118,37 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   }
 }
 
+/** the review page's stand-in for a card (story steps not played for real): made here, kept in no account */
+async function makeTest(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: Work): Promise<Work> {
+  const base: Work = { id: uid(), kind, prompt, status: 'ready', saved: true, ref: { test: true } };
+  await new Promise((r) => setTimeout(r, 1200));
+  switch (kind) {
+    case 'voice':
+      return { ...base, text: prompt.slice(0, 140), audio: neoVoiceUrl(KORORIN_VOICE_STYLE, null, prompt.slice(0, 140)) };
+    case 'art': {
+      const words = (prev?.kind === 'art' ? prev.prompt : prompt).slice(0, 60);
+      return { ...base, prompt: words, image: demoStickerArt(words) };
+    }
+    case 'song': {
+      const words = prev?.kind === 'song' ? `${prev.prompt}。${prompt}` : prompt;
+      const s = makeSong(words, pickGenre(words), ctx.me?.displayName ?? '');
+      return { ...base, prompt: words, title: s.title, audio: 'synth:', ref: { test: true, demoSong: s } };
+    }
+    case 'video': {
+      const words = prev?.kind === 'video' ? `${prev.prompt}。${prompt}` : prompt;
+      return { ...base, prompt: words, title: 'MV（おためし）', text: '映像は、ここ（おためし）では作れないから、絵だけ置いておくね', poster: demoStickerArt(words.slice(0, 60)) };
+    }
+    case 'radio':
+      return { ...base, status: 'record', saved: false, title: (prompt || `${ctx.me?.displayName ?? ''}のラジオ`).slice(0, 40) };
+    default:
+      return { ...base, status: 'failed', saved: false, note: 'これは、ここ（おためし）では作れないんだ' };
+  }
+}
+
 /** a recorded radio take → a private show in Bluena's Venus folder (the name goes through the text check) */
 export async function keepShow(w: Work, blob: Blob, seconds: number): Promise<Work> {
+  // the review page: the take stays in this browser
+  if (w.ref?.test) return { ...w, status: 'ready', audio: URL.createObjectURL(blob), title: w.title || '名前のない番組', saved: true };
   const api = getApi();
   const up = await api.uploadShow(blob);
   const show = await api.createRadioShow({ mediaId: up.id, title: w.title || '名前のない番組', thumbUrl: null, loop: 'drift', seconds: Math.round(seconds), cues: [] });
@@ -126,6 +159,8 @@ export async function keepShow(w: Work, blob: Blob, seconds: number): Promise<Wo
 export async function fly(w: Work, ctx: Ctx): Promise<void> {
   const api = getApi();
   const r = w.ref ?? {};
+  // the review page: flown in the story only
+  if (r.test) return;
   if (w.kind === 'voice' && r.postId) await api.publishSaturnPost(r.postId);
   else if (w.kind === 'art' && r.rootId) await api.createJupiterPost({ rootId: r.rootId, text: '', filter: 'none', branch: 0 });
   else if (w.kind === 'song' && r.songId) await api.createPlanetPost('mercury', { sourceId: r.songId, title: w.title ?? '', text: '' });

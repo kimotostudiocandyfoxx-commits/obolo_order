@@ -346,7 +346,55 @@ export function foodParts(food: string): string {
   return FOOD_PARTS.find(([r]) => r.test(food))?.[1] ?? `the two or three most recognisable parts of "${food}" that a child would know at a glance`;
 }
 
-export function batiPrompt(food: string, fromBody = false): string {
+/** what a {bati} was born from (M-R218): the first from a favourite food, the second a favourite sound, the third a word */
+export type BatiSeedKind = 'food' | 'sound' | 'word';
+export interface BatiSeed {
+  seed: string;
+  kind?: BatiSeedKind;
+}
+
+/**
+ * M-R223: whatever the look, the seed it was born from stays somewhere small — the food as a hair ornament, a pattern or
+ * something it holds (a small tattoo of it when that would look odd); a favourite sound as a small motif of that sound
+ * (a waveform, notes, the thing that makes it); a word as its letters, small. Put into every painting of {bati}.
+ */
+export function batiSeedRule(s: BatiSeed | null | undefined): string {
+  const seed = s?.seed?.trim();
+  if (!seed) return '';
+  const kind = s?.kind ?? 'food';
+  if (kind === 'sound')
+    return (
+      `IMPORTANT: it was born from the favourite sound "${seed}", and a small trace of that sound must stay visible somewhere on it in every look: ` +
+      'a small sound-pattern motif that evokes it (a little waveform, musical notes, ripples, or a tiny version of the thing that makes the sound) ' +
+      'as a hair ornament, a pattern on its body or clothes, or something it holds — small, not the main subject. If that would look unnatural, a ' +
+      'small tattoo of that sound motif somewhere on its body.'
+    );
+  if (kind === 'word')
+    return (
+      `IMPORTANT: it was born from the word "${seed}", and that word must stay visible somewhere small on it in every look: the word's own letters, ` +
+      'written exactly as given, as a small motif — a charm, a badge, an embroidered pattern or something it holds (this is the only text allowed in ' +
+      'the picture). If that would look unnatural, a small tattoo of the word somewhere on its body.'
+    );
+  return (
+    `IMPORTANT: it was born from the food "${seed}", and a little of that food must stay visible somewhere on it in every look: a small hair ` +
+    `ornament, a pattern or an item it holds that is clearly "${seed}" (${foodParts(seed)}) — small, not the main subject. If that would look ` +
+    `unnatural, a small tattoo of "${seed}" somewhere on its body.`
+  );
+}
+
+export function batiPrompt(food: string, fromBody = false, kind: BatiSeedKind = 'food'): string {
+  // M-R218 / M-R223: a {bati} born from a sound or a word carries it as a small motif (the body is restyled like the food's)
+  if (kind !== 'food') {
+    const motif = batiSeedRule({ seed: food, kind });
+    if (fromBody)
+      return (
+        "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. " +
+        `Restyle its colours, patterns and small accessories so it is clearly inspired by ${kind === 'sound' ? 'the sound' : 'the word'} "${food}" and the mood it gives. ` +
+        'It stays a cute, friendly creature, never scary. Keep the tiny mark on its forehead. ' +
+        motif
+      );
+    return `${STYLE} The character is a newborn magical partner creature called Bati: small, round and chubby, with big sparkling eyes, whose colors and accessories are inspired by ${kind === 'sound' ? 'the sound' : 'the word'} "${food}". It looks friendly and happy, as if it just hatched from an egg (a few eggshell pieces nearby). ${motif}`;
+  }
   if (fromBody)
     return (
       "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. " +
@@ -375,18 +423,35 @@ export const BATI_LOOK_RULES =
  * `withOriginal`: the {bati} as it was born is attached as the second picture, so the creature does not drift away
  * over many dress-ups (M-R215: the current look is the reference, the birth's picture keeps who it is).
  */
-export function batiRestylePrompt(wish: string, variant = 0, withOriginal = false): string {
-  const ways = ['a happy pose', 'a proud little pose, showing off the new look', 'a playful pose, turning a little'];
+/**
+ * M-R223 (D03-S008): asked without a wish, the four cards are the {bati} now in four art touches (the script's アニメ風・
+ * ゆるキャラ風・3D風・ドット絵風, BATI_RESTYLE_TOUCHES in @obolo/shared, same order).
+ */
+export const BATI_RESTYLE_TOUCH_WORDS = [
+  'Japanese anime style: clean line art, cel shading, big expressive anime eyes, vivid colours',
+  'Japanese yuru-chara mascot style: very simple rounded shapes, thick soft outlines, flat pastel colours, a gentle goofy charm',
+  'cute 3D style: a soft rounded 3D render like a vinyl toy figure, smooth materials, soft studio light (still on the flat grey background)',
+  'pixel art style: a crisp 32-bit pixel-art sprite with a limited palette and visible square pixels (still on the flat grey background)',
+] as const;
+
+export function batiRestylePrompt(wish: string, variant = 0, withOriginal = false, seed?: BatiSeed | null): string {
+  const ways = ['a happy pose', 'a proud little pose, showing off the new look', 'a playful pose, turning a little', 'a cheerful little jump'];
+  const w = wish.trim();
+  const change = w
+    ? `Dress it up or change it following this wish: "${w}" — new clothes, accessories, a hat, a small costume, a different art ` +
+      'touch (watercolour, crayon, pixel art …) or a cute transformation (colours of a part, little wings, a tail tip, ears), never a ' +
+      'different animal or a different character. ' +
+      `Variation ${variant + 1} of 4 (each of the four a clearly different take on the wish): ${pick(ways, variant)}. `
+    : `Redraw it in a different art touch, keeping who it is: ${pick([...BATI_RESTYLE_TOUCH_WORDS], variant)}. ${pick(ways, variant)}. `;
   return (
-    'Edit the first picture: it is the same small magical partner creature called Bati, and it must stay clearly the same creature — ' +
-    'the same face, eyes, body shape, size, main colours, the tiny mark on its forehead, the same soft painted style, framing and the flat ' +
+    'Edit the first picture: it is the same small magical partner creature called Bati — its look now, the reference to follow — and it must ' +
+    'stay clearly the same creature: the same face, eyes, body shape, main colours, the tiny mark on its forehead, the framing and the flat ' +
     'plain mid-grey background (#808080) with no floor, no shadow and no other objects. ' +
     (withOriginal ? 'The second picture is the same creature as it was born: keep its identity (face, eyes, body shape) from it. ' : '') +
-    `Dress it up or change it a little following this wish: "${wish}" — new clothes, accessories, a hat, a small costume, a different art ` +
-    'touch (watercolour, crayon, pixel art …) or a small, cute transformation (colours of a part, little wings, a tail tip, ears), never a ' +
-    'different animal or a different character. ' +
-    `Variation ${variant + 1}: ${pick(ways, variant)}. No text, no letters. ` +
-    BATI_LOOK_RULES
+    change +
+    (seed?.kind === 'word' ? 'No other text, no other letters. ' : 'No text, no letters. ') +
+    BATI_LOOK_RULES +
+    (seed ? ` ${batiSeedRule(seed)}` : '')
   );
 }
 

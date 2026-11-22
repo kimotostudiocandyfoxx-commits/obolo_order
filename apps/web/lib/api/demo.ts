@@ -32,6 +32,8 @@ import {
   BATI_FACES,
   BATI_MAGIC_PER_DAY,
   BATI_RESTYLE_PER_DAY,
+  BATI_RESTYLE_TOUCHES,
+  LOOK_HISTORY_MAX,
   LAP2,
   lap2Done,
   lap2OpensAt,
@@ -875,7 +877,8 @@ export class DemoApi implements Api {
     const key = `obolo.look.tries.${u.id}`;
     const used = Number(localStorage.getItem(key) ?? 0);
     if (u.journeyDay < JOURNEY_DONE && used >= 8) throw new ApiError(429, 'LOOK_TRIES', 'もう作り直せません');
-    this.charge('look');
+    // M-R223: no mana on day 2
+    if (u.journeyDay > 2) this.charge('look');
     localStorage.setItem(key, String(used + 1));
     await new Promise((r) => setTimeout(r, 1800));
     let urls: string[];
@@ -893,7 +896,8 @@ export class DemoApi implements Api {
 
   private refinesLeft() {
     const u = this.s.users[this.uid()];
-    return u.journeyDay < JOURNEY_DONE ? Math.max(0, 8 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
+    // M-R223: as often as they like (the API's hidden ceiling, NEO_LOOK_REFINES)
+    return u.journeyDay < JOURNEY_DONE ? Math.max(0, 30 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
   }
 
   async refineLook(mediaId: string | null, instruction: string, magic?: boolean) {
@@ -903,8 +907,8 @@ export class DemoApi implements Api {
     // null: the look worn now (the second journey's basin)
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    const n = 8 - this.refinesLeft();
-    this.charge('look');
+    const n = 30 - this.refinesLeft();
+    if (u.journeyDay > 2) this.charge('look');
     localStorage.setItem(`obolo.look.refines.${u.id}`, String(n + 1));
     await new Promise((r) => setTimeout(r, 1500));
     // the one refine: four looks with the wish (client 2026-10-25)
@@ -937,34 +941,75 @@ export class DemoApi implements Api {
   }
 
   // demo: the Bati picture recoloured three ways stands in for the dressed-up Bati (no network)
-  async batiRestyle(wish: string): Promise<BatiRestyleResult> {
+  async batiRestyle(wish = '', from?: string): Promise<BatiRestyleResult> {
     const u = this.s.users[this.uid()];
     if (!u.bati?.imageUrl) throw new ApiError(409, 'NO_BATI', 'Not hatched yet');
     // M-R215: no real person's or another work's lookalike, nothing sexual or violent
-    if (lookWishCategory(wish)) throw new ApiError(422, 'MODERATION', 'その姿には、できないんだ');
+    if (wish.trim() && lookWishCategory(wish)) throw new ApiError(422, 'MODERATION', 'その姿には、できないんだ');
     const key = this.roomKey('restyle');
     const used = Number(localStorage.getItem(key) ?? 0);
     if (used >= BATI_RESTYLE_PER_DAY) throw new ApiError(429, 'RESTYLE_TRIES', '今日はもう着替えられません');
     if (u.journeyDay >= JOURNEY_DONE) this.charge('look');
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
-    const src = u.bati.imageUrl;
-    const candidates = await Promise.all([0, 1, 2].map(async (k) => ({ id: uid(), url: await demoRefine(src, wish, used * 3 + k, true) })));
+    // M-R223: four cards from the look worn now (or the card tapped just before); four touches without a wish
+    const src = (from && this.lookCache.find((c) => c.id === from)?.url) || u.bati.imageUrl;
+    const candidates = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: uid(), url: await demoRefine(src, wish, used * 4 + k, true) })));
     this.lookCache.push(...candidates);
-    return { candidates, left: Math.max(0, BATI_RESTYLE_PER_DAY - used - 1) };
+    return { candidates, left: Math.max(0, BATI_RESTYLE_PER_DAY - used - 1), ...(wish.trim() ? {} : { touches: BATI_RESTYLE_TOUCHES.map((t) => t.label) }) };
+  }
+
+  /** M-R223: the {bati} looks decided so far (the birth's first), the one worn now noted */
+  private batiLooks(u: Me): string[] {
+    const b = u.bati;
+    if (!b?.imageUrl) return [];
+    const looks = b.looks?.length ? [...b.looks] : [];
+    if (!looks.includes(b.imageUrl)) looks.push(b.imageUrl);
+    return looks.slice(-LOOK_HISTORY_MAX);
+  }
+  private wearBati(url: string, isNew: boolean) {
+    return this.patchMe((u) => {
+      if (!u.bati) return {};
+      let looks = this.batiLooks(u);
+      if (isNew && !looks.includes(url)) looks = [...looks, url].slice(-LOOK_HISTORY_MAX);
+      return { bati: { ...u.bati, imageUrl: url, looks, stand: false, faces: Object.fromEntries(BATI_FACES.map((f) => [f, url])) } };
+    });
+  }
+  async batiLookBack() {
+    const u = this.s.users[this.uid()];
+    const looks = this.batiLooks(u);
+    const at = looks.indexOf(u.bati?.imageUrl ?? '');
+    if (at <= 0) throw new ApiError(409, 'NO_PREVIOUS', 'もう前の姿はない');
+    return this.wearBati(looks[at - 1], false);
+  }
+  async batiLookRestore(url: string) {
+    const u = this.s.users[this.uid()];
+    if (!this.batiLooks(u).includes(url)) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return this.wearBati(url, false);
+  }
+  async lookRestore(url: string) {
+    const u = this.s.users[this.uid()];
+    if (!(u.lookHistory ?? []).includes(url)) throw new ApiError(404, 'NOT_FOUND', 'not found');
+    return this.patchMe(() => ({ avatarUrl: url, lookIcon: null }));
   }
 
   async chooseBatiRestyle(id: string) {
     const c = this.lookCache.find((x) => x.id === id);
     if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    // the faces are drawn again from the new picture (the demo: the picture itself stands in for each)
-    return this.patchMe((u) => (u.bati ? { bati: { ...u.bati, imageUrl: c.url, stand: false, faces: Object.fromEntries(BATI_FACES.map((f) => [f, c.url])) } } : {}));
+    // the faces are drawn again from the new picture (the demo: the picture itself stands in for each); kept in its looks
+    return this.wearBati(c.url, true);
   }
 
   async chooseLook(mediaId: string) {
     const c = this.lookCache.find((x) => x.id === mediaId);
     if (!c) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    return this.patchMe(() => ({ avatarUrl: c.url }));
+    // M-R223: the looks worn so far (Bluena's first shelf)
+    return this.patchMe((u) => {
+      const h = [...(u.lookHistory ?? [])];
+      if (u.avatarUrl && !h.includes(u.avatarUrl)) h.push(u.avatarUrl);
+      if (!h.includes(c.url)) h.push(c.url);
+      return { avatarUrl: c.url, lookHistory: h.slice(-LOOK_HISTORY_MAX) };
+    });
   }
 
   // demo: the test pictures stand in for painted candidates

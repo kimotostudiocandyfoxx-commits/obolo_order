@@ -514,8 +514,17 @@ export class HttpApi implements Api {
   batiFaces() {
     return this.req<Awaited<ReturnType<Api['batiFaces']>>>('POST', '/me/bati/faces');
   }
-  batiRestyle(wish: string) {
-    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { wish });
+  batiRestyle(wish?: string, from?: string) {
+    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { ...(wish?.trim() ? { wish } : {}), ...(from ? { from } : {}) });
+  }
+  batiLookBack() {
+    return this.req<Me>('POST', '/me/bati/restyle/back', {});
+  }
+  batiLookRestore(url: string) {
+    return this.req<Me>('POST', '/me/bati/look/restore', { url });
+  }
+  lookRestore(url: string) {
+    return this.req<Me>('POST', '/me/look/restore', { url });
   }
   chooseBatiRestyle(id: string) {
     return this.req<Awaited<ReturnType<Api['chooseBatiRestyle']>>>('POST', '/me/bati/restyle/choose', { id });

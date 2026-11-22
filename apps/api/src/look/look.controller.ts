@@ -1,6 +1,6 @@
 import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { BatiForgetBody, BatiMemoryBody, BatiRoleBody, BatiEggBody, BatiIdBody, BatiNameBody, BatiNewHatchBody, BatiSpeechBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
+import { BatiForgetBody, BatiMemoryBody, BatiRoleBody, BatiEggBody, BatiIdBody, BatiNameBody, BatiNewHatchBody, BatiSpeechBody, BatiRestyleBody, BatiRestyleChooseBody, ChooseLookBody, LookRestoreBody, ChoosePuniPicBody, NeoLookBody, PuniPicBody, RefineLookBody, StickerArtBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -127,7 +127,28 @@ export class LookController {
   @HttpCode(200)
   async restyle(@UserId() userId: string, @Body() body: unknown, @Req() req: Request, @Headers('x-admin-token') token?: string) {
     await rateLimit(this.kv, `bati-restyle:${userId}`, 4, 60);
-    return this.look.restyle(userId, parseBody(BatiRestyleBody, body).wish, origin(req), this.admin(token));
+    return this.look.restyle(userId, parseBody(BatiRestyleBody, body), origin(req), this.admin(token));
+  }
+
+  /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now */
+  @Post('bati/restyle/back')
+  @HttpCode(200)
+  restyleBack(@UserId() userId: string, @Req() req: Request) {
+    return this.look.restyleBack(userId, origin(req));
+  }
+
+  /** M-R223: Bluena's first shelf — a {bati} look kept before, worn again */
+  @Post('bati/look/restore')
+  @HttpCode(200)
+  restoreBati(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    return this.look.restoreBati(userId, parseBody(LookRestoreBody, body).url, origin(req));
+  }
+
+  /** M-R223: Bluena's first shelf — a look of one's own worn before, worn again */
+  @Post('look/restore')
+  @HttpCode(200)
+  restoreLook(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
+    return this.look.restoreLook(userId, parseBody(LookRestoreBody, body).url, origin(req));
   }
 
   @Post('bati/restyle/choose')

@@ -10,6 +10,7 @@ import { walk, type Scene } from '../lib/story/parse';
 import { STORIES } from '../lib/onboarding/stories';
 import { SCENE_DAY } from '../lib/onboarding/sceneDays';
 import { AFTER_DAYS } from '../lib/onboarding/after';
+import { SYS003 } from '../lib/onboarding/sys003';
 
 const ROOT = resolve(__dirname, '../../..');
 const PUB = join(ROOT, 'apps/web/public/story');
@@ -100,5 +101,7 @@ for (let day = 1; day <= 8; day++) {
 }
 // after joining (P05m: M-URANUS / M-PLUTO / M-NEPTUNE / M-END) — lib/onboarding/after.ts
 section('会員後', (id) => id.startsWith('M-'), sayLines(AFTER_DAYS));
+// SYS-S003 (the grown egg, 88 days on) plays from the Moon whenever the egg is ready — lib/onboarding/sys003.ts
+section('たまごが、育った（SYS-S003）', (id) => id === 'SYS-S003', sayLines(SYS003));
 writeFileSync(join(ROOT, 'docs/story-import/sync.md'), out.join('\n') + '\n');
 console.log(`sync: ${total} differences → docs/story-import/sync.md`);

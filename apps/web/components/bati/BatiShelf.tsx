@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth';
-import type { BatiCard } from '@obolo/shared';
+import { getApi } from '@/lib/api';
+import { JOURNEY_DONE, type BatiCard, type Me } from '@obolo/shared';
 import { BatiCardView, exportCard } from './BatiCard';
 import { SmallEgg, eggGrowth } from './SmallEgg';
 import { BatiMemories } from './BatiMemories';
@@ -18,6 +19,7 @@ export function BatiShelf() {
   if (!cards.length && me?.bati?.card) cards.push(me.bati.card);
   if (!cards.length) return null;
   return (
+    <>
     <div className="mb-3 flex items-end gap-2 overflow-x-auto rounded-2xl bg-white/[0.04] p-2" aria-label="バティのカード">
       <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0 self-center text-sky-200" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden>
         <circle cx="12" cy="12" r="8.5" />
@@ -50,6 +52,56 @@ export function BatiShelf() {
           </div>
         </div>
       )}
+    </div>
+    {me && <PastLooks me={me} onMe={setMe} />}
+    </>
+  );
+}
+
+/** M-R223: from day 3 (Bluena received), the first shelf also lists the looks worn before — your own and {bati}'s */
+export function showPastLooks(me: Me): boolean {
+  return !!me.story?.['d3.f_d04_bluena'] || me.journeyDay >= JOURNEY_DONE;
+}
+
+function PastLooks({ me, onMe }: { me: Me; onMe: (me: Me) => void }) {
+  const [busy, setBusy] = useState(false);
+  if (!showPastLooks(me)) return null;
+  const own = me.lookHistory ?? [];
+  const bati = me.bati?.looks ?? [];
+  if (own.length < 2 && bati.length < 2) return null;
+  const wear = async (f: () => Promise<Me>) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      onMe(await f());
+    } catch {
+      /* stays as it is */
+    } finally {
+      setBusy(false);
+    }
+  };
+  const row = (urls: string[], now: string | null | undefined, restore: (url: string) => Promise<Me>, round: boolean, label: string) =>
+    urls.length > 1 && (
+      <div className="flex gap-1.5 overflow-x-auto" aria-label={label}>
+        {[...urls].reverse().map((u) => (
+          <button
+            key={u}
+            type="button"
+            disabled={busy || u === now}
+            onClick={() => void wear(() => restore(u))}
+            aria-label={u === now ? 'いまの姿' : 'この姿にもどす'}
+            className={`h-11 w-11 shrink-0 overflow-hidden ${round ? 'rounded-full' : 'rounded-xl'} border ${u === now ? 'border-sky-200' : 'border-white/10 opacity-80'}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={u} alt="" className={`h-full w-full ${round ? 'object-cover' : 'object-contain'}`} />
+          </button>
+        ))}
+      </div>
+    );
+  return (
+    <div className="mb-3 space-y-1.5 rounded-2xl bg-white/[0.04] p-2" aria-label="前の姿">
+      {row(own, me.avatarUrl, (u) => getApi().lookRestore(u), true, '自分の前の姿')}
+      {row(bati, me.bati?.imageUrl, (u) => getApi().batiLookRestore(u), false, `${me.bati?.name ?? 'バティ'}の前の姿`)}
     </div>
   );
 }

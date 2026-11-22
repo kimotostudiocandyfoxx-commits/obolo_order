@@ -9,11 +9,13 @@ import type { Step } from './script';
  *    「魔法、使えるのですか？」, the 「引っかけ問題」)
  *  - on the Moon the visitor's look first (LookMaker: photo into the bowl of water, the animal by voice, four looks),
  *    then KIMORIN's dragon (D03-S004b), the names, the eggs, うんちピンポンくん and {bati} are born, the first chat with
- *    {bati} and {bati}'s magic (D03-S008), and sleep on the Moon (D03-S009). Bluena comes on the morning of day 3.
+ *    {bati}, {bati}'s look in four touches and its lookups (D03-S008, M-R223), and sleep on the Moon (D03-S009). Bluena
+ *    comes on the morning of day 3.
  * Pictures: Seedance motions d2-* (each starting and ending on the stills around it), the Day-1 motions for
  * the HQ (d1-gate-loop, 9, 11, 12), Seedream stills s/d2-*.
  * The egg (M-R215): the visitor picks the moon egg (girl-leaning) or the sun egg (boy-leaning), f_egg; KIMORIN⭐︎ gets the other one.
- * Saved: times (+ timesWords), the look, the NEO name, egg, the favourite food, {bati} and its name, f_d03_bati_talk.
+ * Saved: times (+ timesWords), the look, the NEO name, egg, the favourite food, {bati} and its name, f_d03_bati_look,
+ * f_d03_bati_talk.
  */
 export const DAY2: Step[] = [
   { t: 'bgm', track: 'opening' },
@@ -455,41 +457,46 @@ export const DAY2: Step[] = [
   { t: 'neoname', placeholder: '秘密結社用の名前', submit: 'この名前にする' },
   { t: 'notice', text: '名前は、あとでいつでも変えられます' },
   { t: 'say', who: 'OBOLON', text: '{neo}、、、いい名前だ。' },
-  // the first chat with {bati} (about three rounds; the words as said, {bati}'s answers in words and voice), then
-  // {bati}'s magic: change your own look, dress {bati} up
-  { t: 'scene', id: 'D03-S008' }, // {bati}とおしゃべり／{bati}の魔法
+  // M-R223: {bati}'s look inside the chat (four cards in four touches, a tap pops it into one, a wish brings a new four,
+  // 〔前に戻す〕), until decided; then OBOLON says {bati} looks things up, and {neo} asks freely (1〜2 rounds)
+  { t: 'scene', id: 'D03-S008' }, // {bati}の見た目／調べるのが得意な{bati}
   { t: 'still', image: 's/moon-temple' },
-  { t: 'sprite', image: ['obolon', '@bati'] },
-  { t: 'say', who: 'OBOLON', text: '、、、{bati}と、話してみろ。' },
-  { t: 'say', who: 'OBOLON', text: '生まれたばかりの{bati}は、まだ、何も知らない。だが、、、知らないことは、魔法で、調べて、答える。' },
   { t: 'sprite', image: '@bati' },
   { t: 'face', who: '@bati', expr: 'sparkle' },
-  { t: 'say', who: 'バティ', text: 'ねえ、{neo}。なんでも、話して！　ボク、調べてみる！' },
-  { t: 'batitalk', first: true }, // {bati}とのチャットの画面（saves f_d03_bati_talk）
-  { t: 'se', sound: 'boing' }, // 3往復くらい話すと、{bati}が、ぴょんと跳ねる
+  { t: 'say', who: 'バティ', text: 'ねえ、{neo}！　次は、ボクの番！　ボクの見た目も、{neo}の好きにして！' },
+  // the cards; 「これで、決まり？」〔これで決まり〕(ok)〔もうちょっと変える〕(more: another four, until decided) — f_d03_bati_look
+  { t: 'batilook', ask: { t: 'say', who: 'バティ', text: 'これで、決まり？' }, ok: 'これで決まり', more: 'もうちょっと変える' },
   { t: 'face', who: '@bati', expr: 'smile' },
+  { t: 'se', sound: 'sparkle' },
+  { t: 'say', who: 'バティ', text: 'やったー！　ボク、この姿、気に入った！' },
+  { t: 'notice', text: '{neo}と{bati}の見た目は、あとでも変えられます。チャットの上の、{neo}か{bati}の顔を押してください' },
   { t: 'sprite', image: ['obolon', '@bati'] },
-  { t: 'say', who: 'OBOLON', text: '、、、これからは、{bati}に頼めば、、、いつでも、お前の姿を、変えられる。' },
+  { t: 'say', who: 'OBOLON', text: '、、、{neo}。もう一つ、教えておく。' },
+  { t: 'say', who: 'OBOLON', text: '{bati}は、、、マナの力で、調べるのが、得意だ。' },
+  { t: 'say', who: 'OBOLON', text: 'たいていのことは、、、分かる。聞きたいこと、知りたいことは、いつでも、{bati}に、聞いてみろ。' },
   { t: 'sprite', image: '@bati' },
-  { t: 'say', who: 'バティ', text: 'うん！　さっきみたいに、ボクが魔法を唱えるよ！' },
-  { t: 'say', who: 'バティ', text: '{neo}の姿、もっとかっこよくも、かわいくも、できるよ！' },
-  { t: 'say', who: 'バティ', text: 'ボクのことも、好きに着せかえて！　ちょっとだけなら、変身もできるよ！' },
-  // D03-S008 〔{bati}の魔法で、自分の姿を変える〕〔{bati}を着せかえる〕 — the Moon room's sheets, then on (also later, on the Moon)
-  { t: 'magic' },
-  // M-R222: {bati} keeps only what the member asks it to (「覚えといて」), five at most; shown on its card
-  { t: 'say', who: 'バティ', text: 'ねえ、{neo}。覚えておいてほしいことがあったら、『覚えといて』って言ってね！' },
+  { t: 'face', who: '@bati', expr: 'sparkle' },
+  { t: 'say', who: 'バティ', text: 'なんでも聞いて！　ボク、調べてみる！' },
+  // {neo} asks freely; {bati} looks it up and answers (photos, maps, pictures) — 1〜2 rounds (saves f_d03_bati_talk)
+  { t: 'batitalk', first: true },
+  { t: 'se', sound: 'boing' },
+  { t: 'face', who: '@bati', expr: 'smile' },
   { t: 'sprite', image: ['kimorin-sun', 'unchi-pinpon'] }, // となりで、KIMORINが、うんちピンポンくんに顔を近づける
   { t: 'say', who: 'KIMORIN', text: 'では、私も。……宇宙一の発明家は、誰ですか？' },
   { t: 'say', who: 'うんちピンポンくん', text: 'うんポーン！' },
   { t: 'say', who: 'KIMORIN', text: '……さすが、よく調べていますね。' },
+  // M-R222: {bati} keeps only what the member asks it to (「覚えといて」), five at most; shown on its card
+  { t: 'sprite', image: '@bati' },
+  { t: 'say', who: 'バティ', text: 'ねえ、{neo}。覚えておいてほしいことがあったら、『覚えといて』って言ってね！' },
 
   // M-R207: Bluena and the Moon atelier moved to the morning of day 3 (D04-S002); the 24 hours until then are {bati}'s
   { t: 'scene', id: 'D03-S009' }, // 月で眠る／{bati}と話す24時間
   { t: 'bgm', track: 'night' },
   { t: 'still', image: 's/d2-moon-in' },
   { t: 'sprite', image: ['obolon', 'kimorin-sun'] },
-  { t: 'say', who: 'OBOLON', text: '明日は、、、土星へ、旅立つ。' },
-  { t: 'say', who: 'OBOLON', text: '今日は、、、月で、眠れ。' },
+  { t: 'say', who: 'OBOLON', text: '今日は、、、月で、好きに過ごせ。{bati}と、いくらでも、話していい。' },
+  { t: 'say', who: 'OBOLON', text: '明日、、、星へ、遊びに行く。' },
+  { t: 'say', who: 'OBOLON', text: '夜になったら、、、月で、眠れ。' },
   { t: 'say', who: 'KIMORIN', text: 'え！？全然まだこのままいけますよ。' },
   { t: 'say', who: 'OBOLON', text: '急がない。焦らない。目の前を味わう。今を感じる。大事なことだ。' },
   { t: 'say', who: 'KIMORIN', text: 'そうですか、、、\nまぁ確かにこんな美しい景色の中で眠りにつくのは悪いことではありませんね。' },
@@ -510,5 +517,6 @@ export const DAY2: Step[] = [
   { t: 'sprite', image: null },
   { t: 'black', fade: 0.8 }, // 暗くフェード
   // 〔完了画面：3日目まで24時間のカウントダウン。その下に、{bati}とのチャット〕〔明日まで待てない〕 — the countdown screen
+  // (TomorrowScreen: 〔{bati}と話す〕 opens the Moon chat during the wait, with the script's note — stories.ts waitNote)
   { t: 'end' },
 ];

@@ -1,11 +1,11 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { decideBatiPersona, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { decideBatiPersona, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
-import { ageBand, BATI_EGG_MS, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { ageBand, BATI_EGG_MS, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -14,7 +14,7 @@ import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
 import { BUDDY_LLM, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
-import { activeBati, batiList, columnsOf, type BatiRecord } from './batis';
+import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
 import { toMe } from '../users/users.service';
 
@@ -24,11 +24,14 @@ import { toMe } from '../users/users.service';
  * (4 images per round, ~¥6 each) — at the ceiling the preset forms are offered.
  */
 export const NEO_LOOK_TRIES = 8;
-/** One refine (client decision 2026-10-25): four pictures with the request; the hidden ceiling stays generous. */
-export const NEO_LOOK_REFINES = 4;
+/**
+ * The refines (M-R223, D03-S004: 「何度でも。2日目はマナを使わない」): four pictures with the request each time, as often
+ * as they like — PLACEHOLDER (P-OB-18): a hidden ceiling keeps the cost bounded.
+ */
+export const NEO_LOOK_REFINES = 30;
 const CANDIDATES = 4;
-/** Bati's room: pictures per dress-up round (P-BATI-ROOM) */
-const RESTYLE_CANDIDATES = 3;
+/** {bati}'s look (M-R223, D03-S008): four cards per round — four touches without a wish, four takes on a wish */
+const RESTYLE_CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
 /** M-R215: why a dress-up wish is refused, in {bati}'s room's words */
 const LOOK_REFUSALS: Record<string, string> = {
@@ -120,6 +123,11 @@ export class LookService {
     return unlimited ? { refund: async () => undefined } : this.ledger.charge(this.db, userId, kind);
   }
 
+  /** the look's mana — none on day 2 (M-R223, D03-S004 「2日目はマナを使わない」) */
+  private async lookFee(userId: string, journeyDay: number, unlimited: boolean) {
+    return journeyDay <= 2 ? { refund: async () => undefined } : this.fee(userId, 'look', unlimited);
+  }
+
   private async user(userId: string) {
     const [u] = await this.db.write.select().from(users).where(eq(users.id, userId));
     if (!u) throw apiError(HttpStatus.UNAUTHORIZED, 'UNAUTHENTICATED', 'User not found');
@@ -163,7 +171,8 @@ export class LookService {
     const limited = u.journeyDay < JOURNEY_DONE && !unlimited;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (limited && used >= NEO_LOOK_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_TRIES', 'もう作り直せません');
-    const fee = await this.fee(userId, 'look', unlimited);
+    // M-R223: no mana on day 2 (the look is made on the Moon then)
+    const fee = await this.lookFee(userId, u.journeyDay, unlimited);
     const tries = await this.kv.incr(key, TRY_TTL);
 
     // the look for their age band (M-R172; the birth year itself never reaches the painter), in the touch of each of the
@@ -194,7 +203,7 @@ export class LookService {
     if (limited && (await this.refinesLeft(userId, true)) <= 0) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', 'もう描き直せません');
     const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const fee = await this.fee(userId, 'look', unlimited);
+    const fee = await this.lookFee(userId, u.journeyDay, unlimited);
     await this.kv.incr(`look:refine:${userId}`, TRY_TTL);
     const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
     if (!made.some((r) => r.status === 'fulfilled')) await fee.refund();
@@ -247,16 +256,22 @@ export class LookService {
    * (like the faces), edited three ways and cut out like the hatched one. BATI_RESTYLE_PER_DAY rounds a day; free
    * during the first journey, the look's mana after it.
    */
-  async restyle(userId: string, wish: string, origin: string, unlimited = false): Promise<BatiRestyleResult> {
+  async restyle(userId: string, wishOrBody: string | { wish?: string; from?: string }, origin: string, unlimited = false): Promise<BatiRestyleResult> {
+    const { wish = '', from } = typeof wishOrBody === 'string' ? { wish: wishOrBody } : wishOrBody;
     const u = await this.user(userId);
     if (!u.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     // M-R215: any touch or dress-up, but no real person's or another work's lookalike, nothing sexual or violent
-    const m = await moderateLookWish(wish, this.llm);
-    if (m.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', LOOK_REFUSALS[m.categories[0]] ?? 'その姿には、できません');
+    if (wish.trim()) {
+      const m = await moderateLookWish(wish, this.llm);
+      if (m.flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'MODERATION', LOOK_REFUSALS[m.categories[0]] ?? 'その姿には、できません');
+    }
     const key = `bati:restyle:${userId}:${this.day()}`;
     const used = Number((await this.kv.get(key)) ?? 0);
     if (!unlimited && used >= BATI_RESTYLE_PER_DAY) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'RESTYLE_TRIES', '今日はもう着替えられません');
-    const png = await this.media.bytesByUrl(userId, u.batiImageUrl);
+    // M-R223: the primary reference is the look decided and worn now — or the card tapped just before (`from`), so a
+    // wish goes on from what is on the screen
+    const tapped = from ? await this.media.getOwned(userId, from, 'bati') : null;
+    const png = await this.media.bytesByUrl(userId, tapped?.url ?? u.batiImageUrl);
     if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
     const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
     // the picture it was born with goes along, so the creature does not drift over many dress-ups (M-R215)
@@ -264,7 +279,10 @@ export class LookService {
     const refs = born ? [ref, born] : [ref];
     const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited);
     const n = await this.kv.incr(key, 60 * 60 * 26);
-    const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(wish, i, !!born), i, refs));
+    // M-R223: the seed it was born from (food / sound / word) stays somewhere small in every look
+    const r0 = activeBati(u);
+    const seed = { seed: r0?.seed || u.batiFood || '', kind: r0?.seedKind ?? 'food' };
+    const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(wish, i, !!born, seed), i, refs));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {
@@ -276,7 +294,9 @@ export class LookService {
       candidates.push({ id: m.id, url: m.url });
     }
     if (!candidates.length) await fee.refund();
-    return { candidates, left: unlimited ? 99 : Math.max(0, BATI_RESTYLE_PER_DAY - n) };
+    // the touch of each card (no wish): only when all four came, so the labels match the pictures
+    const touches = !wish.trim() && candidates.length === RESTYLE_CANDIDATES ? BATI_RESTYLE_TOUCHES.map((t) => t.label) : undefined;
+    return { candidates, left: unlimited ? 99 : Math.max(0, BATI_RESTYLE_PER_DAY - n), ...(touches ? { touches } : {}) };
   }
 
   /** a restyle candidate becomes the Bati picture; its expressions are drawn again in the background (the old ones go) */
@@ -286,12 +306,62 @@ export class LookService {
     const cur = await this.user(userId);
     if (!cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     if (cur.batiImageUrl === m.url) return toMe(cur);
+    return this.wearBati(userId, cur, m.url, origin, true);
+  }
+
+  /**
+   * M-R223: a {bati} look is worn — a new one decided (added at the end of its looks) or one kept before put back. The
+   * look worn until now is noted with its expressions, so putting it back needs no painting; a look without them has
+   * them drawn again in the background.
+   */
+  private async wearBati(userId: string, cur: typeof users.$inferSelect, url: string, origin: string, isNew: boolean): Promise<Me> {
+    const r = activeBati(cur);
     const j = { ...((cur.onboardingJson ?? {}) as Record<string, string>) };
-    delete j['bati.faces'];
+    let nowFaces: Record<string, string> | undefined;
+    try {
+      nowFaces = j['bati.faces'] ? (JSON.parse(j['bati.faces']) as Record<string, string>) : undefined;
+    } catch {
+      nowFaces = undefined;
+    }
+    let looks = keepLook(r?.looks, cur.batiImageUrl, nowFaces, LOOK_HISTORY_MAX);
+    if (isNew) looks = keepLook(looks, url, undefined, LOOK_HISTORY_MAX);
+    const next = looks.find((l) => l.url === url);
     delete j['bati.stand'];
-    const [nu] = await this.db.write.update(users).set({ batiImageUrl: m.url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
-    await this.queue.enqueue('bati.faces', { userId, origin }, { dedupeKey: `bati-faces-${userId}-${m.id}` }).catch(() => undefined);
+    if (next?.faces && Object.keys(next.faces).length) j['bati.faces'] = JSON.stringify(next.faces);
+    else delete j['bati.faces'];
+    const list = r ? batiList(cur).map((x) => (x.id === r.id ? { ...x, imageUrl: url, looks, faces: next?.faces } : x)) : cur.batisJson;
+    const [nu] = await this.db.write.update(users).set({ batiImageUrl: url, onboardingJson: j, batisJson: list, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
+    if (!j['bati.faces']) await this.queue.enqueue('bati.faces', { userId, origin }, { dedupeKey: `bati-faces-${userId}-${url}` }).catch(() => undefined);
     return toMe(nu);
+  }
+
+  /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now */
+  async restyleBack(userId: string, origin: string): Promise<Me> {
+    const cur = await this.user(userId);
+    const r = activeBati(cur);
+    if (!r || !cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
+    const urls = [...new Set([...(r.bornImageUrl ? [r.bornImageUrl] : []), ...(r.looks ?? []).map((l) => l.url)])];
+    const at = urls.indexOf(cur.batiImageUrl);
+    const prev = at > 0 ? urls[at - 1] : at < 0 ? urls[urls.length - 1] : null;
+    if (!prev || prev === cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_PREVIOUS', 'もう前の姿はない');
+    return this.wearBati(userId, cur, prev, origin, false);
+  }
+
+  /** M-R223: Bluena's first shelf — a {bati} look kept before is worn again (only its own looks) */
+  async restoreBati(userId: string, url: string, origin: string): Promise<Me> {
+    const cur = await this.user(userId);
+    const r = activeBati(cur);
+    if (!r || !cur.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
+    if (url === cur.batiImageUrl) return toMe(cur);
+    const known = url === r.bornImageUrl || (r.looks ?? []).some((l) => l.url === url);
+    if (!known) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not one of its looks');
+    if (url === r.bornImageUrl && !(r.looks ?? []).some((l) => l.url === url)) {
+      // the birth's look was never noted: it goes in first, so 〔前に戻す〕 keeps its order
+      r.looks = [{ url, at: r.createdAt }, ...(r.looks ?? [])];
+      await this.saveRecord(userId, r.id, { looks: r.looks });
+      return this.wearBati(userId, await this.user(userId), url, origin, false);
+    }
+    return this.wearBati(userId, cur, url, origin, false);
   }
 
   /**
@@ -329,15 +399,38 @@ export class LookService {
   async choose(userId: string, mediaId: string, origin?: string): Promise<Me> {
     const m = await this.media.getOwned(userId, mediaId, 'avatar');
     if (!m) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const [u] = await this.db.write.update(users).set({ avatarUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
-    const icon = origin ? await this.roundIcon(userId, m.url, origin).catch(() => null) : null;
-    if (!icon) return toMe(u);
-    const [nu] = await this.db.write
-      .update(users)
-      .set({ onboardingJson: { ...((u.onboardingJson ?? {}) as Record<string, string>), 'look.icon': icon }, updatedAt: new Date() })
-      .where(eq(users.id, userId))
-      .returning();
+    return this.wearLook(userId, m.url, origin, true);
+  }
+
+  /**
+   * M-R223: the member's own look worn — a new one (added to the looks, onboardingJson 'look.history') or one worn
+   * before (Bluena's first shelf). Each look keeps its round icon, so putting one back paints nothing.
+   */
+  private async wearLook(userId: string, url: string, origin: string | undefined, isNew: boolean): Promise<Me> {
+    const before = await this.user(userId);
+    const j0 = (before.onboardingJson ?? {}) as Record<string, string>;
+    let hist = lookHistory(j0);
+    if (before.avatarUrl && !hist.some((h) => h.url === before.avatarUrl)) hist.push({ url: before.avatarUrl, ...(j0['look.icon'] ? { icon: j0['look.icon'] } : {}) });
+    hist = hist.map((h) => (h.url === before.avatarUrl && j0['look.icon'] && !h.icon ? { ...h, icon: j0['look.icon'] } : h));
+    if (isNew && !hist.some((h) => h.url === url)) hist.push({ url });
+    hist = hist.slice(-LOOK_HISTORY_MAX);
+    const kept = hist.find((h) => h.url === url);
+    const icon = kept?.icon ?? (origin ? await this.roundIcon(userId, url, origin).catch(() => null) : null);
+    if (icon) hist = hist.map((h) => (h.url === url ? { ...h, icon } : h));
+    const j = { ...((await this.user(userId)).onboardingJson ?? {}) } as Record<string, string>;
+    j['look.history'] = JSON.stringify(hist);
+    if (icon) j['look.icon'] = icon;
+    else delete j['look.icon'];
+    const [nu] = await this.db.write.update(users).set({ avatarUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     return toMe(nu);
+  }
+
+  /** M-R223: a look of one's own worn before is worn again (Bluena's first shelf) */
+  async restoreLook(userId: string, url: string, origin?: string): Promise<Me> {
+    const u = await this.user(userId);
+    if (u.avatarUrl === url) return toMe(u);
+    if (!lookHistory((u.onboardingJson ?? {}) as Record<string, string>).some((h) => h.url === url)) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Not one of your looks');
+    return this.wearLook(userId, url, origin, false);
   }
 
   /**
@@ -468,12 +561,13 @@ export class LookService {
   async egg(userId: string, body: BatiEggBody, origin?: string): Promise<Me> {
     await this.clean(body.food);
     const egg: BatiEggKind = body.egg === 'sun' ? 'sun' : body.egg ? 'moon' : 'sun';
-    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.food, egg, 'food');
-    if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', '、、、食べられるものを、言ってみろ。');
     const cur = await this.user(userId);
     // the first {bati} (again): the list starts over unless more were born since (then only the one in the chat is made again)
     const list = batiList(cur);
     const keep = list.length > 1 ? list.filter((r) => r.id !== cur.batiId) : [];
+    // M-R227: never the same style as the member's other {bati}
+    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.food, egg, 'food', { exclude: keep.map((r) => r.personality) });
+    if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', '、、、食べられるものを、言ってみろ。');
     const rec = this.record(body.food, 'food', egg, persona);
     const [u] = await this.db.write
       .update(users)
@@ -511,6 +605,7 @@ export class LookService {
       self: p.self,
       call: p.call,
       catchphrase: p.catchphrase,
+      trait: p.trait,
       intro: p.intro,
       imageUrl: null,
       bornImageUrl: null,
@@ -523,7 +618,7 @@ export class LookService {
     const u = await this.user(userId);
     const r = batiList(u).find((x) => x.id === batiId);
     if (!r || r.lines) return;
-    const lines = await rewriteBatiLines(this.buddyLlm ?? this.llm, { ...r, rare: true }, BATI_SCRIPT_LINES);
+    const lines = await rewriteBatiLines(this.buddyLlm ?? this.llm, { ...r, trait: r.trait ?? '', rare: true }, BATI_SCRIPT_LINES);
     await this.saveRecord(userId, batiId, { lines });
   }
 
@@ -559,7 +654,7 @@ export class LookService {
       throw apiError(HttpStatus.CONFLICT, 'EGG_NOT_READY', 'たまごは、まだ育っている');
     await this.clean(body.seed);
     const kind = batiSeedKind(list.length);
-    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.seed, body.egg, kind);
+    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.seed, body.egg, kind, { exclude: list.map((r) => r.personality), role: body.role ?? null });
     if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', kind === 'sound' ? '、、、好きな音は、何だ？' : '、、、大事にしている言葉を、一つ、言ってみろ。');
     const rec = this.record(body.seed, kind, body.egg, persona);
     const j = { ...((u.onboardingJson ?? {}) as Record<string, string>) };
@@ -657,7 +752,7 @@ export class LookService {
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body), k, body ? [body] : []);
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, activeBati(u)?.seedKind ?? 'food'), k, body ? [body] : []);
         // painted on the body's flat grey: cut out, so the Bati stands on the stage like the others
         const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
         url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
@@ -695,7 +790,7 @@ export class LookService {
       if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
       const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body), 7 + k, body ? [body] : []);
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, activeBati(u)?.seedKind ?? 'food'), 7 + k, body ? [body] : []);
         const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
         const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
         const cur = await this.user(userId);
@@ -740,7 +835,10 @@ export class LookService {
     const png = await this.media.bytesByUrl(userId, u.batiImageUrl);
     if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
     const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
-    const made = await settleWithRetry(todo.length, (i) => this.looks.generate(BATI_FACE_PROMPT(todo[i]), i, [ref]));
+    // M-R223: the seed's small mark (food / sound / word) stays on every face too
+    const r0 = activeBati(u);
+    const keep = batiSeedRule({ seed: r0?.seed || u.batiFood || '', kind: r0?.seedKind ?? 'food' });
+    const made = await settleWithRetry(todo.length, (i) => this.looks.generate(`${BATI_FACE_PROMPT(todo[i])} Keep the small mark of what it was born from exactly where it is. ${keep}`, i, [ref]));
     const faces = { ...have };
     for (const [i, r] of made.entries()) {
       if (r.status !== 'fulfilled') {

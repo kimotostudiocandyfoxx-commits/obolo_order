@@ -13,6 +13,7 @@ import {
   batiPersonalityFromSeed,
   batiSelf,
   isBatiPersonality,
+  normalizeBatiPersonality,
   isBatiRare,
   type BatiCard,
   type BatiEggKind,
@@ -39,6 +40,8 @@ export interface BatiRecord {
   self: string;
   call: string;
   catchphrase: string;
+  /** M-R225: the card's 性格 (one word; never in the speech) */
+  trait?: string;
   intro: string;
   /** the member's own 一人称 / 呼び方 (the only things that change) */
   selfCustom?: string | null;
@@ -47,6 +50,11 @@ export interface BatiRecord {
   imageUrl: string | null;
   bornImageUrl?: string | null;
   faces?: Record<string, string>;
+  /**
+   * M-R223: the looks decided so far, oldest first, each with its expressions once drawn (〔前に戻す〕 and Bluena's first
+   * shelf put one back without painting again). Kept inside batis_json (no migration).
+   */
+  looks?: BatiLook[];
   /** a rare personality's fixed story lines, rewritten at birth (line as written → its line) */
   lines?: Record<string, string>;
   createdAt: string;
@@ -58,6 +66,31 @@ export interface BatiRecord {
    * data hook: the memory stays with the owner and nothing of the dachi's talk is brought back.
    */
   visit?: { dachiId: string; until: string } | null;
+}
+
+export interface BatiLook {
+  url: string;
+  faces?: Record<string, string>;
+  at: string;
+}
+
+/** M-R223: the looks with the one worn now noted (its faces as they are now); a new one goes at the end */
+export function keepLook(looks: BatiLook[] | undefined, url: string | null | undefined, faces?: Record<string, string>, max = 12): BatiLook[] {
+  const list = [...(looks ?? [])];
+  if (!url) return list;
+  const at = list.findIndex((l) => l.url === url);
+  const f = faces && Object.keys(faces).length ? { faces } : {};
+  if (at >= 0) list[at] = { ...list[at], ...f };
+  else list.push({ url, ...f, at: new Date().toISOString() });
+  return list.slice(-max);
+}
+
+/** the looks of a {bati} as urls, oldest first: the birth's first when it is not kept yet, the one worn now last if missing */
+export function lookUrls(r: BatiRecord): string[] {
+  const urls = (r.looks ?? []).map((l) => l.url);
+  if (r.bornImageUrl && !urls.includes(r.bornImageUrl)) urls.unshift(r.bornImageUrl);
+  if (r.imageUrl && !urls.includes(r.imageUrl)) urls.push(r.imageUrl);
+  return urls;
 }
 
 function faces(j: Record<string, string> | null): Record<string, string> | undefined {
@@ -104,7 +137,8 @@ function live(u: User, r: BatiRecord): BatiRecord {
 
 /** every {bati}, the active one as it is now (an account from before the list: its one {bati}) */
 export function batiList(u: User): BatiRecord[] {
-  const list = (u.batisJson ?? []).filter((r) => r && isBatiPersonality(r.personality));
+  // M-R225: a style retired since is read as the nearest current one (敬語の子 → ていねいな子 …)
+  const list = (u.batisJson ?? []).filter((r) => r && typeof r.id === 'string').map((r) => (isBatiPersonality(r.personality) ? r : { ...r, personality: normalizeBatiPersonality(r.personality) }));
   if (!u.batiFood) return list.filter((r) => r.id !== u.batiId);
   const at = list.findIndex((r) => r.id === u.batiId);
   if (at < 0) return [...list, live(u, legacyRecord(u))];
@@ -125,6 +159,7 @@ export function batiCard(r: BatiRecord): BatiCard {
     personality: r.personality,
     label: BATI_PERSONALITIES[r.personality].label,
     catchphrase: r.catchphrase,
+    ...(r.trait ? { trait: r.trait } : {}),
     intro: r.intro,
     rare: isBatiRare(r.personality),
     imageUrl: r.imageUrl,
@@ -145,6 +180,8 @@ export function batiViewExtra(r: BatiRecord): Partial<BatiView> {
     call: r.call,
     card: batiCard(r),
     ...(r.lines && Object.keys(r.lines).length ? { lines: r.lines } : {}),
+    looks: lookUrls(r),
+    seedKind: r.seedKind,
   };
 }
 
@@ -175,4 +212,14 @@ export function columnsOf(u: User, r: BatiRecord) {
   if (r.faces && Object.keys(r.faces).length) j['bati.faces'] = JSON.stringify(r.faces);
   else delete j['bati.faces'];
   return { batiId: r.id, batiFood: r.seed || '…', batiName: r.name, batiImageUrl: r.imageUrl, onboardingJson: j };
+}
+
+/** M-R223: the member's own looks so far, oldest first (onboardingJson 'look.history'), each with its round icon */
+export function lookHistory(j: Record<string, string> | null | undefined): { url: string; icon?: string }[] {
+  try {
+    const v = JSON.parse(j?.['look.history'] ?? '[]') as unknown;
+    return Array.isArray(v) ? v.filter((h): h is { url: string; icon?: string } => !!h && typeof (h as { url?: unknown }).url === 'string') : [];
+  } catch {
+    return [];
+  }
 }

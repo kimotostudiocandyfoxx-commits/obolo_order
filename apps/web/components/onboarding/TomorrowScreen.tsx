@@ -23,7 +23,10 @@ export function TomorrowScreen({
   skippedText,
   canSkip = false,
   bati,
+  note,
 }: {
+  /** a line under the countdown (D03-S009: the 24 hours are for talking with {bati}) */
+  note?: string;
   /** the hatched Bati: a calm way into Bati's room (the Moon) to talk while the day waits (P-BATI-ROOM) */
   bati?: { name: string; image?: string };
   /** the review pages only: the skip button (never in the members' app, M-R199) */
@@ -201,6 +204,7 @@ export function TomorrowScreen({
                 {bati.name}と話す
               </Link>
             )}
+            {phase === 'wait' && showButton && bati && note && <p className="max-w-xs animate-[fadeUp_0.8s_ease-out] text-[11px] leading-relaxed tracking-wider text-amber-100/55">{note}</p>}
             {phase === 'wait' && showButton && canSkip && (
               <button
                 onClick={skip}

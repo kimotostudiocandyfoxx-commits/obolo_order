@@ -8,12 +8,16 @@ import type { Work } from './work';
  */
 export type StoryMode = {
   mode: 'make' | 'fly';
-  /** the step's script lines, as written (placeholders filled by `fill` at the moment they are said) */
+  /** the step's script lines, as written (said in the speaker's manner by `voice`, placeholders filled by `fill` at the moment they are said) */
   lines?: ScriptLine[];
   /** the story's fill() with its vars */
   fill: (text: string) => string;
+  /** a line in its speaker's manner, before fill() ({bati}'s lines in its personality: batiLine; others as written) */
+  voice: (who: string, text: string) => string;
   /** who says a line: the name shown and the face */
   speaker: (who: string) => { name: string; avatar?: string };
+  /** the review page (not real=1): the works are made by stand-ins in this browser — no AI, nothing saved, nothing flown */
+  test?: boolean;
   /** Bluena is in hand today (d3.f_d04_bluena) */
   bluena?: boolean;
   /** fly mode: today's cards to fly */

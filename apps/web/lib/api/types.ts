@@ -289,9 +289,15 @@ export interface Api {
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;
   /** Bati's room: pictures of the same Bati dressed up / changed a little by the wish (BATI_RESTYLE_PER_DAY rounds a day) */
-  batiRestyle(wish: string): Promise<BatiRestyleResult>;
+  batiRestyle(wish?: string, from?: string): Promise<BatiRestyleResult>;
   /** one of them becomes the Bati picture (its expressions are drawn again in the background) */
   chooseBatiRestyle(id: string): Promise<Me>;
+  /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now (NO_PREVIOUS when none) */
+  batiLookBack(): Promise<Me>;
+  /** M-R223: Bluena's first shelf — a {bati} look kept before (Me.bati.looks), worn again */
+  batiLookRestore(url: string): Promise<Me>;
+  /** M-R223: Bluena's first shelf — a look of one's own worn before (Me.lookHistory), worn again */
+  lookRestore(url: string): Promise<Me>;
   /** the NEO look standing without a background (M-R149), drawn once per look */
   lookStandee(): Promise<Me>;
   /** the small chibi NEO (M-R155/M-R161), drawn once per look */

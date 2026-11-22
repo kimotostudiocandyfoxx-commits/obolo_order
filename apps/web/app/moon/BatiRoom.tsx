@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { BatiLook } from '@/components/bati/BatiLook';
 
 /**
  * Bati's room (the Moon; client 2026-11-22: "24時間の間はバティと喋らせまくる時間にしたい"): next to the chat,
@@ -56,6 +57,35 @@ export function RoomIcon({ id, className = 'h-[18px] w-[18px]' }: { id: 'dress' 
 }
 
 export function RoomSheet({ mode, onClose, onDone }: { mode: RoomMode; onClose: () => void; onDone: (line: string) => void }) {
+  // M-R223: {bati}'s look is the four cards in four touches (components/bati/BatiLook), as in the story
+  if (mode === 'bati') return <BatiLookSheet onClose={onClose} onDone={onDone} />;
+  return <MeSheet onClose={onClose} onDone={onDone} />;
+}
+
+function BatiLookSheet({ onClose, onDone }: { onClose: () => void; onDone: (line: string) => void }) {
+  const { me, setMe } = useAuth();
+  const bati = me?.bati?.name || 'バティ';
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
+      <div className="card max-h-[92svh] w-full max-w-xl overflow-y-auto rounded-b-none px-4 pb-[calc(20px+env(safe-area-inset-bottom))] pt-4" onClick={(e) => e.stopPropagation()}>
+        <BatiLook
+          bati={bati}
+          ask="これで、決まり？"
+          auto={false}
+          onMe={setMe}
+          onClose={onClose}
+          onDecided={() => {
+            onDone(LINES.bati.done);
+            onClose();
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MeSheet({ onClose, onDone }: { onClose: () => void; onDone: (line: string) => void }) {
+  const mode = 'me' as RoomMode;
   const { me, setMe } = useAuth();
   const api = getApi();
   const name = me?.displayName ?? '';
@@ -68,6 +98,8 @@ export function RoomSheet({ mode, onClose, onDone }: { mode: RoomMode; onClose: 
   const [ended, setEnded] = useState(false);
 
   const shown = candidates.find((c) => c.id === pick)?.url ?? current;
+  const hist = me?.lookHistory ?? [];
+  const prevLook = current ? (hist[hist.indexOf(current) - 1] ?? null) : null;
 
   const cast = async () => {
     const w = wish.trim();
@@ -191,6 +223,25 @@ export function RoomSheet({ mode, onClose, onDone }: { mode: RoomMode; onClose: 
         {pick && (
           <button className="btn btn-primary mt-3 h-12 w-full" disabled={busy} onClick={() => void choose()}>
             これにする
+          </button>
+        )}
+        {/* M-R223 〔前に戻す〕: the look worn before this one */}
+        {!pick && prevLook && (
+          <button
+            className="mt-3 w-full text-[12px] text-white/60 underline"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                setMe(await api.lookRestore(prevLook));
+              } catch {
+                setLine(LINES.failed);
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            前に戻す
           </button>
         )}
       </div>

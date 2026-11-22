@@ -30,11 +30,12 @@ function synced(u: Me): BatiSummary[] {
   return list.map((r) => (r.id === b.id ? { ...r, name: b.name, imageUrl: b.imageUrl, faces: b.faces, card: { ...r.card, name: b.name, imageUrl: b.imageUrl } } : r));
 }
 
-function born(seed: string, egg: BatiEggKind, nth: number): { summary: BatiSummary; view: NonNullable<Me['bati']> } {
-  const p = batiPersonaByRules(seed, egg);
+function born(seed: string, egg: BatiEggKind, nth: number, exclude: BatiSummary['personality'][] = []): { summary: BatiSummary; view: NonNullable<Me['bati']> } {
+  // M-R227: never the same style as the member's other {bati}
+  const p = batiPersonaByRules(seed, egg, Math.random(), { exclude });
   const id = uid();
   const createdAt = new Date().toISOString();
-  const card = { name: null, bornAt: createdAt, egg, seed, personality: p.personality, label: BATI_PERSONALITIES[p.personality].label, catchphrase: p.catchphrase, intro: p.intro, rare: isBatiRare(p.personality), imageUrl: null };
+  const card = { name: null, bornAt: createdAt, egg, seed, personality: p.personality, label: BATI_PERSONALITIES[p.personality].label, catchphrase: p.catchphrase, trait: p.trait, intro: p.intro, rare: isBatiRare(p.personality), imageUrl: null };
   const summary: BatiSummary = { id, name: null, egg, personality: p.personality, imageUrl: null, active: true, self: p.self, call: p.call, selfCustom: null, callCustom: null, card, createdAt };
   void nth;
   return { summary, view: { food: seed, name: null, imageUrl: null, id, egg, personality: p.personality, self: p.self, call: p.call, selfCustom: null, callCustom: null, card } };
@@ -45,7 +46,7 @@ export function demoBatiEgg(u: Me, food: string, egg: BatiEggKind): Partial<Me> 
   if (/死ね|殺す|うざい/.test(food)) throw new ApiError(422, 'SEED_REASK', '、、、食べられるものを、言ってみろ。');
   const list = synced(u);
   const keep = list.length > 1 ? list.filter((r) => r.id !== u.bati?.id).map((r) => ({ ...r, active: false })) : [];
-  const { summary, view } = born(food, egg, 0);
+  const { summary, view } = born(food, egg, 0, keep.map((r) => r.personality));
   return { bati: view, batis: [...keep, summary], batiEgg: keep.length + 1 < BATI_MAX ? { readyAt: new Date(Date.now() + BATI_EGG_MS).toISOString(), ready: false } : null };
 }
 
@@ -62,7 +63,7 @@ export function demoBatiNew(u: Me, egg: BatiEggKind, seed: string): Partial<Me> 
   if (list.length >= BATI_MAX) throw new ApiError(409, 'BATI_FULL', '相方は、3体まで');
   if (!demoEggView(u.batiEgg)?.ready) throw new ApiError(409, 'EGG_NOT_READY', 'たまごは、まだ育っている');
   void batiSeedKind(list.length);
-  const { summary, view } = born(seed, egg, list.length);
+  const { summary, view } = born(seed, egg, list.length, list.map((r) => r.personality));
   return {
     bati: view,
     batis: [...list.map((r) => ({ ...r, active: false })), summary],

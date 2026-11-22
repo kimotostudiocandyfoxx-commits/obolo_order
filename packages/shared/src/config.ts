@@ -45,6 +45,19 @@ export type MakeKind = keyof typeof MAKE_COST;
  */
 export const BATI_RESTYLE_PER_DAY = 30; // M-R207: Bati's magic is free and "as often as you like" on day 2 — 30 is only a cost safety cap
 export const BATI_MAGIC_PER_DAY = 30;
+/**
+ * M-R223 (D03-S008): {bati}'s look — opened without a wish, four cards of the {bati} as it is now in four art touches
+ * (the script's examples). With a wish, four variations of it. The label is shown under each card.
+ */
+export const BATI_RESTYLE_TOUCHES = [
+  { id: 'anime', label: 'アニメ風' },
+  { id: 'yuru', label: 'ゆるキャラ風' },
+  { id: '3d', label: '3D風' },
+  { id: 'pixel', label: 'ドット絵風' },
+] as const;
+export type BatiRestyleTouch = (typeof BATI_RESTYLE_TOUCHES)[number]['id'];
+/** M-R223: the looks kept per {bati} and of the member's own (〔前に戻す〕, Bluena's first shelf) */
+export const LOOK_HISTORY_MAX = 12;
 /** Spec §1.1 — subscription price in JPY. */
 export const SUBSCRIPTION_PRICE_JPY = 88;
 

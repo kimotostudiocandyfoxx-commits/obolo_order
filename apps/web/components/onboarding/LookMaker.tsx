@@ -13,9 +13,9 @@ import { VoiceField } from './StoryExtras';
  *  - 〔写真フォルダから器の水に映す〕〔カメラで撮って器の水に映す〕: always their own photo (no way without one)
  *  - OBOLON 「何の動物に、アレンジする？」, answered by voice (〔文字で答える〕 in the corner); the words as said are the
  *    bubble and go into the drawing as they are (no list of animals)
- *  - −3マナ, then four looks from the photo, each with that animal's ears, the society's hood and round sunglasses, in four
- *    different touches. Pick one → the chosen look big on the screen (ドーン). One redraw with a wish (hidden for now:
- *    REDO_ON). Gender is never asked.
+ *  - four looks from the photo, each with that animal's ears, the society's hood and round sunglasses, in four
+ *    different touches. Pick one → the chosen look big on the screen (ドーン). 〔要望を言って描き直す〕 redraws with a wish
+ *    as often as they like, 〔前の4枚〕 goes back (M-R223: no mana on day 2, so no −3マナ either). Gender is never asked.
  *  - if drawing fails, the eight preset forms are offered so the story always moves on.
  * The answers and the last four looks are kept for this visit.
  */
@@ -139,11 +139,13 @@ export function LookMaker({
   };
 
   const add = async () => {
-    if (!sel || !instruction.trim()) return;
+    // the wish redraws from the card picked, or the first of the four on screen (M-R223: 何度でも)
+    const from = sel ?? draft.cands[0];
+    if (!from || !instruction.trim()) return;
     setErr(null);
     setPhase('making');
     try {
-      const r = await within(api.refine(sel.id, instruction.trim()), 180_000);
+      const r = await within(api.refine(from.id, instruction.trim()), 180_000);
       if (r.candidates.length) {
         save({ ...draft, cands: r.candidates, refined: true, prev: draft.cands });
         setSel(null);
@@ -155,7 +157,7 @@ export function LookMaker({
       if (/描き直せません|LOOK_REFINES/.test(String(e))) setTired(true);
       else setErr('うまく描き変わらなかった……もう一度');
     }
-    setPhase('chosen');
+    setPhase(sel ? 'chosen' : 'pick');
   };
 
   const [reveal, setReveal] = useState<string | null>(null);
@@ -278,17 +280,17 @@ export function LookMaker({
       </Panel>
     );
 
-  if ((phase === 'chosen' || phase === 'add') && sel)
+  if ((phase === 'chosen' || phase === 'add') && (sel || phase === 'add'))
     return (
       <Panel>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={sel.url} alt="" className="mx-auto aspect-square w-[min(66vw,280px)] rounded-3xl border-2 border-amber-200/60 object-cover shadow-[0_0_30px_rgba(255,200,90,0.35)]" />
+        <img src={(sel ?? draft.cands[0])?.url} alt="" className="mx-auto aspect-square w-[min(66vw,280px)] rounded-3xl border-2 border-amber-200/60 object-cover shadow-[0_0_30px_rgba(255,200,90,0.35)]" />
         {phase === 'chosen' ? (
           <div className="mt-4 flex flex-col gap-2">
             <Gold disabled={busy} onClick={decide}>
               {busy ? '……' : 'これにする'}
             </Gold>
-            {REDO_ON && !tired && !draft.refined && <Plain onClick={() => setPhase('add')}>要望を言って描き直す（1回だけ）</Plain>}
+            {REDO_ON && !tired && <Plain onClick={() => setPhase('add')}>要望を言って描き直す</Plain>}
             <Back onClick={() => setPhase('pick')} label="4枚にもどる" />
             {err && <p className="text-center text-xs text-rose-300">{err}</p>}
           </div>
@@ -300,7 +302,7 @@ export function LookMaker({
               <Gold disabled={!instruction.trim()} onClick={add}>
                 これにする
               </Gold>
-              <Back onClick={() => setPhase('chosen')} />
+              <Back onClick={() => setPhase(sel ? 'chosen' : 'pick')} />
             </div>
           </div>
         )}
@@ -323,17 +325,20 @@ export function LookMaker({
         ))}
       </div>
       <div className="mt-3 flex flex-col gap-2">
-        {draft.refined ? (
-          <>
-            {draft.prev && draft.prev.length > 0 && (
-              <Plain onClick={() => save({ ...draft, cands: draft.prev!, prev: draft.cands })}>前の4枚</Plain>
-            )}
-            <p className="text-center text-xs text-white/50">この4枚か、前の4枚から決めてください</p>
-          </>
-        ) : !REDO_ON ? null : !tired ? (
-          <Plain onClick={() => (last.current ? draw(last.current) : setPhase('animal'))}>要望を言って描き直す（1回だけ）</Plain>
-        ) : (
-          <p className="text-center text-xs text-white/50">器の水が今日は疲れてしまった……この4枚から選んでください</p>
+        {/* D03-S004#c2 〔要望を言って描き直す〕 as often as they like; 〔前の4枚〕 goes back (M-R223) */}
+        {REDO_ON && !tired && (
+          <Plain
+            onClick={() => {
+              setSel(null);
+              setPhase('add');
+            }}
+          >
+            要望を言って描き直す
+          </Plain>
+        )}
+        {tired && <p className="text-center text-xs text-white/50">器の水が今日は疲れてしまった……この4枚から選んでください</p>}
+        {draft.refined && draft.prev && draft.prev.length > 0 && (
+          <Plain onClick={() => save({ ...draft, cands: draft.prev!, prev: draft.cands })}>前の4枚</Plain>
         )}
         {err && <p className="text-center text-xs text-rose-300">{err}</p>}
       </div>
@@ -351,8 +356,8 @@ export function clearLookDraft() {
 }
 
 /**
- * While the bowl of water draws: what was said, as said, in {name}'s bubble; the light from the mana gem into the water and
- * 〔テロップ：−3マナ〕 (D03-S004). No narration the script does not have (story chat 2026-10-29).
+ * While the bowl of water draws: what was said, as said, in {name}'s bubble; the light from the mana gem into the water
+ * (D03-S004; M-R223: day 2 uses no mana, so no −3マナ telop). No narration the script does not have (story chat 2026-10-29).
  */
 function Basin({ said, spell, spellName, spellFace }: { said?: string; spell?: string; spellName?: string; spellFace?: string }) {
   return (
@@ -373,7 +378,6 @@ function Basin({ said, spell, spellName, spellFace }: { said?: string; spell?: s
         <span className="absolute inset-x-0 bottom-0 h-20 rounded-[50%] border border-sky-100/40 bg-[radial-gradient(ellipse_at_center,rgba(190,225,255,0.45)_0%,rgba(80,120,170,0.15)_60%,transparent_75%)]" />
         <span className="absolute inset-x-10 bottom-5 h-10 animate-pulse rounded-[50%] bg-sky-100/25 blur-md" />
       </div>
-      <p className="animate-[fadeUp_0.5s_ease-out] text-center text-[17px] tracking-[0.2em] text-amber-50">−3マナ</p>
     </div>
   );
 }
@@ -426,8 +430,7 @@ function within<T>(p: Promise<T>, ms: number): Promise<T> {
 }
 
 /**
- * The redraw (〔要望を言って描き直す（1回だけ）〕) is hidden for now: waiting again was the weaker moment (client
- * 2026-10-29, for the investors' evening). The script keeps them; set true to bring them back. 〔もう一度〕 after a
- * failure stays.
+ * The redraw 〔要望を言って描き直す〕 (D03-S004#c2): back with M-R223 — as often as they like, no mana on day 2.
+ * 〔もう一度〕 after a failure stays.
  */
-const REDO_ON = false;
+const REDO_ON = true;

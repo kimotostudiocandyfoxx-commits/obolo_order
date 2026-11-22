@@ -43,8 +43,15 @@ export function BatiCardView({ card, egg, eggGrowth, onExport }: { card: BatiCar
             <dt className="shrink-0 text-amber-200/80">好物</dt>
             <dd className="break-all">{card.seed}</dd>
           </div>
+          {/* M-R225: the trait is the card's only (never in the speech); the way of speaking and its 口ぐせ */}
+          {card.trait && (
+            <div className="flex gap-2">
+              <dt className="shrink-0 text-amber-200/80">性格</dt>
+              <dd>{card.trait}</dd>
+            </div>
+          )}
           <div className="flex gap-2">
-            <dt className="shrink-0 text-amber-200/80">性格</dt>
+            <dt className="shrink-0 text-amber-200/80">話し方</dt>
             <dd>
               {card.label}｜口ぐせ：{card.catchphrase}
             </dd>
@@ -124,7 +131,8 @@ export async function cardPng(card: BatiCard): Promise<Blob | null> {
   ctx.textAlign = 'left';
   ctx.font = `44px ${font}`;
   let y = wrap(ctx, `好物：${card.seed}`, 140, 1300, W - 280, 60);
-  y = wrap(ctx, `性格：${card.label}`, 140, y + 10, W - 280, 60);
+  if (card.trait) y = wrap(ctx, `性格：${card.trait}`, 140, y + 10, W - 280, 60);
+  y = wrap(ctx, `話し方：${card.label}`, 140, y + 10, W - 280, 60);
   y = wrap(ctx, `口ぐせ：${card.catchphrase}`, 140, y + 10, W - 280, 60);
   ctx.font = `40px ${font}`;
   wrap(ctx, card.intro, 140, y + 40, W - 280, 58);

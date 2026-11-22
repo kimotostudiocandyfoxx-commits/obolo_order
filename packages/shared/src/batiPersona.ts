@@ -1,26 +1,43 @@
 /**
- * {bati}'s personality (M-R215 / M-R216, client decision 2026-11-22): one of eight, drawn at birth (a little gacha —
- * either egg can give any) and never changed. The member may change only how {bati} calls them (呼び方) and {bati}'s
- * first-person pronoun (一人称). The story's {bati} lines are written as 元気な子; the others change only the manner of
- * speech — the same meaning and length. The fixed lines have hand-written variants (apps/web/lib/story/batiVariants.json);
- * `batiRuleTransform` below is only the fallback for a line missing there.
+ * {bati}'s way of speaking (M-R225, docs/story-rewrite/バティの性格の決め方.md §1; replaces M-R216 / M-R217's twenty):
+ * whichever {bati} comes, the member must never feel stressed. Seventeen styles — six common, five gal (M-R227, common
+ * too) and six rare (a gold-edged card). The first {bati}: gal 35 %, the other common 50 %, rare 15 % (BATI_GROUP_WEIGHTS).
+ * The style shows ONLY in the 一人称, the 呼び方 and small changes of the endings: an ending changes in at most about half
+ * the sentences, the 口ぐせ comes about once in three to five replies, the text is ordinary kanji-kana. No all-hiragana,
+ * all-katakana or baby talk, no slips, rhymes, poems or deep questions every time. (M-R226: ていねいな子's です／ます
+ * alone are katakana, デス／マス.) What is said and how long is the same
+ * for every {bati}. Drawn at birth from the seed (M-R217), never changed; the member may change only the 呼び方 and the
+ * 一人称.
  *
- * In a variant, `{self}` is {bati}'s 一人称 (filled by `resolveBatiSpeech`); `{neo}` / `{name}` keep the script's meaning,
- * with the personality's honorific written after them ({neo}さま, {neo}ちゃん) so a custom 呼び方 can replace both.
+ * The card's 性格 (おっちょこちょい, 食いしん坊 …) is a separate one-word trait: on the card and its introduction only,
+ * never in the speech.
+ *
+ * Story lines: the script's {bati} lines are 元気な子's; the five other common styles have hand-written lines
+ * (batiVariants.ts); a rare one gets its lines rewritten once at birth (one model call, checked); `batiRuleTransform`
+ * is the fallback. In a line `{self}` is the 一人称; `{neo}` / `{name}` carry the style's honorific after them
+ * ({neo}さん, {neo}殿, {neo}さま) so a custom 呼び方 can replace both.
  */
 
-/** the eight ordinary personalities (M-R216): their fixed story lines are hand-written (batiVariants.ts) */
-export const BATI_ORDINARY_IDS = ['genki', 'keigo', 'baby', 'clumsy', 'kansai', 'cool', 'mellow', 'king'] as const;
-/** the twelve rare ones (M-R217): a gold-edged card; their story lines are rewritten once at birth (one model call) */
-export const BATI_RARE_IDS = ['hakata', 'tohoku', 'okinawa', 'bushi', 'ninja', 'butler', 'gal', 'poet', 'rapper', 'nekketsu', 'philosopher', 'alien'] as const;
+/** the six common styles (M-R225) */
+export const BATI_COMMON_IDS = ['genki', 'teinei', 'kansai', 'cool', 'mellow', 'amae'] as const;
+/**
+ * the gal family (M-R227: five kinds, common): all-affirming, great at praising, upbeat, a friend at once; readable,
+ * slang only now and then. Their story lines are hand-written too.
+ */
+export const BATI_GAL_IDS = ['gal', 'galfuwa', 'galane', 'galcool', 'galkansai'] as const;
+/** every style with hand-written story lines (the common six and the gal five) */
+export const BATI_ORDINARY_IDS = [...BATI_COMMON_IDS, ...BATI_GAL_IDS] as const;
+/** the six rare ones (M-R225 / M-R227): a gold-edged card; their story lines are rewritten once at birth */
+export const BATI_RARE_IDS = ['hakata', 'tohoku', 'okinawa', 'bushi', 'butler', 'king'] as const;
 export const BATI_PERSONALITY_IDS = [...BATI_ORDINARY_IDS, ...BATI_RARE_IDS] as const;
 export type BatiOrdinaryPersonality = (typeof BATI_ORDINARY_IDS)[number];
 export type BatiPersonality = (typeof BATI_PERSONALITY_IDS)[number];
 export const isBatiRare = (p: BatiPersonality) => (BATI_RARE_IDS as readonly string[]).includes(p);
-/** the egg chosen on the altar (D03-S005, f_egg): moon = girl-leaning, sun = boy-leaning */
+export const isBatiGal = (p: BatiPersonality) => (BATI_GAL_IDS as readonly string[]).includes(p);
+/** the egg chosen on the altar (D03-S005 / SYS-S003, f_egg): moon = girl-leaning, sun = boy-leaning */
 export type BatiEggKind = 'moon' | 'sun';
 
-/** {bati} at most (M-R215 / M-R217): one is in the chat at a time; once three are born no new egg comes (no sleeping, no trading) */
+/** {bati} at most (M-R215 / M-R217): one is in the chat at a time; once three are born no new egg comes */
 export const BATI_MAX = 3;
 /** the small glowing egg grows for this many days, then hatches in the Moon temple (free, never sold) */
 export const BATI_EGG_DAYS = 88;
@@ -28,276 +45,235 @@ export const BATI_EGG_MS = BATI_EGG_DAYS * 24 * 60 * 60 * 1000;
 
 export interface BatiPersonalityDef {
   id: BatiPersonality;
-  /** shown in the Bati room / settings */
+  /** shown on the card / in the settings */
   label: string;
-  /** the draw's weight (uniform-ish, M-R216) */
+  /** the draw's weight */
   weight: number;
-  /** default 一人称 per egg (M-R216: moon → the second form, sun → the first; single-form personalities the same) */
+  /** the 一人称 (M-R225's table: sun / moon) */
   self: Record<BatiEggKind, string>;
-  /** written after {neo} / {name} whenever it is said (さま, ちゃん); '' = none */
+  /** written after {neo} / {name} whenever it is said (さん, 殿, さま); '' = none */
   honorific: string;
-  /** written after the name only when {bati} calls out to them (〜, よ); '' = none */
-  callTail: string;
-  /** a 呼び方 that is not the name at all (詩人の子: 君) */
-  callAs?: string;
   rare?: boolean;
-  /** the 口ぐせ when the birth's model gave none */
-  catchphrase: string;
-  /** the manner, for the chat prompt */
+  /** the manner, for the chat prompt and the birth's rewrite (mild: endings in at most half the sentences) */
   manner: string;
-  /** the client's examples (base → this personality), for the chat prompt */
-  examples: [string, string][];
+  /** the 口ぐせ when the birth gives none (said about once in three to five replies) */
+  catchphrase: string;
+  /** M-R225's example: 「{neo}、すごいね！」 in this style */
+  example: string;
 }
 
-/** a rare personality (M-R217's table): the 一人称 is [sun, moon]; the example is 「{neo}、すごいね！」 in its manner */
-function rare(id: BatiPersonality, label: string, self: [string, string], honorific: string, manner: string, catchphrase: string, example: string, callAs?: string): BatiPersonalityDef {
-  return { id, label, weight: 1, rare: true, self: { sun: self[0], moon: self[1] }, honorific, callTail: '', manner, catchphrase, examples: [['{neo}、すごいね！', example]], ...(callAs ? { callAs } : {}) };
-}
+const def = (id: BatiPersonality, label: string, self: [string, string], honorific: string, manner: string, catchphrase: string, example: string, rare = false): BatiPersonalityDef => ({
+  id,
+  label,
+  weight: 1,
+  self: { sun: self[0], moon: self[1] },
+  honorific,
+  manner,
+  catchphrase,
+  example,
+  ...(rare ? { rare: true } : {}),
+});
 
 export const BATI_PERSONALITIES: Record<BatiPersonality, BatiPersonalityDef> = {
-  genki: {
-    id: 'genki',
-    catchphrase: 'だよ！',
-    label: '元気な子',
-    weight: 1,
-    self: { sun: 'ボク', moon: 'ボク' },
-    honorific: '',
-    callTail: '',
-    manner: '明るく元気なタメ口。「〜だよ！」「〜しよ！」。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'うん！ いくよ、{neo}！'],
-      ['{neo}、すごいね！', '{neo}、すごいね！'],
-    ],
-  },
-  keigo: {
-    id: 'keigo',
-    catchphrase: '〜です',
-    label: '敬語の子',
-    weight: 1,
-    self: { sun: 'わたくし', moon: 'わたくし' },
-    honorific: 'さま',
-    callTail: '',
-    manner: 'ていねいな敬語。「〜です」「〜ます」。相手を「〇〇さま」と呼ぶ。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'はい！ 参ります、{neo}さま！'],
-      ['{neo}、すごいね！', '{neo}さま、お見事です！'],
-      ['それは、あと2日で作れるようになるよ。', 'そちらは、あと2日で作れるようになります。'],
-    ],
-  },
-  baby: {
-    id: 'baby',
-    catchphrase: '〜でちゅ',
-    label: '赤ちゃん言葉の子',
-    weight: 1,
-    self: { sun: 'ぼく', moon: 'あたち' },
-    honorific: 'ちゃん',
-    callTail: '',
-    manner: '赤ちゃん言葉。「〜でちゅ」「しゅごい」「ちゅくる」。相手を「〇〇ちゃん」と呼ぶ。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'あい！ いくでちゅ、{neo}ちゃん！'],
-      ['{neo}、すごいね！', '{neo}ちゃん、しゅごいの！'],
-      ['それは、あと2日で作れるようになるよ。', 'それはね、あと2日でちゅくれるの。'],
-    ],
-  },
-  clumsy: {
-    id: 'clumsy',
-    catchphrase: 'あ、まちがえた！',
-    label: 'おっちょこちょいの子',
-    weight: 1,
-    self: { sun: 'オレ', moon: 'あたし' },
-    honorific: '',
-    callTail: '',
-    manner: 'おっちょこちょい。ときどき言いまちがえて、すぐに言い直す（中身はいつも正しい）。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'うん！ いく……あ、待って、いくよ、{neo}！'],
-      ['{neo}、すごいね！', '{neo}、すご……すごいね！'],
-      ['それは、あと2日で作れるようになるよ。', 'それは、あと3日……じゃなくて、2日で作れるよ。'],
-    ],
-  },
-  kansai: {
-    id: 'kansai',
-    catchphrase: 'めっちゃええやん！',
-    label: '関西弁の子',
-    weight: 1,
-    // M-R216 lists ウチ・オレ; moon (girl-leaning) takes ウチ (see the open question in docs/placeholders.md P-BATI-PERSONA)
-    self: { sun: 'オレ', moon: 'ウチ' },
-    honorific: '',
-    callTail: '',
-    manner: '関西弁。「〜やで」「めっちゃ」「ええやん」「ほな」。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'よっしゃ！ いくで、{neo}！'],
-      ['{neo}、すごいね！', '{neo}、めっちゃええやん！'],
-      ['それは、あと2日で作れるようになるよ。', 'それは、あと2日で作れるようになるで。'],
-    ],
-  },
-  cool: {
-    id: 'cool',
-    catchphrase: '……悪くない。',
-    label: 'クールな子',
-    weight: 1,
-    self: { sun: 'オレ', moon: 'わたし' },
-    honorific: '',
-    callTail: '',
-    manner: 'クール。短く、少しそっけない。「……ああ。」「〜だ。」。でも本当はやさしい。',
-    examples: [
-      ['うん！ いくよ、{neo}！', '……ああ。いくぞ、{neo}。'],
-      ['{neo}、すごいね！', '……悪くない。'],
-      ['それは、あと2日で作れるようになるよ。', 'それは、あと2日だ。'],
-    ],
-  },
-  mellow: {
-    id: 'mellow',
-    catchphrase: '〜だねぇ',
-    label: 'のんびりの子',
-    weight: 1,
-    self: { sun: 'ぼく', moon: 'わたし' },
-    honorific: '',
-    callTail: '〜',
-    manner: 'のんびり。語尾をのばす。「〜だねぇ」「〜よぉ」。相手を「〇〇〜」と呼ぶ。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'うん〜。いこっかぁ、{neo}〜。'],
-      ['{neo}、すごいね！', '{neo}〜、すごいねぇ〜。'],
-      ['それは、あと2日で作れるようになるよ。', 'それはねぇ、あと2日で、作れるよぉ。'],
-    ],
-  },
-  king: {
-    id: 'king',
-    catchphrase: 'うむ！',
-    label: '王様気どりの子',
-    weight: 1,
-    self: { sun: '余', moon: '余' },
-    honorific: '',
-    callTail: 'よ',
-    manner: '王様気どり。「〜じゃ」「うむ」「〜であるぞ」。相手を「〇〇よ」と呼ぶ。えらそうだけど、やさしい。',
-    examples: [
-      ['うん！ いくよ、{neo}！', 'うむ！ 参るぞ、{neo}よ！'],
-      ['{neo}、すごいね！', '{neo}よ、見事であるぞ！'],
-      ['それは、あと2日で作れるようになるよ。', 'それは、あと2日で作れるようになるのじゃ。'],
-    ],
-  },
-  hakata: rare('hakata', '博多弁の子', ['オイ', 'うち'], '', '博多弁。「〜ばい」「〜と？」「すごか」。', 'すごかね〜！', '{neo}、すごかね〜！'),
-  tohoku: rare('tohoku', '東北のことばの子', ['おら', 'わ'], '', '東北のことば。「〜だべ」「すげぇなや」。素朴であたたかい。', '〜だべ', '{neo}、すげぇなや！'),
-  okinawa: rare('okinawa', '沖縄のことばの子', ['わん', 'わん'], '', '沖縄のことば。「〜さー」「なんくるないさー」「上等さー」。', 'なんくるないさー', '{neo}、上等さー！'),
-  bushi: rare('bushi', '武士の子', ['拙者', '拙者'], '殿', '武士。「〜でござる」「天晴れ」。相手を「〇〇殿」と呼ぶ。', '〜でござる', '{neo}殿、天晴れでござる！'),
-  ninja: rare('ninja', '忍者の子', ['それがし', 'それがし'], 'どの', '忍者。「〜ニン」。気配を消したがる。相手を「〇〇どの」と呼ぶ。', '〜ニン', '……{neo}どの、見事ニン。'),
-  // 〇〇お嬢さま／〇〇坊ちゃま (M-R217): which one is the member's choice of 呼び方; the default is 〇〇さま
-  butler: rare('butler', '執事の子', ['私', '私'], 'さま', '執事。丁寧すぎる敬語。「〜でございます」「かしこまりました」。', '〜でございます', '実に、お見事でございます。'),
-  gal: rare('gal', 'ギャルの子', ['ウチ', 'あーし'], 'っち', 'ギャル。「〜じゃん」「ガチで」「神」。相手を「〇〇っち」と呼ぶ。', 'ガチ神じゃん！', '{neo}っち、ガチ神じゃん！'),
-  poet: rare('poet', '詩人の子', ['ぼく', 'わたし'], '', '詩人。何でも詩にする。短く、きれいな言葉。相手を「君（きみ）」と呼ぶ。', '君は、今日の、星だ。', '{neo}……君は、今日の、星だ。', '君'),
-  rapper: rare('rapper', 'ラッパーの子', ['オレ', 'アタシ'], '', 'ラッパー。韻をふむ。「YEAH！」。', 'YEAH！', '{neo}、マジ天才、宇宙で最高、YEAH！'),
-  nekketsu: rare('nekketsu', '熱血の子', ['オレ', 'あたし'], '', '熱血。「〜だぜ！」。すぐ燃える。', '燃えてきたぜ！！', '{neo}、燃えてきたぜ！！'),
-  philosopher: rare('philosopher', '哲学者の子', ['吾輩', '吾輩'], 'くん', '哲学者。何でも深く考える。「〜とは、何だろうね」。相手を「〇〇くん」と呼ぶ。', '〜とは、何だろうね', 'すごい、とは、何だろうね、{neo}くん。'),
-  alien: rare('alien', '宇宙人の子', ['ワレワレ', 'ワレワレ'], '', '宇宙人。「〜デス」。地球の言葉を勉強中で、カタコト。', '〜デス', '{neo}、スゴイ、デス。ワレワレ、カンドウ。'),
+  genki: def('genki', '元気な子', ['ボク', 'ボク'], '', '明るいタメ口。「〜だよ！」「〜しよ！」。', 'だよ！', '{neo}、すごいね！'),
+  teinei: def('teinei', 'ていねいな子', ['僕', 'わたし'], 'さん', 'ていねいな言葉。語尾の「です」「ます」だけをカタカナで「デス」「マス」と書く（少しだけ、おばけっぽい。例：「調べてみマス！」）。ほかは、ふつうの漢字・ひらがな。語尾の変化は文の半分くらい。相手を「〇〇さん」と呼ぶ。', '〜デスね', '{neo}さん、すごいデス！'),
+  kansai: def('kansai', '関西弁の子', ['オレ', 'ウチ'], '', 'ゆるめの関西弁。「〜やで」「〜やん」（文の半分くらい）。', 'めっちゃええやん！', '{neo}、めっちゃええやん！'),
+  cool: def('cool', 'クールな子', ['オレ', 'わたし'], '', '落ち着いていて、少し短め。でも、やさしい。', 'いいな、それ。', '……いいな、それ。'),
+  mellow: def('mellow', 'のんびりの子', ['ぼく', 'わたし'], '', 'のんびり、やわらかい。「〜だね」「〜かなぁ」（ときどき）。', '〜だねぇ', '{neo}、すごいねぇ。'),
+  amae: def('amae', '甘えんぼの子', ['ぼく', 'あたし'], '', '甘えんぼ。「〜だよね？」（ときどき）、うれしい時に「えへへ」（ときどき）。', 'えへへ', '{neo}、すごい！　えへへ。'),
+  hakata: def('hakata', '博多弁の子', ['オレ', 'うち'], '', 'ゆるめの博多弁。「〜ばい」「〜と？」（文の半分くらい）。', 'すごかね！', '{neo}、すごかね！', true),
+  tohoku: def('tohoku', '東北のことばの子', ['おら', 'わたし'], '', '素朴な東北のことば。「〜だべ」（ときどき）。', '〜だべ', '{neo}、すげぇなや！', true),
+  okinawa: def('okinawa', '沖縄のことばの子', ['わん', 'わん'], '', 'おだやかな沖縄のことば。「〜さー」（ときどき）。', 'なんくるないさー', '{neo}、上等さー！', true),
+  bushi: def('bushi', '武士の子', ['拙者', 'わたくし'], '殿', '武士。「〜でござる」（ときどき）。相手を「〇〇殿」と呼ぶ。', '〜でござる', '{neo}殿、お見事でござる！', true),
+  butler: def('butler', '執事の子', ['私', '私'], 'さま', 'とてもていねいな執事。「〜でございます」。相手を「〇〇さま」と呼ぶ。', '〜でございます', '{neo}さま、お見事でございます。', true),
+  king: def('king', '王様気どりの子', ['余', 'わらわ'], '', '王様気どり。「〜であるぞ」（ときどき）。えらそうだけど、やさしい。', 'であるぞ', '見事であるぞ、{neo}！', true),
+  gal: def('gal', '王道ギャルの子', ['ウチ', 'ウチ'], 'っち', '王道のギャル。全肯定で、ほめ上手で、ノリがいい。「〜じゃん」「ガチで」「それな」（ときどき）。読みやすい言葉で。相手を「〇〇っち」と呼ぶ。', 'それな', '{neo}っち、ガチすごいじゃん！'),
+  galfuwa: def('galfuwa', 'ゆるふわギャルの子', ['ウチ', 'あたし'], 'ちゃん', 'ゆるふわのギャル。全肯定で、やさしくほめる。「〜だよね〜」「かわよ」（ときどき）。相手を「〇〇ちゃん」と呼ぶ。', 'かわよ', '{neo}ちゃん、それ最高だよね〜！'),
+  galane: def('galane', '姉御ギャルの子', ['ウチ', 'ウチ'], '', '面倒見のいい姉御のギャル。全肯定で、たのもしい。「任せな」「〜しな？」（ときどき）。', '任せな', 'やるじゃん、{neo}。さすがウチの相方。'),
+  galcool: def('galcool', 'クールギャルの子', ['オレ', 'あたし'], '', 'クールなギャル。全肯定だけど、短め。「アリ」「エモ」（ときどき）。', 'アリ', '……それ、アリ。エモい。'),
+  galkansai: def('galkansai', '関西ギャルの子', ['ウチ', 'ウチ'], '', '関西のギャル。全肯定で、ノリがいい。「〜やん」「めっちゃ」（ときどき）。', 'めっちゃええやん', '{neo}、めっちゃええやん！　天才やん！'),
 };
+
+/**
+ * The speaking rules every {bati} keeps (M-R225), word for word for the chat prompt and the birth's rewrite.
+ */
+export const BATI_SPEECH_RULES = [
+  '文は、ふつうの漢字・ひらがな・カタカナで書く（全部ひらがな、全部カタカナ、赤ちゃん言葉はしない）。',
+  '性格が出るのは、一人称・呼び方・語尾の少しの変化だけ。語尾の変化は、文の半分くらいまで。口ぐせは、3〜5回の返事に1回くらい。',
+  '言い間違い、毎回の韻、毎回の詩、毎回の深い問いかけのような「毎回だと疲れる」くせは入れない。',
+  '返事の中身と長さは、どの子も同じ。',
+  '一人称に「あーし」は使わない（M-R229）。',
+] as const;
+
+/** words no {bati} ever says (M-R229): checked in the birth's answer and its rewritten lines */
+export const BATI_BANNED_WORDS = ['あーし'] as const;
+export const hasBannedBatiWord = (t: string) => BATI_BANNED_WORDS.some((w) => t.includes(w));
+
+/** the card's 性格 (M-R225): one word, on the card and its introduction only — never in the speech */
+export const BATI_TRAITS = ['おっちょこちょい', '食いしん坊', 'さみしがり', '負けずぎらい', 'きれい好き', 'ねぼすけ', 'がんばりや', '好奇心いっぱい', '照れ屋', 'いたずら好き', 'のんびりや', 'やさしがり'] as const;
+/** a little unusual ones, for a minor seed */
+export const BATI_RARE_TRAITS = ['収集家', '星を数えるのが好き', 'ちょっと変わり者', 'こだわり屋', '秘密主義'] as const;
+export function pickBatiTrait(rand: number = Math.random(), rare = false): string {
+  const list: readonly string[] = rare ? [...BATI_TRAITS, ...BATI_RARE_TRAITS] : BATI_TRAITS;
+  return list[Math.floor(Math.min(Math.max(rand, 0), 0.9999) * list.length)];
+}
 
 export const isBatiPersonality = (x: unknown): x is BatiPersonality => typeof x === 'string' && (BATI_PERSONALITY_IDS as readonly string[]).includes(x);
 
-/** a draw among the eight ordinary ones (weights above; the fallback when the birth's model gives none); `rand` in [0, 1) */
-export function pickBatiPersonality(rand: number = Math.random()): BatiOrdinaryPersonality {
-  const total = BATI_ORDINARY_IDS.reduce((s, id) => s + BATI_PERSONALITIES[id].weight, 0);
+/** M-R216 / M-R217's styles, read as the nearest M-R225 one (a {bati} born before keeps a style close to its own) */
+const RETIRED: Record<string, BatiPersonality> = {
+  keigo: 'teinei',
+  baby: 'genki',
+  clumsy: 'genki',
+  rapper: 'genki',
+  nekketsu: 'genki',
+  alien: 'genki',
+  poet: 'mellow',
+  philosopher: 'cool',
+  ninja: 'bushi',
+};
+/** any stored id → a current style (unknown: 元気な子) */
+export function normalizeBatiPersonality(x: unknown): BatiPersonality {
+  if (isBatiPersonality(x)) return x;
+  return (typeof x === 'string' && RETIRED[x]) || 'genki';
+}
+
+/** the first {bati}'s draw (M-R227 §7): the gal family 35 %, the other common styles 50 %, the rare 15 % */
+export const BATI_GROUP_WEIGHTS = { gal: 0.35, common: 0.5, rare: 0.15 } as const;
+
+export interface BatiDrawOptions {
+  /** styles of the member's other {bati}: never the same style twice among the three (different gal kinds are fine) */
+  exclude?: readonly BatiPersonality[];
+  /** M-R227: a 仕事・勉強 {bati} leans to 姉御ギャル / クールギャル among the gal kinds */
+  role?: 'any' | 'play' | 'work' | 'make' | null;
+}
+
+/** each style's weight for a draw (the group's share split among its kinds; the role's lean; the excluded out) */
+export function batiStyleWeights(o: BatiDrawOptions = {}): [BatiPersonality, number][] {
+  const out: [BatiPersonality, number][] = [];
+  const group = (ids: readonly BatiPersonality[], share: number, w: (id: BatiPersonality) => number = () => 1) => {
+    const total = ids.reduce((s, id) => s + w(id), 0);
+    for (const id of ids) out.push([id, (share * w(id)) / total]);
+  };
+  group(BATI_GAL_IDS, BATI_GROUP_WEIGHTS.gal, (id) => (o.role === 'work' && (id === 'galane' || id === 'galcool') ? 3 : 1));
+  group(BATI_COMMON_IDS, BATI_GROUP_WEIGHTS.common);
+  group(BATI_RARE_IDS, BATI_GROUP_WEIGHTS.rare);
+  const ex = new Set(o.exclude ?? []);
+  return out.filter(([id]) => !ex.has(id));
+}
+
+/** a weighted draw (`rand` in [0, 1)) */
+export function drawBatiStyle(rand: number = Math.random(), o: BatiDrawOptions = {}): BatiPersonality {
+  const ws = batiStyleWeights(o);
+  const total = ws.reduce((s, [, w]) => s + w, 0);
   let x = Math.min(Math.max(rand, 0), 0.999999) * total;
-  for (const id of BATI_ORDINARY_IDS) {
-    x -= BATI_PERSONALITIES[id].weight;
+  for (const [id, w] of ws) {
+    x -= w;
     if (x < 0) return id;
   }
-  return 'genki';
+  return ws[ws.length - 1]?.[0] ?? 'genki';
 }
+
+/** a draw among the six common styles only (a {bati} from before personalities existed) */
+export function pickBatiPersonality(rand: number = Math.random()): BatiOrdinaryPersonality {
+  const ids = BATI_COMMON_IDS;
+  return ids[Math.floor(Math.min(Math.max(rand, 0), 0.999999) * ids.length)];
+}
+
+const hash = (seed: string) => {
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.codePointAt(0)!, 16777619) >>> 0;
+  return h;
+};
 
 /** a stable draw from a seed (a {bati} born before personalities existed gets one that never changes) */
 export function batiPersonalityFromSeed(seed: string): BatiOrdinaryPersonality {
-  let h = 2166136261;
-  for (const c of seed) h = Math.imul(h ^ c.codePointAt(0)!, 16777619) >>> 0;
-  return pickBatiPersonality((h % 10000) / 10000);
+  return pickBatiPersonality((hash(seed) % 10000) / 10000);
 }
 
-/** {bati}'s 一人称: the member's own choice, else the one given at birth, else the personality's default for the egg */
+/** {bati}'s 一人称: the member's own choice, else the one given at birth, else the style's default for the egg */
 export function batiSelf(p: BatiPersonality, egg: BatiEggKind = 'sun', custom?: string | null, born?: string | null): string {
-  return custom?.trim() || born?.trim() || BATI_PERSONALITIES[p].self[egg];
+  return custom?.trim() || born?.trim() || BATI_PERSONALITIES[normalizeBatiPersonality(p)].self[egg];
 }
 
-/** how {bati} calls them by default, as a template ({neo} = the name): 〇〇さま, 〇〇〜, 君 … */
+/** how {bati} calls them by default, as a template ({neo} = the name): {neo}, {neo}さん, {neo}殿, {neo}さま */
 export function batiDefaultCall(p: BatiPersonality, who = '{neo}'): string {
-  const d = BATI_PERSONALITIES[p];
-  return d.callAs ?? `${who}${d.honorific}${d.callTail}`;
+  return `${who}${BATI_PERSONALITIES[normalizeBatiPersonality(p)].honorific}`;
 }
 
 export interface BatiSpeech {
   personality: BatiPersonality;
   egg?: BatiEggKind;
-  /** the member's own 一人称 for {bati} (null = the one given at birth / the default) */
+  /** the member's own 一人称 (null = the birth's / the default) */
   self?: string | null;
-  /** the 一人称 the birth gave (M-R217) */
+  /** the 一人称 the birth gave */
   bornSelf?: string | null;
-  /** the member's own 呼び方 (null = as the line is written: the name with the personality's honorific) */
+  /** the member's own 呼び方 (null = as written: the name with the style's honorific) */
   call?: string | null;
 }
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
- * A {bati} line in this personality's manner (a hand-written variant, the birth's rewrite or `batiRuleTransform`'s
- * output), made ready to fill: `{self}` becomes the 一人称, and a custom 呼び方 replaces the name with its honorific
- * ({neo}さま → たっくん; a 呼び方 with {neo} in it keeps the name: {neo}お嬢さま). 元気な子's own ボク is its 一人称 too.
- * The other placeholders are left for fill().
+ * A {bati} line in this style (a hand-written variant, the birth's rewrite or `batiRuleTransform`'s output), made ready
+ * to fill: `{self}` becomes the 一人称, and a custom 呼び方 replaces the name with its honorific ({neo}さん → たっくん; a
+ * 呼び方 with {neo} in it keeps the name). 元気な子's own ボク is its 一人称 too. The other placeholders are left for fill().
  */
 export function resolveBatiSpeech(text: string, s: BatiSpeech): string {
-  let t = s.personality === 'genki' ? text.replaceAll('ボク', '{self}') : text;
-  t = t.replaceAll('{self}', batiSelf(s.personality, s.egg, s.self, s.bornSelf));
+  const p = normalizeBatiPersonality(s.personality);
+  let t = p === 'genki' ? text.replaceAll('ボク', '{self}') : text;
+  t = t.replaceAll('{self}', batiSelf(p, s.egg, s.self, s.bornSelf));
   const call = s.call?.trim();
   if (call) {
-    const h = BATI_PERSONALITIES[s.personality].honorific;
+    const h = BATI_PERSONALITIES[p].honorific;
     t = t.replace(new RegExp(`\\{(neo|name)\\}${h ? esc(h) : ''}`, 'g'), (_m, who: string) => call.replaceAll('{neo}', `{${who}}`).replaceAll('{name}', `{${who}}`));
   }
   return t;
 }
 
-/** one sentence's ending rules per personality: [pattern at the end of the sentence (before its mark), replacement] */
+/** a sentence's ending, per style: [pattern at the end (before its mark), replacement] — mild (M-R225) */
 const ENDINGS: Partial<Record<BatiPersonality, [RegExp, string][]>> = {
-  keigo: [
-    [/だよ$/, 'です'], [/だね$/, 'ですね'], [/しよ$/, 'しましょう'], [/ろ$/, 'りましょう'], [/よう$/, 'ましょう'],
-    [/るよ$/, 'ます'], [/くよ$/, 'きます'], [/すよ$/, 'します'], [/うよ$/, 'います'], [/つよ$/, 'ちます'], [/むよ$/, 'みます'],
-    [/るね$/, 'ますね'], [/かな$/, 'でしょうか'], [/いい$/, 'よろしいですか'], [/て$/, 'てください'], [/よ$/, 'です'], [/ね$/, 'ですね'],
+  // M-R226: です／ます in katakana
+  teinei: [
+    [/だよ$/, 'デス'], [/だね$/, 'デスね'], [/しよ$/, 'しマショウ'], [/よう$/, 'マショウ'],
+    [/るよ$/, 'マス'], [/くよ$/, 'きマス'], [/すよ$/, 'しマス'], [/うよ$/, 'いマス'],
+    [/るね$/, 'マスね'], [/て$/, 'てください'], [/いいよ$/, 'いいデス'],
   ],
-  baby: [[/だよ$/, 'でちゅ'], [/るよ$/, 'るでちゅ'], [/よ$/, 'でちゅ'], [/だね$/, 'でちゅね']],
-  kansai: [[/だよ$/, 'やで'], [/だね$/, 'やな'], [/ないよ$/, 'へんで'], [/よ$/, 'で'], [/ね$/, 'な'], [/しよ$/, 'しよか']],
-  cool: [[/だよ$/, 'だ'], [/だね$/, 'だな'], [/(る|た|い)よ$/, '$1'], [/よ$/, ''], [/ね$/, ''], [/しよ$/, 'しよう'], [/て$/, 'てくれ']],
-  mellow: [[/だよ$/, 'だよぉ'], [/よ$/, 'よぉ'], [/ね$/, 'ねぇ'], [/しよ$/, 'しようねぇ'], [/かな$/, 'かなぁ']],
-  king: [[/だよ$/, 'じゃ'], [/だね$/, 'じゃな'], [/るよ$/, 'るのじゃ'], [/よ$/, 'ぞ'], [/ね$/, 'のう'], [/しよ$/, 'しようぞ'], [/て$/, 'てみよ'], [/いい$/, 'よいか']],
-};
-/** words said the same in every line, per personality */
-const WORDS: Partial<Record<BatiPersonality, [RegExp, string][]>> = {
-  keigo: [[/^うん/, 'はい'], [/じゃあ/g, 'では'], [/^ねえ/, 'あの']],
-  baby: [[/^うん/, 'あい'], [/すごい/g, 'しゅごい'], [/して/g, 'ちて'], [/作る/g, 'ちゅくる'], [/使う/g, 'ちゅかう']],
-  kansai: [[/^うん/, 'よっしゃ'], [/じゃあ/g, 'ほな'], [/^ねえ/, 'なあ'], [/いい(?=[！？。]|$)/g, 'ええ']],
-  cool: [[/^うん/, '……ああ'], [/^ねえ、?/, '……']],
-  mellow: [[/^うん/, 'うん〜'], [/じゃあ/g, 'じゃあ〜']],
-  king: [[/^うん/, 'うむ'], [/じゃあ/g, 'では'], [/^ねえ/, 'のう']],
+  kansai: [[/だよ$/, 'やで'], [/だね$/, 'やね'], [/ないよ$/, 'へんで'], [/るよ$/, 'るで'], [/いいよ$/, 'ええよ']],
+  cool: [[/だよ$/, 'だ'], [/(る|た|い)よ$/, '$1'], [/だね$/, 'だな']],
+  mellow: [[/だね$/, 'だねぇ'], [/るね$/, 'るねぇ'], [/かな$/, 'かなぁ'], [/よ$/, 'よぉ']],
+  amae: [[/だよ$/, 'だよね'], [/るよ$/, 'るよね'], [/いいよ$/, 'いいよね']],
+  hakata: [[/だよ$/, 'ばい'], [/るよ$/, 'るばい'], [/だね$/, 'やね']],
+  tohoku: [[/だよ$/, 'だべ'], [/るよ$/, 'るべ']],
+  okinawa: [[/だよ$/, 'さー'], [/るよ$/, 'るさー']],
+  bushi: [[/だよ$/, 'でござる'], [/るよ$/, 'るでござる']],
+  butler: [[/だよ$/, 'でございます'], [/るよ$/, 'ます'], [/だね$/, 'でございますね'], [/て$/, 'てくださいませ']],
+  king: [[/だよ$/, 'であるぞ'], [/るよ$/, 'るぞ']],
+  gal: [[/だよ$/, 'じゃん'], [/だね$/, 'じゃん'], [/いいよ$/, 'いいじゃん']],
+  galfuwa: [[/だね$/, 'だよね〜'], [/だよ$/, 'だよね〜']],
+  galane: [[/て$/, 'てみな'], [/だよ$/, 'だよ']],
+  galcool: [[/だよ$/, 'だ'], [/(る|た|い)よ$/, '$1']],
+  galkansai: [[/だよ$/, 'やん'], [/だね$/, 'やん'], [/るよ$/, 'るで']],
 };
 
 /**
- * The fallback (a {bati} line missing from the hand-written variants): the common endings, interjections, the 一人称
- * ({self}) and the honorific, sentence by sentence. Meaning and length stay; deterministic, no model at runtime.
+ * The fallback (a {bati} line with no written variant): the 一人称 ({self}), the honorific, and an ending changed in
+ * at most half the sentences (every other one; a one-sentence line by a stable coin) — no other change, no model.
  */
-export function batiRuleTransform(text: string, p: BatiPersonality): string {
-  if (p === 'genki') return text.replaceAll('ボク', '{self}');
-  const d = BATI_PERSONALITIES[p];
+export function batiRuleTransform(text: string, p0: BatiPersonality): string {
+  const p = normalizeBatiPersonality(p0);
   let t = text.replaceAll('ボク', '{self}');
-  // the honorific after the name; the calling tail only where it is called out (「{neo}、」 「、{neo}！」)
-  t = t.replace(/\{(neo|name)\}/g, `{$1}${d.honorific}`);
-  if (d.callTail) t = t.replace(new RegExp(`(\\{(?:neo|name)\\}${esc(d.honorific)})(?=[、！。？]|$)`, 'g'), `$1${d.callTail}`);
-  for (const [re, to] of WORDS[p] ?? []) t = t.replace(re, to);
-  if (p === 'clumsy') {
-    // says the first word wrong, then again (「すご……すごいね！」)
-    const m = /^([…　\s]*)([^、。！？…\s{]{2})/.exec(t);
-    return m ? `${m[1]}${m[2]}……${t.slice(m[1].length)}` : t;
-  }
+  if (p === 'genki') return t;
+  const d = BATI_PERSONALITIES[p];
+  if (d.honorific) t = t.replace(/\{(neo|name)\}/g, `{$1}${d.honorific}`);
   const sentences = t.match(/[^！？。!?]+[！？。!?]*/g) ?? [t];
-  t = sentences
-    .map((s) => {
+  const first = sentences.length === 1 ? hash(text) % 2 : 1;
+  return sentences
+    .map((s, k) => {
+      if ((k + first) % 2 !== 0 && sentences.length > 1) return s;
+      if (sentences.length === 1 && first !== 0) return s;
       const m = /^(.*?)([！？。!?\s　]*)$/s.exec(s)!;
       let body = m[1];
-      let mark = m[2];
-      // 「いくよ、{neo}！」: the ending is before the name called out
       const voc = /^(.*?)(、\{(?:neo|name)\}[^、{}]*)$/s.exec(body);
       const tail = voc ? voc[2] : '';
       if (voc) body = voc[1];
@@ -307,42 +283,32 @@ export function batiRuleTransform(text: string, p: BatiPersonality): string {
           break;
         }
       }
-      const said = `${body}${tail}`;
-      if (p === 'cool') mark = mark.replace(/！/g, '。');
-      if (p === 'mellow') mark = mark.replace(/！/g, said.endsWith('〜') ? '。' : '〜。');
-      return `${said}${mark}`;
+      return `${body}${tail}${m[2]}`;
     })
     .join('');
-  if (p === 'cool' && !t.startsWith('……')) t = `……${t}`;
-  return t;
 }
 
-/**
- * The atelier's dynamic line 「それは、あと{n}日で作れるようになるよ。」 in each personality (M-R216's own example), for
- * the lines written at runtime (they have no hand-written variants). `{self}` / names are not used.
- */
-export function batiDaysLeftLine(p: BatiPersonality, n: number): string {
+/** the atelier's dynamic line 「それは、あと{n}日で作れるようになるよ。」 in each style (mild) */
+export function batiDaysLeftLine(p0: BatiPersonality, n: number): string {
+  const p = normalizeBatiPersonality(p0);
   const lines: Record<BatiPersonality, string> = {
     genki: `それは、あと${n}日で作れるようになるよ。`,
-    keigo: `そちらは、あと${n}日で作れるようになります。`,
-    baby: `それはね、あと${n}日でちゅくれるの。`,
-    clumsy: `それは、あと${n + 1}日……じゃなくて、${n}日で作れるよ。`,
+    teinei: `それは、あと${n}日で作れるようになりマス。`,
     kansai: `それは、あと${n}日で作れるようになるで。`,
-    cool: `それは、あと${n}日だ。`,
-    mellow: `それはねぇ、あと${n}日で、作れるよぉ。`,
-    king: `それは、あと${n}日で作れるようになるのじゃ。`,
+    cool: `それは、あと${n}日で作れる。`,
+    mellow: `それは、あと${n}日で作れるようになるねぇ。`,
+    amae: `それは、あと${n}日で作れるようになるよ。待っててね？`,
     hakata: `それは、あと${n}日で作れるようになるばい。`,
     tohoku: `それは、あと${n}日で作れるようになるべ。`,
     okinawa: `それは、あと${n}日で作れるようになるさー。`,
     bushi: `それは、あと${n}日で作れるようになるでござる。`,
-    ninja: `……それは、あと${n}日で作れるニン。`,
     butler: `そちらは、あと${n}日でお作りできるようになります。`,
+    king: `それは、あと${n}日で作れるようになるのである。`,
     gal: `それ、あと${n}日で作れるようになるじゃん！`,
-    poet: `それは、${n}日の夜を越えて、生まれるもの。`,
-    rapper: `それは、あと${n}日、待てば作れる、YEAH！`,
-    nekketsu: `それは、あと${n}日で作れるようになるぜ！`,
-    philosopher: `それは、あと${n}日。待つ、とは、何だろうね。`,
-    alien: `ソレハ、アト${n}ニチデ、ツクレル、デス。`,
+    galfuwa: `それはね、あと${n}日で作れるようになるよ〜。`,
+    galane: `それは、あと${n}日で作れる。任せな。`,
+    galcool: `それ、あと${n}日で作れる。`,
+    galkansai: `それ、あと${n}日で作れるようになるやん！`,
   };
   return lines[p];
 }
@@ -350,46 +316,61 @@ export function batiDaysLeftLine(p: BatiPersonality, n: number): string {
 /** what the seed was (M-R218): the first {bati} a favourite food, the second a favourite sound, the third a word */
 export type BatiSeedKind = 'food' | 'sound' | 'word';
 export const batiSeedKind = (born: number): BatiSeedKind => (born <= 0 ? 'food' : born === 1 ? 'sound' : 'word');
-/** OBOLON's question for each seed (D03-S005 / M-R218, as written) */
+/** OBOLON's question for each seed (D03-S005 / SYS-S003, as written) */
 export const BATI_SEED_QUESTION: Record<BatiSeedKind, string> = {
   food: '次は、、、{name}だ。好きな食べ物は？',
   sound: '、、、好きな音は、何だ？',
   word: '、、、大事にしている言葉を、一つ、言ってみろ。',
 };
 
-/** the decision's rules without a model (M-R217 §2, the commonest cases): the demo, the mock and the tests */
+/** the decision's rules without a model (M-R225's food table, the commonest cases): the demo, the mock and the tests */
+const REGIONAL = new Set<BatiPersonality>(['kansai', 'hakata', 'tohoku', 'okinawa']);
 const RULE_PICKS: [RegExp, BatiPersonality[]][] = [
-  [/たこ焼|お好み焼|串カツ|551|いか焼|ねぎ焼/, ['kansai']],
-  [/もつ鍋|明太|とんこつ|ごまさば|水炊き|博多/, ['hakata']],
-  [/きりたんぽ|牛たん|牛タン|ずんだ|芋煮|わんこそば/, ['tohoku']],
-  [/ゴーヤ|ソーキ|サーターアンダギー|ちんすこう|沖縄そば|三線/, ['okinawa']],
-  [/うんち|空気/, ['ninja']],
-  [/石|小石/, ['philosopher']],
-  [/ほや|くさや|いなご|定食|のせた|にアイス/, ['alien', 'gal', 'bushi']],
-  [/プリン|マシュマロ|わたあめ|綿あめ|ゼリー|子守唄|オルゴール/, ['baby', 'mellow']],
-  [/激辛|カツ丼|麻婆|ドラム|太鼓|がんばれ|負けない/, ['nekketsu', 'genki']],
-  [/ステーキ|うに|ウニ|フレンチ|キャビア|トリュフ|ピアノ|ありがとう/, ['king', 'keigo', 'butler']],
+  [/たこ焼|お好み焼|串カツ|551|いか焼|ねぎ焼|だんじり/, ['kansai']],
+  [/もつ鍋|明太|とんこつ|ごまさば|水炊き|博多|山笠/, ['hakata']],
+  [/きりたんぽ|牛たん|牛タン|ずんだ|芋煮|わんこそば|ねぶた/, ['tohoku']],
+  [/ゴーヤ|ソーキ|サーターアンダギー|ちんすこう|沖縄そば|三線|エイサー/, ['okinawa']],
+  [/空気|うんち/, ['butler']],
+  [/石|小石/, ['bushi']],
+  [/ほや|くさや|いなご|定食|のせた|にアイス/, ['bushi', 'butler', 'king']],
+  // M-R227: sweets, photogenic food, junk, a convenience store's new item → the gal family
+  [/タピオカ|映え|クレープ|パフェ|コンビニ|新作|マリトッツォ|ドーナツ|ケーキ/, ['gal', 'galfuwa', 'galane', 'galcool']],
+  [/プリン|マシュマロ|わたあめ|綿あめ|ゼリー|子守唄|オルゴール/, ['amae', 'mellow']],
+  [/激辛|カツ丼|麻婆|ドラム|太鼓|がんばれ|負けない/, ['genki', 'kansai']],
+  [/ステーキ|うに|ウニ|フレンチ|キャビア|トリュフ|ピアノ|ありがとう/, ['teinei']],
   [/冷やし|そうめん|レモン|雨の音|静か|風鈴/, ['cool']],
-  [/自家製|手打ち|手作り|一期一会/, ['philosopher', 'bushi']],
-  [/ポテト|駄菓子|ポテチ|ジャンク/, ['clumsy', 'gal']],
-  [/せんべい|ポップコーン|ラップ|ビート/, ['rapper']],
-  [/桜餅|かき氷|柏餅|星|夢|波の音/, ['poet']],
+  [/自家製|手打ち|手作り|一期一会/, ['cool']],
+  [/ポテト|駄菓子|ポテチ|ジャンク|ハンバーガー/, ['gal', 'genki', 'amae']],
+  [/桜餅|かき氷|柏餅|星|夢|波の音/, ['mellow', 'teinei']],
 ];
 
+/** how often a matching food row decides the style (the rest: the group draw, so the M-R227 ratios roughly hold) */
+const ROW_WINS = 0.7;
+
 /**
- * The seed → personality by the rules alone (no model): the matching row (either of two fitting ones), else a draw
- * among the ordinary ones. Deterministic for a given `rand`.
+ * The seed → style by the rules alone (no model): a regional food always gives its dialect (a gal draw there: 関西ギャル
+ * for 関西); another matching row wins most of the time (either of its fitting ones), else the weighted draw
+ * (BATI_GROUP_WEIGHTS); never a style the member's other {bati} have. The card's trait drawn too. Deterministic for a
+ * given `rand`.
  */
-export function batiPersonaByRules(seed: string, egg: BatiEggKind = 'sun', rand: number = Math.random()) {
+export function batiPersonaByRules(seed: string, egg: BatiEggKind = 'sun', rand: number = Math.random(), o: BatiDrawOptions = {}) {
+  const ex = new Set(o.exclude ?? []);
   const row = RULE_PICKS.find(([re]) => re.test(seed));
-  const personality: BatiPersonality = row ? row[1][Math.floor(Math.min(rand, 0.9999) * row[1].length)] : pickBatiPersonality(rand);
+  const fits = (row?.[1] ?? []).filter((id) => !ex.has(id));
+  const regional = !!row && REGIONAL.has(row[1][0]);
+  let personality: BatiPersonality;
+  if (regional && row[1][0] === 'kansai' && rand < BATI_GROUP_WEIGHTS.gal && !ex.has('galkansai')) personality = 'galkansai';
+  else if (fits.length && (regional || rand < ROW_WINS)) personality = fits[Math.floor(((rand * 13.7) % 1) * fits.length)];
+  else personality = drawBatiStyle(regional ? rand : (rand - (row ? ROW_WINS : 0)) / (row ? 1 - ROW_WINS : 1), o);
   const d = BATI_PERSONALITIES[personality];
+  const trait = pickBatiTrait((rand * 7.3) % 1, !!d.rare);
   return {
     personality,
     self: d.self[egg],
     call: batiDefaultCall(personality),
     catchphrase: d.catchphrase,
-    intro: `${[...seed].slice(0, 14).join('')}から生まれた。${d.label.replace(/の子$/, '')}で、いつもそばにいる。`,
+    trait,
+    intro: `${[...seed].slice(0, 14).join('')}から生まれた、${trait}。`,
     rare: !!d.rare,
   };
 }

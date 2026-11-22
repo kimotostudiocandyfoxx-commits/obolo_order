@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { BATI_ROLE_LABELS, BATI_ROLE_QUESTION, BATI_ROLES, BATI_PERSONALITIES, BATI_SEED_QUESTION, batiDefaultCall, batiSeedKind, type BatiEggKind, type Me } from '@obolo/shared';
+import { BATI_ROLE_LABELS, BATI_ROLES, BATI_PERSONALITIES, batiDefaultCall, normalizeBatiPersonality, type Me } from '@obolo/shared';
 import { ApiError, getApi } from '@/lib/api';
-import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { fill } from '@/lib/onboarding/script';
 import { BatiCardView, exportCard } from './BatiCard';
 import { SmallEgg, eggGrowth } from './SmallEgg';
 import { BatiMemories } from './BatiMemories';
@@ -46,7 +44,7 @@ export function BatiSettings({ me, onMe }: { me: Me; onMe: (m: Me) => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   if (!b?.personality) return null;
-  const d = BATI_PERSONALITIES[b.personality];
+  const d = BATI_PERSONALITIES[normalizeBatiPersonality(b.personality)];
   const run = async (f: () => Promise<Me>) => {
     setBusy(true);
     setErr(null);
@@ -61,7 +59,7 @@ export function BatiSettings({ me, onMe }: { me: Me; onMe: (m: Me) => void }) {
   return (
     <div className="space-y-4">
       <div>
-        <p className="mb-1 text-xs font-bold text-white/70">性格</p>
+        <p className="mb-1 text-xs font-bold text-white/70">話し方</p>
         <p className="text-sm">
           {d.label}
           <span className="ml-2 text-xs text-white/50">（生まれた時に決まった性格は、ずっと変わりません）</span>
@@ -124,128 +122,6 @@ export function BatiSettings({ me, onMe }: { me: Me; onMe: (m: Me) => void }) {
         </div>
       )}
       {err && <p className="text-center text-sm text-rose-300">{err}</p>}
-    </div>
-  );
-}
-
-type Stage = 'grown' | 'seed' | 'hatching' | 'name' | 'role' | 'card';
-
-/**
- * The morning the egg has grown (M-R218): OBOLON「、、、{neo}。たまごが、育った。」, the egg (moon / sun), the seed (the
- * second: a favourite sound, the third: a word, OBOLON's question as written), the hatching, the name, the card.
- * The lines come from the decision (docs/story-rewrite/バティの性格の決め方.md §4・§6); no script scene has them yet.
- */
-export function NewEggFlow({ me, onMe, onClose }: { me: Me; onMe: (m: Me) => void; onClose: () => void }) {
-  const kind = batiSeedKind(me.batis?.length ?? 1);
-  const [stage, setStage] = useState<Stage>('grown');
-  const [egg, setEgg] = useState<BatiEggKind>('moon');
-  const [seed, setSeed] = useState('');
-  const [name, setName] = useState('');
-  const [err, setErr] = useState<string | null>(null);
-  const [card, setCard] = useState<Me['bati']>(null);
-  const api = getApi();
-  const hatch = async () => {
-    setErr(null);
-    setStage('hatching');
-    try {
-      onMe(await api.batiNew(egg, seed.trim()));
-      const born = await api.batiHatch().catch(() => null);
-      if (born) onMe(born);
-      setStage('name');
-    } catch (e) {
-      const code = e instanceof ApiError ? e.code : '';
-      setErr(code === 'SEED_REASK' || code === 'MODERATION' ? `OBOLON「${BATI_SEED_QUESTION[kind]}」` : code === 'EGG_NOT_READY' ? 'たまごは、まだ育っている' : 'うまくいかなかった……');
-      setStage('seed');
-    }
-  };
-  const named = async () => {
-    try {
-      const m = await api.batiName(name.trim());
-      onMe(m);
-      setCard(m.bati);
-      // the 2nd / 3rd {bati} asks what kind of partner it will be (M-R219 / M-R222)
-      setStage('role');
-    } catch {
-      setErr('その名前は使えません');
-    }
-  };
-  return (
-    <div className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-5 bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] px-6 text-amber-50">
-      {stage === 'grown' && (
-        <button className="flex flex-col items-center gap-6" onClick={() => setStage('seed')}>
-          <SmallEgg growth={1} size={60} ready />
-          <p className="text-lg">OBOLON「、、、{me.displayName}。たまごが、育った。」</p>
-        </button>
-      )}
-      {stage === 'seed' && (
-        <div className="flex w-full max-w-sm flex-col gap-3">
-          <p className="text-center">OBOLON「{BATI_SEED_QUESTION[kind]}」</p>
-          <div className="grid grid-cols-2 gap-2">
-            {(['moon', 'sun'] as const).map((e) => (
-              <button key={e} onClick={() => setEgg(e)} className={`rounded-xl py-2 text-sm ${egg === e ? 'bg-amber-200/30 ring-2 ring-amber-200' : 'bg-white/10'}`}>
-                {e === 'moon' ? '月のたまご（女の子寄り）' : '太陽のたまご（男の子寄り）'}
-              </button>
-            ))}
-          </div>
-          <input className="input" maxLength={30} value={seed} onChange={(e) => setSeed(e.target.value)} />
-          <button className="btn btn-primary" disabled={!seed.trim()} onClick={() => void hatch()}>
-            これにする
-          </button>
-          {err && <p className="text-center text-sm text-amber-100">{err}</p>}
-        </div>
-      )}
-      {stage === 'hatching' && <SmallEgg growth={1} size={80} ready className="animate-[shake_0.5s_ease-in-out_infinite]" />}
-      {stage === 'name' && (
-        <div className="flex w-full max-w-sm flex-col items-center gap-3">
-          {me.bati?.imageUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={me.bati.imageUrl} alt="" className="h-40 w-40 object-contain" />
-          )}
-          <p>OBOLON「お前も、、、名前を、つけてやれ。」</p>
-          <input className="input" maxLength={20} value={name} placeholder="バティの名前" onChange={(e) => setName(e.target.value)} />
-          <button className="btn btn-primary w-full" disabled={!name.trim()} onClick={() => void named()}>
-            この名前にする
-          </button>
-          {err && <p className="text-sm text-rose-300">{err}</p>}
-        </div>
-      )}
-      {stage === 'role' && card && (
-        <div className="flex w-full max-w-sm flex-col items-center gap-3">
-          <p className="text-center">
-            {card.name}「{fill(batiLine(BATI_ROLE_QUESTION, batiLineVoiceOf(card)), { name: me.displayName, neo: me.displayName, inviter: '', bati: card.name ?? '' })}」
-          </p>
-          <div className="grid w-full grid-cols-2 gap-2">
-            {BATI_ROLES.map((r) => (
-              <button
-                key={r}
-                className="rounded-xl bg-white/10 py-2.5 text-sm"
-                onClick={() =>
-                  void api
-                    .batiRole(r)
-                    .then(onMe)
-                    .catch(() => undefined)
-                    .finally(() => setStage('card'))
-                }
-              >
-                {BATI_ROLE_LABELS[r]}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      {stage === 'card' && card?.card && (
-        <>
-          <BatiCardView card={card.card} onExport={() => void exportCard(card.card!)} />
-          <button className="btn btn-ghost" onClick={onClose}>
-            とじる
-          </button>
-        </>
-      )}
-      {stage !== 'hatching' && stage !== 'card' && (
-        <button className="absolute right-4 top-[calc(12px+env(safe-area-inset-top))] text-sm text-white/60" onClick={onClose}>
-          あとで
-        </button>
-      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { ShellEggFx } from '@/components/bati/SmallEgg';
+import { ShellEggFx, SmallEgg } from '@/components/bati/SmallEgg';
 import { isDemoMode } from '@/lib/onboarding/demoMode';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motionUrl, SE_FILES, seUrl, spriteUrl } from '@/lib/onboarding/media';
@@ -595,6 +595,12 @@ export function Takoyaki({ face, size, speaking = false, hue = 28 }: { face?: st
 export function FxLayer({ fx }: { fx: PictureFx | null }) {
   if (!fx) return null;
   if (fx === 'shell-egg') return <ShellEggFx />;
+  if (fx.startsWith('grown-egg'))
+    return (
+      <div className="pointer-events-none absolute inset-x-0 top-[26svh] z-[3] flex justify-center">
+        <SmallEgg growth={1} size={120} ready light={fx === 'grown-egg-choose' ? 'alt' : fx === 'grown-egg-moon' ? 'moon' : fx === 'grown-egg-sun' ? 'sun' : undefined} />
+      </div>
+    );
   if (fx === 'kimorin-kororin')
     return (
       <div className="pointer-events-none absolute inset-x-0 top-[30svh] z-[3] flex animate-[fadeUp_0.5s_ease-out] justify-center">

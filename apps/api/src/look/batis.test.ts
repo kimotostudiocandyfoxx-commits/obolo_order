@@ -47,17 +47,19 @@ describe("the first {bati}: the personality from the favourite food (M-R217)", (
   it('decides it at the egg, keeps the food as the seed, makes the small egg (88 days)', async () => {
     const { s, user } = make();
     const me = await s.egg('u', { food: 'たこ焼き', egg: 'moon' });
-    expect(me.bati?.personality).toBe('kansai');
+    // a 関西 food: 関西弁の子, or now and then 関西ギャルの子 (M-R227)
+    expect(['kansai', 'galkansai']).toContain(me.bati?.personality);
     expect(me.bati?.egg).toBe('moon');
     expect(me.bati?.self).toBe('ウチ');
-    expect(me.bati?.card).toMatchObject({ seed: 'たこ焼き', label: '関西弁の子', rare: false });
+    expect(me.bati?.card).toMatchObject({ seed: 'たこ焼き', rare: false });
+    expect(me.bati?.card?.trait).toBeTruthy();
     expect(me.batis).toHaveLength(1);
     expect(me.batiEgg?.ready).toBe(false);
     expect((user.batiEggAt as Date).getTime() - Date.now()).toBeGreaterThan(87 * 86_400_000);
   });
 
   it('a rare one gets its story lines rewritten once (a job); an unfit seed is asked again', async () => {
-    const { s, jobs } = make({}, '{"personality":"ninja","self":"それがし","call":"{neo}どの","catchphrase":"〜ニン","intro":"空気から生まれた。"}');
+    const { s, jobs } = make({}, '{"personality":"butler","self":"私","call":"{neo}さま","catchphrase":"〜でございます","trait":"きれい好き","intro":"空気から生まれた、きれい好き。"}');
     const me = await s.egg('u', { food: '空気', egg: 'sun' });
     expect(me.bati?.card?.rare).toBe(true);
     expect(jobs).toContain('bati.lines');
@@ -88,7 +90,8 @@ describe('the grown egg and the three (M-R215 / M-R218)', () => {
     const { s, user } = make({ ...one, batiEggAt: new Date(Date.now() - 1000) });
     const me = await s.hatchNew('u', { egg: 'moon', seed: '雨の音' });
     expect(me.batis).toHaveLength(2);
-    expect(me.bati?.personality).toBe('cool');
+    // never the first one's style (M-R227)
+    expect(me.bati?.personality).not.toBe('genki');
     expect(me.bati?.card?.seed).toBe('雨の音');
     expect(me.batis?.find((b) => b.id === 'b1')).toMatchObject({ name: 'ポン', imageUrl: 'https://x/b1.png', active: false });
     // the third egg comes 88 days later
@@ -110,11 +113,12 @@ describe('the grown egg and the three (M-R215 / M-R218)', () => {
     let me = await s.switchBati('u', 'b2');
     expect(user.batiName).toBe('ピン');
     expect(user.batiImageUrl).toBe('https://x/b2.png');
-    expect(me.bati?.personality).toBe('keigo');
+    // a retired style (敬語の子) is read as the nearest current one (M-R225)
+    expect(me.bati?.personality).toBe('teinei');
     me = await s.batiSpeech('u', { call: 'たっくん', self: 'ぼく' });
     expect(me.bati?.callCustom).toBe('たっくん');
     expect(me.bati?.self).toBe('ぼく');
-    expect(me.bati?.personality).toBe('keigo');
+    expect(me.bati?.personality).toBe('teinei');
     me = await s.switchBati('u', 'b1');
     expect(me.bati?.name).toBe('ポン');
     expect(me.batis?.find((b) => b.id === 'b2')?.callCustom).toBe('たっくん');

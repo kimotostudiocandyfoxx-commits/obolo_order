@@ -1,7 +1,9 @@
 'use client';
 
 import type { BuddyPicture, BuddySource } from '@obolo/shared';
-import { DrawnPicture, SourceChips } from '@/components/chat/BuddyExtras';
+import { DrawnPicture, PlaceMap, SourceChips, placeOf } from '@/components/chat/BuddyExtras';
+import { RoomSheet, type RoomMode } from '@/app/moon/BatiRoom';
+import { useAuth } from '@/lib/auth';
 import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { saveSpell } from '@/components/jupiter/JupiterLesson';
@@ -37,8 +39,8 @@ export function BatiChat(props: Parameters<typeof BatiChatFull>[0] & { muted?: b
 }
 
 /** how many answers the first talk on the Moon lasts (M-R179: about five rounds, then {bati} grows sleepy) */
-/** D03-S008 (M-R207): about three rounds, then {bati} hops */
-const FIRST_ROUNDS = 3;
+/** D03-S008 (M-R207): about three rounds, then {bati} hops; M-R223: 「1〜2往復すると」 — two */
+const FIRST_ROUNDS = 2;
 const sentences = (t: string) => (t.match(/[^。！？!?\n]+[。！？!?]*/g) ?? [t]).map((x) => x.trim()).filter(Boolean);
 
 /**
@@ -57,7 +59,12 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: 'smooth' });
   }, [msgs, casting]);
-  const pic = faces?.[face] || image;
+  // M-R223: a tap on {bati}'s face (or your own small one) above the chat changes the look; a look changed here wins
+  const { me: auth } = useAuth();
+  const [room, setRoom] = useState<RoomMode | null>(null);
+  const changed = auth?.bati?.imageUrl && image && auth.bati.imageUrl !== image ? auth.bati : null;
+  const pic = changed ? changed.faces?.[face as 'smile'] || changed.imageUrl || undefined : faces?.[face] || image;
+  const myIcon = auth?.lookIcon || auth?.avatarUrl || me;
   // the voice: one sentence after another, each played as soon as it is made
   const playing = useRef<HTMLAudioElement | null>(null);
   const gen = useRef(0);
@@ -149,14 +156,23 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
 
   return (
     <div className="absolute inset-0 z-[12] flex flex-col bg-gradient-to-b from-[#0a0f24] via-[#0b0a1a] to-black text-amber-50">
-      {/* {bati}, its face changing with the talk */}
+      {/* {bati}, its face changing with the talk; a tap on it (or on your own small face) changes the look (M-R223) */}
       <div className={`pt-safe relative mx-auto mt-12 w-28 ${pic ? 'h-28' : 'h-0'}`}>
         {pic && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={pic} alt="" className="h-full w-full object-contain drop-shadow-[0_0_18px_rgba(255,220,150,0.35)] transition-opacity duration-300" />
+          <button type="button" onClick={() => setRoom('bati')} aria-label={`${bati}の見た目を変える`} className="h-full w-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={pic} alt="" className="h-full w-full object-contain drop-shadow-[0_0_18px_rgba(255,220,150,0.35)] transition-opacity duration-300" />
+          </button>
+        )}
+        {myIcon && (
+          <button type="button" onClick={() => setRoom('me')} aria-label={`${neo}の見た目を変える`} className="absolute -right-10 bottom-0 h-8 w-8 overflow-hidden rounded-full ring-1 ring-amber-200/50">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={myIcon} alt="" className="h-full w-full object-cover" />
+          </button>
         )}
         {casting && <div className="pointer-events-none absolute inset-[-25%] animate-[spin_3s_linear_infinite] rounded-full border border-dashed border-amber-200/50" />}
       </div>
+      {room && <RoomSheet mode={room} onClose={() => setRoom(null)} onDone={() => setRoom(null)} />}
       <div className="flex-1 space-y-2 overflow-y-auto px-4 pb-3 pt-3">
         {msgs.map((m) =>
           m.who === 'me' ? (
@@ -175,6 +191,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
               </p>
               {m.drawn && <DrawnPicture url={m.drawn} alt={m.text} />}
               <SourceChips sources={m.sources} tone="story" />
+              {m.q && !m.noPic && placeOf(m.q) && <PlaceMap place={placeOf(m.q)!} tone="story" />}
               {m.picture && (
                 <figure className="overflow-hidden rounded-xl bg-black/40">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -344,6 +361,7 @@ function BatiChatFull({
               </p>
               {m.drawn && <DrawnPicture url={m.drawn} alt={m.text} />}
               <SourceChips sources={m.sources} tone="story" />
+              {m.q && !m.noPic && placeOf(m.q) && <PlaceMap place={placeOf(m.q)!} tone="story" />}
               {m.q && (
                 <>
                   {m.noPic || m.drawn ? null : m.picture ? (

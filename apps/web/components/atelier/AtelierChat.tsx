@@ -1,10 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MessageBar } from '@/components/story/Chat';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { isOpen, lockLine, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
+import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
+import { batiDaysLeftLine } from '@obolo/shared';
+import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
 import { ASK, DONE, detect, isBare, KIND_WORD } from './intent';
@@ -41,7 +43,9 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  */
 export function AtelierChat({ first, talk, story }: { first: AtelierKind | null; talk: Talk; story?: StoryMode }) {
   const { me, setMe } = useAuth();
-  const partner = usePartner();
+  const own = usePartner();
+  // in a story step the story's {bati} talks (the review page has no account: its {bati} is the story's)
+  const partner = story ? { ...own, name: story.speaker('バティ').name, face: story.speaker('バティ').avatar ?? own.face } : own;
   const day = me?.journeyDay;
   const talkId = talk.id;
   const [msgs, setMsgs] = useState<Msg[]>(() => (story ? (story.works ?? []).map((work) => ({ id: uid(), who: 'work' as const, work })) : talk.msgs));
@@ -52,7 +56,9 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
   const held = useRef(new Map<string, { blob: Blob; seconds: number }>());
   const lastSong = useRef<string | undefined>(undefined);
   const end = useRef<HTMLDivElement>(null);
-  const ctx = useAtelierCtx();
+  const realCtx = useAtelierCtx();
+  const test = !!story?.test;
+  const ctx = useMemo(() => (test ? { ...realCtx, test } : realCtx), [realCtx, test]);
 
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,10 +69,12 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
     saveTalk({ id: talkId, at: new Date().toISOString(), msgs: msgs.filter((m) => m.who !== 'work' || m.work.status !== 'making') });
   }, [msgs, talkId]);
 
-  const say = (text: string, chips?: string[]) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text, chips }]);
-  /** a script line, word for word (the made words in it first, then the story's placeholders) */
+  // {bati}'s own lines in its personality's manner (M-R216); KIMORIN (no {bati} yet) as written
+  const batiVoice = own.isBati ? batiLineVoiceOf(me?.bati) : undefined;
+  const say = (text: string, chips?: string[]) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: story ? story.voice('バティ', text) : batiLine(text, batiVoice), chips }]);
+  /** a script line, word for word in its speaker's manner (then the made words in it, then the story's placeholders) */
   const line = (cue: keyof typeof lines, words = '') => {
-    for (const l of lines[cue] ?? []) setMsgs((m) => [...m, { id: uid(), who: 'bati', speaker: l.who, text: story!.fill(withWords(l.text, words)) }]);
+    for (const l of lines[cue] ?? []) setMsgs((m) => [...m, { id: uid(), who: 'bati', speaker: l.who, text: story!.fill(withWords(story!.voice(l.who, l.text), words)) }]);
     return !!lines[cue]?.length;
   };
   const put = (w: Work) => setMsgs((m) => (m.some((x) => x.who === 'work' && x.work.id === w.id) ? m.map((x) => (x.who === 'work' && x.work.id === w.id ? { ...x, work: w } : x)) : [...m, { id: uid(), who: 'work', work: w }]));
@@ -112,7 +120,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
       setPending({ kind });
       return line('open');
     }
-    if (!isOpen(kind, day)) return say(lockLine(kind, day));
+    if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiDaysLeftLine(batiVoice?.personality ?? 'genki', daysUntil(kind, day)) }]);
     if (isBare(content)) {
       setPending({ kind });
       return say(ASK[kind]);
@@ -219,7 +227,8 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
   // coming with a kind (a Bluena folder's 〔月で作る〕, Saturn's 〔つぶやく〕): ask for it once
   const started = useRef(false);
   useEffect(() => {
-    if (started.current || !first || !me) return;
+    // a story step asks at once (the review page plays it with no account)
+    if (started.current || !first || (!me && !story)) return;
     started.current = true;
     ask(first, '');
     // eslint-disable-next-line react-hooks/exhaustive-deps

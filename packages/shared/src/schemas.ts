@@ -246,7 +246,12 @@ export const BatiSpeechBody = z.object({
 });
 export type BatiSpeechBody = z.infer<typeof BatiSpeechBody>;
 /** M-R218: the grown egg hatched in the Moon temple — which egg it becomes, and its seed (the 2nd: a favourite sound, the 3rd: a word) */
-export const BatiNewHatchBody = z.object({ egg: z.enum(['moon', 'sun']), seed: z.string().trim().min(1).max(40) });
+export const BatiNewHatchBody = z.object({
+  egg: z.enum(['moon', 'sun']),
+  seed: z.string().trim().min(1).max(40),
+  /** M-R227: the role, when it is known before the birth (a 仕事・勉強 {bati} leans to 姉御ギャル / クールギャル) */
+  role: z.enum(BATI_ROLES).optional(),
+});
 export type BatiNewHatchBody = z.infer<typeof BatiNewHatchBody>;
 
 /** Day 4: the newborn Bati's name. */
@@ -254,11 +259,15 @@ export const BatiNameBody = z.object({ name: z.string().trim().min(1).max(20) })
 export type BatiNameBody = z.infer<typeof BatiNameBody>;
 
 /** Bati's room (the Moon, P-BATI-ROOM): dress up / transform the Bati a little — the same creature, changed by the wish. */
-export const BatiRestyleBody = z.object({ wish: z.string().trim().min(1).max(60) });
+// M-R223: no wish = four art touches of the {bati} now; `from` = a candidate tapped just before (the new four start from it)
+export const BatiRestyleBody = z.object({ wish: z.string().trim().max(60).optional(), from: z.string().uuid().optional() });
 export type BatiRestyleBody = z.infer<typeof BatiRestyleBody>;
 /** one of the restyle candidates becomes the Bati picture */
 export const BatiRestyleChooseBody = z.object({ id: z.string().uuid() });
 export type BatiRestyleChooseBody = z.infer<typeof BatiRestyleChooseBody>;
+/** M-R223: a look kept before (own: Me.lookHistory, {bati}: BatiView.looks) is worn again */
+export const LookRestoreBody = z.object({ url: z.string().trim().min(1).max(2000) });
+export type LookRestoreBody = z.infer<typeof LookRestoreBody>;
 
 /** Operator testing (/lab, admin token): move the logged-in account to a journey day. */
 export const JumpJourneyBody = z.object({ day: z.number().int().min(1).max(10) });
@@ -585,6 +594,8 @@ export const BatiPersonaPick = z.union([
     self: z.string().trim().min(1).max(8),
     call: z.string().trim().min(1).max(16),
     catchphrase: z.string().trim().min(1).max(24),
+    /** M-R225: the card's 性格 — one word, never in the speech */
+    trait: z.string().trim().min(1).max(12).optional(),
     intro: z.string().trim().min(4).max(70),
   }),
 ]);

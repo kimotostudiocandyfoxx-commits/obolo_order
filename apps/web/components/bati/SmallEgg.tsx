@@ -4,7 +4,20 @@
  * The small glowing egg the first shell became (M-R218): drawn with shapes (no art yet — PROVISIONAL, P-BATI-EGGS).
  * `growth` 0..1 makes it a little bigger and brighter as the days pass; no number is ever shown.
  */
-export function SmallEgg({ growth = 0, size = 28, ready = false, className = '' }: { growth?: number; size?: number; ready?: boolean; className?: string }) {
+export function SmallEgg({
+  growth = 0,
+  size = 28,
+  ready = false,
+  className = '',
+  light,
+}: {
+  growth?: number;
+  size?: number;
+  ready?: boolean;
+  className?: string;
+  /** SYS-S003: the moon's (white) and the sun's (gold) light taking turns ('alt'), or the chosen one soaked in */
+  light?: 'alt' | 'moon' | 'sun';
+}) {
   const g = Math.min(1, Math.max(0, growth));
   const s = size * (0.75 + 0.45 * g);
   const glow = 0.25 + 0.6 * g;
@@ -26,6 +39,17 @@ export function SmallEgg({ growth = 0, size = 28, ready = false, className = '' 
           boxShadow: `0 0 ${6 + 18 * g}px rgba(255,226,160,${0.4 + 0.5 * g})${ready ? ', 0 0 28px 6px rgba(255,240,200,0.9)' : ''}`,
         }}
       />
+      {light && (
+        <span
+          className="absolute inset-0 mix-blend-screen"
+          style={{
+            borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+            background: light === 'sun' ? 'radial-gradient(circle at 50% 45%, rgba(255,196,80,0.85), rgba(255,160,40,0) 75%)' : 'radial-gradient(circle at 50% 45%, rgba(235,240,255,0.9), rgba(200,215,255,0) 75%)',
+            animation: light === 'alt' ? 'eggLights 2.4s ease-in-out infinite' : 'fadeIn 1.2s ease-out',
+          }}
+        />
+      )}
+      {light === 'alt' && <style>{`@keyframes eggLights{0%,100%{background:radial-gradient(circle at 50% 45%,rgba(235,240,255,.9),rgba(200,215,255,0) 75%)}50%{background:radial-gradient(circle at 50% 45%,rgba(255,196,80,.85),rgba(255,160,40,0) 75%)}}`}</style>}
     </span>
   );
 }

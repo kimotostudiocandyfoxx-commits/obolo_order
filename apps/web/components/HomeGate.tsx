@@ -47,6 +47,7 @@ export function HomeGate({ children }: { children: ReactNode }) {
         canSkip={day <= 2}
         // the wait is the time to talk with Bati (client 2026-11-22): its room is the Moon (P-BATI-ROOM)
         bati={me.bati?.imageUrl ? { name: me.bati.name || 'バティ', image: me.bati.faces?.smile ?? me.bati.imageUrl } : undefined}
+        note={STORIES[day]?.waitNote?.replaceAll('{bati}', me.bati?.name || 'バティ')}
         onUnlocked={async (skipped) => {
           const elapsed = Date.now() >= Date.parse(me.journeyCompletedAt!) + JOURNEY_WAIT_MS;
           // tried again on a bad line; never left on the opened door (story chat 2026-10-29)

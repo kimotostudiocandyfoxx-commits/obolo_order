@@ -29,10 +29,10 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is eight days (draft 21); only days 1 and 2 can skip the wait (明日まで待てない; day 2: もちろん…)', () => {
+  it('the first journey is eight days (draft 21); only days 1 and 2 can skip the wait (明日まで待てない, D03-S009 too)', () => {
     expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     const labels = Object.fromEntries(Object.entries(STORIES).map(([d, s]) => [d, s.skipLabel]));
-    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: 'もちろん明日まで待てない', 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined });
+    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: '明日まで待てない', 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined });
     expect(DEFAULT_SKIP_LABEL).toBe('明日まで待てない');
     expect(STORIES[JOURNEY_PAYMENT].steps.some((s) => s.t === 'order')).toBe(true);
   });
@@ -121,6 +121,18 @@ describe('day 2: KIMORIN, then the Moon (story 2026-10-14)', () => {
     expect(look?.spell).toEqual({ t: 'say', who: 'バティ', text: 'いくよ、{name}！' });
     // Bluena is given on the morning of day 3 (M-R207/M-R212)
     expect(steps.some((s) => s.t === 'say' && s.text.includes('作るのは、月。しまうのは、Bluena。'))).toBe(false);
+  });
+  it("M-R223: {bati}'s look in the chat (four cards, until decided), then OBOLON's lookups, then the free questions", () => {
+    const t = kinds(steps);
+    expect(t).not.toContain('magic');
+    const look = steps.find((s): s is Extract<Step, { t: 'batilook' }> => s.t === 'batilook');
+    expect(look).toEqual({ t: 'batilook', ask: { t: 'say', who: 'バティ', text: 'これで、決まり？' }, ok: 'これで決まり', more: 'もうちょっと変える' });
+    const research = steps.findIndex((s) => s.t === 'say' && s.text === '{bati}は、、、マナの力で、調べるのが、得意だ。');
+    expect(t.indexOf('batilook')).toBeLessThan(research);
+    expect(research).toBeLessThan(t.indexOf('batitalk'));
+    const wait = steps.findIndex((s) => s.t === 'say' && s.text === '今日は、、、月で、好きに過ごせ。{bati}と、いくらでも、話していい。');
+    expect(wait).toBeGreaterThan(t.indexOf('batitalk'));
+    expect(STORIES[2].waitNote).toContain('{bati}と好きなだけ話せます');
   });
   it('KIMORIN wears the sunglasses look after the dragon', () => {
     const dragon = steps.findIndex((s) => s.t === 'video' && s.motion === 'd2-dragon');

@@ -169,6 +169,7 @@ export function DemoDay({
       textOnly={false}
       showGate={showGate}
       replayFilms
+      atelierTest={!live}
       seals={{
         known: day >= 2 ? knownSealsOn(day) : [],
         solved: solvedSealsOn(day),

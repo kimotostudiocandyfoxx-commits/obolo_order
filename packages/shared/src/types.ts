@@ -48,6 +48,8 @@ export interface Me {
   lookChibi?: string | null;
   /** the chosen look cut to a round 512px icon around the face (no painting) */
   lookIcon?: string | null;
+  /** M-R223: the looks worn so far, oldest first (the one worn now included) — Bluena's first shelf, 〔前に戻す〕 */
+  lookHistory?: string[];
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
   puniPic: string | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */
@@ -103,6 +105,10 @@ export interface BatiView {
   memories?: BatiMemory[];
   /** its role (the 1st: なんでも, changeable) */
   role?: BatiRole;
+  /** M-R223: the looks decided so far, oldest first (the one worn now and the birth's included) */
+  looks?: string[];
+  /** M-R223: the seed and what it was (food / sound / word): it stays somewhere small in every look */
+  seedKind?: 'food' | 'sound' | 'word';
 }
 
 /** バティのカード (M-R217): shown in the chat at birth, kept on Bluena's first shelf, exported as a picture */
@@ -117,6 +123,8 @@ export interface BatiCard {
   /** the personality's name (元気な子 …) */
   label: string;
   catchphrase: string;
+  /** M-R225: the card's 性格 (one word: おっちょこちょい, 食いしん坊 …) — on the card only, never in the speech */
+  trait?: string;
   /** about 40 characters, written for the seed at birth */
   intro: string;
   /** a rare personality: the card's edge glows gold */
@@ -162,6 +170,8 @@ export interface NeoLookResult {
 export interface BatiRestyleResult {
   candidates: NeoLookCandidate[];
   left: number;
+  /** M-R223: asked without a wish — each candidate's art touch (BATI_RESTYLE_TOUCHES label), in order */
+  touches?: string[];
 }
 
 /** Result of POST /auth/request-code: who is this email? */

@@ -2,7 +2,7 @@
 
 import { callRequest } from '@obolo/shared';
 import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView, BuddySource } from '@obolo/shared';
-import { DrawnPicture, SourceChips } from '@/components/chat/BuddyExtras';
+import { DrawnPicture, PlaceMap, SourceChips, placeOf } from '@/components/chat/BuddyExtras';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { DemoBanner } from '@/components/DemoBanner';
 import { PlanetShell } from '@/components/PlanetShell';
@@ -11,9 +11,10 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { ApiError, getApi } from '@/lib/api';
 import { useI18n } from '@/lib/i18n/client';
 import { useAuth } from '@/lib/auth';
-import { RoomIcon, RoomSheet, type RoomMode } from './BatiRoom';
+import { RoomSheet, type RoomMode } from './BatiRoom';
 import { LineIcon } from '@/components/LineIcon';
-import { BatiSettings, MoonEgg, NewEggFlow } from '@/components/bati/BatiSheet';
+import { BatiSettings, MoonEgg, eggReady } from '@/components/bati/BatiSheet';
+import { EggMorning } from '@/components/bati/EggMorning';
 
 export function MoonView() {
   return (
@@ -55,6 +56,17 @@ function Chat() {
   const { me, setMe } = useAuth();
   const api = getApi();
   const [eggOpen, setEggOpen] = useState(false);
+  // SYS-S003: the morning the egg has grown, the scene opens by itself on the Moon (once a visit; the egg stays tappable)
+  useEffect(() => {
+    if (!eggReady(me)) return;
+    try {
+      if (sessionStorage.getItem('obolo.eggMorning') === me?.batiEgg?.readyAt) return;
+      sessionStorage.setItem('obolo.eggMorning', me?.batiEgg?.readyAt ?? '');
+    } catch {
+      /* private window: open it anyway */
+    }
+    setEggOpen(true);
+  }, [me]);
   const [profile, setProfile] = useState<BuddyProfileView | null>(null);
   const [messages, setMessages] = useState<BuddyMessageView[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -132,7 +144,14 @@ function Chat() {
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Buddy header */}
       <div className="flex items-center gap-3 px-4 pb-2 pt-3">
-        <BatiFace size={me?.bati?.imageUrl ? 56 : 44} />
+        {/* M-R223: a tap on {bati}'s face or your own small one changes the look (no big buttons) */}
+        {me?.bati?.imageUrl ? (
+          <button type="button" onClick={() => setRoom('bati')} aria-label={`${me.bati.name || 'バティ'}の見た目を変える`} className="shrink-0 rounded-full active:scale-95">
+            <BatiFace size={56} />
+          </button>
+        ) : (
+          <BatiFace size={44} />
+        )}
         <div className="flex-1">
           <div className="font-black">{name}</div>
           <div className="text-[11px] text-white/50">{profile?.hasMemory ? `${m.moon.memoryOn}` : m.moon.memoryOff}</div>
@@ -143,28 +162,16 @@ function Chat() {
         )}
         {/* M-R218: the small egg on the temple's altar — bigger and brighter with the days, no number; ready: tap to hatch */}
         <MoonEgg me={me} onHatch={() => setEggOpen(true)} />
+        {(me?.lookIcon || me?.avatarUrl) && (
+          <button type="button" onClick={() => setRoom('me')} aria-label="自分の見た目を変える" className="h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-sky-100/30 active:scale-95">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={(me.lookIcon || me.avatarUrl)!} alt="" className="h-full w-full object-cover" />
+          </button>
+        )}
         <button className="btn btn-ghost h-9 w-9 !p-0" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
           <LineIcon id="gear" className="h-5 w-5" />
         </button>
       </div>
-
-      {/* Bati's room (P-BATI-ROOM): dress Bati up, or have Bati's magic change your own look */}
-      {(me?.bati?.imageUrl || me?.avatarUrl) && (
-        <div className="flex gap-2 px-4 pb-3">
-          {me?.bati?.imageUrl && (
-            <button type="button" onClick={() => setRoom('bati')} className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber-100/25 bg-white/[0.06] px-4 text-[13px] font-bold text-amber-50/90 active:scale-95">
-              <RoomIcon id="dress" />
-              着替え・変身
-            </button>
-          )}
-          {me?.avatarUrl && (
-            <button type="button" onClick={() => setRoom('me')} className="flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full border border-sky-100/25 bg-white/[0.06] px-3 text-[13px] font-bold text-sky-50/90 active:scale-95">
-              <RoomIcon id="magic" />
-              <span className="truncate">自分の姿を変えてもらう</span>
-            </button>
-          )}
-        </div>
-      )}
 
       {/* Messages */}
       <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto px-4 pb-4" onScroll={(e) => {
@@ -177,8 +184,8 @@ function Chat() {
           </button>
         )}
         {profile && messages.length === 0 && <Bubble role="buddy" text={t(m.moon.greeting, { name })} />}
-        {messages.map((msg) => (
-          <Bubble key={msg.id} role={msg.role} text={msg.text} sources={msg.sources} image={msg.image?.url} />
+        {messages.map((msg, k) => (
+          <Bubble key={msg.id} role={msg.role} text={msg.text} sources={msg.sources} image={msg.image?.url} place={msg.role === 'buddy' && messages[k - 1]?.role === 'user' ? placeOf(messages[k - 1].text) : null} />
         ))}
         {sending && (
           <div className="flex items-end gap-2">
@@ -219,7 +226,8 @@ function Chat() {
         </button>
       </form>
 
-      {eggOpen && me && <NewEggFlow me={me} onMe={setMe} onClose={() => setEggOpen(false)} />}
+      {/* SYS-S003 「たまごが、育った」 (M-R224), played by the story player */}
+      {eggOpen && me && <EggMorning onClose={() => setEggOpen(false)} />}
       {room && (
         <RoomSheet
           mode={room}
@@ -248,7 +256,7 @@ function Chat() {
   );
 }
 
-function Bubble({ role, text, sources, image }: { role: 'user' | 'buddy'; text: string; sources?: BuddySource[]; image?: string }) {
+function Bubble({ role, text, sources, image, place }: { role: 'user' | 'buddy'; text: string; sources?: BuddySource[]; image?: string; place?: string | null }) {
   if (role === 'user') {
     return (
       <div className="flex justify-end">
@@ -266,6 +274,8 @@ function Bubble({ role, text, sources, image }: { role: 'user' | 'buddy'; text: 
         <div className="whitespace-pre-wrap rounded-2xl rounded-bl-sm bg-white/10 px-4 py-2.5 text-[15px] leading-relaxed">{text}</div>
         {image && <DrawnPicture url={image} alt={text} />}
         <SourceChips sources={sources} />
+        {/* M-R223: a place asked about, on a small map */}
+        {place && <PlaceMap place={place} />}
       </div>
     </div>
   );
