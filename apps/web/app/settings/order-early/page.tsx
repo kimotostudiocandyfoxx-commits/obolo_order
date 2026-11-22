@@ -7,7 +7,7 @@ import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { joinFlags } from '@/lib/onboarding/joinFlags';
-import { SYS002 } from '@/lib/onboarding/sys002';
+import { SYS002_ALONE } from '@/lib/onboarding/sys002';
 
 /**
  * 〔設定〕→〔毎月のマナ〕→〔先にObolo Orderになる〕: SYS-S002 always plays first (M-R202 — no way to pay that skips the
@@ -27,7 +27,7 @@ function OrderEarly() {
   if (!me) return null;
   return (
     <StoryPlayer
-      steps={SYS002}
+      steps={SYS002_ALONE}
       vars={{
         name: me.displayName,
         inviter: me.invitedByName ?? 'MIKIE⭐︎DRILL',

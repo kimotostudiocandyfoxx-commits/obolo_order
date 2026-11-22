@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { getApi } from '@/lib/api';
 import { JOURNEY_DONE, type BatiCard, type Me } from '@obolo/shared';
 import { BatiCardView, exportCard } from './BatiCard';
-import { SmallEgg, eggGrowth } from './SmallEgg';
+import { SmallEgg } from './SmallEgg';
 import { BatiMemories } from './BatiMemories';
 
 /**
@@ -42,7 +42,7 @@ export function BatiShelf() {
           <span className="w-full truncate">{c.name ?? '……'}</span>
         </button>
       ))}
-      {me?.batiEgg && <SmallEgg growth={eggGrowth(me.batiEgg.readyAt)} size={18} className="mb-2 shrink-0" />}
+      {me?.batiEgg && <SmallEgg growth={(me.batiEgg.growth ?? 0)} size={18} className="mb-2 shrink-0" />}
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/70" onClick={() => setOpen(null)}>
           <div className="flex flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>

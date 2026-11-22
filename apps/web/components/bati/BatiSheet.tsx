@@ -4,14 +4,14 @@ import { useState } from 'react';
 import { BATI_ROLE_LABELS, BATI_ROLES, BATI_PERSONALITIES, batiDefaultCall, normalizeBatiPersonality, type Me } from '@obolo/shared';
 import { ApiError, getApi } from '@/lib/api';
 import { BatiCardView, exportCard } from './BatiCard';
-import { SmallEgg, eggGrowth } from './SmallEgg';
+import { SmallEgg } from './SmallEgg';
 import { BatiMemories } from './BatiMemories';
 
 /** the egg is ready (the review mode's switch `obolo.demo.eggReady` = '1' makes it ready at once) */
 export function eggReady(me: Me | null | undefined): boolean {
   const e = me?.batiEgg;
   if (!e) return false;
-  if (e.ready || new Date(e.readyAt).getTime() <= Date.now()) return true;
+  if (e.ready) return true;
   try {
     return getApi().mode === 'demo' && localStorage.getItem('obolo.demo.eggReady') === '1';
   } catch {
@@ -28,7 +28,7 @@ export function MoonEgg({ me, onHatch }: { me: Me | null | undefined; onHatch: (
   const ready = eggReady(me);
   return (
     <button type="button" onClick={() => ready && onHatch()} disabled={!ready} aria-label={ready ? 'たまごが、育った' : '小さなたまご'} className="flex h-11 w-9 items-end justify-center">
-      <SmallEgg growth={ready ? 1 : eggGrowth(me.batiEgg.readyAt)} size={20} ready={ready} />
+      <SmallEgg growth={ready ? 1 : (me.batiEgg.growth ?? 0)} size={20} ready={ready} />
     </button>
   );
 }
@@ -116,7 +116,7 @@ export function BatiSettings({ me, onMe }: { me: Me; onMe: (m: Me) => void }) {
       )}
       {b.card && (
         <div className="flex flex-col items-center gap-3">
-          <BatiCardView card={b.card} egg={!!me.batiEgg} eggGrowth={me.batiEgg ? eggGrowth(me.batiEgg.readyAt) : 0} onExport={() => void exportCard(b.card!)} />
+          <BatiCardView card={b.card} egg={!!me.batiEgg} eggGrowth={me.batiEgg?.growth ?? 0} onExport={() => void exportCard(b.card!)} />
           {/* M-R222: 「覚えてること」 (only what was asked in the chat), forget one or all */}
           <BatiMemories me={me} onMe={onMe} />
         </div>

@@ -6,8 +6,8 @@
  * about half the sentences of a style (checked by apps/web/lib/story/batiVariants.test.ts, sentence by sentence; the
  * sentence count never changes); ordinary kanji-kana; no slips, rhymes, deep questions; the 口ぐせ rarely.
  * ていねいな子 (M-R226): only です／ます are katakana (デス／マス).
- * Keyed by the script line as written. Two keys are not `say` lines: SYS-S003's 〈言い方は、その子の性格で〉 text
- * (「……{neo}！　よろしくね！」 and the role question). The rare styles get theirs rewritten once at birth instead.
+ * Keyed by the script line as written. Three keys are not `say` lines: SYS-S003's 〈言い方は、その子の性格で〉 text
+ * (「……{neo}！　よろしくね！」 and the role question), and the first {bati}'s answer to a wish that can not be (M-R230). The rare styles get theirs rewritten once at birth instead.
  */
 import type { BatiOrdinaryPersonality } from './batiPersona';
 
@@ -937,6 +937,18 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
     galane: "{self}は、{neo}の、なんの相方になる？",
     galcool: "{self}は、{neo}の、なんの相方になる？",
     galkansai: "{self}は、{neo}の、なんの相方になる？",
+  },
+  "それは、ちょっとむずかしいかも！　ほかの言い方で、教えて！": {
+    teinei: "それは、ちょっとむずかしいデス！　ほかの言い方で、教えて！",
+    kansai: "それは、ちょっとむずかしいかもやで！　ほかの言い方で、教えて！",
+    cool: "それは、ちょっとむずかしい。ほかの言い方で、教えて！",
+    mellow: "それは、ちょっとむずかしいかもねぇ。ほかの言い方で、教えて！",
+    amae: "それは、ちょっとむずかしいかも！　ほかの言い方で、教えてくれる？",
+    gal: "それは、ちょっとむずかしいかも！　ほかの言い方で、教えてほしいじゃん！",
+    galfuwa: "それは、ちょっとむずかしいかも〜！　ほかの言い方で、教えて！",
+    galane: "それは、ちょっとむずかしいかも！　ほかの言い方で、教えてみな？",
+    galcool: "それは、ちょっとむずかしい。ほかの言い方で、教えて！",
+    galkansai: "それは、ちょっとむずかしいかもやん！　ほかの言い方で、教えて！",
   },
 };
 

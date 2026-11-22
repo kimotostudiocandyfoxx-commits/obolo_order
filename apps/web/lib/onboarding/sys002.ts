@@ -99,3 +99,9 @@ export const SYS002: Step[] = [
   { t: 'motes', count: 40 }, // 景色が光の粒になってほどけ、元いた所へ戻る
   { t: 'black' },
 ];
+
+/**
+ * SYS-S002 played on its own (the settings' 〔先にObolo Orderになる〕 and the review page's day=sys002): the same steps,
+ * then the end — without it the player stopped on the black screen and never handed back (inside day 3 the day goes on).
+ */
+export const SYS002_ALONE: Step[] = [...SYS002, { t: 'end' }];

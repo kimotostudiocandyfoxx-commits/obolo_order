@@ -248,12 +248,12 @@ export type Step =
    * SYS-S003: the grown egg's seed said (a sound / a word, the words as said) and the new {bati} born from it — it
    * comes into the chat (POST /me/bati/new, then the hatching). Saves batiImage.
    */
-  | { t: 'newbati'; kind: 'sound' | 'word' }
+  | { t: 'newbati'; kind: 'sound' | 'word' | 'wish' }
   /**
    * SYS-S003: the new {bati} greets (in its own manner) and asks its role — the script's 〈言い方は、その子の性格で〉
    * lines (not `say` lines: the script keeps them as written text). Saves f_bati_role.
    */
-  | { t: 'batirole'; greet: string; ask: string }
+  | { t: 'batirole'; greet: string; /** the 2nd only (M-R230): the 3rd's role comes from its wish */ ask?: string }
   | { t: 'end' };
 
 /** a line kept in a step for the screen that step opens to say (the look, the atelier): the script's words as written */

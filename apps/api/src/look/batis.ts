@@ -21,6 +21,7 @@ import {
   type BatiRole,
   type BatiSeedKind,
   type BatiMemory,
+  type BatiCustomStyle,
   type BatiSummary,
   type BatiView,
 } from '@obolo/shared';
@@ -58,6 +59,9 @@ export interface BatiRecord {
   /** a rare personality's fixed story lines, rewritten at birth (line as written → its line) */
   lines?: Record<string, string>;
   createdAt: string;
+  /** M-R230: 「ねがいの子」 (the third, from a wish), and a style made for it when none of the seventeen fitted */
+  wish?: boolean;
+  custom?: BatiCustomStyle;
   /** M-R222: 「覚えてること」 — what the member asked it to remember (five at most), and its role */
   memories?: BatiMemory[];
   role?: BatiRole;
@@ -157,11 +161,12 @@ export function batiCard(r: BatiRecord): BatiCard {
     egg: r.egg,
     seed: r.seed,
     personality: r.personality,
-    label: BATI_PERSONALITIES[r.personality].label,
+    label: r.custom?.label ?? BATI_PERSONALITIES[r.personality].label,
     catchphrase: r.catchphrase,
     ...(r.trait ? { trait: r.trait } : {}),
     intro: r.intro,
-    rare: isBatiRare(r.personality),
+    rare: !r.custom && isBatiRare(r.personality),
+    ...(r.wish ? { wish: true } : {}),
     imageUrl: r.imageUrl,
   };
 }
@@ -170,6 +175,7 @@ export function batiCard(r: BatiRecord): BatiCard {
 export function batiViewExtra(r: BatiRecord): Partial<BatiView> {
   return {
     memories: r.memories ?? [],
+    ...(r.custom ? { custom: r.custom } : {}),
     role: r.role ?? 'any',
     id: r.id,
     egg: r.egg,

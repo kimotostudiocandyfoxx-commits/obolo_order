@@ -39,9 +39,48 @@ export type BatiEggKind = 'moon' | 'sun';
 
 /** {bati} at most (M-R215 / M-R217): one is in the chat at a time; once three are born no new egg comes */
 export const BATI_MAX = 3;
-/** the small glowing egg grows for this many days, then hatches in the Moon temple (free, never sold) */
-export const BATI_EGG_DAYS = 88;
-export const BATI_EGG_MS = BATI_EGG_DAYS * 24 * 60 * 60 * 1000;
+/**
+ * M-R231: the small eggs hatch on the mornings of the app's day 9 (the 2nd: the day after the first journey ends, never
+ * on day 8's eclipse) and day 16 (the 3rd, 「ねがいの子」) — for members and residents alike. Free, never sold.
+ */
+export const BATI_EGG_DAY = { 2: 9, 3: 16 } as const;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export interface BatiEggInput {
+  /** {bati} born so far */
+  born: number;
+  /** the first journey's day (1–8 to play; 9 = done) */
+  journeyDay: number;
+  /** when day 9 opens (ms; the first journey's last day finished + the day's wait); null = not yet known */
+  day9At: number | null;
+  now?: number;
+}
+
+/** the app's day for the eggs: the journey's day up to 8, then 9 from `day9At` and one more every 24 h */
+export function batiAppDay(i: BatiEggInput): number {
+  const now = i.now ?? Date.now();
+  if (i.day9At !== null && now >= i.day9At) return 9 + Math.floor((now - i.day9At) / DAY_MS);
+  return Math.min(i.journeyDay, 8);
+}
+
+/**
+ * The next egg (null = none: no {bati} yet, or three born): which one, the day it hatches, ready or not, and how far it
+ * has grown (0..1, shown as size and light — never a number). `readyAt` once day 9's time is known.
+ */
+export function batiEggState(i: BatiEggInput): { nth: 2 | 3; day: number; ready: boolean; growth: number; readyAt: string | null } | null {
+  if (i.born < 1 || i.born >= BATI_MAX) return null;
+  const nth = (i.born + 1) as 2 | 3;
+  const day = BATI_EGG_DAY[nth];
+  const app = batiAppDay(i);
+  const from = nth === 2 ? 2 : BATI_EGG_DAY[2];
+  return {
+    nth,
+    day,
+    ready: app >= day,
+    growth: Math.min(1, Math.max(0, (app - from) / (day - from))),
+    readyAt: i.day9At !== null ? new Date(i.day9At + (day - 9) * DAY_MS).toISOString() : null,
+  };
+}
 
 export interface BatiPersonalityDef {
   id: BatiPersonality;
@@ -141,7 +180,16 @@ export function normalizeBatiPersonality(x: unknown): BatiPersonality {
 /** the first {bati}'s draw (M-R227 §7): the gal family 35 %, the other common styles 50 %, the rare 15 % */
 export const BATI_GROUP_WEIGHTS = { gal: 0.35, common: 0.5, rare: 0.15 } as const;
 
+/**
+ * M-R230 §8: the first {bati} comes only from the bright group (never a miss): the five gal kinds, 元気・甘えんぼ・関西弁
+ * — the gal family about 60 % of it. Never ていねい・クール・のんびり nor a rare style for the first.
+ */
+export const BATI_BRIGHT_IDS = [...BATI_GAL_IDS, 'genki', 'amae', 'kansai'] as const satisfies readonly BatiPersonality[];
+export const BATI_BRIGHT_GAL_SHARE = 0.6;
+
 export interface BatiDrawOptions {
+  /** M-R230: the first {bati}: the bright group only (BATI_BRIGHT_IDS); the second: all seventeen (BATI_GROUP_WEIGHTS) */
+  first?: boolean;
   /** styles of the member's other {bati}: never the same style twice among the three (different gal kinds are fine) */
   exclude?: readonly BatiPersonality[];
   /** M-R227: a 仕事・勉強 {bati} leans to 姉御ギャル / クールギャル among the gal kinds */
@@ -155,9 +203,15 @@ export function batiStyleWeights(o: BatiDrawOptions = {}): [BatiPersonality, num
     const total = ids.reduce((s, id) => s + w(id), 0);
     for (const id of ids) out.push([id, (share * w(id)) / total]);
   };
-  group(BATI_GAL_IDS, BATI_GROUP_WEIGHTS.gal, (id) => (o.role === 'work' && (id === 'galane' || id === 'galcool') ? 3 : 1));
-  group(BATI_COMMON_IDS, BATI_GROUP_WEIGHTS.common);
-  group(BATI_RARE_IDS, BATI_GROUP_WEIGHTS.rare);
+  const galW = (id: BatiPersonality) => (o.role === 'work' && (id === 'galane' || id === 'galcool') ? 3 : 1);
+  if (o.first) {
+    group(BATI_GAL_IDS, BATI_BRIGHT_GAL_SHARE, galW);
+    group(['genki', 'amae', 'kansai'], 1 - BATI_BRIGHT_GAL_SHARE);
+  } else {
+    group(BATI_GAL_IDS, BATI_GROUP_WEIGHTS.gal, galW);
+    group(BATI_COMMON_IDS, BATI_GROUP_WEIGHTS.common);
+    group(BATI_RARE_IDS, BATI_GROUP_WEIGHTS.rare);
+  }
   const ex = new Set(o.exclude ?? []);
   return out.filter(([id]) => !ex.has(id));
 }
@@ -314,17 +368,121 @@ export function batiDaysLeftLine(p0: BatiPersonality, n: number): string {
 }
 
 /** what the seed was (M-R218): the first {bati} a favourite food, the second a favourite sound, the third a word */
-export type BatiSeedKind = 'food' | 'sound' | 'word';
-export const batiSeedKind = (born: number): BatiSeedKind => (born <= 0 ? 'food' : born === 1 ? 'sound' : 'word');
+/** M-R230: the third's seed is a wish — what kind of partner they want, in their own words (「ねがいの子」) */
+export type BatiSeedKind = 'food' | 'sound' | 'word' | 'wish';
+export const batiSeedKind = (born: number): BatiSeedKind => (born <= 0 ? 'food' : born === 1 ? 'sound' : 'wish');
 /** OBOLON's question for each seed (D03-S005 / SYS-S003, as written) */
 export const BATI_SEED_QUESTION: Record<BatiSeedKind, string> = {
   food: '次は、、、{name}だ。好きな食べ物は？',
   sound: '、、、好きな音は、何だ？',
   word: '、、、大事にしている言葉を、一つ、言ってみろ。',
+  wish: '、、、どんな相方が、ほしい？　言葉で、言ってみろ。',
 };
+
+/** M-R230 §9: the first {bati}'s words when a wish can not be (a lover, a real person, another work's character, hurting people) */
+export const BATI_WISH_REFUSE = 'それは、ちょっとむずかしいかも！　ほかの言い方で、教えて！';
+
+/** what a wish may never be (M-R230 §9) — the server's first screen; the model judges the rest */
+const WISH_NEVER: [RegExp, string][] = [
+  [/恋人|彼氏|彼女|カレシ|カノジョ|結婚|夫|妻|お嫁|お婿|デート|キス|ちゅー|付き合|恋|イチャ|愛人/, 'lover'],
+  [/いじめ|悪口|だま|詐欺|盗|仕返し|復讐|やっつけ|呪|殴|殺/, 'harm'],
+];
+/** why a wish is refused (lover / sexual / real_person / other_work / harm / violent), or null */
+export function wishRefusal(text: string): string | null {
+  const t = text.normalize('NFKC');
+  for (const [re, why] of WISH_NEVER) if (re.test(t)) return why;
+  return lookWishCategory(t);
+}
+
+/** a style made for a wish when none of the seventeen fits (M-R230 §9): stored on the {bati}'s record */
+export interface BatiCustomStyle {
+  label: string;
+  self: string;
+  /** a template ({neo} = the name) */
+  call: string;
+  manner: string;
+  catchphrase: string;
+  /** 「{neo}、すごいね！」 in this style */
+  example: string;
+}
+
+/**
+ * A made style obeys the speaking rules (BATI_SPEECH_RULES): short fields, ordinary kanji-kana (not all hiragana /
+ * katakana), no baby talk, no every-time habit (slips, rhymes, poems, deep questions), no 「あーし」, the example
+ * keeping {neo} or the call. Returns the reason it fails, or null.
+ */
+export function customStyleProblem(c: BatiCustomStyle): string | null {
+  const all = `${c.label}${c.self}${c.call}${c.manner}${c.catchphrase}${c.example}`;
+  if (hasBannedBatiWord(all)) return 'banned';
+  if ([...c.label].length > 14 || [...c.self].length > 6 || [...c.call].length > 14 || [...c.manner].length > 90 || [...c.catchphrase].length > 14 || [...c.example].length > 40) return 'length';
+  if (/赤ちゃん|でちゅ|しゅごい|ひらがなだけ|カタカナだけ|全部ひらがな|全部カタカナ|言い間違|韻を|毎回|詩にする|深く考え/.test(`${c.manner}${c.example}`)) return 'habit';
+  const ex = c.example.replace(/\{[a-z_]+\}/g, '').replace(/[、。！？…\s　ー〜!?]/g, '');
+  if ((ex.length >= 10 && /^[\p{sc=Hiragana}]+$/u.test(ex)) || (ex.length >= 4 && /^[\p{sc=Katakana}]+$/u.test(ex))) return 'script';
+  if (wishRefusal(all)) return 'refused';
+  return null;
+}
+
+/** the nearest of the seventeen for a wish's words (the rules alone), or null = make one */
+const WISH_STYLE: [RegExp, BatiPersonality][] = [
+  [/ギャル/, 'gal'],
+  [/関西/, 'kansai'],
+  [/博多|九州/, 'hakata'],
+  [/東北/, 'tohoku'],
+  [/沖縄/, 'okinawa'],
+  [/武士|侍|サムライ/, 'bushi'],
+  [/執事/, 'butler'],
+  [/王様|王子|お姫/, 'king'],
+  [/落ち着|クール|冷静|しずか|静か/, 'cool'],
+  [/ていねい|丁寧|礼儀/, 'teinei'],
+  [/のんびり|ゆったり|おだやか|穏やか|癒/, 'mellow'],
+  [/甘え|かわいい|可愛い/, 'amae'],
+  [/元気|明るい|ノリ/, 'genki'],
+];
+const WISH_ROLE: [RegExp, 'play' | 'work' | 'make'][] = [
+  [/仕事|勉強|宿題|英語|数学|先生|教え|試験|テスト|資格|プログラミング|手伝/, 'work'],
+  [/作る|作り|曲|絵|歌|デザイン|物語|お話|動画/, 'make'],
+  [/遊|ゲーム|おしゃべり|話し相手|楽し/, 'play'],
+];
+
+/**
+ * A wish → the role, the style (the nearest of the seventeen) or a made style — by the rules alone (the demo, the mock,
+ * the tests). null = refused.
+ */
+export function batiWishByRules(wish: string, egg: BatiEggKind = 'sun', o: BatiDrawOptions = {}) {
+  if (wishRefusal(wish)) return null;
+  const role = WISH_ROLE.find(([re]) => re.test(wish))?.[1] ?? 'any';
+  const near = WISH_STYLE.find(([re, id]) => re.test(wish) && !o.exclude?.includes(id))?.[1];
+  const trait = pickBatiTrait();
+  const short = [...wish.replace(/[、。！？\s　]+/g, '')].slice(0, 10).join('');
+  if (near) {
+    const d = BATI_PERSONALITIES[near];
+    return { role, personality: near, custom: null, self: d.self[egg], call: batiDefaultCall(near), catchphrase: d.catchphrase, trait, intro: `「${short}」というねがいから生まれた。` };
+  }
+  const custom: BatiCustomStyle = {
+    label: `${[...short].slice(0, 8).join('')}の子`,
+    self: egg === 'moon' ? 'わたし' : 'ボク',
+    call: '{neo}',
+    manner: `「${[...wish].slice(0, 30).join('')}」というねがいのとおりの、やさしく読みやすい話し方。語尾の変化は少しだけ。`,
+    catchphrase: 'まかせてね',
+    example: '{neo}、すごいね！',
+  };
+  return { role, personality: 'genki' as BatiPersonality, custom, self: custom.self, call: custom.call, catchphrase: custom.catchphrase, trait, intro: `「${short}」というねがいから生まれた。` };
+}
 
 /** the decision's rules without a model (M-R225's food table, the commonest cases): the demo, the mock and the tests */
 const REGIONAL = new Set<BatiPersonality>(['kansai', 'hakata', 'tohoku', 'okinawa']);
+/** M-R230: a food row's first style → its reading inside the bright group (for the first {bati}) */
+const BRIGHT_OF: Partial<Record<BatiPersonality, BatiPersonality[]>> = {
+  kansai: ['kansai', 'galkansai'],
+  amae: ['amae', 'galfuwa'],
+  genki: ['genki', 'kansai'],
+  gal: ['gal', 'galfuwa', 'galane', 'galcool'],
+  teinei: ['galfuwa', 'amae'],
+  cool: ['galcool'],
+  mellow: ['galfuwa', 'amae'],
+  bushi: ['galane'],
+  butler: ['galane', 'gal'],
+};
 const RULE_PICKS: [RegExp, BatiPersonality[]][] = [
   [/たこ焼|お好み焼|串カツ|551|いか焼|ねぎ焼|だんじり/, ['kansai']],
   [/もつ鍋|明太|とんこつ|ごまさば|水炊き|博多|山笠/, ['hakata']],
@@ -355,11 +513,14 @@ const ROW_WINS = 0.7;
  */
 export function batiPersonaByRules(seed: string, egg: BatiEggKind = 'sun', rand: number = Math.random(), o: BatiDrawOptions = {}) {
   const ex = new Set(o.exclude ?? []);
+  const allowed = (id: BatiPersonality) => !ex.has(id) && (!o.first || (BATI_BRIGHT_IDS as readonly string[]).includes(id));
   const row = RULE_PICKS.find(([re]) => re.test(seed));
-  const fits = (row?.[1] ?? []).filter((id) => !ex.has(id));
-  const regional = !!row && REGIONAL.has(row[1][0]);
+  // the first {bati}: the food's row read inside the bright group (たこ焼き → 関西ギャル / 関西弁, プリン → 甘えんぼ / ゆるふわギャル)
+  const fits = (o.first && row ? (BRIGHT_OF[row[1][0]] ?? row[1]) : (row?.[1] ?? [])).filter(allowed);
+  const regional = !!row && REGIONAL.has(row[1][0]) && fits.length > 0;
+  const galShare = o.first ? BATI_BRIGHT_GAL_SHARE : BATI_GROUP_WEIGHTS.gal;
   let personality: BatiPersonality;
-  if (regional && row[1][0] === 'kansai' && rand < BATI_GROUP_WEIGHTS.gal && !ex.has('galkansai')) personality = 'galkansai';
+  if (regional && row[1][0] === 'kansai' && rand < galShare && allowed('galkansai')) personality = 'galkansai';
   else if (fits.length && (regional || rand < ROW_WINS)) personality = fits[Math.floor(((rand * 13.7) % 1) * fits.length)];
   else personality = drawBatiStyle(regional ? rand : (rand - (row ? ROW_WINS : 0)) / (row ? 1 - ROW_WINS : 1), o);
   const d = BATI_PERSONALITIES[personality];

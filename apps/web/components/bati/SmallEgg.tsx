@@ -54,13 +54,6 @@ export function SmallEgg({
   );
 }
 
-/** how far the egg has grown (0..1) from when it was laid to when it is ready */
-export function eggGrowth(readyAt: string | Date, now = Date.now(), days = 88): number {
-  const ready = new Date(readyAt).getTime();
-  const laid = ready - days * 86_400_000;
-  return Math.min(1, Math.max(0, (now - laid) / (ready - laid)));
-}
-
 /**
  * M-R218: the broken shell glows, its pieces gather like star grains and become a thumb-sized egg on the altar —
  * over the chat, shapes only.

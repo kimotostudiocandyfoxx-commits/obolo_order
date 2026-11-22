@@ -60,8 +60,8 @@ function Chat() {
   useEffect(() => {
     if (!eggReady(me)) return;
     try {
-      if (sessionStorage.getItem('obolo.eggMorning') === me?.batiEgg?.readyAt) return;
-      sessionStorage.setItem('obolo.eggMorning', me?.batiEgg?.readyAt ?? '');
+      if (sessionStorage.getItem('obolo.eggMorning') === String(me?.batiEgg?.nth)) return;
+      sessionStorage.setItem('obolo.eggMorning', String(me?.batiEgg?.nth));
     } catch {
       /* private window: open it anyway */
     }

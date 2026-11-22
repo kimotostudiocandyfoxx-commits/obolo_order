@@ -609,3 +609,34 @@ export const BatiForgetBody = z.object({ memory: z.string().trim().min(1).max(64
 export type BatiForgetBody = z.infer<typeof BatiForgetBody>;
 export const BatiRoleBody = z.object({ role: z.enum(BATI_ROLES), id: z.string().trim().min(1).max(64).optional() });
 export type BatiRoleBody = z.infer<typeof BatiRoleBody>;
+
+/**
+ * M-R230 §9: what the birth's model answers for a wish (the third {bati}, 「ねがいの子」): the role, the nearest of the
+ * seventeen styles or a made one (checked by customStyleProblem), the card's trait and introduction; or `ok: false`
+ * (a lover / sexual role, a real person, another work's character, hurting people) — the first {bati} asks again.
+ */
+export const BatiWishPick = z.union([
+  z.object({ ok: z.literal(false), reason: z.string().max(40).optional() }),
+  z.object({
+    ok: z.literal(true).optional(),
+    role: z.enum(BATI_ROLES),
+    personality: z.enum(BATI_PERSONALITY_IDS).nullable(),
+    custom: z
+      .object({
+        label: z.string().trim().min(1).max(14),
+        self: z.string().trim().min(1).max(6),
+        call: z.string().trim().min(1).max(14),
+        manner: z.string().trim().min(1).max(90),
+        catchphrase: z.string().trim().min(1).max(14),
+        example: z.string().trim().min(1).max(40),
+      })
+      .nullable()
+      .optional(),
+    self: z.string().trim().min(1).max(8).optional(),
+    call: z.string().trim().min(1).max(16).optional(),
+    catchphrase: z.string().trim().min(1).max(24).optional(),
+    trait: z.string().trim().min(1).max(12).optional(),
+    intro: z.string().trim().min(4).max(70),
+  }),
+]);
+export type BatiWishPick = z.infer<typeof BatiWishPick>;

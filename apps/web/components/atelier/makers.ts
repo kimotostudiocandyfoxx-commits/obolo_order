@@ -136,7 +136,7 @@ async function makeTest(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: Work
     }
     case 'video': {
       const words = prev?.kind === 'video' ? `${prev.prompt}。${prompt}` : prompt;
-      return { ...base, prompt: words, title: 'MV（おためし）', text: '映像は、ここ（おためし）では作れないから、絵だけ置いておくね', poster: demoStickerArt(words.slice(0, 60)) };
+      return { ...base, prompt: words, title: 'MV（おためし）', image: demoStickerArt(words.slice(0, 60)), note: 'おためしでは映像は作らず、絵だけを置いています' };
     }
     case 'radio':
       return { ...base, status: 'record', saved: false, title: (prompt || `${ctx.me?.displayName ?? ''}のラジオ`).slice(0, 40) };

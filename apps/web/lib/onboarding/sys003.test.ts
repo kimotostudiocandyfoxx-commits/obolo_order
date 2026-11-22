@@ -15,5 +15,11 @@ describe('SYS-S003 たまごが、育った (M-R224)', () => {
     expect(SYS003.slice(labelIndex(SYS003, 'sys3-egg')).some((s) => s.t === 'fx' && s.fx === 'shell-egg')).toBe(true);
     expect(SYS003.slice(labelIndex(SYS003, 'sys3-last')).some((s) => s.t === 'say' && s.text === '、、、これで、三つ。たまごは、もう、生まれない。')).toBe(true);
     expect(SYS003[SYS003.length - 1].t).toBe('end');
+    // M-R230: the 3rd hatches from a wish and is not asked its role; the 2nd is
+    const greet = SYS003[labelIndex(SYS003, 'sys3-greet') + 1];
+    expect(greet.t === 'batirole' && greet.ask).toBeFalsy();
+    const role = SYS003[labelIndex(SYS003, 'sys3-role') + 1];
+    expect(role.t === 'batirole' && role.ask).toBeTruthy();
+    expect(SYS003.slice(labelIndex(SYS003, 'sys3-wish')).find((s) => s.t === 'newbati')).toMatchObject({ kind: 'wish' });
   });
 });

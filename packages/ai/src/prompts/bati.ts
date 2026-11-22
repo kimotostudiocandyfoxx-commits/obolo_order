@@ -5,7 +5,7 @@
  * This is a provisional "bright, friendly sidekick" persona agreed for the 10/10 demo.
  * Replace this file (and only this file) when the client delivers the final character sheet.
  */
-import { BATI_PERSONALITIES, BATI_SPEECH_RULES, batiDefaultCall, normalizeBatiPersonality, type BatiPersonality, type BuddyPersona } from '@obolo/shared';
+import { BATI_PERSONALITIES, BATI_SPEECH_RULES, batiDefaultCall, normalizeBatiPersonality, type BatiCustomStyle, type BatiPersonality, type BuddyPersona } from '@obolo/shared';
 
 export const DEFAULT_BUDDY_NAME = { ja: 'バティ', en: 'Bati' } as const;
 
@@ -177,6 +177,8 @@ export interface BatiSelfView {
   /** how it calls the user, as a template ({neo} = the user's name), the member's own or the birth's */
   call?: string | null;
   catchphrase?: string | null;
+  /** M-R230: a style made for a wish (the third {bati}) */
+  custom?: BatiCustomStyle | null;
 }
 
 /**
@@ -184,7 +186,8 @@ export interface BatiSelfView {
  * the worry / danger answers too — are said in this manner; the meaning stays). Never changes after birth.
  */
 export function batiPersonaBlock(b: BatiSelfView | undefined, userName: string, locale: 'ja' | 'en'): string {
-  const p = BATI_PERSONALITIES[normalizeBatiPersonality(b?.personality ?? 'genki')];
+  const base = BATI_PERSONALITIES[normalizeBatiPersonality(b?.personality ?? 'genki')];
+  const p = b?.custom ? { ...base, id: base.id, label: b.custom.label, manner: b.custom.manner, example: b.custom.example, self: { sun: b.custom.self, moon: b.custom.self } } : base;
   const self = b?.self || p.self.sun;
   const call = (b?.call || batiDefaultCall(p.id)).replaceAll('{neo}', userName).replaceAll('{name}', userName);
   if (locale === 'en') return `[Way of speaking] ${p.label} (${p.id}). In Japanese replies keep it mild; in English keep its spirit. Call the user "${call}".`;

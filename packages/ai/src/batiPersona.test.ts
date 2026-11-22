@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BATI_PERSONA_SYSTEM, decideBatiPersona, rewriteBatiLines, rewrittenLineOk } from './batiPersona';
+import { BATI_PERSONA_SYSTEM, batiRewriteSystem, decideBatiPersona, rewriteBatiLines, rewrittenLineOk } from './batiPersona';
 import { moderateLookWish } from './moderation';
 import { batiRestylePrompt } from './images';
 import { buildBuddySystemPrompt } from './buddy';
@@ -39,8 +39,10 @@ describe("{bati}'s birth: the personality from the seed (M-R217)", () => {
 
   it('without a model: the rules (a regional food → its dialect)', async () => {
     const mock = { name: 'mock', chat: async () => '' } as LlmProvider;
-    expect((await decideBatiPersona(mock, 'たこ焼き'))?.personality).toBe('kansai');
+    expect(['kansai', 'galkansai']).toContain((await decideBatiPersona(mock, 'たこ焼き'))?.personality);
     expect((await decideBatiPersona(mock, '明太子'))?.personality).toBe('hakata');
+    // the first {bati} (M-R230): the bright group only
+    for (let k = 0; k < 20; k++) expect(['galkansai', 'kansai', 'gal', 'galfuwa', 'galane', 'galcool', 'genki', 'amae']).toContain((await decideBatiPersona(mock, '明太子', 'sun', 'food', { first: true }))?.personality);
   });
 });
 
@@ -154,5 +156,36 @@ describe('M-R229: 「あーし」 never comes from the model', () => {
     expect(BATI_PERSONA_SYSTEM.replace('「あーし」は使わない', '')).not.toContain('あーし');
     const chat = buildBuddySystemPrompt({ buddyName: 'ポン', persona: { cheer: 1, polite: 1, humor: 1 }, memorySummary: null, userDisplayName: 'ネオ', locale: 'ja', bati: { personality: 'gal', self: 'ウチ' } });
     expect(chat.replace('「あーし」は使わない', '')).not.toContain('あーし');
+  });
+});
+
+import { BATI_WISH_SYSTEM, decideBatiWish } from './batiPersona';
+
+describe('M-R230: 「ねがいの子」', () => {
+  const fake = (answer: string) => ({ name: 'fake', chat: async () => answer }) as LlmProvider;
+  it('refused before any call for a lover / a real person / another work; the model may refuse too', async () => {
+    let called = false;
+    const spy = { name: 'fake', chat: async () => ((called = true), '{}') } as LlmProvider;
+    expect(await decideBatiWish(spy, '恋人になってくれる子')).toBeNull();
+    expect(called).toBe(false);
+    expect(await decideBatiWish(fake('{"ok":false,"reason":"harm"}'), 'こわい子')).toBeNull();
+    expect(BATI_WISH_SYSTEM).toContain('恋人や性的な役');
+  });
+  it('the nearest of the seventeen, or a made style that keeps the rules (a broken one: the rules reading)', async () => {
+    const near = await decideBatiWish(fake('{"role":"work","personality":"cool","custom":null,"trait":"きれい好き","intro":"落ち着いた子が、ほしいというねがいから。"}'), '仕事を手伝ってくれる、落ち着いた子');
+    expect(near).toMatchObject({ personality: 'cool', role: 'work', custom: null });
+    const made = await decideBatiWish(
+      fake('{"role":"work","personality":null,"custom":{"label":"英語の先生の子","self":"私","call":"{neo}さん","manner":"やさしい先生のように、ときどき英語をまぜる。","catchphrase":"Good job!","example":"{neo}さん、Good job！"},"trait":"がんばりや","intro":"英語の先生みたいな子、というねがいから。"}'),
+      '英語の先生みたいな子',
+    );
+    expect(made?.custom?.label).toBe('英語の先生の子');
+    expect(made?.role).toBe('work');
+    const broken = await decideBatiWish(
+      fake('{"role":"play","personality":null,"custom":{"label":"赤ちゃんの子","self":"あたち","call":"{neo}","manner":"赤ちゃん言葉で話す","catchphrase":"でちゅ","example":"しゅごいでちゅ"},"intro":"ねがいから生まれた。"}'),
+      'あまえんぼうな子',
+    );
+    expect(broken?.custom?.manner ?? '').not.toContain('赤ちゃん');
+    // a made style is rewritten at birth like a rare one: its own manner in the rewrite prompt
+    expect(batiRewriteSystem(made!)).toContain('英語の先生の子');
   });
 });

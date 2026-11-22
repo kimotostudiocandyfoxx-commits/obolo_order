@@ -14,6 +14,7 @@ import {
   BATI_COMMON_IDS,
   BATI_GAL_IDS,
   BATI_GROUP_WEIGHTS,
+  BATI_BRIGHT_IDS,
   BATI_PERSONALITIES,
   BATI_RARE_IDS,
   BATI_SPEECH_RULES,
@@ -26,6 +27,11 @@ import {
   hasBannedBatiWord,
   isBatiRare,
   type BatiDrawOptions,
+  type BatiCustomStyle,
+  BatiWishPick,
+  batiWishByRules,
+  customStyleProblem,
+  wishRefusal,
   pickBatiTrait,
   type BatiEggKind,
   type BatiPersonality,
@@ -45,6 +51,10 @@ export interface BatiPersona {
   rare: boolean;
   /** the model gave nothing usable: the fixed fallback */
   fallback?: boolean;
+  /** M-R230: a style made for a wish (the third {bati}); `personality` is then only its stand-in for old code */
+  custom?: BatiCustomStyle | null;
+  /** M-R230: the wish's role */
+  role?: 'any' | 'play' | 'work' | 'make';
 }
 
 const table = (ids: readonly BatiPersonality[]) =>
@@ -70,7 +80,7 @@ ${table(BATI_GAL_IDS)}
 【めずらしい話し方（6つ・カードの縁が金色）】
 ${table(BATI_RARE_IDS)}
 
-【出る割合（M-R227）】食べ物の決まりで寄せたうえで、全体として、ギャル系 ${BATI_GROUP_WEIGHTS.gal * 100}％・ほかのよく出る話し方 ${BATI_GROUP_WEIGHTS.common * 100}％・めずらしい話し方 ${BATI_GROUP_WEIGHTS.rare * 100}％ くらいになるように選ぶ。ギャル系が合う食べ物：スイーツ・映える物（タピオカ、クレープ、パフェ）・ジャンク・コンビニの新作 など。関西の食べ物でギャル系になる時は galkansai。
+【出る割合（M-R227・2体目）】食べ物の決まりで寄せたうえで、全体として、ギャル系 ${BATI_GROUP_WEIGHTS.gal * 100}％・ほかのよく出る話し方 ${BATI_GROUP_WEIGHTS.common * 100}％・めずらしい話し方 ${BATI_GROUP_WEIGHTS.rare * 100}％ くらいになるように選ぶ。ギャル系が合う食べ物：スイーツ・映える物（タピオカ、クレープ、パフェ）・ジャンク・コンビニの新作 など。関西の食べ物でギャル系になる時は galkansai。
 
 【カードの「性格」】話し方とは別に、その子の性格を一言で（例：${BATI_TRAITS.slice(0, 6).join('、')}）。会話の話し方には出さない。
 
@@ -122,7 +132,7 @@ function readJson(raw: string): unknown {
   }
 }
 
-const KIND_WORD: Record<BatiSeedKind, string> = { food: '好きな食べ物', sound: '好きな音・曲', word: '大事にしている言葉' };
+const KIND_WORD: Record<BatiSeedKind, string> = { food: '好きな食べ物', sound: '好きな音・曲', word: '大事にしている言葉', wish: 'ほしい相方' };
 
 /**
  * The birth's decision: one call (temperature 1: the same seed may give either of two fitting styles). `null` = an
@@ -133,11 +143,12 @@ export async function decideBatiPersona(llm: LlmProvider, seed: string, egg: Bat
   if (llm.name === 'mock') return batiPersonaByRules(seed, egg, Math.random(), o);
   const others = o.exclude?.length ? `\nこの人のほかの相方の話し方（同じものは選ばない。ギャル系どうしは、ちがう種類ならよい）：${o.exclude.join('、')}` : '';
   const role = o.role === 'work' ? '\nこの子の役目は〔仕事・勉強〕：ギャル系にするなら galane／galcool を多めに（全肯定のまま、要点は短く）。' : '';
+  const first = o.first ? `\nこの子は1体目：明るい組（${BATI_BRIGHT_IDS.join('、')}）の中からだけ選ぶ。ギャル系が約6割。食べ物の決まりは、この中で使う（たこ焼き→galkansai か kansai、プリン→amae か galfuwa）。` : '';
   let raw = '';
   try {
     raw = await llm.chat({
       system: BATI_PERSONA_SYSTEM,
-      history: [{ role: 'user', text: `たまご：${egg === 'moon' ? '月のたまご' : '太陽のたまご'}\n種（${KIND_WORD[kind]}）：${seed}${others}${role}` }],
+      history: [{ role: 'user', text: `たまご：${egg === 'moon' ? '月のたまご' : '太陽のたまご'}\n種（${KIND_WORD[kind]}）：${seed}${others}${role}${first}` }],
       temperature: 1,
       maxOutputTokens: 300,
       json: true,
@@ -156,7 +167,7 @@ export async function decideBatiPersona(llm: LlmProvider, seed: string, egg: Bat
   const intro = hasBannedBatiWord(p.intro) ? `${seed.slice(0, 16)}から生まれた、${trait}。` : p.intro;
   const catchphrase = hasBannedBatiWord(p.catchphrase) ? BATI_PERSONALITIES[p.personality].catchphrase : p.catchphrase;
   // never the same style as one of the member's other {bati} (M-R227): drawn again, the card's words kept
-  if (o.exclude?.includes(p.personality)) {
+  if (o.exclude?.includes(p.personality) || (o.first && !(BATI_BRIGHT_IDS as readonly string[]).includes(p.personality))) {
     const again = drawBatiStyle(Math.random(), o);
     const d = BATI_PERSONALITIES[again];
     return { personality: again, self: d.self[egg], call: batiDefaultCall(again), catchphrase: d.catchphrase, trait, intro, rare: isBatiRare(again) };
@@ -200,7 +211,7 @@ function changedSentences(base: string, line: string, honorific: string): number
 }
 
 export function batiRewriteSystem(p: BatiPersona): string {
-  const d = BATI_PERSONALITIES[p.personality];
+  const d = p.custom ? { label: p.custom.label, manner: p.custom.manner, example: p.custom.example } : BATI_PERSONALITIES[p.personality];
   return `あなたは、物語の台詞の書き直し係。下の台詞は、{bati}（元気な子）の台詞。これを「${d.label}」の話し方に書き直す。大前提：どの子でも、ユーザーがストレスを感じないこと。
 ${BATI_SPEECH_RULES.map((r) => `- ${r}`).join('\n')}
 - ${d.manner} 一人称は {self} と書く（「ボク」の所）。相手の呼び方は「${p.call}」（{neo} などの名前の所）。口ぐせ（${p.catchphrase}）は、ほとんど使わない（全体で2〜3回まで）。
@@ -231,7 +242,7 @@ export async function rewriteBatiLines(llm: LlmProvider, p: BatiPersona, lines: 
     arr = null;
   }
   if (!Array.isArray(arr)) return {};
-  const honorific = BATI_PERSONALITIES[p.personality].honorific;
+  const honorific = p.custom ? (p.custom.call.startsWith('{neo}') ? p.custom.call.slice(5) : '') : BATI_PERSONALITIES[p.personality].honorific;
   const total = lines.reduce((s, l) => s + sentences(l).length, 0);
   let changed = 0;
   const out: Record<string, string> = {};
@@ -244,4 +255,57 @@ export async function rewriteBatiLines(llm: LlmProvider, p: BatiPersona, lines: 
     out[base] = line.trim();
   });
   return out;
+}
+
+/** M-R230 §9: the third {bati}, 「ねがいの子」 — the wish's words decide the role, the style and the mood */
+export const BATI_WISH_SYSTEM = `あなたは、Obolo Order の月の神殿で、3体目の{bati}（ユーザーの相方）を生む係。ユーザーが「どんな相方がほしいか」を言葉で言った。その言葉から、役目・話し方・雰囲気を決める。大前提：ユーザーがストレスを感じないこと。
+
+【話し方の決まり（どの子も守る）】
+${BATI_SPEECH_RULES.map((r) => `- ${r}`).join('\n')}
+
+【話し方の一覧（17）】近いものがあれば、それを使う（personality に id）。
+${table([...BATI_COMMON_IDS, ...BATI_GAL_IDS, ...BATI_RARE_IDS])}
+近いものがなければ、言葉に合わせて新しい話し方を作ってよい（personality は null、custom に書く。上の決まりは必ず守る：読みやすく、毎回疲れるくせはなし、全部ひらがな・全部カタカナ・赤ちゃん言葉はなし）。
+
+【役目】any（なんでも）／play（遊び）／work（仕事・勉強）／make（作ること）のどれか。言葉から決める。
+
+【できないこと】恋人や性的な役、実在の人のまね、ほかの作品のキャラクターのまね、人を傷つける役。その時は {"ok":false,"reason":"<lover|sexual|real_person|other_work|harm>"} だけを返す。
+
+【答え方】JSON だけを返す。
+{"role":"<any|play|work|make>","personality":"<id か null>","custom":<null か {"label":"<〇〇の子、12字まで>","self":"<一人称>","call":"<呼び方。名前は {neo}>","manner":"<話し方の説明、80字まで>","catchphrase":"<口ぐせ>","example":"<「{neo}、すごいね！」をこの話し方で>"}>,"self":"<一人称>","call":"<呼び方>","catchphrase":"<口ぐせ>","trait":"<カードの性格。一言>","intro":"<カードの紹介文。ねがいの言葉から生まれた感じ、40字くらい>"}
+一人称が2つある話し方は、太陽のたまごなら1つ目、月のたまごなら2つ目。`;
+
+/**
+ * The wish → the third {bati} (one call). null = refused (the first {bati} asks again with BATI_WISH_REFUSE). Never
+ * throws: a failed call or a bad answer gives the rules' reading; a made style that breaks the speaking rules is not
+ * used (the rules' reading instead); never a style the member's other {bati} have.
+ */
+export async function decideBatiWish(llm: LlmProvider, wish: string, egg: BatiEggKind = 'sun', o: BatiDrawOptions = {}): Promise<BatiPersona | null> {
+  if (wishRefusal(wish)) return null;
+  const rules = () => {
+    const r = batiWishByRules(wish, egg, o);
+    return r ? ({ ...r, rare: !r.custom && isBatiRare(r.personality) } as BatiPersona) : null;
+  };
+  if (llm.name === 'mock') return rules();
+  let raw = '';
+  try {
+    const others = o.exclude?.length ? `\nこの人のほかの相方の話し方（同じものは選ばない）：${o.exclude.join('、')}` : '';
+    raw = await llm.chat({ system: BATI_WISH_SYSTEM, history: [{ role: 'user', text: `たまご：${egg === 'moon' ? '月のたまご' : '太陽のたまご'}\nほしい相方：${wish}${others}` }], temperature: 0.8, maxOutputTokens: 500, json: true });
+  } catch {
+    return rules();
+  }
+  const parsed = BatiWishPick.safeParse(readJson(raw));
+  if (!parsed.success) return rules();
+  const p = parsed.data;
+  if (!('role' in p)) return null;
+  const trait = p.trait || pickBatiTrait();
+  const intro = hasBannedBatiWord(p.intro) ? `「${[...wish].slice(0, 10).join('')}」というねがいから生まれた。` : p.intro;
+  if (p.personality && !o.exclude?.includes(p.personality)) {
+    const d = BATI_PERSONALITIES[p.personality];
+    const self = p.self && !hasBannedBatiWord(p.self) ? p.self : d.self[egg];
+    return { personality: p.personality, self, call: (p.call ?? batiDefaultCall(p.personality)).replace(/\{name\}|〇〇/g, '{neo}'), catchphrase: p.catchphrase && !hasBannedBatiWord(p.catchphrase) ? p.catchphrase : d.catchphrase, trait, intro, rare: isBatiRare(p.personality), role: p.role, custom: null };
+  }
+  const c = p.custom ? { ...p.custom, call: p.custom.call.replace(/\{name\}|〇〇/g, '{neo}') } : null;
+  if (!c || customStyleProblem(c)) return rules();
+  return { personality: 'genki', self: c.self, call: c.call, catchphrase: c.catchphrase, trait, intro, rare: false, role: p.role, custom: c };
 }

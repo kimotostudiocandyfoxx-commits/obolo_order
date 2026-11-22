@@ -3,7 +3,7 @@
  * rules alone (no model), the card, three at most, swapping, 呼び方 / 一人称, the small egg. `obolo.demo.eggReady` = '1'
  * in localStorage makes the egg ready at once (to try the hatching without waiting 88 days).
  */
-import { BATI_EGG_MS, BATI_MAX, BATI_PERSONALITIES, batiPersonaByRules, batiSeedKind, batiSelf, isBatiRare, type BatiEggKind, type BatiSummary, type Me } from '@obolo/shared';
+import { batiEggState, batiWishByRules, BATI_WISH_REFUSE, BATI_MAX, BATI_PERSONALITIES, batiPersonaByRules, batiSeedKind, batiSelf, isBatiRare, type BatiEggKind, type BatiSummary, type Me } from '@obolo/shared';
 import { ApiError } from './types';
 
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -16,11 +16,18 @@ function eggReadyNow() {
   }
 }
 
-/** the egg's state as Me shows it (ready by time, or by the review switch) */
-export function demoEggView(e: Me['batiEgg']): Me['batiEgg'] {
-  if (!e) return e ?? null;
-  return { readyAt: e.readyAt, ready: e.ready || eggReadyNow() || new Date(e.readyAt).getTime() <= Date.now() };
+/**
+ * the egg's state as Me shows it (M-R231: the 2nd on the app's day 9, the 3rd on day 16). Day 9 opens a day after day 8
+ * (the review's day jumps count too); the review switch makes it ready at once.
+ */
+export function demoEggOf(u: Me, born = (u.batis ?? []).length): Me['batiEgg'] {
+  const at = Date.parse(u.story?.['eggs.day9'] ?? '');
+  const day9At = Number.isFinite(at) ? at : u.journeyDay >= 9 ? Date.parse(u.createdAt) : null;
+  const e = batiEggState({ born, journeyDay: u.journeyDay, day9At });
+  return e && eggReadyNow() ? { ...e, ready: true, growth: 1 } : e;
 }
+/** kept for the old callers: the state again */
+export const demoEggView = (_e: Me['batiEgg'], u?: Me): Me['batiEgg'] => (u ? demoEggOf(u) : _e ?? null);
 
 /** the active {bati} written back into the list */
 function synced(u: Me): BatiSummary[] {
@@ -31,14 +38,31 @@ function synced(u: Me): BatiSummary[] {
 }
 
 function born(seed: string, egg: BatiEggKind, nth: number, exclude: BatiSummary['personality'][] = []): { summary: BatiSummary; view: NonNullable<Me['bati']> } {
-  // M-R227: never the same style as the member's other {bati}
-  const p = batiPersonaByRules(seed, egg, Math.random(), { exclude });
+  // M-R227: never the same style as the member's other {bati}; M-R230: the first from the bright group, the third from a wish
+  const wish = batiSeedKind(nth) === 'wish';
+  const w = wish ? batiWishByRules(seed, egg, { exclude }) : null;
+  if (wish && !w) throw new ApiError(422, 'WISH_REFUSED', BATI_WISH_REFUSE);
+  const p = w ?? { ...batiPersonaByRules(seed, egg, Math.random(), { exclude, first: nth === 0 }), role: undefined, custom: null };
   const id = uid();
   const createdAt = new Date().toISOString();
-  const card = { name: null, bornAt: createdAt, egg, seed, personality: p.personality, label: BATI_PERSONALITIES[p.personality].label, catchphrase: p.catchphrase, trait: p.trait, intro: p.intro, rare: isBatiRare(p.personality), imageUrl: null };
-  const summary: BatiSummary = { id, name: null, egg, personality: p.personality, imageUrl: null, active: true, self: p.self, call: p.call, selfCustom: null, callCustom: null, card, createdAt };
-  void nth;
-  return { summary, view: { food: seed, name: null, imageUrl: null, id, egg, personality: p.personality, self: p.self, call: p.call, selfCustom: null, callCustom: null, card } };
+  const custom = p.custom ?? undefined;
+  const card = {
+    name: null,
+    bornAt: createdAt,
+    egg,
+    seed,
+    personality: p.personality,
+    label: custom?.label ?? BATI_PERSONALITIES[p.personality].label,
+    catchphrase: p.catchphrase,
+    trait: p.trait,
+    intro: p.intro,
+    rare: !custom && isBatiRare(p.personality),
+    ...(wish ? { wish: true } : {}),
+    imageUrl: null,
+  };
+  const role = (p.role ?? undefined) as BatiRole | undefined;
+  const summary: BatiSummary = { id, name: null, egg, personality: p.personality, imageUrl: null, active: true, self: p.self, call: p.call, selfCustom: null, callCustom: null, card, createdAt, ...(role ? { role } : {}) };
+  return { summary, view: { food: seed, name: null, imageUrl: null, id, egg, personality: p.personality, self: p.self, call: p.call, selfCustom: null, callCustom: null, card, ...(role ? { role } : {}), ...(custom ? { custom } : {}) } };
 }
 
 /** day 2: the first {bati} (again) */
@@ -47,7 +71,7 @@ export function demoBatiEgg(u: Me, food: string, egg: BatiEggKind): Partial<Me> 
   const list = synced(u);
   const keep = list.length > 1 ? list.filter((r) => r.id !== u.bati?.id).map((r) => ({ ...r, active: false })) : [];
   const { summary, view } = born(food, egg, 0, keep.map((r) => r.personality));
-  return { bati: view, batis: [...keep, summary], batiEgg: keep.length + 1 < BATI_MAX ? { readyAt: new Date(Date.now() + BATI_EGG_MS).toISOString(), ready: false } : null };
+  return { bati: view, batis: [...keep, summary], batiEgg: demoEggOf(u, keep.length + 1) };
 }
 
 /** the picture / the name landed on the active one: the list and the card follow */
@@ -61,13 +85,12 @@ export function demoBatiNew(u: Me, egg: BatiEggKind, seed: string): Partial<Me> 
   const list = synced(u);
   if (!list.length) throw new ApiError(409, 'NO_BATI', 'Not hatched yet');
   if (list.length >= BATI_MAX) throw new ApiError(409, 'BATI_FULL', '相方は、3体まで');
-  if (!demoEggView(u.batiEgg)?.ready) throw new ApiError(409, 'EGG_NOT_READY', 'たまごは、まだ育っている');
-  void batiSeedKind(list.length);
+  if (!demoEggOf(u, list.length)?.ready) throw new ApiError(409, 'EGG_NOT_READY', 'たまごは、まだ育っている');
   const { summary, view } = born(seed, egg, list.length, list.map((r) => r.personality));
   return {
     bati: view,
     batis: [...list.map((r) => ({ ...r, active: false })), summary],
-    batiEgg: list.length + 1 < BATI_MAX ? { readyAt: new Date(Date.now() + BATI_EGG_MS).toISOString(), ready: false } : null,
+    batiEgg: demoEggOf(u, list.length + 1),
   };
 }
 

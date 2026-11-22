@@ -1461,6 +1461,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           </div>
         </div>
       )}
+      {/* D04-S005c: the first voice message, in the inviter's dachi thread (M-R212) */}
+      {started && step?.t === 'dachivoice' && (
+        <DachiVoiceStep
+          key={i}
+          test={atelierTest}
+          fallback={{ name: speakerName(step.fallback.who, v), text: fill(step.fallback.text, v) }}
+          onDone={(answer) => {
+            remember('f_d04_voice_reply', answer);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
       {/* the day's fly-or-keep choice, on today's cards: a card's 〔星へ飛ばす〕 flies it and takes the first way, 〔今は飛ばさない〕
           the second (the labels after it set the flag). Nothing made here today (a resumed day): the plain choice */}
       {started && step?.t === 'choice' && FLY_CHOICES.has(step.key) && flyable.length > 0 && (
@@ -1512,6 +1524,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           key={i}
           kind={step.kind}
           egg={eggOf(stateRef.current.answers)}
+          firstName={v.bati || 'バティ'}
+          firstSays={(t) => sayText('バティ', t, v)}
           onBorn={(url) => {
             if (url) remember('batiImage', url);
             run(iRef.current + 1);
@@ -1525,7 +1539,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           ask={step.ask}
           vars={v}
           onDone={(role) => {
-            remember('f_bati_role', role);
+            if (role) remember('f_bati_role', role);
             run(iRef.current + 1);
           }}
         />

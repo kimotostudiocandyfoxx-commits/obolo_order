@@ -24,7 +24,11 @@ export function BatiCardView({ card, egg, eggGrowth, onExport }: { card: BatiCar
         }`}
       >
         {card.rare && <span className="pointer-events-none absolute inset-0 animate-pulse rounded-2xl ring-2 ring-amber-200/60" />}
-        <p className="text-[10px] tracking-[0.3em] text-amber-200/80">バティのカード{card.rare ? '　✦ めずらしい' : ''}</p>
+        <p className="text-[10px] tracking-[0.3em] text-amber-200/80">
+          バティのカード{card.rare ? '　✦ めずらしい' : ''}
+          {/* M-R230: the third, born from a wish */}
+          {card.wish ? '　☾ ねがいの子' : ''}
+        </p>
         <div className="mt-2 flex items-center gap-3">
           {card.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -123,7 +127,7 @@ export async function cardPng(card: BatiCard): Promise<Blob | null> {
   ctx.fillStyle = '#fbe9c0';
   ctx.textAlign = 'center';
   ctx.font = `36px ${font}`;
-  ctx.fillText(card.rare ? 'バティのカード ✦ めずらしい' : 'バティのカード', W / 2, 160);
+  ctx.fillText(`バティのカード${card.rare ? ' ✦ めずらしい' : ''}${card.wish ? ' ☾ ねがいの子' : ''}`, W / 2, 160);
   ctx.font = `bold 88px ${font}`;
   ctx.fillText(card.name ?? '……', W / 2, 1100);
   ctx.font = `40px ${font}`;

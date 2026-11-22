@@ -16,6 +16,7 @@ import {
   type Me,
   type UpdateProfileBody,
   isChild,
+  batiEggState,
 } from '@obolo/shared';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -31,6 +32,17 @@ function batiFaces(j: Record<string, string> | null): Partial<Record<string, str
   } catch {
     return undefined;
   }
+}
+
+/**
+ * When the app's day 9 opens (M-R231): kept in users.bati_egg_at when the first journey's last day is finished (+ the
+ * day's wait); before that, day 8 finished → its wait; an account past the journey from before → it began long ago.
+ */
+export function day9At(u: typeof users.$inferSelect): number | null {
+  if (u.batiEggAt) return u.batiEggAt.getTime();
+  if (u.journeyDay === JOURNEY_PAYMENT && u.journeyCompletedAt) return u.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS;
+  if (u.journeyDay >= JOURNEY_DONE) return (u.orderedAt ?? u.journeyCompletedAt ?? u.createdAt).getTime();
+  return null;
 }
 
 export function toMe(u: typeof users.$inferSelect): Me {
@@ -74,7 +86,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
         }
       : null,
     batis: batiSummaries(u),
-    batiEgg: u.batiEggAt ? { readyAt: u.batiEggAt.toISOString(), ready: u.batiEggAt.getTime() <= Date.now() } : null,
+    // M-R231: the 2nd hatches on the app's day 9, the 3rd on day 16 (members and residents alike)
+    batiEgg: batiEggState({ born: batiSummaries(u).length, journeyDay: u.journeyDay, day9At: day9At(u) }),
     orderedAt: u.orderedAt?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId },
     look: u.lookJson ?? null,
@@ -171,6 +184,8 @@ export class UsersService {
       .update(users)
       .set({
         journeyCompletedAt: new Date(),
+        // M-R231: the first journey's last day done — day 9 (the 2nd egg's morning) opens after the day's wait
+        ...(body.day === JOURNEY_PAYMENT && !cur.batiEggAt ? { batiEggAt: new Date(Date.now() + JOURNEY_WAIT_MS) } : {}),
         onboardingJson: { ...cur.onboardingJson, ...Object.fromEntries(Object.entries(body.answers ?? {}).map(([k, v]) => [`d${body.day}.${k}`, v])) },
         updatedAt: new Date(),
       })

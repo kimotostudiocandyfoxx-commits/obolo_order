@@ -3,6 +3,7 @@
 import type { DachiThreadView } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { DachiThread } from '@/components/dachi/DachiThread';
+import { HoldMic } from '@/components/dachi/HoldMic';
 import { getApi } from '@/lib/api';
 
 /**
@@ -10,9 +11,10 @@ import { getApi } from '@/lib/api';
  * 「{inviter}がダチになった」 is just before), then their thread opens full screen — the first one that is not KIMORIN⭐︎'s:
  * {inviter}'s, or MIKIE⭐︎DRILL's when there is no inviter. While there is no thread (or it cannot be read) `fallback`
  * (MIKIE⭐︎DRILL 「ようこそ。……」) is shown instead. Sending a voice message → 'reply'; 〔あとで〕 → 'later'.
- * Works in the demo too (lib/api/demo.ts keeps the threads in this browser).
+ * Works in the demo too (lib/api/demo.ts keeps the threads in this browser). `test` (the review page with no account):
+ * no thread can be read, so the fallback gets the mic and the take is sent nowhere.
  */
-export function DachiVoiceStep({ fallback, onDone }: { fallback: { name: string; text: string }; onDone: (answer: 'reply' | 'later') => void }) {
+export function DachiVoiceStep({ fallback, onDone, test = false }: { fallback: { name: string; text: string }; onDone: (answer: 'reply' | 'later') => void; test?: boolean }) {
   const [thread, setThread] = useState<DachiThreadView | null | undefined>(undefined);
 
   useEffect(() => {
@@ -44,6 +46,11 @@ export function DachiVoiceStep({ fallback, onDone }: { fallback: { name: string;
         <div className="px-4 pt-2">
           <p className="text-[11px] text-amber-100/70">{fallback.name}</p>
           <p className="mt-1 inline-block rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2 text-[15px] text-amber-50">{fallback.text}</p>
+        </div>
+      )}
+      {thread === null && test && (
+        <div className="mt-auto">
+          <HoldMic onSend={async () => onDone('reply')} />
         </div>
       )}
       {thread && <DachiThread id={thread.id} thread={thread} onSent={() => onDone('reply')} />}

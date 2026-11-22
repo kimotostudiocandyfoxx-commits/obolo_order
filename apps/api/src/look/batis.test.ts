@@ -54,15 +54,17 @@ describe("the first {bati}: the personality from the favourite food (M-R217)", (
     expect(me.bati?.card).toMatchObject({ seed: 'たこ焼き', rare: false });
     expect(me.bati?.card?.trait).toBeTruthy();
     expect(me.batis).toHaveLength(1);
-    expect(me.batiEgg?.ready).toBe(false);
-    expect((user.batiEggAt as Date).getTime() - Date.now()).toBeGreaterThan(87 * 86_400_000);
+    // M-R231: the small egg hatches on the app's day 9 (not yet: the first journey is on day 3)
+    expect(me.batiEgg).toMatchObject({ nth: 2, ready: false });
+    void user;
   });
 
-  it('a rare one gets its story lines rewritten once (a job); an unfit seed is asked again', async () => {
+  it('the first is never rare (the bright group, M-R230); an unfit seed is asked again', async () => {
     const { s, jobs } = make({}, '{"personality":"butler","self":"私","call":"{neo}さま","catchphrase":"〜でございます","trait":"きれい好き","intro":"空気から生まれた、きれい好き。"}');
     const me = await s.egg('u', { food: '空気', egg: 'sun' });
-    expect(me.bati?.card?.rare).toBe(true);
-    expect(jobs).toContain('bati.lines');
+    expect(me.bati?.card?.rare).toBe(false);
+    expect(['gal', 'galfuwa', 'galane', 'galcool', 'galkansai', 'genki', 'amae', 'kansai']).toContain(me.bati?.personality);
+    expect(jobs).not.toContain('bati.lines');
     const unfit = make({}, '{"ok":false}');
     await expect(unfit.s.egg('u', { food: 'なにか', egg: 'sun' })).rejects.toMatchObject({ response: { error: { code: 'SEED_REASK' } } });
   });
@@ -94,15 +96,16 @@ describe('the grown egg and the three (M-R215 / M-R218)', () => {
     expect(me.bati?.personality).not.toBe('genki');
     expect(me.bati?.card?.seed).toBe('雨の音');
     expect(me.batis?.find((b) => b.id === 'b1')).toMatchObject({ name: 'ポン', imageUrl: 'https://x/b1.png', active: false });
-    // the third egg comes 88 days later
-    expect((user.batiEggAt as Date).getTime()).toBeGreaterThan(Date.now());
+    // the third egg comes on day 16 (a week after day 9)
+    expect(me.batiEgg).toMatchObject({ nth: 3, ready: false });
+    void user;
   });
 
   it(`never more than ${BATI_MAX}: once three are born, no new egg`, async () => {
-    const three = { ...one, batisJson: [born('b1', 'ポン'), born('b2', 'ピン'), born('b3', 'パン')], batiEggAt: new Date(Date.now() - 1000) };
+    const three = { ...one, batisJson: [born('b1', 'ポン'), born('b2', 'ピン'), born('b3', 'パン')], batiEggAt: new Date(Date.now() - 8 * 86_400_000) };
     const { s } = make(three);
     await expect(s.hatchNew('u', { egg: 'sun', seed: 'ありがとう' })).rejects.toMatchObject({ response: { error: { code: 'BATI_FULL' } } });
-    const two = make({ ...one, batisJson: [born('b1', 'ポン'), born('b2', 'ピン')], batiEggAt: new Date(Date.now() - 1000) });
+    const two = make({ ...one, batisJson: [born('b1', 'ポン'), born('b2', 'ピン')], batiEggAt: new Date(Date.now() - 8 * 86_400_000) });
     const me = await two.s.hatchNew('u', { egg: 'sun', seed: 'ありがとう' });
     expect(me.batis).toHaveLength(3);
     expect(me.batiEgg).toBeNull();
@@ -187,5 +190,40 @@ describe("what {bati} remembers (M-R222): only on the member's 「覚えとい�
     const u = await s.callAs('u', 'ネオっち');
     expect(u && toMe(u).bati?.callCustom).toBe('ネオっち');
     expect((await s.role('u', { role: 'work' })).bati?.role).toBe('work');
+  });
+});
+
+describe('「ねがいの子」 (M-R230) and the days the eggs hatch (M-R231)', () => {
+  const two = { batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/b1.png', batiId: 'b1', batisJson: [born('b1', 'ポン'), { ...born('b2', 'ピン'), personality: 'cool' }] };
+  it('the third hatches from a wish on day 16: its role from the words, no repeat of the others; a made style is rewritten at birth', async () => {
+    const early = make({ ...two, batiEggAt: new Date(Date.now() - 3 * 86_400_000) });
+    await expect(early.s.hatchNew('u', { egg: 'moon', seed: '英語の先生みたいな子' })).rejects.toMatchObject({ response: { error: { code: 'EGG_NOT_READY' } } });
+    const { s, jobs } = make({ ...two, batiEggAt: new Date(Date.now() - 7 * 86_400_000 - 1000) });
+    const me = await s.hatchNew('u', { egg: 'moon', seed: '英語の先生みたいな子' });
+    expect(me.bati?.role).toBe('work');
+    expect(me.bati?.card?.wish).toBe(true);
+    expect(me.bati?.custom).toBeTruthy();
+    expect(jobs).toContain('bati.lines');
+    expect(me.batiEgg).toBeNull();
+    const calm = make({ ...two, batiEggAt: new Date(Date.now() - 8 * 86_400_000) });
+    const c = await calm.s.hatchNew('u', { egg: 'sun', seed: '仕事を手伝ってくれる、落ち着いた子' });
+    // クール is the second's already: never twice
+    expect(c.bati?.personality).not.toBe('cool');
+    expect(c.bati?.role).toBe('work');
+  });
+  it('a wish for a lover, a real person or another work is refused (the first {bati} asks again)', async () => {
+    const { s } = make({ ...two, batiEggAt: new Date(Date.now() - 8 * 86_400_000) });
+    for (const w of ['恋人になってくれる子', '有名な俳優にそっくりな子', 'ドラえもんみたいな子'])
+      await expect(s.hatchNew('u', { egg: 'sun', seed: w })).rejects.toMatchObject({ response: { error: { code: 'WISH_REFUSED', message: 'それは、ちょっとむずかしいかも！　ほかの言い方で、教えて！' } } });
+  });
+  it('day 9 opens a day after the first journey ends; the egg grows every day before it', () => {
+    const { user } = make({ batiFood: 'カレー', batiName: 'ポン', batiImageUrl: 'https://x/b1.png', batiId: 'b1', batisJson: [born('b1', 'ポン')], journeyDay: 5 });
+    const a = toMe(user as never).batiEgg!;
+    expect(a).toMatchObject({ nth: 2, ready: false, readyAt: null });
+    expect(a.growth).toBeCloseTo(3 / 7);
+    Object.assign(user, { journeyDay: 8, journeyCompletedAt: new Date(Date.now() - 25 * 3_600_000) });
+    expect(toMe(user as never).batiEgg?.ready).toBe(true);
+    Object.assign(user, { journeyCompletedAt: new Date(Date.now() - 3_600_000) });
+    expect(toMe(user as never).batiEgg?.ready).toBe(false);
   });
 });

@@ -16,9 +16,10 @@ import { demoBati } from '@/lib/look';
 import { DEFAULT_SKIP_LABEL, PREVIEW_ONLY, STORIES } from '@/lib/onboarding/stories';
 import { TomorrowScreen } from '@/components/onboarding/TomorrowScreen';
 import { ReviewBar } from '@/components/review/ReviewBar';
-import { SYS002 } from '@/lib/onboarding/sys002';
+import { SYS002_ALONE } from '@/lib/onboarding/sys002';
 import { joinFlags } from '@/lib/onboarding/joinFlags';
 import { AFTER_DAYS } from '@/lib/onboarding/after';
+import { SYS003 } from '@/lib/onboarding/sys003';
 
 /**
  * /kakunin-5798f28713/play?day=N[&at=<step type>][&timeup=1][&gate=1: the seal E-0 every time] — plays one day's story from the start (or from its first
@@ -45,7 +46,9 @@ function PreviewPlay() {
   const sys = q.get('day') === 'sys002';
   // day=m1|m2|m3: after joining (played with day 8's names, Bati and works)
   const afterN = Number(/^m([1-3])$/.exec(q.get('day') ?? '')?.[1] ?? 0);
-  const day = sys ? 4 : afterN ? 8 : Number(q.get('day'));
+  // day=9egg | 16egg (M-R231): the morning of the app's day 9 / 16 — SYS-S003, the 2nd / the 3rd {bati} (played with day 8's names)
+  const eggN = q.get('day') === '9egg' ? 2 : q.get('day') === '16egg' ? 3 : 0;
+  const day = sys ? 4 : afterN || eggN ? 8 : Number(q.get('day'));
   const at = q.get('at');
   const [ended, setEnded] = useState(false);
   const [neo, setNeo] = useState<string | undefined>(undefined);
@@ -133,7 +136,7 @@ function PreviewPlay() {
     );
   }
 
-  const story = sys ? { steps: SYS002, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : afterN ? { steps: AFTER_DAYS[afterN - 1], skipLabel: DEFAULT_SKIP_LABEL, auth: false } : (STORIES[day] ?? PREVIEW_ONLY[day]);
+  const story = sys ? { steps: SYS002_ALONE, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : eggN ? { steps: SYS003, skipLabel: DEFAULT_SKIP_LABEL, auth: false } : afterN ? { steps: AFTER_DAYS[afterN - 1], skipLabel: DEFAULT_SKIP_LABEL, auth: false } : (STORIES[day] ?? PREVIEW_ONLY[day]);
   if (!story) return <Ended text="その日のストーリーはまだありません" />;
   // thru=N: played straight through, each day handing over to the next up to day N (the client's check from the start to Saturn)
   const thru = Number(q.get('thru') ?? 0);
@@ -162,6 +165,7 @@ function PreviewPlay() {
         next={afterN < 3 ? { href: `/kakunin-5798f28713/play?day=m${afterN + 1}`, label: `会員${afterN + 1}日目へ（24時間を飛ばす）` } : undefined}
       />
     );
+  if (ended && eggN) return <Ended text={`${eggN === 2 ? 9 : 16}日目の朝 おわり`} again={`/kakunin-5798f28713/play?day=${q.get('day')}`} />;
   if (ended) return <Ended text={`${day}日目 おわり`} again={`/kakunin-5798f28713/play?day=${day}${at ? `&at=${at}` : ''}${thru ? `&thru=${thru}` : ''}${q.get('gate') === '1' ? '&gate=1' : ''}`} />;
 
   // at=<step type> (its first step) or i=<step index>
@@ -208,7 +212,7 @@ function PreviewPlay() {
           kimorinStar: day >= 3,
           made: previewMade(day),
           story: (() => {
-            const st = { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる', ...reviewStory };
+            const st = { 'd1.choice1': '行きたい', 'd1.f_d01_talk': '話を聞いてみる', ...reviewStory, ...(eggN ? { 'sys3.nth': String(eggN) } : {}) };
             return { ...st, ...joinFlags(st) };
           })(),
         }}

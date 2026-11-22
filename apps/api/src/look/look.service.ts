@@ -1,11 +1,11 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { decideBatiPersona, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
-import { ageBand, BATI_EGG_MS, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
+import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -16,7 +16,7 @@ import type { JobQueue } from '../infra/queue';
 import { BUDDY_LLM, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
-import { toMe } from '../users/users.service';
+import { day9At, toMe } from '../users/users.service';
 
 /**
  * Generations per OBOLO NEO. The story (2026-10-14) lets the visitor redraw "何度でも", so the screen
@@ -33,6 +33,8 @@ const CANDIDATES = 4;
 /** {bati}'s look (M-R223, D03-S008): four cards per round — four touches without a wish, four takes on a wish */
 const RESTYLE_CANDIDATES = 4;
 const TRY_TTL = 60 * 60 * 24 * 60;
+/** the painting's seed kind: a wish (M-R230, the third) is painted like a word */
+const paintKind = (k: BatiRecord['seedKind'] | undefined) => (k === 'wish' ? 'word' : (k ?? 'food'));
 /** M-R215: why a dress-up wish is refused, in {bati}'s room's words */
 const LOOK_REFUSALS: Record<string, string> = {
   real_person: '本当にいる人に、そっくりには、できないんだ',
@@ -281,7 +283,7 @@ export class LookService {
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // M-R223: the seed it was born from (food / sound / word) stays somewhere small in every look
     const r0 = activeBati(u);
-    const seed = { seed: r0?.seed || u.batiFood || '', kind: r0?.seedKind ?? 'food' };
+    const seed = { seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) };
     const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(wish, i, !!born, seed), i, refs));
     const candidates = [];
     for (const r of made) {
@@ -566,7 +568,8 @@ export class LookService {
     const list = batiList(cur);
     const keep = list.length > 1 ? list.filter((r) => r.id !== cur.batiId) : [];
     // M-R227: never the same style as the member's other {bati}
-    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.food, egg, 'food', { exclude: keep.map((r) => r.personality) });
+    // M-R230: a first {bati} (none other yet) comes from the bright group only
+    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.food, egg, 'food', { exclude: keep.map((r) => r.personality), first: keep.length === 0 });
     if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', '、、、食べられるものを、言ってみろ。');
     const rec = this.record(body.food, 'food', egg, persona);
     const [u] = await this.db.write
@@ -577,8 +580,8 @@ export class LookService {
         batiFood: body.food,
         batiImageUrl: null,
         batiName: null,
-        // M-R218: the broken shell becomes a small egg; it hatches 88 days later (none once three are born)
-        batiEggAt: keep.length + 1 < BATI_MAX ? new Date(Date.now() + BATI_EGG_MS) : null,
+        // M-R218: the broken shell becomes a small egg; M-R231: it hatches on the app's day 9 (users.bati_egg_at keeps when
+        // day 9 opens; set when the first journey ends)
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
@@ -610,6 +613,9 @@ export class LookService {
       imageUrl: null,
       bornImageUrl: null,
       createdAt: new Date().toISOString(),
+      // M-R230: 「ねがいの子」 — its role from the wish (no role question), a made style when none of the seventeen fitted
+      ...(seedKind === 'wish' ? { wish: true, role: p.role ?? 'any' } : {}),
+      ...(p.custom ? { custom: p.custom } : {}),
     };
   }
 
@@ -618,7 +624,7 @@ export class LookService {
     const u = await this.user(userId);
     const r = batiList(u).find((x) => x.id === batiId);
     if (!r || r.lines) return;
-    const lines = await rewriteBatiLines(this.buddyLlm ?? this.llm, { ...r, trait: r.trait ?? '', rare: true }, BATI_SCRIPT_LINES);
+    const lines = await rewriteBatiLines(this.buddyLlm ?? this.llm, { ...r, trait: r.trait ?? '', rare: true, custom: r.custom ?? null }, BATI_SCRIPT_LINES);
     await this.saveRecord(userId, batiId, { lines });
   }
 
@@ -650,12 +656,23 @@ export class LookService {
     const list = batiList(u);
     if (!list.length) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     if (list.length >= BATI_MAX) throw apiError(HttpStatus.CONFLICT, 'BATI_FULL', '相方は、3体まで');
-    if (!u.batiEggAt || u.batiEggAt.getTime() > Date.now())
+    // M-R231: the 2nd on the app's day 9, the 3rd on day 16
+    if (!batiEggState({ born: list.length, journeyDay: u.journeyDay, day9At: day9At(u) })?.ready)
       throw apiError(HttpStatus.CONFLICT, 'EGG_NOT_READY', 'たまごは、まだ育っている');
-    await this.clean(body.seed);
     const kind = batiSeedKind(list.length);
-    const persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.seed, body.egg, kind, { exclude: list.map((r) => r.personality), role: body.role ?? null });
-    if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', kind === 'sound' ? '、、、好きな音は、何だ？' : '、、、大事にしている言葉を、一つ、言ってみろ。');
+    const exclude = list.map((r) => r.personality);
+    let persona: Awaited<ReturnType<typeof decideBatiPersona>>;
+    if (kind === 'wish') {
+      // M-R230 §9: 「ねがいの子」 — a lover / sexual role, a real person, another work's character or a role that hurts
+      // people is refused (the server's screen, the moderation, then the model's judgement): the first {bati} asks again
+      const flagged = (await moderateText(body.seed, this.llm)).flagged;
+      persona = flagged ? null : await decideBatiWish(this.buddyLlm ?? this.llm, body.seed, body.egg, { exclude });
+      if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'WISH_REFUSED', BATI_WISH_REFUSE);
+    } else {
+      await this.clean(body.seed);
+      persona = await decideBatiPersona(this.buddyLlm ?? this.llm, body.seed, body.egg, kind, { exclude, role: body.role ?? null });
+      if (!persona) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'SEED_REASK', BATI_SEED_QUESTION[kind]);
+    }
     const rec = this.record(body.seed, kind, body.egg, persona);
     const j = { ...((u.onboardingJson ?? {}) as Record<string, string>) };
     delete j['bati.faces'];
@@ -669,13 +686,13 @@ export class LookService {
         batiImageUrl: null,
         batiName: null,
         onboardingJson: j,
-        batiEggAt: list.length + 1 < BATI_MAX ? new Date(Date.now() + BATI_EGG_MS) : null,
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))
       .returning();
     await this.kv.set(`bati:egg:${userId}`, body.egg, TRY_TTL);
-    if (persona.rare) await this.queue.enqueue('bati.lines', { userId, batiId: rec.id }, { dedupeKey: `bati-lines-${rec.id}` }).catch(() => undefined);
+    // a rare or a made style: its story lines rewritten once at birth
+    if (persona.rare || persona.custom) await this.queue.enqueue('bati.lines', { userId, batiId: rec.id }, { dedupeKey: `bati-lines-${rec.id}` }).catch(() => undefined);
     if (origin) {
       await this.kv.set(`bati:painting:${userId}`, String(Date.now()), 600);
       await this.queue.enqueue('bati.paint', { userId, origin }, { dedupeKey: `bati-paint-${userId}-${Date.now()}` }).catch(() => undefined);
@@ -752,7 +769,7 @@ export class LookService {
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, activeBati(u)?.seedKind ?? 'food'), k, body ? [body] : []);
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind)), k, body ? [body] : []);
         // painted on the body's flat grey: cut out, so the Bati stands on the stage like the others
         const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
         url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
@@ -790,7 +807,7 @@ export class LookService {
       if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
       const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, activeBati(u)?.seedKind ?? 'food'), 7 + k, body ? [body] : []);
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind)), 7 + k, body ? [body] : []);
         const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
         const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
         const cur = await this.user(userId);
@@ -837,7 +854,7 @@ export class LookService {
     const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
     // M-R223: the seed's small mark (food / sound / word) stays on every face too
     const r0 = activeBati(u);
-    const keep = batiSeedRule({ seed: r0?.seed || u.batiFood || '', kind: r0?.seedKind ?? 'food' });
+    const keep = batiSeedRule({ seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) });
     const made = await settleWithRetry(todo.length, (i) => this.looks.generate(`${BATI_FACE_PROMPT(todo[i])} Keep the small mark of what it was born from exactly where it is. ${keep}`, i, [ref]));
     const faces = { ...have };
     for (const [i, r] of made.entries()) {

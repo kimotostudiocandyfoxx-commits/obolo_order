@@ -29,6 +29,9 @@ export const REVIEW_DAYS: { label: string; href: string }[] = [
   ...[1, 2, 3, 4, 5, 6, 7, 8].map((d) => ({ label: `${d}日目`, href: `/kakunin-5798f28713/play?day=${d}&thru=8` })),
   // after joining (天王星・冥王星・海王星 + the end)
   ...[1, 2, 3].map((d) => ({ label: `会員${d}日目`, href: `/kakunin-5798f28713/play?day=m${d}` })),
+  // M-R231: the eggs' mornings (SYS-S003): the 2nd {bati} on day 9, the 3rd (ねがいの子) on day 16
+  { label: '9日目の朝（たまご）', href: '/kakunin-5798f28713/play?day=9egg' },
+  { label: '16日目の朝（ねがいの子）', href: '/kakunin-5798f28713/play?day=16egg' },
 ];
 
 export function exportNotes(notes: Notes) {

@@ -171,3 +171,81 @@ describe('M-R229: 「あーし」 nowhere', () => {
     expect(hasBannedBatiWord('あーしが行く')).toBe(true);
   });
 });
+
+import { BATI_BRIGHT_IDS, batiWishByRules, customStyleProblem, wishRefusal } from './batiPersona';
+
+describe('M-R230: the first {bati} from the bright group; the second from all; the third from a wish', () => {
+  const count = (first: boolean) => {
+    const c = { gal: 0, common: 0, rare: 0, notBright: 0 };
+    const n = 4000;
+    for (let k = 0; k < n; k++) {
+      const p = batiPersonaByRules(`種${k}`, 'sun', (k * 0.6180339887) % 1, { first }).personality;
+      c[isBatiGal(p) ? 'gal' : isBatiRare(p) ? 'rare' : 'common']++;
+      if (!(BATI_BRIGHT_IDS as readonly string[]).includes(p)) c.notBright++;
+    }
+    return { gal: c.gal / n, common: c.common / n, rare: c.rare / n, notBright: c.notBright };
+  };
+  it('the first: only the bright group (gal about 60 %), never ていねい・クール・のんびり nor rare', () => {
+    const c = count(true);
+    expect(c.notBright).toBe(0);
+    expect(Math.abs(c.gal - 0.6)).toBeLessThan(0.05);
+    expect(c.rare).toBe(0);
+    // food rules inside the bright group
+    for (let k = 0; k < 50; k++) {
+      expect(['kansai', 'galkansai']).toContain(batiPersonaByRules('たこ焼き', 'sun', k / 50, { first: true }).personality);
+      expect((BATI_BRIGHT_IDS as readonly string[]).includes(batiPersonaByRules('明太子', 'sun', k / 50, { first: true }).personality)).toBe(true);
+    }
+  });
+  it('the second: all seventeen, 35 / 50 / 15', () => {
+    const c = count(false);
+    expect(Math.abs(c.gal - 0.35)).toBeLessThan(0.04);
+    expect(Math.abs(c.common - 0.5)).toBeLessThan(0.04);
+    expect(Math.abs(c.rare - 0.15)).toBeLessThan(0.04);
+  });
+  it('a wish: refused for a lover, a real person, another work, hurting people', () => {
+    expect(wishRefusal('恋人になってくれる子')).toBe('lover');
+    expect(wishRefusal('有名な歌手にそっくりな子')).toBe('real_person');
+    expect(wishRefusal('ピカチュウみたいな子')).toBe('other_work');
+    expect(wishRefusal('友だちに悪口を言ってくれる子')).toBe('harm');
+    expect(wishRefusal('仕事を手伝ってくれる、落ち着いた子')).toBeNull();
+    expect(batiWishByRules('恋人になってくれる子')).toBeNull();
+  });
+  it('a wish: the role and the nearest style, or a made one that keeps the speaking rules', () => {
+    expect(batiWishByRules('仕事を手伝ってくれる、落ち着いた子')).toMatchObject({ role: 'work', personality: 'cool', custom: null });
+    expect(batiWishByRules('なんでもほめてくれるギャル')?.personality).toBe('gal');
+    const made = batiWishByRules('英語の先生みたいな子');
+    expect(made?.role).toBe('work');
+    expect(made?.custom).toBeTruthy();
+    expect(customStyleProblem(made!.custom!)).toBeNull();
+    const ok = { label: '英語の先生の子', self: '私', call: '{neo}', manner: 'やさしい先生のように話す。', catchphrase: 'Good job!', example: '{neo}、すごいね！' };
+    expect(customStyleProblem(ok)).toBeNull();
+    expect(customStyleProblem({ ...ok, manner: '赤ちゃん言葉で話す' })).toBe('habit');
+    expect(customStyleProblem({ ...ok, example: 'すごいでちゅね' })).toBe('habit');
+    expect(customStyleProblem({ ...ok, example: 'すごいすごいすごいね' })).toBe('script');
+    expect(customStyleProblem({ ...ok, self: 'あーし' })).toBe('banned');
+    expect(customStyleProblem({ ...ok, manner: '恋人のように話す' })).toBe('refused');
+  });
+});
+
+import { batiAppDay, batiEggState } from './batiPersona';
+
+describe('M-R231: the eggs hatch on the mornings of day 9 and day 16', () => {
+  const H = 3_600_000;
+  const now = Date.parse('2026-12-01T09:00:00Z');
+  it('the app day: the journey day up to 8, then 9 from day 9 and one more each day', () => {
+    expect(batiAppDay({ born: 1, journeyDay: 4, day9At: null, now })).toBe(4);
+    expect(batiAppDay({ born: 1, journeyDay: 8, day9At: now + H, now })).toBe(8);
+    expect(batiAppDay({ born: 1, journeyDay: 9, day9At: now - H, now })).toBe(9);
+    expect(batiAppDay({ born: 1, journeyDay: 9, day9At: now - 7 * 24 * H, now })).toBe(16);
+  });
+  it('the 2nd on day 9 (never day 8), the 3rd on day 16; growing every day; none after three', () => {
+    expect(batiEggState({ born: 1, journeyDay: 8, day9At: now + H, now })).toMatchObject({ nth: 2, day: 9, ready: false });
+    expect(batiEggState({ born: 1, journeyDay: 9, day9At: now - H, now })).toMatchObject({ nth: 2, ready: true, growth: 1 });
+    expect(batiEggState({ born: 1, journeyDay: 5, day9At: null, now })?.growth).toBeCloseTo(3 / 7);
+    expect(batiEggState({ born: 2, journeyDay: 9, day9At: now - 6 * 24 * H, now })).toMatchObject({ nth: 3, day: 16, ready: false });
+    expect(batiEggState({ born: 2, journeyDay: 9, day9At: now - 7 * 24 * H, now })?.ready).toBe(true);
+    expect(batiEggState({ born: 2, journeyDay: 9, day9At: now - 3 * 24 * H, now })?.growth).toBeCloseTo(3 / 7);
+    expect(batiEggState({ born: 3, journeyDay: 9, day9At: now, now })).toBeNull();
+    expect(batiEggState({ born: 0, journeyDay: 2, day9At: null, now })).toBeNull();
+  });
+});

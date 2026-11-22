@@ -1,7 +1,7 @@
 import type { BuddyPersona, Locale } from './index';
 import type { SongEditCommand } from './schemas';
 import type { PuniLook } from './puni';
-import type { BatiEggKind, BatiPersonality } from './batiPersona';
+import type { BatiCustomStyle, BatiEggKind, BatiPersonality } from './batiPersona';
 import type { BatiMemory, BatiRole } from './batiMemory';
 
 /** API response shapes. Kept framework-free so web, api and future native shells share them. */
@@ -30,8 +30,11 @@ export interface Me {
   bati: BatiView | null;
   /** every {bati} of the member (M-R215: up to BATI_MAX_AWAKE awake; the rest sleep on the Moon), the active one included */
   batis?: BatiSummary[];
-  /** the small glowing egg from the first shell (M-R215): hatches in the Moon temple from `readyAt` (88 days) */
-  batiEgg?: { readyAt: string; ready: boolean } | null;
+  /**
+   * the small glowing egg (M-R218 / M-R231): the 2nd hatches on the app's day 9, the 3rd on day 16; `growth` 0..1 (size
+   * and light, never a number); `readyAt` once day 9's time is known
+   */
+  batiEgg?: { nth?: 2 | 3; readyAt: string | null; ready: boolean; growth?: number } | null;
   /** Day 7: when the Eclipse was paid for (null = not yet). */
   orderedAt: string | null;
   /** Registered voices (Fish Audio): own voice (Saturn, songs) and Bati's voice.
@@ -103,12 +106,14 @@ export interface BatiView {
   lines?: Record<string, string>;
   /** M-R222: 「覚えてること」 — what the member asked it to remember (five at most); the only memory the chat is given */
   memories?: BatiMemory[];
+  /** M-R230: a style made for a wish (none of the seventeen fitted); its story lines are in `lines` */
+  custom?: BatiCustomStyle;
   /** its role (the 1st: なんでも, changeable) */
   role?: BatiRole;
   /** M-R223: the looks decided so far, oldest first (the one worn now and the birth's included) */
   looks?: string[];
   /** M-R223: the seed and what it was (food / sound / word): it stays somewhere small in every look */
-  seedKind?: 'food' | 'sound' | 'word';
+  seedKind?: 'food' | 'sound' | 'word' | 'wish';
 }
 
 /** バティのカード (M-R217): shown in the chat at birth, kept on Bluena's first shelf, exported as a picture */
@@ -129,6 +134,8 @@ export interface BatiCard {
   intro: string;
   /** a rare personality: the card's edge glows gold */
   rare: boolean;
+  /** M-R230: the third {bati}, born from a wish — the card shows 「ねがいの子」 */
+  wish?: boolean;
   imageUrl: string | null;
 }
 

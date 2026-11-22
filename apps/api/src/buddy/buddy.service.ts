@@ -247,7 +247,7 @@ export class BuddyService implements OnModuleInit {
             const b = activeBati(me);
             if (!b) return {};
             return {
-              bati: { personality: b.personality, self: b.selfCustom || b.self, call: b.callCustom || b.call, catchphrase: b.catchphrase },
+              bati: { personality: b.personality, self: b.selfCustom || b.self, call: b.callCustom || b.call, catchphrase: b.catchphrase, custom: b.custom ?? null },
               memorySummary: null,
               memories: (b.memories ?? []).map((p) => p.text),
               role: b.role ?? 'any',

@@ -83,7 +83,7 @@ import {
   MEMORY_LINES,
   rememberRequest,
 } from '@obolo/shared';
-import { demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
+import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
 import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
@@ -332,7 +332,9 @@ export class DemoApi implements Api {
   }
 
   async me() {
-    return this.s.users[this.uid()];
+    const u = this.s.users[this.uid()];
+    // M-R231: the egg's day is worked out each time (it grows every day)
+    return u?.bati ? { ...u, batiEgg: demoEggOf(u) } : u;
   }
 
   async updateMe(body: Parameters<Api['updateMe']>[0]) {
@@ -829,6 +831,8 @@ export class DemoApi implements Api {
       if (u.journeyDay !== day || u.journeyCompletedAt) return {};
       // what was made today, for the next days' stories (like the server's onboardingJson)
       const story = { ...(u.story ?? {}), ...Object.fromEntries(Object.entries(answers ?? {}).map(([k, v]) => [`d${day}.${k}`, v])) };
+      // M-R231: the first journey's last day done — the app's day 9 (the 2nd egg's morning) opens after the day's wait
+      if (day === 8 && !story['eggs.day9']) story['eggs.day9'] = new Date(Date.now() + 24 * 3_600_000).toISOString();
       return { journeyCompletedAt: now(), story };
     });
   }

@@ -1,22 +1,40 @@
 'use client';
 
 import { useState } from 'react';
-import { BATI_ROLE_LABELS, BATI_ROLES, type BatiEggKind, type BatiRole } from '@obolo/shared';
+import { BATI_ROLE_LABELS, BATI_ROLES, BATI_SEED_QUESTION, BATI_WISH_REFUSE, wishRefusal, type BatiEggKind, type BatiRole } from '@obolo/shared';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine } from '@/lib/onboarding/batiLine';
 import { fill, type StoryVars } from '@/lib/onboarding/script';
 import { SmallEgg } from './SmallEgg';
 
-/** the 'newbati' step: the seed said as written (a sound / a word), then the new {bati} hatched from the chosen egg */
-export function NewBatiStep({ kind, egg, onBorn }: { kind: 'sound' | 'word'; /** chosen on the altar just before (SYS-S003, f_egg) */ egg: BatiEggKind; onBorn: (imageUrl: string) => void }) {
+/**
+ * the 'newbati' step: the seed said as written (a sound / a word / a wish), then the new {bati} hatched from the chosen
+ * egg. A wish that can not be (M-R230) is answered by the first {bati} (`firstSays`: its line in its own manner).
+ */
+export function NewBatiStep({
+  kind,
+  egg,
+  onBorn,
+  firstSays = (t) => t,
+  firstName = 'バティ',
+}: {
+  kind: 'sound' | 'word' | 'wish';
+  /** chosen on the altar just before (SYS-S003, f_egg) */
+  egg: BatiEggKind;
+  onBorn: (imageUrl: string) => void;
+  firstSays?: (line: string) => string;
+  firstName?: string;
+}) {
   const { setMe } = useAuth();
   const [seed, setSeed] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const go = async () => {
-    setBusy(true);
     setErr(null);
+    // M-R230: a wish that can not be — the same first screen as the server's
+    if (kind === 'wish' && wishRefusal(seed)) return setErr(`${firstName}「${firstSays(BATI_WISH_REFUSE)}」`);
+    setBusy(true);
     try {
       setMe(await getApi().batiNew(egg, seed.trim()));
       const born = await getApi().batiHatch().catch(() => null);
@@ -24,7 +42,17 @@ export function NewBatiStep({ kind, egg, onBorn }: { kind: 'sound' | 'word'; /**
       onBorn(born?.bati?.imageUrl ?? '');
     } catch (e) {
       const code = e instanceof ApiError ? e.code : '';
-      setErr(code === 'SEED_REASK' || code === 'MODERATION' ? (kind === 'sound' ? 'OBOLON「、、、好きな音は、何だ？」' : 'OBOLON「、、、大事にしている言葉を、一つ、言ってみろ。」') : code === 'EGG_NOT_READY' ? 'たまごは、まだ育っている' : 'うまく受け取れなかった……もう一度');
+      // the review mode without a {bati} of its own: the scene goes on
+      if (getApi().mode === 'demo' && ['NO_BATI', 'EGG_NOT_READY', 'BATI_FULL'].includes(code)) return onBorn('');
+      setErr(
+        code === 'WISH_REFUSED' || (kind === 'wish' && code === 'MODERATION')
+          ? `${firstName}「${firstSays(BATI_WISH_REFUSE)}」`
+          : code === 'SEED_REASK' || code === 'MODERATION'
+            ? `OBOLON「${BATI_SEED_QUESTION[kind]}」`
+            : code === 'EGG_NOT_READY'
+              ? 'たまごは、まだ育っている'
+              : 'うまく受け取れなかった……もう一度',
+      );
       setBusy(false);
     }
   };
@@ -37,7 +65,7 @@ export function NewBatiStep({ kind, egg, onBorn }: { kind: 'sound' | 'word'; /**
           </div>
         ) : (
           <>
-            <input className="input" maxLength={30} value={seed} placeholder={kind === 'sound' ? '例：雨の音／ピアノ／お祭りの太鼓' : '例：ありがとう／なんとかなる'} onChange={(e) => setSeed(e.target.value)} />
+            <input className="input" maxLength={kind === 'wish' ? 40 : 30} value={seed} placeholder={kind === 'sound' ? '例：雨の音／ピアノ／お祭りの太鼓' : kind === 'wish' ? '例：仕事を手伝ってくれる、落ち着いた子' : '例：ありがとう／なんとかなる'} onChange={(e) => setSeed(e.target.value)} />
             <button onClick={() => void go()} disabled={!seed.trim()} className="rounded-full border border-amber-200/80 bg-gradient-to-b from-amber-200/25 to-amber-500/10 py-3.5 text-lg tracking-widest text-amber-50 disabled:opacity-40">
               これにする
             </button>
@@ -50,7 +78,7 @@ export function NewBatiStep({ kind, egg, onBorn }: { kind: 'sound' | 'word'; /**
 }
 
 /** the 'batirole' step: the new {bati}'s greeting and question in its own manner, the four roles */
-export function BatiRoleStep({ greet, ask, vars, onDone }: { greet: string; ask: string; vars: StoryVars; onDone: (role: BatiRole) => void }) {
+export function BatiRoleStep({ greet, ask, vars, onDone }: { greet: string; /** none = the 3rd: only the greeting, its role came from the wish */ ask?: string; vars: StoryVars; onDone: (role: BatiRole | null) => void }) {
   const { setMe } = useAuth();
   const [busy, setBusy] = useState(false);
   const say = (t: string) => fill(batiLine(t, vars.batiSpeech), vars);
@@ -60,10 +88,17 @@ export function BatiRoleStep({ greet, ask, vars, onDone }: { greet: string; ask:
         <p className="text-center">
           {vars.bati ?? 'バティ'}「{say(greet)}」
         </p>
-        <p className="text-center">
-          {vars.bati ?? 'バティ'}「{say(ask)}」
-        </p>
-        <div className="grid grid-cols-2 gap-2">
+        {!ask && (
+          <button className="mx-auto rounded-full border border-amber-200/80 px-10 py-2.5 tracking-widest" onClick={() => onDone(null)}>
+            次へ
+          </button>
+        )}
+        {ask && (
+          <p className="text-center">
+            {vars.bati ?? 'バティ'}「{say(ask)}」
+          </p>
+        )}
+        {ask && <div className="grid grid-cols-2 gap-2">
           {BATI_ROLES.map((r) => (
             <button
               key={r}
@@ -79,7 +114,7 @@ export function BatiRoleStep({ greet, ask, vars, onDone }: { greet: string; ask:
               {BATI_ROLE_LABELS[r]}
             </button>
           ))}
-        </div>
+        </div>}
       </div>
     </div>
   );

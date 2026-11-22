@@ -10,6 +10,8 @@ import { useAuth } from '@/lib/auth';
 import { lap2Steps } from '@/lib/onboarding/lap2';
 import { realLessonApi } from '@/lib/onboarding/lessonApi';
 import { madeFrom } from '@/lib/onboarding/made';
+import { EggMorning } from '@/components/bati/EggMorning';
+import { eggReady } from '@/components/bati/BatiSheet';
 
 const key = (uid: string, chapter: number) => `obolo.after.${uid}.${chapter}`;
 function load(k: string): StoryProgress | null {
@@ -46,10 +48,13 @@ export function Lap2Story({ onLeave }: { onLeave: () => void }) {
   const steps = useMemo(() => lap2Steps(chapter), [chapter]);
   const initial = useMemo<StoryProgress>(() => (k ? load(k) : null) ?? { i: 0, name: me?.displayName ?? '', answers: {} }, [k, me?.displayName]);
   const onProgress = useCallback((p: StoryProgress) => k && save(k, p), [k]);
+  // M-R231: on the morning an egg is ready (the app's day 9 / 16), its scene (SYS-S003) plays first, then the day's story
+  const [eggFirst, setEggFirst] = useState(() => eggReady(me));
   useEffect(() => {
-    if (waiting) onLeave();
-  }, [waiting, onLeave]);
+    if (waiting && !eggFirst) onLeave();
+  }, [waiting, eggFirst, onLeave]);
 
+  if (eggFirst && me) return <EggMorning onClose={() => setEggFirst(false)} />;
   if (!me || !me.orderedAt || chapter >= LAP2_DONE || waiting) return null;
   return (
     <StoryPlayer
