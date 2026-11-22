@@ -5,6 +5,49 @@
  "always": "",
  "items": [
   {
+   "id": "kimorin-i",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: standing relaxed and upright facing the viewer, arms down at his sides. Calm expression, mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
    "id": "kimorin-i-talk",
    "w": 1536,
    "h": 2048,
@@ -31,7 +74,7 @@
    "refs": [
     "design/kimorin/kimorin-i-talk.jpg"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text."
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
   },
   {
    "id": "kimorin-i-talk-notail",
@@ -44,6 +87,135 @@
    "always": false,
    "refs": [
     "design/kimorin/kimorin-i-talk.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-lecture",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: facing the viewer, one paw raised with the index finger pointing straight up like a teacher, the other paw open at his side. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-lecture-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-lecture.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-lecture-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-lecture.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-joy",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: both arms spread wide open, delighted and happy, body bouncing. A wide closed-mouth smile. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-joy-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-joy.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-joy-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-joy.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-point",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: facing the viewer, pointing one paw straight at the viewer, confident, the other paw on his hip. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-point-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-point.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-point-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-point.jpg"
    ],
    "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
   },
@@ -74,7 +246,7 @@
    "refs": [
     "design/kimorin/kimorin-i-shock.jpg"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text."
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
   },
   {
    "id": "kimorin-i-shock-notail",
@@ -87,6 +259,221 @@
    "always": false,
    "refs": [
     "design/kimorin/kimorin-i-shock.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-smug",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: one paw under his chin, the other paw on his hip, chin raised proudly, smug and pleased with himself. Mouth closed in a smug little smile. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-smug-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-smug.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-smug-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-smug.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-tears",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: both paws clasped together in front of his chest, deeply moved, small drops of glowing blue light falling like tears from under his goggles. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-tears-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-tears.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-tears-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-tears.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-think",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: one paw at his chin, head tilted slightly, thinking hard. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-think-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-think.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-think-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-think.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-i-blush",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his brass goggles sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: shy and flustered, shoulders raised, both paws held together in front of his chest, fidgeting. His face is blushing: soft pink-red blush across both cheeks, two small embarrassed sweat drops beside his head, tiny wobbly closed mouth. (Only the blush is new; the face design stays the same.) Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-i-blush-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-blush.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-i-blush-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-i-blush.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: standing relaxed and upright facing the viewer, arms down at his sides. Calm expression, mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu.jpg"
    ],
    "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
   },
@@ -117,7 +504,7 @@
    "refs": [
     "design/kimorin/kimorin-iu-talk.jpg"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text."
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
   },
   {
    "id": "kimorin-iu-talk-notail",
@@ -132,6 +519,393 @@
     "design/kimorin/kimorin-iu-talk.jpg"
    ],
    "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-lecture",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: facing the viewer, one paw raised with the index finger pointing straight up like a teacher, the other paw open at his side. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-lecture-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-lecture.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-lecture-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-lecture.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-joy",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: both arms spread wide open, delighted and happy, body bouncing. A wide closed-mouth smile. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-joy-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-joy.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-joy-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-joy.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-point",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: facing the viewer, pointing one paw straight at the viewer, confident, the other paw on his hip. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-point-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-point.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-point-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-point.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-shock",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: startled, leaning back a little, both paws raised up beside his head, tiny round surprised mouth. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-shock-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-shock.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-shock-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-shock.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-smug",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: one paw under his chin, the other paw on his hip, chin raised proudly, smug and pleased with himself. Mouth closed in a smug little smile. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-smug-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-smug.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-smug-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-smug.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-tears",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: both paws clasped together in front of his chest, deeply moved, small drops of glowing blue light falling like tears from his eyes. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-tears-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-tears.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-tears-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-tears.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-think",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: one paw at his chin, head tilted slightly, thinking hard. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-think-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-think.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-think-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-think.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-iu-blush",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), and a small silver box-shaped device on top of his head between the ears with a thin coiled cable. Pose: shy and flustered, shoulders raised, both paws held together in front of his chest, fidgeting. His face is blushing: soft pink-red blush across both cheeks, two small embarrassed sweat drops beside his head, tiny wobbly closed mouth. (Only the blush is new; the face design stays the same.) Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-iu-blush-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-blush.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-iu-blush-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-iu-blush.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-sun",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: standing relaxed and upright facing the viewer, arms down at his sides. Calm expression, mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-sun-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-sun.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-sun-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-sun.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
   },
   {
    "id": "kimorin-xs-talk",
@@ -160,7 +934,7 @@
    "refs": [
     "design/kimorin/kimorin-xs-talk.jpg"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text."
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
   },
   {
    "id": "kimorin-xs-talk-notail",
@@ -173,6 +947,92 @@
    "always": false,
    "refs": [
     "design/kimorin/kimorin-xs-talk.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-xs-lecture",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: facing the viewer, one paw raised with the index finger pointing straight up like a teacher, the other paw open at his side. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-xs-lecture-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-lecture.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-xs-lecture-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-lecture.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-xs-joy",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: both arms spread wide open, delighted and happy, body bouncing. A wide closed-mouth smile. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-xs-joy-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-joy.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-xs-joy-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-joy.jpg"
    ],
    "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
   },
@@ -203,7 +1063,7 @@
    "refs": [
     "design/kimorin/kimorin-xs-point.jpg"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text."
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
   },
   {
    "id": "kimorin-xs-point-notail",
@@ -216,6 +1076,178 @@
    "always": false,
    "refs": [
     "design/kimorin/kimorin-xs-point.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-xs-shock",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: startled, leaning back a little, both paws raised up beside his head, tiny round surprised mouth. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-xs-shock-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-shock.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-xs-shock-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-shock.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-xs-smug",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: one paw under his chin, the other paw on his hip, chin raised proudly, smug and pleased with himself. Mouth closed in a smug little smile. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-xs-smug-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-smug.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-xs-smug-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-smug.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-xs-tears",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: both paws clasped together in front of his chest, deeply moved, small drops of glowing blue light falling like tears from under his sunglasses. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-xs-tears-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-tears.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-xs-tears-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-tears.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
+  },
+  {
+   "id": "kimorin-xs-think",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+    "design/story/refs/cast/kimorin-face-ref.png"
+   ],
+   "prompt": "Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; on the forehead a small blue three-petal leaf mark; his eyes are hidden: the two dark round lenses of his round black sunglasses sit directly ON his face over the eyes and cover them completely, no eye slits visible (in picture 2 the eyes show and the glasses are pushed up — NOT here: here the lenses are worn down over the eyes, nothing is pushed up onto his head); a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. White paw hands with blue paw pads, white feet with blue paw pads. He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes (the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side. Pose: one paw at his chin, head tilted slightly, thinking hard. Mouth closed. Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. Highly detailed painterly anime render, soft studio light from the front. No text, no letters."
+  },
+  {
+   "id": "kimorin-xs-think-o",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-think.jpg"
+   ],
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
+  },
+  {
+   "id": "kimorin-xs-think-notail",
+   "w": 1536,
+   "h": 2048,
+   "size": [
+    960,
+    1280
+   ],
+   "always": false,
+   "refs": [
+    "design/kimorin/kimorin-xs-think.jpg"
    ],
    "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — but remove the whole fan of tail feathers and the small dragon wing behind him, so the flat pure green background shows where they were. Everything else stays exactly as it is. No text."
   },
@@ -246,7 +1278,7 @@
    "refs": [
     "design/kimorin/kimorin-xs-blush.jpg"
    ],
-   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text."
+   "prompt": "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text."
   },
   {
    "id": "kimorin-xs-blush-notail",
