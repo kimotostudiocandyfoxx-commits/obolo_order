@@ -67,7 +67,7 @@ BG = ("Background: a completely flat, solid, pure chroma-key green (#00FF00) eve
       "Highly detailed painterly anime render, soft studio light from the front. No text, no letters.")
 KEEP = "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — "
 OPEN = KEEP + ("and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, "
-               "in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text.")
+               "in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text.")
 NOTAIL = KEEP + ("but remove the whole fan of tail feathers{wing} behind him, so the flat pure green background shows where they were. "
                  "Everything else stays exactly as it is. No text.")
 
