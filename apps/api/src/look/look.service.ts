@@ -16,7 +16,7 @@ import type { JobQueue } from '../infra/queue';
 import { BUDDY_LLM, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
-import { findPart, storedTalk, TALK_BLINK_PROMPT, TALK_KORORIN_PROMPT, TALK_MOUTH_PROMPT, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
+import { findPart, storedTalk, TALK_BLINK_PROMPT, TALK_MOUTH_PROMPT, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
 import { day9At, toMe } from '../users/users.service';
 
 /**
@@ -889,8 +889,7 @@ export class LookService {
   /**
    * 隣に並ぶトーク (M-R234/M-R235): for the look decided now — your own (its standee) or {bati}'s — the expressions (the
    * decided look is the reference, so the face does not drift; your own: only the gentle four; {bati}: its drawn faces
-   * are reused), an eyes-closed and an open-mouth edit of TALK_PART_FACES cut down to patches by differencing, and the
-   * コロリン mini (M-R233). Kept in onboardingJson `talk.<who>`; dropped if the look changed meanwhile. No mana (part of
+   * are reused), an eyes-closed and an open-mouth edit of TALK_PART_FACES cut down to patches by differencing, Kept in onboardingJson `talk.<who>`; dropped if the look changed meanwhile. No mana (part of
    * the look); what fails is left out (the client bobs instead of flapping, the look cut round stands in for the mini).
    */
   async talkLook(userId: string, who: TalkWho, origin: string): Promise<void> {
@@ -953,13 +952,7 @@ export class LookService {
       }),
     );
     parts.forEach((r, i) => r.status === 'rejected' && this.log.warn(`talk parts ${partFaces[i]} failed: ${String(r.reason)}`));
-    // M-R233: the コロリン mini
-    const mini = await this.looks
-      .generate(TALK_KORORIN_PROMPT, 51, [ref])
-      .then(store)
-      .then((m) => m.url)
-      .catch((e: unknown) => (this.log.warn(`talk kororin failed: ${String(e)}`), null));
-    const look: TalkLook = { of, stand, faces, kororin: mini };
+    const look: TalkLook = { of, stand, faces };
     const cur = await this.user(userId);
     if ((who === 'me' ? cur.avatarUrl : cur.batiImageUrl) !== of) return;
     await this.db.write

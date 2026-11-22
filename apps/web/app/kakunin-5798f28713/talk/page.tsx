@@ -1,23 +1,38 @@
 'use client';
 
-import type { TalkFace, TalkMotion } from '@obolo/shared';
+import type { TalkFace, TalkIn, TalkMotion, TalkShape } from '@obolo/shared';
 import Link from 'next/link';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
-import { BATI_COLOR, characterLook, colorOf, PLACE_BG, SELF_COLOR } from '@/lib/talk/looks';
-import { DEMO_GROUP_SEEDS, demoBatiTalkLook, demoNeoTalkLook } from '@/lib/talk/demoLooks';
+import { BATI_COLOR, colorOf, DACHI_COLOR, PLACE_BG, SELF_COLOR } from '@/lib/talk/looks';
+import { castLook, DEMO_GROUP_SEEDS } from '@/lib/talk/demoLooks';
 
 /**
  * /kakunin-5798f28713/talk — 隣に並ぶトーク (M-R232〜M-R235) alive, with stand-in looks (no generation): the client
  * judges the motion here — breathing, sway, blink, lip flap, idle, listening, thinking, reactions — and the layouts
- * (1, 2, 3+, 9+ messages, a long reply, a card, the keyboard, the コロリン switch, a ダチ voice message, groups of 3 and 7).
+ * (1, 2, 3+, 9+ messages, a long reply, a card, the keyboard, a ダチ voice message, groups of 3 and 7).
  * ?s=<scene> opens one; ?bare=1 hides the panel (screenshots).
  */
-const SCENES = ['live', '1', '2', '3', '9', 'long', 'card', 'kb', 'kororin', 'switch', 'dachi', 'g3', 'g7'] as const;
+const SCENES = ['live', '1', '2', '3', '9', 'past', 'long', 'card', 'kb', 'dachi', 'g3', 'g7'] as const;
 type Scene = (typeof SCENES)[number];
-const LABEL: Record<Scene, string> = { live: '話してみる', '1': '1つ', '2': '2つ', '3': '3つ', '9': '9つ以上', long: '長い返事', card: 'カード', kb: 'キーボード', kororin: 'コロリンの輪', switch: 'コロリンに変わる', dachi: 'ダチの声', g3: '3人', g7: '7人' };
+const LABEL: Record<Scene, string> = { live: '話してみる', '1': '1つ', '2': '2つ', '3': '3つ', '9': '9つ以上', long: '長い返事', card: 'カード', kb: 'キーボード', past: '過去に戻る', dachi: 'ダチの声', g3: '3人', g7: '7人' };
+
+/** the prototype's talk (design/talk/proto.html): what was said before (on the ring), then the lines played in a row */
+type Said = [string, [string, TalkFace, TalkMotion | '', { in?: TalkIn; shape?: TalkShape }?][]];
+const HISTORY: [string, string][] = [['bati', 'おはよ、ネオ！　よく眠れた？'], ['me', 'おはよう。ちょっと寝坊した'], ['bati', '今日も月は静かだね〜'], ['me', 'さっきのコロリン、作ったよ'], ['bati', 'いい声だった！　ほんとに！']];
+const SCRIPT: Said[] = [
+  ['me', [['ねえウニュ、明日の土星ってどんなとこ？', 'normal', '']]],
+  ['bati', [['土星はね、コロリンたちが**レコードの上でサイファー**してる星だよ！', 'smile', 'hop'], ['ネオのつぶやきも、きっと回ってるはず！', 'smile', '']]],
+  ['me', [['え、[[赤:マジで！？]]　見てみたい！', 'surprised', 'hop', { in: 'slam', shape: 'burst' }]]],
+  ['bati', [['^^でしょでしょ！^^', 'smile', 'hop', { in: 'shake' }], ['……でも、ボク、ちょっと緊張するかも？', 'thinking', 'tilt', { in: 'slow', shape: 'cloud' }]]],
+  ['me', [['ウニュも緊張するんだ笑', 'smile', '']]],
+  ['bati', [['[[かわいい:えへへ]]……バレた？', 'shy', '', { in: 'slow', shape: 'whisper' }]]],
+  ['me', [['明日、一緒に行こうな。', 'smile', '']]],
+  ['bati', [['うん！　[[金:約束]]だよ、ネオ！', 'smile', 'hop', { in: 'shake' }]]],
+];
+const said = ([who, parts]: Said, k: number): TalkItem => ({ id: `s${k}`, who, text: parts.map((p) => p[0]).join(''), faces: parts.map(([, face, motion, st]) => ({ face, ...(motion ? { motion } : {}), ...(st ?? {}) })) });
 
 const LINES: [string, string, TalkFace?, TalkMotion?][] = [
   ['bati', 'おはよう！ 今日はなにする？', 'smile', 'hop'],
@@ -64,28 +79,31 @@ function Review() {
           ))}
         </div>
       )}
-      <Play key={scene} scene={scene} />
+      <Play key={scene} scene={scene} bare={bare} />
     </main>
   );
 }
 
-function Play({ scene }: { scene: Scene }) {
-  const me: TalkPerson = useMemo(() => ({ id: 'me', name: 'ネオ', look: demoNeoTalkLook('きつね'), color: SELF_COLOR, self: true }), []);
-  const bati: TalkPerson = useMemo(() => ({ id: 'bati', name: 'たこまる', look: demoBatiTalkLook('たこ焼き'), color: BATI_COLOR }), []);
-  const kimorin: TalkPerson = useMemo(() => ({ id: 'kimorin', name: 'KIMORIN⭐︎', look: characterLook('kimorin'), color: '#ff8fb3' }), []);
+function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
+  // the client's talk cast (public/talk, from design/talk): ネオ, ウニュ the {bati}, アポロ the dachi
+  const me: TalkPerson = useMemo(() => ({ id: 'me', name: 'ネオ', look: castLook('user'), color: SELF_COLOR, self: true }), []);
+  const bati: TalkPerson = useMemo(() => ({ id: 'bati', name: 'ウニュ', look: castLook('bati'), color: BATI_COLOR }), []);
+  const kimorin: TalkPerson = useMemo(() => ({ id: 'kimorin', name: 'アポロ', look: castLook('friend'), color: DACHI_COLOR }), []);
   const group = scene === 'g3' || scene === 'g7';
   const people: TalkPerson[] = group
-    ? [...DEMO_GROUP_SEEDS.slice(0, scene === 'g3' ? 2 : 6).map((s, k) => ({ id: `p${k}`, name: `ダチ${k + 1}`, look: k % 2 ? demoBatiTalkLook(s, undefined, ['🍙', '🍓', '🌽', '🍮', '🍜', '🍩'][k]) : demoNeoTalkLook(s), color: colorOf(s, k) })), me]
+    ? [...DEMO_GROUP_SEEDS.slice(0, scene === 'g3' ? 2 : 6).map((s, k) => ({ id: `p${k}`, name: ['アポロ', 'ウニュ', 'ミナ', 'ポコ', 'ソラ', 'テト'][k], look: castLook((['friend', 'bati', 'user'] as const)[k % 3], `g${k}`), color: colorOf(s, k) })), me]
     : scene === 'dachi'
       ? [kimorin, me]
       : [bati, me];
 
   const initial = (): TalkItem[] => {
     const pick = (n: number) => LINES.slice(0, n).map(([who, text, face, motion], k) => ({ id: `l${k}`, who, text, face, motion }));
+    // the prototype's talk: the ring holds what was said before, the script plays in a row (taps go on)
+    if (scene === 'live') return [...HISTORY.map(([who, text], k) => ({ id: `h${k}`, who, text })), ...SCRIPT.map(said)];
     if (scene === '1') return pick(1);
     if (scene === '2') return pick(2);
     if (scene === '3') return pick(3);
-    if (scene === '9' || scene === 'kororin' || scene === 'switch' || scene === 'kb') return pick(11);
+    if (scene === '9' || scene === 'past' || scene === 'kb') return pick(11);
     if (scene === 'long') return [...pick(5), { id: 'long', who: 'bati', text: LONG_TEXT, face: 'smile' }];
     if (scene === 'card')
       return [
@@ -117,9 +135,10 @@ function Play({ scene }: { scene: Scene }) {
       ];
     if (scene === 'dachi')
       return [
-        { id: 'd1', who: 'kimorin', text: '', voice: { url: '/onboarding/kimorin-mercury-1.m4a', seconds: 4 }, face: 'smile' },
-        { id: 'd2', who: 'me', text: '', voice: { url: '/onboarding/kimorin-mercury-2.m4a', seconds: 3 } },
-        { id: 'd3', who: 'kimorin', text: '……私にも、送っていいですよ。返事は、気が向いたら、しますので。', voice: { url: '/onboarding/kimorin-mercury-1.m4a', seconds: 5 }, face: 'shy' },
+        { id: 'd0', who: 'kimorin', text: 'ういっす' },
+        { id: 'd1', who: 'kimorin', text: 'よう！　今日の曲、聴いたぞ。サビで鳥肌が立った……。', voice: { url: '/onboarding/kimorin-mercury-1.m4a', seconds: 4 }, faces: [{ face: 'smile' }, { face: 'surprised', motion: 'lean' }] },
+        { id: 'd2', who: 'me', text: 'ほんと！？　うれしい！', voice: { url: '/onboarding/kimorin-mercury-2.m4a', seconds: 3 }, faces: [{ face: 'smile', motion: 'hop' }] },
+        { id: 'd3', who: 'kimorin', text: '……[[しんみり:鍛えすぎたか]]。いや、!!むしろ見せたい!!。', voice: { url: '/onboarding/kimorin-mercury-1.m4a', seconds: 5 }, faces: [{ face: 'normal' }, { face: 'thinking', motion: 'tilt' }] },
       ];
     if (group) return people.slice(0, -1).flatMap((p, k) => [{ id: `g${k}`, who: p.id, text: ['やっほー！', 'こんばんは！', '今日の曲、聞いた？', 'うん、よかった！', '次は木星だね', 'たのしみ！'][k % 6], face: 'smile' as TalkFace }]).concat([{ id: 'gm', who: 'me', text: 'みんな、おつかれさま！', face: 'smile' }]);
     return pick(2);
@@ -127,12 +146,7 @@ function Play({ scene }: { scene: Scene }) {
   const [items, setItems] = useState<TalkItem[]>(initial);
   const [thinking, setThinking] = useState<string | null>(null);
   const [state, setState] = useState({ listening: false, keyboard: scene === 'kb' });
-  const [kororin, setKororin] = useState(scene === 'kororin');
-  useEffect(() => {
-    if (scene !== 'switch') return;
-    const t = setTimeout(() => setKororin(true), 1200);
-    return () => clearTimeout(t);
-  }, [scene]);
+
   const [turn, setTurn] = useState(0);
 
   const partner = people[0].id;
@@ -154,15 +168,15 @@ function Play({ scene }: { scene: Scene }) {
         thinking={thinking}
         listening={state.listening}
         keyboard={state.keyboard}
-        kororin={kororin}
-        place={scene === 'dachi' ? PLACE_BG.saturn : PLACE_BG.moon}
+        place={PLACE_BG.moon}
         group={group ? { name: '土星のサイファー仲間', count: people.length } : undefined}
-        top={10}
+        top={0}
         // M-R239: the ダチ scene opens with two unread lines (the last read one and the unread ones play in a row)
-        unreadFrom={scene === 'dachi' ? 1 : undefined}
+        unreadFrom={scene === 'dachi' ? 2 : scene === 'live' ? HISTORY.length : undefined}
+        bar={{ title: group ? '' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', onBluena: () => undefined }}
         composer={<TalkComposer placeholder="ことばで話す" onSend={send} onState={(s) => setState((o) => (scene === 'kb' ? { ...s, keyboard: true } : s))} initial={scene === 'kb' ? '土星の輪は' : ''} startTyping={scene === 'kb'} />}
       />
-      {scene === 'live' && (
+      {scene === 'live' && !bare && (
         <div className="z-30 flex shrink-0 flex-wrap gap-1 px-2 py-1 text-[10.5px]">
           <span className="text-white/50">言ってみる：</span>
           {SAMPLES.map((t) => (

@@ -118,19 +118,28 @@ export const BATI_FACE_RULE = {
 - e（表情）：normal（ふつう） smile（笑う） surprised（びっくり） thinking（考え中・首をかしげる） sad（しょんぼり） shy（照れ）のどれか。
 - m（動き）：none hop（うれしくて跳ねる） lean（驚いて少しのけぞる） nod（うなずく） tilt（首をかしげる） sway（うれしくてゆれる） shrink（しょんぼり小さくなる）のどれか。
 - 問いかける文は thinking と tilt。うれしい文は smile と hop。驚いた文は surprised と lean。
-- [worry] の時は sad か normal（動きは none か nod）。[danger] の時は normal。2行目からの返事には、表情のことは書かない。`,
+- in（出方）：pop（ふつう） slam（ドーンと強く・叫び） slow（ゆっくり・しみじみ） shake（ぷるぷる・うれしさや動揺）。shape（形）：round（ふつう） burst（ギザギザの叫び） cloud（もこもこの考えごと・ひとりごと） whisper（小声）。ふつうの文は省いてよい（例：{"e":"smile","m":"hop","in":"slam","shape":"burst"}）。
+- 長い返事（40字をこえる時）は、吹き出しを分けてよい：新しい吹き出しを始める文に "br":true を付ける。1つの吹き出しは2〜3文（60〜80字）まで、全部で5つまで。文の途中では分けない。言葉は変えない。
+- 返事の文の中で、強めたい所に印を1文に1か所まで付けてよい：**太字**、^^少し大きく^^、!!叫び!!。さらに返事全体で1か所までの特別な文字：[[金:…]]（お祝い）、[[赤:…]]（叫び・驚き）、[[かわいい:…]]（うれしい・照れ）、[[しんみり:…]]（怖い・しんみり）。使いすぎない。ほかの記号や HTML は書かない。
+- [worry] の時は sad か normal（動きは none か nod）、in は slow、shape は round。[danger] の時は normal。2行目からの返事には、表情のことは書かない。`,
   en: `[Face and motion, sentence by sentence]
 At the very start of the first line write, as a JSON array, your face and motion for each sentence of the reply, in order (e.g. [{"e":"smile","m":"hop"},{"e":"sad","m":"none"}][normal]).
 - e: one of normal, smile, surprised, thinking (head tilted), sad, shy.
 - m: one of none, hop (happy jump), lean (leans back, surprised), nod, tilt (tilts the head), sway (happy sway), shrink (droops).
 - A question: thinking + tilt. Happy: smile + hop. Surprised: surprised + lean.
-- For [worry] sad or normal (none / nod); for [danger] normal. Never mention the face in the reply itself.`,
+- Optional per sentence: "in" (pop, slam = loud and strong, slow = soft and thoughtful, shake = trembling) and "shape" (round, burst = a shout, cloud = musing, whisper = quiet). Leave them out for ordinary sentences.
+- A long reply (over about 40 characters) may be shown in several bubbles: put "br":true on the sentence that starts a new bubble. 2–3 sentences (60–80 characters) a bubble, five at most; never cut inside a sentence; never change the words.
+- In the reply you may mark at most one spot per sentence: **bold**, ^^a little larger^^, !!a shout!!; and once in the whole reply a special word: [[金:…]] (celebration), [[赤:…]] (a cry, surprise), [[かわいい:…]] (cute, shy joy), [[しんみり:…]] (eerie, quiet). Use them sparingly; no other markup, no HTML.
+- For [worry] sad or normal (none / nod), in slow, shape round; for [danger] normal. Never mention the face in the reply itself.`,
 } as const;
 
 /** M-R238: your own / a dachi's words → each sentence's expression (one small call on sending) */
-export const TALK_BEATS_PROMPT = `You read one chat message and decide, for each sentence in order, the speaker's facial expression and a small motion.
-Answer with only a JSON array, one object per sentence: [{"e":"smile","m":"hop"},{"e":"sad","m":"none"}].
+export const TALK_BEATS_PROMPT = `You read one chat message and decide, for each sentence in order, the speaker's facial expression, a small motion, how its bubble comes in and its shape; you may mark one spot to stress.
+Answer with only a JSON array, one object per sentence: [{"e":"smile","m":"hop","in":"pop","shape":"round","t":"the sentence as written"}].
 - e: normal, smile, surprised, thinking, sad, shy.  m: none, hop, lean, nod, tilt, sway, shrink.
+- in: pop, slam (loud), slow (soft), shake (trembling).  shape: round, burst (a shout), cloud (musing), whisper (quiet).
+- t: the sentence exactly as written; you may wrap at most one spot in **bold**, ^^larger^^ or !!shout!!, and in the whole message at most one special word [[金:…]] / [[赤:…]] / [[かわいい:…]] / [[しんみり:…]] — change nothing else. If the message has no punctuation at all (spoken), cut it into its sentences and add only the punctuation (。！？、).
+- br: true on a sentence that starts a new bubble, for a long message (over about 40 characters): 2–3 sentences (60–80 characters) a bubble, five at most.
 - A question: thinking + tilt. Happy or 「！」「笑」「w」: smile (hop when very happy). Surprised: surprised + lean. 「……」 or worried: sad. Otherwise normal + none.`;
 
 export function batiOneCallRules(locale: 'ja' | 'en', can: BatiAbilities = {}): string {

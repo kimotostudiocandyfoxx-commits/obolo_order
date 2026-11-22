@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TalkComposer } from '@/components/talk/TalkComposer';
+import { useTalkTone } from '@/components/talk/useTalkTone';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
-import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
+import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { batiDaysLeftLine, kororinRing, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
@@ -21,7 +22,7 @@ import { cues, withWords, type StoryMode } from './story';
 import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
-import { uid, type Msg, type Work } from './work';
+import { FLIES, uid, type Msg, type Work } from './work';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
@@ -46,8 +47,10 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  * (Shell.tsx: left = the conversations, right = Bluena from day 3). Opened from a story step it plays the day's script
  * lines at their moments and hands what was made back to the story (`story`, story.ts).
  */
-export function AtelierChat({ first, talk, story }: { first: AtelierKind | null; talk: Talk; story?: StoryMode }) {
+export function AtelierChat({ first, talk, story, onList, onBluena, unread }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean }) {
   const { me, setMe } = useAuth();
+  // M-R245: your bubble colour (picked once)
+  const talkTone = useTalkTone();
   const own = usePartner();
   // in a story step the story's {bati} talks (the review page has no account: its {bati} is the story's)
   const partner = story ? { ...own, name: story.speaker('バティ').name, face: story.speaker('バティ').avatar ?? own.face } : own;
@@ -303,7 +306,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
   // M-R232: the side-by-side talk — you at the right, {bati} (or the story's speaker) at the left, the Moon behind
   const people: TalkPerson[] = [
     { id: 'bati', name: partner.name, look: own.isBati || story ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
-    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
   ];
   const items: TalkItem[] = msgs.map((m) =>
     m.who === 'me'
@@ -335,6 +338,11 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
             who: 'bati',
             text: m.work.status === 'making' ? '' : (m.work.title ?? ''),
             mark: m.work.status === 'ready' ? workMarkRef(m.work) : undefined,
+            // 〔星へ飛ばす〕 right on the bubble (the story's fly choice is made here), as on the opened card
+            chips:
+              FLIES[m.work.kind] && m.work.status === 'ready' && (m.work.saved || !!story)
+                ? [{ label: m.work.flown ? '飛んでいった' : '星へ飛ばす', onPick: () => void flyIt(m.work), disabled: busy || !!m.work.flown }]
+                : undefined,
             card: {
               label: m.work.title ?? m.work.prompt,
               thumb: <WorkThumb w={m.work} />,
@@ -358,14 +366,16 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
       <TalkScene
+        askTone={talkTone.ask}
+        onTone={talkTone.pick}
         people={people}
         items={items}
         thinking={busy || making ? 'bati' : null}
         listening={talkState.listening}
         keyboard={talkState.keyboard}
-        kororin={kororinRing(me)}
         place={PLACE_BG.moon}
-        top={story ? 40 : 6}
+        top={story ? 40 : 0}
+        bar={{ title: partner.name, onList, onBluena, unread }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
         composer={

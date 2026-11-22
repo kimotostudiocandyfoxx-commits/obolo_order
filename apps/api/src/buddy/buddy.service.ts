@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
-import { batiChatPicturePrompt, buddyAnswer, talkBeats, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, type ImageProvider, LlmProvider, moderateText, summarizeMemory } from '@obolo/ai';
+import { batiChatPicturePrompt, buddyAnswer, talkBeatsMarked, ChatTurn, DEFAULT_BUDDY_NAME, DEFAULT_PERSONA, type ImageProvider, LlmProvider, moderateText, summarizeMemory } from '@obolo/ai';
 import { buddyQuotaDecision, idempotencyKey } from '@obolo/ledger';
 import {
   BUDDY_CONTEXT_MESSAGES,
@@ -45,6 +45,7 @@ const toView = (m: typeof buddyMessages.$inferSelect): BuddyMessageView => ({
   ...(m.extraJson?.face ? { face: m.extraJson.face } : {}),
   ...(m.extraJson?.motion ? { motion: m.extraJson.motion } : {}),
   ...(m.extraJson?.faces?.length ? { faces: m.extraJson.faces } : {}),
+  ...(m.extraJson?.marked ? { marked: m.extraJson.marked } : {}),
 });
 
 /** a picture in the chat may take this long; after it, the answer comes without one */
@@ -241,7 +242,8 @@ export class BuddyService implements OnModuleInit {
     let motion: TalkMotion | undefined;
     let faces: TalkBeat[] | undefined;
     // M-R238: your own words' faces, sentence by sentence — one small call beside the reply (the rules if it fails)
-    const mine = talkBeats(this.llm, text, { self: true, timeoutMs: 3000 }).catch(() => ruleBeats(text, true));
+    // M-R243: with its entrances, shapes and marks
+    const mine = talkBeatsMarked(this.llm, text, { self: true, timeoutMs: 3000 }).catch(() => ({ faces: ruleBeats(text, true), marked: undefined as string | undefined }));
     // M-R208: whether Bati may look it up / draw today (a used cap turns it off, the talk goes on)
     const can = await this.caps.abilities(userId).catch(() => ({ search: false, draw: false }));
     try {
@@ -292,7 +294,7 @@ export class BuddyService implements OnModuleInit {
 
     const now = Date.now();
     const result = await this.db.write.transaction(async (tx) => {
-      const [u] = await tx.insert(buddyMessages).values({ userId, role: 'user', text, extraJson: myFaces.length ? { faces: myFaces } : null, createdAt: new Date(now) }).returning();
+      const [u] = await tx.insert(buddyMessages).values({ userId, role: 'user', text, extraJson: myFaces.faces.length ? { faces: myFaces.faces, ...(myFaces.marked ? { marked: myFaces.marked } : {}) } : null, createdAt: new Date(now) }).returning();
       const [b] = await tx
         .insert(buddyMessages)
         .values({ userId, role: 'buddy', text: replyText, provider: this.llm.name, extraJson: extra, createdAt: new Date(now + 1) })

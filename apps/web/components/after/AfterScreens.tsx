@@ -586,6 +586,12 @@ function Nagare({ v, onDone }: { v: StoryVars; onDone: Done }) {
         </div>
       )}
       {phase === 'stage' && <SaturnStage face={face} onClear={() => setPhase('clear')} />}
+      {/* out of the stage without clearing (as in the trial on the island: NagareTrial), so nobody is kept in it */}
+      {phase === 'stage' && (
+        <button onClick={() => onDone({ f_m_neptune_trial: 'none' })} className="absolute right-3 top-[calc(52px+env(safe-area-inset-top))] z-10 rounded-full bg-black/40 px-3 py-1 text-[11px] text-white/70">
+          とじる
+        </button>
+      )}
       {phase === 'clear' && (
         <div className="flex h-full flex-col items-center justify-center gap-6 px-6">
           <p className="animate-[fadeUp_0.5s_ease-out] text-4xl font-bold tracking-[0.3em] text-amber-200 drop-shadow-[0_0_20px_rgba(255,214,120,0.8)]">クリア</p>

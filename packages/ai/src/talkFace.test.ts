@@ -48,3 +48,30 @@ describe('M-R238 sentence by sentence', () => {
     expect(await talkBeats(down, 'これ、なに？ すごい！')).toEqual([{ face: 'thinking', motion: 'tilt' }, { face: 'smile', motion: 'hop' }]);
   });
 });
+
+describe('M-R243 entrances, shapes and marks', () => {
+  it('reads in / shape from the beats', () => {
+    const p = parseTagged('[{"e":"surprised","m":"lean","in":"slam","shape":"burst"},{"e":"thinking","in":"slow","shape":"cloud"}][normal]\n!!マジで！？!!　……どうしよう。');
+    expect(p.faces).toEqual([{ face: 'surprised', motion: 'lean', in: 'slam', shape: 'burst' }, { face: 'thinking', in: 'slow', shape: 'cloud' }]);
+  });
+  it('keeps the marked words from the small call only when nothing but the marks changed', async () => {
+    const { talkBeatsMarked } = await import('./talkBeats');
+    const good = { name: 'm', chat: async () => '[{"e":"smile","in":"shake","t":"^^やった^^！"},{"e":"normal","t":"また明日。"}]' } as never;
+    expect(await talkBeatsMarked(good, 'やった！　また明日。')).toEqual({ faces: [{ face: 'smile', in: 'shake' }, { face: 'normal' }], marked: '^^やった^^！　また明日。' });
+    const sneaky = { name: 'm', chat: async () => '[{"e":"smile","t":"<b>やった</b>！"}]' } as never;
+    expect((await talkBeatsMarked(sneaky, 'やった！')).marked).toBeUndefined();
+  });
+});
+
+describe('M-R244 the cuts from the same call', () => {
+  it('passes br on, and punctuates spoken words without changing them', async () => {
+    expect(parseTagged('[{"e":"smile"},{"e":"normal","br":true}][normal]\nいち。に。').faces).toEqual([{ face: 'smile' }, { face: 'normal', br: true }]);
+    const { talkBeatsMarked } = await import('./talkBeats');
+    const llm = { name: 'm', chat: async () => '[{"e":"smile","t":"きょうは楽しかった。"},{"e":"normal","br":true,"t":"またあしたね！"}]' } as never;
+    const r = await talkBeatsMarked(llm, 'きょうは楽しかった またあしたね');
+    expect(r.marked).toBe('きょうは楽しかった。またあしたね！');
+    expect(r.faces[1]).toEqual({ face: 'normal', br: true });
+    const changed = { name: 'm', chat: async () => '[{"e":"smile","t":"今日は楽しかった。"},{"e":"normal","t":"また明日ね！"}]' } as never;
+    expect((await talkBeatsMarked(changed, 'きょうは楽しかった またあしたね')).marked).toBeUndefined();
+  });
+});

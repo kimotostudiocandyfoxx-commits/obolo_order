@@ -1,13 +1,13 @@
 'use client';
 
-import { kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import { useMemo } from 'react';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useAuth } from '@/lib/auth';
 import { batiDayMsgs } from '@/lib/finds/talks';
 import { usePartner } from '@/lib/partner';
-import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
+import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { talks } from './shelf';
 import { KindMark } from './WorkCard';
 import type { Work } from './work';
@@ -25,7 +25,7 @@ export function BatiDay({ day, onBack }: { day: string; onBack: () => void }) {
   const msgs = useMemo(() => batiDayMsgs(talks(), day), [day]);
   const people: TalkPerson[] = [
     { id: 'bati', name: partner.name, look: partner.isBati ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
-    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
   ];
   const items: TalkItem[] = msgs.map((m) =>
     m.who === 'work'
@@ -44,7 +44,6 @@ export function BatiDay({ day, onBack }: { day: string; onBack: () => void }) {
       <TalkScene
         people={people}
         items={items}
-        kororin={kororinRing(me)}
         place={PLACE_BG.moon}
         top={4}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}

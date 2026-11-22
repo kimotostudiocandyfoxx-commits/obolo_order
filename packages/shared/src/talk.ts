@@ -53,6 +53,17 @@ export type TalkExpression =
       members?: boolean;
     };
 
+/**
+ * M-R240: an expression's own pose (smile = both hands up, surprised = leaning back, thinking = a hand on the chin, sad =
+ * shoulders down, shy = scratching the head) — whole pictures aligned to the same feet, with their own eyes-closed and
+ * open-mouth pictures. The second tier over the plain standing faces; a face without one keeps its standing picture.
+ */
+export interface TalkPose {
+  url: string;
+  blink?: string;
+  mouth?: string;
+}
+
 /** someone's look in the talk: the standing figure, its expressions and its コロリン mini (M-R233) */
 export interface TalkLook {
   /** the picture it was made from (when the look changes, everything is made again) */
@@ -60,8 +71,8 @@ export interface TalkLook {
   /** the decided look as a standing figure (no background) */
   stand: string;
   faces?: Partial<Record<TalkFace, TalkExpression>>;
-  /** M-R233: a small, round chibi of this look (holds the word tag on the ring); none = the look cut round stands in */
-  kororin?: string | null;
+  /** M-R240: the expressions' poses (the second tier); missing = the face's standing picture */
+  poses?: Partial<Record<TalkFace, TalkPose>>;
   /** still being made in the background */
   making?: boolean;
 }
@@ -84,6 +95,13 @@ export function talkExpression(look: Pick<TalkLook, 'stand' | 'faces'> | null | 
   return look.stand ? { kind: 'image', url: look.stand } : null;
 }
 
+/** M-R240: the pose of a face as an expression (null: none — the standing face is used) */
+export function talkPose(look: Pick<TalkLook, 'poses'> | null | undefined, face: TalkFace): TalkExpression | null {
+  if (face === 'normal') return null;
+  const p = look?.poses?.[face];
+  return p ? { kind: 'image', url: p.url, ...(p.blink ? { blink: p.blink } : {}), ...(p.mouth ? { mouth: p.mouth } : {}) } : null;
+}
+
 /** your own look: only the gentle faces (M-R234); `fixed` = 「表情を変えない」 */
 export function selfFace(face: TalkFace, fixed = false): TalkFace {
   if (fixed) return 'normal';
@@ -96,10 +114,6 @@ export const isTalkMotion = (s: unknown): s is TalkMotion => typeof s === 'strin
 /** the old {bati} face names (M-R139) → the talk's six */
 export const BATI_FACE_TO_TALK: Record<string, TalkFace> = { smile: 'smile', surprise: 'surprised', think: 'thinking', sad: 'sad', shy: 'shy' };
 
-/** M-R233: the ring turns into コロリン at D04-S005c (day 3, Saturn): the story flag, kept with the day */
-export const KORORIN_RING_FLAG = 'd3.f_kororin_ring';
-/** whether the talk's ring shows コロリン (the flag, or any later day in case it was not kept) */
-export const kororinRing = (me: { story?: Record<string, string>; journeyDay: number } | null | undefined) => !!me && (me.story?.[KORORIN_RING_FLAG] === 'true' || me.journeyDay >= 4);
 /** M-R234: 「表情を変えない」 (your own look keeps its plain face): a sys story value */
 export const TALK_FIXED_FACE_KEY = 'sys.talk_fixed_face';
 
@@ -111,11 +125,18 @@ export const TALK_FIXED_FACE_KEY = 'sys.talk_fixed_face';
 export interface TalkBeat {
   face: TalkFace;
   motion?: TalkMotion;
+  /** M-R243: how the bubble comes in (pop / slam / slow / shake) and its shape (round / burst / cloud / whisper) */
+  in?: TalkIn;
+  shape?: TalkShape;
+  /** M-R244: a new bubble starts at this sentence (a long utterance shown as several) */
+  br?: boolean;
 }
 
 /** an utterance cut into sentences (the end marks stay with their sentence; 「……」 and 「w」 too) */
-export function talkSentences(text: string): string[] {
-  const out = text.match(/[^。！？!?…\n]+(?:[。！？!?…]+|[wｗ笑]+(?=\s|$)|$)|…+/g) ?? [];
+export function talkSentences(marked: string): string[] {
+  const text = talkPlain(marked);
+  // a leading 「……」 belongs to the sentence after it
+  const out = text.match(/(?:[…‥]+)?[^。！？!?…‥\n]+(?:[。！？!?…‥]+|[wｗ笑]+(?=\s|$)|$)|[…‥]+/g) ?? [];
   const parts = out.map((s) => s.trim()).filter(Boolean);
   return parts.length ? parts : text.trim() ? [text.trim()] : [];
 }
@@ -133,6 +154,10 @@ export function ruleBeats(text: string, self = false): TalkBeat[] {
     else if (/(…|‥|\.\.\.)$/.test(t) || /…{2,}/.test(t)) b = { face: 'sad' };
     else if (/[！!]$|[笑wｗ]$/.test(t)) b = { face: 'smile', motion: /[！!]{1}$/.test(t) && /(やった|すごい|うれし|嬉し|たのし|楽し)/.test(t) ? 'hop' : undefined };
     else b = { face: 'normal' };
+    // M-R243: 「！！」「！？」 shout; 「……」 at the start or the end muses; a whisper is small; else it pops
+    if (/[！!]{2,}|[！!][？?]|[？?][！!]/.test(t)) Object.assign(b, { in: 'slam', shape: 'burst' });
+    else if (/^(…|‥)|(…|‥)[。]?$/.test(t)) Object.assign(b, { in: 'slow', shape: 'cloud' });
+    else if (/（小声）|\(小声\)|ひそひそ|こっそり/.test(t)) Object.assign(b, { in: 'slow', shape: 'whisper' });
     return self ? brightBeat(b) : b;
   });
 }
@@ -140,7 +165,7 @@ export function ruleBeats(text: string, self = false): TalkBeat[] {
 /** your own look: only the bright faces (M-R234 / M-R238) — a dark sentence stays plain */
 export function brightBeat(b: TalkBeat): TalkBeat {
   if ((SELF_TALK_FACES as readonly TalkFace[]).includes(b.face)) return b;
-  return { face: 'normal', ...(b.motion === 'tilt' || b.motion === 'nod' ? { motion: b.motion } : {}) };
+  return { ...b, face: 'normal', ...(b.motion === 'tilt' || b.motion === 'nod' ? { motion: b.motion } : { motion: undefined }) };
 }
 
 /** a beat list as JSON from a model, checked: unknown faces / motions drop to plain; at most one per sentence */
@@ -150,7 +175,144 @@ export function readBeats(raw: unknown, sentences: number): TalkBeat[] | null {
     const o = (x ?? {}) as Record<string, unknown>;
     const face = o.e ?? o.face ?? o.expression;
     const motion = o.m ?? o.motion;
-    return { face: isTalkFace(face) ? face : 'normal', ...(isTalkMotion(motion) && motion !== 'none' ? { motion } : {}) };
+    const inn = o.in;
+    const shape = o.shape;
+    return {
+      face: isTalkFace(face) ? face : 'normal',
+      ...(isTalkMotion(motion) && motion !== 'none' ? { motion } : {}),
+      ...(isTalkIn(inn) && inn !== 'pop' ? { in: inn } : {}),
+      ...(isTalkShape(shape) && shape !== 'round' ? { shape } : {}),
+      ...(o.br === true ? { br: true } : {}),
+    };
   });
+  return out;
+}
+
+/** M-R243: how a sentence's bubble comes in, and its shape (chosen with the face, in the same call) */
+export const TALK_INS = ['pop', 'slam', 'slow', 'shake'] as const;
+export type TalkIn = (typeof TALK_INS)[number];
+export const TALK_SHAPES = ['round', 'burst', 'cloud', 'whisper'] as const;
+export type TalkShape = (typeof TALK_SHAPES)[number];
+export const isTalkIn = (s: unknown): s is TalkIn => typeof s === 'string' && (TALK_INS as readonly string[]).includes(s);
+export const isTalkShape = (s: unknown): s is TalkShape => typeof s === 'string' && (TALK_SHAPES as readonly string[]).includes(s);
+
+/**
+ * M-R243 / M-R245: the marks words may carry — **bold**, ^^a little larger^^, !!a shout!! (one a sentence), and once in a
+ * whole message a special one: [[金:…]] celebration, [[赤:…]] a cry, [[かわいい:…]] cute, [[しんみり:…]] eerie / quiet.
+ * Nothing else is markup: everything else is shown as the letters it is.
+ */
+export type TalkMark = 'b' | 'big' | 'shout' | 'gold' | 'red' | 'cute' | 'eerie';
+const MARKS: Record<string, TalkMark> = { '**': 'b', '^^': 'big', '!!': 'shout' };
+const SPECIAL: Record<string, TalkMark> = { 金: 'gold', 赤: 'red', かわいい: 'cute', しんみり: 'eerie' };
+const MARK_RE = () => /\[\[(金|赤|かわいい|しんみり):(.+?)\]\]|(\*\*|\^\^|!!)(.+?)\3/g;
+/** marked words → runs of plain text with their mark ('' = none); an unclosed mark is dropped from view */
+export function talkRuns(text: string): { t: string; c: TalkMark | '' }[] {
+  const out: { t: string; c: TalkMark | '' }[] = [];
+  const re = MARK_RE();
+  let k = 0;
+  let m: RegExpExecArray | null;
+  const plain = (t: string) => t.replace(/\*\*|\^\^/g, '');
+  while ((m = re.exec(text))) {
+    if (m.index > k) out.push({ t: plain(text.slice(k, m.index)), c: '' });
+    out.push(m[1] ? { t: m[2], c: SPECIAL[m[1]] } : { t: m[4], c: MARKS[m[3]] });
+    k = re.lastIndex;
+  }
+  if (k < text.length) out.push({ t: plain(text.slice(k)), c: '' });
+  return out.filter((r) => r.t);
+}
+/** the words without their marks */
+export const talkPlain = (text: string) => talkRuns(text).map((r) => r.t).join('');
+
+/**
+ * M-R244: a long utterance is shown as several bubbles, one after another — only where to cut is chosen, the words never
+ * change. Up to about 40 characters stays whole; cuts only at a sentence's end (。！？, a line break); 2–3 sentences
+ * (60–80 characters) a bubble; five at most. `beats[k].br` (from the same call as the faces) starts a new bubble at
+ * sentence k; without them, sentences are grouped to about 60 characters. Returns each bubble's words (the marked text
+ * as written: joined they are the utterance exactly) and which sentences it holds.
+ */
+export interface TalkChunk {
+  text: string;
+  /** the sentences it holds: [from, to) */
+  from: number;
+  to: number;
+}
+export function talkChunks(marked: string, beats?: { br?: boolean }[]): TalkChunk[] {
+  const parts = talkSentences(marked);
+  const plainLen = [...talkPlain(marked)].length;
+  if (parts.length <= 1 || plainLen <= 40) return [{ text: marked, from: 0, to: Math.max(1, parts.length) }];
+  // sentence k ends after this many plain characters
+  const flat = talkPlain(marked);
+  const ends: number[] = [];
+  let from = 0;
+  for (const p of parts) {
+    const i = flat.indexOf(p, from);
+    from = (i < 0 ? from : i) + p.length;
+    ends.push([...flat.slice(0, from)].length);
+  }
+  // where to start a new bubble (a sentence index > 0)
+  let starts: number[] = [];
+  if (beats?.some((b) => b.br)) starts = beats.map((b, k) => (k > 0 && k < parts.length && b.br ? k : -1)).filter((k) => k > 0);
+  else {
+    let size = 0;
+    parts.forEach((p, k) => {
+      const len = [...p].length;
+      if (k > 0 && size > 0 && size + len > 64) {
+        starts.push(k);
+        size = 0;
+      }
+      size += len;
+    });
+  }
+  // five at most: the shortest neighbours are merged
+  while (starts.length > 4) {
+    const bounds = [0, ...starts, parts.length];
+    let best = 1;
+    let bestLen = Infinity;
+    for (let s = 1; s < bounds.length - 1; s++) {
+      const len = (ends[bounds[s + 1] - 1] ?? 0) - (ends[bounds[s - 1] - 1] ?? 0);
+      if (len < bestLen) (bestLen = len), (best = s);
+    }
+    starts = starts.filter((_, k) => k !== best - 1);
+  }
+  // cut the marked text after the plain character ends[k - 1] (a closing mark right after stays with it)
+  const cutAt = (plainEnd: number) => {
+    const re = MARK_RE();
+    const tokens = new Set<number>();
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(marked))) {
+      const inner = m[1] ? m[2] : m[4];
+      const open = m[0].indexOf(inner);
+      for (let j = 0; j < open; j++) tokens.add(m.index + j);
+      for (let j = open + inner.length; j < m[0].length; j++) tokens.add(m.index + j);
+    }
+    // stray ** / ^^ are not words either (talkRuns drops them)
+    for (const s of marked.matchAll(/\*\*|\^\^/g)) for (let j = 0; j < 2; j++) tokens.add(s.index! + j);
+    let seen = 0;
+    let i = 0;
+    const chars = [...marked];
+    let off = 0;
+    for (; i < chars.length && seen < plainEnd; i++) {
+      if (!tokens.has(off)) seen++;
+      off += chars[i].length;
+    }
+    while (i < chars.length && tokens.has(off)) {
+      off += chars[i].length;
+      i++;
+    }
+    // the space after a sentence stays with it
+    while (i < chars.length && /\s/.test(chars[i])) {
+      off += chars[i].length;
+      i++;
+    }
+    return off;
+  };
+  const out: TalkChunk[] = [];
+  let at = 0;
+  const bounds = [0, ...starts, parts.length];
+  for (let s = 0; s < bounds.length - 1; s++) {
+    const end = s === bounds.length - 2 ? marked.length : cutAt(ends[bounds[s + 1] - 1]);
+    out.push({ text: marked.slice(at, end), from: bounds[s], to: bounds[s + 1] });
+    at = end;
+  }
   return out;
 }

@@ -57,7 +57,7 @@ export function TalkComposer({
         }}
         className="pb-safe flex items-center gap-2 px-3 pb-2.5 pt-2"
       >
-        <button type="button" onClick={() => setTyping(false)} aria-label="声で話す" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-amber-200/35 bg-black/40 text-amber-100">
+        <button type="button" onClick={() => setTyping(false)} aria-label="声で話す" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] text-[#f4f1ff]">
           <MicGlyph />
         </button>
         <input
@@ -69,29 +69,29 @@ export function TalkComposer({
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
           placeholder={placeholder}
-          className="h-11 min-w-0 flex-1 rounded-full border border-amber-200/30 bg-[rgba(12,9,22,0.82)] px-4 text-[15px] text-amber-50 outline-none placeholder:text-amber-50/35"
+          className="h-11 min-w-0 flex-1 rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] px-4 text-[16px] font-bold text-[#f4f1ff] outline-none placeholder:text-[#b9bde6]/60"
         />
-        <button disabled={!text.trim() || disabled} aria-label="送る" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#fbe9b7] to-[#d79d45] text-[#2b1b06] disabled:opacity-35">
+        <button disabled={!text.trim() || disabled} aria-label="送る" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#070b24] disabled:opacity-35" style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)' }}>
           <SendGlyph />
         </button>
       </form>
     );
 
   return (
-    <div className="pb-safe relative flex flex-col items-center px-3 pb-3 pt-1">
+    <div className="pb-safe relative flex flex-col items-center px-4 pb-[18px] pt-1">
       {/* what was heard, with 〔送る〕 */}
       {(text.trim() || mic.interim) && (
-        <div className="mb-2 flex w-full max-w-sm items-center gap-2 rounded-2xl border border-amber-200/25 bg-[rgba(12,9,22,0.82)] px-3 py-2 backdrop-blur">
-          <p className="min-w-0 flex-1 text-[14px] leading-snug text-amber-50/90">
+        <div className="mb-2 flex w-full max-w-sm items-center gap-2 rounded-2xl border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] px-3 py-2">
+          <p className="min-w-0 flex-1 text-[14px] font-bold leading-snug text-[#f4f1ff]">
             {text}
-            <span className="text-amber-50/45">{mic.interim}</span>
+            <span className="text-[#b9bde6]">{mic.interim}</span>
           </p>
           {text.trim() && !mic.listening && (
             <>
               <button onClick={() => setText('')} aria-label="けす" className="text-[12px] text-amber-50/55">
                 けす
               </button>
-              <button onClick={() => void go()} disabled={disabled} className="rounded-full bg-gradient-to-br from-[#fbe9b7] to-[#d79d45] px-3 py-1.5 text-[13px] font-bold text-[#2b1b06] disabled:opacity-40">
+              <button onClick={() => void go()} disabled={disabled} className="rounded-full bg-[#dfe6ff] px-3 py-1.5 text-[13px] font-bold text-[#070b24] disabled:opacity-40">
                 送る
               </button>
             </>
@@ -103,16 +103,17 @@ export function TalkComposer({
         {side && <div className="absolute left-0 top-1/2 -translate-y-1/2">{side}</div>}
         {/* the hidden field the dictation writes into */}
         <input ref={field} value={text} onChange={(e) => setText(e.target.value)} className="sr-only" tabIndex={-1} aria-hidden />
+        {/* the prototype's big glowing mic (design/talk/proto.html .mic) */}
         <button
           onClick={() => (mic.supported ? mic.toggle() : setTyping(true))}
           disabled={disabled}
           aria-label={mic.listening ? '話し終わる' : '話す'}
-          className={`relative flex h-[66px] w-[66px] items-center justify-center rounded-full text-[#2b1b06] shadow-[0_6px_22px_rgba(0,0,0,0.45)] transition active:scale-95 disabled:opacity-40 ${mic.listening ? 'bg-gradient-to-br from-rose-300 to-pink-500 text-white' : 'bg-gradient-to-br from-[#fbe9b7] via-[#f0c873] to-[#d79d45]'}`}
+          className="grid h-[74px] w-[74px] place-items-center rounded-full text-[#070b24] transition active:scale-95 disabled:opacity-40"
+          style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)', boxShadow: '0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55)', animation: mic.listening ? 'talk-pulse 1.2s ease-in-out infinite' : undefined }}
         >
-          {mic.listening && <span className="absolute inset-0 animate-ping rounded-full bg-pink-400/35" />}
-          <MicGlyph className="relative h-7 w-7" />
+          <MicGlyph className="h-[30px] w-[30px]" />
         </button>
-        <button onClick={() => setTyping(true)} aria-label="文字で答える" className="absolute right-0 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-amber-200/30 bg-black/40 text-[15px] text-amber-100/85">
+        <button onClick={() => setTyping(true)} aria-label="文字で答える" className="absolute right-0 top-1/2 grid h-[42px] w-[42px] -translate-y-1/2 place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] text-[15px] text-[#f4f1ff]">
           ⌨
         </button>
       </div>

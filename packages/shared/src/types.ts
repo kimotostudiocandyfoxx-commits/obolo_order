@@ -246,6 +246,8 @@ export interface BuddyMessageView {
   motion?: TalkMotion;
   /** M-R238: the expression and motion of each sentence ({bati}: the same call; yours: one small call on sending) */
   faces?: TalkBeat[];
+  /** M-R243: the words with their marks (**bold** / ^^larger^^ / !!shout!!) — your own message's, from the small call */
+  marked?: string;
 }
 
 /** a page a looked-up answer is based on: its title and the site's name */

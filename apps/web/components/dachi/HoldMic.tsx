@@ -35,6 +35,7 @@ export function HoldMic({
   disabled,
   hint = '押している間だけ、録音されます',
   left,
+  big = false,
 }: {
   onSend: (blob: Blob, seconds: number) => Promise<void>;
   sendLabel?: string;
@@ -42,6 +43,8 @@ export function HoldMic({
   hint?: string;
   /** something at the bar's left (the work-card button in a thread) */
   left?: React.ReactNode;
+  /** the talk's dock (M-R232, design/talk/proto.html): the big glowing mic in the middle */
+  big?: boolean;
 }) {
   const r = useHoldRecorder();
   const [busy, setBusy] = useState(false);
@@ -88,9 +91,9 @@ export function HoldMic({
               : hint;
 
   return (
-    <div className="pb-safe px-3" style={{ fontFamily: SERIF }}>
-      <div className="mx-auto mb-3 max-w-md">
-        <p className={`mb-1.5 min-h-[18px] px-2 text-right text-xs ${err || r.error ? 'text-rose-300' : 'text-amber-100/60'}`}>{note}</p>
+    <div className="pb-safe px-3" style={{ fontFamily: big ? undefined : SERIF }}>
+      <div className={`mx-auto max-w-md ${big ? 'mb-[14px]' : 'mb-3'}`}>
+        <p className={`mb-1.5 min-h-[18px] px-2 text-xs ${big ? 'text-center [text-shadow:0_1px_4px_#000]' : 'text-right'} ${err || r.error ? 'text-rose-300' : big ? 'text-[#b9bde6]' : 'text-amber-100/60'}`}>{note}</p>
         {r.take ? (
           <div className="flex items-center gap-2 rounded-full border border-amber-200/30 bg-[rgba(16,11,26,0.72)] p-1.5 pl-2 shadow-[0_10px_30px_rgba(0,0,0,0.45)] backdrop-blur-xl">
             <TakePlayer blob={r.take.blob} seconds={r.take.seconds} />
@@ -107,6 +110,28 @@ export function HoldMic({
             >
               {busy ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#2b1b06]/30 border-t-[#2b1b06]" /> : <SendGlyph />}
               {sendLabel}
+            </button>
+          </div>
+        ) : big ? (
+          <div className="relative flex items-center justify-center pb-1 pt-1">
+            <div className="absolute left-1 top-1/2 -translate-y-1/2">{left}</div>
+            <button
+              type="button"
+              disabled={disabled}
+              aria-label="押している間、録音"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+                setErr(null);
+                r.press();
+              }}
+              onPointerUp={r.release}
+              onPointerCancel={r.release}
+              onContextMenu={(e) => e.preventDefault()}
+              className={`grid h-[74px] w-[74px] touch-none select-none place-items-center rounded-full text-[#070b24] transition disabled:opacity-35 ${r.recording ? 'scale-105' : ''}`}
+              style={{ background: 'radial-gradient(circle at 35% 30%,#ffffff,#cdd8ff 55%,#9fb2ff)', boxShadow: r.recording ? '0 0 0 14px rgba(255,170,190,.14),0 0 48px rgba(255,150,180,.8)' : '0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55)' }}
+            >
+              <MicGlyph className="h-[30px] w-[30px]" />
             </button>
           </div>
         ) : (

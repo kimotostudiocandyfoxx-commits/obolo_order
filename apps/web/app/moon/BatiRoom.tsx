@@ -56,10 +56,10 @@ export function RoomIcon({ id, className = 'h-[18px] w-[18px]' }: { id: 'dress' 
   );
 }
 
-export function RoomSheet({ mode, onClose, onDone }: { mode: RoomMode; onClose: () => void; onDone: (line: string) => void }) {
+export function RoomSheet({ mode, onClose, onDone, name }: { mode: RoomMode; onClose: () => void; onDone: (line: string) => void; /** the name {bati} calls you (the story's {neo} when no account: the review page) */ name?: string }) {
   // M-R223: {bati}'s look is the four cards in four touches (components/bati/BatiLook), as in the story
   if (mode === 'bati') return <BatiLookSheet onClose={onClose} onDone={onDone} />;
-  return <MeSheet onClose={onClose} onDone={onDone} />;
+  return <MeSheet onClose={onClose} onDone={onDone} name={name} />;
 }
 
 function BatiLookSheet({ onClose, onDone }: { onClose: () => void; onDone: (line: string) => void }) {
@@ -84,11 +84,11 @@ function BatiLookSheet({ onClose, onDone }: { onClose: () => void; onDone: (line
   );
 }
 
-function MeSheet({ onClose, onDone }: { onClose: () => void; onDone: (line: string) => void }) {
+function MeSheet({ onClose, onDone, name: given }: { onClose: () => void; onDone: (line: string) => void; name?: string }) {
   const mode = 'me' as RoomMode;
   const { me, setMe } = useAuth();
   const api = getApi();
-  const name = me?.displayName ?? '';
+  const name = me?.displayName || given || 'あなた';
   const current = mode === 'bati' ? (me?.bati?.imageUrl ?? null) : (me?.avatarUrl ?? null);
   const [wish, setWish] = useState('');
   const [busy, setBusy] = useState(false);

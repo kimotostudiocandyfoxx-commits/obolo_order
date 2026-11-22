@@ -206,7 +206,7 @@ export const buddyMessages = pgTable(
     audioUrl: text('audio_url'),
     provider: text('provider'),
     /** M-R208: the pages a looked-up answer is based on, or the picture {bati} drew (media URL) */
-    extraJson: jsonb('extra_json').$type<{ sources?: BuddySource[]; image?: { url: string; mediaId: string }; remembered?: { text: string; result: 'kept' | 'refused' | 'full' | 'already' }; face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[] }>(),
+    extraJson: jsonb('extra_json').$type<{ sources?: BuddySource[]; image?: { url: string; mediaId: string }; remembered?: { text: string; result: 'kept' | 'refused' | 'full' | 'already' }; face?: TalkFace; motion?: TalkMotion; faces?: TalkBeat[]; marked?: string }>(),
     ...timestamps,
   },
   (t) => [index('buddy_messages_user_idx').on(t.userId, t.createdAt)],

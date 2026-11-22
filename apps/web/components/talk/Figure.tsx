@@ -1,6 +1,6 @@
 'use client';
 
-import { talkExpression, type TalkExpression, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
+import { talkExpression, talkPose, type TalkExpression, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 
 /**
@@ -19,7 +19,16 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
  * An expression may also be a short looping video (M-R234 §7): it is played as it is.
  */
 export type FigureState = 'idle' | 'talk' | 'listen' | 'think';
-const REACTION: Record<TalkMotion, string> = { none: '', hop: 'talk-hop', lean: 'talk-lean', nod: 'talk-nod', tilt: 'talk-tilt2', sway: 'talk-sway2', shrink: 'talk-shrink' };
+// the prototype's motions (design/talk/proto.html): hop .55 s, lean .5 s, nod .9 s, a tilt held 1.4 s
+const REACTION: Record<TalkMotion, string> = {
+  none: '',
+  hop: 'talk-hop .55s cubic-bezier(.3,1.6,.5,1)',
+  lean: 'talk-lean .5s ease-out',
+  nod: 'talk-nod .9s ease-in-out',
+  tilt: 'talk-tilt2 1.4s ease-in-out',
+  sway: 'talk-sway2 1.6s ease-in-out',
+  shrink: 'talk-shrink 1.1s ease-in-out',
+};
 
 export function Figure({
   look,
@@ -63,8 +72,49 @@ export function Figure({
   className?: string;
   style?: CSSProperties;
 }) {
-  const expr = talkExpression(look, face);
-  const shut = useBlink(!!expr && expr.kind === 'image' && !!expr.blink);
+  // M-R240: two tiers — the plain standing face, and the expression's own pose when there is one (and it loads)
+  const posed = talkPose(look, face);
+  const poseOk = usePresent(posed?.kind === 'image' ? posed.url : undefined);
+  const expr = (poseOk ? posed : null) ?? talkExpression(look, face);
+  // a change of expression cross-fades (~0.2 s) with a small squash-and-recover at the switch
+  const key = expr?.url ?? '';
+  const lastExpr = useRef<TalkExpression | null>(expr);
+  const [prev, setPrev] = useState<{ e: TalkExpression; n: number } | null>(null);
+  useEffect(() => {
+    const was = lastExpr.current;
+    lastExpr.current = expr;
+    if (!was || was.url === key || reduced) return;
+    setPrev((p) => ({ e: was, n: (p?.n ?? 0) + 1 }));
+    const t = setTimeout(() => setPrev(null), 220);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  // no blink while speaking (the prototype); the mouth swap does the work then
+  const shut = useBlink(!!expr && expr.kind === 'image' && !!expr.blink && state !== 'talk');
+  // a wide figure (a round {bati}) stands at 58% of the height, as in the prototype; every face is fetched ahead
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    if (!look?.stand) return;
+    const i = new Image();
+    i.onload = () => setWide(i.naturalWidth / i.naturalHeight > 0.9);
+    i.src = look.stand;
+    for (const e of Object.values(look.faces ?? {})) {
+      if (e?.kind !== 'image') continue;
+      for (const u of [e.url, e.blink, e.mouth]) if (u) new Image().src = u;
+    }
+    // the poses: fetched ahead too, and noted as there (or not) so a change of face swaps at once
+    for (const p of Object.values(look.poses ?? {})) {
+      if (!p) continue;
+      for (const u of [p.url, p.blink, p.mouth]) {
+        if (!u || present.has(u)) continue;
+        const im = new Image();
+        im.onload = () => present.set(u, true);
+        im.onerror = () => present.set(u, false);
+        im.src = u;
+      }
+    }
+  }, [look]);
+  height = wide && !chest ? height * 0.58 : height;
   const open = useFlap(state === 'talk', level);
   const idle = useIdle(state === 'idle' && !reduced && !calm);
   const yawn = idle === 'yawn';
@@ -97,14 +147,15 @@ export function Figure({
     <div className={`pointer-events-none relative flex flex-col items-center ${className}`} style={outer} aria-hidden>
       <div className="relative h-full overflow-visible" style={chest ? { overflow: 'hidden', borderRadius: '0 0 40% 40% / 0 0 10% 10%' } : undefined}>
         {/* the shadow at the feet */}
-        {!chest && <span className="absolute bottom-[-2%] left-1/2 h-[5%] w-[70%] -translate-x-1/2 rounded-[50%] bg-black/45 blur-[3px]" style={live && !calm ? { animation: `talk-shadow ${breath}s ease-in-out infinite` } : undefined} />}
+        {!chest && <span className="absolute bottom-[-8px] left-1/2 h-[18px] w-[64%] -translate-x-1/2 rounded-[50%] blur-[2px]" style={{ background: 'radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0))', opacity: lit ? 0.75 : 1 }} />}
         <div
           key={`m${motionKey}`}
           className="h-full origin-bottom"
           style={{
             ['--dir' as string]: dir,
-            animation: live && motion && motion !== 'none' && motionKey ? `${REACTION[motion]} ${motion === 'hop' ? 0.7 : 1.1}s cubic-bezier(.3,1.3,.5,1)` : undefined,
-            transform: lit ? 'translateY(2%) scale(1.06)' : undefined,
+            animation: live && motion && motion !== 'none' && motionKey ? REACTION[motion] : undefined,
+            // the one speaking steps a little forward and larger
+            transform: lit && live ? 'translateY(-6px) scale(1.03)' : undefined,
             transition: 'transform .35s ease',
             filter: glow ? `drop-shadow(0 0 10px ${glow}) drop-shadow(0 0 3px ${glow})` : undefined,
           }}
@@ -112,7 +163,16 @@ export function Figure({
           <div className="h-full origin-bottom" style={{ ['--dir' as string]: dir, animation: pose }}>
             <div className="h-full origin-bottom" style={{ animation: still && !calm ? undefined : `talk-breath ${breath}s ease-in-out infinite` }}>
               <div className="h-full" style={{ transform: open && live ? 'translateY(-0.8%) scaleY(1.006)' : undefined, transformOrigin: '50% 100%', transition: 'transform 70ms linear' }}>
-                <Picture faceAt={faceBox(look)} expr={expr} img={img} chest={chest} height={height} shut={shut} open={open || yawn} sway={live && !calm} breath={breath} />
+                <div key={prev ? `sq${prev.n}` : 'still'} className="relative h-full origin-bottom" style={prev ? { animation: 'talk-squash .32s ease-out' } : undefined}>
+                  {prev && (
+                    <div className="absolute bottom-0 left-1/2 h-full -translate-x-1/2" style={{ animation: 'talk-fadeout .2s linear forwards' }}>
+                      <Picture faceAt={faceBox(look)} expr={prev.e} img={img} chest={chest} height={height} shut={false} open={false} sway={false} breath={breath} />
+                    </div>
+                  )}
+                  <div className="h-full" style={prev ? { animation: 'talk-fadein .2s linear' } : undefined}>
+                    <Picture faceAt={faceBox(look)} expr={expr} img={img} chest={chest} height={height} shut={shut} open={open || yawn} sway={false} breath={breath} />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -141,9 +201,13 @@ function Picture({ expr, img, chest, height, shut, open, sway, breath, faceAt }:
   // the top copy is solid down to 30% and fades out by 42%; the still copy starts under its solid part (no see-through band)
   const mask = 'linear-gradient(to bottom, #000 0%, #000 30%, transparent 42%)';
   const under = 'linear-gradient(to bottom, transparent 24%, #000 25%)';
+  // a part without a box is a whole picture (eyes closed / mouth open, aligned to the same body): it replaces the face
+  const fullBlink = !!expr.blink && !expr.eyesBox && shut;
+  const fullMouth = !!expr.mouth && !expr.mouthBox && open && !fullBlink;
+  const hideBase = fullBlink || fullMouth;
   return (
     <div className="relative" style={box}>
-      {img(expr.url, { height: '100%', WebkitMaskImage: sway ? under : undefined, maskImage: sway ? under : undefined })}
+      {img(expr.url, { height: '100%', opacity: hideBase ? 0 : 1, WebkitMaskImage: sway ? under : undefined, maskImage: sway ? under : undefined })}
       {sway && <div className="absolute inset-0" style={{ ...top, WebkitMaskImage: mask, maskImage: mask }}>{img(expr.url, { height: '100%' })}</div>}
       {/* the parts move with the top, so they stay on the face */}
       <div className="absolute inset-0" style={top}>
@@ -153,7 +217,7 @@ function Picture({ expr, img, chest, height, shut, open, sway, breath, faceAt }:
         )}
         {expr.mouth && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={expr.mouth} alt="" className="max-w-none select-none" style={{ ...at(expr.mouthBox), opacity: open ? 1 : 0 }} />
+          <img src={expr.mouth} alt="" className="max-w-none select-none" style={{ ...at(expr.mouthBox), opacity: expr.mouthBox ? (open ? 1 : 0) : fullMouth ? 1 : 0 }} />
         )}
       </div>
     </div>
@@ -164,6 +228,20 @@ function Picture({ expr, img, chest, height, shut, open, sway, breath, faceAt }:
 function faceBox(look: TalkLook | null) {
   const n = look?.faces?.normal;
   return n?.kind === 'image' ? (n.eyesBox ?? n.mouthBox) : undefined;
+}
+
+const present = new Map<string, boolean>();
+/** whether a picture exists (M-R240: the pose files come later — a missing one keeps the standing face) */
+function usePresent(url?: string) {
+  const [, force] = useState(0);
+  useEffect(() => {
+    if (!url || present.has(url)) return;
+    const i = new Image();
+    i.onload = () => (present.set(url, true), force((x) => x + 1));
+    i.onerror = () => (present.set(url, false), force((x) => x + 1));
+    i.src = url;
+  }, [url]);
+  return !!url && present.get(url) === true;
 }
 
 /** blinks at random 2–6 s, now and then twice (true while shut) */
@@ -252,7 +330,7 @@ function useIdle(on: boolean) {
 
 /** the keyframes the figures and the ring use (put once in the talk) */
 export const TALK_CSS = `
-@keyframes talk-breath { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.006,1.014) } }
+@keyframes talk-breath { 0%,100% { transform: scale(1,1) } 50% { transform: scale(1.008,1.018) } }
 @keyframes talk-shadow { 0%,100% { transform: translateX(-50%) scaleX(1) } 50% { transform: translateX(-50%) scaleX(1.03) } }
 @keyframes talk-sway { 0%,100% { transform: skewX(0deg) } 30% { transform: skewX(1.3deg) } 70% { transform: skewX(-1.1deg) } }
 @keyframes talk-listen { 0%,100% { transform: translateX(calc(var(--dir) * 3px)) rotate(calc(var(--dir) * 1.6deg)) } 35% { transform: translateX(calc(var(--dir) * 3px)) rotate(calc(var(--dir) * 1.6deg)) translateY(1.2%) } 55% { transform: translateX(calc(var(--dir) * 3px)) rotate(calc(var(--dir) * 2.4deg)) } }
@@ -260,19 +338,31 @@ export const TALK_CSS = `
 @keyframes talk-tilt { 0%,100% { transform: rotate(0) } 30%,70% { transform: rotate(calc(var(--dir) * 3.5deg)) } }
 @keyframes talk-look { 0%,100% { transform: translateX(0) } 25%,40% { transform: translateX(-4px) rotate(-1.5deg) } 60%,75% { transform: translateX(4px) rotate(1.5deg) } }
 @keyframes talk-yawn { 0%,100% { transform: scale(1,1) } 40%,60% { transform: scale(0.99,1.03) } }
-@keyframes talk-hop { 0%,100% { transform: translateY(0) } 15% { transform: translateY(1.5%) scale(1.03,0.96) } 45% { transform: translateY(-9%) scale(0.98,1.03) } 75% { transform: translateY(0.8%) scale(1.02,0.98) } }
-@keyframes talk-lean { 0%,100% { transform: rotate(0) } 25%,55% { transform: rotate(calc(var(--dir) * -5deg)) translateX(calc(var(--dir) * -5px)) } }
-@keyframes talk-nod { 0%,100% { transform: translateY(0) } 25%,75% { transform: translateY(1.8%) rotate(calc(var(--dir) * 1deg)) } 50% { transform: translateY(0) } }
-@keyframes talk-tilt2 { 0%,100% { transform: rotate(0) } 40%,70% { transform: rotate(calc(var(--dir) * 6deg)) } }
+@keyframes talk-hop { 0% { transform: translateY(0) } 40% { transform: translateY(-22px) } 100% { transform: translateY(0) } }
+@keyframes talk-lean { 0% { transform: translateX(0) rotate(0) } 40% { transform: translateX(calc(var(--dir) * -6px)) rotate(calc(var(--dir) * -4deg)) } 100% { transform: none } }
+@keyframes talk-nod { 0%,100% { transform: translateY(0) } 30% { transform: translateY(5px) } 60% { transform: translateY(0) } 80% { transform: translateY(3px) } }
+@keyframes talk-tilt2 { 0%,100% { transform: rotate(0) } 15%,80% { transform: rotate(calc(var(--dir) * -5deg)) } }
 @keyframes talk-sway2 { 0%,100% { transform: rotate(0) } 25% { transform: rotate(3deg) } 75% { transform: rotate(-3deg) } }
 @keyframes talk-shrink { 0%,100% { transform: scale(1) } 30%,70% { transform: scale(0.96,0.94) } }
 @keyframes talk-ring { 0%,100% { transform: rotate(-5deg) } 50% { transform: rotate(5deg) } }
 @keyframes talk-ring-up { 0%,100% { transform: rotate(5deg) } 50% { transform: rotate(-5deg) } }
-@keyframes talk-in { 0% { opacity: 0; transform: translateY(14px) scale(.92) } 100% { opacity: 1; transform: none } }
+@keyframes talk-in { from { transform: scale(.6); opacity: 0 } to { transform: scale(1); opacity: 1 } }
 @keyframes talk-shrinkin { 0% { opacity: 0; transform: translate(var(--fx), var(--fy)) scale(3.2) } 60% { opacity: 1 } 100% { opacity: 1; transform: none } }
-@keyframes talk-bob { 0%,100% { transform: translateY(0) rotate(-3deg) } 50% { transform: translateY(-3px) rotate(3deg) } }
+@keyframes talk-bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
 @keyframes talk-kohop { 0%,86%,100% { transform: translateY(0) } 91% { transform: translateY(-9px) } }
+@keyframes talk-koin { from { transform: translateX(-50%) scale(.4); opacity: 0 } to { transform: translateX(-50%) scale(1); opacity: 1 } }
+@keyframes talk-fly { from { transform: none; opacity: .86 } to { transform: translateY(-120px) scale(.2); opacity: 0 } }
+@keyframes talk-caret { 50% { opacity: 0 } }
+@keyframes talk-slam { 0% { transform: scale(1.9) rotate(-5deg); opacity: 0 } 45% { transform: scale(.9) rotate(2deg); opacity: 1 } 70% { transform: scale(1.05) rotate(-1deg) } 100% { transform: none } }
+@keyframes talk-slowin { from { transform: translateY(12px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes talk-shakeb { 0%,100% { transform: none } 20% { transform: translateX(-6px) rotate(-1deg) } 40% { transform: translateX(5px) rotate(1deg) } 60% { transform: translateX(-3px) } 80% { transform: translateX(2px) } }
+@keyframes talk-quake0 { 0%,100% { transform: none } 25% { transform: translate(2px,-2px) } 50% { transform: translate(-2px,2px) } 75% { transform: translate(1px,1px) } }
+@keyframes talk-quake1 { 0%,100% { transform: none } 25% { transform: translate(2px,-2px) } 50% { transform: translate(-2px,2px) } 75% { transform: translate(1px,1px) } }
+@keyframes talk-fadeout { to { opacity: 0 } }
+@keyframes talk-fadein { from { opacity: 0 } to { opacity: 1 } }
+@keyframes talk-pulse { 0%,100% { box-shadow: 0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55) } 50% { box-shadow: 0 0 0 14px rgba(223,230,255,.08),0 0 48px rgba(160,180,255,.8) } }
+@keyframes talk-squash { 0% { transform: scale(1,1) } 35% { transform: scale(1.04,.95) } 70% { transform: scale(.98,1.03) } 100% { transform: scale(1,1) } }
 @keyframes talk-pop { 0% { transform: scale(1); opacity: 1 } 40% { transform: scale(1.35); opacity: 1 } 100% { transform: scale(1.7); opacity: 0 } }
 @keyframes talk-roll { 0% { transform: translateX(-26px) rotate(-300deg) scale(.4); opacity: 0 } 70% { opacity: 1 } 100% { transform: none; opacity: 1 } }
-@keyframes talk-drift { 0% { transform: translate3d(-1.5%, 0, 0) scale(1.08) } 100% { transform: translate3d(1.5%, -1%, 0) scale(1.08) } }
+@keyframes talk-drift { from { transform: translate3d(0,0,0) scale(1.02) } to { transform: translate3d(-2%,1%,0) scale(1.06) } }
 `;

@@ -4,7 +4,7 @@ import sharp from 'sharp';
 /**
  * 隣に並ぶトーク (M-R232〜M-R235): what the talk needs of a look, made in the background when a look is decided —
  * the six expressions (your own: four), an eyes-closed and an open-mouth edit of the faces that talk most, cut down to
- * small patches with where they sit (found by differencing, like scripts/kimorin/build.py), and the コロリン mini.
+ * small patches with where they sit (found by differencing, like scripts/kimorin/build.py) (M-R241: no コロリン mini any more).
  * Kept in onboardingJson `talk.me` / `talk.bati` (JSON TalkLook, `of` = the picture it was made from).
  */
 export type TalkWho = 'me' | 'bati';
@@ -29,13 +29,6 @@ export const talkFacePrompt = (f: TalkFace) => `Edit the first picture. ${KEEP} 
 export const TALK_BLINK_PROMPT = `Edit the first picture. ${KEEP} Change only the eyes: both eyes gently closed, as soft curved lines, as in the middle of a blink. Nothing else changes, not even a pixel of the pose. No text, no letters.`;
 /** M-R235: the same picture with only the mouth open (the lip flap) */
 export const TALK_MOUTH_PROMPT = `Edit the first picture. ${KEEP} Change only the mouth: open it a little, as in the middle of saying "a", a small rounded open mouth. Nothing else changes, not even a pixel of the pose. No text, no letters.`;
-/** M-R233: the コロリン mini — the look as a small round chibi, holding a blank word tag in both hands */
-export const TALK_KORORIN_PROMPT =
-  'Draw the character of the attached picture as a tiny, very round chibi mascot: a big round head and a small round body (about 1.5 heads tall), the same ' +
-  'face, hair, ears, clothes and colours, simplified and soft, like a round rolling toy. Full body, facing the viewer, holding a small blank cream-coloured ' +
-  'word tag in both hands in front of the tummy (nothing written on it). The whole figure inside the frame with margin, on a perfectly flat plain mid-grey ' +
-  'background (#808080), no floor, no shadow. Safe for children. No text, no letters.';
-
 /** the parts of a picture that changed between two edits: diff → the region → its box (fractions) */
 export interface FoundPart {
   box: PartBox;

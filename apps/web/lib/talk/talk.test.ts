@@ -1,4 +1,4 @@
-import { kororinRing, selfFace, talkExpression } from '@obolo/shared';
+import { selfFace, talkExpression } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { DAY3 } from '../onboarding/day3';
 import { labelIndex, type Step } from '../onboarding/script';
@@ -18,23 +18,15 @@ function walk(steps: Step[], from: number, reply: string, stop: (s: Step) => boo
   return out;
 }
 
-describe('M-R233 the ring becomes コロリン at D04-S005c', () => {
-  const dv = DAY3.findIndex((s) => s.t === 'dachivoice');
-  for (const reply of ['reply', 'later'])
-    it(`plays the switch and its lines (${reply})`, () => {
-      const seen = walk(DAY3, dv + 1, reply, (s) => s.t === 'scene');
-      const fx = seen.findIndex((s) => s.t === 'fx' && s.fx === 'kororin-ring');
-      expect(fx).toBeGreaterThan(0);
-      expect(seen[fx + 1]).toEqual({ t: 'set', key: 'f_kororin_ring', value: 'true' });
-      const said = seen.flatMap((s) => (s.t === 'say' ? [s.text] : []));
-      expect(said).toContain('見て見て！　話した言葉が、ぜんぶ、コロリンになった！');
-      expect(said).toContain('……私の言葉は、コロリンになっても、可愛いですね。');
-      expect(said.includes('……私にも、送っていいですよ。返事は、気が向いたら、しますので。')).toBe(reply === 'later');
-    });
-  it('is kept with the day (and any later day shows it)', () => {
-    expect(kororinRing({ journeyDay: 3, story: { 'd3.f_kororin_ring': 'true' } })).toBe(true);
-    expect(kororinRing({ journeyDay: 3, story: {} })).toBe(false);
-    expect(kororinRing({ journeyDay: 4 })).toBe(true);
+describe('M-R241 no ring, no コロリン', () => {
+  it('D04-S005c plays no コロリン switch any more', () => {
+    expect(DAY3.some((s) => s.t === 'fx' && (s.fx as string) === 'kororin-ring')).toBe(false);
+    expect(DAY3.some((s) => s.t === 'set' && s.key === 'f_kororin_ring')).toBe(false);
+    const dv = DAY3.findIndex((s) => s.t === 'dachivoice');
+    for (const reply of ['reply', 'later']) {
+      const said = walk(DAY3, dv + 1, reply, (s) => s.t === 'scene').flatMap((s) => (s.t === 'say' ? [s.text] : []));
+      expect(said.some((t) => t.includes('コロリンになった'))).toBe(false);
+    }
   });
 });
 
@@ -67,12 +59,14 @@ describe('M-R238 faces from the words, sentence by sentence', () => {
   it('follows the rules when no AI can be had', async () => {
     const { ruleBeats, talkSentences } = await import('@obolo/shared');
     expect(talkSentences('やったー！　でも、ちょっと不安かも……')).toEqual(['やったー！', 'でも、ちょっと不安かも……']);
-    expect(ruleBeats('やったー！　でも、ちょっと不安かも……')).toEqual([{ face: 'smile', motion: 'hop' }, { face: 'sad' }]);
+    expect(ruleBeats('やったー！　でも、ちょっと不安かも……')).toEqual([{ face: 'smile', motion: 'hop' }, { face: 'sad', in: 'slow', shape: 'cloud' }]);
     expect(ruleBeats('これ、なに？')).toEqual([{ face: 'thinking', motion: 'tilt' }]);
-    expect(ruleBeats('えっ、本当！？')).toEqual([{ face: 'surprised', motion: 'lean' }]);
+    // M-R243: 「！？」 slams in as a jagged shout
+    expect(ruleBeats('えっ、本当！？')).toEqual([{ face: 'surprised', motion: 'lean', in: 'slam', shape: 'burst' }]);
+    expect(ruleBeats('ひそひそ、ないしょだよ。')).toEqual([{ face: 'normal', in: 'slow', shape: 'whisper' }]);
     expect(ruleBeats('ふふ笑')).toEqual([{ face: 'smile' }]);
     expect(ruleBeats('そうなんだ。')).toEqual([{ face: 'normal' }]);
     // your own look: a dark sentence stays plain
-    expect(ruleBeats('ちょっと不安……', true)).toEqual([{ face: 'normal' }]);
+    expect(ruleBeats('ちょっと不安……', true)).toEqual([{ face: 'normal', in: 'slow', shape: 'cloud' }]);
   });
 });

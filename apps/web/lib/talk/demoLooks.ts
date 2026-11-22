@@ -1,4 +1,4 @@
-import { TALK_FACES, type PartBox, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
+import { TALK_FACES, type PartBox, type TalkExpression, type TalkFace, type TalkLook, type TalkPose } from '@obolo/shared';
 
 /**
  * Stand-in looks for the side-by-side talk (M-R232〜M-R235) in the demo, the tests and the review pages — nothing is
@@ -104,8 +104,29 @@ function demoLook(of: string, g: Geo, body: string, extra: (f: TalkFace) => stri
     faces[f] = f === 'normal' || f === 'smile' ? { kind: 'image', url, blink: blinkPatch(g, eyesBox), eyesBox, mouth: mouthPatch(g, mouthBox), mouthBox } : { kind: 'image', url };
   }
   const stand = (faces.normal as { url: string }).url;
-  return { of, stand, faces, kororin: null };
+  return { of, stand, faces };
 }
 
 /** the review page's group: a few demo looks in different colours */
 export const DEMO_GROUP_SEEDS = ['あお', 'みどり', 'もも', 'きいろ', 'むらさき', 'しろ', 'あか'];
+
+/**
+ * The client's talk cast (design/talk on the story branch → public/talk): a NEO, a dachi and a {bati}, each with its
+ * faces, an eyes-closed and an open-mouth picture (whole pictures, aligned to the same body: the blink and the lip flap
+ * swap the whole figure) and its コロリン. The demo, the tests and the review page stand them in for generated looks.
+ */
+export type CastId = 'user' | 'friend' | 'bati';
+const CAST_FACES: Record<CastId, TalkFace[]> = {
+  user: ['normal', 'smile', 'surprised', 'shy'],
+  friend: [...TALK_FACES],
+  bati: [...TALK_FACES],
+};
+export function castLook(id: CastId, of = `cast-${id}`): TalkLook {
+  const u = (f: string) => `/talk/${id}/${f}.webp`;
+  // M-R240, one shared canvas (same size, same feet, headroom for raised arms): the plain stand with its blink and open
+  // mouth, and a pose for each expression with its open mouth (the smile's pose blinks too)
+  const faces: Partial<Record<TalkFace, TalkExpression>> = { normal: { kind: 'image', url: u('stand'), blink: u('stand-blink'), mouth: u('stand-talk') } };
+  const poses: Partial<Record<TalkFace, TalkPose>> = {};
+  for (const f of CAST_FACES[id]) if (f !== 'normal') poses[f] = { url: u(`${f}-pose`), mouth: u(`${f}-pose-talk`), ...(f === 'smile' ? { blink: u('smile-pose-blink') } : {}) };
+  return { of, stand: u('stand'), faces, poses };
+}

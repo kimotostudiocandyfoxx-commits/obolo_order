@@ -1,24 +1,24 @@
 'use client';
 
-import { ruleBeats, talkSentences, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
+import { ruleBeats, talkChunks, talkPlain, talkRuns, talkSentences, type TalkMark, type TalkIn, type TalkShape, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
 import { holdProps, StarButton } from '@/components/finds/MarkRing';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Figure, TALK_CSS, type FigureState } from './Figure';
+import { SELF_TONES, TONES, toneOf, type TalkTone } from '@/lib/talk/looks';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 
 const MUTE_KEY = 'obolo.talk.muted';
 
 /**
- * 隣に並ぶトーク (M-R232〜M-R235, docs/story-rewrite/会話の画面.md): the talk where the speakers stand side by side in the
- * lower half (you always at the right), with the place behind them. At most two bubbles over the heads — the new one
- * just above its speaker's head (its tail at them), the one before above it. When a third comes, the top one shrinks
- * into a circle at 12 o'clock of the ring above the two; the ring goes clockwise (12 = newest), eight at most — the
- * rest are in 〔過去の言葉〕 at the left. A circle shows the speaker's small face, the first few characters and their
- * colour (you: blue); a tap opens it as a bubble. From D04-S005c the circles are コロリン (M-R233). A long reply's
- * bubble reaches down and scrolls; a card sits small in its bubble and opens big on a tap. Three or more: everyone
- * in one row (you at the right end), up to five full length, six or more chest up in two rows; the one speaking steps
- * forward and glows; the group's name and count small at the top.
+ * 隣に並ぶトーク (M-R232〜M-R242, docs/story-rewrite/会話の画面.md, design/talk/proto.html): only the two standing side by
+ * side low on the screen (you always at the right) with the place behind them, and at most two bubbles over their heads
+ * (the newest lower, its tail toward its speaker). No ring, no circles (M-R241). Expressions and poses change with the
+ * words, sentence by sentence (M-R238/M-R240); the camera moves in toward the one speaking (M-R242). Going back: dragging
+ * down brings the past bubbles down one by one and both stand as they were then; 〔いまに戻る〕 comes back. A long bubble
+ * scrolls inside; a card sits small in its bubble and opens big on a tap. Three or more: everyone in one row (you at the
+ * right end), up to five full length, six or more chest up in two rows; the one speaking steps forward and glows; the
+ * group's name and count small at the top.
  */
 export type TalkPerson = {
   id: string;
@@ -28,6 +28,8 @@ export type TalkPerson = {
   self?: boolean;
   /** a round icon for the small face (else the look's head is cut round) */
   avatar?: string | null;
+  /** M-R245: the bubble colour (fixed per person); none = from `color` (you: 月光パール, {bati}: はちみつ, a dachi: セージ) */
+  tone?: TalkTone;
 };
 
 export type TalkItem = {
@@ -55,20 +57,64 @@ export type TalkItem = {
   mark?: { kind: MarkedKind; id: string };
 };
 
-const RING_MAX = 8;
 
-/** a line being said: its words come out over `dur`; `cuts` = where each sentence ends (characters) */
-type Speech = { id: string; who: string; start: number; dur: number; len: number; cuts: number[]; beats: TalkBeat[]; typed: boolean; mouth: boolean; text: boolean; level?: () => number; clip?: Clip };
+/**
+ * a line being said: its words come out on a timeline (`times[i]` = ms when the i-th character shows), sentence by
+ * sentence at each sentence's pace (M-R243, the prototype: 60 ms a character, 34 for a slam, 105 for a slow one; a
+ * longer stop at 、。！？…, and 0.65 s between sentences); `cuts` = where each sentence ends (characters of the plain words)
+ */
+type Speech = { id: string; who: string; start: number; dur: number; len: number; cuts: number[]; times: number[]; beats: TalkBeat[]; typed: boolean; mouth: boolean; text: boolean; level?: () => number; clip?: Clip };
 function speechOf(it: TalkItem, beats: TalkBeat[], streamed: boolean): Speech {
-  const len = [...it.text].length;
+  const plain = [...talkPlain(it.text)];
+  const len = plain.length;
   const parts = talkSentences(it.text);
-  let c = 0;
-  const cuts = parts.map((p) => (c += [...p].length + 1));
-  const dur = streamed ? Math.max(900, parts.length * 900) : Math.min(7000, Math.max(1200, len * 75));
-  return { id: it.id, who: it.who, start: Date.now(), dur, len: streamed ? cuts[cuts.length - 1] ?? len : len, cuts, beats, typed: !streamed, mouth: !streamed, text: len > 0 };
+  const flat = plain.join('');
+  let from = 0;
+  const cuts = parts.map((p) => {
+    const i = flat.indexOf(p, from);
+    from = (i < 0 ? from : i) + p.length;
+    return [...flat.slice(0, from)].length;
+  });
+  const times: number[] = [];
+  let t = 0;
+  let k = 0;
+  for (let i = 0; i < len; i++) {
+    while (k < cuts.length - 1 && i >= cuts[k]) {
+      k++;
+      t += 650;
+    }
+    const pace = beats[Math.min(k, beats.length - 1)]?.in;
+    const prev = plain[i - 1] ?? '';
+    t += /[、。！？…!?]/.test(prev) ? (pace === 'slow' ? 380 : 210) : pace === 'slow' ? 105 : pace === 'slam' ? 34 : 60;
+    times.push(t);
+  }
+  const dur = streamed ? Math.max(900, parts.length * 900) : Math.max(900, t + 250);
+  return { id: it.id, who: it.who, start: Date.now(), dur, len, cuts, times, beats, typed: !streamed, mouth: !streamed, text: len > 0 };
 }
-/** where the k-th newest circle sits: degrees from 12 o'clock, clockwise; past 3 o'clock it comes round from the left */
-const SLOT = [0, 25, 50, 75, 100, -75, -50, -25];
+/** M-R244: one bubble of an utterance (its words as written, where they start among the plain characters, its sentences) */
+type Unit = { key: string; item: TalkItem; text: string; first: boolean; last: boolean; from: number; len: number; s0: number; s1: number; beats: TalkBeat[] };
+function unitsOf(it: TalkItem, beats: TalkBeat[]): Unit[] {
+  if (!it.text) return [{ key: it.id, item: it, text: '', first: true, last: true, from: 0, len: 0, s0: 0, s1: 1, beats }];
+  const chunks = talkChunks(it.text, beats);
+  let from = 0;
+  return chunks.map((c, k) => {
+    const len = [...talkPlain(c.text)].length;
+    const u = { key: chunks.length > 1 ? `${it.id}#${k}` : it.id, item: it, text: c.text, first: k === 0, last: k === chunks.length - 1, from, len, s0: c.from, s1: c.to, beats: beats.slice(c.from, c.to) };
+    from += len;
+    return u;
+  });
+}
+/** how many characters are out after `ms` */
+const charsAt = (sp: Speech, ms: number) => {
+  if (!sp.typed) return Math.floor((ms / sp.dur) * sp.len);
+  let n = 0;
+  while (n < sp.times.length && sp.times[n] <= ms) n++;
+  return n;
+};
+/** the prototype's glass round button (design/talk/proto.html .ib) */
+const GLASS = 'relative grid h-[42px] w-[42px] flex-none place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px]';
+const PILL = 'rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.6)] px-5 py-2 text-[13px] font-bold text-[#f4f1ff] backdrop-blur-[10px]';
+export const TALK_FONT = "'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic',system-ui,sans-serif";
 const LONG = 70;
 
 const reducedQuery = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -78,7 +124,6 @@ export function TalkScene({
   items,
   thinking,
   listening = false,
-  kororin = false,
   place,
   group,
   composer,
@@ -87,10 +132,13 @@ export function TalkScene({
   fixedSelfFace = false,
   audioSrc,
   onPlayingChange,
-  logLabel = '過去の言葉',
   unreadFrom,
   loading = false,
   onRing,
+  bar,
+  hint = true,
+  askTone = false,
+  onTone,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -98,8 +146,6 @@ export function TalkScene({
   thinking?: string | null;
   /** you are recording or typing: the others turn to you and nod */
   listening?: boolean;
-  /** M-R233: the ring shows コロリン */
-  kororin?: boolean;
   /** the place behind them (an image URL); none = what is behind the talk */
   place?: string;
   group?: { name: string; count: number };
@@ -112,13 +158,19 @@ export function TalkScene({
   fixedSelfFace?: boolean;
   audioSrc?: (url: string) => Promise<string | null>;
   onPlayingChange?: (playing: boolean) => void;
-  logLabel?: string;
   /** M-R239: the first unread line (opening plays the last read one and every unread one); none = nothing unread */
   unreadFrom?: number | null;
   /** the lines are still being loaded (what is there when they come counts as already said) */
   loading?: boolean;
   /** M-R236: a long press on a line (its ★ / mark ring) */
   onRing?: (item: TalkItem, at: { x: number; y: number }) => void;
+  /** the top bar (glass buttons): the conversations (or 〔過去の言葉〕), the partner's name, the mute and Bluena */
+  bar?: { title: ReactNode; onList?: () => void; onBluena?: () => void; unread?: boolean; left?: ReactNode; right?: ReactNode };
+  /** 「画面を押すと、次の言葉へ進みます」 while lines are played in a row */
+  hint?: boolean;
+  /** M-R245: show the one-time picker of your bubble colour */
+  askTone?: boolean;
+  onTone?: (id: string) => void;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -259,18 +311,32 @@ export function TalkScene({
   const at = speech ? Math.min(1, (now - speech.start) / speech.dur) : 1;
   const beatNow = (() => {
     if (!speech || at >= 1 || !speech.beats.length) return null;
-    const k = speech.typed || speech.text ? Math.max(0, speech.cuts.findIndex((c) => c > at * speech.len)) : Math.floor(at * speech.beats.length);
+    const out = charsAt(speech, now - speech.start);
+    const idx = speech.cuts.findIndex((c) => c > out);
+    const k = speech.typed || speech.text ? (idx < 0 ? speech.cuts.length - 1 : idx) : Math.floor(at * speech.beats.length);
     return { who: speech.who, beat: speech.beats[Math.min(k, speech.beats.length - 1)], k };
   })();
   // a new sentence: its motion, once, and its face
   const lastBeat = useRef<string>('');
+  const [quake, setQuake] = useState(0);
+  /** the bubble's shape and entrance: the sentence being said now, else its last sentence's */
+  const bubbleBeat = (it: TalkItem): { shape?: TalkShape; in?: TalkIn; key: number } => {
+    if (speech?.id === it.id && beatNow) return { shape: beatNow.beat?.shape, in: beatNow.beat?.in, key: beatNow.k };
+    const b = beatsOf(it);
+    const l = b[b.length - 1];
+    return { shape: l?.shape, key: -1 };
+  };
   useEffect(() => {
     if (!beatNow?.beat) return;
     const key = `${speech?.id}:${speech?.start}:${beatNow.k}`;
     if (key === lastBeat.current) return;
     lastBeat.current = key;
     const { who, beat } = beatNow;
+    // M-R243: a slam shakes the whole screen a little (0.28 s)
+    if (beat.in === 'slam' && !reduced) setQuake((q) => q + 1);
     if (beat.motion && beat.motion !== 'none') setReact((r) => ({ ...r, [who]: { motion: beat.motion!, key: (r[who]?.key ?? 0) + 1 } }));
+    // the one listening nods to each sentence (a group's quiet ones keep still)
+    if (people.length <= 2) for (const p of people) if (p.id !== who) setReact((r) => ({ ...r, [p.id]: { motion: 'nod', key: (r[p.id]?.key ?? 0) + 1 } }));
     setHold((h) => ({ ...h, [who]: { face: beat.face, until: Date.now() + 99_000 } }));
   });
   // the end: the last face stays a little, then plain again; the next line of a row
@@ -282,18 +348,94 @@ export function TalkScene({
   const faces = hold;
   const playing = cursor != null || !!speech;
 
-  // a tap goes on to the next line, a long press to the end (M-R239); any tap also lets the voices sound (iOS)
-  const press = useRef(0);
+  // before the first play starts (the very first paint), already only up to the line it starts from
+  const pending = !seen.current && !loading && unreadFrom != null && unreadFrom >= 0 && unreadFrom < items.length ? Math.max(0, unreadFrom - 1) : null;
+  const upTo = cursor ?? pending;
+  const said = (it: TalkItem) => !!(it.text || it.card || it.voice || it.chips?.length || it.extra);
+  const visible = (upTo == null ? items : items.slice(0, upTo + 1)).filter(said);
+  // M-R244: a long utterance is shown as several bubbles in a row (the words unchanged; the cuts from the same call as
+  // the faces, else every ~60 characters at a sentence end); while it is said, its bubbles come one by one
+  const outNow = speech && speech.typed && at < 1 ? charsAt(speech, now - speech.start) : null;
+  const units: Unit[] = visible.flatMap((it) => {
+    const list = unitsOf(it, beatsOf(it));
+    if (outNow == null || speech?.id !== it.id) return list;
+    return list.filter((u) => u.first || u.from < outNow);
+  });
+
+  // M-R241: going back — dragging down brings the past bubbles down from above one by one (one step per 64 px), dragging
+  // up goes toward the newest; where the finger lets go it stays. Meanwhile the row stops, both stand as they were then
+  // and a small 〔いまに戻る〕 shows.
+  const [back, setBack] = useState(0);
+  const backRef = useRef(0);
+  backRef.current = back;
+  const resumeAt = useRef<number | null>(null);
+  const backToNow = () => {
+    setBack(0);
+    const r = resumeAt.current;
+    resumeAt.current = null;
+    // a row that was stopped goes on from the line it stopped at
+    if (r != null && r < itemsRef.current.length) setTimeout(() => alive.current && playFrom(r), 300);
+  };
+  const goBack = (v: number) => {
+    const max = Math.max(0, units.length - 1);
+    const nv = Math.max(0, Math.min(max, v));
+    if (nv === backRef.current) return;
+    if (nv > 0 && backRef.current === 0) {
+      // stop the row (and what is being said) where it is
+      resumeAt.current = cursor;
+      after.current = null;
+      stopClip();
+      setSpeech(null);
+      onPlayingChange?.(false);
+    }
+    backRef.current = nv;
+    if (nv === 0) return backToNow();
+    setBack(nv);
+  };
+  const end = units.length - back;
+  const shown = units.slice(Math.max(0, end - 2), end);
+  const past = back > 0;
+  /** the face someone had at their last line up to the one in view (their last sentence's) */
+  const faceThen = (id: string): TalkFace => {
+    for (let i = end - 1; i >= 0; i--) {
+      const it = units[i].item;
+      if (it.who !== id) continue;
+      // the face of the last sentence of that bubble
+      const b = units[i].beats;
+      return b[b.length - 1]?.face ?? 'normal';
+    }
+    return 'normal';
+  };
+
+  // a tap goes on to the next line, a long press to the end (M-R239); a drag goes back (M-R241); a tap in the past comes
+  // back to now; any tap also lets the voices sound (iOS)
+  const press = useRef<{ at: number; y: number; acc: number; moved: boolean } | null>(null);
+  const wheel = useRef(0);
+  const STEP_PX = 64;
   const onDown = (e: React.PointerEvent) => {
     unlockAudio();
-    if ((e.target as HTMLElement).closest('button,a,input,textarea,label')) return (press.current = 0);
-    press.current = Date.now();
+    if ((e.target as HTMLElement).closest('button,a,input,textarea,label')) return (press.current = null);
+    press.current = { at: Date.now(), y: e.clientY, acc: 0, moved: false };
+  };
+  const onMove = (e: React.PointerEvent) => {
+    const pr = press.current;
+    if (!pr) return;
+    pr.acc += e.clientY - pr.y;
+    pr.y = e.clientY;
+    if (Math.abs(pr.acc) > 10) pr.moved = true;
+    while (Math.abs(pr.acc) >= STEP_PX) {
+      const dir = Math.sign(pr.acc);
+      goBack(backRef.current + dir);
+      pr.acc -= dir * STEP_PX;
+    }
   };
   const onUp = () => {
-    if (!press.current || !playing) return;
-    const long = Date.now() - press.current > 550;
-    press.current = 0;
-    if (long) return skipAll();
+    const pr = press.current;
+    press.current = null;
+    if (!pr || pr.moved) return;
+    if (backRef.current > 0) return backToNow();
+    if (!playing) return;
+    if (Date.now() - pr.at > 550) return skipAll();
     if (cursor != null) {
       const next = cursor + 1;
       after.current = null;
@@ -303,169 +445,192 @@ export function TalkScene({
       else setCursor(null);
     } else finish();
   };
-  // before the first play starts (the very first paint), already only up to the line it starts from
-  const pending = !seen.current && !loading && unreadFrom != null && unreadFrom >= 0 && unreadFrom < items.length ? Math.max(0, unreadFrom - 1) : null;
-  const upTo = cursor ?? pending;
-  const visible = upTo == null ? items : items.slice(0, upTo + 1);
+  const onWheel = (e: React.WheelEvent) => {
+    wheel.current += -e.deltaY;
+    while (Math.abs(wheel.current) >= STEP_PX) {
+      const dir = Math.sign(wheel.current);
+      goBack(backRef.current + dir);
+      wheel.current -= dir * STEP_PX;
+    }
+  };
 
-  // the two bubbles, the ring, the rest
-  const shown = visible.slice(-2);
-  const ring = visible.slice(0, -2).reverse().slice(0, RING_MAX);
-  const older = visible.length - 2 - ring.length;
+  // the top bubble when a third comes: it floats up and fades
+  const [leaving, setLeaving] = useState<TalkItem | null>(null);
+  const lastTop = useRef<string[]>([]);
+  useEffect(() => {
+    const ids = shown.map((x) => x.key);
+    const prev = lastTop.current;
+    lastTop.current = ids;
+    const gone = prev.find((id) => !ids.includes(id));
+    const out = gone ? units.find((x) => x.key === gone) : undefined;
+    if (!out || reduced || past) return;
+    setLeaving({ ...out.item, id: out.key, text: out.text });
+    const t = setTimeout(() => setLeaving(null), 620);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown.map((x) => x.key).join('|')]);
   const [opened, setOpened] = useState<TalkItem | null>(null);
   const [big, setBig] = useState<TalkItem | null>(null);
-  const [log, setLog] = useState(false);
 
-  // M-R233: the moment the ring becomes コロリン — the rims pop one by one and the コロリン roll out
-  const wasK = useRef(kororin);
-  const [popAt, setPopAt] = useState(0);
+  // M-R242 the camera: while a line plays it moves in toward the one speaking (the stage to 1.1 from their side, 3% their
+  // way, 0.9 s; the place 1.5% and 1.07, 1.2 s — parallax) and eases back 0.7 s after the line; none in the past
+  const [cam, setCam] = useState<string | null>(null);
   useEffect(() => {
-    if (kororin && !wasK.current) setPopAt(Date.now());
-    wasK.current = kororin;
-  }, [kororin]);
+    if (reduced || past) return setCam(null);
+    if (talkingId) return setCam(talkingId);
+    const t = setTimeout(() => setCam(null), 700);
+    return () => clearTimeout(t);
+  }, [talkingId, past, reduced]);
 
-  // the layout (portrait first)
+  // the layout (phone portrait first; the client's prototype, design/talk/proto.html)
   const { w, h } = size;
-  const composerH = keyboard ? 64 : 104;
-  const floor = h - composerH - 6;
+  const barH = bar ? 62 : 0;
+  const dockH = keyboard ? 64 : 110;
   const chest = keyboard || n >= 6;
-  const figH = chest ? Math.min(h * 0.24, 200) * (n >= 6 ? 0.78 : 1) : Math.max(110, Math.min(h * (n <= 2 ? 0.4 : n <= 3 ? 0.34 : 0.29), 360, n >= 3 ? (w / n) * 1.6 : 999));
+  // the pair stands low (design/talk/proto.html): at most 46% of the height (420 px), each 40% wide with 6% between;
+  // the pictures share one canvas with headroom for raised arms, so the heads are about 16% down into it
+  const stageH = chest ? Math.min(h * 0.26, 220) : Math.min(h * 0.46, 420);
+  const stageTop = h - dockH - stageH;
   const rows = n >= 6 ? [row.slice(0, Math.ceil(n / 2)), row.slice(Math.ceil(n / 2))] : [row];
-  // x of each person (fractions), the front row last
-  const spots = new Map<string, { x: number; bottom: number; h: number; z: number }>();
+  const spots = new Map<string, { x: number; bottom: number; h: number; z: number; w: number }>();
   rows.forEach((r, ri) => {
     const front = ri === rows.length - 1;
-    const hh = figH * (rows.length > 1 ? (front ? 1 : 0.86) : 1);
-    const b = rows.length > 1 && !front ? hh * 0.55 : 0;
+    const back = rows.length > 1 && !front;
+    const hh = n <= 2 ? stageH : stageH * (back ? 0.62 : rows.length > 1 ? 0.7 : n <= 3 ? 0.86 : 0.72);
     r.forEach((p, k) => {
-      const x = n === 2 ? (k === 0 ? 0.3 : 0.7) : n === 1 ? 0.5 : (k + 0.5 + (rows.length > 1 && !front ? 0.25 : 0)) / (r.length + (rows.length > 1 && !front ? 0.5 : 0));
-      spots.set(p.id, { x, bottom: b, h: hh, z: front ? 2 : 1 });
+      const x = n === 2 ? (k === 0 ? 0.27 : 0.73) : n === 1 ? 0.5 : (k + 0.5 + (back ? 0.25 : 0)) / (r.length + (back ? 0.5 : 0));
+      spots.set(p.id, { x, bottom: back ? stageH * 0.42 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : 0.9 / r.length });
     });
   });
-  const headY = floor - figH * (rows.length > 1 ? 1.5 : 1) + (chest ? 0 : figH * 0.04);
-  // the ring: a half ellipse over the bubbles' place (9 → 12 → 3 o'clock), its ends at the sides beside the bubbles
-  const cx = w / 2;
-  const zone = Math.min(190, Math.max(120, (headY - top) * 0.45));
-  const cy = Math.max(top + 110, headY - zone);
-  const rx = w / 2 - 30;
-  const ry = Math.max(70, Math.min(cy - top - 34, 160));
-  const slot = (k: number) => {
-    const a = (SLOT[k] * Math.PI) / 180;
-    return { x: cx + rx * Math.sin(a), y: cy - ry * Math.cos(a) };
-  };
-  const last = shown[shown.length - 1];
-  const long = !!last && (last.text.length > LONG || !!last.card);
-  const bubbleBottom = h - (headY - 6);
-  const bubbleTop = cy + 4;
+  const heads = stageTop + stageH * (chest ? 0.1 : 0.16) * (rows.length > 1 ? 0.5 : 1);
+  // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
+  const room = Math.max(120, heads - (barH + top + 56) - 48);
+  const bubbleBottom = h - heads + 8;
+  // the camera's side: the one speaking (a group pushes toward them the same way)
+  const camX = cam ? (spots.get(cam)?.x ?? 0.5) : 0.5;
+  const camShift = n <= 2 ? (camX < 0.5 ? 3 : -3) : (0.5 - camX) * 6;
 
-  const stateOf = (p: TalkPerson): FigureState => (thinking === p.id ? 'think' : talkingId === p.id ? 'talk' : listening && !p.self ? 'listen' : 'idle');
+  const stateOf = (p: TalkPerson): FigureState => (past ? 'idle' : thinking === p.id ? 'think' : talkingId === p.id ? 'talk' : listening && !p.self ? 'listen' : 'idle');
   const faceOf = (p: TalkPerson): TalkFace => {
+    // in the past: the face (and pose) they had at that line
+    const pick = (face: TalkFace) => (p.self ? (fixedSelfFace ? 'normal' : face === 'sad' || face === 'thinking' ? 'normal' : face) : face);
+    if (past) return pick(faceThen(p.id));
     if (thinking === p.id) return 'thinking';
     const f = faces[p.id];
-    const face = f && f.until > now ? f.face : 'normal';
-    if (p.self) return fixedSelfFace ? 'normal' : face === 'sad' || face === 'thinking' ? 'normal' : face;
-    return face;
+    return pick(f && f.until > now ? f.face : 'normal');
   };
-
-  const speakerX = (id: string) => (spots.get(id)?.x ?? 0.5) * w;
+  const toggleMute = () => {
+    const m = !muted;
+    setMuted(m);
+    if (m) stopClip();
+    try {
+      localStorage.setItem(MUTE_KEY, m ? '1' : '0');
+    } catch {
+      /* no storage */
+    }
+  };
+  const muteButton = (
+    <button onClick={toggleMute} aria-label={muted ? '声を出す' : '声を消す'} aria-pressed={muted} className={GLASS}>
+      <SpeakerGlyph off={muted} />
+    </button>
+  );
+  const ease = 'cubic-bezier(.33,.1,.2,1)';
 
   return (
-    <div ref={wrap} className="relative min-h-0 flex-1 overflow-hidden" onPointerDown={onDown} onPointerUp={onUp}>
+    <div
+      ref={wrap}
+      className="relative min-h-0 flex-1 touch-none select-none overflow-hidden bg-[#070b24] text-[#f4f1ff]"
+      style={{ fontFamily: TALK_FONT, WebkitTapHighlightColor: 'transparent', animation: quake && !reduced ? `talk-quake${quake % 2} .28s linear` : undefined }}
+      onPointerDown={onDown}
+      onPointerMove={onMove}
+      onPointerUp={onUp}
+      onPointerCancel={() => (press.current = null)}
+      onWheel={onWheel}
+    >
       <style>{TALK_CSS}</style>
-      {/* M-R239: the voice is on from the start; a small mute at the top (kept on this device) */}
-      <button
-        onClick={() => {
-          const m = !muted;
-          setMuted(m);
-          if (m) stopClip();
-          try {
-            localStorage.setItem(MUTE_KEY, m ? '1' : '0');
-          } catch {
-            /* no storage */
-          }
-        }}
-        aria-label={muted ? '声を出す' : '声を消す'}
-        aria-pressed={muted}
-        className="absolute right-2 z-[7] flex h-8 w-8 items-center justify-center rounded-full border border-amber-200/25 bg-black/45 text-amber-100/85 backdrop-blur"
-        style={{ top: top + 4 }}
-      >
-        <SpeakerGlyph off={muted} />
-      </button>
-      {/* the place, drifting very slowly behind the two (depth) */}
+      {/* the place, drifting very slowly behind the two; the camera moves it a little less than them (parallax) */}
       {place && (
-        <div className="absolute inset-0 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={place} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ animation: reduced ? undefined : 'talk-drift 38s ease-in-out infinite alternate', transform: 'scale(1.08)' }} />
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,6,15,0.55),rgba(5,6,15,0.05)_45%,rgba(5,6,15,0.65))]" />
-        </div>
-      )}
-
-      {group && (
-        <p className="absolute inset-x-0 z-[6] text-center text-[11px] tracking-[0.2em] text-amber-100/75" style={{ top }}>
-          {group.name}・{group.count}人
-        </p>
-      )}
-
-      {/* the ring (a faint track and the circles), slowly rocking */}
-      {ring.length > 0 && !keyboard && (
-        <div className="pointer-events-none absolute inset-0 z-[3]">
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            <path d={`M ${cx - rx} ${cy} A ${rx} ${ry} 0 0 1 ${cx + rx} ${cy}`} stroke="rgba(255,236,190,0.16)" strokeWidth="1.2" strokeDasharray="2 6" fill="none" />
-          </svg>
-          <div className="absolute inset-0" style={{ transformOrigin: `${cx}px ${cy}px`, animation: reduced ? undefined : 'talk-ring 16s ease-in-out infinite' }}>
-            {ring.map((it, k) => {
-              const p = slot(k);
-              const who = byId.get(it.who);
-              const fresh = k === 0;
-              return (
-                <span key={it.id} className="absolute" style={{ left: p.x, top: p.y }}>
-                <button
-                  onClick={() => setOpened(it)}
-                  {...(it.mark && onRing ? holdProps((at) => onRing(it, at)) : {})}
-                  aria-label={`${it.name ?? who?.name ?? ''}：${it.text}`}
-                  className="pointer-events-auto absolute left-0 top-0"
-                  style={{ transform: 'translate(-50%,-50%)' }}
-                >
-                  <span className="block" style={{ animation: reduced ? undefined : 'talk-ring-up 16s ease-in-out infinite' }}>
-                    <span
-                      key={`${it.id}-${fresh}`}
-                      className="block"
-                      style={fresh && !reduced ? { ['--fx' as string]: `${(speakerX(it.who) - p.x) * 0.4}px`, ['--fy' as string]: `${(bubbleBottom > 0 ? h - bubbleBottom - p.y - 90 : 60) * 0.6}px`, animation: 'talk-shrinkin .6s cubic-bezier(.2,.8,.2,1) both' } : undefined}
-                    >
-                      {kororin ? <Kororin item={it} who={who} k={k} popAt={popAt} reduced={reduced} /> : <Circle item={it} who={who} />}
-                    </span>
-                  </span>
-                </button>
-                {it.mark && <StarButton kind={it.mark.kind} id={it.mark.id} size={9} onRing={onRing ? (at) => onRing(it, at) : undefined} className="pointer-events-auto absolute left-[14px] top-[-34px]" />}
-                </span>
-              );
-            })}
+        <div className="pointer-events-none absolute inset-0" style={{ transform: cam ? `translateX(${camShift / 2}%) scale(1.07)` : undefined, transition: `transform 1.2s ${ease}` }}>
+          <div className="absolute inset-[-4%_-4%_0]" style={{ animation: reduced ? undefined : 'talk-drift 60s ease-in-out infinite alternate' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={place} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
           </div>
         </div>
       )}
 
-      {/* the people, side by side (you at the right) */}
-      <div className="pointer-events-none absolute inset-x-0 z-[2]" style={{ bottom: h - floor, height: figH * 2 }}>
+      {/* the top bar (small): the conversations at the left, the partner's name, the mute and Bluena at the right */}
+      {bar ? (
+        <header className="absolute inset-x-0 z-[20] flex items-center gap-2.5 px-3.5 py-2.5" style={{ top }}>
+          {bar.left ??
+            (bar.onList ? (
+              <button onClick={bar.onList} aria-label="会話の一覧を開く" className={GLASS}>
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+                  <path d="M4 7h16M4 12h11M4 17h7" />
+                </svg>
+                {bar.unread && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-sky-300" />}
+              </button>
+            ) : (
+              <span className="w-[42px] flex-none" />
+            ))}
+          <div className="flex min-w-0 flex-1 flex-col items-center">
+            <b className="truncate text-[15px] font-black tracking-[0.04em] [text-shadow:0_1px_8px_rgba(0,0,0,.5)]">{group ? group.name : bar.title}</b>
+            {group && <span className="text-[11px] font-bold text-[#b9bde6]">{group.count}人</span>}
+          </div>
+          {bar.right}
+          {muteButton}
+          {bar.onBluena && (
+            <button onClick={bar.onBluena} aria-label="Bluenaを開く" className={GLASS}>
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+                <path d="M12 3c4 0 7 6 7 10.5A7 7 0 0 1 5 13.5C5 9 8 3 12 3z" />
+                <circle cx="12" cy="13" r="2.6" />
+              </svg>
+            </button>
+          )}
+        </header>
+      ) : (
+        <div className="absolute right-3.5 z-[20] flex gap-2.5" style={{ top: top + 10 }}>
+          {muteButton}
+        </div>
+      )}
+      {!bar && group && (
+        <p className="absolute inset-x-0 z-[6] text-center text-[12px] font-bold tracking-[0.1em] text-[#f4f1ff]/85" style={{ top: top + 18 }}>
+          {group.name}・{group.count}人
+        </p>
+      )}
+
+      {/* the people, side by side (you at the right), standing low; the camera moves in toward the one speaking */}
+      <div
+        className="pointer-events-none absolute inset-x-0 z-[6]"
+        style={{
+          bottom: dockH,
+          height: stageH,
+          transformOrigin: `${Math.round(camX * 100) === 27 ? 30 : Math.round(camX * 100) === 73 ? 70 : Math.round(camX * 100)}% 85%`,
+          transform: cam ? `scale(1.1) translateX(${camShift}%)` : undefined,
+          transition: `transform .9s ${ease}`,
+          willChange: 'transform',
+        }}
+      >
         {row.map((p, k) => {
           const s = spots.get(p.id)!;
-          const lit = isGroup && talkingId === p.id;
+          const speaking = talkingId === p.id && !past;
           return (
-            <div key={p.id} className="absolute bottom-0 -translate-x-1/2 transition-[bottom,left] duration-300" style={{ left: `${s.x * 100}%`, bottom: s.bottom, zIndex: lit ? 5 : s.z }}>
+            <div key={p.id} className="absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left] duration-300" style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z }}>
               <Figure
                 look={p.look}
                 face={faceOf(p)}
                 state={stateOf(p)}
-                motion={react[p.id]?.motion}
-                motionKey={react[p.id]?.key ?? 0}
+                motion={past ? undefined : react[p.id]?.motion}
+                motionKey={past ? 0 : (react[p.id]?.key ?? 0)}
                 toward={p.self ? 'left' : 'right'}
                 height={s.h}
                 chest={chest}
-                // the two breathe at their own pace (in step would look mechanical)
-                breath={3.3 + ((k * 0.37) % 0.8)}
-                calm={isGroup && !lit && talkingId != null}
+                // the two breathe at their own pace (in step would look mechanical): 3.4 s and 4.1 s
+                breath={p.self ? 4.1 : 3.4 + ((k * 0.37) % 0.5)}
+                calm={isGroup && !speaking && talkingId != null}
                 reduced={reduced}
-                lit={lit}
-                glow={lit ? p.color : undefined}
+                lit={speaking}
+                glow={isGroup && speaking ? p.color : undefined}
                 level={speech?.who === p.id ? speech.level : undefined}
               />
             </div>
@@ -473,86 +638,68 @@ export function TalkScene({
         })}
       </div>
 
-      {/* the two bubbles: the new one just above its speaker's head, the one before above it */}
-      <div
-        className="pointer-events-none absolute inset-x-0 z-[4] flex flex-col justify-end gap-2 px-3"
-        style={long ? { top: bubbleTop, bottom: Math.max(composerH + 20, h - headY - figH * 0.16) } : { bottom: bubbleBottom, maxHeight: Math.max(120, h - bubbleBottom - bubbleTop + 40) }}
-      >
-        {shown.map((it, k) => {
+      {/* the bubbles: two at most over the heads (the newest lower), 62 px from the sides */}
+      <div className="pointer-events-none absolute inset-x-0 z-[8] flex flex-col items-center justify-end gap-2.5" style={{ paddingLeft: 62, paddingRight: 62, bottom: bubbleBottom }}>
+        {leaving && !past && <Ghost key={`g-${leaving.id}`} item={leaving} who={byId.get(leaving.who)} />}
+        {shown.map((u, k) => {
+          const it = u.item;
           const newest = k === shown.length - 1;
           const who = byId.get(it.who);
+          const live = speech?.id === it.id && outNow != null;
+          // one utterance: its name over the first bubble, its card, choices, ★ on the last
+          const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined }) };
           return (
             <Bubble
-              key={it.id}
-              item={it}
+              key={u.key}
+              item={view}
               who={who}
               newest={newest}
-              clamp={!newest && (long || shown.length > 1)}
-              grow={newest && long}
-              tailX={speakerX(it.who)}
-              width={w}
+              past={past}
+              clamp={false}
+              maxH={view.card ? Math.max(room * 0.8, 200) : room / 2}
+              named={(isGroup || !!it.name) && u.first}
               onCard={() => setBig(it)}
               onOpen={() => setOpened(it)}
               playing={speech?.id === it.id && !!it.voice}
               muted={muted}
               onPlay={() => (speech?.id === it.id ? finish() : say(it))}
-              onReplay={() => say(it)}
-              onRing={onRing ? (at) => onRing(it, at) : undefined}
-              shown={speech?.id === it.id && speech.typed && at < 1 ? Math.floor(at * speech.len) : undefined}
+              onReplay={() => !past && say(it)}
+              onRing={onRing && it.mark ? (at) => onRing(it, at) : undefined}
+              shown={live && outNow! < u.from + u.len ? Math.max(0, outNow! - u.from) : undefined}
+              beat={live && beatNow && beatNow.k >= u.s0 && beatNow.k < u.s1 ? { shape: beatNow.beat?.shape, in: beatNow.beat?.in, key: beatNow.k } : { shape: u.beats[u.beats.length - 1]?.shape, key: -1 }}
             />
           );
         })}
       </div>
 
-      {/* 〔過去の言葉〕: the whole talk, at the left */}
-      {items.length > 2 && (
-        <button onClick={() => setLog(true)} className="absolute left-0 z-[6] rounded-r-full border border-l-0 border-amber-200/25 bg-black/45 py-2 pl-1.5 pr-2 text-[10.5px] tracking-[0.12em] text-amber-100/80 backdrop-blur" style={{ top: top + 6 }}>
-          ‹ {logLabel}
-          {older > 0 && <span className="ml-1 text-amber-200/60">+{older}</span>}
+      {past ? (
+        <button onClick={backToNow} className="absolute left-1/2 z-[21] -translate-x-1/2 rounded-full bg-[rgba(223,230,255,.92)] px-4 py-[7px] text-[12px] font-bold text-[#070b24] shadow-[0_4px_14px_rgba(0,0,0,.35)]" style={{ bottom: dockH - 6 }}>
+          いまに戻る
         </button>
+      ) : (
+        cursor != null && hint && <p className="pointer-events-none absolute inset-x-0 z-[19] text-center text-[11px] text-[#b9bde6] [text-shadow:0_1px_4px_#000]" style={{ bottom: dockH - 10 }}>押すと次へ・下へなぞると過去へ</p>
       )}
 
-      {composer && <div className="absolute inset-x-0 bottom-0 z-[8]">{composer}</div>}
+      {composer && <div className="absolute inset-x-0 bottom-0 z-[20]">{composer}</div>}
+
+      {askTone && onTone && <TonePicker onPick={onTone} />}
 
       {opened && (
-        <div className="absolute inset-0 z-[20] flex items-start justify-center bg-black/35 px-4 backdrop-blur-[1px]" style={{ paddingTop: top + 40 }} onClick={() => setOpened(null)}>
-          <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <Bubble item={opened} who={byId.get(opened.who)} newest grow tailX={-1} width={w} onCard={() => setBig(opened)} onOpen={() => undefined} playing={speech?.id === opened.id} muted={muted} onPlay={() => say(opened)} onReplay={() => say(opened)} onRing={onRing ? (at) => onRing(opened, at) : undefined} />
-            <button onClick={() => setOpened(null)} className="mx-auto mt-2 block rounded-full bg-white/10 px-4 py-1.5 text-[12px] text-amber-50/80">
+        <div className="absolute inset-0 z-[30] flex items-start justify-center bg-black/40 px-6" style={{ paddingTop: barH + top + 60 }} onClick={() => setOpened(null)}>
+          <div className="flex w-full max-w-sm flex-col" onClick={(e) => e.stopPropagation()}>
+            <Bubble item={opened} who={byId.get(opened.who)} newest grow named onCard={() => setBig(opened)} onOpen={() => undefined} playing={speech?.id === opened.id} muted={muted} onPlay={() => say(opened)} onReplay={() => say(opened)} onRing={onRing ? (at) => onRing(opened, at) : undefined} />
+            <button onClick={() => setOpened(null)} className={`${PILL} mx-auto mt-4`}>
               とじる
             </button>
           </div>
         </div>
       )}
       {big && (
-        <div className="absolute inset-0 z-[22] flex flex-col items-center justify-center bg-black/70 px-4 backdrop-blur" onClick={() => setBig(null)}>
+        <div className="absolute inset-0 z-[32] flex flex-col items-center justify-center bg-[rgba(7,11,36,.82)] px-4 backdrop-blur" onClick={() => setBig(null)}>
           <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
             {big.card?.full ?? big.card?.thumb}
           </div>
-          <button className="mt-3 rounded-full bg-white/10 px-5 py-2 text-[13px] text-amber-50/85">とじる</button>
-        </div>
-      )}
-      {log && (
-        <div className="absolute inset-0 z-[24] flex bg-black/40" onClick={() => setLog(false)}>
-          <div className="h-full w-[84%] max-w-sm overflow-y-auto border-r border-amber-200/15 bg-[#0d0a18]/95 px-3 pb-6 backdrop-blur" style={{ paddingTop: top + 8 }} onClick={(e) => e.stopPropagation()}>
-            <p className="mb-2 text-center text-[12px] tracking-[0.2em] text-amber-100/80">{logLabel}</p>
-            <div className="space-y-2">
-              {items.map((it) => {
-                const p = byId.get(it.who);
-                return (
-                  <button key={it.id} onClick={() => setOpened(it)} className="flex w-full items-start gap-2 text-left">
-                    <SmallFace who={p} size={26} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[10px] tracking-[0.18em]" style={{ color: p?.color }}>
-                        {it.name ?? p?.name}
-                      </span>
-                      <span className="line-clamp-3 text-[13px] leading-snug text-amber-50/90">{it.text || (it.voice ? '（声のメッセージ）' : it.card?.label ?? '')}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <button className={`${PILL} mt-4`}>とじる</button>
         </div>
       )}
     </div>
@@ -582,58 +729,23 @@ export function SmallFace({ who, size }: { who?: TalkPerson; size: number }) {
   );
 }
 
-const firstWords = (t: string, n = 4) => [...t.replace(/\s+/g, '')].slice(0, n).join('');
-
-/** day 2 → Saturn: a plain round rim with the face and the first words */
-export function Circle({ item, who }: { item: TalkItem; who?: TalkPerson }) {
-  return (
-    <span className="flex h-[50px] w-[50px] flex-col items-center justify-center gap-[1px] rounded-full bg-[rgba(14,10,24,0.78)]" style={{ boxShadow: `0 0 0 2px ${who?.color ?? '#fff'}, 0 0 12px ${who?.color ?? '#fff'}55` }}>
-      <SmallFace who={who} size={22} />
-      <span className="max-w-[44px] truncate text-[9.5px] leading-none text-amber-50/90">{firstWords(item.text || (item.voice ? '♪声' : (item.card?.label ?? '')))}</span>
-    </span>
-  );
+/** a person's bubble colour (M-R245) */
+export function toneFor(who?: TalkPerson): TalkTone {
+  if (who?.tone) return who.tone;
+  const c = who?.color?.toLowerCase();
+  const known = Object.values(TONES).find((t) => t.line === c);
+  if (known) return known;
+  return who?.self ? TONES.pearl : toneOf(who?.id ?? 'x');
 }
+/** the ink on a speaker's bubble */
+export const inkOf = (color?: string) => (Object.values(TONES).find((t) => t.line === color?.toLowerCase()) ?? TONES.pearl).ink;
 
-/** M-R233: the speaker as a little round コロリン holding the word tag (small sway, a hop now and then) */
-export function Kororin({ item, who, k, popAt, reduced }: { item: TalkItem; who?: TalkPerson; k: number; popAt: number; reduced: boolean }) {
-  const popping = popAt > 0 && Date.now() - popAt < 4000 && !reduced;
-  const delay = k * 0.24;
-  const mini = who?.look?.kororin;
-  const body = (
-    <span className="relative flex flex-col items-center" style={{ animation: reduced ? undefined : `talk-bob ${2.6 + (k % 3) * 0.4}s ease-in-out ${-k * 0.7}s infinite` }}>
-      <span className="block" style={{ animation: reduced ? undefined : `talk-kohop ${5 + (k % 4)}s ease-in-out ${-k * 1.3}s infinite` }}>
-        {mini ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={mini} alt="" className="h-[48px] w-auto" />
-        ) : (
-          // no mini yet (or the demo / a test): the look's head, cut round, on a little round body
-          <span className="relative block h-[46px] w-[44px]">
-            <span className="absolute bottom-0 left-1/2 h-[24px] w-[34px] -translate-x-1/2 rounded-[50%]" style={{ background: who?.color ?? '#ccc', boxShadow: 'inset 0 -4px 6px rgba(0,0,0,.25)' }} />
-            <span className="absolute left-1/2 top-0 -translate-x-1/2">
-              <SmallFace who={who ? { ...who, avatar: null } : undefined} size={32} />
-            </span>
-          </span>
-        )}
-      </span>
-      <span className="relative z-[1] -mt-3 rounded-md border bg-[#fff7e2] px-1 text-[9px] font-bold leading-[14px] text-[#3a2410] shadow" style={{ borderColor: who?.color }}>
-        {firstWords(item.text || (item.voice ? '♪声' : (item.card?.label ?? '')), 3)}
-      </span>
-    </span>
-  );
-  if (!popping) return body;
+/** the top bubble when a third comes: it floats up and fades */
+function Ghost({ item, who }: { item: TalkItem; who?: TalkPerson }) {
   return (
-    <span className="relative block">
-      {/* the old rim pops… */}
-      <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        <span className="block" style={{ animation: `talk-pop .45s ease-out ${delay}s both` }}>
-          <Circle item={item} who={who} />
-        </span>
-      </span>
-      {/* …and the コロリン rolls out */}
-      <span className="block" style={{ animation: `talk-roll .7s cubic-bezier(.3,1.2,.5,1) ${delay + 0.25}s both` }}>
-        {body}
-      </span>
-    </span>
+    <div className={`relative max-w-full rounded-[20px] px-4 pb-3 pt-[11px] text-[15px] font-bold leading-[1.55] ${who?.self ? 'self-end' : 'self-start'}`} style={{ background: `linear-gradient(170deg,${toneFor(who).a},${toneFor(who).b})`, color: toneFor(who).ink, border: `1.5px solid ${toneFor(who).line}`, animation: 'talk-fly .6s cubic-bezier(.4,.1,.2,1) forwards', transformOrigin: '50% 0' }}>
+      <p className="line-clamp-2">{talkPlain(item.text)}</p>
+    </div>
   );
 }
 
@@ -643,8 +755,9 @@ function Bubble({
   newest,
   clamp,
   grow,
-  tailX,
-  width,
+  named,
+  past,
+  maxH,
   onCard,
   onOpen,
   playing: on,
@@ -653,14 +766,19 @@ function Bubble({
   onReplay,
   onRing,
   shown,
+  beat,
 }: {
   item: TalkItem;
   who?: TalkPerson;
   newest: boolean;
   clamp?: boolean;
   grow?: boolean;
-  tailX: number;
-  width: number;
+  /** the speaker's name over it (a group, or a story line by someone else) */
+  named?: boolean;
+  /** px: at most this tall; a long one scrolls inside */
+  maxH?: number;
+  /** a line from the past being looked at (M-R241) */
+  past?: boolean;
   onCard: () => void;
   onOpen: () => void;
   playing: boolean;
@@ -673,73 +791,154 @@ function Bubble({
   onRing?: (at: { x: number; y: number }) => void;
   /** M-R238: the words come out (this many characters shown; the rest keeps its place) */
   shown?: number;
+  /** M-R243: the shape, and how the sentence being said comes in (key = which sentence) */
+  beat?: { shape?: TalkShape; in?: TalkIn; key: number };
 }) {
   const mine = !!who?.self;
-  // inside the ring's ends (the circles at 3 and 9 o'clock stay clear)
-  const edge = tailX < 0 ? 0 : Math.max(0, width * 0.15 - 12);
-  const max = tailX < 0 ? width : Math.min(width - 24 - edge * 2, 300);
-  // the bubble leans toward its speaker; the tail points at them
-  const left = tailX < 0 ? 0 : mine ? undefined : Math.max(edge, Math.min(tailX - 70, width - max - 24 - edge));
-  const right = tailX < 0 || !mine ? undefined : Math.max(edge, Math.min(width - tailX - 70, width - max - 24 - edge));
-  const tail = tailX < 0 ? null : mine ? width - 12 - (right ?? 0) - tailX : tailX - 12 - (left ?? 0);
-  const bg = mine ? 'linear-gradient(180deg, rgba(64,120,210,0.92), rgba(36,72,150,0.92))' : 'linear-gradient(180deg, rgba(38,28,56,0.92), rgba(16,11,28,0.92))';
+  const tone = toneFor(who);
+  const bg = tone.b;
+  const ink = tone.ink;
+  const line = tone.line;
+  const shape = beat?.shape ?? 'round';
+  const entry = beat && beat.key >= 0 && beat.in && beat.in !== 'pop' && !past ? beat.in : null;
+  const entryAnim = entry === 'slam' ? 'talk-slam .5s cubic-bezier(.2,1.7,.4,1)' : entry === 'slow' ? 'talk-slowin .9s ease-out' : entry === 'shake' ? 'talk-shakeb .45s ease-in-out' : undefined;
+  // the shapes (design/talk/proto.html): a jagged shout, a puffy musing cloud, a dotted whisper in a soft hand
+  // M-R245: a faint vertical gradient, a 1.5 px line in the same hue, corners each a little different (hand-drawn)
+  const box: React.CSSProperties = Object.assign(
+    {
+      background: `linear-gradient(170deg,${tone.a},${tone.b})`,
+      border: `1.5px solid ${line}`,
+      borderRadius: '24px 20px 26px 19px / 20px 25px 19px 24px',
+      boxShadow: '0 1px 0 rgba(255,255,255,.7) inset,0 8px 22px rgba(4,8,30,.32)',
+    },
+    shape === 'burst'
+      ? { borderRadius: 0, clipPath: BURST, boxShadow: 'none', border: 0 }
+      : shape === 'cloud'
+        ? { borderRadius: '46% 54% 50% 50%/62% 58% 42% 38%' }
+        : shape === 'whisper'
+          ? { borderStyle: 'dashed', boxShadow: '0 6px 16px rgba(4,8,30,.25)', opacity: 0.95 }
+          : {},
+  );
+  const pad = shape === 'burst' ? 'px-[34px] pb-[28px] pt-[26px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
   return (
-    <div className={`pointer-events-auto relative flex min-h-0 flex-col ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ marginLeft: left, marginRight: right, maxWidth: max, animation: newest ? 'talk-in .35s cubic-bezier(.2,.8,.2,1) both' : undefined, opacity: newest ? 1 : 0.82 }}>
-      {(item.name || !mine) && (
-        <p className="mb-0.5 px-2 text-[10px] tracking-[0.2em]" style={{ color: who?.color }}>
+    <div className={`pointer-events-auto relative flex min-h-0 max-w-[min(100%,380px)] flex-col ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
+      {named && (
+        <p className="mb-1 px-2 text-[10.5px] font-bold tracking-[0.12em] [text-shadow:0_1px_4px_#000]" style={{ color: tone.a }}>
           {item.name ?? who?.name}
         </p>
       )}
       {item.mark && <StarButton kind={item.mark.kind} id={item.mark.id} size={10} onRing={onRing} className={`absolute -top-1 z-[1] ${mine ? 'left-1' : 'right-1'}`} />}
+      <div key={entry ? `in${beat?.key}` : 'still'} className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`} style={{ animation: entryAnim, rotate: mine ? '.4deg' : '-.5deg', filter: shape === 'burst' ? `drop-shadow(1.5px 0 0 ${line}) drop-shadow(-1.5px 0 0 ${line}) drop-shadow(0 1.5px 0 ${line}) drop-shadow(0 -1.5px 0 ${line}) drop-shadow(0 8px 14px rgba(4,8,30,.3))` : undefined }}>
       <div
         {...(onRing && item.mark ? holdProps(onRing) : {})}
-        className={`relative min-h-0 rounded-[18px] px-3.5 py-2 text-[15px] leading-[1.6] text-white/95 shadow-[0_6px_18px_rgba(0,0,0,0.35)] ${grow ? 'flex flex-col' : ''}`}
-        style={{ background: bg, border: `1px solid ${mine ? 'rgba(170,210,255,0.45)' : `${who?.color ?? '#f0cd8c'}55`}` }}
+        className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`}
+        style={{ color: ink, ...box }}
       >
-        <div className={`${grow ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
+        <div className={`${pad} font-bold leading-[1.6] ${grow || maxH ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} style={{ ...(maxH ? { maxHeight: maxH } : {}), ...(shape === 'whisper' ? { fontFamily: "'Klee One', " + TALK_FONT, fontWeight: 600 } : {}) }} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
           {item.voice && (
             <button onClick={onPlay} disabled={!item.voice.url} className="flex items-center gap-2 py-0.5" aria-label={on ? '止める' : muted ? '声を消して見る' : '聞く'}>
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm">{on ? '❚❚' : '▶'}</span>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm" style={{ background: `${ink}1f` }}>{on ? '❚❚' : '▶'}</span>
               <span className="flex h-5 items-end gap-[3px]" aria-hidden>
                 {Array.from({ length: 9 }, (_, k) => (
-                  <span key={k} className="w-[3px] rounded-full bg-white/70" style={{ height: `${30 + ((k * 37) % 70)}%`, animation: on ? `talk-nod ${0.5 + (k % 3) * 0.15}s ease-in-out infinite` : undefined }} />
+                  <span key={k} className="w-[3px] rounded-full" style={{ background: ink, opacity: 0.55, height: `${30 + ((k * 37) % 70)}%`, animation: on ? `talk-nod ${0.5 + (k % 3) * 0.15}s ease-in-out infinite` : undefined }} />
                 ))}
               </span>
-              {item.voice.seconds != null && <span className="text-xs text-white/70">{Math.max(1, Math.round(item.voice.seconds))}秒</span>}
+              {item.voice.seconds != null && <span className="text-xs opacity-70">{Math.max(1, Math.round(item.voice.seconds))}秒</span>}
             </button>
           )}
           {item.text && (
-            <p className={`whitespace-pre-line ${clamp ? 'line-clamp-2 text-[13.5px]' : ''} ${item.voice ? 'mt-1 text-[12.5px] text-white/65' : ''}`}>
-              {shown == null ? item.text : [...item.text].slice(0, shown).join('')}
-              {shown != null && <span className="opacity-0">{[...item.text].slice(shown).join('')}</span>}
-              {item.live && <span className="ml-0.5 inline-block animate-pulse">▍</span>}
+            <p className={`whitespace-pre-line ${clamp ? 'line-clamp-2' : ''} ${item.voice ? 'mt-1 text-[12.5px] opacity-75' : ''}`}>
+              <Marked text={item.text} upto={shown} />
+              {shown != null && <i className="ml-0.5 inline-block h-[1em] w-[6px] rounded-[2px] align-[-2px] opacity-50" style={{ background: 'currentColor', animation: 'talk-caret .8s steps(2) infinite' }} />}
+              {item.live && <i className="ml-0.5 inline-block h-[1em] w-[6px] rounded-[2px] align-[-2px] opacity-50" style={{ background: 'currentColor', animation: 'talk-caret .8s steps(2) infinite' }} />}
             </p>
           )}
           {item.card && !clamp && (
-            <button onClick={onCard} className="mt-1.5 block w-full max-w-[220px] overflow-hidden rounded-xl border border-amber-200/25 text-left" aria-label="大きく開く">
+            <button onClick={onCard} className="mt-2 block max-h-[140px] w-full max-w-[180px] overflow-hidden rounded-xl text-left shadow-[0_2px_8px_rgba(0,0,0,.25)]" aria-label="大きく開く">
               {item.card.thumb}
             </button>
           )}
-          {item.extra && !clamp && <div className="mt-1.5 space-y-1.5">{item.extra}</div>}
-          {item.chips && item.chips.length > 0 && !clamp && (
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {item.chips.map((c) => (
-                <button key={c.label} onClick={c.onPick} disabled={c.disabled} className="rounded-full border border-amber-200/45 bg-[rgba(16,11,26,0.62)] px-3 py-1.5 text-[13px] text-amber-50 disabled:opacity-40">
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          )}
+          {item.extra && !clamp && <div className="mt-1.5 space-y-1.5 text-[#f4f1ff]">{item.extra}</div>}
         </div>
-        {newest && tail != null && (
+        {/* the choices stay in view under a long one (〔星へ飛ばす〕 on a card …) */}
+        {item.chips && item.chips.length > 0 && !clamp && (
+          <div className="flex flex-wrap gap-1.5 px-4 pb-3 -mt-1">
+            {item.chips.map((c) => (
+              <button key={c.label} onClick={c.onPick} disabled={c.disabled} className="rounded-full px-3 py-1.5 text-[13px] font-bold disabled:opacity-40" style={{ background: `${ink}1a`, color: ink, boxShadow: `inset 0 0 0 1px ${ink}33` }}>
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {/* the tail, toward the speaker (none on the older one, none on a shout; a cloud trails two small puffs) */}
+        {newest && shape !== 'burst' && shape !== 'cloud' && (
+          // a small curved tail with the same line (M-R245)
           <span
             aria-hidden
-            className="absolute -bottom-[9px] h-[14px] w-[16px]"
-            style={{ [mine ? 'right' : 'left']: `min(${Math.max(10, tail)}px, calc(100% - 26px))`, background: mine ? 'rgba(36,72,150,0.92)' : 'rgba(16,11,28,0.92)', clipPath: 'polygon(0 0, 100% 0, 50% 100%)' }}
+            className="absolute bottom-[-11px] h-4 w-4"
+            style={{ background: bg, borderRight: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderBottom: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderRadius: '0 0 14px 0', [mine ? 'right' : 'left']: '20%', transform: mine ? 'rotate(30deg) skewX(-12deg)' : 'rotate(60deg) skewY(12deg)' }}
           />
         )}
       </div>
+        {newest && shape === 'cloud' && (
+          <>
+            <span aria-hidden className="absolute bottom-[-18px] h-[13px] w-[13px] rounded-full" style={{ background: bg, border: `1.5px solid ${line}`, [mine ? 'right' : 'left']: '22%' }} />
+            <span aria-hidden className="absolute bottom-[-31px] h-2 w-2 rounded-full" style={{ background: bg, border: `1.5px solid ${line}`, [mine ? 'right' : 'left']: '18%' }} />
+          </>
+        )}
+      </div>
     </div>
+  );
+}
+
+/** the marks' looks (design/talk/proto.html): always outlined, so they read on any bubble colour */
+const DELA = "'Dela Gothic One', " + "'Zen Maru Gothic', sans-serif";
+const MARK_STYLE: Record<TalkMark, React.CSSProperties> = {
+  b: { fontWeight: 900 },
+  big: { fontWeight: 900, fontSize: '1.3em', lineHeight: 1.2 },
+  shout: { fontFamily: DELA, fontSize: '1.38em', lineHeight: 1.2, letterSpacing: '.02em' },
+  gold: {
+    fontFamily: DELA,
+    fontSize: '1.32em',
+    lineHeight: 1.2,
+    background: 'linear-gradient(180deg,#fff6c8 0%,#f2c14e 45%,#b9801c 100%)',
+    WebkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    color: 'transparent',
+    WebkitTextStroke: '1.1px #5a3b06',
+    paintOrder: 'stroke fill',
+    filter: 'drop-shadow(0 0 1px #5a3b06) drop-shadow(0 0 6px rgba(255,214,110,.8))',
+  },
+  red: { fontFamily: DELA, fontSize: '1.34em', lineHeight: 1.2, color: '#e0322b', WebkitTextStroke: '.8px #3a0c0a', paintOrder: 'stroke fill' },
+  cute: { fontFamily: "'Yusei Magic', 'Zen Maru Gothic', sans-serif", fontSize: '1.18em', color: '#d4567e', letterSpacing: '.03em', textShadow: '0 0 1px #fff, 0 0 2px #fff' },
+  eerie: { fontFamily: "'Shippori Mincho', serif", fontWeight: 700, fontSize: '1.08em', letterSpacing: '.12em', color: '#3b3f63', textShadow: '0 0 4px rgba(59,63,99,.45)' },
+};
+
+const BURST =
+  'polygon(50% 0,57% 9%,68% 2%,71% 12%,84% 8%,82% 19%,96% 20%,89% 31%,100% 40%,90% 48%,99% 60%,88% 64%,93% 78%,80% 77%,79% 91%,67% 84%,60% 98%,52% 87%,42% 99%,37% 86%,24% 94%,23% 81%,9% 84%,13% 70%,0 62%,10% 53%,1% 41%,12% 35%,5% 21%,19% 20%,18% 7%,31% 12%,36% 1%,44% 10%)';
+
+/**
+ * M-R243: the words with their marks — **bold** 900, ^^larger^^ 1.3em, !!shout!! Dela Gothic One 1.38em. Rendered as
+ * text runs (React escapes them): nothing but these three marks ever becomes markup. `upto`: only that many characters.
+ */
+function Marked({ text, upto }: { text: string; upto?: number }) {
+  let left = upto ?? Infinity;
+  return (
+    <>
+      {talkRuns(text).map((r, k) => {
+        if (left <= 0) return null;
+        const chars = [...r.t];
+        const part = chars.slice(0, left).join('');
+        left -= chars.length;
+        if (!r.c) return <span key={k}>{part}</span>;
+        const st: React.CSSProperties = MARK_STYLE[r.c];
+        return (
+          <em key={k} className="not-italic" style={st}>
+            {part}
+          </em>
+        );
+      })}
+    </>
   );
 }
 
@@ -749,5 +948,30 @@ function SpeakerGlyph({ off }: { off: boolean }) {
       <path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor" fillOpacity={0.25} />
       {off ? <path d="M16 9.5l5 5M21 9.5l-5 5" /> : <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />}
     </svg>
+  );
+}
+
+/** M-R245: your bubble colour, picked once at the first talk (changeable in the settings) */
+export function TonePicker({ onPick, current, inline = false }: { onPick: (id: string) => void; current?: string; inline?: boolean }) {
+  const list = (
+    <div className="flex flex-wrap justify-center gap-2.5">
+      {SELF_TONES.map((id) => {
+        const t = TONES[id];
+        return (
+          <button key={id} onClick={() => onPick(id)} aria-label={t.name} aria-pressed={current === id} className="flex flex-col items-center gap-1">
+            <span className="block h-10 w-14" style={{ background: `linear-gradient(170deg,${t.a},${t.b})`, border: `1.5px solid ${t.line}`, borderRadius: '16px 13px 17px 12px / 13px 16px 12px 15px', boxShadow: current === id ? `0 0 0 2px #fff, 0 0 0 4px ${t.line}` : undefined }} />
+            <span className="text-[10.5px] font-bold" style={{ color: inline ? undefined : '#f4f1ff' }}>{t.name}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+  if (inline) return list;
+  return (
+    <div className="absolute inset-x-4 bottom-[128px] z-[26] rounded-[22px] border border-[rgba(210,220,255,.22)] bg-[rgba(10,14,44,.9)] px-4 pb-4 pt-3 backdrop-blur-xl">
+      <p className="mb-3 text-center text-[13px] font-bold text-[#f4f1ff]">あなたの吹き出しの色を、えらんでね</p>
+      {list}
+      <p className="mt-2 text-center text-[10.5px] text-[#b9bde6]">あとから設定で変えられます</p>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { callRequest, kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { callRequest, TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import type { BuddyMessageView, BuddyPersona, BuddyProfileView, BuddyQuotaView } from '@obolo/shared';
 import { DrawnPicture, PlaceMap, SourceChips, placeOf } from '@/components/chat/BuddyExtras';
 import { useCallback, useEffect, useState } from 'react';
@@ -16,8 +16,9 @@ import { LineIcon } from '@/components/LineIcon';
 import { BatiSettings, MoonEgg, eggReady } from '@/components/bati/BatiSheet';
 import { EggMorning } from '@/components/bati/EggMorning';
 import { TalkComposer } from '@/components/talk/TalkComposer';
-import { TalkScene } from '@/components/talk/TalkScene';
-import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook } from '@/lib/talk/looks';
+import { useTalkTone } from '@/components/talk/useTalkTone';
+import { TalkScene, TonePicker } from '@/components/talk/TalkScene';
+import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone, TALK_COLOR_KEY } from '@/lib/talk/looks';
 
 export function MoonView() {
   return (
@@ -57,6 +58,8 @@ function BatiFace({ size = 36 }: { size?: number }) {
 function Chat() {
   const { m, t, locale } = useI18n();
   const { me, setMe } = useAuth();
+  // M-R245: your bubble colour (picked once)
+  const talkTone = useTalkTone();
   const api = getApi();
   const [eggOpen, setEggOpen] = useState(false);
   // SYS-S003: the morning the egg has grown, the scene opens by itself on the Moon (once a visit; the egg stays tappable)
@@ -145,49 +148,21 @@ function Chat() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      {/* Buddy header */}
-      <div className="flex items-center gap-3 px-4 pb-2 pt-3">
-        {/* M-R223: a tap on {bati}'s face or your own small one changes the look (no big buttons) */}
-        {me?.bati?.imageUrl ? (
-          <button type="button" onClick={() => setRoom('bati')} aria-label={`${me.bati.name || 'バティ'}の見た目を変える`} className="shrink-0 rounded-full active:scale-95">
-            <BatiFace size={56} />
-          </button>
-        ) : (
-          <BatiFace size={44} />
-        )}
-        <div className="flex-1">
-          <div className="font-black">{name}</div>
-          <div className="text-[11px] text-white/50">{profile?.hasMemory ? `${m.moon.memoryOn}` : m.moon.memoryOff}</div>
-        </div>
-        {/* the day's count only when few are left (story chat 2026-11-02: no numbers on screen otherwise) */}
-        {quota && quota.freeDaily - quota.usedToday <= 5 && (
-          <span className="chip bg-white/10 text-white/70">今日は、あと少し話せるよ</span>
-        )}
-        {/* M-R218: the small egg on the temple's altar — bigger and brighter with the days, no number; ready: tap to hatch */}
-        <MoonEgg me={me} onHatch={() => setEggOpen(true)} />
-        {(me?.lookIcon || me?.avatarUrl) && (
-          <button type="button" onClick={() => setRoom('me')} aria-label="自分の見た目を変える" className="h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-sky-100/30 active:scale-95">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={(me.lookIcon || me.avatarUrl)!} alt="" className="h-full w-full object-cover" />
-          </button>
-        )}
-        <button className="btn btn-ghost h-9 w-9 !p-0" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
-          <LineIcon id="gear" className="h-5 w-5" />
-        </button>
-      </div>
-
       {/* M-R232: the side-by-side talk — {bati} at the left, you at the right, the Moon behind */}
       <TalkScene
+        askTone={talkTone.ask}
+        onTone={talkTone.pick}
         people={[
           { id: 'bati', name, look: me?.bati ? batiLook(me.bati) : characterLook('kimorin'), color: BATI_COLOR },
-          { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+          { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
         ]}
         items={[
           ...(profile && messages.length === 0 ? [{ id: 'hello', who: 'bati', text: t(m.moon.greeting, { name }), face: 'smile' as const }] : []),
           ...messages.map((msg, k) => ({
             id: msg.id,
             who: msg.role === 'user' ? 'me' : 'bati',
-            text: msg.text,
+            // M-R243: your words with their marks (from the small call), {bati}'s as written
+            text: msg.marked ?? msg.text,
             face: msg.faces ? undefined : msg.face,
             motion: msg.motion,
             faces: msg.faces,
@@ -207,10 +182,38 @@ function Chat() {
         thinking={sending && !messages.some((x) => x.id === streamId) ? 'bati' : null}
         listening={talkState.listening}
         keyboard={talkState.keyboard}
-        kororin={kororinRing(me)}
+        place={PLACE_BG.moon}
         loading={!profile}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
-        top={6}
+        top={0}
+        // the prototype's top bar (glass buttons): settings and {bati}'s look at the left, the name, the egg / your look / mute
+        bar={{
+          title: name,
+          left: (
+            <span className="flex flex-none gap-2">
+              <button className="grid h-[42px] w-[42px] flex-none place-items-center overflow-hidden rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px] active:scale-95" onClick={() => setSettingsOpen(true)} aria-label={m.moon.settings}>
+                <LineIcon id="gear" className="h-5 w-5" />
+              </button>
+              {me?.bati?.imageUrl && (
+                <button type="button" className="grid h-[42px] w-[42px] flex-none place-items-center overflow-hidden rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px] active:scale-95" onClick={() => setRoom('bati')} aria-label={`${me.bati.name || 'バティ'}の見た目を変える`}>
+                  <BatiFace size={34} />
+                </button>
+              )}
+            </span>
+          ),
+          right: (
+            <span className="flex flex-none items-center gap-2">
+              {/* M-R218: the small egg on the altar — ready: tap to hatch */}
+              <MoonEgg me={me} onHatch={() => setEggOpen(true)} />
+              {(me?.lookIcon || me?.avatarUrl) && (
+                <button type="button" onClick={() => setRoom('me')} aria-label="自分の見た目を変える" className="grid h-[42px] w-[42px] flex-none place-items-center overflow-hidden rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px] active:scale-95">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={(me.lookIcon || me.avatarUrl)!} alt="" className="h-full w-full object-cover" />
+                </button>
+              )}
+            </span>
+          ),
+        }}
         composer={
           <TalkComposer
             key={`c-${text}`}
@@ -228,6 +231,8 @@ function Chat() {
         </button>
       )}
 
+      {/* the day's count only when few are left (story chat 2026-11-02: no numbers on screen otherwise) */}
+      {quota && quota.freeDaily - quota.usedToday <= 5 && <p className="pointer-events-none absolute inset-x-0 top-[64px] z-20 text-center text-[11px] text-[#b9bde6]">今日は、あと少し話せるよ</p>}
       {notice && <p className="absolute inset-x-4 bottom-[120px] z-20 rounded-xl bg-amber-300/15 px-3 py-2 text-center text-xs text-amber-200">{notice}</p>}
 
       {/* SYS-S003 「たまごが、育った」 (M-R224), played by the story player */}
@@ -348,6 +353,11 @@ function SettingsSheet({
             onChange={(e) => void getApi().saveSysStory({ [TALK_FIXED_FACE_KEY.replace(/^sys\./, '')]: e.target.checked ? '1' : '0' }).then(setMe).catch(() => undefined)}
           />
         </label>
+        {/* M-R245: your bubble colour */}
+        <div className="mt-4 rounded-xl bg-white/5 px-3 py-3">
+          <p className="mb-2 text-[13px] font-bold text-white/80">吹き出しの色</p>
+          <TonePicker inline current={me?.story?.[TALK_COLOR_KEY] ?? 'pearl'} onPick={(id) => void getApi().saveSysStory({ [TALK_COLOR_KEY.replace(/^sys\./, '')]: id }).then(setMe).catch(() => undefined)} />
+        </div>
         <div className="mt-5 flex gap-2">
           <button className="btn btn-ghost flex-1" onClick={onClose}>
             {m.common.cancel}

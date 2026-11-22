@@ -9,10 +9,10 @@ import { getApi } from '@/lib/api';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
 import { saveSpell } from '@/components/jupiter/JupiterLesson';
-import { kororinRing, TALK_FIXED_FACE_KEY, type BatiView, type Me, type TalkBeat, type TalkFace, type TalkMotion } from '@obolo/shared';
+import { talkPlain, TALK_FIXED_FACE_KEY, type BatiView, type Me, type TalkBeat, type TalkFace, type TalkMotion } from '@obolo/shared';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
-import { BATI_COLOR, batiLook, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
+import { BATI_COLOR, batiLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 
 /**
  * 〔💬 バティに聞く〕 (D03-S008 「はじめての、おしゃべり」, M-R138〜140): a chat like any other — Bati's face on top
@@ -72,7 +72,8 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
   const sayAloud = async (text: string) => {
     const g = ++gen.current;
     if (muted) return;
-    const parts = sentences(text).slice(0, 4);
+    // the marks (M-R243) are not read out
+    const parts = sentences(talkPlain(text)).slice(0, 4);
     const urls = parts.map((t) => getApi().batiSays(t).then((r) => r.url).catch(() => null));
     for (const u of urls) {
       const url = await u;
@@ -166,7 +167,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
   }));
   return (
     <div className="absolute inset-0 z-[12] flex flex-col bg-[#05060f] text-amber-50">
-      <div className="pt-safe flex min-h-0 flex-1 flex-col pt-10">
+      <div className="pt-safe flex min-h-0 flex-1 flex-col">
         <TalkScene
           people={people}
           items={items}
@@ -174,9 +175,9 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
           listening={talk.listening}
           keyboard={talk.keyboard}
           place={PLACE_BG.moon}
-          kororin={kororinRing(auth)}
           fixedSelfFace={auth?.story?.[TALK_FIXED_FACE_KEY] === '1'}
-          top={8}
+          top={36}
+          bar={{ title: bati, right: <LookButtons bati={bati} neo={neo} pic={pic} myIcon={myIcon} onRoom={setRoom} /> }}
           composer={
             <div>
               {rounds < FIRST_ROUNDS && <TalkComposer placeholder="" maxLength={120} disabled={casting} onState={setTalk} onSend={(v) => void ask(v)} />}
@@ -185,8 +186,7 @@ function BatiFirstTalk({ bati, neo, image, faces, me, muted = false, onDone }: {
           }
         />
       </div>
-      <LookButtons bati={bati} neo={neo} pic={pic} myIcon={myIcon} onRoom={setRoom} />
-      {room && <RoomSheet mode={room} onClose={() => setRoom(null)} onDone={() => setRoom(null)} />}
+      {room && <RoomSheet mode={room} name={neo} onClose={() => setRoom(null)} onDone={() => setRoom(null)} />}
     </div>
   );
 }
@@ -314,7 +314,7 @@ function BatiChatFull({
   }));
   return (
     <div className="absolute inset-0 z-[12] flex flex-col bg-[#05060f] text-amber-50">
-      <div className="pt-safe flex min-h-0 flex-1 flex-col pt-10">
+      <div className="pt-safe flex min-h-0 flex-1 flex-col">
         <TalkScene
           people={people}
           items={items}
@@ -322,10 +322,9 @@ function BatiChatFull({
           listening={talk.listening}
           keyboard={talk.keyboard}
           place={PLACE_BG.moon}
-          kororin={kororinRing(auth)}
           fixedSelfFace={auth?.story?.[TALK_FIXED_FACE_KEY] === '1'}
-          top={8}
-          logLabel="前の話"
+          top={36}
+          bar={{ title: `${bati}に聞く` }}
           composer={
             <div className="space-y-1.5">
               {/* the how-to comes one step at a time, at the moment it is used (M-R169) */}
@@ -376,7 +375,7 @@ function talkPeople(bati: string, neo: string, image: string | undefined, faces:
   const look = own?.talk && own.imageUrl === image ? own.talk : batiLook({ ...(own ?? ({} as BatiView)), imageUrl: image ?? own?.imageUrl ?? null, faces: (faces ?? own?.faces) as BatiView['faces'], talk: undefined }, image);
   return [
     { id: 'bati', name: bati, look, color: BATI_COLOR },
-    { id: 'me', name: neo, look: selfLook(me) ?? (myIcon ? { of: myIcon, stand: myIcon } : null), color: SELF_COLOR, self: true, avatar: me?.lookIcon ?? myIcon },
+    { id: 'me', name: neo, look: selfLook(me) ?? (myIcon ? { of: myIcon, stand: myIcon } : null), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon ?? myIcon },
   ];
 }
 
@@ -403,15 +402,15 @@ function pictureCard(p: BuddyPicture) {
 /** M-R223: a tap on {bati}'s small face (or your own) changes the look — two small round buttons at the top right */
 function LookButtons({ bati, neo, pic, myIcon, onRoom }: { bati: string; neo: string; pic?: string; myIcon?: string | null; onRoom: (m: RoomMode) => void }) {
   return (
-    <div className="pt-safe absolute right-3 top-2 z-[14] flex gap-2">
+    <div className="flex flex-none gap-2">
       {pic && (
-        <button type="button" onClick={() => onRoom('bati')} aria-label={`${bati}の見た目を変える`} className="h-9 w-9 overflow-hidden rounded-full bg-black/40 ring-1 ring-amber-200/50">
+        <button type="button" onClick={() => onRoom('bati')} aria-label={`${bati}の見た目を変える`} className="h-[42px] w-[42px] overflow-hidden rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={pic} alt="" className="h-full w-full object-contain" />
         </button>
       )}
       {myIcon && (
-        <button type="button" onClick={() => onRoom('me')} aria-label={`${neo}の見た目を変える`} className="h-9 w-9 overflow-hidden rounded-full ring-1 ring-sky-200/50">
+        <button type="button" onClick={() => onRoom('me')} aria-label={`${neo}の見た目を変える`} className="h-[42px] w-[42px] overflow-hidden rounded-full border border-[rgba(210,220,255,.22)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={myIcon} alt="" className="h-full w-full object-cover" />
         </button>

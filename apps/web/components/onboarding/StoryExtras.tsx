@@ -11,7 +11,6 @@ import { TicketArt } from '@/components/story/Ticket';
 import { micTrouble, useDictation } from '@/lib/useDictation';
 import { nameCharsOk } from '@obolo/shared';
 import { LineIcon } from '@/components/LineIcon';
-import { RingFx } from '@/components/talk/RingFx';
 
 /**
  * Pieces of the first journey's story (docs/story-rewrite/土星まで_UI引き継ぎ.md, 2026-10-14) that the
@@ -602,7 +601,6 @@ export function Takoyaki({ face, size, speaking = false, hue = 28 }: { face?: st
 export function FxLayer({ fx }: { fx: PictureFx | null }) {
   if (!fx) return null;
   if (fx === 'shell-egg') return <ShellEggFx />;
-  if (fx === 'kororin-ring') return <RingFx />;
   if (fx.startsWith('grown-egg'))
     return (
       <div className="pointer-events-none absolute inset-x-0 top-[26svh] z-[3] flex justify-center">

@@ -8,11 +8,12 @@ import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
-import { kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { useTalkTone } from '@/components/talk/useTalkTone';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { talkDayOf } from '@/lib/finds/talks';
-import { characterLook, colorOf, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
+import { characterLook, colorOf, DACHI_COLOR, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -26,6 +27,8 @@ export type DachiThreadProps = {
   thread?: DachiThreadView;
   /** back to the conversation list (the shell's ctx.openList) */
   onList?: () => void;
+  /** open Bluena (the shell's right drawer) from the talk's top bar */
+  onBluena?: () => void;
   /** after a message went (the story sets f_d04_voice_reply from here) */
   onSent?: (m: DachiMessageView) => void;
   /** the thread was heard (its unread dot can go) */
@@ -44,9 +47,11 @@ export type DachiThreadProps = {
  * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
-export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon', day }: DachiThreadProps) {
+export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day }: DachiThreadProps) {
   const ring = useMarkRing();
   const { me } = useAuth();
+  // M-R245: your bubble colour (picked once)
+  const talkTone = useTalkTone();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
   const [msgs, setMsgs] = useState<DachiMessageView[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -122,9 +127,9 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
   const kind = thread?.kind ?? (id === 'kimorin' || id === 'mikie' ? id : 'dachi');
   // the people: the dachi (their own look, or a character's story art), a character speaking in their thread, you
   const people: TalkPerson[] = [
-    { id: 'them', name, look: thread?.talk ?? characterLook(kind) ?? (pic ? { of: pic, stand: pic } : null), color: colorOf(id), avatar: kind === 'dachi' ? pic : undefined },
+    { id: 'them', name, look: thread?.talk ?? characterLook(kind) ?? (pic ? { of: pic, stand: pic } : null), color: DACHI_COLOR, avatar: kind === 'dachi' ? pic : undefined },
     ...[...new Set((msgs ?? []).filter((m) => m.character && m.character !== kind).map((m) => m.character!))].map((c) => ({ id: c, name: CHAR_NAME[c] ?? c, look: characterLook(c), color: colorOf(c, 3) })),
-    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, self: true, avatar: me?.lookIcon },
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
   ];
   // M-R239: the first line not heard yet (opening plays from the one before it)
   const firstUnread = (msgs ?? []).findIndex((m) => !m.fromMe && m.read === false);
@@ -142,32 +147,28 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
   }));
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
-      <div className="flex items-center gap-2 px-3.5 pb-1.5">
-        {onList && (
-          <button onClick={onList} aria-label="会話の一覧" className="text-lg text-amber-100/70">
-            ‹
-          </button>
-        )}
-        <Face src={pic} name={name} />
-        <p className="min-w-0 flex-1 truncate text-[13px] tracking-[0.18em] text-amber-100/90">{name}</p>
-        {day && <span className="text-[11px] tracking-[0.12em] text-amber-100/60">{day.slice(5).replace('-', '/')}</span>}
-        {person && (
-          <button onClick={() => setMenu(true)} aria-label="メニュー" className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-amber-100/70">
-            ⋯
-          </button>
-        )}
-      </div>
-
+    <div className="relative flex min-h-0 flex-1 flex-col">
       {/* M-R232: the same side-by-side talk — you at the right, the dachi in the look they made at the left */}
       <TalkScene
+        askTone={talkTone.ask}
+        onTone={talkTone.pick}
         key={id}
         people={people}
         items={items}
         place={place ? PLACE_BG[place] : undefined}
-        kororin={kororinRing(me)}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
-        top={4}
+        top={0}
+        // the prototype's top bar: the conversations, the name (and the day of a past talk), ⋯ / mute / Bluena
+        bar={{
+          title: day ? `${name}・${day.slice(5).replace('-', '/')}` : name,
+          onList,
+          onBluena,
+          right: person ? (
+            <button onClick={() => setMenu(true)} aria-label="メニュー" className="grid h-[42px] w-[42px] flex-none place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-lg text-[#f4f1ff] backdrop-blur-[10px]">
+              ⋯
+            </button>
+          ) : undefined,
+        }}
         loading={msgs === null}
         unreadFrom={day ? null : unreadFrom}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
@@ -176,11 +177,12 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
             {err && <p className="mb-1 text-center text-xs text-rose-300">{err}</p>}
             {msgs === null && <p className="mb-1 text-center text-xs text-white/40">…</p>}
             <HoldMic
+              big
               onSend={sendVoice}
               disabled={!!err && msgs?.length === 0}
               left={
-                <button onClick={() => void openWorks()} className="rounded-full border border-amber-200/30 bg-black/40 px-3 py-2 text-[12.5px] text-amber-50/90">
-                  ✦ 作品を送る
+                <button onClick={() => void openWorks()} aria-label="作品を送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
+                  ✦
                 </button>
               }
             />

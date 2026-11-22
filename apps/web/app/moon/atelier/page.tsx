@@ -29,6 +29,7 @@ function WithDachi() {
           id={id}
           thread={list.find((t) => t.id === id)}
           onList={ctx.day ? ctx.closeDay : ctx.openList}
+          onBluena={ctx.openBluena}
           day={ctx.day}
           onRead={markRead}
           onGone={() => {

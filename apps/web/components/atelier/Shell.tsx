@@ -46,7 +46,8 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
-      <div className="flex items-center justify-between px-3 pb-1">
+      {/* the talk draws its own top bar (M-R232, the prototype's glass buttons); this row stays for a past day's talk */}
+      {past && past.thread === BATI_THREAD && <div className="flex items-center justify-between px-3 pb-1">
         <button onClick={() => setDrawer('left')} aria-label="会話" className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-amber-100/80">
           <LineIcon id="chat" className="h-5 w-5" />
           {unread && <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-sky-300" />}
@@ -57,12 +58,12 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
             <img src="/ui/bluena-icon.webp" alt="" className="h-full w-full scale-125 object-cover" />
           </button>
         )}
-      </div>
+      </div>}
 
       {past && past.thread === BATI_THREAD ? (
         <BatiDay key={past.day} day={past.day} onBack={closePast} />
       ) : thread === BATI_THREAD ? (
-        <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} />
+        <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} />
       ) : (
         <div key={tctx.day ?? 'now'} className="relative flex min-h-0 flex-1 flex-col">
           {renderThread?.(thread, tctx) ?? null}

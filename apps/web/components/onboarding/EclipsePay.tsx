@@ -44,9 +44,10 @@ export function EclipsePay({
     if (phase !== 'error') return;
     const v = new LineVoice();
     v.unlock();
-    void v.say('MONBAN', '……まだ、終わっていない…。決めたら、また来い…。');
+    // the day's own line (D08-S006's failLine), as shown under the error
+    void v.say(failLine.who, failLine.text);
     return () => v.dispose();
-  }, [phase]);
+  }, [phase, failLine.who, failLine.text]);
   const [consent, setConsent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);

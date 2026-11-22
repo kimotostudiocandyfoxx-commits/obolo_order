@@ -48,8 +48,6 @@ export type PictureFx =
   | 'kimorin-kororin'
   /** Saturn: the residents' kororins circle the sky as a ring */
   | 'ring'
-  /** D04-S005c (M-R233): the talk's ring of round rims pops, and the speakers' コロリン roll out (components/talk/RingFx) */
-  | 'kororin-ring'
   /** …one falls down to your feet */
   | 'ring-drop'
   /** …and gets a ☆ (the count is never shown) */

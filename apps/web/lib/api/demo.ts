@@ -58,7 +58,9 @@ import {
   type PlanetProfileView,
   type PlanetReplyView,
   type TimelinePlanet,
+  type BuddyChatResponse,
   type BuddyMessageView,
+  type BuddyPicture,
   type BuddyPersona,
   type InviteView,
   type Locale,
@@ -92,8 +94,8 @@ import {
   type MarkedKind,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
-import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt, foodEmoji } from '@/lib/look';
-import { demoBatiTalkLook, demoNeoTalkLook } from '@/lib/talk/demoLooks';
+import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
+import { castLook } from '@/lib/talk/demoLooks';
 import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
 import { ApiError, type Api } from './types';
@@ -347,6 +349,13 @@ export class DemoApi implements Api {
     await sleep(300);
   }
 
+  /** someone is signed in on this browser's demo */
+  private signedIn(): boolean {
+    const t = tokenStore.get();
+    const id = t ? this.s.sessions[t] : undefined;
+    return !!id && !!this.s.users[id];
+  }
+
   private uid(): string {
     const t = tokenStore.get();
     const id = t ? this.s.sessions[t] : undefined;
@@ -476,6 +485,8 @@ export class DemoApi implements Api {
   }
 
   async buddyChat(text: string, locale: Locale) {
+    // the review page with no account: {bati} answers with the stand-ins (no memory, no quota)
+    if (!this.signedIn()) return guestBuddyChat(text, locale);
     const id = this.uid();
     const qk = `${id}:${today()}`;
     const used = (this.s.quota[qk] ?? 0) + 1;
@@ -1173,7 +1184,7 @@ export class DemoApi implements Api {
     const view = (id: string, kind: DachiThreadView['kind'], name: string): DachiThreadView => {
       const mine = list.filter((m) => m.thread === id);
       // M-R232: the inviter stands in the talk in a drawn stand-in look (nothing is generated in the demo)
-      return { id, kind, name, pic: null, unread: mine.some((m) => !m.fromMe && !m.read), lastAt: mine.at(-1)?.createdAt ?? null, ...(kind === 'dachi' ? { talk: demoNeoTalkLook(name) } : {}) };
+      return { id, kind, name, pic: null, unread: mine.some((m) => !m.fromMe && !m.read), lastAt: mine.at(-1)?.createdAt ?? null, ...(kind === 'dachi' ? { talk: castLook('friend') } : {}) };
     };
     const out: DachiThreadView[] = [];
     if (this.s.dachiInviter && me?.invitedByName) out.push(view('demo-inviter', 'dachi', me.invitedByName));
@@ -1640,8 +1651,7 @@ export class DemoApi implements Api {
     return this.patchMe((u) => (u.bati?.imageUrl ? { bati: { ...u.bati, faces: Object.fromEntries(BATI_FACES.map((f) => [f, u.bati!.imageUrl!])) } } : {}));
   }
   async buddyPicture(question: string) {
-    await sleep(900);
-    return { picture: { url: '/onboarding/s/rocket-space.jpg', title: question.slice(0, 30), source: 'デモの絵（本番は NASA・Wikimedia Commons）', pageUrl: 'https://images.nasa.gov', free: true } };
+    return guestBuddyPicture(question);
   }
 
   async batiName(name: string) {
@@ -1914,12 +1924,44 @@ export class DemoApi implements Api {
  */
 function withTalk<T extends Me | undefined>(u: T): T {
   if (!u) return u;
-  const talk = u.avatarUrl ? demoNeoTalkLook(u.avatarUrl.slice(-24), u.avatarUrl) : null;
-  const bati = u.bati?.imageUrl ? { ...u.bati, talk: demoBatiTalkLook(u.bati.food, u.bati.imageUrl, foodEmoji(u.bati.food)) } : u.bati;
+  // the client's talk cast (public/talk): the NEO for you, the round {bati} for yours
+  const talk = u.avatarUrl ? castLook('user', u.avatarUrl) : null;
+  const bati = u.bati?.imageUrl ? { ...u.bati, talk: castLook('bati', u.bati.imageUrl) } : u.bati;
   return { ...u, talk, bati } as T;
 }
 
 /** the demo's face for a reply: surprised at a question, a hop at something nice, else a smile */
+/**
+ * {bati}'s answer with no account (the review page, story chat 2026-11-22): the offline demo's reply — a drawn picture for
+ * 「〜の絵」, a made-up source link for a question — so the chat shows its lookups, pictures and maps without a login or AI.
+ */
+export async function guestBuddyChat(text: string, locale: Locale, name = locale === 'en' ? 'Bati' : 'バティ'): Promise<BuddyChatResponse> {
+  await sleep(700 + Math.random() * 600);
+  const drawn = /絵|描いて|見た目|picture|draw/i.test(text);
+  const looked = !drawn && /[?？]|いつ|どこ|なに|何|いくつ|ニュース|天気/.test(text);
+  const reply = drawn ? (locale === 'en' ? 'I drew it for you!' : '絵を描いてみたよ！') : cannedReply(text, name, [], locale);
+  const t0 = Date.now();
+  return {
+    userMessage: { id: uid(), role: 'user', text, faces: ruleBeats(text, true), createdAt: new Date(t0).toISOString() },
+    reply: {
+      id: uid(),
+      role: 'buddy',
+      text: reply,
+      createdAt: new Date(t0 + 1).toISOString(),
+      ...(drawn ? { image: { url: '/onboarding/s/rocket-space.jpg' } } : {}),
+      ...demoFace(text, reply),
+      ...(looked ? { sources: [{ title: 'デモのページ（本番は調べたページ）', url: 'https://example.com/', domain: 'example.com' }] } : {}),
+    },
+    quota: { usedToday: 0, freeDaily: BUDDY_FREE_DAILY_MESSAGES },
+  };
+}
+
+/** 〔🖼 絵で見る〕 with no account: the demo's stand-in picture */
+export async function guestBuddyPicture(question: string): Promise<{ picture: BuddyPicture | null }> {
+  await sleep(900);
+  return { picture: { url: '/onboarding/s/rocket-space.jpg', title: question.slice(0, 30), source: 'デモの絵（本番は NASA・Wikimedia Commons）', pageUrl: 'https://images.nasa.gov', free: true } };
+}
+
 function demoFace(text: string, reply: string): Pick<BuddyMessageView, 'face' | 'motion' | 'faces'> {
   // M-R238: each sentence of the reply gets its face from the words (the rules stand in for the model's array)
   const faces = ruleBeats(reply).map((b, k) => (k === 0 && /すごい|やった|好き|うれしい|楽しい|ありがとう/.test(text) ? { face: 'smile' as const, motion: 'hop' as const } : k === 0 && /本当|ほんと|えっ/.test(text) ? { face: 'surprised' as const, motion: 'lean' as const } : b));
