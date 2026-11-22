@@ -2,6 +2,7 @@
 
 import type { SaturnPostView } from '@obolo/shared';
 import { hoursLeft } from '@obolo/shared';
+import { useState, type ReactNode } from 'react';
 import { KORORIN_BASE } from './KororinVessels';
 
 /**
@@ -24,6 +25,7 @@ export function KororinRecord({
   own?: boolean;
   onTap: (p: SaturnPostView) => void;
 }) {
+  const [delay] = useState(spinDelay);
   const list = posts.slice(0, RINGS.reduce((n, r) => n + r.n, 0));
   // fill the outer ring first, then the inner ones
   const placed: { p: SaturnPostView; r: number; a: number }[] = [];
@@ -37,7 +39,7 @@ export function KororinRecord({
     <div className="relative mx-auto aspect-square w-[min(92vw,420px)]">
       {/* the platter's shadow and rim */}
       <div className="absolute inset-0 rounded-full bg-black/40 blur-md" aria-hidden />
-      <div className="record-spin absolute inset-[2%] rounded-full" style={{ animationDelay: spinDelay() }}>
+      <div className="record-spin absolute inset-[2%] rounded-full" style={{ animationDelay: delay }}>
         <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full" aria-hidden>
           <defs>
             <radialGradient id="vinyl" cx="50%" cy="50%" r="50%">
@@ -74,8 +76,7 @@ export function KororinRecord({
           return (
             <div key={p.id} className="absolute" style={{ left: `${50 + r * Math.cos(rad) * 50}%`, top: `${50 + r * Math.sin(rad) * 50}%` }}>
               {/* stays upright while the record turns */}
-              <button onClick={() => onTap(p)} className="record-counter absolute left-0 top-0 flex flex-col items-center"
-                style={{ animationDelay: spinDelay() }} aria-label={`${p.author.displayName || p.author.handle}のコロリン`}>
+              <Upright onClick={() => onTap(p)} label={`${p.author.displayName || p.author.handle}のコロリン`}>
                 <span className={`relative block h-12 w-12 rounded-full ${mine && !own ? 'mine-glow' : ''} ${sing ? 'scale-125' : ''} transition-transform`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -89,7 +90,7 @@ export function KororinRecord({
                   {mine ? 'あなた' : p.author.displayName || p.author.handle}
                   {!own && <span className="ml-1 font-normal opacity-70">{hoursLeft(p.createdAt)}h</span>}
                 </span>
-              </button>
+              </Upright>
             </div>
           );
         })}
@@ -107,6 +108,16 @@ export function KororinRecord({
 /** the record and each kororin's upright turn follow the wall clock, so a kororin that arrives late still stands up */
 const SPIN_MS = 40_000;
 const spinDelay = () => `-${(Date.now() % SPIN_MS) / 1000}s`;
+
+/** a kororin's button, turning back as the record turns; its clock is fixed when it appears */
+function Upright({ onClick, label, children }: { onClick: () => void; label: string; children: ReactNode }) {
+  const [delay] = useState(spinDelay);
+  return (
+    <button onClick={onClick} className="record-counter absolute left-0 top-0 flex flex-col items-center" style={{ animationDelay: delay }} aria-label={label}>
+      {children}
+    </button>
+  );
+}
 
 /** rings of kororins: radius (fraction of the record's radius), how many, start angle */
 const RINGS = [
