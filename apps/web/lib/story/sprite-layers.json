@@ -75,9 +75,19 @@
   "mouth",
   "tail"
  ],
+ "kimorin-i": [
+  "body",
+  "mouth",
+  "tail"
+ ],
+ "kimorin-i-blush": [
+  "body",
+  "mouth",
+  "tail"
+ ],
  "kimorin-i-joy": [
   "body",
-  "shut",
+  "mouth",
   "tail"
  ],
  "kimorin-i-lecture": [
@@ -92,7 +102,7 @@
  ],
  "kimorin-i-shock": [
   "body",
-  "shut",
+  "mouth",
   "tail"
  ],
  "kimorin-i-smug": [
@@ -115,10 +125,22 @@
   "mouth",
   "tail"
  ],
+ "kimorin-iu": [
+  "body",
+  "eyes",
+  "mouth",
+  "tail"
+ ],
+ "kimorin-iu-blush": [
+  "body",
+  "eyes",
+  "mouth",
+  "tail"
+ ],
  "kimorin-iu-joy": [
   "body",
   "eyes",
-  "shut",
+  "mouth",
   "tail"
  ],
  "kimorin-iu-lecture": [
@@ -136,7 +158,7 @@
  "kimorin-iu-shock": [
   "body",
   "eyes",
-  "shut",
+  "mouth",
   "tail"
  ],
  "kimorin-iu-smug": [
@@ -158,10 +180,8 @@
   "tail"
  ],
  "kimorin-iu-think": [
-  "body",
   "eyes",
-  "mouth",
-  "tail"
+  "mouth"
  ],
  "kimorin-n-joy": [
   "body",
@@ -210,6 +230,9 @@
   "eyes",
   "mouth",
   "tail"
+ ],
+ "kimorin-sun": [
+  "mouth"
  ],
  "kimorin-x-joy": [
   "body",
@@ -264,10 +287,11 @@
   "mouth",
   "tail"
  ],
+ "kimorin-xs-joy": [
+  "mouth"
+ ],
  "kimorin-xs-lecture": [
-  "body",
-  "mouth",
-  "tail"
+  "mouth"
  ],
  "kimorin-xs-point": [
   "body",
@@ -275,14 +299,10 @@
   "tail"
  ],
  "kimorin-xs-shock": [
-  "body",
-  "shut",
-  "tail"
+  "mouth"
  ],
  "kimorin-xs-smug": [
-  "body",
-  "mouth",
-  "tail"
+  "mouth"
  ],
  "kimorin-xs-talk": [
   "body",
@@ -290,14 +310,10 @@
   "tail"
  ],
  "kimorin-xs-tears": [
-  "body",
-  "mouth",
-  "tail"
+  "mouth"
  ],
  "kimorin-xs-think": [
-  "body",
-  "mouth",
-  "tail"
+  "mouth"
  ],
  "monban-x-arms": [
   "eyes"

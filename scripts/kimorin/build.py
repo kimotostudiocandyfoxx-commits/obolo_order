@@ -81,6 +81,126 @@ def align(moving, fixed, mask):
     return cv2.warpAffine(moving, warp, (w, h), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP, borderMode=cv2.BORDER_REPLICATE), warp
 
 
+def donor_of(stem):
+    look = 'kimorin-xs' if stem == 'kimorin-sun' or stem.startswith('kimorin-xs') else 'kimorin-iu' if stem.startswith('kimorin-iu') else 'kimorin-i'
+    d = f'{look}-talk'
+    return None if d == stem else d
+
+
+DONOR = {}
+
+
+def closed_mouth(base, al, ys, fig_h):
+    """the closed mouth: the lowest dark (not blue) mark inside the white face, near the head's middle"""
+    h, w = al.shape
+    y0, y1 = int(ys.min() + fig_h * 0.08), int(ys.min() + fig_h * 0.45)
+    skin = ((base.mean(axis=2) > 185) & ((base.max(axis=2) - base.min(axis=2)) < 45)).astype(np.uint8)
+    face = np.zeros_like(skin)
+    face[y0:y1] = skin[y0:y1]
+    face = cv2.morphologyEx(face, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+    n, lab, st, _ = cv2.connectedComponentsWithStats(face, 8)
+    if n < 2:
+        return None
+    # the face: the biggest white patch in the band, with the big ones beside it (sunglasses cut the face in two)
+    k = 1 + int(np.argmax(st[1:, cv2.CC_STAT_AREA]))
+    kx = st[k, 0] + st[k, 2] / 2
+    ks = [j for j in range(1, n) if st[j, cv2.CC_STAT_AREA] >= st[k, cv2.CC_STAT_AREA] * 0.2 and abs(st[j, 0] + st[j, 2] / 2 - kx) < st[k, 2] * 0.5]
+    region = np.isin(lab, ks).astype(np.uint8)
+    # closed a little first: a mouth line near the chin's shading is still inside the face
+    filled = cv2.morphologyEx(region, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31)))
+    cnts, _ = cv2.findContours(filled.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cv2.drawContours(filled, cnts, -1, 1, thickness=cv2.FILLED)
+    R, G, B = base[..., 0], base[..., 1], base[..., 2]
+    # the mouth line: darker than the skin and not the strong blue of the face marks (it may be a blue-grey)
+    dark = ((base.mean(axis=2) < 175) & ~(((B - R) > 60) & (B > 120)) & (filled > 0) & (region == 0)).astype(np.uint8)
+    n, lab2, st2, cen = cv2.connectedComponentsWithStats(dark, 8)
+    fx = np.where(region.any(axis=0))[0]
+    cx = (fx.min() + fx.max()) / 2
+    best = None
+    for j in range(1, n):
+        if not (12 <= st2[j, cv2.CC_STAT_AREA] <= 4000) or abs(cen[j][0] - cx) > (fx.max() - fx.min()) * 0.22:
+            continue
+        if st2[j, cv2.CC_STAT_WIDTH] > (fx.max() - fx.min()) * 0.5:
+            continue
+        if best is None or cen[j][1] > cen[best][1]:
+            best = j
+    if best is None:
+        return None
+    # the pieces beside it on the same line (a ω drawn in two strokes)
+    cy = cen[best][1]
+    js = [j for j in range(1, n) if abs(cen[j][1] - cy) < 14 and abs(cen[j][0] - cen[best][0]) < (fx.max() - fx.min()) * 0.2 and st2[j, cv2.CC_STAT_AREA] >= 6]
+    x0 = min(st2[j, 0] for j in js); y0_ = min(st2[j, 1] for j in js)
+    x1 = max(st2[j, 0] + st2[j, 2] for j in js); y1_ = max(st2[j, 1] + st2[j, 3] for j in js)
+    return (x0, y0_, x1, y1_), fx.max() - fx.min(), region
+
+
+def transplant(stem, base, al, rgb, box, scale, size, save, ys, fig_h):
+    d = DONOR[stem]
+    h, w = al.shape
+    # where the donor's closed mouth is in this face: template matching (a few scales) inside the face band,
+    # else the lowest dark mark on the face (a different mouth shape: the 'o' of a surprise)
+    g = cv2.cvtColor(base.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    a0, a1 = int(ys.min() + fig_h * 0.1), int(ys.min() + fig_h * 0.45)
+    best = (-1.0, 1.0, 0.0, 0.0)
+    for sc in np.arange(0.75, 1.31, 0.05):
+        tp = cv2.resize(d['tpl'], None, fx=sc, fy=sc)
+        r = cv2.matchTemplate(g[a0:a1], tp, cv2.TM_CCOEFF_NORMED)
+        _, mx, _, loc = cv2.minMaxLoc(r)
+        if mx > best[0]:
+            best = (mx, sc, loc[0] + tp.shape[1] / 2, a0 + loc[1] + tp.shape[0] / 2)
+    hint = OVERRIDE.get(stem)
+    if hint:
+        sc, cx, cy, cover = 1.0, hint[0] * w, hint[1] * h, None
+    elif best[0] >= 0.72:
+        sc, cx, cy, cover = best[1], best[2], best[3], None
+    else:
+        me = closed_mouth(base, al, ys, fig_h)
+        if not me:
+            return None
+        cover = me[0]
+        sc, cx, cy = 1.0, (cover[0] + cover[2]) / 2, (cover[1] + cover[3]) / 2
+    print(f'  {stem}: open mouth from {d["from"]} (match {best[0]:.2f}{", hint" if hint else ""})')
+    patch = cv2.resize(d['patch'], None, fx=sc, fy=sc, interpolation=cv2.INTER_AREA)
+    ph, pw = patch.shape[:2]
+    px0, py0 = int(round(cx - pw / 2)), int(round(cy - ph / 2))
+    bx0, by0, bx1, by1 = px0, py0, px0 + pw, py0 + ph
+    if cover:
+        bx0, by0, bx1, by1 = min(bx0, cover[0] - 8), min(by0, cover[1] - 8), max(bx1, cover[2] + 8), max(by1, cover[3] + 8)
+    canvas = np.zeros((h, w, 3), np.float32)
+    # under it, this face's own skin (painting over the closed mouth), an ellipse feathered at the edge
+    ring = ((base.mean(axis=2) > 185) & ((base.max(axis=2) - base.min(axis=2)) < 45))[by0:by1, bx0:bx1]
+    canvas[by0:by1, bx0:bx1] = np.median(base[by0:by1, bx0:bx1][ring], axis=0) if ring.sum() > 20 else 238
+    ell = np.zeros((h, w), np.uint8)
+    cv2.ellipse(ell, (int((bx0 + bx1) / 2), int((by0 + by1) / 2)), (max(2, int((bx1 - bx0) / 2) - 2), max(2, int((by1 - by0) / 2) - 2)), 0, 0, 360, 255, -1)
+    alpha = cv2.GaussianBlur(ell.astype(np.float32), (0, 0), 2.5) / 255
+    sl = (slice(py0, py0 + ph), slice(px0, px0 + pw))
+    pa = patch[..., 3:4] / 255
+    canvas[sl] = canvas[sl] * (1 - pa) + patch[..., :3] * pa
+    alpha[sl] = np.maximum(alpha[sl], patch[..., 3] / 255)
+    fx0, fy0 = (bx0 - box[0]) * scale, (by0 - box[1]) * scale
+    fx1, fy1 = (bx1 - box[0]) * scale, (by1 - box[1]) * scale
+    crop = (int(fx0), int(fy0), int(np.ceil(fx1)), int(np.ceil(fy1)))
+    save(f'{stem}-mouth', canvas, alpha * al, crop)
+    W, H = size
+    return {'x': round(crop[0] / W, 4), 'y': round(crop[1] / H, 4), 'w': round((crop[2] - crop[0]) / W, 4), 'h': round((crop[3] - crop[1]) / H, 4)}
+
+
+def remember_donor(stem, base, op, mask, mbox):
+    """a 'talk' pose's open mouth and the closed mouth under it, kept (in the painting's pixels) for the poses
+    of its look that have no open-mouth painting"""
+    x0, y0, x1, y1 = mbox
+    g = cv2.cvtColor(base.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    DONOR['__' + stem] = {
+        'from': stem,
+        'tpl': g[y0:y1, x0:x1].copy(),
+        'patch': np.dstack([op[y0:y1, x0:x1], mask[y0:y1, x0:x1] * 255]).astype(np.float32),
+    }
+
+
+# a mouth found by hand where both ways above miss (fractions of the painting): stem → (x, y)
+OVERRIDE = {'kimorin-xs-smug': (0.502, 0.328)}  # checked on the painting, 2026-11-22
+
+
 def build(stem):
     base = load(stem)
     if base is None:
@@ -127,12 +247,20 @@ def build(stem):
         # only changes to or from something dark (the open mouth's inside, the closed mouth's line): a blush or
         # a shading the edit also touched on the white face stays out
         lum = np.minimum(op.mean(axis=2), base.mean(axis=2))
-        m[y0:y1] = ((diff > 40) & (lum < 175))[y0:y1].astype(np.uint8)
+        # ... and only on his face: the white skin with its holes filled (the mouth, the face marks), so the
+        # goggles, the device on his head or a hand never count
+        skin = ((base.mean(axis=2) > 185) & ((base.max(axis=2) - base.min(axis=2)) < 45)).astype(np.uint8)
+        filled = skin.copy()
+        cnts, _ = cv2.findContours(skin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(filled, cnts, -1, 1, thickness=cv2.FILLED)
+        m[y0:y1] = ((diff > 40) & (lum < 175) & (filled > 0))[y0:y1].astype(np.uint8)
         m = cv2.morphologyEx(m, cv2.MORPH_CLOSE, np.ones((7, 7), np.uint8))
         n, lab, st, cen = cv2.connectedComponentsWithStats(m, 8)
         # the head's middle: the figure's columns in the face band
         cols = np.where((al[y0:y1] > 0.5).any(axis=0))[0]
         cx_head = (cols.min() + cols.max()) / 2 if len(cols) else w / 2
+        # the mouth sits on his white face: around it (a ring) the closed picture is mostly white skin
+        skin = skin > 0
         best, best_s = 0, 0
         for j in range(1, n):
             area = st[j, cv2.CC_STAT_AREA]
@@ -141,7 +269,14 @@ def build(stem):
                 continue
             low = (cen[j][1] - y0) / (y1 - y0)
             mid = 1 - min(1.0, abs(cen[j][0] - cx_head) / (fig_h * 0.12))
-            s = area * (0.2 + low) * (0.05 + mid) ** 2
+            bx_, by_ = st[j, 0], st[j, 1]
+            sl = (slice(max(0, by_ - 16), by_ + bh + 16), slice(max(0, bx_ - 16), bx_ + bw + 16))
+            blobj = (lab[sl] == j).astype(np.uint8)
+            ring = cv2.dilate(blobj, np.ones((25, 25), np.uint8)) & (1 - cv2.dilate(blobj, np.ones((7, 7), np.uint8)))
+            white = skin[sl][ring > 0].mean() if ring.any() else 0
+            if white < 0.55:
+                continue
+            s = area * (0.2 + low) * (0.05 + mid) ** 2 * white
             if s > best_s:
                 best, best_s = j, s
         if best:
@@ -158,8 +293,17 @@ def build(stem):
             fx1, fy1 = (mx1 - box[0]) * scale, (my1 - box[1]) * scale
             crop = (int(fx0), int(fy0), int(np.ceil(fx1)), int(np.ceil(fy1)))
             save(f'{stem}-mouth', op, mask * al, crop)
+            if stem.endswith('-talk'):
+                remember_donor(stem, base, op, mask * al, (mx0, my0, mx1, my1))
             W, H = size
             mouth = {'x': round(crop[0] / W, 4), 'y': round(crop[1] / H, 4), 'w': round((crop[2] - crop[0]) / W, 4), 'h': round((crop[3] - crop[1]) / H, 4)}
+            layers.append('mouth')
+
+    # no open-mouth painting (or nothing found in it): the open mouth of the same look's 'talk' pose, scaled to
+    # this face and put over this pose's closed mouth (found as the lowest dark mark on the white face)
+    if mouth is None and DONOR.get(stem):
+        mouth = transplant(stem, base, al, rgb, box, scale, size, save, ys, fig_h)
+        if mouth:
             layers.append('mouth')
 
     # the goggles-up look: the eye slits (light cyan arcs in the face) glow a little brighter, breathing
@@ -187,7 +331,14 @@ def main():
     stems = sys.argv[1:] or [x['id'] for x in q['items'] if not x['id'].endswith(('-o', '-notail'))]
     reg = json.load(open(LAYERS))
     mouths = json.load(open(MOUTHS)) if os.path.exists(MOUTHS) else {}
+    # the 'talk' poses first: their open mouths stand in where a pose has no open-mouth painting
+    stems = sorted(stems, key=lambda s_: not s_.endswith('-talk'))
+    if not any(s_.endswith('-talk') for s_ in stems):
+        stems = [d for d in {donor_of(s_) for s_ in stems} if d] + stems
     for st in stems:
+        d = donor_of(st)
+        if d and '__' + d in DONOR:
+            DONOR[st] = DONOR['__' + d]
         r = build(st)
         if not r:
             continue
