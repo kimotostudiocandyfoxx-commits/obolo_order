@@ -1,3 +1,4 @@
+import { PLANET_FLY_HOURS } from './flying';
 /**
  * Product constants shared by web + api. Values marked PLACEHOLDER are listed in
  * docs/placeholders.md and are expected to move to the admin console later (spec §8).
@@ -8,8 +9,8 @@ export const DEFAULT_LOCALE: Locale = 'ja';
 
 /** Spec §2.3 — 280-char class posts. */
 export const SATURN_MAX_CHARS = 280;
-/** Saturn voices vanish this many hours after they are dropped (client decision 2026-10-07). */
-export const SATURN_LIFETIME_HOURS = 88;
+/** Saturn kororins spin on everyone's DJ record this long, then go back to their maker's own record (M-R208). */
+export const SATURN_LIFETIME_HOURS = PLANET_FLY_HOURS;
 /** ひろば names stay short enough for the label over the island. */
 export const PLAZA_NAME_MAX = 16;
 /** The landmark standing on a ひろば's island (PLACEHOLDER P-SAT-13: drawn art later). */
@@ -75,7 +76,7 @@ export const MEDIA_POLICY = {
 } as const;
 
 /** Jupiter: a post flies as a butterfly this long, then becomes a leaf on the tree. */
-export const JUPITER_FLY_HOURS = 88;
+export const JUPITER_FLY_HOURS = PLANET_FLY_HOURS;
 /** Videos kept in Mars's 裏スタジオ are cut to this length (the media policy maximum). */
 export const MARS_VIDEO_SECONDS = 60;
 /** The four branches every tree starts with (renamable). */

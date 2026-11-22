@@ -2,6 +2,8 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   MARS_VIDEO_SECONDS,
+  flyingSince,
+  splitFlying,
   type CreatePlanetPostBody,
   type PlanetAuthor,
   type PlanetFlyer,
@@ -21,8 +23,8 @@ import { notChild } from '../common/child';
 type PostRow = typeof planetPosts.$inferSelect;
 
 const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, pic: users.puniPicUrl };
-const FLY_HOURS = 88;
-const since = () => new Date(Date.now() - FLY_HOURS * 3600_000);
+/** M-R208: one rule for every planet (packages/shared/src/flying.ts) */
+const since = () => flyingSince();
 
 /**
  * Mercury & Mars timelines (client decision 2026-10-07): they work like Saturn and Jupiter.
@@ -128,11 +130,11 @@ export class PlanetPostsService {
         .where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, userId))),
     ]);
     const views = await this.views(viewerId, rows);
-    const cut = since();
+    const { flying, home } = splitFlying(views, (v) => v.createdAt);
     return {
       author: u,
-      flying: views.filter((v) => new Date(v.createdAt) > cut),
-      works: views.filter((v) => new Date(v.createdAt) <= cut),
+      flying,
+      works: home,
       followedByMe: Number(mine?.n ?? 0) > 0,
       isMe: viewerId === userId,
     };

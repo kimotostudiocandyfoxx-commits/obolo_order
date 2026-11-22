@@ -2,7 +2,8 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
 import {
   JUPITER_DEFAULT_BRANCHES,
-  JUPITER_FLY_HOURS,
+  flyingSince as sharedFlyingSince,
+  splitFlying,
   type CreateJupiterPostBody,
   type JupiterAuthor,
   type JupiterFlyer,
@@ -22,7 +23,7 @@ import { notChild } from '../common/child';
 type PostRow = typeof jupiterPosts.$inferSelect;
 
 const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, butterfly: users.butterflyUrl, pic: users.puniPicUrl };
-const flyingSince = () => new Date(Date.now() - JUPITER_FLY_HOURS * 3600_000);
+const flyingSince = () => sharedFlyingSince();
 
 /**
  * Jupiter — パタパタ (client design 2026-10-05, docs/jupiter.md).
@@ -136,7 +137,6 @@ export class JupiterService {
       .from(users)
       .where(and(eq(users.id, userId), isNull(users.deletedAt)));
     if (!u) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
-    const since = flyingSince();
     // no counts (client rule 2026-10-07): no fruits / friends numbers
     const [rows, [mine]] = await Promise.all([
       this.db.read
@@ -153,11 +153,12 @@ export class JupiterService {
     ]);
     const views = await this.views(viewerId, rows);
     const { branches, ...author } = u;
+    const split = splitFlying(views, (v) => v.createdAt);
     return {
       author,
       branches: branchNames(branches),
-      leaves: views.filter((v) => new Date(v.createdAt) <= since),
-      flying: views.filter((v) => new Date(v.createdAt) > since),
+      leaves: split.home,
+      flying: split.flying,
       followedByMe: (mine?.n ?? 0) > 0,
       isMe: viewerId === userId,
     };

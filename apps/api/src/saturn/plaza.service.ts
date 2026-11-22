@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { SATURN_LIFETIME_HOURS, type CreatePlazaBody, type PlazaView } from '@obolo/shared';
+import { flyingSince, type CreatePlazaBody, type PlazaView } from '@obolo/shared';
 import { and, count, desc, eq, gt, ilike, inArray, isNull, or, sql } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
@@ -97,7 +97,7 @@ export class PlazaService {
   private async views(viewerId: string, rows: PlazaRow[], db: Database['read'] = this.db.read): Promise<PlazaView[]> {
     const ids = rows.map((r) => r.id);
     if (!ids.length) return [];
-    const since = new Date(Date.now() - SATURN_LIFETIME_HOURS * 3600_000);
+    const since = flyingSince();
     const live = and(inArray(saturnPosts.plazaId, ids), isNull(saturnPosts.deletedAt), isNull(saturnPosts.replyToId), gt(saturnPosts.createdAt, since));
     const [mine, counts, recent] = await Promise.all([
       db

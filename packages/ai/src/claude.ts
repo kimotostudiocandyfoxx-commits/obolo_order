@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { ChatRequest, LlmProvider } from './types';
+import type { ChatRequest, LlmProvider, SearchAnswer, WebSource } from './types';
 
 /** Bati's conversation model (client decision 2026-11-21, docs/工房とブルーナ_設計.md §14) — a fixed id, never an alias. */
 export const CLAUDE_BUDDY_MODEL = 'claude-haiku-5-5';
@@ -68,6 +68,69 @@ export class ClaudeProvider implements LlmProvider {
     const res = await s.finalMessage();
     return textOf(res);
   }
+
+  /**
+   * Bati looks it up (M-R208): the web search server tool, at most CLAUDE_SEARCH_MAX_USES searches per answer (cost).
+   * Haiku has no dynamic filtering (the `_20260209` tool's code-run filter is for the larger models), so it gets the
+   * basic `_20250305` tool. A paused server turn is sent back once so it can finish.
+   */
+  async search(req: ChatRequest): Promise<SearchAnswer> {
+    const base = this.params(req);
+    const params: Anthropic.MessageCreateParamsNonStreaming = {
+      ...base,
+      tools: [
+        /haiku/.test(this.model)
+          ? { type: 'web_search_20250305', name: 'web_search', max_uses: CLAUDE_SEARCH_MAX_USES }
+          : { type: 'web_search_20260209', name: 'web_search', max_uses: CLAUDE_SEARCH_MAX_USES },
+      ],
+    };
+    let res = await this.client.messages.create(params);
+    let searches = res.usage?.server_tool_use?.web_search_requests ?? 0;
+    if (res.stop_reason === 'pause_turn') {
+      const first = res;
+      res = await this.client.messages.create({ ...params, messages: [...base.messages, { role: 'assistant', content: first.content }] });
+      searches += res.usage?.server_tool_use?.web_search_requests ?? 0;
+      res = { ...res, content: [...first.content, ...res.content] };
+    }
+    return { text: textOf(res), sources: claudeSources(res), searches };
+  }
+}
+
+/** web searches one answer may make (each is billed) */
+export const CLAUDE_SEARCH_MAX_USES = 2;
+
+/** the pages the answer cites first, then the pages the search found; no repeats, at most three */
+export function claudeSources(res: Anthropic.Message): WebSource[] {
+  const found: { url: string; title: string | null }[] = [];
+  for (const b of res.content) {
+    if (b.type === 'text') for (const c of b.citations ?? []) if (c.type === 'web_search_result_location') found.push({ url: c.url, title: c.title });
+  }
+  for (const b of res.content) {
+    if (b.type === 'web_search_tool_result' && Array.isArray(b.content)) for (const r of b.content) found.push({ url: r.url, title: r.title });
+  }
+  return pickSources(found);
+}
+
+/** unique, http(s) only, at most `max` */
+export function pickSources(found: { url?: string | null; title?: string | null; domain?: string | null }[], max = 3): WebSource[] {
+  const out: WebSource[] = [];
+  const seen = new Set<string>();
+  for (const f of found) {
+    if (!f.url || !/^https?:\/\//i.test(f.url) || seen.has(f.url)) continue;
+    let host = '';
+    try {
+      host = new URL(f.url).hostname.replace(/^www\./, '');
+    } catch {
+      continue;
+    }
+    seen.add(f.url);
+    const title = (f.title ?? '').trim();
+    // Gemini's grounding links pass through a Google redirect; its title is the site's own name
+    const domain = (f.domain || (/vertexaisearch|googleusercontent/.test(host) && /^[\w.-]+\.[a-z]{2,}$/i.test(title) ? title : host)).replace(/^www\./, '');
+    out.push({ url: f.url, title: (title || domain).slice(0, 80), domain });
+    if (out.length >= max) break;
+  }
+  return out;
 }
 
 function textOf(res: Anthropic.Message): string {

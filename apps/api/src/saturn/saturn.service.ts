@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { LlmProvider, moderateText } from '@obolo/ai';
-import { neoVoiceUrl, SATURN_LIFETIME_HOURS, type CreateSaturnPostBody, type PuniLook, type Paged, type SaturnPostRef, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
+import { flyingSince, neoVoiceUrl, type CreateSaturnPostBody, type PuniLook, type Paged, type SaturnPostRef, type SaturnPostView, type SaturnProfileView } from '@obolo/shared';
 import { and, asc, count, desc, eq, gt, inArray, isNull, lt, or, sql, sum, type SQL } from 'drizzle-orm';
 import { decodeCursor, encodeCursor } from '../common/cursor';
 import { apiError } from '../common/errors';
@@ -17,7 +17,8 @@ type Author = { id: string; handle: string; displayName: string; neoForm?: strin
 
 const authorCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, look: users.lookJson, pic: users.puniPicUrl };
 
-const alive = () => gt(saturnPosts.createdAt, new Date(Date.now() - SATURN_LIFETIME_HOURS * 3600_000));
+/** M-R208: on everyone's DJ record for 88 hours after it was flown, then back on its maker's own record */
+const alive = () => gt(saturnPosts.createdAt, flyingSince());
 /** voices dropped in a ひろば that is its maker's alone stay inside it (L2-SATURN-S004) */
 const notInPrivatePlaza = () => sql`(${saturnPosts.plazaId} IS NULL OR ${saturnPosts.plazaId} NOT IN (SELECT ${saturnPlazas.id} FROM ${saturnPlazas} WHERE ${saturnPlazas.access} <> 'open'))`;
 

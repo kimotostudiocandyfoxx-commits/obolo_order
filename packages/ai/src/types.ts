@@ -26,6 +26,25 @@ export interface LlmProvider {
   stream?(req: ChatRequest, onText: (piece: string) => void): Promise<string>;
   /** sorts a question and answers it in one call (Bati's one-call prompt; Claude) */
   readonly oneCall?: boolean;
+  /**
+   * The answer from a web search (M-R208): Claude's web search server tool, or Gemini's Google Search grounding.
+   * `sources` are the pages the answer is based on (at most a few); `searches` the searches it took (cost).
+   */
+  search?(req: ChatRequest): Promise<SearchAnswer>;
+}
+
+/** a page a searched answer is based on */
+export interface WebSource {
+  title: string;
+  url: string;
+  /** the site's name to show (e.g. "ja.wikipedia.org") */
+  domain: string;
+}
+
+export interface SearchAnswer {
+  text: string;
+  sources: WebSource[];
+  searches: number;
 }
 
 export interface ModerationResult {

@@ -14,3 +14,4 @@ export * from './atelier';
 export * from './storyVoice';
 export * from './lap2';
 export * from './radio';
+export * from './flying';

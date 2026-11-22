@@ -20,8 +20,12 @@ type Mode = 'idle' | 'recording' | 'live' | 'saving';
  *  3. the picture and its loop
  *  4. 〔収録〕 → Bluena's Venus folder → 〔公開する〕 / 〔生配信〕 (ORDER members) → its recording is
  *     kept in Bluena when it ends
+ * Since M-R208 the booth has two homes: `use="record"` is the recorded show (FM) made in the Moon atelier — your songs
+ * and your voice, listened back and re-recorded as often as you like, then 〔公開する〕 flies it to Venus; `use="live"`
+ * is the members' live booth on Venus (〔生配信〕 only). The show's name goes through the text check on the server
+ * (MODERATION): the take is kept here, so a new name can be tried without recording again.
  */
-export function Booth({ onClose, practice }: { onClose: () => void; practice?: () => void }) {
+export function Booth({ onClose, practice, use = 'live', bare = false }: { onClose?: () => void; practice?: () => void; use?: 'record' | 'live'; bare?: boolean }) {
   const { me } = useAuth();
   const toast = useToast();
   const mixer = useRef<BoothMixer | null>(null);
@@ -40,6 +44,8 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
   const [mine, setMine] = useState<RadioShowView[]>([]);
   const [made, setMade] = useState<RadioShowView | null>(null);
   const cues = useRef<RadioCue[]>([]);
+  // a take whose name was refused (MODERATION): kept until it is saved under another name
+  const [held, setHeld] = useState<{ blob: Blob; seconds: number; cues: RadioCue[]; liveId: string | null } | null>(null);
   const onAir = useRef<0 | 1 | null>(null);
 
   const m = () => {
@@ -199,18 +205,7 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
       const { blob, seconds } = await mx.stopRecording();
       if (wasLive) await getApi().endRadioLive(wasLive).catch(() => undefined);
       if (seconds < 1) throw new Error('short');
-      const up = await getApi().uploadShow(blob);
-      const show = await getApi().createRadioShow({
-        mediaId: up.id,
-        title: title.trim() || '名前のない番組',
-        thumbUrl: thumbOut(thumb),
-        loop,
-        seconds: Math.round(seconds),
-        cues: cues.current,
-        ...(wasLive ? { liveId: wasLive } : {}),
-      });
-      setMine((l) => [show, ...l]);
-      setMade(show);
+      await save({ blob, seconds, cues: cues.current, liveId: wasLive });
     } catch {
       toast.show('しまえなかった…。もう一度、収録してね');
     } finally {
@@ -218,6 +213,46 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
       setLiveId(null);
       setLive(null);
     }
+  };
+
+  /** the take → Bluena's Venus folder (the name is checked on the server; a refused name keeps the take) */
+  const save = async (take: { blob: Blob; seconds: number; cues: RadioCue[]; liveId: string | null }) => {
+    try {
+      const up = await getApi().uploadShow(take.blob);
+      const show = await getApi().createRadioShow({
+        mediaId: up.id,
+        title: title.trim() || '名前のない番組',
+        thumbUrl: thumbOut(thumb),
+        loop,
+        seconds: Math.round(take.seconds),
+        cues: take.cues,
+        ...(take.liveId ? { liveId: take.liveId } : {}),
+      });
+      setHeld(null);
+      setMine((l) => [show, ...l]);
+      setMade(show);
+    } catch (e) {
+      if ((e as { code?: string }).code !== 'MODERATION') throw e;
+      setHeld(take);
+      toast.show('その番組の名前は使えないよ。名前を変えて〔しまう〕');
+    }
+  };
+
+  const saveHeld = async () => {
+    if (!held) return;
+    setMode('saving');
+    await save(held)
+      .catch(() => toast.show('しまえなかった…'))
+      .finally(() => setMode('idle'));
+  };
+
+  /** 〔録り直す〕: the take just kept goes away and the booth is ready again */
+  const again = async (s: RadioShowView) => {
+    await getApi()
+      .removeRadioShow(s.id)
+      .catch(() => undefined);
+    setMine((l) => l.filter((x) => x.id !== s.id));
+    setMade(null);
   };
 
   const publish = async (s: RadioShowView, on: boolean) => {
@@ -252,11 +287,13 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
 
   return (
     <div className="mx-auto max-w-xl px-4 pb-[calc(140px+env(safe-area-inset-bottom))] pt-3">
-      <div className="flex items-center gap-2">
+      <div className={bare ? 'flex items-center gap-2 empty:hidden' : 'flex items-center gap-2'}>
+        {!bare && (
+          <>
         <button
           onClick={() => {
             if (onAirNow && !confirm('放送中です。やめて、ブースを出る？')) return;
-            onClose();
+            onClose?.();
           }}
           className="btn btn-ghost h-9 w-9 !p-0 text-lg"
           aria-label="戻る"
@@ -264,7 +301,9 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
           ←
         </button>
         <Glyph id="radio" className="h-5 w-5 text-amber-100" />
-        <h1 className="text-base font-black">放送ブース</h1>
+        <h1 className="text-base font-black">{use === 'record' ? '番組を収録する' : '放送ブース'}</h1>
+          </>
+        )}
         {onAirNow && <span className="radio-onair ml-auto rounded-md bg-red-600 px-2 py-0.5 font-sans text-xs font-black tracking-widest">{mode === 'live' ? 'ON AIR' : 'REC'}</span>}
       </div>
 
@@ -275,7 +314,7 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 40))}
-            disabled={onAirNow}
+            disabled={onAirNow || mode === 'saving'}
             placeholder="番組の名前"
             className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-bold outline-none"
           />
@@ -489,16 +528,23 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
       {/* 〔収録〕 / 〔生配信〕 */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[color:var(--color-space-950)] via-[color:var(--color-space-950)]/95 to-transparent px-4 pb-[calc(14px+env(safe-area-inset-bottom))] pt-8">
         <div className="pointer-events-auto mx-auto max-w-xl">
-          {onAirNow || mode === 'saving' ? (
+          {held && !onAirNow ? (
+            <button onClick={() => void saveHeld()} disabled={mode === 'saving'} className="flex w-full items-center justify-center gap-2 rounded-full bg-amber-300 py-3 text-base font-black text-slate-950 disabled:opacity-60">
+              {mode === 'saving' ? 'ブルーナにしまっています…' : 'この名前で、しまう'}
+            </button>
+          ) : onAirNow || mode === 'saving' ? (
             <button onClick={() => void finish()} disabled={mode === 'saving'} className="flex w-full items-center justify-center gap-3 rounded-full bg-red-600 py-3 text-base font-black disabled:opacity-60">
               {mode === 'saving' ? 'ブルーナにしまっています…' : <>■ おわる <span className="font-sans text-sm font-bold">{clock(mx?.elapsed() ?? 0)}</span></>}
             </button>
           ) : (
             <div className="flex gap-2">
-              <button onClick={() => void start('recording')} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-white/90 py-3 text-base font-black text-slate-950">
-                <span className="h-3 w-3 rounded-full bg-red-600" />
-                収録
-              </button>
+              {use === 'record' && (
+                <button onClick={() => void start('recording')} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-white/90 py-3 text-base font-black text-slate-950">
+                  <span className="h-3 w-3 rounded-full bg-red-600" />
+                  収録
+                </button>
+              )}
+              {use === 'live' && (
               <button
                 onClick={() => (order ? void start('live') : toast.show('生配信は、Obolo Order になってから'))}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-full py-3 text-base font-black ${order ? 'bg-gradient-to-r from-red-500 to-fuchsia-500' : 'bg-white/10 text-white/50'}`}
@@ -506,6 +552,7 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
                 <Glyph id="radio" label={false} className="h-5 w-5" />
                 生配信
               </button>
+              )}
             </div>
           )}
         </div>
@@ -517,7 +564,14 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
             <ShowArt url={made.thumbUrl} loop={made.loop} className="mx-auto w-40" />
             <p className="mt-4 text-base font-black">ブルーナの金星フォルダに、しまった</p>
             <p className="mt-1 text-xs text-white/60">公開すると、ブルーナから金星へ投影される</p>
-            <div className="mt-4 flex gap-2">
+            {/* listen back before it goes out */}
+            <ListenBack url={made.audioUrl} />
+            {use === 'record' && (
+              <button onClick={() => void again(made)} className="mt-2 w-full rounded-full border border-white/20 py-2 text-xs text-white/80">
+                録り直す
+              </button>
+            )}
+            <div className="mt-3 flex gap-2">
               <button onClick={() => setMade(null)} className="flex-1 rounded-full bg-white/10 py-2.5 text-sm">
                 あとで
               </button>
@@ -531,6 +585,21 @@ export function Booth({ onClose, practice }: { onClose: () => void; practice?: (
       {toast.node}
     </div>
   );
+}
+
+/** the kept take, to hear before it goes out (a demo take lives in this browser: idb:) */
+function ListenBack({ url }: { url: string }) {
+  const [src, setSrc] = useState<string | null>(url.startsWith('idb:') ? null : url);
+  useEffect(() => {
+    if (!url.startsWith('idb:')) return setSrc(url);
+    let made: string | null = null;
+    void import('@/lib/api/idb').then(async ({ getBlob }) => {
+      const b = await getBlob(url.slice(4));
+      if (b) setSrc((made = URL.createObjectURL(b)));
+    });
+    return () => void (made && URL.revokeObjectURL(made));
+  }, [url]);
+  return src ? <audio src={src} controls aria-label="聴いてみる" className="mt-3 w-full" /> : null;
 }
 
 function clock(sec: number) {

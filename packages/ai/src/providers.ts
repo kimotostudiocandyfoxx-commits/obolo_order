@@ -1,8 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
-import { ClaudeProvider, LlmRefusalError } from './claude';
+import { ClaudeProvider, LlmRefusalError, pickSources } from './claude';
 import { mockSongDesign } from './song';
 import { mockSongEdit } from './songEdit';
-import type { ChatRequest, LlmProvider } from './types';
+import type { ChatRequest, LlmProvider, SearchAnswer } from './types';
 
 /**
  * Gemini wants the conversation to start with the user and to alternate: leading partner lines
@@ -53,6 +53,30 @@ export class GeminiProvider implements LlmProvider {
       } catch (e) {
         lastErr = e;
         // only an unknown model name moves on to the next model
+        if (!/404|not found|NOT_FOUND|is not supported/i.test(String(e))) throw e;
+      }
+    }
+    throw lastErr;
+  }
+
+  /** Bati looks it up (M-R208): Google Search grounding; the pages come from the grounding metadata */
+  async search(req: ChatRequest): Promise<SearchAnswer> {
+    const { system, contents } = geminiContents(req);
+    let lastErr: unknown;
+    for (const model of this.models) {
+      try {
+        const res = await this.client.models.generateContent({
+          model,
+          contents,
+          config: { systemInstruction: system, temperature: req.temperature ?? 0.4, maxOutputTokens: req.maxOutputTokens ?? 800, tools: [{ googleSearch: {} }] },
+        });
+        const text = res.text?.trim();
+        if (!text) throw new Error(`Gemini (${model}) returned an empty response`);
+        const meta = res.candidates?.[0]?.groundingMetadata;
+        const sources = pickSources((meta?.groundingChunks ?? []).map((c) => ({ url: c.web?.uri, title: c.web?.title, domain: c.web?.domain })));
+        return { text, sources, searches: meta?.webSearchQueries?.length ? 1 : 0 };
+      } catch (e) {
+        lastErr = e;
         if (!/404|not found|NOT_FOUND|is not supported/i.test(String(e))) throw e;
       }
     }
@@ -154,6 +178,11 @@ export class MockProvider implements LlmProvider {
         : [{ group: '絵のタッチ', text: '水彩' }, { group: '絵のタッチ', text: 'にじみ' }, { group: 'キャラ', text: '二頭身' }, { group: '背景', text: '夕暮れの海辺' }, { group: '色と光', text: '逆光' }, { group: '構図', text: '下から見上げる' }, { group: '雰囲気', text: 'なつかしい' }],
     });
   }
+  /** Offline: a fixed answer with one made-up page, so the link chips can be seen (no network) */
+  async search(req: ChatRequest): Promise<SearchAnswer> {
+    const last = [...req.history].reverse().find((t) => t.role === 'user')?.text ?? '';
+    return { text: `「${last.slice(0, 20)}」のこと、調べたらこうなんだって！（テスト用の答え）`, sources: [{ title: 'テスト用のページ', url: 'https://example.com/', domain: 'example.com' }], searches: 0 };
+  }
   async chat(req: ChatRequest): Promise<string> {
     const last = [...req.history].reverse().find((t) => t.role === 'user')?.text ?? '';
     if (req.json && req.system.includes('SONG_DESIGN')) return mockSongDesign(last);
@@ -231,6 +260,22 @@ export class FallbackProvider implements LlmProvider {
       }
     }
     throw lastErr ?? new Error('No LLM provider configured');
+  }
+
+  /** the first provider that can search; an outage moves on to the next one that can (a refusal does not) */
+  async search(req: ChatRequest): Promise<SearchAnswer> {
+    let lastErr: unknown;
+    for (const p of this.providers) {
+      if (!p.search) continue;
+      try {
+        return await p.search(req);
+      } catch (err) {
+        if (err instanceof LlmRefusalError) throw err;
+        lastErr = err;
+        this.onError?.(p.name, err);
+      }
+    }
+    throw lastErr ?? new Error('No provider can search');
   }
 
   async perceive(input: { mime: string; data: Buffer } | { url: string }, prompt: string): Promise<string> {
