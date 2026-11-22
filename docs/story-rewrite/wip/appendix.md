@@ -757,14 +757,8 @@
 | `f_d05_sent_jacket` | P03 |
 | `f_d05_spell` | P03 |
 | `f_d05_spell_kept` | P03 |
-| `f_d05_tree` | P03 |
-| `f_d05_tree_parts` | P03 |
 | `f_d06_genre` | P03 |
-| `f_d06_island` | P03 |
-| `f_d06_island_name` | P03 |
-| `f_d06_island_parts` | P03 |
 | `f_d06_island_shape` | P03 |
-| `f_d06_know` | P03 |
 | `f_d06_lyric_add` | P03 |
 | `f_d06_night` | P03 |
 | `f_d06_pick` | P03 |
@@ -776,12 +770,8 @@
 | `f_d07_first_frame` | P04 |
 | `f_d07_remade` | P04 |
 | `f_d07_sent_mv` | P04 |
-| `f_d07_studio` | P04 |
-| `f_d07_studio_parts` | P04 |
 | `f_d07v_arrived` | P04 |
-| `f_d07v_dj` | P04 |
 | `f_d07v_done` | P04 |
-| `f_d07v_set_done` | P04 |
 | `f_d07v_show` | P04 |
 | `f_d08_feel` | P04 |
 | `f_dachi_inviter` | P02 |
@@ -816,6 +806,7 @@
 | `f_sticker_art` | P03 |
 | `f_sticker_from` | P03 |
 
+- M-R208 で外したフラグ（3〜7日目を「月で作って・飛ばして・見に行く」に組み直し、星で作る所をなくしたため）：`f_d05_tree`・`f_d05_tree_parts`（アトリエを建てる）・`f_d06_island`・`f_d06_island_parts`・`f_d06_island_name`（島を組む）・`f_d06_know`（フリージーの「音に乗っけたことはあるか？」）・`f_d07_studio`・`f_d07_studio_parts`（スタジオを建てる）・`f_d07v_dj`・`f_d07v_set_done`（金星のかんたんDJ）。立つ場面を移したフラグ：`f_d04_fly`（D04-S005c→D04-S002b）・`f_koro_voice`・`f_d04_kororin_count`（D04-S005→D04-S002b）・`f_d05_sent_jacket`（D05-S008b→D05-S007）・`f_d06_sent_song`（月の工房の D06-S007 のまま）・`f_d07_sent_mv`（D07-S005b→D07-S005）・`f_d07v_show`（D07V-S003→D07V-S002。値を dachi／self から send／keep に）。新しいフラグはない。
 - M-R198 で外したフラグ：`f_d03_bati_talk`・`f_bati_voice`・`f_d04_kororin_design`・`f_d04_kororin_card`・`f_d04_kororin_redraw`・`f_d05_butterfly`・`f_d07_screen`・`f_mystery1_open`・`f_mystery4_open`。
 - M-R207 で足したフラグ・値を変えたフラグ：`f_d03_animal`（D03-S004 の好きな動物）・`f_d03_bati_talk`（D03-S008。M-R198 で外したものを戻した）。`f_d03_photo` の値は photo/nophoto から folder/camera に（写真を使わずに作る道をなくした）。
 - M-R202 で足したフラグ：`f_ej_heard`（SYS-S002 を見た）・`f_kimorin_back`（P02）。
