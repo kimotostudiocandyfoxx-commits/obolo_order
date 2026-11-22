@@ -301,6 +301,11 @@ export const MOON_LINES = {
   homeMany: '「{work}」が、{planet}から帰ってきたよ。{friend}と、ほか{k}人が★つけてた。',
   homeNone: '「{work}」が、{planet}から帰ってきたよ。のんびり、浮かんでたって。',
   homePlace: '{place}に、しまっておいたよ。',
+  /** ⑦ a work dragged in from Bluena: as a rule; only one kind can be made today; two or more works; a kind not open yet */
+  dragIn: 'おっ、{work}！　これを材料にするんだね。何にする？',
+  dragOnly: '{work}で、{kind}を作ろう。どんな感じにする？',
+  dragMix: '{work}と{work2}、まぜちゃおう。……ワクワクしてきた。',
+  dragLocked: 'それは、{d}日後に作れるようになるよ。それまで、とっておこう。',
 } as const;
 
 /** every fixed {bati} line above (each has its variants in BATI_VARIANTS) */

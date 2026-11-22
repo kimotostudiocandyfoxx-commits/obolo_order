@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { faceTo, stack, swipeTo, versionsOf, type Work } from './work';
 import { MOON_LINES } from '@obolo/shared';
-import { dayWord, madeDay, proposalFor } from './proposal';
+import { dayWord, dragLine, madeDay, proposalFor } from './proposal';
 
 const art = (image: string, extra: Partial<Work> = {}): Work => ({ id: 'w1', kind: 'art', prompt: 'うみ', status: 'ready', image, ...extra });
 
@@ -40,7 +40,8 @@ describe('M-R253 §3 / §6 ①: the morning proposal', () => {
     const p = proposalFor(4, [k('voice', '2026-11-21T10:00:00', { text: 'おはよう' })], now);
     expect(p?.kind).toBe('art');
     expect(p?.line).toBe(MOON_LINES.propose.art);
-    expect(p?.fix).toEqual([]);
+    // the day before is 「昨日」
+    expect(p?.fix).toEqual([['3日目', '昨日']]);
   });
   it('day 5 (songs open): the kororin of day 3 as lyrics ({work} = its words)', () => {
     const p = proposalFor(5, [k('voice', '2026-11-20T10:00:00', { text: 'おはよう' }), k('art', '2026-11-21T10:00:00')], now);
@@ -59,5 +60,25 @@ describe('M-R253 §3 / §6 ①: the morning proposal', () => {
     expect(proposalFor(3, [k('voice', '2026-11-21T10:00:00')], now)).toBeNull();
     expect(madeDay('2026-11-22T01:00:00', 5, now)).toBe(5);
     expect(dayWord(4, 5)).toBe('昨日');
+    expect(dayWord(3, 5)).toBe('3日目');
+  });
+});
+
+describe('M-R253 §6 ⑦: a work dragged in from Bluena', () => {
+  const w = (kind: Work['kind'], title: string): Work => ({ id: title, kind, prompt: '', status: 'ready', title });
+  const name = (x: Work) => x.title ?? '';
+  const word = (k: string) => ({ art: 'アート', song: '曲', video: '映像（MV）', radio: 'ラジオ番組' })[k] ?? k;
+  it('as a rule: the kinds it can go into today', () => {
+    const d = dragLine([w('voice', 'おはよう')], 5, name, word);
+    expect(d.line).toBe(MOON_LINES.dragIn);
+    expect(d.kinds).toEqual(['art', 'song']);
+  });
+  it('one kind open today: that kind, asked at once', () => {
+    const d = dragLine([w('voice', 'おはよう')], 4, name, word);
+    expect(d).toMatchObject({ line: MOON_LINES.dragOnly, vars: { work: 'おはよう', kind: 'アート' }, only: 'art' });
+  });
+  it('two works: mixed; not open yet: the days until it opens', () => {
+    expect(dragLine([w('art', '海'), w('song', '夏')], 6, name, word)).toMatchObject({ line: MOON_LINES.dragMix, vars: { work: '海', work2: '夏' } });
+    expect(dragLine([w('art', '海')], 4, name, word)).toMatchObject({ line: MOON_LINES.dragLocked, vars: { d: 2 } });
   });
 });

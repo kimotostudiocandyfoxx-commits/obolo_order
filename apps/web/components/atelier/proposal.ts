@@ -1,5 +1,5 @@
 import { MOON_LINES } from '@obolo/shared';
-import { UNLOCK_DAY, type AtelierKind } from '../../lib/atelier/unlock';
+import { daysUntil, isOpen, UNLOCK_DAY, type AtelierKind } from '../../lib/atelier/unlock';
 import type { Work } from './work';
 
 /** M-R253 §3: what each kind takes as material, and {bati}'s morning proposal (pure) */
@@ -32,7 +32,8 @@ export function madeDay(createdAt: string, today: number, now = new Date()): num
   return Math.max(1, today - Math.max(0, days));
 }
 
-export const dayWord = (made: number, today: number) => (made === today - 1 ? '昨日' : made === today ? '今日' : `${made}日目`);
+/** the day a work was made, as {bati} says it: the day before → 「昨日」, earlier → 「〇日目」 (M-R253 §6 ①) */
+export const dayWord = (made: number, today: number) => (made === today - 1 ? '昨日' : `${made}日目`);
 
 export type Proposal = {
   kind: AtelierKind;
@@ -61,16 +62,32 @@ export function proposalFor(today: number | null | undefined, works: { work: Wor
     else if (all[0]) picks.push(all[0]);
   }
   if (!picks.length || (kind === 'video' && picks.length < 2)) return null;
+  // the line's day words always say the real day (the day before → 昨日, earlier → 〇日目)
   const fix: [string, string][] = [];
   const day = (w: { createdAt: string }) => madeDay(w.createdAt, today, now);
-  if (kind === 'art' || kind === 'song') {
-    if (day(picks[0]) !== 3) fix.push(['3日目', dayWord(day(picks[0]), today)]);
-  } else if (kind === 'video') {
-    const art = picks.find((p) => p.work.kind === 'art')!;
-    const song = picks.find((p) => p.work.kind === 'song')!;
-    if (day(art) !== 4) fix.push(['4日目', dayWord(day(art), today)]);
-    if (day(song) !== today - 1) fix.push(['昨日', dayWord(day(song), today)]);
+  const said = (asWritten: string, w: { createdAt: string }) => {
+    const real = dayWord(day(w), today);
+    if (real !== asWritten) fix.push([asWritten, real]);
+  };
+  if (kind === 'art' || kind === 'song') said('3日目', picks[0]);
+  else if (kind === 'video') {
+    said('4日目', picks.find((p) => p.work.kind === 'art')!);
+    said('昨日', picks.find((p) => p.work.kind === 'song')!);
   }
   const words = picks[0].work.text || picks[0].work.title || '';
   return { kind, line: MOON_LINES.propose[kind as keyof typeof MOON_LINES.propose], vars: { work: words.slice(0, 16) }, fix, materials: picks.map((p) => p.work) };
+}
+
+/**
+ * M-R253 §6 ⑦: {bati}'s line for works dragged in from Bluena — two or more: mixed; nothing it can go into is open
+ * yet: the days until it is; one kind open today: that kind (asked at once); else as a rule, with the kinds to pick.
+ */
+export function dragLine(all: Work[], day: number | null | undefined, name: (w: Work) => string, kindWord: (k: AtelierKind) => string, any = false): { line: string; vars: Record<string, string | number>; kinds: AtelierKind[]; only?: AtelierKind } {
+  const w = all[all.length - 1];
+  const uses = [...new Set(all.flatMap((x) => usesOf(x.kind)))];
+  const open = uses.filter((k) => any || isOpen(k, day));
+  if (all.length >= 2) return { line: MOON_LINES.dragMix, vars: { work: name(all[all.length - 2]), work2: name(w) }, kinds: open };
+  if (uses.length && !open.length) return { line: MOON_LINES.dragLocked, vars: { d: Math.min(...uses.map((k) => daysUntil(k, day))) }, kinds: [] };
+  if (open.length === 1) return { line: MOON_LINES.dragOnly, vars: { work: name(w), kind: kindWord(open[0]) }, kinds: [], only: open[0] };
+  return { line: MOON_LINES.dragIn, vars: { work: name(w) }, kinds: open };
 }

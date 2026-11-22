@@ -18,6 +18,7 @@ import { useAtelierCtx } from './ctx';
 import { ASK, DONE, detect, isBare, KIND_WORD } from './intent';
 import { dropTry, fly, failLine, keep, keepFace, keepShow, make, wear, type MakeOpts } from './makers';
 import { asMaterial, fromMaterial, PROPOSAL_ASK, proposalFor, usesOf } from './material';
+import { dragLine } from './proposal';
 import { saveTalk, type Talk } from './shelf';
 import { countdown, jobView, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
 import { dayOf } from '@/lib/finds/spiral';
@@ -163,6 +164,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   // §3: works chosen as material for the next thing made (from {bati}'s proposal, or dragged in from Bluena)
   const [mats, setMats] = useState<Work[]>([]);
   const [peek, setPeek] = useState<Work | null>(null);
+  const matsRef = useRef(mats);
+  matsRef.current = mats;
   const lastWork = () => [...msgs].reverse().find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.status !== 'making')?.work;
 
   const run = useCallback(
@@ -337,7 +340,9 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       proposal.current = null;
       return sayT(MOON_LINES.fresh, {}, [KIND_WORD[k2]]);
     }
-    if (k && mats.length && usesOf(mats[0].kind).includes(k)) {
+    // ⑦ a material asked into a kind not open yet
+    if (k && mats.length && mats.some((x) => usesOf(x.kind).includes(k)) && !isOpen(k, day) && !story) return sayT(MOON_LINES.dragLocked, { d: daysUntil(k, day) });
+    if (k && mats.length && mats.some((x) => usesOf(x.kind).includes(k))) {
       setPending({ use: k, materials: mats });
       return say(ASK[k]);
     }
@@ -388,10 +393,13 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     const got = (e: Event) => {
       const w = (e as CustomEvent<Work>).detail;
       if (!w) return;
-      setMats((xs) => [...xs.filter((x) => x.id !== w.id), w].slice(-3));
-      const uses = usesOf(w.kind).filter((k) => isOpen(k, day) || !!story);
-      // PLACEHOLDER (P-ATELIER-9): {bati}'s words when a work is brought in
-      say(uses.length ? `「${(w.title || w.text || KIND_WORD[w.kind]).slice(0, 16)}」を材料にするね。なにを作る？` : 'それは、まだ材料にできないみたい', uses.map((k) => KIND_WORD[k]));
+      const all = [...matsRef.current.filter((x) => x.id !== w.id), w].slice(-3);
+      setMats(all);
+      // M-R253 §6 ⑦: two or more works / the one kind it can be made into today / a kind not open yet / as a rule
+      const name = (x: Work) => (x.title || x.text || KIND_WORD[x.kind]).slice(0, 16);
+      const d = dragLine(all, day, name, (k) => KIND_WORD[k], !!story);
+      if (d.only) setPending({ use: d.only, materials: all });
+      sayT(d.line, d.vars, d.kinds.map((k) => KIND_WORD[k]));
     };
     window.addEventListener('obolo:material', got);
     return () => window.removeEventListener('obolo:material', got);
