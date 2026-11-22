@@ -96,6 +96,187 @@
         "design/story/refs/talk-bati.jpg"
       ],
       "prompt": "The same character as the reference picture (a round cute sea-urchin creature with dark purple body, golden-orange spines, uni roe on top of its head, big sparkling eyes, pink cheeks, two small stubby arms), same art style. Full body, floating upright, facing slightly toward the right side of the picture, small arms relaxed, happy smile, mouth open slightly. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body fits inside the frame with margin on all sides, centered. No text, no letters, no logo on clothes, no watermark."
+    },
+    {
+      "id": "talk-user-smile",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: a big happy smile, eyes curved happily, mouth closed. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-surprised",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: surprised: eyes wide open, eyebrows raised, small round open mouth. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-shy",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: shy and embarrassed: blushing cheeks, eyes looking away, small bashful smile. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-blink",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: eyes gently closed (a blink), neutral calm face, mouth closed. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: talking: mouth open in the middle of a word, calm friendly face, eyes open. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-smile",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: a big happy smile, eyes curved happily, mouth closed. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-surprised",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: surprised: eyes wide open, eyebrows raised, small round open mouth. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-thinking",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: thinking: head tilted a little to one side, eyes looking up, mouth slightly pursed, curious. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-sad",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: a little sad: eyebrows down, eyes looking down, small frown. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-shy",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: shy and embarrassed: blushing cheeks, eyes looking away, small bashful smile. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-blink",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: eyes gently closed (a blink), neutral calm face, mouth closed. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-friend-talk",
+      "size": "portrait",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: talking: mouth open in the middle of a word, calm friendly face, eyes open. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-smile",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: a big happy smile, eyes curved happily, mouth closed. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-surprised",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: surprised: eyes wide open, eyebrows raised, small round open mouth. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-thinking",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: thinking: head tilted a little to one side, eyes looking up, mouth slightly pursed, curious. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-sad",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: a little sad: eyebrows down, eyes looking down, small frown. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-shy",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: shy and embarrassed: blushing cheeks, eyes looking away, small bashful smile. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-blink",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: eyes gently closed (a blink), neutral calm face, mouth closed. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-bati-talk",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture, same art style. Facial expression: talking: mouth open in the middle of a word, calm friendly face, eyes open. Keep exactly the same pose, body, clothes, size and position in the frame as the reference; only change the face. Background: one flat solid chroma-key green (#00B140), no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "talk-user-kororin",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-user-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. A tiny chibi mascot version: the whole body squashed into a cute round ball shape (like a round mochi or a gumball), big head, tiny limbs, holding a small blank white paper tag with both hands, simple and adorable, same colors and style cues as the reference. Background: one flat solid chroma-key green (#00B140), no shadow. No text on the tag, no watermark."
+    },
+    {
+      "id": "talk-friend-kororin",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-friend-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. A tiny chibi mascot version: the whole body squashed into a cute round ball shape (like a round mochi or a gumball), big head, tiny limbs, holding a small blank white paper tag with both hands, simple and adorable, same colors and style cues as the reference. Background: one flat solid chroma-key green (#00B140), no shadow. No text on the tag, no watermark."
+    },
+    {
+      "id": "talk-bati-kororin",
+      "size": "square",
+      "refs": [
+        "design/story/out/talk-bati-base-1.jpg"
+      ],
+      "prompt": "The same character as the reference picture. A tiny chibi mascot version: the whole body squashed into a cute round ball shape (like a round mochi or a gumball), big head, tiny limbs, holding a small blank white paper tag with both hands, simple and adorable, same colors and style cues as the reference. Background: one flat solid chroma-key green (#00B140), no shadow. No text on the tag, no watermark."
+    },
+    {
+      "id": "talk-bg-moon",
+      "size": "1152x2048",
+      "prompt": "Background art for a mobile chat screen (portrait): standing on the soft silver-gray surface of the moon at night, gentle craters, the lower third is the moon ground, a big beautiful blue Earth rising in the upper sky, deep navy space with many fine stars and a faint milky way, calm, dreamy, slightly painterly anime background art, no characters, no text, plenty of empty space in the middle for characters and speech bubbles."
     }
   ]
 }
