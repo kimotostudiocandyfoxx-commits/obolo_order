@@ -146,7 +146,7 @@ export function Figure({
 
   return (
     <div className={`pointer-events-none relative flex flex-col items-center ${className}`} style={outer} aria-hidden>
-      <div className="relative h-full overflow-visible" style={chest ? { overflow: 'hidden', borderRadius: '0 0 40% 40% / 0 0 10% 10%' } : undefined}>
+      <div className="relative h-full overflow-visible" style={chest ? { overflow: 'hidden', WebkitMaskImage: 'linear-gradient(to bottom, #000 70%, transparent)', maskImage: 'linear-gradient(to bottom, #000 70%, transparent)' } : undefined}>
         {/* the shadow at the feet */}
         {!chest && <span className="absolute bottom-[-8px] left-1/2 h-[18px] w-[64%] -translate-x-1/2 rounded-[50%] blur-[2px]" style={{ background: 'radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,0))', opacity: lit ? 0.75 : 1 }} />}
         <div
