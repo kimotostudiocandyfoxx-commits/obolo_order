@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""KIMORIN's story sprites, painted again (client 2026-11-22: the grey background cut badly, the talking mouth
+landed in the wrong place, the face changed between pictures; plus a blushing face for 「ア、、、アイ//？」).
+
+Writes design/kimorin-art-queue.json for scripts/ui-art/paint.mjs (.github/workflows/ui-art.yml):
+  <stem>          the pose, on flat pure chroma green, from fixed references (costume + the face sheet)
+  <stem>-o        the same picture with only the mouth open (an edit of <stem>) → the talking mouth
+  <stem>-notail   the same picture without the tail feathers (an edit of <stem>) → the swaying tail layer
+Saved under design/kimorin/ (not deployed); scripts/kimorin/build.py cuts them into apps/web/public/onboarding.
+Run: python3 scripts/kimorin/make-queue.py
+"""
+import json
+import sys
+
+# a trial: only the stems given (python3 scripts/kimorin/make-queue.py kimorin-i-talk …)
+ONLY = set(sys.argv[1:])
+
+FACE_REF = 'design/story/refs/cast/kimorin-face-ref.png'
+RAW = 'design/kimorin'
+
+BODY = (
+    "KIMORIN is a small chibi fox-spirit character, about three heads tall, standing. "
+    "His face (copy it exactly from the face reference picture): a smooth round pure-white porcelain fox-mask face with no nose and no muzzle; "
+    "on the forehead a small blue three-petal leaf mark; two thin curved glowing light-blue eye slits like gently closed smiling eyelids, no pupils, no eyeballs; "
+    "a blue spiral on each cheek; a tiny thin dark ω-shaped cat mouth in the middle of the lower face. "
+    "Big pointed white fox ears with deep blue insides and white fluffy fur. Behind him a large round fan of tail feathers: white inside, black outside with red-orange tips. "
+    "White paw hands with blue paw pads, white feet with blue paw pads."
+)
+LOOKS = {
+    # the inventor, goggles down (day 2 until the startle in the Earth temple)
+    'kimorin-i': ("apps/web/public/onboarding/s/kimorin-i-talk.jpg",
+                  "He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, "
+                  "brass steampunk goggles with dark round lenses worn OVER his eyes (the lenses hide the eye slits), "
+                  "and a small silver box-shaped device on top of his head between the ears with a thin coiled cable."),
+    # the inventor, goggles pushed up (until the Moon)
+    'kimorin-iu': ("apps/web/public/onboarding/s/kimorin-iu-talk.jpg",
+                   "He wears a white, slightly worn laboratory coat over a black shirt, a leather tool belt with small brass gadgets, "
+                   "brass steampunk goggles pushed UP onto the top of his head above the forehead mark (his glowing eye slits are visible), "
+                   "and a small silver box-shaped device on top of his head between the ears with a thin coiled cable."),
+    # after the dragon on the Moon: red robe, sunglasses on
+    'kimorin-xs': ("apps/web/public/onboarding/s/kimorin-xs-talk.jpg",
+                   "He wears a deep red velvet hooded robe with ornate silver-white embroidered trim, the hood up between his ears, "
+                   "a blue jewel brooch at the collar with two blue tassels, round black sunglasses with a thin silver frame worn over his eyes "
+                   "(the black lenses hide the eye slits completely), and a small white dragon wing behind him on one side."),
+}
+POSES = {
+    'stand': "Pose: standing relaxed and upright facing the viewer, arms down at his sides. Calm expression, mouth closed.",
+    'talk': "Pose: facing the viewer, one paw held out forward, open palm up, as if calmly explaining something. Mouth closed.",
+    'lecture': "Pose: facing the viewer, one paw raised with the index finger pointing straight up like a teacher, the other paw open at his side. Mouth closed.",
+    'joy': "Pose: both arms spread wide open, delighted and happy, body bouncing. A wide closed-mouth smile.",
+    'point': "Pose: facing the viewer, pointing one paw straight at the viewer, confident, the other paw on his hip. Mouth closed.",
+    'shock': "Pose: startled, leaning back a little, both paws raised up beside his head, tiny round surprised mouth.",
+    'smug': "Pose: one paw under his chin, the other paw on his hip, chin raised proudly, smug and pleased with himself. Mouth closed in a smug little smile.",
+    'tears': "Pose: both paws clasped together in front of his chest, deeply moved, small drops of glowing blue light falling like tears from his eyes. Mouth closed.",
+    'think': "Pose: one paw at his chin, head tilted slightly, thinking hard. Mouth closed.",
+    'blush': "Pose: shy and flustered, shoulders raised, both paws held together in front of his chest, fidgeting. His face is blushing: soft pink-red blush across both cheeks, "
+             "two small embarrassed sweat drops beside his head, tiny wobbly closed mouth. (Only the blush is new; the face design stays the same.)",
+}
+BG = ("Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. "
+      "Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, "
+      "the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. "
+      "Highly detailed painterly anime render, soft studio light from the front. No text, no letters.")
+KEEP = "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — "
+OPEN = KEEP + ("and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, "
+               "in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the hands. No text.")
+NOTAIL = KEEP + ("but remove the whole fan of tail feathers{wing} behind him, so the flat pure green background shows where they were. "
+                 "Everything else stays exactly as it is. No text.")
+
+items = []
+for look, (costume, dress) in LOOKS.items():
+    for pose, how in POSES.items():
+        if look == 'kimorin-xs' and pose == 'stand':
+            stem = 'kimorin-sun'
+        elif pose == 'stand':
+            stem = look
+        else:
+            stem = f'{look}-{pose}'
+        if ONLY and stem not in ONLY:
+            continue
+        prompt = (f"Picture 1 shows his costume and body; picture 2 shows his exact face design — copy both faithfully, the same character in every detail. "
+                  f"{BODY} {dress} {how} {BG}")
+        if look == 'kimorin-xs' and pose in ('tears', 'blush'):
+            prompt = prompt.replace("from his eyes", "from under his sunglasses")
+        items.append({'id': stem, 'w': 1536, 'h': 2048, 'size': [960, 1280], 'always': False, 'refs': [costume, FACE_REF], 'prompt': prompt})
+        src = f'{RAW}/{stem}.jpg'
+        items.append({'id': f'{stem}-o', 'w': 1536, 'h': 2048, 'size': [960, 1280], 'always': False, 'refs': [src], 'prompt': OPEN})
+        items.append({'id': f'{stem}-notail', 'w': 1536, 'h': 2048, 'size': [960, 1280], 'always': False, 'refs': [src],
+                      'prompt': NOTAIL.format(wing=' and the small dragon wing' if look == 'kimorin-xs' else '')})
+
+queue = {
+    'note': 'KIMORIN の立ち絵を描き直す（2026-11-22）: 緑の背景（クロマキー）、顔は design/story/refs/cast/kimorin-face-ref.png に固定。'
+            '<stem>-o は口だけ開いた絵、<stem>-notail は尾羽なし。scripts/kimorin/build.py で切り抜いて onboarding/<stem>.webp と口の位置 (lib/story/sprite-mouths.json) にする',
+    'dir': '../../../' + RAW,
+    'png': True,
+    'always': '',
+    'items': items,
+    'redo': [],
+}
+json.dump(queue, open('design/kimorin-art-queue.json', 'w'), ensure_ascii=False, indent=1)
+print(len(items), 'items')

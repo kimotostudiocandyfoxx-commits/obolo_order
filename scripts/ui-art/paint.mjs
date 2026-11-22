@@ -67,7 +67,9 @@ async function paint(x) {
         height: x.h,
         numberResults: 1,
         outputType: 'URL',
-        outputFormat: 'JPG',
+        // png: true — the picture comes as PNG and is kept as a JPEG without colour subsampling (4:4:4), so a
+        // chroma-key green edge stays sharp (scripts/kimorin/build.py)
+        outputFormat: queue.png ? 'PNG' : 'JPG',
         includeCost: true,
         ...(refsOf(x).length ? { referenceImages: refsOf(x).map(dataUri) } : {}),
       },
@@ -84,7 +86,7 @@ async function paint(x) {
   const raw = join(OUT, `${x.id}.raw.jpg`);
   writeFileSync(raw, Buffer.from(await (await fetch(d.imageURL, { signal: AbortSignal.timeout(60_000) })).arrayBuffer()));
   const [w, h] = x.size;
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-vf', `scale=${w}:${h}:flags=lanczos`, '-q:v', '2', join(OUT, `${x.id}.jpg`)]);
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', raw, '-vf', `scale=${w}:${h}:flags=lanczos`, ...(queue.png ? ['-pix_fmt', 'yuvj444p'] : []), '-q:v', '2', join(OUT, `${x.id}.jpg`)]);
   rmSync(raw);
   return d.cost ?? 0;
 }
@@ -94,7 +96,7 @@ let yen = 0;
 // the job is stopped at 30 minutes and then saves nothing it had not finished: stop starting new pictures at
 // 22 minutes; what is left (and what failed) stays in redo for the next run (2026-10-27: a stuck task ate a run)
 const START = Date.now();
-const late = () => Date.now() - START > 22 * 60_000;
+const late = () => Date.now() - START > Number(process.env.LATE_MINUTES ?? 22) * 60_000;
 const failed = new Set();
 // what each picture cost, kept in the queue's ledger (the review queue: art/review/saturn/rounds/art-costs.md)
 const spent = [];
