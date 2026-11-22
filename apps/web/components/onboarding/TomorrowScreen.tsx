@@ -6,16 +6,8 @@ import { unlockAudio } from '@/lib/onboarding/audio';
 import { JOURNEY_WAIT_MS } from '@obolo/shared';
 import { playTimeSkip, startDrone, tick } from '@/lib/onboarding/sfx';
 
-const SERIF = '"Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const SKIP_SECONDS = 4.8;
-// U+FE0E forces the monochrome text glyph instead of the colour emoji.
-const ZODIAC = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'].map((z) => `${z}\uFE0E`);
-
-const fmt = (ms: number) => {
-  const s = Math.max(0, Math.ceil(ms / 1000));
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${p(Math.floor(s / 3600))}:${p(Math.floor((s % 3600) / 60))}:${p(s % 60)}`;
-};
 
 /**
  * End of every journey day: "〇〇、また明日。" + a 24-hour countdown with ticking sound.
@@ -116,44 +108,92 @@ export function TomorrowScreen({
     return () => clearTimeout(id);
   }, [phase, onUnlocked]);
 
+  // how much of the day has passed: the golden ring fills towards the next day
+  const passed = Math.min(1, Math.max(0, 1 - left / JOURNEY_WAIT_MS));
+  const sec = Math.max(0, Math.ceil(left / 1000));
+  const parts: [string, string][] = [
+    [String(Math.floor(sec / 3600)).padStart(2, '0'), '時間'],
+    [String(Math.floor((sec % 3600) / 60)).padStart(2, '0'), '分'],
+    [String(sec % 60).padStart(2, '0'), '秒'],
+  ];
+  const R = 118;
+  const C = 2 * Math.PI * R;
   return (
     <div
-      className="fixed inset-0 z-[100] flex select-none flex-col items-center justify-center overflow-hidden bg-black px-6 text-center text-white"
+      className="fixed inset-0 z-[100] flex select-none flex-col items-center justify-center overflow-hidden bg-[radial-gradient(120%_80%_at_50%_40%,#141026_0%,#07060d_60%,#000_100%)] px-6 text-center text-white"
       style={{ fontFamily: SERIF }}
       onPointerDown={enableSound}
     >
+      <Stars warp={phase === 'skip'} />
       {phase === 'open' ? (
-        <div className="animate-[fadeUp_1.2s_ease-out]">
+        <div className="relative animate-[fadeUp_1.2s_ease-out]">
           {/* the script's telop only after a skip; the 24 hours waited out open quietly (story chat 2026-10-29) */}
-          {skipped.current && <p className="text-2xl tracking-[0.25em] text-amber-50">{skippedText ?? t(m.gate.doorOpened, { name })}</p>}
+          {skipped.current && <p className="text-2xl tracking-[0.3em] text-amber-50">{skippedText ?? t(m.gate.doorOpened, { name })}</p>}
         </div>
       ) : (
         <>
-          <div className={`transition-all duration-700 ${phase === 'wait' ? '' : '-translate-y-6 scale-95 opacity-60'}`}>
-            <p className="animate-[fadeUp_1.6s_ease-out] text-[22px] tracking-[0.2em] text-amber-50">{t(m.gate.seeYouName, { name })}</p>
-            <p
-              className="mt-6 font-mono text-5xl tabular-nums tracking-[0.12em] text-amber-100 drop-shadow-[0_0_18px_rgba(255,214,140,0.45)]"
-              style={{ fontFamily: '"SF Mono", ui-monospace, Menlo, monospace' }}
-            >
-              {fmt(left)}
-            </p>
+          <div className={`relative flex flex-col items-center transition-all duration-700 ${phase === 'wait' ? '' : 'scale-[0.97]'}`}>
+            <p className="animate-[fadeUp_1.6s_ease-out] text-[19px] tracking-[0.35em] text-amber-50/90">{t(m.gate.seeYouName, { name })}</p>
+            <div className="relative mt-8 flex h-[280px] w-[280px] items-center justify-center">
+              {/* the eclipse ring: a thin gold circle filling as the day goes by; it spins up on a skip */}
+              <svg viewBox="0 0 280 280" className={`absolute inset-0 h-full w-full ${phase === 'skip' ? 'animate-[ringSpin_1.2s_cubic-bezier(.5,0,.2,1)_infinite]' : ''}`} aria-hidden>
+                <defs>
+                  <linearGradient id="goldArc" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fff2c8" />
+                    <stop offset="0.5" stopColor="#e2b867" />
+                    <stop offset="1" stopColor="#9a6a24" />
+                  </linearGradient>
+                  <radialGradient id="eclipseGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0.72" stopColor="rgba(255,214,140,0)" />
+                    <stop offset="0.84" stopColor="rgba(255,214,140,0.16)" />
+                    <stop offset="1" stopColor="rgba(255,214,140,0)" />
+                  </radialGradient>
+                </defs>
+                <circle cx="140" cy="140" r="138" fill="url(#eclipseGlow)" className="animate-[breathe_6s_ease-in-out_infinite]" />
+                <circle cx="140" cy="140" r={R} fill="none" stroke="rgba(255,226,170,0.12)" strokeWidth="1" />
+                <circle
+                  cx="140"
+                  cy="140"
+                  r={R}
+                  fill="none"
+                  stroke="url(#goldArc)"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeDasharray={`${C * passed} ${C}`}
+                  transform="rotate(-90 140 140)"
+                  style={{ transition: phase === 'wait' ? 'stroke-dasharray 1s linear' : 'none', filter: 'drop-shadow(0 0 6px rgba(255,210,130,0.7))' }}
+                />
+                {Array.from({ length: 24 }, (_, i) => {
+                  const a = (i / 24) * 2 * Math.PI;
+                  return <circle key={i} cx={140 + (R + 9) * Math.sin(a)} cy={140 - (R + 9) * Math.cos(a)} r={i % 6 === 0 ? 1.4 : 0.7} fill="rgba(255,226,170,0.45)" />;
+                })}
+              </svg>
+              <div className="relative flex items-end gap-2.5" style={{ fontFamily: '"Cormorant Garamond", "Shippori Mincho", serif' }}>
+                {parts.map(([n, unit]) => (
+                  <span key={unit} className="flex items-end gap-0.5">
+                    <span className="bg-gradient-to-b from-[#fff6dc] via-[#f0d08c] to-[#b98a3e] bg-clip-text text-[52px] font-light leading-none tabular-nums text-transparent drop-shadow-[0_0_14px_rgba(255,214,140,0.35)]">{n}</span>
+                    <span className="mb-1.5 text-[11px] tracking-[0.15em] text-amber-100/60" style={{ fontFamily: SERIF }}>
+                      {unit}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <p className="mt-6 text-[11px] tracking-[0.4em] text-amber-100/45">つぎの扉が ひらくまで</p>
           </div>
-
-          {phase !== 'wait' && <MysticClock seconds={SKIP_SECONDS} />}
 
           <div className="pb-safe absolute inset-x-0 bottom-0 flex justify-center pb-14">
             {phase === 'wait' && showButton && canSkip && (
               <button
                 onClick={skip}
-                className="animate-[fadeUp_0.8s_ease-out] rounded-full border border-amber-200/70 bg-black px-8 py-3.5 text-[17px] tracking-[0.2em] text-amber-50 shadow-[0_0_28px_rgba(255,210,130,0.3)] active:scale-95"
+                className="relative animate-[fadeUp_0.8s_ease-out] overflow-hidden rounded-full border border-amber-200/50 bg-black/40 px-9 py-3.5 text-[15px] tracking-[0.3em] text-amber-50 backdrop-blur active:scale-95"
               >
+                <span className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 animate-[shimmer_3.2s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-amber-100/25 to-transparent" />
                 {skipLabel ?? m.gate.cantWait}
               </button>
             )}
           </div>
-          {needsTap && phase === 'wait' && (
-            <span className="pt-safe absolute right-4 top-4 text-xs text-white/35">🔊 TAP</span>
-          )}
+          {needsTap && phase === 'wait' && <span className="pt-safe absolute right-4 top-4 text-[11px] tracking-[0.2em] text-white/35">TAP で音</span>}
         </>
       )}
       {/* no sudden light (QA 14 R51): a soft rise to less than half, over half a second */}
@@ -162,61 +202,34 @@ export function TomorrowScreen({
   );
 }
 
-/** The time-skip clock: zodiac ring + hands that spin faster and faster. */
-function MysticClock({ seconds }: { seconds: number }) {
+/** A quiet field of stars; on a skip they stream outwards from the middle (time rushing past). */
+function Stars({ warp }: { warp: boolean }) {
+  const stars = useRef(
+    Array.from({ length: 70 }, (_, i) => {
+      const a = (i * 137.5 * Math.PI) / 180;
+      const d = 8 + ((i * 53) % 46);
+      return { x: 50 + d * Math.cos(a), y: 50 + d * Math.sin(a) * 1.4, s: 0.6 + ((i * 7) % 10) / 10, a, delay: (i % 12) * 0.08 };
+    }),
+  ).current;
   return (
-    <div className="pointer-events-none mt-8 animate-[clockIn_0.9s_ease-out] drop-shadow-[0_0_30px_rgba(255,200,110,0.55)]">
-      <svg viewBox="0 0 200 200" className="h-64 w-64 sm:h-80 sm:w-80" aria-hidden>
-        <defs>
-          <radialGradient id="face" cx="50%" cy="45%" r="60%">
-            <stop offset="0" stopColor="#3a2a12" />
-            <stop offset="1" stopColor="#0a0704" />
-          </radialGradient>
-        </defs>
-        <g style={{ transformOrigin: '100px 100px', animation: `spinRev ${seconds * 2}s linear infinite` }}>
-          <circle cx="100" cy="100" r="96" fill="none" stroke="#d9b46a" strokeWidth="1.2" />
-          <circle cx="100" cy="100" r="84" fill="none" stroke="#d9b46a" strokeOpacity=".5" strokeWidth=".6" strokeDasharray="2 3" />
-          {ZODIAC.map((z, i) => {
-            const a = ((i * 30 - 90) * Math.PI) / 180;
-            return (
-              <text key={z} x={100 + 90 * Math.cos(a)} y={100 + 90 * Math.sin(a) + 3} fontSize="9" fill="#f3d998" textAnchor="middle" fontFamily="'Apple Symbols', 'Segoe UI Symbol', 'Noto Sans Symbols', serif">
-                {z}
-              </text>
-            );
-          })}
-        </g>
-        <circle cx="100" cy="100" r="78" fill="url(#face)" stroke="#d9b46a" strokeWidth="1.5" />
-        {Array.from({ length: 60 }, (_, i) => {
-          const a = ((i * 6) * Math.PI) / 180;
-          const r1 = i % 5 === 0 ? 66 : 71;
-          return (
-            <line
-              key={i}
-              x1={100 + r1 * Math.sin(a)}
-              y1={100 - r1 * Math.cos(a)}
-              x2={100 + 75 * Math.sin(a)}
-              y2={100 - 75 * Math.cos(a)}
-              stroke="#e8c77d"
-              strokeWidth={i % 5 === 0 ? 1.6 : 0.6}
-            />
-          );
-        })}
-        <g style={{ transformOrigin: '100px 100px', animation: `spinRev ${seconds * 3}s linear infinite` }}>
-          <circle cx="100" cy="100" r="40" fill="none" stroke="#d9b46a" strokeOpacity=".35" strokeWidth=".8" />
-          <polygon points="100,62 104,100 100,138 96,100" fill="none" stroke="#d9b46a" strokeOpacity=".35" strokeWidth=".6" />
-          <polygon points="62,100 100,96 138,100 100,104" fill="none" stroke="#d9b46a" strokeOpacity=".35" strokeWidth=".6" />
-        </g>
-        {/* hour hand */}
-        <g style={{ transformOrigin: '100px 100px', animation: `handHour ${seconds}s cubic-bezier(.55,0,.25,1) forwards` }}>
-          <path d="M100 100 L96 96 L100 52 L104 96 Z" fill="#f3d998" />
-        </g>
-        {/* minute hand */}
-        <g style={{ transformOrigin: '100px 100px', animation: `handMinute ${seconds}s cubic-bezier(.6,0,.2,1) forwards` }}>
-          <path d="M100 104 L98.5 100 L100 30 L101.5 100 Z" fill="#fff4d6" />
-        </g>
-        <circle cx="100" cy="100" r="4.5" fill="#f3d998" stroke="#5a4218" strokeWidth="1" />
-        <circle cx="100" cy="100" r="1.6" fill="#fff" />
-      </svg>
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      {stars.map((st, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full bg-amber-50"
+          style={{
+            left: `${st.x}%`,
+            top: `${st.y}%`,
+            width: warp ? 1.5 : st.s * 1.6,
+            height: warp ? 26 : st.s * 1.6,
+            opacity: warp ? 0.7 : 0.25 + st.s * 0.35,
+            transform: warp ? `rotate(${(st.a * 180) / Math.PI + 90}deg)` : undefined,
+            animation: warp ? `warp 0.9s ${st.delay}s ease-in infinite` : `twinkle ${3 + (i % 5)}s ${i * 0.13}s ease-in-out infinite`,
+            ['--dx' as string]: `${Math.cos(st.a) * 60}vw`,
+            ['--dy' as string]: `${Math.sin(st.a) * 60}vh`,
+          }}
+        />
+      ))}
     </div>
   );
 }

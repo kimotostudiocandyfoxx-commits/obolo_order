@@ -194,7 +194,7 @@ function PreviewPlay() {
         onScene={setScene}
         vars={{
           name,
-          inviter: live && me?.invitedByName ? me.invitedByName : '木元 駿之介',
+          inviter: live && me?.invitedByName ? me.invitedByName : 'MIKIE⭐︎DRILL',
           inviterMessage: q.get('msg') === '0' ? undefined : '宇宙で待ってる✌️ウヒョヒョ',
           // logged in: the member's own NEO and Bati (made for real on the Moon), like the members' journey
           neo: live && me && day >= 3 ? me.displayName : (neoForm(neo)?.name ?? (day >= 3 ? 'ミナト⭐︎' : undefined)),

@@ -29,7 +29,7 @@ function OrderEarly() {
       steps={SYS002}
       vars={{
         name: me.displayName,
-        inviter: me.invitedByName ?? '木元 駿之介',
+        inviter: me.invitedByName ?? 'MIKIE⭐︎DRILL',
         neo: me.displayName,
         kimorinStar: true,
         bati: me.bati?.name ?? undefined,

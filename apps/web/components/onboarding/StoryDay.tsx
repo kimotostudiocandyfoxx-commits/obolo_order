@@ -167,7 +167,7 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
       steps={story.steps}
       vars={{
         name: me.displayName,
-        inviter: me.invitedByName ?? '木元 駿之介',
+        inviter: me.invitedByName ?? 'MIKIE⭐︎DRILL',
         // from day 3 the display name is the NEO name (set on the Moon)
         neo: day >= 3 ? me.displayName : undefined,
         kimorinStar: day >= 3,
@@ -182,7 +182,8 @@ export function StoryDay({ day, story }: { day: number; story: DayStory }) {
         made: madeFrom(me.story),
       }}
       lessonApi={realLessonApi}
-      textOnly={day <= 1}
+      // day 1 answers by voice too (client 2026-11-22: the name and 「宇宙へ行ってみるか？」 with the mic button)
+      textOnly={false}
       // the riddle book: 1・7・8 from day 1; 2 (「DJ」) solved on day 3, Saturn
       seals={{ known: knownSealsOn(day), solved: solvedSealsOn(day, !!me?.orderedAt) }}
       stamps={stampsOn(day)}

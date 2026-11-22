@@ -7,8 +7,8 @@ import { micTrouble } from '@/lib/useDictation';
 /**
  * A choice answered by voice (D01-S006, story M-R169): a big mic button 〔話してみよう〕 with the answers as a small
  * example; the corner ⌨ (for when one cannot speak) shows them as buttons. A tap listens at once — the phone asks for
- * the mic itself (client 2026-10-29: the 「声は残しません…［いいよ］［やめる］」 step is gone). What is heard is matched to
- * the nearest answer (the browser's own speech recognition; nothing is sent or kept). A miss stays on the mic with a
+ * the mic itself (client 2026-10-29: the 「声は残しません…［いいよ］［やめる］」 step is gone). What is heard shows as said
+ * (client 2026-11-22) and is only matched to the nearest answer to choose the way on (the browser's own speech recognition; nothing is sent or kept). A miss stays on the mic with a
  * word of why (it used to drop to the buttons, which looked like the old choice coming back); only a mic that cannot
  * be used goes to the buttons, saying so.
  */

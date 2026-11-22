@@ -257,7 +257,8 @@ export function fill(text: string, v: StoryVars): string {
     .replaceAll('{bati}', v.bati || 'バティ')
     .replaceAll('{food}', v.batiFood || '…')
     .replaceAll('{age}', v.age || '…')
-    .replaceAll('{choice1}', v.story?.['d1.choice1'] || '…');
+    // what was said, as said (client 2026-11-22), else the answer it matched
+    .replaceAll('{choice1}', v.story?.['d1.choice1Words'] || v.story?.['d1.choice1'] || '…');
 }
 
 /** The name shown on a line: the Bati's own name, KIMORIN⭐︎ after his naming. */

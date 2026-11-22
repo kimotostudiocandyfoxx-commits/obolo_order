@@ -1221,7 +1221,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           onPick={(k, words) => {
             // the words themselves stay in their own record (M-R169: D08-S007 quotes them)
             if (words) remember(`${step.key}Words`, words);
-            addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
+            // the bubble shows what was said, as said (client 2026-11-22); the matched answer only picks the way on
+            addLine({ id: `c${i}`, kind: 'me', text: words || step.options[k].label });
             neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}

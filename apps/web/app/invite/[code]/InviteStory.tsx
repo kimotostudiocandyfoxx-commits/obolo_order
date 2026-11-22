@@ -99,6 +99,7 @@ export function InviteStory({ code }: { code: string }) {
   if (finished && me) {
     return (
       <TomorrowScreen
+        canSkip
         name={me.displayName}
         completedAt={me.journeyCompletedAt}
         skipLabel={STORIES[1].skipLabel}
@@ -150,7 +151,6 @@ export function InviteStory({ code }: { code: string }) {
 
   return (
     <StoryPlayer
-      textOnly
       steps={DAY1}
       vars={{ name: me?.displayName ?? '', inviter: invite.inviterName, inviterMessage: invite.inviterMessage ?? undefined }}
       initial={saved}

@@ -189,13 +189,13 @@ export class UsersService {
   }
 
   /**
-   * Start the next day: allowed 24 h after the current day was finished. No skipping (M-R199, simple version): the
-   * old `skip` flag is ignored; a couple of minutes' grace covers a phone clock that runs a little fast.
+   * Start the next day: allowed 24 h after the current day was finished. 〔明日まで待てない〕 skips only after days 1 and
+   * 2 (client 2026-11-22); from day 3 the wait is kept. A couple of minutes' grace covers a phone clock that runs fast.
    */
-  async advanceJourney(userId: string, _skip: boolean): Promise<Me> {
+  async advanceJourney(userId: string, skip: boolean): Promise<Me> {
     const cur = await this.load(userId);
     if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_DONE) return toMe(cur);
-    if (Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
+    if (!(skip && cur.journeyDay <= 2) && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
       throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     }
     const [u] = await this.db.write

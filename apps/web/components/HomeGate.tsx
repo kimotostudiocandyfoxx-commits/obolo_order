@@ -43,6 +43,8 @@ export function HomeGate({ children }: { children: ReactNode }) {
         completedAt={me.journeyCompletedAt}
         skipLabel={STORIES[day]?.skipLabel}
         skippedText={STORIES[day]?.skippedText}
+        // the skip comes back only after days 1 and 2 (client 2026-11-22); from day 3 the 24 hours are waited
+        canSkip={day <= 2}
         onUnlocked={async (skipped) => {
           const elapsed = Date.now() >= Date.parse(me.journeyCompletedAt!) + JOURNEY_WAIT_MS;
           // tried again on a bad line; never left on the opened door (story chat 2026-10-29)

@@ -165,7 +165,8 @@ export function DemoDay({
       steps={steps}
       vars={vars}
       lessonApi={live ? realLessonApi : fakeLessonApi}
-      textOnly={day <= 1}
+      // day 1 answers by voice too (client 2026-11-22: the name and 「宇宙へ行ってみるか？」 with the mic button)
+      textOnly={false}
       showGate={showGate}
       replayFilms
       seals={{

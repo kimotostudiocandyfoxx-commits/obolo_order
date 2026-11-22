@@ -38,7 +38,9 @@ export const DAY1: Step[] = [
   // D01-S003 本部とMONBAN
   { t: 'se', sound: 'magic' }, // 文字が光って浮かび、消える
   { t: 'video', motion: 'd1-fold' }, // 白紙になった招待状が、折り鶴に折りたたまれる
+  { t: 'se', sound: 'whoosh' }, // the crane takes off (client 2026-11-22: the way to the gate wanted sound)
   { t: 'video', motion: '5-f' }, // 鶴が星空を飛ぶ
+  { t: 'se', sound: 'portal' },
   { t: 'se', sound: 'whoosh' },
   { t: 'video', motion: 'd1-arrive' }, // 金の雲を抜けて都へ降り、門の光に飛びこむ
   { t: 'loop', motion: 'd1-gate-loop' },
@@ -62,6 +64,7 @@ export const DAY1: Step[] = [
   { t: 'bgvideo', motion: 11 }, // 門の光の幕がほどける（M-R180）— その間に「門をくぐり…」（client 2026-10-20）
   { t: 'say', who: 'MONBAN', text: '門をくぐり、地球の神殿に行け…。' },
   { t: 'action', label: '門をくぐり、地球の神殿に向かう' },
+  { t: 'se', sound: 'footsteps' }, // through the gate to the temple (client 2026-11-22)
 
   { t: 'scene', id: 'D01-S006' },
 

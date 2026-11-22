@@ -1,7 +1,9 @@
 'use client';
 
 import { fastTap } from '@/lib/story/fastTap';
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { MicAllowed } from '@/components/onboarding/StoryExtras';
+import { useDictation } from '@/lib/useDictation';
 import { useHint } from './parts';
 
 /**
@@ -277,7 +279,11 @@ export function MessageBar({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  // the name can be said, too (client 2026-11-22: answer by pressing the mic button)
+  const micOk = useContext(MicAllowed);
+  const dict = useDictation({ field: input, value: v, onChange: setV, maxLength: 24 });
   useEffect(() => {
+    if (micOk) return;
     const t = setTimeout(() => input.current?.focus(), 450);
     return () => clearTimeout(t);
   }, []);
@@ -308,6 +314,19 @@ export function MessageBar({
             enterKeyHint="send"
             className="min-w-0 flex-1 bg-transparent text-[16px] text-amber-50 outline-none placeholder:text-white/35"
           />
+          {micOk && dict.supported && (
+            <button
+              type="button"
+              onClick={dict.toggle}
+              aria-label={dict.listening ? '話し終わった' : 'マイクで話す'}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition active:scale-90 ${dict.listening ? 'animate-pulse border-rose-300 bg-rose-400/30' : 'border-amber-200/40 bg-white/5'}`}
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-amber-100" strokeWidth={1.8} strokeLinecap="round" aria-hidden>
+                <rect x="9" y="3" width="6" height="11" rx="3" />
+                <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" />
+              </svg>
+            </button>
+          )}
           <button
             type="submit"
             disabled={!ok}
