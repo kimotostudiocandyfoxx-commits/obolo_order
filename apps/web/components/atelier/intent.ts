@@ -1,3 +1,4 @@
+import type { BluenaPlanet, ItemMarkId, MarkNames } from '@obolo/shared';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 
 /**
@@ -19,7 +20,7 @@ const WORDS: [AtelierKind, RegExp][] = [
 
 const REFINE = /もっと|やり直|やりなお|ちがう|違う|変えて|かえて|にして|っぽく|明るく|暗く|元気に|静かに|かわいく|かっこよく|足して|入れて/;
 
-export type Intent = { kind: 'make'; what: AtelierKind; content: string } | { kind: 'refine'; content: string } | { kind: 'ask'; options: AtelierKind[] } | { kind: 'talk'; content: string };
+export type Intent = { kind: 'find'; star: boolean; mark?: ItemMarkId; planet?: BluenaPlanet } | { kind: 'make'; what: AtelierKind; content: string } | { kind: 'refine'; content: string } | { kind: 'ask'; options: AtelierKind[] } | { kind: 'talk'; content: string };
 
 /** the words around the keyword: 「」 quotes win, otherwise the request with the "make a …" part taken off */
 export function contentOf(text: string): string {
@@ -30,8 +31,39 @@ export function contentOf(text: string): string {
     .trim();
 }
 
-export function detect(text: string, hasCard: boolean): Intent {
+/**
+ * M-R236 §4: 「★がついた曲、見せて」「♠の画像、出して」 — show your works with a ★ / a mark (a mark by its sign, its
+ * name, or the name you gave it), of one planet when its kind is named. Asking to see, with no ★ or mark, is not this.
+ */
+const FIND = /見せ|みせ|出して|だして|探して|さがして|見たい|みたい|どれ|一覧|リスト|教えて/;
+const STAR = /[★☆⭐]|星(が|の)?つい|ほし(が|の)?つい|お気に入り|おきにいり/;
+const MARK_WORDS: [ItemMarkId, RegExp][] = [
+  ['spade', /♠|♤|スペード/],
+  ['diamond', /♦|♢|ダイヤ/],
+  ['heart', /♥|♡|❤|ハート/],
+  ['club', /♣|♧|クラブ/],
+];
+const FIND_PLANET: [BluenaPlanet, RegExp][] = [
+  ['saturn', /コロリン|ころりん|つぶやき/],
+  ['jupiter', /アート|絵|画像|写真|イラスト/],
+  ['mercury', /曲|歌|うた/],
+  ['mars', /映像|MV|ＭＶ|ムービー|動画/i],
+  ['venus', /ラジオ|番組/],
+];
+export function detectFind(text: string, names?: MarkNames): Extract<Intent, { kind: 'find' }> | null {
   const t = text.trim();
+  if (!FIND.test(t)) return null;
+  const star = STAR.test(t);
+  let mark = MARK_WORDS.find(([, re]) => re.test(t))?.[0];
+  if (!mark && names) mark = (Object.entries(names) as [ItemMarkId, string][]).find(([, n]) => n && n.length >= 1 && new RegExp(`${n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(の|が|で|しるし)`).test(t))?.[0];
+  if (!star && !mark) return null;
+  return { kind: 'find', star, mark, planet: FIND_PLANET.find(([, re]) => re.test(t))?.[0] };
+}
+
+export function detect(text: string, hasCard: boolean, names?: MarkNames): Intent {
+  const t = text.trim();
+  const found = detectFind(t, names);
+  if (found) return found;
   let kinds = WORDS.filter(([, re]) => re.test(t)).map(([k]) => k);
   // 「絵を見せて」 is a picture to see, not art to make; 「姿を変身」 is the look
   if (kinds.includes('image')) kinds = kinds.filter((k) => k !== 'art');

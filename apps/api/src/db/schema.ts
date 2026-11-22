@@ -104,6 +104,8 @@ export const users = pgTable(
     batiId: text('bati_id'),
     /** M-R218: the small egg the first shell became hatches from this time (88 days); null = no egg (three born) */
     batiEggAt: timestamp('bati_egg_at', { withTimezone: true }),
+    /** M-R236: the member's own names for the four marks ♠♦♥♣ (none = no name) */
+    markNamesJson: jsonb('mark_names_json').$type<import('@obolo/shared').MarkNames>(),
     onboardingJson: jsonb('onboarding_json').$type<Record<string, string>>().notNull().default({}),
     /** Uranus: your atelier (AtelierLayout); null = not decorated yet */
     atelierJson: jsonb('atelier_json').$type<AtelierLayout>(),
@@ -862,4 +864,24 @@ export const dachiMessages = pgTable(
     index('dachi_messages_sender_idx').on(t.senderId, t.createdAt),
     uniqueIndex('dachi_messages_line_uq').on(t.recipientId, t.lineId).where(sql`${t.lineId} IS NOT NULL`),
   ],
+);
+
+/**
+ * M-R236 / M-R237: ★ (0–3) and one mark (♠♦♥♣) a member put on their own works and on lines of their talks. Only the
+ * member sees them. `kind` says which store `target_id` is in (@obolo/shared MARKED_KINDS); `local` = an item kept on
+ * the member's device (its id is the device's own). A row with no ★ and no mark is deleted.
+ */
+export const itemMarks = pgTable(
+  'item_marks',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    kind: text('kind').notNull(),
+    targetId: text('target_id').notNull(),
+    stars: integer('stars').notNull().default(0),
+    mark: text('mark'),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.kind, t.targetId] })],
 );

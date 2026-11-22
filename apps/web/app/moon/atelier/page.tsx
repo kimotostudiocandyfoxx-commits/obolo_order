@@ -28,7 +28,8 @@ function WithDachi() {
           key={id}
           id={id}
           thread={list.find((t) => t.id === id)}
-          onList={ctx.openList}
+          onList={ctx.day ? ctx.closeDay : ctx.openList}
+          day={ctx.day}
           onRead={markRead}
           onGone={() => {
             void reload();

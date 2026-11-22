@@ -10,6 +10,8 @@ import { HoldMic, Wave } from './HoldMic';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
 import { kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
+import { useMarkRing } from '@/components/finds/MarkRing';
+import { talkDayOf } from '@/lib/finds/talks';
 import { characterLook, colorOf, PLACE_BG, SELF_COLOR, selfLook } from '@/lib/talk/looks';
 
 
@@ -32,6 +34,8 @@ export type DachiThreadProps = {
   onGone?: (id: string) => void;
   /** M-R232: where the talk is (the place behind the two) */
   place?: 'moon' | 'saturn' | null;
+  /** M-R237: only this day's talk (YYYY-MM-DD), read only — a day opened from the past talks' list */
+  day?: string;
 };
 
 /**
@@ -40,7 +44,8 @@ export type DachiThreadProps = {
  * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
-export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon' }: DachiThreadProps) {
+export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon', day }: DachiThreadProps) {
+  const ring = useMarkRing();
   const { me } = useAuth();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
   const [msgs, setMsgs] = useState<DachiMessageView[] | null>(null);
@@ -62,7 +67,8 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
 
   const load = useCallback(async () => {
     try {
-      const list = await getApi().dachiMessages(id);
+      const all = await getApi().dachiMessages(id);
+      const list = day ? all.filter((m) => talkDayOf(m.createdAt) === day) : all;
       setMsgs(list);
       setErr(null);
       if (list.some((m) => !m.fromMe)) {
@@ -75,11 +81,12 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
       setErr(e instanceof ApiError && e.code === 'NOT_DACHI' ? 'この会話は、もう開けません' : 'うまく読み込めませんでした');
       setMsgs((m) => m ?? []);
     }
-  }, [id]);
+  }, [id, day]);
 
   useEffect(() => {
     setMsgs(null);
     void load();
+    if (day) return;
     const t = setInterval(() => document.visibilityState === 'visible' && void load(), POLL_MS);
     return () => clearInterval(t);
   }, [load]);
@@ -130,6 +137,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
     face: m.faces ? undefined : (m.face ?? undefined),
     faces: m.faces,
     voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
+    mark: { kind: 'dachi_message' as const, id: m.id },
     card: m.kind === 'work' && m.work ? { label: m.work.title || WORK_WORD[m.work.kind], thumb: <WorkCardView card={m.work} />, full: <WorkCardView card={m.work} big /> } : undefined,
   }));
 
@@ -143,6 +151,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
         )}
         <Face src={pic} name={name} />
         <p className="min-w-0 flex-1 truncate text-[13px] tracking-[0.18em] text-amber-100/90">{name}</p>
+        {day && <span className="text-[11px] tracking-[0.12em] text-amber-100/60">{day.slice(5).replace('-', '/')}</span>}
         {person && (
           <button onClick={() => setMenu(true)} aria-label="メニュー" className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-amber-100/70">
             ⋯
@@ -160,9 +169,10 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         top={4}
         loading={msgs === null}
-        unreadFrom={unreadFrom}
+        unreadFrom={day ? null : unreadFrom}
+        onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
         composer={
-          <div>
+          day ? undefined : <div>
             {err && <p className="mb-1 text-center text-xs text-rose-300">{err}</p>}
             {msgs === null && <p className="mb-1 text-center text-xs text-white/40">…</p>}
             <HoldMic
@@ -178,6 +188,7 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
         }
       />
 
+      {ring.node}
       {works && <WorkPicker works={works} onPick={(c) => void sendWork(c)} onClose={() => setWorks(null)} />}
       {menu && thread && (
         <SafetyMenu

@@ -83,6 +83,13 @@ import {
   memoryRefusal,
   MEMORY_LINES,
   rememberRequest,
+  matchesFind,
+  talkDays,
+  ITEM_MARKS,
+  type FoundWork,
+  type ItemMarkView,
+  type MarkNames,
+  type MarkedKind,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt, foodEmoji } from '@/lib/look';
@@ -154,6 +161,9 @@ interface DemoState {
   /** M-R213: works each member chose 〔見えなくする〕 on (`kind:id`) */
   workHides?: Record<string, string[]>;
   bluenaKeeps?: Record<string, string[]>;
+  /** M-R236: each member's ★ / marks (`kind:id` → …) and their names for the marks */
+  itemMarks?: Record<string, Record<string, { stars: number; mark: ItemMarkView['mark'] }>>;
+  markNames?: Record<string, MarkNames>;
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
 }
 
@@ -266,6 +276,60 @@ export class DemoApi implements Api {
     const f = this.s.follows ?? {};
     const dachi = ((f[viewer] ?? []).includes(owner) && (f[owner] ?? []).includes(viewer)) || (owner === 'demo-inviter' && !!this.s.dachiInviter);
     return dachi || !seesOnlyDachi(this.s.users[viewer]?.birthYear);
+  }
+
+  async itemMarks() {
+    const me = this.uid();
+    const m = this.s.itemMarks?.[me] ?? {};
+    return {
+      marks: Object.entries(m).map(([k, v]) => ({ kind: k.slice(0, k.indexOf(':')) as MarkedKind, id: k.slice(k.indexOf(':') + 1), ...v })),
+      names: this.s.markNames?.[me] ?? {},
+    };
+  }
+  async setItemMark(body: Parameters<Api['setItemMark']>[0]) {
+    const me = this.uid();
+    const all = { ...(this.s.itemMarks?.[me] ?? {}) };
+    const key = `${body.kind}:${body.id}`;
+    if (!body.stars && !body.mark) delete all[key];
+    else all[key] = { stars: body.stars, mark: body.mark };
+    this.s.itemMarks = { ...(this.s.itemMarks ?? {}), [me]: all };
+    this.save();
+    return body;
+  }
+  async setMarkNames(body: Parameters<Api['setMarkNames']>[0]) {
+    const names: MarkNames = {};
+    for (const k of ITEM_MARKS) if (body[k]?.trim()) names[k] = body[k]!.trim().slice(0, 12);
+    this.s.markNames = { ...(this.s.markNames ?? {}), [this.uid()]: names };
+    this.save();
+    return names;
+  }
+  /** the planets' demo stores (the demo's songs are on the device: the atelier's shelf, merged by the page) */
+  async findWorks(f: Parameters<Api['findWorks']>[0]): Promise<FoundWork[]> {
+    const me = this.uid();
+    const marks = this.s.itemMarks?.[me] ?? {};
+    const want = (p: FoundWork['planet']) => !f.planet || f.planet === p;
+    const out: FoundWork[] = [];
+    const w = (x: Omit<FoundWork, 'stars' | 'mark'>): FoundWork => ({ ...x, ...(marks[`${x.kind}:${x.id}`] ?? { stars: 0, mark: null }) });
+    if (want('saturn')) for (const p of (await this.saturnUserPosts(me)).items.filter((x) => !x.replyToId)) out.push(w({ kind: 'saturn_post', id: p.id, planet: 'saturn', title: p.text, audio: p.voiceUrl, image: p.photoUrl ?? null, createdAt: p.createdAt, flown: !p.room }));
+    if (want('jupiter')) for (const r of (await this.jupiterRoots()).filter((x) => x.kind === 'photo')) out.push(w({ kind: 'jupiter_root', id: r.id, planet: 'jupiter', title: '', image: r.url, createdAt: r.createdAt }));
+    if (want('mars')) for (const v of await this.marsBackstage()) out.push(w({ kind: 'mars_backstage', id: v.id, planet: 'mars', title: v.title, video: v.url, image: v.posterUrl, createdAt: v.createdAt }));
+    if (want('venus')) for (const r of await this.myRadioShows()) out.push(w({ kind: 'radio_show', id: r.id, planet: 'venus', title: r.title, audio: r.audioUrl, image: r.thumbUrl, createdAt: r.createdAt, flown: r.status === 'public' }));
+    const q = f.q?.trim().toLowerCase();
+    return out.filter((x) => matchesFind(x, f) && (!q || x.title.toLowerCase().includes(q))).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+  async findTalkDays(f: Parameters<Api['findTalkDays']>[0]) {
+    const me = this.uid();
+    const marks = this.s.itemMarks?.[me] ?? {};
+    const local = (iso: string) => {
+      const d = new Date(iso);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+    if (f.thread === 'bati') {
+      const ms = this.s.buddy[me]?.messages ?? [];
+      return talkDays(ms.map((m) => ({ id: m.id, at: m.createdAt, who: m.role === 'user' ? 'me' : 'bati', text: m.text })), (id) => marks[`buddy_message:${id}`], f, local);
+    }
+    const ms = await this.dachiMessages(f.thread);
+    return talkDays(ms.map((m) => ({ id: m.id, at: m.createdAt, who: m.fromMe ? 'me' : (m.character ?? f.thread), text: m.text ?? m.work?.title ?? '' })), (id) => marks[`dachi_message:${id}`], f, local);
   }
 
   async hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean) {

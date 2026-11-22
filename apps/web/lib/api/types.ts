@@ -1,4 +1,4 @@
-import type { BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   BuddyChatResponse,
   BuddyMessageView,
@@ -336,6 +336,15 @@ export interface Api {
   radioMessage(id: string, body: RadioMessageBody): Promise<RadioMessageView>;
   hideRadioMessage(liveId: string, messageId: string): Promise<void>;
   reportRadio(body: RadioReportBody): Promise<void>;
+  /** M-R236: your ★ / marks on everything, and your names for ♠♦♥♣ */
+  itemMarks(): Promise<ItemMarksView>;
+  /** M-R236: one item's ★ (0–3) and mark (no ★ and no mark = cleared) */
+  setItemMark(body: SetItemMarkBody): Promise<ItemMarkView>;
+  setMarkNames(body: MarkNamesBody): Promise<MarkNames>;
+  /** M-R237: Bluena's works across the planets (newest first), filtered by planet / ★ / mark / words */
+  findWorks(f: FindWorksQuery): Promise<FoundWork[]>;
+  /** M-R237: a thread's past talk as days (newest first), filtered by ★ / mark / words */
+  findTalkDays(f: FindTalksQuery): Promise<TalkDayView[]>;
   /** M-R213: 〔見えなくする〕 a stranger's planet work, for you only (kept on the server) */
   hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean): Promise<{ hidden: boolean }>;
   /** M-R213: 〔通報〕 a stranger's planet work */

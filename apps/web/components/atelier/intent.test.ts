@@ -26,3 +26,16 @@ describe('atelier intent (M-R210)', () => {
     expect(contentOf('夏の海の曲を作って')).toBe('夏の海の曲');
   });
 });
+
+describe('M-R236: asking {bati} for the works with a ★ / a mark', () => {
+  it('「★がついた曲、見せて」 is a find of starred songs', () => {
+    expect(detect('★がついた曲、見せて', false)).toEqual({ kind: 'find', star: true, mark: undefined, planet: 'mercury' });
+    expect(detect('♠の画像、出して', false)).toEqual({ kind: 'find', star: false, mark: 'spade', planet: 'jupiter' });
+    expect(detect('お気に入り、ぜんぶ見せて', false)).toMatchObject({ kind: 'find', star: true, planet: undefined });
+    expect(detect('仕事のやつ、見せて', false, { spade: '仕事' })).toMatchObject({ kind: 'find', mark: 'spade' });
+  });
+  it('without a ★ or a mark it is what it was', () => {
+    expect(detect('絵を見せて', false).kind).toBe('make');
+    expect(detect('星の歌を作って', false)).toMatchObject({ kind: 'make', what: 'song' });
+  });
+});

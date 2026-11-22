@@ -7,7 +7,10 @@ import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { batiDaysLeftLine, kororinRing, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { batiDaysLeftLine, kororinRing, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { useMarkRing } from '@/components/finds/MarkRing';
+import { markNames } from '@/lib/finds/marks';
+import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
 import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
@@ -70,7 +73,37 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
 
   // {bati}'s own lines in its personality's manner (M-R216); KIMORIN (no {bati} yet) as written
   const batiVoice = own.isBati ? batiLineVoiceOf(me?.bati) : undefined;
-  const say = (text: string, chips?: string[]) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: story ? story.voice('バティ', text) : batiLine(text, batiVoice), chips }]);
+  const say = (text: string, chips?: string[], found?: Work[]) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: story ? story.voice('バティ', text) : batiLine(text, batiVoice), chips, found }]);
+  const ring = useMarkRing();
+
+  /** M-R236: 「★がついた曲、見せて」 — your works with that ★ / mark, as cards in the talk */
+  const showFound = async (f: { star: boolean; mark?: ItemMarkId; planet?: BluenaPlanet }) => {
+    setBusy(true);
+    try {
+      const list = (await findAll({ star: f.star || undefined, mark: f.mark, planet: f.planet })).slice(0, 12);
+      // PLACEHOLDER (P-FINDS-1): {bati}'s words around what it found
+      const what = `${f.star ? '★' : ''}${f.mark ? (markNames()[f.mark] || MARK_GLYPH[f.mark]) : ''}`;
+      if (!list.length) say(`${what}がついたのは、まだないみたい`);
+      else say(`${what}がついた${f.planet ? (PLANET_NAME[f.planet] + 'の') : ''}作品、これだよ！`, undefined, list.map((x) => x.work));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // M-R236 §4: the first time there are five works, {bati} tells about ★ and marks — once
+  const tipped = useRef(false);
+  const tipCheck = useCallback(async () => {
+    if (tipped.current || story || !me || me.story?.[`sys.${STAR_TIP_KEY}`] === '1') return;
+    const n = (await findAll({}).catch(() => [])).length;
+    if (n < STAR_TIP_AT || tipped.current) return;
+    tipped.current = true;
+    say(STAR_TIP_LINE);
+    void getApi()
+      .saveSysStory({ [STAR_TIP_KEY]: '1' })
+      .then(setMe)
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [me, story]);
   /** a script line, word for word in its speaker's manner (then the made words in it, then the story's placeholders) */
   const line = (cue: keyof typeof lines, words = '') => {
     for (const l of lines[cue] ?? []) setMsgs((m) => [...m, { id: uid(), who: 'bati', speaker: l.who, text: story!.fill(withWords(story!.voice(l.who, l.text), words)) }]);
@@ -101,6 +134,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
           line('after');
           line('fix');
         } else if (DONE[kind]) say(DONE[kind]);
+        if (w.status === 'ready' && !story) void tipCheck();
       } catch (e) {
         put({ ...shell, status: 'failed', note: failLine(e) });
         if (story) line('fail');
@@ -146,7 +180,8 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
     if (p && 'voiceAgain' in p) return void run('voice', text);
     if (p && 'kind' in p) return void run(p.kind, text);
     const last = lastWork();
-    const it = detect(text, !!last);
+    const it = detect(text, !!last, markNames());
+    if (it.kind === 'find') return void showFound(it);
     if (it.kind === 'make') return ask(it.what, it.content);
     if (it.kind === 'refine' && last) {
       if (last.kind === 'voice') {
@@ -272,12 +307,26 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
   ];
   const items: TalkItem[] = msgs.map((m) =>
     m.who === 'me'
-      ? { id: m.id, who: 'me', text: m.text }
+      ? { id: m.id, who: 'me', text: m.text, mark: { kind: 'local', id: m.id } }
       : m.who === 'bati'
         ? {
             id: m.id,
             who: 'bati',
             text: m.text,
+            mark: { kind: 'local', id: m.id },
+            card: m.found?.length
+              ? {
+                  label: m.text,
+                  thumb: <FoundThumb works={m.found} />,
+                  full: (
+                    <div className="no-scrollbar max-h-[70svh] space-y-2 overflow-y-auto">
+                      {m.found.map((w) => (
+                        <WorkCard key={w.id} w={w} busy={busy} onFly={() => void flyIt(w)} onWear={() => undefined} onPick={() => undefined} onRecorded={() => undefined} onRing={(at) => ring.open(workMarkRef(w).kind, workMarkRef(w).id, at)} />
+                      ))}
+                    </div>
+                  ),
+                }
+              : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
             chips: m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
           }
@@ -285,6 +334,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
             id: m.id,
             who: 'bati',
             text: m.work.status === 'making' ? '' : (m.work.title ?? ''),
+            mark: m.work.status === 'ready' ? workMarkRef(m.work) : undefined,
             card: {
               label: m.work.title ?? m.work.prompt,
               thumb: <WorkThumb w={m.work} />,
@@ -297,6 +347,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
                   onWear={() => void wearIt(m.work)}
                   onPick={(id) => put({ ...m.work, pick: id, image: m.work.candidates?.find((c) => c.id === id)?.url, worn: false })}
                   onRecorded={(blob, sec) => void recorded(m.work, blob, sec)}
+                  onRing={(at) => ring.open(workMarkRef(m.work).kind, workMarkRef(m.work).id, at)}
                 />
               ),
             },
@@ -316,6 +367,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
         place={PLACE_BG.moon}
         top={story ? 40 : 6}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
+        onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
         composer={
           <TalkComposer
             key={bar}
@@ -330,6 +382,7 @@ export function AtelierChat({ first, talk, story }: { first: AtelierKind | null;
         }
       />
       {story && <StoryButton story={story} msgs={msgs} busy={busy} />}
+      {ring.node}
 
       {lesson && (
         <Teach
@@ -380,6 +433,26 @@ function WorkThumb({ w }: { w: Work }) {
         <span className="block truncate text-[13px] text-amber-50">{w.title || w.text || w.prompt}</span>
         <span className="block text-[10.5px] text-amber-200/70">{w.status === 'making' ? '作っているよ…' : w.status === 'failed' ? 'うまくできなかった' : w.status === 'record' ? '押して、録る' : '押して、ひらく'}</span>
       </span>
+    </span>
+  );
+}
+
+/** the works {bati} found, small in its bubble: a row of their pictures / marks (a tap opens them all) */
+function FoundThumb({ works }: { works: Work[] }) {
+  return (
+    <span className="flex items-center gap-1.5 bg-[rgba(16,11,26,0.7)] p-1.5">
+      {works.slice(0, 4).map((w) => {
+        const pic = w.image ?? w.poster ?? undefined;
+        return pic && !pic.startsWith('idb:') ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={w.id} src={pic} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" />
+        ) : (
+          <span key={w.id} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/5 text-amber-100/80">
+            <KindMark kind={w.kind} className="h-5 w-5" />
+          </span>
+        );
+      })}
+      {works.length > 4 && <span className="text-[12px] text-amber-100/70">+{works.length - 4}</span>}
     </span>
   );
 }

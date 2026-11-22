@@ -31,7 +31,7 @@ export type Work = {
   saved?: boolean;
 };
 
-export type Msg = { id: string; who: 'me'; text: string } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string } | { id: string; who: 'work'; work: Work };
+export type Msg = { id: string; who: 'me'; text: string } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[] } | { id: string; who: 'work'; work: Work };
 
 /** the kinds that fly to a planet (〔星へ飛ばす〕) */
 export const FLIES: Partial<Record<AtelierKind, 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'>> = {

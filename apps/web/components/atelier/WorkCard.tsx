@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { StarButton } from '@/components/finds/MarkRing';
+import { workMarkRef } from '@/lib/finds/works';
 import { Glyph } from '@/components/bluena/glyphs';
 import { PlanetMark } from '@/components/bluena/PlanetMark';
 import { LineIcon } from '@/components/LineIcon';
@@ -67,10 +69,14 @@ export function WorkCard({
   onWear,
   onPick,
   onRecorded,
+  onRing,
 }: {
   w: Work;
   busy: boolean;
-  onAgain: () => void;
+  /** none: no 〔やり直し〕 (a work shown again, e.g. what {bati} found) */
+  onAgain?: () => void;
+  /** M-R236: a long press on the ★ opens the mark ring */
+  onRing?: (at: { x: number; y: number }) => void;
   onFly: () => void;
   onWear: () => void;
   onPick: (id: string) => void;
@@ -95,6 +101,8 @@ export function WorkCard({
       <div className="mb-1.5 flex items-center gap-1.5 text-amber-100/70">
         <KindMark kind={w.kind} className="h-4 w-4" />
         {w.title && <p className="truncate text-[13px] font-bold text-amber-50">{w.title}</p>}
+        {/* M-R236: the small ★ at the card's top right */}
+        {w.status === 'ready' && <StarButton {...workMarkRef(w)} onRing={onRing} className="ml-auto shrink-0" />}
       </div>
 
       {w.status === 'making' && (
@@ -139,9 +147,11 @@ export function WorkCard({
               {on ? '❚❚ 止める' : '▶ 再生'}
             </button>
           )}
-          <button onClick={onAgain} disabled={busy} className={`${btn} border border-white/20`}>
-            やり直し
-          </button>
+          {onAgain && (
+            <button onClick={onAgain} disabled={busy} className={`${btn} border border-white/20`}>
+              やり直し
+            </button>
+          )}
           {(w.kind === 'look' || w.kind === 'bati') && w.status === 'ready' && (
             <button onClick={onWear} disabled={busy || w.worn} className={`${btn} bg-amber-200 font-bold text-slate-950`}>
               {w.worn ? 'これになった' : 'これにする'}

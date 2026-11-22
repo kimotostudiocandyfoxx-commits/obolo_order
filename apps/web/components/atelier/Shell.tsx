@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { openKinds, type AtelierKind } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { AtelierChat, newTalk } from './AtelierChat';
+import { BatiDay } from './DayReplay';
 import { useAtelierCtx } from './ctx';
 import { BluenaDrawer, ThreadsDrawer } from './Drawers';
 import type { Talk } from './shelf';
@@ -35,7 +36,13 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
   const [firstTalk] = useState(talk.id);
   const [drawer, setDrawer] = useState<'left' | 'right' | null>(null);
   const unread = threads.some((t) => t.id !== BATI_THREAD && !!t.unread);
-  const tctx = { openList: () => setDrawer('left'), openBluena: bluena ? () => setDrawer('right') : undefined };
+  // M-R237: one day of a thread's past talk, opened from the left drawer (read only)
+  const [past, setPast] = useState<{ thread: string; day: string } | null>(null);
+  const closePast = () => {
+    setPast(null);
+    setDrawer('left');
+  };
+  const tctx = { openList: () => setDrawer('left'), openBluena: bluena ? () => setDrawer('right') : undefined, day: past && past.thread === thread ? past.day : undefined, closeDay: closePast };
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
@@ -52,10 +59,14 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
         )}
       </div>
 
-      {thread === BATI_THREAD ? (
+      {past && past.thread === BATI_THREAD ? (
+        <BatiDay key={past.day} day={past.day} onBack={closePast} />
+      ) : thread === BATI_THREAD ? (
         <AtelierChat key={talk.id} first={talk.id === firstTalk ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} />
       ) : (
-        <div className="relative flex min-h-0 flex-1 flex-col">{renderThread?.(thread, tctx) ?? null}</div>
+        <div key={tctx.day ?? 'now'} className="relative flex min-h-0 flex-1 flex-col">
+          {renderThread?.(thread, tctx) ?? null}
+        </div>
       )}
 
       {drawer === 'left' && (
@@ -64,16 +75,24 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
           threads={threads}
           current={thread}
           talkId={talk.id}
+          onDay={(id, d) => {
+            setPast({ thread: id, day: d });
+            setThread(id);
+            setDrawer(null);
+          }}
           onThread={(id) => {
+            setPast(null);
             setThread(id);
             setDrawer(null);
           }}
           onTalk={(t) => {
+            setPast(null);
             setTalk(t);
             setThread(BATI_THREAD);
             setDrawer(null);
           }}
           onNew={() => {
+            setPast(null);
             setTalk(newTalk(day));
             setThread(BATI_THREAD);
             setDrawer(null);
@@ -81,7 +100,7 @@ export function Shell({ first, threads = [], renderThread, story }: { first: Ate
           onClose={() => setDrawer(null)}
         />
       )}
-      {drawer === 'right' && bluena && <BluenaDrawer kinds={openKinds(day)} ctx={ctx} onClose={() => setDrawer(null)} />}
+      {drawer === 'right' && bluena && <BluenaDrawer kinds={openKinds(day)} day={day} ctx={ctx} onClose={() => setDrawer(null)} />}
     </div>
   );
 }

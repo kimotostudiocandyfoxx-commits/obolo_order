@@ -23,6 +23,10 @@ export type ThreadCtx = {
   openList: () => void;
   /** open Bluena (right drawer) — undefined on day 2, when there is no Bluena yet */
   openBluena?: () => void;
+  /** M-R237: show only this day's talk (YYYY-MM-DD), read only — opened from the past talks' list */
+  day?: string;
+  /** back from that day to the list */
+  closeDay?: () => void;
 };
 
 export type RenderThread = (id: string, ctx: ThreadCtx) => ReactNode;

@@ -1,6 +1,7 @@
 'use client';
 
-import { ruleBeats, talkSentences, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
+import { ruleBeats, talkSentences, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
+import { holdProps, StarButton } from '@/components/finds/MarkRing';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Figure, TALK_CSS, type FigureState } from './Figure';
 import { unlockAudio } from '@/lib/onboarding/audio';
@@ -50,6 +51,8 @@ export type TalkItem = {
   extra?: ReactNode;
   /** still being written (streaming) */
   live?: boolean;
+  /** M-R236: where its ★ / mark is kept (a small ★ at the bubble's / コロリン's top right; a long press opens the ring) */
+  mark?: { kind: MarkedKind; id: string };
 };
 
 const RING_MAX = 8;
@@ -87,6 +90,7 @@ export function TalkScene({
   logLabel = '過去の言葉',
   unreadFrom,
   loading = false,
+  onRing,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -113,6 +117,8 @@ export function TalkScene({
   unreadFrom?: number | null;
   /** the lines are still being loaded (what is there when they come counts as already said) */
   loading?: boolean;
+  /** M-R236: a long press on a line (its ★ / mark ring) */
+  onRing?: (item: TalkItem, at: { x: number; y: number }) => void;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -412,12 +418,13 @@ export function TalkScene({
               const who = byId.get(it.who);
               const fresh = k === 0;
               return (
+                <span key={it.id} className="absolute" style={{ left: p.x, top: p.y }}>
                 <button
-                  key={it.id}
                   onClick={() => setOpened(it)}
+                  {...(it.mark && onRing ? holdProps((at) => onRing(it, at)) : {})}
                   aria-label={`${it.name ?? who?.name ?? ''}：${it.text}`}
-                  className="pointer-events-auto absolute"
-                  style={{ left: p.x, top: p.y, transform: 'translate(-50%,-50%)' }}
+                  className="pointer-events-auto absolute left-0 top-0"
+                  style={{ transform: 'translate(-50%,-50%)' }}
                 >
                   <span className="block" style={{ animation: reduced ? undefined : 'talk-ring-up 16s ease-in-out infinite' }}>
                     <span
@@ -429,6 +436,8 @@ export function TalkScene({
                     </span>
                   </span>
                 </button>
+                {it.mark && <StarButton kind={it.mark.kind} id={it.mark.id} size={9} onRing={onRing ? (at) => onRing(it, at) : undefined} className="pointer-events-auto absolute left-[14px] top-[-34px]" />}
+                </span>
               );
             })}
           </div>
@@ -488,6 +497,7 @@ export function TalkScene({
               muted={muted}
               onPlay={() => (speech?.id === it.id ? finish() : say(it))}
               onReplay={() => say(it)}
+              onRing={onRing ? (at) => onRing(it, at) : undefined}
               shown={speech?.id === it.id && speech.typed && at < 1 ? Math.floor(at * speech.len) : undefined}
             />
           );
@@ -507,7 +517,7 @@ export function TalkScene({
       {opened && (
         <div className="absolute inset-0 z-[20] flex items-start justify-center bg-black/35 px-4 backdrop-blur-[1px]" style={{ paddingTop: top + 40 }} onClick={() => setOpened(null)}>
           <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <Bubble item={opened} who={byId.get(opened.who)} newest grow tailX={-1} width={w} onCard={() => setBig(opened)} onOpen={() => undefined} playing={speech?.id === opened.id} muted={muted} onPlay={() => say(opened)} onReplay={() => say(opened)} />
+            <Bubble item={opened} who={byId.get(opened.who)} newest grow tailX={-1} width={w} onCard={() => setBig(opened)} onOpen={() => undefined} playing={speech?.id === opened.id} muted={muted} onPlay={() => say(opened)} onReplay={() => say(opened)} onRing={onRing ? (at) => onRing(opened, at) : undefined} />
             <button onClick={() => setOpened(null)} className="mx-auto mt-2 block rounded-full bg-white/10 px-4 py-1.5 text-[12px] text-amber-50/80">
               とじる
             </button>
@@ -641,6 +651,7 @@ function Bubble({
   muted,
   onPlay,
   onReplay,
+  onRing,
   shown,
 }: {
   item: TalkItem;
@@ -658,6 +669,8 @@ function Bubble({
   onPlay: () => void;
   /** a tap on the words: say it again (M-R239) */
   onReplay: () => void;
+  /** M-R236: a long press opens the ★ / mark ring */
+  onRing?: (at: { x: number; y: number }) => void;
   /** M-R238: the words come out (this many characters shown; the rest keeps its place) */
   shown?: number;
 }) {
@@ -677,7 +690,9 @@ function Bubble({
           {item.name ?? who?.name}
         </p>
       )}
+      {item.mark && <StarButton kind={item.mark.kind} id={item.mark.id} size={10} onRing={onRing} className={`absolute -top-1 z-[1] ${mine ? 'left-1' : 'right-1'}`} />}
       <div
+        {...(onRing && item.mark ? holdProps(onRing) : {})}
         className={`relative min-h-0 rounded-[18px] px-3.5 py-2 text-[15px] leading-[1.6] text-white/95 shadow-[0_6px_18px_rgba(0,0,0,0.35)] ${grow ? 'flex flex-col' : ''}`}
         style={{ background: bg, border: `1px solid ${mine ? 'rgba(170,210,255,0.45)' : `${who?.color ?? '#f0cd8c'}55`}` }}
       >

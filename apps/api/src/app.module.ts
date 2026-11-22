@@ -25,6 +25,8 @@ import { DachiController } from './dachi/dachi.controller';
 import { DachiService } from './dachi/dachi.service';
 import { DachiLinkService } from './dachi/dachi-link.service';
 import { DachiVoiceService } from './dachi/dachi-voice.service';
+import { FindsController } from './finds/finds.controller';
+import { FindsService } from './finds/finds.service';
 import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
@@ -90,6 +92,7 @@ import { WalletController } from './wallet/wallet.controller';
     JobsController,
     InternalJobsController,
     DachiController,
+    FindsController,
   ],
   providers: [
     AuthGuard,
@@ -124,6 +127,7 @@ import { WalletController } from './wallet/wallet.controller';
     DachiService,
     DachiLinkService,
     DachiVoiceService,
+    FindsService,
   ],
 })
 export class AppModule {}

@@ -3,6 +3,14 @@ import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
 
+/** ?planet=…&star=1&mark=…&q=… (only what is set) */
+function findQs(f: Record<string, string | boolean | undefined>): string {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(f)) if (v !== undefined && v !== '' && v !== false) p.set(k, v === true ? '1' : String(v));
+  const q = p.toString();
+  return q ? `?${q}` : '';
+}
+
 export class HttpApi implements Api {
   readonly mode = 'live' as const;
   constructor(private readonly base: string) {}
@@ -595,6 +603,21 @@ export class HttpApi implements Api {
   }
   hideRadioMessage(liveId: string, messageId: string) {
     return this.req<void>('POST', `/venus/lives/${liveId}/messages/${messageId}/hide`);
+  }
+  itemMarks() {
+    return this.req<Awaited<ReturnType<Api['itemMarks']>>>('GET', '/finds/marks');
+  }
+  setItemMark(body: Parameters<Api['setItemMark']>[0]) {
+    return this.req<Awaited<ReturnType<Api['setItemMark']>>>('POST', '/finds/marks', body);
+  }
+  setMarkNames(body: Parameters<Api['setMarkNames']>[0]) {
+    return this.req<Awaited<ReturnType<Api['setMarkNames']>>>('PUT', '/finds/mark-names', body);
+  }
+  findWorks(f: Parameters<Api['findWorks']>[0]) {
+    return this.req<Awaited<ReturnType<Api['findWorks']>>>('GET', `/finds/works${findQs(f)}`);
+  }
+  findTalkDays(f: Parameters<Api['findTalkDays']>[0]) {
+    return this.req<Awaited<ReturnType<Api['findTalkDays']>>>('GET', `/finds/talks${findQs(f)}`);
   }
   hidePlanetWork(kind: Parameters<Api['hidePlanetWork']>[0], id: string, on: boolean) {
     return this.req<{ hidden: boolean }>('POST', `/planet-works/${kind}/${id}/hide`, { on });
