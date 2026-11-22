@@ -347,7 +347,8 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
                     style={{ left: `${SLOTS[i].x}%`, top: `${SLOTS[i].y}%`, animation: leaving === i ? 'flyAway 0.75s ease-in forwards' : 'flyIn 0.9s ease-out' }}
                     aria-label={`@${f.handle}`}
                   >
-                    <div style={{ animation: `hover ${5 + (i % 3)}s ease-in-out ${i * 0.7}s infinite` }}>
+                    {/* M-R208: your own butterfly among everyone's, with a soft glow */}
+                    <div className={f.me ? 'drop-shadow-[0_0_16px_rgba(255,190,90,0.95)]' : ''} style={{ animation: `hover ${5 + (i % 3)}s ease-in-out ${i * 0.7}s infinite` }}>
                       <Butterfly art={f.art} src={f.src} emoji={f.emoji} img={f.img} wing={f.wing} size={bfSize} />
                     </div>
                     <span className={`mt-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] shadow-sm ${f.me ? 'bg-amber-200/90 text-amber-900' : f.hours <= 6 ? 'bg-orange-100/90' : 'bg-white/80'}`}>
@@ -421,16 +422,19 @@ export function PatapataWorld({ events, overlay, topInset = 0, live = false }: {
               <button onClick={() => go(view.v === 'search' ? { v: 'sky' } : { v: 'search' })} className={`flex items-center gap-2 text-sm ${view.v === 'search' ? 'font-bold' : ''}`}>
                 探す
               </button>
-              <button
-                onClick={() => {
-                  go({ v: 'roots' });
-                  ev.current?.onEgg?.();
-                }}
-                className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 border-[#f6ead9] bg-[#fffaf2] shadow-lg"
-                aria-label="たまご"
-              >
-                <span className="text-[10px] tracking-widest">たまご</span>
-              </button>
+              {/* M-R208: the planet is only for seeing; art is made in the Moon atelier (the egg stays for the practice) */}
+              {!live && (
+                <button
+                  onClick={() => {
+                    go({ v: 'roots' });
+                    ev.current?.onEgg?.();
+                  }}
+                  className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 border-[#f6ead9] bg-[#fffaf2] shadow-lg"
+                  aria-label="たまご"
+                >
+                  <span className="text-[10px] tracking-widest">たまご</span>
+                </button>
+              )}
               <button onClick={() => go({ v: 'tree', who: { kind: 'me' } })} className={`flex items-center gap-2 text-sm ${view.v === 'tree' ? 'font-bold' : ''}`}>
                 myツリー
               </button>
@@ -900,9 +904,11 @@ function TreeView({
         {isMe && (
           <div className="mt-4 text-center">
             {!data.leaves.length && <p className="mb-3 text-xs text-[#a58c74]">88時間飛び終えた蝶が、葉っぱになってここに戻ってきます</p>}
-            <button onClick={onRoots} className="rounded-full border border-[#d9c0a0] bg-[#fff6ea] px-5 py-2 text-sm">
-              根っこをひらく（自分だけ）
-            </button>
+            {!live && (
+              <button onClick={onRoots} className="rounded-full border border-[#d9c0a0] bg-[#fff6ea] px-5 py-2 text-sm">
+                根っこをひらく（自分だけ）
+              </button>
+            )}
           </div>
         )}
       </div>

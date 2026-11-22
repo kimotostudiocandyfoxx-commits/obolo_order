@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ApiError, getApi } from '@/lib/api';
@@ -178,7 +177,8 @@ export function MercuryWorld({
                       style={{ left: `${at.x}%`, top: `${at.y}%`, width: `${at.w * Math.min(1, pickShip(r.key).ratio * 1.15)}%`, transform: 'translate(-50%, -100%)', zIndex: Math.round(at.y) }}
                       aria-label={`@${r.name}の船`}
                     >
-                      <span className="flex w-full flex-col items-center" style={{ animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}>
+                      {/* M-R208: your own ship among everyone's, with a soft glow */}
+                      <span className={`flex w-full flex-col items-center ${r.isMe ? 'drop-shadow-[0_0_14px_rgba(255,206,120,0.95)]' : ''}`} style={{ animation: `sail ${4 + (i % 3)}s ease-in-out ${i * 0.5}s infinite` }}>
                         <span className="mb-[3%] max-w-[140%] truncate rounded-xl border border-amber-300/70 bg-[#0d1838]/85 px-2 py-1 text-left text-[clamp(8px,1.4vw,13px)] leading-tight shadow-lg backdrop-blur-sm">
                           {r.isMe ? '新曲を出航！' : `@${r.name}`}「{r.title}」
                           {r.sub && <span className="block text-white/60">{r.sub}</span>}
@@ -258,15 +258,8 @@ export function MercuryWorld({
           海図
         </button>
         {atelier ? (
-          // the real Mercury makes nothing itself (docs/工房とブルーナ_設計.md §3.4): songs are made in the Moon atelier
-          <Link href="/moon/atelier?kind=song" className="-mt-8 flex flex-col items-center text-xs">
-            <span className="flex h-16 w-16 items-center justify-center rounded-full border border-amber-100/40 bg-gradient-to-br from-[#2b3a6b] to-[#0d1430] text-amber-100 shadow-[0_0_24px_rgba(140,200,255,0.45)]">
-              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
-              <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
-            </svg>
-            </span>
-            月で作る
-          </Link>
+          // M-R208: planets are only for seeing works; songs are made in the Moon atelier (no make button on the sea)
+          null
         ) : (
           <button onClick={() => go({ v: 'compose' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'compose' ? 'text-amber-200' : ''}`}>
             <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 via-fuchsia-500 to-violet-500 text-2xl shadow-[0_0_24px_rgba(220,90,255,0.6)]">♫+</span>

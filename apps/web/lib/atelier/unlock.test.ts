@@ -1,36 +1,30 @@
 import { JOURNEY_DONE, JOURNEY_PAYMENT } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
-import { isOpen, lockLine, omakaseKind, openKinds } from './unlock';
+import { daysUntil, isOpen, lockLine, openKinds, openLessons } from './unlock';
 
-describe('atelier unlock by journey day (M-R208)', () => {
-  it('opens one kind a day from day 3', () => {
+describe('atelier unlock by journey day (M-R210)', () => {
+  it('day 2 opens the look, the dress-up, lookups and pictures; then one kind a day', () => {
     expect(openKinds(1)).toEqual([]);
-    expect(openKinds(2)).toEqual([]);
-    expect(openKinds(3)).toEqual(['voice']);
-    expect(openKinds(4)).toEqual(['voice', 'art']);
-    expect(openKinds(5)).toEqual(['voice', 'art', 'song']);
-    expect(openKinds(6)).toEqual(['voice', 'art', 'song', 'video']);
-    expect(openKinds(7)).toEqual(['voice', 'art', 'song', 'video', 'radio']);
-    expect(openKinds(JOURNEY_PAYMENT)).toHaveLength(5);
+    expect(openKinds(2)).toEqual(['look', 'bati', 'lookup', 'image']);
+    expect(openKinds(3)).toContain('voice');
+    expect(openKinds(4)).toContain('art');
+    expect(openKinds(5)).toContain('song');
+    expect(openKinds(6)).toContain('video');
+    expect(openKinds(6)).not.toContain('radio');
+    expect(openKinds(7)).toHaveLength(9);
+    expect(openKinds(JOURNEY_PAYMENT)).toHaveLength(9);
   });
   it('opens everything after the journey', () => {
-    for (const k of ['voice', 'art', 'song', 'video', 'radio', 'any', 'goods']) expect(isOpen(k, JOURNEY_DONE)).toBe(true);
+    expect(openKinds(JOURNEY_DONE)).toHaveLength(9);
+    expect(isOpen('radio', JOURNEY_DONE)).toBe(true);
   });
-  it('locks a kind before its day, with one calm line', () => {
-    expect(isOpen('radio', 6)).toBe(false);
-    expect(isOpen('voice', 3)).toBe(true);
-    expect(lockLine('radio')).toBe('7日目に、作れるようになる');
+  it('says how many days are left', () => {
+    expect(daysUntil('radio', 3)).toBe(4);
+    expect(lockLine('song', 3)).toBe('それは2日後に作れるようになるよ');
   });
-  it('おまかせ follows what is open', () => {
-    expect(isOpen('any', 2)).toBe(false);
-    expect(isOpen('any', 3)).toBe(true);
-    expect(omakaseKind(2)).toBeNull();
-    expect(omakaseKind(3)).toBe('voice');
-    expect(omakaseKind(4)).toBe('art');
-    expect(omakaseKind(5)).toBe('song');
-    expect(omakaseKind(7)).toBe('song');
-  });
-  it('leaves the later planets (goods / book / game) as they are', () => {
-    expect(isOpen('goods', 3)).toBe(true);
+  it('teaches each new thing once on the journey', () => {
+    expect(openLessons(2)).toEqual(['basics']);
+    expect(openLessons(4)).toEqual(['basics', 'voice', 'art']);
+    expect(openLessons(JOURNEY_DONE)).toEqual([]);
   });
 });

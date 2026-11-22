@@ -37,7 +37,7 @@ export function KororinRecord({
     <div className="relative mx-auto aspect-square w-[min(92vw,420px)]">
       {/* the platter's shadow and rim */}
       <div className="absolute inset-0 rounded-full bg-black/40 blur-md" aria-hidden />
-      <div className="record-spin absolute inset-[2%] rounded-full">
+      <div className="record-spin absolute inset-[2%] rounded-full" style={{ animationDelay: spinDelay() }}>
         <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full" aria-hidden>
           <defs>
             <radialGradient id="vinyl" cx="50%" cy="50%" r="50%">
@@ -74,7 +74,8 @@ export function KororinRecord({
           return (
             <div key={p.id} className="absolute" style={{ left: `${50 + r * Math.cos(rad) * 50}%`, top: `${50 + r * Math.sin(rad) * 50}%` }}>
               {/* stays upright while the record turns */}
-              <button onClick={() => onTap(p)} className="record-counter absolute left-0 top-0 flex flex-col items-center" aria-label={`${p.author.displayName || p.author.handle}のコロリン`}>
+              <button onClick={() => onTap(p)} className="record-counter absolute left-0 top-0 flex flex-col items-center"
+                style={{ animationDelay: spinDelay() }} aria-label={`${p.author.displayName || p.author.handle}のコロリン`}>
                 <span className={`relative block h-12 w-12 rounded-full ${mine && !own ? 'mine-glow' : ''} ${sing ? 'scale-125' : ''} transition-transform`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -102,6 +103,10 @@ export function KororinRecord({
     </div>
   );
 }
+
+/** the record and each kororin's upright turn follow the wall clock, so a kororin that arrives late still stands up */
+const SPIN_MS = 40_000;
+const spinDelay = () => `-${(Date.now() % SPIN_MS) / 1000}s`;
 
 /** rings of kororins: radius (fraction of the record's radius), how many, start angle */
 const RINGS = [

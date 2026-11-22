@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { neoForm, type PlanetFlyer, type PlanetPostView, type PlanetProfileView } from '@obolo/shared';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { getApi } from '@/lib/api';
@@ -174,7 +173,8 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
                       style={{ left: `${at.x}%`, top: `${at.y}%`, width: `${at.w}%`, transform: 'translate(-50%, -100%)', zIndex: Math.round(at.y) }}
                       aria-label={`${r.name}の映像`}
                     >
-                      <span className="flex w-full items-end gap-[3%]" style={{ animation: `ufo ${3 + (i % 3) * 0.7}s ease-in-out ${i * 0.4}s infinite` }}>
+                      {/* M-R208: your own UFO among everyone's, with a soft glow */}
+                      <span className={`flex w-full items-end gap-[3%] ${r.mine ? 'drop-shadow-[0_0_14px_rgba(255,206,120,0.95)]' : ''}`} style={{ animation: `ufo ${3 + (i % 3) * 0.7}s ease-in-out ${i * 0.4}s infinite` }}>
                         <span className="w-[50%] shrink-0">
                           <Vessel ride={pickUfo(r.key)} img={r.img} emoji={r.emoji} />
                         </span>
@@ -274,15 +274,8 @@ export function MarsWorld({ events, overlay, live = false }: { events?: MarsEven
           星図
         </button>
         {live ? (
-          // the real Mars makes nothing itself (docs/工房とブルーナ_設計.md §3.4): videos and MVs are made in the Moon atelier
-          <Link href="/moon/atelier?kind=video" className="-mt-8 flex flex-col items-center text-xs">
-            <span className="flex h-16 w-16 items-center justify-center rounded-full border border-amber-100/40 bg-gradient-to-br from-[#3a2050] to-[#120a1e] text-amber-100 shadow-[0_0_24px_rgba(200,140,255,0.45)]">
-              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
-              <path d="M15.5 3.5a8.5 8.5 0 1 0 5 13.6A7 7 0 0 1 15.5 3.5z" />
-            </svg>
-            </span>
-            月で作る
-          </Link>
+          // M-R208: planets are only for seeing works; videos and MVs are made in the Moon atelier (no make button here)
+          null
         ) : (
           <button onClick={() => go({ v: 'shoot' })} className={`-mt-8 flex flex-col items-center text-xs ${view.v === 'shoot' ? 'text-amber-200' : ''}`}>
             <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 via-violet-600 to-indigo-600 shadow-[0_0_24px_rgba(200,90,255,0.6)]"><LineIcon id="camera" className="h-7 w-7" /></span>
