@@ -4,9 +4,24 @@ import type { ReactNode } from 'react';
 /**
  * The review pages (moved from /preview, client 2026-10-25: the old address had been passed around):
  * kept out of search engines; /preview now finds nothing.
+ * A tiny build stamp (the deployed commit) sits in the corner so a reviewer can tell which version is live.
  */
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
+const COMMIT = (process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.NEXT_PUBLIC_BUILD_SHA ?? 'local').slice(0, 7);
+const BRANCH = process.env.VERCEL_GIT_COMMIT_REF ?? '';
+
 export default function ReviewLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <span
+        aria-hidden
+        className="pointer-events-none fixed bottom-[calc(2px+env(safe-area-inset-bottom))] left-1/2 z-[460] -translate-x-1/2 select-none font-mono text-[9px] tracking-wider text-white/35"
+        title={BRANCH}
+      >
+        build {COMMIT}
+      </span>
+    </>
+  );
 }
