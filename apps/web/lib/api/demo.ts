@@ -854,7 +854,7 @@ export class DemoApi implements Api {
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     const src = u.bati.imageUrl;
-    const candidates = await Promise.all([0, 1, 2].map(async (k) => ({ id: uid(), url: await demoRefine(src, wish, used * 3 + k) })));
+    const candidates = await Promise.all([0, 1, 2].map(async (k) => ({ id: uid(), url: await demoRefine(src, wish, used * 3 + k, true) })));
     this.lookCache.push(...candidates);
     return { candidates, left: Math.max(0, BATI_RESTYLE_PER_DAY - used - 1) };
   }

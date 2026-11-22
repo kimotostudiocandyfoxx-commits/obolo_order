@@ -9,6 +9,7 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { ApiError, getApi } from '@/lib/api';
 import { useI18n } from '@/lib/i18n/client';
 import { useAuth } from '@/lib/auth';
+import { RoomIcon, RoomSheet, type RoomMode } from './BatiRoom';
 import { LineIcon } from '@/components/LineIcon';
 
 export function MoonView() {
@@ -25,7 +26,17 @@ export function MoonView() {
 }
 
 function BatiFace({ size = 36 }: { size?: number }) {
-  // PLACEHOLDER (P-MOON-1): provisional Bati avatar (moon + face) until the character art exists.
+  const { me } = useAuth();
+  // the member's own hatched Bati (its smile when drawn); Bati's room (P-BATI-ROOM)
+  const pic = me?.bati?.faces?.smile ?? me?.bati?.imageUrl;
+  if (pic)
+    return (
+      <span className="relative inline-block shrink-0 rounded-full bg-[radial-gradient(circle_at_50%_40%,rgba(255,240,210,0.22),rgba(255,255,255,0.04)_70%)]" style={{ width: size, height: size }} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={pic} alt="" className="h-full w-full object-contain" />
+      </span>
+    );
+  // PLACEHOLDER (P-MOON-1): provisional Bati avatar (moon + face) before the hatching.
   return (
     <span className="relative inline-block shrink-0" style={{ width: size, height: size }} aria-hidden>
       <PlanetSphere id="moon" size={size} />
@@ -48,6 +59,7 @@ function Chat() {
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [room, setRoom] = useState<RoomMode | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const stickToBottom = useRef(true);
 
@@ -113,8 +125,8 @@ function Chat() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Buddy header */}
-      <div className="flex items-center gap-3 px-4 py-3">
-        <BatiFace size={44} />
+      <div className="flex items-center gap-3 px-4 pb-2 pt-3">
+        <BatiFace size={me?.bati?.imageUrl ? 56 : 44} />
         <div className="flex-1">
           <div className="font-black">{name}</div>
           <div className="text-[11px] text-white/50">{profile?.hasMemory ? `${m.moon.memoryOn}` : m.moon.memoryOff}</div>
@@ -127,6 +139,24 @@ function Chat() {
           <LineIcon id="gear" className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Bati's room (P-BATI-ROOM): dress Bati up, or have Bati's magic change your own look */}
+      {(me?.bati?.imageUrl || me?.avatarUrl) && (
+        <div className="flex gap-2 px-4 pb-3">
+          {me?.bati?.imageUrl && (
+            <button type="button" onClick={() => setRoom('bati')} className="flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-amber-100/25 bg-white/[0.06] px-4 text-[13px] font-bold text-amber-50/90 active:scale-95">
+              <RoomIcon id="dress" />
+              着替え・変身
+            </button>
+          )}
+          {me?.avatarUrl && (
+            <button type="button" onClick={() => setRoom('me')} className="flex h-10 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full border border-sky-100/25 bg-white/[0.06] px-3 text-[13px] font-bold text-sky-50/90 active:scale-95">
+              <RoomIcon id="magic" />
+              <span className="truncate">自分の姿を変えてもらう</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Messages */}
       <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto px-4 pb-4" onScroll={(e) => {
@@ -180,6 +210,18 @@ function Chat() {
           {m.moon.send}
         </button>
       </form>
+
+      {room && (
+        <RoomSheet
+          mode={room}
+          onClose={() => setRoom(null)}
+          // Bati's word after the change, in the chat for now (not saved)
+          onDone={(line) => {
+            stickToBottom.current = true;
+            setMessages((cur) => [...cur, { id: `room-${Date.now()}`, role: 'buddy', text: line, createdAt: new Date().toISOString() }]);
+          }}
+        />
+      )}
 
       {settingsOpen && profile && (
         <SettingsSheet

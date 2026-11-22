@@ -171,7 +171,8 @@ export async function demoFromReference(refUrl: string, a: { liked?: string; twi
 }
 
 /** Demo stand-in for a refinement: recolour toward the colour named in the instruction. */
-export async function demoRefine(url: string, instruction: string, n: number): Promise<string> {
+/** `png`: keeps the transparent background (the cut-out Bati in Bati's room) */
+export async function demoRefine(url: string, instruction: string, n: number, png = false): Promise<string> {
   const img = await loadImage(url);
   const c = document.createElement('canvas');
   c.width = c.height = 512;
@@ -183,7 +184,7 @@ export async function demoRefine(url: string, instruction: string, n: number): P
   g.fillStyle = 'rgba(255,240,200,0.9)';
   g.font = '40px serif';
   g.fillText('✦', 430, 70);
-  return c.toDataURL('image/jpeg', 0.82);
+  return png ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.82);
 }
 
 /** Demo stand-in for Bati's sticker picture: a round painted-looking sticker in a colour of the words. */

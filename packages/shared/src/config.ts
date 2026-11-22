@@ -42,8 +42,8 @@ export type MakeKind = keyof typeof MAKE_COST;
  * member's own look. Free during the first journey; after it each round takes the look's mana (MAKE_COST.look).
  * PLACEHOLDER (P-BATI-ROOM): ~3 pictures (restyle) / 4 pictures (look) per round, ~¥6 each.
  */
-export const BATI_RESTYLE_PER_DAY = 8;
-export const BATI_MAGIC_PER_DAY = 8;
+export const BATI_RESTYLE_PER_DAY = 30; // M-R207: Bati's magic is free and "as often as you like" on day 2 — 30 is only a cost safety cap
+export const BATI_MAGIC_PER_DAY = 30;
 /** Spec §1.1 — subscription price in JPY. */
 export const SUBSCRIPTION_PRICE_JPY = 88;
 
