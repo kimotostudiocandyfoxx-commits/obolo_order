@@ -107,6 +107,10 @@ export const STORY_READINGS: [RegExp, string][] = [
   // names the voice misread (client 2026-10-29: 「木元 駿之介」 is きもと しゅんのすけ)
   [/木元/g, 'きもと'],
   [/駿之介/g, 'しゅんのすけ'],
+  // client 2026-11-22: 「ロケット場」 is ロケットじょう; the default inviter MIKIE⭐︎DRILL is ミキエ ドリル
+  [/ロケット場/g, 'ロケットじょう'],
+  [/MIKIE/g, 'ミキエ'],
+  [/DRILL/g, 'ドリル'],
 ];
 export function speakText(text: string): string {
   return STORY_READINGS.reduce((t, [re, kana]) => t.replace(re, kana), text.replace(/\n/g, ' '));

@@ -791,11 +791,20 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     return null;
   };
   const kimorinLook = lookBefore(i);
+  // where today's look is made (answers after it show the visitor's look)
+  const lookStepAt = steps.findIndex((x) => x.t === 'look');
   // the inventor (day 2 until the Moon), then the round sunglasses over his eyes (story M-R112)
+  // until he changes on the Moon the icon is the white lab coat, never the red robe (client 2026-11-22)
   const kimorinAvatar: Avatar | undefined =
-    kimorinLook === 'kimorin-i' || kimorinLook === 'kimorin-iu' ? { src: `/story/avatars/${kimorinLook}.webp` } : kimorinLook === 'kimorin-sun' ? { src: '/story/avatars/kimorin-glasses.webp' } : undefined;
+    kimorinLook === 'kimorin-i' || kimorinLook === 'kimorin-iu'
+      ? { src: `/story/avatars/${kimorinLook}.webp` }
+      : kimorinLook === 'kimorin-sun' || (!kimorinLook && v.kimorinStar)
+        ? { src: '/story/avatars/kimorin-glasses.webp' }
+        : { src: '/story/avatars/kimorin-i.webp' };
   const autoStandee = (() => {
     const st = steps[i];
+    // once the look is made, answering puts the visitor's own look big on screen (client 2026-11-22)
+    if (st && ['choice', 'name', 'neoname', 'batiname', 'egg'].includes(st.t) && v.look && (stateRef.current.answers.look || v.story?.['d2.look'] || i > lookStepAt)) return sprite ? null : '@me';
     if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;
     if (st.who === 'MONBAN') return stillShows(still, 'MONBAN') ? null : 'monban';
     if (st.who === 'KIMORIN' && !stillShows(still, 'KIMORIN')) return lookBefore(i - 1);
