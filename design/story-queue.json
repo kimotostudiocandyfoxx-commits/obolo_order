@@ -72,6 +72,30 @@
       "id": "bluena-egg-v13-back-view",
       "size": "square",
       "prompt": "Product design render of 'Bluena', a premium companion device shaped like a large egg that stands upright on its wide bottom (fills an adult palm). Body: pearlescent white with a clearly visible iridescent sheen shifting from pale blue to violet and soft pink, smooth satin finish. On the FRONT, a detachable round touchscreen disc held by magnets, slightly raised, thin brushed-silver rim, its center a little above the middle of the egg, showing a tiny glowing UI of a moon with orbiting planets. On the BACK, at the same height as the front screen, a small round projector lens in a thin silver ring, angled slightly upward (about 15 degrees). The top tip of the egg is plain and smooth. Minimal, elegant, no buttons, no text, no letters, no logos, no watermark. Studio product photo of the BACK of the egg in three-quarter rear view, clearly showing the round projector lens on the back, at the upper-middle height, tilted slightly upward, with the edge of the front screen's silver rim just visible on the side. Soft light gray gradient background, photorealistic."
+    },
+    {
+      "id": "talk-user-base",
+      "size": "portrait",
+      "refs": [
+        "design/story/refs/talk-user.jpg"
+      ],
+      "prompt": "The same character as the reference picture (a slim young man with a black bowl haircut, black rectangular glasses, white T-shirt, long black ribbed cardigan, black slim pants, black shoes, wristwatch, rubber-hose cartoon white gloved hands, black-and-white vintage cartoon style with grain), same art style and colors. Full body, standing relaxed and natural, body turned slightly to his right (toward the left side of the picture) as if standing next to a friend, arms down at his sides, gentle smile, mouth closed, eyes open. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body fits inside the frame with margin on all sides, centered. No text, no letters, no logo on clothes, no watermark."
+    },
+    {
+      "id": "talk-friend-base",
+      "size": "portrait",
+      "refs": [
+        "design/story/refs/talk-friend.jpg"
+      ],
+      "prompt": "The same character as the reference picture (a very muscular young man with curly blond hair, white cloth wrapped around his waist, classical oil painting style like a renaissance statue), same art style and skin tone. Full body, standing relaxed, body turned slightly to his left (toward the right side of the picture) as if standing next to a friend, arms down at his sides, warm smile, mouth closed, eyes open, barefoot. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body fits inside the frame with margin on all sides, centered. No text, no letters, no logo on clothes, no watermark."
+    },
+    {
+      "id": "talk-bati-base",
+      "size": "square",
+      "refs": [
+        "design/story/refs/talk-bati.jpg"
+      ],
+      "prompt": "The same character as the reference picture (a round cute sea-urchin creature with dark purple body, golden-orange spines, uni roe on top of its head, big sparkling eyes, pink cheeks, two small stubby arms), same art style. Full body, floating upright, facing slightly toward the right side of the picture, small arms relaxed, happy smile, mouth open slightly. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body fits inside the frame with margin on all sides, centered. No text, no letters, no logo on clothes, no watermark."
     }
   ]
 }
