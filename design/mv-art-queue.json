@@ -7721,6 +7721,90 @@
       "refs": [
         "design/mv-art/out/iida-char-b.jpg"
       ]
+    },
+    {
+      "id": "iida-gb-intro-angel-v3a",
+      "prompt": "Camera placed directly underneath, looking straight up: the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) flies straight up away from us; the soles of his big gold shoes and his legs are closest to the camera at the bottom of the picture, his body rises upward in strong foreshortening, a ridiculously bulging bodybuilder upper body — gigantic rounded pecs, boulder shoulders, huge biceps seen from below, wings spread wide; he holds a big bouquet of pale pink roses up in each raised hand; his head is thrown back so he looks up at the sky, we see his chin from below, cross-eyed: both pupils turned inward toward his nose, mouth stretched into a suspiciously enormous wide toothy grin. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-lie-v3a",
+      "prompt": "Extreme close-up bust shot of the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes): his face fills most of the picture, head tilted strongly (about 30 degrees) to one side, face turned upward, cross-eyed: both pupils turned inward toward his nose looking up, one gloved index finger pressed vertically against his lips in a 'shh' secret pose, a huge wide-open laughing grin around the finger, mischievous. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-engineer-clark-v3a",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) with no hat, a ridiculously bulging bodybuilder upper body — gigantic rounded pecs, boulder shoulders, huge biceps, standing heroically like a famous pioneer statue: his right arm stretched out straight forward and diagonally upward, pointing far away toward the distant horizon sky with one finger, gazing into the distance with an ambitious visionary face; his left hand holds an open laptop computer at his side; chest puffed out, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-intro-angel-v3b",
+      "prompt": "Camera placed directly underneath, looking straight up: the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) flies straight up away from us; the soles of his big gold shoes and his legs are closest to the camera at the bottom of the picture, his body rises upward in strong foreshortening, a ridiculously bulging bodybuilder upper body — gigantic rounded pecs, boulder shoulders, huge biceps seen from below, wings spread wide; he holds a big bouquet of pale pink roses up in each raised hand; his head is thrown back so he looks up at the sky, we see his chin from below, cross-eyed: both pupils turned inward toward his nose, mouth stretched into a suspiciously enormous wide toothy grin , ribbons streaming down toward the camera. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-lie-v3b",
+      "prompt": "Extreme close-up bust shot of the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes): his face fills most of the picture, head tilted strongly (about 30 degrees) to one side, face turned upward, cross-eyed: both pupils turned inward toward his nose looking up, one gloved index finger pressed vertically against his lips in a 'shh' secret pose, a huge wide-open laughing grin around the finger, mischievous. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-engineer-clark-v3b",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) with no hat, a ridiculously bulging bodybuilder upper body — gigantic rounded pecs, boulder shoulders, huge biceps, standing heroically like a famous pioneer statue: his right arm stretched out straight forward and diagonally upward, pointing far away toward the distant horizon sky with one finger, gazing into the distance with an ambitious visionary face; his left hand holds an open laptop computer at his side; chest puffed out, full body, seen slightly from the side. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
     }
   ],
   "redo": []
