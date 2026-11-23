@@ -21,6 +21,8 @@ export type HomeOpen = 'sing' | 'view' | 'play-audio' | 'play-video' | 'read';
 
 export interface PlanetHomeConfig {
   planet: HomePlanet;
+  /** the planet's name on screen */
+  name: string;
   /** the store the works come from; null = not wired yet */
   store: PlanetWorkKind | null;
   /** for planet_posts (Mercury / Mars share one table) */
@@ -55,6 +57,7 @@ const line = (place: string) => `あなたの${place}のまわりに、ダチと
 export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   saturn: {
     planet: 'saturn',
+    name: '土星',
     store: 'saturn_post',
     work: 'コロリン',
     place: 'レコード',
@@ -71,6 +74,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   },
   jupiter: {
     planet: 'jupiter',
+    name: '木星',
     store: 'jupiter_post',
     work: 'アート',
     place: '木',
@@ -87,6 +91,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   },
   mercury: {
     planet: 'mercury',
+    name: '水星',
     store: 'planet_post',
     storePlanet: 'mercury',
     work: '曲',
@@ -104,6 +109,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   },
   mars: {
     planet: 'mars',
+    name: '火星',
     store: 'planet_post',
     storePlanet: 'mars',
     work: '映像',
@@ -121,6 +127,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   },
   venus: {
     planet: 'venus',
+    name: '金星',
     store: 'radio_show',
     work: 'ラジオ',
     place: '放送ブース',
@@ -138,6 +145,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   // Uranus / Pluto / Neptune: words are placeholders until their homes are designed (no store of works yet)
   uranus: {
     planet: 'uranus',
+    name: '天王星',
     store: null,
     work: 'グッズ',
     place: '店',
@@ -154,6 +162,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   },
   pluto: {
     planet: 'pluto',
+    name: '冥王星',
     store: null,
     work: '物語',
     place: '図書館',
@@ -171,6 +180,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   // Neptune has no my場所 in M-R191 (games are played, not kept): the island and its 遊び場 are placeholders
   neptune: {
     planet: 'neptune',
+    name: '海王星',
     store: null,
     work: 'ゲーム',
     place: '島',

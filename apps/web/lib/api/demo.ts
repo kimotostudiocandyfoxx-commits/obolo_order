@@ -30,6 +30,12 @@ import {
   type StartRadioLiveBody,
   isFlying,
   seesOnlyDachi,
+  splitHome,
+  orderOwn,
+  type HomeOshi,
+  type HomePlanet,
+  type HomeWork,
+  type PlanetHomeView,
   type PlanetWorkKind,
   type PlanetWorkReportBody,
   type DeliveryView,
@@ -176,6 +182,8 @@ interface DemoState {
   radioPerm?: Record<string, boolean>;
   /** M-R213: works each member chose 〔見えなくする〕 on (`kind:id`) */
   workHides?: Record<string, string[]>;
+  /** M-R258: each member's planet homes (last visit, own order) */
+  planetHomes?: Record<string, Record<string, { lastVisitAt: string | null; order?: string[] }>>;
   bluenaKeeps?: Record<string, string[]>;
   /** M-R236: each member's ★ / marks (`kind:id` → …) and their names for the marks */
   itemMarks?: Record<string, Record<string, { stars: number; mark: ItemMarkView['mark'] }>>;
@@ -377,6 +385,72 @@ export class DemoApi implements Api {
 
   async reportPlanetWork(_kind: PlanetWorkKind, _id: string, _body: PlanetWorkReportBody) {
     await sleep(300);
+  }
+
+  /** M-R258 星のホーム, demo: Saturn's kororins through the same rules as the server (splitHome); other planets empty */
+  async planetHome(planet: HomePlanet): Promise<PlanetHomeView> {
+    const me = this.uid();
+    const u = this.s.users[me];
+    const h = this.s.planetHomes?.[me]?.[planet];
+    const f = this.s.follows ?? {};
+    const isDachi = (o: string) => ((f[me] ?? []).includes(o) && (f[o] ?? []).includes(me)) || (o === 'demo-inviter' && !!this.s.dachiInviter);
+    const base = { planet, owner: { id: me, name: u?.displayName ?? '' }, lastVisitAt: h?.lastVisitAt ?? null };
+    if (planet !== 'saturn') return { ...base, live: false, young: seesOnlyDachi(u?.birthYear), own: [], around: [], far: [] };
+    const hides = new Set(this.s.workHides?.[me] ?? []);
+    const posts = this.s.posts.filter((p) => !p.replyToId && !p.room).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const cands = posts.map((p) => ({
+      id: p.id,
+      authorId: p.author.id,
+      flownAt: p.createdAt,
+      dachi: isDachi(p.author.id),
+      oshi: (f[me] ?? []).includes(p.author.id),
+      authorYoung: p.author.id === me || isDachi(p.author.id) ? false : seesOnlyDachi(this.s.users[p.author.id]?.birthYear ?? 1990),
+      hidden: hides.has(`saturn_post:${p.id}`),
+      p,
+    }));
+    const r = splitHome(me, cands, u?.birthYear);
+    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: null }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
+    return {
+      ...base,
+      live: true,
+      young: r.young,
+      own: orderOwn(r.own.map((c) => work(c, 'own')), h?.order),
+      around: r.around.map((c) => work(c, c.dachi ? 'dachi' : 'oshi')),
+      far: [],
+    };
+  }
+  private home(planet: HomePlanet, patch: { lastVisitAt?: string | null; order?: string[] }) {
+    const me = this.uid();
+    const all = { ...(this.s.planetHomes?.[me] ?? {}) };
+    all[planet] = { ...{ lastVisitAt: null }, ...all[planet], ...patch };
+    this.s.planetHomes = { ...(this.s.planetHomes ?? {}), [me]: all };
+    this.save();
+  }
+  async planetHomeVisit(planet: HomePlanet) {
+    const before = this.s.planetHomes?.[this.uid()]?.[planet]?.lastVisitAt ?? null;
+    this.home(planet, { lastVisitAt: new Date().toISOString() });
+    return { lastVisitAt: before };
+  }
+  async planetHomeOrder(planet: HomePlanet, ids: string[]) {
+    this.home(planet, { order: ids });
+    return { ids };
+  }
+  async planetHomeTakeOut(planet: HomePlanet, id: string) {
+    const p = planet === 'saturn' ? this.s.posts.find((x) => x.id === id && x.author.id === this.uid()) : undefined;
+    if (!p) throw new ApiError(404, 'NOT_FOUND', 'Work not found');
+    p.room = true;
+    this.save();
+  }
+  async oshiList(): Promise<HomeOshi[]> {
+    const me = this.uid();
+    const f = this.s.follows ?? {};
+    return (f[me] ?? []).map((id) => ({ id, name: this.s.users[id]?.displayName ?? this.s.posts.find((p) => p.author.id === id)?.author.displayName ?? id, pic: null, dachi: (f[id] ?? []).includes(me) || (id === 'demo-inviter' && !!this.s.dachiInviter) }));
+  }
+  async setOshi(userId: string, on: boolean) {
+    if (!on && (await this.oshiList()).some((o) => o.id === userId && o.dachi)) throw new ApiError(409, 'DACHI', 'A dachi is in by themselves');
+    if (on && seesOnlyDachi(this.s.users[this.uid()]?.birthYear)) throw new ApiError(403, 'CHILD', 'Not for under 15');
+    await this.followSaturnUser(userId, on);
+    return this.oshiList();
   }
 
   /** someone is signed in on this browser's demo */

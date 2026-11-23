@@ -159,8 +159,8 @@ export const CAMERA = {
   q3: { scale: 1.24, ms: 0, at: 0.42, turn: 7, figureTurn: 16 },
   /** side: the two at 34% / 66%, facing each other (a mirrored front figure where no side view exists) */
   side: { scale: 1.16, ms: 0, at: 0.34 },
-  /** over the shoulder: the speaker back at 34% (0.86×, the camera 1.12× on their face), the listener seen from behind in front at 74% (1.6×, a small painted figure brought up to full size, sunk so the screen cuts them about the waist, soft, darker) */
-  ots: { scale: 1.12, ms: 0, at: 0.34, far: 0.86, near: 1.6, nearAt: 0.74, drop: 0.52 },
+  /** over the shoulder: the speaker back at 30% (0.86×, the camera 1.12× on their face), the listener seen from behind in front at 80% (1.6×, a small painted figure brought up to full size, sunk so the screen cuts them about the waist, soft, darker) */
+  ots: { scale: 1.12, ms: 0, at: 0.3, far: 0.86, near: 1.6, nearAt: 0.8, drop: 0.52 },
   /** how far the framed point is brought toward the middle of the screen (0 = stays, 1 = centred) */
   center: 0.82,
   /** where the face is put, from the top of the stage (0..1) — under the bubbles */

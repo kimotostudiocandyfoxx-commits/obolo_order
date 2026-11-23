@@ -1,4 +1,4 @@
-import type { AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -378,6 +378,18 @@ export interface Api {
   hidePlanetWork(kind: PlanetWorkKind, id: string, on: boolean): Promise<{ hidden: boolean }>;
   /** M-R213: 〔通報〕 a stranger's planet work */
   reportPlanetWork(kind: PlanetWorkKind, id: string, body: PlanetWorkReportBody): Promise<void>;
+  /** M-R258 星のホーム: own forever / dachi and 推し 88 hours / a few strangers far (none under 15) */
+  planetHome(planet: HomePlanet): Promise<PlanetHomeView>;
+  /** opened now (the next visit sparkles what came after); answers the visit before */
+  planetHomeVisit(planet: HomePlanet): Promise<{ lastVisitAt: string | null }>;
+  /** 並べかえ: your own works in your place */
+  planetHomeOrder(planet: HomePlanet, ids: string[]): Promise<{ ids: string[] }>;
+  /** 外す: your own work back into Bluena only */
+  planetHomeTakeOut(planet: HomePlanet, id: string): Promise<void>;
+  /** 推し: who you follow (dachi marked, in by themselves) */
+  oshiList(): Promise<HomeOshi[]>;
+  /** 〔推す〕 / 外す (a dachi cannot be taken out) */
+  setOshi(userId: string, on: boolean): Promise<HomeOshi[]>;
   /** 〔ブルーナにしまう〕 someone else's song (a Mercury post) */
   keepInBluena(postId: string, on: boolean): Promise<{ kept: boolean }>;
   /** Bluena 〔しまった作品〕: your kept works (links) */

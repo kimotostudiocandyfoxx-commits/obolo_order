@@ -673,6 +673,24 @@ export class HttpApi implements Api {
   reportPlanetWork(kind: Parameters<Api['reportPlanetWork']>[0], id: string, body: Parameters<Api['reportPlanetWork']>[2]) {
     return this.req<void>('POST', `/planet-works/${kind}/${id}/report`, body);
   }
+  planetHome(planet: Parameters<Api['planetHome']>[0]) {
+    return this.req<Awaited<ReturnType<Api['planetHome']>>>('GET', `/planet-home/${planet}`);
+  }
+  planetHomeVisit(planet: Parameters<Api['planetHomeVisit']>[0]) {
+    return this.req<{ lastVisitAt: string | null }>('POST', `/planet-home/${planet}/visit`);
+  }
+  planetHomeOrder(planet: Parameters<Api['planetHomeOrder']>[0], ids: string[]) {
+    return this.req<{ ids: string[] }>('PUT', `/planet-home/${planet}/order`, { ids });
+  }
+  planetHomeTakeOut(planet: Parameters<Api['planetHomeTakeOut']>[0], id: string) {
+    return this.req<void>('DELETE', `/planet-home/${planet}/own/${id}`);
+  }
+  oshiList() {
+    return this.req<Awaited<ReturnType<Api['oshiList']>>>('GET', '/oshi');
+  }
+  setOshi(userId: string, on: boolean) {
+    return this.req<Awaited<ReturnType<Api['setOshi']>>>(on ? 'POST' : 'DELETE', `/oshi/${userId}`);
+  }
   reportRadio(body: Parameters<Api['reportRadio']>[0]) {
     return this.req<void>('POST', '/venus/report', body);
   }
