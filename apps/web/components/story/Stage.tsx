@@ -215,9 +215,11 @@ export function Cast({
   const hadMonban = useRef(real.includes('monban'));
   useEffect(() => {
     const has = real.includes('monban');
-    if (has !== hadMonban.current) setSmoke((k) => k + 1);
+    // (not in the cinema: there he comes up close for each of his lines, and the smoke would well up every time — the
+    // story's own 〔登場：煙〕 step still brings it where he really appears)
+    if (has !== hadMonban.current && !cinema) setSmoke((k) => k + 1);
     hadMonban.current = has;
-  }, [real]);
+  }, [real, cinema]);
   return (
     <>
       {smoke > 0 && <Smoke key={smoke} />}
