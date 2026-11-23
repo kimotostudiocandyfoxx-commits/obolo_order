@@ -7805,6 +7805,36 @@
       "refs": [
         "design/mv-art/out/iida-char-b.jpg"
       ]
+    },
+    {
+      "id": "iida-intro-last",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-bg-intro-heaven.jpg",
+        "design/mv-art/out/iida-gb-intro-angel-v2.jpg",
+        "design/mv-art/out/iida-s10-ofcourse.jpg"
+      ],
+      "prompt": "Use the first reference picture as the background exactly as it is (the same heavenly clouds, blue sky and golden rays, the same painterly look). In the centre of that heavenly sky the picture itself is torn open like a sheet of paper: a big jagged hole with curled, ripped paper edges and a dark gap behind them, exactly like the burst in the third reference. Bursting out of the hole toward the viewer is the muscular cartoon angel from the second reference, in the same pose and drawing style (blond curls, gold halo, white wings, huge muscles, white hip cloth), holding a big bouquet of pale pink roses up in each hand with a big grin; torn paper scraps, gold stars and sparkles fly outward from the hole. Square composition, no text."
+    },
+    {
+      "id": "iida-gb-lie-nose",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-gb-lie-v2.jpg"
+      ],
+      "prompt": "Edit this picture: keep everything exactly the same — the same angel, face, grin, finger on his lips, tilted head, halo, wings, drawing style, colours and the plain bright green background — but make his nose stretch out long, straight and pointed like a wooden puppet's nose that grows when he tells a lie, reaching far toward the side of the picture. No text."
     }
   ],
   "redo": []
