@@ -8033,6 +8033,182 @@
         720
       ],
       "always": false
+    },
+    {
+      "id": "home2-bg-saturn",
+      "prompt": "Japanese street-pop anime background art: bold thick outlines, flat cel shading, fluorescent pink, lime and orange accents, graffiti stickers and spray-paint textures, energetic hip-hop vibe. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a giant vinyl DJ record turntable embedded in rust-orange ground, with a tonearm whose needle tip is a retro microphone and a big round play button on the rim, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (dusk sky with Saturn's huge rings drawn as bold graphic stripes), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-jupiter",
+      "prompt": "Japanese hand-painted anime background art in soft watercolour and gouache: lush detailed foliage, warm dappled sunlight, gentle nostalgic atmosphere, delicate brush texture. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a big old tree with a small arched wooden door in its trunk and a little lantern, mossy roots and wildflowers, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (soft green-gold forest canopy sky with sunbeams and faint giant stripes of Jupiter high above), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-mercury",
+      "prompt": "Japanese youth-drama anime background art with luminous, crystal-clear light: vivid blue sky, sparkling lens flares, glittering sea, highly detailed clouds, emotional and transparent atmosphere. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a small sandy island with one palm tree, a tiny cozy cabin and a little wooden pier on clear turquoise sea, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (vast bright sky with towering clouds and a faint aurora ribbon), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-mars",
+      "prompt": "1980s-90s Japanese cel anime background art: retro-futuristic neon city, hard cel shadows, airbrushed glow, film grain, magenta and cyan neon. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a small cube-shaped film studio building with a marquee frame without letters and a round projector window, on red sand, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (magenta dusk sky over a far neon retro-future skyline), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-venus",
+      "prompt": "Japanese city-pop retro anime art: soft pastel sunset gradients, nostalgic 1980s illustration, gentle airbrush, smooth simple shapes. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a small round glass radio booth with an ON AIR lamp (lamp only, no letters) and a tall antenna, standing on fluffy golden clouds, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (peach and lavender sunset sky with soft concentric rings of radio waves), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-uranus",
+      "prompt": "Japanese yume-kawaii magical-girl anime art: sparkly pastel pink, mint and lavender, glitter, stars and hearts, glossy cute shapes. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a tiny cute goods shop with a striped awning and a display window, on a soft green hill, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (pastel mint sky with fluffy clouds, sparkles and Uranus's thin sideways ring), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-pluto",
+      "prompt": "Soft Japanese picture-book anime art: gentle pastel colour pencil and watercolour textures, quiet, warm and slightly lonely, simple rounded shapes. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a tiny cozy library with warm glowing windows and a stack of books by the door, on a white snowy ice plain, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (deep navy night sky with soft twinkling stars), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-neptune",
+      "prompt": "Japanese game-style anime art mixing toon shading with pixel-art details: chunky outlines, retro game pixel sparkles, vivid purple and cyan. Vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a tiny arcade game hut shaped like a retro game cabinet with a glowing screen, on a small rocky island in a deep blue sea, seen slightly from above on its own small patch of ground, with a small blank round name plate. The upper 45 percent is open sky (purple stormy sky with stylised pixel lightning far away), calm and uncluttered, left empty for floating items. A few tiny distant copies of the hero far away. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-korolin",
+      "prompt": "Game sprite: a small round bean-shaped mascot character, 2-head-tall chibi, big sunglasses pushed up, holding a microphone, bold outlines, fluorescent street-pop anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-butterfly",
+      "prompt": "Game sprite: a butterfly whose wings are two tiny framed paintings, hand-painted watercolour anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-ship",
+      "prompt": "Game sprite: a small sailing boat whose square sail is an album cover with a music note, sparkling clear youth-anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-ufo",
+      "prompt": "Game sprite: a small round UFO with a glass dome and a tiny pilot silhouette, retro 1980s cel anime style with neon glow. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-radio",
+      "prompt": "Game sprite: a small retro radio inside a glowing pastel ring of radio waves, city-pop retro anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-balloon",
+      "prompt": "Game sprite: a pastel hot-air balloon with stars and hearts carrying a tiny T-shirt and a mug, sparkly yume-kawaii anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-book",
+      "prompt": "Game sprite: a small flying storybook with soft glowing pages opening like wings, soft picture-book anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-sp-bubble",
+      "prompt": "Game sprite: a shiny bubble with a tiny game controller inside and pixel sparkles, toon-and-pixel game anime style. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
     }
   ],
   "redo": []
