@@ -1,10 +1,44 @@
-# Story images — 2026-11-23T02:13:21.062Z
+# Story images — 2026-11-23T02:18:43.816Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 3枚 / キューの項目: 7件 / 費用の目安: 約21円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 15枚 / キューの項目: 44件 / 費用の目安: 約105円
 
-- ✅ crocopatra-stand（1152x1536, 参考 1枚）: 1枚
-- ✅ kimorin-talk-base（1152x1536, 参考 1枚）: 1枚
-- ✅ plate-moon-temple（1600x2880, 参考 1枚）: 1枚
-- ✅ plate-saturn-inside（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-saturn-inside（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-jupiter-daikon（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-venus-stage（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-jupiter-daikon（1600x2880, 参考 1枚）: 0枚
+- ✅ view-kimorin-sun-back-v1（1152x1536, 参考 2枚）: 1枚
+- ✅ view-takoyaki-brother-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-takoyaki-sister-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-kaiser1-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-unchi-pinpon-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-freezy-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-hipokin-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-bossg-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-mikie-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-monban-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-talk-user-back-v1（1152x1536, 参考 1枚）: 1枚
+- ⏭ view-kimorin-sun-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-takoyaki-brother-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-takoyaki-sister-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-unchi-pinpon-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-kaiser1-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-freezy-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-hipokin-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-bossg-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-mikie-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-talk-user-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-talk-friend-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-talk-bati-q3-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-kimorin-sun-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-takoyaki-brother-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-takoyaki-sister-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-unchi-pinpon-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-kaiser1-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-freezy-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-hipokin-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-bossg-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-mikie-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-talk-user-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-talk-friend-side-v1: 今回の上限（16枚）を超えるので次回
+- ⏭ view-talk-bati-side-v1: 今回の上限（16枚）を超えるので次回
+- ✅ view-talk-friend-back-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-talk-bati-back-v1（1536x1152, 参考 1枚）: 1枚
