@@ -55,6 +55,305 @@
         "apps/web/public/onboarding/s/jupiter-daikon.jpg"
       ],
       "prompt": "Edit and extend this painting into a background plate of the same place (the forest of tall dark trees on Jupiter (WITHOUT the giant white daikon radish: remove it completely)): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
+    },
+    {
+      "id": "view-kimorin-sun-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kimorin-sun-front.jpg",
+        "design/story/refs/talk-kimorin.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small white fox-like mascot with big white-and-blue fox ears, wearing a dark red velvet hooded robe with white lattice trim, a blue jewel brooch with blue tassels, round black sunglasses, white paws, white feet with blue paw pads, a huge fan of white, black and red-tipped feather tails behind, and one small white bat wing — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-takoyaki-brother-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/takoyaki-brother-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge muscular dark blue-grey creature whose head is a spiky takoyaki ball with a wide toothy grin and two long whiskers, wrapped in rusty chains, a ragged chain-mail skirt, chain shackles on wrists and ankles — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-takoyaki-sister-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/takoyaki-sister-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall thin figure whose head is a pale cracked takoyaki ball with a small smile and long pale blue jellyfish-like strands for hair, wearing a long dark purple gown with fine gold geometric patterns and a frayed hem that trails on the ground — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-unchi-pinpon-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/unchi-pinpon-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a cute glossy caramel-brown swirl-shaped mascot (soft-serve / spiral shell shape) with golden stars and a heart on it, big shiny brown eyes, pink cheeks and a small smile, no arms, no legs — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-kaiser1-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kaiser1-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a stern giant white daikon radish with a grumpy wrinkled face, glowing orange eyes, a long white beard of roots, green leaves on top and a mass of long tangled white roots for legs — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-freezy-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/freezy-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall upright wooden coffin-shaped body with three yellow eyes and a black moustache, wild black fur all around, a dark purple robe with a rope belt, grey clawed hands and feet, holding a small white hand fan, purple smoke wisps — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-hipokin-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/hipokin-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a big grey hippo gentleman with glowing blue eyes, a black three-piece suit with gold paisley embroidery, a dark red tie, a gold pocket watch chain, black leather shoes — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-bossg-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/bossg-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge black gorilla boss with a gold cigar, heavy gold chains and a big gold medallion \"5454\", black leather shorts, black-and-gold mechanical cyber arms with glowing cyan lights — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-mikie-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/mikie-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small smiling woman with a black bob haircut and round black sunglasses, a loose hot-pink blouse, a colourful flower-print skirt, beige flat shoes; her right arm is a silver hook and her left arm is a golden-silver gatling gun — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-monban-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/monban-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall hooded figure in a long black robe with fine gold patterns, face hidden in the dark hood — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-user-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/talk-user-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a black-and-white cartoon boy with black hair, round black glasses, a white T-shirt, a black open jacket, black trousers, white cartoon gloves and black shoes — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-friend-back-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/talk-friend-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a muscular young man with wavy blond hair, bare chest, a cream cloth wrapped around the waist, barefoot — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-bati-back-v1",
+      "size": "1536x1152",
+      "refs": [
+        "design/story/refs/views/talk-bati-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a round fluffy sea-urchin creature: a dark purple body covered in long golden-orange spikes, orange roe on top, big sparkling eyes, pink cheeks and a happy open mouth, two small purple arms — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-kimorin-sun-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kimorin-sun-front.jpg",
+        "design/story/refs/talk-kimorin.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small white fox-like mascot with big white-and-blue fox ears, wearing a dark red velvet hooded robe with white lattice trim, a blue jewel brooch with blue tassels, round black sunglasses, white paws, white feet with blue paw pads, a huge fan of white, black and red-tipped feather tails behind, and one small white bat wing — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-takoyaki-brother-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/takoyaki-brother-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge muscular dark blue-grey creature whose head is a spiky takoyaki ball with a wide toothy grin and two long whiskers, wrapped in rusty chains, a ragged chain-mail skirt, chain shackles on wrists and ankles — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-takoyaki-sister-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/takoyaki-sister-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall thin figure whose head is a pale cracked takoyaki ball with a small smile and long pale blue jellyfish-like strands for hair, wearing a long dark purple gown with fine gold geometric patterns and a frayed hem that trails on the ground — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-unchi-pinpon-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/unchi-pinpon-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a cute glossy caramel-brown swirl-shaped mascot (soft-serve / spiral shell shape) with golden stars and a heart on it, big shiny brown eyes, pink cheeks and a small smile, no arms, no legs — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-kaiser1-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kaiser1-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a stern giant white daikon radish with a grumpy wrinkled face, glowing orange eyes, a long white beard of roots, green leaves on top and a mass of long tangled white roots for legs — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-freezy-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/freezy-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall upright wooden coffin-shaped body with three yellow eyes and a black moustache, wild black fur all around, a dark purple robe with a rope belt, grey clawed hands and feet, holding a small white hand fan, purple smoke wisps — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-hipokin-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/hipokin-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a big grey hippo gentleman with glowing blue eyes, a black three-piece suit with gold paisley embroidery, a dark red tie, a gold pocket watch chain, black leather shoes — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-bossg-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/bossg-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge black gorilla boss with a gold cigar, heavy gold chains and a big gold medallion \"5454\", black leather shorts, black-and-gold mechanical cyber arms with glowing cyan lights — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-mikie-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/mikie-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small smiling woman with a black bob haircut and round black sunglasses, a loose hot-pink blouse, a colourful flower-print skirt, beige flat shoes; her right arm is a silver hook and her left arm is a golden-silver gatling gun — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-user-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/talk-user-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a black-and-white cartoon boy with black hair, round black glasses, a white T-shirt, a black open jacket, black trousers, white cartoon gloves and black shoes — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-friend-q3-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/talk-friend-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a muscular young man with wavy blond hair, bare chest, a cream cloth wrapped around the waist, barefoot — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-bati-q3-v1",
+      "size": "1536x1152",
+      "refs": [
+        "design/story/refs/views/talk-bati-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a round fluffy sea-urchin creature: a dark purple body covered in long golden-orange spikes, orange roe on top, big sparkling eyes, pink cheeks and a happy open mouth, two small purple arms — drawn in a three-quarter view: body and head turned about 45 degrees toward the LEFT side of the picture, so the character looks toward the left edge; we see the face and the front at an angle, and a little of the right side of the body. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-kimorin-sun-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kimorin-sun-front.jpg",
+        "design/story/refs/talk-kimorin.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small white fox-like mascot with big white-and-blue fox ears, wearing a dark red velvet hooded robe with white lattice trim, a blue jewel brooch with blue tassels, round black sunglasses, white paws, white feet with blue paw pads, a huge fan of white, black and red-tipped feather tails behind, and one small white bat wing — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-takoyaki-brother-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/takoyaki-brother-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge muscular dark blue-grey creature whose head is a spiky takoyaki ball with a wide toothy grin and two long whiskers, wrapped in rusty chains, a ragged chain-mail skirt, chain shackles on wrists and ankles — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-takoyaki-sister-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/takoyaki-sister-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall thin figure whose head is a pale cracked takoyaki ball with a small smile and long pale blue jellyfish-like strands for hair, wearing a long dark purple gown with fine gold geometric patterns and a frayed hem that trails on the ground — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-unchi-pinpon-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/unchi-pinpon-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a cute glossy caramel-brown swirl-shaped mascot (soft-serve / spiral shell shape) with golden stars and a heart on it, big shiny brown eyes, pink cheeks and a small smile, no arms, no legs — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-kaiser1-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kaiser1-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a stern giant white daikon radish with a grumpy wrinkled face, glowing orange eyes, a long white beard of roots, green leaves on top and a mass of long tangled white roots for legs — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-freezy-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/freezy-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a tall upright wooden coffin-shaped body with three yellow eyes and a black moustache, wild black fur all around, a dark purple robe with a rope belt, grey clawed hands and feet, holding a small white hand fan, purple smoke wisps — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-hipokin-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/hipokin-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a big grey hippo gentleman with glowing blue eyes, a black three-piece suit with gold paisley embroidery, a dark red tie, a gold pocket watch chain, black leather shoes — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-bossg-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/bossg-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge black gorilla boss with a gold cigar, heavy gold chains and a big gold medallion \"5454\", black leather shorts, black-and-gold mechanical cyber arms with glowing cyan lights — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-mikie-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/mikie-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small smiling woman with a black bob haircut and round black sunglasses, a loose hot-pink blouse, a colourful flower-print skirt, beige flat shoes; her right arm is a silver hook and her left arm is a golden-silver gatling gun — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-user-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/talk-user-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a black-and-white cartoon boy with black hair, round black glasses, a white T-shirt, a black open jacket, black trousers, white cartoon gloves and black shoes — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-friend-side-v1",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/talk-friend-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a muscular young man with wavy blond hair, bare chest, a cream cloth wrapped around the waist, barefoot — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-talk-bati-side-v1",
+      "size": "1536x1152",
+      "refs": [
+        "design/story/refs/views/talk-bati-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a round fluffy sea-urchin creature: a dark purple body covered in long golden-orange spikes, orange roe on top, big sparkling eyes, pink cheeks and a happy open mouth, two small purple arms — drawn in a strict side profile: turned 90 degrees, facing the LEFT side of the picture; we see exactly one side of the head and body in profile, nose and toes pointing left. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. Background: a completely flat, solid, pure chroma-key blue (#0000FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
     }
   ]
 }
