@@ -7086,6 +7086,76 @@
         "design/mv-art/out/tak-14b-toast.jpg"
       ],
       "always": false
+    },
+    {
+      "id": "iida-char-a",
+      "prompt": "Character design, full body, front view: an original cartoon angel boy based on the reference picture: a sweet chubby baby face with rosy cheeks and blond curly hair, a small golden halo, big fluffy white feathered wings, a comically huge muscular bodybuilder chest and six-pack drawn with a few simple lines, tiny waist, a white cloth wrapped at the hips, flexing both arms happily. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs with no elbows or knees, an oversized round head, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, a bouncy cheerful pose, vintage hand-drawn cel animation look, original character. Pure black ink and white only, with the halo in gold as the single accent colour. Plain white background, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-iida-1.jpg"
+      ]
+    },
+    {
+      "id": "iida-char-b",
+      "prompt": "Character design, full body, front view: an original cartoon angel boy based on the reference picture: a sweet chubby baby face with rosy cheeks and blond curly hair, a small golden halo, big fluffy white feathered wings, a comically huge muscular bodybuilder chest and six-pack drawn with a few simple lines, tiny waist, a white cloth wrapped at the hips, flexing both arms happily. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs with no elbows or knees, an oversized round head, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, a bouncy cheerful pose, vintage hand-drawn cel animation look, original character. Limited vintage two-strip colour palette: cream, warm gold, soft pink cheeks, pale sky blue, with black ink outlines. Plain white background, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-iida-1.jpg"
+      ]
+    },
+    {
+      "id": "iida-char-c",
+      "prompt": "Character design, full body, three-quarter view: an original cartoon angel boy based on the reference picture: a sweet chubby baby face with rosy cheeks and blond curly hair, a small golden halo, big fluffy white feathered wings, a comically huge muscular bodybuilder chest and six-pack drawn with a few simple lines, tiny waist, a white cloth wrapped at the hips, waving with one hand and holding a small paintbrush in the other. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs with no elbows or knees, an oversized round head, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, a bouncy cheerful pose, vintage hand-drawn cel animation look, original character. Warm sepia-toned 1930s film look with gold halo. Plain white background, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-iida-1.jpg"
+      ]
+    },
+    {
+      "id": "iida-father-toon",
+      "prompt": "Character design, full body, front view: a cartoon version of the man in the reference photo (keep his shoulder-length straight blond hair with bangs, his friendly smile and his brown ribbed turtleneck sweater), drawn as a gentle young father with his hands on his hips. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs with no elbows or knees, an oversized round head, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, a bouncy cheerful pose, vintage hand-drawn cel animation look, original character. Limited vintage colour palette: cream, warm gold, brown, black ink outlines. Plain white background, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-iida-2.jpg"
+      ]
+    },
+    {
+      "id": "iida-baby-toon",
+      "prompt": "Character design, full body: a cartoon version of the newborn baby in the reference photo, wrapped in a fluffy white blanket, wearing a tiny yellow baby chick hood, sleeping peacefully with a tiny smile. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs with no elbows or knees, an oversized round head, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, a bouncy cheerful pose, vintage hand-drawn cel animation look, original character. Limited vintage colour palette: cream, soft yellow, pink cheeks, black ink outlines. Plain white background, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-iida-3.jpg"
+      ]
     }
   ],
   "redo": []
