@@ -1,8 +1,15 @@
-# Story images — 2026-11-23T03:52:58.703Z
+# Story images — 2026-11-23T07:45:30.785Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 4枚 / キューの項目: 125件 / 費用の目安: 約28円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 1枚 / キューの項目: 136件 / 費用の目安: 約7円
 
-- ✅ cutout-monban-x-point-magenta-v2（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-monban-x-stop-magenta-v2（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-monban-x-arms-magenta-v2（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-monban-x-talk-magenta-v2（1152x1536, 参考 1枚）: 1枚
+- ✅ plate-mercury-ice-v3（1440x2560, 参考 2枚）: 1枚
+- ✅ plate-mars-screens-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-moon-night-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-rocket-space-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-uranus-press-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-neptune-town-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-earth-hall-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-jupiter-daikon-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-saturn-night-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-arr-mars-city-v3（1440x2560, 参考 2枚）: 0枚
+- ✅ plate-uranus-field-v3（1440x2560, 参考 2枚）: 0枚
