@@ -7651,6 +7651,76 @@
       "refs": [
         "design/mv-art/out/iida-char-b.jpg"
       ]
+    },
+    {
+      "id": "iida-gb-intro-angel-v2",
+      "prompt": "Seen from directly below (extreme worm's-eye view looking straight up): the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) soaring straight upward into the sky, his body foreshortened toward the viewer, an enormously bulging over-the-top muscular upper body — gigantic pecs, huge shoulders and arms — wings spread wide, holding a big bouquet of pale pink and cream roses up in each hand, ribbons fluttering; his face turned up to the sky, cross-eyed, with a suspiciously huge, wide, toothy, slightly creepy grin. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-lie-v2",
+      "prompt": "Extreme close-up bust shot of the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes): his face fills most of the picture, head tilted strongly to one side, one gloved index finger pressed to his lips in a 'shh, it's a secret' pose, his face turned slightly upward, cross-eyed, with a huge wide-open laughing grin. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-ask-4",
+      "prompt": "the cartoon blond young father from the reference image (same face, shoulder-length blond hair, brown turtleneck, cream trousers, brown shoes) asking a question with one hand held up open, palm facing up toward the viewer, a curious friendly face with raised eyebrows, his other hand relaxed, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-father-toon.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-engineer-v2",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) with no hat, bare curly blond head, arms crossed firmly over his big chest, chin up with a super smug proud know-it-all face and half-closed eyes, a slim laptop computer tucked under one arm, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-engineer-clark",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, white hip cloth, gold shoes) with no hat standing heroically like a famous statue: his right arm stretched out high pointing far away into the distant sky with a visionary, ambitious face, his left hand holding an open laptop computer, chest out, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no other objects, the whole character inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
     }
   ],
   "redo": []
