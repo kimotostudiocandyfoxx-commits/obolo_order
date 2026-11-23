@@ -2,7 +2,7 @@
 
 import { ruleBeats, talkChunks, talkPlain, talkRuns, talkSentences, type TalkMark, type TalkIn, type TalkShape, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
 import { holdProps, StarButton } from '@/components/finds/MarkRing';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Figure, TALK_CSS, type FigureState } from './Figure';
 import { AppThreads, HereThreads, type TalkThread } from './TalkThreads';
 import type { SpiralRow } from '@/components/finds/SpiralList';
@@ -38,6 +38,11 @@ export type TalkPerson = {
   scale?: number;
   /** where their head is, down from the top of the row's height (0..1; default 0.16, the talk looks' headroom) */
   headAt?: number;
+  /**
+   * stands in the back row (the story, M-R251 review: the front row holds the one speaking, the one they talk to and
+   * you; everyone else stands behind them at about 80%, a little darker, until they speak)
+   */
+  back?: boolean;
 };
 
 export type TalkItem = {
@@ -124,6 +129,12 @@ const charsAt = (sp: Speech, ms: number) => {
 /** the prototype's glass round button (design/talk/proto.html .ib) */
 const GLASS = 'relative grid h-[42px] w-[42px] flex-none place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px]';
 const PILL = 'rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.6)] px-5 py-2 text-[13px] font-bold text-[#f4f1ff] backdrop-blur-[10px]';
+/** the story's own bubbles (Mincho, dark glass with a gold line, yours in gold): its scenes keep their world in the row */
+export type TalkSkin = 'app' | 'story';
+const SkinCtx = createContext<TalkSkin>('app');
+export const STORY_SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
+const STORY_THEM: TalkTone = { id: 'story', name: 'story', a: 'rgba(40,30,60,.86)', b: 'rgba(16,11,27,.9)', line: 'rgba(240,205,140,.42)', ink: '#f8f2e6' };
+const STORY_ME: TalkTone = { id: 'story-me', name: 'story-me', a: '#fbe9b7', b: '#dca552', line: '#c98f3a', ink: '#2b1b06' };
 export const TALK_FONT = "'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic',system-ui,sans-serif";
 const LONG = 70;
 
@@ -156,6 +167,7 @@ export function TalkScene({
   transparent = false,
   stageStyle,
   tapThrough = false,
+  skin = 'app',
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -215,6 +227,8 @@ export function TalkScene({
   stageStyle?: React.CSSProperties;
   /** a tap on a bubble is a tap on the screen (the story: it goes on; no replay, no opening) */
   tapThrough?: boolean;
+  /** the bubbles' look: the app's (default) or the story's own */
+  skin?: TalkSkin;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -587,15 +601,49 @@ export function TalkScene({
   // speaking — or who spoke last — steps into it); the rest behind them, smaller, higher, chest up, each between two
   // of the front (staggered by half, not squeezed)
   const lead = talkingId ?? shown[shown.length - 1]?.item.who ?? null;
+  // the story's two rows (M-R251 review): the ones marked `back` stand behind the front row, about 80% of its size; one
+  // coming forward takes the place of the one going back (the others keep theirs)
+  const backRow = row.filter((p) => p.back);
+  const frontIds = row.filter((p) => !p.back && !p.self).map((p) => p.id);
+  const lastFront = useRef<string[]>([]);
+  const frontOrder = (() => {
+    const was = lastFront.current;
+    if (!backRow.length && !was.length) return frontIds;
+    const stay = was.filter((id) => frontIds.includes(id));
+    const come = frontIds.filter((id) => !was.includes(id));
+    // the newcomers take the places of the ones gone back, in order; any left over go at the end
+    const out = was.map((id) => (frontIds.includes(id) ? id : (come.shift() ?? null))).filter((x): x is string => !!x);
+    return stay.length || out.length ? [...out, ...come] : frontIds;
+  })();
+  useEffect(() => {
+    lastFront.current = frontOrder;
+  });
   let rows: TalkPerson[][] = [row];
-  if (n >= 5) {
+  if (backRow.length) {
+    const front = frontOrder.map((id) => row.find((p) => p.id === id)!).filter(Boolean);
+    rows = [backRow, self && !firstPerson ? [...front, self] : front];
+  } else if (n >= 5) {
     const others = self ? row.slice(0, -1) : row;
     let front = others.slice(0, self ? 3 : 4);
     if (lead && lead !== self?.id && !front.some((p) => p.id === lead)) front = [...front.slice(0, -1), others.find((p) => p.id === lead)!];
     front = others.filter((p) => front.includes(p));
     rows = [others.filter((p) => !front.includes(p)), self ? [...front, self] : front];
   }
-  const spots = new Map<string, { x: number; bottom: number; h: number; z: number; w: number; chest: boolean }>();
+  const spots = new Map<string, { x: number; bottom: number; h: number; z: number; w: number; chest: boolean; dim?: boolean }>();
+  if (backRow.length) {
+    // the front row as a row of its own size; the back row in the gaps between them (then toward the ends), 80% as
+    // tall, standing a little higher (further away) and darker
+    const front = rows[1];
+    const fn = front.length;
+    const fh = stageH * (fn <= 2 ? 1 : 0.86);
+    const fx = (k: number) => (fn === 1 ? (front[k].self ? 0.73 : 0.5) : fn === 2 ? (k === 0 ? 0.27 : 0.73) : 0.07 + (0.86 * (k + 0.5)) / fn);
+    front.forEach((p, k) => spots.set(p.id, { x: Math.min(0.93, Math.max(0.07, fx(k))), bottom: 0, h: fh, z: 2, w: fn <= 2 ? 0.4 : 0.9 / fn, chest }));
+    const xs = front.map((_, k) => fx(k));
+    const gaps = xs.slice(1).map((x, k) => (x + xs[k]) / 2);
+    const ends = [Math.max(0.1, (xs[0] ?? 0.5) - 0.2), Math.min(0.9, (xs[xs.length - 1] ?? 0.5) + 0.2)];
+    const places = [...gaps, ...ends, 0.5, 0.2, 0.8];
+    backRow.forEach((p, k) => spots.set(p.id, { x: Math.min(0.9, Math.max(0.1, places[k % places.length])), bottom: stageH * 0.07, h: fh * 0.8, z: 1, w: 0.3, chest, dim: true }));
+  } else
   rows.forEach((r, ri) => {
     const back = rows.length > 1 && ri === 0;
     const fn = rows[rows.length - 1].length;
@@ -611,8 +659,15 @@ export function TalkScene({
   });
   // with the keyboard up the bubbles sit over the canvas's top edge, clear of the two faces
   // the tallest in the row sets where the bubbles start (a small one alone lets them come down to its head)
-  const headAt = Math.min(...row.map((p) => p.headAt ?? 0.16), 0.9);
-  const heads = chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 ? 0.5 : 1);
+  // (the story's back row: their heads by where they stand — lower and smaller than the front)
+  const headOf = (p: TalkPerson) => {
+    const s = spots.get(p.id);
+    const at = p.headAt ?? 0.16;
+    if (!backRow.length || !s) return at;
+    return 1 - (s.bottom + s.h * (1 - at)) / stageH;
+  };
+  const headAt = Math.min(...row.map(headOf), 0.9);
+  const heads = chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 && !backRow.length ? 0.5 : 1);
   // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
   const room = Math.max(120, heads - (barH + top + 56) - 48);
   const bubbleBottom = h - heads + 8;
@@ -660,6 +715,7 @@ export function TalkScene({
   const ease = 'cubic-bezier(.33,.1,.2,1)';
 
   return (
+    <SkinCtx.Provider value={skin}>
     <div
       ref={wrap}
       className={`relative min-h-0 flex-1 touch-none select-none overflow-hidden text-[#f4f1ff] ${transparent ? '' : 'bg-[#070b24]'}`}
@@ -747,7 +803,7 @@ export function TalkScene({
           const s = spots.get(p.id)!;
           const speaking = talkingId === p.id && !past;
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, animation: arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, animation: arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, filter: s.dim ? 'brightness(.68) saturate(.85)' : undefined }}>
               {arriving && p.self && <ArrivalMotes />}
               <Figure
                 look={p.look}
@@ -886,6 +942,7 @@ export function TalkScene({
         </div>
       )}
     </div>
+    </SkinCtx.Provider>
   );
 }
 
@@ -944,8 +1001,10 @@ export const inkOf = (color?: string) => (Object.values(TONES).find((t) => t.lin
 
 /** the top bubble when a third comes: it floats up and fades */
 function Ghost({ item, who }: { item: TalkItem; who?: TalkPerson }) {
+  const story = useContext(SkinCtx) === 'story';
+  const t = story ? (who?.self ? STORY_ME : STORY_THEM) : toneFor(who);
   return (
-    <div className={`relative max-w-full rounded-[20px] px-4 pb-3 pt-[11px] text-[15px] font-bold leading-[1.55] ${who?.self ? 'self-end' : 'self-start'}`} style={{ background: `linear-gradient(170deg,${toneFor(who).a},${toneFor(who).b})`, color: toneFor(who).ink, border: `1.5px solid ${toneFor(who).line}`, animation: 'talk-fly .6s cubic-bezier(.4,.1,.2,1) forwards', transformOrigin: '50% 0' }}>
+    <div className={`relative max-w-full rounded-[20px] px-4 pb-3 pt-[11px] text-[15px] font-bold leading-[1.55] ${who?.self ? 'self-end' : 'self-start'}`} style={{ background: `linear-gradient(170deg,${t.a},${t.b})`, color: t.ink, border: `1.5px solid ${t.line}`, fontFamily: story ? STORY_SERIF : undefined, animation: 'talk-fly .6s cubic-bezier(.4,.1,.2,1) forwards', transformOrigin: '50% 0' }}>
       <p className="line-clamp-2">{talkPlain(item.text)}</p>
     </div>
   );
@@ -1007,7 +1066,8 @@ function Bubble({
 }) {
   // the side it leans to and its tail points to: yours at the right; a partner standing at the right (first person with two) too
   const mine = !!who?.self || right;
-  const tone = toneFor(who);
+  const story = useContext(SkinCtx) === 'story';
+  const tone = story ? (who?.self ? STORY_ME : STORY_THEM) : toneFor(who);
   const bg = tone.b;
   const ink = tone.ink;
   const line = tone.line;
@@ -1021,7 +1081,8 @@ function Bubble({
       background: `linear-gradient(170deg,${tone.a},${tone.b})`,
       border: `1.5px solid ${line}`,
       borderRadius: '24px 20px 26px 19px / 20px 25px 19px 24px',
-      boxShadow: '0 1px 0 rgba(255,255,255,.7) inset,0 8px 22px rgba(4,8,30,.32)',
+      boxShadow: story ? (who?.self ? '0 6px 22px rgba(230,170,70,.35)' : '0 8px 26px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.07)') : '0 1px 0 rgba(255,255,255,.7) inset,0 8px 22px rgba(4,8,30,.32)',
+      ...(story ? { borderWidth: 1, borderRadius: who?.self ? '20px 6px 20px 20px' : '6px 20px 20px 20px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', fontFamily: STORY_SERIF } : {}),
     },
     shape === 'burst'
       ? { borderRadius: 0, clipPath: BURST, boxShadow: 'none', border: 0 }
@@ -1035,7 +1096,7 @@ function Bubble({
   return (
     <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
       {named && (
-        <p className="mb-1 px-2 text-[10.5px] font-bold tracking-[0.12em] [text-shadow:0_1px_4px_#000]" style={{ color: tone.a }}>
+        <p className={`mb-1 px-2 text-[10.5px] [text-shadow:0_1px_4px_#000] ${story ? 'tracking-[0.22em]' : 'font-bold tracking-[0.12em]'}`} style={story ? { color: 'rgba(253,230,170,.92)', fontFamily: STORY_SERIF } : { color: tone.a }}>
           {item.name ?? who?.name}
         </p>
       )}
@@ -1046,7 +1107,7 @@ function Bubble({
         className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`}
         style={{ color: ink, ...box }}
       >
-        <div className={`${pad} font-bold leading-[1.6] ${grow || (maxH && shape !== 'burst') ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} style={{ ...(maxH && shape !== 'burst' ? { maxHeight: maxH } : {}), ...(shape === 'whisper' ? { fontFamily: "'Klee One', " + TALK_FONT, fontWeight: 600 } : {}) }} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
+        <div className={`${pad} ${story ? 'font-medium' : 'font-bold'} leading-[1.6] ${grow || (maxH && shape !== 'burst') ? 'no-scrollbar min-h-0 overflow-y-auto overscroll-contain' : ''}`} style={{ ...(maxH && shape !== 'burst' ? { maxHeight: maxH } : {}), ...(shape === 'whisper' ? { fontFamily: "'Klee One', " + TALK_FONT, fontWeight: 600 } : {}) }} onClick={clamp ? onOpen : (e) => !(e.target as HTMLElement).closest('button,a') && onReplay()}>
           {item.voice && (
             <button onClick={onPlay} disabled={!item.voice.url} className="flex items-center gap-2 py-0.5" aria-label={on ? '止める' : muted ? '声を消して見る' : '聞く'}>
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm" style={{ background: `${ink}1f` }}>{on ? '❚❚' : '▶'}</span>

@@ -175,19 +175,22 @@ export function storyPeople({
     if (sprite) add(id, sprite);
   }
   const people: TalkPerson[] = [];
-  // at most three stand with you (more crowd the phone): the latest to speak stay
-  // (the one speaking now always; then whoever spoke last; then the ones the script put on stage)
+  // M-R251 review: the front row holds three at most — the one speaking, the one they talk to and you (first person:
+  // three of them). Everyone else stands in the back row (smaller, darker); one in the back who speaks comes forward
+  // and the one silent longest goes back. Who is in front: the latest to speak (the one speaking now always), then
+  // the ones the script put on stage, in its order.
+  const room = self ? 2 : 3;
   const last = (id: string) => {
     for (let k = spoke.length - 1; k >= 0; k--) if (talkId(spoke[k]) === id) return k;
-    return onStage.some((s) => sprites.get(id) === s) ? -1 : -2;
+    return onStage.some((s) => sprites.get(id) === s) ? -1 - order.indexOf(id) / 100 : -2;
   };
-  const keep = order.length > 3 ? [...order].sort((a, b) => last(b) - last(a)).slice(0, 3) : order;
+  const front = order.length > room ? [...order].sort((a, b) => last(b) - last(a)).slice(0, room) : order;
   for (const id of order) {
     const sprite = sprites.get(id)!;
     const look = spriteLook(sprite, v);
     const t = toneFor(id);
     const who = (id === 'KIMORIN' ? 'KIMORIN' : id) as Speaker;
-    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look || !keep.includes(id) });
+    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look, ...(front.includes(id) ? {} : { back: true }) });
   }
   // heard only: 「？？？」, a speaker with no picture, and who spoke before this scene
   for (const who of entries.flatMap((e) => (e.kind === 'them' ? [e.who] : []))) {
@@ -198,7 +201,7 @@ export function storyPeople({
   }
   people.push({ id: 'me', name, look: self, color: TONES.pearl.line, tone: TONES.pearl, self: true });
   // three or more in the row: the painted ones (wider than the talk looks) a little smaller, so they overlap less
-  const standing = people.filter((p) => !p.offstage && !!p.look).length;
+  const standing = people.filter((p) => !p.offstage && !p.back && !!p.look).length;
   if (standing >= 3)
     for (const p of people)
       if (!p.self && p.scale) {
