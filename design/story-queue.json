@@ -1011,6 +1011,30 @@
         "design/story/out/kimorin-talk-shy-pose-1.jpg"
       ],
       "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
+    },
+    {
+      "id": "plate-saturn-night-v2",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/saturn-night.jpg"
+      ],
+      "prompt": "Edit and extend this painting (a completely deserted place, empty of anyone) into a background plate of the same place (Saturn temple seen at night): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings. The place is deserted: remove every person or silhouette, including tiny distant ones on stairs, paths and streets."
+    },
+    {
+      "id": "plate-arr-mars-city-v2",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/arr-mars-city.jpg"
+      ],
+      "prompt": "Edit and extend this painting (a completely deserted place, empty of anyone) into a background plate of the same place (the red Mars city with tall spires): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings. The place is deserted: remove every person or silhouette, including tiny distant ones on stairs, paths and streets."
+    },
+    {
+      "id": "plate-uranus-field-v2",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/uranus-field.jpg"
+      ],
+      "prompt": "Edit and extend this painting (a completely deserted place, empty of anyone) into a background plate of the same place (the sky field above the clouds on Uranus with small round shops): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings. The place is deserted: remove every person or silhouette, including tiny distant ones on stairs, paths and streets."
     }
   ]
 }
