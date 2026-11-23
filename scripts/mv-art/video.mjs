@@ -49,7 +49,7 @@ async function make(x) {
       taskType: 'videoInference',
       taskUUID,
       model: x.model ?? queue.model ?? 'bytedance:seedance@2.0-fast',
-      positivePrompt: `${x.prompt} ${queue.always ?? ''}`.trim(),
+      positivePrompt: `${x.prompt} ${x.always === false ? '' : (queue.always ?? '')}`.trim(),   // always: false — a clip in another style skips the queue's style line
       duration: x.duration ?? 5,
       resolution: '720p',
       deliveryMethod: 'async',

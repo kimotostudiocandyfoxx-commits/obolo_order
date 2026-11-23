@@ -370,7 +370,8 @@
       "last": "design/mv-art/out/iida-intro-last.jpg",
       "duration": 5,
       "model": "bytedance:2@2",
-      "prompt": "The calm heavenly sky with soft clouds and golden rays; for a moment nothing moves, then the centre of the sky bulges and rips open like a sheet of paper with jagged curling torn edges, and a muscular cartoon angel in 1930s rubber-hose animation style bursts out through the hole toward the camera, holding a bouquet of pink roses up in each hand, grinning; torn paper scraps, gold stars and sparkles fly outward; the camera gives a small shake on the burst; it ends exactly on the final frame."
+      "prompt": "The calm heavenly sky with soft clouds and golden rays; for a moment nothing moves, then the centre of the sky bulges and rips open like a sheet of paper with jagged curling torn edges, and a muscular cartoon angel in 1930s rubber-hose animation style bursts out through the hole toward the camera, holding a bouquet of pink roses up in each hand, grinning; torn paper scraps, gold stars and sparkles fly outward; the camera gives a small shake on the burst; it ends exactly on the final frame. Keep the vintage cartoon drawing style of the angel and the painterly heavenly sky exactly as in the frames; the angel's face and body stay exactly as in the last frame. No text.",
+      "always": false
     }
   ],
   "redo": []
