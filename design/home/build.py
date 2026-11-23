@@ -20,5 +20,8 @@ for s in 'korolin butterfly ship ufo radio balloon book bubble'.split():
 for s in 'korolin butterfly ship ufo radio balloon book bubble'.split():
     f=f'{O}/home-sp-{s}.jpg'
     if os.path.exists(f): k=key(Image.open(f)); k.thumbnail((240,240)); A['sp-'+s]=uri(k,86)
+for r in 'venus-longg venus-bossg mercury-freezie mercury-salmon mars-hippo uranus-croco neptune-boombox pluto-ribbon'.split():
+    f=f'{O}/res-{r}.jpg'
+    if os.path.exists(f): k=key(Image.open(f)); k.thumbnail((360,640)); A['res-'+r]=uri(k,86)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
 open(H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')

@@ -40,6 +40,10 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .home{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);width:62%;height:30%;border-radius:50%;cursor:pointer;z-index:2}
 .home::before{content:"";position:absolute;inset:18% 10%;border-radius:50%;border:2px solid rgba(255,255,255,.65);animation:ring 2.4s ease-out infinite;opacity:0}
 @keyframes ring{0%{opacity:.8;scale:.7}100%{opacity:0;scale:1.25}}
+.res{position:absolute;bottom:13%;height:34%;z-index:4;cursor:pointer;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4));transition:transform .2s}
+.res img{height:100%;width:auto;display:block}
+.res.l{left:-2%}.res.r{right:-2%}
+.res:active{transform:scale(.96)}
 .plate{position:absolute;left:50%;bottom:calc(16% - 8px);transform:translateX(-50%);font:900 13px var(--f-body);padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.88);color:#2a1630;z-index:3;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .dock{position:absolute;left:0;right:0;bottom:0;padding:0 16px 18px;display:flex;gap:10px;justify-content:center;z-index:5}
 .cta{font:900 16px var(--f-body);color:#2a1630;background:var(--accent);border:0;border-radius:999px;padding:14px 22px;box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 -3px 0 rgba(0,0,0,.12);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
@@ -82,6 +86,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="spin" id="spin"></div>
   <div class="sky" id="sky"></div>
   <div class="home" id="home" role="button" tabindex="0" aria-label="自分の場所"></div>
+  <div id="resWrap"></div>
   <div class="plate" id="plate"></div>
   <div class="needle" id="needle"></div>
   <div class="top">
@@ -99,6 +104,7 @@ const ME='ミナト★';
 const PEOPLE=[{n:'MIKIE⭐︎DRILL',k:'dachi',inv:1},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'たこ焼きシスター',k:'oshi'},{n:'nana',k:'oshi'}];
 const FAR=['はるか','ショウ','れい','ぽんず','kei','みお'];
 /* one row per planet: the whole home is this config */
+const RES={venus:[['longg','ロングG','……いい音だろ。','l'],['bossg','ボスG','誰だ、お前ら。……ネオか。','r']],mercury:[['freezie','フリージー','音に乗っけると、100倍だ。','l'],['salmon','サーモン','おかえり。おかえり。','r']],mars:[['hippo','ヒポキン','……いい画だ。また見せに来い。','l']],uranus:[['croco','クロコパトラ','あら、いらっしゃい。','l']],neptune:[['boombox','ラジカセの侍','遊んでいくか。','r']],pluto:[['ribbon','リボンのもこもこ','おはなし、きかせて！','l']]};
 const P={
  saturn:{name:'土星',en:'SATURN',accent:'#ffb36b',place:'レコード',thing:'コロリン',sp:'korolin',cta:'▶ 再生',inName:'',
   say:'あなたの<b>レコード</b>に、ダチと推しのコロリンが<b>88時間</b>降ってくる。再生すると、針のマイクの前で歌う。',
@@ -136,6 +142,8 @@ function render(){
   $('ttl').innerHTML=`<small>${c.en}</small>${c.name}`;$('say').innerHTML=c.say;
   $('plate').textContent=`${ME}の${c.place}`;$('cta').textContent=c.cta;$('home').setAttribute('aria-label',`${ME}の${c.place}`);
   $('oshiN').textContent=oshi.size;
+  const rw=$('resWrap');rw.innerHTML='';
+  if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
   const sky=$('sky');sky.innerHTML='';items=[];
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
