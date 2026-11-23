@@ -44,6 +44,8 @@ import { JupiterService } from './jupiter/jupiter.service';
 import { MarsController } from './mars/mars.controller';
 import { PlanetPostsController } from './planets/planet-posts.controller';
 import { PlanetPostsService } from './planets/planet-posts.service';
+import { OshiController, PlanetHomeController } from './planets/planet-home.controller';
+import { PlanetHomeService } from './planets/planet-home.service';
 import { WorkSafetyController } from './planets/work-safety.controller';
 import { WorkSafetyService } from './planets/work-safety.service';
 import { AdminRadioController, BluenaController, RadioController } from './radio/radio.controller';
@@ -85,6 +87,8 @@ import { WalletController } from './wallet/wallet.controller';
     MarsController,
     PlanetPostsController,
     WorkSafetyController,
+    PlanetHomeController,
+    OshiController,
     RadioController,
     BluenaController,
     AdminRadioController,
@@ -121,6 +125,7 @@ import { WalletController } from './wallet/wallet.controller';
     MarsService,
     PlanetPostsService,
     WorkSafetyService,
+    PlanetHomeService,
     RadioService,
     InvitesService,
     LookService,

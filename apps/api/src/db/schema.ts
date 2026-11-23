@@ -937,3 +937,21 @@ export const workHomecomings = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.key] })],
 );
+
+/**
+ * 星のホーム (M-R258): per member and planet — when the home was last opened (works that came after it sparkle and fall
+ * in; never counted) and the member's own arrangement of their works in their place (ids, first = front).
+ */
+export const planetHomes = pgTable(
+  'planet_homes',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    planet: text('planet').notNull(),
+    lastVisitAt: timestamp('last_visit_at', { withTimezone: true }),
+    orderJson: jsonb('order_json').$type<string[]>(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.planet] })],
+);
