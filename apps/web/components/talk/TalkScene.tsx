@@ -9,6 +9,8 @@ import type { SpiralRow } from '@/components/finds/SpiralList';
 import { SELF_TONES, TONES, toneOf, type TalkTone } from '@/lib/talk/looks';
 import { CAMERA, type Direction, type Move } from '@/lib/talk/direction';
 import { Subtitle, SubtitleScrim, SUBTITLE_CSS, subtitleStyle } from '@/components/story/Subtitle';
+import { AmbientFront, AmbientSky } from '@/components/story/Ambient';
+import type { Planet } from '@/lib/story/ambient';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 
@@ -181,6 +183,7 @@ export function TalkScene({
   selfName,
   plate,
   onCamera,
+  ambient,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -247,7 +250,12 @@ export function TalkScene({
   /** your name over your subtitles (else 「あなた」) */
   selfName?: string;
   /** a background plate made for the row (lib/onboarding/plates.ts): its floor at the row's ground line, moved by the camera with the row */
-  plate?: { src: string; floorY: number; aspect: number };
+  plate?: { src: string; floorY: number; aspect: number; horizonY?: number; skyMask?: string };
+  /**
+   * the living background (components/story/Ambient.tsx): the sky drifting behind the row (with the plate, moved by the
+   * same camera; else over the still) and a light planet effect in front of the figures, under the words
+   */
+  ambient?: { planet: Planet; sceneId: string | null; still?: string | null; paused?: boolean };
   /**
    * the row camera now (the directed scene), for layers that follow it with parallax (the ambient sky and dust): x / y
    * the shift in px, scale, the point it scales about (px from the stage's top-left), its move in ms. Also sent as the
@@ -859,6 +867,20 @@ export function TalkScene({
     if (reduced) Object.assign(f, { s: Math.min(f.s, CAMERA.reducedMax), tx: f.tx * 0.3, ms: Math.max(f.ms, 400), push: 1, shake: false });
     return f;
   })();
+  // the plate's height on screen (its top above the screen's, wide enough to pan) and the faces in the shot now, in
+  // fractions of the screen (the ambient front layer keeps clear of them)
+  const plateH = plate ? Math.max((h - dockH) / plate.floorY, (w * 1.25) / plate.aspect) * 1.04 : 0;
+  const headBoxes = row
+    .filter((p) => !p.back)
+    .flatMap((p) => {
+      const f = faceAt(p.id);
+      if (!f) return [];
+      const sx = (f.x - frame.ox) * frame.s + frame.ox + frame.tx;
+      const sy = stageTop + (f.y - frame.oy) * frame.s + frame.oy;
+      const bw = 0.22 * frame.s;
+      const bh = (0.16 * frame.s * stageH) / h;
+      return [{ x: sx / w - bw / 2, y: sy / h - bh * 0.6, w: bw, h: bh }];
+    });
   const camKey = `${frame.tx.toFixed(1)}|${frame.s.toFixed(3)}|${frame.ox.toFixed(0)}|${frame.oy.toFixed(0)}|${frame.turn}`;
   const onCam = useRef(onCamera);
   onCam.current = onCamera;
@@ -1016,10 +1038,27 @@ export function TalkScene({
         >
           {(() => {
             // tall enough that its top is above the screen's, wide enough to pan
-            const ih = Math.max((h - dockH) / plate.floorY, (w * 1.25) / plate.aspect) * 1.04;
-            // eslint-disable-next-line @next/next/no-img-element
-            return <img src={plate.src} alt="" className="absolute left-1/2 max-w-none -translate-x-1/2 select-none" style={{ height: ih, width: ih * plate.aspect, bottom: -(1 - plate.floorY) * ih }} />;
+            const ih = plateH;
+            const box: React.CSSProperties = { height: ih, width: ih * plate.aspect, bottom: -(1 - plate.floorY) * ih };
+            return (
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={plate.src} alt="" className="absolute left-1/2 max-w-none -translate-x-1/2 select-none" style={box} />
+                {ambient && (
+                  // the sky moving in the plate's own box: the camera that moves the plate moves it too
+                  <div className="absolute left-1/2 -translate-x-1/2" style={box}>
+                    <AmbientSky planet={ambient.planet} sceneId={ambient.sceneId} plate={{ src: plate.src, horizonY: plate.horizonY, floorY: plate.floorY, skyMask: plate.skyMask, aspect: plate.aspect }} camera={{ x: frame.tx, y: 0, scale: frame.s }} fit="fill" paused={ambient.paused} />
+                  </div>
+                )}
+              </>
+            );
           })()}
+        </div>
+      )}
+
+      {ambient && !plate && ambient.still && (
+        <div className="pointer-events-none absolute inset-0 z-[1]">
+          <AmbientSky planet={ambient.planet} sceneId={ambient.sceneId} still={ambient.still} fit="cover" camera={{ x: frame.tx, y: 0, scale: frame.s }} paused={ambient.paused} />
         </div>
       )}
 
@@ -1092,6 +1131,23 @@ export function TalkScene({
         })}
         </div>
       </div>
+
+      {ambient && (
+        // in front of the figures, under the words: kept off the faces in the shot and off the subtitles
+        <div className="pointer-events-none absolute inset-0 z-[7]">
+          <AmbientFront
+            planet={ambient.planet}
+            sceneId={ambient.sceneId}
+            still={plate ? undefined : (ambient.still ?? undefined)}
+            plate={plate ? { src: plate.src, horizonY: plate.horizonY, floorY: plate.floorY, skyMask: plate.skyMask, aspect: plate.aspect } : undefined}
+            camera={{ x: frame.tx, y: 0, scale: frame.s }}
+            avoid={headBoxes}
+            subtitleTop={Math.max(0.4, Math.min(0.9, (h - dockH) / h))}
+            plateRect={plate ? { left: (w - plateH * plate.aspect) / 2, top: h - dockH + (1 - plate.floorY) * plateH - plateH, width: plateH * plate.aspect, height: plateH } : undefined}
+            paused={ambient.paused}
+          />
+        </div>
+      )}
 
       {/* the story's lines as film subtitles (no bubbles): the newest at the lower third, a log of the past ones when
           dragged back */}

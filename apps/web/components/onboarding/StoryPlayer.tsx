@@ -48,6 +48,7 @@ import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx,
 import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { linesOf, stageOf } from '@/lib/onboarding/stage';
 import { plateFor, plateUrl, STILL_CLEAN } from '@/lib/onboarding/plates';
+import { planetOf } from '@/lib/story/ambient';
 import { lineKind } from '@/lib/talk/direction';
 import { SubtitleScrim, SUBTITLE_CSS, TypedSubtitle } from '@/components/story/Subtitle';
 import { TONES } from '@/lib/talk/looks';
@@ -1202,6 +1203,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   }, [plate]);
   const cleanStill = (img: string) => (!cinema && STILL_CLEAN[img] ? STILL_CLEAN[img] : img);
   const sharpBack = !!plate || (!!still && !!STILL_CLEAN[still] && !cinema);
+  const ambientPlanet = !cinema ? planetOf(sceneNow, still) : null;
   const lineMode = linesOf(sceneNow, cinema ? 'cinema' : 'row', subsFlag);
   const talkOn = !cinema && started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
   const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
@@ -1327,7 +1329,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             transparent
             skin="story"
             lines={lineMode}
-            plate={plate ? { src: plateUrl(plate.image), floorY: plate.floorY, aspect: plateAspect } : undefined}
+            plate={plate ? { src: plateUrl(plate.image), floorY: plate.floorY, horizonY: plate.horizonY, skyMask: plate.skyMask ? plateUrl(plate.skyMask) : undefined, aspect: plateAspect } : undefined}
+            // the living background (day 3 on, the row only): paused while a picture choice covers the talk
+            ambient={ambientPlanet ? { planet: ambientPlanet, sceneId: sceneNow, still, paused: talkHidden } : undefined}
             selfName={v.neo || v.name || undefined}
             noMute
             listening={listening}
