@@ -2,8 +2,8 @@
 """
 A grey sprite re-keyed from its background edit (cut-out review 2026-11-23): the matte comes from the picture whose
 background scripts/cutouts/rebg.py painted again on the character's key colour (aligned onto the original by OpenCV
-ECC), the colours inside the figure stay the original's pixel for pixel, the edge band takes the edit's un-mixed
-colours. Then the figure and its body / tail layers are written on the same canvas as before (scripts/sprite-layers.py
+ECC); every colour comes from the original (opaque pixels as they are, edge pixels un-mixed from its grey with the
+new coverage), so nothing of the edit's key or drift shows. Then the figure and its body / tail layers are written on the same canvas as before (scripts/sprite-layers.py
 geometry), so the mouth / eye patches still line up.
 
   python3 scripts/cutouts/merge.py [--apply] <stem> [<stem> …]   (design/cutouts/rebg/<stem>-<key>.jpg must exist)
@@ -57,8 +57,17 @@ def merge(stem):
     if drift > 28 or iou < 0.85:
         print(stem, key, 'DRIFTED', info)
         return None
-    inner = cv2.erode((al == 255).astype(np.uint8), np.ones((7, 7), np.uint8)) > 0
-    rgb = np.where(inner[..., None], orig, rgba[..., :3].astype(np.float32))
+    # colours: all from the original (no trace of the edit's key, its spill or its small drift) — opaque pixels as
+    # they are, half-covered ones un-mixed against the original's grey with the new coverage, the faintest ones
+    # leaning on the character's own colour nearby
+    a = al.astype(np.float32)[..., None] / 255
+    grey = keying.border_colour(orig)
+    k = np.maximum(a, 0.05)
+    un = np.clip((orig - (1 - k) * grey) / k, 0, 255)
+    solid = (al == 255).astype(np.float32)
+    near = cv2.GaussianBlur(orig * solid[..., None], (0, 0), 2.5) / np.maximum(cv2.GaussianBlur(solid, (0, 0), 2.5), 1e-4)[..., None]
+    t = np.clip(a / 0.35, 0, 1)
+    rgb = np.where(al[..., None] == 255, orig, un * t + near * (1 - t))
     out = np.dstack([rgb, al]).astype(np.uint8)
     os.makedirs('design/cutouts/merged', exist_ok=True)
     Image.fromarray(out, 'RGBA').save(f'design/cutouts/merged/{stem}.png')
