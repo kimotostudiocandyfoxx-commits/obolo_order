@@ -1,19 +1,20 @@
-# UI art — 2026-11-23T03:59:55.906Z
+# UI art — 2026-11-23T04:25:57.297Z
 
-Seedream 5.0 Pro / 15枚 / 約219円
+Seedream 5.0 Pro / 16枚 / 約232円
 
-- ✅ iida-s00-title
-- ✅ iida-s01-asks
-- ✅ iida-s02-question
-- ✅ iida-s03-engineer
-- ✅ iida-s04-lie
-- ✅ iida-s05-sing
-- ✅ iida-s06-river
-- ✅ iida-s07-workbench
-- ✅ iida-s10-ofcourse
-- ✅ iida-s20-point
-- ✅ iida-s28-finale
-- ✅ iida-st-baby
-- ✅ iida-st-dance
-- ✅ iida-st-flex
-- ✅ iida-st-thumb
+- ✅ iida-bg-intro-heaven
+- ✅ iida-gb-ask-1
+- ✅ iida-gb-ask-2
+- ✅ iida-gb-ask-3
+- ✅ iida-gb-engineer
+- ✅ iida-gb-finale-angel
+- ✅ iida-gb-finale-iida
+- ✅ iida-gb-hammer
+- ✅ iida-gb-intro-angel
+- ✅ iida-gb-lie
+- ✅ iida-gb-ofcourse
+- ✅ iida-gb-point-angel
+- ✅ iida-gb-point-iida
+- ✅ iida-gb-question
+- ✅ iida-gb-river
+- ✅ iida-gb-sing
