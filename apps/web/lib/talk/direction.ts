@@ -9,7 +9,7 @@ import { ruleBeats } from '@obolo/shared';
  */
 
 /** the shots */
-export const SHOTS = ['wide', 'two', 'mcu', 'reaction', 'push', 'punch'] as const;
+export const SHOTS = ['wide', 'two', 'mcu', 'reaction', 'push', 'punch', 'q3', 'side', 'ots'] as const;
 export type Shot = (typeof SHOTS)[number];
 /** the moves of the one speaking (or, with a target, of someone else) */
 export const MOVES = ['enter-left', 'enter-right', 'exit-left', 'exit-right', 'turn', 'lean', 'hop', 'step-back'] as const;
@@ -32,6 +32,9 @@ export type Direction = {
   stir?: boolean;
 };
 
+/** which views of each person exist (lib/story/views.json): no back view → no over-the-shoulder for them */
+export type ViewsAvailable = { back: Set<string>; side: Set<string>; q3: Set<string> };
+
 /** the override a script line may carry: shot 'mcu' | 'reaction:MONBAN' | 'two:KIMORIN' …, move 'lean' | 'enter-left:MONBAN' */
 export type DirectionOverride = { shot?: string; move?: string };
 
@@ -50,6 +53,11 @@ export function lineKind(text: string): 'shout' | 'muse' | 'question' | 'joy' | 
 const parseShot = (s?: string) => {
   if (!s) return null;
   const [shot, on] = s.split(':');
+  // 'ots:A>B': over A's shoulder… A speaks, B in the foreground (the listener); 'q3:A' a 3/4 cut on A
+  if (shot === 'ots' && on?.includes('>')) {
+    const [a, b] = on.split('>');
+    return { shot: 'ots' as Shot, on: b || undefined, speaker: a || undefined };
+  }
   return (SHOTS as readonly string[]).includes(shot) ? { shot: shot as Shot, on: on || undefined } : null;
 };
 const parseMove = (s?: string) => {
@@ -71,9 +79,13 @@ const parseMove = (s?: string) => {
  *  - a new speaker → the camera cuts; the same speaker → it moves (and drifts slowly while they talk)
  * `listener`: whom they talk to (the one who spoke before, else you).
  */
-export function directLines(lines: { id: string; who: string; text: string; override?: DirectionOverride }[], selfId = 'me'): Map<string, Direction> {
+export function directLines(lines: { id: string; who: string; text: string; override?: DirectionOverride }[], selfId = 'me', views?: ViewsAvailable): Map<string, Direction> {
   const out = new Map<string, Direction>();
   const shots: Shot[] = [];
+  // the angled cuts (3/4, side, over the shoulder): only in a two-person exchange or on an emotional beat, about one
+  // line in four or five (never two of them within four lines)
+  let lastAngle = -99;
+  let angleTurn = 0;
   let prevWho: string | null = null;
   let before: string | null = null;
   for (const [k, l] of lines.entries()) {
@@ -91,18 +103,35 @@ export function directLines(lines: { id: string; who: string; text: string; over
     else d = { shot: newSpeaker ? 'mcu' : 'two', cut: newSpeaker };
     // your own lines: a two-shot of you and the one you answer (your figure is small in the corner otherwise)
     if (l.who === selfId && k > 0) d = { shot: 'two', cut: newSpeaker };
+    // a two-person exchange (the last lines go back and forth between these two) or an emotional beat (a muse, a
+    // question): now and then an angled cut instead
+    const pair = k >= 2 && lines[k - 1].who === listenTo && lines[k - 2].who === l.who;
+    const emotional = kind === 'muse' || kind === 'question';
+    if (k >= 2 && k - lastAngle >= 4 && (pair || emotional) && d.shot !== 'punch') {
+      const order: Shot[] = ['side', 'q3', 'ots'];
+      for (let t = 0; t < order.length; t++) {
+        const pick = order[(angleTurn + t) % order.length];
+        // over the shoulder needs the listener's back view; a 3/4 cut, a side cut fall back to the front figure
+        if (pick === 'ots' && !(views?.back.has(listenTo) && listenTo !== selfId)) continue;
+        if (pick !== 'q3' && emotional && !pair) continue;
+        d = { ...d, shot: pick, on: pick === 'q3' ? undefined : listenTo, after: undefined, afterOn: undefined };
+        angleTurn = (angleTurn + t + 1) % order.length;
+        lastAngle = k;
+        break;
+      }
+    }
     // no shot three times running
     const n = shots.length;
     if (n >= 2 && shots[n - 1] === d.shot && shots[n - 2] === d.shot) d = { ...d, shot: d.shot === 'two' ? 'wide' : 'two' };
     // the story team's override
     const so = parseShot(l.override?.shot);
-    if (so) d = { ...d, shot: so.shot, on: so.on, ...(so.shot === 'reaction' ? { after: undefined } : {}) };
+    if (so) d = { ...d, shot: so.shot, on: so.on, ...(so.shot === 'reaction' || so.shot === 'ots' || so.shot === 'side' || so.shot === 'q3' ? { after: undefined } : {}) };
     const mo = parseMove(l.override?.move);
     if (mo) {
       if (mo.who && mo.who !== l.who) d = { ...d, moves: { ...(d.moves ?? {}), [mo.who]: mo.move } };
       else d = { ...d, move: mo.move };
     }
-    if (d.shot === 'two' && !d.on) d.on = listenTo;
+    if ((d.shot === 'two' || d.shot === 'side' || d.shot === 'ots') && !d.on) d.on = listenTo;
     if (d.shot === 'reaction' && !d.on) d.on = listenTo;
     out.set(l.id, d);
     shots.push(d.shot);
@@ -122,6 +151,12 @@ export const CAMERA = {
   reaction: { scale: 1.26, ms: 0 },
   push: { scale: 1.36, ms: 5200 },
   punch: { scale: 1.42, ms: 170 },
+  /** 3/4: the speaker at 42% / 58% of the width (toward the one they face), the stage turned this many degrees */
+  q3: { scale: 1.24, ms: 0, at: 0.42, turn: 7, figureTurn: 16 },
+  /** side: the two at 34% / 66%, facing each other (a mirrored front figure where no side view exists) */
+  side: { scale: 1.16, ms: 0, at: 0.34 },
+  /** over the shoulder: the speaker back at 32% (0.72×), the listener seen from behind in front at 76% (1.55×, cut at the waist, soft, darker) */
+  ots: { scale: 1, ms: 0, at: 0.32, far: 0.72, near: 1.55, nearAt: 0.76, drop: 0.42 },
   /** how far the framed point is brought toward the middle of the screen (0 = stays, 1 = centred) */
   center: 0.7,
   /** where the face is put, from the top of the stage (0..1) — under the bubbles */

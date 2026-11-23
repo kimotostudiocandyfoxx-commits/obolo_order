@@ -236,6 +236,11 @@ def cut(rgb: np.ndarray, key=None, *, erode: int = 1, feather: float = 0.6, desp
     tex = np.sqrt(np.maximum(cv2.blur(d * d, (5, 5)) - m1 * m1, 0))
     t_tex = float(max(np.percentile(tex[band], 98) * 1.6, 0.006))
     bg = (d < t_bg) & (tex < t_tex)
+    # a saturated key drifts across a painting (lit unevenly): what is clearly of the key's own channels is background
+    # too, however far from the border's colour (the character has none of it — the key was chosen so)
+    ch0 = _channels(K)
+    if ch0 is not None:
+        bg |= keyness(a, *ch0) >= 0.75 * float(keyness(K[None, None, :], *ch0)[0, 0])
     # the key's hue, only darker: a shadow on the floor (never for a colourless key: grey shading is the character)
     kc = float(np.hypot(kl[1], kl[2]))
     if shadows and kc > 0.08:
@@ -299,8 +304,10 @@ def cut(rgb: np.ndarray, key=None, *, erode: int = 1, feather: float = 0.6, desp
     if ch is not None:
         kn = keyness(a, *ch)
         kk = float(keyness(K[None, None, :], *ch)[0, 0])
-        ka = np.clip(1 - (kn - 22.0) / max(40.0, kk * 0.85 - 22.0), 0, 1)
         sure_kn = keyness(np.clip(ref, 0, 255), *ch)
+        # the keyness mixes linearly between the key's and the nearby character colour's (≤ 0): coverage from that
+        kke = kk * 0.92  # (the key's noise counts as key)
+        ka = np.clip((kke - kn) / np.maximum(kke - np.minimum(sure_kn, 0), 1.0), 0, 1)
         soft_a = np.where(sure_kn < 10, ka, soft_a).astype(np.float32)
     to_bg = _dist_to(~core)  # distance of a figure pixel to the background
     to_fg = _dist_to(core)

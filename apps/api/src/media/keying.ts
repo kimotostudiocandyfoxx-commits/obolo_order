@@ -143,6 +143,17 @@ export async function onKey(png: Buffer, key: KeyName): Promise<{ data: Buffer; 
 
 // --- the matte ---------------------------------------------------------------------------------------------------------
 
+/** a saturated key's own channels and the others (green: hi [1], lo [0, 2]); null for grey, white or a muddy colour */
+function channels(K: Rgb): { hi: number[]; lo: number[] } | null {
+  const m = Math.max(...K);
+  const hi = [0, 1, 2].filter((c) => K[c] >= 0.6 * m);
+  const lo = [0, 1, 2].filter((c) => !hi.includes(c));
+  if (!lo.length || Math.min(...hi.map((c) => K[c])) - Math.max(...lo.map((c) => K[c])) < 60) return null;
+  return { hi, lo };
+}
+/** how much of the key's own channels a colour has over the others (green: g − max(r, b)) */
+const keyness = (v: ArrayLike<number>, o: number, ch: { hi: number[]; lo: number[] }) => Math.min(...ch.hi.map((c) => v[o + c])) - Math.max(...ch.lo.map((c) => v[o + c]));
+
 /** each pixel's standard deviation of `v` over a (2r+1)² window (summed-area tables) */
 function localStd(v: Float32Array, W: number, H: number, r: number): Float32Array {
   const S1 = new Float64Array((W + 1) * (H + 1));
@@ -279,6 +290,12 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
   const tTex = Math.max(percentile(borderTex, 98) * 1.6, 0.006);
   const bg = new Uint8Array(N);
   for (let i = 0; i < N; i++) bg[i] = d[i] < tBg && tex[i] < tTex ? 1 : 0;
+  // a saturated key drifts across a painting (lit unevenly): what is clearly of the key's own channels is background too
+  const ch0 = channels(K);
+  if (ch0) {
+    const kk0 = keyness(K, 0, ch0) * 0.75;
+    for (let i = 0; i < N; i++) if (keyness(px, i * 4, ch0) >= kk0) bg[i] = 1;
+  }
   // a floor shadow: the key's own hue, only darker, touching the background (never for a colourless key)
   const kc = Math.hypot(kl[1], kl[2]);
   if (kc > 0.08) {
@@ -341,6 +358,8 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
   for (let i = 0; i < N; i++) notCore[i] = core[i] ? 0 : 1;
   const toBg = distanceTo(notCore, W, H);
   const toFg = distanceTo(core, W, H);
+  const ch = channels(K);
+  const kke = ch ? keyness(K, 0, ch) * 0.92 : 0;
   const sure = new Uint8Array(N);
   for (let i = 0; i < N; i++) sure[i] = core[i] && d[i] >= tFg ? 1 : 0;
   const alpha = new Float32Array(N);
@@ -392,7 +411,13 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
       const v = px[i * 4 + c];
       lo = Math.max(lo, v < K[c] ? (K[c] - v) / Math.max(K[c], 1) : (v - K[c]) / Math.max(255 - K[c], 1));
     }
-    const a = Math.max(lo, vv > 3600 ? ((px[i * 4] - K[0]) * vr + (px[i * 4 + 1] - K[1]) * vg + (px[i * 4 + 2] - K[2]) * vb) / vv : (d[i] - tBg) / (tFg - tBg));
+    let a = Math.max(lo, vv > 3600 ? ((px[i * 4] - K[0]) * vr + (px[i * 4 + 1] - K[1]) * vg + (px[i * 4 + 2] - K[2]) * vb) / vv : (d[i] - tBg) / (tFg - tBg));
+    // a saturated key: the classic channel difference (green: g − max(r, b)) mixes linearly between the key's and the
+    // nearby character colour's, robust on white, grey and dark outlines alike (where the character has none of it)
+    if (ch) {
+      const kF = keyness(ref, i * 3, ch);
+      if (kF < 10) a = (kke - keyness(px, i * 4, ch)) / Math.max(kke - Math.min(kF, 0), 1);
+    }
     alpha[i] = Math.min(1, Math.max(0, a));
   }
   // colours: the key un-mixed from half-covered pixels (toward the character's own colour at the very edge), then the
@@ -409,13 +434,21 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
     let b = px[i * 4 + 2];
     if (a < 0.999) {
       const k = Math.max(a, 0.05);
-      const t = Math.min(1, a / 0.35);
+      // (by the distance only: the character's own nearby colour at the very edge, where the unmixing is unsure)
+      const t = ch ? 1 : Math.min(1, a / 0.35);
       const un = (c: number, kk: number, rf: number) => Math.min(255, Math.max(0, (c - (1 - k) * kk) / k)) * t + rf * (1 - t);
       r = un(r, K[0], ref[i * 3]);
       g = un(g, K[1], ref[i * 3 + 1]);
       b = un(b, K[2], ref[i * 3 + 2]);
     }
-    if (kc > 0.03 && toBg[i] <= 3) {
+    if (ch && toBg[i] <= 4 && keyness(ref, i * 3, ch) < 10) {
+      // the classic clamp: the key's channels not above the others, nor pushed below them (a lilac rim on green)
+      const c3 = [r, g, b];
+      const top = Math.max(...ch.lo.map((c) => c3[c]));
+      const bot = Math.min(...ch.lo.map((c) => c3[c]));
+      for (const c of ch.hi) c3[c] = Math.max(Math.min(c3[c], top + 4), bot * 0.94);
+      [r, g, b] = c3;
+    } else if (!ch && kc > 0.03 && toBg[i] <= 3) {
       oklab(r, g, b, t3);
       oklab(ref[i * 3], ref[i * 3 + 1], ref[i * 3 + 2], r3);
       const p = t3[1] * khA + t3[2] * khB;
