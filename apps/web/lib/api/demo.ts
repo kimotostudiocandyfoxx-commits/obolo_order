@@ -409,7 +409,7 @@ export class DemoApi implements Api {
       p,
     }));
     const r = splitHome(me, cands, u?.birthYear);
-    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: null }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
+    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: c.p.author.pic ?? null }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
     return {
       ...base,
       live: true,

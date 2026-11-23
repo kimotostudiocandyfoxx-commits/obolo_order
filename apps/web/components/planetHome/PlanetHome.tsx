@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { menuFor, type MenuAct } from '@/lib/planetHome/model';
 import { usePlanetHome } from '@/lib/planetHome/usePlanetHome';
 import { useHold, type At } from '@/lib/planetHome/useHold';
-import type { PlanetHomeSkin } from './skin';
+import { CAPTION, type PlanetHomeSkin } from './skin';
 import { skinFor } from './skins';
 import s from './PlanetHome.module.css';
 
@@ -26,6 +26,16 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
   const h = usePlanetHome(planet, { view, seeds });
   const router = useRouter();
   const root = useRef<HTMLDivElement>(null);
+  const top = useRef<HTMLDivElement>(null);
+  // the top bar's safe zone (its height changes as the explainer strip folds): floating works stay below it
+  const [safe, setSafe] = useState(72);
+  useEffect(() => {
+    const el = top.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setSafe(Math.ceil(el.getBoundingClientRect().height) + 6));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const Scene = (skin ?? skinFor(planet)).Scene;
   const [sheet, setSheet] = useState<HomeWork | null>(null);
   const [menu, setMenu] = useState<{ w: HomeWork; at: At } | null>(null);
@@ -75,7 +85,12 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
   };
 
   return (
-    <div ref={root} className={`${s.home} ${zoom ? s.zoom : ''}`} style={{ '--accent': cfg.accent } as CSSProperties} data-planet={planet}>
+    <div
+      ref={root}
+      className={`${s.home} ${zoom ? s.zoom : ''}`}
+      style={{ '--accent': cfg.accent, '--safe': `${safe}px`, '--caption-top': `max(${CAPTION.top}%, calc(58% + 52px))` } as CSSProperties}
+      data-planet={planet}
+    >
       {h.view && h.stage && (
         <Scene
           cfg={cfg}
@@ -83,6 +98,7 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
           stage={h.stage}
           playingId={h.playingId}
           spinning={h.spinning}
+          caption={!!singing}
           onPlace={enter}
           onPlate={() => setInside(true)}
           onItem={tap}
@@ -95,15 +111,11 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
       {singing && (
         <div className={s.needle} data-testid="singing">
           🎤 {singing.rel === 'own' ? 'あなた' : singing.author.name}
-          {(singing.text || singing.title) && (
-            <>
-              <br />「{singing.text || singing.title}」
-            </>
-          )}
+          {(singing.text || singing.title) && <span className={s.words}>「{singing.text || singing.title}」</span>}
         </div>
       )}
 
-      <div className={s.top}>
+      <div className={s.top} ref={top}>
         <div className={s.row}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {onBack && (

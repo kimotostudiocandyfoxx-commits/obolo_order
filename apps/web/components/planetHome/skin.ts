@@ -17,6 +17,8 @@ export interface SceneProps {
   playingId: string | null;
   /** Saturn: the record is turning */
   spinning: boolean;
+  /** the words of the one playing are showing (in the CAPTION band): works floating there move out of it */
+  caption: boolean;
   /** your place tapped (Saturn: plays; elsewhere: goes inside) */
   onPlace: () => void;
   /** the name plate tapped: your works (Saturn's way to 並べかえ・外す) */
@@ -30,3 +32,9 @@ export interface SceneProps {
 export interface PlanetHomeSkin {
   Scene: ComponentType<SceneProps>;
 }
+
+/**
+ * where the words of the one playing show (percent of the height): over your place, below the floating works and the
+ * needle, above the name plate — so they never cover a work or a name tag
+ */
+export const CAPTION = { top: 64, bottom: 72 };

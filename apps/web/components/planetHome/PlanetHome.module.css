@@ -37,6 +37,8 @@
 .sky {
   position: absolute;
   inset: 0;
+  /* the top bar's safe zone: nothing floating or falling in shows under it */
+  clip-path: inset(var(--safe, 72px) 0 0 0);
 }
 .top {
   position: absolute;
@@ -157,6 +159,18 @@
   object-fit: cover;
   background: #fff;
   pointer-events: none;
+}
+.art {
+  position: absolute;
+  right: -4%;
+  bottom: 8%;
+  width: 40%;
+  height: 40%;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  object-fit: cover;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .tag {
   position: absolute;
@@ -402,6 +416,12 @@
   border: 0;
   white-space: nowrap;
 }
+.words {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .spin {
   position: absolute;
   left: 50%;
@@ -435,7 +455,7 @@
   padding: 7px 11px;
   max-width: 72%;
   left: 50%;
-  top: 44%;
+  top: var(--caption-top, 64%);
   transform: translate(-50%, 0);
   text-align: center;
   pointer-events: none;

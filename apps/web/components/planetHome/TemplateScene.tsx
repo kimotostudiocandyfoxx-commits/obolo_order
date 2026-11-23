@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react';
 import { useHold } from '@/lib/planetHome/useHold';
 import type { StageItem } from '@/lib/planetHome/model';
-import type { SceneProps } from './skin';
+import { CAPTION, type SceneProps } from './skin';
 import s from './PlanetHome.module.css';
 
 /**
@@ -32,6 +32,18 @@ const FAR_SPOTS: [number, number][] = [
 export const SKY_MAX = SPOTS.length;
 const NEEDLE: [number, number] = [70, 58];
 
+/** while the words show (CAPTION, skin.ts), a floating work whose spot is in that band moves up above it */
+const nudge = (y: number, on: boolean) => (on && y + 6 > CAPTION.top && y - 6 < CAPTION.bottom ? CAPTION.top - 7 : y);
+
+/**
+ * each work's own picture: on Saturn the kororin is its maker's own kororin (author.pic) in place of the sample sprite;
+ * elsewhere the planet's sprite carries the maker's face, and a picture work (art / film) shows its own picture on it
+ */
+export function pictureOf(w: StageItem, planet: string, open: string): { body: string | null; face: string | null; art: string | null } {
+  if (planet === 'saturn') return { body: w.author.pic ?? null, face: null, art: null };
+  return { body: null, face: w.author.pic ?? null, art: w.thumbUrl || (open === 'view' ? w.url : null) || null };
+}
+
 const colourOf = (w: StageItem) => (w.rel === 'oshi' ? 'var(--oshi)' : w.rel === 'own' ? 'var(--mine)' : 'var(--dachi)');
 
 /** what floats: dachi and 推し first (newest first); on Saturn your own kororins fill the rest (they live on your record) */
@@ -39,7 +51,7 @@ export function skyOf(stage: SceneProps['stage'], planet: string): StageItem[] {
   return [...stage.around, ...(planet === 'saturn' ? stage.own : [])].slice(0, SKY_MAX);
 }
 
-export function TemplateScene({ cfg, view, stage, playingId, spinning, onPlace, onPlate, onItem, onHold }: SceneProps) {
+export function TemplateScene({ cfg, view, stage, playingId, spinning, caption, onPlace, onPlate, onItem, onHold }: SceneProps) {
   const hold = useHold();
   const sky = skyOf(stage, cfg.planet);
   let fall = 0;
@@ -49,7 +61,9 @@ export function TemplateScene({ cfg, view, stage, playingId, spinning, onPlace, 
       {cfg.planet === 'saturn' && <div className={`${s.spin} ${spinning ? s.spinOn : ''}`} aria-hidden />}
       <div className={s.sky}>
         {sky.map((w, i) => {
-          const [x, y] = playingId === w.id && cfg.planet === 'saturn' ? NEEDLE : SPOTS[i % SPOTS.length];
+          const [x, y0] = playingId === w.id && cfg.planet === 'saturn' ? NEEDLE : SPOTS[i % SPOTS.length];
+          const y = playingId === w.id ? y0 : nudge(y0, caption);
+          const pic = pictureOf(w, cfg.planet, cfg.open);
           const cls = [
             s.item,
             w.fresh ? s.new : '',
@@ -79,10 +93,12 @@ export function TemplateScene({ cfg, view, stage, playingId, spinning, onPlace, 
               )}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img alt="" src={cfg.art.sprite} draggable={false} />
-              {/* the maker's face on it, so whose it is shows at a glance (design/home §5) */}
+              <img alt="" src={pic.body || cfg.art.sprite} draggable={false} />
+              {/* the maker's face on it, so whose it is shows at a glance (design/home §5), and the work's own picture */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              {w.author.pic && <img alt="" src={w.author.pic} className={s.face} draggable={false} />}
+              {pic.face && <img alt="" src={pic.face} className={s.face} draggable={false} />}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {pic.art && <img alt="" src={pic.art} className={s.art} draggable={false} />}
               <span className={s.tag}>{w.rel === 'own' ? 'あなた' : w.author.name}</span>
             </button>
           );
@@ -111,12 +127,12 @@ export function TemplateScene({ cfg, view, stage, playingId, spinning, onPlace, 
             <img alt="" src={cfg.art.sprite} draggable={false} />
           </button>
         ))}
+        {stage.plus && (
+          <div className={s.plus} aria-hidden>
+            ＋
+          </div>
+        )}
       </div>
-      {stage.plus && (
-        <div className={s.plus} aria-hidden>
-          ＋
-        </div>
-      )}
       <button type="button" className={s.place} onClick={onPlace} aria-label={`${view.owner.name}の${cfg.place}`} />
       <button type="button" className={s.plate} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
