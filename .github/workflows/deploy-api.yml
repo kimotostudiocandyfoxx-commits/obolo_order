@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main, claude/solar-system-home-planets-ew766y]
-    paths: ['apps/api/**', 'packages/**', 'pnpm-lock.yaml']
+    paths: ['apps/api/**', 'packages/**', 'pnpm-lock.yaml', 'RELEASE.md']
 
 concurrency:
   group: deploy-api
@@ -28,7 +28,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ vars.GCP_PROJECT_ID != '' }}
+    # The launch version is pinned (2026-11-23): a push deploys only when its last commit says [release]
+    # (made by scripts/release.sh), or when run by hand. Set the variable RELEASE_GATE=off to deploy every push again.
+    if: ${{ vars.GCP_PROJECT_ID != '' && (github.event_name != 'push' || vars.RELEASE_GATE == 'off' || contains(github.event.head_commit.message, '[release]')) }}
     permissions:
       contents: read
       id-token: write
@@ -92,6 +94,12 @@ jobs:
             if [ "${{ vars.CLAUDE_BATI }}" = "true" ]; then
               echo 'ANTHROPIC_API_KEY=obolo-anthropic-api-key:latest'
             fi
+            # Login codes and invitations by email (launch 2026-11-26): switched on by the EMAIL_FROM variable
+            # (e.g. "OBOLO ORDER <no-reply@your-domain>", a domain verified at Resend), after the key was stored
+            # as obolo-resend-api-key. Then the code is no longer shown on the screen.
+            if [ -n "${{ vars.EMAIL_FROM }}" ]; then
+              echo 'RESEND_API_KEY=obolo-resend-api-key:latest'
+            fi
             if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
               echo 'STRIPE_SECRET_KEY=obolo-stripe-secret-key:latest'
               echo 'STRIPE_WEBHOOK_SECRET=obolo-stripe-webhook-secret:latest'
@@ -135,7 +143,9 @@ jobs:
             JOBS_INVOKER_SA=${{ env.RUNTIME_SA }}
             CORS_ORIGINS=${{ env.CORS_ORIGINS }}
             WEB_ORIGIN=${{ vars.WEB_ORIGIN }}
-            AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || 'true' }}
+            AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || (vars.EMAIL_FROM && 'false') || 'true' }}
+            EMAIL_DRIVER=${{ vars.EMAIL_FROM && 'resend' || 'console' }}
+            EMAIL_FROM=${{ vars.EMAIL_FROM || 'Obolo Order <no-reply@example.com>' }}
             BUDDY_OVERAGE_ENABLED=false
             BUNNY_STORAGE_ZONE=${{ vars.BUNNY_STORAGE_ZONE }}
             BUNNY_STORAGE_ENDPOINT=${{ vars.BUNNY_STORAGE_ENDPOINT || 'sg.storage.bunnycdn.com' }}
