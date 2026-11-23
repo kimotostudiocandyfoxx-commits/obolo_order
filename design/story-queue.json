@@ -41,14 +41,6 @@
       "prompt": "Edit and extend this painting into a background plate of the same place (the dark golden temple hall inside Saturn with red lanterns and the round arch): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
     },
     {
-      "id": "plate-venus-stage",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/venus-stage.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the giant golden record turntable on Venus at sunset, seen from its surface): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
-    },
-    {
       "id": "plate-jupiter-daikon",
       "size": "1600x2880",
       "refs": [
@@ -476,12 +468,12 @@
       "prompt": "Edit and extend this painting into a background plate of the same place (the red Mars city with tall spires): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
     },
     {
-      "id": "plate-venus-stage-v2",
+      "id": "plate-venus-stage-v3",
       "size": "1600x2880",
       "refs": [
         "apps/web/public/onboarding/s/venus-stage.jpg"
       ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the giant golden record turntable on Venus at sunset, seen from its surface): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
+      "prompt": "Extend this painting into a wider, calmer background of the same place at sunset: the surface of an enormous golden vinyl record that stretches to the horizon, with the giant tone arm far in the distance and the small round DJ stage platform in the middle distance. Keep the same palette, light and painting style. A flat walkable record surface across the lower part (its grooves going away from the viewer), the horizon at about 45% of the height, the lower middle open and empty, the bottom fifth calm and darker. Nothing alive in the picture: no people, no animals, no figures of any size. No text, no watermark."
     },
     {
       "id": "plate-venus-night",
