@@ -369,10 +369,21 @@
       "image": "design/mv-art/out/iida-bg-intro-heaven.jpg",
       "last": "design/mv-art/out/iida-intro-last.jpg",
       "duration": 5,
-      "model": "bytedance:2@2",
+      "model": "bytedance:seedance@2.0-fast",
       "prompt": "The calm heavenly sky with soft clouds and golden rays; for a moment nothing moves, then the centre of the sky bulges and rips open like a sheet of paper with jagged curling torn edges, and a muscular cartoon angel in 1930s rubber-hose animation style bursts out through the hole toward the camera, holding a bouquet of pink roses up in each hand, grinning; torn paper scraps, gold stars and sparkles fly outward; the camera gives a small shake on the burst; it ends exactly on the final frame. Keep the vintage cartoon drawing style of the angel and the painterly heavenly sky exactly as in the frames; the angel's face and body stay exactly as in the last frame. No text.",
       "always": false
+    },
+    {
+      "id": "iida-intro-burst-rev",
+      "image": "design/mv-art/out/iida-intro-last.jpg",
+      "duration": 5,
+      "model": "bytedance:2@2",
+      "always": false,
+      "cameraFixed": true,
+      "prompt": "The muscular cartoon angel holding two bouquets slowly flies backward away from the camera, shrinking back into the torn hole in the middle of the heavenly sky until he disappears inside it; then the jagged torn paper edges curl inward and close up seamlessly, the flying paper scraps and gold stars float back and vanish, until the heavenly sky with soft clouds and golden rays is completely whole and calm again. Keep the vintage cartoon drawing style of the angel and the painterly heavenly sky exactly as in the frame; the angel's face and body stay the same. No text."
     }
   ],
-  "redo": []
+  "redo": [
+    "iida-intro-burst"
+  ]
 }
