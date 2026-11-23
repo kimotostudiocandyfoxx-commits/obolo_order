@@ -156,6 +156,10 @@ export type Step =
       expr?: string;
       /** the speaker's picture mirrored for this line (a pose that would face away from the one they talk to) */
       flip?: boolean;
+      /** the directed scene (docs/story-direction.md): the shot by hand — 'wide' | 'two[:WHO]' | 'mcu' | 'reaction[:WHO]' | 'push' | 'punch' */
+      shot?: string;
+      /** the directed scene: a move by hand — 'enter-left' | 'enter-right' | 'exit-left' | 'exit-right' | 'turn' | 'lean' | 'hop' | 'step-back', optionally ':WHO' */
+      move?: string;
     }
   /** A single button the visitor must press ("封を開く"). */
   | { t: 'action'; label: string }

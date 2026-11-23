@@ -19,3 +19,16 @@ export function stageOf(sceneId: string | null | undefined): StoryStage {
   if (!sceneId) return 'row';
   return SCENE_STAGE[sceneId] ?? (CINEMA_SCENES.test(sceneId) ? 'cinema' : 'row');
 }
+
+/**
+ * How the lines are shown, part of the same switch: 'subtitles' (film subtitles at the lower third, no bubbles — the
+ * story from day 3 on) or 'bubbles' (the story's own bubbles — days 1–2 for now). Per scene in SCENE_LINES; the
+ * review pages try subtitles in the cinema too with ?subs=1 (and bubbles in the row with ?subs=0).
+ */
+export type StoryLines = 'subtitles' | 'bubbles';
+export const SCENE_LINES: Record<string, StoryLines> = {};
+export function linesOf(sceneId: string | null | undefined, stage: StoryStage, flag?: string | null): StoryLines {
+  if (flag === '1') return 'subtitles';
+  if (flag === '0') return 'bubbles';
+  return (sceneId && SCENE_LINES[sceneId]) || (stage === 'cinema' ? 'bubbles' : 'subtitles');
+}

@@ -366,6 +366,10 @@ export const TALK_CSS = `
 @keyframes talk-arrive { 0% { opacity: 0; filter: brightness(2.6) blur(6px); transform: translateX(-50%) scale(.96) } 55% { opacity: 1; filter: brightness(1.6) blur(1px) } 100% { opacity: 1; filter: none; transform: translateX(-50%) } }
 @keyframes talk-gather { 0% { opacity: 0; transform: translate(var(--mx), var(--my)) scale(1.4) } 30% { opacity: 1 } 100% { opacity: 0; transform: translate(0,0) scale(.5) } }
 @keyframes talk-fadein { from { opacity: 0 } to { opacity: 1 } }
+@keyframes talk-camdrift { from { transform: none } to { transform: scale(var(--cd, 1.035)) } }
+@keyframes talk-camshake { 0%,100% { translate: 0 0 } 20% { translate: -7px 3px } 40% { translate: 6px -3px } 60% { translate: -4px 2px } 80% { translate: 2px -1px } }
+@keyframes talk-enter { from { transform: translateX(var(--ex, -200px)); opacity: 0 } 30% { opacity: 1 } to { transform: none; opacity: 1 } }
+@keyframes talk-exit { from { transform: none; opacity: 1 } 70% { opacity: 1 } to { transform: translateX(var(--ex, -200px)); opacity: 0 } }
 @keyframes talk-pulse { 0%,100% { box-shadow: 0 0 0 6px rgba(223,230,255,.16),0 0 32px rgba(160,180,255,.55) } 50% { box-shadow: 0 0 0 14px rgba(223,230,255,.08),0 0 48px rgba(160,180,255,.8) } }
 @keyframes talk-squash { 0% { transform: scale(1,1) } 35% { transform: scale(1.04,.95) } 70% { transform: scale(.98,1.03) } 100% { transform: scale(1,1) } }
 @keyframes talk-pop { 0% { transform: scale(1); opacity: 1 } 40% { transform: scale(1.35); opacity: 1 } 100% { transform: scale(1.7); opacity: 0 } }

@@ -685,7 +685,95 @@ export function TalkScene({
   const camX = cam ? (spots.get(cam)?.x ?? 0.5) : 0.5;
   const camShift = n <= 2 ? (camX < 0.5 ? 3 : -3) : (0.5 - camX) * 6;
 
-  const stateOf = (p: TalkPerson): FigureState => (past ? 'idle' : thinking === p.id ? 'think' : talkingId === p.id ? 'talk' : listening && !p.self ? 'listen' : 'idle');
+  // blocking: someone new in the row walks in from their side; someone leaving walks out (kept a moment for it)
+  const rowKey = row.map((p) => p.id).join('|');
+  const seenRow = useRef<Map<string, { p: TalkPerson; spot: NonNullable<ReturnType<typeof spots.get>> }> | null>(null);
+  const [entering, setEntering] = useState<Record<string, 'l' | 'r'>>({});
+  const [gone, setGone] = useState<{ p: TalkPerson; spot: NonNullable<ReturnType<typeof spots.get>>; side: 'l' | 'r' }[]>([]);
+  useEffect(() => {
+    const was = seenRow.current;
+    const nowMap = new Map(row.map((p) => [p.id, { p, spot: spots.get(p.id)! }]));
+    seenRow.current = nowMap;
+    if (!was || !directed) return;
+    const sideOf = (id: string, x: number): 'l' | 'r' => {
+      const m = items.find((it) => it.direction?.moves?.[id] || (it.who === id && it.direction?.move))?.direction;
+      const mv = m?.moves?.[id] ?? m?.move;
+      if (mv === 'enter-left' || mv === 'exit-left') return 'l';
+      if (mv === 'enter-right' || mv === 'exit-right') return 'r';
+      return x < 0.5 ? 'l' : 'r';
+    };
+    const add: Record<string, 'l' | 'r'> = {};
+    for (const [id, v] of nowMap) if (!was.has(id) && v.spot && !v.p.self) add[id] = sideOf(id, v.spot.x);
+    const left = [...was.values()].filter((v) => !nowMap.has(v.p.id) && v.spot && !v.p.self).map((v) => ({ ...v, side: sideOf(v.p.id, v.spot.x) }));
+    if (Object.keys(add).length) setEntering(add);
+    if (left.length) setGone(left);
+    const t = setTimeout(() => {
+      setEntering({});
+      setGone([]);
+    }, 750);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowKey]);
+
+  // --- the directed scene (lib/talk/direction.ts, docs/story-direction.md): the line's shot and the people's moves ---
+  const directed = items.some((it) => !!it.direction);
+  const nowUnit = shown[shown.length - 1];
+  const nowItem = speech ? (items.find((it) => it.id === speech.id) ?? nowUnit?.item) : nowUnit?.item;
+  const dir = !past && directed ? nowItem?.direction : undefined;
+  const saying = !!speech && speech.id === nowItem?.id && at < 1;
+  const phase = dir?.after && !saying ? 'after' : 'during';
+  const shot = dir ? (phase === 'after' ? dir.after! : dir.shot) : null;
+  const shotOn = dir ? (phase === 'after' ? dir.afterOn : dir.on) : undefined;
+  const shotKey = `${nowItem?.id ?? ''}:${phase}`;
+  const lastShot = useRef('');
+  const shotChanged = lastShot.current !== shotKey;
+  useEffect(() => {
+    lastShot.current = shotKey;
+  });
+  /** a person's face in the stage's own px (from where they stand and their headroom) */
+  const faceAt = (id?: string | null) => {
+    const sp = id ? spots.get(id) : undefined;
+    const p = id ? byId.get(id) : undefined;
+    if (!sp || !p) return null;
+    return { x: sp.x * w, y: stageH - sp.bottom - sp.h + sp.h * Math.min(0.6, (p.headAt ?? 0.16) + 0.07) };
+  };
+  const frame = (() => {
+    const f = { ox: w / 2, oy: stageH * 0.4, s: 1, tx: 0, ms: 700, push: 1, shake: false };
+    if (!shot) return f;
+    const C = CAMERA[shot];
+    const a = faceAt(shot === 'reaction' ? shotOn : nowItem?.who);
+    if (shot === 'two') {
+      const b = faceAt(shotOn);
+      if (a && b) Object.assign(f, { ox: (a.x + b.x) / 2, oy: Math.min(a.y, b.y), s: Math.max(1, Math.min(C.scale, (w * 0.9) / (Math.abs(a.x - b.x) + w * 0.38))) });
+      else if (a) Object.assign(f, { ox: a.x, oy: a.y, s: C.scale });
+    } else if (shot !== 'wide' && a) Object.assign(f, { ox: a.x, oy: a.y, s: shot === 'push' ? CAMERA.two.scale : C.scale });
+    f.tx = (w / 2 - f.ox) * CAMERA.center * (f.s > 1 ? 1 : 0);
+    // a new speaker (or the reaction after a question): a cut; else the camera moves
+    f.ms = shotChanged && (dir!.cut || phase === 'after') ? 0 : shot === 'push' ? CAMERA.two.ms : C.ms;
+    f.push = shot === 'push' ? CAMERA.push.scale / CAMERA.two.scale : 1;
+    f.shake = shot === 'punch';
+    if (reduced) Object.assign(f, { s: Math.min(f.s, CAMERA.reducedMax), tx: f.tx * 0.3, ms: Math.max(f.ms, 400), push: 1, shake: false });
+    return f;
+  })();
+  const dirKey = nowItem ? 100000 + ([...nowItem.id].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7) % 100000) * 2 + (phase === 'after' ? 1 : 0) : 0;
+  const speakerX = nowItem ? spots.get(nowItem.who)?.x : undefined;
+  /** the move someone makes on this line (the speaker's, or one named in an override), as a talk motion and a facing */
+  const moveOf = (p: TalkPerson): { motion: TalkMotion; toward?: 'left' | 'right'; mirror?: boolean } | null => {
+    if (!dir || phase === 'after') return null;
+    const m: Move | undefined = dir.moves?.[p.id] ?? (nowItem?.who === p.id ? dir.move : undefined);
+    const lx = spots.get(dir.on ?? dir.afterOn ?? '')?.x;
+    const toListener: 'left' | 'right' = lx != null && lx < (spots.get(p.id)?.x ?? 0.5) ? 'left' : 'right';
+    const away: 'left' | 'right' = toListener === 'left' ? 'right' : 'left';
+    // talk-lean tips away from `toward`: leaning in = toward set away from the listener
+    if (m === 'lean') return { motion: 'lean', toward: away };
+    if (m === 'step-back') return { motion: 'lean', toward: toListener };
+    if (m === 'hop') return { motion: 'hop' };
+    if (m === 'turn') return { motion: 'nod', mirror: true };
+    if (p.back && dir.stir) return { motion: nowItem && /[？?]/.test(nowItem.text) ? 'nod' : 'shrink' };
+    return null;
+  };
+  const stateOf = (p: TalkPerson): FigureState =>
+    past ? 'idle' : thinking === p.id ? 'think' : talkingId === p.id ? 'talk' : listening && !p.self ? 'listen' : directed && talkingId && !p.back && !p.self ? 'listen' : 'idle';
   const faceOf = (p: TalkPerson): TalkFace => {
     // in the past: the face (and pose) they had at that line
     const pick = (face: TalkFace) => (p.self ? (fixedSelfFace ? 'normal' : face === 'sad' || face === 'thinking' ? 'normal' : face) : face);
@@ -796,49 +884,106 @@ export function TalkScene({
         </p>
       )}
 
-      {/* the people, side by side (you at the right), standing low; the camera moves in toward the one speaking */}
+      {/* the people, side by side (you at the right), standing low; the camera moves in toward the one speaking (the
+          directed scene: the line's shot — framed on a face, cut or moved — and a slow drift inside it) */}
       <div
         className="pointer-events-none absolute inset-x-0 z-[6]"
         style={{
           bottom: dockH,
           height: stageH,
-          transformOrigin: `${Math.round(camX * 100) === 27 ? 30 : Math.round(camX * 100) === 73 ? 70 : Math.round(camX * 100)}% 85%`,
-          transform: cam ? `scale(1.1) translateX(${camShift}%)` : undefined,
-          transition: `transform .9s ${ease}, bottom .4s ease`,
+          ...(directed
+            ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), bottom .4s ease` }
+            : {
+                transformOrigin: `${Math.round(camX * 100) === 27 ? 30 : Math.round(camX * 100) === 73 ? 70 : Math.round(camX * 100)}% 85%`,
+                transform: cam ? `scale(1.1) translateX(${camShift}%)` : undefined,
+                transition: `transform .9s ${ease}, bottom .4s ease`,
+              }),
           willChange: 'transform',
           ...stageStyle,
         }}
       >
-        {row.map((p, k) => {
-          const s = spots.get(p.id)!;
+        <div
+          key={directed ? shotKey : 'still'}
+          className="absolute inset-0"
+          style={
+            directed && shot && !reduced
+              ? {
+                  transformOrigin: `${frame.ox}px ${frame.oy}px`,
+                  ['--cd' as string]: frame.push !== 1 ? frame.push : CAMERA.drift.scale,
+                  animation: frame.shake ? 'talk-camshake .36s .1s ease-in-out, talk-camdrift 7s .5s ease-out forwards' : frame.push !== 1 ? `talk-camdrift ${CAMERA.push.ms}ms ease-out forwards` : `talk-camdrift ${CAMERA.drift.ms}ms ease-out forwards`,
+                }
+              : undefined
+          }
+        >
+        {[...row, ...gone.filter((g) => !row.some((p) => p.id === g.p.id)).map((g) => g.p)].map((p, k) => {
+          const g = gone.find((x) => x.p.id === p.id && !row.some((r) => r.id === p.id));
+          const s = g ? g.spot : spots.get(p.id)!;
           const speaking = talkingId === p.id && !past;
+          const mv = g ? null : moveOf(p);
+          const towardSpeaker: 'left' | 'right' | undefined = directed && speakerX != null && nowItem?.who !== p.id ? (speakerX < s.x ? 'left' : 'right') : undefined;
+          const enter = entering[p.id];
+          const motion = { animation: g ? `talk-exit .6s ease-in forwards` : enter && !reduced ? `talk-enter .7s cubic-bezier(.2,.8,.25,1) both` : arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, ['--ex' as string]: `${(g ? g.side : enter) === 'l' ? -w * 0.6 : w * 0.6}px` };
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, animation: arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, filter: s.dim ? 'brightness(.68) saturate(.85)' : undefined }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: s.dim ? 'brightness(.68) saturate(.85)' : undefined, ...motion }}>
               {arriving && p.self && <ArrivalMotes />}
+              <div className="flex h-full items-end justify-center" style={mv?.mirror ? { transform: 'scaleX(-1)' } : undefined}>
               <Figure
                 look={p.look}
                 face={faceOf(p)}
                 named={poseOf(p)}
-                state={stateOf(p)}
-                motion={past ? undefined : react[p.id]?.motion}
-                motionKey={past ? 0 : (react[p.id]?.key ?? 0)}
-                toward={p.self ? 'left' : 'right'}
+                state={g ? 'idle' : stateOf(p)}
+                motion={past ? undefined : (mv?.motion ?? react[p.id]?.motion)}
+                motionKey={past ? 0 : mv ? dirKey : (react[p.id]?.key ?? 0)}
+                toward={mv?.toward ?? towardSpeaker ?? (p.self ? 'left' : 'right')}
                 height={s.h * (p.scale ?? 1)}
                 chest={s.chest}
                 // the two breathe at their own pace (in step would look mechanical): 3.4 s and 4.1 s
                 breath={p.self ? 4.1 : 3.4 + ((k * 0.37) % 0.5)}
-                calm={isGroup && !speaking && talkingId != null}
+                calm={isGroup && !speaking && talkingId != null && (!directed || !!p.back)}
                 reduced={reduced}
                 lit={speaking}
-                glow={isGroup && speaking ? p.color : undefined}
+                glow={isGroup && speaking && !directed ? p.color : undefined}
                 level={voice?.who === p.id && voice.level ? voice.level : speech?.who === p.id ? speech.level : undefined}
               />
+              </div>
             </div>
           );
         })}
+        </div>
       </div>
 
+      {/* the story's lines as film subtitles (no bubbles): the newest at the lower third, a log of the past ones when
+          dragged back */}
+      {lines === 'subtitles' && (
+        <>
+          <style>{SUBTITLE_CSS}</style>
+          <SubtitleScrim bottom={dockH} />
+          <div className="pointer-events-none absolute inset-x-0 z-[9] flex flex-col items-center justify-end gap-3 px-5" style={{ bottom: dockH + 10 }}>
+            {(past ? units.slice(Math.max(0, end - 4), end) : nowUnit ? [nowUnit] : []).map((u, k, list) => {
+              const it = u.item;
+              const who = byId.get(it.who);
+              const live = speech?.id === it.id && outNow != null;
+              const b = live && beatNow && beatNow.k >= u.s0 && beatNow.k < u.s1 ? beatNow.beat : u.beats[0];
+              const nm = it.name ?? (who?.self ? selfName || 'あなた' : who?.name);
+              return (
+                <Subtitle
+                  key={past ? `p${u.key}` : u.key}
+                  lineKey={u.key}
+                  name={u.first || past ? nm : null}
+                  color={who ? toneFor(who).line : undefined}
+                  text={u.text}
+                  shown={live && outNow! < u.from + u.len ? Math.max(0, outNow! - u.from) : undefined}
+                  style={subtitleStyle(talkPlain(u.text), b?.shape, b?.in)}
+                  dim={past && k < list.length - 1}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
+
       {/* the bubbles: two at most over the heads (the newest lower), 62 px from the sides */}
+      {lines === 'bubbles' && (
       <div className="pointer-events-none absolute inset-x-0 z-[8] flex flex-col items-center justify-end gap-2.5" style={{ paddingLeft: 62, paddingRight: 62, bottom: bubbleBottom }}>
         {leaving && !past && <Ghost key={`g-${leaving.id}`} item={leaving} who={byId.get(leaving.who)} />}
         {(firstPerson ? shown.filter((u) => !byId.get(u.item.who)?.self) : shown).map((u, k, list) => {
@@ -873,9 +1018,10 @@ export function TalkScene({
           );
         })}
       </div>
+      )}
 
       {/* M-R249 first person: your newest words, from the bottom right, the tail off the screen toward you */}
-      {firstPerson &&
+      {firstPerson && lines === 'bubbles' &&
         shown
           .filter((u) => byId.get(u.item.who)?.self)
           .slice(-1)

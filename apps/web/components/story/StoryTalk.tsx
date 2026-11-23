@@ -8,6 +8,7 @@ import { spriteUrl, stillShows } from '@/lib/onboarding/media';
 import { exprFor } from '@/lib/story/expression';
 import { batiLook, TONES, toneOf } from '@/lib/talk/looks';
 import { castLook } from '@/lib/talk/demoLooks';
+import { directLines, type DirectionOverride } from '@/lib/talk/direction';
 import { charSpec } from './Stage';
 import type { Speaker, StoryVars } from '@/lib/onboarding/script';
 
@@ -71,6 +72,8 @@ export const talkId = (who: string) => (who.startsWith('KIMORIN') ? 'KIMORIN' : 
 /** M-R245: each one's bubble colour, fixed ({bati} はちみつ; the cast in the group colours, one each) */
 const TONE_OF: Record<string, keyof typeof TONES> = { KIMORIN: 'apricot', MONBAN: 'greyblue', OBOLON: 'lilac', バティ: 'honey', たこ焼きブラザー: 'rose', たこ焼きシスター: 'rose', うんちピンポンくん: 'sage', 'MIKIE⭐︎DRILL': 'rose' };
 const toneFor = (id: string) => TONES[TONE_OF[id] ?? ''] ?? toneOf(id);
+/** a story speaker's colour (their name over a subtitle) */
+export const storyTone = (who: string) => toneFor(talkId(who));
 
 /** the size in the row (the painted pictures have no headroom: kept under the bubbles; small ones smaller) */
 const SCALE: Record<string, number> = { monban: 0.86, obolon: 0.62, 'obolon-pit': 0.62, 'unchi-pinpon': 0.42, freezy: 0.72, mikie: 0.76 };
@@ -221,6 +224,7 @@ export function storyItems({
   text,
   sprites,
   expr,
+  direct,
 }: {
   entries: StoryEntry[];
   gen: number;
@@ -228,6 +232,8 @@ export function storyItems({
   sprites: Map<string, string>;
   /** a line's pose by hand (the script's expr / a face step), else from the words */
   expr: (e: Extract<StoryEntry, { kind: 'them' }>) => string | undefined;
+  /** the directed scene: give each line its shot and moves (with the script's own override, if any) */
+  direct?: (e: StoryEntry) => DirectionOverride | undefined;
 }): TalkItem[] {
   const out: TalkItem[] = [];
   for (const e of entries) {
@@ -256,6 +262,13 @@ export function storyItems({
       ...(pose && pose !== 'stand' ? { pose } : {}),
       ...(beats.length ? { faces: beats } : {}),
     });
+  }
+  if (direct) {
+    const dirs = directLines(
+      out.map((it) => ({ id: it.id, who: it.who, text: it.text, override: ((e) => (e ? direct(e) : undefined))(entries.find((e) => `${gen}:${e.id}` === it.id)) })),
+      'me',
+    );
+    for (const it of out) it.direction = dirs.get(it.id);
   }
   return out;
 }

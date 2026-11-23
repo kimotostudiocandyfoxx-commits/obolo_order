@@ -670,6 +670,7 @@ body {
 @keyframes hop { 0%, 100% { transform: none; } 40% { transform: translateY(var(--hop, -2%)); } }
 /* the story's cinema (days 1–2, lib/story/motion.ts MOTION.cinema): the camera pushes onto a new speaker, then drifts closer */
 @keyframes cinePush { from { transform: translateX(var(--pan, 0)) scale(var(--from, 0.8)); opacity: 0.35; } 55% { opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes cineShake { 0%, 100% { translate: 0 0; } 20% { translate: -2.2% 1%; } 40% { translate: 2% -1%; } 60% { translate: -1.2% 0.6%; } 80% { translate: 0.6% -0.3%; } }
 @keyframes cineDrift { from { transform: none; } to { transform: translate(calc(var(--dpx, 1%) * -1), calc(var(--dpx, 1%) * -0.6)) scale(var(--drift, 1.04)); } }
 @keyframes tailSway { 0%, 100% { transform: rotate(calc(var(--tail, 2deg) * -1)); } 50% { transform: rotate(var(--tail, 2deg)); } }
 @keyframes eyeGlow { 0%, 100% { opacity: var(--eyeMin, 0.35); } 50% { opacity: var(--eyeMax, 0.95); } }

@@ -46,9 +46,12 @@ import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
-import { stageOf } from '@/lib/onboarding/stage';
+import { linesOf, stageOf } from '@/lib/onboarding/stage';
+import { lineKind } from '@/lib/talk/direction';
+import { SubtitleScrim, SUBTITLE_CSS, TypedSubtitle } from '@/components/story/Subtitle';
+import { TONES } from '@/lib/talk/looks';
 import { TalkScene } from '@/components/talk/TalkScene';
-import { speakerOfSprite, stillShowsAny, storyItems, storyPeople, storySelfLook, talkId } from '@/components/story/StoryTalk';
+import { speakerOfSprite, stillShowsAny, storyItems, storyPeople, storySelfLook, storyTone, talkId } from '@/components/story/StoryTalk';
 import { VoiceChoice } from './VoiceChoice';
 import { Invitation } from '@/components/story/Invitation';
 import { TicketArt } from '@/components/story/Ticket';
@@ -793,6 +796,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the mixer: music (dipping while someone speaks), sounds, voices
   // a lesson can quiet the music under itself (Saturn: low while kororins sing, silent while the mic records — QA 5 N14)
   const [duck, setDuck] = useState(1);
+  // the review pages: ?subs=1 tries the story's subtitles in the cinema of days 1–2 (?subs=0: bubbles in the row)
+  const [subsFlag, setSubsFlag] = useState<string | null>(null);
+  useEffect(() => setSubsFlag(new URLSearchParams(window.location.search).get('subs')), []);
   // you are speaking into 〔🎙〕: the ones in the talk turn to you and nod
   const [listening, setListening] = useState(false);
   useEffect(() => {
@@ -1159,12 +1165,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       if (e.who === 'バティ') return expressions['@bati'];
       return undefined;
     },
+    // the directed scene: the shot and moves from each line, the script's own shot / move by hand
+    direct: (e) => {
+      const st = steps[Number(e.id.replace(/^s/, '').split('~')[0])];
+      return st?.t === 'say' && (st.shot || st.move) ? { shot: st.shot, move: st.move } : undefined;
+    },
   });
   // on while the thread is (not under a picture choice, which covers the screen), and through the short waits between
   // lines while someone stands on stage (a vanish, a flash)
   const talkHidden = chatOn && step?.t === 'choice' && !!step.pics;
   // the stage of this scene (lib/onboarding/stage.ts): days 1–2 the story's own close-ups, day 3 on the side-by-side row
-  const cinema = stageOf(sceneIdAt(steps, i)) === 'cinema';
+  const sceneNow = sceneIdAt(steps, i);
+  const cinema = stageOf(sceneNow) === 'cinema';
+  // the cinema's push for this line, from the same reading of the line as the directed row (a shout / a muse)
+  const cineKind = cinema && talkSays ? lineKind(sayText(talkSays.who, talkSays.text, v)) : null;
+  const cineShot = cineKind === 'shout' ? 'punch' : cineKind === 'muse' ? 'push' : null;
+  const lineMode = linesOf(sceneNow, cinema ? 'cinema' : 'row', subsFlag);
   const talkOn = !cinema && started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
   const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
   const talkDock = Math.max(84, chatOn && step ? chatBottom(step) : 30);
@@ -1226,7 +1242,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>
       {!sprite && autoStandee && !talkOn && (
-        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} cinema={cinema} />
+        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} cinema={cinema} shot={cineShot} />
       )}
       {sprite && (
         // a wrapper of its own so the 'vanish' step can fade the whole cast into light
@@ -1242,6 +1258,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           react={sayReact}
           slot={spriteSlot}
           cinema={cinema}
+          shot={cineShot}
         />
         </div>
       )}
@@ -1287,6 +1304,8 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <TalkScene
             transparent
             skin="story"
+            lines={lineMode}
+            selfName={v.neo || v.name || undefined}
             noMute
             listening={listening}
             tapThrough
@@ -1326,6 +1345,35 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         <div className="pointer-events-none absolute inset-0 z-[10] transition-opacity duration-300" style={{ opacity: chatOn ? 1 : 0 }}>
           {/* a soft shade under the thread so it reads on any picture */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
+          {lineMode === 'subtitles' ? (
+            // ?subs=1: the newest line as a film subtitle at the lower third (no bubbles)
+            (() => {
+              const list = chatOn ? chatEntries : lastChat.current.entries;
+              const e = [...list].reverse().find((x) => x.kind !== 'sys' && !(x.kind === 'me' && x.action));
+              if (!e) {
+                reveal.current = { done: true, finish: () => undefined };
+                return null;
+              }
+              const bottom = (chatOn && step ? chatBottom(step) : lastChat.current.bottom) + 10;
+              if (!(chatOn && e.kind === 'them' && e === list[list.length - 1])) reveal.current = { done: true, finish: () => undefined };
+              return (
+                <>
+                  <style>{SUBTITLE_CSS}</style>
+                  <SubtitleScrim bottom={bottom} />
+                  <div className="pointer-events-none absolute inset-x-0 z-[11] px-5" style={{ bottom: `calc(${bottom}px + env(safe-area-inset-bottom))` }}>
+                    <TypedSubtitle
+                      lineKey={e.id}
+                      name={e.kind === 'them' ? e.name : v.neo || v.name || 'あなた'}
+                      color={e.kind === 'them' ? storyTone(e.who).line : TONES.pearl.line}
+                      text={e.text}
+                      reveal={chatOn && e === list[list.length - 1] && e.kind === 'them' ? reveal : leavingReveal}
+                      live={chatOn && e.kind === 'them' && e === list[list.length - 1]}
+                    />
+                  </div>
+                </>
+              );
+            })()
+          ) : (
           <ChatLog
             entries={chatOn ? chatEntries : lastChat.current.entries}
             talking={chatOn && talking}
@@ -1333,6 +1381,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             live={chatOn && step?.t === 'say' && !mustWait}
             bottom={chatOn && step ? chatBottom(step) : lastChat.current.bottom}
           />
+          )}
         </div>
       )}
       {started && step?.t === 'action' && (

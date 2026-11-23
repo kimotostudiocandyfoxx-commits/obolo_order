@@ -1,7 +1,7 @@
 'use client';
 
 import { talkPlain } from '@obolo/shared';
-import { type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Marked } from '@/components/talk/TalkScene';
 
 /**
@@ -62,4 +62,22 @@ export function Subtitle({ name, color, text, shown, style = 'plain', lineKey, d
 /** the scrim the subtitles sit on: a soft dark gradient up from the bottom, no box */
 export function SubtitleScrim({ bottom, height = 210 }: { bottom: number; height?: number }) {
   return <div className="pointer-events-none absolute inset-x-0 z-[8]" style={{ bottom: Math.max(0, bottom - 40), height, background: 'linear-gradient(to top, rgba(4,4,10,.72) 0%, rgba(4,4,10,.5) 45%, transparent 100%)' }} aria-hidden />;
+}
+
+/**
+ * A subtitle that types in by itself (the cinema of days 1–2 tried with subtitles, ?subs=1): the words come at the
+ * reading pace; `reveal` lets a tap finish them first (as the story's bubbles do).
+ */
+export function TypedSubtitle({ name, color, text, lineKey, reveal, live }: { name?: string | null; color?: string; text: string; lineKey: string; reveal: { current: { done: boolean; finish: () => void } }; live: boolean }) {
+  const plain = [...talkPlain(text)];
+  const [n, setN] = useState(0);
+  useEffect(() => setN(0), [lineKey]);
+  useEffect(() => {
+    if (n >= plain.length) return;
+    const t = setTimeout(() => setN((x) => x + 1), n === 0 ? 120 : 34);
+    return () => clearTimeout(t);
+  }, [n, plain.length]);
+  if (live) reveal.current = { done: n >= plain.length, finish: () => setN(plain.length) };
+  const st = subtitleStyle(talkPlain(text));
+  return <Subtitle name={name} color={color} text={text} lineKey={lineKey} shown={n < plain.length ? n : undefined} style={st} />;
 }
