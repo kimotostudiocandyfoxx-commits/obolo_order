@@ -7857,6 +7857,182 @@
         720
       ],
       "always": false
+    },
+    {
+      "id": "home-bg-saturn",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a giant glossy vinyl DJ record turntable embedded in rust-orange ground, with a tonearm whose needle tip is a small retro microphone and a big round play button on the rim, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (dusky peach and violet sky with Saturn's huge pastel rings arching across), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-jupiter",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a big round cartoon tree with a tiny arched wooden door in its trunk and a little lantern, soft mossy ground with mushrooms, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (soft green and gold forest-canopy sky with sunbeams and faint giant stripes of Jupiter), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-mercury",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a small sandy island with one palm tree, a tiny cozy cabin and a little wooden pier, on calm glossy turquoise sea, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (icy blue sky with a gentle aurora ribbon), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-mars",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a small cube-shaped film studio building with a marquee sign without letters and a round projector window, on red sand, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (rosy-red dusk sky with soft haze and a faint futuristic city skyline far away), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-venus",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a small round glass radio booth with an ON AIR lamp (lamp only, no letters) and a big antenna, standing on golden fluffy clouds, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (warm golden-orange sunset sky with soft rings of radio waves), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-uranus",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a tiny cute goods shop with a striped awning and a display window, on a soft green grassy hill, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (teal-mint sky with fluffy clouds and Uranus's thin sideways ring), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-pluto",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a tiny cozy library with warm glowing windows and a stack of books by the door, on a white snowy ice plain, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (deep navy night sky full of gentle twinkling stars), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-bg-neptune",
+      "prompt": "Cute 3D toy diorama illustration, soft clay and glossy vinyl art-toy look, rounded chunky shapes, gentle tilt-shift miniature feel, soft studio lighting with a dreamy glow, pastel colours with a few small neon accents, trendy and charming, vertical phone wallpaper composition 9:16. The lower 55 percent of the picture is the hero: a tiny arcade game hut shaped like a retro game cabinet with a glowing screen, on a small rocky island in a deep blue sea, seen slightly from above, sitting on its own small floating patch of ground, with a small blank round name plate. The upper 45 percent is open sky (purple stormy sky with soft cartoon lightning far away), calm and uncluttered, left empty for floating items. Far in the background, a few tiny distant copies of the hero on other floating patches. No people, no characters, no animals, no text, no letters.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-korolin",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a small round bean-shaped mascot character with tiny arms, big sunglasses pushed up, a happy face, holding a tiny microphone. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-butterfly",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a cute butterfly whose two wings are little square framed paintings (one sunset, one flower), tiny smiling body. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-ship",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a tiny toy sailing ship whose square sail is an album cover with a music note, little round portholes. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-ufo",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a tiny round UFO with a glass dome, a small round cute pilot face inside, and a soft light beam underneath. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-radio",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a glowing ring of radio waves around a tiny retro radio with a small antenna. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-balloon",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a pastel hot-air balloon carrying a tiny folded T-shirt and a mug in its basket. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-book",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a small flying storybook with soft glowing pages opening like wings. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "home-sp-bubble",
+      "prompt": "Cute 3D vinyl art-toy style game sprite, glossy rounded shapes, soft lighting, pastel colours with a small neon accent: a shiny soap bubble with a tiny retro game controller floating inside. Centered, the whole object inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        720,
+        720
+      ],
+      "always": false
     }
   ],
   "redo": []
