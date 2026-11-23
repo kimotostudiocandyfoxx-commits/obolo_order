@@ -5,7 +5,7 @@
 <style>
 /* layout: a phone-sized planet home (scene + glass UI), the planet switcher above it shows the same template on every planet */
 :root{
-  --ink:#fffaf2; --ink-dim:rgba(255,250,242,.72); --glass:rgba(255,255,255,.16); --glass-strong:rgba(255,255,255,.26);
+  --ink:#fffaf2; --ink-dim:rgba(255,250,242,.72); --glass:rgba(34,18,52,.34); --glass-strong:rgba(34,18,52,.5);
   --line:rgba(255,255,255,.38); --shade:rgba(20,10,40,.45); --page:#140f22; --accent:#ffb36b;
   --dachi:#ffffff; --oshi:#ff8fc8; --mine:#ffd36b;
   --f-body:'Zen Maru Gothic',system-ui,'Hiragino Maru Gothic ProN',sans-serif; --f-title:'Dela Gothic One','Zen Maru Gothic',sans-serif;
@@ -25,8 +25,10 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .ttl{font-family:var(--f-title);font-size:26px;letter-spacing:.04em;text-shadow:0 2px 12px var(--shade)}
 .ttl small{display:block;font-family:var(--f-body);font-weight:700;font-size:11px;letter-spacing:.12em;opacity:.85}
 .pill{font:700 12px var(--f-body);color:var(--ink);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:7px 12px;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
-.say{font-size:12.5px;line-height:1.55;font-weight:700;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;padding:9px 12px;max-width:94%;text-shadow:0 1px 6px var(--shade)}
+.say{font-size:12.5px;line-height:1.55;font-weight:700;transition:max-height .4s,opacity .4s,padding .4s;max-height:120px;overflow:hidden;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;padding:9px 12px;max-width:94%;text-shadow:0 1px 6px var(--shade)}
 .say b{color:var(--accent)}
+.say.mini{max-height:0;opacity:0;padding-block:0;border-width:0}
+.help{width:30px;height:30px;justify-content:center;padding:0}
 .item{position:absolute;width:var(--s,74px);height:var(--s,74px);margin:calc(var(--s,74px)/-2);cursor:pointer;z-index:3;animation:bob var(--d,6s) ease-in-out infinite;animation-delay:var(--dl,0s);filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
 .item img{width:100%;height:100%;object-fit:contain;pointer-events:none}
 .item .tag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);white-space:nowrap;font:700 10px var(--f-body);padding:2px 7px;border-radius:999px;background:rgba(20,10,30,.55);border:1px solid var(--c,var(--dachi));color:var(--ink)}
@@ -58,7 +60,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .menu{position:absolute;z-index:25;display:flex;flex-direction:column;gap:4px;background:rgba(28,18,44,.9);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:16px;padding:6px;min-width:150px}
 .menu button{font:700 13px var(--f-body);text-align:left;color:var(--ink);background:none;border:0;border-radius:10px;padding:9px 10px;cursor:pointer}
 .menu button:hover,.menu button:focus-visible{background:var(--glass)}
-.inside{position:absolute;inset:0;z-index:15;background:var(--inside-bg,rgba(30,18,40,.92));backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.inside{position:absolute;inset:0;z-index:15;background:radial-gradient(120% 70% at 50% 0%,color-mix(in srgb,var(--accent) 45%,#2a1638),#1c1028 70%);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
 .inside.on{opacity:1;pointer-events:auto}
 .shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;overflow:auto}
 .shelf .w{aspect-ratio:1;border-radius:14px;background:linear-gradient(160deg,rgba(255,255,255,.22),rgba(255,255,255,.05));border:1px solid var(--line);display:grid;place-items:center;font-size:26px;position:relative}
@@ -82,7 +84,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="plate" id="plate"></div>
   <div class="needle" id="needle"></div>
   <div class="top">
-    <div class="row"><div class="ttl" id="ttl"></div><button class="pill" id="oshiBtn" type="button">♡ 推し <span id="oshiN"></span></button></div>
+    <div class="row"><div class="ttl" id="ttl"></div><span style="display:flex;gap:6px"><button class="pill help" id="help" type="button" aria-label="この星の説明">？</button><button class="pill" id="oshiBtn" type="button">♡ 推し <span id="oshiN"></span></button></span></div>
     <div class="say" id="say"></div>
   </div>
   <div class="dock"><button class="cta" id="cta" type="button"></button><button class="ghost" id="fly" type="button">＋ 飛ばす</button></div>
@@ -133,12 +135,13 @@ function render(){
   $('plate').textContent=`${ME}の${c.place}`;$('cta').textContent=c.cta;$('home').setAttribute('aria-label',`${ME}の${c.place}`);
   $('oshiN').textContent=oshi.size;
   const sky=$('sky');sky.innerHTML='';items=[];
-  const spots=[[22,30],[70,27],[45,22],[84,40],[16,44],[58,38],[34,36]];
+  const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
   list.forEach((p,i)=>{const [x,y]=spots[i%spots.length];add({...p,x,y,i,isNew:i<2})});
-  FAR.forEach((n,i)=>add({n,k:'far',x:8+i*16.5,y:[50,47,52,46,51,48][i],i:i+7,far:1}));
+  FAR.forEach((n,i)=>add({n,k:'far',x:[7,16,25,75,84,93][i],y:[53,56,51,52,57,54][i],i:i+7,far:1}));
   document.querySelectorAll('.switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));
   closeAll();
+  const s=$('say');s.classList.remove('mini');clearTimeout(s._t);s._t=setTimeout(()=>s.classList.add('mini'),4500);
 }
 function add(o){
   const c=P[cur],e=document.createElement('div');e.className='item'+(o.far?' far':'')+(o.isNew?' new':'');e.tabIndex=0;e.setAttribute('role','button');
@@ -193,7 +196,7 @@ function stopPlay(){if(playing&&playing!==true)clearTimeout(playing);playing=nul
 $('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
 $('home').onclick=enter;$('home').onkeydown=e=>{if(e.key==='Enter')enter()};$('cta').onclick=enter;
-$('inClose').onclick=closeAll;$('oshiBtn').onclick=()=>toast('推し：'+[...oshi].join('・'));
+$('inClose').onclick=closeAll;$('help').onclick=()=>{const s=$('say');s.classList.toggle('mini');clearTimeout(s._t)};$('oshiBtn').onclick=()=>toast('推し：'+[...oshi].join('・'));
 $('fly').onclick=()=>toast('月の工房で作って、'+P[cur].name+'へ飛ばそう');
 render();
 </script>
