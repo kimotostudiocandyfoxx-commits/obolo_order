@@ -39,6 +39,8 @@ import {
   JOURNEY_DONE,
   JOURNEY_PAYMENT,
   JOURNEY_WAIT_MS,
+  MEMBERS_DAYS,
+  type MembersDay,
   MAKE_COST,
   BATI_FACES,
   BATI_MAGIC_PER_DAY,
@@ -1076,8 +1078,26 @@ export class DemoApi implements Api {
     });
   }
 
-  async jumpJourney(day: number) {
+  async jumpJourney(day: number | MembersDay) {
+    if (typeof day === 'string') {
+      const n = MEMBERS_DAYS.indexOf(day);
+      return this.patchMe((u) => ({ journeyDay: JOURNEY_DONE, journeyCompletedAt: null, orderedAt: u.orderedAt ?? now(), story: { ...(u.story ?? {}), 'l2.done': String(n), 'l2.at': new Date(Date.now() - JOURNEY_WAIT_MS - 60_000).toISOString() } }));
+    }
     return this.patchMe(() => ({ journeyDay: day, journeyCompletedAt: null, ...(day <= JOURNEY_PAYMENT ? { orderedAt: null } : {}) }));
+  }
+
+  // the tester entrance is the real server's only (its allowlist): the demo has no testers
+  async testerUnlockAll(): Promise<Me> {
+    throw new ApiError(403, 'NOT_TESTER', 'Testers only');
+  }
+  async testerJump(_day: number | MembersDay): Promise<Me> {
+    throw new ApiError(403, 'NOT_TESTER', 'Testers only');
+  }
+  async testerNext(): Promise<Me> {
+    throw new ApiError(403, 'NOT_TESTER', 'Testers only');
+  }
+  async testerReset(): Promise<Me> {
+    throw new ApiError(403, 'NOT_TESTER', 'Testers only');
   }
 
   async advanceJourney(skip: boolean) {

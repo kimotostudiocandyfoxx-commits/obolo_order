@@ -10,6 +10,7 @@ import {
   type CompleteJourneyDayBody,
   type CompleteLap2Body,
   LAP2,
+  LAP2_WAIT_MS,
   lap2Done,
   lap2OpensAt,
   type Locale,
@@ -28,6 +29,7 @@ import { users } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
 import { talkLookOf } from '../look/talk';
+import { isTester } from './tester';
 
 /** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
 function batiFaces(j: Record<string, string> | null): Partial<Record<string, string>> | undefined {
@@ -104,6 +106,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
     puniPic: u.puniPicUrl ?? null,
     butterfly: u.butterflyUrl ?? null,
     story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2|sys)\./.test(k))),
+    // the tester entrance (users/tester.ts): only when the server's allowlist names this account
+    ...(isTester(u) ? { tester: true } : {}),
     createdAt: u.createdAt.toISOString(),
   };
 }
@@ -250,7 +254,8 @@ export class UsersService {
     const story = (cur.onboardingJson ?? {}) as Record<string, string>;
     if (!cur.orderedAt || body.chapter !== lap2Done(story)) return toMe(cur);
     const opens = lap2OpensAt(story);
-    if (opens !== null && Date.now() < opens - 120_000) throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
+    // the tester entrance: a tester never waits (users/tester.ts; nobody else)
+    if (opens !== null && !isTester(cur) && Date.now() < opens - 120_000) throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     const id = LAP2[body.chapter].id;
     const [u] = await this.db.write
       .update(users)
@@ -275,7 +280,8 @@ export class UsersService {
   async advanceJourney(userId: string, skip: boolean): Promise<Me> {
     const cur = await this.load(userId);
     if (!cur.journeyCompletedAt || cur.journeyDay >= JOURNEY_DONE) return toMe(cur);
-    if (!(skip && cur.journeyDay <= 2) && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
+    // the tester entrance: a tester never waits (users/tester.ts; nobody else)
+    if (!isTester(cur) && !(skip && cur.journeyDay <= 2) && Date.now() < cur.journeyCompletedAt.getTime() + JOURNEY_WAIT_MS - 120_000) {
       throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
     }
     const [u] = await this.db.write
@@ -297,6 +303,33 @@ export class UsersService {
         journeyDay: day,
         journeyCompletedAt: null,
         ...(day <= JOURNEY_PAYMENT ? { orderedAt: null, stripeSubscriptionId: null } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return toMe(u);
+  }
+
+  /**
+   * Operator / tester testing: put the account on a members' day (shared LAP2, `n` = 1 天王星 … 3 海王星) from its start
+   * with no wait: the first journey done, an Obolo Order (a demo order when there is none — no charge), the members' days
+   * before it finished, and the wait after them over. What was made on those days is kept.
+   */
+  async jumpMembersDay(userId: string, n: 1 | 2 | 3): Promise<Me> {
+    const cur = await this.load(userId);
+    if (!cur.orderedAt) await this.markOrdered(userId, { subscriptionStatus: 'demo' });
+    const story = { ...((await this.load(userId)).onboardingJson ?? {}) } as Record<string, string>;
+    story['l2.done'] = String(n - 1);
+    // finished "a day ago": the next day is open now (lap2OpensAt); for the first, no wait at all
+    story['l2.at'] = new Date(Date.now() - LAP2_WAIT_MS - 60_000).toISOString();
+    const [u] = await this.db.write
+      .update(users)
+      .set({
+        journeyDay: JOURNEY_DONE,
+        journeyCompletedAt: null,
+        // day 9 (the 2nd egg's morning) as it would be after the first journey; kept when already set
+        ...(cur.batiEggAt ? {} : { batiEggAt: new Date(Date.now() + JOURNEY_WAIT_MS) }),
+        onboardingJson: story,
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId))

@@ -70,6 +70,11 @@ export interface Me {
    * kororins, Mercury's song from a sticker, Mars's MV from the song).
    */
   story?: Record<string, string>;
+  /**
+   * A tester account (the API's TESTER_EMAILS / TESTER_ACCOUNT_IDS allowlist): the web shows the tester bar
+   * (components/TesterBar.tsx) and POST /me/tester/* is allowed. Absent / false for everyone else.
+   */
+  tester?: boolean;
   createdAt: string;
 }
 

@@ -45,6 +45,14 @@ const Env = z.object({
   SESSION_TTL_DAYS: z.coerce.number().default(30),
   /** Invite-only: token for POST /admin/invites (issuing the first invitations). Unset = admin API disabled. */
   ADMIN_TOKEN: secret(),
+  /**
+   * The tester entrance (docs/本番の状態.md): login emails (comma-separated, any case) whose account gets Me.tester and
+   * POST /me/tester/* (open everything, jump days, skip the wait, start over). Set from the GitHub Actions variable
+   * TESTER_EMAILS in deploy-api.yml — never written in the repository. Empty = nobody.
+   */
+  TESTER_EMAILS: z.string().default(''),
+  /** the same by account id (users.id, comma-separated) */
+  TESTER_ACCOUNT_IDS: z.string().default(''),
   /** PLACEHOLDER (P-INV-2): invitation validity. */
   INVITE_TTL_DAYS: z.coerce.number().default(14),
   /** Web origin used in invitation emails, e.g. https://obolo-order-web.vercel.app */

@@ -1,4 +1,4 @@
-import type { BatiEggKind, BatiRole, Me, LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
+import type { BatiEggKind, BatiRole, Me, MembersDay, LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
 import type { Api } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
@@ -288,8 +288,20 @@ export class HttpApi implements Api {
     const short = answers && Object.fromEntries(Object.entries(answers).filter(([k, v]) => k.length <= 40 && typeof v === 'string' && v.length <= 100 && !/^(https?:|data:|blob:)/.test(v)));
     return this.req<Awaited<ReturnType<Api['completeJourneyDay']>>>('POST', '/me/journey/complete', { day, answers: short });
   }
-  jumpJourney(day: number) {
+  jumpJourney(day: number | MembersDay) {
     return this.req<Awaited<ReturnType<Api['jumpJourney']>>>('POST', '/me/journey/jump', { day });
+  }
+  testerUnlockAll() {
+    return this.req<Me>('POST', '/me/tester/unlock-all');
+  }
+  testerJump(day: number | MembersDay) {
+    return this.req<Me>('POST', '/me/tester/jump', { day });
+  }
+  testerNext() {
+    return this.req<Me>('POST', '/me/tester/next');
+  }
+  testerReset() {
+    return this.req<Me>('POST', '/me/tester/reset');
   }
   advanceJourney(skip: boolean) {
     return this.req<Awaited<ReturnType<Api['advanceJourney']>>>('POST', '/me/journey/advance', { skip });

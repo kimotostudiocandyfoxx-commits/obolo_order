@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Body, Controller, Get, Headers, HttpCode, Inject, NotFoundException, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { timingSafeEqual } from 'node:crypto';
-import { AdvanceJourneyBody, AtelierLayout, ConsentBody, CompleteJourneyDayBody, CompleteLap2Body, JumpJourneyBody, UpdateProfileBody } from '@obolo/shared';
+import { AdvanceJourneyBody, AtelierLayout, ConsentBody, CompleteJourneyDayBody, CompleteLap2Body, AdminJumpBody, MEMBERS_DAYS, UpdateProfileBody } from '@obolo/shared';
 import { AppConfig, CONFIG } from '../config';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { parseBody } from '../common/validate';
@@ -74,7 +74,10 @@ export class UsersController {
     const expected = this.cfg.ADMIN_TOKEN;
     const ok = !!expected && !!token && token.length === expected.length && timingSafeEqual(Buffer.from(token), Buffer.from(expected));
     if (!ok) throw new NotFoundException();
-    return this.users.jumpJourney(userId, parseBody(JumpJourneyBody, body).day);
+    const { day } = parseBody(AdminJumpBody, body);
+    // 1–10: that journey day from its start; 'm1'〜'm3': a members' day (天王星・冥王星・海王星), the wait before it over
+    if (typeof day === 'string') return this.users.jumpMembersDay(userId, MEMBERS_DAYS.indexOf(day) + 1 as 1 | 2 | 3);
+    return this.users.jumpJourney(userId, day);
   }
 
   @Post('journey/advance')

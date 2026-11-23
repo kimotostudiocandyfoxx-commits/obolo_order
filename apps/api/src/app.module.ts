@@ -58,6 +58,8 @@ import { LookController } from './look/look.controller';
 import { LookService } from './look/look.service';
 import { BatiMemoryService } from './look/memory.service';
 import { UsersController } from './users/users.controller';
+import { TesterController } from './users/tester.controller';
+import { TesterService } from './users/tester.service';
 import { UsersService } from './users/users.service';
 import { LedgerService } from './wallet/ledger.service';
 import { ManaAdminController } from './wallet/mana-admin.controller';
@@ -71,6 +73,7 @@ import { WalletController } from './wallet/wallet.controller';
     HealthController,
     AuthController,
     UsersController,
+    TesterController,
     WalletController,
     ManaAdminController,
     BuddyController,
@@ -104,6 +107,7 @@ import { WalletController } from './wallet/wallet.controller';
     AuthGuard,
     AuthService,
     UsersService,
+    TesterService,
     LedgerService,
     ManaCheckService,
     BuddyService,

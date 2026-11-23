@@ -271,6 +271,21 @@ export type LookRestoreBody = z.infer<typeof LookRestoreBody>;
 export const JumpJourneyBody = z.object({ day: z.number().int().min(1).max(10) });
 export type JumpJourneyBody = z.infer<typeof JumpJourneyBody>;
 
+/** the members' days (shared LAP2: 天王星・冥王星・海王星) as a jump target: 'm1' = the first of them to play */
+export const MEMBERS_DAYS = ['m1', 'm2', 'm3'] as const;
+export type MembersDay = (typeof MEMBERS_DAYS)[number];
+
+/**
+ * The tester entrance (POST /me/tester/jump): a journey day 1–8 (from its start, no wait) or a members' day m1–m3
+ * (an Obolo Order whose earlier members' days are done and the wait over).
+ */
+export const TesterJumpBody = z.object({ day: z.union([z.number().int().min(1).max(8), z.enum(MEMBERS_DAYS)]) });
+export type TesterJumpBody = z.infer<typeof TesterJumpBody>;
+
+/** Operator testing (/lab, admin token) to a members' day — POST /me/journey/jump with day 'm1' | 'm2' | 'm3' */
+export const AdminJumpBody = z.object({ day: z.union([z.number().int().min(1).max(10), z.enum(MEMBERS_DAYS)]) });
+export type AdminJumpBody = z.infer<typeof AdminJumpBody>;
+
 /** Day 9: the embedded Stripe Checkout finished — the server checks the session and records the order. */
 export const ConfirmOrderBody = z.object({ sessionId: z.string().min(8).max(255) });
 export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;

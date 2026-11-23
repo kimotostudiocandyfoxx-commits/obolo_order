@@ -1,5 +1,6 @@
 import type { AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
+  MembersDay,
   BuddyChatResponse,
   BuddyMessageView,
   BuddyProfileView,
@@ -181,8 +182,16 @@ export interface Api {
   saveSysStory(answers: Record<string, string>): Promise<Me>;
   /** the second journey: chapter `chapter` (shared LAP2) finished */
   completeLap2(chapter: number, answers?: Record<string, string>): Promise<Me>;
-  /** Operator testing (/lab, admin token): move this account to a journey day. */
-  jumpJourney(day: number): Promise<Me>;
+  /** Operator testing (/lab, admin token): move this account to a journey day (1–10) or a members' day ('m1'〜'm3'). */
+  jumpJourney(day: number | MembersDay): Promise<Me>;
+  /** The tester entrance (Me.tester only; 403 otherwise): open everything — every Moon atelier kind, {bati}, Bluena, the ダチ. */
+  testerUnlockAll(): Promise<Me>;
+  /** The tester entrance: a journey day 1–8 or a members' day from its start, no wait. */
+  testerJump(day: number | MembersDay): Promise<Me>;
+  /** The tester entrance: the next day now (the wait skipped). */
+  testerNext(): Promise<Me>;
+  /** The tester entrance: this account back to before day 1 (the account and the login stay). */
+  testerReset(): Promise<Me>;
   /** Start the next day (skip = "明日まで待てへん"). */
   advanceJourney(skip: boolean): Promise<Me>;
   /** Day 9 Eclipse payment: Stripe Embedded Checkout, or demo mode when billing is not configured. */

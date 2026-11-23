@@ -9,6 +9,7 @@ import { NoManaNotice } from '@/components/NoManaNotice';
 import { NeoSpeaking } from '@/components/NeoSpeaking';
 import { ConsentGate } from '@/components/ConsentGate';
 import { JobToasts } from '@/components/JobToasts';
+import { TesterBar } from '@/components/TesterBar';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
@@ -47,6 +48,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <NeoSpeaking />
             <ConsentGate />
             <JobToasts />
+            {/* the tester entrance: only for accounts on the server's allowlist (Me.tester) */}
+            <TesterBar />
           </AuthProvider>
         </I18nProvider>
       </body>

@@ -72,7 +72,7 @@ export default function LabPage() {
               {me.orderedAt ? '・支払い済み' : ''}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
-              {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+              {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'm1', 'm2', 'm3'] as const).map((d) => (
                 <button
                   key={d}
                   disabled={!admin || busy}
@@ -87,14 +87,14 @@ export default function LabPage() {
                       setBusy(false);
                     }
                   }}
-                  className={`h-9 w-9 rounded-full text-sm disabled:opacity-30 ${me.journeyDay === d ? 'bg-amber-300 font-bold text-black' : 'bg-white/10'}`}
+                  className={`h-9 min-w-9 rounded-full px-2 text-sm disabled:opacity-30 ${me.journeyDay === d ? 'bg-amber-300 font-bold text-black' : 'bg-white/10'}`}
                 >
-                  {d}
+                  {typeof d === 'string' ? `会員${d.slice(1)}` : d}
                 </button>
               ))}
             </div>
             <p className="mt-2 text-[11px] leading-relaxed text-white/45">
-              7 を押す → トップを開くと7日目（エクリプス）が最初から始まります（支払いもやり直せます）。Stripe のテストはこれで。
+              押した日が最初から始まります（トップを開く）。8＝太陽の日（エクリプス・支払いもやり直せます。Stripe のテストはこれで）、9＝旅のおわり（月の工房が全部ひらく）、10＝旧 ORDER。会員1〜3＝会員の日（天王星・冥王星・海王星）を待ちなしで（会員でなければデモの会員になります・請求なし）。
             </p>
           </section>
 
