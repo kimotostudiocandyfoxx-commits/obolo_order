@@ -4,6 +4,7 @@ import { ORDER_PRICE_JPY, type OrderCheckout } from '@obolo/shared';
 import { useEffect, useRef, useState } from 'react';
 import { ApiError } from '@/lib/api';
 import { LineVoice } from '@/lib/story/lineVoice';
+import { BIRTH_YEAR_KEY } from './SealGate';
 
 export interface OrderApi {
   checkout(): Promise<OrderCheckout>;
@@ -20,8 +21,9 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  * Day 7 (D08-S006): the visitor chose to begin the Eclipse. The final confirmation (M-R20): ¥88 a month
  * (tax included, the monthly mana), the renewal day, that it renews by itself, and how to stop — then
  * Stripe Embedded Checkout inside the story (no redirect, so the story goes on right after paying).
- * Demo mode (no Stripe key on the server) pays without a charge. Under 18 needs a guardian's consent (story M-R113):
- * the visitor ticks one line (18 or over, or a guardian agreed) before the payment form opens.
+ * Demo mode (no Stripe key on the server) pays without a charge. The age is known from the start of the app (M-R252:
+ * the birth year asked by ConsentGate / the seal, obolo.birthYear): no tick box here; under 18 sees one line,
+ * 「家の人と一緒に読んでね」, adults nothing (M-R251 review).
  * PLACEHOLDER (P-BILL-3): the wording must be checked by the operator; the 〔設定〕→〔毎月のマナ〕→〔やめる〕
  * screen does not exist yet (P-BILL-4: the operator stops it in Stripe).
  */
@@ -31,7 +33,10 @@ export function EclipsePay({
   onPaid,
   onCancel,
   failLine = { who: 'MONBAN', text: '……まだ、終わっていない…。決めたら、また来い…。' },
+  birthYear,
 }: {
+  /** the year they were born (the account's, asked at the start of the app); else this device's obolo.birthYear */
+  birthYear?: number | null;
   api: OrderApi;
   paid: boolean;
   onPaid: () => void;
@@ -48,7 +53,19 @@ export function EclipsePay({
     void v.say(failLine.who, failLine.text);
     return () => v.dispose();
   }, [phase, failLine.who, failLine.text]);
-  const [consent, setConsent] = useState(false);
+  // under 18 (by the year asked at the start): one line to read it with the family
+  const [minor, setMinor] = useState(false);
+  useEffect(() => {
+    let y = birthYear ?? 0;
+    if (!y) {
+      try {
+        y = Number(localStorage.getItem(BIRTH_YEAR_KEY)) || 0;
+      } catch {
+        /* no storage */
+      }
+    }
+    setMinor(y > 1900 && new Date().getFullYear() - y < 18);
+  }, [birthYear]);
   const [err, setErr] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const box = useRef<HTMLDivElement>(null);
@@ -65,7 +82,7 @@ export function EclipsePay({
   }, [paid]);
 
   useEffect(() => {
-    if (paid || !consent) return;
+    if (paid) return;
     let cancelled = false;
     let destroy: (() => void) | undefined;
     (async () => {
@@ -102,7 +119,7 @@ export function EclipsePay({
       destroy?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attempt, paid, consent]);
+  }, [attempt, paid]);
 
   // paid: the golden corona flares out over the screen, then the story goes on
   const finishNow = () => {
@@ -203,27 +220,13 @@ export function EclipsePay({
           <p className="mt-2 text-left text-[11px] leading-relaxed text-white/50">入会費はありません。値上げはしません。</p>
         </div>
 
-        <label className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200/25 bg-black/30 px-4 py-3 text-left text-[13px] leading-relaxed text-white/85">
-          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-amber-300" />
-          <span>
-            18歳以上です。18歳未満の場合は、家の人の同意をもらっています。
-            <span className="block text-[11px] text-white/50">18歳未満の人は、家の人と一緒に読んでから進んでください</span>
-          </span>
-        </label>
+        {minor && <p className="mt-4 text-center text-[13px] leading-relaxed text-amber-100/90">家の人と一緒に読んでね</p>}
 
         <div className="mt-4 flex-1">
           {/* Stripe Embedded Checkout mounts here */}
           <div ref={box} className={phase === 'stripe' ? 'overflow-hidden rounded-2xl bg-white' : 'hidden'} />
-          {phase === 'loading' && consent && <p className="py-10 text-center text-sm tracking-widest text-amber-100/70">秘密ロケットの手配中……</p>}
+          {phase === 'loading' && <p className="py-10 text-center text-sm tracking-widest text-amber-100/70">秘密ロケットの手配中……</p>}
           {/* before the check: the button is there already, asleep (story chat 2026-11-02: only 〔戻る〕 could be seen) */}
-          {!consent && (
-            <div className="flex flex-col items-center gap-2 py-3">
-              <button disabled className="w-full rounded-full border border-amber-100/30 bg-amber-200/10 py-4 text-lg tracking-[0.4em] text-amber-100/40">
-                支払う
-              </button>
-              <p className="text-center text-[11px] text-white/50">上のチェックを入れると、押せます</p>
-            </div>
-          )}
           {phase === 'confirming' && <p className="py-10 text-center text-sm tracking-widest text-amber-100/80">エクリプスの準備をしています……</p>}
           {phase === 'demo' && (
             <div className="flex flex-col items-center gap-3 py-4">

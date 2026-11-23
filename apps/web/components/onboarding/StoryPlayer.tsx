@@ -45,7 +45,8 @@ import { SaturnLesson } from '@/components/saturn/SaturnLesson';
 import { SealGate, sealGateSeen } from './SealGate';
 import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
-import { MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
+import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
+import { stageOf } from '@/lib/onboarding/stage';
 import { TalkScene } from '@/components/talk/TalkScene';
 import { speakerOfSprite, stillShowsAny, storyItems, storyPeople, storySelfLook, talkId } from '@/components/story/StoryTalk';
 import { VoiceChoice } from './VoiceChoice';
@@ -185,6 +186,21 @@ function chatBottom(s: Step | undefined): number {
   return 30;
 }
 
+/** the scene a step belongs to (the last scene step at or before it; before any, the first one) */
+function sceneIdAt(steps: Step[], at: number): string | null {
+  for (let k = Math.min(at, steps.length - 1); k >= 0; k--) {
+    const x = steps[k];
+    if (x?.t === 'scene') return x.id;
+  }
+  const first = steps.find((x) => x.t === 'scene');
+  return first?.t === 'scene' ? first.id : null;
+}
+
+/** an answer picked is {neo} speaking too (M-R170): their own figure comes up big for a moment, like with 〔🎙〕 (cinema) */
+function neoSays() {
+  window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: true }));
+  setTimeout(() => window.dispatchEvent(new CustomEvent('obolo:speaking', { detail: false })), 1800);
+}
 
 /** day 2's stills with KIMORIN drawn in, and the look he has in them */
 const STILL_LOOK: Record<string, string> = {
@@ -1147,7 +1163,9 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // on while the thread is (not under a picture choice, which covers the screen), and through the short waits between
   // lines while someone stands on stage (a vanish, a flash)
   const talkHidden = chatOn && step?.t === 'choice' && !!step.pics;
-  const talkOn = started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
+  // the stage of this scene (lib/onboarding/stage.ts): days 1–2 the story's own close-ups, day 3 on the side-by-side row
+  const cinema = stageOf(sceneIdAt(steps, i)) === 'cinema';
+  const talkOn = !cinema && started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
   const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
   const talkDock = Math.max(84, chatOn && step ? chatBottom(step) : 30);
   // Keep the question visible while the visitor answers it (e.g. "お前の名前は？" above the name field).
@@ -1208,7 +1226,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       <style>{'@keyframes stillIn{from{opacity:0}to{opacity:1}}'}</style>
       </Camera>
       {!sprite && autoStandee && !talkOn && (
-        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} />
+        <Cast names={[autoStandee]} src={(n) => spriteSrc(n) ?? null} speaking={autoStandee} talking={talking} expressions={sayExpressions({}, [autoStandee])} mirror={sayMirror([autoStandee])} level={voiceLevel} react={sayReact} slot={spriteSlot} cinema={cinema} />
       )}
       {sprite && (
         // a wrapper of its own so the 'vanish' step can fade the whole cast into light
@@ -1223,6 +1241,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           level={voiceLevel}
           react={sayReact}
           slot={spriteSlot}
+          cinema={cinema}
         />
         </div>
       )}
@@ -1267,6 +1286,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/60 via-black/25 to-transparent" aria-hidden />
           <TalkScene
             transparent
+            skin="story"
             noMute
             listening={listening}
             tapThrough
@@ -1300,6 +1320,21 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       )}
       {ticketArt && <TicketArt dest={ticketArt.dest} leaving={ticketArt.leaving} stamped={(id) => stampList.includes(id)} />}
       {invite && <Invitation inviter={v.inviter} message={v.inviterMessage} settled={step?.t !== 'invitation'} leaving={inviteLeaving} fromMotion={steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation')?.t === 'invitation' && (steps.slice(0, i + 1).reverse().find((x) => x.t === 'invitation') as { fromMotion?: boolean }).fromMotion} onOpened={() => run(iRef.current + 1)} />}
+      {cinema && (chatOn || chatLeaving || chatWas.current) && (
+        // cinema (days 1–2): the story's thread. It and its shade fade out over 0.3 s when they go (QA 12 R35), with
+        // what they showed last (chatWas keeps it mounted the frame it went out on: QA 13 R35)
+        <div className="pointer-events-none absolute inset-0 z-[10] transition-opacity duration-300" style={{ opacity: chatOn ? 1 : 0 }}>
+          {/* a soft shade under the thread so it reads on any picture */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[46%] animate-[fadeUp_0.6s_ease-out] bg-gradient-to-t from-black/75 via-black/35 to-transparent" aria-hidden />
+          <ChatLog
+            entries={chatOn ? chatEntries : lastChat.current.entries}
+            talking={chatOn && talking}
+            reveal={chatOn ? reveal : leavingReveal}
+            live={chatOn && step?.t === 'say' && !mustWait}
+            bottom={chatOn && step ? chatBottom(step) : lastChat.current.bottom}
+          />
+        </div>
+      )}
       {started && step?.t === 'action' && (
         <ReplyChips
           key={i}
@@ -1323,6 +1358,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           labels={step.options.map((o) => o.label)}
           onPick={(k) => {
             addLine({ id: `c${i}`, kind: 'me', text: step.options[k].label });
+            if (cinema) neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />
@@ -1346,6 +1382,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             if (words) remember(`${step.key}Words`, words);
             // the bubble shows what was said, as said (client 2026-11-22); the matched answer only picks the way on
             addLine({ id: `c${i}`, kind: 'me', text: words || step.options[k].label });
+            if (cinema) neoSays();
             choose(step.key, step.options[k].label, step.options[k].goto);
           }}
         />
@@ -1506,7 +1543,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         </button>
       )}
       {started && step?.t === 'order' && orderApi && (
-        <EclipsePay api={orderApi} paid={!!ordered} failLine={step.failLine} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
+        <EclipsePay api={orderApi} paid={!!ordered} failLine={step.failLine} birthYear={vars.birthYear} onPaid={() => run(iRef.current + 1)} onCancel={() => run(labelIndex(steps, step.cancel))} />
       )}
       {started && step?.t === 'neo' && (
         <NeoChooser

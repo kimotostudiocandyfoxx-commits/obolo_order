@@ -27,6 +27,13 @@ export const MOTION = {
   },
   /** a character alone on stage comes up close while speaking, like two do (false: stays standing) */
   soloBust: true,
+  /**
+   * days 1–2 (lib/onboarding/stage.ts 'cinema'): the one speaking alone on screen, pushed in close. zoom: how far
+   * (×, capped per character by bustMax × smallBoost); faceAt: where the face lands (% from the top); push: the
+   * camera's move onto a new speaker (from `from`× and `panPct` % to the side, `ms`); drift: the slow push while they
+   * talk (to `scale`×, `ms` each way); cutMs: how fast the one before leaves
+   */
+  cinema: { zoom: 2.5, smallBoost: 1.35, faceAt: 33, push: { from: 0.78, panPct: 9, ms: 560 }, drift: { scale: 1.045, px: 1.2, ms: 6500 }, cutMs: 110 },
   /** the ones not speaking step back into the dark */
   dim: { brightness: 0.45, saturate: 0.7 },
 } as const;

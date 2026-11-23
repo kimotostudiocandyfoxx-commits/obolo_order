@@ -175,7 +175,10 @@ export function Cast({
   slot,
   mirror,
   className = '',
+  cinema = false,
 }: {
+  /** days 1–2: the speaker alone and close, the camera cutting to each new speaker (MOTION.cinema) */
+  cinema?: boolean;
   /** this picture is shown mirrored (a pose that would face the wrong way) */
   mirror?: string | null;
   /** the voice's loudness now (lip sync) */
@@ -240,6 +243,7 @@ export function Cast({
             style={{ ...(real.length < names.length ? { left: `${names.length === 2 ? [30, 70][k] : [22, 50, 78][k] ?? 50}%` } : slot(k, names.length)), ...(name === '@bati-weak' ? { opacity: 0.5 } : {}) }}
             scale={real.length < names.length ? 0.74 : 1}
             className={className}
+            cinema={cinema}
           />
         );
       })}
@@ -261,11 +265,10 @@ const layersOf = (url: string): string[] => {
 type MouthBox = { x: number; y: number; w: number; h: number };
 const mouthBoxOf = (url: string): MouthBox | undefined => (MOUTHS as Record<string, MouthBox>)[stemOf(url) ?? ''];
 
-function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1, flip = false }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number; flip?: boolean }) {
+function Character({ name, url, posed, lit, bust, hidden, talking, level, react, style, className, scale = 1, flip = false, cinema = false }: { name: string; url: string; posed?: boolean; lit: boolean; bust: boolean; hidden: boolean; talking: boolean; level?: () => number; react?: Reaction; style: CSSProperties; className: string; scale?: number; flip?: boolean; cinema?: boolean }) {
   const base = charSpec(name);
   const spec = { ...base, height: base.height * scale };
   const shut = useBlink(!!spec.eye && !posed);
-  const own = name.startsWith('@') && name !== '@egg';
   const parts = layersOf(url);
   const layer = (k: string) => (parts.includes(k) ? url.replace(/\.webp$/, `-${k}.webp`) : null);
   const mouth = layer('mouth');
@@ -301,17 +304,45 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
     wasLit.current = lit;
   }, [lit]);
   // the bust-up: the same picture, bigger, its face near the upper third of the screen
-  const zoom = bust ? Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6))) : 1;
+  // cinema (days 1–2): much closer — the face nearly fills the width where the picture allows — and the face set at
+  // MOTION.cinema.faceAt % from the top (its place on screen, worked out from where it stands)
+  const C = MOTION.cinema;
+  const own = name.startsWith('@') && name !== '@egg';
+  const zoom = bust ? (cinema ? Math.min(spec.bustMax ? spec.bustMax * C.smallBoost : own ? 1.7 : C.zoom, C.zoom) : Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6)))) : 1;
+  const faceY = 100 - spec.bottom - spec.height * (1 - spec.face);
+  const lift = bust ? (cinema ? `${((C.faceAt - faceY) / spec.height) * 100}%` : `${-12 - (spec.face - 0.2) * 40}%`) : '0';
+  // each time this one takes the floor in cinema: the camera pushes onto them (from the side they stood on)
+  const [push, setPush] = useState(0);
+  const wasBust = useRef(bust);
+  useEffect(() => {
+    if (cinema && bust && !wasBust.current) setPush((n) => n + 1);
+    wasBust.current = bust;
+  }, [bust, cinema]);
+  const side = Math.sign(parseFloat(String(style.left ?? '50')) - 50) || 0;
   const box: CSSProperties = {
     ...style,
-    ...(bust ? { left: '50%', maxWidth: '96%' } : {}),
+    ...(bust ? { left: '50%', maxWidth: cinema ? 'none' : '96%' } : {}),
     bottom: `${spec.bottom}%`,
     height: `${spec.height}%`,
     transformOrigin: `50% ${spec.face * 100}%`,
-    transform: `translateX(-50%) translateY(${bust ? `${-12 - (spec.face - 0.2) * 40}%` : '0'}) scale(${zoom})`,
+    transform: `translateX(-50%) translateY(${lift}) scale(${zoom})`,
     opacity: hidden ? 0 : ((style.opacity as number | undefined) ?? 1),
-    transition: 'transform 320ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out, left 320ms ease-out',
+    transition: cinema
+      ? `transform ${C.push.ms}ms cubic-bezier(.16,.84,.24,1), opacity ${hidden ? C.cutMs : 200}ms ease-out, left ${C.push.ms}ms cubic-bezier(.16,.84,.24,1)`
+      : 'transform 320ms cubic-bezier(.2,.8,.2,1), opacity 260ms ease-out, left 320ms ease-out',
   };
+  // the push-in (a fast move that settles) and, while they hold the floor, a slow drift closer
+  const camera: CSSProperties | undefined =
+    cinema && bust
+      ? {
+          transformOrigin: `50% ${spec.face * 100}%`,
+          ['--from' as string]: `${C.push.from}`,
+          ['--pan' as string]: `${side * C.push.panPct}%`,
+          ['--drift' as string]: `${C.drift.scale}`,
+          ['--dpx' as string]: `${C.drift.px}%`,
+          animation: `cinePush ${C.push.ms}ms cubic-bezier(.16,.84,.24,1) both, cineDrift ${C.drift.ms}ms ease-in-out ${C.push.ms}ms infinite alternate`,
+        }
+      : undefined;
   const dim = lit ? 'none' : `brightness(${MOTION.dim.brightness}) saturate(${MOTION.dim.saturate})`;
   const img = `h-full w-auto max-w-none select-none object-contain`;
   // breathing while quiet; the reaction of the line on top
@@ -335,6 +366,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   };
   return (
     <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden>
+      <div key={`c${push}`} className="relative h-full" style={camera}>
       <div key={hop} className="relative h-full" style={hop ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
         <div className="relative h-full" style={{ ...life, ...(talking && !lips ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>
           <div key={url} className={`relative h-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)] ${posed ? 'animate-[poseIn_0.28s_cubic-bezier(.2,1.4,.4,1)]' : ''}`} style={{ filter: dim, ...(flip ? { transform: 'scaleX(-1)' } : {}) }}>
@@ -377,6 +409,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
             />
           )}
         </div>
+      </div>
       </div>
     </div>
   );
