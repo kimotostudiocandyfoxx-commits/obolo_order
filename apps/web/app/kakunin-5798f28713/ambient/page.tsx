@@ -12,6 +12,7 @@ import { PLANETS, type Planet } from '@/lib/story/ambient';
  * subtitle, so the motion and the subtitle's readability can be judged.
  *   ?p=<planet>      moon | mercury | venus | mars | jupiter | saturn | uranus | neptune | sun | pluto | earth | space
  *   ?s=<still>       another still of that planet (e.g. s/mercury-port, s/saturn-night, s/venus-night)
+ *   ?q=full          the sky at full quality even on a software GL (captures)
  *   ?i=<0..1.5>      intensity      ?off=1  the still alone (compare)      ?bare=1  no panel (screenshots)
  */
 const STILL: Record<Planet, string> = {
@@ -52,7 +53,8 @@ function View() {
   const intensity = Number(q.get('i') ?? 1);
   const off = q.get('off') === '1';
   const bare = q.get('bare') === '1';
-  const props = { planet: p, sceneId: null, plate: { src }, intensity, avoid: HEADS, subtitleTop: SUB_TOP };
+  const quality = q.get('q') === 'full' ? ('full' as const) : ('auto' as const);
+  const props = { planet: p, sceneId: null, plate: { src }, intensity, avoid: HEADS, subtitleTop: SUB_TOP, quality };
   return (
     <main className="fixed inset-0 overflow-hidden bg-black text-white">
       {/* the still (as TalkScene's place: cover) */}

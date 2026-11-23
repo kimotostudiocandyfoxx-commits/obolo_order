@@ -44,6 +44,9 @@ YEN_EACH = 7  # Seedream 5.0 Pro on Runware, about $0.045 a picture (scripts/sto
 CAST = {
     'kimorin-sun': dict(name='KIMORIN', front='onboarding/kimorin-sun.webp', key='magenta', head=0.40,
                         refs=['design/story/refs/talk-kimorin.jpg'],
+                        notes={'back': 'From behind, the huge fan of many white, black and red-tipped feather tails spreads out wide on BOTH '
+                                       'sides behind the robe, as wide as in the reference, symmetric; the hood and the two fox ears seen from '
+                                       'the back; the small white bat wing sticks out on the left side of the picture.'},
                         desc='a small white fox-like mascot with big white-and-blue fox ears, wearing a dark red velvet hooded robe with '
                              'white lattice trim, a blue jewel brooch with blue tassels, round black sunglasses, white paws, white feet '
                              'with blue paw pads, a huge fan of white, black and red-tipped feather tails behind, and one small white bat wing'),
@@ -68,21 +71,26 @@ CAST = {
                          'red tie, a gold pocket watch chain, black leather shoes'),
     'bossg': dict(name='ボスG', front='onboarding/bossg.webp', key='magenta', head=0.20,
                   desc='a huge black gorilla boss with a gold cigar, heavy gold chains and a big gold medallion "5454", black leather '
-                       'shorts, black-and-gold mechanical cyber arms with glowing cyan lights'),
+                       'shorts, black-and-gold mechanical cyber arms with glowing cyan lights',
+                  notes={'back': 'From behind: the gold chains go around the back of the neck only, the medallion hangs on the chest and is '
+                                 'NOT visible from behind; both mechanical arms keep their black-and-gold plates and glowing cyan lights, '
+                                 'seen from the back.'}),
     'mikie': dict(name='MIKIE⭐︎DRILL', front='onboarding/mikie.webp', key='blue', head=0.30,
                   desc='a small smiling woman with a black bob haircut and round black sunglasses, a loose hot-pink blouse, a colourful '
                        'flower-print skirt, beige flat shoes; her right arm is a silver hook and her left arm is a golden-silver gatling gun'),
     'monban': dict(name='MONBAN', front='onboarding/monban.webp', key='magenta', head=0.22, views=('back',),
                    desc='a tall hooded figure in a long black robe with fine gold patterns, face hidden in the dark hood'),
-    'talk-user': dict(name='{neo}', front='talk/user/stand.webp', key='blue', head=0.30,
+    'talk-user': dict(name='{neo}', front='talk/user/stand.webp', key='blue', head=0.30, views=('back',),
                       desc='a black-and-white cartoon boy with black hair, round black glasses, a white T-shirt, a black open jacket, black '
                            'trousers, white cartoon gloves and black shoes'),
-    'talk-friend': dict(name='friend', front='talk/friend/stand.webp', key='blue', head=0.18,
+    'talk-friend': dict(name='friend', front='talk/friend/stand.webp', key='blue', head=0.18, views=('back',),
                         desc='a muscular young man with wavy blond hair, bare chest, a cream cloth wrapped around the waist, barefoot'),
-    'talk-bati': dict(name='バティ', front='talk/bati/stand.webp', key='blue', head=1.0, size=(1536, 1152),
+    'talk-bati': dict(name='バティ', front='talk/bati/stand.webp', key='blue', head=1.0, size=(1536, 1152), views=('back',),
                       desc='a round fluffy sea-urchin creature: a dark purple body covered in long golden-orange spikes, orange roe on top, '
                            'big sparkling eyes, pink cheeks and a happy open mouth, two small purple arms'),
 }
+# user decision 2026-11-23: a user's look, a friend (another user's look) and a Bati get ONLY a back view besides the front
+# (the talk-* entries above); the story cast keeps back, 3/4 and side
 # OBOLON is a black sphere: its views are the front picture itself (mirror for the other side)
 SPHERES = {'obolon': dict(name='OBOLON', front='onboarding/obolon.webp', head=1.0)}
 
@@ -108,7 +116,7 @@ def prompt_of(c: dict, view: str) -> str:
             'frame with a small margin, the same size in the frame as the reference. '
             'Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the '
             'same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. '
-            f'{keying.key_prompt(c["key"])} No text, no letters.')
+            f'{c.get("notes", {}).get(view, "")} {keying.key_prompt(c["key"])} No text, no letters.')
 
 
 def ref_png(c: dict, size: tuple[int, int]) -> bytes:
@@ -215,7 +223,10 @@ def cmd_build(a):
                     'exists. All pictures of a character share the front picture\'s scale and foot line: the view canvas has the '
                     'front\'s height and foot y; its width is the front\'s plus padX on each side (0 unless a pose is wider), the '
                     'figure centred on the front figure\'s centre. q3 and side face LEFT; mirror (scaleX(-1)) for right. back is seen '
-                    'from behind (no face). Boxes are [x, y, w, h] in the picture\'s own pixels; foot = the lowest solid row.'),
+                    'from behind (no face). Boxes are [x, y, w, h] in the picture\'s own pixels; foot = the lowest solid row. '
+                    'Users\' looks, friends (other users\' looks) and Bati get ONLY a back view besides the front (user decision '
+                    '2026-11-23; talk-user / talk-friend / talk-bati here): the production plan is to paint just the back view for each '
+                    'look and Bati at creation, about 1/3 of the earlier three-view estimate.'),
            'views': ['q3', 'side', 'back'], 'faces': 'left', 'characters': {}, 'speakers': {}}
     os.makedirs(SHEETS, exist_ok=True)
     for cid, c in {**CAST, **SPHERES}.items():
@@ -235,15 +246,18 @@ def cmd_build(a):
             k = KEEP.get(cid, {}).get(v)
             if not k:
                 continue
+            flip = isinstance(k, str) and k.endswith('f')  # "1f": try 1, mirrored (a back view painted with the sides swapped)
+            k = int(str(k).rstrip('f'))
             raw = raw_of(cid, v, k)
-            rgb = np.asarray(Image.open(raw).convert('RGB'))
+            img = Image.open(raw).convert('RGB')
+            rgb = np.asarray(img.transpose(Image.FLIP_LEFT_RIGHT) if flip else img)
             rgba, _info = keying.cut(rgb, c['key'])
             im = place(rgba, fa, front.size)
             rel, path = stem_paths(c, v)
             im.save(path, 'WEBP', quality=88, method=6)
             al = np.asarray(im)[:, :, 3]
             entry['views'][v] = {'src': '/' + rel, 'w': im.width, 'h': im.height, 'padX': (im.width - front.width) // 2,
-                                 **metrics(al, c['head']), 'try': k}
+                                 **metrics(al, c['head']), 'try': k, **({'flipped': True} if flip else {})}
         if not any('try' in e for e in entry['views'].values()):
             continue  # nothing painted yet (or a sphere): no contact sheet
         # contact sheet: front | 3/4 | side | back, over grey

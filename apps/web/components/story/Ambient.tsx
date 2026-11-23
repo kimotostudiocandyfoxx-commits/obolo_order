@@ -37,6 +37,8 @@
  *     plateRect?   front layer only: where the picture is, in px of the front box ({ left, top, width, height }), so the
  *                  lamp / neon glows sit on their lamps; default = the picture covering the front box (fit cover)
  *     still?       a still id ('s/moon-temple') when there is no plate src: used for the lookup and as the picture
+ *     quality?     'auto' (default: the sky steps down its resolution / frame rate when frames run long, and draws
+ *                  rarely on a software GL) or 'full' (pinned to the top step: review captures only)
  *
  * Mounting in the row (TalkScene): AmbientSky as the plate <img>'s sibling inside the plate's wrapper (fit 'fill' on a
  * box of the img's size and place, z just above the img), so the camera that moves the plate moves it too;
@@ -67,12 +69,18 @@ export type AmbientProps = {
   position?: [number, number];
   plateRect?: { left: number; top: number; width: number; height: number };
   still?: string;
+  quality?: 'auto' | 'full';
 };
 
 const DPR_CAP = 2;
 /** the sky shader's pixel budget (CSS px × DPR × scale ≤ this) */
-const SKY_PIXELS = 420_000;
+const SKY_PIXELS = 300_000;
 const SKY_FPS = 30;
+/**
+ * the sky's quality steps (the governor below steps down when frames run long, and starts at the bottom on a software
+ * GL): [resolution scale, fps]; the last step only redraws every 2 s
+ */
+const SKY_STEPS: [number, number][] = [[1, SKY_FPS], [0.6, SKY_FPS], [0.4, 15], [0.3, 0.5]];
 
 // ---------------------------------------------------------------------------------------------------------------
 // shared bits
@@ -444,7 +452,11 @@ function createSkyGL(canvas: HTMLCanvasElement) {
   gl.uniform1i(u.img, 1);
   gl.uniform1f(u.hasImg, 0);
   gl.clearColor(0, 0, 0, 0);
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  const renderer = String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
   return {
+    /** a GL drawn by the CPU (SwiftShader, llvmpipe …): the sky is drawn rarely and small there */
+    software: /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer),
     setMask(src: TexImageSource) {
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, maskTex);
@@ -551,7 +563,7 @@ function createSky2D(canvas: HTMLCanvasElement) {
 // AmbientSky
 // ---------------------------------------------------------------------------------------------------------------
 export function AmbientSky(props: AmbientProps) {
-  const { camera, intensity = 1, paused = false, fit = 'fill', position = [0.5, 0.5] } = props;
+  const { camera, intensity = 1, paused = false, fit = 'fill', position = [0.5, 0.5], quality = 'auto' } = props;
   const def = useAmbient(props);
   const src = srcOf(props);
   const reduced = usePrefersReducedMotion();
@@ -604,9 +616,12 @@ export function AmbientSky(props: AmbientProps) {
     canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
     holder.appendChild(canvas);
     const dpr = Math.min(DPR_CAP, window.devicePixelRatio || 1);
-    const scale = Math.min(1, Math.sqrt(SKY_PIXELS / (size.w * size.h * dpr * dpr)));
-    canvas.width = Math.max(1, Math.round(size.w * dpr * scale));
-    canvas.height = Math.max(1, Math.round(size.h * dpr * scale));
+    const base = Math.min(1, Math.sqrt(SKY_PIXELS / (size.w * size.h * dpr * dpr)));
+    const fitCanvas = (q: number) => {
+      canvas.width = Math.max(1, Math.round(size.w * dpr * base * q));
+      canvas.height = Math.max(1, Math.round(size.h * dpr * base * q));
+    };
+    fitCanvas(1);
     const gl = createSkyGL(canvas);
     const g2 = gl ? null : createSky2D(canvas);
     const hasMask = !!maskCanvas.current;
@@ -618,6 +633,12 @@ export function AmbientSky(props: AmbientProps) {
       if (maskCanvas.current) g2.setMask(maskCanvas.current);
       g2.set(def.sky, intensity);
     }
+    // the governor: frames longer than ~28 ms on average (30 frames) step the sky down; a software GL starts at the bottom
+    let step = gl?.software && quality === 'auto' ? SKY_STEPS.length - 1 : 0;
+    if (step) fitCanvas(SKY_STEPS[step][0]);
+    let acc = 0;
+    let count = 0;
+    let prev = -1;
     const rect: [number, number, number, number] = [pr.left / size.w, pr.top / size.h, pr.width / size.w, pr.height / size.h];
     const asp = 1 / aspect;
     const clock = makeClock();
@@ -627,7 +648,19 @@ export function AmbientSky(props: AmbientProps) {
     const drift = def.drift ?? 3;
     const frame = (now: number) => {
       const t = clock.tick(now, running) + (reduced ? 12 : 0);
-      if (now - lastDraw >= 1000 / SKY_FPS - 2 || !running) {
+      if (prev >= 0 && running) {
+        acc += now - prev;
+        if (++count === 30) {
+          if (quality === 'auto' && acc / count > 28 && step < SKY_STEPS.length - 1) {
+            step++;
+            fitCanvas(SKY_STEPS[step][0]);
+            lastDraw = -1e9;
+          }
+          acc = count = 0;
+        }
+      }
+      prev = now;
+      if (now - lastDraw >= 1000 / SKY_STEPS[step][1] - 2 || !running) {
         lastDraw = now;
         if (gl) gl.draw(t, rect, asp);
         else g2?.draw(t, rect);
@@ -658,7 +691,7 @@ export function AmbientSky(props: AmbientProps) {
     };
     // pr is derived from size/aspect/fit/position
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size.w, size.h, img, maskUrl, def, intensity, paused, hidden, reduced, aspect, fit, position[0], position[1]]);
+  }, [size.w, size.h, img, maskUrl, def, intensity, paused, hidden, reduced, aspect, fit, position[0], position[1], quality]);
 
   const picStyle: CSSProperties = { position: 'absolute', left: pr.left, top: pr.top, width: pr.width, height: pr.height, backgroundImage: src ? `url("${src}")` : undefined, backgroundSize: '100% 100%' };
   return (
