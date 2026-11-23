@@ -21,8 +21,17 @@ export type HomeOpen = 'sing' | 'view' | 'play-audio' | 'play-video' | 'read';
 
 export interface PlanetHomeConfig {
   planet: HomePlanet;
-  /** the planet's name on screen */
+  /** the planet's name on screen (Japanese, big) and in English (small, above it) */
   name: string;
+  en: string;
+  /** the planet's colour (buttons, the inside's light, the emphasis in the line) */
+  accent: string;
+  /** the big button at the bottom (Saturn: play; elsewhere: go inside) */
+  cta: string;
+  /** what the sheet's button does to a work: 聞く / 見る / 読む / 遊ぶ */
+  verb: string;
+  /** 〔＋ 飛ばす〕 opens the Moon atelier on this kind (none yet: the atelier as it is) */
+  make?: 'voice' | 'art' | 'song' | 'video' | 'radio';
   /** the store the works come from; null = not wired yet */
   store: PlanetWorkKind | null;
   /** for planet_posts (Mercury / Mars share one table) */
@@ -41,158 +50,194 @@ export interface PlanetHomeConfig {
   open: HomeOpen;
   /** tapping your place: 'enter' goes inside; 'play' starts it in place (Saturn's play button on the rim) */
   placeTap: 'enter' | 'play';
-  /** the one-line description at the top (big the first time, small after) */
+  /** the explainer strip at the top (shown 4.5 s when the home opens, then folded; 〔？〕 toggles it); **…** = emphasis */
   line: string;
   /** {bati}'s line after 〔○○へ飛ばす〕 ({neo} = the member's name) */
   flown: string;
-  /** the art keys the web app resolves (placeholders until the story team's art arrives) */
-  art: { backdrop: string; place: string; around: string; far?: string };
+  /** the planet's art (design/home, the story team's 「ぷっくりした3Dの箱庭」): the backdrop with your place painted in,
+   * and the sprite that floats around it (a dachi's / 推し's face goes on top of it) */
+  art: { backdrop: string; sprite: string };
   /** M-R258 §5: the day it goes out (Saturn first) */
   releaseOrder: number;
 }
 
 const flown = (place: string) => `{neo}の${place}と、ダチ・推してくれている人の${place}に届いたよ`;
-const line = (place: string) => `あなたの${place}のまわりに、ダチと推しの作品が88時間あつまる。${place}の中には、あなたの作品がずっと飾られる。`;
 
 export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
   saturn: {
     planet: 'saturn',
+    en: 'SATURN',
+    accent: '#ffb36b',
+    cta: '▶ 再生',
+    verb: '聞く',
+    make: 'voice',
     name: '土星',
     store: 'saturn_post',
     work: 'コロリン',
     place: 'レコード',
     inside: 'レコード',
-    around: '空から降ってきてレコードに乗るコロリン',
+    around: 'コロリン',
     far: null,
     leave: 'up-to-sky',
     open: 'sing',
     placeTap: 'play',
-    line: 'あなたのレコードに、ダチと推しのコロリンが88時間降ってくる。再生すると、針のマイクの前で歌う。',
+    line: 'あなたの**レコード**に、ダチと推しのコロリンが**88時間**降ってくる。再生すると、針のマイクの前で歌う。',
     flown: '{neo}のレコードと、ダチ・推してくれている人のレコードに降ったよ',
-    art: { backdrop: 'saturn-records', place: 'saturn-my-record', around: 'kororin' },
+    art: { backdrop: '/planet-home/bg-saturn.webp', sprite: '/planet-home/sp-korolin.webp' },
     releaseOrder: 1,
   },
   jupiter: {
     planet: 'jupiter',
+    en: 'JUPITER',
+    accent: '#b6e36b',
+    cta: '🚪 アトリエに入る',
+    verb: '見る',
+    make: 'art',
     name: '木星',
     store: 'jupiter_post',
     work: 'アート',
     place: '木',
     inside: 'アトリエ',
-    around: 'アートの羽の蝶',
+    around: 'アートの蝶',
     far: '遠くの木々を舞う小さな蝶',
     leave: 'fly-away',
     open: 'view',
     placeTap: 'enter',
-    line: line('木'),
+    line: 'あなたの**木**のまわりに、ダチと推しのアートが**88時間**、蝶になって舞う。木の中のアトリエには、あなたのアートがずっと飾られる。',
     flown: flown('木'),
-    art: { backdrop: 'jupiter-forest', place: 'jupiter-my-tree', around: 'butterfly', far: 'butterfly-far' },
+    art: { backdrop: '/planet-home/bg-jupiter.webp', sprite: '/planet-home/sp-butterfly.webp' },
     releaseOrder: 2,
   },
   mercury: {
     planet: 'mercury',
+    en: 'MERCURY',
+    accent: '#7fe0ff',
+    cta: '🏠 島の家に入る',
+    verb: '聞く',
+    make: 'song',
     name: '水星',
     store: 'planet_post',
     storePlanet: 'mercury',
     work: '曲',
     place: '島',
     inside: '島の家',
-    around: '帆にジャケットの音船',
+    around: '音船',
     far: '沖を行く小さな船',
     leave: 'sail-off',
     open: 'play-audio',
     placeTap: 'enter',
-    line: line('島'),
+    line: 'あなたの**島**のまわりに、ダチと推しの曲が**88時間**、音船になってやってくる。島の家には、あなたの曲がずっと並ぶ。',
     flown: flown('島'),
-    art: { backdrop: 'mercury-sea', place: 'mercury-my-island', around: 'sound-ship', far: 'ship-far' },
+    art: { backdrop: '/planet-home/bg-mercury.webp', sprite: '/planet-home/sp-ship.webp' },
     releaseOrder: 3,
   },
   mars: {
     planet: 'mars',
+    en: 'MARS',
+    accent: '#ff8a7a',
+    cta: '🎬 上映室に入る',
+    verb: '見る',
+    make: 'video',
     name: '火星',
     store: 'planet_post',
     storePlanet: 'mars',
     work: '映像',
     place: 'スタジオ',
     inside: '上映室',
-    around: 'ダチ・推しが乗ったUFO',
+    around: 'UFO',
     far: '遠くの空の小さなUFOの光',
     leave: 'ufo-up',
     open: 'play-video',
     placeTap: 'enter',
-    line: line('スタジオ'),
+    line: 'あなたの**スタジオ**の空に、ダチと推しが映像を連れて、UFOで**88時間**やってくる。タップすると、空に映す。',
     flown: flown('スタジオ'),
-    art: { backdrop: 'mars-city', place: 'mars-my-studio', around: 'ufo', far: 'ufo-far' },
+    art: { backdrop: '/planet-home/bg-mars.webp', sprite: '/planet-home/sp-ufo.webp' },
     releaseOrder: 4,
   },
   venus: {
     planet: 'venus',
+    en: 'VENUS',
+    accent: '#ffd36b',
+    cta: '🎙 ブースに入る',
+    verb: '聞く',
+    make: 'radio',
     name: '金星',
     store: 'radio_show',
-    work: 'ラジオ',
-    place: '放送ブース',
+    work: '番組',
+    place: 'ブース',
     inside: 'ブース',
-    around: '漂う電波の輪',
+    around: '電波',
     far: '遠くの雲の小さな電波',
     leave: 'fade',
     open: 'play-audio',
     placeTap: 'enter',
-    line: line('放送ブース'),
-    flown: flown('放送ブース'),
-    art: { backdrop: 'venus-clouds', place: 'venus-my-booth', around: 'radio-ring', far: 'radio-far' },
+    line: 'あなたの**ブース**のまわりに、ダチと推しの番組が**88時間**、電波になって漂う。近づくと聞こえる。',
+    flown: flown('ブース'),
+    art: { backdrop: '/planet-home/bg-venus.webp', sprite: '/planet-home/sp-radio.webp' },
     releaseOrder: 4,
   },
-  // Uranus / Pluto / Neptune: words are placeholders until their homes are designed (no store of works yet)
+  // Uranus / Pluto / Neptune: words from the story team's template (design/home); no store of works yet
   uranus: {
     planet: 'uranus',
+    en: 'URANUS',
+    accent: '#7fffd0',
+    cta: '🛍 お店に入る',
+    verb: '見る',
     name: '天王星',
     store: null,
     work: 'グッズ',
-    place: '店',
-    inside: '天空のアトリエの店',
-    around: '空に浮かぶ宝石',
+    place: 'お店',
+    inside: 'お店',
+    around: 'グッズの気球',
     far: '遠くの店の小さな光',
     leave: 'fade',
     open: 'view',
     placeTap: 'enter',
-    line: line('店'),
-    flown: flown('店'),
-    art: { backdrop: 'uranus-sky-town', place: 'uranus-my-shop', around: 'gem', far: 'gem-far' },
+    line: 'あなたの**お店**の空に、ダチと推しのグッズが**88時間**、気球で届く。お店の棚には、あなたのグッズがずっと並ぶ。',
+    flown: flown('お店'),
+    art: { backdrop: '/planet-home/bg-uranus.webp', sprite: '/planet-home/sp-balloon.webp' },
     releaseOrder: 9,
   },
   pluto: {
     planet: 'pluto',
+    en: 'PLUTO',
+    accent: '#a9b8ff',
+    cta: '📚 図書館に入る',
+    verb: '読む',
     name: '冥王星',
     store: null,
     work: '物語',
     place: '図書館',
-    inside: '氷の書庫',
-    around: '暗い空にともる灯り',
+    inside: '図書館',
+    around: '光る本',
     far: '遠くの氷原の小さな灯り',
     leave: 'dim',
     open: 'read',
     placeTap: 'enter',
-    line: line('図書館'),
+    line: 'あなたの**図書館**のまわりに、ダチと推しの物語が**88時間**、光る本になって飛んでくる。図書館には、あなたの本がずっと並ぶ。',
     flown: flown('図書館'),
-    art: { backdrop: 'pluto-plain', place: 'pluto-my-library', around: 'lantern', far: 'lantern-far' },
+    art: { backdrop: '/planet-home/bg-pluto.webp', sprite: '/planet-home/sp-book.webp' },
     releaseOrder: 9,
   },
-  // Neptune has no my場所 in M-R191 (games are played, not kept): the island and its 遊び場 are placeholders
   neptune: {
     planet: 'neptune',
+    en: 'NEPTUNE',
+    accent: '#c39bff',
+    cta: '🕹 ゲーム小屋に入る',
+    verb: '遊ぶ',
     name: '海王星',
     store: null,
     work: 'ゲーム',
-    place: '島',
-    inside: '遊び場',
-    around: '波間に浮かぶゲームの札',
+    place: 'ゲーム小屋',
+    inside: 'ゲーム小屋',
+    around: 'ゲームの泡',
     far: '遠くの島の小さな札',
     leave: 'sail-off',
     open: 'view',
     placeTap: 'enter',
-    line: line('島'),
-    flown: flown('島'),
-    art: { backdrop: 'neptune-islands', place: 'neptune-my-island', around: 'game-card', far: 'game-card-far' },
+    line: 'あなたの**ゲーム小屋**のまわりに、ダチと推しのゲームが**88時間**、泡になって浮かぶ。小屋の中では、あなたのゲームがいつでも遊べる。',
+    flown: flown('ゲーム小屋'),
+    art: { backdrop: '/planet-home/bg-neptune.webp', sprite: '/planet-home/sp-bubble.webp' },
     releaseOrder: 9,
   },
 };

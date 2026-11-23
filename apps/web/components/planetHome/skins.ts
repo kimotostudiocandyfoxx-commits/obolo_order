@@ -1,20 +1,10 @@
-import type { HomePlanet } from '@obolo/shared';
-import { GenericPlaceholderScene, SaturnPlaceholderScene } from './PlaceholderScenes';
+import { HOME_PLANETS, type HomePlanet } from '@obolo/shared';
 import type { PlanetHomeSkin } from './skin';
+import { TemplateScene } from './TemplateScene';
 
 /**
- * 星のホーム: each planet's look. Placeholders until the story team's art and motion arrive; to add a planet's art,
- * write its Scene (SceneProps in skin.ts) and put it here — the rules, the feed and the frame stay as they are.
+ * 星のホーム: each planet's scene. Every planet uses the story team's one template (design/home) with its own backdrop,
+ * sprite and colour from PLANET_HOMES; a planet that needs its own motion gets its own Scene here (SceneProps in skin.ts).
  */
-const generic: PlanetHomeSkin = { Scene: GenericPlaceholderScene };
-export const SKINS: Record<HomePlanet, PlanetHomeSkin> = {
-  saturn: { Scene: SaturnPlaceholderScene },
-  jupiter: generic,
-  mercury: generic,
-  mars: generic,
-  venus: generic,
-  uranus: generic,
-  pluto: generic,
-  neptune: generic,
-};
+export const SKINS = Object.fromEntries(HOME_PLANETS.map((p) => [p, { Scene: TemplateScene }])) as Record<HomePlanet, PlanetHomeSkin>;
 export const skinFor = (p: HomePlanet) => SKINS[p];

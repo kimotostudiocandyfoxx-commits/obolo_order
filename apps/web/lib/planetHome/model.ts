@@ -73,9 +73,13 @@ export function moveOwn(ids: readonly string[], id: string, by: -1 | 1): string[
   return out;
 }
 
-/** the long-press menu for a work: 推す only for someone not pushed yet (never for the young), 外す (hide), 通報 */
-export function menuFor(w: Pick<HomeWork, 'rel' | 'demo'>, young: boolean, where: 'around' | 'far'): ('push' | 'takeout' | 'report' | 'hide')[] {
+/**
+ * the long-press menu (design/home §3): 〔ひらく〕〔推す / 推しを外す〕〔見えなくする〕〔通報する〕. A dachi is 推し by
+ * themselves (no toggle); the young never get 〔推す〕 for a stranger; a scripted work and your own get none.
+ */
+export type MenuAct = 'open' | 'push' | 'unpush' | 'hide' | 'report';
+export function menuFor(w: Pick<HomeWork, 'rel' | 'demo'>, young: boolean): MenuAct[] {
   if (w.demo || w.rel === 'own') return [];
-  if (where === 'far') return [...(young ? [] : (['push'] as const)), 'report', 'hide'];
-  return [...(w.rel === 'stranger' && !young ? (['push'] as const) : []), 'takeout', 'report'];
+  const oshi: MenuAct[] = w.rel === 'oshi' ? ['unpush'] : w.rel === 'stranger' && !young ? ['push'] : [];
+  return ['open', ...oshi, 'hide', 'report'];
 }

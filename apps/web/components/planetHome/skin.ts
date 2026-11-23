@@ -1,32 +1,30 @@
 import type { HomeWork, PlanetHomeConfig, PlanetHomeView } from '@obolo/shared';
 import type { ComponentType } from 'react';
+import type { At } from '@/lib/planetHome/useHold';
 import type { Stage, StageItem } from '@/lib/planetHome/model';
 
 /**
- * 星のホーム: the swappable look. PlanetHome draws the frame (title, 推し list, the sheets that open a work, the long-press
- * menu, your works inside, the far work up close, the words while it sings); a skin draws only the scene — the backdrop,
- * your place, what floats around it and the far scenery — and calls back. Every planet's art and motion plugs in here
- * (skins.ts); the placeholder shapes in PlaceholderScenes.tsx stand in until the story team's art arrives.
+ * 星のホーム: the swappable scene. PlanetHome draws the frame every planet shares (title, 〔？〕 and the explainer strip,
+ * 〔♡ 推し〕, the dock, the bottom sheet, the long-press menu, the inside shelf, the toast); a skin draws only the scene —
+ * the backdrop with your place, what floats around it, the far scenery — and calls back. Data and callbacks in, so a
+ * planet's art and motion can change without touching the rules (lib/planetHome) or the feed.
  */
 export interface SceneProps {
   cfg: PlanetHomeConfig;
   view: PlanetHomeView;
   stage: Stage;
-  /** the one playing now (Saturn: under the needle) */
+  /** the one playing now (Saturn: it comes to the needle) */
   playingId: string | null;
   /** Saturn: the record is turning */
   spinning: boolean;
-  /** your place tapped: go inside (Saturn: the play button on the rim does onPlay instead) */
+  /** your place tapped (Saturn: plays; elsewhere: goes inside) */
   onPlace: () => void;
-  onPlay: () => void;
-  /** your works in a list (Saturn: 並べかえ・外す, since its inside is the record itself) */
-  onArrange: () => void;
-  /** a work tapped: it comes forward and plays / opens */
+  /** the name plate tapped: your works (Saturn's way to 並べかえ・外す) */
+  onPlate: () => void;
+  /** a work tapped: the sheet opens */
   onItem: (w: StageItem) => void;
-  /** a work held: 推す / 外す / 通報 */
-  onHold: (w: StageItem) => void;
-  /** the far scenery tapped: one stranger's work up close */
-  onFar: (w: HomeWork) => void;
+  /** a work held: the menu at that point */
+  onHold: (w: StageItem, at: At) => void;
 }
 
 export interface PlanetHomeSkin {

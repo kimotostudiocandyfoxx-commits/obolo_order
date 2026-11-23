@@ -25,8 +25,8 @@ export interface PlanetHomeState {
   play: (startId?: string) => void;
   stop: () => void;
   playOne: (w: HomeWork) => void;
-  push: (userId: string) => Promise<void>;
-  unpush: (userId: string) => Promise<void>;
+  push: (who: { id: string; name: string }) => Promise<void>;
+  unpush: (who: { id: string; name: string }) => Promise<void>;
   takeOut: (w: HomeWork) => Promise<void>;
   report: (w: HomeWork, reason: PlanetWorkReportBody['reason']) => Promise<void>;
   hide: (w: HomeWork) => Promise<void>;
@@ -46,8 +46,11 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
   const [spinning, setSpinning] = useState(false);
   const [oshi, setOshi] = useState<HomeOshi[] | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  // 推した / 外した on this screen: the marks change at once (the feed follows on the next visit)
+  const [rels, setRels] = useState<Record<string, 'oshi' | 'stranger'>>({});
   const queue = useRef<StageItem[]>([]);
   const current = useRef<StageItem | null>(null);
+  const switching = useRef(false);
 
   // load, then mark the visit (the view keeps the visit before, so what came after it sparkles this time)
   useEffect(() => {
@@ -58,7 +61,9 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
       .then((v) => {
         if (!on) return;
         setLoaded(v);
-        void getApi().planetHomeVisit(planet).catch(() => undefined);
+        void getApi()
+          .planetHomeVisit(planet)
+          .catch(() => undefined);
       })
       .catch(() => on && setError(true));
     return () => {
@@ -74,10 +79,16 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
 
   const view = opts.view ?? loaded;
   const viewOrdered = useMemo(() => {
-    if (!view || !ownOrder) return view;
-    const pos = new Map(ownOrder.map((id, i) => [id, i]));
-    return { ...view, own: [...view.own].sort((a, b) => (pos.get(a.id) ?? -1) - (pos.get(b.id) ?? -1)) };
-  }, [view, ownOrder]);
+    if (!view) return view;
+    const pos = new Map((ownOrder ?? []).map((id, i) => [id, i]));
+    const rel = (w: HomeWork): HomeWork => (rels[w.author.id] && w.rel !== 'dachi' && w.rel !== 'own' ? { ...w, rel: rels[w.author.id] } : w);
+    return {
+      ...view,
+      own: ownOrder ? [...view.own].sort((a, b) => (pos.get(a.id) ?? -1) - (pos.get(b.id) ?? -1)) : view.own,
+      around: view.around.map(rel),
+      far: view.far.map(rel),
+    };
+  }, [view, ownOrder, rels]);
   const stage = useMemo(() => (viewOrdered ? stageOf(viewOrdered, { now, seeds: opts.seeds, hidden }) : null), [viewOrdered, now, opts.seeds, hidden]);
 
   const flash = (t: string) => {
@@ -89,14 +100,17 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
     if (!w.url) return;
     current.current = w;
     setPlayingId(w.id);
+    // the previous voice is stopped inside toggleAudio: that stop is not the end of this one
+    switching.current = true;
     void toggleAudio(w.url).catch(() => setPlayingId(null));
+    switching.current = false;
   }, []);
 
   // one ends → the next one on the record comes under the needle
   useEffect(
     () =>
       subscribeAudio((st) => {
-        if (st.playing) return;
+        if (st.playing || switching.current) return;
         const ended = st.progress >= 0.97;
         const next = ended ? queue.current.shift() : undefined;
         if (next) return sing(next);
@@ -141,15 +155,15 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
   );
 
   const loadOshi = useCallback(() => {
-    if (scripted) return setOshi([]);
+    // a scripted place: the people whose works are around it
+    if (scripted) return setOshi([...new Map((opts.view?.around ?? []).map((w) => [w.author.id, { id: w.author.id, name: w.author.name, pic: w.author.pic, dachi: w.rel === 'dachi' }])).values()].sort((a, b) => Number(b.dachi) - Number(a.dachi)));
     getApi()
       .oshiList()
       .then(setOshi)
       .catch(() => setOshi([]));
-  }, [scripted]);
+  }, [scripted, opts.view]);
 
   const act = async (fn: () => Promise<unknown>, ok: string) => {
-    if (scripted) return flash(ok);
     try {
       await fn();
       flash(ok);
@@ -171,31 +185,42 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
     stop,
     playOne,
     loadOshi,
-    push: (userId) => act(async () => setOshi(await getApi().setOshi(userId, true)), '推した。次から、ここにも来るよ'),
-    unpush: (userId) => act(async () => setOshi(await getApi().setOshi(userId, false)), '推しから外した'),
+    push: (who) =>
+      act(async () => {
+        if (!scripted) setOshi(await getApi().setOshi(who.id, true));
+        setRels((r) => ({ ...r, [who.id]: 'oshi' }));
+      }, `♥ ${who.name}を推した。次から、あなたの${PLANET_HOMES[planet].place}にも来る`),
+    unpush: (who) =>
+      act(async () => {
+        if (!scripted) setOshi(await getApi().setOshi(who.id, false));
+        setRels((r) => ({ ...r, [who.id]: 'stranger' }));
+      }, `${who.name}の推しを外した`),
     // 外す (a dachi's / 推し's work, from your place): for you only, kept — the same as 〔見えなくする〕 on the server
     takeOut: (w) =>
       act(async () => {
-        await getApi().hidePlanetWork(w.kind, w.id, true);
+        if (!scripted) await getApi().hidePlanetWork(w.kind, w.id, true);
         setHidden((s) => new Set(s).add(w.id));
       }, '外した'),
     hide: (w) =>
       act(async () => {
-        await getApi().hidePlanetWork(w.kind, w.id, true);
+        if (!scripted) await getApi().hidePlanetWork(w.kind, w.id, true);
         setHidden((s) => new Set(s).add(w.id));
-      }, '見えなくした。あなたにだけ、もう出てこない'),
-    report: (w, reason) => act(() => getApi().reportPlanetWork(w.kind, w.id, { reason }), 'とどいた。運営が確かめるね'),
+      }, '見えなくした'),
+    report: (w, reason) => act(async () => void (scripted || (await getApi().reportPlanetWork(w.kind, w.id, { reason }))), '通報した。ありがとう'),
     // your own: back into Bluena only
     removeOwn: (w) =>
       act(async () => {
-        await getApi().planetHomeTakeOut(planet, w.id);
+        if (!scripted) await getApi().planetHomeTakeOut(planet, w.id);
         setHidden((s) => new Set(s).add(w.id));
       }, 'Bluenaに戻した'),
     moveOwn: (id, by) => {
       if (!view) return;
       const ids = moveOwn(ownOrder ?? (stage?.own ?? view.own).map((w) => w.id), id, by);
       setOwnOrder(ids);
-      if (!scripted) void getApi().planetHomeOrder(planet, ids).catch(() => undefined);
+      if (!scripted)
+        void getApi()
+          .planetHomeOrder(planet, ids)
+          .catch(() => undefined);
     },
   };
 }
