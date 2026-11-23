@@ -7,6 +7,54 @@
         "design/story/refs/kimorin.jpg"
       ],
       "prompt": "The same character as the reference picture (KIMORIN: a small chibi fox-spirit with a white mask with blue markings, red hooded robe, many white-and-black tails), standing on a tiny floating island in outer space, waving hello to the viewer. Soft Japanese anime illustration, warm light, stars and a ringed planet behind. No text."
+    },
+    {
+      "id": "kimorin-talk-base",
+      "size": "portrait",
+      "refs": [
+        "design/story/refs/talk-kimorin.jpg"
+      ],
+      "prompt": "The same character as the reference picture (KIMORIN: a small fox-like creature with a white porcelain mask face with blue swirl markings and a blue leaf mark on the forehead, round black sunglasses, white fox ears with blue insides, a deep red hooded velvet robe with gold-and-blue embroidery and a blue jewel brooch, a huge fan of white-and-black feathered tails behind, a small white wing at the side, white paws with blue pads), same painterly art style and colors. Full body, standing relaxed, body turned slightly toward the right side of the picture as if standing next to a friend, arms down at the sides, calm face, mouth closed. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body (including all the tail feathers) fits inside the frame with margin on all sides, centered. No text, no watermark."
+    },
+    {
+      "id": "crocopatra-stand",
+      "size": "portrait",
+      "refs": [
+        "design/story/refs/style-resident.jpg"
+      ],
+      "prompt": "A new character in exactly the same painterly, detailed fantasy art style as the reference picture (not the same character): CROCOPATRA, an elegant crocodile lady, a madam of a sky town — a green crocodile standing upright, wearing a long wine-red ball gown with gold trim, a small golden tiara on her head, holding an open folding fan in one hand, a warm, slightly haughty smile, mouth closed. Full body, standing, facing the viewer slightly turned to the right. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body inside the frame with margin, centered. No text, no watermark."
+    },
+    {
+      "id": "plate-moon-temple",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/moon-temple.jpg"
+      ],
+      "prompt": "Edit and extend this painting into a background plate of the same place (the white marble temple on the Moon with the round window showing the Earth and the shallow stone basin): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
+    },
+    {
+      "id": "plate-saturn-inside",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/saturn-inside.jpg"
+      ],
+      "prompt": "Edit and extend this painting into a background plate of the same place (the dark golden temple hall inside Saturn with red lanterns and the round arch): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
+    },
+    {
+      "id": "plate-venus-stage",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/venus-stage.jpg"
+      ],
+      "prompt": "Edit and extend this painting into a background plate of the same place (the giant golden record turntable on Venus at sunset, seen from its surface): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
+    },
+    {
+      "id": "plate-jupiter-daikon",
+      "size": "1600x2880",
+      "refs": [
+        "apps/web/public/onboarding/s/jupiter-daikon.jpg"
+      ],
+      "prompt": "Edit and extend this painting into a background plate of the same place (the forest of tall dark trees on Jupiter (WITHOUT the giant white daikon radish: remove it completely)): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark."
     }
   ]
 }
