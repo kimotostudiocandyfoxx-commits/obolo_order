@@ -404,14 +404,6 @@
       "prompt": "The same character as the reference picture. Pose and expression: shy and embarrassed, pink blush on the mask cheeks, one paw scratching the back of the hood, a small bashful mouth. The round black sunglasses stay on. Same character, same art style, same clothes and colors as the reference, full body, the whole body (all tail feathers) inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
     },
     {
-      "id": "plate-moon-night",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/moon-night.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the Moon temple at night): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
       "id": "plate-saturn-night",
       "size": "1600x2880",
       "refs": [
@@ -436,28 +428,12 @@
       "prompt": "Edit and extend this painting into a background plate of the same place (the forest of tall dark trees on Jupiter (WITHOUT the giant white daikon radish: remove it completely)): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
     },
     {
-      "id": "plate-mercury-ice",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/mercury-ice.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the frozen ice plain on Mercury by the dark sea): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
       "id": "plate-mercury-port",
       "size": "1600x2880",
       "refs": [
         "apps/web/public/onboarding/s/mercury-port.jpg"
       ],
       "prompt": "Edit and extend this painting into a background plate of the same place (the small ice port on Mercury): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
-      "id": "plate-mars-screens",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/mars-screens.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the red Mars city avenue with giant screens): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
     },
     {
       "id": "plate-arr-mars-city",
@@ -488,14 +464,6 @@
       "size": "1600x2880",
       "refs": [
         "apps/web/public/onboarding/s/rocket-earth.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the brass-and-wood rocket cabin with the round porthole): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
-      "id": "plate-rocket-space",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/rocket-space.jpg"
       ],
       "prompt": "Edit and extend this painting into a background plate of the same place (the brass-and-wood rocket cabin with the round porthole): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
     },
@@ -532,36 +500,12 @@
       "prompt": "Edit and extend this painting into a background plate of the same place (the cosy little goods shop on Uranus with shelves and a round window): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
     },
     {
-      "id": "plate-uranus-press",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/uranus-press.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the floating island with the old printing press on Uranus): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
-      "id": "plate-neptune-town",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/neptune-town.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the small floating town island on Neptune): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
       "id": "plate-neptune-islands",
       "size": "1600x2880",
       "refs": [
         "apps/web/public/onboarding/s/neptune-islands.jpg"
       ],
       "prompt": "Edit and extend this painting into a background plate of the same place (the floating islands on Neptune): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
-    },
-    {
-      "id": "plate-earth-hall",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/earth-hall.jpg"
-      ],
-      "prompt": "Edit and extend this painting into a background plate of the same place (the golden hall of the Earth temple): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
     },
     {
       "id": "view-kimorin-sun-back-v2",
