@@ -562,6 +562,23 @@
         "apps/web/public/onboarding/s/earth-hall.jpg"
       ],
       "prompt": "Edit and extend this painting into a background plate of the same place (the golden hall of the Earth temple): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings."
+    },
+    {
+      "id": "view-kimorin-sun-back-v2",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/kimorin-sun-front.jpg",
+        "design/story/refs/talk-kimorin.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a small white fox-like mascot with big white-and-blue fox ears, wearing a dark red velvet hooded robe with white lattice trim, a blue jewel brooch with blue tassels, round black sunglasses, white paws, white feet with blue paw pads, a huge fan of white, black and red-tipped feather tails behind, and one small white bat wing — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. From behind, the huge fan of many white, black and red-tipped feather tails spreads out wide on BOTH sides behind the robe, as wide as in the reference, symmetric; the hood and the two fox ears seen from the back; the small white bat wing sticks out on the left side of the picture. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "view-bossg-back-v2",
+      "size": "1152x1536",
+      "refs": [
+        "design/story/refs/views/bossg-front.jpg"
+      ],
+      "prompt": "The same character as in the reference picture — a huge black gorilla boss with a gold cigar, heavy gold chains and a big gold medallion \"5454\", black leather shorts, black-and-gold mechanical cyber arms with glowing cyan lights — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. From behind: the gold chains go around the back of the neck only, the medallion hangs on the chest and is NOT visible from behind; both mechanical arms keep their black-and-gold plates and glowing cyan lights, seen from the back. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
     }
   ]
 }
