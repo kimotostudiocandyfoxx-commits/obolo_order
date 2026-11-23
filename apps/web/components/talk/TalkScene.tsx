@@ -882,6 +882,11 @@ export function TalkScene({
       if (shot === 'q3' && a) {
         const facesRight = (angle[nowItem!.who]?.turn ?? 1) > 0 || angle[nowItem!.who]?.mirror === false;
         Object.assign(f, { ox: a.x, oy: a.y, s: CAMERA.q3.scale, tx: w * (facesRight ? CAMERA.q3.at : 1 - CAMERA.q3.at) - a.x, turn: facesRight ? CAMERA.q3.turn : -CAMERA.q3.turn });
+      } else if (shot === 'ots' && a) {
+        // on the speaker's face where they stand in this cut (back, at CAMERA.ots.at of the width)
+        const ax = (angle[nowItem!.who]?.x ?? 0.5) * w;
+        const ay = stageH - stageH * 0.1 - (spots.get(nowItem!.who)?.h ?? stageH) * CAMERA.ots.far * (1 - Math.min(0.92, (byId.get(nowItem!.who)?.headAt ?? 0.16) + 0.07));
+        Object.assign(f, { ox: ax, oy: ay, s: CAMERA.ots.scale, tx: 0 });
       } else Object.assign(f, { ox: w / 2, oy: stageH * 0.35, s: shot === 'side' ? CAMERA.side.scale : 1 });
       f.ms = shotChanged ? 0 : 600;
       if (reduced) Object.assign(f, { s: Math.min(f.s, CAMERA.reducedMax), turn: 0, tx: f.tx * 0.3, ms: 400 });
