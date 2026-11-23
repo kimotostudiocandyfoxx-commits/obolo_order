@@ -1,9 +1,10 @@
-# UI art — 2026-11-23T04:37:17.469Z
+# UI art — 2026-11-23T04:41:50.287Z
 
-Seedream 5.0 Pro / 5枚 / 約72円
+Seedream 5.0 Pro / 6枚 / 約87円
 
-- ✅ iida-gb-ask-4
-- ✅ iida-gb-engineer-clark
-- ✅ iida-gb-engineer-v2
-- ✅ iida-gb-intro-angel-v2
-- ✅ iida-gb-lie-v2
+- ✅ iida-gb-engineer-clark-v3a
+- ✅ iida-gb-engineer-clark-v3b
+- ✅ iida-gb-intro-angel-v3a
+- ✅ iida-gb-intro-angel-v3b
+- ✅ iida-gb-lie-v3a
+- ✅ iida-gb-lie-v3b
