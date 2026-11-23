@@ -14,6 +14,8 @@ import { Marked } from '@/components/talk/TalkScene';
  * words come with the voice); the rest keeps its place.
  */
 export type SubtitleStyle = 'plain' | 'slam' | 'shout' | 'whisper' | 'muse';
+/** the marks in the subtitles' own type: a shout is bold and a little larger in the same serif (not the bubbles' poster font) */
+const SUB_MARKS = { shout: { fontWeight: 800, fontSize: '1.12em' }, big: { fontWeight: 800, fontSize: '1.15em' } } as const;
 export const SUB_SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 
 /** a line's style from its bubble rules (shape / in) and its punctuation */
@@ -52,7 +54,7 @@ export function Subtitle({ name, color, text, shown, style = 'plain', lineKey, d
         className="line-clamp-2 max-w-full whitespace-pre-line text-[#fbf6ea] [line-break:strict] [text-wrap:balance] [word-break:normal]"
         style={{ fontFamily: SUB_SERIF, lineHeight: 1.5, textShadow: '0 2px 10px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.95), 0 1px 1px rgba(0,0,0,.9)', ...s.text, ...(dim ? { fontSize: 15 } : {}) }}
       >
-        <Marked text={text} upto={shown} />
+        <Marked text={text} upto={shown} marks={SUB_MARKS} />
         {shown != null && <span className="invisible">{[...talkPlain(text)].slice(shown).join('')}</span>}
       </p>
     </div>

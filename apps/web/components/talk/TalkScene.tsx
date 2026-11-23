@@ -759,7 +759,8 @@ export function TalkScene({
     // (the talk cast's pictures share a padded canvas: their figures are well inside it)
     if (!sp || !r || sp.chest || p.look?.poses) continue;
     const half = (sp.h * (p.scale ?? 1) * (r > 0.9 ? 0.58 : 1) * r) / 2 / w;
-    const m = 4 / w;
+    // (a margin, so a wide painted prop — ハットG's cloud — does not sit on the screen's edge as if cut)
+    const m = 16 / w;
     if (sp.x - half < m && sp.x + half <= 1 - m) sp.x = Math.min(0.5, m + half);
     else if (sp.x + half > 1 - m && sp.x - half >= m) sp.x = Math.max(0.5, 1 - m - half);
   }
@@ -1587,7 +1588,7 @@ const BURST =
  * M-R243: the words with their marks — **bold** 900, ^^larger^^ 1.3em, !!shout!! Dela Gothic One 1.38em. Rendered as
  * text runs (React escapes them): nothing but these three marks ever becomes markup. `upto`: only that many characters.
  */
-export function Marked({ text, upto }: { text: string; upto?: number }) {
+export function Marked({ text, upto, marks }: { text: string; upto?: number; /** the mark styles replaced (the story's subtitles keep their own type) */ marks?: Partial<Record<TalkMark, React.CSSProperties>> }) {
   let left = upto ?? Infinity;
   return (
     <>
@@ -1597,7 +1598,7 @@ export function Marked({ text, upto }: { text: string; upto?: number }) {
         const part = chars.slice(0, left).join('');
         left -= chars.length;
         if (!r.c) return <span key={k}>{part}</span>;
-        const st: React.CSSProperties = MARK_STYLE[r.c];
+        const st: React.CSSProperties = marks?.[r.c] ?? MARK_STYLE[r.c];
         return (
           <em key={k} className="not-italic" style={st}>
             {part}
