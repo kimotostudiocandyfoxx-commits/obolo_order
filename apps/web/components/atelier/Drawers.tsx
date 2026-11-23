@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import type { AtelierKind } from '@/lib/atelier/unlock';
-import { BLUENA_PLANETS, type BluenaPlanet, type MarkedKind, type TalkDayView } from '@obolo/shared';
+import { HOME_OF_WORK, PLANET_HOMES, BLUENA_PLANETS, type BluenaPlanet, type MarkedKind, type TalkDayView } from '@obolo/shared';
 import { PlanetMark } from '@/components/bluena/PlanetMark';
 import { BluenaOrbit, planetOpen } from '@/components/bluena/BluenaOrbit';
 import { Glyph, GLYPH_NAMES } from '@/components/bluena/glyphs';
@@ -151,6 +151,7 @@ function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx: Ctx; o
 
 /** one planet's works (or all of them): the spiral and the list (M-R237) */
 function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet: BluenaPlanet | null; day?: number | null; ctx: Ctx; onOrigin?: (w: Work) => boolean; onMaterial?: (w: Work) => void }) {
+  const { me } = useAuth();
   const [filter, setFilter] = useState<FindFilter>({});
   const [found, setFound] = useState<Found[] | null>(null);
   const [open, setOpen] = useState<Found | null>(null);
@@ -212,7 +213,7 @@ function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet: Bluen
             tries={open.versionCount ?? w.versions?.length}
             onOrigin={onOrigin && w.origin ? () => onOrigin(w) : undefined}
             onDragOut={onMaterial ? () => onMaterial(w) : undefined}
-            onFly={FLIES[w.kind] && !w.flown && (w.kind !== 'song' || ctx.live || !!w.ref?.demoSong) ? () => void act(() => fly(w, ctx), '星へ飛ばした') : undefined}
+            onFly={FLIES[w.kind] && !w.flown && (w.kind !== 'song' || ctx.live || !!w.ref?.demoSong) ? () => void act(() => fly(w, ctx), flownLine(w.kind, me?.displayName)) : undefined}
             onDiscard={w.kind === 'song' && ctx.live ? undefined : () => confirm('ブルーナから捨てる？') && void act(() => discard(w), '捨てた')}
           />
           <button onClick={() => setOpen(null)} aria-label="とじる" className="absolute -top-3 left-1/2 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-white/10 bg-[#121a3a] text-white/60">
@@ -468,3 +469,6 @@ export function Drawer({ side, label, onClose, children }: { side: 'left' | 'rig
     </div>
   );
 }
+
+/** M-R258 §3: after 〔○○へ飛ばす〕 from Bluena, the planet home's line ({neo} = the member) */
+const flownLine = (kind: string, neo?: string | null) => (HOME_OF_WORK[kind] ? PLANET_HOMES[HOME_OF_WORK[kind]].flown.replace('{neo}', neo ?? 'あなた') : '星へ飛ばした');
