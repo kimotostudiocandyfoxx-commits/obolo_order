@@ -8,7 +8,7 @@ import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, se
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { HOME_OF_WORK, PLANET_HOMES, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
@@ -78,6 +78,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   const [msgs, setMsgs] = useState<Msg[]>(() => (story ? (story.works ?? []).map((work) => ({ id: uid(), who: 'work' as const, work })) : talk.msgs));
   const lines = cues(story?.lines);
   const [busy, setBusy] = useState(false);
+  /** 〔星へ飛ばす〕: the work flying up for a moment (its kind) */
+  const [launch, setLaunch] = useState<string | null>(null);
   const [pending, setPending] = useState<Pending>(null);
   const [bar, setBar] = useState(0);
   const [talkState, setTalkState] = useState({ listening: false, keyboard: false });
@@ -480,7 +482,16 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       put({ ...w, flown: true });
       // in a story the next lines say it; standalone {bati} says where it went
       if (story?.onFly) setTimeout(() => story.onFly!(PLANET_OF[w.kind] ?? ''), 900);
-      else say(`${PLANET_WORD[w.kind] ?? '星'}へ飛んでいった。ロケットで行けば、見られるよ`);
+      else {
+        // M-R258 §3: a short launch (the work flies up), then {bati}'s line for that planet's home
+        const home = HOME_OF_WORK[w.kind];
+        setLaunch(w.kind);
+        setTimeout(() => {
+          setLaunch(null);
+          if (home) sayT(PLANET_HOMES[home].flown);
+          else say(`${PLANET_WORD[w.kind] ?? '星'}へ飛んでいった。ロケットで行けば、見られるよ`);
+        }, 1300);
+      }
     } catch (e) {
       say(failLine(e));
     } finally {
@@ -617,6 +628,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   return (
     <Cards.Provider value={cards}>
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
+      {launch && <FlyLaunch kind={launch} />}
       <TalkScene
         askTone={talkTone.ask}
         onTone={talkTone.pick}
@@ -756,5 +768,18 @@ function FoundThumb({ works }: { works: Work[] }) {
       })}
       {works.length > 4 && <span className="text-[12px] text-amber-100/70">+{works.length - 4}</span>}
     </span>
+  );
+}
+
+/** 〔星へ飛ばす〕: the work goes up into the sky for a moment (the home's art takes over from here) */
+function FlyLaunch({ kind }: { kind: string }) {
+  const home = HOME_OF_WORK[kind];
+  const sprite = home ? PLANET_HOMES[home].art.sprite : null;
+  return (
+    <div className="pointer-events-none absolute inset-0 z-[60] overflow-hidden" aria-hidden>
+      <style>{'@keyframes fly-launch{0%{transform:translate(-50%,0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translate(-50%,-120vh) scale(1.1);opacity:.2}}'}</style>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {sprite && <img src={sprite} alt="" className="absolute bottom-[18%] left-1/2 w-24" style={{ animation: 'fly-launch 1.2s cubic-bezier(.5,0,.8,.4) forwards' }} />}
+    </div>
   );
 }
