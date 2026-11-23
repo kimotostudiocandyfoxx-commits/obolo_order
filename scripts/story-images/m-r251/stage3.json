@@ -1,0 +1,45 @@
+{
+ "items": [
+  {
+   "id": "talk-kimorin-smile-pose-talk",
+   "size": "portrait",
+   "refs": [
+    "design/story/out/talk-kimorin-smile-pose-1.jpg"
+   ],
+   "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
+  },
+  {
+   "id": "talk-kimorin-surprised-pose-talk",
+   "size": "portrait",
+   "refs": [
+    "design/story/out/talk-kimorin-surprised-pose-1.jpg"
+   ],
+   "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
+  },
+  {
+   "id": "talk-kimorin-thinking-pose-talk",
+   "size": "portrait",
+   "refs": [
+    "design/story/out/talk-kimorin-thinking-pose-1.jpg"
+   ],
+   "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
+  },
+  {
+   "id": "talk-kimorin-sad-pose-talk",
+   "size": "portrait",
+   "refs": [
+    "design/story/out/talk-kimorin-sad-pose-1.jpg"
+   ],
+   "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
+  },
+  {
+   "id": "talk-kimorin-shy-pose-talk",
+   "size": "portrait",
+   "refs": [
+    "design/story/out/talk-kimorin-shy-pose-1.jpg"
+   ],
+   "prompt": "The same character as the reference picture, same art style. Mouth open in the middle of a word (talking), keep the same expression otherwise. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
+  }
+ ],
+ "note": "M-R251 review (2026-11-23): run with QUEUE=scripts/story-images/m-r251/stage3.json OUT=design/story/out node scripts/story-images/generate.mjs, in order stage1 → stage2 → stage3; then python3 scripts/talk-assets/kimorin.py"
+}

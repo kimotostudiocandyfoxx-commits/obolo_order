@@ -7,7 +7,7 @@ import MOUTHS from '@/lib/story/sprite-mouths.json';
 import { spriteUrl, stillShows } from '@/lib/onboarding/media';
 import { exprFor } from '@/lib/story/expression';
 import { batiLook, TONES, toneOf } from '@/lib/talk/looks';
-import { castLook } from '@/lib/talk/demoLooks';
+import { castLook, STORY_TALK_LOOKS } from '@/lib/talk/demoLooks';
 import { directLines, type DirectionOverride } from '@/lib/talk/direction';
 import { charSpec } from './Stage';
 import type { Speaker, StoryVars } from '@/lib/onboarding/script';
@@ -75,11 +75,14 @@ const toneFor = (id: string) => TONES[TONE_OF[id] ?? ''] ?? toneOf(id);
 /** a story speaker's colour (their name over a subtitle) */
 export const storyTone = (who: string) => toneFor(talkId(who));
 
+/** KIMORIN's main look (the red robe and the round sunglasses) */
+const KIMORIN_MAIN = new Set(['kimorin-g', 'kimorin-n', 'kimorin-sun']);
 /** the size in the row (the painted pictures have no headroom: kept under the bubbles; small ones smaller) */
 const SCALE: Record<string, number> = { monban: 0.86, obolon: 0.62, 'obolon-pit': 0.62, 'unchi-pinpon': 0.42, freezy: 0.72, mikie: 0.76 };
-const scaleOf = (sprite: string) => SCALE[sprite] ?? (sprite.startsWith('@') ? 1 : 0.84);
+const scaleOf = (sprite: string) => (STORY_TALK_LOOKS.kimorin && KIMORIN_MAIN.has(sprite) ? 1 : (SCALE[sprite] ?? (sprite.startsWith('@') ? 1 : 0.84)));
 /** the round ones (OBOLON, {bati}) stand at 58% of their height (Figure's wide rule) */
 const headOf = (sprite: string) => {
+  if (STORY_TALK_LOOKS.kimorin && KIMORIN_MAIN.has(sprite)) return 0.16;
   const s = scaleOf(sprite);
   if (sprite.startsWith('obolon')) return 1 - s * 0.58 + 0.04;
   if (sprite.startsWith('@')) return 1 - 0.58 + 0.06;
@@ -110,6 +113,9 @@ export function spriteLook(sprite: string, v: StoryVars): TalkLook | null {
     for (const [k, url] of Object.entries(v.batiFaces ?? {})) if (url) named[k] = { kind: 'image', url };
     return { ...look, named };
   }
+  // KIMORIN in his main look (the red robe, the sunglasses: kimorin-g / -n / -sun) has a talk look of his own (faces,
+  // poses, blink, mouth, like the talk cast); the inventor's lab coat (kimorin-i / -iu, day 2) stays painted
+  if (STORY_TALK_LOOKS.kimorin && KIMORIN_MAIN.has(sprite)) return castLook('kimorin', sprite);
   const spec = charSpec(sprite);
   const faces = spec.faces ?? {};
   const named: Record<string, TalkExpression> = {};

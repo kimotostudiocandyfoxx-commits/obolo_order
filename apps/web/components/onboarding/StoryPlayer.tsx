@@ -47,6 +47,7 @@ import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { linesOf, stageOf } from '@/lib/onboarding/stage';
+import { PLATES, plateUrl, STILL_CLEAN } from '@/lib/onboarding/plates';
 import { lineKind } from '@/lib/talk/direction';
 import { SubtitleScrim, SUBTITLE_CSS, TypedSubtitle } from '@/components/story/Subtitle';
 import { TONES } from '@/lib/talk/looks';
@@ -1180,6 +1181,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   // the cinema's push for this line, from the same reading of the line as the directed row (a shout / a muse)
   const cineKind = cinema && talkSays ? lineKind(sayText(talkSays.who, talkSays.text, v)) : null;
   const cineShot = cineKind === 'shout' ? 'punch' : cineKind === 'muse' ? 'push' : null;
+  // the row's background: the scene's plate (made for the figures' size) or the still with its cast painted out
+  const plate = !cinema && sceneNow ? PLATES[sceneNow] : undefined;
+  const [plateAspect, setPlateAspect] = useState(0.5625);
+  useEffect(() => {
+    if (!plate) return;
+    const im = new Image();
+    im.onload = () => setPlateAspect(im.naturalWidth / im.naturalHeight);
+    im.src = plateUrl(plate.image);
+  }, [plate]);
+  const cleanStill = (img: string) => (!cinema && STILL_CLEAN[img] ? STILL_CLEAN[img] : img);
+  const sharpBack = !!plate || (!!still && !!STILL_CLEAN[still] && !cinema);
   const lineMode = linesOf(sceneNow, cinema ? 'cinema' : 'row', subsFlag);
   const talkOn = !cinema && started && !!step && (chatOn || (charsOnStage.length > 0 && ['wait', 'vanish', 'spark'].includes(step.t)));
   const sysNow = chatOn && step && chatLine(step, '')?.kind === 'sys' ? log[log.length - 1] : null;
@@ -1229,7 +1241,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           left in place, and a still's animation is set once, when it comes in (QA 10 R27) */}
       {[...(under && under.image !== still ? [under.image] : []), ...(still ? [still] : [])].map((img) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={img} src={stillUrl(img)} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" style={img === still ? { animation: stillAnim } : undefined} aria-hidden />
+        <img key={img} src={stillUrl(cleanStill(img))} alt="" className="story-fit pointer-events-none absolute inset-0 z-[2] h-full w-full" style={img === still ? { animation: stillAnim } : undefined} aria-hidden />
       ))}
       {still && STILL_MOUTH[still] && !sprite && (
         <StillMouth
@@ -1299,12 +1311,13 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       {talkOn && (
         <div className="absolute inset-0 z-[10] flex flex-col transition-opacity duration-300" style={talkHidden ? { opacity: 0, pointerEvents: 'none' } : undefined}>
           {/* a still that already shows them goes soft behind them (depth of field) */}
-          <div className="pointer-events-none absolute inset-0 transition-[backdrop-filter,background] duration-500" style={talkPeople.some((p) => !p.offstage && !p.self && p.look) || (selfTalkLook && chatOn) ? { backdropFilter: stillShowsAny(still, talkPeople) ? 'blur(6px) brightness(0.6)' : 'blur(3px) brightness(0.7)', WebkitBackdropFilter: stillShowsAny(still, talkPeople) ? 'blur(6px) brightness(0.6)' : 'blur(3px) brightness(0.7)' } : undefined} aria-hidden />
+          <div className="pointer-events-none absolute inset-0 transition-[backdrop-filter,background] duration-500" style={!sharpBack && (talkPeople.some((p) => !p.offstage && !p.self && p.look) || (selfTalkLook && chatOn)) ? { backdropFilter: stillShowsAny(still, talkPeople) ? 'blur(6px) brightness(0.6)' : 'blur(3px) brightness(0.7)', WebkitBackdropFilter: stillShowsAny(still, talkPeople) ? 'blur(6px) brightness(0.6)' : 'blur(3px) brightness(0.7)' } : undefined} aria-hidden />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/60 via-black/25 to-transparent" aria-hidden />
           <TalkScene
             transparent
             skin="story"
             lines={lineMode}
+            plate={plate ? { src: plateUrl(plate.image), floorY: plate.floorY, aspect: plateAspect } : undefined}
             selfName={v.neo || v.name || undefined}
             noMute
             listening={listening}

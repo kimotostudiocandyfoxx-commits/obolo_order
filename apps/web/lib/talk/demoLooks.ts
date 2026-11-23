@@ -115,12 +115,19 @@ export const DEMO_GROUP_SEEDS = ['あお', 'みどり', 'もも', 'きいろ', '
  * faces, an eyes-closed and an open-mouth picture (whole pictures, aligned to the same body: the blink and the lip flap
  * swap the whole figure) and its コロリン. The demo, the tests and the review page stand them in for generated looks.
  */
-export type CastId = 'user' | 'friend' | 'bati';
+export type CastId = 'user' | 'friend' | 'bati' | 'kimorin';
 const CAST_FACES: Record<CastId, TalkFace[]> = {
   user: ['normal', 'smile', 'surprised', 'shy'],
   friend: [...TALK_FACES],
   bati: [...TALK_FACES],
+  kimorin: [...TALK_FACES],
 };
+/**
+ * The story characters' talk looks made so far (M-R251 review: KIMORIN only, in his main look — the red robe and the
+ * round sunglasses — made by scripts/story-images/m-r251 + scripts/talk-assets/kimorin.py into public/talk/kimorin).
+ * Off until those files are in: the painted pictures stand meanwhile.
+ */
+export const STORY_TALK_LOOKS = { kimorin: false };
 export function castLook(id: CastId, of = `cast-${id}`): TalkLook {
   const u = (f: string) => `/talk/${id}/${f}.webp`;
   // M-R240, one shared canvas (same size, same feet, headroom for raised arms): the plain stand with its blink and open

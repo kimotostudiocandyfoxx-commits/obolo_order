@@ -69,6 +69,9 @@ const STILL_CAST: Record<string, string[]> = {
   's/d2-launch-pit': [],
   's/d2-invite-hand': ['KIMORIN', 'MONBAN'],
   's/rocket-over-sea': ['KIMORIN'], // he speaks from inside the rocket: the picture stays clear
+  // day 5's Jupiter forest: the Kaiser is the white daikon tree in it (he also stands in the row) — soft behind him
+  // until its painted-out version is in (lib/onboarding/plates.ts STILL_CLEAN)
+  's/jupiter-daikon': ['大根カイザー'],
 };
 export function stillShows(still: string, who: string): boolean {
   const w = who.startsWith('KIMORIN') ? 'KIMORIN' : who;

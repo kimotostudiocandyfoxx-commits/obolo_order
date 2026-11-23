@@ -1,0 +1,29 @@
+{
+ "items": [
+  {
+   "id": "talk-kimorin-base",
+   "size": "portrait",
+   "refs": [
+    "design/story/refs/talk-kimorin.jpg"
+   ],
+   "prompt": "The same character as the reference picture (KIMORIN: a small fox-like creature with a white porcelain mask face with blue swirl markings and a blue leaf mark on the forehead, round black sunglasses, white fox ears with blue insides, a deep red hooded velvet robe with gold-and-blue embroidery and a blue jewel brooch, a huge fan of white-and-black feathered tails behind, a small white wing at the side, white paws with blue pads), same painterly art style and colors. Full body, standing relaxed, body turned slightly toward the right side of the picture as if standing next to a friend, arms down at the sides, calm face, mouth closed. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body (including all the tail feathers) fits inside the frame with margin on all sides, centered. No text, no watermark."
+  },
+  {
+   "id": "crocopatra-stand",
+   "size": "portrait",
+   "refs": [
+    "design/story/refs/style-resident.jpg"
+   ],
+   "prompt": "A new character in exactly the same painterly, detailed fantasy art style as the reference picture (not the same character): CROCOPATRA, an elegant crocodile lady, a madam of a sky town — a green crocodile standing upright, wearing a long wine-red ball gown with gold trim, a small golden tiara on her head, holding an open folding fan in one hand, a warm, slightly haughty smile, mouth closed. Full body, standing, facing the viewer slightly turned to the right. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. The whole body inside the frame with margin, centered. No text, no watermark."
+  },
+  {
+   "id": "jupiter-daikon-empty",
+   "size": "720x1280",
+   "refs": [
+    "apps/web/public/onboarding/s/jupiter-daikon.jpg"
+   ],
+   "prompt": "Edit this painting: remove the giant white daikon radish with its blue-green leaves (the white trunk in the middle) so that only the empty background remains — the forest of tall dark trees, the light through the leaves and the mossy ground continue naturally where it was. Keep everything else exactly the same: same composition, same trees, same light, same colors, same painting style. No new objects, no people, no text."
+  }
+ ],
+ "note": "M-R251 review (2026-11-23): run with QUEUE=scripts/story-images/m-r251/stage1.json OUT=design/story/out node scripts/story-images/generate.mjs, in order stage1 → stage2 → stage3; then python3 scripts/talk-assets/kimorin.py"
+}

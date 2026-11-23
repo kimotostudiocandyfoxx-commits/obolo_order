@@ -174,6 +174,7 @@ export function TalkScene({
   skin = 'app',
   lines = 'bubbles',
   selfName,
+  plate,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -239,6 +240,8 @@ export function TalkScene({
   lines?: 'bubbles' | 'subtitles';
   /** your name over your subtitles (else 「あなた」) */
   selfName?: string;
+  /** a background plate made for the row (lib/onboarding/plates.ts): its floor at the row's ground line, moved by the camera with the row */
+  plate?: { src: string; floorY: number; aspect: number };
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -882,6 +885,27 @@ export function TalkScene({
         <p className="absolute inset-x-0 z-[6] text-center text-[12px] font-bold tracking-[0.1em] text-[#f4f1ff]/85" style={{ top: top + 18 }}>
           {group.name}・{group.count}人
         </p>
+      )}
+
+      {/* the plate behind the row: the same box and the same camera as the row, so the feet stay on its floor */}
+      {plate && (
+        <div
+          className="pointer-events-none absolute inset-x-0 z-[1]"
+          style={{
+            bottom: dockH,
+            height: stageH,
+            ...(directed ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), filter .5s ease` } : {}),
+            // sharp; a little soft only in a close-up (depth of field)
+            filter: directed && frame.s > 1.2 && !reduced ? 'blur(1.4px)' : undefined,
+          }}
+        >
+          {(() => {
+            // tall enough that its top is above the screen's, wide enough to pan
+            const ih = Math.max((h - dockH) / plate.floorY, (w * 1.25) / plate.aspect) * 1.04;
+            // eslint-disable-next-line @next/next/no-img-element
+            return <img src={plate.src} alt="" className="absolute left-1/2 max-w-none -translate-x-1/2 select-none" style={{ height: ih, width: ih * plate.aspect, bottom: -(1 - plate.floorY) * ih }} />;
+          })()}
+        </div>
       )}
 
       {/* the people, side by side (you at the right), standing low; the camera moves in toward the one speaking (the
