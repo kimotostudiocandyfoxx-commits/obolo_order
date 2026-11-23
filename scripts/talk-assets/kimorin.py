@@ -12,31 +12,14 @@ from PIL import Image, ImageFilter
 
 SRC = 'design/story/out'
 OUT = 'apps/web/public/talk'
-CHARS = {
-    'user': ['base', 'smile', 'surprised', 'shy', 'blink', 'talk'],
-    'friend': ['base', 'smile', 'surprised', 'thinking', 'sad', 'shy', 'blink', 'talk'],
-    'bati': ['base', 'smile', 'surprised', 'thinking', 'sad', 'shy', 'blink', 'talk'],
-}
-H = 900  # output height of a full-body picture
 
 
 def key(path):
-    """Chroma key against the picture's own background colour (read from the border), so a slightly
-    different green from the generator is still removed cleanly."""
-    im = Image.open(path).convert('RGB')
-    a = np.asarray(im).astype(np.float32)
-    border = np.concatenate([a[:6].reshape(-1, 3), a[-6:].reshape(-1, 3), a[:, :6].reshape(-1, 3), a[:, -6:].reshape(-1, 3)])
-    bg = np.median(border, axis=0)
-    dist = np.sqrt(((a - bg) ** 2).sum(axis=2))
-    alpha = np.clip((dist - 38) / 52.0, 0, 1)
-    # despill: on edge pixels, pull the green channel down toward the other two
-    r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    over = np.clip(g - np.maximum(r, b), 0, None)
-    a[..., 1] = np.where(alpha < 0.98, g - over * 0.9, g)
-    out = np.dstack([np.clip(a, 0, 255), alpha * 255]).astype(np.uint8)
-    img = Image.fromarray(out, 'RGBA')
-    al = img.getchannel('A').filter(ImageFilter.GaussianBlur(0.6))
-    img.putalpha(al)
+    """the shared matte (scripts/lib/keying.py: OKLab distance to the border's green, unmixing, despill, clean-up)"""
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
+    import keying
+    img, _ = keying.cut_file(path, 'green')
     return img
 
 

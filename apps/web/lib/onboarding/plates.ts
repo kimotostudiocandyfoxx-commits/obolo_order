@@ -18,9 +18,15 @@ export type Plate = { image: string; floorY: number; horizonY: number; skyMask?:
  */
 export const PLATES: Record<string, Plate> = {
   // made 2026-11-23 (Seedream edit of the still, scripts/story-images/m-r251/plates.json); floor / horizon read off the plate
-  // skyMask: white = the sky (here the space seen through the windows), scripts/story-images/m-r251/skymask.py --indoor
+  // skyMask: white = the sky (the space seen through the windows indoors), scripts/story-images/m-r251/skymask.py; none
+  // where the derived mask was wrong (the ambient layer then finds the sky itself)
   's/moon-temple': { image: 's/plate-moon-temple.jpg', floorY: 0.8, horizonY: 0.5, skyMask: 's/plate-moon-temple-sky.png' },
   's/saturn-inside': { image: 's/plate-saturn-inside.jpg', floorY: 0.86, horizonY: 0.52, skyMask: 's/plate-saturn-inside-sky.png' },
+  's/jupiter-forest': { image: 's/plate-jupiter-forest.jpg', floorY: 0.85, horizonY: 0.55 },
+  's/mercury-port': { image: 's/plate-mercury-port.jpg', floorY: 0.82, horizonY: 0.5, skyMask: 's/plate-mercury-port-sky.png' },
+  's/rocket-earth': { image: 's/plate-rocket-earth.jpg', floorY: 0.82, horizonY: 0.5 },
+  's/launch-pit': { image: 's/plate-launch-pit.jpg', floorY: 0.84, horizonY: 0.55 },
+  's/uranus-shop': { image: 's/plate-uranus-shop.jpg', floorY: 0.88, horizonY: 0.55 },
 };
 /** a scene that wants another plate than its still's (scene id → a PLATES key), or none at all (null) */
 export const SCENE_PLATE: Record<string, string | null> = {};

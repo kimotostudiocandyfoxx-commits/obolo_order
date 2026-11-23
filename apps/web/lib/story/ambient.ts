@@ -12,8 +12,8 @@
  *
  * Lookup: ambientFor(planet, still, sceneId) = the planet's entry, then the still's (sky mask, painted objects, anchor
  * points), then the scene's. Positions of painted things (the Earth, rings, lanterns, neon screens) are measured on the
- * current 720×1280 stills; a plate (lib/onboarding/plates.ts, `plate-<still>`) is looked up under its still's name, and
- * its positions want measuring again once the plates exist (STILL_AMBIENT).
+ * current 720×1280 stills (STILL_AMBIENT); a plate (lib/onboarding/plates.ts, `plate-<still>`) has its own entry in
+ * PLATE_AMBIENT (measured on the plate), or else keeps only its still's planet and sky rule.
  */
 
 export const PLANETS = ['moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'sun', 'pluto', 'earth', 'space'] as const;
@@ -101,7 +101,8 @@ export type Ambient = {
   front: FrontLayer[];
   regions?: SkyRegion[];
   skyMask: SkyMaskRule;
-  /** the sky's own slow drift, px (the camera's parallax adds to it) */
+  /** the sky's own slow drift, px (default 2; the camera's parallax adds to it); 0 = no moving sky copy (when painted
+   *  objects reach into the sky mask and would wobble) */
   drift?: number;
 };
 
@@ -151,6 +152,7 @@ export const AMBIENT: Record<Planet, Ambient> = {
   // 火星：背景＝赤い砂の霞、ときどき遠い空をUFOの光が横切る。前景＝横に流れる赤い砂粒、ネオンの光がわずかに揺らぐ。
   mars: {
     skyMask: { y: 0.55, keep: 'notdark', t: 0.14 },
+    drift: 0,
     sky: [
       { kind: 'haze', color: '#c8553c', scale: 3, speed: [0.012, 0], y0: 0.15, y1: 0.62, alpha: 0.28 },
       { kind: 'ufo', color: '#c6f6ff', y0: 0.08, y1: 0.22, period: 21, alpha: 0.9 },
@@ -301,7 +303,7 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
     ],
   },
   // Mercury: the ice plain under a starry sky, the port under a bright cold sky, the sea
-  'mercury-ice': { planet: 'mercury', skyMask: { y: 0.46, keep: 'all' } },
+  'mercury-ice': { planet: 'mercury', skyMask: { y: 0.46, keep: 'dark', t: 0.5 } }, // dark: not the rocket
   'mercury-port': { planet: 'mercury', skyMask: { y: 0.31, keep: 'all' }, sky: [{ kind: 'aurora', color: '#58f5c8', color2: '#9b8cff', y: 0.24, height: 0.2, speed: 0.05, alpha: 0.5 }] },
   'arr-mercury-sea': { planet: 'mercury', skyMask: { y: 0.42, keep: 'dark', t: 0.45 } },
   'rocket-over-sea': { planet: 'mercury', skyMask: { y: 0.42, keep: 'dark', t: 0.45 } },
@@ -309,15 +311,16 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
   'mars-screens': {
     planet: 'mars',
     skyMask: { y: 0.5, keep: 'notdark', t: 0.14 },
+    drift: 0, // the screens reach into the sky: no sky copy drifting over them
     front: [
       { kind: 'particles', sprite: 'dot', color: '#e2845a', count: 40, size: [0.6, 1.6], speed: [0.075, 0.004], sway: 0.003, twinkle: 0, alpha: 0.5, y0: 0.2, y1: 0.75 },
       { kind: 'particles', sprite: 'dot', color: '#d86a48', count: 6, size: [3, 6], speed: [0.11, 0.003], sway: 0.004, twinkle: 0, alpha: 0.18 },
       { kind: 'glows', color: '#ff5fd2', at: [[0.13, 0.43, 0.08], [0.51, 0.31, 0.07, '#5fe8ff'], [0.87, 0.45, 0.08, '#ffd25f'], [0.51, 0.56, 0.06, '#ff7a5f']], flicker: 0.18, sway: 0, alpha: 0.22 },
     ],
   },
-  'arr-mars-city': { planet: 'mars', skyMask: { y: 0.55, keep: 'notdark', t: 0.2 } },
+  'arr-mars-city': { planet: 'mars', skyMask: { y: 0.55, keep: 'notdark', t: 0.2 }, drift: 0 },
   // Venus: the golden record at sunset (sky above the far edge), and at night
-  'venus-stage': { planet: 'venus' },
+  'venus-stage': { planet: 'venus', skyMask: { y: 0.36, keep: 'notdark', t: 0.3 } }, // not the dark tone arm
   'venus-night': {
     planet: 'venus',
     night: true,
@@ -332,7 +335,7 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
   // Uranus: the sky field with the sideways ring; the shop's round window of pink clouds; the press
   'uranus-field': {
     planet: 'uranus',
-    skyMask: { y: 0.52, keep: 'all' },
+    skyMask: { y: 0.46, keep: 'all' }, // above the floating house
     regions: [{ at: [0.46, 0.33], r: 0.18, motion: 'float', amp: 1.6, period: 18 }],
     addSky: [{ kind: 'ring', color: '#f2fffb', at: [0.47, 0.33], rx: 0.47, ry: 0.07, angle: -28, speed: 0.05, planetR: 0.17, alpha: 0.35, mask: false }],
   },
@@ -355,6 +358,33 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
   'rocket-sun': { planet: 'space' },
 };
 
+/**
+ * per plate (lib/onboarding/plates.ts; the file name without extension): the painted objects measured again on the plate.
+ * A plate without an entry here keeps its still's planet, sky rule and night flag, but none of its positions (painted
+ * objects, rings, lamp glows) — they would sit in the wrong place — and takes the planet's own layers instead.
+ */
+export const PLATE_AMBIENT: Record<string, StillAmbient> = {
+  'plate-moon-temple': {
+    planet: 'moon',
+    skyMask: { y: 0.6, keep: 'dark', t: 0.2 },
+    regions: [{ at: [0.5, 0.41], r: 0.055, motion: 'float', amp: 1.6, period: 14 }],
+    addSky: [{ kind: 'glow', color: '#8fc4ff', speed: 0.1, at: [0.5, 0.41], radius: 0.07, alpha: 0.12, mask: false }],
+  },
+  'plate-saturn-inside': {
+    planet: 'saturn',
+    skyMask: { y: 0.6, keep: 'dark', t: 0.12 },
+    regions: [{ at: [0.5, 0.42], r: 0.28, motion: 'turn', amp: 0.5, period: 36 }],
+    sky: [
+      { kind: 'river', color: '#ffe9c4', at: [0.5, 0.36], angle: 32, width: 0.22, speed: 0.008, alpha: 0.5 },
+      { kind: 'ring', color: '#fff2cf', at: [0.5, 0.42], rx: 0.26, ry: 0.045, angle: -36, speed: 0.08, planetR: 0.125, alpha: 0.7, mask: false },
+    ],
+    front: [
+      { kind: 'particles', sprite: 'glint', color: '#fff2d4', count: 14, size: [1.2, 2.8], speed: [0.004, 0.002], sway: 0.006, twinkle: 1.4, alpha: 0.75, spin: true },
+      { kind: 'glows', color: '#ff4a2a', at: [[0.12, 0.24, 0.09], [0.2, 0.33, 0.075], [0.235, 0.45, 0.07], [0.15, 0.63, 0.075], [0.805, 0.24, 0.09], [0.9, 0.24, 0.09], [0.735, 0.35, 0.075], [0.765, 0.45, 0.07], [0.845, 0.63, 0.075]], flicker: 0.14, sway: 0.003, alpha: 0.42 },
+    ],
+  },
+};
+
 /** per scene: a scene whose place is not its still's (the members' days stand in other planets' stills) */
 export const SCENE_AMBIENT: Record<string, AmbientPatch & { planet?: Planet }> = {
   // Pluto's day stands in Uranus's field and Mercury's ice (after.ts): Pluto's own air over them
@@ -369,6 +399,12 @@ export function stillKey(src: string | null | undefined): string | null {
   if (!src) return null;
   const base = src.split('?')[0].split('/').pop()!.replace(/\.(jpe?g|png|webp|avif)$/i, '');
   return base.replace(/^plate-/, '') || null;
+}
+
+/** 'plate-moon-temple' when the source is a plate, else null */
+export function plateKey(src: string | null | undefined): string | null {
+  const base = src?.split('?')[0].split('/').pop()?.replace(/\.(jpe?g|png|webp|avif)$/i, '');
+  return base && base.startsWith('plate-') ? base : null;
 }
 
 /** the planet a scene is on: the scene's override, else its still's, else by the scene id (null = none known) */
@@ -401,7 +437,9 @@ function patch(base: Ambient, p: AmbientPatch | undefined): Ambient {
  */
 export function ambientFor(planet: Planet, still?: string | null, sceneId?: string | null): Ambient {
   const k = stillKey(still);
-  const st = k ? STILL_AMBIENT[k] : undefined;
+  const pk = plateKey(still);
+  const bare = (x: StillAmbient | undefined): StillAmbient | undefined => x && { planet: x.planet, skyMask: x.skyMask, night: x.night };
+  const st = pk ? (PLATE_AMBIENT[pk] ?? bare(k ? STILL_AMBIENT[k] : undefined)) : k ? STILL_AMBIENT[k] : undefined;
   let a = AMBIENT[planet];
   if (st) {
     a = st.planet === planet ? patch(a, st) : patch(a, { skyMask: st.skyMask, regions: st.regions });

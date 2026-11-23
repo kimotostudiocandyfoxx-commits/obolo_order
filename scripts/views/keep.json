@@ -1,0 +1,59 @@
+{
+ "kimorin-sun": {
+  "back": 2,
+  "q3": 1,
+  "side": 1
+ },
+ "takoyaki-brother": {
+  "back": 1,
+  "q3": 1,
+  "side": 1
+ },
+ "takoyaki-sister": {
+  "back": 1,
+  "q3": 1,
+  "side": 1
+ },
+ "unchi-pinpon": {
+  "back": 1,
+  "q3": 1,
+  "side": 1
+ },
+ "kaiser1": {
+  "back": 1,
+  "q3": 1,
+  "side": 1
+ },
+ "freezy": {
+  "back": 1,
+  "q3": 1,
+  "side": 1
+ },
+ "hipokin": {
+  "back": 1,
+  "q3": 1,
+  "side": 1
+ },
+ "bossg": {
+  "back": 2,
+  "q3": 1,
+  "side": 1
+ },
+ "mikie": {
+  "back": "1f",
+  "q3": 1,
+  "side": 1
+ },
+ "monban": {
+  "back": 1
+ },
+ "talk-user": {
+  "back": 1
+ },
+ "talk-friend": {
+  "back": 1
+ },
+ "talk-bati": {
+  "back": 1
+ }
+}

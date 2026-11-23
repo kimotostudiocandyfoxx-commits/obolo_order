@@ -60,7 +60,7 @@ CAST = {
     'unchi-pinpon': dict(name='うんちピンポンくん', front='onboarding/unchi-pinpon.webp', key='blue', head=1.0,
                          desc='a cute glossy caramel-brown swirl-shaped mascot (soft-serve / spiral shell shape) with golden stars and a '
                               'heart on it, big shiny brown eyes, pink cheeks and a small smile, no arms, no legs'),
-    'kaiser1': dict(name='大根カイザー', front='onboarding/kaiser1-x-talk.webp', key='blue', head=0.35,
+    'kaiser1': dict(name='大根カイザー', front='onboarding/kaiser1-x-talk.webp', stem='kaiser1', key='blue', head=0.35,
                     desc='a stern giant white daikon radish with a grumpy wrinkled face, glowing orange eyes, a long white beard of '
                          'roots, green leaves on top and a mass of long tangled white roots for legs'),
     'freezy': dict(name='フリージー', front='onboarding/freezy.webp', key='blue', head=0.45,
@@ -182,6 +182,8 @@ def cmd_paint(a):
 def stem_paths(c: dict, view: str) -> tuple[str, str]:
     front = c['front']
     base, _ = os.path.splitext(front)
+    if c.get('stem'):
+        base = f'{os.path.dirname(front)}/{c["stem"]}'  # kaiser1's front is a pose (kaiser1-x-talk): its views are kaiser1-*
     if front.startswith('talk/'):
         rel = f'{os.path.dirname(front)}/{view}.webp'  # talk/user/back.webp
     else:

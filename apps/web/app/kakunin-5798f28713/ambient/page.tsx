@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AmbientFront, AmbientSky, type AmbientBox } from '@/components/story/Ambient';
 import { PLANETS, type Planet } from '@/lib/story/ambient';
+import { PLATES } from '@/lib/onboarding/plates';
 
 /**
  * /kakunin-5798f28713/ambient — the living backgrounds from day 3 on (lib/story/ambient.ts, components/story/Ambient.tsx):
  * each planet's sky motion and front effect over its current still, with a dummy row of three figures and a dummy
  * subtitle, so the motion and the subtitle's readability can be judged.
  *   ?p=<planet>      moon | mercury | venus | mars | jupiter | saturn | uranus | neptune | sun | pluto | earth | space
- *   ?s=<still>       another still of that planet (e.g. s/mercury-port, s/saturn-night, s/venus-night)
+ *   ?s=<still>       another still of that planet (e.g. s/mercury-port, s/saturn-night, s/venus-night), or a row
+ *                    plate (s/plate-saturn-inside: its horizon and sky mask come from lib/onboarding/plates.ts)
  *   ?q=full          the sky at full quality even on a software GL (captures)
  *   ?i=<0..1.5>      intensity      ?off=1  the still alone (compare)      ?bare=1  no panel (screenshots)
  */
@@ -31,12 +33,12 @@ const STILL: Record<Planet, string> = {
 };
 const NAME: Record<Planet, string> = { moon: '月', mercury: '水星', venus: '金星', mars: '火星', jupiter: '木星', saturn: '土星', uranus: '天王星', neptune: '海王星', sun: '太陽', pluto: '冥王星', earth: '地球', space: 'ロケット' };
 const MORE: Partial<Record<Planet, string[]>> = {
-  moon: ['s/moon-night'],
-  mercury: ['s/mercury-port'],
+  moon: ['s/moon-night', 's/plate-moon-temple'],
+  mercury: ['s/mercury-port', 's/plate-mercury-port'],
   venus: ['s/venus-night'],
   mars: ['s/arr-mars-city'],
   jupiter: ['s/arr-jupiter-canopy'],
-  saturn: ['s/saturn-night', 's/saturn-outside'],
+  saturn: ['s/saturn-night', 's/saturn-outside', 's/plate-saturn-inside'],
   uranus: ['s/uranus-shop'],
 };
 
@@ -54,7 +56,10 @@ function View() {
   const off = q.get('off') === '1';
   const bare = q.get('bare') === '1';
   const quality = q.get('q') === 'full' ? ('full' as const) : ('auto' as const);
-  const props = { planet: p, sceneId: null, plate: { src }, intensity, avoid: HEADS, subtitleTop: SUB_TOP, quality };
+  // a row plate (?s=s/plate-saturn-inside): its horizon and sky mask from lib/onboarding/plates.ts
+  const pl = Object.values(PLATES).find((x) => x.image === `${still}.jpg`);
+  const plate = pl ? { src, horizonY: pl.horizonY, floorY: pl.floorY, skyMask: pl.skyMask && `/onboarding/${pl.skyMask}` } : { src };
+  const props = { planet: p, sceneId: null, plate, intensity, avoid: HEADS, subtitleTop: SUB_TOP, quality };
   return (
     <main className="fixed inset-0 overflow-hidden bg-black text-white">
       {/* the still (as TalkScene's place: cover) */}

@@ -8,7 +8,7 @@ import { DAY7 } from '../onboarding/day7';
 import { DAY8 } from '../onboarding/day8';
 import type { Step } from '../onboarding/script';
 import { stageOf } from '../onboarding/stage';
-import { AMBIENT, ambientFor, planetOf, PLANETS, SCENE_AMBIENT, STILL_AMBIENT, stillKey } from './ambient';
+import { AMBIENT, ambientFor, PLATE_AMBIENT, plateKey, planetOf, PLANETS, SCENE_AMBIENT, STILL_AMBIENT, stillKey } from './ambient';
 
 /** every still shown under a row scene (day 3 on, the members' days), with its scene */
 function rowStills(steps: Step[]): [string, string][] {
@@ -78,5 +78,18 @@ describe('ambient table', () => {
     const pluto = ambientFor('pluto', 's/uranus-field', 'M-PLUTO-S001');
     expect(pluto.sky.some((l) => l.kind === 'ring')).toBe(false);
     expect(pluto.skyMask).toEqual(STILL_AMBIENT['uranus-field'].skyMask);
+  });
+
+  it('plates: their own positions, or none of the still’s', () => {
+    expect(plateKey('/onboarding/s/plate-saturn-inside.jpg')).toBe('plate-saturn-inside');
+    expect(plateKey('s/saturn-inside')).toBeNull();
+    expect(ambientFor('moon', '/onboarding/s/plate-moon-temple.jpg').regions).toEqual(PLATE_AMBIENT['plate-moon-temple'].regions);
+    // a plate with no entry (uranus-shop has none of its own): the still's planet and sky rule, no painted objects
+    const shop = ambientFor('uranus', '/onboarding/s/plate-uranus-shop.jpg');
+    expect(shop.skyMask).toEqual(STILL_AMBIENT['uranus-shop'].skyMask);
+    const sat = ambientFor('saturn', '/onboarding/s/plate-saturn-night.jpg');
+    expect(sat.regions).toBeUndefined();
+    expect(sat.sky.some((l) => l.kind === 'ring')).toBe(false);
+    for (const [k, v] of Object.entries(PLATE_AMBIENT)) expect(STILL_AMBIENT[k.replace(/^plate-/, '')]?.planet, k).toBe(v.planet);
   });
 });

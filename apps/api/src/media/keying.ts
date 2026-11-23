@@ -445,10 +445,11 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
     }
     if (ch && toBg[i] <= 4 && keyness(ref, i * 3, ch) < 10) {
       // the classic clamp: the key's channels not above the others, nor pushed below them (a lilac rim on green)
+      // (the excess comes off all of the key's channels alike: magenta's red and blue together, so brown stays brown)
       const c3 = [r, g, b];
-      const top = Math.max(...ch.lo.map((c) => c3[c]));
+      const ex = Math.max(0, keyness(c3, 0, ch) - 4);
       const bot = Math.min(...ch.lo.map((c) => c3[c]));
-      for (const c of ch.hi) c3[c] = Math.max(Math.min(c3[c], top + 4), bot * 0.94);
+      for (const c of ch.hi) c3[c] = Math.max(c3[c] - ex, Math.min(c3[c], bot * 0.94));
       [r, g, b] = c3;
     } else if (!ch && kc > 0.03 && toBg[i] <= 3) {
       oklab(r, g, b, t3);

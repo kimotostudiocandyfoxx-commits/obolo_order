@@ -248,7 +248,8 @@ function maskFromImage(img: HTMLImageElement): HTMLCanvasElement {
   g.drawImage(img, 0, 0, c.width, c.height);
   const d = g.getImageData(0, 0, c.width, c.height);
   for (let k = 0; k < d.data.length; k += 4) {
-    d.data[k + 3] = d.data[k];
+    // white = sky; a transparent pixel is not sky either way
+    d.data[k + 3] = Math.round((d.data[k] * d.data[k + 3]) / 255);
     d.data[k] = d.data[k + 1] = d.data[k + 2] = 255;
   }
   g.putImageData(d, 0, 0);
@@ -645,7 +646,7 @@ export function AmbientSky(props: AmbientProps) {
     const running = !paused && !hidden && !reduced;
     let raf = 0;
     let lastDraw = -1e9;
-    const drift = def.drift ?? 3;
+    const drift = def.drift ?? 2;
     const frame = (now: number) => {
       const t = clock.tick(now, running) + (reduced ? 12 : 0);
       if (prev >= 0 && running) {
@@ -696,7 +697,7 @@ export function AmbientSky(props: AmbientProps) {
   const picStyle: CSSProperties = { position: 'absolute', left: pr.left, top: pr.top, width: pr.width, height: pr.height, backgroundImage: src ? `url("${src}")` : undefined, backgroundSize: '100% 100%' };
   return (
     <div ref={box} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden" data-ambient="sky">
-      {img && maskUrl && (
+      {img && maskUrl && def.drift !== 0 && (
         <div ref={driftRef} style={{ ...picStyle, WebkitMaskImage: `url(${maskUrl})`, maskImage: `url(${maskUrl})`, WebkitMaskSize: '100% 100%', maskSize: '100% 100%', willChange: 'transform' }} />
       )}
       {img &&
@@ -866,7 +867,8 @@ export function AmbientFront(props: AmbientProps) {
     if (!canvas || !size.w || !size.h) return;
     const W = size.w;
     const H = size.h;
-    const dpr = Math.min(DPR_CAP, window.devicePixelRatio || 1);
+    // soft particles: 1.5 is enough (under the DPR cap of 2) and saves ~45% of the canvas upload each frame
+    const dpr = Math.min(1.5, DPR_CAP, window.devicePixelRatio || 1);
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
     const g = canvas.getContext('2d')!;

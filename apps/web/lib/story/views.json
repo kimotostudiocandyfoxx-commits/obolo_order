@@ -1,5 +1,5 @@
 {
- "note": "Angle views of the story cast (scripts/views/views.py). Per character: the front picture and each view that exists. All pictures of a character share the front picture's scale and foot line: the view canvas has the front's height and foot y; its width is the front's plus padX on each side (0 unless a pose is wider), the figure centred on the front figure's centre. q3 and side face LEFT; mirror (scaleX(-1)) for right. back is seen from behind (no face). Boxes are [x, y, w, h] in the picture's own pixels; foot = the lowest solid row.",
+ "note": "Angle views of the story cast (scripts/views/views.py). Per character: the front picture and each view that exists. All pictures of a character share the front picture's scale and foot line: the view canvas has the front's height and foot y; its width is the front's plus padX on each side (0 unless a pose is wider), the figure centred on the front figure's centre. q3 and side face LEFT; mirror (scaleX(-1)) for right. back is seen from behind (no face). Boxes are [x, y, w, h] in the picture's own pixels; foot = the lowest solid row. Users' looks, friends (other users' looks) and Bati get ONLY a back view besides the front (user decision 2026-11-23; talk-user / talk-friend / talk-bati here): the production plan is to paint just the back view for each look and Bati at creation, about 1/3 of the earlier three-view estimate.",
  "views": [
   "q3",
   "side",
@@ -27,7 +27,68 @@
      432
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/kimorin-sun-back.webp",
+     "w": 885,
+     "h": 1100,
+     "padX": 0,
+     "box": [
+      104,
+      10,
+      677,
+      1080
+     ],
+     "foot": 1090,
+     "head": [
+      326,
+      10,
+      359,
+      432
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/kimorin-sun-q3.webp",
+     "w": 885,
+     "h": 1100,
+     "padX": 0,
+     "box": [
+      110,
+      10,
+      665,
+      1080
+     ],
+     "foot": 1090,
+     "head": [
+      154,
+      10,
+      421,
+      432
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/kimorin-sun-side.webp",
+     "w": 885,
+     "h": 1100,
+     "padX": 0,
+     "box": [
+      148,
+      10,
+      589,
+      1080
+     ],
+     "foot": 1090,
+     "head": [
+      148,
+      10,
+      398,
+      432
+     ],
+     "try": 1
+    }
+   }
   },
   "takoyaki-brother": {
    "name": "たこ焼きブラザー",
@@ -49,7 +110,68 @@
      224
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/takoyaki-brother-back.webp",
+     "w": 852,
+     "h": 1319,
+     "padX": 0,
+     "box": [
+      4,
+      2,
+      843,
+      1315
+     ],
+     "foot": 1317,
+     "head": [
+      17,
+      2,
+      822,
+      224
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/takoyaki-brother-q3.webp",
+     "w": 852,
+     "h": 1319,
+     "padX": 0,
+     "box": [
+      80,
+      2,
+      691,
+      1315
+     ],
+     "foot": 1317,
+     "head": [
+      216,
+      2,
+      545,
+      224
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/takoyaki-brother-side.webp",
+     "w": 852,
+     "h": 1319,
+     "padX": 0,
+     "box": [
+      168,
+      2,
+      517,
+      1315
+     ],
+     "foot": 1317,
+     "head": [
+      261,
+      2,
+      423,
+      224
+     ],
+     "try": 1
+    }
+   }
   },
   "takoyaki-sister": {
    "name": "たこ焼きシスター",
@@ -71,7 +193,68 @@
      199
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/takoyaki-sister-back.webp",
+     "w": 910,
+     "h": 1334,
+     "padX": 0,
+     "box": [
+      11,
+      2,
+      888,
+      1329
+     ],
+     "foot": 1331,
+     "head": [
+      298,
+      2,
+      325,
+      199
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/takoyaki-sister-q3.webp",
+     "w": 910,
+     "h": 1334,
+     "padX": 0,
+     "box": [
+      68,
+      2,
+      774,
+      1329
+     ],
+     "foot": 1331,
+     "head": [
+      289,
+      2,
+      267,
+      199
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/takoyaki-sister-side.webp",
+     "w": 910,
+     "h": 1334,
+     "padX": 0,
+     "box": [
+      104,
+      2,
+      701,
+      1329
+     ],
+     "foot": 1331,
+     "head": [
+      254,
+      2,
+      243,
+      199
+     ],
+     "try": 1
+    }
+   }
   },
   "unchi-pinpon": {
    "name": "うんちピンポンくん",
@@ -93,7 +276,68 @@
      991
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/unchi-pinpon-back.webp",
+     "w": 726,
+     "h": 995,
+     "padX": 0,
+     "box": [
+      10,
+      2,
+      707,
+      991
+     ],
+     "foot": 993,
+     "head": [
+      10,
+      2,
+      707,
+      991
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/unchi-pinpon-q3.webp",
+     "w": 726,
+     "h": 995,
+     "padX": 0,
+     "box": [
+      36,
+      2,
+      654,
+      991
+     ],
+     "foot": 993,
+     "head": [
+      36,
+      2,
+      654,
+      991
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/unchi-pinpon-side.webp",
+     "w": 726,
+     "h": 995,
+     "padX": 0,
+     "box": [
+      87,
+      2,
+      552,
+      991
+     ],
+     "foot": 993,
+     "head": [
+      87,
+      2,
+      552,
+      991
+     ],
+     "try": 1
+    }
+   }
   },
   "kaiser1": {
    "name": "大根カイザー",
@@ -115,7 +359,68 @@
      379
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/kaiser1-back.webp",
+     "w": 518,
+     "h": 1100,
+     "padX": 0,
+     "box": [
+      8,
+      9,
+      504,
+      1083
+     ],
+     "foot": 1092,
+     "head": [
+      8,
+      9,
+      504,
+      379
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/kaiser1-q3.webp",
+     "w": 518,
+     "h": 1100,
+     "padX": 0,
+     "box": [
+      24,
+      9,
+      470,
+      1083
+     ],
+     "foot": 1092,
+     "head": [
+      58,
+      9,
+      436,
+      379
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/kaiser1-side.webp",
+     "w": 518,
+     "h": 1100,
+     "padX": 0,
+     "box": [
+      40,
+      9,
+      439,
+      1083
+     ],
+     "foot": 1092,
+     "head": [
+      61,
+      9,
+      418,
+      379
+     ],
+     "try": 1
+    }
+   }
   },
   "freezy": {
    "name": "フリージー",
@@ -137,7 +442,68 @@
      583
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/freezy-back.webp",
+     "w": 968,
+     "h": 1299,
+     "padX": 0,
+     "box": [
+      19,
+      2,
+      930,
+      1296
+     ],
+     "foot": 1298,
+     "head": [
+      31,
+      2,
+      897,
+      583
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/freezy-q3.webp",
+     "w": 968,
+     "h": 1299,
+     "padX": 0,
+     "box": [
+      24,
+      2,
+      921,
+      1296
+     ],
+     "foot": 1298,
+     "head": [
+      24,
+      2,
+      906,
+      583
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/freezy-side.webp",
+     "w": 968,
+     "h": 1299,
+     "padX": 0,
+     "box": [
+      62,
+      2,
+      845,
+      1296
+     ],
+     "foot": 1298,
+     "head": [
+      62,
+      2,
+      842,
+      583
+     ],
+     "try": 1
+    }
+   }
   },
   "hipokin": {
    "name": "ヒポキン",
@@ -159,7 +525,68 @@
      264
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/hipokin-back.webp",
+     "w": 673,
+     "h": 1326,
+     "padX": 0,
+     "box": [
+      14,
+      2,
+      646,
+      1322
+     ],
+     "foot": 1324,
+     "head": [
+      78,
+      2,
+      513,
+      264
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/hipokin-q3.webp",
+     "w": 673,
+     "h": 1326,
+     "padX": 0,
+     "box": [
+      60,
+      2,
+      553,
+      1322
+     ],
+     "foot": 1324,
+     "head": [
+      132,
+      2,
+      451,
+      264
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/hipokin-side.webp",
+     "w": 673,
+     "h": 1326,
+     "padX": 0,
+     "box": [
+      122,
+      2,
+      428,
+      1322
+     ],
+     "foot": 1324,
+     "head": [
+      122,
+      2,
+      409,
+      264
+     ],
+     "try": 1
+    }
+   }
   },
   "bossg": {
    "name": "ボスG",
@@ -181,7 +608,68 @@
      256
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/bossg-back.webp",
+     "w": 793,
+     "h": 1290,
+     "padX": 0,
+     "box": [
+      25,
+      6,
+      743,
+      1282
+     ],
+     "foot": 1288,
+     "head": [
+      133,
+      6,
+      519,
+      256
+     ],
+     "try": 1
+    },
+    "q3": {
+     "src": "/onboarding/bossg-q3.webp",
+     "w": 793,
+     "h": 1290,
+     "padX": 0,
+     "box": [
+      62,
+      6,
+      670,
+      1282
+     ],
+     "foot": 1288,
+     "head": [
+      201,
+      6,
+      447,
+      256
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/bossg-side.webp",
+     "w": 793,
+     "h": 1290,
+     "padX": 0,
+     "box": [
+      81,
+      6,
+      631,
+      1282
+     ],
+     "foot": 1288,
+     "head": [
+      82,
+      6,
+      583,
+      256
+     ],
+     "try": 1
+    }
+   }
   },
   "mikie": {
    "name": "MIKIE⭐︎DRILL",
@@ -203,7 +691,69 @@
      301
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/mikie-back.webp",
+     "w": 690,
+     "h": 1021,
+     "padX": 0,
+     "box": [
+      6,
+      9,
+      678,
+      1003
+     ],
+     "foot": 1012,
+     "head": [
+      191,
+      9,
+      493,
+      301
+     ],
+     "try": 1,
+     "flipped": true
+    },
+    "q3": {
+     "src": "/onboarding/mikie-q3.webp",
+     "w": 690,
+     "h": 1021,
+     "padX": 0,
+     "box": [
+      82,
+      9,
+      527,
+      1003
+     ],
+     "foot": 1012,
+     "head": [
+      82,
+      9,
+      454,
+      301
+     ],
+     "try": 1
+    },
+    "side": {
+     "src": "/onboarding/mikie-side.webp",
+     "w": 690,
+     "h": 1021,
+     "padX": 0,
+     "box": [
+      130,
+      9,
+      429,
+      1003
+     ],
+     "foot": 1012,
+     "head": [
+      130,
+      9,
+      429,
+      301
+     ],
+     "try": 1
+    }
+   }
   },
   "monban": {
    "name": "MONBAN",
@@ -225,7 +775,28 @@
      205
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/onboarding/monban-back.webp",
+     "w": 720,
+     "h": 1147,
+     "padX": 0,
+     "box": [
+      114,
+      185,
+      421,
+      932
+     ],
+     "foot": 1117,
+     "head": [
+      201,
+      185,
+      250,
+      205
+     ],
+     "try": 1
+    }
+   }
   },
   "talk-user": {
    "name": "{neo}",
@@ -247,7 +818,28 @@
      215
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/talk/user/back.webp",
+     "w": 355,
+     "h": 900,
+     "padX": 0,
+     "box": [
+      68,
+      173,
+      217,
+      718
+     ],
+     "foot": 891,
+     "head": [
+      95,
+      173,
+      164,
+      215
+     ],
+     "try": 1
+    }
+   }
   },
   "talk-friend": {
    "name": "friend",
@@ -269,7 +861,28 @@
      129
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/talk/friend/back.webp",
+     "w": 439,
+     "h": 900,
+     "padX": 0,
+     "box": [
+      84,
+      173,
+      269,
+      719
+     ],
+     "foot": 892,
+     "head": [
+      151,
+      173,
+      132,
+      129
+     ],
+     "try": 1
+    }
+   }
   },
   "talk-bati": {
    "name": "バティ",
@@ -291,7 +904,28 @@
      718
     ]
    },
-   "views": {}
+   "views": {
+    "back": {
+     "src": "/talk/bati/back.webp",
+     "w": 1320,
+     "h": 900,
+     "padX": 0,
+     "box": [
+      253,
+      173,
+      813,
+      718
+     ],
+     "foot": 891,
+     "head": [
+      253,
+      173,
+      813,
+      718
+     ],
+     "try": 1
+    }
+   }
   },
   "obolon": {
    "name": "OBOLON",

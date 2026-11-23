@@ -337,11 +337,12 @@ def cut(rgb: np.ndarray, key=None, *, erode: int = 1, feather: float = 0.6, desp
         # and never pushed below them either (an over-unmixed edge turns the opposite colour: a lilac rim on green)
         hi, lo_ = ch
         edge = (to_bg <= despill_px + 1) & (core | near) & (keyness(np.clip(ref, 0, 255), hi, lo_) < 10)
-        top = out[..., lo_].max(axis=-1)
+        # (the excess of the key's channels over the others comes off all of them alike: magenta's red and blue
+        # together, so a brown edge stays brown)
+        ex = np.clip(keyness(out, hi, lo_) - 4, 0, None)
         bot = out[..., lo_].min(axis=-1)
         for c in hi:
-            v = np.minimum(out[..., c], top + 4)
-            v = np.maximum(v, bot * 0.94)
+            v = np.maximum(out[..., c] - ex, np.minimum(out[..., c], bot * 0.94))
             out[..., c] = np.where(edge, v, out[..., c])
     elif despill_px > 0 and kc > 0.03:
         edge = (to_bg <= despill_px) & (core | near)
