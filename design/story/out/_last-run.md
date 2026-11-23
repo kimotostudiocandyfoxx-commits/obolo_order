@@ -1,37 +1,21 @@
-# Story images — 2026-11-23T03:07:08.086Z
+# Story images — 2026-11-23T03:10:49.021Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 10枚 / キューの項目: 131件 / 費用の目安: 約70円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 16枚 / キューの項目: 124件 / 費用の目安: 約112円
 
-- ✅ plate-mars-screens（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-mercury-ice（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-moon-night（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-uranus-press（1600x2880, 参考 1枚）: 1枚
-- ✅ plate-rocket-space（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-neptune-town（1600x2880, 参考 1枚）: 0枚
-- ✅ cutout-hipokin-x-talk-magenta（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kaiser1-x-joy-blue（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kaiser1-x-shock-blue（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kaiser1-x-talk-blue（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kimorin-g-joy-green（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kimorin-g-lecture-green（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kimorin-g-point-green（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-kimorin-g-shock-green（1152x1536, 参考 1枚）: 1枚
-- ⏭ cutout-kimorin-g-talk-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-tears-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-think-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-joy-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-lecture-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-point-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-shock-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-smug-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-talk-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-tears-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-n-think-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-x-joy-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-x-lecture-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-x-point-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-x-shock-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-x-smug-green: 今回の上限（16枚）を超えるので次回
+- ✅ cutout-kimorin-g-talk-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-g-tears-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-g-think-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-lecture-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-joy-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-point-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-shock-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-smug-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-talk-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-think-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-n-tears-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-x-joy-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-x-lecture-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-x-point-green（1152x1536, 参考 1枚）: 1枚
 - ⏭ cutout-kimorin-x-talk-green: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-kimorin-x-tears-green: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-kimorin-x-think-green: 今回の上限（16枚）を超えるので次回
@@ -58,5 +42,5 @@ Seedream 5.0 Pro（runware）/ 新しく描いた: 10枚 / キューの項目: 1
 - ⏭ plate-uranus-field-v2: 今回の上限（16枚）を超えるので次回
 - ⏭ still-pluto-plain: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-pluto-plain: 今回の上限（16枚）を超えるので次回
-- ✅ plate-earth-hall（1600x2880, 参考 1枚）: 0枚
-- ✅ cutout-kimorin-g-smug-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-x-shock-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-x-smug-green（1152x1536, 参考 1枚）: 1枚
