@@ -7835,6 +7835,28 @@
         "design/mv-art/out/iida-gb-lie-v2.jpg"
       ],
       "prompt": "Edit this picture: keep everything exactly the same — the same angel, face, grin, finger on his lips, tilted head, halo, wings, drawing style, colours and the plain bright green background — but make his nose stretch out long, straight and pointed like a wooden puppet's nose that grows when he tells a lie, reaching far toward the side of the picture. No text."
+    },
+    {
+      "id": "iida-logo-flourish-a",
+      "prompt": "A single ornate symmetrical baroque gold filigree scroll flourish divider: elegant thin curling acanthus scrolls spreading left and right from a small central fleur-de-lis, polished metallic gold with soft highlights and a subtle bevel, like a luxury wedding invitation ornament, horizontal and centred, delicate and refined, no text, no letters, no frame. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, the whole ornament inside the frame with a margin. The fleur-de-lis points upward.",
+      "w": 2048,
+      "h": 768,
+      "size": [
+        1920,
+        720
+      ],
+      "always": false
+    },
+    {
+      "id": "iida-logo-flourish-b",
+      "prompt": "A single ornate symmetrical baroque gold filigree scroll flourish divider: elegant thin curling acanthus scrolls spreading left and right from a small central fleur-de-lis, polished metallic gold with soft highlights and a subtle bevel, like a luxury wedding invitation ornament, horizontal and centred, delicate and refined, no text, no letters, no frame. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, the whole ornament inside the frame with a margin. The scrolls are a little longer and more swirling.",
+      "w": 2048,
+      "h": 768,
+      "size": [
+        1920,
+        720
+      ],
+      "always": false
     }
   ],
   "redo": []
