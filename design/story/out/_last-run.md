@@ -1,27 +1,21 @@
-# Story images — 2026-11-23T02:51:03.276Z
+# Story images — 2026-11-23T02:59:53.730Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 6枚 / キューの項目: 121件 / 費用の目安: 約42円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 9枚 / キューの項目: 129件 / 費用の目安: 約63円
 
-- ✅ plate-moon-night（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-jupiter-daikon-v2（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-mercury-ice（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-jupiter-daikon-v2（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-venus-stage-v3（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-moon-night（1600x2880, 参考 1枚）: 0枚
 - ✅ plate-mars-screens（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-venus-night（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-sun-inside（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-venus-night（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-rocket-space（1600x2880, 参考 1枚）: 0枚
 - ✅ plate-uranus-press（1600x2880, 参考 1枚）: 0枚
 - ✅ plate-neptune-town（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-neptune-islands（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-earth-hall（1600x2880, 参考 1枚）: 0枚
-- ✅ cutout-daikon-kaiser-x-joy-magenta（1152x1536, 参考 1枚）: 1枚
-- ✅ view-bossg-back-v2（1152x1536, 参考 1枚）: 1枚
-- ⏭ cutout-daikon-kaiser-x-talk-magenta: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-freezy-x-joy-blue: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-freezy-x-shock-blue: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-freezy-x-talk-blue: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-hipokin-x-joy-magenta: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-hipokin-x-shock-magenta: 今回の上限（16枚）を超えるので次回
+- ✅ plate-neptune-islands（1600x2880, 参考 1枚）: 1枚
+- ✅ cutout-daikon-kaiser-x-talk-magenta（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-freezy-x-joy-blue（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-freezy-x-shock-blue（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-freezy-x-talk-blue（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-hipokin-x-joy-magenta（1152x1536, 参考 1枚）: 1枚
 - ⏭ cutout-hipokin-x-talk-magenta: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-kaiser1-x-joy-blue: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-kaiser1-x-shock-blue: 今回の上限（16枚）を超えるので次回
@@ -63,5 +57,13 @@ Seedream 5.0 Pro（runware）/ 新しく描いた: 6枚 / キューの項目: 12
 - ⏭ cutout-unchi-pinpon-x-joy-blue: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-unchi-pinpon-x-shock-blue: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-unchi-pinpon-x-talk-blue: 今回の上限（16枚）を超えるので次回
-- ✅ view-kimorin-sun-back-v2（1152x1536, 参考 2枚）: 1枚
-- ✅ cutout-daikon-kaiser-x-shock-magenta（1152x1536, 参考 1枚）: 1枚
+- ⏭ kimorin-talk-smile-pose-talk: 今回の上限（16枚）を超えるので次回
+- ⏭ kimorin-talk-surprised-pose-talk: 今回の上限（16枚）を超えるので次回
+- ⏭ kimorin-talk-thinking-pose-talk: 今回の上限（16枚）を超えるので次回
+- ⏭ kimorin-talk-sad-pose-talk: 今回の上限（16枚）を超えるので次回
+- ⏭ kimorin-talk-shy-pose-talk: 今回の上限（16枚）を超えるので次回
+- ⏭ plate-saturn-night-v2: 今回の上限（16枚）を超えるので次回
+- ⏭ plate-arr-mars-city-v2: 今回の上限（16枚）を超えるので次回
+- ⏭ plate-uranus-field-v2: 今回の上限（16枚）を超えるので次回
+- ✅ cutout-hipokin-x-shock-magenta（1152x1536, 参考 1枚）: 1枚
+- ✅ plate-earth-hall（1600x2880, 参考 1枚）: 0枚
