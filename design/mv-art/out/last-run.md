@@ -1,6 +1,6 @@
-# UI art — 2026-11-23T04:45:33.135Z
+# UI art — 2026-11-23T05:44:27.728Z
 
-Seedream 5.0 Pro / 2枚 / 約30円
+Seedream 5.0 Pro / 2枚 / 約14円
 
-- ✅ iida-gb-lie-nose
-- ✅ iida-intro-last
+- ✅ iida-logo-flourish-a
+- ✅ iida-logo-flourish-b
