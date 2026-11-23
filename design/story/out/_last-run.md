@@ -1,26 +1,67 @@
-# Story images — 2026-11-23T02:41:02.139Z
+# Story images — 2026-11-23T02:51:03.276Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 8枚 / キューの項目: 72件 / 費用の目安: 約56円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 6枚 / キューの項目: 121件 / 費用の目安: 約42円
 
-- ✅ plate-jupiter-forest（1600x2880, 参考 1枚）: 1枚
-- ✅ plate-saturn-night（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-moon-night（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-jupiter-daikon-v2（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-mercury-port（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-mercury-ice（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-arr-mars-city（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-jupiter-daikon-v2（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-venus-stage-v3（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-mars-screens（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-venus-stage-v3（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-rocket-earth（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-venus-night（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-sun-inside（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-rocket-space（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-launch-pit（1600x2880, 参考 1枚）: 1枚
-- ✅ plate-sun-inside（1600x2880, 参考 1枚）: 0枚
-- ⏭ plate-uranus-press: 今回の上限（16枚）を超えるので次回
-- ⏭ plate-neptune-town: 今回の上限（16枚）を超えるので次回
-- ⏭ plate-neptune-islands: 今回の上限（16枚）を超えるので次回
-- ⏭ plate-earth-hall: 今回の上限（16枚）を超えるので次回
-- ⏭ view-kimorin-sun-back-v2: 今回の上限（16枚）を超えるので次回
-- ⏭ view-bossg-back-v2: 今回の上限（16枚）を超えるので次回
-- ✅ plate-uranus-field（1600x2880, 参考 1枚）: 1枚
-- ✅ plate-uranus-shop（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-uranus-press（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-neptune-town（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-neptune-islands（1600x2880, 参考 1枚）: 0枚
+- ✅ plate-earth-hall（1600x2880, 参考 1枚）: 0枚
+- ✅ cutout-daikon-kaiser-x-joy-magenta（1152x1536, 参考 1枚）: 1枚
+- ✅ view-bossg-back-v2（1152x1536, 参考 1枚）: 1枚
+- ⏭ cutout-daikon-kaiser-x-talk-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-freezy-x-joy-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-freezy-x-shock-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-freezy-x-talk-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-hipokin-x-joy-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-hipokin-x-shock-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-hipokin-x-talk-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kaiser1-x-joy-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kaiser1-x-shock-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kaiser1-x-talk-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-joy-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-lecture-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-point-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-shock-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-smug-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-talk-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-tears-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-g-think-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-joy-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-lecture-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-point-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-shock-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-smug-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-talk-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-tears-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-n-think-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-joy-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-lecture-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-point-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-shock-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-smug-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-talk-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-tears-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-kimorin-x-think-green: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-monban-x-arms-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-monban-x-point-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-monban-x-stop-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-monban-x-talk-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-takoyaki-brother-x-joy-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-takoyaki-brother-x-shock-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-takoyaki-brother-x-talk-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-takoyaki-sister-x-joy-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-takoyaki-sister-x-shock-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-takoyaki-sister-x-talk-magenta: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-unchi-pinpon-x-joy-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-unchi-pinpon-x-shock-blue: 今回の上限（16枚）を超えるので次回
+- ⏭ cutout-unchi-pinpon-x-talk-blue: 今回の上限（16枚）を超えるので次回
+- ✅ view-kimorin-sun-back-v2（1152x1536, 参考 2枚）: 1枚
+- ✅ cutout-daikon-kaiser-x-shock-magenta（1152x1536, 参考 1枚）: 1枚
