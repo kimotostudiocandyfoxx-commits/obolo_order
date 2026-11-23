@@ -7595,6 +7595,62 @@
       "refs": [
         "design/mv-art/out/iida-char-b.jpg"
       ]
+    },
+    {
+      "id": "iida-gb-cherubs-left",
+      "prompt": "A group of four chubby little baby cherubs in the same drawing style as the reference angel (round baby faces, blond curls, small gold halos, small white wings, white cloth wrapped like a nappy) floating in a loose staggered row, all facing to the right and blowing long golden fanfare trumpets pointed up and to the right, cheeks puffed, joyful, side view. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no clouds, no other objects, every character fully inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-cherubs-right",
+      "prompt": "A group of four chubby little baby cherubs in the same drawing style as the reference angel (round baby faces, blond curls, small gold halos, small white wings, white cloth wrapped like a nappy) floating in a loose staggered row, all facing to the left and blowing long golden fanfare trumpets pointed up and to the left, cheeks puffed, joyful, side view. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no clouds, no other objects, every character fully inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-cherub-1",
+      "prompt": "One of the chubby little baby cherubs in the same drawing style as the reference angel (round baby faces, blond curls, small gold halos, small white wings, white cloth wrapped like a nappy) floating and blowing a long golden fanfare trumpet pointed up and to the right, cheeks puffed, full body, side view. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no clouds, no other objects, every character fully inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-gb-cherub-2",
+      "prompt": "One of the chubby little baby cherubs in the same drawing style as the reference angel (round baby faces, blond curls, small gold halos, small white wings, white cloth wrapped like a nappy) floating and blowing a long golden fanfare trumpet pointed up and to the right, eyes closed happily, little feet kicking, full body, side view. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, no text, no letters. Plain solid bright chroma-key green background (#00FF00) filling the whole picture, no shadow, no ground, no clouds, no other objects, every character fully inside the frame with a margin.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
     }
   ],
   "redo": []
