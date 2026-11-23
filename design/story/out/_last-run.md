@@ -1,37 +1,21 @@
-# Story images — 2026-11-23T02:24:20.771Z
+# Story images — 2026-11-23T02:28:42.594Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 15枚 / キューの項目: 71件 / 費用の目安: 約105円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 16枚 / キューの項目: 70件 / 費用の目安: 約112円
 
-- ✅ view-takoyaki-brother-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-kimorin-sun-q3-v1（1152x1536, 参考 2枚）: 1枚
-- ✅ view-takoyaki-sister-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-unchi-pinpon-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-kaiser1-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-freezy-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ plate-venus-stage（1600x2880, 参考 1枚）: 0枚
-- ✅ view-hipokin-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-bossg-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-mikie-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-talk-friend-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-talk-user-q3-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-talk-bati-q3-v1（1536x1152, 参考 1枚）: 1枚
-- ✅ view-kimorin-sun-side-v1（1152x1536, 参考 2枚）: 1枚
-- ⏭ view-unchi-pinpon-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-kaiser1-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-freezy-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-hipokin-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-bossg-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-mikie-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-talk-user-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-talk-friend-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ view-talk-bati-side-v1: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-talk: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-kororin: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-smile-pose: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-surprised-pose: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-thinking-pose: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-sad-pose: 今回の上限（16枚）を超えるので次回
-- ⏭ kimorin-talk-shy-pose: 今回の上限（16枚）を超えるので次回
+- ✅ view-unchi-pinpon-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-kaiser1-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-freezy-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-bossg-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-hipokin-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-mikie-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-talk-friend-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-talk-user-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ view-talk-bati-side-v1（1536x1152, 参考 1枚）: 1枚
+- ✅ kimorin-talk-talk（1152x1536, 参考 1枚）: 1枚
+- ✅ kimorin-talk-smile-pose（1152x1536, 参考 1枚）: 1枚
+- ✅ kimorin-talk-kororin（1536x1536, 参考 1枚）: 1枚
+- ✅ kimorin-talk-surprised-pose（1152x1536, 参考 1枚）: 1枚
+- ✅ kimorin-talk-thinking-pose（1152x1536, 参考 1枚）: 1枚
 - ⏭ plate-moon-night: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-saturn-night: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-jupiter-forest: 今回の上限（16枚）を超えるので次回
@@ -40,7 +24,7 @@ Seedream 5.0 Pro（runware）/ 新しく描いた: 15枚 / キューの項目: 7
 - ⏭ plate-mercury-port: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-mars-screens: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-arr-mars-city: 今回の上限（16枚）を超えるので次回
-- ⏭ plate-venus-stage-v2: 今回の上限（16枚）を超えるので次回
+- ⏭ plate-venus-stage-v3: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-venus-night: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-rocket-earth: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-rocket-space: 今回の上限（16枚）を超えるので次回
@@ -52,5 +36,5 @@ Seedream 5.0 Pro（runware）/ 新しく描いた: 15枚 / キューの項目: 7
 - ⏭ plate-neptune-town: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-neptune-islands: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-earth-hall: 今回の上限（16枚）を超えるので次回
-- ✅ view-takoyaki-brother-side-v1（1152x1536, 参考 1枚）: 1枚
-- ✅ view-takoyaki-sister-side-v1（1152x1536, 参考 1枚）: 1枚
+- ✅ kimorin-talk-sad-pose（1152x1536, 参考 1枚）: 1枚
+- ✅ kimorin-talk-shy-pose（1152x1536, 参考 1枚）: 1枚
