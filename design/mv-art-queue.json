@@ -8209,6 +8209,118 @@
         720
       ],
       "always": false
+    },
+    {
+      "id": "res-venus-longg",
+      "prompt": "Full-body character illustration of the long-haired gorilla in the reference picture (keep his design: long curly blond hair, round white sunglasses, headphones around the neck, studded cap, gold chain with a medallion, psychedelic patterned robe and sash, holding a big denture-shaped staff), redrawn in Japanese city-pop retro anime style: soft pastel sunset colours, smooth simple shapes, gentle airbrush, 1980s illustration look, 6 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-longg.jpg"
+      ]
+    },
+    {
+      "id": "res-venus-bossg",
+      "prompt": "Full-body character illustration of the cyborg gorilla in the reference picture (keep his design: round black sunglasses, banana in his mouth, many gold chains with a big medallion, mechanical glowing cyan robot arms, black leather shorts), redrawn in Japanese city-pop retro anime style: soft pastel sunset colours, smooth simple shapes, gentle airbrush, 1980s illustration look, 6 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-bossg.jpg"
+      ]
+    },
+    {
+      "id": "res-mercury-freezie",
+      "prompt": "Full-body character illustration of the refrigerator spirit in the reference picture (keep his design: a wooden old refrigerator body with three yellow eyes and a big black moustache and beard, long wild black hair, ragged robe with paper talismans, holding a small handheld fan, purple spirit flames), redrawn in Japanese youth-drama anime style with luminous clear light, crisp clean lineart, sparkling highlights, 6-7 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-freezie.jpg"
+      ]
+    },
+    {
+      "id": "res-mercury-salmon",
+      "prompt": "Full-body character illustration of the salmon-block mascot in the reference picture (keep his design: a rectangular block of salmon sashimi with white fat stripes, big sparkling eyes, rosy cheeks, little arms and legs), redrawn in Japanese youth-drama anime style with luminous clear light, crisp clean lineart, sparkling highlights, 6-7 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-salmon.jpg"
+      ]
+    },
+    {
+      "id": "res-pluto-ribbon",
+      "prompt": "Full-body character illustration of the fluffy ribbon creature in the reference picture (keep its design: a round body made of curly pink and cream ribbons, big sparkling eyes, rosy cheeks, both hands making peace signs), redrawn in soft Japanese picture-book anime style: gentle colour-pencil and watercolour texture, pastel colours, simple rounded shapes, 4 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-ribbon.jpg"
+      ]
+    },
+    {
+      "id": "res-uranus-croco",
+      "prompt": "Full-body character illustration of the crocodile queen in the reference picture (keep her design: crocodile head with a jewelled tiara, a grand wine-red and gold embroidered gown with a high lace collar, holding a folding fan), redrawn in Japanese yume-kawaii magical-girl anime style: sparkly pastel pink, mint and lavender, glitter, stars and hearts, big shiny eyes, 3 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-croco.jpg"
+      ]
+    },
+    {
+      "id": "res-mars-hippo",
+      "prompt": "Full-body character illustration of the hippo boss in the reference picture (keep his design: a big dark hippo with glowing cyan eyes and small tusks, a black pinstripe three-piece suit with ornate gold embroidery, a crocodile medallion on a gold chain, a red cravat), redrawn in 1980s-90s Japanese cel anime style: hard cel shadows, airbrushed highlights, neon magenta and cyan rim light, film grain, 7 heads tall. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-hippo.jpg"
+      ]
+    },
+    {
+      "id": "res-neptune-boombox",
+      "prompt": "Full-body character illustration of the boombox samurai in the reference picture (keep his design: a blue-scaled lizard-like spirit with glowing cyan eyes under a woven conical straw hat with goggles, a huge glowing boombox with a screen on his shoulder, a long patterned coat, orange baggy trousers, a katana and gold chains), redrawn in Japanese game-style anime: toon shading with pixel-art sparkles, chunky outlines, vivid purple and cyan, 2 heads tall chibi. Same character, same outfit and colours, standing in a confident pose, facing three-quarter toward the viewer. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text, the whole character inside the frame with a margin.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        720,
+        1280
+      ],
+      "always": false,
+      "refs": [
+        "/tmp/mv-res-boombox.jpg"
+      ]
     }
   ],
   "redo": []
