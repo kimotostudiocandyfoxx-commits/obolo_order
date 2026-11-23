@@ -50,37 +50,12 @@
       "prompt": "Pluto: a white ice plain spreading under a dark star-filled sky; far away on the plain, a small old library building with warm golden lit windows (a personal library); quiet and a little lonely, but the lights are gentle and inviting. Painted in exactly the same painterly, cinematic fantasy style and lighting quality as the reference pictures (other planets of the same story). Vertical composition, the library small in the middle distance. Absolutely no people, animals or figures of any size. No text, no letters, no watermark."
     },
     {
-      "id": "plate-pluto-plain",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/mercury-ice.jpg",
-        "apps/web/public/onboarding/s/moon-night.jpg"
-      ],
-      "prompt": "Pluto: a white ice plain spreading under a dark star-filled sky; far away on the plain, a small old library building with warm golden lit windows (a personal library); quiet and a little lonely, but the lights are gentle and inviting. Painted in exactly the same painterly, cinematic fantasy style and lighting quality as the reference pictures (other planets of the same story). A background plate at human scale for a stage where three small characters stand side by side on the ice in the lower middle: a clear flat ice floor across the lower part with its far edge at about 55% of the height; the horizon at about 45%; the library small and far, around 40–50% of the height; the lower middle open and empty; the bottom fifth calm and darker. Absolutely no figures of any kind anywhere, not even tiny ones in the distance: no people, no animals, no creatures. No text, no letters, no watermark."
-    },
-    {
-      "id": "plate-saturn-night-v2",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/saturn-night.jpg"
-      ],
-      "prompt": "Edit and extend this painting (a completely deserted place, empty of anyone) into a background plate of the same place (Saturn temple seen at night): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings. The place is deserted: remove every person or silhouette, including tiny distant ones on stairs, paths and streets."
-    },
-    {
       "id": "plate-arr-mars-city-v2",
       "size": "1600x2880",
       "refs": [
         "apps/web/public/onboarding/s/arr-mars-city.jpg"
       ],
       "prompt": "Edit and extend this painting (a completely deserted place, empty of anyone) into a background plate of the same place (the red Mars city with tall spires): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings. The place is deserted: remove every person or silhouette, including tiny distant ones on stairs, paths and streets."
-    },
-    {
-      "id": "plate-uranus-field-v2",
-      "size": "1600x2880",
-      "refs": [
-        "apps/web/public/onboarding/s/uranus-field.jpg"
-      ],
-      "prompt": "Edit and extend this painting (a completely deserted place, empty of anyone) into a background plate of the same place (the sky field above the clouds on Uranus with small round shops): pull the camera back to a wider, calmer establishing shot at human scale, as if for a stage where three small characters stand side by side on the floor in the lower middle. Keep the world, palette, light direction and painting style exactly the same. Requirements: a clear flat floor plane across the lower part of the picture with its far edge at about 58% of the height; the eye-level horizon at about 45% of the height; doors, pillars and furniture sized for a person standing on that floor; the lower middle of the picture open and empty for the characters; the bottom fifth calm, darker and not busy. No characters, no people, no creatures, no text, no letters, no watermark. Absolutely no figures of any kind anywhere in the picture, not even tiny ones in the distance: no people, no dolls, no animals, no creatures, no statues of beings. The place is deserted: remove every person or silhouette, including tiny distant ones on stairs, paths and streets."
     },
     {
       "id": "sample-kimorin-intro-v1",
