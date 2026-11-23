@@ -7156,6 +7156,220 @@
       "refs": [
         "/tmp/mv-iida-3.jpg"
       ]
+    },
+    {
+      "id": "iida-s00-title",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) standing proudly on a big smooth river stone, holding a paintbrush like a sword, a sparkling river and autumn trees behind him at sunrise, the upper third of the picture left calm and open sky for a title. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s01-asks",
+      "prompt": "the cartoon blond young father from the reference image (same face, shoulder-length blond hair, brown turtleneck) turns to the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) in a cozy park on an autumn day and asks him something with a curious tilted head and one finger raised; the angel looks back, startled. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-father-toon.jpg",
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s02-question",
+      "prompt": "Close-up of the cartoon blond young father from the reference image (same face, shoulder-length blond hair, brown turtleneck) with a big curious face, chin on his hand, several big floating question-mark shapes bouncing around his head. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-father-toon.jpg"
+      ]
+    },
+    {
+      "id": "iida-s03-engineer",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) wearing a yellow hard hat, holding a laptop and a huge wrench, grinning nervously and trying to look like an engineer, gears and blueprints floating around him. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s04-lie",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) caught telling a fib: sweating buckets, his halo slipping sideways, eyes darting, his nose stretching comically long, little sweat drops flying. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s05-sing",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) singing his heart out into a vintage ribbon microphone on a little theatre stage, a warm spotlight, red curtains and big bouncing musical notes around him. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s06-river",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) wading in a sparkling shallow river with his cloth rolled up, triumphantly holding up a smooth grey river stone like a treasure, a fish jumping beside him, autumn trees. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s07-workbench",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) at a wooden workbench full of paint cans and brushes, painting a smooth stone bright yellow with great concentration, tongue out, drops of yellow paint flying. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s10-ofcourse",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) bursting out through a big paper starburst with a huge thumbs up and a wink, gold confetti and stars exploding around him. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-s20-point",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) dramatically pointing at the cartoon blond young father from the reference image (same face, shoulder-length blond hair, brown turtleneck), who points at himself in surprise with wide eyes; comic action lines. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg",
+        "design/mv-art/out/iida-father-toon.jpg"
+      ]
+    },
+    {
+      "id": "iida-s28-finale",
+      "prompt": "A joyful birthday finale: the cartoon blond young father from the reference image (same face, shoulder-length blond hair, brown turtleneck) gently holds the cartoon baby in a yellow chick hood from the reference image; the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) presents them a smooth bright yellow painted stone with a cute little baby chick drawn on it; a small birthday cake with one candle, balloons and gold confetti, warm golden light. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look with a soft painted background, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg",
+        "design/mv-art/out/iida-father-toon.jpg",
+        "design/mv-art/out/iida-baby-toon.jpg"
+      ]
+    },
+    {
+      "id": "iida-st-flex",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) flexing both arms with a big proud grin, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, the whole character inside the frame.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-st-thumb",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) giving a big thumbs up and winking, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, the whole character inside the frame.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-st-dance",
+      "prompt": "the cartoon angel boy from the reference image (same face, blond curls, gold halo, white wings, huge cartoon muscles, white hip cloth, gold shoes) dancing happily, kicking one leg up and twirling a paintbrush, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, the whole character inside the frame.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-char-b.jpg"
+      ]
+    },
+    {
+      "id": "iida-st-baby",
+      "prompt": "the cartoon baby in a yellow chick hood from the reference image waving one tiny gloved hand with a happy face, full body. 1930s rubber-hose animation style cartoon: thick confident black ink outlines, simple rounded shapes, bendy noodle arms and legs, oversized round heads, big oval eyes with pie-cut pupils, round white gloves, oversized rounded shoes, bouncy expressive poses, vintage hand-drawn cel animation look, limited vintage colour palette: cream, warm gold, soft pink cheeks, pale sky blue, warm browns, square composition, no text, no letters. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, the whole character inside the frame.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/iida-baby-toon.jpg"
+      ]
     }
   ],
   "redo": []
