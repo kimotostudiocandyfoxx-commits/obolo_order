@@ -146,7 +146,7 @@ export const AMBIENT: Record<Planet, Ambient> = {
     ],
     front: [
       { kind: 'rings', color: '#ffe2ac', at: [0.5, 0.45], every: 6, size: 0.55, alpha: 0.2 },
-      { kind: 'haze', color: '#ffb070', y0: 0, y1: 0.6, alpha: 0.14 },
+      { kind: 'haze', color: '#ffb070', y0: 0, y1: 0.6, alpha: 0.07 }, // story team 2026-11-23: 14% tinted skin, keep it 6–8%
     ],
   },
   // 火星：背景＝赤い砂の霞、ときどき遠い空をUFOの光が横切る。前景＝横に流れる赤い砂粒、ネオンの光がわずかに揺らぐ。

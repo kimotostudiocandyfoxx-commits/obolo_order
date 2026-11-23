@@ -27,6 +27,8 @@ export const PLATES: Record<string, Plate> = {
   's/rocket-earth': { image: 's/plate-rocket-earth.jpg', floorY: 0.82, horizonY: 0.5 },
   's/launch-pit': { image: 's/plate-launch-pit.jpg', floorY: 0.84, horizonY: 0.55 },
   's/uranus-shop': { image: 's/plate-uranus-shop.jpg', floorY: 0.88, horizonY: 0.55 },
+  's/venus-stage': { image: 's/plate-venus-stage.jpg', floorY: 0.82, horizonY: 0.32, skyMask: 's/plate-venus-stage-sky.png' },
+  's/sun-inside': { image: 's/plate-sun-inside.jpg', floorY: 0.88, horizonY: 0.6 },
 };
 /** a scene that wants another plate than its still's (scene id → a PLATES key), or none at all (null) */
 export const SCENE_PLATE: Record<string, string | null> = {};
