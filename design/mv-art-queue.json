@@ -6762,6 +6762,273 @@
         "design/mv-art/out/jun-15-temple-finale.jpg"
       ],
       "always": false
+    },
+    {
+      "id": "tak-05-ramen-treat",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo, including his thin round glasses), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a big warm generous smile, seated on a majestic throne of clouds, cheerfully holding out a large steaming bowl of ramen with both hands as a gift toward a small kneeling blond winged angel in the lower corner who looks up at the bowl with tearful gratitude, an enormous golden halo and radiant aureole behind him, cherubs in white cloth and white doves around; full figure from head to feet, centered, heavenly majesty.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-tak-3.jpg"
+      ]
+    },
+    {
+      "id": "tak-14-ramen-feast",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, sitting at a white marble table on the clouds happily eating a big steaming bowl of ramen, lifting noodles with chopsticks, beaming with a big warm smile at the viewer, his face clearly visible and in focus; beside him a young blond curly-haired muscular angel wearing a tall white chef's hat stands proudly serving, seen in profile; golden divine light, heartfelt and comic.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-tak-1.jpg"
+      ]
+    },
+    {
+      "id": "jun-05-palm-b",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), a colossal figure shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, seated majestically on a snow-capped mountain peak, gently holding a tiny winged blond angel in the open palm of one enormous hand and looking down at him with a kind, merciful, closed-mouth smile; the tiny angel kneels in his palm with hands clasped in relief; full figure from head to knees, centered, sublime majesty. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-2.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-06-blessing-b",
+      "prompt": "Waist-up portrait, bare muscular chest visible, of the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique — huge chest, broad shoulders, big arms and a chiseled six-pack, sun-bronzed skin with an oil-painting sheen — huge radiant white feathered angel wings spread wide behind him, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, divine and majestic, bathed in holy light, with a warm kind smile, raising one hand in a gentle blessing gesture, a golden halo behind his head, edelweiss and rose petals drifting down, alpine peaks glowing behind him; his whole head inside the frame with space above. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-2.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-02-serene-b",
+      "prompt": "Close-up portrait of the man in the reference photo (keep his face and hairstyle exactly as in the photo): his face fills the upper frame, looking gently toward the viewer with kind eyes and a serene, warm, closed-mouth smile, a large golden halo blazing behind his head like a sunrise over the peaks, bare muscular shoulders, white wings softly out of focus. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-2.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-14-together-b",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, standing on white marble steps of an ancient temple on a highland plateau at sunrise beside a young blond curly-haired muscular angel with white wings; the man rests a hand on the angel's shoulder; the man faces the viewer with a big warm smile, his face clearly visible and in focus; the angel is turned toward him, seen in profile; snowy peaks behind, golden light, heartfelt. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-2.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-cu-01-smile-b",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo), close-up portrait: his face fills the upper half of the frame, laughing with a big warm joyful smile, eyes crinkled, bare muscular shoulders and chest, a glowing golden halo behind his head, the edges of radiant white angel wings at both sides, golden backlight from the peaks, shallow depth of field. Baroque Romantic landscape oil painting in the style of the great 19th-century sublime Alpine painters, warm golden divine light, god rays, a majestic European highland — sunlit alpine meadows full of wildflowers and edelweiss, distant snow-capped peaks, soft mist in the valleys, rich glazing, fine visible brushwork, cinematic square composition, balanced centered framing that reads well in a 1:1 frame, ultra detailed, no text, no letters, no numbers, no watermark, no frame border.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-jun-2.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "tak-09-angel-chef",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), wearing a tall white chef's hat, standing in a heavenly marble kitchen on the clouds before a gigantic golden pot of milky tonkotsu ramen broth that steams like clouds, pouring a big scoop of white protein powder into the pot with fierce determination, cherubs in white cloth carrying noodles and green onions, golden light.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "tak-10-harmony",
+      "prompt": "Epic vista: a colossal glowing bowl of tonkotsu ramen rising above an endless sea of clouds like the rising sun — creamy white broth, golden noodles, chashu pork slices, a soft-boiled egg and green onions — its steam forming swirling golden musical waves, a choir and orchestra of cherubs wrapped in white cloth playing harps, violins and golden trumpets on the clouds around it, a giant golden halo blazing behind the bowl, rays across the entire sky; majestic and absurdly grand.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "tak-11-chef-march",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), wearing a tall white chef's hat and a white apron over his hip cloth, striding forward boldly along a road of golden clouds that leads to a brilliant horizon, holding a giant golden ladle raised like a sword in one hand and a steaming ramen bowl in the other, wings fully spread, a confident smile; dynamic low angle, streaks of light.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "tak-12-ramen-trophy",
+      "prompt": "the muscular blond angel from the reference image (curly golden hair, thin golden halo, large white feathered wings, extremely muscular bare torso, white cloth wrapped at the hips), wearing a tall white chef's hat, raising a large shining golden ramen bowl full of noodles high above his head toward a radiant sky like a championship trophy, light bursting from the bowl, golden feathers and steam swirling like confetti, triumphant joyful face.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/ref/angel.jpg"
+      ]
+    },
+    {
+      "id": "tak-cu-04-golden-bowl",
+      "prompt": "Low-angle close-up of a radiant golden bowl of tonkotsu ramen raised high by two powerful muscular arms against a blazing sunburst, golden noodles lifted by chopsticks, the rich broth glowing and pouring light over the rim, steam and white feathers flying, triumphant, no face visible.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "tak-05-ramen-treat-plate",
+      "prompt": "Edit this painting: remove the seated winged man and the small kneeling angel (bodies, wings, halos and the bowl) — keep the cloud throne only if it is behind him, otherwise clouds completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (clouds, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/tak-05-ramen-treat.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "tak-09-angel-chef-plate",
+      "prompt": "Edit this painting: remove the angel chef (his body, wings, halo and hat), keep the pot and the kitchen completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (clouds, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/tak-09-angel-chef.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "tak-11-chef-march-plate",
+      "prompt": "Edit this painting: remove the angel (his body, wings, halo, hat, ladle and bowl) completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (clouds, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/tak-11-chef-march.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "tak-12-ramen-trophy-plate",
+      "prompt": "Edit this painting: remove the angel and the golden bowl completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (clouds, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/tak-12-ramen-trophy.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "tak-14-ramen-feast-plate",
+      "prompt": "Edit this painting: remove both winged figures, keep the marble table completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (clouds, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/tak-14-ramen-feast.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-05-palm-b-plate",
+      "prompt": "Edit this painting: remove the colossal man (his body, wings and halo) and the tiny angel in his palm completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (meadow, mountains, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/jun-05-palm-b.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-06-blessing-b-plate",
+      "prompt": "Edit this painting: remove the winged man (his body, wings and halo) completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (meadow, mountains, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/jun-06-blessing-b.jpg"
+      ],
+      "always": false
+    },
+    {
+      "id": "jun-14-together-b-plate",
+      "prompt": "Edit this painting: remove both winged figures completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, sun, light rays, clouds, mountains, architecture and colours, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (meadow, mountains, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/jun-14-together-b.jpg"
+      ],
+      "always": false
     }
   ],
   "redo": []
