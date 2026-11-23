@@ -215,7 +215,8 @@ export function storyPeople({
     const t = toneFor(id);
     people.push({ id, name: speakerName(who), look: null, color: t.line, tone: t, offstage: true });
   }
-  people.push({ id: 'me', name, look: self, color: TONES.pearl.line, tone: TONES.pearl, self: true });
+  // your back view (for the over-the-shoulder cut) exists for the talk cast's NEO only (the review pages' stand-in)
+  people.push({ id: 'me', name, look: self, color: TONES.pearl.line, tone: TONES.pearl, self: true, ...(self?.of?.startsWith('cast-user') ? { views: viewsOf('talk-user') } : {}) });
   // three or more in the row: the painted ones (wider than the talk looks) a little smaller, so they overlap less
   const standing = people.filter((p) => !p.offstage && !p.back && !!p.look).length;
   if (standing >= 3)

@@ -796,6 +796,16 @@ function makeSprite(kind: Sprite, color: string, blur: number): HTMLCanvasElemen
   return c;
 }
 
+function rotated45(src: HTMLCanvasElement): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = c.height = src.width;
+  const g = c.getContext('2d')!;
+  g.translate(c.width / 2, c.height / 2);
+  g.rotate(Math.PI / 4);
+  g.drawImage(src, -c.width / 2, -c.height / 2);
+  return c;
+}
+
 function radialSprite(color: string, soft = 0.0): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = c.height = 64;
@@ -867,11 +877,13 @@ export function AmbientFront(props: AmbientProps) {
     const layers = def.front.filter((l) => l.kind !== 'haze').map((l) => {
       if (l.kind === 'particles') {
         const sprites = [0, 1, 2, 3].map((b) => makeSprite(l.sprite, l.color, b));
+        // spin: half of them turned 45° (pre-drawn; no per-frame rotation)
+        const turned = l.spin ? sprites.map(rotated45) : sprites;
         const n = Math.round(l.count * Math.min(1.5, k));
         const y0 = l.y0 ?? 0.05;
         const y1 = Math.min(l.y1 ?? subtitleTop, subtitleTop + 0.05);
         const ps: Particle[] = Array.from({ length: n }, () => ({ x: rand(), y: y0 + rand() * (y1 - y0), z: rand(), s: l.size[0] + rand() * (l.size[1] - l.size[0]), ph: rand() * 6.283, sp: 0.6 + rand() * 0.8, rot: rand() * 6.283 }));
-        return { l, sprites, ps, y0, y1 };
+        return { l, sprites, turned, ps, y0, y1 };
       }
       if (l.kind === 'glows') return { l, sprites: [...new Set(l.at.map((p) => p[3] ?? l.color))].map((c) => [c, radialSprite(c)] as const) };
       if (l.kind === 'mist') return { l, sprites: [mistSprite(l.color)] };
@@ -907,6 +919,12 @@ export function AmbientFront(props: AmbientProps) {
         const l = L.l as FrontLayer;
         if (l.kind === 'particles' && 'ps' in L && L.ps) {
           g.globalCompositeOperation = l.sprite === 'streak' || l.sprite === 'ring' ? 'source-over' : 'lighter';
+          // rain: one path per depth bucket (no sprite, no per-drop state change)
+          const streak = l.sprite === 'streak';
+          const dir = streak ? Math.atan2(l.speed[1], (l.speed[0] * W) / H) : 0;
+          const ux = Math.cos(dir);
+          const uy = Math.sin(dir);
+          const paths = streak ? [new Path2D(), new Path2D()] : null;
           for (const p of L.ps) {
             const near = 1 - p.z; // 1 = nearest
             const vel = 0.55 + near * 0.9;
@@ -921,26 +939,32 @@ export function AmbientFront(props: AmbientProps) {
             const px = p.x * W + sw + (cam ? cam.x * (0.15 + 0.3 * near) : 0);
             const py = p.y * H + (cam ? cam.y * (0.15 + 0.3 * near) : 0);
             const c = clear(px, py);
-            if (c <= 0.01) continue;
+            if (c <= 0.05) continue;
+            const s = p.s * (0.6 + 1.5 * near) * (l.sprite === 'glint' ? 2.4 : 2);
+            if (paths) {
+              const path = paths[near > 0.6 ? 0 : 1];
+              path.moveTo(px - ux * s * 0.5, py - uy * s * 0.5);
+              path.lineTo(px + ux * s * 0.5, py + uy * s * 0.5);
+              continue;
+            }
             const tw = l.twinkle ? 0.5 + 0.5 * Math.sin(t * l.twinkle * 4 * p.sp + p.ph) : 1;
-            const glint = l.sprite === 'glint' ? Math.pow(tw, 3) : tw;
+            const glint = l.sprite === 'glint' ? tw * tw * tw : tw;
             const a = l.alpha * Math.min(1, k) * c * glint * (near > 0.75 ? 0.55 : 0.8 + 0.2 * p.z);
             if (a <= 0.01) continue;
-            const s = p.s * (0.6 + 1.5 * near) * (l.sprite === 'glint' ? 2.4 : l.sprite === 'fluff' ? 2 : 2);
             const blur = near > 0.8 ? 3 : near > 0.6 ? 2 : near > 0.3 ? 1 : 0;
             g.globalAlpha = a;
-            if (l.sprite === 'streak') {
-              const ang = Math.atan2(l.speed[1], l.speed[0] * (H / W)) - Math.PI / 2;
-              g.setTransform(dpr, 0, 0, dpr, px * dpr, py * dpr);
-              g.rotate(ang);
-              g.drawImage(L.sprites![blur], -s * 0.1, -s, s * 0.2 + 1, s * 2);
-              g.setTransform(dpr, 0, 0, dpr, 0, 0);
-            } else if (l.spin) {
-              g.setTransform(dpr, 0, 0, dpr, px * dpr, py * dpr);
-              g.rotate(p.rot + t * 0.4 * p.sp);
-              g.drawImage(L.sprites![blur], -s / 2, -s / 2, s, s);
-              g.setTransform(dpr, 0, 0, dpr, 0, 0);
-            } else g.drawImage(L.sprites![blur], px - s / 2, py - s / 2, s, s);
+            g.drawImage((p.rot > 3.14 ? L.turned! : L.sprites!)[blur], px - s / 2, py - s / 2, s, s);
+          }
+          if (paths) {
+            const [cr, cg, cb] = rgb(l.color).map((v) => Math.round(v * 255));
+            g.strokeStyle = `rgb(${cr},${cg},${cb})`;
+            g.lineCap = 'round';
+            g.globalAlpha = l.alpha * Math.min(1, k) * 0.6;
+            g.lineWidth = 1.6;
+            g.stroke(paths[0]);
+            g.globalAlpha = l.alpha * Math.min(1, k);
+            g.lineWidth = 0.8;
+            g.stroke(paths[1]);
           }
         } else if (l.kind === 'glows' && 'sprites' in L) {
           g.globalCompositeOperation = 'lighter';

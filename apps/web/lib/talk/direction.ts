@@ -111,8 +111,12 @@ export function directLines(lines: { id: string; who: string; text: string; over
       const order: Shot[] = ['side', 'q3', 'ots'];
       for (let t = 0; t < order.length; t++) {
         const pick = order[(angleTurn + t) % order.length];
-        // over the shoulder needs the listener's back view; a 3/4 cut, a side cut fall back to the front figure
-        if (pick === 'ots' && !(views?.back.has(listenTo) && listenTo !== selfId)) continue;
+        // (user decision 2026-11-23) over the shoulder needs the listener's back view (you and {bati} included: your
+        // back is the usual foreground); a 3/4 cut needs the speaker's 3/4 view, a side cut both side views — only the
+        // story cast has those (you, {bati} and the dachi have front and back only)
+        if (pick === 'ots' && !views?.back.has(listenTo)) continue;
+        if (pick === 'q3' && !views?.q3.has(l.who)) continue;
+        if (pick === 'side' && !(views?.side.has(l.who) && views?.side.has(listenTo))) continue;
         if (pick !== 'q3' && emotional && !pair) continue;
         d = { ...d, shot: pick, on: pick === 'q3' ? undefined : listenTo, after: undefined, afterOn: undefined };
         angleTurn = (angleTurn + t + 1) % order.length;

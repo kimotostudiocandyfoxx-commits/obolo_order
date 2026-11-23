@@ -24,10 +24,10 @@ describe('the directed scene (M-R251 review)', () => {
     expect(d.get('3')).toMatchObject({ shot: 'two', cut: false, on: 'A' });
     expect(d.get('4')).toMatchObject({ shot: 'mcu', after: 'reaction', afterOn: 'B', move: 'lean' });
     expect(d.get('5')).toMatchObject({ shot: 'punch', stir: true });
-    // back and forth between two: now and then an angled cut (a side cut first), then the plain shots again
-    expect(d.get('6')).toMatchObject({ shot: 'side', on: 'B' });
+    // no views at all: no angled cut
+    expect(d.get('6')!.shot).toBe('mcu');
     expect(d.get('7')!.shot).toBe('mcu');
-    expect(d.get('8')!.shot).toBe('mcu');
+    expect(d.get('8')!.shot).toBe('two'); // not a third mcu
   });
   it('never three alike', () => {
     const d = directLines([
@@ -44,6 +44,10 @@ describe('the directed scene (M-R251 review)', () => {
     expect(none).not.toContain('ots');
     const withBack = [...directLines(lines, 'me', { back: new Set(['A', 'B']), side: new Set(), q3: new Set() }).values()].map((x) => x.shot);
     expect(withBack).toContain('ots');
+    expect(withBack).not.toContain('side');
+    expect(withBack).not.toContain('q3');
+    const all = [...directLines(lines, 'me', { back: new Set(['A', 'B']), side: new Set(['A', 'B']), q3: new Set(['A', 'B']) }).values()].map((x) => x.shot);
+    expect(all.filter((x) => x === 'side' || x === 'q3' || x === 'ots').length).toBe(3);
   });
   it('takes the script override', () => {
     const d = directLines([
