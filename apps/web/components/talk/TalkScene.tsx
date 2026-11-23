@@ -7,6 +7,8 @@ import { Figure, TALK_CSS, type FigureState } from './Figure';
 import { AppThreads, HereThreads, type TalkThread } from './TalkThreads';
 import type { SpiralRow } from '@/components/finds/SpiralList';
 import { SELF_TONES, TONES, toneOf, type TalkTone } from '@/lib/talk/looks';
+import { CAMERA, type Direction, type Move } from '@/lib/talk/direction';
+import { Subtitle, SubtitleScrim, SUBTITLE_CSS, subtitleStyle } from '@/components/story/Subtitle';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 
@@ -47,6 +49,8 @@ export type TalkPerson = {
 
 export type TalkItem = {
   id: string;
+  /** the directed scene (lib/talk/direction.ts): the shot and the moves for this line; none = the plain talk camera */
+  direction?: Direction;
   /** a TalkPerson id */
   who: string;
   text: string;
@@ -168,6 +172,8 @@ export function TalkScene({
   stageStyle,
   tapThrough = false,
   skin = 'app',
+  lines = 'bubbles',
+  selfName,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -229,6 +235,10 @@ export function TalkScene({
   tapThrough?: boolean;
   /** the bubbles' look: the app's (default) or the story's own */
   skin?: TalkSkin;
+  /** 'subtitles': the story's lines as film subtitles at the lower third, no bubbles ("bubbles = chat, subtitles = story") */
+  lines?: 'bubbles' | 'subtitles';
+  /** your name over your subtitles (else 「あなた」) */
+  selfName?: string;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
@@ -1194,7 +1204,7 @@ const BURST =
  * M-R243: the words with their marks — **bold** 900, ^^larger^^ 1.3em, !!shout!! Dela Gothic One 1.38em. Rendered as
  * text runs (React escapes them): nothing but these three marks ever becomes markup. `upto`: only that many characters.
  */
-function Marked({ text, upto }: { text: string; upto?: number }) {
+export function Marked({ text, upto }: { text: string; upto?: number }) {
   let left = upto ?? Infinity;
   return (
     <>
