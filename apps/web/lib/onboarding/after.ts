@@ -10,7 +10,7 @@ import type { Speaker, Step } from './script';
  * Played by components/lap2/Lap2Story.tsx (shared LAP2) and on the review page (?day=m1|m2|m3).
  *
  * No pictures were made for these days: the stills are the nearest that exist (s/uranus-field, s/uranus-shop,
- * s/mercury-ice for Pluto's ice plain, s/neptune-islands for the game map …), noted where they stand in.
+ * s/pluto-plain for Pluto's ice plain (made in the M-R251 review), s/neptune-islands for the game map …), noted where they stand in.
  */
 
 /** Uranus's resident (her standing picture: onboarding/crocopatra.webp, M-R251 review) */
@@ -165,8 +165,8 @@ export const M_PLUTO: Step[] = [
   { t: 'say', who: CROCO, text: 'おはようございます、{neo}。冥王星の錠が、開きましたわ。' }, // 扇子をひらいて
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: '冥王星が開いた' },
-  // 太陽からいちばん遠い、小さな冥王星→白い氷の平原、六角形の結晶に眠る本→暗い空の小さな灯り→三輪のバイカ（s/mercury-ice stands in for the ice plain）
-  ...rocket('冥王星に着いた', 's/mercury-ice'),
+  // 太陽からいちばん遠い、小さな冥王星→白い氷の平原、六角形の結晶に眠る本→暗い空の小さな灯り→三輪のバイカ（s/pluto-plain, M-R251 review）
+  ...rocket('冥王星に着いた', 's/pluto-plain'),
   { t: 'bgm', track: 'night' },
   { t: 'sprite', image: 'takoyaki-brother' }, // バイカに乗って、{neo}の前に止まりながら
   { t: 'say', who: 'たこ焼きブラザー', text: 'よく来たZE、{neo}。' },
@@ -291,7 +291,7 @@ export const M_NEPTUNE: Step[] = [
   // M-NEPTUNE-S001 深海の都／『ナガレを越えて』
   { t: 'scene', id: 'M-NEPTUNE-S001' },
   { t: 'bgm', track: 'morning' },
-  { t: 'still', image: 's/mercury-ice' }, // 〔背景 pluto-plain（仮）〕 (the ice plain of the day before)
+  { t: 'still', image: 's/pluto-plain' }, // 〔背景 pluto-plain〕 (the ice plain of the day before)
   { t: 'caption', text: '会員になって、3日目' },
   { t: 'sprite', image: 'takoyaki-brother' },
   { t: 'say', who: 'たこ焼きブラザー', text: 'おはようだZE、{neo}。海王星の錠が、開いたZE。' },

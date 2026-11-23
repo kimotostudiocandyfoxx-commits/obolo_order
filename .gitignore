@@ -14,3 +14,7 @@ apps/web/public/onboarding-test/
 
 # Python bytecode
 __pycache__/
+
+# cut-out review intermediates (scripts/cutouts/merge.py): large, rebuilt from design/story/out
+design/cutouts/merged/
+design/cutouts/rebg/

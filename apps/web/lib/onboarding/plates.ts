@@ -29,6 +29,13 @@ export const PLATES: Record<string, Plate> = {
   's/uranus-shop': { image: 's/plate-uranus-shop.jpg', floorY: 0.88, horizonY: 0.55 },
   's/venus-stage': { image: 's/plate-venus-stage.jpg', floorY: 0.82, horizonY: 0.32, skyMask: 's/plate-venus-stage-sky.png' },
   's/sun-inside': { image: 's/plate-sun-inside.jpg', floorY: 0.88, horizonY: 0.6 },
+  's/venus-night': { image: 's/plate-venus-night.jpg', floorY: 0.78, horizonY: 0.42 },
+  's/neptune-islands': { image: 's/plate-neptune-islands.jpg', floorY: 0.78, horizonY: 0.5 },
+  // Pluto's ice plain: its own still serves as the plate (the large plate came back empty; the library stays far)
+  's/pluto-plain': { image: 's/pluto-plain.jpg', floorY: 0.84, horizonY: 0.62, skyMask: 's/pluto-plain-sky.png' },
+  // the Kaiser's forest: the Jupiter forest plate (no daikon tree in it — he stands in the row); two tries at painting
+  // the daikon out of its own still kept small figures in the distance
+  's/jupiter-daikon': { image: 's/plate-jupiter-forest.jpg', floorY: 0.85, horizonY: 0.55 },
 };
 /** a scene that wants another plate than its still's (scene id → a PLATES key), or none at all (null) */
 export const SCENE_PLATE: Record<string, string | null> = {};

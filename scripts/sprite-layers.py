@@ -204,5 +204,5 @@ reg_path = 'apps/web/lib/story/sprite-layers.json'
 if os.path.realpath(out) != os.path.realpath('apps/web/public/onboarding'):
     sys.exit(0)  # a trial elsewhere: the registry of the real layers is not touched
 reg = json.load(open(reg_path)) if os.path.exists(reg_path) else {}
-reg[stem] = sorted(k for k in ('body', 'tail', 'mouth', 'eyes') if os.path.exists(f'{out}/{stem}-{k}.webp'))
+reg[stem] = sorted(k for k in ('body', 'tail', 'mouth', 'eyes', 'shut') if os.path.exists(f'{out}/{stem}-{k}.webp'))
 json.dump(dict(sorted(reg.items())), open(reg_path, 'w'), indent=1)

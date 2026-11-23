@@ -256,6 +256,12 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
   'moon-temple': { planet: 'moon', skyMask: { y: 0.6, keep: 'dark', t: 0.2 }, regions: [{ at: [0.505, 0.37], r: 0.07, motion: 'float', amp: 1.6, period: 14 }], addSky: [{ kind: 'glow', color: '#8fc4ff', speed: 0.1, at: [0.505, 0.37], radius: 0.09, alpha: 0.12, mask: false }] },
   'moon-night': { planet: 'moon', night: true, skyMask: { y: 0.66, keep: 'dark', t: 0.2 }, regions: [{ at: [0.51, 0.43], r: 0.15, motion: 'float', amp: 1.8, period: 16 }], addSky: [{ kind: 'glow', color: '#8fc4ff', speed: 0.1, at: [0.51, 0.43], radius: 0.18, alpha: 0.12, mask: false }] },
   bluena: { planet: 'moon' },
+  // Pluto's ice plain (M-R251 review): the far library's warm windows glow softly
+  'pluto-plain': {
+    planet: 'pluto',
+    skyMask: { y: 0.62, keep: 'dark', t: 0.3 },
+    addFront: [{ kind: 'glows', color: '#ffc77a', at: [[0.425, 0.61, 0.03], [0.5, 0.605, 0.035], [0.6, 0.612, 0.03], [0.54, 0.555, 0.02]], flicker: 0.08, sway: 0.001, alpha: 0.35 }],
+  },
   // Saturn: the painted planet and rings (a slow turn of the region + a glint going round), the lanterns
   'saturn-inside': {
     planet: 'saturn',
@@ -383,14 +389,25 @@ export const PLATE_AMBIENT: Record<string, StillAmbient> = {
       { kind: 'glows', color: '#ff4a2a', at: [[0.12, 0.24, 0.09], [0.2, 0.33, 0.075], [0.235, 0.45, 0.07], [0.15, 0.63, 0.075], [0.805, 0.24, 0.09], [0.9, 0.24, 0.09], [0.735, 0.35, 0.075], [0.765, 0.45, 0.07], [0.845, 0.63, 0.075]], flicker: 0.14, sway: 0.003, alpha: 0.42 },
     ],
   },
+  // (M-R251 plates) Venus at night: the two table lamps by the doors, warm and flickering a little
+  'plate-venus-night': {
+    planet: 'venus',
+    night: true,
+    addFront: [{ kind: 'glows', color: '#ffc27a', at: [[0.03, 0.385, 0.06], [0.975, 0.38, 0.06]], flicker: 0.12, sway: 0.002, alpha: 0.38 }],
+  },
+  // the rocket cabin: the Earth in the porthole drifts a hair
+  'plate-rocket-earth': {
+    planet: 'space',
+    regions: [{ at: [0.5, 0.37], r: 0.16, motion: 'float', amp: 1.2, period: 18 }],
+  },
 };
 
 /** per scene: a scene whose place is not its still's (the members' days stand in other planets' stills) */
 export const SCENE_AMBIENT: Record<string, AmbientPatch & { planet?: Planet }> = {
-  // Pluto's day stands in Uranus's field and Mercury's ice (after.ts): Pluto's own air over them
+  // Pluto's day: Uranus's field before the rocket, then Pluto's own plain (after.ts): Pluto's air over both
   'M-PLUTO-S001': { planet: 'pluto' },
   'M-PLUTO-S002': { planet: 'pluto' },
-  // Neptune's morning still is the Pluto ice plain of the day before (after.ts: s/mercury-ice as pluto-plain)
+  // Neptune's morning still is the Pluto ice plain of the day before (after.ts: s/pluto-plain)
   'M-NEPTUNE-S001': { planet: 'pluto' },
 };
 

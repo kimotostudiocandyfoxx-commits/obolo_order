@@ -130,6 +130,41 @@ function unitsOf(it: TalkItem, beats: TalkBeat[]): Unit[] {
     return u;
   });
 }
+/**
+ * subtitles: two lines at most (about 17 characters a line at 390 px) — a unit longer than that is cut further at its
+ * sentence ends, then at 「、」 (the words unchanged; a line with marks keeps the bubble cuts)
+ */
+const SUB_MAX = 34;
+function subUnitsOf(it: TalkItem, beats: TalkBeat[]): Unit[] {
+  const base = unitsOf(it, beats);
+  const out: Unit[] = [];
+  for (const u of base) {
+    if (u.len <= SUB_MAX || talkPlain(u.text) !== u.text) {
+      out.push(u);
+      continue;
+    }
+    // pieces: sentences, a long sentence cut after 「、」; then packed up to SUB_MAX
+    const sentences = u.text.match(/[^。！？!?]+[。！？!?」]*|[。！？!?」]+/g) ?? [u.text];
+    const bits: string[] = [];
+    for (const snt of sentences) {
+      if ([...snt].length <= SUB_MAX) bits.push(snt);
+      else bits.push(...(snt.match(/[^、，]+[、，]?/g) ?? [snt]));
+    }
+    const packs: string[] = [];
+    for (const b of bits) {
+      const last = packs[packs.length - 1];
+      if (last != null && [...last].length + [...b].length <= SUB_MAX) packs[packs.length - 1] = last + b;
+      else packs.push(b);
+    }
+    let from = u.from;
+    packs.forEach((t, k) => {
+      const len = [...t].length;
+      out.push({ ...u, key: `${u.key}~${k}`, text: t, first: u.first && k === 0, last: u.last && k === packs.length - 1, from, len });
+      from += len;
+    });
+  }
+  return out;
+}
 /** how many characters are out after `ms` */
 const charsAt = (sp: Speech, ms: number) => {
   if (!sp.typed) return Math.floor((ms / sp.dur) * sp.len);
@@ -501,7 +536,7 @@ export function TalkScene({
   // the faces, else every ~60 characters at a sentence end); while it is said, its bubbles come one by one
   const outNow = speech && speech.typed && at < 1 ? charsAt(speech, now - speech.start) : null;
   const units: Unit[] = visible.flatMap((it) => {
-    const list = unitsOf(it, beatsOf(it));
+    const list = lines === 'subtitles' ? subUnitsOf(it, beatsOf(it)) : unitsOf(it, beatsOf(it));
     if (outNow == null || speech?.id !== it.id) return list;
     return list.filter((u) => u.first || u.from < outNow);
   });

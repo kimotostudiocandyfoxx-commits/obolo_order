@@ -125,9 +125,10 @@ const CAST_FACES: Record<CastId, TalkFace[]> = {
 /**
  * The story characters' talk looks made so far (M-R251 review: KIMORIN only, in his main look — the red robe and the
  * round sunglasses — made by scripts/story-images/m-r251 + scripts/talk-assets/kimorin.py into public/talk/kimorin).
- * Off until those files are in: the painted pictures stand meanwhile.
+ * (made 2026-11-23: the set of friend / bati — stand, blink, talk, five poses with their talk, smile blink, kororin; the
+ * sunglasses cover the eyes, so the blink pictures are the open ones)
  */
-export const STORY_TALK_LOOKS = { kimorin: false };
+export const STORY_TALK_LOOKS = { kimorin: true };
 export function castLook(id: CastId, of = `cast-${id}`): TalkLook {
   const u = (f: string) => `/talk/${id}/${f}.webp`;
   // M-R240, one shared canvas (same size, same feet, headroom for raised arms): the plain stand with its blink and open
