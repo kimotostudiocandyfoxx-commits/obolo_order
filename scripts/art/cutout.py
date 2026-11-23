@@ -10,9 +10,14 @@ become see-through coloured light (so a saucer's under-glow is not a pale cloud 
 """
 import argparse
 
+import os
+import sys
+
 import numpy as np
 from PIL import Image
-from scipy import ndimage
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'lib'))
+import keying  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument('src')
@@ -24,6 +29,20 @@ a = ap.parse_args()
 
 img = Image.open(a.src).convert('RGB')
 rgb = np.asarray(img).astype(np.float32)
+if a.glow_below is None:
+    # a sprite without a glow: the shared matte (scripts/lib/keying.py, cut-out review 2026-11-23) — holes that are
+    # the white seen through a gap go by themselves, so --holes is not needed
+    rgba, _ = keying.cut(rgb, '#FFFFFF')
+    im = Image.fromarray(rgba, 'RGBA')
+    bbox = keying.trim_box(rgba[..., 3], 10, pad=6)
+    if bbox:
+        im = im.crop(bbox)
+    if im.width > a.width:
+        im = im.resize((a.width, round(im.height * a.width / im.width)), Image.LANCZOS)
+    im.save(a.dst, 'WEBP', quality=88, method=6)
+    print(a.dst, im.size)
+    sys.exit(0)
+from scipy import ndimage  # noqa: E402  (the glow path below)
 # distance from white: 0 = pure white
 dist = 255 - rgb.min(axis=2)
 near = dist < 40

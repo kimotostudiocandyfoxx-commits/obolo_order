@@ -24,10 +24,26 @@ describe('the directed scene (M-R251 review)', () => {
     expect(d.get('3')).toMatchObject({ shot: 'two', cut: false, on: 'A' });
     expect(d.get('4')).toMatchObject({ shot: 'mcu', after: 'reaction', afterOn: 'B', move: 'lean' });
     expect(d.get('5')).toMatchObject({ shot: 'punch', stir: true });
-    // mcu, mcu, then not a third
-    expect(d.get('6')!.shot).toBe('mcu');
+    // back and forth between two: now and then an angled cut (a side cut first), then the plain shots again
+    expect(d.get('6')).toMatchObject({ shot: 'side', on: 'B' });
     expect(d.get('7')!.shot).toBe('mcu');
-    expect(d.get('8')!.shot).toBe('two');
+    expect(d.get('8')!.shot).toBe('mcu');
+  });
+  it('never three alike', () => {
+    const d = directLines([
+      { id: '1', who: 'A', text: 'やあ。' },
+      { id: '2', who: 'B', text: 'ふむ!!' },
+      { id: '3', who: 'A', text: 'うむ!!' },
+      { id: '4', who: 'B', text: 'おお!!' },
+    ]);
+    expect([...d.values()].map((x) => x.shot)).toEqual(['wide', 'punch', 'punch', 'two']);
+  });
+  it('over the shoulder only with a back view', () => {
+    const lines = ['こんにちは。', 'はい。', 'そうか。', 'ええ。', 'なるほど。', 'うん。', 'では。', 'また。', 'ふむ。', 'うむ。', 'よし。', 'いこう。'].map((text, k) => ({ id: String(k), who: k % 2 ? 'B' : 'A', text }));
+    const none = [...directLines(lines).values()].map((x) => x.shot);
+    expect(none).not.toContain('ots');
+    const withBack = [...directLines(lines, 'me', { back: new Set(['A', 'B']), side: new Set(), q3: new Set() }).values()].map((x) => x.shot);
+    expect(withBack).toContain('ots');
   });
   it('takes the script override', () => {
     const d = directLines([

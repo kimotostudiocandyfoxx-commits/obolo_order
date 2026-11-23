@@ -5,7 +5,7 @@
   <stem>-tail.webp   the tail feathers alone (they sway)
   <stem>-mouth.webp  only the pixels of the open mouth   (from <stem>-o.jpg; laid over while speaking)
   <stem>-eyes.webp   the eye slits glowing brighter (from <stem>-glow.jpg; laid over, breathing; not for sunglasses on)
-Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--eyes-from-base] [--face 0.4,0.75] [--matte-only]
+Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--eyes-from-base] [--face 0.4,0.75] [--matte-only] [--matte-from <rgba.png>]
 (--matte-only: only the figure and its body / tail layers are made again — the mouth / eye / shut layers, some
 of them fixed by hand with scripts/mouth-fix.py, stay as they are. The canvas is the same as before either way.)
 The figure is cut with the shared matte (scripts/lib/keying.py, cut-out review 2026-11-23): the grey left between
@@ -88,7 +88,12 @@ if base is None:
 # the canvas (crop box) comes from the flood-fill outline it always came from, so every layer — and the hand-made
 # mouth patches — keep their place
 al_old, _ = alpha_of(base)
-al, rgb = matte(base)
+if '--matte-from' in sys.argv:
+    # a matte made elsewhere on the same pixels (scripts/cutouts/merge.py: from a background edit on the key colour)
+    _m = np.asarray(Image.open(sys.argv[sys.argv.index('--matte-from') + 1]).convert('RGBA')).astype(np.float32)
+    al, rgb = _m[..., 3] / 255, _m[..., :3]
+else:
+    al, rgb = matte(base)
 h, w = al.shape
 ys, xs = np.where(al_old > 0.03)
 pad = 8

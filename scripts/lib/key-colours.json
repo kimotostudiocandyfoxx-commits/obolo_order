@@ -1,0 +1,187 @@
+{
+ "note": "The flat key colour each character is painted on, the candidate farthest (OKLab) from all of its colours. Written by scripts/cutouts/choose_keys.py; read by scripts/lib/keying.py key_for().",
+ "characters": {
+  "KIMORIN": {
+   "key": "green",
+   "hex": "#00FF00",
+   "clearance": 0.283,
+   "from": 52,
+   "all": {
+    "magenta": 0.296,
+    "green": 0.283,
+    "yellow": 0.197,
+    "blue": 0.147,
+    "cyan": 0.133,
+    "orange": 0.078
+   }
+  },
+  "daikon-kaiser": {
+   "key": "magenta",
+   "hex": "#FF00FF",
+   "clearance": 0.326,
+   "from": 4,
+   "all": {
+    "magenta": 0.326,
+    "blue": 0.32,
+    "green": 0.27,
+    "yellow": 0.203,
+    "cyan": 0.182,
+    "orange": 0.137
+   }
+  },
+  "freezy": {
+   "key": "blue",
+   "hex": "#0000FF",
+   "clearance": 0.272,
+   "from": 4,
+   "all": {
+    "blue": 0.272,
+    "green": 0.264,
+    "magenta": 0.188,
+    "yellow": 0.176,
+    "cyan": 0.156,
+    "orange": 0.113
+   }
+  },
+  "hipokin": {
+   "key": "magenta",
+   "hex": "#FF00FF",
+   "clearance": 0.311,
+   "from": 4,
+   "all": {
+    "magenta": 0.311,
+    "blue": 0.293,
+    "green": 0.29,
+    "yellow": 0.201,
+    "cyan": 0.158,
+    "orange": 0.153
+   }
+  },
+  "kaiser1": {
+   "key": "blue",
+   "hex": "#0000FF",
+   "clearance": 0.323,
+   "from": 3,
+   "all": {
+    "blue": 0.323,
+    "magenta": 0.318,
+    "green": 0.268,
+    "yellow": 0.185,
+    "cyan": 0.158,
+    "orange": 0.144
+   }
+  },
+  "monban": {
+   "key": "magenta",
+   "hex": "#FF00FF",
+   "clearance": 0.32,
+   "from": 5,
+   "all": {
+    "magenta": 0.32,
+    "blue": 0.317,
+    "green": 0.294,
+    "yellow": 0.217,
+    "cyan": 0.188,
+    "orange": 0.149
+   }
+  },
+  "takoyaki-brother": {
+   "key": "magenta",
+   "hex": "#FF00FF",
+   "clearance": 0.319,
+   "from": 4,
+   "all": {
+    "magenta": 0.319,
+    "green": 0.28,
+    "blue": 0.266,
+    "yellow": 0.196,
+    "cyan": 0.161,
+    "orange": 0.125
+   }
+  },
+  "takoyaki-sister": {
+   "key": "magenta",
+   "hex": "#FF00FF",
+   "clearance": 0.306,
+   "from": 4,
+   "all": {
+    "magenta": 0.306,
+    "blue": 0.286,
+    "green": 0.284,
+    "yellow": 0.19,
+    "orange": 0.143,
+    "cyan": 0.135
+   }
+  },
+  "unchi-pinpon": {
+   "key": "blue",
+   "hex": "#0000FF",
+   "clearance": 0.362,
+   "from": 4,
+   "all": {
+    "blue": 0.362,
+    "magenta": 0.286,
+    "green": 0.251,
+    "cyan": 0.171,
+    "yellow": 0.138,
+    "orange": 0.056
+   }
+  },
+  "talk-user": {
+   "key": "green",
+   "hex": "#00FF00",
+   "clearance": 0.293,
+   "from": 11,
+   "all": {
+    "blue": 0.313,
+    "magenta": 0.298,
+    "green": 0.293,
+    "yellow": 0.197,
+    "cyan": 0.157,
+    "orange": 0.139
+   }
+  },
+  "talk-friend": {
+   "key": "blue",
+   "hex": "#0000FF",
+   "clearance": 0.353,
+   "from": 15,
+   "all": {
+    "blue": 0.353,
+    "magenta": 0.313,
+    "green": 0.273,
+    "yellow": 0.18,
+    "cyan": 0.167,
+    "orange": 0.095
+   }
+  },
+  "talk-bati": {
+   "key": "blue",
+   "hex": "#0000FF",
+   "clearance": 0.311,
+   "from": 15,
+   "all": {
+    "blue": 0.311,
+    "magenta": 0.278,
+    "green": 0.239,
+    "cyan": 0.168,
+    "yellow": 0.124,
+    "orange": 0.043
+   }
+  },
+  "大根カイザー": {
+   "key": "blue",
+   "hex": "#0000FF",
+   "clearance": 0.333,
+   "from": 6,
+   "all": {
+    "blue": 0.333,
+    "magenta": 0.326,
+    "green": 0.251,
+    "yellow": 0.173,
+    "cyan": 0.163,
+    "orange": 0.122
+   }
+  }
+ }
+}

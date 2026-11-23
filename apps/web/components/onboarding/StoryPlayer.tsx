@@ -1175,6 +1175,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       if (e.who === 'バティ') return expressions['@bati'];
       return undefined;
     },
+    people: talkPeople,
     // the directed scene: the shot and moves from each line, the script's own shot / move by hand
     direct: (e) => {
       const st = steps[Number(e.id.replace(/^s/, '').split('~')[0])];

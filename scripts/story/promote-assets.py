@@ -8,8 +8,8 @@ The client's picks → the pictures the app uses (client plan 2026-10-13). Run b
   each becomes <id>-f<k>.webp, and form N is also the standing picture <id>.webp
 
 - people: the candidate (public/story/candidates/cast/<id>/<n>.jpg) or the client's first picture
-  (design/story/cast/<name>/) is cut out of its background unless it already has one transparent —
-  rembg with isnet-anime (an anime-trained matting model, Apache-2.0) — trimmed to the figure and saved
+  (design/story/cast/<name>/) is cut out of its background unless it already has one transparent — the shared
+  matte (scripts/lib/keying.py) when the background is flat, else rembg with isnet-anime (an anime-trained matting model, Apache-2.0) — trimmed to the figure and saved
   as public/story/cast/<id>.webp (at most 1280 tall)
 - places: cropped to 9:16 and saved as public/story/places/<id>.jpg (720×1280, nothing above 720p)
 A pick is promoted once; public/story/promoted.json records what went in (change the pick to redo it).
@@ -35,6 +35,18 @@ def cutout(img: Image.Image) -> Image.Image:
     global _session
     if img.mode == "RGBA" and img.getchannel("A").getextrema()[0] < 250:
         return img  # already transparent
+    # a picture on a flat background (a key colour, the client's beige): the shared matte, scripts/lib/keying.py
+    # (cut-out review 2026-11-23: rembg left haze and ate pale parts); anything else: rembg
+    import numpy as np
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+    import keying
+
+    rgb = np.asarray(img.convert("RGB"))
+    lab = keying.oklab(np.concatenate([rgb[:6].reshape(-1, 3), rgb[-6:].reshape(-1, 3), rgb[:, :6].reshape(-1, 3), rgb[:, -6:].reshape(-1, 3)]))
+    if np.percentile(np.linalg.norm(lab - keying.oklab(keying.border_colour(rgb)), axis=1), 90) < 0.04:
+        rgba, _ = keying.cut(rgb)
+        return Image.fromarray(rgba, "RGBA")
     from rembg import new_session, remove
 
     if _session is None:

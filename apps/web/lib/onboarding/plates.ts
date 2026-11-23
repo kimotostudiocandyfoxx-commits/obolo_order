@@ -9,7 +9,8 @@
  * every shot; it is sharp, a little soft only in close-ups. The stills stay as they are for the cinema of days 1–2 and
  * for the still steps.
  */
-export type Plate = { image: string; floorY: number; horizonY: number };
+/** skyMask: the same size as the plate, white = sky (feathered), for the ambient layer's drifting sky */
+export type Plate = { image: string; floorY: number; horizonY: number; skyMask?: string };
 
 /**
  * still → the plate of that place (row mode): a scene whose background is that still stands on its plate. One plate a

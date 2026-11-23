@@ -1,58 +1,58 @@
 {
  "items": [
   {
-   "id": "talk-kimorin-talk",
+   "id": "kimorin-talk-talk",
    "size": "portrait",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture, same art style. Facial expression: talking: the small mouth open in the middle of a word, calm face. Keep exactly the same pose, body, clothes, sunglasses, size and position in the frame as the reference; only change the mouth. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
   },
   {
-   "id": "talk-kimorin-kororin",
+   "id": "kimorin-talk-kororin",
    "size": "square",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture. A tiny chibi mascot version: the whole body squashed into a cute round ball shape (like a round mochi), big head with the round sunglasses, tiny limbs, holding a small blank white paper tag with both paws, simple and adorable, same colors and style cues as the reference. Background: one flat solid chroma-key green (#00B140), no shadow. No text on the tag, no watermark."
   },
   {
-   "id": "talk-kimorin-smile-pose",
+   "id": "kimorin-talk-smile-pose",
    "size": "portrait",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture. Pose and expression: big happy smile (the mouth open in a smile), both arms raised up happily in a cheer, the tail feathers spread wide. The round black sunglasses stay on. Same character, same art style, same clothes and colors as the reference, full body, the whole body (all tail feathers) inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
   },
   {
-   "id": "talk-kimorin-surprised-pose",
+   "id": "kimorin-talk-surprised-pose",
    "size": "portrait",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture. Pose and expression: surprised (small round open mouth), leaning back a little with both paws raised in front of the chest. The round black sunglasses stay on. Same character, same art style, same clothes and colors as the reference, full body, the whole body (all tail feathers) inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
   },
   {
-   "id": "talk-kimorin-thinking-pose",
+   "id": "kimorin-talk-thinking-pose",
    "size": "portrait",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture. Pose and expression: thinking, one paw on the chin, head tilted to one side, mouth closed. The round black sunglasses stay on. Same character, same art style, same clothes and colors as the reference, full body, the whole body (all tail feathers) inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
   },
   {
-   "id": "talk-kimorin-sad-pose",
+   "id": "kimorin-talk-sad-pose",
    "size": "portrait",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture. Pose and expression: a little sad, shoulders dropped, head slightly down, arms hanging, the tail feathers drooping. The round black sunglasses stay on. Same character, same art style, same clothes and colors as the reference, full body, the whole body (all tail feathers) inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
   },
   {
-   "id": "talk-kimorin-shy-pose",
+   "id": "kimorin-talk-shy-pose",
    "size": "portrait",
    "refs": [
-    "design/story/out/talk-kimorin-base-1.jpg"
+    "design/story/out/kimorin-talk-base-1.jpg"
    ],
    "prompt": "The same character as the reference picture. Pose and expression: shy and embarrassed, pink blush on the mask cheeks, one paw scratching the back of the hood, a small bashful mouth. The round black sunglasses stay on. Same character, same art style, same clothes and colors as the reference, full body, the whole body (all tail feathers) inside the frame, about the same size in the frame as the reference. Background: one flat solid chroma-key green (#00B140) filling the whole image, no gradient, no floor, no shadow, no other objects. No text, no watermark."
   }

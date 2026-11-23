@@ -1,0 +1,396 @@
+{
+ "note": "Angle views of the story cast (scripts/views/views.py). Per character: the front picture and each view that exists. All pictures of a character share the front picture's scale and foot line: the view canvas has the front's height and foot y; its width is the front's plus padX on each side (0 unless a pose is wider), the figure centred on the front figure's centre. q3 and side face LEFT; mirror (scaleX(-1)) for right. back is seen from behind (no face). Boxes are [x, y, w, h] in the picture's own pixels; foot = the lowest solid row.",
+ "views": [
+  "q3",
+  "side",
+  "back"
+ ],
+ "faces": "left",
+ "characters": {
+  "kimorin-sun": {
+   "name": "KIMORIN",
+   "front": {
+    "src": "/onboarding/kimorin-sun.webp",
+    "w": 885,
+    "h": 1100,
+    "box": [
+     9,
+     10,
+     866,
+     1080
+    ],
+    "foot": 1090,
+    "head": [
+     222,
+     10,
+     434,
+     432
+    ]
+   },
+   "views": {}
+  },
+  "takoyaki-brother": {
+   "name": "たこ焼きブラザー",
+   "front": {
+    "src": "/onboarding/takoyaki-brother.webp",
+    "w": 852,
+    "h": 1319,
+    "box": [
+     2,
+     2,
+     848,
+     1315
+    ],
+    "foot": 1317,
+    "head": [
+     10,
+     2,
+     827,
+     224
+    ]
+   },
+   "views": {}
+  },
+  "takoyaki-sister": {
+   "name": "たこ焼きシスター",
+   "front": {
+    "src": "/onboarding/takoyaki-sister.webp",
+    "w": 910,
+    "h": 1334,
+    "box": [
+     3,
+     2,
+     904,
+     1329
+    ],
+    "foot": 1331,
+    "head": [
+     296,
+     2,
+     326,
+     199
+    ]
+   },
+   "views": {}
+  },
+  "unchi-pinpon": {
+   "name": "うんちピンポンくん",
+   "front": {
+    "src": "/onboarding/unchi-pinpon.webp",
+    "w": 726,
+    "h": 995,
+    "box": [
+     2,
+     2,
+     722,
+     991
+    ],
+    "foot": 993,
+    "head": [
+     2,
+     2,
+     722,
+     991
+    ]
+   },
+   "views": {}
+  },
+  "kaiser1": {
+   "name": "大根カイザー",
+   "front": {
+    "src": "/onboarding/kaiser1-x-talk.webp",
+    "w": 518,
+    "h": 1100,
+    "box": [
+     9,
+     9,
+     501,
+     1083
+    ],
+    "foot": 1092,
+    "head": [
+     9,
+     9,
+     501,
+     379
+    ]
+   },
+   "views": {}
+  },
+  "freezy": {
+   "name": "フリージー",
+   "front": {
+    "src": "/onboarding/freezy.webp",
+    "w": 968,
+    "h": 1299,
+    "box": [
+     2,
+     2,
+     964,
+     1296
+    ],
+    "foot": 1298,
+    "head": [
+     23,
+     2,
+     933,
+     583
+    ]
+   },
+   "views": {}
+  },
+  "hipokin": {
+   "name": "ヒポキン",
+   "front": {
+    "src": "/onboarding/hipokin.webp",
+    "w": 673,
+    "h": 1326,
+    "box": [
+     2,
+     2,
+     669,
+     1322
+    ],
+    "foot": 1324,
+    "head": [
+     109,
+     2,
+     503,
+     264
+    ]
+   },
+   "views": {}
+  },
+  "bossg": {
+   "name": "ボスG",
+   "front": {
+    "src": "/onboarding/bossg.webp",
+    "w": 793,
+    "h": 1290,
+    "box": [
+     2,
+     6,
+     789,
+     1282
+    ],
+    "foot": 1288,
+    "head": [
+     38,
+     6,
+     633,
+     256
+    ]
+   },
+   "views": {}
+  },
+  "mikie": {
+   "name": "MIKIE⭐︎DRILL",
+   "front": {
+    "src": "/onboarding/mikie.webp",
+    "w": 690,
+    "h": 1021,
+    "box": [
+     9,
+     9,
+     672,
+     1003
+    ],
+    "foot": 1012,
+    "head": [
+     9,
+     9,
+     492,
+     301
+    ]
+   },
+   "views": {}
+  },
+  "monban": {
+   "name": "MONBAN",
+   "front": {
+    "src": "/onboarding/monban.webp",
+    "w": 720,
+    "h": 1147,
+    "box": [
+     71,
+     185,
+     507,
+     932
+    ],
+    "foot": 1117,
+    "head": [
+     228,
+     185,
+     260,
+     205
+    ]
+   },
+   "views": {}
+  },
+  "talk-user": {
+   "name": "{neo}",
+   "front": {
+    "src": "/talk/user/stand.webp",
+    "w": 355,
+    "h": 900,
+    "box": [
+     74,
+     173,
+     206,
+     718
+    ],
+    "foot": 891,
+    "head": [
+     95,
+     173,
+     175,
+     215
+    ]
+   },
+   "views": {}
+  },
+  "talk-friend": {
+   "name": "friend",
+   "front": {
+    "src": "/talk/friend/stand.webp",
+    "w": 439,
+    "h": 900,
+    "box": [
+     91,
+     173,
+     256,
+     719
+    ],
+    "foot": 892,
+    "head": [
+     155,
+     173,
+     124,
+     129
+    ]
+   },
+   "views": {}
+  },
+  "talk-bati": {
+   "name": "バティ",
+   "front": {
+    "src": "/talk/bati/stand.webp",
+    "w": 1320,
+    "h": 900,
+    "box": [
+     272,
+     173,
+     775,
+     718
+    ],
+    "foot": 891,
+    "head": [
+     272,
+     173,
+     775,
+     718
+    ]
+   },
+   "views": {}
+  },
+  "obolon": {
+   "name": "OBOLON",
+   "front": {
+    "src": "/onboarding/obolon.webp",
+    "w": 800,
+    "h": 800,
+    "box": [
+     71,
+     71,
+     659,
+     659
+    ],
+    "foot": 730,
+    "head": [
+     71,
+     71,
+     659,
+     659
+    ]
+   },
+   "views": {
+    "q3": {
+     "src": "/onboarding/obolon.webp",
+     "same": "front",
+     "w": 800,
+     "h": 800,
+     "padX": 0,
+     "box": [
+      71,
+      71,
+      659,
+      659
+     ],
+     "foot": 730,
+     "head": [
+      71,
+      71,
+      659,
+      659
+     ]
+    },
+    "side": {
+     "src": "/onboarding/obolon.webp",
+     "same": "front",
+     "w": 800,
+     "h": 800,
+     "padX": 0,
+     "box": [
+      71,
+      71,
+      659,
+      659
+     ],
+     "foot": 730,
+     "head": [
+      71,
+      71,
+      659,
+      659
+     ]
+    },
+    "back": {
+     "src": "/onboarding/obolon.webp",
+     "same": "front",
+     "w": 800,
+     "h": 800,
+     "padX": 0,
+     "box": [
+      71,
+      71,
+      659,
+      659
+     ],
+     "foot": 730,
+     "head": [
+      71,
+      71,
+      659,
+      659
+     ]
+    }
+   }
+  }
+ },
+ "speakers": {
+  "KIMORIN": "kimorin-sun",
+  "たこ焼きブラザー": "takoyaki-brother",
+  "たこ焼きシスター": "takoyaki-sister",
+  "うんちピンポンくん": "unchi-pinpon",
+  "大根カイザー": "kaiser1",
+  "フリージー": "freezy",
+  "ヒポキン": "hipokin",
+  "ボスG": "bossg",
+  "MIKIE⭐︎DRILL": "mikie",
+  "MONBAN": "monban",
+  "{neo}": "talk-user",
+  "friend": "talk-friend",
+  "バティ": "talk-bati",
+  "OBOLON": "obolon"
+ }
+}

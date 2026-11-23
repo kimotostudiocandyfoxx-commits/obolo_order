@@ -59,7 +59,7 @@ def place(img, scale, canvas_w, canvas_h, foot_y):
 def kimorin():
     c = 'kimorin'
     os.makedirs(f'{OUT}/{c}', exist_ok=True)
-    base = key(f'{SRC}/talk-{c}-base-1.jpg')
+    base = key(f'{SRC}/{c}-talk-base-1.jpg')
     bx0, by0, bx1, by1 = bbox(base)
     scale = HP / (by1 - by0)
     canvas_h = int(HP * 1.25)
@@ -69,22 +69,22 @@ def kimorin():
     stand = place(base, scale, canvas_w, canvas_h, foot)
     save(stand, 'stand')
     save(stand, 'stand-blink')
-    im = key(f'{SRC}/talk-{c}-talk-1.jpg')
+    im = key(f'{SRC}/{c}-talk-talk-1.jpg')
     ix0, iy0, ix1, iy1 = bbox(im)
     save(place(im, scale * (by1 - by0) / (iy1 - iy0), canvas_w, canvas_h, foot), 'stand-talk')
     for f in ['smile', 'surprised', 'thinking', 'sad', 'shy']:
-        pose = key(f'{SRC}/talk-{c}-{f}-pose-1.jpg')
+        pose = key(f'{SRC}/{c}-talk-{f}-pose-1.jpg')
         p = place(pose, scale, canvas_w, canvas_h, foot)
         save(p, f'{f}-pose')
         if f == 'smile':
             save(p, 'smile-pose-blink')
         px0, py0, px1, py1 = bbox(pose)
-        path = f'{SRC}/talk-{c}-{f}-pose-talk-1.jpg'
+        path = f'{SRC}/{c}-talk-{f}-pose-talk-1.jpg'
         if os.path.exists(path):
             im = key(path)
             ix0, iy0, ix1, iy1 = bbox(im)
             save(place(im, scale * (py1 - py0) / (iy1 - iy0), canvas_w, canvas_h, foot), f'{f}-pose-talk')
-    k = key(f'{SRC}/talk-{c}-kororin-1.jpg')
+    k = key(f'{SRC}/{c}-talk-kororin-1.jpg')
     k = k.crop(bbox(k))
     k.thumbnail((256, 256), Image.LANCZOS)
     save(k, 'kororin')

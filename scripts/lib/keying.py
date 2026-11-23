@@ -271,6 +271,7 @@ def cut(rgb: np.ndarray, key=None, *, erode: int = 1, feather: float = 0.6, desp
         edge_labels = set(np.unique(np.concatenate([lb[0], lb[-1], lb[:, 0], lb[:, -1]])).tolist())
         # 'clearly the key': as close to it as the border's own noise (an eaten part of the figure is near the key,
         # not on it)
+        min_gap = 6 if kc > 0.08 else 80
         clear = bg & ((d < max(noise * 1.15, 0.7 * t_bg)) | (d >= t_bg))  # (the latter: a shade of the key)
         for j in range(1, n):
             if j in edge_labels:
@@ -279,7 +280,9 @@ def cut(rgb: np.ndarray, key=None, *, erode: int = 1, feather: float = 0.6, desp
             area = st[j, cv2.CC_STAT_AREA]
             n_clear = clear[st[j, 1]:st[j, 1] + st[j, 3], st[j, 0]:st[j, 0] + st[j, 2]][m].sum()
             # a gap: a fair part of it is the key itself (a small gap is mostly its own mixed edge)
-            if area >= 6 and n_clear >= max(3, 0.25 * area):
+            # (on a colourless key a small flat patch may as well be the character's own grey: only a sizeable one
+            # counts as a gap)
+            if area >= min_gap and n_clear >= max(3, 0.25 * area):
                 gaps += 1
                 continue
             core[st[j, 1]:st[j, 1] + st[j, 3], st[j, 0]:st[j, 0] + st[j, 2]][m] = True

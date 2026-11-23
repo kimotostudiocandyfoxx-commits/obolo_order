@@ -341,12 +341,14 @@ export function keyMatte(px: Uint8Array, W: number, H: number, key?: Rgb): KeyIn
   const clearCount = new Float64Array(holes.sizes.length);
   // clearly the key: flat and as close to it as the border's noise (or a shade of it)
   for (let i = 0; i < N; i++) if (holes.lab[i] && bg[i] && (d[i] < clearT || d[i] >= tBg)) clearCount[holes.lab[i]]++;
+  // on a colourless key (grey) a small flat patch may as well be the character's own grey: only a sizeable one is a gap
+  const minGap = kc > 0.08 ? 6 : 80 * (N / (864 * 1152));
   let holesFilled = 0;
   let gapsKept = 0;
   const fill = new Uint8Array(holes.sizes.length);
   for (let j = 1; j < holes.sizes.length; j++) {
     if (onEdge.has(j)) continue;
-    if (holes.sizes[j] >= 6 && clearCount[j] / holes.sizes[j] >= 0.6) gapsKept++;
+    if (holes.sizes[j] >= minGap && clearCount[j] >= Math.max(3, 0.25 * holes.sizes[j])) gapsKept++;
     else {
       fill[j] = 1;
       holesFilled++;

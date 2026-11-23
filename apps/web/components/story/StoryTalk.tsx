@@ -8,7 +8,8 @@ import { spriteUrl, stillShows } from '@/lib/onboarding/media';
 import { exprFor } from '@/lib/story/expression';
 import { batiLook, TONES, toneOf } from '@/lib/talk/looks';
 import { castLook, STORY_TALK_LOOKS } from '@/lib/talk/demoLooks';
-import { directLines, type DirectionOverride } from '@/lib/talk/direction';
+import { directLines, type DirectionOverride, type ViewsAvailable } from '@/lib/talk/direction';
+import { viewsOf } from '@/lib/story/views';
 import { charSpec } from './Stage';
 import type { Speaker, StoryVars } from '@/lib/onboarding/script';
 
@@ -202,7 +203,7 @@ export function storyPeople({
     const look = spriteLook(sprite, v);
     const t = toneFor(id);
     const who = (id === 'KIMORIN' ? 'KIMORIN' : id) as Speaker;
-    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look, ...(front.includes(id) ? {} : { back: true }) });
+    people.push({ id, name: speakerName(who), look, color: t.line, tone: t, scale: scaleOf(sprite), headAt: headOf(sprite), offstage: !look, views: viewsOf(sprite, id), ...(front.includes(id) ? {} : { back: true }) });
   }
   // heard only: 「？？？」, a speaker with no picture, and who spoke before this scene
   for (const who of entries.flatMap((e) => (e.kind === 'them' ? [e.who] : []))) {
@@ -234,6 +235,7 @@ export function storyItems({
   sprites,
   expr,
   direct,
+  people,
 }: {
   entries: StoryEntry[];
   gen: number;
@@ -243,6 +245,8 @@ export function storyItems({
   expr: (e: Extract<StoryEntry, { kind: 'them' }>) => string | undefined;
   /** the directed scene: give each line its shot and moves (with the script's own override, if any) */
   direct?: (e: StoryEntry) => DirectionOverride | undefined;
+  /** who has which other views (the angled cuts need them) */
+  people?: TalkPerson[];
 }): TalkItem[] {
   const out: TalkItem[] = [];
   for (const e of entries) {
@@ -276,8 +280,15 @@ export function storyItems({
     const dirs = directLines(
       out.map((it) => ({ id: it.id, who: it.who, text: it.text, override: ((e) => (e ? direct(e) : undefined))(entries.find((e) => `${gen}:${e.id}` === it.id)) })),
       'me',
+      people ? viewsAvailable(people) : undefined,
     );
     for (const it of out) it.direction = dirs.get(it.id);
   }
   return out;
+}
+
+/** the views each person has, for the shot choice */
+export function viewsAvailable(people: TalkPerson[]): ViewsAvailable {
+  const has = (k: 'back' | 'side' | 'q3') => new Set(people.filter((p) => p.views?.[k]).map((p) => p.id));
+  return { back: has('back'), side: has('side'), q3: has('q3') };
 }

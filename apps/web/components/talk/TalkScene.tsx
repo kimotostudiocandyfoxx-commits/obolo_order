@@ -45,7 +45,12 @@ export type TalkPerson = {
    * you; everyone else stands behind them at about 80%, a little darker, until they speak)
    */
   back?: boolean;
+  /** other views of this person (lib/story/views.json): seen from behind, from the side (facing right), at 3/4 */
+  views?: { back?: string; side?: string; q3?: string };
 };
+
+/** the row camera (TalkScene onCamera / the 'obolo:camera' event) */
+export type TalkCamera = { x: number; y: number; scale: number; originX: number; originY: number; turn: number; ms: number; stageBottom: number; stageHeight: number };
 
 export type TalkItem = {
   id: string;
@@ -175,6 +180,7 @@ export function TalkScene({
   lines = 'bubbles',
   selfName,
   plate,
+  onCamera,
 }: {
   people: TalkPerson[];
   items: TalkItem[];
@@ -242,16 +248,33 @@ export function TalkScene({
   selfName?: string;
   /** a background plate made for the row (lib/onboarding/plates.ts): its floor at the row's ground line, moved by the camera with the row */
   plate?: { src: string; floorY: number; aspect: number };
+  /**
+   * the row camera now (the directed scene), for layers that follow it with parallax (the ambient sky and dust): x / y
+   * the shift in px, scale, the point it scales about (px from the stage's top-left), its move in ms. Also sent as the
+   * window event 'obolo:camera'.
+   */
+  onCamera?: (c: TalkCamera) => void;
 }) {
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 390, h: 700 });
   useLayoutEffect(() => {
     const el = wrap.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }));
+    // a moment with no size (the talk hidden behind a full-screen step, a page in the background) is not a size: the
+    // last real one stays (else the row collapsed to nothing and stayed so — M-R251 review playthroughs)
+    const measure = () => {
+      const w = el.clientWidth || window.innerWidth;
+      const h = el.clientHeight || window.innerHeight;
+      if (w > 0 && h > 0) setSize((s) => (s.w === w && s.h === h ? s : { w, h }));
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    setSize({ w: el.clientWidth, h: el.clientHeight });
-    return () => ro.disconnect();
+    measure();
+    window.addEventListener('resize', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+    };
   }, []);
   const [reduced, setReduced] = useState(false);
   useEffect(() => setReduced(reducedQuery()), []);
@@ -767,10 +790,58 @@ export function TalkScene({
     if (!sp || !p) return null;
     return { x: sp.x * w, y: stageH - sp.bottom - sp.h + sp.h * Math.min(0.92, (p.headAt ?? 0.16) + 0.07) };
   };
+  // the angled cuts (3/4, side, over the shoulder): where the two stand and how, for this shot only. The 180° rule:
+  // whoever stands left of the other in the row stays on the left in these cuts too
+  type Angle = { x: number; scale: number; bottom?: number; hide?: boolean; mirror?: boolean; turn?: number; dim?: boolean; blur?: number; look?: TalkLook; z?: number };
+  const viewLook = (id: string, url?: string): TalkLook | undefined => (url ? { of: `${id}-view`, stand: url, faces: { normal: { kind: 'image', url } } } : undefined);
+  const angle = ((): Record<string, Angle> | null => {
+    if (!shot || !nowItem || !(shot === 'q3' || shot === 'side' || shot === 'ots')) return null;
+    const A = nowItem.who;
+    const B = shotOn;
+    const sa = spots.get(A);
+    const sb = B ? spots.get(B) : undefined;
+    const pa = byId.get(A);
+    if (!sa || !pa) return null;
+    const out: Record<string, Angle> = {};
+    if (shot === 'q3') {
+      const facesRight = (sb?.x ?? (sa.x < 0.5 ? 1 : 0)) > sa.x;
+      out[A] = { x: sa.x, scale: 1, look: viewLook(A, pa.views?.q3), ...(pa.views?.q3 ? { mirror: !facesRight } : { turn: facesRight ? CAMERA.q3.figureTurn : -CAMERA.q3.figureTurn }) };
+      return out;
+    }
+    const pb = B ? byId.get(B) : undefined;
+    if (!sb || !pb || !B) return null;
+    const aLeft = sa.x < sb.x;
+    for (const p of row) if (p.id !== A && p.id !== B) out[p.id] = { x: spots.get(p.id)!.x, scale: 1, hide: true };
+    if (shot === 'side') {
+      const C = CAMERA.side;
+      const put = (p: TalkPerson, left: boolean): Angle => ({ x: left ? C.at : 1 - C.at, scale: 1, look: viewLook(p.id, p.views?.side), mirror: !left });
+      out[A] = put(pa, aLeft);
+      out[B] = put(pb, !aLeft);
+      return out;
+    }
+    // over the shoulder: needs the listener's back view (else no such cut: the plain two-shot stands)
+    if (!pb.views?.back) return null;
+    const C = CAMERA.ots;
+    out[A] = { x: aLeft ? C.at : 1 - C.at, scale: C.far, bottom: stageH * 0.1 };
+    out[B] = { x: aLeft ? C.nearAt : 1 - C.nearAt, scale: C.near, bottom: -stageH * C.drop, blur: 2.2, dim: true, look: viewLook(B, pb.views.back), z: 6 };
+    return out;
+  })();
   const frame = (() => {
-    const f = { ox: w / 2, oy: stageH * 0.4, s: 1, tx: 0, ms: 700, push: 1, shake: false };
+    const f = { ox: w / 2, oy: stageH * 0.4, s: 1, tx: 0, ms: 700, push: 1, shake: false, turn: 0 };
     if (!shot) return f;
     const C = CAMERA[shot];
+    if (shot === 'side' || shot === 'ots' || shot === 'q3') {
+      // no angle possible (a missing view, nobody to face): the plain two-shot framing
+      if (!angle) return f;
+      const a = faceAt(nowItem?.who);
+      if (shot === 'q3' && a) {
+        const facesRight = (angle[nowItem!.who]?.turn ?? 1) > 0 || angle[nowItem!.who]?.mirror === false;
+        Object.assign(f, { ox: a.x, oy: a.y, s: CAMERA.q3.scale, tx: w * (facesRight ? CAMERA.q3.at : 1 - CAMERA.q3.at) - a.x, turn: facesRight ? CAMERA.q3.turn : -CAMERA.q3.turn });
+      } else Object.assign(f, { ox: w / 2, oy: stageH * 0.35, s: shot === 'side' ? CAMERA.side.scale : 1 });
+      f.ms = shotChanged ? 0 : 600;
+      if (reduced) Object.assign(f, { s: Math.min(f.s, CAMERA.reducedMax), turn: 0, tx: f.tx * 0.3, ms: 400 });
+      return f;
+    }
     const a = faceAt(shot === 'reaction' ? shotOn : nowItem?.who);
     if (shot === 'two') {
       const b = faceAt(shotOn);
@@ -778,6 +849,7 @@ export function TalkScene({
       else if (a) Object.assign(f, { ox: a.x, oy: a.y, s: C.scale });
     } else if (shot !== 'wide' && a) Object.assign(f, { ox: a.x, oy: a.y, s: shot === 'push' ? CAMERA.two.scale : C.scale });
     f.tx = (w / 2 - f.ox) * CAMERA.center * (f.s > 1 ? 1 : 0);
+    void C;
     // a new speaker (or the reaction after a question): a cut; else the camera moves
     f.ms = shotChanged && (dir!.cut || phase === 'after') ? 0 : shot === 'push' ? CAMERA.two.ms : C.ms;
     f.push = shot === 'push' ? CAMERA.push.scale / CAMERA.two.scale : 1;
@@ -785,6 +857,20 @@ export function TalkScene({
     if (reduced) Object.assign(f, { s: Math.min(f.s, CAMERA.reducedMax), tx: f.tx * 0.3, ms: Math.max(f.ms, 400), push: 1, shake: false });
     return f;
   })();
+  const camKey = `${frame.tx.toFixed(1)}|${frame.s.toFixed(3)}|${frame.ox.toFixed(0)}|${frame.oy.toFixed(0)}|${frame.turn}`;
+  const onCam = useRef(onCamera);
+  onCam.current = onCamera;
+  useEffect(() => {
+    if (!directed) return;
+    const c: TalkCamera = { x: frame.tx, y: 0, scale: frame.s, originX: frame.ox, originY: frame.oy, turn: frame.turn, ms: frame.ms, stageBottom: dockH, stageHeight: stageH };
+    onCam.current?.(c);
+    window.dispatchEvent(new CustomEvent('obolo:camera', { detail: c }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [camKey, directed]);
+  const lastAngled = useRef(false);
+  useEffect(() => {
+    lastAngled.current = !!angle;
+  });
   const dirKey = nowItem ? 100000 + ([...nowItem.id].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7) % 100000) * 2 + (phase === 'after' ? 1 : 0) : 0;
   const speakerX = nowItem ? spots.get(nowItem.who)?.x : undefined;
   /** the move someone makes on this line (the speaker's, or one named in an override), as a talk motion and a facing */
@@ -921,7 +1007,7 @@ export function TalkScene({
           style={{
             bottom: dockH,
             height: stageH,
-            ...(directed ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), filter .5s ease` } : {}),
+            ...(directed ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `${frame.turn ? `perspective(1100px) rotateY(${frame.turn}deg) ` : ''}translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), filter .5s ease` } : {}),
             // sharp; a little soft only in a close-up (depth of field)
             filter: directed && frame.s > 1.2 && !reduced ? 'blur(1.4px)' : undefined,
           }}
@@ -943,7 +1029,7 @@ export function TalkScene({
           bottom: dockH,
           height: stageH,
           ...(directed
-            ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), bottom .4s ease` }
+            ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `${frame.turn ? `perspective(1100px) rotateY(${frame.turn}deg) ` : ''}translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), bottom .4s ease` }
             : {
                 transformOrigin: `${Math.round(camX * 100) === 27 ? 30 : Math.round(camX * 100) === 73 ? 70 : Math.round(camX * 100)}% 85%`,
                 transform: cam ? `scale(1.1) translateX(${camShift}%)` : undefined,
@@ -968,25 +1054,27 @@ export function TalkScene({
         >
         {[...row, ...gone.filter((g) => !row.some((p) => p.id === g.p.id)).map((g) => g.p)].map((p, k) => {
           const g = gone.find((x) => x.p.id === p.id && !row.some((r) => r.id === p.id));
-          const s = g ? g.spot : spots.get(p.id)!;
+          const s0 = g ? g.spot : spots.get(p.id)!;
+          const ag = !g && angle ? angle[p.id] : undefined;
+          const s = ag ? { ...s0, x: ag.x, bottom: ag.bottom ?? s0.bottom, z: ag.z ?? s0.z, dim: ag.dim || s0.dim } : s0;
           const speaking = talkingId === p.id && !past;
           const mv = g ? null : moveOf(p);
           const towardSpeaker: 'left' | 'right' | undefined = directed && speakerX != null && nowItem?.who !== p.id ? (speakerX < s.x ? 'left' : 'right') : undefined;
           const enter = entering[p.id];
           const motion = { animation: g ? `talk-exit .6s ease-in forwards` : enter && !reduced ? `talk-enter .7s cubic-bezier(.2,.8,.25,1) both` : arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, ['--ex' as string]: `${(g ? g.side : enter) === 'l' ? -w * 0.6 : w * 0.6}px` };
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: s.dim ? 'brightness(.68) saturate(.85)' : undefined, ...motion }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...motion }}>
               {arriving && p.self && <ArrivalMotes />}
-              <div className="flex h-full items-end justify-center" style={mv?.mirror ? { transform: 'scaleX(-1)' } : undefined}>
+              <div className="flex h-full items-end justify-center" style={mv?.mirror || ag?.mirror || ag?.turn ? { transform: `${mv?.mirror !== !!ag?.mirror && (mv?.mirror || ag?.mirror) ? 'scaleX(-1) ' : ''}${ag?.turn ? `perspective(700px) rotateY(${ag.turn}deg)` : ''}`.trim() } : undefined}>
               <Figure
-                look={p.look}
+                look={ag?.look ?? p.look}
                 face={faceOf(p)}
                 named={poseOf(p)}
                 state={g ? 'idle' : stateOf(p)}
                 motion={past ? undefined : (mv?.motion ?? react[p.id]?.motion)}
                 motionKey={past ? 0 : mv ? dirKey : (react[p.id]?.key ?? 0)}
                 toward={mv?.toward ?? towardSpeaker ?? (p.self ? 'left' : 'right')}
-                height={s.h * (p.scale ?? 1)}
+                height={s.h * (p.scale ?? 1) * (ag?.scale ?? 1)}
                 chest={s.chest}
                 // the two breathe at their own pace (in step would look mechanical): 3.4 s and 4.1 s
                 breath={p.self ? 4.1 : 3.4 + ((k * 0.37) % 0.5)}

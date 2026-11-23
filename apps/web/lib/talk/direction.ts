@@ -106,7 +106,7 @@ export function directLines(lines: { id: string; who: string; text: string; over
     // a two-person exchange (the last lines go back and forth between these two) or an emotional beat (a muse, a
     // question): now and then an angled cut instead
     const pair = k >= 2 && lines[k - 1].who === listenTo && lines[k - 2].who === l.who;
-    const emotional = kind === 'muse' || kind === 'question';
+    const emotional = kind === 'muse';
     if (k >= 2 && k - lastAngle >= 4 && (pair || emotional) && d.shot !== 'punch') {
       const order: Shot[] = ['side', 'q3', 'ots'];
       for (let t = 0; t < order.length; t++) {
@@ -156,7 +156,7 @@ export const CAMERA = {
   /** side: the two at 34% / 66%, facing each other (a mirrored front figure where no side view exists) */
   side: { scale: 1.16, ms: 0, at: 0.34 },
   /** over the shoulder: the speaker back at 32% (0.72×), the listener seen from behind in front at 76% (1.55×, cut at the waist, soft, darker) */
-  ots: { scale: 1, ms: 0, at: 0.32, far: 0.72, near: 1.55, nearAt: 0.76, drop: 0.42 },
+  ots: { scale: 1, ms: 0, at: 0.32, far: 0.72, near: 1.55, nearAt: 0.76, drop: 1.05 },
   /** how far the framed point is brought toward the middle of the screen (0 = stays, 1 = centred) */
   center: 0.7,
   /** where the face is put, from the top of the stage (0..1) — under the bubbles */

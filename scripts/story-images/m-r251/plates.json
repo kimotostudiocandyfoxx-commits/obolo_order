@@ -3,7 +3,7 @@
  "items": [
   {
    "id": "plate-moon-temple",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/moon-temple.jpg"
    ],
@@ -11,7 +11,7 @@
   },
   {
    "id": "plate-moon-night",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/moon-night.jpg"
    ],
@@ -19,7 +19,7 @@
   },
   {
    "id": "plate-saturn-inside",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/saturn-inside.jpg"
    ],
@@ -27,7 +27,7 @@
   },
   {
    "id": "plate-saturn-night",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/saturn-night.jpg"
    ],
@@ -35,7 +35,7 @@
   },
   {
    "id": "plate-jupiter-forest",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/jupiter-forest.jpg"
    ],
@@ -43,7 +43,7 @@
   },
   {
    "id": "plate-jupiter-daikon",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/jupiter-daikon.jpg"
    ],
@@ -51,7 +51,7 @@
   },
   {
    "id": "plate-mercury-ice",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/mercury-ice.jpg"
    ],
@@ -59,7 +59,7 @@
   },
   {
    "id": "plate-mercury-port",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/mercury-port.jpg"
    ],
@@ -67,7 +67,7 @@
   },
   {
    "id": "plate-mars-screens",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/mars-screens.jpg"
    ],
@@ -75,7 +75,7 @@
   },
   {
    "id": "plate-arr-mars-city",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/arr-mars-city.jpg"
    ],
@@ -83,7 +83,7 @@
   },
   {
    "id": "plate-venus-stage",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/venus-stage.jpg"
    ],
@@ -91,7 +91,7 @@
   },
   {
    "id": "plate-venus-night",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/venus-night.jpg"
    ],
@@ -99,7 +99,7 @@
   },
   {
    "id": "plate-rocket-earth",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/rocket-earth.jpg"
    ],
@@ -107,7 +107,7 @@
   },
   {
    "id": "plate-rocket-space",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/rocket-space.jpg"
    ],
@@ -115,7 +115,7 @@
   },
   {
    "id": "plate-launch-pit",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/launch-pit.jpg"
    ],
@@ -123,7 +123,7 @@
   },
   {
    "id": "plate-sun-inside",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/sun-inside.jpg"
    ],
@@ -131,7 +131,7 @@
   },
   {
    "id": "plate-uranus-field",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/uranus-field.jpg"
    ],
@@ -139,7 +139,7 @@
   },
   {
    "id": "plate-uranus-shop",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/uranus-shop.jpg"
    ],
@@ -147,7 +147,7 @@
   },
   {
    "id": "plate-uranus-press",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/uranus-press.jpg"
    ],
@@ -155,7 +155,7 @@
   },
   {
    "id": "plate-neptune-town",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/neptune-town.jpg"
    ],
@@ -163,7 +163,7 @@
   },
   {
    "id": "plate-neptune-islands",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/neptune-islands.jpg"
    ],
@@ -171,7 +171,7 @@
   },
   {
    "id": "plate-earth-hall",
-   "size": "1620x2880",
+   "size": "1600x2880",
    "refs": [
     "apps/web/public/onboarding/s/earth-hall.jpg"
    ],

@@ -265,7 +265,7 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
     ],
     front: [
       { kind: 'particles', sprite: 'glint', color: '#fff2d4', count: 14, size: [1.2, 2.8], speed: [0.004, 0.002], sway: 0.006, twinkle: 1.4, alpha: 0.75, spin: true },
-      { kind: 'glows', color: '#ff4a2a', at: SATURN_LANTERNS, flicker: 0.12, sway: 0.003, alpha: 0.3 },
+      { kind: 'glows', color: '#ff4a2a', at: SATURN_LANTERNS.map(([x, y, r]) => [x, y, r * 1.5]), flicker: 0.14, sway: 0.003, alpha: 0.42 },
     ],
   },
   'saturn-night': {
@@ -309,7 +309,6 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
   'mars-screens': {
     planet: 'mars',
     skyMask: { y: 0.5, keep: 'notdark', t: 0.14 },
-    addFront: [],
     front: [
       { kind: 'particles', sprite: 'dot', color: '#e2845a', count: 40, size: [0.6, 1.6], speed: [0.075, 0.004], sway: 0.003, twinkle: 0, alpha: 0.5, y0: 0.2, y1: 0.75 },
       { kind: 'particles', sprite: 'dot', color: '#d86a48', count: 6, size: [3, 6], speed: [0.11, 0.003], sway: 0.004, twinkle: 0, alpha: 0.18 },
@@ -335,7 +334,7 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
     planet: 'uranus',
     skyMask: { y: 0.52, keep: 'all' },
     regions: [{ at: [0.46, 0.33], r: 0.18, motion: 'float', amp: 1.6, period: 18 }],
-    addSky: [{ kind: 'ring', color: '#f2fffb', at: [0.47, 0.33], rx: 0.47, ry: 0.07, angle: -28, speed: 0.05, planetR: 0.17, alpha: 0.55, mask: false }],
+    addSky: [{ kind: 'ring', color: '#f2fffb', at: [0.47, 0.33], rx: 0.47, ry: 0.07, angle: -28, speed: 0.05, planetR: 0.17, alpha: 0.35, mask: false }],
   },
   'uranus-shop': { planet: 'uranus', skyMask: { y: 0.42, keep: 'bright', t: 0.5 }, sky: [{ kind: 'clouds', color: '#ffe0ec', scale: 2.4, speed: [0.006, 0], cover: 0.45, y0: 0, y1: 0.42, alpha: 0.35 }] },
   'uranus-press': { planet: 'uranus', skyMask: { y: 0.55, keep: 'all' } },
