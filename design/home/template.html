@@ -75,6 +75,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @media (prefers-reduced-motion:reduce){.item,.item.new::after,.home::before,.spin.on{animation:none}.bg{transition:none}}
 button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 </style>
+<div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="switch" role="toolbar" aria-label="星を切りかえる"></div>
 <div class="phone" id="phone">
   <div class="bg" id="bg"></div>
@@ -125,12 +126,13 @@ const P={
   card:i=>({big:'🕹',cap:'ゲーム'})}
 };
 const $=id=>document.getElementById(id);
-let cur='saturn', items=[], oshi=new Set(['たこ焼きシスター','nana']), playing=null;
+let mode='anime',cur='saturn', items=[], oshi=new Set(['たこ焼きシスター','nana']), playing=null;
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1600)}
-function sprite(k){return A['sp-'+k]||''}
+function sprite(k){return (mode==='anime'&&A['sp2-'+k])||A['sp-'+k]||''}
 function render(){
   const c=P[cur];document.documentElement.style.setProperty('--accent',c.accent);
-  $('bg').style.backgroundImage=A['bg-'+cur]?`url(${A['bg-'+cur]})`:'linear-gradient(#335,#113)';
+  const bgi=(mode==='anime'&&A['bg2-'+cur])||A['bg-'+cur];$('bg').style.backgroundImage=bgi?`url(${bgi})`:'linear-gradient(#335,#113)';
+  document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode));
   $('ttl').innerHTML=`<small>${c.en}</small>${c.name}`;$('say').innerHTML=c.say;
   $('plate').textContent=`${ME}の${c.place}`;$('cta').textContent=c.cta;$('home').setAttribute('aria-label',`${ME}の${c.place}`);
   $('oshiN').textContent=oshi.size;
@@ -139,7 +141,7 @@ function render(){
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
   list.forEach((p,i)=>{const [x,y]=spots[i%spots.length];add({...p,x,y,i,isNew:i<2})});
   FAR.forEach((n,i)=>add({n,k:'far',x:[7,16,25,75,84,93][i],y:[53,56,51,52,57,54][i],i:i+7,far:1}));
-  document.querySelectorAll('.switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));
+  document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));
   closeAll();
   const s=$('say');s.classList.remove('mini');clearTimeout(s._t);s._t=setTimeout(()=>s.classList.add('mini'),4500);
 }
@@ -194,6 +196,7 @@ function play(){
 }
 function stopPlay(){if(playing&&playing!==true)clearTimeout(playing);playing=null;$('spin').classList.remove('on');$('needle').classList.remove('on');$('cta').textContent=P[cur].cta}
 $('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
+$('mode').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;render()}};
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
 $('home').onclick=enter;$('home').onkeydown=e=>{if(e.key==='Enter')enter()};$('cta').onclick=enter;
 $('inClose').onclick=closeAll;$('help').onclick=()=>{const s=$('say');s.classList.toggle('mini');clearTimeout(s._t)};$('oshiBtn').onclick=()=>toast('推し：'+[...oshi].join('・'));

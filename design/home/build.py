@@ -11,6 +11,12 @@ A={}
 for p in 'saturn jupiter mercury mars venus uranus pluto neptune'.split():
     f=f'{O}/home-bg-{p}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg-'+p]=uri(im,76)
+for p in 'saturn jupiter mercury mars venus uranus pluto neptune'.split():
+    f=f'{O}/home2-bg-{p}.jpg'
+    if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg2-'+p]=uri(im,76)
+for s in 'korolin butterfly ship ufo radio balloon book bubble'.split():
+    f=f'{O}/home2-sp-{s}.jpg'
+    if os.path.exists(f): k=key(Image.open(f)); k.thumbnail((240,240)); A['sp2-'+s]=uri(k,86)
 for s in 'korolin butterfly ship ufo radio balloon book bubble'.split():
     f=f'{O}/home-sp-{s}.jpg'
     if os.path.exists(f): k=key(Image.open(f)); k.thumbnail((240,240)); A['sp-'+s]=uri(k,86)
