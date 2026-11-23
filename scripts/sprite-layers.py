@@ -5,16 +5,24 @@
   <stem>-tail.webp   the tail feathers alone (they sway)
   <stem>-mouth.webp  only the pixels of the open mouth   (from <stem>-o.jpg; laid over while speaking)
   <stem>-eyes.webp   the eye slits glowing brighter (from <stem>-glow.jpg; laid over, breathing; not for sunglasses on)
-Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--eyes-from-base] [--face 0.4,0.75]
+Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--eyes-from-base] [--face 0.4,0.75] [--matte-only]
+(--matte-only: only the figure and its body / tail layers are made again — the mouth / eye / shut layers, some
+of them fixed by hand with scripts/mouth-fix.py, stay as they are. The canvas is the same as before either way.)
+The figure is cut with the shared matte (scripts/lib/keying.py, cut-out review 2026-11-23): the grey left between
+leaves, hair strands and arms goes, the grey fringe is un-mixed and despilled, specks go.
 (--eyes-from-base: the eye glow is cut from the pose itself — its bright cyan eye arcs — not from <stem>-glow.jpg,
 whose edit had redrawn KIMORIN's face: slanted black-rimmed eyes, extra forehead lines, a nose. M-R177)
 (--face: where the face is, as fractions of the figure's height; default the top 42%)
 The paintings are on flat #808080; the open-mouth and tail-less ones were edited from the closed one, so
 they line up; the mouth patch keeps only the changed pixels around the face (no flicker elsewhere)."""
+import os
 import sys
 from collections import deque
 import numpy as np
 from PIL import Image, ImageFilter
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
+import keying  # noqa: E402
 
 src, out, stem = sys.argv[1], sys.argv[2], sys.argv[3]
 no_eyes = '--no-eyes' in sys.argv
@@ -67,13 +75,22 @@ def defringe(a, al, ref):
     return np.where(edge[..., None], fixed, rgb)
 
 
+def matte(a):
+    """the shared matte on a grey painting → (alpha 0..1, clean colours)"""
+    rgba, _ = keying.cut(a.astype(np.float32), (128, 128, 128))
+    return rgba[..., 3].astype(np.float32) / 255, rgba[..., :3].astype(np.float32)
+
+
+matte_only = '--matte-only' in sys.argv
 base = load(stem)
 if base is None:
     sys.exit(f'no {stem}.jpg')
-al, ref = alpha_of(base)
-rgb = defringe(base, al, ref)
+# the canvas (crop box) comes from the flood-fill outline it always came from, so every layer — and the hand-made
+# mouth patches — keep their place
+al_old, _ = alpha_of(base)
+al, rgb = matte(base)
 h, w = al.shape
-ys, xs = np.where(al > 0.03)
+ys, xs = np.where(al_old > 0.03)
 pad = 8
 box = (max(0, xs.min() - pad), max(0, ys.min() - pad), min(w, xs.max() + pad), min(h, ys.max() + pad))
 scale = min(1.0, MAX_H / (box[3] - box[1]))
@@ -92,7 +109,7 @@ save(stem, rgb, al)
 # body / tail: the tail is what the tail-less painting no longer has
 nt = load(f'{stem}-notail')
 if nt is not None:
-    al_body, _ = alpha_of(nt)
+    al_body, _ = matte(nt)
     # the edit leaves faint outlines where the feathers were: an opening removes thin leftovers
     hard = Image.fromarray(((al_body > 0.5) * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(7)).filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(1.1))
     al_body = np.minimum(al_body, np.asarray(hard).astype(np.float32) / 255)
@@ -107,7 +124,7 @@ if nt is not None:
     save(f'{stem}-tail', rgb, tail)
 
 # the open mouth: changed pixels near the face, the largest patch
-op = load(f'{stem}-o')
+op = None if matte_only else load(f'{stem}-o')
 if op is not None:
     diff = np.abs(op - base).max(axis=2)
     face_y0, face_y1 = int(ys.min() + (ys.max() - ys.min()) * FACE[0]), int(ys.min() + (ys.max() - ys.min()) * FACE[1])
@@ -147,6 +164,7 @@ if op is not None:
 
 # the eye slits: what a copy with only the slits glowing brighter changed (<stem>-glow.jpg) → a soft glow layer
 eyes_from_base = '--eyes-from-base' in sys.argv
+no_eyes = no_eyes or matte_only
 if not no_eyes and eyes_from_base:
     # the pose's own eye arcs (light cyan, the only such pixels in the face), brightened: the face stays as painted
     face_y0, face_y1 = int(ys.min() + (ys.max() - ys.min()) * FACE[0]), int(ys.min() + (ys.max() - ys.min()) * FACE[1])

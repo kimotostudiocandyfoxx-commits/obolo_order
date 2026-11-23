@@ -2,7 +2,7 @@
 """KIMORIN's repainted sprites (design/kimorin/<stem>.jpg on chroma green, scripts/kimorin/make-queue.py) → the
 layers the story stage animates, in apps/web/public/onboarding (client 2026-11-22):
 
-  <stem>.webp        the whole figure, keyed out of the green (soft edge, green spill removed)
+  <stem>.webp        the whole figure, keyed out of its key colour (scripts/lib/keying.py)
   <stem>-body.webp   the figure without the tail feathers   (from <stem>-notail.jpg, aligned to the pose)
   <stem>-tail.webp   the tail feathers alone (they sway behind the body)
   <stem>-mouth.webp  a small patch: the open mouth only     (from <stem>-o.jpg, aligned to the pose)
@@ -25,6 +25,9 @@ import cv2
 import numpy as np
 from PIL import Image
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'lib'))
+import keying  # noqa: E402
+
 RAW = 'design/kimorin'
 OUT = 'apps/web/public/onboarding'
 LAYERS = 'apps/web/lib/story/sprite-layers.json'
@@ -39,36 +42,10 @@ def load(name):
 
 
 def key(a):
-    """alpha and clean colour from a picture on flat chroma green"""
-    r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    G = g - np.maximum(r, b)  # greenness: ~200+ on the screen, <= 0 on KIMORIN (nothing on him is green)
-    border = np.concatenate([a[:6].reshape(-1, 3), a[-6:].reshape(-1, 3), a[:, :6].reshape(-1, 3), a[:, -6:].reshape(-1, 3)])
-    bgc = np.median(border, axis=0)
-    gb = bgc[1] - max(bgc[0], bgc[2])
-    t0 = 22.0
-    al = np.clip(1 - (G - t0) / max(40.0, gb * 0.85 - t0), 0, 1)
-    # specks of screen noise and tiny islands go; the figure and anything sizeable (tears, sweat drops) stay
-    solid = (al > 0.5).astype(np.uint8)
-    n, lab, st, _ = cv2.connectedComponentsWithStats(solid, 8)
-    if n > 1:
-        big = st[1:, cv2.CC_STAT_AREA].max()
-        keep = np.zeros(n, bool)
-        keep[1:] = st[1:, cv2.CC_STAT_AREA] >= max(60, big * 0.0015)
-        near = cv2.dilate((keep[lab] & (solid > 0)).astype(np.uint8), np.ones((5, 5), np.uint8))
-        al = al * near
-    # the edge: 1 px tighter, then softened a touch
-    al = cv2.erode(al, np.ones((2, 2), np.uint8))
-    al = cv2.GaussianBlur(al, (0, 0), 0.6)
-    al[al < 0.04] = 0
-    # un-mix the green from half-covered edge pixels, then remove any green spill left
-    k = np.maximum(al, 0.05)[..., None]
-    rgb = np.where((al > 0) & (al < 0.98), 1, 0)[..., None] * ((a - (1 - k) * bgc) / k) + np.where((al > 0) & (al < 0.98), 0, 1)[..., None] * a
-    rgb = np.clip(rgb, 0, 255)
-    rgb[..., 1] = np.minimum(rgb[..., 1], np.maximum(rgb[..., 0], rgb[..., 2]) + 4)
-    # un-mixing can take out a little too much green at the very edge (a lilac rim): not below the other two there
-    edge = (al > 0) & (al < 0.98)
-    rgb[..., 1] = np.where(edge, np.maximum(rgb[..., 1], np.minimum(rgb[..., 0], rgb[..., 2]) * 0.94), rgb[..., 1])
-    return al, rgb
+    """alpha and clean colour from a picture on its flat key colour (the shared matte, scripts/lib/keying.py: OKLab
+    distance with a soft band, un-mixed and despilled edge, specks gone, holes filled unless they are the key)"""
+    rgba, _ = keying.cut(a, keying.key_for('KIMORIN')[1])
+    return rgba[..., 3].astype(np.float32) / 255, rgba[..., :3].astype(np.float32)
 
 
 def align(moving, fixed, mask):

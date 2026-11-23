@@ -150,7 +150,10 @@ export function storyPeople({
   name,
   speakerName,
   kimorinSprite,
+  heard = [],
 }: {
+  /** speaking from a screen (MONBAN on the rocket's monitor): heard, not standing in the row */
+  heard?: string[];
   onStage: string[];
   entries: StoryEntry[];
   /** a line said in this scene (the ones from before it keep their bubbles but not their place in the row) */
@@ -179,7 +182,7 @@ export function storyPeople({
   const spoke = [...(sceneSpeakers ?? entries.flatMap((e) => (e.kind === 'them' && inScene(e) ? [e.who] : []))), ...(speaking ? [speaking] : [])];
   for (const who of spoke) {
     const id = talkId(who);
-    if (sprites.has(id)) continue;
+    if (sprites.has(id) || heard.includes(id)) continue;
     const sprite = id === 'KIMORIN' ? kimorinSprite : DEFAULT_SPRITE[who];
     if (sprite) add(id, sprite);
   }

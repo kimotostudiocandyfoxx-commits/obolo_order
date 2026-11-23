@@ -49,7 +49,7 @@ export function Subtitle({ name, color, text, shown, style = 'plain', lineKey, d
         </p>
       )}
       <p
-        className="line-clamp-2 max-w-[22em] whitespace-pre-line text-[#fbf6ea] [line-break:strict] [word-break:normal]"
+        className="line-clamp-2 max-w-[22em] whitespace-pre-line text-[#fbf6ea] [line-break:strict] [text-wrap:balance] [word-break:normal]"
         style={{ fontFamily: SUB_SERIF, lineHeight: 1.5, textShadow: '0 2px 10px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.95), 0 1px 1px rgba(0,0,0,.9)', ...s.text, ...(dim ? { fontSize: 15 } : {}) }}
       >
         <Marked text={text} upto={shown} />

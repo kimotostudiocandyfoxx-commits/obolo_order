@@ -1,5 +1,6 @@
 import { BATI_FACE_TO_TALK, type PartBox, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import sharp from 'sharp';
+import { keyBackground, KEY_WORDS } from '../media/keying';
 
 /**
  * 隣に並ぶトーク (M-R232〜M-R235): what the talk needs of a look, made in the background when a look is decided —
@@ -20,15 +21,20 @@ const FACE_WORDS: Record<TalkFace, string> = {
   sad: 'a gently sad, droopy face, eyebrows tilted, mouth a small frown (soft, not crying)',
   shy: 'a shy, bashful face, cheeks blushing pink, a small embarrassed smile, eyes looking a little away',
 };
-const KEEP =
-  'Keep the same character exactly — the same face, hair, ears, clothes, colours, materials, size, framing, pose, light and the flat plain mid-grey background (#808080).';
+/** what an edit keeps; `key`: the words of the flat key colour the look is painted on (media/keying.ts KEY_WORDS) */
+const keep = (key: string = KEY_WORDS.green) =>
+  `Keep the same character exactly — the same face, hair, ears, clothes, colours, materials, size, framing, pose and light — on ${keyBackground(key)}.`;
 
 /** an expression edit of the decided look (the look itself is the reference, so the face does not drift) */
-export const talkFacePrompt = (f: TalkFace) => `Edit the first picture. ${KEEP} Change only the facial expression to ${FACE_WORDS[f]}. Cute, kids-friendly. No text, no letters.`;
+export const talkFacePrompt = (f: TalkFace, key?: string) => `Edit the first picture. ${keep(key)} Change only the facial expression to ${FACE_WORDS[f]}. Cute, kids-friendly. No text, no letters.`;
 /** M-R235: the same picture with only the eyes closed (the blink) */
-export const TALK_BLINK_PROMPT = `Edit the first picture. ${KEEP} Change only the eyes: both eyes gently closed, as soft curved lines, as in the middle of a blink. Nothing else changes, not even a pixel of the pose. No text, no letters.`;
+export const talkBlinkPrompt = (key?: string) =>
+  `Edit the first picture. ${keep(key)} Change only the eyes: both eyes gently closed, as soft curved lines, as in the middle of a blink. Nothing else changes, not even a pixel of the pose. No text, no letters.`;
 /** M-R235: the same picture with only the mouth open (the lip flap) */
-export const TALK_MOUTH_PROMPT = `Edit the first picture. ${KEEP} Change only the mouth: open it a little, as in the middle of saying "a", a small rounded open mouth. Nothing else changes, not even a pixel of the pose. No text, no letters.`;
+export const talkMouthPrompt = (key?: string) =>
+  `Edit the first picture. ${keep(key)} Change only the mouth: open it a little, as in the middle of saying "a", a small rounded open mouth. Nothing else changes, not even a pixel of the pose. No text, no letters.`;
+export const TALK_BLINK_PROMPT = talkBlinkPrompt();
+export const TALK_MOUTH_PROMPT = talkMouthPrompt();
 /** the parts of a picture that changed between two edits: diff → the region → its box (fractions) */
 export interface FoundPart {
   box: PartBox;

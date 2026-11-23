@@ -1,10 +1,11 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
+import { decideBatiPersona, decideBatiWish, moderateLookWish, rewriteBatiLines, withAgeBand, withTouch, batiPrompt, keyedBackground, batiRestylePrompt, batiSeedRule, butterflyPrompt, stickerArtPrompt, type GeneratedImage, type ImageProvider, type LlmProvider, moderateText, neoFromPhotoPrompt, neoFromReferencePrompt, neoAnimalPrompt, neoLookPrompt, neoMorePrompt, neoOmakasePrompt, neoWordsPrompt, kororinPicPrompt, refineLookPrompt } from '@obolo/ai';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
+import { chooseKey, cutoutChecked, cutoutKey, KEY_WORDS, moveToKey, onKey, type KeyName } from '../media/keying';
 import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody, SELF_TALK_FACES, TALK_FACES, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -16,7 +17,7 @@ import type { JobQueue } from '../infra/queue';
 import { BUDDY_LLM, IMAGES, KV, LLM, LOOK_IMAGES, QUEUE } from '../infra/tokens';
 import { activeBati, batiList, columnsOf, keepLook, lookHistory, type BatiRecord } from './batis';
 import { MediaService } from '../media/media.service';
-import { findPart, storedTalk, TALK_BLINK_PROMPT, TALK_MOUTH_PROMPT, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
+import { findPart, storedTalk, talkBlinkPrompt, talkMouthPrompt, TALK_PART_FACES, talkFacePrompt, type TalkWho } from './talk';
 import { day9At, toMe } from '../users/users.service';
 import { canUseMedia } from '../voice/media-consent';
 
@@ -54,21 +55,29 @@ const kororinStyle = () => (kororinSheet ??= readFile(resolve(__dirname, '../../
 let butterflySheet: Promise<GeneratedImage> | null = null;
 let kororinSheet: Promise<GeneratedImage> | null = null;
 /** The client's パタパタ butterflies (cut from the Jupiter mock), the style to follow. */
-/** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg). */
+/** The Bati's prepared body types (client decision 2026-10-25): eight per egg, on flat grey (assets/bati/<egg>-<n>.jpg); put on the key colour before an edit. */
 const BATI_DIR = resolve(__dirname, '../../assets/bati');
 const BATI_GREY: [number, number, number] = [128, 128, 128];
-const STANDEE_PROMPT =
+/*
+ * Cut-out review (2026-11-23): every picture that is cut out is painted on a flat key colour chosen far from the
+ * character's own colours (media/keying.ts chooseKey: green, magenta or blue), not on the mid-grey of before — and re-keyed
+ * by an edit when the character still came out too near it (cutoutChecked).
+ */
+const STANDEE_PROMPT = (key: KeyName) =>
   'Draw the character of the attached portrait as a full-body standing figure: the same person, face, hair, animal ears, oversized hood and ' +
   'cloak, colours, the round gold-rimmed sunglasses hiding the eyes, and the same semi-real painted style. Standing, facing the viewer, a relaxed ' +
-  'friendly pose, the whole figure inside the frame with margin around it, on a perfectly flat plain mid-grey background (#808080) with no floor, ' +
-  'no shadow and no other objects. A human body with human legs and shoes or boots: the animal is only in the ears. The hood and cloak reach only to ' +
+  'friendly pose, the whole figure inside the frame with margin around it, on ' +
+  keyedBackground(KEY_WORDS[key]) +
+  '. A human body with human legs and shoes or boots: the animal is only in the ears. The hood and cloak reach only to ' +
   'the knees, the head about one sixth of the height, the feet fully visible with empty space below them. Safe for children. No text, no letters.';
 // the small chibi NEO (M-R155/M-R161): the Jupiter butterfly, the Uranus owl, the Mercury captain, the Mars pilot, the game hero
-const CHIBI_PROMPT =
+const CHIBI_PROMPT = (key: KeyName) =>
   'Draw the character of the attached portrait as a small cute chibi figure: a big head and a small round body (about 2.5 heads tall), the same ' +
   'face, hair, animal ears, oversized hood and cloak, colours and the round gold-rimmed sunglasses, simplified and cute, soft painted style. ' +
   'Full body, standing, facing the viewer, both hands a little forward as if holding something, the whole figure inside the frame with margin ' +
-  'around it, on a perfectly flat plain mid-grey background (#808080) with no floor, no shadow and no other objects. Safe for children. No text, no letters.';
+  'around it, on ' +
+  keyedBackground(KEY_WORDS[key]) +
+  '. Safe for children. No text, no letters.';
 const FACE_WORDS: Record<BatiFace, string> = {
   smile: 'a big happy smile, eyes curved with joy',
   sparkle: 'wide open eyes with big star-shaped highlights, cheeks glowing, excited and curious, leaning forward a little',
@@ -78,8 +87,8 @@ const FACE_WORDS: Record<BatiFace, string> = {
   // test 1, E: "half closed" read as grumpy, with teeth, like an old cat
   yawn: 'a cute sleepy yawn: both eyes fully closed as soft curved lines, a small round open mouth with no teeth, a tiny tear at the corner of one eye, one paw near the mouth, cosy and sweet',
 };
-const BATI_FACE_PROMPT = (f: BatiFace) =>
-  `Edit the first picture: keep the same creature exactly — the same body, colours, materials, size, framing, light and the flat plain mid-grey background (#808080) — and change only its expression to ${FACE_WORDS[f]}. A small natural change of pose that fits the expression is fine. Cute, kids-friendly. No text, no letters.`;
+const BATI_FACE_PROMPT = (f: BatiFace, key: KeyName) =>
+  `Edit the first picture: keep the same creature exactly — the same body, colours, materials, size, framing and light, on ${keyedBackground(KEY_WORDS[key])} — and change only its expression to ${FACE_WORDS[f]}. A small natural change of pose that fits the expression is fine. Cute, kids-friendly. No text, no letters.`;
 const butterflyStyle = () => (butterflySheet ??= readFile(resolve(__dirname, '../../assets/butterfly-style.jpg')).then((data) => ({ data, mime: 'image/jpeg' })));
 
 /**
@@ -283,23 +292,25 @@ export class LookService {
     const tapped = from ? await this.media.getOwned(userId, from, 'bati') : null;
     const png = await this.media.bytesByUrl(userId, tapped?.url ?? u.batiImageUrl);
     if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
-    const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
+    // painted on the key colour farthest from its own colours, the reference put on it too
+    const bg = await chooseKey(png);
+    const ref = await onKey(png, bg);
     // the picture it was born with goes along, so the creature does not drift over many dress-ups (M-R215)
-    const born = await this.bornRef(userId, u);
+    const born = await this.bornRef(userId, u, bg);
     const refs = born ? [ref, born] : [ref];
     const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited);
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // M-R223: the seed it was born from (food / sound / word) stays somewhere small in every look
     const r0 = activeBati(u);
     const seed = { seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) };
-    const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(wish, i, !!born, seed), i, refs));
+    const made = await settleWithRetry(RESTYLE_CANDIDATES, (i) => this.looks.generate(batiRestylePrompt(wish, i, !!born, seed, KEY_WORDS[bg]), i, refs));
     const candidates = [];
     for (const r of made) {
       if (r.status !== 'fulfilled') {
         this.log.warn(`bati restyle failed: ${String(r.reason)}`);
         continue;
       }
-      const cut = await cutoutWhite(r.value.data, 768, BATI_GREY).catch(() => null);
+      const cut = await this.cut(r.value, 768, bg);
       const m = cut ? await this.media.storeImage(userId, 'bati', 'image/png', cut, origin) : await this.media.storeImage(userId, 'bati', r.value.mime, r.value.data, origin);
       candidates.push({ id: m.id, url: m.url });
     }
@@ -388,8 +399,9 @@ export class LookService {
     if (j[`look.${kind}`] && j[`look.${kind}.of`] === u.avatarUrl) return toMe(u);
     const src = await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Look not found');
-    const img = await this.looks.generate(kind === 'chibi' ? CHIBI_PROMPT : STANDEE_PROMPT, 0, [src]);
-    const cut = await cutoutWhite(img.data, 1024, BATI_GREY).catch(() => null);
+    const key = await chooseKey(src.data);
+    const img = await this.looks.generate(kind === 'chibi' ? CHIBI_PROMPT(key) : STANDEE_PROMPT(key), 0, [src]);
+    const cut = await this.cut(img, 1024, key);
     const m = cut ? await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin) : await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);
     const cur = ((await this.user(userId)).onboardingJson ?? {}) as Record<string, string>;
     const [nu] = await this.db.write
@@ -670,13 +682,22 @@ export class LookService {
     return nu;
   }
 
-  /** the picture the active {bati} was born with, on grey (null = the same as now, or none) */
-  private async bornRef(userId: string, u: typeof users.$inferSelect): Promise<GeneratedImage | null> {
+  /** the picture the active {bati} was born with, on the key colour (null = the same as now, or none) */
+  private async bornRef(userId: string, u: typeof users.$inferSelect, key: KeyName): Promise<GeneratedImage | null> {
     const born = activeBati(u)?.bornImageUrl;
     if (!born || born === u.batiImageUrl) return null;
     const png = await this.media.bytesByUrl(userId, born).catch(() => null);
     if (!png) return null;
-    return { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
+    return onKey(png, key);
+  }
+
+  /**
+   * A painting on `key` cut out (media/keying.ts); when the character came out too near the key, its background is
+   * painted again on the key farthest from its colours (one more edit) and the cleaner cut kept. Null: nothing to cut.
+   */
+  private async cut(img: GeneratedImage, out: number, key: KeyName): Promise<Buffer | null> {
+    const r = await cutoutChecked(img.data, out, key, async (_to, prompt) => (await this.looks.generate(prompt, 0, [img])).data).catch(() => null);
+    return r?.png ?? null;
   }
 
   /**
@@ -803,9 +824,9 @@ export class LookService {
     let url: string | null = null;
     for (let k = 0; k < 2 && !url; k++) {
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind)), k, body ? [body] : []);
-        // painted on the body's flat grey: cut out, so the Bati stands on the stage like the others
-        const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), k, body ? [body] : []);
+        // painted on the body's flat key colour: cut out, so the Bati stands on the stage like the others
+        const png = body ? await this.cut(img, 768, body.key) : null;
         url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
       } catch (e) {
         this.log.warn(`bati generation failed (${k + 1}): ${String(e)}`);
@@ -813,7 +834,9 @@ export class LookService {
     }
     let stand = false;
     if (!url && body) {
-      const png = await cutoutWhite(body.data, 768, BATI_GREY).catch(() => null);
+      const png = await cutoutKey(body.grey, 768, BATI_GREY)
+        .then((r) => r.png)
+        .catch(() => null);
       if (png) url = (await this.media.storeImage(userId, 'bati', 'image/png', png, origin)).url;
       stand = !!url;
     }
@@ -841,8 +864,8 @@ export class LookService {
       if (!u.batiFood || !(u.onboardingJson as Record<string, string> | null)?.['bati.stand']) return;
       const body = await this.batiBody(activeBati(u)?.egg ?? (await this.kv.get(`bati:egg:${userId}`)) ?? 'sun');
       try {
-        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind)), 7 + k, body ? [body] : []);
-        const png = body ? await cutoutWhite(img.data, 768, BATI_GREY).catch(() => null) : null;
+        const img = await this.looks.generate(batiPrompt(u.batiFood, !!body, paintKind(activeBati(u)?.seedKind), body ? KEY_WORDS[body.key] : undefined), 7 + k, body ? [body] : []);
+        const png = body ? await this.cut(img, 768, body.key) : null;
         const url = (png ? await this.media.storeImage(userId, 'bati', 'image/png', png, origin) : await this.media.storeImage(userId, 'bati', img.mime, img.data, origin)).url;
         const cur = await this.user(userId);
         if (cur.batiFood !== u.batiFood) return;
@@ -858,12 +881,20 @@ export class LookService {
     }
   }
 
-  /** One of the egg's eight body types, at random (none on disk → null, the free drawing). */
-  private async batiBody(egg: string): Promise<GeneratedImage | null> {
+  /**
+   * One of the egg's eight body types, at random (none on disk → null, the free drawing): cut off its grey and put on the
+   * key colour farthest from its colours (`grey`: the painting as it is on disk, the stand-in when painting fails).
+   */
+  private async batiBody(egg: string): Promise<(GeneratedImage & { key: KeyName; grey: Buffer }) | null> {
     const files = (await readdir(BATI_DIR).catch(() => [] as string[])).filter((f) => f.startsWith(`${egg === 'sun' ? 'sun' : 'moon'}-`));
     if (!files.length) return null;
     const f = files[Math.floor(Math.random() * files.length)];
-    return { data: await readFile(resolve(BATI_DIR, f)), mime: 'image/jpeg' };
+    const grey = await readFile(resolve(BATI_DIR, f));
+    const cut = await moveToKey(grey, BATI_GREY, 'green').catch(() => null);
+    if (!cut) return { data: grey, mime: 'image/jpeg', key: 'green', grey };
+    const key = await chooseKey(cut.png);
+    const on = key === 'green' ? cut : await onKey(cut.png, key);
+    return { data: on.data, mime: on.mime, key, grey };
   }
 
   /**
@@ -885,18 +916,19 @@ export class LookService {
     if (!todo.length) return toMe(u);
     const png = await this.media.bytesByUrl(userId, u.batiImageUrl);
     if (!png) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Bati picture not found');
-    const ref = { data: await sharp(png).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' };
+    const key = await chooseKey(png);
+    const ref = await onKey(png, key);
     // M-R223: the seed's small mark (food / sound / word) stays on every face too
     const r0 = activeBati(u);
     const keep = batiSeedRule({ seed: r0?.seed || u.batiFood || '', kind: paintKind(r0?.seedKind) });
-    const made = await settleWithRetry(todo.length, (i) => this.looks.generate(`${BATI_FACE_PROMPT(todo[i])} Keep the small mark of what it was born from exactly where it is. ${keep}`, i, [ref]));
+    const made = await settleWithRetry(todo.length, (i) => this.looks.generate(`${BATI_FACE_PROMPT(todo[i], key)} Keep the small mark of what it was born from exactly where it is. ${keep}`, i, [ref]));
     const faces = { ...have };
     for (const [i, r] of made.entries()) {
       if (r.status !== 'fulfilled') {
         this.log.warn(`bati face ${todo[i]} failed: ${String(r.reason)}`);
         continue;
       }
-      const cut = await cutoutWhite(r.value.data, 768, BATI_GREY).catch(() => null);
+      const cut = await this.cut(r.value, 768, key);
       const m = cut ? await this.media.storeImage(userId, 'bati', 'image/png', cut, origin) : await this.media.storeImage(userId, 'bati', r.value.mime, r.value.data, origin);
       faces[todo[i]] = m.url;
     }
@@ -935,11 +967,13 @@ export class LookService {
     const stand = who === 'me' ? (j1['look.standee.of'] === of ? j1['look.standee'] : null) || of : of;
     const png = await this.media.bytesByUrl(userId, stand);
     if (!png) return;
-    const onGrey = async (b: Buffer) => ({ data: await sharp(b).flatten({ background: { r: 128, g: 128, b: 128 } }).jpeg({ quality: 92 }).toBuffer(), mime: 'image/jpeg' });
-    const ref = await onGrey(png);
+    // painted on the key colour farthest from the look's own colours
+    const key = await chooseKey(png);
+    const kw = KEY_WORDS[key];
+    const ref = await onKey(png, key);
     const kind = who === 'me' ? ('avatar' as const) : ('bati' as const);
     const store = async (img: GeneratedImage) => {
-      const cut = await cutoutWhite(img.data, 1024, BATI_GREY).catch(() => null);
+      const cut = await this.cut(img, 1024, key);
       const m = cut ? await this.media.storeImage(userId, kind, 'image/png', cut, origin) : await this.media.storeImage(userId, kind, img.mime, img.data, origin);
       return { url: m.url, png: cut ?? img.data };
     };
@@ -953,7 +987,7 @@ export class LookService {
     const reuse: Partial<Record<TalkFace, string>> = { smile: old.smile, surprised: old.surprise, thinking: old.think, sad: old.sad };
     const wanted = (who === 'me' ? SELF_TALK_FACES : TALK_FACES).filter((f) => f !== 'normal');
     const todo = wanted.filter((f) => !reuse[f]);
-    const painted = await settleWithRetry(todo.length, (i) => this.looks.generate(talkFacePrompt(todo[i]), 11 + i, [ref]).then(store));
+    const painted = await settleWithRetry(todo.length, (i) => this.looks.generate(talkFacePrompt(todo[i], kw), 11 + i, [ref]).then(store));
     const pics: Partial<Record<TalkFace, { url: string; png: Buffer | null }>> = { normal: { url: stand, png } };
     for (const f of wanted) if (reuse[f]) pics[f] = { url: reuse[f]!, png: null };
     painted.forEach((r, i) => {
@@ -968,9 +1002,9 @@ export class LookService {
       partFaces.map(async (f, i) => {
         const base = pics[f]!.png ?? (await this.media.bytesByUrl(userId, pics[f]!.url));
         if (!base) return;
-        const r = await onGrey(base);
-        const [blink, mouth] = await Promise.allSettled([this.looks.generate(TALK_BLINK_PROMPT, 31 + i, [r]), this.looks.generate(TALK_MOUTH_PROMPT, 41 + i, [r])]);
-        const cutOf = async (g: PromiseSettledResult<GeneratedImage>) => (g.status === 'fulfilled' ? ((await cutoutWhite(g.value.data, 1024, BATI_GREY).catch(() => null)) ?? g.value.data) : null);
+        const r = await onKey(base, key);
+        const [blink, mouth] = await Promise.allSettled([this.looks.generate(talkBlinkPrompt(kw), 31 + i, [r]), this.looks.generate(talkMouthPrompt(kw), 41 + i, [r])]);
+        const cutOf = async (g: PromiseSettledResult<GeneratedImage>) => (g.status === 'fulfilled' ? ((await this.cut(g.value, 1024, key)) ?? g.value.data) : null);
         const [eb, mb] = await Promise.all([cutOf(blink), cutOf(mouth)]);
         const e = faces[f] as Extract<TalkExpression, { kind: 'image' }>;
         const eyes = eb ? await findPart(base, eb, [0, 0.5]).catch(() => null) : null;

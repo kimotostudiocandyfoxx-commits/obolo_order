@@ -47,7 +47,7 @@ import { VenusLesson } from '@/components/venus/VenusLesson';
 import { bgmAt, fill, labelIndex, mediaAt, sayText, speakerName, type PictureFx, type Speaker, type Step, type StoryVars, type TimedCaption } from '@/lib/onboarding/script';
 import { ChatLog, MessageBar, ReplyChips, SysLine, type Avatar, type ChatEntry, type ChatReveal } from '@/components/story/Chat';
 import { linesOf, stageOf } from '@/lib/onboarding/stage';
-import { PLATES, plateUrl, STILL_CLEAN } from '@/lib/onboarding/plates';
+import { plateFor, plateUrl, STILL_CLEAN } from '@/lib/onboarding/plates';
 import { lineKind } from '@/lib/talk/direction';
 import { SubtitleScrim, SUBTITLE_CSS, TypedSubtitle } from '@/components/story/Subtitle';
 import { TONES } from '@/lib/talk/looks';
@@ -1145,13 +1145,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
     onStage: charsOnStage,
     entries: threadEntries,
     inScene: (e) => Number(e.id.replace(/^s/, '').split('~')[0]) >= sceneFrom,
-    sceneSpeakers: steps.slice(sceneFrom, i).flatMap((s) => (s.t === 'say' ? [s.who] : [])),
+    // (who spoke from the rocket's screen was not here: they do not join the row when it closes)
+    sceneSpeakers: (() => {
+      let onScreen = false;
+      return steps.slice(sceneFrom, i).flatMap((s) => {
+        if (s.t === 'screen') onScreen = !!s.open;
+        return s.t === 'say' && !(onScreen && s.who === 'MONBAN') ? [s.who] : [];
+      });
+    })(),
     speaking: talkSays?.who ?? null,
     v,
     self: selfTalkLook,
     name: v.neo || v.name || 'あなた',
     speakerName: (who) => speakerName(who, v),
     kimorinSprite: kimorinLook ?? (v.kimorinStar ? 'kimorin-sun' : 'kimorin-i'),
+    // MONBAN on the rocket's screen speaks from it (he is not in the cabin)
+    heard: screen ? ['MONBAN'] : [],
   });
   const talkItems = storyItems({
     entries: chatOn ? threadEntries : [],
@@ -1182,7 +1191,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const cineKind = cinema && talkSays ? lineKind(sayText(talkSays.who, talkSays.text, v)) : null;
   const cineShot = cineKind === 'shout' ? 'punch' : cineKind === 'muse' ? 'push' : null;
   // the row's background: the scene's plate (made for the figures' size) or the still with its cast painted out
-  const plate = !cinema && sceneNow ? PLATES[sceneNow] : undefined;
+  const plate = !cinema ? plateFor(sceneNow, still) : undefined;
   const [plateAspect, setPlateAspect] = useState(0.5625);
   useEffect(() => {
     if (!plate) return;

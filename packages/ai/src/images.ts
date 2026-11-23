@@ -336,7 +336,7 @@ export function stickerArtPrompt(words: string, style?: string): string {
 
 /**
  * The newborn Bati (client decision 2026-10-25): the egg holds one of eight prepared body types (no misses —
- * apps/api/assets/bati/<egg>-<n>.jpg, painted on flat grey); the favourite food is mixed into that body.
+ * apps/api/assets/bati/<egg>-<n>.jpg, painted on flat grey and put on the key colour before the edit); the favourite food is mixed into that body.
  * Without the body picture (no file), the old free drawing.
  */
 const FOOD_PARTS: [RegExp, string][] = [
@@ -393,13 +393,23 @@ export function batiSeedRule(s: BatiSeed | null | undefined): string {
   );
 }
 
-export function batiPrompt(food: string, fromBody = false, kind: BatiSeedKind = 'food'): string {
+/**
+ * The flat background a picture that is cut out is painted on (cut-out review 2026-11-23): a pure key colour chosen
+ * far from the character's own colours (apps/api/src/media/keying.ts chooseKey), never the mid-grey of before — grey
+ * shading, white masks and silver were eaten by it and its fringe stayed. `key` is the words for the colour, e.g.
+ * "pure chroma-key green (#00FF00)".
+ */
+export const DEFAULT_KEY_WORDS = 'pure chroma-key green (#00FF00)';
+export const keyedBackground = (key: string = DEFAULT_KEY_WORDS) =>
+  `a perfectly flat, solid ${key} background — one single even colour everywhere around it, also in the gaps — with no floor, no shadow, no light spill and no other objects; nothing on the character is that colour`;
+
+export function batiPrompt(food: string, fromBody = false, kind: BatiSeedKind = 'food', key: string = DEFAULT_KEY_WORDS): string {
   // M-R218 / M-R223: a {bati} born from a sound or a word carries it as a small motif (the body is restyled like the food's)
   if (kind !== 'food') {
     const motif = batiSeedRule({ seed: food, kind });
     if (fromBody)
       return (
-        "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. " +
+        "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes exactly the same, on " + keyedBackground(key) + '. ' +
         `Restyle its colours, patterns and small accessories so it is clearly inspired by ${kind === 'sound' ? 'the sound' : 'the word'} "${food}" and the mood it gives. ` +
         'It stays a cute, friendly creature, never scary. Keep the tiny mark on its forehead. ' +
         motif
@@ -408,7 +418,7 @@ export function batiPrompt(food: string, fromBody = false, kind: BatiSeedKind = 
   }
   if (fromBody)
     return (
-      "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes and the flat grey background exactly the same. " +
+      "Edit the first picture: keep the creature's body shape, silhouette, pose, size, framing, face and eyes exactly the same, on " + keyedBackground(key) + '. ' +
       `Restyle its colours, patterns and small accessories so it is clearly inspired by "${food}": the food's colours become its colours, and small parts of the food ` +
       'become a little hat, ear tips, tufts, cheeks or the tip of its tail. Its skin or fur stays soft, smooth and clean (no raw food texture all over the body, ' +
       `no meat on its skin). The food's signature parts must be clearly visible: ${foodParts(food)}. ` +
@@ -418,7 +428,7 @@ export function batiPrompt(food: string, fromBody = false, kind: BatiSeedKind = 
 }
 
 /**
- * Bati's room (P-BATI-ROOM): the hatched Bati, on its flat grey, dressed up or changed a little by the member's wish —
+ * Bati's room (P-BATI-ROOM): the hatched Bati, on its flat key colour, dressed up or changed a little by the member's wish —
  * clothes, accessories, a small transformation — and still clearly the same creature. Three variations per round.
  */
 /**
@@ -441,11 +451,11 @@ export const BATI_LOOK_RULES =
 export const BATI_RESTYLE_TOUCH_WORDS = [
   'Japanese anime style: clean line art, cel shading, big expressive anime eyes, vivid colours',
   'Japanese yuru-chara mascot style: very simple rounded shapes, thick soft outlines, flat pastel colours, a gentle goofy charm',
-  'cute 3D style: a soft rounded 3D render like a vinyl toy figure, smooth materials, soft studio light (still on the flat grey background)',
-  'pixel art style: a crisp 32-bit pixel-art sprite with a limited palette and visible square pixels (still on the flat grey background)',
+  'cute 3D style: a soft rounded 3D render like a vinyl toy figure, smooth materials, soft studio light (still on the same flat background)',
+  'pixel art style: a crisp 32-bit pixel-art sprite with a limited palette and visible square pixels (still on the same flat background)',
 ] as const;
 
-export function batiRestylePrompt(wish: string, variant = 0, withOriginal = false, seed?: BatiSeed | null): string {
+export function batiRestylePrompt(wish: string, variant = 0, withOriginal = false, seed?: BatiSeed | null, key: string = DEFAULT_KEY_WORDS): string {
   const ways = ['a happy pose', 'a proud little pose, showing off the new look', 'a playful pose, turning a little', 'a cheerful little jump'];
   const w = wish.trim();
   const change = w
@@ -456,8 +466,9 @@ export function batiRestylePrompt(wish: string, variant = 0, withOriginal = fals
     : `Redraw it in a different art touch, keeping who it is: ${pick([...BATI_RESTYLE_TOUCH_WORDS], variant)}. ${pick(ways, variant)}. `;
   return (
     'Edit the first picture: it is the same small magical partner creature called Bati — its look now, the reference to follow — and it must ' +
-    'stay clearly the same creature: the same face, eyes, body shape, main colours, the tiny mark on its forehead, the framing and the flat ' +
-    'plain mid-grey background (#808080) with no floor, no shadow and no other objects. ' +
+    'stay clearly the same creature: the same face, eyes, body shape, main colours, the tiny mark on its forehead and the framing, on ' +
+    keyedBackground(key) +
+    '. ' +
     (withOriginal ? 'The second picture is the same creature as it was born: keep its identity (face, eyes, body shape) from it. ' : '') +
     change +
     (seed?.kind === 'word' ? 'No other text, no other letters. ' : 'No text, no letters. ') +

@@ -10,7 +10,16 @@ Saved under design/kimorin/ (not deployed); scripts/kimorin/build.py cuts them i
 Run: python3 scripts/kimorin/make-queue.py
 """
 import json
+import os
 import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'lib'))
+import keying  # noqa: E402
+
+# the key colour KIMORIN is painted on (scripts/lib/key-colours.json: the one farthest from his colours)
+KEY = keying.key_for('KIMORIN')[0]
+KW = keying.KEY_WORDS[KEY]
+COLOUR = {'green': 'green', 'blue': 'blue', 'magenta': 'magenta', 'cyan': 'cyan', 'orange': 'orange', 'yellow': 'yellow'}[KEY]
 
 # a trial: only the stems given (python3 scripts/kimorin/make-queue.py kimorin-i-talk …)
 ARGS = sys.argv[1:]
@@ -61,14 +70,14 @@ POSES = {
     'blush': "Pose: shy and flustered, shoulders raised, both paws held together in front of his chest, fidgeting. His face is blushing: soft pink-red blush across both cheeks, "
              "two small embarrassed sweat drops beside his head, tiny wobbly closed mouth. (Only the blush is new; the face design stays the same.)",
 }
-BG = ("Background: a completely flat, solid, pure chroma-key green (#00FF00) everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. "
-      "Nothing on the character is green. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, "
+BG = (f"Background: a completely flat, solid, {KW} everywhere around him, no gradient, no floor, no shadow, no light spill, no other objects. "
+      f"Nothing on the character is {COLOUR}. The whole body is in the picture, centred, from the ear tips to the feet with a small margin, "
       "the feet near the bottom, the figure fills about 88% of the picture's height. Clean sharp outline. "
       "Highly detailed painterly anime render, soft studio light from the front. No text, no letters.")
-KEEP = "Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat pure green (#00FF00) background — "
+KEEP = f"Edit the first picture: keep everything exactly the same, pixel for pixel — the same character, pose, framing, size, colours, light and the flat {KW} background — "
 OPEN = KEEP + ("and change ONLY his tiny mouth: it is now open as if saying 'a', a small rounded open mouth with dark red inside and a little pink tongue, "
                "in the same place as the closed mouth. Nothing else changes: not the eyes, not the face marks, not the cheeks or any blush on them, not the hands. No text.")
-NOTAIL = KEEP + ("but remove the whole fan of tail feathers{wing} behind him, so the flat pure green background shows where they were. "
+NOTAIL = KEEP + ("but remove the whole fan of tail feathers{wing} behind him, so the flat " + COLOUR + " background shows where they were. "
                  "Everything else stays exactly as it is. No text.")
 
 items = []

@@ -257,6 +257,19 @@ export function TalkScene({
   useEffect(() => setReduced(reducedQuery()), []);
 
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people]);
+  // each standing picture's width / height (to keep a wide one inside the screen)
+  const [aspects, setAspects] = useState<Record<string, number>>({});
+  const standKey = people.map((p) => p.look?.stand ?? '').join('|');
+  useEffect(() => {
+    for (const p of people) {
+      const u = p.look?.stand;
+      if (!u || aspects[u]) continue;
+      const im = new Image();
+      im.onload = () => setAspects((a) => ({ ...a, [u]: im.naturalWidth / im.naturalHeight }));
+      im.src = u;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [standKey]);
   const self = people.find((p) => p.self);
   const others = people.filter((p) => !p.self && !p.offstage);
   // M-R249: no look of yours yet (day 1 until the look is made on day 2's Moon) — first person: you are not shown, the
@@ -604,7 +617,9 @@ export function TalkScene({
   // the layout (phone portrait first; the client's prototype, design/talk/proto.html)
   const { w, h } = size;
   const barH = bar ? 62 : 0;
-  const dockH = dock ?? (keyboard ? 64 : 110);
+  // subtitles: a band of their own under the row (the words never sit over the people)
+  const subBand = lines === 'subtitles' ? 96 : 0;
+  const dockH = (dock ?? (keyboard ? 64 : 110)) + subBand;
   const chest = keyboard;
   // the pair stands low (design/talk/proto.html): at most 46% of the height (420 px), each 40% wide with 6% between;
   // the pictures share one canvas with headroom for raised arms, so the heads are about 16% down into it
@@ -670,6 +685,18 @@ export function TalkScene({
       spots.set(p.id, { x: Math.min(0.93, Math.max(0.07, x)), bottom: back ? stageH * 0.52 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : back ? 0.2 : 0.9 / r.length, chest: chest || back });
     });
   });
+  // a wide picture at an end of the row (a painted resident with something held out to one side) is kept inside the
+  // screen: its whole width, from its picture's own proportions
+  for (const p of row) {
+    const sp = spots.get(p.id);
+    const r = p.look?.stand ? aspects[p.look.stand] : undefined;
+    // (the talk cast's pictures share a padded canvas: their figures are well inside it)
+    if (!sp || !r || sp.chest || p.look?.poses) continue;
+    const half = (sp.h * (p.scale ?? 1) * (r > 0.9 ? 0.58 : 1) * r) / 2 / w;
+    const m = 4 / w;
+    if (sp.x - half < m && sp.x + half <= 1 - m) sp.x = Math.min(0.5, m + half);
+    else if (sp.x + half > 1 - m && sp.x - half >= m) sp.x = Math.max(0.5, 1 - m - half);
+  }
   // with the keyboard up the bubbles sit over the canvas's top edge, clear of the two faces
   // the tallest in the row sets where the bubbles start (a small one alone lets them come down to its head)
   // (the story's back row: their heads by where they stand — lower and smaller than the front)
@@ -738,7 +765,7 @@ export function TalkScene({
     const sp = id ? spots.get(id) : undefined;
     const p = id ? byId.get(id) : undefined;
     if (!sp || !p) return null;
-    return { x: sp.x * w, y: stageH - sp.bottom - sp.h + sp.h * Math.min(0.6, (p.headAt ?? 0.16) + 0.07) };
+    return { x: sp.x * w, y: stageH - sp.bottom - sp.h + sp.h * Math.min(0.92, (p.headAt ?? 0.16) + 0.07) };
   };
   const frame = (() => {
     const f = { ox: w / 2, oy: stageH * 0.4, s: 1, tx: 0, ms: 700, push: 1, shake: false };
@@ -981,8 +1008,8 @@ export function TalkScene({
       {lines === 'subtitles' && (
         <>
           <style>{SUBTITLE_CSS}</style>
-          <SubtitleScrim bottom={dockH} />
-          <div className="pointer-events-none absolute inset-x-0 z-[9] flex flex-col items-center justify-end gap-3 px-5" style={{ bottom: dockH + 10 }}>
+          <SubtitleScrim bottom={dockH - subBand} height={subBand + 150} />
+          <div className="pointer-events-none absolute inset-x-0 z-[9] flex flex-col items-center justify-end gap-3 px-5" style={{ bottom: dockH - subBand + 8, maxHeight: past ? dockH + stageH * 0.6 : undefined }}>
             {(past ? units.slice(Math.max(0, end - 4), end) : nowUnit ? [nowUnit] : []).map((u, k, list) => {
               const it = u.item;
               const who = byId.get(it.who);
@@ -1071,7 +1098,7 @@ export function TalkScene({
           ))}
 
       {past ? (
-        <button onClick={backToNow} className="absolute left-1/2 z-[21] -translate-x-1/2 rounded-full bg-[rgba(223,230,255,.92)] px-4 py-[7px] text-[12px] font-bold text-[#070b24] shadow-[0_4px_14px_rgba(0,0,0,.35)]" style={{ bottom: dockH - 6 }}>
+        <button onClick={backToNow} className="absolute left-1/2 z-[21] -translate-x-1/2 rounded-full bg-[rgba(223,230,255,.92)] px-4 py-[7px] text-[12px] font-bold text-[#070b24] shadow-[0_4px_14px_rgba(0,0,0,.35)]" style={subBand ? { top: top + 56 } : { bottom: dockH - 6 }}>
           いまに戻る
         </button>
       ) : (
