@@ -7029,6 +7029,63 @@
         "design/mv-art/out/jun-14-together-b.jpg"
       ],
       "always": false
+    },
+    {
+      "id": "tak-14b-toast",
+      "prompt": "the man in the reference photo (keep his face and hairstyle exactly as in the photo, including his thin round glasses), shirtless with a heroic, extremely muscular bodybuilder physique, huge radiant white feathered angel wings, a glowing golden halo above his head, a white cloth wrapped at the hips and a golden sash across one shoulder, sitting at a white marble table on the clouds beside a young blond curly-haired muscular angel wearing a tall white chef's hat; both raise steaming bowls of ramen high in a joyful toast; the man laughs toward the viewer, his face clearly visible and in focus; the angel smiles at him in profile; golden divine light, heartfelt and comic.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "/tmp/mv-tak-3.jpg"
+      ]
+    },
+    {
+      "id": "tak-pre-fusion",
+      "prompt": "In a vast heavenly sky of cream clouds, a swirling river of glowing white protein powder and a river of creamy golden tonkotsu broth intertwine and dance around each other like two streams of light, braiding into a radiant double helix that rises above a golden ramen bowl, sparkles and steam, little cherubs wrapped in white cloth watching in awe from the clouds, god rays; majestic, sacred and absurdly grand.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "tak-09b-protein-pour",
+      "prompt": "Dramatic close-up: a golden scoop pours a glittering cascade of white protein powder into a gigantic golden pot of milky tonkotsu broth, the powder swirling into the broth in glowing spirals, rich steam rising like clouds, golden heavenly light, no people.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "tak-new-era",
+      "prompt": "A gleaming radiant bowl of ramen of the new era enshrined on a white marble altar in a heavenly temple of light, its broth glowing gold, a protein shaker and tiny golden dumbbells orbiting the bowl like planets, two cherubs wrapped in white cloth presenting it with golden trumpets, beams of light; majestic and comic.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ]
+    },
+    {
+      "id": "tak-14b-toast-plate",
+      "prompt": "Edit this painting: remove both winged figures and their bowls completely, so that only the empty background remains. Keep everything else exactly as it is — the same sky, light rays, clouds, the marble table, the same composition, the same oil-painting brushwork. Fill the space where they were with the matching background (clouds, sky and light) so it looks naturally painted. No people, no wings, no halo, no text.",
+      "w": 2048,
+      "h": 2048,
+      "size": [
+        1440,
+        1440
+      ],
+      "refs": [
+        "design/mv-art/out/tak-14b-toast.jpg"
+      ],
+      "always": false
     }
   ],
   "redo": []

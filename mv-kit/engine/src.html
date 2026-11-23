@@ -335,13 +335,14 @@ function glyph(ch, px, st, col) {
   const m = mk(4, 4).getContext('2d'); m.font = font; const adv = m.measureText(ch).width;
   const gl = { core, halo, soft, S, bx, by, adv }; glyphs.set(key, gl); return gl;
 }
+const VERT = { 'ー': '｜', '－': '｜', '—': '｜', '〜': '≀', '～': '≀', '「': '﹁', '」': '﹂', '『': '﹃', '』': '﹄', '（': '︵', '）': '︶' };   // vertical columns: long-vowel bar and brackets turned upright
 const KANJI = /[\p{Script=Han}々]/u, SMALL = 'ぁぃぅぇぉっゃゅょゎァィゥェォッャュョ';
 function layoutLine(L0) {   // cached char positions (each char carries its own size)
   if (L0.lay) return L0.lay;
   const base = 54, chars = [], boxes = [];
   L0.rows.forEach((row, ri) => {
     const P = L0.place[ri] || L0.place[L0.place.length - 1], px = Math.round(base * P.k), ls = px * (.06 + (P.sp || 0));
-    const cs = [...row].map(ch => { const sz = KANJI.test(ch) ? Math.round(px * 1.12) : px; return { ch, sz, gl: ch === '\u2002' ? null : glyph(ch, sz, L0.style, L0.color) }; });
+    const cs = [...row].map(ch0 => { const ch = P.v ? (VERT[ch0] || ch0) : ch0; const sz = KANJI.test(ch) ? Math.round(px * 1.12) : px; return { ch, sz, gl: ch === '\u2002' ? null : glyph(ch, sz, L0.style, L0.color) }; });
     const row0 = chars.length;
     if (P.v) {   // vertical column, top to bottom; the glyph's em centre sits on the column centre
       let y = P.y * H; const x = P.x * W;
