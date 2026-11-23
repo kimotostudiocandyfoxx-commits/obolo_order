@@ -47,6 +47,7 @@ const SPRITE_OF: Record<string, Speaker> = {
   hatg: 'ハットG',
   longg: 'ロングG',
   mikie: 'MIKIE⭐︎DRILL',
+  crocopatra: 'クロコパトラ',
   '@bati': 'バティ',
   '@bati-weak': 'バティ',
 };
@@ -64,6 +65,8 @@ const DEFAULT_SPRITE: Partial<Record<Speaker, string>> = {
   ハットG: 'hatg',
   ロングG: 'longg',
   'MIKIE⭐︎DRILL': 'mikie',
+  // Uranus's madam (M-R251 review: she stands while she talks; scripts/story-images/m-r251, crocopatra-stand)
+  クロコパトラ: 'crocopatra',
   バティ: '@bati',
 };
 export const speakerOfSprite = (name: string): Speaker | null => SPRITE_OF[name] ?? null;
@@ -71,7 +74,7 @@ export const speakerOfSprite = (name: string): Speaker | null => SPRITE_OF[name]
 export const talkId = (who: string) => (who.startsWith('KIMORIN') ? 'KIMORIN' : who);
 
 /** M-R245: each one's bubble colour, fixed ({bati} はちみつ; the cast in the group colours, one each) */
-const TONE_OF: Record<string, keyof typeof TONES> = { KIMORIN: 'apricot', MONBAN: 'greyblue', OBOLON: 'lilac', バティ: 'honey', たこ焼きブラザー: 'rose', たこ焼きシスター: 'rose', うんちピンポンくん: 'sage', 'MIKIE⭐︎DRILL': 'rose' };
+const TONE_OF: Record<string, keyof typeof TONES> = { KIMORIN: 'apricot', MONBAN: 'greyblue', OBOLON: 'lilac', バティ: 'honey', たこ焼きブラザー: 'rose', たこ焼きシスター: 'rose', うんちピンポンくん: 'sage', 'MIKIE⭐︎DRILL': 'rose', クロコパトラ: 'rose' };
 const toneFor = (id: string) => TONES[TONE_OF[id] ?? ''] ?? toneOf(id);
 /** a story speaker's colour (their name over a subtitle) */
 export const storyTone = (who: string) => toneFor(talkId(who));

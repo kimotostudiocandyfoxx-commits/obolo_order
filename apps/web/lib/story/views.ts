@@ -1,24 +1,26 @@
 import VIEWS from './views.json';
 
 /**
- * The other views of the story characters (made by the views job; client review of M-R251): per id — a sprite stem
- * (kimorin-sun, monban …) or a speaker (KIMORIN, MONBAN …) — its view files and where its feet and head are. The
- * directed row uses them for the angled cuts (lib/talk/direction.ts: q3 / side / ots); a missing view falls back
- * (no back view → no over-the-shoulder; no side or 3/4 view → the front figure, mirrored or turned).
+ * The other views of the story characters (scripts/views/views.py writes views.json; client review of M-R251): per
+ * character (a sprite stem: kimorin-sun, monban …; speakers map to them) its front picture and each view that exists
+ * — q3 (3/4) and side face LEFT (mirror for right), back is seen from behind; every view shares the front's scale and
+ * foot line. The directed row uses them for the angled cuts (lib/talk/direction.ts: q3 / side / ots); a missing view
+ * falls back (no back view → no over-the-shoulder; no side or 3/4 view → the front figure, mirrored or turned).
  */
-type Entry = { views?: { back?: string; side?: string; q3?: string; front?: string }; back?: string; side?: string; q3?: string; footY?: number; head?: { x: number; y: number; w: number; h: number } };
-const ALL = VIEWS as Record<string, Entry>;
+type View = { src: string };
+type Character = { name?: string; front?: View; views?: Partial<Record<'q3' | 'side' | 'back', View | string>> };
+const M = VIEWS as unknown as { characters?: Record<string, Character>; speakers?: Record<string, string> };
 
-const url = (f?: string) => (!f ? undefined : f.startsWith('/') || f.startsWith('http') ? f : `/onboarding/${f}`);
+const srcOf = (v?: View | string) => (typeof v === 'string' ? v : v?.src);
 
-/** a person's views by their sprite (then their speaker name) */
+/** a person's views by their sprite, then their speaker name (undefined: none made) */
 export function viewsOf(...keys: (string | undefined)[]): { back?: string; side?: string; q3?: string } | undefined {
   for (const k of keys) {
-    const e = k ? (ALL[k] ?? ALL[k.toLowerCase()]) : undefined;
-    if (!e) continue;
-    const v = e.views ?? e;
-    const out = { back: url(v.back), side: url(v.side), q3: url(v.q3) };
-    return out.back || out.side || out.q3 ? out : undefined;
+    if (!k) continue;
+    const c = M.characters?.[k] ?? M.characters?.[M.speakers?.[k] ?? ''];
+    if (!c?.views) continue;
+    const out = { back: srcOf(c.views.back), side: srcOf(c.views.side), q3: srcOf(c.views.q3) };
+    if (out.back || out.side || out.q3) return out;
   }
   return undefined;
 }

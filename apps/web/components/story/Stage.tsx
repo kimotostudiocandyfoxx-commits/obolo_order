@@ -86,6 +86,8 @@ const CHAR: Record<string, CharSpec> = {
   longg: { bottom: 6, height: 70, face: 0.18, tint: '#a07ac8' },
   // KIMORIN's mother (second journey): right arm a silver hook, left arm a golden gatling (M-R135)
   mikie: { bottom: 8, height: 52, face: 0.22, tint: '#d0408a' },
+  // Uranus's madam, the crocodile lady in the wine-red gown (M-R251 review)
+  crocopatra: { bottom: 8, height: 64, face: 0.12, tint: '#8a2a3a' },
   // her cat, Mii-chan (MIKIE⭐︎'s Bati)
   mii: { bottom: 10, height: 26, face: 0.4, tint: '#c8a070', bustMax: 1.4 },
 };
@@ -108,6 +110,7 @@ const SPEAKER: Record<string, string[]> = {
   ボスG: ['bossg'],
   ハットG: ['hatg'],
   ロングG: ['longg'],
+  クロコパトラ: ['crocopatra'],
 };
 /** The one speaking is not among the pictures on stage (in the video, or off screen). */
 export const OFFSTAGE = '__offstage__';

@@ -13,7 +13,7 @@ import type { Speaker, Step } from './script';
  * s/mercury-ice for Pluto's ice plain, s/neptune-islands for the game map …), noted where they stand in.
  */
 
-/** Uranus's resident (no portrait in the app yet) */
+/** Uranus's resident (her standing picture: onboarding/crocopatra.webp, M-R251 review) */
 const CROCO: Speaker = 'クロコパトラ';
 
 /** the rocket from Earth (or the planet before) to today's planet */

@@ -8,8 +8,8 @@
 Usage: scripts/sprite-layers.py <dir with the grey jpgs> <out dir> <stem> [--no-eyes] [--eyes-from-base] [--face 0.4,0.75] [--matte-only] [--matte-from <rgba.png>]
 (--matte-only: only the figure and its body / tail layers are made again — the mouth / eye / shut layers, some
 of them fixed by hand with scripts/mouth-fix.py, stay as they are. The canvas is the same as before either way.)
-The figure is cut with the shared matte (scripts/lib/keying.py, cut-out review 2026-11-23): the grey left between
-leaves, hair strands and arms goes, the grey fringe is un-mixed and despilled, specks go.
+--shared-matte: the figure is cut with the shared matte (scripts/lib/keying.py) instead of the grey flood fill;
+--matte-from <rgba.png>: the matte made from a background edit on the key colour (scripts/cutouts/merge.py).
 (--eyes-from-base: the eye glow is cut from the pose itself — its bright cyan eye arcs — not from <stem>-glow.jpg,
 whose edit had redrawn KIMORIN's face: slanted black-rimmed eyes, extra forehead lines, a nose. M-R177)
 (--face: where the face is, as fractions of the figure's height; default the top 42%)
@@ -92,8 +92,14 @@ if '--matte-from' in sys.argv:
     # a matte made elsewhere on the same pixels (scripts/cutouts/merge.py: from a background edit on the key colour)
     _m = np.asarray(Image.open(sys.argv[sys.argv.index('--matte-from') + 1]).convert('RGBA')).astype(np.float32)
     al, rgb = _m[..., 3] / 255, _m[..., :3]
-else:
+elif '--shared-matte' in sys.argv:
     al, rgb = matte(base)
+else:
+    # the grey key stays on the flood fill by default: on #808080 the shared matte cannot tell the background seen
+    # between leaves / feathers from the characters' own flat grey (cut-out review 2026-11-23, docs/review/cutouts) —
+    # the fix is a background edit on the character's key colour + --matte-from (scripts/cutouts/merge.py)
+    al, ref = al_old, None
+    rgb = defringe(base, al, alpha_of(base)[1])
 h, w = al.shape
 ys, xs = np.where(al_old > 0.03)
 pad = 8
@@ -114,7 +120,7 @@ save(stem, rgb, al)
 # body / tail: the tail is what the tail-less painting no longer has
 nt = load(f'{stem}-notail')
 if nt is not None:
-    al_body, _ = matte(nt)
+    al_body = matte(nt)[0] if '--shared-matte' in sys.argv else alpha_of(nt)[0]
     # the edit leaves faint outlines where the feathers were: an opening removes thin leftovers
     hard = Image.fromarray(((al_body > 0.5) * 255).astype(np.uint8)).filter(ImageFilter.MinFilter(7)).filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.GaussianBlur(1.1))
     al_body = np.minimum(al_body, np.asarray(hard).astype(np.float32) / 255)
@@ -195,6 +201,8 @@ if gl is not None:
 # record which layers this pose has (the stage reads apps/web/lib/story/sprite-layers.json)
 import json, os
 reg_path = 'apps/web/lib/story/sprite-layers.json'
+if os.path.realpath(out) != os.path.realpath('apps/web/public/onboarding'):
+    sys.exit(0)  # a trial elsewhere: the registry of the real layers is not touched
 reg = json.load(open(reg_path)) if os.path.exists(reg_path) else {}
 reg[stem] = sorted(k for k in ('body', 'tail', 'mouth', 'eyes') if os.path.exists(f'{out}/{stem}-{k}.webp'))
 json.dump(dict(sorted(reg.items())), open(reg_path, 'w'), indent=1)

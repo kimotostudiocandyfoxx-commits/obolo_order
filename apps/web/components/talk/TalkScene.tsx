@@ -45,7 +45,7 @@ export type TalkPerson = {
    * you; everyone else stands behind them at about 80%, a little darker, until they speak)
    */
   back?: boolean;
-  /** other views of this person (lib/story/views.json): seen from behind, from the side (facing right), at 3/4 */
+  /** other views of this person (lib/story/views.json): seen from behind, from the side and at 3/4 (both facing left) */
   views?: { back?: string; side?: string; q3?: string };
 };
 
@@ -805,7 +805,8 @@ export function TalkScene({
     const out: Record<string, Angle> = {};
     if (shot === 'q3') {
       const facesRight = (sb?.x ?? (sa.x < 0.5 ? 1 : 0)) > sa.x;
-      out[A] = { x: sa.x, scale: 1, look: viewLook(A, pa.views?.q3), ...(pa.views?.q3 ? { mirror: !facesRight } : { turn: facesRight ? CAMERA.q3.figureTurn : -CAMERA.q3.figureTurn }) };
+      // (the 3/4 and side views face left: mirrored to face right)
+      out[A] = { x: sa.x, scale: 1, look: viewLook(A, pa.views?.q3), ...(pa.views?.q3 ? { mirror: facesRight } : { turn: facesRight ? CAMERA.q3.figureTurn : -CAMERA.q3.figureTurn }) };
       return out;
     }
     const pb = B ? byId.get(B) : undefined;
@@ -814,7 +815,8 @@ export function TalkScene({
     for (const p of row) if (p.id !== A && p.id !== B) out[p.id] = { x: spots.get(p.id)!.x, scale: 1, hide: true };
     if (shot === 'side') {
       const C = CAMERA.side;
-      const put = (p: TalkPerson, left: boolean): Angle => ({ x: left ? C.at : 1 - C.at, scale: 1, look: viewLook(p.id, p.views?.side), mirror: !left });
+      // the one on the left faces right: a side view (facing left) is mirrored there; a front figure is mirrored on the right
+      const put = (p: TalkPerson, left: boolean): Angle => ({ x: left ? C.at : 1 - C.at, scale: 1, look: viewLook(p.id, p.views?.side), mirror: p.views?.side ? left : !left });
       out[A] = put(pa, aLeft);
       out[B] = put(pb, !aLeft);
       return out;
