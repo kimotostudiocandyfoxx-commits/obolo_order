@@ -1022,6 +1022,45 @@
         "design/story/refs/plate-style-empty.jpg"
       ],
       "prompt": "Repaint picture 1 as an empty background plate of the same place (a street of the Mars city at dusk: tall dark towers covered in glowing picture screens, a wide empty red-brown plaza in front). Picture 2 is only a style and composition reference for what an empty plate looks like (calm, wide, human scale, an open floor in the lower middle) — do not copy its place. Pull the camera back to a wider, calmer establishing shot, keeping the world, palette, light and painterly fantasy illustration style of picture 1. A clear flat floor or ground across the lower part with its far edge at about 58% of the height, eye level at about 45%; the lower middle open and empty; the bottom fifth calm and darker. Deserted scenery only: no people, no creatures, no figures, no characters, no animals, no silhouettes, no statues of beings, not even tiny ones in the distance for scale — the floor is completely empty, like a theatre stage before the actors come in. No text, no letters, no watermark."
+    },
+    {
+      "id": "saturn-records-v1",
+      "size": "1152x2048",
+      "n": 2,
+      "refs": [
+        "apps/web/public/onboarding/s/saturn-outside.jpg",
+        "design/story/refs/plate-style-empty.jpg"
+      ],
+      "prompt": "A wide, calm establishing view of the surface of Saturn, keeping the world, palette, golden light and painterly fantasy illustration style of picture 1. Picture 2 is only a style and composition reference for an empty background plate (calm, wide, human scale) — do not copy its place. As far as the eye can see, giant black vinyl records lie set into the golden sandy ground like round ponds, each one bigger than a house, each with a thin metal tonearm standing beside it whose tip is a small round microphone; the records grow smaller toward the horizon in clear perspective, some catching a soft sheen as if slowly turning. Above, a deep violet starry sky with the huge ringed planet Saturn and its golden rings sweeping across the upper third. Horizon at about 42% of the height; the lower half of the picture is calm open ground with only distant records, so a big record can be placed in front later; the bottom fifth calm and darker. Deserted scenery only: no people, no creatures, no figures, no characters, no animals, no silhouettes, no faces, not even tiny ones in the distance for scale. No text, no letters, no numbers, no logos, no watermark."
+    },
+    {
+      "id": "saturn-my-record-v1",
+      "size": "1152x2048",
+      "n": 2,
+      "refs": [
+        "apps/web/public/onboarding/s/saturn-outside.jpg",
+        "design/story/refs/plate-style-empty.jpg"
+      ],
+      "prompt": "One giant black vinyl record set flush into the golden sandy ground of Saturn, seen obliquely from slightly above, keeping the world, palette, golden light and painterly fantasy illustration style of picture 1. Picture 2 is only a style reference for an empty plate — do not copy its place. The record is huge (as wide as the whole picture, its near edge cut by the bottom of the frame), with fine concentric grooves catching light, a warm cream paper label in the middle with nothing written on it, and a plain blank cream name plate set into the near rim. On the upper right a tall slender brass tonearm stands beside the record, its needle tip ending in a small round vintage microphone hovering over the grooves. Behind: more giant records far away in the sand, and a violet starry sky with the ringed planet Saturn and golden rings. The record surface is completely empty. Deserted scenery only: no people, no creatures, no figures, no characters, no animals, no silhouettes, no faces, not even tiny ones in the distance for scale. No text, no letters, no numbers, no logos, no watermark."
+    },
+    {
+      "id": "saturn-takoyaki-record-v1",
+      "size": "1152x2048",
+      "n": 2,
+      "refs": [
+        "apps/web/public/onboarding/s/saturn-outside.jpg",
+        "apps/web/public/onboarding/s/plate-saturn-inside.jpg"
+      ],
+      "prompt": "A close view of one flashy giant vinyl record set into the golden sandy ground of Saturn, seen obliquely from slightly above, keeping the world, palette, golden light and painterly fantasy illustration style of picture 1 (picture 2 shows the same owners' gaudy taste: red paper lanterns and gold). The record has a thick, gaudy shining gold rim studded with ornaments, strings of glowing red paper lanterns hung on poles all around it, a gold label, and beside it a gold tonearm whose tip is a big microphone shaped exactly like a round takoyaki ball (brown, with sauce, green seaweed flakes and bonito flakes on top). Deliberately over the top and a little tacky. Behind: other plain giant records far away in the sand and a violet starry sky with the ringed planet Saturn. Deserted scenery only: no people, no creatures, no figures, no characters, no animals, no silhouettes, no faces, not even tiny ones in the distance for scale. No text, no letters, no numbers, no logos, no watermark."
+    },
+    {
+      "id": "saturn-record-disc-v1",
+      "size": "square",
+      "n": 2,
+      "refs": [
+        "apps/web/public/onboarding/s/saturn-outside.jpg"
+      ],
+      "prompt": "A single giant black vinyl record seen exactly from straight above (top-down, orthographic, a perfect circle), filling the whole square edge to edge and centred, in the painterly fantasy illustration style and warm golden light of picture 1: deep black vinyl with many fine concentric grooves catching soft golden and violet reflections, a thin polished gold rim on the outer edge, and a plain warm cream paper label in the centre with a small spindle hole, nothing written on it. Outside the circle, the four corners are flat solid pure black. Nothing on the record. No text, no letters, no numbers, no logos, no watermark."
     }
   ]
 }
