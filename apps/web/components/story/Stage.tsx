@@ -71,7 +71,7 @@ const CHAR: Record<string, CharSpec> = {
   'kimorin-dragon': { bottom: 14, height: 70, face: 0.2, tint: '#7a2a20' },
   obolon: { bottom: 38, height: 28, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
   // at the launch pit, lower and smaller: clear of MONBAN's halo in the still behind (QA 7, R3)
-  'obolon-pit': { bottom: 22, height: 21, face: 0.5, tint: '#d8b56a', bustMax: 1.35 },
+  'obolon-pit': { bottom: 22, height: 21, face: 0.5, tint: '#d8b56a', bustMax: 1.8 },
   'takoyaki-brother': { bottom: 10, height: 60, face: 0.25, tint: '#d36a2a', faces: madeFaces('takoyaki-brother-x', FRIEND) },
   'takoyaki-sister': { bottom: 10, height: 60, face: 0.25, tint: '#d35a8a', faces: madeFaces('takoyaki-sister-x', FRIEND) },
   'daikon-kaiser': { bottom: 8, height: 70, face: 0.2, tint: '#7aa84a', faces: madeFaces('daikon-kaiser-x', FRIEND) },
@@ -91,6 +91,8 @@ const CHAR: Record<string, CharSpec> = {
   // her cat, Mii-chan (MIKIE⭐︎'s Bati)
   mii: { bottom: 10, height: 26, face: 0.4, tint: '#c8a070', bustMax: 1.4 },
 };
+/** the cinema close-up's background: the scene behind, blurred and dark */
+const CINE_BACK = 'blur(18px) brightness(0.4) saturate(0.8)';
 const DEFAULT: CharSpec = { bottom: 12, height: 58, face: 0.25, tint: '#b08a4a' };
 export const charSpec = (name: string): CharSpec => CHAR[name] ?? (name.startsWith('@') ? { bottom: 30, height: 34, face: 0.45, tint: '#9a7ac8' } : DEFAULT);
 
@@ -222,7 +224,9 @@ export function Cast({
       {/* the bust-up's background: the scene behind goes soft and takes the speaker's colour */}
       <div
         className="pointer-events-none absolute inset-0 z-[3] transition-opacity duration-300"
-        style={{ opacity: bust ? 1 : 0, backdropFilter: 'blur(7px) brightness(0.55)', WebkitBackdropFilter: 'blur(7px) brightness(0.55)', background: `radial-gradient(ellipse at 50% 38%, ${tint}55 0%, transparent 62%), linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55))` }}
+        // (cinema: much softer and darker — a figure painted in the still or the motion behind becomes a blur of colour,
+        // never a second copy of the one in close-up: the two KIMORINs of D03-S004c, review of M-R251)
+        style={{ opacity: bust ? 1 : 0, backdropFilter: cinema ? CINE_BACK : 'blur(7px) brightness(0.55)', WebkitBackdropFilter: cinema ? CINE_BACK : 'blur(7px) brightness(0.55)', background: `radial-gradient(ellipse at 50% 38%, ${tint}55 0%, transparent 62%), linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55))` }}
         aria-hidden
       />
       {names.map((name, k) => {
@@ -315,7 +319,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
   // MOTION.cinema.faceAt % from the top (its place on screen, worked out from where it stands)
   const C = MOTION.cinema;
   const own = name.startsWith('@') && name !== '@egg';
-  const zoom = bust ? (cinema ? Math.min(spec.bustMax ? spec.bustMax * C.smallBoost : own ? 1.7 : C.zoom, C.zoom) * (shot === 'punch' ? C.punch.zoom : 1) : Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6)))) : 1;
+  const zoom = bust ? (cinema ? Math.min(spec.bustMax ? spec.bustMax * C.smallBoost : own ? 1.3 : C.zoom, C.zoom) * (shot === 'punch' ? C.punch.zoom : 1) : Math.min(spec.bustMax ?? 1.75, 62 / (spec.height * Math.max(0.35, 1 - spec.face * 1.6)))) : 1;
   const faceY = 100 - spec.bottom - spec.height * (1 - spec.face);
   const lift = bust ? (cinema ? `${((C.faceAt - faceY) / spec.height) * 100}%` : `${-12 - (spec.face - 0.2) * 40}%`) : '0';
   // each time this one takes the floor in cinema: the camera pushes onto them (from the side they stood on)
@@ -372,7 +376,7 @@ function Character({ name, url, posed, lit, bust, hidden, talking, level, react,
               : undefined,
   };
   return (
-    <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden>
+    <div className={`pointer-events-none absolute z-[4] aspect-auto ${className}`} style={box} aria-hidden data-bust={bust ? name : undefined}>
       <div key={`c${push}${shot ?? ''}`} className="relative h-full" style={camera}>
       <div key={hop} className="relative h-full" style={hop ? { animation: `hop ${MOTION.hop.ms}ms cubic-bezier(.3,1.5,.5,1)`, ['--hop' as string]: `${-MOTION.hop.height}%` } : undefined}>
         <div className="relative h-full" style={{ ...life, ...(talking && !lips ? { animation: 'lipBob 0.22s ease-in-out infinite' } : {}) }}>

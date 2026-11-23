@@ -219,7 +219,7 @@ function PreviewPlay() {
           })(),
         }}
       />
-      <BackLink live={live} />
+      <BackLink live={live} story />
       <ReviewBar day={sys ? null : afterN ? `会員${afterN}日目` : day} scene={scene} />
       {guest && <GuestNote />}
     </>
@@ -234,7 +234,7 @@ function GuestNote() {
   const [shut, setShut] = useState(false);
   if (shut) return null;
   return (
-    <div className="fixed inset-x-3 top-[calc(40px+env(safe-area-inset-top))] z-[400] rounded-xl bg-black/75 px-3 py-2 text-center text-[11px] leading-relaxed text-amber-50 backdrop-blur">
+    <div className="fixed inset-x-3 top-[calc(100px+env(safe-area-inset-top))] z-[400] rounded-xl bg-black/75 px-3 py-2 text-center text-[11px] leading-relaxed text-amber-50 backdrop-blur">
       いまは仮の絵で動いています（姿の絵・バティ・バティとのおしゃべり）。本番と同じにするには、
       <a href="/" className="font-bold underline">
         先にログイン
@@ -247,13 +247,15 @@ function GuestNote() {
   );
 }
 
-function BackLink({ live }: { live?: boolean }) {
+function BackLink({ live, story }: { live?: boolean; story?: boolean }) {
   return (
-    // a small round button low on the left, clear of the worlds' tabs and titles (story chat 2026-11-02)
+    // a small round button low on the left, clear of the worlds' tabs and titles (story chat 2026-11-02). In the story
+    // it sits high on the left instead, under the top bar: low on the left it covered the start of the subtitles
+    // (review of M-R251, D04-S005)
     <Link
       href="/kakunin-5798f28713"
       aria-label="確認用ページへ"
-      className="fixed bottom-[calc(96px+env(safe-area-inset-bottom))] left-2 z-[400] flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-[13px] text-white/70 backdrop-blur"
+      className={`fixed ${story ? 'top-[calc(56px+env(safe-area-inset-top))]' : 'bottom-[calc(96px+env(safe-area-inset-bottom))]'} left-2 z-[400] flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-[13px] text-white/70 backdrop-blur`}
     >
       ←{live && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-emerald-400" />}
     </Link>

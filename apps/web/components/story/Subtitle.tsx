@@ -30,7 +30,7 @@ export function subtitleStyle(text: string, shape?: string, inn?: string): Subti
 const STYLE: Record<SubtitleStyle, { text: CSSProperties; anim?: string }> = {
   plain: { text: { fontSize: 19, fontWeight: 600 }, anim: 'subIn .28s ease-out both' },
   shout: { text: { fontSize: 20, fontWeight: 800 }, anim: 'subIn .2s ease-out both' },
-  slam: { text: { fontSize: 23, fontWeight: 800, lineHeight: 1.4 }, anim: 'subSlam .5s cubic-bezier(.2,1.6,.4,1) both, subShake .32s .18s ease-in-out' },
+  slam: { text: { fontSize: 22, fontWeight: 800, lineHeight: 1.4 }, anim: 'subSlam .5s cubic-bezier(.2,1.6,.4,1) both, subShake .32s .18s ease-in-out' },
   whisper: { text: { fontSize: 16.5, fontWeight: 400, letterSpacing: '.12em', opacity: 0.88 }, anim: 'subIn .5s ease-out both' },
   muse: { text: { fontSize: 18.5, fontWeight: 500, opacity: 0.8 }, anim: 'subIn 1.1s ease-out both' },
 };
@@ -51,7 +51,8 @@ export function Subtitle({ name, color, text, shown, style = 'plain', lineKey, d
         </p>
       )}
       <p
-        className="line-clamp-2 max-w-full whitespace-pre-line text-[#fbf6ea] [line-break:strict] [text-wrap:balance] [word-break:normal]"
+        className="line-clamp-2 max-w-full whitespace-pre-line text-[#fbf6ea] [line-break:strict] [text-wrap:balance] [word-break:auto-phrase]"
+        lang="ja"
         style={{ fontFamily: SUB_SERIF, lineHeight: 1.5, textShadow: '0 2px 10px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.95), 0 1px 1px rgba(0,0,0,.9)', ...s.text, ...(dim ? { fontSize: 15 } : {}) }}
       >
         <Marked text={text} upto={shown} marks={SUB_MARKS} />

@@ -33,6 +33,10 @@ export const PLATES: Record<string, Plate> = {
   's/neptune-islands': { image: 's/plate-neptune-islands.jpg', floorY: 0.78, horizonY: 0.5 },
   // Pluto's ice plain: its own still serves as the plate (the large plate came back empty; the library stays far)
   's/pluto-plain': { image: 's/pluto-plain.jpg', floorY: 0.84, horizonY: 0.62, skyMask: 's/pluto-plain-sky.png' },
+  // made 2026-11-23, second batch (review of M-R251: Seedream with the still and an empty plate as the style reference;
+  // the other nine places came back with no picture twice and stay on their stills)
+  's/mercury-ice': { image: 's/plate-mercury-ice.jpg', floorY: 0.84, horizonY: 0.47 },
+  's/mars-screens': { image: 's/plate-mars-screens.jpg', floorY: 0.88, horizonY: 0.7 },
   // the Kaiser's forest: the Jupiter forest plate (no daikon tree in it — he stands in the row); two tries at painting
   // the daikon out of its own still kept small figures in the distance
   's/jupiter-daikon': { image: 's/plate-jupiter-forest.jpg', floorY: 0.85, horizonY: 0.55 },

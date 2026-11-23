@@ -10,6 +10,7 @@ import { batiLook, TONES, toneOf } from '@/lib/talk/looks';
 import { castLook, STORY_TALK_LOOKS } from '@/lib/talk/demoLooks';
 import { directLines, type DirectionOverride, type ViewsAvailable } from '@/lib/talk/direction';
 import { viewsOf } from '@/lib/story/views';
+import { storyWords } from '@/lib/story/subtitles';
 import { charSpec } from './Stage';
 import type { Speaker, StoryVars } from '@/lib/onboarding/script';
 
@@ -70,6 +71,8 @@ const DEFAULT_SPRITE: Partial<Record<Speaker, string>> = {
   バティ: '@bati',
 };
 export const speakerOfSprite = (name: string): Speaker | null => SPRITE_OF[name] ?? null;
+/** a speaker's plain picture ({bati}: '@bati'), or null where they have none */
+export const defaultSprite = (who: Speaker): string | null => DEFAULT_SPRITE[who] ?? null;
 /** the talk id of a speaker (KIMORIN and KIMORIN⭐︎ are one) */
 export const talkId = (who: string) => (who.startsWith('KIMORIN') ? 'KIMORIN' : who);
 
@@ -258,7 +261,7 @@ export function storyItems({
     if (e.kind === 'me') {
       // an answer written as a deed of saying (〔「そのアート、好きだよ」と言う〕): the bubble holds the words said
       const said = e.text.match(/^「([^」]+)」と(?:言う|いう|答える|こたえる|話す|聞く|きく|伝える)$/);
-      out.push({ id: `${gen}:${e.id}`, who: 'me', text: said ? said[1] : e.text });
+      out.push({ id: `${gen}:${e.id}`, who: 'me', text: storyWords(said ? said[1] : e.text) });
       continue;
     }
     const id = talkId(e.who);
@@ -267,7 +270,7 @@ export function storyItems({
     const pose = hand ?? (sprite && !sprite.startsWith('@') ? exprFor(e.who, e.text) : undefined);
     const face = pose ? POSE_FACE[pose] : undefined;
     const motion = pose ? POSE_MOTION[pose] : undefined;
-    const words = text(e);
+    const words = storyWords(text(e));
     // the words' rules give each sentence its bubble (M-R243: shout, muse, whisper); a painted pose decides the face
     // for the whole line, and its motion comes with the first sentence
     const beats = ruleBeats(words).map((b, k) => ({ ...b, ...(face ? { face } : {}), ...(k === 0 && motion ? { motion } : {}) }));
@@ -293,6 +296,8 @@ export function storyItems({
 
 /** the views each person has, for the shot choice */
 export function viewsAvailable(people: TalkPerson[]): ViewsAvailable {
-  const has = (k: 'back' | 'side' | 'q3') => new Set(people.filter((p) => p.views?.[k]).map((p) => p.id));
-  return { back: has('back'), side: has('side'), q3: has('q3') };
+  // only the ones standing in the row (a voice heard from off stage has no place to be filmed from: the cut fell back to
+  // a plain two-shot, review of M-R251)
+  const has = (k: 'back' | 'side' | 'q3') => new Set(people.filter((p) => p.views?.[k] && p.look && !p.offstage).map((p) => p.id));
+  return { back: has('back'), side: has('side'), q3: has('q3'), standing: new Set(people.filter((p) => p.look && !p.offstage).map((p) => p.id)) };
 }

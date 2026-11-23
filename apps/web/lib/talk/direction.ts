@@ -33,7 +33,7 @@ export type Direction = {
 };
 
 /** which views of each person exist (lib/story/views.json): no back view → no over-the-shoulder for them */
-export type ViewsAvailable = { back: Set<string>; side: Set<string>; q3: Set<string> };
+export type ViewsAvailable = { back: Set<string>; side: Set<string>; q3: Set<string>; /** who stands in the row (an angled cut needs the speaker there) */ standing?: Set<string> };
 
 /** the override a script line may carry: shot 'mcu' | 'reaction:MONBAN' | 'two:KIMORIN' …, move 'lean' | 'enter-left:MONBAN' */
 export type DirectionOverride = { shot?: string; move?: string };
@@ -107,7 +107,7 @@ export function directLines(lines: { id: string; who: string; text: string; over
     // question): now and then an angled cut instead
     const pair = k >= 2 && lines[k - 1].who === listenTo && lines[k - 2].who === l.who;
     const emotional = kind === 'muse';
-    if (k >= 2 && k - lastAngle >= 4 && (pair || emotional) && d.shot !== 'punch') {
+    if (k >= 2 && k - lastAngle >= 4 && (pair || emotional) && d.shot !== 'punch' && (!views?.standing || views.standing.has(l.who))) {
       const order: Shot[] = ['side', 'q3', 'ots'];
       for (let t = 0; t < order.length; t++) {
         const pick = order[(angleTurn + t) % order.length];
@@ -159,10 +159,10 @@ export const CAMERA = {
   q3: { scale: 1.24, ms: 0, at: 0.42, turn: 7, figureTurn: 16 },
   /** side: the two at 34% / 66%, facing each other (a mirrored front figure where no side view exists) */
   side: { scale: 1.16, ms: 0, at: 0.34 },
-  /** over the shoulder: the speaker back at 34% (0.86×, the camera 1.12× on their face), the listener seen from behind in front at 74% (1.5×, sunk so the screen cuts them about the waist, soft, darker) */
-  ots: { scale: 1.12, ms: 0, at: 0.34, far: 0.86, near: 1.5, nearAt: 0.74, drop: 0.62 },
+  /** over the shoulder: the speaker back at 34% (0.86×, the camera 1.12× on their face), the listener seen from behind in front at 74% (1.6×, a small painted figure brought up to full size, sunk so the screen cuts them about the waist, soft, darker) */
+  ots: { scale: 1.12, ms: 0, at: 0.34, far: 0.86, near: 1.6, nearAt: 0.74, drop: 0.52 },
   /** how far the framed point is brought toward the middle of the screen (0 = stays, 1 = centred) */
-  center: 0.7,
+  center: 0.82,
   /** where the face is put, from the top of the stage (0..1) — under the bubbles */
   faceAt: 0.3,
   /** the slow drift while one person talks: this much more scale over this long */

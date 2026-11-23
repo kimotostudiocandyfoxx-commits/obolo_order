@@ -53,7 +53,7 @@ import { lineKind } from '@/lib/talk/direction';
 import { SubtitleScrim, SUBTITLE_CSS, TypedSubtitle } from '@/components/story/Subtitle';
 import { TONES } from '@/lib/talk/looks';
 import { TalkScene } from '@/components/talk/TalkScene';
-import { speakerOfSprite, stillShowsAny, storyItems, storyPeople, storySelfLook, storyTone, talkId } from '@/components/story/StoryTalk';
+import { defaultSprite, speakerOfSprite, stillShowsAny, storyItems, storyPeople, storySelfLook, storyTone, talkId } from '@/components/story/StoryTalk';
 import { VoiceChoice } from './VoiceChoice';
 import { Invitation } from '@/components/story/Invitation';
 import { TicketArt } from '@/components/story/Ticket';
@@ -180,12 +180,29 @@ function chatLine(s: Step, id: string): ChatRaw | null {
   return null;
 }
 /** room the replies / message bar take at the bottom (px) */
+/**
+ * How tall the reply chips stand at a phone's width (ReplyChips: 14.5 px type, 16 px padding each side, 8 px gaps,
+ * wrapping to the right): the rows they take, so the words above (a subtitle, the question) stay clear of them — two
+ * long answers take two rows (review of M-R251, D05-S006: the subtitle sat under the chips)
+ */
+function chipsHeight(labels: string[], width = 362): number {
+  let rows = 1;
+  let x = 0;
+  for (const l of labels) {
+    const w = Math.min(width, [...l].length * 15 + 34);
+    if (x > 0 && x + 8 + w > width) {
+      rows++;
+      x = w;
+    } else x += (x > 0 ? 8 : 0) + w;
+  }
+  return 34 + rows * 44 + (rows - 1) * 8;
+}
 function chatBottom(s: Step | undefined): number {
   if (!s) return 28;
-  if (s.t === 'action') return 78;
+  if (s.t === 'action') return chipsHeight([`✦${s.label}`]);
   // the voice answer (a big 〔🎙〕) needs the room under the question (QA 6 R2)
   if (s.t === 'choice' && s.voice) return 230;
-  if (s.t === 'choice') return s.options.length > 2 ? 128 : 78;
+  if (s.t === 'choice') return Math.max(s.options.length > 2 ? 128 : 78, chipsHeight(s.options.map((o) => o.label)));
   if (s.t === 'name' || s.t === 'batiname' || s.t === 'neoname') return 112;
   if (s.t === 'eggvoice') return 290;
   return 30;
@@ -858,11 +875,24 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
       : kimorinLook === 'kimorin-sun' || (!kimorinLook && v.kimorinStar)
         ? { src: '/story/avatars/kimorin-glasses.webp' }
         : { src: '/story/avatars/kimorin-i.webp' };
+  /** the picture a speaker comes up close with in the cinema (their plain one; KIMORIN in today's look) */
+  const cinemaSprite = (who: Speaker): string | null => {
+    if (talkId(who) === 'KIMORIN') return lookBefore(i - 1) ?? (v.kimorinStar ? 'kimorin-sun' : 'kimorin-i');
+    if (who === 'バティ') return spriteSrc('@bati') ? '@bati' : null;
+    return defaultSprite(who);
+  };
   const autoStandee = (() => {
     const st = steps[i];
     // once the look is made, answering puts the visitor's own look big on screen (client 2026-11-22)
     if (st && ['choice', 'name', 'neoname', 'batiname', 'egg'].includes(st.t) && v.look && (stateRef.current.answers.look || v.story?.['d2.look'] || i > lookStepAt)) return sprite ? null : '@me';
-    if (st?.t !== 'say' || sprite || !still || screen || placeholder) return null;
+    if (st?.t !== 'say' || sprite || screen || placeholder) return null;
+    // the cinema (days 1–2, client review of M-R251): whoever speaks comes up close — over a still or a motion alike —
+    // unless the still is itself their painted close-up (its mouth moves) or the screen is black (a voice in the dark)
+    if (stageOf(sceneIdAt(steps, i)) === 'cinema') {
+      if (blackout || (still && STILL_MOUTH[still] === talkId(st.who))) return null;
+      return cinemaSprite(st.who);
+    }
+    if (!still) return null;
     if (st.who === 'MONBAN') return stillShows(still, 'MONBAN') ? null : 'monban';
     if (st.who === 'KIMORIN' && !stillShows(still, 'KIMORIN')) return lookBefore(i - 1);
     return null;
@@ -1214,6 +1244,17 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
   const prev = steps[pk];
   const prompt =
     step && ['choice', 'name', 'action', 'egg', 'batiname', 'age', 'neoname', 'eggvoice'].includes(step.t) && !(step.t === 'choice' && step.prompt) && prev?.t === 'say' ? prev : null;
+  // the cast standing over the scene; in the cinema one who speaks without standing there comes up close all the same
+  // (their plain picture added for the line: the others step back)
+  let castNames = sprite ? (Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && (speakerOfSprite(n) || n === '@me') ? '' : n)) : [];
+  let castSpeaking = speakerSprite(step?.t === 'say' ? step.who : prompt?.who, spriteNames);
+  if (cinema && talkSays && castSpeaking === OFFSTAGE && !blackout && !screen) {
+    const pic = cinemaSprite(talkSays.who);
+    if (pic && spriteSrc(pic)) {
+      castNames = [...castNames, pic];
+      castSpeaking = pic;
+    }
+  }
 
   return (
     <MicAllowed.Provider value={!textOnly}>
@@ -1272,12 +1313,12 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
         // a wrapper of its own so the 'vanish' step can fade the whole cast into light
         <div className="pointer-events-none absolute inset-0 z-[4]" style={vanish ? { animation: `castVanish ${vanish}s ease-in forwards` } : undefined}>
         <Cast
-          names={(Array.isArray(sprite) ? sprite : [sprite]).map((n) => (talkOn && n && (speakerOfSprite(n) || n === '@me') ? '' : n))}
+          names={castNames}
           src={(n) => spriteSrc(n) ?? null}
-          speaking={speakerSprite(step?.t === 'say' ? step.who : prompt?.who, (Array.isArray(sprite) ? sprite : [sprite]).filter(Boolean))}
+          speaking={castSpeaking}
           talking={talking}
-          expressions={sayExpressions(expressions)}
-          mirror={sayMirror()}
+          expressions={sayExpressions(expressions, castNames.filter(Boolean))}
+          mirror={sayMirror(castNames.filter(Boolean))}
           level={voiceLevel}
           react={sayReact}
           slot={spriteSlot}
@@ -1402,6 +1443,7 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
             })()
           ) : (
           <ChatLog
+            closeUp
             entries={chatOn ? chatEntries : lastChat.current.entries}
             talking={chatOn && talking}
             reveal={chatOn ? reveal : leavingReveal}

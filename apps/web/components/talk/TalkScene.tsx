@@ -9,6 +9,7 @@ import type { SpiralRow } from '@/components/finds/SpiralList';
 import { SELF_TONES, TONES, toneOf, type TalkTone } from '@/lib/talk/looks';
 import { CAMERA, type Direction, type Move } from '@/lib/talk/direction';
 import { Subtitle, SubtitleScrim, SUBTITLE_CSS, subtitleStyle } from '@/components/story/Subtitle';
+import { subtitlePieces } from '@/lib/story/subtitles';
 import { AmbientFront, AmbientSky } from '@/components/story/Ambient';
 import type { Planet } from '@/lib/story/ambient';
 import { unlockAudio } from '@/lib/onboarding/audio';
@@ -131,36 +132,23 @@ function unitsOf(it: TalkItem, beats: TalkBeat[]): Unit[] {
   });
 }
 /**
- * subtitles: two lines at most (about 17 characters a line at 390 px) — a unit longer than that is cut further at its
- * sentence ends, then at 「、」 (the words unchanged; a line with marks keeps the bubble cuts)
+ * subtitles: one sentence at a time, two lines at most (about 15–17 characters a line at 390 px, fewer where the line breaks at a phrase: 24 a piece) — a longer sentence is
+ * cut further at 「、」 (the words unchanged, marks kept whole: Subtitle.tsx subtitlePieces). Each piece takes its own
+ * look from its own words (a shout piece slams, the calm one after it does not).
  */
-const SUB_MAX = 34;
+const SUB_MAX = 24;
 function subUnitsOf(it: TalkItem, beats: TalkBeat[]): Unit[] {
   const base = unitsOf(it, beats);
   const out: Unit[] = [];
   for (const u of base) {
-    if (u.len <= SUB_MAX || talkPlain(u.text) !== u.text) {
-      out.push(u);
+    const pieces = subtitlePieces(u.text, SUB_MAX);
+    if (pieces.length <= 1) {
+      out.push(pieces.length ? { ...u, text: pieces[0].text } : u);
       continue;
     }
-    // pieces: sentences, a long sentence cut after 「、」; then packed up to SUB_MAX
-    const sentences = u.text.match(/[^。！？!?]+[。！？!?」]*|[。！？!?」]+/g) ?? [u.text];
-    const bits: string[] = [];
-    for (const snt of sentences) {
-      if ([...snt].length <= SUB_MAX) bits.push(snt);
-      else bits.push(...(snt.match(/[^、，]+[、，]?/g) ?? [snt]));
-    }
-    const packs: string[] = [];
-    for (const b of bits) {
-      const last = packs[packs.length - 1];
-      if (last != null && [...last].length + [...b].length <= SUB_MAX) packs[packs.length - 1] = last + b;
-      else packs.push(b);
-    }
-    let from = u.from;
-    packs.forEach((t, k) => {
-      const len = [...t].length;
-      out.push({ ...u, key: `${u.key}~${k}`, text: t, first: u.first && k === 0, last: u.last && k === packs.length - 1, from, len });
-      from += len;
+    pieces.forEach((pc, k) => {
+      const own = ruleBeats(talkPlain(pc.text));
+      out.push({ ...u, key: `${u.key}~${k}`, text: pc.text, first: u.first && k === 0, last: u.last && k === pieces.length - 1, from: u.from + pc.from, len: pc.len, s0: -1, s1: -1, beats: own.length ? own : u.beats });
     });
   }
   return out;
@@ -869,7 +857,9 @@ export function TalkScene({
     if (!pb.views?.back) return null;
     const C = CAMERA.ots;
     out[A] = { x: aLeft ? C.at : 1 - C.at, scale: C.far, bottom: stageH * 0.1 };
-    out[B] = { x: aLeft ? C.nearAt : 1 - C.nearAt, scale: C.near, bottom: -stageH * C.drop, blur: 2.2, dim: true, look: viewLook(B, pb.views.back), z: 6 };
+    // (as large as a full-size figure whoever it is: a small painted one is brought up to it, so the back always fills
+    // its side of the frame — review of M-R251: the sister's back read as a small blur)
+    out[B] = { x: aLeft ? C.nearAt : 1 - C.nearAt, scale: C.near * Math.max(1, 0.95 / (pb.scale ?? 1)), bottom: -stageH * C.drop, blur: 2.2, dim: true, look: viewLook(B, pb.views.back), z: 6 };
     return out;
   })();
   const frame = (() => {
@@ -900,6 +890,19 @@ export function TalkScene({
       else if (a) Object.assign(f, { ox: a.x, oy: a.y, s: C.scale });
     } else if (shot !== 'wide' && a) Object.assign(f, { ox: a.x, oy: a.y, s: shot === 'push' ? CAMERA.two.scale : C.scale });
     f.tx = (w / 2 - f.ox) * CAMERA.center * (f.s > 1 ? 1 : 0);
+    // a two-shot that would leave a third one in the front row half off the screen's edge widens to the whole row
+    // instead (review of M-R251: NEO cut in half at the right in D05-S001)
+    if (shot === 'two' && f.s > 1) {
+      const cut = row.some((p) => {
+        if (p.back || p.offstage || !p.look || p.id === nowItem?.who || p.id === shotOn) return false;
+        const sp = spots.get(p.id);
+        if (!sp) return false;
+        const cx = (sp.x * w - f.ox) * f.s + f.ox + f.tx;
+        const half = sp.h * (p.scale ?? 1) * 0.2 * f.s;
+        return (cx - half < 0 && cx + half > 0) || (cx - half < w && cx + half > w);
+      });
+      if (cut) Object.assign(f, { s: 1, tx: 0 });
+    }
     void C;
     // a new speaker (or the reaction after a question): a cut; else the camera moves
     f.ms = shotChanged && (dir!.cut || phase === 'after') ? 0 : shot === 'push' ? CAMERA.two.ms : C.ms;
@@ -1004,6 +1007,11 @@ export function TalkScene({
       onPointerUp={onUp}
       onPointerCancel={() => (press.current = null)}
       onWheel={onWheel}
+      // the shot now (review drivers wait for one to photograph it): its name, whom it is on, and whether the angle drew
+      data-shot={shot ?? undefined}
+      data-shot-on={shotOn ?? undefined}
+      data-angle={angle ? 'drawn' : undefined}
+      data-speaker={nowItem?.who ?? undefined}
     >
       <style>{TALK_CSS}</style>
       {/* the place, drifting very slowly behind the two; the camera moves it a little less than them (parallax) */}
@@ -1151,7 +1159,8 @@ export function TalkScene({
               <Figure
                 look={ag?.look ?? p.look}
                 face={faceOf(p)}
-                named={poseOf(p)}
+                // a view of its own (the back in an over-the-shoulder, a 3/4 or side view): never a front pose over it
+                named={ag?.look ? null : poseOf(p)}
                 state={g ? 'idle' : stateOf(p)}
                 motion={past ? undefined : (mv?.motion ?? react[p.id]?.motion)}
                 motionKey={past ? 0 : mv ? dirKey : (react[p.id]?.key ?? 0)}
@@ -1196,7 +1205,7 @@ export function TalkScene({
         <>
           <style>{SUBTITLE_CSS}</style>
           <SubtitleScrim bottom={dockH - subBand} height={subBand + 150} />
-          <div className="pointer-events-none absolute inset-x-0 z-[9] flex flex-col items-center justify-end gap-3 px-5" style={{ bottom: dockH - subBand + 8, maxHeight: past ? dockH + stageH * 0.6 : undefined }}>
+          <div data-subtitles className="pointer-events-none absolute inset-x-0 z-[9] flex flex-col items-center justify-end gap-3 px-6" style={{ bottom: dockH - subBand + 8, maxHeight: past ? dockH + stageH * 0.6 : undefined }}>
             {(past ? units.slice(Math.max(0, end - 4), end) : nowUnit ? [nowUnit] : []).map((u, k, list) => {
               const it = u.item;
               const who = byId.get(it.who);

@@ -46,7 +46,14 @@ export function ChatLog({
   reveal,
   bottom,
   live,
+  closeUp = false,
 }: {
+  /**
+   * the speaker stands in close-up behind (the cinema of days 1–2, review of M-R251): the premium bubbles — no round
+   * face beside them (the face is the screen), the newest line alone in dark glass with a gold rule and a name plate,
+   * the one before it faded out above
+   */
+  closeUp?: boolean;
   entries: ChatEntry[];
   /** the newest speaker's voice is playing */
   talking: boolean;
@@ -57,7 +64,7 @@ export function ChatLog({
   live: boolean;
 }) {
   // three bubbles at most; the older ones fade and shrink fast so they don't sit over the standing pictures (story chat, 2026-10-26)
-  const shown = entries.slice(-3);
+  const shown = entries.slice(closeUp ? -2 : -3);
   const last = shown[shown.length - 1];
   // the typing state belongs to the newest line only: a caption or a reply on top leaves nothing to finish
   if (last?.kind !== 'them') reveal.current = { done: true, finish: () => undefined };
@@ -74,19 +81,23 @@ export function ChatLog({
         maskImage: 'linear-gradient(to top, #000 0%, #000 62%, transparent 100%)',
       }}
     >
-      <div className="mx-auto flex w-full max-w-md flex-col gap-2.5">
+      <div className={`mx-auto flex w-full max-w-md flex-col ${closeUp ? 'gap-6' : 'gap-2.5'}`}>
         {shown.map((e, k) => {
           const age = shown.length - 1 - k;
           const prev = shown[k - 1];
           const grouped = e.kind === 'them' && prev?.kind === 'them' && prev.who === e.who;
           return (
-            <div key={e.id} style={{ opacity: age === 0 ? 1 : age === 1 ? 0.5 : 0.22, transform: age ? `scale(${age === 1 ? 0.95 : 0.9})` : undefined, transformOrigin: e.kind === 'me' ? 'bottom right' : 'bottom left', transition: 'opacity 400ms ease, transform 400ms ease' }}>
+            <div key={e.id} style={{ opacity: age === 0 ? 1 : closeUp ? 0.28 : age === 1 ? 0.5 : 0.22, transform: age ? `scale(${age === 1 ? 0.95 : 0.9})` : undefined, transformOrigin: e.kind === 'me' ? 'bottom right' : 'bottom left', transition: 'opacity 400ms ease, transform 400ms ease' }}>
               {e.kind === 'sys' ? (
                 <SysLine text={e.text} />
               ) : e.kind === 'me' ? (
                 <MyLine text={e.text} action={e.action} />
               ) : (
-                <TheirLine entry={e} grouped={grouped} fresh={e === last} talking={talking && e === last} reveal={e === last ? reveal : null} live={live && e === last} />
+                closeUp ? (
+                  <PremiumLine entry={e} fresh={e === last} reveal={e === last ? reveal : null} live={live && e === last} />
+                ) : (
+                  <TheirLine entry={e} grouped={grouped} fresh={e === last} talking={talking && e === last} reveal={e === last ? reveal : null} live={live && e === last} />
+                )
               )}
             </div>
           );
@@ -121,6 +132,72 @@ function MyLine({ text, action }: { text: string; action?: boolean }) {
           {text}
         </p>
       )}
+    </div>
+  );
+}
+
+/** the words typing in after a moment of "…" (a tap finishes them through `reveal`) */
+function useTyping(text: string, fresh: boolean, reveal: React.MutableRefObject<ChatReveal> | null) {
+  const chars = [...text.replace(/Obolo Order/g, 'Obolo\u00a0Order')];
+  const [phase, setPhase] = useState<'dots' | 'typing' | 'done'>(fresh ? 'dots' : 'done');
+  const [n, setN] = useState(fresh ? 0 : chars.length);
+  useEffect(() => {
+    if (phase === 'dots') {
+      const t = setTimeout(() => setPhase('typing'), Math.min(200 + chars.length * 7, 520));
+      return () => clearTimeout(t);
+    }
+    if (phase === 'typing') {
+      if (n >= chars.length) return setPhase('done');
+      const t = setTimeout(() => setN((x) => x + 1), chars[n] === '\n' ? 90 : 26);
+      return () => clearTimeout(t);
+    }
+  }, [phase, n, chars]);
+  if (reveal)
+    reveal.current = {
+      done: phase === 'done',
+      finish: () => {
+        setN(chars.length);
+        setPhase('done');
+      },
+    };
+  return { chars, phase, n };
+}
+
+/**
+ * The premium bubble (cinema close-ups): wide, centred low, dark glass with a fine gold rule and a soft gold glow at its
+ * top edge; the name as a small plate on the rule; larger Mincho.
+ */
+function PremiumLine({ entry, fresh, reveal, live }: { entry: Extract<ChatEntry, { kind: 'them' }>; fresh: boolean; reveal: React.MutableRefObject<ChatReveal> | null; live: boolean }) {
+  const { chars, phase, n } = useTyping(entry.text, fresh, reveal);
+  return (
+    <div className={`flex justify-center ${fresh ? 'animate-[chatIn_0.42s_cubic-bezier(.2,.8,.2,1)_both]' : ''}`} data-premium>
+      <div
+        className="relative w-full max-w-[22rem] rounded-[22px] px-5 pb-3.5 pt-4 text-[16.5px] leading-[1.7] text-[#fbf3e0] backdrop-blur-md"
+        style={{
+          background: 'linear-gradient(180deg, rgba(34,24,48,0.86) 0%, rgba(12,8,20,0.9) 100%)',
+          border: '1px solid rgba(236,198,120,0.55)',
+          boxShadow: '0 14px 40px rgba(0,0,0,0.55), 0 0 24px rgba(236,190,100,0.12), inset 0 1px 0 rgba(255,236,190,0.18), inset 0 0 0 3px rgba(12,8,20,0.6), inset 0 0 0 4px rgba(236,198,120,0.14)',
+        }}
+      >
+        <span className="absolute -top-[11px] left-1/2 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-amber-200/60 bg-[#140d1f] px-3 py-[2px] text-[11px] tracking-[0.3em] text-amber-100" style={{ fontFamily: SERIF }}>
+          <span className="h-px w-3 bg-gradient-to-r from-transparent to-amber-200/80" />
+          {entry.name}
+          <span className="h-px w-3 bg-gradient-to-l from-transparent to-amber-200/80" />
+        </span>
+        {phase === 'dots' ? (
+          <span className="flex h-[28px] items-center justify-center gap-1.5" aria-label="…">
+            {[0, 1, 2].map((d) => (
+              <span key={d} className="h-1.5 w-1.5 rounded-full bg-amber-100/80" style={{ animation: `typingDot 1s ${d * 0.16}s ease-in-out infinite` }} />
+            ))}
+          </span>
+        ) : (
+          <p lang="ja" className="whitespace-pre-line text-center [line-break:strict] [word-break:auto-phrase] [text-wrap:balance]" style={{ fontFamily: SERIF, textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>
+            {chars.slice(0, n).join('')}
+            {phase === 'typing' && <span className="invisible">{chars.slice(n).join('')}</span>}
+            {live && phase === 'done' && <span className="ml-1 inline-block h-1.5 w-1.5 animate-[cueBlink_1.1s_ease-in-out_infinite] rounded-full bg-amber-200 align-middle shadow-[0_0_6px_rgba(255,214,140,0.9)]" />}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
