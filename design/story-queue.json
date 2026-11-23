@@ -579,6 +579,398 @@
         "design/story/refs/views/bossg-front.jpg"
       ],
       "prompt": "The same character as in the reference picture — a huge black gorilla boss with a gold cigar, heavy gold chains and a big gold medallion \"5454\", black leather shorts, black-and-gold mechanical cyber arms with glowing cyan lights — drawn seen exactly from behind (back view, rear view): we see the back of the head and the back of the body and outfit; the face is NOT visible at all, no eyes, no mouth. Full body from the top of the head to the feet, standing upright, neutral relaxed pose, the whole character inside the frame with a small margin, the same size in the frame as the reference. Exactly the same design: the same outfit, the same colours, the same materials and details, the same proportions and the same art style and rendering as the reference picture. Do not add or remove anything. One character only, no extra limbs. From behind: the gold chains go around the back of the neck only, the medallion hangs on the chest and is NOT visible from behind; both mechanical arms keep their black-and-gold plates and glowing cyan lights, seen from the back. Background: a completely flat, solid, pure magenta (#FF00FF) everywhere around the character — one single even colour, no gradient, no floor, no shadow, no light spill on the character, no other objects. Nothing on the character is that colour. No text, no letters."
+    },
+    {
+      "id": "cutout-daikon-kaiser-x-joy-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/daikon-kaiser-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-daikon-kaiser-x-shock-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/daikon-kaiser-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-daikon-kaiser-x-talk-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/daikon-kaiser-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-freezy-x-joy-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/freezy-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-freezy-x-shock-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/freezy-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-freezy-x-talk-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/freezy-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-hipokin-x-joy-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/hipokin-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-hipokin-x-shock-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/hipokin-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-hipokin-x-talk-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/hipokin-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kaiser1-x-joy-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kaiser1-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kaiser1-x-shock-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kaiser1-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kaiser1-x-talk-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kaiser1-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-joy-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-lecture-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-lecture.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-point-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-point.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-shock-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-smug-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-smug.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-talk-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-tears-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-tears.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-g-think-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-g-think.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-joy-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-lecture-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-lecture.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-point-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-point.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-shock-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-smug-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-smug.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-talk-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-tears-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-tears.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-n-think-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-n-think.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-joy-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-lecture-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-lecture.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-point-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-point.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-shock-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-smug-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-smug.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-talk-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-tears-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-tears.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-kimorin-x-think-green",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/kimorin-x-think.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key green (#00FF00) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-monban-x-arms-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-arms.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-monban-x-point-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-point.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-monban-x-stop-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-stop.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-monban-x-talk-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/monban-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-takoyaki-brother-x-joy-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-brother-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-takoyaki-brother-x-shock-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-brother-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-takoyaki-brother-x-talk-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-brother-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-takoyaki-sister-x-joy-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-sister-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-takoyaki-sister-x-shock-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-sister-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-takoyaki-sister-x-talk-magenta",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/takoyaki-sister-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure magenta (#FF00FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-unchi-pinpon-x-joy-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-joy.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-unchi-pinpon-x-shock-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-shock.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
+    },
+    {
+      "id": "cutout-unchi-pinpon-x-talk-blue",
+      "size": "portrait",
+      "refs": [
+        "apps/web/public/onboarding/s/unchi-pinpon-x-talk.jpg"
+      ],
+      "prompt": "Edit the picture: replace only the background with a completely flat, solid pure chroma-key blue (#0000FF) — one single even colour everywhere around the character, also in the gaps between the arms, legs, hair and tail; no gradient, no shadow, no floor. Keep the character exactly the same, pixel for pixel: the same pose, size, position, outline, colours, light and details. Nothing else changes. No text, no letters."
     }
   ]
 }
