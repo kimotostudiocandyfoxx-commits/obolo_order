@@ -23,6 +23,8 @@ import keying  # noqa: E402
 
 SRC = 'apps/web/public/onboarding/s'
 REBG = 'design/cutouts/rebg'
+# --min-iou X: an edit that rightly removed a part the old cut kept (MONBAN's halo) changes the outline more
+MIN_IOU = float(sys.argv[sys.argv.index('--min-iou') + 1]) if '--min-iou' in sys.argv else 0.85
 
 
 def aligned(moving, fixed, mask):
@@ -54,7 +56,7 @@ def merge(stem):
     union = ((al > 128) | (rough[..., 3] > 128)).sum()
     iou = float(((al > 128) & (rough[..., 3] > 128)).sum() / max(1, union))
     info.update(drift=round(drift, 1), iou=round(iou, 3))
-    if drift > 28 or iou < 0.85:
+    if drift > 28 or iou < MIN_IOU:
         print(stem, key, 'DRIFTED', info)
         return None
     # colours: all from the original (no trace of the edit's key, its spill or its small drift) — opaque pixels as
@@ -68,6 +70,11 @@ def merge(stem):
     near = cv2.GaussianBlur(orig * solid[..., None], (0, 0), 2.5) / np.maximum(cv2.GaussianBlur(solid, (0, 0), 2.5), 1e-4)[..., None]
     t = np.clip(a / 0.35, 0, 1)
     rgb = np.where(al[..., None] == 255, orig, un * t + near * (1 - t))
+    # where the original's background next to the edge was not its grey (a painted halo the edit took away), the
+    # un-mixing against grey leaves a light rim: there the edge takes the edit's own un-mixed, despilled colours
+    d_grey = np.linalg.norm(keying.oklab(orig) - keying.oklab(grey), axis=2)
+    lit = cv2.dilate(((al == 0) & (d_grey > 0.08)).astype(np.uint8), np.ones((9, 9), np.uint8)) > 0
+    rgb = np.where((lit & (al < 255))[..., None], rgba[..., :3].astype(np.float32), rgb)
     out = np.dstack([rgb, al]).astype(np.uint8)
     os.makedirs('design/cutouts/merged', exist_ok=True)
     Image.fromarray(out, 'RGBA').save(f'design/cutouts/merged/{stem}.png')
@@ -77,7 +84,10 @@ def merge(stem):
 
 if __name__ == '__main__':
     apply = '--apply' in sys.argv  # without it only design/cutouts/merged/<stem>.png is written, to look at first
-    for st in [a for a in sys.argv[1:] if not a.startswith('--')]:
+    args = sys.argv[1:]
+    if '--min-iou' in args:
+        del args[args.index('--min-iou'):args.index('--min-iou') + 2]
+    for st in [a for a in args if not a.startswith('--')]:
         p = merge(st)
         if p and apply:
             # the layers again on the old canvas, from this matte (sprite-layers.py --matte-from)
