@@ -1,30 +1,21 @@
-# Story images — 2026-11-23T02:59:53.730Z
+# Story images — 2026-11-23T03:07:08.086Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 9枚 / キューの項目: 129件 / 費用の目安: 約63円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 10枚 / キューの項目: 131件 / 費用の目安: 約70円
 
-- ✅ plate-jupiter-daikon-v2（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-mars-screens（1600x2880, 参考 1枚）: 0枚
 - ✅ plate-mercury-ice（1600x2880, 参考 1枚）: 0枚
 - ✅ plate-moon-night（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-mars-screens（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-venus-night（1600x2880, 参考 1枚）: 1枚
+- ✅ plate-uranus-press（1600x2880, 参考 1枚）: 1枚
 - ✅ plate-rocket-space（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-uranus-press（1600x2880, 参考 1枚）: 0枚
 - ✅ plate-neptune-town（1600x2880, 参考 1枚）: 0枚
-- ✅ plate-neptune-islands（1600x2880, 参考 1枚）: 1枚
-- ✅ cutout-daikon-kaiser-x-talk-magenta（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-freezy-x-joy-blue（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-freezy-x-shock-blue（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-freezy-x-talk-blue（1152x1536, 参考 1枚）: 1枚
-- ✅ cutout-hipokin-x-joy-magenta（1152x1536, 参考 1枚）: 1枚
-- ⏭ cutout-hipokin-x-talk-magenta: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kaiser1-x-joy-blue: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kaiser1-x-shock-blue: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kaiser1-x-talk-blue: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-joy-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-lecture-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-point-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-shock-green: 今回の上限（16枚）を超えるので次回
-- ⏭ cutout-kimorin-g-smug-green: 今回の上限（16枚）を超えるので次回
+- ✅ cutout-hipokin-x-talk-magenta（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kaiser1-x-joy-blue（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kaiser1-x-shock-blue（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kaiser1-x-talk-blue（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-g-joy-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-g-lecture-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-g-point-green（1152x1536, 参考 1枚）: 1枚
+- ✅ cutout-kimorin-g-shock-green（1152x1536, 参考 1枚）: 1枚
 - ⏭ cutout-kimorin-g-talk-green: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-kimorin-g-tears-green: 今回の上限（16枚）を超えるので次回
 - ⏭ cutout-kimorin-g-think-green: 今回の上限（16枚）を超えるので次回
@@ -65,5 +56,7 @@ Seedream 5.0 Pro（runware）/ 新しく描いた: 9枚 / キューの項目: 12
 - ⏭ plate-saturn-night-v2: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-arr-mars-city-v2: 今回の上限（16枚）を超えるので次回
 - ⏭ plate-uranus-field-v2: 今回の上限（16枚）を超えるので次回
-- ✅ cutout-hipokin-x-shock-magenta（1152x1536, 参考 1枚）: 1枚
+- ⏭ still-pluto-plain: 今回の上限（16枚）を超えるので次回
+- ⏭ plate-pluto-plain: 今回の上限（16枚）を超えるので次回
 - ✅ plate-earth-hall（1600x2880, 参考 1枚）: 0枚
+- ✅ cutout-kimorin-g-smug-green（1152x1536, 参考 1枚）: 1枚
