@@ -328,6 +328,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .lyr .nx{margin-top:6px;font:800 13px/1.2 var(--f-body);color:rgba(255,255,255,.55);text-shadow:0 1px 4px rgba(0,20,60,.8);transition:opacity .3s}
 .lyr.swap .ln{opacity:0;transform:translateY(10px)}
 .top #help,.top #oshiBtn,.top #say{display:none!important}
+.bub .by2,.bubo .by2{display:block;margin-top:2px;font:800 9px var(--f-body);color:#8a6a9a;text-align:right;letter-spacing:.02em}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni.talk{z-index:7}
@@ -613,7 +614,7 @@ function pop(r){
   const c=document.createElement('div');c.className='chibi';c.style.left=x+'px';c.style.top=y+'px';
   c.innerHTML=`<img alt="" src="${A['chibi-'+CHB(r.o.n)]||''}">`;sky.appendChild(c);
   popSound();const vk='voice-'+String(r.i%5+1).padStart(2,'0');if(A[vk])setTimeout(()=>playVoice(vk),300);
-  const card=P.saturn.card(r.i),b=document.createElement('div');b.className='bub';b.innerHTML=`<small>🎤 ${r.o.n}</small>${card.cap}`;
+  const card=P.saturn.card(r.i),b=document.createElement('div');b.className='bub';b.innerHTML=`${card.cap}<small class="by2">by ${r.o.n}</small>`;
   const pw=$('phone').clientWidth;b.style.left=Math.max(pw*.24,Math.min(pw*.76,x))+'px';b.style.top=(y-118)+'px';setTimeout(()=>sky.appendChild(b),260);
   setTimeout(()=>{b.style.display='none';c.classList.add('wave')},2300);
   setTimeout(()=>{const ph=$('phone');c.classList.add('away');c.style.left=(RECLBL[0]*ph.clientWidth)+'px';c.style.top=(RECLBL[1]*ph.clientHeight)+'px';heard.push(r.o)},2900);
@@ -864,7 +865,7 @@ function play(){
   function popOrb(b,x,y){const st=$('hvstage');popSound();b.e.style.zIndex=String(50+b.i);
     for(let n=0;n<14;n++){const dd=document.createElement('i');dd.className='drop';const a=n/14*Math.PI*2,dist=50*(1.2+Math.random()*.8);dd.style.left=x+'px';dd.style.top=y+'px';dd.style.setProperty('--dx',Math.cos(a)*dist+'px');dd.style.setProperty('--dy',Math.sin(a)*dist+'px');st.appendChild(dd);setTimeout(()=>dd.remove(),700)}
     b.e.style.width='120px';b.e.style.height='120px';b.e.firstElementChild.style.transform='';b.e.firstElementChild.innerHTML=`<img alt="" src="${A['chibi-'+CHB(b.o.n)]||''}" style="animation:chibiIn .4s cubic-bezier(.2,1.6,.4,1) both">`;
-    const line=P.saturn.card(b.i).cap,vk='voice-'+String(b.i%5+1).padStart(2,'0'),bb=document.createElement('div');bb.className='bubo';bb.innerHTML=`<small>🎤 ${b.o.n}</small>${line}`;
+    const line=P.saturn.card(b.i).cap,vk='voice-'+String(b.i%5+1).padStart(2,'0'),bb=document.createElement('div');bb.className='bubo';bb.innerHTML=`${line}<small class="by2">by ${b.o.n}</small>`;
     setTimeout(()=>{b.e.appendChild(bb);if(A[vk])playVoice(vk)},240)}
   SV.stopOrbit=()=>{cancelAnimationFrame(raf3);live.forEach(b=>b.e.remove());live.length=0};
   T(()=>{raf3=requestAnimationFrame(step);spawn();SV.iv=setInterval(spawn,2600)},1500);
