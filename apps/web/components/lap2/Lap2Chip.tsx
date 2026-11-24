@@ -19,7 +19,7 @@ export function Lap2Chip() {
     return () => clearInterval(t);
   }, []);
   const done = lap2Done(me?.story);
-  if (!isActiveMember(me) || done >= LAP2_DONE) return null;
+  if (!me || !isActiveMember(me) || done >= LAP2_DONE) return null;
   const planet = PLANET_JA[LAP2[done].planet] ?? '';
   const opens = lap2OpensAt(me.story);
   if (opens !== null && now < opens) {
