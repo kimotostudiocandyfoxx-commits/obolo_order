@@ -1,6 +1,6 @@
 'use client';
 
-import { isFlying, type PlanetPostView, RadioCue, RadioHome, RadioLiveState, RadioLiveView, RadioReportBody, RadioShowView } from '@obolo/shared';
+import { isActiveMember, isFlying, type PlanetPostView, RadioCue, RadioHome, RadioLiveState, RadioLiveView, RadioReportBody, RadioShowView } from '@obolo/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Glyph } from '@/components/bluena/glyphs';
 import { useToast } from '@/components/Toast';
@@ -22,7 +22,7 @@ export function RadioWorld({ practice, startInBooth = false }: { practice?: () =
   const [error, setError] = useState(false);
   const [open, setOpen] = useState<{ kind: 'show'; show: RadioShowView } | { kind: 'live'; live: RadioLiveView } | null>(null);
   // the booth here is the members' live booth (M-R208): recorded shows are made in the Moon atelier
-  const member = !!useAuth().me?.orderedAt;
+  const member = isActiveMember(useAuth().me);
   const [booth, setBooth] = useState(startInBooth);
   // myブース (M-R208): your published shows that came home after 88 hours on the air
   const [myHome, setMyHome] = useState<RadioShowView[]>([]);

@@ -15,7 +15,12 @@ export interface Me {
   bio: string;
   country: string;
   locale: Locale;
-  subscriptionStatus: 'none' | 'demo' | 'active' | 'past_due' | 'canceled';
+  /** Stripe's subscription status as the webhook last saw it (see membership.ts isActiveMember) */
+  subscriptionStatus: 'none' | 'demo' | 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'paused' | 'trialing';
+  /** P-BILL-4: the member cancelled in the Customer Portal; the subscription ends at `currentPeriodEnd` (usable until then) */
+  cancelAtPeriodEnd?: boolean;
+  /** the end of the paid month (ISO), from customer.subscription.updated; null until known */
+  currentPeriodEnd?: string | null;
   /** 1–6 = journey day to play, 7 = the Eclipse day (story + payment), 8 = ORDER member. */
   journeyDay: number;
   /** Set when the current day has been finished (the next unlocks 24 h later or by skipping). */

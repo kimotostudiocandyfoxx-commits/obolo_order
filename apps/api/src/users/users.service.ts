@@ -29,7 +29,7 @@ import { users } from '../db/schema';
 import { LedgerService } from '../wallet/ledger.service';
 import { activeBati, batiSummaries, batiViewExtra, lookHistory } from '../look/batis';
 import { talkLookOf } from '../look/talk';
-import { isTester } from './tester';
+import { activeMember, isTester } from './tester';
 
 /** Bati's expression pictures, kept in onboardingJson['bati.faces'] (JSON) */
 function batiFaces(j: Record<string, string> | null): Partial<Record<string, string>> | undefined {
@@ -99,6 +99,8 @@ export function toMe(u: typeof users.$inferSelect): Me {
     // M-R231: the 2nd hatches on the app's day 9, the 3rd on day 16 (members and residents alike)
     batiEgg: batiEggState({ born: batiSummaries(u).length, journeyDay: u.journeyDay, day9At: day9At(u) }),
     orderedAt: u.orderedAt?.toISOString() ?? null,
+    cancelAtPeriodEnd: u.cancelAtPeriodEnd,
+    currentPeriodEnd: u.currentPeriodEnd?.toISOString() ?? null,
     voices: { self: !!u.voiceSelfId, bati: !!u.voiceBatiId, selfSings: !!u.voiceSelfUrl, kororin: !!u.voiceKororinId, batiState: (u.voiceBatiState as BatiVoiceState | null) ?? (u.voiceBatiId ? 'ready' : 'none') },
     consent: u.consentVersion && u.consentAt ? { version: u.consentVersion, at: u.consentAt.toISOString(), guardian: u.guardianConsentVersion === u.consentVersion && !!u.guardianConsentAt, media: (u.onboardingJson as Record<string, string> | null)?.['consent.media'] !== '0' } : null,
     mediaOk: canUseMedia(u),
@@ -192,13 +194,13 @@ export class UsersService {
   /** Uranus: your atelier; only ORDER members have one (the second journey). */
   async getAtelier(userId: string): Promise<AtelierLayout> {
     const u = await this.load(userId);
-    if (!u.orderedAt) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
+    if (!activeMember(u)) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
     return u.atelierJson ?? EMPTY_ATELIER;
   }
 
   async saveAtelier(userId: string, layout: AtelierLayout): Promise<AtelierLayout> {
     const u = await this.load(userId);
-    if (!u.orderedAt) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
+    if (!activeMember(u)) throw apiError(HttpStatus.FORBIDDEN, 'ORDER_REQUIRED', 'The atelier opens for ORDER members');
     await this.db.write.update(users).set({ atelierJson: layout, updatedAt: new Date() }).where(eq(users.id, userId));
     return layout;
   }
@@ -252,7 +254,7 @@ export class UsersService {
   async completeLap2(userId: string, body: CompleteLap2Body): Promise<Me> {
     const cur = await this.load(userId);
     const story = (cur.onboardingJson ?? {}) as Record<string, string>;
-    if (!cur.orderedAt || body.chapter !== lap2Done(story)) return toMe(cur);
+    if (!activeMember(cur) || body.chapter !== lap2Done(story)) return toMe(cur);
     const opens = lap2OpensAt(story);
     // the tester entrance: a tester never waits (users/tester.ts; nobody else)
     if (opens !== null && !isTester(cur) && Date.now() < opens - 120_000) throw apiError(HttpStatus.CONFLICT, 'NOT_YET', 'The next day has not opened yet');
@@ -344,15 +346,30 @@ export class UsersService {
   async demoOrder(userId: string): Promise<Me> {
     const cur = await this.load(userId);
     // the Sun day, or later as a resident (the Eclipse can be taken any time: D08-S005)
-    if (cur.journeyDay < JOURNEY_PAYMENT || cur.orderedAt) return toMe(cur);
+    if (cur.journeyDay < JOURNEY_PAYMENT || activeMember(cur)) return toMe(cur);
     return this.markOrdered(userId, { subscriptionStatus: 'demo' });
   }
 
-  /** Record a paid (or demo) Eclipse. */
+  /**
+   * Record a paid (or demo) Eclipse. P-BILL-4: a member whose subscription ended (canceled / unpaid) and who pays
+   * again (〔もう一度はじめる〕) keeps the first `orderedAt` (the planets' opening days count from it); the new
+   * subscription replaces the old one. Called by both the confirm and the webhook: the second call is a no-op.
+   */
   async markOrdered(
     userId: string,
     s: { subscriptionStatus: string; stripeCustomerId?: string | null; stripeSubscriptionId?: string | null },
   ): Promise<Me> {
+    const cur = await this.load(userId);
+    if (cur.orderedAt) {
+      if (activeMember(cur)) return toMe(cur);
+      const [again] = await this.db.write
+        .update(users)
+        .set({ ...s, cancelAtPeriodEnd: false, currentPeriodEnd: null, updatedAt: new Date() })
+        .where(eq(users.id, userId))
+        .returning();
+      await this.grantMonth(userId);
+      return toMe(again);
+    }
     const [u] = await this.db.write
       .update(users)
       .set({ ...s, orderedAt: new Date(), updatedAt: new Date() })

@@ -1,6 +1,6 @@
 'use client';
 
-import { JOURNEY_DONE, JOURNEY_WAIT_MS, LAP2_DONE, lap2Done } from '@obolo/shared';
+import { isActiveMember, JOURNEY_DONE, JOURNEY_WAIT_MS, LAP2_DONE, lap2Done } from '@obolo/shared';
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Lap2Story } from '@/components/lap2/Lap2Story';
@@ -36,8 +36,8 @@ export function HomeGate({ children }: { children: ReactNode }) {
   const day = me.journeyDay;
   if (day >= JOURNEY_DONE) {
     // M-R231: a member's day 16 — the egg scene (SYS-S003, the 3rd) first thing that morning, then the Moon home
-    if (me.orderedAt && me.batiEgg?.nth === 3 && eggReady(me)) return <EggMorningGate>{children}</EggMorningGate>;
-    if (me.orderedAt && lap2Done(me.story) < LAP2_DONE) return <Lap2Gate>{children}</Lap2Gate>;
+    if (isActiveMember(me) && me.batiEgg?.nth === 3 && eggReady(me)) return <EggMorningGate>{children}</EggMorningGate>;
+    if (isActiveMember(me) && lap2Done(me.story) < LAP2_DONE) return <Lap2Gate>{children}</Lap2Gate>;
     return <>{children}</>;
   }
   if (me.journeyCompletedAt) {

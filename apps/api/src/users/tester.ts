@@ -1,3 +1,4 @@
+import { isActiveMember } from '@obolo/shared';
 import { loadConfig } from '../config';
 
 /**
@@ -34,4 +35,13 @@ export function isTester(u: { id: string; email: string } | null | undefined, cf
   const l = lists(cfg);
   if (!l.emails.size && !l.ids.size) return false;
   return l.emails.has(u.email.trim().toLowerCase()) || l.ids.has(u.id.toLowerCase());
+}
+
+/**
+ * P-BILL-4: an Obolo Order member right now (shared isActiveMember): paid once, and the subscription has not ended
+ * (canceled / unpaid …). Testers stay members once joined. Used by every member-only guard in the API.
+ */
+export function activeMember(u: { id: string; email: string; orderedAt: Date | null; subscriptionStatus: string } | null | undefined, cfg?: TesterConfig): boolean {
+  if (!u) return false;
+  return isActiveMember({ orderedAt: u.orderedAt, subscriptionStatus: u.subscriptionStatus, tester: isTester(u, cfg) });
 }

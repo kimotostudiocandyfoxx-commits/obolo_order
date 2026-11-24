@@ -8,6 +8,7 @@ import { Database } from '../db/db';
 import { callSessions, dmMessages, follows, userBlocks, userReports, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
 import { PushService } from '../push/push.service';
+import { activeMember } from '../users/tester';
 import { makeCallProvider, makeMailRealtime, pairKey, type CallProvider, type MailRealtime } from './providers';
 
 const personCols = { id: users.id, handle: users.handle, displayName: users.displayName, neoForm: users.neoForm, pic: users.puniPicUrl };
@@ -39,11 +40,12 @@ export class CommsService {
   }
 
   private async isMember(userId: string) {
-    const [u] = await this.db.read.select({ orderedAt: users.orderedAt, status: users.subscriptionStatus, suspendedAt: users.suspendedAt }).from(users).where(eq(users.id, userId));
+    const [u] = await this.db.read.select({ id: users.id, email: users.email, orderedAt: users.orderedAt, subscriptionStatus: users.subscriptionStatus, suspendedAt: users.suspendedAt }).from(users).where(eq(users.id, userId));
     // suspended by the team (a report review): nobody can reach them
     if (!u || u.suspendedAt) return false;
     if (!this.cfg.COMMS_MEMBERS_ONLY) return true;
-    return !!u.orderedAt || u.status === 'active';
+    // P-BILL-4: paid, and the subscription has not ended (shared isActiveMember)
+    return activeMember(u);
   }
 
   private async mustBeMember(userId: string) {

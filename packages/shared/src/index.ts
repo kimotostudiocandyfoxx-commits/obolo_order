@@ -24,5 +24,6 @@ export * from './finds';
 export * from './moonWorks';
 export * from './batiVoice';
 export * from './legal';
+export * from './membership';
 export * from './planetHomeConfig';
 export * from './planetHome';

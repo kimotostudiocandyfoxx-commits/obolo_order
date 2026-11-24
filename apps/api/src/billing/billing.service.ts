@@ -6,6 +6,7 @@ import { apiError } from '../common/errors';
 import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
+import { activeMember } from '../users/tester';
 import { UsersService } from '../users/users.service';
 
 /**
@@ -59,7 +60,8 @@ export class BillingService {
     const pk = this.cfg.STRIPE_PUBLISHABLE_KEY;
     if (!pk) throw apiError(HttpStatus.SERVICE_UNAVAILABLE, 'BILLING_MISCONFIGURED', 'STRIPE_PUBLISHABLE_KEY is not set');
     const u = await this.load(userId);
-    if (u.orderedAt) throw apiError(HttpStatus.CONFLICT, 'ALREADY_ORDERED', 'Already an ORDER member');
+    // P-BILL-4: a member whose subscription ended (canceled / unpaid) may pay again (〔もう一度はじめる〕)
+    if (activeMember(u)) throw apiError(HttpStatus.CONFLICT, 'ALREADY_ORDERED', 'Already an ORDER member');
     // the Sun day, or later as a resident who comes back for the Eclipse (draft 21, D08-S005)
     if (u.journeyDay < JOURNEY_PAYMENT) throw apiError(HttpStatus.CONFLICT, 'NOT_ECLIPSE_DAY', 'Not the Eclipse day yet');
 
@@ -158,7 +160,7 @@ export class BillingService {
         const sub = event.data.object;
         await this.db.write
           .update(users)
-          .set({ subscriptionStatus: sub.status, updatedAt: new Date() })
+          .set({ ...subscriptionState(sub), updatedAt: new Date() })
           .where(eq(users.stripeSubscriptionId, sub.id));
         break;
       }
@@ -180,4 +182,19 @@ export class BillingService {
       stripeSubscriptionId: typeof sub === 'string' ? sub : (sub?.id ?? null),
     });
   }
+}
+
+/**
+ * P-BILL-4: what the settings show from a subscription event — its status, whether it was cancelled to end with the
+ * paid month (the portal sets `cancel_at_period_end`; newer portals may set `cancel_at` instead), and when that month
+ * ends (`cancel_at`, else the item's `current_period_end`: since API 2025-03-31 the period lives on the items).
+ */
+export function subscriptionState(sub: Stripe.Subscription): { subscriptionStatus: string; cancelAtPeriodEnd: boolean; currentPeriodEnd: Date | null } {
+  const ended = sub.status === 'canceled';
+  const end = sub.cancel_at ?? sub.items?.data?.[0]?.current_period_end ?? null;
+  return {
+    subscriptionStatus: sub.status,
+    cancelAtPeriodEnd: !ended && (sub.cancel_at_period_end || !!sub.cancel_at),
+    currentPeriodEnd: end ? new Date(end * 1000) : null,
+  };
 }

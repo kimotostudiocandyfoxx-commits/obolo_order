@@ -27,6 +27,7 @@ import { AppConfig, CONFIG } from '../config';
 import { Database } from '../db/db';
 import { bluenaSaves, mediaObjects, planetPosts, radioLives, radioMessages, radioShows, songs, userBlocks, userReports, users } from '../db/schema';
 import { LLM } from '../infra/tokens';
+import { activeMember } from '../users/tester';
 
 type ShowRow = typeof radioShows.$inferSelect;
 type LiveRow = typeof radioLives.$inferSelect;
@@ -57,13 +58,14 @@ export class RadioService {
 
   private async member(userId: string) {
     const [u] = await this.db.read
-      .select({ orderedAt: users.orderedAt, status: users.subscriptionStatus, suspendedAt: users.suspendedAt, onboarding: users.onboardingJson })
+      .select({ id: users.id, email: users.email, orderedAt: users.orderedAt, subscriptionStatus: users.subscriptionStatus, suspendedAt: users.suspendedAt, onboarding: users.onboardingJson })
       .from(users)
       .where(eq(users.id, userId));
     if (!u || u.suspendedAt) return { ok: false, child: false };
     const year = Number((u.onboarding as Record<string, unknown> | null)?.birthYear ?? 0);
     const child = year > new Date().getFullYear() - CHILD_AGE;
-    return { ok: !this.cfg.COMMS_MEMBERS_ONLY || !!u.orderedAt || u.status === 'active', child };
+    // P-BILL-4: paid, and the subscription has not ended (shared isActiveMember)
+    return { ok: !this.cfg.COMMS_MEMBERS_ONLY || activeMember(u), child };
   }
 
   /** people this user blocked or who blocked them (both ways: they never meet on the radio) */

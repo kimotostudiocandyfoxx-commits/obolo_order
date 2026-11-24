@@ -1,6 +1,6 @@
 'use client';
 
-import { LAP2, LAP2_DONE, lap2Done, lap2OpensAt } from '@obolo/shared';
+import { isActiveMember, LAP2, LAP2_DONE, lap2Done, lap2OpensAt } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { LAP2_LATER, LAP2_OPEN } from '@/components/HomeGate';
 import { useAuth } from '@/lib/auth';
@@ -19,7 +19,7 @@ export function Lap2Chip() {
     return () => clearInterval(t);
   }, []);
   const done = lap2Done(me?.story);
-  if (!me?.orderedAt || done >= LAP2_DONE) return null;
+  if (!isActiveMember(me) || done >= LAP2_DONE) return null;
   const planet = PLANET_JA[LAP2[done].planet] ?? '';
   const opens = lap2OpensAt(me.story);
   if (opens !== null && now < opens) {

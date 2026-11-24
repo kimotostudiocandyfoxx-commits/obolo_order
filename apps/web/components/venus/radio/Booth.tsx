@@ -1,5 +1,6 @@
 'use client';
 
+import { isActiveMember } from '@obolo/shared';
 import type { RadioCue, RadioDeckSong, RadioLiveState, RadioLoop, RadioMessageView, RadioShowView } from '@obolo/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Glyph } from '@/components/bluena/glyphs';
@@ -282,7 +283,7 @@ export function Booth({ onClose, practice, use = 'live', bare = false }: { onClo
 
   const mx = mixer.current;
   const onAirNow = mode === 'recording' || mode === 'live';
-  const order = !!me?.orderedAt;
+  const order = isActiveMember(me);
   const thumbChoices = [null, ...(me?.puniPic ? [me.puniPic] : []), ...thumbs];
 
   return (

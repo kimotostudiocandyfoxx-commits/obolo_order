@@ -62,6 +62,9 @@ export const users = pgTable(
     orderedAt: timestamp('ordered_at', { withTimezone: true }),
     stripeCustomerId: text('stripe_customer_id'),
     stripeSubscriptionId: text('stripe_subscription_id'),
+    /** P-BILL-4: cancelled in the Customer Portal — the subscription ends at current_period_end (customer.subscription.updated) */
+    cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+    currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
     /** Fish Audio voice models made from the member's recordings (client decision 2026-10-07):
      *  their own voice (Saturn, singing) and the voice they gave Bati (a changed voice). */
     voiceSelfId: text('voice_self_id'),

@@ -1,7 +1,7 @@
 'use client';
 
 import { batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { JOURNEY_DONE, LAP2_DONE, lap2Done, lap2OpensAt } from '@obolo/shared';
+import { isActiveMember, JOURNEY_DONE, LAP2_DONE, lap2Done, lap2OpensAt } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StoryPlayer, type StoryProgress } from '@/components/onboarding/StoryPlayer';
 import { knownSealsOn, solvedSealsOn, stampsOn } from '@/components/onboarding/StoryExtras';
@@ -55,7 +55,7 @@ export function Lap2Story({ onLeave }: { onLeave: () => void }) {
   }, [waiting, eggFirst, onLeave]);
 
   if (eggFirst && me) return <EggMorning onClose={() => setEggFirst(false)} />;
-  if (!me || !me.orderedAt || chapter >= LAP2_DONE || waiting) return null;
+  if (!me || !isActiveMember(me) || chapter >= LAP2_DONE || waiting) return null;
   return (
     <StoryPlayer
       key={chapter}
