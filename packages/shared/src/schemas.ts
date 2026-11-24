@@ -6,6 +6,7 @@ import { PuniLook } from './puni';
 import { BATI_PERSONALITY_IDS } from './batiPersona';
 import { BATI_ROLES } from './batiMemory';
 import { MakeConfirm } from './makeConfirm';
+import { SpellTags } from './spell';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -265,6 +266,8 @@ export const BatiRestyleBody = z.object({
   /** R11: asked in the Moon atelier — a paid round needs the member's yes (MakeConfirm) */
   via: z.literal('atelier').optional(),
   confirm: MakeConfirm.optional(),
+  /** R11: the spell said yes to (its English is what is made; MakeConfirm.spell is its key) */
+  spell: SpellTags.optional(),
 });
 export type BatiRestyleBody = z.infer<typeof BatiRestyleBody>;
 /** one of the restyle candidates becomes the Bati picture */
@@ -307,6 +310,8 @@ export const RefineLookBody = z.object({
   /** R11: asked in the Moon atelier — a paid round needs the member's yes (MakeConfirm) */
   via: z.literal('atelier').optional(),
   confirm: MakeConfirm.optional(),
+  /** R11: the spell said yes to (its English is what is made; MakeConfirm.spell is its key) */
+  spell: SpellTags.optional(),
 });
 export type RefineLookBody = z.infer<typeof RefineLookBody>;
 
@@ -431,6 +436,8 @@ export const FullSongBody = SingBody.omit({ melody: true, instrumentalUrl: true,
   from: z.literal('atelier').optional(),
   /** R11: the member's yes to the plan and its price (required from the Moon atelier) */
   confirm: MakeConfirm.optional(),
+  /** R11: the spell said yes to (its English is what is made; MakeConfirm.spell is its key) */
+  spell: SpellTags.optional(),
 });
 export type FullSongBody = z.infer<typeof FullSongBody>;
 
@@ -531,6 +538,8 @@ export const StickerArtBody = z.object({
   /** R11: asked in the Moon atelier — needs the member's yes (MakeConfirm) */
   from: z.literal('atelier').optional(),
   confirm: MakeConfirm.optional(),
+  /** R11: the spell said yes to (its English is what is made; MakeConfirm.spell is its key) */
+  spell: SpellTags.optional(),
 });
 export type StickerArtBody = z.infer<typeof StickerArtBody>;
 

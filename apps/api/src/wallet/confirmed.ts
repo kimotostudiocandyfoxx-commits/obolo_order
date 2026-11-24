@@ -22,10 +22,12 @@ export async function startConfirmed(o: {
   kind: MakeKind;
   refId?: string;
   confirm?: MakeConfirm;
+  /** spellKey of the spell the request carries (it must be the one said yes to) */
+  spell?: string | null;
   required: boolean;
   create: () => Promise<JobView>;
 }): Promise<JobView> {
-  const fee = await o.ledger.charge(o.db, o.userId, o.kind, o.refId, { confirm: o.confirm, required: o.required });
+  const fee = await o.ledger.charge(o.db, o.userId, o.kind, o.refId, { confirm: o.confirm, required: o.required, spell: o.spell ?? null });
   const key = o.confirm ? confirmJobKey(o.userId, o.confirm) : null;
   if (fee.repeat) {
     const id = key ? await o.kv.get(key) : null;

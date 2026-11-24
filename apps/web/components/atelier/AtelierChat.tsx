@@ -10,7 +10,7 @@ import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } f
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { atelierMakeCost, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { atelierMakeCost, spellDrop, spellFrom, spellKey, type SpellView, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -37,7 +37,8 @@ import { clipItem } from './BluenaClip';
 import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
-import { CHANGE, IDEA_CHIPS, isYes, planFor, YES, type Plan } from './plan';
+import { CHANGE, IDEA_CHIPS, isYes, planOf, spellKindOf, YES, type Plan } from './plan';
+import { SpellCard } from './SpellCard';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
@@ -281,19 +282,37 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       .wallet()
       .then((w) => w.manaBalance)
       .catch(() => null);
-  /** {bati}'s plan and its card; `before`: the plan being changed (what the change does not name stays) */
-  const propose = async (kind: AtelierKind, prompt: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk) => {
+  /**
+   * the spell (スペル) and its 木札 card: fresh for the words, or `before` changed by them (`view`: a change already made,
+   * a tag taken off)
+   */
+  const propose = async (kind: AtelierKind, said: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk, view?: SpellView) => {
     const cost = atelierMakeCost(kind, day);
-    if (!cost) return start(kind, prompt, prev, opts);
+    const sk = spellKindOf(kind);
+    if (!cost || !sk) return start(kind, said, prev, opts);
     if (before) setMsgs((m) => m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)));
-    const base = before?.plan ?? (prev ? planFor(kind, prev.prompt) : undefined);
-    const plan = planFor(kind, prompt, base);
-    const have = await manaNow();
+    setBusy(true);
+    const asked = before ? said : prev ? `${prev.prompt}。${said}` : said;
+    const v =
+      view ??
+      (await getApi()
+        .moonSpell({ kind: sk, said: asked.slice(0, 200), ...(before ? { tags: before.plan.tags } : {}) })
+        .catch((): SpellView => (before ? { tags: before.plan.tags, added: [], removed: [] } : { tags: spellFrom(sk, asked), added: [], removed: [] })));
+    const [have] = await Promise.all([manaNow()]);
+    setBusy(false);
+    const plan = planOf(kind, v);
     const id = uid();
-    const text = tline(before ? MOON_LINES.replan : MOON_LINES.plan, { plan: plan.text, mana: cost.mana });
-    setMsgs((m) => [...m, { id, who: 'bati', text, chips: [YES, CHANGE], plan: { kind, text: plan.text, price: cost.mana, have } }]);
-    // a redo is asked with the change's own words (the card's words carry over); a new one with the plan's
-    setPending({ plan: { id, plan, prompt: prev ? (before ? `${before.prompt}、${prompt}` : prompt) : plan.words, prev, opts, price: cost.mana } });
+    const text = tline(before ? MOON_LINES.replan : MOON_LINES.plan);
+    setMsgs((m) => [...m, { id, who: 'bati', text, chips: [YES, CHANGE], plan: { kind, tags: plan.tags, added: plan.added, removed: plan.removed, price: cost.mana, have } }]);
+    // a redo is asked with the change's own words (the card's words carry over); a new one with the spell's
+    setPending({ plan: { id, plan, prompt: prev ? (before ? `${before.prompt}、${said}` : said) : plan.words, prev, opts, price: cost.mana } });
+  };
+  /** a tag taken off the card by tapping its ✕ */
+  const dropTag = (pa: PlanAsk, en: string) => {
+    const sk = spellKindOf(pa.plan.kind);
+    if (!sk || pa.plan.tags.length <= 1) return;
+    setPending(null);
+    void propose(pa.plan.kind, '', pa.prev, pa.opts, pa, spellDrop(pa.plan.tags, en));
   };
   const markPlan = (id: string, done: 'yes' | 'changed' | 'short') => setMsgs((m) => m.map((x) => (x.id === id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done } } : x)));
   const accepted = useRef(new Set<string>());
@@ -313,7 +332,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     sayT(MOON_LINES.start);
     castNow();
-    void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price } });
+    const sk = spellKindOf(pa.plan.kind);
+    void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price, ...(sk ? { spell: spellKey(sk, pa.plan.tags) } : {}) } });
   };
 
   /** what is said once a card is made */
@@ -875,7 +895,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
               : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
             // client 2026-11-24: a picture right in the talk (where it came from, small under it); R11: the plan's card
-            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <PlanCard plan={m.plan} /> : undefined,
+            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <SpellCard spell={m.plan} onDrop={pending && 'plan' in pending && pending.plan.id === m.id && !m.plan.done ? (en) => dropTag(pending.plan, en) : undefined} /> : undefined,
             chips: m.changed
               ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
               : m.plan
@@ -1035,26 +1055,6 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       )}
     </div>
     </Cards.Provider>
-  );
-}
-
-/** R11 (client): the plan's card — what is made, the mana it takes and the mana you have, before the yes */
-function PlanCard({ plan }: { plan: NonNullable<Extract<Msg, { who: 'bati' }>['plan']> }) {
-  const short = plan.have != null && plan.have < plan.price;
-  return (
-    <span className="mt-1 block w-[min(250px,62vw)] rounded-xl border border-[#4a3410]/15 bg-white/60 px-3 py-2 text-[#4a3410]" data-testid="make-confirm">
-      <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-[#4a3410]/70">
-        <KindMark kind={plan.kind} className="h-3.5 w-3.5" />
-        {KIND_WORD[plan.kind]}
-      </span>
-      <span className="mt-0.5 block text-[13px] font-semibold leading-snug">{plan.text}</span>
-      <span className="mt-1.5 flex items-baseline justify-between gap-2 border-t border-[#4a3410]/10 pt-1.5 text-[11.5px]">
-        <span>
-          使うマナ <b className="text-[15px] text-[#2f5fa8]">{plan.price}</b>
-        </span>
-        {plan.have != null && <span className={short ? 'font-semibold text-[#b03a2e]' : 'text-[#4a3410]/70'}>いま {plan.have}マナ</span>}
-      </span>
-    </span>
   );
 }
 

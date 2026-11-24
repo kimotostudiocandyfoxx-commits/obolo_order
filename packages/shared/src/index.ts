@@ -31,3 +31,4 @@ export * from './changeables';
 export * from './talkTone';
 export * from './clip';
 export * from './makeConfirm';
+export * from './spell';

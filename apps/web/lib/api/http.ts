@@ -152,6 +152,9 @@ export class HttpApi implements Api {
   activeJobs() {
     return this.req<Awaited<ReturnType<Api['activeJobs']>>>('GET', '/jobs');
   }
+  moonSpell(body: Parameters<Api['moonSpell']>[0]) {
+    return this.req<Awaited<ReturnType<Api['moonSpell']>>>('POST', '/moon/spell', body);
+  }
   demoJob({ pay: _pay, ...body }: Parameters<Api['demoJob']>[0]) {
     return this.req<Awaited<ReturnType<Api['demoJob']>>>('POST', '/jobs/demo', body);
   }
@@ -380,13 +383,13 @@ export class HttpApi implements Api {
     return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
   }
   refineLook(mediaId: string | null, instruction: string, magic?: boolean, paid?: Paid) {
-    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { ...(mediaId ? { mediaId } : {}), instruction, ...(magic ? { magic } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm } : {}) });
+    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { ...(mediaId ? { mediaId } : {}), instruction, ...(magic ? { magic } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm, ...(paid.spell ? { spell: paid.spell } : {}) } : {}) });
   }
   puniPicCandidates(body: Parameters<Api['puniPicCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['puniPicCandidates']>>>('POST', '/me/puni/pic/candidates', body);
   }
   stickerArt(text: string, style?: string, paid?: Paid) {
-    return this.req<{ id: string; url: string }>('POST', '/me/sticker/art', { text, ...(style ? { style } : {}), ...(paid?.confirm ? { from: 'atelier', confirm: paid.confirm } : {}) });
+    return this.req<{ id: string; url: string }>('POST', '/me/sticker/art', { text, ...(style ? { style } : {}), ...(paid?.confirm ? { from: 'atelier', confirm: paid.confirm, ...(paid.spell ? { spell: paid.spell } : {}) } : {}) });
   }
   butterflyCandidates(body: Parameters<Api['butterflyCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['butterflyCandidates']>>>('POST', '/me/butterfly/candidates', body);
@@ -536,7 +539,7 @@ export class HttpApi implements Api {
     return this.req<MvProjectView>('POST', `/mars/mv/${id}/render`);
   }
   mvStory(id: string, mood: string, from?: 'atelier', paid?: Paid) {
-    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood, from, ...(paid?.confirm ? { confirm: paid.confirm } : {}) });
+    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood, from, ...(paid?.confirm ? { confirm: paid.confirm, ...(paid.spell ? { spell: paid.spell } : {}) } : {}) });
   }
   mvLyrics(id: string) {
     return this.req<Awaited<ReturnType<Api['mvLyrics']>>>('POST', `/mars/mv/${id}/lyrics`);
@@ -639,7 +642,7 @@ export class HttpApi implements Api {
     return this.req<Awaited<ReturnType<Api['batiFaces']>>>('POST', '/me/bati/faces');
   }
   batiRestyle(wish?: string, from?: string, paid?: Paid) {
-    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { ...(wish?.trim() ? { wish } : {}), ...(from ? { from } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm } : {}) });
+    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { ...(wish?.trim() ? { wish } : {}), ...(from ? { from } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm, ...(paid.spell ? { spell: paid.spell } : {}) } : {}) });
   }
   batiLookBack() {
     return this.req<Me>('POST', '/me/bati/restyle/back', {});

@@ -1,4 +1,4 @@
-import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, SpellBody, SpellKind, SpellTag, SpellView, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -87,7 +87,7 @@ export interface UploadedVideo {
 }
 
 /** R11: a paid making asked in the Moon atelier carries the member's yes to the plan and its price */
-export type Paid = { confirm?: MakeConfirm };
+export type Paid = { confirm?: MakeConfirm; /** the spell said yes to (its key is confirm.spell) */ spell?: SpellTag[] };
 
 export interface Api {
   readonly mode: 'live' | 'demo';
@@ -146,7 +146,9 @@ export interface Api {
   activeJobs(): Promise<{ jobs: JobView[] }>;
   /** M-R253 §4: a review stand-in job (no AI): it only takes its seconds */
   /** R11: `pay` — the browser demo charges the stand-in like the API charges the real one (with the yes) */
-  demoJob(body: DemoJobBody & { pay?: { kind: MakeKind; confirm: MakeConfirm } }): Promise<JobView>;
+  demoJob(body: DemoJobBody & { pay?: { kind: MakeKind; confirm: MakeConfirm; spell?: { kind: SpellKind; tags: SpellTag[] } } }): Promise<JobView>;
+  /** R11: the spell (スペル) {bati} lays out for a paid making — fresh for the words, or changed by them */
+  moonSpell(body: SpellBody): Promise<SpellView>;
   /** M-R253: the Moon atelier's works — tries inside one work, the face, material, where it was made */
   moonWorks(ids?: string[]): Promise<MoonWorkView[]>;
   createMoonWork(body: CreateMoonWorkBody): Promise<MoonWorkView>;

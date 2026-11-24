@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { AddMvMaterialBody, CreateMvBody, MakeConfirm } from '@obolo/shared';
+import { AddMvMaterialBody, CreateMvBody, MakeConfirm, SpellTags, spellKey, spellPrompt } from '@obolo/shared';
 import { z } from 'zod';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -14,7 +14,7 @@ import { LedgerService } from '../wallet/ledger.service';
 import { startConfirmed } from '../wallet/confirmed';
 
 const MaterialBody = AddMvMaterialBody.extend({ posterUrl: z.string().url().max(500).nullish(), seconds: z.number().min(0).max(3600).nullish() });
-const StoryBody = z.object({ mood: z.string().trim().max(200).default(''), from: z.literal('atelier').optional(), confirm: MakeConfirm.optional() });
+const StoryBody = z.object({ mood: z.string().trim().max(200).default(''), from: z.literal('atelier').optional(), confirm: MakeConfirm.optional(), spell: SpellTags.optional() });
 const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
 /** Mars MV studio: a Mercury song + videos / photos → Bati's MV (docs/placeholders.md P-MV). */
@@ -82,8 +82,10 @@ export class MvController {
       kind: 'mv',
       refId: id,
       confirm: b.confirm,
+      spell: b.spell ? spellKey('video', b.spell) : null,
       required: b.from === 'atelier',
-      create: () => this.jobs.create(userId, 'mv-story', { mvId: id, mood: b.mood, origin: origin(req), from: b.from }),
+      // R11: made from exactly the spell said yes to
+      create: () => this.jobs.create(userId, 'mv-story', { mvId: id, mood: b.spell ? spellPrompt('video', b.spell).slice(0, 200) : b.mood, origin: origin(req), from: b.from }),
     });
   }
 

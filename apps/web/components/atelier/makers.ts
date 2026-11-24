@@ -7,7 +7,7 @@ import { workMarkRef } from '@/lib/finds/works';
 import { makeSong, pickGenre, songFromDesign, type MadeSong } from '@/lib/mercury/compose';
 import { dropShelf, LOCAL_KINDS, patchTalkWork, putShelf } from './shelf';
 import { stack, uid, type Version, type Work } from './work';
-import type { Plan } from './plan';
+import { spellKindOf, type Plan } from './plan';
 
 /**
  * The generation calls behind the atelier's cards (M-R210): the same ones the old per-kind screens used — the look's
@@ -64,8 +64,11 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   const lyric = materialWords(mats);
   const said = withTarget(prompt, opts.target);
   const api = getApi();
-  const paid = { confirm: opts.confirm };
-  const pay = (kind: 'song' | 'jacketArt' | 'mv') => (opts.confirm ? { kind, confirm: opts.confirm } : undefined);
+  // R11: the yes and the spell it was given to (the server makes the work from exactly those tags)
+  const spell = opts.confirm ? opts.plan?.tags : undefined;
+  const sk = spellKindOf(kind);
+  const paid = { confirm: opts.confirm, spell };
+  const pay = (m: 'song' | 'jacketArt' | 'mv') => (opts.confirm ? { kind: m, confirm: opts.confirm, spell: spell && sk ? { kind: sk, tags: spell } : undefined } : undefined);
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
     const out = { ...w, saved: true };
@@ -139,7 +142,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         progression: d.progression,
         seconds: Math.max(10, Math.min(180, d.seconds)),
         from: 'atelier',
-        ...(opts.confirm ? { confirm: opts.confirm } : {}),
+        ...(opts.confirm ? { confirm: opts.confirm, ...(spell ? { spell } : {}) } : {}),
       });
       return { ...base, prompt: words, status: 'making', title: sketch.title, started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: sketch.title } } };
     }

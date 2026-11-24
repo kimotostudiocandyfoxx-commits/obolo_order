@@ -58,6 +58,10 @@ import {
   MAKE_COST,
   CHARGE_ERROR_WORDS,
   confirmKey,
+  spellEdit,
+  spellFrom,
+  spellKey,
+  type SpellKind,
   decideCharge,
   type MakeConfirm,
   BATI_FACES,
@@ -829,9 +833,15 @@ export class DemoApi implements Api {
   }
 
   // M-R253 §4: a stand-in job — it only waits (the review page's 20 s and 2-minute ones)
-  async demoJob(body: DemoJobBody & { lateBy?: number; pay?: { kind: MakeKind; confirm: MakeConfirm } }): Promise<JobView> {
+  // R11: the spell by the shared rules (the API's model only adds English for free words)
+  async moonSpell(body: Parameters<Api['moonSpell']>[0]) {
+    await sleep(250);
+    return body.tags?.length ? spellEdit(body.kind, body.tags, body.said) : { tags: spellFrom(body.kind, body.said), added: [], removed: [] };
+  }
+
+  async demoJob(body: Parameters<Api['demoJob']>[0] & { lateBy?: number }): Promise<JobView> {
     // R11: a paid stand-in is charged with the yes; the same yes again hands back the job it started
-    const key = body.pay ? this.charge(body.pay.kind, { confirm: body.pay.confirm }, true) : null;
+    const key = body.pay ? this.charge(body.pay.kind, { confirm: body.pay.confirm, spell: body.pay.spell?.tags }, true, body.pay.spell?.kind) : null;
     if (key && this.s.paidYes?.[key]) return this.getJob(this.s.paidYes[key]);
     const id = uid();
     if (key) this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: id };
@@ -1310,10 +1320,10 @@ export class DemoApi implements Api {
    * the same yes again is no second charge (ALREADY_STARTED, or `repeatOk`: the caller hands back what it started).
    * Returns the yes's ledger key when there was one.
    */
-  private charge(kind: MakeKind, paid?: Paid, repeatOk = false): string | null {
+  private charge(kind: MakeKind, paid?: Paid, repeatOk = false, spellKind: SpellKind = 'art'): string | null {
     const w = this.s.wallets[this.uid()];
     const key = paid?.confirm ? confirmKey(this.uid(), kind, paid.confirm) : null;
-    const d = decideCharge({ kind, confirm: paid?.confirm, required: false, balance: w?.mana ?? 0, applied: !!key && key in (this.s.paidYes ?? {}) });
+    const d = decideCharge({ kind, confirm: paid?.confirm, required: false, spell: paid?.spell ? spellKey(spellKind, paid.spell) : null, balance: w?.mana ?? 0, applied: !!key && key in (this.s.paidYes ?? {}) });
     if ('error' in d) {
       if (d.error === 'NO_MANA') window.dispatchEvent(new Event('obolo:nomana'));
       throw new ApiError(d.error === 'NO_MANA' ? 402 : 409, d.error, CHARGE_ERROR_WORDS[d.error]);
@@ -1390,7 +1400,7 @@ export class DemoApi implements Api {
     if (used >= BATI_MAGIC_PER_DAY) throw new ApiError(429, 'LOOK_REFINES', '今日はもう描き直せません');
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid);
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid, false, 'look');
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     const c = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: uid(), url: await demoRefine(src.url, instruction, used * 4 + k) })));
@@ -1408,7 +1418,7 @@ export class DemoApi implements Api {
     const key = this.roomKey('restyle');
     const used = Number(localStorage.getItem(key) ?? 0);
     if (used >= BATI_RESTYLE_PER_DAY) throw new ApiError(429, 'RESTYLE_TRIES', '今日はもう着替えられません');
-    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid);
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid, false, 'bati');
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     // M-R223: four cards from the look worn now (or the card tapped just before); four touches without a wish

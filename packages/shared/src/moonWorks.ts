@@ -289,8 +289,7 @@ export const MOON_LINES = {
   backBig: 'これは、ちょっと大物。だいたい{n}分。できたころに、このトークに戻ってきてね。',
   /**
    * R11 (client): before anything that spends mana — a vague ask gets one question (with a few ideas as chips), a clear
-   * one a plan; the plan's card shows the mana it takes and the mana you have; only a yes starts it ({plan} = the plan,
-   * {mana} = its price, {short} = the mana missing)
+   * one a plan; the plan's card shows the mana it takes and the mana you have; only a yes starts it ({short} = the mana missing)
    */
   ask: {
     song: 'いいね！　どんな曲にする？　気分やテーマを教えて。',
@@ -299,9 +298,10 @@ export const MOON_LINES = {
     look: 'いいね！　どんなふうに変える？',
     bati: 'いいね！　どんなかっこうにする？',
   },
-  plan: 'こんな感じで作るよ：{plan}。マナを{mana}使うけど、これでいい？',
-  replan: 'わかった、こう変えるね：{plan}。マナを{mana}使うけど、これでいい？',
-  change: 'オッケー、どう変える？　言ってみて。',
+  /** the spell (スペル): the line before its 木札 card (the card shows the mana and the buttons) */
+  plan: 'じゃあ、こういうスペルになるね。',
+  replan: 'スペルを、こう変えたよ。',
+  change: 'どこを変える？　「〇〇も足して」「〇〇は外して」みたいに言ってね。',
   start: 'よし、作るね！',
   noMana: 'ごめん、マナが{short}たりないみたい。',
   /** ③ late; the second time its own line */

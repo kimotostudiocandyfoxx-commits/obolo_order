@@ -9,7 +9,12 @@ import { JOURNEY_DONE } from './journey';
  * The server charges only with it (from the Moon atelier), only that price, and only once per id (a double tap is the
  * same yes: no second charge, no second job).
  */
-export const MakeConfirm = z.object({ id: z.string().uuid(), price: z.number().int().min(0).max(100_000) });
+export const MakeConfirm = z.object({
+  id: z.string().uuid(),
+  price: z.number().int().min(0).max(100_000),
+  /** the spell said yes to (spellKey of its tags): the work is made from exactly those tags */
+  spell: z.string().max(64).optional(),
+});
 export type MakeConfirm = z.infer<typeof MakeConfirm>;
 
 /**
@@ -27,7 +32,7 @@ export function confirmKey(userId: string, kind: MakeKind, confirm: MakeConfirm)
   return `make:${kind}:${userId}:ok:${confirm.id}`;
 }
 
-export type ChargeError = 'CONFIRM_REQUIRED' | 'PRICE_CHANGED' | 'NO_MANA';
+export type ChargeError = 'CONFIRM_REQUIRED' | 'PRICE_CHANGED' | 'SPELL_CHANGED' | 'NO_MANA';
 export type ChargeDecision = { do: 'charge'; amount: number } | { do: 'repeat' } | { error: ChargeError };
 
 /**
@@ -35,10 +40,12 @@ export type ChargeDecision = { do: 'charge'; amount: number } | { do: 'repeat' }
  * nothing is charged; a price other than the one shown → nothing is charged; a yes already charged → a repeat (no new
  * charge); not enough mana → nothing is charged; else exactly the price shown is taken.
  */
-export function decideCharge(o: { kind: MakeKind; confirm?: MakeConfirm | null; required: boolean; balance: number; applied: boolean }): ChargeDecision {
+export function decideCharge(o: { kind: MakeKind; confirm?: MakeConfirm | null; required: boolean; balance: number; applied: boolean; /** spellKey of the spell the request carries (none: null) */ spell?: string | null }): ChargeDecision {
   const amount = MAKE_COST[o.kind];
   if (o.required && !o.confirm) return { error: 'CONFIRM_REQUIRED' };
   if (o.confirm && o.confirm.price !== amount) return { error: 'PRICE_CHANGED' };
+  // the spell carried must be the one said yes to (and one said yes to must be carried)
+  if (o.confirm && (o.confirm.spell ?? null) !== (o.spell ?? null)) return { error: 'SPELL_CHANGED' };
   if (o.confirm && o.applied) return { do: 'repeat' };
   if (o.balance < amount) return { error: 'NO_MANA' };
   return { do: 'charge', amount };
@@ -48,5 +55,6 @@ export function decideCharge(o: { kind: MakeKind; confirm?: MakeConfirm | null; 
 export const CHARGE_ERROR_WORDS: Record<ChargeError, string> = {
   CONFIRM_REQUIRED: 'まだ、OKをもらってないよ。',
   PRICE_CHANGED: 'マナの数が変わったみたい。もう一回、たしかめてね。',
+  SPELL_CHANGED: 'スペルが変わったみたい。もう一回、たしかめてね。',
   NO_MANA: 'マナジェムが、光らなくなった',
 };

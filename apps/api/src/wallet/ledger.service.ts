@@ -107,14 +107,14 @@ export class LedgerService {
    * Moon atelier) nothing is charged without it (428 CONFIRM_REQUIRED) or at another price (409 PRICE_CHANGED); the same
    * yes again is no new charge (`repeat`: the caller hands back what the first one started, never a second making).
    */
-  async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
+  async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean; /** spellKey of the spell the request carries */ spell?: string | null } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
     const amount = MAKE_COST[kind];
     const key = opts.confirm ? confirmKey(userId, kind, opts.confirm) : `make:${kind}:${userId}:${randomUUID()}`;
     let repeat = false;
     try {
       await db.write.transaction(async (tx) => {
         const balance = await this.lockedBalance(tx, userId);
-        const d = decideCharge({ kind, confirm: opts.confirm, required: !!opts.required, balance, applied: !!opts.confirm && (await this.applied(tx, key)) });
+        const d = decideCharge({ kind, confirm: opts.confirm, required: !!opts.required, spell: opts.spell ?? null, balance, applied: !!opts.confirm && (await this.applied(tx, key)) });
         if ('error' in d) throw chargeRefused(d.error);
         if (d.do === 'repeat') {
           repeat = true;

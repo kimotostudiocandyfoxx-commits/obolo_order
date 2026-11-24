@@ -32,6 +32,8 @@ import { FindsController } from './finds/finds.controller';
 import { FindsService } from './finds/finds.service';
 import { MoonWorksController } from './moon/moon-works.controller';
 import { MoonWorksService } from './moon/moon-works.service';
+import { SpellController } from './moon/spell.controller';
+import { SpellService } from './moon/spell.service';
 import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
@@ -114,6 +116,7 @@ import { WalletController } from './wallet/wallet.controller';
     DachiController,
     FindsController,
     MoonWorksController,
+    SpellController,
   ],
   providers: [
     AuthGuard,
@@ -155,6 +158,7 @@ import { WalletController } from './wallet/wallet.controller';
     DachiVoiceService,
     FindsService,
     MoonWorksService,
+    SpellService,
   ],
 })
 export class AppModule {}
