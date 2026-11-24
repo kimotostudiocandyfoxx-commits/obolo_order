@@ -1,4 +1,4 @@
-import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, MakeConfirm, MakeKind, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -86,6 +86,9 @@ export interface UploadedVideo {
   height: number;
 }
 
+/** R11: a paid making asked in the Moon atelier carries the member's yes to the plan and its price */
+export type Paid = { confirm?: MakeConfirm };
+
 export interface Api {
   readonly mode: 'live' | 'demo';
   /** Entry: members and invited people get a 6-digit code; anyone else → NOT_INVITED. */
@@ -142,7 +145,8 @@ export interface Api {
   getJob(id: string): Promise<JobView>;
   activeJobs(): Promise<{ jobs: JobView[] }>;
   /** M-R253 §4: a review stand-in job (no AI): it only takes its seconds */
-  demoJob(body: DemoJobBody): Promise<JobView>;
+  /** R11: `pay` — the browser demo charges the stand-in like the API charges the real one (with the yes) */
+  demoJob(body: DemoJobBody & { pay?: { kind: MakeKind; confirm: MakeConfirm } }): Promise<JobView>;
   /** M-R253: the Moon atelier's works — tries inside one work, the face, material, where it was made */
   moonWorks(ids?: string[]): Promise<MoonWorkView[]>;
   createMoonWork(body: CreateMoonWorkBody): Promise<MoonWorkView>;
@@ -225,7 +229,7 @@ export interface Api {
   /** One instruction → one new version of a candidate (3 per apprentice). */
   /** `mediaId` null: change the look worn now (the second journey's basin) */
   /** `magic`: Bati's magic in Bati's room (the Moon) — rounds counted per day (BATI_MAGIC_PER_DAY), free on the first journey */
-  refineLook(mediaId: string | null, instruction: string, magic?: boolean): Promise<NeoLookResult>;
+  refineLook(mediaId: string | null, instruction: string, magic?: boolean, paid?: Paid): Promise<NeoLookResult>;
   chooseLook(mediaId: string): Promise<Me>;
   /** Saturn picture character: 2 painted candidates from a description (+ optional inspiration picture). */
   puniPicCandidates(body: PuniPicBody): Promise<PuniPicResult>;
@@ -256,7 +260,7 @@ export interface Api {
   butterflyCandidates(body: PuniPicBody): Promise<PuniPicResult>;
   chooseButterfly(mediaId: string | null): Promise<Me>;
   /** Jupiter (first journey): Bati draws a sticker's picture from its words (kept only for you). */
-  stickerArt(text: string, style?: string): Promise<{ id: string; url: string }>;
+  stickerArt(text: string, style?: string, paid?: Paid): Promise<{ id: string; url: string }>;
 
   // Jupiter — パタパタ
   jupiterSky(tab: 'all' | 'following' | 'friends'): Promise<JupiterFlyer[]>;
@@ -321,7 +325,7 @@ export interface Api {
   /** the lyrics on the MV — a background job */
   mvLyrics(id: string): Promise<JobView>;
   /** story MV: painted from the song and the profile picture; `mood` may be empty (Bati decides) — a background job */
-  mvStory(id: string, mood: string, from?: 'atelier'): Promise<JobView>;
+  mvStory(id: string, mood: string, from?: 'atelier', paid?: Paid): Promise<JobView>;
   /** `egg`: the egg chosen on the altar (M-R215: 'moon' = 女の子寄り, 'sun' = 男の子寄り); the personality is decided from the food (M-R217) — SEED_REASK: OBOLON asks again */
   batiEgg(food: string, egg?: BatiEggKind): Promise<Me>;
   /** M-R218: the grown egg hatched in the Moon temple from its seed (the 2nd: a sound, the 3rd: a word); EGG_NOT_READY / BATI_FULL / SEED_REASK */
@@ -341,7 +345,7 @@ export interface Api {
   /** Bati's six expressions from the hatched picture (once; M-R139) */
   batiFaces(): Promise<Me>;
   /** Bati's room: pictures of the same Bati dressed up / changed a little by the wish (BATI_RESTYLE_PER_DAY rounds a day) */
-  batiRestyle(wish?: string, from?: string): Promise<BatiRestyleResult>;
+  batiRestyle(wish?: string, from?: string, paid?: Paid): Promise<BatiRestyleResult>;
   /** one of them becomes the Bati picture (its expressions are drawn again in the background) */
   chooseBatiRestyle(id: string): Promise<Me>;
   /** M-R223 〔前に戻す〕: the {bati} look decided before the one worn now (NO_PREVIOUS when none) */

@@ -23,7 +23,7 @@ export type Watched = {
   /** the words used (the finisher of a review stand-in makes its sketch from them) */
   words: string;
   /** the song an MV is made on, the material's picture … (the finisher's inputs) */
-  extra?: { comment?: string; still?: string | null; songTitle?: string };
+  extra?: { comment?: string; still?: string | null; songTitle?: string; /** R11: the plan's genre (the stand-in song) */ genre?: string };
   since: number;
 };
 

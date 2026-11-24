@@ -6,11 +6,11 @@ import { talkMuted, TalkScene, type TalkItem, type TalkPerson } from '@/componen
 import { batiVoiceUrl, speakable } from '@/lib/atelier/batiSpeak';
 import { canPlay, playClip, readyClip, VOICE_WAIT_MS } from '@/lib/voice/webVoice';
 import { logVoice } from '@/lib/voice/voiceLog';
-import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
+import { BATI_COLOR, batiLook, characterLook, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { atelierMakeCost, HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
@@ -26,7 +26,6 @@ import { saveTalk, talks, type Talk } from './shelf';
 import { countdown, jobView, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
 import { dayOf } from '@/lib/finds/spiral';
 import { nextLine } from '@/lib/atelier/lineTurn';
-import { planetOpen } from '@/components/bluena/BluenaOrbit';
 import { cues, withWords, type StoryMode } from './story';
 import { contentOf } from './intent';
 import { toggleAudio } from '@/lib/audio';
@@ -38,11 +37,12 @@ import { clipItem } from './BluenaClip';
 import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
+import { CHANGE, IDEA_CHIPS, isYes, planFor, YES, type Plan } from './plan';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
 const TAUGHT_KEY = 'obolo.atelier.taught';
-const PLANET_WORD = { voice: '土星', art: '木星', song: '水星', video: '火星', radio: '金星' } as Record<string, string>;
 const PLANET_OF = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus' } as Record<string, string>;
+const PLANET_WORD = { voice: '土星', art: '木星', song: '水星', video: '火星', radio: '金星' } as Record<string, string>;
 const LESSON_OF: Partial<Record<AtelierKind, Lesson>> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
 // PLACEHOLDER (P-ATELIER-5): {bati}'s line when the words were not understood (iPad feedback: no longer the opening)
 const HELLO = 'なにをする？ ことばで頼んでね';
@@ -80,7 +80,22 @@ export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined,
   return { id: uid(), at: new Date().toISOString(), msgs: [{ id: uid(), who: 'bati', text }] };
 }
 
-type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | null;
+/** R11: a plan waiting for the member's yes (the message its card is on, what is made with it, its price) */
+type PlanAsk = { id: string; plan: Plan; prompt: string; prev?: Work; opts: MakeOpts; price: number };
+type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | { plan: PlanAsk } | null;
+
+/** a fresh id for one yes (MakeConfirm.id: a UUID) */
+function yesId(): string {
+  const c = typeof crypto !== 'undefined' ? crypto : undefined;
+  if (c?.randomUUID) return c.randomUUID();
+  const b = new Uint8Array(16);
+  if (c?.getRandomValues) c.getRandomValues(b);
+  else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
 
 /**
  * 月で作る (client M-R210/M-R211): one {bati} chat for everything — your look, {bati}'s dress-up / 変身, lookups, pictures,
@@ -125,26 +140,28 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   const say = (text: string, chips?: string[], found?: Work[]) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: story ? story.voice('バティ', text) : batiLine(text, batiVoice), chips, found }]);
   const ring = useMarkRing();
   /** M-R253 §6: an official line in {bati}'s manner, then its placeholders */
+  const tline = (tpl: string, vars: Record<string, string | number | undefined> = {}) => fillLine(story ? story.voice('バティ', tpl) : batiLine(tpl, batiVoice), { neo: me?.displayName ?? '', ...vars });
   const sayT = (tpl: string, vars: Record<string, string | number | undefined> = {}, chips?: string[], fix: [string, string][] = []) => {
-    let text = fillLine(story ? story.voice('バティ', tpl) : batiLine(tpl, batiVoice), { neo: me?.displayName ?? '', ...vars });
+    let text = tline(tpl, vars);
     for (const [a, b] of fix) text = text.replace(a, b);
     setMsgs((m) => [...m, { id: uid(), who: 'bati', text, chips }]);
   };
-  /** ② where to go meanwhile: a planet open today (not the one it is made for); none yet → Bluena */
-  const awayPlanet = (kind: AtelierKind) => {
-    const own = PLANET_OF[kind];
-    const open = (['saturn', 'jupiter', 'mercury', 'mars', 'venus'] as const).filter((p) => p !== own && planetOpen(p, day));
-    return open.length ? PLANET_NAME[nextLine('planet', open)] : null;
-  };
+  // ② when to come back — R11 (client): to this talk; {bati} never tempts you elsewhere meanwhile
   const backLine = (kind: AtelierKind, ms: number) => {
     const n = etaMinutes(ms);
     if (kind === 'video') return sayT(MOON_LINES.backBig, { n });
-    if (kind === 'song') {
-      const planet = awayPlanet(kind);
-      const first = planet ? MOON_LINES.backSong : MOON_LINES.backSongBluena;
-      return sayT(nextLine('back-song', [first, ...MOON_LINES.back]), { n, planet: planet ?? '' });
-    }
+    if (kind === 'song') return sayT(nextLine('back-song', [MOON_LINES.backSong, ...MOON_LINES.back]), { n });
     return sayT(nextLine('back', MOON_LINES.back), { n });
+  };
+  /**
+   * R11 (client): {bati} casts — it goes to the left and casts into the bowl (which glows) for at least `ms`; it stays
+   * there while a quick making runs, and comes back to the middle once a slow one is under way (the bowl shimmers)
+   */
+  const [castTill, setCastTill] = useState(0);
+  const castNow = (ms = 1800) => {
+    const t = Date.now() + ms;
+    setCastTill(t);
+    setTimeout(() => setCastTill((x) => (x === t ? 0 : x)), ms + 30);
   };
   const lates = useRef(new Map<string, number>());
 
@@ -194,7 +211,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   matsRef.current = mats;
   const lastWork = () => [...msgs].reverse().find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.status !== 'making')?.work;
 
-  const run = useCallback(
+  const start = useCallback(
     async (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
       setBusy(true);
       if (story) {
@@ -244,6 +261,60 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ctx, mats],
   );
+
+  /**
+   * R11 (client): a making. Free → at once. One that spends mana never starts on the ask: a vague ask gets one question
+   * (with a few ideas as chips); otherwise {bati} says its plan with a card (what, the mana it takes, the mana you have)
+   * and waits for the yes (〔これで作って〕 or 「OK」「いいよ」「作って」); other words change the plan.
+   */
+  const run = (kind: AtelierKind, prompt: string, prev?: Work, opts: MakeOpts = {}) => {
+    const cost = story?.test ? null : atelierMakeCost(kind, day);
+    if (!cost || opts.confirm) return start(kind, prompt, prev, opts);
+    if (!prev && !opts.materials?.length && isBare(prompt)) {
+      setPending({ kind });
+      return sayT(MOON_LINES.ask[kind as keyof typeof MOON_LINES.ask] ?? ASK[kind], {}, IDEA_CHIPS[kind]);
+    }
+    return propose(kind, prompt, prev, opts);
+  };
+  const manaNow = () =>
+    getApi()
+      .wallet()
+      .then((w) => w.manaBalance)
+      .catch(() => null);
+  /** {bati}'s plan and its card; `before`: the plan being changed (what the change does not name stays) */
+  const propose = async (kind: AtelierKind, prompt: string, prev: Work | undefined, opts: MakeOpts, before?: PlanAsk) => {
+    const cost = atelierMakeCost(kind, day);
+    if (!cost) return start(kind, prompt, prev, opts);
+    if (before) setMsgs((m) => m.map((x) => (x.id === before.id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done: 'changed' as const } } : x)));
+    const base = before?.plan ?? (prev ? planFor(kind, prev.prompt) : undefined);
+    const plan = planFor(kind, prompt, base);
+    const have = await manaNow();
+    const id = uid();
+    const text = tline(before ? MOON_LINES.replan : MOON_LINES.plan, { plan: plan.text, mana: cost.mana });
+    setMsgs((m) => [...m, { id, who: 'bati', text, chips: [YES, CHANGE], plan: { kind, text: plan.text, price: cost.mana, have } }]);
+    // a redo is asked with the change's own words (the card's words carry over); a new one with the plan's
+    setPending({ plan: { id, plan, prompt: prev ? (before ? `${before.prompt}、${prompt}` : prompt) : plan.words, prev, opts, price: cost.mana } });
+  };
+  const markPlan = (id: string, done: 'yes' | 'changed' | 'short') => setMsgs((m) => m.map((x) => (x.id === id && x.who === 'bati' && x.plan ? { ...x, plan: { ...x.plan, done } } : x)));
+  const accepted = useRef(new Set<string>());
+  /** the yes: enough mana → charged with this yes and started ({bati} casts); not enough → said, and (members) the gems */
+  const accept = async (pa: PlanAsk) => {
+    if (accepted.current.has(pa.id)) return;
+    accepted.current.add(pa.id);
+    setPending(null);
+    markPlan(pa.id, 'yes');
+    const have = await manaNow();
+    if (have != null && have < pa.price) {
+      markPlan(pa.id, 'short');
+      sayT(MOON_LINES.noMana, { short: pa.price - have });
+      // no story here: only a member is offered the mana gems (NoManaNotice)
+      window.dispatchEvent(new CustomEvent('obolo:nomana', { detail: { plain: true } }));
+      return;
+    }
+    sayT(MOON_LINES.start);
+    castNow();
+    void start(pa.plan.kind, pa.prompt, pa.prev, { ...pa.opts, plan: pa.plan, confirm: { id: yesId(), price: pa.price } });
+  };
 
   /** what is said once a card is made */
   const afterMade = (w: Work, prompt: string) => {
@@ -300,6 +371,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       return line('open');
     }
     if (!isOpen(kind, day)) return setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiDaysLeftLine(batiVoice?.personality ?? 'genki', daysUntil(kind, day)) }]);
+    // R11: one that spends mana: {bati}'s question or plan first (run)
+    if (atelierMakeCost(kind, day)) return void run(kind, content);
     if (isBare(content)) {
       setPending({ kind });
       return say(ASK[kind]);
@@ -325,6 +398,8 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     }
     void chipped;
     setBusy(true);
+    // R11: a change is cast into the bowl too
+    castNow();
     getApi()
       .setChangeable(r.item.id, r.choice.id)
       .then((res) => {
@@ -400,6 +475,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
     setPending(null);
+    // R11: the plan waiting for a yes — a yes starts it, any other words change it
+    if (p && 'plan' in p) {
+      if (isYes(text)) return void accept(p.plan);
+      return void propose(p.plan.plan.kind, text, p.plan.prev, p.plan.opts, p.plan);
+    }
     if (p && 'radioName' in p) {
       const h = held.current.get(p.radioName);
       const w = msgs.find((m): m is Extract<Msg, { who: 'work' }> => m.who === 'work' && m.work.id === p.radioName)?.work;
@@ -448,7 +528,16 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     return void converse(text);
   };
 
-  const chip = (label: string) => {
+  const chip = (label: string, from?: string) => {
+    // R11: the plan card's buttons and the ideas under {bati}'s question
+    const p = pending;
+    if (p && 'plan' in p && (!from || from === p.plan.id) && (label === YES || label === CHANGE)) {
+      setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
+      if (label === YES) return void accept(p.plan);
+      return sayT(MOON_LINES.change);
+    }
+    if (label === YES || label === CHANGE) return;
+    if (p && 'kind' in p && IDEA_CHIPS[p.kind]?.includes(label)) return send(label);
     const k = (Object.keys(KIND_WORD) as AtelierKind[]).find((x) => KIND_WORD[x] === label);
     setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
     if (!story && changeAsk(label, true)) return;
@@ -785,11 +874,17 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
                 }
               : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
-            // client 2026-11-24: a picture right in the talk (where it came from, small under it)
-            extra: m.pic ? <PicBubble pic={m.pic} /> : undefined,
+            // client 2026-11-24: a picture right in the talk (where it came from, small under it); R11: the plan's card
+            extra: m.pic ? <PicBubble pic={m.pic} /> : m.plan ? <PlanCard plan={m.plan} /> : undefined,
             chips: m.changed
               ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
-              : m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
+              : m.plan
+                ? m.plan.done === 'yes'
+                  ? [{ label: 'OK！', onPick: () => undefined, disabled: true }]
+                  : m.plan.done
+                    ? undefined
+                    : m.chips?.map((c) => ({ label: c, onPick: () => chip(c, m.id), disabled: busy || !(pending && 'plan' in pending && pending.plan.id === m.id) }))
+                : m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
           }
         : {
             id: m.id,
@@ -826,9 +921,12 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     const t = setTimeout(() => setRising((r) => (r?.key === key ? null : r)), 1800);
     return () => clearTimeout(t);
   }, [msgs]);
-  const brewing = msgs.some((m) => m.who === 'work' && m.work.status === 'making');
-  const bowl: BowlState = rising ? { rise: rising } : brewing ? 'glow' : 'idle';
-  const casting = !story && bowl !== 'idle';
+  // R11 (client): every making — the cast (at least a moment; the whole of a quick one) lights the bowl with {bati} at the
+  // left; a slow one still running after the cast keeps a soft shimmer with {bati} back in the middle
+  const quickMaking = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !m.work.job?.long);
+  const slowMaking = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !!m.work.job?.long);
+  const bowl: BowlState = rising ? { rise: rising } : castTill > 0 || quickMaking ? 'glow' : slowMaking ? 'shimmer' : 'idle';
+  const casting = bowl === 'glow' || typeof bowl === 'object';
   const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   // a slow card does not keep {bati} 'thinking' (you may go away meanwhile)
@@ -862,21 +960,23 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       <TalkScene
         people={people}
         items={items}
-        thinking={busy || making || voiceHeld.current.size > 0 ? 'bati' : null}
+        thinking={!casting && (busy || making || voiceHeld.current.size > 0) ? 'bati' : null}
+        castBy={casting ? 'bati' : null}
         voice={speaking ?? undefined}
         log
-        framing={story ? undefined : 'ots'}
+        framing="ots"
         listening={talkState.listening}
         keyboard={talkState.keyboard}
-        // R9 (client): {bati} in the Moon temple, before the water bowl (the story keeps its own place)
-        place={story ? PLACE_BG.moon : TEMPLE_PLATE.src}
-        placeAspect={story ? undefined : TEMPLE_PLATE.aspect}
-        placeFx={story ? undefined : (m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
+        // R9 (client): {bati} in the Moon temple, before the water bowl — R11: in a story day's making too (the client's
+        // song on its day had no bowl and no cast: the story kept its own place then)
+        place={TEMPLE_PLATE.src}
+        placeAspect={TEMPLE_PLATE.aspect}
+        placeFx={(m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
         // R10 (client): {bati} in the middle, facing you, a step in front of the bowl (big enough to hide its lower rim);
         // only while it casts (the bowl glows: something is being made or changed) it goes to the left and casts into the
         // bowl behind it, then comes back to the middle
         otsAt={casting ? 0.21 : 0.5}
-        otsStand={story ? undefined : casting ? TEMPLE_PLATE.bati : TEMPLE_PLATE.batiFront}
+        otsStand={casting ? TEMPLE_PLATE.bati : TEMPLE_PLATE.batiFront}
         top={story ? 40 : 0}
         bar={{ title: partner.name, onList, unread, onBack, below: banner }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
@@ -935,6 +1035,26 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
       )}
     </div>
     </Cards.Provider>
+  );
+}
+
+/** R11 (client): the plan's card — what is made, the mana it takes and the mana you have, before the yes */
+function PlanCard({ plan }: { plan: NonNullable<Extract<Msg, { who: 'bati' }>['plan']> }) {
+  const short = plan.have != null && plan.have < plan.price;
+  return (
+    <span className="mt-1 block w-[min(250px,62vw)] rounded-xl border border-[#4a3410]/15 bg-white/60 px-3 py-2 text-[#4a3410]" data-testid="make-confirm">
+      <span className="flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-[#4a3410]/70">
+        <KindMark kind={plan.kind} className="h-3.5 w-3.5" />
+        {KIND_WORD[plan.kind]}
+      </span>
+      <span className="mt-0.5 block text-[13px] font-semibold leading-snug">{plan.text}</span>
+      <span className="mt-1.5 flex items-baseline justify-between gap-2 border-t border-[#4a3410]/10 pt-1.5 text-[11.5px]">
+        <span>
+          使うマナ <b className="text-[15px] text-[#2f5fa8]">{plan.price}</b>
+        </span>
+        {plan.have != null && <span className={short ? 'font-semibold text-[#b03a2e]' : 'text-[#4a3410]/70'}>いま {plan.have}マナ</span>}
+      </span>
+    </span>
   );
 }
 

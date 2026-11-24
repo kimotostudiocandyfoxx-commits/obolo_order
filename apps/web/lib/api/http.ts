@@ -1,5 +1,5 @@
 import type { BatiEggKind, BatiRole, Me, MembersDay, LineVoicesBody, LineVoicesView, MvProjectView, StoryResult, TimelinePlanet } from '@obolo/shared';
-import type { Api } from './types';
+import type { Api, Paid } from './types';
 import { ApiError } from './types';
 import { tokenStore } from './token';
 
@@ -152,7 +152,7 @@ export class HttpApi implements Api {
   activeJobs() {
     return this.req<Awaited<ReturnType<Api['activeJobs']>>>('GET', '/jobs');
   }
-  demoJob(body: Parameters<Api['demoJob']>[0]) {
+  demoJob({ pay: _pay, ...body }: Parameters<Api['demoJob']>[0]) {
     return this.req<Awaited<ReturnType<Api['demoJob']>>>('POST', '/jobs/demo', body);
   }
   moonWorks(ids?: string[]) {
@@ -379,14 +379,14 @@ export class HttpApi implements Api {
   lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
   }
-  refineLook(mediaId: string | null, instruction: string, magic?: boolean) {
-    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { ...(mediaId ? { mediaId } : {}), instruction, ...(magic ? { magic } : {}) });
+  refineLook(mediaId: string | null, instruction: string, magic?: boolean, paid?: Paid) {
+    return this.req<Awaited<ReturnType<Api['refineLook']>>>('POST', '/me/look/refine', { ...(mediaId ? { mediaId } : {}), instruction, ...(magic ? { magic } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm } : {}) });
   }
   puniPicCandidates(body: Parameters<Api['puniPicCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['puniPicCandidates']>>>('POST', '/me/puni/pic/candidates', body);
   }
-  stickerArt(text: string, style?: string) {
-    return this.req<{ id: string; url: string }>('POST', '/me/sticker/art', { text, ...(style ? { style } : {}) });
+  stickerArt(text: string, style?: string, paid?: Paid) {
+    return this.req<{ id: string; url: string }>('POST', '/me/sticker/art', { text, ...(style ? { style } : {}), ...(paid?.confirm ? { from: 'atelier', confirm: paid.confirm } : {}) });
   }
   butterflyCandidates(body: Parameters<Api['butterflyCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['butterflyCandidates']>>>('POST', '/me/butterfly/candidates', body);
@@ -535,8 +535,8 @@ export class HttpApi implements Api {
   mvRender(id: string) {
     return this.req<MvProjectView>('POST', `/mars/mv/${id}/render`);
   }
-  mvStory(id: string, mood: string, from?: 'atelier') {
-    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood, from });
+  mvStory(id: string, mood: string, from?: 'atelier', paid?: Paid) {
+    return this.req<Awaited<ReturnType<Api['mvStory']>>>('POST', `/mars/mv/${id}/story`, { mood, from, ...(paid?.confirm ? { confirm: paid.confirm } : {}) });
   }
   mvLyrics(id: string) {
     return this.req<Awaited<ReturnType<Api['mvLyrics']>>>('POST', `/mars/mv/${id}/lyrics`);
@@ -638,8 +638,8 @@ export class HttpApi implements Api {
   batiFaces() {
     return this.req<Awaited<ReturnType<Api['batiFaces']>>>('POST', '/me/bati/faces');
   }
-  batiRestyle(wish?: string, from?: string) {
-    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { ...(wish?.trim() ? { wish } : {}), ...(from ? { from } : {}) });
+  batiRestyle(wish?: string, from?: string, paid?: Paid) {
+    return this.req<Awaited<ReturnType<Api['batiRestyle']>>>('POST', '/me/bati/restyle', { ...(wish?.trim() ? { wish } : {}), ...(from ? { from } : {}), ...(paid?.confirm ? { via: 'atelier', confirm: paid.confirm } : {}) });
   }
   batiLookBack() {
     return this.req<Me>('POST', '/me/bati/restyle/back', {});

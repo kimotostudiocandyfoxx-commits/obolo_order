@@ -13,10 +13,11 @@ const EMPTY = { who: 'バティ', text: '今月の泉は、からっぽになっ
  * right there (P-BILL-1). It also hosts the sheet opened by openManaGems() (the wallet, the settings).
  */
 export function NoManaNotice() {
-  const [on, setOn] = useState<null | 'nomana' | 'gems'>(null);
+  const [on, setOn] = useState<null | 'nomana' | 'gems' | 'plain'>(null);
   const resident = useResident();
   useEffect(() => {
-    const dry = () => setOn('nomana');
+    // R11: `plain` — {bati} has said it in the talk already: no story, only the gems (members)
+    const dry = (e: Event) => setOn((e as CustomEvent<{ plain?: boolean } | null>).detail?.plain ? 'plain' : 'nomana');
     const gems = () => setOn('gems');
     window.addEventListener('obolo:nomana', dry);
     window.addEventListener('obolo:managems', gems);
@@ -26,6 +27,7 @@ export function NoManaNotice() {
     };
   }, []);
   if (!on) return null;
+  if (on === 'plain' && resident) return null;
   if (resident && on === 'nomana') return <EclipseGuide what="マナを使って新しく作るの" onClose={() => setOn(null)} />;
   // an Obolo Order's mana wells up from the spring in the chest, not from the gem — when it is empty, more can be bought
   return <ManaGemSheet lead={on === 'nomana' ? EMPTY : undefined} onClose={() => setOn(null)} />;

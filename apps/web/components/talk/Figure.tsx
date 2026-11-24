@@ -374,5 +374,7 @@ export const TALK_CSS = `
 @keyframes talk-squash { 0% { transform: scale(1,1) } 35% { transform: scale(1.04,.95) } 70% { transform: scale(.98,1.03) } 100% { transform: scale(1,1) } }
 @keyframes talk-pop { 0% { transform: scale(1); opacity: 1 } 40% { transform: scale(1.35); opacity: 1 } 100% { transform: scale(1.7); opacity: 0 } }
 @keyframes talk-roll { 0% { transform: translateX(-26px) rotate(-300deg) scale(.4); opacity: 0 } 70% { opacity: 1 } 100% { transform: none; opacity: 1 } }
+@keyframes talk-cast { 0%,100% { transform: rotate(0) translateY(0) } 25% { transform: rotate(5deg) translateY(-4%) } 45% { transform: rotate(7deg) translateY(-2%) } 70% { transform: rotate(-1deg) translateY(0) } }
+@keyframes talk-spark { 0% { opacity: 0; transform: translate(0,0) scale(.4) } 15% { opacity: 1 } 100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(1.1) } }
 @keyframes talk-drift { from { transform: translate3d(0,0,0) scale(1.02) } to { transform: translate3d(-2%,1%,0) scale(1.06) } }
 `;

@@ -56,6 +56,10 @@ import {
   MEMBERS_DAYS,
   type MembersDay,
   MAKE_COST,
+  CHARGE_ERROR_WORDS,
+  confirmKey,
+  decideCharge,
+  type MakeConfirm,
   BATI_FACES,
   BATI_MAGIC_PER_DAY,
   BATI_RESTYLE_PER_DAY,
@@ -138,7 +142,7 @@ import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt }
 import { castLook } from '@/lib/talk/demoLooks';
 import { getBlob, putBlob } from './idb';
 import { tokenStore } from './token';
-import { ApiError, type Api } from './types';
+import { ApiError, type Api, type Paid } from './types';
 
 /** Demo ひろば: name, landmark, people already there (the demo has no other members). */
 const DEMO_PLAZAS: [string, string, number][] = [
@@ -212,6 +216,8 @@ interface DemoState {
   markNames?: Record<string, MarkNames>;
   invites?: Record<string, { code: string; inviterName: string; email: string; status: 'pending' | 'accepted'; createdAt: string; inviterId: string | null; message?: string | null }>;
   /** M-R253 §4: the review's stand-in jobs (they only take their time; `lateBy` s more than said, the first `failTimes` fail) */
+  /** R11: the yeses already charged (MakeConfirm's ledger key → the stand-in job it started, '' for none) */
+  paidYes?: Record<string, string>;
   djobs?: Record<string, { owner: string; seconds: number; lateBy: number; failTimes: number; start: number; attempts: number; eta: number; late: boolean; retrying: boolean; createdAt: string; done?: boolean }>;
   /** M-R253: the Moon atelier's works (tries inside one work) */
   moonWorks?: (MoonWorkView & { owner: string })[];
@@ -823,8 +829,12 @@ export class DemoApi implements Api {
   }
 
   // M-R253 §4: a stand-in job — it only waits (the review page's 20 s and 2-minute ones)
-  async demoJob(body: DemoJobBody & { lateBy?: number }): Promise<JobView> {
+  async demoJob(body: DemoJobBody & { lateBy?: number; pay?: { kind: MakeKind; confirm: MakeConfirm } }): Promise<JobView> {
+    // R11: a paid stand-in is charged with the yes; the same yes again hands back the job it started
+    const key = body.pay ? this.charge(body.pay.kind, { confirm: body.pay.confirm }, true) : null;
+    if (key && this.s.paidYes?.[key]) return this.getJob(this.s.paidYes[key]);
     const id = uid();
+    if (key) this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: id };
     const now = Date.now();
     this.s.djobs = { ...(this.s.djobs ?? {}), [id]: { owner: this.uid(), seconds: body.seconds, lateBy: body.lateBy ?? 0, failTimes: body.failTimes ?? 0, start: now, attempts: 1, eta: now + body.seconds * 1000, late: false, retrying: false, createdAt: new Date(now).toISOString() } };
     this.save();
@@ -1295,17 +1305,30 @@ export class DemoApi implements Api {
   // Demo looks: SVG portraits built in the browser (lib/look.ts); 4 candidates per round, hidden ceiling
   // like the API (NEO_LOOK_TRIES / NEO_LOOK_REFINES = 8).
   /** a making takes mana from the gem like the API (MAKE_COST, M-R132); a dry gem → 402 NO_MANA + the notice */
-  private charge(kind: MakeKind) {
+  /**
+   * R11: with the member's yes (`paid.confirm`) the same rule as the API (decideCharge): the price shown or nothing, and
+   * the same yes again is no second charge (ALREADY_STARTED, or `repeatOk`: the caller hands back what it started).
+   * Returns the yes's ledger key when there was one.
+   */
+  private charge(kind: MakeKind, paid?: Paid, repeatOk = false): string | null {
     const w = this.s.wallets[this.uid()];
-    const amount = MAKE_COST[kind];
-    if (!w || w.mana < amount) {
-      window.dispatchEvent(new Event('obolo:nomana'));
-      throw new ApiError(402, 'NO_MANA', 'マナジェムが、光らなくなった');
+    const key = paid?.confirm ? confirmKey(this.uid(), kind, paid.confirm) : null;
+    const d = decideCharge({ kind, confirm: paid?.confirm, required: false, balance: w?.mana ?? 0, applied: !!key && key in (this.s.paidYes ?? {}) });
+    if ('error' in d) {
+      if (d.error === 'NO_MANA') window.dispatchEvent(new Event('obolo:nomana'));
+      throw new ApiError(d.error === 'NO_MANA' ? 402 : 409, d.error, CHARGE_ERROR_WORDS[d.error]);
     }
+    if (d.do === 'repeat') {
+      if (repeatOk) return key;
+      throw new ApiError(409, 'ALREADY_STARTED', 'もう作り始めているよ');
+    }
+    const amount = d.amount;
     w.mana -= amount;
     w.lastActivity = now();
     w.entries.push({ id: uid(), delta: -amount, reason: 'generation', createdAt: now() });
+    if (key) this.s.paidYes = { ...(this.s.paidYes ?? {}), [key]: '' };
     this.save();
+    return key;
   }
 
   async lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
@@ -1336,9 +1359,9 @@ export class DemoApi implements Api {
     return u.journeyDay < JOURNEY_DONE ? Math.max(0, 30 - Number(localStorage.getItem(`obolo.look.refines.${u.id}`) ?? 0)) : 99;
   }
 
-  async refineLook(mediaId: string | null, instruction: string, magic?: boolean) {
+  async refineLook(mediaId: string | null, instruction: string, magic?: boolean, paid?: Paid) {
     const u = this.s.users[this.uid()];
-    if (magic) return this.lookMagic(mediaId, instruction);
+    if (magic) return this.lookMagic(mediaId, instruction, paid);
     if (this.refinesLeft() <= 0) throw new ApiError(429, 'LOOK_REFINES', 'もう描き直せません');
     // null: the look worn now (the second journey's basin)
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
@@ -1360,14 +1383,14 @@ export class DemoApi implements Api {
   }
 
   // Bati's magic in Bati's room (P-BATI-ROOM): like the API, BATI_MAGIC_PER_DAY rounds a day
-  private async lookMagic(mediaId: string | null, instruction: string) {
+  private async lookMagic(mediaId: string | null, instruction: string, paid?: Paid) {
     const u = this.s.users[this.uid()];
     const key = this.roomKey('magic');
     const used = Number(localStorage.getItem(key) ?? 0);
     if (used >= BATI_MAGIC_PER_DAY) throw new ApiError(429, 'LOOK_REFINES', '今日はもう描き直せません');
     const src = mediaId ? this.lookCache.find((c) => c.id === mediaId) : { url: u.avatarUrl ?? demoNeoLooks({ animal: 'おまかせ', color: 'おまかせ', mood: 'おまかせ' }, 0)[0] };
     if (!src) throw new ApiError(404, 'NOT_FOUND', 'not found');
-    if (u.journeyDay >= JOURNEY_DONE) this.charge('look');
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid);
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     const c = await Promise.all([0, 1, 2, 3].map(async (k) => ({ id: uid(), url: await demoRefine(src.url, instruction, used * 4 + k) })));
@@ -1377,7 +1400,7 @@ export class DemoApi implements Api {
   }
 
   // demo: the Bati picture recoloured three ways stands in for the dressed-up Bati (no network)
-  async batiRestyle(wish = '', from?: string): Promise<BatiRestyleResult> {
+  async batiRestyle(wish = '', from?: string, paid?: Paid): Promise<BatiRestyleResult> {
     const u = this.s.users[this.uid()];
     if (!u.bati?.imageUrl) throw new ApiError(409, 'NO_BATI', 'Not hatched yet');
     // M-R215: no real person's or another work's lookalike, nothing sexual or violent
@@ -1385,7 +1408,7 @@ export class DemoApi implements Api {
     const key = this.roomKey('restyle');
     const used = Number(localStorage.getItem(key) ?? 0);
     if (used >= BATI_RESTYLE_PER_DAY) throw new ApiError(429, 'RESTYLE_TRIES', '今日はもう着替えられません');
-    if (u.journeyDay >= JOURNEY_DONE) this.charge('look');
+    if (u.journeyDay >= JOURNEY_DONE) this.charge('look', paid);
     localStorage.setItem(key, String(used + 1));
     await sleep(1500);
     // M-R223: four cards from the look worn now (or the card tapped just before); four touches without a wish
@@ -1604,8 +1627,8 @@ export class DemoApi implements Api {
   }
 
   // demo: the butterflies cut from the Jupiter mock stand in for painted candidates
-  async stickerArt(text: string) {
-    this.charge('jacketArt');
+  async stickerArt(text: string, _style?: string, paid?: Paid) {
+    this.charge('jacketArt', paid);
     await new Promise((r) => setTimeout(r, 1500));
     return { id: uid(), url: demoStickerArt(text) };
   }

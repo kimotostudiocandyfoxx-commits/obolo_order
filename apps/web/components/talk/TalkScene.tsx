@@ -188,6 +188,7 @@ export function TalkScene({
   people,
   items,
   thinking,
+  castBy,
   listening = false,
   place,
   group,
@@ -256,6 +257,11 @@ export function TalkScene({
   items: TalkItem[];
   /** who is making a reply (the 'thinking' face and a slow sway) */
   thinking?: string | null;
+  /**
+   * R11 (client): who is casting (the Moon temple's {bati} starting a making): it sways into the cast and a stream of
+   * light flies from it toward the middle of the place (the bowl behind); its move to its cast spot takes half a second
+   */
+  castBy?: string | null;
   /** you are recording or typing: the others turn to you and nod */
   listening?: boolean;
   /** the place behind them (an image URL); none = what is behind the talk */
@@ -1261,9 +1267,23 @@ export function TalkScene({
           const towardSpeaker: 'left' | 'right' | undefined = directed && speakerX != null && nowItem?.who !== p.id ? (speakerX < s.x ? 'left' : 'right') : undefined;
           const enter = entering[p.id];
           const motion = { animation: g ? `talk-exit .6s ease-in forwards` : enter && !reduced ? `talk-enter .7s cubic-bezier(.2,.8,.25,1) both` : arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, ['--ex' as string]: `${(g ? g.side : enter) === 'l' ? -w * 0.6 : w * 0.6}px` };
+          const casting = castBy === p.id && !past && !g;
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? OTS_BACK.filter : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...(ots && !p.self && !angle ? { transitionDuration: '500ms', transitionTimingFunction: 'cubic-bezier(.4,0,.2,1)' } : {}), ...motion }}>
+            <div key={p.id} data-casting={casting ? '1' : undefined} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ ...(ots && !p.self && !arriving ? { transitionDuration: '500ms', transitionTimingFunction: 'cubic-bezier(.4,0,.2,1)' } : {}), left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? OTS_BACK.filter : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...(ots && !p.self && !angle ? { transitionDuration: '500ms', transitionTimingFunction: 'cubic-bezier(.4,0,.2,1)' } : {}), ...motion }}>
               {arriving && p.self && <ArrivalMotes />}
+              {casting && !reduced && (
+                // the cast: light from its hands toward the middle of the place (where the bowl is)
+                <span className="pointer-events-none absolute inset-0 z-[2]" aria-hidden>
+                  {[0, 1, 2, 3, 4, 5].map((k) => (
+                    <span
+                      key={k}
+                      className="absolute block rounded-full bg-white"
+                      style={{ left: '62%', bottom: `${46 + (k % 3) * 6}%`, width: 7 + (k % 2) * 4, height: 7 + (k % 2) * 4, boxShadow: '0 0 12px 4px rgba(170,220,255,.95)', ['--sx' as string]: `${((0.5 - s.x) * w * (0.9 + (k % 3) * 0.08)).toFixed(0)}px`, ['--sy' as string]: `${(-s.h * (0.18 + (k % 2) * 0.08)).toFixed(0)}px`, animation: `talk-spark 1.1s ease-out ${(k * 0.18).toFixed(2)}s infinite`, opacity: 0 }}
+                    />
+                  ))}
+                </span>
+              )}
+              <div className="flex h-full w-full items-end justify-center origin-bottom" style={casting && !reduced ? { animation: 'talk-cast 1.2s ease-in-out infinite' } : undefined}>
               <div className="flex h-full items-end justify-center" style={mv?.mirror || ag?.mirror || ag?.turn ? { transform: `${mv?.mirror !== !!ag?.mirror && (mv?.mirror || ag?.mirror) ? 'scaleX(-1) ' : ''}${ag?.turn ? `perspective(700px) rotateY(${ag.turn}deg)` : ''}`.trim() } : undefined}>
               <Figure
                 look={ag?.look ?? (ots && p.self ? (viewLook(p.id, p.views?.back) ?? p.look) : p.look)}
@@ -1284,6 +1304,7 @@ export function TalkScene({
                 glow={isGroup && speaking && !directed ? p.color : undefined}
                 level={voice?.who === p.id && voice.level ? voice.level : speech?.who === p.id ? speech.level : undefined}
               />
+              </div>
               </div>
             </div>
           );

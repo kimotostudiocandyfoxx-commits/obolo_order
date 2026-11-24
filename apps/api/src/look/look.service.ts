@@ -6,11 +6,12 @@ import { resolve } from 'node:path';
 import sharp from 'sharp';
 import { cutoutWhite } from '../media/cutout';
 import { chooseKey, cutoutChecked, cutoutKey, KEY_WORDS, moveToKey, onKey, type KeyName } from '../media/keying';
-import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody, SELF_TALK_FACES, TALK_FACES, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
+import { ageBand, BATI_SEED_QUESTION, BATI_WISH_REFUSE, batiEggState, BATI_RESTYLE_TOUCHES, LOOK_HISTORY_MAX, BATI_MAX, BATI_SCRIPT_LINES, batiSeedKind, type BatiEggKind, type BatiNewHatchBody, type BatiSpeechBody, BATI_FACES, BATI_MAGIC_PER_DAY, BATI_RESTYLE_PER_DAY, type BatiRestyleResult, type BatiFace, JOURNEY_DONE, type MakeKind, type MakeConfirm, type StickerArtBody, type BatiEggBody, type Me, type NeoLookBody, type NeoLookResult, type PuniPicBody, type PuniPicResult, type RefineLookBody, SELF_TALK_FACES, TALK_FACES, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
+import { alreadyStarted } from '../wallet/confirmed';
 import { buddyProfiles, users } from '../db/schema';
 import type { KvStore } from '../infra/kv';
 import type { JobQueue } from '../infra/queue';
@@ -145,8 +146,12 @@ export class LookService {
   }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
-  private async fee(userId: string, kind: MakeKind, unlimited: boolean) {
-    return unlimited ? { refund: async () => undefined } : this.ledger.charge(this.db, userId, kind);
+  private async fee(userId: string, kind: MakeKind, unlimited: boolean, paid: { via?: 'atelier'; from?: 'atelier'; confirm?: MakeConfirm } = {}) {
+    if (unlimited) return { refund: async () => undefined };
+    // R11: asked in the Moon atelier — only with the member's yes to the price shown, and once per yes
+    const fee = await this.ledger.charge(this.db, userId, kind, undefined, { confirm: paid.confirm, required: (paid.via ?? paid.from) === 'atelier' });
+    if (fee.repeat) throw alreadyStarted();
+    return fee;
   }
 
   /** the look's mana — none on day 2 (M-R223, D03-S004 「2日目はマナを使わない」) */
@@ -267,7 +272,7 @@ export class LookService {
     if (!unlimited && used >= BATI_MAGIC_PER_DAY) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'LOOK_REFINES', '今日はもう描き直せません');
     const src = body.mediaId ? await this.media.imageData(userId, body.mediaId, 'avatar') : await this.current(userId, u.avatarUrl);
     if (!src) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'Image not found');
-    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited);
+    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited, body);
     const n = await this.kv.incr(key, 60 * 60 * 26);
     const made = await settleWithRetry(CANDIDATES, (i) => this.looks.generate(refineLookPrompt(body.instruction, i), i, [src]));
     const candidates = [];
@@ -287,8 +292,8 @@ export class LookService {
    * (like the faces), edited three ways and cut out like the hatched one. BATI_RESTYLE_PER_DAY rounds a day; free
    * during the first journey, the look's mana after it.
    */
-  async restyle(userId: string, wishOrBody: string | { wish?: string; from?: string }, origin: string, unlimited = false): Promise<BatiRestyleResult> {
-    const { wish = '', from } = typeof wishOrBody === 'string' ? { wish: wishOrBody } : wishOrBody;
+  async restyle(userId: string, wishOrBody: string | { wish?: string; from?: string; via?: 'atelier'; confirm?: MakeConfirm }, origin: string, unlimited = false): Promise<BatiRestyleResult> {
+    const { wish = '', from, via, confirm } = typeof wishOrBody === 'string' ? { wish: wishOrBody, via: undefined, confirm: undefined } : wishOrBody;
     const u = await this.user(userId);
     if (!u.batiImageUrl) throw apiError(HttpStatus.CONFLICT, 'NO_BATI', 'Not hatched yet');
     // M-R215: any touch or dress-up, but no real person's or another work's lookalike, nothing sexual or violent
@@ -310,7 +315,7 @@ export class LookService {
     // the picture it was born with goes along, so the creature does not drift over many dress-ups (M-R215)
     const born = await this.bornRef(userId, u, bg);
     const refs = born ? [ref, born] : [ref];
-    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited);
+    const fee = u.journeyDay < JOURNEY_DONE ? { refund: async () => undefined } : await this.fee(userId, 'look', unlimited, { via, confirm });
     const n = await this.kv.incr(key, 60 * 60 * 26);
     // M-R223: the seed it was born from (food / sound / word) stays somewhere small in every look
     const r0 = activeBati(u);
@@ -579,7 +584,7 @@ export class LookService {
     if (!unlimited && used >= STICKER_ART_TRIES) throw apiError(HttpStatus.TOO_MANY_REQUESTS, 'STICKER_TRIES', '今日はもう描けません');
     await this.kv.incr(key, 60 * 60 * 26);
     // {bati}'s jacket picture costs mana (3); photos and words-only jackets never come here
-    const fee = await this.fee(userId, 'jacketArt', unlimited);
+    const fee = await this.fee(userId, 'jacketArt', unlimited, body);
     try {
       const img = await this.images.generate(stickerArtPrompt(body.text, body.style), 0, []);
       const m = await this.media.storeImage(userId, 'avatar', img.mime, img.data, origin);

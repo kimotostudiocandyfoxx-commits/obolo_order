@@ -1,4 +1,4 @@
-import { KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, type JobView, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
+import { KORORIN_VOICE_STYLE, neoVoiceUrl, withTarget, type JobView, type MakeConfirm, type Me, type RefineTarget, type WorkVersion } from '@obolo/shared';
 import { demoStickerArt } from '@/lib/look';
 import { ApiError, getApi } from '@/lib/api';
 import type { AtelierKind } from '@/lib/atelier/unlock';
@@ -7,6 +7,7 @@ import { workMarkRef } from '@/lib/finds/works';
 import { makeSong, pickGenre, songFromDesign, type MadeSong } from '@/lib/mercury/compose';
 import { dropShelf, LOCAL_KINDS, patchTalkWork, putShelf } from './shelf';
 import { stack, uid, type Version, type Work } from './work';
+import type { Plan } from './plan';
 
 /**
  * The generation calls behind the atelier's cards (M-R210): the same ones the old per-kind screens used — the look's
@@ -35,7 +36,14 @@ const withTimeout = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Prom
 export type Started = { job: JobView; what: Watched['what']; words: string; extra?: Watched['extra'] };
 export type Made = Work & { started?: Started };
 /** §2 / §3: the part pointed at, and the works used as material */
-export type MakeOpts = { target?: RefineTarget; materials?: Work[] };
+export type MakeOpts = {
+  target?: RefineTarget;
+  materials?: Work[];
+  /** R11: the member's yes to the plan and its price (a paid making is asked with it, never without) */
+  confirm?: MakeConfirm;
+  /** R11: the plan said yes to (its genre / mood go into the making) */
+  plan?: Plan;
+};
 
 /** the review page's stand-in times (M-R253 §4): a 2-minute one (said up front) and a 20-second one (waited in place) */
 export const DEMO_SECONDS: Partial<Record<AtelierKind, number>> = { song: 120, video: 120, art: 20 };
@@ -56,6 +64,8 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
   const lyric = materialWords(mats);
   const said = withTarget(prompt, opts.target);
   const api = getApi();
+  const paid = { confirm: opts.confirm };
+  const pay = (kind: 'song' | 'jacketArt' | 'mv') => (opts.confirm ? { kind, confirm: opts.confirm } : undefined);
   const base: Work = { id: uid(), kind, prompt, status: 'ready' };
   const done = (w: Work): Work => {
     const out = { ...w, saved: true };
@@ -66,7 +76,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
     case 'look':
     case 'bati': {
       // the magic goes on from the one picked, so the look can be changed step by step
-      const r = kind === 'bati' ? await api.batiRestyle(prompt) : await api.refineLook(prev?.kind === 'look' ? (prev.pick ?? null) : null, prompt, true);
+      const r = kind === 'bati' ? await api.batiRestyle(prompt, undefined, paid) : await api.refineLook(prev?.kind === 'look' ? (prev.pick ?? null) : null, prompt, true, paid);
       if (!r.candidates.length) throw new Error('none');
       return done({ ...base, candidates: r.candidates, pick: r.candidates[0].id, image: r.candidates[0].url });
     }
@@ -91,10 +101,10 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       const words = (prev?.kind === 'art' ? prev.prompt : [lyric, prompt].filter(Boolean).join('。')).slice(0, 60);
       // the review page: a 20-second stand-in job (waited in place, no time said)
       if (!ctx.live) {
-        const job = await api.demoJob({ seconds: DEMO_SECONDS.art!, failTimes: 0 });
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.art!, failTimes: 0, pay: pay('jacketArt') });
         return { ...base, prompt: words, status: 'making', ref: { style }, started: { job, what: 'art', words: `${words}${style ?? ''}` } };
       }
-      const r = await api.stickerArt(words, style);
+      const r = await api.stickerArt(words, style, paid);
       const w: Work = { ...base, prompt: words, image: r.url, ref: { style } };
       // into Bluena's Jupiter folder (the roots): a root is a photo, so the picture goes up once as one
       try {
@@ -112,10 +122,10 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       const words = prev?.kind === 'song' ? `${prev.prompt}。${asked}` : asked;
       if (!ctx.live) {
         // the review page: a 2-minute stand-in job, then the offline sketch (finishJob)
-        const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0 });
-        return { ...base, prompt: words, status: 'making', started: { job, what: 'song', words } };
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.song!, failTimes: 0, pay: pay('song') });
+        return { ...base, prompt: words, status: 'making', started: { job, what: 'song', words, extra: opts.plan?.genre ? { genre: opts.plan.genre } : undefined } };
       }
-      const d = await api.composeDesign({ partner: ctx.partner.name, isBati: ctx.partner.isBati, genre: 'auto', history: [{ role: 'user', text: words.slice(0, 400) }] });
+      const d = await api.composeDesign({ partner: ctx.partner.name, isBati: ctx.partner.isBati, genre: opts.plan?.genre ?? 'auto', history: [{ role: 'user', text: words.slice(0, 400) }] });
       const sketch = songFromDesign(d, ctx.me?.displayName ?? '');
       const job = await api.composeFullSong({
         title: d.title.slice(0, 40),
@@ -129,6 +139,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         progression: d.progression,
         seconds: Math.max(10, Math.min(180, d.seconds)),
         from: 'atelier',
+        ...(opts.confirm ? { confirm: opts.confirm } : {}),
       });
       return { ...base, prompt: words, status: 'making', title: sketch.title, started: { job, what: 'song', words, extra: { comment: d.comment, songTitle: sketch.title } } };
     }
@@ -138,7 +149,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
       const art = mats.find((m) => m.kind === 'art' && m.image);
       const songMat = mats.find((m) => m.kind === 'song');
       if (!ctx.live) {
-        const job = await api.demoJob({ seconds: DEMO_SECONDS.video!, failTimes: 0 });
+        const job = await api.demoJob({ seconds: DEMO_SECONDS.video!, failTimes: 0, pay: pay('mv') });
         return { ...base, prompt: words, status: 'making', started: { job, what: 'video', words, extra: { still: art?.image ?? null, songTitle: songMat?.title } } };
       }
       const songId = songMat?.ref?.songId ?? ctx.lastSongId ?? (await api.savedSongs())[0]?.id;
@@ -148,7 +159,7 @@ export async function make(kind: AtelierKind, prompt: string, ctx: Ctx, prev?: W
         const mediaId = art.ref?.mediaId ?? (await fetch(art.image!).then((x) => x.blob()).then((b) => api.uploadPhoto(b)).then((x) => x.id).catch(() => null));
         if (mediaId) await api.mvAddMaterial(mv.id, { mediaId, kind: 'photo' }).catch(() => undefined);
       }
-      const job = await api.mvStory(mv.id, words, 'atelier');
+      const job = await api.mvStory(mv.id, words, 'atelier', paid);
       return { ...base, prompt: words, status: 'making', started: { job, what: 'video', words } };
     }
     case 'radio':
@@ -168,7 +179,7 @@ export async function finishJob(w: Watched, job: JobView, live = getApi().mode =
       await getApi().composeSongSave(song.id).catch(() => undefined);
       made = { ...base, title: song.title || w.extra?.songTitle || c.title, text: w.extra?.comment, audio: song.url, ref: { songId: song.id } };
     } else {
-      const s = makeSong(w.words, pickGenre(w.words), '');
+      const s = makeSong(w.words, (w.extra?.genre as ReturnType<typeof pickGenre> | undefined) ?? pickGenre(w.words), '');
       buryDemo(s);
       made = { ...base, title: s.title, audio: 'synth:', ref: { demoSong: s } };
     }
