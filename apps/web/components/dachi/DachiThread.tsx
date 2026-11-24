@@ -5,10 +5,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
-import { loadBluenaWorks, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
+import { loadBluenaWorks, workCard, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
-import { DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { DACHI_PAGE, DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { DeviceButton } from '@/components/atelier/DeviceButton';
+import type { Work } from '@/components/atelier/work';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useMarkRing } from '@/components/finds/MarkRing';
@@ -44,6 +46,8 @@ export type DachiThreadProps = {
   banner?: React.ReactNode;
   /** a back control in the bar (the ダチ tab: back to the row of ダチ) */
   onBack?: () => void;
+  /** R10: the Bluena device (bottom left, beside the mic), its works sent into this talk */
+  onDevice?: () => void;
 };
 
 /**
@@ -52,7 +56,7 @@ export type DachiThreadProps = {
  * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
-export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day, banner, onBack }: DachiThreadProps) {
+export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day, banner, onBack, onDevice }: DachiThreadProps) {
   const ring = useMarkRing();
   const { me } = useAuth();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
@@ -81,15 +85,18 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
 
   const load = useCallback(async () => {
     try {
-      const all = await getApi().dachiMessages(id);
+      // R10: the newest page (older pages come as the talk is scrolled up); a past day's talk: all of it
+      const all = await getApi().dachiMessages(id, day ? {} : { limit: DACHI_PAGE });
       const list = day ? all.filter((m) => talkDayOf(m.createdAt) === day) : all;
+      if (!day && older.current === null) older.current = all.length >= DACHI_PAGE;
       // R9: a voice not heard yet (KIMORIN⭐︎'s lines, a dachi's message) is fetched and decoded first (≤ 2.5 s), so its
       // bubble and its voice start together
       if (!day) {
         const fresh = list.filter((m) => !m.fromMe && m.read === false && m.audioUrl).slice(-3);
         if (fresh.length) await Promise.all(fresh.map((m) => readyClip(m.audioUrl)));
       }
-      setMsgs(list);
+      // the older pages already loaded stay above the newest one
+      setMsgs((prev) => (day || !prev?.length || !list.length ? list : [...prev.filter((m) => m.createdAt < list[0].createdAt), ...list]));
       setErr(null);
       if (list.some((m) => !m.fromMe)) {
         void getApi()
@@ -102,6 +109,38 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
       setMsgs((m) => m ?? []);
     }
   }, [id, day]);
+
+  /** R10: scrolled to the top of the talk — the page before the oldest one here (no end, until there is no more) */
+  const older = useRef<boolean | null>(null);
+  const loadingOlder = useRef(false);
+  const loadOlder = useCallback(async () => {
+    if (day || !older.current || loadingOlder.current) return;
+    const first = msgsRef.current?.[0];
+    if (!first) return;
+    loadingOlder.current = true;
+    try {
+      const page = await getApi().dachiMessages(id, { before: first.createdAt, limit: DACHI_PAGE });
+      older.current = page.length >= DACHI_PAGE;
+      if (page.length) setMsgs((prev) => [...page.filter((m) => !(prev ?? []).some((x) => x.id === m.id)), ...(prev ?? [])]);
+    } catch {
+      /* tried again at the next scroll to the top */
+    } finally {
+      loadingOlder.current = false;
+    }
+  }, [id, day]);
+  const msgsRef = useRef<DachiMessageView[] | null>(null);
+  msgsRef.current = msgs;
+
+  // R10: a work sent from the Bluena device into this talk (〔送る〕)
+  useEffect(() => {
+    const got = (e: Event) => {
+      const d = (e as CustomEvent<{ to: string; work: Work }>).detail;
+      if (d?.to === id && d.work) void sendWork(workCard(d.work));
+    };
+    window.addEventListener('obolo:dachi-send', got);
+    return () => window.removeEventListener('obolo:dachi-send', got);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   useEffect(() => {
     setMsgs(null);
@@ -215,6 +254,7 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
         }}
         keyboard={typing && keyboard}
         log
+        onReachTop={day ? undefined : () => void loadOlder()}
         loading={msgs === null}
         unreadFrom={day ? null : unreadFrom}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
@@ -235,9 +275,14 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
                 </button>
               }
               left={
-                <button onClick={() => void openWorks()} aria-label="作品を送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
-                  ✦
-                </button>
+                // R10: the Bluena device in this slot (its works can be sent here); the old picker where there is none
+                onDevice ? (
+                  <DeviceButton onClick={onDevice} />
+                ) : (
+                  <button onClick={() => void openWorks()} aria-label="作品を送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
+                    ✦
+                  </button>
+                )
               }
             />
             )}

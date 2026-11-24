@@ -1,7 +1,6 @@
 'use client';
 
 import { ruleBeats, talkChunks, talkPlain, talkRuns, talkSentences, type TalkMark, type TalkIn, type TalkShape, type MarkedKind, type TalkBeat, type TalkFace, type TalkLook, type TalkMotion } from '@obolo/shared';
-import { holdProps, StarButton } from '@/components/finds/MarkRing';
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Figure, TALK_CSS, type FigureState } from './Figure';
 import { AppThreads, HereThreads, type TalkThread } from './TalkThreads';
@@ -221,7 +220,10 @@ export function TalkScene({
   otsStand,
   placeAspect,
   placeFx,
+  onReachTop,
 }: {
+  /** R10: the log scrolled to its top — older lines are asked for (they come in above, where you are reading stays) */
+  onReachTop?: () => void;
   /** R9: where the partner stands in the over-the-shoulder framing (0..1 of the width) */
   otsAt?: number;
   /**
@@ -492,8 +494,8 @@ export function TalkScene({
     const fresh = items.filter((i) => !seen.current!.has(i.id) && !i.live);
     for (const i of fresh) seen.current.add(i.id);
     const last = fresh[fresh.length - 1];
-    // a new line while lines are being played joins the row by itself
-    if (!last || cursor != null) return;
+    // a new line while lines are being played joins the row by itself (R10: older lines loaded above are never said)
+    if (!last || cursor != null || last.id !== items[items.length - 1]?.id) return;
     // a line that was streamed has shown its words already: its faces run on quicker, nothing is typed again
     say(last, undefined, streamedIds.current.has(last.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1323,6 +1325,7 @@ export function TalkScene({
       {/* the bubbles: two at most over the heads (the newest lower), 62 px from the sides */}
       {lines === 'bubbles' && log && (
         <TalkLog
+          onReachTop={onReachTop}
           top={barH + top + 4}
           bottom={bubbleBottom}
           units={units}
@@ -1625,10 +1628,10 @@ function Bubble({
           {item.name ?? who?.name}
         </p>
       )}
-      {item.mark && <StarButton kind={item.mark.kind} id={item.mark.id} size={10} onRing={onRing} className={`absolute -top-1 z-[1] ${mine ? 'left-1' : 'right-1'}`} />}
+      {/* R10 (client): no ☆ on chat bubbles — starring is Bluena's (its works) only; stored marks stay untouched */}
       <div key={entry ? `in${beat?.key}` : 'still'} className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`} style={{ animation: entryAnim, rotate: mine ? '.4deg' : '-.5deg', filter: shape === 'burst' ? `drop-shadow(1.5px 0 0 ${line}) drop-shadow(-1.5px 0 0 ${line}) drop-shadow(0 1.5px 0 ${line}) drop-shadow(0 -1.5px 0 ${line}) drop-shadow(0 8px 14px rgba(4,8,30,.3))` : undefined }}>
       <div
-        {...(onRing && item.mark ? holdProps(onRing) : {})}
+
         className={`relative min-h-0 ${grow ? 'flex flex-col' : ''}`}
         style={{ color: ink, ...box }}
       >
@@ -1745,11 +1748,25 @@ export function Marked({ text, upto, marks }: { text: string; upto?: number; /**
  * newest at the bottom; the older ones move up and fade toward the top. It follows the newest while you are at the
  * bottom; scrolled up, it stays where you read and 〔いまに戻る〕 brings you back.
  */
-function TalkLog<U>({ top, bottom, units, keyOf, render, live }: { top: number; bottom: number; units: U[]; keyOf: (u: U) => string; render: (u: U, newest: boolean) => ReactNode; /** the characters out of the line being said (follows it while typed) */ live: number }) {
+function TalkLog<U>({ top, bottom, units, keyOf, render, live, onReachTop }: { onReachTop?: () => void; top: number; bottom: number; units: U[]; keyOf: (u: U) => string; render: (u: U, newest: boolean) => ReactNode; /** the characters out of the line being said (follows it while typed) */ live: number }) {
   const box = useRef<HTMLDivElement>(null);
   const [atEnd, setAtEnd] = useState(true);
   const atEndRef = useRef(true);
   const last = units.length ? keyOf(units[units.length - 1]) : '';
+  // R10: older lines came in above: keep the line being read where it was
+  const first = units.length ? keyOf(units[0]) : '';
+  const height = useRef({ first: '', h: 0 });
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const was = height.current;
+    if (was.first && first !== was.first && !atEndRef.current) {
+      selfScrollUntil.current = performance.now() + 80;
+      el.scrollTop += el.scrollHeight - was.h;
+    }
+    height.current = { first, h: el.scrollHeight };
+  });
+  const asked = useRef(0);
   // (a scroll the log makes itself is not the reader leaving the bottom: a smooth one passes through the middle)
   const selfScrollUntil = useRef(0);
   const toEnd = (smooth: boolean) => {
@@ -1783,6 +1800,10 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live }: { top: number; 
           const el = e.currentTarget;
           const end = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
           if (!end && performance.now() < selfScrollUntil.current) return;
+          if (onReachTop && el.scrollTop < 40 && Date.now() - asked.current > 800) {
+            asked.current = Date.now();
+            onReachTop();
+          }
           atEndRef.current = end;
           if (end !== atEnd) setAtEnd(end);
         }}

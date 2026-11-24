@@ -33,6 +33,7 @@ function WithDachi() {
           day={ctx.day}
           banner={ctx.banner}
           onBack={ctx.back}
+          onDevice={ctx.openDevice}
           onRead={markRead}
           onGone={() => {
             void reload();

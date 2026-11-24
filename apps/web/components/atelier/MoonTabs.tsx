@@ -16,6 +16,7 @@ import { KindMark } from './WorkCard';
 import { KIND_WORD } from './intent';
 import { findAll, KIND_PLANET, PLANET_COLOR, type Found } from '@/lib/finds/works';
 import { useMarks } from '@/lib/finds/marks';
+import { StarButton, useMarkRing } from '@/components/finds/MarkRing';
 import { openKinds } from '@/lib/atelier/unlock';
 import { useAtelierCtx } from './ctx';
 import type { RenderThread, ThreadInfo } from './threads';
@@ -192,16 +193,19 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
   const [line, setLine] = useState('');
   const [n, setN] = useState(0);
   const [shelf, setShelf] = useState(false);
+  // R10: starring lives here only (the works' ★, kept in item_marks as before), with its filter
+  const [starOnly, setStarOnly] = useState(false);
+  const ring = useMarkRing();
   useMarks();
   useEffect(() => {
     let live = true;
-    void findAll({})
+    void findAll(starOnly ? { star: true } : {})
       .then((x) => live && setFound(x))
       .catch(() => live && setFound([]));
     return () => {
       live = false;
     };
-  }, [n]);
+  }, [n, starOnly]);
   const send = onSend
     ? (w: Work) => {
         onSend(w);
@@ -226,9 +230,14 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
         </header>
         <div className="pointer-events-auto flex items-center justify-between px-4 pt-1">
           <span className="text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{send ? (sendTo === 'dachi' ? '〔送る〕で、この会話に送れるよ' : '〔送る〕で、バティに材料をわたせるよ') : ''}</span>
-          <button onClick={() => setShelf(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 py-1 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
-            姿とバティ
-          </button>
+          <span className="flex items-center gap-1.5">
+            <button onClick={() => setStarOnly((v) => !v)} aria-pressed={starOnly} aria-label="お気に入りだけ" className={`h-7 min-w-7 rounded-full border px-2 text-[13px] ${starOnly ? 'border-amber-200/70 bg-amber-300/25' : 'border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)]'}`} data-testid="bluena-star-filter">
+              <span className="text-amber-300">★</span>
+            </button>
+            <button onClick={() => setShelf(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 py-1 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
+              姿とバティ
+            </button>
+          </span>
         </div>
         {line && <p className="pt-1 text-center text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{line}</p>}
         <div className="no-scrollbar pointer-events-auto min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2">
@@ -255,6 +264,7 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
                     </span>
                   </span>
                 </button>
+                <StarButton kind={x.kind} id={x.id} onRing={(at) => ring.open(x.kind, x.id, at)} />
                 {send && (
                   <button onClick={() => send(x.work)} className="shrink-0 rounded-full bg-[rgba(223,230,255,.92)] px-3 py-1.5 text-[12px] font-bold text-[#070b24] shadow-[0_4px_12px_rgba(0,0,0,.35)]" data-testid="bluena-send">
                     送る
@@ -265,6 +275,7 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
           </ul>
         </div>
       </div>
+      {ring.node}
       {open && (
         <div className="relative z-[2]">
           <WorkSheet found={open} ctx={ctx} onClose={() => setOpen(null)} onLine={setLine} onChanged={() => setN((v) => v + 1)} />
