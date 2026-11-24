@@ -31,12 +31,11 @@ export const DEFAULT_SKIP_LABEL = '明日まで待てない';
 
 export const STORIES: Record<number, DayStory> = {
   1: { steps: DAY1, skipLabel: DEFAULT_SKIP_LABEL, auth: false, skippedText: '24時間スキップした' }, // the script's telop (QA 14 R53)
-  // the end of day 2 (the Moon): D03-S009 〔明日まで待てない〕 → 〔テロップ：24時間スキップした〕; the 24 hours are {bati}'s (M-R223)
+  // the end of day 2 (the Moon): D03-S009 — the 24 hours are waited (M-R269: no 〔明日まで待てない〕 after day 2; testers
+  // still skip); they are {bati}'s (M-R223)
   2: {
     steps: DAY2,
-    skipLabel: '明日まで待てない',
     auth: true,
-    skippedText: '24時間スキップした',
     waitNote: '明日、星へ遊びに行くまでの24時間は、{bati}と好きなだけ話せます。見た目は、チャットの上の顔を押すと、いつでも変えられます',
   },
   3: { steps: DAY3, auth: true },

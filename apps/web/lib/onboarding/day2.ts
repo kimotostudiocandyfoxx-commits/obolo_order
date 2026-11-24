@@ -543,7 +543,8 @@ export const DAY2: Step[] = [
   { t: 'say', who: 'バティ', text: '明日まで、いっぱい、おしゃべりしよ！' },
   { t: 'sprite', image: null },
   { t: 'black', fade: 0.8 }, // 暗くフェード
-  // 〔完了画面：3日目まで24時間のカウントダウン。その下に、{bati}とのチャット〕〔明日まで待てない〕 — the countdown screen
+  // 〔完了画面：3日目まで24時間のカウントダウン。その下に、{bati}とのチャット〕〔0になったら、3日目が始まる〕（M-R269: no
+  // 〔明日まで待てない〕 here — only after day 1） — the countdown screen
   // (TomorrowScreen: 〔{bati}と話す〕 opens the Moon chat during the wait, with the script's note — stories.ts waitNote)
   { t: 'end' },
 ];

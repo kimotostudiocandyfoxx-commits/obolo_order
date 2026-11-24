@@ -29,10 +29,10 @@ describe('all day scripts', () => {
     });
   }
 
-  it('the first journey is eight days (draft 21); only days 1 and 2 can skip the wait (明日まで待てない, D03-S009 too)', () => {
+  it('the first journey is eight days (draft 21); only day 1 can skip the wait (明日まで待てない; M-R269: not D03-S009 any more)', () => {
     expect(Object.keys(STORIES).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     const labels = Object.fromEntries(Object.entries(STORIES).map(([d, s]) => [d, s.skipLabel]));
-    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: '明日まで待てない', 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined });
+    expect(labels).toEqual({ 1: DEFAULT_SKIP_LABEL, 2: undefined, 3: undefined, 4: undefined, 5: undefined, 6: undefined, 7: undefined, 8: undefined });
     expect(DEFAULT_SKIP_LABEL).toBe('明日まで待てない');
     expect(STORIES[JOURNEY_PAYMENT].steps.some((s) => s.t === 'order')).toBe(true);
   });
