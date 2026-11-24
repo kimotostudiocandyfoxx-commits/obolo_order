@@ -18,11 +18,11 @@ import s from './PlanetHome.module.css';
  * prefers-reduced-motion the kororins lie still and only fade into the grooves.
  */
 const SIZE = 58;
-/** where they roll: x 20–80%, the floor 60–74% of the height (the record's face in the backdrop) */
-const BOX = { x0: 0.2, x1: 0.8, y0: 0.6, y1: 0.74 };
+/** where they roll: the record's face in the backdrop (x 14–62%, the floor 58–76% of the height), clear of the needle */
+const BOX = { x0: 0.14, x1: 0.62, y0: 0.58, y1: 0.76 };
 /** the grooves they are drawn into, and the needle-mic */
-const GROOVE = { x: 0.42, y: 0.68 };
-const NEEDLE = { x: 70, y: 58 };
+const GROOVE = { x: 0.4, y: 0.66 };
+const NEEDLE = { x: 72, y: 60 };
 const HOLD_MS = 480;
 /** a kororin talks at least this long (so its bubble can be read), at most this long if its voice never ends */
 const TALK_MIN = 1600;

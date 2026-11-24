@@ -88,7 +88,7 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
     <div
       ref={root}
       className={`${s.home} ${zoom ? s.zoom : ''}`}
-      style={{ '--accent': cfg.accent, '--safe': `${safe}px`, '--caption-top': `max(${CAPTION.top}%, calc(58% + 52px))` } as CSSProperties}
+      style={{ '--accent': cfg.accent, '--safe': `${safe}px`, '--caption-top': cfg.roll ? '44%' : `max(${CAPTION.top}%, calc(58% + 52px))` } as CSSProperties}
       data-planet={planet}
     >
       {h.view && h.stage && (
