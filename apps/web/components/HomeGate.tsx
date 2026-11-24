@@ -48,8 +48,8 @@ export function HomeGate({ children }: { children: ReactNode }) {
         completedAt={me.journeyCompletedAt}
         skipLabel={STORIES[day]?.skipLabel}
         skippedText={STORIES[day]?.skippedText}
-        // the skip comes back only after days 1 and 2 (client 2026-11-22); from day 3 the 24 hours are waited
-        canSkip={day <= 2}
+        // the skip comes only after day 1 (M-R269, client 2026-11-24): from the end of day 2 (Bati's birth) the 24 hours are waited
+        canSkip={day <= 1}
         // the wait is the time to talk with Bati (client 2026-11-22): its room is the Moon (P-BATI-ROOM)
         bati={me.bati?.imageUrl ? { name: me.bati.name || 'バティ', image: me.bati.faces?.smile ?? me.bati.imageUrl } : undefined}
         note={STORIES[day]?.waitNote?.replaceAll('{bati}', me.bati?.name || 'バティ')}
