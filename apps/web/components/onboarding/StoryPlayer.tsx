@@ -15,7 +15,10 @@ import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { PlanetHome } from '@/components/planetHome/PlanetHome';
+import { getApi } from '@/lib/api';
 import { neoRecord, takoyakiRecord, TAKOYAKI_BACKDROP } from '@/lib/planetHome/storyHomes';
+import { RecordTint } from '@/components/planetHome/SaturnBallScene';
+import { RECORD_COLOURS } from '@obolo/shared';
 import { DachiVoiceStep } from './DachiVoiceStep';
 import { EggVoiceStep } from './EggVoiceStep';
 import { isDemoMode } from '@/lib/onboarding/demoMode';
@@ -1721,6 +1724,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           onDone={() => run(iRef.current + 1)}
         />
       )}
+      {/* D04-S005c (M-R263): {neo}'s record's colour, chosen once here */}
+      {started && step?.t === 'recordcolour' && (
+        <RecordColourStep
+          key={i}
+          neo={v.neo || v.name || ''}
+          onDone={(c) => {
+            remember('f_d04_record_colour', c);
+            if (!atelierTest) void getApi().planetHomeColour('saturn', c).catch(() => undefined);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
       {/* D03-S005 (M-R246 / M-R247): 「たまごに声を聞かせる」 — the held mic and its ring; {bati}'s voice from {name}'s */}
       {started && step?.t === 'eggvoice' && (
         <EggVoiceStep
@@ -2176,6 +2191,42 @@ function StoryHome({ place, neo, inviter, fly, words, onDone }: { place: 'takoya
       <button onClick={go} className="pt-safe absolute right-3 top-14 z-[60] rounded-full bg-white/90 px-4 py-1.5 text-sm font-black text-[#2a1630] shadow">
         次へ
       </button>
+    </div>
+  );
+}
+
+/** D04-S005c: {neo}'s record big, the six colours under it; a pick turns it that colour softly, then the story goes on */
+function RecordColourStep({ neo, onDone }: { neo: string; onDone: (colour: string) => void }) {
+  const [c, setC] = useState<string | null>(null);
+  return (
+    <div className="absolute inset-0 z-[40] overflow-hidden bg-[#1c1230]" data-testid="record-colour-step">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/planet-home/bg-saturn.webp" alt="" className="absolute inset-0 h-full w-full object-cover object-bottom" />
+      <div className="absolute inset-0 transition-opacity duration-700" style={{ opacity: c ? 1 : 0 }}>
+        <RecordTint colour={c} />
+      </div>
+      <div className="pt-safe absolute inset-x-0 top-[38%] text-center">
+        <span className="rounded-full bg-white/90 px-4 py-1.5 text-sm font-black text-[#2a1630] shadow">{neo}のレコード</span>
+      </div>
+      <div className="pb-safe absolute inset-x-0 bottom-6 flex flex-wrap justify-center gap-3 px-6" role="radiogroup" aria-label="レコードの色">
+        {RECORD_COLOURS.map((x) => (
+          <button
+            key={x.id}
+            type="button"
+            role="radio"
+            aria-checked={c === x.id}
+            onClick={() => {
+              if (c) return;
+              setC(x.id);
+              setTimeout(() => onDone(x.id), 1100);
+            }}
+            className={`flex flex-col items-center gap-1 text-[11px] font-black text-white [text-shadow:0_1px_4px_rgba(0,0,0,.6)]`}
+          >
+            <span className={`block h-11 w-11 rounded-full border-2 ${c === x.id ? 'border-white ring-4 ring-amber-300' : 'border-white/70'}`} style={{ background: x.color ?? '#141018' }} />
+            {x.name}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

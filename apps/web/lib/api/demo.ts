@@ -30,6 +30,9 @@ import {
   type StartRadioLiveBody,
   isFlying,
   seesOnlyDachi,
+  applyChange,
+  CHANGEABLES,
+  type ChangeStore,
   splitHome,
   orderOwn,
   type HomeOshi,
@@ -435,6 +438,24 @@ export class DemoApi implements Api {
     const before = this.s.planetHomes?.[this.uid()]?.[planet]?.lastVisitAt ?? null;
     this.home(planet, { lastVisitAt: new Date().toISOString() });
     return { lastVisitAt: before };
+  }
+  /** M-R263 in the demo: the same registry, kept with this browser's planet homes */
+  private changeStore(): ChangeStore {
+    return {
+      home: async (planet) => this.s.planetHomes?.[this.uid()]?.[planet] ?? null,
+      setHome: async (planet, patch) => this.home(planet, patch.recordColour ? { recordColour: patch.recordColour } : {}),
+    };
+  }
+  async changeables() {
+    const st = this.changeStore();
+    return Object.fromEntries(await Promise.all(CHANGEABLES.map(async (c) => [c.id, await c.get(st)] as const)));
+  }
+  async setChangeable(id: string, value: string) {
+    try {
+      return await applyChange(this.changeStore(), id, value);
+    } catch {
+      throw new ApiError(404, 'NOT_FOUND', 'Unknown choice');
+    }
   }
   async planetHomeColour(planet: HomePlanet, colour: string) {
     this.home(planet, { recordColour: colour });

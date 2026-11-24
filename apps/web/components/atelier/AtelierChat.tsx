@@ -8,7 +8,7 @@ import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, se
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { HOME_OF_WORK, PLANET_HOMES, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { HOME_OF_WORK, PLANET_HOMES, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
@@ -29,6 +29,7 @@ import { contentOf } from './intent';
 import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
+import { ChangePreview } from './ChangePreview';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -283,6 +284,47 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     void run(kind, content);
   };
 
+  /**
+   * M-R263 (月の工房 §7): a change of something {bati} can change (the registry: @obolo/shared changeables). A choice →
+   * it is changed at once and a card shows it (〔元に戻す〕); one that is not there → the nearest few; none → which one.
+   * Returns false when the words are not about a changeable thing.
+   */
+  const changeAsk = (text: string, chipped = false): boolean => {
+    const r = changeRequest(text);
+    if (!r) return false;
+    if ('ask' in r) {
+      say(changeLines.ask(), r.item.choices.map((c) => `レコードを${c.name}に`));
+      return true;
+    }
+    if ('near' in r) {
+      say(changeLines.near(r.asked, r.near), r.near.map((c) => `レコードを${c.name}に`));
+      return true;
+    }
+    void chipped;
+    setBusy(true);
+    getApi()
+      .setChangeable(r.item.id, r.choice.id)
+      .then((res) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiLine(r.item.doneLine(r.choice), batiVoice), changed: res }]))
+      .catch(() => say('いまは、うまく変えられなかった。もう一回言ってみて'))
+      .finally(() => setBusy(false));
+    return true;
+  };
+  /** 〔元に戻す〕 on a change card: the same change back to what it was */
+  const undoChange = (msgId: string) => {
+    const m = msgs.find((x): x is Extract<Msg, { who: 'bati' }> => x.id === msgId && x.who === 'bati');
+    const ch = m?.changed;
+    const item = ch ? changeableById(ch.id) : undefined;
+    if (!ch || !item || ch.undone) return;
+    setBusy(true);
+    getApi()
+      .setChangeable(ch.id, ch.from)
+      .then(() => {
+        setMsgs((l) => [...l.map((x) => (x.id === msgId && x.who === 'bati' && x.changed ? { ...x, changed: { ...x.changed, undone: true } } : x)), { id: uid(), who: 'bati', text: batiLine(item.undoneLine(item.choices.find((c) => c.id === ch.from) ?? item.choices[0]), batiVoice) }]);
+      })
+      .catch(() => say('いまは、戻せなかった……'))
+      .finally(() => setBusy(false));
+  };
+
   const send = (text: string) => {
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
@@ -299,6 +341,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       if (it.kind === 'refine' && last && last.kind !== 'voice' && last.kind !== 'radio') return void run(last.kind, it.content, last);
       return void run(first, text);
     }
+    // M-R263: 「土星のレコード、ピンクにして」 — {bati} changes it (no buttons on the planets)
+    if (!story && changeAsk(text)) return;
     if (p && 'voiceAgain' in p) return void run('voice', text);
     if (p && 'use' in p) return void run(p.use, text, undefined, { materials: p.materials });
     if (p && 'kind' in p) return void run(p.kind, text);
@@ -330,6 +374,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   const chip = (label: string) => {
     const k = (Object.keys(KIND_WORD) as AtelierKind[]).find((x) => KIND_WORD[x] === label);
     setMsgs((m) => [...m, { id: uid(), who: 'me', text: label }]);
+    if (!story && changeAsk(label, true)) return;
     // M-R253 §3: {bati}'s proposal of the material
     if (label === USE && proposal.current) {
       const pr = proposal.current;
@@ -568,7 +613,9 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
             who: 'bati',
             text: m.text,
             mark: { kind: 'local', id: m.id },
-            card: m.found?.length
+            card: m.changed
+              ? { label: m.text, thumb: <ChangePreview change={m.changed} />, full: <ChangePreview change={m.changed} big /> }
+              : m.found?.length
               ? {
                   label: m.text,
                   thumb: <FoundThumb works={m.found} />,
@@ -582,7 +629,9 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
                 }
               : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
-            chips: m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
+            chips: m.changed
+              ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
+              : m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
           }
         : {
             id: m.id,

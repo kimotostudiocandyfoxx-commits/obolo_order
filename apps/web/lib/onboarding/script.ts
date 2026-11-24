@@ -249,6 +249,12 @@ export type Step =
    */
   | { t: 'home'; planet: 'saturn'; place: 'takoyaki' | 'neo' }
   /**
+   * D04-S005c (M-R263): {neo}'s record's colour, chosen on the first arrival — the record full screen and the six colours
+   * (RECORD_COLOURS); picking one turns the record that colour (saved: PUT /planet-home/saturn/colour) and remembers
+   * f_d04_record_colour. Later it is changed by asking {bati} on the Moon.
+   */
+  | { t: 'recordcolour' }
+  /**
    * D03-S005 (M-R246 / M-R247) 「たまごに声を聞かせる」: a big mic in the middle, held to talk to the egg; a light ring around
    * it fills with the length spoken (full at about 10 s). Released too soon → `short` (OBOLON 「、、、もう少し、聞かせてやれ。」)
    * and the takes go on (appended). The words heard come out as {name}'s bubble; full → the egg glows and the story goes

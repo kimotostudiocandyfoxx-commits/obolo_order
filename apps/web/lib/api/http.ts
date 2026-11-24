@@ -694,6 +694,12 @@ export class HttpApi implements Api {
   planetHomeTakeOut(planet: Parameters<Api['planetHomeTakeOut']>[0], id: string) {
     return this.req<void>('DELETE', `/planet-home/${planet}/own/${id}`);
   }
+  changeables() {
+    return this.req<Record<string, string>>('GET', '/changeables');
+  }
+  setChangeable(id: string, value: string) {
+    return this.req<Awaited<ReturnType<Api['setChangeable']>>>('PUT', `/changeables/${encodeURIComponent(id)}`, { value });
+  }
   planetHomeColour(planet: Parameters<Api['planetHomeColour']>[0], colour: string) {
     return this.req<{ colour: string }>('PUT', `/planet-home/${planet}/colour`, { colour });
   }

@@ -22,13 +22,17 @@ import s from './PlanetHome.module.css';
 const FACE = { x0: 0.04, x1: 0.96, floor: 0.86 };
 /** the groove at the record's centre label, and where the singer of 〔▶ 全部流す〕 stands (shares of the screen) */
 const GROOVE = { x: 0.47, y: 0.69 };
-const NEEDLE = { x: 47, y: 74 };
 const BALL: Record<StageItem['rel'], string> = { own: '/planet-home/ball-mine.webp', dachi: '/planet-home/ball-dachi.webp', oshi: '/planet-home/ball-oshi.webp', stranger: '/planet-home/ball-dachi.webp' };
 export const RECORD_MASK = '/planet-home/saturn-record-mask.png';
 const HOLD_MS = 480;
 const PLATE_H = 17;
 /** the mini figure's box (px) and how far above the popped ball it stands */
 const CHIBI = { w: 124, h: 124, up: 100 };
+/** M-R264: where the words may be (shares of the screen's width), and the pace of 〔▶ 全部流す〕 */
+const BUBBLE = { x0: 0.24, x1: 0.76 };
+const AUTO_MS = 3700;
+/** the needle, right in front: 〔▶ 全部流す〕 pops the ball nearest it first */
+const NEEDLE_AT = { x: 0.74, y: 0.74 };
 const TALK_MIN = 1600;
 const TALK_MAX = 20000;
 const WAVE_MS = 900;
@@ -77,7 +81,7 @@ export function ChibiPic({ w }: { w: StageItem }) {
 
 type Out = { w: StageItem; x: number; y: number; phase: 'talk' | 'wave' | 'away'; t0: number; started: boolean; endAt: number };
 
-export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPlate, onItem, onHold, onHeard }: SceneProps) {
+export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPlate, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
   const layer = useRef<PuniLayerHandle>(null);
@@ -108,7 +112,19 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   const outIds = useMemo(() => new Set(outs.map((o) => o.w.id)), [outs]);
   // the balls still rolling: not popped, not heard
   const shown = useMemo(() => rolling.filter((w) => !gone.has(w.id) && !outIds.has(w.id)), [rolling, gone, outIds]);
-  const items = useMemo<PuniItem[]>(() => shown.map((w) => ({ id: w.id, look: defaultLook(COLORS[hue(w.author.id) % COLORS.length]), pic: BALL[w.rel], R: 26 + (hue(w.id) % 3) * 3 })), [shown]);
+  // M-R264: 44–60 px across at a 430 px screen, in proportion elsewhere
+  const [scale, setScale] = useState(390 / 430);
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const set = () => setScale((el.clientWidth || 390) / 430);
+    set();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const items = useMemo<PuniItem[]>(() => shown.map((w) => ({ id: w.id, look: defaultLook(COLORS[hue(w.author.id) % COLORS.length]), pic: BALL[w.rel], R: (22 + (hue(w.id) % 3) * 4) * scale })), [shown, scale]);
 
   const size = () => ({ W: root.current?.clientWidth ?? 390, H: root.current?.clientHeight ?? 844 });
   const groove = () => {
@@ -155,6 +171,42 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     live.current.onItem(w);
   }, []);
 
+  // M-R264 〔▶ 全部流す〕: while the record spins, the ball nearest the needle pops by itself, then the next, every 3.7 s;
+  // when none is left it stops (「今日のコロリン、全部聞いたね！」). 〔■ 止める〕 stops it at once.
+  const [pressed, setPressed] = useState(false);
+  const autoEnd = useRef(onPlayEnd);
+  autoEnd.current = onPlayEnd;
+  useEffect(() => {
+    if (!spinning) return;
+    setPressed(true);
+    const next = () => {
+      const { W, H } = size();
+      const nx = (NEEDLE_AT.x - FACE.x0) * W;
+      const ny = NEEDLE_AT.y * H;
+      let best: string | null = null;
+      let bd = Infinity;
+      for (const w of live.current.rolling) {
+        if (outsRef.current.some((o) => o.w.id === w.id)) continue;
+        const b = layer.current?.blob(w.id);
+        const d = b ? Math.hypot(b.x - nx, b.y - ny) : 1e6;
+        if (d < bd) [best, bd] = [w.id, d];
+      }
+      if (best) pop(best);
+      return !!best;
+    };
+    if (!next() && !outsRef.current.length) {
+      autoEnd.current?.();
+      return;
+    }
+    const t = setInterval(() => {
+      if (!next() && !outsRef.current.some((o) => o.phase !== 'away')) {
+        clearInterval(t);
+        setTimeout(() => autoEnd.current?.(), WAVE_MS + AWAY_MS);
+      }
+    }, AUTO_MS);
+    return () => clearInterval(t);
+  }, [spinning, pop]);
+
   // its voice started → playing; stopped → it has finished (after at least TALK_MIN)
   useEffect(() => {
     const now = performance.now();
@@ -183,8 +235,9 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       boxes.push({ x0: o.x - CHIBI.w / 2, x1: o.x + CHIBI.w / 2, y0: o.y - CHIBI.up - CHIBI.h / 2, y1: o.y + CHIBI.h / 2 - CHIBI.up + 20 });
       const el = bubbles.current.get(o.w.id);
       if (el) {
+        // M-R264: between 24% and 76% of the screen's width, never cut at an edge
         const half = el.offsetWidth / 2;
-        const bx = Math.max(half + 8 - left, Math.min(W - half - 8 - left, o.x));
+        const bx = Math.max(W * BUBBLE.x0 + half - left, Math.min(W * BUBBLE.x1 - half - left, o.x));
         const by = o.y - CHIBI.up - CHIBI.h / 2 - 2;
         el.style.transform = `translate3d(${bx.toFixed(1)}px, ${by.toFixed(1)}px, 0) translate(-50%, -100%)`;
         boxes.push({ x0: bx - half - 3, x1: bx + half + 3, y0: by - el.offsetHeight - 3, y1: by + 3 });
@@ -313,13 +366,14 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     if (near) layer.current?.poke(near);
   };
 
-  const done = hadAny && !rolling.length && !outs.length;
-  const singer = spinning && playingId ? [...view.own, ...view.around].find((w) => w.id === playingId) : undefined;
+  const done = (hadAny || pressed) && !rolling.length && !outs.length;
   const g = groove();
   return (
     <div ref={root} className={s.scene}>
       <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})`, transform: 'none' }} />
       {cfg.art.backdrop === '/planet-home/bg-saturn.webp' && <RecordTint colour={view.recordColour} />}
+      {/* M-R264: while it spins, the light in the grooves goes round */}
+      {spinning && !reduced && <GrooveSpin />}
       <button type="button" className={s.plate} style={{ bottom: 'auto', top: '49%', zIndex: 5 }} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
       </button>
@@ -374,7 +428,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
                   if (el) bubbles.current.set(o.w.id, el);
                   else bubbles.current.delete(o.w.id);
                 }}
-                className={s.bub}
+                className={`${s.bub} ${s.bubWrap}`}
                 style={{ left: 0, top: 0, bottom: 'auto', transform: `translate3d(${o.x}px, ${o.y - CHIBI.up - CHIBI.h / 2 - 2}px, 0) translate(-50%, -100%)` }}
                 data-testid="bubble"
               >
@@ -393,12 +447,17 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
           🎉 今日のコロリン、全部聞いたね！
         </div>
       )}
-      {/* 〔▶ 全部流す〕: the one singing comes out of the groove, by the record's centre */}
-      {singer && (
-        <div className={`${s.chibi} ${s.atNeedleChibi}`} style={{ left: `${NEEDLE.x}%`, top: `${NEEDLE.y}%`, width: CHIBI.w, height: CHIBI.h, margin: `${-CHIBI.h}px 0 0 ${-CHIBI.w / 2}px` }} data-testid="at-needle">
-          <ChibiPic w={{ ...singer, fresh: false, drop: null, leaving: false }} />
-        </div>
-      )}
+    </div>
+  );
+}
+
+/** the light streaks in the grooves going round (on the record only: through its mask, seen at its low angle) */
+function GrooveSpin() {
+  return (
+    <div className={s.grooveMask} style={{ WebkitMaskImage: `url(${RECORD_MASK})`, maskImage: `url(${RECORD_MASK})` }} aria-hidden data-testid="groove-spin">
+      <div className={s.grooveTilt} style={{ left: `${GROOVE.x * 100}%`, top: `${GROOVE.y * 100}%` }}>
+        <div className={s.grooveLight} />
+      </div>
     </div>
   );
 }

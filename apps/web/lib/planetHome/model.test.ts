@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { HomeWork, PlanetHomeView } from '@obolo/shared';
-import { groovesOf, menuFor, moveOwn, queueFrom, recordOrder, rollingOf, stageOf } from './model';
+import { HOME_PLANETS, PLANET_HOMES, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { dockButtons, groovesOf, menuFor, moveOwn, queueFrom, recordOrder, rollingOf, stageOf } from './model';
 
 const now = Date.parse('2026-11-23T12:00:00Z');
 const ago = (h: number) => new Date(now - h * 3600_000).toISOString();
@@ -99,5 +99,14 @@ describe('星のホーム stage', () => {
     const all = new Set([...s.own, ...s.around].map((x) => x.id));
     expect(rollingOf(s, all, now)).toEqual([]);
     expect(groovesOf(s, []).length).toBe(16);
+  });
+  it('M-R263: one big button per planet — Saturn 〔▶ 全部流す〕 (〔■ 止める〕 while it plays), every other 〔中に入る〕; no 〔＋ 飛ばす〕', () => {
+    for (const p of HOME_PLANETS) {
+      const b = dockButtons(PLANET_HOMES[p], false);
+      expect(b).toHaveLength(1);
+      expect(b[0].label).toBe(p === 'saturn' ? '▶ 全部流す' : '中に入る');
+      expect(b.some((x) => /飛ばす/.test(x.label))).toBe(false);
+    }
+    expect(dockButtons(PLANET_HOMES.saturn, true)).toEqual([{ label: '■ 止める', act: 'stop' }]);
   });
 });

@@ -453,6 +453,42 @@
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
+.grooveMask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mix-blend-mode: screen;
+}
+.grooveTilt {
+  position: absolute;
+  width: 160%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scaleY(0.34);
+}
+.grooveLight {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 255, 255, 0.28) 6deg, transparent 16deg, transparent 90deg, rgba(255, 255, 255, 0.2) 96deg, transparent 106deg, transparent 180deg, rgba(255, 255, 255, 0.28) 186deg, transparent 196deg, transparent 270deg, rgba(255, 255, 255, 0.2) 276deg, transparent 286deg);
+  animation: grooveSpin 2.4s linear infinite;
+}
+@keyframes grooveSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.bubWrap {
+  white-space: normal;
+  width: max-content;
+  max-width: 50vw;
+  text-align: center;
+}
 .splash {
   position: absolute;
   width: 9px;
