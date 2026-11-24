@@ -58,8 +58,10 @@ function LiveCard({ id, fallback }: { id: string; fallback: Work }) {
 export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined, bati = true): Talk {
   let returning = false;
   try {
-    returning = !sessionStorage.getItem(VISIT_KEY) && talks().length > 0;
-    sessionStorage.setItem(VISIT_KEY, '1');
+    // the visit's first talk (its start is kept; a second call at once — React's strict mode — is the same talk)
+    const start = Number(sessionStorage.getItem(VISIT_KEY)) || 0;
+    if (!start) sessionStorage.setItem(VISIT_KEY, String(Date.now()));
+    returning = (!start || Date.now() - start < 1500) && talks().length > 0;
   } catch {
     /* no memory: the plain greeting */
   }
