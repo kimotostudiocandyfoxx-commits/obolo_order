@@ -136,7 +136,7 @@ for nm in ['kakejiku','kakejiku2','kakejiku3','kakejiku4']:
 for nm in ['plaque-1','plaque-2']:
     f=f'{O}/{nm}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((620,260),Image.LANCZOS); A[nm]=uri(o,86)
-for nm,k2 in [('home2-bg-saturn-close','bg2-saturn-close')]:
+for nm,k2 in [('home2-bg-saturn-close','bg2-saturn-close'),('home2-bg-saturn-close2','bg2-saturn-close2')]:
     f=f'{O}/{nm}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[k2]=uri(im,78)
 f=f'{O}/home2-bg-saturn-needle.jpg'
