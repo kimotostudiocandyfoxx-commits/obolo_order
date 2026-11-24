@@ -170,6 +170,18 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
     const rootH = root.current?.clientHeight ?? 844;
     /** the dock's top (〔▶ 全部流す〕〔＋ 飛ばす〕): plates stay above it */
     const bottomLimit = rootH * 0.875;
+    const tk = bubble.current?.dataset.id;
+    const tb = tk ? get(tk) : undefined;
+    if (bubble.current && tb) {
+      // kept inside the screen (a kororin by the edge still shows all its words)
+      const half = bubble.current.offsetWidth / 2;
+      const left = FACE.x0 * rootW;
+      const bx = Math.max(half + 8 - left, Math.min(rootW - half - 8 - left, tb.x));
+      const by = tb.y - tb.R * tb.sy - 8;
+      bubble.current.style.transform = `translate3d(${bx.toFixed(1)}px, ${by.toFixed(1)}px, 0) translate(-50%, -100%)`;
+      // the words take their place first: no plate goes under them
+      boxes.push({ x0: bx - half - 3, x1: bx + half + 3, y0: by - bubble.current.offsetHeight - 3, y1: by + 3 });
+    }
     const hitsFace = (x0: number, x1: number, y0: number, y1: number, own: string) =>
       faces.some((f) => {
         if (f.id === own) return false;
@@ -209,15 +221,6 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
       el.dataset.face = `${b.x.toFixed(0)},${b.y.toFixed(0)},${(b.R * 0.86).toFixed(0)}`;
     }
     for (const [id, el] of tags.current) if (sucks.current.has(id)) el.style.opacity = '0';
-    const tk = bubble.current?.dataset.id;
-    const tb = tk ? get(tk) : undefined;
-    if (bubble.current && tb) {
-      // kept inside the screen (a kororin by the edge still shows all its words)
-      const half = bubble.current.offsetWidth / 2;
-      const left = FACE.x0 * rootW;
-      const bx = Math.max(half + 8 - left, Math.min(rootW - half - 8 - left, tb.x));
-      bubble.current.style.transform = `translate3d(${bx.toFixed(1)}px, ${(tb.y - tb.R * tb.sy - 8).toFixed(1)}px, 0) translate(-50%, -100%)`;
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
