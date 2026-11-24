@@ -9054,6 +9054,94 @@
         512
       ],
       "always": false
+    },
+    {
+      "id": "kor3-17",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour mint green, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): Comedic Japanese gag-anime expression, exaggerated and funny, drawn with classic anime manga symbols (sweat drops, vein marks, shock lines, etc.): utterly SHOCKED — eyes popped wide into huge white circles with tiny pupils, jaw dropped open to the bottom of the face, blue vertical shock lines on the forehead, flying sweat drops. The face fills the front of the sphere. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-18",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour sky blue, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): Comedic Japanese gag-anime expression, exaggerated and funny, drawn with classic anime manga symbols (sweat drops, vein marks, shock lines, etc.): \"gaan\" despair — blank white eyes, wobbly crying mouth, dark gloomy vertical lines over the top half, a tiny soul wisp floating out. The face fills the front of the sphere. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-19",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour tangerine orange, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): Comedic Japanese gag-anime expression, exaggerated and funny, drawn with classic anime manga symbols (sweat drops, vein marks, shock lines, etc.): furious tantrum — angry slanted eyes with flames, a big red cross-shaped vein mark, sharp shouting mouth with little fangs, puff of steam. The face fills the front of the sphere. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-20",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour lemon yellow, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): Comedic Japanese gag-anime expression, exaggerated and funny, drawn with classic anime manga symbols (sweat drops, vein marks, shock lines, etc.): comedic waterfall tears — eyes shut tight, two huge streams of tears gushing out like fountains, wailing open mouth with a runny nose. The face fills the front of the sphere. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-21",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour lavender, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): Comedic Japanese gag-anime expression, exaggerated and funny, drawn with classic anime manga symbols (sweat drops, vein marks, shock lines, etc.): dumbfounded deadpan — tiny blank dot eyes, a small straight line mouth, one big sweat drop on the side, a little \"?\" floating above. The face fills the front of the sphere. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-22",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour fluffy snow white with soft fur texture, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): tiny shiny black dot eyes, a small ω-shaped cat mouth, soft round pink blush on both cheeks — a simple, calm and very cute face. The eyes sit on the horizontal centre line of the sphere and the mouth just below; the bottom quarter of the sphere has no face details. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-23",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour warm toasted cream beige, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): tiny shiny black dot eyes, a small ω-shaped cat mouth, soft round pink blush on both cheeks — a simple, calm and very cute face. The eyes sit on the horizontal centre line of the sphere and the mouth just below; the bottom quarter of the sphere has no face details. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "kor3-24",
+      "prompt": "A round ball-shaped mascot creature drawn in modern Japanese TV anime style, like a cute character from a popular anime or a premium Japanese character-goods brand: clean confident lineart, cel shading with soft gradient shadows, anime-style glossy highlights (a bright white highlight shape at the top left and a soft reflected light on the bottom), a gentle colour rim light. The creature is a perfect sphere with no arms, no legs and no accessories, its body colour pale sakura pink, smooth soft surface. Its face, drawn in true Japanese anime manner (clean lines, anime shading and highlights): tiny shiny black dot eyes, a small ω-shaped cat mouth, soft round pink blush on both cheeks, eyes gently looking up — a simple, calm and very cute face. The eyes sit on the horizontal centre line of the sphere and the mouth just below; the bottom quarter of the sphere has no face details. Polished, high quality key-visual illustration, not an emoji, not a cheap sticker, not 3D render. Front view, centered, the sphere filling about 82% of the frame. Plain solid pure white background, no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
     }
   ],
   "redo": []
