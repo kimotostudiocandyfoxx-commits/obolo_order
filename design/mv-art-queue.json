@@ -9605,6 +9605,96 @@
       ],
       "always": false,
       "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from her black dress, pale tentacle hair and egg-like hat (wings in lavender and pearl with soft tentacle-curl patterns). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "kor4-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-kstyle-1.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: black, white and silver taken from his black jacket and white shirt (a neat jacket-collar pattern). Accessory: his round glasses on the face. On top: a small tuft of his black hair on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "kor4-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-kstyle-1.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: soft white fur with red-brown and black feather patterns taken from its red robe and feathers, little blue swirl marks. Accessory: round black sunglasses. On top: two pointed white fox ears with blue insides. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "kor4-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-kstyle-1.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: warm beige body wrapped in a black hood with gold embroidery. Accessory: a small glowing gold eye mark on the hood. On top: the black hood itself. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "kor4-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-kstyle-1.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: candy pink with colourful little flower patterns taken from her pink top and flower skirt. Accessory: round black sunglasses. On top: a short black bob hair cap on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "kor4-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-kstyle-1.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: dark navy with gold chain patterns taken from his armour and hip-hop style. Accessory: none. On top: a small golden helmet-like cap on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "kor4-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-kstyle-1.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A round ball-shaped mascot (a perfect glossy sphere with no arms and no legs) in exactly the same style as the SECOND reference picture: soft cute anime mascot, glossy highlight top-left, and the same simple face — two tiny shiny black dot eyes, a small ω-shaped cat mouth and soft round pink blush. Its colour and surface pattern are designed from the character in the FIRST reference picture: pearl lavender with soft tentacle-curl patterns taken from her black dress and pale tentacle hair. Accessory: none. On top: a few pale wavy tentacle-hair strands on top. It must still read as a round ball first. Front view, centered, filling about 80% of the frame. Plain solid pure white background, no shadow, no text."
     }
   ],
   "redo": []
