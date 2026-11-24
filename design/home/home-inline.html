@@ -93,7 +93,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .pick .ball .face{position:absolute;inset:0}
 .pick .ok{font:900 15px var(--f-body);background:var(--accent);color:#2a1630;border:0;border-radius:999px;padding:12px 26px;cursor:pointer}
 .face .shades{opacity:0;transform:translateY(-14px);transition:opacity .25s,transform .35s cubic-bezier(.3,1.6,.5,1)}
-.face .shades path:first-child{fill:#141018}.face .shades .br{stroke:#141018;stroke-width:3}.face .shades .gl{stroke:rgba(255,255,255,.7);stroke-width:2;stroke-linecap:round}
+.face .shades .lz{fill:#141018}.face .shades .lz.pk{fill:#3a1238}.face .shades .lz.rd{fill:#3d0f22}.face .shades .br{stroke:#141018;stroke-width:3}.face .shades .gl{stroke:rgba(255,255,255,.7);stroke-width:2;stroke-linecap:round}
 .partying .face .shades{opacity:1;transform:none}
 .partying .face .eyes{visibility:hidden}
 .party{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .6s}
@@ -244,7 +244,7 @@ function render(){
   const bgi=(mode==='anime'&&A['bg2-'+cur])||A['bg-'+cur];$('bg').style.backgroundImage=bgi?`url(${bgi})`:'linear-gradient(#335,#113)';
   document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode));
   $('ttl').innerHTML=`<small>${c.en}</small>${c.name}`;$('say').innerHTML=c.say;
-  $('plate').textContent=`${ME}の${c.place}`;setCta(false);$('home').setAttribute('aria-label',`${ME}の${c.place}`);
+  $('plate').textContent=`${ME}の${c.place}`;$('plate').hidden=cur==='saturn';setCta(false);$('home').setAttribute('aria-label',`${ME}の${c.place}`);
   $('oshiN').textContent=oshi.size;
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
@@ -306,7 +306,13 @@ const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-
 const KOROS=[
  {c:'pearl',f:'omega',n:'しろもち'},{c:'gold',f:'smile',n:'きんぴか'},{c:'pink',f:'wink',n:'もも'},{c:'mint',f:'sleepy',n:'みんと'},
  {c:'lavender',f:'cat',n:'ぷらむ'},{c:'sky',f:'oh',n:'そら'},{c:'peach',f:'grin',n:'ぴーち'},{c:'night',f:'star',n:'よぞら'}];
-function faceSVG(f){
+const STAR=(x,y,s)=>{let d='';for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?s*.48:s;d+=(k?'L':'M')+(x+Math.cos(a)*r).toFixed(1)+' '+(y+Math.sin(a)*r).toFixed(1)}return d+'z'};
+const SHADES={
+ round:'<g class="shades"><circle class="lz" cx="35" cy="51" r="10.5"/><circle class="lz" cx="65" cy="51" r="10.5"/><path class="br" d="M45.5 49 q4.5 -4 9 0"/><path class="gl" d="M29 46 q3 -3 6 -3 M59 46 q3 -3 6 -3"/></g>',
+ way:'<g class="shades"><path class="lz" d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z"/><path class="br" d="M46 49 h8"/><path class="gl" d="M27 48 l6 0 M61 48 l6 0"/></g>',
+ star:'<g class="shades"><path class="lz pk" d="'+STAR(34,51,13)+'"/><path class="lz pk" d="'+STAR(66,51,13)+'"/><path class="br" d="M45 50 h10"/><path class="gl" d="M30 47 l3 -2 M62 47 l3 -2"/></g>',
+ heart:'<g class="shades"><path class="lz rd" d="M35 61 C24 53 23 44 29 42 C32 41 34 43 35 45 C36 43 38 41 41 42 C47 44 46 53 35 61z"/><path class="lz rd" d="M65 61 C54 53 53 44 59 42 C62 41 64 43 65 45 C66 43 68 41 71 42 C77 44 76 53 65 61z"/><path class="br" d="M45 48 h10"/><path class="gl" d="M29 46 l3 -2 M59 46 l3 -2"/></g>'};
+function faceSVG(f,sh){
   const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
   const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
     wink:eye(36)+'<path class="ln" d="M58 52 q6 -5 12 0"/>',sleepy:'<path class="ln" d="M30 53 h12 M58 53 h12"/>',
@@ -316,7 +322,7 @@ function faceSVG(f){
   const M={omega:'<path class="mo" d="M43 61 q3.5 5 7 0 q3.5 5 7 0"/>',smile:'<path class="mo" d="M42 60 q8 9 16 0"/>',wink:'<path class="mo" d="M44 61 q6 6 12 0"/>',
     sleepy:'<ellipse class="mo2" cx="50" cy="63" rx="3" ry="2.4"/>',cat:'<path class="mo" d="M42 60 q4 5 8 0 q4 5 8 0"/>',oh:'<ellipse class="mo2" cx="50" cy="63" rx="4" ry="5"/>',
     grin:'<path class="mo3" d="M40 59 q10 12 20 0 z"/>',star:'<path class="mo" d="M43 60 q7 7 14 0"/>'}[f];
-  return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true"><g class="shades"><path d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z"/><path class="br" d="M46 49 h8"/><path class="gl" d="M27 48 l6 0 M61 48 l6 0"/></g><ellipse class="bl" cx="27" cy="62" rx="9" ry="5"/><ellipse class="bl" cx="73" cy="62" rx="9" ry="5"/><g class="eyes">${E}</g>${M}</svg>`;
+  return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true">${SHADES[sh||'round']}<ellipse class="bl" cx="27" cy="62" rx="9" ry="5"/><ellipse class="bl" cx="73" cy="62" rx="9" ry="5"/><g class="eyes">${E}</g>${M}</svg>`;
 }
 function korPicker(done){
   const ph=$('phone'),d=document.createElement('div');d.className='pick';let sel=window.MYKORO??0;
@@ -335,7 +341,7 @@ function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHei
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
     const kp=o.n===ME?(window.MYKORO??0):(i*3+o.n.length)%8,K=KOROS[kp];
     const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
-    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f)}</div></div>${o.k==='mine'?`<span class="ptag">${o.n}</span>`:''}`;$('sky').appendChild(e);
+    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div></div>${o.k==='mine'?`<span class="ptag">${o.n}</span>`:''}`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:slot>=0?-R-slot*70:-R-40,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
