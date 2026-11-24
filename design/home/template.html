@@ -247,6 +247,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .hv .hvfx,.hv .hvstage{position:absolute;inset:0}
 .hv .hvback{position:absolute;right:-16%;bottom:-9%;width:78%;aspect-ratio:1;filter:blur(3.5px) brightness(.82);transform:translateY(30%);transition:transform .9s cubic-bezier(.2,1,.3,1);z-index:3}
 .hv.on .hvback{transform:translateY(0)}
+.hv.sat .hvback{right:-38%;width:84%}
 .hv .hvback img{width:100%;height:100%;object-fit:contain;animation:hvb 3.2s ease-in-out infinite}
 @keyframes hvb{50%{transform:translateY(-6px) rotate(-1.2deg)}}
 .hv .vig{position:absolute;inset:0;background:radial-gradient(ellipse at 45% 45%,transparent 45%,rgba(0,0,10,.45));z-index:2}
@@ -644,7 +645,7 @@ function vinyl(into,img,x,y,w){const v=document.createElement('div');v.className
 function hvOn(bgk,night){const h=$('hv');const d=document.querySelector('.dock');d.classList.add('hvtop');d.style.left='88%';d.style.top='11%';h.classList.toggle('night',!!night);whoosh();$('hvbg').style.backgroundImage=`url(${A[bgk]||''})`;$('hvback').querySelector('img').src=A['uback']||'';$('hvstage').innerHTML='';$('hvfx').innerHTML='';h.classList.add('on');$('sky').style.opacity='0';}
 function whoosh(){const c=getAC();if(!c)return;const t0=c.currentTime+.01,n=c.createBufferSource(),bf=c.createBuffer(1,Math.floor(c.sampleRate*.6),c.sampleRate),d=bf.getChannelData(0);for(let i=0;i<d.length;i++){const x=i/d.length;d[i]=(Math.random()*2-1)*Math.sin(Math.PI*x)*.8}
   const f=c.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(400,t0);f.frequency.exponentialRampToValueAtTime(3200,t0+.5);const g=c.createGain();g.gain.value=.35;n.buffer=bf;n.connect(f);f.connect(g);g.connect(c.destination);n.start(t0)}
-function hvOff(){$('hv').classList.remove('on','zoomart');document.querySelector('.dock').classList.remove('hvtop');placeDock();$('sky').style.opacity='';setTimeout(()=>{if(!$('hv').classList.contains('on')){$('hvstage').innerHTML='';$('hvfx').innerHTML=''}},700)}
+function hvOff(){$('hv').classList.remove('on','zoomart','sat');document.querySelector('.dock').classList.remove('hvtop');placeDock();$('sky').style.opacity='';setTimeout(()=>{if(!$('hv').classList.contains('on')){$('hvstage').innerHTML='';$('hvfx').innerHTML=''}},700)}
 function hvPos(e,x,y,s){const ph=$('phone');e.style.transform=`translate3d(${x*ph.clientWidth}px,${y*ph.clientHeight}px,0) translate(-50%,-50%) scale(${s})`}
 function popOut(fx,fy,img){const sky=$('sky'),ph=$('phone'),d=document.createElement('div');d.className='dancer';d.innerHTML=`<img alt="" src="${img||''}">`;d.style.left=fx*ph.clientWidth+'px';d.style.top=fy*ph.clientHeight+'px';d.style.transform='scale(.2)';sky.appendChild(d);popSound();
   requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.top=(fy*ph.clientHeight+40)+'px';d.style.transform='scale(.9)'}));setTimeout(()=>d.remove(),1500)}
@@ -840,7 +841,7 @@ function play(){
   // you drop from the sky onto the tonearm
   const d=document.createElement('div');d.className='dancer';d.innerHTML=`<img alt="" src="${A['udance-1']||A['chibi-user']||''}">`;d.style.left=(NEEDLE[0]*ph.clientWidth)+'px';d.style.top='-40px';d.style.transform='scale(.7)';d.style.transition='top .55s cubic-bezier(.5,0,.9,.6),transform .3s';$('sky').appendChild(d);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.top=(NEEDLE[1]*ph.clientHeight)+'px'}));T(()=>{d.style.transform='scale(.8,.6)';popSound()},560);T(()=>{d.style.transform='scale(.7)'},700);
-  T(()=>{d.remove();hvOn(A['bg2-saturn-close2']?'bg2-saturn-close2':A['bg2-saturn-close']?'bg2-saturn-close':'bg2-saturn-needle');ph.classList.add('partying')},1100);
+  T(()=>{d.remove();hvOn(A['bg2-saturn-close2']?'bg2-saturn-close2':A['bg2-saturn-close']?'bg2-saturn-close':'bg2-saturn-needle');ph.classList.add('partying');$('hv').classList.add('sat')},1100);
   // korolin ride the grooves: an ellipse around the label (off to the right); far = small at the top, near = big at the bottom
   const PATH={cx:1.02,cy:.5,rx:.6,ry:.78,a0:226,a1:122,pop:180,dur:8.2};
   const at=(deg)=>{const W=ph.clientWidth,H=ph.clientHeight,r=deg*Math.PI/180,x=PATH.cx*W+PATH.rx*W*Math.cos(r),y=PATH.cy*H+PATH.ry*H*Math.sin(r);return[x,y,.35+1.15*Math.max(0,Math.min(1,y/H))]};
