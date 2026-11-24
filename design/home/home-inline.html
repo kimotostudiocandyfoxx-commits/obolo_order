@@ -44,6 +44,14 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .res img{height:100%;width:auto;display:block}
 .res.l{left:-2%}.res.r{right:-2%}
 .res:active{transform:scale(.96)}
+.roll{position:absolute;width:58px;height:58px;margin:-29px;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+.roll img{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.roll .rim{position:absolute;inset:6%;border-radius:50%;border:2px solid var(--c);opacity:0}
+.roll.talk .rim{opacity:.9}
+.roll.gone{transition:left .6s ease-in,top .6s ease-in,transform .6s ease-in,opacity .6s;transform:scale(.15) rotate(540deg);opacity:0}
+.bub{position:absolute;z-index:8;font:900 12px var(--f-body);background:rgba(255,255,255,.94);color:#2a1630;border-radius:14px;padding:6px 10px;white-space:nowrap;transform:translate(-50%,-100%);pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.bub small{display:block;font-size:10px;opacity:.7}
+.done{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:7;font:900 14px var(--f-body);background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:10px 16px;white-space:nowrap}
 .plate{position:absolute;left:50%;bottom:calc(16% - 8px);transform:translateX(-50%);font:900 13px var(--f-body);padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.88);color:#2a1630;z-index:3;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .dock{position:absolute;left:0;right:0;bottom:0;padding:0 16px 18px;display:flex;gap:10px;justify-content:center;z-index:5}
 .cta{font:900 16px var(--f-body);color:#2a1630;background:var(--accent);border:0;border-radius:999px;padding:14px 22px;box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 -3px 0 rgba(0,0,0,.12);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
@@ -106,8 +114,8 @@ const FAR=['はるか','ショウ','れい','ぽんず','kei','みお'];
 /* one row per planet: the whole home is this config */
 const RES={venus:[['longg','ロングG','……いい音だろ。','l'],['bossg','ボスG','誰だ、お前ら。……ネオか。','r']],mercury:[['freezie','フリージー','音に乗っけると、100倍だ。','l'],['salmon','サーモン','おかえり。おかえり。','r']],mars:[['hippo','ヒポキン','……いい画だ。また見せに来い。','l']],uranus:[['croco','クロコパトラ','あら、いらっしゃい。','l']],neptune:[['boombox','ラジカセの侍','遊んでいくか。','r']],pluto:[['ribbon','リボンのもこもこ','おはなし、きかせて！','l']]};
 const P={
- saturn:{name:'土星',en:'SATURN',accent:'#ffb36b',place:'レコード',thing:'コロリン',sp:'korolin',cta:'▶ 再生',inName:'',
-  say:'あなたの<b>レコード</b>に、ダチと推しのコロリンが<b>88時間</b>降ってくる。再生すると、針のマイクの前で歌う。',
+ saturn:{name:'土星',en:'SATURN',accent:'#ffb36b',place:'レコード',thing:'コロリン',sp:'korolin',cta:'▶ 全部流す',inName:'',
+  say:'あなたの<b>レコード</b>に、ダチと推しのコロリンが降ってくる。<b>つつく・はじく・投げる</b>と喋って、溝にしまわれる。',
   card:i=>({big:'🎤',cap:'「'+['明日もがんばるZE','うまいラーメン見つけた','ねむい…でも楽しい','新曲できたかも','空がきれいだった'][i%5]+'」'})},
  jupiter:{name:'木星',en:'JUPITER',accent:'#b6e36b',place:'木',thing:'アート',sp:'butterfly',cta:'🚪 アトリエに入る',inName:'アトリエ',
   say:'あなたの<b>木</b>のまわりに、ダチと推しのアートが<b>88時間</b>、蝶になって舞う。木の中のアトリエには、あなたのアートがずっと飾られる。',
@@ -145,6 +153,7 @@ function render(){
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
   const sky=$('sky');sky.innerHTML='';items=[];
+  stopRoll();if(cur==='saturn'){setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
   list.forEach((p,i)=>{const [x,y]=spots[i%spots.length];add({...p,x,y,i,isNew:i<2})});
@@ -193,13 +202,42 @@ function enter(){
   $('shelf').innerHTML=ic.map((x,i)=>`<div class="w">${x}<small>11/${26-i}</small></div>`).join('');
   $('inside').classList.add('on');
 }
+let rolls=[],raf=0,heard=[];
+function setupRoll(){
+  const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,box={x0:W*.2,x1:W*.8,y0:H*.6,y1:H*.74};
+  const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
+  rolls=list.map((o,i)=>{const e=document.createElement('div');e.className='roll';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
+    e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
+    e.innerHTML=`<img alt="" src="${sprite('korolin')}"><div class="rim"></div>`;$('sky').appendChild(e);
+    const fl=box.y0+((i*37)%100)/100*(box.y1-box.y0);const r={o,e,x:box.x0+((i*53+17)%100)/100*(box.x1-box.x0),y:H*.2-i*40,vx:(Math.random()-.5)*1.5,vy:0,i,box,fl,drag:false,talk:false};
+    let down=null;
+    e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0});
+    e.addEventListener('pointermove',ev=>{if(!down)return;const dx=ev.clientX-down.lx,dy=ev.clientY-down.ly,dt=Math.max(8,performance.now()-down.lt);r.x+=dx;r.y+=dy;r.vx=dx/dt*16;r.vy=dy/dt*16;down.lx=ev.clientX;down.ly=ev.clientY;down.lt=performance.now()});
+    e.addEventListener('pointerup',ev=>{if(!down)return;const moved=Math.hypot(ev.clientX-down.x,ev.clientY-down.y);r.drag=false;if(moved<6){r.vy=-7;r.vx=(Math.random()-.5)*3}down=null;talk(r)});
+    e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();r.vy=-7;talk(r)}});
+    return r});
+  const step=()=>{for(const r of rolls){if(r.drag||r.gone)continue;r.vy+=.45;r.x+=r.vx;r.y+=r.vy;
+      if(r.y>r.fl){r.y=r.fl;r.vy*=-.45;r.vx*=.9;if(Math.abs(r.vy)<1)r.vy=0}
+      if(r.x<r.box.x0){r.x=r.box.x0;r.vx=Math.abs(r.vx)*.7} if(r.x>r.box.x1){r.x=r.box.x1;r.vx=-Math.abs(r.vx)*.7}
+      if(r.vy===0&&r.y>=r.fl){r.vx*=.96;r.vx+=(Math.random()-.5)*.08}
+      r.e.style.left=r.x+'px';r.e.style.top=r.y+'px';r.e.style.transform=`rotate(${(r.x*2)%360}deg)`;
+      if(r.bub){r.bub.style.left=r.x+'px';r.bub.style.top=(r.y-34)+'px'}}
+    raf=requestAnimationFrame(step)};
+  raf=requestAnimationFrame(step);
+}
+function talk(r){
+  if(r.talk||r.gone)return;r.talk=true;r.e.classList.add('talk');const card=P.saturn.card(r.i);
+  const b=document.createElement('div');b.className='bub';b.innerHTML=`<small>🎤 ${r.o.n}</small>${card.cap}`;$('sky').appendChild(b);r.bub=b;
+  setTimeout(()=>{b.style.display='none';r.bub=null;r.gone=true;const ph=$('phone');r.e.style.left=ph.clientWidth*.42+'px';r.e.style.top=ph.clientHeight*.68+'px';r.e.classList.add('gone');heard.push(r.o);
+    setTimeout(()=>{r.e.style.display='none';if(rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';$('sky').appendChild(d)}},650)},2000);
+}
+function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
 function play(){
   playing=true;$('spin').classList.add('on');$('cta').textContent='■ 止める';
-  const q=items.filter(i=>!i.o.far);let k=0;
-  const step=()=>{if(!playing)return;q.forEach(i=>i.e.style.transition='');const it=q[k%q.length];
-    const save={l:it.e.style.left,t:it.e.style.top};it.e.style.transition='left .6s, top .6s';it.e.style.left='70%';it.e.style.top='58%';
+  const q=(heard.length?heard:PEOPLE).map((o,i)=>({o:{...o,i}}));let k=0;
+  const step=()=>{if(!playing)return;const it=q[k%q.length];
     const card=P.saturn.card(it.o.i);$('needle').innerHTML=`🎤 ${it.o.n}<br>${card.cap}`;$('needle').classList.add('on');
-    playing=setTimeout(()=>{it.e.style.left=save.l;it.e.style.top=save.t;$('needle').classList.remove('on');k++;playing=setTimeout(step,500)},2200)};
+    playing=setTimeout(()=>{$('needle').classList.remove('on');k++;playing=setTimeout(step,500)},2200)};
   step();
 }
 function stopPlay(){if(playing&&playing!==true)clearTimeout(playing);playing=null;$('spin').classList.remove('on');$('needle').classList.remove('on');$('cta').textContent=P[cur].cta}
