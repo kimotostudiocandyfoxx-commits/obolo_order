@@ -209,7 +209,7 @@ interface DemoState {
   /** M-R253 §5: homecomings told (`owner|key`) */
   homeTold?: string[];
   /** R9 review shots: more ダチ for the Moon temple's hall and plain (no talk behind them) */
-  reviewDachi?: { id: string; name: string; recent: number; lastAt: string | null; stand?: string }[];
+  reviewDachi?: { id: string; name: string; recent: number; lastAt: string | null; stand?: string; unread?: boolean }[];
 }
 
 /** Venus radio samples: the gorilla trio's shows on the demo Venus (their own pictures, no new art). */
@@ -1485,7 +1485,7 @@ export class DemoApi implements Api {
     // R9: the last 7 days' messages, ranked as the server ranks them
     const week = Date.now() - 7 * 86_400_000;
     for (const t of out) t.recent = list.filter((m) => m.thread === t.id && Date.parse(m.createdAt) > week).length;
-    for (const d of this.s.reviewDachi ?? []) out.push({ id: d.id, kind: 'dachi', name: d.name, pic: null, unread: false, lastAt: d.lastAt, recent: d.recent, ...(d.stand ? { talk: { of: d.id, stand: d.stand } } : {}) });
+    for (const d of this.s.reviewDachi ?? []) out.push({ id: d.id, kind: 'dachi', name: d.name, pic: null, unread: !!d.unread, lastAt: d.lastAt, recent: d.recent, ...(d.stand ? { talk: { of: d.id, stand: d.stand } } : {}) });
     return rankDachi(out);
   }
   private dachiThreadOk(thread: string) {

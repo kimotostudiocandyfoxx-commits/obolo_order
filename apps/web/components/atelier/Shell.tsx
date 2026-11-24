@@ -4,34 +4,29 @@ import type { Me } from '@obolo/shared';
 import { useEffect, useState } from 'react';
 import { LineIcon } from '@/components/LineIcon';
 import { useAuth } from '@/lib/auth';
-import { openKinds, type AtelierKind } from '@/lib/atelier/unlock';
+import type { AtelierKind } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { AtelierChat, newTalk } from './AtelierChat';
 import { BatiDay } from './DayReplay';
-import { useAtelierCtx } from './ctx';
 import { ThreadsDrawer } from './Drawers';
 import { talkWith, type Talk } from './shelf';
-import type { Work } from './work';
 import type { StoryMode } from './story';
 import { BATI_THREAD, type RenderThread, type ThreadInfo } from './threads';
 
 /**
- * Bluena is handed over on the morning of day 3 (D04-S002 sets d3.f_d04_bluena); before that there is no right drawer at
+ * Bluena is handed over on the morning of day 3 (D04-S002 sets d3.f_d04_bluena); before that there is no Bluena device at
  * all (M-R212). Day 4 on is a fallback in case the flag was not kept.
  */
 export const hasBluena = (me: Me | null) => !me || me.story?.['d3.f_d04_bluena'] === 'true' || me.journeyDay >= 4;
 
 /**
  * 月で作る's frame (M-R211/M-R212): the chat in the centre, the conversations on the left ({bati} first, then the ダチ
- * threads given in `threads`), Bluena on the right from day 3. {bati}'s thread is AtelierChat; any other thread is drawn
+ * threads given in `threads`), Bluena (the device, R10: bottom left; no right drawer any more) from day 3. {bati}'s thread is AtelierChat; any other thread is drawn
  * by `renderThread` in the same place (see threads.ts).
  */
 export function Shell({ first, threads = [], renderThread, story, onBack, open, banner, onDevice }: { first: AtelierKind | null; /** R10: the Bluena device */ onDevice?: () => void; /** the Moon chat's tabs (MoonTabs), under the talk's bar */ banner?: React.ReactNode; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode; /** the page's way out, in the talk's own bar */ onBack?: () => void; /** a thread (and one day of its past) to open with, from another talk's drawer (?thread=&day=) */ open?: { thread: string; day?: string; /** M-R253 §5: the message to open the day at */ at?: string; /** M-R253 §4: the talk whose card waits for this job */ job?: string } }) {
   const { me } = useAuth();
   const partner = usePartner();
-  const ctx = useAtelierCtx();
-  const day = me?.journeyDay;
-  const bluena = !!story?.bluena || hasBluena(me);
   const [thread, setThread] = useState<string>(open?.thread || BATI_THREAD);
   // M-R253 §4: opened from the toast / the push: the talk with that card (else a new talk)
   const [talk, setTalk] = useState<Talk>(() => (open?.job && talkWith((w) => w.job?.id === open.job || w.id === open.job)) || newTalk(me, partner.isBati));
