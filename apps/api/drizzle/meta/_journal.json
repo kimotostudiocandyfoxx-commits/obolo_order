@@ -309,6 +309,13 @@
       "when": 1795480921819,
       "tag": "0043_subscription_period",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1795486915187,
+      "tag": "0044_chibi_record_colour",
+      "breakpoints": true
     }
   ]
 }

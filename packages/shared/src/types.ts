@@ -67,6 +67,8 @@ export interface Me {
   lookHistory?: string[];
   /** the painted ぷにぷに picture (AI, transparent PNG); shown instead of the code-drawn look */
   puniPic: string | null;
+  /** M-R262: the 2-heads glossy mini figure painted once from the look (null until it is made) */
+  chibiPic?: string | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */
   butterfly: string | null;
   /**

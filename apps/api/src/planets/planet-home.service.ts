@@ -122,13 +122,13 @@ export const aroundWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, si
 export const farWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
   sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)})`;
 
-type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null };
+type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null };
 
 export function toWork(r: Row, kind: PlanetWorkKind, rel: HomeRel): HomeWork {
   return {
     id: r.id,
     kind,
-    author: { id: r.userId, name: r.name, pic: r.pic },
+    author: { id: r.userId, name: r.name, pic: r.pic, chibi: r.chibi ?? null },
     rel,
     text: r.text ?? '',
     title: r.title || undefined,
@@ -145,7 +145,7 @@ export class PlanetHomeService {
 
   private async rows(s: Store, where: SQL, order: SQL, limit: number): Promise<Row[]> {
     return (await this.db.read
-      .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl })
+      .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl, chibi: users.chibiPicUrl })
       .from(s.t as typeof saturnPosts)
       .innerJoin(users, sql`${users.id} = ${s.userId}`)
       .where(and(where, isNull(users.deletedAt)))
@@ -169,7 +169,7 @@ export class PlanetHomeService {
     if (!me) throw apiError(HttpStatus.NOT_FOUND, 'NOT_FOUND', 'User not found');
     const young = seesOnlyDachi((me.onboarding as { birthYear?: number } | null)?.birthYear ?? null, now);
     const h = await this.home(viewerId, planet);
-    const base = { planet, owner: { id: me.id, name: me.name }, young, lastVisitAt: h?.lastVisitAt?.toISOString() ?? null };
+    const base = { planet, owner: { id: me.id, name: me.name }, young, lastVisitAt: h?.lastVisitAt?.toISOString() ?? null, recordColour: h?.recordColour ?? null };
     const s = storeOf(planet);
     if (!s || !cfg.store) return { ...base, live: false, own: [], around: [], far: [] };
     const kind = cfg.store;
@@ -201,6 +201,15 @@ export class PlanetHomeService {
       .values({ userId, planet, lastVisitAt: now, updatedAt: now })
       .onConflictDoUpdate({ target: [planetHomes.userId, planetHomes.planet], set: { lastVisitAt: now, updatedAt: now } });
     return { lastVisitAt: h?.lastVisitAt?.toISOString() ?? null };
+  }
+
+  /** M-R262: your record's colour (kept with the home) */
+  async setColour(userId: string, planet: HomePlanet, colour: string): Promise<{ colour: string }> {
+    await this.db.write
+      .insert(planetHomes)
+      .values({ userId, planet, recordColour: colour, updatedAt: new Date() })
+      .onConflictDoUpdate({ target: [planetHomes.userId, planetHomes.planet], set: { recordColour: colour, updatedAt: new Date() } });
+    return { colour };
   }
 
   /** 並べかえ: your own works in your place (only your own ids are kept) */

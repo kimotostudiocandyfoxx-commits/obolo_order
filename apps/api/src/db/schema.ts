@@ -47,6 +47,8 @@ export const users = pgTable(
     lookJson: jsonb('look_json').$type<PuniLook>(),
     /** the painted ぷにぷに picture (AI, transparent PNG on Bunny) */
     puniPicUrl: text('puni_pic_url'),
+    /** M-R262: the member's 2-heads glossy mini figure, jumping out of a popped ball on Saturn (painted once from the look) */
+    chibiPicUrl: text('chibi_pic_url'),
     /** Jupiter: painted butterfly (PNG on Bunny) */
     butterflyUrl: text('butterfly_url'),
     /** Jupiter: the four branch names on the tree (null = the defaults) */
@@ -954,6 +956,8 @@ export const planetHomes = pgTable(
     planet: text('planet').notNull(),
     lastVisitAt: timestamp('last_visit_at', { withTimezone: true }),
     orderJson: jsonb('order_json').$type<string[]>(),
+    /** M-R262 (Saturn): the record's colour (black / pink / lavender / mint / gold / sky) */
+    recordColour: text('record_colour'),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.planet] })],

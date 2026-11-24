@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { isHomePlanet, PlanetHomeOrderBody, type HomePlanet } from '@obolo/shared';
+import { isHomePlanet, PlanetHomeColourBody, PlanetHomeOrderBody, type HomePlanet } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { apiError } from '../common/errors';
 import { rateLimit } from '../common/rate-limit';
@@ -40,6 +40,13 @@ export class PlanetHomeController {
   async reorder(@UserId() userId: string, @Param('planet') planet: string, @Body() body: unknown) {
     await rateLimit(this.kv, `home-order:${userId}`, 60, 600);
     return this.homes.reorder(userId, planetOf(planet), parseBody(PlanetHomeOrderBody, body).ids);
+  }
+
+  /** M-R262: the record's colour */
+  @Put('colour')
+  async colour(@UserId() userId: string, @Param('planet') planet: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `home-colour:${userId}`, 60, 600);
+    return this.homes.setColour(userId, planetOf(planet), parseBody(PlanetHomeColourBody, body).colour);
   }
 
   @Delete('own/:id')

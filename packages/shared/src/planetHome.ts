@@ -20,7 +20,8 @@ export type HomeRel = 'own' | 'dachi' | 'oshi' | 'stranger';
 export interface HomeWork {
   id: string;
   kind: PlanetWorkKind;
-  author: { id: string; name: string; pic?: string | null };
+  /** pic: the puni face; chibi: the 2-heads mini figure that jumps out of the popped ball (M-R262; a round face until made) */
+  author: { id: string; name: string; pic?: string | null; chibi?: string | null };
   rel: HomeRel;
   /** the words (Saturn: what was blown in, shown while it sings) */
   text: string;
@@ -52,6 +53,8 @@ export interface PlanetHomeView {
   young: boolean;
   /** the last time this screen was opened (null the first time): newer works sparkle and fall in */
   lastVisitAt: string | null;
+  /** M-R262 (Saturn): the colour chosen for your record (RECORD_COLOURS id; black when unset) */
+  recordColour?: string | null;
   /** your works in your place, forever: your order first, then newest first */
   own: HomeWork[];
   /** dachi and 推し, flown in the last 88 hours, newest first */
@@ -59,6 +62,19 @@ export interface PlanetHomeView {
   /** a few strangers for the far scenery (empty for the young) */
   far: HomeWork[];
 }
+
+/** M-R262: the record's colours (a screen-blended layer over the record, design/home/saturn-record-mask.png) */
+export const RECORD_COLOURS = [
+  { id: 'black', name: '黒', color: null },
+  { id: 'pink', name: 'ピンク', color: '#ff7ac8' },
+  { id: 'lavender', name: 'ラベンダー', color: '#9b7bff' },
+  { id: 'mint', name: 'ミント', color: '#3fe0b8' },
+  { id: 'gold', name: 'ゴールド', color: '#ffbf40' },
+  { id: 'sky', name: '空色', color: '#5cb8ff' },
+] as const;
+export type RecordColour = (typeof RECORD_COLOURS)[number]['id'];
+export const PlanetHomeColourBody = z.object({ colour: z.enum(['black', 'pink', 'lavender', 'mint', 'gold', 'sky']) });
+export type PlanetHomeColourBody = z.infer<typeof PlanetHomeColourBody>;
 
 export const PlanetHomeOrderBody = z.object({ ids: z.array(z.string().uuid()).max(500) });
 export type PlanetHomeOrderBody = z.infer<typeof PlanetHomeOrderBody>;
