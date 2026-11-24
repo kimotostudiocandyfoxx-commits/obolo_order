@@ -9924,10 +9924,10 @@
     {
       "id": "plaque-1",
       "w": 1280,
-      "h": 512,
+      "h": 720,
       "size": [
         1000,
-        400
+        562
       ],
       "always": false,
       "prompt": "A luxurious horizontal title plaque seen straight from the front: a polished dark walnut wood board with a thin bright gold metal frame, tiny ornate gold corner pieces and two small gold rivets, the centre is an empty smooth wood surface for text. Crisp, premium, stylish. Plain solid pure white background, no shadow, no text, no letters."
@@ -9935,10 +9935,10 @@
     {
       "id": "plaque-2",
       "w": 1280,
-      "h": 512,
+      "h": 720,
       "size": [
         1000,
-        400
+        562
       ],
       "always": false,
       "prompt": "A stylish modern horizontal title plate seen straight from the front: glossy black lacquer with a thin gold-leaf border line and a subtle gold glow on the edges, rounded corners, the centre is an empty black surface for text. Sleek, premium, cool. Plain solid pure white background, no shadow, no text, no letters."
