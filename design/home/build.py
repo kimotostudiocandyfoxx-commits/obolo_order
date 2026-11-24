@@ -59,6 +59,11 @@ for n,pre in [(n,pre) for pre in ('kor2','kor3') for n in range(1,31)]:
     ys,xs=np.where(m); x0,x1=np.percentile(xs,[.5,99.5]); y0,y1=np.percentile(ys,[.5,99.5]); cx,cy=(x0+x1)/2,(y0+y1)/2; r=min(x1-x0,y1-y0)/2-2
     S=4; mk=Image.new('L',(im.width*S,im.height*S),0); _D2.Draw(mk).ellipse(((cx-r)*S,(cy-r)*S,(cx+r)*S,(cy+r)*S),fill=255); mk=mk.resize(im.size,Image.LANCZOS)
     o=im.convert('RGBA'); o.putalpha(mk); o=o.crop((int(cx-r-2),int(cy-r-2),int(cx+r+2),int(cy+r+2))); o.thumbnail((200,200),Image.LANCZOS); A[f'{pre}-{n:02d}']=uri(o,88)
+VD=os.environ.get('VOICE_DIR')
+if VD:
+    for n in range(1,6):
+        f=f'{VD}/line-{n:02d}.mp3'
+        if os.path.exists(f): A[f'voice-{n:02d}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea2')
 RECMASK=H+('/saturn-record-mask2.png' if SAT.endswith('cutea2') else '/saturn-record-mask.png')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
@@ -72,4 +77,4 @@ if SAT.startswith('home2-bg-saturn-cutea') and os.path.exists(RECMASK):
     al=Image.fromarray((fg*255).astype('uint8')).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.6))
     fi=src.convert('RGBA'); fi.putalpha(al); fi.thumbnail((720,1280)); A['sat-fg']=uri(fi,82)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
-open(H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')
+open(os.environ.get('OUT_HTML') or H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')

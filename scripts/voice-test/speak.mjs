@@ -24,15 +24,15 @@ form.append('title', 'voice try-out (temporary)');
 form.append('visibility', 'private');
 form.append('type', 'tts');
 form.append('train_mode', 'fast');
-form.append('texts', readFileSync('/tmp/voice/voice.txt', 'utf8'));
-form.append('voices', new Blob([readFileSync('/tmp/voice/voice.wav')], { type: 'audio/wav' }), 'voice.wav');
+form.append('texts', readFileSync((process.env.VOICE_DIR||'/tmp/voice')+'/voice.txt', 'utf8'));
+form.append('voices', new Blob([readFileSync((process.env.VOICE_DIR||'/tmp/voice')+'/voice.wav')], { type: 'audio/wav' }), 'voice.wav');
 const made = await fetch(`${BASE}/model`, { method: 'POST', headers: { authorization: `Bearer ${KEY}` }, body: form });
 if (!made.ok) throw new Error(`create voice ${made.status}: ${(await made.text()).slice(0, 200)}`);
 const j = await made.json();
 const id = j._id ?? j.id;
 console.log('voice model ready');
 
-mkdirSync('/tmp/voice-out', { recursive: true });
+mkdirSync((process.env.OUT_DIR||'/tmp/voice-out'), { recursive: true });
 try {
   for (const [n, text] of LINES) {
     const res = await fetch(`${BASE}/v1/tts`, {
@@ -41,7 +41,7 @@ try {
       body: JSON.stringify({ text, reference_id: id, format: 'mp3', mp3_bitrate: 128, latency: 'normal', normalize: true }),
     });
     if (!res.ok) { console.log(`line ${n} failed ${res.status}: ${(await res.text()).slice(0, 200)}`); continue; }
-    writeFileSync(`/tmp/voice-out/line-${n}.mp3`, Buffer.from(await res.arrayBuffer()));
+    writeFileSync(`${process.env.OUT_DIR||'/tmp/voice-out'}/line-${n}.mp3`, Buffer.from(await res.arrayBuffer()));
     console.log(`line ${n} done`);
   }
 } finally {
