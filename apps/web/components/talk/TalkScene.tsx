@@ -16,6 +16,14 @@ import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
 
 const MUTE_KEY = 'obolo.talk.muted';
+/** the talk's own sound button is off (its choice is kept on this device) */
+export function talkMuted(): boolean {
+  try {
+    return localStorage.getItem(MUTE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 /**
  * 隣に並ぶトーク (M-R232〜M-R242, docs/story-rewrite/会話の画面.md, design/talk/proto.html): only the two standing side by

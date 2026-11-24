@@ -2,7 +2,9 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { TalkComposer } from '@/components/talk/TalkComposer';
-import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
+import { talkMuted, TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
+import { batiVoiceUrl, speakable } from '@/lib/atelier/batiSpeak';
+import { playClip } from '@/lib/voice/webVoice';
 import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -621,6 +623,36 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       .catch(() => setLesson(null));
   }
 
+  // client 2026-11-24: {bati} speaks its replies aloud (batiSpeak.ts): each new {bati} line once, the newest one when several
+  // come together; not in a story step (its script lines are the story's); quiet when muted / not unlocked / no voice
+  const [speaking, setSpeaking] = useState<{ who: string; level: () => number } | null>(null);
+  const spoken = useRef<Set<string> | null>(null);
+  const speakGen = useRef(0);
+  useEffect(() => {
+    if (story) return;
+    // what was in the talk when it opened is not read again (the greeting of a fresh talk is)
+    if (!spoken.current) spoken.current = new Set(msgs.some((m) => m.who === 'me') ? msgs.map((m) => m.id) : []);
+    const fresh = msgs.filter((m): m is Extract<Msg, { who: 'bati' }> => m.who === 'bati' && !spoken.current!.has(m.id) && !!m.text);
+    for (const m of msgs) spoken.current.add(m.id);
+    const last = fresh.at(-1);
+    if (!last || talkMuted()) return;
+    const words = speakable(last.text);
+    if (!words) return;
+    const g = ++speakGen.current;
+    void (async () => {
+      const url = await batiVoiceUrl(words);
+      if (!url || g !== speakGen.current || talkMuted()) return;
+      const clip = await playClip(url);
+      if (!clip || g !== speakGen.current) return void clip?.stop();
+      speakClip.current = clip;
+      setSpeaking({ who: 'bati', level: clip.level });
+      await clip.done;
+      if (g === speakGen.current) setSpeaking(null);
+    })();
+  }, [msgs, story]);
+  const speakClip = useRef<{ stop: () => void } | null>(null);
+  useEffect(() => () => void (speakGen.current++, speakClip.current?.stop()), []);
+
   // M-R232: the side-by-side talk — you at the right, {bati} (or the story's speaker) at the left, the Moon behind
   const people: TalkPerson[] = [
     { id: 'bati', name: partner.name, look: own.isBati || story ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
@@ -704,6 +736,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         people={people}
         items={items}
         thinking={busy || making ? 'bati' : null}
+        voice={speaking ?? undefined}
         listening={talkState.listening}
         keyboard={talkState.keyboard}
         place={PLACE_BG.moon}

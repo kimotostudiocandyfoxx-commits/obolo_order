@@ -138,21 +138,30 @@ export class LineVoiceService implements OnModuleInit {
    * when it comes and goes on with the words alone if it does not. The answer was already checked by the buddy.
    */
   async batiSays(userId: string, text: string, origin: string): Promise<{ url: string } | null> {
+    // client 2026-11-24 (the Moon chat speaks too): the same words are read once a day per person (a cached file)
+    const cacheKey = `bs:${userId}:${createHash('sha256').update(speakText(text)).digest('hex').slice(0, 32)}`;
+    const cached = await this.kv.get(cacheKey).catch(() => null);
+    if (cached) return { url: cached };
+    // every voice counts toward the day's read-aloud limit (DAILY, shared with the story's line voices) — Fish too
+    if ((await this.kv.incr(`lv-day:${userId}:${Math.floor(Date.now() / 86_400_000)}`, 86_400)) > DAILY) return null;
+    const keep = async (url: string) => {
+      await this.kv.set(cacheKey, url, 86_400).catch(() => undefined);
+      return { url };
+    };
     // M-R246: the member's own {bati} voice (from the egg recording) when it is made; iPad feedback: else the shared
     // default {bati} voice model (FISH_DEFAULT_VOICE_ID) when it is set; else the story's {bati} voice (Gemini)
     const own = await this.batiVoice?.speak(userId, speakText(text)).catch((e) => (this.log.warn(`own bati voice: ${String(e)}`), null));
-    if (own) return { url: (await this.media.storeAudio(userId, 'audio/mpeg', own, origin)).url };
+    if (own) return keep((await this.media.storeAudio(userId, 'audio/mpeg', own, origin)).url);
     const nl = await this.lines();
     const bati = nl && Object.values(nl.lines).find((l) => l.who === 'バティ');
     if (!nl || !bati || !this.cfg.GEMINI_API_KEY) return null;
-    if ((await this.kv.incr(`lv-day:${userId}:${Math.floor(Date.now() / 86_400_000)}`, 86_400)) > DAILY) return null;
     // M-R250: the prepared voice for this {bati}'s egg and personality (no voice of the member's own)
     const dv = await this.batiVoice?.defaultVoice(userId).catch(() => null);
     const spec = { ...bati.spec, model: undefined, ...(dv ? { voice: dv.gemini, pitch: dv.pitch } : {}) };
     const p: JobPayloads['voice.line'] = { userId, hash: '', origin, who: 'バティ', text, spec, brief: bati.brief, model: BATI_SAYS_MODEL, tempo: nl.tempo };
     const mp3 = await this.slot(() => this.gemini(p, storyVoiceFilter(p.spec, p.tempo)));
     const m = await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin);
-    return { url: m.url };
+    return keep(m.url);
   }
 
   private async slot<T>(fn: () => Promise<T>): Promise<T> {

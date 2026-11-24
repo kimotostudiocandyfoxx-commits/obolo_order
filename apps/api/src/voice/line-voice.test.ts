@@ -56,3 +56,36 @@ describe('story lines with the member names', () => {
     expect(queue.enqueue).not.toHaveBeenCalled();
   });
 });
+
+describe('client 2026-11-24: {bati} speaks in the Moon chat (batiSays)', () => {
+  function says(own: Buffer | null) {
+    const kvData = new Map<string, string>();
+    const kv = {
+      get: async (k: string) => kvData.get(k) ?? null,
+      set: async (k: string, v: string) => void kvData.set(k, v),
+      incr: async (k: string) => {
+        const n = Number(kvData.get(k) ?? 0) + 1;
+        kvData.set(k, String(n));
+        return n;
+      },
+    };
+    const speak = vi.fn(async () => own);
+    let n = 0;
+    const media = { storeAudio: vi.fn(async () => ({ url: `https://cdn/v${++n}.mp3`, id: `m${n}` })) };
+    const s = new LineVoiceService({ GEMINI_API_KEY: undefined } as never, kv as never, { register: vi.fn() } as never, {} as never, media as never, { speak, defaultVoice: async () => null } as never);
+    return { s, kvData, speak, media };
+  }
+  it('the Fish voice (own or default) is used, and the same words come from the cache the next time', async () => {
+    const w = says(Buffer.from('mp3'));
+    expect(await w.s.batiSays('u1', 'やっほー！', 'http://api')).toEqual({ url: 'https://cdn/v1.mp3' });
+    expect(await w.s.batiSays('u1', 'やっほー！', 'http://api')).toEqual({ url: 'https://cdn/v1.mp3' });
+    expect(w.speak).toHaveBeenCalledTimes(1);
+    expect(w.media.storeAudio).toHaveBeenCalledTimes(1);
+  });
+  it('counts toward the day\'s read-aloud limit (300), Fish too', async () => {
+    const w = says(Buffer.from('mp3'));
+    w.kvData.set(`lv-day:u1:${Math.floor(Date.now() / 86_400_000)}`, '300');
+    expect(await w.s.batiSays('u1', 'あたらしい言葉', 'http://api')).toBeNull();
+    expect(w.speak).not.toHaveBeenCalled();
+  });
+});
