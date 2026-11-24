@@ -9226,6 +9226,116 @@
       ],
       "always": false,
       "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a graceful cute pose, tentacle hair flowing. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "home3-bg-jupiter",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Lush painterly Japanese anime fantasy film background art, like a hand-painted background from a theatrical anime movie: richly detailed foliage, saturated emerald and jade greens, warm golden afternoon sunlight streaming through the canopy in god rays, floating glowing light motes and tiny pollen sparkles, soft atmospheric depth, dreamy and magical, cinematic. Vertical phone wallpaper 9:16. Scene: a mystical giant forest on the planet Jupiter; Jupiter's huge banded orange-cream disc is visible in the sky through a gap in the canopy at the top. At the back right stands ONE enormous ancient tree with a thick twisting trunk and a small round wooden door with a warm glowing window set into its trunk, little lanterns hanging from its roots — it is clearly someone's home and atelier. The lower half and the centre are an open soft mossy clearing with flowers and ferns, empty and calm, with plenty of open space in front for many flying butterflies. No characters, no animals, no butterflies, no people, no text, no letters."
+    },
+    {
+      "id": "bfly3-1",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single magical butterfly drawn in Japanese anime fantasy film style, seen straight from the front with both wings fully spread and symmetrical, wings coloured sapphire blue and white with glowing cyan edges, delicate glowing veins, soft luminous anime shading and sparkles, small cute body. Centered, the whole butterfly inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "bfly3-2",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single magical butterfly drawn in Japanese anime fantasy film style, seen straight from the front with both wings fully spread and symmetrical, wings coloured sunset orange and gold with cream spots, delicate glowing veins, soft luminous anime shading and sparkles, small cute body. Centered, the whole butterfly inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "bfly3-3",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single magical butterfly drawn in Japanese anime fantasy film style, seen straight from the front with both wings fully spread and symmetrical, wings coloured sakura pink and pearl white with glittering tips, delicate glowing veins, soft luminous anime shading and sparkles, small cute body. Centered, the whole butterfly inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "bfly3-4",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single magical butterfly drawn in Japanese anime fantasy film style, seen straight from the front with both wings fully spread and symmetrical, wings coloured royal purple and gold with star-like dots, delicate glowing veins, soft luminous anime shading and sparkles, small cute body. Centered, the whole butterfly inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "jart-1",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A square artwork: a city-pop style sunset over a seaside town with a pink sky, retro anime look. Polished Japanese anime illustration, rich colours, no text, no letters, no signature, no border."
+    },
+    {
+      "id": "jart-2",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A square artwork: a cat sleeping on a rooftop under a starry night, cozy anime illustration. Polished Japanese anime illustration, rich colours, no text, no letters, no signature, no border."
+    },
+    {
+      "id": "jart-3",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A square artwork: a steaming bowl of ramen drawn as a dramatic glowing anime still life. Polished Japanese anime illustration, rich colours, no text, no letters, no signature, no border."
+    },
+    {
+      "id": "jart-4",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A square artwork: a street of cherry blossoms with petals flying, bright youthful anime look. Polished Japanese anime illustration, rich colours, no text, no letters, no signature, no border."
+    },
+    {
+      "id": "jart-5",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A square artwork: a lone figure watching a huge full moon over the ocean, emotional anime key visual. Polished Japanese anime illustration, rich colours, no text, no letters, no signature, no border."
     }
   ],
   "redo": []
