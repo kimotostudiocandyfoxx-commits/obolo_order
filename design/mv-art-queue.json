@@ -9970,6 +9970,20 @@
         "design/mv-art/out/home2-bg-saturn-needle.jpg"
       ],
       "prompt": "A NEW view in exactly the same soft kawaii pastel anime style, colours and world as the reference picture. Vertical phone wallpaper 9:16. An extreme close, low-angle view on the surface of an ENORMOUS glossy black vinyl record that fills almost the entire frame: the shining grooves sweep in huge gentle arcs from the left edge across to the right edge, like a vast round dance floor, sparkles on the grooves; the pastel label is only partly visible at the far right edge; the pastel mint tonearm with its needle peeks in at the top-right corner; only a thin strip of the dreamy pastel sky with the candy-striped rings at the very top. The middle of the record is open and empty. No characters, no text."
+    },
+    {
+      "id": "home2-bg-saturn-close2",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-close.jpg"
+      ],
+      "prompt": "Edit the reference picture and keep everything exactly the same — the same enormous glossy black record surface filling the frame, the same sweeping grooves, sparkles, pastel label at the right edge, the pastel sky strip with the rings at the top, the same soft kawaii pastel anime style. Only remove the tonearm and needle at the top-right corner completely, and fill that area naturally with the record surface, grooves and sky. No tonearm, no needle, no characters, no text."
     }
   ],
   "redo": []
