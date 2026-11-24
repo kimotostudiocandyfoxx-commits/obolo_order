@@ -174,9 +174,9 @@ describe('day 3: Bluena and Saturn (story 2026-10-14)', () => {
     expect(steps[dv]).toEqual({ t: 'dachivoice', fallback: { t: 'say', who: 'MIKIE⭐︎DRILL', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。' } });
     expect(steps[dv + 1]).toMatchObject({ t: 'branch', key: 'f_d04_voice_reply', cases: { reply: 'reply' }, otherwise: 'reply-later' });
     expect(t.indexOf('ticket')).toBeGreaterThan(t.indexOf('clock'));
-    const c = steps.find((s) => s.t === 'choice' && s.key === 'f_join_early');
-    expect(c?.t === 'choice' && c.options.map((o) => o.label)).toEqual(['先にObolo Orderになる', '8日目に決める']);
-    expect(steps.some((s) => s.t === 'scene' && s.id === 'SYS-S002')).toBe(true);
+    // M-R274: no MONBAN transmission at the end of day 3 (no early/later choice, no SYS-S002 from here)
+    expect(steps.some((s) => s.t === 'choice' && s.key === 'f_join_early')).toBe(false);
+    expect(steps.some((s) => s.t === 'scene' && s.id === 'SYS-S002')).toBe(false);
   });
 });
 

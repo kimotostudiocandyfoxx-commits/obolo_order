@@ -1,5 +1,4 @@
 import type { Step } from './script';
-import { SYS002 } from './sys002';
 
 /**
  * DAY 3 【月 → 土星】 — the simple version (M-R208〜M-R212; wip/P02/c02.md D04-S002〜S002b, c03.md D04-S003〜S007; the scene
@@ -341,31 +340,7 @@ export const DAY3: Step[] = [
   { t: 'sprite', image: null },
   { t: 'wait', s: 1.6 },
   { t: 'caption', text: 'また明日' },
-  // 〔通信：MONBANから（読まなくても、旅は続く）〕 — once, at the end of day 3 (M-R198)
-  { t: 'se', sound: 'blip' },
-  { t: 'screen', open: true },
-  { t: 'say', who: 'MONBAN', text: '……{neo}。旅は、8日目に、地球の神殿へ帰って終わる…。そこで、エクリプスを受けるかを決める…。' },
-  { t: 'say', who: 'MONBAN', text: '……8日目まで待てないなら、先に、Obolo Orderになってもいい…。月に、88円だ…。' },
-  { t: 'say', who: 'MONBAN', text: '……先になっても、旅の道は変わらない…。{bati}のマナが、切れなくなる…。' },
-  {
-    t: 'choice',
-    key: 'f_join_early',
-    options: [
-      { label: '先にObolo Orderになる', goto: 'join-early' },
-      { label: '8日目に決める', goto: 'join-later' },
-    ],
-  },
-  { t: 'label', id: 'join-later' },
-  { t: 'say', who: 'MONBAN', text: '……そうか…。8日目に、待っている…。' },
-  { t: 'goto', id: 'join-close' },
-  { t: 'label', id: 'join-early' },
-  { t: 'say', who: 'MONBAN', text: '……そうか…。では、一度、結社に戻ってこい…。詳しく、話したい…。' },
-  { t: 'screen', open: false },
-  { t: 'label', id: 'sys-s002' },
-  ...SYS002, // SYS-S002 「結社で、詳しく話したい」 (M-R202), then back to the end of the day
-  { t: 'goto', id: 'day-end' },
-  { t: 'label', id: 'join-close' },
-  { t: 'screen', open: false },
-  { t: 'label', id: 'day-end' },
+  // M-R274: MONBAN's transmission (become Obolo Order early, 月に88円) is gone from here — the price is first said on
+  // Jupiter (D05-S006); becoming a member early is from the settings on days 4–7 (SYS-S002)
   { t: 'end' },
 ];

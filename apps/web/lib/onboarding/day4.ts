@@ -47,6 +47,17 @@ export const DAY4: Step[] = [
   { t: 'say', who: 'OBOLON', text: '、、、いいアートだ。' },
   { t: 'say', who: 'KIMORIN', text: '反応の数は、どこで拝見できます？' },
   { t: 'say', who: 'OBOLON', text: '、、、点も、数も、ない。' },
+  // M-R274: the first word of the eclipse and its price (月88円), right after KIMORIN's first card that used mana
+  { t: 'sprite', image: ['obolon', 'kimorin-sun'] }, // KIMORINが、カードのすみの「−3マナ」に、サングラスを近づける
+  { t: 'say', who: 'KIMORIN', text: '……もし、マナを、使い切ったら、どうなるのですか？' },
+  { t: 'say', who: 'OBOLON', text: '、、、エクリプスを受けた者は、体から、毎月、88マナが湧く。' },
+  { t: 'say', who: 'KIMORIN', text: 'お、お金が、かかるのですか？' },
+  { t: 'say', who: 'OBOLON', text: '、、、月に、88円だ。' },
+  { t: 'say', who: 'KIMORIN', text: 'は、はい出ました、超高額入会費……！' },
+  { t: 'say', who: 'OBOLON', text: '、、、88円だ。' },
+  { t: 'say', who: 'OBOLON', text: 'マナを使わない遊びは、、、受けなくても、ずっと、自由だ。' },
+  { t: 'notice', text: '{bati}と話す・土星で聞く／触る・ダチとのチャットと声は、エクリプスを受けなくても、ずっと使えます' },
+  { t: 'say', who: 'OBOLON', text: '決めるのは、、、全部の星を、見てからで、いい。' },
   {
     t: 'choice',
     key: 'f_d05_kimorin_sticker',

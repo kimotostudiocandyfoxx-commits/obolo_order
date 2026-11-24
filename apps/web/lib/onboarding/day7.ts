@@ -161,6 +161,7 @@ export const DAY7: Step[] = [
   { t: 'caption', text: '5つの星を、まわった' },
   { t: 'sprite', image: ['bossg', 'kimorin-sun'] },
   { t: 'say', who: 'ボスG', text: '明日は、地球だ。その先に、太陽がある。' },
+  { t: 'say', who: 'KIMORIN', text: '……明日は、決める日、ですね。' },
   { t: 'sprite', image: 'kimorin-sun' },
   { t: 'say', who: 'KIMORIN', text: '……{neo}の曲が、まだ耳に残っています。……すね毛の、次くらいに。' },
   { t: 'set', key: 'f_d07v_done', value: 'true' },

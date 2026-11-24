@@ -7,6 +7,7 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { getApi } from '@/lib/api';
 import { openManaGems, WALLET_CHANGED } from '@/components/ManaGemSheet';
 import { useAuth } from '@/lib/auth';
+import { canJoinEarly } from '@/lib/onboarding/joinFlags';
 
 /**
  * 〔設定〕 — for now the 〔毎月のマナ〕 part (M-R199 / M-R202): your mana, whether you are Obolo Order, and on days 3–7 of
@@ -37,8 +38,8 @@ function Settings() {
   }, []);
   if (!me) return null;
   const ordered = !!me.orderedAt;
-  // from the end of day 3 to day 7 (day 8 decides it in the story itself)
-  const early = !ordered && (me.journeyDay > 3 || (me.journeyDay === 3 && !!me.journeyCompletedAt)) && me.journeyDay < 8;
+  // M-R274: from the end of day 4 (after Jupiter) to day 7 (day 8 decides it in the story itself)
+  const early = canJoinEarly(me);
   return (
     <main className="pt-safe pb-safe mx-auto min-h-svh max-w-md px-4 py-4">
       <header className="flex items-center gap-2">

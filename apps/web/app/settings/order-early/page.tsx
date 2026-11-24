@@ -6,7 +6,8 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { StoryPlayer } from '@/components/onboarding/StoryPlayer';
 import { getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { joinFlags } from '@/lib/onboarding/joinFlags';
+import { canJoinEarly, joinFlags } from '@/lib/onboarding/joinFlags';
+import { useEffect, useState } from 'react';
 import { SYS002_ALONE } from '@/lib/onboarding/sys002';
 
 /**
@@ -24,7 +25,13 @@ export default function OrderEarlyPage() {
 function OrderEarly() {
   const { me, setMe } = useAuth();
   const router = useRouter();
-  if (!me) return null;
+  // M-R274: only from the end of day 4 to day 7 (a link from elsewhere goes back to the settings) — judged when the page
+  // opens, so paying inside the scene does not close it
+  const [open] = useState(() => !!me && canJoinEarly(me));
+  useEffect(() => {
+    if (me && !open) router.replace('/settings');
+  }, [me, open, router]);
+  if (!me || !open) return null;
   return (
     <StoryPlayer
       steps={SYS002_ALONE}

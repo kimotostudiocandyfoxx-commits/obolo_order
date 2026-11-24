@@ -1,9 +1,9 @@
 import type { Step } from './script';
 
 /**
- * SYS-S002 「結社で、詳しく話したい」 (M-R202): becoming Obolo Order before day 8. Whichever way in — MONBAN's message at
- * the end of day 3 (day3.ts, label sys-s002) or 〔設定〕→〔毎月のマナ〕→〔先にObolo Orderになる〕 on days 3–7 — this scene
- * always plays: MONBAN's explanation and KIMORIN's suspicion of the "entry fee", then the payment screen (now / on day 8).
+ * SYS-S002 「結社で、詳しく話したい」 (M-R202): becoming Obolo Order before day 8. The one way in (M-R274: MONBAN's
+ * message at the end of day 3 is gone) — 〔設定〕→〔毎月のマナ〕→〔先にObolo Orderになる〕 on days 4 (after Jupiter's
+ * OBOLON) to 7 — this scene always plays: MONBAN's explanation and KIMORIN's suspicion of the "entry fee", then the payment screen (now / on day 8).
  * There is no way to pay that skips it. Someone who saw it before (f_ej_heard) gets the short version.
  * Saved: f_ej_heard = true; f_join_early = early (paid) / later; f_join = pay when paid. Day 8 reads them (story keys
  * f_join_early / f_ej_heard, see lib/onboarding/joinFlags.ts).
@@ -41,21 +41,16 @@ export const SYS002: Step[] = [
   { t: 'cam', move: 'in', focus: '50% 30%' },
   { t: 'say', who: 'MONBAN', text: '……{neo}。旅の途中で、Obolo Orderになりたいと、聞いた…。' },
   { t: 'say', who: 'MONBAN', text: '……Obolo Orderになると…お前の体から、マナが湧くようになる…。{bati}のマナも、切れなくなる…。' },
-  { t: 'say', who: 'MONBAN', text: '……それに、旅のあとで、まだ行っていない星にも行ける…。切符の裏の、錠の星だ…。' },
+  { t: 'say', who: 'MONBAN', text: '……それに、旅は、まだ続く…。切符の裏の、天王星、海王星、いちばん外の冥王星…。そこからは、Obolo Orderの旅だ…。' },
   { t: 'say', who: 'MONBAN', text: '……ここには、勝手に流れてくる広告もない…。知らない誰かの『おすすめ』も、流れてこない…。あるのは、誰かが自分の言葉で作ったものだけだ…。灯りは、みんなの88円で、ともしている…。' },
   { t: 'cam', move: 'out' },
   { t: 'bgm', track: 'suspect' },
   { t: 'sprite', image: ['', 'kimorin-sun'] },
-  { t: 'say', who: 'KIMORIN', text: '……はい、出ました。入会費です。' },
-  { t: 'say', who: 'KIMORIN', text: 'ついに、化けの皮が、剥がれましたね。' },
-  { t: 'say', who: 'OBOLON', text: '、、、入会費は、ない。' },
-  { t: 'say', who: 'KIMORIN', text: '……は？' },
-  { t: 'say', who: 'OBOLON', text: 'Obolo Orderになると、、、毎月、体から、88マナが湧く。' },
-  { t: 'say', who: 'OBOLON', text: 'その分が、、、月に、88円だ。' },
-  { t: 'say', who: 'KIMORIN', text: '…………。' },
-  { t: 'say', who: 'KIMORIN', text: '……つまり、入会費は、タダ、ということですね？' },
-  { t: 'say', who: 'OBOLON', text: '、、、そうだ。' },
-  { t: 'say', who: 'KIMORIN', text: '……うまい言い方を、しますね。' },
+  // M-R274: the price was first heard on Jupiter (D05-S006) — KIMORIN looks back on it
+  { t: 'say', who: 'KIMORIN', text: '……88円の話ですね。木星で、聞きました。超高額入会費です。' },
+  { t: 'say', who: 'OBOLON', text: '、、、88円だ。' },
+  { t: 'say', who: 'OBOLON', text: 'Obolo Orderになると、、、毎月、体から、88マナが湧く。その分が、、、月に、88円だ。' },
+  { t: 'say', who: 'OBOLON', text: 'マナが湧けば、、、{bati}と、何度でも、作れる。' },
   { t: 'say', who: 'KIMORIN', text: '月に88円、と言って、あとから、値上がりしていくのでしょう？' },
   { t: 'say', who: 'OBOLON', text: '、、、値上げは、しない。' },
   { t: 'say', who: 'KIMORIN', text: 'やめたくなったら？　どうせ、やめさせてくれない仕組みでしょう？' },

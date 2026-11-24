@@ -10,6 +10,7 @@ import { walk, type Scene } from '../lib/story/parse';
 import { STORIES } from '../lib/onboarding/stories';
 import { SCENE_DAY } from '../lib/onboarding/sceneDays';
 import { AFTER_DAYS } from '../lib/onboarding/after';
+import { SYS002_ALONE } from '../lib/onboarding/sys002';
 import { SYS003 } from '../lib/onboarding/sys003';
 
 const ROOT = resolve(__dirname, '../../..');
@@ -96,9 +97,10 @@ function section(title: string, inSection: (id: string) => boolean, app: L[]) {
 }
 
 for (let day = 1; day <= 8; day++) {
-  // SYS-S002 (joining early) plays at the end of day 3 (and from the settings)
-  section(`${day}日目`, (id) => (id === 'SYS-S002' ? 3 : SCENE_DAY(id)) === day, [...sayLines(STORIES[day]?.steps ?? []), ...lessonLines(day)]);
+  section(`${day}日目`, (id) => id !== 'SYS-S002' && SCENE_DAY(id) === day, [...sayLines(STORIES[day]?.steps ?? []), ...lessonLines(day)]);
 }
+// SYS-S002 (joining early) plays only from the settings, days 4 (after Jupiter) to 7 (M-R274) — lib/onboarding/sys002.ts
+section('先にObolo Order（SYS-S002・設定から）', (id) => id === 'SYS-S002', sayLines(SYS002_ALONE));
 // after joining (P05m: M-URANUS / M-PLUTO / M-NEPTUNE / M-END) — lib/onboarding/after.ts
 section('会員後', (id) => id.startsWith('M-'), sayLines(AFTER_DAYS));
 // SYS-S003 (the grown egg, 88 days on) plays from the Moon whenever the egg is ready — lib/onboarding/sys003.ts
