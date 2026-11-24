@@ -77,11 +77,16 @@ for n in range(1,5):
 for n in range(1,6):
     f=f'{H}/songs/song-{n}.mp3'
     if os.path.exists(f): A[f'song-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
+for k in 'user kimorin monban mikie brother sister'.split():
+    f=f'{O}/chibi3-{k}.jpg'
+    if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi3-'+k]=uri(kk,86)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
         f=f'{VD}/line-{n:02d}.mp3'
         if os.path.exists(f): A[f'voice-{n:02d}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
+        f=f'{VD}/title-{n}.mp3'
+        if os.path.exists(f): A[f'vtitle-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea3')
 RECMASK=H+{'2':'/saturn-record-mask2.png','3':'/saturn-record-mask3.png'}.get(SAT[-1],'/saturn-record-mask.png')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
