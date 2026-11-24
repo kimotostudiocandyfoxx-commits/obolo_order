@@ -1,10 +1,10 @@
-# UI art — 2026-11-24T08:40:53.807Z
+# UI art — 2026-11-24T08:54:28.425Z
 
-Seedream 5.0 Pro / 6枚 / 約46円
+Seedream 5.0 Pro / 6枚 / 約52円
 
-- ✅ kor4-brother
-- ✅ kor4-kimorin
-- ✅ kor4-mikie
-- ✅ kor4-monban
-- ✅ kor4-sister
-- ✅ kor4-user
+- ✅ ship4-brother
+- ✅ ship4-kimorin
+- ✅ ship4-mikie
+- ✅ ship4-monban
+- ✅ ship4-sister
+- ✅ ship4-user
