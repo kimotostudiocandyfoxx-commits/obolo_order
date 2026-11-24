@@ -843,6 +843,8 @@ export function TalkScene({
   // the camera's side: the one speaking (a group pushes toward them the same way)
   const camX = cam ? (spots.get(cam)?.x ?? 0.5) : 0.5;
   const camShift = n <= 2 ? (camX < 0.5 ? 3 : -3) : (0.5 - camX) * 6;
+  /** R10: a partner standing in the middle of the over-the-shoulder ({bati} before the bowl): its bubbles sit over it */
+  const centred = (id: string) => ots && !byId.get(id)?.self && Math.abs((spots.get(id)?.x ?? 0) - 0.5) < 0.12;
 
   // blocking: someone new in the row walks in from their side; someone leaving walks out (kept a moment for it)
   const rowKey = row.map((p) => p.id).join('|');
@@ -1238,7 +1240,7 @@ export function TalkScene({
           const enter = entering[p.id];
           const motion = { animation: g ? `talk-exit .6s ease-in forwards` : enter && !reduced ? `talk-enter .7s cubic-bezier(.2,.8,.25,1) both` : arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, ['--ex' as string]: `${(g ? g.side : enter) === 'l' ? -w * 0.6 : w * 0.6}px` };
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? OTS_BACK.filter : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...motion }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? OTS_BACK.filter : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...(ots && !p.self && !angle ? { transitionDuration: '500ms', transitionTimingFunction: 'cubic-bezier(.4,0,.2,1)' } : {}), ...motion }}>
               {arriving && p.self && <ArrivalMotes />}
               <div className="flex h-full items-end justify-center" style={mv?.mirror || ag?.mirror || ag?.turn ? { transform: `${mv?.mirror !== !!ag?.mirror && (mv?.mirror || ag?.mirror) ? 'scaleX(-1) ' : ''}${ag?.turn ? `perspective(700px) rotateY(${ag.turn}deg)` : ''}`.trim() } : undefined}>
               <Figure
@@ -1334,6 +1336,7 @@ export function TalkScene({
                 newest={newest}
                 clamp={false}
                 named={(isGroup || !!it.name) && u.first}
+                center={centred(it.who)}
                 onCard={() => setBig(it)}
                 onOpen={() => setOpened(it)}
                 playing={speech?.id === it.id && !!it.voice}
@@ -1370,6 +1373,7 @@ export function TalkScene({
               maxH={view.card ? Math.max(room * 0.8, 200) : room / 2}
               named={(isGroup || !!it.name) && u.first}
               right={firstPerson && !who?.self && (spots.get(it.who)?.x ?? 0) > 0.55}
+              center={centred(it.who)}
               onCard={() => setBig(it)}
               onOpen={() => setOpened(it)}
               playing={speech?.id === it.id && !!it.voice}
@@ -1550,12 +1554,15 @@ function Bubble({
   beat,
   out = false,
   right = false,
+  center = false,
   passive = false,
 }: {
   /** taps go through it to the screen */
   passive?: boolean;
   /** the speaker stands at the right (M-R249 first person, two partners): the bubble leans and points that way */
   right?: boolean;
+  /** R10: the speaker stands in the middle (the {bati} talk): the bubble sits over them, its tail down to them */
+  center?: boolean;
   /** M-R249 first person: your words, the tail off the bottom right of the screen (toward you) */
   out?: boolean;
   item: TalkItem;
@@ -1614,7 +1621,7 @@ function Bubble({
   );
   const pad = shape === 'burst' ? 'px-[42px] py-[30px] text-[16px]' : shape === 'cloud' ? 'px-[22px] pb-4 pt-[15px] text-[15px]' : shape === 'whisper' ? 'px-[17px] pb-[13px] pt-3 text-[14px]' : 'px-[17px] pb-[13px] pt-3 text-[15px]';
   return (
-    <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
+    <div className={`${passive ? 'pointer-events-none' : 'pointer-events-auto'} relative flex min-h-0 flex-col ${shape === 'burst' ? 'mx-[-20px] max-w-[min(calc(100%+40px),330px)]' : 'max-w-[min(100%,380px)]'} ${mine ? 'items-end self-end' : center ? 'items-center self-center' : 'items-start self-start'} ${grow ? 'flex-1' : ''}`} style={{ animation: newest && !past && !entry ? 'talk-in .35s cubic-bezier(.3,1.4,.5,1) both' : undefined, opacity: newest ? (past ? 0.97 : 1) : 0.86 }}>
       {named && (
         <p className={`mb-1 px-2 text-[10.5px] [text-shadow:0_1px_4px_#000] ${story ? 'tracking-[0.22em]' : 'font-bold tracking-[0.12em]'}`} style={story ? { color: 'rgba(253,230,170,.92)', fontFamily: STORY_SERIF } : { color: tone.a }}>
           {item.name ?? who?.name}
@@ -1669,7 +1676,7 @@ function Bubble({
           <span
             aria-hidden
             className="absolute bottom-[-11px] h-4 w-4"
-            style={{ background: bg, borderRight: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderBottom: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderRadius: '0 0 14px 0', [mine ? 'right' : 'left']: out ? '6%' : '20%', transform: out ? 'rotate(20deg) skewX(-34deg) translate(4px,2px)' : mine ? 'rotate(30deg) skewX(-12deg)' : 'rotate(60deg) skewY(12deg)' }}
+            style={{ background: bg, borderRight: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderBottom: `1.5px ${shape === 'whisper' ? 'dashed' : 'solid'} ${line}`, borderRadius: '0 0 14px 0', [mine ? 'right' : 'left']: out ? '6%' : center && !mine ? 'calc(50% - 12px)' : '20%', transform: out ? 'rotate(20deg) skewX(-34deg) translate(4px,2px)' : mine ? 'rotate(30deg) skewX(-12deg)' : 'rotate(60deg) skewY(12deg)' }}
           />
         )}
       </div>

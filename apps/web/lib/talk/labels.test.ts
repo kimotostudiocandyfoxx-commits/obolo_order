@@ -80,3 +80,14 @@ describe('placeLabels', () => {
     }
   });
 });
+
+describe('placeLabels in a crowd', () => {
+  it('never puts one name on another even when no place is free of figures', () => {
+    // a wall of figures: every candidate lies on some body, so each name takes the least-covering place
+    const figs: LabelFig[] = [];
+    for (let r = 0; r < 4; r++) for (let k = 0; k < 7; k++) figs.push(fig(30 + k * 55, 640 - r * 60, 60, 120, 54));
+    const out = placeLabels(figs, { width: W, height: H });
+    for (let i = 0; i < figs.length; i++)
+      for (let j = i + 1; j < figs.length; j++) expect(overlap(rectOf(figs[i], out[i]), rectOf(figs[j], out[j])), `${i}~${j}`).toBe(false);
+  });
+});

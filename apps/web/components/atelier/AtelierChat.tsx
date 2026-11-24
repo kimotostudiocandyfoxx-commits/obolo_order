@@ -813,6 +813,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   }, [msgs]);
   const brewing = msgs.some((m) => m.who === 'work' && m.work.status === 'making');
   const bowl: BowlState = rising ? { rise: rising } : brewing ? 'glow' : 'idle';
+  const casting = !story && bowl !== 'idle';
   const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   // a slow card does not keep {bati} 'thinking' (you may go away meanwhile)
@@ -856,9 +857,11 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
         place={story ? PLACE_BG.moon : TEMPLE_PLATE.src}
         placeAspect={story ? undefined : TEMPLE_PLATE.aspect}
         placeFx={story ? undefined : (m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
-        otsAt={0.21}
-        // {bati} beside the bowl, a step in front of it (on the temple plate)
-        otsStand={story ? undefined : TEMPLE_PLATE.bati}
+        // R10 (client): {bati} in the middle, facing you, a step in front of the bowl (big enough to hide its lower rim);
+        // only while it casts (the bowl glows: something is being made or changed) it goes to the left and casts into the
+        // bowl behind it, then comes back to the middle
+        otsAt={casting ? 0.21 : 0.5}
+        otsStand={story ? undefined : casting ? TEMPLE_PLATE.bati : TEMPLE_PLATE.batiFront}
         top={story ? 40 : 0}
         bar={{ title: partner.name, onList, unread, onBack, below: banner }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}

@@ -533,6 +533,7 @@ function Strollers({ threads, onOpen, far = false, ground = 0.1, backRow = 0.28,
         const o = hostEl.getBoundingClientRect();
         soft = back.rects.map((q) => ({ ...q, x: q.x + o.left - a.left, y: q.y + o.top - a.top }));
       }
+      (window as unknown as Record<string, unknown>)[far ? "__dachiPlain" : "__dachiLabels"] = { figsNow, soft, w: size.w, h: size.h, prev };
       prev = placeLabels(figsNow, { width: size.w, height: size.h, soft, prev, order: order.filter((i) => figsNow[i]) });
       prev.forEach((sp, i) => {
         const l = labs.current[i];

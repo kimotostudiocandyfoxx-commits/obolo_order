@@ -42,22 +42,16 @@ export type PlaceOpts = {
   margin?: number;
 };
 
-/** a label's places, best first: under the feet, a step either side, above the head, then higher and higher */
+/** a label's places, best first: under the feet (or a little up, over its own feet), a step either side, above the head, then higher and higher */
 export function labelCandidates(f: LabelFig, width: number, height: number): Rect[] {
   const gap = 2;
   const under = f.feet + 3;
   const above = f.body.y - f.h - gap;
-  const raw: [number, number][] = [
-    [0, under],
-    [0.6, under],
-    [-0.6, under],
-    [1.1, under],
-    [-1.1, under],
-    [0, above],
-    [0.6, above],
-    [-0.6, above],
-  ];
-  for (let k = 1; k <= 4; k++) raw.push([0, above - k * (f.h + 3)]);
+  const raw: [number, number][] = [];
+  // under the feet; nudged up over its own feet (its own figure is no obstacle) before it steps aside
+  for (const dx of [0, 0.3, -0.3, 0.6, -0.6, 1.1, -1.1]) for (const dy of [0, -6, -12]) raw.push([dx, under + dy]);
+  for (const dx of [0, 0.3, -0.3, 0.6, -0.6, 1.1, -1.1]) raw.push([dx, above]);
+  for (let k = 1; k <= 6; k++) for (const dx of [0, 0.6, -0.6]) raw.push([dx, above - k * (f.h + 3)]);
   return raw.map(([dx, y]) => ({
     x: Math.max(2, Math.min(width - f.w - 2, f.cx - f.w / 2 + dx * f.w)),
     y: Math.max(0, Math.min(height - f.h, y)),
@@ -79,7 +73,8 @@ export function placeLabels(figs: LabelFig[], o: PlaceOpts): LabelSpot[] {
     const f = figs[i];
     if (!f) continue;
     const cands = labelCandidates(f, o.width, o.height);
-    const hard = [...figs.filter((g, j) => j !== i && g).map((g) => g.body), ...placed, ...(o.hard ?? [])];
+    const bodies = [...figs.filter((g, j) => j !== i && g).map((g) => g.body), ...(o.hard ?? [])];
+    const hard = [...bodies, ...placed];
     const soft = o.soft ?? [];
     // 0: free of everything; 1: only over a soft place; 2: over a hard one
     const level = (r: Rect, p = pad) => (hard.some((b) => hits(r, b, p)) ? 2 : soft.some((b) => hits(r, b, p)) ? 1 : 0);
@@ -97,10 +92,10 @@ export function placeLabels(figs: LabelFig[], o: PlaceOpts): LabelSpot[] {
         }
     } else if (best < 2) c = levels.indexOf(best);
     else {
-      // nowhere free: the place that covers the least
+      // nowhere free (a crowd): never on another name; of the rest, the place that covers the least of the figures
       let least = Infinity;
       cands.forEach((r, k) => {
-        const a = hard.reduce((s, b) => s + area(r, b), 0);
+        const a = placed.reduce((s, b) => s + (hits(r, b, pad) ? 1e6 + area(r, b) : 0), 0) + bodies.reduce((s, b) => s + area(r, b), 0);
         if (a < least) (least = a), (c = k);
       });
     }
