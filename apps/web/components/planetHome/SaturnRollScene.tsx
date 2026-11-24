@@ -24,6 +24,10 @@ const BOX = { x0: 0.14, x1: 0.62, y0: 0.58, y1: 0.76 };
 const GROOVE = { x: 0.4, y: 0.66 };
 const NEEDLE = { x: 72, y: 60 };
 const HOLD_MS = 480;
+/** the 12 cells, in an order that spreads the first few across the whole face */
+const CELLS = [5, 10, 0, 7, 2, 9, 4, 11, 1, 6, 8, 3];
+/** kororins closer than this (px, centre to centre) push each other apart, gently */
+const GAP = 50;
 /** a kororin talks at least this long (so its bubble can be read), at most this long if its voice never ends */
 const TALK_MIN = 1600;
 const TALK_MAX = 20000;
@@ -70,6 +74,8 @@ function useReducedMotion() {
 export function SaturnRollScene({ cfg, view, rolling, playingId, spinning, onPlace, onPlate, onItem, onHold, onHeard, onResident }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const bodies = useRef(new Map<string, Body>());
+  const seq = useRef(0);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const size = useRef({ W: 390, H: 760 });
   const [talking, setTalking] = useState<Set<string>>(new Set());
   const [hadAny, setHadAny] = useState(false);
@@ -92,8 +98,11 @@ export function SaturnRollScene({ cfg, view, rolling, playingId, spinning, onPla
   // new ones join (kept in a ref, so the touch handlers have them from the first render)
   rolling.forEach((w, i) => {
     if (bodies.current.has(w.id)) return;
-    const fx = BOX.x0 + (((i * 53 + 17) % 100) / 100) * (BOX.x1 - BOX.x0);
-    const ff = BOX.y0 + (((i * 37) % 100) / 100) * (BOX.y1 - BOX.y0);
+    // a cell of a 4 × 3 grid over the record's face, taken in an order that keeps neighbours apart, with a little jitter
+    const k = CELLS[seq.current++ % CELLS.length];
+    const jit = (n: number) => ((((seq.current * 7919 + n) % 97) / 97) - 0.5) * 0.5;
+    const fx = BOX.x0 + ((k % 4) + 0.5 + jit(1)) / 4 * (BOX.x1 - BOX.x0);
+    const ff = BOX.y0 + (Math.floor(k / 4) + 0.5 + jit(2)) / 3 * (BOX.y1 - BOX.y0);
     // what came since the last visit is still falling in (ひゅう、ぽとん)
     const falls = !!w.fresh && !reduced;
     bodies.current.set(w.id, {
@@ -187,7 +196,27 @@ export function SaturnRollScene({ cfg, view, rolling, playingId, spinning, onPla
       const now = performance.now();
       const { W } = size.current;
       let i = 0;
-      for (const b of bodies.current.values()) {
+      const all = [...bodies.current.values()];
+      // a minimum gap: lying kororins push apart (sideways, and along the face's depth), never through the edges
+      if (!live.current.reduced)
+        for (let a = 0; a < all.length; a++)
+          for (let c = a + 1; c < all.length; c++) {
+            const p = all[a];
+            const q = all[c];
+            if (p.gone || q.gone || p.drag || q.drag || !p.placed || !q.placed) continue;
+            const dx = q.x - p.x || 0.01;
+            const dy = q.y - p.y;
+            const d = Math.hypot(dx, dy);
+            if (d >= GAP) continue;
+            const push = ((GAP - d) / GAP) * 0.6;
+            p.vx -= (dx / d) * push;
+            q.vx += (dx / d) * push;
+            const { H } = size.current;
+            const df = ((dy / d) * push) / H;
+            p.ff = Math.min(BOX.y1, Math.max(BOX.y0, p.ff - df));
+            q.ff = Math.min(BOX.y1, Math.max(BOX.y0, q.ff + df));
+          }
+      for (const b of all) {
         settle(b, i++);
         if (b.gone) continue;
         if (b.talk && now >= b.endAt) {
@@ -298,13 +327,37 @@ export function SaturnRollScene({ cfg, view, rolling, playingId, spinning, onPla
     };
   };
 
+  // the record itself tapped: a ripple where it was touched, and the nearest kororin hops away from it
+  const tapRecord = (e: MouseEvent<HTMLButtonElement>) => {
+    const r = root.current?.getBoundingClientRect();
+    if (!r) return;
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const id = Date.now();
+    setRipples((l) => [...l, { id, x, y }]);
+    setTimeout(() => setRipples((l) => l.filter((q) => q.id !== id)), 700);
+    let near: Body | null = null;
+    let best = 160;
+    for (const b of bodies.current.values()) {
+      const d = Math.hypot(b.x - x, b.y - y);
+      if (!b.gone && !b.drag && d < best) [near, best] = [b, d];
+    }
+    if (near && !live.current.reduced) {
+      near.vy = -5;
+      near.vx = Math.sign(near.x - x || 1) * 2.5;
+    }
+  };
+
   const singer = spinning && playingId ? playingId : null;
   const done = hadAny && !rolling.length && !talking.size;
   return (
     <div ref={root} className={s.scene}>
       <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})` }} />
       <div className={`${s.spin} ${spinning ? s.spinOn : ''}`} aria-hidden />
-      <button type="button" className={s.place} onClick={onPlace} aria-label={`${view.owner.name}の${cfg.place}`} />
+      <button type="button" className={s.place} onClick={tapRecord} aria-label={`${view.owner.name}の${cfg.place}`} />
+      {ripples.map((r) => (
+        <span key={r.id} className={s.ripple} style={{ left: r.x, top: r.y }} aria-hidden />
+      ))}
       <button type="button" className={s.plate} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
       </button>

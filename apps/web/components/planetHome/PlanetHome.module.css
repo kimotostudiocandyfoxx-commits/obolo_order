@@ -514,6 +514,27 @@
   white-space: nowrap;
   animation: fadein 0.4s;
 }
+.ripple {
+  position: absolute;
+  z-index: 3;
+  width: 80px;
+  height: 36px;
+  margin: -18px -40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  animation: ripple 0.7s ease-out forwards;
+}
+@keyframes ripple {
+  from {
+    scale: 0.3;
+    opacity: 0.9;
+  }
+  to {
+    scale: 1.6;
+    opacity: 0;
+  }
+}
 .atNeedle {
   position: absolute;
   z-index: 5;
@@ -864,6 +885,7 @@
   .afterPlus,
   .plus,
   .atNeedle,
+  .ripple,
   .done {
     animation: none;
   }
