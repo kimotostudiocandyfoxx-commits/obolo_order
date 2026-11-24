@@ -15,7 +15,7 @@ import { LedgerService } from '../wallet/ledger.service';
 import { MediaService } from '../media/media.service';
 
 /** PLACEHOLDER (P-INV-1): how many invitations a member may send per 30 days. */
-export const INVITES_PER_MONTH = 3; // M-R256: a few invitations each (client 2026-11-23)
+export const INVITES_PER_MONTH = 100; // client 2026-11-24: no limit on invitations; 100 per 30 days only stops spam
 
 const toView = (i: typeof invites.$inferSelect): InviteView => ({
   code: i.code,
