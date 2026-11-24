@@ -7,6 +7,7 @@ import s from './PlanetHome.module.css';
 /**
  * M-R266 (design/home/README.md §11, template.html faceSVG): the 8 faces, drawn over a ball (viewBox 0–100): pink
  * cheeks, the eyes (they blink every 4.6 s and squint while pressed), a mouth. Any face goes with any colour.
+ * M-R268: sunglasses ride above, shown while the scene is `partying`.
  */
 const INK = '#2a1a22';
 const eye = (x: number) => (
@@ -55,6 +56,12 @@ const MOUTH: Record<Face, ReactNode> = {
 export function KororinFace({ face, delay = 0, style }: { face: Face; delay?: number; style?: CSSProperties }) {
   return (
     <svg className={s.ballFace} viewBox="0 0 100 100" aria-hidden data-testid="ball-face" data-face={face} style={style}>
+      {/* M-R268: sunglasses, on in club mode (the eyes hidden under them) */}
+      <g className={s.shades}>
+        <path d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z" fill="#141018" />
+        <path d="M46 49 h8" stroke="#141018" strokeWidth="3" />
+        <path d="M27 48 l6 0 M61 48 l6 0" stroke="rgba(255,255,255,.7)" strokeWidth="2" strokeLinecap="round" />
+      </g>
       <ellipse cx="27" cy="62" rx="9" ry="5" fill="#ff8fa8" opacity=".55" />
       <ellipse cx="73" cy="62" rx="9" ry="5" fill="#ff8fa8" opacity=".55" />
       <g className={s.ballSquint}>

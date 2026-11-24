@@ -17,6 +17,8 @@ export interface SceneProps {
   playingId: string | null;
   /** Saturn: the record is turning */
   spinning: boolean;
+  /** M-R268 (Saturn's club mode): the music's tempo, when it plays (the balls hop and sway to it) */
+  bpm?: number;
   /** the words of the one playing are showing (in the CAPTION band): works floating there move out of it */
   caption: boolean;
   /** your place tapped (Saturn: plays; elsewhere: goes inside) */

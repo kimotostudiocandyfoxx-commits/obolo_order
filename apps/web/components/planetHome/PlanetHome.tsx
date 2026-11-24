@@ -3,6 +3,7 @@
 import { PLANET_HOMES, type HomePlanet, type HomeWork, type PlanetHomeConfig, type PlanetHomeView, type PlanetWorkReportBody } from '@obolo/shared';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { clubStart, clubStop } from '@/lib/planetHome/club';
 import { dockButtons, menuFor, type MenuAct } from '@/lib/planetHome/model';
 import { usePlanetHome } from '@/lib/planetHome/usePlanetHome';
 import { useHold, type At } from '@/lib/planetHome/useHold';
@@ -102,10 +103,30 @@ export function PlanetHome({
   // M-R264 (Saturn): 〔▶ 全部流す〕 spins the record and the balls pop by themselves, nearest the needle first
   const [autoplay, setAutoplay] = useState(false);
   const spinning = cfg.roll ? autoplay : h.spinning;
+  // M-R268: club mode — the music starts from the tap (reduced motion: only if they turn it on), stops with the record
+  const [bpm, setBpm] = useState<number | null>(null);
+  const reducedMotion = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  useEffect(() => {
+    if (autoplay) return;
+    clubStop();
+    setBpm(null);
+  }, [autoplay]);
+  useEffect(() => () => clubStop(), []);
+  const music = () => {
+    if (bpm) {
+      clubStop();
+      return setBpm(null);
+    }
+    setBpm(clubStart());
+  };
   const enter = () => {
     if (cfg.roll) {
-      if (autoplay) h.stop();
-      return setAutoplay((v) => !v);
+      if (autoplay) {
+        h.stop();
+        return setAutoplay(false);
+      }
+      if (!reducedMotion()) setBpm(clubStart());
+      return setAutoplay(true);
     }
     if (cfg.placeTap === 'play') return h.spinning ? h.stop() : h.play();
     setZoom(true);
@@ -139,6 +160,7 @@ export function PlanetHome({
           stage={h.stage}
           playingId={h.playingId}
           spinning={spinning}
+          bpm={bpm ?? undefined}
           onPlayEnd={() => setAutoplay(false)}
           caption={!!singing && (!cfg.roll || h.spinning)}
           onPlace={enter}
@@ -192,11 +214,28 @@ export function PlanetHome({
 
           {/* M-R263: one big button (making and flying are on the Moon) */}
           <div className={s.dock}>
-            {dockButtons(cfg, spinning).map((b) => (
-              <button key={b.act} type="button" className={s.cta} onClick={enter}>
-                {b.label}
+            {cfg.roll ? (
+              // M-R270: Saturn's button is a small record with no words — it spins while playing, ▶ becomes ■
+              <button type="button" className={`${s.cta} ${s.disc} ${spinning ? s.discOn : ''}`} onClick={enter} aria-label={spinning ? '止める' : '全部流す'} data-testid="play-disc">
+                <span className={s.discRec} />
+                <span className={s.discLbl} />
+                <svg viewBox="0 0 24 24" aria-hidden>
+                  {spinning ? <rect x="6" y="6" width="12" height="12" rx="3" fill="#fff" /> : <path d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z" fill="#fff" />}
+                </svg>
               </button>
-            ))}
+            ) : (
+              dockButtons(cfg, spinning).map((b) => (
+                <button key={b.act} type="button" className={s.cta} onClick={enter}>
+                  {b.label}
+                </button>
+              ))
+            )}
+            {/* reduced motion: the music only when they want it */}
+            {cfg.roll && spinning && reducedMotion() && (
+              <button type="button" className={s.pill} onClick={music} aria-pressed={!!bpm}>
+                {bpm ? '♪ 音楽をとめる' : '♪ 音楽をかける'}
+              </button>
+            )}
           </div>
         </>
       )}

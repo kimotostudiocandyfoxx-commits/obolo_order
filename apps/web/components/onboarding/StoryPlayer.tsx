@@ -2212,7 +2212,7 @@ function StoryHome({ place, neo, inviter, fly, words, onDone }: { place: 'takoya
   );
 }
 
-/** D04-S005c (M-R266; the prototype's korPicker): the 8 kororins, one picked, 〔これにする〕 */
+/** D04-S005c (M-R266; the prototype's korPicker): the 8 kororins (no names, M-R268), one picked, 〔これにする〕 */
 function KororinStep({ note, onDone }: { note: string; onDone: (k: KororinChoice) => void }) {
   const [sel, setSel] = useState(0);
   return (
@@ -2227,11 +2227,12 @@ function KororinStep({ note, onDone }: { note: string; onDone: (k: KororinChoice
             type="button"
             role="radio"
             aria-checked={sel === n}
+            aria-label={k.name}
             onClick={() => setSel(n)}
             className={`flex flex-col items-center gap-1 rounded-2xl border px-1 pb-1.5 pt-2 text-[11px] font-bold text-white ${sel === n ? 'border-amber-300 bg-white/25' : 'border-white/25 bg-white/10'}`}
           >
+            {/* M-R268: no names — chosen by the look alone (the name is for screen readers) */}
             <KororinPic k={k} size={58} />
-            {k.name}
           </button>
         ))}
       </div>

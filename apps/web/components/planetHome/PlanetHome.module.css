@@ -475,7 +475,21 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 255, 255, 0.28) 6deg, transparent 16deg, transparent 90deg, rgba(255, 255, 255, 0.2) 96deg, transparent 106deg, transparent 180deg, rgba(255, 255, 255, 0.28) 186deg, transparent 196deg, transparent 270deg, rgba(255, 255, 255, 0.2) 276deg, transparent 286deg);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.28) 6deg,
+    transparent 16deg,
+    transparent 90deg,
+    rgba(255, 255, 255, 0.2) 96deg,
+    transparent 106deg,
+    transparent 180deg,
+    rgba(255, 255, 255, 0.28) 186deg,
+    transparent 196deg,
+    transparent 270deg,
+    rgba(255, 255, 255, 0.2) 276deg,
+    transparent 286deg
+  );
   animation: grooveSpin 2.4s linear infinite;
 }
 @keyframes grooveSpin {
@@ -592,7 +606,9 @@
   border: 0;
   border-bottom: 2px solid var(--c);
   color: #fff;
-  text-shadow: 0 0 3px rgba(20, 10, 30, 0.9), 0 1px 2px rgba(20, 10, 30, 0.9);
+  text-shadow:
+    0 0 3px rgba(20, 10, 30, 0.9),
+    0 1px 2px rgba(20, 10, 30, 0.9);
   pointer-events: none;
   transition: opacity 0.3s;
   will-change: transform;
@@ -665,7 +681,9 @@
   border: 0;
   border-bottom: 2px solid var(--c);
   color: #fff;
-  text-shadow: 0 0 3px rgba(20, 10, 30, 0.9), 0 1px 2px rgba(20, 10, 30, 0.9);
+  text-shadow:
+    0 0 3px rgba(20, 10, 30, 0.9),
+    0 1px 2px rgba(20, 10, 30, 0.9);
 }
 
 /* M-R259 Saturn: a rolling kororin (the outer box moves, the inner one turns; the bubble stays upright) */
@@ -876,7 +894,7 @@
   display: flex;
   gap: 10px;
   justify-content: center;
-  z-index: 5;
+  z-index: 10;
 }
 .cta {
   font: 900 16px var(--f-body);
@@ -1235,4 +1253,261 @@
 .still .kororinPic img {
   box-shadow: none;
   background: none;
+}
+
+/* M-R270: Saturn's play button — a small black record (grooves, an iridescent sheen), a pastel label, a white mark,
+   a soft rainbow glow; it spins while playing */
+.disc {
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+  position: relative;
+  background: none;
+  box-shadow: none;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+.disc::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  z-index: -2;
+  background: conic-gradient(from 0deg, #ffd1f4, #c9b8ff, #a8f0ff, #c6ffd9, #fff2b8, #ffd1f4);
+  filter: blur(9px);
+  opacity: 0.75;
+  animation: discGlow 4s linear infinite;
+}
+.discRec {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      transparent 0 33%,
+      rgba(255, 255, 255, 0.07) 33.5% 34%,
+      transparent 34.5% 41%,
+      rgba(255, 255, 255, 0.08) 41.5% 42%,
+      transparent 42.5% 49%,
+      rgba(255, 255, 255, 0.07) 49.5% 50%,
+      transparent 50.5%
+    ),
+    conic-gradient(from 30deg, rgba(255, 255, 255, 0) 0 8%, rgba(255, 220, 250, 0.38) 12%, rgba(255, 255, 255, 0) 18% 50%, rgba(190, 240, 255, 0.34) 62%, rgba(255, 255, 255, 0) 68%),
+    radial-gradient(circle at 50% 50%, #2a2236 0 58%, #17121f 59% 100%);
+  box-shadow:
+    0 10px 26px rgba(40, 10, 60, 0.45),
+    0 0 0 2px rgba(255, 255, 255, 0.55),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  transition: transform 0.3s;
+}
+.discLbl {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px;
+  border-radius: 50%;
+  z-index: -1;
+  background: radial-gradient(circle at 34% 28%, #fff 0 9%, rgba(255, 255, 255, 0) 30%), linear-gradient(140deg, #ffc6ec, #d7c4ff 45%, #aeeeff);
+  box-shadow:
+    inset 0 -4px 8px rgba(120, 60, 160, 0.25),
+    inset 0 2px 3px rgba(255, 255, 255, 0.8);
+}
+.disc svg {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 1px 2px rgba(120, 40, 140, 0.45));
+}
+.disc:active .discRec {
+  transform: scale(0.94);
+}
+.discOn .discRec,
+.discOn .discLbl {
+  animation: discSpin 1.8s linear infinite;
+}
+.discOn::before {
+  opacity: 1;
+  filter: blur(12px);
+  animation-duration: 1.6s;
+}
+@keyframes discSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes discGlow {
+  to {
+    filter: blur(9px) hue-rotate(360deg);
+  }
+}
+
+/* M-R268: club mode (Saturn's 〔▶ 全部流す〕) — dimmer, a mirror ball coming down, six lasers, a neon rim; sunglasses */
+.fg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center bottom;
+  pointer-events: none;
+  z-index: 2;
+  transition: filter 0.6s;
+}
+.partying .fg {
+  filter: brightness(0.5) saturate(1.3);
+}
+.party {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.partyOn {
+  opacity: 1;
+}
+.partyDim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 50% 30%, rgba(30, 10, 60, 0.35), rgba(8, 4, 20, 0.72));
+}
+.lasers {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  width: 0;
+  height: 0;
+  mix-blend-mode: screen;
+}
+.lasers i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 900px;
+  transform-origin: 50% 0;
+  background: linear-gradient(var(--lc), transparent 85%);
+  opacity: 0.75;
+  animation: laser 3.2s ease-in-out infinite alternate;
+}
+.lasers i:nth-child(1) {
+  --lc: #ff3df0;
+  --a0: -38deg;
+  --a1: -8deg;
+}
+.lasers i:nth-child(2) {
+  --lc: #3dfcff;
+  --a0: 30deg;
+  --a1: 2deg;
+  animation-duration: 2.6s;
+}
+.lasers i:nth-child(3) {
+  --lc: #9dff3d;
+  --a0: -18deg;
+  --a1: 22deg;
+  animation-duration: 3.8s;
+}
+.lasers i:nth-child(4) {
+  --lc: #ff3df0;
+  --a0: 12deg;
+  --a1: -26deg;
+  animation-duration: 2.9s;
+}
+.lasers i:nth-child(5) {
+  --lc: #3dfcff;
+  --a0: -50deg;
+  --a1: -20deg;
+  animation-duration: 4.2s;
+}
+.lasers i:nth-child(6) {
+  --lc: #ffd23d;
+  --a0: 44deg;
+  --a1: 16deg;
+  animation-duration: 3.4s;
+}
+@keyframes laser {
+  from {
+    transform: rotate(var(--a0));
+  }
+  to {
+    transform: rotate(var(--a1));
+  }
+}
+.mball {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -120%);
+  transition: transform 1.1s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.partyOn .mball {
+  transform: translate(-50%, 0);
+}
+.mballWire {
+  width: 2px;
+  height: 150px;
+  margin: 0 auto;
+  background: #ccc;
+}
+.mballOrb {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(#fff 0 8deg, #9aa 8deg 16deg), radial-gradient(circle at 35% 30%, #fff, #888);
+  background-blend-mode: multiply;
+  box-shadow:
+    0 0 30px 8px rgba(255, 255, 255, 0.55),
+    0 0 80px 20px rgba(255, 80, 240, 0.35);
+  animation: orb 2.4s linear infinite;
+}
+@keyframes orb {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+.neon {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 40px 6px rgba(255, 61, 240, 0.55),
+    inset 0 0 90px 10px rgba(61, 252, 255, 0.35);
+  animation: neon 1.1s steps(2) infinite;
+}
+@keyframes neon {
+  50% {
+    box-shadow:
+      inset 0 0 36px 4px rgba(61, 252, 255, 0.6),
+      inset 0 0 80px 12px rgba(255, 61, 240, 0.3);
+  }
+}
+.shades {
+  opacity: 0;
+  transform: translateY(-14px);
+  transition:
+    opacity 0.25s,
+    transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.partying .shades {
+  opacity: 1;
+  transform: none;
+}
+.partying .ballEyes {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .disc::before,
+  .discOn .discRec,
+  .discOn .discLbl,
+  .mballOrb,
+  .neon {
+    animation: none;
+  }
+  .lasers {
+    display: none;
+  }
 }

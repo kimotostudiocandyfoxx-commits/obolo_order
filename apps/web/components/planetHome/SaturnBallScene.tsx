@@ -3,7 +3,7 @@
 import { kororinOf, RECORD_COLOURS } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { COLORS } from '@/lib/puni/parts';
-import type { Ball } from '@/lib/planetHome/ballPhysics';
+import { rimFloor, type Ball } from '@/lib/planetHome/ballPhysics';
 import { BallLayer, type BallItem, type BallLayerHandle } from './BallLayer';
 import { kororinBall, KororinPic } from './KororinFace';
 import { BALLS_AT_ONCE, type StageItem } from '@/lib/planetHome/model';
@@ -25,6 +25,14 @@ const FACE = { x0: 0.04, x1: 0.96, floor: 0.86 };
 /** the groove at the record's centre label, and where the singer of 〔▶ 全部流す〕 stands (shares of the screen) */
 const GROOVE = { x: 0.47, y: 0.69 };
 export const RECORD_MASK = '/planet-home/saturn-record-mask.png';
+/** M-R268: the stones at the bottom of the backdrop, cut out to lie in front of the balls (scripts/planet-home/saturn-fg.py) */
+const FOREGROUND = '/planet-home/bg-saturn-fg.webp';
+/** M-R268: the record's front rim in the backdrop (shares of the 1080×1920 picture) — the balls' floor follows its arc */
+const BG = { w: 1080, h: 1920 };
+const RIM = { cx: 0.481, cy: 0.702, rx: 0.574, ry: 0.1885 };
+/** M-R268 club mode: the sunglasses go on after this, and the first ball pops at this */
+const SHADES_MS = 900;
+const FIRST_POP_MS = 2200;
 const HOLD_MS = 480;
 const PLATE_H = 17;
 /** the mini figure's box (px) and how far above the popped ball it stands */
@@ -95,7 +103,7 @@ export function ChibiPic({ w }: { w: StageItem }) {
 
 type Out = { w: StageItem; x: number; y: number; phase: 'talk' | 'wave' | 'away'; t0: number; started: boolean; endAt: number };
 
-export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPlate, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
+export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, onPlate, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
   const layer = useRef<BallLayerHandle>(null);
@@ -133,10 +141,14 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   const inLine = left.length - shown.length;
   // M-R264: 44–60 px across at a 430 px screen, in proportion elsewhere
   const [scale, setScale] = useState(390 / 430);
+  const [box, setBox] = useState({ W: 0, H: 0 });
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-    const set = () => setScale((el.clientWidth || 390) / 430);
+    const set = () => {
+      setScale((el.clientWidth || 390) / 430);
+      setBox({ W: el.clientWidth, H: el.clientHeight });
+    };
     set();
     if (typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(set);
@@ -154,6 +166,24 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   );
 
   const size = () => ({ W: root.current?.clientWidth ?? 390, H: root.current?.clientHeight ?? 844 });
+  // M-R268: the rim's ellipse, mapped as the backdrop is (cover, centred, bottom-aligned), in the record face's px
+  const isSaturnArt = cfg.art.backdrop === '/planet-home/bg-saturn.webp';
+  const floorAt = useMemo(() => {
+    if (!box.W || !isSaturnArt) return undefined;
+    const k = Math.max(box.W / BG.w, box.H / BG.h);
+    const dw = BG.w * k;
+    const dh = BG.h * k;
+    const x0 = (box.W - dw) / 2 - FACE.x0 * box.W;
+    const y0 = box.H - dh;
+    return rimFloor({ cx: x0 + RIM.cx * dw, cy: y0 + RIM.cy * dh, rx: RIM.rx * dw, ry: RIM.ry * dh });
+  }, [box, isSaturnArt]);
+  // club mode: the sunglasses go on a little after the record starts
+  const [partying, setPartying] = useState(false);
+  useEffect(() => {
+    if (!spinning) return setPartying(false);
+    const t = setTimeout(() => setPartying(true), SHADES_MS);
+    return () => clearTimeout(t);
+  }, [spinning]);
   const groove = () => {
     const { W, H } = size();
     return { x: (GROOVE.x - FACE.x0) * W, y: GROOVE.y * H };
@@ -227,17 +257,24 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       if (best) pop(best);
       return more;
     };
-    if (!next() && !outsRef.current.length) {
-      autoEnd.current?.();
-      return;
-    }
-    const t = setInterval(() => {
-      if (!next() && !outsRef.current.some((o) => o.phase !== 'away')) {
-        clearInterval(t);
-        setTimeout(() => autoEnd.current?.(), WAVE_MS + AWAY_MS);
+    // M-R268: the first one at 2.2 s (the lights and the sunglasses first), then every 3.7 s
+    let t: ReturnType<typeof setInterval> | undefined;
+    const first = setTimeout(() => {
+      if (!next() && !outsRef.current.length) {
+        autoEnd.current?.();
+        return;
       }
-    }, AUTO_MS);
-    return () => clearInterval(t);
+      t = setInterval(() => {
+        if (!next() && !outsRef.current.some((o) => o.phase !== 'away')) {
+          clearInterval(t);
+          setTimeout(() => autoEnd.current?.(), WAVE_MS + AWAY_MS);
+        }
+      }, AUTO_MS);
+    }, FIRST_POP_MS);
+    return () => {
+      clearTimeout(first);
+      clearInterval(t);
+    };
   }, [spinning, pop]);
 
   // its voice started → playing; stopped → it has finished (after at least TALK_MIN)
@@ -405,11 +442,30 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   }, [done, spinning]);
   const g = groove();
   return (
-    <div ref={root} className={s.scene} data-in-line={inLine} data-on-record={shown.length}>
+    <div ref={root} className={`${s.scene} ${partying ? s.partying : ''}`} data-in-line={inLine} data-on-record={shown.length} data-partying={partying || undefined}>
       <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})`, transform: 'none' }} />
       {cfg.art.backdrop === '/planet-home/bg-saturn.webp' && <RecordTint colour={view.recordColour} />}
       {/* M-R264: while it spins, the light in the grooves goes round */}
       {spinning && !reduced && <GrooveSpin />}
+      {/* M-R268 club mode: dimmer, the mirror ball comes down, lasers and a neon rim (reduced motion: no lasers, no flashing) */}
+      <div className={`${s.party} ${spinning ? s.partyOn : ''}`} aria-hidden data-testid="party">
+        <div className={s.partyDim} />
+        {!reduced && (
+          <div className={s.lasers}>
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+          </div>
+        )}
+        <div className={s.mball}>
+          <div className={s.mballWire} />
+          <div className={s.mballOrb} />
+        </div>
+        {!reduced && <div className={s.neon} />}
+      </div>
       <button type="button" className={s.plate} style={{ bottom: 'auto', top: '49%', zIndex: 5 }} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
       </button>
@@ -426,8 +482,10 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
         {reduced ? (
           <StillRows items={shown} onTap={(w, x, y) => pop(w.id, { x, y })} onHold={(w, at) => onHold(w, at)} />
         ) : (
-          <BallLayer ref={layer} items={items} floor={FACE.floor} onTap={tapBall} onTapEmpty={tapEmpty} onFrame={onFrame} />
+          <BallLayer ref={layer} items={items} floor={FACE.floor} floorAt={floorAt} spin={spinning} bpm={bpm ?? 124} onTap={tapBall} onTapEmpty={tapEmpty} onFrame={onFrame} />
         )}
+        {/* M-R268: the stones in front of the balls, placed exactly as the backdrop (this face starts 4% in) */}
+        {isSaturnArt && <div className={s.fg} style={{ backgroundImage: `url(${FOREGROUND})`, left: `${(-FACE.x0 / (FACE.x1 - FACE.x0)) * 100}%`, width: `${100 / (FACE.x1 - FACE.x0)}%` }} aria-hidden data-testid="foreground" />}
         {!reduced &&
           shown.map((w) => (
             <div
