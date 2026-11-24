@@ -25,8 +25,8 @@ const FACE = { x0: 0.04, x1: 0.96, floor: 0.84 };
 const GROOVE = { x: 0.6, y: 0.6 };
 const NEEDLE = { x: 74, y: 60 };
 const HOLD_MS = 480;
-/** a name plate's height (px) */
-const PLATE_H = 14;
+/** a name plate's height (px; measured once shown) */
+const PLATE_H = 17;
 const TALK_MIN = 1600;
 const TALK_MAX = 20000;
 
@@ -53,7 +53,7 @@ function useReducedMotion() {
 type Talk = { t0: number; started: boolean; endAt: number };
 type Suck = { t0: number; x0: number; y0: number; R0: number };
 
-export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPlay, onPlate, onItem, onHold, onHeard }: SceneProps) {
+export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPlate, onItem, onHold, onHeard }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
   const layer = useRef<PuniLayerHandle>(null);
@@ -69,6 +69,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
   const touched = useRef<string | null>(null);
   const freshIds = useRef(new Set<string>());
   const plateW = useRef(new Map<string, number>());
+  const plateHt = useRef(0);
   const lastDown = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hold = useRef<{ timer: ReturnType<typeof setTimeout> | null; x: number; y: number; fired: boolean }>({ timer: null, x: 0, y: 0, fired: false });
   const live = useRef({ onItem, onHeard, onHold, rolling });
@@ -165,6 +166,10 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
     const rank = (id: string) => (id === bubble.current?.dataset.id ? 0 : id === touched.current ? 1 : freshIds.current.has(id) ? 2 : 3);
     live.sort((p, q) => rank(p.id) - rank(q.id));
     const boxes: { x0: number; x1: number; y0: number; y1: number }[] = [];
+    const rootW = root.current?.clientWidth ?? 390;
+    const rootH = root.current?.clientHeight ?? 844;
+    /** the dock's top (〔▶ 全部流す〕〔＋ 飛ばす〕): plates stay above it */
+    const bottomLimit = rootH * 0.875;
     const hitsFace = (x0: number, x1: number, y0: number, y1: number, own: string) =>
       faces.some((f) => {
         if (f.id === own) return false;
@@ -177,9 +182,12 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
       const w = plateW.current.get(id) ?? 64;
       const base = b.y + b.R * b.sy + 2;
       let at: number | null = null;
-      for (const dy of [0, 8, 16, 26]) {
-        const y0 = base + dy;
-        const box = { x0: b.x - w / 2 - 2, x1: b.x + w / 2 + 2, y0: y0 - 1, y1: y0 + PLATE_H + 1 };
+      // below the face (stepping down, never into the dock), else above it (unless it is the one talking: its bubble is there)
+      const tries = [0, 10, 20].map((dy) => base + dy);
+      if (id !== bubble.current?.dataset.id) tries.push(b.y - b.R * b.sy - Math.max(PLATE_H, plateHt.current) - 3);
+      for (const y0 of tries) {
+        const box = { x0: b.x - w / 2 - 2, x1: b.x + w / 2 + 2, y0: y0 - 1, y1: y0 + Math.max(PLATE_H, plateHt.current) + 1 };
+        if (box.y1 > bottomLimit) continue;
         if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) continue;
         if (hitsFace(box.x0, box.x1, box.y0, box.y1, id)) continue;
         boxes.push(box);
@@ -191,7 +199,10 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
         el.dataset.dot = String(dot);
         el.classList.toggle(s.puniDot, dot);
       }
-      if (!dot && !plateW.current.has(id) && el.offsetWidth) plateW.current.set(id, el.offsetWidth);
+      if (!dot && !plateW.current.has(id) && el.offsetWidth) {
+        plateW.current.set(id, el.offsetWidth);
+        plateHt.current = Math.max(plateHt.current, el.offsetHeight);
+      }
       el.style.opacity = '1';
       el.style.transform = dot ? `translate3d(${b.x.toFixed(1)}px, ${(b.y + b.R * b.sy - 5).toFixed(1)}px, 0) translateX(-50%)` : `translate3d(${b.x.toFixed(1)}px, ${at!.toFixed(1)}px, 0) translateX(-50%)`;
       // for the review's overlap check: where this kororin's face is
@@ -200,7 +211,13 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
     for (const [id, el] of tags.current) if (sucks.current.has(id)) el.style.opacity = '0';
     const tk = bubble.current?.dataset.id;
     const tb = tk ? get(tk) : undefined;
-    if (bubble.current && tb) bubble.current.style.transform = `translate3d(${tb.x.toFixed(1)}px, ${(tb.y - tb.R * tb.sy - 8).toFixed(1)}px, 0) translate(-50%, -100%)`;
+    if (bubble.current && tb) {
+      // kept inside the screen (a kororin by the edge still shows all its words)
+      const half = bubble.current.offsetWidth / 2;
+      const left = FACE.x0 * rootW;
+      const bx = Math.max(half + 8 - left, Math.min(rootW - half - 8 - left, tb.x));
+      bubble.current.style.transform = `translate3d(${bx.toFixed(1)}px, ${(tb.y - tb.R * tb.sy - 8).toFixed(1)}px, 0) translate(-50%, -100%)`;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
