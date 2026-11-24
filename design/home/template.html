@@ -78,6 +78,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .puni.held .face .eyes{animation:none;transform:scaleY(.25)}
 .puni .ptag{position:absolute;pointer-events:none;transform:translate(-50%,0);left:50%;bottom:auto;top:calc(var(--r) + 1px);width:max-content;display:block;background:none;border:0;padding:0;font:800 9px var(--f-body);color:#fff;text-shadow:0 0 3px rgba(20,10,30,.9),0 1px 2px rgba(20,10,30,.9);line-height:1.3}
 @media (prefers-reduced-motion:reduce){.face .eyes{animation:none}}
+.puni .bname{position:absolute;left:50%;top:79%;transform:translate(-50%,-50%);max-width:84%;padding:1.5px 4px 1px;border-radius:999px;background:rgba(48,22,72,.42);box-shadow:inset 0 .5px 0 rgba(255,255,255,.25);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-family:var(--f-body);line-height:1;color:#fff;letter-spacing:-.02em;text-shadow:0 .5px 1px rgba(30,10,50,.5);pointer-events:none}
 .puni .fwrap{position:absolute;inset:0}
 .face .ln{fill:none;stroke:#2a1a22;stroke-width:3;stroke-linecap:round}
 .face .st{fill:#ffd23f;stroke:#2a1a22;stroke-width:1.2}
@@ -341,7 +342,7 @@ function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHei
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
     const kp=o.n===ME?(window.MYKORO??0):(i*3+o.n.length)%8,K=KOROS[kp];
     const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
-    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div></div>${o.k==='mine'?`<span class="ptag">${o.n}</span>`:''}`;$('sky').appendChild(e);
+    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div>${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:slot>=0?-R-slot*70:-R-40,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
