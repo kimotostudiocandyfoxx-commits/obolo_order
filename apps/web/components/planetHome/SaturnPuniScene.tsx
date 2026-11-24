@@ -355,7 +355,11 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
           <span key={r.id} className={s.ripple} style={{ left: r.x, top: r.y }} aria-hidden />
         ))}
       </div>
-      {done && <div className={s.done}>🎉 今日のコロリン、全部聞いたね！</div>}
+      {done && (
+        <div className={s.done} style={{ top: '38%' }}>
+          🎉 今日のコロリン、全部聞いたね！
+        </div>
+      )}
       {/* 〔▶ 全部流す〕: the one singing comes out of the groove to the needle-mic */}
       {singer && <Singer id={singer} view={view} />}
     </div>
