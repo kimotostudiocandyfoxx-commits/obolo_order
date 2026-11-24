@@ -57,6 +57,7 @@ import { MvController } from './mv/mv.controller';
 import { MvService } from './mv/mv.service';
 import { SaturnService } from './saturn/saturn.service';
 import { LookController } from './look/look.controller';
+import { ChibiBackfillController } from './look/chibi-backfill.controller';
 import { LookService } from './look/look.service';
 import { BatiMemoryService } from './look/memory.service';
 import { UsersController } from './users/users.controller';
@@ -94,6 +95,7 @@ import { WalletController } from './wallet/wallet.controller';
     AdminRadioController,
     InvitesController,
     LookController,
+    ChibiBackfillController,
     BillingController,
     ComposeController,
     VoiceController,
