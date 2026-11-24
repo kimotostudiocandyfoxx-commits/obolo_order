@@ -1210,6 +1210,25 @@
     "design/story/out/moon-zone-bati-v2-2.jpg"
    ],
    "prompt": "Same world, architecture, lighting and painterly style as the reference pictures, the same night: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with the huge blue planet and one small moon, grey cratered lunar ground, distant grey mountains. Cool moonlight, small gold highlights. The same temple as picture 1, seen from the lunar plain in front of its wide front staircase, but photographed from a MUCH LOWER camera, like picture 2: the camera stands on the grey lunar ground about 25 metres from the foot of the staircase, at the eye height of a small child (1.1 m), looking perfectly level. The horizon line sits at 42% of the image height from the bottom. Because the camera is low, the temple's blue floor is NOT visible at all: we see only the front of its white marble outer wall and balustrade, the wide staircase climbing up toward a marble gateway arch in the centre, blue-domed pavilions on the left and right, and slim towers and broken arches rising behind the wall against the starry sky; the huge blue planet and one small moon above. The lower 40% of the frame is open, empty, gently undulating grey lunar ground with small soft craters, seen at a grazing angle, so many small people can wander on it. Nothing is seen from above: no bird's-eye view, no looking down. Normal 40mm lens, not wide-angle. Absolutely no people, no figures, no silhouettes, no creatures, no footprints. No text, no letters, no logos, no watermark."
+  },
+  {
+   "id": "moon-zone-bati-v6",
+   "size": "1152x2048",
+   "n": 3,
+   "refs": [
+    "design/story/out/moon-zone-bati-v2-2.jpg"
+   ],
+   "prompt": "Repaint picture 1 exactly: the same composition, the same low level camera and framing, the same open-air Moon temple sanctum of white marble with the two framing columns and arch edges, the same wide shallow white marble bowl of softly glowing water at the same size and place in the frame, the same domed tower, blue-domed pavilions, mountains and the same blue tiled floor with glowing gold star-circle patterns, the same painterly style and cool moonlight. ONLY CHANGE THE SKY: there is NO planet and NO Earth in the sky at all (we are looking away from it). The sky is a deep black-blue starry night with the Milky Way faint, one small grey moon high up at the upper left, and a faint cool blue glow near the horizon behind the tower. NO roof. No people, no figures, no creatures, no footprints. No text, no letters, no logos, no watermark."
+  },
+  {
+   "id": "moon-zone-outside-v6",
+   "size": "1152x2048",
+   "n": 3,
+   "refs": [
+    "design/story/out/moon-zone-outside-v5-3.jpg",
+    "design/story/out/moon-zone-bati-v2-2.jpg"
+   ],
+   "prompt": "Repaint picture 1 exactly: the same composition, the same low level camera at child eye height, the same horizon line, the same white marble temple front with the wide staircase, the gateway arch, the blue-domed pavilions left and right, the same grey lunar ground in the lower half with soft craters, the same painterly style and cool moonlight as both pictures. ONLY CHANGE THE SKY: there is NO planet and NO Earth in the sky at all (it is behind the viewer). The sky is a deep black-blue starry night with the Milky Way faint, one small grey moon at the upper left, and a faint cool blue glow along the horizon. No people, no figures, no creatures, no footprints. No text, no letters, no logos, no watermark."
   }
  ]
 }
