@@ -208,7 +208,7 @@ function enter(){
   $('shelf').innerHTML=ic.map((x,i)=>`<div class="w">${x}<small>11/${26-i}</small></div>`).join('');
   $('inside').classList.add('on');
 }
-let rolls=[],raf=0,heard=[],RECLBL=[.07,.69];
+let rolls=[],raf=0,heard=[],RECLBL=[.6,.6];
 const PUNI=['salmon','gray','green','purple','gorilla'];
 const PIMG=(i)=>A['puni-'+PUNI[i%PUNI.length]]||sprite('korolin');
 function setupRoll(){

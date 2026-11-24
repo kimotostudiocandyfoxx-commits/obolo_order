@@ -45,4 +45,4 @@
 ## 6. 決まったこと（2026-11-24）
 - 見た目はアニメ版（`home2-bg-<星>`・`home2-sp-<物>`、住人は `res-<星>-<名前>`。星ごとの画風と頭身）。箱庭版は使わない。
 - 土星は「転がるコロリンを触る」形（M-R259）。
-- 土星の背景は `home2-bg-saturn-biga`（巨大なレコードの一部だけが画面いっぱいに映る）。コロリンは10/7の「ぷにぷに」（ツムツムのような丸いボールの顔。開発の `apps/web/components/puni/PuniPhysicsLayer.tsx`・`lib/puni/physics.ts` と、プロフィールから描く丸い絵 `PuniPicMaker`）。空から落ちてレコードの上に積み重なり、ぶつかるとつぶれてぷるんと戻る。つつくと凹んで跳ねて喋り、ドラッグで投げられる。試作の絵は `design/home/puni/*.png`（開発の `public/puni-test`）。
+- 土星の背景は `home2-bg-saturn-lowb`（約15度の低い角度から見た巨大なレコード。針は上がっていてレコードに触れていない）。コロリンは10/7の「ぷにぷに」（ツムツムのような丸いボールの顔。開発の `apps/web/components/puni/PuniPhysicsLayer.tsx`・`lib/puni/physics.ts` と、プロフィールから描く丸い絵 `PuniPicMaker`）。空から落ちてレコードの上に積み重なり、ぶつかるとつぶれてぷるんと戻る。つつくと凹んで跳ねて喋り、ドラッグで投げられる。試作の絵は `design/home/puni/*.png`（開発の `public/puni-test`）。
