@@ -97,7 +97,8 @@ jobs:
             # Login codes and invitations by email (launch 2026-11-26): switched on by the EMAIL_FROM variable
             # (e.g. "OBOLO ORDER <no-reply@your-domain>", a domain verified at Resend), after the key was stored
             # as obolo-resend-api-key. Then the code is no longer shown on the screen.
-            if [ -n "${{ vars.EMAIL_FROM }}" ]; then
+            # (or, without Google Cloud console access: the GitHub Actions secret RESEND_API_KEY, passed below)
+            if [ -n "${{ vars.EMAIL_FROM }}" ] && [ -z "${{ secrets.RESEND_API_KEY }}" ]; then
               echo 'RESEND_API_KEY=obolo-resend-api-key:latest'
             fi
             if [ -n "${{ vars.STRIPE_PUBLISHABLE_KEY }}" ]; then
@@ -146,6 +147,7 @@ jobs:
             AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || (vars.EMAIL_FROM && 'false') || 'true' }}
             EMAIL_DRIVER=${{ vars.EMAIL_FROM && 'resend' || 'console' }}
             EMAIL_FROM=${{ vars.EMAIL_FROM || 'Obolo Order <no-reply@example.com>' }}
+            ${{ secrets.RESEND_API_KEY != '' && format('RESEND_API_KEY={0}', secrets.RESEND_API_KEY) || 'EMAIL_KEY_SOURCE=secret-manager' }}
             BUDDY_OVERAGE_ENABLED=false
             BUNNY_STORAGE_ZONE=${{ vars.BUNNY_STORAGE_ZONE }}
             BUNNY_STORAGE_ENDPOINT=${{ vars.BUNNY_STORAGE_ENDPOINT || 'sg.storage.bunnycdn.com' }}
