@@ -150,7 +150,7 @@ function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx: Ctx; o
 }
 
 /** one planet's works (or all of them): the spiral and the list (M-R237) */
-function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet: BluenaPlanet | null; day?: number | null; ctx: Ctx; onOrigin?: (w: Work) => boolean; onMaterial?: (w: Work) => void }) {
+export function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet: BluenaPlanet | null; day?: number | null; ctx: Ctx; onOrigin?: (w: Work) => boolean; onMaterial?: (w: Work) => void }) {
   const { me } = useAuth();
   const [filter, setFilter] = useState<FindFilter>({});
   const [found, setFound] = useState<Found[] | null>(null);

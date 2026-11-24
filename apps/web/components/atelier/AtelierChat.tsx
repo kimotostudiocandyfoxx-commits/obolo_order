@@ -82,7 +82,7 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  * (Shell.tsx: left = the conversations, right = Bluena from day 3). Opened from a story step it plays the day's script
  * lines at their moments and hands what was made back to the story (`story`, story.ts).
  */
-export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack, welcome }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** M-R253 §6 ⑤: opened from the toast / the push — {bati}'s word for coming back */ welcome?: boolean; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
+export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack, welcome, banner }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** the Moon chat's tabs, just under the bar (MoonTabs) */ banner?: React.ReactNode; /** M-R253 §6 ⑤: opened from the toast / the push — {bati}'s word for coming back */ welcome?: boolean; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
   const { me, setMe } = useAuth();
   const own = usePartner();
   // in a story step the story's {bati} talks (the review page has no account: its {bati} is the story's)
@@ -708,7 +708,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         keyboard={talkState.keyboard}
         place={PLACE_BG.moon}
         top={story ? 40 : 0}
-        bar={{ title: partner.name, onList, onBluena, unread, onBack }}
+        bar={{ title: partner.name, onList, onBluena, unread, onBack, below: banner }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
         composer={

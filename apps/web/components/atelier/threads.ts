@@ -27,6 +27,10 @@ export type ThreadCtx = {
   day?: string;
   /** back from that day to the list */
   closeDay?: () => void;
+  /** the Moon chat's tabs (MoonTabs), to show under the thread's bar */
+  banner?: ReactNode;
+  /** a back control in the thread's bar (the ダチ tab: back to the row of ダチ) */
+  back?: () => void;
 };
 
 export type RenderThread = (id: string, ctx: ThreadCtx) => ReactNode;

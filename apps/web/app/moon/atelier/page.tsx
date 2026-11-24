@@ -31,6 +31,8 @@ function WithDachi() {
           onList={ctx.day ? ctx.closeDay : ctx.openList}
           onBluena={ctx.openBluena}
           day={ctx.day}
+          banner={ctx.banner}
+          onBack={ctx.back}
           onRead={markRead}
           onGone={() => {
             void reload();

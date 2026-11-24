@@ -38,6 +38,10 @@ export type DachiThreadProps = {
   place?: 'moon' | 'saturn' | null;
   /** M-R237: only this day's talk (YYYY-MM-DD), read only — a day opened from the past talks' list */
   day?: string;
+  /** the Moon chat's tabs (MoonTabs), under the bar */
+  banner?: React.ReactNode;
+  /** a back control in the bar (the ダチ tab: back to the row of ダチ) */
+  onBack?: () => void;
 };
 
 /**
@@ -46,7 +50,7 @@ export type DachiThreadProps = {
  * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
-export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day }: DachiThreadProps) {
+export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day, banner, onBack }: DachiThreadProps) {
   const ring = useMarkRing();
   const { me } = useAuth();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
@@ -158,6 +162,8 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
           title: day ? `${name}・${day.slice(5).replace('-', '/')}` : name,
           onList,
           onBluena,
+          onBack,
+          below: banner,
           right: person ? (
             <button onClick={() => setMenu(true)} aria-label="メニュー" className="grid h-[42px] w-[42px] flex-none place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-lg text-[#f4f1ff] backdrop-blur-[10px]">
               ⋯

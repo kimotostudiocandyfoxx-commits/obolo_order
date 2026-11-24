@@ -160,8 +160,10 @@ const charsAt = (sp: Speech, ms: number) => {
   while (n < sp.times.length && sp.times[n] <= ms) n++;
   return n;
 };
+/** the row under the bar (bar.below), px */
+export const BELOW_H = 34;
 /** the prototype's glass round button (design/talk/proto.html .ib) */
-const GLASS = 'relative grid h-[42px] w-[42px] flex-none place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px]';
+export const GLASS = 'relative grid h-[42px] w-[42px] flex-none place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[#f4f1ff] backdrop-blur-[10px]';
 const PILL = 'rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.6)] px-5 py-2 text-[13px] font-bold text-[#f4f1ff] backdrop-blur-[10px]';
 /** the story's own bubbles (Mincho, dark glass with a gold line, yours in gold): its scenes keep their world in the row */
 export type TalkSkin = 'app' | 'story';
@@ -240,6 +242,8 @@ export function TalkScene({
     unread?: boolean;
     left?: ReactNode;
     right?: ReactNode;
+    /** a small row just under the bar (the Moon chat's tabs: バティ | ダチ | ブルーナ) */
+    below?: ReactNode;
     /** at the top of this talk's own drawer (settings, the looks …) */
     drawer?: ReactNode;
     /** this talk's own drawer: 'app' = the signed-in app's threads (choosing one goes to the atelier); else the threads given */
@@ -665,7 +669,7 @@ export function TalkScene({
 
   // the layout (phone portrait first; the client's prototype, design/talk/proto.html)
   const { w, h } = size;
-  const barH = bar ? 62 : 0;
+  const barH = bar ? (bar.below ? 62 + BELOW_H : 62) : 0;
   // subtitles: a band of their own under the row (the words never sit over the people)
   const subBand = lines === 'subtitles' ? 96 : 0;
   const dockH = (dock ?? (keyboard ? 64 : 110)) + subBand;
@@ -1033,7 +1037,8 @@ export function TalkScene({
 
       {/* the top bar (small): the conversations at the left, the partner's name, the mute and Bluena at the right */}
       {bar ? (
-        <header className="absolute inset-x-0 z-[20] flex items-center gap-2.5 px-3.5 py-2.5" style={{ top }}>
+        <div className="absolute inset-x-0 z-[20]" style={{ top }}>
+        <header className="flex items-center gap-2.5 px-3.5 py-2.5">
           {/* the left: back (where the page has no other way out), then the conversations — the shell's drawer, or this talk's own */}
           <span className="flex flex-none gap-2">
             {bar.onBack && (
@@ -1066,6 +1071,8 @@ export function TalkScene({
             </button>
           )}
         </header>
+        {bar.below && <div className="-mt-1 flex justify-center px-3.5">{bar.below}</div>}
+        </div>
       ) : (
         !noMute && (
           <div className="absolute right-3.5 z-[20] flex gap-2.5" style={{ top: top + 10 }}>
