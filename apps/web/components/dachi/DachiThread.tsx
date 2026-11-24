@@ -10,6 +10,8 @@ import { HoldMic, Wave } from './HoldMic';
 import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
 import { DACHI_PAGE, DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import { DeviceButton } from '@/components/atelier/DeviceButton';
+import { clipItem } from '@/components/atelier/BluenaClip';
+import { clipsChanged, useClipSend } from '@/lib/clip/useClip';
 import type { Work } from '@/components/atelier/work';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
@@ -140,6 +142,15 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Bluena's 📎: files from the device, sent into this talk one after another (the open talk only: not a past day)
+  useClipSend('dachi', (files) => {
+    if (day) return;
+    void (async () => {
+      for (const f of files) await sendBody({ fileId: f.id });
+      clipsChanged();
+    })();
+  });
+
   useEffect(() => {
     setMsgs(null);
     void load();
@@ -188,10 +199,17 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
 
   const sendWork = async (card: DachiWorkCard) => {
     setWorks(null);
+    await sendBody({ work: card });
+  };
+  /** a work card or a 📎 file (KIMORIN⭐︎ answers these too) */
+  const sendBody = async (body: { work: DachiWorkCard } | { fileId: string }) => {
+    setErr(null);
+    if (id === 'kimorin') setWaiting(true);
     try {
-      sent(await getApi().sendDachiMessage(id, { work: card }));
+      sent(await getApi().sendDachiMessage(id, body));
     } catch (e) {
-      setErr(e instanceof ApiError ? e.message : String(e));
+      setWaiting(false);
+      setErr(e instanceof ApiError ? (e.code === 'FILE_NOT_FOUND' ? 'そのファイルは、もうないみたい' : e.message) : String(e));
     }
   };
 
@@ -217,13 +235,15 @@ export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone,
   const items: TalkItem[] = (msgs ?? []).map((m) => ({
     id: m.id,
     who: m.fromMe ? 'me' : m.character && m.character !== kind ? m.character : 'them',
-    text: m.kind === 'work' ? '' : (m.text ?? ''),
+    text: m.kind === 'work' || m.kind === 'file' ? '' : (m.text ?? ''),
     // M-R238: from the words (a character's line), else the sender's own face with it, else the rules
     face: m.faces ? undefined : (m.face ?? undefined),
     faces: m.faces,
     voice: m.kind === 'voice' ? { url: m.audioUrl, seconds: m.seconds } : undefined,
     mark: { kind: 'dachi_message' as const, id: m.id },
     card: m.kind === 'work' && m.work ? { label: m.work.title || WORK_WORD[m.work.kind], thumb: <WorkCardView card={m.work} />, full: <WorkCardView card={m.work} big /> } : undefined,
+    // Bluena's 📎: a picture as a card (the whole screen on a tap), a film / a sound / a document right in the bubble
+    ...(m.kind === 'file' && m.file ? clipItem(m.file) : {}),
   }));
 
   return (

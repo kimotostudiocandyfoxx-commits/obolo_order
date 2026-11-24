@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { DELIVERY_KINDS } from './schemas';
 import { TALK_FACES, type TalkBeat, type TalkFace, type TalkLook } from './talk';
+import type { ClipFile } from './clip';
 
 /**
  * ダチの声のメッセージ (client decision M-R212). After {name} becomes dachi with {inviter} on Saturn (day 3,
@@ -202,14 +203,16 @@ export interface DachiMessageView {
   fromMe: boolean;
   /** a character spoke it (MIKIE⭐︎DRILL's welcome in {inviter}'s thread, KIMORIN⭐︎'s lines) */
   character: DachiCharacter | null;
-  /** client 2026-11-24: 'text' — words typed in the ダチ talk (in `text`) */
-  kind: 'voice' | 'work' | 'text';
+  /** client 2026-11-24: 'text' — words typed in the ダチ talk (in `text`); 'file' — a 📎 file from the device (in `file`) */
+  kind: 'voice' | 'work' | 'text' | 'file';
   /** the voice (an absolute URL, or a path of the web app for a character's line); null = voice not made yet */
   audioUrl: string | null;
   seconds: number | null;
   /** the words of a character's line (shown while its voice is not made), or of a text message */
   text: string | null;
   work: DachiWorkCard | null;
+  /** a 📎 file (a picture, a film, a sound, a document); opened through GET /media/files/:id */
+  file?: ClipFile | null;
   /** M-R234: the sender's expression, decided when it was sent */
   face?: TalkFace | null;
   /** M-R238: the words' expressions, sentence by sentence (a character's line, a message with words) */
@@ -228,6 +231,8 @@ export const SendDachiMessageBody = z.union([
   z.object({ work: DachiWorkCard, face: SendFace }),
   // client 2026-11-24: words typed in the ダチ talk (the small keyboard beside the mic)
   z.object({ text: z.string().trim().min(1).max(DACHI_TEXT_MAX), face: SendFace }),
+  // Bluena's 📎: one of your own files (POST /media/files …/done), sent into the talk
+  z.object({ fileId: z.string().uuid(), face: SendFace }),
 ]);
 export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 

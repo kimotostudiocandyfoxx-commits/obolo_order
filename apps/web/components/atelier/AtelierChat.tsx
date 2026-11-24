@@ -34,6 +34,8 @@ import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
 import { ChangePreview } from './ChangePreview';
 import { DeviceButton } from './DeviceButton';
+import { clipItem } from './BluenaClip';
+import { useClipSend } from '@/lib/clip/useClip';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 
@@ -529,6 +531,19 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day]);
 
+  // Bluena's 📎: files from the device handed to {bati} — shown on your side; a picture is looked at, the rest answered
+  useClipSend('bati', (files) => {
+    setMsgs((m) => [...m, ...files.map((file) => ({ id: uid(), who: 'me' as const, text: '', file }))]);
+    void (async () => {
+      const first = files.find((f) => f.kind === 'photo') ?? files[0];
+      const r = await getApi()
+        .lookClip(first.id)
+        .catch(() => null);
+      if (r?.line) say(r.line);
+      if (files.length > 1) say(`${files.length}こ、うけとったよ。ブルーナにも、しまってあるからね`);
+    })();
+  });
+
   // M-R253 §5: works back home from their planets — {bati} tells who reacted (under 15: only the dachi; the server)
   useEffect(() => {
     if (story || !me) return;
@@ -747,7 +762,7 @@ export function AtelierChat({ first, talk, story, onList, unread, onBack, welcom
   ];
   const items: TalkItem[] = msgs.filter((m) => !hidden(m)).map((m) =>
     m.who === 'me'
-      ? { id: m.id, who: 'me', text: m.text, mark: { kind: 'local', id: m.id } }
+      ? { id: m.id, who: 'me', text: m.text, mark: { kind: 'local', id: m.id }, ...(m.file ? clipItem(m.file) : {}) }
       : m.who === 'bati'
         ? {
             id: m.id,

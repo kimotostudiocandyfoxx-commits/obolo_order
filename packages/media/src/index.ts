@@ -15,7 +15,7 @@ export interface BunnyStorageConfig {
   cdnHost: string;
 }
 
-export type MediaKind = 'voice' | 'image' | 'audio' | 'video-thumb' | 'avatar' | 'bati' | 'photo' | 'video' | 'poster' | 'show';
+export type MediaKind = 'voice' | 'image' | 'audio' | 'video-thumb' | 'avatar' | 'bati' | 'photo' | 'video' | 'poster' | 'show' | 'file';
 
 const EXT_BY_MIME: Record<string, string> = {
   'audio/webm': 'webm',
@@ -29,6 +29,10 @@ const EXT_BY_MIME: Record<string, string> = {
   'image/webp': 'webp',
   'image/svg+xml': 'svg',
   'video/mp4': 'mp4',
+  'application/pdf': 'pdf',
+  'text/plain': 'txt',
+  'text/csv': 'csv',
+  'application/zip': 'zip',
 };
 
 export function extForMime(mime: string): string {
@@ -58,6 +62,14 @@ export async function putObject(cfg: BunnyStorageConfig, key: string, body: Uint
   });
   if (!res.ok) throw new Error(`Bunny Storage upload failed: ${res.status} ${await res.text().catch(() => '')}`);
   return cdnUrl(cfg, key);
+}
+
+/**
+ * Read an object straight from Bunny Storage (with the zone's AccessKey, not through the public CDN): Bluena's private
+ * files are served by the API this way, after it checked who is asking. `range` passes a byte range through.
+ */
+export async function getObject(cfg: BunnyStorageConfig, key: string, range?: string): Promise<Response> {
+  return fetch(`https://${cfg.endpoint}/${cfg.zone}/${key}`, { headers: { AccessKey: cfg.accessKey, ...(range ? { range } : {}) } });
 }
 
 export async function deleteObject(cfg: BunnyStorageConfig, key: string): Promise<void> {

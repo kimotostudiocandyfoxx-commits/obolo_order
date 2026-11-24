@@ -88,6 +88,33 @@ export async function transcodePhoto(data: Buffer): Promise<{ data: Buffer; widt
   return { data: out, width: info.width, height: info.height };
 }
 
+/** a sound's length and whether it has one (Bluena's 📎 sounds) */
+export async function probeAudio(file: string): Promise<{ seconds: number; hasAudio: boolean }> {
+  const json = JSON.parse(await run('ffprobe', ['-v', 'error', '-print_format', 'json', '-show_streams', '-show_format', file], 30_000)) as {
+    streams?: { codec_type?: string }[];
+    format?: { duration?: string };
+  };
+  return { seconds: Number(json.format?.duration ?? 0), hasAudio: !!json.streams?.some((s) => s.codec_type === 'audio') };
+}
+
+/** Bluena's 📎 sounds: AAC 128 kbps in MP4 (plays everywhere, iPad included), metadata dropped, cut at `maxSeconds` */
+export async function transcodeAudio(input: string, output: string, maxSeconds: number): Promise<void> {
+  await run(
+    'ffmpeg',
+    ['-y', '-hide_banner', '-loglevel', 'error', '-i', input, '-t', String(maxSeconds), '-vn', '-map', '0:a:0', '-c:a', 'aac', '-b:a', '128k', '-ac', '2', '-movflags', '+faststart', '-map_metadata', '-1', '-f', 'mp4', output],
+    600_000,
+  );
+}
+
+/**
+ * An iPhone HEIC picture that sharp cannot read (its prebuilt libvips has no HEVC decoder): converted with libheif's
+ * heif-convert (apt libheif-examples in the API image) to a JPEG, which then goes through transcodePhoto as usual.
+ */
+export async function heicToJpeg(input: string, output: string): Promise<Buffer> {
+  await run('heif-convert', ['-q', '92', input, output], 60_000);
+  return readFile(output);
+}
+
 /**
  * Mars posts are square (client decision 2026-10-07): centre-crop to a square, 720 px, H.264.
  */

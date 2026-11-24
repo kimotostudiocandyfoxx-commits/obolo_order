@@ -29,3 +29,4 @@ export * from './planetHomeConfig';
 export * from './planetHome';
 export * from './changeables';
 export * from './talkTone';
+export * from './clip';

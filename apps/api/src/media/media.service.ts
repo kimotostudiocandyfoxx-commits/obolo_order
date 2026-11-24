@@ -4,11 +4,13 @@ import { MEDIA_POLICY, VOICE_MAX_BYTES, VOICE_MIME_TYPES } from '@obolo/shared';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull, ne, sql } from 'drizzle-orm';
 import { AppConfig, CONFIG } from '../config';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { mediaObjects, users } from '../db/schema';
+import { clipView } from './clip-view';
+import type { ClipFile } from '@obolo/shared';
 import { probe, squareVideo, transcodePhoto, transcodeVideo, videoPoster } from './transcode';
 import { writeFile } from 'node:fs/promises';
 
@@ -101,13 +103,18 @@ export class MediaService {
     return this.store(userId, kind, mime, data, requestOrigin);
   }
 
-  private async store(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string) {
+  /** Bluena's 📎: a private file (kind 'file') with what it is in `meta`; `id` chosen by the caller (a film and its poster) */
+  storeFile(userId: string, mime: string, data: Buffer, meta: Record<string, unknown>, requestOrigin: string, id?: string) {
+    return this.store(userId, 'file', mime, data, requestOrigin, { meta, id });
+  }
+
+  private async store(userId: string, kind: MediaKind, mime: string, data: Buffer, requestOrigin: string, opts: { meta?: Record<string, unknown>; id?: string } = {}) {
     const [u] = await this.db.write.select({ used: users.storageUsageBytes }).from(users).where(eq(users.id, userId));
     if ((u?.used ?? 0) + data.length > STORAGE_QUOTA_BYTES) {
       // Spec §5: reject with a storage add-on offer (add-on purchase = phase 1 billing, P-BILL-1).
       throw apiError(HttpStatus.PAYLOAD_TOO_LARGE, 'STORAGE_QUOTA', 'Storage quota exceeded');
     }
-    const id = crypto.randomUUID();
+    const id = opts.id ?? crypto.randomUUID();
     const key = mediaKey(kind, userId, mime, id);
     const bunny = this.bunny;
     let url: string;
@@ -131,6 +138,7 @@ export class MediaService {
         key,
         url,
         data: storage === 'db' ? data : null,
+        ...(opts.meta ? { meta: opts.meta } : {}),
       });
       await tx
         .update(users)
@@ -166,6 +174,16 @@ export class MediaService {
     return m ?? null;
   }
 
+  /** one of the user's 📎 files, as Bluena shows it (a film's poster is not one) */
+  async getOwnedFile(userId: string, id: string): Promise<ClipFile | null> {
+    const [m] = await this.db.write
+      .select()
+      .from(mediaObjects)
+      .where(and(eq(mediaObjects.id, id), eq(mediaObjects.userId, userId), eq(mediaObjects.kind, 'file'), isNull(mediaObjects.deletedAt)));
+    const v = m ? clipView(m) : null;
+    return v;
+  }
+
   async getOwned(userId: string, id: string, kind: MediaKind) {
     const [m] = await this.db.write
       .select({ id: mediaObjects.id, url: mediaObjects.url })
@@ -178,7 +196,8 @@ export class MediaService {
     const [m] = await this.db.read
       .select({ mime: mediaObjects.mime, data: mediaObjects.data })
       .from(mediaObjects)
-      .where(and(eq(mediaObjects.id, id), eq(mediaObjects.storage, 'db'), isNull(mediaObjects.deletedAt)));
+      // Bluena's 📎 files are private: never here (GET /media/files/:id checks who asks)
+      .where(and(eq(mediaObjects.id, id), eq(mediaObjects.storage, 'db'), ne(mediaObjects.kind, 'file'), isNull(mediaObjects.deletedAt)));
     return m?.data ? m : null;
   }
 

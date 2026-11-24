@@ -1,4 +1,4 @@
-import type { ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { ClipFile, ClipStartBody, ClipUploadStart, ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -158,6 +158,17 @@ export interface Api {
   composeSongSave(id: string): Promise<SongView>;
   /** Photo → WebP ≤ 1600 px on the server (docs/media.md). */
   uploadPhoto(blob: Blob): Promise<UploadedPhoto>;
+  /** Bluena's 📎 (shared/clip.ts): a file from the device, in pieces — start, each piece, done (the kept file) */
+  startClip(body: ClipStartBody): Promise<ClipUploadStart>;
+  putClipPart(id: string, n: number, piece: Blob, onProgress?: (sent: number) => void): Promise<void>;
+  finishClip(id: string): Promise<ClipFile>;
+  /** your 📎 files in Bluena, newest first */
+  clips(): Promise<ClipFile[]>;
+  /** a 📎 file's bytes (yours, or one a ダチ sent you), for an object URL */
+  clipBlob(id: string): Promise<Blob>;
+  dropClip(id: string): Promise<void>;
+  /** a 📎 file handed to {bati}: a picture is looked at; the line {bati} says */
+  lookClip(id: string): Promise<{ line: string; looked: boolean }>;
   /** Video → 720p / ~1.5 Mbps MP4 trimmed to `maxSeconds`, plus a poster image. */
   uploadVideo(blob: Blob, maxSeconds: number): Promise<UploadedVideo>;
   /** `plaza`: only the voices dropped in that ひろば (みんな map) */

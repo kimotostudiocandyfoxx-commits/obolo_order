@@ -16,6 +16,21 @@
 
 API：`POST /media/photo`、`POST /media/video?max=<秒>`（本文はファイルそのもの）、`POST /media/voice`。
 
+## ブルーナの📎（端末から とりこむ・2026-11-24）
+ブルーナの一覧のいちばん上〔とりこむ〕から、スマホ・iPad の写真・動画・音・ファイルを入れて、ダチの会話に送る／バティにわたす／ブルーナにしまう。
+保存先は上と同じ（Bunny、開発中は Postgres・1人1GB の枠に入る）。ただし **非公開**：`media_objects.kind = 'file'`、公開の `GET /media/:id` では出さない。
+`GET /media/files/:id` が、持ち主と「その会話で送られたダチ（いまもダチ）」にだけ返す（Bunny からはストレージの鍵で読む。CDN のURLは渡さない）。
+
+| 種類 | 変換 | 受け付ける元の大きさ |
+|---|---|---|
+| 写真 | 上の写真と同じ（WebP・1600px・位置情報など消す）。iPhone の HEIC は heif-convert で JPEG にしてから | 25MB まで |
+| 動画 | 上の動画と同じ（720p・はじめの60秒）＋サムネイル | 100MB まで |
+| 音 | AAC 128kbps（MP4）、メタデータを消す、30分まで | 30MB まで |
+| ファイル | そのまま。PDF・テキスト・CSV・ZIP・Word/Excel/PowerPoint だけ。中身の先頭が名乗った種類と合うか確かめる | 20MB まで |
+
+Cloud Run は1回のリクエストが 32MiB までなので、**8MB ずつに分けて送る**：`POST /media/files`（名前・種類・大きさ）→ `POST /media/files/:id/parts/:n` → `POST /media/files/:id/done`。
+分けた途中のものは Bunny の `tmp/clip/` に置き、done で消す。回数の上限：とりこみ 60回/時、分けた送信 600回/時、バティに見せる 20回/時。
+
 ## 費用の考え方
 - 1日88分しか使えない → 最大でも月44時間。全部を動画にしても 720p・1.5Mbps なら **月約30GB/人**。
 - Bunny の Volume ネットワーク（約 $0.005/GB）なら約23円/人、Standard（約 $0.03/GB）だと約135円/人。

@@ -4,6 +4,8 @@ import { CONFIG, type AppConfig } from '../config';
 import { textToSpeech } from '../voice/fish.client';
 import { toMp3 } from '../voice/audio';
 import {
+  CLIP_WORD,
+  type ClipFile,
   DACHI_CHARACTER_NAMES,
   dachiLine,
   isCharacterThread,
@@ -47,6 +49,9 @@ const cardOf = (j: unknown): DachiWorkCard | null => {
 };
 type NewRow = typeof dachiMessages.$inferInsert;
 /** a text message's words (work_json { text }) */
+/** a 📎 file's view kept with the message (work_json { file }) */
+const fileOf = (j: unknown): ClipFile | null => (j && typeof j === 'object' && (j as { file?: unknown }).file && typeof (j as { file: { id?: unknown } }).file.id === 'string' ? (j as { file: ClipFile }).file : null);
+const fileWords = (f: ClipFile | null) => (f ? `${CLIP_WORD[f.kind]}「${f.name}」` : 'ファイル');
 const textOf = (j: unknown): string | null => (j && typeof j === 'object' && typeof (j as { text?: unknown }).text === 'string' ? (j as { text: string }).text : null);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -283,6 +288,7 @@ export class DachiVoiceService {
     const fromMe = r.senderId === userId;
     const words = (r.senderId ? null : dachiLine(r.lineId)?.text) ?? textOf(r.workJson);
     if (r.kind === 'work') return { kind: 'work', text: cardOf(r.workJson)?.title || '作品', fromMe };
+    if (r.kind === 'file') return { kind: 'work', text: `📎 ${CLIP_WORD[fileOf(r.workJson)?.kind ?? 'file']}`, fromMe };
     if (r.kind === 'voice') return { kind: 'voice', text: words ?? '声のメッセージ', fromMe };
     return { kind: 'text', text: words ?? '', fromMe };
   }
@@ -297,6 +303,11 @@ export class DachiVoiceService {
       if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
       // M-R234: the sender's expression rides in work_json (a voice row has no card; no new column)
       row = { ...base, kind: 'voice', audioUrl: m.url, audioMediaId: m.id, seconds: Math.round(body.seconds * 10) / 10, ...(body.face ? { workJson: { face: body.face } } : {}) };
+    } else if ('fileId' in body) {
+      // Bluena's 📎: one of your own files; its id in audio_media_id (who may open it: GET /media/files/:id)
+      const f = await this.media.getOwnedFile(userId, body.fileId);
+      if (!f) throw apiError(HttpStatus.NOT_FOUND, 'FILE_NOT_FOUND', 'File not found');
+      row = { ...base, kind: 'file', audioMediaId: f.id, seconds: f.seconds ?? null, workJson: { file: f, ...(body.face ? { face: body.face } : {}) } };
     } else if ('text' in body) {
       // client 2026-11-24: words typed in the ダチ talk — checked like Saturn's words (refused, never sent, when flagged);
       // kept in work_json { text, face } (the kind column is free text: no migration)
@@ -308,7 +319,13 @@ export class DachiVoiceService {
     const m = await this.insertMessage(row);
     if (!character) {
       const name = (await this.journey(userId))?.displayName || 'ダチ';
-      const n = 'text' in body ? { title: `💬 ${name}から、メッセージ`, body: body.text.length > 40 ? `${body.text.slice(0, 40)}…` : body.text } : { title: `🎤 ${name}から、声のメッセージ`, body: 'ひらいて聞いてみよう' };
+      const file = fileOf(row.workJson);
+      const n =
+        'text' in body
+          ? { title: `💬 ${name}から、メッセージ`, body: body.text.length > 40 ? `${body.text.slice(0, 40)}…` : body.text }
+          : file
+            ? { title: `📎 ${name}から、${CLIP_WORD[file.kind]}`, body: 'ひらいて見てみよう' }
+            : { title: `🎤 ${name}から、声のメッセージ`, body: 'ひらいて聞いてみよう' };
       void this.push
         .notify(thread, { ...n, url: `/moon/atelier?tab=dachi&dachi=${userId}`, tag: `dachi-${userId}` })
         .catch((e: unknown) => this.log.warn(`push failed: ${String(e)}`));
@@ -347,7 +364,7 @@ export class DachiVoiceService {
   /** the turns of the KIMORIN thread so far, for the answer (the member's words, KIMORIN's words) */
   private turnOf(r: Row): ChatTurn | null {
     const text = (r.senderId ? null : dachiLine(r.lineId)?.text) ?? textOf(r.workJson);
-    if (r.senderId) return { role: 'user', text: text ?? (r.kind === 'voice' ? '（声のメッセージ）' : r.kind === 'work' ? `（作品「${cardOf(r.workJson)?.title || '作品'}」）` : '') };
+    if (r.senderId) return { role: 'user', text: text ?? (r.kind === 'voice' ? '（声のメッセージ）' : r.kind === 'work' ? `（作品「${cardOf(r.workJson)?.title || '作品'}」）` : r.kind === 'file' ? `（${fileWords(fileOf(r.workJson))}）` : '') };
     return text ? { role: 'assistant', text } : null;
   }
 
@@ -358,7 +375,8 @@ export class DachiVoiceService {
     else if ('mediaId' in body) {
       words = sent.audioUrl ? await this.transcribeVoice(userId, sent.audioUrl).catch(() => '') : '';
       if (words && (await moderateText(words, this.llm)).flagged) return null;
-    } else words = `（作品「${body.work.title || '作品'}」を送りました）`;
+    } else if ('fileId' in body) words = `（${fileWords(fileOf(sent.workJson))}を送りました）`;
+    else words = `（作品「${body.work.title || '作品'}」を送りました）`;
     if (!words) return null;
     const past = (await this.rows(this.where(userId, 'kimorin'), 12)).filter((r) => r.id !== sent.id).map((r) => this.turnOf(r)).filter((t): t is ChatTurn => !!t?.text);
     const name = (await this.journey(userId))?.displayName ?? '';
@@ -383,12 +401,13 @@ export class DachiVoiceService {
       id: r.id,
       fromMe: r.senderId === userId,
       character: r.senderId ? null : ((r.character as DachiCharacter | null) ?? null),
-      kind: r.kind === 'work' ? 'work' : r.kind === 'text' ? 'text' : 'voice',
+      kind: r.kind === 'work' ? 'work' : r.kind === 'text' ? 'text' : r.kind === 'file' ? 'file' : 'voice',
       // a character's voice comes from the line data (filled in when the voice is made), so no migration is needed then
       audioUrl: line ? line.voice : (r.audioUrl ?? null),
       seconds: r.seconds ?? null,
       text: line?.text ?? textOf(r.workJson),
       work: r.kind === 'work' ? cardOf(r.workJson) : null,
+      ...(r.kind === 'file' ? { file: fileOf(r.workJson) } : {}),
       face: faceOf(r.workJson),
       // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
       ...(line?.text ? { faces: ruleBeats(line.text) } : textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),

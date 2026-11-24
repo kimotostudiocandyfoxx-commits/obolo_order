@@ -330,6 +330,13 @@
       "when": 1795504218804,
       "tag": "0046_kororin_pic",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1795522528821,
+      "tag": "0047_media_meta",
+      "breakpoints": true
     }
   ]
 }

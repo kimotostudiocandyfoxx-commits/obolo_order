@@ -15,7 +15,11 @@ function world(o: { llm?: unknown } = {}) {
   const invitations: Record<string, { inviterId: string | null; voiceUrl: string | null; voiceMediaId: string | null; voiceSeconds: number | null }> = {};
   const rows: Row[] = [];
   const pushes: string[] = [];
-  const media = { getOwned: async (userId: string, id: string) => (id.startsWith(userId.slice(0, 1)) ? { id, url: `https://cdn/${id}.webm` } : null) };
+  const media = {
+    getOwned: async (userId: string, id: string) => (id.startsWith(userId.slice(0, 1)) ? { id, url: `https://cdn/${id}.webm` } : null),
+    // Bluena's 📎: a file is the sender's when its id starts like theirs
+    getOwnedFile: async (userId: string, id: string) => (id.startsWith(userId.slice(0, 1)) ? { id, kind: 'photo', name: 'umi.jpg', mime: 'image/webp', sizeBytes: 1200, width: 800, height: 600, seconds: null, posterId: null, createdAt: new Date().toISOString() } : null),
+  };
   const notes: { to: string; title: string; body: string; url: string }[] = [];
   const push = { notify: async (to: string, n: { title: string; body: string; url: string }) => void (pushes.push(to), notes.push({ to, ...n })) };
   const s = new DachiVoiceService({} as never, { list: async () => [] } as never, media as never, push as never, o.llm as never);
@@ -368,5 +372,38 @@ describe('R10: the ダチ history and older messages', () => {
     await w.s.messages(A, B, { before: new Date().toISOString(), limit: 50 });
     await w.s.messages(A, B, { limit: 9999 });
     expect(calls.map((c) => c.limit)).toEqual([50, 200]);
+  });
+});
+
+describe("Bluena's 📎: a file into a ダチ talk", () => {
+  const file = (who: string) => ({ fileId: `${who.slice(0, 1)}2222222-2222-4222-8222-222222222222` });
+  it('your own file goes to a ダチ, kept by its id; both see it in the talk and the history', async () => {
+    const w = world();
+    w.dachi(A, B);
+    w.people[A] = { journeyDay: 4, journeyCompletedAt: null, dachiAt: new Date(), displayName: 'ネオ' };
+    const m = await w.s.send(A, B, file(A));
+    expect(m).toMatchObject({ kind: 'file', fromMe: true, file: { kind: 'photo', name: 'umi.jpg' } });
+    expect(w.rows.at(-1)).toMatchObject({ senderId: A, recipientId: B, kind: 'file', audioMediaId: file(A).fileId });
+    const seen = w.s.toView(B, w.rows.at(-1) as never);
+    expect(seen).toMatchObject({ fromMe: false, kind: 'file', file: { id: file(A).fileId } });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(w.notes.at(-1)).toMatchObject({ to: B, title: '📎 ネオから、写真' });
+  });
+
+  it("someone else's file, or one that is not there, is not sent; nor to a non-ダチ", async () => {
+    const w = world();
+    w.dachi(A, B);
+    await expect(w.s.send(A, B, file(B))).rejects.toThrow();
+    await expect(w.s.send(A, C, file(A))).rejects.toThrow();
+    expect(w.rows).toHaveLength(0);
+  });
+
+  it('KIMORIN⭐︎ hears what was sent', async () => {
+    const said: string[] = [];
+    const w = world({ llm: { name: 't', chat: async (r: { history: { text: string }[] }) => (said.push(r.history.at(-1)!.text), 'いい写真ですね。') } });
+    w.people[A] = { journeyDay: 4, journeyCompletedAt: null, dachiAt: null, displayName: 'ネオ' };
+    const m = await w.s.send(A, 'kimorin', file(A), { reply: true });
+    expect(m.kind).toBe('file');
+    expect(said.some((t) => t.includes('写真「umi.jpg」'))).toBe(true);
   });
 });

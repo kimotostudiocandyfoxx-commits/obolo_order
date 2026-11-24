@@ -125,6 +125,13 @@ import {
   type MarkedKind,
   BATI_VOICE_MIN_SECONDS,
   mediaAllowed,
+  CLIP_BATI_LINES,
+  CLIP_CHUNK_BYTES,
+  clipKindOf,
+  clipName,
+  clipParts,
+  clipType,
+  type ClipFile,
 } from '@obolo/shared';
 import { demoEggOf, demoBatiEgg, demoBatiForget, demoBatiMemory, demoBatiNew, demoBatiRole, demoBatiSpeech, demoBatiSwitch, demoBatiSync } from './demoBati';
 import { demoBati, demoFromReference, demoNeoLooks, demoRefine, demoStickerArt } from '@/lib/look';
@@ -173,6 +180,8 @@ interface DemoState {
   dachiAt?: string;
   /** ダチの声のメッセージ in this browser (`thread` = 'demo-inviter' | 'kimorin' | 'mikie') */
   dachiMsgs?: (DachiMessageView & { thread: string; lineId?: string; read?: boolean })[];
+  /** Bluena's 📎 files in this browser (their bytes in IndexedDB) */
+  clips?: ClipFile[];
   /** works delivered to the dachi (〔推し〕) */
   deliveries?: DeliveryView[];
   /** Jupiter (パタパタ): roots, posts, branch names — this browser only */
@@ -902,6 +911,55 @@ export class DemoApi implements Api {
     throw new ApiError(501, 'DEMO', 'demo');
   }
 
+  // Bluena's 📎 in the demo: the pieces in memory, the file in IndexedDB, kept as it is (no re-encoding)
+  private clipUps = new Map<string, { name: string; type: string; size: number; pieces: Blob[] }>();
+  async startClip(body: Parameters<Api['startClip']>[0]) {
+    const type = clipType(body.type, body.name);
+    if (!clipKindOf(type, body.name)) throw new ApiError(415, 'UNSUPPORTED_FILE', 'Unsupported file type');
+    const id = uid();
+    this.clipUps.set(id, { name: clipName(body.name), type, size: body.size, pieces: [] });
+    return { id, parts: clipParts(body.size), chunkBytes: CLIP_CHUNK_BYTES };
+  }
+  async putClipPart(id: string, n: number, piece: Blob, onProgress?: (sent: number) => void) {
+    const u = this.clipUps.get(id);
+    if (!u) throw new ApiError(404, 'UPLOAD_NOT_FOUND', 'Upload not found');
+    // a little time, so the bar is seen moving
+    for (let k = 1; k <= 4; k++) {
+      await sleep(120);
+      onProgress?.((piece.size * k) / 4);
+    }
+    u.pieces[n] = piece;
+  }
+  async finishClip(id: string) {
+    const u = this.clipUps.get(id);
+    if (!u) throw new ApiError(404, 'UPLOAD_NOT_FOUND', 'Upload not found');
+    this.clipUps.delete(id);
+    const blob = new Blob(u.pieces, { type: u.type });
+    await putBlob(id, blob);
+    const kind = clipKindOf(u.type, u.name)!;
+    const f: ClipFile = { id, kind, name: u.name, mime: u.type, sizeBytes: blob.size, width: null, height: null, seconds: null, posterId: null, createdAt: now() };
+    (this.s.clips ??= []).unshift(f);
+    this.save();
+    return f;
+  }
+  async clips() {
+    return [...(this.s.clips ?? [])];
+  }
+  async clipBlob(id: string) {
+    const b = await getBlob(id);
+    if (!b) throw new ApiError(404, 'FILE_NOT_FOUND', 'File not found');
+    return b;
+  }
+  async dropClip(id: string) {
+    this.s.clips = (this.s.clips ?? []).filter((f) => f.id !== id);
+    this.save();
+  }
+  async lookClip(id: string) {
+    const f = (this.s.clips ?? []).find((x) => x.id === id);
+    await sleep(500);
+    return { line: CLIP_BATI_LINES[f?.kind ?? 'file'], looked: false };
+  }
+
   // demo: kept as-is in this browser (no re-encoding)
   async uploadPhoto(blob: Blob) {
     const { id, url } = await this.uploadVoice(blob);
@@ -1504,7 +1562,7 @@ export class DemoApi implements Api {
     const msgs = this.dachiArrive();
     const rows = list.map((t) => {
       const last = msgs.filter((m) => m.thread === t.id).at(-1);
-      return { ...t, lastAt: last?.createdAt ?? t.lastAt, preview: last ? { kind: last.kind, text: last.kind === 'work' ? (last.work?.title || '作品') : last.kind === 'voice' ? (last.text ?? '声のメッセージ') : (last.text ?? ''), fromMe: last.fromMe } : null };
+      return { ...t, lastAt: last?.createdAt ?? t.lastAt, preview: last ? { kind: last.kind === 'file' ? ('work' as const) : last.kind, text: last.kind === 'file' ? '📎 ファイル' : last.kind === 'work' ? (last.work?.title || '作品') : last.kind === 'voice' ? (last.text ?? '声のメッセージ') : (last.text ?? ''), fromMe: last.fromMe } : null };
     });
     return historyPage(historyOrder(rows), cursor);
   }
@@ -1516,6 +1574,8 @@ export class DemoApi implements Api {
         ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: null, work: null, face: body.face ?? null, createdAt: now() }
         : 'text' in body
           ? { id: uid(), fromMe: true, character: null, kind: 'text', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now() }
+          : 'fileId' in body
+          ? { id: uid(), fromMe: true, character: null, kind: 'file', audioUrl: null, seconds: null, text: null, work: null, file: (this.s.clips ?? []).find((f) => f.id === body.fileId) ?? null, face: body.face ?? null, createdAt: now() }
           : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, face: body.face ?? null, createdAt: now() };
     (this.s.dachiMsgs ??= []).push({ ...m, thread });
     // R9 in the demo: KIMORIN⭐︎ answers with a set line (the server answers through the chat provider)

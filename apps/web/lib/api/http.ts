@@ -219,6 +219,58 @@ export class HttpApi implements Api {
   uploadPhoto(blob: Blob) {
     return this.req<Awaited<ReturnType<Api['uploadPhoto']>>>('POST', '/media/photo', undefined, blob);
   }
+  startClip(body: Parameters<Api['startClip']>[0]) {
+    return this.req<Awaited<ReturnType<Api['startClip']>>>('POST', '/media/files', body);
+  }
+  /** one piece by XHR (fetch has no upload progress); the token as for every call */
+  putClipPart(id: string, n: number, piece: Blob, onProgress?: (sent: number) => void) {
+    return new Promise<void>((resolve, reject) => {
+      const x = new XMLHttpRequest();
+      x.open('POST', `${this.base}/media/files/${encodeURIComponent(id)}/parts/${n}`);
+      const token = tokenStore.get();
+      if (token) x.setRequestHeader('authorization', `Bearer ${token}`);
+      x.setRequestHeader('content-type', 'application/octet-stream');
+      x.upload.onprogress = (e) => onProgress?.(e.loaded);
+      x.onload = () => {
+        if (x.status >= 200 && x.status < 300) return resolve();
+        let j: { error?: { code: string; message: string } } | null;
+        try {
+          j = JSON.parse(x.responseText) as { error?: { code: string; message: string } } | null;
+        } catch {
+          j = null;
+        }
+        if (x.status === 401) tokenStore.clear();
+        reject(new ApiError(x.status, j?.error?.code ?? 'ERROR', j?.error?.message ?? x.statusText));
+      };
+      x.onerror = () => reject(new ApiError(0, 'NETWORK', 'Network error'));
+      x.send(piece);
+    });
+  }
+  finishClip(id: string) {
+    return this.req<Awaited<ReturnType<Api['finishClip']>>>('POST', `/media/files/${encodeURIComponent(id)}/done`, {});
+  }
+  clips() {
+    return this.req<Awaited<ReturnType<Api['clips']>>>('GET', '/media/files');
+  }
+  async clipBlob(id: string) {
+    const headers: Record<string, string> = {};
+    const token = tokenStore.get();
+    if (token) headers.authorization = `Bearer ${token}`;
+    let res: Response;
+    try {
+      res = await fetch(`${this.base}/media/files/${encodeURIComponent(id)}`, { headers });
+    } catch {
+      throw new ApiError(0, 'NETWORK', 'Network error');
+    }
+    if (!res.ok) throw new ApiError(res.status, res.status === 404 ? 'FILE_NOT_FOUND' : 'ERROR', res.statusText);
+    return res.blob();
+  }
+  async dropClip(id: string) {
+    await this.req<unknown>('DELETE', `/media/files/${encodeURIComponent(id)}`);
+  }
+  lookClip(id: string) {
+    return this.req<Awaited<ReturnType<Api['lookClip']>>>('POST', `/media/files/${encodeURIComponent(id)}/look`, {});
+  }
   uploadVideo(blob: Blob, maxSeconds: number) {
     return this.req<Awaited<ReturnType<Api['uploadVideo']>>>('POST', `/media/video?max=${Math.round(maxSeconds)}`, undefined, blob);
   }

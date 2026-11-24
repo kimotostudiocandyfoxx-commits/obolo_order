@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/auth';
 import { characterLook, PLACE_BG } from '@/lib/talk/looks';
 import { MoonShelf, WorkSheet } from './Drawers';
 import { DeviceButton } from './DeviceButton';
+import { BluenaClip, ClipRows } from './BluenaClip';
 import { DachiHistory } from './DachiHistory';
 import type { Work } from './work';
 import { KindMark } from './WorkCard';
@@ -262,6 +263,9 @@ export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void;
           {found === null && <p className="py-10 text-center text-xs text-white/60">…</p>}
           {found?.length === 0 && <p className="py-10 text-center text-[13px] text-white/75 [text-shadow:0_1px_4px_#000]">まだ、なにもない</p>}
           <ul className="space-y-3.5">
+            {/* 📎: pictures, films, sounds, files from this phone / iPad, first in the list; then the ones kept (BluenaClip) */}
+            <BluenaClip mode={send ? sendTo : 'keep'} onSent={onClose} onLine={setLine} />
+            {!starOnly && <ClipRows mode={send ? sendTo : 'keep'} onSent={onClose} />}
             {found?.map((x, k) => (
               <li key={`${x.kind}:${x.id}`} className="flex items-center gap-2">
                 <button onClick={() => setOpen(x)} className="flex min-w-0 flex-1 items-center gap-3 text-left" data-testid="bluena-work">

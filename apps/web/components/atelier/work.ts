@@ -1,5 +1,5 @@
 import type { AtelierKind } from '@/lib/atelier/unlock';
-import type { RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
+import type { ClipFile, RefineTarget, WorkMaterial, WorkOrigin } from '@obolo/shared';
 import type { MadeSong } from '@/lib/mercury/compose';
 
 /**
@@ -83,7 +83,7 @@ export function swipeTo(i: number, dir: -1 | 1, n: number): number {
   return Math.max(0, Math.min(n - 1, i + dir));
 }
 
-export type Msg = { id: string; who: 'me'; text: string } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[]; /** M-R263: a change {bati} made (the preview card and 〔元に戻す〕) */ changed?: { id: string; from: string; to: string; undone?: boolean }; /** client 2026-11-24: a picture in the talk (a lookup's, 「〇〇の絵を見せて」) */ pic?: { url: string; title?: string; source?: string; pageUrl?: string } } | { id: string; who: 'work'; work: Work };
+export type Msg = { id: string; who: 'me'; text: string; /** Bluena's 📎: a file from the device handed over */ file?: ClipFile } | { id: string; who: 'bati'; text: string; chips?: string[]; /** a story line: the script's speaker (KIMORIN, OBOLON, コロリン …) */ speaker?: string; /** M-R236: the works {bati} found (「★がついた曲、見せて」), shown as cards */ found?: Work[]; /** M-R263: a change {bati} made (the preview card and 〔元に戻す〕) */ changed?: { id: string; from: string; to: string; undone?: boolean }; /** client 2026-11-24: a picture in the talk (a lookup's, 「〇〇の絵を見せて」) */ pic?: { url: string; title?: string; source?: string; pageUrl?: string } } | { id: string; who: 'work'; work: Work };
 
 /** the kinds that fly to a planet (〔星へ飛ばす〕) */
 export const FLIES: Partial<Record<AtelierKind, 'saturn' | 'jupiter' | 'mercury' | 'mars' | 'venus'>> = {

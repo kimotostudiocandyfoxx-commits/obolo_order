@@ -36,6 +36,8 @@ import { InfraModule } from './infra/infra.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
 import { MediaController } from './media/media.controller';
+import { FilesController } from './media/files.controller';
+import { FilesService } from './media/files.service';
 import { MediaService } from './media/media.service';
 import { SaturnController, SaturnPlazasController, SaturnUsersController } from './saturn/saturn.controller';
 import { PlazaService } from './saturn/plaza.service';
@@ -81,6 +83,8 @@ import { WalletController } from './wallet/wallet.controller';
     WalletController,
     ManaAdminController,
     BuddyController,
+    // before MediaController: GET /media/files must not be read as GET /media/:id
+    FilesController,
     MediaController,
     SaturnController,
     SaturnUsersController,
@@ -123,6 +127,7 @@ import { WalletController } from './wallet/wallet.controller';
     CompassService,
     StoryService,
     MediaService,
+    FilesService,
     SaturnService,
     PlazaService,
     JupiterService,

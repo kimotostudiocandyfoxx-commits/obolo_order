@@ -250,6 +250,8 @@ export const mediaObjects = pgTable(
     url: text('url').notNull(),
     data: bytea('data'),
     synthetic: integer('synthetic').notNull().default(0), // spec §6.3: synthetic audio flag
+    /** Bluena's 📎 files (kind 'file'): { sub: photo|video|audio|file|poster, name, width, height, seconds, posterId, parent } */
+    meta: jsonb('meta'),
     ...timestamps,
   },
   (t) => [index('media_objects_user_idx').on(t.userId)],

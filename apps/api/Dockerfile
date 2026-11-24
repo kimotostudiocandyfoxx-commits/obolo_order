@@ -12,8 +12,8 @@ RUN pnpm --filter @obolo/api deploy --prod --legacy /out
 
 FROM node:22-slim
 # ffmpeg re-encodes uploaded videos to 720p / ~1.5 Mbps (docs/media.md) and renders Mars MVs;
-# the CJK font is for the lyrics burnt onto MVs
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk && rm -rf /var/lib/apt/lists/*
+# the CJK font is for the lyrics burnt onto MVs; heif-convert turns iPhone HEIC pictures (Bluena's clip) into JPEG
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk libheif-examples && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /out .
