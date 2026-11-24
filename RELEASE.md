@@ -7,3 +7,4 @@
 - R3 2026-11-24T03:09Z 0ef93680 — R3: Saturn final form (cute record with 6 colours, popping balls, chibi figures), mana gems 88/888/8888 (1 yen = 1 mana), tokushoho operator details, login codes and invitations by email, WEB_ORIGIN default
 - R4 2026-11-24T06:10Z b58e835f — R4: Saturn polish (8 kororin, faces, smooth jiggle, club mode, 16-ball queue, disc button, names on balls), changes through Bati with undo cards, one button per planet, skip only after day 1 (M-R263-M-R273, M-R269)
 - R5 2026-11-24T06:15Z bd4d80b4 — R5: Eclipse told on Jupiter (月88円, free play stays free), early-join only from settings after day 4, Obolo Order journey card on day 8, deciding-day line (M-R274)
+- R6 2026-11-24T07:18Z 38b0ef3f — R6: start screen without the summary lines, Bati greets with やっほー (no chips), bubble colour through Bati, iPad audio unlock, recording conversion fix, default Fish voice path, Moon chat tabs (Bati | ダチ | ブルーナ)
