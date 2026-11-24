@@ -9876,6 +9876,17 @@
       ],
       "always": false,
       "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines, sticker-like): the cute super-deformed chibi of the character in the FIRST reference picture seen FROM BEHIND — the back of the big round head with his black hair, the back of his black jacket, the small body; one hand slightly raised as if waving to someone in front. Upper body and head fill most of the frame. Centered. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "kakejiku",
+      "w": 896,
+      "h": 1280,
+      "size": [
+        700,
+        1000
+      ],
+      "always": false,
+      "prompt": "An ornate Japanese hanging scroll (kakejiku) seen straight from the front, drawn in a rich painterly Japanese anime fantasy film style: a thin dark lacquered wooden rod at the top with a twisted red-and-gold silk hanging cord, a mounting of deep forest-green brocade silk with subtle gold leaf and vine patterns around the edges, thin gold trim lines, a heavier dark wooden roller at the bottom with ornate gold end caps and two small red tassels. In the centre a large perfectly SQUARE area of plain, completely empty, smooth cream washi paper with no drawing, no text, no marks at all. Symmetrical, crisp clean outline around the whole scroll, high detail. Plain solid pure white background, no shadow, no text."
     }
   ],
   "redo": []
