@@ -27,7 +27,7 @@ for f in sorted(os.listdir(H+'/kororin')):
     if f.endswith('.webp'): im=Image.open(H+'/kororin/'+f).convert('RGBA'); im.thumbnail((200,200)); A['kor-'+f[:-5]]=uri(im,86)
 for f in sorted(os.listdir(H+'/puni')):
     if f.endswith('.png'): im=Image.open(H+'/puni/'+f).convert('RGBA'); im.thumbnail((200,200)); A['puni-'+f[:-4]]=uri(im,88)
-SAT=os.environ.get('SATURN_BG','home2-bg-saturn-lowb')
+SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cuteb')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
 open(H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')
