@@ -103,7 +103,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
           <img src={MOON_ZONES.hall} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
           <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
           {hall.length ? (
-            <Strollers threads={hall} onOpen={onOpen} ground={outside.length || lonely ? 0.095 : 0.07} back={0.28} eye={MOON_ZONES_EYE.hall} />
+            <Strollers threads={hall} onOpen={onOpen} ground={outside.length || lonely ? 0.19 : 0.17} back={0.32} eye={MOON_ZONES_EYE.hall} />
           ) : (
             <div className="absolute inset-x-0 bottom-[14%] z-[5] flex flex-col items-center gap-4 px-8 text-center">
               {/* PLACEHOLDER (P-MOON-TABS-1): the words when there is no ダチ yet */}
@@ -145,7 +145,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
             <img src={MOON_ZONES.outside} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 60%' }} />
             <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.45) 0%,rgba(7,11,36,0) 25%,rgba(7,11,36,0) 70%,rgba(7,11,36,.5) 100%)' }} />
             <p className="absolute inset-x-0 top-[13.5%] z-[6] text-center text-[12px] font-bold tracking-[0.3em] text-[#f4f1ff]/80 [text-shadow:0_1px_6px_#000]">みんな</p>
-            <Strollers threads={outside} onOpen={onOpen} far ground={0.04} back={0.25} eye={MOON_ZONES_EYE.outside} />
+            <Strollers threads={outside} onOpen={onOpen} far ground={0.1} back={0.28} eye={MOON_ZONES_EYE.outside} />
           </section>
         )}
       </div>
@@ -268,6 +268,67 @@ const standOf = (t: ThreadInfo) => t.stand || (t.id === 'kimorin' ? characterLoo
 /** the strollers' box: the lower 78% of the zone (the tab bar above) */
 const BOX = 0.78;
 
+/**
+ * Where a standing picture's figure begins (its head): the top of its opaque pixels and the middle of that top row, as
+ * fractions of the picture, with its natural aspect (width / height) — so the unread dot sits by the head, not in the
+ * picture's empty padding. Measured once per picture on a small canvas.
+ */
+type Head = { top: number; cx: number; aspect: number };
+const HEADS = new Map<string, Head | Promise<Head | null>>();
+function headOf(src: string): Promise<Head | null> {
+  const got = HEADS.get(src);
+  if (got) return Promise.resolve(got);
+  const p = new Promise<Head | null>((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const w = 64;
+        const h = Math.max(1, Math.round((64 * img.naturalHeight) / Math.max(1, img.naturalWidth)));
+        const c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+        const g = c.getContext('2d', { willReadFrequently: true });
+        if (!g) return resolve(null);
+        g.drawImage(img, 0, 0, w, h);
+        const d = g.getImageData(0, 0, w, h).data;
+        for (let y = 0; y < h; y++) {
+          let lo = -1;
+          let hi = -1;
+          for (let x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 40) (lo < 0 && (lo = x), (hi = x));
+          if (lo >= 0) {
+            const head = { top: y / h, cx: (lo + hi + 1) / 2 / w, aspect: img.naturalWidth / Math.max(1, img.naturalHeight) };
+            HEADS.set(src, head);
+            return resolve(head);
+          }
+        }
+        resolve(null);
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+  HEADS.set(src, p as Promise<Head | null>);
+  return p;
+}
+function useHeads(srcs: string[]) {
+  const [heads, setHeads] = useState<Record<string, Head>>({});
+  const key = srcs.join('|');
+  useEffect(() => {
+    let live = true;
+    for (const src of new Set(srcs))
+      void headOf(src).then((h) => {
+        if (live && h) setHeads((was) => (was[src] ? was : { ...was, [src]: h }));
+      });
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return heads;
+}
+
 function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
   threads: ThreadInfo[];
   onOpen: (id: string) => void;
@@ -280,6 +341,7 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
   const box = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLButtonElement | null)[]>([]);
   const figs = useRef<(HTMLImageElement | null)[]>([]);
+  const labs = useRef<(HTMLSpanElement | null)[]>([]);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const n = threads.length;
   const reduced = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -304,13 +366,35 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
   const liftOf = (r: number) => feetOf(r) - feetOf(0);
   const H0 = Math.round(Math.min(zoneH * (eye - ground) * (far ? 0.55 : 0.5), far ? 220 : 320, ((size.w / most) * 1.25) / 0.62));
   const key = threads.map((t) => t.id).join('|');
+  const heads = useHeads(threads.map(standOf));
   useEffect(() => {
     if (!size.w || !H0) return;
+    // the names, in a layer of their own above every figure: under each one's feet, and where two in a row would touch,
+    // the later one steps down a line (they never overlap)
+    const xs: number[] = [];
     const place = (i: number, x: number, bob: number, dir: number, half: number) => {
       const b = els.current[i];
       const f = figs.current[i];
       if (b) b.style.transform = `translate3d(${(x - half).toFixed(1)}px, ${bob.toFixed(1)}px, 0)`;
       if (f) f.style.transform = dir < 0 ? 'scaleX(-1)' : 'none';
+      xs[i] = x;
+    };
+    const names = () => {
+      for (let r = 0; r < rows; r++) {
+        const ids = threads.map((_, i) => i).filter((i) => rowOf(i) === r && xs[i] != null).sort((a, b) => xs[a] - xs[b]);
+        let right = -Infinity;
+        let down = 0;
+        for (const i of ids) {
+          const l = labs.current[i];
+          if (!l) continue;
+          const lw = l.offsetWidth;
+          const left = Math.max(2, Math.min(size.w - lw - 2, xs[i] - lw / 2));
+          down = left < right + 4 ? (down ? 0 : l.offsetHeight + 2) : 0;
+          if (!down) right = left + lw;
+          else right = Math.max(right, left + lw);
+          l.style.transform = `translate3d(${left.toFixed(1)}px, ${down}px, 0)`;
+        }
+      }
     };
     const st = threads.map((_, i) => {
       const r = rowOf(i);
@@ -321,6 +405,7 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
     });
     if (reduced) {
       st.forEach((s, i) => place(i, Math.max(s.half, Math.min(size.w - s.half, s.x)), 0, 1, s.half));
+      names();
       return;
     }
     let last = performance.now();
@@ -347,6 +432,7 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
         }
         place(i, s.x, walking ? -Math.abs(Math.sin(s.t * 5.2)) * 4 * scaleOf(s.r) : 0, s.dir, s.half);
       });
+      names();
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
@@ -360,6 +446,11 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
         const r = rowOf(i);
         const H = Math.round(H0 * scaleOf(r));
         const W = Math.round(H * 0.62);
+        // the unread dot by the head: the picture is contained at the bottom of its W × H box
+        const hd = heads[standOf(t)];
+        const dw = hd ? (hd.aspect < W / H ? H * hd.aspect : W) : W;
+        const dh = hd ? (hd.aspect < W / H ? H : W / hd.aspect) : H;
+        const dot = hd ? { top: H - dh + hd.top * dh, left: (W - dw) / 2 + hd.cx * dw + Math.max(6, W * 0.1) } : { top: H * 0.06, left: W * 0.72 };
         return (
           <button
             key={t.id}
@@ -372,14 +463,25 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
             <span className="relative block" style={{ width: W, height: H, animation: reduced ? 'dachi-idle 4.5s ease-in-out infinite' : undefined, transformOrigin: '50% 100%' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img ref={(el) => void (figs.current[i] = el)} src={standOf(t)} alt="" draggable={false} className="h-full w-full select-none object-contain object-bottom drop-shadow-[0_8px_10px_rgba(0,0,0,.35)]" />
-              {!!t.unread && <span className="absolute right-[18%] top-[6%] h-3.5 w-3.5 rounded-full border-2 border-[#0b1027] bg-sky-300" aria-label="まだ聞いていない" />}
+              {!!t.unread && <span className="absolute h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-[#0b1027] bg-sky-300" style={{ top: Math.max(0, dot.top - 4), left: dot.left }} aria-label="まだ聞いていない" />}
             </span>
-            {/* the shadow on the ground, the name under the feet */}
+            {/* the shadow on the ground (the name is in the layer above) */}
             <span className="-mt-2 block h-2 rounded-[50%] bg-black/35 blur-[2px]" style={{ width: W * 0.55 }} aria-hidden />
-            <span className={`mt-1 max-w-[160%] truncate whitespace-nowrap rounded-full bg-[rgba(10,14,44,.6)] px-2 py-0.5 font-bold text-[#f4f1ff] backdrop-blur ${far || r ? 'text-[10px]' : 'text-[11px]'}`}>{t.name}</span>
           </button>
         );
       })}
+      {/* the names, above every figure, under each one's feet */}
+      {threads.map((t, i) => (
+        <span
+          key={`n-${t.id}`}
+          ref={(el) => void (labs.current[i] = el)}
+          className={`pointer-events-none absolute left-0 z-[30] max-w-[40%] truncate whitespace-nowrap rounded-full bg-[rgba(10,14,44,.72)] px-2 py-0.5 font-bold text-[#f4f1ff] backdrop-blur will-change-transform ${far || rowOf(i) ? 'text-[10px]' : 'text-[11px]'}`}
+          style={{ bottom: feetOf(rowOf(i)) - 22, transform: `translate3d(${(size.w / Math.max(1, perRow(rowOf(i)))) * (Math.floor(i / rows) + 0.5)}px,0,0)` }}
+          aria-hidden
+        >
+          {t.name}
+        </span>
+      ))}
     </div>
   );
 }
