@@ -8571,6 +8571,123 @@
         "design/home/puni-ref/puni-style.jpg",
         "design/home/puni-ref/mikie.jpg"
       ]
+    },
+    {
+      "id": "chibi-user",
+      "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ]
+    },
+    {
+      "id": "chibi-kimorin",
+      "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, a proud smug smile, fox tails fluffed. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ]
+    },
+    {
+      "id": "chibi-monban",
+      "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, mysterious but cute, glowing eyes under the hood. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "refs": [
+        "design/home/chibi-ref/monban.jpg"
+      ]
+    },
+    {
+      "id": "chibi-mikie",
+      "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, a big cheeky grin, hook hand raised. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ]
+    },
+    {
+      "id": "chibi-brother",
+      "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, an energetic hip-hop pose, mouth open shouting happily. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "refs": [
+        "design/home/chibi-ref/brother.jpg"
+      ]
+    },
+    {
+      "id": "chibi-sister",
+      "prompt": "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, a graceful cute pose, tentacle hair flowing. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ]
+    },
+    {
+      "id": "ball-mine",
+      "prompt": "A single perfectly round glossy ball, like a shiny warm golden capsule toy or a pearlescent bubble, smooth and slightly translucent with a soft inner glow, a big bright highlight on the top-left and a small rim light, tiny sparkles on its surface, cute and premium, no face, no text. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "ball-dachi",
+      "prompt": "A single perfectly round glossy ball, like a shiny pearl white capsule toy or a pearlescent bubble, smooth and slightly translucent with a soft inner glow, a big bright highlight on the top-left and a small rim light, tiny sparkles on its surface, cute and premium, no face, no text. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
+    },
+    {
+      "id": "ball-oshi",
+      "prompt": "A single perfectly round glossy ball, like a shiny baby pink capsule toy or a pearlescent bubble, smooth and slightly translucent with a soft inner glow, a big bright highlight on the top-left and a small rim light, tiny sparkles on its surface, cute and premium, no face, no text. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false
     }
   ],
   "redo": []
