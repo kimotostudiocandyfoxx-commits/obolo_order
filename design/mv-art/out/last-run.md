@@ -1,7 +1,5 @@
-# UI art — 2026-11-24T10:05:00.631Z
+# UI art — 2026-11-24T11:27:22.713Z
 
-Seedream 5.0 Pro / 3枚 / 約23円
+Seedream 5.0 Pro / 1枚 / 約7円
 
-- ✅ home3-bg-jupiter-porch
-- ✅ home3-bg-mercury-pier
-- ✅ uback
+- ✅ kakejiku
