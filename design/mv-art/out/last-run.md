@@ -1,12 +1,10 @@
-# UI art — 2026-11-24T06:12:24.044Z
+# UI art — 2026-11-24T06:15:29.434Z
 
-Seedream 5.0 Pro / 8枚 / 約58円
+Seedream 5.0 Pro / 6枚 / 約43円
 
-- ✅ kor3-17
-- ✅ kor3-18
-- ✅ kor3-19
-- ✅ kor3-20
-- ✅ kor3-21
-- ✅ kor3-22
-- ✅ kor3-23
-- ✅ kor3-24
+- ✅ chibi2-brother
+- ✅ chibi2-kimorin
+- ✅ chibi2-mikie
+- ✅ chibi2-monban
+- ✅ chibi2-sister
+- ✅ chibi2-user
