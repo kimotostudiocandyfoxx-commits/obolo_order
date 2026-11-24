@@ -113,7 +113,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread, 
           <img src={MOON_ZONES.hall} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
           <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
           {hall.length ? (
-            <Strollers threads={hall} onOpen={onOpen} rowsAt={[0.13, 0.25, 0.34]} eye={MOON_ZONES_EYE.hall} />
+            <Strollers threads={hall} onOpen={onOpen} rowsAt={[0.11, 0.29, 0.355]} eye={MOON_ZONES_EYE.hall} />
           ) : (
             <div className="absolute inset-x-0 bottom-[14%] z-[5] flex flex-col items-center gap-4 px-8 text-center">
               {/* PLACEHOLDER (P-MOON-TABS-1): the words when there is no ダチ yet */}
@@ -407,7 +407,7 @@ function Strollers({ threads, onOpen, far = false, ground = 0.1, back = 0.28, ey
   const scaleOf = (r: number) => (eye - at(r)) / (eye - at(0));
   // as tall as the ground allows, but never wider than a figure's own stretch in its row (they must not stand on each other)
   const fit = Math.min(...Array.from({ length: rows }, (_, r) => ((size.w / Math.max(1, perRow(r))) * 1.25) / 0.62 / scaleOf(r)));
-  const H0 = Math.round(Math.min(zoneH * (eye - at(0)) * (far ? 0.55 : 0.5), far ? 220 : 320, fit));
+  const H0 = Math.round(Math.min(zoneH * (eye - at(0)) * (far ? 0.55 : 0.47), far ? 220 : 320, fit));
   const key = threads.map((t) => t.id).join('|');
   const heads = useHeads(threads.map(standOf));
   useEffect(() => {
