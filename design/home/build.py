@@ -33,7 +33,7 @@ for k in 'user kimorin monban mikie brother sister'.split():
 for k in 'mine dachi oshi'.split():
     f=f'{O}/ball-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((160,160)); A['ball-'+k]=uri(kk,88)
-if os.path.exists(H+'/saturn-record-mask.png'): mk=Image.open(H+'/saturn-record-mask.png').convert('L'); mk.thumbnail((720,1280)); b2=io.BytesIO(); mk.save(b2,'PNG',optimize=True); A['rec-mask']='data:image/png;base64,'+base64.b64encode(b2.getvalue()).decode()
+if os.path.exists(H+'/saturn-record-mask.png'): mk=Image.open(H+'/saturn-record-mask.png').convert('L'); mk.thumbnail((720,1280)); ma=Image.new('RGBA',mk.size,(255,255,255,0)); ma.putalpha(mk); b2=io.BytesIO(); ma.save(b2,'PNG',optimize=True); A['rec-mask']='data:image/png;base64,'+base64.b64encode(b2.getvalue()).decode()
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
