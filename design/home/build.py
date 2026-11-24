@@ -101,6 +101,11 @@ for k in 'user kimorin monban mikie brother sister'.split():
         if k=='user' and os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((260,260),Image.LANCZOS); A[f'udance-{n}']=uri(o,88)
     f=f'{O}/ship4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((260,260),Image.LANCZOS); A['ship4-'+k]=uri(o,88)
+for nm,key2 in [('home3-bg-jupiter-porch','bg3-jupiter-porch'),('home3-bg-mercury-pier','bg3-mercury-pier')]:
+    f=f'{O}/{nm}.jpg'
+    if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[key2]=uri(im,78)
+f=f'{O}/uback.jpg'
+if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((420,420),Image.LANCZOS); A['uback']=uri(o,86)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
