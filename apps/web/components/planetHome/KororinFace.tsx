@@ -1,6 +1,6 @@
 'use client';
 
-import { kororinOf, type KororinChoice, type KororinFace as Face } from '@obolo/shared';
+import { kororinOf, type KororinFace as Face } from '@obolo/shared';
 import type { CSSProperties, ReactNode } from 'react';
 import s from './PlanetHome.module.css';
 
@@ -84,7 +84,7 @@ export function faceTurn(n: number) {
 }
 
 /** a kororin, still (the picker, the chat card): its ball and face */
-export function KororinPic({ k, size = 58, turn }: { k?: Partial<KororinChoice> | null; size?: number; turn?: number }) {
+export function KororinPic({ k, size = 58, turn }: { k?: { colour?: string | null; face?: string | null } | null; size?: number; turn?: number }) {
   const c = kororinOf(k);
   const t = turn === undefined ? null : faceTurn(turn);
   return (

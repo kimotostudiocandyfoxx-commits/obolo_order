@@ -6,7 +6,7 @@ import { COLORS } from '@/lib/puni/parts';
 import type { Ball } from '@/lib/planetHome/ballPhysics';
 import { BallLayer, type BallItem, type BallLayerHandle } from './BallLayer';
 import { kororinBall, KororinPic } from './KororinFace';
-import type { StageItem } from '@/lib/planetHome/model';
+import { BALLS_AT_ONCE, type StageItem } from '@/lib/planetHome/model';
 import type { SceneProps } from './skin';
 import s from './PlanetHome.module.css';
 
@@ -32,6 +32,8 @@ const CHIBI = { w: 124, h: 124, up: 100 };
 /** M-R264: where the words may be (shares of the screen's width), and the pace of 〔▶ 全部流す〕 */
 const BUBBLE = { x0: 0.24, x1: 0.76 };
 const AUTO_MS = 3700;
+/** M-R267: after a pop, the next one in line falls from the sky this much later */
+const NEXT_MS = 900;
 /** the needle, right in front: 〔▶ 全部流す〕 pops the ball nearest it first */
 const NEEDLE_AT = { x: 0.74, y: 0.74 };
 const TALK_MIN = 1600;
@@ -58,6 +60,17 @@ function useReducedMotion() {
     return () => m.removeEventListener?.('change', on);
   }, []);
   return r;
+}
+
+/** BALLS_AT_ONCE; the lab page (/lab/planet-home?atonce=20) may try another, never above 20 */
+function useAtOnce() {
+  const [n, setN] = useState(BALLS_AT_ONCE);
+  useEffect(() => {
+    if (!location.pathname.startsWith('/lab/')) return;
+    const q = Number(new URLSearchParams(location.search).get('atonce'));
+    if (q > 0) setN(Math.min(20, q));
+  }, []);
+  return n;
 }
 
 /** the record's colour: a layer through the mask, screen-blended (black = none) */
@@ -111,8 +124,13 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   }, [rolling]);
 
   const outIds = useMemo(() => new Set(outs.map((o) => o.w.id)), [outs]);
-  // the balls still rolling: not popped, not heard
-  const shown = useMemo(() => rolling.filter((w) => !gone.has(w.id) && !outIds.has(w.id)), [rolling, gone, outIds]);
+  // the balls still rolling: not popped, not heard — at most BALLS_AT_ONCE on the record (M-R267); a popped ball's
+  // place stays empty for NEXT_MS, then the next in line falls in
+  const [waiting, setWaiting] = useState(0);
+  const left = useMemo(() => rolling.filter((w) => !gone.has(w.id) && !outIds.has(w.id)), [rolling, gone, outIds]);
+  const atOnce = useAtOnce();
+  const shown = useMemo(() => left.slice(0, Math.max(0, atOnce - waiting)), [left, waiting, atOnce]);
+  const inLine = left.length - shown.length;
   // M-R264: 44–60 px across at a 430 px screen, in proportion elsewhere
   const [scale, setScale] = useState(390 / 430);
   useEffect(() => {
@@ -177,6 +195,8 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     setTimeout(() => setDrops((l) => l.filter((d) => !d.id.startsWith(`${id}-${n}-`))), 700);
     const t0 = performance.now();
     setOuts((l) => [...l, { w, x, y, phase: 'talk', t0, started: false, endAt: t0 + (w.url ? TALK_MAX : TALK_MIN + 600) }]);
+    setWaiting((n) => n + 1);
+    setTimeout(() => setWaiting((n) => n - 1), NEXT_MS);
     live.current.onItem(w);
   }, []);
 
@@ -194,14 +214,18 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       const ny = NEEDLE_AT.y * H;
       let best: string | null = null;
       let bd = Infinity;
+      let more = false;
       for (const w of live.current.rolling) {
         if (outsRef.current.some((o) => o.w.id === w.id)) continue;
+        more = true;
+        // only a ball on the record (one still in line falls in first)
         const b = layer.current?.ball(w.id);
-        const d = b ? Math.hypot(b.x - nx, b.y - ny) : 1e6;
+        if (!b || b.y < 0) continue;
+        const d = Math.hypot(b.x - nx, b.y - ny);
         if (d < bd) [best, bd] = [w.id, d];
       }
       if (best) pop(best);
-      return !!best;
+      return more;
     };
     if (!next() && !outsRef.current.length) {
       autoEnd.current?.();
@@ -375,9 +399,13 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   };
 
   const done = (hadAny || pressed) && !rolling.length && !outs.length;
+  // everything heard (the line too): 〔▶ 全部流す〕 ends with the pill, the record stops
+  useEffect(() => {
+    if (done && spinning) autoEnd.current?.();
+  }, [done, spinning]);
   const g = groove();
   return (
-    <div ref={root} className={s.scene}>
+    <div ref={root} className={s.scene} data-in-line={inLine} data-on-record={shown.length}>
       <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})`, transform: 'none' }} />
       {cfg.art.backdrop === '/planet-home/bg-saturn.webp' && <RecordTint colour={view.recordColour} />}
       {/* M-R264: while it spins, the light in the grooves goes round */}

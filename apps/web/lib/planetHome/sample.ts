@@ -1,4 +1,4 @@
-import { HOME_PLANETS, PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { HOME_PLANETS, KORORINS, PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
 
 /**
  * Sample views for 星のホーム (the lab page /lab/planet-home and the story's scripted places). The names are the story
@@ -27,6 +27,8 @@ export function sampleView(
     owner?: string;
     demo?: boolean;
     now?: number;
+    /** M-R267's check: this many more kororins from more people (the record holds 16, the rest wait in line) */
+    crowd?: number;
   } = {},
 ): PlanetHomeView {
   const now = o.now ?? Date.now();
@@ -38,7 +40,8 @@ export function sampleView(
     id: `${planet}-${id}`,
     kind,
     // the story cast's mini figures stand in where there is one (M-R262); the others show the round face
-    author: { id: `u-${name}`, name, chibi: CAST_CHIBI[rel === 'own' ? 'own' : name] ?? null },
+    // M-R266: everyone's own kororin (the 8 made ones, by name; one has not chosen yet → しろもち)
+    author: { id: `u-${name}`, name, chibi: CAST_CHIBI[rel === 'own' ? 'own' : name] ?? null, kororin: name === 'ショウ' ? null : KORORINS[[...name].reduce((a, c) => a + c.codePointAt(0)!, 0) % KORORINS.length] },
     rel,
     text: planet === 'saturn' ? WORDS[i % WORDS.length] : '',
     title: planet === 'saturn' ? undefined : `${name}の${cfg.work}`,
@@ -48,6 +51,7 @@ export function sampleView(
   });
   // the last visit was 12 hours ago: the first `arrivals` came after it
   const around = PEOPLE.filter(([, r]) => !o.young || r === 'dachi').map(([n, r], i) => work(`a${i}`, n, r, i < arrivals ? 1 + i : 14 + i * 9, i));
+  for (let i = 0; i < (o.crowd ?? 0); i++) around.push(work(`c${i}`, `${FAR[i % FAR.length]}${Math.floor(i / FAR.length) + 1}`, i % 3 ? 'dachi' : 'oshi', 1 + i * 0.1, i));
   return {
     planet,
     live: true,

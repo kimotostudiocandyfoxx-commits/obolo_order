@@ -87,11 +87,17 @@ export function menuFor(w: Pick<HomeWork, 'rel' | 'demo'>, young: boolean): Menu
 // --- M-R259 Saturn: the rolling kororins -------------------------------------------------------------------------
 
 /** at most this many roll at once; the rest come out as earlier ones go into the grooves */
-export const ROLL_MAX = 12;
+/**
+ * M-R267 (design/home/README.md §12): at most this many balls on the record at once (16; never above 20) — the rest
+ * wait their turn and fall in one by one as balls pop. ROLL_MAX only bounds the whole line (today's kororins).
+ */
+export const BALLS_AT_ONCE = Math.min(20, 16);
+export const ROLL_MAX = 200;
 
 /**
  * what rolls on the record: kororins not heard yet that came in the last 88 hours (dachi's, 推し's, and your own just
- * flown), newest first, up to ROLL_MAX. Your older kororins are in the grooves already.
+ * flown), newest first — the first BALLS_AT_ONCE on the record, the rest in line. Your older kororins are in the
+ * grooves already.
  */
 export function rollingOf(stage: Stage, heard: ReadonlySet<string>, now: number = Date.now(), max = ROLL_MAX): StageItem[] {
   const recent = (w: StageItem) => w.rel !== 'own' || now - Date.parse(w.flownAt) < PLANET_FLY_MS;

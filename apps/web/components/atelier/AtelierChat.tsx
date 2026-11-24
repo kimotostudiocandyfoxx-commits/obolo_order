@@ -293,11 +293,11 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     const r = changeRequest(text);
     if (!r) return false;
     if ('ask' in r) {
-      say(changeLines.ask(), r.item.choices.map((c) => `レコードを${c.name}に`));
+      say(changeLines.ask(r.item), r.item.choices.map((c) => r.item.chip(c)));
       return true;
     }
     if ('near' in r) {
-      say(changeLines.near(r.asked, r.near), r.near.map((c) => `レコードを${c.name}に`));
+      say(changeLines.near(r.asked, r.near), r.near.map((c) => r.item.chip(c)));
       return true;
     }
     void chipped;

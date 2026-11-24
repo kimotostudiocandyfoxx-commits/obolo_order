@@ -18,7 +18,8 @@ import { PlanetHome } from '@/components/planetHome/PlanetHome';
 import { getApi } from '@/lib/api';
 import { neoRecord, takoyakiRecord, TAKOYAKI_BACKDROP } from '@/lib/planetHome/storyHomes';
 import { RecordTint } from '@/components/planetHome/SaturnBallScene';
-import { RECORD_COLOURS } from '@obolo/shared';
+import { KORORINS, RECORD_COLOURS, type KororinChoice } from '@obolo/shared';
+import { KororinPic } from '@/components/planetHome/KororinFace';
 import { DachiVoiceStep } from './DachiVoiceStep';
 import { EggVoiceStep } from './EggVoiceStep';
 import { isDemoMode } from '@/lib/onboarding/demoMode';
@@ -1724,6 +1725,22 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           onDone={() => run(iRef.current + 1)}
         />
       )}
+      {/* D04-S005c (M-R266): {neo}'s kororin, one of the 8, chosen once here (later: ask {bati} on the Moon) */}
+      {started && step?.t === 'kororin' && (
+        <KororinStep
+          key={i}
+          note={fill('あとから、月で{bati}に頼めば色や顔を変えられるよ', v)}
+          onDone={(k) => {
+            remember('f_d04_kororin', `${k.colour}/${k.face}`);
+            if (!atelierTest)
+              void getApi()
+                .setChangeable('kororin.colour', k.colour)
+                .then(() => getApi().setChangeable('kororin.face', k.face))
+                .catch(() => undefined);
+            run(iRef.current + 1);
+          }}
+        />
+      )}
       {/* D04-S005c (M-R263): {neo}'s record's colour, chosen once here */}
       {started && step?.t === 'recordcolour' && (
         <RecordColourStep
@@ -2191,6 +2208,37 @@ function StoryHome({ place, neo, inviter, fly, words, onDone }: { place: 'takoya
       <button onClick={go} className="pt-safe absolute right-3 top-14 z-[60] rounded-full bg-white/90 px-4 py-1.5 text-sm font-black text-[#2a1630] shadow">
         次へ
       </button>
+    </div>
+  );
+}
+
+/** D04-S005c (M-R266; the prototype's korPicker): the 8 kororins, one picked, 〔これにする〕 */
+function KororinStep({ note, onDone }: { note: string; onDone: (k: KororinChoice) => void }) {
+  const [sel, setSel] = useState(0);
+  return (
+    <div className="absolute inset-0 z-[40] flex flex-col items-center justify-center gap-3 overflow-hidden bg-[#140a22]/80 px-[18px] backdrop-blur-md" data-testid="kororin-step">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/planet-home/bg-saturn.webp" alt="" className="absolute inset-0 -z-10 h-full w-full object-cover object-bottom opacity-60" />
+      <h3 className="text-center text-[17px] font-black text-white">あなたのコロリンを選んでね</h3>
+      <div className="grid w-full max-w-[400px] grid-cols-4 gap-2.5" role="radiogroup" aria-label="あなたのコロリン">
+        {KORORINS.map((k, n) => (
+          <button
+            key={k.name}
+            type="button"
+            role="radio"
+            aria-checked={sel === n}
+            onClick={() => setSel(n)}
+            className={`flex flex-col items-center gap-1 rounded-2xl border px-1 pb-1.5 pt-2 text-[11px] font-bold text-white ${sel === n ? 'border-amber-300 bg-white/25' : 'border-white/25 bg-white/10'}`}
+          >
+            <KororinPic k={k} size={58} />
+            {k.name}
+          </button>
+        ))}
+      </div>
+      <button type="button" onClick={() => onDone({ colour: KORORINS[sel].colour, face: KORORINS[sel].face })} className="rounded-full bg-amber-300 px-7 py-3 text-[15px] font-black text-[#2a1630]">
+        これにする
+      </button>
+      <small className="text-[11px] text-white/75">{note}</small>
     </div>
   );
 }

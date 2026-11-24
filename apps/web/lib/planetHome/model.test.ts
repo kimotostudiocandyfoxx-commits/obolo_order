@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HOME_PLANETS, PLANET_HOMES, type HomeWork, type PlanetHomeView } from '@obolo/shared';
-import { dockButtons, groovesOf, menuFor, moveOwn, queueFrom, recordOrder, rollingOf, stageOf } from './model';
+import { BALLS_AT_ONCE, dockButtons, groovesOf, menuFor, moveOwn, queueFrom, recordOrder, rollingOf, stageOf } from './model';
 
 const now = Date.parse('2026-11-23T12:00:00Z');
 const ago = (h: number) => new Date(now - h * 3600_000).toISOString();
@@ -82,12 +82,14 @@ describe('星のホーム stage', () => {
     expect(menuFor({ rel: 'stranger' }, true)).toEqual(['open', 'hide', 'report']);
     expect(menuFor({ rel: 'dachi', demo: true }, false)).toEqual([]);
   });
-  it('M-R259: what rolls — new and unheard (88 hours), at most twelve; heard ones and your older ones are in the grooves', () => {
+  it('M-R259 / M-R267: what rolls — new and unheard (88 hours), all of them in line (the record shows 16 at once); heard ones and your older ones are in the grooves', () => {
     const around = Array.from({ length: 14 }, (_, i) => w(`a${i}`, i % 2 ? 'oshi' : 'dachi', 1 + i));
     const s = stageOf(view({ own: [w('mine-new', 'own', 0.5), w('mine-old', 'own', 200)], around }), { now });
     const heard = new Set(['a0', 'a1']);
     const roll = rollingOf(s, heard, now);
-    expect(roll).toHaveLength(12);
+    // 13 left of the 14 + your new one; none waits outside the line any more (M-R267 replaces the cap of 12)
+    expect(roll).toHaveLength(13);
+    expect(BALLS_AT_ONCE).toBe(16);
     expect(roll[0].id).toBe('mine-new');
     expect(roll.map((x) => x.id)).not.toContain('a0');
     expect(roll.map((x) => x.id)).not.toContain('mine-old');

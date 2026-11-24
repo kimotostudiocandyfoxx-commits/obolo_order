@@ -254,6 +254,8 @@ export type Step =
    * f_d04_record_colour. Later it is changed by asking {bati} on the Moon.
    */
   | { t: 'recordcolour' }
+  /** M-R266: choose your kororin (the 8: colour + face) */
+  | { t: 'kororin' }
   /**
    * D03-S005 (M-R246 / M-R247) 「たまごに声を聞かせる」: a big mic in the middle, held to talk to the egg; a light ring around
    * it fills with the length spoken (full at about 10 s). Released too soon → `short` (OBOLON 「、、、もう少し、聞かせてやれ。」)
