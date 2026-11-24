@@ -98,17 +98,20 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
           stage={h.stage}
           playingId={h.playingId}
           spinning={h.spinning}
-          caption={!!singing}
+          caption={!!singing && (!cfg.roll || h.spinning)}
           onPlace={enter}
           onPlate={() => setInside(true)}
           onItem={tap}
           onHold={(w, at) => menuFor(w, young).length && setMenu({ w, at: local(at) })}
+          onResident={(r) => h.say(`${r.name}「${r.line}」`)}
+          rolling={h.rolling}
+          onHeard={h.markHeard}
         />
       )}
       {h.error && <p className={s.empty}>いまは、開けなかった。もう一度ためしてみて</p>}
 
       {/* Saturn: the words of the kororin singing at the needle */}
-      {singing && (
+      {singing && (!cfg.roll || h.spinning) && (
         <div className={s.needle} data-testid="singing">
           🎤 {singing.rel === 'own' ? 'あなた' : singing.author.name}
           {(singing.text || singing.title) && <span className={s.words}>「{singing.text || singing.title}」</span>}

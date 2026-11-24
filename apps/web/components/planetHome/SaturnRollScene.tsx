@@ -96,7 +96,28 @@ export function SaturnRollScene({ cfg, view, rolling, playingId, spinning, onPla
     const ff = BOX.y0 + (((i * 37) % 100) / 100) * (BOX.y1 - BOX.y0);
     // what came since the last visit is still falling in (ひゅう、ぽとん)
     const falls = !!w.fresh && !reduced;
-    bodies.current.set(w.id, { w, x: 0, y: 0, vx: (((i * 29) % 10) / 10 - 0.5) * 1.5, vy: 0, rot: 0, fl: 0, drag: false, talk: false, gone: false, t0: 0, started: false, endAt: 0, el: null, spin: null, fx, ff, falls, placed: false, down: null });
+    bodies.current.set(w.id, {
+      w,
+      x: 0,
+      y: 0,
+      vx: (((i * 29) % 10) / 10 - 0.5) * 1.5,
+      vy: 0,
+      rot: 0,
+      fl: 0,
+      drag: false,
+      talk: false,
+      gone: false,
+      t0: 0,
+      started: false,
+      endAt: 0,
+      el: null,
+      spin: null,
+      fx,
+      ff,
+      falls,
+      placed: false,
+      down: null,
+    });
   });
   useEffect(() => {
     if (rolling.length) setHadAny(true);
@@ -215,7 +236,8 @@ export function SaturnRollScene({ cfg, view, rolling, playingId, spinning, onPla
         if (b.gone) return;
         e.currentTarget.setPointerCapture?.(e.pointerId);
         const at: At = { x: e.clientX, y: e.clientY };
-        const down = (b.down = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), held: false, timer: null as ReturnType<typeof setTimeout> | null });
+        const down: NonNullable<Body['down']> = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), held: false, timer: null };
+        b.down = down;
         down.timer = setTimeout(() => {
           if (b.down !== down) return;
           down.held = true;

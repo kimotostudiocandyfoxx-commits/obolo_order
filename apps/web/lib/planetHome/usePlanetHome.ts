@@ -28,6 +28,8 @@ export interface PlanetHomeState {
   grooves: StageItem[];
   /** heard to the end: into the grooves (kept on this device) */
   markHeard: (id: string) => void;
+  /** a short note on screen (a resident's line, 推した …) */
+  say: (text: string) => void;
   play: (startId?: string) => void;
   stop: () => void;
   playOne: (w: HomeWork) => void;
@@ -182,7 +184,12 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
 
   const loadOshi = useCallback(() => {
     // a scripted place: the people whose works are around it
-    if (scripted) return setOshi([...new Map((opts.view?.around ?? []).map((w) => [w.author.id, { id: w.author.id, name: w.author.name, pic: w.author.pic, dachi: w.rel === 'dachi' }])).values()].sort((a, b) => Number(b.dachi) - Number(a.dachi)));
+    if (scripted)
+      return setOshi(
+        [...new Map((opts.view?.around ?? []).map((w) => [w.author.id, { id: w.author.id, name: w.author.name, pic: w.author.pic, dachi: w.rel === 'dachi' }])).values()].sort(
+          (a, b) => Number(b.dachi) - Number(a.dachi),
+        ),
+      );
     getApi()
       .oshiList()
       .then(setOshi)
@@ -210,6 +217,7 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
     rolling,
     grooves,
     markHeard,
+    say: (t) => flash(t),
     play,
     stop,
     playOne,
