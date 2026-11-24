@@ -145,7 +145,7 @@ jobs:
             JOBS_TARGET_URL=${{ format('https://{0}-{1}.{2}.run.app', env.SERVICE, vars.GCP_PROJECT_NUMBER, env.REGION) }}
             JOBS_INVOKER_SA=${{ env.RUNTIME_SA }}
             CORS_ORIGINS=${{ env.CORS_ORIGINS }}
-            WEB_ORIGIN=${{ vars.WEB_ORIGIN }}
+            WEB_ORIGIN=${{ vars.WEB_ORIGIN || 'https://oboloorder-web.vercel.app' }}
             AUTH_DEMO_SHOW_CODE=${{ vars.AUTH_DEMO_SHOW_CODE || (vars.EMAIL_FROM && 'false') || 'true' }}
             EMAIL_DRIVER=${{ vars.EMAIL_FROM && 'resend' || 'console' }}
             EMAIL_FROM=${{ vars.EMAIL_FROM || 'Obolo Order <no-reply@example.com>' }}
