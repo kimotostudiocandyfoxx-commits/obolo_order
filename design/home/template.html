@@ -140,6 +140,25 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .cta.disc.jup .rec{background:radial-gradient(circle at 50% 50%,transparent 0 33%,rgba(255,255,255,.08) 33.5% 34%,transparent 34.5%),conic-gradient(from 20deg,rgba(255,230,150,0) 0 10%,rgba(255,230,150,.35) 15%,rgba(255,230,150,0) 22% 55%,rgba(180,255,200,.3) 65%,rgba(255,255,255,0) 72%),radial-gradient(circle,#2f5a2e 0 58%,#1d3a20 59%)}
 .cta.disc.jup .lbl{background:radial-gradient(circle at 34% 28%,#fff 0 9%,rgba(255,255,255,0) 30%),linear-gradient(140deg,#ffe9a8,#ffc26b 50%,#9fe3a6)}
 .cta.disc.jup::before{background:conic-gradient(from 0deg,#fff1a8,#b8f5b0,#ffd59a,#fff1a8)}
+.sh{position:absolute;left:0;top:0;width:92px;height:120px;margin:-90px 0 0 -46px;z-index:6;cursor:pointer;will-change:transform;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.sh .bt{position:absolute;left:0;top:28px;width:92px;height:92px}
+.sh .bt img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 6px rgba(0,40,80,.35))}
+.sh.left .bt img{transform:scaleX(-1)}
+.sh .jk{position:absolute;left:50%;top:0;width:34px;height:34px;margin-left:-17px;border:3px solid #fff;border-radius:4px;box-shadow:0 3px 8px rgba(0,30,60,.4);background-size:cover;background-position:center;animation:jkb 2.2s ease-in-out infinite}
+@keyframes jkb{50%{transform:translateY(-4px) rotate(3deg)}}
+.sh .nm{position:absolute;left:50%;top:116px;transform:translateX(-50%);font:900 9px var(--f-body);color:#fff;white-space:nowrap;text-shadow:0 1px 2px rgba(0,30,60,.9),0 0 4px rgba(0,30,60,.6)}
+.sh .wk{position:absolute;left:8px;right:8px;top:108px;height:8px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.75),rgba(255,255,255,0) 70%);animation:wk 1.4s ease-in-out infinite}
+@keyframes wk{50%{transform:scaleX(1.25);opacity:.6}}
+.drop2{position:absolute;width:8px;height:8px;margin:-4px;border-radius:50% 50% 50% 0;background:radial-gradient(circle at 35% 35%,#fff,#9fe6ff 55%,#3db4ff);z-index:8;pointer-events:none;animation:dr2 .8s cubic-bezier(.2,.6,.4,1) forwards}
+@keyframes dr2{60%{opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(.4);opacity:0}}
+.fw{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity 1.4s}
+.fw.on{opacity:1}
+.fw .sky2{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,60,.82),rgba(60,30,90,.6) 40%,rgba(255,120,80,.25) 62%,rgba(10,30,60,.5))}
+.fwp{position:absolute;width:5px;height:5px;margin:-2px;border-radius:50%;background:var(--c);box-shadow:0 0 6px 2px var(--c);z-index:5;pointer-events:none;animation:fwp 1.5s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes fwp{70%{opacity:1}to{transform:translate(var(--dx),calc(var(--dy) + 26px));opacity:0}}
+.cta.disc.mer .rec{background:radial-gradient(circle at 50% 50%,transparent 0 33%,rgba(255,255,255,.1) 33.5% 34%,transparent 34.5%),conic-gradient(from 20deg,rgba(255,255,255,0) 0 10%,rgba(200,250,255,.4) 15%,rgba(255,255,255,0) 22% 55%,rgba(255,240,180,.35) 65%,rgba(255,255,255,0) 72%),radial-gradient(circle,#1b4f8a 0 58%,#0f2f5c 59%)}
+.cta.disc.mer .lbl{background:radial-gradient(circle at 34% 28%,#fff 0 9%,rgba(255,255,255,0) 30%),linear-gradient(140deg,#bff4ff,#6fd3ff 50%,#ffe08a)}
+.cta.disc.mer::before{background:conic-gradient(from 0deg,#a8ecff,#fff3a8,#7fd8ff,#a8ecff)}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni.talk{z-index:7}
@@ -211,6 +230,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="bg" id="bg"></div>
   <div class="tint" id="tint" hidden></div>
   <div class="party" id="party" aria-hidden="true"><div class="dim"></div><div class="lasers"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="mball"><div class="wire"></div><div class="orb"></div></div><div class="neon"></div></div>
+  <div class="fw" id="fw" aria-hidden="true"><div class="sky2"></div></div>
   <div class="fest" id="fest" aria-hidden="true"><div class="dusk"></div><div class="glow"></div></div>
   <div class="spinwrap" id="spinwrap"><div class="spinner"></div></div>
   <div class="sky" id="sky"></div>
@@ -278,7 +298,8 @@ function render(){
   const sky=$('sky');sky.innerHTML='';items=[];
   const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('fg').hidden=!(isS&&A['sat-fg']);if(isS&&A['sat-fg'])$('fg').style.backgroundImage=`url(${A['sat-fg']})`;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
-  stopRoll();stopJup();if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
+  stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
+  if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
@@ -323,6 +344,7 @@ function closeAll(){$('sheet').classList.remove('on');$('inside').classList.remo
 function enter(){
   const c=P[cur];if(cur==='saturn'){playing?stopPlay():play();return}
   if(cur==='jupiter'&&A['bg3-jupiter']){JPLAY?stopJ():playJ();return}
+  if(cur==='mercury'&&A['bg3-mercury']){MPLAY?stopM():playM();return}
   $('phone').classList.add('zoom');setTimeout(()=>$('phone').classList.remove('zoom'),700);
   $('inTtl').textContent=`${ME}の${c.inName}`;$('inSay').innerHTML=`ここには、あなたが作った<b>${c.thing}</b>が、<b>ずっと</b>あります。`;
   const ic={jupiter:['🌅','🍜','🐈','🌸','🌃','🗻'],mercury:['🎵','🎶','🎸','🎹','🥁','🎺'],mars:['🎬','🎞','📽','🎥','🌆','🛸'],venus:['📻','🎙','📼','🎧','📡','🌙'],uranus:['👕','☕','🧢','🏷','🖼','🧸'],pluto:['📖','📕','📗','📘','📙','📔'],neptune:['🕹','👾','🎮','🧩','🏝','⚡']}[cur];
@@ -425,6 +447,60 @@ function pop(r){
   setTimeout(()=>{c.style.display='none';if(!QUEUE.length&&rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
+/* ---- Mercury: music boats carrying dachi/oshi songs sail in front of your island ---- */
+let SH=[],SHQ=[],SHraf=0,MPLAY=null,MNB=0,SONG=null;const MMAX=7,MISLE=[.78,.56];
+const MSONG=['夏のはじまり','チルな午後','パーティー','夜のバラード','走れ'];
+function stopMer(){cancelAnimationFrame(SHraf);SH=[];SHQ=[];if(MPLAY)stopM();stopSong()}
+function stopSong(){if(SONG){try{SONG.stop()}catch(e){}SONG=null}}
+function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=.9;s.buffer=buf;s.connect(g);g.connect(c.destination);s.start();SONG=s;return buf.duration}
+  if(A[k]){try{const au=new Audio(A[k]);au.play().catch(()=>{});SONG={stop:()=>au.pause()}}catch(e){}}return 10}
+function setupMer(){
+  const base=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
+  SH=[];SHQ=base.slice(MMAX);base.slice(0,MMAX).forEach((o,i)=>SH.push(makeSh(o,i)));
+  let last=performance.now();const ph=$('phone');
+  const step=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;const W=ph.clientWidth,H=ph.clientHeight,ts=now/1000;
+    for(const s of SH){if(s.gone)continue;s.x+=s.v*dt*(MPLAY?.6:1);if(s.x>W+60){s.x=-60}if(s.x<-60){s.x=W+60}
+      const y=s.lane*H+Math.sin(ts*1.6+s.i)*4,r=Math.sin(ts*1.3+s.i*2)*4;s.y=y;
+      s.e.style.transform=`translate3d(${s.x}px,${y}px,0) rotate(${r}deg)`}
+    SHraf=requestAnimationFrame(step)};
+  SHraf=requestAnimationFrame(step);
+}
+function makeSh(o,i){const ph=$('phone'),W=ph.clientWidth,e=document.createElement('div');const lanes=[.62,.7,.78,.86,.66,.82,.74];const v=(14+((i*7)%5)*6)*(i%2?-1:1);
+  e.className='sh'+(v<0?' left':'');e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'の曲');
+  const si=(i*3+o.n.length)%4+1,ji=(i*2+o.n.length)%5+1;
+  e.innerHTML=`<div class="wk"></div><div class="bt"><img alt="" src="${A['ship3-'+si]||''}"></div><div class="jk" style="background-image:url(${A['jart-'+ji]||''})"></div><span class="nm">${o.n}</span>`;$('sky').appendChild(e);
+  const s={o,e,i,ji,lane:lanes[i%7],v,x:((i*0.37)%1)*W,y:0,gone:false};
+  e.addEventListener('click',()=>popSh(s));e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();popSh(s)}});
+  return s}
+function splash(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;const n=c.createBufferSource(),bf=c.createBuffer(1,Math.floor(c.sampleRate*.45),c.sampleRate),d=bf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2.2);
+  const f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(3800,t0);f.frequency.exponentialRampToValueAtTime(500,t0+.4);const g=c.createGain();g.gain.value=.5;n.buffer=bf;n.connect(f);f.connect(g);g.connect(c.destination);n.start(t0)}
+function popSh(s){if(s.gone)return;s.gone=true;const sky=$('sky'),x=s.x,y=s.y;splash();popSound();
+  s.e.style.transition='opacity .25s,transform .25s';s.e.style.opacity='0';setTimeout(()=>s.e.remove(),260);
+  for(let k=0;k<20;k++){const d=document.createElement('i');d.className='drop2';const a=-Math.PI*(.1+.8*k/19),dist=40+Math.random()*40;d.style.left=x+'px';d.style.top=y+'px';d.style.setProperty('--dx',Math.cos(a)*dist+'px');d.style.setProperty('--dy',Math.sin(a)*dist+'px');sky.appendChild(d);setTimeout(()=>d.remove(),850)}
+  const c=document.createElement('div');c.className='chibi';c.style.left=x+'px';c.style.top=(y-10)+'px';c.innerHTML=`<img alt="" src="${A['chibi-'+CHB(s.o.n)]||''}">`;sky.appendChild(c);
+  const line=['明日もがんばるZE','うまいラーメン見つけた','ねむい…でも楽しい','新曲できたかも','空がきれいだった'][s.i%5],vk='voice-'+String(s.i%5+1).padStart(2,'0');
+  const pw=$('phone').clientWidth,ph=$('phone').clientHeight,bb=document.createElement('div');bb.className='bub';bb.innerHTML=`<small>⛵ ${s.o.n}</small>「${line}」`;bb.style.left=Math.max(pw*.24,Math.min(pw*.76,x))+'px';bb.style.top=(y-130)+'px';
+  setTimeout(()=>{sky.appendChild(bb);if(A[vk])playVoice(vk)},300);
+  const art=document.createElement('div');art.className='artbig';art.style.backgroundImage=`url(${A['jart-'+s.ji]||''})`;art.innerHTML=`<small>♪『${MSONG[s.ji-1]}』 ${s.o.n}</small>`;art.style.setProperty('--ax',(MISLE[0]*100)+'%');
+  let dur=10;
+  setTimeout(()=>{bb.remove();c.classList.add('wave');sky.appendChild(art);requestAnimationFrame(()=>art.classList.add('on'));dur=playSong('song-'+s.ji)},2000);
+  setTimeout(()=>{c.classList.add('away');c.style.left=(MISLE[0]*pw)+'px';c.style.top=(MISLE[1]*ph)+'px'},2600);
+  setTimeout(()=>{art.style.left=(MISLE[0]*100)+'%';art.style.top=(MISLE[1]*100)+'%';art.classList.add('away')},MPLAY?9800:5200);
+  setTimeout(()=>{c.remove();art.remove()},MPLAY?10900:6300);
+  setTimeout(()=>{if(SHQ.length){const o=SHQ.shift();SH.push(makeSh(o,100+(MNB++)))}else if(SH.every(z=>z.gone)){if(MPLAY)stopM();toast('🏝 今日の曲、全部聴いたね！')}},1400);
+}
+let FWT=null;
+function firework(){const sky=$('sky'),ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,x=W*(.15+Math.random()*.7),y=H*(.12+Math.random()*.25),cols=['#ff5fa2','#ffd84d','#6fe3ff','#b48cff','#7dffb0','#ff8a4d'],col=cols[Math.floor(Math.random()*cols.length)],n=28;
+  for(let k=0;k<n;k++){const d=document.createElement('i');d.className='fwp';const a=k/n*Math.PI*2,r=50+Math.random()*30;d.style.left=x+'px';d.style.top=y+'px';d.style.setProperty('--c',col);d.style.setProperty('--dx',Math.cos(a)*r+'px');d.style.setProperty('--dy',Math.sin(a)*r+'px');sky.appendChild(d);setTimeout(()=>d.remove(),1600)}
+  const c=getAC();if(c){const t0=c.currentTime+.01,nn=c.createBufferSource(),bf=c.createBuffer(1,Math.floor(c.sampleRate*.7),c.sampleRate),dd=bf.getChannelData(0);for(let i=0;i<dd.length;i++)dd[i]=(Math.random()*2-1)*Math.pow(1-i/dd.length,3);
+    const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=380;const g=c.createGain();g.gain.value=SONG?.18:.4;nn.buffer=bf;nn.connect(f);f.connect(g);g.connect(c.destination);nn.start(t0)}}
+function playM(){$('fw').classList.add('on');setCta(true);getAC();loadVoices();firework();FWT=setInterval(()=>{firework();if(Math.random()<.5)setTimeout(firework,350)},1500);
+  const next=()=>{if(!MPLAY)return;const ph=$('phone'),tx=MISLE[0]*ph.clientWidth,ty=MISLE[1]*ph.clientHeight,live=SH.filter(s=>!s.gone);
+    if(!live.length&&!SHQ.length){stopM();toast('🏝 今日の曲、全部聴いたね！');return}
+    if(!live.length){MPLAY=setTimeout(next,900);return}
+    live.sort((p,q)=>Math.hypot(p.x-tx,p.y-ty)-Math.hypot(q.x-tx,q.y-ty));popSh(live[0]);MPLAY=setTimeout(next,12600)};
+  MPLAY=setTimeout(next,1600)}
+function stopM(){if(MPLAY&&MPLAY!==true)clearTimeout(MPLAY);MPLAY=null;clearInterval(FWT);FWT=null;stopSong();const f=$('fw');if(f)f.classList.remove('on');setCta(false)}
 /* ---- Jupiter: butterflies carrying dachi/oshi art flutter in front of your tree ---- */
 let BF=[],BFQ=[],BFraf=0,JPLAY=null,JNB=0;const JMAX=8,JTREE=[.74,.62];
 const JART=['夕焼けの町','屋根の上のねこ','ラーメン','さくら通り','月と海'];
@@ -484,7 +560,7 @@ function playJ(){const f=$('fest');if(!f.querySelector('i'))for(let k=0;k<26;k++
 function stopJ(){if(JPLAY&&JPLAY!==true)clearTimeout(JPLAY);JPLAY=null;festStop();const f=$('fest');if(f)f.classList.remove('on');setCta(false)}
 let AC=null,BEAT=null,VBUF={};
 function getAC(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){}return AC}
-function loadVoices(){const c=getAC();if(!c)return;for(let n=1;n<=5;n++){const k='voice-'+String(n).padStart(2,'0');if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
+function loadVoices(){const c=getAC();if(!c)return;for(const k of [1,2,3,4,5].flatMap(n=>['voice-'+String(n).padStart(2,'0'),'song-'+n])){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
   fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))).then(buf=>{VBUF[k]=buf}).catch(()=>{delete VBUF[k]})}}
 document.addEventListener('pointerdown',()=>{getAC();loadVoices()},{once:false,passive:true});
 // voice through the same (already unlocked) context, so timed pops in club mode are not blocked; music dips meanwhile
@@ -510,7 +586,7 @@ function clubStart(){
 }
 function clubStop(){if(!BEAT)return;clearInterval(BEAT.timer);const g=BEAT.out.gain;try{g.setTargetAtTime(0,AC.currentTime,.2)}catch(e){}BEAT=null}
 function setCta(on){const b=$('cta');
-  if(cur==='saturn'||(cur==='jupiter'&&A['bg3-jupiter'])){b.className='cta disc'+(cur==='jupiter'?' jup':'')+(on?' on':'');b.setAttribute('aria-label',on?'止める':'全部流す');
+  if(cur==='saturn'||(cur==='jupiter'&&A['bg3-jupiter'])||(cur==='mercury'&&A['bg3-mercury'])){b.className='cta disc'+(cur==='jupiter'?' jup':cur==='mercury'?' mer':'')+(on?' on':'');b.setAttribute('aria-label',on?'止める':'全部流す');
     b.innerHTML='<span class="rec"></span><span class="lbl"></span><svg viewBox="0 0 24 24" aria-hidden="true">'+(on?'<rect class="pl" x="6" y="6" width="12" height="12" rx="3"/>':'<path class="pl" d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z"/>')+'</svg>';return}
   b.className='cta';b.removeAttribute('aria-label');b.textContent=P[cur].cta}
 function play(){

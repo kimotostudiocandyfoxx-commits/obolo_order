@@ -35,7 +35,7 @@ for k in 'user kimorin monban mikie brother sister'.split():
 for k in 'mine dachi oshi'.split():
     f=f'{O}/ball-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((160,160)); A['ball-'+k]=uri(kk,88)
-_RM=H+('/saturn-record-mask2.png' if os.environ.get('SATURN_BG','home2-bg-saturn-cutea2').endswith('cutea2') else '/saturn-record-mask.png')
+_RM=H+{'2':'/saturn-record-mask2.png','3':'/saturn-record-mask3.png'}.get(os.environ.get('SATURN_BG','home2-bg-saturn-cutea3')[-1],'/saturn-record-mask.png')
 if os.path.exists(_RM): mk=Image.open(_RM).convert('L'); mk.thumbnail((720,1280)); ma=Image.new('RGBA',mk.size,(255,255,255,0)); ma.putalpha(mk); b2=io.BytesIO(); ma.save(b2,'PNG',optimize=True); A['rec-mask']='data:image/png;base64,'+base64.b64encode(b2.getvalue()).decode()
 # 8 korolin colours: tint the pearl ball (soft colour, highlights kept) and bake a soft shadow under it
 _pearl=f'{O}/ball-dachi.jpg'
@@ -68,13 +68,22 @@ for n in range(1,5):
 for n in range(1,6):
     f=f'{O}/jart-{n}.jpg'
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((360,360)); A[f'jart-{n}']=uri(im,80)
+# Mercury v3: sea with your island, music boats, song clips
+f=f'{O}/home3-bg-mercury.jpg'
+if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg3-mercury']=uri(im,78)
+for n in range(1,5):
+    f=f'{O}/ship3-{n}.jpg'
+    if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((220,220)); A[f'ship3-{n}']=uri(kk,86)
+for n in range(1,6):
+    f=f'{H}/songs/song-{n}.mp3'
+    if os.path.exists(f): A[f'song-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
         f=f'{VD}/line-{n:02d}.mp3'
         if os.path.exists(f): A[f'voice-{n:02d}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
-SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea2')
-RECMASK=H+('/saturn-record-mask2.png' if SAT.endswith('cutea2') else '/saturn-record-mask.png')
+SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea3')
+RECMASK=H+{'2':'/saturn-record-mask2.png','3':'/saturn-record-mask3.png'}.get(SAT[-1],'/saturn-record-mask.png')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
 if SAT.startswith('home2-bg-saturn-cutea') and os.path.exists(RECMASK):
     import numpy as np
