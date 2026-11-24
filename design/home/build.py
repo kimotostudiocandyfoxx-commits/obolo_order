@@ -106,6 +106,8 @@ for nm,key2 in [('home3-bg-jupiter-porch','bg3-jupiter-porch'),('home3-bg-mercur
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[key2]=uri(im,78)
 f=f'{O}/uback.jpg'
 if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((420,420),Image.LANCZOS); A['uback']=uri(o,86)
+f=f'{O}/kakejiku.jpg'
+if os.path.exists(f): _k=Image.open(f).convert('RGB'); _k=_k.crop((0,176,_k.width,_k.height)); o=unwhite(_k); o.thumbnail((520,740),Image.LANCZOS); A['kakejiku']=uri(o,86)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
