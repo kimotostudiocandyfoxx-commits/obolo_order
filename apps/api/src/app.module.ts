@@ -45,6 +45,7 @@ import { MarsController } from './mars/mars.controller';
 import { PlanetPostsController } from './planets/planet-posts.controller';
 import { PlanetPostsService } from './planets/planet-posts.service';
 import { OshiController, PlanetHomeController } from './planets/planet-home.controller';
+import { ChangeablesController } from './planets/changeables.controller';
 import { PlanetHomeService } from './planets/planet-home.service';
 import { WorkSafetyController } from './planets/work-safety.controller';
 import { WorkSafetyService } from './planets/work-safety.service';
@@ -89,6 +90,7 @@ import { WalletController } from './wallet/wallet.controller';
     PlanetPostsController,
     WorkSafetyController,
     PlanetHomeController,
+    ChangeablesController,
     OshiController,
     RadioController,
     BluenaController,

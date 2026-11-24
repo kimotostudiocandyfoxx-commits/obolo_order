@@ -153,7 +153,7 @@ export class PlanetHomeService {
       .limit(limit)) as Row[];
   }
 
-  private async home(userId: string, planet: HomePlanet) {
+  async home(userId: string, planet: HomePlanet) {
     const [h] = await this.db.read.select().from(planetHomes).where(and(eq(planetHomes.userId, userId), eq(planetHomes.planet, planet)));
     return h ?? null;
   }

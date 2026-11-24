@@ -1,9 +1,9 @@
 'use client';
 
-import { RECORD_COLOURS, PLANET_HOMES, type HomePlanet, type HomeWork, type PlanetHomeConfig, type PlanetHomeView, type PlanetWorkReportBody } from '@obolo/shared';
+import { PLANET_HOMES, type HomePlanet, type HomeWork, type PlanetHomeConfig, type PlanetHomeView, type PlanetWorkReportBody } from '@obolo/shared';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { menuFor, type MenuAct } from '@/lib/planetHome/model';
+import { dockButtons, menuFor, type MenuAct } from '@/lib/planetHome/model';
 import { usePlanetHome } from '@/lib/planetHome/usePlanetHome';
 import { useHold, type At } from '@/lib/planetHome/useHold';
 import { CAPTION, type PlanetHomeSkin } from './skin';
@@ -14,7 +14,7 @@ import s from './PlanetHome.module.css';
  * 星のホーム (M-R258; Saturn M-R257), in the story team's template (design/home): one component for every planet. Data
  * and callbacks come from usePlanetHome; the scene (backdrop, floating works, far scenery, your place) is a swappable
  * skin (skin.ts / skins.ts); this is the frame every planet shares — the planet's name, 〔？〕 and the explainer strip
- * (4.5 s, then folded), 〔♡ 推し〕, the dock (the big button + 〔＋ 飛ばす〕), the bottom sheet for a work, the long-press
+ * (4.5 s, then folded), 〔♡ 推し〕, the one big button (M-R263), the bottom sheet for a work, the long-press
  * menu, the inside shelf (your works, forever, newest first; hold one to move it or take it out), the singer's words
  * and the toast. Never a count.
  *
@@ -38,14 +38,13 @@ export function PlanetHome({
   onBack?: () => void;
   /** M-R259: every rolling kororin has been heard (the story goes on) */
   onAllHeard?: () => void;
-  /** inside the story: no dock (〔▶ 全部流す〕〔＋ 飛ばす〕) and no 〔♡ 推し〕 */
+  /** inside the story: no big button and no 〔♡ 推し〕 */
   bare?: boolean;
   /** another backdrop for this place (the story's takoyaki siblings' record) */
   backdrop?: string;
 }) {
   const base = PLANET_HOMES[planet];
   const cfg = backdrop ? { ...base, art: { ...base.art, backdrop } } : base;
-  const [palette, setPalette] = useState(false);
   const h = usePlanetHome(planet, { view, seeds });
   const router = useRouter();
   const root = useRef<HTMLDivElement>(null);
@@ -173,12 +172,6 @@ export function PlanetHome({
                 <button type="button" className={`${s.pill} ${s.help}`} onClick={() => setSay((v) => !v)} aria-label="この星の説明" aria-expanded={say}>
                   ？
                 </button>
-                {/* M-R262: the record's colour */}
-                {cfg.roll && (
-                  <button type="button" className={`${s.pill} ${s.help}`} onClick={() => setPalette((v) => !v)} aria-label="レコードの色" aria-expanded={palette}>
-                    🎨
-                  </button>
-                )}
                 <button type="button" className={s.pill} onClick={() => (setOshiOpen(true), h.loadOshi())}>
                   ♡ 推し
                 </button>
@@ -189,13 +182,13 @@ export function PlanetHome({
             </div>
           </div>
 
+          {/* M-R263: one big button (making and flying are on the Moon) */}
           <div className={s.dock}>
-            <button type="button" className={s.cta} onClick={enter}>
-              {cfg.placeTap === 'play' && h.spinning ? '■ 止める' : cfg.cta}
-            </button>
-            <button type="button" className={s.ghost} onClick={() => router.push(cfg.make ? `/moon/atelier?kind=${cfg.make}` : '/moon/atelier')}>
-              ＋ 飛ばす
-            </button>
+            {dockButtons(cfg, h.spinning).map((b) => (
+              <button key={b.act} type="button" className={s.cta} onClick={enter}>
+                {b.label}
+              </button>
+            ))}
           </div>
         </>
       )}
@@ -321,27 +314,6 @@ export function PlanetHome({
             ))}
           </div>
         </Sheet>
-      )}
-
-      {palette && cfg.roll && (
-        <div className={s.swatches} role="radiogroup" aria-label="レコードの色">
-          {RECORD_COLOURS.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              role="radio"
-              aria-checked={(h.recordColour ?? 'black') === c.id}
-              aria-label={c.name}
-              title={c.name}
-              className={`${s.swatch} ${(h.recordColour ?? 'black') === c.id ? s.swatchOn : ''}`}
-              style={{ background: c.color ?? '#141018' }}
-              onClick={() => {
-                h.setRecordColour(c.id);
-                setPalette(false);
-              }}
-            />
-          ))}
-        </div>
       )}
 
       {h.note && (

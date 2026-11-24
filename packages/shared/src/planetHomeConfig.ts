@@ -26,11 +26,12 @@ export interface PlanetHomeConfig {
   en: string;
   /** the planet's colour (buttons, the inside's light, the emphasis in the line) */
   accent: string;
-  /** the big button at the bottom (Saturn: play; elsewhere: go inside) */
+  /** the one big button at the bottom (M-R263: Saturn 〔▶ 全部流す〕, every other planet 〔中に入る〕; nothing else — making
+   * and flying are on the Moon) */
   cta: string;
   /** what the sheet's button does to a work: 聞く / 見る / 読む / 遊ぶ */
   verb: string;
-  /** 〔＋ 飛ばす〕 opens the Moon atelier on this kind (none yet: the atelier as it is) */
+  /** the Moon atelier's kind for this planet's works (M-R263: no 〔＋ 飛ばす〕 on the planets any more) */
   make?: 'voice' | 'art' | 'song' | 'video' | 'radio';
   /** the store the works come from; null = not wired yet */
   store: PlanetWorkKind | null;
@@ -124,7 +125,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'jupiter',
     en: 'JUPITER',
     accent: '#b6e36b',
-    cta: '🚪 アトリエに入る',
+    cta: '中に入る',
     verb: '見る',
     make: 'art',
     name: '木星',
@@ -147,7 +148,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'mercury',
     en: 'MERCURY',
     accent: '#7fe0ff',
-    cta: '🏠 島の家に入る',
+    cta: '中に入る',
     verb: '聞く',
     make: 'song',
     name: '水星',
@@ -171,7 +172,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'mars',
     en: 'MARS',
     accent: '#ff8a7a',
-    cta: '🎬 上映室に入る',
+    cta: '中に入る',
     verb: '見る',
     make: 'video',
     name: '火星',
@@ -195,7 +196,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'venus',
     en: 'VENUS',
     accent: '#ffd36b',
-    cta: '🎙 ブースに入る',
+    cta: '中に入る',
     verb: '聞く',
     make: 'radio',
     name: '金星',
@@ -219,7 +220,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'uranus',
     en: 'URANUS',
     accent: '#7fffd0',
-    cta: '🛍 お店に入る',
+    cta: '中に入る',
     verb: '見る',
     name: '天王星',
     store: null,
@@ -241,7 +242,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'pluto',
     en: 'PLUTO',
     accent: '#a9b8ff',
-    cta: '📚 図書館に入る',
+    cta: '中に入る',
     verb: '読む',
     name: '冥王星',
     store: null,
@@ -263,7 +264,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'neptune',
     en: 'NEPTUNE',
     accent: '#c39bff',
-    cta: '🕹 ゲーム小屋に入る',
+    cta: '中に入る',
     verb: '遊ぶ',
     name: '海王星',
     store: null,

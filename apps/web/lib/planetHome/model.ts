@@ -1,4 +1,4 @@
-import { PLANET_FLY_MS, dropPlan, homeHoursLeft, isNewSince, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { PLANET_FLY_MS, type PlanetHomeConfig, dropPlan, homeHoursLeft, isNewSince, type HomeWork, type PlanetHomeView } from '@obolo/shared';
 
 /**
  * 星のホーム (M-R258): what is on the screen, worked out from the feed (or from a story's scripted view) — no drawing
@@ -105,4 +105,13 @@ export function rollingOf(stage: Stage, heard: ReadonlySet<string>, now: number 
 export function groovesOf(stage: Stage, rolling: readonly StageItem[]): StageItem[] {
   const out = new Set(rolling.map((w) => w.id));
   return recordOrder(stage).filter((w) => !out.has(w.id));
+}
+
+/**
+ * M-R263: the one big button a planet home has — Saturn 〔▶ 全部流す〕 (〔■ 止める〕 while it plays), every other planet
+ * 〔中に入る〕. Nothing else at the bottom: making and flying works are on the Moon.
+ */
+export function dockButtons(cfg: Pick<PlanetHomeConfig, 'placeTap' | 'cta'>, spinning: boolean): { label: string; act: 'play' | 'stop' | 'enter' }[] {
+  if (cfg.placeTap === 'play') return [spinning ? { label: '■ 止める', act: 'stop' } : { label: cfg.cta, act: 'play' }];
+  return [{ label: cfg.cta, act: 'enter' }];
 }
