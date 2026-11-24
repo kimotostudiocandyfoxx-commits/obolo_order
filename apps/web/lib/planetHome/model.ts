@@ -101,9 +101,12 @@ export const ROLL_MAX = 200;
  */
 export function rollingOf(stage: Stage, heard: ReadonlySet<string>, now: number = Date.now(), max = ROLL_MAX): StageItem[] {
   const recent = (w: StageItem) => w.rel !== 'own' || now - Date.parse(w.flownAt) < PLANET_FLY_MS;
-  return [...stage.around.filter((w) => !w.leaving), ...stage.own]
+  // M-R271: at most one of your own in the line — only the first (your newest) counts; the others are in the grooves
+  const newest = (a: StageItem, b: StageItem) => Date.parse(b.flownAt) - Date.parse(a.flownAt);
+  const mine = stage.own.filter(recent).sort(newest)[0];
+  return [...stage.around.filter((w) => !w.leaving), ...(mine ? [mine] : [])]
     .filter((w) => recent(w) && !heard.has(w.id))
-    .sort((a, b) => Date.parse(b.flownAt) - Date.parse(a.flownAt))
+    .sort(newest)
     .slice(0, max);
 }
 

@@ -118,9 +118,6 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
   const tags = useRef(new Map<string, HTMLDivElement>());
   const bubbles = useRef(new Map<string, HTMLDivElement>());
   const touched = useRef<string | null>(null);
-  const freshIds = useRef(new Set<string>());
-  const plateW = useRef(new Map<string, number>());
-  const plateHt = useRef(0);
   const lastDown = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hold = useRef<{ timer: ReturnType<typeof setTimeout> | null; x: number; y: number; fired: boolean }>({ timer: null, x: 0, y: 0, fired: false });
   const live = useRef({ onItem, onHeard, onHold, rolling });
@@ -128,7 +125,6 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
 
   useEffect(() => {
     if (rolling.length) setHadAny(true);
-    freshIds.current = new Set(rolling.filter((w) => w.fresh).map((w) => w.id));
   }, [rolling]);
 
   const outIds = useMemo(() => new Set(outs.map((o) => o.w.id)), [outs]);
@@ -294,7 +290,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
     return () => clearInterval(t);
   }, [finish]);
 
-  // every frame: the name plates, laid out so none covers another plate, another ball, a mini figure, its words or the dock
+  // every frame: the words kept on the screen, and your own ball's name, clear of the balls, mini figures and words
   const onFrame = useCallback((get: (id: string) => Ball | undefined) => {
     const { W, H } = size();
     const left = FACE.x0 * W;
@@ -313,51 +309,28 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
         boxes.push({ x0: bx - half - 3, x1: bx + half + 3, y0: by - el.offsetHeight - 3, y1: by + 3 });
       }
     }
-    const balls: { id: string; b: Ball }[] = [];
-    for (const id of tags.current.keys()) {
+    // M-R271: only your own kororin has its name under it (the others' names are in their bubbles when they pop)
+    for (const [id, el] of tags.current) {
       const b = get(id);
-      if (b) balls.push({ id, b });
-    }
-    const faces = balls.map(({ id, b }) => ({ id, x: b.x, y: b.y, r: b.R * 0.9 }));
-    const rank = (id: string) => (id === touched.current ? 0 : freshIds.current.has(id) ? 1 : 2);
-    balls.sort((p, q) => rank(p.id) - rank(q.id));
-    const bottomLimit = H * 0.875;
-    const hitsFace = (x0: number, x1: number, y0: number, y1: number, own: string) =>
-      faces.some((f) => {
-        if (f.id === own) return false;
-        const cx = Math.max(x0, Math.min(f.x, x1));
-        const cy = Math.max(y0, Math.min(f.y, y1));
-        return Math.hypot(cx - f.x, cy - f.y) < f.r;
+      if (!b) continue;
+      const faces = live.current.rolling.flatMap((w) => {
+        const q = w.id === id ? undefined : get(w.id);
+        return q ? [{ x: q.x, y: q.y, r: q.R * 0.9 }] : [];
       });
-    const ph = Math.max(PLATE_H, plateHt.current);
-    for (const { id, b } of balls) {
-      const el = tags.current.get(id)!;
-      const w = plateW.current.get(id) ?? 64;
-      const base = b.y + b.R * b.sy + 2;
-      let at: number | null = null;
-      const above = b.y - b.R * b.sy - ph - 3;
-      // below the ball (stepping down, never into the dock), else above it, stepping up so neighbours' plates stagger
-      // kept fully on the screen (a ball by the edge has its plate pulled in)
+      const w = el.offsetWidth || 40;
+      const ph = Math.max(PLATE_H, el.offsetHeight);
       const cx = Math.max(w / 2 + 4 - left, Math.min(W - left - w / 2 - 4, b.x));
-      for (const y0 of [base, base + 10, above, above - (ph + 2), above - 2 * (ph + 2)]) {
+      const base = b.y + b.R * b.sy + 2;
+      const above = b.y - b.R * b.sy - ph - 3;
+      const free = (y0: number) => {
         const box = { x0: cx - w / 2 - 2, x1: cx + w / 2 + 2, y0: y0 - 1, y1: y0 + ph + 1 };
-        if (box.y1 > bottomLimit) continue;
-        if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) continue;
-        if (hitsFace(box.x0, box.x1, box.y0, box.y1, id)) continue;
-        boxes.push(box);
-        at = y0;
-        break;
-      }
-      const dot = at === null;
-      if (el.dataset.dot !== String(dot)) {
-        el.dataset.dot = String(dot);
-        el.classList.toggle(s.puniDot, dot);
-      }
-      if (!dot && !plateW.current.has(id) && el.offsetWidth) {
-        plateW.current.set(id, el.offsetWidth);
-        plateHt.current = Math.max(plateHt.current, el.offsetHeight);
-      }
-      el.style.transform = dot ? `translate3d(${b.x.toFixed(1)}px, ${(b.y + b.R * b.sy - 5).toFixed(1)}px, 0) translateX(-50%)` : `translate3d(${cx.toFixed(1)}px, ${at!.toFixed(1)}px, 0) translateX(-50%)`;
+        if (box.y1 > H * 0.875) return false;
+        if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) return false;
+        return !faces.some((f) => Math.hypot(Math.max(box.x0, Math.min(f.x, box.x1)) - f.x, Math.max(box.y0, Math.min(f.y, box.y1)) - f.y) < f.r);
+      };
+      // under it; else above it; else (crowded) under it all the same
+      const at = [base, base + 10, above, above - (ph + 2)].find(free) ?? base;
+      el.style.transform = `translate3d(${cx.toFixed(1)}px, ${at.toFixed(1)}px, 0) translateX(-50%)`;
       // for the review's overlap check: where this ball is
       el.dataset.face = `${b.x.toFixed(0)},${b.y.toFixed(0)},${(b.R * 0.9).toFixed(0)}`;
     }
@@ -487,7 +460,9 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
         {/* M-R268: the stones in front of the balls, placed exactly as the backdrop (this face starts 4% in) */}
         {isSaturnArt && <div className={s.fg} style={{ backgroundImage: `url(${FOREGROUND})`, left: `${(-FACE.x0 / (FACE.x1 - FACE.x0)) * 100}%`, width: `${100 / (FACE.x1 - FACE.x0)}%` }} aria-hidden data-testid="foreground" />}
         {!reduced &&
-          shown.map((w) => (
+          shown
+            .filter((w) => w.rel === 'own')
+            .map((w) => (
             <div
               key={w.id}
               ref={(el) => {
@@ -495,9 +470,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
                 else tags.current.delete(w.id);
               }}
               className={s.puniTag}
-              style={{ '--c': tagColour(w) } as CSSProperties}
-              data-rel={w.rel}
-              data-testid="rolling"
+              data-testid="own-name"
             >
               {w.fresh && <span className={s.spark}>✦</span>}
               {nameOf(w)}

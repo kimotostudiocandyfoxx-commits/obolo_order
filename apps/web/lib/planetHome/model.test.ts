@@ -102,6 +102,17 @@ describe('星のホーム stage', () => {
     expect(rollingOf(s, all, now)).toEqual([]);
     expect(groovesOf(s, []).length).toBe(16);
   });
+  it('M-R271: never more than one of your own kororins in the line — only the first (newest) counts, the rest are in the grooves', () => {
+    const own = [w('mine-1', 'own', 0.5), w('mine-2', 'own', 1), w('mine-3', 'own', 2)];
+    const s = stageOf(view({ own, around: [w('a0', 'dachi', 0.7), w('a1', 'oshi', 3)] }), { now });
+    const roll = rollingOf(s, new Set(), now);
+    expect(roll.filter((x) => x.rel === 'own').map((x) => x.id)).toEqual(['mine-1']);
+    expect(roll.map((x) => x.id)).toEqual(['mine-1', 'a0', 'a1']);
+    const g = groovesOf(s, roll).map((x) => x.id);
+    expect(g).toEqual(expect.arrayContaining(['mine-2', 'mine-3']));
+    // heard the first: no other of yours comes into the line
+    expect(rollingOf(s, new Set(['mine-1']), now).filter((x) => x.rel === 'own')).toEqual([]);
+  });
   it('M-R263: one big button per planet — Saturn 〔▶ 全部流す〕 (〔■ 止める〕 while it plays), every other 〔中に入る〕; no 〔＋ 飛ばす〕', () => {
     for (const p of HOME_PLANETS) {
       const b = dockButtons(PLANET_HOMES[p], false);
