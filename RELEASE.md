@@ -4,3 +4,4 @@
 
 - R1 2026-11-24T00:43Z 51a1f450 — R1: story camera and subtitles, planet home (Saturn, anime art), unlimited invitations, cancel portal and tokushoho, email login and Stripe switches
 - R2 2026-11-24T02:08Z fb10da09 — R2: anime planet home with residents, Saturn puni on the low-angle record, day-3 Saturn script (D04), KIMORIN crop fix, membership closes after cancel with end date and pay again
+- R3 2026-11-24T03:09Z 0ef93680 — R3: Saturn final form (cute record with 6 colours, popping balls, chibi figures), mana gems 88/888/8888 (1 yen = 1 mana), tokushoho operator details, login codes and invitations by email, WEB_ORIGIN default
