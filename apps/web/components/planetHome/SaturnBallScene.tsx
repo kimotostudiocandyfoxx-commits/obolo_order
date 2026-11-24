@@ -214,8 +214,10 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       let at: number | null = null;
       const above = b.y - b.R * b.sy - ph - 3;
       // below the ball (stepping down, never into the dock), else above it, stepping up so neighbours' plates stagger
+      // kept fully on the screen (a ball by the edge has its plate pulled in)
+      const cx = Math.max(w / 2 + 4 - left, Math.min(W - left - w / 2 - 4, b.x));
       for (const y0 of [base, base + 10, above, above - (ph + 2), above - 2 * (ph + 2)]) {
-        const box = { x0: b.x - w / 2 - 2, x1: b.x + w / 2 + 2, y0: y0 - 1, y1: y0 + ph + 1 };
+        const box = { x0: cx - w / 2 - 2, x1: cx + w / 2 + 2, y0: y0 - 1, y1: y0 + ph + 1 };
         if (box.y1 > bottomLimit) continue;
         if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) continue;
         if (hitsFace(box.x0, box.x1, box.y0, box.y1, id)) continue;
@@ -232,7 +234,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
         plateW.current.set(id, el.offsetWidth);
         plateHt.current = Math.max(plateHt.current, el.offsetHeight);
       }
-      el.style.transform = dot ? `translate3d(${b.x.toFixed(1)}px, ${(b.y + b.R * b.sy - 5).toFixed(1)}px, 0) translateX(-50%)` : `translate3d(${b.x.toFixed(1)}px, ${at!.toFixed(1)}px, 0) translateX(-50%)`;
+      el.style.transform = dot ? `translate3d(${b.x.toFixed(1)}px, ${(b.y + b.R * b.sy - 5).toFixed(1)}px, 0) translateX(-50%)` : `translate3d(${cx.toFixed(1)}px, ${at!.toFixed(1)}px, 0) translateX(-50%)`;
       // for the review's overlap check: where this ball is
       el.dataset.face = `${b.x.toFixed(0)},${b.y.toFixed(0)},${(b.R * 0.9).toFixed(0)}`;
     }
