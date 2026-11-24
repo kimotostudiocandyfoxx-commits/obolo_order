@@ -1,12 +1,13 @@
-# UI art — 2026-11-24T01:47:49.753Z
+# UI art — 2026-11-24T02:14:16.128Z
 
-Seedream 5.0 Pro / 8枚 / 約60円
+Seedream 5.0 Pro / 9枚 / 約65円
 
-- ✅ home2-bg-saturn-cutea
-- ✅ home2-bg-saturn-cuteb
-- ✅ home2-bg-saturn-tako-cute
-- ✅ puni2-brother
-- ✅ puni2-kimorin
-- ✅ puni2-mikie
-- ✅ puni2-monban
-- ✅ puni2-sister
+- ✅ ball-dachi
+- ✅ ball-mine
+- ✅ ball-oshi
+- ✅ chibi-brother
+- ✅ chibi-kimorin
+- ✅ chibi-mikie
+- ✅ chibi-monban
+- ✅ chibi-sister
+- ✅ chibi-user
