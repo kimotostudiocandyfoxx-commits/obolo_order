@@ -1,15 +1,17 @@
 'use client';
 
 import type { AtelierKind } from '@/lib/atelier/unlock';
+import { MOON_ZONES } from '@/lib/talk/zones';
 import { KindMark } from './WorkCard';
 
 /**
  * R9 (client): the Moon temple's water bowl, behind {bati} in its talk. While something is being made the water glows
  * (light rising off the surface, ripples spreading); when it is done the work rises out of the bowl toward the talk.
  * Transform and opacity only (60 fps on the iPad); reduced motion: a gentle fade, nothing moves.
- * The bowl's place on the temple plate (public/onboarding/s/plate-moon-temple.jpg, 1600 × 2880): the water's centre.
+ * The bowl's place on the temple plate (MOON_ZONES.bati, public/talk/moon/temple-bati.webp, 1152 × 2048): the water's
+ * centre and its width, measured on the picture.
  */
-export const TEMPLE_PLATE = { src: '/onboarding/s/plate-moon-temple.jpg', aspect: 1600 / 2880, bowl: { u: 0.5, v: 0.592, w: 0.24 } } as const;
+export const TEMPLE_PLATE = { src: MOON_ZONES.bati, aspect: 1152 / 2048, bowl: { u: 0.508, v: 0.6, w: 0.39 } } as const;
 
 export type BowlState = 'idle' | 'glow' | { rise: { key: string; image?: string | null; kind: AtelierKind } };
 

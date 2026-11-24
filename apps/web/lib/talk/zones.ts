@@ -1,16 +1,16 @@
-import { PLACE_BG } from './looks';
-
 /**
- * R9 (client): the Moon temple as one place with zones. The plates are swapped here (and only here) when the client
- * picks the new ones (moon-zone-dachi / moon-zone-outside / moon-zone-bati, being generated):
- *  - hall: the great hall, where the ダチ you talk with most stroll (the ダチ tab's main view);
- *  - outside: the lunar plain below the temple's front stairs, everyone else;
- *  - bati: {bati}'s place, before the water bowl (the bowl's position is in components/atelier/BowlFx.tsx TEMPLE_PLATE:
- *    a new plate needs its bowl's centre there too).
- * PLACEHOLDER until the client picks: the current ダチ backdrop for the hall, the existing Moon surface outside.
+ * R9 (client): the Moon temple as one place with zones, the three plates painted for the client's map
+ * (design/story/refs/moon-temple-zones-client.jpg), all from where you stand, the top of the short steps between the
+ * inner sanctum and the great hall, at eye level, the same night:
+ *  - bati: looking in, {bati}'s place before the wide water bowl (the bowl's position is in
+ *    components/atelier/BowlFx.tsx TEMPLE_PLATE: a new plate needs its bowl's centre there too);
+ *  - hall: looking out, down the steps into the great circular hall, where the ダチ you talk with most stroll (the ダチ
+ *    tab's main view; MoonTabs' strollers stand on its floor);
+ *  - outside: the lunar plain below the temple's front stairs, everyone else.
+ * Sources: design/story/out/moon-zone-*.jpg (the queue's moon-zone-* items).
  */
 export const MOON_ZONES = {
-  hall: PLACE_BG.moon,
-  outside: '/onboarding/s/moon-surface.jpg',
-  bati: '/onboarding/s/plate-moon-temple.jpg',
+  hall: '/talk/moon/temple-hall.webp',
+  outside: '/talk/moon/temple-outside.webp',
+  bati: '/talk/moon/temple-bati.webp',
 } as const;
