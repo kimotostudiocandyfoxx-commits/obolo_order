@@ -49,7 +49,7 @@ if os.path.exists(_pearl):
         cv.alpha_composite(sh); cv.alpha_composite(im,(0,0)); cv=cv.crop((0,0,W,Hh))
         A['ballc-'+name]=uri(cv,88)
 # painted korolin (white background): cut the sphere out as a clean circle
-for n,pre in [(n,pre) for pre in ('kor2','kor3') for n in range(1,17)]:
+for n,pre in [(n,pre) for pre in ('kor2','kor3') for n in range(1,31)]:
     f=f'{O}/{pre}-{n:02d}.jpg'
     if not os.path.exists(f): continue
     from PIL import ImageDraw as _D2, ImageFilter as _F2
