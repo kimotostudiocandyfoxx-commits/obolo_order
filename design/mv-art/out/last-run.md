@@ -1,12 +1,6 @@
-# UI art — 2026-11-23T10:39:32.925Z
+# UI art — 2026-11-24T00:28:33.044Z
 
-Seedream 5.0 Pro / 8枚 / 約58円
+Seedream 5.0 Pro / 2枚 / 約14円
 
-- ✅ res-mars-hippo
-- ✅ res-mercury-freezie
-- ✅ res-mercury-salmon
-- ✅ res-neptune-boombox
-- ✅ res-pluto-ribbon
-- ✅ res-uranus-croco
-- ✅ res-venus-bossg
-- ✅ res-venus-longg
+- ✅ home2-bg-saturn-biga
+- ✅ home2-bg-saturn-bigb
