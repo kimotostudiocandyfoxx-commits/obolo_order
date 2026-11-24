@@ -20,6 +20,8 @@ export interface BallItem {
   /** M-R266: the maker's kororin face, and a number of the ball's own (which way its face looks, when it blinks) */
   face: KororinFaceId;
   turn: number;
+  /** M-R273: a dachi's / 推し's name, inside the ball under the face (none on your own) */
+  name?: string | null;
 }
 
 export interface BallLayerHandle {
@@ -59,7 +61,17 @@ export const BallLayer = forwardRef<
     const el = box.current!;
     return cb.current.floorAt ? cb.current.floorAt(x) : el.clientHeight * floor;
   };
-  const grab = useRef<{ id: string | null; pid: number; t0: number; x0: number; y0: number; dx: number; dy: number; moved: boolean; hist: { t: number; x: number; y: number }[] } | null>(null);
+  const grab = useRef<{
+    id: string | null;
+    pid: number;
+    t0: number;
+    x0: number;
+    y0: number;
+    dx: number;
+    dy: number;
+    moved: boolean;
+    hist: { t: number; x: number; y: number }[];
+  } | null>(null);
 
   useEffect(() => {
     const el = box.current;
@@ -117,7 +129,15 @@ export const BallLayer = forwardRef<
         const dt = (now - last) / 1000;
         last = now;
         const c = cb.current;
-        const world = { floor: el.clientHeight * floor, floorAt: c.floorAt, left: 0, right: el.clientWidth, reduced, spin: c.spin && !reduced, bpm: c.bpm };
+        const world = {
+          floor: el.clientHeight * floor,
+          floorAt: c.floorAt,
+          left: 0,
+          right: el.clientWidth,
+          reduced,
+          spin: c.spin && !reduced,
+          bpm: c.bpm,
+        };
         if (world.spin) {
           const beat = Math.floor((now / 1000) * (c.bpm / 60));
           if (beat !== lastBeat) hop(balls.current, beat, world);
@@ -156,7 +176,17 @@ export const BallLayer = forwardRef<
     const p = local(e);
     const b = hit(p.x, p.y);
     const t = performance.now();
-    grab.current = { id: b?.id ?? null, pid: e.pointerId, t0: t, x0: p.x, y0: p.y, dx: b ? b.x - p.x : 0, dy: b ? b.y - p.y : 0, moved: false, hist: [{ t, x: p.x, y: p.y }] };
+    grab.current = {
+      id: b?.id ?? null,
+      pid: e.pointerId,
+      t0: t,
+      x0: p.x,
+      y0: p.y,
+      dx: b ? b.x - p.x : 0,
+      dy: b ? b.y - p.y : 0,
+      moved: false,
+      hist: [{ t, x: p.x, y: p.y }],
+    };
     if (!b) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
     b.drag = true;
@@ -210,30 +240,45 @@ export const BallLayer = forwardRef<
       {items.map((it) => {
         const turn = faceTurn(it.turn);
         return (
-        <div
-          key={it.id}
-          ref={(el) => {
-            if (el) outer.current.set(it.id, el);
-            else outer.current.delete(it.id);
-          }}
-          className={s.ball}
-          style={{ width: it.R * 2, height: it.R * 2, transform: 'translate3d(-999px, -999px, 0)' }}
-          data-ball={it.id}
-        >
           <div
+            key={it.id}
             ref={(el) => {
-              if (el) inner.current.set(it.id, el);
-              else inner.current.delete(it.id);
+              if (el) outer.current.set(it.id, el);
+              else outer.current.delete(it.id);
             }}
-            className={s.ballBody}
+            className={s.ball}
+            style={{
+              width: it.R * 2,
+              height: it.R * 2,
+              transform: 'translate3d(-999px, -999px, 0)',
+            }}
+            data-ball={it.id}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img alt="" src={it.pic} draggable={false} />
-            <KororinFace face={it.face} delay={turn.delay} style={{ transform: turn.transform }} shades={shadesOf(it.turn)} />
+            <div
+              ref={(el) => {
+                if (el) inner.current.set(it.id, el);
+                else inner.current.delete(it.id);
+              }}
+              className={s.ballBody}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img alt="" src={it.pic} draggable={false} />
+              <KororinFace face={it.face} delay={turn.delay} style={{ transform: turn.transform }} shades={shadesOf(it.turn)} />
+              {it.name && <BallName name={it.name} R={it.R} />}
+            </div>
           </div>
-        </div>
         );
       })}
     </div>
   );
 });
+
+/** M-R273: the name on the ball (moves with its jiggle) — sized to fit, else cut with 「…」 */
+export function BallName({ name, R }: { name: string; R: number }) {
+  const size = Math.max(6.5, Math.min(R * 0.34, (R * 1.4) / [...name].length));
+  return (
+    <span className={s.bname} style={{ fontSize: `${size.toFixed(1)}px` }} data-testid="ball-name">
+      {name}
+    </span>
+  );
+}

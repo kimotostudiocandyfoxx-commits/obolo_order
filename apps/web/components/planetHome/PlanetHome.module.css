@@ -1513,3 +1513,26 @@
 .party:not(.partyOn) * {
   animation-play-state: paused;
 }
+
+/* M-R273: a dachi's / 推し's name on the ball, under the face (inside the jiggling body) */
+.bname {
+  position: absolute;
+  left: 50%;
+  top: 79%;
+  transform: translate(-50%, -50%);
+  max-width: 84%;
+  padding: 1.5px 4px 1px;
+  border-radius: 999px;
+  background: rgba(48, 22, 72, 0.42);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 900;
+  font-family: var(--f-body);
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0.5px 1px rgba(30, 10, 50, 0.5);
+  pointer-events: none;
+}

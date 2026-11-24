@@ -150,7 +150,13 @@ export function PlanetHome({
     <div
       ref={root}
       className={`${s.home} ${zoom ? s.zoom : ''}`}
-      style={{ '--accent': cfg.accent, '--safe': `${safe}px`, '--caption-top': cfg.roll ? '34%' : `max(${CAPTION.top}%, calc(58% + 52px))` } as CSSProperties}
+      style={
+        {
+          '--accent': cfg.accent,
+          '--safe': `${safe}px`,
+          '--caption-top': cfg.roll ? '34%' : `max(${CAPTION.top}%, calc(58% + 52px))`,
+        } as CSSProperties
+      }
       data-planet={planet}
     >
       {h.view && h.stage && (
@@ -220,7 +226,11 @@ export function PlanetHome({
                 <span className={s.discRec} />
                 <span className={s.discLbl} />
                 <svg viewBox="0 0 24 24" aria-hidden>
-                  {spinning ? <rect x="6" y="6" width="12" height="12" rx="3" fill="#fff" /> : <path d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z" fill="#fff" />}
+                  {spinning ? (
+                    <rect x="6" y="6" width="12" height="12" rx="3" fill="#fff" />
+                  ) : (
+                    <path d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z" fill="#fff" />
+                  )}
                 </svg>
               </button>
             ) : (

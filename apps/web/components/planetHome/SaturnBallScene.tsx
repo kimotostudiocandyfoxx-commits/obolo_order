@@ -3,8 +3,8 @@
 import { kororinOf, RECORD_COLOURS } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { COLORS } from '@/lib/puni/parts';
-import { rimFloor, type Ball } from '@/lib/planetHome/ballPhysics';
-import { BallLayer, type BallItem, type BallLayerHandle } from './BallLayer';
+import { rimFloor } from '@/lib/planetHome/ballPhysics';
+import { BallLayer, BallName, type BallItem, type BallLayerHandle } from './BallLayer';
 import { kororinBall, KororinPic } from './KororinFace';
 import { BALLS_AT_ONCE, type StageItem } from '@/lib/planetHome/model';
 import type { SceneProps } from './skin';
@@ -34,7 +34,6 @@ const RIM = { cx: 0.481, cy: 0.702, rx: 0.574, ry: 0.1885 };
 const SHADES_MS = 900;
 const FIRST_POP_MS = 2200;
 const HOLD_MS = 480;
-const PLATE_H = 17;
 /** the mini figure's box (px) and how far above the popped ball it stands */
 const CHIBI = { w: 124, h: 124, up: 100 };
 /** M-R264: where the words may be (shares of the screen's width), and the pace of 〔▶ 全部流す〕 */
@@ -84,7 +83,18 @@ function useAtOnce() {
 export function RecordTint({ colour }: { colour?: string | null }) {
   const c = RECORD_COLOURS.find((x) => x.id === colour)?.color;
   if (!c) return null;
-  return <div className={s.tint} style={{ background: c, WebkitMaskImage: `url(${RECORD_MASK})`, maskImage: `url(${RECORD_MASK})` }} aria-hidden data-testid="record-tint" />;
+  return (
+    <div
+      className={s.tint}
+      style={{
+        background: c,
+        WebkitMaskImage: `url(${RECORD_MASK})`,
+        maskImage: `url(${RECORD_MASK})`,
+      }}
+      aria-hidden
+      data-testid="record-tint"
+    />
+  );
 }
 
 /** the mini figure, or a round face (the puni picture, else a colour with the first letter) until it is painted */
@@ -94,13 +104,26 @@ export function ChibiPic({ w }: { w: StageItem }) {
     return <img alt="" src={w.author.chibi} draggable={false} />;
   }
   return (
-    <span className={s.chibiFace} style={{ background: w.author.pic ? `center / cover url(${w.author.pic})` : COLORS[hue(w.author.id) % COLORS.length] }}>
+    <span
+      className={s.chibiFace}
+      style={{
+        background: w.author.pic ? `center / cover url(${w.author.pic})` : COLORS[hue(w.author.id) % COLORS.length],
+      }}
+    >
       {!w.author.pic && [...nameOf(w)][0]}
     </span>
   );
 }
 
-type Out = { w: StageItem; x: number; y: number; phase: 'talk' | 'wave' | 'away'; t0: number; started: boolean; endAt: number };
+type Out = {
+  w: StageItem;
+  x: number;
+  y: number;
+  phase: 'talk' | 'wave' | 'away';
+  t0: number;
+  started: boolean;
+  endAt: number;
+};
 
 export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
@@ -114,11 +137,15 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
   const [hadAny, setHadAny] = useState(false);
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const [drops, setDrops] = useState<{ id: string; x: number; y: number; dx: number; dy: number }[]>([]);
-  const tags = useRef(new Map<string, HTMLDivElement>());
   const bubbles = useRef(new Map<string, HTMLDivElement>());
   const touched = useRef<string | null>(null);
   const lastDown = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const hold = useRef<{ timer: ReturnType<typeof setTimeout> | null; x: number; y: number; fired: boolean }>({ timer: null, x: 0, y: 0, fired: false });
+  const hold = useRef<{
+    timer: ReturnType<typeof setTimeout> | null;
+    x: number;
+    y: number;
+    fired: boolean;
+  }>({ timer: null, x: 0, y: 0, fired: false });
   const live = useRef({ onItem, onHeard, onHold, rolling });
   live.current = { onItem, onHeard, onHold, rolling };
 
@@ -155,12 +182,22 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
     () =>
       shown.map((w) => {
         const k = kororinOf(w.author.kororin);
-        return { id: w.id, pic: kororinBall(k.colour), face: k.face, turn: hue(w.id), R: (22 + (hue(w.id) % 3) * 4) * scale };
+        return {
+          id: w.id,
+          pic: kororinBall(k.colour),
+          face: k.face,
+          turn: hue(w.id),
+          name: w.rel === 'own' ? null : w.author.name,
+          R: (22 + (hue(w.id) % 3) * 4) * scale,
+        };
       }),
     [shown, scale],
   );
 
-  const size = () => ({ W: root.current?.clientWidth ?? 390, H: root.current?.clientHeight ?? 844 });
+  const size = () => ({
+    W: root.current?.clientWidth ?? 390,
+    H: root.current?.clientHeight ?? 844,
+  });
   // M-R268: the rim's ellipse, mapped as the backdrop is (cover, centred, bottom-aligned), in the record face's px
   const isSaturnArt = cfg.art.backdrop === '/planet-home/bg-saturn.webp';
   const floorAt = useMemo(() => {
@@ -170,7 +207,12 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
     const dh = BG.h * k;
     const x0 = (box.W - dw) / 2 - FACE.x0 * box.W;
     const y0 = box.H - dh;
-    return rimFloor({ cx: x0 + RIM.cx * dw, cy: y0 + RIM.cy * dh, rx: RIM.rx * dw, ry: RIM.ry * dh });
+    return rimFloor({
+      cx: x0 + RIM.cx * dw,
+      cy: y0 + RIM.cy * dh,
+      rx: RIM.rx * dw,
+      ry: RIM.ry * dh,
+    });
   }, [box, isSaturnArt]);
   // club mode: the sunglasses go on a little after the record starts
   const [partying, setPartying] = useState(false);
@@ -214,12 +256,29 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
       ...Array.from({ length: 14 }, (_, k) => {
         const a = (k / 14) * Math.PI * 2;
         const d = R * (1.2 + ((k * 37) % 10) / 12);
-        return { id: `${id}-${n}-${k}`, x, y, dx: Math.cos(a) * d, dy: Math.sin(a) * d };
+        return {
+          id: `${id}-${n}-${k}`,
+          x,
+          y,
+          dx: Math.cos(a) * d,
+          dy: Math.sin(a) * d,
+        };
       }),
     ]);
     setTimeout(() => setDrops((l) => l.filter((d) => !d.id.startsWith(`${id}-${n}-`))), 700);
     const t0 = performance.now();
-    setOuts((l) => [...l, { w, x, y, phase: 'talk', t0, started: false, endAt: t0 + (w.url ? TALK_MAX : TALK_MIN + 600) }]);
+    setOuts((l) => [
+      ...l,
+      {
+        w,
+        x,
+        y,
+        phase: 'talk',
+        t0,
+        started: false,
+        endAt: t0 + (w.url ? TALK_MAX : TALK_MIN + 600),
+      },
+    ]);
     setWaiting((n) => n + 1);
     setTimeout(() => setWaiting((n) => n - 1), NEXT_MS);
     live.current.onItem(w);
@@ -289,15 +348,12 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
     return () => clearInterval(t);
   }, [finish]);
 
-  // every frame: the words kept on the screen, and your own ball's name, clear of the balls, mini figures and words
-  const onFrame = useCallback((get: (id: string) => Ball | undefined) => {
-    const { W, H } = size();
+  // every frame: the words kept on the screen (M-R273: the names are on the balls; no plates to lay out)
+  const onFrame = useCallback(() => {
+    const { W } = size();
     const left = FACE.x0 * W;
-    const boxes: { x0: number; x1: number; y0: number; y1: number }[] = [];
-    // the mini figures and their words take their place first (the words kept inside the screen)
     for (const o of outsRef.current) {
       if (o.phase === 'away') continue;
-      boxes.push({ x0: o.x - CHIBI.w / 2, x1: o.x + CHIBI.w / 2, y0: o.y - CHIBI.up - CHIBI.h / 2, y1: o.y + CHIBI.h / 2 - CHIBI.up + 20 });
       const el = bubbles.current.get(o.w.id);
       if (el) {
         // M-R264: between 24% and 76% of the screen's width, never cut at an edge
@@ -305,33 +361,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
         const bx = Math.max(W * BUBBLE.x0 + half - left, Math.min(W * BUBBLE.x1 - half - left, o.x));
         const by = o.y - CHIBI.up - CHIBI.h / 2 - 2;
         el.style.transform = `translate3d(${bx.toFixed(1)}px, ${by.toFixed(1)}px, 0) translate(-50%, -100%)`;
-        boxes.push({ x0: bx - half - 3, x1: bx + half + 3, y0: by - el.offsetHeight - 3, y1: by + 3 });
       }
-    }
-    // M-R271: only your own kororin has its name under it (the others' names are in their bubbles when they pop)
-    for (const [id, el] of tags.current) {
-      const b = get(id);
-      if (!b) continue;
-      const faces = live.current.rolling.flatMap((w) => {
-        const q = w.id === id ? undefined : get(w.id);
-        return q ? [{ x: q.x, y: q.y, r: q.R * 0.9 }] : [];
-      });
-      const w = el.offsetWidth || 40;
-      const ph = Math.max(PLATE_H, el.offsetHeight);
-      const cx = Math.max(w / 2 + 4 - left, Math.min(W - left - w / 2 - 4, b.x));
-      const base = b.y + b.R * b.sy + 2;
-      const above = b.y - b.R * b.sy - ph - 3;
-      const free = (y0: number) => {
-        const box = { x0: cx - w / 2 - 2, x1: cx + w / 2 + 2, y0: y0 - 1, y1: y0 + ph + 1 };
-        if (box.y1 > H * 0.875) return false;
-        if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) return false;
-        return !faces.some((f) => Math.hypot(Math.max(box.x0, Math.min(f.x, box.x1)) - f.x, Math.max(box.y0, Math.min(f.y, box.y1)) - f.y) < f.r);
-      };
-      // under it; else above it; else (crowded) under it all the same
-      const at = [base, base + 10, above, above - (ph + 2)].find(free) ?? base;
-      el.style.transform = `translate3d(${cx.toFixed(1)}px, ${at.toFixed(1)}px, 0) translateX(-50%)`;
-      // for the review's overlap check: where this ball is
-      el.dataset.face = `${b.x.toFixed(0)},${b.y.toFixed(0)},${(b.R * 0.9).toFixed(0)}`;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -415,7 +445,13 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
   const g = groove();
   return (
     <div ref={root} className={`${s.scene} ${partying ? s.partying : ''}`} data-in-line={inLine} data-on-record={shown.length} data-partying={partying || undefined}>
-      <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})`, transform: 'none' }} />
+      <div
+        className={s.bg}
+        style={{
+          backgroundImage: `url(${cfg.art.backdrop})`,
+          transform: 'none',
+        }}
+      />
       {cfg.art.backdrop === '/planet-home/bg-saturn.webp' && <RecordTint colour={view.recordColour} />}
       {/* M-R264: while it spins, the light in the grooves goes round */}
       {spinning && !reduced && <GrooveSpin />}
@@ -455,33 +491,45 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
           <BallLayer ref={layer} items={items} floor={FACE.floor} floorAt={floorAt} spin={spinning} bpm={bpm ?? 124} onTap={tapBall} onTapEmpty={tapEmpty} onFrame={onFrame} />
         )}
         {/* M-R268: the stones in front of the balls, placed exactly as the backdrop (this face starts 4% in) */}
-        {isSaturnArt && <div className={s.fg} style={{ backgroundImage: `url(${FOREGROUND})`, left: `${(-FACE.x0 / (FACE.x1 - FACE.x0)) * 100}%`, width: `${100 / (FACE.x1 - FACE.x0)}%` }} aria-hidden data-testid="foreground" />}
-        {!reduced &&
-          shown
-            .filter((w) => w.rel === 'own')
-            .map((w) => (
-            <div
-              key={w.id}
-              ref={(el) => {
-                if (el) tags.current.set(w.id, el);
-                else tags.current.delete(w.id);
-              }}
-              className={s.puniTag}
-              data-testid="own-name"
-            >
-              {w.fresh && <span className={s.spark}>✦</span>}
-              {nameOf(w)}
-            </div>
-          ))}
+        {isSaturnArt && (
+          <div
+            className={s.fg}
+            style={{
+              backgroundImage: `url(${FOREGROUND})`,
+              left: `${(-FACE.x0 / (FACE.x1 - FACE.x0)) * 100}%`,
+              width: `${100 / (FACE.x1 - FACE.x0)}%`,
+            }}
+            aria-hidden
+            data-testid="foreground"
+          />
+        )}
         {drops.map((d) => (
-          <i key={d.id} className={s.splash} style={{ left: d.x, top: d.y, '--dx': `${d.dx}px`, '--dy': `${d.dy}px` } as CSSProperties} aria-hidden />
+          <i
+            key={d.id}
+            className={s.splash}
+            style={
+              {
+                left: d.x,
+                top: d.y,
+                '--dx': `${d.dx}px`,
+                '--dy': `${d.dy}px`,
+              } as CSSProperties
+            }
+            aria-hidden
+          />
         ))}
         {/* the mini figures out of their balls: jump out, talk, wave, into the groove */}
         {outs.map((o) => (
           <div key={o.w.id}>
             <div
               className={`${s.chibi} ${o.phase === 'wave' ? s.chibiWave : ''} ${o.phase === 'away' ? s.chibiAway : ''} ${reduced ? s.chibiStill : ''}`}
-              style={{ left: o.phase === 'away' ? g.x : o.x, top: (o.phase === 'away' ? g.y : o.y - CHIBI.up) - CHIBI.h / 2, width: CHIBI.w, height: CHIBI.h, marginLeft: -CHIBI.w / 2 }}
+              style={{
+                left: o.phase === 'away' ? g.x : o.x,
+                top: (o.phase === 'away' ? g.y : o.y - CHIBI.up) - CHIBI.h / 2,
+                width: CHIBI.w,
+                height: CHIBI.h,
+                marginLeft: -CHIBI.w / 2,
+              }}
               data-testid="chibi"
             >
               <ChibiPic w={o.w} />
@@ -493,7 +541,12 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
                   else bubbles.current.delete(o.w.id);
                 }}
                 className={`${s.bub} ${s.bubWrap}`}
-                style={{ left: 0, top: 0, bottom: 'auto', transform: `translate3d(${o.x}px, ${o.y - CHIBI.up - CHIBI.h / 2 - 2}px, 0) translate(-50%, -100%)` }}
+                style={{
+                  left: 0,
+                  top: 0,
+                  bottom: 'auto',
+                  transform: `translate3d(${o.x}px, ${o.y - CHIBI.up - CHIBI.h / 2 - 2}px, 0) translate(-50%, -100%)`,
+                }}
                 data-testid="bubble"
               >
                 <small>🎤 {nameOf(o.w)}</small>
@@ -518,7 +571,15 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
 /** the light streaks in the grooves going round (on the record only: through its mask, seen at its low angle) */
 function GrooveSpin() {
   return (
-    <div className={s.grooveMask} style={{ WebkitMaskImage: `url(${RECORD_MASK})`, maskImage: `url(${RECORD_MASK})` }} aria-hidden data-testid="groove-spin">
+    <div
+      className={s.grooveMask}
+      style={{
+        WebkitMaskImage: `url(${RECORD_MASK})`,
+        maskImage: `url(${RECORD_MASK})`,
+      }}
+      aria-hidden
+      data-testid="groove-spin"
+    >
       <div className={s.grooveTilt} style={{ left: `${GROOVE.x * 100}%`, top: `${GROOVE.y * 100}%` }}>
         <div className={s.grooveLight} />
       </div>
@@ -549,7 +610,7 @@ function StillRows({ items, onTap, onHold }: { items: StageItem[]; onTap: (w: St
           data-testid="rolling"
         >
           <KororinPic k={w.author.kororin} size={56} turn={hue(w.id)} />
-          {w.rel === 'own' && <span className={s.puniTagStill}>{nameOf(w)}</span>}
+          {w.rel !== 'own' && <BallName name={w.author.name} R={28} />}
         </button>
       ))}
     </div>

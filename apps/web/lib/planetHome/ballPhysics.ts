@@ -52,7 +52,22 @@ export const THROW = 0.6;
 export const EASE = 0.45;
 
 export function newBall(id: string, x: number, y: number, R: number, seed: number, n = 0): Ball {
-  return { id, R, x, y, vx: 0, vy: 0, ws: 0, wv: 0, sx: 1, sy: 1, tilt: 0, drag: false, seed, n };
+  return {
+    id,
+    R,
+    x,
+    y,
+    vx: 0,
+    vy: 0,
+    ws: 0,
+    wv: 0,
+    sx: 1,
+    sy: 1,
+    tilt: 0,
+    drag: false,
+    seed,
+    n,
+  };
 }
 
 export const floorOf = (w: BallWorld, x: number) => (w.floorAt ? w.floorAt(x) : w.floor);
@@ -193,7 +208,7 @@ export function stepBalls(balls: Ball[], dt: number, t: number, w: BallWorld) {
     b.sx += (tx - b.sx) * EASE;
     b.sy += (ty - b.sy) * EASE;
     // M-R268: swaying to the beat while it spins
-    const sway = w.spin && w.beat !== undefined ? Math.sin(t * Math.PI * (w.bpm ?? 124) / 60 + b.n) * 9 : 0;
+    const sway = w.spin && w.beat !== undefined ? Math.sin((t * Math.PI * (w.bpm ?? 124)) / 60 + b.n) * 9 : 0;
     const tilt = w.reduced ? 0 : Math.max(-12, Math.min(12, b.vx * 0.012)) + sway;
     b.tilt += (tilt - b.tilt) * 0.2;
   }
