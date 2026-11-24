@@ -20,13 +20,14 @@ export type MoonTab = 'bati' | 'dachi' | 'bluena';
 export const tabOf = (v: string | null): MoonTab => (v === 'dachi' || v === 'bluena' ? v : 'bati');
 
 /**
- * The small segmented control under the Moon chat's bar: {bati}'s name | ダチ | ブルーナ. ブルーナ only once Bluena is
+ * The small segmented control under the Moon chat's bar: ダチ | {bati}'s name | ブルーナ (R9). ブルーナ only once Bluena is
  * handed over (day 3, D04-S002; there is no Bluena before — M-R212).
  */
 export function MoonTabs({ tab, bati, bluena, unread, onTab }: { tab: MoonTab; bati: string; bluena: boolean; /** a ダチ thread not heard yet */ unread?: boolean; onTab: (t: MoonTab) => void }) {
+  // R9 (client): ダチ | {bati} | ブルーナ — {bati} in the middle, and the default
   const tabs: [MoonTab, string][] = [
-    ['bati', bati || 'バティ'],
     ['dachi', 'ダチ'],
+    ['bati', bati || 'バティ'],
     ...(bluena ? ([['bluena', 'ブルーナ']] as [MoonTab, string][]) : []),
   ];
   return (

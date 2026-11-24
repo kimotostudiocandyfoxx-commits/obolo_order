@@ -33,6 +33,7 @@ import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
 import { ChangePreview } from './ChangePreview';
+import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 
 const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif';
@@ -791,6 +792,28 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
             },
           },
   );
+  // R9 (client): making something — the bowl's water glows while it is made; when it is done, the work rises out of it
+  const [rising, setRising] = useState<{ key: string; image?: string | null; kind: AtelierKind } | null>(null);
+  const workState = useRef(new Map<string, string>());
+  useEffect(() => {
+    const was = workState.current;
+    let done: Work | null = null;
+    for (const m of msgs) {
+      if (m.who !== 'work') continue;
+      const before = was.get(m.work.id);
+      if (before === 'making' && m.work.status === 'ready') done = m.work;
+      was.set(m.work.id, m.work.status);
+    }
+    if (!done) return;
+    const key = `${done.id}-${Date.now()}`;
+    setRising({ key, image: done.image ?? done.poster ?? done.candidates?.[0]?.url, kind: done.kind });
+    const t = setTimeout(() => setRising((r) => (r?.key === key ? null : r)), 1800);
+    return () => clearTimeout(t);
+  }, [msgs]);
+  const brewing = msgs.some((m) => m.who === 'work' && m.work.status === 'making');
+  const bowl: BowlState = rising ? { rise: rising } : brewing ? 'glow' : 'idle';
+  const reducedMotion = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
   // a slow card does not keep {bati} 'thinking' (you may go away meanwhile)
   const making = msgs.some((m) => m.who === 'work' && m.work.status === 'making' && !m.work.job?.long);
   const renderCard = (w: Work) => (
@@ -828,7 +851,11 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         framing={story ? undefined : 'ots'}
         listening={talkState.listening}
         keyboard={talkState.keyboard}
-        place={PLACE_BG.moon}
+        // R9 (client): {bati} in the Moon temple, before the water bowl (the story keeps its own place)
+        place={story ? PLACE_BG.moon : TEMPLE_PLATE.src}
+        placeAspect={story ? undefined : TEMPLE_PLATE.aspect}
+        placeFx={story ? undefined : (m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
+        otsAt={0.27}
         top={story ? 40 : 0}
         bar={{ title: partner.name, onList, onBluena, unread, onBack, below: banner }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}

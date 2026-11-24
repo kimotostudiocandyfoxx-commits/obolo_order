@@ -217,7 +217,20 @@ export function TalkScene({
   ambient,
   log = false,
   framing,
+  otsAt = 0.44,
+  placeAspect,
+  placeFx,
 }: {
+  /** R9: where the partner stands in the over-the-shoulder framing (0..1 of the width) */
+  otsAt?: number;
+  /** R9: the place picture's width / height (for placeFx's cover mapping) */
+  placeAspect?: number;
+  /**
+   * R9: something drawn on the place itself (the temple bowl's glow), in the place's own box so it drifts and moves with
+   * it; `at(u, v)` maps a point of the picture (0..1) to px in that box through the same cover fit, `scale` = px per
+   * picture width.
+   */
+  placeFx?: (m: { at: (u: number, v: number) => { x: number; y: number }; scale: number }) => ReactNode;
   /**
    * client 2026-11-24 (iPad, R7): the whole talk as a log — every bubble in one column over the place, the past ones
    * moving up and fading out toward the top; scrolling up reads back the whole talk, scrolling down returns to now (no
@@ -773,7 +786,7 @@ export function TalkScene({
     const other = row.find((p) => !p.self)!;
     // R9 (client): the partner is the subject — large and sharp, a little left of centre; your back is a soft presence
     // in the lower right, bigger, blurred (depth of field) and spilling off the right edge
-    spots.set(other.id, { x: 0.44, bottom: stageH * 0.06, h: stageH * 0.9, z: 1, w: 0.5, chest: false });
+    spots.set(other.id, { x: otsAt, bottom: stageH * 0.06, h: stageH * 0.9, z: 1, w: 0.5, chest: false });
     spots.set(self!.id, { x: 0.9, bottom: -stageH * 1.15, h: stageH * 2.05, z: 3, w: 0.8, chest: false });
   }
   // a wide picture at an end of the row (a painted resident with something held out to one side) is kept inside the
@@ -1069,6 +1082,17 @@ export function TalkScene({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={place} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
+            {placeFx && placeAspect && (() => {
+              // the same cover fit as the picture (object-cover, center 30%) in this box (the root, 4% wider each side and taller at the top)
+              const cw = size.w * 1.08;
+              const ch = size.h * 1.04;
+              const sc = Math.max(cw / placeAspect, ch);
+              const dw = sc * placeAspect;
+              const dh = sc;
+              const ox = (cw - dw) * 0.5;
+              const oy = (ch - dh) * 0.3;
+              return placeFx({ at: (u, v) => ({ x: ox + u * dw, y: oy + v * dh }), scale: dw });
+            })()}
           </div>
         </div>
       )}

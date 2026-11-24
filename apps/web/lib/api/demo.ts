@@ -764,7 +764,12 @@ export class DemoApi implements Api {
   }
 
   async batiSays(): Promise<{ url: string | null }> {
-    return { url: null };
+    // the demo has no voice for {bati}'s free words; the review shots may lend one (R9: words and voice together)
+    try {
+      return { url: localStorage.getItem('obolo.review.batiVoice') };
+    } catch {
+      return { url: null };
+    }
   }
   async speak(): Promise<{ url: string }> {
     throw new ApiError(501, 'DEMO', 'デモモードでは読み上げできません');
