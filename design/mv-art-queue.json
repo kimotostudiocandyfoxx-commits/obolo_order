@@ -8454,6 +8454,123 @@
         "design/mv-art/out/home2-bg-saturn-lowb.jpg"
       ],
       "prompt": "Japanese street-pop anime background art, the same style, sky, angle and composition as the reference picture: an enormous vinyl record lying flat on red rocky ground, seen from a low angle of about 15 degrees. This record is outrageously flashy: a shiny gold rim with rhinestones, a row of red paper lanterns hanging on poles around its edge, a takoyaki-shaped centre label, and the tonearm lifted and parked away, its tip a takoyaki-shaped microphone, NOT touching the record. The record surface is wide, flat and empty. No people, no characters, no text, no letters."
+    },
+    {
+      "id": "home2-bg-saturn-cutea",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg"
+      ],
+      "prompt": "Soft kawaii pastel anime illustration in exactly the same art style as the first reference picture (the round puni-puni characters): soft glossy pastel shading, gentle airbrushed gradients, rounded marshmallow-like shapes, dreamy candy colours (lavender, peach, mint, baby pink, cream), little sparkles and stars, clean soft lines, cosy and cute. Vertical phone wallpaper 9:16. An enormous cute vinyl record lying flat on soft pastel ground of Saturn (lavender and peach rounded pebbles), seen from a low camera angle of about 15 degrees, almost at eye level, so the record is a wide flat ellipse stretching across the whole width and beyond both sides. The glossy record surface with soft shining grooves fills the lower half as a wide flat stage. The tonearm is lifted and parked away at the side, its needle up in the air, NOT touching the record. A big round cute play button on the near rim. The upper half: a dreamy pastel dusk sky with Saturn and its soft candy-striped rings, little stars, fluffy clouds, other cute giant records far away. The record surface is wide, flat and empty, ready for many round characters. No people, no characters, no text, no letters. The record is classic glossy black with a pastel label."
+    },
+    {
+      "id": "home2-bg-saturn-cuteb",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg"
+      ],
+      "prompt": "Soft kawaii pastel anime illustration in exactly the same art style as the first reference picture (the round puni-puni characters): soft glossy pastel shading, gentle airbrushed gradients, rounded marshmallow-like shapes, dreamy candy colours (lavender, peach, mint, baby pink, cream), little sparkles and stars, clean soft lines, cosy and cute. Vertical phone wallpaper 9:16. An enormous cute vinyl record lying flat on soft pastel ground of Saturn (lavender and peach rounded pebbles), seen from a low camera angle of about 15 degrees, almost at eye level, so the record is a wide flat ellipse stretching across the whole width and beyond both sides. The glossy record surface with soft shining grooves fills the lower half as a wide flat stage. The tonearm is lifted and parked away at the side, its needle up in the air, NOT touching the record. A big round cute play button on the near rim. The upper half: a dreamy pastel dusk sky with Saturn and its soft candy-striped rings, little stars, fluffy clouds, other cute giant records far away. The record surface is wide, flat and empty, ready for many round characters. No people, no characters, no text, no letters. The record itself is a soft pastel lavender colour with a peach label."
+    },
+    {
+      "id": "home2-bg-saturn-tako-cute",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg"
+      ],
+      "prompt": "Soft kawaii pastel anime illustration in exactly the same art style as the first reference picture (the round puni-puni characters): soft glossy pastel shading, gentle airbrushed gradients, rounded marshmallow-like shapes, dreamy candy colours (lavender, peach, mint, baby pink, cream), little sparkles and stars, clean soft lines, cosy and cute. Vertical phone wallpaper 9:16. An enormous, outrageously flashy cute vinyl record with a shiny gold rim, sparkly rhinestones, a row of little red paper lanterns around its edge, a takoyaki-shaped centre label, and a takoyaki-shaped microphone on the tip of the lifted tonearm, lying flat on soft pastel ground of Saturn (lavender and peach rounded pebbles), seen from a low camera angle of about 15 degrees, almost at eye level, so the record is a wide flat ellipse stretching across the whole width and beyond both sides. The glossy record surface with soft shining grooves fills the lower half as a wide flat stage. The tonearm is lifted and parked away at the side, its needle up in the air, NOT touching the record. A big round cute play button on the near rim. The upper half: a dreamy pastel dusk sky with Saturn and its soft candy-striped rings, little stars, fluffy clouds, other cute giant records far away. The record surface is wide, flat and empty, ready for many round characters. No people, no characters, no text, no letters."
+    },
+    {
+      "id": "puni2-kimorin",
+      "prompt": "A single round soft 'puni-puni' character ball drawn in exactly the same flat 2D illustration style as the first reference picture: a perfectly round squishy ball, soft pastel airbrushed shading, a big soft white highlight on the top-left, small shiny black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms, no legs, NOT photorealistic, NOT 3D rendered, like a cute sticker illustration. The ball's colours, pattern and small accessories show the character from the second reference picture: KIMORIN: white fox fur colour, small pointed white-and-blue fox ears on top, tiny round dark sunglasses pushed up on the forehead. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-kimorin.jpg"
+      ]
+    },
+    {
+      "id": "puni2-monban",
+      "prompt": "A single round soft 'puni-puni' character ball drawn in exactly the same flat 2D illustration style as the first reference picture: a perfectly round squishy ball, soft pastel airbrushed shading, a big soft white highlight on the top-left, small shiny black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms, no legs, NOT photorealistic, NOT 3D rendered, like a cute sticker illustration. The ball's colours, pattern and small accessories show the character from the second reference picture: MONBAN: a black hood with thin gold trim draped over the top of the ball, a small glowing gold eye emblem on the hood. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-monban.jpg"
+      ]
+    },
+    {
+      "id": "puni2-brother",
+      "prompt": "A single round soft 'puni-puni' character ball drawn in exactly the same flat 2D illustration style as the first reference picture: a perfectly round squishy ball, soft pastel airbrushed shading, a big soft white highlight on the top-left, small shiny black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms, no legs, NOT photorealistic, NOT 3D rendered, like a cute sticker illustration. The ball's colours, pattern and small accessories show the character from the second reference picture: the takoyaki brother: golden-brown takoyaki colour with brown sauce, white mayo zigzag and bonito flakes on top, tiny round sunglasses. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-brother.jpg"
+      ]
+    },
+    {
+      "id": "puni2-sister",
+      "prompt": "A single round soft 'puni-puni' character ball drawn in exactly the same flat 2D illustration style as the first reference picture: a perfectly round squishy ball, soft pastel airbrushed shading, a big soft white highlight on the top-left, small shiny black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms, no legs, NOT photorealistic, NOT 3D rendered, like a cute sticker illustration. The ball's colours, pattern and small accessories show the character from the second reference picture: the takoyaki sister: golden-brown takoyaki colour with sauce and mayo, a little red ribbon and a tiny pink flower on top, long eyelashes. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-sister.jpg"
+      ]
+    },
+    {
+      "id": "puni2-mikie",
+      "prompt": "A single round soft 'puni-puni' character ball drawn in exactly the same flat 2D illustration style as the first reference picture: a perfectly round squishy ball, soft pastel airbrushed shading, a big soft white highlight on the top-left, small shiny black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms, no legs, NOT photorealistic, NOT 3D rendered, like a cute sticker illustration. The ball's colours, pattern and small accessories show the character from the second reference picture: MIKIE DRILL: her hair colour and drill-curl twin tails shown as two little curls on the sides of the ball, a small star accessory. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/mikie.jpg"
+      ]
     }
   ],
   "redo": []
