@@ -327,6 +327,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .lyr .ln{font:900 clamp(18px,5.8vw,25px)/1.25 var(--f-body);letter-spacing:.04em;background:linear-gradient(90deg,#fff 0 var(--p,0%),rgba(255,255,255,.38) var(--p,0%));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 6px rgba(0,20,60,.7));transition:opacity .3s,transform .35s cubic-bezier(.2,1,.3,1)}
 .lyr .nx{margin-top:6px;font:800 13px/1.2 var(--f-body);color:rgba(255,255,255,.55);text-shadow:0 1px 4px rgba(0,20,60,.8);transition:opacity .3s}
 .lyr.swap .ln{opacity:0;transform:translateY(10px)}
+.top #help,.top #oshiBtn,.top #say{display:none!important}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni.talk{z-index:7}
@@ -637,7 +638,7 @@ function openArt(into,o){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,
   requestAnimationFrame(()=>requestAnimationFrame(()=>{sc.classList.add('open');const ot=sc.querySelector('.ot');if(ot)ot.classList.add('on');if(cam==='shake'||cam==='slam'){const ph2=$('phone');setTimeout(()=>{ph2.classList.add('camfx-shake');setTimeout(()=>ph2.classList.remove('camfx-shake'),520)},cam==='slam'?120:380)}}));if(!onArt)setTimeout(()=>{into.appendChild(pl);requestAnimationFrame(()=>pl.classList.add('on'))},380);
   return {close(){sc.classList.add('closing');sc.classList.remove('open');pl.classList.remove('on');setTimeout(()=>{sc.remove();pl.remove()},260)}}}
 function kinTitle(into,o){const st=TSTYLE[o.title]||{f:"'Dela Gothic One'",a:'pop'},gap={pop:.045,float:.09,slam:.07,glitch:.03,brush:0}[st.a];const e=document.createElement('div');e.className='kin a-'+st.a;e.style.top=o.top;e.style.setProperty('--kc',o.c||'#ff4fa2');e.style.setProperty('--kc2',o.c2||'#ffd6f0');e.style.setProperty('--kg',o.g||'rgba(255,80,170,.55)');
-  e.innerHTML=`<div class="lab"><span class="dot"></span>${o.label}</div><div class="tt" style="font-family:${st.f},var(--f-body)">${[...o.title].map((ch,i)=>`<span class="${chk(ch)}" style="transition-delay:${(.12+i*gap).toFixed(2)}s;--gx:${(i%2?-1:1)*7}px">${ch===' '?'&nbsp;':ch}</span>`).join('')}</div>${o.noby?'':`<div class="by">by ${o.by}</div>`}`;
+  e.innerHTML=`${o.label?`<div class="lab"><span class="dot"></span>${o.label}</div>`:''}<div class="tt" style="font-family:${st.f},var(--f-body)">${[...o.title].map((ch,i)=>`<span class="${chk(ch)}" style="transition-delay:${(.12+i*gap).toFixed(2)}s;--gx:${(i%2?-1:1)*7}px">${ch===' '?'&nbsp;':ch}</span>`).join('')}</div>${o.noby?'':`<div class="by">by ${o.by}</div>`}`;
   into.appendChild(e);requestAnimationFrame(()=>requestAnimationFrame(()=>e.classList.add('on')));
   return {el:e,out(){e.classList.add('out');setTimeout(()=>e.remove(),320)}}}
 function vinyl(into,img,x,y,w){const v=document.createElement('div');v.className='vinyl cd';v.style.left=x;v.style.top=y;if(w)v.style.width=w;v.innerHTML=`<div class="sp" style="background-image:url(${img})"></div>`;into.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('on')));
@@ -667,7 +668,7 @@ function lyricsStart(into,k,top){lyricsStop();const L=LYRICS[k];if(!L||!SONG||!A
 function lyricsStop(){if(LYR){LYR.stop();LYR=null}}
 function stopSong(){lyricsStop();if(SONG){const s=SONG;SONG=null;try{if(s.g&&AC){s.g.gain.setTargetAtTime(0,AC.currentTime,.08);setTimeout(()=>{try{s.stop()}catch(e){}},400)}else s.stop()}catch(e){}}}
 function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=.9;s.buffer=buf;s.loop=true;s.connect(g);g.connect(c.destination);s.start();s.g=g;s.__t0=c.currentTime;SONG=s;return buf.duration}
-  if(A[k]){try{const au=new Audio(A[k]);au.loop=true;au.play().catch(()=>{});SONG={stop:()=>au.pause()}}catch(e){}}return 10}
+  if(A[k]){const au=VEL.length?VEL[VEL.length-1]:new Audio();try{au.pause();au.src=A[k];au.loop=true;au.currentTime=0;au.play().catch(()=>{});SONG={stop:()=>au.pause(),__el:au}}catch(e){}return au.duration&&isFinite(au.duration)?au.duration:60}return 60}
 function setupMer(){
   const base=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
   SH=[];SHQ=base.slice(MMAX);base.slice(0,MMAX).forEach((o,i)=>SH.push(makeSh(o,i,i)));
@@ -694,7 +695,7 @@ function popSh(s){if(s.gone||MBUSY||MPLAY)return;s.gone=true;const ph=$('phone')
   ph.classList.add('zoomart');document.querySelector('.dock').classList.add('busy');s.e.style.transform=`translate3d(${W*.5}px,${H*.84}px,0) scale(2.15)`;
   let kt=null,vn=null;
   tm.push(setTimeout(()=>{playSong('song-'+s.ji);vn=vinyl(sky,A['jart-'+s.ji]||'','50%','38%','80%');vn.el.style.zIndex='9';lyricsStart(sky,'song-'+s.ji,'60%')},450));
-  tm.push(setTimeout(()=>{const k='stitle-'+s.ji;if(A[k])playVoice(k);kt=kinTitle(sky,{top:'6%',label:'NOW PLAYING',noby:1,title:MSONG[s.ji-1],by:s.o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},2200));
+  tm.push(setTimeout(()=>{const k='stitle-'+s.ji;if(A[k])playVoice(k);kt=kinTitle(sky,{top:'6%',label:'',noby:1,title:MSONG[s.ji-1],by:s.o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},2200));
   function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);stopSong();if(kt)kt.out();if(vn)vn.out();ph.classList.remove('dim2','zoomart');document.querySelector('.dock').classList.remove('busy');
     s.e.style.transition='transform .35s ease-in,opacity .3s';s.e.style.transform=`translate3d(${W*MISLE[0]}px,${H*MISLE[1]}px,0) scale(.2)`;s.e.style.opacity='0';
     setTimeout(()=>{s.e.remove()},380);MBUSY=null;
@@ -721,7 +722,7 @@ function playM(){if(MBUSY)MBUSY.close();setCta(true);getAC();loadVoices();const 
     v.style.transition='none';hvPos(v,-.15,.6,.35);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.8s cubic-bezier(.3,.7,.3,1),opacity .5s';hvPos(v,.42,.67,1.25)}));
     let kt=null,vn=null;
     T(()=>{v.classList.add('bob');splash();const sd=(playSong('song-'+ji)||16)*1000;T(()=>{if(kt)kt.out();if(vn)vn.out();stopSong();$('hv').classList.remove('zoomart');v.classList.remove('bob');v.style.transition='transform 1.4s ease-in,opacity 1s';hvPos(v,1.2,.62,.5);v.style.opacity='0'},sd);T(()=>{v.remove();one()},sd+1100);$('hv').classList.add('zoomart');v.style.transition='transform .45s cubic-bezier(.3,.9,.3,1)';hvPos(v,.5,.84,1.9);v.style.zIndex='3';const nm=v.querySelector('.nm2');if(nm)nm.remove();vn=vinyl($('hvstage'),A['jart-'+ji]||'','50%','37%','78%');vn.el.style.zIndex='1';lyricsStart($('hvstage'),'song-'+ji,'59%')},1800);
-    T(()=>{const kk='stitle-'+ji;if(A[kk])playVoice(kk);kt=kinTitle($('hvstage'),{top:'7%',label:'NOW PLAYING',noby:1,title:MSONG[ji-1],by:o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},3300);
+    T(()=>{const kk='stitle-'+ji;if(A[kk])playVoice(kk);kt=kinTitle($('hvstage'),{top:'7%',label:'',noby:1,title:MSONG[ji-1],by:o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},3300);
   };
   T(one,1700)}
 function stopM(){if(MV){MV.t.forEach(clearTimeout);MV=null}clearInterval(FWT);FWT=null;stopSong();hvOff();setCta(false)}
@@ -801,16 +802,15 @@ const VPROM={};let DQ=Promise.resolve();
 const SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=';
 const VEL=[];let VELi=0,VEL_ON=false;
 document.addEventListener('pointerdown',()=>{if(VEL_ON)return;VEL_ON=true;for(let n=0;n<3;n++){const a=new Audio();a.preload='auto';a.src=SILENT;a.play().then(()=>a.pause()).catch(()=>{});VEL.push(a)}},{passive:true});
-function playEl(src){if(!VEL.length)return false;const a=VEL[VELi++%VEL.length];try{a.pause();a.src=src;a.currentTime=0;a.play().catch(()=>{});return true}catch(e){return false}}
-function decodeOne(c,k){return fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng)))}
+function playEl(src){if(VEL.length<2)return false;const a=VEL[VELi++%(VEL.length-1)];try{a.pause();a.src=src;a.currentTime=0;a.play().catch(()=>{});return true}catch(e){return false}}
+function decodeOne(c,k){return Promise.race([fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))),new Promise((_,ng)=>setTimeout(()=>ng('timeout'),5000))])}
 function loadVoices(){const c=getAC();if(!c)return;const ks=[1,2,3,4,5].map(n=>'voice-'+String(n).padStart(2,'0')).concat([1,2,3,4,5].flatMap(n=>['vtitle-'+n,'stitle-'+n]),[1,2,3,4,5].map(n=>'song-'+n));for(const k of ks){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
-  VPROM[k]=DQ=DQ.then(()=>decodeOne(c,k)).catch(()=>new Promise(r=>setTimeout(r,300)).then(()=>decodeOne(c,k))).then(buf=>{VBUF[k]=buf}).catch(()=>{delete VBUF[k]})}}
-// decode right away (works before the first tap, while the context is still suspended)
-setTimeout(()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();loadVoices()}catch(e){}},300);
+  VPROM[k]=DQ=DQ.then(()=>decodeOne(c,k)).then(buf=>{VBUF[k]=buf}).catch(()=>{VBUF[k]=null})}}
+// decoding starts on the first tap (after the context is resumed)
 document.addEventListener('pointerdown',()=>{getAC();loadVoices()},{once:false,passive:true});
 // voice through the same (already unlocked) context, so timed pops in club mode are not blocked; music dips meanwhile
 function playVoice(k){const c=getAC(),buf=VBUF[k];
-  if(buf==='loading'&&VPROM[k]){const t0=performance.now();VPROM[k].then(()=>{if(performance.now()-t0<2500&&VBUF[k]&&VBUF[k]!=='loading')playVoice(k)});return}
+  if(!(c&&buf&&buf!=='loading')){if(A[k]&&!playEl(A[k])){try{new Audio(A[k]).play().catch(()=>{})}catch(e){}}return}
   if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=1.15;s.buffer=buf;s.connect(g);g.connect(c.destination);s.start();
     if(BEAT){const bg=BEAT.out.gain,t0=c.currentTime;bg.cancelScheduledValues(t0);bg.setTargetAtTime(.16,t0,.04);bg.setTargetAtTime(.5,t0+buf.duration+.1,.25)}return}
   if(A[k]){if(!playEl(A[k])){try{const au=new Audio(A[k]);au.play().catch(()=>{})}catch(e){}}}}
@@ -831,7 +831,7 @@ function clubStart(){
   BEAT={out,timer:setInterval(()=>{while(next<ac.currentTime+.2){const q=step%16;if(q%4===0)kick(next);if(q%4===2)hat(next,.18);else hat(next,.05);if(q%2===1)bass(next,S.bass[Math.floor(step/16)%4]);if(q===0&&step%64===0)pad(next);next+=spb/4;step++}},50)};
 }
 function clubStop(){if(!BEAT)return;clearInterval(BEAT.timer);const g=BEAT.out.gain;try{g.setTargetAtTime(0,AC.currentTime,.2)}catch(e){}BEAT=null}
-const DOCK={saturn:[.86,.55],jupiter:[.77,.47],mercury:[.78,.41]};
+const DOCK={saturn:[.88,.4],jupiter:[.77,.47],mercury:[.78,.41]};
 function placeDock(){const d=document.querySelector('.dock'),pos=DOCK[cur],v3=(cur==='saturn'&&mode==='anime')||(cur==='jupiter'&&A['bg3-jupiter'])||(cur==='mercury'&&A['bg3-mercury']);d.classList.toggle('at',!!(v3&&pos));if(v3&&pos){d.style.left=(pos[0]*100)+'%';d.style.top=(pos[1]*100)+'%'}else{d.style.left='';d.style.top=''}}
 function setCta(on){const b=$('cta');placeDock();
   if(cur==='saturn'||(cur==='jupiter'&&A['bg3-jupiter'])||(cur==='mercury'&&A['bg3-mercury'])){b.className='cta disc'+(cur==='jupiter'?' jup':cur==='mercury'?' mer':'')+(on?' on':'');b.setAttribute('aria-label',on?'止める':'全部流す');
@@ -861,7 +861,7 @@ function play(){
       if(!b.popped)b.e.firstElementChild.style.transform=`rotate(${b.rot}deg)`;
       if(b.a<=PATH.a1){b.e.remove();live.splice(live.indexOf(b),1);if(!live.length&&k>=order.length&&SV){stopPlay();toast('🎉 今日のコロリン、全部聞いたね！')}}}
     if(SV)raf3=requestAnimationFrame(step)};
-  function popOrb(b,x,y){const st=$('hvstage');popSound();
+  function popOrb(b,x,y){const st=$('hvstage');popSound();b.e.style.zIndex=String(50+b.i);
     for(let n=0;n<14;n++){const dd=document.createElement('i');dd.className='drop';const a=n/14*Math.PI*2,dist=50*(1.2+Math.random()*.8);dd.style.left=x+'px';dd.style.top=y+'px';dd.style.setProperty('--dx',Math.cos(a)*dist+'px');dd.style.setProperty('--dy',Math.sin(a)*dist+'px');st.appendChild(dd);setTimeout(()=>dd.remove(),700)}
     b.e.style.width='120px';b.e.style.height='120px';b.e.firstElementChild.style.transform='';b.e.firstElementChild.innerHTML=`<img alt="" src="${A['chibi-'+CHB(b.o.n)]||''}" style="animation:chibiIn .4s cubic-bezier(.2,1.6,.4,1) both">`;
     const line=P.saturn.card(b.i).cap,vk='voice-'+String(b.i%5+1).padStart(2,'0'),bb=document.createElement('div');bb.className='bubo';bb.innerHTML=`<small>🎤 ${b.o.n}</small>${line}`;
