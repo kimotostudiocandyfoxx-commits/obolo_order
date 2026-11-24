@@ -1101,6 +1101,33 @@
     "apps/web/public/onboarding/s/plate-moon-temple.jpg"
    ],
    "prompt": "Picture 1 is the client's concept of the Moon temple: an open-air ruin of white marble arches, columns and small blue domed pavilions on the grey lunar surface, with no roof, a floor of deep blue tiles inlaid with glowing gold star-circle patterns, the black starry sky and a huge blue planet above. Picture 2 is the current temple's style and its water bowl (reference only for the bowl and the marble). Paint the view from INSIDE the temple's largest front hall, standing on its floor at eye level: open to the sky, NO roof and NO ceiling, columns and broken arches around the edges, the blue tiled floor with glowing gold circular star patterns leading toward the centre. In the exact centre of the hall stands one wide shallow white marble bowl filled with still, softly glowing water. Leave the lower part of the frame calm floor (characters will stand in front), and the bowl clearly visible in the middle third. No people, no creatures, no figures. No text, no letters, no logos, no watermark. Painterly fantasy illustration, cool moonlight with small gold highlights. Closer, more intimate: the bowl larger, two tall columns framing it at the sides, starry sky through a broken arch behind, the planet partly visible at top."
+  },
+  {
+   "id": "moon-zone-bati",
+   "size": "1152x2048",
+   "n": 2,
+   "refs": [
+    "design/story/refs/moon-temple-open-client.jpg"
+   ],
+   "prompt": "Same world, architecture and style as picture 1: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, a floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with a huge blue planet and a small moon, grey cratered lunar ground. Painterly fantasy illustration, cool moonlight, small gold highlights. No people, no creatures, no figures. No text, no letters, no logos, no watermark. Eye-level view from just inside the inner archway of the temple, looking forward into the innermost sanctum: a narrow blue-tiled court with the tall domed tower behind it. In the centre of that sanctum stands one wide shallow white marble bowl filled with still, softly glowing water. The bowl sits in the middle third of the frame; the lower third is calm blue tiled floor. Open sky above with the huge blue planet."
+  },
+  {
+   "id": "moon-zone-dachi",
+   "size": "1152x2048",
+   "n": 2,
+   "refs": [
+    "design/story/refs/moon-temple-open-client.jpg"
+   ],
+   "prompt": "Same world, architecture and style as picture 1: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, a floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with a huge blue planet and a small moon, grey cratered lunar ground. Painterly fantasy illustration, cool moonlight, small gold highlights. No people, no creatures, no figures. No text, no letters, no logos, no watermark. Eye-level view standing in the temple's largest front hall: a wide open-air circular plaza with the big glowing gold star-circle pattern on the blue tiled floor, broken arches and columns around its edges, blue-domed pavilions at the sides, the inner arch and tower in the distance. Lots of open floor for several people to stroll across (the lower half is empty floor). Open sky with the huge blue planet."
+  },
+  {
+   "id": "moon-zone-outside",
+   "size": "1152x2048",
+   "n": 2,
+   "refs": [
+    "design/story/refs/moon-temple-open-client.jpg"
+   ],
+   "prompt": "Same world, architecture and style as picture 1: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, a floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with a huge blue planet and a small moon, grey cratered lunar ground. Painterly fantasy illustration, cool moonlight, small gold highlights. No people, no creatures, no figures. No text, no letters, no logos, no watermark. Eye-level view standing on the grey cratered lunar plain just below the temple's front stairs: the temple's outer wall, the wide front staircase and blue-domed pavilions behind, long shadows across the lunar dust, a wide empty plain in the foreground for many small figures to wander. Huge blue planet in the starry sky."
   }
  ]
 }
