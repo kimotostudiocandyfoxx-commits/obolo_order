@@ -30,6 +30,8 @@ for f in sorted(os.listdir(H+'/puni')):
 for k in 'user kimorin monban mikie brother sister'.split():
     f=f'{O}/chibi-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
+    f2=f.replace('/chibi-','/chibi2-')
+    if os.path.exists(f2): kk=key(Image.open(f2)); kk.thumbnail((300,300)); A['chibi-'+k]=uri(kk,86)
 for k in 'mine dachi oshi'.split():
     f=f'{O}/ball-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((160,160)); A['ball-'+k]=uri(kk,88)

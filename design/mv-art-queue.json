@@ -9142,6 +9142,90 @@
         512
       ],
       "always": false
+    },
+    {
+      "id": "chibi2-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "chibi2-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a proud smug smile, fox tails fluffed. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "chibi2-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, mysterious but cute, glowing eyes under the hood. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "chibi2-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a big cheeky grin, hook hand raised. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "chibi2-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, an energetic hip-hop pose, mouth open shouting happily. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
+    },
+    {
+      "id": "chibi2-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art in a popular TV anime or its character goods): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. Clean confident lineart, anime cel shading with soft gradient shadows, big expressive anime eyes with sparkling highlights, soft blush, bright clear colours. Not 3D, not a figure, not a render. Jumping out joyfully with both arms up, a graceful cute pose, tentacle hair flowing. Centered, the whole character inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no ground, no text."
     }
   ],
   "redo": []
