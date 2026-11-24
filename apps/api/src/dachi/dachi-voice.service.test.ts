@@ -333,3 +333,40 @@ describe('R9: the Moon temple — ダチ ranked by the last 7 days', () => {
     ]);
   });
 });
+
+describe('R10: the ダチ history and older messages', () => {
+  it('every talk newest first with its last message: words, 🎤 a voice, a work', async () => {
+    const w = world();
+    w.people[A] = { journeyDay: 5, journeyCompletedAt: null, dachiAt: new Date(Date.now() - 864e5 * 30), displayName: 'a' };
+    (w.s as unknown as { dachi: { list: () => Promise<unknown> } }).dachi = { list: async () => [B, C].map((id) => ({ id, displayName: id.slice(0, 1), pic: null })) };
+    (w.s as unknown as Record<string, unknown>).db = { read: { select: () => ({ from: () => ({ where: async () => [] }) }) } };
+    w.dachi(A, B);
+    w.dachi(A, C);
+    const msg = (from: string | null, to: string | null, min: number, extra: Record<string, unknown>) => w.rows.push({ id: `x${w.rows.length}`, senderId: from, recipientId: to, createdAt: new Date(Date.now() - min * 60_000), ...extra });
+    msg(A, C, 30, { kind: 'work', workJson: { kind: 'song', title: 'うた', text: '' } });
+    msg(B, A, 10, { kind: 'voice', audioUrl: 'https://cdn/v.mp3' });
+    msg(null, A, 5, { kind: 'text', character: 'kimorin', workJson: { text: '……こんにちは。' } });
+    const page = await w.s.history(A);
+    expect(page.items.map((t) => [t.id, t.preview])).toEqual([
+      ['kimorin', { kind: 'text', text: '……こんにちは。', fromMe: false }],
+      [B, { kind: 'voice', text: '声のメッセージ', fromMe: false }],
+      [C, { kind: 'work', text: 'うた', fromMe: true }],
+      ['mikie', { kind: 'voice', text: 'ようこそ。……あなたのつぶやき、聞こえたわよ。', fromMe: false }],
+    ]);
+    expect(page.next).toBeNull();
+    // two at a time: the cursor goes on
+    const p1 = await w.s.history(A, null, 2);
+    const p2 = await w.s.history(A, p1.next, 2);
+    expect([...p1.items, ...p2.items].map((t) => t.id)).toEqual(page.items.map((t) => t.id));
+  });
+  it('older messages: the page before a time, a limit kept within 1–200', async () => {
+    const w = world();
+    w.dachi(A, B);
+    const calls: { limit: number }[] = [];
+    const x = w.s as unknown as Record<string, unknown>;
+    x.rows = async (_where: unknown, limit: number) => (calls.push({ limit }), []);
+    await w.s.messages(A, B, { before: new Date().toISOString(), limit: 50 });
+    await w.s.messages(A, B, { limit: 9999 });
+    expect(calls.map((c) => c.limit)).toEqual([50, 200]);
+  });
+});

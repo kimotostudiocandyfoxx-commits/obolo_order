@@ -147,6 +147,35 @@ export const DACHI_RECENT_DAYS = 7;
 export function rankDachi<T extends { recent?: number; lastAt?: string | null }>(list: readonly T[]): T[] {
   return [...list].sort((a, b) => (b.recent ?? 0) - (a.recent ?? 0) || (b.lastAt ?? '').localeCompare(a.lastAt ?? ''));
 }
+/** R10: the ダチ talks as a chat app lists them — newest first, with what was said last */
+export interface DachiHistoryRow extends DachiThreadView {
+  /** the last message: words, 🎤 a voice, ✦ a work (null = nothing yet) */
+  preview: { kind: 'text' | 'voice' | 'work'; text: string; fromMe: boolean } | null;
+}
+export interface DachiHistoryPage {
+  items: DachiHistoryRow[];
+  /** the cursor for the next page (null = the end) */
+  next: string | null;
+}
+/** R10: a ダチ talk's messages come a page at a time (older ones as the talk is scrolled up) */
+export const DACHI_PAGE = 50;
+export const DACHI_HISTORY_PAGE = 20;
+/** newest first; ties by id (a stable cursor `lastAt|id`) */
+export function historyOrder<T extends { id: string; lastAt: string | null }>(list: readonly T[]): T[] {
+  return [...list].sort((a, b) => (b.lastAt ?? '').localeCompare(a.lastAt ?? '') || a.id.localeCompare(b.id));
+}
+/** one page after `cursor` (`lastAt|id` of the last row seen) */
+export function historyPage<T extends { id: string; lastAt: string | null }>(ordered: readonly T[], cursor: string | null | undefined, limit = DACHI_HISTORY_PAGE): { items: T[]; next: string | null } {
+  let from = 0;
+  if (cursor) {
+    const i = ordered.findIndex((t) => `${t.lastAt ?? ''}|${t.id}` === cursor);
+    from = i >= 0 ? i + 1 : ordered.length;
+  }
+  const items = ordered.slice(from, from + limit);
+  const last = items.at(-1);
+  return { items, next: from + limit < ordered.length && last ? `${last.lastAt ?? ''}|${last.id}` : null };
+}
+
 /** the great hall (the top DACHI_HALL_MAX) and the plain (the rest), in rank order */
 export function dachiZones<T extends { recent?: number; lastAt?: string | null }>(list: readonly T[], max = DACHI_HALL_MAX): { hall: T[]; outside: T[] } {
   const r = rankDachi(list);

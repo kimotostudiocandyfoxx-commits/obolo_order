@@ -35,6 +35,8 @@ import {
   CHANGEABLES,
   type ChangeStore,
   rankDachi,
+  historyOrder,
+  historyPage,
   TALK_COLOR_KEY,
   splitHome,
   orderOwn,
@@ -1490,11 +1492,21 @@ export class DemoApi implements Api {
     const ok = thread === 'kimorin' || !!this.s.reviewDachi?.some((d) => d.id === thread) || (!!this.s.dachiAt && (thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter)));
     if (!ok) throw new ApiError(403, 'NOT_DACHI', 'Voice messages go only between ダチ');
   }
-  async dachiMessages(thread: string) {
+  async dachiMessages(thread: string, page: { before?: string; limit?: number } = {}) {
     this.dachiThreadOk(thread);
-    return this.dachiArrive()
-      .filter((m) => m.thread === thread)
+    const all = this.dachiArrive()
+      .filter((m) => m.thread === thread && (!page.before || m.createdAt < page.before))
       .map(({ thread: _t, lineId: _l, read, ...m }) => ({ ...m, read: m.fromMe || !!read }));
+    return page.limit ? all.slice(-page.limit) : all;
+  }
+  async dachiHistory(cursor?: string | null) {
+    const list = await this.dachiThreads();
+    const msgs = this.dachiArrive();
+    const rows = list.map((t) => {
+      const last = msgs.filter((m) => m.thread === t.id).at(-1);
+      return { ...t, lastAt: last?.createdAt ?? t.lastAt, preview: last ? { kind: last.kind, text: last.kind === 'work' ? (last.work?.title || '作品') : last.kind === 'voice' ? (last.text ?? '声のメッセージ') : (last.text ?? ''), fromMe: last.fromMe } : null };
+    });
+    return historyPage(historyOrder(rows), cursor);
   }
   async sendDachiMessage(thread: string, body: Parameters<Api['sendDachiMessage']>[1]) {
     this.dachiThreadOk(thread);

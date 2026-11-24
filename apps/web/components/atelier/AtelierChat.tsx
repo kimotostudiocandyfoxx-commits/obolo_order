@@ -33,6 +33,7 @@ import { toggleAudio } from '@/lib/audio';
 import { Teach } from './Teach';
 import { KindMark, WorkCard } from './WorkCard';
 import { ChangePreview } from './ChangePreview';
+import { DeviceButton } from './DeviceButton';
 import { BowlFx, TEMPLE_PLATE, type BowlState } from './BowlFx';
 import { faceTo, FLIES, uid, versionsOf, type Msg, type Work } from './work';
 
@@ -89,7 +90,7 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  * (Shell.tsx: left = the conversations, right = Bluena from day 3). Opened from a story step it plays the day's script
  * lines at their moments and hands what was made back to the story (`story`, story.ts).
  */
-export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack, welcome, banner }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** the Moon chat's tabs, just under the bar (MoonTabs) */ banner?: React.ReactNode; /** M-R253 §6 ⑤: opened from the toast / the push — {bati}'s word for coming back */ welcome?: boolean; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
+export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack, welcome, banner, onDevice }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** R10: the Bluena device (bottom left, beside the mic) */ onDevice?: () => void; /** the Moon chat's tabs, just under the bar (MoonTabs) */ banner?: React.ReactNode; /** M-R253 §6 ⑤: opened from the toast / the push — {bati}'s word for coming back */ welcome?: boolean; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
   const { me, setMe } = useAuth();
   const own = usePartner();
   // in a story step the story's {bati} talks (the review page has no account: its {bati} is the story's)
@@ -868,6 +869,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
             placeholder={`${partner.name}に頼む`}
             disabled={busy}
             onState={setTalkState}
+            side={onDevice && !story ? <DeviceButton onClick={onDevice} /> : undefined}
             onSend={(v) => {
               send(v);
               setBar((n) => n + 1);

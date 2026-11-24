@@ -1,4 +1,4 @@
-import type { ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
+import type { ChangeResult, HomeOshi, HomePlanet, PlanetHomeView, AddVersionBody, CreateMoonWorkBody, DemoJobBody, HomecomingView, MoonWorkView, WorkVersion, FindTalksQuery, FindWorksQuery, FoundWork, ItemMarksView, ItemMarkView, MarkNames, MarkNamesBody, SetItemMarkBody, TalkDayView, BatiEggKind, BatiRole, DachiHistoryPage, DachiMessageView, DachiThreadView, SendDachiMessageBody, PlanetWorkKind, PlanetWorkReportBody, BluenaKeptView, CreateRadioShowBody, RadioDeckSong, RadioHome, RadioLiveState, RadioLiveView, RadioMessageBody, RadioMessageView, RadioNowBody, RadioReportBody, RadioShowView, StartRadioLiveBody, CompassCard, StoryResult, BuddyPicture, DachiLinkAsk, DachiLinkPeek, DachiLinkView, DachiView, DeliverBody, DeliveryView, LineVoicesBody, LineVoicesView, AtelierLayout, CallJoin, CallView, CommsContact, CommsFound, CommsStatus, DmMessage, JobView, MvProjectView } from '@obolo/shared';
 import type {
   MembersDay,
   BuddyChatResponse,
@@ -234,7 +234,10 @@ export interface Api {
   oshi(kind?: DeliveryView['kind']): Promise<DeliveryView[]>;
   /** ダチの声のメッセージ (M-R212): the atelier drawer's threads ({inviter} / KIMORIN⭐︎ / MIKIE⭐︎DRILL / other dachi), empty until D04-S005c */
   dachiThreads(): Promise<DachiThreadView[]>;
-  dachiMessages(thread: string): Promise<DachiMessageView[]>;
+  /** R10: a page at a time — the newest, or the ones before `before` (oldest first) */
+  dachiMessages(thread: string, page?: { before?: string; limit?: number }): Promise<DachiMessageView[]>;
+  /** R10: every ダチ talk, newest first, with its last message */
+  dachiHistory(cursor?: string | null): Promise<DachiHistoryPage>;
   /** a voice message (mediaId from uploadVoice, ≤ 60 s) or a Bluena work card; only between dachi */
   sendDachiMessage(thread: string, body: SendDachiMessageBody): Promise<DachiMessageView>;
   readDachiThread(thread: string): Promise<void>;

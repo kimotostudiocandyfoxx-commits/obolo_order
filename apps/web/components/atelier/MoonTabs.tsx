@@ -9,6 +9,9 @@ import { GLASS } from '@/components/talk/TalkScene';
 import { useAuth } from '@/lib/auth';
 import { characterLook, PLACE_BG } from '@/lib/talk/looks';
 import { MoonShelf, WorkSheet } from './Drawers';
+import { DeviceButton } from './DeviceButton';
+import { DachiHistory } from './DachiHistory';
+import type { Work } from './work';
 import { KindMark } from './WorkCard';
 import { KIND_WORD } from './intent';
 import { findAll, KIND_PLANET, PLANET_COLOR, type Found } from '@/lib/finds/works';
@@ -25,12 +28,11 @@ export const tabOf = (v: string | null): MoonTab => (v === 'dachi' || v === 'blu
  * The small segmented control under the Moon chat's bar: ダチ | {bati}'s name | ブルーナ (R9). ブルーナ only once Bluena is
  * handed over (day 3, D04-S002; there is no Bluena before — M-R212).
  */
-export function MoonTabs({ tab, bati, bluena, unread, onTab }: { tab: MoonTab; bati: string; bluena: boolean; /** a ダチ thread not heard yet */ unread?: boolean; onTab: (t: MoonTab) => void }) {
-  // R9 (client): ダチ | {bati} | ブルーナ — {bati} in the middle, and the default
+export function MoonTabs({ tab, bati, unread, onTab }: { tab: MoonTab; bati: string; /** a ダチ thread not heard yet */ unread?: boolean; onTab: (t: MoonTab) => void }) {
+  // R10 (client): ダチ | {bati}, {bati} the default — Bluena is a device now (BluenaDevice, from the header's button)
   const tabs: [MoonTab, string][] = [
     ['dachi', 'ダチ'],
     ['bati', bati || 'バティ'],
-    ...(bluena ? ([['bluena', 'ブルーナ']] as [MoonTab, string][]) : []),
   ];
   return (
     <div role="tablist" aria-label="月の会話" className="flex h-[28px] items-stretch rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(10,14,44,.55)] p-[2px] backdrop-blur-[10px]" data-testid="moon-tabs">
@@ -51,7 +53,7 @@ export function MoonTabs({ tab, bati, bluena, unread, onTab }: { tab: MoonTab; b
 }
 
 /** the small bar of a tab that is not a talk: ← back, the title, and the tabs under it (the same place as the talk's) */
-function TabBar({ title, onBack, banner }: { title: string; onBack?: () => void; banner: React.ReactNode }) {
+function TabBar({ title, onBack, banner, right, onList }: { title: string; onBack?: () => void; banner: React.ReactNode; right?: React.ReactNode; /** R10: ≡ the conversations (as the Bati tab's) */ onList?: () => void }) {
   return (
     <div className="relative z-[20] shrink-0">
       <header className="flex items-center gap-2.5 px-3.5 py-2.5">
@@ -64,8 +66,15 @@ function TabBar({ title, onBack, banner }: { title: string; onBack?: () => void;
         ) : (
           <span className="w-[42px]" />
         )}
+        {onList && (
+          <button onClick={onList} aria-label="会話の一覧を開く" className={GLASS} data-testid="dachi-history-button">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+              <path d="M4 7h16M4 12h11M4 17h7" />
+            </svg>
+          </button>
+        )}
         <b className="min-w-0 flex-1 truncate text-center text-[15px] font-black tracking-[0.04em] [text-shadow:0_1px_8px_rgba(0,0,0,.5)]">{title}</b>
-        <span className="w-[42px]" />
+        {right ?? <span className={onList ? 'w-[94px]' : 'w-[42px]'} />}
       </header>
       <div className="-mt-1 flex justify-center px-3.5">{banner}</div>
     </div>
@@ -78,14 +87,15 @@ function TabBar({ title, onBack, banner }: { title: string; onBack?: () => void;
  * the under-15 rules), with ← back to the row. KIMORIN⭐︎ is always there (everyone's ダチ, client 2026-11-24); with no
  * real ダチ yet 〔🤝 ダチの招待状〕 sits under the row.
  */
-export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }: { threads: ThreadInfo[]; open: string | null; onOpen: (id: string | null) => void; onBack?: () => void; banner: React.ReactNode; renderThread?: RenderThread }) {
+export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread, onDevice }: { threads: ThreadInfo[]; open: string | null; onOpen: (id: string | null) => void; onBack?: () => void; banner: React.ReactNode; renderThread?: RenderThread; /** R10: the Bluena device */ onDevice?: () => void }) {
   const [invite, setInvite] = useState(false);
   const { me } = useAuth();
   const scroller = useRef<HTMLDivElement>(null);
+  const [history, setHistory] = useState(false);
   if (open && renderThread)
     return (
       <div className="relative flex min-h-0 flex-1 flex-col">
-        {renderThread(open, { openList: () => onOpen(null), back: () => onOpen(null), banner })}
+        {renderThread(open, { openList: () => onOpen(null), back: () => onOpen(null), banner, openDevice: onDevice })}
       </div>
     );
   const { hall, outside } = dachiZones(threads);
@@ -93,7 +103,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="dachi-tab">
       <div className="absolute inset-x-0 top-0 z-[20]">
-        <TabBar title="ダチ" onBack={onBack} banner={banner} />
+        <TabBar title="ダチ" onBack={onBack} banner={banner} onList={() => setHistory(true)} />
       </div>
       {/* R9 (client): the temple's great hall (the ダチ you talk with most, at most 8), and below its front stairs the
           plain (everyone else) — a scroll / swipe down is a smooth camera move between them */}
@@ -149,6 +159,10 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
           </section>
         )}
       </div>
+      {/* R10: the Bluena device, bottom left, where it sits beside the mic in a talk */}
+      {onDevice && <DeviceButton onClick={onDevice} floating />}
+      {/* R10: ≡ every ダチ talk, newest first (like a chat app's list) */}
+      {history && <DachiHistory onClose={() => setHistory(false)} onOpen={(id) => (setHistory(false), onOpen(id))} />}
       {invite && (
         <div className="absolute inset-0 z-[40] flex items-end justify-center bg-black/55 p-3" onClick={() => setInvite(false)}>
           <div className="max-h-[80%] w-full max-w-md overflow-y-auto rounded-3xl bg-[#121a3a] p-4" onClick={(e) => e.stopPropagation()}>
@@ -164,12 +178,13 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
 }
 
 /**
- * ブルーナ tab (client 2026-11-24, iPad R7): the Moon behind (not black); your works float as icons in a column at the
- * left, each gently bobbing, with a short line to its right — what it is called (or what it is) and when it was made.
- * A tap opens or plays it as Bluena does (WorkSheet). Your looks and {bati} (the Moon's shelf) are behind 〔姿とバティ〕.
- * No orbit (the planets going round are gone everywhere).
+ * R10 (client): Bluena is a device. Opened from the header's button over whatever is on screen (the Bati chat, the ダチ
+ * hall or plain, a ダチ talk) — the place behind blurs; the works float as icons in a column with their short line
+ * (what it is called, what it is and when it was made); a tap opens or plays it as Bluena does (WorkSheet). From a talk
+ * each work has 〔送る〕: in a ダチ talk it goes to that friend as a work card, in the Bati chat to {bati} as material
+ * (as when a work is dragged in). A tap outside or ✕ closes it. Your looks and {bati} are behind 〔姿とバティ〕.
  */
-export function BluenaTab({ onBack, banner, overPlace = false }: { onBack?: () => void; banner: React.ReactNode; /** R9: over the temple (the Bati tab, blurred behind): no backdrop of its own */ overPlace?: boolean }) {
+export function BluenaDevice({ onClose, onSend, sendTo }: { onClose: () => void; onSend?: (w: Work) => void; sendTo: 'bati' | 'dachi' }) {
   const { me } = useAuth();
   const ctx = useAtelierCtx();
   const [found, setFound] = useState<Found[] | null>(null);
@@ -187,50 +202,74 @@ export function BluenaTab({ onBack, banner, overPlace = false }: { onBack?: () =
       live = false;
     };
   }, [n]);
+  const send = onSend
+    ? (w: Work) => {
+        onSend(w);
+        onClose();
+      }
+    : undefined;
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="bluena-tab">
-      <style>{'@keyframes bluena-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}'}</style>
-      {!overPlace && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={PLACE_BG.moon} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
-      )}
-      <div className="pointer-events-none absolute inset-0" style={{ background: overPlace ? 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,.2) 30%,rgba(7,11,36,.25) 70%,rgba(7,11,36,.6) 100%)' : 'linear-gradient(to bottom,rgba(7,11,36,.6) 0%,rgba(7,11,36,.15) 30%,rgba(7,11,36,.2) 70%,rgba(7,11,36,.7) 100%)' }} />
-      <TabBar title="ブルーナ" onBack={onBack} banner={banner} />
-      <div className="relative z-[5] flex justify-end px-4 pt-2">
-        <button onClick={() => setShelf(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 py-1 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
-          姿とバティ
-        </button>
-      </div>
-      {line && <p className="relative z-[5] pt-1 text-center text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{line}</p>}
-      <div className="no-scrollbar relative z-[5] min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2">
-        {found === null && <p className="py-10 text-center text-xs text-white/60">…</p>}
-        {found?.length === 0 && <p className="py-10 text-center text-[13px] text-white/75 [text-shadow:0_1px_4px_#000]">まだ、なにもない</p>}
-        <ul className="space-y-3.5">
-          {found?.map((x, k) => (
-            <li key={`${x.kind}:${x.id}`}>
-              <button onClick={() => setOpen(x)} className="flex w-full items-center gap-3 text-left" data-testid="bluena-work">
-                <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 shadow-[0_6px_16px_rgba(0,0,0,.45)]" style={{ borderColor: PLANET_COLOR[x.planet], background: '#141b44', animation: `bluena-bob ${3.2 + (k % 3) * 0.5}s ease-in-out ${(k % 5) * 0.4}s infinite` }}>
-                  {x.image && !x.image.startsWith('idb:') ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={x.image} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center" style={{ color: PLANET_COLOR[x.planet] }}>
-                      <KindMark kind={x.work.kind} className="h-6 w-6" />
-                    </span>
-                  )}
-                </span>
-                <span className="min-w-0 flex-1 rounded-2xl bg-[rgba(10,14,44,.55)] px-3 py-1.5 backdrop-blur-sm">
-                  <span className="block truncate text-[13.5px] font-bold text-[#f4f1ff]">{x.title || x.work.prompt || KIND_WORD[x.work.kind]}</span>
-                  <span className="block text-[11px] text-[#c9cff5]/80">
-                    {KIND_WORD[x.work.kind]}・{madeWhen(x.createdAt)}
+    <div className="absolute inset-0 z-[45] flex flex-col" data-testid="bluena-device" role="dialog" aria-label="ブルーナ">
+      <style>{'@keyframes bluena-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes bluena-in{from{opacity:0}to{opacity:1}}'}</style>
+      {/* the place behind, blurred and dimmed; a tap outside closes */}
+      <button aria-label="とじる" onClick={onClose} className="absolute inset-0 cursor-default bg-[rgba(7,11,36,.45)] backdrop-blur-[8px]" style={{ animation: 'bluena-in .3s ease-out both', WebkitBackdropFilter: 'blur(8px)' }} />
+      <div className="pointer-events-none relative z-[1] flex min-h-0 flex-1 flex-col pt-safe" style={{ animation: 'bluena-in .3s ease-out both' }}>
+        <header className="pointer-events-auto flex items-center gap-2.5 px-3.5 py-2.5">
+          <span className="block h-[42px] w-[42px] overflow-hidden rounded-full border border-sky-200/40">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/ui/bluena-icon.webp" alt="" className="h-full w-full scale-[1.3] object-cover" />
+          </span>
+          <b className="min-w-0 flex-1 truncate text-center text-[15px] font-black tracking-[0.04em] [text-shadow:0_1px_8px_rgba(0,0,0,.5)]">ブルーナ</b>
+          <button onClick={onClose} aria-label="とじる" className={GLASS}>
+            ✕
+          </button>
+        </header>
+        <div className="pointer-events-auto flex items-center justify-between px-4 pt-1">
+          <span className="text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{send ? (sendTo === 'dachi' ? '〔送る〕で、この会話に送れるよ' : '〔送る〕で、バティに材料をわたせるよ') : ''}</span>
+          <button onClick={() => setShelf(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 py-1 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
+            姿とバティ
+          </button>
+        </div>
+        {line && <p className="pt-1 text-center text-[11px] text-sky-100/80 [text-shadow:0_1px_4px_#000]">{line}</p>}
+        <div className="no-scrollbar pointer-events-auto min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2">
+          {found === null && <p className="py-10 text-center text-xs text-white/60">…</p>}
+          {found?.length === 0 && <p className="py-10 text-center text-[13px] text-white/75 [text-shadow:0_1px_4px_#000]">まだ、なにもない</p>}
+          <ul className="space-y-3.5">
+            {found?.map((x, k) => (
+              <li key={`${x.kind}:${x.id}`} className="flex items-center gap-2">
+                <button onClick={() => setOpen(x)} className="flex min-w-0 flex-1 items-center gap-3 text-left" data-testid="bluena-work">
+                  <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 shadow-[0_6px_16px_rgba(0,0,0,.45)]" style={{ borderColor: PLANET_COLOR[x.planet], background: '#141b44', animation: `bluena-bob ${3.2 + (k % 3) * 0.5}s ease-in-out ${(k % 5) * 0.4}s infinite` }}>
+                    {x.image && !x.image.startsWith('idb:') ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={x.image} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center" style={{ color: PLANET_COLOR[x.planet] }}>
+                        <KindMark kind={x.work.kind} className="h-6 w-6" />
+                      </span>
+                    )}
                   </span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+                  <span className="min-w-0 flex-1 rounded-2xl bg-[rgba(10,14,44,.6)] px-3 py-1.5 backdrop-blur-sm">
+                    <span className="block truncate text-[13.5px] font-bold text-[#f4f1ff]">{x.title || x.work.prompt || KIND_WORD[x.work.kind]}</span>
+                    <span className="block text-[11px] text-[#c9cff5]/80">
+                      {KIND_WORD[x.work.kind]}・{madeWhen(x.createdAt)}
+                    </span>
+                  </span>
+                </button>
+                {send && (
+                  <button onClick={() => send(x.work)} className="shrink-0 rounded-full bg-[rgba(223,230,255,.92)] px-3 py-1.5 text-[12px] font-bold text-[#070b24] shadow-[0_4px_12px_rgba(0,0,0,.35)]" data-testid="bluena-send">
+                    送る
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      {open && <WorkSheet found={open} ctx={ctx} onClose={() => setOpen(null)} onLine={setLine} onChanged={() => setN((v) => v + 1)} />}
+      {open && (
+        <div className="relative z-[2]">
+          <WorkSheet found={open} ctx={ctx} onClose={() => setOpen(null)} onLine={setLine} onChanged={() => setN((v) => v + 1)} />
+        </div>
+      )}
       {shelf && (
         <div className="absolute inset-0 z-[30] flex flex-col bg-[rgba(8,12,36,.94)] px-4 pb-4 pt-3 backdrop-blur">
           <div className="flex items-center pb-2">

@@ -495,8 +495,15 @@ export class HttpApi implements Api {
   dachiThreads() {
     return this.req<Awaited<ReturnType<Api['dachiThreads']>>>('GET', '/dachi/threads');
   }
-  dachiMessages(thread: string) {
-    return this.req<Awaited<ReturnType<Api['dachiMessages']>>>('GET', `/dachi/threads/${encodeURIComponent(thread)}/messages`);
+  dachiMessages(thread: string, page: { before?: string; limit?: number } = {}) {
+    const q = new URLSearchParams();
+    if (page.before) q.set('before', page.before);
+    if (page.limit) q.set('limit', String(page.limit));
+    const qs = q.toString();
+    return this.req<Awaited<ReturnType<Api['dachiMessages']>>>('GET', `/dachi/threads/${encodeURIComponent(thread)}/messages${qs ? `?${qs}` : ''}`);
+  }
+  dachiHistory(cursor?: string | null) {
+    return this.req<Awaited<ReturnType<Api['dachiHistory']>>>('GET', `/dachi/history${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`);
   }
   sendDachiMessage(thread: string, body: Parameters<Api['sendDachiMessage']>[1]) {
     return this.req<Awaited<ReturnType<Api['sendDachiMessage']>>>('POST', `/dachi/threads/${encodeURIComponent(thread)}/messages`, body);

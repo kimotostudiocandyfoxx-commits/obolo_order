@@ -50,9 +50,16 @@ export class DachiController {
     return this.voice.threads(userId);
   }
 
+  /** R10: every ダチ talk, newest first, with its last message — ?cursor= for the next page */
+  @Get('history')
+  history(@UserId() userId: string, @Query('cursor') cursor?: string, @Query('limit') limit?: string) {
+    return this.voice.history(userId, cursor?.slice(0, 120) || null, Number(limit) || undefined);
+  }
+
+  /** R10: ?before=<createdAt>&limit= for the older ones (oldest first, as always) */
   @Get('threads/:id/messages')
-  messages(@UserId() userId: string, @Param('id') id: string) {
-    return this.voice.messages(userId, checkThread(id));
+  messages(@UserId() userId: string, @Param('id') id: string, @Query('before') before?: string, @Query('limit') limit?: string) {
+    return this.voice.messages(userId, checkThread(id), { before: before?.slice(0, 40) || undefined, limit: Number(limit) || undefined });
   }
 
   /** a voice message (from POST /media/voice, ≤ 60 s) or a Bluena work card — only to a dachi */

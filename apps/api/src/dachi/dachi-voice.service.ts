@@ -9,6 +9,11 @@ import {
   isCharacterThread,
   kimorinDue,
   MIKIE_WELCOME,
+  DACHI_HISTORY_PAGE,
+  historyOrder,
+  historyPage,
+  type DachiHistoryPage,
+  type DachiHistoryRow,
   DACHI_RECENT_DAYS,
   rankDachi,
   KIMORIN_VOICE,
@@ -22,7 +27,7 @@ import {
   ruleBeats,
   type TalkFace,
 } from '@obolo/shared';
-import { and, desc, eq, inArray, isNotNull, isNull, or, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, isNull, lt, or, sql, type SQL } from 'drizzle-orm';
 import { apiError } from '../common/errors';
 import { Database } from '../db/db';
 import { dachiMessages, follows, invites, userBlocks, users } from '../db/schema';
@@ -252,10 +257,34 @@ export class DachiVoiceService {
     }
   }
 
-  async messages(userId: string, thread: string): Promise<DachiMessageView[]> {
+  /**
+   * A talk's messages, oldest first. R10: a page at a time — the newest `limit`, or the `limit` before `before` (the
+   * talk asks for the older ones as it is scrolled up, with no end).
+   */
+  async messages(userId: string, thread: string, page: { before?: string; limit?: number } = {}): Promise<DachiMessageView[]> {
     await this.mustReach(userId, thread);
-    await this.arrive(userId);
-    return (await this.rows(this.where(userId, thread))).map((r) => this.toView(userId, r));
+    if (!page.before) await this.arrive(userId);
+    const before = page.before ? new Date(page.before) : null;
+    const where = before && !Number.isNaN(before.getTime()) ? and(this.where(userId, thread), lt(dachiMessages.createdAt, before))! : this.where(userId, thread);
+    return (await this.rows(where, Math.max(1, Math.min(200, page.limit ?? 200)))).map((r) => this.toView(userId, r));
+  }
+
+  /** R10: every ダチ talk, newest first, with its last message (a page at a time: `cursor` = `lastAt|id`) */
+  async history(userId: string, cursor?: string | null, limit = DACHI_HISTORY_PAGE): Promise<DachiHistoryPage> {
+    const all = await this.threads(userId);
+    const lastRow = new Map<string, Row>();
+    for (const r of await this.rows(or(eq(dachiMessages.recipientId, userId), eq(dachiMessages.senderId, userId))!, 500)) lastRow.set(this.threadOf(userId, r), r);
+    const rows: DachiHistoryRow[] = all.map((t) => ({ ...t, preview: this.previewOf(userId, lastRow.get(t.id)) }));
+    return historyPage(historyOrder(rows), cursor, Math.max(1, Math.min(50, limit)));
+  }
+
+  private previewOf(userId: string, r: Row | undefined): DachiHistoryRow['preview'] {
+    if (!r) return null;
+    const fromMe = r.senderId === userId;
+    const words = (r.senderId ? null : dachiLine(r.lineId)?.text) ?? textOf(r.workJson);
+    if (r.kind === 'work') return { kind: 'work', text: cardOf(r.workJson)?.title || '作品', fromMe };
+    if (r.kind === 'voice') return { kind: 'voice', text: words ?? '声のメッセージ', fromMe };
+    return { kind: 'text', text: words ?? '', fromMe };
   }
 
   async send(userId: string, thread: string, body: SendDachiMessageBody, opts: { origin?: string; reply?: boolean } = {}): Promise<DachiMessageView> {

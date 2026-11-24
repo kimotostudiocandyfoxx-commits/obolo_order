@@ -26,7 +26,7 @@ export const hasBluena = (me: Me | null) => !me || me.story?.['d3.f_d04_bluena']
  * threads given in `threads`), Bluena on the right from day 3. {bati}'s thread is AtelierChat; any other thread is drawn
  * by `renderThread` in the same place (see threads.ts).
  */
-export function Shell({ first, threads = [], renderThread, story, onBack, open, banner }: { first: AtelierKind | null; /** the Moon chat's tabs (MoonTabs), under the talk's bar */ banner?: React.ReactNode; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode; /** the page's way out, in the talk's own bar */ onBack?: () => void; /** a thread (and one day of its past) to open with, from another talk's drawer (?thread=&day=) */ open?: { thread: string; day?: string; /** M-R253 §5: the message to open the day at */ at?: string; /** M-R253 §4: the talk whose card waits for this job */ job?: string } }) {
+export function Shell({ first, threads = [], renderThread, story, onBack, open, banner, onDevice }: { first: AtelierKind | null; /** R10: the Bluena device */ onDevice?: () => void; /** the Moon chat's tabs (MoonTabs), under the talk's bar */ banner?: React.ReactNode; threads?: ThreadInfo[]; renderThread?: RenderThread; story?: StoryMode; /** the page's way out, in the talk's own bar */ onBack?: () => void; /** a thread (and one day of its past) to open with, from another talk's drawer (?thread=&day=) */ open?: { thread: string; day?: string; /** M-R253 §5: the message to open the day at */ at?: string; /** M-R253 §4: the talk whose card waits for this job */ job?: string } }) {
   const { me } = useAuth();
   const partner = usePartner();
   const ctx = useAtelierCtx();
@@ -69,7 +69,7 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open, 
     setPast(null);
     setDrawer('left');
   };
-  const tctx = { openList: () => setDrawer('left'), openBluena: bluena ? () => setDrawer('right') : undefined, day: past && past.thread === thread ? past.day : undefined, closeDay: closePast, banner };
+  const tctx = { openList: () => setDrawer('left'), openBluena: bluena ? () => setDrawer('right') : undefined, day: past && past.thread === thread ? past.day : undefined, closeDay: closePast, banner, openDevice: onDevice };
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
@@ -90,7 +90,7 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open, 
       {past && past.thread === BATI_THREAD ? (
         <BatiDay key={`${past.day}-${past.at ?? ''}`} day={past.day} at={past.at} onBack={closePast} />
       ) : thread === BATI_THREAD ? (
-        <AtelierChat key={talk.id} first={talk.id === firstTalk && !open?.job ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} onBack={onBack} welcome={welcomeTalk === talk.id} banner={banner} />
+        <AtelierChat key={talk.id} first={talk.id === firstTalk && !open?.job ? first : null} talk={talk} story={talk.id === firstTalk ? story : undefined} onList={() => setDrawer('left')} onBluena={bluena ? () => setDrawer('right') : undefined} unread={unread} onBack={onBack} welcome={welcomeTalk === talk.id} banner={banner} onDevice={onDevice} />
       ) : (
         <div key={tctx.day ?? 'now'} className="relative flex min-h-0 flex-1 flex-col">
           {renderThread?.(thread, tctx) ?? null}

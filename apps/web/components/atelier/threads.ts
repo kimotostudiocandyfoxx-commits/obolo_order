@@ -36,6 +36,8 @@ export type ThreadCtx = {
   banner?: ReactNode;
   /** a back control in the thread's bar (the ダチ tab: back to the row of ダチ) */
   back?: () => void;
+  /** R10: the Bluena device (bottom left, beside the mic; its works can be sent into the talk) */
+  openDevice?: () => void;
 };
 
 export type RenderThread = (id: string, ctx: ThreadCtx) => ReactNode;
