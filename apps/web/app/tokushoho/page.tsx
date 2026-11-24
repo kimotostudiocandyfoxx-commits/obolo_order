@@ -1,4 +1,4 @@
-import { MANA_GEMS, ORDER_PRICE_JPY } from '@obolo/shared';
+import { MANA_GEMS, OPERATOR, ORDER_PRICE_JPY } from '@obolo/shared';
 import { LegalPage } from '@/components/LegalPage';
 
 const TITLE = '特定商取引法に基づく表記';
@@ -9,21 +9,17 @@ const yen = (n: number) => n.toLocaleString('ja-JP');
 const GEM_PRICES = MANA_GEMS.map((g) => `${yen(g.priceJpy)}円`).join('・');
 const GEM_LINES = MANA_GEMS.map((g) => `${yen(g.priceJpy)}円（${yen(g.mana)}マナ）`).join('、');
 
-/** what the operator still has to write in (PLACEHOLDER P-BILL-5 in docs/placeholders.md) */
-const FILL = '（記入してください）';
-
 /**
  * 〔特定商取引法に基づく表記〕 for the ¥88/month Eclipse subscription and the mana gems (P-BILL-1; linked from the payment screen, the settings and
- * next to 〔利用規約〕〔プライバシーについて〕). PLACEHOLDER (P-BILL-5): the operator's name, address, phone and e-mail are
- * left as 「（記入してください）」. For 所在地・電話番号 the law allows 「請求があれば遅滞なく開示します」 instead, where
- * the operator qualifies (e.g. an individual business that discloses on request) — the operator decides.
+ * next to 〔利用規約〕〔プライバシーについて〕). The operator's details come from OPERATOR (packages/shared/src/legal.ts,
+ * client 2026-11-24); the phone number is disclosed on request, not published.
  */
 const ITEMS: { term: string; body: string }[] = [
-  { term: '販売事業者', body: FILL },
-  { term: '運営責任者', body: FILL },
-  { term: '所在地', body: FILL },
-  { term: '電話番号', body: FILL },
-  { term: 'メールアドレス', body: FILL },
+  { term: '販売事業者', body: OPERATOR.company },
+  { term: '運営責任者', body: OPERATOR.manager },
+  { term: '所在地', body: OPERATOR.address },
+  { term: '電話番号', body: OPERATOR.phone },
+  { term: 'メールアドレス', body: OPERATOR.email },
   { term: '販売価格', body: `エクリプス（OBOLO ORDER 月額）：月額${ORDER_PRICE_JPY}円（税込）` },
   { term: '販売価格（マナジェム）', body: `${GEM_PRICES}（税込）。マナジェムは、Obolo Order の方が、マナが足りない時に買えるアプリの中のマナです。それぞれ ${GEM_LINES} が加わります。` },
   { term: '商品代金以外の必要料金', body: 'インターネットにつなぐための通信料は、お客様のご負担になります。' },
@@ -46,9 +42,6 @@ export default function TokushohoPage() {
     <LegalPage>
       <article>
         <h1 className="text-lg font-black">{TITLE}</h1>
-        <p className="mt-1 text-[11px] leading-relaxed text-white/45">
-          下書きです。「{FILL}」の所は、運営者が記入します。所在地・電話番号は、法律で認められる場合は「請求があれば遅滞なく開示します」と書くこともできます。
-        </p>
         <dl className="mt-4 divide-y divide-white/10 rounded-3xl border border-white/10 bg-white/5 px-4">
           {ITEMS.map((it) => (
             <div key={it.term} className="py-3 text-[14px] leading-relaxed">

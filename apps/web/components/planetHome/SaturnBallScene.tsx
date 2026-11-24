@@ -212,7 +212,9 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       const w = plateW.current.get(id) ?? 64;
       const base = b.y + b.R * b.sy + 2;
       let at: number | null = null;
-      for (const y0 of [base, base + 10, base + 20, b.y - b.R * b.sy - ph - 3]) {
+      const above = b.y - b.R * b.sy - ph - 3;
+      // below the ball (stepping down, never into the dock), else above it, stepping up so neighbours' plates stagger
+      for (const y0 of [base, base + 10, above, above - (ph + 2), above - 2 * (ph + 2)]) {
         const box = { x0: b.x - w / 2 - 2, x1: b.x + w / 2 + 2, y0: y0 - 1, y1: y0 + ph + 1 };
         if (box.y1 > bottomLimit) continue;
         if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) continue;

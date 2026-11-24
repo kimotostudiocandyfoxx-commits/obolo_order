@@ -2,9 +2,23 @@
  * M-R252: the start-of-app agreement, the terms of use and the privacy summary — the words of the draft
  * (docs/legal/同意の画面と規約の下書き.md), word for word.
  * PLACEHOLDER (P-LEGAL-1 / P-LEGAL-2): these are DRAFTS. A specialist (a lawyer) checks them before launch (M-R248);
- * until then they stand in the app as they are. The contact (〔問い合わせ先〕) is left blank, as in the draft.
+ * until then they stand in the app as they are. The contact is the operator's published address (OPERATOR.email).
  * `{bati}` is {bati}'s name (バティ until one is given).
  */
+
+/**
+ * The operator, as published on /tokushoho (client 2026-11-24). Edit here. The address and the phone number are not
+ * published (disclosed on request) and are kept nowhere in the repository.
+ */
+export const OPERATOR = {
+  company: 'StudioCandyFoxx株式会社',
+  /** spelled as the client gave it */
+  manager: 'Shunnosuke Kimoto',
+  address: '請求があれば遅滞なく開示します',
+  phone: '請求があれば遅滞なく開示します',
+  /** the published contact (support) address */
+  email: 'parist.scf@gmail.com',
+} as const;
 
 /** 1-1: the year asked first; no answer / not known = treated as under 13 */
 export const CONSENT_YEAR = {
@@ -60,8 +74,8 @@ export const PRIVACY_DRAFT: LegalItem[] = [
   { title: '見えるもの', body: '飛ばした作品は、星で88時間ほかの人に見えます（15歳未満の人には、ダチの作品だけが見えます）。会話はダチどうしだけです。' },
   { title: '消す', body: '写真・声・作った物・会話は、設定から消せます。退会すると、すべて消します（支払いの記録など、法律で残す必要があるものを除く）。' },
   { title: '子ども', body: '13歳未満の人の写真と声は集めません。13〜15歳は、保護者の同意がある時だけ集めます。' },
-  // PLACEHOLDER (P-LEGAL-1): the contact is blank in the draft
-  { title: '問い合わせ', body: '〔問い合わせ先〕' },
+  // the contact: the operator's published address (client 2026-11-24)
+  { title: '問い合わせ', body: `${OPERATOR.company}　${OPERATOR.email}` },
 ];
 
 /** the note shown on the terms / privacy pages until the specialist's check (M-R248) */

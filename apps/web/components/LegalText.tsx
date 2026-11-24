@@ -7,7 +7,7 @@ export type LegalKind = 'terms' | 'privacy';
 
 /**
  * M-R252: the full text of 〔利用規約〕 / 〔プライバシーについて〕 — the draft's points word for word (shared legal.ts).
- * PLACEHOLDER (P-LEGAL-1): drafts until a specialist has checked them; the contact is blank.
+ * PLACEHOLDER (P-LEGAL-1): drafts until a specialist has checked them; the contact is the operator's (OPERATOR.email).
  */
 export function LegalText({ kind }: { kind: LegalKind }) {
   const { me } = useAuth();
