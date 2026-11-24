@@ -3,7 +3,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from 'react';
 import type { KororinFace as KororinFaceId } from '@obolo/shared';
 import { hop, newBall, press, release, stepBalls, THROW, type Ball } from '@/lib/planetHome/ballPhysics';
-import { faceTurn, KororinFace } from './KororinFace';
+import { faceTurn, KororinFace, shadesOf } from './KororinFace';
 import s from './PlanetHome.module.css';
 
 /**
@@ -229,7 +229,7 @@ export const BallLayer = forwardRef<
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img alt="" src={it.pic} draggable={false} />
-            <KororinFace face={it.face} delay={turn.delay} style={{ transform: turn.transform }} />
+            <KororinFace face={it.face} delay={turn.delay} style={{ transform: turn.transform }} shades={shadesOf(it.turn)} />
           </div>
         </div>
         );

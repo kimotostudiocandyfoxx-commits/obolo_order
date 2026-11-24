@@ -53,15 +53,11 @@ const MOUTH: Record<Face, ReactNode> = {
   star: mo('M43 60 q7 7 14 0'),
 };
 
-export function KororinFace({ face, delay = 0, style }: { face: Face; delay?: number; style?: CSSProperties }) {
+export function KororinFace({ face, delay = 0, style, shades = 'round' }: { face: Face; delay?: number; style?: CSSProperties; shades?: Shades }) {
   return (
     <svg className={s.ballFace} viewBox="0 0 100 100" aria-hidden data-testid="ball-face" data-face={face} style={style}>
-      {/* M-R268: sunglasses, on in club mode (the eyes hidden under them) */}
-      <g className={s.shades}>
-        <path d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z" fill="#141018" />
-        <path d="M46 49 h8" stroke="#141018" strokeWidth="3" />
-        <path d="M27 48 l6 0 M61 48 l6 0" stroke="rgba(255,255,255,.7)" strokeWidth="2" strokeLinecap="round" />
-      </g>
+      {/* M-R268 / M-R272: sunglasses, on in club mode (the eyes hidden under them) — this ball's own shape */}
+      {SHADES[shades]}
       <ellipse cx="27" cy="62" rx="9" ry="5" fill="#ff8fa8" opacity=".55" />
       <ellipse cx="73" cy="62" rx="9" ry="5" fill="#ff8fa8" opacity=".55" />
       <g className={s.ballSquint}>
@@ -73,6 +69,58 @@ export function KororinFace({ face, delay = 0, style }: { face: Face; delay?: nu
     </svg>
   );
 }
+
+/** M-R272: the club's sunglasses — 7 in 10 round, the rest a square wayfarer, a deep-pink star or a deep-red heart */
+export type Shades = 'round' | 'way' | 'star' | 'heart';
+export const shadesOf = (n: number): Shades => {
+  const h = (n * 7 + 3) % 10;
+  return h < 7 ? 'round' : (['way', 'star', 'heart'] as const)[h - 7];
+};
+const star = (x: number, y: number, r: number) => {
+  let d = '';
+  for (let k = 0; k < 10; k++) {
+    const a = -Math.PI / 2 + (k * Math.PI) / 5;
+    const q = k % 2 ? r * 0.48 : r;
+    d += `${k ? 'L' : 'M'}${(x + Math.cos(a) * q).toFixed(1)} ${(y + Math.sin(a) * q).toFixed(1)}`;
+  }
+  return `${d}z`;
+};
+const LENS = '#141018';
+const bridge = (d: string) => <path d={d} fill="none" stroke={LENS} strokeWidth="3" />;
+const glint = (d: string) => <path d={d} fill="none" stroke="rgba(255,255,255,.7)" strokeWidth="2" strokeLinecap="round" />;
+const SHADES: Record<Shades, ReactNode> = {
+  round: (
+    <g className={s.shades} data-shades="round">
+      <circle cx="35" cy="51" r="10.5" fill={LENS} />
+      <circle cx="65" cy="51" r="10.5" fill={LENS} />
+      {bridge('M45.5 49 q4.5 -4 9 0')}
+      {glint('M29 46 q3 -3 6 -3 M59 46 q3 -3 6 -3')}
+    </g>
+  ),
+  way: (
+    <g className={s.shades} data-shades="way">
+      <path d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z" fill={LENS} />
+      {bridge('M46 49 h8')}
+      {glint('M27 48 l6 0 M61 48 l6 0')}
+    </g>
+  ),
+  star: (
+    <g className={s.shades} data-shades="star">
+      <path d={star(34, 51, 13)} fill="#3a1238" />
+      <path d={star(66, 51, 13)} fill="#3a1238" />
+      {bridge('M45 50 h10')}
+      {glint('M30 47 l3 -2 M62 47 l3 -2')}
+    </g>
+  ),
+  heart: (
+    <g className={s.shades} data-shades="heart">
+      <path d="M35 61 C24 53 23 44 29 42 C32 41 34 43 35 45 C36 43 38 41 41 42 C47 44 46 53 35 61z" fill="#3d0f22" />
+      <path d="M65 61 C54 53 53 44 59 42 C62 41 64 43 65 45 C66 43 68 41 71 42 C77 44 76 53 65 61z" fill="#3d0f22" />
+      {bridge('M45 48 h10')}
+      {glint('M29 46 l3 -2 M59 46 l3 -2')}
+    </g>
+  ),
+};
 
 export const kororinBall = (colour: string) => `/planet-home/ballc-${colour}.webp`;
 

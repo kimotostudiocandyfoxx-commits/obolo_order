@@ -54,7 +54,6 @@ const hue = (str: string) => {
   for (const ch of str) h = (h * 31 + ch.codePointAt(0)!) % 997;
   return h;
 };
-const tagColour = (w: StageItem) => (w.rel === 'oshi' ? 'var(--oshi)' : w.rel === 'own' ? 'var(--mine)' : 'var(--dachi)');
 const nameOf = (w: StageItem) => (w.rel === 'own' ? 'あなた' : w.author.name);
 
 function useReducedMotion() {
@@ -103,7 +102,7 @@ export function ChibiPic({ w }: { w: StageItem }) {
 
 type Out = { w: StageItem; x: number; y: number; phase: 'talk' | 'wave' | 'away'; t0: number; started: boolean; endAt: number };
 
-export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, onPlate, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
+export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
   const layer = useRef<BallLayerHandle>(null);
@@ -439,9 +438,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
         </div>
         {!reduced && <div className={s.neon} />}
       </div>
-      <button type="button" className={s.plate} style={{ bottom: 'auto', top: '49%', zIndex: 5 }} onClick={onPlate} data-testid="name-plate">
-        {view.owner.name}の{cfg.place}
-      </button>
+      {/* M-R272: no record plate on Saturn (your own kororins are kept in Bluena's Saturn folder on the Moon) */}
       <div
         ref={face}
         className={s.puniFace}
@@ -539,7 +536,6 @@ function StillRows({ items, onTap, onHold }: { items: StageItem[]; onTap: (w: St
           key={w.id}
           type="button"
           className={s.still}
-          style={{ '--c': tagColour(w) } as CSSProperties}
           onClick={(e) => {
             const f = box.current?.parentElement?.getBoundingClientRect();
             const r = e.currentTarget.getBoundingClientRect();
@@ -553,7 +549,7 @@ function StillRows({ items, onTap, onHold }: { items: StageItem[]; onTap: (w: St
           data-testid="rolling"
         >
           <KororinPic k={w.author.kororin} size={56} turn={hue(w.id)} />
-          <span className={s.puniTagStill}>{nameOf(w)}</span>
+          {w.rel === 'own' && <span className={s.puniTagStill}>{nameOf(w)}</span>}
         </button>
       ))}
     </div>
