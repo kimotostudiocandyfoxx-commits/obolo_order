@@ -596,7 +596,7 @@ function startSim(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,L=W*.
       if(d<m){const o=(m-d)/2,nx=dx/d,ny=dy/d;if(!p.drag){p.x-=nx*o;p.y-=ny*o}if(!q.drag){q.x+=nx*o;q.y+=ny*o}
         const rv=(q.vx-p.vx)*nx+(q.vy-p.vy)*ny;if(rv<0){const im=-rv*.6;if(!p.drag){p.vx-=im*nx*.5;p.vy-=im*ny*.5}if(!q.drag){q.vx+=im*nx*.5;q.vy+=im*ny*.5}if(im>160){p.wv+=.9;q.wv+=.9}}}}
     const tnow=now/1000;
-    for(const r of live){for(let k=0;k<6;k++){const h=dt/6;r.wv+=(-420*r.ws-11*r.wv)*h;r.ws+=r.wv*h}
+    for(const r of live){for(let k=0;k<6;k++){const h=dt/6;r.wv+=(-560*r.ws-4.4*r.wv)*h;r.ws+=r.wv*h}
       const sp=Math.min(1,Math.hypot(r.vx,r.vy)/1400),onG=r.y+r.R>=fl(r.x)-1&&!r.drag;
       const breathe=onG?Math.sin(tnow*2.4+r.i)*.018:0,s=Math.max(-.16,Math.min(.16,r.ws))+breathe;
       const tsx=1+s+(onG?.04:0)+sp*.06,tsy=1-s-(onG?.04:0)+sp*.1;r.sx=(r.sx||1)+(tsx-(r.sx||1))*.75;r.sy=(r.sy||1)+(tsy-(r.sy||1))*.75;
