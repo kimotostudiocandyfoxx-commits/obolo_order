@@ -130,6 +130,23 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .done{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:8;font:900 14px var(--f-body);background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:10px 16px;white-space:nowrap}
 .plate{position:absolute;left:50%;bottom:calc(16% - 8px);transform:translateX(-50%);font:900 13px var(--f-body);padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.88);color:#2a1630;z-index:3;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .dock{position:absolute;left:0;right:0;bottom:0;padding:0 16px 18px;display:flex;gap:10px;justify-content:center;z-index:10}
+.cta.disc{width:76px;height:76px;padding:0;border-radius:50%;justify-content:center;position:relative;background:none;box-shadow:none;isolation:isolate;-webkit-tap-highlight-color:transparent}
+.cta.disc::before{content:"";position:absolute;inset:-7px;border-radius:50%;z-index:-2;background:conic-gradient(from 0deg,#ffd1f4,#c9b8ff,#a8f0ff,#c6ffd9,#fff2b8,#ffd1f4);filter:blur(9px);opacity:.75;animation:discGlow 4s linear infinite}
+.cta.disc .rec{position:absolute;inset:0;border-radius:50%;z-index:-1;background:
+ radial-gradient(circle at 50% 50%,transparent 0 33%,rgba(255,255,255,.07) 33.5% 34%,transparent 34.5% 41%,rgba(255,255,255,.08) 41.5% 42%,transparent 42.5% 49%,rgba(255,255,255,.07) 49.5% 50%,transparent 50.5%),
+ conic-gradient(from 30deg,rgba(255,255,255,0) 0 8%,rgba(255,220,250,.38) 12%,rgba(255,255,255,0) 18% 50%,rgba(190,240,255,.34) 62%,rgba(255,255,255,0) 68%),
+ radial-gradient(circle at 50% 50%,#2a2236 0 58%,#17121f 59% 100%);
+ box-shadow:0 10px 26px rgba(40,10,60,.45),0 0 0 2px rgba(255,255,255,.55),inset 0 0 0 1px rgba(255,255,255,.12);transition:transform .3s}
+.cta.disc .lbl{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:50%;z-index:-1;
+ background:radial-gradient(circle at 34% 28%,#fff 0 9%,rgba(255,255,255,0) 30%),linear-gradient(140deg,#ffc6ec,#d7c4ff 45%,#aeeeff);box-shadow:inset 0 -4px 8px rgba(120,60,160,.25),inset 0 2px 3px rgba(255,255,255,.8)}
+.cta.disc svg{width:24px;height:24px;filter:drop-shadow(0 1px 2px rgba(120,40,140,.45))}
+.cta.disc svg .pl{fill:#fff}
+.cta.disc:active .rec{transform:scale(.94)}
+.cta.disc.on .rec{animation:discSpin 1.8s linear infinite}
+.cta.disc.on::before{opacity:1;filter:blur(12px);animation-duration:1.6s}
+@keyframes discSpin{to{transform:rotate(360deg)}}
+@keyframes discGlow{to{filter:blur(9px) hue-rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.cta.disc::before,.cta.disc.on .rec{animation:none}}
 .cta{font:900 16px var(--f-body);color:#2a1630;background:var(--accent);border:0;border-radius:999px;padding:14px 22px;box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 -3px 0 rgba(0,0,0,.12);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .ghost{font:700 14px var(--f-body);color:var(--ink);background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;padding:13px 16px;cursor:pointer}
 .sheet{position:absolute;left:0;right:0;bottom:0;z-index:20;background:rgba(28,18,44,.78);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:10px 18px 22px;transform:translateY(105%);transition:transform .35s cubic-bezier(.2,.9,.25,1.1)}
@@ -228,7 +245,7 @@ function render(){
   const bgi=(mode==='anime'&&A['bg2-'+cur])||A['bg-'+cur];$('bg').style.backgroundImage=bgi?`url(${bgi})`:'linear-gradient(#335,#113)';
   document.querySelectorAll('#mode button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode));
   $('ttl').innerHTML=`<small>${c.en}</small>${c.name}`;$('say').innerHTML=c.say;
-  $('plate').textContent=`${ME}の${c.place}`;$('cta').textContent=c.cta;$('home').setAttribute('aria-label',`${ME}の${c.place}`);
+  $('plate').textContent=`${ME}の${c.place}`;setCta(false);$('home').setAttribute('aria-label',`${ME}の${c.place}`);
   $('oshiN').textContent=oshi.size;
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
@@ -382,9 +399,13 @@ function clubStart(){
   BEAT={out,timer:setInterval(()=>{while(next<ac.currentTime+.2){const q=step%16;if(q%4===0)kick(next);if(q%4===2)hat(next,.18);else hat(next,.05);if(q%2===1)bass(next,S.bass[Math.floor(step/16)%4]);if(q===0&&step%64===0)pad(next);next+=spb/4;step++}},50)};
 }
 function clubStop(){if(!BEAT)return;clearInterval(BEAT.timer);const g=BEAT.out.gain;try{g.setTargetAtTime(0,AC.currentTime,.2)}catch(e){}BEAT=null}
+function setCta(on){const b=$('cta');
+  if(cur==='saturn'){b.className='cta disc'+(on?' on':'');b.setAttribute('aria-label',on?'止める':'全部流す');
+    b.innerHTML='<span class="rec"></span><span class="lbl"></span><svg viewBox="0 0 24 24" aria-hidden="true">'+(on?'<rect class="pl" x="6" y="6" width="12" height="12" rx="3"/>':'<path class="pl" d="M8.5 5.6c0-1.1 1.2-1.8 2.2-1.2l8.6 5.5c.9.6.9 1.9 0 2.5l-8.6 5.5c-1 .6-2.2-.1-2.2-1.2z"/>')+'</svg>';return}
+  b.className='cta';b.removeAttribute('aria-label');b.textContent=P[cur].cta}
 function play(){
   if(cur!=='saturn')return;
-  SPIN=true;playing=true;$('cta').textContent='■ 止める';clubStart();
+  SPIN=true;playing=true;setCta(true);clubStart();
   $('party').classList.add('on');$('spinwrap').classList.add('on');
   setTimeout(()=>{if(SPIN)$('phone').classList.add('partying')},900);
   const next=()=>{if(!SPIN)return;const ph=$('phone'),nx=NEEDLE[0]*ph.clientWidth,ny=NEEDLE[1]*ph.clientHeight;
@@ -395,7 +416,7 @@ function play(){
     pop(live[0]);playing=setTimeout(next,3700)};
   playing=setTimeout(next,2200);
 }
-function stopPlay(){SPIN=false;if(playing&&playing!==true)clearTimeout(playing);playing=null;clubStop();const w=$('spinwrap');if(w)w.classList.remove('on');const pa=$('party');if(pa)pa.classList.remove('on');$('phone').classList.remove('partying');$('needle').classList.remove('on');$('cta').textContent=P[cur].cta}
+function stopPlay(){SPIN=false;if(playing&&playing!==true)clearTimeout(playing);playing=null;clubStop();const w=$('spinwrap');if(w)w.classList.remove('on');const pa=$('party');if(pa)pa.classList.remove('on');$('phone').classList.remove('partying');$('needle').classList.remove('on');setCta(false)}
 $('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
 $('mode').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;render()}};
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
