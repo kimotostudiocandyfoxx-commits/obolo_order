@@ -44,6 +44,19 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .res img{height:100%;width:auto;display:block}
 .res.l{left:-2%}.res.r{right:-2%}
 .res:active{transform:scale(.96)}
+.puni.popping{transition:transform .16s ease-out,opacity .16s;transform:translate(-50%,-50%) scale(1.35)!important;opacity:0}
+.drop{position:absolute;width:9px;height:9px;margin:-4px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,rgba(255,255,255,.4) 60%,transparent 70%);z-index:8;pointer-events:none;animation:drop .65s ease-out forwards}
+@keyframes drop{to{transform:translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+.chibi{position:absolute;width:150px;height:150px;margin:-120px 0 0 -75px;z-index:9;pointer-events:none;animation:chibiIn .45s cubic-bezier(.2,1.6,.4,1) both;filter:drop-shadow(0 10px 12px rgba(0,0,0,.35))}
+.chibi img{width:100%;height:100%;object-fit:contain}
+@keyframes chibiIn{0%{transform:translateY(40px) scale(.2);opacity:0}100%{transform:none;opacity:1}}
+.chibi.wave{animation:wave .5s ease-in-out 2}
+@keyframes wave{50%{transform:rotate(-8deg) translateY(-6px)}}
+.chibi.away{transition:left .65s ease-in,top .65s ease-in,transform .65s ease-in,opacity .65s;transform:scale(.15);opacity:0}
+.tint{position:absolute;inset:0;background:var(--rec,transparent);mix-blend-mode:screen;-webkit-mask-size:cover;mask-size:cover;-webkit-mask-position:center bottom;mask-position:center bottom;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;transform:scale(1.04);pointer-events:none;opacity:.85;z-index:1}
+.swatch{display:flex;gap:6px;align-items:center}
+.swatch button{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.8);cursor:pointer;padding:0}
+.swatch button[aria-pressed=true]{outline:2px solid var(--accent);outline-offset:2px}
 .puni{position:absolute;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni .ptag{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);white-space:nowrap;font:700 9px var(--f-body);padding:1px 6px;border-radius:999px;background:rgba(20,10,30,.55);border:1px solid var(--c);color:var(--ink)}
@@ -97,6 +110,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 <div class="switch" id="switch" role="toolbar" aria-label="星を切りかえる"></div>
 <div class="phone" id="phone">
   <div class="bg" id="bg"></div>
+  <div class="tint" id="tint" hidden></div>
   <div class="spin" id="spin"></div>
   <div class="sky" id="sky"></div>
   <div class="home" id="home" role="button" tabindex="0" aria-label="自分の場所"></div>
@@ -106,6 +120,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
   <div class="top">
     <div class="row"><div class="ttl" id="ttl"></div><span style="display:flex;gap:6px"><button class="pill help" id="help" type="button" aria-label="この星の説明">？</button><button class="pill" id="oshiBtn" type="button">♡ 推し <span id="oshiN"></span></button></span></div>
     <div class="say" id="say"></div>
+    <div class="swatch" id="swatch" hidden aria-label="レコードの色"></div>
   </div>
   <div class="dock"><button class="cta" id="cta" type="button"></button><button class="ghost" id="fly" type="button">＋ 飛ばす</button></div>
   <div class="inside" id="inside"><div class="row"><div class="ttl" id="inTtl" style="font-size:22px"></div><button class="pill" id="inClose" type="button">← 外へ</button></div><div class="say" id="inSay"></div><div class="shelf" id="shelf"></div></div>
@@ -159,6 +174,8 @@ function render(){
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
   const sky=$('sky');sky.innerHTML='';items=[];
+  const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('swatch').hidden=!isS;
+  if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
   stopRoll();if(cur==='saturn'){setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
@@ -208,42 +225,48 @@ function enter(){
   $('shelf').innerHTML=ic.map((x,i)=>`<div class="w">${x}<small>11/${26-i}</small></div>`).join('');
   $('inside').classList.add('on');
 }
-let rolls=[],raf=0,heard=[],RECLBL=[.6,.6];
-const PUNI=['salmon','gray','green','purple','gorilla'];
-const PIMG=(i)=>A['puni-'+PUNI[i%PUNI.length]]||sprite('korolin');
+let rolls=[],raf=0,heard=[],RECLBL=[.47,.69];
+const CHB=n=>n===ME?'user':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':['user','kimorin','mikie','monban','brother','sister'][n.length%6];
+const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
 function setupRoll(){
-  const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.84,L=W*.04,Rw=W*.96;
+  const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
   const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
-  rolls=list.map((o,i)=>{const R=34+((i*7)%3)*6,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
+  rolls=list.map((o,i)=>{const R=30+((i*7)%3)*5,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
     e.style.width=e.style.height=(R*2)+'px';e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
-    e.innerHTML=`<img alt="" src="${PIMG(i)}"><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
-    const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:-R-i*70,vx:(((i*13)%7)-3)*30,vy:0,sx:1,sy:1,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
+    e.innerHTML=`<img alt="" src="${BALL(o.k)}"><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
+    const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:-R-i*70,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=6});
     e.addEventListener('pointermove',ev=>{if(!down)return;const dx=ev.clientX-down.lx,dy=ev.clientY-down.ly,dt=Math.max(8,performance.now()-down.lt)/1000;r.x+=dx;r.y+=dy;r.vx=dx/dt;r.vy=dy/dt;down.lx=ev.clientX;down.ly=ev.clientY;down.lt=performance.now()});
-    e.addEventListener('pointerup',ev=>{if(!down)return;const moved=Math.hypot(ev.clientX-down.x,ev.clientY-down.y);r.drag=false;if(moved<6){r.vy=-520;r.vx=(Math.random()-.5)*160;r.wv-=14}down=null;talk(r)});
-    e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();r.vy=-520;r.wv-=14;talk(r)}});
+    e.addEventListener('pointerup',ev=>{if(!down)return;const moved=Math.hypot(ev.clientX-down.x,ev.clientY-down.y);r.drag=false;down=null;if(moved<6)pop(r);else r.wv-=8});
+    e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pop(r)}});
     return r});
   let last=performance.now();
   const step=now=>{const dt=Math.min(.033,(now-last)/1000);last=now;const live=rolls.filter(r=>!r.gone);
     for(const r of live){if(r.drag)continue;r.vy+=1900*dt;r.x+=r.vx*dt;r.y+=r.vy*dt;r.vx*=.995;
       if(r.y+r.R>F){const imp=r.vy;r.y=F-r.R;r.vy=-r.vy*.35;r.vx*=.86;if(imp>260)r.wv+=Math.min(18,imp/90);if(Math.abs(r.vy)<40)r.vy=0}
       if(r.x-r.R<L){r.x=L+r.R;r.vx=Math.abs(r.vx)*.5} if(r.x+r.R>Rw){r.x=Rw-r.R;r.vx=-Math.abs(r.vx)*.5}}
-    for(let k=0;k<3;k++)for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){const p=live[i],q=live[j],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1,m=p.R+q.R-6;
+    for(let k=0;k<3;k++)for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){const p=live[i],q=live[j],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1,m=p.R+q.R-4;
       if(d<m){const o=(m-d)/2,nx=dx/d,ny=dy/d;if(!p.drag){p.x-=nx*o;p.y-=ny*o}if(!q.drag){q.x+=nx*o;q.y+=ny*o}
         const rv=(q.vx-p.vx)*nx+(q.vy-p.vy)*ny;if(rv<0){const im=-rv*.6;if(!p.drag){p.vx-=im*nx*.5;p.vy-=im*ny*.5}if(!q.drag){q.vx+=im*nx*.5;q.vy+=im*ny*.5}if(im>220){p.wv+=2;q.wv+=2}}}}
-    for(const r of live){r.wv+=(-160*r.ws-9*r.wv)*dt;r.ws+=r.wv*dt;const s=Math.max(-.28,Math.min(.28,r.ws));
-      const ground=r.y+r.R>=F-1&&!r.drag?.06:0;r.sx=1+s+ground;r.sy=1-s-ground;r.a+=r.vx*dt/r.R;
-      r.e.style.left=r.x+'px';r.e.style.top=r.y+'px';r.e.style.transform=`translate(-50%,-50%) scale(${r.sx},${r.sy}) rotate(${Math.max(-18,Math.min(18,r.a*20))}deg)`;r.e.style.transformOrigin='50% 85%';
-      if(r.bub){r.bub.style.left=r.x+'px';r.bub.style.top=(r.y-r.R-8)+'px'}}
+    for(const r of live){r.wv+=(-160*r.ws-9*r.wv)*dt;r.ws+=r.wv*dt;const s=Math.max(-.22,Math.min(.22,r.ws));
+      const ground=r.y+r.R>=F-1&&!r.drag?.05:0;r.a+=r.vx*dt/r.R;
+      r.e.style.left=r.x+'px';r.e.style.top=r.y+'px';r.e.style.transform=`translate(-50%,-50%) scale(${1+s+ground},${1-s-ground})`;r.e.style.transformOrigin='50% 85%'}
     raf=requestAnimationFrame(step)};
   raf=requestAnimationFrame(step);
 }
-function talk(r){
-  if(r.talk||r.gone)return;r.talk=true;r.e.classList.add('talk');const card=P.saturn.card(r.i);
-  const b=document.createElement('div');b.className='bub';b.innerHTML=`<small>🎤 ${r.o.n}</small>${card.cap}`;$('sky').appendChild(b);r.bub=b;
-  setTimeout(()=>{b.style.display='none';r.bub=null;r.gone=true;const ph=$('phone');r.e.classList.add('gone');r.e.style.left=(RECLBL[0]*ph.clientWidth)+'px';r.e.style.top=(RECLBL[1]*ph.clientHeight)+'px';heard.push(r.o);
-    setTimeout(()=>{r.e.style.display='none';if(rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';$('sky').appendChild(d)}},650)},2000);
+function pop(r){
+  if(r.talk||r.gone)return;r.talk=true;r.gone=true;const sky=$('sky'),x=r.x,y=r.y;
+  r.e.classList.add('popping');setTimeout(()=>{r.e.style.display='none'},160);
+  for(let k=0;k<14;k++){const d=document.createElement('i');d.className='drop';const ang=k/14*Math.PI*2,dist=r.R*(1.2+Math.random()*.8);
+    d.style.left=x+'px';d.style.top=y+'px';d.style.setProperty('--dx',Math.cos(ang)*dist+'px');d.style.setProperty('--dy',Math.sin(ang)*dist+'px');sky.appendChild(d);setTimeout(()=>{d.style.display='none'},700)}
+  const c=document.createElement('div');c.className='chibi';c.style.left=x+'px';c.style.top=y+'px';
+  c.innerHTML=`<img alt="" src="${A['chibi-'+CHB(r.o.n)]||''}">`;sky.appendChild(c);
+  const card=P.saturn.card(r.i),b=document.createElement('div');b.className='bub';b.innerHTML=`<small>🎤 ${r.o.n}</small>${card.cap}`;
+  b.style.left=x+'px';b.style.top=(y-118)+'px';setTimeout(()=>sky.appendChild(b),260);
+  setTimeout(()=>{b.style.display='none';c.classList.add('wave')},2300);
+  setTimeout(()=>{const ph=$('phone');c.classList.add('away');c.style.left=(RECLBL[0]*ph.clientWidth)+'px';c.style.top=(RECLBL[1]*ph.clientHeight)+'px';heard.push(r.o)},2900);
+  setTimeout(()=>{c.style.display='none';if(rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
 function play(){
@@ -259,7 +282,10 @@ $('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data
 $('mode').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;render()}};
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
 $('home').onclick=enter;$('home').onkeydown=e=>{if(e.key==='Enter')enter()};$('cta').onclick=enter;
-$('inClose').onclick=closeAll;$('help').onclick=()=>{const s=$('say');s.classList.toggle('mini');clearTimeout(s._t)};$('oshiBtn').onclick=()=>toast('推し：'+[...oshi].join('・'));
+$('inClose').onclick=closeAll;const RECS=[['黒','transparent'],['ピンク','#ff7ac8'],['ラベンダー','#9b7bff'],['ミント','#3fe0b8'],['ゴールド','#ffbf40'],['空色','#5cb8ff']];
+$('swatch').innerHTML='<small style="font:700 11px var(--f-body);opacity:.85">レコードの色</small>'+RECS.map(([n,c],i)=>`<button type="button" aria-label="${n}" aria-pressed="${i===0}" style="background:${c==='transparent'?'#111':c}" data-c="${c}"></button>`).join('');
+$('swatch').onclick=e=>{const c=e.target.dataset.c;if(!c)return;$('phone').style.setProperty('--rec',c);document.querySelectorAll('#swatch button').forEach(b=>b.setAttribute('aria-pressed',b===e.target))};
+$('help').onclick=()=>{const s=$('say');s.classList.toggle('mini');clearTimeout(s._t)};$('oshiBtn').onclick=()=>toast('推し：'+[...oshi].join('・'));
 $('fly').onclick=()=>toast('月の工房で作って、'+P[cur].name+'へ飛ばそう');
 render();
 </script>
