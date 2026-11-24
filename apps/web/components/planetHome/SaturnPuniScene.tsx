@@ -237,7 +237,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
   return (
     <div ref={root} className={s.scene}>
       <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})`, transform: 'none' }} />
-      <button type="button" className={s.plate} style={{ bottom: '5%' }} onClick={onPlate} data-testid="name-plate">
+      <button type="button" className={s.plate} style={{ bottom: '5%', zIndex: 5 }} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
       </button>
       {/* the painted play button: the grooves at the needle-mic */}
