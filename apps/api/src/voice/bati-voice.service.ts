@@ -2,6 +2,7 @@ import { HttpStatus, Inject, Injectable, Logger, type OnModuleInit } from '@nest
 import { BATI_VOICE_BASE_SEMITONES, BATI_VOICE_MAX_SECONDS, BATI_VOICE_MIN_SECONDS, batiDefaultVoice, batiVoiceTuning, type BatiVoiceBody, type Me } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import { apiError } from '../common/errors';
+import { CONFIG, type AppConfig } from '../config';
 import { Database } from '../db/db';
 import { users } from '../db/schema';
 import type { JobPayloads, JobQueue } from '../infra/queue';
@@ -41,6 +42,8 @@ export class BatiVoiceService implements OnModuleInit {
     private readonly media: MediaService,
     @Inject(QUEUE) private readonly queue: JobQueue,
     @Inject(VOICE_MODELS) private readonly models: VoiceModels,
+    /** FISH_DEFAULT_VOICE_ID: the shared default {bati} voice model (iPad feedback; scripts/make-default-bati-voice.ts) */
+    @Inject(CONFIG) private readonly cfg: Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID'> = {},
   ) {}
 
   onModuleInit() {
@@ -128,15 +131,30 @@ export class BatiVoiceService implements OnModuleInit {
   }
 
   /**
-   * A text in the member's own {bati} voice (MP3), or null (no model: the caller uses the default voice). The 1st
-   * {bati} speaks in the model as made (+2); the 2nd / 3rd with their personality's pitch and speed on top.
+   * The Fish voice model {bati} speaks in (iPad feedback): the member's own (from the egg recording, when it may be
+   * used) → the prepared one for the egg × personality (BATI_DEFAULT_VOICES.fish, none chosen yet) → the shared
+   * default {bati} voice (FISH_DEFAULT_VOICE_ID: the client's recording, +2 semitones). When the member's own model is
+   * made (make()), it is used from the next line on — no switch to flip. null: no Fish voice (the caller's fallback).
+   */
+  voiceRef(u: User | null): string | null {
+    if (!u) return this.cfg.FISH_DEFAULT_VOICE_ID ?? null;
+    if (u.voiceBatiId && canUseMedia(u)) return u.voiceBatiId;
+    const r = activeBati(u);
+    return batiDefaultVoice(r?.egg, r?.personality).fish ?? this.cfg.FISH_DEFAULT_VOICE_ID ?? null;
+  }
+
+  /**
+   * A text in {bati}'s Fish voice (MP3): the member's own, else the default model (voiceRef); null when there is none
+   * (the caller uses the Gemini voice). The 1st {bati} speaks in the model as made (+2); the 2nd / 3rd with their
+   * personality's pitch and speed on top.
    */
   async speak(userId: string, text: string): Promise<Buffer | null> {
     if (!this.models.enabled) return null;
     const u = await this.row(userId);
-    if (!u?.voiceBatiId || !canUseMedia(u)) return null;
+    const ref = this.voiceRef(u);
+    if (!u || !ref) return null;
     const tune = this.tuning(u);
-    const mp3 = await this.models.speak(u.voiceBatiId, text, tune.speed);
+    const mp3 = await this.models.speak(ref, text, tune.speed);
     return tune.semitones ? this.convert(mp3, tune.semitones) : mp3;
   }
 

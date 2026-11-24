@@ -34,6 +34,7 @@ import {
   kororinOf,
   CHANGEABLES,
   type ChangeStore,
+  TALK_COLOR_KEY,
   splitHome,
   orderOwn,
   type HomeOshi,
@@ -452,6 +453,9 @@ export class DemoApi implements Api {
         u.kororin = kororinOf({ ...u.kororin, ...patch });
         this.save();
       },
+      // iPad feedback: the member's own bubble colour, where the settings keep it (Me.story 'sys.talk_color')
+      talkColour: async () => this.s.users[this.uid()]?.story?.[TALK_COLOR_KEY] ?? null,
+      setTalkColour: async (id) => void (await this.saveSysStory({ [TALK_COLOR_KEY.replace(/^sys\./, '')]: id })),
     };
   }
   async changeables() {

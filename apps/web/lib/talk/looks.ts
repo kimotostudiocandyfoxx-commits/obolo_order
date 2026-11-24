@@ -1,4 +1,4 @@
-import { BATI_FACE_TO_TALK, type BatiView, type Me, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
+import { BATI_FACE_TO_TALK, SELF_TALK_TONES, TALK_COLOR_KEY, TALK_TONE_DEFAULT, TALK_TONES, type TalkToneDef, type BatiView, type Me, type TalkExpression, type TalkFace, type TalkLook } from '@obolo/shared';
 import LAYERS from '@/lib/story/sprite-layers.json';
 import MOUTHS from '@/lib/story/sprite-mouths.json';
 import { spriteUrl } from '@/lib/onboarding/media';
@@ -7,27 +7,19 @@ import { castLook } from './demoLooks';
 /** M-R232: each speaker's colour on the ring (you are always blue) */
 /**
  * M-R245: each person's bubble colour, fixed (in a group too): muted tones, a faint vertical gradient, a 1.5 px line in the
- * same hue and the words in a deepened version of it (never black). You pick yours once (月光パール unless you do).
+ * same hue and the words in a deepened version of it (never black). The tones are shared (@obolo/shared talkTone.ts);
+ * iPad feedback: everyone starts with 月光パール and asks {bati} to change it (the changeable 'talk.bubbleColour').
  */
-export type TalkTone = { id: string; name: string; a: string; b: string; line: string; ink: string };
-export const TONES: Record<string, TalkTone> = {
-  pearl: { id: 'pearl', name: '月光パール', a: '#f7f4fd', b: '#e7e1f6', line: '#9a8fc4', ink: '#2b2550' },
-  honey: { id: 'honey', name: 'はちみつクリーム', a: '#fbf0d9', b: '#f0dcb0', line: '#c29a52', ink: '#4a3410' },
-  sage: { id: 'sage', name: 'セージ', a: '#eef4ee', b: '#d9e6db', line: '#86a58e', ink: '#253d2c' },
-  rose: { id: 'rose', name: 'くすみローズ', a: '#fbeff0', b: '#efd6da', line: '#b98790', ink: '#4a2730' },
-  sky: { id: 'sky', name: '霧の空色', a: '#eef4fa', b: '#d6e4f1', line: '#87a3c2', ink: '#22374e' },
-  apricot: { id: 'apricot', name: '杏', a: '#fdf1e8', b: '#f5dcc6', line: '#c79a73', ink: '#4a3018' },
-  lilac: { id: 'lilac', name: 'ライラック', a: '#f5f0fb', b: '#e3d8f1', line: '#a48cc6', ink: '#35254f' },
-  greyblue: { id: 'greyblue', name: '灰青', a: '#eef1f5', b: '#d8dee7', line: '#8a97a9', ink: '#283344' },
-};
-/** the colours you may pick for yourself (once, at the first talk; changeable in the settings) */
-export const SELF_TONES = ['pearl', 'sky', 'rose', 'sage', 'apricot', 'lilac'];
+export type TalkTone = TalkToneDef;
+export const TONES: Record<string, TalkTone> = TALK_TONES;
+/** the colours you may have for yourself ({bati} changes it; the Moon settings too) */
+export const SELF_TONES: string[] = [...SELF_TALK_TONES];
 /** the others in a group: one each, the same for that person every time */
 const GROUP_TONES = ['rose', 'sky', 'apricot', 'lilac', 'greyblue'];
 export const toneOf = (id: string) => TONES[GROUP_TONES[[...id].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7) % GROUP_TONES.length]];
-/** your colour as you picked it (Me.story 'sys.talk_color'), else 月光パール */
-export const TALK_COLOR_KEY = 'sys.talk_color';
-export const selfTone = (me: Me | null | undefined) => TONES[me?.story?.[TALK_COLOR_KEY] ?? ''] ?? TONES.pearl;
+/** your colour as kept (Me.story 'sys.talk_color'), else 月光パール */
+export { TALK_COLOR_KEY };
+export const selfTone = (me: Me | null | undefined) => TONES[me?.story?.[TALK_COLOR_KEY] ?? ''] ?? TONES[TALK_TONE_DEFAULT];
 
 // the key colours (a person's line colour: names, glows)
 export const SELF_COLOR = TONES.pearl.line;

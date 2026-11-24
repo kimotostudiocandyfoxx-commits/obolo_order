@@ -125,3 +125,17 @@ export const DONE: Record<AtelierKind, string> = {
   video: 'できたよ。ブルーナにしまったよ',
   radio: '準備できたよ。〔録る〕を押して、話してね',
 };
+
+/**
+ * iPad feedback: {bati}'s opening in the atelier is a short greeting — no 「なにをする？」 and no row of kinds (you ask
+ * in words; 「なにをする？」 and the kinds still come when the words were not understood). `returning`: the first talk of a
+ * visit when there were talks before → 「おかえり！」; otherwise the two やっほー in turn (`turn`: 0 / 1). No name → the
+ * plain one. Returns the line as written ({neo} filled by the caller, after {bati}'s manner). A story step never shows it (the day's script lines are said as written).
+ * PLACEHOLDER (P-ATELIER-5): UI words, not from the script.
+ */
+export const GREETINGS = { hello: 'やっほー！', helloName: 'やっほー、{neo}！', back: 'おかえり！' } as const;
+export function greetingOf({ neo, returning, turn }: { neo?: string | null; returning: boolean; turn: number }): string {
+  if (returning) return GREETINGS.back;
+  if (turn % 2 === 1 && neo) return GREETINGS.helloName;
+  return GREETINGS.hello;
+}

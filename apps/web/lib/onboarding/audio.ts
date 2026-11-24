@@ -48,6 +48,57 @@ export function unlockAudio(): AudioContext | null {
   return c;
 }
 
+/**
+ * iPad feedback (voices did not play): iOS / iPadOS Safari lets a suspended AudioContext start only inside a real user
+ * activation — touchend / click / keydown / pointerup. A pointerdown from a finger (TalkScene's tap) is a touchstart
+ * underneath and does not count, so resume() there left the context suspended and every clip came back null (the
+ * words and the mouth without sound). This arms a listener for the whole app (layout: AudioUnlock): the first such
+ * event resumes the context and plays one silent frame (what WebKit needs to really open the output); it stays armed
+ * until the context runs, and arms again when the page comes back (iOS suspends / interrupts it in the background).
+ * The silent switch (M-R239, the "ambient" session) is untouched: with the iPad muted, nothing sounds, as decided.
+ */
+const UNLOCK_EVENTS = ['touchend', 'click', 'keydown', 'pointerup'] as const;
+let armed = false;
+function unlockOnce() {
+  const c = unlockAudio();
+  if (!c) return;
+  try {
+    const b = c.createBuffer(1, 1, 22050);
+    const src = c.createBufferSource();
+    src.buffer = b;
+    src.connect(c.destination);
+    src.start(0);
+  } catch {
+    /* nothing to open */
+  }
+  if (c.state === 'running') disarm();
+  else void c.resume().then(() => c.state === 'running' && disarm(), () => undefined);
+}
+function disarm() {
+  if (!armed) return;
+  armed = false;
+  for (const e of UNLOCK_EVENTS) window.removeEventListener(e, unlockOnce, true);
+}
+/** arm the first-tap unlock (idempotent); returns the clean-up */
+export function armAudioUnlock(): () => void {
+  if (typeof window === 'undefined') return () => undefined;
+  const arm = () => {
+    if (armed) return;
+    if (ctx && ctx.state === 'running') return;
+    armed = true;
+    for (const e of UNLOCK_EVENTS) window.addEventListener(e, unlockOnce, { capture: true, passive: true });
+  };
+  const back = () => {
+    if (document.visibilityState === 'visible' && ctx && ctx.state !== 'running') arm();
+  };
+  arm();
+  document.addEventListener('visibilitychange', back);
+  return () => {
+    disarm();
+    document.removeEventListener('visibilitychange', back);
+  };
+}
+
 let bus: DynamicsCompressorNode | null = null;
 
 /**

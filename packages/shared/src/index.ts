@@ -28,3 +28,4 @@ export * from './membership';
 export * from './planetHomeConfig';
 export * from './planetHome';
 export * from './changeables';
+export * from './talkTone';

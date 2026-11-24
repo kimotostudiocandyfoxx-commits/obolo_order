@@ -71,9 +71,12 @@ export const agreedNow = (me: Pick<Me, 'consent'> | null | undefined) => me?.con
  * M-R247 / M-R252: the one agreement at the start of the app, before day 1 (the story itself explains nothing). The
  * words are the draft's (docs/legal/同意の画面と規約の下書き.md; shared legal.ts), word for word:
  *  1-1 「生まれた年を教えてください」〔年を選ぶ〕 — no answer / not known = as under 13 (skipped when the account has one);
- *  1-2 by age (mediaAge): 16+ the body, 〔利用規約〕〔プライバシーについて〕 (the full text over this screen), 〔同意してはじめる〕;
- *      13〜15 the body and the guardian line, 〔保護者の人が同意しました〕 (as 16+) or 〔保護者の同意なしではじめる〕 (no
+ *  1-2 by age (mediaAge): 16+ 〔利用規約〕〔プライバシーについて〕 (the full text over this screen), 〔同意してはじめる〕;
+ *      13〜15 the guardian line, 〔保護者の人が同意しました〕 (as 16+) or 〔保護者の同意なしではじめる〕 (no
  *      photo, no voice); under 13 the one line and 〔はじめる〕 (no photo, no voice).
+ * iPad feedback: the three summary lines (CONSENT_TEXT.adult) are no longer shown — the client: they mean nothing before
+ * the user knows the app, and other SNS apps don't say them; the same points stay in the terms and the privacy text.
+ * What is recorded is unchanged (version, guardian, media, birthYear).
  * The server keeps the branch (POST /me/consent `media`) and decides by it and the birth year (canUseMedia).
  * PLACEHOLDER (P-LEGAL-1/2): the texts are drafts; the wording and the flow are checked by a specialist before launch.
  */
@@ -139,7 +142,6 @@ export function ConsentPanel({ onAgree, busy = false, knownYear = null }: { onAg
         )}
         {age === 'adult' && (
           <div className="mt-6">
-            {lines(CONSENT_TEXT.adult)}
             {links}
             <button type="button" disabled={busy} onClick={() => agree({ guardian: false, media: true })} className={`${main} mt-7`}>
               {CONSENT_TEXT.agree}
@@ -148,7 +150,7 @@ export function ConsentPanel({ onAgree, busy = false, knownYear = null }: { onAg
         )}
         {age === 'teen' && (
           <div className="mt-6">
-            {lines([...CONSENT_TEXT.adult, CONSENT_TEXT.teen])}
+            {lines([CONSENT_TEXT.teen])}
             {links}
             <button type="button" disabled={busy} onClick={() => agree({ guardian: true, media: true })} className={`${main} mt-7`}>
               {CONSENT_TEXT.guardianAgreed}

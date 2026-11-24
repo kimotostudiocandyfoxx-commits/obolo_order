@@ -2,24 +2,23 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { TalkComposer } from '@/components/talk/TalkComposer';
-import { useTalkTone } from '@/components/talk/useTalkTone';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
-import { HOME_OF_WORK, PLANET_HOMES, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
+import { HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
 import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
-import { ASK, DONE, detect, isBare, KIND_WORD } from './intent';
+import { ASK, DONE, detect, greetingOf, isBare, KIND_WORD } from './intent';
 import { dropTry, fly, failLine, keep, keepFace, keepShow, make, wear, type MakeOpts } from './makers';
 import { asMaterial, fromMaterial, PROPOSAL_ASK, proposalFor, usesOf } from './material';
 import { dragLine } from './proposal';
-import { saveTalk, type Talk } from './shelf';
+import { saveTalk, talks, type Talk } from './shelf';
 import { countdown, jobView, msLeft, onJobs, watchJob } from '@/lib/atelier/jobs';
 import { dayOf } from '@/lib/finds/spiral';
 import { nextLine } from '@/lib/atelier/lineTurn';
@@ -37,8 +36,10 @@ const TAUGHT_KEY = 'obolo.atelier.taught';
 const PLANET_WORD = { voice: '土星', art: '木星', song: '水星', video: '火星', radio: '金星' } as Record<string, string>;
 const PLANET_OF = { voice: 'saturn', art: 'jupiter', song: 'mercury', video: 'mars', radio: 'venus' } as Record<string, string>;
 const LESSON_OF: Partial<Record<AtelierKind, Lesson>> = { voice: 'voice', art: 'art', song: 'song', video: 'video', radio: 'radio' };
-// PLACEHOLDER (P-ATELIER-5): {bati}'s opening line in the atelier
+// PLACEHOLDER (P-ATELIER-5): {bati}'s line when the words were not understood (iPad feedback: no longer the opening)
 const HELLO = 'なにをする？ ことばで頼んでね';
+/** this visit has greeted already (the first new talk of a visit, after earlier talks, is 「おかえり！」) */
+const VISIT_KEY = 'obolo.atelier.visit';
 const USE = '使う';
 const NEW_TODAY = '今日は新しく';
 const PROPOSED_KEY = 'obolo.atelier.proposed';
@@ -50,9 +51,21 @@ function LiveCard({ id, fallback }: { id: string; fallback: Work }) {
   return <>{c.render(c.get(id) ?? fallback)}</>;
 }
 
-/** a fresh talk with {bati} (its opening line offers what is open today) */
-export function newTalk(day: number | null | undefined): Talk {
-  return { id: uid(), at: new Date().toISOString(), msgs: [{ id: uid(), who: 'bati', text: HELLO, chips: openKinds(day).map((k) => KIND_WORD[k]) }] };
+/**
+ * a fresh talk with {bati}: iPad feedback — it opens with a short greeting only (やっほー！ / やっほー、{neo}！ / おかえり！),
+ * no question and no row of kinds; what to make is asked in words. `bati`: {bati}'s manner (none: KIMORIN, as written).
+ */
+export function newTalk(me: Pick<Me, 'displayName' | 'bati'> | null | undefined, bati = true): Talk {
+  let returning = false;
+  try {
+    returning = !sessionStorage.getItem(VISIT_KEY) && talks().length > 0;
+    sessionStorage.setItem(VISIT_KEY, '1');
+  } catch {
+    /* no memory: the plain greeting */
+  }
+  const tpl = greetingOf({ neo: me?.displayName, returning, turn: returning ? 0 : Number(nextLine('hello', ['0', '1'] as const)) });
+  const text = fillLine(bati ? batiLine(tpl, batiLineVoiceOf(me?.bati)) : tpl, { neo: me?.displayName ?? '' });
+  return { id: uid(), at: new Date().toISOString(), msgs: [{ id: uid(), who: 'bati', text }] };
 }
 
 type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: true } | { use: AtelierKind; materials: Work[] } | null;
@@ -69,8 +82,6 @@ type Pending = { kind: AtelierKind } | { radioName: string } | { voiceAgain: tru
  */
 export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBack, welcome }: { first: AtelierKind | null; talk: Talk; story?: StoryMode; /** M-R253 §6 ⑤: opened from the toast / the push — {bati}'s word for coming back */ welcome?: boolean; /** the shell's drawers, from the talk's top bar */ onList?: () => void; onBluena?: () => void; unread?: boolean; onBack?: () => void }) {
   const { me, setMe } = useAuth();
-  // M-R245: your bubble colour (picked once)
-  const talkTone = useTalkTone();
   const own = usePartner();
   // in a story step the story's {bati} talks (the review page has no account: its {bati} is the story's)
   const partner = story ? { ...own, name: story.speaker('バティ').name, face: story.speaker('バティ').avatar ?? own.face } : own;
@@ -304,10 +315,18 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     setBusy(true);
     getApi()
       .setChangeable(r.item.id, r.choice.id)
-      .then((res) => setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiLine(r.item.doneLine(r.choice), batiVoice), changed: res }]))
+      .then((res) => {
+        bubbleNow(res.id, res.to);
+        setMsgs((m) => [...m, { id: uid(), who: 'bati', text: batiLine(r.item.doneLine(r.choice), batiVoice), changed: res }]);
+      })
       .catch(() => say('いまは、うまく変えられなかった。もう一回言ってみて'))
       .finally(() => setBusy(false));
     return true;
+  };
+  /** iPad feedback: your bubble colour changed by {bati} shows at once (the server keeps it as Me.story 'sys.talk_color') */
+  const bubbleNow = (id: ChangeResult['id'], to: string) => {
+    if (id !== TALK_BUBBLE_COLOUR.id || !me) return;
+    setMe({ ...me, story: { ...(me.story ?? {}), [TALK_COLOR_KEY]: to } });
   };
   /** 〔元に戻す〕 on a change card: the same change back to what it was */
   const undoChange = (msgId: string) => {
@@ -319,6 +338,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     getApi()
       .setChangeable(ch.id, ch.from)
       .then(() => {
+        bubbleNow(ch.id, ch.from);
         setMsgs((l) => [...l.map((x) => (x.id === msgId && x.who === 'bati' && x.changed ? { ...x, changed: { ...x.changed, undone: true } } : x)), { id: uid(), who: 'bati', text: batiLine(item.undoneLine(item.choices.find((c) => c.id === ch.from) ?? item.choices[0]), batiVoice) }]);
       })
       .catch(() => say('いまは、戻せなかった……'))
@@ -679,8 +699,6 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ fontFamily: SERIF }}>
       {launch && <FlyLaunch kind={launch} />}
       <TalkScene
-        askTone={talkTone.ask}
-        onTone={talkTone.pick}
         people={people}
         items={items}
         thinking={busy || making ? 'bati' : null}

@@ -164,7 +164,9 @@ const Env = z.object({
   FISH_SING_GUIDE: bool(false),
   /**
    * PLACEHOLDER (P-SAT-8): a shared Fish voice model id used as Bati's voice for members who have
-   * not registered one yet. Unset = their posts use the device's reading voice instead.
+   * not registered one yet (the chat's answers, Saturn's read-aloud). Unset = Bati's chat answers use the Gemini
+   * voice for the egg and posts use the device's reading voice. Made from design/voices/default-bati-source.* (+2
+   * semitones) by .github/workflows/make-default-bati-voice.yml; set as the GitHub variable FISH_DEFAULT_VOICE_ID.
    */
   FISH_DEFAULT_VOICE_ID: secret(),
 

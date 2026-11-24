@@ -1,12 +1,13 @@
 'use client';
 
-import { changeableById } from '@obolo/shared';
+import { changeableById, TALK_TONES } from '@obolo/shared';
 import { KororinPic } from '@/components/planetHome/KororinFace';
 import { RecordTint } from '@/components/planetHome/SaturnBallScene';
 
 /**
  * M-R263: the card {bati} shows after a change — the changed thing, small (Saturn: the record in its new colour, the
- * same mask and screen blend as the planet; M-R266: the kororin with its new colour or face). `big`: the opened card.
+ * same mask and screen blend as the planet; M-R266: the kororin with its new colour or face; iPad feedback: your bubble in
+ * its new colour). `big`: the opened card.
  */
 export function ChangePreview({ change, big = false }: { change: { id: string; to: string; from: string; undone?: boolean; kororin?: { colour: string; face: string } }; big?: boolean }) {
   const item = changeableById(change.id);
@@ -21,6 +22,21 @@ export function ChangePreview({ change, big = false }: { change: { id: string; t
       <div className={`relative flex items-center justify-center overflow-hidden rounded-xl bg-[radial-gradient(circle_at_50%_40%,#5b3f86,#1c1230)] ${big ? 'aspect-square w-[min(80vw,320px)]' : 'aspect-square w-24'}`} data-testid="change-preview" data-colour={k.colour} data-face={k.face}>
         <span className={big ? '-mt-6' : '-mt-4'}>
           <KororinPic k={k} size={big ? 180 : 56} />
+        </span>
+        {label}
+      </div>
+    );
+  }
+  if (item?.preview === 'talk-bubble') {
+    const t = TALK_TONES[now] ?? TALK_TONES.pearl;
+    return (
+      <div className={`relative flex items-center justify-center overflow-hidden rounded-xl bg-[radial-gradient(circle_at_50%_35%,#2a3470,#0b1027)] ${big ? 'aspect-square w-[min(80vw,320px)]' : 'aspect-square w-24'}`} data-testid="change-preview" data-colour={now}>
+        {/* the same bubble as in the talk (TalkScene): the faint gradient, the 1.5 px line, the deepened words */}
+        <span
+          className={`${big ? '-mt-8 px-5 py-3 text-[18px]' : '-mt-5 px-2.5 py-1.5 text-[11px]'} font-bold`}
+          style={{ background: `linear-gradient(170deg,${t.a},${t.b})`, border: `1.5px solid ${t.line}`, color: t.ink, borderRadius: '16px 13px 17px 12px / 13px 16px 12px 15px' }}
+        >
+          やっほー
         </span>
         {label}
       </div>

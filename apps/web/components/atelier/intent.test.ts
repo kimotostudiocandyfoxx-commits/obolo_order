@@ -48,3 +48,13 @@ describe('M-R253 §1: 「新しく作って」', () => {
     expect(isBare('夏の海の歌')).toBe(false);
   });
 });
+
+describe('iPad feedback: {bati} opens with a short greeting', () => {
+  it('おかえり！ on a returning visit, else the two やっほー in turn', async () => {
+    const { greetingOf } = await import('./intent');
+    expect(greetingOf({ neo: 'ネオ', returning: true, turn: 0 })).toBe('おかえり！');
+    expect(greetingOf({ neo: 'ネオ', returning: false, turn: 0 })).toBe('やっほー！');
+    expect(greetingOf({ neo: 'ネオ', returning: false, turn: 1 })).toBe('やっほー、{neo}！');
+    expect(greetingOf({ neo: '', returning: false, turn: 1 })).toBe('やっほー！');
+  });
+});

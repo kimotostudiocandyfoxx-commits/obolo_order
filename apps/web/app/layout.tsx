@@ -10,6 +10,7 @@ import { NeoSpeaking } from '@/components/NeoSpeaking';
 import { ConsentGate } from '@/components/ConsentGate';
 import { JobToasts } from '@/components/JobToasts';
 import { TesterBar } from '@/components/TesterBar';
+import { AudioUnlock } from '@/components/AudioUnlock';
 
 export const metadata: Metadata = {
   title: 'Obolo Order',
@@ -48,6 +49,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <NeoSpeaking />
             <ConsentGate />
             <JobToasts />
+            {/* iPad: the first real tap lets the voices sound */}
+            <AudioUnlock />
             {/* the tester entrance: only for accounts on the server's allowlist (Me.tester) */}
             <TesterBar />
           </AuthProvider>

@@ -34,7 +34,7 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open }
   const bluena = !!story?.bluena || hasBluena(me);
   const [thread, setThread] = useState<string>(open?.thread || BATI_THREAD);
   // M-R253 §4: opened from the toast / the push: the talk with that card (else a new talk)
-  const [talk, setTalk] = useState<Talk>(() => (open?.job && talkWith((w) => w.job?.id === open.job || w.id === open.job)) || newTalk(day));
+  const [talk, setTalk] = useState<Talk>(() => (open?.job && talkWith((w) => w.job?.id === open.job || w.id === open.job)) || newTalk(me, partner.isBati));
   const [firstTalk] = useState(talk.id);
   // M-R253 §6 ⑤: the talk opened from the toast / the push ({bati} says its word for coming back)
   const [welcomeTalk, setWelcomeTalk] = useState<string | null>(open?.job ? talk.id : null);
@@ -121,7 +121,7 @@ export function Shell({ first, threads = [], renderThread, story, onBack, open }
           }}
           onNew={() => {
             setPast(null);
-            setTalk(newTalk(day));
+            setTalk(newTalk(me, partner.isBati));
             setThread(BATI_THREAD);
             setDrawer(null);
           }}

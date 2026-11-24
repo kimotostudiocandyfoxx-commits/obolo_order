@@ -9,7 +9,7 @@ const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: str
 const U = 'a0000000-0000-4000-8000-000000000001';
 
 /** a service over a little world in memory: one user row, the media store, the queue and a fake voice-model provider */
-function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; guardian?: boolean } = {}) {
+function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; guardian?: boolean; defaultVoice?: string } = {}) {
   const user: Record<string, unknown> = {
     id: U,
     voiceBatiId: null,
@@ -52,9 +52,9 @@ function world(o: { consent?: boolean; enabled?: boolean; age?: number | null; g
       return `model-${models.made.length}`;
     }),
     remove: vi.fn(async (id: string) => void models.gone.push(id)),
-    speak: vi.fn(async (_id: string, text: string) => Buffer.from(`tts:${text}`)),
+    speak: vi.fn(async (id: string, text: string) => Buffer.from(id.startsWith('model-') ? `tts:${text}` : `tts@${id}:${text}`)),
   };
-  const s = new BatiVoiceService({} as never, media as never, queue as never, models);
+  const s = new BatiVoiceService({} as never, media as never, queue as never, models, { FISH_DEFAULT_VOICE_ID: o.defaultVoice });
   // ffmpeg stands in: the bytes marked with the semitones they were shifted by
   const shifts: number[] = [];
   s.convert = async (input, semitones) => {
@@ -185,5 +185,29 @@ describe('the 2nd / 3rd {bati}: the same base voice, a little changed by persona
       expect(t.speed).toBeGreaterThan(0.85);
       expect(t.speed).toBeLessThan(1.15);
     }
+  });
+
+  describe('iPad feedback: the default {bati} voice (FISH_DEFAULT_VOICE_ID) until the member\'s own is made', () => {
+    it('no own voice yet: {bati} speaks in the default model; once the own model is made, in that — by itself', async () => {
+      const w = world({ defaultVoice: 'default-bati' });
+      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
+      await w.s.record(U, { takes: [take()], seconds: 10 }, 'http://api');
+      // still being made: the default voice
+      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
+      await w.s.make(w.jobs[0].p as never);
+      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts:やぁ'));
+      // 〔声を消す〕: back to the default voice
+      await w.s.remove(U);
+      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
+    });
+    it('under 13 / no consent: never the own voice, the default one still', async () => {
+      const w = world({ age: 10, defaultVoice: 'default-bati' });
+      w.user.voiceBatiId = 'model-x';
+      expect(await w.s.speak(U, 'やぁ')).toEqual(Buffer.from('tts@default-bati:やぁ'));
+    });
+    it('no default set and no own voice: null (the Gemini voice); Fish off: null', async () => {
+      expect(await world().s.speak(U, 'やぁ')).toBeNull();
+      expect(await world({ enabled: false, defaultVoice: 'default-bati' }).s.speak(U, 'やぁ')).toBeNull();
+    });
   });
 });

@@ -9,7 +9,6 @@ import { loadBluenaWorks, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
 import { TALK_FIXED_FACE_KEY } from '@obolo/shared';
-import { useTalkTone } from '@/components/talk/useTalkTone';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { talkDayOf } from '@/lib/finds/talks';
@@ -50,8 +49,6 @@ export type DachiThreadProps = {
 export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day }: DachiThreadProps) {
   const ring = useMarkRing();
   const { me } = useAuth();
-  // M-R245: your bubble colour (picked once)
-  const talkTone = useTalkTone();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
   const [msgs, setMsgs] = useState<DachiMessageView[] | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -150,8 +147,6 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
     <div className="relative flex min-h-0 flex-1 flex-col">
       {/* M-R232: the same side-by-side talk — you at the right, the dachi in the look they made at the left */}
       <TalkScene
-        askTone={talkTone.ask}
-        onTone={talkTone.pick}
         key={id}
         people={people}
         items={items}

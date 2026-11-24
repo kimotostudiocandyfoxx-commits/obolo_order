@@ -214,6 +214,12 @@ export class UsersService {
     return u;
   }
 
+  /** one sys.<key> answer as kept (users.onboarding_json), without the rest of Me (the changeables read the bubble colour) */
+  async sysAnswer(userId: string, key: string): Promise<string | null> {
+    const v = (await this.load(userId)).onboardingJson?.[`sys.${key}`];
+    return typeof v === 'string' ? v : null;
+  }
+
   /**
    * Answers of a story scene that is not on a day (SYS-S002 from the settings: f_ej_heard_now, f_join_early_now),
    * kept as sys.<key> next to the days' answers. Day 8 reads them (web lib/onboarding/joinFlags.ts).

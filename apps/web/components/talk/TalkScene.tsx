@@ -192,8 +192,6 @@ export function TalkScene({
   onRing,
   bar,
   hint = true,
-  askTone = false,
-  onTone,
   onTap,
   voice,
   noMute = false,
@@ -249,9 +247,6 @@ export function TalkScene({
   };
   /** 「画面を押すと、次の言葉へ進みます」 while lines are played in a row */
   hint?: boolean;
-  /** M-R245: show the one-time picker of your bubble colour */
-  askTone?: boolean;
-  onTone?: (id: string) => void;
   /** a tap while nothing is being said (the story goes on to its next step) */
   onTap?: () => void;
   /** a voice played outside (the story's line voices): whose mouth moves, and its loudness */
@@ -1314,8 +1309,6 @@ export function TalkScene({
 
       {composer && <div className="absolute inset-x-0 bottom-0 z-[20]">{composer}</div>}
 
-      {askTone && onTone && <TonePicker onPick={onTone} />}
-
       {/* the left drawer of a talk with no shell around it (M-R237: the conversations, then the chosen one's past as the
           spiral and the list — the atelier's parts); this talk's own past is its lines, a row goes back to that line */}
       {drawer &&
@@ -1638,7 +1631,7 @@ function SpeakerGlyph({ off }: { off: boolean }) {
   );
 }
 
-/** M-R245: your bubble colour, picked once at the first talk (changeable in the settings) */
+/** M-R245: your bubble colour in the Moon settings (iPad feedback: no longer asked at the first talk — {bati} changes it too) */
 export function TonePicker({ onPick, current, inline = false }: { onPick: (id: string) => void; current?: string; inline?: boolean }) {
   const list = (
     <div className="flex flex-wrap justify-center gap-2.5">

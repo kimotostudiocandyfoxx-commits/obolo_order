@@ -1,0 +1,64 @@
+# One-off (iPad feedback 2026-11-24): {bati}'s default voice. The client's recording committed at
+# design/voices/default-bati-source.<ext> → +2 semitones (the egg recording's conversion) → a private Fish Audio
+# voice model (paid; approved as part of the product). The id is printed in the run's summary: set it as the
+# repository variable FISH_DEFAULT_VOICE_ID, then run "Deploy API". Run by hand only (Actions → Default Bati voice).
+name: Default Bati voice
+
+on:
+  workflow_dispatch:
+    inputs:
+      transcript:
+        description: 'What is said in the recording (optional; helps the cloning)'
+        required: false
+        default: ''
+      dry:
+        description: 'Only make the pitched MP3 (no Fish model)'
+        type: boolean
+        default: false
+
+env:
+  WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER || format('projects/{0}/locations/global/workloadIdentityPools/github/providers/github', vars.GCP_PROJECT_NUMBER) }}
+  DEPLOY_SA: ${{ vars.GCP_DEPLOY_SA || format('obolo-deployer@{0}.iam.gserviceaccount.com', vars.GCP_PROJECT_ID) }}
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @obolo/shared build
+      - name: ffmpeg
+        run: command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+      - uses: google-github-actions/auth@v2
+        if: ${{ !inputs.dry }}
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_SA }}
+      - uses: google-github-actions/setup-gcloud@v2
+        if: ${{ !inputs.dry }}
+      - name: Make the voice model
+        env:
+          TRANSCRIPT: ${{ inputs.transcript }}
+          DRY: ${{ inputs.dry && '--dry' || '' }}
+        run: |
+          if [ -z "$DRY" ]; then
+            FISH_API_KEY="$(gcloud secrets versions access latest --secret=obolo-fish-api-key)"
+            echo "::add-mask::$FISH_API_KEY"
+            export FISH_API_KEY
+          fi
+          cd apps/api && npx --yes tsx@4.19.2 scripts/make-default-bati-voice.ts $DRY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: default-bati-pitched
+          path: design/voices/default-bati-pitched.mp3
+          if-no-files-found: ignore

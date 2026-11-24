@@ -138,7 +138,8 @@ export class LineVoiceService implements OnModuleInit {
    * when it comes and goes on with the words alone if it does not. The answer was already checked by the buddy.
    */
   async batiSays(userId: string, text: string, origin: string): Promise<{ url: string } | null> {
-    // M-R246: the member's own {bati} voice (from the egg recording) when it is made; else the story's {bati} voice
+    // M-R246: the member's own {bati} voice (from the egg recording) when it is made; iPad feedback: else the shared
+    // default {bati} voice model (FISH_DEFAULT_VOICE_ID) when it is set; else the story's {bati} voice (Gemini)
     const own = await this.batiVoice?.speak(userId, speakText(text)).catch((e) => (this.log.warn(`own bati voice: ${String(e)}`), null));
     if (own) return { url: (await this.media.storeAudio(userId, 'audio/mpeg', own, origin)).url };
     const nl = await this.lines();

@@ -16,7 +16,6 @@ import { LineIcon } from '@/components/LineIcon';
 import { BatiSettings, MoonEgg, eggReady } from '@/components/bati/BatiSheet';
 import { EggMorning } from '@/components/bati/EggMorning';
 import { TalkComposer } from '@/components/talk/TalkComposer';
-import { useTalkTone } from '@/components/talk/useTalkTone';
 import { TalkScene, TonePicker } from '@/components/talk/TalkScene';
 import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone, TALK_COLOR_KEY } from '@/lib/talk/looks';
 
@@ -58,8 +57,6 @@ function BatiFace({ size = 36 }: { size?: number }) {
 function Chat() {
   const { m, t, locale } = useI18n();
   const { me, setMe } = useAuth();
-  // M-R245: your bubble colour (picked once)
-  const talkTone = useTalkTone();
   const api = getApi();
   const [eggOpen, setEggOpen] = useState(false);
   // SYS-S003: the morning the egg has grown, the scene opens by itself on the Moon (once a visit; the egg stays tappable)
@@ -150,8 +147,6 @@ function Chat() {
     <div className="flex min-h-0 flex-1 flex-col">
       {/* M-R232: the side-by-side talk — {bati} at the left, you at the right, the Moon behind */}
       <TalkScene
-        askTone={talkTone.ask}
-        onTone={talkTone.pick}
         people={[
           { id: 'bati', name, look: me?.bati ? batiLook(me.bati) : characterLook('kimorin'), color: BATI_COLOR },
           { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
