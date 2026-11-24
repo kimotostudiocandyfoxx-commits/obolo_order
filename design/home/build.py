@@ -48,14 +48,14 @@ if os.path.exists(_pearl):
         cv.alpha_composite(sh); cv.alpha_composite(im,(0,0)); cv=cv.crop((0,0,W,Hh))
         A['ballc-'+name]=uri(cv,88)
 # painted korolin (white background): cut the sphere out as a clean circle
-for n in range(1,17):
-    f=f'{O}/kor2-{n:02d}.jpg'
+for n,pre in [(n,pre) for pre in ('kor2','kor3') for n in range(1,17)]:
+    f=f'{O}/{pre}-{n:02d}.jpg'
     if not os.path.exists(f): continue
     from PIL import ImageDraw as _D2, ImageFilter as _F2
     im=Image.open(f).convert('RGB'); a=np.asarray(im).astype(int); m=(a.min(2)<232)|((a.max(2)-a.min(2))>18)
     ys,xs=np.where(m); x0,x1=np.percentile(xs,[.5,99.5]); y0,y1=np.percentile(ys,[.5,99.5]); cx,cy=(x0+x1)/2,(y0+y1)/2; r=min(x1-x0,y1-y0)/2-2
     S=4; mk=Image.new('L',(im.width*S,im.height*S),0); _D2.Draw(mk).ellipse(((cx-r)*S,(cy-r)*S,(cx+r)*S,(cy+r)*S),fill=255); mk=mk.resize(im.size,Image.LANCZOS)
-    o=im.convert('RGBA'); o.putalpha(mk); o=o.crop((int(cx-r-2),int(cy-r-2),int(cx+r+2),int(cy+r+2))); o.thumbnail((200,200),Image.LANCZOS); A[f'kor2-{n:02d}']=uri(o,88)
+    o=im.convert('RGBA'); o.putalpha(mk); o=o.crop((int(cx-r-2),int(cy-r-2),int(cx+r+2),int(cy+r+2))); o.thumbnail((200,200),Image.LANCZOS); A[f'{pre}-{n:02d}']=uri(o,88)
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
 if SAT=='home2-bg-saturn-cutea' and os.path.exists(H+'/saturn-record-mask.png'):

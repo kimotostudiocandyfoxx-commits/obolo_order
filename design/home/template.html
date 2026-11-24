@@ -95,9 +95,9 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .pick .ball img{width:100%;height:100%;border-radius:50%}
 .pick .ball .face{position:absolute;inset:0}
 .pick .ok{font:900 15px var(--f-body);background:var(--accent);color:#2a1630;border:0;border-radius:999px;padding:12px 26px;cursor:pointer}
-.face .shades{opacity:0;transform:translateY(-14px);transition:opacity .25s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.face .shades{opacity:0;transform-box:view-box;transform-origin:50% 51%;transform:translateY(-14px) scale(1.42);transition:opacity .25s,transform .35s cubic-bezier(.3,1.6,.5,1)}
 .face .shades .lz{fill:#141018}.face .shades .lz.pk{fill:#3a1238}.face .shades .lz.rd{fill:#3d0f22}.face .shades .br{stroke:#141018;stroke-width:3}.face .shades .gl{stroke:rgba(255,255,255,.7);stroke-width:2;stroke-linecap:round}
-.partying .face .shades{opacity:1;transform:none}
+.partying .face .shades{opacity:1;transform:scale(1.42)}
 .partying .face .eyes{visibility:hidden}
 .party{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .6s}
 .party.on{opacity:1}
@@ -316,8 +316,8 @@ const SHADES={
  star:'<g class="shades"><path class="lz pk" d="'+STAR(34,51,13)+'"/><path class="lz pk" d="'+STAR(66,51,13)+'"/><path class="br" d="M45 50 h10"/><path class="gl" d="M30 47 l3 -2 M62 47 l3 -2"/></g>',
  heart:'<g class="shades"><path class="lz rd" d="M35 61 C24 53 23 44 29 42 C32 41 34 43 35 45 C36 43 38 41 41 42 C47 44 46 53 35 61z"/><path class="lz rd" d="M65 61 C54 53 53 44 59 42 C62 41 64 43 65 45 C66 43 68 41 71 42 C77 44 76 53 65 61z"/><path class="br" d="M45 48 h10"/><path class="gl" d="M29 46 l3 -2 M59 46 l3 -2"/></g>'};
 function shadesSVG(sh){return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true">${SHADES[sh||'round']}</svg>`}
-const KOR2=Array.from({length:16},(_,i)=>'kor2-'+String(i+1).padStart(2,'0'));
-const HAS2=()=>!!A['kor2-01'];
+const KPRE=()=>A['kor3-01']?'kor3-':'kor2-',KOR2=new Proxy([],{get:(o,k)=>k==='map'?(f=>Array.from({length:16},(_,i)=>KPRE()+String(i+1).padStart(2,'0')).map(f)):(/^\d+$/.test(k)?KPRE()+String(+k+1).padStart(2,'0'):o[k])});
+const HAS2=()=>!!(A['kor2-01']||A['kor3-01']);
 function faceSVG(f,sh){
   const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
   const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
