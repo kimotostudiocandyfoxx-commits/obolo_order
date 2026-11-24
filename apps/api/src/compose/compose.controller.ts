@@ -11,6 +11,7 @@ import { JobsService } from '../jobs/jobs.service';
 import { SongService } from './song.service';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
+import { startConfirmed } from '../wallet/confirmed';
 
 /** Mercury 作曲 (see ComposeService). */
 @Controller('compose')
@@ -67,14 +68,20 @@ export class ComposeController {
   async fullSong(@UserId() userId: string, @Body() body: unknown, @Req() req: Request) {
     const b = parseBody(FullSongBody, body);
     await rateLimit(this.kv, `compose-song:${userId}`, 20, 86400);
-    // a song costs mana (2): taken before the studio starts; given back if the job cannot be queued
-    const fee = await this.ledger.charge(this.db, userId, 'song');
-    try {
-      return await this.jobs.create(userId, 'song', { body: b, origin: `${req.protocol}://${req.get('host')}` });
-    } catch (e) {
-      await fee.refund();
-      throw e;
-    }
+    // a song costs mana (2): taken before the studio starts; given back if the job cannot be queued. R11: from the Moon
+    // atelier only with the member's yes to the plan and its price (once per yes)
+    const { confirm, ...song } = b;
+    return startConfirmed({
+      ledger: this.ledger,
+      db: this.db,
+      kv: this.kv,
+      jobs: this.jobs,
+      userId,
+      kind: 'song',
+      confirm,
+      required: b.from === 'atelier',
+      create: () => this.jobs.create(userId, 'song', { body: song, origin: `${req.protocol}://${req.get('host')}` }),
+    });
   }
 
   /** Your saved songs (the soil of your island on Mercury). */

@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { applyDelta, assertInteger, LedgerError, ManaReason } from '@obolo/ledger';
-import { MAKE_COST, type MakeKind } from '@obolo/shared';
+import { CHARGE_ERROR_WORDS, confirmKey, decideCharge, MAKE_COST, type ChargeError, type MakeConfirm, type MakeKind } from '@obolo/shared';
 import { randomUUID } from 'node:crypto';
 import { apiError } from '../common/errors';
 import { and, asc, eq, isNull, sql } from 'drizzle-orm';
@@ -86,24 +86,58 @@ export class LedgerService {
     return tail;
   }
 
+  /** the member's balance, the wallet row locked for this transaction (serialises a double tap) */
+  protected async lockedBalance(tx: Tx, userId: string): Promise<number> {
+    const [wallet] = await tx.select().from(wallets).where(eq(wallets.userId, userId)).for('update');
+    if (!wallet) throw new Error(`wallet missing for ${userId}`);
+    return wallet.manaBalance;
+  }
+
+  /** a ledger row with this idempotency key is there already */
+  protected async applied(tx: Tx, key: string): Promise<boolean> {
+    const [dupe] = await tx.select({ id: manaLedger.id }).from(manaLedger).where(eq(manaLedger.idempotencyKey, key)).limit(1);
+    return !!dupe;
+  }
+
   /**
    * Making with mana (story M-R132, D08-S002's table): takes the cost from the gem / the month's mana before
    * the work is made. Not enough → 402 NO_MANA (「マナジェムが、光らなくなった」; a resident is then offered the
    * Eclipse). Returns `refund`, to give it back when the making fails.
+   * R11: `confirm` is the member's yes to the plan and the price shown (MakeConfirm). With `required` (a request from the
+   * Moon atelier) nothing is charged without it (428 CONFIRM_REQUIRED) or at another price (409 PRICE_CHANGED); the same
+   * yes again is no new charge (`repeat`: the caller hands back what the first one started, never a second making).
    */
-  async charge(db: Database, userId: string, kind: MakeKind, refId?: string): Promise<{ refund: () => Promise<void> }> {
+  async charge(db: Database, userId: string, kind: MakeKind, refId?: string, opts: { confirm?: MakeConfirm; required?: boolean } = {}): Promise<{ refund: () => Promise<void>; repeat: boolean }> {
     const amount = MAKE_COST[kind];
-    const key = `make:${kind}:${userId}:${randomUUID()}`;
+    const key = opts.confirm ? confirmKey(userId, kind, opts.confirm) : `make:${kind}:${userId}:${randomUUID()}`;
+    let repeat = false;
     try {
-      await db.write.transaction((tx) => this.applyMana(tx, { userId, delta: -amount, reason: 'generation', idempotencyKey: key, refType: kind, refId }));
+      await db.write.transaction(async (tx) => {
+        const balance = await this.lockedBalance(tx, userId);
+        const d = decideCharge({ kind, confirm: opts.confirm, required: !!opts.required, balance, applied: !!opts.confirm && (await this.applied(tx, key)) });
+        if ('error' in d) throw chargeRefused(d.error);
+        if (d.do === 'repeat') {
+          repeat = true;
+          return;
+        }
+        await this.applyMana(tx, { userId, delta: -d.amount, reason: 'generation', idempotencyKey: key, refType: kind, refId });
+      });
     } catch (e) {
-      if (e instanceof LedgerError) throw apiError(HttpStatus.PAYMENT_REQUIRED, 'NO_MANA', 'マナジェムが、光らなくなった');
+      if (e instanceof LedgerError) throw chargeRefused('NO_MANA');
       throw e;
     }
     return {
+      repeat,
       refund: async () => {
+        if (repeat) return;
         await db.write.transaction((tx) => this.applyMana(tx, { userId, delta: amount, reason: 'refund', idempotencyKey: `${key}:refund`, refType: kind, refId }));
       },
     };
   }
+}
+
+/** a charge refused, as the API's error (no codes on screen: the words are {bati}'s) */
+export function chargeRefused(code: ChargeError) {
+  const status = code === 'NO_MANA' ? HttpStatus.PAYMENT_REQUIRED : code === 'CONFIRM_REQUIRED' ? HttpStatus.PRECONDITION_REQUIRED : HttpStatus.CONFLICT;
+  return apiError(status, code, CHARGE_ERROR_WORDS[code]);
 }

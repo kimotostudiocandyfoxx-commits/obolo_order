@@ -7,7 +7,7 @@ const holes = (t: string) => [...new Set([...t.matchAll(/\{[a-z_]+\}/g)].map((m)
 
 describe("M-R253 §6: {bati}'s Moon atelier lines", () => {
   it('every fixed line has all the common styles, with the same placeholders', () => {
-    expect(MOON_LINE_TEXTS).toHaveLength(30);
+    expect(MOON_LINE_TEXTS).toHaveLength(39);
     for (const line of MOON_LINE_TEXTS) {
       const v = BATI_VARIANTS[line];
       expect(v, line).toBeDefined();
@@ -16,6 +16,16 @@ describe("M-R253 §6: {bati}'s Moon atelier lines", () => {
         expect(holes(v[p].replace(/\{neo\}(さん|っち|ちゃん)/g, '{neo}')), `${p} 「${line}」`).toEqual(holes(line));
       }
     }
+  });
+  it('R11: the waiting lines send you back to this talk, never elsewhere (no planet, no Bluena, no ダチ talk)', () => {
+    const waits = [MOON_LINES.backSong, ...MOON_LINES.back, MOON_LINES.backBig];
+    for (const line of waits) {
+      for (const said of [line, ...Object.values(BATI_VARIANTS[line])]) {
+        expect(said).not.toMatch(/\{planet\}|Bluena|ブルーナ|ダチ|星|見てくる|のぞいて|ゆっくりしてきて/);
+      }
+    }
+    expect(fillLine(MOON_LINES.backSong, { n: 4 })).toBe('この曲は、だいたい4分かかるよ。できたころに、このトークに戻ってきてね。');
+    expect(MOON_LINES).not.toHaveProperty('backSongBluena');
   });
   it('rendered in the manner, then filled', () => {
     expect(fillLine(batiSay(MOON_LINES.push, { personality: 'teinei' }), { bati: 'タコポン', work: '夏ロック' })).toBe('タコポン：夏ロック、できたよ！　見に来てください。');

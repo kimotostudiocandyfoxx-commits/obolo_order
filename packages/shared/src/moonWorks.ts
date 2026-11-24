@@ -280,11 +280,30 @@ export const MOON_LINES = {
     radio: '今まで作った曲を流して、しゃべってみる？　DJ、{neo}。',
   },
   fresh: '了解！　まっさらから、いこう。',
-  /** ② slow work: when to come back ({planet}: one reachable today; none yet → the Bluena line) */
-  backSong: 'この曲は、だいたい{n}分かかるよ。{n}分後に戻ってきてね。そのあいだ、{planet}でも見てくる？',
-  backSongBluena: 'この曲は、だいたい{n}分かかるよ。{n}分後に戻ってきてね。Bluenaでも開いてみる？',
-  back: ['よし、作り始めた！　だいたい{n}分。{n}分後に、ここで会おう。', '{n}分くらい、かかりそう。ダチのトークでも、のぞいてきなよ。できたら、呼ぶから。'],
-  backBig: 'これは、ちょっと大物。だいたい{n}分。ゆっくりしてきて。ちゃんと、呼ぶから。',
+  /**
+   * ② slow work: when to come back — R11 (client): to this talk, never tempted elsewhere (no planet, no Bluena, no ダチ
+   * talk while it is made)
+   */
+  backSong: 'この曲は、だいたい{n}分かかるよ。できたころに、このトークに戻ってきてね。',
+  back: ['よし、作り始めた！　だいたい{n}分。できたころに、このトークに戻ってきてね。', '{n}分くらい、かかりそう。できたら、このトークで見せるね。'],
+  backBig: 'これは、ちょっと大物。だいたい{n}分。できたころに、このトークに戻ってきてね。',
+  /**
+   * R11 (client): before anything that spends mana — a vague ask gets one question (with a few ideas as chips), a clear
+   * one a plan; the plan's card shows the mana it takes and the mana you have; only a yes starts it ({plan} = the plan,
+   * {mana} = its price, {short} = the mana missing)
+   */
+  ask: {
+    song: 'いいね！　どんな曲にする？　気分やテーマを教えて。',
+    art: 'いいね！　どんな絵にする？　描きたいものを教えて。',
+    video: 'いいね！　どんな映像にする？　雰囲気を教えて。',
+    look: 'いいね！　どんなふうに変える？',
+    bati: 'いいね！　どんなかっこうにする？',
+  },
+  plan: 'こんな感じで作るよ：{plan}。マナを{mana}使うけど、これでいい？',
+  replan: 'わかった、こう変えるね：{plan}。マナを{mana}使うけど、これでいい？',
+  change: 'オッケー、どう変える？　言ってみて。',
+  start: 'よし、作るね！',
+  noMana: 'ごめん、マナが{short}たりないみたい。',
   /** ③ late; the second time its own line */
   late: ['ごめん、あと1分だけ！　いま、いちばん、いい所。', 'ごめん、ちょっと混んでる。あと{n}分、ちょうだい。'],
   late2: '……ほんとに、ごめん。あと{n}分。その分、いいの作る。',

@@ -5,6 +5,7 @@ import { VOICE_STYLE_IDS } from './neoVoice';
 import { PuniLook } from './puni';
 import { BATI_PERSONALITY_IDS } from './batiPersona';
 import { BATI_ROLES } from './batiMemory';
+import { MakeConfirm } from './makeConfirm';
 
 export const RequestCodeBody = z.object({
   email: z.string().trim().toLowerCase().email().max(254),
@@ -258,7 +259,13 @@ export type BatiNameBody = z.infer<typeof BatiNameBody>;
 
 /** Bati's room (the Moon, P-BATI-ROOM): dress up / transform the Bati a little — the same creature, changed by the wish. */
 // M-R223: no wish = four art touches of the {bati} now; `from` = a candidate tapped just before (the new four start from it)
-export const BatiRestyleBody = z.object({ wish: z.string().trim().max(60).optional(), from: z.string().uuid().optional() });
+export const BatiRestyleBody = z.object({
+  wish: z.string().trim().max(60).optional(),
+  from: z.string().uuid().optional(),
+  /** R11: asked in the Moon atelier — a paid round needs the member's yes (MakeConfirm) */
+  via: z.literal('atelier').optional(),
+  confirm: MakeConfirm.optional(),
+});
 export type BatiRestyleBody = z.infer<typeof BatiRestyleBody>;
 /** one of the restyle candidates becomes the Bati picture */
 export const BatiRestyleChooseBody = z.object({ id: z.string().uuid() });
@@ -293,7 +300,14 @@ export type ConfirmOrderBody = z.infer<typeof ConfirmOrderBody>;
 /** Day 3: refine the chosen look with one instruction (3 times). */
 /** `mediaId` left out: the look worn now (the second journey's basin, L2-MOON-S002, changes the current look) */
 /** `magic`: Bati's magic in Bati's room (the Moon, P-BATI-ROOM) — counted per day, so the visitor can keep changing it until they like it */
-export const RefineLookBody = z.object({ mediaId: z.string().uuid().optional(), instruction: z.string().trim().min(1).max(60), magic: z.boolean().optional() });
+export const RefineLookBody = z.object({
+  mediaId: z.string().uuid().optional(),
+  instruction: z.string().trim().min(1).max(60),
+  magic: z.boolean().optional(),
+  /** R11: asked in the Moon atelier — a paid round needs the member's yes (MakeConfirm) */
+  via: z.literal('atelier').optional(),
+  confirm: MakeConfirm.optional(),
+});
 export type RefineLookBody = z.infer<typeof RefineLookBody>;
 
 /** Mercury 作曲: the conversation so far (the partner's and the visitor's lines). */
@@ -415,6 +429,8 @@ export const FullSongBody = SingBody.omit({ melody: true, instrumentalUrl: true,
   seconds: z.number().min(10).max(180),
   /** M-R253 §4: asked in the Moon atelier (the push opens its card there) */
   from: z.literal('atelier').optional(),
+  /** R11: the member's yes to the plan and its price (required from the Moon atelier) */
+  confirm: MakeConfirm.optional(),
 });
 export type FullSongBody = z.infer<typeof FullSongBody>;
 
@@ -509,7 +525,13 @@ export type CreateJupiterPostBody = z.infer<typeof CreateJupiterPostBody>;
  * (a kororin's words). The picture is kept only for the member; it is posted nowhere.
  */
 /** Jupiter's art (M-R151): the words, and the touch said to {bati} (the spell's style cards, M-R142) */
-export const StickerArtBody = z.object({ text: z.string().trim().min(1).max(60), style: z.string().trim().max(80).optional() });
+export const StickerArtBody = z.object({
+  text: z.string().trim().min(1).max(60),
+  style: z.string().trim().max(80).optional(),
+  /** R11: asked in the Moon atelier — needs the member's yes (MakeConfirm) */
+  from: z.literal('atelier').optional(),
+  confirm: MakeConfirm.optional(),
+});
 export type StickerArtBody = z.infer<typeof StickerArtBody>;
 
 /** A reply to a Jupiter post. */

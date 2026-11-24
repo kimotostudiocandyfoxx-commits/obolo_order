@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
-import { AddMvMaterialBody, CreateMvBody } from '@obolo/shared';
+import { AddMvMaterialBody, CreateMvBody, MakeConfirm } from '@obolo/shared';
 import { z } from 'zod';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
@@ -11,9 +11,10 @@ import { JobsService } from '../jobs/jobs.service';
 import { MvService } from './mv.service';
 import { Database } from '../db/db';
 import { LedgerService } from '../wallet/ledger.service';
+import { startConfirmed } from '../wallet/confirmed';
 
 const MaterialBody = AddMvMaterialBody.extend({ posterUrl: z.string().url().max(500).nullish(), seconds: z.number().min(0).max(3600).nullish() });
-const StoryBody = z.object({ mood: z.string().trim().max(200).default(''), from: z.literal('atelier').optional() });
+const StoryBody = z.object({ mood: z.string().trim().max(200).default(''), from: z.literal('atelier').optional(), confirm: MakeConfirm.optional() });
 const origin = (req: Request) => `${req.protocol}://${req.get('host')}`;
 
 /** Mars MV studio: a Mercury song + videos / photos → Bati's MV (docs/placeholders.md P-MV). */
@@ -69,15 +70,21 @@ export class MvController {
   async story(@UserId() userId: string, @Param('id', new ParseUUIDPipe()) id: string, @Body() body: unknown, @Req() req: Request) {
     await rateLimit(this.kv, `mv-render:${userId}`, 6, 3600);
     await this.mv.get(userId, id); // yours? (fails before queueing)
-    // an MV costs mana (8): taken before the shoot; given back if the job cannot be queued
-    const fee = await this.ledger.charge(this.db, userId, 'mv', id);
-    try {
-      const b = parseBody(StoryBody, body);
-      return await this.jobs.create(userId, 'mv-story', { mvId: id, mood: b.mood, origin: origin(req), from: b.from });
-    } catch (e) {
-      await fee.refund();
-      throw e;
-    }
+    // an MV costs mana (8): taken before the shoot; given back if the job cannot be queued. R11: from the Moon atelier
+    // only with the member's yes to the plan and its price (once per yes)
+    const b = parseBody(StoryBody, body);
+    return startConfirmed({
+      ledger: this.ledger,
+      db: this.db,
+      kv: this.kv,
+      jobs: this.jobs,
+      userId,
+      kind: 'mv',
+      refId: id,
+      confirm: b.confirm,
+      required: b.from === 'atelier',
+      create: () => this.jobs.create(userId, 'mv-story', { mvId: id, mood: b.mood, origin: origin(req), from: b.from }),
+    });
   }
 
   /** The same MV with the lyrics on it — a background job too. */
