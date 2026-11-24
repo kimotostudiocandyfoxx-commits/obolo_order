@@ -80,6 +80,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @media (prefers-reduced-motion:reduce){.face .eyes{animation:none}}
 .puni .bname{position:absolute;left:50%;top:79%;transform:translate(-50%,-50%);max-width:84%;padding:1.5px 4px 1px;border-radius:999px;background:rgba(48,22,72,.42);box-shadow:inset 0 .5px 0 rgba(255,255,255,.25);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-family:var(--f-body);line-height:1;color:#fff;letter-spacing:-.02em;text-shadow:0 .5px 1px rgba(30,10,50,.5);pointer-events:none}
 .puni .fwrap{position:absolute;inset:0}
+.puni .body.k2 img{border-radius:50%;filter:drop-shadow(0 4px 5px rgba(30,10,50,.35))}.puni .body.k2 .face{position:absolute;inset:0}.puni .body.k2 .bname{top:84%}
 .face .ln{fill:none;stroke:#2a1a22;stroke-width:3;stroke-linecap:round}
 .face .st{fill:#ffd23f;stroke:#2a1a22;stroke-width:1.2}
 .face .mo2{fill:#2a1a22}.face .mo3{fill:#2a1a22;stroke:#2a1a22;stroke-width:1.5;stroke-linejoin:round}
@@ -90,6 +91,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .pick button{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:8px 4px 6px;color:var(--ink);font:700 11px var(--f-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
 .pick button[aria-pressed=true]{border-color:var(--accent);background:rgba(255,255,255,.22)}
 .pick .ball{position:relative;width:58px;height:58px}
+.pick .g button{padding:6px 2px 4px}.pick .ball img{filter:drop-shadow(0 3px 4px rgba(30,10,50,.35))}
 .pick .ball img{width:100%;height:100%;border-radius:50%}
 .pick .ball .face{position:absolute;inset:0}
 .pick .ok{font:900 15px var(--f-body);background:var(--accent);color:#2a1630;border:0;border-radius:999px;padding:12px 26px;cursor:pointer}
@@ -313,6 +315,9 @@ const SHADES={
  way:'<g class="shades"><path class="lz" d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z"/><path class="br" d="M46 49 h8"/><path class="gl" d="M27 48 l6 0 M61 48 l6 0"/></g>',
  star:'<g class="shades"><path class="lz pk" d="'+STAR(34,51,13)+'"/><path class="lz pk" d="'+STAR(66,51,13)+'"/><path class="br" d="M45 50 h10"/><path class="gl" d="M30 47 l3 -2 M62 47 l3 -2"/></g>',
  heart:'<g class="shades"><path class="lz rd" d="M35 61 C24 53 23 44 29 42 C32 41 34 43 35 45 C36 43 38 41 41 42 C47 44 46 53 35 61z"/><path class="lz rd" d="M65 61 C54 53 53 44 59 42 C62 41 64 43 65 45 C66 43 68 41 71 42 C77 44 76 53 65 61z"/><path class="br" d="M45 48 h10"/><path class="gl" d="M29 46 l3 -2 M59 46 l3 -2"/></g>'};
+function shadesSVG(sh){return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true">${SHADES[sh||'round']}</svg>`}
+const KOR2=Array.from({length:16},(_,i)=>'kor2-'+String(i+1).padStart(2,'0'));
+const HAS2=()=>!!A['kor2-01'];
 function faceSVG(f,sh){
   const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
   const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
@@ -327,7 +332,7 @@ function faceSVG(f,sh){
 }
 function korPicker(done){
   const ph=$('phone'),d=document.createElement('div');d.className='pick';let sel=window.MYKORO??0;
-  d.innerHTML='<h3>あなたのコロリンを選んでね</h3><div class="g">'+KOROS.map((k,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===sel}"><span class="ball"><img alt="" src="${A['ballc-'+k.c]||''}">${faceSVG(k.f)}</span></button>`).join('')+'</div><button class="ok" type="button">これにする</button><small style="opacity:.75;font-size:11px">あとから、月で{bati}に頼めば色や顔を変えられるよ</small>'.replace('{bati}','バティ');
+  d.innerHTML='<h3>あなたのコロリンを選んでね</h3><div class="g">'+(HAS2()?KOR2.map((k,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===sel}" aria-label="コロリン ${i+1}"><span class="ball"><img alt="" src="${A[k]}"></span></button>`):KOROS.map((k,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===sel}"><span class="ball"><img alt="" src="${A['ballc-'+k.c]||''}">${faceSVG(k.f)}</span></button>`)).join('')+'</div><button class="ok" type="button">これにする</button><small style="opacity:.75;font-size:11px">あとから、月で{bati}に頼めば色や顔を変えられるよ</small>'.replace('{bati}','バティ');
   d.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.classList.contains('ok')){window.MYKORO=sel;d.style.display='none';done();return}sel=+b.dataset.i;d.querySelectorAll('.g button').forEach(x=>x.setAttribute('aria-pressed',x===b))};
   ph.appendChild(d);
 }
@@ -340,9 +345,9 @@ function setupRoll(){
 }
 function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,L=W*.04,Rw=W*.96;const R=22+((i*7)%3)*4,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
-    const kp=o.n===ME?(window.MYKORO??0):(i*3+o.n.length)%8,K=KOROS[kp];
+    const kp=o.n===ME?(window.MYKORO??0):(i*5+o.n.length*3)%(HAS2()?16:8),K=KOROS[kp%8],sh=(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})();
     const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
-    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div>${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`;$('sky').appendChild(e);
+    e.innerHTML=HAS2()?`<div class="body k2"><img alt="" src="${A[KOR2[kp]]}" style="transform:rotate(${fr*.6}deg)">${shadesSVG(sh)}${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`:`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div>${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:slot>=0?-R-slot*70:-R-40,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
