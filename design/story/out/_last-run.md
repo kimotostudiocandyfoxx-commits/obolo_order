@@ -1,8 +1,7 @@
-# Story images — 2026-11-24T09:48:29.421Z
+# Story images — 2026-11-24T09:53:21.164Z
 
-Seedream 5.0 Pro（runware）/ 新しく描いた: 8枚 / キューの項目: 135件 / 費用の目安: 約56円
+Seedream 5.0 Pro（runware）/ 新しく描いた: 6枚 / キューの項目: 138件 / 費用の目安: 約42円
 
-- ✅ moon-temple-open-a（1152x2048, 参考 2枚）: 2枚
-- ✅ moon-temple-open-c（1152x2048, 参考 2枚）: 2枚
-- ✅ moon-temple-open-b（1152x2048, 参考 2枚）: 2枚
-- ✅ moon-temple-open-d（1152x2048, 参考 2枚）: 2枚
+- ✅ moon-zone-outside（1152x2048, 参考 1枚）: 2枚
+- ✅ moon-zone-bati（1152x2048, 参考 1枚）: 2枚
+- ✅ moon-zone-dachi（1152x2048, 参考 1枚）: 2枚
