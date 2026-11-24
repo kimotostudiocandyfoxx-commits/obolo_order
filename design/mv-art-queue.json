@@ -10027,6 +10027,44 @@
       ],
       "always": false,
       "prompt": "The egg's body is divided by a graceful S-shaped yin-yang curve, exactly like the SECOND reference picture: one half is planet Earth (blue oceans, continents, white clouds) and the other half is the Moon's grey cratered surface, the two halves flowing into each other along the curve with a soft glowing pearly seam. The round screen sits in the very centre of the egg, right on the curve, filled edge to edge with no gap by a glowing view of the Earth and Moon embracing each other in space. Keep exactly the same product shape, proportions, camera angle, soft studio lighting and soft lavender-grey background as the FIRST reference picture: an egg-shaped device standing upright with one round screen set into its front, framed by a thin polished silver bezel. Remove the small camera lens on the top completely — the top of the egg is smooth with no lens and no holes. Premium, realistic, beautifully lit product photo, high detail, no text, no logo."
+    },
+    {
+      "id": "bluena3-moon-earth",
+      "refs": [],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        1024,
+        1024
+      ],
+      "always": false,
+      "prompt": "Drawn as a dreamy, cute, trendy illustration that teenage girls and young women love: soft pastel colours (lilac, baby pink, mint, sky blue, cream), pearly iridescent sheen, soft airbrushed gradients, gentle glow, tiny sparkles and little stars floating around, clean smooth shapes, kawaii lifestyle-gadget design like a premium Japanese/Korean character-goods brand, not photo-realistic. An egg-shaped gadget standing upright on a soft pastel background, with one round screen set into its front framed by a thin rose-gold bezel. The top is smooth with no camera lens. Centered, the whole egg in frame, soft shadow, no text, no logo. The egg's body is a cute stylised Moon: pale lavender-cream with soft pastel round craters and little sparkles, matte and velvety. The round screen is filled completely edge to edge, no gap, by a cute stylised Earth: pastel blue ocean, simple mint-green continents, puffy white clouds, a soft pink glow at the rim. "
+    },
+    {
+      "id": "bluena3-earth-moon",
+      "refs": [],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        1024,
+        1024
+      ],
+      "always": false,
+      "prompt": "Drawn as a dreamy, cute, trendy illustration that teenage girls and young women love: soft pastel colours (lilac, baby pink, mint, sky blue, cream), pearly iridescent sheen, soft airbrushed gradients, gentle glow, tiny sparkles and little stars floating around, clean smooth shapes, kawaii lifestyle-gadget design like a premium Japanese/Korean character-goods brand, not photo-realistic. An egg-shaped gadget standing upright on a soft pastel background, with one round screen set into its front framed by a thin rose-gold bezel. The top is smooth with no camera lens. Centered, the whole egg in frame, soft shadow, no text, no logo. The egg's body is a cute stylised Earth: pastel sky-blue and aqua ocean with simple soft mint and peach continents and puffy white swirl clouds, a satin pearly finish. The round screen is filled completely edge to edge, no gap, by a cute glowing stylised full Moon in cream and lavender with soft round craters and a tiny sparkle. "
+    },
+    {
+      "id": "bluena3-yinyang",
+      "refs": [
+        "docs/story-rewrite/design/refs/props/egg-earth-moon.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        1024,
+        1024
+      ],
+      "always": false,
+      "prompt": "Drawn as a dreamy, cute, trendy illustration that teenage girls and young women love: soft pastel colours (lilac, baby pink, mint, sky blue, cream), pearly iridescent sheen, soft airbrushed gradients, gentle glow, tiny sparkles and little stars floating around, clean smooth shapes, kawaii lifestyle-gadget design like a premium Japanese/Korean character-goods brand, not photo-realistic. An egg-shaped gadget standing upright on a soft pastel background, with one round screen set into its front framed by a thin rose-gold bezel. The top is smooth with no camera lens. Centered, the whole egg in frame, soft shadow, no text, no logo. The egg's body is split by a graceful S-shaped yin-yang curve: one side a cute stylised pastel Earth (blue ocean, mint continents, white clouds), the other side a cute stylised pastel Moon (lavender-cream with soft craters); along the curve a glowing pearly pink-gold ribbon of light where they softly blend, with a few stars. The round screen sits in the centre on the curve, filled completely edge to edge by a cute pastel Earth and Moon hugging each other with a tiny heart-shaped sparkle between them. "
     }
   ],
   "redo": []
