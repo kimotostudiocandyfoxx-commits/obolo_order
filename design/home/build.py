@@ -49,5 +49,14 @@ if os.path.exists(_pearl):
         A['ballc-'+name]=uri(cv,88)
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
+if SAT=='home2-bg-saturn-cutea' and os.path.exists(H+'/saturn-record-mask.png'):
+    import numpy as np
+    from PIL import ImageFilter
+    src=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); mk=np.array(Image.open(H+'/saturn-record-mask.png').convert('L').resize(src.size))>128
+    Hh,Ww=mk.shape; yy,xx=np.mgrid[0:Hh,0:Ww]; cx,cy,rx,ry=.481*Ww,.702*Hh,.574*Ww,.1885*Hh
+    inside=((xx-cx)/rx)**2+((yy-cy)/ry)**2<1
+    fg=(~mk)&(yy>cy)&((~inside)|(yy>cy+.6*ry))
+    al=Image.fromarray((fg*255).astype('uint8')).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.6))
+    fi=src.convert('RGBA'); fi.putalpha(al); fi.thumbnail((720,1280)); A['sat-fg']=uri(fi,82)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
 open(H+'/home-inline.html','w').write(t); print(len(A),'assets',round(len(t)/1e6,2),'MB')
