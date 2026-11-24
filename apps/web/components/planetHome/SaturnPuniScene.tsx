@@ -10,21 +10,20 @@ import s from './PlanetHome.module.css';
 
 /**
  * Saturn (M-R259, as the client changed it for R2; design/home/home-inline.html Saturn mode): a huge record fills the
- * screen (its label on the left, the needle-mic and the play button in front). The new kororins are the 10/7 ぷにぷに —
+ * screen, seen from a low angle (its centre label, the needle raised beside it). The new kororins are the 10/7 ぷにぷに —
  * round soft balls with their maker's puni face (author.pic; a drawn one in their colour when there is none) — run by
  * the same soft physics (components/puni/PuniPhysicsLayer). They fall from the sky and pile up on the record (50–80% of
  * the height, 16–86% of the width, at most 12), squash when they bump, dent and bounce when poked and talk (name and
  * words over their head), can be dragged and thrown, and when they have finished they are drawn into the groove by
- * the label (heard, kept; not deleted). Tap the record itself: a ripple, and the nearest one hops.
+ * the centre label (heard, kept; not deleted). Tap the record itself: a ripple, and the nearest one hops.
  * With prefers-reduced-motion they sit still in rows and only fade into the groove.
  */
-/** the record's face where they pile (shares of the screen) */
-const FACE = { x0: 0.16, x1: 0.86, floor: 0.8 };
-/** the groove by the label they are drawn into, and the needle-mic (shares of the screen) */
-const GROOVE = { x: 0.07, y: 0.69 };
-const NEEDLE = { x: 52, y: 68 };
-/** the painted play button (bottom right of the backdrop): plays the grooves, like 〔▶ 全部流す〕 */
-const PLAY_SPOT = { x: 82, y: 89, r: 9 };
+/** the record's face where they pile (shares of the screen): the low-angle record (home2-bg-saturn-lowb) covers 53–85% of
+ * the height and the whole width; they settle on its floor at 84% (design/home Saturn mode) */
+const FACE = { x0: 0.04, x1: 0.96, floor: 0.84 };
+/** the groove by the centre label they are drawn into, and where the singer comes out by the raised needle (shares of the screen) */
+const GROOVE = { x: 0.6, y: 0.6 };
+const NEEDLE = { x: 74, y: 60 };
 const HOLD_MS = 480;
 /** a name plate's height (px) */
 const PLATE_H = 14;
@@ -283,19 +282,9 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
   return (
     <div ref={root} className={s.scene}>
       <div className={s.bg} style={{ backgroundImage: `url(${cfg.art.backdrop})`, transform: 'none' }} />
-      <button type="button" className={s.plate} style={{ bottom: '12%', zIndex: 5 }} onClick={onPlate} data-testid="name-plate">
+      <button type="button" className={s.plate} style={{ bottom: 'auto', top: '49%', zIndex: 5 }} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
       </button>
-      {/* the painted play button: the grooves at the needle-mic */}
-      {onPlay && (
-        <button
-          type="button"
-          aria-label="全部流す"
-          className={s.paintedPlay}
-          style={{ left: `${PLAY_SPOT.x}%`, top: `${PLAY_SPOT.y}%`, width: `${PLAY_SPOT.r * 2}vw`, height: `${PLAY_SPOT.r * 2}vw` }}
-          onClick={onPlay}
-        />
-      )}
       <div
         ref={face}
         className={s.puniFace}
@@ -312,7 +301,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
           <PuniPhysicsLayer
             ref={layer}
             items={items}
-            floorAt={(x, W, H) => H * (FACE.floor - 0.015 * (x / W))}
+            floorAt={(_x, _W, H) => H * FACE.floor}
             onTap={tapBall}
             onTapEmpty={tapEmpty}
             onFrame={onFrame}
