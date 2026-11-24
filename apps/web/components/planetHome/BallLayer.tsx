@@ -2,7 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from 'react';
 import type { KororinFace as KororinFaceId } from '@obolo/shared';
-import { newBall, press, release, stepBalls, type Ball } from '@/lib/planetHome/ballPhysics';
+import { hop, newBall, press, release, stepBalls, THROW, type Ball } from '@/lib/planetHome/ballPhysics';
 import { faceTurn, KororinFace } from './KororinFace';
 import s from './PlanetHome.module.css';
 
@@ -37,20 +37,28 @@ export const BallLayer = forwardRef<
   BallLayerHandle,
   {
     items: BallItem[];
-    /** the floor, a share of the layer's height */
+    /** the floor, a share of the layer's height; or (M-R268) the floor's y at x, in the layer's px */
     floor: number;
+    floorAt?: (x: number) => number;
+    /** M-R268: the record spins — the balls hop and sway at `bpm`, drifting left */
+    spin?: boolean;
+    bpm?: number;
     onTap: (id: string) => void;
     onTapEmpty?: () => void;
     onFrame?: (get: (id: string) => Ball | undefined) => void;
   }
->(function BallLayer({ items, floor, onTap, onTapEmpty, onFrame }, ref) {
+>(function BallLayer({ items, floor, floorAt, spin = false, bpm = 124, onTap, onTapEmpty, onFrame }, ref) {
   const box = useRef<HTMLDivElement>(null);
   const balls = useRef<Ball[]>([]);
   const outer = useRef(new Map<string, HTMLDivElement>());
   const inner = useRef(new Map<string, HTMLDivElement>());
   const [W, setW] = useState(0);
-  const cb = useRef({ onTap, onTapEmpty, onFrame });
-  cb.current = { onTap, onTapEmpty, onFrame };
+  const cb = useRef({ onTap, onTapEmpty, onFrame, floorAt, spin, bpm });
+  cb.current = { onTap, onTapEmpty, onFrame, floorAt, spin, bpm };
+  const floorY = (x: number) => {
+    const el = box.current!;
+    return cb.current.floorAt ? cb.current.floorAt(x) : el.clientHeight * floor;
+  };
   const grab = useRef<{ id: string | null; pid: number; t0: number; x0: number; y0: number; dx: number; dy: number; moved: boolean; hist: { t: number; x: number; y: number }[] } | null>(null);
 
   useEffect(() => {
@@ -74,7 +82,7 @@ export const BallLayer = forwardRef<
         return old;
       }
       const x = Math.max(it.R, Math.min(W - it.R, W * (0.1 + ((i * 0.618) % 1) * 0.8)));
-      const b = newBall(it.id, x, -it.R * 2 - (i % 6) * it.R * 1.6, it.R, i * 1.7);
+      const b = newBall(it.id, x, -it.R * 2 - (i % 6) * it.R * 1.6, it.R, i * 1.7, it.turn);
       b.vx = (Math.random() - 0.5) * 120;
       return b;
     });
@@ -101,13 +109,21 @@ export const BallLayer = forwardRef<
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
+    let lastBeat = -1;
     const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
     const tick = (now: number) => {
       const el = box.current;
       if (el) {
         const dt = (now - last) / 1000;
         last = now;
-        stepBalls(balls.current, dt, now / 1000, { floor: el.clientHeight * floor, left: 0, right: el.clientWidth, reduced });
+        const c = cb.current;
+        const world = { floor: el.clientHeight * floor, floorAt: c.floorAt, left: 0, right: el.clientWidth, reduced, spin: c.spin && !reduced, bpm: c.bpm };
+        if (world.spin) {
+          const beat = Math.floor((now / 1000) * (c.bpm / 60));
+          if (beat !== lastBeat) hop(balls.current, beat, world);
+          lastBeat = beat;
+        }
+        stepBalls(balls.current, dt, now / 1000, { ...world, beat: lastBeat });
         for (const b of balls.current) {
           const o = outer.current.get(b.id);
           const n = inner.current.get(b.id);
@@ -157,7 +173,7 @@ export const BallLayer = forwardRef<
     if (!b || !b.drag) return;
     const el = box.current!;
     b.x = Math.max(b.R, Math.min(el.clientWidth - b.R, p.x + g.dx));
-    b.y = Math.min(el.clientHeight * floor - b.R, p.y + g.dy);
+    b.y = Math.min(floorY(b.x) - b.R, p.y + g.dy);
     const t = performance.now();
     g.hist.push({ t, x: p.x, y: p.y });
     while (g.hist.length > 2 && t - g.hist[0].t > 90) g.hist.shift();
@@ -176,8 +192,9 @@ export const BallLayer = forwardRef<
       const h1 = g.hist[g.hist.length - 1];
       const dt = Math.max(16, h1.t - h0.t) / 1000;
       if (!tap) {
-        b.vx = Math.max(-2400, Math.min(2400, (h1.x - h0.x) / dt));
-        b.vy = Math.max(-2400, Math.min(2400, (h1.y - h0.y) / dt));
+        // M-R268: a throw carries 0.6 of the hand's speed (the calmer motion)
+        b.vx = ((h1.x - h0.x) / dt) * THROW;
+        b.vy = ((h1.y - h0.y) / dt) * THROW;
         release(b);
       } else {
         b.wv += 1.5;
