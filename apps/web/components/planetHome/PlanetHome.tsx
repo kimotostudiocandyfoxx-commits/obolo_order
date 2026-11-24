@@ -100,6 +100,7 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
           spinning={h.spinning}
           caption={!!singing && (!cfg.roll || h.spinning)}
           onPlace={enter}
+          onPlay={() => (h.spinning ? h.stop() : h.play())}
           onPlate={() => setInside(true)}
           onItem={tap}
           onHold={(w, at) => menuFor(w, young).length && setMenu({ w, at: local(at) })}

@@ -21,6 +21,8 @@ export interface SceneProps {
   caption: boolean;
   /** your place tapped (Saturn: plays; elsewhere: goes inside) */
   onPlace: () => void;
+  /** play the grooves at the needle-mic (Saturn's painted play button; the frame's 〔▶ 全部流す〕 does the same) */
+  onPlay?: () => void;
   /** the name plate tapped: your works (Saturn's way to 並べかえ・外す) */
   onPlate: () => void;
   /** a work tapped: the sheet opens */
