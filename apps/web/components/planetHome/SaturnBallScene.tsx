@@ -22,7 +22,7 @@ import s from './PlanetHome.module.css';
 const FACE = { x0: 0.04, x1: 0.96, floor: 0.86 };
 /** the groove at the record's centre label, and where the singer of 〔▶ 全部流す〕 stands (shares of the screen) */
 const GROOVE = { x: 0.47, y: 0.69 };
-const NEEDLE = { x: 47, y: 62 };
+const NEEDLE = { x: 47, y: 74 };
 const BALL: Record<StageItem['rel'], string> = { own: '/planet-home/ball-mine.webp', dachi: '/planet-home/ball-dachi.webp', oshi: '/planet-home/ball-oshi.webp', stranger: '/planet-home/ball-dachi.webp' };
 export const RECORD_MASK = '/planet-home/saturn-record-mask.png';
 const HOLD_MS = 480;
