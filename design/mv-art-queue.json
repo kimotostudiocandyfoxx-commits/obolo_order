@@ -9419,6 +9419,90 @@
       ],
       "always": false,
       "prompt": "A single small cute sailboat drawn in bright summer Japanese anime style, seen from the side, hull and sail coloured lavender purple and candy pink (no green at all), the sail shaped like a big music note, a little round porthole, a small pennant flag, clean lines, cel shading with glossy highlights, cheerful. Centered, the whole boat inside the frame with a margin, no water, no sea. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi3-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (sapphire blue, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi3-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (pearl white and sky blue, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi3-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (deep violet and gold, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi3-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (sunset orange and pink, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi3-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (emerald and gold, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi3-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (sakura pink and lavender, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
     }
   ],
   "redo": []
