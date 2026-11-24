@@ -21,7 +21,7 @@ export function ChangePreview({ change, big = false }: { change: { id: string; t
         <RecordTint colour={now} />
       </div>
       <span className="absolute bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-black text-[#2a1630]">
-        {item.label}・{name}
+        {name}
       </span>
     </div>
   );
