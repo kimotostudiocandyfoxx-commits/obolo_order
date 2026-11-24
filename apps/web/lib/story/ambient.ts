@@ -297,6 +297,30 @@ export const STILL_AMBIENT: Record<string, StillAmbient> = {
       { kind: 'glows', color: '#ffac48', at: [[0.42, 0.6, 0.04], [0.6, 0.6, 0.04], [0.3, 0.64, 0.04], [0.7, 0.64, 0.04]], flicker: 0.12, sway: 0.003, alpha: 0.25 },
     ],
   },
+  // Saturn of records (M-R257): the land of giant records under the ringed planet; the takoyaki siblings' flashy record
+  // (red lanterns); {neo}'s own record. A slow turn of the planet region, the ring's glint going round, sand glints
+  'saturn-records': {
+    planet: 'saturn',
+    skyMask: { y: 0.42, keep: 'dark', t: 0.2 },
+    regions: [{ at: [0.55, 0.15], r: 0.2, motion: 'turn', amp: 0.4, period: 40 }],
+    addSky: [{ kind: 'ring', color: '#fff2cf', at: [0.55, 0.15], rx: 0.32, ry: 0.07, angle: -14, speed: 0.06, planetR: 0.12, alpha: 0.55, mask: false }],
+    front: [{ kind: 'particles', sprite: 'glint', color: '#fff2d4', count: 14, size: [1.2, 2.6], speed: [0.004, 0.002], sway: 0.006, twinkle: 1.4, alpha: 0.7, spin: true }],
+  },
+  'saturn-takoyaki-record': {
+    planet: 'saturn',
+    skyMask: { y: 0.3, keep: 'dark', t: 0.2 },
+    regions: [{ at: [0.6, 0.12], r: 0.16, motion: 'turn', amp: 0.4, period: 40 }],
+    front: [
+      { kind: 'particles', sprite: 'glint', color: '#fff2d4', count: 12, size: [1.2, 2.6], speed: [0.004, 0.002], sway: 0.006, twinkle: 1.4, alpha: 0.7, spin: true },
+      { kind: 'glows', color: '#ff4a2a', at: [[0.06, 0.37, 0.03], [0.17, 0.4, 0.03], [0.33, 0.45, 0.03], [0.9, 0.42, 0.03], [0.08, 0.86, 0.04]], flicker: 0.14, sway: 0.003, alpha: 0.35 },
+    ],
+  },
+  'saturn-my-record': {
+    planet: 'saturn',
+    skyMask: { y: 0.34, keep: 'dark', t: 0.2 },
+    regions: [{ at: [0.55, 0.12], r: 0.18, motion: 'turn', amp: 0.4, period: 40 }],
+    front: [{ kind: 'particles', sprite: 'glint', color: '#fff2d4', count: 12, size: [1.2, 2.6], speed: [0.004, 0.002], sway: 0.006, twinkle: 1.4, alpha: 0.65, spin: true }],
+  },
   // Jupiter: the forest (light between the trees), the canopy (the planet's green bands overhead)
   'jupiter-forest': { planet: 'jupiter' },
   'jupiter-daikon': { planet: 'jupiter' },

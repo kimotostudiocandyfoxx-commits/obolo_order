@@ -890,6 +890,18 @@ export const BATI_VARIANTS: Record<string, BatiVariantSet> = {
     galcool: "……やった。{self}、この姿、気に入った。",
     galkansai: "やったー！　{self}、この姿、気に入った！",
   },
+  "ボクたちの歌、ちゃんと並んでる！": {
+    teinei: "{self}たちの歌、ちゃんと並んでいマス！",
+    kansai: "{self}らの歌、ちゃんと並んでるやん！",
+    cool: "{self}たちの歌、ちゃんと並んでる。",
+    mellow: "{self}たちの歌、ちゃんと並んでるねぇ。",
+    amae: "{self}たちの歌、ちゃんと並んでる！",
+    gal: "{self}たちの歌、ちゃんと並んでる！",
+    galfuwa: "{self}たちの歌、ちゃんと並んでる〜！",
+    galane: "{self}たちの歌、ちゃんと並んでるね！",
+    galcool: "{self}たちの歌、並んでる。",
+    galkansai: "{self}らの歌、ちゃんと並んでるやん！",
+  },
   "なんでも聞いて！　ボク、調べてみる！": {
     teinei: "なんでも聞いてください！　{self}、調べてみる！",
     kansai: "なんでも聞いて！　{self}、調べてみる！",

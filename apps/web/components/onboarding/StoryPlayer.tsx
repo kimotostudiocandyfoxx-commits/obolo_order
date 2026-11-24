@@ -5,7 +5,7 @@ import { BatiChat } from './BatiChat';
 import { SongShow } from '@/components/lap2/SongShow';
 import { MIKIE_DRILL } from '@/lib/onboarding/lap2';
 import { BatiLook, type BatiLookApi } from '@/components/bati/BatiLook';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { hasMotion, motionUrl, spriteUrl, STILL_MOUTH, stillMouthUrl, stillShows, stillUrl, type MotionId } from '@/lib/onboarding/media';
 import { Bgm } from '@/lib/onboarding/bgm';
 import { DualVideo } from '@/lib/onboarding/dualVideo';
@@ -14,6 +14,8 @@ import { eggSvg } from '@/lib/look';
 import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
+import { PlanetHome } from '@/components/planetHome/PlanetHome';
+import { neoRecord, takoyakiRecord } from '@/lib/planetHome/storyHomes';
 import { DachiVoiceStep } from './DachiVoiceStep';
 import { EggVoiceStep } from './EggVoiceStep';
 import { isDemoMode } from '@/lib/onboarding/demoMode';
@@ -1707,6 +1709,18 @@ export function StoryPlayer({ steps, vars, initial, onProgress, onName, onNeo, l
           }}
         />
       )}
+      {/* 星のホーム in the story (M-R257 / M-R259): the takoyaki siblings' record, then {neo}'s — touch the rolling kororins */}
+      {started && step?.t === 'home' && (
+        <StoryHome
+          key={i}
+          place={step.place}
+          neo={v.neo || v.name || ''}
+          inviter={v.inviter}
+          fly={(stateRef.current.answers.f_d04_fly ?? v.story?.f_d04_fly) === 'fly'}
+          words={stateRef.current.answers.kororinWords ?? v.story?.['d3.kororinWords']}
+          onDone={() => run(iRef.current + 1)}
+        />
+      )}
       {/* D03-S005 (M-R246 / M-R247): 「たまごに声を聞かせる」 — the held mic and its ring; {bati}'s voice from {name}'s */}
       {started && step?.t === 'eggvoice' && (
         <EggVoiceStep
@@ -2143,6 +2157,25 @@ function TapPick({ pics, labels, onPick }: { pics: string[]; labels: string[]; o
       <p className="mt-6 text-[13px] tracking-[0.3em] text-amber-100/80" style={{ opacity: picked === null ? 1 : 0, transition: 'opacity 300ms' }}>
         たまごをタップして選ぼう
       </p>
+    </div>
+  );
+}
+
+/** 星のホーム inside the story: the scripted place full screen; 〔次へ〕, or (on {neo}'s record) hearing them all, goes on */
+function StoryHome({ place, neo, inviter, fly, words, onDone }: { place: 'takoyaki' | 'neo'; neo: string; inviter: string; fly: boolean; words?: string; onDone: () => void }) {
+  const view = useMemo(() => (place === 'takoyaki' ? takoyakiRecord() : neoRecord({ neo, inviter, fly, words })), [place, neo, inviter, fly, words]);
+  const done = useRef(false);
+  const go = () => {
+    if (done.current) return;
+    done.current = true;
+    onDone();
+  };
+  return (
+    <div className="absolute inset-0 z-[40]" data-testid={`story-home-${place}`}>
+      <PlanetHome planet="saturn" view={view} bare onAllHeard={place === 'neo' ? go : undefined} />
+      <button onClick={go} className="pt-safe absolute right-3 top-14 z-[60] rounded-full bg-white/90 px-4 py-1.5 text-sm font-black text-[#2a1630] shadow">
+        次へ
+      </button>
     </div>
   );
 }

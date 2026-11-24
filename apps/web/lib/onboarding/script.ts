@@ -242,6 +242,13 @@ export type Step =
    */
   | { t: 'dachivoice'; fallback: ScriptLine }
   /**
+   * 星のホーム inside the story (M-R257 / M-R258 / M-R259): the planet home full screen with a scripted place
+   * (lib/planetHome/storyHomes) — `takoyaki`: the takoyaki siblings' record (D04-S005), `neo`: {neo}'s record with the
+   * inviter's and KIMORIN's kororins falling in (D04-S005c). The visitor touches the rolling kororins; 〔次へ〕 goes on,
+   * and on {neo}'s record hearing them all goes on by itself. Nothing is saved.
+   */
+  | { t: 'home'; planet: 'saturn'; place: 'takoyaki' | 'neo' }
+  /**
    * D03-S005 (M-R246 / M-R247) 「たまごに声を聞かせる」: a big mic in the middle, held to talk to the egg; a light ring around
    * it fills with the length spoken (full at about 10 s). Released too soon → `short` (OBOLON 「、、、もう少し、聞かせてやれ。」)
    * and the takes go on (appended). The words heard come out as {name}'s bubble; full → the egg glows and the story goes

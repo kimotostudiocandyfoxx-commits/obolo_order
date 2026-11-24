@@ -9,8 +9,9 @@ import { SYS002 } from './sys002';
  *  - D04-S002b: OBOLON teaches the kororin; Bluena gains the sound-wave shelf; KIMORIN⭐︎'s 「うんち。」 kororin sings;
  *    {neo}'s two kororins are made in {bati}'s chat (the 'atelier' step: cards, in Bluena at once); 〔土星へ飛ばす〕
  *    or 〔今は飛ばさない〕 (f_d04_fly = fly / skip); the rocket leaves the Moon — the day's 88 minutes start here ('clock')
- *  - Saturn only to look: the gaudy temple, the giant DJ record's cypher (D04-S005), the dachi with KIMORIN⭐︎ and
- *    {inviter}, {neo}'s own record, the first voice message in the inviter's dachi thread (D04-S005c, 'dachivoice': f_d04_voice_reply = reply / later)
+ *  - Saturn (M-R257 / M-R259): the land of records, the takoyaki siblings' flashy record — touch its rolling kororins
+ *    (D04-S005, the 'home' step: 星のホーム), the dachi with KIMORIN⭐︎ and {inviter}, {neo}'s own record with their kororins
+ *    falling in, touched until all are heard ('home'), the first voice message in the inviter's dachi thread (D04-S005c, 'dachivoice': f_d04_voice_reply = reply / later)
  *  - the night: the Saturn stamp, back to the Moon to sleep, MONBAN's one-time offer to become Obolo Order early (SYS-S002)
  * Nothing is made on Saturn (M-R208).
  */
@@ -182,21 +183,21 @@ export const DAY3: Step[] = [
   { t: 'still', image: 's/rocket-saturn' }, // 窓の外に、大きな輪のある星が近づいてくる
   { t: 'se', sound: 'whoosh' },
 
-  // D04-S003 趣味の悪い神殿
+  // D04-S003 趣味の悪い神殿（M-R257: 神殿をやめ、見わたすかぎりのレコードの大地。たこ焼き兄妹の派手なレコードの前）
   { t: 'scene', id: 'D04-S003' },
   { t: 'say', who: 'KIMORIN', text: '見てください。土星に着きました。' },
   { t: 'bgm', track: 'saturn' },
-  // 到着カット（止め絵＋ゆっくりしたカメラ）：巨大な輪、赤茶の大地、円い段々の神殿とタコの石像
-  { t: 'arrive', image: 's/saturn-outside', caption: '土星の神殿に着いた' },
+  // 到着カット（止め絵＋ゆっくりしたカメラ）：空いっぱいの輪。夕焼けの大地に、巨大なレコードが何枚も地面に埋まるように並ぶ
+  { t: 'arrive', image: 's/saturn-records', caption: '土星に着いた' },
   { t: 'cam', move: 'in' },
+  // いちばん手前に、金ぴかのふちに赤い提灯、たこ焼きの形のマイクの針の派手なレコード
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: 'これが土星の神殿ですか、、、土星の神殿は趣味悪いですね。' },
-  { t: 'action', label: '神殿の中に入る' },
-  { t: 'still', image: 's/saturn-inside' },
-  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] }, // 左にブラザー、右にシスター
+  { t: 'say', who: 'KIMORIN', text: 'これが土星ですか、、、レコードだらけですね。……あの手前のは、趣味悪いですね。' },
+  { t: 'still', image: 's/saturn-takoyaki-record' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] }, // 派手なレコードの陰から。左にブラザー、右にシスター
   { t: 'caption', text: 'たこ焼きブラザーとたこ焼きシスターが現れた' },
-  { t: 'say', who: 'たこ焼きシスター', text: '誰？　勝手に、私たちの神殿に入ってるのは。' },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'この趣味のいい神殿に、何の用だZE!!' },
+  { t: 'say', who: 'たこ焼きシスター', text: '誰？　勝手に、私たちのレコードをのぞいてるのは。' },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'この趣味のいいレコードに、何の用だZE!!' },
   { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
   { t: 'say', who: 'KIMORIN', text: 'はじめまして、たこ焼きのお二人。私たちは、Obolo Neoです。' },
   { t: 'say', who: 'たこ焼きシスター', text: 'ああ、君たちは、Neoなのね。' },
@@ -206,51 +207,52 @@ export const DAY3: Step[] = [
   { t: 'say', who: 'たこ焼きシスター', text: '遊んでる人って楽しそうで魅力的。とっても素敵だワ。私..大好きだワ' },
   { t: 'say', who: 'KIMORIN', text: '、、、ふふふふ。もももちろん、正体を暴くのも、楽しみの一環、つまり遊びなのです。' },
   { t: 'say', who: 'たこ焼きシスター', text: 'そうなのね！じゃあさっそく、土星のコロリンを見せてあげるワ！' },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'ついてこいだZE!!!' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '再生するZE!!!' },
 
-  // D04-S005 巨大なDJレコードの、サイファー（見るだけ。飛ばしたコロリンが、ここで88時間サイファーする）
+  // D04-S005 たこ焼き兄妹のレコード（M-R259: 転がるコロリンを、つつく・はじく・投げると喋り、聞き終わると溝にしまわれる）
   { t: 'scene', id: 'D04-S005' },
-  { t: 'still', image: 's/saturn-inside' }, // 神殿の奥の大広間。巨大なDJレコードが、ゆっくり回っている。レコードの上に、いろんな顔のコロリン
-  { t: 'fx', fx: 'ring' },
-  { t: 'caption', text: '土星の巨大なレコード' },
+  { t: 'still', image: 's/saturn-takoyaki-record' }, // 派手なレコードの上に、いろんな顔のコロリンが、ころころ転がっている
+  { t: 'caption', text: '土星のレコード' },
   { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
   { t: 'say', who: 'たこ焼きブラザー', text: '土星は原石の星だZE!!' },
-  { t: 'say', who: 'たこ焼きシスター', text: '飛んできたコロリンは、みんな、ここで、サイファーするのよ。' },
+  { t: 'say', who: 'たこ焼きシスター', text: '土星には、一人に一枚、自分のレコードがあるの。' },
+  { t: 'say', who: 'たこ焼きシスター', text: 'ダチや、推してる人がコロリンを飛ばすと、自分のレコードに、降ってくるのよ。' },
   { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
-  { t: 'say', who: 'KIMORIN', text: 'サイファー？' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '順番に、歌うんだZE!!　聞いてみるZE!!' },
-  // 針が、レコードに落ちる。知らない誰かのコロリンが、知らない誰かの声のまま、つぶやきを歌いつないでいく
+  { t: 'say', who: 'KIMORIN', text: '降ってくる、、、？' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '触ってみるZE!!' },
+  { t: 'notice', text: '転がっているコロリンを、つつく・はじく・投げると、そのコロリンが喋ります' },
+  // 星のホーム：たこ焼き兄妹のレコード。ブラザーがはじく／MONBANのコロリンを、KIMORINがつつく（触ってみる）
+  { t: 'home', planet: 'saturn', place: 'takoyaki' },
   { t: 'sprite', image: null },
   { t: 'say', who: 'コロリン', text: '♪……今日も、異常なし…。♪', voice: 'MONBAN' }, // 黒いフードのMONBANのコロリン
   { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……MONBANさんのまで、いますね。' },
-  { t: 'sprite', image: null },
-  { t: 'say', who: 'コロリン', text: '♪うんち。♪', voice: 'KIMORIN' }, // KIMORINのコロリン（ふちが、ほんのり白く光る）
-  { t: 'wait', s: 1.2, keepChat: true }, // シーン……。知らない誰かのコロリンたちが、一瞬だけ、歌うのをやめる
-  { t: 'sprite', image: 'kimorin-sun' },
-  { t: 'say', who: 'KIMORIN', text: '……大舞台でも、堂々としていますね。さすが、私です。' },
-  { t: 'branch', key: 'f_d04_fly', cases: { fly: 'rec-fly' }, otherwise: 'rec-skip' },
-  { t: 'label', id: 'rec-fly' },
-  { t: 'sprite', image: null }, // 輪の中に、{neo}のコロリン。ふちが、金色に光っている
-  { t: 'notice', text: '光っているのが、{neo}のコロリンです。タップすると、そのコロリンの番がきます' },
-  { t: 'action', label: '自分のコロリンをタップする' },
-  { t: 'say', who: 'コロリン', text: '♪〈{neo}が吹き込んだ言葉、そのまま〉♪' },
-  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
-  { t: 'say', who: 'たこ焼きシスター', text: '……いい声だワ。' },
-  { t: 'goto', id: 'rec-end' },
-  { t: 'label', id: 'rec-skip' },
-  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] }, // 輪の中に、{neo}のコロリンは、まだいない
-  { t: 'say', who: 'たこ焼きシスター', text: '{neo}のコロリンは、まだBluenaの中ね。飛ばしたくなったら、いつでも来るワ。' },
-  { t: 'label', id: 'rec-end' },
-  { t: 'notice', text: 'ここには、この88時間に土星へ飛ばされたコロリンが集まっています（ダチの分も、ほかの人の分も）。タップしたコロリンの番がきます' },
-  { t: 'say', who: 'たこ焼きブラザー', text: 'サイファーは、88時間、止まらないZE。{neo}が寝てる間も、だZE!!' },
+  { t: 'say', who: 'KIMORIN', text: '……MONBANさんのまで、ありますね。' },
+  { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: 'MONBANは、私たちのダチだワ。' },
+  { t: 'sprite', image: null }, // 白い狐の顔のコロリンが二つ。シスターが、ひょいと投げる
+  { t: 'say', who: 'コロリン', text: '♪うんち。♪', voice: 'KIMORIN' },
+  { t: 'wait', s: 1.2, keepChat: true }, // シーン……。たこ焼きの二人が、一瞬だけ、固まる
+  { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: '……今朝、KIMORINが月から飛ばしたのね。私、KIMORINを推してるの。' },
+  { t: 'say', who: 'KIMORIN', text: '……私、推されていたのですね。……さすが、私です。' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '聞き終わったコロリンは、溝にしまわれるZE。再生ボタンを押せば、溝のコロリンが、針のマイクの前で、全部まとめて歌うZE!!' },
   { t: 'say', who: 'たこ焼きブラザー', text: '自分で思ったことや、感じたこと、思いついたことは、全部コロリンにしちゃえ。それは全部、大切な思い出だZE。' },
-  { t: 'fx', fx: null },
 
-  // D04-S005c ダチになる／自分のレコード／はじめての声のメッセージ（M-R212）
+  // D04-S005c ダチになる／自分のレコード／はじめての声のメッセージ（M-R257 / M-R259: {neo}のレコードで、転がるコロリンを自分で触って聞く）
   { t: 'scene', id: 'D04-S005c' },
-  { t: 'fx', fx: 'ring-drop' }, // 羅針盤の形の金の封印がついたコロリンが一つ。知らない声で、短く歌う
-  { t: 'say', who: 'たこ焼きブラザー', text: '今の、招待者の、{inviter}のだZE。' },
+  { t: 'say', who: 'たこ焼きブラザー', text: '次は、{neo}のレコードだZE!!' },
+  { t: 'still', image: 's/saturn-my-record' }, // まっさらなレコードが一枚。ふちの名札に『{neo}』。となりに白いふちの『KIMORIN⭐︎』のレコード
+  { t: 'branch', key: 'f_d04_fly', cases: { fly: 'own-fly' }, otherwise: 'own-skip' },
+  { t: 'label', id: 'own-fly' },
+  // {neo}のレコードの溝に、{neo}のコロリンが一つ。ふちが、金色に光っている
+  { t: 'say', who: 'たこ焼きシスター', text: '今朝、月から飛ばしたコロリンね。自分のコロリンは、ずっと、自分のレコードにいるワ。' },
+  { t: 'goto', id: 'own-end' },
+  { t: 'label', id: 'own-skip' },
+  // {neo}のレコードの溝は、まだ、からっぽ
+  { t: 'say', who: 'たこ焼きシスター', text: '{neo}のコロリンは、まだBluenaの中ね。飛ばしたら、ここに降ってくるワ。' },
+  { t: 'label', id: 'own-end' },
+  { t: 'fx', fx: 'ring-drop' }, // ひゅう。羅針盤の形の金の封印がついたコロリンが一つ、{neo}のレコードの上に、ぽとん
+  { t: 'say', who: 'たこ焼きブラザー', text: '今のは、招待者の、{inviter}のだZE。' },
   { t: 'say', who: 'たこ焼きシスター', text: '{neo}を、ここに招いてくれた人だワ。' },
   { t: 'fx', fx: null },
   { t: 'say', who: 'たこ焼きブラザー', text: '土星では、作ったものを届け合う仲間を、ダチって呼ぶZE。' },
@@ -260,6 +262,8 @@ export const DAY3: Step[] = [
   { t: 'se', sound: 'chime' },
   { t: 'caption', text: 'KIMORIN⭐︎がダチになった' },
   { t: 'set', key: 'f_dachi_kimorin', value: 'true' },
+  // ひゅう、ぽとん。{neo}のレコードに、白い狐の顔のコロリンが、もう一つ降ってくる
+  { t: 'say', who: 'KIMORIN', text: '……さっそく、私のが、行きましたね。' }, // KIMORIN⭐︎の扇の尾が、ぱたぱた揺れている
   // 右上の〔ダチ〕がひらく。名札が二つ。『ダチ　KIMORIN⭐︎』と、羅針盤の封印の{inviter}の名札。招待状のひとことが金色の字で
   { t: 'caption', text: '「{inviter_message}」', when: 'inviterMessage' },
   { t: 'se', sound: 'chime' },
@@ -267,18 +271,28 @@ export const DAY3: Step[] = [
   { t: 'set', key: 'f_dachi_inviter', value: 'true' },
   { t: 'set', key: 'f_d04_dachi_inviter', value: 'true' },
   { t: 'sprite', image: ['takoyaki-brother', 'kimorin-sun', 'takoyaki-sister'] },
-  { t: 'say', who: 'たこ焼きシスター', text: '今日から、上に〔推し〕ができるワ。ダチの作品だけが、そこに入るワ。' },
+  { t: 'say', who: 'たこ焼きシスター', text: 'ダチや、{neo}が推した人がコロリンを飛ばすと、{neo}のレコードに降ってくるの。降ってきたコロリンは、88時間ここで歌って、その人のレコードに帰っていくワ。' },
   { t: 'say', who: 'KIMORIN', text: '推し、ですか。……私は、ずっと、自分推しです。' },
-  { t: 'notice', text: 'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '最後に、{neo}の場所だZE!!' },
-  // 大広間の壁に、丸い棚。名札つきのレコードが一枚ずつ。その一枚に『{neo}』、となりに『KIMORIN⭐︎』。溝は、まだからっぽ
-  { t: 'say', who: 'たこ焼きシスター', text: 'サイファーが終わったコロリンは、自分のレコードに、並ぶの。' },
-  { t: 'branch', key: 'f_d04_fly', cases: { fly: 'own-fly' }, otherwise: 'own-end' },
-  { t: 'label', id: 'own-fly' },
-  { t: 'say', who: 'たこ焼きブラザー', text: '88時間たったら、{neo}のコロリンも、ここに帰ってくるZE!!' },
-  { t: 'label', id: 'own-end' },
-  { t: 'notice', text: '{neo}のレコードは、土星へ飛ばしたコロリンを見せる棚です。Bluenaの中のコロリンと同じ物が並びます' },
-  { t: 'say', who: 'KIMORIN', text: '……私のレコードは、名作で、すぐ、いっぱいになりますね。' },
+  { t: 'notice', text: 'ダチになれるのは、招待状でつながった、本当に知っている人だけです。知らない人から、ダチの申しこみが来ることはありません。ほかの星で見かけた作品の人は、〔推す〕で推せます' },
+  { t: 'say', who: 'たこ焼きブラザー', text: 'さあ、{neo}も、触ってみるZE!!' },
+  // 星のホーム：{neo}のレコード。降ってきたコロリンたちが、ころころ転がっている。全部聞くと、次へ
+  { t: 'home', planet: 'saturn', place: 'neo' },
+  { t: 'branch', key: 'f_d04_fly', cases: { fly: 'touch-fly' }, otherwise: 'touch-end' },
+  { t: 'label', id: 'touch-fly' },
+  { t: 'sprite', image: null }, // {neo}のコロリン。サングラスがシャキーンと落ち、{neo}の声のまま歌う
+  { t: 'say', who: 'コロリン', text: '♪〈{neo}が吹き込んだ言葉、そのまま〉♪' },
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: '……いい声だワ。' },
+  { t: 'label', id: 'touch-end' },
+  // 羅針盤の封印のコロリンを、はじく。{inviter}の声で、短く歌って、溝へ。白い狐の顔のコロリンを、投げる
+  { t: 'sprite', image: null },
+  { t: 'say', who: 'コロリン', text: '♪うんち。♪', voice: 'KIMORIN' },
+  { t: 'sprite', image: 'kimorin-sun' },
+  { t: 'say', who: 'KIMORIN', text: '……大舞台でも、堂々としていますね。さすが、私です。' },
+  // 表に転がっていたコロリンが、全部溝に入る。レコードの上が、すっきりする
+  { t: 'sprite', image: ['takoyaki-brother', 'takoyaki-sister'] },
+  { t: 'say', who: 'たこ焼きシスター', text: '全部、聞いたワね。新しいコロリンが降ってきたら、また転がってるワ。' },
+  { t: 'notice', text: '転がっているコロリンは、前に開いてから降ってきた新しいコロリンです。つつく・はじく・投げると喋って、溝にしまわれます。〔▶ 全部流す〕で、溝のコロリンを、針のマイクの前でまとめて聞けます' },
   // ピロン。チャットの画面の左のバナーが光る。{bati}の下に『{inviter}』と『KIMORIN⭐︎』の会話。『{inviter}』に声のメッセージ
   { t: 'se', sound: 'blip' },
   { t: 'notice', text: '左のバナーを開いて、『{inviter}』を押す。声のメッセージを再生する' },
@@ -306,7 +320,7 @@ export const DAY3: Step[] = [
   { t: 'scene', id: 'D04-S007' },
   { t: 'bgm', track: 'night' },
   { t: 'caption', text: 'その夜' },
-  { t: 'still', image: 's/saturn-night' }, // 神殿の石段。頭上で、輪が、ごう、と回る。サイファーの歌が、まだ、かすかに
+  { t: 'still', image: 's/saturn-my-record' }, // {neo}のレコードのふちに、腰かける。頭上で、輪が、ごう、と回る。あちこちのコロリンが、小さく歌っている
   { t: 'se', sound: 'stamp' },
   { t: 'ticket', stamp: 'saturn' },
   { t: 'caption', text: '切符に、土星のスタンプが押された' },

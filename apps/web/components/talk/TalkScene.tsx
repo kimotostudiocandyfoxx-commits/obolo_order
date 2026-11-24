@@ -890,18 +890,29 @@ export function TalkScene({
       else if (a) Object.assign(f, { ox: a.x, oy: a.y, s: C.scale });
     } else if (shot !== 'wide' && a) Object.assign(f, { ox: a.x, oy: a.y, s: shot === 'push' ? CAMERA.two.scale : C.scale });
     f.tx = (w / 2 - f.ox) * CAMERA.center * (f.s > 1 ? 1 : 0);
-    // a two-shot that would leave a third one in the front row half off the screen's edge widens to the whole row
-    // instead (review of M-R251: NEO cut in half at the right in D05-S001)
-    if (shot === 'two' && f.s > 1) {
-      const cut = row.some((p) => {
-        if (p.back || p.offstage || !p.look || p.id === nowItem?.who || p.id === shotOn) return false;
+    // a third one in the front row left half off the screen's edge: a two-shot widens to the whole row (review of M-R251:
+    // NEO cut in half at the right in D05-S001); a close-up (a shout's punch, mcu, reaction) eases back just enough to
+    // bring them fully in, else cuts them out entirely (KIMORIN cut at the right edge in the brother's punches, D04)
+    const halfCut = (sc: number, tx: number) =>
+      row.some((p) => {
+        if (p.back || p.offstage || !p.look || p.id === nowItem?.who || (shot === 'two' && p.id === shotOn)) return false;
         const sp = spots.get(p.id);
         if (!sp) return false;
-        const cx = (sp.x * w - f.ox) * f.s + f.ox + f.tx;
-        const half = sp.h * (p.scale ?? 1) * 0.2 * f.s;
+        const cx = (sp.x * w - f.ox) * sc + f.ox + tx;
+        const half = sp.h * (p.scale ?? 1) * 0.2 * sc;
         return (cx - half < 0 && cx + half > 0) || (cx - half < w && cx + half > w);
       });
-      if (cut) Object.assign(f, { s: 1, tx: 0 });
+    if (f.s > 1 && halfCut(f.s, f.tx)) {
+      if (shot === 'two') Object.assign(f, { s: 1, tx: 0 });
+      else {
+        const towards = (sc: number) => (w / 2 - f.ox) * CAMERA.center * (sc > 1 ? 1 : 0);
+        let fixed = false;
+        // back a little, until they are fully in (not below a two-shot's size)…
+        for (let sc = f.s - 0.04; sc >= CAMERA.two.scale && !fixed; sc -= 0.04) if (!halfCut(sc, towards(sc))) [f.s, f.tx, fixed] = [sc, towards(sc), true];
+        // …or a little closer, so the one at the edge leaves the frame
+        for (let sc = f.s + 0.06; sc <= f.s + 0.25 && !fixed; sc += 0.06) if (!halfCut(sc, towards(sc))) [f.s, f.tx, fixed] = [sc, towards(sc), true];
+        if (!fixed) Object.assign(f, { s: 1, tx: 0 });
+      }
     }
     void C;
     // a new speaker (or the reaction after a question): a cut; else the camera moves

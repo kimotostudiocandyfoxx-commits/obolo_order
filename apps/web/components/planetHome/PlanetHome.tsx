@@ -21,7 +21,25 @@ import s from './PlanetHome.module.css';
  * A story passes `view` (a resident's scripted place, or {neo}'s) and `seeds` (the inviter's and KIMORIN's works
  * arriving); nothing is then loaded or written.
  */
-export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: HomePlanet; view?: PlanetHomeView; seeds?: HomeWork[]; skin?: PlanetHomeSkin; onBack?: () => void }) {
+export function PlanetHome({
+  planet,
+  view,
+  seeds,
+  skin,
+  onBack,
+  onAllHeard,
+  bare,
+}: {
+  planet: HomePlanet;
+  view?: PlanetHomeView;
+  seeds?: HomeWork[];
+  skin?: PlanetHomeSkin;
+  onBack?: () => void;
+  /** M-R259: every rolling kororin has been heard (the story goes on) */
+  onAllHeard?: () => void;
+  /** inside the story: no dock (〔▶ 全部流す〕〔＋ 飛ばす〕) and no 〔♡ 推し〕 */
+  bare?: boolean;
+}) {
   const cfg = PLANET_HOMES[planet];
   const h = usePlanetHome(planet, { view, seeds });
   const router = useRouter();
@@ -49,6 +67,18 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
   const all = [...(h.stage?.own ?? []), ...(h.stage?.around ?? []), ...(h.stage?.far ?? [])];
   const singing = h.playingId ? all.find((w) => w.id === h.playingId) : undefined;
   const hold = useHold();
+  // M-R259: the last rolling one heard → once
+  const hadRolling = useRef(false);
+  const allHeard = useRef(onAllHeard);
+  allHeard.current = onAllHeard;
+  useEffect(() => {
+    if (h.rolling.length) hadRolling.current = true;
+    else if (hadRolling.current) {
+      hadRolling.current = false;
+      const t = setTimeout(() => allHeard.current?.(), 1400);
+      return () => clearTimeout(t);
+    }
+  }, [h.rolling.length]);
 
   // the explainer strip: shown when the home opens, folded after 4.5 s; 〔？〕 toggles it
   useEffect(() => {
@@ -119,41 +149,45 @@ export function PlanetHome({ planet, view, seeds, skin, onBack }: { planet: Home
         </div>
       )}
 
-      <div className={s.top} ref={top}>
-        <div className={s.row}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {onBack && (
-              <button type="button" className={`${s.pill} ${s.help}`} onClick={onBack} aria-label="もどる">
-                ←
-              </button>
-            )}
-            <div className={s.ttl}>
-              <small>{cfg.en}</small>
-              {cfg.name}
+      {!bare && (
+        <>
+          <div className={s.top} ref={top}>
+            <div className={s.row}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {onBack && (
+                  <button type="button" className={`${s.pill} ${s.help}`} onClick={onBack} aria-label="もどる">
+                    ←
+                  </button>
+                )}
+                <div className={s.ttl}>
+                  <small>{cfg.en}</small>
+                  {cfg.name}
+                </div>
+              </div>
+              <span style={{ display: 'flex', gap: 6 }}>
+                <button type="button" className={`${s.pill} ${s.help}`} onClick={() => setSay((v) => !v)} aria-label="この星の説明" aria-expanded={say}>
+                  ？
+                </button>
+                <button type="button" className={s.pill} onClick={() => (setOshiOpen(true), h.loadOshi())}>
+                  ♡ 推し
+                </button>
+              </span>
+            </div>
+            <div className={`${s.say} ${say ? '' : s.mini}`}>
+              <Emph text={cfg.line} />
             </div>
           </div>
-          <span style={{ display: 'flex', gap: 6 }}>
-            <button type="button" className={`${s.pill} ${s.help}`} onClick={() => setSay((v) => !v)} aria-label="この星の説明" aria-expanded={say}>
-              ？
-            </button>
-            <button type="button" className={s.pill} onClick={() => (setOshiOpen(true), h.loadOshi())}>
-              ♡ 推し
-            </button>
-          </span>
-        </div>
-        <div className={`${s.say} ${say ? '' : s.mini}`}>
-          <Emph text={cfg.line} />
-        </div>
-      </div>
 
-      <div className={s.dock}>
-        <button type="button" className={s.cta} onClick={enter}>
-          {cfg.placeTap === 'play' && h.spinning ? '■ 止める' : cfg.cta}
-        </button>
-        <button type="button" className={s.ghost} onClick={() => router.push(cfg.make ? `/moon/atelier?kind=${cfg.make}` : '/moon/atelier')}>
-          ＋ 飛ばす
-        </button>
-      </div>
+          <div className={s.dock}>
+            <button type="button" className={s.cta} onClick={enter}>
+              {cfg.placeTap === 'play' && h.spinning ? '■ 止める' : cfg.cta}
+            </button>
+            <button type="button" className={s.ghost} onClick={() => router.push(cfg.make ? `/moon/atelier?kind=${cfg.make}` : '/moon/atelier')}>
+              ＋ 飛ばす
+            </button>
+          </div>
+        </>
+      )}
 
       {/* inside your place: your works, forever, newest first (hold one: 前へ / 後ろへ / 外す) */}
       {inside && h.stage && h.view && (
