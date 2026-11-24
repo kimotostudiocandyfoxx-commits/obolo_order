@@ -30,8 +30,6 @@ export type DachiThreadProps = {
   thread?: DachiThreadView;
   /** back to the conversation list (the shell's ctx.openList) */
   onList?: () => void;
-  /** open Bluena (the shell's right drawer) from the talk's top bar */
-  onBluena?: () => void;
   /** after a message went (the story sets f_d04_voice_reply from here) */
   onSent?: (m: DachiMessageView) => void;
   /** the thread was heard (its unread dot can go) */
@@ -56,7 +54,7 @@ export type DachiThreadProps = {
  * sent or thrown away. Block and report are in the menu at the top right (a person's thread only). Messages go only
  * between dachi — the server refuses anything else. No live calls here (a later members' feature).
  */
-export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRead, onGone, place = 'moon', day, banner, onBack, onDevice }: DachiThreadProps) {
+export function DachiThread({ id, thread: given, onList, onSent, onRead, onGone, place = 'moon', day, banner, onBack, onDevice }: DachiThreadProps) {
   const ring = useMarkRing();
   const { me } = useAuth();
   const [thread, setThread] = useState<DachiThreadView | undefined>(given);
@@ -243,7 +241,6 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
         bar={{
           title: day ? `${name}・${day.slice(5).replace('-', '/')}` : name,
           onList,
-          onBluena,
           onBack,
           below: banner,
           right: person ? (

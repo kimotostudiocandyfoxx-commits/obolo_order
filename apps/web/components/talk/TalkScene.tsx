@@ -13,6 +13,7 @@ import { AmbientFront, AmbientSky } from '@/components/story/Ambient';
 import type { Planet } from '@/lib/story/ambient';
 import { unlockAudio } from '@/lib/onboarding/audio';
 import { playClip, stopClip, type Clip } from '@/lib/voice/webVoice';
+import { OTS_BACK } from './SelfBack';
 
 const MUTE_KEY = 'obolo.talk.muted';
 /** the talk's own sound button is off (its choice is kept on this device) */
@@ -280,7 +281,6 @@ export function TalkScene({
     title: ReactNode;
     /** the shell's left drawer (the conversations); none = this talk's own drawer of what was said */
     onList?: () => void;
-    onBluena?: () => void;
     onBack?: () => void;
     unread?: boolean;
     left?: ReactNode;
@@ -811,7 +811,7 @@ export function TalkScene({
         ? { x: otsAt, bottom: Math.max(0, stageTop + stageH - feet), h: Math.min(otsStand!.h * cover.dw, stageH * 1.1), z: 1, w: 0.5, chest: false }
         : { x: otsAt, bottom: stageH * 0.06, h: stageH * 0.9, z: 1, w: 0.5, chest: false },
     );
-    spots.set(self!.id, { x: 0.9, bottom: -stageH * 1.15, h: stageH * 2.05, z: 3, w: 0.8, chest: false });
+    spots.set(self!.id, { x: OTS_BACK.x, bottom: -stageH * OTS_BACK.drop, h: stageH * OTS_BACK.h, z: 3, w: OTS_BACK.w, chest: false });
   }
   // a wide picture at an end of the row (a painted resident with something held out to one side) is kept inside the
   // screen: its whole width, from its picture's own proportions
@@ -1142,14 +1142,6 @@ export function TalkScene({
           </div>
           {bar.right}
           {!noMute && muteButton}
-          {bar.onBluena && (
-            <button onClick={bar.onBluena} aria-label="Bluenaを開く" className={GLASS}>
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
-                <path d="M12 3c4 0 7 6 7 10.5A7 7 0 0 1 5 13.5C5 9 8 3 12 3z" />
-                <circle cx="12" cy="13" r="2.6" />
-              </svg>
-            </button>
-          )}
         </header>
         {bar.below && <div className="-mt-1 flex justify-center px-3.5">{bar.below}</div>}
         </div>
@@ -1246,7 +1238,7 @@ export function TalkScene({
           const enter = entering[p.id];
           const motion = { animation: g ? `talk-exit .6s ease-in forwards` : enter && !reduced ? `talk-enter .7s cubic-bezier(.2,.8,.25,1) both` : arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, ['--ex' as string]: `${(g ? g.side : enter) === 'l' ? -w * 0.6 : w * 0.6}px` };
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? 'blur(3.5px) brightness(.9)' : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...motion }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? OTS_BACK.filter : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...motion }}>
               {arriving && p.self && <ArrivalMotes />}
               <div className="flex h-full items-end justify-center" style={mv?.mirror || ag?.mirror || ag?.turn ? { transform: `${mv?.mirror !== !!ag?.mirror && (mv?.mirror || ag?.mirror) ? 'scaleX(-1) ' : ''}${ag?.turn ? `perspective(700px) rotateY(${ag.turn}deg)` : ''}`.trim() } : undefined}>
               <Figure

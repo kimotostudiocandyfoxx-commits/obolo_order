@@ -57,60 +57,6 @@ async function load(kind: AtelierKind, meId: string | undefined, live: boolean, 
   return kept;
 }
 
-/**
- * Bluena on the right (M-R211 → M-R237; client 2026-11-24: no orbit any more): all the works as the spiral and the
- * list (SpiralList): ★ and marks, the planets' filter strip, the search box. 〔姿とバティ〕 opens your
- * looks and {bati} (BatiShelf and the device's own folders). Every work can be played, flown to its planet, or thrown
- * away here. The gear at the top right names the marks.
- */
-export function BluenaDrawer({ kinds, day, ctx, onClose, onOrigin, onMaterial }: { kinds: AtelierKind[]; day?: number | null; ctx: Ctx; onClose: () => void; /** M-R253 §5: a work tapped → the talk it was made in (false: not known) */ onOrigin?: (w: Work) => boolean; /** M-R253 §3: a work dragged into the chat */ onMaterial?: (w: Work) => void }) {
-  // client 2026-11-24 (iPad, R7): the planets going round (the orbit) are gone — Bluena opens on all the works (the
-  // planets' strip filters them); your looks and {bati} are one tap away (〔姿とバティ〕)
-  const [view, setView] = useState<'moon' | { planet: BluenaPlanet | null }>({ planet: null });
-  const [names, setNames] = useState(false);
-  const back = view === 'moon' || (typeof view === 'object' && view.planet) ? () => setView({ planet: null }) : null;
-  return (
-    <Drawer side="right" onClose={onClose} label="ブルーナ">
-      <div className="relative flex shrink-0 items-center gap-2 pb-2">
-        {back ? (
-          <button onClick={back} aria-label="もどる" className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-sky-100/80">
-            ‹
-          </button>
-        ) : (
-          <span className="block h-8 w-8 overflow-hidden rounded-full border border-sky-200/40">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ui/bluena-icon.webp" alt="" className="h-full w-full scale-125 object-cover" />
-          </span>
-        )}
-        {typeof view === 'object' && (
-          <span className="flex items-center gap-1.5 text-sky-100/80" aria-label={view.planet ? PLANET_NAME[view.planet] : 'すべて'}>
-            {view.planet ? (
-              <>
-                <PlanetMark id={view.planet} size={20} />
-                <Glyph id={PLANET_GLYPH[view.planet]} label={false} className="h-4 w-4" />
-              </>
-            ) : (
-              <span className="text-[11px] tracking-[0.2em]">すべて</span>
-            )}
-          </span>
-        )}
-        <span className="flex-1" />
-        {view !== 'moon' && (
-          <button onClick={() => setView('moon')} className="rounded-full border border-sky-200/30 px-3 py-1 text-[11px] text-sky-100/85">
-            姿とバティ
-          </button>
-        )}
-        <button onClick={() => setNames(true)} aria-label="しるしの名前" className="flex h-7 w-7 items-center justify-center rounded-full text-white/45">
-          <GearGlyph />
-        </button>
-      </div>
-      {view === 'moon' && <MoonShelf kinds={kinds.filter((k) => !KIND_PLANET[k])} ctx={ctx} onOrigin={onOrigin} />}
-      {typeof view === 'object' && <PlanetWorks planet={view.planet} day={day} ctx={ctx} onOrigin={onOrigin} onMaterial={onMaterial} />}
-      {names && <MarkNamesSheet onClose={() => setNames(false)} />}
-    </Drawer>
-  );
-}
-
 /** the Moon: your looks, {bati}'s cards and dress-ups, lookups and pictures (kept on this device) */
 export function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx: Ctx; onOrigin?: (w: Work) => boolean }) {
   const { me } = useAuth();
@@ -144,56 +90,6 @@ export function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx:
       </div>
       {ring.node}
     </div>
-  );
-}
-
-/** one planet's works (or all of them): the spiral and the list (M-R237) */
-export function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet: BluenaPlanet | null; day?: number | null; ctx: Ctx; onOrigin?: (w: Work) => boolean; onMaterial?: (w: Work) => void }) {
-  const { me } = useAuth();
-  const [filter, setFilter] = useState<FindFilter>({});
-  const [found, setFound] = useState<Found[] | null>(null);
-  const [open, setOpen] = useState<Found | null>(null);
-  const [line, setLine] = useState('');
-  const [n, setN] = useState(0);
-  const ring = useMarkRing();
-  useMarks();
-  const f = { ...filter, planet: planet ?? filter.planet };
-  const key = JSON.stringify(f);
-  useEffect(() => {
-    let live = true;
-    setFound(null);
-    void findAll(f).then((x) => live && setFound(x));
-    return () => {
-      live = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, n]);
-  const rows: SpiralRow[] | null =
-    found?.map((x) => ({
-      id: `${x.kind}:${x.id}`,
-      at: x.createdAt,
-      color: PLANET_COLOR[x.planet],
-      glyph: PLANET_GLYPH[x.planet],
-      thumb: x.image && !x.image.startsWith('idb:') ? x.image : null,
-      title: x.title || x.work.prompt || GLYPH_NAMES[PLANET_GLYPH[x.planet]],
-      mark: { kind: x.kind, id: x.id },
-    })) ?? null;
-  return (
-    <>
-      {line && <p className="pb-1 text-center text-[11px] text-sky-100/70">{line}</p>}
-      <SpiralList
-        rows={rows}
-        filter={filter}
-        onFilter={setFilter}
-        planets={planet ? undefined : BLUENA_PLANETS.filter((p) => planetOpen(p, day) && found?.some((x) => x.planet === p))}
-        onRow={(_r, i) => found && setOpen(found[i])}
-        onRing={(r, at) => r.mark && ring.open(r.mark.kind, r.mark.id, at)}
-        empty={filter.star || filter.mark || filter.q ? '見つからなかった' : 'まだ、なにもない'}
-        search="題名・歌詞・言葉"
-      />
-      {open && <WorkSheet found={open} ctx={ctx} onClose={() => setOpen(null)} onLine={setLine} onChanged={() => setN((x) => x + 1)} onOrigin={onOrigin} onMaterial={onMaterial} />}
-      {ring.node}
-    </>
   );
 }
 

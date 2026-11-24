@@ -226,7 +226,7 @@ function Play({ scene, bare }: { scene: Scene; bare?: boolean }) {
         top={0}
         // M-R239: the ダチ scene opens with two unread lines (the last read one and the unread ones play in a row)
         unreadFrom={scene === 'dachi' || scene === 'fp2' ? 2 : scene === 'live' ? HISTORY.length : undefined}
-        bar={{ title: group ? '' : scene === 'fp2' ? 'MONBAN・KIMORIN' : day1 ? 'KIMORIN' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', onBluena: () => undefined, threads: { list: THREADS, current: group ? 'group' : scene === 'dachi' ? 'dachi' : 'bati', days: demoDays } }}
+        bar={{ title: group ? '' : scene === 'fp2' ? 'MONBAN・KIMORIN' : day1 ? 'KIMORIN' : scene === 'dachi' ? 'アポロ（ダチ）' : 'ウニュ（バティ）', threads: { list: THREADS, current: group ? 'group' : scene === 'dachi' ? 'dachi' : 'bati', days: demoDays } }}
         composer={<TalkComposer placeholder="ことばで話す" onSend={send} onState={(s) => setState((o) => (scene === 'kb' ? { ...s, keyboard: true } : s))} initial={scene === 'kb' ? '土星の輪は' : ''} startTyping={scene === 'kb'} />}
       />
       {scene === 'live' && !bare && (
