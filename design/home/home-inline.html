@@ -122,7 +122,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
     <div class="say" id="say"></div>
     <div class="swatch" id="swatch" hidden aria-label="レコードの色"></div>
   </div>
-  <div class="dock"><button class="cta" id="cta" type="button"></button><button class="ghost" id="fly" type="button">＋ 飛ばす</button></div>
+  <div class="dock"><button class="cta" id="cta" type="button"></button></div>
   <div class="inside" id="inside"><div class="row"><div class="ttl" id="inTtl" style="font-size:22px"></div><button class="pill" id="inClose" type="button">← 外へ</button></div><div class="say" id="inSay"></div><div class="shelf" id="shelf"></div></div>
   <div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-label="作品"><div class="grab"></div><div id="sheetBody"></div></div>
   <div class="toast" id="toast"></div>
@@ -174,7 +174,7 @@ function render(){
   const rw=$('resWrap');rw.innerHTML='';
   if(mode==='anime')(RES[cur]||[]).forEach(([k,n,line,side])=>{const s=A['res-'+cur+'-'+k];if(!s)return;const e=document.createElement('div');e.className='res '+side;e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',n);e.innerHTML=`<img alt="" src="${s}">`;e.onclick=()=>toast(n+'「'+line+'」');rw.appendChild(e)});
   const sky=$('sky');sky.innerHTML='';items=[];
-  const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('swatch').hidden=!isS;
+  const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
   stopRoll();if(cur==='saturn'){setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
@@ -286,6 +286,6 @@ $('inClose').onclick=closeAll;const RECS=[['黒','transparent'],['ピンク','#f
 $('swatch').innerHTML='<small style="font:700 11px var(--f-body);opacity:.85">レコードの色</small>'+RECS.map(([n,c],i)=>`<button type="button" aria-label="${n}" aria-pressed="${i===0}" style="background:${c==='transparent'?'#111':c}" data-c="${c}"></button>`).join('');
 $('swatch').onclick=e=>{const c=e.target.dataset.c;if(!c)return;$('phone').style.setProperty('--rec',c);document.querySelectorAll('#swatch button').forEach(b=>b.setAttribute('aria-pressed',b===e.target))};
 $('help').onclick=()=>{const s=$('say');s.classList.toggle('mini');clearTimeout(s._t)};$('oshiBtn').onclick=()=>toast('推し：'+[...oshi].join('・'));
-$('fly').onclick=()=>toast('月の工房で作って、'+P[cur].name+'へ飛ばそう');
+
 render();
 </script>
