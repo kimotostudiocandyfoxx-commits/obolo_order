@@ -1,20 +1,21 @@
-# UI art — 2026-11-24T04:36:53.468Z
+# UI art — 2026-11-24T05:55:29.332Z
 
-Seedream 5.0 Pro / 16枚 / 約116円
+Seedream 5.0 Pro / 17枚 / 約123円
 
-- ✅ kor2-01
-- ✅ kor2-02
-- ✅ kor2-03
-- ✅ kor2-04
-- ✅ kor2-05
-- ✅ kor2-06
-- ✅ kor2-07
-- ✅ kor2-08
-- ✅ kor2-09
-- ✅ kor2-10
-- ✅ kor2-11
-- ✅ kor2-12
-- ✅ kor2-13
-- ✅ kor2-14
-- ✅ kor2-15
-- ✅ kor2-16
+- ✅ home2-bg-saturn-cutea2
+- ✅ kor3-01
+- ✅ kor3-02
+- ✅ kor3-03
+- ✅ kor3-04
+- ✅ kor3-05
+- ✅ kor3-06
+- ✅ kor3-07
+- ✅ kor3-08
+- ✅ kor3-09
+- ✅ kor3-10
+- ✅ kor3-11
+- ✅ kor3-12
+- ✅ kor3-13
+- ✅ kor3-14
+- ✅ kor3-15
+- ✅ kor3-16
