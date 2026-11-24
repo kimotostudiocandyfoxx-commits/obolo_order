@@ -37,7 +37,7 @@ async function bootstrap() {
   app.useBodyParser('json', { limit: '64kb' });
   app.enableCors({
     origin: parseOrigins(cfg.CORS_ORIGINS),
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['authorization', 'content-type', 'accept-language', 'x-admin-token'],
     maxAge: 600,
   });
