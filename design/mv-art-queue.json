@@ -8321,6 +8321,28 @@
       "refs": [
         "/tmp/mv-res-boombox.jpg"
       ]
+    },
+    {
+      "id": "home2-bg-saturn-biga",
+      "prompt": "Japanese street-pop anime background art: bold thick outlines, flat cel shading, fluorescent pink, lime and orange accents, graffiti sticker and spray-paint textures, energetic hip-hop vibe. Vertical phone wallpaper 9:16. An enormous vinyl DJ record, so gigantic that only part of it fits in the picture: the black glossy record surface with shining concentric grooves fills the lower 70 percent of the picture, seen from slightly above in strong perspective, its curved outer edge sweeping across, the colourful centre label only partly visible at one side. At the right edge, a giant tonearm whose needle tip is a retro microphone rests near the grooves. On the record's rim, a big round play button. The upper 30 percent: dusk sky with Saturn's huge rings as bold graphic stripes, and red rocky ground with other giant records far away. The record surface is wide, flat and clear, empty, ready for many small characters to roll on it. No people, no characters, no text, no letters. The centre label is on the left side.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-saturn-bigb",
+      "prompt": "Japanese street-pop anime background art: bold thick outlines, flat cel shading, fluorescent pink, lime and orange accents, graffiti sticker and spray-paint textures, energetic hip-hop vibe. Vertical phone wallpaper 9:16. An enormous vinyl DJ record, so gigantic that only part of it fits in the picture: the black glossy record surface with shining concentric grooves fills the lower 70 percent of the picture, seen from slightly above in strong perspective, its curved outer edge sweeping across, the colourful centre label only partly visible at one side. At the right edge, a giant tonearm whose needle tip is a retro microphone rests near the grooves. On the record's rim, a big round play button. The upper 30 percent: dusk sky with Saturn's huge rings as bold graphic stripes, and red rocky ground with other giant records far away. The record surface is wide, flat and clear, empty, ready for many small characters to roll on it. No people, no characters, no text, no letters. The centre label is just above the bottom edge, so the grooves curve around the whole picture.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
     }
   ],
   "redo": []
