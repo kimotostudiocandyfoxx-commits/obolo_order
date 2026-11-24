@@ -44,7 +44,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .res img{height:100%;width:auto;display:block}
 .res.l{left:-2%}.res.r{right:-2%}
 .res:active{transform:scale(.96)}
-.roll{position:absolute;width:58px;height:58px;margin:-29px;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
+.roll{position:absolute;width:76px;height:76px;margin:-38px;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 6px 8px rgba(0,0,0,.35))}
 .roll img{width:100%;height:100%;object-fit:contain;pointer-events:none}
 .roll .rim{position:absolute;inset:6%;border-radius:50%;border:2px solid var(--c);opacity:0}
 .roll.talk .rim{opacity:.9}
@@ -202,14 +202,16 @@ function enter(){
   $('shelf').innerHTML=ic.map((x,i)=>`<div class="w">${x}<small>11/${26-i}</small></div>`).join('');
   $('inside').classList.add('on');
 }
-let rolls=[],raf=0,heard=[];
+let rolls=[],raf=0,heard=[],RECLBL=[.07,.69];
+const KOR=n=>n===ME?'mine':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':'dachi';
+const KIMG=(n,sing)=>A['kor-'+KOR(n)+(sing&&A['kor-'+KOR(n)+'-sing']?'-sing':'')]||sprite('korolin');
 function setupRoll(){
-  const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,box={x0:W*.2,x1:W*.8,y0:H*.6,y1:H*.74};
-  const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
+  const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,box={x0:W*.16,x1:W*.86,y0:H*.5,y1:H*.8};
+  const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
   rolls=list.map((o,i)=>{const e=document.createElement('div');e.className='roll';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
     e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
-    e.innerHTML=`<img alt="" src="${sprite('korolin')}"><div class="rim"></div>`;$('sky').appendChild(e);
-    const fl=box.y0+((i*37)%100)/100*(box.y1-box.y0);const r={o,e,x:box.x0+((i*53+17)%100)/100*(box.x1-box.x0),y:H*.2-i*40,vx:(Math.random()-.5)*1.5,vy:0,i,box,fl,drag:false,talk:false};
+    e.innerHTML=`<img alt="" src="${KIMG(o.n)}"><div class="rim"></div>`;$('sky').appendChild(e);
+    const J=[[.08,.15],[.42,.05],[.78,.22],[.25,.38],[.6,.3],[.9,.5],[.05,.62],[.38,.7],[.7,.62],[.18,.95],[.52,.92],[.85,.88]][i%12];const fl=box.y0+J[1]*(box.y1-box.y0);const r={o,e,x:box.x0+J[0]*(box.x1-box.x0),y:H*.2-i*40,vx:0,vy:0,i,box,fl,drag:false,talk:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0});
     e.addEventListener('pointermove',ev=>{if(!down)return;const dx=ev.clientX-down.lx,dy=ev.clientY-down.ly,dt=Math.max(8,performance.now()-down.lt);r.x+=dx;r.y+=dy;r.vx=dx/dt*16;r.vy=dy/dt*16;down.lx=ev.clientX;down.ly=ev.clientY;down.lt=performance.now()});
@@ -219,16 +221,16 @@ function setupRoll(){
   const step=()=>{for(const r of rolls){if(r.drag||r.gone)continue;r.vy+=.45;r.x+=r.vx;r.y+=r.vy;
       if(r.y>r.fl){r.y=r.fl;r.vy*=-.45;r.vx*=.9;if(Math.abs(r.vy)<1)r.vy=0}
       if(r.x<r.box.x0){r.x=r.box.x0;r.vx=Math.abs(r.vx)*.7} if(r.x>r.box.x1){r.x=r.box.x1;r.vx=-Math.abs(r.vx)*.7}
-      if(r.vy===0&&r.y>=r.fl){r.vx*=.96;r.vx+=(Math.random()-.5)*.08}
-      r.e.style.left=r.x+'px';r.e.style.top=r.y+'px';r.e.style.transform=`rotate(${(r.x*2)%360}deg)`;
+      if(r.vy===0&&r.y>=r.fl){r.vx*=.9;if(Math.abs(r.vx)<.05)r.vx=0}
+      r.e.style.left=r.x+'px';r.e.style.top=r.y+'px';r.e.style.transform=`rotate(${Math.max(-14,Math.min(14,r.vx*3))}deg)`;
       if(r.bub){r.bub.style.left=r.x+'px';r.bub.style.top=(r.y-34)+'px'}}
     raf=requestAnimationFrame(step)};
   raf=requestAnimationFrame(step);
 }
 function talk(r){
-  if(r.talk||r.gone)return;r.talk=true;r.e.classList.add('talk');const card=P.saturn.card(r.i);
+  if(r.talk||r.gone)return;r.talk=true;r.e.classList.add('talk');r.e.querySelector('img').src=KIMG(r.o.n,true);const card=P.saturn.card(r.i);
   const b=document.createElement('div');b.className='bub';b.innerHTML=`<small>🎤 ${r.o.n}</small>${card.cap}`;$('sky').appendChild(b);r.bub=b;
-  setTimeout(()=>{b.style.display='none';r.bub=null;r.gone=true;const ph=$('phone');r.e.style.left=ph.clientWidth*.42+'px';r.e.style.top=ph.clientHeight*.68+'px';r.e.classList.add('gone');heard.push(r.o);
+  setTimeout(()=>{b.style.display='none';r.bub=null;r.gone=true;const ph=$('phone');r.e.style.left=(RECLBL[0]*ph.clientWidth)+'px';r.e.style.top=(RECLBL[1]*ph.clientHeight)+'px';r.e.classList.add('gone');heard.push(r.o);
     setTimeout(()=>{r.e.style.display='none';if(rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';$('sky').appendChild(d)}},650)},2000);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
