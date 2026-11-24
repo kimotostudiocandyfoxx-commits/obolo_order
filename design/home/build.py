@@ -96,6 +96,9 @@ def unwhite(im):
 for k in 'user kimorin monban mikie brother sister'.split():
     f=f'{O}/kor4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
+    for n in (1,2):
+        f=f'{O}/udance-{n}.jpg'
+        if k=='user' and os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((260,260),Image.LANCZOS); A[f'udance-{n}']=uri(o,88)
     f=f'{O}/ship4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((260,260),Image.LANCZOS); A['ship4-'+k]=uri(o,88)
 VD=os.environ.get('VOICE_DIR')
@@ -103,6 +106,8 @@ if VD:
     for n in range(1,6):
         f=f'{VD}/line-{n:02d}.mp3'
         if os.path.exists(f): A[f'voice-{n:02d}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
+        f=f'{VD}/stitle-{n}.mp3'
+        if os.path.exists(f): A[f'stitle-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
         f=f'{VD}/title-{n}.mp3'
         if os.path.exists(f): A[f'vtitle-{n}']='data:audio/mpeg;base64,'+base64.b64encode(open(f,'rb').read()).decode()
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea3')
