@@ -1,10 +1,12 @@
-# UI art — 2026-11-24T01:28:32.984Z
+# UI art — 2026-11-24T01:47:49.753Z
 
-Seedream 5.0 Pro / 6枚 / 約46円
+Seedream 5.0 Pro / 8枚 / 約60円
 
-- ✅ home2-bg-saturn-tako
-- ✅ puni-brother
-- ✅ puni-kimorin
-- ✅ puni-mikie
-- ✅ puni-monban
-- ✅ puni-sister
+- ✅ home2-bg-saturn-cutea
+- ✅ home2-bg-saturn-cuteb
+- ✅ home2-bg-saturn-tako-cute
+- ✅ puni2-brother
+- ✅ puni2-kimorin
+- ✅ puni2-mikie
+- ✅ puni2-monban
+- ✅ puni2-sister
