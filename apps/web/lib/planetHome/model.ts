@@ -1,4 +1,4 @@
-import { dropPlan, homeHoursLeft, isNewSince, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { PLANET_FLY_MS, dropPlan, homeHoursLeft, isNewSince, type HomeWork, type PlanetHomeView } from '@obolo/shared';
 
 /**
  * 星のホーム (M-R258): what is on the screen, worked out from the feed (or from a story's scripted view) — no drawing
@@ -82,4 +82,27 @@ export function menuFor(w: Pick<HomeWork, 'rel' | 'demo'>, young: boolean): Menu
   if (w.demo || w.rel === 'own') return [];
   const oshi: MenuAct[] = w.rel === 'oshi' ? ['unpush'] : w.rel === 'stranger' && !young ? ['push'] : [];
   return ['open', ...oshi, 'hide', 'report'];
+}
+
+// --- M-R259 Saturn: the rolling kororins -------------------------------------------------------------------------
+
+/** at most this many roll at once; the rest come out as earlier ones go into the grooves */
+export const ROLL_MAX = 12;
+
+/**
+ * what rolls on the record: kororins not heard yet that came in the last 88 hours (dachi's, 推し's, and your own just
+ * flown), newest first, up to ROLL_MAX. Your older kororins are in the grooves already.
+ */
+export function rollingOf(stage: Stage, heard: ReadonlySet<string>, now: number = Date.now(), max = ROLL_MAX): StageItem[] {
+  const recent = (w: StageItem) => w.rel !== 'own' || now - Date.parse(w.flownAt) < PLANET_FLY_MS;
+  return [...stage.around.filter((w) => !w.leaving), ...stage.own]
+    .filter((w) => recent(w) && !heard.has(w.id))
+    .sort((a, b) => Date.parse(b.flownAt) - Date.parse(a.flownAt))
+    .slice(0, max);
+}
+
+/** the grooves: everything on the record that is not rolling (heard, or your older ones), in record order */
+export function groovesOf(stage: Stage, rolling: readonly StageItem[]): StageItem[] {
+  const out = new Set(rolling.map((w) => w.id));
+  return recordOrder(stage).filter((w) => !out.has(w.id));
 }

@@ -1,4 +1,4 @@
-import type { HomeWork, PlanetHomeConfig, PlanetHomeView } from '@obolo/shared';
+import type { HomeResident, PlanetHomeConfig, PlanetHomeView } from '@obolo/shared';
 import type { ComponentType } from 'react';
 import type { At } from '@/lib/planetHome/useHold';
 import type { Stage, StageItem } from '@/lib/planetHome/model';
@@ -27,6 +27,12 @@ export interface SceneProps {
   onItem: (w: StageItem) => void;
   /** a work held: the menu at that point */
   onHold: (w: StageItem, at: At) => void;
+  /** a resident beside your place tapped: says their line */
+  onResident: (r: HomeResident) => void;
+  /** M-R259 (Saturn): the kororins rolling on the record (new, not heard yet) */
+  rolling: StageItem[];
+  /** one rolling kororin has finished talking and gone into the grooves */
+  onHeard: (id: string) => void;
 }
 
 export interface PlanetHomeSkin {

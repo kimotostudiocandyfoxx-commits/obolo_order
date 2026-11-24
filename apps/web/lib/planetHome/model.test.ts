@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { HomeWork, PlanetHomeView } from '@obolo/shared';
-import { menuFor, moveOwn, queueFrom, recordOrder, stageOf } from './model';
+import { groovesOf, menuFor, moveOwn, queueFrom, recordOrder, rollingOf, stageOf } from './model';
 
 const now = Date.parse('2026-11-23T12:00:00Z');
 const ago = (h: number) => new Date(now - h * 3600_000).toISOString();
@@ -81,5 +81,23 @@ describe('星のホーム stage', () => {
     expect(menuFor({ rel: 'stranger' }, false)).toEqual(['open', 'push', 'hide', 'report']);
     expect(menuFor({ rel: 'stranger' }, true)).toEqual(['open', 'hide', 'report']);
     expect(menuFor({ rel: 'dachi', demo: true }, false)).toEqual([]);
+  });
+  it('M-R259: what rolls — new and unheard (88 hours), at most twelve; heard ones and your older ones are in the grooves', () => {
+    const around = Array.from({ length: 14 }, (_, i) => w(`a${i}`, i % 2 ? 'oshi' : 'dachi', 1 + i));
+    const s = stageOf(view({ own: [w('mine-new', 'own', 0.5), w('mine-old', 'own', 200)], around }), { now });
+    const heard = new Set(['a0', 'a1']);
+    const roll = rollingOf(s, heard, now);
+    expect(roll).toHaveLength(12);
+    expect(roll[0].id).toBe('mine-new');
+    expect(roll.map((x) => x.id)).not.toContain('a0');
+    expect(roll.map((x) => x.id)).not.toContain('mine-old');
+    const g = groovesOf(s, roll).map((x) => x.id);
+    expect(g).toContain('a0');
+    expect(g).toContain('mine-old');
+    expect(g).not.toContain('mine-new');
+    // everything heard: nothing rolls, all in the grooves
+    const all = new Set([...s.own, ...s.around].map((x) => x.id));
+    expect(rollingOf(s, all, now)).toEqual([]);
+    expect(groovesOf(s, []).length).toBe(16);
   });
 });

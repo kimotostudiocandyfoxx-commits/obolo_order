@@ -401,6 +401,34 @@
     scale: 1.25;
   }
 }
+/* the residents beside your place (design/home: bottom 13%, 34% tall, at the left / right edge) */
+.res {
+  position: absolute;
+  bottom: 13%;
+  height: 34%;
+  z-index: 4;
+  cursor: pointer;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.res img {
+  height: 100%;
+  width: auto;
+  display: block;
+  pointer-events: none;
+}
+.resL {
+  left: -2%;
+}
+.resR {
+  right: -2%;
+}
+.res:active {
+  transform: scale(0.96);
+}
 .plate {
   position: absolute;
   left: 50%;

@@ -48,18 +48,50 @@ export interface PlanetHomeConfig {
   far: string | null;
   leave: HomeLeave;
   open: HomeOpen;
+  /** M-R259 (Saturn): the new works roll about on your place to be touched (poke / flick / throw); heard ones go into
+   * the grooves, and the big button plays the grooves in one go */
+  roll?: boolean;
   /** tapping your place: 'enter' goes inside; 'play' starts it in place (Saturn's play button on the rim) */
   placeTap: 'enter' | 'play';
   /** the explainer strip at the top (shown 4.5 s when the home opens, then folded; 〔？〕 toggles it); **…** = emphasis */
   line: string;
   /** {bati}'s line after 〔○○へ飛ばす〕 ({neo} = the member's name) */
   flown: string;
-  /** the planet's art (design/home, the story team's 「ぷっくりした3Dの箱庭」): the backdrop with your place painted in,
-   * and the sprite that floats around it (a dachi's / 推し's face goes on top of it) */
+  /** the planet's art (design/home, the anime version chosen in M-R259: each planet in its own style): the backdrop
+   * with your place painted in, and the sprite that floats around it (a dachi's / 推し's face goes on top of it) */
   art: { backdrop: string; sprite: string };
+  /** the residents standing beside your place (each says one line when tapped); see HOME_RESIDENTS */
+  residents: HomeResident[];
   /** M-R258 §5: the day it goes out (Saturn first) */
   releaseOrder: number;
 }
+
+export interface HomeResident {
+  id: string;
+  name: string;
+  /** said when tapped (design/home/template.html, verbatim) */
+  line: string;
+  /** which side of your place they stand on */
+  side: 'l' | 'r';
+  art: string;
+}
+
+/**
+ * The residents (design/home: res-<planet>-<name>; served as res-<name> so a move needs no new file). Which planet each one lives on is decided here only — サーモン,
+ * ラジカセの侍 and リボンのもこもこ may still move (the user has not decided): moving one is changing its planet below.
+ */
+const RES = (planet: string, id: string, name: string, line: string, side: 'l' | 'r'): HomeResident & { planet: string } => ({ planet, id, name, line, side, art: `/planet-home/res-${id}.webp` });
+export const HOME_RESIDENTS = [
+  RES('venus', 'longg', 'ロングG', '……いい音だろ。', 'l'),
+  RES('venus', 'bossg', 'ボスG', '誰だ、お前ら。……ネオか。', 'r'),
+  RES('mercury', 'freezie', 'フリージー', '音に乗っけると、100倍だ。', 'l'),
+  RES('mercury', 'salmon', 'サーモン', 'おかえり。おかえり。', 'r'),
+  RES('mars', 'hippo', 'ヒポキン', '……いい画だ。また見せに来い。', 'l'),
+  RES('uranus', 'croco', 'クロコパトラ', 'あら、いらっしゃい。', 'l'),
+  RES('neptune', 'boombox', 'ラジカセの侍', '遊んでいくか。', 'r'),
+  RES('pluto', 'ribbon', 'リボンのもこもこ', 'おはなし、きかせて！', 'l'),
+];
+const residentsOf = (planet: string): HomeResident[] => HOME_RESIDENTS.filter((r) => r.planet === planet).map(({ planet: _p, ...r }) => r);
 
 const flown = (place: string) => `{neo}の${place}と、ダチ・推してくれている人の${place}に届いたよ`;
 
@@ -68,7 +100,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     planet: 'saturn',
     en: 'SATURN',
     accent: '#ffb36b',
-    cta: '▶ 再生',
+    cta: '▶ 全部流す',
     verb: '聞く',
     make: 'voice',
     name: '土星',
@@ -81,9 +113,11 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     leave: 'up-to-sky',
     open: 'sing',
     placeTap: 'play',
-    line: 'あなたの**レコード**に、ダチと推しのコロリンが**88時間**降ってくる。再生すると、針のマイクの前で歌う。',
+    roll: true,
+    line: 'あなたの**レコード**に、ダチと推しのコロリンが降ってくる。**つつく・はじく・投げる**と喋って、溝にしまわれる。',
     flown: '{neo}のレコードと、ダチ・推してくれている人のレコードに降ったよ',
     art: { backdrop: '/planet-home/bg-saturn.webp', sprite: '/planet-home/sp-korolin.webp' },
+    residents: residentsOf('saturn'),
     releaseOrder: 1,
   },
   jupiter: {
@@ -106,6 +140,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**木**のまわりに、ダチと推しのアートが**88時間**、蝶になって舞う。木の中のアトリエには、あなたのアートがずっと飾られる。',
     flown: flown('木'),
     art: { backdrop: '/planet-home/bg-jupiter.webp', sprite: '/planet-home/sp-butterfly.webp' },
+    residents: residentsOf('jupiter'),
     releaseOrder: 2,
   },
   mercury: {
@@ -129,6 +164,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**島**のまわりに、ダチと推しの曲が**88時間**、音船になってやってくる。島の家には、あなたの曲がずっと並ぶ。',
     flown: flown('島'),
     art: { backdrop: '/planet-home/bg-mercury.webp', sprite: '/planet-home/sp-ship.webp' },
+    residents: residentsOf('mercury'),
     releaseOrder: 3,
   },
   mars: {
@@ -152,6 +188,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**スタジオ**の空に、ダチと推しが映像を連れて、UFOで**88時間**やってくる。タップすると、空に映す。',
     flown: flown('スタジオ'),
     art: { backdrop: '/planet-home/bg-mars.webp', sprite: '/planet-home/sp-ufo.webp' },
+    residents: residentsOf('mars'),
     releaseOrder: 4,
   },
   venus: {
@@ -174,6 +211,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**ブース**のまわりに、ダチと推しの番組が**88時間**、電波になって漂う。近づくと聞こえる。',
     flown: flown('ブース'),
     art: { backdrop: '/planet-home/bg-venus.webp', sprite: '/planet-home/sp-radio.webp' },
+    residents: residentsOf('venus'),
     releaseOrder: 4,
   },
   // Uranus / Pluto / Neptune: words from the story team's template (design/home); no store of works yet
@@ -196,6 +234,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**お店**の空に、ダチと推しのグッズが**88時間**、気球で届く。お店の棚には、あなたのグッズがずっと並ぶ。',
     flown: flown('お店'),
     art: { backdrop: '/planet-home/bg-uranus.webp', sprite: '/planet-home/sp-balloon.webp' },
+    residents: residentsOf('uranus'),
     releaseOrder: 9,
   },
   pluto: {
@@ -217,6 +256,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**図書館**のまわりに、ダチと推しの物語が**88時間**、光る本になって飛んでくる。図書館には、あなたの本がずっと並ぶ。',
     flown: flown('図書館'),
     art: { backdrop: '/planet-home/bg-pluto.webp', sprite: '/planet-home/sp-book.webp' },
+    residents: residentsOf('pluto'),
     releaseOrder: 9,
   },
   neptune: {
@@ -238,6 +278,7 @@ export const PLANET_HOMES: Record<HomePlanet, PlanetHomeConfig> = {
     line: 'あなたの**ゲーム小屋**のまわりに、ダチと推しのゲームが**88時間**、泡になって浮かぶ。小屋の中では、あなたのゲームがいつでも遊べる。',
     flown: flown('ゲーム小屋'),
     art: { backdrop: '/planet-home/bg-neptune.webp', sprite: '/planet-home/sp-bubble.webp' },
+    residents: residentsOf('neptune'),
     releaseOrder: 9,
   },
 };

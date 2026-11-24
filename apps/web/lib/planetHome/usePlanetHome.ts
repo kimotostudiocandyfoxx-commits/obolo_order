@@ -4,7 +4,8 @@ import { PLANET_HOMES, type HomeOshi, type HomePlanet, type HomeWork, type Plane
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
-import { moveOwn, queueFrom, recordOrder, stageOf, type Stage, type StageItem } from './model';
+import { loadHeard, saveHeard } from './heard';
+import { groovesOf, moveOwn, queueFrom, recordOrder, rollingOf, stageOf, type Stage, type StageItem } from './model';
 
 /**
  * 星のホーム (M-R258): the state and the actions behind one planet home — load, the visit mark, singing / playing in
@@ -22,6 +23,11 @@ export interface PlanetHomeState {
   spinning: boolean;
   oshi: HomeOshi[] | null;
   note: string | null;
+  /** M-R259 (Saturn): the new kororins rolling on the record, and the ones in the grooves (heard / older) */
+  rolling: StageItem[];
+  grooves: StageItem[];
+  /** heard to the end: into the grooves (kept on this device) */
+  markHeard: (id: string) => void;
   play: (startId?: string) => void;
   stop: () => void;
   playOne: (w: HomeWork) => void;
@@ -51,6 +57,7 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
   const queue = useRef<StageItem[]>([]);
   const current = useRef<StageItem | null>(null);
   const switching = useRef(false);
+  const [heard, setHeard] = useState<Set<string>>(new Set());
 
   // load, then mark the visit (the view keeps the visit before, so what came after it sparkles this time)
   useEffect(() => {
@@ -91,6 +98,23 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
   }, [view, ownOrder, rels]);
   const stage = useMemo(() => (viewOrdered ? stageOf(viewOrdered, { now, seeds: opts.seeds, hidden }) : null), [viewOrdered, now, opts.seeds, hidden]);
 
+  // M-R259: which ones were heard (this device); a scripted place starts with none
+  const ownerId = view?.owner.id;
+  useEffect(() => {
+    if (!scripted && ownerId) setHeard(loadHeard(ownerId, planet));
+  }, [scripted, ownerId, planet]);
+  const rolling = useMemo(() => (stage && PLANET_HOMES[planet].roll ? rollingOf(stage, heard, now) : []), [stage, heard, now, planet]);
+  const grooves = useMemo(() => (stage ? (PLANET_HOMES[planet].roll ? groovesOf(stage, rolling) : recordOrder(stage)) : []), [stage, rolling, planet]);
+  const markHeard = useCallback(
+    (id: string) =>
+      setHeard((h) => {
+        const n = new Set(h).add(id);
+        if (!scripted && ownerId && stage) saveHeard(ownerId, planet, n, new Set([...stage.own, ...stage.around].map((w) => w.id)));
+        return n;
+      }),
+    [scripted, ownerId, planet, stage],
+  );
+
   const flash = (t: string) => {
     setNote(t);
     setTimeout(() => setNote((n) => (n === t ? null : n)), 2600);
@@ -127,13 +151,14 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
   const play = useCallback(
     (startId?: string) => {
       if (!stage) return;
-      const q = queueFrom(recordOrder(stage), startId);
+      // the grooves (Saturn: the heard ones, at the needle-mic in one go; elsewhere everything on the record)
+      const q = queueFrom(grooves, startId);
       if (!q.length) return;
       setSpinning(true);
       queue.current = q.slice(1);
       sing(q[0]);
     },
-    [stage, sing],
+    [stage, grooves, sing],
   );
   const stop = useCallback(() => {
     queue.current = [];
@@ -147,11 +172,12 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
       const all = [...stage.own, ...stage.around, ...stage.far];
       const it = all.find((x) => x.id === w.id);
       if (!it) return;
-      if (spinning && PLANET_HOMES[planet].placeTap === 'play') return play(w.id);
+      if (spinning && PLANET_HOMES[planet].placeTap === 'play' && grooves.some((x) => x.id === w.id)) return play(w.id);
       queue.current = [];
+      setSpinning(false);
       sing(it);
     },
-    [stage, spinning, planet, play, sing],
+    [stage, spinning, planet, play, sing, grooves],
   );
 
   const loadOshi = useCallback(() => {
@@ -181,6 +207,9 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
     spinning,
     oshi,
     note,
+    rolling,
+    grooves,
+    markHeard,
     play,
     stop,
     playOne,

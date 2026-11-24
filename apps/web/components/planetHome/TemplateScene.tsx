@@ -51,7 +51,7 @@ export function skyOf(stage: SceneProps['stage'], planet: string): StageItem[] {
   return [...stage.around, ...(planet === 'saturn' ? stage.own : [])].slice(0, SKY_MAX);
 }
 
-export function TemplateScene({ cfg, view, stage, playingId, spinning, caption, onPlace, onPlate, onItem, onHold }: SceneProps) {
+export function TemplateScene({ cfg, view, stage, playingId, spinning, caption, onPlace, onPlate, onItem, onHold, onResident }: SceneProps) {
   const hold = useHold();
   const sky = skyOf(stage, cfg.planet);
   let fall = 0;
@@ -134,9 +134,24 @@ export function TemplateScene({ cfg, view, stage, playingId, spinning, caption, 
         )}
       </div>
       <button type="button" className={s.place} onClick={onPlace} aria-label={`${view.owner.name}の${cfg.place}`} />
+      <Residents cfg={cfg} onResident={onResident} />
       <button type="button" className={s.plate} onClick={onPlate} data-testid="name-plate">
         {view.owner.name}の{cfg.place}
       </button>
+    </>
+  );
+}
+
+/** the residents standing beside your place (design/home: left / right of it); tapped, they say their line */
+export function Residents({ cfg, onResident }: Pick<SceneProps, 'cfg' | 'onResident'>) {
+  return (
+    <>
+      {cfg.residents.map((r) => (
+        <button key={r.id} type="button" className={`${s.res} ${r.side === 'l' ? s.resL : s.resR}`} onClick={() => onResident(r)} aria-label={r.name} data-testid={`resident-${r.id}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="" src={r.art} draggable={false} />
+        </button>
+      ))}
     </>
   );
 }
