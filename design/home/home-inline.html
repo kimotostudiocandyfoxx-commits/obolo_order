@@ -258,7 +258,7 @@ function enter(){
   $('shelf').innerHTML=ic.map((x,i)=>`<div class="w">${x}<small>11/${26-i}</small></div>`).join('');
   $('inside').classList.add('on');
 }
-let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.8,.76];
+let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.8,.76],QUEUE=[],MAXB=window.KMAX||16,NB=0;
 const CHB=n=>n===ME?'user':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
 const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
 const KOROS=[
@@ -284,19 +284,24 @@ function korPicker(done){
 }
 function setupRoll(){
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
-  const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
-  rolls=list.map((o,i)=>{const R=22+((i*7)%3)*4,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
+  const base=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
+  const total=window.KTOTAL||24,all=[];for(let i=0;i<total;i++)all.push(base[i%base.length]);
+  QUEUE=all.slice(MAXB);rolls=[];all.slice(0,MAXB).forEach((o,i)=>rolls.push(makeBall(o,i,i)));
+  startSim();
+}
+function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,L=W*.04,Rw=W*.96;const R=22+((i*7)%3)*4,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
     const kp=o.n===ME?(window.MYKORO??0):(i*3+o.n.length)%8,K=KOROS[kp];
     const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
     e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f)}</div></div><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
-    const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:-R-i*70,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
+    const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:slot>=0?-R-slot*70:-R-40,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
     e.addEventListener('pointermove',ev=>{if(!down)return;const dx=ev.clientX-down.lx,dy=ev.clientY-down.ly,dt=Math.max(8,performance.now()-down.lt)/1000;r.x+=dx;r.y+=dy;r.vx=dx/dt;r.vy=dy/dt;down.lx=ev.clientX;down.ly=ev.clientY;down.lt=performance.now()});
     e.addEventListener('pointerup',ev=>{if(!down)return;e.classList.remove('held');const moved=Math.hypot(ev.clientX-down.x,ev.clientY-down.y);r.drag=false;down=null;if(moved<6)pop(r);else r.wv+=4.5});
     e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pop(r)}});
-    return r});
+    return r}}
+function startSim(){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
   let last=performance.now();
   const step=now=>{const dt=Math.min(.033,(now-last)/1000);last=now;const live=rolls.filter(r=>!r.gone);
     const ph0=$('phone'),cx=RECLBL[0]*ph0.clientWidth;
@@ -327,7 +332,8 @@ function pop(r){
   const pw=$('phone').clientWidth;b.style.left=Math.max(pw*.24,Math.min(pw*.76,x))+'px';b.style.top=(y-118)+'px';setTimeout(()=>sky.appendChild(b),260);
   setTimeout(()=>{b.style.display='none';c.classList.add('wave')},2300);
   setTimeout(()=>{const ph=$('phone');c.classList.add('away');c.style.left=(RECLBL[0]*ph.clientWidth)+'px';c.style.top=(RECLBL[1]*ph.clientHeight)+'px';heard.push(r.o)},2900);
-  setTimeout(()=>{c.style.display='none';if(rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
+  setTimeout(()=>{if(QUEUE.length){const o=QUEUE.shift();rolls.push(makeBall(o,100+(NB++),-1))}},900);
+  setTimeout(()=>{c.style.display='none';if(!QUEUE.length&&rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
 function play(){
