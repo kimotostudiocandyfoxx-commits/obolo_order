@@ -17,3 +17,27 @@ export const MOON_ZONES = {
 
 /** each plate's horizon (the camera's eye level), as a fraction of its height from the bottom: the strollers' rows shrink toward it */
 export const MOON_ZONES_EYE = { hall: 0.47, outside: 0.4 } as const;
+
+/** the great hall's depth rows, front to back (client): the top 2 by the week's talk large in front, ranks 3–6 in the middle, 7–8 far at the back */
+export const HALL_ROWS = [2, 4, 2] as const;
+
+/**
+ * Where each stroller stands, in rank order: its row (0 = nearest) and its place in that row (0 = leftmost). With
+ * `caps` (the hall), the rows fill front first, then the middle, then the back; without (the plain), one row for up to
+ * 4, two for up to 10, else three, dealt in turn so the nearest row gets the first.
+ */
+export function strollSlots(n: number, caps: readonly number[] | null): { r: number; k: number }[] {
+  const out: { r: number; k: number }[] = [];
+  if (caps) {
+    let r = 0;
+    let k = 0;
+    for (let i = 0; i < n; i++) {
+      while (r < caps.length - 1 && k >= caps[r]) (r++, (k = 0));
+      out.push({ r, k: k++ });
+    }
+    return out;
+  }
+  const rows = n <= 4 ? 1 : n <= 10 ? 2 : 3;
+  for (let i = 0; i < n; i++) out.push({ r: i % rows, k: Math.floor(i / rows) });
+  return out;
+}

@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 import { KINDS, type AtelierKind } from '@/lib/atelier/unlock';
 import { useAuth } from '@/lib/auth';
 import { usePartner } from '@/lib/partner';
-import { BluenaTab, DachiTab, MoonTabs, tabOf, type MoonTab } from './MoonTabs';
+import { BluenaDevice, DachiTab, MoonTabs, tabOf, type MoonTab } from './MoonTabs';
+import type { Work } from './work';
 import { hasBluena, Shell } from './Shell';
 import type { RenderThread, ThreadInfo } from './threads';
 
@@ -31,9 +32,20 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
   const partner = usePartner();
   const [gate, setGate] = useState(true);
   const bluena = hasBluena(me);
+  // R10 (client): Bluena is a device, not a tab — ダチ | {bati}; an old ?tab=bluena link opens the device over {bati}
   const asked = tabOf(params.get('tab'));
-  const tab: MoonTab = asked === 'bluena' && !bluena ? 'bati' : asked;
+  const tab: MoonTab = asked === 'bluena' ? 'bati' : asked;
   const dachi = tab === 'dachi' ? params.get('dachi') : null;
+  const [device, setDevice] = useState(false);
+  useEffect(() => {
+    if (params.get('tab') !== 'bluena') return;
+    if (bluena) setDevice(true);
+    router.replace(path, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const openDevice = bluena ? () => setDevice(true) : undefined;
+  /** from a talk, each work can be sent: to the ダチ of the open talk, or to {bati} as material (the drag-a-work-in path) */
+  const sendTo: ((w: Work) => void) | undefined = tab === 'dachi' ? (dachi ? (w) => window.dispatchEvent(new CustomEvent('obolo:dachi-send', { detail: { to: dachi, work: w } })) : undefined) : (w) => window.dispatchEvent(new CustomEvent('obolo:material', { detail: w }));
 
   // the gate plays once per visit; reduced motion → straight in
   useEffect(() => {
@@ -50,7 +62,7 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
     const s = q.toString();
     router.push(s ? `${path}?${s}` : path, { scroll: false });
   };
-  const banner = <MoonTabs tab={tab} bati={partner.name} bluena={bluena} unread={threads?.some((t) => !!t.unread)} onTab={(t) => go(t)} />;
+  const banner = <MoonTabs tab={tab} bati={partner.name} unread={threads?.some((t) => !!t.unread)} onTab={(t) => go(t)} />;
   const back = () => router.back();
   // a ダチ talk opened here goes back by the history; one opened by a link / a refresh goes to the row in its place
   const openedHere = useRef(false);
@@ -69,22 +81,12 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
   return (
     <main className="pt-safe relative mx-auto flex h-svh max-w-xl flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
       {/* one bar: the talk's own (← back, the conversations, {bati}, Bluena) with the tabs under it — no page header above */}
-      {/* R9 (client): the Bati and ブルーナ tabs are one place — the temple with {bati} before the bowl; on ブルーナ it
-          blurs and dims behind the works (300 ms), nothing reloads. Only ダチ has the Earth-sky Moon. */}
-      <div
-        className={tab === 'dachi' ? 'hidden' : 'relative flex min-h-0 flex-1 flex-col'}
-        style={{ filter: tab === 'bluena' ? 'blur(7px) brightness(.72)' : 'blur(0px) brightness(1)', transition: 'filter .3s ease', pointerEvents: tab === 'bluena' ? 'none' : undefined }}
-        aria-hidden={tab === 'bluena' || undefined}
-        data-testid="bati-place"
-      >
-        <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={back} banner={banner} open={params.get('thread') || params.get('job') ? { thread: params.get('thread') || 'bati', day: params.get('day') ?? undefined, at: params.get('at') ?? undefined, job: params.get('job') ?? undefined } : undefined} />
+      <div className={tab === 'dachi' ? 'hidden' : 'relative flex min-h-0 flex-1 flex-col'} data-testid="bati-place">
+        <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={back} banner={banner} onDevice={openDevice} open={params.get('thread') || params.get('job') ? { thread: params.get('thread') || 'bati', day: params.get('day') ?? undefined, at: params.get('at') ?? undefined, job: params.get('job') ?? undefined } : undefined} />
       </div>
-      {tab === 'dachi' && <DachiTab threads={(threads ?? []).filter((t) => t.id !== 'bati')} open={dachi} onOpen={openDachi} onBack={back} banner={banner} renderThread={renderThread} />}
-      {tab === 'bluena' && (
-        <div className="absolute inset-0 z-[10] flex flex-col pt-safe">
-          <BluenaTab onBack={back} banner={banner} overPlace />
-        </div>
-      )}
+      {tab === 'dachi' && <DachiTab threads={(threads ?? []).filter((t) => t.id !== 'bati')} open={dachi} onOpen={openDachi} onBack={back} banner={banner} renderThread={renderThread} onDevice={openDevice} />}
+      {/* R10: the Bluena device, over whatever is open (the place behind blurs); from a talk each work can be sent */}
+      {device && <BluenaDevice onClose={() => setDevice(false)} onSend={sendTo} sendTo={tab === 'dachi' ? 'dachi' : 'bati'} />}
       {gate && <Gate onSkip={() => setGate(false)} />}
     </main>
   );

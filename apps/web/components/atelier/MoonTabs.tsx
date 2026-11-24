@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { castLook } from '@/lib/talk/demoLooks';
-import { MOON_ZONES, MOON_ZONES_EYE } from '@/lib/talk/zones';
+import { HALL_ROWS, MOON_ZONES, MOON_ZONES_EYE, strollSlots } from '@/lib/talk/zones';
 import { dachiZones } from '@obolo/shared';
 import { DachiLinkCard } from '@/components/DachiLinkCard';
 import { GLASS } from '@/components/talk/TalkScene';
@@ -103,7 +103,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
           <img src={MOON_ZONES.hall} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
           <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
           {hall.length ? (
-            <Strollers threads={hall} onOpen={onOpen} ground={outside.length || lonely ? 0.19 : 0.17} back={0.32} eye={MOON_ZONES_EYE.hall} />
+            <Strollers threads={hall} onOpen={onOpen} rowsAt={[0.13, 0.25, 0.34]} eye={MOON_ZONES_EYE.hall} />
           ) : (
             <div className="absolute inset-x-0 bottom-[14%] z-[5] flex flex-col items-center gap-4 px-8 text-center">
               {/* PLACEHOLDER (P-MOON-TABS-1): the words when there is no ダチ yet */}
@@ -329,14 +329,16 @@ function useHeads(srcs: string[]) {
   return heads;
 }
 
-function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
+function Strollers({ threads, onOpen, far = false, ground = 0.1, back = 0.28, eye, rowsAt }: {
   threads: ThreadInfo[];
   onOpen: (id: string) => void;
   far?: boolean;
-  /** where the front row stands (the bottom of their names), the farthest row, and the plate's horizon (eye level): fractions of the zone's height from its bottom */
-  ground: number;
-  back: number;
+  /** where the front row's feet are, the farthest row's, and the plate's horizon (eye level): fractions of the zone's height from its bottom */
+  ground?: number;
+  back?: number;
   eye: number;
+  /** the hall: its three depth rows' feet (front, middle, back), with HALL_ROWS' places in each, instead of ground / back */
+  rowsAt?: readonly number[];
 }) {
   const box = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLButtonElement | null)[]>([]);
@@ -352,19 +354,21 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  // rows: one for a few, two for the hall's 5–8, up to three outside (front row last in the list = nearest)
-  const rows = far ? (n <= 4 ? 1 : n <= 10 ? 2 : 3) : n <= 4 ? 1 : 2;
-  const rowOf = (i: number) => i % rows;
-  const perRow = (r: number) => threads.filter((_, i) => rowOf(i) === r).length;
-  // as tall as the ground allows, but never wider than a figure's own stretch (they must not stand on each other)
-  const most = Math.max(1, ...Array.from({ length: rows }, (_, r) => perRow(r)));
+  // the rows (0 = nearest): the hall in three depths by rank (client: the top 2 large in front, ranks 3–6 in the middle,
+  // 7–8 far at the back, filled front first); the plain in up to three rows, dealt in turn
+  const slots = strollSlots(n, rowsAt ? HALL_ROWS : null);
+  const rows = Math.max(1, ...slots.map((x) => x.r + 1));
+  const rowOf = (i: number) => slots[i]?.r ?? 0;
+  const perRow = (r: number) => slots.filter((x) => x.r === r).length;
   // the plates are eye-level (moon-zone-*): a row further back stands higher, toward the horizon, and is smaller by just
   // as much (its height is in proportion to its feet's distance below the horizon), so they all stand on the floor
   const zoneH = size.h / BOX;
-  const feetOf = (r: number) => zoneH * (ground + (rows > 1 ? ((back - ground) * r) / (rows - 1) : 0));
-  const scaleOf = (r: number) => (zoneH ? (eye - feetOf(r) / zoneH) / (eye - ground) : 1);
-  const liftOf = (r: number) => feetOf(r) - feetOf(0);
-  const H0 = Math.round(Math.min(zoneH * (eye - ground) * (far ? 0.55 : 0.5), far ? 220 : 320, ((size.w / most) * 1.25) / 0.62));
+  const at = (r: number) => (rowsAt ? rowsAt[Math.min(r, rowsAt.length - 1)] : ground + (rows > 1 ? ((back - ground) * r) / (rows - 1) : 0));
+  const feetOf = (r: number) => zoneH * at(r);
+  const scaleOf = (r: number) => (eye - at(r)) / (eye - at(0));
+  // as tall as the ground allows, but never wider than a figure's own stretch in its row (they must not stand on each other)
+  const fit = Math.min(...Array.from({ length: rows }, (_, r) => ((size.w / Math.max(1, perRow(r))) * 1.25) / 0.62 / scaleOf(r)));
+  const H0 = Math.round(Math.min(zoneH * (eye - at(0)) * (far ? 0.55 : 0.5), far ? 220 : 320, fit));
   const key = threads.map((t) => t.id).join('|');
   const heads = useHeads(threads.map(standOf));
   useEffect(() => {
@@ -397,11 +401,15 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
       }
     };
     const st = threads.map((_, i) => {
-      const r = rowOf(i);
-      const k = Math.floor(i / rows);
+      const { r, k } = slots[i];
       const lane = size.w / Math.max(1, perRow(r));
       const half = (H0 * scaleOf(r) * 0.62) / 2;
-      return { r, lane, half, lo: lane * k, hi: lane * (k + 1), x: lane * (k + 0.5) + (r % 2 ? lane * 0.25 : 0), dir: i % 2 ? -1 : 1, pause: 0.6 + (i % 5) * 0.6, speed: (14 + ((i * 7) % 5) * 2) * scaleOf(r), t: i * 1.7 };
+      // the hall's big front pair strolls only a little, in the gaps between the middle row (so it never stands on their names)
+      // and the far pair near the back of the hall, either side of the entrance (the middle of the picture)
+      const farPair = !!rowsAt && rows === 3 && r === 2;
+      const roam = rowsAt && r === 0 && rows > 1 ? lane * 0.14 : farPair ? size.w * 0.05 : null;
+      const mid = farPair ? size.w * (0.5 + (k - (perRow(r) - 1) / 2) * 0.3) : lane * (k + 0.5);
+      return { r, lane, half, lo: roam ? mid - roam - half : lane * k, hi: roam ? mid + roam + half : lane * (k + 1), roam: !!roam, x: mid + (!rowsAt && r % 2 ? lane * 0.25 : 0), dir: i % 2 ? -1 : 1, pause: 0.6 + (i % 5) * 0.6, speed: (14 + ((i * 7) % 5) * 2) * scaleOf(r), t: i * 1.7 };
     });
     if (reduced) {
       st.forEach((s, i) => place(i, Math.max(s.half, Math.min(size.w - s.half, s.x)), 0, 1, s.half));
@@ -415,8 +423,8 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
       last = now;
       st.forEach((s, i) => {
         // each in its own stretch, the figure's half-width kept inside it (and inside the screen)
-        const lo = Math.max(s.half + 6, s.lo + Math.min(s.half, s.lane * 0.3));
-        const hi = Math.min(size.w - s.half - 6, s.hi - Math.min(s.half, s.lane * 0.3));
+        const lo = Math.max(s.half + 6, s.lo + (s.roam ? s.half : Math.min(s.half, s.lane * 0.3)));
+        const hi = Math.min(size.w - s.half - 6, s.hi - (s.roam ? s.half : Math.min(s.half, s.lane * 0.3)));
         let walking = false;
         if (s.pause > 0) s.pause -= dt;
         else if (hi - lo < 8) s.x = (lo + hi) / 2;
@@ -458,7 +466,7 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
             onClick={() => onOpen(t.id)}
             aria-label={`${t.name}と話す`}
             className="absolute left-0 flex flex-col items-center will-change-transform"
-            style={{ bottom: feetOf(r), width: W, zIndex: 10 - r, filter: r ? `brightness(${1 - r * 0.1})` : undefined, transform: `translate3d(${(size.w / Math.max(1, perRow(r))) * (Math.floor(i / rows) + 0.5) - W / 2}px,0,0)` }}
+            style={{ bottom: feetOf(r), width: W, zIndex: 10 - r, filter: r ? `brightness(${1 - r * 0.1})` : undefined, transform: `translate3d(${(size.w / Math.max(1, perRow(r))) * ((slots[i]?.k ?? 0) + 0.5) - W / 2}px,0,0)` }}
           >
             <span className="relative block" style={{ width: W, height: H, animation: reduced ? 'dachi-idle 4.5s ease-in-out infinite' : undefined, transformOrigin: '50% 100%' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -476,7 +484,7 @@ function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
           key={`n-${t.id}`}
           ref={(el) => void (labs.current[i] = el)}
           className={`pointer-events-none absolute left-0 z-[30] max-w-[40%] truncate whitespace-nowrap rounded-full bg-[rgba(10,14,44,.72)] px-2 py-0.5 font-bold text-[#f4f1ff] backdrop-blur will-change-transform ${far || rowOf(i) ? 'text-[10px]' : 'text-[11px]'}`}
-          style={{ bottom: feetOf(rowOf(i)) - 22, transform: `translate3d(${(size.w / Math.max(1, perRow(rowOf(i)))) * (Math.floor(i / rows) + 0.5)}px,0,0)` }}
+          style={{ bottom: feetOf(rowOf(i)) - 22, transform: `translate3d(${(size.w / Math.max(1, perRow(rowOf(i)))) * ((slots[i]?.k ?? 0) + 0.5)}px,0,0)` }}
           aria-hidden
         >
           {t.name}
