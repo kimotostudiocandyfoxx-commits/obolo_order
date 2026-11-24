@@ -1734,9 +1734,13 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live }: { top: number; 
   const [atEnd, setAtEnd] = useState(true);
   const atEndRef = useRef(true);
   const last = units.length ? keyOf(units[units.length - 1]) : '';
+  // (a scroll the log makes itself is not the reader leaving the bottom: a smooth one passes through the middle)
+  const selfScrollUntil = useRef(0);
   const toEnd = (smooth: boolean) => {
     const el = box.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+    if (!el) return;
+    selfScrollUntil.current = performance.now() + (smooth ? 700 : 80);
+    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
   };
   // the first paint at the newest; then it follows while you are at the bottom
   useLayoutEffect(() => toEnd(false), []);
@@ -1750,6 +1754,8 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live }: { top: number; 
     if (!el || typeof ResizeObserver === 'undefined') return;
     const ro = new ResizeObserver(() => atEndRef.current && toEnd(false));
     ro.observe(el);
+    // the log's own box changes too (the keyboard up and down, the bar's height): stay at the newest
+    if (box.current) ro.observe(box.current);
     return () => ro.disconnect();
   }, []);
   return (
@@ -1760,6 +1766,7 @@ function TalkLog<U>({ top, bottom, units, keyOf, render, live }: { top: number; 
         onScroll={(e) => {
           const el = e.currentTarget;
           const end = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+          if (!end && performance.now() < selfScrollUntil.current) return;
           atEndRef.current = end;
           if (end !== atEnd) setAtEnd(end);
         }}

@@ -69,11 +69,22 @@ export function MoonAtelier({ threads, renderThread }: { threads?: ThreadInfo[];
   return (
     <main className="pt-safe relative mx-auto flex h-svh max-w-xl flex-col overflow-hidden bg-[radial-gradient(130%_70%_at_50%_0%,#1d2a52_0%,#0b1027_55%,#05060f_100%)] text-amber-50">
       {/* one bar: the talk's own (← back, the conversations, {bati}, Bluena) with the tabs under it — no page header above */}
-      <div className={tab === 'bati' ? 'contents' : 'hidden'}>
+      {/* R9 (client): the Bati and ブルーナ tabs are one place — the temple with {bati} before the bowl; on ブルーナ it
+          blurs and dims behind the works (300 ms), nothing reloads. Only ダチ has the Earth-sky Moon. */}
+      <div
+        className={tab === 'dachi' ? 'hidden' : 'relative flex min-h-0 flex-1 flex-col'}
+        style={{ filter: tab === 'bluena' ? 'blur(7px) brightness(.72)' : 'blur(0px) brightness(1)', transition: 'filter .3s ease', pointerEvents: tab === 'bluena' ? 'none' : undefined }}
+        aria-hidden={tab === 'bluena' || undefined}
+        data-testid="bati-place"
+      >
         <Shell first={kindOf(params.get('kind'))} threads={threads} renderThread={renderThread} onBack={back} banner={banner} open={params.get('thread') || params.get('job') ? { thread: params.get('thread') || 'bati', day: params.get('day') ?? undefined, at: params.get('at') ?? undefined, job: params.get('job') ?? undefined } : undefined} />
       </div>
       {tab === 'dachi' && <DachiTab threads={(threads ?? []).filter((t) => t.id !== 'bati')} open={dachi} onOpen={openDachi} onBack={back} banner={banner} renderThread={renderThread} />}
-      {tab === 'bluena' && <BluenaTab onBack={back} banner={banner} />}
+      {tab === 'bluena' && (
+        <div className="absolute inset-0 z-[10] flex flex-col pt-safe">
+          <BluenaTab onBack={back} banner={banner} overPlace />
+        </div>
+      )}
       {gate && <Gate onSkip={() => setGate(false)} />}
     </main>
   );

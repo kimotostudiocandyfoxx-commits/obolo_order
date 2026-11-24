@@ -138,7 +138,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
  * A tap opens or plays it as Bluena does (WorkSheet). Your looks and {bati} (the Moon's shelf) are behind 〔姿とバティ〕.
  * No orbit (the planets going round are gone everywhere).
  */
-export function BluenaTab({ onBack, banner }: { onBack?: () => void; banner: React.ReactNode }) {
+export function BluenaTab({ onBack, banner, overPlace = false }: { onBack?: () => void; banner: React.ReactNode; /** R9: over the temple (the Bati tab, blurred behind): no backdrop of its own */ overPlace?: boolean }) {
   const { me } = useAuth();
   const ctx = useAtelierCtx();
   const [found, setFound] = useState<Found[] | null>(null);
@@ -159,9 +159,11 @@ export function BluenaTab({ onBack, banner }: { onBack?: () => void; banner: Rea
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden" data-testid="bluena-tab">
       <style>{'@keyframes bluena-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}'}</style>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={PLACE_BG.moon} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
-      <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.6) 0%,rgba(7,11,36,.15) 30%,rgba(7,11,36,.2) 70%,rgba(7,11,36,.7) 100%)' }} />
+      {!overPlace && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={PLACE_BG.moon} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
+      )}
+      <div className="pointer-events-none absolute inset-0" style={{ background: overPlace ? 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,.2) 30%,rgba(7,11,36,.25) 70%,rgba(7,11,36,.6) 100%)' : 'linear-gradient(to bottom,rgba(7,11,36,.6) 0%,rgba(7,11,36,.15) 30%,rgba(7,11,36,.2) 70%,rgba(7,11,36,.7) 100%)' }} />
       <TabBar title="ブルーナ" onBack={onBack} banner={banner} />
       <div className="relative z-[5] flex justify-end px-4 pt-2">
         <button onClick={() => setShelf(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.6)] px-3 py-1 text-[12px] font-bold text-[#f4f1ff] backdrop-blur">
