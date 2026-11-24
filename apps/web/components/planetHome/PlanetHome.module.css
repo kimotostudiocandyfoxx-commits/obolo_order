@@ -1148,3 +1148,69 @@
     transition: none;
   }
 }
+
+/* M-R265: Saturn's balls as DOM (BallLayer): position on the outer, squash on the inner about its bottom, a face */
+.ballLayer {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ball {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+.ballBody {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 88%;
+  will-change: transform;
+}
+.ballBody img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+.ballFace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.ballEyes,
+.ballSquint {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.ballEyes {
+  animation: ballBlink 4.6s infinite;
+}
+.ballSquint {
+  transition: transform 0.12s ease-out;
+}
+.ballHeld .ballSquint {
+  transform: scaleY(0.25);
+}
+@keyframes ballBlink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  95.5% {
+    transform: scaleY(0.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ballEyes {
+    animation: none;
+  }
+}

@@ -2,9 +2,9 @@
 
 import { RECORD_COLOURS } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
-import { PuniPhysicsLayer, type PuniItem, type PuniLayerHandle } from '@/components/puni/PuniPhysicsLayer';
-import { COLORS, defaultLook } from '@/lib/puni/parts';
-import type { Blob } from '@/lib/puni/physics';
+import { COLORS } from '@/lib/puni/parts';
+import type { Ball } from '@/lib/planetHome/ballPhysics';
+import { BallFace, BallLayer, type BallItem, type BallLayerHandle } from './BallLayer';
 import type { StageItem } from '@/lib/planetHome/model';
 import type { SceneProps } from './skin';
 import s from './PlanetHome.module.css';
@@ -13,8 +13,8 @@ import s from './PlanetHome.module.css';
  * Saturn, the final form (M-R262; design/home/README.md §7, home-inline.html Saturn mode): a cute huge record seen from a
  * low angle (home2-bg-saturn-cutea, the needle up), its colour chosen by the member (a screen-blended layer through
  * saturn-record-mask). The new kororins are glossy balls — gold = yours, white = a dachi's, pink = a 推し's — run by
- * the 10/7 soft physics (components/puni/PuniPhysicsLayer): they fall, pile on the record (floor at 86%, 4–96% of the
- * width, at most 12), squash when they bump, and can be dragged and thrown. A tap pops the ball like a soap bubble (a
+ * plain DOM balls with faces (M-R265, BallLayer + lib/planetHome/ballPhysics): they fall, pile on the record (floor at
+ * 86%, 4–96% of the width, at most 12), jiggle on a spring when they bump or are pressed, and can be dragged and thrown. A tap pops the ball like a soap bubble (a
  * splash), and its maker's 2-heads mini figure (author.chibi; a round face until it is painted) jumps out and says the
  * words in its own voice, in a bubble; then it waves and goes into the groove at the record's centre (heard, kept).
  * Tap the record itself: a ripple, and the nearest ball hops. Reduced motion: still rows, no physics.
@@ -84,7 +84,7 @@ type Out = { w: StageItem; x: number; y: number; phase: 'talk' | 'wave' | 'away'
 export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPlate, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
   const root = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
-  const layer = useRef<PuniLayerHandle>(null);
+  const layer = useRef<BallLayerHandle>(null);
   const reduced = useReducedMotion();
   const [outs, setOuts] = useState<Out[]>([]);
   const outsRef = useRef<Out[]>([]);
@@ -124,7 +124,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  const items = useMemo<PuniItem[]>(() => shown.map((w) => ({ id: w.id, look: defaultLook(COLORS[hue(w.author.id) % COLORS.length]), pic: BALL[w.rel], R: (22 + (hue(w.id) % 3) * 4) * scale })), [shown, scale]);
+  const items = useMemo<BallItem[]>(() => shown.map((w) => ({ id: w.id, pic: BALL[w.rel], R: (22 + (hue(w.id) % 3) * 4) * scale })), [shown, scale]);
 
   const size = () => ({ W: root.current?.clientWidth ?? 390, H: root.current?.clientHeight ?? 844 });
   const groove = () => {
@@ -152,7 +152,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     const w = live.current.rolling.find((x) => x.id === id);
     if (!w || outsRef.current.some((o) => o.w.id === id)) return;
     touched.current = id;
-    const b = layer.current?.blob(id);
+    const b = layer.current?.ball(id);
     const x = at?.x ?? b?.x ?? 0;
     const y = at?.y ?? b?.y ?? 0;
     const R = b?.R ?? 28;
@@ -187,7 +187,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       let bd = Infinity;
       for (const w of live.current.rolling) {
         if (outsRef.current.some((o) => o.w.id === w.id)) continue;
-        const b = layer.current?.blob(w.id);
+        const b = layer.current?.ball(w.id);
         const d = b ? Math.hypot(b.x - nx, b.y - ny) : 1e6;
         if (d < bd) [best, bd] = [w.id, d];
       }
@@ -225,7 +225,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
   }, [finish]);
 
   // every frame: the name plates, laid out so none covers another plate, another ball, a mini figure, its words or the dock
-  const onFrame = useCallback((get: (id: string) => Blob | undefined) => {
+  const onFrame = useCallback((get: (id: string) => Ball | undefined) => {
     const { W, H } = size();
     const left = FACE.x0 * W;
     const boxes: { x0: number; x1: number; y0: number; y1: number }[] = [];
@@ -243,7 +243,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
         boxes.push({ x0: bx - half - 3, x1: bx + half + 3, y0: by - el.offsetHeight - 3, y1: by + 3 });
       }
     }
-    const balls: { id: string; b: Blob }[] = [];
+    const balls: { id: string; b: Ball }[] = [];
     for (const id of tags.current.keys()) {
       const b = get(id);
       if (b) balls.push({ id, b });
@@ -299,7 +299,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     let best: string | null = null;
     let bd = Infinity;
     for (const w of live.current.rolling) {
-      const b = layer.current?.blob(w.id);
+      const b = layer.current?.ball(w.id);
       if (!b) continue;
       const d = Math.hypot(b.x - x, b.y - y);
       if (d < b.R * 1.15 && d < bd) [best, bd] = [w.id, d];
@@ -326,8 +326,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
       h.timer = null;
       h.fired = true;
       const w = live.current.rolling.find((x) => x.id === id);
-      const b = layer.current?.blob(id);
-      if (b) b.drag = null;
+      layer.current?.drop(id);
       if (w) live.current.onHold(w, at);
     }, HOLD_MS);
   };
@@ -358,7 +357,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     let near: string | null = null;
     let bd = 180;
     for (const w of live.current.rolling) {
-      const b = layer.current?.blob(w.id);
+      const b = layer.current?.ball(w.id);
       if (!b) continue;
       const d = Math.hypot(b.x - x, b.y - y);
       if (d < bd) [near, bd] = [w.id, d];
@@ -390,7 +389,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
         {reduced ? (
           <StillRows items={shown} onTap={(w, x, y) => pop(w.id, { x, y })} onHold={(w, at) => onHold(w, at)} />
         ) : (
-          <PuniPhysicsLayer ref={layer} items={items} floorAt={(_x, _W, H) => H * FACE.floor} onTap={tapBall} onTapEmpty={tapEmpty} onFrame={onFrame} />
+          <BallLayer ref={layer} items={items} floor={FACE.floor} onTap={tapBall} onTapEmpty={tapEmpty} onFrame={onFrame} />
         )}
         {!reduced &&
           shown.map((w) => (
@@ -487,6 +486,7 @@ function StillRows({ items, onTap, onHold }: { items: StageItem[]; onTap: (w: St
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="" src={BALL[w.rel]} />
+          <BallFace />
           <span className={s.puniTagStill}>{nameOf(w)}</span>
         </button>
       ))}
