@@ -27,7 +27,7 @@ export function BatiDay({ day, at, onBack }: { day: string; /** M-R253 §5: open
   const cut = at ? all.findIndex((m) => m.id === at || (m.who === 'work' && `m-${m.work.id}` === at)) : -1;
   const msgs = whole || cut < 0 ? all : all.slice(0, cut + 1);
   const people: TalkPerson[] = [
-    { id: 'bati', name: partner.name, look: partner.isBati ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
+    { id: 'bati', name: partner.name, look: batiLook(me?.bati, partner.face), color: BATI_COLOR },
     { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
   ];
   const items: TalkItem[] = msgs.map((m) =>

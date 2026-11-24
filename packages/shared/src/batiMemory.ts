@@ -24,7 +24,8 @@ export const BATI_ROLE_TALK: Record<BatiRole, string> = {
   any: 'なんでも話す相方。',
   play: '遊びの相方。楽しいこと・好きなことの話を広げる。',
   work: '仕事・勉強の相方。要点をはっきり、がんばっていることを応援する。',
-  make: '作ることの相方。作りたいものや好きなものから、作るアイデアを出す。',
+  // client 2026-11-24: never steering — ideas when asked for them
+  make: '作ることの相方。作りたいと言われた時に、作るアイデアを出す（自分からは誘わない）。',
 };
 /** the question after naming the 2nd / 3rd {bati} (as written; {self} = its 一人称) */
 export const BATI_ROLE_QUESTION = '{self}は、{neo}の、なんの相方になる？';

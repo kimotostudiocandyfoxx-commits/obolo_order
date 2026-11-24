@@ -75,3 +75,29 @@ describe('Bati answers (generation test 1, F・G)', () => {
     expect(r.text).toContain('いじめられているかも');
   });
 });
+
+describe('client 2026-11-24: a health question gets an answer — no menu, no steering', () => {
+  const ctx = { buddyName: 'バティ', persona: DEFAULT_PERSONA, memorySummary: null, userDisplayName: 'ユキ', locale: 'ja' as const };
+  it('the prompt: kind general words and a doctor if it goes on, never a diagnosis; never steering toward making', () => {
+    const s = buildBuddySystemPrompt(ctx);
+    expect(s).toContain('お医者さんに見てもらってね');
+    expect(s).toContain('診断はしない');
+    expect(s).toContain('誘わない');
+  });
+  it('「昨日から顎が痛いんだけど病気かなぁ」 is an ordinary question: answered by the ordinary answer, not the worry line', async () => {
+    const { buddyAnswer } = await import('./buddy');
+    const { BATI_SORT } = await import('./prompts/bati');
+    expect(BATI_SORT).toContain('昨日から顎が痛いんだけど病気かなぁ is normal');
+    const llm: LlmProvider = {
+      name: 'fake',
+      chat: async ({ system }) => {
+        if (system.startsWith('Classify')) return 'normal';
+        return '顎が痛いのは、つらいね。かみしめや、口の開けすぎで痛くなることがあるんだって。続いたら、お医者さんに見てもらってね。';
+      },
+    };
+    const r = await buddyAnswer(llm, ctx, [{ role: 'user', text: '昨日から顎が痛いんだけど病気かなぁ' }]);
+    expect(r.kind).toBe('normal');
+    expect(r.text).toContain('お医者さん');
+    expect(r.text).not.toContain('なにをする');
+  });
+});

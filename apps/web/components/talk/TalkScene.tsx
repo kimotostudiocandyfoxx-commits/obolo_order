@@ -215,7 +215,20 @@ export function TalkScene({
   plate,
   onCamera,
   ambient,
+  log = false,
+  framing,
 }: {
+  /**
+   * client 2026-11-24 (iPad, R7): the whole talk as a log — every bubble in one column over the place, the past ones
+   * moving up and fading out toward the top; scrolling up reads back the whole talk, scrolling down returns to now (no
+   * drag-to-the-past steps). The Moon chat and the ダチ talk.
+   */
+  log?: boolean;
+  /**
+   * 'ots' (client 2026-11-24): face to face, over your shoulder — you large in the foreground seen from behind (your
+   * back view; the talk cast's back while looks have none), the partner further back facing the camera. Two only.
+   */
+  framing?: 'ots';
   people: TalkPerson[];
   items: TalkItem[];
   /** who is making a reply (the 'thinking' face and a slow sway) */
@@ -335,7 +348,8 @@ export function TalkScene({
   const others = people.filter((p) => !p.self && !p.offstage);
   // M-R249: no look of yours yet (day 1 until the look is made on day 2's Moon) — first person: you are not shown, the
   // partners stand in the middle facing you, your words come from the bottom right with the tail off the screen toward you
-  const firstPerson = !!self && !self.look;
+  // (the over-the-shoulder framing always stands you in it: your back needs no look of your own)
+  const firstPerson = !!self && !self.look && !(framing === 'ots' && self.views?.back);
   const row = self && !firstPerson ? [...others, self] : others;
   // the moment your look is made: you step in beside the partner for the first time (light gathering into you, ~1.1 s)
   const wasFirst = useRef(firstPerson);
@@ -594,6 +608,11 @@ export function TalkScene({
   const onMove = (e: React.PointerEvent) => {
     const pr = press.current;
     if (!pr) return;
+    if (log) {
+      // the log scrolls by itself: a move only stops it counting as a tap
+      if (Math.abs(e.clientY - pr.y) > 10) pr.moved = true;
+      return;
+    }
     pr.acc += e.clientY - pr.y;
     pr.y = e.clientY;
     if (Math.abs(pr.acc) > 10) pr.moved = true;
@@ -620,6 +639,7 @@ export function TalkScene({
     } else finish();
   };
   const onWheel = (e: React.WheelEvent) => {
+    if (log) return;
     wheel.current += -e.deltaY;
     while (Math.abs(wheel.current) >= STEP_PX) {
       const dir = Math.sign(wheel.current);
@@ -746,13 +766,21 @@ export function TalkScene({
       spots.set(p.id, { x: Math.min(0.93, Math.max(0.07, x)), bottom: back ? stageH * 0.52 : 0, h: hh, z: back ? 1 : 2, w: n <= 2 ? 0.4 : back ? 0.2 : 0.9 / r.length, chest: chest || back });
     });
   });
+  // client 2026-11-24: face to face over your shoulder — you big in the front (from behind, cut by the screen's bottom),
+  // the partner further back, smaller and higher, facing the camera
+  const ots = framing === 'ots' && n === 2 && !!self && !firstPerson && !!self.views?.back;
+  if (ots) {
+    const other = row.find((p) => !p.self)!;
+    spots.set(other.id, { x: 0.4, bottom: stageH * 0.2, h: stageH * 0.74, z: 1, w: 0.4, chest: false });
+    spots.set(self!.id, { x: 0.8, bottom: -stageH * 0.55, h: stageH * 1.5, z: 3, w: 0.62, chest: false });
+  }
   // a wide picture at an end of the row (a painted resident with something held out to one side) is kept inside the
   // screen: its whole width, from its picture's own proportions
   for (const p of row) {
     const sp = spots.get(p.id);
     const r = p.look?.stand ? aspects[p.look.stand] : undefined;
     // (the talk cast's pictures share a padded canvas: their figures are well inside it)
-    if (!sp || !r || sp.chest || p.look?.poses) continue;
+    if (!sp || !r || sp.chest || p.look?.poses || ots) continue;
     const half = (sp.h * (p.scale ?? 1) * (r > 0.9 ? 0.58 : 1) * r) / 2 / w;
     // (a margin, so a wide painted prop — ハットG's cloud — does not sit on the screen's edge as if cut)
     const m = 16 / w;
@@ -769,7 +797,7 @@ export function TalkScene({
     return 1 - (s.bottom + s.h * (1 - at)) / stageH;
   };
   const headAt = Math.min(...row.map(headOf), 0.9);
-  const heads = chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 && !backRow.length ? 0.5 : 1);
+  const heads = ots ? stageTop + stageH * 0.08 : chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 && !backRow.length ? 0.5 : 1);
   // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
   const room = Math.max(120, heads - (barH + top + 56) - 48);
   const bubbleBottom = h - heads + 8;
@@ -1178,10 +1206,10 @@ export function TalkScene({
               {arriving && p.self && <ArrivalMotes />}
               <div className="flex h-full items-end justify-center" style={mv?.mirror || ag?.mirror || ag?.turn ? { transform: `${mv?.mirror !== !!ag?.mirror && (mv?.mirror || ag?.mirror) ? 'scaleX(-1) ' : ''}${ag?.turn ? `perspective(700px) rotateY(${ag.turn}deg)` : ''}`.trim() } : undefined}>
               <Figure
-                look={ag?.look ?? p.look}
+                look={ag?.look ?? (ots && p.self ? (viewLook(p.id, p.views?.back) ?? p.look) : p.look)}
                 face={faceOf(p)}
                 // a view of its own (the back in an over-the-shoulder, a 3/4 or side view): never a front pose over it
-                named={ag?.look ? null : poseOf(p)}
+                named={ag?.look || (ots && p.self) ? null : poseOf(p)}
                 state={g ? 'idle' : stateOf(p)}
                 motion={past ? undefined : (mv?.motion ?? react[p.id]?.motion)}
                 motionKey={past ? 0 : mv ? dirKey : (react[p.id]?.key ?? 0)}
@@ -1251,7 +1279,40 @@ export function TalkScene({
       )}
 
       {/* the bubbles: two at most over the heads (the newest lower), 62 px from the sides */}
-      {lines === 'bubbles' && (
+      {lines === 'bubbles' && log && (
+        <TalkLog
+          top={barH + top + 4}
+          bottom={bubbleBottom}
+          units={units}
+          keyOf={(u) => u.key}
+          render={(u, newest) => {
+            const it = u.item;
+            const who = byId.get(it.who);
+            const live = speech?.id === it.id && outNow != null;
+            const view: TalkItem = { ...it, text: u.text, ...(u.first ? {} : { name: undefined }), ...(u.last ? {} : { card: undefined, chips: undefined, extra: undefined, mark: undefined, voice: undefined }) };
+            return (
+              <Bubble
+                item={view}
+                who={who}
+                newest={newest}
+                clamp={false}
+                named={(isGroup || !!it.name) && u.first}
+                onCard={() => setBig(it)}
+                onOpen={() => setOpened(it)}
+                playing={speech?.id === it.id && !!it.voice}
+                muted={muted}
+                onPlay={() => (speech?.id === it.id ? finish() : say(it))}
+                onReplay={() => say(it)}
+                onRing={onRing && it.mark ? (at) => onRing(it, at) : undefined}
+                shown={live && outNow! < u.from + u.len ? Math.max(0, outNow! - u.from) : undefined}
+                beat={live && beatNow && beatNow.k >= u.s0 && beatNow.k < u.s1 ? { shape: beatNow.beat?.shape, in: beatNow.beat?.in, key: beatNow.k } : { shape: u.beats[u.beats.length - 1]?.shape, key: -1 }}
+              />
+            );
+          }}
+          live={outNow ?? 0}
+        />
+      )}
+      {lines === 'bubbles' && !log && (
       <div className="pointer-events-none absolute inset-x-0 z-[8] flex flex-col items-center justify-end gap-2.5" style={{ paddingLeft: 62, paddingRight: 62, bottom: bubbleBottom }}>
         {leaving && !past && <Ghost key={`g-${leaving.id}`} item={leaving} who={byId.get(leaving.who)} />}
         {(firstPerson ? shown.filter((u) => !byId.get(u.item.who)?.self) : shown).map((u, k, list) => {
@@ -1289,7 +1350,7 @@ export function TalkScene({
       )}
 
       {/* M-R249 first person: your newest words, from the bottom right, the tail off the screen toward you */}
-      {firstPerson && lines === 'bubbles' &&
+      {firstPerson && lines === 'bubbles' && !log &&
         shown
           .filter((u) => byId.get(u.item.who)?.self)
           .slice(-1)
@@ -1633,6 +1694,73 @@ export function Marked({ text, upto, marks }: { text: string; upto?: number; /**
           </em>
         );
       })}
+    </>
+  );
+}
+
+/**
+ * client 2026-11-24: the talk as a log — one column of every bubble (yours at the right, the others at the left), the
+ * newest at the bottom; the older ones move up and fade toward the top. It follows the newest while you are at the
+ * bottom; scrolled up, it stays where you read and 〔いまに戻る〕 brings you back.
+ */
+function TalkLog<U>({ top, bottom, units, keyOf, render, live }: { top: number; bottom: number; units: U[]; keyOf: (u: U) => string; render: (u: U, newest: boolean) => ReactNode; /** the characters out of the line being said (follows it while typed) */ live: number }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [atEnd, setAtEnd] = useState(true);
+  const atEndRef = useRef(true);
+  const last = units.length ? keyOf(units[units.length - 1]) : '';
+  const toEnd = (smooth: boolean) => {
+    const el = box.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+  };
+  // the first paint at the newest; then it follows while you are at the bottom
+  useLayoutEffect(() => toEnd(false), []);
+  useEffect(() => {
+    if (atEndRef.current) toEnd(true);
+  }, [last, units.length, live]);
+  // a picture that loads later (or a bubble that grows) keeps the newest in view while you are at the bottom
+  const inner = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = inner.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => atEndRef.current && toEnd(false));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <>
+      <div
+        ref={box}
+        data-talk-log
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          const end = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+          atEndRef.current = end;
+          if (end !== atEnd) setAtEnd(end);
+        }}
+        className="no-scrollbar pointer-events-auto absolute inset-x-0 z-[8] overflow-y-auto overscroll-contain px-4"
+        style={{ top, bottom, WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)', maskImage: 'linear-gradient(to bottom, transparent 0, rgba(0,0,0,.25) 9%, #000 34%)' }}
+      >
+        <div ref={inner} className="flex min-h-full flex-col justify-end gap-2.5 pb-1 pt-[30%]">
+          {units.map((u, k) => (
+            <div key={keyOf(u)} className="flex flex-col">
+              {render(u, k === units.length - 1)}
+            </div>
+          ))}
+        </div>
+      </div>
+      {!atEnd && (
+        <button
+          onClick={() => {
+            atEndRef.current = true;
+            setAtEnd(true);
+            toEnd(true);
+          }}
+          className="absolute left-1/2 z-[21] -translate-x-1/2 rounded-full bg-[rgba(223,230,255,.92)] px-4 py-[7px] text-[12px] font-bold text-[#070b24] shadow-[0_4px_14px_rgba(0,0,0,.35)]"
+          style={{ bottom: bottom + 8 }}
+        >
+          いまに戻る
+        </button>
+      )}
     </>
   );
 }

@@ -11,12 +11,13 @@ import { useAuth } from '@/lib/auth';
 import { batiLine, batiLineVoiceOf } from '@/lib/onboarding/batiLine';
 import { HOME_OF_WORK, PLANET_HOMES, TALK_BUBBLE_COLOUR, TALK_COLOR_KEY, type ChangeResult, type Me, changeableById, changeLines, changeRequest, etaMinutes, fillLine, homecomingSay, MOON_LINES, type RefineTarget, type WorkMaterial, batiDaysLeftLine, MARK_GLYPH, STAR_TIP_AT, STAR_TIP_KEY, STAR_TIP_LINE, TALK_FIXED_FACE_KEY, type BluenaPlanet, type ItemMarkId } from '@obolo/shared';
 import { useMarkRing } from '@/components/finds/MarkRing';
+import { viewsOf } from '@/lib/story/views';
 import { markNames } from '@/lib/finds/marks';
 import { findAll, PLANET_NAME, workMarkRef } from '@/lib/finds/works';
 import { daysUntil, isOpen, openKinds, openLessons, type AtelierKind, type Lesson } from '@/lib/atelier/unlock';
 import { usePartner } from '@/lib/partner';
 import { useAtelierCtx } from './ctx';
-import { ASK, DONE, detect, greetingOf, isBare, KIND_WORD } from './intent';
+import { ASK, DONE, detect, greetingOf, isBare, KIND_WORD, wantsPicture } from './intent';
 import { dropTry, fly, failLine, keep, keepFace, keepShow, make, wear, type MakeOpts } from './makers';
 import { asMaterial, fromMaterial, PROPOSAL_ASK, proposalFor, usesOf } from './material';
 import { dragLine } from './proposal';
@@ -45,6 +46,8 @@ const VISIT_KEY = 'obolo.atelier.visit';
 const USE = '使う';
 const NEW_TODAY = '今日は新しく';
 const PROPOSED_KEY = 'obolo.atelier.proposed';
+/** client 2026-11-24: the morning offer is off (never steering toward making) */
+const OFFER_ON_MORNING: boolean = false;
 
 /** M-R253: the cards as they are now, for a card opened big (the talk keeps a copy of what was opened) */
 const Cards = createContext<{ get: (id: string) => Work | undefined; render: (w: Work) => React.ReactNode }>({ get: () => undefined, render: () => null });
@@ -349,6 +352,45 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       .finally(() => setBusy(false));
   };
 
+  /**
+   * client 2026-11-24 (iPad, R7): {bati} answers in the talk itself — a question, a worry, a chat — through the buddy
+   * (short, plain words; a health question gets kind general words and "see a doctor if it goes on", never a
+   * diagnosis), then a picture as a picture bubble when one fits (never for a worry or a danger). No card to open.
+   */
+  const converse = async (text: string) => {
+    setBusy(true);
+    try {
+      const r = await Promise.race([getApi().buddyChat(text, 'ja'), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 25_000))]);
+      setMsgs((m) => [...m, { id: uid(), who: 'bati', text: r.reply.text }]);
+      const noPic = !!r.kind && r.kind !== 'normal';
+      const drawn = r.reply.image?.url;
+      if (drawn) setMsgs((m) => [...m, { id: uid(), who: 'bati', text: '', pic: { url: drawn } }]);
+      else if (!noPic && wantsPicture(text)) {
+        const pic = await Promise.race([getApi().buddyPicture(text, r.reply.text), new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 10_000))])
+          .then((x) => x.picture)
+          .catch(() => null);
+        if (pic) setMsgs((m) => [...m, { id: uid(), who: 'bati', text: '', pic: { url: pic.url, title: pic.title, source: pic.source, pageUrl: pic.pageUrl } }]);
+      }
+    } catch {
+      say('むむ…いまは、うまく答えられなかった。もう一回言ってみて');
+    } finally {
+      setBusy(false);
+    }
+  };
+  /** 「〇〇の絵を見せて」: the picture straight into the talk */
+  const showPicture = async (what: string) => {
+    setBusy(true);
+    try {
+      const pic = (await getApi().buddyPicture(what)).picture;
+      if (pic) setMsgs((m) => [...m, { id: uid(), who: 'bati', text: '', pic: { url: pic.url, title: pic.title, source: pic.source, pageUrl: pic.pageUrl } }]);
+      else say('ぴったりの絵は、見つからなかった……');
+    } catch {
+      say('いまは、絵を見つけられなかった……');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const send = (text: string) => {
     setMsgs((m) => [...m, { id: uid(), who: 'me', text }]);
     const p = pending;
@@ -369,10 +411,15 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     if (!story && changeAsk(text)) return;
     if (p && 'voiceAgain' in p) return void run('voice', text);
     if (p && 'use' in p) return void run(p.use, text, undefined, { materials: p.materials });
+    if (p && 'kind' in p && p.kind === 'lookup') return void converse(text);
+    if (p && 'kind' in p && p.kind === 'image') return void showPicture(text);
     if (p && 'kind' in p) return void run(p.kind, text);
     const last = lastWork();
     const it = detect(text, !!last, markNames());
     if (it.kind === 'find') return void showFound(it);
+    // client 2026-11-24: a lookup is answered right in the talk (short, plain words; a picture as a picture bubble)
+    if (it.kind === 'make' && it.what === 'lookup') return void converse(text);
+    if (it.kind === 'make' && it.what === 'image' && !isBare(it.content)) return void showPicture(it.content);
     if (it.kind === 'make') return ask(it.what, it.content);
     // M-R253 §1: 「新しく作って」 — a new card of the same kind (a change is made inside the card)
     if (last && /新しく|あたらしく|別の|べつの/.test(text)) {
@@ -392,7 +439,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       return void run(last.kind, it.content, last);
     }
     if (it.kind === 'ask') return say('どれにする？', it.options.map((k) => KIND_WORD[k]));
-    return say(HELLO, openKinds(day).map((k) => KIND_WORD[k]));
+    // client 2026-11-24: no 「なにをする？」 and no menu — anything else is talk, answered by {bati} itself
+    return void converse(text);
   };
 
   const chip = (label: string) => {
@@ -420,10 +468,11 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     if (k) ask(k, '');
   };
 
-  // M-R253 §3: on the morning a kind opens, {bati} offers what was made before as its material (once a day)
+  // M-R253 §3 (the morning's offer of earlier works as material) — client 2026-11-24 (iPad, R7): {bati} never steers
+  // toward making, so it no longer offers on its own; works dragged in from Bluena are still material
   const proposal = useRef<{ kind: AtelierKind; materials: Work[] } | null>(null);
   useEffect(() => {
-    if (story || !me || !day) return;
+    if (OFFER_ON_MORNING === false || story || !me || !day) return;
     const key = `${PROPOSED_KEY}.${day}`;
     try {
       if (localStorage.getItem(key)) return;
@@ -655,8 +704,11 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
 
   // M-R232: the side-by-side talk — you at the right, {bati} (or the story's speaker) at the left, the Moon behind
   const people: TalkPerson[] = [
-    { id: 'bati', name: partner.name, look: own.isBati || story ? batiLook(me?.bati, partner.face) : characterLook('kimorin'), color: BATI_COLOR },
-    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
+    // (no {bati} yet: the neutral stand-in, the egg, smaller — client 2026-11-24)
+    { id: 'bati', name: partner.name, look: batiLook(me?.bati, partner.face), color: BATI_COLOR, ...(own.placeholder && !story ? { scale: 0.55, headAt: 0.5 } : {}) },
+    // client 2026-11-24: face to face over your shoulder — your back in the front (the talk cast's back: looks have no
+    // back view painted yet)
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon, views: viewsOf('talk-user') },
   ];
   const items: TalkItem[] = msgs.map((m) =>
     m.who === 'me'
@@ -683,6 +735,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
                 }
               : undefined,
             name: m.speaker && story ? story.speaker(m.speaker).name : undefined,
+            // client 2026-11-24: a picture right in the talk (where it came from, small under it)
+            extra: m.pic ? <PicBubble pic={m.pic} /> : undefined,
             chips: m.changed
               ? [{ label: m.changed.undone ? '元に戻した' : '元に戻す', onPick: () => undoChange(m.id), disabled: busy || !!m.changed.undone }]
               : m.chips?.map((c) => ({ label: c, onPick: () => chip(c), disabled: busy })),
@@ -737,6 +791,8 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         items={items}
         thinking={busy || making ? 'bati' : null}
         voice={speaking ?? undefined}
+        log
+        framing={story ? undefined : 'ots'}
         listening={talkState.listening}
         keyboard={talkState.keyboard}
         place={PLACE_BG.moon}
@@ -797,6 +853,21 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       )}
     </div>
     </Cards.Provider>
+  );
+}
+
+/** client 2026-11-24: a picture {bati} found or drew, as a picture bubble (the source small under it) */
+function PicBubble({ pic }: { pic: NonNullable<Extract<Msg, { who: 'bati' }>['pic']> }) {
+  return (
+    <span className="block">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={pic.url} alt={pic.title ?? ''} className="block max-h-[220px] w-[min(240px,60vw)] rounded-xl object-cover" />
+      {(pic.source || pic.title) && (
+        <a href={pic.pageUrl} target="_blank" rel="noreferrer" className="mt-1 block truncate text-[10.5px] text-[#4a3410]/70 underline-offset-2 hover:underline">
+          {[pic.title, pic.source].filter(Boolean).join('・')}
+        </a>
+      )}
+    </span>
   );
 }
 

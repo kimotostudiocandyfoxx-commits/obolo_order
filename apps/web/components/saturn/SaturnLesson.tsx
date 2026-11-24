@@ -7,6 +7,7 @@ import { getApi } from '@/lib/api';
 import { stopAudio, subscribeAudio, toggleAudio } from '@/lib/audio';
 import { useAuth } from '@/lib/auth';
 import { unlockAudio } from '@/lib/onboarding/audio';
+import { openMic, quietMic } from '@/lib/micStream';
 import { spriteUrl } from '@/lib/onboarding/media';
 import { LineVoice, lineVoiceUrl } from '@/lib/story/lineVoice';
 import type { LessonApi } from '@/lib/onboarding/lessonApi';
@@ -178,7 +179,8 @@ function useRecorder() {
   const start = async (): Promise<boolean> => {
     if (rec.current && rec.current.state !== 'inactive') return true;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      // client 2026-11-24: the page's one mic stream (asked once, kept quiet between takes)
+      const stream = await openMic();
       const chunks: Blob[] = [];
       const type = recType();
       const r = type ? new MediaRecorder(stream, { mimeType: type }) : new MediaRecorder(stream);
@@ -186,7 +188,7 @@ function useRecorder() {
         if (e.data.size) chunks.push(e.data);
       };
       r.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
+        quietMic();
         rec.current = null;
         unlockAudio();
         done.current(chunks.length ? new Blob(chunks, { type: r.mimeType || type || 'audio/webm' }) : null);

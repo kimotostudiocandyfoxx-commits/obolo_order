@@ -148,7 +148,7 @@ function Chat() {
       {/* M-R232: the side-by-side talk — {bati} at the left, you at the right, the Moon behind */}
       <TalkScene
         people={[
-          { id: 'bati', name, look: me?.bati ? batiLook(me.bati) : characterLook('kimorin'), color: BATI_COLOR },
+          { id: 'bati', name, look: batiLook(me?.bati, me?.bati?.imageUrl ? undefined : '/onboarding/egg-pick-earth.webp'), color: BATI_COLOR },
           { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
         ]}
         items={[

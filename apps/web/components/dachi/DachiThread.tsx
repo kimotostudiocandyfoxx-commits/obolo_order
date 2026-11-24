@@ -13,6 +13,7 @@ import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { talkDayOf } from '@/lib/finds/talks';
+import { castLook } from '@/lib/talk/demoLooks';
 import { characterLook, colorOf, DACHI_COLOR, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 
 
@@ -145,7 +146,8 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
   const people: TalkPerson[] = [
     { id: 'them', name, look: thread?.talk ?? characterLook(kind) ?? (pic ? { of: pic, stand: pic } : null), color: DACHI_COLOR, avatar: kind === 'dachi' ? pic : undefined },
     ...[...new Set((msgs ?? []).filter((m) => m.character && m.character !== kind).map((m) => m.character!))].map((c) => ({ id: c, name: CHAR_NAME[c] ?? c, look: characterLook(c), color: colorOf(c, 3) })),
-    { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
+    // client 2026-11-24: you stand beside them, side by side, as in the story (no look yet: the talk cast's stand-in)
+    { id: 'me', name: me?.displayName ?? '', look: selfLook(me) ?? castLook('user'), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon },
   ];
   // M-R239: the first line not heard yet (opening plays from the one before it)
   const firstUnread = (msgs ?? []).findIndex((m) => !m.fromMe && m.read === false);
@@ -186,6 +188,7 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
           ) : undefined,
         }}
         keyboard={typing && keyboard}
+        log
         loading={msgs === null}
         unreadFrom={day ? null : unreadFrom}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}

@@ -58,3 +58,21 @@ describe('iPad feedback: {bati} opens with a short greeting', () => {
     expect(greetingOf({ neo: '', returning: false, turn: 1 })).toBe('やっほー！');
   });
 });
+
+describe('client 2026-11-24: {bati} answers — never the menu', () => {
+  it('a health question is answered in the talk, not with 「なにをする？」 and the kinds', async () => {
+    const { conversational, detect, wantsPicture } = await import('./intent');
+    for (const last of [false, true]) {
+      const it = detect('昨日から顎が痛いんだけど病気かなぁ', last);
+      expect(conversational(it)).toBe(true);
+    }
+    // words only for a pain; a picture may come for a thing one can see
+    expect(wantsPicture('昨日から顎が痛いんだけど病気かなぁ')).toBe(false);
+    expect(wantsPicture('パンダってどんな動物？')).toBe(true);
+  });
+  it('small talk is answered too; a make request still makes', async () => {
+    const { conversational, detect } = await import('./intent');
+    expect(conversational(detect('こんにちは', false))).toBe(true);
+    expect(conversational(detect('夜の海の絵を描いて', false))).toBe(false);
+  });
+});

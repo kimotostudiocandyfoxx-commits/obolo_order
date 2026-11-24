@@ -1,4 +1,5 @@
 import { EasyDeck } from '@/lib/dj/easy';
+import { openMic as openMicStream, quietMic } from '@/lib/micStream';
 
 /**
  * The Venus broadcast booth's sound (docs/工房とブルーナ_設計.md §10): two decks and a crossfader on
@@ -116,7 +117,8 @@ export class BoothMixer {
 
   async openMic(): Promise<void> {
     if (this.mic) return;
-    this.mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    // client 2026-11-24: the page's one mic stream (asked once)
+    this.mic = await openMicStream();
     this.micNode = this.ctx.createMediaStreamSource(this.mic);
     this.micNode.connect(this.voice);
     this.micNode.connect(this.meter);
@@ -126,7 +128,7 @@ export class BoothMixer {
   closeMic() {
     this.micNode?.disconnect();
     this.micNode = null;
-    this.mic?.getTracks().forEach((t) => t.stop());
+    if (this.mic) quietMic();
     this.mic = null;
     this.micLevel = 0;
     this.speaking = false;

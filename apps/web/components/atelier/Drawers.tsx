@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import type { AtelierKind } from '@/lib/atelier/unlock';
 import { HOME_OF_WORK, PLANET_HOMES, BLUENA_PLANETS, type BluenaPlanet, type MarkedKind, type TalkDayView } from '@obolo/shared';
 import { PlanetMark } from '@/components/bluena/PlanetMark';
-import { BluenaOrbit, planetOpen } from '@/components/bluena/BluenaOrbit';
+import { planetOpen } from '@/components/bluena/BluenaOrbit';
 import { Glyph, GLYPH_NAMES } from '@/components/bluena/glyphs';
 import { BatiShelf } from '@/components/bati/BatiShelf';
 import { MarkNamesSheet, GearGlyph } from '@/components/finds/MarkNames';
@@ -14,7 +14,6 @@ import { StarButton, useMarkRing } from '@/components/finds/MarkRing';
 import { SpiralList, type FindFilter, type SpiralRow } from '@/components/finds/SpiralList';
 import { useMarks } from '@/lib/finds/marks';
 import { findAll, KIND_PLANET, PLANET_COLOR, PLANET_GLYPH, PLANET_NAME, workMarkRef, type Found } from '@/lib/finds/works';
-import { usePartner } from '@/lib/partner';
 import { batiTalkDays } from '@/lib/finds/talks';
 import { BATI_COLOR, colorOf, SELF_COLOR } from '@/lib/talk/looks';
 import { discard, fly, type Ctx } from './makers';
@@ -59,18 +58,17 @@ async function load(kind: AtelierKind, meId: string | undefined, live: boolean, 
 }
 
 /**
- * Bluena on the right (M-R211 → M-R237): on opening, the Moon in the middle (your look and {bati}) with the eight
- * planets going round it — drag to turn them; one not open yet is dark (BluenaOrbit). A planet (or 〔すべて〕) opens its
- * works as the spiral and the list (SpiralList): ★ and marks, the filter strip, the search box. The Moon opens your
+ * Bluena on the right (M-R211 → M-R237; client 2026-11-24: no orbit any more): all the works as the spiral and the
+ * list (SpiralList): ★ and marks, the planets' filter strip, the search box. 〔姿とバティ〕 opens your
  * looks and {bati} (BatiShelf and the device's own folders). Every work can be played, flown to its planet, or thrown
  * away here. The gear at the top right names the marks.
  */
 export function BluenaDrawer({ kinds, day, ctx, onClose, onOrigin, onMaterial }: { kinds: AtelierKind[]; day?: number | null; ctx: Ctx; onClose: () => void; /** M-R253 §5: a work tapped → the talk it was made in (false: not known) */ onOrigin?: (w: Work) => boolean; /** M-R253 §3: a work dragged into the chat */ onMaterial?: (w: Work) => void }) {
-  const { me } = useAuth();
-  const partner = usePartner();
-  const [view, setView] = useState<'orbit' | 'moon' | { planet: BluenaPlanet | null }>('orbit');
+  // client 2026-11-24 (iPad, R7): the planets going round (the orbit) are gone — Bluena opens on all the works (the
+  // planets' strip filters them); your looks and {bati} are one tap away (〔姿とバティ〕)
+  const [view, setView] = useState<'moon' | { planet: BluenaPlanet | null }>({ planet: null });
   const [names, setNames] = useState(false);
-  const back = view === 'orbit' ? null : () => setView('orbit');
+  const back = view === 'moon' || (typeof view === 'object' && view.planet) ? () => setView({ planet: null }) : null;
   return (
     <Drawer side="right" onClose={onClose} label="ブルーナ">
       <div className="relative flex shrink-0 items-center gap-2 pb-2">
@@ -97,15 +95,15 @@ export function BluenaDrawer({ kinds, day, ctx, onClose, onOrigin, onMaterial }:
           </span>
         )}
         <span className="flex-1" />
+        {view !== 'moon' && (
+          <button onClick={() => setView('moon')} className="rounded-full border border-sky-200/30 px-3 py-1 text-[11px] text-sky-100/85">
+            姿とバティ
+          </button>
+        )}
         <button onClick={() => setNames(true)} aria-label="しるしの名前" className="flex h-7 w-7 items-center justify-center rounded-full text-white/45">
           <GearGlyph />
         </button>
       </div>
-      {view === 'orbit' && (
-        <div className="flex min-h-0 flex-1 flex-col justify-center pb-10">
-          <BluenaOrbit day={day} face={me?.avatarUrl ?? me?.lookIcon} bati={partner.isBati ? partner.face : null} onPlanet={(p) => setView({ planet: p })} onAll={() => setView({ planet: null })} onMoon={() => setView('moon')} />
-        </div>
-      )}
       {view === 'moon' && <MoonShelf kinds={kinds.filter((k) => !KIND_PLANET[k])} ctx={ctx} onOrigin={onOrigin} />}
       {typeof view === 'object' && <PlanetWorks planet={view.planet} day={day} ctx={ctx} onOrigin={onOrigin} onMaterial={onMaterial} />}
       {names && <MarkNamesSheet onClose={() => setNames(false)} />}
@@ -114,7 +112,7 @@ export function BluenaDrawer({ kinds, day, ctx, onClose, onOrigin, onMaterial }:
 }
 
 /** the Moon: your looks, {bati}'s cards and dress-ups, lookups and pictures (kept on this device) */
-function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx: Ctx; onOrigin?: (w: Work) => boolean }) {
+export function MoonShelf({ kinds, ctx, onOrigin }: { kinds: AtelierKind[]; ctx: Ctx; onOrigin?: (w: Work) => boolean }) {
   const { me } = useAuth();
   const [kind, setKind] = useState<AtelierKind | null>(kinds[0] ?? null);
   const [items, setItems] = useState<Work[] | null>(null);
@@ -180,17 +178,6 @@ export function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet
       title: x.title || x.work.prompt || GLYPH_NAMES[PLANET_GLYPH[x.planet]],
       mark: { kind: x.kind, id: x.id },
     })) ?? null;
-  const act = async (fn: () => Promise<void>, ok: string) => {
-    try {
-      await fn();
-      setLine(ok);
-      setOpen(null);
-      setN((x) => x + 1);
-    } catch {
-      setLine('うまくいかなかった…');
-    }
-  };
-  const w = open ? { ...open.work, origin: open.work.origin ?? open.origin ?? undefined, atelierId: open.work.atelierId ?? open.atelierId } : undefined;
   return (
     <>
       {line && <p className="pb-1 text-center text-[11px] text-sky-100/70">{line}</p>}
@@ -204,27 +191,46 @@ export function PlanetWorks({ planet, day, ctx, onOrigin, onMaterial }: { planet
         empty={filter.star || filter.mark || filter.q ? '見つからなかった' : 'まだ、なにもない'}
         search="題名・歌詞・言葉"
       />
-      {open && w && (
-        <div className="absolute inset-x-2 bottom-3 z-20 rounded-2xl border border-white/10 bg-[#121a3a]/95 p-1 shadow-[0_-8px_30px_rgba(0,0,0,0.5)] backdrop-blur">
-          <Item
-            w={w}
-            onRing={(at) => ring.open(open.kind, open.id, at)}
-            markRef={{ kind: open.kind, id: open.id }}
-            tries={open.versionCount ?? w.versions?.length}
-            onOrigin={onOrigin && w.origin ? () => onOrigin(w) : undefined}
-            onDragOut={onMaterial ? () => onMaterial(w) : undefined}
-            onFly={FLIES[w.kind] && !w.flown && (w.kind !== 'song' || ctx.live || !!w.ref?.demoSong) ? () => void act(() => fly(w, ctx), flownLine(w.kind, me?.displayName)) : undefined}
-            onDiscard={w.kind === 'song' && ctx.live ? undefined : () => confirm('ブルーナから捨てる？') && void act(() => discard(w), '捨てた')}
-          />
-          <button onClick={() => setOpen(null)} aria-label="とじる" className="absolute -top-3 left-1/2 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-white/10 bg-[#121a3a] text-white/60">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
-        </div>
-      )}
+      {open && <WorkSheet found={open} ctx={ctx} onClose={() => setOpen(null)} onLine={setLine} onChanged={() => setN((x) => x + 1)} onOrigin={onOrigin} onMaterial={onMaterial} />}
       {ring.node}
     </>
+  );
+}
+
+/** one work opened from Bluena's list: play it, fly it, throw it away, back to the talk it was made in */
+export function WorkSheet({ found: open, ctx, onClose, onLine, onChanged, onOrigin, onMaterial }: { found: Found; ctx: Ctx; onClose: () => void; onLine?: (l: string) => void; onChanged?: () => void; onOrigin?: (w: Work) => boolean; onMaterial?: (w: Work) => void }) {
+  const { me } = useAuth();
+  const ring = useMarkRing();
+  const act = async (fn: () => Promise<void>, ok: string) => {
+    try {
+      await fn();
+      onLine?.(ok);
+      onClose();
+      onChanged?.();
+    } catch {
+      onLine?.('うまくいかなかった…');
+    }
+  };
+  const w = { ...open.work, origin: open.work.origin ?? open.origin ?? undefined, atelierId: open.work.atelierId ?? open.atelierId };
+  return (
+    <div className="absolute inset-x-2 bottom-3 z-20 rounded-2xl border border-white/10 bg-[#121a3a]/95 p-1 shadow-[0_-8px_30px_rgba(0,0,0,0.5)] backdrop-blur">
+      <Item
+        w={w}
+        onRing={(at) => ring.open(open.kind, open.id, at)}
+        markRef={{ kind: open.kind, id: open.id }}
+        tries={open.versionCount ?? w.versions?.length}
+        onOrigin={onOrigin && w.origin ? () => onOrigin(w) : undefined}
+        onDragOut={onMaterial ? () => onMaterial(w) : undefined}
+        onFly={FLIES[w.kind] && !w.flown && (w.kind !== 'song' || ctx.live || !!w.ref?.demoSong) ? () => void act(() => fly(w, ctx), flownLine(w.kind, me?.displayName)) : undefined}
+        onDiscard={w.kind === 'song' && ctx.live ? undefined : () => confirm('ブルーナから捨てる？') && void act(() => discard(w), '捨てた')}
+      />
+      <button onClick={onClose} aria-label="とじる" className="absolute -top-3 left-1/2 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-white/10 bg-[#121a3a] text-white/60">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden>
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      {ring.node}
+    </div>
   );
 }
 

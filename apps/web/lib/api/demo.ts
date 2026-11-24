@@ -1460,7 +1460,8 @@ export class DemoApi implements Api {
   }
   async dachiThreads(): Promise<DachiThreadView[]> {
     const list = this.dachiArrive();
-    if (!this.s.dachiAt) return [];
+    // client 2026-11-24: KIMORIN⭐︎ is everyone's ダチ (before D04-S005c too)
+    if (!this.s.dachiAt) return [{ id: 'kimorin', kind: 'kimorin', name: 'KIMORIN⭐︎', pic: null, unread: false, lastAt: null }];
     const me = this.s.users[this.uid()];
     const view = (id: string, kind: DachiThreadView['kind'], name: string): DachiThreadView => {
       const mine = list.filter((m) => m.thread === id);
@@ -1474,7 +1475,7 @@ export class DemoApi implements Api {
     return out;
   }
   private dachiThreadOk(thread: string) {
-    const ok = !!this.s.dachiAt && (thread === 'kimorin' || thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter));
+    const ok = thread === 'kimorin' || (!!this.s.dachiAt && (thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter)));
     if (!ok) throw new ApiError(403, 'NOT_DACHI', 'Voice messages go only between ダチ');
   }
   async dachiMessages(thread: string) {

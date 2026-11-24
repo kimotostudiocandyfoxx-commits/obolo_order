@@ -2,6 +2,7 @@
 
 import { VOICE_MAX_SECONDS } from '@obolo/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { openMic, quietMic } from './micStream';
 
 export type RecorderError = 'denied' | 'unsupported' | null;
 
@@ -26,7 +27,8 @@ export function useRecorder(maxSec = VOICE_MAX_SECONDS) {
   const cleanup = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = null;
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    // client 2026-11-24: the page's one stream is kept (quiet between recordings), so the next press does not ask again
+    if (streamRef.current) quietMic();
     streamRef.current = null;
   }, []);
 
@@ -44,7 +46,7 @@ export function useRecorder(maxSec = VOICE_MAX_SECONDS) {
     }
     let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      stream = await openMic();
     } catch {
       setError('denied');
       return;

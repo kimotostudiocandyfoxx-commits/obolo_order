@@ -173,7 +173,13 @@ export class DachiVoiceService {
   /** The drawer's conversations, from D04-S005c: {inviter} (or MIKIE⭐︎DRILL when there is none), KIMORIN⭐︎, then other dachi. */
   async threads(userId: string): Promise<DachiThreadView[]> {
     const u = await this.arrive(userId);
-    if (!u?.dachiAt) return [];
+    // client 2026-11-24 (iPad, R7): KIMORIN⭐︎ is everyone's ダチ — listed before D04-S005c too (a tester who jumped days
+    // never passed it, and production showed no ダチ at all); the rest comes with dachiAt as before
+    if (!u?.dachiAt) {
+      if (!u) return [];
+      const mine = await this.rows(this.where(userId, 'kimorin'), 50);
+      return [{ id: 'kimorin', kind: 'kimorin', name: DACHI_CHARACTER_NAMES.kimorin, pic: null, unread: mine.some((r) => r.recipientId === userId && !r.readAt), lastAt: mine.at(-1)?.createdAt.toISOString() ?? null }];
+    }
     const [friends, inv, recent] = await Promise.all([
       this.dachi.list(userId),
       this.invitation(userId),
@@ -206,6 +212,8 @@ export class DachiVoiceService {
   /** May `userId` use this thread? A character's: once dachi. A person's: only while you are dachi. */
   private async mustReach(userId: string, thread: string) {
     if (isCharacterThread(thread)) {
+      // KIMORIN⭐︎: always (everyone's ダチ); MIKIE⭐︎DRILL's: once dachi
+      if (thread === 'kimorin') return;
       const u = await this.journey(userId);
       if (!u?.dachiAt) throw apiError(HttpStatus.FORBIDDEN, 'NOT_DACHI', 'Not yet');
       return;

@@ -139,3 +139,16 @@ export function greetingOf({ neo, returning, turn }: { neo?: string | null; retu
   if (turn % 2 === 1 && neo) return GREETINGS.helloName;
   return GREETINGS.hello;
 }
+
+/**
+ * client 2026-11-24: does a question want a picture beside its answer (things one can see: an animal, a place, a
+ * thing …)? A worry, a feeling or a health question gets words only. Kept simple: the server's sort also keeps
+ * worries and dangers without one.
+ */
+export function wantsPicture(text: string): boolean {
+  if (/痛|かゆ|熱|せき|咳|病気|びょうき|つらい|眠れ|ねむれ|悩|なや|いじめ|こわい|怖|死|けが|怪我/.test(text)) return false;
+  return /どんな|見た目|姿|すがた|どこ|写真|絵|見せ|って何|ってなに|とは|何\?|なに\?|って？|なに？|何？/.test(text);
+}
+
+/** client 2026-11-24: answered by {bati} in the talk (no menu, no card): plain talk and lookups */
+export const conversational = (it: Intent) => it.kind === 'talk' || (it.kind === 'make' && it.what === 'lookup');

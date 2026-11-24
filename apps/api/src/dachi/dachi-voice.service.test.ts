@@ -83,11 +83,14 @@ describe('ダチの声のメッセージ: who may write (M-R212)', () => {
     expect(code(await w.s.send(A, B, voice(B)).catch((e: unknown) => e))).toBe('MEDIA_NOT_FOUND');
   });
 
-  it('the characters’ threads open only once dachi (D04-S005c)', async () => {
+  it('KIMORIN⭐︎ is everyone\'s ダチ (client 2026-11-24): listed and open before D04-S005c; MIKIE⭐︎DRILL only once dachi', async () => {
     const w = world();
     w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: null, displayName: 'a' };
-    await expect(w.s.send(A, 'kimorin', voice(A))).rejects.toThrow();
-    expect(await w.s.threads(A)).toEqual([]);
+    expect((await w.s.threads(A)).map((t) => t.id)).toEqual(['kimorin']);
+    await expect(w.s.send(A, 'mikie', voice(A))).rejects.toThrow();
+    expect((await w.s.send(A, 'kimorin', { text: 'こんにちは' })).kind).toBe('text');
+    // a person who is not there at all gets nothing
+    expect(await w.s.threads(C)).toEqual([]);
     w.people[A].dachiAt = new Date();
     const m = await w.s.send(A, 'kimorin', voice(A));
     expect(m.fromMe).toBe(true);
