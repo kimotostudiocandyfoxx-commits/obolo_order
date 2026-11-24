@@ -9350,6 +9350,75 @@
         "design/mv-art/out/home3-bg-jupiter.jpg"
       ],
       "prompt": "Edit the reference picture and keep everything exactly the same — the same forest, the same giant tree with its door and lanterns on the right, the same mossy clearing, light rays, colours and painterly anime art style. Only change the sky seen through the gap in the canopy at the top: remove the big planet completely. Instead, the sky is a warm glowing amber-gold sky with soft swirling bands of orange, cream and rose clouds stretching across it, like Jupiter's own atmosphere seen from below, and two small pale moons hang in it. No planet disc, no rings, no characters, no text."
+    },
+    {
+      "id": "home2-bg-saturn-cutea3",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-cutea2.jpg"
+      ],
+      "prompt": "Edit the reference picture and keep everything exactly the same — the same giant vinyl record in the same place, size and angle, the tonearm at the back, the pastel pebbles, clouds, sparkles, colours and soft kawaii pastel anime style. Only change the sky: remove the round planet body completely. Keep only Saturn's soft candy-striped pastel rings, now seen from the surface as a huge glowing arc sweeping across the whole sky from one side to the other. No planet ball, no characters, no text."
+    },
+    {
+      "id": "home3-bg-mercury",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "prompt": "Bright summer youth Japanese anime background art, like the background of a popular coming-of-age summer anime: vivid deep blue sky, huge towering white cumulus clouds, dazzling sunlight with lens flare, crisp clean shading, saturated turquoise and cobalt colours, sparkling light on the water, refreshing and nostalgic. Vertical phone wallpaper 9:16. Scene: a shining sea on the planet Mercury under a very big, bright, white-gold sun high in the sky (no other planet visible). At the back right, ONE small cute island with palm trees and a cosy little white house with a red roof, a tiny pier and a lantern — clearly someone's own island home. The lower two-thirds are open sparkling sea with gentle waves, empty, with plenty of space for many small boats to sail in front. No boats, no characters, no people, no text, no letters."
+    },
+    {
+      "id": "ship3-1",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single small cute sailboat drawn in bright summer Japanese anime style, seen from the side, hull and sail coloured red and white, the sail shaped like a big music note, a little round porthole, a small pennant flag, clean lines, cel shading with glossy highlights, cheerful. Centered, the whole boat inside the frame with a margin, no water, no sea. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "ship3-2",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single small cute sailboat drawn in bright summer Japanese anime style, seen from the side, hull and sail coloured sunny yellow and sky blue, the sail shaped like a big music note, a little round porthole, a small pennant flag, clean lines, cel shading with glossy highlights, cheerful. Centered, the whole boat inside the frame with a margin, no water, no sea. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "ship3-3",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single small cute sailboat drawn in bright summer Japanese anime style, seen from the side, hull and sail coloured navy blue and gold, the sail shaped like a big music note, a little round porthole, a small pennant flag, clean lines, cel shading with glossy highlights, cheerful. Centered, the whole boat inside the frame with a margin, no water, no sea. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "ship3-4",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "A single small cute sailboat drawn in bright summer Japanese anime style, seen from the side, hull and sail coloured candy pink and mint, the sail shaped like a big music note, a little round porthole, a small pennant flag, clean lines, cel shading with glossy highlights, cheerful. Centered, the whole boat inside the frame with a margin, no water, no sea. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
     }
   ],
   "redo": []
