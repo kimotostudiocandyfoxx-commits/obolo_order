@@ -80,6 +80,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @media (prefers-reduced-motion:reduce){.face .eyes{animation:none}}
 .puni .bname{position:absolute;left:50%;top:79%;transform:translate(-50%,-50%);max-width:84%;padding:1.5px 4px 1px;border-radius:999px;background:rgba(48,22,72,.42);box-shadow:inset 0 .5px 0 rgba(255,255,255,.25);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-family:var(--f-body);line-height:1;color:#fff;letter-spacing:-.02em;text-shadow:0 .5px 1px rgba(30,10,50,.5);pointer-events:none}
 .puni .fwrap{position:absolute;inset:0}
+.puni .body.k2.k4 img{border-radius:0;object-fit:contain;transform-origin:50% 60%}.puni .body.k2.k4 .face{top:8%}
 .puni .body.k2 img{border-radius:50%;filter:drop-shadow(0 4px 5px rgba(30,10,50,.35))}.puni .body.k2 .face{position:absolute;inset:0}.puni .body.k2 .bname{top:84%}
 .face .ln{fill:none;stroke:#2a1a22;stroke-width:3;stroke-linecap:round}
 .face .st{fill:#ffd23f;stroke:#2a1a22;stroke-width:1.2}
@@ -324,7 +325,7 @@ function render(){
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
 stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
-  if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
+  if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked&&!A['kor4-user']){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
   list.forEach((p,i)=>{const [x,y]=spots[i%spots.length];add({...p,x,y,i,isNew:i<2})});
@@ -390,6 +391,8 @@ const SHADES={
 function shadesSVG(sh){return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true">${SHADES[sh||'round']}</svg>`}
 const KPRE=()=>A['kor3-01']?'kor3-':'kor2-',KN=()=>{let n=0;while(A[KPRE()+String(n+1).padStart(2,'0')])n++;return n||16},KOR2=new Proxy([],{get:(o,k)=>k==='map'?(f=>Array.from({length:KN()},(_,i)=>KPRE()+String(i+1).padStart(2,'0')).map(f)):(/^\d+$/.test(k)?KPRE()+String(+k+1).padStart(2,'0'):o[k])});
 const HAS2=()=>!!(A['kor2-01']||A['kor3-01']);
+const K4N=n=>({'KIMORIN⭐︎':'kimorin','MONBAN':'monban','MIKIE⭐︎DRILL':'mikie','たこ焼きブラザー':'brother','たこ焼きシスター':'sister'})[n]||(n===ME?'user':null);
+const K4SG={kimorin:1,mikie:1};
 function faceSVG(f,sh){
   const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
   const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
@@ -419,7 +422,7 @@ function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHei
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
     const kp=o.n===ME?(window.MYKORO??0):(i*5+o.n.length*3)%(HAS2()?KN():8),K=KOROS[kp%8],sh=(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})();
     const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
-    e.innerHTML=HAS2()?`<div class="body k2"><img alt="" src="${A[KOR2[kp]]}" style="transform:rotate(${fr*.6}deg)">${shadesSVG(sh)}${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`:`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div>${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`;$('sky').appendChild(e);
+    const k4=K4N(o.n),k4s=k4&&A['kor4-'+k4];e.innerHTML=HAS2()?`<div class="body k2${k4s?' k4':''}"><img alt="" src="${k4s||A[KOR2[kp]]}" style="transform:rotate(${fr*.6}deg)">${k4s&&K4SG[k4]?'':shadesSVG(sh)}${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`:`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f,(()=>{const h=(i*7+3)%10;return h<7?'round':['way','star','heart'][h-7]})())}</div>${o.k==='mine'?'':`<span class="bname" style="font-size:${Math.max(6.5,Math.min(R*.34,R*1.4/[...o.n].length)).toFixed(1)}px">${o.n}</span>`}</div>`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:slot>=0?-R-slot*70:-R-40,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});

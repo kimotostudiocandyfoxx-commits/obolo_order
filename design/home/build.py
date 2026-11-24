@@ -82,6 +82,20 @@ for k in 'user kimorin monban mikie brother sister'.split():
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi3-'+k]=uri(kk,86)
     f=f'{O}/chibi4-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi4-'+k]=uri(kk,86)
+# profile korolin (white background, ears/hair stick out): remove only the white that touches the border
+def unwhite(im):
+    from PIL import ImageFilter as _F
+    a=np.asarray(im.convert('RGB')).astype(int); h,w,_=a.shape; wh=(a.min(2)>228)
+    seen=np.zeros((h,w),bool); st=[(0,x) for x in range(w)]+[(h-1,x) for x in range(w)]+[(y,0) for y in range(h)]+[(y,w-1) for y in range(h)]
+    while st:
+        y,x=st.pop()
+        if y<0 or y>=h or x<0 or x>=w or seen[y,x] or not wh[y,x]: continue
+        seen[y,x]=True; st+= [(y+1,x),(y-1,x),(y,x+1),(y,x-1)]
+    al=Image.fromarray(((~seen)*255).astype('uint8')).filter(_F.MinFilter(3)).filter(_F.GaussianBlur(1.2))
+    o=im.convert('RGBA'); o.putalpha(al); return o.crop(o.getbbox())
+for k in 'user kimorin monban mikie brother sister'.split():
+    f=f'{O}/kor4-{k}.jpg'
+    if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
