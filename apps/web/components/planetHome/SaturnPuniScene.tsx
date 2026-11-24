@@ -26,6 +26,8 @@ const NEEDLE = { x: 52, y: 68 };
 /** the painted play button (bottom right of the backdrop): plays the grooves, like 〔▶ 全部流す〕 */
 const PLAY_SPOT = { x: 82, y: 89, r: 9 };
 const HOLD_MS = 480;
+/** a name plate's height (px) */
+const PLATE_H = 14;
 const TALK_MIN = 1600;
 const TALK_MAX = 20000;
 
@@ -65,6 +67,9 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
   const sucks = useRef(new Map<string, Suck>());
   const tags = useRef(new Map<string, HTMLDivElement>());
   const bubble = useRef<HTMLDivElement>(null);
+  const touched = useRef<string | null>(null);
+  const freshIds = useRef(new Set<string>());
+  const plateW = useRef(new Map<string, number>());
   const lastDown = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const hold = useRef<{ timer: ReturnType<typeof setTimeout> | null; x: number; y: number; fired: boolean }>({ timer: null, x: 0, y: 0, fired: false });
   const live = useRef({ onItem, onHeard, onHold, rolling });
@@ -72,6 +77,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
 
   useEffect(() => {
     if (rolling.length) setHadAny(true);
+    freshIds.current = new Set(rolling.filter((w) => w.fresh).map((w) => w.id));
   }, [rolling]);
 
   const shown = useMemo(() => rolling.filter((w) => !gone.has(w.id)), [rolling, gone]);
@@ -79,7 +85,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
     () =>
       shown.map((w) => {
         const h = hue(w.author.id);
-        return { id: w.id, look: defaultLook(COLORS[h % COLORS.length]), pic: w.author.pic ?? null, R: 30 + (hue(w.id) % 3) * 4 };
+        return { id: w.id, look: defaultLook(COLORS[h % COLORS.length]), pic: w.author.pic ?? null, R: 23 + (hue(w.id) % 3) * 2 };
       }),
     [shown],
   );
@@ -110,6 +116,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
   const talk = useCallback((id: string) => {
     const w = live.current.rolling.find((x) => x.id === id);
     if (!w || talks.current.has(id) || sucks.current.has(id)) return;
+    touched.current = id;
     const t0 = performance.now();
     talks.current.set(id, { t0, started: false, endAt: t0 + (w.url ? TALK_MAX : TALK_MIN + 600) });
     setTalking(id);
@@ -148,12 +155,50 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
       b.R = Math.max(2, k.R0 * (1 - 0.85 * e));
       b.angle += 0.3;
     }
-    for (const [id, el] of tags.current) {
+    // the name plates, laid out every frame: the talking one, the one touched last and the new ones first; a plate that
+    // would cover another plate or another kororin's face moves down a step, or becomes a small dot in its colour
+    const live: { id: string; b: Blob }[] = [];
+    for (const id of tags.current.keys()) {
       const b = get(id);
-      if (!b) continue;
-      el.style.opacity = sucks.current.has(id) ? '0' : '1';
-      el.style.transform = `translate3d(${b.x.toFixed(1)}px, ${(b.y + b.R * b.sy + 2).toFixed(1)}px, 0) translateX(-50%)`;
+      if (b && !sucks.current.has(id)) live.push({ id, b });
     }
+    const faces = live.map(({ id, b }) => ({ id, x: b.x, y: b.y, r: b.R * 0.86 }));
+    const rank = (id: string) => (id === bubble.current?.dataset.id ? 0 : id === touched.current ? 1 : freshIds.current.has(id) ? 2 : 3);
+    live.sort((p, q) => rank(p.id) - rank(q.id));
+    const boxes: { x0: number; x1: number; y0: number; y1: number }[] = [];
+    const hitsFace = (x0: number, x1: number, y0: number, y1: number, own: string) =>
+      faces.some((f) => {
+        if (f.id === own) return false;
+        const cx = Math.max(x0, Math.min(f.x, x1));
+        const cy = Math.max(y0, Math.min(f.y, y1));
+        return Math.hypot(cx - f.x, cy - f.y) < f.r;
+      });
+    for (const { id, b } of live) {
+      const el = tags.current.get(id)!;
+      const w = plateW.current.get(id) ?? 64;
+      const base = b.y + b.R * b.sy + 2;
+      let at: number | null = null;
+      for (const dy of [0, 8, 16, 26]) {
+        const y0 = base + dy;
+        const box = { x0: b.x - w / 2 - 2, x1: b.x + w / 2 + 2, y0: y0 - 1, y1: y0 + PLATE_H + 1 };
+        if (boxes.some((o) => !(box.x1 <= o.x0 || box.x0 >= o.x1 || box.y1 <= o.y0 || box.y0 >= o.y1))) continue;
+        if (hitsFace(box.x0, box.x1, box.y0, box.y1, id)) continue;
+        boxes.push(box);
+        at = y0;
+        break;
+      }
+      const dot = at === null;
+      if (el.dataset.dot !== String(dot)) {
+        el.dataset.dot = String(dot);
+        el.classList.toggle(s.puniDot, dot);
+      }
+      if (!dot && !plateW.current.has(id) && el.offsetWidth) plateW.current.set(id, el.offsetWidth);
+      el.style.opacity = '1';
+      el.style.transform = dot ? `translate3d(${b.x.toFixed(1)}px, ${(b.y + b.R * b.sy - 5).toFixed(1)}px, 0) translateX(-50%)` : `translate3d(${b.x.toFixed(1)}px, ${at!.toFixed(1)}px, 0) translateX(-50%)`;
+      // for the review's overlap check: where this kororin's face is
+      el.dataset.face = `${b.x.toFixed(0)},${b.y.toFixed(0)},${(b.R * 0.86).toFixed(0)}`;
+    }
+    for (const [id, el] of tags.current) if (sucks.current.has(id)) el.style.opacity = '0';
     const tk = bubble.current?.dataset.id;
     const tb = tk ? get(tk) : undefined;
     if (bubble.current && tb) bubble.current.style.transform = `translate3d(${tb.x.toFixed(1)}px, ${(tb.y - tb.R * tb.sy - 8).toFixed(1)}px, 0) translate(-50%, -100%)`;
@@ -186,6 +231,7 @@ export function SaturnPuniScene({ cfg, view, rolling, playingId, spinning, onPla
     h.y = e.clientY;
     const id = hitAt(p.x, p.y);
     if (!id) return;
+    touched.current = id;
     const at = { x: e.clientX, y: e.clientY };
     h.timer = setTimeout(() => {
       h.timer = null;

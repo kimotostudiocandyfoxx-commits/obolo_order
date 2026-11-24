@@ -463,6 +463,18 @@
   transition: opacity 0.3s;
   will-change: transform;
 }
+.puniDot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  font-size: 0;
+  border: 0;
+  background: var(--c);
+  box-shadow: 0 0 0 1px rgba(20, 10, 30, 0.5);
+}
+.puniDot .spark {
+  display: none;
+}
 .spark {
   margin-right: 3px;
   color: #fff6b0;
