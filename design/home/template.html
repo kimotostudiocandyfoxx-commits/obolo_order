@@ -248,6 +248,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="switch" role="toolbar" aria-label="星を切りかえる"></div>
+<div class="switch" id="bstyle" role="toolbar" aria-label="蝶のデザイン" hidden><button type="button" data-b="4" aria-pressed="true">蝶：着ぐるみ</button><button type="button" data-b="3" aria-pressed="false">蝶：アニメ</button></div>
 <div class="phone" id="phone">
   <div class="bg" id="bg"></div>
   <div class="tint" id="tint" hidden></div>
@@ -321,7 +322,7 @@ function render(){
   const sky=$('sky');sky.innerHTML='';items=[];
   const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('fg').hidden=!(isS&&A['sat-fg']);if(isS&&A['sat-fg'])$('fg').style.backgroundImage=`url(${A['sat-fg']})`;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
-  stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
+  $('bstyle').hidden=!(cur==='jupiter'&&A['chibi4-user']);stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
@@ -470,6 +471,7 @@ function pop(r){
   setTimeout(()=>{c.style.display='none';if(!QUEUE.length&&rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
+document.addEventListener('click',e=>{const b=e.target.closest('#bstyle button');if(!b)return;window.BST=b.dataset.b;document.querySelectorAll('#bstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
 /* ---- Mercury: music boats carrying dachi/oshi songs sail in front of your island ---- */
 let SH=[],SHQ=[],SHraf=0,MPLAY=null,MNB=0,SONG=null;const MMAX=7,MISLE=[.78,.56];
 const MSONG=['夏のはじまり','チルな午後','パーティー','夜のバラード','走れ'];
@@ -544,7 +546,7 @@ function setupJup(){
 }
 function makeBf(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,e=document.createElement('div');e.className='bf';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のアート');
   const wi=(i*3+o.n.length)%4+1,ai=(i*2+o.n.length)%5+1;e.style.setProperty('--fl',(.26+((i*7)%5)*.03)+'s');
-  const ck='chibi3-'+CHB(o.n);if(A[ck]){e.classList.add('ch');e.innerHTML=`<div class="w"><img alt="" src="${A[ck]}"></div><span class="nm">${o.n}</span>`}
+  const ck=((window.BST||'4')==='4'&&A['chibi4-'+CHB(o.n)]?'chibi4-':'chibi3-')+CHB(o.n);if(A[ck]){e.classList.add('ch');e.innerHTML=`<div class="w"><img alt="" src="${A[ck]}"></div><span class="nm">${o.n}</span>`}
   else e.innerHTML=`<div class="w"><img alt="" src="${A['bfly3-'+wi]||''}"></div><div class="art" style="background-image:url(${A['jart-'+ai]||''})"></div><span class="nm">${o.n}</span>`;$('sky').appendChild(e);
   const S=JSLOT[slot%8];e.classList.add('l'+S[5]);
   const b={o,e,i,ai,slot,sc:S[2],cx:S[0],cy:S[1],ax:S[3],ay:S[4],w1:.5+((i*17)%7)*.07,w2:.7+((i*11)%5)*.09,w3:.3,p1:i*1.7,p2:i*2.3,t:0,x:W*(i%2?1.1:-.1),y:H*.6,tl:0,gone:false};
@@ -553,7 +555,7 @@ function makeBf(o,i,slot){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight
 function chime(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;[1318.5,1975.5,2637].forEach((f,k)=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t0+k*.035);g.gain.exponentialRampToValueAtTime(.22/(k+1),t0+k*.035+.008);g.gain.exponentialRampToValueAtTime(.0001,t0+k*.035+.55);o.connect(g);g.connect(c.destination);o.start(t0+k*.035);o.stop(t0+k*.035+.6)})}
 let JBUSY=false;
 function popBf(b){if(b.gone||JBUSY)return;b.gone=true;JBUSY=true;const sky=$('sky'),ph=$('phone'),pw=ph.clientWidth,phh=ph.clientHeight,x=b.x,y=b.y;chime();
-  const ck='chibi3-'+CHB(b.o.n),img=A[ck]||A['bfly3-1']||'';b.e.classList.add('held');
+  const ck=((window.BST||'4')==='4'&&A['chibi4-'+CHB(b.o.n)]?'chibi4-':'chibi3-')+CHB(b.o.n),img=A[ck]||A['bfly3-1']||'';b.e.classList.add('held');
   // 1) the camera pushes in a little toward the tapped one
   const bgEl=$('bg');bgEl.style.transformOrigin=`${x/pw*100}% ${y/phh*100}%`;ph.classList.add('cam');$('camfx').classList.add('on');
   const f=document.createElement('div');f.className='flyc';f.innerHTML=`<img alt="" src="${img}">`;f.style.left=x+'px';f.style.top=y+'px';sky.appendChild(f);

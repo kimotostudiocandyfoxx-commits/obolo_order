@@ -80,6 +80,8 @@ for n in range(1,6):
 for k in 'user kimorin monban mikie brother sister'.split():
     f=f'{O}/chibi3-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi3-'+k]=uri(kk,86)
+    f=f'{O}/chibi4-{k}.jpg'
+    if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((260,260)); A['chibi4-'+k]=uri(kk,86)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
