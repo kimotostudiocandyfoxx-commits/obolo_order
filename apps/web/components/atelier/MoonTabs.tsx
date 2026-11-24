@@ -454,14 +454,15 @@ function Strollers({ threads, onOpen, far = false, ground = 0.1, backRow = 0.28,
   const scaleOf = (r: number) => (eye - at(r)) / (eye - at(0));
   // your back, in this box's coordinates once the zone fills the screen (the box is the zone's lower BOX)
   const backRects = (back?.rects ?? []).map((q) => ({ ...q, y: q.y - zoneH * (1 - BOX) }));
-  // a row the back would cover walks only left of it (a figure may reach a third of its width behind it)
+  // a row the back would cover walks only left of it (a figure may reach a third of its width behind it, on the plain more)
   const widthOf = (r: number, h0: number) => {
     const H = h0 * scaleOf(r);
     const top = size.h - feetOf(r) - H;
     const bottom = size.h - feetOf(r);
     let right = size.w;
-    for (const q of backRects) if (q.y < bottom - H * 0.15 && q.y + q.h > top) right = Math.min(right, q.x + H * 0.62 * 0.3);
-    return Math.max(size.w * 0.55, right);
+    // (the plain's crowd may stand further behind it: squeezed, they would stand on each other)
+    for (const q of backRects) if (q.y < bottom - 4 && q.y + q.h > top) right = Math.min(right, q.x + H * 0.62 * (far ? 0.6 : 0.3));
+    return Math.max(size.w * 0.55, perRow(r) * H * 0.62 * 0.8, right);
   };
   // as tall as the ground allows, but never wider than a figure's own stretch in its row (they must not stand on each other)
   const tall = (wOf: (r: number) => number) => {
@@ -533,7 +534,6 @@ function Strollers({ threads, onOpen, far = false, ground = 0.1, backRow = 0.28,
         const o = hostEl.getBoundingClientRect();
         soft = back.rects.map((q) => ({ ...q, x: q.x + o.left - a.left, y: q.y + o.top - a.top }));
       }
-      (window as unknown as Record<string, unknown>)[far ? "__dachiPlain" : "__dachiLabels"] = { figsNow, soft, w: size.w, h: size.h, prev };
       prev = placeLabels(figsNow, { width: size.w, height: size.h, soft, prev, order: order.filter((i) => figsNow[i]) });
       prev.forEach((sp, i) => {
         const l = labs.current[i];

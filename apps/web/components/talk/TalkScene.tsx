@@ -841,8 +841,6 @@ export function TalkScene({
   const room = Math.max(120, heads - (barH + top + 56) - 48);
   const bubbleBottom = h - heads + 8;
   // the camera's side: the one speaking (a group pushes toward them the same way)
-  const camX = cam ? (spots.get(cam)?.x ?? 0.5) : 0.5;
-  const camShift = n <= 2 ? (camX < 0.5 ? 3 : -3) : (0.5 - camX) * 6;
   /** R10: a partner standing in the middle of the over-the-shoulder ({bati} before the bowl): its bubbles sit over it */
   const centred = (id: string) => ots && !byId.get(id)?.self && Math.abs((spots.get(id)?.x ?? 0) - 0.5) < 0.12;
 
@@ -1028,6 +1026,30 @@ export function TalkScene({
   });
   const dirKey = nowItem ? 100000 + ([...nowItem.id].reduce((x, c) => (x * 31 + c.charCodeAt(0)) >>> 0, 7) % 100000) * 2 + (phase === 'after' ? 1 : 0) : 0;
   const speakerX = nowItem ? spots.get(nowItem.who)?.x : undefined;
+  // M-R242, R10: the undirected camera (the {bati} talk, the ダチ talks) — framed on the face of the one speaking: it
+  // pushes in about that face and brings it toward the middle, then eases back between lines. (It was a fixed 1.1 with
+  // a 3% shift by which half the speaker stood in, which pushed away from {bati} standing in the middle, and the place
+  // behind moved on its own origin, so the floor slid under the feet.) Your own back in the over-the-shoulder gets
+  // only a breath of it. The place follows with the same origin, a little less (parallax), never showing its edges.
+  const camOrigin = useRef<{ x: number; y: number } | null>(null);
+  const liveCam = (() => {
+    const f = cam ? faceAt(cam) : null;
+    if (!cam || !f || directed) return { s: 1, tx: 0 };
+    camOrigin.current = { x: f.x, y: f.y };
+    const mine = !!byId.get(cam)?.self;
+    if (mine && ots) return { s: 1.05, tx: (w / 2 - f.x) * 0.15 };
+    return { s: CAMERA.two.scale + 0.04, tx: (w / 2 - f.x) * 0.55 };
+  })();
+  const camO = camOrigin.current ?? { x: w / 2, y: stageH * 0.4 };
+  const placeCam = (() => {
+    const ps = 1 + (liveCam.s - 1) * 0.7;
+    const ox = camO.x;
+    // (the place's box is 4% wider each side; keep 2% of it as the margin)
+    const m = w * 0.02;
+    const lo = w - ox - (w + m - ox) * ps;
+    const hi = ox * (ps - 1) + m * ps;
+    return { s: ps, tx: Math.max(lo, Math.min(hi, liveCam.tx * 0.6)), oy: stageTop + camO.y };
+  })();
   /** the move someone makes on this line (the speaker's, or one named in an override), as a talk motion and a facing */
   const moveOf = (p: TalkPerson): { motion: TalkMotion; toward?: 'left' | 'right'; mirror?: boolean } | null => {
     if (!dir || phase === 'after') return null;
@@ -1103,7 +1125,7 @@ export function TalkScene({
       <style>{TALK_CSS}</style>
       {/* the place, drifting very slowly behind the two; the camera moves it a little less than them (parallax) */}
       {place && (
-        <div className="pointer-events-none absolute inset-0" style={{ transform: cam ? `translateX(${camShift / 2}%) scale(1.07)` : undefined, transition: `transform 1.2s ${ease}` }}>
+        <div className="pointer-events-none absolute inset-0" style={{ transformOrigin: `${camO.x}px ${placeCam.oy}px`, transform: liveCam.s !== 1 ? `translateX(${placeCam.tx.toFixed(1)}px) scale(${placeCam.s.toFixed(3)})` : undefined, transition: `transform 1.1s ${ease}` }}>
           <div className="absolute inset-[-4%_-4%_0]" style={{ animation: reduced ? undefined : 'talk-drift 60s ease-in-out infinite alternate' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={place} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
@@ -1208,8 +1230,8 @@ export function TalkScene({
           ...(directed
             ? { transformOrigin: `${frame.ox}px ${frame.oy}px`, transform: `${frame.turn ? `perspective(1100px) rotateY(${frame.turn}deg) ` : ''}translateX(${frame.tx}px) scale(${frame.s})`, transition: `transform ${frame.ms}ms cubic-bezier(.2,.75,.25,1), bottom .4s ease` }
             : {
-                transformOrigin: `${Math.round(camX * 100) === 27 ? 30 : Math.round(camX * 100) === 73 ? 70 : Math.round(camX * 100)}% 85%`,
-                transform: cam ? `scale(1.1) translateX(${camShift}%)` : undefined,
+                transformOrigin: `${camO.x}px ${camO.y}px`,
+                transform: liveCam.s !== 1 ? `translateX(${liveCam.tx.toFixed(1)}px) scale(${liveCam.s.toFixed(3)})` : undefined,
                 transition: `transform .9s ${ease}, bottom .4s ease`,
               }),
           willChange: 'transform',
