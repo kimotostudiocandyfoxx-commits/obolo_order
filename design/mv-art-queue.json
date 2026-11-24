@@ -9797,6 +9797,40 @@
       ],
       "always": false,
       "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a small cute sailboat seen from the side with a sail shaped like a music note. The boat's hull and sail colours and patterns are designed from the character: pearl lavender with soft tentacle-curl patterns, like her dress and pale tentacle hair. Riding in the boat is a cute super-deformed chibi of the character in the FIRST reference picture (face and identity recognisable), happily carrying a big boombox speaker on its shoulder. No water, no sea. Centered, the whole boat and character inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "udance-1",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed 2-heads-tall chibi of the character in the FIRST reference picture (same face, hair, black jacket and white shirt), wearing cool round black sunglasses instead of glasses, dancing with both arms raised high and one knee up, big happy grin. No wings, no props. Full body, centered, inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "udance-2",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed 2-heads-tall chibi of the character in the FIRST reference picture (same face, hair, black jacket and white shirt), wearing cool round black sunglasses instead of glasses, dancing with arms bent pointing to the sky on one side and hips swung to the other side, singing happily. No wings, no props. Full body, centered, inside the frame with a margin. Plain solid pure white background, no shadow, no text."
     }
   ],
   "redo": []
