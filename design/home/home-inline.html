@@ -64,7 +64,19 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .spinwrap.on .spinner{animation:recspin 2.2s linear infinite}
 @keyframes recspin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spinwrap.on .spinner{animation:none}}
-.puni{position:absolute;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));will-change:transform}
+.puni .body{position:absolute;left:0;top:0;width:calc(var(--r)*2);height:calc(var(--r)*2);transform-origin:50% 88%;will-change:transform}
+.puni .body img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
+.puni .face{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.puni .face .eyes ellipse{fill:#2a1a22}.puni .face .hl{fill:#fff}
+.puni .face .bl{fill:#ff8fa8;opacity:.55}
+.puni .face .mo{fill:none;stroke:#2a1a22;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.puni .face .eyes{transform-origin:50% 52%;animation:blink 4.6s infinite}
+.puni:nth-child(3n) .face .eyes{animation-delay:-1.7s}.puni:nth-child(3n+1) .face .eyes{animation-delay:-3.1s}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
+.puni.held .face .eyes{animation:none;transform:scaleY(.25)}
+.puni .ptag{transform:translate(-50%,0);left:0;bottom:auto;top:calc(var(--r) + 2px)}
+@media (prefers-reduced-motion:reduce){.puni .face .eyes{animation:none}}
+.puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni .ptag{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);white-space:nowrap;font:700 9px var(--f-body);padding:1px 6px;border-radius:999px;background:rgba(20,10,30,.55);border:1px solid var(--c);color:var(--ink)}
 .puni.talk{z-index:7}
@@ -239,27 +251,31 @@ function setupRoll(){
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
   const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
   rolls=list.map((o,i)=>{const R=22+((i*7)%3)*4,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
-    e.style.width=e.style.height=(R*2)+'px';e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
-    e.innerHTML=`<img alt="" src="${BALL(o.k)}"><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
+    e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
+    e.innerHTML=`<div class="body"><img alt="" src="${BALL(o.k)}"><svg class="face" viewBox="0 0 100 100" aria-hidden="true"><ellipse class="bl" cx="27" cy="62" rx="9" ry="5"/><ellipse class="bl" cx="73" cy="62" rx="9" ry="5"/><g class="eyes"><ellipse cx="36" cy="52" rx="5.2" ry="6.2"/><ellipse cx="64" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="34.4" cy="49.6" r="1.8"/><circle class="hl" cx="62.4" cy="49.6" r="1.8"/></g><path class="mo" d="M43 60 q3.5 5 7 0 q3.5 5 7 0"/></svg></div><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:-R-i*70,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
-    e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=6});
+    e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
     e.addEventListener('pointermove',ev=>{if(!down)return;const dx=ev.clientX-down.lx,dy=ev.clientY-down.ly,dt=Math.max(8,performance.now()-down.lt)/1000;r.x+=dx;r.y+=dy;r.vx=dx/dt;r.vy=dy/dt;down.lx=ev.clientX;down.ly=ev.clientY;down.lt=performance.now()});
-    e.addEventListener('pointerup',ev=>{if(!down)return;const moved=Math.hypot(ev.clientX-down.x,ev.clientY-down.y);r.drag=false;down=null;if(moved<6)pop(r);else r.wv-=8});
+    e.addEventListener('pointerup',ev=>{if(!down)return;e.classList.remove('held');const moved=Math.hypot(ev.clientX-down.x,ev.clientY-down.y);r.drag=false;down=null;if(moved<6)pop(r);else r.wv+=4.5});
     e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();pop(r)}});
     return r});
   let last=performance.now();
   const step=now=>{const dt=Math.min(.033,(now-last)/1000);last=now;const live=rolls.filter(r=>!r.gone);
     const ph0=$('phone'),cx=RECLBL[0]*ph0.clientWidth;
     for(const r of live){if(r.drag)continue;if(SPIN&&r.y+r.R>=F-2){const side=r.x<cx?-1:1;r.vx+=(side>0?-1:1)*0+(70-r.vx)*.04}r.vy+=1900*dt;r.x+=r.vx*dt;r.y+=r.vy*dt;r.vx*=.995;
-      if(r.y+r.R>F){const imp=r.vy;r.y=F-r.R;r.vy=-r.vy*.35;r.vx*=.86;if(imp>260)r.wv+=Math.min(18,imp/90);if(Math.abs(r.vy)<40)r.vy=0}
+      if(r.y+r.R>F){const imp=r.vy;r.y=F-r.R;r.vy=-r.vy*.35;r.vx*=.86;if(imp>200)r.wv+=Math.min(4.2,imp/420);if(Math.abs(r.vy)<40)r.vy=0}
       if(r.x-r.R<L){r.x=L+r.R;r.vx=Math.abs(r.vx)*.5} if(r.x+r.R>Rw){r.x=Rw-r.R;r.vx=-Math.abs(r.vx)*.5}}
     for(let k=0;k<3;k++)for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){const p=live[i],q=live[j],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1,m=p.R+q.R-4;
       if(d<m){const o=(m-d)/2,nx=dx/d,ny=dy/d;if(!p.drag){p.x-=nx*o;p.y-=ny*o}if(!q.drag){q.x+=nx*o;q.y+=ny*o}
-        const rv=(q.vx-p.vx)*nx+(q.vy-p.vy)*ny;if(rv<0){const im=-rv*.6;if(!p.drag){p.vx-=im*nx*.5;p.vy-=im*ny*.5}if(!q.drag){q.vx+=im*nx*.5;q.vy+=im*ny*.5}if(im>220){p.wv+=2;q.wv+=2}}}}
-    for(const r of live){r.wv+=(-160*r.ws-9*r.wv)*dt;r.ws+=r.wv*dt;const s=Math.max(-.22,Math.min(.22,r.ws));
-      const ground=r.y+r.R>=F-1&&!r.drag?.05:0;r.a+=r.vx*dt/r.R;
-      r.e.style.left=r.x+'px';r.e.style.top=r.y+'px';r.e.style.transform=`translate(-50%,-50%) scale(${1+s+ground},${1-s-ground})`;r.e.style.transformOrigin='50% 85%'}
+        const rv=(q.vx-p.vx)*nx+(q.vy-p.vy)*ny;if(rv<0){const im=-rv*.6;if(!p.drag){p.vx-=im*nx*.5;p.vy-=im*ny*.5}if(!q.drag){q.vx+=im*nx*.5;q.vy+=im*ny*.5}if(im>160){p.wv+=.9;q.wv+=.9}}}}
+    const tnow=now/1000;
+    for(const r of live){for(let k=0;k<4;k++){const h=dt/4;r.wv+=(-70*r.ws-4.2*r.wv)*h;r.ws+=r.wv*h}
+      const sp=Math.min(1,Math.hypot(r.vx,r.vy)/1400),onG=r.y+r.R>=F-1&&!r.drag;
+      const breathe=onG?Math.sin(tnow*2.4+r.i)*.018:0,s=Math.max(-.3,Math.min(.3,r.ws))+breathe;
+      const tsx=1+s+(onG?.04:0)+sp*.06,tsy=1-s-(onG?.04:0)+sp*.1;r.sx=(r.sx||1)+(tsx-(r.sx||1))*.45;r.sy=(r.sy||1)+(tsy-(r.sy||1))*.45;
+      const tilt=Math.max(-12,Math.min(12,r.vx*.012));r.tl=(r.tl||0)+(tilt-(r.tl||0))*.2;
+      r.e.style.transform=`translate3d(${r.x}px,${r.y}px,0)`;r.e.firstElementChild.style.transform=`translate(-50%,-50%) rotate(${r.tl}deg) scale(${r.sx},${r.sy})`}
     raf=requestAnimationFrame(step)};
   raf=requestAnimationFrame(step);
 }
