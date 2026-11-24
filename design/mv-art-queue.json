@@ -9503,6 +9503,108 @@
       ],
       "always": false,
       "prompt": "A super-deformed 2-heads-tall chibi of the character in the reference picture, drawn as a flat 2D Japanese anime illustration (like official chibi art of a popular TV anime): a big round head and a tiny body, keeping the character's face, hairstyle, outfit, colours and signature items exactly recognisable. The chibi has a pair of large glowing magical butterfly wings (sakura pink and lavender, delicate veins, sparkles) growing from its back and is flying happily, hugging a rolled-up old paper scroll with red cords in both arms. Clean confident lineart, anime cel shading, big sparkling anime eyes, soft blush, bright clear colours. Not 3D. Centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi4-user",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from his black jacket, white shirt and round glasses (wings in black, white and silver with a round-glasses motif, no green). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi4-kimorin",
+      "refs": [
+        "design/home/chibi-ref/kimorin.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from its red velvet hooded robe, white-black-orange feathers, blue swirl marks and fox ears (wings in red-brown, white and black feather patterns with blue eye spots). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi4-monban",
+      "refs": [
+        "design/home/chibi-ref/monban.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from his black hood and robe with gold embroidery and glowing eye (wings in black and deep violet with gold embroidery lines). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi4-mikie",
+      "refs": [
+        "design/home/chibi-ref/mikie.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from her pink top, flower skirt, round sunglasses and hook (wings in pink with colourful flower patterns). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi4-brother",
+      "refs": [
+        "design/home/chibi-ref/brother.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from his dark armour, golden hat and hip-hop style (wings in dark navy and gold with chain patterns, no green). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
+    },
+    {
+      "id": "chibi4-sister",
+      "refs": [
+        "design/home/chibi-ref/sister.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "Draw the character from the FIRST reference picture as a cute super-deformed chibi, in exactly the same art style as the other reference pictures (soft hand-drawn kawaii chibi illustration, gentle muted watercolour-like colouring, clean brown-black outlines, sticker-like): the character is dressed up as a butterfly — keep the character's face and identity recognisable, give it curly butterfly antennae on the head or hood, and butterfly wings growing from its back whose colours and patterns are designed from her black dress, pale tentacle hair and egg-like hat (wings in lavender and pearl with soft tentacle-curl patterns). The chibi is flying gently and hugging a rolled-up old paper scroll with a red cord in both arms. Front view, centered, the whole character and both wings inside the frame with a margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text."
     }
   ],
   "redo": []
