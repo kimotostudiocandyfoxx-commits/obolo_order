@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { LegalText, type LegalKind } from '@/components/LegalText';
 
-/** M-R252: /terms and /privacy — the full text as a simple page (from the settings); ← goes back */
-export function LegalPage({ kind }: { kind: LegalKind }) {
+/** M-R252: /terms and /privacy (and /tokushoho, its own children) — the full text as a simple page (from the settings); ← goes back */
+export function LegalPage({ kind, children }: { kind?: LegalKind; children?: ReactNode }) {
   const router = useRouter();
   return (
     <main className="pt-safe pb-safe mx-auto min-h-svh max-w-md px-4 py-4">
@@ -17,7 +18,7 @@ export function LegalPage({ kind }: { kind: LegalKind }) {
         ←
       </button>
       <div className="mt-3">
-        <LegalText kind={kind} />
+        {kind ? <LegalText kind={kind} /> : children}
       </div>
     </main>
   );

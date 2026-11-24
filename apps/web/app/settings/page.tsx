@@ -1,5 +1,6 @@
 'use client';
 
+import type { Me } from '@obolo/shared';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RequireAuth } from '@/components/RequireAuth';
@@ -9,7 +10,7 @@ import { useAuth } from '@/lib/auth';
 /**
  * 〔設定〕 — for now the 〔毎月のマナ〕 part (M-R199 / M-R202): your mana, whether you are Obolo Order, and on days 3–7 of
  * the first journey 〔先にObolo Orderになる〕, which always plays SYS-S002 (the explanation) before the payment.
- * PLACEHOLDER (P-BILL-3): 〔やめる〕 (cancelling the monthly mana) is not built yet (shown, off).
+ * P-BILL-4: 〔エクリプス（月¥88）〕 — the status and 〔支払い方法の変更・解約〕 (the Stripe Customer Portal).
  * M-R252 (the draft's section 4): 〔写真と声を消す〕, 〔作った物を消す〕〔会話を消す〕, 〔毎月のマナ〕→〔やめる〕, 〔利用規約〕〔プライバシーについて〕.
  */
 export default function SettingsPage() {
@@ -50,16 +51,8 @@ function Settings() {
             先にObolo Orderになる
           </Link>
         )}
-        {ordered && (
-          // PLACEHOLDER (P-BILL-3): the cancelling itself is not built yet
-          <div className="mt-4 flex items-center gap-3">
-            <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-white/45">いつでもやめられます。やめても、作った物は残ります（〔やめる〕の画面は準備中です）</p>
-            <button type="button" disabled className="shrink-0 rounded-full border border-white/25 px-3 py-1.5 text-[12px] text-white/70 disabled:opacity-40">
-              やめる
-            </button>
-          </div>
-        )}
       </section>
+      {ordered && <Eclipse />}
       <VoiceAndPhoto />
       <WorksAndTalk />
       <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">
@@ -71,8 +64,69 @@ function Settings() {
             プライバシーについて
           </Link>
         </div>
+        <Link href="/tokushoho" className="mt-2 block rounded-full border border-white/20 py-2.5 text-center text-[13px] text-white/85">
+          特定商取引法に基づく表記
+        </Link>
       </section>
     </main>
+  );
+}
+
+const SUB_STATUS: Record<Me['subscriptionStatus'], string> = {
+  active: '続いています',
+  past_due: 'お支払いが確認できていません。カードをご確認ください',
+  canceled: '解約しました',
+  demo: 'デモ（請求はありません）',
+  none: 'まだ始まっていません',
+};
+
+/**
+ * P-BILL-4: 〔エクリプス（月¥88）〕 for members who have paid — the subscription status and 〔支払い方法の変更・解約〕,
+ * which opens the Stripe Customer Portal (POST /billing/portal; it comes back to /settings). Demo mode has nothing to cancel.
+ * The portal cancels at the end of the paid month (the dashboard's default, "At end of billing period").
+ */
+function Eclipse() {
+  const { me } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  if (!me) return null;
+  const open = async () => {
+    setBusy(true);
+    setNote(null);
+    try {
+      const p = await getApi().billingPortal();
+      if (p.mode === 'demo') {
+        setNote('デモなので解約はありません');
+        setBusy(false);
+        return;
+      }
+      window.location.assign(p.url);
+    } catch {
+      setNote('うまく開けませんでした。少し待って、もう一度どうぞ');
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4">
+      <h2 className="text-sm font-black text-amber-100">エクリプス（月¥88）</h2>
+      <div className="py-2.5">
+        <p className="text-[11px] text-white/50">いまの状態</p>
+        <p className="mt-0.5 text-[14px] font-bold">{SUB_STATUS[me.subscriptionStatus] ?? me.subscriptionStatus}</p>
+      </div>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void open()}
+        className="block w-full rounded-full border border-amber-200/60 py-2.5 text-center text-[13px] text-amber-100 disabled:opacity-40"
+      >
+        {busy ? '開いています…' : '支払い方法の変更・解約'}
+      </button>
+      <p className="mt-2 text-[11px] leading-relaxed text-white/50">解約しても、その月の終わりまでは使えます。作った物は残ります</p>
+      {note && <p className="mt-2 text-[12px] text-amber-100/80">{note}</p>}
+      <Link href="/tokushoho" className="mt-2 inline-block text-[11px] text-white/55 underline underline-offset-4">
+        特定商取引法に基づく表記
+      </Link>
+    </section>
   );
 }
 

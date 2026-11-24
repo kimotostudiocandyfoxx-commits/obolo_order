@@ -83,6 +83,8 @@ export interface Me {
  * secret, then confirm the session. `demo`: billing is not configured — confirm with /me/order.
  */
 export type OrderCheckout = { mode: 'stripe'; publishableKey: string; clientSecret: string; sessionId: string } | { mode: 'demo' };
+/** P-BILL-4: POST /billing/portal — the Stripe Customer Portal (change the card, cancel); demo mode has none. */
+export type BillingPortal = { mode: 'stripe'; url: string } | { mode: 'demo'; url: null };
 
 export interface BatiView {
   /** favourite food the egg was made from */

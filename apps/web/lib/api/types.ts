@@ -41,6 +41,7 @@ import type {
   NeoLookResult,
   BatiRestyleResult,
   WalletView,
+  BillingPortal,
   OrderCheckout,
   ComposeChatBody,
   ComposeChatResult,
@@ -200,6 +201,8 @@ export interface Api {
   confirmOrder(sessionId: string): Promise<Me>;
   /** Demo mode only: "OK" without a charge. */
   becomeOrder(): Promise<Me>;
+  /** P-BILL-4: the Stripe Customer Portal (change the card, cancel); demo mode has none. */
+  billingPortal(): Promise<BillingPortal>;
   // --- Day 3/4: generated OBOLO NEO look and the Bati egg (client decision 2026-10-05)
   lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;
   /** One instruction → one new version of a candidate (3 per apprentice). */

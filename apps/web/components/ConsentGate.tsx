@@ -102,13 +102,16 @@ export function ConsentPanel({ onAgree, busy = false, knownYear = null }: { onAg
     </ul>
   );
   const links = (
-    <p className="mt-5 flex justify-center gap-3 text-[13px]">
+    <p className="mt-5 flex flex-wrap justify-center gap-x-3 gap-y-1 text-[13px]">
       <button type="button" onClick={() => setSheet('terms')} className="text-amber-200/90 underline underline-offset-4">
         {CONSENT_TEXT.terms}
       </button>
       <button type="button" onClick={() => setSheet('privacy')} className="text-amber-200/90 underline underline-offset-4">
         {CONSENT_TEXT.privacy}
       </button>
+      <a href="/tokushoho" target="_blank" rel="noopener" className="text-amber-200/90 underline underline-offset-4">
+        特定商取引法に基づく表記
+      </a>
     </p>
   );
   return (
@@ -185,7 +188,7 @@ export async function sendLocalConsent() {
 }
 
 /** pages that never ask (the invitation asks itself; the team's review pages play without an account of their own; the texts themselves) */
-const QUIET = /^\/(invite|kakunin-|tameshi-|admin|terms|privacy)/;
+const QUIET = /^\/(invite|kakunin-|tameshi-|admin|terms|privacy|tokushoho)/;
 
 /** members who have not agreed to the current words yet (an account from before M-R247 / M-R252): the agreement over the app, once */
 export function ConsentGate() {

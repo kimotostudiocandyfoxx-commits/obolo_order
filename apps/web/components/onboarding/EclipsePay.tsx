@@ -24,8 +24,8 @@ const SERIF = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", "Noto Ser
  * Demo mode (no Stripe key on the server) pays without a charge. The age is known from the start of the app (M-R252:
  * the birth year asked by ConsentGate / the seal, obolo.birthYear): no tick box here; under 18 sees one line,
  * 「家の人と一緒に読んでね」, adults nothing (M-R251 review).
- * PLACEHOLDER (P-BILL-3): the wording must be checked by the operator; the 〔設定〕→〔毎月のマナ〕→〔やめる〕
- * screen does not exist yet (P-BILL-4: the operator stops it in Stripe).
+ * PLACEHOLDER (P-BILL-3): the wording must be checked by the operator. Stopping: 〔設定〕→〔エクリプス（月¥88）〕
+ * (P-BILL-4, the Stripe Customer Portal); the 特定商取引法に基づく表記 opens in a new tab so the story stays here.
  */
 export function EclipsePay({
   api,
@@ -214,10 +214,13 @@ export function EclipsePay({
             </div>
             <div className="py-2.5">
               <dt className="text-[11px] tracking-[0.2em] text-amber-200/80">やめ方</dt>
-              <dd>〔設定〕→〔毎月のマナ〕→〔やめる〕から、いつでも。やめると、次の更新日から支払いが止まります。作ったものは消えません</dd>
+              <dd>〔設定〕→〔エクリプス（月¥88）〕→〔支払い方法の変更・解約〕から、いつでも。やめると、次の更新日から支払いが止まり、その月の終わりまでは使えます。作ったものは消えません</dd>
             </div>
           </dl>
           <p className="mt-2 text-left text-[11px] leading-relaxed text-white/50">入会費はありません。値上げはしません。</p>
+          <a href="/tokushoho" target="_blank" rel="noopener" className="mt-2 inline-block text-[11px] text-amber-200/80 underline underline-offset-4">
+            特定商取引法に基づく表記
+          </a>
         </div>
 
         {minor && <p className="mt-4 text-center text-[13px] leading-relaxed text-amber-100/90">家の人と一緒に読んでね</p>}

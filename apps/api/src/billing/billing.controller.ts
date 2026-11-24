@@ -39,6 +39,15 @@ export class BillingController {
     return this.billing.demoOrder(userId);
   }
 
+  /** P-BILL-4: the Stripe Customer Portal (change the card, cancel) — { mode, url } */
+  @Post('billing/portal')
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  async portal(@UserId() userId: string) {
+    await rateLimit(this.kv, `portal:${userId}`, 10, 600);
+    return this.billing.portal(userId);
+  }
+
   @Post('billing/webhook')
   @HttpCode(200)
   webhook(@Req() req: Request, @Headers('stripe-signature') sig?: string) {

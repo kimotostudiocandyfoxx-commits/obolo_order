@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
-import { JOURNEY_PAYMENT, ORDER_PRICE_JPY, type Me, type OrderCheckout } from '@obolo/shared';
+import { JOURNEY_PAYMENT, ORDER_PRICE_JPY, type BillingPortal, type Me, type OrderCheckout } from '@obolo/shared';
 import { eq } from 'drizzle-orm';
 import Stripe from 'stripe';
 import { apiError } from '../common/errors';
@@ -104,6 +104,23 @@ export class BillingService {
     if (session.client_reference_id !== userId) throw apiError(HttpStatus.FORBIDDEN, 'FORBIDDEN', 'Not your checkout');
     if (!this.paid(session)) throw apiError(HttpStatus.CONFLICT, 'NOT_PAID', 'The payment is not complete yet');
     return this.record(userId, session);
+  }
+
+  /**
+   * P-BILL-4: 〔支払い方法の変更・解約〕 — a Stripe Customer Portal session for the member's Stripe customer (stored by
+   * the checkout, see createCheckout); back to WEB_ORIGIN/settings. The portal itself must be switched on once in the
+   * Stripe dashboard (Settings → Billing → Customer portal). Demo mode (no key): nothing to cancel.
+   */
+  async portal(userId: string): Promise<BillingPortal> {
+    if (!this.stripe) return { mode: 'demo', url: null };
+    const stripe = this.stripe;
+    const u = await this.load(userId);
+    if (!u.stripeCustomerId) throw apiError(HttpStatus.CONFLICT, 'NO_SUBSCRIPTION', 'No Stripe customer for this member');
+    const origin = (this.cfg.WEB_ORIGIN ?? 'https://oboloorder-web.vercel.app').replace(/\/$/, '');
+    const session = await this.stripeErrors(() =>
+      stripe.billingPortal.sessions.create({ customer: u.stripeCustomerId!, return_url: `${origin}/settings`, locale: 'ja' }),
+    );
+    return { mode: 'stripe', url: session.url };
   }
 
   /** Demo mode only: "OK" without a charge. */

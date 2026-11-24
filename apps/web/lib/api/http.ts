@@ -315,6 +315,9 @@ export class HttpApi implements Api {
   becomeOrder() {
     return this.req<Awaited<ReturnType<Api['becomeOrder']>>>('POST', '/me/order');
   }
+  billingPortal() {
+    return this.req<Awaited<ReturnType<Api['billingPortal']>>>('POST', '/billing/portal');
+  }
   lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
   }

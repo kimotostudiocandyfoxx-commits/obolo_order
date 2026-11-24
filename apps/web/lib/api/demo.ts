@@ -83,6 +83,7 @@ import {
   type InviteView,
   type Locale,
   type Me,
+  type BillingPortal,
   type OrderCheckout,
   type ComposeChatBody,
   type ComposeChatResult,
@@ -1907,6 +1908,10 @@ export class DemoApi implements Api {
 
   async confirmOrder(): Promise<Me> {
     throw new ApiError(409, 'BILLING_DEMO', 'demo');
+  }
+
+  async billingPortal(): Promise<BillingPortal> {
+    return { mode: 'demo', url: null };
   }
 
   async becomeOrder() {
