@@ -60,7 +60,7 @@ for n,pre in [(n,pre) for pre in ('kor2','kor3') for n in range(1,31)]:
     S=4; mk=Image.new('L',(im.width*S,im.height*S),0); _D2.Draw(mk).ellipse(((cx-r)*S,(cy-r)*S,(cx+r)*S,(cy+r)*S),fill=255); mk=mk.resize(im.size,Image.LANCZOS)
     o=im.convert('RGBA'); o.putalpha(mk); o=o.crop((int(cx-r-2),int(cy-r-2),int(cx+r+2),int(cy+r+2))); o.thumbnail((200,200),Image.LANCZOS); A[f'{pre}-{n:02d}']=uri(o,88)
 # Jupiter v3 (2026-11-24): forest with your tree, butterflies, sample art
-f=f'{O}/home3-bg-jupiter.jpg'
+f=f'{O}/home3-bg-jupiter2.jpg' if os.path.exists(f'{O}/home3-bg-jupiter2.jpg') else f'{O}/home3-bg-jupiter.jpg'
 if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg3-jupiter']=uri(im,78)
 for n in range(1,5):
     f=f'{O}/bfly3-{n}.jpg'
