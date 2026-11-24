@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import { CHIBI_TRIES, LookService } from './look.service';
 
 vi.mock('../media/keying', async (orig) => ({ ...(await orig<typeof import('../media/keying')>()), chooseKey: async () => 'green' }));
-const { CHIBI_TRIES, LookService } = await import('./look.service');
 
 /** a member row kept in memory; update().set() merges into it */
 function make(row: Record<string, unknown>, paint: () => Promise<{ data: Buffer; mime: string }>) {
