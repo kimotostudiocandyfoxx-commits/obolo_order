@@ -1484,16 +1484,19 @@
       inset 0 0 80px 12px rgba(255, 61, 240, 0.3);
   }
 }
+/* M-R275: over the painted face, 1.42× about the eyes */
 .shades {
   opacity: 0;
-  transform: translateY(-14px);
+  transform-box: view-box;
+  transform-origin: 50% 51%;
+  transform: translateY(-14px) scale(1.42);
   transition:
     opacity 0.25s,
     transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 .partying .shades {
   opacity: 1;
-  transform: none;
+  transform: scale(1.42);
 }
 .partying .ballEyes {
   visibility: hidden;

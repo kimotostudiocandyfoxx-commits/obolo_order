@@ -18,6 +18,7 @@ export function TalkComposer({
   side,
   initial = '',
   startTyping = false,
+  onVoice,
 }: {
   onSend: (text: string) => void | Promise<void>;
   placeholder: string;
@@ -29,6 +30,8 @@ export function TalkComposer({
   initial?: string;
   /** open with the keyboard (the review page) */
   startTyping?: boolean;
+  /** the mic button beside the field goes back to the caller's own mic (the ダチ talk's held mic) instead of dictation */
+  onVoice?: () => void;
 }) {
   const [text, setText] = useState(initial);
   const [typing, setTyping] = useState(startTyping);
@@ -57,7 +60,7 @@ export function TalkComposer({
         }}
         className="pb-safe flex items-center gap-2 px-3 pb-2.5 pt-2"
       >
-        <button type="button" onClick={() => setTyping(false)} aria-label="声で話す" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] text-[#f4f1ff]">
+        <button type="button" onClick={() => (onVoice ? onVoice() : setTyping(false))} aria-label="声で話す" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] backdrop-blur-[10px] text-[#f4f1ff]">
           <MicGlyph />
         </button>
         <input

@@ -4,15 +4,19 @@ mask's outer edge (closed, holes filled), minus the centre label (an ellipse fit
 button (the round hole), and the tonearm / needle base (their mint and cream paint, found in the background, grown a
 little and filled). Edge softened ~1.5 px. Writes an alpha PNG at half size.
 
-  python3 scripts/planet-home/saturn-record-mask.py <background.jpg> <provided-mask.png> <out.png> [preview.jpg]
+  python3 scripts/planet-home/saturn-record-mask.py <background.jpg> <provided-mask.png> <out.png> [preview.jpg] [--no-button]
+M-R275: the backdrop home2-bg-saturn-cutea2 (with saturn-record-mask2.png) has no play button painted on the record —
+pass --no-button so no round hole is cut for it.
 """
 import sys
 import cv2
 import numpy as np
 from PIL import Image
 
-bg_p, mask_p, out_p = sys.argv[1:4]
-prev_p = sys.argv[4] if len(sys.argv) > 4 else None
+NO_BUTTON = '--no-button' in sys.argv
+args = [a for a in sys.argv[1:] if a != '--no-button']
+bg_p, mask_p, out_p = args[0:3]
+prev_p = args[3] if len(args) > 3 else None
 bg = np.asarray(Image.open(bg_p).convert('RGB')).astype(np.int16)
 m = (np.asarray(Image.open(mask_p).convert('L')) > 127).astype(np.uint8)
 H, W = m.shape
@@ -53,7 +57,7 @@ for i in order[1:]:
     if a < 2000:
         continue
     fill_ratio = a / float(w * h)
-    if 0.65 < w / h < 1.6 and fill_ratio > 0.6:  # round: the play button
+    if not NO_BUTTON and 0.65 < w / h < 1.6 and fill_ratio > 0.6:  # round: the play button
         cv2.ellipse(keep_out, ((float(cent[i][0]), float(cent[i][1])), (w * 1.12, h * 1.12), 0), 1, -1)
 
 # 3. the tonearm and the needle base: their mint / cream paint on the record, grown and filled

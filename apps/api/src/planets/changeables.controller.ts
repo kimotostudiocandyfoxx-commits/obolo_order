@@ -35,7 +35,7 @@ export class ChangeablesController {
         if (patch.recordColour) await this.homes.setColour(userId, planet, patch.recordColour);
       },
       kororin: async () => this.homes.kororin(userId),
-      setKororin: async (patch) => void (await this.homes.setKororin(userId, patch)),
+      setKororin: async (pic) => void (await this.homes.setKororin(userId, pic)),
       // iPad feedback: the member's own bubble colour, where the first-talk picker and the settings keep it (Me.story)
       talkColour: async () => this.users.sysAnswer(userId, TALK_KEY),
       setTalkColour: async (id) => void (await this.users.saveSysStory(userId, { [TALK_KEY]: id })),

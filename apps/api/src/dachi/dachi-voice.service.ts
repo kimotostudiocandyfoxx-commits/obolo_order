@@ -1,4 +1,5 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
+import { moderateText, type LlmProvider } from '@obolo/ai';
 import {
   DACHI_CHARACTER_NAMES,
   dachiLine,
@@ -20,6 +21,7 @@ import { Database } from '../db/db';
 import { dachiMessages, follows, invites, userBlocks, users } from '../db/schema';
 import { MediaService } from '../media/media.service';
 import { PushService } from '../push/push.service';
+import { LLM } from '../infra/tokens';
 import { DachiService } from './dachi.service';
 import { talkLookOf } from '../look/talk';
 
@@ -32,6 +34,8 @@ const cardOf = (j: unknown): DachiWorkCard | null => {
   return card as DachiWorkCard;
 };
 type NewRow = typeof dachiMessages.$inferInsert;
+/** a text message's words (work_json { text }) */
+const textOf = (j: unknown): string | null => (j && typeof j === 'object' && typeof (j as { text?: unknown }).text === 'string' ? (j as { text: string }).text : null);
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** dachi = both follow each other (2 rows), no block either way, the other is still here and not suspended */
@@ -58,6 +62,8 @@ export class DachiVoiceService {
     private readonly dachi: DachiService,
     private readonly media: MediaService,
     private readonly push: PushService,
+    /** the text messages' check (client 2026-11-24): the same moderation as Saturn's words */
+    @Optional() @Inject(LLM) private readonly llm?: LlmProvider,
   ) {}
 
   // ── small lookups (stubbed in tests) ──
@@ -226,14 +232,20 @@ export class DachiVoiceService {
       if (!m) throw apiError(HttpStatus.NOT_FOUND, 'MEDIA_NOT_FOUND', 'Recording not found');
       // M-R234: the sender's expression rides in work_json (a voice row has no card; no new column)
       row = { ...base, kind: 'voice', audioUrl: m.url, audioMediaId: m.id, seconds: Math.round(body.seconds * 10) / 10, ...(body.face ? { workJson: { face: body.face } } : {}) };
+    } else if ('text' in body) {
+      // client 2026-11-24: words typed in the ダチ talk — checked like Saturn's words (refused, never sent, when flagged);
+      // kept in work_json { text, face } (the kind column is free text: no migration)
+      if ((await moderateText(body.text, this.llm)).flagged) throw apiError(HttpStatus.UNPROCESSABLE_ENTITY, 'CONTENT_FLAGGED', 'This cannot be sent');
+      row = { ...base, kind: 'text', workJson: { text: body.text, ...(body.face ? { face: body.face } : {}) } };
     } else {
       row = { ...base, kind: 'work', workJson: body.face ? { ...body.work, face: body.face } : body.work };
     }
     const m = await this.insertMessage(row);
     if (!character) {
       const name = (await this.journey(userId))?.displayName || 'ダチ';
+      const n = 'text' in body ? { title: `💬 ${name}から、メッセージ`, body: body.text.length > 40 ? `${body.text.slice(0, 40)}…` : body.text } : { title: `🎤 ${name}から、声のメッセージ`, body: 'ひらいて聞いてみよう' };
       void this.push
-        .notify(thread, { title: `🎤 ${name}から、声のメッセージ`, body: 'ひらいて聞いてみよう', url: '/moon/atelier', tag: `dachi-${userId}` })
+        .notify(thread, { ...n, url: `/moon/atelier?tab=dachi&dachi=${userId}`, tag: `dachi-${userId}` })
         .catch((e: unknown) => this.log.warn(`push failed: ${String(e)}`));
     }
     return this.toView(userId, m);
@@ -253,15 +265,15 @@ export class DachiVoiceService {
       id: r.id,
       fromMe: r.senderId === userId,
       character: r.senderId ? null : ((r.character as DachiCharacter | null) ?? null),
-      kind: r.kind === 'work' ? 'work' : 'voice',
+      kind: r.kind === 'work' ? 'work' : r.kind === 'text' ? 'text' : 'voice',
       // a character's voice comes from the line data (filled in when the voice is made), so no migration is needed then
-      audioUrl: line ? line.voice : r.audioUrl,
+      audioUrl: line ? line.voice : (r.audioUrl ?? null),
       seconds: r.seconds ?? null,
-      text: line?.text ?? null,
+      text: line?.text ?? (r.kind === 'text' ? textOf(r.workJson) : null),
       work: r.kind === 'work' ? cardOf(r.workJson) : null,
       face: faceOf(r.workJson),
       // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
-      ...(line?.text ? { faces: ruleBeats(line.text) } : {}),
+      ...(line?.text ? { faces: ruleBeats(line.text) } : r.kind === 'text' && textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),
       read: r.recipientId !== userId || !!r.readAt,
       createdAt: r.createdAt.toISOString(),
     };

@@ -16,6 +16,8 @@ import { TALK_FACES, type TalkBeat, type TalkFace, type TalkLook } from './talk'
 
 /** longest voice message (seconds); the recorder stops itself here */
 export const DACHI_VOICE_MAX_SECONDS = 60;
+/** client 2026-11-24: the longest text message in a ダチ talk (characters) */
+export const DACHI_TEXT_MAX = 300;
 /** PLACEHOLDER (P-DACHI-2): how many messages one person may send per hour / per day (all threads) */
 export const DACHI_SEND_PER_HOUR = 30;
 export const DACHI_SEND_PER_DAY = 120;
@@ -144,11 +146,12 @@ export interface DachiMessageView {
   fromMe: boolean;
   /** a character spoke it (MIKIE⭐︎DRILL's welcome in {inviter}'s thread, KIMORIN⭐︎'s lines) */
   character: DachiCharacter | null;
-  kind: 'voice' | 'work';
+  /** client 2026-11-24: 'text' — words typed in the ダチ talk (in `text`) */
+  kind: 'voice' | 'work' | 'text';
   /** the voice (an absolute URL, or a path of the web app for a character's line); null = voice not made yet */
   audioUrl: string | null;
   seconds: number | null;
-  /** the words of a character's line (shown while its voice is not made) */
+  /** the words of a character's line (shown while its voice is not made), or of a text message */
   text: string | null;
   work: DachiWorkCard | null;
   /** M-R234: the sender's expression, decided when it was sent */
@@ -165,6 +168,8 @@ const SendFace = z.enum(TALK_FACES).optional();
 export const SendDachiMessageBody = z.union([
   z.object({ mediaId: z.string().uuid(), seconds: z.number().positive().max(DACHI_VOICE_MAX_SECONDS + 1), face: SendFace }),
   z.object({ work: DachiWorkCard, face: SendFace }),
+  // client 2026-11-24: words typed in the ダチ talk (the small keyboard beside the mic)
+  z.object({ text: z.string().trim().min(1).max(DACHI_TEXT_MAX), face: SendFace }),
 ]);
 export type SendDachiMessageBody = z.infer<typeof SendDachiMessageBody>;
 

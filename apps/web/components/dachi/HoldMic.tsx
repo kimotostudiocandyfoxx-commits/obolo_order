@@ -35,6 +35,7 @@ export function HoldMic({
   disabled,
   hint = '押している間だけ、録音されます',
   left,
+  right,
   big = false,
 }: {
   onSend: (blob: Blob, seconds: number) => Promise<void>;
@@ -43,6 +44,8 @@ export function HoldMic({
   hint?: string;
   /** something at the bar's left (the work-card button in a thread) */
   left?: React.ReactNode;
+  /** something at the bar's right, in the big layout (the ダチ talk's keyboard button) */
+  right?: React.ReactNode;
   /** the talk's dock (M-R232, design/talk/proto.html): the big glowing mic in the middle */
   big?: boolean;
 }) {
@@ -115,6 +118,7 @@ export function HoldMic({
         ) : big ? (
           <div className="relative flex items-center justify-center pb-1 pt-1">
             <div className="absolute left-1 top-1/2 -translate-y-1/2">{left}</div>
+            {right && <div className="absolute right-1 top-1/2 -translate-y-1/2">{right}</div>}
             <button
               type="button"
               disabled={disabled}

@@ -8,7 +8,8 @@ import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
 import { playClip, type Clip } from '@/lib/voice/webVoice';
-import { TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
+import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { useMarkRing } from '@/components/finds/MarkRing';
 import { talkDayOf } from '@/lib/finds/talks';
@@ -58,6 +59,10 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
   const [err, setErr] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
   const [works, setWorks] = useState<BluenaWork[] | null>(null);
+  /** client 2026-11-24: the text field is open (the keyboard beside the mic) */
+  const [typing, setTyping] = useState(false);
+  const [bar, setBar] = useState(0);
+  const [keyboard, setKeyboard] = useState(false);
   const readCb = useRef(onRead);
   readCb.current = onRead;
   const person = (thread?.kind ?? (id === 'kimorin' || id === 'mikie' ? id : 'dachi')) === 'dachi';
@@ -106,6 +111,16 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
     const api = getApi();
     const up = await api.uploadVoice(blob);
     sent(await api.sendDachiMessage(id, { mediaId: up.id, seconds: Math.max(0.1, Math.round(seconds * 10) / 10) }));
+  };
+
+  /** client 2026-11-24: words typed in the talk (the small keyboard beside the mic) */
+  const sendText = async (text: string) => {
+    setErr(null);
+    try {
+      sent(await getApi().sendDachiMessage(id, { text }));
+    } catch (e) {
+      setErr(e instanceof ApiError && e.code === 'CONTENT_FLAGGED' ? 'その言葉は、送れないみたい' : e instanceof ApiError ? e.message : String(e));
+    }
   };
 
   const sendWork = async (card: DachiWorkCard) => {
@@ -170,6 +185,7 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
             </button>
           ) : undefined,
         }}
+        keyboard={typing && keyboard}
         loading={msgs === null}
         unreadFrom={day ? null : unreadFrom}
         onRing={(it, at) => it.mark && ring.open(it.mark.kind, it.mark.id, at)}
@@ -177,16 +193,25 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
           day ? undefined : <div>
             {err && <p className="mb-1 text-center text-xs text-rose-300">{err}</p>}
             {msgs === null && <p className="mb-1 text-center text-xs text-white/40">…</p>}
+            {typing ? (
+              <TalkComposer key={bar} startTyping placeholder={`${name}に送る`} maxLength={DACHI_TEXT_MAX} onVoice={() => setTyping(false)} onState={(st) => setKeyboard(st.keyboard)} onSend={(t) => { void sendText(t); setBar((n) => n + 1); }} />
+            ) : (
             <HoldMic
               big
               onSend={sendVoice}
               disabled={!!err && msgs?.length === 0}
+              right={
+                <button onClick={() => setTyping(true)} aria-label="文字で送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
+                  ⌨
+                </button>
+              }
               left={
                 <button onClick={() => void openWorks()} aria-label="作品を送る" className="grid h-[42px] w-[42px] place-items-center rounded-full border border-[rgba(210,220,255,.22)] bg-[rgba(16,22,64,.46)] text-[15px] text-[#f4f1ff] backdrop-blur-[10px]">
                   ✦
                 </button>
               }
             />
+            )}
           </div>
         }
       />

@@ -21,7 +21,7 @@ export interface HomeWork {
   id: string;
   kind: PlanetWorkKind;
   /** pic: the puni face; chibi: the 2-heads mini figure that jumps out of the popped ball (M-R262; a round face until made) */
-  /** M-R266: the maker's chosen kororin (colour + face; しろもち when unset) */
+  /** M-R275: the maker's chosen kororin picture (1–24; none: not chosen yet) */
   author: { id: string; name: string; pic?: string | null; chibi?: string | null; kororin?: KororinChoice | null };
   rel: HomeRel;
   /** the words (Saturn: what was blown in, shown while it sings) */
@@ -76,54 +76,57 @@ export const RECORD_COLOURS = [
 export type RecordColour = (typeof RECORD_COLOURS)[number]['id'];
 
 /**
- * M-R266 (design/home/README.md §11): a kororin is a colour (a tint of the pearl ball) and a face; the 8 made ones
- * are pairs, but any colour may go with any face. Each member's choice is theirs; the balls on Saturn are the makers'.
+ * M-R275 (decisions_round20 M-R275): a kororin is one of 24 painted anime balls (design/mv-art/out/kor3-01…24; the
+ * face is in the picture, only the club's sunglasses go over it). Each member chooses one (D04-S005c, or later by
+ * asking {bati}); a maker who has not chosen gets one from the ball itself (kororinPicOf). The names are the words a
+ * member may use for one in the Moon chat (「コロリンをドヤ顔にして」).
  */
-export const KORORIN_COLOURS = [
-  { id: 'pearl', name: 'パール' },
-  { id: 'gold', name: '金' },
-  { id: 'pink', name: 'ピンク' },
-  { id: 'mint', name: 'ミント' },
-  { id: 'lavender', name: 'ラベンダー' },
-  { id: 'sky', name: '空色' },
-  { id: 'peach', name: 'ピーチ' },
-  { id: 'night', name: '夜色' },
-] as const;
-export const KORORIN_FACES = [
-  { id: 'omega', name: 'ω' },
-  { id: 'smile', name: 'にっこり' },
-  { id: 'wink', name: 'ウインク' },
-  { id: 'sleepy', name: 'ねむい' },
-  { id: 'cat', name: 'ねこ口' },
-  { id: 'oh', name: 'びっくり' },
-  { id: 'grin', name: 'にかっ' },
-  { id: 'star', name: 'キラキラ目' },
-] as const;
-export type KororinColour = (typeof KORORIN_COLOURS)[number]['id'];
-export type KororinFace = (typeof KORORIN_FACES)[number]['id'];
-export interface KororinChoice {
-  colour: KororinColour;
-  face: KororinFace;
-}
-/** the 8 (README §11): しろもち（パール・ω）… よぞら（夜色・キラキラ目） */
-export const KORORINS: ({ name: string } & KororinChoice)[] = [
-  { name: 'しろもち', colour: 'pearl', face: 'omega' },
-  { name: 'きんぴか', colour: 'gold', face: 'smile' },
-  { name: 'もも', colour: 'pink', face: 'wink' },
-  { name: 'みんと', colour: 'mint', face: 'sleepy' },
-  { name: 'ぷらむ', colour: 'lavender', face: 'cat' },
-  { name: 'そら', colour: 'sky', face: 'oh' },
-  { name: 'ぴーち', colour: 'peach', face: 'grin' },
-  { name: 'よぞら', colour: 'night', face: 'star' },
+export const KORORIN_PICS: { n: number; name: string; words: string[] }[] = [
+  { n: 1, name: 'キラキラ目のピンク', words: ['キラキラ目', 'きらきら目'] },
+  { n: 2, name: 'ドヤ顔', words: ['ドヤ顔', 'どや顔', 'ドヤ'] },
+  { n: 3, name: 'ねむねむ', words: ['ねむねむ', 'ねむい', '眠い', 'ねむそう', 'クリーム'] },
+  { n: 4, name: 'にっこにこ', words: ['にっこにこ', '笑ってる', 'わらってる', '大笑い'] },
+  { n: 5, name: 'ウインク', words: ['ウインク', 'ウィンク', 'オレンジ'] },
+  { n: 6, name: 'にこにこピンク', words: ['にこにこ', 'ピンク'] },
+  { n: 7, name: 'よぞら', words: ['よぞら', '夜空', '夜色', '星空', '紺', 'ネイビー'] },
+  { n: 8, name: 'しろもち', words: ['しろもち', 'にっこり', '銀', 'シルバー', 'グレー'] },
+  { n: 9, name: 'うるうる', words: ['うるうる', '黄色', 'きいろ'] },
+  { n: 10, name: 'ぽかんの空色', words: ['空色', 'そら色', '水色', '青', 'ブルー'] },
+  { n: 11, name: 'ジト目', words: ['ジト目', 'じと目', 'ジトめ'] },
+  { n: 12, name: 'ぷくー', words: ['ぷくー', 'ぷく', 'ふくれ', 'むすっ'] },
+  { n: 13, name: 'きんぴか', words: ['きんぴか', '金', 'ゴールド', '星の目'] },
+  { n: 14, name: 'しろの青い目', words: ['青い目', 'あおい目', '白', 'しろ', 'ホワイト'] },
+  { n: 15, name: '八重歯', words: ['八重歯', 'やえば', '赤', 'あか', 'レッド'] },
+  { n: 16, name: 'ちゅっ', words: ['ちゅっ', 'キス', 'ちゅー', 'パステル'] },
+  { n: 17, name: 'すごく驚く', words: ['すごく驚く', '驚く', 'おどろく', 'びっくり', 'ミント'] },
+  { n: 18, name: 'ガーン', words: ['ガーン', 'がーん', 'ショック'] },
+  { n: 19, name: 'ブチギレ', words: ['ブチギレ', 'ぶちぎれ', '怒って', 'おこ'] },
+  { n: 20, name: '滝の涙', words: ['滝の涙', '泣いて', 'なみだ', '涙'] },
+  { n: 21, name: 'ポカン', words: ['ポカン', 'ぽかん', 'はてな', '紫', 'むらさき', 'ラベンダー'] },
+  { n: 22, name: '点の目のしろ', words: ['点の目', 'てんの目', 'ω'] },
+  { n: 23, name: '点の目のベージュ', words: ['ベージュ', 'きなこ', '茶', 'ちゃいろ'] },
+  { n: 24, name: '点の目のさくら', words: ['さくら', '桜', 'うすピンク'] },
 ];
-export const isKororinColour = (v: unknown): v is KororinColour => KORORIN_COLOURS.some((c) => c.id === v);
-export const isKororinFace = (v: unknown): v is KororinFace => KORORIN_FACES.some((c) => c.id === v);
-/** someone's kororin: theirs, else しろもち */
-export function kororinOf(c?: { colour?: string | null; face?: string | null } | null): KororinChoice {
-  return { colour: isKororinColour(c?.colour) ? c!.colour : 'pearl', face: isKororinFace(c?.face) ? c!.face : 'omega' };
+export const KORORIN_PIC_COUNT = KORORIN_PICS.length;
+export interface KororinChoice {
+  /** 1–24 */
+  pic: number;
 }
-/** the made kororin with this colour and face (its name), if it is one of the 8 */
-export const kororinName = (c: KororinChoice) => KORORINS.find((k) => k.colour === c.colour && k.face === c.face)?.name ?? null;
+export const isKororinPic = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= KORORIN_PIC_COUNT;
+/** someone's chosen kororin (null: not chosen yet) */
+export function kororinOf(c?: { pic?: number | string | null } | null): KororinChoice | null {
+  const n = typeof c?.pic === 'string' ? Number(c.pic.replace(/^k/, '')) : c?.pic;
+  return isKororinPic(n) ? { pic: n } : null;
+}
+/**
+ * the picture a ball shows: its maker's chosen one; else, from the ball's own number and the maker's name, as the
+ * prototype does ((i×5 + the name's length×3) mod 24) — the same every time for the same ball
+ */
+export function kororinPicOf(chosen: { pic?: number | string | null } | null | undefined, i: number, name: string): number {
+  return kororinOf(chosen)?.pic ?? ((((i * 5 + [...name].length * 3) % KORORIN_PIC_COUNT) + KORORIN_PIC_COUNT) % KORORIN_PIC_COUNT) + 1;
+}
+/** the choice id {bati} and the API use for a picture ('k01'…'k24') */
+export const kororinPicId = (n: number) => `k${String(n).padStart(2, '0')}`;
 export const PlanetHomeColourBody = z.object({ colour: z.enum(['black', 'pink', 'lavender', 'mint', 'gold', 'sky']) });
 export type PlanetHomeColourBody = z.infer<typeof PlanetHomeColourBody>;
 

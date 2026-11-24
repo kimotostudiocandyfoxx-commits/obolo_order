@@ -2,7 +2,11 @@
  * M-R268 (design/home/template.html clubStart / clubStop): Saturn's club music for 〔▶ 全部流す〕 — one of three tracks
  * at random (124 / 128 / 120 BPM), made with WebAudio in the browser (kick on the beat, hats, a filtered saw bass line,
  * a soft triangle pad every 16 bars). Started only from a tap (browsers allow sound then), stopped with a short fade.
+ * M-R275: on the app's one AudioContext (lib/onboarding/audio.ts), at 0.5, dipping while a voice plays (saturnSound).
  */
+import { audioCtx, masterBus, unlockAudio } from '@/lib/onboarding/audio';
+import { MUSIC_GAIN } from './saturnSoundCore';
+
 export interface ClubTrack {
   bpm: number;
   bass: number[];
@@ -13,25 +17,17 @@ export const CLUB_TRACKS: ClubTrack[] = [
   { bpm: 120, bass: [49, 58.3, 65.4, 43.7] },
 ];
 
-let ac: AudioContext | null = null;
 let playing: { out: GainNode; timer: ReturnType<typeof setInterval> } | null = null;
 
 /** starts a random track (from a tap); returns its BPM, or null when there is no sound here */
 export function clubStart(pick = Math.random()): number | null {
   clubStop();
-  try {
-    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return null;
-    ac = ac ?? new AC();
-    void ac.resume?.();
-  } catch {
-    return null;
-  }
-  const a = ac;
+  const a = unlockAudio();
+  if (!a) return null;
   const S = CLUB_TRACKS[Math.floor(pick * CLUB_TRACKS.length) % CLUB_TRACKS.length];
   const out = a.createGain();
-  out.gain.value = 0.35;
-  out.connect(a.destination);
+  out.gain.value = MUSIC_GAIN;
+  out.connect(masterBus(a));
   const spb = 60 / S.bpm;
   let step = 0;
   let next = a.currentTime + 0.05;
@@ -113,6 +109,7 @@ export function clubStart(pick = Math.random()): number | null {
 
 /** a short fade, then quiet (nothing left scheduled past it) */
 export function clubStop() {
+  const ac = audioCtx();
   if (!playing || !ac) return;
   clearInterval(playing.timer);
   const out = playing.out;
@@ -126,3 +123,5 @@ export function clubStop() {
 }
 
 export const clubPlaying = () => !!playing;
+/** the music's gain while it plays (a voice dips it) */
+export const clubGain = () => playing?.out.gain ?? null;

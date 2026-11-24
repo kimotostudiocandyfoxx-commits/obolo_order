@@ -447,10 +447,10 @@ export class DemoApi implements Api {
       home: async (planet) => this.s.planetHomes?.[this.uid()]?.[planet] ?? null,
       setHome: async (planet, patch) => this.home(planet, patch.recordColour ? { recordColour: patch.recordColour } : {}),
       kororin: async () => this.s.users[this.uid()]?.kororin ?? null,
-      setKororin: async (patch) => {
+      setKororin: async (pic) => {
         const u = this.s.users[this.uid()];
         if (!u) return;
-        u.kororin = kororinOf({ ...u.kororin, ...patch });
+        u.kororin = kororinOf({ pic });
         this.save();
       },
       // iPad feedback: the member's own bubble colour, where the settings keep it (Me.story 'sys.talk_color')
@@ -1489,7 +1489,9 @@ export class DemoApi implements Api {
     const m: DachiMessageView =
       'mediaId' in body
         ? { id: uid(), fromMe: true, character: null, kind: 'voice', audioUrl: `idb:${body.mediaId}`, seconds: Math.round(body.seconds * 10) / 10, text: null, work: null, face: body.face ?? null, createdAt: now() }
-        : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, face: body.face ?? null, createdAt: now() };
+        : 'text' in body
+          ? { id: uid(), fromMe: true, character: null, kind: 'text', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now() }
+          : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, face: body.face ?? null, createdAt: now() };
     (this.s.dachiMsgs ??= []).push({ ...m, thread });
     this.save();
     return m;

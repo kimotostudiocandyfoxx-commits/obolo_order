@@ -49,9 +49,12 @@ export const users = pgTable(
     puniPicUrl: text('puni_pic_url'),
     /** M-R262: the member's 2-heads glossy mini figure, jumping out of a popped ball on Saturn (painted once from the look) */
     chibiPicUrl: text('chibi_pic_url'),
-    /** M-R266: the chosen kororin — a colour and a face (@obolo/shared KORORIN_COLOURS / KORORIN_FACES; null = しろもち) */
+    /** M-R266 (replaced by kororinPic, M-R275): the old choice, a colour and a face — kept, no longer read */
     kororinColour: text('kororin_colour'),
     kororinFace: text('kororin_face'),
+    /** M-R275: the chosen kororin picture, 1–24 (@obolo/shared KORORIN_PICS; null = not chosen). Migration 0046 filled it
+     * from the old colour choice (the nearest picture) */
+    kororinPic: integer('kororin_pic'),
     /** Jupiter: painted butterfly (PNG on Bunny) */
     butterflyUrl: text('butterfly_url'),
     /** Jupiter: the four branch names on the tree (null = the defaults) */

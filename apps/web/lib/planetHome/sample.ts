@@ -1,4 +1,4 @@
-import { HOME_PLANETS, KORORINS, PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
+import { HOME_PLANETS, PLANET_HOMES, type HomePlanet, type HomeRel, type HomeWork, type PlanetHomeView } from '@obolo/shared';
 
 /**
  * Sample views for 星のホーム (the lab page /lab/planet-home and the story's scripted places). The names are the story
@@ -18,6 +18,8 @@ const CAST_CHIBI: Record<string, string> = { own: '/planet-home/chibi-user.webp'
 const FAR = ['はるか', 'ショウタ', 'れい', 'ぽんず', 'kei', 'みお'];
 const WORDS = ['明日もがんばるZE', 'うまいラーメン見つけた', 'ねむい…でも楽しい', '新曲できたかも', '空がきれいだった', 'たこ焼き食べたい。', 'きょうは晴れ'];
 
+const VOICE_MP3 = ['100noso6h92fo', '10149vuhvw91k', '1022gz118mxxnh', '102og5kogbg1c', '103h34a17mrfxs'].map((n) => `/story/voices/lines/${n}.mp3`);
+
 export function sampleView(
   planet: HomePlanet,
   o: {
@@ -29,6 +31,8 @@ export function sampleView(
     now?: number;
     /** M-R267's check: this many more kororins from more people (the record holds 16, the rest wait in line) */
     crowd?: number;
+    /** M-R275's check: real recorded voices (mp3s from the story's voice lines) instead of read-aloud words */
+    voices?: boolean;
   } = {},
 ): PlanetHomeView {
   const now = o.now ?? Date.now();
@@ -40,12 +44,12 @@ export function sampleView(
     id: `${planet}-${id}`,
     kind,
     // the story cast's mini figures stand in where there is one (M-R262); the others show the round face
-    // M-R266: everyone's own kororin (the 8 made ones, by name; one has not chosen yet → しろもち)
-    author: { id: `u-${name}`, name, chibi: CAST_CHIBI[rel === 'own' ? 'own' : name] ?? null, kororin: name === 'ショウ' ? null : KORORINS[[...name].reduce((a, c) => a + c.codePointAt(0)!, 0) % KORORINS.length] },
+    // M-R275: everyone's chosen kororin picture (two have not chosen: theirs comes from the ball and the name)
+    author: { id: `u-${name}`, name, chibi: CAST_CHIBI[rel === 'own' ? 'own' : name] ?? null, kororin: name === 'ショウ' || name === 'nana' ? null : { pic: ([...name].reduce((a, c) => a + c.codePointAt(0)!, 0) % 24) + 1 } },
     rel,
     text: planet === 'saturn' ? WORDS[i % WORDS.length] : '',
     title: planet === 'saturn' ? undefined : `${name}の${cfg.work}`,
-    url: planet === 'saturn' ? `tts:${WORDS[i % WORDS.length]}` : null,
+    url: planet === 'saturn' ? (o.voices ? VOICE_MP3[i % VOICE_MP3.length] : `tts:${WORDS[i % WORDS.length]}`) : null,
     flownAt: at(h),
     demo: o.demo,
   });

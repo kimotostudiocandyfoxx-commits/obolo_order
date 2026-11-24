@@ -1,12 +1,14 @@
 'use client';
 
-import { kororinOf, RECORD_COLOURS } from '@obolo/shared';
+import { RECORD_COLOURS } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { COLORS } from '@/lib/puni/parts';
 import { rimFloor } from '@/lib/planetHome/ballPhysics';
 import { BallLayer, BallName, type BallItem, type BallLayerHandle } from './BallLayer';
-import { kororinBall, KororinPic } from './KororinFace';
+import { ballPic, kororinBall, KororinPic } from './KororinFace';
 import { BALLS_AT_ONCE, type StageItem } from '@/lib/planetHome/model';
+import { playVoice, popSound, preloadVoice } from '@/lib/planetHome/saturnSound';
+import { VOICE_DELAY_MS } from '@/lib/planetHome/saturnSoundCore';
 import type { SceneProps } from './skin';
 import s from './PlanetHome.module.css';
 
@@ -41,8 +43,8 @@ const BUBBLE = { x0: 0.24, x1: 0.76 };
 const AUTO_MS = 3700;
 /** M-R267: after a pop, the next one in line falls from the sky this much later */
 const NEXT_MS = 900;
-/** the needle, right in front: 〔▶ 全部流す〕 pops the ball nearest it first */
-const NEEDLE_AT = { x: 0.74, y: 0.74 };
+/** M-R275: the needle's tip (moved back, upper right in the new backdrop): 〔▶ 全部流す〕 pops the ball nearest it first */
+const NEEDLE_AT = { x: 0.6, y: 0.52 };
 const TALK_MIN = 1600;
 const TALK_MAX = 20000;
 const WAVE_MS = 900;
@@ -123,6 +125,8 @@ type Out = {
   t0: number;
   started: boolean;
   endAt: number;
+  /** M-R275: its voice plays through Web Audio (its end is known; the <audio> player's state does not apply) */
+  web?: boolean;
 };
 
 export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, onItem, onHold, onHeard, onPlayEnd }: SceneProps) {
@@ -177,15 +181,13 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  // M-R266: each ball is its maker's kororin (しろもち until chosen); whose it is shows only in the plate's underline
+  // M-R275: each ball is its maker's chosen kororin picture (else one from the ball's number and the name)
   const items = useMemo<BallItem[]>(
     () =>
       shown.map((w) => {
-        const k = kororinOf(w.author.kororin);
         return {
           id: w.id,
-          pic: kororinBall(k.colour),
-          face: k.face,
+          pic: kororinBall(ballPic(w, hue(w.id))),
           turn: hue(w.id),
           name: w.rel === 'own' ? null : w.author.name,
           R: (22 + (hue(w.id) % 3) * 4) * scale,
@@ -281,8 +283,21 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
     ]);
     setWaiting((n) => n + 1);
     setTimeout(() => setWaiting((n) => n - 1), NEXT_MS);
-    live.current.onItem(w);
+    // M-R275: the soap-bubble pop now, the maker's voice 300 ms later on the shared AudioContext (decoded ahead); the
+    // <audio> player only when it is not ready in time (or there is no Web Audio)
+    popSound();
+    setTimeout(() => {
+      const d = playVoice(w.url);
+      if (d === null) return live.current.onItem(w);
+      const o = outsRef.current.find((q) => q.w.id === id);
+      if (o) Object.assign(o, { web: true, started: true, endAt: performance.now() + Math.max(TALK_MIN - VOICE_DELAY_MS, d * 1000 + 250) });
+    }, VOICE_DELAY_MS);
   }, []);
+
+  // M-R275: the voices of the balls on the record, fetched and decoded ahead (a pop plays one at once)
+  useEffect(() => {
+    for (const w of shown) preloadVoice(w.url);
+  }, [shown]);
 
   // M-R264 〔▶ 全部流す〕: while the record spins, the ball nearest the needle pops by itself, then the next, every 3.7 s;
   // when none is left it stops (「今日のコロリン、全部聞いたね！」). 〔■ 止める〕 stops it at once.
@@ -335,7 +350,7 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
   useEffect(() => {
     const now = performance.now();
     for (const o of outsRef.current) {
-      if (o.phase !== 'talk') continue;
+      if (o.phase !== 'talk' || o.web) continue;
       if (playingId === o.w.id) o.started = true;
       else if (o.started || now - o.t0 > 2500) o.endAt = Math.max(now, o.t0 + TALK_MIN);
     }
@@ -609,7 +624,7 @@ function StillRows({ items, onTap, onHold }: { items: StageItem[]; onTap: (w: St
           data-rel={w.rel}
           data-testid="rolling"
         >
-          <KororinPic k={w.author.kororin} size={56} turn={hue(w.id)} />
+          <KororinPic pic={ballPic(w, hue(w.id))} size={56} turn={hue(w.id)} />
           {w.rel !== 'own' && <BallName name={w.author.name} R={28} />}
         </button>
       ))}

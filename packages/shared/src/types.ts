@@ -69,8 +69,8 @@ export interface Me {
   puniPic: string | null;
   /** M-R262: the 2-heads glossy mini figure painted once from the look (null until it is made) */
   chibiPic?: string | null;
-  /** M-R266: the chosen kororin (colour + face); unset = not chosen yet (しろもち) */
-  kororin?: { colour: string; face: string } | null;
+  /** M-R275: the chosen kororin picture (1–24); unset = not chosen yet */
+  kororin?: { pic: number } | null;
   /** Jupiter: your painted butterfly (🦋 蝶を描いてもらう) */
   butterfly: string | null;
   /**

@@ -1,4 +1,4 @@
-import { KIMORIN_PER_WAIT, KIMORIN_WAIT_LINES, kimorinDue, kimorinSchedule, MIKIE_WELCOME, type SendDachiMessageBody } from '@obolo/shared';
+import { DACHI_TEXT_MAX, SendDachiMessageBody as SendBody, KIMORIN_PER_WAIT, KIMORIN_WAIT_LINES, kimorinDue, kimorinSchedule, MIKIE_WELCOME, type SendDachiMessageBody } from '@obolo/shared';
 import { describe, expect, it } from 'vitest';
 import { DachiVoiceService, reachable, welcomeRow } from './dachi-voice.service';
 
@@ -16,7 +16,8 @@ function world() {
   const rows: Row[] = [];
   const pushes: string[] = [];
   const media = { getOwned: async (userId: string, id: string) => (id.startsWith(userId.slice(0, 1)) ? { id, url: `https://cdn/${id}.webm` } : null) };
-  const push = { notify: async (to: string) => void pushes.push(to) };
+  const notes: { to: string; title: string; body: string; url: string }[] = [];
+  const push = { notify: async (to: string, n: { title: string; body: string; url: string }) => void (pushes.push(to), notes.push({ to, ...n })) };
   const s = new DachiVoiceService({} as never, { list: async () => [] } as never, media as never, push as never);
   const x = s as unknown as Record<string, unknown>;
   x.journey = async (id: string) => people[id] ?? null;
@@ -37,7 +38,7 @@ function world() {
     follows.add(`${a}>${b}`);
     follows.add(`${b}>${a}`);
   };
-  return { s, follows, blocks, people, invitations, rows, pushes, dachi };
+  return { s, follows, blocks, people, invitations, rows, pushes, notes, dachi };
 }
 
 const A = 'a0000000-0000-4000-8000-000000000001';
@@ -206,5 +207,36 @@ describe('KIMORIN⭐︎ during the waits (M-R214)', () => {
     expect(new Set(lines).size).toBe(lines.length);
     // each was written at its own time (not when read) and after becoming dachi
     for (const r of w.rows) expect(r.createdAt.getTime()).toBeGreaterThanOrEqual(w.people[A].dachiAt!.getTime());
+  });
+});
+
+describe('client 2026-11-24: text messages in the ダチ talk', () => {
+  it('dachi send each other words: kept as a text row, shown as a text bubble, the friend notified like a voice', async () => {
+    const w = world();
+    w.dachi(A, B);
+    const m = await w.s.send(A, B, { text: 'あした、土星で会おう', face: 'smile' });
+    expect(m).toMatchObject({ fromMe: true, kind: 'text', text: 'あした、土星で会おう', audioUrl: null, work: null, face: 'smile' });
+    expect(m.faces?.length).toBeGreaterThan(0);
+    expect(w.rows.at(-1)).toMatchObject({ senderId: A, recipientId: B, kind: 'text' });
+    // the friend sees it as theirs to read
+    const seen = w.s.toView(B, w.rows.at(-1) as never);
+    expect(seen).toMatchObject({ fromMe: false, kind: 'text', text: 'あした、土星で会おう', read: false });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(w.notes).toMatchObject([{ to: B, title: '💬 ダチから、メッセージ', body: 'あした、土星で会おう', url: `/moon/atelier?tab=dachi&dachi=${A}` }]);
+  });
+  it('the same walls as voice: not dachi, blocked → refused; flagged words are never sent', async () => {
+    const w = world();
+    expect(code(await w.s.send(A, B, { text: 'やあ' }).catch((e) => e))).toBe('NOT_DACHI');
+    w.dachi(A, B);
+    w.blocks.add(`${B}>${A}`);
+    expect(code(await w.s.send(A, B, { text: 'やあ' }).catch((e) => e))).toBe('NOT_DACHI');
+    w.blocks.clear();
+    expect(code(await w.s.send(A, B, { text: '死ね' }).catch((e) => e))).toBe('CONTENT_FLAGGED');
+    expect(w.rows.filter((r) => r.kind === 'text')).toHaveLength(0);
+  });
+  it('the body: words 1–300 characters (trimmed)', () => {
+    expect(SendBody.safeParse({ text: '  ' }).success).toBe(false);
+    expect(SendBody.safeParse({ text: 'x'.repeat(DACHI_TEXT_MAX + 1) }).success).toBe(false);
+    expect(SendBody.safeParse({ text: ' やあ ' }).data).toEqual({ text: 'やあ' });
   });
 });

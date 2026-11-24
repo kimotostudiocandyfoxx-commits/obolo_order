@@ -1,24 +1,21 @@
 'use client';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from 'react';
-import type { KororinFace as KororinFaceId } from '@obolo/shared';
 import { hop, newBall, press, release, stepBalls, THROW, type Ball } from '@/lib/planetHome/ballPhysics';
-import { faceTurn, KororinFace, shadesOf } from './KororinFace';
+import { ballTilt, KororinShades, shadesOf } from './KororinFace';
 import s from './PlanetHome.module.css';
 
 /**
  * M-R265 (design/home/README.md §10): Saturn's balls as plain DOM, like the prototype. Each ball: an outer element
  * moved with translate3d (its position), an inner body squashed / stretched about a point near its bottom
- * (transform-origin 50% 88%), the maker's kororin (M-R266: its tinted ball, the shadow painted in, and its SVG face,
- * turned a little its own way; a blink every 4.6 s, each ball at its own moment; the eyes squint while pressed). Drag and throw; a short
- * touch is a tap. The physics (lib/planetHome/ballPhysics) runs once a frame and writes transforms only.
+ * (transform-origin 50% 88%), the maker's kororin (M-R275: one of the 24 painted balls, a little tilt of its own, and
+ * only the club's sunglasses over it). Drag and throw; a short touch is a tap. The physics (lib/planetHome/ballPhysics) runs once a frame and writes transforms only.
  */
 export interface BallItem {
   id: string;
   R: number;
   pic: string;
-  /** M-R266: the maker's kororin face, and a number of the ball's own (which way its face looks, when it blinks) */
-  face: KororinFaceId;
+  /** a number of the ball's own (its tilt, its sunglasses) */
   turn: number;
   /** M-R273: a dachi's / 推し's name, inside the ball under the face (none on your own) */
   name?: string | null;
@@ -238,7 +235,6 @@ export const BallLayer = forwardRef<
   return (
     <div ref={box} className={s.ballLayer} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} data-testid="ball-layer">
       {items.map((it) => {
-        const turn = faceTurn(it.turn);
         return (
           <div
             key={it.id}
@@ -262,8 +258,8 @@ export const BallLayer = forwardRef<
               className={s.ballBody}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img alt="" src={it.pic} draggable={false} />
-              <KororinFace face={it.face} delay={turn.delay} style={{ transform: turn.transform }} shades={shadesOf(it.turn)} />
+              <img alt="" src={it.pic} draggable={false} style={{ transform: `rotate(${ballTilt(it.turn).toFixed(1)}deg)` }} />
+              <KororinShades shades={shadesOf(it.turn)} />
               {it.name && <BallName name={it.name} R={it.R} />}
             </div>
           </div>

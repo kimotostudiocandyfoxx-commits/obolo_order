@@ -306,7 +306,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     const r = changeRequest(text);
     if (!r) return false;
     if ('ask' in r) {
-      say(changeLines.ask(r.item), r.item.choices.map((c) => r.item.chip(c)));
+      say(changeLines.ask(r.item), (r.item.offer?.(r.item.choices) ?? r.item.choices).map((c) => r.item.chip(c)));
       return true;
     }
     if ('near' in r) {

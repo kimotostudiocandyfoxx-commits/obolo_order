@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { applyChange, changeRequest, CHANGEABLES, KORORIN_COLOUR, KORORIN_FACE, SATURN_RECORD_COLOUR, TALK_BUBBLE_COLOUR, type ChangeStore } from './changeables';
+import { applyChange, changeRequest, CHANGEABLES, KORORIN_PIC, SATURN_RECORD_COLOUR, TALK_BUBBLE_COLOUR, type ChangeStore } from './changeables';
 import { SELF_TALK_TONES, TALK_TONE_DEFAULT } from './talkTone';
-import { KORORINS, kororinOf } from './planetHome';
+import { KORORIN_PICS, kororinOf, kororinPicOf } from './planetHome';
 import { changeLines, type ChangeRequest } from './changeables';
 
 const changeLinesNear = (r: ChangeRequest) => ('near' in r ? changeLines.near(r.asked, r.near) : null);
 
 const memStore = () => {
   const homes: Record<string, { recordColour?: string | null }> = {};
-  let kororin: { colour?: string; face?: string } | null = null;
+  let kororin: { pic?: number } | null = null;
   let talk: string | null = null;
   const store: ChangeStore = {
     talkColour: async () => talk,
@@ -16,7 +16,7 @@ const memStore = () => {
     home: async (p) => homes[p] ?? null,
     setHome: async (p, patch) => void (homes[p] = { ...homes[p], ...patch }),
     kororin: async () => kororin,
-    setKororin: async (patch) => void (kororin = { ...kororin, ...patch }),
+    setKororin: async (pic) => void (kororin = { pic }),
   };
   return { homes, store, kororin: () => kororin, talk: () => talk, setTalk: (t: string | null) => void (talk = t) };
 };
@@ -55,19 +55,27 @@ describe('M-R263: what {bati} can change (the registry)', () => {
   });
 });
 
-describe('M-R266: the kororin (8 made, any colour with any face)', () => {
-  it('the 8, and しろもち for someone who has not chosen', () => {
-    expect(KORORINS.map((k) => k.name)).toEqual(['しろもち', 'きんぴか', 'もも', 'みんと', 'ぷらむ', 'そら', 'ぴーち', 'よぞら']);
-    expect(kororinOf(null)).toEqual({ colour: 'pearl', face: 'omega' });
-    expect(kororinOf({ colour: 'night', face: 'nope' })).toEqual({ colour: 'night', face: 'omega' });
+describe('M-R275: the kororin is one of 24 pictures', () => {
+  it('24, and a ball whose maker has not chosen gets one from its own number and the name', () => {
+    expect(KORORIN_PICS.map((k) => k.n)).toEqual(Array.from({ length: 24 }, (_, i) => i + 1));
+    expect(new Set(KORORIN_PICS.map((k) => k.name)).size).toBe(24);
+    expect(kororinOf(null)).toBeNull();
+    expect(kororinOf({ pic: 7 })).toEqual({ pic: 7 });
+    expect(kororinOf({ pic: 'k12' })).toEqual({ pic: 12 });
+    expect(kororinOf({ pic: 25 })).toBeNull();
+    // the prototype's (i×5 + the name's length×3) mod 24, as 1–24
+    expect(kororinPicOf(null, 0, 'nana')).toBe(13);
+    expect(kororinPicOf(null, 3, 'MONBAN')).toBe(((3 * 5 + 6 * 3) % 24) + 1);
+    expect(kororinPicOf({ pic: 5 }, 3, 'MONBAN')).toBe(5);
   });
-  it('{bati} reads a colour or a face for the kororin, and leaves the record alone', () => {
-    const c = changeRequest('コロリンをピンクにして');
-    expect(c && 'choice' in c && [c.item.id, c.choice.id]).toEqual(['kororin.colour', 'pink']);
-    const f = changeRequest('コロリンの顔、ウインクにして');
-    expect(f && 'choice' in f && [f.item.id, f.choice.id]).toEqual(['kororin.face', 'wink']);
-    const a = changeRequest('コロリンの顔を変えたい');
-    expect(a && 'ask' in a && a.item.id).toBe('kororin.face');
+  it('{bati} reads a face, a name or a number for the kororin, and leaves the record alone', () => {
+    const d = changeRequest('コロリンをドヤ顔にして');
+    expect(d && 'choice' in d && [d.item.id, d.choice.id]).toEqual(['kororin.pic', 'k02']);
+    const n = changeRequest('コロリン、12番にして');
+    expect(n && 'choice' in n && n.choice.id).toBe('k12');
+    const a = changeRequest('コロリンを変えたい');
+    expect(a && 'ask' in a && a.item.id).toBe('kororin.pic');
+    expect(KORORIN_PIC.offer!(KORORIN_PIC.choices).length).toBeGreaterThan(3);
     const r = changeRequest('レコードをピンクにして');
     expect(r && 'choice' in r && r.item.id).toBe('saturn.recordColour');
     // every chip reads back as its own choice
@@ -77,14 +85,14 @@ describe('M-R266: the kororin (8 made, any colour with any face)', () => {
         expect(q && 'choice' in q && [q.item.id, q.choice.id]).toEqual([item.id, ch.id]);
       }
   });
-  it('a kororin change keeps the other half, carries the whole kororin, and undoes', async () => {
+  it('a kororin change undoes', async () => {
     const { store, kororin } = memStore();
-    await applyChange(store, KORORIN_FACE.id, 'star');
-    const r = await applyChange(store, KORORIN_COLOUR.id, 'night');
-    expect(r).toEqual({ id: 'kororin.colour', from: 'pearl', to: 'night', kororin: { colour: 'night', face: 'star' } });
+    const r = await applyChange(store, KORORIN_PIC.id, 'k19');
+    expect(r).toEqual({ id: 'kororin.pic', from: 'k01', to: 'k19' });
+    expect(kororin()).toEqual({ pic: 19 });
     await applyChange(store, r.id, r.from);
-    expect(kororin()).toEqual({ colour: 'pearl', face: 'star' });
-    await expect(applyChange(store, KORORIN_FACE.id, 'pink')).rejects.toThrow();
+    expect(kororin()).toEqual({ pic: 1 });
+    await expect(applyChange(store, KORORIN_PIC.id, 'k25')).rejects.toThrow();
   });
 });
 
@@ -120,7 +128,7 @@ describe('iPad feedback: the bubble colour is a changeable (no picker at the fir
     const r = changeRequest('レコードをピンクにして');
     expect(r && 'choice' in r && r.item.id).toBe('saturn.recordColour');
     const k = changeRequest('コロリンをピンクにして');
-    expect(k && 'choice' in k && k.item.id).toBe('kororin.colour');
+    expect(k && 'choice' in k && k.item.id).toBe('kororin.pic');
     expect(changeRequest('吹き出しの絵を見せて')).toBeNull();
   });
   it('applies through the store, keeps what it was for 〔元に戻す〕, refuses others', async () => {

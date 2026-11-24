@@ -18,7 +18,8 @@ export default function PlanetHomeLab() {
   const first = q?.get('first') === '1';
   const n = Number(q?.get('n') ?? 2);
   const crowd = Number(q?.get('crowd') ?? 0);
-  const view = useMemo(() => sampleView(planet, { young, firstTime: first, arrivals: n, crowd }), [planet, young, first, n, crowd]);
+  const voices = q?.get('voice') === '1';
+  const view = useMemo(() => sampleView(planet, { young, firstTime: first, arrivals: n, crowd, voices }), [planet, young, first, n, crowd, voices]);
   if (!q) return <main className="h-svh bg-[#140f22]" />;
   return (
     <main className="flex h-svh flex-col bg-[#140f22]">
@@ -36,7 +37,7 @@ export default function PlanetHomeLab() {
         </nav>
       )}
       <div className="relative min-h-0 flex-1">
-        <PlanetHome key={`${planet}${young}${first}${n}${crowd}`} planet={planet} view={view} />
+        <PlanetHome key={`${planet}${young}${first}${n}${crowd}${voices}`} planet={planet} view={view} />
       </div>
     </main>
   );
