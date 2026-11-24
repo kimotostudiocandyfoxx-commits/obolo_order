@@ -11,13 +11,14 @@ const MODEL = process.env.FISH_MODEL || 's2.1-pro';
 const BASE = 'https://api.fish.audio';
 if (!KEY) throw new Error('FISH_API_KEY missing');
 
-const LINES = [
+const LINES = process.env.LINES_JSON ? JSON.parse(process.env.LINES_JSON) : [
   ['01', '明日も、がんばるぜ！'],
   ['02', 'うまいラーメン、見つけた！'],
   ['03', 'ねむい……でも、楽しい。'],
   ['04', '新曲、できたかも！'],
   ['05', '空が、きれいだった。'],
 ];
+const PREFIX = process.env.OUT_PREFIX || 'line-';
 
 const form = new FormData();
 form.append('title', 'voice try-out (temporary)');
@@ -41,7 +42,7 @@ try {
       body: JSON.stringify({ text, reference_id: id, format: 'mp3', mp3_bitrate: 128, latency: 'normal', normalize: true }),
     });
     if (!res.ok) { console.log(`line ${n} failed ${res.status}: ${(await res.text()).slice(0, 200)}`); continue; }
-    writeFileSync(`${process.env.OUT_DIR||'/tmp/voice-out'}/line-${n}.mp3`, Buffer.from(await res.arrayBuffer()));
+    writeFileSync(`${process.env.OUT_DIR||'/tmp/voice-out'}/${PREFIX}${n}.mp3`, Buffer.from(await res.arrayBuffer()));
     console.log(`line ${n} done`);
   }
 } finally {
