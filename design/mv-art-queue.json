@@ -9336,6 +9336,20 @@
       ],
       "always": false,
       "prompt": "A square artwork: a lone figure watching a huge full moon over the ocean, emotional anime key visual. Polished Japanese anime illustration, rich colours, no text, no letters, no signature, no border."
+    },
+    {
+      "id": "home3-bg-jupiter2",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter.jpg"
+      ],
+      "prompt": "Edit the reference picture and keep everything exactly the same — the same forest, the same giant tree with its door and lanterns on the right, the same mossy clearing, light rays, colours and painterly anime art style. Only change the sky seen through the gap in the canopy at the top: remove the big planet completely. Instead, the sky is a warm glowing amber-gold sky with soft swirling bands of orange, cream and rose clouds stretching across it, like Jupiter's own atmosphere seen from below, and two small pale moons hang in it. No planet disc, no rings, no characters, no text."
     }
   ],
   "redo": []
