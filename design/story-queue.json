@@ -1190,6 +1190,26 @@
     "design/story/refs/moon-temple-open-client.jpg"
    ],
    "prompt": "Same world, architecture, lighting and painterly style as the reference pictures, the same night: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky, grey cratered lunar ground, distant grey mountains. Cool moonlight, small gold highlights. VIEWPOINT: standing on the grey lunar plain in front of the temple, about 30 metres from the foot of its wide front staircase, looking at the temple. CAMERA LOW and LEVEL: the eye height of a child standing on the ground (about 1.2 m), looking straight ahead, NOT from above. The horizon line is LOW, at 40% of the image height from the bottom. The temple's front rises in the middle distance across the frame: the wide white marble front staircase in the centre climbing to a marble gateway, the low circular outer wall with balustrades and columns, blue-domed pavilions on the left and right, broken arches and the slim domed tower peeking above the wall further back; the huge blue planet and a small moon in the starry sky above. The lower 40% of the frame is open, smooth grey lunar ground with soft small craters and gentle long shadows, empty, so many small people can wander on it. Normal 40mm lens, not wide-angle. Absolutely no people, no figures, no silhouettes, no creatures, no footprints. No text, no letters, no logos, no watermark."
+  },
+  {
+   "id": "moon-zone-dachi-v5",
+   "size": "1152x2048",
+   "n": 3,
+   "refs": [
+    "design/story/out/moon-zone-dachi-v4-1.jpg",
+    "design/story/out/moon-zone-bati-v2-2.jpg"
+   ],
+   "prompt": "Same world, architecture, lighting and painterly style as the reference pictures, the same night: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with the huge blue planet and one small moon, grey cratered lunar ground, distant grey mountains. Cool moonlight, small gold highlights. The same great circular hall as picture 1, seen from the same side (from the inner end of the hall, looking OUTWARD toward the marble gateway at the top of the front staircase and the lunar plain beyond), but photographed from a MUCH LOWER camera, like picture 2: the camera stands on the hall floor itself, just at the foot of the two low steps, at the eye height of a small child (1.1 m), looking perfectly level at the horizon. The horizon line and the base of the far mountains sit at 46% of the image height from the bottom, exactly like in picture 2. The blue star-patterned floor is seen at a grazing angle, strongly foreshortened, filling the lower 45% of the frame from the bottom edge to the far balustrade; the glowing gold star-circle is a flat ellipse in the middle of the floor. The far balustrade, the gateway arch and the two blue-domed pavilions at the left and right stand on the horizon and rise above it against the starry sky; the huge blue planet at the upper right. Nothing is seen from above: no bird's-eye view, no looking down. Normal 40mm lens, not wide-angle. Absolutely no people, no figures, no silhouettes, no creatures, no footprints. No text, no letters, no logos, no watermark."
+  },
+  {
+   "id": "moon-zone-outside-v5",
+   "size": "1152x2048",
+   "n": 3,
+   "refs": [
+    "design/story/out/moon-zone-outside-v4-1.jpg",
+    "design/story/out/moon-zone-bati-v2-2.jpg"
+   ],
+   "prompt": "Same world, architecture, lighting and painterly style as the reference pictures, the same night: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with the huge blue planet and one small moon, grey cratered lunar ground, distant grey mountains. Cool moonlight, small gold highlights. The same temple as picture 1, seen from the lunar plain in front of its wide front staircase, but photographed from a MUCH LOWER camera, like picture 2: the camera stands on the grey lunar ground about 25 metres from the foot of the staircase, at the eye height of a small child (1.1 m), looking perfectly level. The horizon line sits at 42% of the image height from the bottom. Because the camera is low, the temple's blue floor is NOT visible at all: we see only the front of its white marble outer wall and balustrade, the wide staircase climbing up toward a marble gateway arch in the centre, blue-domed pavilions on the left and right, and slim towers and broken arches rising behind the wall against the starry sky; the huge blue planet and one small moon above. The lower 40% of the frame is open, empty, gently undulating grey lunar ground with small soft craters, seen at a grazing angle, so many small people can wander on it. Nothing is seen from above: no bird's-eye view, no looking down. Normal 40mm lens, not wide-angle. Absolutely no people, no figures, no silhouettes, no creatures, no footprints. No text, no letters, no logos, no watermark."
   }
  ]
 }
