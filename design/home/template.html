@@ -58,6 +58,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .chibi.away{transition:left .65s ease-in,top .65s ease-in,transform .65s ease-in,opacity .65s;transform:scale(.15);opacity:0}
 .tint{position:absolute;inset:0;background:var(--rec,transparent);mix-blend-mode:screen;-webkit-mask-size:cover;mask-size:cover;-webkit-mask-position:center bottom;mask-position:center bottom;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;transform:scale(1.04);pointer-events:none;opacity:.85;z-index:1}
 .swatch[hidden]{display:none}
+#tstyle[hidden]{display:none}
 .swatch{display:flex;gap:6px;align-items:center}
 .swatch button{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.8);cursor:pointer;padding:0}
 .swatch button[aria-pressed=true]{outline:2px solid var(--accent);outline-offset:2px}
@@ -103,8 +104,8 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .partying .face .eyes{visibility:hidden}
 .party{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .6s}
 .party.on{opacity:1}
-.party.inhv{z-index:9}.party.inhv .dim{opacity:.35}
-@keyframes hvroll{from{transform:rotate(-200deg)}to{transform:none}}
+.party.inhv{z-index:auto}.party.inhv .dim{opacity:.35}
+@keyframes hvroll{from{transform:rotate(-400deg)}to{transform:none}}
 .party .dim{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 30%,rgba(30,10,60,.35),rgba(8,4,20,.72))}
 .party .lasers{position:absolute;left:50%;top:14%;width:0;height:0;mix-blend-mode:screen}
 .party .lasers i{position:absolute;left:0;top:0;width:3px;height:900px;transform-origin:50% 0;background:linear-gradient(var(--lc),transparent 85%);filter:blur(.6px);opacity:.75;animation:laser 3.2s ease-in-out infinite alternate}
@@ -774,11 +775,15 @@ function playJ(){if(JOPEN)JOPEN.close();setCta(true);festStart();const order=[..
 function stopJ(){if(JV){JV.t.forEach(clearTimeout);JV=null}festStop();hvOff();const f=$('fest');if(f)f.classList.remove('on');setCta(false)}
 let AC=null,BEAT=null,VBUF={};
 function getAC(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){}return AC}
-function loadVoices(){const c=getAC();if(!c)return;for(const k of [1,2,3,4,5].flatMap(n=>['voice-'+String(n).padStart(2,'0'),'song-'+n,'vtitle-'+n,'stitle-'+n])){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
-  fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))).then(buf=>{VBUF[k]=buf}).catch(()=>{delete VBUF[k]})}}
+const VPROM={};
+function loadVoices(){const c=getAC();if(!c)return;const ks=[1,2,3,4,5].map(n=>'voice-'+String(n).padStart(2,'0')).concat([1,2,3,4,5].flatMap(n=>['vtitle-'+n,'stitle-'+n]),[1,2,3,4,5].map(n=>'song-'+n));for(const k of ks){if(!A[k]||VBUF[k])continue;VBUF[k]='loading';
+  VPROM[k]=fetch(A[k]).then(r=>r.arrayBuffer()).then(b=>new Promise((ok,ng)=>c.decodeAudioData(b,ok,ng))).then(buf=>{VBUF[k]=buf}).catch(()=>{delete VBUF[k]})}}
+// decode right away (works before the first tap, while the context is still suspended)
+setTimeout(()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();loadVoices()}catch(e){}},300);
 document.addEventListener('pointerdown',()=>{getAC();loadVoices()},{once:false,passive:true});
 // voice through the same (already unlocked) context, so timed pops in club mode are not blocked; music dips meanwhile
 function playVoice(k){const c=getAC(),buf=VBUF[k];
+  if(buf==='loading'&&VPROM[k]){const t0=performance.now();VPROM[k].then(()=>{if(performance.now()-t0<2500&&VBUF[k]&&VBUF[k]!=='loading')playVoice(k)});return}
   if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=1.15;s.buffer=buf;s.connect(g);g.connect(c.destination);s.start();
     if(BEAT){const bg=BEAT.out.gain,t0=c.currentTime;bg.cancelScheduledValues(t0);bg.setTargetAtTime(.16,t0,.04);bg.setTargetAtTime(.5,t0+buf.duration+.1,.25)}return}
   if(A[k]){try{const au=new Audio(A[k]);au.play().catch(()=>{})}catch(e){}}}
@@ -808,17 +813,17 @@ function setCta(on){const b=$('cta');placeDock();
 let SV=null;
 function play(){
   if(cur!=='saturn')return;
-  SPIN=true;playing=true;setCta(true);clubStart();$('party').classList.add('on');$('party').classList.add('inhv');
+  SPIN=true;playing=true;setCta(true);clubStart();$('party').classList.add('on');$('party').classList.add('inhv');$('hv').insertBefore($('party'),$('hvstage'));
   const ph=$('phone'),order=[...rolls.filter(r=>!r.gone).map(r=>r.o),...QUEUE];let k=0;SV={t:[]};const T=(f,ms)=>SV.t.push(setTimeout(f,ms));
   // you drop from the sky onto the tonearm
   const d=document.createElement('div');d.className='dancer';d.innerHTML=`<img alt="" src="${A['udance-1']||A['chibi-user']||''}">`;d.style.left=(NEEDLE[0]*ph.clientWidth)+'px';d.style.top='-40px';d.style.transform='scale(.7)';d.style.transition='top .55s cubic-bezier(.5,0,.9,.6),transform .3s';$('sky').appendChild(d);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.top=(NEEDLE[1]*ph.clientHeight)+'px'}));T(()=>{d.style.transform='scale(.8,.6)';popSound()},560);T(()=>{d.style.transform='scale(.7)'},700);
-  T(()=>{d.remove();hvOn('bg2-saturn-needle');ph.classList.add('partying')},1100);
+  T(()=>{d.remove();hvOn(A['bg2-saturn-close']?'bg2-saturn-close':'bg2-saturn-needle');ph.classList.add('partying')},1100);
   const one=()=>{if(!SV)return;if(k>=order.length){stopPlay();toast('🎉 今日のコロリン、全部聞いたね！');return}const o=order[k],i=k++;
     const k4=K4N(o.n),img=(k4&&A['kor4-'+k4])||A[KOR2[(i*5+o.n.length*3)%(KN())]]||'';
-    const v=document.createElement('div');v.className='vis';v.style.width='96px';v.style.height='96px';v.innerHTML=`<img alt="" src="${img}" style="animation:hvroll .9s linear">`;$('hvstage').appendChild(v);
-    v.style.transition='none';hvPos(v,.58+Math.random()*.1,.47,.35);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.1s cubic-bezier(.3,.6,.3,1)';hvPos(v,.42,.62,1.25)}));
-    T(()=>{const st=$('hvstage'),r=st.getBoundingClientRect(),x=.42*ph.clientWidth,y=.62*ph.clientHeight;v.remove();popSound();
+    const v=document.createElement('div');v.className='vis';v.style.width='96px';v.style.height='96px';v.style.width='110px';v.style.height='110px';v.innerHTML=`<img alt="" src="${img}" style="animation:hvroll 1.15s cubic-bezier(.3,.6,.3,1)">`;$('hvstage').appendChild(v);
+    v.style.transition='none';hvPos(v,-.2,.66,1.2);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.15s cubic-bezier(.3,.6,.3,1)';hvPos(v,.47,.6,1.3)}));
+    T(()=>{const st=$('hvstage'),r=st.getBoundingClientRect(),x=.47*ph.clientWidth,y=.6*ph.clientHeight;v.remove();popSound();
       for(let n=0;n<14;n++){const dd=document.createElement('i');dd.className='drop';const a=n/14*Math.PI*2,dist=50*(1.2+Math.random()*.8);dd.style.left=x+'px';dd.style.top=y+'px';dd.style.setProperty('--dx',Math.cos(a)*dist+'px');dd.style.setProperty('--dy',Math.sin(a)*dist+'px');st.appendChild(dd);setTimeout(()=>dd.remove(),700)}
       const c=document.createElement('div');c.className='chibi';c.style.left=x+'px';c.style.top=(y+30)+'px';c.style.width='190px';c.style.height='190px';c.style.margin='-150px 0 0 -95px';c.innerHTML=`<img alt="" src="${A['chibi-'+CHB(o.n)]||''}">`;st.appendChild(c);
       const line=P.saturn.card(i).cap,vk='voice-'+String(i%5+1).padStart(2,'0'),bb=document.createElement('div');bb.className='bub';bb.innerHTML=`<small>🎤 ${o.n}</small>${line}`;bb.style.left='50%';bb.style.top=(y-150)+'px';
@@ -826,7 +831,7 @@ function play(){
     T(one,3900)};
   T(one,1700);
 }
-function stopPlay(){SPIN=false;if(SV){SV.t.forEach(clearTimeout);SV=null;hvOff()}const pa0=$('party');if(pa0)pa0.classList.remove('inhv');if(playing&&playing!==true)clearTimeout(playing);playing=null;clubStop();const w=$('spinwrap');if(w)w.classList.remove('on');const pa=$('party');if(pa)pa.classList.remove('on');$('phone').classList.remove('partying');$('needle').classList.remove('on');setCta(false)}
+function stopPlay(){SPIN=false;if(SV){SV.t.forEach(clearTimeout);SV=null;hvOff()}const pa0=$('party');if(pa0){pa0.classList.remove('inhv');$('phone').insertBefore(pa0,$('fw')||$('spinwrap'))}if(playing&&playing!==true)clearTimeout(playing);playing=null;clubStop();const w=$('spinwrap');if(w)w.classList.remove('on');const pa=$('party');if(pa)pa.classList.remove('on');$('phone').classList.remove('partying');$('needle').classList.remove('on');setCta(false)}
 $('switch').innerHTML=Object.entries(P).map(([k,c])=>`<button type="button" data-k="${k}">${c.name}</button>`).join('');
 $('mode').onclick=e=>{const m=e.target.dataset.m;if(m){mode=m;render()}};
 $('switch').onclick=e=>{const k=e.target.dataset.k;if(k){cur=k;render()}};
