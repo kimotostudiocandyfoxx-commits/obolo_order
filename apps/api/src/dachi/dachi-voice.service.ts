@@ -9,6 +9,8 @@ import {
   isCharacterThread,
   kimorinDue,
   MIKIE_WELCOME,
+  DACHI_RECENT_DAYS,
+  rankDachi,
   KIMORIN_VOICE,
   speakText,
   type DachiCharacter,
@@ -185,12 +187,14 @@ export class DachiVoiceService {
     if (!u?.dachiAt) {
       if (!u) return [];
       const mine = await this.rows(this.where(userId, 'kimorin'), 50);
-      return [{ id: 'kimorin', kind: 'kimorin', name: DACHI_CHARACTER_NAMES.kimorin, pic: null, unread: mine.some((r) => r.recipientId === userId && !r.readAt), lastAt: mine.at(-1)?.createdAt.toISOString() ?? null }];
+      const week = Date.now() - DACHI_RECENT_DAYS * 86_400_000;
+      return [{ id: 'kimorin', kind: 'kimorin', name: DACHI_CHARACTER_NAMES.kimorin, pic: null, unread: mine.some((r) => r.recipientId === userId && !r.readAt), lastAt: mine.at(-1)?.createdAt.toISOString() ?? null, recent: mine.filter((r) => r.createdAt.getTime() > week).length }];
     }
-    const [friends, inv, recent] = await Promise.all([
+    const [friends, inv, recent, week] = await Promise.all([
       this.dachi.list(userId),
       this.invitation(userId),
       this.rows(or(eq(dachiMessages.recipientId, userId), eq(dachiMessages.senderId, userId))!, 500),
+      this.weekCounts(userId),
     ]);
     const last = new Map<string, string>();
     const unread = new Set<string>();
@@ -205,15 +209,32 @@ export class DachiVoiceService {
     if (ids.length)
       for (const r of await this.db.read.select({ id: users.id, j: users.onboardingJson, avatarUrl: users.avatarUrl }).from(users).where(inArray(users.id, ids)))
         talk.set(r.id, talkLookOf((r.j ?? {}) as Record<string, string>, 'me', r.avatarUrl));
-    const view = (id: string, kind: DachiThreadView['kind'], name: string, pic: string | null): DachiThreadView => ({ id, kind, name, pic, unread: unread.has(id), lastAt: last.get(id) ?? null, ...(talk.get(id) ? { talk: talk.get(id) } : {}) });
+    const view = (id: string, kind: DachiThreadView['kind'], name: string, pic: string | null): DachiThreadView => ({ id, kind, name, pic, unread: unread.has(id), lastAt: last.get(id) ?? null, recent: week.get(id) ?? 0, ...(talk.get(id) ? { talk: talk.get(id) } : {}) });
     const out: DachiThreadView[] = [];
     const inviter = friends.find((f) => f.id === inv?.inviterId);
     if (inviter) out.push(view(inviter.id, 'dachi', inviter.displayName, inviter.pic));
     if (last.has('mikie')) out.push(view('mikie', 'mikie', DACHI_CHARACTER_NAMES.mikie, null));
     out.push(view('kimorin', 'kimorin', DACHI_CHARACTER_NAMES.kimorin, null));
     const others = friends.filter((f) => f !== inviter).map((f) => view(f.id, 'dachi', f.displayName, f.pic));
-    others.sort((a, b) => (b.lastAt ?? '').localeCompare(a.lastAt ?? ''));
-    return [...out, ...others];
+    // R9: ranked by the last 7 days' messages (ties: the most recent), for the Moon temple's great hall and plain
+    return rankDachi([...out, ...others]);
+  }
+
+  /**
+   * R9: messages exchanged in the last 7 days, per thread as `userId` sees it (both ways; a character's lines and
+   * answers count for that character). One grouped query on the (recipient, created_at) / (sender, created_at) indexes.
+   */
+  protected async weekCounts(userId: string): Promise<Map<string, number>> {
+    const since = new Date(Date.now() - DACHI_RECENT_DAYS * 86_400_000);
+    const res = await this.db.read.execute<{ thread: string; n: string }>(sql`SELECT
+      CASE WHEN sender_id = ${userId} THEN COALESCE(recipient_id::text, character)
+           WHEN sender_id IS NOT NULL THEN sender_id::text
+           ELSE COALESCE(peer_id::text, character) END AS thread,
+      count(*) AS n
+      FROM ${dachiMessages}
+      WHERE (sender_id = ${userId} OR recipient_id = ${userId}) AND created_at > ${since} AND deleted_at IS NULL
+      GROUP BY 1`);
+    return new Map(res.rows.filter((r) => r.thread).map((r) => [r.thread, Number(r.n)]));
   }
 
   /** May `userId` use this thread? A character's: once dachi. A person's: only while you are dachi. */

@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth';
 export const CHARACTER_AVATAR: Record<string, string> = { kimorin: '/story/avatars/kimorin.webp', mikie: '/onboarding/mikie.webp' };
 
 /** one row of the atelier's conversation list (components/atelier/threads.ts ThreadInfo, kept structurally the same) */
-export type DachiThreadInfo = { id: string; name: string; avatar?: string; unread?: number; /** R9: the full figure */ stand?: string };
+export type DachiThreadInfo = { id: string; name: string; avatar?: string; unread?: number; /** R9: the full figure */ stand?: string; recent?: number; lastAt?: string | null };
 
 const POLL_MS = 30_000;
 
@@ -47,7 +47,7 @@ export function useDachiThreads() {
 
   // KIMORIN⭐︎ always (even when the server's list is empty or could not be read)
   const all: DachiThreadView[] = on && !list.some((t) => t.id === 'kimorin') ? [...list, { id: 'kimorin', kind: 'kimorin', name: 'KIMORIN⭐︎', pic: null, unread: false, lastAt: null }] : list;
-  const threads: DachiThreadInfo[] = all.map((t) => ({ id: t.id, name: t.name, avatar: t.pic ?? CHARACTER_AVATAR[t.kind], unread: t.unread ? 1 : 0, stand: t.talk?.stand }));
+  const threads: DachiThreadInfo[] = all.map((t) => ({ id: t.id, name: t.name, avatar: t.pic ?? CHARACTER_AVATAR[t.kind], unread: t.unread ? 1 : 0, stand: t.talk?.stand, recent: t.recent ?? 0, lastAt: t.lastAt }));
   /** a thread was opened and heard: its dot goes */
   const markRead = useCallback((id: string) => setList((l) => l.map((t) => (t.id === id ? { ...t, unread: false } : t))), []);
   return { threads, list: all, reload, markRead };

@@ -34,6 +34,7 @@ import {
   kororinOf,
   CHANGEABLES,
   type ChangeStore,
+  rankDachi,
   TALK_COLOR_KEY,
   splitHome,
   orderOwn,
@@ -205,6 +206,8 @@ interface DemoState {
   moonWorks?: (MoonWorkView & { owner: string })[];
   /** M-R253 §5: homecomings told (`owner|key`) */
   homeTold?: string[];
+  /** R9 review shots: more ダチ for the Moon temple's hall and plain (no talk behind them) */
+  reviewDachi?: { id: string; name: string; recent: number; lastAt: string | null; stand?: string }[];
 }
 
 /** Venus radio samples: the gorilla trio's shows on the demo Venus (their own pictures, no new art). */
@@ -1477,10 +1480,14 @@ export class DemoApi implements Api {
     if (this.s.dachiInviter && me?.invitedByName) out.push(view('demo-inviter', 'dachi', me.invitedByName));
     if (list.some((m) => m.thread === 'mikie')) out.push(view('mikie', 'mikie', 'MIKIE⭐︎DRILL'));
     out.push(view('kimorin', 'kimorin', 'KIMORIN⭐︎'));
-    return out;
+    // R9: the last 7 days' messages, ranked as the server ranks them
+    const week = Date.now() - 7 * 86_400_000;
+    for (const t of out) t.recent = list.filter((m) => m.thread === t.id && Date.parse(m.createdAt) > week).length;
+    for (const d of this.s.reviewDachi ?? []) out.push({ id: d.id, kind: 'dachi', name: d.name, pic: null, unread: false, lastAt: d.lastAt, recent: d.recent, ...(d.stand ? { talk: { of: d.id, stand: d.stand } } : {}) });
+    return rankDachi(out);
   }
   private dachiThreadOk(thread: string) {
-    const ok = thread === 'kimorin' || (!!this.s.dachiAt && (thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter)));
+    const ok = thread === 'kimorin' || !!this.s.reviewDachi?.some((d) => d.id === thread) || (!!this.s.dachiAt && (thread === 'mikie' || (thread === 'demo-inviter' && !!this.s.dachiInviter)));
     if (!ok) throw new ApiError(403, 'NOT_DACHI', 'Voice messages go only between ダチ');
   }
   async dachiMessages(thread: string) {

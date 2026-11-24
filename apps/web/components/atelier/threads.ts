@@ -16,6 +16,9 @@ export type ThreadInfo = {
   avatar?: string;
   /** R9: their full figure (the look's standing picture) for the ダチ tab's Moon */
   stand?: string;
+  /** R9: the last 7 days' messages and the newest one (the temple's great hall / plain ranking) */
+  recent?: number;
+  lastAt?: string | null;
   /** unread count, shown as a dot (no number on screen) */
   unread?: number;
 };

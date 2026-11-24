@@ -34,6 +34,17 @@ function world(o: { llm?: unknown } = {}) {
     return m;
   };
   x.rows = async () => rows;
+  // R9: the 7-day counts as SQL would group them (here from the rows in memory)
+  x.weekCounts = async (u: string) => {
+    const m = new Map<string, number>();
+    const since = Date.now() - 7 * 86_400_000;
+    for (const r of rows) {
+      if ((r.senderId !== u && r.recipientId !== u) || r.createdAt.getTime() <= since) continue;
+      const t = r.senderId === u ? (r.recipientId ?? (r.character as string)) : r.senderId ? r.senderId : ((r.peerId as string) ?? (r.character as string));
+      m.set(t, (m.get(t) ?? 0) + 1);
+    }
+    return m;
+  };
   const dachi = (a: string, b: string) => {
     follows.add(`${a}>${b}`);
     follows.add(`${b}>${a}`);
@@ -290,5 +301,35 @@ describe('R9: KIMORIN⭐︎ answers in the ダチ talk (the chat provider mocked
     w.dachi(A, B);
     expect((await w.s.send(A, B, { text: 'やあ' }, { reply: true })).reply).toBeUndefined();
     expect(l.calls).toHaveLength(0);
+  });
+});
+
+describe('R9: the Moon temple — ダチ ranked by the last 7 days', () => {
+  it('threads come ranked by messages both ways in 7 days; ties to the most recent; KIMORIN ranked like anyone', async () => {
+    const w = world();
+    w.people[A] = { journeyDay: 5, journeyCompletedAt: null, dachiAt: new Date(Date.now() - 864e5 * 30), displayName: 'a' };
+    const friends = [B, C].map((id) => ({ id, displayName: id.slice(0, 1), pic: null }));
+    (w.s as unknown as { dachi: { list: () => Promise<unknown> } }).dachi = { list: async () => friends };
+    (w.s as unknown as Record<string, unknown>).db = { read: { select: () => ({ from: () => ({ where: async () => [] }) }) } };
+    w.dachi(A, B);
+    w.dachi(A, C);
+    const old = new Date(Date.now() - 864e5 * 10);
+    const msg = (from: string | null, to: string | null, at: Date, extra: Record<string, unknown> = {}) => w.rows.push({ id: `x${w.rows.length}`, senderId: from, recipientId: to, createdAt: at, kind: 'text', ...extra });
+    // B: 3 this week (both ways); C: 1 this week but 5 old ones; KIMORIN: 2 this week
+    msg(A, B, new Date(Date.now() - 3600e3));
+    msg(B, A, new Date(Date.now() - 7200e3));
+    msg(A, B, new Date(Date.now() - 9000e3));
+    for (let k = 0; k < 5; k++) msg(A, C, old);
+    msg(C, A, new Date(Date.now() - 60e3));
+    msg(A, null, new Date(Date.now() - 100e3), { character: 'kimorin' });
+    msg(null, A, new Date(Date.now() - 90e3), { character: 'kimorin' });
+    const t = await w.s.threads(A);
+    expect(t.map((x) => [x.id, x.recent])).toEqual([
+      [B, 3],
+      ['kimorin', 2],
+      [C, 1],
+      // MIKIE⭐︎DRILL's welcome came a month ago: listed, last
+      ['mikie', 0],
+    ]);
   });
 });

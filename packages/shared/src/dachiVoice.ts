@@ -133,6 +133,24 @@ export interface DachiThreadView {
   lastAt: string | null;
   /** M-R232: the dachi's own look in the talk (made when they decided it); characters use their story art */
   talk?: TalkLook | null;
+  /** R9 (the Moon temple's zones): messages exchanged with this ダチ in the last 7 days, both ways (KIMORIN's too) */
+  recent?: number;
+}
+
+/**
+ * R9 (client): the Moon temple as one place — the ダチ you talk with most stroll in the great hall (at most
+ * DACHI_HALL_MAX), everyone else wanders on the plain outside. Ranked by the messages of the last 7 days (both ways),
+ * ties to the most recent message; KIMORIN⭐︎ is ranked like anyone (it takes no place ahead of a ダチ who talked more).
+ */
+export const DACHI_HALL_MAX = 8;
+export const DACHI_RECENT_DAYS = 7;
+export function rankDachi<T extends { recent?: number; lastAt?: string | null }>(list: readonly T[]): T[] {
+  return [...list].sort((a, b) => (b.recent ?? 0) - (a.recent ?? 0) || (b.lastAt ?? '').localeCompare(a.lastAt ?? ''));
+}
+/** the great hall (the top DACHI_HALL_MAX) and the plain (the rest), in rank order */
+export function dachiZones<T extends { recent?: number; lastAt?: string | null }>(list: readonly T[], max = DACHI_HALL_MAX): { hall: T[]; outside: T[] } {
+  const r = rankDachi(list);
+  return { hall: r.slice(0, max), outside: r.slice(max) };
 }
 
 /** A Bluena work sent as a card: 〔ダチへ〕's delivery shape, with Bluena's folders' kinds too (art, video, radio) */
