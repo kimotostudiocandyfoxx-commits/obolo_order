@@ -231,6 +231,28 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .sh.front .bt img{animation:bop .42s ease-in-out infinite alternate}
 .phone.dim2 .sh:not(.front),.phone.dim2 .bf:not(.held){opacity:.35;transition:opacity .3s}
 .phone.dim2 .bg{filter:blur(2.5px) brightness(.75);transition:filter .35s}
+.phone.dim2 .top,.phone.cam .top{opacity:0;transition:opacity .25s;pointer-events:none}
+.top{transition:opacity .25s}
+.kin{position:absolute;left:50%;transform:translateX(-50%);z-index:14;pointer-events:none;text-align:center;width:92%}
+.kin .lab{display:inline-flex;align-items:center;gap:6px;font:900 10px/1 var(--f-body);letter-spacing:.32em;color:#fff;padding:5px 10px 5px 12px;border-radius:999px;background:rgba(10,10,20,.55);border:1px solid rgba(255,255,255,.28);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transform:translateY(8px);transition:opacity .3s,transform .4s cubic-bezier(.2,1.5,.4,1)}
+.kin .lab .dot{width:7px;height:7px;border-radius:50%;background:var(--kc,#ff4fa2);box-shadow:0 0 8px var(--kc,#ff4fa2);animation:kdot 1s ease-in-out infinite alternate}
+@keyframes kdot{to{opacity:.35}}
+.kin.on .lab{opacity:1;transform:none}
+.kin .tt{margin-top:8px;font:900 clamp(26px,8.6vw,38px)/1.08 var(--f-body);letter-spacing:.01em;word-break:keep-all}
+.kin .tt span{display:inline-block;background:linear-gradient(180deg,#fff 30%,var(--kc2,#ffd6f0));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35)) drop-shadow(0 0 14px var(--kg,rgba(255,80,170,.55)));opacity:0;transform:translateY(18px) scale(.6) rotate(-6deg);transition:opacity .25s,transform .45s cubic-bezier(.2,1.8,.4,1)}
+.kin.on .tt span{opacity:1;transform:none}
+.kin .by{margin-top:8px;display:inline-flex;align-items:center;gap:6px;font:800 12px var(--f-body);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);opacity:0;transition:opacity .4s .25s}
+.kin .by i{width:16px;height:16px;border-radius:50%;background:var(--kc,#ff4fa2);border:2px solid #fff}
+.kin.on .by{opacity:1}
+.kin.out{opacity:0;transform:translateX(-50%) translateY(-10px);transition:opacity .25s,transform .3s}
+.vinyl{position:absolute;left:0;top:0;width:58%;aspect-ratio:1;border-radius:50%;z-index:10;pointer-events:none;transform:translate(-50%,-50%) scale(.6);opacity:0;transition:opacity .4s,transform .6s cubic-bezier(.2,1.3,.4,1);
+  background:radial-gradient(circle,transparent 0 31%,rgba(255,255,255,.07) 31.5% 32%,transparent 32.5%),repeating-radial-gradient(circle,#121218 0 2px,#1d1d26 2px 4px);box-shadow:0 18px 40px rgba(0,0,0,.5),0 0 0 3px rgba(255,255,255,.08)}
+.vinyl.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.vinyl .sp{position:absolute;inset:0;border-radius:50%;animation:vspin 2.6s linear infinite}
+.vinyl .sp::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(255,255,255,0) 0 10%,rgba(255,255,255,.18) 14%,rgba(255,255,255,0) 20% 60%,rgba(255,255,255,.12) 66%,rgba(255,255,255,0) 72%)}
+.vinyl .lb2{position:absolute;inset:30%;border-radius:50%;background-size:cover;background-position:center;box-shadow:inset 0 0 0 3px rgba(255,255,255,.85)}
+.vinyl .lb2::after{content:"";position:absolute;left:50%;top:50%;width:9%;height:9%;margin:-4.5%;border-radius:50%;background:#0b0b10}
+@keyframes vspin{to{transform:rotate(360deg)}}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni.talk{z-index:7}
@@ -526,6 +548,12 @@ function pop(r){
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
 document.addEventListener('click',e=>{const b=e.target.closest('#bstyle button');if(!b)return;window.BST=b.dataset.b;document.querySelectorAll('#bstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
 /* ---- Mercury: music boats carrying dachi/oshi songs sail in front of your island ---- */
+function kinTitle(into,o){const e=document.createElement('div');e.className='kin';e.style.top=o.top;e.style.setProperty('--kc',o.c||'#ff4fa2');e.style.setProperty('--kc2',o.c2||'#ffd6f0');e.style.setProperty('--kg',o.g||'rgba(255,80,170,.55)');
+  e.innerHTML=`<div class="lab"><span class="dot"></span>${o.label}</div><div class="tt">${[...o.title].map((ch,i)=>`<span style="transition-delay:${(.12+i*.045).toFixed(2)}s">${ch===' '?'&nbsp;':ch}</span>`).join('')}</div><div class="by"><i></i>by ${o.by}</div>`;
+  into.appendChild(e);requestAnimationFrame(()=>requestAnimationFrame(()=>e.classList.add('on')));
+  return {el:e,out(){e.classList.add('out');setTimeout(()=>e.remove(),320)}}}
+function vinyl(into,img,x,y,w){const v=document.createElement('div');v.className='vinyl';v.style.left=x;v.style.top=y;if(w)v.style.width=w;v.innerHTML=`<div class="sp"><div class="lb2" style="background-image:url(${img})"></div></div>`;into.appendChild(v);requestAnimationFrame(()=>requestAnimationFrame(()=>v.classList.add('on')));
+  return {el:v,out(){v.classList.remove('on');setTimeout(()=>v.remove(),450)}}}
 function hvOn(bgk,night){const h=$('hv');h.classList.toggle('night',!!night);whoosh();$('hvbg').style.backgroundImage=`url(${A[bgk]||''})`;$('hvback').querySelector('img').src=A['uback']||'';$('hvstage').innerHTML='';$('hvfx').innerHTML='';h.classList.add('on');$('sky').style.opacity='0';}
 function whoosh(){const c=getAC();if(!c)return;const t0=c.currentTime+.01,n=c.createBufferSource(),bf=c.createBuffer(1,Math.floor(c.sampleRate*.6),c.sampleRate),d=bf.getChannelData(0);for(let i=0;i<d.length;i++){const x=i/d.length;d[i]=(Math.random()*2-1)*Math.sin(Math.PI*x)*.8}
   const f=c.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(400,t0);f.frequency.exponentialRampToValueAtTime(3200,t0+.5);const g=c.createGain();g.gain.value=.35;n.buffer=bf;n.connect(f);f.connect(g);g.connect(c.destination);n.start(t0)}
@@ -539,8 +567,8 @@ const MSLOT=[[.6,.5,0],[.62,.5,0],[.69,.78,1],[.72,.78,1],[.75,.78,1],[.83,1.08,
 const MSONG=['夏のはじまり','チルな午後','パーティー','夜のバラード','走れ'];
 const onBg=(fx,fy)=>{const ph=$('phone');return[fx*ph.clientWidth,fy*ph.clientHeight]};
 function stopMer(){cancelAnimationFrame(SHraf);SH=[];SHQ=[];if(MV)stopM();stopSong();if(MBUSY)MBUSY.close(true)}
-function stopSong(){if(SONG){try{SONG.stop()}catch(e){}SONG=null}}
-function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=.9;s.buffer=buf;s.loop=true;s.connect(g);g.connect(c.destination);s.start();SONG=s;return buf.duration}
+function stopSong(){if(SONG){const s=SONG;SONG=null;try{if(s.g&&AC){s.g.gain.setTargetAtTime(0,AC.currentTime,.08);setTimeout(()=>{try{s.stop()}catch(e){}},400)}else s.stop()}catch(e){}}}
+function playSong(k){const c=getAC(),buf=VBUF[k];stopSong();if(c&&buf&&buf!=='loading'){const s=c.createBufferSource(),g=c.createGain();g.gain.value=.9;s.buffer=buf;s.loop=true;s.connect(g);g.connect(c.destination);s.start();s.g=g;SONG=s;return buf.duration}
   if(A[k]){try{const au=new Audio(A[k]);au.loop=true;au.play().catch(()=>{});SONG={stop:()=>au.pause()}}catch(e){}}return 10}
 function setupMer(){
   const base=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'れい',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'}];
@@ -566,12 +594,12 @@ function splash(){const c=getAC();if(!c)return;const t0=c.currentTime+.005;const
 function popSh(s){if(s.gone||MBUSY||MPLAY)return;s.gone=true;const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,sky=$('sky');let closed=false;const tm=[];
   s.e.classList.add('front');s.e.classList.remove('left');ph.classList.add('dim2');splash();
   s.e.style.transform=`translate3d(${W*.5}px,${H*.7}px,0) scale(2)`;
-  const np=document.createElement('div');np.className='nowp';np.style.top=(H*.31)+'px';np.innerHTML=`<small>${s.o.n} の曲</small><span class="eq"><i></i><i></i><i></i><i></i></span>『${MSONG[s.ji-1]}』`;
-  tm.push(setTimeout(()=>{playSong('song-'+s.ji);sky.appendChild(np);requestAnimationFrame(()=>np.classList.add('on'))},450));
-  tm.push(setTimeout(()=>{const k='stitle-'+s.ji;if(A[k])playVoice(k)},2200));
-  function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);stopSong();np.classList.remove('on');ph.classList.remove('dim2');
+  let kt=null,vn=null;
+  tm.push(setTimeout(()=>{playSong('song-'+s.ji);vn=vinyl(sky,A['jart-'+s.ji]||'','50%','50%','56%')},450));
+  tm.push(setTimeout(()=>{const k='stitle-'+s.ji;if(A[k])playVoice(k);kt=kinTitle(sky,{top:'17%',label:'NOW PLAYING',title:MSONG[s.ji-1],by:s.o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},2200));
+  function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);stopSong();if(kt)kt.out();if(vn)vn.out();ph.classList.remove('dim2');
     s.e.style.transition='transform .35s ease-in,opacity .3s';s.e.style.transform=`translate3d(${W*MISLE[0]}px,${H*MISLE[1]}px,0) scale(.2)`;s.e.style.opacity='0';
-    setTimeout(()=>{s.e.remove();np.remove()},380);MBUSY=null;
+    setTimeout(()=>{s.e.remove()},380);MBUSY=null;
     setTimeout(()=>{if(SHQ.length){const o=SHQ.shift();SH.push(makeSh(o,100+(MNB++),s.slot))}else if(SH.every(z=>z.gone))toast('🏝 今日の曲、全部聴いたね！')},420)}
   MBUSY={s,t0:performance.now(),close};
 }
@@ -593,11 +621,11 @@ function playM(){if(MBUSY)MBUSY.close();setCta(true);getAC();loadVoices();const 
     const ji=(i*2+o.n.length)%5+1,k4=K4N(o.n),img=(k4&&A['ship4-'+k4])||A['ship3-'+((i*3+o.n.length)%4+1)]||'';
     const v=document.createElement('div');v.className='vis';v.style.width='150px';v.style.height='134px';v.innerHTML=`<img alt="" src="${img}"><span class="nm2">${o.n}</span>`;$('hvstage').appendChild(v);
     v.style.transition='none';hvPos(v,-.15,.6,.35);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.8s cubic-bezier(.3,.7,.3,1),opacity .5s';hvPos(v,.42,.67,1.25)}));
-    const np=document.createElement('div');np.className='nowp';np.style.top='24%';np.innerHTML=`<small>${o.n} の曲</small><span class="eq"><i></i><i></i><i></i><i></i></span>『${MSONG[ji-1]}』`;
-    T(()=>{v.classList.add('bob');splash();playSong('song-'+ji);$('hvstage').appendChild(np);requestAnimationFrame(()=>np.classList.add('on'))},1800);
-    T(()=>{const kk='stitle-'+ji;if(A[kk])playVoice(kk)},3500);
-    T(()=>{np.classList.remove('on');stopSong();v.classList.remove('bob');v.style.transition='transform 1.4s ease-in,opacity 1s';hvPos(v,1.2,.62,.5);v.style.opacity='0'},12200);
-    T(()=>{v.remove();np.remove();one()},13300)};
+    let kt=null,vn=null;
+    T(()=>{v.classList.add('bob');splash();playSong('song-'+ji);vn=vinyl($('hvstage'),A['jart-'+ji]||'','42%','47%','50%')},1800);
+    T(()=>{const kk='stitle-'+ji;if(A[kk])playVoice(kk);kt=kinTitle($('hvstage'),{top:'13%',label:'NOW PLAYING',title:MSONG[ji-1],by:o.n,c:'#38c8ff',c2:'#bdf0ff',g:'rgba(56,200,255,.6)'})},3300);
+    T(()=>{if(kt)kt.out();if(vn)vn.out();stopSong();v.classList.remove('bob');v.style.transition='transform 1.4s ease-in,opacity 1s';hvPos(v,1.2,.62,.5);v.style.opacity='0'},12200);
+    T(()=>{v.remove();one()},13300)};
   T(one,1700)}
 function stopM(){if(MV){MV.t.forEach(clearTimeout);MV=null}clearInterval(FWT);FWT=null;stopSong();hvOff();setCta(false)}
 /* ---- Jupiter: butterflies carrying dachi/oshi art flutter in front of your tree ---- */
@@ -634,10 +662,10 @@ function popBf(b){if(b.gone||JBUSY||JV)return;b.gone=true;JBUSY=true;const sky=$
   const f=document.createElement('div');f.className='flyc';f.style.transition='left .32s cubic-bezier(.3,.9,.3,1),top .32s cubic-bezier(.3,.9,.3,1),transform .32s,opacity .3s';f.innerHTML=`<img alt="" src="${img}">`;f.style.left=x+'px';f.style.top=y+'px';sky.appendChild(f);
   f.style.zIndex='13';requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.left=(pw*.5)+'px';f.style.top=(phh*.84)+'px';f.style.transform='scale(2.1)'}));
   const tk='vtitle-'+b.ai,title=JART[b.ai-1];
-  const sc=document.createElement('div');sc.className='scroll';sc.innerHTML=`<div class="rod"></div><div class="paper"><div class="art" style="background-image:url(${A['jart-'+b.ai]||''})"></div><div class="ttl">『${title}』</div><div class="by">${b.o.n}</div></div><div class="rod"></div>`;
-  const tm=[];tm.push(setTimeout(()=>{sky.appendChild(sc);requestAnimationFrame(()=>requestAnimationFrame(()=>sc.classList.add('open')));popSound();if(A[tk])playVoice(tk)},200));
+  const sc=document.createElement('div');sc.className='scroll';sc.innerHTML=`<div class="rod"></div><div class="paper"><div class="art" style="background-image:url(${A['jart-'+b.ai]||''})"></div></div><div class="rod"></div>`;let kt=null;
+  const tm=[];tm.push(setTimeout(()=>{sky.appendChild(sc);requestAnimationFrame(()=>requestAnimationFrame(()=>sc.classList.add('open')));popSound();if(A[tk])playVoice(tk);kt=kinTitle(sky,{top:'7%',label:'NEW ART',title,by:b.o.n,c:'#ffc94d',c2:'#fff1c2',g:'rgba(255,190,70,.6)'})},200));
   let closed=false;
-  function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);JOPEN=null;sc.classList.add('closing');sc.classList.remove('open');
+  function close(){if(closed)return;closed=true;tm.forEach(clearTimeout);JOPEN=null;if(kt)kt.out();sc.classList.add('closing');sc.classList.remove('open');
     setTimeout(()=>{sc.remove();ph.classList.remove('cam');$('camfx').classList.remove('on');f.style.transition='left .5s ease-in,top .5s ease-in,transform .5s,opacity .5s';f.style.left=(JTREE[0]*pw)+'px';f.style.top=(JTREE[1]*phh)+'px';f.style.transform='scale(.25)';f.style.opacity='0';b.e.remove();JBUSY=false},230);
     setTimeout(()=>f.remove(),800);
     setTimeout(()=>{if(BFQ.length){const o=BFQ.shift();BF.push(makeBf(o,100+(JNB++),b.slot))}else if(BF.every(z=>z.gone)){if(JPLAY)stopJ();toast('🌳 今日のアート、全部見たね！')}},600)}
@@ -660,12 +688,12 @@ function playJ(){if(JOPEN)JOPEN.close();setCta(true);festStart();const order=[..
   T(()=>{hvOn('bg3-jupiter-porch',true);const fx=$('hvfx');for(let n=0;n<18;n++){const i=document.createElement('i');i.className='ff2';i.style.left=(Math.random()*100)+'%';i.style.top=(10+Math.random()*80)+'%';i.style.setProperty('--d',(4+Math.random()*4)+'s');i.style.setProperty('--b',(1+Math.random()*1.4)+'s');i.style.setProperty('--fx',(Math.random()*60-30)+'px');i.style.setProperty('--fy',(Math.random()*-60)+'px');fx.appendChild(i)}},900);
   const one=()=>{if(!JV)return;if(k>=order.length){stopJ();toast('🌳 今日のアート、全部見たね！');return}const o=order[k],i=k++,ai=(i*2+o.n.length)%5+1;
     const img=A['chibi4-'+CHB(o.n)]||A['chibi3-'+CHB(o.n)]||'';const v=document.createElement('div');v.className='vis flap';v.style.width='120px';v.style.height='120px';v.innerHTML=`<img alt="" src="${img}"><span class="nm2">${o.n}</span>`;$('hvstage').appendChild(v);
-    v.style.transition='none';hvPos(v,.15+Math.random()*.3,.18,.3);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform 1.3s cubic-bezier(.25,.8,.3,1),opacity .5s';hvPos(v,.3,.74,1.35)}));chime();
-    const sc=document.createElement('div');sc.className='scroll';sc.style.top='40%';sc.style.left='46%';sc.style.width='62%';sc.innerHTML=`<div class="rod"></div><div class="paper"><div class="art" style="background-image:url(${A['jart-'+ai]||''})"></div><div class="ttl">『${JART[ai-1]}』</div><div class="by">${o.n}</div></div><div class="rod"></div>`;
-    T(()=>{$('hvstage').appendChild(sc);requestAnimationFrame(()=>requestAnimationFrame(()=>sc.classList.add('open')));popSound();const tk='vtitle-'+ai;if(A[tk])playVoice(tk)},1300);
-    T(()=>{sc.classList.add('closing');sc.classList.remove('open')},6100);
-    T(()=>{sc.remove();v.style.transition='transform 1s ease-in,opacity .8s';hvPos(v,.9,.15,.3);v.style.opacity='0'},6400);
-    T(()=>{v.remove();one()},7300)};
+    v.style.transition='none';hvPos(v,.15+Math.random()*.3,.18,.3);requestAnimationFrame(()=>requestAnimationFrame(()=>{v.style.transition='transform .85s cubic-bezier(.25,.8,.3,1),opacity .4s';hvPos(v,.3,.76,1.35)}));chime();
+    const sc=document.createElement('div');sc.className='scroll';sc.style.top='44%';sc.style.left='46%';sc.style.width='60%';sc.innerHTML=`<div class="rod"></div><div class="paper"><div class="art" style="background-image:url(${A['jart-'+ai]||''})"></div></div><div class="rod"></div>`;let kt=null;
+    T(()=>{$('hvstage').appendChild(sc);requestAnimationFrame(()=>requestAnimationFrame(()=>sc.classList.add('open')));popSound();const tk='vtitle-'+ai;if(A[tk])playVoice(tk);kt=kinTitle($('hvstage'),{top:'10%',label:'NEW ART',title:JART[ai-1],by:o.n,c:'#ffc94d',c2:'#fff1c2',g:'rgba(255,190,70,.6)'})},850);
+    T(()=>{if(kt)kt.out();sc.classList.add('closing');sc.classList.remove('open')},3700);
+    T(()=>{sc.remove();v.style.transition='transform .7s ease-in,opacity .6s';hvPos(v,.9,.15,.3);v.style.opacity='0'},3950);
+    T(()=>{v.remove();one()},4500)};
   T(one,1700)}
 function stopJ(){if(JV){JV.t.forEach(clearTimeout);JV=null}festStop();hvOff();const f=$('fest');if(f)f.classList.remove('on');setCta(false)}
 let AC=null,BEAT=null,VBUF={};
