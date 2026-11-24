@@ -99,7 +99,14 @@ export function PlanetHome({
         }
       : at;
   };
+  // M-R264 (Saturn): 〔▶ 全部流す〕 spins the record and the balls pop by themselves, nearest the needle first
+  const [autoplay, setAutoplay] = useState(false);
+  const spinning = cfg.roll ? autoplay : h.spinning;
   const enter = () => {
+    if (cfg.roll) {
+      if (autoplay) h.stop();
+      return setAutoplay((v) => !v);
+    }
     if (cfg.placeTap === 'play') return h.spinning ? h.stop() : h.play();
     setZoom(true);
     setTimeout(() => {
@@ -131,10 +138,11 @@ export function PlanetHome({
           view={{ ...h.view, recordColour: h.recordColour }}
           stage={h.stage}
           playingId={h.playingId}
-          spinning={h.spinning}
+          spinning={spinning}
+          onPlayEnd={() => setAutoplay(false)}
           caption={!!singing && (!cfg.roll || h.spinning)}
           onPlace={enter}
-          onPlay={() => (h.spinning ? h.stop() : h.play())}
+          onPlay={enter}
           onPlate={() => setInside(true)}
           onItem={tap}
           onHold={(w, at) => menuFor(w, young).length && setMenu({ w, at: local(at) })}
@@ -184,7 +192,7 @@ export function PlanetHome({
 
           {/* M-R263: one big button (making and flying are on the Moon) */}
           <div className={s.dock}>
-            {dockButtons(cfg, h.spinning).map((b) => (
+            {dockButtons(cfg, spinning).map((b) => (
               <button key={b.act} type="button" className={s.cta} onClick={enter}>
                 {b.label}
               </button>
