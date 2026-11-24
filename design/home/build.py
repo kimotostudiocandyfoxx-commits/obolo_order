@@ -121,7 +121,18 @@ for nm in ['kakejiku','kakejiku2','kakejiku3','kakejiku4']:
     if not os.path.exists(f): continue
     _k=Image.open(f).convert('RGB')
     if nm=='kakejiku': _k=_k.crop((0,176,_k.width,_k.height))
-    o=unwhite(_k); bx=kkbox(o.convert('RGB') if False else Image.alpha_composite(Image.new('RGBA',o.size,(255,255,255,255)),o)); o.thumbnail((560,760),Image.LANCZOS); A[nm]=uri(o,86); A['box-'+nm]=_json.dumps(bx); A['ar-'+nm]=str(round(o.height/o.width,4))
+    o=unwhite(_k); bx=kkbox(Image.alpha_composite(Image.new('RGBA',o.size,(255,255,255,255)),o))
+    # make the paper square: keep the top and bottom parts, resize the middle band (side borders + paper) to the paper's width
+    W_,H_=o.size; x0=int(bx[0]*W_); y0=int(bx[1]*H_); pw=int(bx[2]*W_); ph=int(bx[3]*H_); y1=y0+ph
+    mid=o.crop((0,y0,W_,y1))
+    if pw<=ph: mid=mid.crop((0,(ph-pw)//2,W_,(ph-pw)//2+pw))
+    else:
+        tall=Image.new('RGBA',(W_,pw)); yy=0
+        while yy<pw: tall.paste(mid,(0,yy)); yy+=ph
+        mid=tall
+    q=Image.new('RGBA',(W_,y0+pw+(H_-y1))); q.paste(o.crop((0,0,W_,y0)),(0,0)); q.paste(mid,(0,y0)); q.paste(o.crop((0,y1,W_,H_)),(0,y0+pw))
+    bx=[round(x0/W_,4),round(y0/q.height,4),round(pw/W_,4),round(pw/q.height,4)]; o=q
+    o.thumbnail((560,760),Image.LANCZOS); A[nm]=uri(o,86); A['box-'+nm]=_json.dumps(bx); A['ar-'+nm]=str(round(o.height/o.width,4))
 for nm in ['plaque-1','plaque-2']:
     f=f'{O}/{nm}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((620,260),Image.LANCZOS); A[nm]=uri(o,86)

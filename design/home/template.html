@@ -178,6 +178,29 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .camfx.on{opacity:1}
 .phone.cam .bf{opacity:.45;transition:opacity .4s}
 .phone.cam .bg{transition:transform .45s cubic-bezier(.3,.9,.3,1),filter .45s!important;transform:scale(1.22);filter:blur(2.5px)}
+.scroll .kk .art .ot{z-index:1;position:absolute;left:0;right:0;bottom:7%;text-align:center;font:900 clamp(30px,10vw,46px)/1.05 var(--f-body);letter-spacing:.03em;color:#fff;pointer-events:none;padding:0 4%}
+.scroll .kk .art .ot span{display:inline-block;opacity:0;-webkit-text-stroke:1.5px rgba(20,10,0,.55);paint-order:stroke fill;text-shadow:0 3px 0 rgba(0,0,0,.35),0 0 22px rgba(0,0,0,.45),0 0 2px #000}
+.scroll .kk .art .ot .kj{font-size:1.14em}.scroll .kk .art .ot .hr{font-size:.8em}
+.scroll .kk .art::after{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,rgba(0,0,0,.45));opacity:0;transition:opacity .5s .3s}
+.scroll.open.ottl .kk .art::after{opacity:1}
+.ot.a-pop span{transform:translateY(22px) scale(.4) rotate(-8deg);transition:opacity .25s,transform .5s cubic-bezier(.2,1.8,.4,1)}
+.ot.a-float span{transform:translateY(16px);filter:blur(10px);transition:opacity .8s,transform 1s cubic-bezier(.2,.8,.2,1),filter 1s}
+.ot.a-slam span{transform:scale(3) translateY(-10px);transition:opacity .1s,transform .3s cubic-bezier(.3,1.6,.5,1)}
+.ot.a-glitch span{transform:translateX(var(--gx)) skewX(-14deg);transition:opacity .05s,transform .2s steps(3)}
+.ot.a-brush{clip-path:inset(0 100% 0 0);transition:clip-path 1.2s cubic-bezier(.6,.1,.2,1) .2s}.ot.a-brush span{opacity:1}
+.scroll .kk .art .ot.on span{opacity:1;transform:none;filter:none}.ot.a-brush.on{clip-path:inset(-30% -5% -30% 0)}
+.ot.a-slam.on{animation:kshake .35s .6s}
+.scroll.cam-push .kk{animation:cpush .6s cubic-bezier(.2,.8,.2,1)}
+.scroll.cam-slam .kk{animation:cslam .45s cubic-bezier(.3,1.6,.4,1)}
+.scroll.cam-shake .kk{animation:cpush .4s cubic-bezier(.2,.8,.2,1),cshake .5s .35s}
+.scroll.cam-drift .kk{animation:cdrift 1.6s cubic-bezier(.2,.7,.2,1)}
+.scroll.cam-whip .kk{animation:cwhip .42s cubic-bezier(.2,.9,.2,1)}
+@keyframes cpush{from{transform:scale(.82)}to{transform:none}}
+@keyframes cslam{0%{transform:scale(1.35)}60%{transform:scale(.96)}100%{transform:none}}
+@keyframes cshake{15%{transform:translate(-6px,3px) rotate(-.6deg)}30%{transform:translate(6px,-3px) rotate(.6deg)}45%{transform:translate(-4px,2px)}60%{transform:translate(4px,-1px)}80%{transform:translate(-2px,1px)}}
+@keyframes cdrift{from{transform:scale(1.12) rotate(-2.5deg)}to{transform:none}}
+@keyframes cwhip{from{transform:translateX(70%) skewX(-8deg);filter:blur(6px)}to{transform:none;filter:none}}
+.phone.camfx-shake{animation:cshake .5s}
 .scroll .kk{position:relative;clip-path:inset(0 0 100% 0);transition:clip-path .55s cubic-bezier(.3,.8,.3,1)}
 .scroll.open .kk{clip-path:inset(-6% -6% -6% -6%)}
 .scroll.closing .kk{transition:clip-path .22s ease-in}
@@ -356,6 +379,7 @@ button:focus-visible,.item:focus-visible,.home:focus-visible{outline:3px solid v
 </style>
 <div class="switch" id="mode" role="toolbar" aria-label="絵のタッチ"><button type="button" data-m="anime" aria-pressed="true">アニメ版</button><button type="button" data-m="toy" aria-pressed="false">箱庭版</button></div>
 <div class="switch" id="switch" role="toolbar" aria-label="星を切りかえる"></div>
+<div class="switch" id="tstyle" role="toolbar" aria-label="タイトルの出し方" hidden><button type="button" data-t="art" aria-pressed="true">タイトル：アートの上</button><button type="button" data-t="plq" aria-pressed="false">タイトル：表札</button></div>
 
 <div class="phone" id="phone">
   <div class="bg" id="bg"></div>
@@ -431,7 +455,7 @@ function render(){
   const sky=$('sky');sky.innerHTML='';items=[];
   const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('fg').hidden=!(isS&&A['sat-fg']);if(isS&&A['sat-fg'])$('fg').style.backgroundImage=`url(${A['sat-fg']})`;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
-  $('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(MHOUSE[0]*100)+'%';$('home').style.top=(MHOUSE[1]*100)+'%';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
+  $('tstyle').hidden=!(cur==='jupiter'&&A['bg3-jupiter']);$('home').classList.remove('ghost');$('home').style.left='';$('home').style.top='';stopRoll();stopJup();stopMer();if(cur==='mercury'&&mode==='anime'&&A['bg3-mercury']){$('bg').style.backgroundImage=`url(${A['bg3-mercury']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(MHOUSE[0]*100)+'%';$('home').style.top=(MHOUSE[1]*100)+'%';setupMer();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='jupiter'&&mode==='anime'&&A['bg3-jupiter']){$('bg').style.backgroundImage=`url(${A['bg3-jupiter']})`;$('plate').hidden=true;rw.innerHTML='';$('home').classList.add('ghost');$('home').style.left=(JTREE[0]*100)+'%';$('home').style.top=(JTREE[1]*100)+'%';setupJup();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));return}
   if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked&&!A['kor4-user']){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
@@ -582,6 +606,7 @@ function pop(r){
   setTimeout(()=>{c.style.display='none';if(!QUEUE.length&&rolls.every(x=>x.gone)){const d=document.createElement('div');d.className='done';d.textContent='🎉 今日のコロリン、全部聞いたね！';sky.appendChild(d)}},3600);
 }
 function stopRoll(){cancelAnimationFrame(raf);rolls=[]}
+document.addEventListener('click',e=>{const b=e.target.closest('#tstyle button');if(!b)return;window.TST=b.dataset.t;document.querySelectorAll('#tstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
 document.addEventListener('click',e=>{const b=e.target.closest('#bstyle button');if(!b)return;window.BST=b.dataset.b;document.querySelectorAll('#bstyle button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()});
 /* ---- Mercury: music boats carrying dachi/oshi songs sail in front of your island ---- */
 const TSTYLE={'夏のはじまり':{f:"'Mochiy Pop One'",a:'pop'},'チルな午後':{f:"'Zen Kurenaido'",a:'float'},'パーティー':{f:"'Rampart One'",a:'glitch'},'夜のバラード':{f:"'Shippori Mincho B1'",a:'float'},'走れ':{f:"'Reggae One'",a:'slam'},
@@ -590,11 +615,12 @@ const chk=ch=>/[一-鿿々]/.test(ch)?'kj':/[぀-ゟ]/.test(ch)?'hr':/[゠-ヿ�
 const KKS=()=>['kakejiku','kakejiku2','kakejiku3','kakejiku4'].filter(k=>A[k]);
 function openArt(into,o){const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,ks=KKS(),kk=ks[Math.floor(Math.random()*ks.length)]||'kakejiku',bx=JSON.parse(A['box-'+kk]||'[.242,.196,.516,.469]');
   const sw=.95/bx[2],ar=+(A['ar-'+kk]||1.25),sh=sw*W*ar,aw=.95*W,artTop=.09*H,ph_=bx[3]*sh,top=artTop-(bx[1]*sh+(ph_-aw)/2);
-  const sc=document.createElement('div');sc.className='scroll';sc.style.width=(sw*100)+'%';sc.style.left='50%';sc.style.top=top+'px';sc.style.transform='translate(-50%,0)';
-  sc.innerHTML=`<div class="kk"><img alt="" src="${A[kk]||''}"><div class="art" style="left:${bx[0]*100}%;top:${(bx[1]+(bx[3]-bx[2]/ar)/2)*100}%;width:${bx[2]*100}%;height:${bx[2]/ar*100}%;background-image:url(${o.img})"></div></div>`;into.appendChild(sc);
+  const cams=['push','slam','shake','drift','whip'],cam=cams[Math.floor(Math.random()*cams.length)],onArt=(window.TST||'art')==='art';
+  const sc=document.createElement('div');sc.className='scroll cam-'+cam+(onArt?' ottl':'');sc.style.width=(sw*100)+'%';sc.style.left='50%';sc.style.top=top+'px';sc.style.transform='translate(-50%,0)';
+  sc.innerHTML=`<div class="kk"><img alt="" src="${A[kk]||''}"><div class="art" style="left:${bx[0]*100}%;top:${(bx[1]+(bx[3]-bx[2]/ar)/2)*100}%;width:${bx[2]*100}%;height:${bx[2]/ar*100}%;background-image:url(${o.img})">${onArt?`<div class="ot a-${(TSTYLE[o.title]||{a:'pop'}).a}" style="font-family:${(TSTYLE[o.title]||{f:"'Dela Gothic One'"}).f},var(--f-body)">${[...o.title].map((ch,i)=>`<span class="${chk(ch)}" style="transition-delay:${(.45+i*.07).toFixed(2)}s;--gx:${(i%2?-1:1)*8}px">${ch}</span>`).join('')}</div>`:''}</div></div>`;into.appendChild(sc);
   const st=TSTYLE[o.title]||{f:"'Dela Gothic One'"},pk=Math.random()<.5?'plaque-1':'plaque-2',pl=document.createElement('div');pl.className='plq '+(pk==='plaque-1'?'wood':'black');pl.style.backgroundImage=`url(${A[pk]||''})`;
   pl.style.top=(artTop+aw+H*.025)+'px';pl.innerHTML=`<div class="pt" style="font-family:${st.f},var(--f-body)">${[...o.title].map(ch=>`<span class="${chk(ch)}">${ch}</span>`).join('')}</div>`;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{sc.classList.add('open')}));setTimeout(()=>{into.appendChild(pl);requestAnimationFrame(()=>pl.classList.add('on'))},380);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{sc.classList.add('open');const ot=sc.querySelector('.ot');if(ot)ot.classList.add('on');if(cam==='shake'||cam==='slam'){const ph2=$('phone');setTimeout(()=>{ph2.classList.add('camfx-shake');setTimeout(()=>ph2.classList.remove('camfx-shake'),520)},cam==='slam'?120:380)}}));if(!onArt)setTimeout(()=>{into.appendChild(pl);requestAnimationFrame(()=>pl.classList.add('on'))},380);
   return {close(){sc.classList.add('closing');sc.classList.remove('open');pl.classList.remove('on');setTimeout(()=>{sc.remove();pl.remove()},260)}}}
 function kinTitle(into,o){const st=TSTYLE[o.title]||{f:"'Dela Gothic One'",a:'pop'},gap={pop:.045,float:.09,slam:.07,glitch:.03,brush:0}[st.a];const e=document.createElement('div');e.className='kin a-'+st.a;e.style.top=o.top;e.style.setProperty('--kc',o.c||'#ff4fa2');e.style.setProperty('--kc2',o.c2||'#ffd6f0');e.style.setProperty('--kg',o.g||'rgba(255,80,170,.55)');
   e.innerHTML=`<div class="lab"><span class="dot"></span>${o.label}</div><div class="tt" style="font-family:${st.f},var(--f-body)">${[...o.title].map((ch,i)=>`<span class="${chk(ch)}" style="transition-delay:${(.12+i*gap).toFixed(2)}s;--gx:${(i%2?-1:1)*7}px">${ch===' '?'&nbsp;':ch}</span>`).join('')}</div>${o.noby?'':`<div class="by">by ${o.by}</div>`}`;
