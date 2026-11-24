@@ -106,8 +106,27 @@ for nm,key2 in [('home3-bg-jupiter-porch','bg3-jupiter-porch'),('home3-bg-mercur
     if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A[key2]=uri(im,78)
 f=f'{O}/uback.jpg'
 if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((420,420),Image.LANCZOS); A['uback']=uri(o,86)
-f=f'{O}/kakejiku.jpg'
-if os.path.exists(f): _k=Image.open(f).convert('RGB'); _k=_k.crop((0,176,_k.width,_k.height)); o=unwhite(_k); o.thumbnail((520,740),Image.LANCZOS); A['kakejiku']=uri(o,86)
+import json as _json
+def kkbox(im):
+    a=np.asarray(im.convert('RGB')).astype(int); m=(a.mean(2)>196)&(a.mean(2)<251)&((a[...,0]-a[...,2])>3); H_,W_=m.shape; cy,cx=H_//2,W_//2
+    def run(v,c):
+        l=c
+        while l>0 and v[l-1]: l-=1
+        r=c
+        while r<len(v)-1 and v[r+1]: r+=1
+        return l,r
+    x0,x1=run(m[cy],cx); y0,y1=run(m[:,cx],cy); return [round(x0/W_,4),round(y0/H_,4),round((x1-x0)/W_,4),round((y1-y0)/H_,4)]
+for nm in ['kakejiku','kakejiku2','kakejiku3','kakejiku4']:
+    f=f'{O}/{nm}.jpg'
+    if not os.path.exists(f): continue
+    _k=Image.open(f).convert('RGB')
+    if nm=='kakejiku': _k=_k.crop((0,176,_k.width,_k.height))
+    o=unwhite(_k); bx=kkbox(o.convert('RGB') if False else Image.alpha_composite(Image.new('RGBA',o.size,(255,255,255,255)),o)); o.thumbnail((560,760),Image.LANCZOS); A[nm]=uri(o,86); A['box-'+nm]=_json.dumps(bx); A['ar-'+nm]=str(round(o.height/o.width,4))
+for nm in ['plaque-1','plaque-2']:
+    f=f'{O}/{nm}.jpg'
+    if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((620,260),Image.LANCZOS); A[nm]=uri(o,86)
+f=f'{O}/home2-bg-saturn-needle.jpg'
+if os.path.exists(f): im=Image.open(f).convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn-needle']=uri(im,78)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
