@@ -1158,6 +1158,16 @@
     "design/story/refs/moon-temple-open-client.jpg"
    ],
    "prompt": "Same world, architecture and style as the reference pictures: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky with a huge blue planet and a small moon, grey lunar ground. Painterly fantasy illustration, cool moonlight, small gold highlights. CAMERA: low, at the eye height of a small child standing on the floor (about 1.2 m), looking straight ahead and very slightly UP; a normal 40mm lens, not wide-angle; the horizon line sits low, about 40% up from the bottom of the frame. Closer and more intimate than a wide establishing shot. No people, no creatures, no figures. No text, no letters, no logos, no watermark. Standing on the grey lunar plain a short distance in front of the temple's wide front staircase: the stairs and the outer wall with blue-domed pavilions fill the middle of the frame, the plain in the foreground with soft long shadows and footprints, open ground in the lower half for many small figures to wander, the huge blue planet in the starry sky."
+  },
+  {
+   "id": "moon-zone-dachi-v3",
+   "size": "1152x2048",
+   "n": 3,
+   "refs": [
+    "design/story/refs/moon-temple-zones-client.jpg",
+    "design/story/out/moon-zone-dachi-2.jpg"
+   ],
+   "prompt": "Same world, architecture and style as the reference pictures: an open-air Moon temple ruin of white marble arches and columns with small blue-domed pavilions, NO roof, floor of deep blue tiles inlaid with glowing gold star-circle patterns, black starry sky, grey cratered lunar ground. Painterly fantasy illustration, cool moonlight, small gold highlights. VIEWPOINT (important): the viewer stands at the TOP of the short flight of steps between the inner sanctum and the great hall (the inner arch is BEHIND the viewer), looking OUTWARD and slightly DOWN the steps into the great circular hall, toward the temple's front entrance. In view: the few steps going down in the foreground; the great circular hall below with its big glowing gold star-circle pattern on the blue floor; low balustrades and columns curving around the hall; blue-domed pavilions on the left and right edges; at the far side of the hall, the low front wall with the opening to the wide front staircase, and beyond it the wide grey lunar plain stretching to the horizon with craters and distant mountains. A small moon low in the starry sky; the huge blue planet is behind the viewer, so only its blue glow tints the sky edge. CAMERA: standing adult eye height on the top step, normal 40mm lens, horizon about 45% from the bottom, closer and more intimate than an aerial shot, the hall filling most of the frame. Plenty of open hall floor for several people to stroll. No people, no creatures, no figures. No text, no letters, no logos, no watermark."
   }
  ]
 }
