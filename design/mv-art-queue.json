@@ -8365,6 +8365,95 @@
         1920
       ],
       "always": false
+    },
+    {
+      "id": "puni-kimorin",
+      "prompt": "A single round soft 'puni-puni' character ball in exactly the same style as the first reference picture: a perfectly round glossy squishy ball like a cute plush mochi, soft pastel shading, big shiny highlight on top-left, small black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms and no legs. The ball's colours, pattern and small accessories show the character from the second reference picture: KIMORIN: white fox fur colour, small pointed white-and-blue fox ears on top, tiny round dark sunglasses pushed up on the forehead, a little green sprinkle on top. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-kimorin.jpg"
+      ]
+    },
+    {
+      "id": "puni-monban",
+      "prompt": "A single round soft 'puni-puni' character ball in exactly the same style as the first reference picture: a perfectly round glossy squishy ball like a cute plush mochi, soft pastel shading, big shiny highlight on top-left, small black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms and no legs. The ball's colours, pattern and small accessories show the character from the second reference picture: MONBAN: a black hood with thin gold trim draped over the top of the ball, a small glowing gold eye emblem on the hood, mysterious but cute. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-monban.jpg"
+      ]
+    },
+    {
+      "id": "puni-brother",
+      "prompt": "A single round soft 'puni-puni' character ball in exactly the same style as the first reference picture: a perfectly round glossy squishy ball like a cute plush mochi, soft pastel shading, big shiny highlight on top-left, small black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms and no legs. The ball's colours, pattern and small accessories show the character from the second reference picture: the takoyaki brother: golden-brown takoyaki colour with brown sauce, white mayo zigzag and bonito flakes on top, tiny round sunglasses, a gold chain. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-brother.jpg"
+      ]
+    },
+    {
+      "id": "puni-sister",
+      "prompt": "A single round soft 'puni-puni' character ball in exactly the same style as the first reference picture: a perfectly round glossy squishy ball like a cute plush mochi, soft pastel shading, big shiny highlight on top-left, small black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms and no legs. The ball's colours, pattern and small accessories show the character from the second reference picture: the takoyaki sister: golden-brown takoyaki colour with sauce and mayo, a little red ribbon and a tiny pink flower on top, long eyelashes. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/kororin-sister.jpg"
+      ]
+    },
+    {
+      "id": "puni-mikie",
+      "prompt": "A single round soft 'puni-puni' character ball in exactly the same style as the first reference picture: a perfectly round glossy squishy ball like a cute plush mochi, soft pastel shading, big shiny highlight on top-left, small black dot eyes with white sparkles, a tiny 'ω' cat mouth, pink blush cheeks, no arms and no legs. The ball's colours, pattern and small accessories show the character from the second reference picture: MIKIE DRILL: her signature hair colour and drill-curl twin tails shown as two little curls on the sides of the ball, a small star accessory. Centered, the whole ball inside the frame with a small margin. Plain solid bright chroma-key green background (#00FF00), no shadow, no text.",
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        512,
+        512
+      ],
+      "always": false,
+      "refs": [
+        "design/home/puni-ref/puni-style.jpg",
+        "design/home/puni-ref/mikie.jpg"
+      ]
+    },
+    {
+      "id": "home2-bg-saturn-tako",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home2-bg-saturn-lowb.jpg"
+      ],
+      "prompt": "Japanese street-pop anime background art, the same style, sky, angle and composition as the reference picture: an enormous vinyl record lying flat on red rocky ground, seen from a low angle of about 15 degrees. This record is outrageously flashy: a shiny gold rim with rhinestones, a row of red paper lanterns hanging on poles around its edge, a takoyaki-shaped centre label, and the tonearm lifted and parked away, its tip a takoyaki-shaped microphone, NOT touching the record. The record surface is wide, flat and empty. No people, no characters, no text, no letters."
     }
   ],
   "redo": []
