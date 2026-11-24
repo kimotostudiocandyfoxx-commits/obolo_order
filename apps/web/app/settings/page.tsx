@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { RequireAuth } from '@/components/RequireAuth';
 import { getApi } from '@/lib/api';
+import { openManaGems, WALLET_CHANGED } from '@/components/ManaGemSheet';
 import { useAuth } from '@/lib/auth';
 
 /**
@@ -25,10 +26,14 @@ function Settings() {
   const { me } = useAuth();
   const [mana, setMana] = useState<number | null>(null);
   useEffect(() => {
-    getApi()
-      .wallet()
-      .then((w) => setMana(w.manaBalance))
-      .catch(() => setMana(null));
+    const load = () =>
+      getApi()
+        .wallet()
+        .then((w) => setMana(w.manaBalance))
+        .catch(() => setMana(null));
+    void load();
+    window.addEventListener(WALLET_CHANGED, load);
+    return () => window.removeEventListener(WALLET_CHANGED, load);
   }, []);
   if (!me) return null;
   const ordered = !!me.orderedAt;
@@ -46,6 +51,11 @@ function Settings() {
         <h2 className="text-sm font-black text-[color:var(--color-mana)]">毎月のマナ</h2>
         <p className="mt-2 text-3xl font-black text-[color:var(--color-mana)]">{mana === null ? '…' : mana.toLocaleString()}</p>
         <p className="mt-1 text-xs text-white/55">{isActiveMember(me) ? 'Obolo Order：毎月、体から88マナが湧きます（月額88円）' : '住人：マナジェムのマナで作ります'}</p>
+        {isActiveMember(me) && (
+          <button onClick={openManaGems} className="mt-3 w-full rounded-full border border-sky-200/40 py-2.5 text-center text-[13px] text-sky-100">
+            マナジェムを買う
+          </button>
+        )}
         {early && (
           <Link href="/settings/order-early" className="mt-4 block rounded-full bg-gradient-to-b from-amber-300 to-orange-500 py-3 text-center text-[15px] font-black text-slate-950">
             先にObolo Orderになる

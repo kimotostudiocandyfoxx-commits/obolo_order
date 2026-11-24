@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, HttpCode, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, Inject, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ConfirmOrderBody } from '@obolo/shared';
 import type { Request } from 'express';
 import { AuthGuard, UserId } from '../auth/auth.guard';
@@ -46,6 +46,24 @@ export class BillingController {
   async portal(@UserId() userId: string) {
     await rateLimit(this.kv, `portal:${userId}`, 10, 600);
     return this.billing.portal(userId);
+  }
+
+  /** P-BILL-1: buy a mana gem (MANA_GEMS) — Embedded Checkout `mode: 'payment'`; demo mode adds the mana at once */
+  @Post('billing/gems/:id/checkout')
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  async gemCheckout(@UserId() userId: string, @Param('id') id: string) {
+    await rateLimit(this.kv, `gem:${userId}`, 10, 600);
+    return this.billing.gemCheckout(userId, id);
+  }
+
+  /** P-BILL-1: after the gem's Embedded Checkout completed — the mana is added (once per session) */
+  @Post('billing/gems/confirm')
+  @HttpCode(200)
+  @UseGuards(AuthGuard)
+  async gemConfirm(@UserId() userId: string, @Body() body: unknown) {
+    await rateLimit(this.kv, `gemconfirm:${userId}`, 60, 600);
+    return this.billing.confirmGem(userId, parseBody(ConfirmOrderBody, body).sessionId);
   }
 
   @Post('billing/webhook')

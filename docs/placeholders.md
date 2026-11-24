@@ -153,7 +153,7 @@
 | P-MEDIA-3 | ✏️ | 動画の長さの上限 | 既定60秒（木星は8秒）。火星の動画の最大の長さはクライアント未決 | `packages/shared/src/config.ts`（`MEDIA_POLICY`） |
 | P-MEDIA-4 | ⚪ | Bunny の配信プラン | 少人数のうちは Standard。人が増えたら Volume に切り替え（docs/media.md） | Bunny 管理画面 |
 | P-USE-1 | 🔴 | 1日88分の利用時間 | クライアントの決まり（全惑星合計で1日88分）。**まだ作っていない**。費用の上限の前提なので次に作る | — |
-| P-BILL-1 | ⚪ | Stripe（¥88/月）、MANA購入、ストレージ追加購入 | 「準備中」表示のみ。MANA は表示だけ |
+| P-BILL-1 | 🟡 | Stripe（¥88/月）、MANA購入（マナジェム）、ストレージ追加購入 | エクリプス（月¥88）は本番の Stripe。**マナジェム（2026-11-24）**：88円・888円・8,888円（税込）の3つ、1円＝1マナ・おまけなし（88／888／8,888マナ、クライアント決定）。表は `packages/shared/src/config.ts` の `MANA_GEMS` だけ。今の Obolo Order（`isActiveMember`）だけが買える。Stripe Embedded Checkout の一回払い（`POST /billing/gems/:id/checkout`）→ `POST /billing/gems/confirm` か Webhook `checkout.session.completed` で台帳に1回だけ加算（`gem:<セッションID>`、`mana_ledger_idem_uq`）。マナが足りない時（NO_MANA）に〔マナジェムを買う〕が自動で開く。Stripe キーがないデモでは、すぐ請求なしで加算。ストレージ追加購入は未実装。資金決済法の確認は `docs/ローンチの準備.md` §7 | `apps/api/src/billing/`、`apps/web/components/ManaGemSheet.tsx` |
 | P-LEDGER-1 | 🟡 | 92/8 分配の端数処理 | プラットフォーム側を切り捨て（クリエイター有利）。税理士確認待ち |
 | — | 🔴 | 資金決済法の弁護士レビュー（仕様 §3.2） | 未実施 |
 | — | 🟡 | MANA 価格表（OPEN #6） | 仕様 §3.1 の初期値を定数化 |

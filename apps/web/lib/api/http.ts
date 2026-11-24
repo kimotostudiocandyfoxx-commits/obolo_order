@@ -318,6 +318,12 @@ export class HttpApi implements Api {
   billingPortal() {
     return this.req<Awaited<ReturnType<Api['billingPortal']>>>('POST', '/billing/portal');
   }
+  gemCheckout(gemId: string) {
+    return this.req<Awaited<ReturnType<Api['gemCheckout']>>>('POST', `/billing/gems/${encodeURIComponent(gemId)}/checkout`);
+  }
+  confirmGem(sessionId: string) {
+    return this.req<Awaited<ReturnType<Api['confirmGem']>>>('POST', '/billing/gems/confirm', { sessionId });
+  }
   lookCandidates(body: Parameters<Api['lookCandidates']>[0]) {
     return this.req<Awaited<ReturnType<Api['lookCandidates']>>>('POST', '/me/look/candidates', body);
   }
@@ -688,14 +694,14 @@ export class HttpApi implements Api {
   planetHomeTakeOut(planet: Parameters<Api['planetHomeTakeOut']>[0], id: string) {
     return this.req<void>('DELETE', `/planet-home/${planet}/own/${id}`);
   }
+  planetHomeColour(planet: Parameters<Api['planetHomeColour']>[0], colour: string) {
+    return this.req<{ colour: string }>('PUT', `/planet-home/${planet}/colour`, { colour });
+  }
   oshiList() {
     return this.req<Awaited<ReturnType<Api['oshiList']>>>('GET', '/oshi');
   }
   setOshi(userId: string, on: boolean) {
     return this.req<Awaited<ReturnType<Api['setOshi']>>>(on ? 'POST' : 'DELETE', `/oshi/${userId}`);
-  }
-  planetHomeColour(planet: Parameters<Api['planetHomeColour']>[0], colour: string) {
-    return this.req<{ colour: string }>('PUT', `/planet-home/${planet}/colour`, { colour });
   }
   reportRadio(body: Parameters<Api['reportRadio']>[0]) {
     return this.req<void>('POST', '/venus/report', body);

@@ -43,6 +43,8 @@ import type {
   WalletView,
   BillingPortal,
   OrderCheckout,
+  GemCheckout,
+  GemCredit,
   ComposeChatBody,
   ComposeChatResult,
   ComposeDesignBody,
@@ -203,6 +205,10 @@ export interface Api {
   becomeOrder(): Promise<Me>;
   /** P-BILL-4: the Stripe Customer Portal (change the card, cancel); demo mode has none. */
   billingPortal(): Promise<BillingPortal>;
+  /** P-BILL-1: buy a mana gem (MANA_GEMS id) — Embedded Checkout, or demo mode (the mana is added at once). Members only. */
+  gemCheckout(gemId: string): Promise<GemCheckout>;
+  /** P-BILL-1: after the gem's Embedded Checkout completed — adds its mana once (NOT_PAID while pending). */
+  confirmGem(sessionId: string): Promise<GemCredit>;
   // --- Day 3/4: generated OBOLO NEO look and the Bati egg (client decision 2026-10-05)
   lookCandidates(body: NeoLookBody): Promise<NeoLookResult>;
   /** One instruction → one new version of a candidate (3 per apprentice). */
@@ -389,14 +395,14 @@ export interface Api {
   planetHomeOrder(planet: HomePlanet, ids: string[]): Promise<{ ids: string[] }>;
   /** 外す: your own work back into Bluena only */
   planetHomeTakeOut(planet: HomePlanet, id: string): Promise<void>;
+  /** M-R262: your record's colour on a planet home (Saturn) */
+  planetHomeColour(planet: HomePlanet, colour: string): Promise<{ colour: string }>;
   /** 推し: who you follow (dachi marked, in by themselves) */
   oshiList(): Promise<HomeOshi[]>;
   /** 〔推す〕 / 外す (a dachi cannot be taken out) */
   setOshi(userId: string, on: boolean): Promise<HomeOshi[]>;
   /** 〔ブルーナにしまう〕 someone else's song (a Mercury post) */
   keepInBluena(postId: string, on: boolean): Promise<{ kept: boolean }>;
-  /** M-R262: your record's colour on a planet home (Saturn) */
-  planetHomeColour(planet: HomePlanet, colour: string): Promise<{ colour: string }>;
   /** Bluena 〔しまった作品〕: your kept works (links) */
   bluenaKept(): Promise<BluenaKeptView[]>;
 }

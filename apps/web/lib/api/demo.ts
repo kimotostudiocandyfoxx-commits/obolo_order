@@ -85,6 +85,10 @@ import {
   type Me,
   type BillingPortal,
   type OrderCheckout,
+  type GemCheckout,
+  type GemCredit,
+  findManaGem,
+  isActiveMember,
   type ComposeChatBody,
   type ComposeChatResult,
   type SongDesign,
@@ -432,13 +436,13 @@ export class DemoApi implements Api {
     this.home(planet, { lastVisitAt: new Date().toISOString() });
     return { lastVisitAt: before };
   }
-  async planetHomeOrder(planet: HomePlanet, ids: string[]) {
-    this.home(planet, { order: ids });
-    return { ids };
-  }
   async planetHomeColour(planet: HomePlanet, colour: string) {
     this.home(planet, { recordColour: colour });
     return { colour };
+  }
+  async planetHomeOrder(planet: HomePlanet, ids: string[]) {
+    this.home(planet, { order: ids });
+    return { ids };
   }
   async planetHomeTakeOut(planet: HomePlanet, id: string) {
     const p = planet === 'saturn' ? this.s.posts.find((x) => x.id === id && x.author.id === this.uid()) : undefined;
@@ -1916,6 +1920,25 @@ export class DemoApi implements Api {
 
   async billingPortal(): Promise<BillingPortal> {
     return { mode: 'demo', url: null };
+  }
+
+  /** P-BILL-1 in the demo: like the API without a Stripe key — members only, the mana is added at once, no charge */
+  async gemCheckout(gemId: string): Promise<GemCheckout> {
+    const gem = findManaGem(gemId);
+    if (!gem) throw new ApiError(404, 'UNKNOWN_GEM', 'No such mana gem');
+    const id = this.uid();
+    if (!isActiveMember(this.s.users[id])) throw new ApiError(403, 'MEMBERS_ONLY', 'Mana gems are for Obolo Order members');
+    await sleep(400);
+    const w = this.s.wallets[id];
+    w.mana += gem.mana;
+    w.lastActivity = now();
+    w.entries.push({ id: uid(), delta: gem.mana, reason: 'purchase', createdAt: now() });
+    this.save();
+    return { mode: 'demo', gemId: gem.id, credit: { gemId: gem.id, manaAdded: gem.mana, manaBalance: w.mana }, note: 'デモモード：請求なしで、マナを加えました' };
+  }
+
+  async confirmGem(): Promise<GemCredit> {
+    throw new ApiError(409, 'BILLING_DEMO', 'demo');
   }
 
   async becomeOrder() {

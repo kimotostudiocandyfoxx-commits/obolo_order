@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getApi } from '@/lib/api';
+import { WALLET_CHANGED } from '@/components/ManaGemSheet';
 import { useAuth } from '@/lib/auth';
 
 export function ManaChip() {
@@ -10,10 +11,15 @@ export function ManaChip() {
   const [mana, setMana] = useState<number | null>(null);
   useEffect(() => {
     if (status !== 'authed') return;
-    getApi()
-      .wallet()
-      .then((w) => setMana(w.manaBalance))
-      .catch(() => setMana(null));
+    const load = () =>
+      getApi()
+        .wallet()
+        .then((w) => setMana(w.manaBalance))
+        .catch(() => setMana(null));
+    void load();
+    // a mana gem was bought (ManaGemSheet)
+    window.addEventListener(WALLET_CHANGED, load);
+    return () => window.removeEventListener(WALLET_CHANGED, load);
   }, [status]);
   if (status !== 'authed' || mana === null) return null;
   return (

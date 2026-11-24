@@ -1,6 +1,7 @@
 'use client';
 
-import { HANDLE_RE, neoForm, type Me, type WalletView } from '@obolo/shared';
+import { HANDLE_RE, isActiveMember, neoForm, type Me, type WalletView } from '@obolo/shared';
+import { openManaGems, WALLET_CHANGED } from '@/components/ManaGemSheet';
 import { NeoEmblem } from '@/components/onboarding/NeoChooser';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -129,17 +130,22 @@ function Home() {
   const [walletErr, setWalletErr] = useState(false);
 
   useEffect(() => {
-    getApi()
-      .wallet()
-      .then(setWallet)
-      .catch(() => setWalletErr(true));
+    const load = () =>
+      getApi()
+        .wallet()
+        .then(setWallet)
+        .catch(() => setWalletErr(true));
+    void load();
+    // a mana gem was bought (ManaGemSheet): the balance and the history again
+    window.addEventListener(WALLET_CHANGED, load);
+    return () => window.removeEventListener(WALLET_CHANGED, load);
   }, []);
 
   if (!me) return null;
   return (
     <div className="space-y-4">
       <ProfileCard me={me} />
-      <WalletCard wallet={wallet} failed={walletErr} />
+      <WalletCard wallet={wallet} failed={walletErr} member={isActiveMember(me)} />
       {/* 〔お財布〕 opens with the first distribution income (client 2026-10-28); until then it is not shown */}
       {wallet && (wallet.earningsBalanceJpy > 0 || wallet.recent.some((e) => e.ledger === 'earnings')) && (
         <section className="card p-5">
@@ -223,9 +229,12 @@ function ProfileCard({ me }: { me: Me }) {
               相棒：{me.bati.name}
             </div>
           )}
-          <span className="chip mt-1 bg-emerald-300/15 text-emerald-200">
-            {me.subscriptionStatus === 'active' ? m.earth.subActive : m.earth.subDemo}
-          </span>
+          {/* the Eclipse's state, once joined (a resident has none) */}
+          {me.orderedAt && (
+            <span className="chip mt-1 bg-emerald-300/15 text-emerald-200">
+              {me.subscriptionStatus === 'demo' ? m.earth.subDemo : isActiveMember(me) ? m.earth.subActive : m.earth.subEnded}
+            </span>
+          )}
         </div>
         {!editing && (
           <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => setEditing(true)}>
@@ -280,7 +289,7 @@ function ProfileCard({ me }: { me: Me }) {
   );
 }
 
-function WalletCard({ wallet, failed }: { wallet: WalletView | null; failed: boolean }) {
+function WalletCard({ wallet, failed, member }: { wallet: WalletView | null; failed: boolean; member: boolean }) {
   const { m, t, locale } = useI18n();
   const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(locale === 'ja' ? 'ja-JP' : 'en-US');
   return (
@@ -297,8 +306,9 @@ function WalletCard({ wallet, failed }: { wallet: WalletView | null; failed: boo
         {wallet?.manaExpiresAt && (
           <p className="text-[11px] text-white/45">{t(m.earth.manaExpires, { date: fmtDate(wallet.manaExpiresAt) })}</p>
         )}
-        <button className="btn btn-ghost mt-3 w-full !py-2 text-xs" disabled>
-          {m.earth.manaNoBilling}
+        {/* P-BILL-1: the mana gems (active members; others see why not) */}
+        <button className="btn btn-ghost mt-3 w-full !py-2 text-xs" disabled={!member} onClick={openManaGems}>
+          {member ? m.earth.buyGems : m.earth.gemsMembersOnly}
         </button>
       </div>
       <div className="p-5">

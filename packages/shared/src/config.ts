@@ -29,9 +29,9 @@ export const BUDDY_OVERAGE_MANA = 1;
 export const MONTHLY_GRANT_MANA = 88;
 /**
  * The mana gems a member can buy when the mana runs short (P-BILL-1, client 2026-11-24). Exactly three prices (JPY, tax
- * included). PLACEHOLDER: the mana each one adds is not decided yet — the client changes the `mana` numbers here, and
- * only here (the API's checkout, the sheet in the app and /tokushoho all read this table). Default 1 yen = 1 mana, the
- * same ratio as the monthly grant (MONTHLY_GRANT_MANA for ORDER_PRICE_JPY).
+ * included). Client decision 2026-11-24: 1 yen = 1 mana, no bonus (88 → 88, 888 → 888, 8,888 → 8,888), the same ratio
+ * as the monthly grant (MONTHLY_GRANT_MANA for ORDER_PRICE_JPY). To change the mana, change the `mana` numbers here and
+ * only here (the API's checkout, the sheet in the app and /tokushoho all read this table).
  */
 export const MANA_GEMS = [
   { id: 'gem88', priceJpy: 88, mana: 88 },
