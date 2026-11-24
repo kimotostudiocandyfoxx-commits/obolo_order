@@ -34,6 +34,19 @@ for k in 'mine dachi oshi'.split():
     f=f'{O}/ball-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((160,160)); A['ball-'+k]=uri(kk,88)
 if os.path.exists(H+'/saturn-record-mask.png'): mk=Image.open(H+'/saturn-record-mask.png').convert('L'); mk.thumbnail((720,1280)); ma=Image.new('RGBA',mk.size,(255,255,255,0)); ma.putalpha(mk); b2=io.BytesIO(); ma.save(b2,'PNG',optimize=True); A['rec-mask']='data:image/png;base64,'+base64.b64encode(b2.getvalue()).decode()
+# 8 korolin colours: tint the pearl ball (soft colour, highlights kept) and bake a soft shadow under it
+_pearl=f'{O}/ball-dachi.jpg'
+if os.path.exists(_pearl):
+    from PIL import ImageFilter
+    base=key(Image.open(_pearl)); base.thumbnail((160,160)); ba=np.asarray(base).astype(np.float32)
+    for name,(r,g,b) in {'pearl':(255,255,255),'gold':(255,196,70),'pink':(255,150,190),'mint':(120,230,195),'lavender':(185,160,255),'sky':(130,195,255),'peach':(255,180,140),'night':(90,95,150)}.items():
+        rgb=ba[...,:3]/255; lum=rgb.mean(2,keepdims=True); tint=np.array([r,g,b])/255
+        col=np.clip(lum*tint*1.15+(lum**3)*.35,0,1) if name!='pearl' else rgb
+        im=Image.fromarray(np.dstack([col*255,ba[...,3]]).astype(np.uint8),'RGBA')
+        W,Hh=im.size; cv=Image.new('RGBA',(W,Hh+14),(0,0,0,0)); sh=Image.new('RGBA',(W,Hh+14),(0,0,0,0))
+        from PIL import ImageDraw as _D; _D.Draw(sh).ellipse((W*.18,Hh-6,W*.82,Hh+10),fill=(30,10,40,90)); sh=sh.filter(ImageFilter.GaussianBlur(5))
+        cv.alpha_composite(sh); cv.alpha_composite(im,(0,0)); cv=cv.crop((0,0,W,Hh))
+        A['ballc-'+name]=uri(cv,88)
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))

@@ -66,17 +66,31 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @media (prefers-reduced-motion:reduce){.spinwrap.on .spinner{animation:none}}
 .puni .body{position:absolute;left:0;top:0;width:calc(var(--r)*2);height:calc(var(--r)*2);transform-origin:50% 88%;will-change:transform}
 .puni .body img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
-.puni .face{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.puni .face .eyes ellipse{fill:#2a1a22}.puni .face .hl{fill:#fff}
-.puni .face .bl{fill:#ff8fa8;opacity:.55}
-.puni .face .mo{fill:none;stroke:#2a1a22;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-.puni .face .eyes{transform-origin:50% 52%;animation:blink 4.6s infinite}
+.face{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.face .eyes ellipse{fill:#2a1a22}.face .hl{fill:#fff}
+.face .bl{fill:#ff8fa8;opacity:.55}
+.face .mo{fill:none;stroke:#2a1a22;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.face .eyes{transform-origin:50% 52%;animation:blink 4.6s infinite}
 .puni:nth-child(3n) .face .eyes{animation-delay:-1.7s}.puni:nth-child(3n+1) .face .eyes{animation-delay:-3.1s}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
 .puni.held .face .eyes{animation:none;transform:scaleY(.25)}
-.puni .ptag{transform:translate(-50%,0);left:0;bottom:auto;top:calc(var(--r) + 2px)}
-@media (prefers-reduced-motion:reduce){.puni .face .eyes{animation:none}}
-.puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));will-change:transform}
+.puni .ptag{transform:translate(-50%,0);left:0;bottom:auto;top:calc(var(--r) + 1px);width:max-content;display:block;background:none;border:0;padding:0;font:800 9px var(--f-body);color:#fff;text-shadow:0 0 3px rgba(20,10,30,.9),0 1px 2px rgba(20,10,30,.9);border-bottom:2px solid var(--c);line-height:1.3}
+@media (prefers-reduced-motion:reduce){.face .eyes{animation:none}}
+.puni .fwrap{position:absolute;inset:0}
+.face .ln{fill:none;stroke:#2a1a22;stroke-width:3;stroke-linecap:round}
+.face .st{fill:#ffd23f;stroke:#2a1a22;stroke-width:1.2}
+.face .mo2{fill:#2a1a22}.face .mo3{fill:#2a1a22;stroke:#2a1a22;stroke-width:1.5;stroke-linejoin:round}
+.face circle:not(.hl){fill:#2a1a22}
+.pick{position:absolute;inset:0;z-index:30;background:rgba(20,10,34,.78);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px}
+.pick h3{margin:0;font:900 17px var(--f-body);color:var(--ink);text-align:center}
+.pick .g{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%}
+.pick button{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:8px 4px 6px;color:var(--ink);font:700 11px var(--f-body);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.pick button[aria-pressed=true]{border-color:var(--accent);background:rgba(255,255,255,.22)}
+.pick .ball{position:relative;width:58px;height:58px}
+.pick .ball img{width:100%;height:100%;border-radius:50%}
+.pick .ball .face{position:absolute;inset:0}
+.pick .ok{font:900 15px var(--f-body);background:var(--accent);color:#2a1630;border:0;border-radius:999px;padding:12px 26px;cursor:pointer}
+.puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
 .puni .ptag{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);white-space:nowrap;font:700 9px var(--f-body);padding:1px 6px;border-radius:999px;background:rgba(20,10,30,.55);border:1px solid var(--c);color:var(--ink)}
 .puni.talk{z-index:7}
@@ -195,7 +209,7 @@ function render(){
   const sky=$('sky');sky.innerHTML='';items=[];
   const isS=cur==='saturn'&&mode==='anime';$('tint').hidden=!isS;$('swatch').hidden=true;
   if(isS&&A['rec-mask']){$('tint').style.webkitMaskImage=$('tint').style.maskImage=`url(${A['rec-mask']})`}
-  stopRoll();if(cur==='saturn'){setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
+  stopRoll();if(cur==='saturn'){if(window.MYKORO===undefined&&!window.__picked){window.__picked=1;korPicker(()=>{$('sky').innerHTML='';setupRoll()})}setupRoll();document.querySelectorAll('#switch button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===cur));closeAll();return}
   const spots=[[20,33],[72,31],[46,27],[84,44],[15,47],[58,41],[33,40]];
   const list=[...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n))];
   list.forEach((p,i)=>{const [x,y]=spots[i%spots.length];add({...p,x,y,i,isNew:i<2})});
@@ -247,12 +261,35 @@ function enter(){
 let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.8,.76];
 const CHB=n=>n===ME?'user':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
 const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
+const KOROS=[
+ {c:'pearl',f:'omega',n:'しろもち'},{c:'gold',f:'smile',n:'きんぴか'},{c:'pink',f:'wink',n:'もも'},{c:'mint',f:'sleepy',n:'みんと'},
+ {c:'lavender',f:'cat',n:'ぷらむ'},{c:'sky',f:'oh',n:'そら'},{c:'peach',f:'grin',n:'ぴーち'},{c:'night',f:'star',n:'よぞら'}];
+function faceSVG(f){
+  const eye=(x)=>`<ellipse cx="${x}" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="${x-1.6}" cy="49.6" r="1.8"/>`;
+  const E={omega:eye(36)+eye(64),smile:'<path class="ln" d="M30 53 q6 -7 12 0 M58 53 q6 -7 12 0"/>',
+    wink:eye(36)+'<path class="ln" d="M58 52 q6 -5 12 0"/>',sleepy:'<path class="ln" d="M30 53 h12 M58 53 h12"/>',
+    cat:eye(36)+eye(64),oh:'<circle cx="36" cy="51" r="6.5"/><circle class="hl" cx="34" cy="48.5" r="2.2"/><circle cx="64" cy="51" r="6.5"/><circle class="hl" cx="62" cy="48.5" r="2.2"/>',
+    grin:'<path class="ln" d="M30 55 q6 -8 12 0 M58 55 q6 -8 12 0"/>',
+    star:'<path class="st" d="M36 44 l2.2 5.2 5.6 .5 -4.3 3.6 1.4 5.4 -4.9 -3 -4.9 3 1.4 -5.4 -4.3 -3.6 5.6 -.5z"/><path class="st" d="M64 44 l2.2 5.2 5.6 .5 -4.3 3.6 1.4 5.4 -4.9 -3 -4.9 3 1.4 -5.4 -4.3 -3.6 5.6 -.5z"/>'}[f];
+  const M={omega:'<path class="mo" d="M43 61 q3.5 5 7 0 q3.5 5 7 0"/>',smile:'<path class="mo" d="M42 60 q8 9 16 0"/>',wink:'<path class="mo" d="M44 61 q6 6 12 0"/>',
+    sleepy:'<ellipse class="mo2" cx="50" cy="63" rx="3" ry="2.4"/>',cat:'<path class="mo" d="M42 60 q4 5 8 0 q4 5 8 0"/>',oh:'<ellipse class="mo2" cx="50" cy="63" rx="4" ry="5"/>',
+    grin:'<path class="mo3" d="M40 59 q10 12 20 0 z"/>',star:'<path class="mo" d="M43 60 q7 7 14 0"/>'}[f];
+  return `<svg class="face" viewBox="0 0 100 100" aria-hidden="true"><ellipse class="bl" cx="27" cy="62" rx="9" ry="5"/><ellipse class="bl" cx="73" cy="62" rx="9" ry="5"/><g class="eyes">${E}</g>${M}</svg>`;
+}
+function korPicker(done){
+  const ph=$('phone'),d=document.createElement('div');d.className='pick';let sel=window.MYKORO??0;
+  d.innerHTML='<h3>あなたのコロリンを選んでね</h3><div class="g">'+KOROS.map((k,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===sel}"><span class="ball"><img alt="" src="${A['ballc-'+k.c]||''}">${faceSVG(k.f)}</span>${k.n}</button>`).join('')+'</div><button class="ok" type="button">これにする</button><small style="opacity:.75;font-size:11px">あとから、月で{bati}に頼めば色や顔を変えられるよ</small>'.replace('{bati}','バティ');
+  d.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.classList.contains('ok')){window.MYKORO=sel;d.style.display='none';done();return}sel=+b.dataset.i;d.querySelectorAll('.g button').forEach(x=>x.setAttribute('aria-pressed',x===b))};
+  ph.appendChild(d);
+}
 function setupRoll(){
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
   const list=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
   rolls=list.map((o,i)=>{const R=22+((i*7)%3)*4,e=document.createElement('div');e.className='puni';e.tabIndex=0;e.setAttribute('role','button');e.setAttribute('aria-label',o.n+'のコロリン');
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
-    e.innerHTML=`<div class="body"><img alt="" src="${BALL(o.k)}"><svg class="face" viewBox="0 0 100 100" aria-hidden="true"><ellipse class="bl" cx="27" cy="62" rx="9" ry="5"/><ellipse class="bl" cx="73" cy="62" rx="9" ry="5"/><g class="eyes"><ellipse cx="36" cy="52" rx="5.2" ry="6.2"/><ellipse cx="64" cy="52" rx="5.2" ry="6.2"/><circle class="hl" cx="34.4" cy="49.6" r="1.8"/><circle class="hl" cx="62.4" cy="49.6" r="1.8"/></g><path class="mo" d="M43 60 q3.5 5 7 0 q3.5 5 7 0"/></svg></div><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
+    const kp=o.n===ME?(window.MYKORO??0):(i*3+o.n.length)%8,K=KOROS[kp];
+    const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
+    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f)}</div></div><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:-R-i*70,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
