@@ -14,6 +14,8 @@ export type ThreadInfo = {
   id: string;
   name: string;
   avatar?: string;
+  /** R9: their full figure (the look's standing picture) for the ダチ tab's Moon */
+  stand?: string;
   /** unread count, shown as a dot (no number on screen) */
   unread?: number;
 };

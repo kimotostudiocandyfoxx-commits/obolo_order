@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { castLook } from '@/lib/talk/demoLooks';
 import { DachiLinkCard } from '@/components/DachiLinkCard';
 import { GLASS } from '@/components/talk/TalkScene';
 import { useAuth } from '@/lib/auth';
-import { PLACE_BG } from '@/lib/talk/looks';
+import { characterLook, PLACE_BG } from '@/lib/talk/looks';
 import { MoonShelf, WorkSheet } from './Drawers';
 import { KindMark } from './WorkCard';
 import { KIND_WORD } from './intent';
@@ -91,35 +92,18 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
       <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
       <TabBar title="ダチ" onBack={onBack} banner={banner} />
       {threads.length ? (
-        // standing on the Moon's ground: the row sits low, over the surface
-        <div className="relative z-[5] mt-auto mb-[16svh] flex flex-wrap items-end justify-center gap-x-5 gap-y-6 px-5">
-          {threads.map((t) => (
-            <button key={t.id} onClick={() => onOpen(t.id)} className="group flex w-[76px] flex-col items-center gap-1.5" aria-label={`${t.name}と話す`}>
-              <span className="relative block">
-              <span className="relative block h-[68px] w-[68px] overflow-hidden rounded-full border-2 border-[rgba(223,230,255,.85)] bg-[#1a2150] shadow-[0_6px_18px_rgba(0,0,0,.45)] transition-transform group-active:scale-95">
-                {t.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={t.avatar} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <span className="flex h-full w-full items-center justify-center text-[22px] font-black text-[#dfe4ff]">{t.name.slice(0, 1)}</span>
-                )}
-              </span>
-              {!!t.unread && <span className="absolute right-0 top-0 h-3.5 w-3.5 rounded-full border-2 border-[#0b1027] bg-sky-300" aria-label="まだ聞いていない" />}
-              </span>
-              <span className="max-w-full truncate rounded-full bg-[rgba(10,14,44,.6)] px-2 py-0.5 text-[11px] font-bold text-[#f4f1ff] backdrop-blur">{t.name}</span>
-              {/* the shadow on the ground */}
-              <span className="-mt-1 block h-1.5 w-12 rounded-[50%] bg-black/35 blur-[2px]" aria-hidden />
-            </button>
-          ))}
-          {/* only the story's ダチ so far (KIMORIN⭐︎ is everyone's): the invitation to a real one, under the row */}
+        <>
+          {/* R9 (client): your ダチ as full figures, strolling on the Moon's ground */}
+          <Strollers threads={threads} onOpen={onOpen} />
+          {/* only the story's ダチ so far (KIMORIN⭐︎ is everyone's): the invitation to a real one */}
           {!threads.some((t) => t.id !== 'kimorin' && t.id !== 'mikie') && (me?.journeyDay ?? 0) >= 3 && (
-            <div className="flex w-full justify-center pt-1">
+            <div className="absolute inset-x-0 bottom-[4svh] z-[6] flex justify-center">
               <button onClick={() => setInvite(true)} className="rounded-full border border-[rgba(210,220,255,.3)] bg-[rgba(16,22,64,.7)] px-4 py-2 text-[13px] font-bold text-[#f4f1ff] backdrop-blur">
                 🤝 ダチの招待状
               </button>
             </div>
           )}
-        </div>
+        </>
       ) : (
         <div className="relative z-[5] mt-auto mb-[14svh] flex flex-col items-center gap-4 px-8 text-center">
           {/* PLACEHOLDER (P-MOON-TABS-1): the words when there is no ダチ yet */}
@@ -235,4 +219,99 @@ export function madeWhen(iso: string, now = new Date()): string {
   if (Number.isNaN(d.getTime()) || d.getTime() <= 0) return '';
   const hm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   return d.toDateString() === now.toDateString() ? `きょう ${hm}` : `${d.getMonth() + 1}/${d.getDate()} ${hm}`;
+}
+
+/** a ダチ's full figure (their look's standing picture; KIMORIN⭐︎'s sprite; else the talk cast's friend) */
+const standOf = (t: ThreadInfo) => t.stand || (t.id === 'kimorin' ? characterLook('kimorin')?.stand : t.id === 'mikie' ? characterLook('mikie')?.stand : undefined) || castLook('friend').stand;
+
+/**
+ * R9 (client): the ダチ stroll on the Moon — each in a stretch of ground of its own (so they never stand on each other),
+ * walking slowly left and right with a small bob, facing the way they walk, stopping now and then. One rAF loop moves
+ * them by transform only (no React render per frame: 60 fps on the iPad). Reduced motion: standing, a gentle idle.
+ * Their names under their feet; a tap opens the talk; the unread dot by the head.
+ */
+function Strollers({ threads, onOpen }: { threads: ThreadInfo[]; onOpen: (id: string) => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const els = useRef<(HTMLButtonElement | null)[]>([]);
+  const figs = useRef<(HTMLImageElement | null)[]>([]);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  const n = threads.length;
+  const reduced = typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const H = Math.round(Math.min(size.h * (n <= 2 ? 0.44 : n <= 4 ? 0.36 : 0.28), n <= 2 ? 320 : 240));
+  const W = Math.round(H * 0.62);
+  const key = threads.map((t) => t.id).join('|');
+  useEffect(() => {
+    if (!size.w || !H) return;
+    const lane = size.w / n;
+    const place = (i: number, x: number, bob: number, dir: number) => {
+      const b = els.current[i];
+      const f = figs.current[i];
+      if (b) b.style.transform = `translate3d(${(x - W / 2).toFixed(1)}px, ${bob.toFixed(1)}px, 0)`;
+      if (f) f.style.transform = dir < 0 ? 'scaleX(-1)' : 'none';
+    };
+    const st = threads.map((_, i) => ({ x: lane * (i + 0.5), dir: i % 2 ? -1 : 1, pause: 0.6 + i * 0.7, speed: 16 + ((i * 7) % 5) * 2, t: i * 1.7 }));
+    if (reduced) {
+      st.forEach((s, i) => place(i, s.x, 0, 1));
+      return;
+    }
+    let last = performance.now();
+    let raf = 0;
+    const step = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      st.forEach((s, i) => {
+        // each in its own stretch, the figure's half-width kept inside it (and inside the screen)
+        const lo = Math.max(W / 2 + 6, lane * i + Math.min(W / 2, lane * 0.3));
+        const hi = Math.min(size.w - W / 2 - 6, lane * (i + 1) - Math.min(W / 2, lane * 0.3));
+        let walking = false;
+        if (s.pause > 0) s.pause -= dt;
+        else {
+          walking = true;
+          s.t += dt;
+          s.x += s.dir * s.speed * dt;
+          if (s.x <= lo || s.x >= hi || hi - lo < 8) {
+            s.x = Math.max(lo, Math.min(hi, s.x));
+            s.dir = -s.dir;
+            s.pause = 0.9 + Math.random() * 1.8;
+          } else if (Math.random() < dt * 0.12) s.pause = 0.8 + Math.random() * 1.6;
+        }
+        place(i, s.x, walking ? -Math.abs(Math.sin(s.t * 5.2)) * 4 : 0, s.dir);
+      });
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, size.w, H, W, reduced]);
+  return (
+    <div ref={box} className="absolute inset-x-0 bottom-0 top-[30%] z-[5]" data-testid="dachi-strollers">
+      <style>{'@keyframes dachi-idle{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.012)}}'}</style>
+      {threads.map((t, i) => (
+        <button
+          key={t.id}
+          ref={(el) => void (els.current[i] = el)}
+          onClick={() => onOpen(t.id)}
+          aria-label={`${t.name}と話す`}
+          className="absolute left-0 flex flex-col items-center will-change-transform"
+          style={{ bottom: '13%', width: W, transform: `translate3d(${(size.w / n) * (i + 0.5) - W / 2}px,0,0)` }}
+        >
+          <span className="relative block" style={{ width: W, height: H, animation: reduced ? 'dachi-idle 4.5s ease-in-out infinite' : undefined, transformOrigin: '50% 100%' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img ref={(el) => void (figs.current[i] = el)} src={standOf(t)} alt="" draggable={false} className="h-full w-full select-none object-contain object-bottom drop-shadow-[0_8px_10px_rgba(0,0,0,.35)]" />
+            {!!t.unread && <span className="absolute right-[18%] top-[6%] h-3.5 w-3.5 rounded-full border-2 border-[#0b1027] bg-sky-300" aria-label="まだ聞いていない" />}
+          </span>
+          {/* the shadow on the ground, the name under the feet */}
+          <span className="-mt-2 block h-2 rounded-[50%] bg-black/35 blur-[2px]" style={{ width: W * 0.55 }} aria-hidden />
+          <span className="mt-1 max-w-[150%] truncate whitespace-nowrap rounded-full bg-[rgba(10,14,44,.6)] px-2 py-0.5 text-[11px] font-bold text-[#f4f1ff] backdrop-blur">{t.name}</span>
+        </button>
+      ))}
+    </div>
+  );
 }

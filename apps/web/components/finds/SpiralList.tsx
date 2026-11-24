@@ -47,7 +47,10 @@ export function SpiralList({
   empty,
   search = '探す',
   dateOf = shortDate,
+  noSpiral = false,
 }: {
+  /** R9 (client): the list alone, no galaxy above it (the talk's left drawer) */
+  noSpiral?: boolean;
   rows: SpiralRow[] | null;
   filter: FindFilter;
   onFilter: (f: FindFilter) => void;
@@ -106,8 +109,8 @@ export function SpiralList({
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       {/* the spiral's place (it shrinks into the corner when the list is scrolled) */}
-      <div className="shrink-0 transition-[height] duration-300 ease-out" style={{ height: compact ? 0 : BIG + 4 }} />
-      <div
+      {!noSpiral && <div className="shrink-0 transition-[height] duration-300 ease-out" style={{ height: compact ? 0 : BIG + 4 }} />}
+      {!noSpiral && <div
         className="absolute z-[2] transition-all duration-300 ease-out"
         style={compact ? { top: 0, right: 0, width: SMALL, height: SMALL } : { top: 0, left: `calc(50% - ${BIG / 2}px)`, width: BIG, height: BIG }}
       >
@@ -125,10 +128,10 @@ export function SpiralList({
             if (d) jump(d.first);
           }}
         />
-      </div>
+      </div>}
 
       {/* the filter strip and the small search box */}
-      <div className={`flex shrink-0 items-center gap-1.5 pb-2 transition-[padding] duration-300 ${compact ? 'pr-[60px] pt-3' : 'pt-1'}`}>
+      <div className={`flex shrink-0 items-center gap-1.5 pb-2 transition-[padding] duration-300 ${compact && !noSpiral ? 'pr-[60px] pt-3' : 'pt-1'}`}>
         <div className="no-scrollbar flex min-w-0 flex-1 gap-1 overflow-x-auto" role="toolbar" aria-label="しぼりこみ">
           <button className={chip(!!filter.star)} aria-pressed={!!filter.star} aria-label="お気に入り" onClick={() => onFilter({ ...filter, star: !filter.star || undefined })}>
             <span className="text-amber-300">★</span>

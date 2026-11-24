@@ -335,7 +335,8 @@ export function ThreadsDrawer({
   /** above the threads (a talk's settings, the looks …) */
   extra?: React.ReactNode;
 }) {
-  const all = [{ id: 'bati', name: bati.name, avatar: bati.face }, ...threads.filter((t) => t.id !== 'bati')];
+  // R9 (client): KIMORIN⭐︎ lives in the ダチ tab, not in this drawer
+  const all = [{ id: 'bati', name: bati.name, avatar: bati.face }, ...threads.filter((t) => t.id !== 'bati' && t.id !== 'kimorin')];
   const [sel, setSel] = useState(current || 'bati');
   const [filter, setFilter] = useState<FindFilter>({});
   const [days, setDays] = useState<TalkDayView[] | null>(null);
@@ -395,7 +396,7 @@ export function ThreadsDrawer({
           話す
         </button>
       </div>
-      <SpiralList rows={rows} filter={filter} onFilter={setFilter} onRow={(r) => onDay(sel, r.id)} empty={filter.star || filter.mark || filter.q ? '見つからなかった' : 'まだ、話していない'} search="言葉" />
+      <SpiralList rows={rows} filter={filter} onFilter={setFilter} onRow={(r) => onDay(sel, r.id)} empty={filter.star || filter.mark || filter.q ? '見つからなかった' : 'まだ、話していない'} search="さがす" noSpiral />
     </Drawer>
   );
 }

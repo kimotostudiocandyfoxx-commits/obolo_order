@@ -101,3 +101,13 @@ export async function playClip(url: string, opts: { volume?: number } = {}): Pro
     },
   };
 }
+
+/**
+ * R9 (client): the words and the voice start together — fetch and decode the clip first, at most `capMs` (then the
+ * words show and the voice plays when it comes). true = decoded and ready to start at once.
+ */
+export const VOICE_WAIT_MS = 2500;
+export async function readyClip(url: string | null | undefined, capMs = VOICE_WAIT_MS): Promise<boolean> {
+  if (!url) return false;
+  return Promise.race([loadClip(url).then((b) => !!b).catch(() => false), new Promise<boolean>((r) => setTimeout(() => r(false), capMs))]);
+}

@@ -4,7 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { talkMuted, TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
 import { batiVoiceUrl, speakable } from '@/lib/atelier/batiSpeak';
-import { playClip } from '@/lib/voice/webVoice';
+import { canPlay, playClip, readyClip, VOICE_WAIT_MS } from '@/lib/voice/webVoice';
+import { logVoice } from '@/lib/voice/voiceLog';
 import { BATI_COLOR, batiLook, characterLook, PLACE_BG, SELF_COLOR, selfLook, selfTone } from '@/lib/talk/looks';
 import { ApiError, getApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -673,24 +674,57 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
   }
 
   // client 2026-11-24: {bati} speaks its replies aloud (batiSpeak.ts): each new {bati} line once, the newest one when several
-  // come together; not in a story step (its script lines are the story's); quiet when muted / not unlocked / no voice
+  // come together; not in a story step (its script lines are the story's); quiet when muted / not unlocked / no voice.
+  // R9 (client): the bubble and the voice start together — a new line is held back (… thinking) while its voice is
+  // fetched and decoded, at most VOICE_WAIT_MS (2.5 s); then the bubble shows as the voice starts. Not ready by then:
+  // the bubble shows, and the voice plays when it comes.
   const [speaking, setSpeaking] = useState<{ who: string; level: () => number } | null>(null);
-  const spoken = useRef<Set<string> | null>(null);
+  const known = useRef<Set<string> | null>(null);
+  // what was in the talk when it opened shows at once and is not read again (the greeting of a fresh talk is)
+  if (known.current === null) known.current = new Set(msgs.filter((m) => story || m.who !== 'bati' || msgs.some((x) => x.who === 'me')).map((m) => m.id));
+  const voiceHeld = useRef(new Set<string>());
+  const [, rerender] = useState(0);
+  const [toPlay, setToPlay] = useState<{ url: string; g: number } | null>(null);
   const speakGen = useRef(0);
+  const speakClip = useRef<{ stop: () => void } | null>(null);
+  /** a {bati} line not shown yet: new (not looked at yet) or waiting for its voice */
+  const hidden = (m: Msg) => !story && m.who === 'bati' && (!known.current!.has(m.id) || voiceHeld.current.has(m.id));
   useEffect(() => {
     if (story) return;
-    // what was in the talk when it opened is not read again (the greeting of a fresh talk is)
-    if (!spoken.current) spoken.current = new Set(msgs.some((m) => m.who === 'me') ? msgs.map((m) => m.id) : []);
-    const fresh = msgs.filter((m): m is Extract<Msg, { who: 'bati' }> => m.who === 'bati' && !spoken.current!.has(m.id) && !!m.text);
-    for (const m of msgs) spoken.current.add(m.id);
-    const last = fresh.at(-1);
-    if (!last || talkMuted()) return;
-    const words = speakable(last.text);
-    if (!words) return;
+    const fresh = msgs.filter((m) => !known.current!.has(m.id));
+    if (!fresh.length) return;
+    for (const m of fresh) known.current!.add(m.id);
+    const said = fresh.filter((m): m is Extract<Msg, { who: 'bati' }> => m.who === 'bati' && !!m.text);
+    const last = said.at(-1);
+    const words = last ? speakable(last.text) : '';
+    if (!last || !words || talkMuted()) return void rerender((n) => n + 1);
     const g = ++speakGen.current;
+    voiceHeld.current.add(last.id);
+    rerender((n) => n + 1);
+    const t0 = performance.now();
     void (async () => {
-      const url = await batiVoiceUrl(words);
-      if (!url || g !== speakGen.current || talkMuted()) return;
+      const urlP = batiVoiceUrl(words);
+      const url = await Promise.race([urlP, new Promise<null>((r) => setTimeout(() => r(null), VOICE_WAIT_MS))]);
+      const ready = url ? await readyClip(url, Math.max(0, VOICE_WAIT_MS - (performance.now() - t0))) : false;
+      if (g !== speakGen.current) return;
+      voiceHeld.current.delete(last.id);
+      if (ready && url && canPlay()) {
+        // the bubble and the voice in the same frame (the clip starts in the effect after the talk has shown the line)
+        logVoice('together', last.id, performance.now() - t0);
+        setToPlay({ url, g });
+        return;
+      }
+      logVoice('words first', last.id, performance.now() - t0);
+      rerender((n) => n + 1);
+      // the voice was late: it plays when it comes
+      const late = url ?? (await urlP);
+      if (late && g === speakGen.current && !talkMuted()) setToPlay({ url: late, g });
+    })();
+  }, [msgs, story]);
+  useEffect(() => {
+    if (!toPlay || toPlay.g !== speakGen.current || talkMuted()) return;
+    const { url, g } = toPlay;
+    void (async () => {
       const clip = await playClip(url);
       if (!clip || g !== speakGen.current) return void clip?.stop();
       speakClip.current = clip;
@@ -698,8 +732,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       await clip.done;
       if (g === speakGen.current) setSpeaking(null);
     })();
-  }, [msgs, story]);
-  const speakClip = useRef<{ stop: () => void } | null>(null);
+  }, [toPlay]);
   useEffect(() => () => void (speakGen.current++, speakClip.current?.stop()), []);
 
   // M-R232: the side-by-side talk — you at the right, {bati} (or the story's speaker) at the left, the Moon behind
@@ -710,7 +743,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
     // back view painted yet)
     { id: 'me', name: me?.displayName ?? '', look: selfLook(me), color: SELF_COLOR, tone: selfTone(me), self: true, avatar: me?.lookIcon, views: viewsOf('talk-user') },
   ];
-  const items: TalkItem[] = msgs.map((m) =>
+  const items: TalkItem[] = msgs.filter((m) => !hidden(m)).map((m) =>
     m.who === 'me'
       ? { id: m.id, who: 'me', text: m.text, mark: { kind: 'local', id: m.id } }
       : m.who === 'bati'
@@ -789,7 +822,7 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
       <TalkScene
         people={people}
         items={items}
-        thinking={busy || making ? 'bati' : null}
+        thinking={busy || making || voiceHeld.current.size > 0 ? 'bati' : null}
         voice={speaking ?? undefined}
         log
         framing={story ? undefined : 'ots'}

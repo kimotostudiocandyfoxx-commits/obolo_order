@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { CHARACTER_AVATAR } from '@/lib/dachi/useDachiThreads';
 import { loadBluenaWorks, WORK_WORD, type BluenaWork } from '@/lib/dachi/works';
 import { HoldMic, Wave } from './HoldMic';
-import { playClip, type Clip } from '@/lib/voice/webVoice';
+import { playClip, readyClip, type Clip } from '@/lib/voice/webVoice';
 import { DACHI_TEXT_MAX, TALK_FIXED_FACE_KEY } from '@obolo/shared';
 import { TalkComposer } from '@/components/talk/TalkComposer';
 import { TalkScene, type TalkItem, type TalkPerson } from '@/components/talk/TalkScene';
@@ -64,6 +64,8 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
   const [typing, setTyping] = useState(false);
   const [bar, setBar] = useState(0);
   const [keyboard, setKeyboard] = useState(false);
+  /** R9: KIMORIN⭐︎'s answer is on its way (thinking … until its voice is ready) */
+  const [waiting, setWaiting] = useState(false);
   const readCb = useRef(onRead);
   readCb.current = onRead;
   const person = (thread?.kind ?? (id === 'kimorin' || id === 'mikie' ? id : 'dachi')) === 'dachi';
@@ -81,6 +83,12 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
     try {
       const all = await getApi().dachiMessages(id);
       const list = day ? all.filter((m) => talkDayOf(m.createdAt) === day) : all;
+      // R9: a voice not heard yet (KIMORIN⭐︎'s lines, a dachi's message) is fetched and decoded first (≤ 2.5 s), so its
+      // bubble and its voice start together
+      if (!day) {
+        const fresh = list.filter((m) => !m.fromMe && m.read === false && m.audioUrl).slice(-3);
+        if (fresh.length) await Promise.all(fresh.map((m) => readyClip(m.audioUrl)));
+      }
       setMsgs(list);
       setErr(null);
       if (list.some((m) => !m.fromMe)) {
@@ -106,22 +114,37 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
   const sent = (m: DachiMessageView) => {
     // R9: KIMORIN⭐︎'s answer comes back with the message (said in the talk like any line)
     const { reply, ...mine } = m;
-    setMsgs((l) => [...(l ?? []), mine, ...(reply ? [reply] : [])]);
+    setMsgs((l) => [...(l ?? []), mine]);
     onSent?.(mine);
+    if (!reply) return setWaiting(false);
+    // R9: KIMORIN⭐︎'s words and voice together — the voice decoded first (≤ 2.5 s), the bubble at the moment it plays
+    setWaiting(true);
+    void readyClip(reply.audioUrl).finally(() => {
+      setWaiting(false);
+      setMsgs((l) => [...(l ?? []), reply]);
+    });
   };
 
   const sendVoice = async (blob: Blob, seconds: number) => {
     const api = getApi();
-    const up = await api.uploadVoice(blob);
-    sent(await api.sendDachiMessage(id, { mediaId: up.id, seconds: Math.max(0.1, Math.round(seconds * 10) / 10) }));
+    if (id === 'kimorin') setWaiting(true);
+    try {
+      const up = await api.uploadVoice(blob);
+      sent(await api.sendDachiMessage(id, { mediaId: up.id, seconds: Math.max(0.1, Math.round(seconds * 10) / 10) }));
+    } catch (e) {
+      setWaiting(false);
+      throw e;
+    }
   };
 
   /** client 2026-11-24: words typed in the talk (the small keyboard beside the mic) */
   const sendText = async (text: string) => {
     setErr(null);
+    if (id === 'kimorin') setWaiting(true);
     try {
       sent(await getApi().sendDachiMessage(id, { text }));
     } catch (e) {
+      setWaiting(false);
       setErr(e instanceof ApiError && e.code === 'CONTENT_FLAGGED' ? 'その言葉は、送れないみたい' : e instanceof ApiError ? e.message : String(e));
     }
   };
@@ -173,6 +196,7 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
         key={id}
         people={people}
         items={items}
+        thinking={waiting ? 'them' : null}
         place={place ? PLACE_BG[place] : undefined}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}
         top={0}
