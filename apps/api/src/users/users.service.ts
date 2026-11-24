@@ -20,6 +20,7 @@ import {
   batiEggState,
   type BatiVoiceState,
   MEDIA_CONSENT_VERSION,
+  kororinOf,
 } from '@obolo/shared';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 import { apiError } from '../common/errors';
@@ -107,6 +108,7 @@ export function toMe(u: typeof users.$inferSelect): Me {
     look: u.lookJson ?? null,
     puniPic: u.puniPicUrl ?? null,
     chibiPic: u.chibiPicUrl ?? null,
+    kororin: u.kororinColour || u.kororinFace ? kororinOf({ colour: u.kororinColour, face: u.kororinFace }) : null,
     butterfly: u.butterflyUrl ?? null,
     story: Object.fromEntries(Object.entries(u.onboardingJson ?? {}).filter(([k]) => /^(d\d+|l2|sys)\./.test(k))),
     // the tester entrance (users/tester.ts): only when the server's allowlist names this account

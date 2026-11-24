@@ -21,7 +21,8 @@ export interface HomeWork {
   id: string;
   kind: PlanetWorkKind;
   /** pic: the puni face; chibi: the 2-heads mini figure that jumps out of the popped ball (M-R262; a round face until made) */
-  author: { id: string; name: string; pic?: string | null; chibi?: string | null };
+  /** M-R266: the maker's chosen kororin (colour + face; しろもち when unset) */
+  author: { id: string; name: string; pic?: string | null; chibi?: string | null; kororin?: KororinChoice | null };
   rel: HomeRel;
   /** the words (Saturn: what was blown in, shown while it sings) */
   text: string;
@@ -73,6 +74,56 @@ export const RECORD_COLOURS = [
   { id: 'sky', name: '空色', color: '#5cb8ff' },
 ] as const;
 export type RecordColour = (typeof RECORD_COLOURS)[number]['id'];
+
+/**
+ * M-R266 (design/home/README.md §11): a kororin is a colour (a tint of the pearl ball) and a face; the 8 made ones
+ * are pairs, but any colour may go with any face. Each member's choice is theirs; the balls on Saturn are the makers'.
+ */
+export const KORORIN_COLOURS = [
+  { id: 'pearl', name: 'パール' },
+  { id: 'gold', name: '金' },
+  { id: 'pink', name: 'ピンク' },
+  { id: 'mint', name: 'ミント' },
+  { id: 'lavender', name: 'ラベンダー' },
+  { id: 'sky', name: '空色' },
+  { id: 'peach', name: 'ピーチ' },
+  { id: 'night', name: '夜色' },
+] as const;
+export const KORORIN_FACES = [
+  { id: 'omega', name: 'ω' },
+  { id: 'smile', name: 'にっこり' },
+  { id: 'wink', name: 'ウインク' },
+  { id: 'sleepy', name: 'ねむい' },
+  { id: 'cat', name: 'ねこ口' },
+  { id: 'oh', name: 'びっくり' },
+  { id: 'grin', name: 'にかっ' },
+  { id: 'star', name: 'キラキラ目' },
+] as const;
+export type KororinColour = (typeof KORORIN_COLOURS)[number]['id'];
+export type KororinFace = (typeof KORORIN_FACES)[number]['id'];
+export interface KororinChoice {
+  colour: KororinColour;
+  face: KororinFace;
+}
+/** the 8 (README §11): しろもち（パール・ω）… よぞら（夜色・キラキラ目） */
+export const KORORINS: ({ name: string } & KororinChoice)[] = [
+  { name: 'しろもち', colour: 'pearl', face: 'omega' },
+  { name: 'きんぴか', colour: 'gold', face: 'smile' },
+  { name: 'もも', colour: 'pink', face: 'wink' },
+  { name: 'みんと', colour: 'mint', face: 'sleepy' },
+  { name: 'ぷらむ', colour: 'lavender', face: 'cat' },
+  { name: 'そら', colour: 'sky', face: 'oh' },
+  { name: 'ぴーち', colour: 'peach', face: 'grin' },
+  { name: 'よぞら', colour: 'night', face: 'star' },
+];
+export const isKororinColour = (v: unknown): v is KororinColour => KORORIN_COLOURS.some((c) => c.id === v);
+export const isKororinFace = (v: unknown): v is KororinFace => KORORIN_FACES.some((c) => c.id === v);
+/** someone's kororin: theirs, else しろもち */
+export function kororinOf(c?: { colour?: string | null; face?: string | null } | null): KororinChoice {
+  return { colour: isKororinColour(c?.colour) ? c!.colour : 'pearl', face: isKororinFace(c?.face) ? c!.face : 'omega' };
+}
+/** the made kororin with this colour and face (its name), if it is one of the 8 */
+export const kororinName = (c: KororinChoice) => KORORINS.find((k) => k.colour === c.colour && k.face === c.face)?.name ?? null;
 export const PlanetHomeColourBody = z.object({ colour: z.enum(['black', 'pink', 'lavender', 'mint', 'gold', 'sky']) });
 export type PlanetHomeColourBody = z.infer<typeof PlanetHomeColourBody>;
 

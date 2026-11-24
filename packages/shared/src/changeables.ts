@@ -1,4 +1,4 @@
-import { RECORD_COLOURS } from './planetHome';
+import { KORORIN_COLOURS, KORORIN_FACES, RECORD_COLOURS, isKororinColour, isKororinFace, kororinOf } from './planetHome';
 import type { HomePlanet } from './planetHomeConfig';
 
 /**
@@ -20,6 +20,9 @@ export interface ChangeChoice {
 export interface ChangeStore {
   home(planet: HomePlanet): Promise<{ recordColour?: string | null } | null>;
   setHome(planet: HomePlanet, patch: { recordColour?: string }): Promise<void>;
+  /** M-R266: the member's kororin (colour + face) */
+  kororin(): Promise<{ colour?: string | null; face?: string | null } | null>;
+  setKororin(patch: { colour?: string; face?: string }): Promise<void>;
 }
 
 export interface Changeable {
@@ -33,8 +36,14 @@ export interface Changeable {
   set(store: ChangeStore, value: string): Promise<void>;
   /** words that name the thing itself (a request must name it) */
   names: RegExp;
+  /** more than the name: the request must be about this one (the kororin's face, not its colour) */
+  about?: (text: string) => boolean;
   /** what the preview card draws */
-  preview: 'saturn-record';
+  preview: 'saturn-record' | 'kororin-colour' | 'kororin-face';
+  /** {bati}'s question when the choice is not said */
+  askLine: string;
+  /** a chip the member can tap for one choice (the words read back as that request) */
+  chip(choice: ChangeChoice): string;
   /** {bati}'s words when it changed it / put it back */
   doneLine(choice: ChangeChoice): string;
   undoneLine(choice: ChangeChoice): string;
@@ -63,12 +72,78 @@ export const SATURN_RECORD_COLOUR: Changeable = {
   },
   names: /レコード/,
   preview: 'saturn-record',
+  askLine: '何色にする？',
+  chip: (c) => `レコードを${c.name}にして`,
   // M-R263 §7's example, as written
   doneLine: (c) => `レコード、${c.name}にしたよ！ 土星に行ったら見てみて。`,
   undoneLine: (c) => `元に戻したよ。レコードは、${c.name}！`,
 };
 
-export const CHANGEABLES: Changeable[] = [SATURN_RECORD_COLOUR];
+const KORORIN_COLOUR_WORDS: Record<string, string[]> = {
+  pearl: ['パール', '白', 'しろ', 'ホワイト', 'しろもち'],
+  gold: ['ゴールド', '金', 'きん色', '黄色', 'きいろ', 'イエロー', 'きんぴか'],
+  pink: ['ピンク', '桃', 'もも色'],
+  mint: ['ミント', '緑', 'みどり', 'グリーン'],
+  lavender: ['ラベンダー', '紫', 'むらさき', 'パープル'],
+  sky: ['空色', 'そら色', '水色', 'みずいろ', '青', 'あお', 'ブルー', 'スカイ'],
+  peach: ['ピーチ', 'オレンジ', 'だいだい', 'ぴーち'],
+  night: ['夜色', 'よる色', '紺', 'ネイビー', '黒', 'くろ', 'ブラック', 'よぞら'],
+};
+const KORORIN_FACE_WORDS: Record<string, string[]> = {
+  omega: ['ω', 'オメガ'],
+  smile: ['にっこり', 'ニッコリ', '笑顔', 'えがお'],
+  wink: ['ウインク', 'ウィンク'],
+  sleepy: ['ねむい', '眠い', 'ねむそう', '眠そう'],
+  cat: ['ねこ口', '猫口', 'ねこ', '猫'],
+  oh: ['びっくり', 'ビックリ', 'おどろ'],
+  grin: ['にかっ', 'ニカッ', '歯'],
+  star: ['キラキラ', 'きらきら', '星の目', 'ほしの目'],
+};
+const faceWords = Object.values(KORORIN_FACE_WORDS).flat();
+
+/** M-R266: the member's kororin — its colour, and its face (any colour with any face) */
+export const KORORIN_COLOUR: Changeable = {
+  id: 'kororin.colour',
+  label: 'コロリンの色',
+  planet: 'saturn',
+  choices: KORORIN_COLOURS.map((c) => ({ id: c.id, name: c.name, words: KORORIN_COLOUR_WORDS[c.id] ?? [c.name] })),
+  async get(store) {
+    return kororinOf(await store.kororin()).colour;
+  },
+  async set(store, value) {
+    if (!isKororinColour(value)) throw new Error(`not a kororin colour: ${value}`);
+    await store.setKororin({ colour: value });
+  },
+  names: /コロリン/,
+  about: (t) => !/顔|かお/.test(t),
+  preview: 'kororin-colour',
+  askLine: 'コロリン、何色にする？',
+  chip: (c) => `コロリンを${c.name}にして`,
+  doneLine: (c) => `コロリン、${c.name}にしたよ！ これから飛ばすコロリンは、みんなこの子に入って届くよ。`,
+  undoneLine: (c) => `元に戻したよ。コロリンの色は、${c.name}！`,
+};
+export const KORORIN_FACE: Changeable = {
+  id: 'kororin.face',
+  label: 'コロリンの顔',
+  planet: 'saturn',
+  choices: KORORIN_FACES.map((c) => ({ id: c.id, name: c.name, words: KORORIN_FACE_WORDS[c.id] ?? [c.name] })),
+  async get(store) {
+    return kororinOf(await store.kororin()).face;
+  },
+  async set(store, value) {
+    if (!isKororinFace(value)) throw new Error(`not a kororin face: ${value}`);
+    await store.setKororin({ face: value });
+  },
+  names: /コロリン/,
+  about: (t) => /顔|かお/.test(t) || faceWords.some((w) => t.includes(w)),
+  preview: 'kororin-face',
+  askLine: 'コロリン、どんな顔にする？',
+  chip: (c) => `コロリンの顔を${c.name}にして`,
+  doneLine: (c) => `コロリンの顔、${c.name}にしたよ！ かわいい！`,
+  undoneLine: (c) => `元に戻したよ。コロリンの顔は、${c.name}！`,
+};
+
+export const CHANGEABLES: Changeable[] = [SATURN_RECORD_COLOUR, KORORIN_FACE, KORORIN_COLOUR];
 export const changeableById = (id: string) => CHANGEABLES.find((c) => c.id === id);
 
 /** colours that are not among the choices → the nearest few that are */
@@ -93,8 +168,8 @@ export type ChangeRequest =
 export function changeRequest(text: string): ChangeRequest | null {
   const t = text.replace(/\s+/g, '');
   for (const item of CHANGEABLES) {
-    if (!item.names.test(t)) continue;
-    const wantsChange = /色|カラー|変え|かえ|にして|に変|にする|に塗|塗って|がいい/.test(t);
+    if (!item.names.test(t) || (item.about && !item.about(t))) continue;
+    const wantsChange = /色|カラー|顔|かお|変え|かえ|にして|に変|にする|に塗|塗って|がいい/.test(t);
     // the longest word first (水色 before 色 words, ゴールド before 金)
     const hits = item.choices.flatMap((c) => c.words.map((w) => ({ c, w }))).filter(({ w }) => t.includes(w));
     hits.sort((a, b) => b.w.length - a.w.length);
@@ -109,7 +184,7 @@ export function changeRequest(text: string): ChangeRequest | null {
 /** {bati}'s words (M-R263 §7, the example as written) */
 export const changeLines = {
   near: (asked: string, near: ChangeChoice[]) => `${asked}は、ないんだ。${near.map((c) => c.name).join('・')}なら、できるよ！`,
-  ask: () => '何色にする？',
+  ask: (item?: Changeable) => item?.askLine ?? '何色にする？',
 };
 
 /** a change {bati} made (the card in the chat: the preview, and 〔元に戻す〕 back to `from`) */
@@ -117,6 +192,8 @@ export interface ChangeResult {
   id: string;
   from: string;
   to: string;
+  /** M-R266: a kororin change carries the whole kororin after it (the preview draws the colour with its face) */
+  kororin?: { colour: string; face: string };
 }
 
 /** apply one choice through the store; returns what it was before (for 〔元に戻す〕) */
@@ -126,5 +203,6 @@ export async function applyChange(store: ChangeStore, id: string, value: string)
   if (!item.choices.some((c) => c.id === value)) throw new Error(`not a choice of ${id}: ${value}`);
   const from = await item.get(store);
   await item.set(store, value);
+  if (item.preview === 'kororin-colour' || item.preview === 'kororin-face') return { id, from, to: value, kororin: kororinOf(await store.kororin()) };
   return { id, from, to: value };
 }

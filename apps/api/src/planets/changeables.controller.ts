@@ -29,6 +29,8 @@ export class ChangeablesController {
       setHome: async (planet, patch) => {
         if (patch.recordColour) await this.homes.setColour(userId, planet, patch.recordColour);
       },
+      kororin: async () => this.homes.kororin(userId),
+      setKororin: async (patch) => void (await this.homes.setKororin(userId, patch)),
     };
   }
 

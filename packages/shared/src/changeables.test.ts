@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { applyChange, changeRequest, CHANGEABLES, SATURN_RECORD_COLOUR, type ChangeStore } from './changeables';
+import { applyChange, changeRequest, CHANGEABLES, KORORIN_COLOUR, KORORIN_FACE, SATURN_RECORD_COLOUR, type ChangeStore } from './changeables';
+import { KORORINS, kororinOf } from './planetHome';
 
 const memStore = () => {
   const homes: Record<string, { recordColour?: string | null }> = {};
-  const store: ChangeStore = { home: async (p) => homes[p] ?? null, setHome: async (p, patch) => void (homes[p] = { ...homes[p], ...patch }) };
-  return { homes, store };
+  let kororin: { colour?: string; face?: string } | null = null;
+  const store: ChangeStore = {
+    home: async (p) => homes[p] ?? null,
+    setHome: async (p, patch) => void (homes[p] = { ...homes[p], ...patch }),
+    kororin: async () => kororin,
+    setKororin: async (patch) => void (kororin = { ...kororin, ...patch }),
+  };
+  return { homes, store, kororin: () => kororin };
 };
 
 describe('M-R263: what {bati} can change (the registry)', () => {
@@ -38,5 +45,38 @@ describe('M-R263: what {bati} can change (the registry)', () => {
   });
   it('lines: the example of §7 as written', () => {
     expect(SATURN_RECORD_COLOUR.doneLine(SATURN_RECORD_COLOUR.choices[1])).toBe('レコード、ピンクにしたよ！ 土星に行ったら見てみて。');
+  });
+});
+
+describe('M-R266: the kororin (8 made, any colour with any face)', () => {
+  it('the 8, and しろもち for someone who has not chosen', () => {
+    expect(KORORINS.map((k) => k.name)).toEqual(['しろもち', 'きんぴか', 'もも', 'みんと', 'ぷらむ', 'そら', 'ぴーち', 'よぞら']);
+    expect(kororinOf(null)).toEqual({ colour: 'pearl', face: 'omega' });
+    expect(kororinOf({ colour: 'night', face: 'nope' })).toEqual({ colour: 'night', face: 'omega' });
+  });
+  it('{bati} reads a colour or a face for the kororin, and leaves the record alone', () => {
+    const c = changeRequest('コロリンをピンクにして');
+    expect(c && 'choice' in c && [c.item.id, c.choice.id]).toEqual(['kororin.colour', 'pink']);
+    const f = changeRequest('コロリンの顔、ウインクにして');
+    expect(f && 'choice' in f && [f.item.id, f.choice.id]).toEqual(['kororin.face', 'wink']);
+    const a = changeRequest('コロリンの顔を変えたい');
+    expect(a && 'ask' in a && a.item.id).toBe('kororin.face');
+    const r = changeRequest('レコードをピンクにして');
+    expect(r && 'choice' in r && r.item.id).toBe('saturn.recordColour');
+    // every chip reads back as its own choice
+    for (const item of CHANGEABLES)
+      for (const ch of item.choices) {
+        const q = changeRequest(item.chip(ch));
+        expect(q && 'choice' in q && [q.item.id, q.choice.id]).toEqual([item.id, ch.id]);
+      }
+  });
+  it('a kororin change keeps the other half, carries the whole kororin, and undoes', async () => {
+    const { store, kororin } = memStore();
+    await applyChange(store, KORORIN_FACE.id, 'star');
+    const r = await applyChange(store, KORORIN_COLOUR.id, 'night');
+    expect(r).toEqual({ id: 'kororin.colour', from: 'pearl', to: 'night', kororin: { colour: 'night', face: 'star' } });
+    await applyChange(store, r.id, r.from);
+    expect(kororin()).toEqual({ colour: 'pearl', face: 'star' });
+    await expect(applyChange(store, KORORIN_FACE.id, 'pink')).rejects.toThrow();
   });
 });

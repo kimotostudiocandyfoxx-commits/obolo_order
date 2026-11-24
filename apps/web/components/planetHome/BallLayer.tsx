@@ -1,20 +1,25 @@
 'use client';
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type PointerEvent } from 'react';
+import type { KororinFace as KororinFaceId } from '@obolo/shared';
 import { newBall, press, release, stepBalls, type Ball } from '@/lib/planetHome/ballPhysics';
+import { faceTurn, KororinFace } from './KororinFace';
 import s from './PlanetHome.module.css';
 
 /**
  * M-R265 (design/home/README.md §10): Saturn's balls as plain DOM, like the prototype. Each ball: an outer element
  * moved with translate3d (its position), an inner body squashed / stretched about a point near its bottom
- * (transform-origin 50% 88%), the glossy ball picture and an SVG face on top (eyes with a highlight, an ω mouth, pink
- * cheeks; a blink every 4.6 s, each ball at its own moment; the eyes squint while pressed). Drag and throw; a short
+ * (transform-origin 50% 88%), the maker's kororin (M-R266: its tinted ball, the shadow painted in, and its SVG face,
+ * turned a little its own way; a blink every 4.6 s, each ball at its own moment; the eyes squint while pressed). Drag and throw; a short
  * touch is a tap. The physics (lib/planetHome/ballPhysics) runs once a frame and writes transforms only.
  */
 export interface BallItem {
   id: string;
   R: number;
   pic: string;
+  /** M-R266: the maker's kororin face, and a number of the ball's own (which way its face looks, when it blinks) */
+  face: KororinFaceId;
+  turn: number;
 }
 
 export interface BallLayerHandle {
@@ -185,7 +190,9 @@ export const BallLayer = forwardRef<
 
   return (
     <div ref={box} className={s.ballLayer} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} data-testid="ball-layer">
-      {items.map((it, i) => (
+      {items.map((it) => {
+        const turn = faceTurn(it.turn);
+        return (
         <div
           key={it.id}
           ref={(el) => {
@@ -205,29 +212,11 @@ export const BallLayer = forwardRef<
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img alt="" src={it.pic} draggable={false} />
-            <BallFace delay={-((i * 1.37) % 4.6)} />
+            <KororinFace face={it.face} delay={turn.delay} style={{ transform: turn.transform }} />
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 });
-
-/** the face (README §10): black eyes with a white highlight, an ω mouth, pink cheeks; it blinks every 4.6 s */
-export function BallFace({ delay = 0 }: { delay?: number }) {
-  return (
-    <svg className={s.ballFace} viewBox="0 0 100 100" aria-hidden data-testid="ball-face">
-      <ellipse cx="27" cy="62" rx="9" ry="5" fill="#ff8fa8" opacity=".55" />
-      <ellipse cx="73" cy="62" rx="9" ry="5" fill="#ff8fa8" opacity=".55" />
-      <g className={s.ballSquint}>
-        <g className={s.ballEyes} style={{ animationDelay: `${delay.toFixed(2)}s` }}>
-          <ellipse cx="36" cy="52" rx="5.2" ry="6.2" fill="#2a1a22" />
-          <ellipse cx="64" cy="52" rx="5.2" ry="6.2" fill="#2a1a22" />
-          <circle cx="34.4" cy="49.6" r="1.8" fill="#fff" />
-          <circle cx="62.4" cy="49.6" r="1.8" fill="#fff" />
-        </g>
-      </g>
-      <path d="M43 60 q3.5 5 7 0 q3.5 5 7 0" fill="none" stroke="#2a1a22" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}

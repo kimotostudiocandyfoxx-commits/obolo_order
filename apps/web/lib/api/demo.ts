@@ -31,6 +31,7 @@ import {
   isFlying,
   seesOnlyDachi,
   applyChange,
+  kororinOf,
   CHANGEABLES,
   type ChangeStore,
   splitHome,
@@ -417,7 +418,7 @@ export class DemoApi implements Api {
       p,
     }));
     const r = splitHome(me, cands, u?.birthYear);
-    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: c.p.author.pic ?? null, chibi: this.s.users[c.p.author.id]?.chibiPic ?? null }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
+    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: c.p.author.pic ?? null, chibi: this.s.users[c.p.author.id]?.chibiPic ?? null, kororin: kororinOf(this.s.users[c.p.author.id]?.kororin) }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
     return {
       ...base,
       live: true,
@@ -444,6 +445,13 @@ export class DemoApi implements Api {
     return {
       home: async (planet) => this.s.planetHomes?.[this.uid()]?.[planet] ?? null,
       setHome: async (planet, patch) => this.home(planet, patch.recordColour ? { recordColour: patch.recordColour } : {}),
+      kororin: async () => this.s.users[this.uid()]?.kororin ?? null,
+      setKororin: async (patch) => {
+        const u = this.s.users[this.uid()];
+        if (!u) return;
+        u.kororin = kororinOf({ ...u.kororin, ...patch });
+        this.save();
+      },
     };
   }
   async changeables() {

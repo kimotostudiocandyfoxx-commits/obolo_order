@@ -49,6 +49,9 @@ export const users = pgTable(
     puniPicUrl: text('puni_pic_url'),
     /** M-R262: the member's 2-heads glossy mini figure, jumping out of a popped ball on Saturn (painted once from the look) */
     chibiPicUrl: text('chibi_pic_url'),
+    /** M-R266: the chosen kororin — a colour and a face (@obolo/shared KORORIN_COLOURS / KORORIN_FACES; null = しろもち) */
+    kororinColour: text('kororin_colour'),
+    kororinFace: text('kororin_face'),
     /** Jupiter: painted butterfly (PNG on Bunny) */
     butterflyUrl: text('butterfly_url'),
     /** Jupiter: the four branch names on the tree (null = the defaults) */

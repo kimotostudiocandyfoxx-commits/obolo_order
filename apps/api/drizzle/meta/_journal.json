@@ -316,6 +316,13 @@
       "when": 1795486915187,
       "tag": "0044_chibi_record_colour",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1795492628763,
+      "tag": "0045_kororin_choice",
+      "breakpoints": true
     }
   ]
 }

@@ -1,10 +1,11 @@
 'use client';
 
-import { RECORD_COLOURS } from '@obolo/shared';
+import { kororinOf, RECORD_COLOURS } from '@obolo/shared';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { COLORS } from '@/lib/puni/parts';
 import type { Ball } from '@/lib/planetHome/ballPhysics';
-import { BallFace, BallLayer, type BallItem, type BallLayerHandle } from './BallLayer';
+import { BallLayer, type BallItem, type BallLayerHandle } from './BallLayer';
+import { kororinBall, KororinPic } from './KororinFace';
 import type { StageItem } from '@/lib/planetHome/model';
 import type { SceneProps } from './skin';
 import s from './PlanetHome.module.css';
@@ -12,7 +13,8 @@ import s from './PlanetHome.module.css';
 /**
  * Saturn, the final form (M-R262; design/home/README.md §7, home-inline.html Saturn mode): a cute huge record seen from a
  * low angle (home2-bg-saturn-cutea, the needle up), its colour chosen by the member (a screen-blended layer through
- * saturn-record-mask). The new kororins are glossy balls — gold = yours, white = a dachi's, pink = a 推し's — run by
+ * saturn-record-mask). The new kororins are glossy balls, each its maker's own kororin (M-R266: colour + face; whose it
+ * is — yours / a dachi's / a 推し's — only in the name plate's underline: gold / white / pink), run by
  * plain DOM balls with faces (M-R265, BallLayer + lib/planetHome/ballPhysics): they fall, pile on the record (floor at
  * 86%, 4–96% of the width, at most 12), jiggle on a spring when they bump or are pressed, and can be dragged and thrown. A tap pops the ball like a soap bubble (a
  * splash), and its maker's 2-heads mini figure (author.chibi; a round face until it is painted) jumps out and says the
@@ -22,7 +24,6 @@ import s from './PlanetHome.module.css';
 const FACE = { x0: 0.04, x1: 0.96, floor: 0.86 };
 /** the groove at the record's centre label, and where the singer of 〔▶ 全部流す〕 stands (shares of the screen) */
 const GROOVE = { x: 0.47, y: 0.69 };
-const BALL: Record<StageItem['rel'], string> = { own: '/planet-home/ball-mine.webp', dachi: '/planet-home/ball-dachi.webp', oshi: '/planet-home/ball-oshi.webp', stranger: '/planet-home/ball-dachi.webp' };
 export const RECORD_MASK = '/planet-home/saturn-record-mask.png';
 const HOLD_MS = 480;
 const PLATE_H = 17;
@@ -124,7 +125,15 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, onPla
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  const items = useMemo<BallItem[]>(() => shown.map((w) => ({ id: w.id, pic: BALL[w.rel], R: (22 + (hue(w.id) % 3) * 4) * scale })), [shown, scale]);
+  // M-R266: each ball is its maker's kororin (しろもち until chosen); whose it is shows only in the plate's underline
+  const items = useMemo<BallItem[]>(
+    () =>
+      shown.map((w) => {
+        const k = kororinOf(w.author.kororin);
+        return { id: w.id, pic: kororinBall(k.colour), face: k.face, turn: hue(w.id), R: (22 + (hue(w.id) % 3) * 4) * scale };
+      }),
+    [shown, scale],
+  );
 
   const size = () => ({ W: root.current?.clientWidth ?? 390, H: root.current?.clientHeight ?? 844 });
   const groove = () => {
@@ -484,9 +493,7 @@ function StillRows({ items, onTap, onHold }: { items: StageItem[]; onTap: (w: St
           data-rel={w.rel}
           data-testid="rolling"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="" src={BALL[w.rel]} />
-          <BallFace />
+          <KororinPic k={w.author.kororin} size={56} turn={hue(w.id)} />
           <span className={s.puniTagStill}>{nameOf(w)}</span>
         </button>
       ))}

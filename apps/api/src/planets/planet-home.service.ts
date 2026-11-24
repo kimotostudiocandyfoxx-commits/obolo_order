@@ -12,6 +12,10 @@ import {
   type HomeWork,
   type PlanetHomeView,
   type PlanetWorkKind,
+  isKororinColour,
+  isKororinFace,
+  kororinOf,
+  type KororinChoice,
 } from '@obolo/shared';
 import { and, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { dachiOf, notHidden, viewerIsYoung } from '../common/child';
@@ -122,13 +126,13 @@ export const aroundWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, si
 export const farWhere = (s: Store, viewerId: string, kind: PlanetWorkKind, since: Date): SQL =>
   sql`(${s.live} AND ${s.flownAt} > ${since} AND ${s.userId} <> ${viewerId} AND ${s.userId} NOT IN (${followsOf(viewerId)}) AND NOT ${viewerIsYoung(viewerId)} AND NOT ${authorIsYoung(s.userId)} AND ${notHidden(viewerId, kind, s.id)} AND NOT ${blockedWith(viewerId, s.userId)})`;
 
-type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null };
+type Row = { id: string; userId: string; flownAt: Date | string; text: string | null; title: string | null; url: string | null; thumb: string | null; seconds: number | null; name: string; pic: string | null; chibi?: string | null; kColour?: string | null; kFace?: string | null };
 
 export function toWork(r: Row, kind: PlanetWorkKind, rel: HomeRel): HomeWork {
   return {
     id: r.id,
     kind,
-    author: { id: r.userId, name: r.name, pic: r.pic, chibi: r.chibi ?? null },
+    author: { id: r.userId, name: r.name, pic: r.pic, chibi: r.chibi ?? null, kororin: kororinOf({ colour: r.kColour, face: r.kFace }) },
     rel,
     text: r.text ?? '',
     title: r.title || undefined,
@@ -145,7 +149,7 @@ export class PlanetHomeService {
 
   private async rows(s: Store, where: SQL, order: SQL, limit: number): Promise<Row[]> {
     return (await this.db.read
-      .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl, chibi: users.chibiPicUrl })
+      .select({ id: s.id, userId: s.userId, flownAt: s.flownAt, text: s.text, title: s.title, url: s.url, thumb: s.thumb, seconds: s.seconds, name: users.displayName, pic: users.puniPicUrl, chibi: users.chibiPicUrl, kColour: users.kororinColour, kFace: users.kororinFace })
       .from(s.t as typeof saturnPosts)
       .innerJoin(users, sql`${users.id} = ${s.userId}`)
       .where(and(where, isNull(users.deletedAt)))
@@ -210,6 +214,21 @@ export class PlanetHomeService {
       .values({ userId, planet, recordColour: colour, updatedAt: new Date() })
       .onConflictDoUpdate({ target: [planetHomes.userId, planetHomes.planet], set: { recordColour: colour, updatedAt: new Date() } });
     return { colour };
+  }
+
+  /** M-R266: the member's kororin (colour + face; null columns = not chosen) */
+  async kororin(userId: string): Promise<{ colour: string | null; face: string | null } | null> {
+    const [u] = await this.db.read.select({ colour: users.kororinColour, face: users.kororinFace }).from(users).where(eq(users.id, userId));
+    return u ?? null;
+  }
+
+  async setKororin(userId: string, patch: { colour?: string; face?: string }): Promise<KororinChoice> {
+    if (patch.colour !== undefined && !isKororinColour(patch.colour)) throw apiError(HttpStatus.BAD_REQUEST, 'VALIDATION', 'Not a kororin colour');
+    if (patch.face !== undefined && !isKororinFace(patch.face)) throw apiError(HttpStatus.BAD_REQUEST, 'VALIDATION', 'Not a kororin face');
+    const now = await this.kororin(userId);
+    const next = kororinOf({ colour: patch.colour ?? now?.colour, face: patch.face ?? now?.face });
+    await this.db.write.update(users).set({ kororinColour: next.colour, kororinFace: next.face, updatedAt: new Date() }).where(eq(users.id, userId));
+    return next;
   }
 
   /** 並べかえ: your own works in your place (only your own ids are kept) */
