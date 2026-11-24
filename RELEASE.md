@@ -10,3 +10,4 @@
 - R6 2026-11-24T07:18Z 38b0ef3f — R6: start screen without the summary lines, Bati greets with やっほー (no chips), bubble colour through Bati, iPad audio unlock, recording conversion fix, default Fish voice path, Moon chat tabs (Bati | ダチ | ブルーナ)
 - R7 2026-11-24T07:54Z fc3903a4 — R7: Saturn polish (24 anime kororin, chibi2, rings-only sky, pop sound and voices, M-R275/M-R277), Bati speaks in the Moon chat, text in the ダチ talk, default Bati voice (client's voice +2)
 - R8 2026-11-24T08:44Z a1cc1fc3 — R8: Moon chat as a scrolling log, over-the-shoulder Bati chat, KIMORIN always a ダチ, egg Bati placeholder, lookups answered in the talk, no steering, Bluena tab on the Moon (no orbit), one mic stream per page
+- R9 2026-11-24T11:12Z 6e68b68a — R9: Moon temple zones (Bati at the bowl, ダチ great hall with the top 8 by 7-day talk, the plain for everyone else), making glow from the bowl, tabs ダチ|Bati|ブルーナ, KIMORIN replies in its voice, bubble and voice together, drawer tidy
