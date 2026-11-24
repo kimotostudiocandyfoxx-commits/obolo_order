@@ -303,7 +303,7 @@ function enter(){
   $('shelf').innerHTML=ic.map((x,i)=>`<div class="w">${x}<small>11/${26-i}</small></div>`).join('');
   $('inside').classList.add('on');
 }
-const REC={cx:.481,cy:.702,rx:.574,ry:.1885};let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.8,.76],QUEUE=[],MAXB=window.KMAX||16,NB=0;
+const REC={cx:.481,cy:.702,rx:.574,ry:.1885};let rolls=[],raf=0,heard=[],RECLBL=[.47,.69],SPIN=false,NEEDLE=[.6,.52],QUEUE=[],MAXB=window.KMAX||16,NB=0;
 const CHB=n=>n===ME?'user':n==='KIMORIN⭐︎'?'kimorin':n==='MONBAN'?'monban':n==='たこ焼きブラザー'?'brother':n==='たこ焼きシスター'?'sister':n==='MIKIE⭐︎DRILL'?'mikie':'user';
 const BALL=k=>A['ball-'+(k==='mine'?'mine':k==='oshi'?'oshi':'dachi')]||A['puni-gray'];
 const KOROS=[

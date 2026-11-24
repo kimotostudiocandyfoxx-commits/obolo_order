@@ -33,7 +33,8 @@ for k in 'user kimorin monban mikie brother sister'.split():
 for k in 'mine dachi oshi'.split():
     f=f'{O}/ball-{k}.jpg'
     if os.path.exists(f): kk=key(Image.open(f)); kk.thumbnail((160,160)); A['ball-'+k]=uri(kk,88)
-if os.path.exists(H+'/saturn-record-mask.png'): mk=Image.open(H+'/saturn-record-mask.png').convert('L'); mk.thumbnail((720,1280)); ma=Image.new('RGBA',mk.size,(255,255,255,0)); ma.putalpha(mk); b2=io.BytesIO(); ma.save(b2,'PNG',optimize=True); A['rec-mask']='data:image/png;base64,'+base64.b64encode(b2.getvalue()).decode()
+_RM=H+('/saturn-record-mask2.png' if os.environ.get('SATURN_BG','home2-bg-saturn-cutea2').endswith('cutea2') else '/saturn-record-mask.png')
+if os.path.exists(_RM): mk=Image.open(_RM).convert('L'); mk.thumbnail((720,1280)); ma=Image.new('RGBA',mk.size,(255,255,255,0)); ma.putalpha(mk); b2=io.BytesIO(); ma.save(b2,'PNG',optimize=True); A['rec-mask']='data:image/png;base64,'+base64.b64encode(b2.getvalue()).decode()
 # 8 korolin colours: tint the pearl ball (soft colour, highlights kept) and bake a soft shadow under it
 _pearl=f'{O}/ball-dachi.jpg'
 if os.path.exists(_pearl):
@@ -56,12 +57,13 @@ for n,pre in [(n,pre) for pre in ('kor2','kor3') for n in range(1,17)]:
     ys,xs=np.where(m); x0,x1=np.percentile(xs,[.5,99.5]); y0,y1=np.percentile(ys,[.5,99.5]); cx,cy=(x0+x1)/2,(y0+y1)/2; r=min(x1-x0,y1-y0)/2-2
     S=4; mk=Image.new('L',(im.width*S,im.height*S),0); _D2.Draw(mk).ellipse(((cx-r)*S,(cy-r)*S,(cx+r)*S,(cy+r)*S),fill=255); mk=mk.resize(im.size,Image.LANCZOS)
     o=im.convert('RGBA'); o.putalpha(mk); o=o.crop((int(cx-r-2),int(cy-r-2),int(cx+r+2),int(cy+r+2))); o.thumbnail((200,200),Image.LANCZOS); A[f'{pre}-{n:02d}']=uri(o,88)
-SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea')
+SAT=os.environ.get('SATURN_BG','home2-bg-saturn-cutea2')
+RECMASK=H+('/saturn-record-mask2.png' if SAT.endswith('cutea2') else '/saturn-record-mask.png')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
-if SAT=='home2-bg-saturn-cutea' and os.path.exists(H+'/saturn-record-mask.png'):
+if SAT.startswith('home2-bg-saturn-cutea') and os.path.exists(RECMASK):
     import numpy as np
     from PIL import ImageFilter
-    src=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); mk=np.array(Image.open(H+'/saturn-record-mask.png').convert('L').resize(src.size))>128
+    src=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); mk=np.array(Image.open(RECMASK).convert('L').resize(src.size))>128
     Hh,Ww=mk.shape; yy,xx=np.mgrid[0:Hh,0:Ww]; cx,cy,rx,ry=.481*Ww,.702*Hh,.574*Ww,.1885*Hh
     inside=((xx-cx)/rx)**2+((yy-cy)/ry)**2<1
     fg=(~mk)&(yy>cy)&((~inside)|(yy>cy+.6*ry))
