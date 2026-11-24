@@ -28,6 +28,21 @@ export const BUDDY_OVERAGE_MANA = 1;
 /** Spec §3.4 — monthly grant included in the ¥88 subscription. */
 export const MONTHLY_GRANT_MANA = 88;
 /**
+ * The mana gems a member can buy when the mana runs short (P-BILL-1, client 2026-11-24). Exactly three prices (JPY, tax
+ * included). PLACEHOLDER: the mana each one adds is not decided yet — the client changes the `mana` numbers here, and
+ * only here (the API's checkout, the sheet in the app and /tokushoho all read this table). Default 1 yen = 1 mana, the
+ * same ratio as the monthly grant (MONTHLY_GRANT_MANA for ORDER_PRICE_JPY).
+ */
+export const MANA_GEMS = [
+  { id: 'gem88', priceJpy: 88, mana: 88 },
+  { id: 'gem888', priceJpy: 888, mana: 888 },
+  { id: 'gem8888', priceJpy: 8888, mana: 8888 },
+] as const;
+export type ManaGem = (typeof MANA_GEMS)[number];
+export type ManaGemId = ManaGem['id'];
+/** the gem with this id, or undefined */
+export const findManaGem = (id: string): ManaGem | undefined => MANA_GEMS.find((g) => g.id === id);
+/**
  * The first mana gem, the inviter's gift (story M-R124/M-R132): enough to make everything on the first journey
  * once and redo each once (look 3+3, kororin design 3+3, jacket art 3+3, song 2+2, MV 8+8 = 38) and a little more.
  * PLACEHOLDER (P-WALLET-2): the operator decides the number.

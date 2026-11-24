@@ -92,6 +92,20 @@ export interface Me {
 export type OrderCheckout = { mode: 'stripe'; publishableKey: string; clientSecret: string; sessionId: string } | { mode: 'demo' };
 /** P-BILL-4: POST /billing/portal — the Stripe Customer Portal (change the card, cancel); demo mode has none. */
 export type BillingPortal = { mode: 'stripe'; url: string } | { mode: 'demo'; url: null };
+/**
+ * P-BILL-1: POST /billing/gems/:id/checkout — a mana gem (MANA_GEMS), a one-time payment in the same Embedded Checkout
+ * as the Eclipse. `stripe`: mount it, then POST /billing/gems/confirm. `demo` (no Stripe key): the mana was added at
+ * once, without a charge (`credit`).
+ */
+export type GemCheckout =
+  | { mode: 'stripe'; gemId: string; publishableKey: string; clientSecret: string; sessionId: string }
+  | { mode: 'demo'; gemId: string; credit: GemCredit; note: string };
+/** the mana a gem added (once per Checkout Session) and the balance after it */
+export interface GemCredit {
+  gemId: string;
+  manaAdded: number;
+  manaBalance: number;
+}
 
 export interface BatiView {
   /** favourite food the egg was made from */
