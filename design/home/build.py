@@ -96,6 +96,8 @@ def unwhite(im):
 for k in 'user kimorin monban mikie brother sister'.split():
     f=f'{O}/kor4-{k}.jpg'
     if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((220,220),Image.LANCZOS); A['kor4-'+k]=uri(o,88)
+    f=f'{O}/ship4-{k}.jpg'
+    if os.path.exists(f): o=unwhite(Image.open(f)); o.thumbnail((260,260),Image.LANCZOS); A['ship4-'+k]=uri(o,88)
 VD=os.environ.get('VOICE_DIR')
 if VD:
     for n in range(1,6):
