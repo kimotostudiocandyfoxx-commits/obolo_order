@@ -64,6 +64,15 @@ export function dachiLine(id: string | null | undefined): DachiLine | undefined 
   return id === MIKIE_WELCOME.id ? MIKIE_WELCOME : KIMORIN_WAIT_LINES.find((l) => l.id === id);
 }
 
+/**
+ * Client 2026-11-24 (R9): KIMORIN⭐︎ answers in the ダチ talk (the server, as KIMORIN, through the chat provider) and
+ * speaks it in the story's KIMORIN voice: the Fish voice model the story lines are made with (design/story-voices.json
+ * chosen.KIMORIN: cloned from the recording, −1 semitone, tempo 0.85). Text alone when no voice can be made.
+ */
+export const KIMORIN_VOICE = { fish: '84b27f575dba40e4bc7cabe20ac11b0f', semitones: -1, speed: 0.85 } as const;
+/** PLACEHOLDER: how many answers KIMORIN⭐︎ gives one person a day (like {bati}'s read-aloud limit) */
+export const KIMORIN_REPLIES_PER_DAY = 60;
+
 /** at most this many KIMORIN⭐︎ lines per wait */
 export const KIMORIN_PER_WAIT = 2;
 const HOUR = 3600_000;
@@ -161,6 +170,8 @@ export interface DachiMessageView {
   /** M-R239: heard already (yours always are): opening the thread plays the last heard one and every unheard one */
   read?: boolean;
   createdAt: string;
+  /** R9: KIMORIN⭐︎'s answer to the message just sent (POST to the KIMORIN thread only) */
+  reply?: DachiMessageView | null;
 }
 
 /** M-R234: the sender's expression with the message */

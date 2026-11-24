@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, Inject, NotFoundException, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody } from '@obolo/shared';
+import { Body, Controller, Delete, Get, HttpCode, Inject, NotFoundException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
+import { DACHI_SEND_PER_DAY, DACHI_SEND_PER_HOUR, KIMORIN_REPLIES_PER_DAY, DELIVERY_KINDS, DeliverBody, isCharacterThread, SendDachiMessageBody } from '@obolo/shared';
 import { AuthGuard, UserId } from '../auth/auth.guard';
 import { rateLimit } from '../common/rate-limit';
 import { parseBody } from '../common/validate';
@@ -56,12 +57,14 @@ export class DachiController {
 
   /** a voice message (from POST /media/voice, ≤ 60 s) or a Bluena work card — only to a dachi */
   @Post('threads/:id/messages')
-  async send(@UserId() userId: string, @Param('id') id: string, @Body() body: unknown) {
+  async send(@UserId() userId: string, @Param('id') id: string, @Body() body: unknown, @Req() req: Request) {
     const thread = checkThread(id);
     const b = parseBody(SendDachiMessageBody, body);
     await rateLimit(this.kv, `dachi-voice:${userId}`, DACHI_SEND_PER_HOUR, 3600);
     await rateLimit(this.kv, `dachi-voice-day:${userId}`, DACHI_SEND_PER_DAY, 86400);
-    return this.voice.send(userId, thread, b);
+    // R9: KIMORIN⭐︎ answers, up to KIMORIN_REPLIES_PER_DAY a day (past it the message stands, unanswered)
+    const reply = thread === 'kimorin' && (await this.kv.incr(`kimorin-day:${userId}:${Math.floor(Date.now() / 86_400_000)}`, 86_400)) <= KIMORIN_REPLIES_PER_DAY;
+    return this.voice.send(userId, thread, b, { reply, origin: `${req.protocol}://${req.get('host')}` });
   }
 
   @Post('threads/:id/read')

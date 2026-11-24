@@ -8,7 +8,7 @@ const code = (e: unknown) => ((e as { getResponse?: () => { error?: { code?: str
 type Row = Record<string, unknown> & { id: string; createdAt: Date; senderId: string | null; recipientId: string | null };
 
 /** a service with its database lookups replaced by a little world in memory */
-function world() {
+function world(o: { llm?: unknown } = {}) {
   const follows = new Set<string>();
   const blocks = new Set<string>();
   const people: Record<string, { journeyDay: number; journeyCompletedAt: Date | null; dachiAt: Date | null; displayName: string }> = {};
@@ -18,7 +18,7 @@ function world() {
   const media = { getOwned: async (userId: string, id: string) => (id.startsWith(userId.slice(0, 1)) ? { id, url: `https://cdn/${id}.webm` } : null) };
   const notes: { to: string; title: string; body: string; url: string }[] = [];
   const push = { notify: async (to: string, n: { title: string; body: string; url: string }) => void (pushes.push(to), notes.push({ to, ...n })) };
-  const s = new DachiVoiceService({} as never, { list: async () => [] } as never, media as never, push as never);
+  const s = new DachiVoiceService({} as never, { list: async () => [] } as never, media as never, push as never, o.llm as never);
   const x = s as unknown as Record<string, unknown>;
   x.journey = async (id: string) => people[id] ?? null;
   x.areDachi = async (a: string, b: string) =>
@@ -241,5 +241,54 @@ describe('client 2026-11-24: text messages in the ダチ talk', () => {
     expect(SendBody.safeParse({ text: '  ' }).success).toBe(false);
     expect(SendBody.safeParse({ text: 'x'.repeat(DACHI_TEXT_MAX + 1) }).success).toBe(false);
     expect(SendBody.safeParse({ text: ' やあ ' }).data).toEqual({ text: 'やあ' });
+  });
+});
+
+describe('R9: KIMORIN⭐︎ answers in the ダチ talk (the chat provider mocked)', () => {
+  const llm = (answer: string) => {
+    const calls: { system: string; history: { role: string; text: string }[] }[] = [];
+    return { calls, provider: { name: 'fake', chat: async (r: { system: string; history: { role: string; text: string }[] }) => (r.system.includes('content moderator') ? 'OK' : (calls.push(r), answer)), transcribe: async () => 'きょうは、なにをしてたの？' } };
+  };
+  it('a text: KIMORIN answers in character, voiced with the story\'s KIMORIN voice, kept as a message from KIMORIN', async () => {
+    const l = llm('……こんにちは。私は、新しい発明の途中です🔧。あなたは、どうですか？');
+    const w = world({ llm: l.provider });
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: null, displayName: 'ネオ' };
+    const x = w.s as unknown as Record<string, unknown>;
+    const voiced: string[] = [];
+    x.kimorinVoice = async (_u: string, text: string) => (voiced.push(text), 'https://cdn/kimorin.mp3');
+    const m = await w.s.send(A, 'kimorin', { text: 'KIMORIN、元気？' }, { reply: true, origin: 'http://api' });
+    expect(m).toMatchObject({ fromMe: true, kind: 'text', text: 'KIMORIN、元気？' });
+    // the persona: polite, in character, the safety rules; the member's words last
+    expect(l.calls[0].system).toContain('KIMORIN');
+    expect(l.calls[0].system).toContain('です・ます');
+    expect(l.calls[0].system).toContain('お医者さん');
+    expect(l.calls[0].system).toContain('話を向けない');
+    expect(l.calls[0].history.at(-1)).toEqual({ role: 'user', text: 'KIMORIN、元気？' });
+    // emoji gone, three sentences at most
+    expect(m.reply).toMatchObject({ fromMe: false, character: 'kimorin', kind: 'voice', audioUrl: 'https://cdn/kimorin.mp3', text: '……こんにちは。私は、新しい発明の途中です。あなたは、どうですか？' });
+    expect(voiced).toEqual([m.reply!.text]);
+    expect(w.rows.at(-1)).toMatchObject({ senderId: null, recipientId: A, character: 'kimorin' });
+    // it is in the KIMORIN thread as unread for the member
+    expect(w.s.toView(A, w.rows.at(-1) as never).read).toBe(false);
+  });
+  it('no voice possible: the words alone; a voice message is transcribed first', async () => {
+    const l = llm('それは、私にもわかりません。');
+    const w = world({ llm: l.provider });
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: null, displayName: 'ネオ' };
+    const x = w.s as unknown as Record<string, unknown>;
+    x.kimorinVoice = async () => null;
+    x.transcribeVoice = async () => 'きょうは、なにをしてたの？';
+    const m = await w.s.send(A, 'kimorin', voice(A), { reply: true });
+    expect(l.calls[0].history.at(-1)).toEqual({ role: 'user', text: 'きょうは、なにをしてたの？' });
+    expect(m.reply).toMatchObject({ kind: 'text', audioUrl: null, text: 'それは、私にもわかりません。' });
+  });
+  it('past the day\'s limit (reply: false), or a real ダチ thread: no answer', async () => {
+    const l = llm('はい。');
+    const w = world({ llm: l.provider });
+    w.people[A] = { journeyDay: 3, journeyCompletedAt: null, dachiAt: null, displayName: 'ネオ' };
+    expect((await w.s.send(A, 'kimorin', { text: 'やあ' }, { reply: false })).reply).toBeUndefined();
+    w.dachi(A, B);
+    expect((await w.s.send(A, B, { text: 'やあ' }, { reply: true })).reply).toBeUndefined();
+    expect(l.calls).toHaveLength(0);
   });
 });

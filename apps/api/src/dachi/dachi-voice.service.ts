@@ -1,11 +1,16 @@
 import { HttpStatus, Inject, Injectable, Logger, Optional } from '@nestjs/common';
-import { moderateText, type LlmProvider } from '@obolo/ai';
+import { kimorinReply, moderateText, type ChatTurn, type LlmProvider } from '@obolo/ai';
+import { CONFIG, type AppConfig } from '../config';
+import { textToSpeech } from '../voice/fish.client';
+import { toMp3 } from '../voice/audio';
 import {
   DACHI_CHARACTER_NAMES,
   dachiLine,
   isCharacterThread,
   kimorinDue,
   MIKIE_WELCOME,
+  KIMORIN_VOICE,
+  speakText,
   type DachiCharacter,
   type DachiMessageView,
   type DachiThreadView,
@@ -64,6 +69,8 @@ export class DachiVoiceService {
     private readonly push: PushService,
     /** the text messages' check (client 2026-11-24): the same moderation as Saturn's words */
     @Optional() @Inject(LLM) private readonly llm?: LlmProvider,
+    /** R9: the Fish key for KIMORIN⭐︎'s voice */
+    @Optional() @Inject(CONFIG) private readonly cfg?: Pick<AppConfig, 'FISH_API_KEY' | 'FISH_MODEL'>,
   ) {}
 
   // ── small lookups (stubbed in tests) ──
@@ -230,7 +237,7 @@ export class DachiVoiceService {
     return (await this.rows(this.where(userId, thread))).map((r) => this.toView(userId, r));
   }
 
-  async send(userId: string, thread: string, body: SendDachiMessageBody): Promise<DachiMessageView> {
+  async send(userId: string, thread: string, body: SendDachiMessageBody, opts: { origin?: string; reply?: boolean } = {}): Promise<DachiMessageView> {
     await this.mustReach(userId, thread);
     const character = isCharacterThread(thread) ? (thread as DachiCharacter) : null;
     const base: NewRow = { senderId: userId, recipientId: character ? null : thread, character };
@@ -256,7 +263,60 @@ export class DachiVoiceService {
         .notify(thread, { ...n, url: `/moon/atelier?tab=dachi&dachi=${userId}`, tag: `dachi-${userId}` })
         .catch((e: unknown) => this.log.warn(`push failed: ${String(e)}`));
     }
-    return this.toView(userId, m);
+    const view = this.toView(userId, m);
+    // R9: KIMORIN⭐︎ answers (within the day's limit, decided by the caller); the message stands even when it cannot
+    if (character === 'kimorin' && opts.reply) {
+      const reply = await this.kimorinAnswer(userId, body, m, opts.origin ?? '').catch((e: unknown) => (this.log.warn(`kimorin reply: ${String(e)}`), null));
+      return { ...view, reply };
+    }
+    return view;
+  }
+
+  // ── R9: KIMORIN⭐︎ answers ──
+
+  /** the words of a voice message (the same transcription as the mic's words elsewhere) */
+  protected async transcribeVoice(userId: string, url: string): Promise<string> {
+    if (!this.llm?.transcribe) return '';
+    const raw = await this.media.audioByUrl(userId, url);
+    if (!raw) return '';
+    return (await this.llm.transcribe(await toMp3(raw), 'audio/mp3')).replace(/\s+/g, ' ').trim().slice(0, 600);
+  }
+
+  /** KIMORIN⭐︎'s voice for the words (the story's Fish model, −1 semitone, a little slower); null = text alone */
+  protected async kimorinVoice(userId: string, text: string, origin: string): Promise<string | null> {
+    const key = this.cfg?.FISH_API_KEY;
+    if (!key) return null;
+    const raw = await Promise.race([
+      textToSpeech(key, this.cfg?.FISH_MODEL ?? 's2.1-pro', { text: speakText(text), referenceId: KIMORIN_VOICE.fish, prosody: { speed: KIMORIN_VOICE.speed, volume: 0 } }),
+      new Promise<never>((_, no) => setTimeout(() => no(new Error('slow')), 20_000)),
+    ]);
+    const mp3 = KIMORIN_VOICE.semitones ? await toMp3(raw, KIMORIN_VOICE.semitones) : raw;
+    return (await this.media.storeAudio(userId, 'audio/mpeg', mp3, origin)).url;
+  }
+
+  /** the turns of the KIMORIN thread so far, for the answer (the member's words, KIMORIN's words) */
+  private turnOf(r: Row): ChatTurn | null {
+    const text = (r.senderId ? null : dachiLine(r.lineId)?.text) ?? textOf(r.workJson);
+    if (r.senderId) return { role: 'user', text: text ?? (r.kind === 'voice' ? '（声のメッセージ）' : r.kind === 'work' ? `（作品「${cardOf(r.workJson)?.title || '作品'}」）` : '') };
+    return text ? { role: 'assistant', text } : null;
+  }
+
+  private async kimorinAnswer(userId: string, body: SendDachiMessageBody, sent: Row, origin: string): Promise<DachiMessageView | null> {
+    if (!this.llm) return null;
+    let words = '';
+    if ('text' in body) words = body.text;
+    else if ('mediaId' in body) {
+      words = sent.audioUrl ? await this.transcribeVoice(userId, sent.audioUrl).catch(() => '') : '';
+      if (words && (await moderateText(words, this.llm)).flagged) return null;
+    } else words = `（作品「${body.work.title || '作品'}」を送りました）`;
+    if (!words) return null;
+    const past = (await this.rows(this.where(userId, 'kimorin'), 12)).filter((r) => r.id !== sent.id).map((r) => this.turnOf(r)).filter((t): t is ChatTurn => !!t?.text);
+    const name = (await this.journey(userId))?.displayName ?? '';
+    const text = await kimorinReply(this.llm, { userName: name, history: [...past, { role: 'user', text: words }] });
+    if (!text) return null;
+    const url = await this.kimorinVoice(userId, text, origin).catch((e: unknown) => (this.log.warn(`kimorin voice: ${String(e)}`), null));
+    const row = await this.insertMessage({ senderId: null, recipientId: userId, character: 'kimorin', kind: url ? 'voice' : 'text', audioUrl: url, workJson: { text } });
+    return this.toView(userId, row);
   }
 
   async markRead(userId: string, thread: string) {
@@ -277,11 +337,11 @@ export class DachiVoiceService {
       // a character's voice comes from the line data (filled in when the voice is made), so no migration is needed then
       audioUrl: line ? line.voice : (r.audioUrl ?? null),
       seconds: r.seconds ?? null,
-      text: line?.text ?? (r.kind === 'text' ? textOf(r.workJson) : null),
+      text: line?.text ?? textOf(r.workJson),
       work: r.kind === 'work' ? cardOf(r.workJson) : null,
       face: faceOf(r.workJson),
       // M-R238: a line with words gets its sentences' faces by the rules (no call: the characters' lines are fixed)
-      ...(line?.text ? { faces: ruleBeats(line.text) } : r.kind === 'text' && textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),
+      ...(line?.text ? { faces: ruleBeats(line.text) } : textOf(r.workJson) ? { faces: ruleBeats(textOf(r.workJson)!) } : {}),
       read: r.recipientId !== userId || !!r.readAt,
       createdAt: r.createdAt.toISOString(),
     };

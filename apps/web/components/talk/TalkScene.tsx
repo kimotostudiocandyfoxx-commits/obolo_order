@@ -771,8 +771,10 @@ export function TalkScene({
   const ots = framing === 'ots' && n === 2 && !!self && !firstPerson && !!self.views?.back;
   if (ots) {
     const other = row.find((p) => !p.self)!;
-    spots.set(other.id, { x: 0.4, bottom: stageH * 0.2, h: stageH * 0.74, z: 1, w: 0.4, chest: false });
-    spots.set(self!.id, { x: 0.8, bottom: -stageH * 0.55, h: stageH * 1.5, z: 3, w: 0.62, chest: false });
+    // R9 (client): the partner is the subject — large and sharp, a little left of centre; your back is a soft presence
+    // in the lower right, bigger, blurred (depth of field) and spilling off the right edge
+    spots.set(other.id, { x: 0.44, bottom: stageH * 0.06, h: stageH * 0.9, z: 1, w: 0.5, chest: false });
+    spots.set(self!.id, { x: 0.9, bottom: -stageH * 1.15, h: stageH * 2.05, z: 3, w: 0.8, chest: false });
   }
   // a wide picture at an end of the row (a painted resident with something held out to one side) is kept inside the
   // screen: its whole width, from its picture's own proportions
@@ -797,7 +799,7 @@ export function TalkScene({
     return 1 - (s.bottom + s.h * (1 - at)) / stageH;
   };
   const headAt = Math.min(...row.map(headOf), 0.9);
-  const heads = ots ? stageTop + stageH * 0.08 : chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 && !backRow.length ? 0.5 : 1);
+  const heads = ots ? stageTop + stageH * 0.1 : chest ? stageTop - 6 : stageTop + stageH * (row.length ? headAt : 0.16) * (rows.length > 1 && !backRow.length ? 0.5 : 1);
   // the bubbles stack from just above the heads; each at most half the free room tall (a long one scrolls inside)
   const room = Math.max(120, heads - (barH + top + 56) - 48);
   const bubbleBottom = h - heads + 8;
@@ -1202,7 +1204,7 @@ export function TalkScene({
           const enter = entering[p.id];
           const motion = { animation: g ? `talk-exit .6s ease-in forwards` : enter && !reduced ? `talk-enter .7s cubic-bezier(.2,.8,.25,1) both` : arriving && p.self ? 'talk-arrive 1.1s ease-out both' : undefined, ['--ex' as string]: `${(g ? g.side : enter) === 'l' ? -w * 0.6 : w * 0.6}px` };
           return (
-            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...motion }}>
+            <div key={p.id} className={`absolute flex -translate-x-1/2 items-end justify-center transition-[bottom,left,height,filter] ${arriving || (wasFirst.current && !firstPerson) ? 'duration-[900ms] ease-out' : 'duration-300'}`} style={{ left: `${s.x * 100}%`, bottom: s.bottom, width: `${s.w * 100}%`, height: s.h, zIndex: speaking ? 5 : s.z, filter: [s.dim ? 'brightness(.68) saturate(.85)' : '', ag?.blur ? `blur(${ag.blur}px)` : ots && p.self ? 'blur(3.5px) brightness(.9)' : ''].join(' ').trim() || undefined, opacity: ag?.hide ? 0 : undefined, transitionDuration: angle || lastAngled.current ? (shotChanged ? '0ms' : undefined) : undefined, ...motion }}>
               {arriving && p.self && <ArrivalMotes />}
               <div className="flex h-full items-end justify-center" style={mv?.mirror || ag?.mirror || ag?.turn ? { transform: `${mv?.mirror !== !!ag?.mirror && (mv?.mirror || ag?.mirror) ? 'scaleX(-1) ' : ''}${ag?.turn ? `perspective(700px) rotateY(${ag.turn}deg)` : ''}`.trim() } : undefined}>
               <Figure

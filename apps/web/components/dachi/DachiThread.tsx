@@ -104,8 +104,10 @@ export function DachiThread({ id, thread: given, onList, onBluena, onSent, onRea
   }, [load]);
 
   const sent = (m: DachiMessageView) => {
-    setMsgs((l) => [...(l ?? []), m]);
-    onSent?.(m);
+    // R9: KIMORIN⭐︎'s answer comes back with the message (said in the talk like any line)
+    const { reply, ...mine } = m;
+    setMsgs((l) => [...(l ?? []), mine, ...(reply ? [reply] : [])]);
+    onSent?.(mine);
   };
 
   const sendVoice = async (blob: Blob, seconds: number) => {

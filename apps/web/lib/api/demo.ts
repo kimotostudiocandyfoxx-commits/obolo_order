@@ -1494,8 +1494,15 @@ export class DemoApi implements Api {
           ? { id: uid(), fromMe: true, character: null, kind: 'text', audioUrl: null, seconds: null, text: body.text, work: null, face: body.face ?? null, createdAt: now() }
           : { id: uid(), fromMe: true, character: null, kind: 'work', audioUrl: null, seconds: null, text: null, work: body.work, face: body.face ?? null, createdAt: now() };
     (this.s.dachiMsgs ??= []).push({ ...m, thread });
+    // R9 in the demo: KIMORIN⭐︎ answers with a set line (the server answers through the chat provider)
+    let reply: DachiMessageView | null = null;
+    if (thread === 'kimorin') {
+      await sleep(600);
+      reply = { id: uid(), fromMe: false, character: 'kimorin', kind: 'text', audioUrl: null, seconds: null, text: '……こんにちは。私は、新しい発明の途中です。あなたは、どうですか？', work: null, createdAt: now(), read: true };
+      this.s.dachiMsgs.push({ ...reply, thread });
+    }
     this.save();
-    return m;
+    return reply ? { ...m, reply } : m;
   }
   async readDachiThread(thread: string) {
     for (const m of this.s.dachiMsgs ?? []) if (m.thread === thread) m.read = true;
