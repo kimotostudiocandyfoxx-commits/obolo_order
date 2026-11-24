@@ -76,7 +76,7 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 .puni:nth-child(3n) .face .eyes{animation-delay:-1.7s}.puni:nth-child(3n+1) .face .eyes{animation-delay:-3.1s}
 @keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
 .puni.held .face .eyes{animation:none;transform:scaleY(.25)}
-.puni .ptag{transform:translate(-50%,0);left:0;bottom:auto;top:calc(var(--r) + 1px);width:max-content;display:block;background:none;border:0;padding:0;font:800 9px var(--f-body);color:#fff;text-shadow:0 0 3px rgba(20,10,30,.9),0 1px 2px rgba(20,10,30,.9);border-bottom:2px solid var(--c);line-height:1.3}
+.puni .ptag{position:absolute;pointer-events:none;transform:translate(-50%,0);left:50%;bottom:auto;top:calc(var(--r) + 1px);width:max-content;display:block;background:none;border:0;padding:0;font:800 9px var(--f-body);color:#fff;text-shadow:0 0 3px rgba(20,10,30,.9),0 1px 2px rgba(20,10,30,.9);line-height:1.3}
 @media (prefers-reduced-motion:reduce){.face .eyes{animation:none}}
 .puni .fwrap{position:absolute;inset:0}
 .face .ln{fill:none;stroke:#2a1a22;stroke-width:3;stroke-linecap:round}
@@ -116,7 +116,6 @@ body{background:var(--page);color:var(--ink);font-family:var(--f-body);padding-l
 @media (prefers-reduced-motion:reduce){.party .lasers i,.party .orb,.party .neon{animation:none}}
 .puni{position:absolute;left:0;top:0;z-index:6;cursor:grab;touch-action:none;will-change:transform}
 .puni img{width:100%;height:100%;object-fit:contain;pointer-events:none;border-radius:50%}
-.puni .ptag{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);white-space:nowrap;font:700 9px var(--f-body);padding:1px 6px;border-radius:999px;background:rgba(20,10,30,.55);border:1px solid var(--c);color:var(--ink)}
 .puni.talk{z-index:7}
 .puni.gone{transition:left .6s ease-in,top .6s ease-in,opacity .6s;opacity:0}
 .puni.gone{transform:translate(-50%,-50%) scale(.15)!important}
@@ -328,7 +327,7 @@ function korPicker(done){
 function setupRoll(){
   const ph=$('phone'),W=ph.clientWidth,H=ph.clientHeight,F=H*.86,L=W*.04,Rw=W*.96;
   const base=[{n:ME,k:'mine'},...PEOPLE.filter(p=>p.k==='dachi'||oshi.has(p.n)),{n:'MONBAN',k:'dachi'},{n:'たこ焼きブラザー',k:'oshi'},{n:'ユウキ',k:'dachi'},{n:'nana',k:'oshi'},{n:'KIMORIN⭐︎',k:'dachi'},{n:'れい',k:'oshi'}];
-  const total=window.KTOTAL||24,all=[];for(let i=0;i<total;i++)all.push(base[i%base.length]);
+  const total=window.KTOTAL||24,rest=base.slice(1),all=[base[0]];for(let i=1;i<total;i++)all.push(rest[(i-1)%rest.length]);
   QUEUE=all.slice(MAXB);rolls=[];all.slice(0,MAXB).forEach((o,i)=>rolls.push(makeBall(o,i,i)));
   startSim();
 }
@@ -336,7 +335,7 @@ function makeBall(o,i,slot){{const ph=$('phone'),W=ph.clientWidth,H=ph.clientHei
     e.style.width=e.style.height='0px';e.style.setProperty('--r',R+'px');e.firstElementChild;e.style.setProperty('--c',o.k==='mine'?'var(--mine)':o.k==='oshi'?'var(--oshi)':'var(--dachi)');
     const kp=o.n===ME?(window.MYKORO??0):(i*3+o.n.length)%8,K=KOROS[kp];
     const fx=((i*37)%17-8)*1.1,fy=((i*53)%13-6)*1.1,fr=((i*29)%15-7)*1.4;
-    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f)}</div></div><span class="ptag">${o.n}</span>`;$('sky').appendChild(e);
+    e.innerHTML=`<div class="body"><img alt="" src="${A['ballc-'+K.c]||BALL(o.k)}"><div class="fwrap" style="transform:translate(${fx}%,${fy}%) rotate(${fr}deg) scale(${1-Math.abs(fx)/80},${1-Math.abs(fy)/70})">${faceSVG(K.f)}</div></div>${o.k==='mine'?`<span class="ptag">${o.n}</span>`:''}`;$('sky').appendChild(e);
     const r={o,e,R,x:L+R+((i*61)%100)/100*(Rw-L-2*R),y:slot>=0?-R-slot*70:-R-40,vx:(((i*13)%7)-3)*30,vy:0,ws:0,wv:0,a:0,i,drag:false,talk:false,gone:false};
     let down=null;
     e.addEventListener('pointerdown',ev=>{e.setPointerCapture(ev.pointerId);down={x:ev.clientX,y:ev.clientY,lx:ev.clientX,ly:ev.clientY,lt:performance.now()};r.drag=true;r.vx=r.vy=0;r.wv-=3.2;e.classList.add('held')});
