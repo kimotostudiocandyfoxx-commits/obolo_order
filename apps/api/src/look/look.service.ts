@@ -78,6 +78,17 @@ const CHIBI_PROMPT = (key: KeyName) =>
   'around it, on ' +
   keyedBackground(KEY_WORDS[key]) +
   '. Safe for children. No text, no letters.';
+// M-R262: the member's mini figure jumping out of a popped ball on Saturn — the same request as the story cast's chibi-*
+// (design/mv-art-queue.json on the story branch), on the key colour farthest from the look's own colours
+const KORORIN_CHIBI_PROMPT = (key: KeyName) =>
+  "A super-deformed 2-heads-tall chibi version of the character in the reference picture: a huge round head and a tiny body, keeping the character's " +
+  'face, hairstyle, outfit, colours and signature items exactly recognisable, drawn as a glossy cute 3D vinyl mini figure with soft studio lighting ' +
+  'and a sparkly highlight, matching cute pastel kawaii style. Jumping out joyfully with both arms up, a big happy smile, waving one hand. Centered, ' +
+  'the whole character inside the frame with a margin, on ' +
+  keyedBackground(KEY_WORDS[key]) +
+  ', no shadow, no ground. Safe for children. No text, no letters.';
+/** M-R262: one mini figure per member, at most this many paintings in all (one + one retry) */
+export const CHIBI_TRIES = 2;
 const FACE_WORDS: Record<BatiFace, string> = {
   smile: 'a big happy smile, eyes curved with joy',
   sparkle: 'wide open eyes with big star-shaped highlights, cheeks glowing, excited and curious, leaning forward a little',
@@ -130,6 +141,7 @@ export class LookService {
     this.queue.register('bati.repaint', ({ userId, origin }) => this.repaintBati(userId, origin));
     this.queue.register('bati.faces', ({ userId, origin }) => this.batiFaces(userId, origin).then(() => undefined));
     this.queue.register('talk.look', ({ userId, origin, who }) => this.talkLook(userId, who, origin));
+    this.queue.register('look.chibi', ({ userId, origin }) => this.kororinChibi(userId, origin));
   }
 
   /** mana for a making (M-R132); admins (unlimited) make for free. Returns the refund for a failed making. */
@@ -448,6 +460,8 @@ export class LookService {
     const [nu] = await this.db.write.update(users).set({ avatarUrl: url, onboardingJson: j, updatedAt: new Date() }).where(eq(users.id, userId)).returning();
     // M-R234: the decided look's expressions, blink / mouth parts and コロリン, in the background
     if (origin) await this.enqueueTalk(userId, 'me', url, origin);
+    // M-R262: the Saturn mini figure, once per member (from the first look decided)
+    if (origin && !nu.chibiPicUrl) await this.enqueueChibi(userId, origin);
     return toMe(nu);
   }
 
@@ -940,6 +954,42 @@ export class LookService {
       .returning();
     if (nu.batiImageUrl) await this.enqueueTalk(userId, 'bati', nu.batiImageUrl, origin);
     return toMe(nu);
+  }
+
+  async enqueueChibi(userId: string, origin: string) {
+    await this.queue.enqueue('look.chibi', { userId, origin }, { dedupeKey: `chibi-${userId}` }).catch(() => undefined);
+  }
+
+  /**
+   * M-R262: the member's 2-heads glossy mini figure (users.chibi_pic_url), painted from the decided look by the look
+   * painter and cut from its key colour. A paid call: one per member, at most CHIBI_TRIES paintings in all, counted in
+   * onboardingJson 'chibi.tries' before each one (a job retried by the queue never paints more). No mana (part of the look).
+   */
+  async kororinChibi(userId: string, origin: string): Promise<void> {
+    for (;;) {
+      const u = await this.user(userId);
+      if (!u.avatarUrl || u.chibiPicUrl) return;
+      const j = (u.onboardingJson ?? {}) as Record<string, string>;
+      const tries = Number(j['chibi.tries'] ?? 0);
+      if (tries >= CHIBI_TRIES) return;
+      await this.db.write
+        .update(users)
+        .set({ onboardingJson: { ...j, 'chibi.tries': String(tries + 1) }, updatedAt: new Date() })
+        .where(eq(users.id, userId));
+      try {
+        const src = await this.current(userId, u.avatarUrl);
+        if (!src) return;
+        const key = await chooseKey(src.data);
+        const img = await this.looks.generate(KORORIN_CHIBI_PROMPT(key), 0, [src]);
+        const cut = await this.cut(img, 768, key);
+        if (!cut) throw new Error('chibi cut failed');
+        const m = await this.media.storeImage(userId, 'avatar', 'image/png', cut, origin);
+        await this.db.write.update(users).set({ chibiPicUrl: m.url, updatedAt: new Date() }).where(eq(users.id, userId));
+        return;
+      } catch (e) {
+        this.log.warn(`chibi failed (${tries + 1}/${CHIBI_TRIES}): ${String(e)}`);
+      }
+    }
   }
 
   private async enqueueTalk(userId: string, who: TalkWho, url: string, origin: string) {
