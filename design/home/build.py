@@ -25,6 +25,8 @@ for r in 'venus-longg venus-bossg mercury-freezie mercury-salmon mars-hippo uran
     if os.path.exists(f): k=key(Image.open(f)); k.thumbnail((360,640)); A['res-'+r]=uri(k,86)
 for f in sorted(os.listdir(H+'/kororin')):
     if f.endswith('.webp'): im=Image.open(H+'/kororin/'+f).convert('RGBA'); im.thumbnail((200,200)); A['kor-'+f[:-5]]=uri(im,86)
+for f in sorted(os.listdir(H+'/puni')):
+    if f.endswith('.png'): im=Image.open(H+'/puni/'+f).convert('RGBA'); im.thumbnail((200,200)); A['puni-'+f[:-4]]=uri(im,88)
 SAT=os.environ.get('SATURN_BG','home2-bg-saturn-biga')
 if SAT and os.path.exists(f'{O}/{SAT}.jpg'): im=Image.open(f'{O}/{SAT}.jpg').convert('RGB'); im.thumbnail((720,1280)); A['bg2-saturn']=uri(im,78)
 t=open(H+'/template.html').read().replace('/*ASSETS*/{}',json.dumps(A))
