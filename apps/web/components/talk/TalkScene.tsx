@@ -218,11 +218,18 @@ export function TalkScene({
   log = false,
   framing,
   otsAt = 0.44,
+  otsStand,
   placeAspect,
   placeFx,
 }: {
   /** R9: where the partner stands in the over-the-shoulder framing (0..1 of the width) */
   otsAt?: number;
+  /**
+   * moon-zone plates: the partner stands on the place itself — `v`, where their feet are on the picture (0..1 of its
+   * height), and `h`, their height as a share of the picture's drawn width — so they stay beside what they stand by
+   * (the temple bowl) at any screen size. Needs placeAspect.
+   */
+  otsStand?: { v: number; h: number };
   /** R9: the place picture's width / height (for placeFx's cover mapping) */
   placeAspect?: number;
   /**
@@ -781,12 +788,27 @@ export function TalkScene({
   });
   // client 2026-11-24: face to face over your shoulder — you big in the front (from behind, cut by the screen's bottom),
   // the partner further back, smaller and higher, facing the camera
+  // the place's cover fit (object-cover at center 30%, in its box 4% wider each side and 4% taller at the top)
+  const cover = (() => {
+    if (!placeAspect) return null;
+    const cw = w * 1.08;
+    const ch = h * 1.04;
+    const dh = Math.max(cw / placeAspect, ch);
+    const dw = dh * placeAspect;
+    return { cw, ch, dw, dh, ox: (cw - dw) * 0.5, oy: (ch - dh) * 0.3 };
+  })();
   const ots = framing === 'ots' && n === 2 && !!self && !firstPerson && !!self.views?.back;
   if (ots) {
     const other = row.find((p) => !p.self)!;
     // R9 (client): the partner is the subject — large and sharp, a little left of centre; your back is a soft presence
     // in the lower right, bigger, blurred (depth of field) and spilling off the right edge
-    spots.set(other.id, { x: otsAt, bottom: stageH * 0.06, h: stageH * 0.9, z: 1, w: 0.5, chest: false });
+    const feet = otsStand && cover ? cover.oy - h * 0.04 + otsStand.v * cover.dh : null;
+    spots.set(
+      other.id,
+      feet != null && cover
+        ? { x: otsAt, bottom: Math.max(0, stageTop + stageH - feet), h: Math.min(otsStand!.h * cover.dw, stageH * 1.1), z: 1, w: 0.5, chest: false }
+        : { x: otsAt, bottom: stageH * 0.06, h: stageH * 0.9, z: 1, w: 0.5, chest: false },
+    );
     spots.set(self!.id, { x: 0.9, bottom: -stageH * 1.15, h: stageH * 2.05, z: 3, w: 0.8, chest: false });
   }
   // a wide picture at an end of the row (a painted resident with something held out to one side) is kept inside the
@@ -1082,15 +1104,9 @@ export function TalkScene({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={place} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
-            {placeFx && placeAspect && (() => {
+            {placeFx && cover && (() => {
               // the same cover fit as the picture (object-cover, center 30%) in this box (the root, 4% wider each side and taller at the top)
-              const cw = size.w * 1.08;
-              const ch = size.h * 1.04;
-              const sc = Math.max(cw / placeAspect, ch);
-              const dw = sc * placeAspect;
-              const dh = sc;
-              const ox = (cw - dw) * 0.5;
-              const oy = (ch - dh) * 0.3;
+              const { ox, oy, dw, dh } = cover!;
               return placeFx({ at: (u, v) => ({ x: ox + u * dw, y: oy + v * dh }), scale: dw });
             })()}
           </div>

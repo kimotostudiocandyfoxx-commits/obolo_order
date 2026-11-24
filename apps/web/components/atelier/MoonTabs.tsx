@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { castLook } from '@/lib/talk/demoLooks';
-import { MOON_ZONES } from '@/lib/talk/zones';
+import { MOON_ZONES, MOON_ZONES_EYE } from '@/lib/talk/zones';
 import { dachiZones } from '@obolo/shared';
 import { DachiLinkCard } from '@/components/DachiLinkCard';
 import { GLASS } from '@/components/talk/TalkScene';
@@ -103,7 +103,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
           <img src={MOON_ZONES.hall} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 30%' }} />
           <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.55) 0%,rgba(7,11,36,0) 22%,rgba(7,11,36,0) 62%,rgba(7,11,36,.7) 100%)' }} />
           {hall.length ? (
-            <Strollers threads={hall} onOpen={onOpen} ground={outside.length || lonely ? '15%' : '11%'} />
+            <Strollers threads={hall} onOpen={onOpen} ground={outside.length || lonely ? 0.095 : 0.07} back={0.28} eye={MOON_ZONES_EYE.hall} />
           ) : (
             <div className="absolute inset-x-0 bottom-[14%] z-[5] flex flex-col items-center gap-4 px-8 text-center">
               {/* PLACEHOLDER (P-MOON-TABS-1): the words when there is no ダチ yet */}
@@ -145,7 +145,7 @@ export function DachiTab({ threads, open, onOpen, onBack, banner, renderThread }
             <img src={MOON_ZONES.outside} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" style={{ objectPosition: 'center 60%' }} />
             <div className="pointer-events-none absolute inset-0" style={{ background: 'linear-gradient(to bottom,rgba(7,11,36,.45) 0%,rgba(7,11,36,0) 25%,rgba(7,11,36,0) 70%,rgba(7,11,36,.5) 100%)' }} />
             <p className="absolute inset-x-0 top-[13.5%] z-[6] text-center text-[12px] font-bold tracking-[0.3em] text-[#f4f1ff]/80 [text-shadow:0_1px_6px_#000]">みんな</p>
-            <Strollers threads={outside} onOpen={onOpen} far ground="5%" />
+            <Strollers threads={outside} onOpen={onOpen} far ground={0.04} back={0.25} eye={MOON_ZONES_EYE.outside} />
           </section>
         )}
       </div>
@@ -265,7 +265,18 @@ const standOf = (t: ThreadInfo) => t.stand || (t.id === 'kimorin' ? characterLoo
  * 60 fps on the iPad). Reduced motion: standing, a gentle idle. Their names under their feet; a tap opens the talk; the
  * unread dot by the head. `far`: the plain outside (smaller, more of them).
  */
-function Strollers({ threads, onOpen, far = false, ground = '13%' }: { threads: ThreadInfo[]; onOpen: (id: string) => void; far?: boolean; ground?: string }) {
+/** the strollers' box: the lower 78% of the zone (the tab bar above) */
+const BOX = 0.78;
+
+function Strollers({ threads, onOpen, far = false, ground, back, eye }: {
+  threads: ThreadInfo[];
+  onOpen: (id: string) => void;
+  far?: boolean;
+  /** where the front row stands (the bottom of their names), the farthest row, and the plate's horizon (eye level): fractions of the zone's height from its bottom */
+  ground: number;
+  back: number;
+  eye: number;
+}) {
   const box = useRef<HTMLDivElement>(null);
   const els = useRef<(HTMLButtonElement | null)[]>([]);
   const figs = useRef<(HTMLImageElement | null)[]>([]);
@@ -285,9 +296,13 @@ function Strollers({ threads, onOpen, far = false, ground = '13%' }: { threads: 
   const perRow = (r: number) => threads.filter((_, i) => rowOf(i) === r).length;
   // as tall as the ground allows, but never wider than a figure's own stretch (they must not stand on each other)
   const most = Math.max(1, ...Array.from({ length: rows }, (_, r) => perRow(r)));
-  const H0 = Math.round(Math.min(size.h * (far ? 0.42 : rows > 1 ? 0.42 : 0.5), far ? 220 : 320, ((size.w / most) * 1.25) / 0.62));
-  const scaleOf = (r: number) => 1 - r * (far ? 0.2 : 0.2);
-  const liftOf = (r: number) => r * size.h * (far ? 0.12 : 0.14);
+  // the plates are eye-level (moon-zone-*): a row further back stands higher, toward the horizon, and is smaller by just
+  // as much (its height is in proportion to its feet's distance below the horizon), so they all stand on the floor
+  const zoneH = size.h / BOX;
+  const feetOf = (r: number) => zoneH * (ground + (rows > 1 ? ((back - ground) * r) / (rows - 1) : 0));
+  const scaleOf = (r: number) => (zoneH ? (eye - feetOf(r) / zoneH) / (eye - ground) : 1);
+  const liftOf = (r: number) => feetOf(r) - feetOf(0);
+  const H0 = Math.round(Math.min(zoneH * (eye - ground) * (far ? 0.55 : 0.5), far ? 220 : 320, ((size.w / most) * 1.25) / 0.62));
   const key = threads.map((t) => t.id).join('|');
   useEffect(() => {
     if (!size.w || !H0) return;
@@ -339,7 +354,7 @@ function Strollers({ threads, onOpen, far = false, ground = '13%' }: { threads: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, size.w, size.h, H0, reduced]);
   return (
-    <div ref={box} className="absolute inset-x-0 bottom-0 top-[22%] z-[5]" data-testid={far ? 'dachi-outside' : 'dachi-strollers'}>
+    <div ref={box} className="absolute inset-x-0 bottom-0 z-[5]" style={{ top: `${(1 - BOX) * 100}%` }} data-testid={far ? 'dachi-outside' : 'dachi-strollers'}>
       <style>{'@keyframes dachi-idle{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.012)}}'}</style>
       {threads.map((t, i) => {
         const r = rowOf(i);
@@ -352,7 +367,7 @@ function Strollers({ threads, onOpen, far = false, ground = '13%' }: { threads: 
             onClick={() => onOpen(t.id)}
             aria-label={`${t.name}と話す`}
             className="absolute left-0 flex flex-col items-center will-change-transform"
-            style={{ bottom: `calc(${ground} + ${liftOf(r)}px)`, width: W, zIndex: 10 - r, filter: r ? `brightness(${1 - r * 0.1})` : undefined, transform: `translate3d(${(size.w / Math.max(1, perRow(r))) * (Math.floor(i / rows) + 0.5) - W / 2}px,0,0)` }}
+            style={{ bottom: feetOf(r), width: W, zIndex: 10 - r, filter: r ? `brightness(${1 - r * 0.1})` : undefined, transform: `translate3d(${(size.w / Math.max(1, perRow(r))) * (Math.floor(i / rows) + 0.5) - W / 2}px,0,0)` }}
           >
             <span className="relative block" style={{ width: W, height: H, animation: reduced ? 'dachi-idle 4.5s ease-in-out infinite' : undefined, transformOrigin: '50% 100%' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}

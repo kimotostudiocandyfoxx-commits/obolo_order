@@ -9,9 +9,9 @@ import { KindMark } from './WorkCard';
  * (light rising off the surface, ripples spreading); when it is done the work rises out of the bowl toward the talk.
  * Transform and opacity only (60 fps on the iPad); reduced motion: a gentle fade, nothing moves.
  * The bowl's place on the temple plate (MOON_ZONES.bati, public/talk/moon/temple-bati.webp, 1152 × 2048): the water's
- * centre and its width, measured on the picture.
+ * centre and its width, measured on the picture; `bati`: where {bati} stands on it, beside the bowl (TalkScene otsStand).
  */
-export const TEMPLE_PLATE = { src: MOON_ZONES.bati, aspect: 1152 / 2048, bowl: { u: 0.508, v: 0.6, w: 0.39 } } as const;
+export const TEMPLE_PLATE = { src: MOON_ZONES.bati, aspect: 1152 / 2048, bowl: { u: 0.508, v: 0.598, w: 0.37 }, bati: { v: 0.8, h: 0.62 } } as const;
 
 export type BowlState = 'idle' | 'glow' | { rise: { key: string; image?: string | null; kind: AtelierKind } };
 

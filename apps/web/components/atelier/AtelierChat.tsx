@@ -855,7 +855,9 @@ export function AtelierChat({ first, talk, story, onList, onBluena, unread, onBa
         place={story ? PLACE_BG.moon : TEMPLE_PLATE.src}
         placeAspect={story ? undefined : TEMPLE_PLATE.aspect}
         placeFx={story ? undefined : (m) => <BowlFx state={bowl} at={m.at} scale={m.scale} reduced={reducedMotion} />}
-        otsAt={0.27}
+        otsAt={0.25}
+        // {bati} beside the bowl, a step in front of it (on the temple plate)
+        otsStand={story ? undefined : TEMPLE_PLATE.bati}
         top={story ? 40 : 0}
         bar={{ title: partner.name, onList, onBluena, unread, onBack, below: banner }}
         fixedSelfFace={me?.story?.[TALK_FIXED_FACE_KEY] === '1'}

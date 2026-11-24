@@ -14,3 +14,6 @@ export const MOON_ZONES = {
   outside: '/talk/moon/temple-outside.webp',
   bati: '/talk/moon/temple-bati.webp',
 } as const;
+
+/** each plate's horizon (the camera's eye level), as a fraction of its height from the bottom: the strollers' rows shrink toward it */
+export const MOON_ZONES_EYE = { hall: 0.47, outside: 0.4 } as const;
