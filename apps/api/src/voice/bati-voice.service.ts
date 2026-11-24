@@ -43,7 +43,7 @@ export class BatiVoiceService implements OnModuleInit {
     @Inject(QUEUE) private readonly queue: JobQueue,
     @Inject(VOICE_MODELS) private readonly models: VoiceModels,
     /** FISH_DEFAULT_VOICE_ID: the shared default {bati} voice model (iPad feedback; scripts/make-default-bati-voice.ts) */
-    @Inject(CONFIG) private readonly cfg: Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID'> = {},
+    @Inject(CONFIG) private readonly cfg: Partial<Pick<AppConfig, 'FISH_DEFAULT_VOICE_ID'>> = {},
   ) {}
 
   onModuleInit() {
