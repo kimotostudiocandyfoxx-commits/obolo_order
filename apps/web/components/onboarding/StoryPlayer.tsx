@@ -15,7 +15,7 @@ import { EggStep, HatchStep } from './BatiSteps';
 import { EclipsePay, type OrderApi } from './EclipsePay';
 import { LookMaker, type LookApi } from './LookMaker';
 import { PlanetHome } from '@/components/planetHome/PlanetHome';
-import { neoRecord, takoyakiRecord } from '@/lib/planetHome/storyHomes';
+import { neoRecord, takoyakiRecord, TAKOYAKI_BACKDROP } from '@/lib/planetHome/storyHomes';
 import { DachiVoiceStep } from './DachiVoiceStep';
 import { EggVoiceStep } from './EggVoiceStep';
 import { isDemoMode } from '@/lib/onboarding/demoMode';
@@ -2172,7 +2172,7 @@ function StoryHome({ place, neo, inviter, fly, words, onDone }: { place: 'takoya
   };
   return (
     <div className="absolute inset-0 z-[40]" data-testid={`story-home-${place}`}>
-      <PlanetHome planet="saturn" view={view} bare onAllHeard={place === 'neo' ? go : undefined} />
+      <PlanetHome planet="saturn" view={view} bare backdrop={place === 'takoyaki' ? TAKOYAKI_BACKDROP : undefined} onAllHeard={place === 'neo' ? go : undefined} />
       <button onClick={go} className="pt-safe absolute right-3 top-14 z-[60] rounded-full bg-white/90 px-4 py-1.5 text-sm font-black text-[#2a1630] shadow">
         次へ
       </button>

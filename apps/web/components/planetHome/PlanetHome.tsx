@@ -1,6 +1,6 @@
 'use client';
 
-import { PLANET_HOMES, type HomePlanet, type HomeWork, type PlanetHomeConfig, type PlanetHomeView, type PlanetWorkReportBody } from '@obolo/shared';
+import { RECORD_COLOURS, PLANET_HOMES, type HomePlanet, type HomeWork, type PlanetHomeConfig, type PlanetHomeView, type PlanetWorkReportBody } from '@obolo/shared';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { menuFor, type MenuAct } from '@/lib/planetHome/model';
@@ -29,6 +29,7 @@ export function PlanetHome({
   onBack,
   onAllHeard,
   bare,
+  backdrop,
 }: {
   planet: HomePlanet;
   view?: PlanetHomeView;
@@ -39,8 +40,12 @@ export function PlanetHome({
   onAllHeard?: () => void;
   /** inside the story: no dock (〔▶ 全部流す〕〔＋ 飛ばす〕) and no 〔♡ 推し〕 */
   bare?: boolean;
+  /** another backdrop for this place (the story's takoyaki siblings' record) */
+  backdrop?: string;
 }) {
-  const cfg = PLANET_HOMES[planet];
+  const base = PLANET_HOMES[planet];
+  const cfg = backdrop ? { ...base, art: { ...base.art, backdrop } } : base;
+  const [palette, setPalette] = useState(false);
   const h = usePlanetHome(planet, { view, seeds });
   const router = useRouter();
   const root = useRef<HTMLDivElement>(null);
@@ -124,7 +129,7 @@ export function PlanetHome({
       {h.view && h.stage && (
         <Scene
           cfg={cfg}
-          view={h.view}
+          view={{ ...h.view, recordColour: h.recordColour }}
           stage={h.stage}
           playingId={h.playingId}
           spinning={h.spinning}
@@ -168,6 +173,12 @@ export function PlanetHome({
                 <button type="button" className={`${s.pill} ${s.help}`} onClick={() => setSay((v) => !v)} aria-label="この星の説明" aria-expanded={say}>
                   ？
                 </button>
+                {/* M-R262: the record's colour */}
+                {cfg.roll && (
+                  <button type="button" className={`${s.pill} ${s.help}`} onClick={() => setPalette((v) => !v)} aria-label="レコードの色" aria-expanded={palette}>
+                    🎨
+                  </button>
+                )}
                 <button type="button" className={s.pill} onClick={() => (setOshiOpen(true), h.loadOshi())}>
                   ♡ 推し
                 </button>
@@ -310,6 +321,27 @@ export function PlanetHome({
             ))}
           </div>
         </Sheet>
+      )}
+
+      {palette && cfg.roll && (
+        <div className={s.swatches} role="radiogroup" aria-label="レコードの色">
+          {RECORD_COLOURS.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              role="radio"
+              aria-checked={(h.recordColour ?? 'black') === c.id}
+              aria-label={c.name}
+              title={c.name}
+              className={`${s.swatch} ${(h.recordColour ?? 'black') === c.id ? s.swatchOn : ''}`}
+              style={{ background: c.color ?? '#141018' }}
+              onClick={() => {
+                h.setRecordColour(c.id);
+                setPalette(false);
+              }}
+            />
+          ))}
+        </div>
       )}
 
       {h.note && (

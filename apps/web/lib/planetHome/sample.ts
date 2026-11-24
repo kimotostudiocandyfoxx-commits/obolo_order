@@ -14,6 +14,7 @@ const PEOPLE: [string, HomeRel][] = [
   ['ミオ', 'oshi'],
   ['ショウ', 'dachi'],
 ];
+const CAST_CHIBI: Record<string, string> = { own: '/planet-home/chibi-user.webp', 'MIKIE⭐︎DRILL': '/planet-home/chibi-mikie.webp', 'KIMORIN⭐︎': '/planet-home/chibi-kimorin.webp' };
 const FAR = ['はるか', 'ショウタ', 'れい', 'ぽんず', 'kei', 'みお'];
 const WORDS = ['明日もがんばるZE', 'うまいラーメン見つけた', 'ねむい…でも楽しい', '新曲できたかも', '空がきれいだった', 'たこ焼き食べたい。', 'きょうは晴れ'];
 
@@ -36,7 +37,8 @@ export function sampleView(
   const work = (id: string, name: string, rel: HomeRel, h: number, i: number): HomeWork => ({
     id: `${planet}-${id}`,
     kind,
-    author: { id: `u-${name}`, name },
+    // the story cast's mini figures stand in where there is one (M-R262); the others show the round face
+    author: { id: `u-${name}`, name, chibi: CAST_CHIBI[rel === 'own' ? 'own' : name] ?? null },
     rel,
     text: planet === 'saturn' ? WORDS[i % WORDS.length] : '',
     title: planet === 'saturn' ? undefined : `${name}の${cfg.work}`,

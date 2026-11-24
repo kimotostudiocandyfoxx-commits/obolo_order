@@ -694,6 +694,9 @@ export class HttpApi implements Api {
   setOshi(userId: string, on: boolean) {
     return this.req<Awaited<ReturnType<Api['setOshi']>>>(on ? 'POST' : 'DELETE', `/oshi/${userId}`);
   }
+  planetHomeColour(planet: Parameters<Api['planetHomeColour']>[0], colour: string) {
+    return this.req<{ colour: string }>('PUT', `/planet-home/${planet}/colour`, { colour });
+  }
   reportRadio(body: Parameters<Api['reportRadio']>[0]) {
     return this.req<void>('POST', '/venus/report', body);
   }

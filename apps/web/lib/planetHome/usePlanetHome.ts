@@ -28,6 +28,9 @@ export interface PlanetHomeState {
   grooves: StageItem[];
   /** heard to the end: into the grooves (kept on this device) */
   markHeard: (id: string) => void;
+  /** M-R262: your record's colour (Saturn), and changing it */
+  recordColour: string | null;
+  setRecordColour: (c: string) => void;
   /** a short note on screen (a resident's line, 推した …) */
   say: (text: string) => void;
   play: (startId?: string) => void;
@@ -60,6 +63,7 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
   const current = useRef<StageItem | null>(null);
   const switching = useRef(false);
   const [heard, setHeard] = useState<Set<string>>(new Set());
+  const [colour, setColour] = useState<string | null>(null);
 
   // load, then mark the visit (the view keeps the visit before, so what came after it sparkles this time)
   useEffect(() => {
@@ -218,6 +222,11 @@ export function usePlanetHome(planet: HomePlanet, opts: { view?: PlanetHomeView;
     grooves,
     markHeard,
     say: (t) => flash(t),
+    recordColour: colour ?? view?.recordColour ?? null,
+    setRecordColour: (c) => {
+      setColour(c);
+      if (!scripted) void getApi().planetHomeColour(planet, c).catch(() => undefined);
+    },
     play,
     stop,
     playOne,

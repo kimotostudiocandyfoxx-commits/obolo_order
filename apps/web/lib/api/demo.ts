@@ -184,7 +184,7 @@ interface DemoState {
   /** M-R213: works each member chose 〔見えなくする〕 on (`kind:id`) */
   workHides?: Record<string, string[]>;
   /** M-R258: each member's planet homes (last visit, own order) */
-  planetHomes?: Record<string, Record<string, { lastVisitAt: string | null; order?: string[] }>>;
+  planetHomes?: Record<string, Record<string, { lastVisitAt: string | null; order?: string[]; recordColour?: string }>>;
   bluenaKeeps?: Record<string, string[]>;
   /** M-R236: each member's ★ / marks (`kind:id` → …) and their names for the marks */
   itemMarks?: Record<string, Record<string, { stars: number; mark: ItemMarkView['mark'] }>>;
@@ -395,7 +395,7 @@ export class DemoApi implements Api {
     const h = this.s.planetHomes?.[me]?.[planet];
     const f = this.s.follows ?? {};
     const isDachi = (o: string) => ((f[me] ?? []).includes(o) && (f[o] ?? []).includes(me)) || (o === 'demo-inviter' && !!this.s.dachiInviter);
-    const base = { planet, owner: { id: me, name: u?.displayName ?? '' }, lastVisitAt: h?.lastVisitAt ?? null };
+    const base = { planet, owner: { id: me, name: u?.displayName ?? '' }, lastVisitAt: h?.lastVisitAt ?? null, recordColour: h?.recordColour ?? null };
     if (planet !== 'saturn') return { ...base, live: false, young: seesOnlyDachi(u?.birthYear), own: [], around: [], far: [] };
     const hides = new Set(this.s.workHides?.[me] ?? []);
     const posts = this.s.posts.filter((p) => !p.replyToId && !p.room).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -410,7 +410,7 @@ export class DemoApi implements Api {
       p,
     }));
     const r = splitHome(me, cands, u?.birthYear);
-    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: c.p.author.pic ?? null }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
+    const work = (c: (typeof cands)[number], rel: HomeWork['rel']): HomeWork => ({ id: c.id, kind: 'saturn_post', author: { id: c.p.author.id, name: c.p.author.displayName || c.p.author.handle, pic: c.p.author.pic ?? null, chibi: this.s.users[c.p.author.id]?.chibiPic ?? null }, rel, text: c.p.text, url: c.p.voiceUrl, thumbUrl: c.p.photoUrl ?? null, seconds: c.p.voiceDurationSec ?? null, flownAt: c.p.createdAt });
     return {
       ...base,
       live: true,
@@ -420,7 +420,7 @@ export class DemoApi implements Api {
       far: [],
     };
   }
-  private home(planet: HomePlanet, patch: { lastVisitAt?: string | null; order?: string[] }) {
+  private home(planet: HomePlanet, patch: { lastVisitAt?: string | null; order?: string[]; recordColour?: string }) {
     const me = this.uid();
     const all = { ...(this.s.planetHomes?.[me] ?? {}) };
     all[planet] = { ...{ lastVisitAt: null }, ...all[planet], ...patch };
@@ -435,6 +435,10 @@ export class DemoApi implements Api {
   async planetHomeOrder(planet: HomePlanet, ids: string[]) {
     this.home(planet, { order: ids });
     return { ids };
+  }
+  async planetHomeColour(planet: HomePlanet, colour: string) {
+    this.home(planet, { recordColour: colour });
+    return { colour };
   }
   async planetHomeTakeOut(planet: HomePlanet, id: string) {
     const p = planet === 'saturn' ? this.s.posts.find((x) => x.id === id && x.author.id === this.uid()) : undefined;

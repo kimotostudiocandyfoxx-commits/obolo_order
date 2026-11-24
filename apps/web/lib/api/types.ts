@@ -395,6 +395,8 @@ export interface Api {
   setOshi(userId: string, on: boolean): Promise<HomeOshi[]>;
   /** 〔ブルーナにしまう〕 someone else's song (a Mercury post) */
   keepInBluena(postId: string, on: boolean): Promise<{ kept: boolean }>;
+  /** M-R262: your record's colour on a planet home (Saturn) */
+  planetHomeColour(planet: HomePlanet, colour: string): Promise<{ colour: string }>;
   /** Bluena 〔しまった作品〕: your kept works (links) */
   bluenaKept(): Promise<BluenaKeptView[]>;
 }
