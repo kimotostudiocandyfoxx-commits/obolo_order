@@ -9831,6 +9831,51 @@
       ],
       "always": false,
       "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines around everything, sticker-like): a cute super-deformed 2-heads-tall chibi of the character in the FIRST reference picture (same face, hair, black jacket and white shirt), wearing cool round black sunglasses instead of glasses, dancing with arms bent pointing to the sky on one side and hips swung to the other side, singing happily. No wings, no props. Full body, centered, inside the frame with a margin. Plain solid pure white background, no shadow, no text."
+    },
+    {
+      "id": "home3-bg-jupiter-porch",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-jupiter2.jpg"
+      ],
+      "prompt": "A NEW view in exactly the same painterly Japanese anime fantasy film art style, colours and world as the reference picture (do not copy its composition). Vertical phone wallpaper 9:16. The view from the doorstep of the giant tree house, looking out over the mossy forest clearing at a magical festival night: the huge gnarled tree trunk and the edge of its round wooden door frame fill the left edge and bottom-left corner, glowing paper lanterns hang from roots and branches, many fireflies drift, soft moonlight, the amber cloud-banded sky with two small moons glimpsed through the canopy high above. The middle of the picture is open air above the clearing, empty, for a visitor to float in. Cosy, warm, intimate. No characters, no people, no text."
+    },
+    {
+      "id": "home3-bg-mercury-pier",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false,
+      "refs": [
+        "design/mv-art/out/home3-bg-mercury.jpg"
+      ],
+      "prompt": "A NEW view in exactly the same bright summer Japanese anime art style, colours and world as the reference picture (do not copy its composition). Vertical phone wallpaper 9:16. The view from the wooden deck of the little white island house with a red roof, at a summer night: the edge of the red roof eave hangs across the top, a wooden deck railing and a potted palm at the right edge, string lights glowing; a short wooden pier with a lantern stretches forward from the deck into the calm night sea; deep blue starry sky, a big bright moon reflected on the water, colourful fireworks blooming far away over the horizon. Open water at the end of the pier in the middle of the picture for a boat to arrive. Nostalgic, romantic, festive. No boats, no characters, no people, no text."
+    },
+    {
+      "id": "uback",
+      "refs": [
+        "design/home/chibi-ref/user.jpg",
+        "/tmp/mv-bstyle-1.jpg",
+        "/tmp/mv-bstyle-2.jpg",
+        "/tmp/mv-bstyle-3.jpg"
+      ],
+      "w": 1024,
+      "h": 1024,
+      "size": [
+        640,
+        640
+      ],
+      "always": false,
+      "prompt": "In exactly the same art style as the 2nd-4th reference pictures (soft hand-drawn kawaii chibi illustration, gentle watercolour-like colouring, clean dark brown-black outlines, sticker-like): the cute super-deformed chibi of the character in the FIRST reference picture seen FROM BEHIND — the back of the big round head with his black hair, the back of his black jacket, the small body; one hand slightly raised as if waving to someone in front. Upper body and head fill most of the frame. Centered. Plain solid pure white background, no shadow, no text."
     }
   ],
   "redo": []
