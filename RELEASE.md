@@ -9,3 +9,4 @@
 - R5 2026-11-24T06:15Z bd4d80b4 — R5: Eclipse told on Jupiter (月88円, free play stays free), early-join only from settings after day 4, Obolo Order journey card on day 8, deciding-day line (M-R274)
 - R6 2026-11-24T07:18Z 38b0ef3f — R6: start screen without the summary lines, Bati greets with やっほー (no chips), bubble colour through Bati, iPad audio unlock, recording conversion fix, default Fish voice path, Moon chat tabs (Bati | ダチ | ブルーナ)
 - R7 2026-11-24T07:54Z fc3903a4 — R7: Saturn polish (24 anime kororin, chibi2, rings-only sky, pop sound and voices, M-R275/M-R277), Bati speaks in the Moon chat, text in the ダチ talk, default Bati voice (client's voice +2)
+- R8 2026-11-24T08:44Z a1cc1fc3 — R8: Moon chat as a scrolling log, over-the-shoulder Bati chat, KIMORIN always a ダチ, egg Bati placeholder, lookups answered in the talk, no steering, Bluena tab on the Moon (no orbit), one mic stream per page
