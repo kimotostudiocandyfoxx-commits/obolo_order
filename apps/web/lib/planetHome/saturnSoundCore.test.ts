@@ -18,7 +18,13 @@ function fakeContext() {
     destination: node(),
     createOscillator: () => {
       const f = param('freq', 440);
-      const o = { ...node(), type: 'sine', frequency: { ...f, setValueAtTime: (v: number, t: number) => void log.freq.push(['set', v, t]), exponentialRampToValueAtTime: (v: number, t: number) => void log.freq.push(['exp', v, t]) }, start: (at: number) => void log.started.push({ kind: 'osc', at }), stop: () => undefined };
+      const o = {
+        ...node(),
+        type: 'sine',
+        frequency: { ...f, setValueAtTime: (v: number, t: number) => void log.freq.push(['set', v, t]), exponentialRampToValueAtTime: (v: number, t: number) => void log.freq.push(['exp', v, t]) },
+        start: (at: number) => void log.started.push({ kind: 'osc', at }),
+        stop: () => undefined,
+      };
       return o;
     },
     createGain: () => ({ ...node(), gain: param('gain') }),

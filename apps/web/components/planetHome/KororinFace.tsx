@@ -38,7 +38,10 @@ const SHADES: Record<Shades, ReactNode> = {
   ),
   way: (
     <g className={s.shades} data-shades="way">
-      <path d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z" fill={LENS} />
+      <path
+        d="M22 44 h22 a4 4 0 0 1 4 4 v3 a9 9 0 0 1 -9 9 h-6 a11 11 0 0 1 -11 -11 v-1 a4 4 0 0 1 0 -4z M78 44 h-22 a4 4 0 0 0 -4 4 v3 a9 9 0 0 0 9 9 h6 a11 11 0 0 0 11 -11 v-1 a4 4 0 0 0 0 -4z"
+        fill={LENS}
+      />
       {bridge('M46 49 h8')}
       {glint('M27 48 l6 0 M61 48 l6 0')}
     </g>

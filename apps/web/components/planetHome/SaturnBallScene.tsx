@@ -32,6 +32,8 @@ const FOREGROUND = '/planet-home/bg-saturn-fg.webp';
 /** M-R268: the record's front rim in the backdrop (shares of the 1080×1920 picture) — the balls' floor follows its arc */
 const BG = { w: 1080, h: 1920 };
 const RIM = { cx: 0.481, cy: 0.702, rx: 0.574, ry: 0.1885 };
+/** the record's centre label in the backdrop (shares of the picture; the grooves' light turns about it) */
+const LABEL = { x: 0.464, y: 0.645 };
 /** M-R268 club mode: the sunglasses go on after this, and the first ball pops at this */
 const SHADES_MS = 900;
 const FIRST_POP_MS = 2200;
@@ -585,21 +587,51 @@ export function SaturnBallScene({ cfg, view, rolling, playingId, spinning, bpm, 
 
 /** the light streaks in the grooves going round (on the record only: through its mask, seen at its low angle) */
 function GrooveSpin() {
-  return (
-    <div
-      className={s.grooveMask}
-      style={{
-        WebkitMaskImage: `url(${RECORD_MASK})`,
-        maskImage: `url(${RECORD_MASK})`,
-      }}
-      aria-hidden
-      data-testid="groove-spin"
-    >
-      <div className={s.grooveTilt} style={{ left: `${GROOVE.x * 100}%`, top: `${GROOVE.y * 100}%` }}>
-        <div className={s.grooveLight} />
-      </div>
-    </div>
-  );
+  // M-R275 (iPad): drawn on a small canvas (a third of the screen's pixels) — a masked, spinning full-screen layer cost
+  // a frame in two on an iPad-sized screen; this keeps 60 fps
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current;
+    const g = cv?.getContext('2d');
+    if (!cv || !g || typeof g.createConicGradient !== 'function') return;
+    const mask = new Image();
+    mask.src = RECORD_MASK;
+    let raf = 0;
+    const t0 = performance.now();
+    const draw = (now: number) => {
+      raf = requestAnimationFrame(draw);
+      const W = Math.max(1, Math.round(cv.clientWidth / 3));
+      const H = Math.max(1, Math.round(cv.clientHeight / 3));
+      if (cv.width !== W || cv.height !== H) Object.assign(cv, { width: W, height: H });
+      if (!mask.complete || !mask.naturalWidth) return;
+      // the backdrop's cover, centred, bottom-aligned
+      const k = Math.max(W / BG.w, H / BG.h);
+      const dw = BG.w * k;
+      const dh = BG.h * k;
+      const x0 = (W - dw) / 2;
+      const y0 = H - dh;
+      g.globalCompositeOperation = 'source-over';
+      g.clearRect(0, 0, W, H);
+      g.save();
+      g.translate(x0 + LABEL.x * dw, y0 + LABEL.y * dh);
+      g.scale(1, 0.34);
+      const grad = g.createConicGradient((((now - t0) / 2400) % 1) * Math.PI * 2, 0, 0);
+      for (const q of [0, 0.25, 0.5, 0.75]) {
+        const a = q === 0 || q === 0.5 ? 0.28 : 0.2;
+        grad.addColorStop(q, 'rgba(255,255,255,0)');
+        grad.addColorStop(q + 6 / 360, `rgba(255,255,255,${a})`);
+        grad.addColorStop(q + 16 / 360, 'rgba(255,255,255,0)');
+      }
+      g.fillStyle = grad;
+      g.fillRect(-dw, -dh * 3, dw * 2, dh * 6);
+      g.restore();
+      g.globalCompositeOperation = 'destination-in';
+      g.drawImage(mask, x0, y0, dw, dh);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} className={s.grooveCanvas} aria-hidden data-testid="groove-spin" />;
 }
 
 /** reduced motion: the balls sit still in rows on the record; a tap pops one in place (no splash, no flight) */
