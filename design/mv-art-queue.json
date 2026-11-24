@@ -8343,6 +8343,28 @@
         1920
       ],
       "always": false
+    },
+    {
+      "id": "home2-bg-saturn-lowa",
+      "prompt": "Japanese street-pop anime background art: bold thick outlines, flat cel shading, fluorescent pink, lime and orange accents, graffiti sticker and spray-paint textures, energetic hip-hop vibe. Vertical phone wallpaper 9:16. An enormous vinyl DJ record lying flat on red rocky ground, seen from a LOW camera angle of about 15 degrees above the surface, almost at eye level with the record, so the record is strongly foreshortened into a wide flat ellipse that stretches across the whole width of the picture and beyond both side edges. The glossy black record surface with shining concentric grooves fills the lower half of the picture as a wide flat stage. Only part of the colourful centre label is visible. The tonearm is lifted and parked away at the far side, its needle up in the air, NOT touching the record, no microphone on the record surface. A big round play button on the near rim. The upper half: dusk sky with Saturn's huge rings as bold graphic stripes, red rocky horizon with other giant records far away. The record surface is wide, flat and clear, empty, ready for many small round characters to sit on it. No people, no characters, no text, no letters. The centre label is at the left edge.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
+    },
+    {
+      "id": "home2-bg-saturn-lowb",
+      "prompt": "Japanese street-pop anime background art: bold thick outlines, flat cel shading, fluorescent pink, lime and orange accents, graffiti sticker and spray-paint textures, energetic hip-hop vibe. Vertical phone wallpaper 9:16. An enormous vinyl DJ record lying flat on red rocky ground, seen from a LOW camera angle of about 15 degrees above the surface, almost at eye level with the record, so the record is strongly foreshortened into a wide flat ellipse that stretches across the whole width of the picture and beyond both side edges. The glossy black record surface with shining concentric grooves fills the lower half of the picture as a wide flat stage. Only part of the colourful centre label is visible. The tonearm is lifted and parked away at the far side, its needle up in the air, NOT touching the record, no microphone on the record surface. A big round play button on the near rim. The upper half: dusk sky with Saturn's huge rings as bold graphic stripes, red rocky horizon with other giant records far away. The record surface is wide, flat and clear, empty, ready for many small round characters to sit on it. No people, no characters, no text, no letters. The centre label is just behind the middle, far away on the record.",
+      "w": 1152,
+      "h": 2048,
+      "size": [
+        1080,
+        1920
+      ],
+      "always": false
     }
   ],
   "redo": []
